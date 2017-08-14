@@ -24,13 +24,13 @@ def minusI():
     return np.array([1, -1j])/np.sqrt(2)
 
 def sigmaz():
-    return np.array([[1, 0], [0, -1]])
+    return np.array([[1+0.j, 0+0.j], [0+0.j, -1+0.j]])
 
 def sigmax():
-    return np.array([[0, 1], [1, 0]])
+    return np.array([[0+0.j, 1+0.j], [1+0.j, 0+0.j]])
 
 def sigmay():
-    return np.array([[0, -1j], [1j, 0]])
+    return np.array([[0+0.j, 0-1.j], [0+1.j, 0+0.j]])
 
     
     
