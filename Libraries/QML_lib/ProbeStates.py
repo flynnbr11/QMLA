@@ -23,13 +23,28 @@ def choose_probe(oplist,modelpars=None):
     return probe
     
     
+def Hahn_probe(oplist, base_states=None):
+    
+    dim = int(np.log2(oplist.shape[-1]))
+    
+    if base_states is None:
+        base_states = np.repeat(plus(), dim).reshape(dim, 2)
+    
+    for i in range(len(base_states)-1):
+        probe = np.kron(base_states[i], base_states[i+1])
+    
+    return probe
+    
+    
     
 def def_randomprobe(oplist,modelpars=None):
     #TODO: check and decide whether better calculated for each particle or once for the model
     """
     Picks a random probe in the space
     """
-    probe = (np.random.random((1,len(oplist[0])))+1j*np.random.random((1,len(oplist[0]))))[0]
+    a = 2*np.random.random((1,len(oplist[0])))-1
+    b = 2*np.random.random((1,len(oplist[0])))-1
+    probe = (a+1j*b)[0]
     probe /= np.linalg.norm(probe)
     return probe
 

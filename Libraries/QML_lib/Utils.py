@@ -26,6 +26,21 @@ def PossibleOPListCombGen(singoplist):
             newlist.append(newoplist[i][j])    
     
     return(newlist)
+    
+    
+def BuildPossiblePool(qbitlist):
+    newoplist=[]
+    for i in range(1,len(qbitlist)+1):
+        els = ([
+            list(x) for x in itertools.combinations(qbitlist, i)
+        ])
+        newoplist.append(els)
+    newlist=[]
+    for i in range(len(newoplist)):
+        for j in range(len(newoplist[i])):
+            newlist.append(newoplist[i][j])    
+    
+    return(newlist)
 
     
 ## Funciton to evaluate losses ##########################################################
@@ -67,12 +82,16 @@ def OpIndex(lst, dictionary):
     return indices
 
 def ModelNamesPauli(full_lst, dictionary):
-        base_names = list(PauliNames().keys())
-        model_names = []
-        for i in range(len(full_lst)):
-            model_names.append("")
-            indices =  OpIndex(full_lst[i], dictionary)
-            for j in range(len(dictionary)):
-                if len(indices[j])>0:
-                    model_names[i]=base_names[j]+"_"+model_names[i]
-        return model_names   
+    base_names = list(PauliNames().keys())
+    model_names = []
+    for i in range(len(full_lst)):
+        model_names.append("")
+        indices =  OpIndex(full_lst[i], dictionary)
+        for j in range(len(dictionary)):
+            if len(indices[j])>0:
+                model_names[i]=base_names[j]+"_"+model_names[i]
+    return model_names
+        
+        
+## Funciton for fit quality ##########################################################
+    

@@ -74,3 +74,39 @@ def LogL_UpdateCalc(Kmodel, idMod, tpool, Kupdater = None):
     LogLikelihood = np.sum(Kupdater.log_total_likelihood)
     
     return(LogLikelihood)
+    
+
+def getProLst(length):
+    prolst=np.arange(length)
+
+    prooutlst = np.empty(0)
+    for i in range(len(prolst)):
+        for j in range(len(prolst)):
+            if i is not j:
+                prooutlst = np.append(prooutlst, np.array([prolst[i],prolst[j]]) )
+    return(prooutlst)
+    
+    
+def findWinners(modelNames, proBayesFactorsList, threshold =1):
+    proBayesFactorNames=[]
+    for i in range(int(len(prooutlst)/2)):
+        proBayesFactorNames.append("")
+        if proBayesFactorsList[i] > threshold:
+            proBayesFactorNames[-1]= str(modelNames[int(prooutlst[2*i])])
+        elif proBayesFactorsList[i] < 1/threshold:
+            proBayesFactorNames[-1]= str(modelNames[int(prooutlst[2*i+1])])
+            
+    return(proBayesFactorNames)
+    
+    
+def ChampbyTourn(modelNames, collectLogL_single):
+    proBayesFactorsList=[]
+    for i in range(int(len(prooutlst)/2)):
+        proBayesFactorsList.append(bayf.BayesFactorfromLogL(collectLogL_single[int(prooutlst[2*i])], collectLogL_single[int(prooutlst[2*i+1])] ))
+    
+    proBayesFactorNames = findWinners(modelNames, proBayesFactorsList)
+    
+    wincount = np.array(list((map(lambda testmodel: proBayesFactorNames.count(testmodel), modelNames))))
+    winner = modelNames[np.argmax(wincount)]
+    
+    return(winner)

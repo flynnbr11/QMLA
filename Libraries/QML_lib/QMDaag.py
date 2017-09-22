@@ -1,17 +1,18 @@
 import numpy as np
 import scipy as sp
 from Utils import *
-from QML import *
+from QMLaag import *
 from Distrib import *
 from BayesF import *
+from EvalLoss import *
 import time as time
 import Evo as evo
 import ProbeStates as pros
-import GenSimQMD_IQLE as gsi
+import GenSimQMD as gsi
 import multiPGH as mpgh
 
 class ModelsDevelopmentClass():
-    def __init__(self, maxmodnum=3, singoplist=[evo.sigmax(),evo.sigmay(), evo.sigmaz()] ,trotterize=True,gaussian=False):
+    def __init__(self, maxmodnum=3, singoplist=[evo.sigmax(),evo.sigmay(), evo.sigmaz()], checkloss=False, trotter=True, gaussian=False, IQLE=True ):
         
         self.MaxModNum = maxmodnum
         self.ModelsList=[None]*self.MaxModNum
@@ -31,10 +32,11 @@ class ModelsDevelopmentClass():
         self.BayesFactorsList=[]
         self.BayesFactorDictionary=[]
         self.BayesFactorNames=[]        
-        
-        self.gaussian=gaussian
     
-
+        self.checkloss=checkloss
+        self.trotter=trotter
+        self.gaussian=gaussian
+        self.IQLE=IQLE
 
 
 
@@ -127,20 +129,24 @@ class ModelsDevelopmentClass():
     # def InitiliaseAllModels(self,inputpartnum=400):
     def InitialiseAllActiveModels(self,inputpartnum=400):
         self.PartNum=inputpartnum
+        del_list=[]
+        
         start=time.clock()
         for i in range(self.MaxModNum):
-            self.ModelsList[i].InitialiseNewModel(trueoplist=self.TrueOpList, modeltrueparams=self.TrueParamsList,simoplist=self.AvailableModsOpList[i],simparams=np.array([self.ModsParamsList[i]]), numparticles=self.PartNum, gaussian=self.gaussian)
+            self.ModelsList[i].InitialiseNewModel(trueoplist=self.TrueOpList, modeltrueparams=self.TrueParamsList,simoplist=self.AvailableModsOpList[i],simparams=np.array([self.ModsParamsList[i]]), numparticles=self.PartNum, checkloss=self.checkloss, trotter=self.trotter, gaussian=self.gaussian, IQLE=self.IQLE)
             # CHANGE ME
             self.ModsOpList.append(self.AvailableModsOpList[i])
+            del_list.append(i)
             
+        del_list.reverse()
         
-        for i in range(self.MaxModNum):
+        for i in del_list:
             del(self.AvailableModsOpList[i])
             del(self.ModsParamsList[i])    
         
 
         """CHANGE ME"""
-        self.ModelNames = ModelNamesPauli(self.ModsOpList, PauliNames())
+        self.ModelNames = ModelNamesPauli(self.AvailableModsOpList, PauliNames())
         self.ModelDict ={key:value for key, value in zip(self.ModelNames, self.ModsOpList)}
         
         end=time.clock()
@@ -168,7 +174,7 @@ class ModelsDevelopmentClass():
             
         for i in range(len(self.ModelsList)):
             start=time.clock()
-            self.ModelsList[i].UpdateModel(n_experiments=expnum,sigma_threshold=sigma_threshold)
+            self.ModelsList[i].UpdateModel(n_experiments=expnum,sigma_threshold=sigma_threshold,checkloss=self.checkloss)
             
             end=time.clock()
             # #print('True model was: '+ str(self.TrueOpList)) 
