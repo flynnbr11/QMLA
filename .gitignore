@@ -6,6 +6,17 @@ __pycache__/
 # C extensions
 *.so
 
+# Unwanted large files/plots/compiled python
+*.pyc
+*.pdf
+*.png
+*.jpg
+*.csv
+*.dat
+*.pptx
+
+
+
 # Distribution / packaging
 .Python
 build/
