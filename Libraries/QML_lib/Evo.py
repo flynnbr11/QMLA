@@ -2,7 +2,12 @@ import qinfer as qi
 import numpy as np
 import scipy as sp
 
-
+try: 
+    import hamiltonian_exponentiation as h
+    ham_exp_installed = True
+except:
+    ham_exp_installed = False
+     
 ## Generic states and Pauli matrices ##########################################################
 
 def plus():
@@ -32,7 +37,8 @@ def sigmax():
 def sigmay():
     return np.array([[0+0.j, 0-1.j], [0+1.j, 0+0.j]])
 
-    
+def paulilist():
+    return [sigmax(), sigmay(), sigmaz()]
     
     
 ## Functions for evolution ##########################################################
@@ -65,11 +71,12 @@ def pr0fromScipy(tvec, dw, oplist, probestate):
 
 
 
-def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=True):
+def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=True, use_exp_ham=ham_exp_installed):
     """Generic version to be adopted in case oplist includes non-commutative operators"""
-    
+#    use_exp_ham = True
+#    print("pr0fromScipyNC using exp_ham: ", use_exp_ham)
+    print_exp_ham=True
     evo = np.empty([len(modpar), len(tvec)])
-    
     #dimension check
     if len(np.shape(oplist)) != 3:
         raise IndexError('OperatorList has the wrong shape')
@@ -97,14 +104,21 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
         for idt in range(len(tvec)):
             
             if trotterize is False:
-                backstate = np.dot(sp.linalg.expm((1j)*tvec[idt]*Hm), probestate)
-                evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*Hp), backstate)
+                if use_exp_ham:
+                  backstate = np.dot(h.exp_ham(Hm, tvec[idt], plus_or_minus=1.0, print_method=print_exp_ham), probestate)
+                  evostate = np.dot(h.exp_ham(Hp, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), backstate)
+                else: 
+                  backstate = np.dot(sp.linalg.expm((1j)*tvec[idt]*Hm), probestate)
+                  evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*Hp), backstate)
                 #print('Evostate: ', evostate)
                 
             else:
                 # print('trotter')
-                evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*(Hp-Hm)), probestate)
-        
+                if use_exp_ham:
+                  evostate = np.dot(h.exp_ham(Hp-Hm, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), probestate)
+                else: 
+                  evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*(Hp-Hm)), probestate)
+
             evo[evoidx][idt] = np.abs(np.dot(evostate.conj(), probestate.T)) ** 2         
     
     return evo
