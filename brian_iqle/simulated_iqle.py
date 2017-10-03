@@ -8,7 +8,7 @@ import importlib as imp
 import time as time
 import matplotlib.pyplot as plt
 
-sys.path.append(os.path.join("..", "..", "Libraries","QML_lib"))
+sys.path.append(os.path.join("..", "Libraries","QML_lib"))
 from Evo import *
 from ProbeStates import *
 from Norms import *
@@ -219,7 +219,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
 
 n_particles = 1200
 n_experiments = 200
-num_tests = 30
+num_tests = 3
 n_params = 1
 
 param_1 = 0.65
@@ -297,8 +297,7 @@ for a in range(num_tests):
   track_time = np.empty(n_experiments)
 
   track_particle_locs = np.empty([n_particles, len(true_params[0]), n_experiments])
-  track_particle_wght = np.empty([n_ps
-  articles, n_experiments])
+  track_particle_wght = np.empty([n_particles, n_experiments])
 
   if global_use_exp_ham == True: 
     exp_method = 'custom'

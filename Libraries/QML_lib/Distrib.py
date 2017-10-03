@@ -12,6 +12,19 @@ def MultiVariateUniformDistribution(NumMulti, DistroLimits=np.array([[-0.5,1.5]]
     OutputDistribution = qi.ProductDistribution(DistroList)
     return(OutputDistribution)
 
+
+def MultiVariateNormalDistributionNocov(NumMulti, mean=None, sigmas=None):
+    if mean is None:
+        mean = np.repeat(0.5, NumMulti)
+    if sigmas is None:
+        sigmas = np.array([np.repeat(0.15, len(truelist))])
+    cov_matrix = np.diag(sigmas[0]**2)
+    OutputDistribution = qi.MultivariateNormalDistribution(mean, cov_matrix)
+    return(OutputDistribution)
+
+# Replaced the below version of MultiVariateNormalDistributionNocov with the above; not sure which is more recent.
+
+"""
 def MultiVariateNormalDistributionNocov(NumMulti, mean=None, sigmas=None):
     if mean is None:
         mean = np.repeat(0.5, NumMulti)
@@ -20,4 +33,4 @@ def MultiVariateNormalDistributionNocov(NumMulti, mean=None, sigmas=None):
     cov_matrix = np.diag(sigmas**2)
     OutputDistribution = qi.MultivariateNormalDistribution(mean, cov_matrix)
     return(OutputDistribution)
-    
+"""    
