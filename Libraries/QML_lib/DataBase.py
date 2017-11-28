@@ -59,7 +59,7 @@ import Evo as evo
 from QML import *
 
 global paulis_list
-paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
+paulis_list = {'i' : evo.identity(), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
 
 
 
@@ -578,10 +578,9 @@ def launch_db(RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=
         for j in range(op.num_constituents):
             sim_ops.append(normal_dist.sample()[0,0])
 #            sim_ops[i].append(normal_dist.sample())
-        constituent_list = op.constituents_operators
         sim_ops = [sim_ops]
-        qml_inst.InitialiseNewModel(
 
+        qml_inst.InitialiseNewModel(
 #          trueoplist = true_operator_list,
 #          modeltrueparams = true_param_list,
           trueoplist = true_ops,
@@ -677,6 +676,7 @@ def add_model(model_name, running_database, model_lists, epoch=0, true_ops=[], t
         # add model_db_new_row to model_db and running_database
         # Note: do NOT use pd.df.append() as this copies total DB,
         # appends and returns copy.
+
         qml_instance.InitialiseNewModel(
 #          trueoplist = true_operator_list,
 #          modeltrueparams = true_param_list,
@@ -778,7 +778,7 @@ def move_to_legacy(db, legacy_db, name):
     legacy_db = legacy_db
     num_rows = len(legacy_db)
     model_instance = get_qml_instance(db, name)
-    print("Model instance : ", model_instance, " for model ", name)
+    print("Model instance ", name, " moved to legacy db")
     new_row = pd.Series({
         '<Name>' : name, 
         'Param_Est_Final' : model_instance.FinalParams,

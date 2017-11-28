@@ -6,6 +6,9 @@ import warnings
 from Evo import *
 from ProbeStates import *
 
+global debug_print
+debug_print = False
+
 class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     r"""
     Describes the free evolution of a single qubit prepared in the
@@ -38,6 +41,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._probelist = probelist
         self._trotter = trotter
         
+        self._modelparams = modelparams
         self._true_oplist = true_oplist
         self._trueparams = trueparams
         
@@ -48,10 +52,15 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             warnings.warn("\nI am assuming the Model and System Hamiltonians to be the same", UserWarning)
             self._trueHam = None
         else:
-#            self._trueHam = getH(trueparams, true_oplist)
+#           self._trueHam = getH(trueparams, true_oplist)
 #TODO: changing to try get update working for >1 qubit systems -Brian
             self._trueHam = np.tensordot(trueparams, true_oplist, axes=1)
-            
+        if debug_print: print("Gen sim. True ham has been set as : ")
+        if debug_print: print(self._trueHam)
+        
+        if debug_print:print("True params & true_oplist: [which are passed to getH] ")
+        if debug_print:print(trueparams)
+        if debug_print:print(true_oplist)
         super(GenSimQMD_IQLE, self).__init__(self._oplist)
         #probestate = choose_randomprobe(self._probelist)
         probestate = def_randomprobe(oplist,modelpars=None)
@@ -186,6 +195,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         """ Various evolution solvers are listed here: """
         
         if (self._solver == 'scipy'):
+            if debug_print: print("In GenSimQMD. Solver = ", self._solver)
+            if debug_print: print("trueHam : ")
+            if debug_print: print(self._trueHam)
             #only for models made by single or commutative operators
             #pr0[:, :] = pr0fromScipy(t, dw, self._oplist, probestate)
             #for all other models

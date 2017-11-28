@@ -21,6 +21,9 @@ import SETTINGS
 
 ## Generic states and Pauli matrices ##########################################################
 
+global debug_print
+debug_print = False
+
 def plus():
     return np.array([1, 1])/np.sqrt(2)
 
@@ -47,6 +50,10 @@ def sigmax():
 
 def sigmay():
     return np.array([[0+0.j, 0-1.j], [0+1.j, 0+0.j]])
+
+def identity():
+    return np.array([[1+0.j, 0+0.j], [0+0.j, 1+0.j]])
+
 
 def paulilst():
     return [sigmax(), sigmay(), sigmaz()]
@@ -113,6 +120,10 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
     #evolution for the system experimental parameters
     if IQLE is True:
         Hm = getH(exppar, oplist)
+#        Hm = np.tensordot(exppar, oplist, axes=1) #TODO -- checking if this can fix an error -Brian
+        if debug_print: print("in pr0fromScipyNC, Hm = ")
+        if debug_print: print(Hm) 
+      
     else:
         Hm = None
     #print(Hm)
@@ -153,10 +164,16 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
                     # 0th order Trotterization for the evolution
                     if use_exp_ham:
                         #print("Using Exp ham custom")
+                        if debug_print: print("Before exponentiation, Hm & Hp : ")
+                        if debug_print: print(Hm)
+                        if debug_print: print(Hp)
+                        if debug_print: print("Giving ")
+                        if debug_print: print(Hp-Hm)
+                        
                         evostate = np.dot(h.exp_ham(Hp-Hm, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), probestate)
                     else:
                         evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*(Hp-Hm)), probestate)
-                #print('Evostate: ', evostate)
+                #if debug_print: print('Evostate: ', evostate)
         
             evo[evoidx][idt] = np.abs(np.dot(evostate.conj(), probestate.T)) ** 2         
     
@@ -182,7 +199,7 @@ def pr0fromScipyNCpp(tvec, modpar, exppar, oplist, probestate, Hp = None, trotte
 
     #evolution for the system experimental parameters
     Hm = getH(exppar, oplist)
-    #print(Hm)
+    #if debug_print: print(Hm)
    
     if Hp is None or len(modpar)>1:
         trueEvo = False		# call the system with the tested Hamiltonian (or the simulator Hamiltonian for particles)
@@ -195,7 +212,7 @@ def pr0fromScipyNCpp(tvec, modpar, exppar, oplist, probestate, Hp = None, trotte
         #evolution for the system and particles in the simulator, assuming trueHam = simHam
         if not trueEvo:
             Hp = getH(modpar[evoidx, np.newaxis], oplist)
-        #print(Hp)
+        #if debug_print: print(Hp)
         
         for idt in range(len(tvec)):
             
@@ -237,7 +254,7 @@ def pr0fromHahnPeak(tvec, modpar, exppar, oplist, probestate, Hp = None, trotter
         Hm = getH(exppar, oplist)
     else:
         Hm = None
-    #print(Hm)
+    #if debug_print: print(Hm)
    
     if Hp is None or len(modpar)>1:
         trueEvo = False		# call the system with the tested Hamiltonian (or the simulator Hamiltonian for particles)
@@ -250,7 +267,7 @@ def pr0fromHahnPeak(tvec, modpar, exppar, oplist, probestate, Hp = None, trotter
         #evolution for the system and particles in the simulator, assuming trueHam = simHam
         if not trueEvo:
             Hp = getH(modpar[evoidx, np.newaxis], oplist)
-        #print(Hp)
+        #if debug_print: print(Hp)
         
         
         for idt in range(len(tvec)):
