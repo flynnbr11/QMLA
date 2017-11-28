@@ -1,13 +1,24 @@
 import qinfer as qi
 import numpy as np
 import scipy as sp
+#import qutip as qt
+import sys as sys
+import os as os
 
 try: 
     import hamiltonian_exponentiation as h
+    # TODO set to true after testing
     ham_exp_installed = True
+    
 except:
     ham_exp_installed = False
-     
+    
+    
+import IOfuncts as mIO 
+
+sys.path.append((os.path.join("..")))
+import SETTINGS
+
 ## Generic states and Pauli matrices ##########################################################
 
 def plus():
@@ -37,6 +48,11 @@ def sigmax():
 def sigmay():
     return np.array([[0+0.j, 0-1.j], [0+1.j, 0+0.j]])
 
+def paulilst():
+    return [sigmax(), sigmay(), sigmaz()]
+    
+    """!!!!!!!!!!! Defined twice in different ways among me & Brian, argh XD
+    we might want to unify at some point here - AAG"""
 def paulilist():
     return [sigmax(), sigmay(), sigmaz()]
     
@@ -46,6 +62,9 @@ def paulilist():
 def getH(_pars, _ops):
     #return np.sum(pars*ops, axis=0)
     return (np.tensordot(_pars, _ops, axes=1))[0]
+
+# TODO: I changed this to give back total array, not just 0th element -- is that a problem? -Brian
+#    return (np.tensordot(_pars, _ops, axes=1))
 
 def pr0fromScipy(tvec, dw, oplist, probestate):
     """Version to be adopted only if operators in oplist commute"""
@@ -71,21 +90,31 @@ def pr0fromScipy(tvec, dw, oplist, probestate):
 
 
 
-def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=True, use_exp_ham=ham_exp_installed):
+def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=True, IQLE=True, use_exp_ham=ham_exp_installed):
     """Generic version to be adopted in case oplist includes non-commutative operators"""
-#    use_exp_ham = True
-#    print("pr0fromScipyNC using exp_ham: ", use_exp_ham)
-    print_exp_ham=True
+    
+    print_exp_ham=False
+    #    print("pr0fromScipyNC using exp_ham: ", use_exp_ham)
+    
     evo = np.empty([len(modpar), len(tvec)])
+
+    
     #dimension check
     if len(np.shape(oplist)) != 3:
         raise IndexError('OperatorList has the wrong shape')
     
     if not(all(np.shape(modpar)[1] == np.repeat(np.shape(oplist)[0], len(modpar)))):
+        print("modpar has shape", np.shape(modpar))
+        print(modpar)
+        print("ops has shape ", np.shape(oplist))
+        print(oplist)
         raise AttributeError('Shapes of OperatorList and Parameters do not match')
 
     #evolution for the system experimental parameters
-    Hm = getH(exppar, oplist)
+    if IQLE is True:
+        Hm = getH(exppar, oplist)
+    else:
+        Hm = None
     #print(Hm)
    
     if Hp is None or len(modpar)>1:
@@ -95,30 +124,40 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
         trueEvo = True		# call the system with the "true" Hamiltonian
         #print("Calling the true Hamiltonian")
     
-    for evoidx in range(len(modpar)):
+    for evoidx in range(len(modpar)):    
         #evolution for the system and particles in the simulator, assuming trueHam = simHam
         if not trueEvo:
             Hp = getH(modpar[evoidx, np.newaxis], oplist)
-        #print(Hp)
+#            Hp = np.tensordot(modpar[evoidx, np.newaxis], oplist, axes=1)
         
         for idt in range(len(tvec)):
             
-            if trotterize is False:
+            # QLE evolution
+            if Hm is None:
                 if use_exp_ham:
-                  backstate = np.dot(h.exp_ham(Hm, tvec[idt], plus_or_minus=1.0, print_method=print_exp_ham), probestate)
-                  evostate = np.dot(h.exp_ham(Hp, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), backstate)
-                else: 
-                  backstate = np.dot(sp.linalg.expm((1j)*tvec[idt]*Hm), probestate)
-                  evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*Hp), backstate)
-                #print('Evostate: ', evostate)
-                
+                #TODO should exp_ham be used here?
+                    evostate = np.dot(h.exp_ham(Hp, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), backstate)
+                else:
+                    evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*Hp), probestate)
+            
+            # IQLE evolution
             else:
-                # print('trotter')
-                if use_exp_ham:
-                  evostate = np.dot(h.exp_ham(Hp-Hm, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), probestate)
-                else: 
-                  evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*(Hp-Hm)), probestate)
-
+                if trotterize is False:
+                    if use_exp_ham:
+                        backstate = np.dot(h.exp_ham(Hm, tvec[idt], plus_or_minus=1.0, print_method=print_exp_ham), probestate)
+                        evostate = np.dot(h.exp_ham(Hp, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), backstate)
+                    else:
+                        backstate = np.dot(sp.linalg.expm((1j)*tvec[idt]*Hm), probestate)
+                        evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*Hp), backstate)
+                else:
+                    # 0th order Trotterization for the evolution
+                    if use_exp_ham:
+                        #print("Using Exp ham custom")
+                        evostate = np.dot(h.exp_ham(Hp-Hm, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), probestate)
+                    else:
+                        evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*(Hp-Hm)), probestate)
+                #print('Evostate: ', evostate)
+        
             evo[evoidx][idt] = np.abs(np.dot(evostate.conj(), probestate.T)) ** 2         
     
     return evo
@@ -175,8 +214,9 @@ def pr0fromScipyNCpp(tvec, modpar, exppar, oplist, probestate, Hp = None, trotte
         return (evo[0][0])
     else:
         return evo
+        
+        
 
-    
 def pr0fromHahnPeak(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=True, IQLE=True):
     """Version dedicated to obtain likelihoods from Hahn-echo peak (i.e. tau != tau') experiments"""
     

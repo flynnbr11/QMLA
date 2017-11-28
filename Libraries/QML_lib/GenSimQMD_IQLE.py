@@ -38,6 +38,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._probelist = probelist
         self._trotter = trotter
         
+        self._true_oplist = true_oplist
+        self._trueparams = trueparams
+        
         self._min_freq = min_freq
         if true_oplist is not None and trueparams is None:
             raise(ValueError('\nA system Hamiltonian with unknown parameters was requested'))
@@ -45,7 +48,12 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             warnings.warn("\nI am assuming the Model and System Hamiltonians to be the same", UserWarning)
             self._trueHam = None
         else:
-            self._trueHam = getH(trueparams, true_oplist)
+#            self._trueHam = getH(trueparams, true_oplist)
+#TODO: changing to try get update working for >1 qubit systems -Brian
+            self._trueHam = np.tensordot(trueparams, true_oplist, axes=1)
+            
+        print("Gen sim IQLE has true Hamiltonian : ")
+        print(self._trueHam)
         super(GenSimQMD_IQLE, self).__init__(self._oplist)
         #probestate = choose_randomprobe(self._probelist)
         probestate = def_randomprobe(oplist,modelpars=None)

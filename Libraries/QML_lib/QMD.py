@@ -11,7 +11,9 @@ import GenSimQMD_IQLE as gsi
 import multiPGH as mpgh
 
 class ModelsDevelopmentClass():
-    def __init__(self, maxmodnum=3, singoplist=[evo.sigmax(),evo.sigmay(), evo.sigmaz()] ,trotterize=True,gaussian=False):
+    def __init__(self, maxmodnum=3, singoplist=[evo.sigmax(),evo.sigmay(), evo.sigmaz()], trotterize=True,gaussian=False):
+        
+        #Needs to be recast using the database
         
         self.MaxModNum = maxmodnum
         self.ModelsList=[None]*self.MaxModNum
@@ -20,14 +22,11 @@ class ModelsDevelopmentClass():
         self.BayesFactorDictionary=[]
         self.BayesFactorNames=[]        
         self.gaussian=gaussian
-    
-
-
-
-
-        #generate a list of all the possible lists of operators used in models
-        self.AllOpListsList = PossibleOPListCombGen(singoplist)
         
+        self.tpool=np.array([])
+    
+        #generate a list of all the possible lists of operators used myModelsListin models
+        self.AllOpListsList = PossibleOPListCombGen(singoplist)
         
         #generate a Random truemodel
         
@@ -179,7 +178,11 @@ class ModelsDevelopmentClass():
     
     
     
-    def UpdatePairModelLogLikelihoods(self, Model1Position, Model2Position, tpool):
+    #At the moment LokLikelihoods will be computed using all the available data
+    #option 1 loglikelihood from data of models you are comparing (2)
+    #option 2 loglikelihood from data of all the models (active, or same tree, or active with same dimensionality)
+    
+    def UpdateAllLogLikelihoods(self, Model1Position, Model2Position, tpool):
     	self.ModelsList[Model1Position].KLogTotLikelihood = LogL_UpdateCalc(self.ModelsList[Model1Position], Model1Position, tpool)
     	self.ModelsList[Model2Position].KLogTotLikelihood = LogL_UpdateCalc(self.ModelsList[Model2Position], Model2Position, tpool)    
     	print('LogTotLikelihoods updated')    
@@ -188,16 +191,29 @@ class ModelsDevelopmentClass():
   
     
     # Create a list (tpool) containing the evolution times of all the models considered in the ModelsList
-    def DataPool(self, stepnum):
+    def DataPool(self, db, stepnum): # TODO: check this only runs for active models
+        #list of models which have status==active
+        myModelsList = list(db.loc[db["Status"] == 'Ready']["Model_Class_Instance"])
         
-        tpool = np.empty([len(self.ModelsList), stepnum])
-        #dpool = np.empty([len(self.ModelsList), stepnum, len(self.TrueHam) ])
-        for i in range(len(self.ModelsList)):
-            tpool[i,:] = self.ModelsList[i].TrackTime[-stepnum-1:-1]
-            #dpool[i,:,0] = self.ModelsList[i].TrackTime[-stepnum:-1]
-        #tpool = tpool.reshape(np.product(tpool.shape))
-        return tpool
-        #return([tpool, dpool])
+        tpool = np.empty([len(myModelsList), stepnum])
+        for i in range(len(myModelsList)):
+            tpool[i,:] = myModelsList[i].TrackTime[-stepnum-1:-1]
+
+        tpool = tpool.flatten()
+        binbounds = np.histogram(tpool, 2)[1]
+
+        for i in range(len(binbounds)-1):
+            lowers = tpool > binbounds[i]
+            highers = tpool < binbounds[i+1]
+            candidates = np.logical_and(lowers, highers) 
+            candidates = tpool[candidates]
+            print(candidates)
+
+            tpool = np.append(tpool, candidates[int(len(candidates)*np.random.rand(1))])
+            
+        self.tpool = np.array(newtpool)
+
+        return self.tpool
     
         
     def ComputeAllBayesFactors(self, fromLogL = True):

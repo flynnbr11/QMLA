@@ -30,6 +30,32 @@ def BayesFactorfromLogL(LogLikelihood1, LogLikelihood2):
     
     
     
+def KLogLikelihoodBwModels(Kmodel, mytpool):
+    
+    Kupdater = Kmodel.Updater
+    """This can be adopted alternatively to sample the frequencies"""
+    #myexperiments = np.array(list(map(lambda x: Kmodel.Heuristic(), range(len(tpool))) ) )
+    
+    myexperiments = np.empty((len(mytpool), ), dtype=Kmodel.GenSimModel.expparams_dtype)       #initialises the experiments to perform for the update
+    
+    myexperiments['t']  = mytpool
+    
+    inv_field = [item[0] for item in Kmodel.GenSimModel.expparams_dtype[1:] ]
+    for i in range(len(inv_field)):
+        myexperiments[inv_field[i]] = Kmodel.NewEval[i]
+    
+    mysimparams = Kmodel.SimParams
+    
+    mydata = Kmodel.GenSimModel.simulate_experiment(Kmodel.SimParams, myexperiments)[0][0]
+    Kupdater.batch_update(mydata, myexperiments, resample_interval=100)
+    
+    LogLikelihood = np.sum(Kupdater.log_total_likelihood)
+    
+    return(LogLikelihood)
+    
+    
+    
+    
     
 #  It calculates the likelihoods of one model with the experiments of all the others, including in tpool, which is the list of all the experiments you want to consider
 #  tpool list of the time evolutions used in the models you want to confront to. It can be optained using the function DataPool or DataPairPool in the QMD class  
