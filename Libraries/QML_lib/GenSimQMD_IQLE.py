@@ -52,8 +52,6 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
 #TODO: changing to try get update working for >1 qubit systems -Brian
             self._trueHam = np.tensordot(trueparams, true_oplist, axes=1)
             
-        print("Gen sim IQLE has true Hamiltonian : ")
-        print(self._trueHam)
         super(GenSimQMD_IQLE, self).__init__(self._oplist)
         #probestate = choose_randomprobe(self._probelist)
         probestate = def_randomprobe(oplist,modelpars=None)

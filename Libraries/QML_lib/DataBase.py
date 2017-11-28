@@ -527,7 +527,6 @@ true_operator_list = np.array([evo.sigmax(), evo.sigmay()])
 
 #xtx = operator('xTx')
 ytz = operator('yTz')
-
 true_operator_list = np.array([ ytz.matrix] )
 
 
@@ -747,6 +746,8 @@ def consider_new_model(model_lists, name, db):
     n_qub = get_num_qubits(name)
     if al_name in model_lists[n_qub]:
         location = get_location_by_alph_name(db, al_name)
+        if location is None: 
+          return "Legacy database"
         return location
     else: 
         return 'New'
