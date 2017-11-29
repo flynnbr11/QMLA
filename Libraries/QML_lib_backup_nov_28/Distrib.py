@@ -16,7 +16,7 @@ def MultiVariateNormalDistributionNocov(NumMulti, mean=None, sigmas=None):
     if mean is None:
         mean = np.repeat(0.5, NumMulti)
     if sigmas is None:
-        sigmas = np.repeat(0.25, NumMulti)
+        sigmas = np.repeat(0.15, NumMulti)
     cov_matrix = np.diag(sigmas**2)
     OutputDistribution = qi.MultivariateNormalDistribution(mean, cov_matrix)
     return(OutputDistribution)

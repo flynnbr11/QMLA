@@ -54,6 +54,7 @@ import pandas as pd
 import warnings
 import hashlib
 
+from __future__ import print_function # so print doesn't show brackets
 
 import Evo as evo
 from QML import *
@@ -609,6 +610,7 @@ def launch_db(RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=
         'Status' : [], #TODO can get rid?
         'Selected' : [], #TODO what's this for?
         'TreeID' : [], # TODO proper tree id's,
+        'BayesSum' : [],
         #'Param_Estimates' : sim_ops,
         #'Estimates_Dist_Width' : [normal_dist_width for gen in generators],
         'Model_Class_Instance' : [],
@@ -635,7 +637,7 @@ def launch_db(RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, epoch=0, true_ops=[], true_params=[] ):
+def add_model(model_name, running_database, model_lists, treeID=0, epoch=0, true_ops=[], true_params=[] ):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 
@@ -695,7 +697,8 @@ def add_model(model_name, running_database, model_lists, epoch=0, true_ops=[], t
             'Alph_Name' : op.alph_name,
             'Status' : 'Ready', 
             'Selected' : False, 
-            'TreeID' : 0, #TODO make argument of add_model fnc,
+            'TreeID' : treeID, #TODO make argument of add_model fnc,
+            'BayesSum' : 0,
             'Param_Estimates' : sim_pars,
             'Estimates_Dist_Width' : normal_dist_width,
             'Model_Class_Instance' : qml_instance,
@@ -787,3 +790,27 @@ def move_to_legacy(db, legacy_db, name):
     })
 
     legacy_db.loc[num_rows] = new_row         
+    
+    
+    
+    
+def update_field(db, name, field, new_value=None, increment=None):
+    idx = get_location(db, name)
+    if idx is not None: 
+      if new_value is not None:
+          db.loc[idx, field] = new_value
+      elif increment is not None:
+          db.loc[idx, field] = db.loc[idx, field]+ 1
+      else: 
+          print("Must pass new_value or increment")    
+    else: 
+      print("Cannot update field -- model does not exist in database.")
+        
+        
+def pull_field(db, name, field):
+    idx = get_location(db, name)
+    if idx is not None:
+        return db.loc[idx,field]
+    else: 
+      print("Cannot update field -- model does not exist in database.")
+    
