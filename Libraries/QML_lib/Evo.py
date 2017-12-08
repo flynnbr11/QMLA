@@ -1,3 +1,4 @@
+from __future__ import print_function # so print doesn't show brackets
 import qinfer as qi
 import numpy as np
 import scipy as sp
@@ -121,7 +122,7 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
     if IQLE is True:
         Hm = getH(exppar, oplist)
 #        Hm = np.tensordot(exppar, oplist, axes=1) #TODO -- checking if this can fix an error -Brian
-        if debug_print: print("in pr0fromScipyNC, Hm = ")
+        if debug_print: print("in pr0fromScipyNC, within IQLE TRUE Hm = ")
         if debug_print: print(Hm) 
       
     else:
@@ -130,16 +131,14 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
    
     if Hp is None or len(modpar)>1:
         trueEvo = False		# call the system with the tested Hamiltonian (or the simulator Hamiltonian for particles)
-        #print("Calling the false Hamiltonian")
     else:
         trueEvo = True		# call the system with the "true" Hamiltonian
-        #print("Calling the true Hamiltonian")
     
     for evoidx in range(len(modpar)):    
         #evolution for the system and particles in the simulator, assuming trueHam = simHam
         if not trueEvo:
             Hp = getH(modpar[evoidx, np.newaxis], oplist)
-#            Hp = np.tensordot(modpar[evoidx, np.newaxis], oplist, axes=1)
+            #Hp = np.tensordot(modpar[evoidx, np.newaxis], oplist, axes=1)
         
         for idt in range(len(tvec)):
             
@@ -164,13 +163,18 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
                     # 0th order Trotterization for the evolution
                     if use_exp_ham:
                         #print("Using Exp ham custom")
+                        HpMinusHm = Hp - Hm
+    
                         if debug_print: print("Before exponentiation, Hm & Hp : ")
                         if debug_print: print(Hm)
                         if debug_print: print(Hp)
-                        if debug_print: print("Giving ")
+                        if debug_print: print("Giving mtx of shape ", np.shape(HpMinusHm))
                         if debug_print: print(Hp-Hm)
-                        
-                        evostate = np.dot(h.exp_ham(Hp-Hm, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), probestate)
+                        if debug_print: print("t= ", tvec[idt])
+
+                        # TODO HpMinusHm has np.shape (1,2,2) --  should be (2,2) for passing to exp_ham
+                        unitary = h.exp_ham(HpMinusHm, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham)
+                        evostate = np.dot(unitary, probestate)
                     else:
                         evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*(Hp-Hm)), probestate)
                 #if debug_print: print('Evostate: ', evostate)

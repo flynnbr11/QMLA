@@ -87,7 +87,8 @@ def AdjustDimSingOP(singop, dim, qbit_s):
         if i in qbit_s:
             myop = singop
         else:
-            myop = np.eye(2)
+#            myop = np.eye(2)
+            myop = evo.identity()
         if i == 0:
             newop = myop
         else:

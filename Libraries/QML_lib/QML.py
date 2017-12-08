@@ -34,15 +34,15 @@ class ModelLearningClass():
     
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
     
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, resample_thresh=0.5,checkloss=False,gaussian=False):
+    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5,checkloss=False,gaussian=False):
         
         self.TrueOpList = np.asarray(trueoplist)
         self.TrueParams = np.asarray(modeltrueparams)
         self.SimOpList  = np.asarray(simoplist)
         self.SimParams = np.asarray(simparams)
-        self.NumParticles = numparticles
+        self.NumParticles = numparticles # function to adapt by dimension
         self.ResamplerTresh = resample_thresh
-        
+        self.ModelID = int(modelID)
         #self.TrueHam = evo.getH(self.TrueParams, self.TrueOpList) # This is the Hamiltonian for the time evolution in the system
 #         self.Prior = MultiVariateUniformDistribution(len(self.OpList))
         if gaussian:
@@ -68,6 +68,7 @@ class ModelLearningClass():
         # self.ProbeList = np.array([evo.zero()])
         
         self.ProbeList = list(map(lambda x: pros.def_randomprobe(self.TrueOpList), range(15)))
+        #self.ProbeList =  [pros.def_randomprobe(self.TrueOpList)]
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
         

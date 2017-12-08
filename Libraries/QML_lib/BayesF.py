@@ -3,7 +3,7 @@ import numpy as np
 
 
 # These next two function should be removed unless we understand they do something meaningful
-def BayesFactorCalc(Model1, Model2):
+def PoorManBayesFactorCalc(Model1, Model2):
     LogLikelihood1 = Model1.Updater.log_total_likelihood
     LogLikelihood2 = Model2.Updater.log_total_likelihood
     #print(str(LogLikelihood1))
@@ -12,7 +12,7 @@ def BayesFactorCalc(Model1, Model2):
     return(BayesFactorValue)
 
 
-def BayesFactorCalcLin(Model1, Model2):
+def PoorManBayesFactorCalcLin(Model1, Model2):
     Likelihood1 = np.sum(Model1.Updater.normalization_record)
     Likelihood2 = np.sum(Model2.Updater.normalization_record)
     print(str(Likelihood1))
@@ -60,7 +60,7 @@ def KLogLikelihoodBwModels(Kmodel, mytpool):
 #  It calculates the likelihoods of one model with the experiments of all the others, including in tpool, which is the list of all the experiments you want to consider
 #  tpool list of the time evolutions used in the models you want to confront to. It can be optained using the function DataPool or DataPairPool in the QMD class  
 def LogL_UpdateCalc(Kmodel, idMod, tpool, Kupdater = None):
-    
+    ### TODO write equivalent function for datbase
     """
     Kmodel from QMD class 
         e.g. modeltest.ModelsList[i] where

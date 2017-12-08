@@ -40,10 +40,11 @@ e.g. usage of operator:
   $ test_op = operator(name)
   $ print(test_op.name)
   $ print(test_op.matrix)
-  $ print(test_op.constituent_operators
+  $ print(test_op.constituents_operators
 
 """
 
+from __future__ import print_function # so print doesn't show brackets
 
 import numpy as np
 import itertools as itr
@@ -54,10 +55,10 @@ import pandas as pd
 import warnings
 import hashlib
 
-from __future__ import print_function # so print doesn't show brackets
 
 import Evo as evo
 from QML import *
+import ModelGeneration
 
 global paulis_list
 paulis_list = {'i' : evo.identity(), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
@@ -96,9 +97,10 @@ class operator():
       -- uniquely identifies equivalent operators for comparison against previously considered models
     -
     """
-    def __init__(self, name): 
+    def __init__(self, name, undimensionalised_name=None): 
         self.name = name
-    
+        if undimensionalised_name is not None:   
+            self.undimensionalised_name = undimensionalised_name
     @property
     def constituents_names(self):
         """
@@ -174,6 +176,7 @@ class operator():
         For use when comparing potential new operators. 
         """
         return alph(self.name)
+        
     
     
 """
@@ -531,7 +534,7 @@ ytz = operator('yTz')
 true_operator_list = np.array([ ytz.matrix] )
 
 
-def launch_db(RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[]):
+def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[]):
     """
     Inputs:
     TODO
@@ -540,104 +543,54 @@ def launch_db(RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=
     gen_list: list of strings corresponding to model names. 
     
     Outputs: 
-      - db: "running database", info on log likelihood, etc.
-      - model_db: info on construction of model, i.e. constituent operators etc.
+      - db: "running database", info on active models. Can access QML and operator instances for all information about models.
+      - legacy_db: when a model is terminated, we maintain essential information in this db (for plotting, debugging etc.).
       - model_lists = list of lists containing alphabetised model names. When a new model is considered, it     
 
     Usage: 
         $ gen_list = ['xTy, yPz, iTxTTy] # Sample list of model names
-        $ running_db, model_db, model_lists = DataBase.launch_db(gen_list=gen_list)
+        $ running_db, legacy_db, model_lists = DataBase.launch_db(gen_list=gen_list)
     
     """
-    generators = []
-    total_model_list = []
-    qml_instances = []
-#     TODO: Is this the absolute total ever???? Could define this as a global variable at top of file. 
+
     Max_N_Qubits = 13
     model_lists = {}
     for j in range(1, Max_N_Qubits):
         model_lists[j] = []
-    
-    for i in gen_list:
-        generators.append(operator(i))
-        qml_instances.append(ModelLearningClass(name=i))
-        alph_model_name = alph(i)
-        num_qubits = get_num_qubits(i)
-        #model_lists[num_qubits].append(alph_model_name)
-
-    #sim_ops = [ [] for _ in range(len(gen_list))]
-    for i in range(len(qml_instances)):
-        qml_inst = qml_instances[i] 
-        op = generators[i]
-        
-        true_param_list = []
-        for j in range(np.shape(true_operator_list)[1]):
-            true_param_list.append(0.3)
-
-        sim_ops=[]
-        #sim_ops[i] = []
-        for j in range(op.num_constituents):
-            sim_ops.append(normal_dist.sample()[0,0])
-#            sim_ops[i].append(normal_dist.sample())
-        sim_ops = [sim_ops]
-
-        qml_inst.InitialiseNewModel(
-#          trueoplist = true_operator_list,
-#          modeltrueparams = true_param_list,
-          trueoplist = true_ops,
-          modeltrueparams = true_params,
-          simoplist = op.constituents_operators,
-#          simparams = sim_ops[i],
-          simparams = sim_ops,
-          numparticles = n_particles,
-          gaussian=False
-        )
 
     legacy_db = pd.DataFrame({
         '<Name>' : [ ], 
         'Param_Est_Final' : [],
         'Epoch_Start' : [],
         'Epoch_Finish' : [],
+        'ModelID' : [],
     })
         
-    # if N_qubits defined: work out generator list.
-    # Or should number qubits be implied by gen list?
-
-
     db = pd.DataFrame({
         '<Name>' : [ ], 
-        'Alph_Name' : [],
         'Status' : [], #TODO can get rid?
-        'Selected' : [], #TODO what's this for?
+        'Completed' : [], #TODO what's this for?
         'TreeID' : [], # TODO proper tree id's,
-        'BayesSum' : [],
         #'Param_Estimates' : sim_ops,
         #'Estimates_Dist_Width' : [normal_dist_width for gen in generators],
         'Model_Class_Instance' : [],
         'Operator_Instance' : [],
         'Epoch_Start' : [],
+        'ModelID' : [],
         })
         
+    modelID = 0
     for model_name in gen_list: 
-        add_model(model_name=model_name, running_database=db, model_lists=model_lists, true_ops=true_ops, true_params=true_params, epoch=0)  
+        try_add_model = add_model(model_name=model_name, running_database=db, model_lists=model_lists, true_op_name=true_op_name, 
+                    true_ops=true_ops, true_params=true_params, modelID=modelID, epoch=0
+                )
+        if try_add_model is True: 
+            modelID += int(1) 
 
-    """
-    db = pd.DataFrame({
-        '<Name>' : [ gen.name for gen in generators], 
-        'Status' : 'Ready', #TODO can get rid?
-        'Selected' : False, #TODO what's this for?
-        'TreeID' : [0 for gen in generators ], # TODO proper tree id's,
-        #'Param_Estimates' : sim_ops,
-        #'Estimates_Dist_Width' : [normal_dist_width for gen in generators],
-        'Model_Class_Instance' : qml_instances,
-        'Operator_Instance' : [gen for gen in generators],
-        'Epoch_Start' : [0 for gen in generators],
-        })  
-    """    
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, treeID=0, epoch=0, true_ops=[], true_params=[] ):
+def add_model(model_name, running_database, model_lists, true_op_name, modelID,  num_particles=2000, treeID=0, epoch=0, true_ops=[], true_params=[] ):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 
@@ -657,19 +610,37 @@ def add_model(model_name, running_database, model_lists, treeID=0, epoch=0, true
           Adds a row to running_database containing all columns of those.     
     """    
     
+    
+    # Fix dimensions if model and true model are of different starting dimension.
+    
     alph_model_name = alph(model_name)
     model_num_qubits = get_num_qubits(model_name)
     
-    
     if consider_new_model(model_lists, model_name, running_database)=='New':
         model_lists[model_num_qubits].append(alph_model_name)
+
+        true_dim = int(np.log2(np.shape(true_ops[0])[0]))
+        sim_dim = get_num_qubits(model_name)
+        
+        if sim_dim > true_dim: 
+            true_params = [true_params[0]]
+            redimensionalised_true_op = ModelGeneration.identity_interact(subsystem=true_op_name, num_qubits=sim_dim, return_operator=True)
+            true_ops = redimensionalised_true_op.constituents_operators
+            sim_name = model_name
+            
+        elif true_dim > sim_dim: 
+            print("Before dimensionalising name. Name = ", model_name, "true_dim = ", true_dim)
+            sim_name = ModelGeneration.dimensionalise_name_by_name(name=model_name, true_dim = true_dim) 
+        else: 
+            sim_name = model_name
+        
     
         print("Model ", model_name, " not previously considered -- adding.")
-        op = operator(model_name)
+        op = operator(name = sim_name, undimensionalised_name = model_name)
         num_rows = len(running_database)
-        qml_instance = ModelLearningClass(name=model_name)
+        qml_instance = ModelLearningClass(name=op.name)
         true_param_list = []
-        for j in range(len(true_operator_list)):
+        for j in range(len(true_ops)):
             true_param_list.append(0.3)
 
         sim_pars = []
@@ -686,32 +657,32 @@ def add_model(model_name, running_database, model_lists, treeID=0, epoch=0, true
           modeltrueparams = true_params,
           simoplist = op.constituents_operators,
           simparams = [sim_pars],
-          numparticles = n_particles,
+          numparticles = num_particles,
+          modelID = modelID,
           gaussian=False
         )
         
         # Add to running_database, same columns as initial gen_list
         
         running_db_new_row = pd.Series({
-            '<Name>': op.name,
-            'Alph_Name' : op.alph_name,
-            'Status' : 'Ready', 
-            'Selected' : False, 
+            '<Name>': model_name,
+            'Status' : 'Active',  #TODO 
+            'Completed' : False, 
             'TreeID' : treeID, #TODO make argument of add_model fnc,
-            'BayesSum' : 0,
             'Param_Estimates' : sim_pars,
             'Estimates_Dist_Width' : normal_dist_width,
             'Model_Class_Instance' : qml_instance,
             'Operator_Instance' : op,
             'Epoch_Start' : 0, #TODO fill in
+            'ModelID' : int(modelID), ## needs to be unique for each model
         })
 
         running_database.loc[num_rows] = running_db_new_row      
-        
+        return True
     else:
-        location = consider_new_model(model_lists, model_name, running_database)
-        print("Model", alph_model_name, " previously considered at location", location)  
-
+        #location = consider_new_model(model_lists, model_name, running_database)
+        print("Model", alph_model_name, " previously considered.") # at location", location)  
+        return False
 
 
 def get_location(db, name):
@@ -748,10 +719,11 @@ def consider_new_model(model_lists, name, db):
     al_name = alph(name)
     n_qub = get_num_qubits(name)
     if al_name in model_lists[n_qub]:
-        location = get_location_by_alph_name(db, al_name)
-        if location is None: 
-          return "Legacy database"
-        return location
+        return 'Previously Considered' # todo -- make clear if in legacy or running db
+#        location = get_location_by_alph_name(db, al_name)
+#        if location is None: 
+#          return "Legacy database"
+#        return location
     else: 
         return 'New'
 
@@ -786,25 +758,39 @@ def move_to_legacy(db, legacy_db, name):
         '<Name>' : name, 
         'Param_Est_Final' : model_instance.FinalParams,
         'Epoch_Start' : 0, #TODO
-        'Epoch_Finish' : 10  #TODO
+        'Epoch_Finish' : 10,  #TODO
+        'ModelID' : model_instance.ModelID
     })
 
     legacy_db.loc[num_rows] = new_row         
     
     
-    
-    
-def update_field(db, name, field, new_value=None, increment=None):
-    idx = get_location(db, name)
-    if idx is not None: 
-      if new_value is not None:
-          db.loc[idx, field] = new_value
-      elif increment is not None:
-          db.loc[idx, field] = db.loc[idx, field]+ 1
-      else: 
-          print("Must pass new_value or increment")    
-    else: 
-      print("Cannot update field -- model does not exist in database.")
+def model_id_from_name(db, name):
+    return db.loc[db['<Name>']==name]['ModelID'].item()
+
+def model_name_from_id(db, model_id):
+    return db.loc[db['ModelID']==model_id]['<Name>'].item()
+
+def index_from_name(db, name):
+    return db.loc[db['<Name>']==name].index[0]    
+
+def index_from_model_id(db, model_id):
+    return db.loc[db['ModelID']==model_id].index[0]    
+
+
+def model_instance_from_id(db, model_id):
+    idx = index_from_model_id(db, model_id)
+    return db.loc[idx]["Model_Class_Instance"]
+
+
+def list_model_id_in_tree(db, treeID):
+    return list(db[db['TreeID']==treeID]['ModelID'])
+
+def update_field(db, field, name=None, model_id=None, new_value=None, increment=None):
+    if name is not None: 
+        db.loc[db['<Name>']==name, field] = new_value
+    elif model_id is not None:
+        db.loc[db['ModelID']==model_id, field] = new_value
         
         
 def pull_field(db, name, field):
@@ -813,4 +799,7 @@ def pull_field(db, name, field):
         return db.loc[idx,field]
     else: 
       print("Cannot update field -- model does not exist in database.")
-    
+
+
+def active_model_ids_by_tree_id(db, treeID):
+    return list(db[ (db['TreeID']==treeID) & (db['Status']=='Active') ]['ModelID'])

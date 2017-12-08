@@ -1,3 +1,5 @@
+from __future__ import print_function # so print doesn't show brackets
+
 import qinfer as qi
 import numpy as np
 import scipy as sp
@@ -189,7 +191,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             probestate = self._probelist[self._probecounter]
             #print('probestate:'+repr(probestate))
         self.ProbeState = probestate
-            
+        print("Probe state = ", self.ProbeState)    
             
         
         """ Various evolution solvers are listed here: """
@@ -201,6 +203,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             #only for models made by single or commutative operators
             #pr0[:, :] = pr0fromScipy(t, dw, self._oplist, probestate)
             #for all other models
+            if debug_print: print("in Pr0fromScipy, oplist = ", self._oplist)
             pr0[:, :] = pr0fromScipyNC(t, modelparams[:,], np.array([expparams.item(0)[1:]]), self._oplist, probestate, Hp=self._trueHam, trotterize=self._trotter)
         else:
             if (self._solver == 'qutip'):
