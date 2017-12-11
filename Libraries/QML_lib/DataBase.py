@@ -574,7 +574,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
         '<Name>' : [ ], 
         'Status' : [], #TODO can get rid?
         'Completed' : [], #TODO what's this for?
-        'TreeID' : [], # TODO proper tree id's,
+        'branchID' : [], # TODO proper branch id's,
         #'Param_Estimates' : sim_ops,
         #'Estimates_Dist_Width' : [normal_dist_width for gen in generators],
         'Model_Class_Instance' : [],
@@ -598,7 +598,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
                                     redimensionalise=redimensionalise,              
                                     use_exp_custom = use_exp_custom, 
                                     debug_directory = debug_directory,
-                                    treeID=0
+                                    branchID=0
         )
         if try_add_model is True: 
             modelID += int(1) 
@@ -606,7 +606,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise, num_particles=2000, treeID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, debug_directory = None ):
+def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, debug_directory = None ):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 
@@ -692,7 +692,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
             '<Name>': model_name,
             'Status' : 'Active',  #TODO 
             'Completed' : False, 
-            'TreeID' : int(treeID), #TODO make argument of add_model fnc,
+            'branchID' : int(branchID), #TODO make argument of add_model fnc,
             'Param_Estimates' : sim_pars,
             'Estimates_Dist_Width' : normal_dist_width,
             'Model_Class_Instance' : qml_instance,
@@ -807,8 +807,8 @@ def model_instance_from_id(db, model_id):
     return db.loc[idx]["Model_Class_Instance"]
 
 
-def list_model_id_in_tree(db, treeID):
-    return list(db[db['TreeID']==treeID]['ModelID'])
+def list_model_id_in_branch(db, branchID):
+    return list(db[db['branchID']==branchID]['ModelID'])
 
 def update_field(db, field, name=None, model_id=None, new_value=None, increment=None):
     if name is not None: 
@@ -825,8 +825,8 @@ def pull_field(db, name, field):
       print("Cannot update field -- model does not exist in database.")
 
 
-def active_model_ids_by_tree_id(db, treeID):
-    return list(db[ (db['TreeID']==treeID) & (db['Status']=='Active') ]['ModelID'])
+def active_model_ids_by_branch_id(db, branchID):
+    return list(db[ (db['branchID']==branchID) & (db['Status']=='Active') ]['ModelID'])
     
-def unfinished_model_ids_by_tree_id(db, treeID):
-    return list(db[ (db['TreeID']==treeID) & (db['Completed']=='False') ]['ModelID'])    
+def unfinished_model_ids_by_branch_id(db, branchID):
+    return list(db[ (db['branchID']==branchID) & (db['Completed']=='False') ]['ModelID'])    

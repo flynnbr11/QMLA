@@ -240,7 +240,6 @@ def dimensionalise_name_by_name_list(constituents, true_dim, return_operator=Fal
             
 def new_model_list_grow_one_qubit(generator_list, options=['x', 'y', 'z']):
     new_options = []
-    print("In ising function, model list is : ", generator_list)
 
     for gen in generator_list: 
         num_qubits = DataBase.get_num_qubits(gen)
@@ -254,7 +253,6 @@ def new_model_list_grow_one_qubit(generator_list, options=['x', 'y', 'z']):
     
     
 def new_model_list(model_list, options=['x', 'y', 'z'], generator='simple_ising'):
-    print("In generation function, model list is : ", model_list)
     if generator == 'simple_ising':
         return new_model_list_grow_one_qubit(generator_list=model_list, options=options)
         #todo integrate Andreas' simple Ising growth
