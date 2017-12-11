@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+import os 
 import Evo as evo
 from Distrib import *
 import ProbeStates as pros
@@ -21,7 +22,8 @@ class ModelLearningClass():
         self.VolumeList = np.array([])        #List with the Volume as a function of number of steps
         self.Name = name
         self.Operator = DB.operator(name)
-   
+        self.NumExperimentsToDate = 0
+        self.BayesFactors = {}
         
     
     def InsertNewOperator(self, NewOperator):
@@ -34,7 +36,7 @@ class ModelLearningClass():
     
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
     
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5,checkloss=False,gaussian=False):
+    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5,checkloss=False,gaussian=False, use_exp_custom=True, debug_directory=None):
         
         self.TrueOpList = np.asarray(trueoplist)
         self.TrueParams = np.asarray(modeltrueparams)
@@ -43,6 +45,11 @@ class ModelLearningClass():
         self.NumParticles = numparticles # function to adapt by dimension
         self.ResamplerTresh = resample_thresh
         self.ModelID = int(modelID)
+        self.UseExpCustom = use_exp_custom
+        
+        if debug_directory is not None: 
+            self.debugSave = True
+            self.debugDirectory = debug_directory            
         #self.TrueHam = evo.getH(self.TrueParams, self.TrueOpList) # This is the Hamiltonian for the time evolution in the system
 #         self.Prior = MultiVariateUniformDistribution(len(self.OpList))
         if gaussian:
@@ -72,7 +79,7 @@ class ModelLearningClass():
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
         
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, probelist=self.ProbeList, probecounter = self.ProbeCounter, solver='scipy', trotter=True)    # probelist=self.TrueOpList,,
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, probelist=self.ProbeList, probecounter = self.ProbeCounter, solver='scipy', trotter=True, use_exp_custom=self.UseExpCustom)    # probelist=self.TrueOpList,,
 
         
                 
@@ -144,7 +151,6 @@ class ModelLearningClass():
         self.Covars= np.empty(n_experiments)
         self.TrackEval = []
         self.TrackTime =np.empty(n_experiments)#only for debugging
-        
     
         self.Particles = np.empty([self.NumParticles, len(self.SimParams[0]), self.NumExperiments])
 #        self.Particles = np.empty([self.NumParticles, len(self.SimParams), self.NumExperiments]) ## I changed this to test init from db-- Brian
@@ -155,6 +161,7 @@ class ModelLearningClass():
     
         for istep in range(self.NumExperiments):
             self.Experiment = self.Heuristic()
+            self.NumExperimentsToDate += 1
             #print('Chosen experiment: ' + repr(self.Experiment))
             if istep == 0:
                 print('Initial time selected > ' + str(self.Experiment[0][0]))
@@ -191,6 +198,8 @@ class ModelLearningClass():
                 self.QLosses[istep] = self.NewLoss[0]
             
                 if self.NewLoss[0]<(10**(-17)):
+                    if self.debugSave: 
+                        self.debug_store()
                     print('Final time selected > ' + str(self.Experiment[0][0]))
                     print('Exiting learning for Reaching Num. Prec. -  Iteration Number ' + str(istep))
                     for iterator in range(len(self.FinalParams)):
@@ -205,6 +214,8 @@ class ModelLearningClass():
                     break
             
             if self.Covars[istep]<self.SigmaThresh:
+                if self.debugSave: 
+                    self.debug_store()
                 print('Final time selected > ' + str(self.Experiment[0][0]))
                 print('Exiting learning for Reaching Cov. Norm. Thrshold of '+ str(self.Covars[istep]))
                 print(' at Iteration Number ' + str(istep)) 
@@ -219,6 +230,7 @@ class ModelLearningClass():
                 self.Particles = self.Particles[:, :, 0:istep]
                 self.Weights = self.Weights[:, 0:istep]
                 self.TrackTime = self.TrackTime[0:istep]
+                
                 break
             
             
@@ -232,6 +244,8 @@ class ModelLearningClass():
             if istep == self.NumExperiments-1:
                 print('Final time selected > ' + str(self.Experiment[0][0]))
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
+                if self.debugSave: 
+                    self.debug_store()
         
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep-1]), np.std(self.Particles[:,iterator,istep-1])]
@@ -246,10 +260,46 @@ class ModelLearningClass():
         self.TrackLogTotLikelihood = np.append(self.TrackLogTotLikelihood, LogL_UpdateCalc(self, tpool))
 
 
-    def MoveModelToLegacyDB(self, db):
-        newRowDB = pd.Series({
-            '<Name>' :  self.Name
-        })
-    
-
- 
+    def addBayesFactor(self, compared_with, bayes_factor):
+        if compared_with in self.BayesFactors: 
+            self.BayesFactors[compared_with].append(bayes_factor)
+        else: 
+            self.BayesFactors[compared_with] = [bayes_factor]
+            
+            
+    def store_particles(self, debug_dir=None):
+        if debug_dir is not None: 
+            save_dir = debug_dir
+        elif self.debugDirectory is not None: 
+            save_dir = self.debugDirectory
+        else: 
+            print("Need to pass debug_dir to QML.debug_save function")
+            return False            
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)            
+        
+        save_file =  save_dir+'/particles_mod_' +str(self.ModelID)+'.dat'
+        
+        particle_file = open(save_file, 'w')
+        particle_file.write("\n".join(str(elem) for elem in self.Particles.T))
+        particle_file.close()
+        
+    def store_covariances(self, debug_dir=None):
+        if debug_dir is not None: 
+            save_dir = debug_dir
+        elif self.debugDirectory is not None: 
+            save_dir = self.debugDirectory
+        else: 
+            print("Need to pass debug_dir to QML.debug_save function")
+            return False            
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)            
+        
+        save_file =  save_dir+'/covariances_mod_' +str(self.ModelID)+'.dat'
+        particle_file = open(save_file, 'w')
+        particle_file.write("\n".join(str(elem) for elem in self.Covars))
+        particle_file.close()
+        
+    def debug_store(self, debug_dir=None): ## Adjust what gets stored here
+        self.store_particles(debug_dir=debug_dir)
+        self.store_covariances(debug_dir=debug_dir)

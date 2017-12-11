@@ -183,6 +183,10 @@ class operator():
 Functions for use by operator class to parse string (name) and prodcue relevent operators, lists etc.
 """
 
+def print_matrix(name):
+    op = operator(name)
+    print(op.matrix)
+
 def get_num_qubits(name):
     """
     Parse string and determine number of qubits this operator acts on. 
@@ -534,7 +538,7 @@ ytz = operator('yTz')
 true_operator_list = np.array([ ytz.matrix] )
 
 
-def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[]):
+def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, redimensionalise=False, use_exp_custom=True, debug_directory = None):
     """
     Inputs:
     TODO
@@ -579,18 +583,30 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
         'ModelID' : [],
         })
         
-    modelID = 0
+    modelID = int(0)
     for model_name in gen_list: 
-        try_add_model = add_model(model_name=model_name, running_database=db, model_lists=model_lists, true_op_name=true_op_name, 
-                    true_ops=true_ops, true_params=true_params, modelID=modelID, epoch=0
-                )
+        try_add_model = add_model(
+                                    model_name=model_name,
+                                    running_database=db, 
+                                    model_lists=model_lists, 
+                                    true_op_name=true_op_name,
+                                    true_ops=true_ops, 
+                                    true_params=true_params, 
+                                    modelID=int(modelID), 
+                                    epoch=0, 
+                                    num_particles=num_particles, 
+                                    redimensionalise=redimensionalise,              
+                                    use_exp_custom = use_exp_custom, 
+                                    debug_directory = debug_directory,
+                                    treeID=0
+        )
         if try_add_model is True: 
             modelID += int(1) 
 
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, true_op_name, modelID,  num_particles=2000, treeID=0, epoch=0, true_ops=[], true_params=[] ):
+def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise, num_particles=2000, treeID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, debug_directory = None ):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 
@@ -612,28 +628,34 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
     
     
     # Fix dimensions if model and true model are of different starting dimension.
-    
+    modelID = int(float(modelID))
     alph_model_name = alph(model_name)
     model_num_qubits = get_num_qubits(model_name)
     
     if consider_new_model(model_lists, model_name, running_database)=='New':
         model_lists[model_num_qubits].append(alph_model_name)
-
-        true_dim = int(np.log2(np.shape(true_ops[0])[0]))
-        sim_dim = get_num_qubits(model_name)
         
-        if sim_dim > true_dim: 
-            true_params = [true_params[0]]
-            redimensionalised_true_op = ModelGeneration.identity_interact(subsystem=true_op_name, num_qubits=sim_dim, return_operator=True)
-            true_ops = redimensionalised_true_op.constituents_operators
-            sim_name = model_name
+        if redimensionalise:
+            print("Redimensionalising") 
+            true_dim = int(np.log2(np.shape(true_ops[0])[0]))
+            sim_dim = get_num_qubits(model_name)
             
-        elif true_dim > sim_dim: 
-            print("Before dimensionalising name. Name = ", model_name, "true_dim = ", true_dim)
-            sim_name = ModelGeneration.dimensionalise_name_by_name(name=model_name, true_dim = true_dim) 
+            if sim_dim > true_dim: 
+                true_params = [true_params[0]]
+                redimensionalised_true_op = ModelGeneration.identity_interact(subsystem=true_op_name, num_qubits=sim_dim, return_operator=True)
+                true_ops = redimensionalised_true_op.constituents_operators
+                sim_name = model_name
+                
+            elif true_dim > sim_dim: 
+                print("Before dimensionalising name. Name = ", model_name, "true_dim = ", true_dim)
+                sim_name = ModelGeneration.dimensionalise_name_by_name(name=model_name, true_dim = true_dim) 
+            else: 
+                sim_name = model_name
+
         else: 
+            print("Not Redimensionalising") 
             sim_name = model_name
-        
+    
     
         print("Model ", model_name, " not previously considered -- adding.")
         op = operator(name = sim_name, undimensionalised_name = model_name)
@@ -658,8 +680,10 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
           simoplist = op.constituents_operators,
           simparams = [sim_pars],
           numparticles = num_particles,
+          use_exp_custom = use_exp_custom,
           modelID = modelID,
-          gaussian=False
+          gaussian=False,
+          debug_directory = debug_directory
         )
         
         # Add to running_database, same columns as initial gen_list
@@ -668,13 +692,13 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
             '<Name>': model_name,
             'Status' : 'Active',  #TODO 
             'Completed' : False, 
-            'TreeID' : treeID, #TODO make argument of add_model fnc,
+            'TreeID' : int(treeID), #TODO make argument of add_model fnc,
             'Param_Estimates' : sim_pars,
             'Estimates_Dist_Width' : normal_dist_width,
             'Model_Class_Instance' : qml_instance,
             'Operator_Instance' : op,
             'Epoch_Start' : 0, #TODO fill in
-            'ModelID' : int(modelID), ## needs to be unique for each model
+            'ModelID' : int(float(modelID)), ## needs to be unique for each model
         })
 
         running_database.loc[num_rows] = running_db_new_row      
@@ -803,3 +827,6 @@ def pull_field(db, name, field):
 
 def active_model_ids_by_tree_id(db, treeID):
     return list(db[ (db['TreeID']==treeID) & (db['Status']=='Active') ]['ModelID'])
+    
+def unfinished_model_ids_by_tree_id(db, treeID):
+    return list(db[ (db['TreeID']==treeID) & (db['Completed']=='False') ]['ModelID'])    

@@ -1,10 +1,14 @@
 from __future__ import print_function # so print doesn't show brackets
 import qinfer as qi
+import qutip as qt
 import numpy as np
 import scipy as sp
 #import qutip as qt
 import sys as sys
 import os as os
+
+use_linalg = False
+
 
 try: 
     import hamiltonian_exponentiation as h
@@ -12,6 +16,10 @@ try:
     ham_exp_installed = True
     
 except:
+    ham_exp_installed = False
+    
+
+if(use_linalg):
     ham_exp_installed = False
     
     
@@ -98,12 +106,56 @@ def pr0fromScipy(tvec, dw, oplist, probestate):
 
 
 
-def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=True, IQLE=True, use_exp_ham=ham_exp_installed):
+
+def get_pr0_array(t_list, sim_params, sim_ops, true_ham, trotterize=True):
+    
+    num_params = sim_params.shape[1]
+    num_times = len(t_list)
+    
+    print("num parms : ", num_params)
+    print("num times : ", num_times)
+    
+    print("get pr0; t_list =", t_list)
+    #print("sim params ", sim_params)
+    print("sim params has shape ", sim_params.shape)
+    print("true_ham = ", true_ham)
+#    print("true params :", true_params)
+#    print("true ops : ", true_ops)
+
+#    print("sim params :", sim_params)
+#    print("sim ops : ", sim_ops)
+    sim_ham = getH(sim_params, sim_ops)
+
+#    true_ham = getH(true_params, true_ops)
+    
+#    print("Sim ham = ", sim_ham)
+#    print("True ham = ", true_ham)
+    output = np.empty([num_params, num_times])
+#    evo = np.empty([len(modpar), len(tvec)])
+    print("output has shape ", output.shape)
+   # print("sim params has shape : ", np.shape(sim_params))
+    print("len sim params : ", len(sim_params[0,:]))
+    print("len t list : ", len(t_list))
+    for evoId in range( len(sim_params[0,:])): ## todo not sure about length/arrays here
+        for tId in range(len(t_list)):
+            t = t_list[tId]
+            
+            print("evoId=", evoId, "\t tId = ", tId)
+            output[evoId][tId] = overlap(ham_true = true_ham, ham_sim=sim_ham, t=t)
+    print("Returning output : ", output)
+    return output
+
+
+def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=True, IQLE=True, use_exp_custom=ham_exp_installed):
     """Generic version to be adopted in case oplist includes non-commutative operators"""
     
     print_exp_ham=False
-    #    print("pr0fromScipyNC using exp_ham: ", use_exp_ham)
-    
+    """
+    if use_exp_custom: 
+        print("pr0fromScipyNC using exp_ham ")
+    else: 
+        print("pr0fromScipyNC using linalg")
+    """
     evo = np.empty([len(modpar), len(tvec)])
 
     
@@ -144,16 +196,17 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
             
             # QLE evolution
             if Hm is None:
-                if use_exp_ham:
+                if use_exp_custom:
                 #TODO should exp_ham be used here?
-                    evostate = np.dot(h.exp_ham(Hp, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), backstate)
+#                    evostate = np.dot(h.exp_ham(Hp, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), backstate)
+                    evostate = np.dot(h.exp_ham(Hp, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), probestate)
                 else:
                     evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*Hp), probestate)
             
             # IQLE evolution
             else:
                 if trotterize is False:
-                    if use_exp_ham:
+                    if use_exp_custom:
                         backstate = np.dot(h.exp_ham(Hm, tvec[idt], plus_or_minus=1.0, print_method=print_exp_ham), probestate)
                         evostate = np.dot(h.exp_ham(Hp, tvec[idt], plus_or_minus=1.0,print_method=print_exp_ham), backstate)
                     else:
@@ -161,7 +214,7 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
                         evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*Hp), backstate)
                 else:
                     # 0th order Trotterization for the evolution
-                    if use_exp_ham:
+                    if use_exp_custom:
                         #print("Using Exp ham custom")
                         HpMinusHm = Hp - Hm
     
@@ -183,6 +236,12 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
     
     return evo
     
+
+# def pr0_partial_trace(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=True, IQLE=True, use_exp_ham=ham_exp_installed):
+    
+
+
+
     
     
     
@@ -590,8 +649,8 @@ def pr0fromHahn(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=
                 
             
             
-            ### Added here the conversion to QuTip object
             qt_evostate = qt.Qobj(evostate) 
+            ### Added here the conversion to QuTip object
             qt_evostate.dims = [[2,2],[1,1]]
 
             
@@ -605,3 +664,81 @@ def pr0fromHahn(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=
                 # evo[evoidx][idt] = pr0EXPfromHahn(tvec[idt])
                      
     return evo
+    
+    
+    
+## Partial trace functionality
+
+def expectation_value(ham, t, state=None, choose_random_probe=False):
+    if choose_random_probe is True: 
+        num_qubits = int(np.log2(np.shape(ham)[0]))
+        state = random_probe(num_qubits)
+    elif random_probe is False and state is None: 
+        print ("expectation value function: you need to either pass a state or set choose_random_probe=True")
+    u_psi = evolved_state(ham, t, state)
+    probe_bra = state.conj().T
+    psi_u_psi = np.dot(probe_bra, u_psi)
+    return np.abs(psi_u_psi**2)
+
+def evolved_state(ham, t, state):
+    import hamiltonian_exponentiation as h
+    unitary = h.exp_ham(ham, t)
+    return np.dot(unitary, state)
+
+def random_probe(num_qubits):
+    dim = 2**num_qubits
+    real = np.random.rand(1,dim)
+    imaginary = np.random.rand(1,dim)
+    complex_vectors = np.empty([1, dim])
+    complex_vectors = real +1.j*imaginary
+
+    vals_squared = [val**2 for val in complex_vectors]
+    norm_factor = np.sqrt(np.sum(vals_squared))
+    probe = complex_vectors/norm_factor
+    return probe[0][:]
+
+def trim_vector(state, final_num_qubits):
+    return state[:2**final_num_qubits]
+
+def qutip_evolved_state(ham, t, state):
+    evolved = evolved_state(ham,t,state=state)
+    return qt.Qobj(evolved)
+
+
+def overlap(ham_true, ham_sim, t):
+    print("overlap :")
+    print("ham true :" , ham_true)
+    print("ham sim :", ham_sim)
+    print("t=", t)
+
+
+    true_dim = int(np.log2(np.shape(ham_true)[0])) 
+    sim_dim = int(np.log2(np.shape(ham_sim)[0]))
+
+    min_dim = min(true_dim, sim_dim)
+    max_dim = max(true_dim, sim_dim)
+    to_keep = range(min_dim)
+
+    probe = random_probe(max_dim)
+    reduced_probe = trim_vector(probe, final_num_qubits=min_dim)
+    
+    
+    if sim_dim > min_dim: 
+        sim = qutip_evolved_state(ham_sim, t, probe)
+        sim_reduced = sim.ptrace(to_keep)
+    else:
+        sim =  qutip_evolved_state(ham_sim, t, reduced_probe)
+        sim_reduced = sim.ptrace(to_keep)
+    
+    if true_dim > min_dim: 
+        true = qutip_evolved_state(ham_true, t, probe)
+        true_reduced = true.ptrace(to_keep)
+    else: 
+        true = qutip_evolved_state(ham_true, t, reduced_probe)
+        true_reduced = true.ptrace(to_keep)
+        
+    #return true_reduced, sim_reduced
+    overlap = qt.expect(sim_reduced, true_reduced)
+    print("overlap is ", overlap)
+    return overlap
+    

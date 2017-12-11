@@ -10,6 +10,8 @@ from ProbeStates import *
 
 global debug_print
 debug_print = False
+global likelihood_dev
+likelihood_dev = False
 
 class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     r"""
@@ -36,7 +38,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False):
+    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, use_exp_custom=True):
         self._solver = solver #This is the solver used for time evolution scipy is faster, QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
         self._probecounter = probecounter
@@ -46,7 +48,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._modelparams = modelparams
         self._true_oplist = true_oplist
         self._trueparams = trueparams
-        
+        self.use_exp_custom = use_exp_custom
         self._min_freq = min_freq
         if true_oplist is not None and trueparams is None:
             raise(ValueError('\nA system Hamiltonian with unknown parameters was requested'))
@@ -120,7 +122,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         """
         return 2
         
-    def likelihood(self, outcomes, modelparams, expparams):
+    def likelihood(self, outcomes, modelparams, expparams): ##TODO REPLACING THIS WITH LIKELIHOOD FNC BELOW TO INTRODUCE PARTIAL TRACE
         # By calling the superclass implementation, we can consolidate
         # call counting there.
         # THIS is for calling likelihood outside of the class
@@ -191,7 +193,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             probestate = self._probelist[self._probecounter]
             #print('probestate:'+repr(probestate))
         self.ProbeState = probestate
-        print("Probe state = ", self.ProbeState)    
+        #print("Probe state = ", self.ProbeState)    
             
         
         """ Various evolution solvers are listed here: """
@@ -204,7 +206,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             #pr0[:, :] = pr0fromScipy(t, dw, self._oplist, probestate)
             #for all other models
             if debug_print: print("in Pr0fromScipy, oplist = ", self._oplist)
-            pr0[:, :] = pr0fromScipyNC(t, modelparams[:,], np.array([expparams.item(0)[1:]]), self._oplist, probestate, Hp=self._trueHam, trotterize=self._trotter)
+            pr0[:, :] = pr0fromScipyNC(t, modelparams[:,], np.array([expparams.item(0)[1:]]), self._oplist, probestate, Hp=self._trueHam, trotterize=self._trotter, use_exp_custom=self.use_exp_custom)
         else:
             if (self._solver == 'qutip'):
                 pr0[:, :] = pr0fromQutip(t, dw, self._oplist, probestate, Hp=self._trueHam)
@@ -214,5 +216,27 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         # print("Pr0 = " + str(pr0[0:cutoff]) )
         # print("likelihoods: " + str(qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)))
         
+        if likelihood_dev: print("About to enter qi.FiniteOutcomeModel. \npr0 has shape ", np.shape(pr0))
+        if likelihood_dev: print("outcomes has shape ", np.shape(outcomes))
         
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
+        
+        
+    def new_likelihood(self, outcomes, modelparams, expparams):
+        super(GenSimQMD_IQLE, self).likelihood(
+            outcomes, modelparams, expparams
+        )
+        
+        if len(modelparams.shape) == 1:
+            modelparams = modelparams[..., np.newaxis]
+            
+        t = expparams['t']
+#        pr0 = np.zeros((self._modelparams.shape[1], expparams.shape[0]))
+        #print("pr0 has shape ", pr0.shape)
+        
+        pr0 = get_pr0_array(t_list=t, sim_params=modelparams, sim_ops=self._oplist, true_ham = self._trueHam)        
+        
+        if likelihood_dev: print("About to enter qi.FiniteOutcomeModel. \npr0 has shape ", np.shape(pr0))
+        if likelihood_dev: print("outcomes has shape ", np.shape(outcomes))
+        return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
+        
