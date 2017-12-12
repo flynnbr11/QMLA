@@ -628,7 +628,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
     
     
     # Fix dimensions if model and true model are of different starting dimension.
-    modelID = int(float(modelID))
+    modelID = int(modelID)
     alph_model_name = alph(model_name)
     model_num_qubits = get_num_qubits(model_name)
     

@@ -226,7 +226,7 @@ class ModelLearningClass():
                 if checkloss == True: 
                     self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
                 
-                self.Covars=(np.resize(self.Covars, (1,istep)))[0]
+               # self.Covars=(np.resize(self.Covars, (1,istep)))[0]
                 self.Particles = self.Particles[:, :, 0:istep]
                 self.Weights = self.Weights[:, 0:istep]
                 self.TrackTime = self.TrackTime[0:istep]

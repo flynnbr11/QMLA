@@ -8,6 +8,8 @@ import sys as sys
 import os as os
 
 use_linalg = False
+global print_pr0
+print_pr0 = False 
 
 
 try: 
@@ -109,16 +111,15 @@ def pr0fromScipy(tvec, dw, oplist, probestate):
 
 def get_pr0_array(t_list, sim_params, sim_ops, true_ham, trotterize=True):
     
-    num_params = sim_params.shape[1]
+    num_params = sim_params.shape[0]
     num_times = len(t_list)
     
-    print("num parms : ", num_params)
-    print("num times : ", num_times)
-    
-    print("get pr0; t_list =", t_list)
+    if print_pr0: print("num parms : ", num_params)
+    if print_pr0: print("num times : ", num_times)
+    #print("get pr0; t_list =", t_list)
     #print("sim params ", sim_params)
-    print("sim params has shape ", sim_params.shape)
-    print("true_ham = ", true_ham)
+    if print_pr0: print("sim params has shape ", sim_params.shape)
+    if print_pr0: print("true_ham = ", true_ham)
 #    print("true params :", true_params)
 #    print("true ops : ", true_ops)
 
@@ -132,17 +133,17 @@ def get_pr0_array(t_list, sim_params, sim_ops, true_ham, trotterize=True):
 #    print("True ham = ", true_ham)
     output = np.empty([num_params, num_times])
 #    evo = np.empty([len(modpar), len(tvec)])
-    print("output has shape ", output.shape)
+    if print_pr0: print("output has shape ", output.shape)
    # print("sim params has shape : ", np.shape(sim_params))
-    print("len sim params : ", len(sim_params[0,:]))
-    print("len t list : ", len(t_list))
-    for evoId in range( len(sim_params[0,:])): ## todo not sure about length/arrays here
+    if print_pr0: print("len sim params : ", len(sim_params[0,:]))
+    if print_pr0: print("len t list : ", len(t_list))
+    for evoId in range( output.shape[0]): ## todo not sure about length/arrays here
         for tId in range(len(t_list)):
             t = t_list[tId]
             
-            print("evoId=", evoId, "\t tId = ", tId)
+            #print("evoId=", evoId, "\t tId = ", tId)
             output[evoId][tId] = overlap(ham_true = true_ham, ham_sim=sim_ham, t=t)
-    print("Returning output : ", output)
+    #print("Returning output : ", output)
     return output
 
 
@@ -156,8 +157,10 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
     else: 
         print("pr0fromScipyNC using linalg")
     """
+    print("len modpar =", len(modpar), "\t len tvec=  ", len(tvec))
+    print("modparams has shape : ", modpar.shape)
     evo = np.empty([len(modpar), len(tvec)])
-
+    print("So evo.shape=", evo.shape)
     
     #dimension check
     if len(np.shape(oplist)) != 3:
@@ -233,7 +236,7 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
                 #if debug_print: print('Evostate: ', evostate)
         
             evo[evoidx][idt] = np.abs(np.dot(evostate.conj(), probestate.T)) ** 2         
-    
+    print("Evo has shape : " , evo.shape)
     return evo
     
 
@@ -670,6 +673,7 @@ def pr0fromHahn(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=
 ## Partial trace functionality
 
 def expectation_value(ham, t, state=None, choose_random_probe=False):
+# todo: list of probes, maybe 5 is enough? test with different values
     if choose_random_probe is True: 
         num_qubits = int(np.log2(np.shape(ham)[0]))
         state = random_probe(num_qubits)
@@ -698,18 +702,23 @@ def random_probe(num_qubits):
     return probe[0][:]
 
 def trim_vector(state, final_num_qubits):
-    return state[:2**final_num_qubits]
+#todo: renormalise
+    new_vec = state[:2**final_num_qubits]/np.linalg.norm(state[:2**final_num_qubits])
+    return new_vec
 
 def qutip_evolved_state(ham, t, state):
+    length = int(np.shape(ham)[0])
     evolved = evolved_state(ham,t,state=state)
+    #density_mtx = np.kron(evolved.conj(), evolved).reshape(length, length)
     return qt.Qobj(evolved)
 
 
 def overlap(ham_true, ham_sim, t):
-    print("overlap :")
-    print("ham true :" , ham_true)
-    print("ham sim :", ham_sim)
-    print("t=", t)
+    overlap_print =False
+    if overlap_print: print("overlap :")
+    if overlap_print: print("ham true :" , ham_true)
+    if overlap_print: print("ham sim :", ham_sim)
+    if overlap_print: print("t=", t)
 
 
     true_dim = int(np.log2(np.shape(ham_true)[0])) 
@@ -724,21 +733,29 @@ def overlap(ham_true, ham_sim, t):
     
     
     if sim_dim > min_dim: 
+    #todo: remove partial trace when system is smallest one anyway
+    # if dims match -> don't go into qutip (expectation_value function); 
+    # if one bigger -> ptrace on bigger Qobj on other -> get qt.expect
         sim = qutip_evolved_state(ham_sim, t, probe)
+        sim.dims = [[2]*sim_dim, [1]*sim_dim]
         sim_reduced = sim.ptrace(to_keep)
     else:
         sim =  qutip_evolved_state(ham_sim, t, reduced_probe)
+        sim.dims = [[2]*sim_dim, [1]*sim_dim]
         sim_reduced = sim.ptrace(to_keep)
     
     if true_dim > min_dim: 
         true = qutip_evolved_state(ham_true, t, probe)
+        true.dims = [[2]*true_dim, [1]*true_dim]
         true_reduced = true.ptrace(to_keep)
     else: 
         true = qutip_evolved_state(ham_true, t, reduced_probe)
+        true.dims = [[2]*true_dim, [1]*true_dim]
         true_reduced = true.ptrace(to_keep)
         
     #return true_reduced, sim_reduced
     overlap = qt.expect(sim_reduced, true_reduced)
-    print("overlap is ", overlap)
+    if overlap_print: print("overlap is ", overlap)
+    print ("overlap  = ", overlap)
     return overlap
     

@@ -122,7 +122,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         """
         return 2
         
-    def likelihood(self, outcomes, modelparams, expparams): ##TODO REPLACING THIS WITH LIKELIHOOD FNC BELOW TO INTRODUCE PARTIAL TRACE
+    def old_likelihood(self, outcomes, modelparams, expparams): ##TODO REPLACING THIS WITH LIKELIHOOD FNC BELOW TO INTRODUCE PARTIAL TRACE
         # By calling the superclass implementation, we can consolidate
         # call counting there.
         # THIS is for calling likelihood outside of the class
@@ -222,7 +222,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
         
         
-    def new_likelihood(self, outcomes, modelparams, expparams):
+    def likelihood(self, outcomes, modelparams, expparams):
         super(GenSimQMD_IQLE, self).likelihood(
             outcomes, modelparams, expparams
         )
