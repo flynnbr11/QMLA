@@ -1,3 +1,4 @@
+from __future__ import print_function # so print doesn't show brackets
 import numpy as np
 import scipy as sp
 import os 
@@ -7,6 +8,9 @@ import ProbeStates as pros
 import GenSimQMD_IQLE as gsi
 import multiPGH as mpgh
 import DataBase as DB
+
+global debug_print
+debug_print = False
 
 class ModelLearningClass():
     def __init__(self, name):
@@ -22,6 +26,7 @@ class ModelLearningClass():
         self.VolumeList = np.array([])        #List with the Volume as a function of number of steps
         self.Name = name
         self.Operator = DB.operator(name)
+        self.Matrix = self.Operator.matrix
         self.NumExperimentsToDate = 0
         self.BayesFactors = {}
         
@@ -193,6 +198,8 @@ class ModelLearningClass():
             self.TrackLogTotLikelihood = np.append(self.TrackLogTotLikelihood, self.Updater.log_total_likelihood)
 
             self.NewEval = self.Updater.est_mean()
+            
+                
             if checkloss == True: 
                 self.NewLoss = eval_loss(self.GenSimModel, self.NewEval, self.TrueParams)
                 self.QLosses[istep] = self.NewLoss[0]
@@ -226,7 +233,7 @@ class ModelLearningClass():
                 if checkloss == True: 
                     self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
                 
-               # self.Covars=(np.resize(self.Covars, (1,istep)))[0]
+                self.Covars=(np.resize(self.Covars, (1,istep)))[0]
                 self.Particles = self.Particles[:, :, 0:istep]
                 self.Weights = self.Weights[:, 0:istep]
                 self.TrackTime = self.TrackTime[0:istep]
@@ -251,6 +258,12 @@ class ModelLearningClass():
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep-1]), np.std(self.Particles[:,iterator,istep-1])]
                     print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator]))
             
+
+            if debug_print:
+                print("step ", istep)
+                print( " has params: ", self.NewEval)
+                print(" log tot like  : ", self.TrackLogTotLikelihood[-1])
+
 
     def UpdateKLogTotLikelihood(self, epoch, tpool, stepnum):
         # Calcalate total log likelihood when the model finishes, compared with all previously completed but still active models. 

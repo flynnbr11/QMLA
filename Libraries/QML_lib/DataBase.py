@@ -538,7 +538,7 @@ ytz = operator('yTz')
 true_operator_list = np.array([ ytz.matrix] )
 
 
-def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, redimensionalise=False, use_exp_custom=True, debug_directory = None):
+def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, redimensionalise=True, use_exp_custom=True, debug_directory = None):
     """
     Inputs:
     TODO
@@ -606,7 +606,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, debug_directory = None ):
+def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, debug_directory = None ):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 

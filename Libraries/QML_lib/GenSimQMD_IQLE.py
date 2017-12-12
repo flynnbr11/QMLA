@@ -193,7 +193,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             probestate = self._probelist[self._probecounter]
             #print('probestate:'+repr(probestate))
         self.ProbeState = probestate
-        #print("Probe state = ", self.ProbeState)    
+        print("Probe state = ", self.ProbeState)    
             
         
         """ Various evolution solvers are listed here: """
@@ -213,11 +213,11 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             else:
                 raise ValueError('No solver called "{}" known'.format(self._solver))
 
-        # print("Pr0 = " + str(pr0[0:cutoff]) )
-        # print("likelihoods: " + str(qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)))
+        print("Pr0 = " + str(pr0[0:cutoff]) )
+        #print("likelihoods: " + str((qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0))[0:cutoff]  ))
         
-        if likelihood_dev: print("About to enter qi.FiniteOutcomeModel. \npr0 has shape ", np.shape(pr0))
-        if likelihood_dev: print("outcomes has shape ", np.shape(outcomes))
+        #if likelihood_dev: print("About to enter qi.FiniteOutcomeModel. \npr0 has shape ", np.shape(pr0))
+        #if likelihood_dev: print("outcomes has shape ", np.shape(outcomes))
         
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
         
@@ -230,13 +230,19 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         if len(modelparams.shape) == 1:
             modelparams = modelparams[..., np.newaxis]
             
+        cutoff=min(len(modelparams), 5)
+            
         t = expparams['t']
 #        pr0 = np.zeros((self._modelparams.shape[1], expparams.shape[0]))
         #print("pr0 has shape ", pr0.shape)
         
-        pr0 = get_pr0_array(t_list=t, sim_params=modelparams, sim_ops=self._oplist, true_ham = self._trueHam)        
+        pr0 = get_pr0_array(t_list=t, sim_params=modelparams, sim_ops=self._oplist, true_ham = self._trueHam)    
         
-        if likelihood_dev: print("About to enter qi.FiniteOutcomeModel. \npr0 has shape ", np.shape(pr0))
-        if likelihood_dev: print("outcomes has shape ", np.shape(outcomes))
+        #print("Pr0 = " + str(pr0[0:cutoff]) )
+        #print("likelihoods: " + str((qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0))[0:cutoff]  ))    
+        
+        #if likelihood_dev: print("About to enter qi.FiniteOutcomeModel. \npr0 has shape ", np.shape(pr0))
+        #if likelihood_dev: print("outcomes has shape ", np.shape(outcomes))
+        
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
         
