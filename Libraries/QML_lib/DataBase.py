@@ -538,7 +538,7 @@ ytz = operator('yTz')
 true_operator_list = np.array([ ytz.matrix] )
 
 
-def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, redimensionalise=True, use_exp_custom=True, debug_directory = None):
+def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True, redimensionalise=True, use_exp_custom=True, debug_directory = None):
     """
     Inputs:
     TODO
@@ -598,7 +598,9 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
                                     redimensionalise=redimensionalise,              
                                     use_exp_custom = use_exp_custom, 
                                     debug_directory = debug_directory,
-                                    branchID=0
+                                    branchID=0, 
+                                    qle=qle
+                                    
         )
         if try_add_model is True: 
             modelID += int(1) 
@@ -606,7 +608,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, debug_directory = None ):
+def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, debug_directory = None, qle=True ):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 
@@ -683,8 +685,10 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
           use_exp_custom = use_exp_custom,
           modelID = modelID,
           gaussian=False,
-          debug_directory = debug_directory
+          debug_directory = debug_directory,
+          qle = qle
         )
+        print("on initialisation, simparams : ", [sim_pars])
         
         # Add to running_database, same columns as initial gen_list
         

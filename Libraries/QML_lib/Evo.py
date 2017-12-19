@@ -108,34 +108,49 @@ def pr0fromScipy(tvec, dw, oplist, probestate):
 
 
 
-
-def get_pr0_array(t_list, sim_params, sim_ops, true_ham, trotterize=True):
-    
-    num_params = sim_params.shape[0]
+def get_pr0_array_qle(t_list, ham_list, probe):
+    num_particles = len(ham_list)
     num_times = len(t_list)
     
-#    if print_pr0: print("num parms : ", num_params)
-#    if print_pr0: print("num times : ", num_times)
-    if print_pr0: print("sim params has shape ", sim_params.shape)
-    #if print_pr0: print("true_ham = ", true_ham)
-    if print_pr0: print("sim paramS: ", sim_params)
-    sim_ham = getH(sim_params, sim_ops)
+    output = np.empty([num_particles, num_times])
+    for evoId in range(num_particles): ## todo not sure about length/arrays here
+        for tId in range(len(t_list)):
+            t = t_list[tId]
+            ham=ham_list[evoId]
+          #  print("ham = \n", ham)
+            
+#            output[evoId][tId] = iqle_evolve(ham_true = true_ham, ham_sim=sim_ham, t=t)
+            output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe)
+            if output[evoId][tId] < 0:
+                print("negative probability : \t \t probability = ", output[evoId][tId])
+            elif output[evoId][tId] > 1.000000000000001: ## todo some times getting p=1.0 show up
+                print("Probability > 1: \t \t probability = ", output[evoId][tId]) 
+        #    print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
+    
+    return output
 
-    output = np.empty([num_params, num_times])
+
+
+def get_pr0_array_iqle(t_list, ham_list, ham_minus, probe, trotterize=True):
+    
+    num_particles = len(ham_list)
+    num_times = len(t_list)
+    
+
+    output = np.empty([num_particles, num_times])
 
     if print_pr0: print("output has shape ", output.shape)
-   # if print_pr0: print("len sim params : ", len(sim_params[0,:]))
-   # if print_pr0: print("len t list : ", len(t_list))
-
 
     for evoId in range( output.shape[0]): ## todo not sure about length/arrays here
         for tId in range(len(t_list)):
             t = t_list[tId]
-            output[evoId][tId] = iqle_evolve(ham_true = true_ham, ham_sim=sim_ham, t=t)
+            ham = ham_list[evoId]
+            
+            output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe)
             if output[evoId][tId] < 0:
-                print("negative overlap")
-            elif output[evoId][tId] > 1:
-                print("Probability > 1 !!!!!!!")
+                print("negative probability : \t \t probability = ", output[evoId][tId])
+            elif output[evoId][tId] > 1.000000000000001:
+                print("Probability > 1: \t \t probability = ", output[evoId][tId]) 
             #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
     #if print_pr0: print ("output sample : ", output[0:min(output.shape[0], 5)])
     return output
@@ -712,42 +727,49 @@ def outer_product(state, as_qutip_object=False):
 
 #import qutip as qt
 
-def iqle_evolve(ham_sim, ham_true,t):
-    true_dim = int(np.log2(np.shape(ham_true)[0])) 
-    sim_dim = int(np.log2(np.shape(ham_sim)[0]))
+def iqle_evolve(ham, ham_minus, t, probe, trotterize=True ):
+    ham_dim = int(np.log2(np.shape(ham)[0])) 
+    ham_minus_dim = int(np.log2(np.shape(ham_minus)[0]))
 
-    
-    if true_dim == sim_dim: 
-        ham = ham_sim - ham_true
-        probe = random_probe(true_dim)
-        reversed_evolved_probe = expectation_value(ham, t, state=probe) 
-        #print("expected value = ", reversed_evolved_probe)
-        return reversed_evolved_probe
 
-    elif true_dim > sim_dim:
-        dim = true_dim
-        smaller_dim = sim_dim
-        probe = random_probe(dim)
-        qt_probe = qt.Qobj(trim_vector(probe, final_num_qubits=smaller_dim))
-        print("qt probe: ", qt_probe)
-        to_keep = range(smaller_dim)
-        evolved_probe = evolved_state(ham=ham_true, t=1, state=probe)
-        evolved_qt_obj = qt.Qobj(evolved_probe)
-        evolved_qt_obj.dims = [[2]*dim, [1]*dim]
-        evolved_partial_trace = evolved_qt_obj.ptrace(sim_dim)[:]
-        sim_unitary = h.exp_ham(ham_sim, t, plus_or_minus=1)
-        sim_unitary_dagger = sim_unitary.conj().T # U_adjoint
-        Rho_U = np.dot(evolved_partial_trace, sim_unitary)
-        U_adjoint_Rho_U = qt.Qobj(np.dot(sim_unitary_dagger, Rho_U))
-        U_adjoint_Rho_U.dims = [[2]*smaller_dim, [2]*smaller_dim]
-        print("U_rho_U = ", U_adjoint_Rho_U)
-        expected_value = qt.expect(U_adjoint_Rho_U, qt_probe)
-        #print("expected value = ", expected_value)
-        return expected_value
+    if trotterize == True: 
+        if ham_dim == ham_minus_dim: 
+            H = ham_minus - ham ##reversed because exp_ham function calculated e^{-iHt}
+            expec_value = expectation_value(H, t, state=probe) 
+            #print("expected value = ", reversed_evolved_probe)
+            #print("expectation value: ", reversed_evolved_probe)
+            return expec_value
+
+        elif ham_dim > ham_minus_dim:
+            print(" Dimensions don't match; IQLE not applicable")
+            return 0.5
+            """
+            dim = true_dim
+            smaller_dim = sim_dim
+            probe = random_probe(dim)
+            qt_probe = qt.Qobj(trim_vector(probe, final_num_qubits=smaller_dim))
+            #print("qt probe: ", qt_probe)
+            to_keep = range(smaller_dim)
+            evolved_probe = evolved_state(ham=ham_true, t=1, state=probe)
+            evolved_qt_obj = qt.Qobj(evolved_probe)
+            evolved_qt_obj.dims = [[2]*dim, [1]*dim]
+            evolved_partial_trace = evolved_qt_obj.ptrace(to_keep)[:]
+            sim_unitary = h.exp_ham(ham_sim, t, plus_or_minus=1)
+            sim_unitary_dagger = sim_unitary.conj().T # U_adjoint
+            Rho_U = np.dot(evolved_partial_trace, sim_unitary)
+            U_adjoint_Rho_U = qt.Qobj(np.dot(sim_unitary_dagger, Rho_U))
+            U_adjoint_Rho_U.dims = [[2]*smaller_dim, [2]*smaller_dim]
+            #print("U_rho_U = ", U_adjoint_Rho_U)
+            expected_value = qt.expect(U_adjoint_Rho_U, qt_probe)
+            #print("expected value = ", expected_value)
+            #print("expectation value: ", expected_value)
+            return expected_value
+            """
+        else: 
+            print("giving expectation value = 0.5 because simulated system is bigger than true system.")
+            return 0.5
     else: 
-        print("giving expectation value =0.5 because simulated system is bigger than true system.")
-        return 0.5
-
+        print("Implement trotterization in IQLE evolve function (Evo.py)")
 
 
 def old_overlap(ham_true, ham_sim, t):

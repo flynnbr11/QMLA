@@ -37,11 +37,10 @@ class ModelLearningClass():
         self.Particles =  np.random.rand(self.NumParticles,len(self.OpList))
         self.ExpParams = np.append(self.ExpParams, 1)
         self.Weights = np.full((1, self.NumParticles), 1./self.NumParticles)
-
     
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
     
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5,checkloss=False,gaussian=False, use_exp_custom=True, debug_directory=None):
+    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5,checkloss=False,gaussian=False, use_exp_custom=True, debug_directory=None, qle=True):
         
         self.TrueOpList = np.asarray(trueoplist)
         self.TrueParams = np.asarray(modeltrueparams)
@@ -51,10 +50,13 @@ class ModelLearningClass():
         self.ResamplerTresh = resample_thresh
         self.ModelID = int(modelID)
         self.UseExpCustom = use_exp_custom
+        self.QLE = qle
         
         if debug_directory is not None: 
             self.debugSave = True
-            self.debugDirectory = debug_directory            
+            self.debugDirectory = debug_directory 
+        else:            
+            self.debugSave = False
         #self.TrueHam = evo.getH(self.TrueParams, self.TrueOpList) # This is the Hamiltonian for the time evolution in the system
 #         self.Prior = MultiVariateUniformDistribution(len(self.OpList))
         if gaussian:
@@ -84,7 +86,7 @@ class ModelLearningClass():
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
         
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, probelist=self.ProbeList, probecounter = self.ProbeCounter, solver='scipy', trotter=True, use_exp_custom=self.UseExpCustom)    # probelist=self.TrueOpList,,
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, probelist=self.ProbeList, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom)    # probelist=self.TrueOpList,,
 
         
                 

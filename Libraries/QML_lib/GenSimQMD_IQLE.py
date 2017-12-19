@@ -38,11 +38,14 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, use_exp_custom=True):
+    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True):
         self._solver = solver #This is the solver used for time evolution scipy is faster, QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
         self._probecounter = probecounter
         self._probelist = probelist
+        self._a = 0
+        self._b = 0 
+        self.QLE = qle
         self._trotter = trotter
         
         self._modelparams = modelparams
@@ -56,9 +59,10 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             warnings.warn("\nI am assuming the Model and System Hamiltonians to be the same", UserWarning)
             self._trueHam = None
         else:
-#           self._trueHam = getH(trueparams, true_oplist)
+           #self._trueHam = getH(trueparams, true_oplist)
+           self._trueHam = np.tensordot(trueparams, true_oplist, axes=1)
+           print("true ham = \n", self._trueHam)
 #TODO: changing to try get update working for >1 qubit systems -Brian
-            self._trueHam = np.tensordot(trueparams, true_oplist, axes=1)
         if debug_print: print("Gen sim. True ham has been set as : ")
         if debug_print: print(self._trueHam)
         
@@ -136,6 +140,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         # Possibly add a second axis to modelparams.
         if len(modelparams.shape) == 1:
             modelparams = modelparams[..., np.newaxis]
+        print ("outcomes : ", outcomes)
             
         cutoff=min(len(modelparams), 5)
         # print('modelparams = ' + repr(modelparams[0:cutoff]))
@@ -226,18 +231,52 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         super(GenSimQMD_IQLE, self).likelihood(
             outcomes, modelparams, expparams
         )
+        ## either len(outcomes) or len(outcomes[0]) tells us whether we are using 1 particle (true case) or N particles (simulated case).
+        #print ("modelparams : ", modelparams.shape)
         
+        cutoff=min(len(modelparams), 5)
+        self._a += 1
+        if self._a % 2 == 1:
+            self._b += 1
+        probe = self._probelist[self._b % len(self._probelist)]
+        
+#        ham_minus = getH(sample, self._true_oplist)
+#        print("sample : ", sample)
+#        print("true oplist : \n", self._true_oplist)
+        
+        num_particles = modelparams.shape[0]
+        num_parameters = modelparams.shape[1]
+        if  num_particles == 1:
+            #print("true evolution with params: ", modelparams[0:cutoff], "\t true params: ", self._trueparams)
+            ham_list = [self._trueHam]
+            sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
+            true_evo = True
+        else:
+            #print("sim evolution with params: ", modelparams[0:cutoff])
+            ham_list = [np.tensordot(params, self._oplist, axes=1) for params in modelparams] 
+            sample = np.array([expparams.item(0)[1:]])
+            true_evo = False
+
+        ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
+
+#        print("probe : \n", probe)
+#        print("ham minus : \n", ham_minus)
+#        print ("ham list : \n", ham_list[0:cutoff])
+
         if len(modelparams.shape) == 1:
             modelparams = modelparams[..., np.newaxis]
             
-        cutoff=min(len(modelparams), 5)
             
-        t = expparams['t']
+        times = expparams['t']
 #        pr0 = np.zeros((self._modelparams.shape[1], expparams.shape[0]))
         #print("pr0 has shape ", pr0.shape)
-        
-        pr0 = get_pr0_array(t_list=t, sim_params=modelparams, sim_ops=self._oplist, true_ham = self._trueHam)    
-        
+#        pr0 = get_pr0_array_qle(t_list=times, ham_list=ham_list)
+        if self.QLE is True:
+            #print("using QLE function")
+            pr0 = get_pr0_array_qle(t_list=times, ham_list=ham_list, probe=probe)    
+        else: 
+            #print("using IQLE function")
+            pr0 = get_pr0_array_iqle(t_list=times, ham_list=ham_list, ham_minus=ham_minus, probe=probe)    
         #print("Pr0 = " + str(pr0[0:cutoff]) )
         #print("likelihoods: " + str((qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0))[0:cutoff]  ))    
         
