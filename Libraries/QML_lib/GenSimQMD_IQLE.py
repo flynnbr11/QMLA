@@ -38,16 +38,14 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True):
+    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True):
         self._solver = solver #This is the solver used for time evolution scipy is faster, QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
         self._probecounter = probecounter
-        self._probelist = probelist
         self._a = 0
         self._b = 0 
         self.QLE = qle
         self._trotter = trotter
-        
         self._modelparams = modelparams
         self._true_oplist = true_oplist
         self._trueparams = trueparams
@@ -61,7 +59,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         else:
            #self._trueHam = getH(trueparams, true_oplist)
            self._trueHam = np.tensordot(trueparams, true_oplist, axes=1)
-           print("true ham = \n", self._trueHam)
+           #print("true ham = \n", self._trueHam)
 #TODO: changing to try get update working for >1 qubit systems -Brian
         if debug_print: print("Gen sim. True ham has been set as : ")
         if debug_print: print(self._trueHam)
@@ -73,7 +71,11 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         #probestate = choose_randomprobe(self._probelist)
         probestate = def_randomprobe(oplist,modelpars=None)
         self.ProbeState=None
-        
+        self.NumProbes = num_probes
+        if probe_dict is None: 
+            self._probelist = seperable_probe_dict(max_num_qubits=10, num_probes = self.NumProbes)
+        else:
+            self._probelist = probe_dict    
     ## PROPERTIES ##
     
     @property
@@ -238,7 +240,11 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._a += 1
         if self._a % 2 == 1:
             self._b += 1
-        probe = self._probelist[self._b % len(self._probelist)]
+            
+        # choose a probe from self._probelist 
+        # two indices: 
+        # probe index
+        # - max qubits in this system
         
 #        ham_minus = getH(sample, self._true_oplist)
 #        print("sample : ", sample)
@@ -256,7 +262,11 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             ham_list = [np.tensordot(params, self._oplist, axes=1) for params in modelparams] 
             sample = np.array([expparams.item(0)[1:]])
             true_evo = False
-
+    
+        ham_num_qubits = np.log2(ham_list[0].shape[0])
+#        probe = trim_vector(state=probe, final_num_qubits=ham_num_qubits)
+        probe = self._probelist[(self._b % self.NumProbes), ham_num_qubits]
+       # print("ham num qubits : ", ham_num_qubits, " has probe \n ", probe)
         ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
 
 #        print("probe : \n", probe)
@@ -284,4 +294,35 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         #if likelihood_dev: print("outcomes has shape ", np.shape(outcomes))
         
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
+
+
+
+def seperable_probe_dict(max_num_qubits, num_probes):
+    seperable_probes = {}
+    for i in range(num_probes):
+        seperable_probes[i,0] = random_probe(1)
+        for j in range(1, 1+max_num_qubits):
+            if j==1:
+                seperable_probes[i,j] = seperable_probes[i,0]
+            else: 
+                seperable_probes[i,j] = np.tensordot(seperable_probes[i,j-1], random_probe(1), axes=0).flatten(order='c')
+            if np.linalg.norm(seperable_probes[i,j]) < 0.999999999 or np.linalg.norm(seperable_probes[i,j]) > 1.0000000000001:
+                print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
+    return seperable_probes
+
+
+def random_probe(num_qubits):
+    dim = 2**num_qubits
+    real = np.random.rand(1,dim)
+    imaginary = np.random.rand(1,dim)
+    complex_vectors = np.empty([1, dim])
+    complex_vectors = real +1.j*imaginary
+    norm_factor = np.linalg.norm(complex_vectors)
+    probe = complex_vectors/norm_factor
+    return probe[0][:]
+
+
+
+
+
         

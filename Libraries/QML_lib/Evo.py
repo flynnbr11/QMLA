@@ -708,9 +708,22 @@ def random_probe(num_qubits):
     probe = complex_vectors/norm_factor
     return probe[0][:]
 
+def one_zeros_probe(num_qubits):
+    dim = 2**num_qubits
+    real = np.zeros(dim)
+    imaginary = np.zeros(dim)
+    real[0] = 1.0
+    complex_vectors = np.empty([dim])
+    complex_vectors = real +1.j*imaginary
+    probe = complex_vectors/1.0
+    return probe
+
+
+
+
 def trim_vector(state, final_num_qubits):
 #todo: renormalise
-    new_vec = state[:2**final_num_qubits]/np.linalg.norm(state[:2**final_num_qubits])
+    new_vec = state[:2**int(final_num_qubits)]/np.linalg.norm(state[:2**int(final_num_qubits)])
     return new_vec
 
 def qutip_evolved_state(ham, t, state):

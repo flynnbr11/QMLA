@@ -538,7 +538,7 @@ ytz = operator('yTz')
 true_operator_list = np.array([ ytz.matrix] )
 
 
-def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True, redimensionalise=True, use_exp_custom=True, debug_directory = None):
+def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True, redimensionalise=True, num_probes = None, probe_dict=None, use_exp_custom=True, debug_directory = None):
     """
     Inputs:
     TODO
@@ -594,6 +594,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
                                     true_params=true_params, 
                                     modelID=int(modelID), 
                                     epoch=0, 
+                                    num_probes = num_probes,
                                     num_particles=num_particles, 
                                     redimensionalise=redimensionalise,              
                                     use_exp_custom = use_exp_custom, 
@@ -608,7 +609,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, debug_directory = None, qle=True ):
+def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, probe_dict=None, num_probes = None, debug_directory = None, qle=True ):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 
@@ -655,14 +656,12 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
                 sim_name = model_name
 
         else: 
-            print("Not Redimensionalising") 
             sim_name = model_name
-    
     
         print("Model ", model_name, " not previously considered -- adding.")
         op = operator(name = sim_name, undimensionalised_name = model_name)
         num_rows = len(running_database)
-        qml_instance = ModelLearningClass(name=op.name)
+        qml_instance = ModelLearningClass(name=op.name, num_probes = num_probes, probe_dict=probe_dict)
         true_param_list = []
         for j in range(len(true_ops)):
             true_param_list.append(0.3)
@@ -688,7 +687,6 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
           debug_directory = debug_directory,
           qle = qle
         )
-        print("on initialisation, simparams : ", [sim_pars])
         
         # Add to running_database, same columns as initial gen_list
         
