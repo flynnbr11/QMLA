@@ -1,15 +1,15 @@
 from __future__ import print_function # so print doesn't show brackets
+import sys as sys
+import os as os
+#import SETTINGS
 import qinfer as qi
 import qutip as qt
 import numpy as np
 import scipy as sp
 #import qutip as qt
-import sys as sys
-import os as os
+sys.path.append((os.path.join("..")))
 import IOfuncts as mIO 
  
-sys.path.append((os.path.join("..")))
-import SETTINGS
  
 use_linalg = False
 global print_pr0
@@ -28,6 +28,8 @@ except:
 if(use_linalg):
     ham_exp_installed = False
      
+def identity():
+    return np.array([[1+0.j, 0+0.j], [0+0.j, 1+0.j]])
 
 
 
@@ -40,7 +42,6 @@ debug_print = False
 
 def plus():
     return np.array([1, 1])/np.sqrt(2)
-
  
 def minus():
     return np.array([1, -1])/np.sqrt(2)
@@ -57,8 +58,6 @@ def plusI():
 def minusI():
     return np.array([1, -1j])/np.sqrt(2)
 
-def identity():
-    return np.array([[1+0.j, 0+0.j], [0+0.j, 1+0.j]])
  
  
 def sigmaz():
