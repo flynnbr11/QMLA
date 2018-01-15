@@ -16,7 +16,10 @@ import QMD
 import QML
 import ModelGeneration
 import BayesF
+import matplotlib
+
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 
 global paulis_list
 paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}

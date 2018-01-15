@@ -1,0 +1,8 @@
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (8.607457667476812). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/matplotlib/cbook/deprecation.py:106: MatplotlibDeprecationWarning: Adding an axes using the same arguments as a previous axes currently reuses the earlier instance.  In a future version, a new instance will always be created and returned.  Meanwhile, this warning can be suppressed, and the future behavior ensured, by passing a unique label to each axes instance.
+  warnings.warn(message, mplDeprecation, stacklevel=1)
+
+real	0m12.548s
+user	0m23.632s
+sys	0m1.371s

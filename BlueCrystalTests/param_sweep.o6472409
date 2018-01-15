@@ -1,0 +1,68 @@
+Running QLE for true operator  y  with parameters :  [0.6721110713139598]
+Model  y  not previously considered -- adding.
+Initialization Ready
+
+Running IQLE for model:  y
+Initial time selected > 0.739607722055
+Final time selected > 6.90781878962
+Final Parameters mean and stdev:[ 1.14613616  0.1278307 ]
+Killing model y
+Model instance  y  moved to legacy db
+Running IQLE for true operator  y  with parameters :  [0.6721110713139598]
+Model  y  not previously considered -- adding.
+Initialization Ready
+
+Running IQLE for model:  y
+Initial time selected > 3.36090524743
+Final time selected > 8.85382233904
+Final Parameters mean and stdev:[ 0.52067132  0.08123958]
+Killing model y
+Model instance  y  moved to legacy db
+Running QLE for true operator  z  with parameters :  [0.6137554498925308]
+Model  z  not previously considered -- adding.
+Initialization Ready
+
+Running IQLE for model:  z
+Initial time selected > 2.51397784482
+Final time selected > 1.84456245768
+Final Parameters mean and stdev:[-0.12524949  0.41217482]
+Killing model z
+Model instance  z  moved to legacy db
+Running IQLE for true operator  z  with parameters :  [0.6137554498925308]
+Model  z  not previously considered -- adding.
+Initialization Ready
+
+Running IQLE for model:  z
+Initial time selected > 4.69305577791
+Final time selected > 3.83227494281
+Final Parameters mean and stdev:[ 0.78250729  0.15946419]
+Killing model z
+Model instance  z  moved to legacy db
+Running QLE for true operator  z  with parameters :  [0.6803107674053138]
+Model  z  not previously considered -- adding.
+Initialization Ready
+
+Running IQLE for model:  z
+Initial time selected > 0.636747372973
+Final time selected > 1.01139381904
+Final Parameters mean and stdev:[ 0.67347695  0.40672432]
+Killing model z
+Model instance  z  moved to legacy db
+Running IQLE for true operator  z  with parameters :  [0.6803107674053138]
+Model  z  not previously considered -- adding.
+Initialization Ready
+
+Running IQLE for model:  z
+Initial time selected > 1.87780689729
+Final time selected > 2.71406567794
+Final Parameters mean and stdev:[ 0.45236115  0.39943073]
+Killing model z
+Model instance  z  moved to legacy db
+storing data for QLE
+
+
+
+
+
+
+TIME TAKEN FOR  3 TESTS :  7.990432977676392
