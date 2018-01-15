@@ -42,14 +42,16 @@ class ModelLearningClass():
     
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
     
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5,checkloss=True,gaussian=False, use_exp_custom=True, debug_directory=None, qle=True):
+    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=False, use_exp_custom=True, debug_directory=None, qle=True):
         
         self.TrueOpList = np.asarray(trueoplist)
         self.TrueParams = np.asarray(modeltrueparams)
         self.SimOpList  = np.asarray(simoplist)
         self.SimParams = np.asarray(simparams)
         self.NumParticles = numparticles # function to adapt by dimension
-        self.ResamplerTresh = resample_thresh
+        self.ResamplerThresh = resample_thresh
+        self.ResamplerA = resampler_a
+        self.PGHPrefactor = pgh_prefactor
         self.ModelID = int(modelID)
         self.UseExpCustom = use_exp_custom
         self.QLE = qle
@@ -97,8 +99,7 @@ class ModelLearningClass():
         #print('Chosen true_params: ' + str(self.TrueParams))
         #self.GenSimModel = gsi.GenSim_IQLE(oplist=self.OpList, modelparams=self.TrueParams, probecounter = self.ProbeCounter, probelist= [self.ProbeState], solver='scipy', trotter=True)
         #Here you can turn off the debugger change the resampling threshold etc...
-
-        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior , resample_thresh=self.ResamplerTresh , resampler = qi.LiuWestResampler(a=0.95), debug_resampling=False)
+        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior , resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
         
         #doublecheck and coment properly
         self.Inv_Field = [item[0] for item in self.GenSimModel.expparams_dtype[1:] ]
@@ -170,7 +171,10 @@ class ModelLearningClass():
         self.LogTotLikelihood=[] #log_total_likelihood
     
         for istep in range(self.NumExperiments):
-            self.Experiment = self.Heuristic()
+        
+            # self.Experiment =  self.PGHPrefactor * (self.Heuristic()) ## TODO: use PGH prefactor, either here or in multiPGH
+            self.Experiment =  self.Heuristic()
+            self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
             self.NumExperimentsToDate += 1
             #print('Chosen experiment: ' + repr(self.Experiment))
             if istep == 0:
