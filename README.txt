@@ -10,10 +10,6 @@ load here notebooks that are "stable" files you would like to share with other c
 pay extra care when modifying this, ideally ONLY pull_request/commit it via GitHub, working on a safe local copy folder, unless you are sure changes do not affect retro-compatibility
 
 
-/testing_notebooks 
-folder  ideally suited for quick draft tests for yourself or to address to specific people, here you can upload via Dropbox without dedicating much care, they will eventually be committed to GitHub by someone
-
-
 
 HOW TO USE THIS FOLDER
 Ideally, Dropbox will be more updated than GitHub, so that the first is to be intended as "nightly" release and GitHub files should be slightly more stable. 
