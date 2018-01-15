@@ -1,6 +1,6 @@
 from __future__ import print_function # so print doesn't show brackets
 import qinfer as qi
-import qutip as qt
+#import qutip as qt
 import numpy as np
 import scipy as sp
 #import qutip as qt
