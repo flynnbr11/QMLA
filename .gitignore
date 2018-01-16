@@ -15,7 +15,9 @@ __pycache__/
 *.dat
 *.pptx
 
-
+# Output files from cluster
+*.e*
+*.o*
 
 # Distribution / packaging
 .Python
