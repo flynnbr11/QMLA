@@ -9,7 +9,7 @@ import os as os
 import IOfuncts as mIO 
  
 sys.path.append((os.path.join("..")))
-import SETTINGS
+#import SETTINGS
  
 use_linalg = False
 global print_pr0
@@ -29,6 +29,7 @@ if(use_linalg):
     ham_exp_installed = False
      
 
+print("Using exp ham custom : ", ham_exp_installed)
 
 
      
@@ -245,7 +246,7 @@ def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotteri
                     else:
                         evostate = np.dot(sp.linalg.expm(-(1j)*tvec[idt]*(Hp-Hm)), probestate)
                 #if debug_print: print('Evostate: ', evostate)
-         
+       
             evo[evoidx][idt] = np.abs(np.dot(evostate.conj(), probestate.T)) ** 2        
     print("Evo has shape : " , evo.shape)
     print("modpar has shape : ", modpar.shape)
@@ -704,10 +705,12 @@ def expectation_value(ham, t, state=None, choose_random_probe=False):
 def evolved_state(ham, t, state):
     import hamiltonian_exponentiation as h
     from scipy import linalg
-    use_exp_ham_custom = False
+    use_exp_ham_custom = True
     if use_exp_ham_custom:
+      print("custom")
       unitary = h.exp_ham(ham, t)
     else:
+      print("linalg")
       unitary = linalg.expm(-1j*ham*t)
     return np.dot(unitary, state)
  
@@ -734,7 +737,7 @@ def one_zeros_probe(num_qubits):
  
  
  
- 
+
 def trim_vector(state, final_num_qubits):
 #todo: renormalise
     new_vec = state[:2**int(final_num_qubits)]/np.linalg.norm(state[:2**int(final_num_qubits)])
