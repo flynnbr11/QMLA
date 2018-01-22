@@ -981,7 +981,7 @@ def draw_summary_plots(iqle_qle):
     
     # Median Quadratic loss with variable resampling threshold
     # %matplotlib inline
-    plot_description='Median_Q_Loss_w_variable_'+variable_parameter
+    plot_description='Median_Q_Loss_w_'+variable_parameter
     plt.clf()
     for i in range(len(all_medians)):
         plt.semilogy( range(1,1+(num_exp)), list(all_medians[i]), label=descriptions_of_runs[i])
@@ -1004,7 +1004,7 @@ def draw_summary_plots(iqle_qle):
 
     # Mean Quadratic loss with variable resampling threshold
     # %matplotlib inline
-    plot_description='Mean_Q_Loss_w_variable_'+variable_parameter
+    plot_description='Mean_Q_Loss_w_'+variable_parameter
     plt.clf()
     for i in range(len(all_medians)):
         plt.semilogy( range(1,1+(num_exp)), list(all_means[i]), label=descriptions_of_runs[i])
