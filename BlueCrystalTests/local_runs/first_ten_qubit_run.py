@@ -9,7 +9,7 @@ import warnings
 import time as time
 import random
 
-sys.path.append(os.path.join("..","Libraries","QML_lib"))
+sys.path.append(os.path.join("..", "..","Libraries","QML_lib"))
 import Evo as evo
 import DataBase 
 import QMD
@@ -46,30 +46,19 @@ def get_directory_name_by_time(just_date=False):
     
 # Set parameters for tests
 
-num_tests = 5
-num_exp = 20
-num_part = 300
-#global_true_op = 'xTxTTxTTTyTTTTxTTTTTy'
-#global_true_op = 'xMy'
-global_true_op = 'xTxTTxTTTxTTTTxTTTTTx'
-#global_true_op = 'xTxTTxTTTyTTTTy'
+num_tests = 2
+num_exp = 2
+num_part = 5
 
 do_iqle = True
 do_qle = False
-
-do_summary_plots = True
-do_intermediate_plots = True
 
 plot_time = get_directory_name_by_time(just_date=False) # rather than calling at separate times and causing confusion
 save_figs = True
 save_intermediate_data = True
 save_summary_data = True
-
-
-if num_tests == 1:
-    intermediate_plots = False
-else:
-    intermediate_plots = do_intermediate_plots
+intermediate_plots = True
+do_summary_plots = True
 
 
 vary_resample_thresh = False
@@ -720,15 +709,12 @@ def store_data_for_plotting(iqle_qle):
     mins=[]
     maxs = []
     for k in range(num_exp):
-        try:
-            medians.append(np.median(exp_values[k]) )
-            means.append(np.mean(exp_values[k]) )
-            mins.append(np.min(exp_values[k]) )
-            maxs.append(np.max(exp_values[k]) )
-            std_dev.append(np.std(exp_values[k]) )
-        except ValueError:
-            pass
-            
+        medians.append(np.median(exp_values[k]) )
+        means.append(np.mean(exp_values[k]) )
+        mins.append(np.min(exp_values[k]) )
+        maxs.append(np.max(exp_values[k]) )
+        std_dev.append(np.std(exp_values[k]) )
+    
     if iqle_qle == 'qle':
         qle_intermediate_medians = medians
         qle_intermediate_means= means
@@ -1000,7 +986,6 @@ def draw_summary_plots(iqle_qle):
     for i in range(len(all_medians)):
         plt.semilogy( range(1,1+(num_exp)), list(all_medians[i]), label=descriptions_of_runs[i])
 
-#    plt.ylim(min(all_medians),max(all_medians) )  
     ax = plt.subplot(111)
     ## Shrink current axis's height by 10% on the bottom
     box = ax.get_position()
@@ -1022,8 +1007,6 @@ def draw_summary_plots(iqle_qle):
     plt.clf()
     for i in range(len(all_medians)):
         plt.semilogy( range(1,1+(num_exp)), list(all_means[i]), label=descriptions_of_runs[i])
-
- #   plt.ylim(min(all_means),max(all_means) )  
     ax = plt.subplot(111)
 
     # Shrink current axis's height by 10% on the bottom
@@ -1130,10 +1113,7 @@ for resample_thresh in resample_threshold_options:
                 true_params = [np.random.rand()]
                 true_param_list.append(true_params[0])
                 true_op=np.random.choice(paulis) # to choose a random True model each time 
-
-                true_op = global_true_op
-                #true_op = 'xTxTTxTTTxTTTTxTTTTTx'
-                # true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTx'
+                true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTx'
                 true_op_list.append(true_op)
                 # (Note: not learning between models yet; just learning paramters of true model)
 
@@ -1197,7 +1177,7 @@ for resample_thresh in resample_threshold_options:
             #plot_directory = 'test_plots/'+plot_time+'/'+plot_title_appendix+'/'+
             plot_directory = 'test_plots/'+plot_time+'/'+plot_title_appendix+'/'+param_details+'/'
 
-            if do_intermediate_plots:
+            if intermediate_plots:
                 if not os.path.exists(plot_directory):
                     os.makedirs(plot_directory)
 
