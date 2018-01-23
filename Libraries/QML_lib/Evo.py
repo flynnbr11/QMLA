@@ -699,8 +699,7 @@ def expectation_value(ham, t, state=None, choose_random_probe=False):
     psi_u_psi = np.dot(probe_bra, u_psi)
         
     #print("returning expec value : ", np.abs(psi_u_psi**2))
-#    expec_value = psi_u_psi**2 ## TODO MAKE 100% sure about this!!
-    expec_value = psi_u_psi
+    expec_value = psi_u_psi**2 ## TODO MAKE 100% sure about this!!
     
     if np.abs(expec_value) > 1.0000001:
         print("expectation value function has value ", np.abs(psi_u_psi**2))
