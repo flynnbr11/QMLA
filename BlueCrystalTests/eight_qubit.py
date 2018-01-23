@@ -49,7 +49,7 @@ def get_directory_name_by_time(just_date=False):
 num_tests = 1
 num_exp = 20
 num_part = 100
-global_true_op = 'xTxTTxTTTyTTTTxTTTTTyTTTTTTxTTTTTTTiTTTTTTTTzTTTTTTTTTx'
+global_true_op = 'xTxTTxTTTyTTTTxTTTTTyTTTTTTxTTTTTTTy'
 
 
 do_iqle = True
