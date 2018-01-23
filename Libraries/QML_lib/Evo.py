@@ -693,26 +693,33 @@ def expectation_value(ham, t, state=None, choose_random_probe=False):
         state = random_probe(num_qubits)
     elif random_probe is False and state is None: 
         print ("expectation value function: you need to either pass a state or set choose_random_probe=True")
+    #print("\n")
     u_psi = evolved_state(ham, t, state)
     probe_bra = state.conj().T
     psi_u_psi = np.dot(probe_bra, u_psi)
+        
     #print("returning expec value : ", np.abs(psi_u_psi**2))
-    if np.abs(psi_u_psi**2) > 1.0000001:
+#    expec_value = psi_u_psi**2 ## TODO MAKE 100% sure about this!!
+    expec_value = psi_u_psi
+    
+    if np.abs(expec_value) > 1.0000001:
         print("expectation value function has value ", np.abs(psi_u_psi**2))
         print("t=", t, "\nham = \n ", ham, "\n probe : \n", state, "\n probe normalisation : ", np.linalg.norm(u_psi))
-    return np.abs(psi_u_psi**2)
+    return np.abs(expec_value)
  
 def evolved_state(ham, t, state):
     import hamiltonian_exponentiation as h
     from scipy import linalg
     use_exp_ham_custom = True
-    if use_exp_ham_custom:
-      print("custom")
-      unitary = h.exp_ham(ham, t)
+    if use_exp_ham_custom and ham_exp_installed:
+      unitary = np.array(h.exp_ham(ham, t))
     else:
-      print("linalg")
+      print("Note: using linalg for exponentiating Hamiltonian.")
       unitary = linalg.expm(-1j*ham*t)
-    return np.dot(unitary, state)
+
+    ev_state = np.dot(unitary, state)
+        
+    return ev_state
  
  
 def random_probe(num_qubits):
