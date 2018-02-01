@@ -10,7 +10,7 @@ from ProbeStates import *
 from MemoryTest import print_loc
 from psutil import virtual_memory
 
-global_print_loc=True
+global_print_loc=False
 global debug_print
 debug_print = False
 global likelihood_dev
@@ -231,8 +231,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         #if likelihood_dev: print("outcomes has shape ", np.shape(outcomes))
         
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
-        
-        
+
     def likelihood(self, outcomes, modelparams, expparams):
         super(GenSimQMD_IQLE, self).likelihood(
             outcomes, modelparams, expparams
@@ -250,34 +249,17 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         # - max qubits in this system
         
         num_particles = modelparams.shape[0]
+
         num_parameters = modelparams.shape[1]
         print_loc(global_print_loc)
         if  num_particles == 1:
-            #print("true evolution with params: ", modelparams[0:cutoff], "\t true params: ", self._trueparams)
-            print_loc(global_print_loc)            
-            ham_list = [self._trueHam]
-            print("Memory used by ham_list : ", sys.getsizeof(ham_list))
-            print_loc(global_print_loc)            
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
-            print_loc(global_print_loc)            
             true_evo = True
         else:
-            print_loc(global_print_loc)            
-            print("Total memory before assining ham_list: ", virtual_memory().used)
-            ham_list = [np.tensordot(params, self._oplist, axes=1) for params in modelparams]
-            print("Total memory after assining ham_list: ", virtual_memory().used)
-            print("Length of: \nmodelparams ",  len(modelparams), "\noplist : ", len(self._oplist))
-            print("Length ham_list : ", len(ham_list), "\t elements has shape : ", ham_list[0].shape)
-            print("Single element has size : ", sys.getsizeof(ham_list[0]))
-            print("Memory used by ham_list : ", sys.getsizeof(ham_list))
-            print("Memory used by ham_list as %: ", 100*(sys.getsizeof(ham_list)/virtual_memory().total))
-            print_loc(global_print_loc)            
             sample = np.array([expparams.item(0)[1:]])
-            print_loc(global_print_loc)            
             true_evo = False
-        print_loc(global_print_loc)
     
-        ham_num_qubits = np.log2(ham_list[0].shape[0])
+        ham_num_qubits = np.log2(self._oplist[0].shape[0])
         probe = self._probelist[(self._b % self.NumProbes), ham_num_qubits]
         ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
         print_loc(global_print_loc)
@@ -285,26 +267,13 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         if len(modelparams.shape) == 1:
             modelparams = modelparams[..., np.newaxis]
             
-        print_loc(global_print_loc)
-            
         times = expparams['t']
-        print_loc(global_print_loc)
 
         if self.QLE is True:
-            #print("using QLE function")
-            print_loc(global_print_loc)
-            pr0 = get_pr0_array_qle(t_list=times, ham_list=ham_list, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
-            print_loc(global_print_loc)
+            pr0 = get_pr0_array_qle(t_list=times, modelparams=modelparams, oplist=self._oplist, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
         else: 
-            #print("using IQLE function")
-            print_loc(global_print_loc)
-            pr0 = get_pr0_array_iqle(t_list=times, ham_list=ham_list, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
-            print_loc(global_print_loc)
+            pr0 = get_pr0_array_iqle(t_list=times, modelparams=modelparams, oplist=self._oplist, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
 
-        print_loc(global_print_loc)
-        del ham_list # TODO: can i do this??
-#        print("Memory used by ham_list after del: ", sys.getsizeof(ham_list))
-        print_loc(global_print_loc)
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
 
 

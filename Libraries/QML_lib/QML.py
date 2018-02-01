@@ -18,7 +18,7 @@ debug_print = False
 global print_mem_status
 print_mem_status = True
 
-global_print_loc = True
+global_print_loc = False
 
 class ModelLearningClass():
     def __init__(self, name, num_probes, probe_dict):
@@ -182,7 +182,7 @@ class ModelLearningClass():
         
             # self.Experiment =  self.PGHPrefactor * (self.Heuristic()) ## TODO: use PGH prefactor, either here or in multiPGH
             print("\n\nUpdate at exp # ", istep)
-            print("Memory used : ", virtual_memory().percent, "%")
+            #print("Memory used : ", virtual_memory().percent, "%")
             print_loc(global_print_loc)
             
             self.Experiment =  self.Heuristic()

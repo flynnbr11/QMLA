@@ -48,21 +48,21 @@ def get_directory_name_by_time(just_date=False):
     
 # Set parameters for tests
 
-num_tests = 1
-num_exp = 2
-num_part = 200
+num_tests = 5
+num_exp = 50
+num_part = 300
 
 #global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTx'
-global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTx'
-#global_true_op = 'xTx'
+#global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTx'
+global_true_op = 'xTx'
 
 
 exp_custom = True
 use_sparse = True
 
-do_iqle = False
+do_iqle = True
 do_qle = True
-save_all = False #  save all plots etc.
+save_all = True #  save all plots etc.
 
 plot_time = get_directory_name_by_time(just_date=False) # rather than calling at separate times and causing confusion
 save_figs = save_all
@@ -1167,7 +1167,7 @@ for resample_thresh in resample_threshold_options:
                         iqle_final_qloss.append(mod.QLosses[-1])
 
                     qmd.killModel(true_op)
-                    del qmd
+                    qmd
 
             all_true_params.append(true_param_list)
             all_true_params_single_list.extend(true_param_list)
@@ -1250,8 +1250,8 @@ if do_qle:
         
     
 b = time.time()
-mem=virtual_memory()
-print("Memory used at end: \n", mem.percent, "%\n", mem.used, " used\n ", mem.total, " Total")
+#mem=virtual_memory()
+#print("Memory used at end: \n", mem.percent, "%\n", mem.used, " used\n ", mem.total, " Total")
 print("\n\n\n\n\n\nTIME TAKEN FOR ", num_tests, "TESTS : ", b-a)
 
 

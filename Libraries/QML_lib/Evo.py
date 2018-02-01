@@ -14,7 +14,7 @@ sys.path.append((os.path.join("..")))
 #import SETTINGS
 
 
-global_print_loc = True 
+global_print_loc = False 
 use_linalg = False
 use_sparse = False 
 global print_pr0
@@ -119,16 +119,17 @@ def pr0fromScipy(tvec, dw, oplist, probestate):
  
  
  
-def get_pr0_array_qle(t_list, ham_list, probe, use_exp_custom=True, enable_sparse=True):
+def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, enable_sparse=True):
     print_loc(global_print_loc)
-    num_particles = len(ham_list)
+    num_particles = len(modelparams)
     num_times = len(t_list)
      
     output = np.empty([num_particles, num_times])
     for evoId in range(num_particles): ## todo not sure about length/arrays here
+        ham = np.tensordot(modelparams[evoId], oplist, axes=1)
         for tId in range(len(t_list)):
             t = t_list[tId]
-            ham=ham_list[evoId]
+            #ham=ham_list[evoId]
           #  print("ham = \n", ham)
              
             print_loc(global_print_loc)
@@ -141,11 +142,10 @@ def get_pr0_array_qle(t_list, ham_list, probe, use_exp_custom=True, enable_spars
     print_loc(global_print_loc) 
     return output
  
- 
- 
-def get_pr0_array_iqle(t_list, ham_list, ham_minus, probe, use_exp_custom=True, enable_sparse=True, trotterize=True):
+
+def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_custom=True, enable_sparse=True, trotterize=True):
     print_loc(global_print_loc)
-    num_particles = len(ham_list)
+    num_particles = len(modelparams)
     num_times = len(t_list)
      
  
@@ -154,9 +154,10 @@ def get_pr0_array_iqle(t_list, ham_list, ham_minus, probe, use_exp_custom=True, 
     if print_pr0: print("output has shape ", output.shape)
  
     for evoId in range( output.shape[0]): ## todo not sure about length/arrays here
+        ham = np.tensordot(modelparams[evoId], oplist, axes=1)
         for tId in range(len(t_list)):
             t = t_list[tId]
-            ham = ham_list[evoId]
+#            ham = ham_list[evoId]
              
             output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
             print_loc(global_print_loc)
@@ -168,7 +169,8 @@ def get_pr0_array_iqle(t_list, ham_list, ham_minus, probe, use_exp_custom=True, 
     #if print_pr0: print ("output sample : ", output[0:min(output.shape[0], 5)])
     print_loc(global_print_loc)
     return output
- 
+
+
  
 def pr0fromScipyNC(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=True, IQLE=True, use_exp_custom=ham_exp_installed):
     """Generic version to be adopted in case oplist includes non-commutative operators"""
@@ -704,12 +706,21 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     elif random_probe is False and state is None: 
         print ("expectation value function: you need to either pass a state or set choose_random_probe=True")
     #print("\n")
-    u_psi = evolved_state(ham, t, state, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
+    print_loc(global_print_loc)
+    if use_exp_custom and ham_exp_installed:    
+      u_psi = h.unitary_evolve(ham, t, state, enable_sparse_functionality=enable_sparse)
+    else:
+      u_psi = evolved_state(ham, t, state, use_exp_custom=False, enable_sparse=enable_sparse)
+    print_loc(global_print_loc)
+    
     probe_bra = state.conj().T
     psi_u_psi = np.dot(probe_bra, u_psi)
-        
+    print_loc(global_print_loc)    
     #print("returning expec value : ", np.abs(psi_u_psi**2))
     expec_value = psi_u_psi**2 ## TODO MAKE 100% sure about this!!
+    print_loc(global_print_loc)
+    del u_psi
+    print_loc(global_print_loc)
     
     if np.abs(expec_value) > 1.0000001:
         print("expectation value function has value ", np.abs(psi_u_psi**2))
@@ -724,9 +735,9 @@ def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True):
   
     #print("Enable sparse : ", enable_sparse)    
     if use_exp_custom and ham_exp_installed:
-      unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse, sparse_min_qubit_number=7)
+      unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse)
     else:
-#      print("Note: using linalg for exponentiating Hamiltonian.")
+      print("Note: using linalg for exponentiating Hamiltonian.")
       unitary = linalg.expm(-1j*ham*t)
     print_loc(global_print_loc)
     ev_state = np.dot(unitary, state)
