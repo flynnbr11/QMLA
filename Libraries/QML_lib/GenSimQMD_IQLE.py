@@ -7,7 +7,10 @@ import warnings
 
 from Evo import *
 from ProbeStates import *
+from MemoryTest import print_loc
+from psutil import virtual_memory
 
+global_print_loc=True
 global debug_print
 debug_print = False
 global likelihood_dev
@@ -38,7 +41,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True):
+    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True, enable_sparse=True):
         self._solver = solver #This is the solver used for time evolution scipy is faster, QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
         self._probecounter = probecounter
@@ -50,6 +53,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._true_oplist = true_oplist
         self._trueparams = trueparams
         self.use_exp_custom = use_exp_custom
+        self.enable_sparse = enable_sparse
         self._min_freq = min_freq
         if true_oplist is not None and trueparams is None:
             raise(ValueError('\nA system Hamiltonian with unknown parameters was requested'))
@@ -73,7 +77,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self.ProbeState=None
         self.NumProbes = num_probes
         if probe_dict is None: 
-            self._probelist = seperable_probe_dict(max_num_qubits=10, num_probes = self.NumProbes)
+            self._probelist = seperable_probe_dict(max_num_qubits=12, num_probes = self.NumProbes) # TODO -- make same as number of qubits in model.
         else:
             self._probelist = probe_dict    
     ## PROPERTIES ##
@@ -233,66 +237,74 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         super(GenSimQMD_IQLE, self).likelihood(
             outcomes, modelparams, expparams
         )
-        ## either len(outcomes) or len(outcomes[0]) tells us whether we are using 1 particle (true case) or N particles (simulated case).
-        #print ("modelparams : ", modelparams.shape)
-        
+        print_loc(global_print_loc)
         cutoff=min(len(modelparams), 5)
         self._a += 1
         if self._a % 2 == 1:
             self._b += 1
+        print_loc(global_print_loc)
             
         # choose a probe from self._probelist 
         # two indices: 
         # probe index
         # - max qubits in this system
         
-#        ham_minus = getH(sample, self._true_oplist)
-#        print("sample : ", sample)
-#        print("true oplist : \n", self._true_oplist)
-        
         num_particles = modelparams.shape[0]
         num_parameters = modelparams.shape[1]
+        print_loc(global_print_loc)
         if  num_particles == 1:
             #print("true evolution with params: ", modelparams[0:cutoff], "\t true params: ", self._trueparams)
+            print_loc(global_print_loc)            
             ham_list = [self._trueHam]
+            print("Memory used by ham_list : ", sys.getsizeof(ham_list))
+            print_loc(global_print_loc)            
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
+            print_loc(global_print_loc)            
             true_evo = True
         else:
-            #print("sim evolution with params: ", modelparams[0:cutoff])
-            ham_list = [np.tensordot(params, self._oplist, axes=1) for params in modelparams] 
+            print_loc(global_print_loc)            
+            print("Total memory before assining ham_list: ", virtual_memory().used)
+            ham_list = [np.tensordot(params, self._oplist, axes=1) for params in modelparams]
+            print("Total memory after assining ham_list: ", virtual_memory().used)
+            print("Length of: \nmodelparams ",  len(modelparams), "\noplist : ", len(self._oplist))
+            print("Length ham_list : ", len(ham_list), "\t elements has shape : ", ham_list[0].shape)
+            print("Single element has size : ", sys.getsizeof(ham_list[0]))
+            print("Memory used by ham_list : ", sys.getsizeof(ham_list))
+            print("Memory used by ham_list as %: ", 100*(sys.getsizeof(ham_list)/virtual_memory().total))
+            print_loc(global_print_loc)            
             sample = np.array([expparams.item(0)[1:]])
+            print_loc(global_print_loc)            
             true_evo = False
+        print_loc(global_print_loc)
     
         ham_num_qubits = np.log2(ham_list[0].shape[0])
-#        probe = trim_vector(state=probe, final_num_qubits=ham_num_qubits)
         probe = self._probelist[(self._b % self.NumProbes), ham_num_qubits]
-       # print("ham num qubits : ", ham_num_qubits, " has probe \n ", probe)
         ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
-
-#        print("probe : \n", probe)
-#        print("ham minus : \n", ham_minus)
-#        print ("ham list : \n", ham_list[0:cutoff])
+        print_loc(global_print_loc)
 
         if len(modelparams.shape) == 1:
             modelparams = modelparams[..., np.newaxis]
             
+        print_loc(global_print_loc)
             
         times = expparams['t']
-#        pr0 = np.zeros((self._modelparams.shape[1], expparams.shape[0]))
-        #print("pr0 has shape ", pr0.shape)
-#        pr0 = get_pr0_array_qle(t_list=times, ham_list=ham_list)
+        print_loc(global_print_loc)
+
         if self.QLE is True:
             #print("using QLE function")
-            pr0 = get_pr0_array_qle(t_list=times, ham_list=ham_list, probe=probe)    
+            print_loc(global_print_loc)
+            pr0 = get_pr0_array_qle(t_list=times, ham_list=ham_list, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
+            print_loc(global_print_loc)
         else: 
             #print("using IQLE function")
-            pr0 = get_pr0_array_iqle(t_list=times, ham_list=ham_list, ham_minus=ham_minus, probe=probe)    
-        #print("Pr0 = " + str(pr0[0:cutoff]) )
-        #print("likelihoods: " + str((qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0))[0:cutoff]  ))    
-        
-        #if likelihood_dev: print("About to enter qi.FiniteOutcomeModel. \npr0 has shape ", np.shape(pr0))
-        #if likelihood_dev: print("outcomes has shape ", np.shape(outcomes))
-        
+            print_loc(global_print_loc)
+            pr0 = get_pr0_array_iqle(t_list=times, ham_list=ham_list, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
+            print_loc(global_print_loc)
+
+        print_loc(global_print_loc)
+        del ham_list # TODO: can i do this??
+#        print("Memory used by ham_list after del: ", sys.getsizeof(ham_list))
+        print_loc(global_print_loc)
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
 
 

@@ -21,6 +21,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 
+from psutil import virtual_memory
+
 global paulis_list
 paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
 
@@ -47,18 +49,27 @@ def get_directory_name_by_time(just_date=False):
 # Set parameters for tests
 
 num_tests = 1
-num_exp = 300
-num_part = 500
+num_exp = 2
+num_part = 200
 
-do_iqle = True
-do_qle = False
+#global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTx'
+global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTx'
+#global_true_op = 'xTx'
+
+
+exp_custom = True
+use_sparse = True
+
+do_iqle = False
+do_qle = True
+save_all = False #  save all plots etc.
 
 plot_time = get_directory_name_by_time(just_date=False) # rather than calling at separate times and causing confusion
-save_figs = True
-save_intermediate_data = True
-save_summary_data = True
-intermediate_plots = True
-do_summary_plots = True
+save_figs = save_all
+save_intermediate_data = save_all
+save_summary_data = save_all
+intermediate_plots = save_all
+do_summary_plots = save_all
 
 
 vary_resample_thresh = False
@@ -99,7 +110,7 @@ class NewQMDClass():
                  true_param_list = None,
                  num_particles=1000,
                  max_num_models=10, 
-                 max_num_qubits=4, 
+                 max_num_qubits=12, 
                  gaussian=True,
                  resample_threshold = 0.5,
                  resampler_a = 0.95,
@@ -108,6 +119,7 @@ class NewQMDClass():
                  max_num_branches = 20, 
                  use_exp_custom = True,
                  enable_sparse = True,
+                 sigma_threshold = 1e-13, 
                  debug_directory = None,
                  qle = True # Set to False for IQLE
                 ):
@@ -151,6 +163,7 @@ class NewQMDClass():
         self.GlobalEpoch = 0 
         self.UseExpCustom = use_exp_custom
         self.EnableSparse = enable_sparse
+        self.SigmaThreshold = sigma_threshold
         self.DebugDirectory = debug_directory
         
         self.BranchBayesComputed[0] = False
@@ -284,7 +297,7 @@ class NewQMDClass():
         if model_exists==True and has_model_finished==False : 
             model_instance = self.getModelInstance(model)
             print("\nRunning IQLE for model: ", model)
-            model_instance.UpdateModel(num_exp)
+            model_instance.UpdateModel(num_exp, sigma_threshold = self.SigmaThreshold)
             self.updateModelRecord(name=model, field='Completed', new_value=True)
             #model_instance.BayesOnModelsWithinbranches
         else: 
@@ -1117,8 +1130,7 @@ for resample_thresh in resample_threshold_options:
                 true_params = [np.random.rand()]
                 true_param_list.append(true_params[0])
                 #true_op=np.random.choice(paulis) # to choose a random True model each time 
-                #true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTx'
-                true_op = 'xTxTTx'
+                true_op = global_true_op 
                 
                 true_op_list.append(true_op)
                 # (Note: not learning between models yet; just learning paramters of true model)
@@ -1137,8 +1149,8 @@ for resample_thresh in resample_threshold_options:
                         num_particles=num_part,
                         qle=qle,
                         resample_threshold = resample_thresh,
-                        use_exp_custom = False,
-                        enable_sparse = True,
+                        use_exp_custom = exp_custom,
+                        enable_sparse = use_sparse,
                         resampler_a = resample_a,
                         pgh_prefactor = pgh_factor
                     )
@@ -1238,7 +1250,9 @@ if do_qle:
         
     
 b = time.time()
-
+mem=virtual_memory()
+print("Memory used at end: \n", mem.percent, "%\n", mem.used, " used\n ", mem.total, " Total")
 print("\n\n\n\n\n\nTIME TAKEN FOR ", num_tests, "TESTS : ", b-a)
+
 
 

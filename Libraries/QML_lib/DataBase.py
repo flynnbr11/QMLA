@@ -538,7 +538,7 @@ ytz = operator('yTz')
 true_operator_list = np.array([ ytz.matrix] )
 
 
-def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True, redimensionalise=True, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, probe_dict=None, use_exp_custom=True, debug_directory = None):
+def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True, redimensionalise=True, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, probe_dict=None, use_exp_custom=True, enable_sparse=True, debug_directory = None):
     """
     Inputs:
     TODO
@@ -600,7 +600,8 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
                                     num_probes = num_probes,
                                     num_particles=num_particles, 
                                     redimensionalise=redimensionalise,              
-                                    use_exp_custom = use_exp_custom, 
+                                    use_exp_custom = use_exp_custom,
+                                    enable_sparse=enable_sparse, 
                                     debug_directory = debug_directory,
                                     branchID=0, 
                                     qle=qle
@@ -612,7 +613,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, probe_dict=None, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, debug_directory = None, qle=True ):
+def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, enable_sparse=True, probe_dict=None, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, debug_directory = None, qle=True ):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 
@@ -685,6 +686,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
           simparams = [sim_pars],
           numparticles = num_particles,
           use_exp_custom = use_exp_custom,
+          enable_sparse=enable_sparse,
           modelID = modelID,
           resample_thresh = resample_threshold,
           resampler_a = resampler_a,

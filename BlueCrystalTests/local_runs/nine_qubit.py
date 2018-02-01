@@ -47,18 +47,28 @@ def get_directory_name_by_time(just_date=False):
 # Set parameters for tests
 
 num_tests = 1
-num_exp = 300
-num_part = 500
+num_exp = 2
+num_part = 10
+
+global_true_op = 'xTxTTxTTTyTTTTxTTTTTyTTTTTTxTTTTTTTxTTTTTTTTy'
+
 
 do_iqle = True
 do_qle = False
+
+do_summary_plots = True
+do_intermediate_plots = True
 
 plot_time = get_directory_name_by_time(just_date=False) # rather than calling at separate times and causing confusion
 save_figs = True
 save_intermediate_data = True
 save_summary_data = True
-intermediate_plots = True
-do_summary_plots = True
+
+
+if num_tests == 1:
+    intermediate_plots = False
+else:
+    intermediate_plots = do_intermediate_plots
 
 
 vary_resample_thresh = False
@@ -107,7 +117,6 @@ class NewQMDClass():
                  max_num_layers = 10,
                  max_num_branches = 20, 
                  use_exp_custom = True,
-                 enable_sparse = True,
                  debug_directory = None,
                  qle = True # Set to False for IQLE
                 ):
@@ -150,7 +159,6 @@ class NewQMDClass():
         self.InterBranchChampions = {}
         self.GlobalEpoch = 0 
         self.UseExpCustom = use_exp_custom
-        self.EnableSparse = enable_sparse
         self.DebugDirectory = debug_directory
         
         self.BranchBayesComputed[0] = False
@@ -184,7 +192,6 @@ class NewQMDClass():
                 num_probes = self.NumProbes,
                 probe_dict = self.ProbeDict,
                 use_exp_custom = self.UseExpCustom,
-                enable_sparse = self.EnableSparse,
                 debug_directory = self.DebugDirectory
             )
     def addModel(self, model, branchID=0):
@@ -204,7 +211,6 @@ class NewQMDClass():
             num_probes = self.NumProbes,
             probe_dict = self.ProbeDict,
             use_exp_custom = self.UseExpCustom,
-            enable_sparse = self.EnableSparse,
             debug_directory = self.DebugDirectory,
             modelID = self.NumModels,
             redimensionalise = False,
@@ -713,12 +719,15 @@ def store_data_for_plotting(iqle_qle):
     mins=[]
     maxs = []
     for k in range(num_exp):
-        medians.append(np.median(exp_values[k]) )
-        means.append(np.mean(exp_values[k]) )
-        mins.append(np.min(exp_values[k]) )
-        maxs.append(np.max(exp_values[k]) )
-        std_dev.append(np.std(exp_values[k]) )
-    
+        try:
+            medians.append(np.median(exp_values[k]) )
+            means.append(np.mean(exp_values[k]) )
+            mins.append(np.min(exp_values[k]) )
+            maxs.append(np.max(exp_values[k]) )
+            std_dev.append(np.std(exp_values[k]) )
+        except ValueError:
+            pass
+            
     if iqle_qle == 'qle':
         qle_intermediate_medians = medians
         qle_intermediate_means= means
@@ -990,6 +999,7 @@ def draw_summary_plots(iqle_qle):
     for i in range(len(all_medians)):
         plt.semilogy( range(1,1+(num_exp)), list(all_medians[i]), label=descriptions_of_runs[i])
 
+#    plt.ylim(min(all_medians),max(all_medians) )  
     ax = plt.subplot(111)
     ## Shrink current axis's height by 10% on the bottom
     box = ax.get_position()
@@ -1011,6 +1021,8 @@ def draw_summary_plots(iqle_qle):
     plt.clf()
     for i in range(len(all_medians)):
         plt.semilogy( range(1,1+(num_exp)), list(all_means[i]), label=descriptions_of_runs[i])
+
+ #   plt.ylim(min(all_means),max(all_means) )  
     ax = plt.subplot(111)
 
     # Shrink current axis's height by 10% on the bottom
@@ -1116,10 +1128,11 @@ for resample_thresh in resample_threshold_options:
             for i in range(num_tests):
                 true_params = [np.random.rand()]
                 true_param_list.append(true_params[0])
-                #true_op=np.random.choice(paulis) # to choose a random True model each time 
-                #true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTx'
-                true_op = 'xTxTTx'
-                
+                true_op=np.random.choice(paulis) # to choose a random True model each time 
+
+                true_op = global_true_op
+                #true_op = 'xTxTTxTTTxTTTTxTTTTTx'
+                # true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTx'
                 true_op_list.append(true_op)
                 # (Note: not learning between models yet; just learning paramters of true model)
 
@@ -1137,8 +1150,6 @@ for resample_thresh in resample_threshold_options:
                         num_particles=num_part,
                         qle=qle,
                         resample_threshold = resample_thresh,
-                        use_exp_custom = False,
-                        enable_sparse = True,
                         resampler_a = resample_a,
                         pgh_prefactor = pgh_factor
                     )
@@ -1185,7 +1196,7 @@ for resample_thresh in resample_threshold_options:
             #plot_directory = 'test_plots/'+plot_time+'/'+plot_title_appendix+'/'+
             plot_directory = 'test_plots/'+plot_time+'/'+plot_title_appendix+'/'+param_details+'/'
 
-            if intermediate_plots:
+            if do_intermediate_plots:
                 if not os.path.exists(plot_directory):
                     os.makedirs(plot_directory)
 

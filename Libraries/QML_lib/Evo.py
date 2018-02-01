@@ -3,15 +3,20 @@ import qinfer as qi
 #import qutip as qt
 import numpy as np
 import scipy as sp
+import inspect
+
 #import qutip as qt
 import sys as sys
 import os as os
 import IOfuncts as mIO 
- 
+from MemoryTest import print_loc
 sys.path.append((os.path.join("..")))
 #import SETTINGS
- 
+
+
+global_print_loc = True 
 use_linalg = False
+use_sparse = False 
 global print_pr0
 print_pr0 = False
  
@@ -114,7 +119,8 @@ def pr0fromScipy(tvec, dw, oplist, probestate):
  
  
  
-def get_pr0_array_qle(t_list, ham_list, probe):
+def get_pr0_array_qle(t_list, ham_list, probe, use_exp_custom=True, enable_sparse=True):
+    print_loc(global_print_loc)
     num_particles = len(ham_list)
     num_times = len(t_list)
      
@@ -125,20 +131,20 @@ def get_pr0_array_qle(t_list, ham_list, probe):
             ham=ham_list[evoId]
           #  print("ham = \n", ham)
              
-#            output[evoId][tId] = iqle_evolve(ham_true = true_ham, ham_sim=sim_ham, t=t)
-            output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe)
+            print_loc(global_print_loc)
+            output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
             if output[evoId][tId] < 0:
                 print("negative probability : \t \t probability = ", output[evoId][tId])
             elif output[evoId][tId] > 1.000000000000001: ## todo some times getting p=1.0 show up
                 print("[QLE] Probability > 1: \t \t probability = ", output[evoId][tId]) 
         #    print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
-     
+    print_loc(global_print_loc) 
     return output
  
  
  
-def get_pr0_array_iqle(t_list, ham_list, ham_minus, probe, trotterize=True):
-     
+def get_pr0_array_iqle(t_list, ham_list, ham_minus, probe, use_exp_custom=True, enable_sparse=True, trotterize=True):
+    print_loc(global_print_loc)
     num_particles = len(ham_list)
     num_times = len(t_list)
      
@@ -152,13 +158,15 @@ def get_pr0_array_iqle(t_list, ham_list, ham_minus, probe, trotterize=True):
             t = t_list[tId]
             ham = ham_list[evoId]
              
-            output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe)
+            output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
+            print_loc(global_print_loc)
             if output[evoId][tId] < 0:
                 print("negative probability : \t \t probability = ", output[evoId][tId])
             elif output[evoId][tId] > 1.000000000000001:
                 print("[IQLE] Probability > 1: \t \t probability = ", output[evoId][tId]) 
             #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
     #if print_pr0: print ("output sample : ", output[0:min(output.shape[0], 5)])
+    print_loc(global_print_loc)
     return output
  
  
@@ -686,15 +694,17 @@ def pr0fromHahn(tvec, modpar, exppar, oplist, probestate, Hp = None, trotterize=
      
 ## Partial trace functionality
  
-def expectation_value(ham, t, state=None, choose_random_probe=False):
+def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_custom=True, enable_sparse=True):
 # todo: list of probes, maybe 5 is enough? test with different values
+    print_loc(global_print_loc)
+    print_loc(global_print_loc)
     if choose_random_probe is True: 
         num_qubits = int(np.log2(np.shape(ham)[0]))
         state = random_probe(num_qubits)
     elif random_probe is False and state is None: 
         print ("expectation value function: you need to either pass a state or set choose_random_probe=True")
     #print("\n")
-    u_psi = evolved_state(ham, t, state)
+    u_psi = evolved_state(ham, t, state, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
     probe_bra = state.conj().T
     psi_u_psi = np.dot(probe_bra, u_psi)
         
@@ -704,22 +714,27 @@ def expectation_value(ham, t, state=None, choose_random_probe=False):
     if np.abs(expec_value) > 1.0000001:
         print("expectation value function has value ", np.abs(psi_u_psi**2))
         print("t=", t, "\nham = \n ", ham, "\n probe : \n", state, "\n probe normalisation : ", np.linalg.norm(u_psi))
+    print_loc(global_print_loc)
     return np.abs(expec_value)
  
-def evolved_state(ham, t, state):
+def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True):
     import hamiltonian_exponentiation as h
     from scipy import linalg
-    use_exp_ham_custom = True
-    if use_exp_ham_custom and ham_exp_installed:
-      unitary = np.array(h.exp_ham(ham, t))
+    print_loc(global_print_loc)
+  
+    #print("Enable sparse : ", enable_sparse)    
+    if use_exp_custom and ham_exp_installed:
+      unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse, sparse_min_qubit_number=7)
     else:
-      print("Note: using linalg for exponentiating Hamiltonian.")
+#      print("Note: using linalg for exponentiating Hamiltonian.")
       unitary = linalg.expm(-1j*ham*t)
-
+    print_loc(global_print_loc)
     ev_state = np.dot(unitary, state)
-        
+    del unitary # to save space
+    print_loc(global_print_loc)
     return ev_state
- 
+
+
  
 def random_probe(num_qubits):
     dim = 2**num_qubits
@@ -742,17 +757,7 @@ def one_zeros_probe(num_qubits):
     return probe
  
  
- 
-
-def trim_vector(state, final_num_qubits):
-#todo: renormalise
-    new_vec = state[:2**int(final_num_qubits)]/np.linalg.norm(state[:2**int(final_num_qubits)])
-    return new_vec
- 
-def qutip_evolved_state(ham, t, state):
-    evolved = evolved_state(ham,t,state=state)
-    return qt.Qobj(evolved)
- 
+  
 def outer_product(state, as_qutip_object=False):
     dim = int((state.shape[0]))
     if as_qutip_object:
@@ -763,7 +768,8 @@ def outer_product(state, as_qutip_object=False):
  
 #import qutip as qt
  
-def iqle_evolve(ham, ham_minus, t, probe, trotterize=True ):
+def iqle_evolve(ham, ham_minus, t, probe, trotterize=True, use_exp_custom=True, enable_sparse=True ):
+    print_loc(global_print_loc)
     ham_dim = int(np.log2(np.shape(ham)[0])) 
     ham_minus_dim = int(np.log2(np.shape(ham_minus)[0]))
  
@@ -771,10 +777,12 @@ def iqle_evolve(ham, ham_minus, t, probe, trotterize=True ):
     if trotterize == True: 
         if ham_dim == ham_minus_dim: 
             H = ham_minus - ham ##reversed because exp_ham function calculated e^{-iHt}
-            expec_value = expectation_value(H, t, state=probe)
+            print_loc(global_print_loc)
+            expec_value = expectation_value(H, t, state=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
             #print("expectation value : ", expec_value) 
             #print("expected value = ", reversed_evolved_probe)
             #print("expectation value: ", reversed_evolved_probe)
+            print_loc(global_print_loc)
             return expec_value
  
         elif ham_dim > ham_minus_dim:
@@ -809,52 +817,3 @@ def iqle_evolve(ham, ham_minus, t, probe, trotterize=True ):
         print("Implement trotterization in IQLE evolve function (Evo.py)")
  
  
-def old_overlap(ham_true, ham_sim, t):
-    overlap_print =False
-    if overlap_print: print("overlap :")
-    if overlap_print: print("ham true :" , ham_true)
-    if overlap_print: print("ham sim :", ham_sim)
-    if overlap_print: print("t=", t)
- 
-    true_dim = int(np.log2(np.shape(ham_true)[0])) 
-    sim_dim = int(np.log2(np.shape(ham_sim)[0]))
- 
-     
-    if true_dim == sim_dim:
-        joined_ham = ham_sim - ham_true
-        return expectation_value(joined_ham, t, choose_random_probe=True)
- 
-    min_dim = min(true_dim, sim_dim)
-    max_dim = max(true_dim, sim_dim)
-    to_keep = range(min_dim)
- 
-    probe = random_probe(max_dim)
-    reduced_probe = trim_vector(probe, final_num_qubits=min_dim)
-     
-    if sim_dim > min_dim: 
-    #todo: remove partial trace when system is smallest one anyway
-    # if dims match -> don't go into qutip (expectation_value function); 
-    # if one bigger -> ptrace on bigger Qobj on other -> get qt.expect
-        sim = qutip_evolved_state(ham_sim, t, probe)
-        sim.dims = [[2]*sim_dim, [1]*sim_dim]
-        sim_density_mtx = sim.ptrace(to_keep)
-    else:
-        sim =  evolved_state(ham_sim, t, reduced_probe)
-        #sim.dims = [[2]*sim_dim, [1]*sim_dim]
-        sim_density_mtx = outer_product(sim, as_qutip_object=True)
-     
-    if true_dim > min_dim: 
-        true = qutip_evolved_state(ham_true, t, probe)
-        true.dims = [[2]*true_dim, [1]*true_dim]
-        true_density_mtx = true.ptrace(to_keep)
-    else: 
-        true = evolved_state(ham_true, t, reduced_probe)
-        #true.dims = [[2]*true_dim, [1]*true_dim]
-        true_density_mtx = outer_product(true, as_qutip_object=True)
-         
-    #return true_reduced, sim_reduced
-    overlap = qt.expect(sim_reduced, true_reduced)
-     
-     
-    if overlap_print: print("overlap is ", overlap)
-    return overlap

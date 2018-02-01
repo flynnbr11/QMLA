@@ -1,0 +1,64 @@
+Using exp ham custom :  True
+Running IQLE for true operator  xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTx  with parameters :  [0.6740641399717091]
+Model  xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTx  not previously considered -- adding.
+Initialization Ready
+
+Running IQLE for model:  xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTx
+
+
+Update at exp #  0
+Memory used :  25.8 %
+Initial time selected > 0.0168656547151
+
+
+Update at exp #  1
+Memory used :  25.8 %
+[IQLE] Probability > 1: 	 	 probability =  1.0
+
+
+Update at exp #  2
+Memory used :  25.8 %
+[IQLE] Probability > 1: 	 	 probability =  1.0
+
+
+Update at exp #  3
+Memory used :  25.8 %
+
+
+Update at exp #  4
+Memory used :  25.8 %
+
+
+Update at exp #  5
+Memory used :  26.7 %
+
+
+Update at exp #  6
+Memory used :  26.8 %
+
+
+Update at exp #  7
+Memory used :  26.8 %
+
+
+Update at exp #  8
+Memory used :  26.8 %
+
+
+Update at exp #  9
+Memory used :  26.8 %
+Final time selected > 0.0834605972347
+Final Parameters mean and stdev:[ 0.51046938  0.60182204]
+Killing model xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTx
+Model instance  xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTx  moved to legacy db
+Memory used at end: 
+ 26.0 %
+ 3040305152  used
+  16695414784  Total
+
+
+
+
+
+
+TIME TAKEN FOR  1 TESTS :  613.559719086
