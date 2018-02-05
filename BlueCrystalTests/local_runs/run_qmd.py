@@ -49,9 +49,9 @@ def get_directory_name_by_time(just_date=False):
     
 # Set parameters for tests
 
-num_tests = 10
-num_exp = 200
-num_part = 300
+num_tests = 2
+num_exp = 20
+num_part = 30
 
 #global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTx'
 #global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTx'

@@ -143,7 +143,8 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         if self._a % 2 == 1:
             self._b += 1
         print_loc(global_print_loc)
-            
+        fill_ham_list = True
+        ham_list = None
         # choose a probe from self._probelist 
         # two indices: 
         # probe index
@@ -158,13 +159,15 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         if  num_particles == 1:
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
             true_evo = True
-            ham_list = [self._trueHam]
+            if fill_ham_list:
+                ham_list = [self._trueHam]
             params = [self._trueparams]
             
         else:
             sample = np.array([expparams.item(0)[1:]])
             true_evo = False
-            ham_list = [np.tensordot(params, self._oplist, axes=1) for params in modelparams] 
+            if fill_ham_list:
+                ham_list = [np.tensordot(params, self._oplist, axes=1) for params in modelparams] 
             params = modelparams
     
         ham_num_qubits = np.log2(self._oplist[0].shape[0])
@@ -178,9 +181,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         times = expparams['t']
 
         if self.QLE is True:
-            pr0 = get_pr0_array_qle(t_list=times, ham_list=ham_list, modelparams=params, oplist=self._oplist, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
+            pr0 = get_pr0_array_qle(t_list=times, modelparams=params, oplist=self._oplist, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse, ham_list=ham_list)    
         else: 
-            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params, oplist=self._oplist, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
+            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params, oplist=self._oplist, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse, ham_list=ham_list)    
 
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
 

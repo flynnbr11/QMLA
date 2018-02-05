@@ -97,7 +97,7 @@ def getH(_pars, _ops):
  
  
  
-def get_pr0_array_qle(t_list, ham_list, modelparams, oplist, probe, use_exp_custom=True, enable_sparse=True):
+def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, enable_sparse=True, ham_list=None):
     #print("QLE get_pr0 function")
     print("modelparams : \n", modelparams)
     #print("oplist : \n", oplist)
@@ -112,13 +112,14 @@ def get_pr0_array_qle(t_list, ham_list, modelparams, oplist, probe, use_exp_cust
 #        ham = np.tensordot(modelparams[evoId], oplist, axes=1)
         for tId in range(len(t_list)):
             ham = np.tensordot(modelparams[evoId], oplist, axes=1)
-            ham1 = ham_list[evoId]
-            if not np.all(ham1==ham):
-              print("Different hamiltonian from list than generating.")
-              print("Ham from list : \n", ham)
-              print("Ham from generation: \n", ham1) 
-            else: 
-              print("Hamiltonians matched.")
+            if ham_list is not None:
+              ham1 = ham_list[evoId]
+              if not np.all(ham1==ham):
+                print("Different hamiltonian from list than generating.")
+                print("Ham from list : \n", ham)
+                print("Ham from generation: \n", ham1) 
+#              else: 
+#                print("Hamiltonians matched.")
             t = t_list[tId]
             #ham=ham_list[evoId]
             print("ham = \n", ham)
@@ -136,7 +137,7 @@ def get_pr0_array_qle(t_list, ham_list, modelparams, oplist, probe, use_exp_cust
     return output
  
 
-def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_custom=True, enable_sparse=True, trotterize=True):
+def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_custom=True, enable_sparse=True, trotterize=True, ham_list = None):
     print_loc(global_print_loc)
     num_particles = len(modelparams)
     num_times = len(t_list)
@@ -148,6 +149,14 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_cu
  
     for evoId in range( output.shape[0]): ## todo not sure about length/arrays here
         ham = np.tensordot(modelparams[evoId], oplist, axes=1)
+        if ham_list is not None:
+            ham1 = ham_list[evoId]
+            if not np.all(ham1==ham):
+                print("Different hamiltonian from list than generating.")
+                print("Ham from list : \n", ham)
+                print("Ham from generation: \n", ham1) 
+#            else: 
+#                print("Hamiltonians matched.")
         for tId in range(len(t_list)):
             t = t_list[tId]
 #            ham = np.tensordot(modelparams[evoId], oplist, axes=1)
