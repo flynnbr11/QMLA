@@ -48,19 +48,19 @@ def get_directory_name_by_time(just_date=False):
     
 # Set parameters for tests
 
-num_tests = 5
-num_exp = 50
-num_part = 300
+num_tests = 1
+num_exp = 100
+num_part = 1000
 
 #global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTx'
 #global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTx'
-global_true_op = 'xTx'
+global_true_op = 'x'
 
 
 exp_custom = True
 use_sparse = True
 
-do_iqle = True
+do_iqle = False
 do_qle = True
 save_all = True #  save all plots etc.
 
@@ -81,6 +81,10 @@ variable_parameter = 'vary'
 best_resample_threshold = 0.65
 best_resample_a = 0.9
 best_pgh = 1.4
+
+best_resample_threshold = 0.5
+best_resample_a = 0.9
+best_pgh = 1.0
 
 a_options = [best_resample_a]
 resample_threshold_options = [best_resample_threshold]
@@ -1167,7 +1171,7 @@ for resample_thresh in resample_threshold_options:
                         iqle_final_qloss.append(mod.QLosses[-1])
 
                     qmd.killModel(true_op)
-                    qmd
+                    del qmd
 
             all_true_params.append(true_param_list)
             all_true_params_single_list.extend(true_param_list)

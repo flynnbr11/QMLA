@@ -177,9 +177,10 @@ class ModelLearningClass():
         self.Experiment = self.Heuristic()    
         self.SigmaThresh = sigma_threshold   #This is the value of the Norm of the COvariance matrix which stops the IQLE 
         self.LogTotLikelihood=[] #log_total_likelihood
+
+        print("sigma_threshold = ", self.SigmaThresh)
     
         for istep in range(self.NumExperiments):
-        
             # self.Experiment =  self.PGHPrefactor * (self.Heuristic()) ## TODO: use PGH prefactor, either here or in multiPGH
             print("\n\nUpdate at exp # ", istep)
             #print("Memory used : ", virtual_memory().percent, "%")
@@ -277,8 +278,7 @@ class ModelLearningClass():
                 self.Weights = self.Weights[:, 0:istep]
                 self.TrackTime = self.TrackTime[0:istep]
                 
-                break #TODO: Reinstate this break; disabled to test different cases while chasing memory leak.
-             #TODO: UNCOMMENT THIS SECTION. commented to ensure all steps are performed when tracking memory leak. 
+                break 
             
             ####Need to ADD check with dereivative of sigmas!!!!
             
