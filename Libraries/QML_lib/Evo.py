@@ -99,14 +99,14 @@ def getH(_pars, _ops):
  
 def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, enable_sparse=True, ham_list=None):
     #print("QLE get_pr0 function")
-    print("modelparams : \n", modelparams)
+    #print("modelparams : \n", modelparams)
     #print("oplist : \n", oplist)
     #print("probe : \n", probe)
     print_loc(global_print_loc)
     num_particles = len(modelparams)
     num_times = len(t_list)
-    print("num particles = ", num_particles)
-    print("num_times ", num_times)
+    #print("num particles = ", num_particles)
+    #print("num_times ", num_times)
     output = np.empty([num_particles, num_times])
     for evoId in range(num_particles): ## todo not sure about length/arrays here
 #        ham = np.tensordot(modelparams[evoId], oplist, axes=1)
@@ -122,7 +122,7 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, e
 #                print("Hamiltonians matched.")
             t = t_list[tId]
             #ham=ham_list[evoId]
-            print("ham = \n", ham)
+            #print("ham = \n", ham)
              
             print_loc(global_print_loc)
             #print("param: ", modelparams[evoId])
@@ -132,7 +132,7 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, e
                 print("[QLE] Negative probability : \t \t probability = ", output[evoId][tId])
             elif output[evoId][tId] > 1.000000000000001: ## todo some times getting p=1.0 show up
                 print("[QLE] Probability > 1: \t \t probability = ", output[evoId][tId]) 
-            print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
+            #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
     print_loc(global_print_loc) 
     return output
  

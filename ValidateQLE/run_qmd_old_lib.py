@@ -9,7 +9,7 @@ import warnings
 import time as time
 import random
 
-sys.path.append(os.path.join("..","Libraries","QML_lib"))
+sys.path.append(os.path.join("..","Libraries","QML_lib_Jan_17"))
 import Evo as evo
 import DataBase 
 import QMD
@@ -22,6 +22,48 @@ global paulis_list
 paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
 
 warnings.filterwarnings("ignore", message='Negative weights occured', category=RuntimeWarning)
+
+
+def get_directory_name_by_time(just_date=False):
+    import datetime
+    # Directory name based on date and time it was generated 
+    # from https://www.saltycrane.com/blog/2008/06/how-to-get-current-date-and-time-in/
+    now =  datetime.date.today()
+    year = now.strftime("%y")
+    month = now.strftime("%b")
+    day = now.strftime("%d")
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    date = str (str(day)+'_'+str(month)+'_'+str(year) )
+    time = str(str(hour)+'_'+str(minute))
+    name = str(date+'/'+time+'/')
+    if just_date is False:
+        return name
+    else: 
+        return str(date+'/')
+
+
+num_tests = 50
+num_exp = 200
+num_part = 300
+
+do_iqle = True
+do_qle = True
+
+plot_time = get_directory_name_by_time(just_date=False) # rather than calling at separate times and causing confusion
+save_figs = True
+save_data = False
+intermediate_plots = True
+do_summary_plots = True
+
+vary_resample_a = False
+vary_resample_thresh = False
+vary_pgh_factor = False
+
+best_resample_threshold = 0.65
+best_resample_a = 0.9
+best_pgh = 1.4
+
 
 class NewQMDClass():
     #TODO: rename as ModelsDevelopmentClass when finished
@@ -90,9 +132,11 @@ class NewQMDClass():
 #            self.LayerChampions[i] = 0
         
         if self.QLE:
-            print("Running QLE for true operator ", true_operator, " with parameters : ", self.TrueParamsList)
+            self.QLE_Type = 'QLE'
         else: 
-            print("Running IQLE for true operator ", true_operator, " with parameters : ", self.TrueParamsList)
+            self.QLE_Type = 'IQLE'
+    
+        print("Running ", self.QLE_Type, " for true operator ", true_operator, " with parameters : ", self.TrueParamsList)
         # Initialise database and lists.
         self.initiateDB()
         
@@ -211,7 +255,7 @@ class NewQMDClass():
         
         if model_exists==True and has_model_finished==False : 
             model_instance = self.getModelInstance(model)
-            print("\nRunning IQLE for model: ", model)
+            print("\nRunning ", self.QLE_Type, " for model: ", model)
             model_instance.UpdateModel(num_exp)
             self.updateModelRecord(name=model, field='Completed', new_value=True)
             #model_instance.BayesOnModelsWithinbranches
@@ -573,24 +617,6 @@ def random_probe(num_qubits):
     probe = complex_vectors/norm_factor
     return probe[0][:]
 
-def get_directory_name_by_time(just_date=False):
-    import datetime
-    # Directory name based on date and time it was generated 
-    # from https://www.saltycrane.com/blog/2008/06/how-to-get-current-date-and-time-in/
-    now =  datetime.date.today()
-    year = now.strftime("%y")
-    month = now.strftime("%b")
-    day = now.strftime("%d")
-    hour = datetime.datetime.now().hour
-    minute = datetime.datetime.now().minute
-    date = str (str(day)+'_'+str(month)+'_'+str(year) )
-    time = str(str(hour)+'_'+str(minute))
-    name = str(date+'/'+time+'/')
-    if just_date is False:
-        return name
-    else: 
-        return str(date+'/')
-
 #####################################
 
 ### Plotting functions 
@@ -740,25 +766,17 @@ def individual_plots(iqle_qle):
     """
     # Median with shadowing
     # %matplotlib inline
-    """
     plot_description = 'Median_with_std_dev'
     plt.clf()
     #plt.axes.Axes.set_yscale('log')
-    y = medians
+    y = medians[0]
     x = range(1,1+num_exp)
     #print("Different length lists")
-    #y_lower = [( y[[i] - std_devs[i]) for i in range(len(y))]
-    #y_upper = [ (y[i] + std_devs[i] )for i in range(len(y))]
-    print(y)
-    print(std_devs)
-    
-    print(np.shape(y), np.shape(std_devs))    
-    y_lower = np.array(y[0])  - np.array(std_devs[0]) 
-    y_upper = np.array(y[0])  + np.array(std_devs[0])
-    
-
-
-    
+    devs = std_devs[0]
+    y_lower = [( y[i] - devs[i]) for i in range(len(y))]
+    y_upper = [ (y[i] + devs[i] )for i in range(len(y))]
+    #y_lower = np.array(y[0])  - np.array(std_devs[0]) 
+    #y_upper = np.array(y[0])  + np.array(std_devs[0])
     fig,ax = plt.subplots()
     ax.set_yscale('log', nonposy="clip")
     ax.set_xscale('linear')
@@ -770,7 +788,6 @@ def individual_plots(iqle_qle):
     plt.ylabel('Quadratic Loss');
     plt.title(qle_type + ' Median Quadratic Loss '+title_appendix);
     if save_figs: plt.savefig(plot_directory+qle_type+'_'+ plot_description)
-    """
     
     
     # Median with shadowing
@@ -778,10 +795,11 @@ def individual_plots(iqle_qle):
     plot_description = 'Median_min_max'
     plt.clf()
     #plt.axes.Axes.set_yscale('log')
-    y = medians
+    y = medians[0]
+    
     x = range(1,1+num_exp)
-    y_lower = maxs
-    y_upper = mins
+    y_lower = maxs[0]
+    y_upper = mins[0]
     
     fig,ax = plt.subplots()
     ax.set_yscale('log', nonposy="clip")
@@ -801,10 +819,11 @@ def individual_plots(iqle_qle):
     plot_description = 'Mean_with_std_dev'
     plt.clf()
     #plt.axes.Axes.set_yscale('log')
-    y = means
+    y = means[0]
+    devs =  std_devs[0]
     x = range(1,1+num_exp)
-    y_lower = [( y[i] - std_devs[i]) for i in range(len(y))]
-    y_upper = [ (y[i] + std_devs[i] )for i in range(len(y))]
+    y_lower = [( y[i] - devs[i]) for i in range(len(y))]
+    y_upper = [ (y[i] + devs[i] )for i in range(len(y))]
     
     fig,ax = plt.subplots()
     ax.set_yscale('log', nonposy="clip")
@@ -823,10 +842,10 @@ def individual_plots(iqle_qle):
     plot_description = 'Mean_min_max'
     plt.clf()
     #plt.axes.Axes.set_yscale('log')
-    y = means
+    y = means[0]
     x = range(1,1+num_exp)
-    y_lower = mins
-    y_upper = maxs
+    y_lower = mins[0]
+    y_upper = maxs[0]
     
     fig,ax = plt.subplots()
     ax.set_yscale('log', nonposy="clip")
@@ -946,23 +965,6 @@ import time as time
 a = time.time()
 
 
-num_tests = 1
-num_exp = 100
-num_part = 300
-
-do_iqle = True
-do_qle = True
-
-plot_time = get_directory_name_by_time(just_date=False) # rather than calling at separate times and causing confusion
-save_figs = True
-save_data = False
-intermediate_plots = False
-do_summary_plots = True
-
-resample_thresh = 0.5
-resample_a = 0.95
-pgh_factor = 1.0
-
 all_true_ops = []
 all_true_params = []
 all_true_params_single_list = []
@@ -987,19 +989,16 @@ qle_descriptions_of_runs = []
 old_descriptions_of_runs = {}
 
 
-vary_resample_a = False
-vary_resample_thresh = False
-vary_pgh_factor = False
-
-variable_parameter = 'vary'
-
-best_resample_threshold = 0.65
-best_resample_a = 0.9
-best_pgh = 1.4
 
 a_options = [best_resample_a]
 resample_threshold_options = [best_resample_threshold]
 pgh_options = [best_pgh]
+
+if vary_resample_thresh or vary_resample_a or vary_pgh_factor: 
+    variable_parameter = 'vary'
+else:
+    variable_parameter = ''
+
     
 if vary_resample_thresh : 
     variable_parameter += '_thresh'

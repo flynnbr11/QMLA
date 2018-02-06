@@ -740,25 +740,17 @@ def individual_plots(iqle_qle):
     """
     # Median with shadowing
     # %matplotlib inline
-    """
     plot_description = 'Median_with_std_dev'
     plt.clf()
     #plt.axes.Axes.set_yscale('log')
-    y = medians
+    y = medians[0]
     x = range(1,1+num_exp)
     #print("Different length lists")
-    #y_lower = [( y[[i] - std_devs[i]) for i in range(len(y))]
-    #y_upper = [ (y[i] + std_devs[i] )for i in range(len(y))]
-    print(y)
-    print(std_devs)
-    
-    print(np.shape(y), np.shape(std_devs))    
-    y_lower = np.array(y[0])  - np.array(std_devs[0]) 
-    y_upper = np.array(y[0])  + np.array(std_devs[0])
-    
-
-
-    
+    devs = std_devs[0]
+    y_lower = [( y[i] - devs[i]) for i in range(len(y))]
+    y_upper = [ (y[i] + devs[i] )for i in range(len(y))]
+    #y_lower = np.array(y[0])  - np.array(std_devs[0]) 
+    #y_upper = np.array(y[0])  + np.array(std_devs[0])
     fig,ax = plt.subplots()
     ax.set_yscale('log', nonposy="clip")
     ax.set_xscale('linear')
@@ -770,7 +762,6 @@ def individual_plots(iqle_qle):
     plt.ylabel('Quadratic Loss');
     plt.title(qle_type + ' Median Quadratic Loss '+title_appendix);
     if save_figs: plt.savefig(plot_directory+qle_type+'_'+ plot_description)
-    """
     
     
     # Median with shadowing
@@ -778,10 +769,11 @@ def individual_plots(iqle_qle):
     plot_description = 'Median_min_max'
     plt.clf()
     #plt.axes.Axes.set_yscale('log')
-    y = medians
+    y = medians[0]
+    
     x = range(1,1+num_exp)
-    y_lower = maxs
-    y_upper = mins
+    y_lower = maxs[0]
+    y_upper = mins[0]
     
     fig,ax = plt.subplots()
     ax.set_yscale('log', nonposy="clip")
@@ -801,10 +793,11 @@ def individual_plots(iqle_qle):
     plot_description = 'Mean_with_std_dev'
     plt.clf()
     #plt.axes.Axes.set_yscale('log')
-    y = means
+    y = means[0]
+    devs =  std_devs[0]
     x = range(1,1+num_exp)
-    y_lower = [( y[i] - std_devs[i]) for i in range(len(y))]
-    y_upper = [ (y[i] + std_devs[i] )for i in range(len(y))]
+    y_lower = [( y[i] - devs[i]) for i in range(len(y))]
+    y_upper = [ (y[i] + devs[i] )for i in range(len(y))]
     
     fig,ax = plt.subplots()
     ax.set_yscale('log', nonposy="clip")
@@ -823,10 +816,10 @@ def individual_plots(iqle_qle):
     plot_description = 'Mean_min_max'
     plt.clf()
     #plt.axes.Axes.set_yscale('log')
-    y = means
+    y = means[0]
     x = range(1,1+num_exp)
-    y_lower = mins
-    y_upper = maxs
+    y_lower = mins[0]
+    y_upper = maxs[0]
     
     fig,ax = plt.subplots()
     ax.set_yscale('log', nonposy="clip")
@@ -946,8 +939,8 @@ import time as time
 a = time.time()
 
 
-num_tests = 1
-num_exp = 100
+num_tests = 50
+num_exp = 200
 num_part = 300
 
 do_iqle = True
@@ -956,12 +949,9 @@ do_qle = True
 plot_time = get_directory_name_by_time(just_date=False) # rather than calling at separate times and causing confusion
 save_figs = True
 save_data = False
-intermediate_plots = False
+intermediate_plots = True
 do_summary_plots = True
 
-resample_thresh = 0.5
-resample_a = 0.95
-pgh_factor = 1.0
 
 all_true_ops = []
 all_true_params = []

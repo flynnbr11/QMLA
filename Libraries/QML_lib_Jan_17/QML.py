@@ -8,17 +8,10 @@ import ProbeStates as pros
 import GenSimQMD_IQLE as gsi
 import multiPGH as mpgh
 import DataBase as DB
-from MemoryTest import print_loc
 from EvalLoss import *
-from psutil import virtual_memory
 
 global debug_print
 debug_print = False
-
-global print_mem_status
-print_mem_status = True
-
-global_print_loc = False
 
 class ModelLearningClass():
     def __init__(self, name, num_probes, probe_dict):
@@ -34,7 +27,7 @@ class ModelLearningClass():
         self.VolumeList = np.array([])        #List with the Volume as a function of number of steps
         self.Name = name
         self.Operator = DB.operator(name)
-      #  self.Matrix = self.Operator.matrix
+        self.Matrix = self.Operator.matrix
         self.NumExperimentsToDate = 0
         self.BayesFactors = {}
         self.NumProbes = num_probes
@@ -49,7 +42,7 @@ class ModelLearningClass():
     
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
     
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=False, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True):
+    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=False, use_exp_custom=True, debug_directory=None, qle=True):
         
         self.TrueOpList = np.asarray(trueoplist)
         self.TrueParams = np.asarray(modeltrueparams)
@@ -61,7 +54,6 @@ class ModelLearningClass():
         self.PGHPrefactor = pgh_prefactor
         self.ModelID = int(modelID)
         self.UseExpCustom = use_exp_custom
-        self.EnableSparse = enable_sparse
         self.QLE = qle
         self.checkQLoss = True
         
@@ -99,7 +91,7 @@ class ModelLearningClass():
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
         
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, enable_sparse=self.EnableSparse)    # probelist=self.TrueOpList,,
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom)    # probelist=self.TrueOpList,,
 
         
                 
@@ -177,66 +169,44 @@ class ModelLearningClass():
         self.Experiment = self.Heuristic()    
         self.SigmaThresh = sigma_threshold   #This is the value of the Norm of the COvariance matrix which stops the IQLE 
         self.LogTotLikelihood=[] #log_total_likelihood
-
-        #print("sigma_threshold = ", self.SigmaThresh)
     
         for istep in range(self.NumExperiments):
+        
             # self.Experiment =  self.PGHPrefactor * (self.Heuristic()) ## TODO: use PGH prefactor, either here or in multiPGH
-            #print("\n\nUpdate at exp # ", istep)
-            #print("Memory used : ", virtual_memory().percent, "%")
-            print_loc(global_print_loc)
-            
             self.Experiment =  self.Heuristic()
-            print_loc(global_print_loc)
             self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
-            global_print_loc
             self.NumExperimentsToDate += 1
-            print_loc(global_print_loc)
             #print('Chosen experiment: ' + repr(self.Experiment))
             if istep == 0:
-                print_loc(global_print_loc)
                 print('Initial time selected > ' + str(self.Experiment[0][0]))
             
             
             self.TrackTime[istep] = self.Experiment[0][0]
-            print_loc(global_print_loc)
             
             self.Datum = self.GenSimModel.simulate_experiment(self.SimParams, self.Experiment)
-            print_loc(global_print_loc)
             
             #print(str(self.GenSimModel.ProbeState))
             
             self.Updater.update(self.Datum, self.Experiment)
-            print_loc(global_print_loc)
 
             if len(self.Experiment[0]) < 3:
-                print_loc(global_print_loc)
                 covmat = self.Updater.est_covariance_mtx()
                 self.VolumeList = np.append(self.VolumeList, covmat)
-                print_loc(global_print_loc)
-
             else:
-                print_loc(global_print_loc)
-
                 #covmat = self.Updater.region_est_ellipsoid()
                 covmat = self.Updater.est_covariance_mtx()
                 self.VolumeList = np.append(self.VolumeList,  np.linalg.det( sp.linalg.sqrtm(covmat) )    )
-                print_loc(global_print_loc)
             
             """!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!this one is probably to remove from here, as superfluous????????????????????????????"""
             self.Heuristic = mpgh.multiPGH(self.Updater, self.SimOpList, inv_field=self.Inv_Field)
-            print_loc(global_print_loc)
             
             self.TrackEval.append(self.Updater.est_mean())
-            print_loc(global_print_loc)
             self.Covars[istep] = np.linalg.norm(self.Updater.est_covariance_mtx())
-            print_loc(global_print_loc)
             self.Particles[:, :, istep] = self.Updater.particle_locations
             self.Weights[:, istep] = self.Updater.particle_weights
-            #self.TrackLogTotLikelihood = np.append(self.TrackLogTotLikelihood, self.Updater.log_total_likelihood)
+            self.TrackLogTotLikelihood = np.append(self.TrackLogTotLikelihood, self.Updater.log_total_likelihood)
 
             self.NewEval = self.Updater.est_mean()
-            print_loc(global_print_loc)
             
 
                 
@@ -258,7 +228,7 @@ class ModelLearningClass():
                     self.Particles = self.Particles[:, :, 0:istep]
                     self.Weights = self.Weights[:, 0:istep]
                     self.TrackTime = self.TrackTime[0:istep] 
-                    break #TODO: Reinstate this break; disabled to test different cases while chasing memory leak.
+                    break
             
             if self.Covars[istep]<self.SigmaThresh:
                 if self.debugSave: 
@@ -278,7 +248,8 @@ class ModelLearningClass():
                 self.Weights = self.Weights[:, 0:istep]
                 self.TrackTime = self.TrackTime[0:istep]
                 
-                break 
+                break
+            
             
             ####Need to ADD check with dereivative of sigmas!!!!
             
@@ -352,57 +323,3 @@ class ModelLearningClass():
     def debug_store(self, debug_dir=None): ## Adjust what gets stored here
         self.store_particles(debug_dir=debug_dir)
         self.store_covariances(debug_dir=debug_dir)
-        
-        
-        
-import sys, os        
-import inspect
-
-
-def lineno():
-    """Returns the current line number in our program."""
-    return inspect.currentframe().f_back.f_lineno
-
-def filename():
-    """Returns the current line number in our program."""
-    return inspect.currentframe().co_name
-
-
-
-def get_size(obj, seen=None):
-    """Recursively finds size of objects in bytes"""
-    size = sys.getsizeof(obj)
-    if seen is None:
-        seen = set()
-    obj_id = id(obj)
-    if obj_id in seen:
-        return 0
-    # Important mark as seen *before* entering recursion to gracefully handle
-    # self-referential objects
-    seen.add(obj_id)
-    if hasattr(obj, '__dict__'):
-        for cls in obj.__class__.__mro__:
-            if '__dict__' in cls.__dict__:
-                d = cls.__dict__['__dict__']
-                if inspect.isgetsetdescriptor(d) or inspect.ismemberdescriptor(d):
-                    size += get_size(obj.__dict__, seen)
-                break
-    if isinstance(obj, dict):
-        size += sum((get_size(v, seen) for v in obj.values()))
-        size += sum((get_size(k, seen) for k in obj.keys()))
-    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
-        size += sum((get_size(i, seen) for i in obj))
-    return size
-
-def print_memory_usage(my_object, big_size):
-    print("Total memory used by object : ", get_size(my_object)/10**6, "MB")
-    my_memory = {}
-    for item in dir(my_object):
-        if item in dir(my_object):
-            my_memory[item] = get_size(my_object.__getattribute__(item))/10**6
-#        print(repr(item), get_size(my_object.__getattribute__(item))/10**6)
-    
-    for key in my_memory.keys():
-        if my_memory[key] > big_size:
-            print(key, " : ", my_memory[key])                
-        
