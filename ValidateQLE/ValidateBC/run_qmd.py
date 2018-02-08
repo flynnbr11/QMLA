@@ -9,7 +9,7 @@ import warnings
 import time as time
 import random
 
-sys.path.append(os.path.join("..","Libraries","QML_lib"))
+sys.path.append(os.path.join("..", "..", "Libraries","QML_lib"))
 import Evo as evo
 import DataBase 
 from QMD import QMD #  class moved to QMD in Library
