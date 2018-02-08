@@ -236,7 +236,7 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     return expec_value
  
 def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True):
-    import hamiltonian_exponentiation as h
+    #import hamiltonian_exponentiation as h
     from scipy import linalg
     print_loc(global_print_loc)
   

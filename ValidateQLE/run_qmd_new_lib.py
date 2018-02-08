@@ -493,7 +493,8 @@ for resample_thresh in resample_threshold_options:
                 print("Test ", i)
                 true_params = [np.random.rand()]
                 true_param_list.append(true_params[0])
-                true_op=np.random.choice(paulis) # to choose a random True model each time 
+                true_op=np.random.choice(paulis) # to choose a random True model each time
+                true_op = 'xTxTTxTTTxTTTTTx' 
                 true_op_list.append(true_op)
                 # (Note: not learning between models yet; just learning paramters of true model)
 
