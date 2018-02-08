@@ -14,7 +14,7 @@ import Evo as evo
 import DataBase 
 from QMD import QMD #  class moved to QMD in Library
 import QML
-import ModelGeneration
+import ModelGeneration 
 import BayesF
 import matplotlib.pyplot as plt
 
@@ -72,6 +72,12 @@ parser.add_argument(
   help='Number of qubits to run tests for.',
   type=int,
   default=2
+)
+parser.add_argument(
+  '-pm', '--num_parameters', 
+  help='Number of parameters to run tests for.',
+  type=int,
+  default=1
 )
 
 parser.add_argument(
@@ -135,6 +141,7 @@ do_iqle = arguments.iqle
 do_qle = arguments.qle
 num_tests = arguments.num_tests
 num_qubits = arguments.num_qubits
+num_parameters = arguments.num_parameters
 num_exp = arguments.num_experiments
 num_part = arguments.num_particles
 all_plots = arguments.plots
@@ -155,6 +162,7 @@ intermediate_plots = all_plots
 do_summary_plots = all_plots
 store_data = all_plots
 
+global_true_op = ModelGeneration.random_model_name(num_dimensions=num_qubits, num_terms=num_parameters)  # choose a random initial Hamiltonian.
 
 
 global paulis_list
@@ -163,44 +171,31 @@ paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : ev
 warnings.filterwarnings("ignore", message='Negative weights occured', category=RuntimeWarning)
 
 if num_qubits == 1:
-	global_true_op = 'x'
 	expected_exp_time = 0.00042629241943359375
 elif num_qubits == 2:
-	global_true_op = 'xTx'
 	expected_exp_time = 8.749961853027344e-05
 elif num_qubits == 3:
-	global_true_op = 'xTxTTx'
 	expected_exp_time = 9.322166442871094e-05
 elif num_qubits == 4:
-	global_true_op = 'xTxTTxTTTx'
 	expected_exp_time = 0.00024390220642089844
 elif num_qubits == 5:
-	global_true_op = 'xTxTTxTTTxTTTTx'
 	expected_exp_time = 0.0004100799560546875
 elif num_qubits == 6:
-	global_true_op = 'xTxTTxTTTxTTTTxTTTTTx'
 	expected_exp_time = 0.0013692378997802734
 elif num_qubits == 7:
-	global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTx'
 	expected_exp_time = 0.0033864974975585938
 elif num_qubits == 8:
-	global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTx'
 	expected_exp_time = 0.016048431396484375
 elif num_qubits == 9:
-	global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTTx'
 	expected_exp_time = 0.04578542709350586
 elif num_qubits == 10:
-	global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTTxTTTTTTTTTx'
 	expected_exp_time = 0.10511422157287598
 elif num_qubits == 11:
-	global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTx'
 	expected_exp_time = 0.400219202041626
 elif num_qubits == 12:
-	global_true_op = 'xTxTTxTTTxTTTTxTTTTTxTTTTTTxTTTTTTTTxTTTTTTTTTxTTTTTTTTTTxTTTTTTTTTTTx'
 	expected_exp_time = 1.6444416046142578
 else:
 	print("Choose a number of qubits between 1-12")
-
 
 #####################################
 
@@ -621,7 +616,7 @@ for resample_thresh in resample_threshold_options:
 
             for i in range(num_tests):
                 print("Test ", i)
-                true_params = [np.random.rand()]
+                true_params = [np.random.rand() for i in range(num_parameters)]
                 true_param_list.append(true_params[0])
                 true_op = global_true_op
                 true_op_list.append(true_op)

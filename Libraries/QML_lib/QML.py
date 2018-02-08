@@ -11,7 +11,6 @@ import DataBase as DB
 from MemoryTest import print_loc
 from EvalLoss import *
 from psutil import virtual_memory
-
 global debug_print
 debug_print = False
 
@@ -252,6 +251,8 @@ class ModelLearningClass():
                     for iterator in range(len(self.FinalParams)):
                         self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep]), np.std(self.Particles[:,iterator,istep])]
                         print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator])) 
+                        print('Final quadratic loss: ', str(self.QLosses[-1]))
+
                     self.LogTotLikelihood=self.Updater.log_total_likelihood                
                     self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
                     self.Covars=(np.resize(self.Covars, (1,istep)))[0]
@@ -269,6 +270,7 @@ class ModelLearningClass():
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep]), np.std(self.Particles[:,iterator,istep])]
                     print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator]))
+                    print('Final quadratic loss: ', self.QLosses[-1]  )
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
                 if checkloss == True: 
                     self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
@@ -293,6 +295,7 @@ class ModelLearningClass():
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep-1]), np.std(self.Particles[:,iterator,istep-1])]
                     print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator]))
+                    print('Final quadratic loss: ', str(self.QLosses[-1]))
             
 
             if debug_print:

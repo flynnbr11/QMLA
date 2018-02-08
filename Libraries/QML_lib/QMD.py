@@ -98,7 +98,7 @@ class QMD():
         else: 
             self.QLE_Type = 'IQLE'
     
-        print("Running ", self.QLE_Type, " for true operator ", true_operator, " with parameters : ", self.TrueParamsList)
+        print("\nRunning ", self.QLE_Type, " for true operator ", true_operator, " with parameters : ", self.TrueParamsList)
         # Initialise database and lists.
         self.initiateDB()
         
@@ -219,7 +219,7 @@ class QMD():
         
         if model_exists==True and has_model_finished==False : 
             model_instance = self.getModelInstance(model)
-            print("\nRunning ", self.QLE_Type, " for model: ", model)
+            print("Running ", self.QLE_Type, " for model: ", model)
             model_instance.UpdateModel(num_exp, sigma_threshold = self.SigmaThreshold)
             self.updateModelRecord(name=model, field='Completed', new_value=True)
             #model_instance.BayesOnModelsWithinbranches
