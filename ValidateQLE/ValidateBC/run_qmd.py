@@ -9,7 +9,7 @@ import warnings
 import time as time
 import random
 
-sys.path.append(os.path.join("..", "..","Libraries","QML_lib"))
+sys.path.append(os.path.join("..","Libraries","QML_lib"))
 import Evo as evo
 import DataBase 
 from QMD import QMD #  class moved to QMD in Library
@@ -22,6 +22,8 @@ import matplotlib.pyplot as plt
 paulis = ['x', 'y', 'z'] # will be chosen at random. or uncomment below and comment within loop to hard-set
 
 import time as time 
+import argparse
+parser = argparse.ArgumentParser(description='Pass variables for (I)QLE.')
 
 
 def get_directory_name_by_time(just_date=False):
@@ -42,21 +44,71 @@ def get_directory_name_by_time(just_date=False):
     else: 
         return str(date+'/')
 
+### Set up command line arguments to alter script parameters. ###
 
+parser.add_argument(
+  '-t', '--num_tests', 
+  help="Number of complete tests to average over.",
+  type=int,
+  default=1
+)
 
+parser.add_argument(
+  '-e', '--num_experiments', 
+  help='Number of experiments to use for the learning process',
+  type=int,
+  default=200
+)
 
-num_tests = 1
-num_qubits = 12
-num_exp = 200
-num_part = 250
+parser.add_argument(
+  '-p', '--num_particles', 
+  help='Number of particles to use for the learning process',
+  type=int,
+  default=300
+)
 
-do_iqle = True
-do_qle = True
+parser.add_argument(
+  '-q', '--num_qubits', 
+  help='Number of qubits to run tests for.',
+  type=int,
+  default=2
+)
+
+parser.add_argument(
+  '-qle',
+  help='True to perform QLE, False otherwise.',
+  type=bool,
+  default=True
+)
+parser.add_argument(
+  '-iqle',
+  help='True to perform IQLE, False otherwise.',
+  type=bool,
+  default=True
+)
+parser.add_argument(
+  '-pt', '--plots',
+  help='True do generate all plots for this script; False to not.',
+  type=bool,
+  default=True
+)
+
+arguments = parser.parse_args()
+
+num_tests = arguments.num_tests
+num_qubits = arguments.num_qubits
+num_exp = arguments.num_experiments
+num_part = arguments.num_particles
+all_plots = arguments.plots
+do_iqle = arguments.iqle
+do_qle = arguments.qle
+
+#######
 
 plot_time = get_directory_name_by_time(just_date=False) # rather than calling at separate times and causing confusion
 save_figs = False
 save_data = False
-all_plots = False
+
 intermediate_plots = all_plots
 do_summary_plots = all_plots
 store_data = all_plots
@@ -645,7 +697,7 @@ if do_qle:
 num_qle_types = 0
 if do_qle: num_qle_types += 1
 if do_iqle: num_qle_types += 1
-c=time.time()
+d=time.time()
 
 
 num_exponentiations = num_qle_types * num_part * num_exp*num_tests
