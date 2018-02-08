@@ -1,0 +1,45 @@
+Test  0
+Running  QLE  for true operator  xTxTTxTTTxTTTTxTTTTTxTTTTTTx  with parameters :  [0.25789447825564693]
+Model  xTxTTxTTTxTTTTxTTTTTxTTTTTTx  not previously considered -- adding.
+Initialization Ready
+
+Running  QLE  for model:  xTxTTxTTTxTTTTxTTTTTxTTTTTTx
+Initial time selected > 0.793630752762
+Final time selected > 1.60423418486
+Final Parameters mean and stdev:[ 0.01280097  0.23068254]
+Killing model xTxTTxTTTxTTTTxTTTTTxTTTTTTx
+Model instance  xTxTTxTTTxTTTTxTTTTTxTTTTTTx  moved to legacy db
+Running  IQLE  for true operator  xTxTTxTTTxTTTTxTTTTTxTTTTTTx  with parameters :  [0.25789447825564693]
+Model  xTxTTxTTTxTTTTxTTTTTxTTTTTTx  not previously considered -- adding.
+Initialization Ready
+
+Running  IQLE  for model:  xTxTTxTTTxTTTTxTTTTTxTTTTTTx
+Initial time selected > 0.0959652094564
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+[IQLE] Probability > 1: 	 	 probability =  1.0
+Final time selected > 2066.67668996
+Final Parameters mean and stdev:[ 0.2583162   0.00027945]
+Killing model xTxTTxTTTxTTTTxTTTTTxTTTTTTx
+Model instance  xTxTTxTTTxTTTTxTTTTTxTTTTTTx  moved to legacy db
+description :  (0.65, 0.9, 1.4)
+storing data for QLE
+
+
+
+
+
+
+TIME TAKEN FOR  1 TESTS :  3876.336096048355

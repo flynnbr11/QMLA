@@ -244,7 +244,7 @@ def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True):
     if use_exp_custom and ham_exp_installed:
       unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse)
     else:
-      print("Note: using linalg for exponentiating Hamiltonian.")
+      #print("Note: using linalg for exponentiating Hamiltonian.")
       unitary = linalg.expm(-1j*ham*t)
     print_loc(global_print_loc)
     ev_state = np.dot(unitary, state)
