@@ -1,6 +1,8 @@
 import time 
 import hamiltonian_exponentiation as h
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
+
 import numpy as np
 import sys, os
 sys.path.append(os.path.join("..", "..", "Libraries","QML_lib"))
@@ -88,8 +90,8 @@ for q in qubits:
 
 # Plots
 
-description = '_times_'+machine_type+'_machine_upto_'+str(max_qubit)+'_qubits'
-title_description = ' Timings of Custom Exponentiation function (' + str(num_tests) + ' tests; ', machine_type, ')'
+description = str('_times_'+machine_type+'_machine_upto_'+str(max_qubit)+'_qubits')
+title_description = str('Timings of Custom Exponentiation function (' + str(num_tests) + ' tests; ' +  machine_type+ ')')
 
 if save_plots:
   # Average timings
@@ -113,7 +115,7 @@ if save_plots:
   y=minimum_times
   plt.ylabel('Time')
   plt.xlabel('Number of Qubits')
-  plt.title(str(method)+str(title_description))
+  plt.title(method+title_description)
   plt.axhline(y=1, label='1 sec', color='red')
   plt.legend()
   plt.semilogy(x,y, marker='o')
