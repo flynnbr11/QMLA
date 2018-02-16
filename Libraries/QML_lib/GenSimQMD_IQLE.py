@@ -41,7 +41,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True, enable_sparse=True):
+    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True, enable_sparse=True, model_name=None):
         self._solver = solver #This is the solver used for time evolution scipy is faster, QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
         self._probecounter = probecounter
@@ -55,6 +55,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self.use_exp_custom = use_exp_custom
         self.enable_sparse = enable_sparse
         self._min_freq = min_freq
+        self.ModelName = model_name
         if true_oplist is not None and trueparams is None:
             raise(ValueError('\nA system Hamiltonian with unknown parameters was requested'))
         if true_oplist is None:
@@ -139,39 +140,36 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         )
         print_loc(global_print_loc)
         cutoff=min(len(modelparams), 5)
+        num_particles = modelparams.shape[0]
+        #print("Likelihood called; _a=", self._a)
         self._a += 1
         if self._a % 2 == 1:
             self._b += 1
+        #print("(a,b)= ", self._a, self._b)
         print_loc(global_print_loc)
-        fill_ham_list = True
-        ham_list = None
-        # choose a probe from self._probelist 
-        # two indices: 
-        # probe index
-        # - max qubits in this system
-        
-        #print("modelparams has shape ", modelparams.shape)
-        #print("true params has shape ", self._trueparams.shape)
-        num_particles = modelparams.shape[0]
 
         num_parameters = modelparams.shape[1]
         print_loc(global_print_loc)
         if  num_particles == 1:
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
             true_evo = True
-            if fill_ham_list:
-                ham_list = [self._trueHam]
             params = [self._trueparams]
             
         else:
             sample = np.array([expparams.item(0)[1:]])
             true_evo = False
-            if fill_ham_list:
-                ham_list = [np.tensordot(params, self._oplist, axes=1) for params in modelparams] 
             params = modelparams
     
         ham_num_qubits = np.log2(self._oplist[0].shape[0])
-        probe = self._probelist[(self._b % self.NumProbes), ham_num_qubits]
+        
+        
+#        if num_particles==1: 
+          #print("True (", self.ModelName , "); probe id: (", (self._b % int(self.NumProbes)), ", ",  ham_num_qubits, ")")
+#          print("modelparams : ", modelparams) 
+#        else: 
+          #print("Simulated(", self.ModelName , "); probe id: (", (self._b % int(self.NumProbes)), ",",  ham_num_qubits, ")")      
+        
+        probe = self._probelist[(self._b % int(self.NumProbes)), ham_num_qubits]
         ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
         print_loc(global_print_loc)
 
@@ -181,9 +179,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         times = expparams['t']
 
         if self.QLE is True:
-            pr0 = get_pr0_array_qle(t_list=times, modelparams=params, oplist=self._oplist, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse, ham_list=ham_list)    
+            pr0 = get_pr0_array_qle(t_list=times, modelparams=params, oplist=self._oplist, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
         else: 
-            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params, oplist=self._oplist, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse, ham_list=ham_list)    
+            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params, oplist=self._oplist, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
 
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
 

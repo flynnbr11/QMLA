@@ -8,6 +8,7 @@ import pandas as pd
 import warnings
 import time as time
 import random
+import pickle
 
 sys.path.append(os.path.join("..", "Libraries","QML_lib"))
 import Evo as evo
@@ -83,20 +84,20 @@ parser.add_argument(
 parser.add_argument(
   '-qle',
   help='True to perform QLE, False otherwise.',
-  type=bool,
-  default=True
+  type=int,
+  default=1
 )
 parser.add_argument(
   '-iqle',
   help='True to perform IQLE, False otherwise.',
-  type=bool,
-  default=True
+  type=int,
+  default=1
 )
 parser.add_argument(
   '-pt', '--plots',
   help='True: do generate all plots for this script; False: do not.',
-  type=bool,
-  default=False
+  type=int,
+  default=0
 )
 parser.add_argument(
   '-rt', '--resample_threshold',
@@ -136,15 +137,14 @@ parser.add_argument(
 )
 
 arguments = parser.parse_args()
-
-do_iqle = arguments.iqle
-do_qle = arguments.qle
+do_iqle = bool(arguments.iqle)
+do_qle = bool(arguments.qle)
 num_tests = arguments.num_tests
 num_qubits = arguments.num_qubits
 num_parameters = arguments.num_parameters
 num_exp = arguments.num_experiments
 num_part = arguments.num_particles
-all_plots = arguments.plots
+all_plots = bool(arguments.plots)
 best_resample_threshold = arguments.resample_threshold
 best_resample_a = arguments.resample_a
 best_pgh = arguments.pgh_factor
@@ -164,38 +164,15 @@ store_data = all_plots
 
 global_true_op = ModelGeneration.random_model_name(num_dimensions=num_qubits, num_terms=num_parameters)  # choose a random initial Hamiltonian.
 
+while global_true_op == 'i':
+  global_true_op = ModelGeneration.random_model_name(num_dimensions=num_qubits, num_terms=num_parameters)  # choose a random initial Hamiltonian.
+
 
 global paulis_list
 paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
 
 warnings.filterwarnings("ignore", message='Negative weights occured', category=RuntimeWarning)
 
-if num_qubits == 1:
-	expected_exp_time = 0.00042629241943359375
-elif num_qubits == 2:
-	expected_exp_time = 8.749961853027344e-05
-elif num_qubits == 3:
-	expected_exp_time = 9.322166442871094e-05
-elif num_qubits == 4:
-	expected_exp_time = 0.00024390220642089844
-elif num_qubits == 5:
-	expected_exp_time = 0.0004100799560546875
-elif num_qubits == 6:
-	expected_exp_time = 0.0013692378997802734
-elif num_qubits == 7:
-	expected_exp_time = 0.0033864974975585938
-elif num_qubits == 8:
-	expected_exp_time = 0.016048431396484375
-elif num_qubits == 9:
-	expected_exp_time = 0.04578542709350586
-elif num_qubits == 10:
-	expected_exp_time = 0.10511422157287598
-elif num_qubits == 11:
-	expected_exp_time = 0.400219202041626
-elif num_qubits == 12:
-	expected_exp_time = 1.6444416046142578
-else:
-	print("Choose a number of qubits between 1-12")
 
 #####################################
 
@@ -616,32 +593,42 @@ for resample_thresh in resample_threshold_options:
 
             for i in range(num_tests):
                 print("Test ", i)
+                initial_op_list = ['x', 'y', 'z', 'xTy', 'xTz', 'yTz']
+#                initial_op_list = ['x', 'y', 'z']
                 true_params = [np.random.rand() for i in range(num_parameters)]
                 true_param_list.append(true_params[0])
-                true_op = global_true_op
+#                true_op = global_true_op
+                true_op = random.choice(initial_op_list)
+#                true_op = 'xTy'
+                global_true_op = true_op
                 true_op_list.append(true_op)
+                                
                 # (Note: not learning between models yet; just learning paramters of true model)
+
 
                 qle_values = [] # qle True does QLE; False does IQLE
                 if do_qle is True:
                     qle_values.append(True)
                 if do_iqle is True:
                     qle_values.append(False)
-                
 
                 for qle in qle_values:
                     a = time.time() # track time in just QMD
                     qmd = QMD(
-                        initial_op_list=[true_op], 
+                        initial_op_list=initial_op_list, 
                         true_operator=true_op, 
                         true_param_list=true_params, 
                         num_particles=num_part,
                         qle=qle,
+                        max_num_branches = 0,
+                        max_num_qubits = 2, 
                         resample_threshold = resample_thresh,
                         resampler_a = resample_a,
                         pgh_prefactor = pgh_factor
                     )
-                    qmd.runAllActiveModelsIQLE(num_exp=num_exp)
+                    # qmd.runAllActiveModelsIQLE(num_exp=num_exp)
+                    qmd.runQMD(num_exp = num_exp, spawn=False)
+#                    qmd.runAllActiveModelsIQLE(num_exp = num_exp)
                     b = time.time()
                     qmd_time += b-a
 
@@ -655,7 +642,10 @@ for resample_thresh in resample_threshold_options:
                         iqle_qlosses.append(mod.QLosses)
                         iqle_final_qloss.append(mod.QLosses[-1])
 
-                    qmd.killModel(true_op)
+                    champion = qmd.ChampionName
+                    # Load QMD instance into pickle file to read in notebook.
+                    pickle.dump(qmd, open("qmd_class.npy", "wb"))
+                    # qmd.killModel(true_op)
                     del qmd
 
             all_true_params.append(true_param_list)
@@ -691,7 +681,6 @@ for resample_thresh in resample_threshold_options:
                     os.makedirs(plot_directory)
 
             description = str('('+ str(resample_thresh)+ ', '+ str(resample_a) + ', '+ str(pgh_factor)+')')
-            print("description : ", description)
             if do_iqle:
                 if store_data: store_data_for_plotting('iqle')
                 if intermediate_plots: individual_plots('iqle')
@@ -749,20 +738,19 @@ num_exponentiations = num_qle_types * num_part * num_exp*num_tests
 
 print("\n\n\n")
 if all_plots: print("Plots made with matplotlib.")
-if not all_plots: print("Plots NOT drawn.")
-                                       
+if not all_plots: print("Plots NOT drawn.")                                       
 print(num_qubits, "Qubits")
 print(num_qle_types, "Types of (I)QLE")
 print(num_part, "Particles")
 print(num_exp, "Experiments")
 print(num_tests, "Tests")
-print("Totalling ", num_exponentiations, " calls to ", num_qubits, "-qubit exponentiation function. Exponentiation alone should take around ", expected_exp_time, "seconds.")
+print("Totalling ", num_exponentiations, " calls to ", num_qubits,"-qubit exponentiation function.")
 print("QMD-time / num exponentiations = ", qmd_time/num_exponentiations)
 print("Total time on QMD : ", qmd_time, "seconds.")
 if all_plots: print("Total time on plotting : ", d-c, "seconds.")
 print("Total time : ", end - start, "seconds.")
-
-
+print("True model: ", global_true_op)
+print("QMD Champion:", champion)
 
 
 

@@ -666,9 +666,6 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
         op = operator(name = sim_name, undimensionalised_name = model_name)
         num_rows = len(running_database)
         qml_instance = ModelLearningClass(name=op.name, num_probes = num_probes, probe_dict=probe_dict)
-        true_param_list = []
-        for j in range(len(true_ops)):
-            true_param_list.append(0.3)
 
         sim_pars = []
         for j in range(op.num_constituents):
@@ -678,8 +675,6 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
         # appends and returns copy.
 
         qml_instance.InitialiseNewModel(
-#          trueoplist = true_operator_list,
-#          modeltrueparams = true_param_list,
           trueoplist = true_ops,
           modeltrueparams = true_params,
           simoplist = op.constituents_operators,

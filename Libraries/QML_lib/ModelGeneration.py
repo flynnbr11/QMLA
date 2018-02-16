@@ -45,7 +45,12 @@ def random_model_name(num_dimensions=1, num_terms=1):
         summed_term += this_term
         if(j!=num_terms):
             summed_term += p_str
-            
+    
+    
+    # Don't allow returning just identity in any dimension #TODO?
+    while summed_term == ('i' or 'iTi' or 'iTiTTi' or 'iTiTTiTTTi' or 'iTiTTiTTTiTTTTi' or 'iTiTTiTTTiTTTTiTTTTTi' or 'iTiTTiTTTiTTTTiTTTTTiTTTTTTi' or 'iTiTTiTTTiTTTTiTTTTTiTTTTTTiTTTTTTTi'):
+      summed_term = random_model_name(num_dimensions, num_terms) 
+    
     return summed_term
 
 

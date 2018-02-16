@@ -64,6 +64,8 @@ class ModelLearningClass():
         self.QLE = qle
         self.checkQLoss = True
         
+#        print("Model instance ", self.Name, " has initial parameters: ", self.SimParams, "\nTrue op list: \n", self.TrueOpList)
+        
         if debug_directory is not None: 
             self.debugSave = True
             self.debugDirectory = debug_directory 
@@ -98,7 +100,7 @@ class ModelLearningClass():
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
         
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, enable_sparse=self.EnableSparse)    # probelist=self.TrueOpList,,
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, enable_sparse=self.EnableSparse, model_name=self.Name)    # probelist=self.TrueOpList,,
 
         
                 
@@ -178,7 +180,6 @@ class ModelLearningClass():
         self.LogTotLikelihood=[] #log_total_likelihood
 
         #print("sigma_threshold = ", self.SigmaThresh)
-    
         for istep in range(self.NumExperiments):
             # self.Experiment =  self.PGHPrefactor * (self.Heuristic()) ## TODO: use PGH prefactor, either here or in multiPGH
             #print("\n\nUpdate at exp # ", istep)
@@ -200,11 +201,10 @@ class ModelLearningClass():
             self.TrackTime[istep] = self.Experiment[0][0]
             print_loc(global_print_loc)
             
-            self.Datum = self.GenSimModel.simulate_experiment(self.SimParams, self.Experiment)
+            self.Datum = self.GenSimModel.simulate_experiment(self.SimParams, self.Experiment) # doesn't need to be self?
             print_loc(global_print_loc)
             
             #print(str(self.GenSimModel.ProbeState))
-            
             self.Updater.update(self.Datum, self.Experiment)
             print_loc(global_print_loc)
 
@@ -296,7 +296,7 @@ class ModelLearningClass():
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep-1]), np.std(self.Particles[:,iterator,istep-1])]
                     print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator]))
                     print('Final quadratic loss: ', str(self.QLosses[-1]))
-            
+#                final_ham = evo.getH(self.)
 
             if debug_print:
                 print("step ", istep)

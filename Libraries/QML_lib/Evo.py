@@ -98,34 +98,20 @@ def getH(_pars, _ops):
  
  
 def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, enable_sparse=True, ham_list=None):
-    #print("QLE get_pr0 function")
-    #print("modelparams : \n", modelparams)
-    #print("oplist : \n", oplist)
-    #print("probe : \n", probe)
+    
     print_loc(global_print_loc)
     num_particles = len(modelparams)
+
+    #if num_particles==1: print("True probe \n", probe)
+    #else: print("Simulated probe \n", probe)
     num_times = len(t_list)
-    #print("num particles = ", num_particles)
-    #print("num_times ", num_times)
     output = np.empty([num_particles, num_times])
     for evoId in range(num_particles): ## todo not sure about length/arrays here
 #        ham = np.tensordot(modelparams[evoId], oplist, axes=1)
         for tId in range(len(t_list)):
             ham = np.tensordot(modelparams[evoId], oplist, axes=1)
-            if ham_list is not None:
-              ham1 = ham_list[evoId]
-              if not np.all(ham1==ham):
-                print("Different hamiltonian from list than generating.")
-                print("Ham from list : \n", ham)
-                print("Ham from generation: \n", ham1) 
-#              else: 
-#                print("Hamiltonians matched.")
             t = t_list[tId]
-            #ham=ham_list[evoId]
-            #print("ham = \n", ham)
-             
             print_loc(global_print_loc)
-            #print("param: ", modelparams[evoId])
             
             output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
             if output[evoId][tId] < 0:
@@ -149,17 +135,8 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_cu
  
     for evoId in range( output.shape[0]): ## todo not sure about length/arrays here
         ham = np.tensordot(modelparams[evoId], oplist, axes=1)
-        if ham_list is not None:
-            ham1 = ham_list[evoId]
-            if not np.all(ham1==ham):
-                print("Different hamiltonian from list than generating.")
-                print("Ham from list : \n", ham)
-                print("Ham from generation: \n", ham1) 
-#            else: 
-#                print("Hamiltonians matched.")
         for tId in range(len(t_list)):
             t = t_list[tId]
-#            ham = np.tensordot(modelparams[evoId], oplist, axes=1)
              
             output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
             print_loc(global_print_loc)
@@ -168,7 +145,6 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_cu
             elif output[evoId][tId] > 1.000000000000001:
                 print("[IQLE] Probability > 1: \t \t probability = ", output[evoId][tId]) 
             #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
-    #if print_pr0: print ("output sample : ", output[0:min(output.shape[0], 5)])
     print_loc(global_print_loc)
     return output
 
