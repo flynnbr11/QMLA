@@ -116,7 +116,7 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, e
             output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
             if output[evoId][tId] < 0:
                 print("[QLE] Negative probability : \t \t probability = ", output[evoId][tId])
-            elif output[evoId][tId] > 1.000000000000001: ## todo some times getting p=1.0 show up
+            elif output[evoId][tId] > 1.001: ## todo some times getting p=1.0 show up
                 print("[QLE] Probability > 1: \t \t probability = ", output[evoId][tId]) 
             #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
     print_loc(global_print_loc) 

@@ -9,7 +9,7 @@ import warnings
 import time as time
 import random
 import pickle
-
+pickle.HIGHEST_PROTOCOL = 2
 sys.path.append(os.path.join("..", "Libraries","QML_lib"))
 import Evo as evo
 import DataBase 
@@ -46,6 +46,14 @@ def get_directory_name_by_time(just_date=False):
         return str(date+'/')
 
 ### Set up command line arguments to alter script parameters. ###
+
+parser.add_argument(
+  '-r', '--num_runs', 
+  help="Number of runs to perform majority voting.",
+  type=int,
+  default=1
+)
+
 
 parser.add_argument(
   '-t', '--num_tests', 
@@ -139,6 +147,7 @@ parser.add_argument(
 arguments = parser.parse_args()
 do_iqle = bool(arguments.iqle)
 do_qle = bool(arguments.qle)
+num_runs = arguments.num_runs
 num_tests = arguments.num_tests
 num_qubits = arguments.num_qubits
 num_parameters = arguments.num_parameters
@@ -171,7 +180,10 @@ while global_true_op == 'i':
 global paulis_list
 paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
 
+
+#TODO Should we remove these warning?
 warnings.filterwarnings("ignore", message='Negative weights occured', category=RuntimeWarning)
+warnings.filterwarnings("ignore", message='Extremely small n_ess encountered', category=RuntimeWarning)
 
 
 #####################################
@@ -593,14 +605,23 @@ for resample_thresh in resample_threshold_options:
 
             for i in range(num_tests):
                 print("Test ", i)
-                initial_op_list = ['x', 'y', 'z', 'xTy', 'xTz', 'yTz']
-#                initial_op_list = ['x', 'y', 'z']
-                true_params = [np.random.rand() for i in range(num_parameters)]
-                true_param_list.append(true_params[0])
+#                initial_op_list = ['x', 'y', 'z', 'xTy', 'xTz', 'yTz']
+#                initial_op_list = ['xPz', 'xPy', 'xPz', 'yPz']
+                initial_op_list = ['x', 'y', 'z']
+#                initial_op_list = ['xPz']
+                  
 #                true_op = global_true_op
                 true_op = random.choice(initial_op_list)
-#                true_op = 'xTy'
+#                true_op = 'xPz'
+#                true_op = 'x'
                 global_true_op = true_op
+      
+                op = DataBase.operator(global_true_op)
+                n_pars = op.num_constituents
+                true_params = [np.random.rand() for i in range(n_pars)]
+                for i in true_params: 
+                  true_param_list.append(i)
+
                 true_op_list.append(true_op)
                                 
                 # (Note: not learning between models yet; just learning paramters of true model)
@@ -627,8 +648,9 @@ for resample_thresh in resample_threshold_options:
                         pgh_prefactor = pgh_factor
                     )
                     # qmd.runAllActiveModelsIQLE(num_exp=num_exp)
-                    qmd.runQMD(num_exp = num_exp, spawn=False)
+#                    qmd.runQMD(num_exp = num_exp, spawn=False, just_given_models=True)
 #                    qmd.runAllActiveModelsIQLE(num_exp = num_exp)
+                    qmd.majorityVoteQMD(num_runs=num_runs, num_exp=num_exp, just_given_models=True)
                     b = time.time()
                     qmd_time += b-a
 
@@ -642,7 +664,7 @@ for resample_thresh in resample_threshold_options:
                         iqle_qlosses.append(mod.QLosses)
                         iqle_final_qloss.append(mod.QLosses[-1])
 
-                    champion = qmd.ChampionName
+                    # champion = qmd.ChampionName
                     # Load QMD instance into pickle file to read in notebook.
                     pickle.dump(qmd, open("qmd_class.npy", "wb"))
                     # qmd.killModel(true_op)
@@ -750,7 +772,7 @@ print("Total time on QMD : ", qmd_time, "seconds.")
 if all_plots: print("Total time on plotting : ", d-c, "seconds.")
 print("Total time : ", end - start, "seconds.")
 print("True model: ", global_true_op)
-print("QMD Champion:", champion)
+# print("QMD Champion:", champion)
 
 
 

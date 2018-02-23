@@ -26,7 +26,7 @@ import BayesF
 class QMD():
     #TODO: rename as ModelsDevelopmentClass when finished
     def __init__(self,
-                 initial_op_list,
+                 initial_op_list=['x'],
                  true_operator='x',
                  true_param_list = None,
                  num_particles=1000,
@@ -59,7 +59,7 @@ class QMD():
         # todo set true parmams properly
         #self.TrueParamsList = [0.75 for i in self.TrueOpList] # TODO: actual true params?
         #self.TrueHam = evo.getH(self.TrueParamsList, self.TrueOpList)
-        self.TrueHam = np.tensordot(self.TrueParamsList, self.TrueOpList, axes=1)
+        #self.TrueHam = np.tensordot(self.TrueParamsList, self.TrueOpList, axes=1)
         self.MaxModNum = max_num_models #TODO: necessary?
         self.gaussian = gaussian
         self.NumModels = len(initial_op_list)
@@ -69,8 +69,8 @@ class QMD():
         self.ResamplerA = resampler_a
         self.PGHPrefactor = pgh_prefactor
         self.NumProbes = 40
-#         self.ProbeDict = separable_probe_dict(max_num_qubits=self.MaxQubitNumber, num_probes=self.NumProbes)
-        self.ProbeDict = None
+        self.ProbeDict = separable_probe_dict(max_num_qubits=self.MaxQubitNumber, num_probes=self.NumProbes)
+#        self.ProbeDict = None
         self.HighestQubitNumber = int(0)
         self.MaxBranchID = max_num_branches
         self.HighestBranchID = 0
@@ -87,7 +87,7 @@ class QMD():
         self.EnableSparse = enable_sparse
         self.SigmaThreshold = sigma_threshold
         self.DebugDirectory = debug_directory
-        
+        self.ModelPointsDict = {}
         self.BranchBayesComputed[0] = False
 #        for i in range(self.MaxBranchID+1):
 #            self.BranchChampions[i] = 0
@@ -276,7 +276,7 @@ class QMD():
         if model_a ==  model_b:
             return "Same Models"
         else: 
-            print("Computing Bayes Factor b/w ", model_a.Name, " & ", model_b.Name)
+#            print("Computing Bayes Factor b/w ", model_a.Name, " & ", model_b.Name)
             log_comparison_low = 1.0/log_comparison_high
             if model_a_id is None and model_b is None:
                 model_a_id = model_a.ModelID
@@ -295,37 +295,20 @@ class QMD():
                 times_b = model_b.TrackTime
             else: 
                 times_b = model_b.TrackTime[num_times_to_use:]
-            gen_a = model_a.GenSimModel
-            gen_b = model_b.GenSimModel
 
-            # TODO: cutting times arrays because when one model finishes it doesn't have as many times as other. But it shouldn't be adding times together as list anyway??
  #           num_times_to_use = min(len(times_a), len(times_b))
 #            times = times_a[:num_times_to_use] + times_b[:num_times_to_use]
             
             times = []
             times.extend(times_a)
             times.extend(times_b)
-            
-            use_hypothetical_update = False
-            if use_hypothetical_update:
-              log_l_a =  alternative_log_total_likelihood(model_a, gen_a, times_b)
-              log_l_b =  alternative_log_total_likelihood(model_b, gen_b, times_a)
 
-            else:           
-              exps_a = get_exps(model_a, gen_a, times) #TODO should this take all times??
-              exps_b = get_exps(model_b, gen_b, times)
+            bayes_factor = compute_bayes_factor(model_a, model_b, times_a, times_b)
 
-              log_l_a =  get_log_likelihood(model_a, gen_a, exps_a, times)
-              log_l_b =  get_log_likelihood(model_b, gen_b, exps_b, times)
-
-#            print("Log likelihoods : ", log_l_a, log_l_b)
-
-#            bayes_factor = np.expm1(log_l_a - log_l_b) +1 #todo: is this the right exp function?
-            bayes_factor = np.exp(log_l_a - log_l_b)
             model_a.addBayesFactor(compared_with=model_b_id, bayes_factor=bayes_factor)
             model_b.addBayesFactor(compared_with=model_a_id, bayes_factor=1.0/bayes_factor)
             if print_result:
-              print("Bayes factor  b/w ", model_a.Name, "&", model_b.Name," = ", bayes_factor)
+              print("Bayes factor b/w ", model_a.Name, "&", model_b.Name," = ", bayes_factor)
 
             if bayes_factor >= log_comparison_high: 
                 if print_result: print("Point to ", model_a.Name)
@@ -333,10 +316,6 @@ class QMD():
             elif bayes_factor < log_comparison_low: 
                 if print_result: print("Point to ", model_b.Name)
                 return "b"
-            #else:
-            #    print("No real winner")  
-            # todo: Add bayes_factor with mod_id's to QML class
-
             
     def compareModelsWithinBranch(self, branchID):
         active_models_in_branch = DataBase.active_model_ids_by_branch_id(self.db, branchID)
@@ -382,7 +361,7 @@ class QMD():
         return models_points, champ_id
 
     
-    def compareModelList(self, model_list, bayes_threshold = 50, models_points_dict=None):
+    def compareModelList(self, model_list, bayes_threshold = 50, models_points_dict=None, num_times_to_use = 'all'):
         models_points = {}
         for mod in model_list:
             models_points[mod] = 0
@@ -392,7 +371,7 @@ class QMD():
             for j in range(i, len(model_list)):
                 mod2 = model_list[j]
                 if mod1 != mod2:
-                    res = self.compareModels(model_a_id=mod1, model_b_id=mod2, log_comparison_high=bayes_threshold)
+                    res = self.compareModels(model_a_id=mod1, model_b_id=mod2, log_comparison_high=bayes_threshold, num_times_to_use=num_times_to_use)
                     if res == "a":
                         models_points[mod1] += 1
                         if models_points_dict is not None: 
@@ -406,7 +385,7 @@ class QMD():
         max_points_branches = [key for key, val in models_points.items() if val==max_points]
         if len(max_points_branches) > 1: 
             # todo: recompare. Fnc: compareListOfModels (rather than branch based)
-            print("No distinct champion, recomputing bayes factors between : ", max_points_branches)
+            #print("No distinct champion, recomputing bayes factors between : ", max_points_branches)
             champ_id = self.compareModelList(max_points_branches, bayes_threshold=1)
         else: 
             champ_id = max(models_points, key=models_points.get)
@@ -522,31 +501,68 @@ class QMD():
         self.newBranch(model_list=new_models) 
       #todo probailistically append model_list with suboptimal model in any of the branches in branch_list
 
-    def runQMD(self, num_exp = 20, max_branches= None, max_num_qubits = None, max_num_models=None, spawn=True):
-        if max_branches is None:
-            max_branches = self.MaxBranchID
+    def runQMD(self, num_exp = 20, max_branches= None, max_num_qubits = None, max_num_models=None, spawn=True, just_given_models=False):
+        if just_given_models:
+              self.runAllActiveModelsIQLE(num_exp=num_exp)
+              final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
+              self.ChampionName = final_winner
+              
+              print("Final winner = ", final_winner)
 
-        if max_num_qubits is None:
-            max_num_qubits = self.MaxQubitNumber
+        else:
+            if max_branches is None:
+                max_branches = self.MaxBranchID
+
+            if max_num_qubits is None:
+                max_num_qubits = self.MaxQubitNumber
+                
+            if max_num_models is None: 
+                max_num_models = self.MaxModNum
+                
             
-        if max_num_models is None: 
-            max_num_models = self.MaxModNum
+                
+            while self.HighestQubitNumber < max_num_qubits: 
+                self.runAllActiveModelsIQLE(num_exp=num_exp)
+                self.spawn()
+                if self.HighestBranchID > max_branches or self.NumModels > max_num_models:
+                    break
+
             
-        
-            
-        while self.HighestQubitNumber < max_num_qubits: 
             self.runAllActiveModelsIQLE(num_exp=num_exp)
-            self.spawn()
-            if self.HighestBranchID > max_branches or self.NumModels > max_num_models:
-                break
+            print("\n\n\n\nBayes Updates\n\n\n\n")
+            final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
+            self.ChampionName = final_winner
+            
+            print("Final winner = ", final_winner)
 
-        
-        self.runAllActiveModelsIQLE(num_exp=num_exp)
-        print("\n\n\n\nBayes Updates\n\n\n\n")
-        final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
-        self.ChampionName = final_winner
-        
-        print("Final winner = ", final_winner)
+    def majorityVoteQMD(self, num_runs=1, num_exp=20, max_branches= None, max_num_qubits = None, max_num_models=None, spawn=True, just_given_models=False):
+
+        model_id_list = DataBase.active_model_ids_by_branch_id(self.db, branchID=0) 
+        #print("model list : ", model_id_list)
+        for i in range(num_runs):
+            print("i=", i)
+            for j in model_id_list:
+                mod = self.getModelInstanceFromID(j)
+                mod.resetPrior()
+                mod.UpdateModel(n_experiments=num_exp)
+            self.compareModelList(model_list=model_id_list, bayes_threshold=1, num_times_to_use=num_exp)
+        self.MajorityVotingScores = self.majorityVotingTally()
+
+    def majorityVotingTally(self):
+        mod_ids = DataBase.list_model_id_in_branch(self.db, 0)
+        tally = {}
+
+        for i in mod_ids:
+            mod = self.getModelInstanceFromID(i)
+            tally[mod.Name] = 0
+            scores = mod.BayesFactors
+            for j in mod_ids:
+                if i != j:
+                    comparison = np.array(scores[j]) > 1
+                    points = np.sum(comparison)
+                    tally[mod.Name] += points
+        return tally    
+
 
     def inspectModel(self, name):
         print("\nmodel name: ", name)
@@ -606,7 +622,6 @@ def get_log_likelihood(model, gen, exps, times):
         updater.batch_update(data, exps, resample_interval=100)
     
       else:
-        print("Updates")
         for i in range(len(times)):
           #print("i=", i)
           exp = get_exp(model, gen, [times[i]])
@@ -639,6 +654,85 @@ def alternative_log_total_likelihood(model, gen, times):
     
     #print("norms after : ", norms)
     return np.sum(np.log(np.array(norms)))
+
+def compute_bayes_factor(model_a, model_b, times_a, times_b, only_ideal_probes=False):
+    if model_a.Dimension == model_b.Dimension and only_ideal_probes:
+        # models have same dimension so may be locally equivalent (??)
+        if model_a.Updater.log_total_likelihood > model_b.Updater.log_total_likelihood:
+            ideal = model_a.Operator.ideal_probe
+            #if ideal in model_b.Operator.eigenvectors:
+             #   print("Chosen ideal probe (model", model_a.Name, ") is an eigenvector of model", model_b.Name)
+        else: 
+            ideal = model_b.Operator.ideal_probe
+            #if ideal in model_a.Operator.eigenvectors:
+             #   print("Chosen ideal probe (model", model_b.Name, ") is an eigenvector of model", model_a.Name)
+        
+        ideal_probes_list = [model_a.Operator.ideal_probe, model_b.Operator.ideal_probe]
+        
+        print("Updating ", model_a.Name, " with times of ", model_b.Name)
+#        log_l_a = log_likelihood_given_probelist(model_a, times_b, ideal_probes_list)
+        log_l_a = log_likelihood_given_probe(model_a, times_b, ideal)
+
+        print("Updating ", model_b.Name, " with times of ", model_a.Name)
+#        log_l_b = log_likelihood_given_probelist(model_b, times_a, ideal_probes_list)
+        log_l_b = log_likelihood_given_probe(model_b, times_a, ideal)
+
+    else:
+        log_l_a = log_likelihood_general(model_a, times_b)
+        log_l_b = log_likelihood_general(model_b, times_a)
+
+    bayes_factor = np.exp(log_l_a - log_l_b)
+    return bayes_factor
+    
+
+def log_likelihood_given_probe(model, times, ideal_probe):
+    import copy
+    updater = copy.deepcopy(model.Updater)
+    updater.model.inBayesUpdates = True # updater.model is our gen
+    updater.model.ideal_probe = ideal_probe
+    for i in range(len(times)):
+    
+        exp = get_exp(model, updater.model, [times[i]])
+        params_array = np.array([[model.FinalParams[0][0]]])
+        datum = updater.model.simulate_experiment(params_array, exp)
+        updater.update(datum, exp)
+
+    log_likelihood = updater.log_total_likelihood
+    del updater
+    return log_likelihood        
+
+def log_likelihood_given_probelist(model, times, ideal_probes):
+    import copy
+    updater = copy.deepcopy(model.Updater)
+    updater.model.inBayesUpdates = True # updater.model is our gen
+    updater.model.ideal_probelist = ideal_probes
+    for i in range(len(times)):
+    
+        exp = get_exp(model, updater.model, [times[i]])
+        params_array = np.array([[model.FinalParams[0][0]]])
+        datum = updater.model.simulate_experiment(params_array, exp)
+        updater.update(datum, exp)
+
+    log_likelihood = updater.log_total_likelihood
+    del updater
+    return log_likelihood        
+
+def log_likelihood_general(model, times):
+    import copy
+    updater = copy.deepcopy(model.Updater) #this could be what Updater.hypotheticalUpdate is for?
+    
+    for i in range(len(times)):
+    
+        exp = get_exp(model, updater.model, [times[i]])
+        params_array = np.array([[model.FinalParams[0][0]]])
+        datum = updater.model.simulate_experiment(params_array, exp)
+        updater.update(datum, exp)
+
+    log_likelihood = updater.log_total_likelihood
+    del updater
+    return log_likelihood        
+    
+
 
 
 

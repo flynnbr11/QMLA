@@ -300,8 +300,6 @@ if __name__=='__main__':
                 pgh_prefactor = best_pgh
             )
 
-                
-                  
             b = time.time()
             qmd_time += b-a
   num_qle_types = do_iqle + do_qle

@@ -20,7 +20,7 @@ print_mem_status = True
 global_print_loc = False
 
 class ModelLearningClass():
-    def __init__(self, name, num_probes, probe_dict):
+    def __init__(self, name, num_probes=20, probe_dict=None):
         self.TrueOpList = np.array([])        # These are the true operators of the true model for time evol in the syst
         self.SimOpList = np.array([])            # Operators for the model under test for time evol. in the sim.
         self.TrueParams = np.array([])        #True parameters of the model of the system for time evol in the syst
@@ -34,6 +34,7 @@ class ModelLearningClass():
         self.Name = name
         self.Operator = DB.operator(name)
       #  self.Matrix = self.Operator.matrix
+        self.Dimension = self.Operator.num_qubits
         self.NumExperimentsToDate = 0
         self.BayesFactors = {}
         self.NumProbes = num_probes
@@ -53,7 +54,8 @@ class ModelLearningClass():
         self.TrueOpList = np.asarray(trueoplist)
         self.TrueParams = np.asarray(modeltrueparams)
         self.SimOpList  = np.asarray(simoplist)
-        self.SimParams = np.asarray(simparams)
+        #self.SimParams = simparams[0]
+        self.SimParams = np.asarray([simparams[0]])
         self.NumParticles = numparticles # function to adapt by dimension
         self.ResamplerThresh = resample_thresh
         self.ResamplerA = resampler_a
@@ -76,7 +78,9 @@ class ModelLearningClass():
         if gaussian:
             self.Prior = MultiVariateNormalDistributionNocov(len(self.SimOpList))
         else:
-            self.Prior = MultiVariateUniformDistribution(len(self.SimOpList)) #the prior distribution is on the model we want to test i.e. the one implemented in the simulator
+             self.Prior = MultiVariateUniformDistribution(len(self.SimOpList)) #the prior distribution is on the model we want to test i.e. the one implemented in the     simulator
+#            self.Prior = MultiVariateNormalDistributionNocov(len(self.SimOpList), mean = self.TrueParams[0])
+  
         self.ProbeCounter = 0 #probecounter for the choice of the state
 #         if len(oplist)>1:
 #             self.ProbeState = pros.choose_probe(self.OpList, self.TrueParams)
@@ -99,7 +103,6 @@ class ModelLearningClass():
         #self.ProbeList =  [pros.def_randomprobe(self.TrueOpList)]
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
-        
         self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, enable_sparse=self.EnableSparse, model_name=self.Name)    # probelist=self.TrueOpList,,
 
         
@@ -108,7 +111,7 @@ class ModelLearningClass():
         #print('Chosen true_params: ' + str(self.TrueParams))
         #self.GenSimModel = gsi.GenSim_IQLE(oplist=self.OpList, modelparams=self.TrueParams, probecounter = self.ProbeCounter, probelist= [self.ProbeState], solver='scipy', trotter=True)
         #Here you can turn off the debugger change the resampling threshold etc...
-        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior , resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
+        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
         
         #doublecheck and coment properly
         self.Inv_Field = [item[0] for item in self.GenSimModel.expparams_dtype[1:] ]
@@ -201,7 +204,7 @@ class ModelLearningClass():
             self.TrackTime[istep] = self.Experiment[0][0]
             print_loc(global_print_loc)
             
-            self.Datum = self.GenSimModel.simulate_experiment(self.SimParams, self.Experiment) # doesn't need to be self?
+            self.Datum = self.GenSimModel.simulate_experiment(self.SimParams, self.Experiment, repeat=10) # todo reconsider repeat number
             print_loc(global_print_loc)
             
             #print(str(self.GenSimModel.ProbeState))
@@ -243,7 +246,7 @@ class ModelLearningClass():
                 self.NewLoss = eval_loss(self.GenSimModel, self.NewEval, self.TrueParams)
                 self.QLosses[istep] = self.NewLoss
             
-                if self.NewLoss<(10**(-17)):
+                if self.NewLoss<(10**(-17)) and False: #  I don't want it to stop learning - Brian
                     if self.debugSave: 
                         self.debug_store()
                     print('Final time selected > ' + str(self.Experiment[0][0]))
@@ -261,7 +264,7 @@ class ModelLearningClass():
                     self.TrackTime = self.TrackTime[0:istep] 
                     break #TODO: Reinstate this break; disabled to test different cases while chasing memory leak.
             
-            if self.Covars[istep]<self.SigmaThresh:
+            if self.Covars[istep]<self.SigmaThresh and False: #  I don't want it to stop learning - Brian
                 if self.debugSave: 
                     self.debug_store()
                 print('Final time selected > ' + str(self.Experiment[0][0]))
@@ -304,6 +307,26 @@ class ModelLearningClass():
                 print(" log tot like  : ", self.TrackLogTotLikelihood[-1])
 
 
+    def resetPrior(self):
+        self.Updater.prior = self.Prior
+        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
+        self.Heuristic = mpgh.multiPGH(self.Updater, self.SimOpList, inv_field=self.Inv_Field)
+        print("model params reset")
+        return 1
+        
+        
+    def learned_info_dict(self):
+        learned_info = {}
+        learned_info['times'] = self.TrackTime
+        learned_info['final_params'] = self.FinalParams
+        learned_info['normalization_record'] = self.Updater.normalization_record
+        learned_info['name'] = self.Name
+        learned_info['model_id'] = self.ModelID
+        learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
+        return learned_info
+        
+        
+    
     def UpdateKLogTotLikelihood(self, epoch, tpool, stepnum):
         # Calcalate total log likelihood when the model finishes, compared with all previously completed but still active models. 
         
@@ -358,54 +381,55 @@ class ModelLearningClass():
         
         
         
-import sys, os        
-import inspect
-
-
-def lineno():
-    """Returns the current line number in our program."""
-    return inspect.currentframe().f_back.f_lineno
-
-def filename():
-    """Returns the current line number in our program."""
-    return inspect.currentframe().co_name
-
-
-
-def get_size(obj, seen=None):
-    """Recursively finds size of objects in bytes"""
-    size = sys.getsizeof(obj)
-    if seen is None:
-        seen = set()
-    obj_id = id(obj)
-    if obj_id in seen:
-        return 0
-    # Important mark as seen *before* entering recursion to gracefully handle
-    # self-referential objects
-    seen.add(obj_id)
-    if hasattr(obj, '__dict__'):
-        for cls in obj.__class__.__mro__:
-            if '__dict__' in cls.__dict__:
-                d = cls.__dict__['__dict__']
-                if inspect.isgetsetdescriptor(d) or inspect.ismemberdescriptor(d):
-                    size += get_size(obj.__dict__, seen)
-                break
-    if isinstance(obj, dict):
-        size += sum((get_size(v, seen) for v in obj.values()))
-        size += sum((get_size(k, seen) for k in obj.keys()))
-    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
-        size += sum((get_size(i, seen) for i in obj))
-    return size
-
-def print_memory_usage(my_object, big_size):
-    print("Total memory used by object : ", get_size(my_object)/10**6, "MB")
-    my_memory = {}
-    for item in dir(my_object):
-        if item in dir(my_object):
-            my_memory[item] = get_size(my_object.__getattribute__(item))/10**6
-#        print(repr(item), get_size(my_object.__getattribute__(item))/10**6)
-    
-    for key in my_memory.keys():
-        if my_memory[key] > big_size:
-            print(key, " : ", my_memory[key])                
         
+        
+### Reduced class with only essential information saved ###
+class learnedQML():
+    """
+    Class holds what is required for updates only. 
+    i.e. 
+    - times learned over
+    - final parameters
+    - oplist
+    - true_oplist (?) needed to regenerate GenSimModel identically (necessary?)
+    - true_params (?)
+    - resample_thresh
+    - resample_a [are resampling params needed only for updates?]
+    - Prior (specified by mean and std_dev?)
+    
+    Then initialises an updater and GenSimModel which are used for updates. 
+    """
+    def __init__(self, model_name, sim_oplist, true_oplist, true_params, numparticles, modelID, resample_thresh=0.5, resample_a=0.9, qle=True, probe_dict= None):
+        self.SimOpList = sim_oplist
+        self.TrueOpList = true_oplist
+        self.TrueParams = true_params
+        self.Name = model_name
+        self.ResamplerThresh = resample_thresh
+        self.ResamplerA = resample_a
+        self.NumParticles = numparticles
+        self.ModelID = modelID
+        self.QLE = qle
+        self.ProbeDict = probe_dict
+        
+        
+    def updateLearnedValues(self, learned_info):
+        """
+        Pass a dict, learned_info, with essential info on reconstructing the state of the model, updater and GenSimModel
+        """
+        self.Times = learned_info['times']
+        self.FinalParams = learned_info['final_params'] # should be final params from learning process
+        self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
+        self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
+        self._normalization_record = learned_info['normalization_record']
+
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.TrueOpList,,
+
+        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
+        self.Updater._normalization_record = self._normalization_record
+    
+        
+        
+
+        
+
+

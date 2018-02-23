@@ -41,7 +41,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, oplist, modelparams, probecounter, true_oplist = None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True, enable_sparse=True, model_name=None):
+    def __init__(self, oplist, modelparams, probecounter=None, true_oplist = None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True, enable_sparse=True, model_name=None):
         self._solver = solver #This is the solver used for time evolution scipy is faster, QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
         self._probecounter = probecounter
@@ -56,6 +56,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self.enable_sparse = enable_sparse
         self._min_freq = min_freq
         self.ModelName = model_name
+        self.inBayesUpdates = False
+        self.ideal_probe = None
+        self.ideal_probelist = None
         if true_oplist is not None and trueparams is None:
             raise(ValueError('\nA system Hamiltonian with unknown parameters was requested'))
         if true_oplist is None:
@@ -63,7 +66,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             self._trueHam = None
         else:
            #self._trueHam = getH(trueparams, true_oplist)
-           self._trueHam = np.tensordot(trueparams, true_oplist, axes=1)
+#           self._trueHam = np.tensordot(trueparams, true_oplist, axes=1)
+            self._trueHam = None
+
            #print("true ham = \n", self._trueHam)
 #TODO: changing to try get update working for >1 qubit systems -Brian
         if debug_print: print("Gen sim. True ham has been set as : ")
@@ -159,7 +164,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             sample = np.array([expparams.item(0)[1:]])
             true_evo = False
             params = modelparams
-    
+
         ham_num_qubits = np.log2(self._oplist[0].shape[0])
         
         
@@ -168,8 +173,17 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
 #          print("modelparams : ", modelparams) 
 #        else: 
           #print("Simulated(", self.ModelName , "); probe id: (", (self._b % int(self.NumProbes)), ",",  ham_num_qubits, ")")      
+        if self.inBayesUpdates:
+          if self.ideal_probe is not None:
+            probe = self.ideal_probe # this won't work
+          elif self.ideal_probelist is not None: 
+            probe = self.ideal_probelist[self._b % 2] # this won't work
+          else:
+            print("Either ideal_probe or ideal_probes must be given")
+        else:
+          probe = self._probelist[(self._b % int(self.NumProbes)), ham_num_qubits]
         
-        probe = self._probelist[(self._b % int(self.NumProbes)), ham_num_qubits]
+        
         ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
         print_loc(global_print_loc)
 
@@ -183,6 +197,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         else: 
             pr0 = get_pr0_array_iqle(t_list=times, modelparams=params, oplist=self._oplist, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
 
+        #print("pr0 list : ", pr0[0:min(3, len(pr0))])
         return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
 
 

@@ -8,6 +8,7 @@ __pycache__/
 
 # Unwanted large files/plots/compiled python
 *.pyc
+*.npy
 *.pdf
 *.png
 *.jpg

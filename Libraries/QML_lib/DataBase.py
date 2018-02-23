@@ -177,6 +177,14 @@ class operator():
         """
         return alph(self.name)
         
+    @property 
+    def ideal_probe(self):
+        return ideal_probe(self.name)
+        
+    @property
+    def eigenvectors(self):
+        return get_eigenvectors(self.name)
+        
     
     
 """
@@ -509,7 +517,22 @@ def compute(inp):
     else:
         return compute_p(inp)    
 
+def ideal_probe(name):
+    """
+    Returns a probe state which is the normalised sum of the given operators 
+    eigenvectors, ideal for probing that operator. 
+    """
+    mtx = operator(name).matrix
+    eigvalues = np.linalg.eig(mtx)[1]
+    summed_eigvals = np.sum(eigvalues, axis=0)
+    normalised_probe = summed_eigvals / np.linalg.norm(summed_eigvals)
+    return normalised_probe
 
+
+def get_eigenvectors(name):
+    mtx = operator(name).matrix
+    eigvectors = np.linalg.eig(mtx)[0]
+    return eigvectors
 
 
 """
@@ -521,7 +544,6 @@ Initial distribution to sample from, normal_dist
 """
 #TODO: change mean and var?
 from qinfer import NormalDistribution
-normal_dist=NormalDistribution(mean=0.5, var=0.05)  
 normal_dist_width = 0.25
 
 """
@@ -578,6 +600,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
         #'Param_Estimates' : sim_ops,
         #'Estimates_Dist_Width' : [normal_dist_width for gen in generators],
         'Model_Class_Instance' : [],
+        'Reduced_Model_Class_Instance' : [],
         'Operator_Instance' : [],
         'Epoch_Start' : [],
         'ModelID' : [],
@@ -594,6 +617,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
                                     true_params=true_params, 
                                     modelID=int(modelID), 
                                     epoch=0, 
+                                    probe_dict = probe_dict, 
                                     resample_threshold = resample_threshold, 
                                     resampler_a = resampler_a,
                                     pgh_prefactor = pgh_prefactor,
@@ -638,6 +662,10 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
     modelID = int(modelID)
     alph_model_name = alph(model_name)
     model_num_qubits = get_num_qubits(model_name)
+
+    if probe_dict is None: print("In DB, probe dict is none")
+    else: print("probe dict given to add model function")
+    
     
     if consider_new_model(model_lists, model_name, running_database)=='New':
         model_lists[model_num_qubits].append(alph_model_name)
@@ -668,12 +696,18 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
         qml_instance = ModelLearningClass(name=op.name, num_probes = num_probes, probe_dict=probe_dict)
 
         sim_pars = []
+        num_pars = op.num_constituents
+        if num_pars ==1 : #TODO Remove this fixing the prior
+          normal_dist=NormalDistribution(mean=true_params[0], var=0.1)
+        else:  
+          normal_dist = MultiVariateNormalDistributionNocov(num_pars)
+        
         for j in range(op.num_constituents):
           sim_pars.append(normal_dist.sample()[0,0])
+          
         # add model_db_new_row to model_db and running_database
         # Note: do NOT use pd.df.append() as this copies total DB,
         # appends and returns copy.
-
         qml_instance.InitialiseNewModel(
           trueoplist = true_ops,
           modeltrueparams = true_params,
@@ -691,6 +725,18 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
           qle = qle
         )
         
+        reduced_qml_instance = learnedQML(
+          model_name = model_name, 
+          sim_oplist = op.constituents_operators, 
+          true_oplist = true_ops, 
+          true_params = true_params, 
+          numparticles = num_particles,
+          modelID = int(modelID), 
+          resample_thresh = resample_threshold,
+          resample_a = resampler_a,
+          qle = qle
+        )
+        
         # Add to running_database, same columns as initial gen_list
         
         running_db_new_row = pd.Series({
@@ -701,6 +747,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
             'Param_Estimates' : sim_pars,
             'Estimates_Dist_Width' : normal_dist_width,
             'Model_Class_Instance' : qml_instance,
+            'Reduced_Model_Class_Instance' : reduced_qml_instance, 
             'Operator_Instance' : op,
             'Epoch_Start' : 0, #TODO fill in
             'ModelID' : int(float(modelID)), ## needs to be unique for each model
