@@ -316,6 +316,9 @@ class ModelLearningClass():
         
         
     def learned_info_dict(self):
+        """
+        Place essential information after learning has occured into a dict. This can be used to recreate the model on another node. 
+        """
         learned_info = {}
         learned_info['times'] = self.TrackTime
         learned_info['final_params'] = self.FinalParams
@@ -384,7 +387,7 @@ class ModelLearningClass():
         
         
 ### Reduced class with only essential information saved ###
-class learnedQML():
+class reducedModel():
     """
     Class holds what is required for updates only. 
     i.e. 

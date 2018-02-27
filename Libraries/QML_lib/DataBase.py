@@ -59,6 +59,7 @@ import hashlib
 import Evo as evo
 from QML import *
 import ModelGeneration
+from qinfer import NormalDistribution
 
 global paulis_list
 paulis_list = {'i' : evo.identity(), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
@@ -543,7 +544,6 @@ def get_eigenvectors(name):
 Initial distribution to sample from, normal_dist
 """
 #TODO: change mean and var?
-from qinfer import NormalDistribution
 normal_dist_width = 0.25
 
 """
@@ -725,7 +725,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
           qle = qle
         )
         
-        reduced_qml_instance = learnedQML(
+        reduced_qml_instance = reducedModel(
           model_name = model_name, 
           sim_oplist = op.constituents_operators, 
           true_oplist = true_ops, 
@@ -790,6 +790,7 @@ def consider_new_model(model_lists, name, db):
     If name has not been previously considered, 'New' is returned. 
     If name has been previously considered, the corresponding location in db is returned. 
     TODO: return something else? Called in add_model function. 
+    Returning 0,1 would cause an error on the condition the function is returned into.
     """
     # Return true indicates it has not been considered and so can be added
     al_name = alph(name)
@@ -802,6 +803,14 @@ def consider_new_model(model_lists, name, db):
 #        return location
     else: 
         return 'New'
+
+def check_model_exists(model_name, model_lists, db):
+    # Return True if model exits; False if not. 
+    if consider_new_model(model_lists, model_name, db) == 'New':
+        return False
+    else:
+        return True
+
 
 
 """

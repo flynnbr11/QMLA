@@ -9,7 +9,12 @@ import warnings
 import time as time
 import random
 from psutil import virtual_memory
-
+import redis
+redis_db = redis.StrictRedis(host="localhost", port=6379, db=0)
+learned_models_info = redis.StrictRedis(host="localhost", port=6379, db=1)
+import pickle 
+pickle.HIGHEST_PROTOCOL=2 # TODO if >python3, can use higher protocol
+import json
 import matplotlib
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
@@ -20,8 +25,20 @@ import DataBase
 import QML
 import ModelGeneration
 import BayesF
-
+from ModelLearningFunction import learnModelRemote
 # Class definition
+
+try:
+    import pickle
+    pickle.HIGHEST_PROTOCOL=2
+    from rq import Connection, Queue
+    from redis import Redis
+
+    redis_conn = Redis()
+    q = Queue(connection=redis_conn)
+    parallel_enabled = True
+except:
+    parallel_enabled = False    
 
 class QMD():
     #TODO: rename as ModelsDevelopmentClass when finished
@@ -29,20 +46,23 @@ class QMD():
                  initial_op_list=['x'],
                  true_operator='x',
                  true_param_list = None,
-                 num_particles=1000,
+                 num_particles= 300,
+                 num_experiments = 50,
                  max_num_models=10, 
-                 max_num_qubits=12, 
+                 max_num_qubits=7, #TODO change -- this may cause crashes somewhere
                  gaussian=True,
                  resample_threshold = 0.5,
                  resampler_a = 0.95,
                  pgh_prefactor = 1.0,
+                 num_probes = 20, 
                  max_num_layers = 10,
                  max_num_branches = 20, 
                  use_exp_custom = True,
                  enable_sparse = True,
                  sigma_threshold = 1e-13, 
                  debug_directory = None,
-                 qle = True # Set to False for IQLE
+                 qle = True, # Set to False for IQLE
+                 parallel = False
                 ):
 #    def __init__(self, initial_op_list, true_op_list, true_param_list):
         self.QLE = qle # Set to False for IQLE
@@ -64,13 +84,13 @@ class QMD():
         self.gaussian = gaussian
         self.NumModels = len(initial_op_list)
         self.NumParticles = num_particles
+        self.NumExperiments = num_experiments
         self.MaxQubitNumber = max_num_qubits
         self.ResampleThreshold = resample_threshold
         self.ResamplerA = resampler_a
         self.PGHPrefactor = pgh_prefactor
-        self.NumProbes = 40
+        self.NumProbes = num_probes
         self.ProbeDict = separable_probe_dict(max_num_qubits=self.MaxQubitNumber, num_probes=self.NumProbes)
-#        self.ProbeDict = None
         self.HighestQubitNumber = int(0)
         self.MaxBranchID = max_num_branches
         self.HighestBranchID = 0
@@ -94,11 +114,34 @@ class QMD():
 #        for i in range(self.MaxLayerNumber+1):
 #            self.LayerChampions[i] = 0
         
+        self.RunParallel = parallel and parallel_enabled # only true if both. 
+        
+        
+        
         if self.QLE:
             self.QLE_Type = 'QLE'
         else: 
             self.QLE_Type = 'IQLE'
     
+        self.QMDInfo = {
+         # may need to take copies of these in case pointers accross nodes break
+          'num_probes' : self.NumProbes,
+          'probe_dict' : self.ProbeDict,
+          'true_oplist' : self.TrueOpList,
+          'true_params' : self.TrueParamsList,  
+          'num_particles' : self.NumParticles,
+          'num_experiments' : self.NumExperiments, 
+          'resampler_thresh' : self.ResampleThreshold,
+          'resampler_a' : self.ResamplerA,
+          'pgh_prefactor' : self.PGHPrefactor,
+          'debug_directory' : self.DebugDirectory,
+          'qle' : self.QLE,
+          'sigma_threshold' : self.SigmaThreshold
+        }
+        if self.RunParallel:
+            compressed_qmd_info = pickle.dumps(self.QMDInfo)
+            learned_models_info.set('QMDInfo', compressed_qmd_info)
+
         print("\nRunning ", self.QLE_Type, " for true operator ", true_operator, " with parameters : ", self.TrueParamsList)
         # Initialise database and lists.
         self.initiateDB()
@@ -227,6 +270,33 @@ class QMD():
         else: 
             print("Model ", model ,"does not exist")
 
+    def learnModel(self, model_name, use_rq = True): 
+        exists = DataBase.check_model_exists(model_name=model_name, model_lists = self.model_lists, db = self.db)
+        if exists:
+            modelID = DataBase.model_id_from_name(self.db, name = model_name)
+            if self.RunParallel and use_rq: # i.e. use a job queue rather than sequentially doing it. 
+                # add function call to RQ queue
+                queued_model = q.enqueue(learnModelRemote, model_name, modelID, self.QMDInfo, remote=True) # add result_ttl=-1 to keep result indefinitely on redis server
+                
+                print("Model", model_name, "added to queue.")
+                while queued_model.is_finished == False:
+                    if queued_model.is_finished:
+                        print("Model has failed on remote worker")
+                    time.sleep(0.1)
+                updated_model_info = pickle.loads(learned_models_info[modelID])
+#                updated_model_info = json.loads(learned_models_info[modelID])
+
+
+            else:
+                updated_model_info = learnModelRemote(model_name, modelID, self.QMDInfo, remote=False)
+
+            reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
+            reduced_model.updateLearnedValues(learned_info = updated_model_info)
+            del updated_model_info
+        else:
+            print("Model", model_name, "does not yet exist.")        
+            
+    
     def runAllActiveModelsIQLE(self, num_exp):
         active_models = self.db.loc[self.db['Status']=='Active']['<Name>']
 
