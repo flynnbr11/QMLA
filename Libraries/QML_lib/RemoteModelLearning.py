@@ -14,10 +14,12 @@ import pickle
 pickle.HIGHEST_PROTOCOL=2
 import copy
 
-import redis
-redis_db = redis.StrictRedis(host="localhost", port=6379, db=0)
-learned_models_info = redis.StrictRedis(host="localhost", port=6379, db=1)
-  
+try:
+    from RedisSettings import * 
+    enfore_serial = False  
+except:
+    enforce_serial = True # shouldn't be needed
+      
 import matplotlib
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
@@ -33,9 +35,15 @@ from Distrib import MultiVariateNormalDistributionNocov
 
 ## Single function call, given QMDInfo and a name, to learn model entirely. 
 
-def learnModelRemote(name, modelID, qmd_info, remote=False):
+def learnModelRemote(name, modelID, qmd_info=None, remote=False):
 
         # Get params from qmd_info
+        if qmd_info == None:
+            qmd_info = pickle.loads(qmd_info_db['QMDInfo'])
+            probe_dict = pickle.loads(qmd_info_db['ProbeDict'])
+        else: # if in serial, qmd_info given, with probe_dict included in it. 
+            probe_dict = qmd_info['probe_dict']
+
         true_ops = qmd_info['true_oplist']
         true_params = qmd_info['true_params']
         num_particles = qmd_info['num_particles']
@@ -46,7 +54,6 @@ def learnModelRemote(name, modelID, qmd_info, remote=False):
         debug_directory = qmd_info['debug_directory']
         qle = qmd_info['qle']
         num_probes = qmd_info['num_probes']
-        probe_dict = qmd_info['probe_dict']
         sigma_threshold = qmd_info['sigma_threshold']
         
         # Generate model and learn
@@ -88,12 +95,9 @@ def learnModelRemote(name, modelID, qmd_info, remote=False):
         del qml_instance
 
         if remote: 
-#            pickled_file = open('test_pickled_model_dict.pkl', "wb")
-#            pickle.dump(learned_model_info, pickled_file, protocol=2)
-#            pickled_file.close()
             compressed_info = pickle.dumps(updated_model_info)
             learned_models_info.set(modelID, compressed_info)
-            redis_db.set(modelID, True)
+            learned_models_ids.set(modelID, True)
 
             del updated_model_info
             del compressed_info

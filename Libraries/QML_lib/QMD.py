@@ -9,9 +9,8 @@ import warnings
 import time as time
 import random
 from psutil import virtual_memory
-import redis
-redis_db = redis.StrictRedis(host="localhost", port=6379, db=0)
-learned_models_info = redis.StrictRedis(host="localhost", port=6379, db=1)
+from RedisSettings import *
+flushdatabases() # only want to do this once at the start!
 import pickle 
 pickle.HIGHEST_PROTOCOL=2 # TODO if >python3, can use higher protocol
 import json
@@ -25,20 +24,10 @@ import DataBase
 import QML
 import ModelGeneration
 import BayesF
-from ModelLearningFunction import learnModelRemote
+from RemoteModelLearning import *
+from RemoteBayesFactor import * 
 # Class definition
 
-try:
-    import pickle
-    pickle.HIGHEST_PROTOCOL=2
-    from rq import Connection, Queue
-    from redis import Redis
-
-    redis_conn = Redis()
-    q = Queue(connection=redis_conn)
-    parallel_enabled = True
-except:
-    parallel_enabled = False    
 
 class QMD():
     #TODO: rename as ModelsDevelopmentClass when finished
@@ -126,7 +115,7 @@ class QMD():
         self.QMDInfo = {
          # may need to take copies of these in case pointers accross nodes break
           'num_probes' : self.NumProbes,
-          'probe_dict' : self.ProbeDict,
+#          'probe_dict' : self.ProbeDict, # possibly include here?
           'true_oplist' : self.TrueOpList,
           'true_params' : self.TrueParamsList,  
           'num_particles' : self.NumParticles,
@@ -140,14 +129,15 @@ class QMD():
         }
         if self.RunParallel:
             compressed_qmd_info = pickle.dumps(self.QMDInfo)
-            learned_models_info.set('QMDInfo', compressed_qmd_info)
+            compressed_probe_dict = pickle.dumps(self.ProbeDict)
+            qmd_info_db.set('QMDInfo', compressed_qmd_info)
+            qmd_info_db.set('ProbeDict', compressed_probe_dict)
 
         print("\nRunning ", self.QLE_Type, " for true operator ", true_operator, " with parameters : ", self.TrueParamsList)
         # Initialise database and lists.
         self.initiateDB()
         
     def initiateDB(self):
-        
         ## TODO: Models should be initialised with appropriate TrueOp dimension -- see getListTrueOpByDimension function
         self.db, self.legacy_db, self.model_lists = \
             DataBase.launch_db(
@@ -270,33 +260,49 @@ class QMD():
         else: 
             print("Model ", model ,"does not exist")
 
-    def learnModel(self, model_name, use_rq = True): 
+    
+    
+    def learnModelNameList(self, model_name_list, use_rq=True, blocking=False):
+        for model_name in model_name_list:
+            self.learnModel(model_name=model_name, use_rq=use_rq, blocking=blocking)
+            
+    
+    def learnModel(self, model_name, use_rq = True, blocking=False): 
         exists = DataBase.check_model_exists(model_name=model_name, model_lists = self.model_lists, db = self.db)
         if exists:
             modelID = DataBase.model_id_from_name(self.db, name = model_name)
             if self.RunParallel and use_rq: # i.e. use a job queue rather than sequentially doing it. 
                 # add function call to RQ queue
-                queued_model = q.enqueue(learnModelRemote, model_name, modelID, self.QMDInfo, remote=True) # add result_ttl=-1 to keep result indefinitely on redis server
+                queued_model = q.enqueue(learnModelRemote, model_name, modelID, remote=True) # add result_ttl=-1 to keep result indefinitely on redis server
                 
                 print("Model", model_name, "added to queue.")
-                while queued_model.is_finished == False:
-                    if queued_model.is_finished:
-                        print("Model has failed on remote worker")
-                    time.sleep(0.1)
-                updated_model_info = pickle.loads(learned_models_info[modelID])
-#                updated_model_info = json.loads(learned_models_info[modelID])
+                if blocking: # i.e. wait for result when called. 
+                    while not queued_model.is_finished:
+                        if queued_model.is_failed:
+                            print("Model", model_name, "has failed on remote worker")
+                            break
+                        time.sleep(0.1)
+                    updated_model_info = pickle.loads(learned_models_info[modelID])
+                    reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
+                    reduced_model.updateLearnedValues(learned_info = updated_model_info)
+                    del updated_model_info
 
 
             else:
-                updated_model_info = learnModelRemote(model_name, modelID, self.QMDInfo, remote=False)
+                self.QMDInfo['probe_dict'] = self.ProbeDict
+                updated_model_info = learnModelRemote(model_name, modelID, qmd_info=self.QMDInfo, remote=False)
 
-            reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
-            reduced_model.updateLearnedValues(learned_info = updated_model_info)
-            del updated_model_info
+                reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
+                reduced_model.updateLearnedValues(learned_info = updated_model_info)
+                del updated_model_info
         else:
             print("Model", model_name, "does not yet exist.")        
-            
-    
+
+
+    def remoteBayes(self, model_a_id, model_b_id):
+        q.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id) 
+        print("Bayes factor calculation queued.")
+
     def runAllActiveModelsIQLE(self, num_exp):
         active_models = self.db.loc[self.db['Status']=='Active']['<Name>']
 

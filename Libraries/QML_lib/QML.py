@@ -11,6 +11,7 @@ import DataBase as DB
 from MemoryTest import print_loc
 from EvalLoss import *
 from psutil import virtual_memory
+from RedisSettings import *
 global debug_print
 debug_print = False
 
@@ -403,6 +404,7 @@ class reducedModel():
     Then initialises an updater and GenSimModel which are used for updates. 
     """
     def __init__(self, model_name, sim_oplist, true_oplist, true_params, numparticles, modelID, resample_thresh=0.5, resample_a=0.9, qle=True, probe_dict= None):
+        
         self.SimOpList = sim_oplist
         self.TrueOpList = true_oplist
         self.TrueParams = true_params
@@ -431,7 +433,38 @@ class reducedModel():
         self.Updater._normalization_record = self._normalization_record
     
         
+class modelClassForRemoteBayesFactor():
+    def __init__(self, modelID):
+        model_id_str = str(modelID)
+        import pickle
+        qmd_info = pickle.loads(qmd_info_db['QMDInfo'])
+        learned_model_info = pickle.loads(learned_models_info[model_id_str])        
+
+        self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
+        self.ModelID = modelID
+        self.NumParticles = qmd_info['num_particles']
+        self.NumProbes = qmd_info['num_probes']
+        self.ResamplerThresh = qmd_info['resampler_thresh']
+        self.ResamplerA = qmd_info['resampler_a']
+        self.TrueOpList = qmd_info['true_oplist']
+        self.TrueParams = qmd_info['true_params']
+
+        self.Name = learned_model_info['name']
+        op = DB.operator(self.Name)
+        self.SimOpList = op.constituents_operators # todo, put this in a lighter function
+        self.Times = learned_model_info['times']
+        self.FinalParams = learned_model_info['final_params'] 
+        self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
+        self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
+        self._normalization_record = learned_model_info['normalization_record']
+
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict)    
+
+        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
+        self.Updater._normalization_record = self._normalization_record
+        del qmd_info, learned_model_info
         
+        # could pickle updaters to a redis db for updaters, but first construct these model classes each time a BF is to be computed. 
 
         
 
