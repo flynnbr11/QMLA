@@ -96,6 +96,22 @@ def getH(_pars, _ops):
 #    return (np.tensordot(_pars, _ops, axes=1))
  
  
+def anaytical_pr0(t_list, modelparams, oplist, probe):
+    print_loc(global_print_loc)
+    num_particles = len(modelparams)
+
+    #if num_particles==1: print("True probe \n", probe)
+    #else: print("Simulated probe \n", probe)
+    num_times = len(t_list)
+    output = np.empty([num_particles, num_times])
+
+    for evoId in range(num_particles): ## todo not sure about length/arrays here
+#        ham = np.tensordot(modelparams[evoId], oplist, axes=1)
+        for tId in range(len(t_list)):
+            t = t_list[tId]
+            output[evoId][tId] = (np.cos(modelparams[evoId] * t))**2
+    return output
+
  
 def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, enable_sparse=True, ham_list=None):
     

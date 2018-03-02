@@ -9,6 +9,7 @@ from Evo import *
 from ProbeStates import *
 from MemoryTest import print_loc
 from psutil import virtual_memory
+import DataBase
 
 global_print_loc=False
 global debug_print
@@ -58,6 +59,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self.ModelName = model_name
         self.inBayesUpdates = False
         self.ideal_probe = None
+        self.IdealProbe = DataBase.ideal_probe(self.ModelName)
         self.ideal_probelist = None
         if true_oplist is not None and trueparams is None:
             raise(ValueError('\nA system Hamiltonian with unknown parameters was requested'))
@@ -158,21 +160,27 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         if  num_particles == 1:
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
             true_evo = True
+            operators = self._true_oplist
             params = [self._trueparams]
             
         else:
             sample = np.array([expparams.item(0)[1:]])
             true_evo = False
+            operators = self._oplist
             params = modelparams
 
         ham_num_qubits = np.log2(self._oplist[0].shape[0])
         
         
-#        if num_particles==1: 
-          #print("True (", self.ModelName , "); probe id: (", (self._b % int(self.NumProbes)), ", ",  ham_num_qubits, ")")
+        
+        """
+        if num_particles==1: 
+          print("True (", self.ModelName , "); probe id: (", (self._b % int(self.NumProbes)), ", ",  ham_num_qubits, ")")
 #          print("modelparams : ", modelparams) 
-#        else: 
-          #print("Simulated(", self.ModelName , "); probe id: (", (self._b % int(self.NumProbes)), ",",  ham_num_qubits, ")")      
+        else: 
+          print("Simulated(", self.ModelName , "); probe id: (", (self._b % int(self.NumProbes)), ",",  ham_num_qubits, ")")      
+        """
+        
         if self.inBayesUpdates:
           if self.ideal_probe is not None:
             probe = self.ideal_probe # this won't work
@@ -191,15 +199,14 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             modelparams = modelparams[..., np.newaxis]
             
         times = expparams['t']
-
         if self.QLE is True:
-            pr0 = get_pr0_array_qle(t_list=times, modelparams=params, oplist=self._oplist, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
+            pr0 = get_pr0_array_qle(t_list=times, modelparams=params, oplist=operators, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
+
         else: 
-            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params, oplist=self._oplist, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
+            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params, oplist=operators, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
 
-        #print("pr0 list : ", pr0[0:min(3, len(pr0))])
-        return qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
-
+        likelihood_array = qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
+        return likelihood_array
 
 
 def seperable_probe_dict(max_num_qubits, num_probes):
@@ -215,19 +222,22 @@ def seperable_probe_dict(max_num_qubits, num_probes):
                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
     return seperable_probes
 
-
 def random_probe(num_qubits):
     dim = 2**num_qubits
-    real = np.random.rand(1,dim)
-    imaginary = np.random.rand(1,dim)
-    complex_vectors = np.empty([1, dim])
-    complex_vectors = real +1.j*imaginary
-    norm_factor = np.linalg.norm(complex_vectors)
+    real = []
+    imaginary = []
+    complex_vectors = []
+    for i in range(dim):
+        real.append(np.random.uniform(low=-1, high=1))
+        imaginary.append(np.random.uniform(low=-1, high=1))
+        complex_vectors.append(real[i] + 1j*imaginary[i])
+
+    a=np.array(complex_vectors)
+    norm_factor = np.linalg.norm(a)
     probe = complex_vectors/norm_factor
-    return probe[0][:]
-
-
-
+    if np.linalg.norm(probe) -1  > 1e-10:
+        print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
+    return probe
 
 
         

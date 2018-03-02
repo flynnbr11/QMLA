@@ -663,10 +663,6 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
     alph_model_name = alph(model_name)
     model_num_qubits = get_num_qubits(model_name)
 
-    if probe_dict is None: print("In DB, probe dict is none")
-    else: print("probe dict given to add model function")
-    
-    
     if consider_new_model(model_lists, model_name, running_database)=='New':
         model_lists[model_num_qubits].append(alph_model_name)
         
@@ -720,7 +716,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
           resample_thresh = resample_threshold,
           resampler_a = resampler_a,
           pgh_prefactor = pgh_prefactor,
-          gaussian=False,
+          gaussian=True,
           debug_directory = debug_directory,
           qle = qle
         )
@@ -811,7 +807,17 @@ def check_model_exists(model_name, model_lists, db):
     else:
         return True
 
-
+def unique_model_pair_identifier(model_a_id, model_b_id):
+    a=int(float(model_a_id))
+    b=int(float(model_b_id))
+    std=sorted([a,b])
+    id_str = ''
+    for i in range(len(std)):
+        id_str+=str(std[i])
+        if i!=len(std)-1:
+            id_str+=','
+            
+    return id_str    
 
 """
 Functions for accessing class instances of models within databse. 
@@ -867,6 +873,10 @@ def model_instance_from_id(db, model_id):
     idx = index_from_model_id(db, model_id)
     return db.loc[idx]["Model_Class_Instance"]
 
+
+def reduced_model_instance_from_id(db, model_id):
+    idx = index_from_model_id(db, model_id)
+    return db.loc[idx]["Reduced_Model_Class_Instance"]
 
 def list_model_id_in_branch(db, branchID):
     return list(db[db['branchID']==branchID]['ModelID'])

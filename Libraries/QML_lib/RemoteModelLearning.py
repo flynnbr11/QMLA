@@ -36,7 +36,7 @@ from Distrib import MultiVariateNormalDistributionNocov
 ## Single function call, given QMDInfo and a name, to learn model entirely. 
 
 def learnModelRemote(name, modelID, qmd_info=None, remote=False):
-
+        print("QHL for", name)
         # Get params from qmd_info
         if qmd_info == None:
             qmd_info = pickle.loads(qmd_info_db['QMDInfo'])
@@ -94,11 +94,10 @@ def learnModelRemote(name, modelID, qmd_info=None, remote=False):
         updated_model_info = copy.deepcopy(qml_instance.learned_info_dict()) # possibly need to take a copy
         del qml_instance
 
+        compressed_info = pickle.dumps(updated_model_info)
+        learned_models_info.set(str(modelID), compressed_info)
+        learned_models_ids.set(str(modelID), True)
         if remote: 
-            compressed_info = pickle.dumps(updated_model_info)
-            learned_models_info.set(modelID, compressed_info)
-            learned_models_ids.set(modelID, True)
-
             del updated_model_info
             del compressed_info
             print("Model", name, "learned and pickled to redis DB.")

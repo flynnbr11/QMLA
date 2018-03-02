@@ -44,6 +44,7 @@ class QMD():
                  resampler_a = 0.95,
                  pgh_prefactor = 1.0,
                  num_probes = 20, 
+                 num_times_for_bayes_updates = 'all',
                  max_num_layers = 10,
                  max_num_branches = 20, 
                  use_exp_custom = True,
@@ -75,6 +76,7 @@ class QMD():
         self.NumParticles = num_particles
         self.NumExperiments = num_experiments
         self.MaxQubitNumber = max_num_qubits
+        self.NumTimesForBayesUpdates = num_times_for_bayes_updates
         self.ResampleThreshold = resample_threshold
         self.ResamplerA = resampler_a
         self.PGHPrefactor = pgh_prefactor
@@ -98,6 +100,7 @@ class QMD():
         self.DebugDirectory = debug_directory
         self.ModelPointsDict = {}
         self.BranchBayesComputed[0] = False
+        self.BayesFactorsComputed = []
 #        for i in range(self.MaxBranchID+1):
 #            self.BranchChampions[i] = 0
 #        for i in range(self.MaxLayerNumber+1):
@@ -182,6 +185,7 @@ class QMD():
         )
         if tryAddModel == True: ## keep track of how many models/branches in play
             self.HighestModelID += 1 
+            # this_model_id = model_id_from_name(self.db, name = model) 
             self.NumModels += 1
             if DataBase.get_num_qubits(model) > self.HighestQubitNumber:
                 self.HighestQubitNumber = DataBase.get_num_qubits(model)
@@ -225,6 +229,10 @@ class QMD():
 
     def getModelInstanceFromID(self, model_id):
         return DataBase.model_instance_from_id(self.db, model_id)    
+
+    def reducedModelInstanceFromID(self, model_id):
+        return DataBase.reduced_model_instance_from_id(self.db, model_id)    
+
     
     def killModel(self, name):
         if name not in list(self.db['<Name>']):
@@ -299,9 +307,56 @@ class QMD():
             print("Model", model_name, "does not yet exist.")        
 
 
-    def remoteBayes(self, model_a_id, model_b_id):
-        q.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id) 
-        print("Bayes factor calculation queued.")
+    def remoteBayes(self, model_a_id, model_b_id, remote=True):
+        # only do this when both models have learned. TODO add check for this. 
+        if remote:
+            q.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName) 
+            print("Bayes factor calculation queued.")
+        else:
+            BayesFactorRemote(model_a_id=model_a_id, model_b_id=model_b_id, trueModel=self.TrueOpName)
+        
+
+    def remoteBayesFromIDList(self, model_id_list, remote=True):
+        for a in model_id_list:
+            for b in model_id_list:
+                if a!=b:
+                    unique_id = DataBase.unique_model_pair_identifier(a,b)
+                    if unique_id not in self.BayesFactorsComputed: #ie not yet considered
+                        self.BayesFactorsComputed.append(unique_id)
+                        self.remoteBayes(a,b, remote=remote)
+                    else:
+                        print("Bayes already computed bw", a,b)
+
+    def blockingQMD(self):
+        # primarily for use during development. 
+        self.learnModelNameList(model_name_list=self.InitialOpList, blocking=True, use_rq=False)
+        ids=DataBase.active_model_ids_by_branch_id(self.db, 0)
+        self.remoteBayesFromIDList(ids, remote=False)
+        self.processRemoteBayesFactors()
+    
+    
+
+    def processRemoteBayesFactors(self):
+        computed_pairs = bayes_factors_db.keys()
+        #TODO check whether pair computed before using bayes dict of QMD, or something more efficient
+        # TODO take list, or branch argument and only process those.
+        for pair in computed_pairs:
+            bayes_factor = float(bayes_factors_db.get(pair))
+            model_ids = pair.split(',')
+            a=int(float(model_ids[0]))
+            b=int(float(model_ids[1]))
+            mod_a = self.reducedModelInstanceFromID(a)
+            mod_b = self.reducedModelInstanceFromID(b)
+            if b in mod_a.BayesFactors:
+                mod_a.BayesFactors[b].append(bayes_factor)
+            else:
+                mod_a.BayesFactors[b] = [bayes_factor]
+            
+            if a in mod_b.BayesFactors:
+                mod_b.BayesFactors[a].append((1.0/bayes_factor))
+            else:
+                mod_b.BayesFactors[a] = [(1.0/bayes_factor)]
+                        
 
     def runAllActiveModelsIQLE(self, num_exp):
         active_models = self.db.loc[self.db['Status']=='Active']['<Name>']
@@ -649,6 +704,24 @@ class QMD():
         print("final params : ", mod.FinalParams)
         print("bayes factors: ", mod.BayesFactors)
         
+
+    def one_qubit_probes_bloch_sphere(self):
+        print("In jupyter, include the following to view sphere: %matplotlib inline")
+        import qutip as qt
+        bloch = qt.Bloch()
+        for i in range(self.NumProbes):
+            state = self.ProbeDict[i,1]
+            a = state[0]
+            b = state[1]
+            A=a*qt.basis(2,0)
+            B=b*qt.basis(2,1)
+            vec = (A + B)
+            print(vec)
+            bloch.add_states(vec)
+        bloch.show()
+
+        
+        
 def get_exps(model, gen, times):
 
     exps = np.empty(len(times), dtype=gen.expparams_dtype)
@@ -827,11 +900,17 @@ def separable_probe_dict(max_num_qubits, num_probes):
 
 def random_probe(num_qubits):
     dim = 2**num_qubits
-    real = np.random.rand(1,dim)
-    imaginary = np.random.rand(1,dim)
-    complex_vectors = np.empty([1, dim])
-    complex_vectors = real +1.j*imaginary
-    norm_factor = np.linalg.norm(complex_vectors)
-    probe = complex_vectors/norm_factor
-    return probe[0][:]
+    real = []
+    imaginary = []
+    complex_vectors = []
+    for i in range(dim):
+        real.append(np.random.uniform(low=-1, high=1))
+        imaginary.append(np.random.uniform(low=-1, high=1))
+        complex_vectors.append(real[i] + 1j*imaginary[i])
 
+    a=np.array(complex_vectors)
+    norm_factor = np.linalg.norm(a)
+    probe = complex_vectors/norm_factor
+    if np.linalg.norm(probe) -1  > 1e-10:
+        print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
+    return probe

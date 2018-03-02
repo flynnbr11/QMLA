@@ -50,13 +50,14 @@ class ModelLearningClass():
     
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
     
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=False, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True):
+    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True):
         
         self.TrueOpList = np.asarray(trueoplist)
         self.TrueParams = np.asarray(modeltrueparams)
         self.SimOpList  = np.asarray(simoplist)
         #self.SimParams = simparams[0]
         self.SimParams = np.asarray([simparams[0]])
+        self.InitialParams = np.asarray([simparams[0]])
         self.NumParticles = numparticles # function to adapt by dimension
         self.ResamplerThresh = resample_thresh
         self.ResamplerA = resampler_a
@@ -117,7 +118,12 @@ class ModelLearningClass():
         #doublecheck and coment properly
         self.Inv_Field = [item[0] for item in self.GenSimModel.expparams_dtype[1:] ]
         #print('Inversion fields are: ' + str(self.Inv_Field))
-        self.Heuristic = mpgh.multiPGH(self.Updater, self.SimOpList, inv_field=self.Inv_Field)
+#        self.Heuristic = mpgh.multiPGH(self.Updater, self.SimOpList, inv_field=self.Inv_Field)
+        self.Heuristic = mpgh.multiPGH(self.Updater, inv_field=self.Inv_Field)
+        
+        
+        #TODO: should heuristic use TRUEoplist???
+        
         #print('Heuristic output:' + repr(self.Heuristic()))
         self.ExpParams = np.empty((1, ), dtype=self.GenSimModel.expparams_dtype)
         
@@ -205,7 +211,12 @@ class ModelLearningClass():
             self.TrackTime[istep] = self.Experiment[0][0]
             print_loc(global_print_loc)
             
+            #TODO should this use TRUE params???
+            true_params = np.array([[self.TrueParams[0]]])
             self.Datum = self.GenSimModel.simulate_experiment(self.SimParams, self.Experiment, repeat=10) # todo reconsider repeat number
+#            self.Datum = self.GenSimModel.simulate_experiment(true_params, self.Experiment, repeat=1) # todo reconsider repeat number
+            
+            
             print_loc(global_print_loc)
             
             #print(str(self.GenSimModel.ProbeState))
@@ -240,7 +251,7 @@ class ModelLearningClass():
 
             self.NewEval = self.Updater.est_mean()
             print_loc(global_print_loc)
-            
+#            print("At epoch", istep, "loglikelihood=", self.Updater.log_total_likelihood)
 
                 
             if checkloss == True: 
@@ -255,7 +266,7 @@ class ModelLearningClass():
                     for iterator in range(len(self.FinalParams)):
                         self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep]), np.std(self.Particles[:,iterator,istep])]
                         print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator])) 
-                        print('Final quadratic loss: ', str(self.QLosses[-1]))
+#                        print('Final quadratic loss: ', str(self.QLosses[-1]))
 
                     self.LogTotLikelihood=self.Updater.log_total_likelihood                
                     self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
@@ -274,7 +285,7 @@ class ModelLearningClass():
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep]), np.std(self.Particles[:,iterator,istep])]
                     print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator]))
-                    print('Final quadratic loss: ', self.QLosses[-1]  )
+#                    print('Final quadratic loss: ', self.QLosses[-1]  )
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
                 if checkloss == True: 
                     self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
@@ -299,7 +310,7 @@ class ModelLearningClass():
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep-1]), np.std(self.Particles[:,iterator,istep-1])]
                     print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator]))
-                    print('Final quadratic loss: ', str(self.QLosses[-1]))
+#                   print('Final quadratic loss: ', str(self.QLosses[-1]))
 #                final_ham = evo.getH(self.)
 
             if debug_print:
@@ -324,9 +335,12 @@ class ModelLearningClass():
         learned_info['times'] = self.TrackTime
         learned_info['final_params'] = self.FinalParams
         learned_info['normalization_record'] = self.Updater.normalization_record
+        learned_info['data_record'] = self.Updater.data_record
         learned_info['name'] = self.Name
         learned_info['model_id'] = self.ModelID
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
+        learned_info['initial_params'] = self.InitialParams
+        learned_info['updater'] = pickle.dumps(self.Updater)
         return learned_info
         
         
@@ -415,6 +429,7 @@ class reducedModel():
         self.ModelID = modelID
         self.QLE = qle
         self.ProbeDict = probe_dict
+        self.BayesFactors = {}
         
         
     def updateLearnedValues(self, learned_info):
@@ -435,10 +450,11 @@ class reducedModel():
         
 class modelClassForRemoteBayesFactor():
     def __init__(self, modelID):
-        model_id_str = str(modelID)
+        model_id_float = float(modelID)
+        model_id_str = str(model_id_float)
         import pickle
-        qmd_info = pickle.loads(qmd_info_db['QMDInfo'])
-        learned_model_info = pickle.loads(learned_models_info[model_id_str])        
+        learned_model_info = pickle.loads(learned_models_info.get(model_id_str))        
+        qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.ModelID = modelID
@@ -455,13 +471,18 @@ class modelClassForRemoteBayesFactor():
         self.Times = learned_model_info['times']
         self.FinalParams = learned_model_info['final_params'] 
         self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
+        self.InitialParams = learned_model_info['initial_params']
+        
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_model_info['normalization_record']
 
         self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict)    
 
-        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
-        self.Updater._normalization_record = self._normalization_record
+        self.Updater_regenerated = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
+        self.Updater_regenerated._normalization_record = self._normalization_record
+        self.Updater_regenerated._data_record = learned_model_info['data_record']
+        
+        self.Updater = pickle.loads(learned_model_info['updater'])
         del qmd_info, learned_model_info
         
         # could pickle updaters to a redis db for updaters, but first construct these model classes each time a BF is to be computed. 
