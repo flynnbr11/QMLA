@@ -128,7 +128,6 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, e
             ham = np.tensordot(modelparams[evoId], oplist, axes=1)
             t = t_list[tId]
             print_loc(global_print_loc)
-            
             output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
             if output[evoId][tId] < 0:
                 print("[QLE] Negative probability : \t \t probability = ", output[evoId][tId])
@@ -188,10 +187,14 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     
     #print("diff in expec val from linalg to exp custom = ", diff, "\t abs=", np.absolute(diff))
     
-    
+        
     if use_exp_custom and ham_exp_installed:
       import hamiltonian_exponentiation as h    
-      u_psi = h.unitary_evolve(ham, t, state, enable_sparse_functionality=enable_sparse)
+      try:
+          u_psi = h.unitary_evolve(ham, t, state, enable_sparse_functionality=enable_sparse)
+      except ValueError:
+          print("Value error when exponentiating Hamiltonian. Ham:\n", ham)
+          print("Probe: ", state)
     else:
       u_psi = evolved_state(ham, t, state, use_exp_custom=False)
     print_loc(global_print_loc)

@@ -27,15 +27,18 @@ import time as time
 import argparse
 parser = argparse.ArgumentParser(description='Pass variables for (I)QLE.')
 
-for i in range(24):
-    print("i=",i)
-    num_particles=400
-    num_experiments = 250
-    qle=True
 
-    #initial_op_list = ['x', 'y', 'z', 'xTx', 'yTz', 'xTz']
-    initial_op_list = ['x', 'y', 'z']
-    true_op=initial_op_list[i%3]
+initial_op_list = ['x', 'y', 'z', 'xTx', 'xPy', 'xTz', 'xTyPPzTy']
+num_ops = len(initial_op_list)
+num_particles = 400
+num_experiments = 200
+qle=True
+
+for i in range(num_ops):
+    print("i=",i)
+
+    #initial_op_list = ['x', 'y', 'z']
+    true_op=initial_op_list[i%num_ops]
     #true_op = random.choice(initial_op_list)
     global_true_op = true_op
 

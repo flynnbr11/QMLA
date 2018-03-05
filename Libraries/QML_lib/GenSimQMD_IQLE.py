@@ -169,7 +169,8 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             operators = self._oplist
             params = modelparams
 
-        ham_num_qubits = np.log2(self._oplist[0].shape[0])
+#        ham_num_qubits = np.log2(self._oplist[0].shape[0])
+        ham_num_qubits = np.log2(operators[0].shape[0])
         
         
         

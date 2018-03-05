@@ -255,10 +255,11 @@ class ModelLearningClass():
 
                 
             if checkloss == True: 
-                self.NewLoss = eval_loss(self.GenSimModel, self.NewEval, self.TrueParams)
-                self.QLosses[istep] = self.NewLoss
+                #self.NewLoss = eval_loss(self.GenSimModel, self.NewEval, self.TrueParams)
+                #self.QLosses[istep] = self.NewLoss
             
-                if self.NewLoss<(10**(-17)) and False: #  I don't want it to stop learning - Brian
+#                if self.NewLoss<(10**(-17)) and False: #  I don't want it to stop learning - Brian
+                if False:
                     if self.debugSave: 
                         self.debug_store()
                     print('Final time selected > ' + str(self.Experiment[0][0]))

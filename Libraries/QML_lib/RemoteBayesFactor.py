@@ -60,7 +60,7 @@ def BayesFactorRemote(model_a_id, model_b_id, num_times_to_use = 'all', check_db
         log_l_b = log_likelihood(model_b, times_a)     
 
         bayes_factor = np.exp(log_l_a - log_l_b)
-        print("Bayes factor bw", model_a.Name, "/", model_b.Name, "=", bayes_factor)
+        print("Bayes factor bw", model_a.Name, "/", model_b.Name, "= %.0e"%bayes_factor)
         
         
         pair_id = DataBase.unique_model_pair_identifier(model_a_id, model_b_id)

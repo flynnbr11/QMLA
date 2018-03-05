@@ -343,8 +343,10 @@ class QMD():
         for pair in computed_pairs:
             bayes_factor = float(bayes_factors_db.get(pair))
             model_ids = pair.split(',')
-            a=int(float(model_ids[0]))
-            b=int(float(model_ids[1]))
+#            a=int(float(model_ids[0]))
+#            b=int(float(model_ids[1]))
+            a=(float(model_ids[0]))
+            b=(float(model_ids[1]))
             mod_a = self.reducedModelInstanceFromID(a)
             mod_b = self.reducedModelInstanceFromID(b)
             if b in mod_a.BayesFactors:

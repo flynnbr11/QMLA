@@ -1,6 +1,8 @@
 import redis
 
 #TODO do as list?
+#TODO do in function and return unique set of dbs.. or else set list of port ids in QMD, cycle through them so several QMDs can be run simultaneously. 
+
 qmd_info_db = redis.StrictRedis(host="localhost", port=6379, db=0)
 learned_models_info = redis.StrictRedis(host="localhost", port=6379, db=1)
 learned_models_ids = redis.StrictRedis(host="localhost", port=6379, db=2)
@@ -29,3 +31,6 @@ def flushdatabases():
 def countWorkers():
     # TODO this isn't working
     return Worker.count(connection=redis_conn)
+    
+    
+    
