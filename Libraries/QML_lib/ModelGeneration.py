@@ -258,6 +258,7 @@ def new_model_list_grow_one_qubit(generator_list, options=['x', 'y', 'z']):
     
     
 def new_model_list(model_list, options=['x', 'y', 'z'], generator='simple_ising'):
+    print("generating new models according to options:", options)
     if generator == 'simple_ising':
         return new_model_list_grow_one_qubit(generator_list=model_list, options=options)
         #todo integrate Andreas' simple Ising growth

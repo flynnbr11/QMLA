@@ -35,7 +35,7 @@ from Distrib import MultiVariateNormalDistributionNocov
 
 ## Single function call to compute Bayes Factor between models given their IDs
 
-def BayesFactorRemote(model_a_id, model_b_id, num_times_to_use = 'all', check_db=False, trueModel=None):
+def BayesFactorRemote(model_a_id, model_b_id, num_times_to_use = 'all', check_db=False, trueModel=None, bayes_threshold=1):
     if check_db: # built in to only compute once and always return the stored value.
         if pair_id in bayes_factors_db.keys():
             bayes_factor = bayes_factors_db.get(pair_id)
@@ -68,7 +68,15 @@ def BayesFactorRemote(model_a_id, model_b_id, num_times_to_use = 'all', check_db
             bayes_factors_db.set(pair_id, bayes_factor)
         else:
             bayes_factors_db.set(pair_id, (1.0/bayes_factor))
-        
+
+        if bayes_factor > bayes_threshold: #TODO minimum threshold to determine 'winner'
+            bayes_factors_winners_db.set(pair_id, 'a')
+        elif bayes_factor < (1.0/bayes_threshold):
+            bayes_factors_winners_db.set(pair_id, 'b')
+        else:
+            print("Neither model convincingly stronger than the other.")
+
+        """
         if trueModel is not None:
             if (trueModel!=model_a.Name and trueModel!=model_b.Name):
                 print("Neither model correct")
@@ -78,8 +86,7 @@ def BayesFactorRemote(model_a_id, model_b_id, num_times_to_use = 'all', check_db
                 print("Bayes Correct")
             else:
                 print("Bayes Incorrect")
-        
-        
+        """
         return bayes_factor
     
     
@@ -87,10 +94,10 @@ def BayesFactorRemote(model_a_id, model_b_id, num_times_to_use = 'all', check_db
     
 def log_likelihood(model, times):
     updater = model.Updater #this could be what Updater.hypotheticalUpdate is for?
-    print("Loglikelihoods for", model.Name)
+#    print("Loglikelihoods for", model.Name)
 #    print(model.Name, "has final params", model.FinalParams)
 #    print("New times considered:", times)
-    print("Before:", updater.log_total_likelihood)
+#    print("Before:", updater.log_total_likelihood)
     sum_data = 0
     for i in range(len(times)):
         exp = get_exp(model, [times[i]])
@@ -102,9 +109,9 @@ def log_likelihood(model, times):
         updater.update(datum, exp)
        # print("Update", i, "Loglikelihood=", updater.log_total_likelihood)
 
-    print("After:", updater.log_total_likelihood)
+#    print("After:", updater.log_total_likelihood)
     fraction_ones = (float(sum_data)/len(times))*100
-    print("Sum of data:", sum_data, " 1s out of ", len(times),"=", fraction_ones, "%")
+#    print("Sum of data:", sum_data, " 1s out of ", len(times),"=", fraction_ones, "%")
     log_likelihood = updater.log_total_likelihood
     
     return log_likelihood        
@@ -118,19 +125,5 @@ def get_exp(model, time):
         col_name = 'w_'+str(i)
         exp[col_name] = model.FinalParams[i-1,0] 
     return exp
-
-"""
-OLD but I think equivalent to above?
-
-def get_exp(model, gen, time):
-    exp = np.empty(len(time), dtype=gen.expparams_dtype)
-    exp['t'] = time
-
-    for i in range(1, len(gen.expparams_dtype)):
-        col_name = 'w_'+str(i)
-        exp[col_name] = model.FinalParams[i-1,0] 
-    return exp
-"""
-
 
 

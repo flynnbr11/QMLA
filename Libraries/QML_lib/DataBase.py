@@ -898,6 +898,12 @@ def pull_field(db, name, field):
 
 def active_model_ids_by_branch_id(db, branchID):
     return list(db[ (db['branchID']==branchID) & (db['Status']=='Active') ]['ModelID'])
+
+def all_unfinished_model_ids(db):
+    return list(db[ (db['Completed']==False) ]['ModelID'])    
+
+def all_unfinished_model_names(db):
+    return list(db[ (db['Completed']==False) ]['<Name>'])    
     
 def unfinished_model_ids_by_branch_id(db, branchID):
-    return list(db[ (db['branchID']==branchID) & (db['Completed']=='False') ]['ModelID'])    
+    return list(db[ (db['branchID']==branchID) & (db['Completed']==False) ]['ModelID'])
