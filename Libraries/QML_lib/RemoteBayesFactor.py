@@ -35,7 +35,7 @@ from Distrib import MultiVariateNormalDistributionNocov
 
 ## Single function call to compute Bayes Factor between models given their IDs
 
-def BayesFactorRemote(model_a_id, model_b_id, num_times_to_use = 'all', check_db=False, trueModel=None, bayes_threshold=1):
+def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, num_times_to_use = 'all', check_db=False, trueModel=None, bayes_threshold=1):
     if check_db: # built in to only compute once and always return the stored value.
         if pair_id in bayes_factors_db.keys():
             bayes_factor = bayes_factors_db.get(pair_id)
@@ -87,6 +87,18 @@ def BayesFactorRemote(model_a_id, model_b_id, num_times_to_use = 'all', check_db
             else:
                 print("Bayes Incorrect")
         """
+        
+        if branchID is not None:    
+            # only want to fill these lists when comparing models within branch
+
+
+            current = int(active_branches_bayes.get(int(branchID))) # if first to finish
+            print("active_branches_bayes: branch", branchID, "Current = ", current)
+            active_branches_bayes.set(int(branchID), current+1)  
+            print("Reset active_branch_bayes for branch", branchID, "as", current+1)  
+        else:
+            active_interbranch_bayes.set(pair_id, True)
+    
         return bayes_factor
     
     

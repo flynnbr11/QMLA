@@ -35,7 +35,7 @@ from Distrib import MultiVariateNormalDistributionNocov
 
 ## Single function call, given QMDInfo and a name, to learn model entirely. 
 
-def learnModelRemote(name, modelID, qmd_info=None, remote=False):
+def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False):
         print("QHL for", name)
         # Get params from qmd_info
         if qmd_info == None:
@@ -97,6 +97,11 @@ def learnModelRemote(name, modelID, qmd_info=None, remote=False):
         compressed_info = pickle.dumps(updated_model_info)
         learned_models_info.set(str(modelID), compressed_info)
         learned_models_ids.set(str(modelID), True)
+
+        current = int(active_branches_learning_models.get(int(branchID))) # if first to finish
+        print("branch", branchID, "Current = ", current)
+        active_branches_learning_models.set(int(branchID), current+1)    
+            
         if remote: 
             del updated_model_info
             del compressed_info

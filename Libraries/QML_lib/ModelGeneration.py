@@ -19,6 +19,13 @@ import warnings
 global paulis_list
 paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
 
+# Dict of max spawn depths, corresponding to different generation functions. 
+
+max_spawn_depth_info = {
+    'simple_ising' : 3,
+    'hyperfine' : 3
+}
+
 
 """
 Functions for generation of random model names for testing/debugging.
@@ -243,7 +250,7 @@ def dimensionalise_name_by_name_list(constituents, true_dim, return_operator=Fal
         return new_name
             
             
-def new_model_list_grow_one_qubit(generator_list, options=['x', 'y', 'z']):
+def simple_ising(generator_list, options=['x', 'y', 'z']):
     new_options = []
 
     for gen in generator_list: 
@@ -257,8 +264,20 @@ def new_model_list_grow_one_qubit(generator_list, options=['x', 'y', 'z']):
     return new_options
     
     
-def new_model_list(model_list, options=['x', 'y', 'z'], generator='simple_ising'):
-    print("generating new models according to options:", options)
+def new_model_list(model_list, spawn_depth, options=['x', 'y', 'z'], generator='simple_ising'):
+    print("Generating new models according to best of last round: ", model_list, "; and options:", options)
     if generator == 'simple_ising':
-        return new_model_list_grow_one_qubit(generator_list=model_list, options=options)
+        return simple_ising(generator_list=model_list, options=options)
         #todo integrate Andreas' simple Ising growth
+    else:
+        print("Generator", generator, "not recognised")        
+
+def max_spawn_depth(generator):
+    if generator not in max_spawn_depth_info:
+        print("Generator not recognised; does not have maximum spawn depth or generation function")
+    else:
+        return max_spawn_depth_info[generator]
+        
+    
+        
+        

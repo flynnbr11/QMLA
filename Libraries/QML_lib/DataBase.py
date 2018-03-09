@@ -856,6 +856,10 @@ def move_to_legacy(db, legacy_db, name):
     legacy_db.loc[num_rows] = new_row         
     
     
+def model_branch_from_model_id(db, model_id):
+    return db.loc[db['ModelID']==model_id]['branchID'].item()
+
+    
 def model_id_from_name(db, name):
     return db.loc[db['<Name>']==name]['ModelID'].item()
 
@@ -894,6 +898,9 @@ def pull_field(db, name, field):
         return db.loc[idx,field]
     else: 
       print("Cannot update field -- model does not exist in database.")
+
+def model_names_on_branch(db, branchID):
+    return list(db[ (db['branchID']==branchID) ]['<Name>'])
 
 
 def active_model_ids_by_branch_id(db, branchID):

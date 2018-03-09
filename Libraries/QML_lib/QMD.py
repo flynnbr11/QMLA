@@ -17,6 +17,7 @@ import json
 import matplotlib
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
+import math
 
 # Local files
 import Evo as evo
@@ -52,7 +53,8 @@ class QMD():
                  sigma_threshold = 1e-13, 
                  debug_directory = None,
                  qle = True, # Set to False for IQLE
-                 parallel = False
+                 parallel = False,
+                 growth_generator='simple_ising'
                 ):
 #    def __init__(self, initial_op_list, true_op_list, true_param_list):
         self.QLE = qle # Set to False for IQLE
@@ -107,7 +109,11 @@ class QMD():
 #            self.LayerChampions[i] = 0
         self.ModelNameIDs = {}
         self.RunParallel = parallel and parallel_enabled # only true if both. 
-        
+        self.GrowthGenerator = growth_generator
+        self.SpawnDepth = 0
+        self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(self.GrowthGenerator)
+        self.NumModelsPerBranch = {0:len(self.InitialOpList)}
+        self.NumModelPairsPerBranch = {0 : num_pairs_in_list(len(self.InitialOpList))}
         if self.QLE:
             self.QLE_Type = 'QLE'
         else: 
@@ -200,6 +206,9 @@ class QMD():
         self.HighestBranchID += 1
         branchID = self.HighestBranchID
         self.BranchBayesComputed[branchID] = False
+        num_models = len(model_list)
+        self.NumModelsPerBranch[branchID] = num_models
+        self.NumModelPairsPerBranch[branchID] = num_pairs_in_list(num_models)
         for model in model_list:
             self.addModel(model, branchID=branchID)
     
@@ -278,6 +287,16 @@ class QMD():
             self.learnModel(model_name=model_name, use_rq=use_rq, blocking=blocking)
             self.updateModelRecord(field='Completed', name=model_name,  new_value=True)
         
+
+    def learnModelFromBranchID(self, branchID, use_rq=True, blocking=False):
+        model_list = DataBase.model_names_on_branch(self.db, branchID)
+        active_branches_learning_models.set(int(branchID), 0)
+        for model_name in model_list:
+            print("Model ", model_name, "being learned")
+            self.learnModel(model_name=model_name, use_rq=use_rq, blocking=blocking)
+            self.updateModelRecord(field='Completed', name=model_name,  new_value=True)
+
+        
     
     
     def learnModelNameList(self, model_name_list, use_rq=True, blocking=False):
@@ -290,9 +309,10 @@ class QMD():
         exists = DataBase.check_model_exists(model_name=model_name, model_lists = self.model_lists, db = self.db)
         if exists:
             modelID = DataBase.model_id_from_name(self.db, name = model_name)
+            branchID = DataBase.model_branch_from_model_id(self.db, model_id=modelID)
             if self.RunParallel and use_rq: # i.e. use a job queue rather than sequentially doing it. 
                 # add function call to RQ queue
-                queued_model = q.enqueue(learnModelRemote, model_name, modelID, remote=True) # add result_ttl=-1 to keep result indefinitely on redis server
+                queued_model = q.enqueue(learnModelRemote, model_name, modelID, branchID=branchID, remote=True) # add result_ttl=-1 to keep result indefinitely on redis server
                 
                 print("Model", model_name, "added to queue.")
                 if blocking: # i.e. wait for result when called. 
@@ -309,7 +329,7 @@ class QMD():
 
             else:
                 self.QMDInfo['probe_dict'] = self.ProbeDict
-                updated_model_info = learnModelRemote(model_name, modelID, qmd_info=self.QMDInfo, remote=False)
+                updated_model_info = learnModelRemote(model_name, modelID, branchID=branchID, qmd_info=self.QMDInfo, remote=False)
 
                 reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
                 reduced_model.updateLearnedValues(learned_info = updated_model_info)
@@ -318,13 +338,17 @@ class QMD():
             print("Model", model_name, "does not yet exist.")        
 
 
-    def remoteBayes(self, model_a_id, model_b_id, remote=True, bayes_threshold=100):
+    def remoteBayes(self, model_a_id, model_b_id, branchID=None, interbranch=False, remote=True, bayes_threshold=100):
         # only do this when both models have learned. TODO add check for this. 
+        
+        if branchID is None:
+            interbranch=True            
+        
         if remote:
-            q.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName, bayes_threshold=bayes_threshold) 
+            q.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, branchID=branchID, interbranch=interbranch, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName, bayes_threshold=bayes_threshold) 
             print("Bayes factor calculation queued.")
         else:
-            BayesFactorRemote(model_a_id=model_a_id, model_b_id=model_b_id, trueModel=self.TrueOpName, bayes_threshold=bayes_threshold)
+            BayesFactorRemote(model_a_id=model_a_id, model_b_id=model_b_id, trueModel=self.TrueOpName, branchID=branchID, interbranch=interbranch, bayes_threshold=bayes_threshold)
         
 
     def remoteBayesFromIDList(self, model_id_list, remote=True, recompute=False, bayes_threshold=1): 
@@ -341,6 +365,29 @@ class QMD():
                         self.remoteBayes(a,b, remote=remote, bayes_threshold=bayes_threshold)
 #                    else:
 #                       print("Bayes already computed bw", a,b)
+    
+    
+    
+    def remoteBayesFromBranchID(self, branchID, remote=False, bayes_threshold=50):
+        active_branches_bayes.set(int(branchID), 0)
+        model_id_list = DataBase.active_model_ids_by_branch_id(self.db, branchID)
+        print("Active branch bayes db set to 0 for branch", branchID)
+        num_models = len(model_id_list)
+        for i in range(num_models):
+            a = model_id_list[i]
+            for j in range(i,num_models):
+                b=model_id_list[j]
+                if a!=b:
+                    unique_id = DataBase.unique_model_pair_identifier(a,b)
+                    if (unique_id not in self.BayesFactorsComputed or recompute==True): #ie not yet considered
+                        self.BayesFactorsComputed.append(unique_id)
+                        self.remoteBayes(a,b, remote=remote, branchID=branchID, bayes_threshold=bayes_threshold)
+                        print("Returned from remote bayes function")
+#                    else:
+#                       print("Bayes already computed bw", a,b)
+        
+
+
 
     def blockingQMD(self):
         # primarily for use during development. 
@@ -349,8 +396,6 @@ class QMD():
         self.remoteBayesFromIDList(ids, remote=False)
         self.remoteBranchBayesComparison(branchID=0)
     
-    
-
     def remoteBranchBayesComparison(self, branchID):
         active_models_in_branch = DataBase.active_model_ids_by_branch_id(self.db, branchID)
         
@@ -706,10 +751,10 @@ class QMD():
             
         overall_champ, branch_champions = self.interBranchChampion(branch_list=branch_list, global_champion=global_champion)
         print("Overall champion within spawn function:", overall_champ)
-        #options=['x', 'y', 'z'] # append best model with these options
+        options=['x', 'y', 'z'] # append best model with these options
         
         # for ising model of all x components
-        options = ['x']
+#        options = ['x']
 
         if single_champion:
             new_models = ModelGeneration.new_model_list(model_list=[overall_champ], generator='simple_ising',options=options)
@@ -721,35 +766,94 @@ class QMD():
       #todo probailistically append model_list with suboptimal model in any of the branches in branch_list
 
 
+    def spawnFromBranch(self, branchID, num_models=1):
+        self.SpawnDepth+=1
+        best_models = self.BranchRankings[branchID][:num_models]
+        best_model_names = [DataBase.model_name_from_id(self.db, mod_id) for mod_id in best_models ]
+        new_models = ModelGeneration.new_model_list(model_list=best_model_names, spawn_depth=self.SpawnDepth, generator=self.GrowthGenerator)
+        
+        print("New models to add to new branch : ", new_models)
+        self.newBranch(model_list=new_models) 
+        if self.SpawnDepth == self.MaxSpawnDepth:
+            return True
+        else:
+            return False
+        
+
+
     def runRemoteQMD(self, num_exp=40, num_spawns=1, max_branches= None, max_num_qubits = None, max_num_models=None, spawn=True, just_given_models=False):
 
 #        self.learnModelNameList(model_name_list=self.InitialOpList, blocking=True, use_rq=False)
-        for i in range(num_spawns):
-            print("Spawn number", i)
-            self.learnUnfinishedModels(blocking=True, use_rq=False)
-            ids=DataBase.active_model_ids_by_branch_id(self.db, i)
-            self.remoteBayesFromIDList(ids, remote=False, bayes_threshold=1)
-            try: self.compareModelsWithinBranch(i)
-            except ValueError:
-                print("New models have already been considered")
-                final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
-                self.ChampionName = final_winner
 
-                print("Final winner = ", final_winner)
-                break
-            if i<num_spawns-1: 
-                try:
-                    self.spawn()
-                except ValueError:
-                    print("New models have already been considered")
-                    break
-                    #TODO tidy up function
+
+        self.learnModelFromBranchID(0, blocking=True, use_rq=False)
+
+
+        max_spawn_depth_reached=False
+#        for i in range(num_spawns):
+        while max_spawn_depth_reached is False:
+#            print("While loop: before active learning for loop")
+            for branchID_bytes in active_branches_learning_models.keys():
+                branchID = int(branchID_bytes)
+                if int(active_branches_learning_models.get(branchID)) == self.NumModelsPerBranch[branchID]:
+                    print("All models on branch", branchID, "have finished learning.")
+                    del active_branches_learning_models[branchID]
+
+                    self.remoteBayesFromBranchID(branchID)
+#            print("While loop: before active bayes for loop")
+
+            for branchID_bytes in active_branches_bayes.keys():
                 
-            elif i==num_spawns-1:
-                final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
+                branchID = int(branchID_bytes)
+                print("Checking branchID", branchID)
+                num_mods_factorial = math.factorial(self.NumModelsPerBranch[branchID])
+                from_db = active_branches_bayes.get(branchID_bytes)
+                print("Number compared in DB: ", from_db)
+                if int(from_db) == self.NumModelPairsPerBranch[branchID]:
+                    print("branch ID has all models compared")
+                    
+                    try: self.compareModelsWithinBranch(branchID)
+                    except ValueError:
+                        print("New models have already been considered")
+                        final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
+                        self.ChampionName = final_winner
+
+                        print("Final winner = ", final_winner)
+                        max_spawn_depth_reached=True
+                    try:
+                        max_spawn_depth_reached = self.spawnFromBranch(branchID, num_models=2)
+                        self.learnModelFromBranchID(branchID+1, blocking=True, use_rq=False)
+                        
+                    except ValueError:
+                        print("New models have already been considered")
+                        max_spawn_depth_reached=True
+                        #TODO tidy up function
+                        
+                    del active_branches_learning_models[branchID]
+                        
+#            print("While loop: before checking if spawn depth reached")
+
+            if max_spawn_depth_reached:
+                print("Max spawn depth reached; determining winner.")
+                final_winner_id = self.BranchRankings[branchID][0]
+                final_winner = DataBase.model_name_from_id(self.db, final_winner_id)
                 self.ChampionName = final_winner
 
                 print("Final winner = ", final_winner)
+
+            
+
+                    # TODO : self.remoteBayesFromBranch(branchID)
+            
+#            branch_id=self.HighestBranchID
+#            print("Spawn number", self.SpawnDepth)
+
+#            self.learnUnfinishedModels(blocking=True, use_rq=False)
+#            ids=DataBase.active_model_ids_by_branch_id(self.db, branch_id)
+#            self.remoteBayesFromIDList(ids, remote=False, bayes_threshold=1)
+
+
+                
 
                 
         
@@ -842,7 +946,20 @@ class QMD():
             bloch.add_states(vec)
         bloch.show()
 
+
+
+def num_pairs_in_list(num_models):
+    n = num_models
+    k = 2 # ie. nCk where k=2 since we want pairs
+    
+    a= math.factorial(n) / math.factorial(k)
+    b= math.factorial(n-k)
+    
+    return a/b
+
         
+
+
         
 def get_exps(model, gen, times):
 
