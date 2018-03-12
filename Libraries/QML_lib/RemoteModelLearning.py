@@ -99,7 +99,6 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False):
         learned_models_ids.set(str(modelID), True)
 
         current = int(active_branches_learning_models.get(int(branchID))) # if first to finish
-        print("branch", branchID, "Current = ", current)
         active_branches_learning_models.set(int(branchID), current+1)    
             
         if remote: 

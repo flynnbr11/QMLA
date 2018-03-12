@@ -22,7 +22,7 @@ paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : ev
 # Dict of max spawn depths, corresponding to different generation functions. 
 
 max_spawn_depth_info = {
-    'simple_ising' : 3,
+    'simple_ising' : 4,
     'hyperfine' : 3
 }
 

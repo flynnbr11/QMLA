@@ -191,7 +191,18 @@ class operator():
 """
 Functions for use by operator class to parse string (name) and prodcue relevent operators, lists etc.
 """
-
+def reduced_operators(name, max_dim):
+    t_str=''
+    p_str = 'P'
+    for i in range(max_dim):
+        t_str+='T'
+        p_str+='P'
+    
+    split_by_t = name.split(t_str)
+    reduced_dim_op = split_by_t[0]
+    op = operator(reduced_dim_op)
+    return op.constituents_operators
+    
 def print_matrix(name):
     op = operator(name)
     print(op.matrix)

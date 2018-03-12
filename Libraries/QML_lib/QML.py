@@ -40,8 +40,12 @@ class ModelLearningClass():
         self.BayesFactors = {}
         self.NumProbes = num_probes
         self.ProbeDict = probe_dict
+
+
+
         
     def InsertNewOperator(self, NewOperator):
+
         self.NumParticles = len(self.Particles)
         self.OpList = MatrixAppendToArray(self.OpList, NewOperator)
         self.Particles =  np.random.rand(self.NumParticles,len(self.OpList))
@@ -51,21 +55,37 @@ class ModelLearningClass():
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
     
     def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True):
+
+        import pickle
+        qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
+
+        self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
+        self.NumParticles = qmd_info['num_particles']
+        self.NumProbes = qmd_info['num_probes']
+        self.ResamplerThresh = qmd_info['resampler_thresh']
+        self.ResamplerA = qmd_info['resampler_a']
+        self.PGHPrefactor = qmd_info['pgh_prefactor']
+        self.TrueOpList = qmd_info['true_oplist']
+        self.TrueParams = qmd_info['true_params']
+        self.TrueOpName  = qmd_info['true_name']
+        self.QLE = qmd_info['qle']
+
+
         
-        self.TrueOpList = np.asarray(trueoplist)
-        self.TrueParams = np.asarray(modeltrueparams)
+#        self.TrueOpList = np.asarray(trueoplist)
+ #       self.TrueParams = np.asarray(modeltrueparams)
         self.SimOpList  = np.asarray(simoplist)
         #self.SimParams = simparams[0]
         self.SimParams = np.asarray([simparams[0]])
         self.InitialParams = np.asarray([simparams[0]])
-        self.NumParticles = numparticles # function to adapt by dimension
-        self.ResamplerThresh = resample_thresh
-        self.ResamplerA = resampler_a
-        self.PGHPrefactor = pgh_prefactor
+#        self.NumParticles = numparticles # function to adapt by dimension
+#        self.ResamplerThresh = resample_thresh
+#        self.ResamplerA = resampler_a
+#        self.PGHPrefactor = pgh_prefactor
         self.ModelID = int(modelID)
         self.UseExpCustom = use_exp_custom
         self.EnableSparse = enable_sparse
-        self.QLE = qle
+#        self.QLE = qle
         self.checkQLoss = True
         
 #        print("Model instance ", self.Name, " has initial parameters: ", self.SimParams, "\nTrue op list: \n", self.TrueOpList)
@@ -105,7 +125,7 @@ class ModelLearningClass():
         #self.ProbeList =  [pros.def_randomprobe(self.TrueOpList)]
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, enable_sparse=self.EnableSparse, model_name=self.Name)    # probelist=self.TrueOpList,,
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, enable_sparse=self.EnableSparse, model_name=self.Name)    # probelist=self.TrueOpList,,
 
         
                 
@@ -419,19 +439,28 @@ class reducedModel():
     Then initialises an updater and GenSimModel which are used for updates. 
     """
     def __init__(self, model_name, sim_oplist, true_oplist, true_params, numparticles, modelID, resample_thresh=0.5, resample_a=0.9, qle=True, probe_dict= None):
-        
-        self.SimOpList = sim_oplist
-        self.TrueOpList = true_oplist
-        self.TrueParams = true_params
+
         self.Name = model_name
-        self.ResamplerThresh = resample_thresh
-        self.ResamplerA = resample_a
-        self.NumParticles = numparticles
         self.ModelID = modelID
-        self.QLE = qle
-        self.ProbeDict = probe_dict
-        self.BayesFactors = {}
+        self.SimOpList = sim_oplist
+        self.ModelID = modelID
         
+        import pickle
+        qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
+        
+        self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
+        self.NumParticles = qmd_info['num_particles']
+        self.NumProbes = qmd_info['num_probes']
+        self.ResamplerThresh = qmd_info['resampler_thresh']
+        self.ResamplerA = qmd_info['resampler_a']
+        self.PGHPrefactor = qmd_info['pgh_prefactor']
+        self.TrueOpList = qmd_info['true_oplist']
+        self.TrueParams = qmd_info['true_params']
+        self.TrueOpName  = qmd_info['true_name']
+        self.QLE = qmd_info['qle']
+        self.BayesFactors = {}
+
+
         
     def updateLearnedValues(self, learned_info):
         """
@@ -443,7 +472,8 @@ class reducedModel():
         self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_info['normalization_record']
 
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.TrueOpList,,
+
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.TrueOpList,,
 
         self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
         self.Updater._normalization_record = self._normalization_record
@@ -463,8 +493,10 @@ class modelClassForRemoteBayesFactor():
         self.NumProbes = qmd_info['num_probes']
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.ResamplerA = qmd_info['resampler_a']
+        self.PGHPrefactor = qmd_info['pgh_prefactor']
         self.TrueOpList = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
+        self.TrueOpName  = qmd_info['true_name']
 
         self.Name = learned_model_info['name']
         op = DB.operator(self.Name)
@@ -477,7 +509,7 @@ class modelClassForRemoteBayesFactor():
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_model_info['normalization_record']
 
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict)    
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict)    
 
         self.Updater_regenerated = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
         self.Updater_regenerated._normalization_record = self._normalization_record

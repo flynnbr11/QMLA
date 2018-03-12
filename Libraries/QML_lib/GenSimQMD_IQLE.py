@@ -42,7 +42,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, oplist, modelparams, probecounter=None, true_oplist = None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True, enable_sparse=True, model_name=None):
+    def __init__(self, oplist, modelparams, probecounter=None, true_oplist = None, truename=None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True, enable_sparse=True, model_name=None):
         self._solver = solver #This is the solver used for time evolution scipy is faster, QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
         self._probecounter = probecounter
@@ -53,6 +53,8 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._modelparams = modelparams
         self._true_oplist = true_oplist
         self._trueparams = trueparams
+        self._truename = truename
+        self._true_dim = DataBase.get_num_qubits(self._truename)
         self.use_exp_custom = use_exp_custom
         self.enable_sparse = enable_sparse
         self._min_freq = min_freq
@@ -157,10 +159,21 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
 
         num_parameters = modelparams.shape[1]
         print_loc(global_print_loc)
+
+        true_dim = np.log2(self._true_oplist[0].shape[0])
+        sim_dim = np.log2(self._oplist[0].shape[0])
+        
+        
         if  num_particles == 1:
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
             true_evo = True
             operators = self._true_oplist
+            if true_dim > sim_dim: 
+                operators = DataBase.reduced_operators(self._truename, int(sim_dim))
+                #print("True dim=", true_dim, "Sim dim=", sim_dim)
+                #print("operators:", operators)
+            else:
+                operators = self._true_oplist
             params = [self._trueparams]
             
         else:

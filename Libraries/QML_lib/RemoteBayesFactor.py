@@ -93,9 +93,7 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
 
 
             current = int(active_branches_bayes.get(int(branchID))) # if first to finish
-            print("active_branches_bayes: branch", branchID, "Current = ", current)
             active_branches_bayes.set(int(branchID), current+1)  
-            print("Reset active_branch_bayes for branch", branchID, "as", current+1)  
         else:
             active_interbranch_bayes.set(pair_id, True)
     
