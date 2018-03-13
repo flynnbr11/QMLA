@@ -44,7 +44,7 @@ def flushdatabases():
         active_branches_bayes.flushdb()
         active_interbranch_bayes.flushdb()
     except:
-        continue
+        print("Databases don't exist on Redis yet.")
     
 def countWorkers():
     # TODO this isn't working
