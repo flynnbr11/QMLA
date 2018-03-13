@@ -382,7 +382,7 @@ class QMD():
                         remote_jobs.append(self.remoteBayes(a,b, remote=remote, return_job=wait_on_result, bayes_threshold=bayes_threshold))
 
         if wait_on_result:
-            print("Waiting on result of interbranch champion")
+            print("Waiting on result of Bayes comparisons from given list:", model_id_list)
             for job in remote_jobs:
                 while job.is_finished == False:
                     time.sleep(0.01)
@@ -604,7 +604,7 @@ class QMD():
         if len(max_points_branches) > 1: 
             # todo: recompare. Fnc: compareListOfModels (rather than branch based)
             print("Multiple models have same number of points within branch.\n", models_points)
-            self.remoteBayesFromIDList(model_id_list=max_points_branches, remote=True, recompute=True, bayes_threshold=bayes_threshold)
+            self.remoteBayesFromIDList(model_id_list=max_points_branches, remote=True, recompute=True, bayes_threshold=bayes_threshold, wait_on_result=True)
 
             champ_id = self.compareModelList(max_points_branches, bayes_threshold=bayes_threshold, models_points_dict=models_points)
         else: 
@@ -666,7 +666,7 @@ class QMD():
             for i in max_points_branches:
                 print(DataBase.model_name_from_id(self.db, i))
             print("Points:\n", models_points)
-            self.remoteBayesFromIDList(model_id_list=max_points_branches, remote=True, recompute=True, bayes_threshold=1)
+            self.remoteBayesFromIDList(model_id_list=max_points_branches, remote=True, recompute=True, bayes_threshold=1, wait_on_result=True)
             champ_id = self.compareModelList(max_points_branches, bayes_threshold=1)
         else: 
             print("After comparing list:", models_points)
@@ -848,25 +848,10 @@ class QMD():
                 if int(from_db) == self.NumModelPairsPerBranch[branchID] and self.BranchComparisonsComplete[branchID]==False:
                     self.BranchComparisonsComplete[branchID] = True
                     
-                    try: self.compareModelsWithinBranch(branchID)
-                    except ValueError:
-                        print("New models have already been considered")
-                        final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
-                        self.ChampionName = final_winner
-
-                        print("Final winner = ", final_winner)
-                        max_spawn_depth_reached=True
-                    try:
-                        max_spawn_depth_reached = self.spawnFromBranch(branchID, num_models=1)
+                    self.compareModelsWithinBranch(branchID)
+                    max_spawn_depth_reached = self.spawnFromBranch(branchID, num_models=1)
                         
-                    except ValueError:
-                        print("New models have already been considered")
-                        max_spawn_depth_reached=True
                         #TODO tidy up function
-                    #print("Deleting branch", branchID, "from active_branches_bayes")    
-                    #del active_branches_learning_models[branchID]
-                        
-#            print("While loop: before checking if spawn depth reached")
 
             if max_spawn_depth_reached:
                 print("Max spawn depth reached; determining winner. Entering while loop until all models/Bayes factors remaining have finished.")
@@ -885,7 +870,7 @@ class QMD():
                             num_bayes_done_on_branch = active_branches_bayes.get(branchID_bytes)
                             if int(num_bayes_done_on_branch) == self.NumModelPairsPerBranch[branchID] and self.BranchComparisonsComplete[branchID]==False:
                                 self.BranchComparisonsComplete[branchID] = True
-
+                                self.compareModelsWithinBranch(branchID)
                     
                     if np.all(np.array(list(self.BranchAllModelsLearned.values()))==True) and np.all(np.array(list(self.BranchComparisonsComplete.values()))==True):
                             
