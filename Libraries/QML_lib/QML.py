@@ -12,6 +12,9 @@ from MemoryTest import print_loc
 from EvalLoss import *
 from psutil import virtual_memory
 from RedisSettings import *
+import pickle
+pickle.HIGHEST_PROTOCOL=2
+
 global debug_print
 debug_print = False
 
@@ -56,7 +59,6 @@ class ModelLearningClass():
     
     def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True):
 
-        import pickle
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
@@ -361,7 +363,7 @@ class ModelLearningClass():
         learned_info['model_id'] = self.ModelID
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_params'] = self.InitialParams
-        learned_info['updater'] = pickle.dumps(self.Updater)
+        learned_info['updater'] = pickle.dumps(self.Updater, protocol=2)
         return learned_info
         
         
@@ -445,7 +447,6 @@ class reducedModel():
         self.SimOpList = sim_oplist
         self.ModelID = modelID
         
-        import pickle
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
         
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
@@ -483,7 +484,6 @@ class modelClassForRemoteBayesFactor():
     def __init__(self, modelID):
         model_id_float = float(modelID)
         model_id_str = str(model_id_float)
-        import pickle
         learned_model_info = pickle.loads(learned_models_info.get(model_id_str))        
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 

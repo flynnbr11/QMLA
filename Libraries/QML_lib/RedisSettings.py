@@ -17,6 +17,8 @@ active_branches_bayes = redis.StrictRedis(host=host_name, port=port_number, db=6
 active_interbranch_bayes =  redis.StrictRedis(host=host_name, port=port_number, db=7)
 
 
+test_workers = True
+
 
 try:
     import pickle
@@ -24,7 +26,7 @@ try:
     from rq import Connection, Queue, Worker
 
     redis_conn = redis.Redis()
-    q = Queue(connection=redis_conn)
+    q = Queue(connection=redis_conn, async=test_workers)
     parallel_enabled = True
 except:
     parallel_enabled = False    
