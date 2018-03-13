@@ -974,6 +974,9 @@ class QMD():
 
 
 def num_pairs_in_list(num_models):
+    if num_models == 1:
+        return 0
+
     n = num_models
     k = 2 # ie. nCk where k=2 since we want pairs
     

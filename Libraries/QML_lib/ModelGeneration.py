@@ -21,10 +21,43 @@ paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : ev
 
 # Dict of max spawn depths, corresponding to different generation functions. 
 
+##################################################################################
+##################################################################################
+"""
+Essential functions. Functions below are specific, for generating terms according to given rules. new_model_list is the wrapper function which calls the selected generator rule.
+"""
+##################################################################################
+##################################################################################
+
 max_spawn_depth_info = {
     'simple_ising' : 1,
-    'hyperfine' : 3
+    'hyperfine' : 3,
+    'experimental_qmd' : 5
 }
+
+
+def new_model_list(model_list, spawn_depth, options=['x', 'y', 'z'], generator='simple_ising'):
+    print("Generating new models according to best of last round: ", model_list, "; and options:", options)
+    if generator == 'simple_ising':
+        return simple_ising(generator_list=model_list, options=options)
+        #todo integrate Andreas' simple Ising growth
+    elif generator=='experimental_qmd':
+        return experimental_qmd(model_list, spawn_step=spawn_depth)
+    
+    else:
+        print("Generator", generator, "not recognised")        
+
+def max_spawn_depth(generator):
+    if generator not in max_spawn_depth_info:
+        print("Generator not recognised; does not have maximum spawn depth or generation function")
+    else:
+        return max_spawn_depth_info[generator]
+
+
+##################################################################################
+##################### Other Functions ############################################
+##################################################################################
+
 
 
 """
@@ -120,6 +153,28 @@ def generate_term(num_dimensions, paulis=['x', 'y', 'z', 'i']):
 
         return running_str
             
+def single_pauli_multiple_dim(num_dimensions, paulis=['x', 'y', 'z', 'i'], pauli=None):
+    """
+    For use only in random_model_name() function. 
+    """
+    import random
+    t_str = ''
+    running_str =''
+    
+    if pauli is None: pauli=random.choice(paulis)
+
+    if num_dimensions == 1:
+        return random.choice(paulis)
+    else:
+        for j in range(num_dimensions):
+            t_str += 'T'
+            running_str += pauli
+            
+            if j != num_dimensions -1:
+                running_str += t_str
+
+        return running_str
+
 
 
 """
@@ -262,21 +317,99 @@ def simple_ising(generator_list, options=['x', 'y', 'z']):
             new_options.append(gen+t_str+opt)
     
     return new_options
-    
-    
-def new_model_list(model_list, spawn_depth, options=['x', 'y', 'z'], generator='simple_ising'):
-    print("Generating new models according to best of last round: ", model_list, "; and options:", options)
-    if generator == 'simple_ising':
-        return simple_ising(generator_list=model_list, options=options)
-        #todo integrate Andreas' simple Ising growth
-    else:
-        print("Generator", generator, "not recognised")        
 
-def max_spawn_depth(generator):
-    if generator not in max_spawn_depth_info:
-        print("Generator not recognised; does not have maximum spawn depth or generation function")
+
+### spawn function to match process followed during experimental QMD ###
+
+def single_pauli_multiple_dim(num_qubits, paulis=['x', 'y', 'z', 'i'], pauli=None):
+    import random
+    t_str = ''
+    running_str =''
+    
+    if pauli is None: pauli=random.choice(paulis)
+
+    if num_qubits == 1:
+        return random.choice(paulis)
     else:
-        return max_spawn_depth_info[generator]
+        for j in range(num_qubits):
+            t_str += 'T'
+            running_str += pauli
+            
+            if j != num_qubits -1:
+                running_str += t_str
+
+        return running_str
+
+
+def experimental_qmd(model_list, spawn_step):
+    
+    if len(model_list) > 1:
+        print("Single model (in a list) required for this spawn rule.")
+        return False
+    else:
+        model = model_list[0]
+    pauli_ops = ['x', 'y', 'z']
+    
+    
+    new_models =[]
+        
+    if spawn_step == 1:
+        pauli = model.split('T')[0]
+        for p in pauli_ops:
+            if p!=pauli:
+                new_term = identity_interact(num_qubits=2, subsystem=p)
+                new_mod = model+'PP'+new_term
+                new_models.append(new_mod)
+                
+    elif spawn_step == 2:
+        paulis_present = []
+        paulis_present.append(model.split('PP')[0].split('T')[0])
+        paulis_present.append(model.split('PP')[1].split('T')[0])
+        for p in pauli_ops:
+            if p not in paulis_present:
+                new_term = identity_interact(num_qubits=2, subsystem=p)
+                new_mod = model+'PP'+new_term
+                new_models.append(new_mod)
+
+    elif spawn_step == 3:
+        for p in pauli_ops:
+            new_term = single_pauli_multiple_dim(num_qubits=2, pauli=p)
+            new_mod = model+'PP'+new_term
+            new_models.append(new_mod)
+
+    elif spawn_step == 4:
+        interaction_paulis_present = []
+        interaction_paulis_present.append(model[-1])
+        paulis_present = [single_pauli_multiple_dim(num_qubits=2, pauli=p) for p in interaction_paulis_present ]
+        print(paulis_present)
+        for p in pauli_ops:
+                new_term = single_pauli_multiple_dim(num_qubits=2, pauli=p)
+                if new_term not in paulis_present:
+                    new_mod = model+'PP'+new_term
+                    new_models.append(new_mod)
+                
+
+                
+    elif spawn_step == 5:
+        interaction_paulis_present = []
+        interaction_paulis_present.append(model[-1])
+        interaction_paulis_present.append(model[-6])
+        paulis_present = [single_pauli_multiple_dim(num_qubits=2, pauli=p) for p in interaction_paulis_present ]
+        print(paulis_present)
+        for p in pauli_ops:
+                new_term = single_pauli_multiple_dim(num_qubits=2, pauli=p)
+                if new_term not in paulis_present:
+                    new_mod = model+'PP'+new_term
+                    new_models.append(new_mod)
+
+    return new_models
+
+        
+###        
+
+
+    
+    
         
     
         
