@@ -17,7 +17,7 @@ active_branches_bayes = redis.StrictRedis(host=host_name, port=port_number, db=6
 active_interbranch_bayes =  redis.StrictRedis(host=host_name, port=port_number, db=7)
 
 
-test_workers = True
+test_workers = False
 
 
 try:
@@ -34,14 +34,17 @@ except:
 
 
 def flushdatabases():
-    qmd_info_db.flushdb()
-    learned_models_info.flushdb()
-    learned_models_ids.flushdb()
-    bayes_factors_db.flushdb()
-    bayes_factors_winners_db.flushdb()
-    active_branches_learning_models.flushdb()
-    active_branches_bayes.flushdb()
-    active_interbranch_bayes.flushdb()
+    try:
+        qmd_info_db.flushdb()
+        learned_models_info.flushdb()
+        learned_models_ids.flushdb()
+        bayes_factors_db.flushdb()
+        bayes_factors_winners_db.flushdb()
+        active_branches_learning_models.flushdb()
+        active_branches_bayes.flushdb()
+        active_interbranch_bayes.flushdb()
+    except:
+        continue
     
 def countWorkers():
     # TODO this isn't working
