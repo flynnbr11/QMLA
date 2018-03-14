@@ -71,6 +71,7 @@ class ModelLearningClass():
         self.TrueParams = qmd_info['true_params']
         self.TrueOpName  = qmd_info['true_name']
         self.QLE = qmd_info['qle']
+        self.UseExpCustom = qmd_info['use_exp_custom']
 
 
         
@@ -85,7 +86,6 @@ class ModelLearningClass():
 #        self.ResamplerA = resampler_a
 #        self.PGHPrefactor = pgh_prefactor
         self.ModelID = int(modelID)
-        self.UseExpCustom = use_exp_custom
         self.EnableSparse = enable_sparse
 #        self.QLE = qle
         self.checkQLoss = True
@@ -459,6 +459,7 @@ class reducedModel():
         self.TrueParams = qmd_info['true_params']
         self.TrueOpName  = qmd_info['true_name']
         self.QLE = qmd_info['qle']
+        self.UseExpCustom = qmd_info['use_exp_custom']
         self.BayesFactors = {}
 
 
@@ -497,6 +498,7 @@ class modelClassForRemoteBayesFactor():
         self.TrueOpList = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
         self.TrueOpName  = qmd_info['true_name']
+        self.UseExpCustom = qmd_info['use_exp_custom']
 
         self.Name = learned_model_info['name']
         op = DB.operator(self.Name)

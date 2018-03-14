@@ -211,9 +211,16 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
 #    del u_psi
     print_loc(global_print_loc)
     
-    if np.abs(expec_value) > 1.0000001:
+    while expec_value > 1.000001:
         print("expectation value function has value ", np.abs(psi_u_psi**2))
-        print("t=", t, "\nham = \n ", ham, "\n probe : \n", state, "\n probe normalisation : ", np.linalg.norm(u_psi))
+        print("t=", t, "\nham = \n ", ham, "\n probe : \n", state, "\n probe normalisation : ", np.linalg.norm(state), "\n normalisation of U|probe>:", np.linalg.norm(u_psi))
+        print("Recalculating expectation value using linalg.")
+        u_psi = evolved_state(ham, t, state, use_exp_custom=False)
+        psi_u_psi = np.dot(probe_bra, u_psi)
+        expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
+        
+        
+        
     print_loc(global_print_loc)
     print_expec_value_intermediate = False
     if print_expec_value_intermediate:
@@ -239,7 +246,7 @@ def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True):
     if use_exp_custom and ham_exp_installed:
       unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse)
     else:
-      print("Note: using linalg for exponentiating Hamiltonian.")
+      #print("Note: using linalg for exponentiating Hamiltonian.")
       unitary = linalg.expm(-1j*ham*t)
     print_loc(global_print_loc)
     ev_state = np.dot(unitary, state)
@@ -251,14 +258,22 @@ def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True):
  
 def random_probe(num_qubits):
     dim = 2**num_qubits
-    real = np.random.rand(1,dim)
-    imaginary = np.random.rand(1,dim)
-    complex_vectors = np.empty([1, dim])
-    complex_vectors = real +1.j*imaginary
-    norm_factor = np.linalg.norm(complex_vectors)
+    real = []
+    imaginary = []
+    complex_vectors = []
+    for i in range(dim):
+        real.append(np.random.uniform(low=-1, high=1))
+        imaginary.append(np.random.uniform(low=-1, high=1))
+        complex_vectors.append(real[i] + 1j*imaginary[i])
+
+    a=np.array(complex_vectors)
+    norm_factor = np.linalg.norm(a)
     probe = complex_vectors/norm_factor
-    return probe[0][:]
- 
+    if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
+        print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
+        return random_probe(num_qubits)
+
+    return probe
 def one_zeros_probe(num_qubits):
     dim = 2**num_qubits
     real = np.zeros(dim)

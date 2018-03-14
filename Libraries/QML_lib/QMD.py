@@ -140,7 +140,8 @@ class QMD():
           'debug_directory' : self.DebugDirectory,
           'qle' : self.QLE,
           'sigma_threshold' : self.SigmaThreshold,
-          'true_name' : self.TrueOpName
+          'true_name' : self.TrueOpName,
+          'use_exp_custom' : self.UseExpCustom
         }
         if self.RunParallel:
             compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
@@ -1161,8 +1162,10 @@ def separable_probe_dict(max_num_qubits, num_probes):
                 seperable_probes[i,j] = seperable_probes[i,0]
             else: 
                 seperable_probes[i,j] = np.tensordot(seperable_probes[i,j-1], random_probe(1), axes=0).flatten(order='c')
-            if np.linalg.norm(seperable_probes[i,j]) < 0.999999999 or np.linalg.norm(seperable_probes[i,j]) > 1.0000000000001:
+            while np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]), atol=1e-14) is  False:
                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
+                # keep replacing until a unit-norm 
+                seperable_probes[i,j] = np.tensordot(seperable_probes[i,j-1], random_probe(1), axes=0).flatten(order='c')
     return seperable_probes
 
 def random_probe(num_qubits):
@@ -1178,6 +1181,8 @@ def random_probe(num_qubits):
     a=np.array(complex_vectors)
     norm_factor = np.linalg.norm(a)
     probe = complex_vectors/norm_factor
-    if np.linalg.norm(probe) -1  > 1e-10:
+    if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
         print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
+        return random_probe(num_qubits)
+
     return probe

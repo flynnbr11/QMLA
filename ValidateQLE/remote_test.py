@@ -67,6 +67,7 @@ for i in range(1):
         max_num_branches = 0,
         max_num_qubits = 10, 
         parallel = True,
+        use_exp_custom=False, 
         growth_generator='simple_ising'
     )
    # qmd.learnModelNameList(model_name_list=['z'], blocking=True, use_rq=False)

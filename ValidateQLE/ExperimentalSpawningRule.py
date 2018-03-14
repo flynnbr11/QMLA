@@ -33,8 +33,8 @@ warnings.filterwarnings("ignore")
 
 
 num_runs=1
-num_particles= 5
-num_experiments = 5 
+num_particles= 15
+num_experiments = 6
 num_times_bayes = 'all'
 qle=True
 
@@ -46,8 +46,9 @@ initial_op_list = ['xTi', 'yTi', 'zTi']
 #initial_op_list = ['x', 'y', 'z']
 
 num_ops = len(initial_op_list)
-for i in range(1):
+for i in range(5):
     print("i=",i)
+    print(num_particles, "Paricles for ", num_experiments, "Experiments:")
     true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
     true_params = [np.random.rand()]
     qmd = QMD(
@@ -62,6 +63,7 @@ for i in range(1):
         max_num_branches = 0,
         max_num_qubits = 10, 
         parallel = True,
+        use_exp_custom=False, 
         growth_generator='experimental_qmd'
         #growth_generator='experimental_qmd'
     )
