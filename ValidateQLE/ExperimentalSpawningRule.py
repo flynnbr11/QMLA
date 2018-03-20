@@ -33,9 +33,11 @@ warnings.filterwarnings("ignore")
 
 
 num_runs=1
-num_particles= 15
-num_experiments = 6
-num_times_bayes = 'all'
+num_particles= 100
+num_experiments = 10
+num_times_bayes = 5
+#num_times_bayes = int(np.ceil(num_experiments/5))
+print("num times to use:", num_times_bayes)
 qle=True
 
 
@@ -46,25 +48,28 @@ initial_op_list = ['xTi', 'yTi', 'zTi']
 #initial_op_list = ['x', 'y', 'z']
 
 num_ops = len(initial_op_list)
-for i in range(5):
-    print("i=",i)
+for i in range(num_runs):
+    print("\ni=",i)
     print(num_particles, "Paricles for ", num_experiments, "Experiments:")
     true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-    true_params = [np.random.rand()]
+#    true_params = [np.random.rand()]
+    true_params = [0.19, 0.21, 0.8, 0.22, 0.20, 0.27]
     qmd = QMD(
         initial_op_list=initial_op_list, 
         true_operator=true_op, 
-        true_param_list=None, 
+        true_param_list=true_params, 
         num_particles=num_particles,
         num_experiments = num_experiments, 
         num_times_for_bayes_updates = num_times_bayes,
         qle=qle,
         num_probes=5,
+        gaussian=False, 
         max_num_branches = 0,
         max_num_qubits = 10, 
         parallel = True,
         use_exp_custom=False, 
-        growth_generator='experimental_qmd'
+        compare_linalg_exp_tol=None,
+        growth_generator='ising_non_transverse'
         #growth_generator='experimental_qmd'
     )
    # qmd.learnModelNameList(model_name_list=['z'], blocking=True, use_rq=False)

@@ -57,7 +57,7 @@ class ModelLearningClass():
     
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
     
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True):
+    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, simopnames, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True):
 
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 
@@ -72,7 +72,8 @@ class ModelLearningClass():
         self.TrueOpName  = qmd_info['true_name']
         self.QLE = qmd_info['qle']
         self.UseExpCustom = qmd_info['use_exp_custom']
-
+        self.ExpComparisonTol = qmd_info['compare_linalg_exp_tol']
+        self.SimOpsNames = simopnames
 
         
 #        self.TrueOpList = np.asarray(trueoplist)
@@ -127,7 +128,7 @@ class ModelLearningClass():
         #self.ProbeList =  [pros.def_randomprobe(self.TrueOpList)]
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, enable_sparse=self.EnableSparse, model_name=self.Name)    # probelist=self.TrueOpList,,
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, exp_comparison_tol = self.ExpComparisonTol, enable_sparse=self.EnableSparse, model_name=self.Name)    # probelist=self.TrueOpList,,
 
         
                 
@@ -325,6 +326,7 @@ class ModelLearningClass():
             
             
             if istep == self.NumExperiments-1:
+                print("Results for QHL on ", self.Name)
                 print('Final time selected > ' + str(self.Experiment[0][0]))
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
                 if self.debugSave: 
@@ -332,7 +334,7 @@ class ModelLearningClass():
         
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep-1]), np.std(self.Particles[:,iterator,istep-1])]
-                    print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator]))
+                    print('Final Parameters mean and stdev (term ', self.SimOpsNames[iterator] , '):'+str(self.FinalParams[iterator]))
 #                   print('Final quadratic loss: ', str(self.QLosses[-1]))
 #                final_ham = evo.getH(self.)
 
@@ -482,6 +484,7 @@ class reducedModel():
     
         
 class modelClassForRemoteBayesFactor():
+#TODO: use this instead of full ModelClass above.
     def __init__(self, modelID):
         model_id_float = float(modelID)
         model_id_str = str(model_id_float)

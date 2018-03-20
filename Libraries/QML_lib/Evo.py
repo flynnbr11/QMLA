@@ -113,7 +113,7 @@ def anaytical_pr0(t_list, modelparams, oplist, probe):
     return output
 
  
-def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, enable_sparse=True, ham_list=None):
+def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True,exp_comparison_tol=None, enable_sparse=True, ham_list=None):
     
     print_loc(global_print_loc)
     num_particles = len(modelparams)
@@ -128,7 +128,7 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, e
             ham = np.tensordot(modelparams[evoId], oplist, axes=1)
             t = t_list[tId]
             print_loc(global_print_loc)
-            output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
+            output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol, enable_sparse=enable_sparse)
             if output[evoId][tId] < 0:
                 print("[QLE] Negative probability : \t \t probability = ", output[evoId][tId])
             elif output[evoId][tId] > 1.001: ## todo some times getting p=1.0 show up
@@ -138,7 +138,7 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True, e
     return output
  
 
-def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_custom=True, enable_sparse=True, trotterize=True, ham_list = None):
+def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_custom=True, enable_sparse=True, exp_comparison_tol=None, trotterize=True, ham_list = None):
     print_loc(global_print_loc)
     num_particles = len(modelparams)
     num_times = len(t_list)
@@ -153,7 +153,7 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_cu
         for tId in range(len(t_list)):
             t = t_list[tId]
              
-            output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
+            output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol,  enable_sparse=enable_sparse)
             print_loc(global_print_loc)
             if output[evoId][tId] < 0:
                 print("negative probability : \t \t probability = ", output[evoId][tId])
@@ -168,7 +168,7 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_cu
      
 ## Partial trace functionality
  
-def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_custom=True, enable_sparse=True):
+def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=20, compare_exp_fncs_tol=None):
 # todo: list of probes, maybe 5 is enough? test with different values
     print_loc(global_print_loc)
     print_loc(global_print_loc)
@@ -187,18 +187,36 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     
     #print("diff in expec val from linalg to exp custom = ", diff, "\t abs=", np.absolute(diff))
     
+    if compare_exp_fncs_tol is not None:
+        u_psi_linalg = evolved_state(ham, t, state, use_exp_custom=False, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
+        u_psi_exp_custom = evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
         
-    if use_exp_custom and ham_exp_installed:
-      import hamiltonian_exponentiation as h    
-      try:
-          u_psi = h.unitary_evolve(ham, t, state, enable_sparse_functionality=enable_sparse)
-      except ValueError:
-          print("Value error when exponentiating Hamiltonian. Ham:\n", ham)
-          print("Probe: ", state)
+        diff = np.max(np.abs(u_psi_linalg-u_psi_exp_custom))
+        #print("Diff:", diff, "\tComparing vs", compare_exp_fncs_tol )
+        #print(np.all(np.isclose(u_psi_linalg, u_psi_exp_custom, atol=compare_exp_fncs_tol)))
+        #print("lin:", u_psi_linalg)
+        #print("Exp:", u_psi_exp_custom)
+        #print(np.isclose(u_psi_linalg, u_psi_exp_custom))
+        if np.allclose(u_psi_linalg, u_psi_exp_custom, atol=compare_exp_fncs_tol) == False:
+            print("Linalg/ExpHam give different evolved state by", diff)
+            u_psi = u_psi_linalg
+        else:
+            #else("Linalg/ExpHam give same evolved state to error", np.max(np.abs(u_psi_linalg-u_psi_exp_custom)))
+            u_psi = u_psi_exp_custom
+            
     else:
-      u_psi = evolved_state(ham, t, state, use_exp_custom=False)
-    print_loc(global_print_loc)
+        
+        if use_exp_custom and ham_exp_installed:
+          try:
+              u_psi = evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
+          except ValueError:
+              print("Value error when exponentiating Hamiltonian. Ham:\n", ham)
+              print("Probe: ", state)
+        else:
+          u_psi = evolved_state(ham, t, state, use_exp_custom=False, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
     
+    
+    print_loc(global_print_loc)
     probe_bra = state.conj().T
     
     
@@ -237,16 +255,16 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
       print("Expectation value : ", expec_value)
     return expec_value
  
-def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True):
+def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=10):
     #import hamiltonian_exponentiation as h
     from scipy import linalg
     print_loc(global_print_loc)
   
     #print("Enable sparse : ", enable_sparse)    
     if use_exp_custom and ham_exp_installed:
-      unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse)
+      unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse, print_method=print_exp_details, scalar_cutoff=t+1)
     else:
-      #print("Note: using linalg for exponentiating Hamiltonian.")
+      # print("Note: using linalg for exponentiating Hamiltonian.")
       unitary = linalg.expm(-1j*ham*t)
     print_loc(global_print_loc)
     ev_state = np.dot(unitary, state)

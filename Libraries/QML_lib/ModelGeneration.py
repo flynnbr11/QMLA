@@ -32,7 +32,9 @@ Essential functions. Functions below are specific, for generating terms accordin
 max_spawn_depth_info = {
     'simple_ising' : 1,
     'hyperfine' : 3,
-    'experimental_qmd' : 5
+    'ising_non_transverse' : 5,
+    'ising_transverse' : 12,
+    'hyperfine_like' : 6
 }
 
 
@@ -41,8 +43,8 @@ def new_model_list(model_list, spawn_depth, options=['x', 'y', 'z'], generator='
     if generator == 'simple_ising':
         return simple_ising(generator_list=model_list, options=options)
         #todo integrate Andreas' simple Ising growth
-    elif generator=='experimental_qmd':
-        return experimental_qmd(model_list, spawn_step=spawn_depth)
+    elif generator=='ising_non_transverse':
+        return ising_non_transverse(model_list, spawn_step=spawn_depth)
     
     else:
         print("Generator", generator, "not recognised")        
@@ -339,73 +341,117 @@ def single_pauli_multiple_dim(num_qubits, paulis=['x', 'y', 'z', 'i'], pauli=Non
                 running_str += t_str
 
         return running_str
+        
+def ising_non_transverse(model_list, spawn_step):
+    single_qubit_terms = ['xTi', 'yTi', 'zTi']
+    nontransverse_terms = ['xTx', 'yTy', 'zTz']
 
-
-def experimental_qmd(model_list, spawn_step):
-    
     if len(model_list) > 1:
-        print("Single model (in a list) required for this spawn rule.")
+        print("Only one model required for non-transverse Ising growth.")
         return False
     else:
         model = model_list[0]
-    pauli_ops = ['x', 'y', 'z']
     
-    
-    new_models =[]
+#    present_terms = model[0].split('PP')
+    present_terms = model.split('PP')
+
+    new_models = []
+    if spawn_step in [1,2]:
+        for term in single_qubit_terms:
+            if term not in present_terms:
+                new_model = model+'PP'+term
+                new_models.append(new_model)
+
+    elif spawn_step in [3,4,5]:
+        for term in nontransverse_terms:
+            if term not in present_terms:
+                new_model = model+'PP'+term
+                new_models.append(new_model)
+                
+    return new_models    
+
+
+def ising_transverse(model_list, spawn_step):
+# TODO before using this function, need to add a max_spawn_depth to the dict above for ising_transverse. How many spawns can it support?
+    single_qubit_terms = ['xTi', 'yTi', 'zTi']
+    nontransverse_terms = ['xTx', 'yTy', 'zTz']
+    transverse_terms = ['xTy', 'xTz', 'yTx', 'yTz', 'zTy', 'zTx']
+    all_two_qubit_terms =  single_qubit_terms + nontransverse_terms  + transverse_terms
+    if len(model_list) > 1:
+        print("Only one model required for transverse Ising growth.")
+        return False
+    else:
+        model = model_list[0]
+
+    present_terms = model.split('PP')
+
+    new_models = []
+    if spawn_step in [1,2]:
+        for term in single_qubit_terms:
+            if term not in present_terms:
+                new_model = model+'PP'+term
+                new_models.append(new_model)
+
+    elif spawn_step in [3,4,5]:
+        for term in nontransverse_terms:
+            if term not in present_terms:
+                new_model = model+'PP'+term
+                new_models.append(new_model)
+
+    else:
+        for term in transverse_terms:
+            if term not in present_terms:
+                new_model = model+'PP'+term
+                new_models.append(new_model)
+
+    return new_models    
+
+def hyperfine_like(model_list, spawn_step):
+# TODO before using this function, need to add a max_spawn_depth to the dict above for ising_transverse. How many spawns can it support?
+    import random
+    single_qubit_terms = ['xTi', 'yTi', 'zTi']
+    nontransverse_terms = ['xTx', 'yTy', 'zTz']
+    transverse_terms = ['xTy', 'xTz', 'yTx', 'yTz', 'zTy', 'zTx']
+    all_two_qubit_terms =  single_qubit_terms + nontransverse_terms  + transverse_terms
+    if len(model_list) > 1:
+        print("Only one model required for transverse Ising growth.")
+        return False
+    else:
+        model = model_list[0]
+
+    present_terms = model.split('PP')
+
+    new_models = []
+    if spawn_step in [1,2]:
+        for term in single_qubit_terms:
+            if term not in present_terms:
+                new_model = model+'PP'+term
+                new_models.append(new_model)
+
+    else: 
         
-    if spawn_step == 1:
-        pauli = model.split('T')[0]
-        for p in pauli_ops:
-            if p!=pauli:
-                new_term = identity_interact(num_qubits=2, subsystem=p)
-                new_mod = model+'PP'+new_term
-                new_models.append(new_mod)
+        for i in range(3):
+            term = random.choice(all_two_qubit_terms)
+            
+            if term not in present_terms:
+                new_model = model+'PP'+term
+                new_models.append(new_model)
                 
-    elif spawn_step == 2:
-        paulis_present = []
-        paulis_present.append(model.split('PP')[0].split('T')[0])
-        paulis_present.append(model.split('PP')[1].split('T')[0])
-        for p in pauli_ops:
-            if p not in paulis_present:
-                new_term = identity_interact(num_qubits=2, subsystem=p)
-                new_mod = model+'PP'+new_term
-                new_models.append(new_mod)
-
-    elif spawn_step == 3:
-        for p in pauli_ops:
-            new_term = single_pauli_multiple_dim(num_qubits=2, pauli=p)
-            new_mod = model+'PP'+new_term
-            new_models.append(new_mod)
-
-    elif spawn_step == 4:
-        interaction_paulis_present = []
-        interaction_paulis_present.append(model[-1])
-        paulis_present = [single_pauli_multiple_dim(num_qubits=2, pauli=p) for p in interaction_paulis_present ]
-        print(paulis_present)
-        for p in pauli_ops:
-                new_term = single_pauli_multiple_dim(num_qubits=2, pauli=p)
-                if new_term not in paulis_present:
-                    new_mod = model+'PP'+new_term
-                    new_models.append(new_mod)
-                
-
-                
-    elif spawn_step == 5:
-        interaction_paulis_present = []
-        interaction_paulis_present.append(model[-1])
-        interaction_paulis_present.append(model[-6])
-        paulis_present = [single_pauli_multiple_dim(num_qubits=2, pauli=p) for p in interaction_paulis_present ]
-        print(paulis_present)
-        for p in pauli_ops:
-                new_term = single_pauli_multiple_dim(num_qubits=2, pauli=p)
-                if new_term not in paulis_present:
-                    new_mod = model+'PP'+new_term
-                    new_models.append(new_mod)
-
-    return new_models
-
         
-###        
+    """
+    elif spawn_step in [3,4,5]:
+        for term in nontransverse_terms:
+            if term not in present_terms:
+                new_model = model+'PP'+term
+                new_models.append(new_model)
+
+    else:
+        for term in transverse_terms:
+            if term not in present_terms:
+                new_model = model+'PP'+term
+                new_models.append(new_model)
+    """
+    return new_models    
 
 
     

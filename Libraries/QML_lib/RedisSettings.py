@@ -17,7 +17,7 @@ active_branches_bayes = redis.StrictRedis(host=host_name, port=port_number, db=6
 active_interbranch_bayes =  redis.StrictRedis(host=host_name, port=port_number, db=7)
 
 
-test_workers = False
+test_workers = True
 
 
 try:

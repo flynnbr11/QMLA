@@ -50,6 +50,7 @@ class QMD():
                  max_num_branches = 20, 
                  use_exp_custom = True,
                  enable_sparse = True,
+                 compare_linalg_exp_tol = None,
                  sigma_threshold = 1e-13, 
                  debug_directory = None,
                  qle = True, # Set to False for IQLE
@@ -99,6 +100,7 @@ class QMD():
         self.GlobalEpoch = 0 
         self.UseExpCustom = use_exp_custom
         self.EnableSparse = enable_sparse
+        self.ExpComparisonTol = compare_linalg_exp_tol
         self.SigmaThreshold = sigma_threshold
         self.DebugDirectory = debug_directory
         self.ModelPointsDict = {}
@@ -141,7 +143,9 @@ class QMD():
           'qle' : self.QLE,
           'sigma_threshold' : self.SigmaThreshold,
           'true_name' : self.TrueOpName,
-          'use_exp_custom' : self.UseExpCustom
+          'use_exp_custom' : self.UseExpCustom,
+          'compare_linalg_exp_tol' : self.ExpComparisonTol,
+          'gaussian' : self.gaussian
         }
         if self.RunParallel:
             compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)

@@ -58,6 +58,7 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False):
         qle = qmd_info['qle']
         num_probes = qmd_info['num_probes']
         sigma_threshold = qmd_info['sigma_threshold']
+        gaussian = qmd_info['gaussian']
         
         # Generate model and learn
         op = DataBase.operator(name = name)
@@ -81,6 +82,7 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False):
           modeltrueparams = true_params,
           simoplist = op.constituents_operators,
           simparams = [sim_pars],
+          simopnames = op.constituents_names,
           numparticles = num_particles,
           use_exp_custom = True,
           enable_sparse=True,

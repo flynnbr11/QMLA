@@ -42,7 +42,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, oplist, modelparams, probecounter=None, true_oplist = None, truename=None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True, enable_sparse=True, model_name=None):
+    def __init__(self, oplist, modelparams, probecounter=None, true_oplist = None, truename=None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True, exp_comparison_tol=None, enable_sparse=True, model_name=None):
         self._solver = solver #This is the solver used for time evolution scipy is faster, QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
         self._probecounter = probecounter
@@ -57,6 +57,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._true_dim = DataBase.get_num_qubits(self._truename)
         self.use_exp_custom = use_exp_custom
         self.enable_sparse = enable_sparse
+        self.exp_comparison_tol = exp_comparison_tol  
         self._min_freq = min_freq
         self.ModelName = model_name
         self.inBayesUpdates = False
@@ -214,10 +215,10 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             
         times = expparams['t']
         if self.QLE is True:
-            pr0 = get_pr0_array_qle(t_list=times, modelparams=params, oplist=operators, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
+            pr0 = get_pr0_array_qle(t_list=times, modelparams=params, oplist=operators, probe=probe, use_exp_custom=self.use_exp_custom, exp_comparison_tol=self.exp_comparison_tol, enable_sparse = self.enable_sparse)    
 
         else: 
-            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params, oplist=operators, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, enable_sparse = self.enable_sparse)    
+            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params, oplist=operators, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, exp_comparison_tol=self.exp_comparison_tol, enable_sparse = self.enable_sparse)    
 
         likelihood_array = qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
         return likelihood_array
