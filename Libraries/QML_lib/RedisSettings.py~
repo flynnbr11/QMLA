@@ -9,8 +9,6 @@ except:
 	print("Couldn't find environment variable for Redis server name.")
 	host_name= 'localhost'
 
-
-print("Using host name ", host_name)
 port_number = 6379
 
 qmd_info_db = redis.StrictRedis(host=host_name, port=port_number, db=0)
