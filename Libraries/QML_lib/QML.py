@@ -103,8 +103,12 @@ class ModelLearningClass():
         if gaussian:
             self.Prior = MultiVariateNormalDistributionNocov(len(self.SimOpList))
         else:
-             self.Prior = MultiVariateUniformDistribution(len(self.SimOpList)) #the prior distribution is on the model we want to test i.e. the one implemented in the     simulator
-#            self.Prior = MultiVariateNormalDistributionNocov(len(self.SimOpList), mean = self.TrueParams[0])
+#             self.Prior = MultiVariateUniformDistribution(len(self.SimOpList)) #the prior distribution is on the model we want to test i.e. the one implemented in the     simulator
+           # print("Num elements:", len(self.SimOpList))
+            # print("self.trueparams:", self.TrueParams)
+            
+            num_params = len(self.SimOpList)
+            self.Prior = MultiVariateNormalDistributionNocov(num_params, mean = self.TrueParams[0:num_params])
   
         self.ProbeCounter = 0 #probecounter for the choice of the state
 #         if len(oplist)>1:
@@ -365,7 +369,13 @@ class ModelLearningClass():
         learned_info['model_id'] = self.ModelID
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_params'] = self.InitialParams
+        learned_info['volume_list'] = self.VolumeList
+
+
         learned_info['updater'] = pickle.dumps(self.Updater, protocol=2)
+        learned_info['gen_sim_model'] = pickle.dumps(self.GenSimModel, protocol=2)
+
+
         return learned_info
         
         
@@ -450,7 +460,6 @@ class reducedModel():
         self.ModelID = modelID
         
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
-        
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.NumParticles = qmd_info['num_particles']
         self.NumProbes = qmd_info['num_probes']
@@ -464,24 +473,33 @@ class reducedModel():
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.BayesFactors = {}
 
-
         
-    def updateLearnedValues(self, learned_info):
+    def updateLearnedValues(self, learned_info=None):
         """
         Pass a dict, learned_info, with essential info on reconstructing the state of the model, updater and GenSimModel
         """
+
+        if learned_info is None:
+            model_id_float = float(self.ModelID)
+            model_id_str = str(model_id_float)
+            learned_info = pickle.loads(learned_models_info.get(model_id_str))        
+
         self.Times = learned_info['times']
         self.FinalParams = learned_info['final_params'] # should be final params from learning process
         self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
         self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_info['normalization_record']
+        self.VolumeList = learned_info['volume_list'] 
 
+#        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.TrueOpList,,
 
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.TrueOpList,,
-
-        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
-        self.Updater._normalization_record = self._normalization_record
-    
+#        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
+#        self.Updater._normalization_record = self._normalization_record
+ 
+        
+        
+        
+        
         
 class modelClassForRemoteBayesFactor():
 #TODO: use this instead of full ModelClass above.
@@ -513,14 +531,16 @@ class modelClassForRemoteBayesFactor():
         
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_model_info['normalization_record']
+#        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict)    
 
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict)    
-
-        self.Updater_regenerated = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
-        self.Updater_regenerated._normalization_record = self._normalization_record
-        self.Updater_regenerated._data_record = learned_model_info['data_record']
+        #self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
+        #self.Updater._normalization_record = self._normalization_record
+        #self.Updater._data_record = learned_model_info['data_record']
         
+        
+        self.GenSimModel = pickle.loads(learned_model_info['gen_sim_model'])
         self.Updater = pickle.loads(learned_model_info['updater'])
+        # TODO not clear which is quicker: generating new instance of classes/updater or unpickling every time.
         del qmd_info, learned_model_info
         
         # could pickle updaters to a redis db for updaters, but first construct these model classes each time a BF is to be computed. 

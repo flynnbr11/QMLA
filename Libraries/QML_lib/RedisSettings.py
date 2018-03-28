@@ -3,11 +3,18 @@ import os, sys
 #TODO do as list?
 #TODO do in function and return unique set of dbs.. or else set list of port ids in QMD, cycle through them so several QMDs can be run simultaneously. 
 
+
+
 try:
 	host_name = os.getenv("QMD_REDIS_HOST")
 except:
 	print("Couldn't find environment variable for Redis server name.")
 	host_name= 'localhost'
+
+
+if host_name is None:
+    host_name= 'localhost'
+
 
 
 print("Using host name ", host_name)
@@ -23,7 +30,7 @@ active_branches_bayes = redis.StrictRedis(host=host_name, port=port_number, db=6
 active_interbranch_bayes =  redis.StrictRedis(host=host_name, port=port_number, db=7)
 
 
-test_workers = True
+test_workers = False
 
 
 try:
@@ -32,7 +39,7 @@ try:
     from rq import Connection, Queue, Worker
 
     redis_conn = redis.Redis()
-    q = Queue(connection=redis_conn, async=test_workers)
+    q = Queue(connection=redis_conn, async=test_workers, default_timeout=3600) # TODO is this timeout sufficient for ALL QMD jobs?
     parallel_enabled = True
 except:
     parallel_enabled = False    

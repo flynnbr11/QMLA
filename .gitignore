@@ -16,6 +16,8 @@ __pycache__/
 *.dat
 *.pptx
 *.txt
+*.p
+*.pkl
 
 # Output files from cluster
 *.e*

@@ -330,7 +330,7 @@ class QMD():
             branchID = DataBase.model_branch_from_model_id(self.db, model_id=modelID)
             if self.RunParallel and use_rq: # i.e. use a job queue rather than sequentially doing it. 
                 # add function call to RQ queue
-                queued_model = q.enqueue(learnModelRemote, model_name, modelID, branchID=branchID, remote=True) # add result_ttl=-1 to keep result indefinitely on redis server
+                queued_model = q.enqueue(learnModelRemote, model_name, modelID, branchID=branchID, remote=True, timeout=3600) # add result_ttl=-1 to keep result indefinitely on redis server
                 
                 print("Model", model_name, "added to queue.")
                 if blocking: # i.e. wait for result when called. 
@@ -339,9 +339,9 @@ class QMD():
                             print("Model", model_name, "has failed on remote worker")
                             break
                         time.sleep(0.1)
-                    updated_model_info = pickle.loads(learned_models_info[modelID])
+                    #updated_model_info = pickle.loads(learned_models_info[modelID])
                     reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
-                    reduced_model.updateLearnedValues(learned_info = updated_model_info)
+                    reduced_model.updateLearnedValues()
                     del updated_model_info
 
 
@@ -363,7 +363,7 @@ class QMD():
             interbranch=True            
         
         if remote:
-            job = q.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, branchID=branchID, interbranch=interbranch, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName, bayes_threshold=bayes_threshold) 
+            job = q.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, branchID=branchID, interbranch=interbranch, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName, bayes_threshold=bayes_threshold, timeout=3600) 
             print("Bayes factor calculation queued. Model IDs", model_a_id, model_b_id)
         else:
             BayesFactorRemote(model_a_id=model_a_id, model_b_id=model_b_id, trueModel=self.TrueOpName, branchID=branchID, interbranch=interbranch, bayes_threshold=bayes_threshold)
@@ -386,11 +386,13 @@ class QMD():
                         self.BayesFactorsComputed.append(unique_id)
                         remote_jobs.append(self.remoteBayes(a,b, remote=remote, return_job=wait_on_result, bayes_threshold=bayes_threshold))
 
-        if wait_on_result:
+        if wait_on_result and test_workers: # test_workers from RedisSettings
             print("Waiting on result of Bayes comparisons from given list:", model_id_list)
             for job in remote_jobs:
                 while job.is_finished == False:
                     time.sleep(0.01)
+        else:
+            print("Not waiting on results since not using RQ workers.")
                 
                
             
@@ -849,14 +851,12 @@ class QMD():
             for branchID_bytes in active_branches_bayes.keys():
                 
                 branchID = int(branchID_bytes)
-                from_db = active_branches_bayes.get(branchID_bytes)
-                if int(from_db) == self.NumModelPairsPerBranch[branchID] and self.BranchComparisonsComplete[branchID]==False:
+                bayes_calculated = active_branches_bayes.get(branchID_bytes)
+                if int(bayes_calculated) == self.NumModelPairsPerBranch[branchID] and self.BranchComparisonsComplete[branchID]==False:
                     self.BranchComparisonsComplete[branchID] = True
-                    
                     self.compareModelsWithinBranch(branchID)
                     max_spawn_depth_reached = self.spawnFromBranch(branchID, num_models=1)
-                        
-                        #TODO tidy up function
+                    #TODO tidy up function
 
             if max_spawn_depth_reached:
                 print("Max spawn depth reached; determining winner. Entering while loop until all models/Bayes factors remaining have finished.")
@@ -882,11 +882,18 @@ class QMD():
                             still_learning = False # i.e. break out of this while loop
                             final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
                             self.ChampionName = final_winner
-
+                            self.updateDataBaseModelValues()
                             print("Final winner = ", final_winner)
+
                     
                
+
+    def updateDataBaseModelValues(self):
+        for mod_id in range(self.HighestModelID):
+            mod = self.reducedModelInstanceFromID(mod_id)
+            mod.updateLearnedValues()
         
+            
 
 
 
@@ -934,6 +941,56 @@ class QMD():
                 mod.UpdateModel(n_experiments=num_exp)
             self.compareModelList(model_list=model_id_list, bayes_threshold=1, num_times_to_use=num_exp)
         self.MajorityVotingScores = self.majorityVotingTally()
+
+    def plotVolumes(self, model_id_list=None, branch_champions=False, branch_id=None, save_to_file=None):
+
+        plt.clf()
+        plot_descriptor = '\n('+str(self.NumParticles)+'particles; '+str(self.NumExperiments)+'experiments). '
+
+
+        if branch_champions:
+            # only plot for branch champions
+            model_id_list = list(self.BranchChampions.values())
+            plot_descriptor+='[Branch champions]'
+
+        
+        elif branch_id is not None:
+            model_id_list = DataBase.list_model_id_in_branch(self.db, branch_id)
+            plot_descriptor+='[Branch'+str(branch_id)+']'
+        
+        elif model_id_list is None:
+            print("Plotting volumes for all models by default.")
+            model_id_list = range(self.HighestModelID)
+            plot_descriptor+='[All models]'
+
+        plt.title('Volume evolution through QMD '+plot_descriptor)
+        plt.xlabel('Epoch')
+        plt.ylabel('Volume')
+
+
+        for i in model_id_list:
+            vols = self.reducedModelInstanceFromID(i).VolumeList
+            plt.semilogy(vols, label=str('ID:'+str(i)))
+#            plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1.0))
+
+        ax = plt.subplot(111)
+
+        # Shrink current axis's height by 10% on the bottom
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0 + box.height * 0.1,
+                         box.width, box.height * 0.9])
+
+        # Put a legend below current axis
+        lgd=ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15),
+                  fancybox=True, shadow=True, ncol=4)
+
+
+        if save_to_file is None:
+            plt.show()
+        else:
+            plt.savefig(save_to_file, bbox_extra_artists=(lgd,), bbox_inches='tight')
+    
+
 
     def majorityVotingTally(self):
         mod_ids = DataBase.list_model_id_in_branch(self.db, 0)

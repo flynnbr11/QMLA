@@ -2,14 +2,15 @@
 #PBS -l nodes=2:ppn=16,walltime=01:00:00
 #PBS -q veryshort
 
-module load tools/redis-4.0.8
+# module load tools/redis-4.0.8
 
 set -x
 
 # The redis server is started on the first node.
 SERVER_HOST=$(head -1 "$PBS_NODEFILE")
 #TODO create a redis config
-cd $HOME/QMD/Libraries/QML_lib
+qmd_lib
+# cd $HOME/QMD/Libraries/QML_lib
 redis-server --protected-mode no &
 
 # wait for redis to start up
@@ -23,7 +24,11 @@ sleep 20
 
 
 export QMD_REDIS_HOST=$SERVER_HOST
-cd $HOME/QMD/ValidateQLE/
+
+qmd
+cd ValidateQLE
+# cd $HOME/QMD/ValidateQLE/
+
 
 python3 ExperimentalSpawningRule.py 
 
