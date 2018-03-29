@@ -77,6 +77,7 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False):
         # add model_db_new_row to model_db and running_database
         # Note: do NOT use pd.df.append() as this copies total DB,
         # appends and returns copy.
+        print("Trying to initialise new model with id", modelID, " and name", name)
         qml_instance.InitialiseNewModel(
           trueoplist = true_ops,
           modeltrueparams = true_params,

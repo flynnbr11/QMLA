@@ -38,7 +38,7 @@ class QMD():
                  true_param_list = None,
                  num_particles= 300,
                  num_experiments = 50,
-                 max_num_models=10, 
+                 max_num_models=30, 
                  max_num_qubits=7, #TODO change -- this may cause crashes somewhere
                  gaussian=True,
                  resample_threshold = 0.5,
@@ -682,13 +682,18 @@ class QMD():
         
         return champ_id
     
-    def interBranchChampion(self, branch_list=[], global_champion=False, bayes_threshold=1):
+    def interBranchChampion(self, branch_list=[], just_active_models=False, global_champion=False, bayes_threshold=1):
         all_branches = self.db['branchID'].unique()
         if global_champion == True: 
             branches = all_branches
+        elif just_active_models:
+            # some models turned off intermediately
+            branches = all_active_model_ids(self.db)
         else: 
             branches = branch_list
         print("Branches : ", branches)
+        
+        
         
         num_branches = len(branches)
         points_by_branches = [None] * num_branches
@@ -1036,14 +1041,17 @@ class QMD():
 
 
 def num_pairs_in_list(num_models):
-    if num_models == 1:
+    if num_models <= 1:
         return 0
 
     n = num_models
     k = 2 # ie. nCk where k=2 since we want pairs
     
-    a= math.factorial(n) / math.factorial(k)
-    b= math.factorial(n-k)
+    try:    
+        a= math.factorial(n) / math.factorial(k)
+        b= math.factorial(n-k)
+    except:
+        print("n=",n,"\t k=",k)
     
     return a/b
 

@@ -33,9 +33,9 @@ warnings.filterwarnings("ignore")
 
 
 num_runs=1
-num_particles= 2500
-num_experiments = 350
-num_times_bayes = 75
+num_particles= 25
+num_experiments = 3
+num_times_bayes = 2
 #num_times_bayes = int(np.ceil(num_experiments/5))
 print("num times to use:", num_times_bayes)
 qle=True
@@ -70,8 +70,8 @@ for i in range(num_runs):
         parallel = True,
         use_exp_custom=False, 
         compare_linalg_exp_tol=None,
-        growth_generator='ising_non_transverse'
-        #growth_generator='experimental_qmd'
+        #growth_generator='ising_non_transverse'
+        growth_generator='ising_transverse'
     )
    # qmd.learnModelNameList(model_name_list=['z'], blocking=True, use_rq=False)
     qmd.runRemoteQMD(num_spawns=3)

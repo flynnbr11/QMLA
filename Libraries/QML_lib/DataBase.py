@@ -610,7 +610,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
         'branchID' : [], # TODO proper branch id's,
         #'Param_Estimates' : sim_ops,
         #'Estimates_Dist_Width' : [normal_dist_width for gen in generators],
-        'Model_Class_Instance' : [],
+        #'Model_Class_Instance' : [],
         'Reduced_Model_Class_Instance' : [],
         'Operator_Instance' : [],
         'Epoch_Start' : [],
@@ -620,26 +620,26 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
     modelID = int(0)
     for model_name in gen_list: 
         try_add_model = add_model(
-                                    model_name=model_name,
-                                    running_database=db, 
-                                    model_lists=model_lists, 
-                                    true_op_name=true_op_name,
-                                    true_ops=true_ops, 
-                                    true_params=true_params, 
-                                    modelID=int(modelID), 
-                                    epoch=0, 
-                                    probe_dict = probe_dict, 
-                                    resample_threshold = resample_threshold, 
-                                    resampler_a = resampler_a,
-                                    pgh_prefactor = pgh_prefactor,
-                                    num_probes = num_probes,
-                                    num_particles=num_particles, 
-                                    redimensionalise=redimensionalise,              
-                                    use_exp_custom = use_exp_custom,
-                                    enable_sparse=enable_sparse, 
-                                    debug_directory = debug_directory,
-                                    branchID=0, 
-                                    qle=qle
+            model_name=model_name,
+            running_database=db, 
+            model_lists=model_lists, 
+            true_op_name=true_op_name,
+            true_ops=true_ops, 
+            true_params=true_params, 
+            modelID=int(modelID), 
+            epoch=0, 
+            probe_dict = probe_dict, 
+            resample_threshold = resample_threshold, 
+            resampler_a = resampler_a,
+            pgh_prefactor = pgh_prefactor,
+            num_probes = num_probes,
+            num_particles=num_particles, 
+            redimensionalise=redimensionalise,              
+            use_exp_custom = use_exp_custom,
+            enable_sparse=enable_sparse, 
+            debug_directory = debug_directory,
+            branchID=0, 
+            qle=qle
                                     
         )
         if try_add_model is True: 
@@ -715,6 +715,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
         # add model_db_new_row to model_db and running_database
         # Note: do NOT use pd.df.append() as this copies total DB,
         # appends and returns copy.
+        """
         qml_instance.InitialiseNewModel(
           trueoplist = true_ops,
           modeltrueparams = true_params,
@@ -732,7 +733,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
           debug_directory = debug_directory,
           qle = qle
         )
-        
+        """
         reduced_qml_instance = reducedModel(
           model_name = model_name, 
           sim_oplist = op.constituents_operators, 
@@ -754,7 +755,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
             'branchID' : int(branchID), #TODO make argument of add_model fnc,
             'Param_Estimates' : sim_pars,
             'Estimates_Dist_Width' : normal_dist_width,
-            'Model_Class_Instance' : qml_instance,
+            #'Model_Class_Instance' : qml_instance,
             'Reduced_Model_Class_Instance' : reduced_qml_instance, 
             'Operator_Instance' : op,
             'Epoch_Start' : 0, #TODO fill in
@@ -913,6 +914,9 @@ def pull_field(db, name, field):
 
 def model_names_on_branch(db, branchID):
     return list(db[ (db['branchID']==branchID) ]['<Name>'])
+
+def all_active_model_ids(db):
+    return list(db[ (db['Status']=='Active') ]['ModelID'])
 
 
 def active_model_ids_by_branch_id(db, branchID):

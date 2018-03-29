@@ -59,6 +59,8 @@ class ModelLearningClass():
     
     def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, simopnames, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True):
 
+        init_model_print_loc = False
+        print_loc(print_location=init_model_print_loc)
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
@@ -74,6 +76,7 @@ class ModelLearningClass():
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.ExpComparisonTol = qmd_info['compare_linalg_exp_tol']
         self.SimOpsNames = simopnames
+        print_loc(print_location=init_model_print_loc)
 
         
 #        self.TrueOpList = np.asarray(trueoplist)
@@ -90,6 +93,7 @@ class ModelLearningClass():
         self.EnableSparse = enable_sparse
 #        self.QLE = qle
         self.checkQLoss = True
+        print_loc(print_location=init_model_print_loc)
         
 #        print("Model instance ", self.Name, " has initial parameters: ", self.SimParams, "\nTrue op list: \n", self.TrueOpList)
         
@@ -108,7 +112,14 @@ class ModelLearningClass():
             # print("self.trueparams:", self.TrueParams)
             
             num_params = len(self.SimOpList)
-            self.Prior = MultiVariateNormalDistributionNocov(num_params, mean = self.TrueParams[0:num_params])
+            means = self.TrueParams[0:num_params]
+
+            if num_params > len(self.TrueParams):
+                for i in range(len(self.TrueParams), num_params):
+                    means.append(self.TrueParams[i%len(self.TrueParams)])
+            print("length of means:", len(means))
+            
+            self.Prior = MultiVariateNormalDistributionNocov(num_params, mean = means)
   
         self.ProbeCounter = 0 #probecounter for the choice of the state
 #         if len(oplist)>1:
@@ -127,12 +138,15 @@ class ModelLearningClass():
         #self.ProbeList = np.array([evo.zero(),evo.plus(),evo.minusI()])
         
         # self.ProbeList = np.array([evo.zero()])
+        print_loc(print_location=init_model_print_loc)
         
         self.ProbeList = list(map(lambda x: pros.def_randomprobe(self.TrueOpList), range(15)))
         #self.ProbeList =  [pros.def_randomprobe(self.TrueOpList)]
+        print_loc(print_location=init_model_print_loc)
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
         self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, exp_comparison_tol = self.ExpComparisonTol, enable_sparse=self.EnableSparse, model_name=self.Name)    # probelist=self.TrueOpList,,
+        print_loc(print_location=init_model_print_loc)
 
         
                 
@@ -140,7 +154,11 @@ class ModelLearningClass():
         #print('Chosen true_params: ' + str(self.TrueParams))
         #self.GenSimModel = gsi.GenSim_IQLE(oplist=self.OpList, modelparams=self.TrueParams, probecounter = self.ProbeCounter, probelist= [self.ProbeState], solver='scipy', trotter=True)
         #Here you can turn off the debugger change the resampling threshold etc...
+
         self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
+
+
+        print_loc(print_location=init_model_print_loc)
         
         #doublecheck and coment properly
         self.Inv_Field = [item[0] for item in self.GenSimModel.expparams_dtype[1:] ]
@@ -148,6 +166,7 @@ class ModelLearningClass():
 #        self.Heuristic = mpgh.multiPGH(self.Updater, self.SimOpList, inv_field=self.Inv_Field)
         self.Heuristic = mpgh.multiPGH(self.Updater, inv_field=self.Inv_Field)
         
+        print_loc(print_location=init_model_print_loc)
         
         #TODO: should heuristic use TRUEoplist???
         
@@ -166,6 +185,7 @@ class ModelLearningClass():
         self.Experiment = self.Heuristic()   
         self.ExperimentsHistory = np.array([])
         self.FinalParams = np.empty([len(self.SimOpList),2]) #average and standard deviation at the final step of the parameters inferred distributions
+        print_loc(print_location=init_model_print_loc)
 
         print('Initialization Ready')
         

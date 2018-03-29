@@ -33,7 +33,7 @@ max_spawn_depth_info = {
     'simple_ising' : 1,
     'hyperfine' : 3,
     'ising_non_transverse' : 5,
-    'ising_transverse' : 12,
+    'ising_transverse' : 8,
     'hyperfine_like' : 6
 }
 
@@ -45,6 +45,8 @@ def new_model_list(model_list, spawn_depth, options=['x', 'y', 'z'], generator='
         #todo integrate Andreas' simple Ising growth
     elif generator=='ising_non_transverse':
         return ising_non_transverse(model_list, spawn_step=spawn_depth)
+    elif generator == 'ising_transverse':
+        return ising_transverse(model_list, spawn_step=spawn_depth)
     
     else:
         print("Generator", generator, "not recognised")        
