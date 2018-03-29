@@ -33,7 +33,7 @@ warnings.filterwarnings("ignore")
 
 
 num_runs=1
-num_particles= 25
+num_particles= 10
 num_experiments = 3
 num_times_bayes = 2
 #num_times_bayes = int(np.ceil(num_experiments/5))

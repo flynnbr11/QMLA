@@ -7,6 +7,7 @@ import sys as sys
 import pandas as pd
 import warnings
 import time as time
+from time import sleep
 import random
 from psutil import virtual_memory
 from RedisSettings import *
@@ -341,8 +342,8 @@ class QMD():
                             break
                         time.sleep(0.1)
                     #updated_model_info = pickle.loads(learned_models_info[modelID])
-                    reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
-                    reduced_model.updateLearnedValues()
+                    #reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
+                    #reduced_model.updateLearnedValues()
                     del updated_model_info
 
 
@@ -350,8 +351,8 @@ class QMD():
                 self.QMDInfo['probe_dict'] = self.ProbeDict
                 updated_model_info = learnModelRemote(model_name, modelID, branchID=branchID, qmd_info=self.QMDInfo, remote=True)
 
-                reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
-                reduced_model.updateLearnedValues(learned_info = updated_model_info)
+#                reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
+#                reduced_model.updateLearnedValues(learned_info = updated_model_info)
                 del updated_model_info
         else:
             print("Model", model_name, "does not yet exist.")        
@@ -683,13 +684,99 @@ class QMD():
         
         return champ_id
     
+    
+    
+    def finalBayesComparisons(self, bayes_threshold=100):
+        branch_champions = list(self.BranchChampions.values())
+        job_list = []
+        job_finished_count = 0
+        interbranch_collapse_threshold = 100 ## if a spawned model is this much better than its parent, parent is deactivated
+        num_champs = len(branch_champions)
+        
+        for k in range( num_champs -1 ):
+            mod1 = branch_champions[k]
+            mod2 = branch_champions[k+1]
+            
+            job_list.append(self.remoteBayes(model_a_id=mod1, model_b_id=mod2, return_job=True))
+            
+        print("Entering while loop in final bayes fnc.")
+        print("num champs = ", num_champs)
+        while job_finished_count < num_champs:
+            # wait for those to finish
+            sleep(0.1)
+            for k in range(len(job_list)):
+                if job_list[k].is_finished == True:
+                    job_finished_count += 1 
+            
+        for k in range(num_champs - 1):
+            mod1 = branch_champions[k]
+            mod2 = branch_champions[k+1]
+            pair_id = DataBase.unique_model_pair_identifier(mod1, mod2)
+            bayes_factor = float(bayes_factors_db.get(pair_id))
+        
+            if bayes_factor > interbranch_collapse_threshold:
+                # bayes_factor heavily favours mod1, so deactive mod2
+                self.updateModelRecord(model_id=mod2, field='Status', new_value='Deactivated')
+            elif bayes_factor < (1.0/interbranch_collapse_threshold):
+                self.updateModelRecord(model_id=mod1, field='Status', new_value='Deactivated')
+        
+        
+        active_models = DataBase.all_active_model_ids(self.db)
+        print("After initial interbranch comparisons, remaining active branch champions:", active_models)
+        num_active_models = len(active_models)
+        
+        self.remoteBayesFromIDList(model_id_list=active_models, remote=True, recompute=True, wait_on_result=True, bayes_threshold=bayes_threshold)
+
+        branch_champions_points = {}
+        for c in active_models: 
+            branch_champions_points[c] = 0
+
+        for i in range(num_active_models):
+            mod1 = active_models[i]
+            for j in range(i, num_active_models):
+                mod2 = active_models[j]
+                if mod1!=mod2:
+    #                res = self.compareModels(model_a_id=mod1, model_b_id=mod2, log_comparison_high=20.0)
+#                    pair = DataBase.unique_model_pair_identifier(mod1, mod2)
+#                    res = bayes_factors_winners_db.get(pair)
+                    res = self.processRemoteBayesPair(a=mod1, b=mod2)
+                    
+                    if res == "a":
+                        branch_champions_points[mod1] += 1
+                    elif res == "b":
+                        branch_champions_points[mod2] += 1
+        self.ranked_champions = sorted(branch_champions_points, reverse=True)
+        
+        max_points = max(branch_champions_points.values())
+        max_points_branches = [key for key, val in branch_champions_points.items() if val==max_points]
+        if len(max_points_branches) > 1: 
+            # todo: recompare. Fnc: compareListOfModels (rather than branch based)
+            print("No distinct champion, recomputing bayes factors between : ", max_points_branches)
+            champ_id = self.compareModelList(max_points_branches, bayes_threshold=1, models_points_dict=branch_champions_points)
+        else: 
+            champ_id = max(branch_champions_points, key=branch_champions_points.get)
+        champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        
+        branch_champ_names = [DataBase.model_name_from_id(self.db, mod_id) for mod_id in active_models]
+        self.statusChangeModel(champ_name, new_status = 'Active')
+        
+        return champ_name, branch_champ_names
+
+                                    
+            
+        
+    
+    
+    
+    
     def interBranchChampion(self, branch_list=[], just_active_models=False, global_champion=False, bayes_threshold=1):
+        
         all_branches = self.db['branchID'].unique()
         if global_champion == True: 
             branches = all_branches
         elif just_active_models:
             # some models turned off intermediately
-            branches = all_active_model_ids(self.db)
+            branches = DataBase.all_active_model_ids(self.db)
         else: 
             branches = branch_list
         print("Branches : ", branches)
@@ -886,12 +973,17 @@ class QMD():
                     if np.all(np.array(list(self.BranchAllModelsLearned.values()))==True) and np.all(np.array(list(self.BranchComparisonsComplete.values()))==True):
                             
                             still_learning = False # i.e. break out of this while loop
-                            final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
-                            self.ChampionName = final_winner
-                            self.updateDataBaseModelValues()
-                            print("Final winner = ", final_winner)
+
 
         ### Final functions at end of QMD
+#        final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
+        final_winner, final_branch_winners = self.finalBayesComparisons()        
+        
+
+        self.ChampionName = final_winner
+        print("Final winner = ", final_winner)
+
+        self.updateDataBaseModelValues()
         for i in range(self.HighestModelID):
             # Dict of all Bayes factors for each model considered. 
             self.AllBayesFactors[i] = self.reducedModelInstanceFromID(i).BayesFactors

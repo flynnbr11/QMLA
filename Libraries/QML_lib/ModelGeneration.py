@@ -449,9 +449,6 @@ def hyperfine_like(model_list, spawn_step, model_dict):
                     
                     new_models.append(new_model)
                     i+=1
-                    print("Generation:", new_model, "not yet considered -- adding.")
-                else:
-                    print("Generation:", new_model, "was considered previously; not adding.")
         
     """
     elif spawn_step in [3,4,5]:
