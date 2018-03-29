@@ -104,6 +104,7 @@ class QMD():
         self.SigmaThreshold = sigma_threshold
         self.DebugDirectory = debug_directory
         self.ModelPointsDict = {}
+        self.AllBayesFactors = {}
         self.BranchBayesComputed[0] = False
         self.BayesFactorsComputed = []
 #        for i in range(self.MaxBranchID+1):
@@ -800,9 +801,9 @@ class QMD():
 #        options = ['x']
 
         if single_champion:
-            new_models = ModelGeneration.new_model_list(model_list=[overall_champ], generator='simple_ising',options=options)
+            new_models = ModelGeneration.new_model_list(model_list=[overall_champ], generator='simple_ising',model_dict=self.model_lists, options=options)
         else: 
-            new_models = ModelGeneration.new_model_list(model_list=branch_champions, generator='simple_ising', options=options)
+            new_models = ModelGeneration.new_model_list(model_list=branch_champions, generator='simple_ising', model_dict=self.model_lists, options=options)
         
         print("New models to add to new branch : ", new_models)
         self.newBranch(model_list=new_models) 
@@ -814,7 +815,7 @@ class QMD():
         print("Spawning, spawn depth:", self.SpawnDepth)
         best_models = self.BranchRankings[branchID][:num_models]
         best_model_names = [DataBase.model_name_from_id(self.db, mod_id) for mod_id in best_models ]
-        new_models = ModelGeneration.new_model_list(model_list=best_model_names, spawn_depth=self.SpawnDepth, generator=self.GrowthGenerator)
+        new_models = ModelGeneration.new_model_list(model_list=best_model_names, spawn_depth=self.SpawnDepth, model_dict=self.model_lists, generator=self.GrowthGenerator)
         
         print("New models to add to new branch : ", new_models)
         new_branch_id = self.newBranch(model_list=new_models) 
@@ -889,6 +890,15 @@ class QMD():
                             self.ChampionName = final_winner
                             self.updateDataBaseModelValues()
                             print("Final winner = ", final_winner)
+
+        ### Final functions at end of QMD
+        for i in range(self.HighestModelID):
+            # Dict of all Bayes factors for each model considered. 
+            self.AllBayesFactors[i] = self.reducedModelInstanceFromID(i).BayesFactors
+        
+
+
+
 
                     
                

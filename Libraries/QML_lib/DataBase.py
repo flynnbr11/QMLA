@@ -813,6 +813,33 @@ def consider_new_model(model_lists, name, db):
     else: 
         return 'New'
 
+
+def check_model_in_dict(name, model_dict):
+    """
+    Check whether the new model, name, exists in all previously considered models, 
+    held in model_lists. 
+    If name has not been previously considered, False is returned. 
+    """
+    # Return true indicates it has not been considered and so can be added
+    
+    print("Checking whether", name, " in dict")
+    al_name = alph(name)
+    n_qub = get_num_qubits(name)
+
+    print("Alph:", al_name)
+    print("Current models: ",model_dict[n_qub])
+
+    if al_name in model_dict[n_qub]:
+        return True # todo -- make clear if in legacy or running db
+#        location = get_location_by_alph_name(db, al_name)
+#        if location is None: 
+#          return "Legacy database"
+#        return location
+    else: 
+        return False
+
+
+
 def check_model_exists(model_name, model_lists, db):
     # Return True if model exits; False if not. 
     if consider_new_model(model_lists, model_name, db) == 'New':

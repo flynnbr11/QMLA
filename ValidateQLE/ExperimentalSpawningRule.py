@@ -71,7 +71,7 @@ for i in range(num_runs):
         use_exp_custom=False, 
         compare_linalg_exp_tol=None,
         #growth_generator='ising_non_transverse'
-        growth_generator='ising_transverse'
+        growth_generator='hyperfine_like'
     )
    # qmd.learnModelNameList(model_name_list=['z'], blocking=True, use_rq=False)
     qmd.runRemoteQMD(num_spawns=3)

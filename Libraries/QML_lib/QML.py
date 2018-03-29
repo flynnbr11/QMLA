@@ -60,7 +60,6 @@ class ModelLearningClass():
     def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, simopnames, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True):
 
         init_model_print_loc = False
-        print_loc(print_location=init_model_print_loc)
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
@@ -117,7 +116,6 @@ class ModelLearningClass():
             if num_params > len(self.TrueParams):
                 for i in range(len(self.TrueParams), num_params):
                     means.append(self.TrueParams[i%len(self.TrueParams)])
-            print("length of means:", len(means))
             
             self.Prior = MultiVariateNormalDistributionNocov(num_params, mean = means)
   
@@ -138,15 +136,12 @@ class ModelLearningClass():
         #self.ProbeList = np.array([evo.zero(),evo.plus(),evo.minusI()])
         
         # self.ProbeList = np.array([evo.zero()])
-        print_loc(print_location=init_model_print_loc)
         
         self.ProbeList = list(map(lambda x: pros.def_randomprobe(self.TrueOpList), range(15)))
         #self.ProbeList =  [pros.def_randomprobe(self.TrueOpList)]
-        print_loc(print_location=init_model_print_loc)
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
         self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, exp_comparison_tol = self.ExpComparisonTol, enable_sparse=self.EnableSparse, model_name=self.Name)    # probelist=self.TrueOpList,,
-        print_loc(print_location=init_model_print_loc)
 
         
                 
@@ -157,16 +152,11 @@ class ModelLearningClass():
 
         self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
 
-
-        print_loc(print_location=init_model_print_loc)
-        
         #doublecheck and coment properly
         self.Inv_Field = [item[0] for item in self.GenSimModel.expparams_dtype[1:] ]
         #print('Inversion fields are: ' + str(self.Inv_Field))
 #        self.Heuristic = mpgh.multiPGH(self.Updater, self.SimOpList, inv_field=self.Inv_Field)
         self.Heuristic = mpgh.multiPGH(self.Updater, inv_field=self.Inv_Field)
-        
-        print_loc(print_location=init_model_print_loc)
         
         #TODO: should heuristic use TRUEoplist???
         

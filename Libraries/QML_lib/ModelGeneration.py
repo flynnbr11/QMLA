@@ -33,12 +33,12 @@ max_spawn_depth_info = {
     'simple_ising' : 1,
     'hyperfine' : 3,
     'ising_non_transverse' : 5,
-    'ising_transverse' : 8,
-    'hyperfine_like' : 6
+    'ising_transverse' : 11,
+    'hyperfine_like' : 7
 }
 
 
-def new_model_list(model_list, spawn_depth, options=['x', 'y', 'z'], generator='simple_ising'):
+def new_model_list(model_list, spawn_depth, model_dict, options=['x', 'y', 'z'], generator='simple_ising'):
     print("Generating new models according to best of last round: ", model_list, "; and options:", options)
     if generator == 'simple_ising':
         return simple_ising(generator_list=model_list, options=options)
@@ -47,6 +47,9 @@ def new_model_list(model_list, spawn_depth, options=['x', 'y', 'z'], generator='
         return ising_non_transverse(model_list, spawn_step=spawn_depth)
     elif generator == 'ising_transverse':
         return ising_transverse(model_list, spawn_step=spawn_depth)
+    elif generator == 'hyperfine_like':
+        return hyperfine_like(model_list, spawn_step=spawn_depth, model_dict=model_dict)
+    
     
     else:
         print("Generator", generator, "not recognised")        
@@ -408,7 +411,7 @@ def ising_transverse(model_list, spawn_step):
 
     return new_models    
 
-def hyperfine_like(model_list, spawn_step):
+def hyperfine_like(model_list, spawn_step, model_dict):
 # TODO before using this function, need to add a max_spawn_depth to the dict above for ising_transverse. How many spawns can it support?
     import random
     single_qubit_terms = ['xTi', 'yTi', 'zTi']
@@ -429,16 +432,26 @@ def hyperfine_like(model_list, spawn_step):
             if term not in present_terms:
                 new_model = model+'PP'+term
                 new_models.append(new_model)
+    elif spawn_step in [3,4,5]:
+        for term in nontransverse_terms:
+            if term not in present_terms:
+                new_model = model+'PP'+term
+                new_models.append(new_model)
 
     else: 
-        
-        for i in range(3):
+        i=0
+        while i < 3:
             term = random.choice(all_two_qubit_terms)
             
             if term not in present_terms:
                 new_model = model+'PP'+term
-                new_models.append(new_model)
-                
+                if DataBase.check_model_in_dict(new_model, model_dict) == False and new_model not in new_models:
+                    
+                    new_models.append(new_model)
+                    i+=1
+                    print("Generation:", new_model, "not yet considered -- adding.")
+                else:
+                    print("Generation:", new_model, "was considered previously; not adding.")
         
     """
     elif spawn_step in [3,4,5]:
