@@ -729,6 +729,20 @@ class QMD():
             elif bayes_factor < (1.0/interbranch_collapse_threshold):
                 print("Spawned model", mod2, "stronger than parent; deactivating model", mod1)
                 self.updateModelRecord(model_id=mod1, field='Status', new_value='Deactivated')
+                
+            # Add bayes factors to BayesFactor dict for each model        
+            mod_a = self.reducedModelInstanceFromID(mod1)
+            mod_b = self.reducedModelInstanceFromID(mod2)
+            if mod2 in mod_a.BayesFactors:
+                mod_a.BayesFactors[mod2].append(bayes_factor)
+            else:
+                mod_a.BayesFactors[mod2] = [bayes_factor]
+            
+            if mod1 in mod_b.BayesFactors:
+                mod_b.BayesFactors[mod1].append((1.0/bayes_factor))
+            else:
+                mod_b.BayesFactors[mod1] = [(1.0/bayes_factor)]
+        
         
         
         active_models = DataBase.all_active_model_ids(self.db)
@@ -997,7 +1011,7 @@ class QMD():
         for i in range(self.HighestModelID):
             # Dict of all Bayes factors for each model considered. 
             self.AllBayesFactors[i] = self.reducedModelInstanceFromID(i).BayesFactors
-        
+            # TODO also pull bayes factors of branch champions in parent/child collapse stage. 
 
 
 

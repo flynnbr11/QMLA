@@ -4,7 +4,7 @@ import os, sys
 #TODO do in function and return unique set of dbs.. or else set list of port ids in QMD, cycle through them so several QMDs can be run simultaneously. 
 
 
-
+"""
 try:
 	host_name = os.getenv("QMD_REDIS_HOST")
 except:
@@ -19,6 +19,15 @@ if host_name is None:
 
 
 print("Using host name ", host_name)
+port_number = 6379
+"""
+
+
+
+
+
+test_workers = False
+host_name = 'localhost'
 port_number = 6379
 
 
@@ -35,7 +44,7 @@ active_branches_bayes = redis.StrictRedis(host=host_name, port=port_number, db=6
 active_interbranch_bayes =  redis.StrictRedis(host=host_name, port=port_number, db=7)
 
 
-test_workers = False
+
 
 
 try:

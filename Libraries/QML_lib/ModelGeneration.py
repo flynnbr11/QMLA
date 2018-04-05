@@ -380,7 +380,8 @@ def ising_transverse(model_list, spawn_step):
 # TODO before using this function, need to add a max_spawn_depth to the dict above for ising_transverse. How many spawns can it support?
     single_qubit_terms = ['xTi', 'yTi', 'zTi']
     nontransverse_terms = ['xTx', 'yTy', 'zTz']
-    transverse_terms = ['xTy', 'xTz', 'yTx', 'yTz', 'zTy', 'zTx']
+    all_transverse_terms = ['xTy', 'xTz', 'yTx', 'yTz', 'zTy', 'zTx']
+    transverse_terms = ['xTy', 'xTz','yTz']
     all_two_qubit_terms =  single_qubit_terms + nontransverse_terms  + transverse_terms
     if len(model_list) > 1:
         print("Only one model required for transverse Ising growth.")
