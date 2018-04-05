@@ -822,12 +822,8 @@ def check_model_in_dict(name, model_dict):
     """
     # Return true indicates it has not been considered and so can be added
     
-    print("Checking whether", name, " in dict")
     al_name = alph(name)
     n_qub = get_num_qubits(name)
-
-    print("Alph:", al_name)
-    print("Current models: ",model_dict[n_qub])
 
     if al_name in model_dict[n_qub]:
         return True # todo -- make clear if in legacy or running db

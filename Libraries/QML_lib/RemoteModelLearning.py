@@ -39,13 +39,13 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False):
         print("QHL for", name, "remote:", remote)
         # Get params from qmd_info
         if qmd_info == None:
-            print("Trying to load qmd info from redis db")
+            #print("Trying to load qmd info from redis db")
             qmd_info = pickle.loads(qmd_info_db['QMDInfo'])
-            print("Trying to load probe dict info from redis db")
+            #print("Trying to load probe dict info from redis db")
             probe_dict = pickle.loads(qmd_info_db['ProbeDict'])
         else: # if in serial, qmd_info given, with probe_dict included in it. 
             probe_dict = qmd_info['probe_dict']
-        print("QMD info loaded")
+        #print("QMD info loaded")
 
         true_ops = qmd_info['true_oplist']
         true_params = qmd_info['true_params']
@@ -77,7 +77,6 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False):
         # add model_db_new_row to model_db and running_database
         # Note: do NOT use pd.df.append() as this copies total DB,
         # appends and returns copy.
-        print("Trying to initialise new model with id", modelID, " and name", name)
         qml_instance.InitialiseNewModel(
           trueoplist = true_ops,
           modeltrueparams = true_params,
@@ -95,12 +94,11 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False):
           debug_directory = debug_directory,
           qle = qle
         )
-        print("QML instance generated")
         qml_instance.UpdateModel(n_experiments = num_experiments, sigma_threshold = sigma_threshold)
         updated_model_info = copy.deepcopy(qml_instance.learned_info_dict()) # possibly need to take a copy
         del qml_instance
 
-        compressed_info = pickle.dumps(updated_model_info, protocol=2) #TODO is there a way to use higher protocol when using python3 for faster pickling?
+        compressed_info = pickle.dumps(updated_model_info, protocol=2) #TODO is there a way to use higher protocol when using python3 for faster pickling? this seems to need to be decoded using encoding='latin1'.... not entirely clear why this encoding is used
         learned_models_info.set(str(modelID), compressed_info)
         learned_models_ids.set(str(modelID), True)
 

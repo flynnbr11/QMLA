@@ -14,11 +14,16 @@ except:
 
 if host_name is None:
     host_name= 'localhost'
+#    host_name = 'redis://localhost:6379/1'
 
 
 
 print("Using host name ", host_name)
 port_number = 6379
+
+
+#use_rq = bool(os.getenv("USE_RQ"))
+#print("use rq from environment:", use_rq)
 
 qmd_info_db = redis.StrictRedis(host=host_name, port=port_number, db=0)
 learned_models_info = redis.StrictRedis(host=host_name, port=port_number, db=1)
@@ -38,7 +43,7 @@ try:
     pickle.HIGHEST_PROTOCOL=2
     from rq import Connection, Queue, Worker
 
-    redis_conn = redis.Redis()
+    redis_conn = redis.Redis(host=host_name, port=port_number)
     q = Queue(connection=redis_conn, async=test_workers, default_timeout=3600) # TODO is this timeout sufficient for ALL QMD jobs?
     parallel_enabled = True
 except:

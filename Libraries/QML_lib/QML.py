@@ -382,8 +382,8 @@ class ModelLearningClass():
         learned_info['volume_list'] = self.VolumeList
 
 
-        learned_info['updater'] = pickle.dumps(self.Updater, protocol=2)
-        learned_info['gen_sim_model'] = pickle.dumps(self.GenSimModel, protocol=2)
+        #learned_info['updater'] = pickle.dumps(self.Updater, protocol=2)
+        #learned_info['gen_sim_model'] = pickle.dumps(self.GenSimModel, protocol=2)
 
 
         return learned_info
@@ -492,7 +492,7 @@ class reducedModel():
         if learned_info is None:
             model_id_float = float(self.ModelID)
             model_id_str = str(model_id_float)
-            learned_info = pickle.loads(learned_models_info.get(model_id_str))        
+            learned_info = pickle.loads(learned_models_info.get(model_id_str), encoding='latin1') # TODO telling pickle which encoding was used, though I'm not sure why/where that encoding was given...        
 
         self.Times = learned_info['times']
         self.FinalParams = learned_info['final_params'] # should be final params from learning process
@@ -541,15 +541,18 @@ class modelClassForRemoteBayesFactor():
         
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_model_info['normalization_record']
-#        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict)    
+        
+        
+        
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict)    
 
-        #self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
+        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
         #self.Updater._normalization_record = self._normalization_record
         #self.Updater._data_record = learned_model_info['data_record']
         
         
-        self.GenSimModel = pickle.loads(learned_model_info['gen_sim_model'])
-        self.Updater = pickle.loads(learned_model_info['updater'])
+        #self.GenSimModel = pickle.loads(learned_model_info['gen_sim_model'])
+        #self.Updater = pickle.loads(learned_model_info['updater'])
         # TODO not clear which is quicker: generating new instance of classes/updater or unpickling every time.
         del qmd_info, learned_model_info
         

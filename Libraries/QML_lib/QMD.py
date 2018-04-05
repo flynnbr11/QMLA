@@ -10,7 +10,6 @@ import time as time
 from time import sleep
 import random
 from psutil import virtual_memory
-from RedisSettings import *
  # only want to do this once at the start!
 import pickle 
 pickle.HIGHEST_PROTOCOL=2 # TODO if >python3, can use higher protocol
@@ -19,6 +18,10 @@ import matplotlib
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 import math
+
+
+# import from RedisSettings only when env variables set.
+from RedisSettings import *
 
 # Local files
 import Evo as evo
@@ -56,9 +59,9 @@ class QMD():
                  debug_directory = None,
                  qle = True, # Set to False for IQLE
                  parallel = False,
+                 use_rq=True, 
                  growth_generator='simple_ising'
                 ):
-        flushdatabases() # fresh redis databases for this instance of QMD.
 #    def __init__(self, initial_op_list, true_op_list, true_param_list):
         self.QLE = qle # Set to False for IQLE
         trueOp = DataBase.operator(true_operator)
@@ -122,8 +125,10 @@ class QMD():
         self.BranchAllModelsLearned = { 0 : False}
         self.BranchComparisonsComplete = {0 : False}
 #        active_branches_bayes.set(int(0), 0)
-
-
+        
+        self.use_rq = use_rq
+        flushdatabases() # fresh redis databases for this instance of QMD.
+ 
         
         if self.QLE:
             self.QLE_Type = 'QLE'
@@ -690,7 +695,7 @@ class QMD():
         branch_champions = list(self.BranchChampions.values())
         job_list = []
         job_finished_count = 0
-        interbranch_collapse_threshold = 100 ## if a spawned model is this much better than its parent, parent is deactivated
+        interbranch_collapse_threshold = 1e5 ## if a spawned model is this much better than its parent, parent is deactivated
         num_champs = len(branch_champions)
         
         for k in range( num_champs -1 ):
@@ -701,23 +706,28 @@ class QMD():
             
         print("Entering while loop in final bayes fnc.")
         print("num champs = ", num_champs)
-        while job_finished_count < num_champs:
-            # wait for those to finish
-            sleep(0.1)
+        
+        if test_workers:
             for k in range(len(job_list)):
-                if job_list[k].is_finished == True:
-                    job_finished_count += 1 
-            
+                while job_list[k].is_finished == False:
+                    sleep(0.01)
+        else:
+            print("Jobs all finished because not on RQ")
+                        
+#        print("Job finished count=", job_finished_count)    
         for k in range(num_champs - 1):
             mod1 = branch_champions[k]
             mod2 = branch_champions[k+1]
             pair_id = DataBase.unique_model_pair_identifier(mod1, mod2)
-            bayes_factor = float(bayes_factors_db.get(pair_id))
+            bf_from_db = bayes_factors_db.get(pair_id)
+            bayes_factor = float(bf_from_db)
         
             if bayes_factor > interbranch_collapse_threshold:
                 # bayes_factor heavily favours mod1, so deactive mod2
+                print("Parent model, ", mod1, "stronger than spawned; deactivating model", mod2)
                 self.updateModelRecord(model_id=mod2, field='Status', new_value='Deactivated')
             elif bayes_factor < (1.0/interbranch_collapse_threshold):
+                print("Spawned model", mod2, "stronger than parent; deactivating model", mod1)
                 self.updateModelRecord(model_id=mod1, field='Status', new_value='Deactivated')
         
         

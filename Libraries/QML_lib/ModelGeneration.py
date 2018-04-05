@@ -34,7 +34,7 @@ max_spawn_depth_info = {
     'hyperfine' : 3,
     'ising_non_transverse' : 5,
     'ising_transverse' : 11,
-    'hyperfine_like' : 7
+    'hyperfine_like' : 8
 }
 
 
