@@ -34,7 +34,9 @@ read_env = True
 print("in redis settings, parent pid:", os.getppid())
 
 try:
-    env_vars = pickle.load(open('/home/bf16951/Dropbox/QML_share_stateofart/QMD/ValidateQLE/environment_variables.p', 'rb')) # TODO don't use absolute path of my laptop!
+#    env_vars = pickle.load(open('/home/bf16951/Dropbox/QML_share_stateofart/QMD/ValidateQLE/environment_variables.p', 'rb')) # TODO don't use absolute path of my laptop!
+
+	env_vars = pickle.load(open('/panfs/panasas01/phys/bf16951/QMD/ValidateQLE/environment_variables.p', 'rb')) ## For blue crystal
 #    env_vars = pickle.load(open('environment_variables.p', 'rb')) # TODO don't use absolute path of my 
 except:
     print("Failed; directory:", os.getcwd())
