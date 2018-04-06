@@ -1,5 +1,7 @@
+from __future__ import print_function # so print doesn't show brackets
 import redis
 import os, sys
+import pickle
 #TODO do as list?
 #TODO do in function and return unique set of dbs.. or else set list of port ids in QMD, cycle through them so several QMDs can be run simultaneously. 
 
@@ -24,20 +26,47 @@ port_number = 6379
 
 
 
+print("Redis settings")
+
+read_env = True
 
 
-test_workers = False
-host_name = 'localhost'
-port_number = 6379
+print("in redis settings, parent pid:", os.getppid())
+
+try:
+    env_vars = pickle.load(open('/home/bf16951/Dropbox/QML_share_stateofart/QMD/ValidateQLE/environment_variables.p', 'rb')) # TODO don't use absolute path of my laptop!
+#    env_vars = pickle.load(open('environment_variables.p', 'rb')) # TODO don't use absolute path of my 
+except:
+    print("Failed; directory:", os.getcwd())
+    print("Paths:")
+    for p in sys.path:
+        print(p)
+    read_env = False
 
 
-#use_rq = bool(os.getenv("USE_RQ"))
-#print("use rq from environment:", use_rq)
+#sys.path.append(os.path.join("..", "Libraries","QML_lib"))
+
+
+
+if read_env:
+    print("Reading from environment_variables pickled object.")
+    test_workers = env_vars['use_rq']
+    host_name = env_vars['host']
+    port_number = env_vars['port']
+else:
+    test_workers = False
+    host_name = 'localhost'
+    port_number = 6379
+
+print("test workers:", test_workers)
+print("host name", host_name)
+print("port number", port_number)
+
 
 qmd_info_db = redis.StrictRedis(host=host_name, port=port_number, db=0)
 learned_models_info = redis.StrictRedis(host=host_name, port=port_number, db=1)
 learned_models_ids = redis.StrictRedis(host=host_name, port=port_number, db=2)
-bayes_factors_db = redis.StrictRedis(host=host_name, port=port_number, db=3) # Don't think this is a good approach for bayes factors since you'd need an entire db for each model id
+bayes_factors_db = redis.StrictRedis(host=host_name, port=port_number, db=3) 
 bayes_factors_winners_db = redis.StrictRedis(host=host_name, port=port_number, db=4)
 active_branches_learning_models = redis.StrictRedis(host=host_name, port=port_number, db=5)
 active_branches_bayes = redis.StrictRedis(host=host_name, port=port_number, db=6)

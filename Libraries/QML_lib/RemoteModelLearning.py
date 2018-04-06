@@ -16,7 +16,7 @@ import copy
 
 try:
     from RedisSettings import * 
-    enfore_serial = False  
+    enforce_serial = False  
 except:
     enforce_serial = True # shouldn't be needed
       

@@ -1,4 +1,7 @@
 import argparse
+import os, sys
+import pickle 
+
 default_host_name = 'localhost'
 default_port_number = 6379
 default_use_rq = 1
@@ -156,6 +159,23 @@ def parse_cmd_line_args(args):
       default=1.0
     )
 
+
+    ## Redis environment
+    parser.add_argument(
+      '-host', '--redis_host',
+      help='Name of Redis host.',
+      type=str,
+      default='localhost'
+    )
+    parser.add_argument(
+      '-port', '--redis_port_number',
+      help='Redis port number.',
+      type=int,
+      default=6379
+    )
+
+
+
     # Process arguments from command line
     arguments = parser.parse_args(args)
     
@@ -196,5 +216,26 @@ def parse_cmd_line_args(args):
         pgh_factor = pgh_factor
     )
     
+    
+    
+    # Redis environment
+    redis_use_rq = arguments.use_rq
+    redis_host_name = arguments.redis_host
+    redis_port_number = arguments.redis_port_number
+    
+    os.environ["USE_RQ"] = str(use_rq)
+    os.environ["REDIS_HOST"] = str(redis_host_name)
+    os.environ["REDIS_PORT_NUMBER"] = str(redis_port_number)
+    
+    
+    environment_variables = {
+        'use_rq' : use_rq,
+        'host' : redis_host_name,
+        'port' : redis_port_number
+    }
+
+    sys.path.append(os.path.join("..", "..","ValidateQLE"))
+
+    pickle.dump(environment_variables, open('environment_variables.p', 'wb'), protocol=2)
     return global_variables
 
