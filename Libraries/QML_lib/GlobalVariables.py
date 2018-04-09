@@ -1,12 +1,30 @@
 import argparse
 import os, sys
 import pickle 
+def get_directory_name_by_time(just_date=False):
+    import datetime
+    # Directory name based on date and time it was generated 
+    # from https://www.saltycrane.com/blog/2008/06/how-to-get-current-date-and-time-in/
+    now =  datetime.date.today()
+    year = now.strftime("%y")
+    month = now.strftime("%b")
+    day = now.strftime("%d")
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    date = str (str(day)+'_'+str(month)+'_'+str(year) )
+    time = str(str(hour)+'_'+str(minute))
+    name = str(date+'/'+time+'/')
+    if just_date is False:
+        return name
+    else: 
+        return str(date+'/')
+
 
 default_host_name = 'localhost'
 default_port_number = 6379
 default_use_rq = 1
 default_do_iqle  = 0 
-defaul_do_qle = 1
+default_do_qle = 1
 default_use_rq = 1
 default_num_runs = 1
 default_num_tests = 1
@@ -19,6 +37,13 @@ default_do_plots =  0
 default_resample_threshold = 0.5
 default_resample_a = 0.95
 default_pgh_factor = 1.0
+default_qmd_id = 1
+default_results_directory = get_directory_name_by_time(just_date=False)
+default_pickle_qmd_class = 0
+default_port_number = 6379
+default_host = 'localhost'
+
+
 
 
 
@@ -29,7 +54,7 @@ class GlobalVariablesClass():
         port_number = default_port_number,
         use_rq = default_use_rq,
         do_iqle = default_do_iqle,
-        do_qle = defaul_do_qle,
+        do_qle = default_do_qle,
         num_runs = default_num_runs,
         num_tests = default_num_tests,
         num_qubits = default_num_qubits,
@@ -40,7 +65,10 @@ class GlobalVariablesClass():
         all_plots = default_do_plots,
         resample_threshold = default_resample_threshold,
         resample_a = default_resample_a,
-        pgh_factor = default_pgh_factor
+        pgh_factor = default_pgh_factor,
+        qmd_id = default_qmd_id,
+        results_directory = default_results_directory,
+        pickle_qmd_class = default_pickle_qmd_class
     ):
         self.do_iqle = do_iqle
         self.do_qle = do_qle
@@ -56,7 +84,20 @@ class GlobalVariablesClass():
         self.resample_threshold = resample_threshold
         self.resample_a = resample_a
         self.pgh_factor = pgh_factor
-
+        self.pickle_qmd_class = pickle_qmd_class
+        self.qmd_id = qmd_id
+        self.results_directory = 'Results/'+results_directory
+        
+        if self.results_directory[-1] != '/':
+            self.results_directory += '/'
+        
+        if not os.path.exists(self.results_directory):
+            os.makedirs(self.results_directory)
+            
+        self.long_id ='{0:03d}'.format(self.qmd_id)
+        self.results_file = self.results_directory+'results_'+str(self.long_id)+'.p' #for pickling results into
+        self.class_pickle_file = self.results_directory+'qmd_class_'+str(self.long_id)+'.p'
+        
 
 
 def parse_cmd_line_args(args):
@@ -69,38 +110,38 @@ def parse_cmd_line_args(args):
       '-r', '--num_runs', 
       help="Number of runs to perform majority voting.",
       type=int,
-      default=1
+      default=default_num_runs
     )
     parser.add_argument(
       '-t', '--num_tests', 
       help="Number of complete tests to average over.",
       type=int,
-      default=1
+      default=default_num_tests
     )
 
     parser.add_argument(
       '-e', '--num_experiments', 
       help='Number of experiments to use for the learning process',
       type=int,
-      default=5
+      default=default_num_experiments
     )
     parser.add_argument(
       '-p', '--num_particles', 
       help='Number of particles to use for the learning process',
       type=int,
-      default=10
+      default=default_num_particles
     )
     parser.add_argument(
       '-bt', '--bayes_times', 
       help='Number of times to consider in Bayes function.',
       type=int,
-      default=2
+      default=default_bayes_times
     )
     parser.add_argument(
       '-rq', '--use_rq', 
       help='Bool whether to use RQ for parallel or not.',
       type=int,
-      default=1
+      default=default_use_rq
     )
 
     ## Parameters about the model to use as true model (currently deprecated)
@@ -108,13 +149,13 @@ def parse_cmd_line_args(args):
       '-q', '--num_qubits', 
       help='Number of qubits to run tests for.',
       type=int,
-      default=2
+      default=default_num_qubits
     )
     parser.add_argument(
       '-pm', '--num_parameters', 
       help='Number of parameters to run tests for.',
       type=int,
-      default=1
+      default=default_num_parameters
     )
 
     ## Whether to use QLE, IQLE or both (currently deprecated)
@@ -122,13 +163,13 @@ def parse_cmd_line_args(args):
       '-qle',
       help='True to perform QLE, False otherwise.',
       type=int,
-      default=1
+      default=default_do_qle
     )
     parser.add_argument(
       '-iqle',
       help='True to perform IQLE, False otherwise.',
       type=int,
-      default=1
+      default=default_do_iqle
     )
 
     ## Include optional plots
@@ -136,7 +177,7 @@ def parse_cmd_line_args(args):
       '-pt', '--plots',
       help='True: do generate all plots for this script; False: do not.',
       type=int,
-      default=0
+      default=default_do_plots
     )
 
     ## QInfer parameters, i.e. resampling a and resamping threshold, pgh prefactor.
@@ -144,19 +185,19 @@ def parse_cmd_line_args(args):
       '-rt', '--resample_threshold',
       help='Resampling threshold for QInfer.',
       type=float,
-      default=0.6
+      default=default_resample_threshold
     )
     parser.add_argument(
       '-ra', '--resample_a',
       help='Resampling a for QInfer.',
       type=float,
-      default=0.9
+      default=default_resample_a
     )
     parser.add_argument(
       '-pgh', '--pgh_factor',
       help='Resampling threshold for QInfer.',
       type=float,
-      default=1.0
+      default=default_pgh_factor
     )
 
 
@@ -165,13 +206,33 @@ def parse_cmd_line_args(args):
       '-host', '--redis_host',
       help='Name of Redis host.',
       type=str,
-      default='localhost'
+      default=default_host
     )
     parser.add_argument(
       '-port', '--redis_port_number',
       help='Redis port number.',
       type=int,
-      default=6379
+      default=default_port_number
+    )
+
+
+    parser.add_argument(
+      '-qid', '--qmd_id',
+      help='ID tag for QMD.',
+      type=int,
+      default=default_qmd_id
+    )
+    parser.add_argument(
+      '-dir', '--results_directory',
+      help='Relative directory to store results in.',
+      type=str,
+      default=default_results_directory
+    )
+    parser.add_argument(
+      '-pkl', '--pickle_result_class',
+      help='Store QMD class in pickled file at end. Large memory requirement, recommend not to.',
+      type=int,
+      default=default_pickle_qmd_class
     )
 
 
@@ -195,6 +256,9 @@ def parse_cmd_line_args(args):
     resample_threshold = arguments.resample_threshold
     resample_a = arguments.resample_a
     pgh_factor = arguments.pgh_factor
+    qmd_id = arguments.qmd_id
+    results_directory = arguments.results_directory
+    pickle_qmd_class = bool(arguments.pickle_result_class)
     
     
     # Use arguments to initialise global variables class. 
@@ -213,7 +277,10 @@ def parse_cmd_line_args(args):
         all_plots = arguments.plots,
         resample_threshold = resample_threshold,
         resample_a = resample_a,
-        pgh_factor = pgh_factor
+        pgh_factor = pgh_factor,
+        qmd_id = qmd_id, 
+        results_directory = results_directory,
+        pickle_qmd_class = pickle_qmd_class
     )
     
     
@@ -234,8 +301,10 @@ def parse_cmd_line_args(args):
         'port' : redis_port_number
     }
 
-    sys.path.append(os.path.join("..", "..","ValidateQLE"))
+    sys.path.append(os.path.join("..", "..","ExperimentalSimulations"))
 
     pickle.dump(environment_variables, open('environment_variables.p', 'wb'), protocol=2)
     return global_variables
+
+
 

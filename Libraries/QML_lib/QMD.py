@@ -1005,6 +1005,7 @@ class QMD():
         
 
         self.ChampionName = final_winner
+        champid = self.pullField(name=final_winner, field='ModelID')
         print("Final winner = ", final_winner)
 
         self.updateDataBaseModelValues()
@@ -1012,6 +1013,16 @@ class QMD():
             # Dict of all Bayes factors for each model considered. 
             self.AllBayesFactors[i] = self.reducedModelInstanceFromID(i).BayesFactors
             # TODO also pull bayes factors of branch champions in parent/child collapse stage. 
+
+
+
+        self.ChampionFinalParams = self.reducedModelInstanceFromID(champid).FinalParams
+
+        self.ChampionResultsDict = {
+            'NameAlphabetical' : DataBase.alph(self.ChampionName),
+            'NameNonAlph' : self.ChampionName,
+            'FinalParams' : self.ChampionFinalParams
+        }
 
 
 
