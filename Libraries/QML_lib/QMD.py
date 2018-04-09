@@ -1021,7 +1021,8 @@ class QMD():
         self.ChampionResultsDict = {
             'NameAlphabetical' : DataBase.alph(self.ChampionName),
             'NameNonAlph' : self.ChampionName,
-            'FinalParams' : self.ChampionFinalParams
+            'FinalParams' : self.ChampionFinalParams,
+            'LatexName' : DataBase.latex_name_ising(self.ChampionName)
         }
 
 

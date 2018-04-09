@@ -417,7 +417,8 @@ def hyperfine_like(model_list, spawn_step, model_dict):
     import random
     single_qubit_terms = ['xTi', 'yTi', 'zTi']
     nontransverse_terms = ['xTx', 'yTy', 'zTz']
-    transverse_terms = ['xTy', 'xTz', 'yTx', 'yTz', 'zTy', 'zTx']
+    # transverse_terms = ['xTy', 'xTz', 'yTx', 'yTz', 'zTy', 'zTx']
+    transverse_terms = ['xTy', 'xTz', 'yTz']
     all_two_qubit_terms =  single_qubit_terms + nontransverse_terms  + transverse_terms
     if len(model_list) > 1:
         print("Only one model required for transverse Ising growth.")
@@ -439,10 +440,10 @@ def hyperfine_like(model_list, spawn_step, model_dict):
                 new_model = model+'PP'+term
                 new_models.append(new_model)
 
-    else: 
+    elif spawn_step == 6: 
         i=0
         while i < 3:
-            term = random.choice(all_two_qubit_terms)
+            term = random.choice(transverse_terms)
             
             if term not in present_terms:
                 new_model = model+'PP'+term
@@ -450,20 +451,32 @@ def hyperfine_like(model_list, spawn_step, model_dict):
                     
                     new_models.append(new_model)
                     i+=1
-        
-    """
-    elif spawn_step in [3,4,5]:
-        for term in nontransverse_terms:
+    elif spawn_step == 7: 
+        i=0
+        while i < 2:
+            term = random.choice(transverse_terms)
+            
             if term not in present_terms:
                 new_model = model+'PP'+term
-                new_models.append(new_model)
+                if DataBase.check_model_in_dict(new_model, model_dict) == False and new_model not in new_models:
+                    
+                    new_models.append(new_model)
+                    i+=1
 
-    else:
-        for term in transverse_terms:
+    elif spawn_step == 8: 
+        i=0
+        while i < 1:
+            term = random.choice(transverse_terms)
+            
             if term not in present_terms:
                 new_model = model+'PP'+term
-                new_models.append(new_model)
-    """
+                if DataBase.check_model_in_dict(new_model, model_dict) == False and new_model not in new_models:
+                    
+                    new_models.append(new_model)
+                    i+=1
+
+
+        
     return new_models    
 
 
