@@ -16,3 +16,6 @@ done
 
 cd ../Libraries/QML_lib
 python3 AnalyseMultipleQMD.py -dir=$long_dir
+
+
+# TODO google array job for PBS -- node exclusive flag
