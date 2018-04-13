@@ -13,15 +13,18 @@ then
     script_dir="/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations"
     SERVER_HOST='localhost'
         
-elif [ "$host" == "newblue*" ]
+elif [ "$host" == "newblue4" ]
 then
+    echo "BC identified"
     echo "host= $host"
     running_dir=$(pwd)
     lib_dir="/panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib"
     script_dir="/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations"
     module load tools/redis-4.0.8
     module load mvapich/gcc/64/1.2.0-qlc
-    SERVER_HOST=$(head -1 "$PBS_NODEFILE")
+#    SERVER_HOST=$(head -1 "$PBS_NODEFILE")
+    SERVER_HOST='localhost'
+
 
 else
     echo "neither local machine or blue crystal identified." 
