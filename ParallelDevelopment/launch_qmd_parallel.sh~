@@ -26,7 +26,7 @@ then
     SERVER_HOST='localhost'
 
 
-elif [[ "$host" == "node"* ]]
+elif [ "$host" == "node"* ]
 then
     echo "BC backend identified"
     echo "host= $host"
