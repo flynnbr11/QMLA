@@ -1,7 +1,7 @@
 #!/bin/bash
 
-max_qmd_id=10
-directory="Pipeline/"
+max_qmd_id=5
+directory="testdir/"
 
 cwd=$(pwd)
 long_dir="$cwd/Results/$directory"

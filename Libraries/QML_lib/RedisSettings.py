@@ -2,31 +2,8 @@ from __future__ import print_function # so print doesn't show brackets
 import redis
 import os, sys
 import pickle
-#TODO do as list?
-#TODO do in function and return unique set of dbs.. or else set list of port ids in QMD, cycle through them so several QMDs can be run simultaneously. 
 
 
-"""
-try:
-	host_name = os.getenv("QMD_REDIS_HOST")
-except:
-	print("Couldn't find environment variable for Redis server name.")
-	host_name= 'localhost'
-
-
-if host_name is None:
-    host_name= 'localhost'
-#    host_name = 'redis://localhost:6379/1'
-
-
-
-print("Using host name ", host_name)
-port_number = 6379
-"""
-
-
-
-print("Redis settings")
 
 read_env = True
 
@@ -67,6 +44,19 @@ print("host name", host_name)
 print("port number", port_number)
 
 
+try:
+    import pickle
+    pickle.HIGHEST_PROTOCOL=2
+    from rq import Connection, Queue, Worker
+
+    redis_conn = redis.Redis(host=host_name, port=port_number)
+    q = Queue(connection=redis_conn, async=test_workers, default_timeout=3600) # TODO is this timeout sufficient for ALL QMD jobs?
+    parallel_enabled = True
+except:
+    parallel_enabled = False    
+
+
+
 qmd_info_db = redis.StrictRedis(host=host_name, port=port_number, db=0)
 learned_models_info = redis.StrictRedis(host=host_name, port=port_number, db=1)
 learned_models_ids = redis.StrictRedis(host=host_name, port=port_number, db=2)
@@ -80,16 +70,6 @@ active_interbranch_bayes =  redis.StrictRedis(host=host_name, port=port_number, 
 
 
 
-try:
-    import pickle
-    pickle.HIGHEST_PROTOCOL=2
-    from rq import Connection, Queue, Worker
-
-    redis_conn = redis.Redis(host=host_name, port=port_number)
-    q = Queue(connection=redis_conn, async=test_workers, default_timeout=3600) # TODO is this timeout sufficient for ALL QMD jobs?
-    parallel_enabled = True
-except:
-    parallel_enabled = False    
 
 
 

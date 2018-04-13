@@ -482,7 +482,7 @@ class reducedModel():
         self.QLE = qmd_info['qle']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.BayesFactors = {}
-
+        self.LatexTerm = DB.latex_name_ising(self.Name)
         
     def updateLearnedValues(self, learned_info=None):
         """

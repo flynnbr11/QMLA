@@ -1,13 +1,18 @@
 import numpy as np
-
+import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib import collections
 from matplotlib import ticker
 from matplotlib import transforms
+from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib.ticker import Formatter
+#from QMD import  *
+#from QML import *
+import DataBase
 
+#### Hinton Disagram ####
 
-def ising_name_processing(name):
+def latex_name_ising(name):
     terms=name.split('PP')
     rotations = ['xTi', 'yTi', 'zTi']
     hartree_fock = ['xTx', 'yTy', 'zTz']
@@ -28,34 +33,28 @@ def ising_name_processing(name):
             present_t.append(string)
         else:
             print("Term",t,"doesn't belong to rotations, Hartree-Fock or transverse.")
-
+            print("Given name:", name)
     present_r.sort()
     present_hf.sort()
     present_t.sort()
-    
-    return present_r, present_hf, present_t
-    
 
-def latex_processing(splitname):    
-    outstring = ['$']
-    indices = range(len(splitname))
-    for termindex in indices:
-        termclass = splitname[termindex]
-        if len(termclass)>0:
-            if termindex is 0 :
-                outstring.append('R_{')
-            elif termindex is 1 :
-                outstring.append('HF_{')
-            else:
-                outstring.append('T_{')
-            for term in termclass:
-                outstring.append(term)
-                if (termindex is 2) and (termclass.index(term) is not len(termclass)-1):
-                    outstring.append(',')
-            outstring.append('}')
-    outstring.append('$')
+    r_terms = ','.join(present_r)
+    hf_terms = ','.join(present_hf)
+    t_terms = ','.join(present_t)
+    
+    
+    latex_term = ''
+    if len(present_r) > 0:
+        latex_term+='R_{'+r_terms+'}'
+    if len(present_hf) > 0:
+        latex_term+='HF_{'+hf_terms+'}'
+    if len(present_t) > 0:
+        latex_term+='T_{'+t_terms+'}'
+    
+    final_term = 'r$'+latex_term+'$'
+    
+    return latex_term
 
-    return r''.join(outstring)
     
     
 def BayF_IndexDictToMatrix(ModelNames, AllBayesFactors, StartBayesFactors=None):
@@ -219,6 +218,8 @@ def hinton(inarray, max_value=None, use_default_ticks=True, skip_diagonal = True
         ax.xaxis.tick_top()
         ax.yaxis.tick_right()
         
+        
+        
 def format_fn(tick_val, tick_pos, labels):
     
     if int(tick_val) in range(len(labels)):
@@ -245,4 +246,172 @@ class QMDFuncFormatter(Formatter):
 
         `x` and `pos` are passed through as-is.
         """
-        return self.func(x, pos, self.args)
+        return self.func(x, pos, self.args)   
+        
+def plotHinton(model_names, bayes_factors, save_to_file=None):
+    hinton_mtx=BayF_IndexDictToMatrix(model_names, bayes_factors)
+    log_hinton_mtx = np.log10(hinton_mtx)
+    labels = [latex_name_ising(name) for name in model_names.values()]
+
+
+    fig, ax = plt.subplots(figsize=(7,7))
+
+    hinton(log_hinton_mtx, use_default_ticks=True, skip_diagonal=True, where_labels='topright', skip_which='upper')
+    ax.xaxis.set_major_formatter(QMDFuncFormatter(format_fn, labels))
+    ax.yaxis.set_major_formatter(QMDFuncFormatter(format_fn, labels))
+    plt.xticks(rotation=90)
+
+    # savefigs(expdire, "EXP_CompareModels_BFhinton"+mytimestamp+".pdf")
+
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+    plt.show()
+    
+    
+    
+    
+###### Tree diagram #####
+
+def available_position_list(max_this_branch, max_any_branch):   
+    # Used to get a list of positions to place nodes centrally 
+    N = 2*max_any_branch - 1
+    all_nums = list(range(N))
+    evens = [a for a in all_nums if a%2==0]
+    odds = [a for a in all_nums if a%2!=0]    
+    
+    diff = max_any_branch-max_this_branch 
+    if diff%2==0:
+        all_positions = evens
+        even_odd = 'even'
+    else:
+        all_positions = odds
+        even_odd = 'odd'
+
+    if diff > 1:
+        if even_odd=='even':
+            to_cut = int(diff/2)
+            available_positions = all_positions[to_cut:-to_cut]
+        else:
+            to_cut = int((diff)/2)
+            available_positions = all_positions[to_cut:-to_cut]
+    else:
+        available_positions = all_positions
+        
+    return available_positions
+
+def adjacent_branch_test(qmd, mod1, mod2):
+    mod_a = qmd.reducedModelInstanceFromID(mod1).Name
+    mod_b = qmd.reducedModelInstanceFromID(mod2).Name
+    br_a = qmd.pullField(name=mod_a, field='branchID')
+    br_b = qmd.pullField(name=mod_b, field='branchID')
+       
+    diff = br_a - br_b
+    if diff in [-1, 0, 1]:
+        return True
+    else:
+        return False
+def plotTreeDiagram(qmd, modlist=None, save_to_file=None, only_adjacent_branches=True):
+    plt.clf()
+    plt.figure(figsize=(16,11))
+    G=nx.Graph()
+    losing_node_colour = 'r'
+    branch_champ_node_colour = 'b'
+    overall_champ_node_colour = 'g'
+    positions = {}
+    labels = {}
+    edges_weights = {}
+    branch_x_filled = {}
+    branch_mod_count = {}
+    node_colours = {}
+    
+    
+    max_branch_id = qmd.HighestBranchID
+    max_mod_id = qmd.HighestModelID
+    if modlist is None:
+        modlist = range(max_mod_id)
+    for i in range(max_branch_id+1):
+        branch_x_filled[i] = 0
+        branch_mod_count[i] =  0 
+
+    for i in modlist:
+        G.add_node(i)
+        node_colours[i] = losing_node_colour
+        mod = qmd.reducedModelInstanceFromID(i)
+        name = mod.Name
+        branch=qmd.pullField(name=name, field='branchID')
+        branch_mod_count[branch] += 1
+        latex_term = mod.LatexTerm[1:]
+        labels[i] = latex_term
+
+    most_models_per_branch = max(branch_mod_count.values())
+    
+    for i in modlist:
+        mod = qmd.reducedModelInstanceFromID(i)
+        name = mod.Name
+        branch=qmd.pullField(name=name, field='branchID')
+        num_models_this_branch = branch_mod_count[branch]
+        pos_list = available_position_list(num_models_this_branch, most_models_per_branch)
+        branch_filled_so_far = branch_x_filled[branch]
+        branch_x_filled[branch]+=1
+        
+        x_pos = pos_list[branch_filled_so_far]
+        y_pos = branch
+        positions[i] = (x_pos, y_pos)
+
+    # set node colour based on whether that model won a branch 
+    for b in list(qmd.BranchChampions.values()):
+        node_colours[b] = branch_champ_node_colour
+    node_colours[qmd.ChampID] = overall_champ_node_colour
+    
+    edges = []
+    for a in modlist:
+        for b in modlist:
+            if adjacent_branch_test(qmd, a, b) or only_adjacent_branches==False:
+                if a!=b:
+                    unique_pair = DataBase.unique_model_pair_identifier(a,b)
+                    if unique_pair not in edges and unique_pair in qmd.BayesFactorsComputed:
+                        edges.append(unique_pair)
+    edge_tuples = []
+    weights = []
+    for pair in edges:
+        mod_ids = pair.split(",")
+        pair_tuple=tuple([int(s) for s in mod_ids])
+        pair_bf = qmd.AllBayesFactors[float(mod_ids[0])][float(mod_ids[1])][-1]
+        weights.append(pair_bf)
+        edge_tuples.append(pair_tuple)
+
+    edge_tuples = tuple(edge_tuples)
+    weights = np.log10(weights)
+    weights = tuple(weights)
+    n_colours = tuple(node_colours.values())
+    
+    nx.draw_networkx(
+        G, 
+        labels=labels, 
+        pos=positions, 
+        width=5,
+        k=2, #node spacing
+        arrows=True,
+        arrowstyle='->',
+        node_size=5000,
+        linewidth=5,
+        node_shape='8',
+        node_color=n_colours,
+        edgelist=edge_tuples,
+        edge_color=weights, 
+        edge_cmap=plt.cm.Spectral,
+    )  
+    
+    edges_for_cmap = nx.draw_networkx_edges(G,pos=positions,edgelist=edge_tuples, edge_color=weights,width=4,edge_cmap=plt.cm.Spectral)
+       
+    plt.tight_layout()
+    plt.gca().invert_yaxis() # so branch 0 on top
+    plt.gca().get_xaxis().set_visible(False)
+    plt.ylabel('Branch')
+    plt.colorbar(edges_for_cmap)
+    plt.title('Tree Diagram for QMD')
+
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
+        

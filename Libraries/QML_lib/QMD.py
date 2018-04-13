@@ -29,6 +29,7 @@ import DataBase
 import QML
 import ModelGeneration
 import BayesF
+import PlotQMD 
 from RemoteModelLearning import *
 from RemoteBayesFactor import * 
 # Class definition
@@ -746,6 +747,7 @@ class QMD():
         
         
         active_models = DataBase.all_active_model_ids(self.db)
+        self.SurvivingChampions = DataBase.all_active_model_ids(self.db)
         print("After initial interbranch comparisons, remaining active branch champions:", active_models)
         num_active_models = len(active_models)
         
@@ -1005,7 +1007,7 @@ class QMD():
         
 
         self.ChampionName = final_winner
-        champid = self.pullField(name=final_winner, field='ModelID')
+        self.ChampID = self.pullField(name=final_winner, field='ModelID')
         print("Final winner = ", final_winner)
 
         self.updateDataBaseModelValues()
@@ -1016,8 +1018,9 @@ class QMD():
 
 
 
-        self.ChampionFinalParams = self.reducedModelInstanceFromID(champid).FinalParams
+        self.ChampionFinalParams = self.reducedModelInstanceFromID(self.ChampID).FinalParams
 
+        
         self.ChampionResultsDict = {
             'NameAlphabetical' : DataBase.alph(self.ChampionName),
             'NameNonAlph' : self.ChampionName,
@@ -1027,7 +1030,7 @@ class QMD():
 
 
 
-
+    
                     
                
 
@@ -1134,6 +1137,36 @@ class QMD():
             plt.savefig(save_to_file, bbox_extra_artists=(lgd,), bbox_inches='tight')
     
 
+    def plotHintonAllModels(self, save_to_file=None):
+        PlotQMD.plotHinton(model_names=self.ModelNameIDs, bayes_factors=self.AllBayesFactors, save_to_file=save_to_file)
+
+
+    def plotHintonListModels(self, model_list, save_to_file=None):
+        bayes_factors = {}
+        for a in model_list:
+            bayes_factors[a] = {}
+            key_empty = True
+            for b in model_list:
+                if a!=b:
+                    try:
+                        bayes_factors[a][b] = self.AllBayesFactors[a][b]
+                        key_empty = False
+                    except:
+                        pass
+            if key_empty:
+                bayes_factors.pop(a)
+            
+        model_name_dict = {}
+        for m in model_list:
+            model_name_dict[m] = DataBase.model_name_from_id(self.db, m)
+        
+        
+        PlotQMD.plotHinton(model_names=model_name_dict, bayes_factors=bayes_factors, save_to_file=save_to_file)
+        
+
+
+    def plotTreeDiagram(self, modlist=None, save_to_file=None):
+        PlotQMD.plotTreeDiagram(self, modlist=modlist, save_to_file=save_to_file)
 
     def majorityVotingTally(self):
         mod_ids = DataBase.list_model_id_in_branch(self.db, 0)

@@ -88,6 +88,13 @@ for i in range(global_variables.num_runs):
     qmd.plotVolumes(save_to_file=global_variables.results_directory+'volumes_all_models_'+str(global_variables.long_id)+'.png')
     qmd.plotVolumes(branch_champions=True, save_to_file=global_variables.results_directory+'volumes_branch_champs_'+str(global_variables.long_id) +'.png')
     
+    qmd.plotHintonAllModels(save_to_file=global_variables.results_directory+'hinton_'+str(global_variables.long_id)+'.png')
+    
+    qmd.plotHintonListModels(model_list=qmd.SurvivingChampions, save_to_file=global_variables.results_directory+'hinton_champions_'+str(global_variables.long_id)+'.png')
+    
+    
+    qmd.plotTreeDiagram(save_to_file = global_variables.results_directory+'tree_diagram_'+str(global_variables.long_id)+'.png')
+    
     results_file = global_variables.results_file
     pickle.dump(qmd.ChampionResultsDict, open(results_file, "wb"), protocol=2)
         

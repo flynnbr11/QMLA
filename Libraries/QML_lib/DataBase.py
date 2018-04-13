@@ -568,7 +568,7 @@ def latex_name_ising(name):
             present_t.append(string)
         else:
             print("Term",t,"doesn't belong to rotations, Hartree-Fock or transverse.")
-
+            print("Given name:", name)
     present_r.sort()
     present_hf.sort()
     present_t.sort()
@@ -586,7 +586,9 @@ def latex_name_ising(name):
     if len(present_t) > 0:
         latex_term+='T_{'+t_terms+'}'
     
-    return latex_term
+    final_term = 'r$'+latex_term+'$'
+    
+    return final_term
     
 
 
