@@ -90,7 +90,7 @@ for i in range(global_variables.num_runs):
     
     qmd.plotHintonAllModels(save_to_file=global_variables.results_directory+'hinton_'+str(global_variables.long_id)+'.png')
     
-    qmd.plotHintonListModels(model_list=qmd.SurvivingChampions, save_to_file=global_variables.results_directory+'hinton_champions_'+str(global_variables.long_id)+'.png')
+#    qmd.plotHintonListModels(model_list=qmd.SurvivingChampions, save_to_file=global_variables.results_directory+'hinton_champions_'+str(global_variables.long_id)+'.png')
     
     
     qmd.plotTreeDiagram(save_to_file = global_variables.results_directory+'tree_diagram_'+str(global_variables.long_id)+'.png')
