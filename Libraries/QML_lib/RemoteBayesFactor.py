@@ -57,8 +57,8 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
                 return (1.0/bayes_factor)
     else:
         
-        model_a = modelClassForRemoteBayesFactor(modelID=model_a_id)
-        model_b = modelClassForRemoteBayesFactor(modelID=model_b_id)
+        model_a = modelClassForRemoteBayesFactor(modelID=model_a_id, host_name=host_name, port_number=port_number, qid=qid)
+        model_b = modelClassForRemoteBayesFactor(modelID=model_b_id, host_name=host_name, port_number=port_number, qid=qid)
         print("Calculating Bayes factor bw", model_a.Name, "&", model_b.Name)
 
 

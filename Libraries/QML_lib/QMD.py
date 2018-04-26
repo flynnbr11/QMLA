@@ -243,7 +243,10 @@ class QMD():
             debug_directory = self.DebugDirectory,
             modelID = self.NumModels,
             redimensionalise = False,
-            qle = self.QLE
+            qle = self.QLE,
+            host_name = self.HostName, 
+            port_number = self.PortNumber, 
+            qid = self.Q_id
         )
         if tryAddModel == True: ## keep track of how many models/branches in play
             self.HighestModelID += 1 
@@ -405,8 +408,6 @@ class QMD():
             from rq import Connection, Queue, Worker
             queue = Queue(connection=self.redis_conn, async=self.use_rq, default_timeout=3600) # TODO is this timeout sufficient for ALL QMD jobs?
 
-            print("In remote bayes function; remote True")
-        
             job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, branchID=branchID, interbranch=interbranch, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName, bayes_threshold=bayes_threshold, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, timeout=3600) 
             print("Bayes factor calculation queued. Model IDs", model_a_id, model_b_id)
 
@@ -414,7 +415,6 @@ class QMD():
                 return job
 
         else:
-            print("In remote bayes function; remote False")
 
             BayesFactorRemote(model_a_id=model_a_id, model_b_id=model_b_id, trueModel=self.TrueOpName, branchID=branchID, interbranch=interbranch, bayes_threshold=bayes_threshold, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id)
             

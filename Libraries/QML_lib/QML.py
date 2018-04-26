@@ -60,6 +60,7 @@ class ModelLearningClass():
     
     def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, simopnames, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True, host_name='localhost', port_number=6379, qid=0):
 
+        print("In QML, qid=", qid)
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db'] 
         init_model_print_loc = False
@@ -469,7 +470,7 @@ class reducedModel():
 
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db'] 
-       # print("In reduced model. rds_dbs:", rds_dbs)
+        #print("In reduced model. rds_dbs:", rds_dbs)
       #  print("QMD INFO DB has type", type(qmd_info_db), "\n", qmd_info_db)
         
         self.Name = model_name
@@ -531,6 +532,7 @@ class modelClassForRemoteBayesFactor():
     qid=0):
 
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
+        #print("modelclass remote bayes:",rds_dbs)
         qmd_info_db = rds_dbs['qmd_info_db'] 
         learned_models_info = rds_dbs['learned_models_info']
     
@@ -539,7 +541,9 @@ class modelClassForRemoteBayesFactor():
         try:
             learned_model_info = pickle.loads(learned_models_info.get(model_id_str), encoding='latin1')        
         except:
+            #print(learned_models_info.get(model_id_str))
             learned_model_info = pickle.loads(learned_models_info.get(model_id_str))        
+
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])

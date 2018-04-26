@@ -100,7 +100,10 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
           pgh_prefactor = pgh_prefactor,
           gaussian=False,
           debug_directory = debug_directory,
-          qle = qle
+          qle = qle,
+          host_name = host_name,
+          port_number = port_number, 
+          qid=qid
         )
         qml_instance.UpdateModel(n_experiments = num_experiments, sigma_threshold = sigma_threshold)
         updated_model_info = copy.deepcopy(qml_instance.learned_info_dict()) # possibly need to take a copy
