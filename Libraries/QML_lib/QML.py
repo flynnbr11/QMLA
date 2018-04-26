@@ -11,7 +11,8 @@ import DataBase as DB
 from MemoryTest import print_loc
 from EvalLoss import *
 from psutil import virtual_memory
-from RedisSettings import *
+import RedisSettings as rds
+import redis
 import pickle
 pickle.HIGHEST_PROTOCOL=2
 
@@ -57,8 +58,10 @@ class ModelLearningClass():
     
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
     
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, simopnames, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True):
+    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, simopnames, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True, host_name='localhost', port_number=6379, qid=0):
 
+        rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
+        qmd_info_db = rds_dbs['qmd_info_db'] 
         init_model_print_loc = False
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 
@@ -462,13 +465,17 @@ class reducedModel():
     
     Then initialises an updater and GenSimModel which are used for updates. 
     """
-    def __init__(self, model_name, sim_oplist, true_oplist, true_params, numparticles, modelID, resample_thresh=0.5, resample_a=0.9, qle=True, probe_dict= None):
+    def __init__(self, model_name, sim_oplist, true_oplist, true_params, numparticles, modelID, resample_thresh=0.5, resample_a=0.9, qle=True, probe_dict= None, qid=0, host_name='localhost', port_number=6379):
 
+        rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
+        qmd_info_db = rds_dbs['qmd_info_db'] 
+       # print("In reduced model. rds_dbs:", rds_dbs)
+      #  print("QMD INFO DB has type", type(qmd_info_db), "\n", qmd_info_db)
+        
         self.Name = model_name
         self.ModelID = modelID
         self.SimOpList = sim_oplist
         self.ModelID = modelID
-        
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.NumParticles = qmd_info['num_particles']
@@ -483,11 +490,18 @@ class reducedModel():
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.BayesFactors = {}
         self.LatexTerm = DB.latex_name_ising(self.Name)
+        self.HostName = host_name
+        self.PortNumber = port_number
+        self.Q_id = qid
+        
         
     def updateLearnedValues(self, learned_info=None):
         """
         Pass a dict, learned_info, with essential info on reconstructing the state of the model, updater and GenSimModel
         """
+
+        rds_dbs = rds.databases_from_qmd_id(self.HostName, self.PortNumber, self.Q_id)
+        learned_models_info = rds_dbs['learned_models_info']
 
         if learned_info is None:
             model_id_float = float(self.ModelID)
@@ -513,10 +527,19 @@ class reducedModel():
         
 class modelClassForRemoteBayesFactor():
 #TODO: use this instead of full ModelClass above.
-    def __init__(self, modelID):
+    def __init__(self, modelID, host_name='localhost', port_number=6379,
+    qid=0):
+
+        rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
+        qmd_info_db = rds_dbs['qmd_info_db'] 
+        learned_models_info = rds_dbs['learned_models_info']
+    
         model_id_float = float(modelID)
         model_id_str = str(model_id_float)
-        learned_model_info = pickle.loads(learned_models_info.get(model_id_str))        
+        try:
+            learned_model_info = pickle.loads(learned_models_info.get(model_id_str), encoding='latin1')        
+        except:
+            learned_model_info = pickle.loads(learned_models_info.get(model_id_str))        
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])

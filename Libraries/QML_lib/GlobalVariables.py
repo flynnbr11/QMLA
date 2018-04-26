@@ -50,8 +50,6 @@ default_host = 'localhost'
 class GlobalVariablesClass():
     def __init__(
         self, 
-        host_name = default_host_name,
-        port_number = default_port_number,
         use_rq = default_use_rq,
         do_iqle = default_do_iqle,
         do_qle = default_do_qle,
@@ -67,6 +65,8 @@ class GlobalVariablesClass():
         resample_a = default_resample_a,
         pgh_factor = default_pgh_factor,
         qmd_id = default_qmd_id,
+        host_name = default_host,
+        port_number = default_port_number,
         results_directory = default_results_directory,
         pickle_qmd_class = default_pickle_qmd_class
     ):
@@ -86,6 +86,8 @@ class GlobalVariablesClass():
         self.pgh_factor = pgh_factor
         self.pickle_qmd_class = pickle_qmd_class
         self.qmd_id = qmd_id
+        self.host_name = host_name
+        self.port_number = port_number
         self.results_directory = 'Results/'+results_directory
         
         if self.results_directory[-1] != '/':
@@ -257,6 +259,8 @@ def parse_cmd_line_args(args):
     resample_a = arguments.resample_a
     pgh_factor = arguments.pgh_factor
     qmd_id = arguments.qmd_id
+    host_name = arguments.redis_host
+    port_number = arguments.redis_port_number
     results_directory = arguments.results_directory
     pickle_qmd_class = bool(arguments.pickle_result_class)
     
@@ -279,6 +283,8 @@ def parse_cmd_line_args(args):
         resample_a = resample_a,
         pgh_factor = pgh_factor,
         qmd_id = qmd_id, 
+        host_name = host_name,
+        port_number = port_number,
         results_directory = results_directory,
         pickle_qmd_class = pickle_qmd_class
     )

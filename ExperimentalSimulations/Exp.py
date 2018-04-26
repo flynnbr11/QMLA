@@ -77,7 +77,10 @@ for i in range(global_variables.num_runs):
         use_exp_custom=False, 
         compare_linalg_exp_tol=None,
         #growth_generator='ising_non_transverse'
-        growth_generator='hyperfine_like'
+        growth_generator='hyperfine_like',
+        q_id = global_variables.qmd_id,
+        host_name = global_variables.host_name,
+        port_number = global_variables.port_number
     )
     qmd.runRemoteQMD(num_spawns=3)
     

@@ -4,92 +4,60 @@ import os, sys
 import pickle
 
 
+databases_required  = [
+    'qmd_info_db',
+    'learned_models_info',
+    'learned_models_ids',
+    'bayes_factors_db',
+    'bayes_factors_winners_db',
+    'active_branches_learning_models',
+    'active_branches_bayes',
+    'active_interbranch_bayes'
+]
 
-read_env = True
+def databases_from_qmd_id(host_name, port_number, qmd_id):
+    database_dict = {}
+    seed = get_seed(host_name=host_name, port_number=port_number, qmd_id=qmd_id)
 
-
-print("in redis settings, parent pid:", os.getppid())
-
-try:
-    try:
-        env_vars = pickle.load(open('/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/environment_variables.p', 'rb')) # TODO don't use absolute path of my laptop!
-    except:
-	    env_vars = pickle.load(open('/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations/environment_variables.p', 'rb')) ## For blue crystal
-
-
-except:
-    print("Failed; directory:", os.getcwd())
-    print("Paths:")
-    for p in sys.path:
-        print(p)
-    read_env = False
-
-
-#sys.path.append(os.path.join("..", "Libraries","QML_lib"))
+    for i in range(len(databases_required)):
+        new_db = databases_required[i]
+        database_dict[new_db] = redis.StrictRedis(host=host_name, port=port_number, db=seed+i)
+        
+    return database_dict
 
 
-
-if read_env:
-    print("Reading from environment_variables pickled object.")
-    test_workers = env_vars['use_rq']
-    host_name = env_vars['host']
-    port_number = env_vars['port']
-else:
-    test_workers = False
-    host_name = 'localhost'
-    port_number = 6379
-
-print("test workers:", test_workers)
-print("host name", host_name)
-print("port number", port_number)
-
-
-try:
-    import pickle
-    pickle.HIGHEST_PROTOCOL=2
-    from rq import Connection, Queue, Worker
-
-    redis_conn = redis.Redis(host=host_name, port=port_number)
-    q = Queue(connection=redis_conn, async=test_workers, default_timeout=3600) # TODO is this timeout sufficient for ALL QMD jobs?
-    parallel_enabled = True
-except:
-    parallel_enabled = False    
-
-
-
-qmd_info_db = redis.StrictRedis(host=host_name, port=port_number, db=0)
-learned_models_info = redis.StrictRedis(host=host_name, port=port_number, db=1)
-learned_models_ids = redis.StrictRedis(host=host_name, port=port_number, db=2)
-bayes_factors_db = redis.StrictRedis(host=host_name, port=port_number, db=3) 
-bayes_factors_winners_db = redis.StrictRedis(host=host_name, port=port_number, db=4)
-active_branches_learning_models = redis.StrictRedis(host=host_name, port=port_number, db=5)
-active_branches_bayes = redis.StrictRedis(host=host_name, port=port_number, db=6)
-active_interbranch_bayes =  redis.StrictRedis(host=host_name, port=port_number, db=7)
-
-
-
-
-
-
-
-
-def flushdatabases():
-    try:
-        qmd_info_db.flushdb()
-        learned_models_info.flushdb()
-        learned_models_ids.flushdb()
-        bayes_factors_db.flushdb()
-        bayes_factors_winners_db.flushdb()
-        active_branches_learning_models.flushdb()
-        active_branches_bayes.flushdb()
-        active_interbranch_bayes.flushdb()
-    except:
-        print("Databases don't exist on Redis yet.")
+def get_seed(host_name, port_number, qmd_id):
+    #print("Get seed for host", host_name, " port", port_number, "id", qmd_id)
+    # db=0 is reserved for a SEED dict: QMD_IDs have a seed
+    # their dbs are counted from that seed
+    qid_seeds = redis.StrictRedis(host=host_name, port=port_number, db=0)
     
-def countWorkers():
-    # TODO this isn't working
-    return Worker.count(connection=redis_conn)
-    
-    
-def hello():
-    print("Hello")    
+    seed_db_keys = [a.decode() for a in qid_seeds.keys()]
+    #print("seed db keys:", seed_db_keys)
+
+    if 'max' not in seed_db_keys:
+        # ie the database has not been set yet
+        #print("Max not present; setting")
+        qid_seeds.set('max', 1)
+
+    if str(qmd_id) in seed_db_keys:
+        return int(qid_seeds.get(qmd_id))
+        
+    elif qmd_id not in seed_db_keys:
+        max_seed = int(qid_seeds.get('max'))
+        if len(list(qid_seeds.keys())) == 1:
+            new_qid_seed = 1
+        else:
+            new_qid_seed = max_seed+len(databases_required)
+        qid_seeds.set(qmd_id, int(new_qid_seed))
+        qid_seeds.set('max', new_qid_seed)
+        #print("Adding QMD_id", qmd_id, "to Redis server on host", host_name, ", port", port_number)
+        return new_qid_seed
+
+    return database_dict  
+
+def flush_dbs_from_id(host_name, port_number, qmd_id):
+    dbs = databases_from_qmd_id(host_name, port_number, qmd_id=qmd_id)
+    #print("flushing for id ", qmd_id, "host", host_name, "port", port_number, "db=", dbs)
+    for v in list(dbs.values()):
+        v.flushdb()        

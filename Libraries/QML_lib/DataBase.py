@@ -55,7 +55,7 @@ import pandas as pd
 import warnings
 import hashlib
 
-
+import redis
 import Evo as evo
 from QML import *
 import ModelGeneration
@@ -617,7 +617,8 @@ ytz = operator('yTz')
 true_operator_list = np.array([ ytz.matrix] )
 
 
-def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True, redimensionalise=True, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, probe_dict=None, use_exp_custom=True, enable_sparse=True, debug_directory = None):
+def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True, redimensionalise=True, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, probe_dict=None, use_exp_custom=True, enable_sparse=True, debug_directory = None,
+qid=0, host_name='localhost', port_number=6379):
     """
     Inputs:
     TODO
@@ -685,8 +686,10 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
             enable_sparse=enable_sparse, 
             debug_directory = debug_directory,
             branchID=0, 
-            qle=qle
-                                    
+            qle=qle,
+            qid=qid, 
+            host_name=host_name,
+            port_number=port_number
         )
         if try_add_model is True: 
             modelID += int(1) 
@@ -694,7 +697,7 @@ def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[]
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, enable_sparse=True, probe_dict=None, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, debug_directory = None, qle=True ):
+def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, enable_sparse=True, probe_dict=None, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, debug_directory = None, qle=True, qid=0, host_name='localhost', port_number=6379):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 
@@ -789,7 +792,10 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
           modelID = int(modelID), 
           resample_thresh = resample_threshold,
           resample_a = resampler_a,
-          qle = qle
+          qle = qle,
+          qid=qid,
+          host_name=host_name,
+          port_number=port_number
         )
         
         # Add to running_database, same columns as initial gen_list

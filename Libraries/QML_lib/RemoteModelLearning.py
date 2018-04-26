@@ -15,7 +15,8 @@ pickle.HIGHEST_PROTOCOL=2
 import copy
 
 try:
-    from RedisSettings import * 
+    import redis
+    import RedisSettings as rds
     enforce_serial = False  
 except:
     enforce_serial = True # shouldn't be needed
@@ -35,9 +36,16 @@ from Distrib import MultiVariateNormalDistributionNocov
 
 ## Single function call, given QMDInfo and a name, to learn model entirely. 
 
-def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False):
+def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_name='localhost', port_number=6379, qid=0):
         print("QHL for", name, "remote:", remote)
+
         # Get params from qmd_info
+        rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
+        qmd_info_db = rds_dbs['qmd_info_db'] 
+        learned_models_info = rds_dbs['learned_models_info']
+        learned_models_ids = rds_dbs['learned_models_ids']
+        active_branches_learning_models = rds_dbs['active_branches_learning_models']
+
         if qmd_info == None:
             #print("Trying to load qmd info from redis db")
             qmd_info = pickle.loads(qmd_info_db['QMDInfo'])

@@ -15,8 +15,9 @@ pickle.HIGHEST_PROTOCOL=2
 import copy
 
 try:
-    from RedisSettings import * 
-    enfore_serial = False  
+    import RedisSettings as rds
+    import redis
+    enforce_serial = False  
 except:
     enforce_serial = True # shouldn't be needed
       
@@ -35,7 +36,17 @@ from Distrib import MultiVariateNormalDistributionNocov
 
 ## Single function call to compute Bayes Factor between models given their IDs
 
-def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, num_times_to_use = 'all', check_db=False, trueModel=None, bayes_threshold=1):
+def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, num_times_to_use = 'all', check_db=False, trueModel=None, bayes_threshold=1, host_name='localhost', port_number=6379, qid=0):
+
+    rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
+    qmd_info_db = rds_dbs['qmd_info_db'] 
+    learned_models_info = rds_dbs['learned_models_info']
+    learned_models_ids = rds_dbs['learned_models_ids']
+    bayes_factors_db = rds_dbs['bayes_factors_db']
+    bayes_factors_winners_db = rds_dbs['bayes_factors_winners_db']
+    active_branches_learning_models = rds_dbs['active_branches_learning_models']
+    active_branches_bayes = rds_dbs['active_branches_bayes']
+    active_interbranch_bayes = rds_dbs['active_interbranch_bayes']
     
     if check_db: # built in to only compute once and always return the stored value.
         if pair_id in bayes_factors_db.keys():
