@@ -3,7 +3,11 @@
 
 let NUM_WORKERS="$PBS_NUM_NODES * $PBS_NUM_PPN"
 echo "Num workers: $NUM_WORKERS"
+# echo $1
 
+# QMD_ID=$1
+
+echo "QMD ID =$QMD_ID"
 host=$(hostname)
 echo "host= $host"
 
@@ -14,7 +18,7 @@ then
     lib_dir="/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib"
     script_dir="/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations"
     SERVER_HOST='localhost'
-    ~/redis-4.0.8/src/redis-server & 
+    ~/redis-4.0.8/src/redis-server  $lib_dir/RedisConfig.conf & 
         
 elif [[ "$host" == "newblue"* ]]
 then
@@ -26,7 +30,7 @@ then
     module load tools/redis-4.0.8
     module load mvapich/gcc/64/1.2.0-qlc
     echo "launching redis"
-    redis-server --protected-mode no &
+    redis-server $lib_dir/RedisConfig.conf --protected-mode no  &
     SERVER_HOST='localhost'
 
 
@@ -40,9 +44,11 @@ then
     module load tools/redis-4.0.8
     module load languages/intel-compiler-16-u2
     SERVER_HOST=$(head -1 "$PBS_NODEFILE")
-    echo "launching redis"
-    redis-server --protected-mode no &
-
+    echo "launching redis: $lib_dir/RedisConfig.conf on $SERVER_HOST"
+	cd $lib_dir    
+	redis-server RedisDatabaseConfig.conf --protected-mode no &
+	# redis-server $lib_dir/RedisConfig.conf &
+	# redis-server  --protected-mode no & ##This works
 
 else
     echo "Neither local machine (Brian's university laptop) or blue crystal identified." 
@@ -53,7 +59,7 @@ job_id=$PBS_JOBID
 
 job_number="$(cut -d'.' -f1 <<<"$job_id")"
 echo "Job id is $job_number"
-
+cd $running_dir
 mkdir -p $running_dir/logs
 mkdir -p $PBS_O_WORKDIR/logs
 
@@ -92,9 +98,11 @@ fi
 sleep 5
 
 cd $script_dir
-python3 Exp.py -rq=1 -p=50 -e=15 -bt=5 -pkl=0 -host=$SERVER_HOST
+python3 Exp.py -rq=0 -p=20 -e=10 -bt=5 -qid=$QMD_ID -pkl=0 -host=$SERVER_HOST
 
 sleep 1
 echo "   SHUTDOWN REDIS   "
-redis-cli shutdown
+
+# redis-cli flushall
+# redis-cli shutdown
 

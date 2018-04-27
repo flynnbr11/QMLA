@@ -15,10 +15,14 @@ databases_required  = [
     'active_interbranch_bayes'
 ]
 
-def databases_from_qmd_id(host_name, port_number, qmd_id):
+def databases_from_qmd_id(host_name, port_number, qmd_id, print_status=False):
     database_dict = {}
     seed = get_seed(host_name=host_name, port_number=port_number, qmd_id=qmd_id)
-    print("Database requested for host/port/id", host_name, port_number, qmd_id, "has seed", seed)
+	
+	if print_status:
+        print("Database requested for host/port/id", host_name, port_number, qmd_id, "has seed", seed)
+        qid_seeds = redis.StrictRedis(host=host_name, port=port_number, db=0)
+        print("QID seed dict has keys:", qid_seeds.keys())
 
     for i in range(len(databases_required)):
         new_db = databases_required[i]
@@ -27,7 +31,7 @@ def databases_from_qmd_id(host_name, port_number, qmd_id):
     return database_dict
 
 
-def get_seed(host_name, port_number, qmd_id):
+def get_seed(host_name, port_number, qmd_id, print_status=False):
     #print("Get seed for host", host_name, " port", port_number, "id", qmd_id)
     # db=0 is reserved for a SEED dict: QMD_IDs have a seed
     # their dbs are counted from that seed
@@ -35,6 +39,14 @@ def get_seed(host_name, port_number, qmd_id):
     
     seed_db_keys = [a.decode() for a in qid_seeds.keys()]
     #print("seed db keys:", seed_db_keys)
+
+	if print_status:
+        print("Seed requested for host/port/id", host_name, port_number, qmd_id, "has seed", seed)
+        qid_seeds = redis.StrictRedis(host=host_name, port=port_number, db=0)
+        print("QID seed dict has keys:", seed_db_keys)
+
+
+
 
     first_qmd_id=False
     

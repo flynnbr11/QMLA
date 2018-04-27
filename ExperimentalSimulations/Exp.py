@@ -61,7 +61,7 @@ for i in range(global_variables.num_runs):
     #true_params = [0.19, 0.21, 0.8, 0.22, 0.20, 0.27]
     true_params = [0.25, 0.21, 0.28, 0.22, 0.23, 0.27]
     
-    print("QMD id", global_variables.qmd_id, " on host ", global_variables.host_name, "and port", global_variables.port_number, "has seed", rds.get_seed(global_variables.host_name, global_variables.port_number, global_variables.qmd_id),".", global_variables.num_particles, " particles for", global_variables.num_experiments, "experiments and ", global_variables.num_times_bayes, "bayes updates. RQ=", global_variables.use_rq)
+    print("QMD id", global_variables.qmd_id, " on host ", global_variables.host_name, "and port", global_variables.port_number, "has seed", rds.get_seed(global_variables.host_name, global_variables.port_number, global_variables.qmd_id, print_status=True),".", global_variables.num_particles, " particles for", global_variables.num_experiments, "experiments and ", global_variables.num_times_bayes, "bayes updates. RQ=", global_variables.use_rq)
     
     qmd = QMD(
         initial_op_list=initial_op_list, 
