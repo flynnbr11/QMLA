@@ -16,6 +16,7 @@ databases_required  = [
 ]
 
 def databases_from_qmd_id(host_name, port_number, qmd_id):
+    print("Database requested for host/port/id", host_name, port_number, qmd_id)
     database_dict = {}
     seed = get_seed(host_name=host_name, port_number=port_number, qmd_id=qmd_id)
 
