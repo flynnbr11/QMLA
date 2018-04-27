@@ -94,8 +94,11 @@ class GlobalVariablesClass():
             self.results_directory += '/'
         
         if not os.path.exists(self.results_directory):
-            os.makedirs(self.results_directory)
-            
+            try:
+                os.makedirs(self.results_directory)
+            except FileExistsError:
+                pass
+                        
         self.long_id ='{0:03d}'.format(self.qmd_id)
         self.results_file = self.results_directory+'results_'+str(self.long_id)+'.p' #for pickling results into
         self.class_pickle_file = self.results_directory+'qmd_class_'+str(self.long_id)+'.p'
