@@ -19,7 +19,7 @@ def databases_from_qmd_id(host_name, port_number, qmd_id, print_status=False):
     database_dict = {}
     seed = get_seed(host_name=host_name, port_number=port_number, qmd_id=qmd_id)
 	
-	if print_status:
+    if print_status:
         print("Database requested for host/port/id", host_name, port_number, qmd_id, "has seed", seed)
         qid_seeds = redis.StrictRedis(host=host_name, port=port_number, db=0)
         print("QID seed dict has keys:", qid_seeds.keys())
@@ -40,14 +40,6 @@ def get_seed(host_name, port_number, qmd_id, print_status=False):
     seed_db_keys = [a.decode() for a in qid_seeds.keys()]
     #print("seed db keys:", seed_db_keys)
 
-	if print_status:
-        print("Seed requested for host/port/id", host_name, port_number, qmd_id, "has seed", seed)
-        qid_seeds = redis.StrictRedis(host=host_name, port=port_number, db=0)
-        print("QID seed dict has keys:", seed_db_keys)
-
-
-
-
     first_qmd_id=False
     
     if 'max' not in seed_db_keys:
@@ -59,7 +51,7 @@ def get_seed(host_name, port_number, qmd_id, print_status=False):
     if str(qmd_id) in seed_db_keys:
         #print("QMD id", qmd_id, "in", seed_db_keys)
         #print("Returning", int(qid_seeds.get(qmd_id)))
-        return int(qid_seeds.get(qmd_id))
+        seed = int(qid_seeds.get(qmd_id))
         
     elif qmd_id not in seed_db_keys:
         max_seed = int(qid_seeds.get('max'))
@@ -69,12 +61,17 @@ def get_seed(host_name, port_number, qmd_id, print_status=False):
             new_qid_seed = max_seed+len(databases_required)
         qid_seeds.set(qmd_id, int(new_qid_seed))
         qid_seeds.set('max', new_qid_seed)
-        #print("Adding QMD_id", qmd_id, "to Redis server on host", host_name, ", port", port_number)
-        
-        #print("for host, port, id", host_name, port_number, qmd_id, "not in", seed_db_keys)
-        return new_qid_seed
 
-    return database_dict  
+        seed = new_qid_seed
+
+    if print_status:
+        print("Seed requested for host/port/id", host_name,'/', port_number, '/', qmd_id, ";has seed", seed)
+        qid_seeds = redis.StrictRedis(host=host_name, port=port_number, db=0)
+        
+    return int(seed)
+
+
+
 
 def flush_dbs_from_id(host_name, port_number, qmd_id):
     dbs = databases_from_qmd_id(host_name, port_number, qmd_id=qmd_id)
