@@ -1052,7 +1052,9 @@ class QMD():
             'FinalParams' : self.ChampionFinalParams,
             'LatexName' : DataBase.latex_name_ising(self.ChampionName)
         }
-
+        # rds.remove_from_dict(host_name=self.HostName, port_number=self.PortNumber, qmd_id=self.Q_id)
+        # rds.flush_dbs_from_id(host_name=self.HostName, port_number=self.PortNumber, qmd_id=self.Q_id)
+        # TODO reinstate
 
 
     
