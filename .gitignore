@@ -22,6 +22,8 @@ __pycache__/
 
 # But want redis configuration:
 !Libraries/QML_lib/RedisConfig.conf
+!Libraries/QML_lib/RedisDatabaseCConfig.conf
+
 
 
 # Output files from cluster
@@ -35,7 +37,7 @@ develop-eggs/
 dist/
 downloads/
 eggs/
-.eggs/
+.eggs/.
 lib/
 lib64/
 parts/

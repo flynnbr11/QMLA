@@ -18,6 +18,11 @@ __pycache__/
 *.txt
 *.p
 *.pkl
+*.conf
+
+# But want redis configuration:
+!Libraries/QML_lib/RedisConfig.conf
+
 
 # Output files from cluster
 *.e*
