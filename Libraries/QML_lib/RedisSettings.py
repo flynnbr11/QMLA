@@ -66,7 +66,7 @@ def get_seed(host_name, port_number, qmd_id, print_status=False):
 
     if print_status:
         print("Seed requested for host/port/id", host_name,'/', port_number, '/', qmd_id, ";has seed", seed)
-        qid_seeds = redis.StrictRedis(host=host_name, port=port_number, db=0)
+        print("Seed keys", seed_db_keys)
         
     return int(seed)
 

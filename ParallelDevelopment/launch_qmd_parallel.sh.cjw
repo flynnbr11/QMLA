@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=2:ppn=3,walltime=00:03:00
+#PBS -l nodes=1:ppn=1,walltime=24:00:00
 
 let NUM_WORKERS="$PBS_NUM_NODES * $PBS_NUM_PPN"
 echo "Num workers: $NUM_WORKERS"
@@ -98,7 +98,7 @@ fi
 sleep 5
 
 cd $script_dir
-python3 Exp.py -rq=0 -p=20 -e=10 -bt=5 -qid=$QMD_ID -pkl=0 -host=$SERVER_HOST
+python3 Exp.py -rq=0 -p=2500 -e=400 -bt=75 -qid=$QMD_ID -pkl=0 -host=$SERVER_HOST
 
 sleep 1
 echo "   SHUTDOWN REDIS   "
