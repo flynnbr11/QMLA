@@ -372,8 +372,12 @@ class QMD():
             modelID = DataBase.model_id_from_name(self.db, name = model_name)
             branchID = DataBase.model_branch_from_model_id(self.db, model_id=modelID)
             if self.RunParallel and use_rq: # i.e. use a job queue rather than sequentially doing it. 
+                from rq import Connection, Queue, Worker
+                queue = Queue(connection=self.redis_conn, async=self.use_rq, default_timeout=3600) # TODO is this timeout sufficient for ALL QMD jobs?
+
+
                 # add function call to RQ queue
-                queued_model = self.rq_queue.enqueue(learnModelRemote, model_name, modelID, branchID=branchID, remote=True, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, timeout=3600) # add result_ttl=-1 to keep result indefinitely on redis server
+                queued_model = queue.enqueue(learnModelRemote, model_name, modelID, branchID=branchID, remote=True, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, timeout=3600) # add result_ttl=-1 to keep result indefinitely on redis server
                 
                 print("Model", model_name, "added to queue.")
                 if blocking: # i.e. wait for result when called. 
