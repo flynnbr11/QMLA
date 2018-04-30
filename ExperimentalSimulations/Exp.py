@@ -27,7 +27,7 @@ os.environ["TEST_ENV"] = 'test'
 import RedisSettings as rds
 
 # Set up redis 
-rds.redis_start(global_variables.host_name, global_variables.port_number, global_variables.qmd_id)
+# rds.redis_start(global_variables.host_name, global_variables.port_number, global_variables.qmd_id)
 
 
 import Evo as evo
@@ -107,7 +107,7 @@ for i in range(global_variables.num_runs):
     results_file = global_variables.results_file
     pickle.dump(qmd.ChampionResultsDict, open(results_file, "wb"), protocol=2)
     
-    rds.remove_from_dict(host_name=qmd.HostName, port_number=qmd.PortNumber, qmd_id=qmd.Q_id)
+#    rds.remove_from_dict(host_name=qmd.HostName, port_number=qmd.PortNumber, qmd_id=qmd.Q_id)
 
         
     
