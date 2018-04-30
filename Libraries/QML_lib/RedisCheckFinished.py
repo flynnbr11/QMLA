@@ -25,29 +25,21 @@ parser.add_argument(
   default=0
 )
 
-parser.add_argument(
-  '-action', '--redis_action', 
-  help="QMD ID.",
-  type=str,
-  default=0
-)
-
-
 arguments = parser.parse_args()
 
 host_name = arguments.redis_host_name
 port_number = arguments.redis_port_number
 qmd_id = arguments.redis_qmd_id
-action  = arguments.redis_action
 
 
-if action=='add':
-    rds.redis_start(host_name, port_number, qmd_id)
-elif action=='remove':
-    rds.redis_end(host_name, port_number, qmd_id)
-else:
-    print("Redis Manager: action should be either 'add' or 'remove'")
-    
-    
-    
-    
+try:
+    running = rds.check_running(host_name, port_number)
+    if running == 'Running':
+        print("redis-running")
+    elif running == 'Finished':
+        print("redis-finished")
+    else:
+        print("Problem with check_running function in RedisManageServer")
+
+except redis.ConnectionError:
+    print("redis-finished")
