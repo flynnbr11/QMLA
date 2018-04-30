@@ -89,4 +89,56 @@ def remove_from_dict(host_name, port_number, qmd_id):
     flush_dbs_from_id(host_name, port_number, qmd_id)
     
     del seeds_dict[seed]
+
+
+
+def redis_start(host_name, port_number, qmd_id):
+    redis_conn = redis.Redis(host=host_name, port=port_number)
+
+    if 'Running' not in redis_conn:
+        print("On host/port", host_name, "/", port_number, ": first QMD", qmd_id)
+        running_dict = {}
+        running_dict[qmd_id] = True
+        pickled_running_dict = pickle.dumps(running_dict, protocol=2)
+        redis_conn.set('Running', pickled_running_dict)
+        
+    else:
+        print("On host/port", host_name, "/", port_number, ": setting ON QMD", qmd_id)
+        current = pickle.loads(redis_conn['Running'])
+        current[qmd_id] = True
+        pickled_running_dict = pickle.dumps(current, protocol=2)
+        redis_conn.set('Running', pickled_running_dict)
+        
+
+        
+def redis_end(host_name, port_number, qmd_id):
+    redis_conn = redis.Redis(host=host_name, port=port_number)
+    current = pickle.loads(redis_conn['Running'])
+    current[qmd_id] = False
+    pickled_running_dict = pickle.dumps(current, protocol=2)
+    redis_conn.set('Running', pickled_running_dict)
+
+def check_running(host_name, port_number):
+    # Check if all QMD ids on this redis host have finished, ie turned Running to False.
+    redis_conn = redis.Redis(host=host_name, port=port_number)
+    
+    if 'Running' in redis_conn:
+        current = pickle.loads(redis_conn['Running'])
+        if all(a == False for a in list(current.values())):
+            print("On redis host/port", host_name, "/", port_number, ":QMD ids have all finished:", list(current.keys()))
+            return 'Finished'
+        else:
+            return 'Running'
+
+    else:
+        return 'Finished'
+        
+def cleanup_redis(host_name, port_number):
+    if check_running(host_name, port_number)=='Finished':
+        redis_conn = redis.Redis(host=host_name, port=port_number)
+        redis_conn.flushall()
+        redis_conn.shutdown()
+        print("Redis flushed and shut down on", host_name, "/", port_number)
+    else:
+        print("Some QMD still active on", host_name, "/", port_number) 
         

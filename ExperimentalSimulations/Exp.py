@@ -24,9 +24,12 @@ import GlobalVariables
 global_variables = GlobalVariables.parse_cmd_line_args(sys.argv[1:])
 os.environ["TEST_ENV"] = 'test'
 
-
-
 import RedisSettings as rds
+
+# Set up redis 
+rds.redis_start(global_variables.host_name, global_variables.port_number, global_variables.qmd_id)
+
+
 import Evo as evo
 import DataBase 
 from QMD import QMD #  class moved to QMD in Library
@@ -111,4 +114,10 @@ for i in range(global_variables.num_runs):
         
 end = time.time()
 print("\n\nTime taken:", end-start)
+
+rds.redis_end(global_variables.host_name, global_variables.port_number, global_variables.qmd_id)
+
+rds.cleanup_redis(global_variables.host_name, global_variables.port_number)
+
+
 
