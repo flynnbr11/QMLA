@@ -33,7 +33,7 @@ qmd_id = arguments.redis_qmd_id
 
 
 try:
-    running = rds.check_running(host_name, port_number)
+    running = rds.check_running(host_name, port_number, print_status=False)
     if running == 'Running':
         print("redis-running")
     elif running == 'Finished':

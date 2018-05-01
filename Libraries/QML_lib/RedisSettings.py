@@ -118,14 +118,15 @@ def redis_end(host_name, port_number, qmd_id):
     pickled_running_dict = pickle.dumps(current, protocol=2)
     redis_conn.set('Running', pickled_running_dict)
 
-def check_running(host_name, port_number):
+def check_running(host_name, port_number, print_status=True):
     # Check if all QMD ids on this redis host have finished, ie turned Running to False.
     redis_conn = redis.Redis(host=host_name, port=port_number)
     
     if 'Running' in redis_conn:
         current = pickle.loads(redis_conn['Running'])
         if all(a == False for a in list(current.values())):
-            print("On redis host/port", host_name, "/", port_number, ":QMD ids have all finished:", list(current.keys()))
+            if print_status:
+                print("On redis host/port", host_name, "/", port_number, ":QMD ids have all finished:", list(current.keys()))
             return 'Finished'
         else:
             return 'Running'
