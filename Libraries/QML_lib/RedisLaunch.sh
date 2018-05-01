@@ -47,6 +47,7 @@ then
 	else 
 		echo "Redis server NOT already present on $SERVER_HOST; launching"
 		redis-server RedisDatabaseConfig.conf --protected-mode no &
+	    redis-cli flushall
 		python3 RedisManageServer.py -rh=$SERVER_HOST -rqid=$QMD_ID -action='add'
 
 	fi

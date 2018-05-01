@@ -77,7 +77,7 @@ def flush_dbs_from_id(host_name, port_number, qmd_id):
     dbs = databases_from_qmd_id(host_name, port_number, qmd_id=qmd_id)
     #print("flushing for id ", qmd_id, "host", host_name, "port", port_number, "db=", dbs)
     for v in list(dbs.values()):
-        print("flushing",v)
+        #print("flushing",v)
         try:
             v.flushdb()        
         except:
