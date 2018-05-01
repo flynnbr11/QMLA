@@ -31,10 +31,15 @@ host_name = arguments.redis_host_name
 port_number = arguments.redis_port_number
 qid = arguments.redis_qmd_id
 
+redis_server_exists = True
+redis_conn = redis.Redis(host=host_name, port=port_number)
 try:
-    redis_conn = redis.Redis(host=host_name, port=port_number)
-    print("redis-ready")
+    redis_conn.keys()
 except redis.ConnectionError:
-    print("redis-not-ready")        
-    
+    redis_server_exists = False    
+
+if redis_server_exists:
+    print("redis-ready")
+else:
+    print("redis-not-ready")
 
