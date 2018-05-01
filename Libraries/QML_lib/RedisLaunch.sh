@@ -3,6 +3,8 @@
 host=$(hostname)
 
 
+echo "Inside launch redis script; host=$host"
+
 if [ "$host" == "IT067176" ]
 then
     echo "Brian's laptop identified -  launching redis"
@@ -33,7 +35,8 @@ then
     script_dir="/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations"
     module load tools/redis-4.0.8
     module load languages/intel-compiler-16-u2
-    SERVER_HOST=$(head -1 "$PBS_NODEFILE")
+#    SERVER_HOST=$(head -1 "$PBS_NODEFILE")
+	SERVER_HOST=$(hostname)
     echo "launching redis: $lib_dir/RedisConfig.conf on $SERVER_HOST"
 	cd $lib_dir    
 	redis_run_test=`python3 RedisCheck.py -rh=$SERVER_HOST`
@@ -47,8 +50,9 @@ then
 	else 
 		echo "Redis server NOT already present on $SERVER_HOST; launching"
 		redis-server RedisDatabaseConfig.conf --protected-mode no &
-	    redis-cli flushall
+        redis-cli flushall
 		python3 RedisManageServer.py -rh=$SERVER_HOST -rqid=$QMD_ID -action='add'
+
 
 	fi
 else
