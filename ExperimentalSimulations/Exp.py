@@ -115,9 +115,9 @@ for i in range(global_variables.num_runs):
 end = time.time()
 print("\n\nTime taken:", end-start)
 
-rds.redis_end(global_variables.host_name, global_variables.port_number, global_variables.qmd_id)
+#rds.redis_end(global_variables.host_name, global_variables.port_number, global_variables.qmd_id)
 
-rds.cleanup_redis(global_variables.host_name, global_variables.port_number)
+#rds.cleanup_redis(global_variables.host_name, global_variables.port_number)
 
 
 
