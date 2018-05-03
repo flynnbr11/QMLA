@@ -1,7 +1,13 @@
 #!/bin/bash
 
+echo "local host is $(hostname). Global redis launced here." 
+./global_redis_launch.sh
 
-for i in `seq 1 15`;
+global_server=$(hostname)
+
+for i in `seq 1 1`;
 do
-	qsub -v QMD_ID=$i launch_qmd_parallel.sh.cjw
+	qsub -v QMD_ID=$i,GLOBAL_SERVER=$global_server  launch_qmd_parallel.sh
 done 
+
+

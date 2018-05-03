@@ -51,7 +51,7 @@ then
 
 	redis_run_test=`python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER -a='check'`
 	redis_test=$(echo $redis_run_test)	
-	#redis_test=""	
+	redis_test=""	
 	echo "redis test: $redis_test"
 
 	if [[ "$redis_test" == "redis-ready" ]]

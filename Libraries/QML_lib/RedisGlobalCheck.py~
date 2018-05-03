@@ -101,10 +101,7 @@ elif action=='check-end':
 
 elif action=='check':
     if str(host_name) in global_keys:
-        if int(redis_conn.get(host_name))== 0:
-            print("redis-not-ready")
-        else:
-            print("redis-ready")
+        print("redis-ready")
     else:
         print("redis-not-ready")
 
