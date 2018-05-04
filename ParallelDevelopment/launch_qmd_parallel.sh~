@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=2:ppn=2,walltime=00:20:00
+#PBS -l nodes=1:ppn=2,walltime=00:05:00
 
 rm dump.rdb 
 
@@ -8,8 +8,8 @@ echo "Num workers: $NUM_WORKERS"
 # echo $1
 
 # QMD_ID=$1
-
-echo "QMD ID =$QMD_ID"
+let REDIS_PORT="6300 + $QMD_ID"
+echo "QMD ID =$QMD_ID; REDIS_PORT=$REDIS_PORT"
 echo "Global server: $GLOBAL_SERVER"
 host=$(hostname)
 echo "just host= $host"
@@ -35,6 +35,7 @@ then
     module load mvapich/gcc/64/1.2.0-qlc
     echo "launching redis"
 #   redis-server $lib_dir/RedisConfig.conf --protected-mode no  &
+
     SERVER_HOST='localhost'
 
 
@@ -46,8 +47,11 @@ then
     script_dir="/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations"
     module load tools/redis-4.0.8
     module load languages/intel-compiler-16-u2
+	
     SERVER_HOST=$(head -1 "$PBS_NODEFILE")
-
+	cd $lib_dir
+	redis-server RedisDatabaseConfig.conf --protected-mode no --port $REDIS_PORT & 
+	redis-cli -p $REDIS_PORT flushall
 else
     echo "Neither local machine (Brian's university laptop) or blue crystal identified." 
 fi
@@ -55,7 +59,7 @@ fi
 cd $lib_dir
 echo "Going in to launch redis script"
 echo "If this fails -- ensure permission enabled on RedisLaunch script in library"
-./RedisLaunch.sh $GLOBAL_SERVER &
+# ./RedisLaunch.sh $GLOBAL_SERVER $REDIS_PORT &
 
 sleep 7
 
@@ -84,7 +88,7 @@ echo "Nodelist"
 cat $confile 
 
 # The redis server is started on the first node.
-REDIS_URL=redis://$SERVER_HOST:6379
+REDIS_URL=redis://$SERVER_HOST:$REDIS_PORT
 echo "REDIS_URL is $REDIS_URL"
 #TODO create a redis config
 
@@ -109,23 +113,23 @@ cd $script_dir
 # python3 Exp.py -rq=0 -p=2500 -e=400 -bt=75 -qid=$QMD_ID -pkl=0 -host=$SERVER_HOST
 # python3 Exp.py -rq=1 -p=100 -e=40 -bt=25 -qid=$QMD_ID -pkl=0 -host=$SERVER_HOST
 echo "Starting Exp.py at $(date +%H:%M:%S)"
-python3 Exp.py -rq=1 -p=100 -e=25 -bt=10 -qid=$QMD_ID -pkl=0 -host=$SERVER_HOST
+python3 Exp.py -rq=1 -p=6 -e=3 -bt=2 -qid=$QMD_ID  -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT
 
 sleep 1
 cd $lib_dir
 echo "Removing $QMD_ID from redis on $SERVER_HOST"
-python3 RedisManageServer.py -rh=$SERVER_HOST -rqid=$QMD_ID -action='remove'
+# python3 RedisManageServer.py -rh=$SERVER_HOST -rqid=$QMD_ID -action='remove'
 
 python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER --action='remove'
 finished=`python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER --action='check-end'`
 finished_test="$(echo $finished)"
-# finished_test=""
+finished_test=""
 echo "Finished test: $finished_test"
 if [ $finished_test == "redis-finished" ]
 then
 	echo "Redis server on $SERVER_HOST no longer needed by any QMD; terminating at $(date +%H:%M:%S)."
 	#redis-cli flushall
-	#redis-cli shutdown
+	redis-cli -p $REDIS_PORT shutdown
 elif  [ $finished_test == "redis-running" ]
 then
 	echo "Redis server on $SERVER_HOST still in use by other QMD at $(date +%H:%M:%S)"
@@ -133,5 +137,4 @@ else
 	echo "Neither condition met on finished_test: $finished_test"
 fi
 
-echo "Time: $(date +%H:%M:%S)"
-echo "QMD $QMD_ID Finished; end of script" 
+echo "QMD $QMD_ID Finished; end of script at Time: $(date +%H:%M:%S)"

@@ -3,12 +3,12 @@
 host=$(hostname)
 
 GLOBAL_SERVER=$1
-
+REDIS_PORT=$2
 job_id=$PBS_JOBID
 job_number="$(cut -d'.' -f1 <<<"$job_id")"
 
 
-echo "Inside launch redis script; host=$host; Global server: $GLOBAL_SERVER"
+echo "Inside launch redis script; host=$host; Global server: $GLOBAL_SERVER; redis port=$REDIS_PORT"
 
 if [ "$host" == "IT067176" ]
 then
@@ -46,7 +46,7 @@ then
 	cd $lib_dir    
 	echo "Running check on redisgGlobal"
 	#python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER -a='check'
-	REDIS_URL=redis://$SERVER_HOST:6379
+	REDIS_URL=redis://$SERVER_HOST:$REDIS_PORT
 	echo "REDIS_URL is $REDIS_URL"
 
 	redis_run_test=`python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER -a='check'`
@@ -61,7 +61,7 @@ then
 		echo "Redis server NOT already present on $SERVER_HOST; launching at $(date +%H:%M:%S)"
 		rm dump.rdb		
 		#redis-cli shutdown		
-		redis-server RedisDatabaseConfig.conf --protected-mode no &
+		redis-server RedisDatabaseConfig.conf --protected-mode no --port $REDIS_PORT &
 		echo "Testing launching an RQ worker from inside RedisLaunch script at $(date +%H:%M:%S). Cmd:"
 		echo "rq worker $QMD_ID -u $REDIS_URL > $PBS_O_WORKDIR/logs/worker_$job_number.log 2>&1 &"
 		rq worker $QMD_ID -u $REDIS_URL >> $PBS_O_WORKDIR/logs/worker_$job_number.log 2>&1 &	
