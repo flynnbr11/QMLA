@@ -38,6 +38,7 @@ from Distrib import MultiVariateNormalDistributionNocov
 
 def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, num_times_to_use = 'all', check_db=False, trueModel=None, bayes_threshold=1, host_name='localhost', port_number=6379, qid=0):
 
+    time_start = time.time()
     rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
     qmd_info_db = rds_dbs['qmd_info_db'] 
     learned_models_info = rds_dbs['learned_models_info']
@@ -109,6 +110,8 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
             active_branches_bayes.set(int(branchID), current+1)  
         else:
             active_interbranch_bayes.set(pair_id, True)
+        time_end = time.time()
+        print("Time taken to compute Bayes factor:", time_end - time_start)
     
         return bayes_factor
     

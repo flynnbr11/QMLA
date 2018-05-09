@@ -38,7 +38,7 @@ from Distrib import MultiVariateNormalDistributionNocov
 
 def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_name='localhost', port_number=6379, qid=0):
         print("QHL for", name, "remote:", remote)
-
+        time_start = time.time()
         # Get params from qmd_info
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db'] 
@@ -115,11 +115,14 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
 
         current = int(active_branches_learning_models.get(int(branchID))) # if first to finish
         active_branches_learning_models.set(int(branchID), current+1)    
+        time_end = time.time()
+
             
         if remote: 
             del updated_model_info
             del compressed_info
             print("Model", name, "learned and pickled to redis DB.")
+            print("Time taken to learn model:", time_end - time_start)
             return None
         else: 
             return updated_model_info

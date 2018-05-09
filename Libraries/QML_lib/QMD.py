@@ -67,6 +67,7 @@ class QMD():
                  host_name='localhost',
                  port_number = 6379,
                  use_rq=True, 
+                 rq_timeout=3600,
                  growth_generator='simple_ising'
                 ):
 #    def __init__(self, initial_op_list, true_op_list, true_param_list):
@@ -135,14 +136,14 @@ class QMD():
         self.HostName = host_name
         self.PortNumber = port_number
         self.use_rq = use_rq
-
+        self.rq_timeout = rq_timeout
         try:
             from rq import Connection, Queue, Worker
             self.redis_conn = redis.Redis(host=self.HostName, port=self.PortNumber)
             test_workers=self.use_rq
-            self.rq_queue = Queue(self.Q_id, connection=self.redis_conn, async=test_workers, default_timeout=7200) # TODO is this timeout sufficient for ALL QMD jobs?
+            self.rq_queue = Queue(self.Q_id, connection=self.redis_conn, async=test_workers, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
 
-#            self.rq_queue = Queue(connection=self.redis_conn, async=test_workers, default_timeout=7200) # TODO is this timeout sufficient for ALL QMD jobs?
+#            self.rq_queue = Queue(connection=self.redis_conn, async=test_workers, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
 
             parallel_enabled = True
         except:
@@ -376,11 +377,11 @@ class QMD():
             branchID = DataBase.model_branch_from_model_id(self.db, model_id=modelID)
             if self.RunParallel and use_rq: # i.e. use a job queue rather than sequentially doing it. 
                 from rq import Connection, Queue, Worker
-                queue = Queue(self.Q_id, connection=self.redis_conn, async=self.use_rq, default_timeout=7200) # TODO is this timeout sufficient for ALL QMD jobs?
-#                queue = Queue(connection=self.redis_conn, async=self.use_rq, default_timeout=7200) # TODO is this timeout sufficient for ALL 
+                queue = Queue(self.Q_id, connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
+#                queue = Queue(connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL 
 
                 # add function call to RQ queue
-                queued_model = queue.enqueue(learnModelRemote, model_name, modelID, branchID=branchID, remote=True, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, timeout=7200) # add result_ttl=-1 to keep result indefinitely on redis server
+                queued_model = queue.enqueue(learnModelRemote, model_name, modelID, branchID=branchID, remote=True, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, timeout=self.rq_timeout) # add result_ttl=-1 to keep result indefinitely on redis server
                 
                 print("Model", model_name, "added to queue.")
                 if blocking: # i.e. wait for result when called. 
@@ -413,10 +414,10 @@ class QMD():
         
         if self.use_rq:
             from rq import Connection, Queue, Worker
-            queue = Queue(self.Q_id, connection=self.redis_conn, async=self.use_rq, default_timeout=7200) # TODO is this timeout sufficient for ALL QMD jobs?
-#            queue = Queue(connection=self.redis_conn, async=self.use_rq, default_timeout=7200) # TODO is this timeout sufficient for ALL QMD jobs?
+            queue = Queue(self.Q_id, connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
+#            queue = Queue(connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
 
-            job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, branchID=branchID, interbranch=interbranch, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName, bayes_threshold=bayes_threshold, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, timeout=7200) 
+            job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, branchID=branchID, interbranch=interbranch, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName, bayes_threshold=bayes_threshold, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, timeout=self.rq_timeout) 
             print("Bayes factor calculation queued. Model IDs", model_a_id, model_b_id)
 
             if return_job:

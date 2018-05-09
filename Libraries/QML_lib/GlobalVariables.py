@@ -42,7 +42,7 @@ default_results_directory = get_directory_name_by_time(just_date=False)
 default_pickle_qmd_class = 0
 default_port_number = 6379
 default_host = 'localhost'
-
+default_rq_timeout = 3600
 
 
 
@@ -68,7 +68,8 @@ class GlobalVariablesClass():
         host_name = default_host,
         port_number = default_port_number,
         results_directory = default_results_directory,
-        pickle_qmd_class = default_pickle_qmd_class
+        pickle_qmd_class = default_pickle_qmd_class,
+        rq_timeout = default_rq_timeout
     ):
         self.do_iqle = do_iqle
         self.do_qle = do_qle
@@ -89,6 +90,7 @@ class GlobalVariablesClass():
         self.host_name = host_name
         self.port_number = port_number
         self.results_directory = 'Results/'+results_directory
+        self.rq_timeout = rq_timeout
         
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -240,6 +242,12 @@ def parse_cmd_line_args(args):
       default=default_pickle_qmd_class
     )
 
+    parser.add_argument(
+      '-rqt', '--rq_timeout',
+      help='Time allowed before RQ job crashes.',
+      type=int,
+      default=default_rq_timeout
+    )
 
 
     # Process arguments from command line
@@ -266,6 +274,7 @@ def parse_cmd_line_args(args):
     port_number = arguments.redis_port_number
     results_directory = arguments.results_directory
     pickle_qmd_class = bool(arguments.pickle_result_class)
+    rq_timeout = arguments.rq_timeout
     
     
     # Use arguments to initialise global variables class. 
@@ -289,7 +298,8 @@ def parse_cmd_line_args(args):
         host_name = host_name,
         port_number = port_number,
         results_directory = results_directory,
-        pickle_qmd_class = pickle_qmd_class
+        pickle_qmd_class = pickle_qmd_class,
+        rq_timeout = rq_timeout
     )
     
     

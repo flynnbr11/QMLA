@@ -1,6 +1,0 @@
-#!/bin/bash
-
-
-set SERVER = $1
-cd $HOME/QMD/Libraries/QML_lib
-rq worker -u redis://$SERVER:6379/1
