@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=1:ppn=4,walltime=00:05:00
+#PBS -l nodes=2:ppn=3,walltime=00:15:00
 
 rm dump.rdb 
 
@@ -112,29 +112,33 @@ sleep 5
 cd $script_dir
 # python3 Exp.py -rq=0 -p=2500 -e=400 -bt=75 -qid=$QMD_ID -pkl=0 -host=$SERVER_HOST
 # python3 Exp.py -rq=1 -p=100 -e=40 -bt=25 -qid=$QMD_ID -pkl=0 -host=$SERVER_HOST
-echo "Starting Exp.py at $(date +%H:%M:%S)"
-python3 Exp.py -rq=1 -p=6 -e=3 -bt=2 -qid=$QMD_ID  -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT
+echo "Starting Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
+
+python3 Exp.py -rq=1 -p=250 -e=100 -bt=25 -qid=$QMD_ID  -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR
+
+echo "Finished Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
 
 sleep 1
-cd $lib_dir
-echo "Removing $QMD_ID from redis on $SERVER_HOST"
+#cd $lib_dir
+#echo "Removing $QMD_ID from redis on $SERVER_HOST"
 # python3 RedisManageServer.py -rh=$SERVER_HOST -rqid=$QMD_ID -action='remove'
+# python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER --action='remove'
+#finished=`python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER --action='check-end'`
+#finished_test="$(echo $finished)"
+#finished_test=""
+#echo "Finished test: $finished_test"
+#if [ $finished_test == "redis-finished" ]
+#then
+#	echo "Redis server on $SERVER_HOST no longer needed by any QMD; terminating at $(date +%H:%M:%S)."
+#	redis-cli flushall
+#	redis-cli -p $REDIS_PORT shutdown
+#elif  [ $finished_test == "redis-running" ]
+#then
+#	echo "Redis server on $SERVER_HOST still in use by other QMD at $(date +%H:%M:%S)"
+#else
+#	echo "Neither condition met on finished_test: $finished_test"
+#fi
 
-python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER --action='remove'
-finished=`python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER --action='check-end'`
-finished_test="$(echo $finished)"
-finished_test=""
-echo "Finished test: $finished_test"
-if [ $finished_test == "redis-finished" ]
-then
-	echo "Redis server on $SERVER_HOST no longer needed by any QMD; terminating at $(date +%H:%M:%S)."
-	#redis-cli flushall
-	redis-cli -p $REDIS_PORT shutdown
-elif  [ $finished_test == "redis-running" ]
-then
-	echo "Redis server on $SERVER_HOST still in use by other QMD at $(date +%H:%M:%S)"
-else
-	echo "Neither condition met on finished_test: $finished_test"
-fi
-
+redis-cli flushall
+redis-cli -p $REDIS_PORT shutdown
 echo "QMD $QMD_ID Finished; end of script at Time: $(date +%H:%M:%S)"
