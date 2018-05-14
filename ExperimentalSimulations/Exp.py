@@ -93,6 +93,7 @@ for i in range(global_variables.num_runs):
     
     if global_variables.pickle_qmd_class:
         print("QMD complete. Pickling result.")
+        qmd.delete_unpicklable_attributes()
         pickle.dump(qmd, open(global_variables.class_pickle_file, "wb"), protocol=2)
     
     qmd.plotVolumes(save_to_file=global_variables.results_directory+'volumes_all_models_'+str(global_variables.long_id)+'.png')
