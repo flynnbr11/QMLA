@@ -11,6 +11,9 @@ from matplotlib.spines import Spine
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.projections import register_projection
 
+import matplotlib.cbook as cb
+from matplotlib.colors import colorConverter, Colormap
+
 import networkx as nx
 
 
@@ -441,7 +444,7 @@ def qmdclassTOnxobj(qmd, modlist=None, directed=True, only_adjacent_branches=Tru
     
 
     
-def plotTreeDiagram(G, modlist=None, save_to_file=None, only_adjacent_branches=True):
+def plotTreeDiagram(G, n_cmap, e_cmap, modlist=None, e_alpha = 1.0, label_padding = 0.4, only_adjacent_branches=True):
     plt.clf()
     plt.figure(figsize=(6,11))   
     
@@ -450,39 +453,28 @@ def plotTreeDiagram(G, modlist=None, save_to_file=None, only_adjacent_branches=T
     
     positions = dict( zip( G.nodes(), tuple(  [prop['pos'] for (n,prop) in G.nodes(data=True)]  ) ))
     # n_colours = tuple(  [prop['color'] for (n,prop) in G.nodes(data=True)]  ) 
-    n_colours = tuple( [ plt.cm.Greens(prop['status']) for (n,prop) in G.nodes(data=True)]   )
+    n_colours = tuple( [ n_cmap(prop['status']) for (n,prop) in G.nodes(data=True)]   )
     
     labels = dict( zip( G.nodes(), tuple(  [prop['label'] for (n,prop) in G.nodes(data=True)]  ) ))  
     label_positions = []    
     for key in positions.keys():
-        label_positions.append( tuple( np.array(positions[key])- np.array([0., 0.4]) ) )
+        label_positions.append( tuple( np.array(positions[key])- np.array([0., label_padding]) ) )
     label_positions = dict(zip( positions.keys(), tuple(label_positions) ))
     
     
     weights = tuple( [prop['weight'] for (u,v,prop) in G.edges(data=True)] )
 
     
-    nx.draw_networkx(
+    nx.draw_networkx_nodes(
         G, with_labels = False, # labels=labels, 
         pos=positions, 
         k=1.5, #node spacing
-        node_size=2000, node_shape='8',
-        node_color = n_colours,
-        
-        width= 2,   #linewidth of the edges 
-        edgelist = edge_tuples,
-        # edge_color =  weights, 
-        # edge_cmap=plt.cm.Spectral,
-        
-        # arrowstyle='->',
-        # head_length=12,
-        # head_width=0.1,
-        
-        arrows=True
+        node_size=700, node_shape='8',
+        node_color = n_colours
     )  
     
-    edges_for_cmap = nx.draw_networkx_edges(G, width = 2, pos=positions, arrows=True, arrowstyle='---', edgelist=edge_tuples, edge_color= weights, edge_cmap=plt.cm.Spectral)
-    # nx.draw_networkx_edges(G, pos=positions, arrows=True, arrowstyle='->', edgelist=edge_tuples, edge_color=weights)
+    # edges_for_cmap = nx.draw_networkx_edges(G, width = 3,  pos=positions, arrows=True, arrowstyle='->', edgelist=edge_tuples, edge_color= weights, edge_cmap=plt.cm.Spectral)
+    edges_for_cmap = draw_networkx_arrows(G, width = 0.02,  pos=positions, arrows=True, arrowstyle='->', alpha = e_alpha, edgelist=edge_tuples, edge_color= weights, edge_cmap=e_cmap)
     
     nx.draw_networkx_labels(G, label_positions, labels)
     plt.tight_layout()
@@ -500,12 +492,142 @@ def plotTreeDiagram(G, modlist=None, save_to_file=None, only_adjacent_branches=T
     # plt.colorbar(n_colours)
 
     plt.title('Tree Diagram for QMD')
+    
+    
+def draw_networkx_arrows(G, pos,
+                        edgelist=None,
+                        nodedim = 0.,
+                        width=0.02,
+                        edge_color='k',
+                        style='solid',
+                        alpha=1.,
+                        edge_cmap=None,
+                        edge_vmin=None,
+                        edge_vmax=None,
+                        ax=None,
+                        label=[None],
+                        pathstyle='straight',
+                        **kwds):
 
-    if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
-    plt.show()
+    if ax is None:
+        ax = plt.gca()
+
+    if edgelist is None:
+        edgelist = G.edges()
+
+    if not edgelist or len(edgelist) == 0:  # no edges!
+        return None
+
+    # set edge positions
+    edge_pos = np.asarray([(pos[e[0]], pos[e[1]]) for e in edgelist])
+    
     
 
+    if not cb.iterable(width):
+        lw = (width,)
+    else:
+        lw = width
+
+    if not cb.is_string_like(edge_color) \
+           and cb.iterable(edge_color) \
+           and len(edge_color) == len(edge_pos):
+        if np.alltrue([cb.is_string_like(c)
+                         for c in edge_color]):
+            # (should check ALL elements)
+            # list of color letters such as ['k','r','k',...]
+            edge_colors = tuple([colorConverter.to_rgba(c, alpha)
+                                 for c in edge_color])
+        elif np.alltrue([not cb.is_string_like(c)
+                           for c in edge_color]):
+            # If color specs are given as (rgb) or (rgba) tuples, we're OK
+            if np.alltrue([cb.iterable(c) and len(c) in (3, 4)
+                             for c in edge_color]):
+                edge_colors = tuple(edge_color)
+            else:
+                # numbers (which are going to be mapped with a colormap)
+                edge_colors = None
+        else:
+            raise ValueError('edge_color must consist of either color names or numbers')
+    else:
+        if cb.is_string_like(edge_color) or len(edge_color) == 1:
+            edge_colors = (colorConverter.to_rgba(edge_color, alpha), )
+        else:
+            raise ValueError('edge_color must be a single color or list of exactly m colors where m is the number or edges')
+
+    edge_collection = collections.LineCollection(edge_pos,
+                                     colors=edge_colors,
+                                     linewidths=lw,
+                                     antialiaseds= tuple(np.repeat(3*width, len(edge_pos))),
+                                     linestyle=style,
+                                     transOffset = ax.transData,
+                                     )
+
+    edge_collection.set_zorder(1)  # edges go behind nodes
+
+    # ax.add_collection(edge_collection)
+
+    # Note: there was a bug in mpl regarding the handling of alpha values for
+    # each line in a LineCollection.  It was fixed in matplotlib in r7184 and
+    # r7189 (June 6 2009).  We should then not set the alpha value globally,
+    # since the user can instead provide per-edge alphas now.  Only set it
+    # globally if provided as a scalar.
+    if cb.is_numlike(alpha):
+        edge_collection.set_alpha(alpha)
+
+    if edge_colors is None:
+        if edge_cmap is not None:
+            assert(isinstance(edge_cmap, Colormap))
+        edge_collection.set_array(np.asarray(edge_color))
+        edge_collection.set_cmap(edge_cmap)
+        if edge_vmin is not None or edge_vmax is not None:
+            edge_collection.set_clim(edge_vmin, edge_vmax)
+        else:
+            edge_collection.autoscale()
+    
+
+    if G.is_directed():
+
+        for idx in range(len(edgelist)):
+            (src, dst) = edge_pos[idx]
+            x1, y1 = src
+            x2, y2 = dst
+            delta = 0.2
+            theta = np.arctan((y2-y1)/(x2-x1))
+            # print(theta)
+            if x1==x2:
+                dx = x2-x1
+                dy = y2-y1 - np.sign(y2-y1)*delta
+            elif y1==y2:
+                dx = x2-x1 - np.sign(x2-x1)*delta
+                dy = y2-y1 
+            else:
+                dx = x2-x1 - np.sign(x2-x1)*np.abs(np.cos(theta)*delta)   # x offset
+                dy = y2-y1 - np.sign(y2-y1)*np.abs(np.sin(theta)*delta)   # y offset 
+            
+            thislabel = None if len(label)<len(edgelist) else label[idx]
+
+            ax.arrow(
+                x1,y1, dx,dy,
+                facecolor=edge_cmap(edge_color[idx]), alpha = alpha,
+                linewidth = 0, antialiased = True,
+                width= width, head_width = 5*width, overhang = -5, length_includes_head=True, 
+                label=thislabel, zorder=1
+                )
+
+    # update view
+    minx = np.amin(np.ravel(edge_pos[:, :, 0]))
+    maxx = np.amax(np.ravel(edge_pos[:, :, 0]))
+    miny = np.amin(np.ravel(edge_pos[:, :, 1]))
+    maxy = np.amax(np.ravel(edge_pos[:, :, 1]))
+
+    w = maxx-minx
+    h = maxy-miny
+    padx,  pady = 0.05*w, 0.05*h
+    corners = (minx-padx, miny-pady), (maxx+padx, maxy+pady)
+    ax.update_datalim(corners)
+    ax.autoscale_view()
+
+    return edge_collection
    
     
 ####################################################
