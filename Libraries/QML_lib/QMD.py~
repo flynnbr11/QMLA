@@ -155,8 +155,8 @@ class QMD():
         print("Retrieving databases from redis")
         self.RedisDataBases = rds.databases_from_qmd_id(self.HostName, self.PortNumber, self.Q_id)
         
-        #rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.
-        #print("Databases flushed for id", self.Q_id)
+        rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.
+        print("Databases flushed for id", self.Q_id)
  
         
         if self.QLE:

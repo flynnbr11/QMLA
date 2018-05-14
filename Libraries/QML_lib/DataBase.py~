@@ -586,7 +586,7 @@ def latex_name_ising(name):
     if len(present_t) > 0:
         latex_term+='T_{'+t_terms+'}'
     
-    final_term = '$'+latex_term+'$'
+    final_term = 'r$'+latex_term+'$'
     
     return final_term
     
