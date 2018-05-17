@@ -13,6 +13,7 @@ from matplotlib.projections import register_projection
 
 import matplotlib.cbook as cb
 from matplotlib.colors import colorConverter, Colormap
+from matplotlib.patches import FancyArrowPatch, Circle
 
 import networkx as nx
 
@@ -393,7 +394,6 @@ def qmdclassTOnxobj(qmd, modlist=None, directed=True, only_adjacent_branches=Tru
         
         G.add_node(i)
         G.node[i]['label'] = latex_term
-        G.node[i]['color'] = losing_node_colour
         G.node[i]['status'] = 0.2
 
     # Set x-coordinate for each node based on how many nodes are on that branch (y-coordinate)
@@ -414,15 +414,14 @@ def qmdclassTOnxobj(qmd, modlist=None, directed=True, only_adjacent_branches=Tru
 
     # set node colour based on whether that model won a branch 
     for b in list(qmd.BranchChampions.values()):
-        G.node[b]['color'] = branch_champ_node_colour
         G.node[b]['status'] = 0.4
-    G.node[qmd.ChampID]['color'] = overall_champ_node_colour
     G.node[qmd.ChampID]['status'] = 0.6
     
     edges = []
     for a in modlist:
         for b in modlist:
-            if adjacent_branch_test(qmd, a, b) or not only_adjacent_branches:
+            is_adj = adjacent_branch_test(qmd, a, b)
+            if is_adj or not only_adjacent_branches:
                 if a!=b:
                     unique_pair = DataBase.unique_model_pair_identifier(a,b)
                     if unique_pair not in edges and unique_pair in qmd.BayesFactorsComputed:
@@ -434,21 +433,25 @@ def qmdclassTOnxobj(qmd, modlist=None, directed=True, only_adjacent_branches=Tru
                         if thisweight < 0:
                             thisweight = - thisweight # flip negative valued edges and move them to positive
                             flipped = True
-                            G.add_edge(vs[1], vs[0], weight=thisweight, flipped = flipped)
+                            G.add_edge(vs[1], vs[0], weight=thisweight, flipped = flipped, adj = is_adj)
                         else:
                             flipped = False
-                            G.add_edge(vs[0], vs[1], weight=thisweight, flipped = flipped)
+                            G.add_edge(vs[0], vs[1], weight=thisweight, flipped = flipped, adj = is_adj)
     
     return G
     
     
 
     
-def plotTreeDiagram(G, n_cmap, e_cmap, modlist=None, e_alpha = 1.0, label_padding = 0.4, only_adjacent_branches=True):
+def plotTreeDiagram(G, n_cmap, e_cmap, 
+                    e_alphas = [], nonadj_alpha=0.1, label_padding = 0.4, 
+                    arrow_size = 0.02, pathstyle = "straight"):
     plt.clf()
     plt.figure(figsize=(6,11))   
     
     directed  = nx.is_directed(G)
+    
+    
     edge_tuples = tuple( G.edges() )
     
     positions = dict( zip( G.nodes(), tuple(  [prop['pos'] for (n,prop) in G.nodes(data=True)]  ) ))
@@ -461,20 +464,25 @@ def plotTreeDiagram(G, n_cmap, e_cmap, modlist=None, e_alpha = 1.0, label_paddin
         label_positions.append( tuple( np.array(positions[key])- np.array([0., label_padding]) ) )
     label_positions = dict(zip( positions.keys(), tuple(label_positions) ))
     
+
+    if len(e_alphas) == 0: 
+        for idx in range(len(edge_tuples)):
+            e_alphas.append(  0.8 if G.edges(data=True)[idx][2]["adj"] else nonadj_alpha )
     
     weights = tuple( [prop['weight'] for (u,v,prop) in G.edges(data=True)] )
 
-    
     nx.draw_networkx_nodes(
         G, with_labels = False, # labels=labels, 
         pos=positions, 
         k=1.5, #node spacing
-        node_size=700, node_shape='8',
+        node_size=700, #node_shape='8',
         node_color = n_colours
     )  
     
     # edges_for_cmap = nx.draw_networkx_edges(G, width = 3,  pos=positions, arrows=True, arrowstyle='->', edgelist=edge_tuples, edge_color= weights, edge_cmap=plt.cm.Spectral)
-    edges_for_cmap = draw_networkx_arrows(G, width = 0.02,  pos=positions, arrows=True, arrowstyle='->', alpha = e_alpha, edgelist=edge_tuples, edge_color= weights, edge_cmap=e_cmap)
+    edges_for_cmap = draw_networkx_arrows(G, edgelist=edge_tuples, pos=positions, arrows=True, 
+        arrowstyle='->', width = arrow_size,  pathstyle=pathstyle,
+        alphas = e_alphas, edge_color= weights, edge_cmap=e_cmap)
     
     nx.draw_networkx_labels(G, label_positions, labels)
     plt.tight_layout()
@@ -500,7 +508,7 @@ def draw_networkx_arrows(G, pos,
                         width=0.02,
                         edge_color='k',
                         style='solid',
-                        alpha=1.,
+                        alphas=1.,
                         edge_cmap=None,
                         edge_vmin=None,
                         edge_vmax=None,
@@ -517,6 +525,9 @@ def draw_networkx_arrows(G, pos,
 
     if not edgelist or len(edgelist) == 0:  # no edges!
         return None
+        
+    if len(alphas)<len(edgelist):
+        alphas = np.repeat(alphas, len(edgelist))
 
     # set edge positions
     edge_pos = np.asarray([(pos[e[0]], pos[e[1]]) for e in edgelist])
@@ -535,7 +546,7 @@ def draw_networkx_arrows(G, pos,
                          for c in edge_color]):
             # (should check ALL elements)
             # list of color letters such as ['k','r','k',...]
-            edge_colors = tuple([colorConverter.to_rgba(c, alpha)
+            edge_colors = tuple([colorConverter.to_rgba(c)
                                  for c in edge_color])
         elif np.alltrue([not cb.is_string_like(c)
                            for c in edge_color]):
@@ -550,29 +561,17 @@ def draw_networkx_arrows(G, pos,
             raise ValueError('edge_color must consist of either color names or numbers')
     else:
         if cb.is_string_like(edge_color) or len(edge_color) == 1:
-            edge_colors = (colorConverter.to_rgba(edge_color, alpha), )
+            edge_colors = (colorConverter.to_rgba(edge_color), )
         else:
             raise ValueError('edge_color must be a single color or list of exactly m colors where m is the number or edges')
 
     edge_collection = collections.LineCollection(edge_pos,
                                      colors=edge_colors,
-                                     linewidths=lw,
-                                     antialiaseds= tuple(np.repeat(3*width, len(edge_pos))),
-                                     linestyle=style,
-                                     transOffset = ax.transData,
+                                     linewidths=lw
                                      )
-
     edge_collection.set_zorder(1)  # edges go behind nodes
 
     # ax.add_collection(edge_collection)
-
-    # Note: there was a bug in mpl regarding the handling of alpha values for
-    # each line in a LineCollection.  It was fixed in matplotlib in r7184 and
-    # r7189 (June 6 2009).  We should then not set the alpha value globally,
-    # since the user can instead provide per-edge alphas now.  Only set it
-    # globally if provided as a scalar.
-    if cb.is_numlike(alpha):
-        edge_collection.set_alpha(alpha)
 
     if edge_colors is None:
         if edge_cmap is not None:
@@ -585,34 +584,68 @@ def draw_networkx_arrows(G, pos,
             edge_collection.autoscale()
     
 
+    for n in G:
+        c=Circle(pos[n],radius=0.02,alpha=0.5)
+        ax.add_patch(c)
+        G.node[n]['patch']=c
+        x,y=pos[n]
+    seen={}
+
+    
     if G.is_directed():
-
+        seen = {}
+        
         for idx in range(len(edgelist)):
-            (src, dst) = edge_pos[idx]
-            x1, y1 = src
-            x2, y2 = dst
-            delta = 0.2
-            theta = np.arctan((y2-y1)/(x2-x1))
-            # print(theta)
-            if x1==x2:
-                dx = x2-x1
-                dy = y2-y1 - np.sign(y2-y1)*delta
-            elif y1==y2:
-                dx = x2-x1 - np.sign(x2-x1)*delta
-                dy = y2-y1 
-            else:
-                dx = x2-x1 - np.sign(x2-x1)*np.abs(np.cos(theta)*delta)   # x offset
-                dy = y2-y1 - np.sign(y2-y1)*np.abs(np.sin(theta)*delta)   # y offset 
             
-            thislabel = None if len(label)<len(edgelist) else label[idx]
+            if pathstyle is "straight":
+                (src, dst) = edge_pos[idx]
+                x1, y1 = src
+                x2, y2 = dst
+                delta = 0.2
+                theta = np.arctan((y2-y1)/(x2-x1))
+                # print(theta)
+                if x1==x2:
+                    dx = x2-x1
+                    dy = y2-y1 - np.sign(y2-y1)*delta
+                elif y1==y2:
+                    dx = x2-x1 - np.sign(x2-x1)*delta
+                    dy = y2-y1 
+                else:
+                    dx = x2-x1 - np.sign(x2-x1)*np.abs(np.cos(theta)*delta)   # x offset
+                    dy = y2-y1 - np.sign(y2-y1)*np.abs(np.sin(theta)*delta)   # y offset 
+                
+                thislabel = None if len(label)<len(edgelist) else label[idx]
 
-            ax.arrow(
-                x1,y1, dx,dy,
-                facecolor=edge_cmap(edge_color[idx]), alpha = alpha,
-                linewidth = 0, antialiased = True,
-                width= width, head_width = 5*width, overhang = -5, length_includes_head=True, 
-                label=thislabel, zorder=1
-                )
+                ax.arrow(
+                    x1,y1, dx,dy,
+                    facecolor=edge_cmap(edge_color[idx]), alpha = alphas[idx],
+                    linewidth = 0, antialiased = True,
+                    width= width, head_width = 5*width, overhang = -5*0.02/width, length_includes_head=True, 
+                    label=thislabel, zorder=1
+                    )
+                    
+            elif pathstyle is "curve":
+                
+                (u,v) = edgelist[idx]
+                n1=G.node[u]['patch']
+                n2=G.node[v]['patch']
+                rad=0.1
+                
+                if (u,v) in seen:
+                    rad=seen.get((u,v))
+                    rad=(rad+np.sign(rad)*0.1)*-1
+                alpha=0.5
+
+                e = FancyArrowPatch(n1.center,n2.center,patchA=n1,patchB=n2,
+                                    arrowstyle='-|>',
+                                    connectionstyle='arc3,rad=%s'%rad,
+                                    mutation_scale=10.0,
+                                    lw=10,
+                                    alpha=alphas[idx],
+                                    color=edge_cmap(edge_color[idx]))
+                seen[(u,v)]=rad
+                ax.add_patch(e)
+           
 
     # update view
     minx = np.amin(np.ravel(edge_pos[:, :, 0]))

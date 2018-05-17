@@ -34,9 +34,21 @@ import BayesF
 from qinfer import NormalDistribution
 from Distrib import MultiVariateNormalDistributionNocov
 
+
+def time_seconds():
+    import datetime
+    now =  datetime.date.today()
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    second = datetime.datetime.now().second
+    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    return time
+
+
+
 ## Single function call, given QMDInfo and a name, to learn model entirely. 
 
-def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_name='localhost', port_number=6379, qid=0):
+def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_name='localhost', port_number=6379, qid=0, log_file='rq_output.log'):
         print("QHL for", name, "remote:", remote)
         time_start = time.time()
         # Get params from qmd_info
@@ -45,6 +57,12 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
         learned_models_info = rds_dbs['learned_models_info']
         learned_models_ids = rds_dbs['learned_models_ids']
         active_branches_learning_models = rds_dbs['active_branches_learning_models']
+
+        write_log_file = open(log_file, 'a')
+        def log_print(to_print):
+            identifier = str(str(time_seconds()) + " [RQ Learn "+str(modelID)+"]")
+            print(identifier, str(to_print), file=write_log_file)
+
 
         if qmd_info == None:
             #print("Trying to load qmd info from redis db")
@@ -70,7 +88,7 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
         
         # Generate model and learn
         op = DataBase.operator(name = name)
-        qml_instance = ModelLearningClass(name=name, num_probes = num_probes, probe_dict=probe_dict)
+        qml_instance = ModelLearningClass(name=name, num_probes = num_probes, probe_dict=probe_dict, qid=qid, log_file=log_file, modelID=modelID)
 
         sim_pars = []
         num_pars = op.num_constituents
@@ -103,8 +121,10 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
           qle = qle,
           host_name = host_name,
           port_number = port_number, 
-          qid=qid
+          qid=qid,
+          log_file = log_file
         )
+        
         qml_instance.UpdateModel(n_experiments = num_experiments, sigma_threshold = sigma_threshold)
         updated_model_info = copy.deepcopy(qml_instance.learned_info_dict()) # possibly need to take a copy
         del qml_instance
@@ -122,7 +142,10 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
             del updated_model_info
             del compressed_info
             print("Model", name, "learned and pickled to redis DB.")
-            print("Time taken to learn model:", time_end - time_start)
+            log_print("Learned")
+#            print("Time taken to learn model:", time_end - time_start)
+            time_taken = "Time:"+str(time_end-time_start)
+            log_print(time_taken)
             return None
         else: 
             return updated_model_info
