@@ -93,11 +93,13 @@ for i in range(global_variables.num_runs):
     
     if global_variables.pickle_qmd_class:
         print("QMD complete. Pickling result.")
+        qmd.delete_unpicklable_attributes()
         pickle.dump(qmd, open(global_variables.class_pickle_file, "wb"), protocol=2)
     
     qmd.plotVolumes(save_to_file=global_variables.results_directory+'volumes_all_models_'+str(global_variables.long_id)+'.png')
     qmd.plotVolumes(branch_champions=True, save_to_file=global_variables.results_directory+'volumes_branch_champs_'+str(global_variables.long_id) +'.png')
     
+    qmd.saveBayesCSV(save_to_file=global_variables.results_directory+'bayes_factors_'+str(global_variables.long_id)+'.csv', names_ids='latex')
     qmd.plotHintonAllModels(save_to_file=global_variables.results_directory+'hinton_'+str(global_variables.long_id)+'.png')
     
 #    qmd.plotHintonListModels(model_list=qmd.SurvivingChampions, save_to_file=global_variables.results_directory+'hinton_champions_'+str(global_variables.long_id)+'.png')

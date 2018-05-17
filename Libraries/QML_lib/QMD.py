@@ -186,19 +186,19 @@ class QMD():
         }
         
         print("QMD: self.RunParallel=", self.RunParallel)
-        if self.RunParallel:
-            compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
-            compressed_probe_dict = pickle.dumps(self.ProbeDict, protocol=2)
-            qmd_info_db = self.RedisDataBases['qmd_info_db']
-            print("Saving qmd info db to ", qmd_info_db)
-            qmd_info_db.set('QMDInfo', compressed_qmd_info)
-            qmd_info_db.set('ProbeDict', compressed_probe_dict)
+        compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
+        compressed_probe_dict = pickle.dumps(self.ProbeDict, protocol=2)
+        qmd_info_db = self.RedisDataBases['qmd_info_db']
+        print("Saving qmd info db to ", qmd_info_db)
+        qmd_info_db.set('QMDInfo', compressed_qmd_info)
+        qmd_info_db.set('ProbeDict', compressed_probe_dict)
 
         print("\nRunning ", self.QLE_Type, " for true operator ", true_operator, " with parameters : ", self.TrueParamsList)
         # Initialise database and lists.
         self.initiateDB()
         
     def initiateDB(self):
+        # print("Initiating QMD DB")
         ## TODO: Models should be initialised with appropriate TrueOp dimension -- see getListTrueOpByDimension function
         self.db, self.legacy_db, self.model_lists = \
             DataBase.launch_db(
@@ -261,6 +261,12 @@ class QMD():
                 self.HighestQubitNumber = DataBase.get_num_qubits(model)
         #else: 
         #    self.NumModels-=int(1)
+
+
+    def delete_unpicklable_attributes(self):
+        del self.redis_conn
+        del self.rq_queue
+        del self.RedisDataBases
 
     def newBranch(self, model_list):
         self.HighestBranchID += 1
@@ -1172,6 +1178,9 @@ class QMD():
         else:
             plt.savefig(save_to_file, bbox_extra_artists=(lgd,), bbox_inches='tight')
     
+
+    def saveBayesCSV(self, save_to_file, names_ids='latex'):
+        PlotQMD.BayesFactorsCSV(self, save_to_file, names_ids=names_ids)
 
     def plotHintonAllModels(self, save_to_file=None):
         PlotQMD.plotHinton(model_names=self.ModelNameIDs, bayes_factors=self.AllBayesFactors, save_to_file=save_to_file)

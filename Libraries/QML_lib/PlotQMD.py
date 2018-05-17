@@ -415,3 +415,45 @@ def plotTreeDiagram(qmd, modlist=None, save_to_file=None, only_adjacent_branches
         plt.savefig(save_to_file, bbox_inches='tight')
 
         
+        
+       
+def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
+
+    import csv
+    fields = ['ID', 'Name']
+    if names_ids=='latex':
+        names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in range(qmd.HighestModelID)]
+    elif names_ids=='nonlatex':
+        names = [qmd.ModelNameIDs[i] for i in range(qmd.HighestModelID)]
+    elif names_ids=='ids':
+        names=range(qmd.HighestModelID)
+    else:
+        print("BayesFactorsCSV names_ids must be latex, nonlatex, or ids.")
+
+    fields.extend(names)
+
+    with open(save_to_file, 'w') as csvfile:
+
+        fieldnames = fields
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        for i in range(qmd.HighestModelID):
+            model_bf = {}
+            for j in qmd.AllBayesFactors[i].keys():
+                if names_ids=='latex':
+                    other_model_name = DataBase.latex_name_ising(qmd.ModelNameIDs[j])
+                elif names_ids=='nonlatex':
+                    other_model_name = qmd.ModelNameIDs[j]
+                elif names_ids=='ids':
+                    other_model_name = j
+                model_bf[other_model_name] = qmd.AllBayesFactors[i][j][-1]
+
+            if names_ids=='latex':
+                model_bf['Name'] = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
+            else:
+                model_bf['Name'] = qmd.ModelNameIDs[i]
+            model_bf['ID'] = i
+            writer.writerow(model_bf)
+     
+        
