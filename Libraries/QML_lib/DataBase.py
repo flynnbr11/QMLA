@@ -70,6 +70,29 @@ paulis_list = {'i' : evo.identity(), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z'
 ------ ------ Operator Class ------ ------
 """
 
+
+def time_seconds():
+    import datetime
+    now =  datetime.date.today()
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    second = datetime.datetime.now().second
+    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    return time
+
+
+def log_print(to_print_list, log_file):
+	# print("QMD Log print called at ", time_seconds(), "; printing to", self.write_log_file)
+	identifier = str(str(time_seconds()) +" [DB]")
+	if type(to_print_list)!=list:
+	    to_print_list = list(to_print_list)
+
+	print_strings = [str(s) for s in to_print_list]
+	to_print = " ".join(print_strings)
+	print(identifier, str(to_print), file=log_file, flush=True)
+
+
+
 class operator():
     """
     Operator class:
@@ -617,7 +640,7 @@ ytz = operator('yTz')
 true_operator_list = np.array([ ytz.matrix] )
 
 
-def launch_db(true_op_name, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True, redimensionalise=True, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, probe_dict=None, use_exp_custom=True, enable_sparse=True, debug_directory = None,
+def launch_db(true_op_name, log_file, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True, redimensionalise=True, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, probe_dict=None, use_exp_custom=True, enable_sparse=True, debug_directory = None,
 qid=0, host_name='localhost', port_number=6379):
     """
     Inputs:
@@ -674,6 +697,7 @@ qid=0, host_name='localhost', port_number=6379):
             true_ops=true_ops, 
             true_params=true_params, 
             modelID=int(modelID), 
+            log_file=log_file, 
             epoch=0, 
             probe_dict = probe_dict, 
             resample_threshold = resample_threshold, 
@@ -697,7 +721,7 @@ qid=0, host_name='localhost', port_number=6379):
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, true_op_name, modelID, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, enable_sparse=True, probe_dict=None, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, debug_directory = None, qle=True, qid=0, host_name='localhost', port_number=6379):
+def add_model(model_name, running_database, model_lists, true_op_name, modelID, log_file, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, enable_sparse=True, probe_dict=None, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, debug_directory = None, qle=True, qid=0, host_name='localhost', port_number=6379):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 
@@ -746,7 +770,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
         else: 
             sim_name = model_name
     
-        print("Model ", model_name, " not previously considered -- adding.")
+        log_print(["Model ", model_name, " not previously considered -- adding."], log_file)
         op = operator(name = sim_name, undimensionalised_name = model_name)
         num_rows = len(running_database)
         qml_instance = ModelLearningClass(name=op.name, num_probes = num_probes, probe_dict=probe_dict)
@@ -818,7 +842,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
         return True
     else:
         #location = consider_new_model(model_lists, model_name, running_database)
-        print("Model", alph_model_name, " previously considered.") # at location", location)  
+        log_print(["Model", alph_model_name, " previously considered."], log_file) # at location", location)  
         return False
 
 

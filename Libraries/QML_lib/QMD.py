@@ -137,7 +137,6 @@ class QMD():
         # only true if both. 
         self.GrowthGenerator = growth_generator
         self.SpawnDepth = 0
-        self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(self.GrowthGenerator)
         self.NumModelsPerBranch = {0:len(self.InitialOpList)}
         self.NumModelPairsPerBranch = {0 : num_pairs_in_list(len(self.InitialOpList))}
         self.BranchAllModelsLearned = { 0 : False}
@@ -151,19 +150,17 @@ class QMD():
             self.log_file = log_file
         else:
             self.log_file = str('QMD_'+str(q_id)+'.log')
-        try:
-            self.rq_log_file = self.log_file[:-4]+'.rq.log'
-        except:
-            print("LOG file can't be used:", self.log_file)
-            self.rq_log_file = str(self.log_file)+'.rq'
+        self.rq_log_file = self.log_file
+
+#        try:
+#            self.rq_log_file = self.log_file[:-4]+'.rq.log'
+#        except:
+#            print("LOG file can't be used:", self.log_file)
+#            self.rq_log_file = str(self.log_file)+'.rq'
 
         self.write_log_file = open(self.log_file, 'a')
+        self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(self.GrowthGenerator, log_file=self.write_log_file)
             
-            
-        print("\n\n Log file:", self.log_file)
-        print("\n\n Write file:", self.write_log_file)
-        print("RQ log file:", self.rq_log_file)
-        
         try:
             from rq import Connection, Queue, Worker
             self.redis_conn = redis.Redis(host=self.HostName, port=self.PortNumber)
@@ -242,6 +239,7 @@ class QMD():
         self.db, self.legacy_db, self.model_lists = \
             DataBase.launch_db(
                 true_op_name = self.TrueOpName,
+                log_file = self.write_log_file, 
                 gen_list = self.InitialOpList,
                 qle = self.QLE,
                 true_ops = self.TrueOpList,
@@ -289,7 +287,8 @@ class QMD():
             qle = self.QLE,
             host_name = self.HostName, 
             port_number = self.PortNumber, 
-            qid = self.Q_id
+            qid = self.Q_id,
+            log_file = self.write_log_file
         )
         if tryAddModel == True: ## keep track of how many models/branches in play
             self.HighestModelID += 1 
@@ -994,9 +993,9 @@ class QMD():
 #        options = ['x']
 
         if single_champion:
-            new_models = ModelGeneration.new_model_list(model_list=[overall_champ], generator='simple_ising',model_dict=self.model_lists, options=options)
+            new_models = ModelGeneration.new_model_list(model_list=[overall_champ], generator='simple_ising',model_dict=self.model_lists, log_file=self.write_log_file, options=options)
         else: 
-            new_models = ModelGeneration.new_model_list(model_list=branch_champions, generator='simple_ising', model_dict=self.model_lists, options=options)
+            new_models = ModelGeneration.new_model_list(model_list=branch_champions, generator='simple_ising', model_dict=self.model_lists, log_file=self.write_log_file, options=options)
         
         self.log_print(["New models to add to new branch : ", new_models])
         self.newBranch(model_list=new_models) 
@@ -1008,7 +1007,7 @@ class QMD():
         self.log_print(["Spawning, spawn depth:", self.SpawnDepth])
         best_models = self.BranchRankings[branchID][:num_models]
         best_model_names = [DataBase.model_name_from_id(self.db, mod_id) for mod_id in best_models ]
-        new_models = ModelGeneration.new_model_list(model_list=best_model_names, spawn_depth=self.SpawnDepth, model_dict=self.model_lists, generator=self.GrowthGenerator)
+        new_models = ModelGeneration.new_model_list(model_list=best_model_names, spawn_depth=self.SpawnDepth, model_dict=self.model_lists, log_file=self.write_log_file, generator=self.GrowthGenerator)
         
         self.log_print(["New models to add to new branch : ", new_models])
         new_branch_id = self.newBranch(model_list=new_models) 

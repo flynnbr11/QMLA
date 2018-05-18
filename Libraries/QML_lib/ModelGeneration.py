@@ -29,6 +29,16 @@ Essential functions. Functions below are specific, for generating terms accordin
 ##################################################################################
 ##################################################################################
 
+def time_seconds():
+    import datetime
+    now =  datetime.date.today()
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    second = datetime.datetime.now().second
+    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    return time
+
+
 max_spawn_depth_info = {
     'simple_ising' : 1,
     'hyperfine' : 3,
@@ -37,9 +47,17 @@ max_spawn_depth_info = {
     'hyperfine_like' : 8
 }
 
+def log_print(to_print_list, log_file):
+    identifier = str(str(time_seconds()) +" [MOD_GEN]")
+    if type(to_print_list)!=list:
+        to_print_list = list(to_print_list)
 
-def new_model_list(model_list, spawn_depth, model_dict, options=['x', 'y', 'z'], generator='simple_ising'):
-    print("Generating new models according to best of last round: ", model_list, "; and options:", options)
+    print_strings = [str(s) for s in to_print_list]
+    to_print = " ".join(print_strings)
+    print(identifier, str(to_print), file=log_file, flush=True)
+
+def new_model_list(model_list, spawn_depth, model_dict, log_file, options=['x', 'y', 'z'], generator='simple_ising'):
+    log_print(["Generating new models according to best of last round: ", model_list, "; and options:", options], log_file)
     if generator == 'simple_ising':
         return simple_ising(generator_list=model_list, options=options)
         #todo integrate Andreas' simple Ising growth
@@ -48,15 +66,15 @@ def new_model_list(model_list, spawn_depth, model_dict, options=['x', 'y', 'z'],
     elif generator == 'ising_transverse':
         return ising_transverse(model_list, spawn_step=spawn_depth)
     elif generator == 'hyperfine_like':
-        return hyperfine_like(model_list, spawn_step=spawn_depth, model_dict=model_dict)
+        return hyperfine_like(model_list, spawn_step=spawn_depth, model_dict=model_dict, log_file=log_file)
     
     
     else:
-        print("Generator", generator, "not recognised")        
+        log_print(["Generator", generator, "not recognised"], log_file)        
 
-def max_spawn_depth(generator):
+def max_spawn_depth(generator, log_file):
     if generator not in max_spawn_depth_info:
-        print("Generator not recognised; does not have maximum spawn depth or generation function")
+        log_print(["Generator not recognised; does not have maximum spawn depth or generation function"], log_file)
     else:
         return max_spawn_depth_info[generator]
 
@@ -328,7 +346,7 @@ def simple_ising(generator_list, options=['x', 'y', 'z']):
 
 ### spawn function to match process followed during experimental QMD ###
 
-def single_pauli_multiple_dim(num_qubits, paulis=['x', 'y', 'z', 'i'], pauli=None):
+def single_pauli_multiple_dim(num_qubits, log_file, paulis=['x', 'y', 'z', 'i'], pauli=None):
     import random
     t_str = ''
     running_str =''
@@ -347,12 +365,12 @@ def single_pauli_multiple_dim(num_qubits, paulis=['x', 'y', 'z', 'i'], pauli=Non
 
         return running_str
         
-def ising_non_transverse(model_list, spawn_step):
+def ising_non_transverse(model_list, spawn_step, log_file):
     single_qubit_terms = ['xTi', 'yTi', 'zTi']
     nontransverse_terms = ['xTx', 'yTy', 'zTz']
 
     if len(model_list) > 1:
-        print("Only one model required for non-transverse Ising growth.")
+        log_print(["Only one model required for non-transverse Ising growth."], log_file)
         return False
     else:
         model = model_list[0]
@@ -376,7 +394,7 @@ def ising_non_transverse(model_list, spawn_step):
     return new_models    
 
 
-def ising_transverse(model_list, spawn_step):
+def ising_transverse(model_list, spawn_step, log_file):
 # TODO before using this function, need to add a max_spawn_depth to the dict above for ising_transverse. How many spawns can it support?
     single_qubit_terms = ['xTi', 'yTi', 'zTi']
     nontransverse_terms = ['xTx', 'yTy', 'zTz']
@@ -384,7 +402,7 @@ def ising_transverse(model_list, spawn_step):
     transverse_terms = ['xTy', 'xTz','yTz']
     all_two_qubit_terms =  single_qubit_terms + nontransverse_terms  + transverse_terms
     if len(model_list) > 1:
-        print("Only one model required for transverse Ising growth.")
+        log_print(["Only one model required for transverse Ising growth."], log_file)
         return False
     else:
         model = model_list[0]
@@ -412,7 +430,7 @@ def ising_transverse(model_list, spawn_step):
 
     return new_models    
 
-def hyperfine_like(model_list, spawn_step, model_dict):
+def hyperfine_like(model_list, spawn_step, model_dict, log_file):
 # TODO before using this function, need to add a max_spawn_depth to the dict above for ising_transverse. How many spawns can it support?
     import random
     single_qubit_terms = ['xTi', 'yTi', 'zTi']
@@ -421,7 +439,7 @@ def hyperfine_like(model_list, spawn_step, model_dict):
     transverse_terms = ['xTy', 'xTz', 'yTz']
     all_two_qubit_terms =  single_qubit_terms + nontransverse_terms  + transverse_terms
     if len(model_list) > 1:
-        print("Only one model required for transverse Ising growth.")
+        log_print(["Only one model required for transverse Ising growth."], log_file)
         return False
     else:
         model = model_list[0]

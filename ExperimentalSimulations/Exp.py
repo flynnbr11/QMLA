@@ -45,26 +45,44 @@ import time as time
 
 ###  START QMD ###
 
-print("num times to use:", global_variables.num_times_bayes)
 qle=global_variables.do_qle # True for QLE, False for IQLE
 pickle_result_db = True
 
 import time
 start = time.time()
 
+log_file = open(global_variables.log_file, 'a')
+
+def time_seconds():
+    import datetime
+    now =  datetime.date.today()
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    second = datetime.datetime.now().second
+    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    return time
+
+def log_print(to_print_list, log_file):
+    identifier = str(str(time_seconds()) +" [EXP]")
+    if type(to_print_list)!=list:
+        to_print_list = list(to_print_list)
+
+    print_strings = [str(s) for s in to_print_list]
+    to_print = " ".join(print_strings)
+    print(identifier, str(to_print), file=log_file, flush=True)
+
+
 initial_op_list = ['xTi', 'yTi', 'zTi']
 #initial_op_list = ['x', 'y', 'z']
 
 num_ops = len(initial_op_list)
 for i in range(global_variables.num_runs):
-    print("\ni=",i)
-    print(global_variables.num_particles, "Paricles for ", global_variables.num_experiments, "Experiments:")
     true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 #    true_params = [np.random.rand()]
     #true_params = [0.19, 0.21, 0.8, 0.22, 0.20, 0.27]
     true_params = [0.25, 0.21, 0.28, 0.22, 0.23, 0.27]
     
-    print("QMD id", global_variables.qmd_id, " on host ", global_variables.host_name, "and port", global_variables.port_number, "has seed", rds.get_seed(global_variables.host_name, global_variables.port_number, global_variables.qmd_id, print_status=True),".", global_variables.num_particles, " particles for", global_variables.num_experiments, "experiments and ", global_variables.num_times_bayes, "bayes updates. RQ=", global_variables.use_rq, "RQ log:", global_variables.log_file)
+    log_print(["QMD id", global_variables.qmd_id, " on host ", global_variables.host_name, "and port", global_variables.port_number, "has seed", rds.get_seed(global_variables.host_name, global_variables.port_number, global_variables.qmd_id, print_status=True),".", global_variables.num_particles, " particles for", global_variables.num_experiments, "experiments and ", global_variables.num_times_bayes, "bayes updates. RQ=", global_variables.use_rq, "RQ log:", global_variables.log_file], log_file)
     
     qmd = QMD(
         initial_op_list=initial_op_list, 
@@ -93,7 +111,7 @@ for i in range(global_variables.num_runs):
     qmd.runRemoteQMD(num_spawns=3)
     
     if global_variables.pickle_qmd_class:
-        print("QMD complete. Pickling result.")
+        log_print(["QMD complete. Pickling result."], log_file)
         qmd.delete_unpicklable_attributes()
         pickle.dump(qmd, open(global_variables.class_pickle_file, "wb"), protocol=2)
     
@@ -117,7 +135,7 @@ for i in range(global_variables.num_runs):
     
         
 end = time.time()
-print("\n\nTime taken:", end-start)
+log_print(["Time taken:", end-start], log_file)
 
 #rds.redis_end(global_variables.host_name, global_variables.port_number, global_variables.qmd_id)
 

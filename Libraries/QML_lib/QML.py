@@ -79,7 +79,7 @@ class ModelLearningClass():
 
         print_strings = [str(s) for s in to_print_list]
         to_print = " ".join(print_strings)
-        print(identifier, str(to_print), file=self.log_file)
+        print(identifier, str(to_print), file=self.log_file, flush=True)
 
 
     

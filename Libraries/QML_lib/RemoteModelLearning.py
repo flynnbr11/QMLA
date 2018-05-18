@@ -61,7 +61,7 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
         write_log_file = open(log_file, 'a')
         def log_print(to_print):
             identifier = str(str(time_seconds()) + " [RQ Learn "+str(modelID)+"]")
-            print(identifier, str(to_print), file=write_log_file)
+            print(identifier, str(to_print), file=write_log_file, flush=True)
 
 
         if qmd_info == None:

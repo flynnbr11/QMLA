@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=1:ppn=4,walltime=00:00:30
+#PBS -l nodes=1:ppn=4,walltime=00:20:00
 
 rm dump.rdb 
 
@@ -95,18 +95,21 @@ echo "REDIS_URL is $REDIS_URL"
 
 echo "Running dir is $running_dir"
 echo "workers will log in $running_dir/logs"
-QMD_LOG="$running_dir/logs/QMD_$QMD_ID.$job_number.log"
+
+QMD_JOB=$PBS_JOBNAME
+echo "PBS job name is $QMD_JOB"
+QMD_LOG="$PBS_O_WORKDIR/logs/$QMD_JOB.qmd.$job_number.log"
 
 cd $lib_dir
 if [[ "$host" == "node"* ]]
 then
 	echo "Launching RQ worker on remote nodes using mpirun"
-	mpirun -np $NUM_WORKERS -machinefile $confile rq worker $QMD_ID -u $REDIS_URL >> $PBS_O_WORKDIR/logs/worker_$job_number.log 2>&1 &
+	mpirun -np $NUM_WORKERS -machinefile $confile rq worker $QMD_ID -u $REDIS_URL >> $PBS_O_WORKDIR/logs/$QMD_JOB.worker.$job_number.log 2>&1 &
 #	mpirun -np $NUM_WORKERS rq worker $QMD_ID -u $REDIS_URL > $PBS_O_WORKDIR/logs/worker_$job_number.log 2>&1 &
 else
 	echo "Launching RQ worker locally"
 	echo "RQ launched on $REDIS_URL at $(date +%H:%M:%S)" > $running_dir/logs/worker_$HOSTNAME.log 2>&1 
-	rq worker -u $REDIS_URL >> $running_dir/logs/worker_$HOSTNAME.log 2>&1 &
+	rq worker -u $REDIS_URL >> $running_dir/logs/worker_$QMD_JOB.$HOSTNAME.log 2>&1 &
 fi
 
 sleep 5
@@ -119,7 +122,7 @@ echo "Starting Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
 export full_path_to_results="$script_dir/$RESULTS_DIR"
 
 #python3 Exp.py -rq=1 -p=3000 -e=600 -bt=250 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR
-python3 Exp.py -rq=1 -p=25 -e=4 -bt=2 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG
+python3 Exp.py -rq=1 -p=300 -e=70 -bt=25 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG
 
 # python3 Exp.py -rq=1 -p=25 -e=4 -bt=2 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_dir
 
