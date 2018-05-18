@@ -34,9 +34,29 @@ import BayesF
 from qinfer import NormalDistribution
 from Distrib import MultiVariateNormalDistributionNocov
 
+def time_seconds():
+    import datetime
+    now =  datetime.date.today()
+#    year = now.strftime("%y")
+#    month = now.strftime("%b")
+#    day = now.strftime("%d")
+#    date = str (str(day)+'_'+str(month)+'_'+str(year) )
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    second = datetime.datetime.now().second
+    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    
+    return time
+
 ## Single function call to compute Bayes Factor between models given their IDs
 
-def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, num_times_to_use = 'all', check_db=False, trueModel=None, bayes_threshold=1, host_name='localhost', port_number=6379, qid=0):
+def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, num_times_to_use = 'all', check_db=False, trueModel=None, bayes_threshold=1, host_name='localhost', port_number=6379, qid=0, log_file='rq_output.log'):
+
+    write_log_file = open(log_file, 'a')
+
+    def log_print(to_print):
+        identifier = str(str(time_seconds()) + " [RQ Bayes "+str(model_a_id)+"/"+str(model_b_id)+"]")
+        print(identifier, str(to_print), file=write_log_file)
 
     time_start = time.time()
     rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
@@ -58,9 +78,10 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
                 return (1.0/bayes_factor)
     else:
         
-        model_a = modelClassForRemoteBayesFactor(modelID=model_a_id, host_name=host_name, port_number=port_number, qid=qid)
-        model_b = modelClassForRemoteBayesFactor(modelID=model_b_id, host_name=host_name, port_number=port_number, qid=qid)
-        print("Calculating Bayes factor bw", model_a.Name, "&", model_b.Name)
+        model_a = modelClassForRemoteBayesFactor(modelID=model_a_id, host_name=host_name, port_number=port_number, qid=qid, log_file=log_file)
+        model_b = modelClassForRemoteBayesFactor(modelID=model_b_id, host_name=host_name, port_number=port_number, qid=qid, log_file=log_file)
+
+        log_print("Start")
 
 
         if num_times_to_use == 'all' or len(model_a.Times) < num_times_to_use:
@@ -74,7 +95,6 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
         log_l_b = log_likelihood(model_b, times_a)     
 
         bayes_factor = np.exp(log_l_a - log_l_b)
-        print("Bayes factor bw", model_a.Name, "/", model_b.Name, "= %.0e"%bayes_factor)
         
         
         pair_id = DataBase.unique_model_pair_identifier(model_a_id, model_b_id)
@@ -88,7 +108,7 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
         elif bayes_factor < (1.0/bayes_threshold):
             bayes_factors_winners_db.set(pair_id, 'b')
         else:
-            print("Neither model convincingly stronger than the other.")
+            log_print("Neither model much better.")
 
         """
         if trueModel is not None:
@@ -111,7 +131,8 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
         else:
             active_interbranch_bayes.set(pair_id, True)
         time_end = time.time()
-        print("Time taken to compute Bayes factor:", time_end - time_start)
+        time_taken = "Time to compute: "+str(time_end-time_start)
+        log_print(time_taken)
     
         return bayes_factor
     

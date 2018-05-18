@@ -24,8 +24,19 @@ print_mem_status = True
 
 global_print_loc = False
 
+def time_seconds():
+    import datetime
+    now =  datetime.date.today()
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    second = datetime.datetime.now().second
+    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    return time
+
+
+
 class ModelLearningClass():
-    def __init__(self, name, num_probes=20, probe_dict=None):
+    def __init__(self, name, num_probes=20, probe_dict=None, qid=0, log_file='QMD_log.log', modelID=0):
         self.TrueOpList = np.array([])        # These are the true operators of the true model for time evol in the syst
         self.SimOpList = np.array([])            # Operators for the model under test for time evol. in the sim.
         self.TrueParams = np.array([])        #True parameters of the model of the system for time evol in the syst
@@ -44,6 +55,9 @@ class ModelLearningClass():
         self.BayesFactors = {}
         self.NumProbes = num_probes
         self.ProbeDict = probe_dict
+        self.log_file = open(log_file, 'a')
+        self.Q_id = qid
+        self.ModelID = int(modelID)
 
 
 
@@ -57,10 +71,22 @@ class ModelLearningClass():
         self.Weights = np.full((1, self.NumParticles), 1./self.NumParticles)
     
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
-    
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, simopnames, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True, host_name='localhost', port_number=6379, qid=0):
 
-        print("In QML, qid=", qid)
+    def log_print(self, to_print_list):
+        identifier = str(str(time_seconds()) +" [QML "+ str(self.ModelID) +"; QMD "+str(self.Q_id)+"]")
+        if type(to_print_list)!=list:
+            to_print_list = list(to_print_list)
+
+        print_strings = [str(s) for s in to_print_list]
+        to_print = " ".join(print_strings)
+        print(identifier, str(to_print), file=self.log_file)
+
+
+    
+    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, simopnames, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True, host_name='localhost', port_number=6379, qid=0, log_file='QMD_log.log'):
+       
+        self.log_print(["In QML, qid=", qid])
+        
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db'] 
         init_model_print_loc = False
@@ -92,7 +118,7 @@ class ModelLearningClass():
 #        self.ResamplerThresh = resample_thresh
 #        self.ResamplerA = resampler_a
 #        self.PGHPrefactor = pgh_prefactor
-        self.ModelID = int(modelID)
+#        self.ModelID = int(modelID)
         self.EnableSparse = enable_sparse
 #        self.QLE = qle
         self.checkQLoss = True
@@ -181,7 +207,7 @@ class ModelLearningClass():
         self.FinalParams = np.empty([len(self.SimOpList),2]) #average and standard deviation at the final step of the parameters inferred distributions
         print_loc(print_location=init_model_print_loc)
 
-        print('Initialization Ready')
+        self.log_print(['Initialization Ready'])
         
         
         
@@ -246,7 +272,7 @@ class ModelLearningClass():
             #print('Chosen experiment: ' + repr(self.Experiment))
             if istep == 0:
                 print_loc(global_print_loc)
-                print('Initial time selected > ' + str(self.Experiment[0][0]))
+                self.log_print(['Initial time selected > ', str(self.Experiment[0][0])])
             
             
             self.TrackTime[istep] = self.Experiment[0][0]
@@ -303,7 +329,7 @@ class ModelLearningClass():
                 if False:
                     if self.debugSave: 
                         self.debug_store()
-                    print('Final time selected > ' + str(self.Experiment[0][0]))
+                    self.log_print(['Final time selected > ', str(self.Experiment[0][0])])
                     print('Exiting learning for Reaching Num. Prec. -  Iteration Number ' + str(istep))
                     for iterator in range(len(self.FinalParams)):
                         self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep]), np.std(self.Particles[:,iterator,istep])]
@@ -321,13 +347,12 @@ class ModelLearningClass():
             if self.Covars[istep]<self.SigmaThresh and False: #  I don't want it to stop learning - Brian
                 if self.debugSave: 
                     self.debug_store()
-                print('Final time selected > ' + str(self.Experiment[0][0]))
-                print('Exiting learning for Reaching Cov. Norm. Thrshold of '+ str(self.Covars[istep]))
-                print(' at Iteration Number ' + str(istep)) 
+                self.log_print(['Final time selected > ', str(self.Experiment[0][0])])
+                self.log_print(['Exiting learning for Reaching Cov. Norm. Thrshold of ', str(self.Covars[istep])])
+                self.log_print([' at Iteration Number ' , str(istep)]) 
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep]), np.std(self.Particles[:,iterator,istep])]
-                    print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator]))
-#                    print('Final quadratic loss: ', self.QLosses[-1]  )
+                    self.log_print(['Final Parameters mean and stdev:',str(self.FinalParams[iterator])])
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
                 if checkloss == True: 
                     self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
@@ -344,22 +369,22 @@ class ModelLearningClass():
             
             
             if istep == self.NumExperiments-1:
-                print("Results for QHL on ", self.Name)
-                print('Final time selected > ' + str(self.Experiment[0][0]))
+                self.log_print(["Results for QHL on ", self.Name])
+                self.log_print(['Final time selected > ' , str(self.Experiment[0][0])])
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
                 if self.debugSave: 
                     self.debug_store()
         
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep-1]), np.std(self.Particles[:,iterator,istep-1])]
-                    print('Final Parameters mean and stdev (term ', self.SimOpsNames[iterator] , '):'+str(self.FinalParams[iterator]))
+                    self.log_print(['Final Parameters mean and stdev (term ', self.SimOpsNames[iterator] , '):',str(self.FinalParams[iterator])])
 #                   print('Final quadratic loss: ', str(self.QLosses[-1]))
 #                final_ham = evo.getH(self.)
 
             if debug_print:
-                print("step ", istep)
-                print( " has params: ", self.NewEval)
-                print(" log tot like  : ", self.TrackLogTotLikelihood[-1])
+                self.log_print(["step ", istep])
+                self.log_print( [" has params: ", self.NewEval])
+                self.log_print([" log tot like  : ", self.TrackLogTotLikelihood[-1]])
 
 
     def resetPrior(self):
@@ -415,7 +440,7 @@ class ModelLearningClass():
         elif self.debugDirectory is not None: 
             save_dir = self.debugDirectory
         else: 
-            print("Need to pass debug_dir to QML.debug_save function")
+            self.log_print(["Need to pass debug_dir to QML.debug_save function"])
             return False            
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)            
@@ -432,7 +457,7 @@ class ModelLearningClass():
         elif self.debugDirectory is not None: 
             save_dir = self.debugDirectory
         else: 
-            print("Need to pass debug_dir to QML.debug_save function")
+            self.log_print(["Need to pass debug_dir to QML.debug_save function"])
             return False            
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)            
@@ -466,7 +491,7 @@ class reducedModel():
     
     Then initialises an updater and GenSimModel which are used for updates. 
     """
-    def __init__(self, model_name, sim_oplist, true_oplist, true_params, numparticles, modelID, resample_thresh=0.5, resample_a=0.9, qle=True, probe_dict= None, qid=0, host_name='localhost', port_number=6379):
+    def __init__(self, model_name, sim_oplist, true_oplist, true_params, numparticles, modelID, resample_thresh=0.5, resample_a=0.9, qle=True, probe_dict= None, qid=0, host_name='localhost', port_number=6379, log_file='QMD_log.log'):
 
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db'] 
@@ -494,6 +519,17 @@ class reducedModel():
         self.HostName = host_name
         self.PortNumber = port_number
         self.Q_id = qid
+        self.log_file = open(log_file, 'a')
+        
+    def log_print(self, to_print_list):
+        identifier = str(str(time_seconds()) +" [QML:Reduced "+ str(self.ModelID) +"; QMD "+str(self.Q_id)+"]")
+        if type(to_print_list)!=list:
+            to_print_list = list(to_print_list)
+
+        print_strings = [str(s) for s in to_print_list]
+        to_print = " ".join(print_strings)
+        print(identifier, str(to_print), file=self.log_file)
+    
         
         
     def updateLearnedValues(self, learned_info=None):
@@ -529,7 +565,7 @@ class reducedModel():
 class modelClassForRemoteBayesFactor():
 #TODO: use this instead of full ModelClass above.
     def __init__(self, modelID, host_name='localhost', port_number=6379,
-    qid=0):
+    qid=0 ,log_file='QMD_log.log'):
 
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         #print("modelclass remote bayes:",rds_dbs)
@@ -558,6 +594,9 @@ class modelClassForRemoteBayesFactor():
         self.TrueOpName  = qmd_info['true_name']
         self.UseExpCustom = qmd_info['use_exp_custom']
 
+        self.log_file = open(log_file, 'a')
+        self.Q_id = qid
+
         self.Name = learned_model_info['name']
         op = DB.operator(self.Name)
         self.SimOpList = op.constituents_operators # todo, put this in a lighter function
@@ -585,6 +624,14 @@ class modelClassForRemoteBayesFactor():
         
         # could pickle updaters to a redis db for updaters, but first construct these model classes each time a BF is to be computed. 
 
+    def log_print(self, to_print_list):
+        identifier = str(str(time_seconds()) +" [QML:Bayes "+ str(self.ModelID) +"; QMD "+str(self.Q_id)+"]")
+        if type(to_print_list)!=list:
+            to_print_list = list(to_print_list)
+
+        print_strings = [str(s) for s in to_print_list]
+        to_print = " ".join(print_strings)
+        print(identifier, str(to_print), file=self.log_file)
         
 
 

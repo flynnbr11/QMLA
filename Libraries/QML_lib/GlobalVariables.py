@@ -43,7 +43,7 @@ default_pickle_qmd_class = 0
 default_port_number = 6379
 default_host = 'localhost'
 default_rq_timeout = 3600
-
+default_log_file = 'log_file.log'
 
 
 
@@ -69,7 +69,8 @@ class GlobalVariablesClass():
         port_number = default_port_number,
         results_directory = default_results_directory,
         pickle_qmd_class = default_pickle_qmd_class,
-        rq_timeout = default_rq_timeout
+        rq_timeout = default_rq_timeout,
+        log_file = default_log_file
     ):
         self.do_iqle = do_iqle
         self.do_qle = do_qle
@@ -91,6 +92,8 @@ class GlobalVariablesClass():
         self.port_number = port_number
         self.results_directory = 'Results/'+results_directory
         self.rq_timeout = rq_timeout
+        self.log_file = log_file
+        
         
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -248,6 +251,14 @@ def parse_cmd_line_args(args):
       type=int,
       default=default_rq_timeout
     )
+    
+    parser.add_argument(
+      '-log', '--logfile',
+      help='File to log RQ workers.',
+      type=str,
+      default=default_rq_timeout
+    )
+    
 
 
     # Process arguments from command line
@@ -275,7 +286,7 @@ def parse_cmd_line_args(args):
     results_directory = arguments.results_directory
     pickle_qmd_class = bool(arguments.pickle_result_class)
     rq_timeout = arguments.rq_timeout
-    
+    log_file = arguments.logfile
     
     # Use arguments to initialise global variables class. 
 #    global global_variables
@@ -299,7 +310,8 @@ def parse_cmd_line_args(args):
         port_number = port_number,
         results_directory = results_directory,
         pickle_qmd_class = pickle_qmd_class,
-        rq_timeout = rq_timeout
+        rq_timeout = rq_timeout,
+        log_file = log_file
     )
     
     

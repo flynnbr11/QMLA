@@ -1,6 +1,6 @@
 #!/bin/bash
 
-test_description="prt_25_one_core_four_ppn"
+test_description="run_20_prt_3000_one_core_four_ppn"
 
 echo "local host is $(hostname). Global redis launced here." 
 # ./global_redis_launch.sh
@@ -18,7 +18,7 @@ mkdir -p results_dir
 
 global_server=$(hostname)
 
-for i in `seq 1 2`;
+for i in `seq 3 3`;
 do
 	this_qmd_name="$test_description""_$i"
 	echo "This name: $this_qmd_name"

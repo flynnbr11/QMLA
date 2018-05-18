@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=1:ppn=4,walltime=00:10:00
+#PBS -l nodes=1:ppn=4,walltime=00:00:30
 
 rm dump.rdb 
 
@@ -42,7 +42,8 @@ then
 elif [[ "$host" == "node"* ]]
 then
     echo "BC backend identified"
-    running_dir=$(pwd)
+    #running_dir="$(pwd)"
+	running_dir="/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment"
     lib_dir="/panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib"
     script_dir="/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations"
     module load tools/redis-4.0.8
@@ -92,8 +93,9 @@ REDIS_URL=redis://$SERVER_HOST:$REDIS_PORT
 echo "REDIS_URL is $REDIS_URL"
 #TODO create a redis config
 
-
+echo "Running dir is $running_dir"
 echo "workers will log in $running_dir/logs"
+QMD_LOG="$running_dir/logs/QMD_$QMD_ID.$job_number.log"
 
 cd $lib_dir
 if [[ "$host" == "node"* ]]
@@ -116,8 +118,11 @@ echo "Starting Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
 
 export full_path_to_results="$script_dir/$RESULTS_DIR"
 
-# python3 Exp.py -rq=1 -p=2500 -e=400 -bt=150 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR
-python3 Exp.py -rq=1 -p=25 -e=4 -bt=2 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR
+#python3 Exp.py -rq=1 -p=3000 -e=600 -bt=250 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR
+python3 Exp.py -rq=1 -p=25 -e=4 -bt=2 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG
+
+# python3 Exp.py -rq=1 -p=25 -e=4 -bt=2 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_dir
+
 
 echo "Finished Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
 
