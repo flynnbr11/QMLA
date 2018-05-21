@@ -59,7 +59,8 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
             to_print_list = list(to_print_list)
         print_strings = [str(s) for s in to_print_list]
         to_print = " ".join(print_strings)
-        print(identifier, str(to_print), file=write_log_file, flush=True)
+        with open(log_file, 'a') as write_log_file:
+            print(identifier, str(to_print), file=write_log_file, flush=True)
 
     time_start = time.time()
     rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)

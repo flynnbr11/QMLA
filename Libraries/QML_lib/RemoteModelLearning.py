@@ -58,7 +58,6 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
         learned_models_ids = rds_dbs['learned_models_ids']
         active_branches_learning_models = rds_dbs['active_branches_learning_models']
 
-        write_log_file = open(log_file, 'a')
         def log_print(to_print_list):
             identifier = str(str(time_seconds()) + " [RQ Learn "+str(modelID)+"]")
             if type(to_print_list)!=list:
@@ -66,8 +65,10 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
 
             print_strings = [str(s) for s in to_print_list]
             to_print = " ".join(print_strings)
-            print(identifier, str(to_print), file=write_log_file, flush=True)
 
+            with open(log_file, 'a') as write_log_file:
+                print(identifier, str(to_print), file=write_log_file, flush=True)
+    
 
 
         if qmd_info == None:

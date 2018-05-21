@@ -51,7 +51,6 @@ pickle_result_db = True
 import time
 start = time.time()
 
-log_file = open(global_variables.log_file, 'a')
 
 def time_seconds():
     import datetime
@@ -69,7 +68,8 @@ def log_print(to_print_list, log_file):
 
     print_strings = [str(s) for s in to_print_list]
     to_print = " ".join(print_strings)
-    print(identifier, str(to_print), file=log_file, flush=True)
+    with open(global_variables.log_file, 'a') as log_file:
+        print(identifier, str(to_print), file=log_file, flush=True)
 
 
 initial_op_list = ['xTi', 'yTi', 'zTi']
@@ -135,7 +135,7 @@ for i in range(global_variables.num_runs):
     
         
 end = time.time()
-log_print(["\n\nTime taken:", end-start], log_file)
+log_print(["Time taken:", end-start], log_file)
 
 #rds.redis_end(global_variables.host_name, global_variables.port_number, global_variables.qmd_id)
 

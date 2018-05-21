@@ -230,7 +230,8 @@ class QMD():
 
         print_strings = [str(s) for s in to_print_list]
         to_print = " ".join(print_strings)
-        print(identifier, str(to_print), file=self.write_log_file, flush=True)
+        with open(self.log_file, 'a') as write_log_file:
+            print(identifier, str(to_print), file=write_log_file, flush=True)
         
 
     def initiateDB(self):
@@ -288,7 +289,7 @@ class QMD():
             host_name = self.HostName, 
             port_number = self.PortNumber, 
             qid = self.Q_id,
-            log_file = self.write_log_file
+            log_file = self.log_file
         )
         if tryAddModel == True: ## keep track of how many models/branches in play
             self.HighestModelID += 1 
@@ -805,8 +806,8 @@ class QMD():
                     sleep(0.01)
         else:
             self.log_print(["Jobs all finished because not on RQ"])
-                        
-	self.log_print(["Bayes calculated between branch champions"])
+
+        self.log_print(["Bayes calculated between branch champions"])
         for k in range(num_champs - 1):
             mod1 = branch_champions[k]
             mod2 = branch_champions[k+1]

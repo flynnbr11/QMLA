@@ -54,7 +54,8 @@ def log_print(to_print_list, log_file):
 
     print_strings = [str(s) for s in to_print_list]
     to_print = " ".join(print_strings)
-    print(identifier, str(to_print), file=log_file, flush=True)
+    with open(log_file, 'a') as write_log_file:
+        print(identifier, str(to_print), file=write_log_file, flush=True)
 
 def new_model_list(model_list, spawn_depth, model_dict, log_file, options=['x', 'y', 'z'], generator='simple_ising'):
     log_print(["Generating new models according to best of last round: ", model_list, "; and options:", options], log_file)

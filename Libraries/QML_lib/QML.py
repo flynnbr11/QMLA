@@ -519,7 +519,7 @@ class reducedModel():
         self.HostName = host_name
         self.PortNumber = port_number
         self.Q_id = qid
-        self.log_file = open(log_file, 'a')
+        self.log_file = log_file
         
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) +" [QML:Reduced "+ str(self.ModelID) +"; QMD "+str(self.Q_id)+"]")
@@ -528,7 +528,8 @@ class reducedModel():
 
         print_strings = [str(s) for s in to_print_list]
         to_print = " ".join(print_strings)
-        print(identifier, str(to_print), file=self.log_file)
+        with open(self.log_file, 'a') as write_log_file:
+            print(identifier, str(to_print), file=write_log_file)
     
         
         

@@ -82,16 +82,15 @@ def time_seconds():
 
 
 def log_print(to_print_list, log_file):
-	# print("QMD Log print called at ", time_seconds(), "; printing to", self.write_log_file)
-	identifier = str(str(time_seconds()) +" [DB]")
-	if type(to_print_list)!=list:
-	    to_print_list = list(to_print_list)
+    # print("QMD Log print called at ", time_seconds(), "; printing to", self.write_log_file)
+    identifier = str(str(time_seconds()) +" [DB]")
+    if type(to_print_list)!=list:
+        to_print_list = list(to_print_list)
 
-	print_strings = [str(s) for s in to_print_list]
-	to_print = " ".join(print_strings)
-	print(identifier, str(to_print), file=log_file, flush=True)
-
-
+    print_strings = [str(s) for s in to_print_list]
+    to_print = " ".join(print_strings)
+    with open(log_file, 'a') as write_log_file:
+        print(identifier, str(to_print), file=write_log_file, flush=True)
 
 class operator():
     """

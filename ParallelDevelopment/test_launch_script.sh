@@ -3,7 +3,7 @@
 test_description="race_condition_small_test"
 
 
-num_tests=8
+num_tests=20
 min_id=2
 let max_id="$min_id + $num_tests - 1 "
 

@@ -51,7 +51,6 @@ pickle_result_db = True
 import time
 start = time.time()
 
-log_file = open(global_variables.log_file, 'a')
 
 def time_seconds():
     import datetime
@@ -69,8 +68,10 @@ def log_print(to_print_list, log_file):
 
     print_strings = [str(s) for s in to_print_list]
     to_print = " ".join(print_strings)
-    print(identifier, str(to_print), file=log_file, flush=True)
+    with open(log_file, 'a') as write_log_file:
+        print(identifier, str(to_print), file=write_log_file, flush=True)
 
+log_file = global_variables.log_file
 
 initial_op_list = ['xTi', 'yTi', 'zTi']
 #initial_op_list = ['x', 'y', 'z']
