@@ -1,9 +1,9 @@
 #!/bin/bash
 
-test_description="hundred_particles"
+test_description="race_condition_small_test"
 
 
-num_tests=1
+num_tests=8
 min_id=2
 let max_id="$min_id + $num_tests - 1 "
 

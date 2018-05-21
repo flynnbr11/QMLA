@@ -161,11 +161,6 @@ class QMD():
         self.write_log_file = open(self.log_file, 'a')
         self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(self.GrowthGenerator, log_file=self.write_log_file)
             
-            
-        print("\n\n Log file:", self.log_file)
-        print("\n\n Write file:", self.write_log_file)
-        print("RQ log file:", self.rq_log_file)
-        
         try:
             from rq import Connection, Queue, Worker
             self.redis_conn = redis.Redis(host=self.HostName, port=self.PortNumber)
@@ -405,6 +400,8 @@ class QMD():
         model_list = DataBase.model_names_on_branch(self.db, branchID)
         active_branches_learning_models = self.RedisDataBases['active_branches_learning_models']
         active_branches_learning_models.set(int(branchID), 0)
+        active_branches_learning_models.set('LOCKED', 0)
+
         for model_name in model_list:
             self.log_print(["Model ", model_name, "being learned"])
             self.learnModel(model_name=model_name, use_rq=use_rq, blocking=blocking)
@@ -809,7 +806,7 @@ class QMD():
         else:
             self.log_print(["Jobs all finished because not on RQ"])
                         
-#        print("Job finished count=", job_finished_count)    
+	self.log_print(["Bayes calculated between branch champions"])
         for k in range(num_champs - 1):
             mod1 = branch_champions[k]
             mod2 = branch_champions[k+1]
@@ -1037,7 +1034,10 @@ class QMD():
 #        for i in range(num_spawns):
 #        while max_spawn_depth_reached==False and all_comparisons_complete==False: 
         while max_spawn_depth_reached==False:
-            for branchID_bytes in active_branches_learning_models.keys():
+            model_ids_on_db = list(active_branches_learning_models.keys())
+            model_ids_on_db.remove(b'LOCKED')
+            #self.log_print(["Branch list:", model_ids_on_db])
+            for branchID_bytes in model_ids_on_db:
                 branchID = int(branchID_bytes)
                 if int(active_branches_learning_models.get(branchID)) == self.NumModelsPerBranch[branchID] and self.BranchAllModelsLearned[branchID]==False:
                     
@@ -1060,7 +1060,9 @@ class QMD():
 
                 still_learning = True
                 while still_learning:
-                    for branchID_bytes in active_branches_learning_models.keys():
+                    branch_ids_on_db = list(active_branches_learning_models.keys())
+                    branch_ids_on_db.remove(b'LOCKED')
+                    for branchID_bytes in branch_ids_on_db:
                         branchID = int(branchID_bytes)
                         if int(active_branches_learning_models.get(branchID)) == self.NumModelsPerBranch[branchID] and self.BranchAllModelsLearned[branchID]==False:
                             self.BranchAllModelsLearned[branchID] = True

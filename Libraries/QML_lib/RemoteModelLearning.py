@@ -59,9 +59,15 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
         active_branches_learning_models = rds_dbs['active_branches_learning_models']
 
         write_log_file = open(log_file, 'a')
-        def log_print(to_print):
+        def log_print(to_print_list):
             identifier = str(str(time_seconds()) + " [RQ Learn "+str(modelID)+"]")
+            if type(to_print_list)!=list:
+                to_print_list = list(to_print_list)
+
+            print_strings = [str(s) for s in to_print_list]
+            to_print = " ".join(print_strings)
             print(identifier, str(to_print), file=write_log_file, flush=True)
+
 
 
         if qmd_info == None:
@@ -131,10 +137,28 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
 
         compressed_info = pickle.dumps(updated_model_info, protocol=2) #TODO is there a way to use higher protocol when using python3 for faster pickling? this seems to need to be decoded using encoding='latin1'.... not entirely clear why this encoding is used
         learned_models_info.set(str(modelID), compressed_info)
+        log_print(["Redis SET learned_models_info model:", modelID])
         learned_models_ids.set(str(modelID), True)
+        log_print(["Redis SET learned_models_ids:", modelID, "; set True"])
 
+        
+        while int(active_branches_learning_models.get('LOCKED')) == 1:
+            log_print(["Redis LOCKED: active_branches_learning_models, branch", branchID, "Model trying to get access:", modelID])		
+            time.sleep(0.05)
+        
+        if int(active_branches_learning_models.get('LOCKED')) == 0:
+            active_branches_learning_models.set('LOCKED', 1)
+            log_print(["Redis: active_branches_learning_models, branch", branchID, "; Locked by ", modelID])		
+        else:
+            log_print(["Redis lock: active_branches_learning_models, unrecognised", active_branches_learning_models.get('LOCKED')])		
+
+                
         current = int(active_branches_learning_models.get(int(branchID))) # if first to finish
+        log_print(["Redis GET active_branches_learning_models branch:", branchID])
         active_branches_learning_models.set(int(branchID), current+1)    
+        log_print(["Redis SET active_branches_learning_models branch:", branchID, "by model", modelID, "; setting", current+1])
+        log_print(["Redis: active_branches_learning_models, branch", branchID, "by model", modelID, "; Unlocked by ", modelID])		
+        active_branches_learning_models.set('LOCKED', 0)
         time_end = time.time()
 
             
@@ -142,10 +166,7 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
             del updated_model_info
             del compressed_info
             print("Model", name, "learned and pickled to redis DB.")
-            log_print("Learned")
-#            print("Time taken to learn model:", time_end - time_start)
-            time_taken = "Time:"+str(time_end-time_start)
-            log_print(time_taken)
+            log_print(["Learned. Took time:", str(time_end-time_start)])
             return None
         else: 
             return updated_model_info

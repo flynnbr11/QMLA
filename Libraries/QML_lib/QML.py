@@ -73,7 +73,7 @@ class ModelLearningClass():
     """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
 
     def log_print(self, to_print_list):
-        identifier = str(str(time_seconds()) +" [QML "+ str(self.ModelID) +"; QMD "+str(self.Q_id)+"]")
+        identifier = str(str(time_seconds()) +" [QML "+ str(self.ModelID) +"]")
         if type(to_print_list)!=list:
             to_print_list = list(to_print_list)
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=1:ppn=4,walltime=00:04:00
+#PBS -l nodes=2:ppn=2,walltime=12:00:00
 
 rm dump.rdb 
 
@@ -122,9 +122,9 @@ echo "Starting Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
 export full_path_to_results="$script_dir/$RESULTS_DIR"
 
 #python3 Exp.py -rq=1 -p=3000 -e=600 -bt=250 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR
-python3 Exp.py -rq=1 -p=300 -e=70 -bt=25 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG
+python3 Exp.py -rq=1 -p=1000 -e=400 -bt=200 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG
+# python3 Exp.py -rq=1 -p=10 -e=4 -bt=3 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG
 
-# python3 Exp.py -rq=1 -p=25 -e=4 -bt=2 -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_dir
 
 
 echo "Finished Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
