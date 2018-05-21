@@ -1,9 +1,9 @@
 #!/bin/bash
 
-test_description="race_condition_small_test"
+test_description="failure_tests"
 
 
-num_tests=20
+num_tests=50
 min_id=2
 let max_id="$min_id + $num_tests - 1 "
 

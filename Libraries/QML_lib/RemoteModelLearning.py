@@ -142,11 +142,11 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
         learned_models_ids.set(str(modelID), True)
         log_print(["Redis SET learned_models_ids:", modelID, "; set True"])
 
-        
+        """
         while int(active_branches_learning_models.get('LOCKED')) == 1:
             log_print(["Redis LOCKED: active_branches_learning_models, branch", branchID, "Model trying to get access:", modelID])		
             time.sleep(0.05)
-        
+
         if int(active_branches_learning_models.get('LOCKED')) == 0:
             active_branches_learning_models.set('LOCKED', 1)
             log_print(["Redis: active_branches_learning_models, branch", branchID, "; Locked by ", modelID])		
@@ -157,9 +157,15 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
         current = int(active_branches_learning_models.get(int(branchID))) # if first to finish
         log_print(["Redis GET active_branches_learning_models branch:", branchID])
         active_branches_learning_models.set(int(branchID), current+1)    
+
         log_print(["Redis SET active_branches_learning_models branch:", branchID, "by model", modelID, "; setting", current+1])
         log_print(["Redis: active_branches_learning_models, branch", branchID, "by model", modelID, "; Unlocked by ", modelID])		
         active_branches_learning_models.set('LOCKED', 0)
+        """
+
+        log_print(["Redis INCR active_branches_learning_models branch:", branchID, "model", modelID])
+        active_branches_learning_models.incr(int(branchID), 1)    
+
         time_end = time.time()
 
             

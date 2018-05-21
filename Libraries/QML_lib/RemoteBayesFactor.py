@@ -133,13 +133,14 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
         
         if branchID is not None:    
             # only want to fill these lists when comparing models within branch
-
-
+            """
             current = int(active_branches_bayes.get(int(branchID))) # if first to finish
             log_print(["Redis GET active_branches_bayes branchID:", branchID, "; val:", current])
             active_branches_bayes.set(int(branchID), current+1)  
             log_print(["Redis SET active_branches_bayes branch:", branchID, "; set:", current+1])
-
+            """
+            log_print(["Redis INCR active_branches_bayes branch:", branchID])
+            active_branches_bayes.incr(int(branchID), 1)  
         else:
             active_interbranch_bayes.set(pair_id, True)
             log_print(["Redis SET active_interbranch_bayes pair:", pair_id, "; set:True"])

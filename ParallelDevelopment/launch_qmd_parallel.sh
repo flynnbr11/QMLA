@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=2:ppn=2,walltime=00:06:00
+#PBS -l nodes=1:ppn=5,walltime=00:06:00
 
 rm dump.rdb 
 
