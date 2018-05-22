@@ -55,7 +55,7 @@ class ModelLearningClass():
         self.BayesFactors = {}
         self.NumProbes = num_probes
         self.ProbeDict = probe_dict
-        self.log_file = open(log_file, 'a')
+        self.log_file = log_file
         self.Q_id = qid
         self.ModelID = int(modelID)
 
@@ -79,7 +79,8 @@ class ModelLearningClass():
 
         print_strings = [str(s) for s in to_print_list]
         to_print = " ".join(print_strings)
-        print(identifier, str(to_print), file=self.log_file, flush=True)
+        with open(self.log_file, 'a') as write_log_file:
+            print(identifier, str(to_print), file=write_log_file)
 
 
     
@@ -595,7 +596,7 @@ class modelClassForRemoteBayesFactor():
         self.TrueOpName  = qmd_info['true_name']
         self.UseExpCustom = qmd_info['use_exp_custom']
 
-        self.log_file = open(log_file, 'a')
+        self.log_file = log_file
         self.Q_id = qid
 
         self.Name = learned_model_info['name']
@@ -632,7 +633,8 @@ class modelClassForRemoteBayesFactor():
 
         print_strings = [str(s) for s in to_print_list]
         to_print = " ".join(print_strings)
-        print(identifier, str(to_print), file=self.log_file)
+        with open(self.log_file, 'a') as write_log_file:
+            print(identifier, str(to_print), file=write_log_file)
         
 
 
