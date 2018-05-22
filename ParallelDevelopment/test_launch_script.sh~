@@ -1,9 +1,9 @@
 #!/bin/bash
 
-test_description="failure_tests"
+test_description="long_3500p_800e_400b"
 
 
-num_tests=40
+num_tests20
 min_id=2
 let max_id="$min_id + $num_tests - 1 "
 
@@ -26,7 +26,6 @@ global_server=$(hostname)
 for i in `seq $min_id $max_id`;
 do
 	this_qmd_name="$test_description""_$i"
-	echo "This name: $this_qmd_name"
 	qsub -v QMD_ID=$i,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir -N $this_qmd_name launch_qmd_parallel.sh
 
 done 

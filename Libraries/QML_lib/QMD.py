@@ -428,7 +428,7 @@ class QMD():
 #                queue = Queue(connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL 
 
                 # add function call to RQ queue
-                queued_model = queue.enqueue(learnModelRemote, model_name, modelID, branchID=branchID, remote=True, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, log_file=self.rq_log_file, timeout=self.rq_timeout) # add result_ttl=-1 to keep result indefinitely on redis server
+                queued_model = queue.enqueue(learnModelRemote, model_name, modelID, branchID=branchID, remote=True, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, log_file=self.rq_log_file, result_ttl=-1, timeout=self.rq_timeout) # add result_ttl=-1 to keep result indefinitely on redis server
                 
                 self.log_print(["Model", model_name, "added to queue."])
                 if blocking: # i.e. wait for result when called. 
@@ -463,7 +463,7 @@ class QMD():
             queue = Queue(self.Q_id, connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
 #            queue = Queue(connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
 
-            job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, branchID=branchID, interbranch=interbranch, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName, bayes_threshold=bayes_threshold, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, log_file=self.rq_log_file, timeout=self.rq_timeout) 
+            job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, branchID=branchID, interbranch=interbranch, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName, bayes_threshold=bayes_threshold, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, log_file=self.rq_log_file, result_ttl=-1, timeout=self.rq_timeout) 
             self.log_print(["Bayes factor calculation queued. Model IDs", model_a_id, model_b_id])
 
             if return_job:
@@ -801,7 +801,9 @@ class QMD():
         self.log_print(["num champs = ", num_champs])
         
         if self.use_rq:
+            self.log_print(["Waiting on parent/child Bayes factors."])
             for k in range(len(job_list)):
+                self.log_print(["Waiting on parent/child Bayes factors."])
                 while job_list[k].is_finished == False:
                     sleep(0.01)
         else:
