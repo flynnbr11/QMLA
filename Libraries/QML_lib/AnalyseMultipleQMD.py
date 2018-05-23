@@ -5,11 +5,86 @@ import argparse
 import numpy as np
 
 import DataBase
+import pandas
+
+def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
+    import os, csv
+    if not directory_name.endswith('/'):
+        directory_name += '/'
+
+    if not csv_name.endswith('.csv'):
+        csv_name += '.csv'
+        
+    pickled_files = []
+    for file in os.listdir(directory_name):
+        if file.endswith(".p") and file.startswith("results"):
+            pickled_files.append(file)
+
+    filenames = [directory_name+str(f) for f in pickled_files ]
+    some_results = pickle.load(open(filenames[0], "rb"))
+    result_fields = list(some_results.keys())
+    
+    
+    results_csv = str(directory_name+str(csv_name))
+
+    
+    with open(results_csv, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=result_fields)
+        writer.writeheader()
+
+        for f in filenames:
+            results = pickle.load(open(f, "rb"))
+            writer.writerow(results)
+
+
+def parameter_sweep_analysis(directory_name, save_to_file=None):
+
+    import os, csv
+    if not directory_name.endswith('/'):
+        directory_name += '/'
+
+    results_csv = 'param_sweep.csv'
+    results_path = directory_name+results_csv
+    summariseResultsCSV(directory_name = directory_name, csv_name=results_csv)
+    
+    qmd_cumulative_results = pandas.DataFrame.from_csv(results_path)
+    
+    piv = pandas.pivot_table(qmd_cumulative_results, values=['CorrectModel', 'Time'], index=['ConfigLatex'], aggfunc={'Time':[np.mean, np.median, min, max], 'CorrectModel' : [np.sum, np.mean]})
+
+    time_means = list(piv['Time']['mean'])
+    time_mins = list(piv['Time']['min'])
+    time_maxs = list(piv['Time']['max'])
+    time_medians = list(piv['Time']['median'])
+    correct_count = list(piv['CorrectModel']['sum'])
+    correct_ratio = list(piv['CorrectModel']['mean'])
+    configs = piv.index.tolist()
+    percentages = [a*100 for a in correct_ratio]
+    log_times = [np.log10(t) for t in time_medians]
+
+
+    plt.clf()
+    fig, ax = plt.subplots()
+    ax2 = ax.twiny()
+    width = 0.5 # the width of the bars 
+    ind = np.arange(len(correct_ratio))  # the x locations for the groups
+    ax2.barh(ind, log_times, width/4, color='r', label='Time')
+    ax.barh(ind, percentages, width, color='g', align='center', label='Correct Models')
+    ax.set_yticks(ind)
+    ax.set_yticklabels(configs, minor=False)
+    ax.set_ylabel('Configurations')
+    ax2.set_xlabel('Time ($log_{10}$ seconds)')
+    ax.set_xlabel('% Correct Models')
+
+    lines, labels = ax.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(lines + lines2, labels + labels2, loc='upper center', bbox_to_anchor=(0.5, -0.2), ncol=2)
+
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
 
 def model_scores(directory_name):
 #    sys.path.append(directory_name)
 
-    print("current:", os.getcwd())
     os.chdir(directory_name)
 
     scores = {}
@@ -68,11 +143,22 @@ parser.add_argument(
 
 arguments = parser.parse_args()
 directory_to_analyse = arguments.results_directory
-plot_file = directory_to_analyse+'/model_scores.png'
-print("directory : ", directory_to_analyse)
+
+print("\nAnalysing and storing results in", directory_to_analyse)
+
+if not directory_to_analyse.endswith('/'):
+    directory_to_analyse += '/'
+
+plot_file = directory_to_analyse+'model_scores.png'
 
 model_scores = model_scores(directory_to_analyse)
 plot_scores(model_scores, plot_file)
+
+
+#summariseResultsCSV(directory_name = directory_to_analyse)
+
+param_plot = str(directory_to_analyse+'param_analysis.png')
+parameter_sweep_analysis(directory_name = directory_to_analyse, save_to_file=param_plot)
 
 
 

@@ -9,6 +9,7 @@ from matplotlib.ticker import Formatter
 #from QMD import  *
 #from QML import *
 import DataBase
+import Evo as evo
 
 #### Hinton Disagram ####
 
@@ -54,6 +55,116 @@ def latex_name_ising(name):
     final_term = 'r$'+latex_term+'$'
     
     return latex_term
+
+def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, max_time=3, t_interval=0.01, save_to_file=None):
+    import random
+    if model_ids is None and champ == True:
+        model_ids = [qmd.ChampID]
+    elif model_ids is not None and champ == True:
+
+        if type(model_ids) is not list:
+            model_ids = [model_ids]
+        if qmd.ChampID not in model_ids:
+            model_ids.append(qmd.ChampID)
+
+    probe_id = random.choice(range(qmd.NumProbes))
+    times = np.arange(0, max_time, t_interval)
+    true_colour ='b'
+    champion_colour = 'r'
+    sim_colours = ['g', 'c', 'm', 'y', 'k']
+
+    plt.clf()
+    plt.xlabel('Time')
+    plt.ylabel('Expectation Value')
+
+    true = qmd.TrueOpName
+    true_op = DataBase.operator(true)
+    true_params = qmd.TrueParamsList
+    true_ops = true_op.constituents_operators
+    true_ham = np.tensordot(true_params, true_ops, axes=1)
+    true_dim = true_op.num_qubits
+    true_probe = qmd.ProbeDict[(probe_id,true_dim)]
+    true_expec_values = [evo.expectation_value(ham=true_ham, t=t, state=true_probe) for t in times]
+    plt.scatter(times, true_expec_values, label='True Expectation Value', marker='x', color = true_colour)
+
+    
+    ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
+    for i in range(len(model_ids)):
+        mod_id = model_ids[i]
+        sim = qmd.ModelNameIDs[mod_id]
+        sim_op  = DataBase.operator(sim)
+        mod=qmd.reducedModelInstanceFromID(mod_id)
+        sim_params = list(mod.FinalParams[:,0])
+        sim_ops = sim_op.constituents_operators
+        sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
+        sim_dim = sim_op.num_qubits
+        sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
+        colour_id = int(i%len(sim_colours))
+        sim_col = sim_colours[colour_id]
+        sim_expec_values = [evo.expectation_value(ham=sim_ham, t=t, state=sim_probe) for t in times]
+
+        if mod_id == qmd.ChampID:
+            models_branch = ChampionsByBranch[mod_id]
+#            sim_label = 'Champion Model (Branch ' +str(models_branch)+')'
+            sim_label = 'Champion Model'
+            sim_col = champion_colour
+        elif mod_id in list(qmd.BranchChampions.values()):
+            models_branch = ChampionsByBranch[mod_id]
+            sim_label = 'Branch '+str(models_branch)+' Champion'
+        else:
+            sim_label = 'Model '+str(mod_id)
+
+        plt.plot(times, sim_expec_values, label=sim_label, color=sim_col)
+
+    ax = plt.subplot(111)
+
+    # Shrink current axis's height by 10% on the bottom
+    box = ax.get_position()
+    qty = 0.1
+    ax.set_position([box.x0, box.y0 + box.height * qty,
+                     box.width, box.height * (1.0-qty)])
+
+    handles, labels = ax.get_legend_handles_labels()
+    label_list = list(labels)
+    handle_list = list(handles)
+
+    new_labels=[]
+    new_handles=[]
+
+    special_labels=[]
+    special_handles=[]
+
+    special_terms = ['True Expectation Value', 'Champion Model']
+
+    for i in range(len(label_list)):
+        if label_list[i] in special_terms:
+            special_labels.append(label_list[i])
+            special_handles.append(handle_list[i])
+        else:
+            new_labels.append(label_list[i])
+            new_handles.append(handle_list[i])
+
+
+    special_handles = tuple(special_handles)
+    special_labels = tuple(special_labels)
+
+    extra_lgd = True
+    if len(new_handles) == 0:
+        print("No models other than champ/true")
+        extra_lgd=False
+        
+    new_handles = tuple(new_handles)
+    new_labels = tuple(new_labels)
+
+    if extra_lgd:
+        lgd_spec=ax.legend(special_handles, special_labels, loc='upper center', bbox_to_anchor=(1, 1),fancybox=True, shadow=True, ncol=1)
+        lgd_new=ax.legend(new_handles, new_labels, loc='upper center', bbox_to_anchor=(1.15, 0.75),fancybox=True, shadow=True, ncol=1)
+        plt.gca().add_artist(lgd_spec)
+    else:
+        lgd_spec=ax.legend(special_handles, special_labels, loc='upper center', bbox_to_anchor=(1, 1),fancybox=True, shadow=True, ncol=1)
+        
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
 
     
     
@@ -340,7 +451,7 @@ def plotTreeDiagram(qmd, modlist=None, save_to_file=None, only_adjacent_branches
         name = mod.Name
         branch=qmd.pullField(name=name, field='branchID')
         branch_mod_count[branch] += 1
-        latex_term = mod.LatexTerm[1:]
+        latex_term = mod.LatexTerm
         labels[i] = latex_term
 
     most_models_per_branch = max(branch_mod_count.values())

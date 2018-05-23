@@ -3,7 +3,7 @@
 test_description="long_3500p_800e_400b"
 
 
-num_tests=2
+num_tests=1
 min_id=2
 let max_id="$min_id + $num_tests - 1 "
 
