@@ -80,7 +80,7 @@ class QMD():
                  growth_generator='simple_ising',
                  log_file = None
                 ):
-#    def __init__(self, initial_op_list, true_op_list, true_param_list):
+        self.StartingTime = time.time()
         self.QLE = qle # Set to False for IQLE
         trueOp = DataBase.operator(true_operator)
         self.TrueOpName = true_operator
@@ -1101,20 +1101,53 @@ class QMD():
 
         self.ChampionFinalParams = self.reducedModelInstanceFromID(self.ChampID).FinalParams
 
+        if DataBase.alph(self.ChampionName) == DataBase.alph(self.TrueOpName):
+            found_correct_model = 1
+        else:
+            found_correct_model = 0
+        
+
+        config = str( 'config' + 
+            '_p'+str(self.NumParticles) +
+            '_e' + str(self.NumExperiments) +
+            '_b' + str( self.NumTimesForBayesUpdates)  +
+            '_ra' + str(self.ResamplerA) +
+            '_rt' + str(self.ResampleThreshold) +
+            '_rp' + str(self.PGHPrefactor)
+            )
+
+        latex_config = str( 
+            '$P_{'+str(self.NumParticles) +
+            '}E_{' + str(self.NumExperiments) +
+            '}B_{' + str( self.NumTimesForBayesUpdates)  +
+            '}RT_{' + str(self.ResamplerA) +
+            '}RA_{' + str(self.ResampleThreshold) +
+            '}RP_{' + str(self.PGHPrefactor) +
+            '}$'
+            )
+
+        time_now = time.time()
+        time_taken = time_now - self.StartingTime
         
         self.ChampionResultsDict = {
             'NameAlphabetical' : DataBase.alph(self.ChampionName),
             'NameNonAlph' : self.ChampionName,
             'FinalParams' : self.ChampionFinalParams,
-            'LatexName' : DataBase.latex_name_ising(self.ChampionName)
+            'LatexName' : DataBase.latex_name_ising(self.ChampionName),
+            'NumParticles' : self.NumParticles,
+            'NumExperiments' : self.NumExperiments,
+            'NumBayesTimes' : self.NumTimesForBayesUpdates,
+            'ResampleThreshold' : self.ResampleThreshold,
+            'ResamplerA' : self.ResamplerA,
+            'PHGPrefactor' : self.PGHPrefactor,
+            'LogFile' : self.log_file,
+            'CorrectModel' : found_correct_model,
+            'ParamConfiguration' : config,
+            'ConfigLatex' : latex_config,       
+            'Time': time_taken,
+            'QID' : self.Q_id
+            
         }
-        # rds.remove_from_dict(host_name=self.HostName, port_number=self.PortNumber, qmd_id=self.Q_id)
-        # rds.flush_dbs_from_id(host_name=self.HostName, port_number=self.PortNumber, qmd_id=self.Q_id)
-        # TODO reinstate
-
-
-    
-                    
                
 
     def updateDataBaseModelValues(self):
@@ -1249,6 +1282,9 @@ class QMD():
         
         PlotQMD.plotHinton(model_names=model_name_dict, bayes_factors=bayes_factors, save_to_file=save_to_file)
         
+    def plotExpecValues(self, model_ids=None, champ=True, max_time=1, t_interval=0.01, save_to_file=None):
+        PlotQMD.ExpectationValuesTrueSim(qmd=self, model_ids=model_ids, champ=champ, max_time=max_time, t_interval=t_interval, save_to_file=save_to_file)
+
 
 
     def plotTreeDiagram(self, modlist=None, save_to_file=None):

@@ -43,8 +43,8 @@ default_pickle_qmd_class = 0
 default_port_number = 6379
 default_host = 'localhost'
 default_rq_timeout = 3600
-default_log_file = 'log_file.log'
-
+default_log_file = 'default_log_file.log'
+default_save_plots = False
 
 
 class GlobalVariablesClass():
@@ -70,7 +70,8 @@ class GlobalVariablesClass():
         results_directory = default_results_directory,
         pickle_qmd_class = default_pickle_qmd_class,
         rq_timeout = default_rq_timeout,
-        log_file = default_log_file
+        log_file = default_log_file,
+        save_plots = default_save_plots
     ):
         self.do_iqle = do_iqle
         self.do_qle = do_qle
@@ -93,6 +94,7 @@ class GlobalVariablesClass():
         self.results_directory = 'Results/'+results_directory
         self.rq_timeout = rq_timeout
         self.log_file = log_file
+        self.save_plots = save_plots
         
         
         if self.results_directory[-1] != '/':
@@ -185,9 +187,9 @@ def parse_cmd_line_args(args):
     ## Include optional plots
     parser.add_argument(
       '-pt', '--plots',
-      help='True: do generate all plots for this script; False: do not.',
+      help='True: save all plots for this QMD; False: do not.',
       type=int,
-      default=default_do_plots
+      default=default_save_plots
     )
 
     ## QInfer parameters, i.e. resampling a and resamping threshold, pgh prefactor.
@@ -256,8 +258,10 @@ def parse_cmd_line_args(args):
       '-log', '--logfile',
       help='File to log RQ workers.',
       type=str,
-      default=default_rq_timeout
+      default=default_log_file
     )
+    
+    
     
 
 
@@ -301,7 +305,6 @@ def parse_cmd_line_args(args):
         num_experiments = num_experiments,
         num_particles = num_particles,
         num_times_bayes = num_times_bayes,
-        all_plots = arguments.plots,
         resample_threshold = resample_threshold,
         resample_a = resample_a,
         pgh_factor = pgh_factor,
@@ -311,7 +314,8 @@ def parse_cmd_line_args(args):
         results_directory = results_directory,
         pickle_qmd_class = pickle_qmd_class,
         rq_timeout = rq_timeout,
-        log_file = log_file
+        log_file = log_file,
+        save_plots = arguments.plots,
     )
     
     

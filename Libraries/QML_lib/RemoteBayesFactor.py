@@ -96,8 +96,10 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
             times_a = model_a.Times[num_times_to_use:]
             times_b = model_b.Times[num_times_to_use:]
         
+        log_print(["Computing log likelihoods."])
         log_l_a = log_likelihood(model_a, times_b)
         log_l_b = log_likelihood(model_b, times_a)     
+        log_print(["Log likelihoods computed."])
 
         bayes_factor = np.exp(log_l_a - log_l_b)
         
@@ -119,17 +121,6 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
         else:
             log_print(["Neither model much better."])
 
-        """
-        if trueModel is not None:
-            if (trueModel!=model_a.Name and trueModel!=model_b.Name):
-                print("Neither model correct")
-            elif bayes_factor > 1 and trueModel == model_a.Name:
-                print("Bayes Correct")
-            elif bayes_factor < 1 and trueModel == model_b.Name:
-                print("Bayes Correct")
-            else:
-                print("Bayes Incorrect")
-        """
         
         if branchID is not None:    
             # only want to fill these lists when comparing models within branch
@@ -145,7 +136,7 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
             active_interbranch_bayes.set(pair_id, True)
             log_print(["Redis SET active_interbranch_bayes pair:", pair_id, "; set:True"])
         time_end = time.time()
-        log_print(["Time to compute: ", str(time_end-time_start)])
+        log_print(["Finished. rq time: ", str(time_end-time_start)])
     
         return bayes_factor
     

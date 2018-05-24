@@ -1,6 +1,6 @@
 #!/bin/bash
 
-test_description="long_3500p_800e_400b"
+test_description="timing_tests"
 
 
 num_tests=1
@@ -23,12 +23,53 @@ mkdir -p results_dir
 
 global_server=$(hostname)
 
-for i in `seq $min_id $max_id`;
-do
-	this_qmd_name="$test_description""_$i"
-	qsub -v QMD_ID=$i,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir -N $this_qmd_name launch_qmd_parallel.sh
+very_short_time="walltime=00:06:00"
+short_time="walltime=00:20:00"
+medium_time="walltime=01:00:00"
+long_time="walltime=08:00:00"
+very_long_time="walltime=16:00:00"
 
-done 
+test_time="walltime=04:00:00"
+
+time=$test_time
+qmd_id=0
+
+
+NUM_PARTICLES=10
+NUM_EXP=5
+NUM_BAYES=4
+RESAMPLE_A=0.95
+RESAMPLE_T=0.5
+RESAMPLE_PGH=1.0
+
+
+for ((e=50; e<400; e+=50));
+do 
+	for ((j=100; j<=1500; j+=200));
+	do 
+
+		for i in `seq $min_id $max_id`;
+		do
+			NUM_PARTICLES="$j"
+			NUM_EXP=$e
+			let NUM_BAYES="$NUM_EXP/2"
+			let qmd_id="$qmd_id+1"
+			let ham_exp="$e * $j"
+			if (( ham_exp > 500000)); then
+				time=$long_time
+			fi 
+
+			this_qmd_name="$test_description""_$qmd_id"
+			echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
+			qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$NUM_PARTICLES,NUM_EXP=$NUM_EXP,NUM_BAYES=$NUM_BAYES,RESAMPLE_A=$RESAMPLE_A,RESAMPLE_T=$RESAMPLE_T,RESAMPLE_PGH=$RESAMPLE_PGH -N $this_qmd_name -l $time launch_qmd_parallel.sh
+
+		done 
+	done
+
+done
+
+
+
 
 echo "
 #!/bin/bash 

@@ -116,17 +116,22 @@ for i in range(global_variables.num_runs):
         qmd.delete_unpicklable_attributes()
         pickle.dump(qmd, open(global_variables.class_pickle_file, "wb"), protocol=2)
     
-    qmd.plotVolumes(save_to_file=global_variables.results_directory+'volumes_all_models_'+str(global_variables.long_id)+'.png')
-    qmd.plotVolumes(branch_champions=True, save_to_file=global_variables.results_directory+'volumes_branch_champs_'+str(global_variables.long_id) +'.png')
     
-    qmd.saveBayesCSV(save_to_file=global_variables.results_directory+'bayes_factors_'+str(global_variables.long_id)+'.csv', names_ids='latex')
-    qmd.plotHintonAllModels(save_to_file=global_variables.results_directory+'hinton_'+str(global_variables.long_id)+'.png')
+    if global_variables.save_plots:
     
-#    qmd.plotHintonListModels(model_list=qmd.SurvivingChampions, save_to_file=global_variables.results_directory+'hinton_champions_'+str(global_variables.long_id)+'.png')
-    
-    
-    qmd.plotTreeDiagram(save_to_file = global_variables.results_directory+'tree_diagram_'+str(global_variables.long_id)+'.png')
-    
+        qmd.plotVolumes(save_to_file=global_variables.results_directory+'volumes_all_models_'+str(global_variables.long_id)+'.png')
+        qmd.plotVolumes(branch_champions=True, save_to_file=global_variables.results_directory+'volumes_branch_champs_'+str(global_variables.long_id) +'.png')
+        
+        qmd.saveBayesCSV(save_to_file=global_variables.results_directory+'bayes_factors_'+str(global_variables.long_id)+'.csv', names_ids='latex')
+        qmd.plotHintonAllModels(save_to_file=global_variables.results_directory+'hinton_'+str(global_variables.long_id)+'.png')
+        
+        qmd.plotExpecValues(save_to_file=global_variables.results_directory+'expec_values_'+str(global_variables.long_id)+'.png')
+        
+    #    qmd.plotHintonListModels(model_list=qmd.SurvivingChampions, save_to_file=global_variables.results_directory+'hinton_champions_'+str(global_variables.long_id)+'.png')
+        
+        
+        qmd.plotTreeDiagram(save_to_file = global_variables.results_directory+'tree_diagram_'+str(global_variables.long_id)+'.png')
+        
     results_file = global_variables.results_file
     pickle.dump(qmd.ChampionResultsDict, open(results_file, "wb"), protocol=2)
     
@@ -137,6 +142,9 @@ for i in range(global_variables.num_runs):
         
 end = time.time()
 log_print(["Time taken:", end-start], log_file)
+log_print(["END: QMD id", global_variables.qmd_id, ":", global_variables.num_particles, " particles;", global_variables.num_experiments, "exp; ", global_variables.num_times_bayes, "bayes. Time:", end-start], log_file)
+
+
 
 #rds.redis_end(global_variables.host_name, global_variables.port_number, global_variables.qmd_id)
 

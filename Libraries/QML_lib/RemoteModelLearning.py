@@ -131,7 +131,8 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
           qid=qid,
           log_file = log_file
         )
-        
+
+        log_print(["Updating model."])
         qml_instance.UpdateModel(n_experiments = num_experiments, sigma_threshold = sigma_threshold)
         updated_model_info = copy.deepcopy(qml_instance.learned_info_dict()) # possibly need to take a copy
         del qml_instance
@@ -173,7 +174,7 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False, host_
             del updated_model_info
             del compressed_info
             print("Model", name, "learned and pickled to redis DB.")
-            log_print(["Learned. Took time:", str(time_end-time_start)])
+            log_print(["Learned. rq time:", str(time_end-time_start)])
             return None
         else: 
             return updated_model_info
