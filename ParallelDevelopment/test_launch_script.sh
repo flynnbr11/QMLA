@@ -29,7 +29,7 @@ medium_time="walltime=01:00:00"
 long_time="walltime=08:00:00"
 very_long_time="walltime=16:00:00"
 
-test_time="walltime=04:00:00"
+test_time="walltime=00:90:00"
 
 time=$test_time
 qmd_id=0
@@ -43,27 +43,30 @@ RESAMPLE_T=0.5
 RESAMPLE_PGH=1.0
 
 
-for ((e=50; e<400; e+=50));
+for ((e=50; e<=100; e+=50));
 do 
-	for ((j=100; j<=1500; j+=200));
+	for ((p=100; p<=300; p+=200));
 	do 
-
-		for i in `seq $min_id $max_id`;
+		for ra in `seq 0.8 0.05 1.0 `;
 		do
-			NUM_PARTICLES="$j"
-			NUM_EXP=$e
-			let NUM_BAYES="$NUM_EXP/2"
-			let qmd_id="$qmd_id+1"
-			let ham_exp="$e * $j"
-			if (( ham_exp > 500000)); then
-				time=$long_time
-			fi 
-
-			this_qmd_name="$test_description""_$qmd_id"
-			echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
-			qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$NUM_PARTICLES,NUM_EXP=$NUM_EXP,NUM_BAYES=$NUM_BAYES,RESAMPLE_A=$RESAMPLE_A,RESAMPLE_T=$RESAMPLE_T,RESAMPLE_PGH=$RESAMPLE_PGH -N $this_qmd_name -l $time launch_qmd_parallel.sh
-
-		done 
+			for rt in `seq 0.35 0.05 0.65 `;
+			do
+				for rp in `seq 0.8 0.1 1.2`;
+				do		
+					for i in `seq $min_id $max_id`;
+					do
+						let bt="$e/2"
+						let qmd_id="$qmd_id+1"
+						let ham_exp="$e*$p + $p*$bt"
+						let seconds_reqd="$ham_exp/50"
+						time="walltime=00:00:$seconds_reqd"
+						this_qmd_name="$test_description""_$qmd_id"
+						echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
+						qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp -N $this_qmd_name -l $time launch_qmd_parallel.sh
+					done 
+				done
+			done
+		done
 	done
 
 done

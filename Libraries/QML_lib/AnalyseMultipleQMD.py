@@ -21,7 +21,6 @@ def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
             pickled_files.append(file)
 
     filenames = [directory_name+str(f) for f in pickled_files ]
-    print("File names:", filenames)
     some_results = pickle.load(open(filenames[0], "rb"))
     result_fields = list(some_results.keys())
     
@@ -118,18 +117,12 @@ def parameter_sweep_analysis(directory_name, save_to_file=None, use_log_times=Fa
     time_colour = 'b'
     ax2.barh(ind, times_to_use, width/4, color=time_colour, label='Time')
     
-    times_to_mark = [1,2,3,600, 3600, 14400, 36000]
+    times_to_mark = [60,600, 3600, 14400, 36000]
     max_time = max(times_to_use)
     for t in times_to_mark:
         if t < max_time:
             ax2.axvline(x=t, color=time_colour)
 
-
-    print("Correct:", correct)    
-    print("Misfit:", misfit)    
-    print("overfit:", overfit)    
-    print("underfit:", underfit)    
-    
 
     left_pts = [0] * num_models
     ax.barh(ind, correct, width, color='g', align='center', label='Correct Models', left=left_pts)
