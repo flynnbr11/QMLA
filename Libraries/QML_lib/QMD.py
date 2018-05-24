@@ -87,6 +87,7 @@ class QMD():
         self.TrueOpDim = trueOp.num_qubits
         self.InitialOpList = initial_op_list
         self.TrueOpList = trueOp.constituents_operators
+        self.TrueOpNumParams = trueOp.num_constituents
         if true_param_list is not None: 
             self.TrueParamsList = true_param_list
         else:
@@ -1101,11 +1102,27 @@ class QMD():
 
         self.ChampionFinalParams = self.reducedModelInstanceFromID(self.ChampID).FinalParams
 
-        if DataBase.alph(self.ChampionName) == DataBase.alph(self.TrueOpName):
-            found_correct_model = 1
-        else:
-            found_correct_model = 0
+        champ_op = DataBase.operator(self.ChampionName)        
+        num_params_champ_model = champ_op.num_constituents
         
+        correct_model = misfit = underfit = overfit = 0
+        
+        
+        self.log_print(["Num params - champ:", num_params_champ_model,"; \t true:", self.TrueOpNumParams])
+
+        if DataBase.alph(self.ChampionName) == DataBase.alph(self.TrueOpName):
+            correct_model = 1
+        elif num_params_champ_model ==  self.TrueOpNumParams and DataBase.alph(self.ChampionName) != DataBase.alph(self.TrueOpName):
+            misfit = 1
+        elif num_params_champ_model > self.TrueOpNumParams: 
+            overfit = 1
+        elif num_params_champ_model < self.TrueOpNumParams: 
+            underfit=1
+            
+
+
+        
+        num_exp_ham = self.NumParticles * (self.NumExperiments + self.NumTimesForBayesUpdates)
 
         config = str( 'config' + 
             '_p'+str(self.NumParticles) +
@@ -1123,8 +1140,10 @@ class QMD():
             '}RT_{' + str(self.ResamplerA) +
             '}RA_{' + str(self.ResampleThreshold) +
             '}RP_{' + str(self.PGHPrefactor) +
+            '}H_{' + str(num_exp_ham) + 
             '}$'
             )
+
 
         time_now = time.time()
         time_taken = time_now - self.StartingTime
@@ -1141,12 +1160,14 @@ class QMD():
             'ResamplerA' : self.ResamplerA,
             'PHGPrefactor' : self.PGHPrefactor,
             'LogFile' : self.log_file,
-            'CorrectModel' : found_correct_model,
             'ParamConfiguration' : config,
             'ConfigLatex' : latex_config,       
             'Time': time_taken,
-            'QID' : self.Q_id
-            
+            'QID' : self.Q_id,
+            'CorrectModel' : correct_model,
+            'Underfit' : underfit,
+            'Overfit' : overfit, 
+            'Misfit' : misfit
         }
                
 
