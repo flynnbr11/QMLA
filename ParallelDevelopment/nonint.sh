@@ -27,7 +27,7 @@ rp_int=0.1
 
 count=0
 
-
+: <<'END'
 for e in `seq $e_min $e_int $e_max`;
 do 
 	for p in `seq $p_min $p_int $p_max `;
@@ -54,3 +54,22 @@ do
 done
 
 echo "\n\n Final Count: $count"
+END
+
+
+expected_time=0
+cutoff_time=180
+if (( $expected_time == 0));
+then
+	echo "top"
+	seconds_reqd=180	
+elif (( $expected_time < $cutoff_time));
+then
+	seconds_reqd=880		
+else
+	echo "bottom"
+	seconds_reqd=$expected_time	
+fi
+echo "var1: $seconds_reqd"
+
+

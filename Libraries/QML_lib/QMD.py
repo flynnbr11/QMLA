@@ -1137,8 +1137,8 @@ class QMD():
             '$P_{'+str(self.NumParticles) +
             '}E_{' + str(self.NumExperiments) +
             '}B_{' + str( self.NumTimesForBayesUpdates)  +
-            '}RT_{' + str(self.ResamplerA) +
-            '}RA_{' + str(self.ResampleThreshold) +
+            '}RT_{' + str(self.ResampleThreshold) +
+            '}RA_{' + str(self.ResamplerA) +
             '}RP_{' + str(self.PGHPrefactor) +
             '}H_{' + str(num_exp_ham) + 
             '}$'

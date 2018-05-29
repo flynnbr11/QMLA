@@ -89,10 +89,6 @@ def parameter_sweep_analysis(directory_name, save_to_file=None, use_log_times=Fa
     width = 0.5 # the width of the bars 
     ind = np.arange(len(correct_ratio))  # the x locations for the groups
 
-    use_log_times=False
-    use_percentage_models = False
-
-
     if use_log_times:
         times_to_use = [np.log10(t) for t in time_medians]
         ax2.set_xlabel('Time ($log_{10}$ seconds)')
@@ -118,6 +114,9 @@ def parameter_sweep_analysis(directory_name, save_to_file=None, use_log_times=Fa
     ax2.barh(ind, times_to_use, width/4, color=time_colour, label='Time')
     
     times_to_mark = [60,600, 3600, 14400, 36000]
+    if use_log_times:
+        times_to_mark = [np.log10(t) for t in times_to_mark]
+
     max_time = max(times_to_use)
     for t in times_to_mark:
         if t < max_time:
@@ -231,8 +230,10 @@ plot_scores(model_scores, plot_file)
 
 #summariseResultsCSV(directory_name = directory_to_analyse)
 
-param_plot = str(directory_to_analyse+'param_analysis.png')
+param_plot = str(directory_to_analyse+'param_analysis_total.png')
+param_percent_plot = str(directory_to_analyse+'param_analysis_percentage.png')
 parameter_sweep_analysis(directory_name = directory_to_analyse, save_to_file=param_plot)
+parameter_sweep_analysis(directory_name = directory_to_analyse, use_log_times=True, use_percentage_models=True, save_to_file=param_percent_plot)
 
 
 

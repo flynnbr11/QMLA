@@ -80,13 +80,14 @@ class QMD():
                  growth_generator='simple_ising',
                  log_file = None
                 ):
-#    def __init__(self, initial_op_list, true_op_list, true_param_list):
+        self.StartingTime = time.time()
         self.QLE = qle # Set to False for IQLE
         trueOp = DataBase.operator(true_operator)
         self.TrueOpName = true_operator
         self.TrueOpDim = trueOp.num_qubits
         self.InitialOpList = initial_op_list
         self.TrueOpList = trueOp.constituents_operators
+        self.TrueOpNumParams = trueOp.num_constituents
         if true_param_list is not None: 
             self.TrueParamsList = true_param_list
         else:
@@ -1101,20 +1102,73 @@ class QMD():
 
         self.ChampionFinalParams = self.reducedModelInstanceFromID(self.ChampID).FinalParams
 
+        champ_op = DataBase.operator(self.ChampionName)        
+        num_params_champ_model = champ_op.num_constituents
+        
+        correct_model = misfit = underfit = overfit = 0
+        
+        
+        self.log_print(["Num params - champ:", num_params_champ_model,"; \t true:", self.TrueOpNumParams])
+
+        if DataBase.alph(self.ChampionName) == DataBase.alph(self.TrueOpName):
+            correct_model = 1
+        elif num_params_champ_model ==  self.TrueOpNumParams and DataBase.alph(self.ChampionName) != DataBase.alph(self.TrueOpName):
+            misfit = 1
+        elif num_params_champ_model > self.TrueOpNumParams: 
+            overfit = 1
+        elif num_params_champ_model < self.TrueOpNumParams: 
+            underfit=1
+            
+
+
+        
+        num_exp_ham = self.NumParticles * (self.NumExperiments + self.NumTimesForBayesUpdates)
+
+        config = str( 'config' + 
+            '_p'+str(self.NumParticles) +
+            '_e' + str(self.NumExperiments) +
+            '_b' + str( self.NumTimesForBayesUpdates)  +
+            '_ra' + str(self.ResamplerA) +
+            '_rt' + str(self.ResampleThreshold) +
+            '_rp' + str(self.PGHPrefactor)
+            )
+
+        latex_config = str( 
+            '$P_{'+str(self.NumParticles) +
+            '}E_{' + str(self.NumExperiments) +
+            '}B_{' + str( self.NumTimesForBayesUpdates)  +
+            '}RT_{' + str(self.ResamplerA) +
+            '}RA_{' + str(self.ResampleThreshold) +
+            '}RP_{' + str(self.PGHPrefactor) +
+            '}H_{' + str(num_exp_ham) + 
+            '}$'
+            )
+
+
+        time_now = time.time()
+        time_taken = time_now - self.StartingTime
         
         self.ChampionResultsDict = {
             'NameAlphabetical' : DataBase.alph(self.ChampionName),
             'NameNonAlph' : self.ChampionName,
             'FinalParams' : self.ChampionFinalParams,
-            'LatexName' : DataBase.latex_name_ising(self.ChampionName)
+            'LatexName' : DataBase.latex_name_ising(self.ChampionName),
+            'NumParticles' : self.NumParticles,
+            'NumExperiments' : self.NumExperiments,
+            'NumBayesTimes' : self.NumTimesForBayesUpdates,
+            'ResampleThreshold' : self.ResampleThreshold,
+            'ResamplerA' : self.ResamplerA,
+            'PHGPrefactor' : self.PGHPrefactor,
+            'LogFile' : self.log_file,
+            'ParamConfiguration' : config,
+            'ConfigLatex' : latex_config,       
+            'Time': time_taken,
+            'QID' : self.Q_id,
+            'CorrectModel' : correct_model,
+            'Underfit' : underfit,
+            'Overfit' : overfit, 
+            'Misfit' : misfit
         }
-        # rds.remove_from_dict(host_name=self.HostName, port_number=self.PortNumber, qmd_id=self.Q_id)
-        # rds.flush_dbs_from_id(host_name=self.HostName, port_number=self.PortNumber, qmd_id=self.Q_id)
-        # TODO reinstate
-
-
-    
-                    
                
 
     def updateDataBaseModelValues(self):
@@ -1249,6 +1303,9 @@ class QMD():
         
         PlotQMD.plotHinton(model_names=model_name_dict, bayes_factors=bayes_factors, save_to_file=save_to_file)
         
+    def plotExpecValues(self, model_ids=None, champ=True, max_time=1, t_interval=0.01, save_to_file=None):
+        PlotQMD.ExpectationValuesTrueSim(qmd=self, model_ids=model_ids, champ=champ, max_time=max_time, t_interval=t_interval, save_to_file=save_to_file)
+
 
 
     def plotTreeDiagram(self, modlist=None, save_to_file=None):
