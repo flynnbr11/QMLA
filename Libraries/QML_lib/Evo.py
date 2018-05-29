@@ -229,15 +229,21 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     print_loc(global_print_loc) 
     expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
     
-    while expec_value > 1.000001:
+#    while expec_value > 1.000001:
+    if expec_value > 1.00000001:
         log_print(["expectation value function has value ", np.abs(psi_u_psi**2)], log_file=log_file, log_identifier=log_identifier)
-        log_print(["t=", t, "\nham = \n ", ham, "\n probe : \n", state, "\n probe normalisation : ", np.linalg.norm(state), "\nU|p>:", u_psi, "\n normalisation of U|p>:", np.linalg.norm(u_psi), "\n<pUp> : ", psi_u_psi, "\nExpec val:", expec_value], log_file=log_file, log_identifier=log_identifier)
+        log_print(["t=", t, "\n\t ham = \n ", ham, "\n\t probe : \n", state, "\n\t probe normalisation : ", np.linalg.norm(state), "\n\t U|p>:", u_psi, "\n\t normalisation of U|p>:", np.linalg.norm(u_psi), "\n\t <pUp> : ", psi_u_psi, "\n\t Expec val:", expec_value], log_file=log_file, log_identifier=log_identifier)
         log_print(["Recalculating expectation value using linalg."], log_file=log_file, log_identifier=log_identifier)
         u_psi = evolved_state(ham, t, state, use_exp_custom=False)
         psi_u_psi = np.dot(probe_bra, u_psi)
         expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
-        
-        
+    
+#    if expec_value > 1:
+#        expec_value = 1
+      
+    if expec_value > 0.1:
+        log_print(["Terminating due to expec value:", expec_value], log_file, log_identifier)
+        sys.exit()  
         
     print_loc(global_print_loc)
     print_expec_value_intermediate = False

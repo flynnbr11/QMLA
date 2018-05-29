@@ -1,9 +1,9 @@
 #!/bin/bash
 
-test_description="high_experiment_particle"
+test_description="evo_failure_test"
 
 
-num_tests=10
+num_tests=1
 min_id=2
 let max_id="$min_id + $num_tests - 1 "
 
@@ -36,13 +36,13 @@ qmd_id=0
 cutoff_time=180
 
 
-p_min=1000
+p_min=3000
 p_max=3000
 p_int=1000
 p_default=1000
 
-e_min=1000 
-e_max=3000
+e_min=2000 
+e_max=2000
 e_int=1000
 e_default=100
 
@@ -69,6 +69,31 @@ rt=$rt_default
 rp=$rp_default
 
 
+
+
+
+
+let bt="$e/2"
+let qmd_id="$qmd_id+1"
+let ham_exp="$e*$p + $p*$bt"
+let expected_time="$ham_exp/50"
+if (( $expected_time < $cutoff_time));
+then
+	seconds_reqd=$cutoff_time	
+else
+	seconds_reqd=$expected_time	
+fi
+time="walltime=00:00:$seconds_reqd"
+this_qmd_name="$test_description""_$qmd_id"
+echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
+echo "Config: e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd"
+qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp -N $this_qmd_name -l $time launch_qmd_parallel.sh
+
+
+
+
+: <<'END'
+
 for e in `seq $e_min $e_int $e_max`;
 do 
 	for p in `seq $p_min $p_int $p_max `;
@@ -79,7 +104,13 @@ do
 			let bt="$e/2"
 			let qmd_id="$qmd_id+1"
 			let ham_exp="$e*$p + $p*$bt"
-			let seconds_reqd="$ham_exp/50"
+			let expected_time="$ham_exp/50"
+			if (( $expected_time < $cutoff_time));
+			then
+				seconds_reqd=$cutoff_time	
+			else
+				seconds_reqd=$expected_time	
+			fi
 			time="walltime=00:00:$seconds_reqd"
 			this_qmd_name="$test_description""_$qmd_id"
 			echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
@@ -93,7 +124,6 @@ done
 
 
 
-: <<'END'
 # Loop over resample_a
 for ra in `seq $ra_min $ra_int $ra_max `;
 do
