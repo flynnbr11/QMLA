@@ -146,11 +146,17 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True,ex
             ham = np.tensordot(modelparams[evoId], oplist, axes=1)
             t = t_list[tId]
             print_loc(global_print_loc)
-            output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol, enable_sparse=enable_sparse, log_file=log_file, log_identifier=log_identifier)
+            try:
+                output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol, enable_sparse=enable_sparse, log_file=log_file, log_identifier=log_identifier)
+            except NameError:
+                log_print(["Error raised; unphysical expecation value."], log_file, log_identifier)
+                sys.exit()
+            
+                
             if output[evoId][tId] < 0:
-                log_print(["[QLE] Negative probability : \t \t probability = ", output[evoId][tId]], log_file)
+                log_print(["[QLE] Negative probability : \t \t probability = ", output[evoId][tId]], log_file, log_identifier)
             elif output[evoId][tId] > 1.001: ## todo some times getting p=1.0 show up
-                log_print(["[QLE] Probability > 1: \t \t probability = ", output[evoId][tId]], log_file) 
+                log_print(["[QLE] Probability > 1: \t \t probability = ", output[evoId][tId]], log_file, log_identifier) 
             #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
     print_loc(global_print_loc) 
     return output
@@ -174,9 +180,9 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_cu
             output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol,  enable_sparse=enable_sparse, log_file=log_file, log_identifier=log_identifier)
             print_loc(global_print_loc)
             if output[evoId][tId] < 0:
-                log_print(["negative probability : \t \t probability = ", output[evoId][tId]], log_file)
+                log_print(["negative probability : \t \t probability = ", output[evoId][tId]], log_file, log_identifier)
             elif output[evoId][tId] > 1.000000000000001:
-                log_print(["[IQLE] Probability > 1: \t \t probability = ", output[evoId][tId]], log_file) 
+                log_print(["[IQLE] Probability > 1: \t \t probability = ", output[evoId][tId]], log_file, log_identifier) 
             #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
     print_loc(global_print_loc)
     return output
@@ -238,12 +244,10 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
         psi_u_psi = np.dot(probe_bra, u_psi)
         expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
     
-#    if expec_value > 1:
-#        expec_value = 1
       
-    if expec_value > 0.1:
+    if expec_value > 1.00000001:
         log_print(["Terminating due to expec value:", expec_value], log_file, log_identifier)
-        sys.exit()  
+        raise NameError('UnphysicalExpectationValue') 
         
     print_loc(global_print_loc)
     print_expec_value_intermediate = False
