@@ -172,7 +172,8 @@ class ModelLearningClass():
         #self.ProbeList =  [pros.def_randomprobe(self.TrueOpList)]
         
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, exp_comparison_tol = self.ExpComparisonTol, enable_sparse=self.EnableSparse, model_name=self.Name)    # probelist=self.TrueOpList,,
+        log_identifier=str("QML "+str(self.ModelID))
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, exp_comparison_tol = self.ExpComparisonTol, enable_sparse=self.EnableSparse, model_name=self.Name, log_file=self.log_file, log_identifier=log_identifier)    # probelist=self.TrueOpList,,
 
         
                 
@@ -611,8 +612,10 @@ class modelClassForRemoteBayesFactor():
         self._normalization_record = learned_model_info['normalization_record']
         
         
+        log_identifier = str("Bayes "+str(self.ModelID)) 
         
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict)    
+                
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict, log_file=self.log_file, log_identifier=log_identifier)    
 
         self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
         #self.Updater._normalization_record = self._normalization_record

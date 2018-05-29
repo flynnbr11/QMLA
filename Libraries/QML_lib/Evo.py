@@ -94,6 +94,27 @@ def getH(_pars, _ops):
  
 # TODO: I changed this to give back total array, not just 0th element -- is that a problem? -Brian
 #    return (np.tensordot(_pars, _ops, axes=1))
+
+
+def time_seconds():
+    import datetime
+    now =  datetime.date.today()
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    second = datetime.datetime.now().second
+    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    return time
+
+
+def log_print(to_print_list, log_file, log_identifier=None):
+    identifier = str(str(time_seconds()) +" [Evo ("+str(log_identifier)+")]")
+    if type(to_print_list)!=list:
+        to_print_list = list(to_print_list)
+
+    print_strings = [str(s) for s in to_print_list]
+    to_print = " ".join(print_strings)
+    with open(log_file, 'a') as write_log_file:
+        print(identifier, str(to_print), file=write_log_file)
  
  
 def anaytical_pr0(t_list, modelparams, oplist, probe):
@@ -113,32 +134,29 @@ def anaytical_pr0(t_list, modelparams, oplist, probe):
     return output
 
  
-def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True,exp_comparison_tol=None, enable_sparse=True, ham_list=None):
+def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True,exp_comparison_tol=None, enable_sparse=True, ham_list=None, log_file='QMDLog.log', log_identifier=None):
     
     print_loc(global_print_loc)
     num_particles = len(modelparams)
 
-    #if num_particles==1: print("True probe \n", probe)
-    #else: print("Simulated probe \n", probe)
     num_times = len(t_list)
     output = np.empty([num_particles, num_times])
     for evoId in range(num_particles): ## todo not sure about length/arrays here
-#        ham = np.tensordot(modelparams[evoId], oplist, axes=1)
         for tId in range(len(t_list)):
             ham = np.tensordot(modelparams[evoId], oplist, axes=1)
             t = t_list[tId]
             print_loc(global_print_loc)
-            output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol, enable_sparse=enable_sparse)
+            output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol, enable_sparse=enable_sparse, log_file=log_file, log_identifier=log_identifier)
             if output[evoId][tId] < 0:
-                print("[QLE] Negative probability : \t \t probability = ", output[evoId][tId])
+                log_print(["[QLE] Negative probability : \t \t probability = ", output[evoId][tId]], log_file)
             elif output[evoId][tId] > 1.001: ## todo some times getting p=1.0 show up
-                print("[QLE] Probability > 1: \t \t probability = ", output[evoId][tId]) 
+                log_print(["[QLE] Probability > 1: \t \t probability = ", output[evoId][tId]], log_file) 
             #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
     print_loc(global_print_loc) 
     return output
  
 
-def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_custom=True, enable_sparse=True, exp_comparison_tol=None, trotterize=True, ham_list = None):
+def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_custom=True, enable_sparse=True, exp_comparison_tol=None, trotterize=True, ham_list = None, log_file='QMDLog.log',log_identifier=None):
     print_loc(global_print_loc)
     num_particles = len(modelparams)
     num_times = len(t_list)
@@ -153,12 +171,12 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_cu
         for tId in range(len(t_list)):
             t = t_list[tId]
              
-            output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol,  enable_sparse=enable_sparse)
+            output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol,  enable_sparse=enable_sparse, log_file=log_file, log_identifier=log_identifier)
             print_loc(global_print_loc)
             if output[evoId][tId] < 0:
-                print("negative probability : \t \t probability = ", output[evoId][tId])
+                log_print(["negative probability : \t \t probability = ", output[evoId][tId]], log_file)
             elif output[evoId][tId] > 1.000000000000001:
-                print("[IQLE] Probability > 1: \t \t probability = ", output[evoId][tId]) 
+                log_print(["[IQLE] Probability > 1: \t \t probability = ", output[evoId][tId]], log_file) 
             #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
     print_loc(global_print_loc)
     return output
@@ -168,7 +186,7 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_cu
      
 ## Partial trace functionality
  
-def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=20, compare_exp_fncs_tol=None):
+def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=20, compare_exp_fncs_tol=None, log_file='QMDLog.log', log_identifier=None):
 # todo: list of probes, maybe 5 is enough? test with different values
     print_loc(global_print_loc)
     print_loc(global_print_loc)
@@ -176,32 +194,18 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
         num_qubits = int(np.log2(np.shape(ham)[0]))
         state = random_probe(num_qubits)
     elif random_probe is False and state is None: 
-        print ("expectation value function: you need to either pass a state or set choose_random_probe=True")
-    #print("\n")
+        log_print(["expectation value function: you need to either pass a state or set choose_random_probe=True"], log_file=log_file, log_identifier=log_identifier)
     print_loc(global_print_loc)
-    #import hamiltonian_exponentiation as h
-    #u_psi_exp_custom = h.unitary_evolve(ham, t, state, enable_sparse_functionality=enable_sparse)
-    #u_psi_linalg = evolved_state(ham, t, state, use_exp_custom=False)
-    
-    #diff = u_psi_exp_custom - u_psi_linalg
-    
-    #print("diff in expec val from linalg to exp custom = ", diff, "\t abs=", np.absolute(diff))
     
     if compare_exp_fncs_tol is not None:
         u_psi_linalg = evolved_state(ham, t, state, use_exp_custom=False, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
         u_psi_exp_custom = evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
         
         diff = np.max(np.abs(u_psi_linalg-u_psi_exp_custom))
-        #print("Diff:", diff, "\tComparing vs", compare_exp_fncs_tol )
-        #print(np.all(np.isclose(u_psi_linalg, u_psi_exp_custom, atol=compare_exp_fncs_tol)))
-        #print("lin:", u_psi_linalg)
-        #print("Exp:", u_psi_exp_custom)
-        #print(np.isclose(u_psi_linalg, u_psi_exp_custom))
         if np.allclose(u_psi_linalg, u_psi_exp_custom, atol=compare_exp_fncs_tol) == False:
-            print("Linalg/ExpHam give different evolved state by", diff)
+            log_print(["Linalg/ExpHam give different evolved state by", diff], log_file=log_file, log_identifier=log_identifier)
             u_psi = u_psi_linalg
         else:
-            #else("Linalg/ExpHam give same evolved state to error", np.max(np.abs(u_psi_linalg-u_psi_exp_custom)))
             u_psi = u_psi_exp_custom
             
     else:
@@ -224,15 +228,11 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     
     print_loc(global_print_loc) 
     expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
-
-    print_loc(global_print_loc)
-#    del u_psi
-    print_loc(global_print_loc)
     
     while expec_value > 1.000001:
-        print("expectation value function has value ", np.abs(psi_u_psi**2))
-        print("t=", t, "\nham = \n ", ham, "\n probe : \n", state, "\n probe normalisation : ", np.linalg.norm(state), "\n normalisation of U|probe>:", np.linalg.norm(u_psi))
-        print("Recalculating expectation value using linalg.")
+        log_print(["expectation value function has value ", np.abs(psi_u_psi**2)], log_file=log_file, log_identifier=log_identifier)
+        log_print(["t=", t, "\nham = \n ", ham, "\n probe : \n", state, "\n probe normalisation : ", np.linalg.norm(state), "\nU|p>:", u_psi, "\n normalisation of U|p>:", np.linalg.norm(u_psi), "\n<pUp> : ", psi_u_psi, "\nExpec val:", expec_value], log_file=log_file, log_identifier=log_identifier)
+        log_print(["Recalculating expectation value using linalg."], log_file=log_file, log_identifier=log_identifier)
         u_psi = evolved_state(ham, t, state, use_exp_custom=False)
         psi_u_psi = np.dot(probe_bra, u_psi)
         expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
@@ -242,17 +242,15 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     print_loc(global_print_loc)
     print_expec_value_intermediate = False
     if print_expec_value_intermediate:
-      print("Bra : \n", probe_bra)
-      print("u_psi\n", u_psi)
-      
-      print("psi_psi:\n", np.dot(probe_bra, state))
-      print("t=", t)
-      print("Ham : \n", ham)
-      print("probe : \n", state)
-      print("u_psi: \n", u_psi)
-      print("psi_u_psi: \n", psi_u_psi)
-      
-      print("Expectation value : ", expec_value)
+      log_print(["Bra : \n", probe_bra], log_file=log_file, log_identifier=log_identifier)
+      log_print(["u_psi\n", u_psi], log_file=log_file, log_identifier=log_identifier)
+      log_print(["psi_psi:\n", np.dot(probe_bra, state)], log_file=log_file, log_identifier=log_identifier)
+      log_print(["t=", t], log_file=log_file, log_identifier=log_identifier)
+      log_print(["Ham : \n", ham], log_file=log_file, log_identifier=log_identifier)
+      log_print(["probe : \n", state], log_file=log_file, log_identifier=log_identifier)
+      log_print(["u_psi: \n", u_psi], log_file=log_file, log_identifier=log_identifier)
+      log_print(["psi_u_psi: \n", psi_u_psi], log_file=log_file, log_identifier=log_identifier)
+      log_print(["Expectation value : ", expec_value], log_file=log_file, log_identifier=log_identifier)
     return expec_value
  
 def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=10):
@@ -314,7 +312,7 @@ def outer_product(state, as_qutip_object=False):
  
 #import qutip as qt
  
-def iqle_evolve(ham, ham_minus, t, probe, trotterize=True, use_exp_custom=True, enable_sparse=True ):
+def iqle_evolve(ham, ham_minus, t, probe, trotterize=True, use_exp_custom=True, enable_sparse=True, log_file='QMDLog.log', log_identifier=None):
     print_loc(global_print_loc)
     ham_dim = int(np.log2(np.shape(ham)[0])) 
     ham_minus_dim = int(np.log2(np.shape(ham_minus)[0]))
@@ -332,7 +330,7 @@ def iqle_evolve(ham, ham_minus, t, probe, trotterize=True, use_exp_custom=True, 
             return expec_value
  
         elif ham_dim > ham_minus_dim:
-            print(" Dimensions don't match; IQLE not applicable")
+            log_print([" Dimensions don't match; IQLE not applicable"], log_file=log_file, log_identifier=log_identifier)
             return 0.5
             """
             dim = true_dim
@@ -357,9 +355,9 @@ def iqle_evolve(ham, ham_minus, t, probe, trotterize=True, use_exp_custom=True, 
             return expected_value
             """
         else: 
-            print("giving expectation value = 0.5 because simulated system is bigger than true system.")
+            log_print(["giving expectation value = 0.5 because simulated system is bigger than true system."], log_file=log_file, log_identifier=log_identifier)
             return 0.5
     else: 
-        print("Implement trotterization in IQLE evolve function (Evo.py)")
+        log_print(["Implement trotterization in IQLE evolve function (Evo.py)"], log_file=log_file, log_identifier=log_identifier)
  
  
