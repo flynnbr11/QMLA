@@ -39,12 +39,12 @@ cutoff_time=180
 p_min=3000
 p_max=3000
 p_int=1000
-p_default=10
+p_default=2000
 
 e_min=2000 
 e_max=2000
 e_int=1000
-e_default=10
+e_default=2000
 
 ra_min=0.8
 ra_max=0.95
@@ -71,25 +71,29 @@ rp=$rp_default
 
 
 
+for i in `seq $min_id $max_id`;
+do
 
 
-let bt="$e/2"
-let qmd_id="$qmd_id+1"
-let ham_exp="$e*$p + $p*$bt"
-let expected_time="$ham_exp/50"
-if (( $expected_time < $cutoff_time));
-then
-	seconds_reqd=$cutoff_time	
-else
-	seconds_reqd=$expected_time	
-fi
-time="walltime=00:00:$seconds_reqd"
-this_qmd_name="$test_description""_$qmd_id"
-echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
-echo "Config: e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd"
-qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp -N $this_qmd_name -l $time launch_qmd_parallel.sh
+	let bt="$e/2"
+	let qmd_id="$qmd_id+1"
+	let ham_exp="$e*$p + $p*$bt"
+	let expected_time="$ham_exp/50"
+	if (( $expected_time < $cutoff_time));
+	then
+		seconds_reqd=$cutoff_time	
+	else
+		seconds_reqd=$expected_time	
+	fi
+	time="walltime=00:00:$seconds_reqd"
+	# only need one hour while testing evo failure
+	time="walltime=01:00:00"
+	this_qmd_name="$test_description""_$qmd_id"
+	echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
+	echo "Config: e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd"
+	qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp -N $this_qmd_name -l $time launch_qmd_parallel.sh
 
-
+done
 
 
 : <<'END'

@@ -151,6 +151,7 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True,ex
             except NameError:
                 log_print(["Error raised; unphysical expecation value."], log_file, log_identifier)
                 sys.exit()
+                log_print(["Inputs to expectation value function. \n\t ham=", ham, "\n\t t=", t, "\n\t state=",probe, "\n\t use_exp_custom=", use_exp_custom, "\n\t exp_comparison_tol=", exp_comparison_tol, "\n\t enable_sparse", enable_sparse, "\n\t log_file=", log_file, "\n\t log_id=", log_identifier], log_file, log_identifier)
             
                 
             if output[evoId][tId] < 0:
@@ -235,18 +236,21 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     print_loc(global_print_loc) 
     expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
     
-#    while expec_value > 1.000001:
     if expec_value > 1.00000001:
+#    if expec_value > 0.100000001:
         log_print(["expectation value function has value ", np.abs(psi_u_psi**2)], log_file=log_file, log_identifier=log_identifier)
-        log_print(["t=", t, "\n\t ham = \n ", ham, "\n\t probe : \n", state, "\n\t probe normalisation : ", np.linalg.norm(state), "\n\t U|p>:", u_psi, "\n\t normalisation of U|p>:", np.linalg.norm(u_psi), "\n\t <pUp> : ", psi_u_psi, "\n\t Expec val:", expec_value], log_file=log_file, log_identifier=log_identifier)
+        log_print(["t=", t, "\nham = \n ", ham, "\nprobe : \n", state, "\nprobe normalisation:", np.linalg.norm(state), "\nU|p>:", u_psi, "\nnormalisation of U|p>:", np.linalg.norm(u_psi), "\n<p|U|p>:", psi_u_psi, "\nExpec val:", expec_value], log_file=log_file, log_identifier=log_identifier)
         log_print(["Recalculating expectation value using linalg."], log_file=log_file, log_identifier=log_identifier)
-        u_psi = evolved_state(ham, t, state, use_exp_custom=False)
+        u_psi = evolved_state(ham, t, state, use_exp_custom=False, log_file=log_file, log_identifier=log_identifier)
         psi_u_psi = np.dot(probe_bra, u_psi)
         expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
     
       
     if expec_value > 1.00000001:
+#    if expec_value > 0.100000001:
         log_print(["Terminating due to expec value:", expec_value], log_file, log_identifier)
+        log_print(["Testing evolved state fnc:"], log_file, log_identifier)
+        evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=True, log_file=log_file, log_identifier=log_identifier)
         raise NameError('UnphysicalExpectationValue') 
         
     print_loc(global_print_loc)
@@ -263,19 +267,28 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
       log_print(["Expectation value : ", expec_value], log_file=log_file, log_identifier=log_identifier)
     return expec_value
  
-def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=10):
+def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=10, log_file=None, log_identifier=None):
     #import hamiltonian_exponentiation as h
     from scipy import linalg
     print_loc(global_print_loc)
   
     #print("Enable sparse : ", enable_sparse)    
     if use_exp_custom and ham_exp_installed:
-      unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse, print_method=print_exp_details, scalar_cutoff=t+1)
+        if log_file is not None:
+            log_print(["Using custom expm. Exponentiating\nt=",t, "\nHam=\n", ham], log_file, log_identifier)
+        unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse, print_method=print_exp_details, scalar_cutoff=t+1)
     else:
       # print("Note: using linalg for exponentiating Hamiltonian.")
-      unitary = linalg.expm(-1j*ham*t)
+        if log_file is not None:
+            log_print(["Using linalg.expm. Exponentiating\nt=",t, "\nHam=\n", ham], log_file, log_identifier)
+        unitary = linalg.expm(-1j*ham*t)
+        if log_file is not None:
+            log_print(["linalg.expm gives \nU=\n",unitary], log_file, log_identifier)
+    
     print_loc(global_print_loc)
     ev_state = np.dot(unitary, state)
+    if log_file is not None:
+        log_print(["evolved state fnc. Method details printed in worker log. \nt=",t, "\nHam=\n", ham, "\nprobe=", state, "\nU=\n", unitary, "\nev_state=", ev_state], log_file, log_identifier)
     del unitary # to save space
     print_loc(global_print_loc)
     return ev_state
