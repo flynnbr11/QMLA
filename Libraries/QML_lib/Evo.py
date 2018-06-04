@@ -273,6 +273,9 @@ def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True, print_
     from scipy import linalg
     print_loc(global_print_loc)
   
+    if t>1e6: ## Try limiting times to use to 1 million
+        t=1e6
+
     #print("Enable sparse : ", enable_sparse)    
     if use_exp_custom and ham_exp_installed:
         if log_file is not None:

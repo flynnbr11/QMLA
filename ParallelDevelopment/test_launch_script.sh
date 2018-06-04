@@ -3,7 +3,7 @@
 test_description="evo_failure_test"
 
 
-num_tests=1
+num_tests=10
 min_id=2
 let max_id="$min_id + $num_tests - 1 "
 
@@ -68,8 +68,8 @@ ra=$ra_default
 rt=$rt_default
 rp=$rp_default
 
-
-
+e=500
+p=500
 
 for i in `seq $min_id $max_id`;
 do
@@ -86,14 +86,125 @@ do
 		seconds_reqd=$expected_time	
 	fi
 	time="walltime=00:00:$seconds_reqd"
-	# only need one hour while testing evo failure
-	time="walltime=01:00:00"
+#	  only need one hour while testing evo failure
+#	time="walltime=01:00:00"
 	this_qmd_name="$test_description""_$qmd_id"
 	echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
 	echo "Config: e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd"
 	qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp -N $this_qmd_name -l $time launch_qmd_parallel.sh
 
 done
+
+e=1000
+p=1000
+
+for i in `seq $min_id $max_id`;
+do
+
+
+	let bt="$e/2"
+	let qmd_id="$qmd_id+1"
+	let ham_exp="$e*$p + $p*$bt"
+	let expected_time="$ham_exp/50"
+	if (( $expected_time < $cutoff_time));
+	then
+		seconds_reqd=$cutoff_time	
+	else
+		seconds_reqd=$expected_time	
+	fi
+	time="walltime=00:00:$seconds_reqd"
+#	  only need one hour while testing evo failure
+#	time="walltime=01:00:00"
+	this_qmd_name="$test_description""_$qmd_id"
+	echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
+	echo "Config: e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd"
+	qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp -N $this_qmd_name -l $time launch_qmd_parallel.sh
+
+done
+
+e=2000
+p=1000
+
+for i in `seq $min_id $max_id`;
+do
+
+
+	let bt="$e/2"
+	let qmd_id="$qmd_id+1"
+	let ham_exp="$e*$p + $p*$bt"
+	let expected_time="$ham_exp/50"
+	if (( $expected_time < $cutoff_time));
+	then
+		seconds_reqd=$cutoff_time	
+	else
+		seconds_reqd=$expected_time	
+	fi
+	time="walltime=00:00:$seconds_reqd"
+#	  only need one hour while testing evo failure
+#	time="walltime=01:00:00"
+	this_qmd_name="$test_description""_$qmd_id"
+	echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
+	echo "Config: e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd"
+	qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp -N $this_qmd_name -l $time launch_qmd_parallel.sh
+
+done
+
+e=2000
+p=200
+
+for i in `seq $min_id $max_id`;
+do
+
+
+	let bt="$e/2"
+	let qmd_id="$qmd_id+1"
+	let ham_exp="$e*$p + $p*$bt"
+	let expected_time="$ham_exp/50"
+	if (( $expected_time < $cutoff_time));
+	then
+		seconds_reqd=$cutoff_time	
+	else
+		seconds_reqd=$expected_time	
+	fi
+	time="walltime=00:00:$seconds_reqd"
+#	  only need one hour while testing evo failure
+#	time="walltime=01:00:00"
+	this_qmd_name="$test_description""_$qmd_id"
+	echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
+	echo "Config: e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd"
+	qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp -N $this_qmd_name -l $time launch_qmd_parallel.sh
+
+done
+
+
+e=2000
+p=2000
+
+for i in `seq $min_id $max_id`;
+do
+
+
+	let bt="$e/2"
+	let qmd_id="$qmd_id+1"
+	let ham_exp="$e*$p + $p*$bt"
+	let expected_time="$ham_exp/50"
+	if (( $expected_time < $cutoff_time));
+	then
+		seconds_reqd=$cutoff_time	
+	else
+		seconds_reqd=$expected_time	
+	fi
+	time="walltime=00:00:$seconds_reqd"
+#	  only need one hour while testing evo failure
+#	time="walltime=01:00:00"
+	this_qmd_name="$test_description""_$qmd_id"
+	echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
+	echo "Config: e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd"
+	qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp -N $this_qmd_name -l $time launch_qmd_parallel.sh
+
+done
+
+
 
 
 : <<'END'
