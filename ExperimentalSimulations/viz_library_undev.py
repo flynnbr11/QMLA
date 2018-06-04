@@ -413,10 +413,12 @@ def qmdclassTOnxobj(qmd, modlist=None, directed=True, only_adjacent_branches=Tru
         G.node[i]['pos'] = (x_pos, y_pos)
 
     # set node colour based on whether that model won a branch 
+    """
     for b in list(qmd.BranchChampions.values()):
-        G.node[b]['status'] = 0.4
-    G.node[qmd.ChampID]['status'] = 0.6
-    
+        if b in modlist:
+            G.node[b]['status'] = 0.4
+        G.node[qmd.ChampID]['status'] = 0.6
+    """
     edges = []
     for a in modlist:
         for b in modlist:
@@ -441,15 +443,24 @@ def qmdclassTOnxobj(qmd, modlist=None, directed=True, only_adjacent_branches=Tru
     return G
     
     
-
+def plotQMDTree(qmd, save_to_file=None, only_adjacent_branches=True, id_labels=False, modlist=None):
+    G = qmdclassTOnxobj(qmd, only_adjacent_branches=only_adjacent_branches, modlist=modlist)
+    plotTreeDiagram(G, n_cmap = plt.cm.pink_r, e_cmap = plt.cm.viridis_r, arrow_size = 0.1,
+                    nonadj_alpha = 0.1, e_alphas = [], 
+                    label_padding = 0.4, pathstyle="curve", id_labels=id_labels, save_to_file=save_to_file)
+    
+    
     
 def plotTreeDiagram(G, n_cmap, e_cmap, 
                     e_alphas = [], nonadj_alpha=0.1, label_padding = 0.4, 
-                    arrow_size = 0.02, pathstyle = "straight"):
+                    arrow_size = 0.02, pathstyle = "straight", id_labels = False, save_to_file=None):
     plt.clf()
     plt.figure(figsize=(6,11))   
     
     directed  = nx.is_directed(G)
+
+    if int(nx.__version__[0])>=2: 
+        list_of_edges = list(G.edges(data=True))
     
     
     edge_tuples = tuple( G.edges() )
@@ -458,18 +469,27 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
     # n_colours = tuple(  [prop['color'] for (n,prop) in G.nodes(data=True)]  ) 
     n_colours = tuple( [ n_cmap(prop['status']) for (n,prop) in G.nodes(data=True)]   )
     
-    labels = dict( zip( G.nodes(), tuple(  [prop['label'] for (n,prop) in G.nodes(data=True)]  ) ))  
-    label_positions = []    
-    for key in positions.keys():
-        label_positions.append( tuple( np.array(positions[key])- np.array([0., label_padding]) ) )
+    
+    label_positions = []   
+    if id_labels is True:
+        labels = dict( zip( G.nodes(), tuple(  [n for (n,prop) in G.nodes(data=True)]  ) ))
+        for key in positions.keys():
+            label_positions.append( tuple( np.array(positions[key])- np.array([0., 0.]) ) )
+    else:
+        labels = dict( zip( G.nodes(), tuple(  [prop['label'] for (n,prop) in G.nodes(data=True)]  ) ))  
+        for key in positions.keys():
+            label_positions.append( tuple( np.array(positions[key])- np.array([0., label_padding]) ) )
+    
     label_positions = dict(zip( positions.keys(), tuple(label_positions) ))
+     
+    
     
 
     if len(e_alphas) == 0: 
         for idx in range(len(edge_tuples)):
-            e_alphas.append(  0.8 if G.edges(data=True)[idx][2]["adj"] else nonadj_alpha )
+            e_alphas.append(  0.8 if list_of_edges[idx][2]["adj"] else nonadj_alpha )
     
-    weights = tuple( [prop['weight'] for (u,v,prop) in G.edges(data=True)] )
+    weights = tuple( [prop['weight'] for (u,v,prop) in list_of_edges] )
 
     nx.draw_networkx_nodes(
         G, with_labels = False, # labels=labels, 
@@ -495,11 +515,13 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
     xmax = max( np.array(list(label_positions.values()))[:,0] )
     plt.xlim(xmin -0.8, xmax +0.8)
     
-    plt.colorbar(edges_for_cmap, orientation="horizontal", pad= 0) # DONE - negative weights are unaccetpable for directed graphs, as they simply mean a flipped edge
+    plt.colorbar(edges_for_cmap, orientation="horizontal", pad= 0, label=r'$\log_{10}$ Bayes factor') # DONE - negative weights are unaccetpable for directed graphs, as they simply mean a flipped edge
 
     # plt.colorbar(n_colours)
 
     plt.title('Tree Diagram for QMD')
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
     
     
 def draw_networkx_arrows(G, pos,
