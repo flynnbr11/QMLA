@@ -115,9 +115,10 @@ for i in range(global_variables.num_runs):
     qmd.runRemoteQMD(num_spawns=3)
     
     if global_variables.pickle_qmd_class:
-        log_print(["QMD complete. Pickling result."], log_file)
+        log_print(["QMD complete. Pickling result to", global_variables.class_pickle_file], log_file)
         qmd.delete_unpicklable_attributes()
-        pickle.dump(qmd, open(global_variables.class_pickle_file, "wb"), protocol=2)
+        with open(global_variables.class_pickle_file, "wb") as pkl_file:
+            pickle.dump(qmd, pkl_file , protocol=2)
     
     
     if global_variables.save_plots:

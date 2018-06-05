@@ -307,6 +307,7 @@ class QMD():
         del self.redis_conn
         del self.rq_queue
         del self.RedisDataBases
+        del self.write_log_file
 
     def newBranch(self, model_list):
         self.HighestBranchID += 1
@@ -1303,13 +1304,13 @@ class QMD():
         
         PlotQMD.plotHinton(model_names=model_name_dict, bayes_factors=bayes_factors, save_to_file=save_to_file)
         
-    def plotExpecValues(self, model_ids=None, champ=True, max_time=1, t_interval=0.01, save_to_file=None):
+    def plotExpecValues(self, model_ids=None, champ=True, max_time=10, t_interval=0.1, save_to_file=None):
         PlotQMD.ExpectationValuesTrueSim(qmd=self, model_ids=model_ids, champ=champ, max_time=max_time, t_interval=t_interval, save_to_file=save_to_file)
 
 
 
     def plotTreeDiagram(self, modlist=None, save_to_file=None):
-        PlotQMD.plotTreeDiagram(self, modlist=modlist, save_to_file=save_to_file)
+        PlotQMD.plotQMDTree(self, modlist=modlist, save_to_file=save_to_file)
 
     def majorityVotingTally(self):
         mod_ids = DataBase.list_model_id_in_branch(self.db, 0)

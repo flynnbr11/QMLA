@@ -9,14 +9,14 @@ rm -r $long_dir
 mkdir -p $long_dir
 
 q_id=0
-for i in `seq 1 3`;
+for i in `seq 1 1`;
 do
-    for j in `seq 1 3`;
+    for j in `seq 1 1`;
     do
         let num_prt="$i+10"
         redis-cli flushall
         let q_id="$q_id+1"
-        python3 Exp.py -p $num_prt -e 4 -rq=0 -dir=$directory -qid=$q_id
+        python3 Exp.py -p $num_prt -e 4 -rq=0 -dir=$directory -qid=$q_id -pt=1 -pkl=1 -log='test.log'
     done 
 done
 
