@@ -236,7 +236,7 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     print_loc(global_print_loc) 
     expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
     
-    expec_value_limit=1.00001
+    expec_value_limit=1.1
 #    expec_value_limit=0.1000
     
     if expec_value > expec_value_limit:
@@ -251,7 +251,7 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     if expec_value > expec_value_limit:
         log_print(["Terminating due to expec value:", expec_value], log_file, log_identifier)
         log_print(["Testing evolved state fnc:"], log_file, log_identifier)
-        evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=True, log_file=log_file, log_identifier=log_identifier)
+        expec_value = evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=True, log_file=log_file, log_identifier=log_identifier)
         raise NameError('UnphysicalExpectationValue') 
         
     print_loc(global_print_loc)
@@ -274,7 +274,7 @@ def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True, print_
     print_loc(global_print_loc)
   
     if t>1e6: ## Try limiting times to use to 1 million
-        t=1e6
+        t=1e6 # TODO PUT BACK IN. testing high t to find bug. 
 
     #print("Enable sparse : ", enable_sparse)    
     if use_exp_custom and ham_exp_installed:
@@ -284,8 +284,10 @@ def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True, print_
     else:
       # print("Note: using linalg for exponentiating Hamiltonian.")
         if log_file is not None:
-            log_print(["Using linalg.expm. Exponentiating\nt=",t, "\nHam=\n", ham, "\n-iHt=\n", (-1j*ham*t)], log_file, log_identifier)
+            iht = (-1j*ham*t)
+            log_print(["Using linalg.expm. Exponentiating\nt=",t, "\nHam=\n", ham, "\n-iHt=\n", iht, "\nMtx elements type:", type(iht[0][0]), "\nMtx type:", type(iht)], log_file, log_identifier)
         unitary = linalg.expm(-1j*ham*t)
+        
         if log_file is not None:
             log_print(["linalg.expm gives \nU=\n",unitary], log_file, log_identifier)
     

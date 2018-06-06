@@ -18,6 +18,8 @@ def MultiVariateNormalDistributionNocov(NumMulti, mean=None, sigmas=None):
     if sigmas is None:
 #        sigmas = np.repeat(0.25, NumMulti) # Using sigma=0.1 for experimental case. 
         sigmas = np.repeat(0.1, NumMulti)
+#        sigmas = np.repeat(0.000000000001, NumMulti) ## TODO REMOVE! only for testing extremely high t quickly
+        
     cov_matrix = np.diag(sigmas**2)
     OutputDistribution = qi.MultivariateNormalDistribution(mean, cov_matrix)
     return(OutputDistribution)

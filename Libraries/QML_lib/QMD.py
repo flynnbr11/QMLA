@@ -1312,6 +1312,12 @@ class QMD():
     def plotTreeDiagram(self, modlist=None, save_to_file=None):
         PlotQMD.plotQMDTree(self, modlist=modlist, save_to_file=save_to_file)
 
+    def plotRadarDiagram(self, modlist=None, save_to_file=None):
+        plot_title=str("Radar Plot QMD "+ str(self.Q_id))
+        if modlist is None:
+            modlist = list(self.BranchChampions.values())
+        PlotQMD.plotRadar(self, modlist, save_to_file=save_to_file, plot_title=plot_title)
+
     def majorityVotingTally(self):
         mod_ids = DataBase.list_model_id_in_branch(self.db, 0)
         tally = {}

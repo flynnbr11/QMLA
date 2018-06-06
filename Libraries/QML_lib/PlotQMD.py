@@ -10,12 +10,18 @@ from matplotlib.ticker import Formatter
 import matplotlib.cbook as cb
 from matplotlib.colors import colorConverter, Colormap
 from matplotlib.patches import FancyArrowPatch, Circle
+
+from matplotlib.path import Path
+from matplotlib.spines import Spine
+from matplotlib.projections.polar import PolarAxes
+from matplotlib.projections import register_projection
+
 #from QMD import  *
 #from QML import *
 import DataBase
 import Evo as evo
 
-#### Hinton Disagram ####
+#### Hinton Diagram ####
 
 def latex_name_ising(name):
     terms=name.split('PP')
@@ -853,11 +859,203 @@ def draw_networkx_arrows(G, pos,
     return edge_collection
 
 
+### Radar Plot ###
+
+def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
+    from matplotlib import cm as colmap
+    from viz_library_undev import radar_factory
+    
+    labels = [DataBase.latex_name_ising(qmd.ModelNameIDs[l]) for l in modlist]
+    size = len(modlist)
+    theta = custom_radar_factory(size, frame='polygon') 
+    
+    fig, ax = plt.subplots(figsize=(12,6), subplot_kw=dict(projection='radar'))
+    
+#    cmap = colmap.get_cmap('viridis')
+    cmap = colmap.get_cmap('RdYlBu')
+    colors = [cmap(col) for col in np.linspace(0.1,1,size)]
+
+    required_bayes = {}
+    scale = []
+
+    for i in modlist:
+        required_bayes[i] = {}
+        for j in modlist:
+            if i is not j:
+                try:
+                    val = qmd.AllBayesFactors[i][j][-1]
+                    scale.append(np.log10(val))
+                except:
+                    val = 1.0
+                required_bayes[i][j] = val
+
+
+    [scale_min, scale_max] = [min(scale), max(scale)]
+    many_circles = 4
+    low_ini = scale_min
+    shift_ini = 1
+    shift = 6
+    ax.set_rgrids(list(shift_ini + np.linspace(low_ini+0.05,0.05,many_circles)), 
+                   labels = list(np.round(np.linspace(low_ini+0.05,0.05,many_circles), 2)), angle=180)
+
+    for i in modlist:
+        dplot = []
+        for j in modlist:
+            if i is not j:
+                try:
+                    bayes_factor = qmd.AllBayesFactors[i][j][-1]
+                except: 
+                    bayes_factor = 1.0
+
+                log_bayes_factor = np.log10(bayes_factor)
+                dplot.append(shift+log_bayes_factor)
+            else:
+                dplot.append(shift+0.0)
+        ax.plot(theta, np.array(dplot), color=colors[int(i%len(colors))], linestyle = '--', alpha = 1.)
+        ax.fill(theta, np.array(dplot), facecolor=colors[int(i%len(colors))], alpha=0.25)
+
+    ax.plot(theta, np.repeat(shift, len(labels)), color='black', linestyle = '-', label='BayesFactor=1')
+    
+    ax.set_varlabels(labels, fontsize=15)
+    try:
+        ax.tick_params(pad=50)
+    except:
+        pass
+        
+    legend = ax.legend(labels, loc=(1.5, .35),
+        labelspacing=0.1, fontsize=14)
+
+    if plot_title is not None:
+        plt.title(str(plot_title))
+
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
+
+
+    
+class IndexLocator(ticker.Locator):
+
+    def __init__(self, max_ticks=10):
+        self.max_ticks = max_ticks
+
+    def __call__(self):
+        """Return the locations of the ticks."""
+        dmin, dmax = self.axis.get_data_interval()
+        if dmax < self.max_ticks:
+            step = 1
+        else:
+            step = np.ceil(dmax / self.max_ticks)
+        return self.raise_if_exceeds(np.arange(0, dmax, step))
+        
+        
+        
+        
+        
+def custom_radar_factory(num_vars, frame='circle'):
+    """Create a radar chart with `num_vars` axes.
+
+    This function creates a RadarAxes projection and registers it.
+
+    Parameters
+    ----------
+    num_vars : int
+        Number of variables for radar chart.
+    frame : {'circle' | 'polygon'}
+        Shape of frame surrounding axes.
+
+    """
+    # calculate evenly-spaced axis angles
+    theta = np.linspace(0, 2*np.pi, num_vars, endpoint=False)
+
+    def draw_poly_patch(self):
+        # rotate theta such that the first axis is at the top
+        verts = unit_poly_verts(theta + np.pi / 2)
+        return plt.Polygon(verts, closed=True, edgecolor='k')
+
+    def draw_circle_patch(self):
+        # unit circle centered on (0.5, 0.5)
+        return plt.Circle((0.5, 0.5), 0.5)
+
+    patch_dict = {'polygon': draw_poly_patch, 'circle': draw_circle_patch}
+    if frame not in patch_dict:
+        raise ValueError('unknown value for `frame`: %s' % frame)
+
+    class RadarAxes(PolarAxes):
+
+        name = 'radar'
+        # use 1 line segment to connect specified points
+        RESOLUTION = 1
+        # define draw_frame method
+        draw_patch = patch_dict[frame]
+
+        def __init__(self, *args, **kwargs):
+            super(RadarAxes, self).__init__(*args, **kwargs)
+            # rotate plot such that the first axis is at the top
+            self.set_theta_zero_location('N')
+
+        def fill(self, *args, **kwargs):
+            """Override fill so that line is closed by default"""
+            closed = kwargs.pop('closed', True)
+            return super(RadarAxes, self).fill(closed=closed, *args, **kwargs)
+
+        def plot(self, *args, **kwargs):
+            """Override plot so that line is closed by default"""
+            lines = super(RadarAxes, self).plot(*args, **kwargs)
+            for line in lines:
+                self._close_line(line)
+
+        def _close_line(self, line):
+            x, y = line.get_data()
+            # FIXME: markers at x[0], y[0] get doubled-up
+            if x[0] != x[-1]:
+                x = np.concatenate((x, [x[0]]))
+                y = np.concatenate((y, [y[0]]))
+                line.set_data(x, y)
+
+        def set_varlabels(self, labels, fontsize = None, frac=1.0):
+            self.set_thetagrids(np.degrees(theta), labels, fontsize = fontsize, frac=frac)
+
+        def _gen_axes_patch(self):
+            return self.draw_patch()
+
+        def _gen_axes_spines(self):
+            if frame == 'circle':
+                return PolarAxes._gen_axes_spines(self)
+            # The following is a hack to get the spines (i.e. the axes frame)
+            # to draw correctly for a polygon frame.
+
+            # spine_type must be 'left', 'right', 'top', 'bottom', or `circle`.
+            spine_type = 'circle'
+            verts = unit_poly_verts(theta + np.pi / 2)
+            # close off polygon by repeating first vertex
+            verts.append(verts[0])
+            path = Path(verts)
+
+            spine = Spine(self, spine_type, path)
+            spine.set_transform(self.transAxes)
+            return {'polar': spine}
+
+    register_projection(RadarAxes)
+    return theta
+
+
+def unit_poly_verts(theta):
+    """Return vertices of polygon for subplot axes.
+
+    This polygon is circumscribed by a unit circle centered at (0.5, 0.5)
+    """
+    x0, y0, r = [0.5] * 3
+    verts = [(r*np.cos(t) + x0, r*np.sin(t) + y0) for t in theta]
+    return verts
+    
+    
+
+
+
+
 
 #### Manipulate QMD output
-        
-        
-       
 def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
 
     import csv

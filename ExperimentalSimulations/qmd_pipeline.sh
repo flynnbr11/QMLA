@@ -16,7 +16,7 @@ do
         let num_prt="$i+10"
         redis-cli flushall
         let q_id="$q_id+1"
-        python3 Exp.py -p $num_prt -e 4 -rq=0 -dir=$directory -qid=$q_id -pt=1 -pkl=1 -log='test.log'
+        python3 Exp.py -p 10 -e 4 -rq=0 -dir=$directory -qid=$q_id -pt=1 -pkl=1 -log='highTfailure.log'
     done 
 done
 

@@ -243,11 +243,10 @@ def radar_factory(num_vars, frame='circle'):
     """
     # calculate evenly-spaced axis angles
     theta = np.linspace(0, 2*np.pi, num_vars, endpoint=False)
-    # rotate theta such that the first axis is at the top
-    theta += np.pi/2
 
     def draw_poly_patch(self):
-        verts = unit_poly_verts(theta)
+        # rotate theta such that the first axis is at the top
+        verts = unit_poly_verts(theta + np.pi / 2)
         return plt.Polygon(verts, closed=True, edgecolor='k')
 
     def draw_circle_patch(self):
@@ -265,6 +264,11 @@ def radar_factory(num_vars, frame='circle'):
         RESOLUTION = 1
         # define draw_frame method
         draw_patch = patch_dict[frame]
+
+        def __init__(self, *args, **kwargs):
+            super(RadarAxes, self).__init__(*args, **kwargs)
+            # rotate plot such that the first axis is at the top
+            self.set_theta_zero_location('N')
 
         def fill(self, *args, **kwargs):
             """Override fill so that line is closed by default"""
@@ -285,8 +289,8 @@ def radar_factory(num_vars, frame='circle'):
                 y = np.concatenate((y, [y[0]]))
                 line.set_data(x, y)
 
-        def set_varlabels(self, labels, fontsize = None):
-            self.set_thetagrids(np.degrees(theta), labels, fontsize = fontsize)
+        def set_varlabels(self, labels, fontsize = None, frac=1.0):
+            self.set_thetagrids(np.degrees(theta), labels, fontsize = fontsize, frac=frac)
 
         def _gen_axes_patch(self):
             return self.draw_patch()
@@ -299,7 +303,7 @@ def radar_factory(num_vars, frame='circle'):
 
             # spine_type must be 'left', 'right', 'top', 'bottom', or `circle`.
             spine_type = 'circle'
-            verts = unit_poly_verts(theta)
+            verts = unit_poly_verts(theta + np.pi / 2)
             # close off polygon by repeating first vertex
             verts.append(verts[0])
             path = Path(verts)
@@ -310,6 +314,16 @@ def radar_factory(num_vars, frame='circle'):
 
     register_projection(RadarAxes)
     return theta
+
+
+def unit_poly_verts(theta):
+    """Return vertices of polygon for subplot axes.
+
+    This polygon is circumscribed by a unit circle centered at (0.5, 0.5)
+    """
+    x0, y0, r = [0.5] * 3
+    verts = [(r*np.cos(t) + x0, r*np.sin(t) + y0) for t in theta]
+    return verts
     
     
 

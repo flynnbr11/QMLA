@@ -131,6 +131,8 @@ for i in range(global_variables.num_runs):
         
         qmd.plotExpecValues(save_to_file=global_variables.results_directory+'expec_values_'+str(global_variables.long_id)+'.png')
         
+        qmd.plotRadarDiagram(save_to_file=global_variables.results_directory+'radar_'+str(global_variables.long_id)+'.png')
+        
     #    qmd.plotHintonListModels(model_list=qmd.SurvivingChampions, save_to_file=global_variables.results_directory+'hinton_champions_'+str(global_variables.long_id)+'.png')
         
         

@@ -47,7 +47,7 @@ def parameter_sweep_analysis(directory_name, save_to_file=None, use_log_times=Fa
     results_path = directory_name+results_csv
     summariseResultsCSV(directory_name=directory_name, csv_name=results_csv)
     
-    qmd_cumulative_results = pandas.DataFrame.from_csv(results_path)
+    qmd_cumulative_results = pandas.DataFrame.from_csv(results_path, index_col='ConfigLatex')
     piv = pandas.pivot_table(qmd_cumulative_results, values=['CorrectModel', 'Time', 'Overfit', 'Underfit', 'Misfit'], index=['ConfigLatex'], 
                              aggfunc={
                                  'Time':[np.mean, np.median, min, max], 
