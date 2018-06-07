@@ -1123,77 +1123,114 @@ def get_bayes_latex_dict(qmd):
 
 
 
-def ising_terms_full_list():
+
+def ising_terms_full_list(return_branch_dict=None):
     pauli_terms = ['x','y','z']
 
+    branches= {}
+    branch_by_term_dict = {}
+    for i in range(9):
+        branches[i] = []
+    
     rotation_terms = []
+    hf_terms = []
     transverse_terms = []
-    hartree_terms = []
 
     for t in pauli_terms:
         rotation_terms.append(t+'Ti')
-        transverse_terms.append(t+'T'+t)
+        hf_terms.append(t+'T'+t)
         for k in pauli_terms:
             if k>t:
-                hartree_terms.append(t+'T'+k)
+                transverse_terms.append(t+'T'+k)
 
     ising_terms = []            
     add = 'PP'
 
     for r in rotation_terms:
         ising_terms.append(r)
-
+        branches[0].append(r)
+        branch_by_term_dict[r] = 0
+        
     for r in rotation_terms:
         new_terms=[]
         for i in rotation_terms:
             if r<i:
+                branches[1].append(r+add+i)
+                branch_by_term_dict[r+add+i] = 1
                 new_terms.append(r+add+i)
         ising_terms.extend(new_terms)
 
     full_rotation = add.join(rotation_terms)
     ising_terms.append(full_rotation)
+    branches[2].append(full_rotation)
+    branch_by_term_dict[full_rotation] = 2
+    
+
+    for t in hf_terms:
+        new_term = full_rotation+add+t
+        branches[3].append(new_term)
+        branch_by_term_dict[new_term] = 3
+        ising_terms.append(new_term)
+
+    for t in hf_terms:
+        for k in hf_terms:
+            if t<k:
+                dual_hf_term= full_rotation+add+t+add+k
+                branches[4].append(dual_hf_term)
+                branch_by_term_dict[dual_hf_term] = 4
+                ising_terms.append(dual_hf_term)
+
+    for t in hf_terms:
+        for l in hf_terms:
+            for k in hf_terms:
+                if t<k<l:
+                    triple_hf = full_rotation + add + t + add + k + add + l
+                    branches[5].append(triple_hf)
+                    ising_terms.append(triple_hf)
+                    branch_by_term_dict[triple_hf] = 5
+
+
 
     for t in transverse_terms:
-        new_term = full_rotation+add+t
-        ising_terms.append(new_term)
+        transverse_term= triple_hf+add+t
+        branches[6].append(transverse_term)
+        branch_by_term_dict[transverse_term] = 6
+        ising_terms.append(transverse_term)
+
 
     for t in transverse_terms:
         for k in transverse_terms:
             if t<k:
-                dual_transverse_term= full_rotation+add+t+add+k
+                dual_transverse_term= triple_hf+add+t+add+k
+                branches[7].append(dual_transverse_term)
+                branch_by_term_dict[dual_transverse_term] = 7
                 ising_terms.append(dual_transverse_term)
 
     for t in transverse_terms:
         for l in transverse_terms:
             for k in transverse_terms:
                 if t<k<l:
-                    triple_transverse = full_rotation + add + t + add + k + add + l
-                    ising_terms.append(triple_transverse)
+                    triple_hf_term= triple_hf+add+t+add+k+add+l
+                    branch_by_term_dict[triple_hf_term] = 8
+                    branches[8].append(triple_hf_term)
+                    ising_terms.append(triple_hf_term)
 
-
-
-    for t in hartree_terms:
-        hartree_term= triple_transverse+add+t
-        ising_terms.append(hartree_term)
-
-
-    for t in hartree_terms:
-        for k in hartree_terms:
-            if t<k:
-                dual_hartree_term= triple_transverse+add+t+add+k
-                ising_terms.append(dual_hartree_term)
-
-    for t in hartree_terms:
-        for l in hartree_terms:
-            for k in hartree_terms:
-                if t<k<l:
-                    triple_hartree_term= triple_transverse+add+t+add+k+add+l
-                    ising_terms.append(triple_hartree_term)
     
     latex_terms = [DataBase.latex_name_ising(i) for i in ising_terms]
     
-    return latex_terms
-    
+    if return_branch_dict=='branches':
+        return branches
+    elif return_branch_dict=='terms':
+        return branch_by_term_dict
+
+    elif return_branch_dict == 'latex_terms':
+        for k in list(branch_by_term_dict.keys()):
+            branch_by_term_dict[DataBase.latex_name_ising(k)] = branch_by_term_dict.pop(k)
+        return branch_by_term_dict
+        
+    else:
+        return latex_terms
+
 
     
         

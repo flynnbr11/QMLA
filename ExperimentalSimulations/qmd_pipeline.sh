@@ -9,7 +9,7 @@ rm -r $long_dir
 mkdir -p $long_dir
 
 q_id=0
-for i in `seq 1 2`;
+for i in `seq 1 5`;
 do
     for j in `seq 1 1`;
     do
