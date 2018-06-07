@@ -138,6 +138,8 @@ for i in range(global_variables.num_runs):
         
         qmd.plotTreeDiagram(save_to_file = global_variables.results_directory+'tree_diagram_'+str(global_variables.long_id)+'.png')
         
+        qmd.writeInterQMDBayesCSV(bayes_csv=global_variables.results_directory+str(global_variables.cumulative_csv))
+        
     results_file = global_variables.results_file
     pickle.dump(qmd.ChampionResultsDict, open(results_file, "wb"), protocol=2)
     

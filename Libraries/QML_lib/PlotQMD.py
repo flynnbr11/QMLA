@@ -1049,7 +1049,154 @@ def unit_poly_verts(theta):
     verts = [(r*np.cos(t) + x0, r*np.sin(t) + y0) for t in theta]
     return verts
     
+
+
+#### Cumulative Bayes CSV and InterQMD Tree plotting ####
+
+def multiQMDBayes(all_bayes_csv):
+    import csv, pandas
+    cumulative_bayes = pandas.DataFrame.from_csv(all_bayes_csv)
+    names=list(cumulative_bayes.keys())
+
+    count_bayes={}
+    mod_names= ising_terms_full_list()
+
+    for mod in mod_names:
+        count_bayes[mod] = {}
+        model_results=cumulative_bayes[mod]
+        for comp_mod in mod_names:
+            try:
+                num_bayes=model_results[comp_mod].count()
+            except:
+                num_bayes=0
+            count_bayes[mod][comp_mod] = num_bayes
+
+
+
+    piv = pandas.pivot_table(cumulative_bayes, index='ModelName', values=names, aggfunc=[np.mean, np.median])
+    means=piv['mean']
+    medians=piv['median']
+
+    b=means.apply(lambda x: x.dropna().to_dict(), axis=1)
+    means_dict = b.to_dict()
+
+    c=medians.apply(lambda x: x.dropna().to_dict(), axis=1)
+    medians_dict = c.to_dict()        
     
+    return means_dict, medians_dict, count_bayes
+
+
+def updateAllBayesCSV(qmd, all_bayes_csv):
+    import os,csv
+    
+    data = get_bayes_latex_dict(qmd)
+    names = list(data.keys())
+    fields = ['ModelName']
+    fields += names
+    all_models= ['ModelName']
+    all_models += ising_terms_full_list()
+    
+    if os.path.isfile(all_bayes_csv) is False:
+        with open(all_bayes_csv, 'a') as bayes_csv:
+            writer = csv.DictWriter(bayes_csv, fieldnames=all_models)
+            writer.writeheader()
+    
+    with open(all_bayes_csv, 'a') as bayes_csv:
+        writer = csv.DictWriter(bayes_csv, fieldnames=all_models)
+
+        for f in names:
+            single_model_dict = data[f]
+            single_model_dict['ModelName']=f
+            writer.writerow(single_model_dict)
+
+
+def get_bayes_latex_dict(qmd):
+    latex_dict = {}
+    for i in list(qmd.AllBayesFactors.keys()):
+        mod_a = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
+        latex_dict[mod_a] = {}
+        for j in list(qmd.AllBayesFactors[i].keys()):
+            mod_b = DataBase.latex_name_ising(qmd.ModelNameIDs[j])
+            latex_dict[mod_a][mod_b]= qmd.AllBayesFactors[i][j][-1]
+    return latex_dict
+
+
+
+
+def ising_terms_full_list():
+    pauli_terms = ['x','y','z']
+
+    rotation_terms = []
+    transverse_terms = []
+    hartree_terms = []
+
+    for t in pauli_terms:
+        rotation_terms.append(t+'Ti')
+        transverse_terms.append(t+'T'+t)
+        for k in pauli_terms:
+            if k>t:
+                hartree_terms.append(t+'T'+k)
+
+    ising_terms = []            
+    add = 'PP'
+
+    for r in rotation_terms:
+        ising_terms.append(r)
+
+    for r in rotation_terms:
+        new_terms=[]
+        for i in rotation_terms:
+            if r<i:
+                new_terms.append(r+add+i)
+        ising_terms.extend(new_terms)
+
+    full_rotation = add.join(rotation_terms)
+    ising_terms.append(full_rotation)
+
+    for t in transverse_terms:
+        new_term = full_rotation+add+t
+        ising_terms.append(new_term)
+
+    for t in transverse_terms:
+        for k in transverse_terms:
+            if t<k:
+                dual_transverse_term= full_rotation+add+t+add+k
+                ising_terms.append(dual_transverse_term)
+
+    for t in transverse_terms:
+        for l in transverse_terms:
+            for k in transverse_terms:
+                if t<k<l:
+                    triple_transverse = full_rotation + add + t + add + k + add + l
+                    ising_terms.append(triple_transverse)
+
+
+
+    for t in hartree_terms:
+        hartree_term= triple_transverse+add+t
+        ising_terms.append(hartree_term)
+
+
+    for t in hartree_terms:
+        for k in hartree_terms:
+            if t<k:
+                dual_hartree_term= triple_transverse+add+t+add+k
+                ising_terms.append(dual_hartree_term)
+
+    for t in hartree_terms:
+        for l in hartree_terms:
+            for k in hartree_terms:
+                if t<k<l:
+                    triple_hartree_term= triple_transverse+add+t+add+k+add+l
+                    ising_terms.append(triple_hartree_term)
+    
+    latex_terms = [DataBase.latex_name_ising(i) for i in ising_terms]
+    
+    return latex_terms
+    
+
+    
+        
 
 
 

@@ -45,6 +45,7 @@ default_host = 'localhost'
 default_rq_timeout = 3600
 default_log_file = 'default_log_file.log'
 default_save_plots = False
+default_cumulative_csv = 'cumulative_bayes.csv'
 
 
 class GlobalVariablesClass():
@@ -71,7 +72,8 @@ class GlobalVariablesClass():
         pickle_qmd_class = default_pickle_qmd_class,
         rq_timeout = default_rq_timeout,
         log_file = default_log_file,
-        save_plots = default_save_plots
+        save_plots = default_save_plots,
+        cumulative_csv = default_cumulative_csv
     ):
         self.do_iqle = do_iqle
         self.do_qle = do_qle
@@ -95,6 +97,7 @@ class GlobalVariablesClass():
         self.rq_timeout = rq_timeout
         self.log_file = log_file
         self.save_plots = save_plots
+        self.cumulative_csv = cumulative_csv
         
         
         if self.results_directory[-1] != '/':
@@ -261,6 +264,15 @@ def parse_cmd_line_args(args):
       default=default_log_file
     )
     
+    parser.add_argument(
+      '-cb', '--cumulative_bayes',
+      help='CSV to store Bayes factors of all QMDs.',
+      type=str,
+      default=default_cumulative_csv
+    )
+    
+    
+    
     
     
 
@@ -291,6 +303,7 @@ def parse_cmd_line_args(args):
     pickle_qmd_class = bool(arguments.pickle_result_class)
     rq_timeout = arguments.rq_timeout
     log_file = arguments.logfile
+    cumulative_csv = arguments.cumulative_bayes
     
     # Use arguments to initialise global variables class. 
 #    global global_variables
@@ -316,6 +329,7 @@ def parse_cmd_line_args(args):
         rq_timeout = rq_timeout,
         log_file = log_file,
         save_plots = arguments.plots,
+        cumulative_csv = cumulative_csv
     )
     
     
