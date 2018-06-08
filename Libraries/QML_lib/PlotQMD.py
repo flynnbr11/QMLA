@@ -419,7 +419,8 @@ def print_treeplot_legend(G):
     
 def plotTreeDiagram(G, n_cmap, e_cmap, 
                     e_alphas = [], nonadj_alpha=0.1, label_padding = 0.4, 
-                    arrow_size = 0.02, pathstyle = "straight", id_labels = False, save_to_file=None):
+                    arrow_size = 0.02, pathstyle = "straight", id_labels = False,
+                    save_to_file=None):
     plt.clf()
     plt.figure(figsize=(6,11))   
     
@@ -464,6 +465,8 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
         node_size=700, #node_shape='8',
         node_color = n_colours
     )  
+    
+    
     
     # edges_for_cmap = nx.draw_networkx_edges(G, width = 3,  pos=positions, arrows=True, arrowstyle='->', edgelist=edge_tuples, edge_color= weights, edge_cmap=plt.cm.Spectral)
     edges_for_cmap = draw_networkx_arrows(G, edgelist=edge_tuples, pos=positions, arrows=True, 
@@ -627,7 +630,7 @@ def plotQMDTree(qmd, save_to_file=None, only_adjacent_branches=True, id_labels=F
     
 def plotTreeDiagram(G, n_cmap, e_cmap, 
                     e_alphas = [], nonadj_alpha=0.1, label_padding = 0.4, 
-                    arrow_size = 0.02, pathstyle = "straight", id_labels = False, save_to_file=None):
+                    arrow_size = 0.02,widthscale=1.0, pathstyle = "straight", id_labels = False, save_to_file=None):
     plt.clf()
     plt.figure(figsize=(6,11))   
     
@@ -675,7 +678,7 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
     
     # edges_for_cmap = nx.draw_networkx_edges(G, width = 3,  pos=positions, arrows=True, arrowstyle='->', edgelist=edge_tuples, edge_color= weights, edge_cmap=plt.cm.Spectral)
     edges_for_cmap = draw_networkx_arrows(G, edgelist=edge_tuples, pos=positions, arrows=True, 
-        arrowstyle='->', width = arrow_size,  pathstyle=pathstyle,
+        arrowstyle='->', width = arrow_size, widthscale=widthscale, pathstyle=pathstyle,
         alphas = e_alphas, edge_color= weights, edge_cmap=e_cmap)
     
     nx.draw_networkx_labels(G, label_positions, labels)
@@ -702,6 +705,7 @@ def draw_networkx_arrows(G, pos,
                         edgelist=None,
                         nodedim = 0.,
                         width=0.02,
+                        widthscale = 1.0,
                         edge_color='k',
                         style='solid',
                         alphas=1.,
@@ -718,6 +722,14 @@ def draw_networkx_arrows(G, pos,
 
     if edgelist is None:
         edgelist = G.edges()
+        
+    if width is None:
+        try:
+            widthlist = list(  [(widthscale*prop['freq']) for (u,v,prop) in G.edges(data=True)]  )
+        except:
+            widthlist = widthscale*0.02
+    else:
+        widthlist = width
 
     if not edgelist or len(edgelist) == 0:  # no edges!
         return None
@@ -730,10 +742,10 @@ def draw_networkx_arrows(G, pos,
     
     
 
-    if not cb.iterable(width):
-        lw = (width,)
+    if not cb.iterable(widthlist):
+        lw = (widthlist,)
     else:
-        lw = width
+        lw = widthlist
 
     if not cb.is_string_like(edge_color) \
            and cb.iterable(edge_color) \
@@ -792,6 +804,11 @@ def draw_networkx_arrows(G, pos,
         seen = {}
         
         for idx in range(len(edgelist)):
+        
+            if not cb.iterable(widthlist):
+                lw = widthlist
+            else:
+                lw = widthlist[idx]
             
             if pathstyle is "straight":
                 (src, dst) = edge_pos[idx]
@@ -812,11 +829,13 @@ def draw_networkx_arrows(G, pos,
                 
                 thislabel = None if len(label)<len(edgelist) else label[idx]
 
+                
+                
                 ax.arrow(
                     x1,y1, dx,dy,
                     facecolor=edge_cmap(edge_color[idx]), alpha = alphas[idx],
                     linewidth = 0, antialiased = True,
-                    width= width, head_width = 5*width, overhang = -5*0.02/width, length_includes_head=True, 
+                    width= lw, head_width = 5*lw, overhang = -5*0.02/lw, length_includes_head=True, 
                     label=thislabel, zorder=1
                     )
                     
@@ -831,14 +850,20 @@ def draw_networkx_arrows(G, pos,
                     rad=seen.get((u,v))
                     rad=(rad+np.sign(rad)*0.1)*-1
                 alpha=0.5
-
+                
+                kwargs = {'head_width': 5*lw, 
+                          #'overhang':-5*0.02/lw,  
+                          #'length_includes_head': True
+                          }
                 e = FancyArrowPatch(n1.center,n2.center,patchA=n1,patchB=n2,
                                     arrowstyle='-|>',
                                     connectionstyle='arc3,rad=%s'%rad,
                                     mutation_scale=10.0,
-                                    lw=10,
+                                    lw=lw,   #AROUND 10 TO BE FEASIBLE
                                     alpha=alphas[idx],
-                                    color=edge_cmap(edge_color[idx]))
+                                    color=edge_cmap(edge_color[idx]),
+                            #        **kwargs
+                                    )
                 seen[(u,v)]=rad
                 ax.add_patch(e)
            
@@ -1097,7 +1122,7 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
     all_models += ising_terms_full_list()
     
     if os.path.isfile(all_bayes_csv) is False:
-        with open(all_bayes_csv, 'a') as bayes_csv:
+        with open(all_bayes_csv, 'a+') as bayes_csv:
             writer = csv.DictWriter(bayes_csv, fieldnames=all_models)
             writer.writeheader()
     
