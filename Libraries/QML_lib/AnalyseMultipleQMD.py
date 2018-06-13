@@ -262,7 +262,8 @@ summariseResultsCSV(directory_name=directory_to_analyse, csv_name=results_csv)
 
 param_plot = str(directory_to_analyse+'param_analysis_total.png')
 param_percent_plot = str(directory_to_analyse+'param_analysis_percentage.png')
-#parameter_sweep_analysis(directory_name = directory_to_analyse, save_to_file=param_plot)
+
+parameter_sweep_analysis(directory_name = directory_to_analyse, results_csv=results_csv, save_to_file=param_plot)
 parameter_sweep_analysis(directory_name = directory_to_analyse, results_csv=results_csv, use_log_times=True, use_percentage_models=True, save_to_file=param_percent_plot)
 
 
