@@ -1256,10 +1256,129 @@ def ising_terms_full_list(return_branch_dict=None):
     else:
         return latex_terms
 
+def global_adjacent_branch_test(a,b, term_branches):
+    branch_a = term_branches[a]
+    branch_b = term_branches[b]
+    
+    if (branch_a==branch_b) or (branch_a==branch_b+1) or (branch_a==branch_b-1):
+        return True
+    else:
+        return False
 
     
         
+def cumulativeQMDTreePlot(cumulative_csv, wins_per_mod, avg='means', only_adjacent_branches=True, save_to_file=None, directed=True):
+    import networkx as nx
+    means, medians, counts = multiQMDBayes(cumulative_csv)
+    if avg=='means':
+        bayes_factors = means #medians
+    elif avg=='medians':
+        bayes_factors = medians
 
+    modlist = ising_terms_full_list()
+    term_branches = ising_terms_full_list(return_branch_dict='latex_terms')        
+
+    pair_freqs={}
+    for c in list(counts.keys()):
+        for k in list(counts[c].keys()):
+            this_edge=(c,k)
+            pair_freqs[this_edge]=counts[c][k]
+
+
+    if directed:
+        G=nx.DiGraph()
+    else:
+        G=nx.Graph()
+
+    positions = {}
+    branch_x_filled = {}
+    branch_mod_count = {}
+
+#    max_branch_id = qmd.HighestBranchID # TODO: get this number without access to QMD class instance
+#    max_mod_id = qmd.HighestModelID
+
+
+    max_branch_id = 8 # TODO: get this number without access to QMD class instance
+    max_mod_id = 17
+
+
+    for i in range(max_branch_id+1):
+        branch_x_filled[i] = 0
+        branch_mod_count[i] =  0 
+
+    most_wins = max(list(wins_per_mod.values()))
+    for k in list(wins_per_mod.keys()):
+        wins_per_mod[k] /= most_wins
+
+
+    for m in modlist:
+        branch = term_branches[m]
+        branch_mod_count[branch]+=1
+        G.add_node(m)
+        G.nodes[m]['label']=str(m)
+#        G.nodes[m]['status']=0.2
+        try:
+            G.nodes[m]['status']=wins_per_mod[m]
+        except:
+            G.nodes[m]['status']=0
+            
+            
+    max_num_mods_any_branch=max(list(branch_mod_count.values()))
+    for m in modlist:
+        branch = term_branches[m]
+        num_mods_this_branch = branch_mod_count[branch]
+        pos_list = available_position_list(num_mods_this_branch, max_num_mods_any_branch)
+        branch_filled_so_far = branch_x_filled[branch]
+        branch_x_filled[branch]+=1
+
+        x_pos = pos_list[branch_filled_so_far]
+        y_pos = branch
+        positions[i] = (x_pos, y_pos)
+        G.node[m]['pos'] = (x_pos, y_pos)
+
+    edges = []
+    edge_frequencies=[]
+    for a in modlist:
+        remaining_modlist = modlist[modlist.index(a)+1:]
+        for b in remaining_modlist:
+            is_adj = global_adjacent_branch_test(a, b, term_branches)
+            if is_adj or not only_adjacent_branches:
+                if a!=b:
+                    pairing = (a,b)
+                    frequency = pair_freqs[pairing] #TODO build frequency into edges
+                    edges.append(pairing)
+                    edge_frequencies.append(frequency)
+                    vs = [a,b]
+
+                    try:
+                        thisweight = np.log10(bayes_factors[a][b])
+                    except:
+                        thisweight=0 #TODO is this right?
+
+                    if thisweight < 0:
+                        thisweight = - thisweight # flip negative valued edges and move them to positive
+                        flipped = True
+                        G.add_edge(b, a, weight=thisweight, flipped = flipped, adj = is_adj, freq = frequency)
+                    else:
+                        flipped = False
+                        G.add_edge(a, b, weight=thisweight, flipped = flipped, adj = is_adj, freq = frequency)
+
+                        
+    max_freq = max(edge_frequencies)
+    if max_freq==0:
+#        print("MulitQMDTreePlot: Edges not found; only one QMD instance performed.")
+        raise NameError("Insufficient Data for multiple QMD.")
+    
+    freq_scale = 10/max_freq
+    edge_f = [i*freq_scale for i in edge_frequencies]
+    
+    plotTreeDiagram(G,n_cmap = plt.cm.cool, e_cmap = plt.cm.viridis_r, 
+                       nonadj_alpha = 0.1, e_alphas = [] , widthscale=1.5, 
+                       label_padding = 0.4, pathstyle="curve", arrow_size=None) #  
+
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+    # return G, edges, edge_f
 
 
 

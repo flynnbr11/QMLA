@@ -25,7 +25,8 @@ def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
     result_fields = list(some_results.keys())
     
     
-    results_csv = str(directory_name+str(csv_name))
+#    results_csv = str(directory_name+str(csv_name))
+    results_csv = str(csv_name)
 
     
     with open(results_csv, 'w') as csvfile:
@@ -37,17 +38,19 @@ def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
             writer.writerow(results)
 
 
-def parameter_sweep_analysis(directory_name, save_to_file=None, use_log_times=False, use_percentage_models=False):
+def parameter_sweep_analysis(directory_name, results_csv, save_to_file=None, use_log_times=False, use_percentage_models=False):
 
     import os, csv
     if not directory_name.endswith('/'):
         directory_name += '/'
 
-    results_csv = 'param_sweep.csv'
-    results_path = directory_name+results_csv
-    summariseResultsCSV(directory_name=directory_name, csv_name=results_csv)
+#    results_csv = 'param_sweep.csv'
+#    results_path = directory_name+results_csv
+#    summariseResultsCSV(directory_name=directory_name, csv_name=results_csv)
     
-    qmd_cumulative_results = pandas.DataFrame.from_csv(results_path, index_col='ConfigLatex')
+    
+    
+    qmd_cumulative_results = pandas.DataFrame.from_csv(results_csv, index_col='ConfigLatex')
     piv = pandas.pivot_table(qmd_cumulative_results, values=['CorrectModel', 'Time', 'Overfit', 'Underfit', 'Misfit'], index=['ConfigLatex'], 
                              aggfunc={
                                  'Time':[np.mean, np.median, min, max], 
@@ -202,6 +205,19 @@ def plot_scores(scores, save_file='model_scores.png'):
     plt.savefig(save_file, bbox_inches='tight')
     
 
+def plot_tree_multi_QMD(results_csv, all_bayes_csv, avg_type='medians', save_to_file=None):
+#    res_csv="/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Results/multtestdir/param_sweep.csv"
+    import PlotQMD as ptq
+    qmd_res = pandas.DataFrame.from_csv(results_csv, index_col='LatexName')
+    mods = list(qmd_res.index)
+    winning_count = {}
+    for mod in mods:
+        winning_count[mod]=mods.count(mod)
+
+    ptq.cumulativeQMDTreePlot(cumulative_csv=all_bayes_csv, wins_per_mod = winning_count, only_adjacent_branches=True, avg=avg_type, save_to_file=save_to_file)        
+
+
+
 parser = argparse.ArgumentParser(description='Pass variables for (I)QLE.')
 
 # Add parser arguments, ie command line arguments for QMD
@@ -213,11 +229,21 @@ parser.add_argument(
   default=os.getcwd()
 )
 
+parser.add_argument(
+  '-bcsv', '--bayes_csv', 
+  help="CSV given to QMD to store all Bayes factors computed.",
+  type=str,
+  default=os.getcwd()
+)
+
+
 
 arguments = parser.parse_args()
 directory_to_analyse = arguments.results_directory
+all_bayes_csv = arguments.bayes_csv
 
 print("\nAnalysing and storing results in", directory_to_analyse)
+
 
 if not directory_to_analyse.endswith('/'):
     directory_to_analyse += '/'
@@ -228,13 +254,22 @@ model_scores = model_scores(directory_to_analyse)
 plot_scores(model_scores, plot_file)
 
 
-#summariseResultsCSV(directory_name = directory_to_analyse)
+
+results_csv_name = 'param_sweep.csv'
+results_csv = directory_to_analyse+results_csv_name
+summariseResultsCSV(directory_name=directory_to_analyse, csv_name=results_csv)
+
 
 param_plot = str(directory_to_analyse+'param_analysis_total.png')
 param_percent_plot = str(directory_to_analyse+'param_analysis_percentage.png')
-parameter_sweep_analysis(directory_name = directory_to_analyse, save_to_file=param_plot)
-parameter_sweep_analysis(directory_name = directory_to_analyse, use_log_times=True, use_percentage_models=True, save_to_file=param_percent_plot)
+#parameter_sweep_analysis(directory_name = directory_to_analyse, save_to_file=param_plot)
+parameter_sweep_analysis(directory_name = directory_to_analyse, results_csv=results_csv, use_log_times=True, use_percentage_models=True, save_to_file=param_percent_plot)
 
+
+try:
+    plot_tree_multi_QMD(results_csv = results_csv, all_bayes_csv = all_bayes_csv, save_to_file='multiQMD_tree.png')
+except NameError:
+    print("Can not plot multiQMD tree -- this might be because only one instance of QMD was performed. All other plots generated without error.")
 
 
 
