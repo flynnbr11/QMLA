@@ -148,7 +148,8 @@ class ModelLearningClass():
                 for i in range(len(self.TrueParams), num_params):
                     means.append(self.TrueParams[i%len(self.TrueParams)])
             
-            self.Prior = MultiVariateNormalDistributionNocov(num_params, mean = means)
+#            self.Prior = MultiVariateNormalDistributionNocov(num_params, mean = means)
+            self.Prior = MultiVariateNormalDistributionNocov(num_params)
   
         self.ProbeCounter = 0 #probecounter for the choice of the state
 #         if len(oplist)>1:
