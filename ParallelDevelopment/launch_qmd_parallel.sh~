@@ -100,6 +100,7 @@ QMD_JOB=$PBS_JOBNAME
 echo "PBS job name is $QMD_JOB"
 QMD_LOG="$PBS_O_WORKDIR/logs/$QMD_JOB.qmd.$job_number.log"
 
+
 cd $lib_dir
 if [[ "$host" == "node"* ]]
 then
@@ -123,7 +124,7 @@ export full_path_to_results="$script_dir/$RESULTS_DIR"
 
 echo "CONFIG: -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG"
 
-python3 Exp.py -rq=1 -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG
+python3 Exp.py -rq=1 -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -bc=$BAYES_CSV
 
 
 
