@@ -127,7 +127,7 @@ for i in range(global_variables.num_runs):
         qmd.plotVolumes(branch_champions=True, save_to_file=global_variables.results_directory+'volumes_branch_champs_'+str(global_variables.long_id) +'.png')
         
         qmd.saveBayesCSV(save_to_file=global_variables.results_directory+'bayes_factors_'+str(global_variables.long_id)+'.csv', names_ids='latex')
-        qmd.plotHintonAllModels(save_to_file=global_variables.results_directory+'hinton_'+str(global_variables.long_id)+'.png')
+#        qmd.plotHintonAllModels(save_to_file=global_variables.results_directory+'hinton_'+str(global_variables.long_id)+'.png')
         
         qmd.plotExpecValues(save_to_file=global_variables.results_directory+'expec_values_'+str(global_variables.long_id)+'.png')
         

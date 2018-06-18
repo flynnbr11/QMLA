@@ -102,6 +102,8 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None, interbranch=False, 
         log_print(["Log likelihoods computed."])
 
         bayes_factor = np.exp(log_l_a - log_l_b)
+        if bayes_factor < 1e-160:
+            bayes_factor = 1e-160
         
         
         pair_id = DataBase.unique_model_pair_identifier(model_a_id, model_b_id)
