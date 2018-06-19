@@ -675,7 +675,7 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
     
     edges_for_cmap = draw_networkx_arrows(G, edgelist=edge_tuples, pos=positions, arrows=True, 
         arrowstyle='->', width = arrow_size, widthscale=widthscale, pathstyle=pathstyle,
-        alphas = e_alphas, edge_color= weights, edge_cmap=e_cmap)
+        alphas = e_alphas, edge_color= weights, edge_cmap=e_cmap, edge_vmin=0.8, edge_vmax=0.85)
     
     nx.draw_networkx_labels(G, label_positions, labels)
     plt.tight_layout()
@@ -705,11 +705,18 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
             handles.append(mpatches.Patch(color=col))
             labels.append(info)
     labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: t[0]))
+
+
+    lgd_handles=[]
+#    for i in range(len(labels)):
+#        lgd_handles.append((handles[i], labels[i], marker='o'))
+    
     if 'Branch Champion' in labels:
         legend_title='Champion Type'
     else:
         legend_title='# QMD wins'
     plt.legend(handles, labels, title=legend_title)
+#    plt.legend(lgd_handles, title=legend_title)
 
     #plt.title('Tree Diagram for QMD')
     if save_to_file is not None:
@@ -828,6 +835,7 @@ def cumulativeQMDTreePlot(
 
     edges = []
     edge_frequencies=[]
+    max_frequency = max(list(pair_freqs.values()))
     for a in modlist:
         remaining_modlist = modlist[modlist.index(a)+1:]
         for b in remaining_modlist:
@@ -835,7 +843,7 @@ def cumulativeQMDTreePlot(
             if is_adj or not only_adjacent_branches:
                 if a!=b:
                     pairing = (a,b)
-                    frequency = pair_freqs[pairing] #TODO build frequency into edges
+                    frequency = pair_freqs[pairing]/max_frequency #TODO build frequency into edges
                     edges.append(pairing)
                     edge_frequencies.append(frequency)
                     vs = [a,b]
@@ -860,7 +868,7 @@ def cumulativeQMDTreePlot(
     edge_f = [i*freq_scale for i in edge_frequencies]
     
     plotTreeDiagram(G,n_cmap = plt.cm.pink_r, e_cmap = plt.cm.Blues, #TODO should be pt.plot when finished dev
-                       nonadj_alpha = 0.1, e_alphas = [] , widthscale=1.5, 
+                       nonadj_alpha = 0.1, e_alphas = [] , widthscale=10.5, 
                        label_padding = 0.4, pathstyle="curve", arrow_size=None) #  
 
     if save_to_file is not None:
@@ -892,7 +900,9 @@ def draw_networkx_arrows(G, pos,
         
     if width is None:
         try:
-            widthlist = list(  [(widthscale*prop['freq']) for (u,v,prop) in G.edges(data=True)]  )
+            widthlist = np.array(list(  [(widthscale*prop['freq']) for (u,v,prop) in G.edges(data=True)]  ))
+            widthlist = widthscale*widthlist/np.max(widthlist)
+            # widthlist = [(a+widthscale*0.1) for a in widthlist] ## this was giving colour to non-existent edges
         except:
 #            widthlist = widthscale*0.02
             widthlist = widthscale
