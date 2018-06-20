@@ -134,14 +134,11 @@ class ModelLearningClass():
             self.debugSave = False
         #self.TrueHam = evo.getH(self.TrueParams, self.TrueOpList) # This is the Hamiltonian for the time evolution in the system
 #         self.Prior = MultiVariateUniformDistribution(len(self.OpList))
+        num_params = len(self.SimOpList)
+
         if gaussian:
-            self.Prior = MultiVariateNormalDistributionNocov(len(self.SimOpList))
-        else:
-#             self.Prior = MultiVariateUniformDistribution(len(self.SimOpList)) #the prior distribution is on the model we want to test i.e. the one implemented in the     simulator
-           # print("Num elements:", len(self.SimOpList))
-            # print("self.trueparams:", self.TrueParams)
-            
-            num_params = len(self.SimOpList)
+#            self.Prior = MultiVariateNormalDistributionNocov(len(self.SimOpList))
+			self.log_print(["Normal distribution generated"])			
             means = self.TrueParams[0:num_params]
 
             if num_params > len(self.TrueParams):
@@ -150,7 +147,17 @@ class ModelLearningClass():
             
 #            self.Prior = MultiVariateNormalDistributionNocov(num_params, mean = means)
             self.Prior = MultiVariateNormalDistributionNocov(num_params)
-  
+
+
+        else:
+			self.log_print(["Unfirom distribution generated"])			
+			self.Prior = MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the     simulator
+           # print("Num elements:", len(self.SimOpList))
+            # print("self.trueparams:", self.TrueParams)
+            
+
+	
+	  
         self.ProbeCounter = 0 #probecounter for the choice of the state
 #         if len(oplist)>1:
 #             self.ProbeState = pros.choose_probe(self.OpList, self.TrueParams)
