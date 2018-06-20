@@ -138,20 +138,17 @@ class ModelLearningClass():
 
         if gaussian:
 #            self.Prior = MultiVariateNormalDistributionNocov(len(self.SimOpList))
-			self.log_print(["Normal distribution generated"])			
+            self.log_print(["Normal distribution generated"])
             means = self.TrueParams[0:num_params]
-
             if num_params > len(self.TrueParams):
                 for i in range(len(self.TrueParams), num_params):
                     means.append(self.TrueParams[i%len(self.TrueParams)])
-            
-#            self.Prior = MultiVariateNormalDistributionNocov(num_params, mean = means)
             self.Prior = MultiVariateNormalDistributionNocov(num_params)
 
 
         else:
-			self.log_print(["Unfirom distribution generated"])			
-			self.Prior = MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the     simulator
+            self.log_print(["Uniform distribution generated"])
+            self.Prior = MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the simulator
            # print("Num elements:", len(self.SimOpList))
             # print("self.trueparams:", self.TrueParams)
             
