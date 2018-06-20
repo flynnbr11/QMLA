@@ -135,7 +135,7 @@ def anaytical_pr0(t_list, modelparams, oplist, probe):
 
  
 def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True,exp_comparison_tol=None, enable_sparse=True, ham_list=None, log_file='QMDLog.log', log_identifier=None):
-    
+    from rq import timeouts
     print_loc(global_print_loc)
     num_particles = len(modelparams)
 
@@ -152,6 +152,9 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True,ex
                 log_print(["Error raised; unphysical expecation value."], log_file, log_identifier)
                 sys.exit()
                 log_print(["Inputs to expectation value function. \n\t ham=", ham, "\n\t t=", t, "\n\t state=",probe, "\n\t use_exp_custom=", use_exp_custom, "\n\t exp_comparison_tol=", exp_comparison_tol, "\n\t enable_sparse", enable_sparse, "\n\t log_file=", log_file, "\n\t log_id=", log_identifier], log_file, log_identifier)
+            except timeouts.JobTimeoutException:
+                log_print(["RQ Time exception. \nprobe=", probe, "\nt=", t,"\nHam=", ham], log_file, log_identifier)
+                raise
             
                 
             if output[evoId][tId] < 0:
