@@ -95,8 +95,6 @@ class QMD():
             self.TrueParamsList = [random.random() for i in self.TrueOpList] # TODO: actual true params?
         # todo set true parmams properly
         #self.TrueParamsList = [0.75 for i in self.TrueOpList] # TODO: actual true params?
-        #self.TrueHam = evo.getH(self.TrueParamsList, self.TrueOpList)
-        #self.TrueHam = np.tensordot(self.TrueParamsList, self.TrueOpList, axes=1)
         self.MaxModNum = max_num_models #TODO: necessary?
         self.gaussian = gaussian
         self.NumModels = len(initial_op_list)
@@ -135,7 +133,6 @@ class QMD():
 #        for i in range(self.MaxLayerNumber+1):
 #            self.LayerChampions[i] = 0
         self.ModelNameIDs = {}
-        # only true if both. 
         self.GrowthGenerator = growth_generator
         self.SpawnDepth = 0
         self.NumModelsPerBranch = {0:len(self.InitialOpList)}
@@ -153,11 +150,6 @@ class QMD():
             self.log_file = str('QMD_'+str(q_id)+'.log')
         self.rq_log_file = self.log_file
 
-#        try:
-#            self.rq_log_file = self.log_file[:-4]+'.rq.log'
-#        except:
-#            print("LOG file can't be used:", self.log_file)
-#            self.rq_log_file = str(self.log_file)+'.rq'
 
         self.write_log_file = open(self.log_file, 'a')
         self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(self.GrowthGenerator, log_file=self.log_file)
@@ -167,8 +159,6 @@ class QMD():
             self.redis_conn = redis.Redis(host=self.HostName, port=self.PortNumber)
             test_workers=self.use_rq
             self.rq_queue = Queue(self.Q_id, connection=self.redis_conn, async=test_workers, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
-
-#            self.rq_queue = Queue(connection=self.redis_conn, async=test_workers, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
 
             parallel_enabled = True
         except:
@@ -181,7 +171,6 @@ class QMD():
         self.RedisDataBases = rds.databases_from_qmd_id(self.HostName, self.PortNumber, self.Q_id)
         
         rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.
-        #print("Databases flushed for id", self.Q_id)
  
         
         if self.QLE:
@@ -224,7 +213,6 @@ class QMD():
         
 
     def log_print(self, to_print_list):
-        # print("QMD Log print called at ", time_seconds(), "; printing to", self.write_log_file)
         identifier = str(str(time_seconds()) +" [QMD "+ str(self.Q_id) +"]")
         if type(to_print_list)!=list:
             to_print_list = list(to_print_list)
@@ -236,8 +224,6 @@ class QMD():
         
 
     def initiateDB(self):
-        # print("Initiating QMD DB")
-        ## TODO: Models should be initialised with appropriate TrueOp dimension -- see getListTrueOpByDimension function
         self.db, self.legacy_db, self.model_lists = \
             DataBase.launch_db(
                 true_op_name = self.TrueOpName,
@@ -294,14 +280,10 @@ class QMD():
         )
         if tryAddModel == True: ## keep track of how many models/branches in play
             self.HighestModelID += 1 
-            # this_model_id = model_id_from_name(self.db, name = model) 
             self.ModelNameIDs[self.NumModels] = model
             self.NumModels += 1
             if DataBase.get_num_qubits(model) > self.HighestQubitNumber:
                 self.HighestQubitNumber = DataBase.get_num_qubits(model)
-        #else: 
-        #    self.NumModels-=int(1)
-
 
     def delete_unpicklable_attributes(self):
         del self.redis_conn
@@ -324,8 +306,6 @@ class QMD():
         return branchID
     
     def printState(self):
-        
-        
         self.log_print(["Branch champions:", self.BranchChampions])
         self.log_print(["InterBranch champions:", self.InterBranchChampions])
         self.log_print(["Branch Rankings: \n", self.BranchRankings])
@@ -384,9 +364,10 @@ class QMD():
         if model_exists==True and has_model_finished==False : 
             model_instance = self.getModelInstance(model)
             print("Running ", self.QLE_Type, " for model: ", model)
-            model_instance.UpdateModel(num_exp, sigma_threshold = self.SigmaThreshold)
+            model_instance.UpdateModel(num_exp, 
+                sigma_threshold = self.SigmaThreshold
+            )
             self.updateModelRecord(name=model, field='Completed', new_value=True)
-            #model_instance.BayesOnModelsWithinbranches
         else: 
             print("Model ", model ,"does not exist")
 
@@ -396,19 +377,24 @@ class QMD():
         for model_name in unfinished_model_names:
             print("Model ", model_name, "being learned")
             self.learnModel(model_name=model_name, use_rq=use_rq, blocking=blocking)
-            self.updateModelRecord(field='Completed', name=model_name,  new_value=True)
+            self.updateModelRecord(field='Completed', 
+                name=model_name,  new_value=True
+            )
         
 
     def learnModelFromBranchID(self, branchID, use_rq=True, blocking=False):
         model_list = DataBase.model_names_on_branch(self.db, branchID)
-        active_branches_learning_models = self.RedisDataBases['active_branches_learning_models']
+        active_branches_learning_models = \
+            self.RedisDataBases['active_branches_learning_models']
         active_branches_learning_models.set(int(branchID), 0)
         active_branches_learning_models.set('LOCKED', 0)
 
         for model_name in model_list:
             self.log_print(["Model ", model_name, "being learned"])
             self.learnModel(model_name=model_name, use_rq=use_rq, blocking=blocking)
-            self.updateModelRecord(field='Completed', name=model_name,  new_value=True)
+            self.updateModelRecord(field='Completed', name=model_name, 
+                new_value=True
+            )
 
         
     
@@ -416,21 +402,33 @@ class QMD():
     def learnModelNameList(self, model_name_list, use_rq=True, blocking=False):
         for model_name in model_name_list:
             self.learnModel(model_name=model_name, use_rq=use_rq, blocking=blocking)
-            self.updateModelRecord(field='Completed', name=model_name,  new_value=True)
+            self.updateModelRecord(field='Completed', name=model_name,
+                new_value=True
+            )
             
     
     def learnModel(self, model_name, use_rq = True, blocking=False): 
-        exists = DataBase.check_model_exists(model_name=model_name, model_lists = self.model_lists, db = self.db)
+        exists = DataBase.check_model_exists(model_name=model_name,
+            model_lists = self.model_lists, db = self.db
+        )
         if exists:
             modelID = DataBase.model_id_from_name(self.db, name = model_name)
-            branchID = DataBase.model_branch_from_model_id(self.db, model_id=modelID)
-            if self.RunParallel and use_rq: # i.e. use a job queue rather than sequentially doing it. 
+            branchID = DataBase.model_branch_from_model_id(self.db, 
+                model_id=modelID
+            )
+            if self.RunParallel and use_rq:
+            # i.e. use a job queue rather than sequentially doing it. 
                 from rq import Connection, Queue, Worker
-                queue = Queue(self.Q_id, connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
-#                queue = Queue(connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL 
+                queue = Queue(self.Q_id, connection=self.redis_conn,
+                async=self.use_rq, default_timeout=self.rq_timeout
+            ) # TODO is this timeout sufficient for ALL QMD jobs?
 
                 # add function call to RQ queue
-                queued_model = queue.enqueue(learnModelRemote, model_name, modelID, branchID=branchID, remote=True, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, log_file=self.rq_log_file, result_ttl=-1, timeout=self.rq_timeout) # add result_ttl=-1 to keep result indefinitely on redis server
+                queued_model = queue.enqueue(learnModelRemote, model_name,
+                    modelID, branchID=branchID, remote=True, 
+                    host_name=self.HostName, port_number=self.PortNumber,
+                    qid=self.Q_id, log_file=self.rq_log_file, result_ttl=-1,
+                    timeout=self.rq_timeout) 
                 
                 self.log_print(["Model", model_name, "added to queue."])
                 if blocking: # i.e. wait for result when called. 
@@ -439,17 +437,17 @@ class QMD():
                             self.log_print(["Model", model_name, "has failed on remote worker"])
                             break
                         time.sleep(0.1)
-                    #reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
-                    #reduced_model.updateLearnedValues()
                     del updated_model_info
-
 
             else:
                 self.QMDInfo['probe_dict'] = self.ProbeDict
-                updated_model_info = learnModelRemote(model_name, modelID, branchID=branchID, qmd_info=self.QMDInfo, remote=True, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id,log_file=self.rq_log_file)
+                updated_model_info = learnModelRemote(model_name,
+                    modelID, branchID=branchID, qmd_info=self.QMDInfo, 
+                    remote=True, host_name=self.HostName, 
+                    port_number=self.PortNumber,
+                    qid=self.Q_id,log_file=self.rq_log_file
+                )
 
-#                reduced_model = DataBase.pull_field(self.db, name=model_name, field='Reduced_Model_Class_Instance')
-#                reduced_model.updateLearnedValues(learned_info = updated_model_info)
                 del updated_model_info
         else:
             self.log_print(["Model", model_name, "does not yet exist."])
@@ -463,22 +461,33 @@ class QMD():
         if self.use_rq:
             from rq import Connection, Queue, Worker
             queue = Queue(self.Q_id, connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
-#            queue = Queue(connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
 
-            job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id, model_b_id=model_b_id, branchID=branchID, interbranch=interbranch, num_times_to_use = self.NumTimesForBayesUpdates,  trueModel=self.TrueOpName, bayes_threshold=bayes_threshold, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, log_file=self.rq_log_file, result_ttl=-1, timeout=self.rq_timeout) 
-            self.log_print(["Bayes factor calculation queued. Model IDs", model_a_id, model_b_id])
-
+            job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id,
+                model_b_id=model_b_id, branchID=branchID, 
+                interbranch=interbranch, 
+                num_times_to_use = self.NumTimesForBayesUpdates, 
+                trueModel=self.TrueOpName, bayes_threshold=bayes_threshold,
+                host_name=self.HostName, port_number=self.PortNumber, 
+                qid=self.Q_id, log_file=self.rq_log_file, result_ttl=-1,
+                timeout=self.rq_timeout
+            ) 
+            self.log_print(["Bayes factor calculation queued. Model IDs",
+                model_a_id, model_b_id]
+            )
             if return_job:
                 return job
-
         else:
 
-            BayesFactorRemote(model_a_id=model_a_id, model_b_id=model_b_id, trueModel=self.TrueOpName, branchID=branchID, interbranch=interbranch, bayes_threshold=bayes_threshold, host_name=self.HostName, port_number=self.PortNumber, qid=self.Q_id, log_file=self.rq_log_file)
+            BayesFactorRemote(model_a_id=model_a_id, model_b_id=model_b_id,
+                trueModel=self.TrueOpName, branchID=branchID,
+                interbranch=interbranch, bayes_threshold=bayes_threshold,
+                host_name=self.HostName, port_number=self.PortNumber, 
+                qid=self.Q_id, log_file=self.rq_log_file
+            )
             
-        
-
-    def remoteBayesFromIDList(self, model_id_list, remote=True, wait_on_result=False, recompute=False, bayes_threshold=1): 
-    #TODO need a remote blocking argument for when this is called in case where numerous models have same points   
+    def remoteBayesFromIDList(self, model_id_list, remote=True,
+        wait_on_result=False, recompute=False, bayes_threshold=1
+    ): 
         remote_jobs=[]
         num_models = len(model_id_list)
         for i in range(num_models):
@@ -487,28 +496,32 @@ class QMD():
                 b=model_id_list[j]
                 if a!=b:
                     unique_id = DataBase.unique_model_pair_identifier(a,b)
-                    if (unique_id not in self.BayesFactorsComputed or recompute==True): #ie not yet considered
+                    if (unique_id not in self.BayesFactorsComputed 
+                        or recompute==True
+                    ): #ie not yet considered
                         self.BayesFactorsComputed.append(unique_id)
-                        remote_jobs.append(self.remoteBayes(a,b, remote=remote, return_job=wait_on_result, bayes_threshold=bayes_threshold))
+                        remote_jobs.append(self.remoteBayes(a,b, remote=remote,
+                            return_job=wait_on_result,
+                            bayes_threshold=bayes_threshold)
+                        )
 
         if wait_on_result and self.use_rq: # test_workers from RedisSettings
-            self.log_print(["Waiting on result of Bayes comparisons from given list:", model_id_list])
+            self.log_print(["Waiting on result of \
+                Bayes comparisons from given list:", model_id_list]
+            )
             for job in remote_jobs:
                 while job.is_finished == False:
                     time.sleep(0.01)
         else:
-            self.log_print(["Not waiting on results since not using RQ workers."])
-            
-#                    else:
-#                       print("Bayes already computed bw", a,b)
+            self.log_print(["Not waiting on results \
+                since not using RQ workers."]
+            )
     
+    def remoteBayesFromBranchID(self, branchID, remote=True, 
+        bayes_threshold=50
+    ):
 
-    
-    
-    
-    def remoteBayesFromBranchID(self, branchID, remote=True, bayes_threshold=50):
         active_branches_bayes = self.RedisDataBases['active_branches_bayes']
-
         model_id_list = DataBase.active_model_ids_by_branch_id(self.db, branchID)
         active_branches_bayes.set(int(branchID), 0) # set up branch 0
         num_models = len(model_id_list)
@@ -520,22 +533,23 @@ class QMD():
                     unique_id = DataBase.unique_model_pair_identifier(a,b)
                     if (unique_id not in self.BayesFactorsComputed or recompute==True): #ie not yet considered
                         self.BayesFactorsComputed.append(unique_id)
-                        self.remoteBayes(a,b, remote=remote, branchID=branchID, bayes_threshold=bayes_threshold)
-#                    else:
-#                       print("Bayes already computed bw", a,b)
-        
-
-
+                        self.remoteBayes(a,b, remote=remote, 
+                            branchID=branchID, bayes_threshold=bayes_threshold
+                        )
 
     def blockingQMD(self):
-        # primarily for use during development. 
-        self.learnModelNameList(model_name_list=self.InitialOpList, blocking=False, use_rq=True)
+        self.learnModelNameList(model_name_list=self.InitialOpList, 
+            blocking=False, use_rq=True
+        )
         ids=DataBase.active_model_ids_by_branch_id(self.db, 0)
         self.remoteBayesFromIDList(ids, remote=True)
         self.remoteBranchBayesComparison(branchID=0)
     
     def remoteBranchBayesComparison(self, branchID):
-        active_models_in_branch = DataBase.active_model_ids_by_branch_id(self.db, branchID)
+        active_models_in_branch = \
+            DataBase.active_model_ids_by_branch_id(self.db,
+            branchID
+        )
         
         num_models = len(active_models_in_branch)
         models_points = {}
