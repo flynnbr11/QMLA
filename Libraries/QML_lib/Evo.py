@@ -130,17 +130,12 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe,
                     log_file, log_identifier
                 )
                 sys.exit()
-                log_print(["Inputs to expectation value function. \n\t ham=", ham,
-                    "\n\t t=", t, "\n\t state=",probe, "\n\t use_exp_custom=",
-                    use_exp_custom, "\n\t exp_comparison_tol=", exp_comparison_tol, 
-                    "\n\t enable_sparse", enable_sparse, "\n\t log_file=", log_file,
-                    "\n\t log_id=", log_identifier], log_file, log_identifier
-                )
             except timeouts.JobTimeoutException:
                 log_print(["RQ Time exception. \nprobe=", probe,
                     "\nt=", t,"\nHam=", ham], log_file, log_identifier
                 )
-                raise
+                sys.exit()
+#                raise
             
                 
             if output[evoId][tId] < 0:
@@ -192,7 +187,11 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus,
      
 ## Partial trace functionality
  
-def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=20, compare_exp_fncs_tol=None, log_file='QMDLog.log', log_identifier=None):
+def expectation_value(ham, t, state=None, choose_random_probe=False,
+    use_exp_custom=True, enable_sparse=True, print_exp_details=False,
+    exp_fnc_cutoff=20, compare_exp_fncs_tol=None, log_file='QMDLog.log',
+    log_identifier=None
+):
 
     if choose_random_probe is True: 
         num_qubits = int(np.log2(np.shape(ham)[0]))
@@ -227,7 +226,10 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
     else: # compute straight away; don't compare exponentiations
         if use_exp_custom and ham_exp_installed: 
             try:
-              u_psi = evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
+              u_psi = evolved_state(ham, t, state, use_exp_custom=True,
+                  print_exp_details=print_exp_details, 
+                  exp_fnc_cutoff=exp_fnc_cutoff
+              )
             except ValueError:
                 log_print(["Value error when exponentiating Hamiltonian. Ham:\n",
                     ham, "\nProbe: ", state], log_file=log_file,
@@ -268,26 +270,6 @@ def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_cus
         expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
         raise NameError('UnphysicalExpectationValue') 
     
-    """      
-    if expec_value > expec_value_limit:
-        log_print(["Terminating due to expec value:", expec_value], log_file, log_identifier)
-        log_print(["Testing evolved state fnc:"], log_file, log_identifier)
-        expec_value = evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=True, log_file=log_file, log_identifier=log_identifier)
-        
-    print_loc(global_print_loc)
-    print_expec_value_intermediate = False
-    if print_expec_value_intermediate:
-      log_print(["Bra : \n", probe_bra], log_file=log_file, log_identifier=log_identifier)
-      log_print(["u_psi\n", u_psi], log_file=log_file, log_identifier=log_identifier)
-      log_print(["psi_psi:\n", np.dot(probe_bra, state)], log_file=log_file, log_identifier=log_identifier)
-      log_print(["t=", t], log_file=log_file, log_identifier=log_identifier)
-      log_print(["Ham : \n", ham], log_file=log_file, log_identifier=log_identifier)
-      log_print(["probe : \n", state], log_file=log_file, log_identifier=log_identifier)
-      log_print(["u_psi: \n", u_psi], log_file=log_file, log_identifier=log_identifier)
-      log_print(["psi_u_psi: \n", psi_u_psi], log_file=log_file, log_identifier=log_identifier)
-      log_print(["Expectation value : ", expec_value], log_file=log_file, log_identifier=log_identifier)
-    """
-
     return expec_value
 
 
