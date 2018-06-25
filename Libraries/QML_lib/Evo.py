@@ -1,25 +1,18 @@
 from __future__ import print_function # so print doesn't show brackets
 import qinfer as qi
-#import qutip as qt
 import numpy as np
 import scipy as sp
 import inspect
 
-#import qutip as qt
 import sys as sys
 import os as os
 import IOfuncts as mIO 
 from MemoryTest import print_loc
 sys.path.append((os.path.join("..")))
-#import SETTINGS
 
-global print_pr0
-global debug_print
 global_print_loc = False 
 use_linalg = False
 use_sparse = False 
-print_pr0 = False
-debug_print = False
  
 try: 
     import hamiltonian_exponentiation as h
@@ -28,9 +21,9 @@ try:
      
 except:
     ham_exp_installed = False
-     
  
-if(use_linalg):
+if (use_linalg): 
+    # override and use linalg.expm even if hamiltonian_exponentiation is installed
     ham_exp_installed = False
      
 # Generic states and Pauli matrices  
@@ -159,7 +152,6 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus,
     num_times = len(t_list)
     output = np.empty([num_particles, num_times])
  
-    if print_pr0: print("output has shape ", output.shape)
     for evoId in range( output.shape[0]): ## todo not sure about length/arrays here
         ham = np.tensordot(modelparams[evoId], oplist, axes=1)
         for tId in range(len(t_list)):
