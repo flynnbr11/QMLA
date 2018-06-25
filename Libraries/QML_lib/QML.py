@@ -110,35 +110,21 @@ class ModelLearningClass():
         print_loc(print_location=init_model_print_loc)
 
         
-#        self.TrueOpList = np.asarray(trueoplist)
- #       self.TrueParams = np.asarray(modeltrueparams)
         self.SimOpList  = np.asarray(simoplist)
-        #self.SimParams = simparams[0]
         self.SimParams = np.asarray([simparams[0]])
         self.InitialParams = np.asarray([simparams[0]])
-#        self.NumParticles = numparticles # function to adapt by dimension
-#        self.ResamplerThresh = resample_thresh
-#        self.ResamplerA = resampler_a
-#        self.PGHPrefactor = pgh_prefactor
-#        self.ModelID = int(modelID)
         self.EnableSparse = enable_sparse
-#        self.QLE = qle
         self.checkQLoss = True
         print_loc(print_location=init_model_print_loc)
-        
-#        print("Model instance ", self.Name, " has initial parameters: ", self.SimParams, "\nTrue op list: \n", self.TrueOpList)
         
         if debug_directory is not None: 
             self.debugSave = True
             self.debugDirectory = debug_directory 
         else:            
             self.debugSave = False
-        #self.TrueHam = evo.getH(self.TrueParams, self.TrueOpList) # This is the Hamiltonian for the time evolution in the system
-#         self.Prior = MultiVariateUniformDistribution(len(self.OpList))
         num_params = len(self.SimOpList)
 
         if gaussian:
-#            self.Prior = MultiVariateNormalDistributionNocov(len(self.SimOpList))
             self.log_print(["Normal distribution generated"])
             means = self.TrueParams[0:num_params]
             if num_params > len(self.TrueParams):
@@ -151,61 +137,29 @@ class ModelLearningClass():
             self.log_print(["Uniform distribution generated"])
             self.Prior = MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the simulator
            # print("Num elements:", len(self.SimOpList))
-            # print("self.trueparams:", self.TrueParams)
             
 
 	
 	  
         self.ProbeCounter = 0 #probecounter for the choice of the state
-#         if len(oplist)>1:
-#             self.ProbeState = pros.choose_probe(self.OpList, self.TrueParams)
-#         else:
-#             self.ProbeState = (sp.linalg.orth(oplist[0])[0]+sp.linalg.orth(oplist[0])[1])/np.sqrt(2)
-        
-#         if len(self.SimOpList)>1:
-# #             self.ProbeState = pros.choose_probe(self.TrueOpList, self.TrueParams)#change to pros.choose_randomprobe
-#             self.ProbeState = pros.choose_randomprobe(self.SimOpList, self.TrueParams)#change to pros.choose_randomprobe
-#         else:
-# #             self.ProbeState = (sp.linalg.orth(trueoplist[0])[0]+sp.linalg.orth(trueoplist[0])[1])/np.sqrt(2)
-#             self.ProbeState = pros.choose_randomprobe(self.SimOpList, self.TrueParams)
-        
-    
-        #self.ProbeList = np.array([evo.zero(),evo.plus(),evo.minusI()])
-        
-        # self.ProbeList = np.array([evo.zero()])
-        
         self.ProbeList = list(map(lambda x: pros.def_randomprobe(self.TrueOpList), range(15)))
-        #self.ProbeList =  [pros.def_randomprobe(self.TrueOpList)]
-        
         #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
         log_identifier=str("QML "+str(self.ModelID))
         self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, exp_comparison_tol = self.ExpComparisonTol, enable_sparse=self.EnableSparse, model_name=self.Name, log_file=self.log_file, log_identifier=log_identifier)    # probelist=self.TrueOpList,,
 
         
-                
-        #print('Chosen probestate: ' + str(self.GenSimModel.ProbeState))
-        #print('Chosen true_params: ' + str(self.TrueParams))
-        #self.GenSimModel = gsi.GenSim_IQLE(oplist=self.OpList, modelparams=self.TrueParams, probecounter = self.ProbeCounter, probelist= [self.ProbeState], solver='scipy', trotter=True)
         #Here you can turn off the debugger change the resampling threshold etc...
 
         self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
 
-        #doublecheck and coment properly
         self.Inv_Field = [item[0] for item in self.GenSimModel.expparams_dtype[1:] ]
-        #print('Inversion fields are: ' + str(self.Inv_Field))
-#        self.Heuristic = mpgh.multiPGH(self.Updater, self.SimOpList, inv_field=self.Inv_Field)
         self.Heuristic = mpgh.multiPGH(self.Updater, inv_field=self.Inv_Field)
         
-        #TODO: should heuristic use TRUEoplist???
-        
-        #print('Heuristic output:' + repr(self.Heuristic()))
         self.ExpParams = np.empty((1, ), dtype=self.GenSimModel.expparams_dtype)
         
         self.NumExperiments = 0
         if checkloss == True or self.checkQLoss==True:     
             self.QLosses = np.array([])
-       # self.TrackEval = np.array([]) #only for debugging
-      #  self.Covars= np.array([])
         self.TrackLogTotLikelihood = np.array([])
         self.TrackTime = np.array([]) #only for debugging
         self.Particles = np.array([])
@@ -217,39 +171,10 @@ class ModelLearningClass():
 
         self.log_print(['Initialization Ready'])
         
-        
-        
-        
-        
     
     
-#     #UPDATER e quanto segue VA RESETTATO COME PROPRIETA DELLA CLASSE
-#     updater= qi.SMCUpdater(model, n_particles, prior, resample_thresh=0.5, resampler = qi.LiuWestResampler(a=0.95), debug_resampling=True)
-    
-    
-#     probestate=pros.choose_probe(oplist,true_params)
-    
-#     Model = gsi.GenSim_IQLE(oplist=oplist, modelparams=true_params, probecounter = 0, probelist= [probestate], solver='scipy', trotter=True)
 
-    
-#     inv_field = [item[0] for item in model.expparams_dtype[1:] ]
-#     print('Inversion fields are: ' + str(inv_field))
-#     heuristic = mpgh.multiPGH(updater, oplist, inv_field=inv_field)
-
-    
-#     self.ExpParams = np.empty((1, ), dtype=model.expparams_dtype)
-#     experiment = heuristic()
-    
-    
-    
-    
-    
-    
-#     """Function which perfoms IQLE on the particular instance of the model for given number of experiments etc... and 
-#     updates all the relevant quanttities in the object for comparison with other models -- It must be run after InitialiseNewModel"""
     def UpdateModel(self, n_experiments, sigma_threshold=10**-13,checkloss=True):
-   
-    #Insert check and append old data to a storing list like ExperimentsHistory or something similar. 
         self.NumExperiments = n_experiments
         if self.checkQLoss == True: 
             self.QLosses = np.empty(n_experiments)
@@ -258,7 +183,6 @@ class ModelLearningClass():
         self.TrackTime =np.empty(n_experiments)#only for debugging
     
         self.Particles = np.empty([self.NumParticles, len(self.SimParams[0]), self.NumExperiments])
-#        self.Particles = np.empty([self.NumParticles, len(self.SimParams), self.NumExperiments]) ## I changed this to test init from db-- Brian
         self.Weights = np.empty([self.NumParticles, self.NumExperiments])
         self.Experiment = self.Heuristic()    
         self.SigmaThresh = sigma_threshold   #This is the value of the Norm of the COvariance matrix which stops the IQLE 
@@ -270,41 +194,25 @@ class ModelLearningClass():
         
         
         for istep in range(self.NumExperiments):
-            # self.Experiment =  self.PGHPrefactor * (self.Heuristic()) ## TODO: use PGH prefactor, either here or in multiPGH
-            #print("\n\nUpdate at exp # ", istep)
-            #print("Memory used : ", virtual_memory().percent, "%")
-            print_loc(global_print_loc)
-            
             self.Experiment =  self.Heuristic()
             print_loc(global_print_loc)
             self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
-            global_print_loc
             self.NumExperimentsToDate += 1
             print_loc(global_print_loc)
-            #print('Chosen experiment: ' + repr(self.Experiment))
             if istep == 0:
                 print_loc(global_print_loc)
                 self.log_print(['Initial time selected > ', str(self.Experiment[0][0])])
             
             
             self.TrackTime[istep] = self.Experiment[0][0]
-            print_loc(global_print_loc)
-            
-            #TODO should this use TRUE params???
             true_params = np.array([[self.TrueParams[0]]])
             
             before_datum = time.time()
             self.Datum = self.GenSimModel.simulate_experiment(self.SimParams, self.Experiment, repeat=10) # todo reconsider repeat number
 #            self.Datum = self.GenSimModel.simulate_experiment(true_params, self.Experiment, repeat=1) # todo reconsider repeat number
-
             after_datum = time.time()
             self.datum_gather_cumulative_time+=after_datum-before_datum
 
-            
-            
-            print_loc(global_print_loc)
-            
-            #print(str(self.GenSimModel.ProbeState))
             before_upd = time.time()
             self.Updater.update(self.Datum, self.Experiment)
             after_upd = time.time()
@@ -320,8 +228,6 @@ class ModelLearningClass():
 
             else:
                 print_loc(global_print_loc)
-
-                #covmat = self.Updater.region_est_ellipsoid()
                 covmat = self.Updater.est_covariance_mtx()
                 self.VolumeList = np.append(self.VolumeList,  np.linalg.det( sp.linalg.sqrtm(covmat) )    )
                 print_loc(global_print_loc)
@@ -336,18 +242,11 @@ class ModelLearningClass():
             print_loc(global_print_loc)
             self.Particles[:, :, istep] = self.Updater.particle_locations
             self.Weights[:, istep] = self.Updater.particle_weights
-            #self.TrackLogTotLikelihood = np.append(self.TrackLogTotLikelihood, self.Updater.log_total_likelihood)
 
             self.NewEval = self.Updater.est_mean()
             print_loc(global_print_loc)
-#            print("At epoch", istep, "loglikelihood=", self.Updater.log_total_likelihood)
-
                 
             if checkloss == True: 
-                #self.NewLoss = eval_loss(self.GenSimModel, self.NewEval, self.TrueParams)
-                #self.QLosses[istep] = self.NewLoss
-            
-#                if self.NewLoss<(10**(-17)) and False: #  I don't want it to stop learning - Brian
                 if False:
                     if self.debugSave: 
                         self.debug_store()
@@ -356,8 +255,6 @@ class ModelLearningClass():
                     for iterator in range(len(self.FinalParams)):
                         self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep]), np.std(self.Particles[:,iterator,istep])]
                         print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator])) 
-#                        print('Final quadratic loss: ', str(self.QLosses[-1]))
-
                     self.LogTotLikelihood=self.Updater.log_total_likelihood                
                     self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
                     self.Covars=(np.resize(self.Covars, (1,istep)))[0]
@@ -385,10 +282,6 @@ class ModelLearningClass():
                 self.TrackTime = self.TrackTime[0:istep]
                 
                 break 
-            
-            ####Need to ADD check with dereivative of sigmas!!!!
-            
-            
             
             if istep == self.NumExperiments-1:
                 self.log_print(["Results for QHL on ", self.Name])
@@ -435,11 +328,6 @@ class ModelLearningClass():
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_params'] = self.InitialParams
         learned_info['volume_list'] = self.VolumeList
-
-
-        #learned_info['updater'] = pickle.dumps(self.Updater, protocol=2)
-        #learned_info['gen_sim_model'] = pickle.dumps(self.GenSimModel, protocol=2)
-
 
         return learned_info
         
@@ -595,7 +483,6 @@ class modelClassForRemoteBayesFactor():
     qid=0 ,log_file='QMD_log.log'):
 
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
-        #print("modelclass remote bayes:",rds_dbs)
         qmd_info_db = rds_dbs['qmd_info_db'] 
         learned_models_info = rds_dbs['learned_models_info']
     
@@ -604,7 +491,6 @@ class modelClassForRemoteBayesFactor():
         try:
             learned_model_info = pickle.loads(learned_models_info.get(model_id_str), encoding='latin1')        
         except:
-            #print(learned_models_info.get(model_id_str))
             learned_model_info = pickle.loads(learned_models_info.get(model_id_str))        
 
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
@@ -642,8 +528,6 @@ class modelClassForRemoteBayesFactor():
         self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict, log_file=self.log_file, log_identifier=log_identifier)    
 
         self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
-        #self.Updater._normalization_record = self._normalization_record
-        #self.Updater._data_record = learned_model_info['data_record']
         
         
         #self.GenSimModel = pickle.loads(learned_model_info['gen_sim_model'])
