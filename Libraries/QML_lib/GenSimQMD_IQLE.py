@@ -42,7 +42,13 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, oplist, modelparams, probecounter=None, true_oplist = None, truename=None, num_probes=40, probe_dict=None, trueparams = None, probelist = None, min_freq=0, solver='scipy', trotter=False, qle=True, use_exp_custom=True, exp_comparison_tol=None, enable_sparse=True, model_name=None, log_file='QMDLog.log', log_identifier=None):
+    def __init__(self, oplist, modelparams, probecounter=None, 
+        true_oplist = None, truename=None, num_probes=40, probe_dict=None, 
+        trueparams = None, probelist = None, min_freq=0, solver='scipy', 
+        trotter=False, qle=True, use_exp_custom=True, exp_comparison_tol=None,
+        enable_sparse=True, model_name=None, log_file='QMDLog.log',
+        log_identifier=None
+    ):
         self._solver = solver #This is the solver used for time evolution scipy is faster, QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
         self._probecounter = probecounter
@@ -67,34 +73,25 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self.log_file = log_file
         self.log_identifier = log_identifier
         if true_oplist is not None and trueparams is None:
-            raise(ValueError('\nA system Hamiltonian with unknown parameters was requested'))
+            raise(ValueError('\nA system Hamiltonian with unknown \
+                parameters was requested')
+            )
         if true_oplist is None:
-            warnings.warn("\nI am assuming the Model and System Hamiltonians to be the same", UserWarning)
+            warnings.warn("\nI am assuming the Model and System \
+                Hamiltonians to be the same", UserWarning
+            )
             self._trueHam = None
         else:
-           #self._trueHam = getH(trueparams, true_oplist)
-#           self._trueHam = np.tensordot(trueparams, true_oplist, axes=1)
             self._trueHam = None
 
-           #print("true ham = \n", self._trueHam)
-#TODO: changing to try get update working for >1 qubit systems -Brian
-        if debug_print: print("Gen sim. True ham has been set as : ")
-        if debug_print: print(self._trueHam)
-        
-        if debug_print:print("True params & true_oplist: [which are passed to getH] ")
-        if debug_print:print(trueparams)
-        if debug_print:print(true_oplist)
         super(GenSimQMD_IQLE, self).__init__(self._oplist)
-        #probestate = choose_randomprobe(self._probelist)
-        probestate = def_randomprobe(oplist,modelpars=None)
-        self.ProbeState=None
         self.NumProbes = num_probes
         if probe_dict is None: 
             self._probelist = seperable_probe_dict(max_num_qubits=12, num_probes = self.NumProbes) # TODO -- make same as number of qubits in model.
         else:
             self._probelist = probe_dict    
+
     ## PROPERTIES ##
-    
     @property
     def n_modelparams(self):
         return len(self._oplist)
@@ -153,19 +150,13 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         print_loc(global_print_loc)
         cutoff=min(len(modelparams), 5)
         num_particles = modelparams.shape[0]
-        #print("Likelihood called; _a=", self._a)
         self._a += 1
         if self._a % 2 == 1:
             self._b += 1
-        #print("(a,b)= ", self._a, self._b)
-        print_loc(global_print_loc)
 
         num_parameters = modelparams.shape[1]
-        print_loc(global_print_loc)
-
         true_dim = np.log2(self._true_oplist[0].shape[0])
         sim_dim = np.log2(self._oplist[0].shape[0])
-        
         
         if  num_particles == 1:
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
@@ -173,8 +164,6 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             operators = self._true_oplist
             if true_dim > sim_dim: 
                 operators = DataBase.reduced_operators(self._truename, int(sim_dim))
-                #print("True dim=", true_dim, "Sim dim=", sim_dim)
-                #print("operators:", operators)
             else:
                 operators = self._true_oplist
             params = [self._trueparams]
@@ -184,29 +173,18 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             true_evo = False
             operators = self._oplist
             params = modelparams
-
-#        ham_num_qubits = np.log2(self._oplist[0].shape[0])
         ham_num_qubits = np.log2(operators[0].shape[0])
-        
-        
-        
-        """
-        if num_particles==1: 
-          print("True (", self.ModelName , "); probe id: (", (self._b % int(self.NumProbes)), ", ",  ham_num_qubits, ")")
-#          print("modelparams : ", modelparams) 
-        else: 
-          print("Simulated(", self.ModelName , "); probe id: (", (self._b % int(self.NumProbes)), ",",  ham_num_qubits, ")")      
-        """
+
         
         if self.inBayesUpdates:
-          if self.ideal_probe is not None:
-            probe = self.ideal_probe # this won't work
-          elif self.ideal_probelist is not None: 
-            probe = self.ideal_probelist[self._b % 2] # this won't work
-          else:
-            print("Either ideal_probe or ideal_probes must be given")
+            if self.ideal_probe is not None:
+                probe = self.ideal_probe # this won't work
+            elif self.ideal_probelist is not None: 
+                probe = self.ideal_probelist[self._b % 2] # this won't work
+            else:
+                print("Either ideal_probe or ideal_probes must be given")
         else:
-          probe = self._probelist[(self._b % int(self.NumProbes)), ham_num_qubits]
+            probe = self._probelist[(self._b % int(self.NumProbes)), ham_num_qubits]
         
         
         ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
@@ -217,10 +195,22 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             
         times = expparams['t']
         if self.QLE is True:
-            pr0 = get_pr0_array_qle(t_list=times, modelparams=params, oplist=operators, probe=probe, use_exp_custom=self.use_exp_custom, exp_comparison_tol=self.exp_comparison_tol, enable_sparse = self.enable_sparse, log_file=self.log_file, log_identifier=self.log_identifier)    
+            pr0 = get_pr0_array_qle(t_list=times, modelparams=params,
+                oplist=operators, probe=probe, 
+                use_exp_custom=self.use_exp_custom,
+                exp_comparison_tol=self.exp_comparison_tol, 
+                enable_sparse = self.enable_sparse, 
+                log_file=self.log_file, log_identifier=self.log_identifier
+            )
 
         else: 
-            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params, oplist=operators, ham_minus=ham_minus, probe=probe, use_exp_custom=self.use_exp_custom, exp_comparison_tol=self.exp_comparison_tol, enable_sparse = self.enable_sparse, log_file=self.log_file, log_identifier=self.log_identifier)    
+            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params,
+            oplist=operators, ham_minus=ham_minus, probe=probe,
+            use_exp_custom=self.use_exp_custom,
+            exp_comparison_tol=self.exp_comparison_tol, 
+            enable_sparse = self.enable_sparse, 
+            log_file=self.log_file, log_identifier=self.log_identifier
+        )    
 
         likelihood_array = qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
         return likelihood_array
@@ -234,8 +224,12 @@ def seperable_probe_dict(max_num_qubits, num_probes):
             if j==1:
                 seperable_probes[i,j] = seperable_probes[i,0]
             else: 
-                seperable_probes[i,j] = np.tensordot(seperable_probes[i,j-1], random_probe(1), axes=0).flatten(order='c')
-            if np.linalg.norm(seperable_probes[i,j]) < 0.999999999 or np.linalg.norm(seperable_probes[i,j]) > 1.0000000000001:
+                seperable_probes[i,j] = np.tensordot(
+                    seperable_probes[i,j-1], random_probe(1), 
+                    axes=0).flatten(order='c')
+            if ( np.linalg.norm(seperable_probes[i,j]) < 0.999999999 
+                or np.linalg.norm(seperable_probes[i,j]) > 1.0000000000001
+            ):
                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
     return seperable_probes
 
