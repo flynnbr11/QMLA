@@ -18,14 +18,22 @@ import pickle
 pickle.HIGHEST_PROTOCOL=2
 
 global debug_print
-debug_print = False
-
 global print_mem_status
+debug_print = False
 print_mem_status = True
-
 global_print_loc = False
 
+
+"""
+In this file are class definitions:
+    - ModelLearningClass
+    - reducedModel
+    - modelClassForRemoteBayesFactor
+
+"""
+
 def time_seconds():
+    # return time in h:m:s format for logging. 
     import datetime
     now =  datetime.date.today()
     hour = datetime.datetime.now().hour
@@ -37,6 +45,15 @@ def time_seconds():
 
 
 class ModelLearningClass():
+    """
+    Class to learn individual model. Model name is given when initialised. 
+    A host_name and port_number are given to InitialiseNewModel. The qmd_info dict from Redis is pulled and pickled to find the true model and other QMD parameters needed. 
+    A GenSimModel is set which details the SMCUpdater used to update the posterior distribution. 
+    UpdateModel calls the updater in a loop of n_experiments. 
+    The final parameter estimates are set as the mean of the posterior distribution after n_experiments wherein n_particles are sampled per experiment (set in qmd_info). 
+    
+    """
+
     def __init__(self, name, num_probes=20, probe_dict=None, qid=0, log_file='QMD_log.log', modelID=0):
         self.VolumeList = np.array([])  
         self.Name = name
@@ -279,7 +296,6 @@ class ModelLearningClass():
         learned_info['name'] = self.Name
         learned_info['model_id'] = self.ModelID
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
-#        learned_info['initial_params'] = self.InitialParams
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
 
@@ -348,14 +364,14 @@ class reducedModel():
     """
     Class holds what is required for updates only. 
     i.e. 
-    - times learned over
-    - final parameters
-    - oplist
-    - true_oplist (?) needed to regenerate GenSimModel identically (necessary?)
-    - true_params (?)
-    - resample_thresh
-    - resample_a [are resampling params needed only for updates?]
-    - Prior (specified by mean and std_dev?)
+        - times learned over
+        - final parameters
+        - oplist
+        - true_oplist (?) needed to regenerate GenSimModel identically (necessary?)
+        - true_params (?)
+        - resample_thresh
+        - resample_a [are resampling params needed only for updates?]
+        - Prior (specified by mean and std_dev?)
     
     Then initialises an updater and GenSimModel which are used for updates. 
     """
@@ -432,9 +448,25 @@ class reducedModel():
         
         
 class modelClassForRemoteBayesFactor():
-#TODO: use this instead of full ModelClass above.
-    def __init__(self, modelID, host_name='localhost', port_number=6379,
-    qid=0 ,log_file='QMD_log.log'):
+    """
+    When Bayes factors are calculated remotely (ie on RQ workers), 
+    they require SMCUpdaters etc to do calculations. 
+    This class captures the minimum required to enable these calculations. 
+    These are pickled by the ModelLearningClass to a redis database: 
+    this class unpickles the useful information and generates new instances 
+    of GenSimModel etc. to use in those calculations. 
+    
+    """
+
+
+    def __init__(
+            self,
+            modelID,
+            host_name='localhost',
+            port_number=6379,
+            qid=0,
+            log_file='QMD_log.log'
+        ):
 
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db'] 
