@@ -82,7 +82,6 @@ def time_seconds():
 
 
 def log_print(to_print_list, log_file):
-    # print("QMD Log print called at ", time_seconds(), "; printing to", self.write_log_file)
     identifier = str(str(time_seconds()) +" [DB]")
     if type(to_print_list)!=list:
         to_print_list = list(to_print_list)
@@ -363,7 +362,6 @@ def empty_array_of_same_dim(name):
 
     num_qubits = len(t_str) +1
     dim = 2**num_qubits
-    #print("String: ", name, " has NQubits: ", num_qubits)
     empty_mtx = np.zeros([dim, dim], dtype=np.complex128)
     return empty_mtx
 
@@ -445,16 +443,12 @@ def compute_t(inp):
         return compute(inp)
     else:
         to_tens = inp.split(t_str)
-        #print("To tens: ", to_tens)
         running_tens_prod=compute(to_tens[0])
-        #print("Split by ", t_str, " : \n", to_tens)
         for i in range(1,len(to_tens)):
             max_p, p_str = find_max_letter(to_tens[i], "P")
             max_t, t_str = find_max_letter(to_tens[i], "T")
-            #print("To tens [i=", i, "]:\n", to_tens[i] )
             rhs = compute(to_tens[i])
             running_tens_prod = np.kron(running_tens_prod, rhs)
-        #print("RESULT ", t_str, " : ", inp, ": \n", running_tens_prod)
         return running_tens_prod
 
 def compute_p(inp):
@@ -720,7 +714,14 @@ qid=0, host_name='localhost', port_number=6379):
     return db, legacy_db, model_lists
 
 
-def add_model(model_name, running_database, model_lists, true_op_name, modelID, log_file, redimensionalise=True, num_particles=2000, branchID=0, epoch=0, true_ops=[], true_params=[], use_exp_custom=True, enable_sparse=True, probe_dict=None, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, debug_directory = None, qle=True, qid=0, host_name='localhost', port_number=6379):
+def add_model(model_name, running_database, model_lists, 
+                true_op_name, modelID, log_file, redimensionalise=True,
+                num_particles=2000, branchID=0, epoch=0, true_ops=[],
+                true_params=[], use_exp_custom=True, enable_sparse=True,
+                probe_dict=None, resample_threshold = 0.5, resampler_a = 0.95,
+                pgh_prefactor = 1.0, num_probes = None, debug_directory = None,
+                qle=True, qid=0, host_name='localhost', port_number=6379
+            ):
     """
     Function to add a model to the existing databases. 
     First checks whether the model already exists. 
@@ -787,25 +788,7 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
         # add model_db_new_row to model_db and running_database
         # Note: do NOT use pd.df.append() as this copies total DB,
         # appends and returns copy.
-        """
-        qml_instance.InitialiseNewModel(
-          trueoplist = true_ops,
-          modeltrueparams = true_params,
-          simoplist = op.constituents_operators,
-          simparams = [sim_pars],
-          simopnames = op.constituents_names, 
-          numparticles = num_particles,
-          use_exp_custom = use_exp_custom,
-          enable_sparse=enable_sparse,
-          modelID = modelID,
-          resample_thresh = resample_threshold,
-          resampler_a = resampler_a,
-          pgh_prefactor = pgh_prefactor,
-          gaussian=True,
-          debug_directory = debug_directory,
-          qle = qle
-        )
-        """
+
         reduced_qml_instance = reducedModel(
           model_name = model_name, 
           sim_oplist = op.constituents_operators, 
@@ -830,7 +813,6 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
             'branchID' : int(branchID), #TODO make argument of add_model fnc,
             'Param_Estimates' : sim_pars,
             'Estimates_Dist_Width' : normal_dist_width,
-            #'Model_Class_Instance' : qml_instance,
             'Reduced_Model_Class_Instance' : reduced_qml_instance, 
             'Operator_Instance' : op,
             'Epoch_Start' : 0, #TODO fill in
@@ -840,7 +822,6 @@ def add_model(model_name, running_database, model_lists, true_op_name, modelID, 
         running_database.loc[num_rows] = running_db_new_row      
         return True
     else:
-        #location = consider_new_model(model_lists, model_name, running_database)
         log_print(["Model", alph_model_name, " previously considered."], log_file) # at location", location)  
         return False
 
