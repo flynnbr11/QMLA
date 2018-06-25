@@ -73,9 +73,8 @@ def log_print(to_print_list, log_file):
 
 log_file = global_variables.log_file
 
-#initial_op_list = ['xTi', 'yTi', 'zTi']
+initial_op_list = ['xTi', 'yTi', 'zTi']
 #initial_op_list = ['x', 'y', 'z']
-initial_op_list = ['zTi', 'xTi', 'yTi']
 
 num_ops = len(initial_op_list)
 for i in range(global_variables.num_runs):

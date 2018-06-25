@@ -45,7 +45,24 @@ def time_seconds():
     return time
 
 class QMD():
-    #TODO: rename as ModelsDevelopmentClass when finished
+    """
+    - This class manages quantum model development. 
+    - This is done by controlling a pandas database, sending model specifications
+        to remote actors (via RQ) to compute QHL, and also Bayes factors, generating 
+        a next set of models iteratively. 
+    - This is done in a tree like growth mechanism where new branches consist of 
+        models generated considering previously determined "good" models. 
+    - Model generation rules are given in ModelGeneration. 
+    - Database control is given in DataBase. 
+    - Remote functions for computing QHL/Bayes factors are in
+    - RemoteModelLearning and RemoteBayesFactor respectively. 
+    - Redis databases are used to ensure QMD parameters are accessible to 
+        remote models (since shared memory is not available). 
+        Relevant QMD parameters and info are pickled to redis.  
+
+    """
+
+
     def __init__(self,
                  initial_op_list=['x'],
                  true_operator='x',
