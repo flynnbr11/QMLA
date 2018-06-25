@@ -2,6 +2,7 @@ from __future__ import print_function # so print doesn't show brackets
 import numpy as np
 import scipy as sp
 import os 
+import time
 import Evo as evo
 from Distrib import *
 import ProbeStates as pros
@@ -264,6 +265,10 @@ class ModelLearningClass():
         self.LogTotLikelihood=[] #log_total_likelihood
 
         #print("sigma_threshold = ", self.SigmaThresh)
+        self.datum_gather_cumulative_time = 0
+        self.update_cumulative_time = 0
+        
+        
         for istep in range(self.NumExperiments):
             # self.Experiment =  self.PGHPrefactor * (self.Heuristic()) ## TODO: use PGH prefactor, either here or in multiPGH
             #print("\n\nUpdate at exp # ", istep)
@@ -287,14 +292,24 @@ class ModelLearningClass():
             
             #TODO should this use TRUE params???
             true_params = np.array([[self.TrueParams[0]]])
+            
+            before_datum = time.time()
             self.Datum = self.GenSimModel.simulate_experiment(self.SimParams, self.Experiment, repeat=10) # todo reconsider repeat number
 #            self.Datum = self.GenSimModel.simulate_experiment(true_params, self.Experiment, repeat=1) # todo reconsider repeat number
+
+            after_datum = time.time()
+            self.datum_gather_cumulative_time+=after_datum-before_datum
+
             
             
             print_loc(global_print_loc)
             
             #print(str(self.GenSimModel.ProbeState))
+            before_upd = time.time()
             self.Updater.update(self.Datum, self.Experiment)
+            after_upd = time.time()
+            self.update_cumulative_time+=after_upd-before_upd
+            
             print_loc(global_print_loc)
 
             if len(self.Experiment[0]) < 3:
@@ -379,6 +394,10 @@ class ModelLearningClass():
                 self.log_print(["Results for QHL on ", self.Name])
                 self.log_print(['Final time selected > ' , str(self.Experiment[0][0])])
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
+                from pympler import asizeof
+                self.log_print(['Cumulative time.\t Datum:', self.datum_gather_cumulative_time, '\t Update:', self.update_cumulative_time])
+        
+                self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.Updater), '\t GenSim:', asizeof.asizeof(self.GenSimModel) ])
                 if self.debugSave: 
                     self.debug_store()
         

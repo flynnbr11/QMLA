@@ -1086,7 +1086,6 @@ class QMD():
 
 
         ### Final functions at end of QMD
-#        final_winner, final_branch_winners = self.interBranchChampion(global_champion=True)
         final_winner, final_branch_winners = self.finalBayesComparisons()        
         
 
