@@ -1,25 +1,18 @@
 from __future__ import print_function # so print doesn't show brackets
 import qinfer as qi
-#import qutip as qt
 import numpy as np
 import scipy as sp
 import inspect
 
-#import qutip as qt
 import sys as sys
 import os as os
 import IOfuncts as mIO 
 from MemoryTest import print_loc
 sys.path.append((os.path.join("..")))
-#import SETTINGS
-
 
 global_print_loc = False 
 use_linalg = False
 use_sparse = False 
-global print_pr0
-print_pr0 = False
- 
  
 try: 
     import hamiltonian_exponentiation as h
@@ -28,21 +21,12 @@ try:
      
 except:
     ham_exp_installed = False
-     
  
-if(use_linalg):
+if (use_linalg): 
+    # override and use linalg.expm even if hamiltonian_exponentiation is installed
     ham_exp_installed = False
      
-
-#print("Using exp ham custom : ", ham_exp_installed)
-
-
-     
- 
-## Generic states and Pauli matrices ##########################################################
- 
-global debug_print
-debug_print = False
+# Generic states and Pauli matrices  
 
 def plus():
     return np.array([1, 1])/np.sqrt(2)
@@ -86,15 +70,10 @@ def paulilist():
     return [sigmax(), sigmay(), sigmaz()]
      
      
-## Functions for evolution ##########################################################
- 
+# Functions for evolution 
 def getH(_pars, _ops):
-    #return np.sum(pars*ops, axis=0)
     return (np.tensordot(_pars, _ops, axes=1))[0]
  
-# TODO: I changed this to give back total array, not just 0th element -- is that a problem? -Brian
-#    return (np.tensordot(_pars, _ops, axes=1))
-
 
 def time_seconds():
     import datetime
@@ -117,24 +96,10 @@ def log_print(to_print_list, log_file, log_identifier=None):
         print(identifier, str(to_print), file=write_log_file)
  
  
-def anaytical_pr0(t_list, modelparams, oplist, probe):
-    print_loc(global_print_loc)
-    num_particles = len(modelparams)
-
-    #if num_particles==1: print("True probe \n", probe)
-    #else: print("Simulated probe \n", probe)
-    num_times = len(t_list)
-    output = np.empty([num_particles, num_times])
-
-    for evoId in range(num_particles): ## todo not sure about length/arrays here
-#        ham = np.tensordot(modelparams[evoId], oplist, axes=1)
-        for tId in range(len(t_list)):
-            t = t_list[tId]
-            output[evoId][tId] = (np.cos(modelparams[evoId] * t))**2
-    return output
-
- 
-def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True,exp_comparison_tol=None, enable_sparse=True, ham_list=None, log_file='QMDLog.log', log_identifier=None):
+def get_pr0_array_qle(t_list, modelparams, oplist, probe,
+        use_exp_custom=True,exp_comparison_tol=None, enable_sparse=True, 
+        ham_list=None, log_file='QMDLog.log', log_identifier=None
+    ):
     from rq import timeouts
     print_loc(global_print_loc)
     num_particles = len(modelparams)
@@ -147,48 +112,66 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe, use_exp_custom=True,ex
             t = t_list[tId]
             print_loc(global_print_loc)
             try:
-                output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol, enable_sparse=enable_sparse, log_file=log_file, log_identifier=log_identifier)
+                output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe,
+                    use_exp_custom=use_exp_custom, 
+                    compare_exp_fncs_tol=exp_comparison_tol,
+                    enable_sparse=enable_sparse, log_file=log_file,
+                    log_identifier=log_identifier
+                )
             except NameError:
-                log_print(["Error raised; unphysical expecation value."], log_file, log_identifier)
+                log_print(["Error raised; unphysical expecation value."], 
+                    log_file, log_identifier
+                )
                 sys.exit()
-                log_print(["Inputs to expectation value function. \n\t ham=", ham, "\n\t t=", t, "\n\t state=",probe, "\n\t use_exp_custom=", use_exp_custom, "\n\t exp_comparison_tol=", exp_comparison_tol, "\n\t enable_sparse", enable_sparse, "\n\t log_file=", log_file, "\n\t log_id=", log_identifier], log_file, log_identifier)
             except timeouts.JobTimeoutException:
-                log_print(["RQ Time exception. \nprobe=", probe, "\nt=", t,"\nHam=", ham], log_file, log_identifier)
-                raise
+                log_print(["RQ Time exception. \nprobe=", probe,
+                    "\nt=", t,"\nHam=", ham], log_file, log_identifier
+                )
+                sys.exit()
+#                raise
             
                 
             if output[evoId][tId] < 0:
-                log_print(["[QLE] Negative probability : \t \t probability = ", output[evoId][tId]], log_file, log_identifier)
+                log_print(["[QLE] Negative probability : \t \t probability = ", 
+                    output[evoId][tId]], log_file, log_identifier
+                )
             elif output[evoId][tId] > 1.001: ## todo some times getting p=1.0 show up
-                log_print(["[QLE] Probability > 1: \t \t probability = ", output[evoId][tId]], log_file, log_identifier) 
-            #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
-    print_loc(global_print_loc) 
+                log_print(["[QLE] Probability > 1: \t \t probability = ", 
+                    output[evoId][tId]], log_file, log_identifier
+                )
     return output
  
 
-def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_custom=True, enable_sparse=True, exp_comparison_tol=None, trotterize=True, ham_list = None, log_file='QMDLog.log',log_identifier=None):
+def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, 
+        probe, use_exp_custom=True, enable_sparse=True, 
+        exp_comparison_tol=None, trotterize=True, ham_list = None,
+        log_file='QMDLog.log',log_identifier=None
+    ):
     print_loc(global_print_loc)
     num_particles = len(modelparams)
     num_times = len(t_list)
-     
- 
     output = np.empty([num_particles, num_times])
- 
-    if print_pr0: print("output has shape ", output.shape)
  
     for evoId in range( output.shape[0]): ## todo not sure about length/arrays here
         ham = np.tensordot(modelparams[evoId], oplist, axes=1)
         for tId in range(len(t_list)):
             t = t_list[tId]
              
-            output[evoId][tId] = iqle_evolve(ham = ham, ham_minus = ham_minus, t=t, probe=probe, use_exp_custom=use_exp_custom, compare_exp_fncs_tol=exp_comparison_tol,  enable_sparse=enable_sparse, log_file=log_file, log_identifier=log_identifier)
-            print_loc(global_print_loc)
+            output[evoId][tId] = iqle_evolve(ham = ham, 
+                ham_minus = ham_minus, t=t, probe=probe,
+                use_exp_custom=use_exp_custom,
+                compare_exp_fncs_tol=exp_comparison_tol,
+                enable_sparse=enable_sparse, log_file=log_file,
+                log_identifier=log_identifier
+            )
             if output[evoId][tId] < 0:
-                log_print(["negative probability : \t \t probability = ", output[evoId][tId]], log_file, log_identifier)
+                log_print(["negative probability : \t \t probability = ",
+                    output[evoId][tId]], log_file, log_identifier
+                )
             elif output[evoId][tId] > 1.000000000000001:
-                log_print(["[IQLE] Probability > 1: \t \t probability = ", output[evoId][tId]], log_file, log_identifier) 
-            #print("(i,j) = (", evoId, tId,") \t val: ", output[evoId][tId])
-    print_loc(global_print_loc)
+                log_print(["[IQLE] Probability > 1: \t \t probability = ",
+                    output[evoId][tId]], log_file, log_identifier
+                )
     return output
 
      
@@ -196,80 +179,92 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus, probe, use_exp_cu
      
 ## Partial trace functionality
  
-def expectation_value(ham, t, state=None, choose_random_probe=False, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=20, compare_exp_fncs_tol=None, log_file='QMDLog.log', log_identifier=None):
-# todo: list of probes, maybe 5 is enough? test with different values
-    print_loc(global_print_loc)
-    print_loc(global_print_loc)
+def expectation_value(ham, t, state=None, choose_random_probe=False,
+    use_exp_custom=True, enable_sparse=True, print_exp_details=False,
+    exp_fnc_cutoff=20, compare_exp_fncs_tol=None, log_file='QMDLog.log',
+    log_identifier=None
+):
+
     if choose_random_probe is True: 
         num_qubits = int(np.log2(np.shape(ham)[0]))
         state = random_probe(num_qubits)
     elif random_probe is False and state is None: 
-        log_print(["expectation value function: you need to either pass a state or set choose_random_probe=True"], log_file=log_file, log_identifier=log_identifier)
-    print_loc(global_print_loc)
+        log_print(["expectation value function: you need to \
+            either pass a state or set choose_random_probe=True"],
+            log_file=log_file, log_identifier=log_identifier
+        )
     
-    if compare_exp_fncs_tol is not None:
-        u_psi_linalg = evolved_state(ham, t, state, use_exp_custom=False, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
-        u_psi_exp_custom = evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
+    if compare_exp_fncs_tol is not None: # For testing custom ham-exp function
+        u_psi_linalg = evolved_state(ham, t, state, 
+            use_exp_custom=False, print_exp_details=print_exp_details,
+            exp_fnc_cutoff=exp_fnc_cutoff
+        )
+        u_psi_exp_custom = evolved_state(ham, t, state,
+            use_exp_custom=True, print_exp_details=print_exp_details,
+            exp_fnc_cutoff=exp_fnc_cutoff
+        )
         
         diff = np.max(np.abs(u_psi_linalg-u_psi_exp_custom))
-        if np.allclose(u_psi_linalg, u_psi_exp_custom, atol=compare_exp_fncs_tol) == False:
-            log_print(["Linalg/ExpHam give different evolved state by", diff], log_file=log_file, log_identifier=log_identifier)
+        if (np.allclose(u_psi_linalg, u_psi_exp_custom, 
+            atol=compare_exp_fncs_tol) == False
+        ):
+            log_print(["Linalg/ExpHam give different evolved state by", diff],
+                log_file=log_file, log_identifier=log_identifier
+            )
             u_psi = u_psi_linalg
         else:
             u_psi = u_psi_exp_custom
             
-    else:
-        
-        if use_exp_custom and ham_exp_installed:
-          try:
-              u_psi = evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
-          except ValueError:
-              print("Value error when exponentiating Hamiltonian. Ham:\n", ham)
-              print("Probe: ", state)
+    else: # compute straight away; don't compare exponentiations
+        if use_exp_custom and ham_exp_installed: 
+            try:
+              u_psi = evolved_state(ham, t, state, use_exp_custom=True,
+                  print_exp_details=print_exp_details, 
+                  exp_fnc_cutoff=exp_fnc_cutoff
+              )
+            except ValueError:
+                log_print(["Value error when exponentiating Hamiltonian. Ham:\n",
+                    ham, "\nProbe: ", state], log_file=log_file,
+                    log_identifier=log_identifier
+                )
         else:
-          u_psi = evolved_state(ham, t, state, use_exp_custom=False, print_exp_details=print_exp_details, exp_fnc_cutoff=exp_fnc_cutoff)
+            u_psi = evolved_state(ham, t, state, use_exp_custom=False,
+                print_exp_details=print_exp_details, 
+                exp_fnc_cutoff=exp_fnc_cutoff
+            )
     
     
-    print_loc(global_print_loc)
     probe_bra = state.conj().T
-    
-    
     psi_u_psi = np.dot(probe_bra, u_psi)
-    
-    print_loc(global_print_loc) 
     expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
     
-    expec_value_limit=1.1
-#    expec_value_limit=0.1000
+    expec_value_limit=1.10000000001 # maximum permitted expectation value
     
     if expec_value > expec_value_limit:
-        log_print(["expectation value function has value ", np.abs(psi_u_psi**2)], log_file=log_file, log_identifier=log_identifier)
-        log_print(["t=", t, "\nham = \n ", ham, "\nprobe : \n", state, "\nprobe normalisation:", np.linalg.norm(state), "\nU|p>:", u_psi, "\nnormalisation of U|p>:", np.linalg.norm(u_psi), "\n<p|U|p>:", psi_u_psi, "\nExpec val:", expec_value], log_file=log_file, log_identifier=log_identifier)
-        log_print(["Recalculating expectation value using linalg."], log_file=log_file, log_identifier=log_identifier)
-        u_psi = evolved_state(ham, t, state, use_exp_custom=False, log_file=log_file, log_identifier=log_identifier)
+        log_print(["expectation value function has value ", 
+            np.abs(psi_u_psi**2)], log_file=log_file, 
+            log_identifier=log_identifier
+        )
+        log_print(["t=", t, "\nham = \n ", ham, "\nprobe : \n", state, 
+            "\nprobe normalisation:", np.linalg.norm(state), "\nU|p>:", 
+            u_psi, "\nnormalisation of U|p>:", np.linalg.norm(u_psi), 
+            "\n<p|U|p>:", psi_u_psi, "\nExpec val:", expec_value],
+            log_file=log_file, log_identifier=log_identifier
+        )
+        log_print(["Recalculating expectation value using linalg."],
+            log_file=log_file, log_identifier=log_identifier
+        )
+        u_psi = evolved_state(ham, t, state, 
+            use_exp_custom=False, log_file=log_file, 
+            log_identifier=log_identifier
+        )
         psi_u_psi = np.dot(probe_bra, u_psi)
         expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
-    
-      
-    if expec_value > expec_value_limit:
-        log_print(["Terminating due to expec value:", expec_value], log_file, log_identifier)
-        log_print(["Testing evolved state fnc:"], log_file, log_identifier)
-        expec_value = evolved_state(ham, t, state, use_exp_custom=True, print_exp_details=True, log_file=log_file, log_identifier=log_identifier)
         raise NameError('UnphysicalExpectationValue') 
-        
-    print_loc(global_print_loc)
-    print_expec_value_intermediate = False
-    if print_expec_value_intermediate:
-      log_print(["Bra : \n", probe_bra], log_file=log_file, log_identifier=log_identifier)
-      log_print(["u_psi\n", u_psi], log_file=log_file, log_identifier=log_identifier)
-      log_print(["psi_psi:\n", np.dot(probe_bra, state)], log_file=log_file, log_identifier=log_identifier)
-      log_print(["t=", t], log_file=log_file, log_identifier=log_identifier)
-      log_print(["Ham : \n", ham], log_file=log_file, log_identifier=log_identifier)
-      log_print(["probe : \n", state], log_file=log_file, log_identifier=log_identifier)
-      log_print(["u_psi: \n", u_psi], log_file=log_file, log_identifier=log_identifier)
-      log_print(["psi_u_psi: \n", psi_u_psi], log_file=log_file, log_identifier=log_identifier)
-      log_print(["Expectation value : ", expec_value], log_file=log_file, log_identifier=log_identifier)
+    
     return expec_value
+
+
  
 def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=10, log_file=None, log_identifier=None):
     #import hamiltonian_exponentiation as h
@@ -277,29 +272,41 @@ def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True, print_
     print_loc(global_print_loc)
   
     if t>1e6: ## Try limiting times to use to 1 million
-        t=1e6 # TODO PUT BACK IN. testing high t to find bug. 
+        import random
+        t = random.randint(1e6, 3e6) # random large number but still computable without error
+    
+#        t=1e6 # TODO PUT BACK IN. testing high t to find bug. 
 
-    #print("Enable sparse : ", enable_sparse)    
     if use_exp_custom and ham_exp_installed:
         if log_file is not None:
-            log_print(["Using custom expm. Exponentiating\nt=",t, "\nHam=\n", ham], log_file, log_identifier)
-        unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse, print_method=print_exp_details, scalar_cutoff=t+1)
+            log_print(
+                ["Using custom expm. Exponentiating\nt=",t, "\nHam=\n", ham],
+                log_file, log_identifier
+            )
+        unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse,
+            print_method=print_exp_details, scalar_cutoff=t+1
+        )
     else:
-      # print("Note: using linalg for exponentiating Hamiltonian.")
         if log_file is not None:
             iht = (-1j*ham*t)
-            log_print(["Using linalg.expm. Exponentiating\nt=",t, "\nHam=\n", ham, "\n-iHt=\n", iht, "\nMtx elements type:", type(iht[0][0]), "\nMtx type:", type(iht)], log_file, log_identifier)
+            log_print(["Using linalg.expm. Exponentiating\nt=",t, "\nHam=\n",
+                ham, "\n-iHt=\n", iht, "\nMtx elements type:", 
+                type(iht[0][0]), "\nMtx type:", type(iht)], 
+                log_file, log_identifier
+            )
         unitary = linalg.expm(-1j*ham*t)
         
         if log_file is not None:
             log_print(["linalg.expm gives \nU=\n",unitary], log_file, log_identifier)
     
-    print_loc(global_print_loc)
     ev_state = np.dot(unitary, state)
+
     if log_file is not None:
-        log_print(["evolved state fnc. Method details printed in worker log. \nt=",t, "\nHam=\n", ham, "\nprobe=", state, "\nU=\n", unitary, "\nev_state=", ev_state], log_file, log_identifier)
+        log_print(["evolved state fnc. Method details printed in worker log. \nt=",
+            t, "\nHam=\n", ham, "\nprobe=", state, "\nU=\n", unitary, "\nev_state=",
+            ev_state], log_file, log_identifier
+        )
     del unitary # to save space
-    print_loc(global_print_loc)
     return ev_state
 
 
