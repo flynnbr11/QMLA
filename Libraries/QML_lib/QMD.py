@@ -44,9 +44,6 @@ def time_seconds():
     time = str(str(hour)+':'+str(minute)+':'+str(second))
     return time
 
-
-
-
 class QMD():
     #TODO: rename as ModelsDevelopmentClass when finished
     def __init__(self,
@@ -106,7 +103,9 @@ class QMD():
         self.ResamplerA = resampler_a
         self.PGHPrefactor = pgh_prefactor
         self.NumProbes = num_probes
-        self.ProbeDict = separable_probe_dict(max_num_qubits=self.MaxQubitNumber, num_probes=self.NumProbes)
+        self.ProbeDict = separable_probe_dict(max_num_qubits=
+            self.MaxQubitNumber, num_probes=self.NumProbes
+        )
         self.HighestQubitNumber = int(0)
         self.MaxBranchID = max_num_branches
         self.HighestBranchID = 0
@@ -128,10 +127,6 @@ class QMD():
         self.AllBayesFactors = {}
         self.BranchBayesComputed[0] = False
         self.BayesFactorsComputed = []
-#        for i in range(self.MaxBranchID+1):
-#            self.BranchChampions[i] = 0
-#        for i in range(self.MaxLayerNumber+1):
-#            self.LayerChampions[i] = 0
         self.ModelNameIDs = {}
         self.GrowthGenerator = growth_generator
         self.SpawnDepth = 0
@@ -434,7 +429,9 @@ class QMD():
                 if blocking: # i.e. wait for result when called. 
                     while not queued_model.is_finished:
                         if queued_model.is_failed:
-                            self.log_print(["Model", model_name, "has failed on remote worker"])
+                            self.log_print(["Model", model_name, 
+                                "has failed on remote worker"]
+                            )
                             break
                         time.sleep(0.1)
                     del updated_model_info
@@ -452,7 +449,9 @@ class QMD():
         else:
             self.log_print(["Model", model_name, "does not yet exist."])
 
-    def remoteBayes(self, model_a_id, model_b_id, return_job=False, branchID=None, interbranch=False, remote=True, bayes_threshold=100):
+    def remoteBayes(self, model_a_id, model_b_id, return_job=False, 
+        branchID=None, interbranch=False, remote=True, bayes_threshold=100
+    ):
         # only do this when both models have learned. TODO add check for this. 
         
         if branchID is None:
@@ -460,7 +459,9 @@ class QMD():
         
         if self.use_rq:
             from rq import Connection, Queue, Worker
-            queue = Queue(self.Q_id, connection=self.redis_conn, async=self.use_rq, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
+            queue = Queue(self.Q_id, connection=self.redis_conn, 
+                async=self.use_rq, default_timeout=self.rq_timeout
+            ) 
 
             job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id,
                 model_b_id=model_b_id, branchID=branchID, 
