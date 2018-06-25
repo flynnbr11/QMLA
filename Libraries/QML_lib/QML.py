@@ -38,41 +38,16 @@ def time_seconds():
 
 class ModelLearningClass():
     def __init__(self, name, num_probes=20, probe_dict=None, qid=0, log_file='QMD_log.log', modelID=0):
-        self.TrueOpList = np.array([])        # These are the true operators of the true model for time evol in the syst
-        self.SimOpList = np.array([])            # Operators for the model under test for time evol. in the sim.
-        self.TrueParams = np.array([])        #True parameters of the model of the system for time evol in the syst
-        self.SimParams = np.array([])         #Parameters for the model under test for time evol. in the sim.
-        self.ExpParams = np.array([])         #ExpParams of the simulator used inside the GenSimQMD_IQLE class
-        self.Particles = np.array([])         #List of all the particles
-        self.Weights = np.array([])           # List of all the weights of the particles
-        self.BayesFactorList = np.array([]) #probably to be removed
-        self.KLogTotLikelihood = np.array([]) #Total Likelihood for the BayesFactor calculation
-        self.VolumeList = np.array([])        #List with the Volume as a function of number of steps
+        self.VolumeList = np.array([])  
         self.Name = name
-        self.Operator = DB.operator(name)
-      #  self.Matrix = self.Operator.matrix
-        self.Dimension = self.Operator.num_qubits
+        self.Dimension = DB.get_num_qubits(name)
         self.NumExperimentsToDate = 0
         self.BayesFactors = {}
-        self.NumProbes = num_probes
-        self.ProbeDict = probe_dict
         self.log_file = log_file
         self.Q_id = qid
         self.ModelID = int(modelID)
-
-
-
-        
-    def InsertNewOperator(self, NewOperator):
-
-        self.NumParticles = len(self.Particles)
-        self.OpList = MatrixAppendToArray(self.OpList, NewOperator)
-        self.Particles =  np.random.rand(self.NumParticles,len(self.OpList))
-        self.ExpParams = np.append(self.ExpParams, 1)
-        self.Weights = np.full((1, self.NumParticles), 1./self.NumParticles)
+ 
     
-    """Initilise the Prior distribution using a uniform multidimensional distribution where the dimension d=Num of Params for example using the function MultiVariateUniformDistribution"""
-
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) +" [QML "+ str(self.ModelID) +"]")
         if type(to_print_list)!=list:
@@ -87,7 +62,7 @@ class ModelLearningClass():
     
     def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, simopnames, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True, host_name='localhost', port_number=6379, qid=0, log_file='QMD_log.log'):
        
-        self.log_print(["In QML, qid=", qid])
+        self.log_print(["QID=", qid])
         
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db'] 
@@ -112,7 +87,6 @@ class ModelLearningClass():
         
         self.SimOpList  = np.asarray(simoplist)
         self.SimParams = np.asarray([simparams[0]])
-        self.InitialParams = np.asarray([simparams[0]])
         self.EnableSparse = enable_sparse
         self.checkQLoss = True
         print_loc(print_location=init_model_print_loc)
@@ -136,28 +110,17 @@ class ModelLearningClass():
         else:
             self.log_print(["Uniform distribution generated"])
             self.Prior = MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the simulator
-           # print("Num elements:", len(self.SimOpList))
-            
-
-	
 	  
-        self.ProbeCounter = 0 #probecounter for the choice of the state
-        self.ProbeList = list(map(lambda x: pros.def_randomprobe(self.TrueOpList), range(15)))
-        #When ProbeList is not defined the probestate will be chosen completely random for each experiment.
         log_identifier=str("QML "+str(self.ModelID))
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = self.ProbeCounter, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, exp_comparison_tol = self.ExpComparisonTol, enable_sparse=self.EnableSparse, model_name=self.Name, log_file=self.log_file, log_identifier=log_identifier)    # probelist=self.TrueOpList,,
 
-        
-        #Here you can turn off the debugger change the resampling threshold etc...
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = 0, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, exp_comparison_tol = self.ExpComparisonTol, enable_sparse=self.EnableSparse, model_name=self.Name, log_file=self.log_file, log_identifier=log_identifier)    # probelist=self.TrueOpList,,
+
 
         self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
 
         self.Inv_Field = [item[0] for item in self.GenSimModel.expparams_dtype[1:] ]
         self.Heuristic = mpgh.multiPGH(self.Updater, inv_field=self.Inv_Field)
         
-        self.ExpParams = np.empty((1, ), dtype=self.GenSimModel.expparams_dtype)
-        
-        self.NumExperiments = 0
         if checkloss == True or self.checkQLoss==True:     
             self.QLosses = np.array([])
         self.TrackLogTotLikelihood = np.array([])
@@ -171,8 +134,6 @@ class ModelLearningClass():
 
         self.log_print(['Initialization Ready'])
         
-    
-    
 
     def UpdateModel(self, n_experiments, sigma_threshold=10**-13,checkloss=True):
         self.NumExperiments = n_experiments
@@ -188,7 +149,6 @@ class ModelLearningClass():
         self.SigmaThresh = sigma_threshold   #This is the value of the Norm of the COvariance matrix which stops the IQLE 
         self.LogTotLikelihood=[] #log_total_likelihood
 
-        #print("sigma_threshold = ", self.SigmaThresh)
         self.datum_gather_cumulative_time = 0
         self.update_cumulative_time = 0
         
@@ -232,10 +192,6 @@ class ModelLearningClass():
                 self.VolumeList = np.append(self.VolumeList,  np.linalg.det( sp.linalg.sqrtm(covmat) )    )
                 print_loc(global_print_loc)
             
-            """!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!this one is probably to remove from here, as superfluous????????????????????????????"""
-            self.Heuristic = mpgh.multiPGH(self.Updater, self.SimOpList, inv_field=self.Inv_Field)
-            print_loc(global_print_loc)
-            
             self.TrackEval.append(self.Updater.est_mean())
             print_loc(global_print_loc)
             self.Covars[istep] = np.linalg.norm(self.Updater.est_covariance_mtx())
@@ -247,7 +203,7 @@ class ModelLearningClass():
             print_loc(global_print_loc)
                 
             if checkloss == True: 
-                if False:
+                if False: # can be reinstated to stop learning when volume converges
                     if self.debugSave: 
                         self.debug_store()
                     self.log_print(['Final time selected > ', str(self.Experiment[0][0])])
@@ -261,9 +217,9 @@ class ModelLearningClass():
                     self.Particles = self.Particles[:, :, 0:istep]
                     self.Weights = self.Weights[:, 0:istep]
                     self.TrackTime = self.TrackTime[0:istep] 
-                    break #TODO: Reinstate this break; disabled to test different cases while chasing memory leak.
+                    break 
             
-            if self.Covars[istep]<self.SigmaThresh and False: #  I don't want it to stop learning - Brian
+            if self.Covars[istep]<self.SigmaThresh and False: #  can be reinstated to stop learning when volume converges
                 if self.debugSave: 
                     self.debug_store()
                 self.log_print(['Final time selected > ', str(self.Experiment[0][0])])
@@ -297,8 +253,6 @@ class ModelLearningClass():
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep-1]), np.std(self.Particles[:,iterator,istep-1])]
                     self.log_print(['Final Parameters mean and stdev (term ', self.SimOpsNames[iterator] , '):',str(self.FinalParams[iterator])])
-#                   print('Final quadratic loss: ', str(self.QLosses[-1]))
-#                final_ham = evo.getH(self.)
 
             if debug_print:
                 self.log_print(["step ", istep])
@@ -310,7 +264,6 @@ class ModelLearningClass():
         self.Updater.prior = self.Prior
         self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
         self.Heuristic = mpgh.multiPGH(self.Updater, self.SimOpList, inv_field=self.Inv_Field)
-        print("model params reset")
         return 1
         
         
@@ -326,7 +279,8 @@ class ModelLearningClass():
         learned_info['name'] = self.Name
         learned_info['model_id'] = self.ModelID
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
-        learned_info['initial_params'] = self.InitialParams
+#        learned_info['initial_params'] = self.InitialParams
+        learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
 
         return learned_info
