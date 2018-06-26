@@ -35,9 +35,7 @@ then
     module load mvapich/gcc/64/1.2.0-qlc
     echo "launching redis"
 #   redis-server $lib_dir/RedisConfig.conf --protected-mode no  &
-
     SERVER_HOST='localhost'
-
 
 elif [[ "$host" == "node"* ]]
 then

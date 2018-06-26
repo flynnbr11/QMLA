@@ -3,7 +3,7 @@
 test_description="wider_initial_dist"
 
 
-num_tests=30
+num_tests=3
 min_id=2
 let max_id="$min_id + $num_tests - 1 "
 
@@ -71,8 +71,8 @@ ra=$ra_default
 rt=$rt_default
 rp=$rp_default
 
-e=4500
-p=1000
+e=5
+p=10
 
 for i in `seq $min_id $max_id`;
 do
