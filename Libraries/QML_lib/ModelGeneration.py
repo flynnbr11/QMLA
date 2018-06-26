@@ -57,17 +57,22 @@ def log_print(to_print_list, log_file):
     with open(log_file, 'a') as write_log_file:
         print(identifier, str(to_print), file=write_log_file, flush=True)
 
-def new_model_list(model_list, spawn_depth, model_dict, log_file, options=['x', 'y', 'z'], generator='simple_ising'):
-    log_print(["Generating new models according to best of last round: ", model_list, "; and options:", options], log_file)
+def new_model_list(model_list, spawn_depth, model_dict, log_file, 
+    options=['x', 'y', 'z'], generator='simple_ising'
+):
+    log_print(["Generating new models according to best of last round: ",
+        model_list, "; and options:", options], log_file
+    )
     if generator == 'simple_ising':
         return simple_ising(generator_list=model_list, options=options)
-        #todo integrate Andreas' simple Ising growth
     elif generator=='ising_non_transverse':
         return ising_non_transverse(model_list, spawn_step=spawn_depth)
     elif generator == 'ising_transverse':
         return ising_transverse(model_list, spawn_step=spawn_depth)
     elif generator == 'hyperfine_like':
-        return hyperfine_like(model_list, spawn_step=spawn_depth, model_dict=model_dict, log_file=log_file)
+        return hyperfine_like(model_list, spawn_step=spawn_depth,
+        model_dict=model_dict, log_file=log_file
+    )
     
     
     else:
@@ -114,8 +119,12 @@ def random_model_name(num_dimensions=1, num_terms=1):
     
     
     # Don't allow returning just identity in any dimension #TODO?
-    while summed_term == ('i' or 'iTi' or 'iTiTTi' or 'iTiTTiTTTi' or 'iTiTTiTTTiTTTTi' or 'iTiTTiTTTiTTTTiTTTTTi' or 'iTiTTiTTTiTTTTiTTTTTiTTTTTTi' or 'iTiTTiTTTiTTTTiTTTTTiTTTTTTiTTTTTTTi'):
-      summed_term = random_model_name(num_dimensions, num_terms) 
+    while summed_term == ('i' or 'iTi' or 'iTiTTi' or 'iTiTTiTTTi' or
+        'iTiTTiTTTiTTTTi' or 'iTiTTiTTTiTTTTiTTTTTi' or 
+        'iTiTTiTTTiTTTTiTTTTTiTTTTTTi' or 
+        'iTiTTiTTTiTTTTiTTTTTiTTTTTTiTTTTTTTi'
+    ):
+        summed_term = random_model_name(num_dimensions, num_terms) 
     
     return summed_term
 
@@ -242,7 +251,9 @@ def ising_fully_interacting(num_qubits):
                 this_idx+=1
                 op_list = ['z', 'z']
                 qub_list = [i,j]
-                new_term = interaction_ham(qubit_list=qub_list, operator_list=op_list, num_qubits=num_qubits)
+                new_term = interaction_ham(qubit_list=qub_list,
+                    operator_list=op_list, num_qubits=num_qubits
+                )
                 running_str += new_term
                 if(this_idx < max_idx):
                     running_str += p_str
@@ -253,8 +264,6 @@ def ising_fully_interacting(num_qubits):
 
 def identity_interact(subsystem, num_qubits, return_operator=False):
     new_string = ''
-#    op = DataBase.operator(subsystem)
-#    sub_dim=op.num_qubits
     sub_dim = DataBase.get_num_qubits(subsystem)
     if sub_dim >= num_qubits:
         if return_operator: 
@@ -371,12 +380,13 @@ def ising_non_transverse(model_list, spawn_step, log_file):
     nontransverse_terms = ['xTx', 'yTy', 'zTz']
 
     if len(model_list) > 1:
-        log_print(["Only one model required for non-transverse Ising growth."], log_file)
+        log_print(["Only one model required for non-transverse Ising growth."],
+            log_file
+        )
         return False
     else:
         model = model_list[0]
     
-#    present_terms = model[0].split('PP')
     present_terms = model.split('PP')
 
     new_models = []
@@ -401,9 +411,14 @@ def ising_transverse(model_list, spawn_step, log_file):
     nontransverse_terms = ['xTx', 'yTy', 'zTz']
     all_transverse_terms = ['xTy', 'xTz', 'yTx', 'yTz', 'zTy', 'zTx']
     transverse_terms = ['xTy', 'xTz','yTz']
-    all_two_qubit_terms =  single_qubit_terms + nontransverse_terms  + transverse_terms
+    all_two_qubit_terms = ( single_qubit_terms
+        + nontransverse_terms  + transverse_terms
+    )
+     
     if len(model_list) > 1:
-        log_print(["Only one model required for transverse Ising growth."], log_file)
+        log_print(["Only one model required for transverse Ising growth."],
+            log_file
+        )
         return False
     else:
         model = model_list[0]
@@ -436,11 +451,14 @@ def hyperfine_like(model_list, spawn_step, model_dict, log_file):
     import random
     single_qubit_terms = ['xTi', 'yTi', 'zTi']
     nontransverse_terms = ['xTx', 'yTy', 'zTz']
-    # transverse_terms = ['xTy', 'xTz', 'yTx', 'yTz', 'zTy', 'zTx']
     transverse_terms = ['xTy', 'xTz', 'yTz']
-    all_two_qubit_terms =  single_qubit_terms + nontransverse_terms  + transverse_terms
+    all_two_qubit_terms = ( single_qubit_terms + nontransverse_terms
+        + transverse_terms
+    )
     if len(model_list) > 1:
-        log_print(["Only one model required for transverse Ising growth."], log_file)
+        log_print(["Only one model required for transverse Ising growth."],
+            log_file
+        )
         return False
     else:
         model = model_list[0]
@@ -466,7 +484,10 @@ def hyperfine_like(model_list, spawn_step, model_dict, log_file):
             
             if term not in present_terms:
                 new_model = model+'PP'+term
-                if DataBase.check_model_in_dict(new_model, model_dict) == False and new_model not in new_models:
+                if ( 
+                    DataBase.check_model_in_dict(new_model, model_dict) == False
+                    and new_model not in new_models
+                ):
                     
                     new_models.append(new_model)
                     i+=1
@@ -477,7 +498,10 @@ def hyperfine_like(model_list, spawn_step, model_dict, log_file):
             
             if term not in present_terms:
                 new_model = model+'PP'+term
-                if DataBase.check_model_in_dict(new_model, model_dict) == False and new_model not in new_models:
+                if (
+                    DataBase.check_model_in_dict(new_model, model_dict) == False
+                    and new_model not in new_models
+                ):
                     
                     new_models.append(new_model)
                     i+=1
@@ -489,19 +513,13 @@ def hyperfine_like(model_list, spawn_step, model_dict, log_file):
             
             if term not in present_terms:
                 new_model = model+'PP'+term
-                if DataBase.check_model_in_dict(new_model, model_dict) == False and new_model not in new_models:
+                if (
+                    DataBase.check_model_in_dict(new_model, model_dict) == False
+                    and new_model not in new_models
+                ):
                     
                     new_models.append(new_model)
                     i+=1
-
-
-        
     return new_models    
-
-
-    
-    
-        
-    
         
         
