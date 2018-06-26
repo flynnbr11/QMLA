@@ -4,17 +4,10 @@
 rm dump.rdb 
 
 let NUM_WORKERS="$PBS_NUM_NODES * $PBS_NUM_PPN"
-echo "Num workers: $NUM_WORKERS"
-# echo $1
-
-# QMD_ID=$1
 let REDIS_PORT="6300 + $QMD_ID"
 echo "QMD ID =$QMD_ID; REDIS_PORT=$REDIS_PORT"
 echo "Global server: $GLOBAL_SERVER"
 host=$(hostname)
-echo "just host= $host"
-
-
 
 if [ "$host" == "IT067176" ]
 then
@@ -23,7 +16,6 @@ then
     lib_dir="/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib"
     script_dir="/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations"
     SERVER_HOST='localhost'
-#    ~/redis-4.0.8/src/redis-server  $lib_dir/RedisConfig.conf & 
         
 elif [[ "$host" == "newblue"* ]]
 then
@@ -34,7 +26,6 @@ then
     module load tools/redis-4.0.8
     module load mvapich/gcc/64/1.2.0-qlc
     echo "launching redis"
-#   redis-server $lib_dir/RedisConfig.conf --protected-mode no  &
     SERVER_HOST='localhost'
 
 elif [[ "$host" == "node"* ]]
@@ -58,7 +49,6 @@ fi
 cd $lib_dir
 echo "Going in to launch redis script"
 echo "If this fails -- ensure permission enabled on RedisLaunch script in library"
-# ./RedisLaunch.sh $GLOBAL_SERVER $REDIS_PORT &
 
 sleep 7
 
@@ -77,7 +67,7 @@ mkdir -p $PBS_O_WORKDIR/logs
 cat $PBS_NODEFILE
 export nodes=`cat $PBS_NODEFILE`
 export nnodes=`cat $PBS_NODEFILE | wc -l`
-export confile=$PBS_O_WORKDIR/logs/inf.$PBS_JOBID.conf
+export confile=$PBS_O_WORKDIR/logs/node_info.$PBS_JOBID.conf
 for i in $nodes; do
  echo ${i} >>$confile
 done
@@ -104,7 +94,6 @@ if [[ "$host" == "node"* ]]
 then
 	echo "Launching RQ worker on remote nodes using mpirun"
 	mpirun -np $NUM_WORKERS -machinefile $confile rq worker $QMD_ID -u $REDIS_URL >> $PBS_O_WORKDIR/logs/$QMD_JOB.worker.$job_number.log 2>&1 &
-#	mpirun -np $NUM_WORKERS rq worker $QMD_ID -u $REDIS_URL > $PBS_O_WORKDIR/logs/worker_$job_number.log 2>&1 &
 else
 	echo "Launching RQ worker locally"
 	echo "RQ launched on $REDIS_URL at $(date +%H:%M:%S)" > $running_dir/logs/worker_$HOSTNAME.log 2>&1 
@@ -112,13 +101,8 @@ else
 fi
 
 sleep 5
-
 cd $script_dir
-# python3 Exp.py -rq=0 -p=2500 -e=400 -bt=75 -qid=$QMD_ID -pkl=0 -host=$SERVER_HOST
-# python3 Exp.py -rq=1 -p=100 -e=40 -bt=25 -qid=$QMD_ID -pkl=0 -host=$SERVER_HOST
 echo "Starting Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
-
-export full_path_to_results="$script_dir/$RESULTS_DIR"
 
 echo "CONFIG: -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG"
 
@@ -127,27 +111,7 @@ python3 Exp.py -rq=1 -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_
 
 
 echo "Finished Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
-
 sleep 1
-#cd $lib_dir
-#echo "Removing $QMD_ID from redis on $SERVER_HOST"
-# python3 RedisManageServer.py -rh=$SERVER_HOST -rqid=$QMD_ID -action='remove'
-# python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER --action='remove'
-#finished=`python3 RedisGlobalCheck.py -rh=$SERVER_HOST -rqid=$QMD_ID -g=$GLOBAL_SERVER --action='check-end'`
-#finished_test="$(echo $finished)"
-#finished_test=""
-#echo "Finished test: $finished_test"
-#if [ $finished_test == "redis-finished" ]
-#then
-#	echo "Redis server on $SERVER_HOST no longer needed by any QMD; terminating at $(date +%H:%M:%S)."
-#	redis-cli flushall
-#	redis-cli -p $REDIS_PORT shutdown
-#elif  [ $finished_test == "redis-running" ]
-#then
-#	echo "Redis server on $SERVER_HOST still in use by other QMD at $(date +%H:%M:%S)"
-#else
-#	echo "Neither condition met on finished_test: $finished_test"
-#fi
 
 redis-cli -p $REDIS_PORT flushall
 redis-cli -p $REDIS_PORT shutdown
