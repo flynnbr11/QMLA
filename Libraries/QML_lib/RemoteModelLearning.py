@@ -6,6 +6,7 @@ import os as os
 import sys as sys 
 import pandas as pd
 import warnings
+warnings.filterwarnings("ignore")
 import time as time
 import random
 from psutil import virtual_memory
