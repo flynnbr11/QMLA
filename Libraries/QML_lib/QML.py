@@ -260,10 +260,10 @@ class ModelLearningClass():
                 self.log_print(["Results for QHL on ", self.Name])
                 self.log_print(['Final time selected > ' , str(self.Experiment[0][0])])
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
-                from pympler import asizeof
+                #from pympler import asizeof
                 self.log_print(['Cumulative time.\t Datum:', self.datum_gather_cumulative_time, '\t Update:', self.update_cumulative_time])
         
-                self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.Updater), '\t GenSim:', asizeof.asizeof(self.GenSimModel) ])
+                #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.Updater), '\t GenSim:', asizeof.asizeof(self.GenSimModel) ])
                 if self.debugSave: 
                     self.debug_store()
         
