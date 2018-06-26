@@ -1,6 +1,14 @@
 import argparse
 import os, sys
 import pickle 
+
+"""
+This file is callable with *kwargs from a separate QMD program. 
+It returns an instance of the class GlobalVariablesClass, which has attributes 
+for all the user defined parameters, and defaults if not specified by the user. 
+
+"""
+
 def get_directory_name_by_time(just_date=False):
     import datetime
     # Directory name based on date and time it was generated 
