@@ -15,7 +15,7 @@ rm $this_log
 mkdir -p $long_dir
 
 q_id=0
-for i in `seq 1 1`;
+for i in `seq 1 2`;
 do
     for j in `seq 1 1`;
     do

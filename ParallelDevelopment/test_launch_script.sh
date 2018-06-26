@@ -2,17 +2,20 @@
 
 test_description="wider_initial_dist"
 
+OUT_LOG="$(pwd)/logs/OUTPUT_AND_ERROR_FILES"
+echo "pwd: $(pwd)"
+echo "OUT LOG: $OUT_LOG"
+mkdir -p $OUT_LOG
+output_file="output_file"
+error_file="error_file" 
 
-num_tests=30
-min_id=2
+num_tests=3
+min_id=1
 let max_id="$min_id + $num_tests - 1 "
 
-echo "local host is $(hostname). Global redis launced here." 
-# ./global_redis_launch.sh
 
 this_dir=$(hostname)
 day_time=$(date +%b_%d/%H_%M)
-#results_dir=$dir_name/Results/$day_time
 
 script_dir="/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations"
 results_dir=$day_time
@@ -33,7 +36,7 @@ very_long_time="walltime=16:00:00"
 test_time="walltime=00:90:00"
 
 time=$test_time
-qmd_id=0
+qmd_id=$min_id
 cutoff_time=180
 
 do_plots=1
@@ -71,8 +74,8 @@ ra=$ra_default
 rt=$rt_default
 rp=$rp_default
 
-e=4500
-p=1000
+e=5
+p=10
 
 for i in `seq $min_id $max_id`;
 do
@@ -92,9 +95,12 @@ do
 #	  only need one hour while testing evo failure
 #	time="walltime=01:00:00"
 	this_qmd_name="$test_description""_$qmd_id"
+	this_error_file="$OUT_LOG/$error_file""_$qmd_id.txt"
+	this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
+	echo "This output file: $this_output_file"
 	echo "QMD ID: $qmd_id \t num particles:$NUM_PARTICLES"
 	echo "Config: e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd"
-	qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv -N $this_qmd_name -l $time  launch_qmd_parallel.sh
+	qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$results_dir,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv -N $this_qmd_name -l $time -o $this_output_file -e $this_error_file launch_qmd_parallel.sh
 
 done
 
@@ -426,4 +432,4 @@ echo "
 #!/bin/bash 
 cd ../Libraries/QML_lib
 python3 AnalyseMultipleQMD.py -dir="$full_path_to_results" --bayes_csv=$all_qmd_bayes_csv
-" > analyse_$test_description.sh
+" > analyse_results/analyse_$test_description.sh

@@ -6,7 +6,6 @@ import inspect
 
 import sys as sys
 import os as os
-import IOfuncts as mIO 
 from MemoryTest import print_loc
 sys.path.append((os.path.join("..")))
 

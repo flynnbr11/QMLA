@@ -314,7 +314,6 @@ def parse_cmd_line_args(args):
     cumulative_csv = arguments.cumulative_bayes
     
     # Use arguments to initialise global variables class. 
-#    global global_variables
     global_variables = GlobalVariablesClass(
         do_iqle = do_iqle,
         do_qle = do_qle,
@@ -339,28 +338,7 @@ def parse_cmd_line_args(args):
         save_plots = arguments.plots,
         cumulative_csv = cumulative_csv
     )
-    
-    
-    
-    # Redis environment
-    redis_use_rq = arguments.use_rq
-    redis_host_name = arguments.redis_host
-    redis_port_number = arguments.redis_port_number
-    
-    os.environ["USE_RQ"] = str(use_rq)
-    os.environ["REDIS_HOST"] = str(redis_host_name)
-    os.environ["REDIS_PORT_NUMBER"] = str(redis_port_number)
-    
-    
-    environment_variables = {
-        'use_rq' : use_rq,
-        'host' : redis_host_name,
-        'port' : redis_port_number
-    }
 
-    sys.path.append(os.path.join("..", "..","ExperimentalSimulations"))
-
-    pickle.dump(environment_variables, open('environment_variables.p', 'wb'), protocol=2)
     return global_variables
 
 

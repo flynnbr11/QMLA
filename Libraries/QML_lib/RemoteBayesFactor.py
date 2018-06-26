@@ -31,7 +31,7 @@ import Evo as evo
 import DataBase 
 import QML
 import ModelGeneration
-import BayesF
+#import BayesF
 from qinfer import NormalDistribution
 from Distrib import MultiVariateNormalDistributionNocov
 
