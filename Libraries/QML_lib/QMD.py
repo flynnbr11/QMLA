@@ -28,7 +28,7 @@ import Evo as evo
 import DataBase 
 import QML
 import ModelGeneration
-import BayesF
+#import BayesF
 import PlotQMD 
 from RemoteModelLearning import *
 from RemoteBayesFactor import * 
