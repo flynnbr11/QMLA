@@ -48,7 +48,9 @@ def latex_name_ising(name):
             string = t[0]+t[-1]
             present_t.append(string)
         else:
-            print("Term",t,"doesn't belong to rotations, Hartree-Fock or transverse.")
+            print("Term",t,"doesn't belong to rotations, \
+                Hartree-Fock or transverse."
+            )
             print("Given name:", name)
     present_r.sort()
     present_hf.sort()
@@ -71,7 +73,9 @@ def latex_name_ising(name):
     
     return latex_term
 
-def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, max_time=3, t_interval=0.01, save_to_file=None):
+def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, 
+    max_time=3, t_interval=0.01, save_to_file=None
+):
     import random
     if model_ids is None and champ == True:
         model_ids = [qmd.ChampID]
@@ -84,7 +88,8 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, max_time=3, t_inte
 
     probe_id = random.choice(range(qmd.NumProbes))
     times = np.arange(0, max_time, t_interval)
-    # names colours from https://matplotlib.org/2.0.0/examples/color/named_colors.html
+    # names colours from
+    # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour =  colors.cnames['lightsalmon'] #'b'
     champion_colour =  colors.cnames['cornflowerblue'] #'r'
     sim_colours = ['g', 'c', 'm', 'y', 'k']
@@ -101,9 +106,10 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, max_time=3, t_inte
     true_dim = true_op.num_qubits
     true_probe = qmd.ProbeDict[(probe_id,true_dim)]
     true_expec_values = [evo.expectation_value(ham=true_ham, t=t, state=true_probe) for t in times]
-    plt.scatter(times, true_expec_values, label='True Expectation Value', marker='x', color = true_colour)
+    plt.scatter(times, true_expec_values, label='True Expectation Value',
+        marker='x', color = true_colour
+    )
 
-    
     ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
     for i in range(len(model_ids)):
         mod_id = model_ids[i]
@@ -117,11 +123,12 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, max_time=3, t_inte
         sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
         colour_id = int(i%len(sim_colours))
         sim_col = sim_colours[colour_id]
-        sim_expec_values = [evo.expectation_value(ham=sim_ham, t=t, state=sim_probe) for t in times]
+        sim_expec_values = [evo.expectation_value(ham=sim_ham, t=t,
+            state=sim_probe) for t in times
+        ]
 
         if mod_id == qmd.ChampID:
             models_branch = ChampionsByBranch[mod_id]
-#            sim_label = 'Champion Model (Branch ' +str(models_branch)+')'
             sim_label = 'Champion Model'
             sim_col = champion_colour
         elif mod_id in list(qmd.BranchChampions.values()):
@@ -173,11 +180,20 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, max_time=3, t_inte
     new_labels = tuple(new_labels)
 
     if extra_lgd:
-        lgd_spec=ax.legend(special_handles, special_labels, loc='upper center', bbox_to_anchor=(1, 1),fancybox=True, shadow=True, ncol=1)
-        lgd_new=ax.legend(new_handles, new_labels, loc='upper center', bbox_to_anchor=(1.15, 0.75),fancybox=True, shadow=True, ncol=1)
+        lgd_spec=ax.legend(special_handles, special_labels, 
+            loc='upper center', bbox_to_anchor=(1, 1),fancybox=True,
+            shadow=True, ncol=1
+        )
+        lgd_new=ax.legend(new_handles, new_labels, 
+            loc='upper center', bbox_to_anchor=(1.15, 0.75),
+            fancybox=True, shadow=True, ncol=1
+        )
         plt.gca().add_artist(lgd_spec)
     else:
-        lgd_spec=ax.legend(special_handles, special_labels, loc='upper center', bbox_to_anchor=(1, 1),fancybox=True, shadow=True, ncol=1)
+        lgd_spec=ax.legend(special_handles, special_labels,
+            loc='upper center', bbox_to_anchor=(1, 1),fancybox=True, 
+            shadow=True, ncol=1
+        )
         
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
@@ -195,12 +211,6 @@ def BayF_IndexDictToMatrix(ModelNames, AllBayesFactors, StartBayesFactors=None):
                 Bayf_matrix[i,j] = AllBayesFactors[i][j][-1]
             except:
                 Bayf_matrix[i,j] = 1
-    
-            # elif j<i and (StartBayesFactors is not None):
-                # try: 
-                    # Bayf_matrix[i,j] = StartBayesFactors[i][j]
-                # except:
-                    # Bayf_matrix[i,j] = 1
     
     return Bayf_matrix
     
@@ -237,7 +247,10 @@ class IndexLocator(ticker.Locator):
 
 
         
-def hinton(inarray, max_value=None, use_default_ticks=True, skip_diagonal = True, skip_which = None, grid = True, white_half = 0., where_labels = 'bottomleft'):
+def hinton(inarray, max_value=None, use_default_ticks=True, 
+    skip_diagonal = True, skip_which = None, grid = True, white_half = 0.,
+    where_labels = 'bottomleft'
+):
     """Plot Hinton diagram for visualizing the values of a 2D array.
 
     Plot representation of an array with positive and negative values
@@ -258,11 +271,13 @@ def hinton(inarray, max_value=None, use_default_ticks=True, skip_diagonal = True
     skip_diagonal: boolean
         remove plotting of values on the diagonal
     skip_which: None, upper, lower
-        whether to plot both upper and lower triangular matrix or just one of them
+        whether to plot both upper and lower triangular 
+        matrix or just one of them
     grid: Boolean
         to remove the grid from the plot
     white_half : float
-        adjust the size of the white "coverage" of the "skip_which" part of the diagram
+        adjust the size of the white "coverage" of the "skip_which"
+        part of the diagram
     where_labels: "bottomleft", "topright"
         move the xy labels and ticks to the corresponding position
     """
@@ -447,7 +462,9 @@ branch_champ_node_colour = 'b'
 overall_champ_node_colour = 'g'    
 
     
-def qmdclassTOnxobj(qmd, modlist=None, directed=True, only_adjacent_branches=True):
+def qmdclassTOnxobj(qmd, modlist=None, directed=True,
+    only_adjacent_branches=True
+):
     
     if directed:
         G=nx.DiGraph()
@@ -479,14 +496,17 @@ def qmdclassTOnxobj(qmd, modlist=None, directed=True, only_adjacent_branches=Tru
         G.node[i]['status'] = 0.2
         G.node[i]['info'] = 'Non-winner'
 
-    # Set x-coordinate for each node based on how many nodes are on that branch (y-coordinate)
+    # Set x-coordinate for each node based on how many nodes 
+    # are on that branch (y-coordinate)
     most_models_per_branch = max(branch_mod_count.values())
     for i in modlist:
         mod = qmd.reducedModelInstanceFromID(i)
         name = mod.Name
         branch=qmd.pullField(name=name, field='branchID')
         num_models_this_branch = branch_mod_count[branch]
-        pos_list = available_position_list(num_models_this_branch, most_models_per_branch)
+        pos_list = available_position_list(num_models_this_branch,
+            most_models_per_branch
+        )
         branch_filled_so_far = branch_x_filled[branch]
         branch_x_filled[branch]+=1
         
@@ -511,20 +531,33 @@ def qmdclassTOnxobj(qmd, modlist=None, directed=True, only_adjacent_branches=Tru
             if is_adj or not only_adjacent_branches:
                 if a!=b:
                     unique_pair = DataBase.unique_model_pair_identifier(a,b)
-                    if unique_pair not in edges and unique_pair in qmd.BayesFactorsComputed:
+                    if ((unique_pair not in edges)
+                        and (unique_pair in qmd.BayesFactorsComputed)
+                    ):
                         edges.append(unique_pair)
-                        vs = [int(stringa) for stringa in unique_pair.split(',')]
+                        vs = [int(stringa) for stringa 
+                            in unique_pair.split(',')
+                        ]
                         
-                        thisweight = np.log10(qmd.AllBayesFactors[float(vs[0])][float(vs[1])][-1])
+                        thisweight = np.log10(
+                            qmd.AllBayesFactors[float(vs[0])][float(vs[1])][-1]
+                        )
                         
                         if thisweight < 0:
-                            thisweight = - thisweight # flip negative valued edges and move them to positive
+                            # flip negative valued edges and move 
+                            # them to positive
+                            thisweight = - thisweight 
                             flipped = True
-                            G.add_edge(vs[1], vs[0], weight=thisweight, flipped = flipped, adj = is_adj)
+                            G.add_edge(vs[1], vs[0], 
+                                weight=thisweight, flipped=flipped, 
+                                adj=is_adj
+                            )
                         else:
                             flipped = False
-                            G.add_edge(vs[0], vs[1], weight=thisweight, flipped = flipped, adj = is_adj)
-    
+                            G.add_edge(vs[0], vs[1], 
+                                weight=thisweight, flipped=flipped, 
+                                adj=is_adj
+                            )
     return G
     
     
@@ -542,15 +575,15 @@ def plotQMDTree(qmd, save_to_file=None,
         label_padding = 0.4, pathstyle="curve",
         id_labels=id_labels, save_to_file=save_to_file)
     
-    
-""" 
-# Old as of 18/6/18    
+   
+
 def plotTreeDiagram(G, n_cmap, e_cmap, 
                     e_alphas = [], nonadj_alpha=0.1, 
                     label_padding = 0.4, 
                     arrow_size = 0.02, widthscale=1.0,
                     pathstyle = "straight", id_labels = False,
-                    save_to_file=None):
+                    save_to_file=None
+):
     plt.clf()
     plt.figure(figsize=(6,11))   
     
@@ -562,105 +595,40 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
     
     edge_tuples = tuple( G.edges() )
     
-    positions = dict( zip( G.nodes(), tuple(  [prop['pos'] for (n,prop) in G.nodes(data=True)]  ) ))
-    # n_colours = tuple(  [prop['color'] for (n,prop) in G.nodes(data=True)]  ) 
-    n_colours = tuple( [ n_cmap(prop['status']) for (n,prop) in G.nodes(data=True)]   )
-    
-    
-    label_positions = []   
-    if id_labels is True:
-        labels = dict( zip( G.nodes(), tuple(  [n for (n,prop) in G.nodes(data=True)]  ) ))
-        for key in positions.keys():
-            label_positions.append( tuple( np.array(positions[key])- np.array([0., 0.]) ) )
-    else:
-        labels = dict( zip( G.nodes(), tuple(  [prop['label'] for (n,prop) in G.nodes(data=True)]  ) ))  
-        for key in positions.keys():
-            label_positions.append( tuple( np.array(positions[key])- np.array([0., label_padding]) ) )
-    
-    label_positions = dict(zip( positions.keys(), tuple(label_positions) ))
-     
-    
-    
-
-    if len(e_alphas) == 0: 
-        for idx in range(len(edge_tuples)):
-            e_alphas.append(  0.8 if list_of_edges[idx][2]["adj"] else nonadj_alpha )
-    
-    weights = tuple( [prop['weight'] for (u,v,prop) in list_of_edges] )
-
-    nx.draw_networkx_nodes(
-        G, with_labels = False, # labels=labels, 
-        pos=positions, 
-        k=1.5, #node spacing
-        node_size=700, #node_shape='8',
-        node_color = n_colours
-    )  
-    
-    # edges_for_cmap = nx.draw_networkx_edges(G, width = 3,  pos=positions, arrows=True, arrowstyle='->', edgelist=edge_tuples, edge_color= weights, edge_cmap=plt.cm.Spectral)
-    edges_for_cmap = draw_networkx_arrows(G, 
-        edgelist=edge_tuples, pos=positions, 
-        arrows=True, arrowstyle='->', width = arrow_size, 
-        widthscale=widthscale, pathstyle=pathstyle,
-        alphas = e_alphas, edge_color= weights, 
-        edge_cmap=e_cmap)
-    
-    nx.draw_networkx_labels(G, label_positions, labels)
-    plt.tight_layout()
-    
-    plt.gca().invert_yaxis() # so branch 0 on top
-    plt.gca().get_xaxis().set_visible(False)
-    plt.ylabel('Branch')
-    
-    xmin = min( np.array(list(label_positions.values()))[:,0] )
-    xmax = max( np.array(list(label_positions.values()))[:,0] )
-    plt.xlim(xmin -0.8, xmax +0.8)
-    
-    plt.colorbar(edges_for_cmap, orientation="horizontal", pad= 0, label=r'$\log_{10}$ Bayes factor') # DONE - negative weights are unaccetpable for directed graphs, as they simply mean a flipped edge
-
-    # plt.colorbar(n_colours)
-
-    plt.title('Tree Diagram for QMD')
-    if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
-""" 
-
-
-def plotTreeDiagram(G, n_cmap, e_cmap, 
-                    e_alphas = [], nonadj_alpha=0.1, 
-                    label_padding = 0.4, 
-                    arrow_size = 0.02, widthscale=1.0,
-                    pathstyle = "straight", id_labels = False,
-                    save_to_file=None):
-    plt.clf()
-    plt.figure(figsize=(6,11))   
-    
-    directed  = nx.is_directed(G)
-
-    if int(nx.__version__[0])>=2: 
-        list_of_edges = list(G.edges(data=True))
-    
-    
-    edge_tuples = tuple( G.edges() )
-    
-    positions = dict( zip( G.nodes(), tuple(  [prop['pos'] for (n,prop) in G.nodes(data=True)]  ) ))
-    n_colours = tuple( [ n_cmap(prop['status']) for (n,prop) in G.nodes(data=True)]   )
+    positions = dict( zip( G.nodes(), tuple(  [prop['pos'] for
+        (n,prop) in G.nodes(data=True)]  ) )
+    )
+    n_colours = tuple( [ n_cmap(prop['status']) for (n,prop) 
+        in G.nodes(data=True)]   
+    )
     
     label_positions = []   
     if id_labels is True:
-        labels = dict( zip( G.nodes(), tuple(  [n for (n,prop) in G.nodes(data=True)]  ) ))
+        labels = dict( zip( G.nodes(), tuple(  [n for (n,prop) in 
+            G.nodes(data=True)]  ) )
+        )
         for key in positions.keys():
-            label_positions.append( tuple( np.array(positions[key])- np.array([0., 0.]) ) )
+            label_positions.append( tuple( np.array(positions[key]) -
+            np.array([0., 0.]) ) 
+        )
     else:
-        labels = dict( zip( G.nodes(), tuple(  [prop['label'] for (n,prop) in G.nodes(data=True)]  ) ))  
+        labels = dict( zip( G.nodes(), tuple(  [prop['label'] for 
+            (n,prop) in G.nodes(data=True)]  ) )
+        )  
         for key in positions.keys():
-            label_positions.append( tuple( np.array(positions[key])- np.array([0., label_padding]) ) )
+            label_positions.append( tuple( np.array(positions[key])- 
+                np.array([0., label_padding]) ) 
+        )
     
     label_positions = dict(zip( positions.keys(), tuple(label_positions) ))
      
     
     if len(e_alphas) == 0: 
         for idx in range(len(edge_tuples)):
-            e_alphas.append(  0.8 if list_of_edges[idx][2]["adj"] else nonadj_alpha )
+            e_alphas.append(  
+                0.8 if list_of_edges[idx][2]["adj"] 
+                else nonadj_alpha 
+            )
     
     weights = tuple( [prop['weight'] for (u,v,prop) in list_of_edges] )
 
@@ -673,9 +641,12 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
         node_color = n_colours
     )  
     
-    edges_for_cmap = draw_networkx_arrows(G, edgelist=edge_tuples, pos=positions, arrows=True, 
-        arrowstyle='->', width = arrow_size, widthscale=widthscale, pathstyle=pathstyle,
-        alphas = e_alphas, edge_color= weights, edge_cmap=e_cmap, edge_vmin=0.8, edge_vmax=0.85)
+    edges_for_cmap = draw_networkx_arrows(G, edgelist=edge_tuples,
+        pos=positions, arrows=True, 
+        arrowstyle='->', width = arrow_size, widthscale=widthscale,
+        pathstyle=pathstyle, alphas = e_alphas, edge_color= weights,
+        edge_cmap=e_cmap, edge_vmin=0.8, edge_vmax=0.85
+    )
     
     nx.draw_networkx_labels(G, label_positions, labels)
     plt.tight_layout()
@@ -688,7 +659,9 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
     xmax = max( np.array(list(label_positions.values()))[:,0] )
     plt.xlim(xmin -0.8, xmax +0.8)
     
-    plt.colorbar(edges_for_cmap, orientation="horizontal", pad= 0, label=r'$\log_{10}$ Bayes factor') # DONE - negative weights are unaccetpable for directed graphs, as they simply mean a flipped edge
+    plt.colorbar(edges_for_cmap, orientation="horizontal", 
+        pad= 0, label=r'$\log_{10}$ Bayes factor'
+    ) 
 
     nodes=list(G.nodes)
     distinct_status=[]
@@ -698,7 +671,7 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
         stat = G.nodes[n]['status'] # only for status not yet represented in legend
         if stat not in distinct_status:
             distinct_status.append(stat)
-            # what does node colour encode? either number wins or branch champion
+            # node colour encodes either number wins or branch champion
             info=str(G.nodes[n]['info']) 
             col = tuple( n_cmap(G.nodes[n]['status']) )
 
@@ -708,22 +681,16 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
 
 
     lgd_handles=[]
-#    for i in range(len(labels)):
-#        lgd_handles.append((handles[i], labels[i], marker='o'))
     
     if 'Branch Champion' in labels:
         legend_title='Champion Type'
     else:
         legend_title='# QMD wins'
     plt.legend(handles, labels, title=legend_title)
-#    plt.legend(lgd_handles, title=legend_title)
 
-    #plt.title('Tree Diagram for QMD')
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
-
-# import PlotQMD as pt
 
 def colour_dicts_from_win_count(winning_count, min_colour_value=0.1):
     max_wins=max(list(winning_count.values()))
@@ -738,11 +705,12 @@ def colour_dicts_from_win_count(winning_count, min_colour_value=0.1):
     col_space = np.linspace(min_col, max_col, num_colours)
     colour_by_win_count = {}
     colour_by_node_name = {}
-    all_models=list(ising_terms_full_list(return_branch_dict='latex_terms').keys())
+    all_models=list(
+        ising_terms_full_list(return_branch_dict='latex_terms').keys()
+    )
 
     for k in range(num_colours):
         colour_by_win_count[k] = col_space[k]
-
 
     for k in all_models:
         try:
@@ -772,7 +740,9 @@ def cumulativeQMDTreePlot(
         bayes_factors = medians
 
     modlist = ising_terms_full_list()
-    term_branches = ising_terms_full_list(return_branch_dict='latex_terms')        
+    term_branches = (
+        ising_terms_full_list(return_branch_dict='latex_terms')       
+    ) 
 
     pair_freqs={}
     for c in list(counts.keys()):
@@ -801,7 +771,9 @@ def cumulativeQMDTreePlot(
         branch_x_filled[i] = 0
         branch_mod_count[i] =  0 
 
-    colour_by_node_name, colour_by_count = colour_dicts_from_win_count(wins_per_mod, 0.4)
+    colour_by_node_name, colour_by_count = (
+        colour_dicts_from_win_count(wins_per_mod, 0.4)
+    )
     min_colour = min(list(colour_by_node_name.values()))
     
     for m in modlist:
@@ -824,7 +796,9 @@ def cumulativeQMDTreePlot(
     for m in modlist:
         branch = term_branches[m]
         num_mods_this_branch = branch_mod_count[branch]
-        pos_list = available_position_list(num_mods_this_branch, max_num_mods_any_branch)
+        pos_list = available_position_list(num_mods_this_branch,
+            max_num_mods_any_branch
+        )
         branch_filled_so_far = branch_x_filled[branch]
         branch_x_filled[branch]+=1
 
@@ -843,7 +817,7 @@ def cumulativeQMDTreePlot(
             if is_adj or not only_adjacent_branches:
                 if a!=b:
                     pairing = (a,b)
-                    frequency = pair_freqs[pairing]/max_frequency #TODO build frequency into edges
+                    frequency = pair_freqs[pairing]/max_frequency
                     edges.append(pairing)
                     edge_frequencies.append(frequency)
                     vs = [a,b]
@@ -853,23 +827,29 @@ def cumulativeQMDTreePlot(
                     except:
                         thisweight=0 #TODO is this right?
 
-                    if thisweight < 0:
-                        thisweight = - thisweight # flip negative valued edges and move them to positive
+                    if thisweight < 0:  
+                        # flip negative valued edges and move them to positive
+                        thisweight = - thisweight 
                         flipped = True
-                        G.add_edge(b, a, weight=thisweight, flipped = flipped, adj = is_adj, freq = frequency)
+                        G.add_edge(b, a, weight=thisweight, flipped=flipped,
+                            adj = is_adj, freq=frequency
+                        )
                     else:
                         flipped = False
-                        G.add_edge(a, b, weight=thisweight, flipped = flipped, adj = is_adj, freq = frequency)
-
+                        G.add_edge(a, b, weight=thisweight, flipped=flipped,
+                            adj=is_adj, freq=frequency
+                        )
                         
     max_freq = max(edge_frequencies)
     
     freq_scale = 10/max_freq
     edge_f = [i*freq_scale for i in edge_frequencies]
     
-    plotTreeDiagram(G,n_cmap = plt.cm.pink_r, e_cmap = plt.cm.Blues, #TODO should be pt.plot when finished dev
+    plotTreeDiagram(G,n_cmap = plt.cm.pink_r, e_cmap = plt.cm.Blues, 
                        nonadj_alpha = 0.1, e_alphas = [] , widthscale=10.5, 
-                       label_padding = 0.4, pathstyle="curve", arrow_size=None) #  
+                       label_padding = 0.4, pathstyle="curve",
+                       arrow_size=None
+       )   
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
@@ -919,8 +899,6 @@ def draw_networkx_arrows(G, pos,
     # set edge positions
     edge_pos = np.asarray([(pos[e[0]], pos[e[1]]) for e in edgelist])
     
-    
-
     if not cb.iterable(widthlist):
         lw = (widthlist,)
     else:
@@ -945,17 +923,20 @@ def draw_networkx_arrows(G, pos,
                 # numbers (which are going to be mapped with a colormap)
                 edge_colors = None
         else:
-            raise ValueError('edge_color must consist of either color names or numbers')
+            raise ValueError('edge_color must consist of \
+                either color names or numbers'
+            )
     else:
         if cb.is_string_like(edge_color) or len(edge_color) == 1:
             edge_colors = (colorConverter.to_rgba(edge_color), )
         else:
-            raise ValueError('edge_color must be a single color or list of exactly m colors where m is the number or edges')
+            raise ValueError('edge_color must be a single color or \
+            list of exactly m colors where m is the number or edges'
+        )
 
     edge_collection = collections.LineCollection(edge_pos,
-                                     colors=edge_colors,
-                                     linewidths=lw
-                                     )
+        colors=edge_colors, linewidths=lw
+    )
     edge_collection.set_zorder(1)  # edges go behind nodes
 
     # ax.add_collection(edge_collection)
@@ -1014,7 +995,8 @@ def draw_networkx_arrows(G, pos,
                     x1,y1, dx,dy,
                     facecolor=edge_cmap(edge_color[idx]), alpha = alphas[idx],
                     linewidth = 0, antialiased = True,
-                    width= lw, head_width = 5*lw, overhang = -5*0.02/lw, length_includes_head=True, 
+                    width= lw, head_width = 5*lw,
+                    overhang = -5*0.02/lw, length_includes_head=True, 
                     label=thislabel, zorder=1
                     )
                     
@@ -1107,8 +1089,11 @@ def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
     low_ini = scale_min
     shift_ini = 1
     shift = 6
-    ax.set_rgrids(list(shift_ini + np.linspace(low_ini+0.05,0.05,many_circles)), 
-                   labels = list(np.round(np.linspace(low_ini+0.05,0.05,many_circles), 2)), angle=180)
+    ax.set_rgrids(list(shift_ini + 
+        np.linspace(low_ini+0.05,0.05,many_circles)), 
+        labels = list(np.round(np.linspace(low_ini+0.05,0.05,many_circles), 
+        2)), angle=180
+    )
 
     for i in modlist:
         dplot = []
@@ -1123,10 +1108,16 @@ def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
                 dplot.append(shift+log_bayes_factor)
             else:
                 dplot.append(shift+0.0)
-        ax.plot(theta, np.array(dplot), color=colors[int(i%len(colors))], linestyle = '--', alpha = 1.)
-        ax.fill(theta, np.array(dplot), facecolor=colors[int(i%len(colors))], alpha=0.25)
+        ax.plot(theta, np.array(dplot), color=colors[int(i%len(colors))],
+            linestyle = '--', alpha = 1.
+        )
+        ax.fill(theta, np.array(dplot), 
+            facecolor=colors[int(i%len(colors))], alpha=0.25
+        )
 
-    ax.plot(theta, np.repeat(shift, len(labels)), color='black', linestyle = '-', label='BayesFactor=1')
+    ax.plot(theta, np.repeat(shift, len(labels)), color='black', 
+        linestyle = '-', label='BayesFactor=1'
+    )
     
     ax.set_varlabels(labels, fontsize=15)
     try:
@@ -1226,7 +1217,9 @@ def custom_radar_factory(num_vars, frame='circle'):
                 line.set_data(x, y)
 
         def set_varlabels(self, labels, fontsize = None, frac=1.0):
-            self.set_thetagrids(np.degrees(theta), labels, fontsize = fontsize, frac=frac)
+            self.set_thetagrids(np.degrees(theta), labels, 
+                fontsize = fontsize, frac=frac
+            )
 
         def _gen_axes_patch(self):
             return self.draw_patch()
@@ -1285,7 +1278,9 @@ def multiQMDBayes(all_bayes_csv):
 
 
 
-    piv = pandas.pivot_table(cumulative_bayes, index='ModelName', values=names, aggfunc=[np.mean, np.median])
+    piv = pandas.pivot_table(cumulative_bayes, 
+        index='ModelName', values=names, aggfunc=[np.mean, np.median]
+    )
     means=piv['mean']
     medians=piv['median']
 
@@ -1437,7 +1432,9 @@ def ising_terms_full_list(return_branch_dict=None):
 
     elif return_branch_dict == 'latex_terms':
         for k in list(branch_by_term_dict.keys()):
-            branch_by_term_dict[DataBase.latex_name_ising(k)] = branch_by_term_dict.pop(k)
+            branch_by_term_dict[DataBase.latex_name_ising(k)]=(
+                branch_by_term_dict.pop(k)
+            )
         return branch_by_term_dict
         
     else:
@@ -1459,7 +1456,9 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
     import csv
     fields = ['ID', 'Name']
     if names_ids=='latex':
-        names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in range(qmd.HighestModelID)]
+        names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in 
+            range(qmd.HighestModelID)
+        ]
     elif names_ids=='nonlatex':
         names = [qmd.ModelNameIDs[i] for i in range(qmd.HighestModelID)]
     elif names_ids=='ids':
@@ -1479,7 +1478,9 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
             model_bf = {}
             for j in qmd.AllBayesFactors[i].keys():
                 if names_ids=='latex':
-                    other_model_name = DataBase.latex_name_ising(qmd.ModelNameIDs[j])
+                    other_model_name = (
+                        DataBase.latex_name_ising(qmd.ModelNameIDs[j])
+                    )
                 elif names_ids=='nonlatex':
                     other_model_name = qmd.ModelNameIDs[j]
                 elif names_ids=='ids':
