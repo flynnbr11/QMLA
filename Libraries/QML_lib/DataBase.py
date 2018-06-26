@@ -13,7 +13,8 @@ A Pandas dataframe is used as a database for running QMD, recording:
   - Status
 
 A separate database holds all information on individual models:
-  - constituent operators (names and matrices) [i.e. those which are summed to give model]
+  - constituent operators (names and matrices) 
+        [i.e. those which are summed to give model]
   - total matrix
   - number of qubits (dimension)
 
@@ -25,7 +26,11 @@ This returns:
 
   - db: "running database", info on dlog likelihood, etc.
   - model_db: info on construction of model, i.e. constituent operators etc.
-  - model_lists = list of lists containing alphabetised model names. When a new model is considered, it should be compared against models of identical dimension (number of qubits) by alhpabetical name. If the alphabetical name is found in, e.g. model_lists[3], it has already been considered and the QML should be terminated.
+  - model_lists = list of lists containing alphabetised model names. 
+        When a new model is considered, it should be compared against models of
+        identical dimension (number of qubits) by alhpabetical name. If the
+        alphabetical name is found in, e.g. model_lists[3], it has already been
+        considered and the QML should be terminated.
 
 
 To fill the data base, a list of generators are passed to launch_db. 
@@ -62,7 +67,9 @@ import ModelGeneration
 from qinfer import NormalDistribution
 
 global paulis_list
-paulis_list = {'i' : evo.identity(), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
+paulis_list = {'i' : evo.identity(), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 
+    'z' : evo.sigmaz()
+}
 
 
 
@@ -104,7 +111,8 @@ class operator():
       -- 3 qubit operator. X+Z on qubit 1; I on qubit 2; Z on qubit 3
     See Naming_Convention.pdf for details.
 
-    Constituents of an operator are operators of the same dimension which sum to give the operator.
+    Constituents of an operator are operators of the same dimension 
+        which sum to give the operator.
     e.g. 
     - xPy = X + Y has constituents X, Y
 
@@ -116,7 +124,8 @@ class operator():
     - qubits_acted_on: list of qubits which are acted on non-trivially
       -- e.g. xTiTTz has list [1,3], since qubit 2 is acted on by identity
     - alph_name: rearranged version of name which follows alphabetical convention
-      -- uniquely identifies equivalent operators for comparison against previously considered models
+      -- uniquely identifies equivalent operators for comparison 
+            against previously considered models
     -
     """
     def __init__(self, name, undimensionalised_name=None): 
@@ -633,8 +642,13 @@ ytz = operator('yTz')
 true_operator_list = np.array([ ytz.matrix] )
 
 
-def launch_db(true_op_name, log_file, RootN_Qbit=[0], N_Qubits=1, gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True, redimensionalise=True, resample_threshold = 0.5, resampler_a = 0.95, pgh_prefactor = 1.0, num_probes = None, probe_dict=None, use_exp_custom=True, enable_sparse=True, debug_directory = None,
-qid=0, host_name='localhost', port_number=6379):
+def launch_db(true_op_name, log_file, RootN_Qbit=[0], N_Qubits=1,
+    gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True,
+    redimensionalise=True, resample_threshold = 0.5, resampler_a = 0.95,
+    pgh_prefactor = 1.0, num_probes = None, probe_dict=None, 
+    use_exp_custom=True, enable_sparse=True, debug_directory = None,
+    qid=0, host_name='localhost', port_number=6379
+):
     """
     Inputs:
     TODO
@@ -643,9 +657,12 @@ qid=0, host_name='localhost', port_number=6379):
     gen_list: list of strings corresponding to model names. 
     
     Outputs: 
-      - db: "running database", info on active models. Can access QML and operator instances for all information about models.
-      - legacy_db: when a model is terminated, we maintain essential information in this db (for plotting, debugging etc.).
-      - model_lists = list of lists containing alphabetised model names. When a new model is considered, it     
+      - db: "running database", info on active models. Can access QML and 
+        operator instances for all information about models.
+      - legacy_db: when a model is terminated, we maintain essential information 
+        in this db (for plotting, debugging etc.).
+      - model_lists = list of lists containing alphabetised model names.
+        When a new model is considered, it     
 
     Usage: 
         $ gen_list = ['xTy, yPz, iTxTTy] # Sample list of model names
@@ -730,8 +747,10 @@ def add_model(model_name, running_database, model_lists,
     
     Inputs: 
       - model_name: new model name to be considered and added if new. 
-      - running_database: Database (output of launch_db) containing info on log likelihood etc. 
-      - model_lists: output of launch_db. A list of lists containing every previously considered model, categorised by dimension. 
+      - running_database: Database (output of launch_db) containing
+        info on log likelihood etc. 
+      - model_lists: output of launch_db. A list of lists containing
+        every previously considered model, categorised by dimension. 
       
     Outputs: 
       TODO: return True if added; False if previously considered? 
@@ -757,24 +776,35 @@ def add_model(model_name, running_database, model_lists,
             
             if sim_dim > true_dim: 
                 true_params = [true_params[0]]
-                redimensionalised_true_op = ModelGeneration.identity_interact(subsystem=true_op_name, num_qubits=sim_dim, return_operator=True)
+                redimensionalised_true_op = (
+                    ModelGeneration.identity_interact(subsystem=true_op_name,
+                    num_qubits=sim_dim, return_operator=True)
+                )
                 true_ops = redimensionalised_true_op.constituents_operators
                 sim_name = model_name
                 
             elif true_dim > sim_dim: 
-                print("Before dimensionalising name. Name = ", model_name, "true_dim = ", true_dim)
-                sim_name = ModelGeneration.dimensionalise_name_by_name(name=model_name, true_dim = true_dim) 
+                print("Before dimensionalising name. Name = ", 
+                    model_name, "true_dim = ", true_dim
+                )
+                sim_name = (
+                    ModelGeneration.dimensionalise_name_by_name(name=model_name,
+                    true_dim = true_dim)
+                ) 
             else: 
                 sim_name = model_name
 
         else: 
             sim_name = model_name
     
-        log_print(["Model ", model_name, " not previously considered -- adding."], log_file)
+        log_print(["Model ", model_name, 
+            " not previously considered -- adding."], log_file
+        )
         op = operator(name = sim_name, undimensionalised_name = model_name)
         num_rows = len(running_database)
-        qml_instance = ModelLearningClass(name=op.name, num_probes = num_probes, probe_dict=probe_dict)
-
+        qml_instance = ModelLearningClass(name=op.name, num_probes = num_probes,
+            probe_dict=probe_dict
+        )
         sim_pars = []
         num_pars = op.num_constituents
         if num_pars ==1 : #TODO Remove this fixing the prior
@@ -822,7 +852,7 @@ def add_model(model_name, running_database, model_lists,
         running_database.loc[num_rows] = running_db_new_row      
         return True
     else:
-        log_print(["Model", alph_model_name, " previously considered."], log_file) # at location", location)  
+        log_print(["Model", alph_model_name, " previously considered."], log_file) 
         return False
 
 
@@ -853,19 +883,17 @@ def consider_new_model(model_lists, name, db):
     Check whether the new model, name, exists in all previously considered models, 
     held in model_lists. 
     If name has not been previously considered, 'New' is returned. 
-    If name has been previously considered, the corresponding location in db is returned. 
+    If name has been previously considered, the corresponding location 
+        in db is returned. 
     TODO: return something else? Called in add_model function. 
-    Returning 0,1 would cause an error on the condition the function is returned into.
+    Returning 0,1 would cause an error on the condition the function is
+        returned into.
     """
     # Return true indicates it has not been considered and so can be added
     al_name = alph(name)
     n_qub = get_num_qubits(name)
     if al_name in model_lists[n_qub]:
         return 'Previously Considered' # todo -- make clear if in legacy or running db
-#        location = get_location_by_alph_name(db, al_name)
-#        if location is None: 
-#          return "Legacy database"
-#        return location
     else: 
         return 'New'
 
@@ -873,7 +901,7 @@ def consider_new_model(model_lists, name, db):
 def check_model_in_dict(name, model_dict):
     """
     Check whether the new model, name, exists in all previously considered models, 
-    held in model_lists. 
+        held in model_lists. 
     If name has not been previously considered, False is returned. 
     """
     # Return true indicates it has not been considered and so can be added
@@ -883,10 +911,6 @@ def check_model_in_dict(name, model_dict):
 
     if al_name in model_dict[n_qub]:
         return True # todo -- make clear if in legacy or running db
-#        location = get_location_by_alph_name(db, al_name)
-#        if location is None: 
-#          return "Legacy database"
-#        return location
     else: 
         return False
 
@@ -1008,4 +1032,6 @@ def all_unfinished_model_names(db):
     return list(db[ (db['Completed']==False) ]['<Name>'])    
     
 def unfinished_model_ids_by_branch_id(db, branchID):
-    return list(db[ (db['branchID']==branchID) & (db['Completed']==False) ]['ModelID'])
+    return list(db[ (db['branchID']==branchID) & 
+        (db['Completed']==False) ]['ModelID']
+    )
