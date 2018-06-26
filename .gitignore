@@ -23,7 +23,7 @@ __pycache__/
 
 # But want redis configuration:
 !Libraries/QML_lib/RedisConfig.conf
-!Libraries/QML_lib/RedisDatabaseCConfig.conf
+!Libraries/QML_lib/RedisDatabaseConfig.conf
 
 
 
