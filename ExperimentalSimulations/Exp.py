@@ -35,7 +35,7 @@ import DataBase
 from QMD import QMD #  class moved to QMD in Library
 import QML
 import ModelGeneration 
-import BayesF
+#import BayesF
 import matplotlib.pyplot as plt
 #from pympler import asizeof
 import matplotlib.pyplot as plt
