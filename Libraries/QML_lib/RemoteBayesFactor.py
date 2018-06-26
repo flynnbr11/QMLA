@@ -29,7 +29,6 @@ plt.switch_backend('agg')
 # Local files
 import Evo as evo
 import DataBase 
-# from QML import *
 import QML
 import ModelGeneration
 import BayesF
@@ -53,6 +52,16 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
     trueModel=None, bayes_threshold=1, host_name='localhost', port_number=6379, 
     qid=0, log_file='rq_output.log'
 ):
+    """
+    This is a standalone function to compute Bayes factors without knowledge 
+    of full QMD program. QMD info is unpickled from a redis databse, containing
+    learned_model information, i.e. final parameters etc. 
+    Given model ids correspond to model names in the database, which are combined 
+    with the final learned parameters to reconstruct model classes of 
+    complete learned models. 
+    From these we extract log likelihoods to compute Bayes factors. 
+    
+    """
 
     write_log_file = open(log_file, 'a')
     def log_print(to_print_list):
@@ -114,10 +123,13 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
             bayes_factor = 1e-160
         
         pair_id = DataBase.unique_model_pair_identifier(model_a_id, model_b_id)
+        print("Bayes Factor:", pair_id)
         if float(model_a_id) < float(model_b_id):
             # so that BF in db always refers to (a/b), not (b/a). 
             bayes_factors_db.set(pair_id, bayes_factor)
-            log_print(["Redis SET bayes_factors_db, pair:", pair_id, "bayes:", bayes_factor])
+            log_print(["Redis SET bayes_factors_db, pair:", pair_id,
+                "bayes:", bayes_factor]
+            )
         else:
             bayes_factors_db.set(pair_id, (1.0/bayes_factor))
             log_print(["Redis SET bayes_factors_db, pair:", pair_id, 
