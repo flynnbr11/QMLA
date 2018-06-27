@@ -31,7 +31,6 @@ then
 elif [[ "$host" == "node"* ]]
 then
     echo "BC backend identified"
-    #running_dir="$(pwd)"
 	running_dir="/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment"
     lib_dir="/panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib"
     script_dir="/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations"
@@ -62,16 +61,6 @@ mkdir -p $running_dir/logs
 mkdir -p $PBS_O_WORKDIR/logs
 
 
-# Create the node file ---------------
-# 
-cat $PBS_NODEFILE
-export nodes=`cat $PBS_NODEFILE`
-export nnodes=`cat $PBS_NODEFILE | wc -l`
-export confile=$PBS_O_WORKDIR/logs/node_info.$PBS_JOBID.conf
-for i in $nodes; do
- echo ${i} >>$confile
-done
-# -------------------------------------
 
 echo "Nodelist"
 cat $confile 
@@ -84,20 +73,34 @@ echo "REDIS_URL is $REDIS_URL"
 echo "Running dir is $running_dir"
 echo "workers will log in $running_dir/logs"
 
+QMD_LOG_DIR="$PBS_O_WORKDIR/logs/$DATETIME"
+mkdir -p $QMD_LOG_DIR
 QMD_JOB=$PBS_JOBNAME
 echo "PBS job name is $QMD_JOB"
-QMD_LOG="$PBS_O_WORKDIR/logs/$QMD_JOB.qmd.$job_number.log"
+QMD_LOG="$QMD_LOG_DIR/$QMD_JOB.qmd.$job_number.log"
+
+
+# Create the node file ---------------
+# 
+cat $PBS_NODEFILE
+export nodes=`cat $PBS_NODEFILE`
+export nnodes=`cat $PBS_NODEFILE | wc -l`
+export confile=$QMD_LOG_DIR/node_info.$QMD_JOB.conf
+for i in $nodes; do
+ echo ${i} >>$confile
+done
+# -------------------------------------
 
 
 cd $lib_dir
 if [[ "$host" == "node"* ]]
 then
 	echo "Launching RQ worker on remote nodes using mpirun"
-	mpirun -np $NUM_WORKERS -machinefile $confile rq worker $QMD_ID -u $REDIS_URL >> $PBS_O_WORKDIR/logs/$QMD_JOB.worker.$job_number.log 2>&1 &
+	mpirun -np $NUM_WORKERS -machinefile $confile rq worker $QMD_ID -u $REDIS_URL >> $QMD_LOG_DIR/$QMD_JOB.worker.$job_number.log 2>&1 &
 else
 	echo "Launching RQ worker locally"
 	echo "RQ launched on $REDIS_URL at $(date +%H:%M:%S)" > $running_dir/logs/worker_$HOSTNAME.log 2>&1 
-	rq worker -u $REDIS_URL >> $running_dir/logs/worker_$QMD_JOB.$HOSTNAME.log 2>&1 &
+	rq worker -u $REDIS_URL >> $QMD_LOG_DIR/worker_$QMD_JOB.$HOSTNAME.log 2>&1 &
 fi
 
 sleep 5
