@@ -73,7 +73,8 @@ class QMD():
         resample_threshold = 0.5,
         resampler_a = 0.95,
         pgh_prefactor = 1.0,
-        num_probes = 20, 
+        num_probes = 20,
+        probe_dict = None,  
         num_times_for_bayes_updates = 'all',
         max_num_layers = 10,
         max_num_branches = 20, 
@@ -120,9 +121,12 @@ class QMD():
         self.ResamplerA = resampler_a
         self.PGHPrefactor = pgh_prefactor
         self.NumProbes = num_probes
-        self.ProbeDict = separable_probe_dict(max_num_qubits=
-            self.MaxQubitNumber, num_probes=self.NumProbes
-        )
+        if probe_dict is None:
+            self.ProbeDict = separable_probe_dict(max_num_qubits=
+                self.MaxQubitNumber, num_probes=self.NumProbes
+            )
+        else:
+            self.ProbeDict = probe_dict
         self.HighestQubitNumber = int(0)
         self.MaxBranchID = max_num_branches
         self.HighestBranchID = 0

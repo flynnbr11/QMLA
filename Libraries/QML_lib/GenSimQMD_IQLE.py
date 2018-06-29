@@ -189,6 +189,17 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             params = modelparams
         ham_num_qubits = np.log2(operators[0].shape[0])
 
+        """
+        # TODO 
+        if true_evo and self.use_experimental_data:
+            time = expparams['t]
+            experimental_expec_value = get_experimental_expec_value(
+                times=self.ExperimentalMeasurementTimes,
+                
+                
+            pr0 = np.ndarray([[experimental_expec_value]])
+
+        """
         
         if self.inBayesUpdates:
             if self.ideal_probe is not None:

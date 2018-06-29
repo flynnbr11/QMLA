@@ -23,6 +23,7 @@ global_variables = GlobalVariables.parse_cmd_line_args(sys.argv[1:])
 import RedisSettings as rds
 import Evo as evo
 import DataBase 
+import ExperimentalDataFunctions as expdt
 from QMD import QMD #  class moved to QMD in Library
 import QML
 import ModelGeneration 
@@ -63,6 +64,23 @@ def log_print(to_print_list, log_file):
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
 
+
+num_probes = 40
+experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
+    num_probes=num_probes
+)
+
+experimental_measurements_dict = expdt.experimentalMeasurementDict(
+    directory="NV05_HahnPeaks_expdataset"
+)
+
+
+#print("experimental measurements:", experimental_measurements_dict)
+
+#print("exp probes:", experimental_probe_dict)
+use_experimental_measurements = True
+
+
 initial_op_list = ['xTi', 'yTi', 'zTi']
 true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 true_params = [0.25, 0.21, 0.28, 0.22, 0.23, 0.27]
@@ -96,8 +114,11 @@ qmd = QMD(
     resample_threshold = global_variables.resample_threshold,
     resampler_a = global_variables.resample_a, 
     pgh_prefactor = global_variables.pgh_factor,
-    num_probes=5,
+    num_probes=num_probes,
+    probe_dict = experimental_probe_dict, 
     gaussian=True, 
+    use_experimental_data = use_experimental_measurements,
+    experimental_measurements = experimental_measurements_dict,
     max_num_branches = 0,
     max_num_qubits = 10, 
     parallel = True,
