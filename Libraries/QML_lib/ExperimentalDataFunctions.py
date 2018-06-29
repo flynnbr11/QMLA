@@ -7,7 +7,9 @@ import random
 
 
 def experimentalMeasurementDict(directory):
-    experimental_times_exp_vals = importExperimentalData(directory=directory, rescale=True)
+    experimental_times_exp_vals = importExperimentalData(
+        directory=directory, rescale=True
+    )
     
     times=list(experimental_times_exp_vals[:,0])
     exp=list(experimental_times_exp_vals[:,1])
@@ -68,6 +70,33 @@ def rescaleData(datavector, newrange = [0.,1.]):
     return datavector
 
 
+def nearestAvailableExpTime(times, t):
+    """
+    - times: Sorted time list
+    - experimental_data: dict where key is time and value is expectation value
+    - t: time to get nearest available experimental data point for. 
+    
+    If two times are equally close, return the smallest.
+    """
+    if t > max(times):
+        nearest = random.choice(times)
+
+    else:
+        pos = bisect_left(times, t)
+        if pos == 0:
+            return times[0]
+        if pos == len(times):
+            return times[-1]
+        before = times[pos - 1]
+        after = times[pos]
+        if after - t < t - before:
+            nearest =  after
+        else:
+            nearest = before
+    
+    return nearest
+
+
 
 def nearestAvailableExpVal(times, experimental_data, t):
     """
@@ -102,9 +131,16 @@ def experimental_NVcentre_ising_probes(max_num_qubits=2, num_probes=40):
     a plus state. 
     """
     plus_state = np.array([1, 1])/np.sqrt(2)
+    noise_level = 0.03 # from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    random_noise = noise_level * random_probe(1)    
+    noisy_plus = plus_state + random_noise
+    norm_factor = np.linalg.norm(noisy_plus)
+    noisy_plus = noisy_plus/norm_factor
+    
     seperable_probes = {}
     for i in range(num_probes):
-        seperable_probes[i,0] = plus_state
+#        seperable_probes[i,0] = plus_state
+        seperable_probes[i,0] = noisy_plus
         for j in range(1, 1+max_num_qubits):
             if j==1:
                 seperable_probes[i,j] = seperable_probes[i,0]

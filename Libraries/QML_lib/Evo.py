@@ -98,11 +98,10 @@ def log_print(to_print_list, log_file, log_identifier=None):
 def get_pr0_array_qle(t_list, modelparams, oplist, probe,
         use_exp_custom=True,exp_comparison_tol=None, enable_sparse=True, 
         ham_list=None, log_file='QMDLog.log', log_identifier=None
-    ):
+):
     from rq import timeouts
     print_loc(global_print_loc)
     num_particles = len(modelparams)
-
     num_times = len(t_list)
     output = np.empty([num_particles, num_times])
     for evoId in range(num_particles): ## todo not sure about length/arrays here
@@ -145,7 +144,7 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus,
         probe, use_exp_custom=True, enable_sparse=True, 
         exp_comparison_tol=None, trotterize=True, ham_list = None,
         log_file='QMDLog.log',log_identifier=None
-    ):
+):
     print_loc(global_print_loc)
     num_particles = len(modelparams)
     num_times = len(t_list)

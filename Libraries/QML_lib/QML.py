@@ -6,6 +6,7 @@ import time
 import Evo as evo
 from Distrib import *
 import GenSimQMD_IQLE as gsi
+import ExperimentalDataFunctions as expdt
 import multiPGH as mpgh
 import DataBase as DB
 from MemoryTest import print_loc
@@ -208,7 +209,16 @@ class ModelLearningClass():
         for istep in range(self.NumExperiments):
             self.Experiment =  self.Heuristic()
             print_loc(global_print_loc)
-            self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
+            if self.UseExperimentalData:
+                t = self.Experiment[0][0]
+                nearest = expdt.nearestAvailableExpTime(
+                    times=self.ExperimentalMeasurementTimes,
+                    t=t
+                )
+                self.Experiment[0][0] = nearest
+            else:
+                self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
+            
             self.NumExperimentsToDate += 1
             print_loc(global_print_loc)
             if istep == 0:
