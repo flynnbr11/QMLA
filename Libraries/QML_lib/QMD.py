@@ -28,12 +28,10 @@ import Evo as evo
 import DataBase 
 import QML
 import ModelGeneration
-#import BayesF
 import PlotQMD 
 from RemoteModelLearning import *
 from RemoteBayesFactor import * 
 # Class definition
-#from RQ_config import *
 
 def time_seconds():
     import datetime
@@ -64,36 +62,38 @@ class QMD():
 
 
     def __init__(self,
-                 initial_op_list=['x'],
-                 true_operator='x',
-                 true_param_list = None,
-                 num_particles= 300,
-                 num_experiments = 50,
-                 max_num_models=30, 
-                 max_num_qubits=7, #TODO change -- this may cause crashes somewhere
-                 gaussian=True,
-                 resample_threshold = 0.5,
-                 resampler_a = 0.95,
-                 pgh_prefactor = 1.0,
-                 num_probes = 20, 
-                 num_times_for_bayes_updates = 'all',
-                 max_num_layers = 10,
-                 max_num_branches = 20, 
-                 use_exp_custom = True,
-                 enable_sparse = True,
-                 compare_linalg_exp_tol = None,
-                 sigma_threshold = 1e-13, 
-                 debug_directory = None,
-                 qle = True, # Set to False for IQLE
-                 parallel = False,
-                 q_id = 0, # id for QMD instance to keep concurrent QMDs distinct on cluster
-                 host_name='localhost',
-                 port_number = 6379,
-                 use_rq=True, 
-                 rq_timeout=3600,
-                 growth_generator='simple_ising',
-                 log_file = None
-                ):
+        initial_op_list=['x'],
+        true_operator='x',
+        true_param_list = None,
+        num_particles= 300,
+        num_experiments = 50,
+        max_num_models=30, 
+        max_num_qubits=7, #TODO change -- this may cause crashes somewhere
+        gaussian=True,
+        resample_threshold = 0.5,
+        resampler_a = 0.95,
+        pgh_prefactor = 1.0,
+        num_probes = 20, 
+        num_times_for_bayes_updates = 'all',
+        max_num_layers = 10,
+        max_num_branches = 20, 
+        use_exp_custom = True,
+        enable_sparse = True,
+        compare_linalg_exp_tol = None,
+        sigma_threshold = 1e-13, 
+        debug_directory = None,
+        qle = True, # Set to False for IQLE
+        parallel = False,
+        use_experimental_data = False,
+        experimental_measurements = None,
+        q_id = 0, # id for QMD instance to keep concurrent QMDs distinct on cluster
+        host_name='localhost',
+        port_number = 6379,
+        use_rq=True, 
+        rq_timeout=3600,
+        growth_generator='simple_ising',
+        log_file = None
+    ):
         self.StartingTime = time.time()
         self.QLE = qle # Set to False for IQLE
         trueOp = DataBase.operator(true_operator)
@@ -135,6 +135,14 @@ class QMD():
         self.BranchBayesComputed = {}
         self.InterBranchChampions = {}
         self.GlobalEpoch = 0 
+        self.UseExperimentalData = use_experimental_data
+        self.ExperimentalMeasurements = experimental_measurements
+        if self.ExperimentalMeasurements is not None:
+            self.ExperimentalMeasurementTimes = (
+                sorted(list(self.ExperimentalMeasurements.keys()))
+            )
+        else: 
+            self.ExperimentalMeasurementTimes=None
         self.UseExpCustom = use_exp_custom
         self.EnableSparse = enable_sparse
         self.ExpComparisonTol = compare_linalg_exp_tol
@@ -197,24 +205,27 @@ class QMD():
             self.QLE_Type = 'IQLE'
     
         self.QMDInfo = {
-         # may need to take copies of these in case pointers accross nodes break
-          'num_probes' : self.NumProbes,
-#          'probe_dict' : self.ProbeDict, # possibly include here?
-          'true_oplist' : self.TrueOpList,
-          'true_params' : self.TrueParamsList,  
-          'num_particles' : self.NumParticles,
-          'num_experiments' : self.NumExperiments, 
-          'resampler_thresh' : self.ResampleThreshold,
-          'resampler_a' : self.ResamplerA,
-          'pgh_prefactor' : self.PGHPrefactor,
-          'debug_directory' : self.DebugDirectory,
-          'qle' : self.QLE,
-          'sigma_threshold' : self.SigmaThreshold,
-          'true_name' : self.TrueOpName,
-          'use_exp_custom' : self.UseExpCustom,
-          'compare_linalg_exp_tol' : self.ExpComparisonTol,
-          'gaussian' : self.gaussian,
-          'q_id' : self.Q_id
+            # may need to take copies of these in case pointers accross nodes break
+            'num_probes' : self.NumProbes,
+            #          'probe_dict' : self.ProbeDict, # possibly include here?
+            'true_oplist' : self.TrueOpList,
+            'true_params' : self.TrueParamsList,  
+            'num_particles' : self.NumParticles,
+            'num_experiments' : self.NumExperiments, 
+            'resampler_thresh' : self.ResampleThreshold,
+            'resampler_a' : self.ResamplerA,
+            'pgh_prefactor' : self.PGHPrefactor,
+            'debug_directory' : self.DebugDirectory,
+            'qle' : self.QLE,
+            'sigma_threshold' : self.SigmaThreshold,
+            'true_name' : self.TrueOpName,
+            'use_exp_custom' : self.UseExpCustom,
+            'use_experimental_data' : self.UseExperimentalData,
+            'experimental_measurements' : self.ExperimentalMeasurements,
+            'experimental_measurement_times' : self.ExperimentalMeasurementTimes, 
+            'compare_linalg_exp_tol' : self.ExpComparisonTol,
+            'gaussian' : self.gaussian,
+            'q_id' : self.Q_id
         }
         
         self.log_print(["RunParallel=", self.RunParallel])

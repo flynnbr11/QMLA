@@ -109,6 +109,9 @@ class ModelLearningClass():
         self.QLE = qmd_info['qle']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.ExpComparisonTol = qmd_info['compare_linalg_exp_tol']
+        self.UseExperimentalData = qmd_info['use_experimental_data']
+        self.ExperimentalMeasurements = qmd_info['experimental_measurements']
+        self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
         self.SimOpsNames = simopnames
         print_loc(print_location=init_model_print_loc)
 
@@ -145,6 +148,9 @@ class ModelLearningClass():
             oplist=self.SimOpList, modelparams=self.SimParams, 
             true_oplist=self.TrueOpList, trueparams=self.TrueParams,
             truename=self.TrueOpName, num_probes=self.NumProbes,
+            use_experimental_data = self.UseExperimentalData,
+            experimental_measurements = self.ExperimentalMeasurements,
+            experimental_measurement_times=self.ExperimentalMeasurementTimes, 
             probe_dict=self.ProbeDict, probecounter=0, solver='scipy',
             trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom,
             exp_comparison_tol = self.ExpComparisonTol,
@@ -528,8 +534,12 @@ class reducedModel():
         self._normalization_record = learned_info['normalization_record']
         self.VolumeList = learned_info['volume_list'] 
 
-#        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.TrueOpList,,
-
+#        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,
+#            experimental_measurements = self.ExperimentalMeasurements,
+#            experimental_measurement_times=(
+#                self.ExperimentalMeasurementTimes
+#            ),             
+#model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.TrueOpList,
 #        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
 #        self.Updater._normalization_record = self._normalization_record
  
@@ -587,6 +597,9 @@ class modelClassForRemoteBayesFactor():
         self.TrueParams = qmd_info['true_params']
         self.TrueOpName  = qmd_info['true_name']
         self.UseExpCustom = qmd_info['use_exp_custom']
+        self.UseExperimentalData = qmd_info['use_experimental_data']
+        self.ExperimentalMeasurements = qmd_info['experimental_measurements']
+        self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
 
         self.log_file = log_file
         self.Q_id = qid
@@ -609,6 +622,11 @@ class modelClassForRemoteBayesFactor():
         self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList,
             modelparams=self.SimParams_Final, true_oplist = self.TrueOpList,
             trueparams = self.TrueParams, truename=self.TrueOpName,
+            use_experimental_data = self.UseExperimentalData,
+            experimental_measurements = self.ExperimentalMeasurements,
+            experimental_measurement_times=(
+                self.ExperimentalMeasurementTimes
+            ),             
             model_name=self.Name, num_probes = self.NumProbes, 
             probe_dict=self.ProbeDict, log_file=self.log_file,
             log_identifier=log_identifier

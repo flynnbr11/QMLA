@@ -47,7 +47,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     def __init__(self, oplist, modelparams, probecounter=None, 
         true_oplist = None, truename=None, num_probes=40, probe_dict=None, 
         trueparams = None, probelist = None, min_freq=0, solver='scipy', 
-        trotter=False, qle=True, use_exp_custom=True, exp_comparison_tol=None,
+        use_experimental_data = False, experimental_measurements = None,
+        experimental_measurement_times=None,trotter=False, qle=True,
+        use_exp_custom=True, exp_comparison_tol=None,
         enable_sparse=True, model_name=None, log_file='QMDLog.log',
         log_identifier=None
     ):
@@ -65,6 +67,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._trueparams = trueparams
         self._truename = truename
         self._true_dim = DataBase.get_num_qubits(self._truename)
+        self.use_experimental_data = use_experimental_data
+        self.experimental_measurements = experimental_measurements
+        self.experimental_measurement_times = experimental_measurement_times
         self.use_exp_custom = use_exp_custom
         self.enable_sparse = enable_sparse
         self.exp_comparison_tol = exp_comparison_tol  
