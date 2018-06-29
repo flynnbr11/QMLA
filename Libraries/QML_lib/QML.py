@@ -45,14 +45,21 @@ def time_seconds():
 class ModelLearningClass():
     """
     Class to learn individual model. Model name is given when initialised. 
-    A host_name and port_number are given to InitialiseNewModel. The qmd_info dict from Redis is pulled and pickled to find the true model and other QMD parameters needed. 
-    A GenSimModel is set which details the SMCUpdater used to update the posterior distribution. 
+    A host_name and port_number are given to InitialiseNewModel. 
+    The qmd_info dict from Redis is pulled and pickled to find
+    the true model and other QMD parameters needed. 
+    A GenSimModel is set which details the SMCUpdater
+    used to update the posterior distribution. 
     UpdateModel calls the updater in a loop of n_experiments. 
-    The final parameter estimates are set as the mean of the posterior distribution after n_experiments wherein n_particles are sampled per experiment (set in qmd_info). 
+    The final parameter estimates are set as the mean of the
+    posterior distribution after n_experiments wherein n_particles 
+    are sampled per experiment (set in qmd_info). 
     
     """
 
-    def __init__(self, name, num_probes=20, probe_dict=None, qid=0, log_file='QMD_log.log', modelID=0):
+    def __init__(self, name, num_probes=20, probe_dict=None, qid=0,
+        log_file='QMD_log.log', modelID=0
+    ):
         self.VolumeList = np.array([])  
         self.Name = name
         self.Dimension = DB.get_num_qubits(name)
@@ -75,7 +82,13 @@ class ModelLearningClass():
 
 
     
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist, simparams, simopnames, numparticles, modelID, resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,gaussian=True, use_exp_custom=True, enable_sparse=True, debug_directory=None, qle=True, host_name='localhost', port_number=6379, qid=0, log_file='QMD_log.log'):
+    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist,
+        simparams, simopnames, numparticles, modelID, resample_thresh=0.5,
+        resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,
+        gaussian=True, use_exp_custom=True, enable_sparse=True,
+        debug_directory=None, qle=True, host_name='localhost', 
+        port_number=6379, qid=0, log_file='QMD_log.log'
+    ):
        
         self.log_print(["QID=", qid])
         
@@ -128,12 +141,26 @@ class ModelLearningClass():
 	  
         log_identifier=str("QML "+str(self.ModelID))
 
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, num_probes = self.NumProbes, probe_dict=self.ProbeDict, probecounter = 0, solver='scipy', trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom, exp_comparison_tol = self.ExpComparisonTol, enable_sparse=self.EnableSparse, model_name=self.Name, log_file=self.log_file, log_identifier=log_identifier)    # probelist=self.TrueOpList,,
+        self.GenSimModel = gsi.GenSimQMD_IQLE(
+            oplist=self.SimOpList, modelparams=self.SimParams, 
+            true_oplist=self.TrueOpList, trueparams=self.TrueParams,
+            truename=self.TrueOpName, num_probes=self.NumProbes,
+            probe_dict=self.ProbeDict, probecounter=0, solver='scipy',
+            trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom,
+            exp_comparison_tol = self.ExpComparisonTol,
+            enable_sparse=self.EnableSparse, model_name=self.Name,
+            log_file=self.log_file, log_identifier=log_identifier
+        ) 
 
+        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles,
+            self.Prior, resample_thresh=self.ResamplerThresh , 
+            resampler=qi.LiuWestResampler(a=self.ResamplerA),
+            debug_resampling=False
+        )
 
-        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
-
-        self.Inv_Field = [item[0] for item in self.GenSimModel.expparams_dtype[1:] ]
+        self.Inv_Field = [
+            item[0] for item in self.GenSimModel.expparams_dtype[1:] 
+        ]
         self.Heuristic = mpgh.multiPGH(self.Updater, inv_field=self.Inv_Field)
         
         if checkloss == True or self.checkQLoss==True:     
@@ -150,7 +177,9 @@ class ModelLearningClass():
         self.log_print(['Initialization Ready'])
         
 
-    def UpdateModel(self, n_experiments, sigma_threshold=10**-13,checkloss=True):
+    def UpdateModel(self, n_experiments, sigma_threshold=10**-13,
+        checkloss=True
+    ):
         self.NumExperiments = n_experiments
         if self.checkQLoss == True: 
             self.QLosses = np.empty(n_experiments)
@@ -158,7 +187,9 @@ class ModelLearningClass():
         self.TrackEval = []
         self.TrackTime =np.empty(n_experiments)#only for debugging
     
-        self.Particles = np.empty([self.NumParticles, len(self.SimParams[0]), self.NumExperiments])
+        self.Particles = np.empty([self.NumParticles, 
+            len(self.SimParams[0]), self.NumExperiments]
+        )
         self.Weights = np.empty([self.NumParticles, self.NumExperiments])
         self.Experiment = self.Heuristic()    
         self.SigmaThresh = sigma_threshold   #This is the value of the Norm of the COvariance matrix which stops the IQLE 
@@ -176,14 +207,18 @@ class ModelLearningClass():
             print_loc(global_print_loc)
             if istep == 0:
                 print_loc(global_print_loc)
-                self.log_print(['Initial time selected > ', str(self.Experiment[0][0])])
+                self.log_print(['Initial time selected > ',
+                    str(self.Experiment[0][0])]
+                )
             
             
             self.TrackTime[istep] = self.Experiment[0][0]
             true_params = np.array([[self.TrueParams[0]]])
             
             before_datum = time.time()
-            self.Datum = self.GenSimModel.simulate_experiment(self.SimParams, self.Experiment, repeat=10) # todo reconsider repeat number
+            self.Datum = self.GenSimModel.simulate_experiment(self.SimParams,
+                self.Experiment, repeat=10
+            ) # todo reconsider repeat number
 #            self.Datum = self.GenSimModel.simulate_experiment(true_params, self.Experiment, repeat=1) # todo reconsider repeat number
             after_datum = time.time()
             self.datum_gather_cumulative_time+=after_datum-before_datum
@@ -204,12 +239,16 @@ class ModelLearningClass():
             else:
                 print_loc(global_print_loc)
                 covmat = self.Updater.est_covariance_mtx()
-                self.VolumeList = np.append(self.VolumeList,  np.linalg.det( sp.linalg.sqrtm(covmat) )    )
+                self.VolumeList = np.append(self.VolumeList,  
+                    np.linalg.det( sp.linalg.sqrtm(covmat) )
+                )
                 print_loc(global_print_loc)
             
             self.TrackEval.append(self.Updater.est_mean())
             print_loc(global_print_loc)
-            self.Covars[istep] = np.linalg.norm(self.Updater.est_covariance_mtx())
+            self.Covars[istep] = np.linalg.norm(
+                self.Updater.est_covariance_mtx()
+            )
             print_loc(global_print_loc)
             self.Particles[:, :, istep] = self.Updater.particle_locations
             self.Weights[:, istep] = self.Updater.particle_weights
@@ -221,12 +260,23 @@ class ModelLearningClass():
                 if False: # can be reinstated to stop learning when volume converges
                     if self.debugSave: 
                         self.debug_store()
-                    self.log_print(['Final time selected > ', str(self.Experiment[0][0])])
-                    print('Exiting learning for Reaching Num. Prec. -  Iteration Number ' + str(istep))
+                    self.log_print(['Final time selected > ',
+                        str(self.Experiment[0][0])]
+                    )
+                    print('Exiting learning for Reaching Num. Prec. \
+                         -  Iteration Number ' + str(istep)
+                    )
                     for iterator in range(len(self.FinalParams)):
-                        self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep]), np.std(self.Particles[:,iterator,istep])]
-                        print('Final Parameters mean and stdev:'+str(self.FinalParams[iterator])) 
-                    self.LogTotLikelihood=self.Updater.log_total_likelihood                
+                        self.FinalParams[iterator]= [
+                            np.mean(self.Particles[:,iterator,istep]), 
+                            np.std(self.Particles[:,iterator,istep])
+                        ]
+                        print('Final Parameters mean and stdev:'+
+                            str(self.FinalParams[iterator])
+                        ) 
+                    self.LogTotLikelihood=(
+                        self.Updater.log_total_likelihood                
+                    )
                     self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
                     self.Covars=(np.resize(self.Covars, (1,istep)))[0]
                     self.Particles = self.Particles[:, :, 0:istep]
@@ -237,12 +287,21 @@ class ModelLearningClass():
             if self.Covars[istep]<self.SigmaThresh and False: #  can be reinstated to stop learning when volume converges
                 if self.debugSave: 
                     self.debug_store()
-                self.log_print(['Final time selected > ', str(self.Experiment[0][0])])
-                self.log_print(['Exiting learning for Reaching Cov. Norm. Thrshold of ', str(self.Covars[istep])])
+                self.log_print(['Final time selected > ',
+                    str(self.Experiment[0][0])]
+                )
+                self.log_print(['Exiting learning for Reaching Cov. \
+                    Norm. Thrshold of ', str(self.Covars[istep])]
+                )
                 self.log_print([' at Iteration Number ' , str(istep)]) 
                 for iterator in range(len(self.FinalParams)):
-                    self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep]), np.std(self.Particles[:,iterator,istep])]
-                    self.log_print(['Final Parameters mean and stdev:',str(self.FinalParams[iterator])])
+                    self.FinalParams[iterator]= [np.mean(
+                        self.Particles[:,iterator,istep]), 
+                        np.std(self.Particles[:,iterator,istep])
+                    ]
+                    self.log_print(['Final Parameters mean and stdev:',
+                        str(self.FinalParams[iterator])]
+                    )
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
                 if checkloss == True: 
                     self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
@@ -256,35 +315,57 @@ class ModelLearningClass():
             
             if istep == self.NumExperiments-1:
                 self.log_print(["Results for QHL on ", self.Name])
-                self.log_print(['Final time selected > ' , str(self.Experiment[0][0])])
+                self.log_print(['Final time selected >',
+                    str(self.Experiment[0][0])]
+                )
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
                 #from pympler import asizeof
-                self.log_print(['Cumulative time.\t Datum:', self.datum_gather_cumulative_time, '\t Update:', self.update_cumulative_time])
+                self.log_print(['Cumulative time.\t Datum:',
+                    self.datum_gather_cumulative_time, '\t Update:',
+                    self.update_cumulative_time]
+                )
         
                 #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.Updater), '\t GenSim:', asizeof.asizeof(self.GenSimModel) ])
                 if self.debugSave: 
                     self.debug_store()
         
                 for iterator in range(len(self.FinalParams)):
-                    self.FinalParams[iterator]= [np.mean(self.Particles[:,iterator,istep-1]), np.std(self.Particles[:,iterator,istep-1])]
-                    self.log_print(['Final Parameters mean and stdev (term ', self.SimOpsNames[iterator] , '):',str(self.FinalParams[iterator])])
+                    self.FinalParams[iterator]= [
+                        np.mean(self.Particles[:,iterator,istep-1]), 
+                        np.std(self.Particles[:,iterator,istep-1])
+                    ]
+                    self.log_print([
+                        'Final Parameters mean and stdev (term ',
+                        self.SimOpsNames[iterator] , '):',
+                        str(self.FinalParams[iterator])]
+                    )
 
             if debug_print:
                 self.log_print(["step ", istep])
-                self.log_print( [" has params: ", self.NewEval])
-                self.log_print([" log tot like  : ", self.TrackLogTotLikelihood[-1]])
+                self.log_print( ["has params: ", self.NewEval])
+                self.log_print(["log total likelihood:",
+                    self.TrackLogTotLikelihood[-1]]
+                )
 
 
     def resetPrior(self):
         self.Updater.prior = self.Prior
-        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
-        self.Heuristic = mpgh.multiPGH(self.Updater, self.SimOpList, inv_field=self.Inv_Field)
+        self.Updater = qi.SMCUpdater(self.GenSimModel,
+            self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh,
+            resampler = qi.LiuWestResampler(a=self.ResamplerA),
+            debug_resampling=False
+        )
+        self.Heuristic = mpgh.multiPGH(self.Updater, 
+            self.SimOpList, inv_field=self.Inv_Field
+        )
         return 1
         
         
     def learned_info_dict(self):
         """
-        Place essential information after learning has occured into a dict. This can be used to recreate the model on another node. 
+        Place essential information after learning has occured into a dict. 
+        This can be used to recreate the model on another node. 
+        
         """
         learned_info = {}
         learned_info['times'] = self.TrackTime
@@ -306,7 +387,9 @@ class ModelLearningClass():
         
         mytpool = np.setdiff1d(tpool, self.TrackTime[-stepnum-1:-1])
         
-        self.TrackLogTotLikelihood = np.append(self.TrackLogTotLikelihood, LogL_UpdateCalc(self, tpool))
+        self.TrackLogTotLikelihood = np.append(
+            self.TrackLogTotLikelihood, LogL_UpdateCalc(self, tpool)
+        )
 
 
     def addBayesFactor(self, compared_with, bayes_factor):
@@ -322,7 +405,9 @@ class ModelLearningClass():
         elif self.debugDirectory is not None: 
             save_dir = self.debugDirectory
         else: 
-            self.log_print(["Need to pass debug_dir to QML.debug_save function"])
+            self.log_print([
+                "Need to pass debug_dir to QML.debug_save function"]
+            )
             return False            
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)            
@@ -373,7 +458,11 @@ class reducedModel():
     
     Then initialises an updater and GenSimModel which are used for updates. 
     """
-    def __init__(self, model_name, sim_oplist, true_oplist, true_params, numparticles, modelID, resample_thresh=0.5, resample_a=0.9, qle=True, probe_dict= None, qid=0, host_name='localhost', port_number=6379, log_file='QMD_log.log'):
+    def __init__(self, model_name, sim_oplist, true_oplist, true_params,
+        numparticles, modelID, resample_thresh=0.5, resample_a=0.9, qle=True,
+        probe_dict= None, qid=0, host_name='localhost', port_number=6379,
+        log_file='QMD_log.log'
+    ):
 
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db'] 
@@ -404,7 +493,9 @@ class reducedModel():
         self.log_file = log_file
         
     def log_print(self, to_print_list):
-        identifier = str(str(time_seconds()) +" [QML:Reduced "+ str(self.ModelID) +"; QMD "+str(self.Q_id)+"]")
+        identifier = str(str(time_seconds()) +
+            "[QML:Reduced "+ str(self.ModelID) +"; QMD "+str(self.Q_id)+"]"
+        )
         if type(to_print_list)!=list:
             to_print_list = list(to_print_list)
 
@@ -417,7 +508,9 @@ class reducedModel():
         
     def updateLearnedValues(self, learned_info=None):
         """
-        Pass a dict, learned_info, with essential info on reconstructing the state of the model, updater and GenSimModel
+        Pass a dict, learned_info, with essential info on 
+        reconstructing the state of the model, updater and GenSimModel
+        
         """
 
         rds_dbs = rds.databases_from_qmd_id(self.HostName, self.PortNumber, self.Q_id)
@@ -473,9 +566,13 @@ class modelClassForRemoteBayesFactor():
         model_id_float = float(modelID)
         model_id_str = str(model_id_float)
         try:
-            learned_model_info = pickle.loads(learned_models_info.get(model_id_str), encoding='latin1')        
+            learned_model_info = pickle.loads(
+                learned_models_info.get(model_id_str), encoding='latin1'
+            )        
         except:
-            learned_model_info = pickle.loads(learned_models_info.get(model_id_str))        
+            learned_model_info = pickle.loads(
+                learned_models_info.get(model_id_str)
+            )        
 
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 
@@ -509,10 +606,19 @@ class modelClassForRemoteBayesFactor():
         log_identifier = str("Bayes "+str(self.ModelID)) 
         
                 
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName, model_name=self.Name, num_probes = self.NumProbes, probe_dict = self.ProbeDict, log_file=self.log_file, log_identifier=log_identifier)    
+        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList,
+            modelparams=self.SimParams_Final, true_oplist = self.TrueOpList,
+            trueparams = self.TrueParams, truename=self.TrueOpName,
+            model_name=self.Name, num_probes = self.NumProbes, 
+            probe_dict=self.ProbeDict, log_file=self.log_file,
+            log_identifier=log_identifier
+        )    
 
-        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False)
-        
+        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles,
+            self.Prior, resample_thresh=self.ResamplerThresh , 
+            resampler=qi.LiuWestResampler(a=self.ResamplerA), 
+            debug_resampling=False
+        )
         
         #self.GenSimModel = pickle.loads(learned_model_info['gen_sim_model'])
         #self.Updater = pickle.loads(learned_model_info['updater'])
@@ -522,7 +628,9 @@ class modelClassForRemoteBayesFactor():
         # could pickle updaters to a redis db for updaters, but first construct these model classes each time a BF is to be computed. 
 
     def log_print(self, to_print_list):
-        identifier = str(str(time_seconds()) +" [QML:Bayes "+ str(self.ModelID) +"; QMD "+str(self.Q_id)+"]")
+        identifier = str(str(time_seconds()) +
+            "[QML:Bayes "+ str(self.ModelID) +"; QMD "+str(self.Q_id)+"]"
+        )
         if type(to_print_list)!=list:
             to_print_list = list(to_print_list)
 

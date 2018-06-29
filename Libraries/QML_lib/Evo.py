@@ -265,7 +265,10 @@ def expectation_value(ham, t, state=None, choose_random_probe=False,
 
 
  
-def evolved_state(ham, t, state, use_exp_custom=True, enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=10, log_file=None, log_identifier=None):
+def evolved_state(ham, t, state, use_exp_custom=True, 
+    enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=10, log_file=None,
+    log_identifier=None
+):
     #import hamiltonian_exponentiation as h
     from scipy import linalg
     print_loc(global_print_loc)
@@ -350,7 +353,10 @@ def outer_product(state, as_qutip_object=False):
  
 #import qutip as qt
  
-def iqle_evolve(ham, ham_minus, t, probe, trotterize=True, use_exp_custom=True, enable_sparse=True, log_file='QMDLog.log', log_identifier=None):
+def iqle_evolve(ham, ham_minus, t, probe, 
+    trotterize=True, use_exp_custom=True, enable_sparse=True, 
+    log_file='QMDLog.log', log_identifier=None
+):
     print_loc(global_print_loc)
     ham_dim = int(np.log2(np.shape(ham)[0])) 
     ham_minus_dim = int(np.log2(np.shape(ham_minus)[0]))
@@ -360,15 +366,16 @@ def iqle_evolve(ham, ham_minus, t, probe, trotterize=True, use_exp_custom=True, 
         if ham_dim == ham_minus_dim: 
             H = ham_minus - ham ##reversed because exp_ham function calculated e^{-iHt}
             print_loc(global_print_loc)
-            expec_value = expectation_value(H, t, state=probe, use_exp_custom=use_exp_custom, enable_sparse=enable_sparse)
-            #print("expectation value : ", expec_value) 
-            #print("expected value = ", reversed_evolved_probe)
-            #print("expectation value: ", reversed_evolved_probe)
+            expec_value = expectation_value(H, t, state=probe,
+                use_exp_custom=use_exp_custom, enable_sparse=enable_sparse
+            )
             print_loc(global_print_loc)
             return expec_value
  
         elif ham_dim > ham_minus_dim:
-            log_print([" Dimensions don't match; IQLE not applicable"], log_file=log_file, log_identifier=log_identifier)
+            log_print([" Dimensions don't match; IQLE not applicable"],
+                log_file=log_file, log_identifier=log_identifier
+            )
             return 0.5
             """
             dim = true_dim
@@ -393,9 +400,14 @@ def iqle_evolve(ham, ham_minus, t, probe, trotterize=True, use_exp_custom=True, 
             return expected_value
             """
         else: 
-            log_print(["giving expectation value = 0.5 because simulated system is bigger than true system."], log_file=log_file, log_identifier=log_identifier)
+            log_print(["giving expectation value = 0.5 because simulated \
+                system is bigger than true system."], log_file=log_file,
+                log_identifier=log_identifier
+            )
             return 0.5
     else: 
-        log_print(["Implement trotterization in IQLE evolve function (Evo.py)"], log_file=log_file, log_identifier=log_identifier)
+        log_print(["Implement trotterization in IQLE evolve function (Evo.py)"],
+            log_file=log_file, log_identifier=log_identifier
+        )
  
  
