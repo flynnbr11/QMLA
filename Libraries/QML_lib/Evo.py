@@ -134,7 +134,7 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe,
                 log_print(["[QLE] Negative probability : \t \t probability = ", 
                     output[evoId][tId]], log_file, log_identifier
                 )
-            elif output[evoId][tId] > 1.001: ## todo some times getting p=1.0 show up
+            elif output[evoId][tId] > 1.001: 
                 log_print(["[QLE] Probability > 1: \t \t probability = ", 
                     output[evoId][tId]], log_file, log_identifier
                 )

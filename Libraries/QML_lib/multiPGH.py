@@ -3,7 +3,6 @@ import numpy as np
 import scipy as sp
 
 from Evo import *
-#from Norms import *
 
 def singvalnorm(matrix):
     return np.real(max(np.sqrt(np.linalg.eig(np.dot(
