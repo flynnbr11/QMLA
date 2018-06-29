@@ -26,7 +26,8 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     :param np.array oplist:  
     using the interactive QLE model proposed by [WGFC13a]_.
     
-    :param np.array oplist: Set of operators whose sum defines the evolution Hamiltonian
+    :param np.array oplist: Set of operators whose sum 
+    defines the evolution Hamiltonian
 
     :param float min_freq: Minimum value for :math:`\omega` to accept as valid.
         This is used for testing techniques that mitigate the effects of
@@ -36,7 +37,8 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     :param str solver: Which solver to use for the Hamiltonian simulation.
         'scipy' invokes matrix exponentiation (i.e. time-independent evolution)
         -> fast, accurate when applicable
-        'qutip' invokes ODE solver (i.e. time-dependent evolution can be also managed approx.)
+        'qutip' invokes ODE solver (i.e. time-dependent evolution can 
+        be also managed approx.)
         -> not invoked by deafult
     """
     
@@ -49,7 +51,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         enable_sparse=True, model_name=None, log_file='QMDLog.log',
         log_identifier=None
     ):
-        self._solver = solver #This is the solver used for time evolution scipy is faster, QuTip can handle implicit time dependent likelihoods
+        self._solver = solver 
+        # This is the solver used for time evolution scipy is faster
+        # QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
         self._probecounter = probecounter
         self._a = 0
@@ -87,7 +91,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         super(GenSimQMD_IQLE, self).__init__(self._oplist)
         self.NumProbes = num_probes
         if probe_dict is None: 
-            self._probelist = seperable_probe_dict(max_num_qubits=12, num_probes = self.NumProbes) # TODO -- make same as number of qubits in model.
+            self._probelist = seperable_probe_dict(max_num_qubits=12, 
+                num_probes = self.NumProbes
+            ) # TODO -- make same as number of qubits in model.
         else:
             self._probelist = probe_dict    
 
@@ -96,7 +102,8 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     def n_modelparams(self):
         return len(self._oplist)
 
-    # Modelparams is the list of parameters in the System Hamiltonian - the ones we want to know
+    # Modelparams is the list of parameters in the System Hamiltonian
+    # -- the ones we want to know
     # Possibly add a second axis to modelparams.    
     @property
     def modelparam_names(self):
@@ -163,7 +170,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             true_evo = True
             operators = self._true_oplist
             if true_dim > sim_dim: 
-                operators = DataBase.reduced_operators(self._truename, int(sim_dim))
+                operators = DataBase.reduced_operators(self._truename, 
+                    int(sim_dim)
+                )
             else:
                 operators = self._true_oplist
             params = [self._trueparams]
@@ -184,7 +193,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             else:
                 print("Either ideal_probe or ideal_probes must be given")
         else:
-            probe = self._probelist[(self._b % int(self.NumProbes)), ham_num_qubits]
+            probe = self._probelist[
+                (self._b % int(self.NumProbes)), ham_num_qubits
+            ]
         
         
         ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
@@ -212,7 +223,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             log_file=self.log_file, log_identifier=self.log_identifier
         )    
 
-        likelihood_array = qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
+        likelihood_array = (
+            qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
+        )
         return likelihood_array
 
 
@@ -249,6 +262,4 @@ def random_probe(num_qubits):
     if np.linalg.norm(probe) -1  > 1e-10:
         print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
     return probe
-
-
         

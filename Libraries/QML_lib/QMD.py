@@ -164,13 +164,17 @@ class QMD():
 
 
         self.write_log_file = open(self.log_file, 'a')
-        self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(self.GrowthGenerator, log_file=self.log_file)
+        self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(
+            self.GrowthGenerator, log_file=self.log_file
+        )
             
         try:
             from rq import Connection, Queue, Worker
             self.redis_conn = redis.Redis(host=self.HostName, port=self.PortNumber)
             test_workers=self.use_rq
-            self.rq_queue = Queue(self.Q_id, connection=self.redis_conn, async=test_workers, default_timeout=self.rq_timeout) # TODO is this timeout sufficient for ALL QMD jobs?
+            self.rq_queue = Queue(self.Q_id, connection=self.redis_conn,
+                async=test_workers, default_timeout=self.rq_timeout
+            ) # TODO is this timeout sufficient for ALL QMD jobs?
 
             parallel_enabled = True
         except:
@@ -180,7 +184,9 @@ class QMD():
         self.RunParallel = parallel and parallel_enabled
 
         self.log_print(["Retrieving databases from redis"])
-        self.RedisDataBases = rds.databases_from_qmd_id(self.HostName, self.PortNumber, self.Q_id)
+        self.RedisDataBases = rds.databases_from_qmd_id(self.HostName,
+            self.PortNumber, self.Q_id
+        )
         
         rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.
  
@@ -220,7 +226,9 @@ class QMD():
         qmd_info_db.set('ProbeDict', compressed_probe_dict)
 
         # Initialise database and lists.
-        self.log_print(["Running ", self.QLE_Type, " for true operator ", true_operator, " with parameters : ", self.TrueParamsList])
+        self.log_print(["Running ", self.QLE_Type, " for true operator ",
+            true_operator, " with parameters : ", self.TrueParamsList]
+        )
         self.initiateDB()
         
 
@@ -549,7 +557,9 @@ class QMD():
                 b=model_id_list[j]
                 if a!=b:
                     unique_id = DataBase.unique_model_pair_identifier(a,b)
-                    if (unique_id not in self.BayesFactorsComputed or recompute==True): #ie not yet considered
+                    if (unique_id not in self.BayesFactorsComputed
+                        or recompute==True
+                    ): #ie not yet considered
                         self.BayesFactorsComputed.append(unique_id)
                         self.remoteBayes(a,b, remote=remote, 
                             branchID=branchID, bayes_threshold=bayes_threshold
@@ -942,7 +952,9 @@ class QMD():
             self.log_print(["No distinct champion, recomputing bayes \
                 factors between : ", max_points_branches]
             )
-            champ_id = self.compareModelList(max_points_branches, bayes_threshold=1, models_points_dict=branch_champions_points)
+            champ_id = self.compareModelList(max_points_branches, 
+                bayes_threshold=1, models_points_dict=branch_champions_points
+            )
         else: 
             champ_id = max(branch_champions_points, key=branch_champions_points.get)
         champ_name = DataBase.model_name_from_id(self.db, champ_id)
@@ -980,7 +992,9 @@ class QMD():
                 self.log_print(["branch ID : ", branchID])
                 warnings.warn("branch not in database.")
                 return False
-            points_by_branches[i], champions_of_branches[i] = self.compareModelsWithinBranch(branchID)
+            points_by_branches[i], champions_of_branches[i] = (
+                self.compareModelsWithinBranch(branchID)
+            )
 
         self.remoteBayesFromIDList(model_id_list=champions_of_branches, 
             remote=True, recompute=True, wait_on_result=True,
@@ -1221,24 +1235,32 @@ class QMD():
                 self.reducedModelInstanceFromID(i).BayesFactors
             )
 
-        self.ChampionFinalParams = self.reducedModelInstanceFromID(self.ChampID).FinalParams
+        self.ChampionFinalParams = (
+            self.reducedModelInstanceFromID(self.ChampID).FinalParams
+        )
 
         champ_op = DataBase.operator(self.ChampionName)        
         num_params_champ_model = champ_op.num_constituents
         
         correct_model = misfit = underfit = overfit = 0
-        self.log_print(["Num params - champ:", num_params_champ_model,"; \t true:", self.TrueOpNumParams])
+        self.log_print(["Num params - champ:", 
+            num_params_champ_model,"; \t true:", self.TrueOpNumParams]
+        )
 
         if DataBase.alph(self.ChampionName) == DataBase.alph(self.TrueOpName):
             correct_model = 1
-        elif num_params_champ_model ==  self.TrueOpNumParams and DataBase.alph(self.ChampionName) != DataBase.alph(self.TrueOpName):
+        elif ( num_params_champ_model ==  self.TrueOpNumParams and
+            DataBase.alph(self.ChampionName) != DataBase.alph(self.TrueOpName)
+        ):
             misfit = 1
         elif num_params_champ_model > self.TrueOpNumParams: 
             overfit = 1
         elif num_params_champ_model < self.TrueOpNumParams: 
             underfit=1
         
-        num_exp_ham = self.NumParticles * (self.NumExperiments + self.NumTimesForBayesUpdates)
+        num_exp_ham = (
+            self.NumParticles * (self.NumExperiments + self.NumTimesForBayesUpdates)
+        )
 
         config = str( 'config' + 
             '_p'+str(self.NumParticles) +
@@ -1407,7 +1429,9 @@ class QMD():
         PlotQMD.updateAllBayesCSV(self, bayes_csv)
 
     def plotHintonAllModels(self, save_to_file=None):
-        PlotQMD.plotHinton(model_names=self.ModelNameIDs, bayes_factors=self.AllBayesFactors, save_to_file=save_to_file)
+        PlotQMD.plotHinton(model_names=self.ModelNameIDs,
+            bayes_factors=self.AllBayesFactors, save_to_file=save_to_file
+        )
 
 
     def plotHintonListModels(self, model_list, save_to_file=None):
@@ -1518,11 +1542,18 @@ def separable_probe_dict(max_num_qubits, num_probes):
             if j==1:
                 seperable_probes[i,j] = seperable_probes[i,0]
             else: 
-                seperable_probes[i,j] = np.tensordot(seperable_probes[i,j-1], random_probe(1), axes=0).flatten(order='c')
-            while np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]), atol=1e-14) is  False:
+                seperable_probes[i,j] = (np.tensordot(seperable_probes[i,j-1],
+                    random_probe(1), axes=0).flatten(order='c')
+                )
+            while (np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]), 
+                atol=1e-14) is  False
+            ):
                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
                 # keep replacing until a unit-norm 
-                seperable_probes[i,j] = np.tensordot(seperable_probes[i,j-1], random_probe(1), axes=0).flatten(order='c')
+                seperable_probes[i,j] = (
+                    np.tensordot(seperable_probes[i,j-1], random_probe(1),
+                    axes=0).flatten(order='c')
+                )
     return seperable_probes
 
 def random_probe(num_qubits):
