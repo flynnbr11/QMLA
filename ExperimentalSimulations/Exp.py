@@ -78,7 +78,7 @@ experimental_measurements_dict = expdt.experimentalMeasurementDict(
 #print("experimental measurements:", experimental_measurements_dict)
 
 #print("exp probes:", experimental_probe_dict)
-use_experimental_measurements = True
+use_experimental_measurements = False
 
 
 initial_op_list = ['xTi', 'yTi', 'zTi']

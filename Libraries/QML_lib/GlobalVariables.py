@@ -101,7 +101,8 @@ class GlobalVariablesClass():
         self.qmd_id = qmd_id
         self.host_name = host_name
         self.port_number = port_number
-        self.results_directory = 'Results/'+results_directory
+#        self.results_directory = 'Results/'+results_directory
+        self.results_directory = results_directory
         self.rq_timeout = rq_timeout
         self.log_file = log_file
         self.save_plots = save_plots
