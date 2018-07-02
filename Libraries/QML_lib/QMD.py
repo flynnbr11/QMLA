@@ -45,10 +45,13 @@ def time_seconds():
 class QMD():
     """
     - This class manages quantum model development. 
-    - This is done by controlling a pandas database, sending model specifications
-        to remote actors (via RQ) to compute QHL, and also Bayes factors, generating 
+    - This is done by controlling a pandas database, 
+        sending model specifications
+        to remote actors (via RQ) to compute QHL, 
+        and also Bayes factors, generating 
         a next set of models iteratively. 
-    - This is done in a tree like growth mechanism where new branches consist of 
+    - This is done in a tree like growth mechanism where
+        new branches consist of 
         models generated considering previously determined "good" models. 
     - Model generation rules are given in ModelGeneration. 
     - Database control is given in DataBase. 
@@ -1199,8 +1202,8 @@ class QMD():
 
             if max_spawn_depth_reached:
                 self.log_print(["Max spawn depth reached; determining winner. \
-                    Entering while loop until all models/Bayes factors remaining \
-                    have finished."]
+                    Entering while loop until all models/Bayes factors \
+                    remaining have finished."]
                 )
                 still_learning = True
 
@@ -1209,9 +1212,11 @@ class QMD():
                     branch_ids_on_db.remove(b'LOCKED')
                     for branchID_bytes in branch_ids_on_db:
                         branchID = int(branchID_bytes)
-                        if ( int(active_branches_learning_models.get(branchID)) == \
-                            self.NumModelsPerBranch[branchID] and
-                            self.BranchAllModelsLearned[branchID]==False
+                        if ( 
+                            (int(active_branches_learning_models.get(branchID)) == 
+                            self.NumModelsPerBranch[branchID]) 
+                            and 
+                            (self.BranchAllModelsLearned[branchID]==False)
                         ):
                             self.BranchAllModelsLearned[branchID] = True
                             self.remoteBayesFromBranchID(branchID)
@@ -1473,8 +1478,8 @@ class QMD():
             bayes_factors=bayes_factors, save_to_file=save_to_file
         )
         
-    def plotExpecValues(self, model_ids=None, champ=True, max_time=10,
-        t_interval=0.1, save_to_file=None
+    def plotExpecValues(self, model_ids=None, champ=True, max_time=1e6,
+        t_interval=50000, save_to_file=None
     ):
         PlotQMD.ExpectationValuesTrueSim(qmd=self, model_ids=model_ids, 
             champ=champ, max_time=max_time, t_interval=t_interval,

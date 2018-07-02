@@ -95,7 +95,7 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
     sim_colours = ['g', 'c', 'm', 'y', 'k']
 
     plt.clf()
-    plt.xlabel('Time')
+    plt.xlabel('Time (microseconds)')
     plt.ylabel('Expectation Value')
 
     true = qmd.TrueOpName
@@ -105,7 +105,9 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
     true_ham = np.tensordot(true_params, true_ops, axes=1)
     true_dim = true_op.num_qubits
     true_probe = qmd.ProbeDict[(probe_id,true_dim)]
-    true_expec_values = [evo.expectation_value(ham=true_ham, t=t, state=true_probe) for t in times]
+    true_expec_values = [evo.expectation_value(ham=true_ham, t=t, 
+        state=true_probe) for t in times
+    ]
     plt.scatter(times, true_expec_values, label='True Expectation Value',
         marker='x', color = true_colour
     )

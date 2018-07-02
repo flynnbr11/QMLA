@@ -166,14 +166,10 @@ if global_variables.save_plots:
         'volumes_branch_champs_'+ str(global_variables.long_id)+
         '.png')
     )
-    bayes = str(
-        global_variables.results_directory+ 
-        'bayes_factors_'+ str(global_variables.long_id)+'.csv'
-    )
-   
-    print("Bayes: ", bayes)
     
-    qmd.saveBayesCSV(save_to_file=bayes,
+    qmd.saveBayesCSV(save_to_file=str(
+        global_variables.results_directory+ 
+        'bayes_factors_'+ str(global_variables.long_id)+'.csv'),
         names_ids='latex'
     )
     
