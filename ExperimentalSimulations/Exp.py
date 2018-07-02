@@ -75,6 +75,7 @@ experimental_measurements_dict = expdt.experimentalMeasurementDict(
 )
 
 for k in list(experimental_measurements_dict.keys()):
+    # Convert nanoseconds in exp data to milliseconds
     t_new = k/1000
     experimental_measurements_dict[t_new] = experimental_measurements_dict.pop(k)
 
@@ -83,7 +84,7 @@ for k in list(experimental_measurements_dict.keys()):
 #print("experimental measurements:", experimental_measurements_dict)
 
 #print("exp probes:", experimental_probe_dict)
-use_experimental_measurements = False
+use_experimental_measurements = True
 
 
 initial_op_list = ['xTi', 'yTi', 'zTi']
