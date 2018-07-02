@@ -74,6 +74,11 @@ experimental_measurements_dict = expdt.experimentalMeasurementDict(
     directory="NV05_HahnPeaks_expdataset"
 )
 
+for k in list(experimental_measurements_dict.keys()):
+    t_new = k/1000
+    experimental_measurements_dict[t_new] = experimental_measurements_dict.pop(k)
+
+
 
 #print("experimental measurements:", experimental_measurements_dict)
 
@@ -160,10 +165,14 @@ if global_variables.save_plots:
         'volumes_branch_champs_'+ str(global_variables.long_id)+
         '.png')
     )
-    
-    qmd.saveBayesCSV(save_to_file=str(
+    bayes = str(
         global_variables.results_directory+ 
-       'bayes_factors_'+ str(global_variables.long_id)+'.csv'),
+        'bayes_factors_'+ str(global_variables.long_id)+'.csv'
+    )
+   
+    print("Bayes: ", bayes)
+    
+    qmd.saveBayesCSV(save_to_file=bayes,
         names_ids='latex'
     )
     
