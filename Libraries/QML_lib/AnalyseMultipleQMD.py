@@ -21,7 +21,6 @@ def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
             pickled_files.append(file)
 
     filenames = [directory_name+str(f) for f in pickled_files ]
-    print("Filenames:", filenames)
     some_results = pickle.load(open(filenames[0], "rb"))
     result_fields = list(some_results.keys())
     

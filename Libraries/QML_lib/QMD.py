@@ -1240,10 +1240,8 @@ class QMD():
                     ):    
                             still_learning = False # i.e. break out of this while loop
 
-
         ### Final functions at end of QMD
         final_winner, final_branch_winners = self.finalBayesComparisons()        
-        
 
         self.ChampionName = final_winner
         self.ChampID = self.pullField(name=final_winner, field='ModelID')

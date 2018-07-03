@@ -3,8 +3,9 @@ import numpy as np
 import scipy as sp
 import os 
 import time
+import qinfer as qi
 import Evo as evo
-from Distrib import *
+import Distrib as Distributions
 import GenSimQMD_IQLE as gsi
 import ExperimentalDataFunctions as expdt
 import multiPGH as mpgh
@@ -92,12 +93,10 @@ class ModelLearningClass():
     ):
        
         self.log_print(["QID=", qid])
-        
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db'] 
         init_model_print_loc = False
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
-
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.NumParticles = qmd_info['num_particles']
         self.NumProbes = qmd_info['num_probes']
@@ -129,22 +128,32 @@ class ModelLearningClass():
         else:            
             self.debugSave = False
         num_params = len(self.SimOpList)
-
         if gaussian:
+            # Use a normal distribution
             self.log_print(["Normal distribution generated"])
             means = self.TrueParams[0:num_params]
             if num_params > len(self.TrueParams):
                 for i in range(len(self.TrueParams), num_params):
                     means.append(self.TrueParams[i%len(self.TrueParams)])
-            self.Prior = MultiVariateNormalDistributionNocov(num_params)
-
-
+#            self.Prior = Distributions.MultiVariateNormalDistributionNocov(num_params)
+            self.Prior = Distributions.normal_distribution_ising(
+                term = self.Name,
+                specific_terms = {
+                    'xTy' : [0.0,0.0001],
+                    'xTz' : [0.0,0.0001],
+                    'yTz' : [0.0,0.0001]
+                }
+            )
         else:
             self.log_print(["Uniform distribution generated"])
-            self.Prior = MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the simulator
+ 
+            self.Prior = Distributions.uniform_distribution_ising(
+                term = self.Name
+            )
+    
+#            self.Prior = Distributions.MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the simulator
 	  
         log_identifier=str("QML "+str(self.ModelID))
-
         self.GenSimModel = gsi.GenSimQMD_IQLE(
             oplist=self.SimOpList, modelparams=self.SimParams, 
             true_oplist=self.TrueOpList, trueparams=self.TrueParams,
@@ -180,9 +189,7 @@ class ModelLearningClass():
         self.ExperimentsHistory = np.array([])
         self.FinalParams = np.empty([len(self.SimOpList),2]) #average and standard deviation at the final step of the parameters inferred distributions
         print_loc(print_location=init_model_print_loc)
-
         self.log_print(['Initialization Ready'])
-        
 
     def UpdateModel(self, n_experiments, sigma_threshold=10**-13,
         checkloss=True
@@ -205,7 +212,6 @@ class ModelLearningClass():
         self.datum_gather_cumulative_time = 0
         self.update_cumulative_time = 0
         
-        
         for istep in range(self.NumExperiments):
             self.Experiment =  self.Heuristic()
             print_loc(global_print_loc)
@@ -227,7 +233,6 @@ class ModelLearningClass():
                     str(self.Experiment[0][0])]
                 )
             
-            
             self.TrackTime[istep] = self.Experiment[0][0]
             true_params = np.array([[self.TrueParams[0]]])
             
@@ -235,7 +240,6 @@ class ModelLearningClass():
             self.Datum = self.GenSimModel.simulate_experiment(self.SimParams,
                 self.Experiment, repeat=10
             ) # todo reconsider repeat number
-#            self.Datum = self.GenSimModel.simulate_experiment(true_params, self.Experiment, repeat=1) # todo reconsider repeat number
             after_datum = time.time()
             self.datum_gather_cumulative_time+=after_datum-before_datum
 
@@ -300,7 +304,8 @@ class ModelLearningClass():
                     self.TrackTime = self.TrackTime[0:istep] 
                     break 
             
-            if self.Covars[istep]<self.SigmaThresh and False: #  can be reinstated to stop learning when volume converges
+            if self.Covars[istep]<self.SigmaThresh and False: 
+                # can be reinstated to stop learning when volume converges
                 if self.debugSave: 
                     self.debug_store()
                 self.log_print(['Final time selected > ',
