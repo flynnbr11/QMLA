@@ -223,7 +223,10 @@ def plot_tree_multi_QMD(results_csv, all_bayes_csv, avg_type='medians', save_to_
     for mod in mods:
         winning_count[mod]=mods.count(mod)
 
-    ptq.cumulativeQMDTreePlot(cumulative_csv=all_bayes_csv, wins_per_mod = winning_count, only_adjacent_branches=True, avg=avg_type, save_to_file=save_to_file)        
+    ptq.cumulativeQMDTreePlot(cumulative_csv=all_bayes_csv, 
+        wins_per_mod=winning_count, only_adjacent_branches=True, 
+        avg=avg_type, save_to_file=save_to_file
+    )        
 
 
 

@@ -44,7 +44,10 @@ max_spawn_depth_info = {
     'hyperfine' : 3,
     'ising_non_transverse' : 5,
     'ising_transverse' : 11,
-    'hyperfine_like' : 8
+    'hyperfine_like' : 8,
+    'two_qubit_ising_rotation' : 2,
+    'two_qubit_ising_rotation_hyperfine' : 5,
+    'two_qubit_ising_rotation_hyperfine_transverse' : 8,
 }
 
 def log_print(to_print_list, log_file):
@@ -69,6 +72,14 @@ def new_model_list(model_list, spawn_depth, model_dict, log_file,
         return ising_non_transverse(model_list, spawn_step=spawn_depth)
     elif generator == 'ising_transverse':
         return ising_transverse(model_list, spawn_step=spawn_depth)
+    elif generator == 'two_qubit_ising_rotation_hyperfine':
+        return hyperfine_like(model_list, spawn_step=spawn_depth,
+        model_dict=model_dict, log_file=log_file
+    )
+    elif generator == 'two_qubit_ising_rotation_hyperfine_transverse':
+        return hyperfine_like(model_list, spawn_step=spawn_depth,
+        model_dict=model_dict, log_file=log_file
+    )
     elif generator == 'hyperfine_like':
         return hyperfine_like(model_list, spawn_step=spawn_depth,
         model_dict=model_dict, log_file=log_file
