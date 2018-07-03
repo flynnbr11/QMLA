@@ -1481,6 +1481,9 @@ class QMD():
     ):
         PlotQMD.ExpectationValuesTrueSim(qmd=self, model_ids=model_ids, 
             champ=champ, max_time=max_time, t_interval=t_interval,
+            use_experimental_data=self.UseExperimentalData,
+            experimental_measurements_dict=self.ExperimentalMeasurements,
+            upper_x_lim = 1.8,
             save_to_file=save_to_file
         )
 
