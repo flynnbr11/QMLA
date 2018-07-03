@@ -93,15 +93,16 @@ true_params = [0.25, 0.21, 0.28, 0.22, 0.23, 0.27]
 num_ops = len(initial_op_list)
 
     
-log_print(["QMD id", global_variables.qmd_id, " on host ",
+log_print(["\n QMD id", global_variables.qmd_id, " on host ",
     global_variables.host_name, "and port", global_variables.port_number,
     "has seed", rds.get_seed(global_variables.host_name,
     global_variables.port_number, global_variables.qmd_id,
-    print_status=True),".", global_variables.num_particles,
+    print_status=True),"\n", global_variables.num_particles,
     " particles for", global_variables.num_experiments, 
     "experiments and ", global_variables.num_times_bayes,
-    "bayes updates. RQ=", global_variables.use_rq, "RQ log:",
-     global_variables.log_file, "Bayes CSV:",
+    "bayes updates\n Gaussian=", global_variables.gaussian, 
+    "\n RQ=", global_variables.use_rq, "RQ log:",
+     global_variables.log_file, "\n Bayes CSV:",
      global_variables.cumulative_csv], log_file
  )
 
@@ -122,7 +123,7 @@ qmd = QMD(
     pgh_prefactor = global_variables.pgh_factor,
     num_probes=num_probes,
     probe_dict = experimental_probe_dict, 
-    gaussian=False, 
+    gaussian = global_variables.gaussian, 
     use_experimental_data = use_experimental_measurements,
     experimental_measurements = experimental_measurements_dict,
     max_num_branches = 0,

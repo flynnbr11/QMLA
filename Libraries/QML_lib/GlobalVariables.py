@@ -41,6 +41,7 @@ default_num_parameters = 2
 default_num_experiments = 10
 default_num_particles = 20
 default_bayes_times = 5
+default_gaussian = True
 default_do_plots =  0
 default_resample_threshold = 0.5
 default_resample_a = 0.95
@@ -70,6 +71,7 @@ class GlobalVariablesClass():
         num_particles = default_num_particles,
         num_times_bayes = default_bayes_times,
         all_plots = default_do_plots,
+        gaussian = default_gaussian,
         resample_threshold = default_resample_threshold,
         resample_a = default_resample_a,
         pgh_factor = default_pgh_factor,
@@ -94,6 +96,7 @@ class GlobalVariablesClass():
         self.num_particles = num_particles
         self.num_times_bayes = num_times_bayes
         self.all_plots = all_plots
+        self.gaussian = gaussian
         self.resample_threshold = resample_threshold
         self.resample_a = resample_a
         self.pgh_factor = pgh_factor
@@ -196,6 +199,14 @@ def parse_cmd_line_args(args):
       default=default_do_iqle
     )
 
+    parser.add_argument(
+      '-g', '--gaussian',
+      help='True: normal distribution; False: uniform.',
+      type=int,
+      default=default_gaussian
+    )
+    
+
     ## Include optional plots
     parser.add_argument(
       '-pt', '--plots',
@@ -281,11 +292,6 @@ def parse_cmd_line_args(args):
     )
     
     
-    
-    
-    
-
-
     # Process arguments from command line
     arguments = parser.parse_args(args)
     
@@ -302,6 +308,7 @@ def parse_cmd_line_args(args):
     if num_times_bayes > num_experiments:
         num_times_bayes = num_experiments-1
     all_plots = bool(arguments.plots)
+    gaussian = bool(arguments.gaussian)
     resample_threshold = arguments.resample_threshold
     resample_a = arguments.resample_a
     pgh_factor = arguments.pgh_factor
@@ -329,6 +336,7 @@ def parse_cmd_line_args(args):
         resample_threshold = resample_threshold,
         resample_a = resample_a,
         pgh_factor = pgh_factor,
+        gaussian = gaussian,
         qmd_id = qmd_id, 
         host_name = host_name,
         port_number = port_number,
