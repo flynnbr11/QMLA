@@ -141,7 +141,10 @@ class ModelLearningClass():
                 specific_terms = {
                     'xTy' : [0.0,0.0001],
                     'xTz' : [0.0,0.0001],
-                    'yTz' : [0.0,0.0001]
+                    'yTz' : [0.0,0.0001],
+                    'xTx' : [2.6, 0.2], # true value 2.7
+                    'yTy' : [2.8, 0.2], # true value 2.7
+                    'zTz' : [2.2, 0.2] # true value 2.14
                 }
             )
         else:

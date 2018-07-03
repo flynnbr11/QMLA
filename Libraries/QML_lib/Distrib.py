@@ -29,7 +29,7 @@ def MultiVariateNormalDistributionNocov(NumMulti, mean=None, sigmas=None):
 def means_sigmas_ising_term(term, specific_terms={}, 
     rotation_mean=0.5, rotation_sigma=2, 
     hyperfine_mean=2.5, hyperfine_sigma=0.5,
-    transverse_mean=0.0, transverse_sigma=0.01
+    transverse_mean=0.5, transverse_sigma=1.0
 ):
     """
     Get means and sigmas for models in Ising type configurations
@@ -73,6 +73,7 @@ def normal_distribution_ising(term, specific_terms={}):
         specific_terms = specific_terms
     )
     cov_matrix = np.diag(sigmas**2)
+    
     dist = qi.MultivariateNormalDistribution(means, cov_matrix)
 
 #    print("[Normal] Given term ", term,
