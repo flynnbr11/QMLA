@@ -89,7 +89,16 @@ use_experimental_measurements = True
 
 initial_op_list = ['xTi', 'yTi', 'zTi']
 true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-true_params = [0.25, 0.21, 0.28, 0.22, 0.23, 0.27]
+# true_params = [0.25, 0.21, 0.28, 0.22, 0.23, 0.27]
+
+true_params = []
+
+for i in range(3):
+    true_params.append(random.uniform(-1,2))
+for i in range(3):
+    true_params.append(random.uniform(2,3))
+
+
 num_ops = len(initial_op_list)
 
     
