@@ -17,12 +17,13 @@ def identity(arg): return arg
 
 class multiPGH(qi.Heuristic):
     
-    def __init__(self, updater, oplist=None, norm='Frobenius', inv_field='x_', t_field='t',
-                 inv_func=identity,
-                 t_func=identity,
-                 maxiters=10,
-                 other_fields=None
-                 ):
+    def __init__(self, updater, oplist=None, norm='Frobenius', 
+        inv_field='x_', t_field='t',
+        inv_func=identity,
+        t_func=identity,
+        maxiters=10,
+        other_fields=None
+     ):
         super(multiPGH, self).__init__(updater)
         self._oplist = oplist
         self._norm = norm
@@ -44,7 +45,9 @@ class multiPGH(qi.Heuristic):
                 idx_iter += 1
                 
         if self._updater.model.distance(x, xp) == 0:
-            raise RuntimeError("PGH did not find distinct particles in {} iterations.".format(self._maxiters))
+            raise RuntimeError("PGH did not find distinct particles in \
+                {} iterations.".format(self._maxiters)
+            )
             
         #print('Selected particles: #1 ' + repr(x) + ' #2 ' + repr(xp))
             
@@ -97,7 +100,9 @@ class tHeurist(qi.Heuristic):
                 idx_iter += 1
                 
         if self._updater.model.distance(x, xp) == 0:
-            raise RuntimeError("PGH did not find distinct particles in {} iterations.".format(self._maxiters))
+            raise RuntimeError("PGH did not find distinct particles in {} \
+                iterations.".format(self._maxiters)
+            )
             
         eps = np.empty((1,), dtype=self._updater.model.expparams_dtype)
         eps[self._t]  = self._t_func(1 / self._updater.model.distance(x, xp))

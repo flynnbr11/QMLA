@@ -192,11 +192,21 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
 
         if true_evo and self.use_experimental_data:
             time = expparams['t']
-            experimental_expec_value = expdt.nearestAvailableExpVal(
-                times = self.experimental_measurement_times,
-                experimental_data = self.experimental_measurements,
-                t =time
-            )
+            #print("Time:", time[0])
+            try:
+                # If time already exists in experimental data
+                experimental_expec_value = self.self.experimental_measurements[time]
+            except:
+                #print("t=",time,"not found in data")
+                #print("t type:", type(time))
+                experimental_expec_value = expdt.nearestAvailableExpVal(
+                    times = self.experimental_measurement_times,
+                    experimental_data = self.experimental_measurements,
+                    t = time
+                )
+            #print("Using experimental time",time,"\texp val:",
+            #    experimental_expec_value
+            #)
             pr0 = np.array([[experimental_expec_value]])
 
 

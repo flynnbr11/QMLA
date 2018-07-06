@@ -1476,14 +1476,14 @@ class QMD():
             bayes_factors=bayes_factors, save_to_file=save_to_file
         )
         
-    def plotExpecValues(self, model_ids=None, champ=True, max_time=1e6,
+    def plotExpecValues(self, model_ids=None, champ=True, max_time=1.8,
         t_interval=50000, save_to_file=None
     ):
         PlotQMD.ExpectationValuesTrueSim(qmd=self, model_ids=model_ids, 
             champ=champ, max_time=max_time, t_interval=t_interval,
             use_experimental_data=self.UseExperimentalData,
             experimental_measurements_dict=self.ExperimentalMeasurements,
-            upper_x_lim = 1.8,
+            upper_x_lim = max_time,
             save_to_file=save_to_file
         )
 

@@ -88,10 +88,15 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         if qmd.ChampID not in model_ids:
             model_ids.append(qmd.ChampID)
 
+    if qmd.ChampID in model_ids and champ==False:
+        model_ids.remove(qmd.ChampID)
+    
     probe_id = random.choice(range(qmd.NumProbes))
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour =  colors.cnames['lightsalmon'] #'b'
+    true_colour =  'r' #'b'
+    
     champion_colour =  colors.cnames['cornflowerblue'] #'r'
     sim_colours = ['g', 'c', 'm', 'y', 'k']
 
@@ -118,7 +123,7 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
             state=true_probe) for t in times
         ]
     plt.scatter(times, true_expec_values, label='True Expectation Value',
-        marker='x', color = true_colour
+        marker='o', s=8, color = true_colour
     )
 
     ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
