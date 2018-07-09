@@ -23,6 +23,7 @@ global_variables = GlobalVariables.parse_cmd_line_args(sys.argv[1:])
 import RedisSettings as rds
 import Evo as evo
 import DataBase 
+import ExperimentalDataFunctions as expdt
 from QMD import QMD #  class moved to QMD in Library
 import QML
 import ModelGeneration 
@@ -63,21 +64,54 @@ def log_print(to_print_list, log_file):
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
 
+
+num_probes = 40
+experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
+    num_probes=num_probes
+)
+
+experimental_measurements_dict = expdt.experimentalMeasurementDict(
+    directory="NV05_HahnPeaks_expdataset"
+)
+
+for k in list(experimental_measurements_dict.keys()):
+    # Convert nanoseconds in exp data to milliseconds
+    t_new = k/1000
+    experimental_measurements_dict[t_new] = experimental_measurements_dict.pop(k)
+
+
+
+#print("experimental measurements:", experimental_measurements_dict)
+
+#print("exp probes:", experimental_probe_dict)
+use_experimental_measurements = False
+
+
 initial_op_list = ['xTi', 'yTi', 'zTi']
 true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-true_params = [0.25, 0.21, 0.28, 0.22, 0.23, 0.27]
+# true_params = [0.25, 0.21, 0.28, 0.22, 0.23, 0.27]
+
+true_params = []
+
+for i in range(3):
+    true_params.append(random.uniform(-1,2))
+for i in range(3):
+    true_params.append(random.uniform(2,3))
+
+
 num_ops = len(initial_op_list)
 
     
-log_print(["QMD id", global_variables.qmd_id, " on host ",
+log_print(["\n QMD id", global_variables.qmd_id, " on host ",
     global_variables.host_name, "and port", global_variables.port_number,
     "has seed", rds.get_seed(global_variables.host_name,
     global_variables.port_number, global_variables.qmd_id,
-    print_status=True),".", global_variables.num_particles,
+    print_status=True),"\n", global_variables.num_particles,
     " particles for", global_variables.num_experiments, 
     "experiments and ", global_variables.num_times_bayes,
-    "bayes updates. RQ=", global_variables.use_rq, "RQ log:",
-     global_variables.log_file, "Bayes CSV:",
+    "bayes updates\n Gaussian=", global_variables.gaussian, 
+    "\n RQ=", global_variables.use_rq, "RQ log:",
+     global_variables.log_file, "\n Bayes CSV:",
      global_variables.cumulative_csv], log_file
  )
 
@@ -96,8 +130,11 @@ qmd = QMD(
     resample_threshold = global_variables.resample_threshold,
     resampler_a = global_variables.resample_a, 
     pgh_prefactor = global_variables.pgh_factor,
-    num_probes=5,
-    gaussian=True, 
+    num_probes=num_probes,
+    probe_dict = experimental_probe_dict, 
+    gaussian = global_variables.gaussian, 
+    use_experimental_data = global_variables.use_experimental_data,
+    experimental_measurements = experimental_measurements_dict,
     max_num_branches = 0,
     max_num_qubits = 10, 
     parallel = True,
@@ -105,7 +142,7 @@ qmd = QMD(
     use_exp_custom=False, 
     compare_linalg_exp_tol=None,
     #growth_generator='ising_non_transverse'
-    growth_generator='hyperfine_like',
+    growth_generator='two_qubit_ising_rotation_hyperfine',
     q_id = global_variables.qmd_id,
     host_name = global_variables.host_name,
     port_number = global_variables.port_number,
@@ -142,7 +179,7 @@ if global_variables.save_plots:
     
     qmd.saveBayesCSV(save_to_file=str(
         global_variables.results_directory+ 
-       'bayes_factors_'+ str(global_variables.long_id)+'.csv'),
+        'bayes_factors_'+ str(global_variables.long_id)+'.csv'),
         names_ids='latex'
     )
     

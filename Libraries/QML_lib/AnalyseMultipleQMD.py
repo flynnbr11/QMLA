@@ -44,21 +44,20 @@ def parameter_sweep_analysis(directory_name, results_csv, save_to_file=None, use
     if not directory_name.endswith('/'):
         directory_name += '/'
 
-#    results_csv = 'param_sweep.csv'
-#    results_path = directory_name+results_csv
-#    summariseResultsCSV(directory_name=directory_name, csv_name=results_csv)
-    
-    
-    
-    qmd_cumulative_results = pandas.DataFrame.from_csv(results_csv, index_col='ConfigLatex')
-    piv = pandas.pivot_table(qmd_cumulative_results, values=['CorrectModel', 'Time', 'Overfit', 'Underfit', 'Misfit'], index=['ConfigLatex'], 
-                             aggfunc={
-                                 'Time':[np.mean, np.median, min, max], 
-                                 'CorrectModel' : [np.sum, np.mean],
-                                 'Overfit' : [np.sum, np.mean],
-                                 'Misfit' : [np.sum, np.mean],
-                                 'Underfit' : [np.sum, np.mean]
-                             })
+    qmd_cumulative_results = pandas.DataFrame.from_csv(results_csv,
+        index_col='ConfigLatex'
+    )
+    piv = pandas.pivot_table(qmd_cumulative_results, 
+        values=['CorrectModel', 'Time', 'Overfit', 'Underfit', 'Misfit'], 
+        index=['ConfigLatex'], 
+        aggfunc={
+            'Time':[np.mean, np.median, min, max], 
+            'CorrectModel' : [np.sum, np.mean],
+            'Overfit' : [np.sum, np.mean],
+            'Misfit' : [np.sum, np.mean],
+            'Underfit' : [np.sum, np.mean] 
+        }
+    )
 
     time_means = list(piv['Time']['mean'])
     time_mins = list(piv['Time']['min'])
@@ -127,16 +126,24 @@ def parameter_sweep_analysis(directory_name, results_csv, save_to_file=None, use
 
 
     left_pts = [0] * num_models
-    ax.barh(ind, correct, width, color='g', align='center', label='Correct Models', left=left_pts)
+    ax.barh(ind, correct, width, color='g', align='center', 
+        label='Correct Models', left=left_pts
+    )
     left_pts = [sum(x) for x in zip(left_pts, correct)]
 
-    ax.barh(ind, underfit, width, color='r', align='center', label='Underfit Models', left=left_pts)
+    ax.barh(ind, underfit, width, color='r', align='center', 
+        label='Underfit Models', left=left_pts
+    )
     left_pts = [sum(x) for x in zip(left_pts, underfit)]
     
-    ax.barh(ind, misfit, width, color='orange', align='center', label='Misfit Models', left=left_pts)
+    ax.barh(ind, misfit, width, color='orange', align='center', 
+        label='Misfit Models', left=left_pts
+    )
     left_pts = [sum(x) for x in zip(left_pts, misfit)]
 
-    ax.barh(ind, overfit, width, color='y', align='center', label='Overfit Models', left=left_pts)
+    ax.barh(ind, overfit, width, color='y', align='center', 
+        label='Overfit Models', left=left_pts
+    )
     left_pts = [sum(x) for x in zip(left_pts, overfit)]
 
 
@@ -151,7 +158,9 @@ def parameter_sweep_analysis(directory_name, results_csv, save_to_file=None, use
 
     lines, labels = ax.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
-    ax2.legend(lines + lines2, labels + labels2, loc='upper center', bbox_to_anchor=(0.5, -0.2), ncol=2)
+    ax2.legend(lines + lines2, labels + labels2, loc='upper center',
+        bbox_to_anchor=(0.5, -0.2), ncol=2
+    )
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
@@ -214,7 +223,10 @@ def plot_tree_multi_QMD(results_csv, all_bayes_csv, avg_type='medians', save_to_
     for mod in mods:
         winning_count[mod]=mods.count(mod)
 
-    ptq.cumulativeQMDTreePlot(cumulative_csv=all_bayes_csv, wins_per_mod = winning_count, only_adjacent_branches=True, avg=avg_type, save_to_file=save_to_file)        
+    ptq.cumulativeQMDTreePlot(cumulative_csv=all_bayes_csv, 
+        wins_per_mod=winning_count, only_adjacent_branches=True, 
+        avg=avg_type, save_to_file=save_to_file
+    )        
 
 
 
@@ -235,8 +247,6 @@ parser.add_argument(
   type=str,
   default=os.getcwd()
 )
-
-
 
 arguments = parser.parse_args()
 directory_to_analyse = arguments.results_directory
@@ -268,9 +278,15 @@ parameter_sweep_analysis(directory_name = directory_to_analyse, results_csv=resu
 
 
 try:
-    plot_tree_multi_QMD(results_csv = results_csv, all_bayes_csv = all_bayes_csv, save_to_file='multiQMD_tree.png')
+    plot_tree_multi_QMD(results_csv = results_csv, 
+        all_bayes_csv = all_bayes_csv, save_to_file='multiQMD_tree.png'
+    )
+
 except NameError:
-    print("Can not plot multiQMD tree -- this might be because only one instance of QMD was performed. All other plots generated without error.")
+    print("Can not plot multiQMD tree -- this might be because only \
+        one instance of QMD was performed. All other plots generated \
+        without error."
+    )
 
 
 

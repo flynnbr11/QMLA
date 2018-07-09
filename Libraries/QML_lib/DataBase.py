@@ -65,6 +65,7 @@ import Evo as evo
 from QML import *
 import ModelGeneration
 from qinfer import NormalDistribution
+from Distrib import MultiVariateNormalDistributionNocov
 
 global paulis_list
 paulis_list = {'i' : evo.identity(), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 
@@ -137,8 +138,11 @@ class operator():
         """
         List of constituent operators names.
         """
+        
         t_str, p_str, max_t, max_p = get_t_p_strings(self.name)
-        paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
+        paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 
+            'y' : evo.sigmay(), 'z' : evo.sigmaz()
+        }
         if(max_t >= max_p):
             # if more T's than P's in name, it has only one constituent. 
             return [self.name]
@@ -808,7 +812,7 @@ def add_model(model_name, running_database, model_lists,
         sim_pars = []
         num_pars = op.num_constituents
         if num_pars ==1 : #TODO Remove this fixing the prior
-          normal_dist=NormalDistribution(mean=true_params[0], var=0.1)
+          normal_dist = NormalDistribution(mean=true_params[0], var=0.1)
         else:  
           normal_dist = MultiVariateNormalDistributionNocov(num_pars)
         
@@ -896,6 +900,19 @@ def consider_new_model(model_lists, name, db):
         return 'Previously Considered' # todo -- make clear if in legacy or running db
     else: 
         return 'New'
+
+def num_parameters_from_name(name):
+    t_str, p_str, max_t, max_p = DB.get_t_p_strings(name)
+    paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 
+        'y' : evo.sigmay(), 'z' : evo.sigmaz()
+    }
+    if(max_t >= max_p):
+        # if more T's than P's in name, it has only one constituent. 
+        return 1
+    else: 
+        # More P's indicates a sum at the highest dimension. 
+        return len(name.split(p_str))
+
 
 
 def check_model_in_dict(name, model_dict):

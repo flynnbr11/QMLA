@@ -41,6 +41,7 @@ default_num_parameters = 2
 default_num_experiments = 10
 default_num_particles = 20
 default_bayes_times = 5
+default_gaussian = True
 default_do_plots =  0
 default_resample_threshold = 0.5
 default_resample_a = 0.95
@@ -54,7 +55,7 @@ default_rq_timeout = 3600
 default_log_file = 'default_log_file.log'
 default_save_plots = False
 default_cumulative_csv = 'cumulative_bayes.csv'
-
+default_experimental_data = False
 
 class GlobalVariablesClass():
     def __init__(
@@ -70,6 +71,7 @@ class GlobalVariablesClass():
         num_particles = default_num_particles,
         num_times_bayes = default_bayes_times,
         all_plots = default_do_plots,
+        gaussian = default_gaussian,
         resample_threshold = default_resample_threshold,
         resample_a = default_resample_a,
         pgh_factor = default_pgh_factor,
@@ -81,7 +83,8 @@ class GlobalVariablesClass():
         rq_timeout = default_rq_timeout,
         log_file = default_log_file,
         save_plots = default_save_plots,
-        cumulative_csv = default_cumulative_csv
+        cumulative_csv = default_cumulative_csv,
+        experimental_data = default_experimental_data
     ):
         self.do_iqle = do_iqle
         self.do_qle = do_qle
@@ -94,6 +97,7 @@ class GlobalVariablesClass():
         self.num_particles = num_particles
         self.num_times_bayes = num_times_bayes
         self.all_plots = all_plots
+        self.gaussian = gaussian
         self.resample_threshold = resample_threshold
         self.resample_a = resample_a
         self.pgh_factor = pgh_factor
@@ -101,12 +105,13 @@ class GlobalVariablesClass():
         self.qmd_id = qmd_id
         self.host_name = host_name
         self.port_number = port_number
-        self.results_directory = 'Results/'+results_directory
+#        self.results_directory = 'Results/'+results_directory
+        self.results_directory = results_directory
         self.rq_timeout = rq_timeout
         self.log_file = log_file
         self.save_plots = save_plots
         self.cumulative_csv = cumulative_csv
-        
+        self.use_experimental_data = experimental_data
         
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -195,6 +200,14 @@ def parse_cmd_line_args(args):
       default=default_do_iqle
     )
 
+    parser.add_argument(
+      '-g', '--gaussian',
+      help='True: normal distribution; False: uniform.',
+      type=int,
+      default=default_gaussian
+    )
+    
+
     ## Include optional plots
     parser.add_argument(
       '-pt', '--plots',
@@ -279,12 +292,14 @@ def parse_cmd_line_args(args):
       default=default_cumulative_csv
     )
     
-    
-    
-    
-    
+    parser.add_argument(
+      '-exp', '--experimental_data',
+      help='Use experimental data if provided',
+      type=str,
+      default=default_experimental_data
+    )
 
-
+    
     # Process arguments from command line
     arguments = parser.parse_args(args)
     
@@ -301,6 +316,7 @@ def parse_cmd_line_args(args):
     if num_times_bayes > num_experiments:
         num_times_bayes = num_experiments-1
     all_plots = bool(arguments.plots)
+    gaussian = bool(arguments.gaussian)
     resample_threshold = arguments.resample_threshold
     resample_a = arguments.resample_a
     pgh_factor = arguments.pgh_factor
@@ -312,6 +328,8 @@ def parse_cmd_line_args(args):
     rq_timeout = arguments.rq_timeout
     log_file = arguments.logfile
     cumulative_csv = arguments.cumulative_bayes
+    use_experimental_data = bool(arguments.experimental_data)
+    
     
     # Use arguments to initialise global variables class. 
     global_variables = GlobalVariablesClass(
@@ -328,6 +346,7 @@ def parse_cmd_line_args(args):
         resample_threshold = resample_threshold,
         resample_a = resample_a,
         pgh_factor = pgh_factor,
+        gaussian = gaussian,
         qmd_id = qmd_id, 
         host_name = host_name,
         port_number = port_number,
@@ -336,7 +355,8 @@ def parse_cmd_line_args(args):
         rq_timeout = rq_timeout,
         log_file = log_file,
         save_plots = arguments.plots,
-        cumulative_csv = cumulative_csv
+        cumulative_csv = cumulative_csv,
+        experimental_data = use_experimental_data
     )
 
     return global_variables

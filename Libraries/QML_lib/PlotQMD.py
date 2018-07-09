@@ -74,7 +74,9 @@ def latex_name_ising(name):
     return latex_term
 
 def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, 
-    max_time=3, t_interval=0.01, save_to_file=None
+    max_time=3, t_interval=0.01, experimental_measurements_dict=None,
+    use_experimental_data=False, upper_x_lim=None,
+    save_to_file=None
 ):
     import random
     if model_ids is None and champ == True:
@@ -86,28 +88,42 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         if qmd.ChampID not in model_ids:
             model_ids.append(qmd.ChampID)
 
+    if qmd.ChampID in model_ids and champ==False:
+        model_ids.remove(qmd.ChampID)
+    
     probe_id = random.choice(range(qmd.NumProbes))
-    times = np.arange(0, max_time, t_interval)
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour =  colors.cnames['lightsalmon'] #'b'
+    true_colour =  'r' #'b'
+    
     champion_colour =  colors.cnames['cornflowerblue'] #'r'
     sim_colours = ['g', 'c', 'm', 'y', 'k']
 
     plt.clf()
-    plt.xlabel('Time')
+    plt.xlabel('Time (microseconds)')
     plt.ylabel('Expectation Value')
 
-    true = qmd.TrueOpName
-    true_op = DataBase.operator(true)
-    true_params = qmd.TrueParamsList
-    true_ops = true_op.constituents_operators
-    true_ham = np.tensordot(true_params, true_ops, axes=1)
-    true_dim = true_op.num_qubits
-    true_probe = qmd.ProbeDict[(probe_id,true_dim)]
-    true_expec_values = [evo.expectation_value(ham=true_ham, t=t, state=true_probe) for t in times]
+    
+    if (experimental_measurements_dict is not None) and (use_experimental_data==True):
+        times = sorted(list(experimental_measurements_dict.keys()))
+        true_expec_values = [
+            experimental_measurements_dict[t] for t in times
+        ]
+    else:
+        times = np.arange(0, max_time, t_interval)
+        true = qmd.TrueOpName
+        true_op = DataBase.operator(true)
+        true_params = qmd.TrueParamsList
+        true_ops = true_op.constituents_operators
+        true_ham = np.tensordot(true_params, true_ops, axes=1)
+        true_dim = true_op.num_qubits
+        true_probe = qmd.ProbeDict[(probe_id,true_dim)]
+        true_expec_values = [evo.expectation_value(ham=true_ham, t=t, 
+            state=true_probe) for t in times
+        ]
     plt.scatter(times, true_expec_values, label='True Expectation Value',
-        marker='x', color = true_colour
+        marker='o', s=8, color = true_colour
     )
 
     ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
@@ -178,7 +194,12 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         
     new_handles = tuple(new_handles)
     new_labels = tuple(new_labels)
-
+    
+    if upper_x_lim is not None:
+        plt.xlim(0,upper_x_lim)
+    else:
+        plt.xlim(0, max(times))
+    
     if extra_lgd:
         lgd_spec=ax.legend(special_handles, special_labels, 
             loc='upper center', bbox_to_anchor=(1, 1),fancybox=True,

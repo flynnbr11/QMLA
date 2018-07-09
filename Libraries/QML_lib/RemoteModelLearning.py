@@ -65,7 +65,7 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
     
     """
 
-    print("QHL for", name)
+    print("QHL", modelID, ":", name)
     time_start = time.time()
     # Get params from qmd_info
     rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
@@ -140,7 +140,7 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
       resample_thresh = resampler_threshold,
       resampler_a = resampler_a,
       pgh_prefactor = pgh_prefactor,
-      gaussian=False,
+      gaussian=gaussian,
       debug_directory = debug_directory,
       qle = qle,
       host_name = host_name,

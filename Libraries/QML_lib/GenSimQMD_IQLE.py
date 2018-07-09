@@ -5,7 +5,9 @@ import numpy as np
 import scipy as sp
 import warnings
 
-from Evo import *
+from Evo import * # TODO remove ALL import * calls across QMD
+import ExperimentalDataFunctions as expdt
+
 # from ProbeStates import *
 from MemoryTest import print_loc
 from psutil import virtual_memory
@@ -47,7 +49,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     def __init__(self, oplist, modelparams, probecounter=None, 
         true_oplist = None, truename=None, num_probes=40, probe_dict=None, 
         trueparams = None, probelist = None, min_freq=0, solver='scipy', 
-        trotter=False, qle=True, use_exp_custom=True, exp_comparison_tol=None,
+        use_experimental_data = False, experimental_measurements = None,
+        experimental_measurement_times=None,trotter=False, qle=True,
+        use_exp_custom=True, exp_comparison_tol=None,
         enable_sparse=True, model_name=None, log_file='QMDLog.log',
         log_identifier=None
     ):
@@ -65,6 +69,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._trueparams = trueparams
         self._truename = truename
         self._true_dim = DataBase.get_num_qubits(self._truename)
+        self.use_experimental_data = use_experimental_data
+        self.experimental_measurements = experimental_measurements
+        self.experimental_measurement_times = experimental_measurement_times
         self.use_exp_custom = use_exp_custom
         self.enable_sparse = enable_sparse
         self.exp_comparison_tol = exp_comparison_tol  
@@ -160,7 +167,6 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._a += 1
         if self._a % 2 == 1:
             self._b += 1
-
         num_parameters = modelparams.shape[1]
         true_dim = np.log2(self._true_oplist[0].shape[0])
         sim_dim = np.log2(self._oplist[0].shape[0])
@@ -184,44 +190,64 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             params = modelparams
         ham_num_qubits = np.log2(operators[0].shape[0])
 
-        
-        if self.inBayesUpdates:
-            if self.ideal_probe is not None:
-                probe = self.ideal_probe # this won't work
-            elif self.ideal_probelist is not None: 
-                probe = self.ideal_probelist[self._b % 2] # this won't work
+        if true_evo and self.use_experimental_data:
+            time = expparams['t']
+            #print("Time:", time[0])
+            try:
+                # If time already exists in experimental data
+                experimental_expec_value = self.self.experimental_measurements[time]
+            except:
+                #print("t=",time,"not found in data")
+                #print("t type:", type(time))
+                experimental_expec_value = expdt.nearestAvailableExpVal(
+                    times = self.experimental_measurement_times,
+                    experimental_data = self.experimental_measurements,
+                    t = time
+                )
+            #print("Using experimental time",time,"\texp val:",
+            #    experimental_expec_value
+            #)
+            pr0 = np.array([[experimental_expec_value]])
+
+
+        else:        
+            if self.inBayesUpdates:
+                if self.ideal_probe is not None:
+                    probe = self.ideal_probe # this won't work
+                elif self.ideal_probelist is not None: 
+                    probe = self.ideal_probelist[self._b % 2] # this won't work
+                else:
+                    print("Either ideal_probe or ideal_probes must be given")
             else:
-                print("Either ideal_probe or ideal_probes must be given")
-        else:
-            probe = self._probelist[
-                (self._b % int(self.NumProbes)), ham_num_qubits
-            ]
-        
-        
-        ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
-        print_loc(global_print_loc)
-
-        if len(modelparams.shape) == 1:
-            modelparams = modelparams[..., np.newaxis]
+                probe = self._probelist[
+                    (self._b % int(self.NumProbes)), ham_num_qubits
+                ]
             
-        times = expparams['t']
-        if self.QLE is True:
-            pr0 = get_pr0_array_qle(t_list=times, modelparams=params,
-                oplist=operators, probe=probe, 
-                use_exp_custom=self.use_exp_custom,
-                exp_comparison_tol=self.exp_comparison_tol, 
-                enable_sparse = self.enable_sparse, 
-                log_file=self.log_file, log_identifier=self.log_identifier
-            )
+            
+            ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
+            print_loc(global_print_loc)
 
-        else: 
-            pr0 = get_pr0_array_iqle(t_list=times, modelparams=params,
-            oplist=operators, ham_minus=ham_minus, probe=probe,
-            use_exp_custom=self.use_exp_custom,
-            exp_comparison_tol=self.exp_comparison_tol, 
-            enable_sparse = self.enable_sparse, 
-            log_file=self.log_file, log_identifier=self.log_identifier
-        )    
+            if len(modelparams.shape) == 1:
+                modelparams = modelparams[..., np.newaxis]
+                
+            times = expparams['t']
+            if self.QLE is True:
+                pr0 = get_pr0_array_qle(t_list=times, modelparams=params,
+                    oplist=operators, probe=probe, 
+                    use_exp_custom=self.use_exp_custom,
+                    exp_comparison_tol=self.exp_comparison_tol, 
+                    enable_sparse = self.enable_sparse, 
+                    log_file=self.log_file, log_identifier=self.log_identifier
+                )
+
+            else: 
+                pr0 = get_pr0_array_iqle(t_list=times, modelparams=params,
+                    oplist=operators, ham_minus=ham_minus, probe=probe,
+                    use_exp_custom=self.use_exp_custom,
+                    exp_comparison_tol=self.exp_comparison_tol, 
+                    enable_sparse = self.enable_sparse, 
+                    log_file=self.log_file, log_identifier=self.log_identifier
+                )    
 
         likelihood_array = (
             qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)

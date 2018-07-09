@@ -1,10 +1,10 @@
 #!/bin/bash
 
-test_description="wider_initial_dist"
+test_description="test_exp_data"
 
 
 
-num_tests=3
+num_tests=2
 min_id=1
 let max_id="$min_id + $num_tests - 1 "
 
@@ -32,13 +32,6 @@ mkdir -p $OUT_LOG
 mkdir -p results_dir
 
 global_server=$(hostname)
-
-very_short_time="walltime=00:06:00"
-short_time="walltime=00:20:00"
-medium_time="walltime=01:00:00"
-long_time="walltime=08:00:00"
-very_long_time="walltime=16:00:00"
-
 test_time="walltime=00:90:00"
 
 time=$test_time
@@ -80,8 +73,10 @@ ra=$ra_default
 rt=$rt_default
 rp=$rp_default
 
-e=5
-p=10
+e=20
+p=20
+
+printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp \n" >> QMD_Results_directories.log
 
 for i in `seq $min_id $max_id`;
 do
@@ -101,7 +96,7 @@ do
 	this_qmd_name="$test_description""_$qmd_id"
 	this_error_file="$OUT_LOG/$error_file""_$qmd_id.txt"
 	this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
-	echo "Config: e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd"
+	printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd \n" >> QMD_all_tasks.log
 
 	qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv -N $this_qmd_name -l $time -o $this_output_file -e $this_error_file run_qmd_instance.sh
 
