@@ -55,7 +55,7 @@ default_rq_timeout = 3600
 default_log_file = 'default_log_file.log'
 default_save_plots = False
 default_cumulative_csv = 'cumulative_bayes.csv'
-
+default_experimental_data = False
 
 class GlobalVariablesClass():
     def __init__(
@@ -83,7 +83,8 @@ class GlobalVariablesClass():
         rq_timeout = default_rq_timeout,
         log_file = default_log_file,
         save_plots = default_save_plots,
-        cumulative_csv = default_cumulative_csv
+        cumulative_csv = default_cumulative_csv,
+        experimental_data = default_experimental_data
     ):
         self.do_iqle = do_iqle
         self.do_qle = do_qle
@@ -110,7 +111,7 @@ class GlobalVariablesClass():
         self.log_file = log_file
         self.save_plots = save_plots
         self.cumulative_csv = cumulative_csv
-        
+        self.use_experimental_data = experimental_data
         
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -291,6 +292,13 @@ def parse_cmd_line_args(args):
       default=default_cumulative_csv
     )
     
+    parser.add_argument(
+      '-exp', '--experimental_data',
+      help='Use experimental data if provided',
+      type=str,
+      default=default_experimental_data
+    )
+
     
     # Process arguments from command line
     arguments = parser.parse_args(args)
@@ -320,6 +328,8 @@ def parse_cmd_line_args(args):
     rq_timeout = arguments.rq_timeout
     log_file = arguments.logfile
     cumulative_csv = arguments.cumulative_bayes
+    use_experimental_data = bool(arguments.experimental_data)
+    
     
     # Use arguments to initialise global variables class. 
     global_variables = GlobalVariablesClass(
@@ -345,7 +355,8 @@ def parse_cmd_line_args(args):
         rq_timeout = rq_timeout,
         log_file = log_file,
         save_plots = arguments.plots,
-        cumulative_csv = cumulative_csv
+        cumulative_csv = cumulative_csv,
+        experimental_data = use_experimental_data
     )
 
     return global_variables
