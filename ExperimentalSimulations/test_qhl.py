@@ -88,18 +88,22 @@ use_experimental_measurements = False
 
 
 initial_op_list = ['xTi', 'yTi', 'zTi']
-#true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-true_op = global_variables.true_operator
-
-
-true_op_list = DataBase.get_constituent_names_from_name(true_op)
-num_params = len(true_op_list)
+# true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+true_op = 'xTi'
+# true_params = [0.25, 0.21, 0.28, 0.22, 0.23, 0.27]
 
 true_params = []
-for i in range(num_params):
+
+for i in range(3):
     true_params.append(random.uniform(-1,2))
+for i in range(3):
+    true_params.append(random.uniform(2,3))
+
+
+true_params = [0.321]
 
 num_ops = len(initial_op_list)
+
     
 log_print(["\n QMD id", global_variables.qmd_id, " on host ",
     global_variables.host_name, "and port", global_variables.port_number,
@@ -120,7 +124,6 @@ Launch and run QMD
 
 qmd = QMD(
     initial_op_list=initial_op_list, 
-    qhl_test = global_variables.qhl_test, 
     true_operator=true_op, 
     true_param_list=true_params, 
     num_particles=global_variables.num_particles,
@@ -143,107 +146,24 @@ qmd = QMD(
     compare_linalg_exp_tol=None,
     #growth_generator='ising_non_transverse'
 #    growth_generator='two_qubit_ising_rotation_hyperfine',
-    growth_generator='two_qubit_ising_rotation_hyperfine',
+#    growth_generator='two_qubit_ising_rotation_hyperfine',
+    growth_generator='qhl_TEST',
     q_id = global_variables.qmd_id,
     host_name = global_variables.host_name,
     port_number = global_variables.port_number,
     rq_timeout = global_variables.rq_timeout,
     log_file = global_variables.log_file
 )
+# qmd.runRemoteQMD(num_spawns=3)
 
 
-print("global_variables.qhl_test: \t", global_variables.qhl_test)
+qmd.runQHLTest()
 
-if global_variables.qhl_test:
-    qmd.runQHLTest()
+qmd.delete_unpicklable_attributes()
 
-    qmd.plotParameterEstimates(true_model=True, 
-        save_to_file= str(global_variables.results_directory+
-            'parameter_estimates_QHL_TEST'+
-            '.png')
-    )
-
-    if global_variables.pickle_qmd_class:
-        log_print(["QMD complete. Pickling result to",
-            global_variables.class_pickle_file], log_file
-        )
-        qmd.delete_unpicklable_attributes()
-        with open(global_variables.class_pickle_file, "wb") as pkl_file:
-            pickle.dump(qmd, pkl_file , protocol=2)
-            
-    
-else:
-    qmd.runRemoteQMD(num_spawns=3)
-
-    """
-    Tidy up and analysis. 
-    """
-    if global_variables.pickle_qmd_class:
-        log_print(["QMD complete. Pickling result to",
-            global_variables.class_pickle_file], log_file
-        )
-        qmd.delete_unpicklable_attributes()
-        with open(global_variables.class_pickle_file, "wb") as pkl_file:
-            pickle.dump(qmd, pkl_file , protocol=2)
+with open('test_qhl_output.p', "wb") as pkl_file:
+    pickle.dump(qmd, pkl_file, protocol=2)
 
 
-    if global_variables.save_plots:
-
-        qmd.plotVolumes(save_to_file=str(
-            global_variables.results_directory+
-            'volumes_all_models_'+ str(global_variables.long_id)+ '.png')
-        )
-        qmd.plotVolumes(branch_champions=True,
-            save_to_file=str(global_variables.results_directory+
-            'volumes_branch_champs_'+ str(global_variables.long_id)+
-            '.png')
-        )
-        
-        qmd.saveBayesCSV(save_to_file=str(
-            global_variables.results_directory+ 
-            'bayes_factors_'+ str(global_variables.long_id)+'.csv'),
-            names_ids='latex'
-        )
-        
-        qmd.plotExpecValues(save_to_file=str( 
-            global_variables.results_directory+
-            'expec_values_'+str(global_variables.long_id)+'.png')
-        )
-        qmd.plotRadarDiagram(save_to_file=str(
-            global_variables.results_directory+
-            'radar_'+ str(global_variables.long_id)+ '.png')
-        )
 
 
-    #        qmd.plotHintonAllModels(save_to_file=str(
-    #            global_variables.results_directory,'hinton_', 
-    #            str(global_variables.long_id), '.png')
-    #        )
-
-    #        qmd.plotHintonListModels(model_list=qmd.SurvivingChampions,
-    #            save_to_file=str(global_variables.results_directory,
-    #            'hinton_champions_', str(global_variables.long_id), 
-    #            '.png')
-    #        )
-        
-        
-        qmd.plotTreeDiagram(save_to_file = str
-            (global_variables.results_directory+
-            'tree_diagram_'+ str(global_variables.long_id)+ '.png')
-        )
-        
-        qmd.writeInterQMDBayesCSV(
-            bayes_csv=str(global_variables.cumulative_csv)
-        )
-
-    results_file = global_variables.results_file
-    pickle.dump(qmd.ChampionResultsDict, open(results_file, "wb"), protocol=2)
-        
-    end = time.time()
-    log_print(["Time taken:", end-start], log_file)
-    log_print(["END: QMD id", global_variables.qmd_id, ":",
-        global_variables.num_particles, " particles;",
-        global_variables.num_experiments, "exp; ", 
-        global_variables.num_times_bayes, "bayes. Time:", end-start], 
-        log_file
-    )

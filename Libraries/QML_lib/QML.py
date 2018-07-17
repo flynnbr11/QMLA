@@ -114,7 +114,7 @@ class ModelLearningClass():
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
         self.SimOpsNames = simopnames
         print_loc(print_location=init_model_print_loc)
-
+        self.log_print(["learning true params:", self.TrueParams])
         
         self.SimOpList  = np.asarray(simoplist)
         self.SimParams = np.asarray([simparams[0]])
@@ -145,7 +145,7 @@ class ModelLearningClass():
                     'xTx' : [2.7, 0.2], # true value 2.7
                     'yTy' : [2.7, 0.2], # true value 2.7
                     'zTz' : [2.14, 0.2], # true value 2.14
-                    'xTi' : [0.5, 2.0],
+                    'xTi' : [1.0, 0.5],
                     'yTi' : [0.5, 2.0],
                     'zTi' : [0.5, 2.0],
                 }
@@ -404,6 +404,7 @@ class ModelLearningClass():
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
+        learned_info['track_eval'] = self.TrackEval
 
         return learned_info
         
@@ -546,7 +547,9 @@ class reducedModel():
         if learned_info is None:
             model_id_float = float(self.ModelID)
             model_id_str = str(model_id_float)
-            learned_info = pickle.loads(learned_models_info.get(model_id_str), encoding='latin1') # TODO telling pickle which encoding was used, though I'm not sure why/where that encoding was given...        
+            learned_info = pickle.loads(
+                learned_models_info.get(model_id_str), encoding='latin1'
+            ) # TODO telling pickle which encoding was used, though I'm not sure why/where that encoding was given...        
 
         self.Times = learned_info['times']
         self.FinalParams = learned_info['final_params'] # should be final params from learning process
@@ -554,6 +557,7 @@ class reducedModel():
         self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_info['normalization_record']
         self.VolumeList = learned_info['volume_list'] 
+        self.TrackEval = np.array(learned_info['track_eval'])
 
 #        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,
 #            experimental_measurements = self.ExperimentalMeasurements,
@@ -635,7 +639,6 @@ class modelClassForRemoteBayesFactor():
         
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_model_info['normalization_record']
-        
         
         log_identifier = str("Bayes "+str(self.ModelID)) 
         

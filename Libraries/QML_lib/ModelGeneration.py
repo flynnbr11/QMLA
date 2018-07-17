@@ -40,6 +40,7 @@ def time_seconds():
 
 
 max_spawn_depth_info = {
+    'qhl_TEST' : 2, 
     'simple_ising' : 1,
     'hyperfine' : 3,
     'ising_non_transverse' : 5,

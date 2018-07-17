@@ -66,6 +66,7 @@ class QMD():
 
     def __init__(self,
         initial_op_list=['x'],
+        qhl_test = False,
         true_operator='x',
         true_param_list = None,
         num_particles= 300,
@@ -104,6 +105,8 @@ class QMD():
         self.TrueOpName = true_operator
         self.TrueOpDim = trueOp.num_qubits
         self.InitialOpList = initial_op_list
+        if qhl_test and self.TrueOpName not in self.InitialOpList: 
+            self.InitialOpList.append(self.TrueOpName)
         self.TrueOpList = trueOp.constituents_operators
         self.TrueOpNumParams = trueOp.num_constituents
         if true_param_list is not None: 
@@ -113,6 +116,15 @@ class QMD():
             self.TrueParamsList = [random.random() for i in self.TrueOpList] # TODO: actual true params?
         # todo set true parmams properly
         #self.TrueParamsList = [0.75 for i in self.TrueOpList] # TODO: actual true params?
+        
+        
+        self.TrueParamDict = {}
+        true_ops = DataBase.get_constituent_names_from_name(self.TrueOpName)
+        for i in range(len(true_ops)):
+            op_name = true_ops[i]
+            param = self.TrueParamsList[i]
+            self.TrueParamDict[op_name] = param        
+        
         self.MaxModNum = max_num_models #TODO: necessary?
         self.gaussian = gaussian
         self.NumModels = len(initial_op_list)
@@ -1156,6 +1168,19 @@ class QMD():
             return False
         
 
+    def runQHLTest(self):
+    
+        mod_to_learn = self.TrueOpName
+        self.learnModel(model_name=mod_to_learn, use_rq=self.use_rq)
+        
+        mod_id = DB.model_id_from_name(db=self.db, name=mod_to_learn)
+        mod = self.reducedModelInstanceFromID(mod_id)
+        mod.updateLearnedValues()
+#        self.updateDataBaseModelValues()
+        #TODO write single QHL test
+
+
+
 
     def runRemoteQMD(self, num_exp=40, num_spawns=1, max_branches= None,
         max_num_qubits = None, max_num_models=None, spawn=True,
@@ -1475,6 +1500,18 @@ class QMD():
         PlotQMD.plotHinton(model_names=model_name_dict, 
             bayes_factors=bayes_factors, save_to_file=save_to_file
         )
+        
+    def plotParameterEstimates(self, model_id=0, true_model=False, 
+        save_to_file=None
+    ):
+    
+        if true_model: 
+            model_id = DataBase.model_id_from_name(db=self.db, name=self.TrueOpName)
+
+        PlotQMD.parameterEstimates(qmd=self, modelID = model_id, 
+            save_to_file = save_to_file
+        )
+    
         
     def plotExpecValues(self, model_ids=None, champ=True, max_time=1.8,
         t_interval=50000, save_to_file=None

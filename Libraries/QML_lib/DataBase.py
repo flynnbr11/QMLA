@@ -139,16 +139,7 @@ class operator():
         List of constituent operators names.
         """
         
-        t_str, p_str, max_t, max_p = get_t_p_strings(self.name)
-        paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 
-            'y' : evo.sigmay(), 'z' : evo.sigmaz()
-        }
-        if(max_t >= max_p):
-            # if more T's than P's in name, it has only one constituent. 
-            return [self.name]
-        else: 
-            # More P's indicates a sum at the highest dimension. 
-            return self.name.split(p_str)
+        return get_constituent_names_from_name(self.name)
 
     @property
     def num_qubits(self):
@@ -252,6 +243,18 @@ def get_num_qubits(name):
 
     num_qubits = len(t_str) + 1
     return num_qubits
+
+def get_constituent_names_from_name(name):
+    t_str, p_str, max_t, max_p = get_t_p_strings(name)
+    paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 
+        'y' : evo.sigmay(), 'z' : evo.sigmaz()
+    }
+    if(max_t >= max_p):
+        # if more T's than P's in name, it has only one constituent. 
+        return [name]
+    else: 
+        # More P's indicates a sum at the highest dimension. 
+        return name.split(p_str)
     
 
 def list_used_qubits(name):

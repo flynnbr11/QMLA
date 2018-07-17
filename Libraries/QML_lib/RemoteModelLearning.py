@@ -108,6 +108,8 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
     sigma_threshold = qmd_info['sigma_threshold']
     gaussian = qmd_info['gaussian']
     
+    log_print(["True ops being learned:", true_params])
+    
     # Generate model and learn
     op = DataBase.operator(name = name)
     qml_instance = QML.ModelLearningClass(name=name, num_probes=num_probes,

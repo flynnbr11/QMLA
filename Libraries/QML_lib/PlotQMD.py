@@ -1074,6 +1074,65 @@ def draw_networkx_arrows(G, pos,
     return edge_collection
 
 
+### Parameter Estimate Plot ###
+
+
+def parameterEstimates(qmd, modelID, save_to_file=None):
+
+    mod = qmd.reducedModelInstanceFromID(modelID)
+    name = mod.Name
+        
+    if name not in list(qmd.ModelNameIDs.values()):
+        print("True model ", name, " not in studied models", 
+            list(qmd.ModelNameIDs.values())
+        )
+        return False
+    terms = DataBase.get_constituent_names_from_name(name)
+    num_terms = len(terms) 
+
+    term_positions={}
+    param_estimate_by_term = {}
+
+    for t in range(num_terms):
+        term_positions[terms[t]] = t 
+        term = terms[t]
+        param_position = term_positions[term]
+        param_estimates = mod.TrackEval[:,param_position]
+        param_estimate_by_term[term] = param_estimates    
+
+    colours = ['b','r','g','orange', 'pink', 'grey']
+    # TODO use color map as list
+    num_epochs = qmd.NumExperiments
+    fig = plt.figure()
+    ax = plt.subplot(111)
+
+    i=0
+    for term in list(param_estimate_by_term.keys()):
+        colour = colours[i%len(colours)]
+        i+=1
+        try:
+            y_true = qmd.TrueParamDict[term]
+            true_term_latex = DataBase.latex_name_ising(term)
+            ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
+        except:
+            pass
+        y = param_estimate_by_term[term]
+        x = range(1,1+len(param_estimate_by_term[term]))
+        latex_term = DataBase.latex_name_ising(term)
+        ax.scatter(x,y, s=max(1,50/num_epochs), 
+            label=str(latex_term + ' Estimate'), color=colour
+        )
+
+    plt.xlabel('Epoch')
+    plt.ylabel('Parameter Estimate')
+    plt.legend(bbox_to_anchor=(1.1, 1.05))
+    plt.title(str("Parameter estimation for model " +  
+        DataBase.latex_name_ising(name))
+    )
+    if save_to_file is not None:
+        plt.savefig(save_to_file)
+
+
 ### Radar Plot ###
 
 def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):

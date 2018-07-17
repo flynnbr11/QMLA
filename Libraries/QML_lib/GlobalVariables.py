@@ -56,10 +56,14 @@ default_log_file = 'default_log_file.log'
 default_save_plots = False
 default_cumulative_csv = 'cumulative_bayes.csv'
 default_experimental_data = False
+default_true_operator = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+default_qhl_test = 0
 
 class GlobalVariablesClass():
     def __init__(
         self, 
+        true_operator = default_true_operator,
+        qhl_test = default_qhl_test,
         use_rq = default_use_rq,
         do_iqle = default_do_iqle,
         do_qle = default_do_qle,
@@ -84,8 +88,10 @@ class GlobalVariablesClass():
         log_file = default_log_file,
         save_plots = default_save_plots,
         cumulative_csv = default_cumulative_csv,
-        experimental_data = default_experimental_data
+        experimental_data = default_experimental_data,
     ):
+        self.true_operator = true_operator
+        self.qhl_test = qhl_test
         self.do_iqle = do_iqle
         self.do_qle = do_qle
         self.use_rq = use_rq
@@ -133,6 +139,21 @@ def parse_cmd_line_args(args):
     parser = argparse.ArgumentParser(description='Pass variables for (I)QLE.')
 
     # Add parser arguments, ie command line arguments for QMD
+
+    parser.add_argument(
+      '-op', '--true_operator', 
+      help="True operator to be simulated and learned against.",
+      type=str,
+      default=default_true_operator
+    )
+
+    parser.add_argument(
+      '-qhl', '--qhl_test', 
+      help="Bool to test QHL on given true operator only.",
+      type=int,
+      default=default_qhl_test
+    )
+
     ## QMD parameters -- fundamentals such as number of particles etc
     parser.add_argument(
       '-r', '--num_runs', 
@@ -140,6 +161,7 @@ def parse_cmd_line_args(args):
       type=int,
       default=default_num_runs
     )
+
     parser.add_argument(
       '-t', '--num_tests', 
       help="Number of complete tests to average over.",
@@ -303,6 +325,8 @@ def parse_cmd_line_args(args):
     # Process arguments from command line
     arguments = parser.parse_args(args)
     
+    true_operator = arguments.true_operator
+    qhl_test = bool(arguments.qhl_test)
     do_iqle = bool(arguments.iqle)
     do_qle = bool(arguments.qle)
     use_rq = bool(arguments.use_rq)
@@ -333,6 +357,8 @@ def parse_cmd_line_args(args):
     
     # Use arguments to initialise global variables class. 
     global_variables = GlobalVariablesClass(
+        true_operator = true_operator,
+        qhl_test = qhl_test, 
         do_iqle = do_iqle,
         do_qle = do_qle,
         use_rq = use_rq,
