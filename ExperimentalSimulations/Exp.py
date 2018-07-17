@@ -152,14 +152,12 @@ qmd = QMD(
 )
 
 
-print("global_variables.qhl_test: \t", global_variables.qhl_test)
-
 if global_variables.qhl_test:
     qmd.runQHLTest()
 
     qmd.plotParameterEstimates(true_model=True, 
         save_to_file= str(global_variables.results_directory+
-            'parameter_estimates_QHL_TEST'+
+            'parameter_estimates_'+ str(global_variables.long_id) +
             '.png')
     )
 
@@ -170,6 +168,14 @@ if global_variables.qhl_test:
         qmd.delete_unpicklable_attributes()
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file , protocol=2)
+
+    if global_variables.save_plots:
+
+        qmd.plotExpecValuesQHLTrueModel(
+            save_to_file = str( 
+            global_variables.results_directory+
+            'qhl_expec_values_'+str(global_variables.long_id)+'.png')
+        )
             
     
 else:
@@ -189,27 +195,32 @@ else:
 
     if global_variables.save_plots:
 
-        qmd.plotVolumes(save_to_file=str(
+        qmd.plotVolumes(
+            save_to_file=str(
             global_variables.results_directory+
             'volumes_all_models_'+ str(global_variables.long_id)+ '.png')
         )
-        qmd.plotVolumes(branch_champions=True,
+        qmd.plotVolumes(
+            branch_champions=True,
             save_to_file=str(global_variables.results_directory+
             'volumes_branch_champs_'+ str(global_variables.long_id)+
             '.png')
         )
         
-        qmd.saveBayesCSV(save_to_file=str(
+        qmd.saveBayesCSV(
+            save_to_file=str(
             global_variables.results_directory+ 
             'bayes_factors_'+ str(global_variables.long_id)+'.csv'),
             names_ids='latex'
         )
         
-        qmd.plotExpecValues(save_to_file=str( 
+        qmd.plotExpecValues(
+            save_to_file=str( 
             global_variables.results_directory+
             'expec_values_'+str(global_variables.long_id)+'.png')
         )
-        qmd.plotRadarDiagram(save_to_file=str(
+        qmd.plotRadarDiagram(
+            save_to_file=str(
             global_variables.results_directory+
             'radar_'+ str(global_variables.long_id)+ '.png')
         )
@@ -227,7 +238,8 @@ else:
     #        )
         
         
-        qmd.plotTreeDiagram(save_to_file = str
+        qmd.plotTreeDiagram(
+            save_to_file = str
             (global_variables.results_directory+
             'tree_diagram_'+ str(global_variables.long_id)+ '.png')
         )

@@ -299,6 +299,9 @@ class QMD():
             
         for i in range(len(self.InitialOpList)):
             model = self.InitialOpList[i]
+
+            if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
+                self.TrueOpModelID = i
             self.ModelNameIDs[i] = model
             
     def addModel(self, model, branchID=0):
@@ -329,6 +332,8 @@ class QMD():
             log_file = self.log_file
         )
         if tryAddModel == True: ## keep track of how many models/branches in play
+            if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
+                self.TrueOpModelID = self.NumModels
             self.HighestModelID += 1 
             self.ModelNameIDs[self.NumModels] = model
             self.NumModels += 1
@@ -1516,12 +1521,20 @@ class QMD():
     def plotExpecValues(self, model_ids=None, champ=True, max_time=1.8,
         t_interval=50000, save_to_file=None
     ):
+    
         PlotQMD.ExpectationValuesTrueSim(qmd=self, model_ids=model_ids, 
             champ=champ, max_time=max_time, t_interval=t_interval,
             use_experimental_data=self.UseExperimentalData,
             experimental_measurements_dict=self.ExperimentalMeasurements,
             upper_x_lim = max_time,
             save_to_file=save_to_file
+        )
+
+    def plotExpecValuesQHLTrueModel(self, 
+        save_to_file=None    
+    ):
+        PlotQMD.ExpectationValuesQHL_TrueModel(qmd=self, 
+            save_to_file = save_to_file
         )
 
     def plotTreeDiagram(self, modlist=None, save_to_file=None):

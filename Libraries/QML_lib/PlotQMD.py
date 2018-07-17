@@ -9,7 +9,7 @@ from matplotlib.ticker import Formatter
 from matplotlib import colors as mcolors
 
 
-
+import random
 import matplotlib.cbook as cb
 from matplotlib.colors import colorConverter, Colormap
 from matplotlib.patches import FancyArrowPatch, Circle, ArrowStyle
@@ -220,6 +220,140 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         plt.savefig(save_to_file, bbox_inches='tight')
 
     
+def ExpectationValuesQHL_TrueModel(qmd, 
+    max_time=3, t_interval=0.01, experimental_measurements_dict=None,
+    use_experimental_data=False, upper_x_lim=None,
+    save_to_file=None
+):
+    model_ids = [qmd.TrueOpModelID]
+    probe_id = random.choice(range(qmd.NumProbes))
+    # names colours from
+    # https://matplotlib.org/2.0.0/examples/color/named_colors.html
+    true_colour =  colors.cnames['lightsalmon'] #'b'
+    true_colour =  'r' #'b'
+    
+    champion_colour =  colors.cnames['cornflowerblue'] #'r'
+    sim_colours = ['g', 'c', 'm', 'y', 'k']
+
+    plt.clf()
+    plt.xlabel('Time (microseconds)')
+    plt.ylabel('Expectation Value')
+
+    
+    if (experimental_measurements_dict is not None) and (use_experimental_data==True):
+        times = sorted(list(experimental_measurements_dict.keys()))
+        true_expec_values = [
+            experimental_measurements_dict[t] for t in times
+        ]
+    else:
+        times = np.arange(0, max_time, t_interval)
+        true = qmd.TrueOpName
+        true_op = DataBase.operator(true)
+        true_params = qmd.TrueParamsList
+        true_ops = true_op.constituents_operators
+        true_ham = np.tensordot(true_params, true_ops, axes=1)
+        true_dim = true_op.num_qubits
+        true_probe = qmd.ProbeDict[(probe_id,true_dim)]
+        true_expec_values = [evo.expectation_value(ham=true_ham, t=t, 
+            state=true_probe) for t in times
+        ]
+    plt.scatter(times, true_expec_values, label='True Expectation Value',
+        marker='o', s=8, color = true_colour
+    )
+
+    ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
+    for i in range(len(model_ids)):
+        mod_id = model_ids[i]
+        sim = qmd.ModelNameIDs[mod_id]
+        sim_op  = DataBase.operator(sim)
+        mod=qmd.reducedModelInstanceFromID(mod_id)
+        sim_params = list(mod.FinalParams[:,0])
+        sim_ops = sim_op.constituents_operators
+        sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
+        sim_dim = sim_op.num_qubits
+        sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
+        colour_id = int(i%len(sim_colours))
+        sim_col = sim_colours[colour_id]
+        sim_expec_values = [evo.expectation_value(ham=sim_ham, t=t,
+            state=sim_probe) for t in times
+        ]
+
+        if mod_id == qmd.TrueOpModelID:
+            sim_label = 'Simulated Model'
+            sim_col = champion_colour
+        else:
+            sim_label = 'Model '+str(mod_id)
+
+        plt.plot(times, sim_expec_values, label=sim_label, color=sim_col)
+
+    ax = plt.subplot(111)
+
+    # Shrink current axis's height by 10% on the bottom
+    box = ax.get_position()
+    qty = 0.1
+    ax.set_position([box.x0, box.y0 + box.height * qty,
+                     box.width, box.height * (1.0-qty)])
+
+    handles, labels = ax.get_legend_handles_labels()
+    label_list = list(labels)
+    handle_list = list(handles)
+
+    new_labels=[]
+    new_handles=[]
+
+    special_labels=[]
+    special_handles=[]
+
+    special_terms = ['True Expectation Value', 'Champion Model', 'Simulated Model']
+
+    for i in range(len(label_list)):
+        if label_list[i] in special_terms:
+            special_labels.append(label_list[i])
+            special_handles.append(handle_list[i])
+        else:
+            new_labels.append(label_list[i])
+            new_handles.append(handle_list[i])
+
+
+    special_handles = tuple(special_handles)
+    special_labels = tuple(special_labels)
+
+    extra_lgd = True
+    if len(new_handles) == 0:
+        print("No models other than champ/true")
+        extra_lgd=False
+        
+    new_handles = tuple(new_handles)
+    new_labels = tuple(new_labels)
+    
+    if upper_x_lim is not None:
+        plt.xlim(0,upper_x_lim)
+    else:
+        plt.xlim(0, max(times))
+    
+    if extra_lgd:
+        lgd_spec=ax.legend(special_handles, special_labels, 
+            loc='upper center', bbox_to_anchor=(1, 1),fancybox=True,
+            shadow=True, ncol=1
+        )
+        lgd_new=ax.legend(new_handles, new_labels, 
+            loc='upper center', bbox_to_anchor=(1.15, 0.75),
+            fancybox=True, shadow=True, ncol=1
+        )
+        plt.gca().add_artist(lgd_spec)
+    else:
+        lgd_spec=ax.legend(special_handles, special_labels,
+            loc='upper center', bbox_to_anchor=(1, 1),fancybox=True, 
+            shadow=True, ncol=1
+        )
+        
+    plt.title(str("QHL test for " + 
+        str(DataBase.latex_name_ising(qmd.TrueOpName)))
+    )        
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
+
     
 def BayF_IndexDictToMatrix(ModelNames, AllBayesFactors, StartBayesFactors=None):
     
@@ -1129,8 +1263,9 @@ def parameterEstimates(qmd, modelID, save_to_file=None):
     plt.title(str("Parameter estimation for model " +  
         DataBase.latex_name_ising(name))
     )
+
     if save_to_file is not None:
-        plt.savefig(save_to_file)
+        plt.savefig(save_to_file, bbox_inches='tight')
 
 
 ### Radar Plot ###
