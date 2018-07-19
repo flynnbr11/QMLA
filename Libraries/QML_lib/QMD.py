@@ -494,7 +494,10 @@ class QMD():
                             )
                             break
                         time.sleep(0.1)
-                    del updated_model_info
+                    self.log_print(
+                    ['Blocking RQ model learned:', model_name]
+                    )
+#                    del updated_model_info
 
             else:
                 self.QMDInfo['probe_dict'] = self.ProbeDict
@@ -1177,7 +1180,9 @@ class QMD():
     
         mod_to_learn = self.TrueOpName
         self.log_print(["QHL test on:", mod_to_learn])
-        self.learnModel(model_name=mod_to_learn, use_rq=self.use_rq)
+        self.learnModel(model_name=mod_to_learn, use_rq=self.use_rq, 
+            blocking=True
+        )
                 
         mod_id = DB.model_id_from_name(db=self.db, name=mod_to_learn)
         self.log_print(["Learned:", mod_to_learn, ". ID=", mod_id])

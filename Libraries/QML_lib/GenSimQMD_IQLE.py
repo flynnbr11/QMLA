@@ -17,7 +17,7 @@ global_print_loc=False
 global debug_print
 debug_print = False
 global debug_log_print
-debug_log_print = True
+debug_log_print = False
 global likelihood_dev
 likelihood_dev = False
 
