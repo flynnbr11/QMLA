@@ -76,7 +76,7 @@ def latex_name_ising(name):
 def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, 
     max_time=3, t_interval=0.01, experimental_measurements_dict=None,
     use_experimental_data=False, upper_x_lim=None,
-    save_to_file=None
+    true_plot_type='scatter', save_to_file=None
 ):
     import random
     if model_ids is None and champ == True:
@@ -122,9 +122,15 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         true_expec_values = [evo.expectation_value(ham=true_ham, t=t, 
             state=true_probe) for t in times
         ]
-    plt.scatter(times, true_expec_values, label='True Expectation Value',
-        marker='o', s=8, color = true_colour
-    )
+
+    if true_plot_type=='plot': 
+        plt.plot(times, true_expec_values, label='True Expectation Value',
+                 color = true_colour
+        )
+    else:
+        plt.scatter(times, true_expec_values, label='True Expectation Value',
+            marker='o', s=8, color = true_colour
+        )
 
     ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
     for i in range(len(model_ids)):
@@ -194,6 +200,11 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         
     new_handles = tuple(new_handles)
     new_labels = tuple(new_labels)
+
+    all_expec_values = sim_expec_values + true_expec_values
+    lower_y_lim = max(0,min(all_expec_values))
+    upper_y_lim = max(all_expec_values)
+    plt.ylim(lower_y_lim, upper_y_lim)
     
     if upper_x_lim is not None:
         plt.xlim(0,upper_x_lim)
@@ -223,6 +234,7 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
 def ExpectationValuesQHL_TrueModel(qmd, 
     max_time=3, t_interval=0.01, experimental_measurements_dict=None,
     use_experimental_data=False, upper_x_lim=None,
+    true_plot_type='scatter',
     save_to_file=None
 ):
     model_ids = [qmd.TrueOpModelID]
@@ -257,9 +269,15 @@ def ExpectationValuesQHL_TrueModel(qmd,
         true_expec_values = [evo.expectation_value(ham=true_ham, t=t, 
             state=true_probe) for t in times
         ]
-    plt.scatter(times, true_expec_values, label='True Expectation Value',
-        marker='o', s=8, color = true_colour
-    )
+        
+    if true_plot_type=='plot':
+        plt.plot(times, true_expec_values, label='True Expectation Value',
+                 color = true_colour
+        )
+    else:
+        plt.scatter(times, true_expec_values, label='True Expectation Value',
+            marker='o', s=8, color = true_colour
+        )
 
     ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
     for i in range(len(model_ids)):
@@ -326,6 +344,11 @@ def ExpectationValuesQHL_TrueModel(qmd,
     new_handles = tuple(new_handles)
     new_labels = tuple(new_labels)
     
+    all_expec_values = sim_expec_values + true_expec_values
+    lower_y_lim = max(0,min(all_expec_values))
+    upper_y_lim = max(all_expec_values)
+    plt.ylim(lower_y_lim, upper_y_lim)
+    
     if upper_x_lim is not None:
         plt.xlim(0,upper_x_lim)
     else:
@@ -348,10 +371,14 @@ def ExpectationValuesQHL_TrueModel(qmd,
         )
         
     plt.title(str("QHL test for " + 
-        str(DataBase.latex_name_ising(qmd.TrueOpName)))
+        str(DataBase.latex_name_ising(qmd.TrueOpName))
+        +". [" + str(qmd.NumParticles) + " prt; "
+        + str(qmd.NumExperiments) +"exp]"
+        )
     )        
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
+
 
 
     

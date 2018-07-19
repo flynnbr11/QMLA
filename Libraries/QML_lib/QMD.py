@@ -1519,7 +1519,7 @@ class QMD():
     
         
     def plotExpecValues(self, model_ids=None, champ=True, max_time=1.8,
-        t_interval=50000, save_to_file=None
+        t_interval=0.3, save_to_file=None
     ):
     
         PlotQMD.ExpectationValuesTrueSim(qmd=self, model_ids=model_ids, 
@@ -1531,9 +1531,13 @@ class QMD():
         )
 
     def plotExpecValuesQHLTrueModel(self, 
+        max_time = 1.8,
+        t_interval= 0.1,
         save_to_file=None    
     ):
         PlotQMD.ExpectationValuesQHL_TrueModel(qmd=self, 
+            max_time = max_time,
+            t_interval = t_interval,
             save_to_file = save_to_file
         )
 

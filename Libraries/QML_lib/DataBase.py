@@ -580,6 +580,9 @@ def get_eigenvectors(name):
 
 
 def latex_name_ising(name):
+    if name=='x' or name=='y' or name=='z':
+        return '$'+name+'$'
+
     terms=name.split('PP')
     rotations = ['xTi', 'yTi', 'zTi']
     hartree_fock = ['xTx', 'yTy', 'zTz']

@@ -16,8 +16,22 @@ import DataBase
 global_print_loc=False
 global debug_print
 debug_print = False
+global debug_log_print
+debug_log_print = True
 global likelihood_dev
 likelihood_dev = False
+
+def log_print(to_print_list, log_file, log_identifier=None):
+    identifier = str(str(time_seconds()) +" [GenSim ("+str(log_identifier)+")]")
+    if type(to_print_list)!=list:
+        to_print_list = list(to_print_list)
+
+    print_strings = [str(s) for s in to_print_list]
+    to_print = " ".join(print_strings)
+    with open(log_file, 'a') as write_log_file:
+        print(identifier, str(to_print), file=write_log_file)
+
+
 
 class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     r"""
@@ -96,6 +110,18 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             self._trueHam = None
 
         super(GenSimQMD_IQLE, self).__init__(self._oplist)
+        
+        log_print(
+            [
+            'True Ops:\n', self._true_oplist,
+            '\n true params:', self._trueparams, 
+            '\n true name:', self._truename, 
+            '\n model name:', self.ModelName
+            ], 
+            self.log_file, self.log_identifier
+        )
+        
+        
         self.NumProbes = num_probes
         if probe_dict is None: 
             self._probelist = seperable_probe_dict(max_num_qubits=12, 
@@ -192,6 +218,17 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
 
         if true_evo and self.use_experimental_data:
             time = expparams['t']
+
+            if debug_log_print:
+                log_print(
+                    [
+                    'Getting outcome from experimental data.',
+                    'times:\n', time
+                    ],
+                    self.log_file, 
+                    self.log_identifier
+                )
+
             #print("Time:", time[0])
             try:
                 # If time already exists in experimental data
@@ -249,9 +286,34 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                     log_file=self.log_file, log_identifier=self.log_identifier
                 )    
 
+
+
+            if debug_log_print:
+                log_print(
+                    [
+                    'Simulating experiment.',
+                    'times:', times,
+                    '\nOutcomes:', outcomes, 
+                    '\n pr0:\n', pr0,
+                    ],
+                    self.log_file, 
+                    self.log_identifier
+                )
+
         likelihood_array = (
             qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
         )
+
+        if debug_log_print:
+            log_print(
+                [
+                '\n likelihood values:\n:', likelihood_array
+                ],
+                self.log_file, 
+                self.log_identifier
+            )
+
+
         return likelihood_array
 
 

@@ -108,7 +108,9 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
     sigma_threshold = qmd_info['sigma_threshold']
     gaussian = qmd_info['gaussian']
     
-    log_print(["True ops being learned:", true_params])
+    log_print(['Name:', name])
+    log_print(['true ops:\n', true_ops])
+    log_print(["true params:", true_params])
     
     # Generate model and learn
     op = DataBase.operator(name = name)
@@ -152,7 +154,8 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
     )
 
     log_print(["Updating model."])
-    qml_instance.UpdateModel(n_experiments=num_experiments,
+    qml_instance.UpdateModel(
+        n_experiments=num_experiments,
         sigma_threshold = sigma_threshold
     )
     updated_model_info = copy.deepcopy(qml_instance.learned_info_dict()) 

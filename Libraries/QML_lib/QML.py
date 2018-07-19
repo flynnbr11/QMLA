@@ -19,6 +19,8 @@ pickle.HIGHEST_PROTOCOL=2
 
 global debug_print
 global print_mem_status
+global debug_log_print
+debug_log_print = False
 debug_print = False
 print_mem_status = True
 global_print_loc = False
@@ -122,6 +124,14 @@ class ModelLearningClass():
         self.checkQLoss = True
         print_loc(print_location=init_model_print_loc)
         
+        self.log_print(['True params', self.TrueParams, '\n true op list:',
+            self.TrueOpList, 'true op name:', self.TrueOpName]
+        )
+        self.log_print(['SimOpsNames:', self.SimOpsNames, 
+            '\n\tSimOpList:\n', self.SimOpList, 
+            '\n\t SimParams:', self.SimParams]
+        )    
+            
         if debug_directory is not None: 
             self.debugSave = True
             self.debugDirectory = debug_directory 
@@ -139,13 +149,16 @@ class ModelLearningClass():
             self.Prior = Distributions.normal_distribution_ising(
                 term = self.Name,
                 specific_terms = {
+                    'x' : [0.34, 0.1],
+                    'y' : [0.34, 0.1],
+                    'z' : [0.34, 0.1],
                     'xTy' : [0.0,0.0001],
                     'xTz' : [0.0,0.0001],
                     'yTz' : [0.0,0.0001],
                     'xTx' : [2.7, 0.2], # true value 2.7
                     'yTy' : [2.7, 0.2], # true value 2.7
                     'zTz' : [2.14, 0.2], # true value 2.14
-                    'xTi' : [1.0, 0.5],
+                    'xTi' : [0.35, 0.04], # TODO Broaden, testing with small dist
                     'yTi' : [0.5, 2.0],
                     'zTi' : [0.5, 2.0],
                 }
@@ -250,6 +263,7 @@ class ModelLearningClass():
             self.datum_gather_cumulative_time+=after_datum-before_datum
 
             before_upd = time.time()
+            ## Call updater to update distribution based on datum
             self.Updater.update(self.Datum, self.Experiment)
             after_upd = time.time()
             self.update_cumulative_time+=after_upd-before_upd
@@ -270,7 +284,10 @@ class ModelLearningClass():
                 )
                 print_loc(global_print_loc)
             
+            if istep%50==0:
+                self.log_print(['Step', istep, '\t Mean:', self.Updater.est_mean()])
             self.TrackEval.append(self.Updater.est_mean())
+            
             print_loc(global_print_loc)
             self.Covars[istep] = np.linalg.norm(
                 self.Updater.est_covariance_mtx()
@@ -278,6 +295,7 @@ class ModelLearningClass():
             print_loc(global_print_loc)
             self.Particles[:, :, istep] = self.Updater.particle_locations
             self.Weights[:, istep] = self.Updater.particle_weights
+            
 
             self.NewEval = self.Updater.est_mean()
             print_loc(global_print_loc)
@@ -322,8 +340,8 @@ class ModelLearningClass():
                 )
                 self.log_print([' at Iteration Number ' , str(istep)]) 
                 for iterator in range(len(self.FinalParams)):
-                    self.FinalParams[iterator]= [np.mean(
-                        self.Particles[:,iterator,istep]), 
+                    self.FinalParams[iterator]= [
+                        np.mean(self.Particles[:,iterator,istep]), 
                         np.std(self.Particles[:,iterator,istep])
                     ]
                     self.log_print(['Final Parameters mean and stdev:',
@@ -398,6 +416,7 @@ class ModelLearningClass():
         learned_info['times'] = self.TrackTime
         learned_info['final_params'] = self.FinalParams
         learned_info['normalization_record'] = self.Updater.normalization_record
+        learned_info['log_total_likelihood'] = self.Updater.log_total_likelihood
         learned_info['data_record'] = self.Updater.data_record
         learned_info['name'] = self.Name
         learned_info['model_id'] = self.ModelID
@@ -405,6 +424,8 @@ class ModelLearningClass():
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
+        learned_info ['particles'] = self.Particles
+        learned_info['weights'] = self.Weights
 
         return learned_info
         
@@ -520,6 +541,7 @@ class reducedModel():
         self.Q_id = qid
         self.log_file = log_file
         
+        
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) +
             "[QML:Reduced "+ str(self.ModelID) +"; QMD "+str(self.Q_id)+"]"
@@ -556,9 +578,12 @@ class reducedModel():
         self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
         self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_info['normalization_record']
+        self.log_total_likelihod = learned_info['log_total_likelihood']
         self.VolumeList = learned_info['volume_list'] 
         self.TrackEval = np.array(learned_info['track_eval'])
-
+        self.Particles = np.array(learned_info['particles'])
+        self.Weights = np.array(learned_info['weights'])
+    
 #        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,
 #            experimental_measurements = self.ExperimentalMeasurements,
 #            experimental_measurement_times=(

@@ -70,6 +70,10 @@ experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
     num_probes=num_probes
 )
 
+
+if global_variables.use_experimental_data:
+    experimental_probe_dict = None
+
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
     directory="NV05_HahnPeaks_expdataset"
 )
@@ -87,6 +91,7 @@ for k in list(experimental_measurements_dict.keys()):
 use_experimental_measurements = False
 
 
+
 initial_op_list = ['xTi', 'yTi', 'zTi']
 #true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 true_op = global_variables.true_operator
@@ -98,6 +103,9 @@ num_params = len(true_op_list)
 true_params = []
 for i in range(num_params):
     true_params.append(random.uniform(-1,2))
+
+if true_op == 'xTi' or true_op == 'x' or true_op == 'y' or true_op == 'z':       
+    true_params = [0.33]
 
 num_ops = len(initial_op_list)
     
@@ -172,6 +180,8 @@ if global_variables.qhl_test:
     if global_variables.save_plots:
 
         qmd.plotExpecValuesQHLTrueModel(
+            max_time=100, 
+            t_interval=1,
             save_to_file = str( 
             global_variables.results_directory+
             'qhl_expec_values_'+str(global_variables.long_id)+'.png')

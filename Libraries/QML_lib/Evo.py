@@ -10,7 +10,7 @@ from MemoryTest import print_loc
 sys.path.append((os.path.join("..")))
 
 global_print_loc = False 
-use_linalg = False
+use_linalg = True
 use_sparse = False 
  
 try: 
@@ -127,7 +127,6 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe,
                 )
                 sys.exit()
 #                raise
-            
                 
             if output[evoId][tId] < 0:
                 log_print(["[QLE] Negative probability : \t \t probability = ", 
