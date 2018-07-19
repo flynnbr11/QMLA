@@ -380,9 +380,11 @@ def ExpectationValuesQHL_TrueModel(qmd,
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-def plotDistributionProgression(qmd, model_id=None, true_model=False, 
-                            num_steps_to_show=2, show_means=True,
-                            save_to_file=None
+def plotDistributionProgression(
+    qmd, 
+    model_id=None, true_model=False, 
+    num_steps_to_show=2, show_means=True,
+    save_to_file=None
 ):
     # Plots initial and final prior distribution over parameter space
     # with num_steps_to_show intermediate distributions 
@@ -407,6 +409,8 @@ def plotDistributionProgression(qmd, model_id=None, true_model=False,
     increment = int(num_experiments/num_intervals_to_show)
 
     nearest_five = round(increment/5)*5
+    if nearest_five == 0:
+        nearest_five = 1
 
     steps_to_show = list(range(0,num_experiments,nearest_five))
 
@@ -464,7 +468,47 @@ def plotDistributionProgression(qmd, model_id=None, true_model=False,
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
+
+def plotVolumeQHL(qmd, model_id=None, 
+    true_model=True, show_resamplings=True,  
+    save_to_file=None
+):
+    if true_model:
+        try:
+            mod = qmd.reducedModelInstanceFromID(qmd.TrueOpModelID) 
+        except:
+            print("True model not present in QMD models.")
+    elif model_id is not None:
+        mod = qmd.reducedModelInstanceFromID(model_id)
+    else:
+        print("Must either provide model_id or set true_model=True for volume plot.")
+        
+    try:
+        y = mod.VolumeList
+    except AttributeError:
+        print("Model not considered.")
+        raise
+
+    x = range(qmd.NumExperiments)
+        
+    plt.clf()
+    plt.xlabel('Epoch')
+    plt.ylabel('Volume')
+    plt.semilogy(x,y, label='Volume')
+
+    resamplings = mod.ResampleEpochs
     
+    if show_resamplings and len(resamplings)>0:
+        plt.axvline(resamplings[0], linestyle='dashed', 
+            c='grey', label='Resample point'
+        )
+        for r in resamplings[1:]:
+            plt.axvline(r, linestyle='dashed', c='grey')
+    
+    plt.legend()
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
 def BayF_IndexDictToMatrix(ModelNames, AllBayesFactors, StartBayesFactors=None):
     
     size = len(ModelNames)

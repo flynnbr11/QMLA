@@ -204,6 +204,7 @@ class ModelLearningClass():
         self.TrackTime = np.array([]) #only for debugging
         self.Particles = np.array([])
         self.Weights = np.array([])
+        self.ResampleEpochs = []
         self.Experiment = self.Heuristic()   
         self.ExperimentsHistory = np.array([])
         self.FinalParams = np.empty([len(self.SimOpList),2]) #average and standard deviation at the final step of the parameters inferred distributions
@@ -270,6 +271,9 @@ class ModelLearningClass():
             self.Updater.update(self.Datum, self.Experiment)
             after_upd = time.time()
             self.update_cumulative_time+=after_upd-before_upd
+            
+            if self.Updater.just_resampled:
+                self.ResampleEpochs.append(istep)
             
             print_loc(global_print_loc)
 
@@ -435,6 +439,8 @@ class ModelLearningClass():
         learned_info['track_eval'] = self.TrackEval
         learned_info ['particles'] = self.Particles
         learned_info['weights'] = self.Weights
+        learned_info['resample_epochs'] = self.ResampleEpochs
+        learned_info['quadratic_losses'] = self.QLosses
 
         return learned_info
         
@@ -592,6 +598,8 @@ class reducedModel():
         self.TrackEval = np.array(learned_info['track_eval'])
         self.Particles = np.array(learned_info['particles'])
         self.Weights = np.array(learned_info['weights'])
+        self.ResampleEpochs = learned_info['resample_epochs']
+        self.QuadraticLosses = learned_info['quadratic_losses']
     
 #        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,
 #            experimental_measurements = self.ExperimentalMeasurements,

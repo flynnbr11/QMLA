@@ -1554,14 +1554,27 @@ class QMD():
         true_model = True,
         save_to_file = None
     ):
-        PlotQMD.plotDistributionProgression(qmd=self, 
+        PlotQMD.plotDistributionProgression(
+            qmd=self, 
             show_means = show_means,
             num_steps_to_show = num_steps_to_show,
             true_model = true_model,
             save_to_file = save_to_file
         )               
             
-        
+    def plotVolumeQHL(self, 
+        model_id = None, 
+        true_model = True, 
+        show_resamplings = True, 
+        save_to_file = None
+    ):
+        PlotQMD.plotVolumeQHL(
+            qmd=self,
+            model_id = model_id, 
+            true_model = true_model, 
+            show_resamplings = show_resamplings, 
+            save_to_file = save_to_file
+        )
 
     def plotTreeDiagram(self, modlist=None, save_to_file=None):
         PlotQMD.plotQMDTree(self, modlist=modlist, save_to_file=save_to_file)

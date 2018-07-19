@@ -192,6 +192,13 @@ if global_variables.qhl_test:
             global_variables.results_directory+
             'qhl_distribution_'+str(global_variables.long_id)+'.png')
         )
+        
+        qmd.plotVolumeQHL(
+            save_to_file = str( 
+            global_variables.results_directory+
+            'qhl_volume_'+str(global_variables.long_id)+'.png')
+        )
+        
             
     
 else:
