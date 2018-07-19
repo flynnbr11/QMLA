@@ -60,6 +60,12 @@ cd $running_dir
 mkdir -p $running_dir/logs
 mkdir -p $PBS_O_WORKDIR/logs
 
+if [ "$QHL" == 1 ]
+then
+	true_hamiltonian='z'
+else
+	true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+fi
 
 
 echo "Nodelist"
@@ -73,7 +79,8 @@ echo "REDIS_URL is $REDIS_URL"
 echo "Running dir is $running_dir"
 echo "workers will log in $running_dir/logs"
 
-QMD_LOG_DIR="$PBS_O_WORKDIR/logs/$DATETIME"
+#QMD_LOG_DIR="$PBS_O_WORKDIR/logs/$DATETIME"
+QMD_LOG_DIR="$RESULTS_DIR/logs"
 mkdir -p $QMD_LOG_DIR
 QMD_JOB=$PBS_JOBNAME
 echo "PBS job name is $QMD_JOB"
@@ -109,7 +116,7 @@ echo "Starting Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
 
 echo "CONFIG: -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG"
 
-python3 Exp.py -rq=1 -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -cb=$BAYES_CSV
+python3 Exp.py -rq=1 -op=$true_hamiltonian -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -g=1 -exp=0 -qhl=$QHL -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -cb=$BAYES_CSV
 
 
 

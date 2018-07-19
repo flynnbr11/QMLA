@@ -2,9 +2,7 @@
 
 test_description="test_exp_data"
 
-
-
-num_tests=2
+num_tests=1
 min_id=1
 let max_id="$min_id + $num_tests - 1 "
 
@@ -20,7 +18,7 @@ full_path_to_results=$(pwd)/Results/$results_dir
 all_qmd_bayes_csv="$full_path_to_results/multiQMD.csv"
 
 
-OUT_LOG="$(pwd)/logs/$day_time/OUTPUT_AND_ERROR_FILES/"
+OUT_LOG="$full_path_to_results/OUTPUT_AND_ERROR_FILES/"
 echo "pwd: $(pwd)"
 echo "OUT LOG: $OUT_LOG"
 output_file="output_file"
@@ -39,7 +37,8 @@ qmd_id=$min_id
 cutoff_time=180
 
 do_plots=1
-pickle_class=0
+pickle_class=1
+qhl=1
 
 p_min=3000
 p_max=3000
@@ -73,8 +72,8 @@ ra=$ra_default
 rt=$rt_default
 rp=$rp_default
 
-e=20
-p=20
+e=3
+p=10
 
 printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp \n" >> QMD_Results_directories.log
 
@@ -98,7 +97,7 @@ do
 	this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
 	printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd \n" >> QMD_all_tasks.log
 
-	qsub -v QMD_ID=$qmd_id,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv -N $this_qmd_name -l $time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+	qsub -v QMD_ID=$qmd_id,QHL=$qhl,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv -N $this_qmd_name -l $time -o $this_output_file -e $this_error_file run_qmd_instance.sh
 
 done
 
