@@ -380,6 +380,89 @@ def ExpectationValuesQHL_TrueModel(qmd,
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
+def plotDistributionProgression(qmd, model_id=None, true_model=False, 
+                            num_steps_to_show=2, show_means=True,
+                            save_to_file=None
+):
+    # Plots initial and final prior distribution over parameter space
+    # with num_steps_to_show intermediate distributions 
+    # Note only safe/tested for QHL, ie on true model (single parameter). 
+    from scipy import stats
+    plt.clf()
+    if true_model:
+        try:
+            mod = qmd.reducedModelInstanceFromID(qmd.TrueOpModelID)
+        except:
+            print("True model not present in this instance of QMD.")
+    elif model_id is not None:
+        mod = qmd.reducedModelInstanceFromID(model_id)
+    else:
+        print("Either provide a model id or set true_model=True to generate \
+              plot of distribution development."
+         )
+    true_parameters = mod.TrueParams
+    num_experiments = np.shape(mod.Particles)[2]
+    max_exp_num = num_experiments - 1
+    num_intervals_to_show = num_steps_to_show
+    increment = int(num_experiments/num_intervals_to_show)
+
+    nearest_five = round(increment/5)*5
+
+    steps_to_show = list(range(0,num_experiments,nearest_five))
+
+    if max_exp_num not in steps_to_show:
+        steps_to_show.append(max_exp_num)
+
+    # TODO use a colourmap insted of manual list
+    colours = ['gray', 'rosybrown', 'cadetblue']
+    true_colour = 'k'
+    initial_colour = 'b'
+    final_colour = 'r'
+    steps_to_show = sorted(steps_to_show)
+
+    ax = plt.subplot(111)
+    
+    if show_means:
+        for t in true_parameters:
+            ax.axvline(t, label='True param', c=true_colour, linestyle='dashed')
+
+    for i in steps_to_show:
+        j = steps_to_show.index(i) - 1 # previous step which is shown on plot already
+        if not np.all(mod.Particles[:,:,i] == mod.Particles[:,:,j]):
+            # don't display identical distributions between steps
+            particles = mod.Particles[:,:,i]
+            particles = sorted(particles)
+            colour = colours[i%len(colours)]
+
+            fit = stats.norm.pdf(particles, np.mean(particles), np.std(particles))
+            max_fit = max(fit)
+            fit = fit/max_fit
+            if i==max_exp_num:
+                colour = final_colour
+                label = 'Final distribution'
+                if show_means: 
+                    ax.axvline(np.mean(particles), 
+                        label='Final Mean', color=colour, linestyle='dashed'
+                    )
+            elif i==min(steps_to_show):
+                colour = initial_colour
+                if show_means:
+                    ax.axvline(np.mean(particles), label='Initial Mean',
+                        color=colour, linestyle='dashed'
+                    )
+                label='Initial distribution'
+            else:
+                label=str('Step '+str(i))
+
+            ax.plot(particles, fit, label=label, color=colour)
+
+    plt.legend(bbox_to_anchor=(1.02, 1.02), ncol=1)
+    plt.xlabel('Parameter estimate')
+    plt.ylabel('Probability Density (relative)')
+    title=str('Probability density function of parameter for '+mod.LatexTerm)
+    plt.title(title)
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
 
     
 def BayF_IndexDictToMatrix(ModelNames, AllBayesFactors, StartBayesFactors=None):

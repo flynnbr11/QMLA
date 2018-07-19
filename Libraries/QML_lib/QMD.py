@@ -1548,6 +1548,21 @@ class QMD():
             save_to_file = save_to_file
         )
 
+    def plotDistributionProgression(self, 
+        show_means = True,
+        num_steps_to_show = 2,
+        true_model = True,
+        save_to_file = None
+    ):
+        PlotQMD.plotDistributionProgression(qmd=self, 
+            show_means = show_means,
+            num_steps_to_show = num_steps_to_show,
+            true_model = true_model,
+            save_to_file = save_to_file
+        )               
+            
+        
+
     def plotTreeDiagram(self, modlist=None, save_to_file=None):
         PlotQMD.plotQMDTree(self, modlist=modlist, save_to_file=save_to_file)
 

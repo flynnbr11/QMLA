@@ -260,7 +260,6 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                     (self._b % int(self.NumProbes)), ham_num_qubits
                 ]
             
-            
             ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
             print_loc(global_print_loc)
 

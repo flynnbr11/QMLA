@@ -224,6 +224,9 @@ class ModelLearningClass():
             len(self.SimParams[0]), self.NumExperiments]
         )
         self.Weights = np.empty([self.NumParticles, self.NumExperiments])
+        self.DistributionMeans = np.empty([self.NumExperiments])
+        self.DistributionStdDevs = np.empty([self.NumExperiments])
+        
         self.Experiment = self.Heuristic()    
         self.SigmaThresh = sigma_threshold   #This is the value of the Norm of the COvariance matrix which stops the IQLE 
         self.LogTotLikelihood=[] #log_total_likelihood
@@ -295,10 +298,14 @@ class ModelLearningClass():
             print_loc(global_print_loc)
             self.Particles[:, :, istep] = self.Updater.particle_locations
             self.Weights[:, istep] = self.Updater.particle_weights
-            
 
             self.NewEval = self.Updater.est_mean()
             print_loc(global_print_loc)
+
+
+            #TODO this won't work -- what does iterator mean??
+            self.DistributionMeans[istep] = self.Updater.est_mean()
+#            self.DistributionStdDevs[istep] = 
                 
             if checkloss == True: 
                 if False: # can be reinstated to stop learning when volume converges
@@ -384,6 +391,8 @@ class ModelLearningClass():
                         self.SimOpsNames[iterator] , '):',
                         str(self.FinalParams[iterator])]
                     )
+
+            
 
             if debug_print:
                 self.log_print(["step ", istep])
@@ -664,6 +673,7 @@ class modelClassForRemoteBayesFactor():
         
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_model_info['normalization_record']
+        self.log_likelihood = learned_model_info['log_total_likelihood']
         
         log_identifier = str("Bayes "+str(self.ModelID)) 
         
