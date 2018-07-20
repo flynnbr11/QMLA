@@ -39,10 +39,7 @@ declare -a qhl_operators=(
 
 """
 declare -a qhl_operators=(
-'z'
-'zTi'
-'xTiPPyTy'
-'yTiPPzTi'
+'xTiPPzTiPPyTyPPzTz'
 )
 
 true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
@@ -63,7 +60,7 @@ then
             let num_prt="$i+10"
             redis-cli flushall
             let q_id="$q_id+1"
-            python3 Exp.py -p=1000 -e=500 -rq=0 -ra=0.99 -g=1 -qhl=$qhl_test -op="$op" -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=0
+            python3 Exp.py -p=30 -e=10 -rq=0 -ra=0.99 -g=1 -qhl=$qhl_test -op="$op" -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=0
         done 
     done
 

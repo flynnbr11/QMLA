@@ -102,7 +102,7 @@ num_params = len(true_op_list)
 
 true_params = []
 for i in range(num_params):
-    true_params.append(random.uniform(-1,2))
+    true_params.append(random.uniform(0,1))
 
 if true_op == 'xTi' or true_op == 'x' or true_op == 'y' or true_op == 'z' or true_op=='zTi' or true_op=='yTi':       
     true_params = [0.33]

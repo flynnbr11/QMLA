@@ -1424,7 +1424,9 @@ def parameterEstimates(qmd, modelID, save_to_file=None):
     plt.ylabel('Parameter Estimate')
     plt.legend(bbox_to_anchor=(1.1, 1.05))
     plt.title(str("Parameter estimation for model " +  
-        DataBase.latex_name_ising(name))
+        DataBase.latex_name_ising(name)+" ["+str(qmd.NumParticles)
+        +" prt;" + str(qmd.NumExperiments) + "exp]"
+        )
     )
 
     if save_to_file is not None:
