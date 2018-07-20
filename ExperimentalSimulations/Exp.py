@@ -71,7 +71,7 @@ experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
 )
 
 
-if global_variables.use_experimental_data:
+if global_variables.use_experimental_data == False:
     experimental_probe_dict = None
 
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
