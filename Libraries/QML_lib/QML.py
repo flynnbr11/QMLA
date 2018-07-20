@@ -308,7 +308,7 @@ class ModelLearningClass():
 
 
             #TODO this won't work -- what does iterator mean??
-            self.DistributionMeans[istep] = self.Updater.est_mean()
+#            self.DistributionMeans[istep] = self.Updater.est_mean()
 #            self.DistributionStdDevs[istep] = 
                 
             if checkloss == True: 

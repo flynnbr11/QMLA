@@ -222,7 +222,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             if debug_log_print:
                 log_print(
                     [
-                    'Getting outcome from experimental data.',
+                    'Getting system outcome',
                     'times:\n', time
                     ],
                     self.log_file, 

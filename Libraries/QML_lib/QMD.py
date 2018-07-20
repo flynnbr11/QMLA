@@ -1551,12 +1551,14 @@ class QMD():
     def plotDistributionProgression(self, 
         show_means = True,
         num_steps_to_show = 2,
+        renormalise = True,
         true_model = True,
         save_to_file = None
     ):
         PlotQMD.plotDistributionProgression(
             qmd=self, 
             show_means = show_means,
+            renormalise = renormalise,
             num_steps_to_show = num_steps_to_show,
             true_model = true_model,
             save_to_file = save_to_file

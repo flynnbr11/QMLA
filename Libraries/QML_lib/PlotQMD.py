@@ -384,6 +384,7 @@ def plotDistributionProgression(
     qmd, 
     model_id=None, true_model=False, 
     num_steps_to_show=2, show_means=True,
+    renormalise=True,
     save_to_file=None
 ):
     # Plots initial and final prior distribution over parameter space
@@ -438,9 +439,17 @@ def plotDistributionProgression(
             particles = sorted(particles)
             colour = colours[i%len(colours)]
 
-            fit = stats.norm.pdf(particles, np.mean(particles), np.std(particles))
-            max_fit = max(fit)
-            fit = fit/max_fit
+            # TODO if renormalise False, DON'T use a stat.pdf to model distribution
+            
+            
+            if renormalise:
+                fit = stats.norm.pdf(particles, np.mean(particles), np.std(particles))
+                max_fit = max(fit)
+                fit = fit/max_fit
+            else:
+                fit = mod.Weights[:,i]
+                
+                
             if i==max_exp_num:
                 colour = final_colour
                 label = 'Final distribution'

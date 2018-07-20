@@ -317,7 +317,7 @@ def parse_cmd_line_args(args):
     parser.add_argument(
       '-exp', '--experimental_data',
       help='Use experimental data if provided',
-      type=str,
+      type=int,
       default=default_experimental_data
     )
 

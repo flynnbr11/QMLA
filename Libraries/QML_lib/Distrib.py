@@ -90,9 +90,22 @@ def uniform_distribution_ising(term, specific_terms={},
     rotation = [lower_rotation, upper_rotation]
     hyperfine = [lower_hyperfine, upper_hyperfine]
     transverse = [lower_transverse, upper_transverse]
+    
+    single_qubit_terms = ['x', 'y', 'z']
     rotation_terms = ['xTi', 'yTi', 'zTi']
     hyperfine_terms = ['xTx', 'yTy', 'zTz']
     transverse_terms = ['xTy', 'xTz', 'yTz']
+    
+    if term in single_qubit_terms:
+        # For use in QHL tests, possibly can be removed later. -BF
+        limits = np.array([[0.0, 1.0]])
+        DistroList = list(map(
+            lambda limits: qi.UniformDistribution(limits), limits)
+        ) 
+        dist = qi.ProductDistribution(DistroList)
+
+
+        return dist
     
     individual_terms = term.split('PP')
     limits = []
