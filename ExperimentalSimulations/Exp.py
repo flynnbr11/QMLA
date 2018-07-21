@@ -174,11 +174,11 @@ if global_variables.qhl_test:
 
     if global_variables.save_plots:
 
-		qmd.plotParameterEstimates(true_model=True, 
-		save_to_file= str(global_variables.results_directory+
-			'qhl_parameter_estimates_'+ str(global_variables.long_id) +
-			'.png')
-		)
+        qmd.plotParameterEstimates(true_model=True, 
+            save_to_file= str(global_variables.results_directory+
+            'qhl_parameter_estimates_'+ str(global_variables.long_id) +
+            '.png')
+        )
 
 
         qmd.plotExpecValuesQHLTrueModel(
@@ -190,7 +190,7 @@ if global_variables.qhl_test:
         )
         
         if DataBase.num_parameters_from_name(qmd.TrueOpName) == 1:
-                qmd.plotDistributionProgression(
+            qmd.plotDistributionProgression(
                 renormalise = True,
                 save_to_file = str( 
                 global_variables.results_directory+
