@@ -163,11 +163,6 @@ qmd = QMD(
 if global_variables.qhl_test:
     qmd.runQHLTest()
 
-    qmd.plotParameterEstimates(true_model=True, 
-        save_to_file= str(global_variables.results_directory+
-            'qhl_parameter_estimates_'+ str(global_variables.long_id) +
-            '.png')
-    )
 
     if global_variables.pickle_qmd_class:
         log_print(["QMD complete. Pickling result to",
@@ -178,6 +173,13 @@ if global_variables.qhl_test:
             pickle.dump(qmd, pkl_file , protocol=2)
 
     if global_variables.save_plots:
+
+		qmd.plotParameterEstimates(true_model=True, 
+		save_to_file= str(global_variables.results_directory+
+			'qhl_parameter_estimates_'+ str(global_variables.long_id) +
+			'.png')
+		)
+
 
         qmd.plotExpecValuesQHLTrueModel(
             max_time=100, 
