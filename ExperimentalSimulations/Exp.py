@@ -66,31 +66,35 @@ qle = global_variables.do_qle # True for QLE, False for IQLE
 
 
 num_probes = 40
-experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
-    num_probes=num_probes
-)
 
 
-if global_variables.use_experimental_data == False:
+if global_variables.use_experimental_data == True:
+    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
+        num_probes=num_probes
+    )
+else:
     experimental_probe_dict = None
+
+# Load in experimental data
 
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
     directory="NV05_HahnPeaks_expdataset"
 )
 
-for k in list(experimental_measurements_dict.keys()):
-    # Convert nanoseconds in exp data to milliseconds
-    t_new = k/1000
-    experimental_measurements_dict[t_new] = experimental_measurements_dict.pop(k)
+for t in list(experimental_measurements_dict.keys()):
+    # Shift t-values by 180ns so t=0 corresponds to Pr(0)=1
+    # Convert t from ns to ms; remove old records
 
+#    new_time = (t - 180)/1000
+    new_time = (t - 205)/1000
+    msmt = experimental_measurements_dict[t]
+    experimental_measurements_dict.pop(t)
+    experimental_measurements_dict[new_time] = msmt
 
 
 #print("experimental measurements:", experimental_measurements_dict)
 
 #print("exp probes:", experimental_probe_dict)
-use_experimental_measurements = False
-
-
 
 initial_op_list = ['xTi', 'yTi', 'zTi']
 #true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
@@ -104,8 +108,8 @@ true_params = []
 for i in range(num_params):
     true_params.append(random.uniform(0,1))
 
-if true_op == 'xTi' or true_op == 'x' or true_op == 'y' or true_op == 'z' or true_op=='zTi' or true_op=='yTi':       
-    true_params = [0.33]
+#if true_op == 'xTi' or true_op == 'x' or true_op == 'y' or true_op == 'z' or true_op=='zTi' or true_op=='yTi':       
+#    true_params = [0.33]
 
 num_ops = len(initial_op_list)
     

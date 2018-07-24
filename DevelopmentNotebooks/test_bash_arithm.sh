@@ -8,3 +8,10 @@ then
     
     echo "Now this thing: $this_thing"
 fi
+
+
+for i in  [1 3 5 ]
+do
+    echo "i=$i"
+done
+

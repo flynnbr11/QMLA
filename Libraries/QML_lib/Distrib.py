@@ -98,13 +98,11 @@ def uniform_distribution_ising(term, specific_terms={},
     
     if term in single_qubit_terms:
         # For use in QHL tests, possibly can be removed later. -BF
-        limits = np.array([[0.0, 1.0]])
+        limits = np.array([[-0.5, 1.5]])
         DistroList = list(map(
             lambda limits: qi.UniformDistribution(limits), limits)
         ) 
         dist = qi.ProductDistribution(DistroList)
-
-
         return dist
     
     individual_terms = term.split('PP')
