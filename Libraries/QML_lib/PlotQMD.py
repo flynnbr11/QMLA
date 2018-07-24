@@ -1374,7 +1374,9 @@ def draw_networkx_arrows(G, pos,
 ### Parameter Estimate Plot ###
 
 
-def parameterEstimates(qmd, modelID, save_to_file=None):
+def parameterEstimates(qmd, modelID, 
+    use_experimental_data=False,save_to_file=None
+):
 
     mod = qmd.reducedModelInstanceFromID(modelID)
     name = mod.Name
@@ -1408,9 +1410,10 @@ def parameterEstimates(qmd, modelID, save_to_file=None):
         colour = colours[i%len(colours)]
         i+=1
         try:
-            y_true = qmd.TrueParamDict[term]
-            true_term_latex = DataBase.latex_name_ising(term)
-            ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
+            if use_experimental_data==False:
+                y_true = qmd.TrueParamDict[term]
+                true_term_latex = DataBase.latex_name_ising(term)
+                ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
         except:
             pass
         y = param_estimate_by_term[term]
