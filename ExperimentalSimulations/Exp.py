@@ -192,7 +192,6 @@ if global_variables.qhl_test:
             '.png')
         )
 
-
         qmd.plotExpecValuesQHLTrueModel(
             max_time=100, 
             t_interval=1,
@@ -252,6 +251,21 @@ else:
             '.png')
         )
         
+        qmd.plotParameterEstimates(
+            model_id = qmd.TrueOpModelID, 
+            save_to_file= str(global_variables.results_directory+
+            'true_model_parameter_estimates_'+ str(global_variables.long_id) +
+            '.png')
+        )
+        if qmd.ChampID != qmd.TrueOpModelID:
+            qmd.plotParameterEstimates(
+                model_id = qmd.ChampID, 
+                save_to_file= str(global_variables.results_directory+
+                'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
+                '.png')
+            )
+            
+
         qmd.saveBayesCSV(
             save_to_file=str(
             global_variables.results_directory+ 

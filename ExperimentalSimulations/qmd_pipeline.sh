@@ -54,8 +54,8 @@ sample='xTiPPzTiPPyTy'
 qhl_test=0
 q_id=0
 exp_data=1
-prt=1000
-exp=400
+prt=10
+exp=4
 gaussian=1
 
 
@@ -75,7 +75,7 @@ then
     done
 
 else
-    for i in `seq 1 1`;
+    for i in `seq 1 2`;
     do
         redis-cli flushall
         let q_id="$q_id+1"
