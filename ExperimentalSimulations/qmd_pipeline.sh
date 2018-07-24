@@ -51,8 +51,12 @@ two_param='zTiPPxTi'
 one_param='zTi'
 single_qubit='x'
 sample='xTiPPzTiPPyTy'
-qhl_test=1
+qhl_test=0
 q_id=0
+exp_data=1
+prt=1000
+exp=400
+gaussian=1
 
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
@@ -66,7 +70,7 @@ then
             let num_prt="$i+10"
             redis-cli flushall
             let q_id="$q_id+1"
-            python3 Exp.py -p=7 -e=3 -rq=0 -ra=0.99 -g=0 -qhl=$qhl_test -op="$single_qubit" -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=1
+            python3 Exp.py -p=$prt -e=$exp -rq=0 -ra=0.99 -g=$gaussian -qhl=$qhl_test -op="$one_param" -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
         done 
     done
 
@@ -75,7 +79,7 @@ else
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        python3 Exp.py -p=5 -e=3 -rq=0 -g=1 -qhl=$qhl_test -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=0
+        python3 Exp.py -p=$prt -e=$exp -rq=0 -g=$gaussian -qhl=$qhl_test -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
     done
 
     cd ../Libraries/QML_lib

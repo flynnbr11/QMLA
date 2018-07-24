@@ -108,9 +108,9 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
     sigma_threshold = qmd_info['sigma_threshold']
     gaussian = qmd_info['gaussian']
     
-    log_print(['Name:', name])
-    log_print(['true ops:\n', true_ops])
-    log_print(["true params:", true_params])
+#    log_print(['Name:', name])
+#    log_print(['true ops:\n', true_ops])
+#    log_print(["true params:", true_params])
     
     # Generate model and learn
     op = DataBase.operator(name = name)

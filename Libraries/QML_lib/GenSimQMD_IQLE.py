@@ -111,17 +111,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
 
         super(GenSimQMD_IQLE, self).__init__(self._oplist)
         
-        log_print(
-            [
-            'True Ops:\n', self._true_oplist,
-            '\n true params:', self._trueparams, 
-            '\n true name:', self._truename, 
-            '\n model name:', self.ModelName
-            ], 
-            self.log_file, self.log_identifier
-        )
-        
-        
+       
         self.NumProbes = num_probes
         if probe_dict is None: 
             self._probelist = seperable_probe_dict(max_num_qubits=12, 
@@ -216,6 +206,8 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             params = modelparams
         ham_num_qubits = np.log2(operators[0].shape[0])
 
+        # Now get pr0 and pass to likelihood function
+
         if true_evo and self.use_experimental_data:
             time = expparams['t']
 
@@ -232,7 +224,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             #print("Time:", time[0])
             try:
                 # If time already exists in experimental data
-                experimental_expec_value = self.self.experimental_measurements[time]
+                experimental_expec_value = self.experimental_measurements[time]
             except:
                 #print("t=",time,"not found in data")
                 #print("t type:", type(time))
@@ -270,6 +262,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             if self.QLE is True:
                 pr0 = get_pr0_array_qle(t_list=times, modelparams=params,
                     oplist=operators, probe=probe, 
+                    use_experimental_data = self.use_experimental_data,
                     use_exp_custom=self.use_exp_custom,
                     exp_comparison_tol=self.exp_comparison_tol, 
                     enable_sparse = self.enable_sparse, 

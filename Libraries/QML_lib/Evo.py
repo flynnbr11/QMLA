@@ -96,7 +96,8 @@ def log_print(to_print_list, log_file, log_identifier=None):
  
  
 def get_pr0_array_qle(t_list, modelparams, oplist, probe,
-        use_exp_custom=True,exp_comparison_tol=None, enable_sparse=True, 
+        use_experimental_data=False, use_exp_custom=True,
+        exp_comparison_tol=None, enable_sparse=True, 
         ham_list=None, log_file='QMDLog.log', log_identifier=None
 ):
     from rq import timeouts
@@ -110,14 +111,30 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe,
             t = t_list[tId]
             print_loc(global_print_loc)
             try:
-                output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe,
-                    use_exp_custom=use_exp_custom, 
-                    compare_exp_fncs_tol=exp_comparison_tol,
-                    enable_sparse=enable_sparse, log_file=log_file,
-                    log_identifier=log_identifier
-                )
+                
+                if use_experimental_data == True:
+                    # TODO replace call to exp_val with call to Hahn exp val
+                    output[evoId][tId] = hahn_evolution(
+                        ham = ham,
+                        t = t,
+                        state = probe,
+                        log_file = log_file, 
+                        log_identifier = log_identifier
+                    )
+                    
+                else: 
+                    output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe,
+                        use_exp_custom=use_exp_custom, 
+                        compare_exp_fncs_tol=exp_comparison_tol,
+                        enable_sparse=enable_sparse, log_file=log_file,
+                        log_identifier=log_identifier
+                    )
             except NameError:
-                log_print(["Error raised; unphysical expecation value."], 
+                log_print(["Error raised; unphysical expecation value.",
+                    "\nHam:\n", ham,
+                    "\nt=", t,
+                    "\nState=", probe
+                    ], 
                     log_file, log_identifier
                 )
                 sys.exit()
@@ -308,6 +325,50 @@ def evolved_state(ham, t, state, use_exp_custom=True,
         )
     del unitary # to save space
     return ev_state
+
+
+
+# Expecactation value function using Hahn inversion gate:
+
+def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
+    
+    #hahn_angle = np.pi/2
+    #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))
+    #inversion_gate = linalg.expm(-1j*hahn)
+    # inversion gate generated as above, done once and hardocded since this doesn't change.
+    inversion_gate = np. array([[0.-1.j, 0.+0.j, 0.+0.j, 0.+0.j],
+       [0.+0.j, 0.-1.j, 0.+0.j, 0.+0.j],
+       [0.+0.j, 0.+0.j, 0.+1.j, 0.+0.j],
+       [0.+0.j, 0.+0.j, 0.+0.j, 0.+1.j]])
+
+    unitary_time_evolution = h.exp_ham(ham, t)
+
+    total_evolution = np.dot(
+        unitary_time_evolution,
+        np.dot(inversion_gate,
+              unitary_time_evolution)
+    )
+
+    evolved_state = np.dot(total_evolution, state)
+    state_bra = state.conj().T
+
+    psi_u_psi = np.dot(state_bra, evolved_state)
+    expec_value = np.abs(psi_u_psi)**2
+    
+    if expec_value > 1.0000000001:
+        if log_file is not None: 
+            log_print([
+                "(Hahn) Expec value:2, expec_value",
+                "\nHam:\n", ham,
+                "\nState=\n", state,
+                "\nt=", t,
+                ],
+                log_file = log_file,
+                log_identifier = log_identifier
+            )
+                
+    
+    return expec_value
 
 
  

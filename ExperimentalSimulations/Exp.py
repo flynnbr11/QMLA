@@ -67,7 +67,6 @@ qle = global_variables.do_qle # True for QLE, False for IQLE
 
 num_probes = 40
 
-
 if global_variables.use_experimental_data == True:
     experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
         num_probes=num_probes
@@ -99,17 +98,26 @@ for t in list(experimental_measurements_dict.keys()):
 initial_op_list = ['xTi', 'yTi', 'zTi']
 #true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 true_op = global_variables.true_operator
-
-
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 num_params = len(true_op_list)
 
 true_params = []
-for i in range(num_params):
-    true_params.append(random.uniform(0,1))
+if (
+    true_op == 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz' and
+    global_variables.use_experimental_data==True
+):
+    for i in range(3):
+        true_params.append(random.uniform(0,1)) # for xTi, yTi, zTi
+    true_params.append(random.uniform(2.5, 2.7))    #xTx
+    true_params.append(random.uniform(2.5, 2.7))    #yTy
+    true_params.append(random.uniform(2.0, 2.3))    #zTz
+else:
+    for i in range(num_params):
+        true_params.append(random.uniform(0,1))
 
 #if true_op == 'xTi' or true_op == 'x' or true_op == 'y' or true_op == 'z' or true_op=='zTi' or true_op=='yTi':       
 #    true_params = [0.33]
+
 
 num_ops = len(initial_op_list)
     

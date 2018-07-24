@@ -123,14 +123,15 @@ class ModelLearningClass():
         self.EnableSparse = enable_sparse
         self.checkQLoss = True
         print_loc(print_location=init_model_print_loc)
-        
+        """        
         self.log_print(['True params', self.TrueParams, '\n true op list:',
             self.TrueOpList, 'true op name:', self.TrueOpName]
         )
         self.log_print(['SimOpsNames:', self.SimOpsNames, 
             '\n\tSimOpList:\n', self.SimOpList, 
             '\n\t SimParams:', self.SimParams]
-        )    
+        )
+        """    
             
         if debug_directory is not None: 
             self.debugSave = True
@@ -155,13 +156,13 @@ class ModelLearningClass():
                     'xTy' : [0.0,0.0001],
                     'xTz' : [0.0,0.0001],
                     'yTz' : [0.0,0.0001],
-#                    'xTx' : [2.7, 0.2], # true value 2.7
-#                    'yTy' : [2.7, 0.2], # true value 2.7
-#                    'zTz' : [2.14, 0.2], # true value 2.14
+                    'xTx' : [2.7, 0.2], # true value 2.7
+                    'yTy' : [2.7, 0.2], # true value 2.7
+                    'zTz' : [2.14, 0.2], # true value 2.14
 # TODO return to realistic values, using ideal when testing QHL -BF
-                    'xTx' : [0.5, 0.5], # true value 2.7
-                    'yTy' : [0.5, 0.5], # true value 2.7
-                    'zTz' : [0.5, 0.5], # true value 2.14
+#                    'xTx' : [0.5, 0.5], # true value 2.7
+#                    'yTy' : [0.5, 0.5], # true value 2.7
+#                    'zTz' : [0.5, 0.5], # true value 2.14
                     'xTi' : [0.5, 0.5], # TODO Broaden, testing with small dist
                     'yTi' : [0.5, 0.5],
                     'zTi' : [0.5, 0.5],
