@@ -296,8 +296,8 @@ class ModelLearningClass():
                 )
                 print_loc(global_print_loc)
             
-            if istep%50==0:
-                self.log_print(['Step', istep, '\t Mean:', self.Updater.est_mean()])
+#            if istep%50==0:
+#                self.log_print(['Step', istep, '\t Mean:', self.Updater.est_mean()])
             self.TrackEval.append(self.Updater.est_mean())
             
             print_loc(global_print_loc)
