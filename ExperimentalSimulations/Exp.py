@@ -208,27 +208,12 @@ if global_variables.qhl_test:
             'qhl_expec_values_'+str(global_variables.long_id)+'.png')
         )
 
-        """        
         if DataBase.num_parameters_from_name(qmd.TrueOpName) == 1:
-            qmd.plotDistributionProgression(
-                renormalise = True,
-                save_to_file = str( 
-                global_variables.results_directory+
-                'qhl_distribution_normalised_'+str(global_variables.long_id)+'.png')
-            )
-            qmd.plotDistributionProgression(
-                renormalise = False,
-                save_to_file = str( 
-                global_variables.results_directory+
-                'qhl_distribution_nonnormalised_'+str(global_variables.long_id)+'.png')
-            )
-            
             qmd.plotVolumeQHL(
                 save_to_file = str( 
                 global_variables.results_directory+
                 'qhl_volume_'+str(global_variables.long_id)+'.png')
             )
-        """
             
     
 else:
