@@ -380,7 +380,7 @@ def parse_cmd_line_args(args):
         pickle_qmd_class = pickle_qmd_class,
         rq_timeout = rq_timeout,
         log_file = log_file,
-        save_plots = arguments.plots,
+        save_plots = all_plots,
         cumulative_csv = cumulative_csv,
         experimental_data = use_experimental_data
     )

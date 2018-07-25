@@ -77,6 +77,10 @@ class QMD():
         resample_threshold = 0.5,
         resampler_a = 0.95,
         pgh_prefactor = 1.0,
+        store_particles_weights = False,
+        qhl_plots = False, 
+        results_directory = '', 
+        long_id = '001', 
         num_probes = 20,
         probe_dict = None,  
         num_times_for_bayes_updates = 'all',
@@ -135,6 +139,11 @@ class QMD():
         self.ResampleThreshold = resample_threshold
         self.ResamplerA = resampler_a
         self.PGHPrefactor = pgh_prefactor
+        self.StoreParticlesWeights = store_particles_weights
+        self.QHL_plots = qhl_plots
+        self.ResultsDirectory = results_directory
+        if not self.ResultsDirectory.endswith('/'):
+            self.ResultsDirectory += '/'
         self.NumProbes = num_probes
         if probe_dict is None:
             self.ProbeDict = separable_probe_dict(max_num_qubits=
@@ -234,6 +243,10 @@ class QMD():
             'resampler_thresh' : self.ResampleThreshold,
             'resampler_a' : self.ResamplerA,
             'pgh_prefactor' : self.PGHPrefactor,
+            'store_particles_weights' : self.StoreParticlesWeights,
+            'qhl_plots' : self.QHL_plots, 
+            'results_directory' : self.ResultsDirectory, 
+            'long_id' : long_id, 
             'debug_directory' : self.DebugDirectory,
             'qle' : self.QLE,
             'sigma_threshold' : self.SigmaThreshold,
@@ -1522,6 +1535,7 @@ class QMD():
             model_id = DataBase.model_id_from_name(db=self.db, name=self.TrueOpName)
 
         PlotQMD.parameterEstimates(qmd=self, modelID = model_id, 
+            use_experimental_data = self.UseExperimentalData,
             save_to_file = save_to_file
         )
     
@@ -1551,6 +1565,7 @@ class QMD():
 
     def plotDistributionProgression(self, 
         show_means = True,
+        model_id = None,
         num_steps_to_show = 2,
         renormalise = True,
         true_model = True,
@@ -1558,6 +1573,7 @@ class QMD():
     ):
         PlotQMD.plotDistributionProgression(
             qmd=self, 
+            model_id = model_id,
             show_means = show_means,
             renormalise = renormalise,
             num_steps_to_show = num_steps_to_show,

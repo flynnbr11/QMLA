@@ -440,6 +440,90 @@ def plotDistributionProgression(
             colour = colours[i%len(colours)]
 
             # TODO if renormalise False, DON'T use a stat.pdf to model distribution
+            if renormalise:
+                fit = stats.norm.pdf(particles, np.mean(particles), np.std(particles))
+                max_fit = max(fit)
+                fit = fit/max_fit
+            else:
+                fit = mod.Weights[:,i]
+                
+            if i==max_exp_num:
+                colour = final_colour
+                label = 'Final distribution'
+                if show_means: 
+                    ax.axvline(np.mean(particles), 
+                        label='Final Mean', color=colour, linestyle='dashed'
+                    )
+            elif i==min(steps_to_show):
+                colour = initial_colour
+                if show_means:
+                    ax.axvline(np.mean(particles), label='Initial Mean',
+                        color=colour, linestyle='dashed'
+                    )
+                label='Initial distribution'
+            else:
+                label=str('Step '+str(i))
+
+            ax.plot(particles, fit, label=label, color=colour)
+
+    plt.legend(bbox_to_anchor=(1.02, 1.02), ncol=1)
+    plt.xlabel('Parameter estimate')
+    plt.ylabel('Probability Density (relative)')
+    title=str('Probability density function of parameter for '+mod.LatexTerm)
+    plt.title(title)
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
+
+def plotDistributionProgressionQML(
+    mod, 
+    num_steps_to_show=2, show_means=True,
+    renormalise=True,
+    save_to_file=None
+):
+    # Plots initial and final prior distribution over parameter space
+    # with num_steps_to_show intermediate distributions 
+    # Note only safe/tested for QHL, ie on true model (single parameter). 
+    from scipy import stats
+    plt.clf()
+
+    true_parameters = mod.TrueParams
+    num_experiments = np.shape(mod.Particles)[2]
+    max_exp_num = num_experiments - 1
+    num_intervals_to_show = num_steps_to_show
+    increment = int(num_experiments/num_intervals_to_show)
+
+    nearest_five = round(increment/5)*5
+    if nearest_five == 0:
+        nearest_five = 1
+
+    steps_to_show = list(range(0,num_experiments,nearest_five))
+
+    if max_exp_num not in steps_to_show:
+        steps_to_show.append(max_exp_num)
+
+    # TODO use a colourmap insted of manual list
+    colours = ['gray', 'rosybrown', 'cadetblue']
+    true_colour = 'k'
+    initial_colour = 'b'
+    final_colour = 'r'
+    steps_to_show = sorted(steps_to_show)
+
+    ax = plt.subplot(111)
+    
+    if show_means:
+        for t in true_parameters:
+            ax.axvline(t, label='True param', c=true_colour, linestyle='dashed')
+
+    for i in steps_to_show:
+        j = steps_to_show.index(i) - 1 # previous step which is shown on plot already
+        if not np.all(mod.Particles[:,:,i] == mod.Particles[:,:,j]):
+            # don't display identical distributions between steps
+            particles = mod.Particles[:,:,i]
+            particles = sorted(particles)
+            colour = colours[i%len(colours)]
+
+            # TODO if renormalise False, DON'T use a stat.pdf to model distribution
             
             
             if renormalise:
@@ -476,6 +560,7 @@ def plotDistributionProgression(
     plt.title(title)
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
+
 
 
 def plotVolumeQHL(qmd, model_id=None, 
@@ -1374,7 +1459,9 @@ def draw_networkx_arrows(G, pos,
 ### Parameter Estimate Plot ###
 
 
-def parameterEstimates(qmd, modelID, save_to_file=None):
+def parameterEstimates(qmd, modelID, 
+    use_experimental_data=False,save_to_file=None
+):
 
     mod = qmd.reducedModelInstanceFromID(modelID)
     name = mod.Name
@@ -1408,9 +1495,10 @@ def parameterEstimates(qmd, modelID, save_to_file=None):
         colour = colours[i%len(colours)]
         i+=1
         try:
-            y_true = qmd.TrueParamDict[term]
-            true_term_latex = DataBase.latex_name_ising(term)
-            ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
+            if use_experimental_data==False:
+                y_true = qmd.TrueParamDict[term]
+                true_term_latex = DataBase.latex_name_ising(term)
+                ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
         except:
             pass
         y = param_estimate_by_term[term]

@@ -67,7 +67,6 @@ qle = global_variables.do_qle # True for QLE, False for IQLE
 
 num_probes = 40
 
-
 if global_variables.use_experimental_data == True:
     experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
         num_probes=num_probes
@@ -99,19 +98,31 @@ for t in list(experimental_measurements_dict.keys()):
 initial_op_list = ['xTi', 'yTi', 'zTi']
 #true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 true_op = global_variables.true_operator
-
-
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 num_params = len(true_op_list)
 
 true_params = []
-for i in range(num_params):
-    true_params.append(random.uniform(0,1))
+if (
+    true_op == 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz' and
+    global_variables.use_experimental_data==True
+):
+    for i in range(3):
+        true_params.append(random.uniform(0,1)) # for xTi, yTi, zTi
+    true_params.append(random.uniform(2.5, 2.7))    #xTx
+    true_params.append(random.uniform(2.5, 2.7))    #yTy
+    true_params.append(random.uniform(2.0, 2.3))    #zTz
+else:
+    for i in range(num_params):
+        true_params.append(random.uniform(0,1))
 
 #if true_op == 'xTi' or true_op == 'x' or true_op == 'y' or true_op == 'z' or true_op=='zTi' or true_op=='yTi':       
 #    true_params = [0.33]
 
+
 num_ops = len(initial_op_list)
+    
+results_directory = global_variables.results_directory
+long_id = global_variables.long_id
     
 log_print(["\n QMD id", global_variables.qmd_id, " on host ",
     global_variables.host_name, "and port", global_variables.port_number,
@@ -142,6 +153,10 @@ qmd = QMD(
     resample_threshold = global_variables.resample_threshold,
     resampler_a = global_variables.resample_a, 
     pgh_prefactor = global_variables.pgh_factor,
+    store_particles_weights = False,
+    qhl_plots=True, 
+    results_directory = results_directory,
+    long_id = long_id, 
     num_probes=num_probes,
     probe_dict = experimental_probe_dict, 
     gaussian = global_variables.gaussian, 
@@ -177,13 +192,13 @@ if global_variables.qhl_test:
             pickle.dump(qmd, pkl_file , protocol=2)
 
     if global_variables.save_plots:
-
+        
+        print("Plotting things")
         qmd.plotParameterEstimates(true_model=True, 
             save_to_file= str(global_variables.results_directory+
             'qhl_parameter_estimates_'+ str(global_variables.long_id) +
             '.png')
         )
-
 
         qmd.plotExpecValuesQHLTrueModel(
             max_time=100, 
@@ -192,7 +207,8 @@ if global_variables.qhl_test:
             global_variables.results_directory+
             'qhl_expec_values_'+str(global_variables.long_id)+'.png')
         )
-        
+
+        """        
         if DataBase.num_parameters_from_name(qmd.TrueOpName) == 1:
             qmd.plotDistributionProgression(
                 renormalise = True,
@@ -212,7 +228,7 @@ if global_variables.qhl_test:
                 global_variables.results_directory+
                 'qhl_volume_'+str(global_variables.long_id)+'.png')
             )
-        
+        """
             
     
 else:
@@ -244,6 +260,21 @@ else:
             '.png')
         )
         
+        qmd.plotParameterEstimates(
+            model_id = qmd.TrueOpModelID, 
+            save_to_file= str(global_variables.results_directory+
+            'true_model_parameter_estimates_'+ str(global_variables.long_id) +
+            '.png')
+        )
+        if qmd.ChampID != qmd.TrueOpModelID:
+            qmd.plotParameterEstimates(
+                model_id = qmd.ChampID, 
+                save_to_file= str(global_variables.results_directory+
+                'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
+                '.png')
+            )
+            
+
         qmd.saveBayesCSV(
             save_to_file=str(
             global_variables.results_directory+ 
