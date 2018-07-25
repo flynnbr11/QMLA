@@ -3,7 +3,9 @@
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
 
-max_qmd_id=10
+num_tests=2
+let max_qmd_id="$num_tests + 1"
+
 day_time=$(date +%b_%d/%H_%M)
 directory="$day_time/"
 
@@ -51,11 +53,11 @@ two_param='zTiPPxTi'
 one_param='zTi'
 single_qubit='x'
 sample='xTiPPzTiPPyTy'
-qhl_test=0
+qhl_test=1
 q_id=0
 exp_data=1
-prt=400
-exp=300
+prt=50
+exp=25
 gaussian=1
 
 
@@ -75,15 +77,18 @@ then
     done
 
 else
-    for i in `seq 1 2`;
+    for i in `seq 1 $max_qmd_id`;
     do
         redis-cli flushall
         let q_id="$q_id+1"
         python3 Exp.py -p=$prt -e=$exp -rq=0 -g=$gaussian -qhl=$qhl_test -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
     done
-
     cd ../Libraries/QML_lib
-    python3 AnalyseMultipleQMD.py -dir=$long_dir --bayes_csv=$bayes_csv
+    
+    if [ $num_tests > 1 ]
+    then
+        python3 AnalyseMultipleQMD.py -dir=$long_dir --bayes_csv=$bayes_csv
+    fi
 
 fi 
 

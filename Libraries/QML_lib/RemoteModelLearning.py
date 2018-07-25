@@ -107,6 +107,10 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
     num_probes = qmd_info['num_probes']
     sigma_threshold = qmd_info['sigma_threshold']
     gaussian = qmd_info['gaussian']
+    store_particles_weights = qmd_info['store_particles_weights']
+    qhl_plots = qmd_info['qhl_plots']
+    results_directory = qmd_info['results_directory']
+    long_id = qmd_info['long_id']
     
 #    log_print(['Name:', name])
 #    log_print(['true ops:\n', true_ops])
@@ -158,20 +162,51 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
         n_experiments=num_experiments,
         sigma_threshold = sigma_threshold
     )
+
+    log_print(["qml particles:", qml_instance.Particles])
+    with open("qml_instance.p", "wb") as pkl_file:
+        pickle.dump(qml_instance, pkl_file , protocol=2)
+    
+
+    if qhl_plots:
+        log_print(["Drawing plots for QHL"])
+        if len(true_ops) == 1:
+            qml_instance.plotDistributionProgression(
+                save_to_file = str(
+                results_directory
+                +'qhl_distribution_progression_'+str(long_id) + '.png')
+            )
+        
+            qml_instance.plotDistributionProgression(
+                renormalise=False, 
+                save_to_file = str(
+                results_directory
+                +'qhl_distribution_progression_uniform_'+str(long_id) + '.png')
+            )
+
+        
+
+
+
     updated_model_info = copy.deepcopy(qml_instance.learned_info_dict()) 
+
     del qml_instance
 
     compressed_info = pickle.dumps(updated_model_info, protocol=2) 
     # TODO is there a way to use higher protocol when using python3 for faster
     # pickling? this seems to need to be decoded using encoding='latin1'.... 
     # not entirely clear why this encoding is used
-    learned_models_info.set(str(modelID), compressed_info)
-    log_print(["Redis SET learned_models_info model:", modelID])
+    try:
+        learned_models_info.set(str(modelID), compressed_info)
+        log_print(["Redis learned_models_info added to db for model:", modelID])
+    except:
+        log_print(["Failed to add learned_models_info \
+            added to db for model:", modelID]
+        )
     learned_models_ids.set(str(modelID), True)
     log_print(["Redis SET learned_models_ids:", modelID, "; set True"])
     active_branches_learning_models.incr(int(branchID), 1)    
     time_end = time.time()
-
         
     if remote: 
         del updated_model_info

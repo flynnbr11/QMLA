@@ -13,6 +13,7 @@ import DataBase as DB
 from MemoryTest import print_loc
 from psutil import virtual_memory
 import RedisSettings as rds
+import PlotQMD 
 import redis
 import pickle
 pickle.HIGHEST_PROTOCOL=2
@@ -66,6 +67,7 @@ class ModelLearningClass():
     ):
         self.VolumeList = np.array([])  
         self.Name = name
+        self.LatexTerm = DB.latex_name_ising(self.Name)
         self.Dimension = DB.get_num_qubits(name)
         self.NumExperimentsToDate = 0
         self.BayesFactors = {}
@@ -88,8 +90,8 @@ class ModelLearningClass():
     
     def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist,
         simparams, simopnames, numparticles, modelID, resample_thresh=0.5,
-        resampler_a = 0.95, pgh_prefactor = 1.0, checkloss=True,
-        gaussian=True, use_exp_custom=True, enable_sparse=True,
+        resampler_a = 0.95, pgh_prefactor = 1.0, store_partices_weights=False,
+        checkloss=True, gaussian=True, use_exp_custom=True, enable_sparse=True,
         debug_directory=None, qle=True, host_name='localhost', 
         port_number=6379, qid=0, log_file='QMD_log.log'
     ):
@@ -105,6 +107,9 @@ class ModelLearningClass():
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.ResamplerA = qmd_info['resampler_a']
         self.PGHPrefactor = qmd_info['pgh_prefactor']
+        self.StoreParticlesWeights = qmd_info['store_particles_weights']
+        self.QHL_plots = qmd_info['qhl_plots']
+        self.ResultsDirectory = qmd_info['results_directory']
         self.TrueOpList = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
         self.TrueOpName  = qmd_info['true_name']
@@ -305,8 +310,9 @@ class ModelLearningClass():
                 self.Updater.est_covariance_mtx()
             )
             print_loc(global_print_loc)
-            self.Particles[:, :, istep] = self.Updater.particle_locations
-            self.Weights[:, istep] = self.Updater.particle_weights
+            if self.StoreParticlesWeights or self.QHL_plots:
+                self.Particles[:, :, istep] = self.Updater.particle_locations
+                self.Weights[:, istep] = self.Updater.particle_weights
 
             self.NewEval = self.Updater.est_mean()
             print_loc(global_print_loc)
@@ -442,10 +448,12 @@ class ModelLearningClass():
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
-        learned_info ['particles'] = self.Particles
-        learned_info['weights'] = self.Weights
         learned_info['resample_epochs'] = self.ResampleEpochs
         learned_info['quadratic_losses'] = self.QLosses
+        if self.StoreParticlesWeights:
+            learned_info ['particles'] = self.Particles
+            learned_info['weights'] = self.Weights
+
 
         return learned_info
         
@@ -507,7 +515,17 @@ class ModelLearningClass():
         self.store_particles(debug_dir=debug_dir)
         self.store_covariances(debug_dir=debug_dir)
         
-        
+    def plotDistributionProgression(self, 
+        renormalise=False, 
+        save_to_file=None
+    ):
+        PlotQMD.plotDistributionProgressionQML(
+            mod = self,
+            num_steps_to_show = 2, 
+            show_means = True,
+            renormalise = renormalise,
+            save_to_file = save_to_file
+        )           
         
         
         
@@ -554,6 +572,7 @@ class reducedModel():
         self.TrueOpName  = qmd_info['true_name']
         self.QLE = qmd_info['qle']
         self.UseExpCustom = qmd_info['use_exp_custom']
+        self.StoreParticlesWeights = qmd_info['store_particles_weights']
         self.BayesFactors = {}
         self.LatexTerm = DB.latex_name_ising(self.Name)
         self.HostName = host_name
@@ -601,10 +620,16 @@ class reducedModel():
         self.log_total_likelihod = learned_info['log_total_likelihood']
         self.VolumeList = learned_info['volume_list'] 
         self.TrackEval = np.array(learned_info['track_eval'])
-        self.Particles = np.array(learned_info['particles'])
-        self.Weights = np.array(learned_info['weights'])
         self.ResampleEpochs = learned_info['resample_epochs']
         self.QuadraticLosses = learned_info['quadratic_losses']
+        try:
+            self.Particles = np.array(learned_info['particles'])
+            self.Weights = np.array(learned_info['weights'])
+        except:
+            self.Particles = 'Particles not stored.'
+            self.Weights = 'Weights not stored.'
+        
+
     
 #        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,
 #            experimental_measurements = self.ExperimentalMeasurements,

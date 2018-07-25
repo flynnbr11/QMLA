@@ -121,6 +121,9 @@ else:
 
 num_ops = len(initial_op_list)
     
+results_directory = global_variables.results_directory
+long_id = global_variables.long_id
+    
 log_print(["\n QMD id", global_variables.qmd_id, " on host ",
     global_variables.host_name, "and port", global_variables.port_number,
     "has seed", rds.get_seed(global_variables.host_name,
@@ -150,6 +153,10 @@ qmd = QMD(
     resample_threshold = global_variables.resample_threshold,
     resampler_a = global_variables.resample_a, 
     pgh_prefactor = global_variables.pgh_factor,
+    store_particles_weights = False,
+    qhl_plots=True, 
+    results_directory = results_directory,
+    long_id = long_id, 
     num_probes=num_probes,
     probe_dict = experimental_probe_dict, 
     gaussian = global_variables.gaussian, 
@@ -185,7 +192,8 @@ if global_variables.qhl_test:
             pickle.dump(qmd, pkl_file , protocol=2)
 
     if global_variables.save_plots:
-
+        
+        print("Plotting things")
         qmd.plotParameterEstimates(true_model=True, 
             save_to_file= str(global_variables.results_directory+
             'qhl_parameter_estimates_'+ str(global_variables.long_id) +
@@ -199,7 +207,8 @@ if global_variables.qhl_test:
             global_variables.results_directory+
             'qhl_expec_values_'+str(global_variables.long_id)+'.png')
         )
-        
+
+        """        
         if DataBase.num_parameters_from_name(qmd.TrueOpName) == 1:
             qmd.plotDistributionProgression(
                 renormalise = True,
@@ -219,7 +228,7 @@ if global_variables.qhl_test:
                 global_variables.results_directory+
                 'qhl_volume_'+str(global_variables.long_id)+'.png')
             )
-        
+        """
             
     
 else:
