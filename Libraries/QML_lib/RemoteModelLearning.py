@@ -163,13 +163,13 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
         sigma_threshold = sigma_threshold
     )
 
-    log_print(["qml particles:", qml_instance.Particles])
-    with open("qml_instance.p", "wb") as pkl_file:
-        pickle.dump(qml_instance, pkl_file , protocol=2)
-    
 
     if qhl_plots:
         log_print(["Drawing plots for QHL"])
+
+        with open(str(results_directory+"qml_instance.p"), "wb") as pkl_file:
+            pickle.dump(qml_instance, pkl_file , protocol=2)
+
         if len(true_ops) == 1:
             qml_instance.plotDistributionProgression(
                 save_to_file = str(

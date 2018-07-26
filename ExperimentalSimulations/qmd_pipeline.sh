@@ -1,8 +1,6 @@
 #!/bin/bash
 
-
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-
 num_tests=2
 let max_qmd_id="$num_tests + 1"
 
@@ -56,8 +54,8 @@ sample='xTiPPzTiPPyTy'
 qhl_test=1
 q_id=0
 exp_data=1
-prt=50
-exp=25
+prt=30
+exp=20
 gaussian=1
 
 
@@ -72,7 +70,7 @@ then
             let num_prt="$i+10"
             redis-cli flushall
             let q_id="$q_id+1"
-            python3 Exp.py -p=$prt -e=$exp -rq=0 -ra=0.99 -g=$gaussian -qhl=$qhl_test -op="$one_param" -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
+            python3 Exp.py -p=$prt -e=$exp -rq=0 -ra=0.99 -g=$gaussian -qhl=$qhl_test -op="$true_operator" -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
         done 
     done
 
