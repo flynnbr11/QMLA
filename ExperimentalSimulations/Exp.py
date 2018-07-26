@@ -102,10 +102,10 @@ true_op_list = DataBase.get_constituent_names_from_name(true_op)
 num_params = len(true_op_list)
 
 true_params = []
-random_variables = True
+random_true_params = True
 if(
     global_variables.use_experimental_data==False and
-    random_variables == False
+    random_true_params == False
 ):
     if true_op == 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz':
         for i in range(3):
