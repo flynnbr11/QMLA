@@ -102,18 +102,20 @@ true_op_list = DataBase.get_constituent_names_from_name(true_op)
 num_params = len(true_op_list)
 
 true_params = []
-if (
-    true_op == 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz' and
-    global_variables.use_experimental_data==True
+random_variables = True
+if(
+    global_variables.use_experimental_data==False and
+    random_variables == False
 ):
-    for i in range(3):
-        true_params.append(random.uniform(0,1)) # for xTi, yTi, zTi
-    true_params.append(random.uniform(2.5, 2.7))    #xTx
-    true_params.append(random.uniform(2.5, 2.7))    #yTy
-    true_params.append(random.uniform(2.0, 2.3))    #zTz
+    if true_op == 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz':
+        for i in range(3):
+            true_params.append(random.uniform(0,1)) # for xTi, yTi, zTi
+        true_params.append(random.uniform(2.5, 2.7))    #xTx
+        true_params.append(random.uniform(2.5, 2.7))    #yTy
+        true_params.append(random.uniform(2.0, 2.3))    #zTz
 else:
     for i in range(num_params):
-        true_params.append(random.uniform(0,1))
+        true_params.append(random.uniform(0,10))
 
 #if true_op == 'xTi' or true_op == 'x' or true_op == 'y' or true_op == 'z' or true_op=='zTi' or true_op=='yTi':       
 #    true_params = [0.33]
