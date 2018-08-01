@@ -1,9 +1,9 @@
 #!/bin/bash
 
-test_description="test_exp_data"
+test_description="QMD_broad_prior_not_exp_data"
 
-num_tests=1
-min_id=1
+num_tests=3
+min_id=4 # update so instances don't clash and hit eachother's redis databases
 let max_id="$min_id + $num_tests - 1 "
 
 
@@ -36,71 +36,107 @@ time=$test_time
 qmd_id=$min_id
 cutoff_time=180
 
+## QMD parameters
 do_plots=1
 pickle_class=1
 qhl=1
+experimental_data=0
 
-p_min=3000
-p_max=3000
-p_int=1000
-p_default=2000
+p=500
+e=200
+ra=0.95
+rt=0.5
+rp=1.0
 
-e_min=2000 
-e_max=2000
-e_int=1000
-e_default=2000
+true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 
-ra_min=0.8
-ra_max=0.95
-ra_int=0.05
-ra_default=0.9
+declare -a qhl_operators=(
+'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+)
 
-rt_min=0.4
-rt_max=0.6
-rt_int=0.1
-rt_default=0.5
+declare -a particle_counts=(
+$p
+)
 
-rp_min=0.9
-rp_max=1.1
-rp_int=0.1
-rp_default=1.0
+declare -a experiment_counts=(
+$e
+)
 
 
-e=$e_default
-p=$p_default
-ra=$ra_default
-rt=$rt_default
-rp=$rp_default
+printf "$day_time: \t $test_description \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp \n" >> QMD_Results_directories.log
 
-e=3
-p=10
+if [ "$qhl" == 1 ]
+then
+    for op in "${qhl_operators[@]}";
+	do
+		for p in  "${particle_counts[@]}";
+		do
+			for e in "${experiment_counts[@]}";
+			do
+				for i in `seq $min_id $max_id`;
+				do
+					let bt="$e/2"
+					let qmd_id="$qmd_id+1"
+					let ham_exp="$e*$p + $p*$bt"
+					let expected_time="$ham_exp/50"
 
-printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp \n" >> QMD_Results_directories.log
+					if [ "$qhl" == 1 ]
+					then
+						let expected_time="$expected_time/10"
+					fi
 
-for i in `seq $min_id $max_id`;
-do
+					if (( $expected_time < $cutoff_time));
+					then
+						seconds_reqd=$cutoff_time	
+					else
+						seconds_reqd=$expected_time	
+					fi
+					time="walltime=00:00:$seconds_reqd"
+					this_qmd_name="$test_description""_$qmd_id"
+					this_error_file="$OUT_LOG/$error_file""_$qmd_id.txt"
+					this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
+					printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd \n" >> QMD_all_tasks.log
+
+					qsub -v QMD_ID=$qmd_id,OP="$op",QHL=$qhl,EXP_DATA=$experimental_data,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv -N $this_qmd_name -l $time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+
+				done
+			done
+		done
+	done
+
+else 
+	for p in  "${particle_counts[@]}";
+	do
+		for e in "${experiment_counts[@]}";
+		do
+			for i in `seq $min_id $max_id`;
+			do
+				let bt="$e/2"
+				let qmd_id="$qmd_id+1"
+				let ham_exp="$e*$p + $p*$bt"
+				let expected_time="$ham_exp/50"
+				if (( $expected_time < $cutoff_time));
+				then
+					seconds_reqd=$cutoff_time	
+				else
+					seconds_reqd=$expected_time	
+				fi
+				time="walltime=00:00:$seconds_reqd"
+				this_qmd_name="$test_description""_$qmd_id"
+				this_error_file="$OUT_LOG/$error_file""_$qmd_id.txt"
+				this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
+				printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd \n" >> QMD_all_tasks.log
+
+				qsub -v QMD_ID=$qmd_id,OP="$true_hamiltonian",QHL=$qhl,EXP_DATA=$experimental_data,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv -N $this_qmd_name -l $time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+
+			done
+		done
+	done
 
 
-	let bt="$e/2"
-	let qmd_id="$qmd_id+1"
-	let ham_exp="$e*$p + $p*$bt"
-	let expected_time="$ham_exp/50"
-	if (( $expected_time < $cutoff_time));
-	then
-		seconds_reqd=$cutoff_time	
-	else
-		seconds_reqd=$expected_time	
-	fi
-	time="walltime=00:00:$seconds_reqd"
-	this_qmd_name="$test_description""_$qmd_id"
-	this_error_file="$OUT_LOG/$error_file""_$qmd_id.txt"
-	this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
-	printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd \n" >> QMD_all_tasks.log
 
-	qsub -v QMD_ID=$qmd_id,QHL=$qhl,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv -N $this_qmd_name -l $time -o $this_output_file -e $this_error_file run_qmd_instance.sh
 
-done
-
+fi
 
 echo "
 #!/bin/bash 
