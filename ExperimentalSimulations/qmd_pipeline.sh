@@ -51,11 +51,11 @@ two_param='zTiPPxTi'
 one_param='zTi'
 single_qubit='x'
 sample='xTiPPzTiPPyTy'
-qhl_test=1
+qhl_test=0
 q_id=0
-exp_data=0
-prt=30
-exp=20
+exp_data=1
+prt=400
+exp=300
 gaussian=1
 
 

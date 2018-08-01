@@ -161,16 +161,16 @@ class ModelLearningClass():
                     'xTy' : [0.0,0.0001],
                     'xTz' : [0.0,0.0001],
                     'yTz' : [0.0,0.0001],
-                    'xTx' : [5.0, 2.5], # true value 2.7
-                    'yTy' : [5.0, 2.5], # true value 2.7
-                    'zTz' : [5.0, 2.5], # true value 2.14
+#                    'xTx' : [5.0, 2.5], # true value 2.7
+#                    'yTy' : [5.0, 2.5], # true value 2.7
+#                    'zTz' : [5.0, 2.5], # true value 2.14
 # TODO return to realistic values, using ideal when testing QHL -BF
-#                    'xTx' : [0.5, 0.5], # true value 2.7
-#                    'yTy' : [0.5, 0.5], # true value 2.7
-#                    'zTz' : [0.5, 0.5], # true value 2.14
-                    'xTi' : [5.0, 2.5], # TODO Broaden, testing with small dist
-                    'yTi' : [5.0, 2.5],
-                    'zTi' : [5.0, 2.5],
+                    'xTx' : [2.7, 0.1], # true value 2.7
+                    'yTy' : [2.7, 0.1], # true value 2.7
+                    'zTz' : [2.1, 0.1], # true value 2.14
+                    'xTi' : [0.5, 0.5], # TODO Broaden, testing with small dist
+                    'yTi' : [0.5, 0.5],
+                    'zTi' : [0.5, 0.5],
                 }
             )
         else:
@@ -248,6 +248,7 @@ class ModelLearningClass():
         for istep in range(self.NumExperiments):
             self.Experiment =  self.Heuristic()
             print_loc(global_print_loc)
+            self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
             if self.UseExperimentalData:
                 t = self.Experiment[0][0]
                 nearest = expdt.nearestAvailableExpTime(
@@ -255,8 +256,6 @@ class ModelLearningClass():
                     t=t
                 )
                 self.Experiment[0][0] = nearest
-            else:
-                self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
             
             self.NumExperimentsToDate += 1
             print_loc(global_print_loc)
