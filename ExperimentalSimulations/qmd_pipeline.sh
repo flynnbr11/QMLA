@@ -54,8 +54,8 @@ sample='xTiPPzTiPPyTy'
 qhl_test=0
 q_id=0
 exp_data=1
-prt=400
-exp=300
+prt=4
+exp=3
 gaussian=1
 
 
