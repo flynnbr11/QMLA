@@ -1,8 +1,8 @@
 #!/bin/bash
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=2
-let max_qmd_id="$num_tests + 1"
+num_tests=1
+let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)
 directory="$day_time/"
@@ -53,9 +53,9 @@ single_qubit='x'
 sample='xTiPPzTiPPyTy'
 qhl_test=0
 q_id=0
-exp_data=1
-prt=4
-exp=3
+exp_data=0
+prt=150
+exp=20
 gaussian=1
 
 
@@ -79,7 +79,7 @@ else
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        python3 Exp.py -p=$prt -e=$exp -rq=0 -g=$gaussian -qhl=$qhl_test -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
+        python3 Exp.py -op='xTi' -p=$prt -e=$exp -rq=0 -g=$gaussian -qhl=$qhl_test -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
     done
     cd ../Libraries/QML_lib
     

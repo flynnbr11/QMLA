@@ -3,7 +3,7 @@ import qinfer as qi
 import numpy as np
 import scipy as sp
 import inspect
-
+import time
 import sys as sys
 import os as os
 from MemoryTest import print_loc
@@ -196,7 +196,7 @@ def get_pr0_array_iqle(t_list, modelparams, oplist, ham_minus,
 def expectation_value(ham, t, state=None, choose_random_probe=False,
     use_exp_custom=True, enable_sparse=True, print_exp_details=False,
     exp_fnc_cutoff=20, compare_exp_fncs_tol=None, log_file='QMDLog.log',
-    log_identifier=None
+    log_identifier=None, debug_plot_print=False
 ):
 
     if choose_random_probe is True: 
@@ -247,9 +247,20 @@ def expectation_value(ham, t, state=None, choose_random_probe=False,
                 exp_fnc_cutoff=exp_fnc_cutoff
             )
     
-    
     probe_bra = state.conj().T
-    psi_u_psi = np.dot(probe_bra, u_psi)
+    try:
+        psi_u_psi = np.dot(probe_bra, u_psi)
+    except UnboundLocalError: 
+        log_print(
+            [
+            "UnboundLocalError when exponentiating Hamiltonian. t=", t, 
+            "\nHam:\n", ham,
+            "\nProbe: ", state
+            ], log_file=log_file,
+            log_identifier=log_identifier
+        )
+        raise
+    
     expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
     
     expec_value_limit=1.10000000001 # maximum permitted expectation value

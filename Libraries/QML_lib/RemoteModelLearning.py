@@ -111,6 +111,8 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
     qhl_plots = qmd_info['qhl_plots']
     results_directory = qmd_info['results_directory']
     long_id = qmd_info['long_id']
+#    use_time_dep_true_params = qmd_info['use_time_dep_true_params']
+#    time_dep_true_params = qmd_info['time_dep_true_params']
     
 #    log_print(['Name:', name])
 #    log_print(['true ops:\n', true_ops])
@@ -154,7 +156,9 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
       host_name = host_name,
       port_number = port_number, 
       qid=qid,
-      log_file = log_file
+      log_file = log_file,
+#      use_time_dep_true_params = use_time_dep_true_params,
+#      time_dep_true_params = time_dep_true_params
     )
 
     log_print(["Updating model."])

@@ -122,6 +122,7 @@ else:
 
 
 num_ops = len(initial_op_list)
+do_qhl_plots = global_variables.qhl_test and False # TODO when to turn this on?
     
 results_directory = global_variables.results_directory
 long_id = global_variables.long_id
@@ -143,11 +144,14 @@ log_print(["\n QMD id", global_variables.qmd_id, " on host ",
 Launch and run QMD
 """
 
+
 qmd = QMD(
     initial_op_list=initial_op_list, 
     qhl_test = global_variables.qhl_test, 
     true_operator=true_op, 
     true_param_list=true_params, 
+    use_time_dep_true_model = True, 
+    true_params_time_dep = { 'xTi' : 0.01},
     num_particles=global_variables.num_particles,
     num_experiments = global_variables.num_experiments, 
     num_times_for_bayes_updates = global_variables.num_times_bayes,
@@ -155,8 +159,8 @@ qmd = QMD(
     resample_threshold = global_variables.resample_threshold,
     resampler_a = global_variables.resample_a, 
     pgh_prefactor = global_variables.pgh_factor,
-    store_particles_weights = False,
-    qhl_plots=True, 
+    store_particles_weights = True,
+    qhl_plots=do_qhl_plots, 
     results_directory = results_directory,
     long_id = long_id, 
     num_probes=num_probes,

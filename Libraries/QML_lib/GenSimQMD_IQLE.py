@@ -61,6 +61,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     ## INITIALIZER ##
 
     def __init__(self, oplist, modelparams, probecounter=None, 
+        use_time_dep_true_model = False,
+        time_dep_true_params = None,
+        num_time_dep_true_params = 0,
         true_oplist = None, truename=None, num_probes=40, probe_dict=None, 
         trueparams = None, probelist = None, min_freq=0, solver='scipy', 
         use_experimental_data = False, experimental_measurements = None,
@@ -83,6 +86,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self._trueparams = trueparams
         self._truename = truename
         self._true_dim = DataBase.get_num_qubits(self._truename)
+        self.use_time_dep_true_model = use_time_dep_true_model
+        self.time_dep_true_params = time_dep_true_params
+        self.num_time_dep_true_params = num_time_dep_true_params
         self.use_experimental_data = use_experimental_data
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
@@ -192,12 +198,34 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             true_evo = True
             operators = self._true_oplist
             if true_dim > sim_dim: 
-                operators = DataBase.reduced_operators(self._truename, 
+                operators = DataBase.reduced_operators(
+                    self._truename, 
                     int(sim_dim)
                 )
             else:
                 operators = self._true_oplist
             params = [self._trueparams]
+            
+            if self.use_time_dep_true_model:
+                # Multiply time dependent parameters by time of this evolution.
+                time = expparams['t'] 
+                for i in range(
+                    len(params)-self.num_time_dep_true_params,
+                    self.num_time_dep_true_params
+                ):
+                    params[i] = params[i] * time
+
+
+                log_print(
+                    [
+                    'Time:', expparams['t'],
+                    '\nParams:', params, 
+                    '\nOps:\n:', operators
+                    ],
+                    self.log_file, 
+                    self.log_identifier
+                )
+
             
         else:
             sample = np.array([expparams.item(0)[1:]])
@@ -240,6 +268,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
 
 
         else:        
+            
             if self.inBayesUpdates:
                 if self.ideal_probe is not None:
                     probe = self.ideal_probe # this won't work
