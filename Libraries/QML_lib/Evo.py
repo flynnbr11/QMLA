@@ -108,6 +108,18 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe,
     for evoId in range(num_particles): ## todo not sure about length/arrays here
         for tId in range(len(t_list)):
             ham = np.tensordot(modelparams[evoId], oplist, axes=1)
+
+            """
+            # Log print to prove True Hamiltonian is time dependent.
+            if num_particles == 1: 
+                log_print(
+                    [
+                    "Time dependent, true Hamiltonian:\n", ham
+                    ], 
+                    log_file, log_identifier
+                )
+            """
+                
             t = t_list[tId]
             print_loc(global_print_loc)
             try:

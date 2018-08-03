@@ -102,7 +102,7 @@ true_op_list = DataBase.get_constituent_names_from_name(true_op)
 num_params = len(true_op_list)
 
 true_params = []
-random_true_params = True
+random_true_params = False
 if(
     global_variables.use_experimental_data==False and
     random_true_params == False
@@ -113,9 +113,18 @@ if(
         true_params.append(random.uniform(2.5, 2.7))    #xTx
         true_params.append(random.uniform(2.5, 2.7))    #yTy
         true_params.append(random.uniform(2.0, 2.3))    #zTz
+    elif true_op == 'xTi':
+        true_params = [1.0]
+
 else:
     for i in range(num_params):
         true_params.append(random.uniform(0,10))
+
+log_print(
+    ["True params:", true_params
+    ], 
+    log_file
+)
 
 #if true_op == 'xTi' or true_op == 'x' or true_op == 'y' or true_op == 'z' or true_op=='zTi' or true_op=='yTi':       
 #    true_params = [0.33]

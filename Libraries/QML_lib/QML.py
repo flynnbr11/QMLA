@@ -466,7 +466,6 @@ class ModelLearningClass():
             learned_info ['particles'] = self.Particles
             learned_info['weights'] = self.Weights
 
-
         return learned_info
         
         

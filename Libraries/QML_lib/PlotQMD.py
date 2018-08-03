@@ -215,11 +215,13 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         plt.plot(times, sim_expec_values, label=sim_label, color=sim_col)
 
     ax = plt.subplot(111)
+    """
     print("[PlotQMD]. \n True Params:", true_params, 
         "\n sim model:", sim, 
         "\n Sim Params:", sim_params
         
     )
+    """
 
     # Shrink current axis's height by 10% on the bottom
     box = ax.get_position()
@@ -325,12 +327,10 @@ def ExpectationValuesQHL_TrueModel(qmd,
         true_ops = qmd.TrueOpList
         true_dim = true_op.num_qubits
         true_probe = qmd.ProbeDict[(probe_id,true_dim)]
-
-#        print("True params:\n", true_params, 
-#            "True ops:\n", true_ops
-#        )
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
         true_expec_values = []
+                
+        
         for t in times:
             if qmd.UseTimeDepTrueModel:
                 # Multiply time dependent parameters by time value
@@ -344,11 +344,23 @@ def ExpectationValuesQHL_TrueModel(qmd,
             else:
                 true_ham = time_ind_true_ham
         
-            expec = evo.expectation_value(
-                ham=true_ham, 
-                t=t, 
-                state=true_probe
-            )
+            try:
+                expec = evo.expectation_value(
+                    ham=true_ham, 
+                    t=t, 
+                    state=true_probe,
+                    log_file = qmd.log_file, 
+                    log_identifier = '[PlotQMD]'
+                )
+            except UnboundLocalError:
+                print("[PlotQMD]\n Unbound local error for:",
+                    "\nParams:", params, 
+                    "\nTimes:", times, 
+                    "\ntrue_ham:", true_ham,
+                    "\nt=", t,
+                    "\nstate=", true_probe
+                )
+
             true_expec_values.append(expec) 
         
     if true_plot_type=='plot':

@@ -51,11 +51,11 @@ two_param='zTiPPxTi'
 one_param='zTi'
 single_qubit='x'
 sample='xTiPPzTiPPyTy'
-qhl_test=0
+qhl_test=1
 q_id=0
 exp_data=0
-prt=150
-exp=20
+prt=10
+exp=3
 gaussian=1
 
 
@@ -70,7 +70,7 @@ then
             let num_prt="$i+10"
             redis-cli flushall
             let q_id="$q_id+1"
-            python3 Exp.py -p=$prt -e=$exp -rq=0 -ra=0.99 -g=$gaussian -qhl=$qhl_test -op="$true_operator" -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
+            python3 Exp.py -p=$prt -e=$exp -rq=0 -ra=0.99 -g=$gaussian -qhl=$qhl_test -op="xTi" -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
         done 
     done
 
