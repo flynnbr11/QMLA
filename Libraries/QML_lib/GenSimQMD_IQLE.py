@@ -212,27 +212,10 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 time = expparams['t'] 
                 a=len(params[0])-self.num_time_dep_true_params
                 b=len(params[0])
-
                 before = (params)
-                print("BEFORE:", before)
                 for i in range(a,b):
                     # Because params is a list of 1 element, an array, need [0] index.
                     params[0][i] *=  time
-                after = params
-                log_print(
-                    [
-                    "True evo. t=", time, 
-                    "\nparams before:", before,
-                    "\nparams after:", after,
-                    "\nlen(params)=", len(params),
-                    "\n(a,b)=",a,b,
-                    "\nparams:", params
-                    ],
-                    self.log_file, 
-                    self.log_identifier
-                )
-#                params = np.array(params)
-                
             
         else:
             sample = np.array([expparams.item(0)[1:]])

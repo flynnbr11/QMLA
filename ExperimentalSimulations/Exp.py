@@ -197,7 +197,6 @@ qmd = QMD(
 if global_variables.qhl_test:
     qmd.runQHLTest()
 
-
     if global_variables.pickle_qmd_class:
         log_print(["QMD complete. Pickling result to",
             global_variables.class_pickle_file], log_file
