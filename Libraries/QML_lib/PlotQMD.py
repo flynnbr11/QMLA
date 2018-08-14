@@ -8,7 +8,7 @@ from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib.ticker import Formatter
 from matplotlib import colors as mcolors
 
-
+import copy
 import random
 import matplotlib.cbook as cb
 from matplotlib.colors import colorConverter, Colormap
@@ -114,14 +114,49 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         times = np.arange(0, max_time, t_interval)
         true = qmd.TrueOpName
         true_op = DataBase.operator(true)
+        
         true_params = qmd.TrueParamsList
-        true_ops = true_op.constituents_operators
-        true_ham = np.tensordot(true_params, true_ops, axes=1)
+#        true_ops = true_op.constituents_operators
+        true_ops = qmd.TrueOpList
         true_dim = true_op.num_qubits
         true_probe = qmd.ProbeDict[(probe_id,true_dim)]
-        true_expec_values = [evo.expectation_value(ham=true_ham, t=t, 
-            state=true_probe) for t in times
-        ]
+
+        time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
+        true_expec_values = []
+        
+        
+        for t in times:
+            if qmd.UseTimeDepTrueModel:
+                # Multiply time dependent parameters by time value
+                params = copy.copy(qmd.TrueParamsList)
+                for i in range(
+                    len(params) - qmd.NumTimeDepTrueParams,
+                    len(params)
+                ):
+                    params[i] = params[i] * t
+                true_ham = np.tensordot(params, true_ops, axes=1)
+            else:
+                true_ham = time_ind_true_ham
+        
+            try:
+                expec = evo.expectation_value(
+                    ham=true_ham, 
+                    t=t, 
+                    state=true_probe,
+                    log_file = qmd.log_file, 
+                    log_identifier = '[PlotQMD]'
+                )
+            except UnboundLocalError:
+                print("[PlotQMD]\n Unbound local error for:",
+                    "\nParams:", params, 
+                    "\nTimes:", times, 
+                    "\ntrue_ham:", true_ham,
+                    "\nt=", t,
+                    "\nstate=", true_probe
+                )
+
+            true_expec_values.append(expec) 
+        
 
     if true_plot_type=='plot': 
         plt.plot(times, true_expec_values, label='True Expectation Value',
@@ -145,9 +180,27 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
         colour_id = int(i%len(sim_colours))
         sim_col = sim_colours[colour_id]
-        sim_expec_values = [evo.expectation_value(ham=sim_ham, t=t,
-            state=sim_probe) for t in times
-        ]
+#        print("sim model:", sim,"\nparams:\n", sim_params, "\nOps:\n", sim_ops)
+        sim_expec_values = []
+        for t in times: 
+            try:
+                expec = evo.expectation_value(
+                    ham=sim_ham, 
+                    t=t, 
+                    state=sim_probe,
+                    log_file = qmd.log_file, 
+                    log_identifier = '[PlotQMD]'
+                )
+            except UnboundLocalError:
+                print("[PlotQMD]\n Unbound local error for:",
+                    "\nParams:", sim_params, 
+                    "\nTimes:", times, 
+                    "\ntrue_ham:", sim_ham,
+                    "\nt=", t,
+                    "\nstate=", sim_probe
+                )
+        
+            sim_expec_values.append(expec) 
 
         if mod_id == qmd.ChampID:
             models_branch = ChampionsByBranch[mod_id]
@@ -162,6 +215,13 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         plt.plot(times, sim_expec_values, label=sim_label, color=sim_col)
 
     ax = plt.subplot(111)
+    """
+    print("[PlotQMD]. \n True Params:", true_params, 
+        "\n sim model:", sim, 
+        "\n Sim Params:", sim_params
+        
+    )
+    """
 
     # Shrink current axis's height by 10% on the bottom
     box = ax.get_position()
@@ -261,14 +321,47 @@ def ExpectationValuesQHL_TrueModel(qmd,
         times = np.arange(0, max_time, t_interval)
         true = qmd.TrueOpName
         true_op = DataBase.operator(true)
+        
         true_params = qmd.TrueParamsList
-        true_ops = true_op.constituents_operators
-        true_ham = np.tensordot(true_params, true_ops, axes=1)
+#        true_ops = true_op.constituents_operators
+        true_ops = qmd.TrueOpList
         true_dim = true_op.num_qubits
         true_probe = qmd.ProbeDict[(probe_id,true_dim)]
-        true_expec_values = [evo.expectation_value(ham=true_ham, t=t, 
-            state=true_probe) for t in times
-        ]
+        time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
+        true_expec_values = []
+                
+        
+        for t in times:
+            if qmd.UseTimeDepTrueModel:
+                # Multiply time dependent parameters by time value
+                params = copy.copy(qmd.TrueParamsList)
+                for i in range(
+                    len(params) - qmd.NumTimeDepTrueParams,
+                    len(params)
+                ):
+                    params[i] = params[i] * t
+                true_ham = np.tensordot(params, true_ops, axes=1)
+            else:
+                true_ham = time_ind_true_ham
+        
+            try:
+                expec = evo.expectation_value(
+                    ham=true_ham, 
+                    t=t, 
+                    state=true_probe,
+                    log_file = qmd.log_file, 
+                    log_identifier = '[PlotQMD]'
+                )
+            except UnboundLocalError:
+                print("[PlotQMD]\n Unbound local error for:",
+                    "\nParams:", params, 
+                    "\nTimes:", times, 
+                    "\ntrue_ham:", true_ham,
+                    "\nt=", t,
+                    "\nstate=", true_probe
+                )
+
+            true_expec_values.append(expec) 
         
     if true_plot_type=='plot':
         plt.plot(times, true_expec_values, label='True Expectation Value',

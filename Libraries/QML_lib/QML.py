@@ -88,11 +88,18 @@ class ModelLearningClass():
 
 
     
-    def InitialiseNewModel(self, trueoplist, modeltrueparams, simoplist,
-        simparams, simopnames, numparticles, modelID, resample_thresh=0.5,
-        resampler_a = 0.95, pgh_prefactor = 1.0, store_partices_weights=False,
-        checkloss=True, gaussian=True, use_exp_custom=True, enable_sparse=True,
-        debug_directory=None, qle=True, host_name='localhost', 
+    def InitialiseNewModel(self, 
+        trueoplist,
+        modeltrueparams,
+        simoplist, 
+        simparams, simopnames, numparticles, modelID, 
+        use_time_dep_true_params=False, 
+        time_dep_true_params=None,
+        resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0,
+        store_partices_weights=False, checkloss=True, gaussian=True,
+        use_exp_custom=True, enable_sparse=True,
+        debug_directory=None, qle=True, 
+        host_name='localhost', 
         port_number=6379, qid=0, log_file='QMD_log.log'
     ):
        
@@ -113,6 +120,9 @@ class ModelLearningClass():
         self.TrueOpList = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
         self.TrueOpName  = qmd_info['true_name']
+        self.UseTimeDepTrueModel = qmd_info['use_time_dep_true_params']
+        self.TimeDepTrueParams = qmd_info['time_dep_true_params']
+        self.NumTimeDepTrueParams = qmd_info['num_time_dependent_true_params']
         self.QLE = qmd_info['qle']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.ExpComparisonTol = qmd_info['compare_linalg_exp_tol']
@@ -186,7 +196,11 @@ class ModelLearningClass():
         self.GenSimModel = gsi.GenSimQMD_IQLE(
             oplist=self.SimOpList, modelparams=self.SimParams, 
             true_oplist=self.TrueOpList, trueparams=self.TrueParams,
-            truename=self.TrueOpName, num_probes=self.NumProbes,
+            truename=self.TrueOpName, 
+            use_time_dep_true_model = self.UseTimeDepTrueModel,
+            time_dep_true_params = self.TimeDepTrueParams,
+            num_time_dep_true_params = self.NumTimeDepTrueParams,
+            num_probes=self.NumProbes,
             use_experimental_data = self.UseExperimentalData,
             experimental_measurements = self.ExperimentalMeasurements,
             experimental_measurement_times=self.ExperimentalMeasurementTimes, 
@@ -309,9 +323,8 @@ class ModelLearningClass():
                 self.Updater.est_covariance_mtx()
             )
             print_loc(global_print_loc)
-            if self.StoreParticlesWeights or self.QHL_plots:
-                self.Particles[:, :, istep] = self.Updater.particle_locations
-                self.Weights[:, istep] = self.Updater.particle_weights
+            self.Particles[:, :, istep] = self.Updater.particle_locations
+            self.Weights[:, istep] = self.Updater.particle_weights
 
             self.NewEval = self.Updater.est_mean()
             print_loc(global_print_loc)
@@ -449,10 +462,9 @@ class ModelLearningClass():
         learned_info['track_eval'] = self.TrackEval
         learned_info['resample_epochs'] = self.ResampleEpochs
         learned_info['quadratic_losses'] = self.QLosses
-        if self.StoreParticlesWeights:
+        if self.StoreParticlesWeights or self.QHL_plots:
             learned_info ['particles'] = self.Particles
             learned_info['weights'] = self.Weights
-
 
         return learned_info
         

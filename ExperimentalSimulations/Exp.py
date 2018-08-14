@@ -102,7 +102,7 @@ true_op_list = DataBase.get_constituent_names_from_name(true_op)
 num_params = len(true_op_list)
 
 true_params = []
-random_true_params = True
+random_true_params = False
 if(
     global_variables.use_experimental_data==False and
     random_true_params == False
@@ -113,15 +113,25 @@ if(
         true_params.append(random.uniform(2.5, 2.7))    #xTx
         true_params.append(random.uniform(2.5, 2.7))    #yTy
         true_params.append(random.uniform(2.0, 2.3))    #zTz
+    elif true_op == 'xTi':
+        true_params = [1.0]
+
 else:
     for i in range(num_params):
         true_params.append(random.uniform(0,10))
+
+log_print(
+    ["True params:", true_params
+    ], 
+    log_file
+)
 
 #if true_op == 'xTi' or true_op == 'x' or true_op == 'y' or true_op == 'z' or true_op=='zTi' or true_op=='yTi':       
 #    true_params = [0.33]
 
 
 num_ops = len(initial_op_list)
+do_qhl_plots = global_variables.qhl_test and False # TODO when to turn this on?
     
 results_directory = global_variables.results_directory
 long_id = global_variables.long_id
@@ -143,11 +153,14 @@ log_print(["\n QMD id", global_variables.qmd_id, " on host ",
 Launch and run QMD
 """
 
+
 qmd = QMD(
     initial_op_list=initial_op_list, 
     qhl_test = global_variables.qhl_test, 
     true_operator=true_op, 
     true_param_list=true_params, 
+    use_time_dep_true_model = True, 
+    true_params_time_dep = { 'xTi' : 0.01},
     num_particles=global_variables.num_particles,
     num_experiments = global_variables.num_experiments, 
     num_times_for_bayes_updates = global_variables.num_times_bayes,
@@ -155,8 +168,8 @@ qmd = QMD(
     resample_threshold = global_variables.resample_threshold,
     resampler_a = global_variables.resample_a, 
     pgh_prefactor = global_variables.pgh_factor,
-    store_particles_weights = False,
-    qhl_plots=True, 
+    store_particles_weights = True,
+    qhl_plots=do_qhl_plots, 
     results_directory = results_directory,
     long_id = long_id, 
     num_probes=num_probes,
@@ -183,7 +196,6 @@ qmd = QMD(
 
 if global_variables.qhl_test:
     qmd.runQHLTest()
-
 
     if global_variables.pickle_qmd_class:
         log_print(["QMD complete. Pickling result to",

@@ -62,13 +62,13 @@ class QMD():
         Relevant QMD parameters and info are pickled to redis.  
 
     """
-
-
     def __init__(self,
         initial_op_list=['x'],
         qhl_test = False,
         true_operator='x',
         true_param_list = None,
+        use_time_dep_true_model = False,
+        true_params_time_dep = None,
         num_particles= 300,
         num_experiments = 50,
         max_num_models=30, 
@@ -226,7 +226,31 @@ class QMD():
         
         rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.
  
-        
+        self.UseTimeDepTrueModel = use_time_dep_true_model 
+        if self.UseTimeDepTrueModel:
+            # Build time dependent parameters into true op/param list
+            self.TimeDepParams = true_params_time_dep
+            self.NumTimeDepTrueParams = len(self.TimeDepParams)
+
+            time_dep_term = ''
+            time_dep_params = []
+            terms = list(self.TimeDepParams.keys())
+
+            for t in terms:
+                if terms.index(t)>0:
+                    time_dep_term += str('PP')
+                time_dep_term += str(t)
+                time_dep_params.append(self.TimeDepParams[t])
+                
+            time_dep_op = DataBase.operator(time_dep_term)
+            time_dep_ops = time_dep_op.constituents_operators    
+
+            self.TrueOpList.extend(time_dep_ops)
+            self.TrueParamsList.extend(time_dep_params)
+
+        else:
+            self.NumTimeDepTrueParams = 0
+            self.TimeDepParams = None
         if self.QLE:
             self.QLE_Type = 'QLE'
         else: 
@@ -257,7 +281,10 @@ class QMD():
             'experimental_measurement_times' : self.ExperimentalMeasurementTimes, 
             'compare_linalg_exp_tol' : self.ExpComparisonTol,
             'gaussian' : self.gaussian,
-            'q_id' : self.Q_id
+            'q_id' : self.Q_id,
+            'use_time_dep_true_params' : use_time_dep_true_model,
+            'time_dep_true_params' : self.TimeDepParams,
+            'num_time_dependent_true_params' : self.NumTimeDepTrueParams
         }
         
         self.log_print(["RunParallel=", self.RunParallel])
