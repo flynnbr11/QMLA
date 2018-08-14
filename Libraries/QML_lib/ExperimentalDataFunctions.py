@@ -6,22 +6,35 @@ import random
 
 
 
-def experimentalMeasurementDict(directory):
+def experimentalMeasurementDict(directory, max_time=1e4):
     experimental_times_exp_vals = importExperimentalData(
-        directory=directory, rescale=True
+        directory=directory, rescale=False
     )
     
+    # get rid of times too high
+
     times=list(experimental_times_exp_vals[:,0])
     exp=list(experimental_times_exp_vals[:,1])
+
+    useful_times=[]
+    useful_exps=[]
     
-    experimental_data = {}
     for i in range(len(times)):
-        experimental_data[times[i]] = exp[i]    
+        if times[i] < max_time:
+            useful_times.append(times[i])
+            useful_exps.append(exp[i])
+        
+
+    useful_exps = rescaleData(useful_exps)
+
+    experimental_data = {}
+    for i in range(len(useful_times)):
+        experimental_data[useful_times[i]] = useful_exps[i]    
 
     return experimental_data
 
 
-def importExperimentalData(directory, rescale = False, clean_duplicates = True):
+def importExperimentalData(directory, max_time=1e4, rescale = False, clean_duplicates = True):
     
     exp_data = []
     

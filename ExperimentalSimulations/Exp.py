@@ -91,6 +91,15 @@ for t in list(experimental_measurements_dict.keys()):
     experimental_measurements_dict[new_time] = msmt
 
 
+plt.clf()
+exp_times = sorted(experimental_measurements_dict.keys())
+exp_vals = [ experimental_measurements_dict[k] for k in exp_times ]
+
+plt.plot()
+#plt.xlim(0,300)
+plt.scatter(exp_times, exp_vals)
+plt.savefig('ExperimentalDataExpectationValue.png')
+
 #print("experimental measurements:", experimental_measurements_dict)
 
 #print("exp probes:", experimental_probe_dict)
