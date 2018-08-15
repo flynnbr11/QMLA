@@ -70,13 +70,13 @@ num_probes = 40
 if global_variables.use_experimental_data == True:
 # TODO reinstate regualar probes
 
-#    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
-#        num_probes=num_probes
-#    )
-
-    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes_plusplus(
+    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
         num_probes=num_probes
     )
+
+#    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes_plusplus(
+#        num_probes=num_probes
+#    )
 
 else:
     experimental_probe_dict = None
@@ -231,7 +231,7 @@ if global_variables.qhl_test:
         )
 
         qmd.plotExpecValuesQHLTrueModel(
-            max_time=100, 
+            max_time=10, 
             t_interval=1,
             save_to_file = str( 
             global_variables.results_directory+

@@ -355,6 +355,7 @@ def traced_expectation_value_project_one_qubit_plus(
     t, 
     state, 
 ):
+    #TODO for simulations, don't want to use this -- want to use projection with access to full state, so not tracing out. 
     """ 
     Expectation value tracing out all but 
     first qubit to project onto plus state
@@ -378,6 +379,8 @@ def traced_expectation_value_project_one_qubit_plus(
 # Expecactation value function using Hahn inversion gate:
 
 def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
+    import qutip 
+    import numpy as np
     
     #hahn_angle = np.pi/2
     #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))
@@ -398,29 +401,20 @@ def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
               unitary_time_evolution)
     )
 
-    evolved_state = np.dot(total_evolution, state)
-    state_bra = state.conj().T
-
-    psi_u_psi = np.dot(state_bra, evolved_state)
-    expec_value = np.abs(psi_u_psi)**2
+    ev_state = np.dot(total_evolution, state)
+    qstate = qutip.Qobj(ev_state)
+    qstate.dims= [[2,2], [1,1]]
+    traced_state = qstate.ptrace(0) # TODO: to generalise, make this exclude everything apart from 0th dimension ?
     
-    if expec_value > 1.0000000001:
-        if log_file is not None: 
-            log_print([
-                "(Hahn) Expec value:2, expec_value",
-                "\nHam:\n", ham,
-                "\nState=\n", state,
-                "\nt=", t,
-                ],
-                log_file = log_file,
-                log_identifier = log_identifier
-            )
-                
+    one_over_sqrt_two = 1/np.sqrt(2) + 0j 
+    plus = np.array([one_over_sqrt_two, one_over_sqrt_two])
+    one_qubit_plus = qutip.Qobj(plus)
     
-    return expec_value
-
-
- 
+    expect_value = np.abs(qutip.expect(traced_state, one_qubit_plus))**2
+    
+    return expect_value
+    
+    
 def random_probe(num_qubits):
     dim = 2**num_qubits
     real = []

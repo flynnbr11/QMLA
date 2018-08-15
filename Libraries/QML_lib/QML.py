@@ -183,9 +183,9 @@ class ModelLearningClass():
                     'xTx' : [-2.7, 0.1], # true value 2.7
                     'yTy' : [-2.7, 0.1], # true value 2.7
                     'zTz' : [-2.1, 0.1], # true value 2.14
-                    'xTi' : [0.5, 1.0], # TODO Broaden, testing with small dist
-                    'yTi' : [0.5, 1.0],
-                    'zTi' : [0.5, 1.0],
+                    'xTi' : [0.5, 0.5], # TODO Broaden, testing with small dist
+                    'yTi' : [0.5, 0.5],
+                    'zTi' : [0.5, 0.5],
                 }
             )
         else:
