@@ -2,8 +2,8 @@
 
 test_description="QMD_broad_prior_not_exp_data"
 
-num_tests=3
-min_id=4 # update so instances don't clash and hit eachother's redis databases
+num_tests=1
+min_id=0 # update so instances don't clash and hit eachother's redis databases
 let max_id="$min_id + $num_tests - 1 "
 
 
@@ -37,16 +37,16 @@ qmd_id=$min_id
 cutoff_time=180
 
 ## QMD parameters
-do_plots=1
-pickle_class=1
-qhl=1
-experimental_data=0
+do_plots=0
+pickle_class=0
+qhl=0
+experimental_data=1
 
-p=500
-e=200
+p=50
+e=20
 ra=0.95
 rt=0.5
-rp=1.0
+rp=0.3
 
 true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 
