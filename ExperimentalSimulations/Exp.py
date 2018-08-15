@@ -68,9 +68,16 @@ qle = global_variables.do_qle # True for QLE, False for IQLE
 num_probes = 40
 
 if global_variables.use_experimental_data == True:
-    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
+# TODO reinstate regualar probes
+
+#    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
+#        num_probes=num_probes
+#    )
+
+    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes_plusplus(
         num_probes=num_probes
     )
+
 else:
     experimental_probe_dict = None
 
@@ -95,10 +102,10 @@ plt.clf()
 exp_times = sorted(experimental_measurements_dict.keys())
 exp_vals = [ experimental_measurements_dict[k] for k in exp_times ]
 
-plt.plot()
+#plt.plot()
 #plt.xlim(0,300)
-plt.scatter(exp_times, exp_vals)
-plt.savefig('ExperimentalDataExpectationValue.png')
+#plt.scatter(exp_times, exp_vals)
+#plt.savefig('ExperimentalDataExpectationValue.png')
 
 #print("experimental measurements:", experimental_measurements_dict)
 
@@ -168,7 +175,7 @@ qmd = QMD(
     qhl_test = global_variables.qhl_test, 
     true_operator=true_op, 
     true_param_list=true_params, 
-    use_time_dep_true_model = True, 
+    use_time_dep_true_model = False, 
     true_params_time_dep = { 'xTi' : 0.01},
     num_particles=global_variables.num_particles,
     num_experiments = global_variables.num_experiments, 

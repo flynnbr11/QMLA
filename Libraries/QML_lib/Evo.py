@@ -350,6 +350,30 @@ def evolved_state(ham, t, state, use_exp_custom=True,
     return ev_state
 
 
+def traced_expectation_value_project_one_qubit_plus(
+    ham,
+    t, 
+    state, 
+):
+    """ 
+    Expectation value tracing out all but 
+    first qubit to project onto plus state
+    """
+    import qutip 
+    import numpy as np
+    
+    one_over_sqrt_two = 1/np.sqrt(2) + 0j 
+    plus = np.array([one_over_sqrt_two, one_over_sqrt_two])
+    one_qubit_plus = qutip.Qobj(plus)
+    
+    ev_state = evolved_state(ham, t, state)
+    qstate = qutip.Qobj(ev_state)
+    qstate.dims= [[2,2], [1,1]]
+    traced_state = qstate.ptrace(0) # TODO: to generalise, make this exclude everything apart from 0th dimension ?
+    expect_value = np.abs(qutip.expect(traced_state, one_qubit_plus))**2
+    
+    return expect_value
+    
 
 # Expecactation value function using Hahn inversion gate:
 
@@ -359,10 +383,12 @@ def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
     #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))
     #inversion_gate = linalg.expm(-1j*hahn)
     # inversion gate generated as above, done once and hardocded since this doesn't change.
-    inversion_gate = np. array([[0.-1.j, 0.+0.j, 0.+0.j, 0.+0.j],
-       [0.+0.j, 0.-1.j, 0.+0.j, 0.+0.j],
-       [0.+0.j, 0.+0.j, 0.+1.j, 0.+0.j],
-       [0.+0.j, 0.+0.j, 0.+0.j, 0.+1.j]])
+    inversion_gate = np. array([
+        [0.-1.j, 0.+0.j, 0.+0.j, 0.+0.j],
+        [0.+0.j, 0.-1.j, 0.+0.j, 0.+0.j],
+        [0.+0.j, 0.+0.j, 0.+1.j, 0.+0.j],
+        [0.+0.j, 0.+0.j, 0.+0.j, 0.+1.j]]
+    )
 
     unitary_time_evolution = h.exp_ham(ham, t)
 

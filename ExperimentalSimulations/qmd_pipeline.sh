@@ -56,6 +56,9 @@ q_id=0
 exp_data=1
 prt=400
 exp=300
+pgh=0.3
+ra=0.8
+rt=0.6
 gaussian=1
 
 
@@ -70,7 +73,7 @@ then
             let num_prt="$i+10"
             redis-cli flushall
             let q_id="$q_id+1"
-            python3 Exp.py -p=$prt -e=$exp -rq=0 -ra=0.99 -g=$gaussian -qhl=$qhl_test -op="xTi" -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
+            python3 Exp.py -p=$prt -e=$exp -rq=0  -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -op=$true_operator -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
         done 
     done
 
@@ -79,7 +82,7 @@ else
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        python3 Exp.py -op=$true_operator -p=$prt -e=$exp -rq=0 -g=$gaussian -qhl=$qhl_test -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
+        python3 Exp.py -op=$true_operator -p=$prt -e=$exp -rq=0 -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
     done
     cd ../Libraries/QML_lib
     

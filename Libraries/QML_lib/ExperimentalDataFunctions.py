@@ -174,6 +174,44 @@ def experimental_NVcentre_ising_probes(max_num_qubits=2, num_probes=40):
     
     
     
+
+def experimental_NVcentre_ising_probes_plusplus(max_num_qubits=2, num_probes=40):
+    """
+    Returns a dict of separable probes where the first qubit always acts on 
+    a plus state. 
+    """
+    plus_state = np.array([1, 1])/np.sqrt(2)
+    noise_level = 0.03 # from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    random_noise = noise_level * random_probe(1)    
+    noisy_plus = plus_state + random_noise
+    norm_factor = np.linalg.norm(noisy_plus)
+    noisy_plus = noisy_plus/norm_factor
+    
+    seperable_probes = {}
+    for i in range(num_probes):
+#        seperable_probes[i,0] = plus_state
+        seperable_probes[i,0] = noisy_plus
+        for j in range(1, 1+max_num_qubits):
+            if j==1:
+                seperable_probes[i,j] = seperable_probes[i,0]
+            else: 
+                seperable_probes[i,j] = (np.tensordot(seperable_probes[i,j-1],
+                    noisy_plus, axes=0).flatten(order='c')
+                )
+            while (np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]), 
+                atol=1e-14) is  False
+            ):
+                print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
+                # keep replacing until a unit-norm 
+                seperable_probes[i,j] = (
+                    np.tensordot(seperable_probes[i,j-1], random_probe(1),
+                    axes=0).flatten(order='c')
+                )
+    return seperable_probes
+    
+    
+
+
 def random_probe(num_qubits):
     dim = 2**num_qubits
     real = []

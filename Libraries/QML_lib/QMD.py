@@ -1573,8 +1573,6 @@ class QMD():
     
         PlotQMD.ExpectationValuesTrueSim(qmd=self, model_ids=model_ids, 
             champ=champ, max_time=max_time, t_interval=t_interval,
-            use_experimental_data=self.UseExperimentalData,
-            experimental_measurements_dict=self.ExperimentalMeasurements,
             upper_x_lim = max_time,
             save_to_file=save_to_file
         )
@@ -1582,12 +1580,15 @@ class QMD():
     def plotExpecValuesQHLTrueModel(self, 
         max_time = 1.8,
         t_interval= 0.1,
-        save_to_file=None    
+        save_to_file=None,
+        debug_print=False,
+        plus_probe=False 
     ):
         PlotQMD.ExpectationValuesQHL_TrueModel(qmd=self, 
             max_time = max_time,
             t_interval = t_interval,
-            save_to_file = save_to_file
+            save_to_file = save_to_file,
+            debug_print = debug_print
         )
 
     def plotDistributionProgression(self, 

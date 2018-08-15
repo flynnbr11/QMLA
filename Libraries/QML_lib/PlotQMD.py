@@ -74,11 +74,16 @@ def latex_name_ising(name):
     return latex_term
 
 def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, 
-    max_time=3, t_interval=0.01, experimental_measurements_dict=None,
-    use_experimental_data=False, upper_x_lim=None,
+    max_time=3, t_interval=0.01, 
+    upper_x_lim=None,
+    plus_probe=False,
     true_plot_type='scatter', save_to_file=None
 ):
     import random
+    
+    experimental_measurements_dict = qmd.ExperimentalMeasurements
+    use_experimental_data = qmd.UseExperimentalData
+    
     if model_ids is None and champ == True:
         model_ids = [qmd.ChampID]
     elif model_ids is not None and champ == True:
@@ -90,7 +95,8 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
 
     if qmd.ChampID in model_ids and champ==False:
         model_ids.remove(qmd.ChampID)
-    
+
+    plus_plus = np.array([0.5-0.j,  0.5-0.j, 0.5-0.j, 0.5-0.j]) #if probe for plot should be |+>|+>
     probe_id = random.choice(range(qmd.NumProbes))
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
@@ -119,7 +125,10 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
 #        true_ops = true_op.constituents_operators
         true_ops = qmd.TrueOpList
         true_dim = true_op.num_qubits
-        true_probe = qmd.ProbeDict[(probe_id,true_dim)]
+        if plus_probe:
+            true_probe = plus_plus
+        else:
+            true_probe = qmd.ProbeDict[(probe_id,true_dim)]
 
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
         true_expec_values = []
@@ -139,13 +148,20 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
                 true_ham = time_ind_true_ham
         
             try:
-                expec = evo.expectation_value(
-                    ham=true_ham, 
+#                expec = evo.expectation_value(
+#                    ham=true_ham, 
+#                    t=t, 
+#                    state=true_probe,
+#                    log_file = qmd.log_file, 
+#                    log_identifier = '[PlotQMD]'
+#                )
+                expec = evo.traced_expectation_value_project_one_qubit_plus(
+                    ham = true_ham, 
                     t=t, 
-                    state=true_probe,
-                    log_file = qmd.log_file, 
-                    log_identifier = '[PlotQMD]'
+                    state = true_probe
                 )
+
+                
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
                     "\nParams:", params, 
@@ -168,40 +184,51 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         )
 
     ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
+    #print("Times:", times)
     for i in range(len(model_ids)):
         mod_id = model_ids[i]
         sim = qmd.ModelNameIDs[mod_id]
         sim_op  = DataBase.operator(sim)
-        mod=qmd.reducedModelInstanceFromID(mod_id)
+        mod = qmd.reducedModelInstanceFromID(mod_id)
         sim_params = list(mod.FinalParams[:,0])
         sim_ops = sim_op.constituents_operators
         sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
         sim_dim = sim_op.num_qubits
-        sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
+        if plus_probe:
+            true_probe = plus_plus
+        else:
+            sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
         colour_id = int(i%len(sim_colours))
         sim_col = sim_colours[colour_id]
 #        print("sim model:", sim,"\nparams:\n", sim_params, "\nOps:\n", sim_ops)
-        sim_expec_values = []
-        for t in times: 
-            try:
-                expec = evo.expectation_value(
-                    ham=sim_ham, 
-                    t=t, 
-                    state=sim_probe,
-                    log_file = qmd.log_file, 
-                    log_identifier = '[PlotQMD]'
-                )
-            except UnboundLocalError:
-                print("[PlotQMD]\n Unbound local error for:",
-                    "\nParams:", sim_params, 
-                    "\nTimes:", times, 
-                    "\ntrue_ham:", sim_ham,
-                    "\nt=", t,
-                    "\nstate=", sim_probe
-                )
-        
-            sim_expec_values.append(expec) 
-
+#        sim_expec_values = []
+#        for t in times: 
+#            try:
+#                expec = evo.expectation_value(
+#                    ham=sim_ham, 
+#                    t=t, 
+#                    state=sim_probe,
+#                    log_file = qmd.log_file, 
+#                    log_identifier = '[PlotQMD]'
+#                )
+#            except UnboundLocalError:
+#                print("[PlotQMD]\n Unbound local error for:",
+#                    "\nParams:", sim_params, 
+#                    "\nTimes:", times, 
+#                    "\ntrue_ham:", sim_ham,
+#                    "\nt=", t,
+#                    "\nstate=", sim_probe
+#                )
+#            sim_expec_values.append(expec) 
+#        print("going into sim expec list. Ham=", sim_ham, "\nTimes=", times)
+        sim_expec_values = [
+            evo.traced_expectation_value_project_one_qubit_plus(
+                ham=sim_ham, 
+                t=t,
+                state=sim_probe
+            ) for t in times
+        ]
+            
         if mod_id == qmd.ChampID:
             models_branch = ChampionsByBranch[mod_id]
             sim_label = 'Champion Model'
@@ -265,7 +292,7 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
     lower_y_lim = max(0,min(all_expec_values))
     upper_y_lim = max(all_expec_values)
     plt.ylim(lower_y_lim, upper_y_lim)
-    
+
     if upper_x_lim is not None:
         plt.xlim(0,upper_x_lim)
     else:
@@ -292,13 +319,18 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
 
     
 def ExpectationValuesQHL_TrueModel(qmd, 
-    max_time=3, t_interval=0.01, experimental_measurements_dict=None,
-    use_experimental_data=False, upper_x_lim=None,
+    max_time=3, t_interval=0.01,
+    upper_x_lim=None,
     true_plot_type='scatter',
-    save_to_file=None
+    save_to_file=None,
+    debug_print=False
 ):
     model_ids = [qmd.TrueOpModelID]
-    probe_id = random.choice(range(qmd.NumProbes))
+#    probe_id = random.choice(range(qmd.NumProbes))
+    probe_id = 10
+
+    experimental_measurements_dict = qmd.ExperimentalMeasurements
+    use_experimental_data = qmd.UseExperimentalData
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour =  colors.cnames['lightsalmon'] #'b'
@@ -345,13 +377,20 @@ def ExpectationValuesQHL_TrueModel(qmd,
                 true_ham = time_ind_true_ham
         
             try:
-                expec = evo.expectation_value(
-                    ham=true_ham, 
+#                expec = evo.expectation_value(
+#                    ham=true_ham, 
+#                    t=t, 
+#                    state=true_probe,
+#                    log_file = qmd.log_file, 
+#                    log_identifier = '[PlotQMD]'
+#                )
+
+                expec = evo.traced_expectation_value_project_one_qubit_plus(
+                    ham = true_ham, 
                     t=t, 
-                    state=true_probe,
-                    log_file = qmd.log_file, 
-                    log_identifier = '[PlotQMD]'
+                    state = true_probe
                 )
+                
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
                     "\nParams:", params, 
@@ -377,18 +416,31 @@ def ExpectationValuesQHL_TrueModel(qmd,
         mod_id = model_ids[i]
         sim = qmd.ModelNameIDs[mod_id]
         sim_op  = DataBase.operator(sim)
-        mod=qmd.reducedModelInstanceFromID(mod_id)
+        mod = qmd.reducedModelInstanceFromID(mod_id)
         sim_params = list(mod.FinalParams[:,0])
         sim_ops = sim_op.constituents_operators
         sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
+        if debug_print: 
+            print("Times:\n", times)
+            print("SIM HAM:\n", sim_ham)
         sim_dim = sim_op.num_qubits
         sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
         colour_id = int(i%len(sim_colours))
         sim_col = sim_colours[colour_id]
-        sim_expec_values = [evo.expectation_value(ham=sim_ham, t=t,
-            state=sim_probe) for t in times
+#        sim_expec_values = [evo.expectation_value(ham=sim_ham, t=t,
+#            state=sim_probe) for t in times
+#        ]
+
+        sim_expec_values = [
+            evo.traced_expectation_value_project_one_qubit_plus(
+                ham=sim_ham, 
+                t=t,
+                state=sim_probe
+            ) for t in times
         ]
 
+        
+        
         if mod_id == qmd.TrueOpModelID:
             sim_label = 'Simulated Model'
             sim_col = champion_colour
@@ -446,6 +498,7 @@ def ExpectationValuesQHL_TrueModel(qmd,
         plt.xlim(0,upper_x_lim)
     else:
         plt.xlim(0, max(times))
+    plt.xlim(0, max_time)
     
     if extra_lgd:
         lgd_spec=ax.legend(special_handles, special_labels, 
