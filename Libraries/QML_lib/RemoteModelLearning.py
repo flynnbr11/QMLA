@@ -188,10 +188,6 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
                 +'qhl_distribution_progression_uniform_'+str(long_id) + '.png')
             )
 
-        
-
-
-
     updated_model_info = copy.deepcopy(qml_instance.learned_info_dict()) 
 
     del qml_instance

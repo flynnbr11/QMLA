@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=1
+num_tests=3
 let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)
@@ -51,12 +51,14 @@ two_param='zTiPPxTi'
 one_param='zTi'
 single_qubit='x'
 sample='xTiPPzTiPPyTy'
-qhl_test=1
+qhl_test=0
 q_id=0
 exp_data=1
-prt=1200
-exp=600
-pgh=0.3
+use_rq=1
+prt=1000
+exp=500
+let bt="$exp-1"
+pgh=0.1
 ra=0.8
 rt=0.6
 gaussian=1
@@ -73,7 +75,7 @@ then
             let num_prt="$i+10"
             redis-cli flushall
             let q_id="$q_id+1"
-            python3 Exp.py -p=$prt -e=$exp -rq=0  -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -op=$true_operator -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
+            python3 Exp.py -p=$prt -e=$exp -bt=$bt -rq=$use_rq  -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -op=$true_operator -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
         done 
     done
 
@@ -82,7 +84,7 @@ else
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        python3 Exp.py -op=$true_operator -p=$prt -e=$exp -rq=0 -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
+        python3 Exp.py -op=$true_operator -p=$prt -e=$exp -bt=$bt -rq=$use_rq -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data
     done
     cd ../Libraries/QML_lib
     

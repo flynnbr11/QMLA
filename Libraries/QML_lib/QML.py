@@ -180,12 +180,12 @@ class ModelLearningClass():
 #                    'yTy' : [5.0, 2.5], # true value 2.7
 #                    'zTz' : [5.0, 2.5], # true value 2.14
 # TODO return to realistic values, using ideal when testing QHL -BF
-                    'xTx' : [-2.7, 0.1], # true value 2.7
-                    'yTy' : [-2.7, 0.1], # true value 2.7
-                    'zTz' : [-2.1, 0.1], # true value 2.14
-                    'xTi' : [0.5, 0.5], # TODO Broaden, testing with small dist
-                    'yTi' : [0.5, 0.5],
-                    'zTi' : [0.5, 0.5],
+                    'xTx' : [-2.7, 0.2], # true value 2.7
+                    'yTy' : [-2.7, 0.2], # true value 2.7
+                    'zTz' : [-2.1, 0.2], # true value 2.14
+                    'xTi' : [1.0, 2.0], # TODO Broaden, testing with small dist
+                    'yTi' : [1.0, 2.0],
+                    'zTi' : [1.0, 2.0],
                 }
             )
         else:
