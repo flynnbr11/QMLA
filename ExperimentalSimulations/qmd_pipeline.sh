@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=10
+num_tests=5
 let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)

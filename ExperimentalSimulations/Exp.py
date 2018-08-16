@@ -84,7 +84,8 @@ else:
 # Load in experimental data
 
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
-    directory="NV05_HahnPeaks_expdataset"
+    directory = "NV05_HahnPeaks_expdataset",
+    max_time = 3500
 )
 
 for t in list(experimental_measurements_dict.keys()):

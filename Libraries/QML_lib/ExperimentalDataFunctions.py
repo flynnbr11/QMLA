@@ -137,7 +137,6 @@ def nearestAvailableExpVal(times, experimental_data, t):
     
     return experimental_data[nearest]
 
-
 def experimental_NVcentre_ising_probes(max_num_qubits=2, num_probes=40):
     """
     Returns a dict of separable probes where the first qubit always acts on 
