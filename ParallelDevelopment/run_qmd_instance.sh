@@ -114,7 +114,7 @@ sleep 5
 cd $script_dir
 echo "Starting Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
 
-echo "CONFIG: -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG"
+echo "CONFIG: -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -cb=$BAYES_CSV -pt=$PLOTS -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG"
 
 python3 Exp.py -rq=1 -op="$OP" -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=30000 -g=1 -exp=$EXP_DATA -qhl=$QHL -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -cb=$BAYES_CSV
 

@@ -250,7 +250,7 @@ if global_variables.qhl_test:
             
     
 else:
-    qmd.runRemoteQMD(num_spawns=3)
+    qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
 
     """
     Tidy up and analysis. 
@@ -299,12 +299,15 @@ else:
             'bayes_factors_'+ str(global_variables.long_id)+'.csv'),
             names_ids='latex'
         )
-        
-        qmd.plotExpecValues(
-            save_to_file=str( 
-            global_variables.results_directory+
-            'expec_values_'+str(global_variables.long_id)+'.png')
-        )
+
+#        log_print(["Before expec value plot"], log_file)
+#        This causes BC to break and nothing after this happens for some reason, so commented out for now (Brian, Aug 16)
+#        qmd.plotExpecValues(
+#            save_to_file=str( 
+#            global_variables.results_directory+
+#            'expec_values_'+str(global_variables.long_id)+'.png')
+#        )
+
         qmd.plotRadarDiagram(
             save_to_file=str(
             global_variables.results_directory+
@@ -323,16 +326,15 @@ else:
     #            '.png')
     #        )
         
-        
         qmd.plotTreeDiagram(
             save_to_file = str
             (global_variables.results_directory+
             'tree_diagram_'+ str(global_variables.long_id)+ '.png')
         )
-        
-        qmd.writeInterQMDBayesCSV(
-            bayes_csv=str(global_variables.cumulative_csv)
-        )
+
+    qmd.writeInterQMDBayesCSV(
+        bayes_csv=str(global_variables.cumulative_csv)
+    )
 
     results_file = global_variables.results_file
     pickle.dump(qmd.ChampionResultsDict, open(results_file, "wb"), protocol=2)
