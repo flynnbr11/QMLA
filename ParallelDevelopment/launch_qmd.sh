@@ -1,8 +1,27 @@
 #!/bin/bash
 
-test_description="QMD_broad_prior_not_exp_data"
+test_description="QMD_one_hundred_particles"
 
-num_tests=1
+## QMD parameters
+num_tests=30
+do_plots=0
+pickle_class=0
+qhl=0 # do a test on QHL only -> 1; QMD -> 0
+experimental_data=1 # use experimental data -> 1; use fake data ->0
+
+p=400 # particles
+e=30 # experiments
+ra=0.8 #resample a 
+rt=0.6 # resample threshold
+rp=0.1 # PGH factor
+
+true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+
+### --------------------------------------------------- ###
+
+
+### ---------------------------------------------------###
+
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 let max_id="$min_id + $num_tests - 1 "
 
@@ -36,19 +55,6 @@ time=$test_time
 qmd_id=$min_id
 cutoff_time=180
 
-## QMD parameters
-do_plots=0
-pickle_class=0
-qhl=0
-experimental_data=1
-
-p=50
-e=20
-ra=0.95
-rt=0.5
-rp=0.3
-
-true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 
 declare -a qhl_operators=(
 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
@@ -75,7 +81,7 @@ then
 			do
 				for i in `seq $min_id $max_id`;
 				do
-					let bt="$e/2"
+					let bt="$e-1"
 					let qmd_id="$qmd_id+1"
 					let ham_exp="$e*$p + $p*$bt"
 					let expected_time="$ham_exp/50"
