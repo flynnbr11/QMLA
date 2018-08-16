@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=3
+num_tests=10
 let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)
@@ -21,26 +21,8 @@ mkdir -p $long_dir
 
 """
 declare -a qhl_operators=(
-'xTi'
-'yTi'
-'zTi'
-'xTiPPyTi'
-'xTiPPzTi'
-'xTiPPzTiPPyTi'
-'xTiPPzTiPPyTiPPxTx'
-'xTiPPzTiPPyTiPPyTy'
-'xTiPPzTiPPyTiPPzTz'
-'xTiPPzTiPPyTiPPzTzPPxTx'
-'xTiPPzTiPPyTiPPzTzPPyTy'
-'xTiPPzTiPPyTiPPzTzPPxTxPPyTy'
-'xTiPPzTiPPyTiPPzTzPPxTxPPyTyPPxTz'
-'xTiPPzTiPPyTiPPzTzPPxTxPPyTyPPxTy'
-'xTiPPzTiPPyTiPPzTzPPxTxPPyTyPPyTz'
-'xTiPPzTiPPyTiPPzTzPPxTxPPyTyPPxTyPPxTz'
-'xTiPPzTiPPyTiPPzTzPPxTxPPyTyPPxTyPPyTz'
 'xTiPPzTiPPyTiPPzTzPPxTxPPyTyPPxTyPPyTzPPxTz' 
 )
-
 """
 declare -a qhl_operators=(
 'z'
@@ -54,9 +36,9 @@ sample='xTiPPzTiPPyTy'
 qhl_test=0
 q_id=0
 exp_data=1
-use_rq=1
-prt=1000
-exp=500
+use_rq=0
+prt=40
+exp=30
 let bt="$exp-1"
 pgh=0.1
 ra=0.8
@@ -70,7 +52,7 @@ if [ "$qhl_test" == 1 ]
 then
     for op in "${qhl_operators[@]}";
     do
-        for i in `seq 1 1`;
+        for i in `seq 1 $max_qmd_id`;
         do
             let num_prt="$i+10"
             redis-cli flushall

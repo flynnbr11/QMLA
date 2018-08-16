@@ -402,19 +402,70 @@ def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
     )
 
     ev_state = np.dot(total_evolution, state)
-    qstate = qutip.Qobj(ev_state)
-    qstate.dims= [[2,2], [1,1]]
-    traced_state = qstate.ptrace(0) # TODO: to generalise, make this exclude everything apart from 0th dimension ?
-    
-    one_over_sqrt_two = 1/np.sqrt(2) + 0j 
-    plus = np.array([one_over_sqrt_two, one_over_sqrt_two])
-    one_qubit_plus = qutip.Qobj(plus)
-    
-    expect_value = np.abs(qutip.expect(traced_state, one_qubit_plus))**2
+
+    density_matrix = np.kron( ev_state, (ev_state.T).conj() )
+    density_matrix = np.reshape(density_matrix, [4,4])
+    reduced_matrix = partial_trace_out_second_qubit(
+        density_matrix,
+        qubits_to_trace = [1]
+    )
+
+    plus_state = np.array([1, 1])/np.sqrt(2)
+    noise_level = 0.03 # from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    random_noise = noise_level * random_probe(1)    
+    noisy_plus = plus_state + random_noise
+    norm_factor = np.linalg.norm(noisy_plus)
+    noisy_plus = noisy_plus/norm_factor
+
+
+    bra = noisy_plus.conj().T
+    rho_state = np.dot(reduced_matrix, noisy_plus)
+    expect_value = np.abs(np.dot(bra, rho_state))
     
     return expect_value
+
+
+
+def swap_vector_elements_positions(input_vector, pos1, pos2):
+    import copy
+    new_vector = copy.deepcopy(input_vector)
+    new_vector[pos1] = input_vector[pos2]
+    new_vector[pos2] = input_vector[pos1]
     
+    return new_vector
+
+def partial_trace_out_second_qubit(global_rho, qubits_to_trace=[1]):
     
+    # INPUTS
+    """
+     - global_rho: numpy array of the original full density matrix
+     - qubits_to_trace: list of the qubit indexes to trace out from the full system
+    """
+    #print("trace fnc. global rho", global_rho)
+    len_input_state = len(global_rho)
+    input_num_qubits = int(np.log2(len_input_state))
+
+    qubits_to_trace.reverse()
+
+    num_qubits_to_trace = len(qubits_to_trace)
+    output_matrix = [] #initialise the output reduced matrix
+
+    for i in range(num_qubits_to_trace):
+        k = qubits_to_trace[i]
+
+        if k == num_qubits_to_trace:
+            for p in range(0, int(len_input_state), 2):
+
+                odd_positions = global_rho[p][::2]    # pick odd positions in the original matrix
+                even_positions = global_rho[p+1][1::2]   #pick even positions in the original matrix
+
+                output_matrix.append(
+                    odd_positions + even_positions  
+                )
+    output_matrix = np.array(output_matrix)
+    return output_matrix
+    
+
 def random_probe(num_qubits):
     dim = 2**num_qubits
     real = []
