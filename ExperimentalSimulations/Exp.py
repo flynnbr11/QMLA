@@ -87,9 +87,9 @@ if global_variables.qhl_test:
 # Load in experimental data
 
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
-#    directory = "NV05_HahnPeaks_expdataset",
-#    directory = "NV05_HahnEcho02",
-    directory = "NVB_HahnPeaks_Newdata",
+#    directory = "Data/NV05_HahnPeaks_expdataset",
+#    directory = "Data/NV05_HahnEcho02",
+    directory = "Data/NVB_HahnPeaks_Newdata",
 
     max_time = 5000
 #    max_time = 3500
@@ -310,11 +310,11 @@ else:
 
 #        log_print(["Before expec value plot"], log_file)
 #        This causes BC to break and nothing after this happens for some reason, so commented out for now (Brian, Aug 16)
-#        qmd.plotExpecValues(
-#            save_to_file=str( 
-#            global_variables.results_directory+
-#            'expec_values_'+str(global_variables.long_id)+'.png')
-#        )
+        qmd.plotExpecValues(
+            save_to_file=str( 
+            global_variables.results_directory+
+            'expec_values_'+str(global_variables.long_id)+'.png')
+        )
 
         qmd.plotRadarDiagram(
             save_to_file=str(
