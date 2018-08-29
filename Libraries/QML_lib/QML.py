@@ -180,12 +180,31 @@ class ModelLearningClass():
 #                    'yTy' : [5.0, 2.5], # true value 2.7
 #                    'zTz' : [5.0, 2.5], # true value 2.14
 # TODO return to realistic values, using ideal when testing QHL -BF
-                    'xTx' : [-2.7, 0.3], # true value 2.7
-                    'yTy' : [-2.7, 0.3], # true value 2.7
-                    'zTz' : [-2.1, 0.3], # true value 2.14
-                    'xTi' : [1.0, 2.0], # TODO Broaden, testing with small dist
-                    'yTi' : [1.0, 2.0],
-                    'zTi' : [1.0, 2.0],
+
+                    # Values below correspond to simulated data
+#                    'xTx' : [2.0, 1.0], # true value 2.7
+#                    'yTy' : [2.0, 1.0], # true value 2.7
+#                    'zTz' : [2.0, 1.0], # true value 2.14
+#                    'xTi' : [1.0, 0.5], # TODO Broaden, testing with small dist
+#                    'yTi' : [1.0, 0.5],
+#                    'zTi' : [1.0, 0.5],
+
+                    # Values below correspond to Andreas' inital QMD values for this data set
+                    'xTx' : [-2.5, 0.5], # true value 2.7
+                    'yTy' : [-2.5, 0.5], # true value 2.7
+                    'zTz' : [-1.5, 0.5], # true value 2.14
+                    'xTi' : [0.2, 0.5], # TODO Broaden, testing with small dist
+                    'yTi' : [0.2, 0.5],
+                    'zTi' : [0.2, 0.5],
+
+
+                    # Values below correspond to Andreas' final values for this data set
+#                    'xTx' : [-2.85, 0.3], # true value 2.7
+#                    'yTy' : [-2.76, 0.3], # true value 2.7
+#                    'zTz' : [-2.13, 0.3], # true value 2.14
+#                    'xTi' : [0.66, 0.3], # TODO Broaden, testing with small dist
+#                    'yTi' : [0.43, 0.3],
+#                    'zTi' : [0.55, 0.3],
                 }
             )
         else:
@@ -289,7 +308,7 @@ class ModelLearningClass():
             
             before_datum = time.time()
             self.Datum = self.GenSimModel.simulate_experiment(self.SimParams,
-                self.Experiment, repeat=10
+                self.Experiment, repeat=100
             ) # todo reconsider repeat number
             after_datum = time.time()
             self.datum_gather_cumulative_time+=after_datum-before_datum
@@ -645,6 +664,10 @@ class reducedModel():
             self.Particles = 'Particles not stored.'
             self.Weights = 'Weights not stored.'
         
+        sim_params = list(self.FinalParams[:,0])
+        self.LearnedHamiltonian = np.tensordot(sim_params, self.SimOpList, axes=1)
+
+
 
     
 #        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,

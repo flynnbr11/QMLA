@@ -37,13 +37,14 @@ qhl_test=0
 q_id=0
 exp_data=1
 use_rq=1
-prt=600
-exp=300
+prt=400
+exp=1000
 let bt="$exp-1"
 pgh=0.1
 ra=0.8
-rt=0.5
+rt=0.6
 gaussian=1
+
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 

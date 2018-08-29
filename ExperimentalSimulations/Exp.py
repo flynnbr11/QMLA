@@ -73,19 +73,27 @@ if global_variables.use_experimental_data == True:
     experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
         num_probes=num_probes
     )
-
-#    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes_plusplus(
-#        num_probes=num_probes
-#    )
-
 else:
     experimental_probe_dict = None
+
+"""
+if global_variables.qhl_test:
+    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes_plusplus(
+        num_probes=num_probes
+    )
+"""
+
 
 # Load in experimental data
 
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
-    directory = "NV05_HahnPeaks_expdataset",
-    max_time = 3500
+#    directory = "NV05_HahnPeaks_expdataset",
+#    directory = "NV05_HahnEcho02",
+    directory = "NVB_HahnPeaks_Newdata",
+
+    max_time = 5000
+#    max_time = 3500
+#    max_time = 1500
 )
 
 for t in list(experimental_measurements_dict.keys()):
@@ -128,10 +136,10 @@ if(
 ):
     if true_op == 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz':
         for i in range(3):
-            true_params.append(random.uniform(0,1)) # for xTi, yTi, zTi
-        true_params.append(random.uniform(2.5, 2.7))    #xTx
-        true_params.append(random.uniform(2.5, 2.7))    #yTy
-        true_params.append(random.uniform(2.0, 2.3))    #zTz
+            true_params.append(random.uniform(0,2)) # for xTi, yTi, zTi
+        true_params.append(random.uniform(2.0, 3.0))    #xTx
+        true_params.append(random.uniform(2.0, 3.0))    #yTy
+        true_params.append(random.uniform(2.0, 3.0))    #zTz
     elif true_op == 'xTi':
         true_params = [1.0]
 
@@ -344,6 +352,10 @@ else:
     log_print(["END: QMD id", global_variables.qmd_id, ":",
         global_variables.num_particles, " particles;",
         global_variables.num_experiments, "exp; ", 
-        global_variables.num_times_bayes, "bayes. Time:", end-start], 
+        global_variables.num_times_bayes, "bayes. Time:", end-start
+        ], 
         log_file
     )
+    
+print("QMD finished - results in:", global_variables.results_directory)
+

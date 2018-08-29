@@ -233,12 +233,11 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 log_print(
                     [
                     'Getting system outcome',
-                    'times:\n', time
+                    'time:\n', time
                     ],
                     self.log_file, 
                     self.log_identifier
                 )
-
             #print("Time:", time[0])
             try:
                 # If time already exists in experimental data
@@ -251,9 +250,15 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                     experimental_data = self.experimental_measurements,
                     t = time
                 )
-            #print("Using experimental time",time,"\texp val:",
-            #    experimental_expec_value
-            #)
+            if debug_log_print:
+                log_print(
+                    [
+                    "Using experimental time",time,
+                    "\texp val:", experimental_expec_value
+                    ],
+                    self.log_file, 
+                    self.log_identifier
+                )
             pr0 = np.array([[experimental_expec_value]])
 
 
