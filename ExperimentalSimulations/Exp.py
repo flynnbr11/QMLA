@@ -33,9 +33,6 @@ import matplotlib.pyplot as plt
 import time as time 
 
 ###  START QMD ###
-
-
-import time
 start = time.time()
 
 """
@@ -63,8 +60,6 @@ def log_print(to_print_list, log_file):
 
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
-
-
 num_probes = 40
 
 if global_variables.use_experimental_data == True:
@@ -84,12 +79,11 @@ if global_variables.qhl_test:
 """
 
 # Load in experimental data
-experimental_time_max = 5000 # in ns, max time to consider for
+experimental_time_max = 3000 # in ns, max time to consider for
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
 #    directory = "Data/NV05_HahnPeaks_expdataset",
 #    directory = "Data/NV05_HahnEcho02",
     directory = "Data/NVB_HahnPeaks_Newdata",
-
     max_time = experimental_time_max
 )
 
@@ -108,23 +102,14 @@ plt.clf()
 exp_times = sorted(experimental_measurements_dict.keys())
 exp_vals = [ experimental_measurements_dict[k] for k in exp_times ]
 
-#plt.plot()
-#plt.xlim(0,300)
-#plt.scatter(exp_times, exp_vals)
-#plt.savefig('ExperimentalDataExpectationValue.png')
-
-#print("experimental measurements:", experimental_measurements_dict)
-
-#print("exp probes:", experimental_probe_dict)
 
 initial_op_list = ['xTi', 'yTi', 'zTi']
-#true_op = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 true_op = global_variables.true_operator
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 num_params = len(true_op_list)
-
 true_params = []
 random_true_params = False
+
 if(
     global_variables.use_experimental_data==False and
     random_true_params == False
@@ -138,9 +123,9 @@ if(
     elif true_op == 'xTi':
         true_params = [1.0]
 
-else:
+else: # i.e. purely random true parameters
     for i in range(num_params):
-        true_params.append(random.uniform(0,10))
+        true_params.append(random.uniform(0,2))
 
 log_print(
     ["True params:", true_params
@@ -206,7 +191,6 @@ log_print(["\n QMD id", global_variables.qmd_id, " on host ",
 Launch and run QMD
 """
 
-
 qmd = QMD(
     initial_op_list=initial_op_list, 
     qhl_test = global_variables.qhl_test, 
@@ -217,6 +201,8 @@ qmd = QMD(
     num_particles=global_variables.num_particles,
     num_experiments = global_variables.num_experiments, 
     num_times_for_bayes_updates = global_variables.num_times_bayes,
+    bayes_lower = global_variables.bayes_lower,
+    bayes_upper = global_variables.bayes_upper,
     qle=qle,
     resample_threshold = global_variables.resample_threshold,
     resampler_a = global_variables.resample_a, 
