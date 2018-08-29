@@ -243,7 +243,7 @@ if global_variables.qhl_test:
         )
 
         qmd.plotExpecValuesQHLTrueModel(
-            max_time=10, 
+            max_time=experimental_time_max/1000, 
             t_interval=1,
             save_to_file = str( 
             global_variables.plots_directory+
