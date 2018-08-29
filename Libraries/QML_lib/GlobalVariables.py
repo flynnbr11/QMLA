@@ -41,6 +41,8 @@ default_num_parameters = 2
 default_num_experiments = 10
 default_num_particles = 20
 default_bayes_times = 5
+default_bayes_threshold_lower = 1
+default_bayes_threshold_upper = 100
 default_gaussian = True
 default_custom_prior = False
 default_do_plots =  0
@@ -75,6 +77,8 @@ class GlobalVariablesClass():
         num_experiments = default_num_experiments,
         num_particles = default_num_particles,
         num_times_bayes = default_bayes_times,
+        bayes_upper = default_bayes_threshold_upper,
+        bayes_lower = default_bayes_threshold_lower,
         all_plots = default_do_plots,
         gaussian = default_gaussian,
         custom_prior = default_custom_prior,
@@ -104,6 +108,8 @@ class GlobalVariablesClass():
         self.num_experiments = num_experiments
         self.num_particles = num_particles
         self.num_times_bayes = num_times_bayes
+        self.bayes_lower = bayes_lower
+        self.bayes_upper = bayes_upper
         self.all_plots = all_plots
         self.gaussian = gaussian
         self.custom_prior = custom_prior
@@ -207,6 +213,20 @@ def parse_cmd_line_args(args):
       help='Bool whether to use RQ for parallel or not.',
       type=int,
       default=default_use_rq
+    )
+
+    parser.add_argument(
+      '-bu', '--bayes_upper', 
+      help='Higher Bayes threshold.',
+      type=int,
+      default=default_bayes_threshold_upper
+    )
+
+    parser.add_argument(
+      '-bl', '--bayes_lower', 
+      help='Lower Bayes threshold.',
+      type=int,
+      default=default_bayes_threshold_lower
     )
 
     ## Parameters about the model to use as true model (currently deprecated)
@@ -361,6 +381,8 @@ def parse_cmd_line_args(args):
     num_times_bayes = arguments.bayes_times
     if num_times_bayes > num_experiments:
         num_times_bayes = num_experiments-1
+    bayes_upper = arguments.bayes_upper
+    bayes_lower = arguments.bayes_lower
     all_plots = bool(arguments.plots)
     gaussian = bool(arguments.gaussian)
     custom_prior = bool(arguments.custom_prior)
@@ -392,6 +414,8 @@ def parse_cmd_line_args(args):
         num_experiments = num_experiments,
         num_particles = num_particles,
         num_times_bayes = num_times_bayes,
+        bayes_lower = bayes_lower, 
+        bayes_upper = bayes_upper, 
         resample_threshold = resample_threshold,
         resample_a = resample_a,
         pgh_factor = pgh_factor,

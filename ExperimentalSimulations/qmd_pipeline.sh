@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=2
+num_tests=1
 let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)
@@ -36,11 +36,11 @@ sample='xTiPPzTiPPyTy'
 qhl_test=0
 q_id=0
 exp_data=1
-use_rq=0
-prt=6
-exp=3
+use_rq=1
+prt=600
+exp=200
 let bt="$exp-1"
-pgh=0.1
+pgh=1.0
 ra=0.8
 rt=0.5
 gaussian=1

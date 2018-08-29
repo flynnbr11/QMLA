@@ -147,12 +147,6 @@ class ModelLearningClass():
             '\n\t SimParams:', self.SimParams]
         )
         """    
-        self.log_print([
-            'ResamplerA', self.ResamplerA, 
-            '\n ResamplerThresh:', self.ResamplerThresh,
-            '\n PGH Prefactor:', self.PGHPrefactor
-            ]
-        )
         if debug_directory is not None: 
             self.debugSave = True
             self.debugDirectory = debug_directory 

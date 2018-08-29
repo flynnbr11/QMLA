@@ -41,10 +41,10 @@ def time_seconds():
     time = str(str(hour)+':'+str(minute)+':'+str(second))
     return time
 
-def low_BF():
+def high_BF():
 	return 1
 
-def high_BF():
+def low_BF():
 	return 100
 
 class QMD():
@@ -80,6 +80,8 @@ class QMD():
         max_num_qubits=7, #TODO change -- this may cause crashes somewhere
         gaussian=True,
         prior_specific_terms = None,
+        bayes_lower = 1, 
+        bayes_upper = 100,
         resample_threshold = 0.5,
         resampler_a = 0.95,
         pgh_prefactor = 1.0,
@@ -142,6 +144,8 @@ class QMD():
         self.NumExperiments = num_experiments
         self.MaxQubitNumber = max_num_qubits
         self.NumTimesForBayesUpdates = num_times_for_bayes_updates
+        self.BayesLower = bayes_lower
+        self.BayesUpper = bayes_upper
         self.ResampleThreshold = resample_threshold
         self.ResamplerA = resampler_a
         self.PGHPrefactor = pgh_prefactor
@@ -560,10 +564,13 @@ class QMD():
             self.log_print(["Model", model_name, "does not yet exist."])
 
     def remoteBayes(self, model_a_id, model_b_id, return_job=False, 
-        branchID=None, interbranch=False, remote=True, bayes_threshold=high_BF()
+        branchID=None, interbranch=False, remote=True, bayes_threshold=None
     ):
         # only do this when both models have learned. TODO add check for this. 
         
+        if bayes_threshold is None: 
+            bayes_threshold = self.BayesUpper
+
         if branchID is None:
             interbranch=True            
         # print("[QMD remoteBayes] self.NumTimesForBayesUpdates: ", self.NumTimesForBayesUpdates)
@@ -599,8 +606,11 @@ class QMD():
             )
             
     def remoteBayesFromIDList(self, model_id_list, remote=True,
-        wait_on_result=False, recompute=False, bayes_threshold=low_BF()
+        wait_on_result=False, recompute=False, bayes_threshold=None
     ): 
+        if bayes_threshold is None:
+            bayes_threshold=self.BayesLower
+
         remote_jobs=[]
         num_models = len(model_id_list)
         for i in range(num_models):
@@ -631,8 +641,10 @@ class QMD():
             )
     
     def remoteBayesFromBranchID(self, branchID, remote=True, 
-        bayes_threshold=high_BF() #actually was 50
+        bayes_threshold=None #actually was 50
     ):
+        if bayes_threshold is None: 
+            bayes_threshold=self.BayesUpper
 
         active_branches_bayes = self.RedisDataBases['active_branches_bayes']
         model_id_list = DataBase.active_model_ids_by_branch_id(self.db, branchID)
@@ -685,7 +697,10 @@ class QMD():
             self.processRemoteBayesPair(pair=pair)
 
 
-    def processRemoteBayesPair(self, a=None, b=None, pair=None, bayes_threshold=low_BF()):
+    def processRemoteBayesPair(self, a=None, b=None, pair=None, bayes_threshold=None):
+
+        if bayes_threshold is None: 
+            bayes_threshold=self.BayesLower
         bayes_factors_db = self.RedisDataBases['bayes_factors_db']
         if pair is not None:        
             model_ids = pair.split(',')
@@ -824,10 +839,12 @@ class QMD():
                 if print_result: print("Point to ", model_b.Name)
                 return "b"
 
-    def compareModelsWithinBranch(self, branchID, bayes_threshold=low_BF()):
+    def compareModelsWithinBranch(self, branchID, bayes_threshold=None):
         active_models_in_branch = DataBase.active_model_ids_by_branch_id(self.db,
             branchID
         )
+        if bayes_threshold is None:
+            bayes_threshold=self.BayesLower
         
         models_points = {}
         for model_id in active_models_in_branch:
@@ -887,9 +904,12 @@ class QMD():
         return models_points, champ_id
 
     
-    def compareModelList(self, model_list, bayes_threshold = low_BF(),
+    def compareModelList(self, model_list, bayes_threshold=None, 
         models_points_dict=None, num_times_to_use = 'all'
     ):
+        if bayes_threshold is None:
+            bayes_threshold = self.BayesLower
+
         models_points = {}
         for mod in model_list:
             models_points[mod] = 0
@@ -923,9 +943,9 @@ class QMD():
                 self.log_print([DataBase.model_name_from_id(self.db, i)])
             self.log_print(["Points:\n", models_points])
             self.remoteBayesFromIDList(model_id_list=max_points_branches,
-                remote=True, recompute=True, bayes_threshold=low_BF(), wait_on_result=True
+                remote=True, recompute=True, bayes_threshold=self.BayesLower, wait_on_result=True
             )
-            champ_id = self.compareModelList(max_points_branches, bayes_threshold=low_BF())
+            champ_id = self.compareModelList(max_points_branches, bayes_threshold=self.BayesLower)
         else: 
             self.log_print(["After comparing list:", models_points])
             champ_id = max(models_points, key=models_points.get)
@@ -935,7 +955,10 @@ class QMD():
     
     
     
-    def finalBayesComparisons(self, bayes_threshold=high_BF()):
+    def finalBayesComparisons(self, bayes_threshold=None):
+        if bayes_threshold is None: 
+            bayes_threshold=self.BayesUpper
+
         bayes_factors_db = self.RedisDataBases['bayes_factors_db']
         branch_champions = list(self.BranchChampions.values())
         job_list = []
@@ -1040,7 +1063,7 @@ class QMD():
                 factors between : ", max_points_branches]
             )
             champ_id = self.compareModelList(max_points_branches, 
-                bayes_threshold=low_BF(), models_points_dict=branch_champions_points
+                bayes_threshold=self.BayesLower, models_points_dict=branch_champions_points
             )
         else: 
             champ_id = max(branch_champions_points, key=branch_champions_points.get)
@@ -1055,9 +1078,12 @@ class QMD():
     
     
     def interBranchChampion(self, branch_list=[], just_active_models=False,
-        global_champion=False, bayes_threshold=low_BF()
+        global_champion=False, bayes_threshold = None
     ):
         
+        if bayes_threshold is None:
+            bayes_threshold=self.BayesLower
+
         all_branches = self.db['branchID'].unique()
         if global_champion == True: 
             branches = all_branches
@@ -1118,7 +1144,7 @@ class QMD():
                 between : ", max_points_branches]
             )
             champ_id = self.compareModelList(max_points_branches, 
-                bayes_threshold=low_BF(), models_points_dict=branch_champions_points
+                bayes_threshold=self.BayesLower, models_points_dict=branch_champions_points
             )
         else: 
             champ_id = max(branch_champions_points, 
@@ -1470,7 +1496,7 @@ class QMD():
                 mod = self.getModelInstanceFromID(j)
                 mod.resetPrior()
                 mod.UpdateModel(n_experiments=num_exp)
-            self.compareModelList(model_list=model_id_list, bayes_threshold=low_BF(),
+            self.compareModelList(model_list=model_id_list, bayes_threshold=self.BayesLower,
                 num_times_to_use=num_exp
             )
         self.MajorityVotingScores = self.majorityVotingTally()
