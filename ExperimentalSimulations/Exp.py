@@ -79,20 +79,16 @@ if global_variables.qhl_test:
 """
 
 # Load in experimental data
-experimental_time_max = 3000 # in ns, max time to consider for
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
-#    directory = "Data/NV05_HahnPeaks_expdataset",
-#    directory = "Data/NV05_HahnEcho02",
-    directory = "Data/NVB_HahnPeaks_Newdata",
-    max_time = experimental_time_max
+    directory = str("Data/"+global_variables.dataset),
+    max_time = global_variables.data_max_time + global_variables.data_time_offset
 )
 
 for t in list(experimental_measurements_dict.keys()):
     # Shift t-values by 180ns so t=0 corresponds to Pr(0)=1
     # Convert t from ns to ms; remove old records
 
-#    new_time = (t - 180)/1000
-    new_time = (t - 205)/1000
+    new_time = (t - global_variables.data_time_offset)/1000
     msmt = experimental_measurements_dict[t]
     experimental_measurements_dict.pop(t)
     experimental_measurements_dict[new_time] = msmt
@@ -255,7 +251,7 @@ if global_variables.qhl_test:
         )
 
         qmd.plotExpecValuesQHLTrueModel(
-            max_time=experimental_time_max/1000, 
+            max_time=global_variables.data_max_time/1000, 
             t_interval=1,
             save_to_file = str( 
             global_variables.plots_directory+
@@ -325,7 +321,7 @@ else:
 #        This causes BC to break and nothing after this happens for some reason, so commented out for now (Brian, Aug 16)
         qmd.plotExpecValues(
             model_ids = [11], # hardcode to see full model for development
-            max_time = experimental_time_max/1000, #in microsec
+            max_time = global_variables.data_max_time/1000, #in microsec
             save_to_file=str( 
             global_variables.plots_directory+
             'expec_values_'+str(global_variables.long_id)+'.png')

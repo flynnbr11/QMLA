@@ -61,6 +61,9 @@ default_cumulative_csv = 'cumulative_bayes.csv'
 default_experimental_data = False
 default_true_operator = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 default_qhl_test = 0
+default_dataset = 'NV_HahnPeaks_expdataset'
+default_data_max_useful_time = 2000 # nanoseconds
+default_data_time_offset = 180 # nanoseconds
 
 class GlobalVariablesClass():
     def __init__(
@@ -95,6 +98,10 @@ class GlobalVariablesClass():
         save_plots = default_save_plots,
         cumulative_csv = default_cumulative_csv,
         experimental_data = default_experimental_data,
+        dataset = default_dataset,
+        data_max_time = default_data_max_useful_time,
+        data_time_offset = default_data_time_offset
+
     ):
         self.true_operator = true_operator
         self.qhl_test = qhl_test
@@ -128,7 +135,11 @@ class GlobalVariablesClass():
         self.save_plots = save_plots
         self.cumulative_csv = cumulative_csv
         self.use_experimental_data = experimental_data
-        
+        self.dataset = dataset
+        self.data_time_offset = data_time_offset
+        self.data_max_time = data_max_time 
+
+
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
         self.plots_directory = self.results_directory+'Plots/'
@@ -363,7 +374,27 @@ def parse_cmd_line_args(args):
       default=default_experimental_data
     )
 
-    
+    parser.add_argument(
+      '-ds', '--dataset',
+      help='Dataset to use',
+      type=str,
+      default=default_dataset
+    )
+
+    parser.add_argument(
+      '-dst', '--dataset_max_time',
+      help='Maximum useful time in given data.',
+      type=int,
+      default=default_data_max_useful_time
+    )
+
+    parser.add_argument(
+      '-dto', '--data_time_offset',
+      help='Offset to ensure at t=0, Pr=1.',
+      type=int,
+      default=default_data_time_offset
+    )
+
     # Process arguments from command line
     arguments = parser.parse_args(args)
     
@@ -398,7 +429,9 @@ def parse_cmd_line_args(args):
     log_file = arguments.logfile
     cumulative_csv = arguments.cumulative_bayes
     use_experimental_data = bool(arguments.experimental_data)
-    
+    dataset = arguments.dataset
+    data_max_time = arguments.dataset_max_time    
+    data_time_offset = arguments.data_time_offset
     
     # Use arguments to initialise global variables class. 
     global_variables = GlobalVariablesClass(
@@ -430,7 +463,10 @@ def parse_cmd_line_args(args):
         log_file = log_file,
         save_plots = all_plots,
         cumulative_csv = cumulative_csv,
-        experimental_data = use_experimental_data
+        experimental_data = use_experimental_data,
+        dataset = dataset,
+        data_max_time = data_max_time,
+        data_time_offset = data_time_offset
     )
 
     return global_variables
