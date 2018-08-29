@@ -20,7 +20,6 @@ plt.switch_backend('agg')
 import math
 
 import redis
-# import from RedisSettings only when env variables set.
 import RedisSettings as rds
 
 # Local files
@@ -80,6 +79,7 @@ class QMD():
         max_num_models=30, 
         max_num_qubits=7, #TODO change -- this may cause crashes somewhere
         gaussian=True,
+        prior_specific_terms = None,
         resample_threshold = 0.5,
         resampler_a = 0.95,
         pgh_prefactor = 1.0,
@@ -230,7 +230,7 @@ class QMD():
             self.PortNumber, self.Q_id
         )
         
-        rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.
+#        rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.
  
         self.UseTimeDepTrueModel = use_time_dep_true_model 
         if self.UseTimeDepTrueModel:
@@ -290,7 +290,8 @@ class QMD():
             'q_id' : self.Q_id,
             'use_time_dep_true_params' : use_time_dep_true_model,
             'time_dep_true_params' : self.TimeDepParams,
-            'num_time_dependent_true_params' : self.NumTimeDepTrueParams
+            'num_time_dependent_true_params' : self.NumTimeDepTrueParams, 
+            'prior_specific_terms' : prior_specific_terms
         }
         
         self.log_print(["RunParallel=", self.RunParallel])
@@ -1592,7 +1593,6 @@ class QMD():
         debug_print=False,
         plus_probe=False 
     ):
-        print("Plotting QHL expectation value")
         PlotQMD.ExpectationValuesQHL_TrueModel(qmd=self, 
             max_time = max_time,
             t_interval = t_interval,

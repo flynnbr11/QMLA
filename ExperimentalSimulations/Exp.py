@@ -83,7 +83,6 @@ if global_variables.qhl_test:
     )
 """
 
-
 # Load in experimental data
 experimental_time_max = 5000 # in ns, max time to consider for
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
@@ -100,8 +99,6 @@ for t in list(experimental_measurements_dict.keys()):
 
 #    new_time = (t - 180)/1000
     new_time = (t - 205)/1000
-#    new_time = (t - 180)/1000
-
     msmt = experimental_measurements_dict[t]
     experimental_measurements_dict.pop(t)
     experimental_measurements_dict[new_time] = msmt
@@ -151,17 +148,45 @@ log_print(
     log_file
 )
 
-#if true_op == 'xTi' or true_op == 'x' or true_op == 'y' or true_op == 'z' or true_op=='zTi' or true_op=='yTi':       
-#    true_params = [0.33]
+
+if global_variables.custom_prior:
+
+    prior_specific_terms = {
+        'xTy' : [0.0,0.0001],
+        'xTz' : [0.0,0.0001],
+        'yTz' : [0.0,0.0001],
+        # Values below correspond to simulated data
+        # 'xTx' : [2.0, 1.0], # true value 2.7
+        # 'yTy' : [2.0, 1.0], # true value 2.7
+        # 'zTz' : [2.0, 1.0], # true value 2.14
+        # 'xTi' : [1.0, 0.5], # TODO Broaden, testing with small dist
+        # 'yTi' : [1.0, 0.5],
+        # 'zTi' : [1.0, 0.5],
+
+        # Values below correspond to Andreas' inital QMD values for this data set
+        'xTx' : [-2.5, 0.5], # true value 2.7
+        'yTy' : [-2.5, 0.5], # true value 2.7
+        'zTz' : [-1.5, 0.5], # true value 2.14
+        'xTi' : [0.2, 0.5], # TODO Broaden, testing with small dist
+        'yTi' : [0.2, 0.5],
+        'zTi' : [0.2, 0.5],
+
+        # Values below correspond to Andreas' final values for this data set
+        # 'xTx' : [-2.85, 0.3], # true value 2.7
+        # 'yTy' : [-2.76, 0.3], # true value 2.7
+        # 'zTz' : [-2.13, 0.3], # true value 2.14
+        # 'xTi' : [0.66, 0.3], # TODO Broaden, testing with small dist
+        # 'yTi' : [0.43, 0.3],
+        # 'zTi' : [0.55, 0.3],
+    }
+else:
+    prior_specific_terms = {}
 
 
 num_ops = len(initial_op_list)
 do_qhl_plots = global_variables.qhl_test and False # TODO when to turn this on?
     
 results_directory = global_variables.results_directory
-if not results_directory.endswith('/'):
-            results_directory += '/'
-
 long_id = global_variables.long_id
     
 log_print(["\n QMD id", global_variables.qmd_id, " on host ",
@@ -203,6 +228,7 @@ qmd = QMD(
     num_probes=num_probes,
     probe_dict = experimental_probe_dict, 
     gaussian = global_variables.gaussian, 
+    prior_specific_terms = prior_specific_terms,    
     use_experimental_data = global_variables.use_experimental_data,
     experimental_measurements = experimental_measurements_dict,
     max_num_branches = 0,

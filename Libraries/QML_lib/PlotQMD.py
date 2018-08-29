@@ -350,7 +350,6 @@ def ExpectationValuesQHL_TrueModel(qmd,
 
     experimental_measurements_dict = qmd.ExperimentalMeasurements
     use_experimental_data = qmd.UseExperimentalData
-    print("QHL expect val plot; use_exp_Data:", use_experimental_data)
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour =  colors.cnames['lightsalmon'] #'b'
@@ -462,7 +461,7 @@ def ExpectationValuesQHL_TrueModel(qmd,
 
 #        print("Calling expectation value function for expec val plot. Experimental data=", use_experimental_data)
 #        print("Sim ham:", sim_ham)
-        print("[Expectation value function, QHL]\nSim probe:", sim_probe)
+#        print("[Expectation value function, QHL]\nSim probe:", sim_probe)
 #        print("Times =\n", times)
 
 

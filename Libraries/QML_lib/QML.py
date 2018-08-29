@@ -167,45 +167,10 @@ class ModelLearningClass():
                 for i in range(len(self.TrueParams), num_params):
                     means.append(self.TrueParams[i%len(self.TrueParams)])
 #            self.Prior = Distributions.MultiVariateNormalDistributionNocov(num_params)
+            self.PriorSpecificTerms = qmd_info['prior_specific_terms']
             self.Prior = Distributions.normal_distribution_ising(
                 term = self.Name,
-                specific_terms = {
-                    'x' : [0.34, 0.1],
-                    'y' : [0.34, 0.1],
-                    'z' : [0.34, 0.1],
-                    'xTy' : [0.0,0.0001],
-                    'xTz' : [0.0,0.0001],
-                    'yTz' : [0.0,0.0001],
-#                    'xTx' : [5.0, 2.5], # true value 2.7
-#                    'yTy' : [5.0, 2.5], # true value 2.7
-#                    'zTz' : [5.0, 2.5], # true value 2.14
-# TODO return to realistic values, using ideal when testing QHL -BF
-
-                    # Values below correspond to simulated data
-#                    'xTx' : [2.0, 1.0], # true value 2.7
-#                    'yTy' : [2.0, 1.0], # true value 2.7
-#                    'zTz' : [2.0, 1.0], # true value 2.14
-#                    'xTi' : [1.0, 0.5], # TODO Broaden, testing with small dist
-#                    'yTi' : [1.0, 0.5],
-#                    'zTi' : [1.0, 0.5],
-
-                    # Values below correspond to Andreas' inital QMD values for this data set
-                    'xTx' : [-2.5, 0.5], # true value 2.7
-                    'yTy' : [-2.5, 0.5], # true value 2.7
-                    'zTz' : [-1.5, 0.5], # true value 2.14
-                    'xTi' : [0.2, 0.5], # TODO Broaden, testing with small dist
-                    'yTi' : [0.2, 0.5],
-                    'zTi' : [0.2, 0.5],
-
-
-                    # Values below correspond to Andreas' final values for this data set
-#                    'xTx' : [-2.85, 0.3], # true value 2.7
-#                    'yTy' : [-2.76, 0.3], # true value 2.7
-#                    'zTz' : [-2.13, 0.3], # true value 2.14
-#                    'xTi' : [0.66, 0.3], # TODO Broaden, testing with small dist
-#                    'yTi' : [0.43, 0.3],
-#                    'zTi' : [0.55, 0.3],
-                }
+                specific_terms = self.PriorSpecificTerms
             )
         else:
             self.log_print(["Uniform distribution generated"])

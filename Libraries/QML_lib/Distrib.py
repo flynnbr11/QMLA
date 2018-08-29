@@ -67,7 +67,6 @@ def means_sigmas_ising_term(term, specific_terms={},
     return num_params, np.array(means), np.array(sigmas)
 
 def normal_distribution_ising(term, specific_terms={}):
-
     num_params, means, sigmas = means_sigmas_ising_term(
         term = term, 
         specific_terms = specific_terms
