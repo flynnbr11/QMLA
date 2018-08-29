@@ -7,6 +7,8 @@ import numpy as np
 import DataBase
 import pandas
 
+#This is a simple test comment
+
 def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
     import os, csv
     if not directory_name.endswith('/'):

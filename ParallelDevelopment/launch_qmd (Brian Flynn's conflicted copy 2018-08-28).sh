@@ -7,7 +7,7 @@ num_tests=2
 do_plots=0
 pickle_class=0
 qhl=0 # do a test on QHL only -> 1; QMD -> 0
-experimental_data=0 # use experimental data -> 1; use fake data ->0
+experimental_data=1 # use experimental data -> 1; use fake data ->0
 
 p=20 # particles
 e=10 # experiments
@@ -63,22 +63,27 @@ declare -a qhl_operators=(
 
 declare -a resample_a_values=(
 0.8
+0.85
 )
 
 declare -a resample_thresh_values=(
 0.5
+0.6
 )
 
 declare -a pgh_values=(
 0.1
+0.3
 )
 
 declare -a particle_counts=(
 10
+20
 )
 
 declare -a experiment_counts=(
 5
+10
 )
 
 

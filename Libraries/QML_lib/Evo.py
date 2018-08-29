@@ -401,6 +401,8 @@ def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
               unitary_time_evolution)
     )
 
+
+#    print("total ev:\n", total_evolution)
     ev_state = np.dot(total_evolution, state)
 
     density_matrix = np.kron( ev_state, (ev_state.T).conj() )
@@ -411,18 +413,18 @@ def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
     )
 
     plus_state = np.array([1, 1])/np.sqrt(2)
-    noise_level = 0.03 # from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    noise_level = 0.00 # from 1000 counts - Poissonian noise = 1/sqrt(1000) # should be ~0.03
     random_noise = noise_level * random_probe(1)    
     noisy_plus = plus_state + random_noise
     norm_factor = np.linalg.norm(noisy_plus)
     noisy_plus = noisy_plus/norm_factor
-
-
+#    noisy_plus = np.array([1, 1])/np.sqrt(2)
     bra = noisy_plus.conj().T
     rho_state = np.dot(reduced_matrix, noisy_plus)
     expect_value = np.abs(np.dot(bra, rho_state))
+#    print("Hahn. Time=",t, "\t ex = ", expect_value)
     
-    return expect_value
+    return 1-expect_value
 
 
 

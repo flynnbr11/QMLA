@@ -106,14 +106,18 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
         )
 
         log_print(["Start"])
+        first_t_idx = len(model_a.Times) - num_times_to_use
         if num_times_to_use == 'all' or len(model_a.Times) < num_times_to_use:
             times_a = model_a.Times
             times_b = model_b.Times
         else:
-            times_a = model_a.Times[num_times_to_use:]
-            times_b = model_b.Times[num_times_to_use:]
+            times_a = model_a.Times[first_t_idx:]
+            times_b = model_b.Times[first_t_idx:]
         
         log_print(["Computing log likelihoods."])
+        #print("Num times to use", num_times_to_use)
+        #print("Model", model_a.ModelID, " Times:", times_a)
+        #print("Model", model_b.ModelID, " Times:", times_b)
         log_l_a = log_likelihood(model_a, times_b)
         log_l_b = log_likelihood(model_b, times_a)     
         log_print(["Log likelihoods computed."])
@@ -168,8 +172,11 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
 def log_likelihood(model, times):
     updater = model.Updater
     sum_data = 0
+    #print("log likelihood function. Model", model.ModelID, "\n Times:", times)
+
     for i in range(len(times)):
         exp = get_exp(model, [times[i]])
+    #    print("exp:", exp)
         params_array = np.array([[model.TrueParams[0]]]) # TODO this will cause an error for multiple parameters
         datum = updater.model.simulate_experiment(params_array, exp, repeat=1)
         sum_data+=datum       

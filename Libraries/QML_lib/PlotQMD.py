@@ -155,11 +155,20 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
 #                    log_file = qmd.log_file, 
 #                    log_identifier = '[PlotQMD]'
 #                )
-                expec = evo.traced_expectation_value_project_one_qubit_plus(
-                    ham = true_ham, 
-                    t=t, 
-                    state = true_probe
-                )
+
+                if use_experimental_data:
+                    expec = evo.hahn_evolution(
+                        ham = true_ham, 
+                        t=t, 
+                        state = true_probe
+                    )
+                
+                else: # Tracing out second qubit and projecting on plus for simulated case.
+                    expec = evo.traced_expectation_value_project_one_qubit_plus(
+                        ham = true_ham, 
+                        t=t, 
+                        state = true_probe
+                    )
 
                 
             except UnboundLocalError:
@@ -221,13 +230,23 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
 #                )
 #            sim_expec_values.append(expec) 
 #        print("going into sim expec list. Ham=", sim_ham, "\nTimes=", times)
-        sim_expec_values = [
-            evo.traced_expectation_value_project_one_qubit_plus(
-                ham=sim_ham, 
-                t=t,
-                state=sim_probe
-            ) for t in times
-        ]
+        
+        if use_experimental_data:
+            sim_expec_values = [
+                evo.hahn_evolution(
+                    ham=sim_ham, 
+                    t=t,
+                    state=sim_probe
+                ) for t in times
+            ]
+        else:
+            sim_expec_values = [
+                evo.traced_expectation_value_project_one_qubit_plus(
+                    ham=sim_ham, 
+                    t=t,
+                    state=sim_probe
+                ) for t in times
+            ]
             
         if mod_id == qmd.ChampID:
             models_branch = ChampionsByBranch[mod_id]
@@ -331,6 +350,7 @@ def ExpectationValuesQHL_TrueModel(qmd,
 
     experimental_measurements_dict = qmd.ExperimentalMeasurements
     use_experimental_data = qmd.UseExperimentalData
+    print("QHL expect val plot; use_exp_Data:", use_experimental_data)
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour =  colors.cnames['lightsalmon'] #'b'
@@ -385,11 +405,19 @@ def ExpectationValuesQHL_TrueModel(qmd,
 #                    log_identifier = '[PlotQMD]'
 #                )
 
-                expec = evo.traced_expectation_value_project_one_qubit_plus(
-                    ham = true_ham, 
-                    t=t, 
-                    state = true_probe
-                )
+                if use_experimental_data: 
+                    expec = evo.hahn_evolution(
+                        ham = true_ham, 
+                        t=t, 
+                        state = true_probe
+                    )
+
+                else:
+                    expec = evo.traced_expectation_value_project_one_qubit_plus(
+                        ham = true_ham, 
+                        t=t, 
+                        state = true_probe
+                    )
                 
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
@@ -431,13 +459,38 @@ def ExpectationValuesQHL_TrueModel(qmd,
 #            state=sim_probe) for t in times
 #        ]
 
-        sim_expec_values = [
-            evo.traced_expectation_value_project_one_qubit_plus(
-                ham=sim_ham, 
-                t=t,
-                state=sim_probe
-            ) for t in times
-        ]
+
+#        print("Calling expectation value function for expec val plot. Experimental data=", use_experimental_data)
+#        print("Sim ham:", sim_ham)
+        print("[Expectation value function, QHL]\nSim probe:", sim_probe)
+#        print("Times =\n", times)
+
+
+        if use_experimental_data:
+
+            sim_expec_values = []
+            for t in times:
+                ex_val = evo.hahn_evolution(
+                    ham=sim_ham, 
+                    t=t,
+                    state=sim_probe
+                )
+                sim_expec_values.append(ex_val)
+
+ #               if t%10==0:
+ #                   print("t=", t, "\nham=",sim_ham, "\nex_val=", ex_val)
+            
+        else:
+            sim_expec_values = [
+                evo.traced_expectation_value_project_one_qubit_plus(
+                    ham=sim_ham, 
+                    t=t,
+                    state=sim_probe
+                ) for t in times
+            ]
+
+
+#        print("sim expec values:\n", sim_expec_values)
 
         
         
@@ -483,7 +536,7 @@ def ExpectationValuesQHL_TrueModel(qmd,
 
     extra_lgd = True
     if len(new_handles) == 0:
-        print("No models other than champ/true")
+#        print("No models other than champ/true")
         extra_lgd=False
         
     new_handles = tuple(new_handles)

@@ -565,13 +565,13 @@ class QMD():
         
         if branchID is None:
             interbranch=True            
+        # print("[QMD remoteBayes] self.NumTimesForBayesUpdates: ", self.NumTimesForBayesUpdates)
         
         if self.use_rq:
             from rq import Connection, Queue, Worker
             queue = Queue(self.Q_id, connection=self.redis_conn, 
                 async=self.use_rq, default_timeout=self.rq_timeout
             ) 
-
             job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id,
                 model_b_id=model_b_id, branchID=branchID, 
                 interbranch=interbranch, 
@@ -589,7 +589,9 @@ class QMD():
         else:
 
             BayesFactorRemote(model_a_id=model_a_id, model_b_id=model_b_id,
-                trueModel=self.TrueOpName, branchID=branchID,
+                trueModel=self.TrueOpName, 
+                num_times_to_use = self.NumTimesForBayesUpdates,
+                branchID=branchID,
                 interbranch=interbranch, bayes_threshold=bayes_threshold,
                 host_name=self.HostName, port_number=self.PortNumber, 
                 qid=self.Q_id, log_file=self.rq_log_file
@@ -1590,6 +1592,7 @@ class QMD():
         debug_print=False,
         plus_probe=False 
     ):
+        print("Plotting QHL expectation value")
         PlotQMD.ExpectationValuesQHL_TrueModel(qmd=self, 
             max_time = max_time,
             t_interval = t_interval,
