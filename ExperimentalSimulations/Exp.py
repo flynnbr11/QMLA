@@ -85,15 +85,13 @@ if global_variables.qhl_test:
 
 
 # Load in experimental data
-
+experimental_time_max = 5000 # in ns, max time to consider for
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
 #    directory = "Data/NV05_HahnPeaks_expdataset",
 #    directory = "Data/NV05_HahnEcho02",
     directory = "Data/NVB_HahnPeaks_Newdata",
 
-    max_time = 5000
-#    max_time = 3500
-#    max_time = 1500
+    max_time = experimental_time_max
 )
 
 for t in list(experimental_measurements_dict.keys()):
@@ -161,6 +159,9 @@ num_ops = len(initial_op_list)
 do_qhl_plots = global_variables.qhl_test and False # TODO when to turn this on?
     
 results_directory = global_variables.results_directory
+if not results_directory.endswith('/'):
+            results_directory += '/'
+
 long_id = global_variables.long_id
     
 log_print(["\n QMD id", global_variables.qmd_id, " on host ",
@@ -236,7 +237,7 @@ if global_variables.qhl_test:
         
         print("Plotting things")
         qmd.plotParameterEstimates(true_model=True, 
-            save_to_file= str(global_variables.results_directory+
+            save_to_file= str(global_variables.plots_directory+
             'qhl_parameter_estimates_'+ str(global_variables.long_id) +
             '.png')
         )
@@ -245,14 +246,14 @@ if global_variables.qhl_test:
             max_time=10, 
             t_interval=1,
             save_to_file = str( 
-            global_variables.results_directory+
+            global_variables.plots_directory+
             'qhl_expec_values_'+str(global_variables.long_id)+'.png')
         )
 
         if DataBase.num_parameters_from_name(qmd.TrueOpName) == 1:
             qmd.plotVolumeQHL(
                 save_to_file = str( 
-                global_variables.results_directory+
+                global_variables.plots_directory+
                 'qhl_volume_'+str(global_variables.long_id)+'.png')
             )
             
@@ -276,26 +277,26 @@ else:
 
         qmd.plotVolumes(
             save_to_file=str(
-            global_variables.results_directory+
+            global_variables.plots_directory+
             'volumes_all_models_'+ str(global_variables.long_id)+ '.png')
         )
         qmd.plotVolumes(
             branch_champions=True,
-            save_to_file=str(global_variables.results_directory+
+            save_to_file=str(global_variables.plots_directory+
             'volumes_branch_champs_'+ str(global_variables.long_id)+
             '.png')
         )
         
         qmd.plotParameterEstimates(
             model_id = qmd.TrueOpModelID, 
-            save_to_file= str(global_variables.results_directory+
+            save_to_file= str(global_variables.plots_directory+
             'true_model_parameter_estimates_'+ str(global_variables.long_id) +
             '.png')
         )
         if qmd.ChampID != qmd.TrueOpModelID:
             qmd.plotParameterEstimates(
                 model_id = qmd.ChampID, 
-                save_to_file= str(global_variables.results_directory+
+                save_to_file= str(global_variables.plots_directory+
                 'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
                 '.png')
             )
@@ -311,14 +312,16 @@ else:
 #        log_print(["Before expec value plot"], log_file)
 #        This causes BC to break and nothing after this happens for some reason, so commented out for now (Brian, Aug 16)
         qmd.plotExpecValues(
+            model_ids = [11], # hardcode to see full model for development
+            max_time = experimental_time_max/1000, #in microsec
             save_to_file=str( 
-            global_variables.results_directory+
+            global_variables.plots_directory+
             'expec_values_'+str(global_variables.long_id)+'.png')
         )
 
         qmd.plotRadarDiagram(
             save_to_file=str(
-            global_variables.results_directory+
+            global_variables.plots_directory+
             'radar_'+ str(global_variables.long_id)+ '.png')
         )
 
@@ -336,7 +339,7 @@ else:
         
         qmd.plotTreeDiagram(
             save_to_file = str
-            (global_variables.results_directory+
+            (global_variables.plots_directory+
             'tree_diagram_'+ str(global_variables.long_id)+ '.png')
         )
 

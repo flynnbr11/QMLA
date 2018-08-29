@@ -113,6 +113,7 @@ class GlobalVariablesClass():
         self.port_number = port_number
 #        self.results_directory = 'Results/'+results_directory
         self.results_directory = results_directory
+
         self.rq_timeout = rq_timeout
         self.log_file = log_file
         self.save_plots = save_plots
@@ -121,13 +122,24 @@ class GlobalVariablesClass():
         
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
-        
+        self.plots_directory = self.results_directory+'Plots/'
+
+
         if not os.path.exists(self.results_directory):
             try:
                 os.makedirs(self.results_directory)
             except FileExistsError:
                 pass
                         
+
+        if not os.path.exists(self.plots_directory):
+            try:
+                os.makedirs(self.plots_directory)
+            except FileExistsError:
+                pass
+                        
+
+
         self.long_id ='{0:03d}'.format(self.qmd_id)
         self.results_file = self.results_directory+'results_'+str(self.long_id)+'.p' #for pickling results into
         self.class_pickle_file = self.results_directory+'qmd_class_'+str(self.long_id)+'.p'
