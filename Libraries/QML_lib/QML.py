@@ -266,12 +266,30 @@ class ModelLearningClass():
             true_params = np.array([[self.TrueParams[0]]])
             
             before_datum = time.time()
-            self.Datum = self.GenSimModel.simulate_experiment(self.SimParams,
-                self.Experiment, repeat=100
-            ) # todo reconsider repeat number
+
+#            self.log_print(
+#                [
+#                'Getting Datum'
+#                ]
+#            )
+
+            self.Datum = self.GenSimModel.simulate_experiment(
+                self.SimParams,
+                self.Experiment,
+                repeat=100
+            ) # TODO reconsider repeat number
             after_datum = time.time()
             self.datum_gather_cumulative_time+=after_datum-before_datum
+            
+            exp_t = self.Experiment[0][0]
+#            self.log_print(
+#                [
+#                'True', self.ExperimentalMeasurements[exp_t],
+#                'Datum', np.mean(self.Datum),
+#               'Entering Updater'
+#                ]
 
+#                )
             before_upd = time.time()
             ## Call updater to update distribution based on datum
             self.Updater.update(self.Datum, self.Experiment)
@@ -539,9 +557,14 @@ class reducedModel():
     
     Then initialises an updater and GenSimModel which are used for updates. 
     """
-    def __init__(self, model_name, sim_oplist, true_oplist, true_params,
-        numparticles, modelID, resample_thresh=0.5, resample_a=0.9, qle=True,
-        probe_dict= None, qid=0, host_name='localhost', port_number=6379,
+    def __init__(
+        self, 
+        model_name, sim_oplist, 
+        true_oplist, true_params,
+        numparticles, modelID, 
+        resample_thresh=0.5, resample_a=0.9, qle=True,
+        probe_dict= None, qid=0,
+        host_name='localhost', port_number=6379,
         log_file='QMD_log.log'
     ):
 
@@ -715,7 +738,8 @@ class modelClassForRemoteBayesFactor():
         
                 
         self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList,
-            modelparams=self.SimParams_Final, true_oplist = self.TrueOpList,
+            modelparams=self.SimParams_Final, 
+            true_oplist = self.TrueOpList,
             trueparams = self.TrueParams, truename=self.TrueOpName,
             use_experimental_data = self.UseExperimentalData,
             experimental_measurements = self.ExperimentalMeasurements,
@@ -732,7 +756,9 @@ class modelClassForRemoteBayesFactor():
             resampler=qi.LiuWestResampler(a=self.ResamplerA), 
             debug_resampling=False
         )
-        
+        self.Updater._normalization_record = self._normalization_record
+        self.Updater.log_likelihood = self.log_likelihood
+
         #self.GenSimModel = pickle.loads(learned_model_info['gen_sim_model'])
         #self.Updater = pickle.loads(learned_model_info['updater'])
         # TODO not clear which is quicker: generating new instance of classes/updater or unpickling every time.

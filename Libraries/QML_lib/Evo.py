@@ -381,7 +381,7 @@ def traced_expectation_value_project_one_qubit_plus(
 def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
     import qutip 
     import numpy as np
-    
+#    print("Hahn evo")
     #hahn_angle = np.pi/2
     #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))
     #inversion_gate = linalg.expm(-1j*hahn)
@@ -424,7 +424,8 @@ def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
     expect_value = np.abs(np.dot(bra, rho_state))
 #    print("Hahn. Time=",t, "\t ex = ", expect_value)
     
-    return 1-expect_value
+#    return 1-expect_value
+    return expect_value
 
 
 

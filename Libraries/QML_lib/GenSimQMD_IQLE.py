@@ -183,6 +183,16 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         super(GenSimQMD_IQLE, self).likelihood(
             outcomes, modelparams, expparams
         )
+        """
+        log_print(
+            [
+            'Likelihood function. \t len(modelparams):',
+            len(modelparams)
+            ],
+            self.log_file, 
+            self.log_identifier
+        )
+        """
         import copy
         print_loc(global_print_loc)
         cutoff=min(len(modelparams), 5)
@@ -228,7 +238,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
 
         if true_evo and self.use_experimental_data:
             time = expparams['t']
-
+            #print("[likelihood fnc] Experimental data being called.")
             if debug_log_print:
                 log_print(
                     [
@@ -263,6 +273,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
 
 
         else:        
+            #print("[likelihood fnc] Simulated data being called.")
             
             if self.inBayesUpdates:
                 if self.ideal_probe is not None:
@@ -302,19 +313,20 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                     log_file=self.log_file, log_identifier=self.log_identifier
                 )    
 
-
-
             if debug_log_print:
                 log_print(
                     [
                     'Simulating experiment.',
                     'times:', times,
+                    'len(outcomes):', len(outcomes),
                     '\nOutcomes:', outcomes, 
-                    '\n pr0:\n', pr0,
+                    #'\n pr0:\n', pr0,
                     ],
                     self.log_file, 
                     self.log_identifier
                 )
+
+#        outcomes[[0]] = 1-outcomes[[0]]
 
         likelihood_array = (
             qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)

@@ -36,9 +36,9 @@ sample='xTiPPzTiPPyTy'
 qhl_test=0
 q_id=0
 exp_data=1
-use_rq=0
-prt=20
-exp=10
+use_rq=1
+prt=400
+exp=250
 let bt="$exp-1"
 pgh=1.0
 ra=0.8
@@ -46,7 +46,7 @@ rt=0.5
 gaussian=1
 custom_prior=1
 dataset='NVB_HahnPeaks_Newdata'
-data_max_time=1500 # nanoseconds
+data_max_time=2800 # nanoseconds
 data_time_offset=180 # nanoseconds
 
 

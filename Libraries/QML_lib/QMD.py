@@ -107,7 +107,7 @@ class QMD():
         host_name='localhost',
         port_number = 6379,
         use_rq=True, 
-        rq_timeout=3600,
+        rq_timeout=36000,
         growth_generator='simple_ising',
         log_file = None
     ):
@@ -230,8 +230,10 @@ class QMD():
         self.RunParallel = parallel and parallel_enabled
 
         self.log_print(["Retrieving databases from redis"])
-        self.RedisDataBases = rds.databases_from_qmd_id(self.HostName,
-            self.PortNumber, self.Q_id
+        self.RedisDataBases = rds.databases_from_qmd_id(
+            self.HostName, 
+            self.PortNumber, 
+            self.Q_id
         )
         
 #        rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.

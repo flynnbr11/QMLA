@@ -91,7 +91,8 @@ for t in list(experimental_measurements_dict.keys()):
     new_time = (t - global_variables.data_time_offset)/1000
     msmt = experimental_measurements_dict[t]
     experimental_measurements_dict.pop(t)
-    experimental_measurements_dict[new_time] = msmt
+#    experimental_measurements_dict[new_time] = msmt
+    experimental_measurements_dict[new_time] = 1-msmt
 
 
 plt.clf()
@@ -203,7 +204,7 @@ qmd = QMD(
     resample_threshold = global_variables.resample_threshold,
     resampler_a = global_variables.resample_a, 
     pgh_prefactor = global_variables.pgh_factor,
-    store_particles_weights = True,
+    store_particles_weights = False,
     qhl_plots=do_qhl_plots, 
     results_directory = results_directory,
     long_id = long_id, 
