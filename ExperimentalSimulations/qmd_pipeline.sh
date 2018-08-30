@@ -38,15 +38,15 @@ q_id=0
 exp_data=1
 use_rq=1
 prt=400
-exp=250
+exp=60
 let bt="$exp-1"
-pgh=1.0
+pgh=0.1
 ra=0.8
 rt=0.5
 gaussian=1
 custom_prior=1
 dataset='NVB_HahnPeaks_Newdata'
-data_max_time=2800 # nanoseconds
+data_max_time=5000 # nanoseconds
 data_time_offset=180 # nanoseconds
 
 

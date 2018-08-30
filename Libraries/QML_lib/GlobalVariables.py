@@ -142,7 +142,7 @@ class GlobalVariablesClass():
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
-        self.plots_directory = self.results_directory+'Plots/'
+        self.plots_directory = self.results_directory+'plots/'
 
 
         if not os.path.exists(self.results_directory):

@@ -83,6 +83,10 @@ experimental_measurements_dict = expdt.experimentalMeasurementDict(
     directory = str("Data/"+global_variables.dataset),
     max_time = global_variables.data_max_time + global_variables.data_time_offset
 )
+if global_variables.qhl_test is False:
+    expec_val_plot_max_time = global_variables.data_max_time/1000
+else:
+    expec_val_plot_max_time = 200    
 
 for t in list(experimental_measurements_dict.keys()):
     # Shift t-values by 180ns so t=0 corresponds to Pr(0)=1
@@ -146,12 +150,12 @@ if global_variables.custom_prior:
         # 'zTi' : [1.0, 0.5],
 
         # Values below correspond to Andreas' inital QMD values for this data set
-        'xTx' : [-2.5, 0.5], # true value 2.7
-        'yTy' : [-2.5, 0.5], # true value 2.7
-        'zTz' : [-1.5, 0.5], # true value 2.14
-        'xTi' : [0.2, 0.5], # TODO Broaden, testing with small dist
-        'yTi' : [0.2, 0.5],
-        'zTi' : [0.2, 0.5],
+        'xTx' : [-2.5, 0.3], # true value 2.7
+        'yTy' : [-2.5, 0.3], # true value 2.7
+        'zTz' : [-1.5, 0.3], # true value 2.14
+        'xTi' : [0.2, 0.3], # TODO Broaden, testing with small dist
+        'yTi' : [0.2, 0.3],
+        'zTi' : [0.1, 0.3],
 
         # Values below correspond to Andreas' final values for this data set
         # 'xTx' : [-2.85, 0.3], # true value 2.7
@@ -252,7 +256,7 @@ if global_variables.qhl_test:
         )
 
         qmd.plotExpecValuesQHLTrueModel(
-            max_time=global_variables.data_max_time/1000, 
+            max_time=expec_val_plot_max_time, 
             t_interval=1,
             save_to_file = str( 
             global_variables.plots_directory+
@@ -322,7 +326,7 @@ else:
 #        This causes BC to break and nothing after this happens for some reason, so commented out for now (Brian, Aug 16)
         qmd.plotExpecValues(
             model_ids = [11], # hardcode to see full model for development
-            max_time = global_variables.data_max_time/1000, #in microsec
+            max_time = expec_val_plot_max_time, #in microsec
             save_to_file=str( 
             global_variables.plots_directory+
             'expec_values_'+str(global_variables.long_id)+'.png')
