@@ -424,8 +424,8 @@ def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
     expect_value = np.abs(np.dot(bra, rho_state))
 #    print("Hahn. Time=",t, "\t ex = ", expect_value)
     
-#    return 1-expect_value
-    return expect_value
+    return 1-expect_value
+#    return expect_value
 
 
 

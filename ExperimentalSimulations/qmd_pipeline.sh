@@ -29,16 +29,12 @@ declare -a qhl_operators=(
 )
 
 true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-two_param='zTiPPxTi'
-one_param='zTi'
-single_qubit='x'
-sample='xTiPPzTiPPyTy'
 qhl_test=0
 q_id=0
 exp_data=1
 use_rq=1
-prt=400
-exp=60
+prt=100
+exp=50
 let bt="$exp-1"
 pgh=0.1
 ra=0.8
@@ -46,8 +42,9 @@ rt=0.5
 gaussian=1
 custom_prior=1
 dataset='NVB_HahnPeaks_Newdata'
-data_max_time=5000 # nanoseconds
-data_time_offset=180 # nanoseconds
+#dataset='NV05_HahnPeaks_expdataset'
+data_max_time=3000 # nanoseconds
+data_time_offset=205 # nanoseconds
 
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log

@@ -83,7 +83,8 @@ experimental_measurements_dict = expdt.experimentalMeasurementDict(
     directory = str("Data/"+global_variables.dataset),
     max_time = global_variables.data_max_time + global_variables.data_time_offset
 )
-if global_variables.qhl_test is False:
+
+if global_variables.use_experimental_data is True:
     expec_val_plot_max_time = global_variables.data_max_time/1000
 else:
     expec_val_plot_max_time = 200    
@@ -95,8 +96,8 @@ for t in list(experimental_measurements_dict.keys()):
     new_time = (t - global_variables.data_time_offset)/1000
     msmt = experimental_measurements_dict[t]
     experimental_measurements_dict.pop(t)
-#    experimental_measurements_dict[new_time] = msmt
-    experimental_measurements_dict[new_time] = 1-msmt
+    experimental_measurements_dict[new_time] = msmt
+#    experimental_measurements_dict[new_time] = 1-msmt
 
 
 plt.clf()
