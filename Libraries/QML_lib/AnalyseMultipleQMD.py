@@ -6,6 +6,8 @@ import numpy as np
 
 import DataBase
 import pandas
+import PlotQMD as ptq
+
 
 #This is a simple test comment
 
@@ -218,7 +220,6 @@ def plot_scores(scores, save_file='model_scores.png'):
 
 def plot_tree_multi_QMD(results_csv, all_bayes_csv, avg_type='medians', save_to_file=None):
 #    res_csv="/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Results/multtestdir/param_sweep.csv"
-    import PlotQMD as ptq
     qmd_res = pandas.DataFrame.from_csv(results_csv, index_col='LatexName')
     mods = list(qmd_res.index)
     winning_count = {}
@@ -267,16 +268,34 @@ plot_scores(model_scores, plot_file)
 
 
 
+ptq.plotTrueModelBayesFactors_IsingRotationTerms(
+    results_csv_path = all_bayes_csv,
+    save_to_file = str(directory_to_analyse+'true_model_bayes_comparisons.png')
+)
+
+
 results_csv_name = 'param_sweep.csv'
 results_csv = directory_to_analyse+results_csv_name
-summariseResultsCSV(directory_name=directory_to_analyse, csv_name=results_csv)
+summariseResultsCSV(
+    directory_name=directory_to_analyse, 
+    csv_name=results_csv
+)
 
 
 param_plot = str(directory_to_analyse+'param_analysis_total.png')
 param_percent_plot = str(directory_to_analyse+'param_analysis_percentage.png')
 
-parameter_sweep_analysis(directory_name = directory_to_analyse, results_csv=results_csv, save_to_file=param_plot)
-parameter_sweep_analysis(directory_name = directory_to_analyse, results_csv=results_csv, use_log_times=True, use_percentage_models=True, save_to_file=param_percent_plot)
+parameter_sweep_analysis(
+    directory_name = directory_to_analyse, 
+    results_csv=results_csv, 
+    save_to_file=param_plot)
+parameter_sweep_analysis(
+    directory_name = directory_to_analyse,
+    results_csv=results_csv,
+    use_log_times=True,
+    use_percentage_models=True, 
+    save_to_file=param_percent_plot
+)
 
 
 try:

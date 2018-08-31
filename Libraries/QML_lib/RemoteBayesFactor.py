@@ -106,7 +106,11 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
         )
 
         log_print(["Start"])
-        first_t_idx = len(model_a.Times) - num_times_to_use
+        if num_times_to_use == 'all':
+            first_t_idx = 0
+        else:
+            first_t_idx = len(model_a.Times) - num_times_to_use
+
         if num_times_to_use == 'all' or len(model_a.Times) < num_times_to_use:
             times_a = model_a.Times
             times_b = model_b.Times

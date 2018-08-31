@@ -1,4 +1,6 @@
+import os
 import numpy as np
+import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib import collections
@@ -2245,3 +2247,59 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
             writer.writerow(model_bf)
      
         
+## Overall multiple QMD analyses
+
+
+def plotTrueModelBayesFactors_IsingRotationTerms(
+    results_csv_path, 
+    correct_mod="xTiPPyTiPPzTiPPxTxPPyTyPPzTz", 
+    save_to_file=None
+):
+    from matplotlib import cm
+
+    # TODO saved fig is cut off on edges and don't have axes titles.
+
+    correct_mod = DataBase.latex_name_ising(correct_mod)
+    results_csv = os.path.abspath(results_csv_path)
+    qmd_res = pd.DataFrame.from_csv(results_csv)
+
+    mods = ising_terms_rotation_hyperfine()
+    mods.pop(mods.index(correct_mod))
+    othermods = mods
+    correct_subDB = qmd_res.ix[correct_mod]    
+    all_BFs = []
+
+    for competitor in othermods:
+        BF_values = np.array((correct_subDB[competitor]))
+        BF_values = BF_values[~np.isnan(BF_values)]
+
+        all_BFs.append(BF_values)
+
+    n_bins = 30
+    nrows=5
+    ncols=3
+    fig, axes = plt.subplots(figsize = (20, 10), nrows=nrows, ncols=ncols)
+    cm_subsection = np.linspace(0.1, 0.9, len(all_BFs)) 
+    colors = [ cm.viridis(x) for x in cm_subsection ]
+
+    for row in range(nrows):
+        for col in range(ncols):
+            # Make a multiple-histogram of data-sets with different length.
+            idx = row*ncols+col
+            if idx < len(all_BFs):
+                hist, bins, _ = axes[row,col].hist(np.log10(all_BFs[idx]), n_bins, color=colors[idx], label=othermods[idx])
+                
+                try: 
+                    maxBF = 1.1*np.max(np.abs(np.log10(all_BFs[idx])))
+                except:
+                    maxBF = 10
+                axes[row,col].legend()
+                axes[row,col].set_xlim(-maxBF, maxBF)
+
+
+#    fig.text(0.07, 0.5, 'Occurences', va='center', rotation='vertical')
+#    fig.text(0.5, 0.07, '$log_{10}$ Bayes Factor', ha='center')
+
+
+    if save_to_file is not None:
+        fig.savefig(save_to_file, bbox_inches='tight')
