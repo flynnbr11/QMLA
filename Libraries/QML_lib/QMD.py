@@ -86,6 +86,7 @@ class QMD():
         resampler_a = 0.95,
         pgh_prefactor = 1.0,
         store_particles_weights = False,
+        bayes_time_binning = False,
         qhl_plots = False, 
         results_directory = '', 
         long_id = '001', 
@@ -149,6 +150,7 @@ class QMD():
         self.ResampleThreshold = resample_threshold
         self.ResamplerA = resampler_a
         self.PGHPrefactor = pgh_prefactor
+        self.BayesTimeBinning = bayes_time_binning 
         self.StoreParticlesWeights = store_particles_weights
         self.QHL_plots = qhl_plots
         self.ResultsDirectory = results_directory
@@ -293,6 +295,7 @@ class QMD():
             'experimental_measurement_times' : self.ExperimentalMeasurementTimes, 
             'compare_linalg_exp_tol' : self.ExpComparisonTol,
             'gaussian' : self.gaussian,
+            'bayes_factors_time_binning' : self.BayesTimeBinning,
             'q_id' : self.Q_id,
             'use_time_dep_true_params' : use_time_dep_true_model,
             'time_dep_true_params' : self.TimeDepParams,

@@ -210,6 +210,7 @@ qmd = QMD(
     resampler_a = global_variables.resample_a, 
     pgh_prefactor = global_variables.pgh_factor,
     store_particles_weights = False,
+    bayes_time_binning=True, 
     qhl_plots=do_qhl_plots, 
     results_directory = results_directory,
     long_id = long_id, 

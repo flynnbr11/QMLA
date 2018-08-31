@@ -31,6 +31,7 @@ import Evo as evo
 import DataBase 
 import QML
 import ModelGeneration
+import ExperimentalDataFunctions
 #import BayesF
 from qinfer import NormalDistribution
 from Distrib import MultiVariateNormalDistributionNocov
@@ -86,6 +87,12 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
     active_branches_bayes = rds_dbs['active_branches_bayes']
     active_interbranch_bayes = rds_dbs['active_interbranch_bayes']
     
+    info_dict = pickle.loads(rds_dbs['qmd_info_db']['QMDInfo'])
+    use_experimental_data = info_dict['use_experimental_data']
+    experimental_data_times = info_dict['experimental_measurement_times']
+    binning = info_dict['bayes_factors_time_binning']
+
+
     if check_db: # built in to only compute once and always return the stored value.
         if pair_id in bayes_factors_db.keys():
             bayes_factor = bayes_factors_db.get(pair_id)
@@ -118,12 +125,52 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
             times_a = model_a.Times[first_t_idx:]
             times_b = model_b.Times[first_t_idx:]
         
+        if binning==True and use_experimental_data==True:
+            # TODO introduce binning for simulated data. 
+            min_time = min(min(times_a), min(times_b))
+            max_time = max(max(times_a), max(times_b))
+
+            times_list = np.linspace(
+                min_time,
+                max_time, 
+                2*num_times_to_use # learning from scratch so need twice the number of times.
+            )
+
+            all_times = [
+                ExperimentalDataFunctions.nearestAvailableExpTime(
+                    times = experimental_data_times,
+                    t=t
+                ) 
+                for t in times_list
+            ]
+
+            log_print(
+                [
+                "Binning. Before times\n A:", times_a, 
+                "\nB:", times_b
+                ]
+            )
+
+            times_a = all_times
+            times_b = all_times
+            log_print(
+                [
+                ".After \n A:", times_a, 
+                "\nB:", times_b
+                ]
+            )
+
+
+
+
         log_print(["Computing log likelihoods."])
         #print("Num times to use", num_times_to_use)
         #print("Model", model_a.ModelID, " Times:", times_a)
         #print("Model", model_b.ModelID, " Times:", times_b)
-        log_l_a = log_likelihood(model_a, times_b)
-        log_l_b = log_likelihood(model_b, times_a)     
+
+
+        log_l_a = log_likelihood(model_a, times_b, binning=binning)
+        log_l_b = log_likelihood(model_b, times_a, binning=binning)     
         log_print(["Log likelihoods computed."])
 
         bayes_factor = np.exp(log_l_a - log_l_b)
@@ -173,18 +220,22 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
         return bayes_factor
     
     
-def log_likelihood(model, times):
+def log_likelihood(model, times, binning=False):
     updater = model.Updater
     sum_data = 0
     #print("log likelihood function. Model", model.ModelID, "\n Times:", times)
+
+    if binning:
+        updater._renormalization_record = []    
 
     for i in range(len(times)):
         exp = get_exp(model, [times[i]])
     #    print("exp:", exp)
         params_array = np.array([[model.TrueParams[0]]]) # TODO this will cause an error for multiple parameters
         datum = updater.model.simulate_experiment(params_array, exp, repeat=100)
-        sum_data += datum       
+        sum_data += datum   
         updater.update(datum, exp)
+
 
     log_likelihood = updater.log_total_likelihood
     return log_likelihood        
