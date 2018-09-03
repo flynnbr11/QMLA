@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=1
+num_tests=2
 let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)
@@ -29,18 +29,13 @@ declare -a qhl_operators=(
 )
 
 true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-qhl_test=0
+qhl_test=1
 q_id=0
 exp_data=1
 use_rq=0
-prt=400
-exp=100
-if (($prt > 50))
-then
-    use_rq=1
-fi
-
-if (($exp > 10))
+prt=40
+exp=10
+if (($prt > 50)) || (($exp > 10))
 then
     use_rq=1
 fi
@@ -58,35 +53,17 @@ data_time_offset=205 # nanoseconds
 
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
+# Launch $num_tests instances of QMD 
+for i in `seq 1 $max_qmd_id`;
+do
+    redis-cli flushall
+    let q_id="$q_id+1"
+    python3 Exp.py -op=$true_operator -p=$prt -e=$exp -bt=$bt -rq=$use_rq -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data -cpr=$custom_prior -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
+done
 
-if [ "$qhl_test" == 1 ]
-then
-    for op in "${qhl_operators[@]}";
-    do
-        for i in `seq 1 $max_qmd_id`;
-        do
-            let num_prt="$i+10"
-            redis-cli flushall
-            let q_id="$q_id+1"
-            python3 Exp.py -p=$prt -e=$exp -bt=$bt -rq=$use_rq  -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -op=$true_operator -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data -cpr=$custom_prior -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
-        done 
-    done
-
-else
-    for i in `seq 1 $max_qmd_id`;
-    do
-        redis-cli flushall
-        let q_id="$q_id+1"
-        python3 Exp.py -op=$true_operator -p=$prt -e=$exp -bt=$bt -rq=$use_rq -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data -cpr=$custom_prior -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
-    done
+# Analyse results of QMD.
+if (( "$qhl_test" == "0" ))
+then 
     cd ../Libraries/QML_lib
-    
-    if [ $num_tests > 1 ]
-    then
-        python3 AnalyseMultipleQMD.py -dir=$long_dir --bayes_csv=$bayes_csv
-    fi
-
-fi 
-
-
-# TODO google array job for PBS -- node exclusive flag
+    python3 AnalyseMultipleQMD.py -dir=$long_dir --bayes_csv=$bayes_csv
+fi
