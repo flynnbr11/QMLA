@@ -1626,11 +1626,13 @@ class QMD():
         debug_print=False,
         plus_probe=False 
     ):
-        """
         # TODO use this updated function instead of old one
+        
+        true_mod_id = self.TrueOpModelID
         PlotQMD.ExpectationValuesTrueSim(
             qmd=self, 
-            model_ids=model_ids, champ=champ, 
+            champ=False,
+            model_ids=[true_mod_id], 
             max_time=max_time, t_interval=t_interval,
             upper_x_lim = max_time,
             save_to_file=save_to_file
@@ -1642,6 +1644,7 @@ class QMD():
             save_to_file = save_to_file,
             debug_print = debug_print
         )
+        """
 
 
 

@@ -194,14 +194,48 @@ def model_scores(directory_name):
             scores[alph] = 1
     return scores
 
+def get_entropy(models_points, inf_gain=False):
+    # TODO this calculation of entropy may not be correct
+    # What is initial_entropy meant to be?
+    num_qmd_instances = sum(list(models_points.values()))
+    num_possible_qmd_instances = len(ptq.ising_terms_rotation_hyperfine())
+    # TODO don't always want ising terms only
 
-def plot_scores(scores, save_file='model_scores.png'):
+    
+    model_fractions = {}
+    for k in list(models_points.keys()):
+        model_fractions[k] = models_points[k]/num_qmd_instances    
+    
+    initial_entropy = np.log2(1/num_possible_qmd_instances)
+    entropy = 0
+    for i in list(models_points.keys()):
+        success_prob = model_fractions[i]
+        partial_entropy = success_prob * np.log2(success_prob)
+        if np.isnan(partial_entropy):
+            partial_entropy = 0 
+        entropy -= partial_entropy
+    
+    if inf_gain:
+        information_gain = initial_entropy - entropy
+        return information_gain
+    else:
+        return entropy
+
+
+def plot_scores(
+        scores, 
+        entropy=None,
+        inf_gain=None, 
+        save_file='model_scores.png'
+    ):
     plt.clf()
     models = list(scores.keys())
     
-    latex_model_names = [DataBase.latex_name_ising(model) for model in models]
-    scores = list(scores.values())
+    latex_model_names = [
+        DataBase.latex_name_ising(model) for model in models
+    ]
 
+    scores = list(scores.values())
 
     fig, ax = plt.subplots()    
     width = 0.75 # the width of the bars 
@@ -210,15 +244,37 @@ def plot_scores(scores, save_file='model_scores.png'):
     ax.set_yticks(ind+width/2)
     ax.set_yticklabels(latex_model_names, minor=False)
     
-    plt.title('Number of QMD instances won by models')
+    plot_title = str(
+        'Number of QMD instances won by models.' 
+    )
+
+    if entropy is not None:
+        plot_title += str( 
+            '\n$\mathcal{S}$=' 
+            + str(round(entropy, 2))
+        )
+    if inf_gain is not None:
+        plot_title += str(
+            '\t $\mathcal{IG}$=' 
+            + str(round(inf_gain, 2))
+        )
+
+    plt.title(plot_title)
     plt.ylabel('Model')
     plt.xlabel('Number of wins')
     #plt.bar(scores, latex_model_names)
     
     plt.savefig(save_file, bbox_inches='tight')
     
-
-def plot_tree_multi_QMD(results_csv, all_bayes_csv, avg_type='medians', save_to_file=None):
+    
+def plot_tree_multi_QMD(
+        results_csv, 
+        all_bayes_csv, 
+        avg_type='medians',
+        entropy=None, 
+        inf_gain=None, 
+        save_to_file=None
+    ):
 #    res_csv="/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Results/multtestdir/param_sweep.csv"
     qmd_res = pandas.DataFrame.from_csv(results_csv, index_col='LatexName')
     mods = list(qmd_res.index)
@@ -228,7 +284,8 @@ def plot_tree_multi_QMD(results_csv, all_bayes_csv, avg_type='medians', save_to_
 
     ptq.cumulativeQMDTreePlot(cumulative_csv=all_bayes_csv, 
         wins_per_mod=winning_count, only_adjacent_branches=True, 
-        avg=avg_type, save_to_file=save_to_file
+        avg=avg_type, entropy=entropy, inf_gain=inf_gain,
+        save_to_file=save_to_file
     )        
 
 
@@ -264,7 +321,15 @@ if not directory_to_analyse.endswith('/'):
 plot_file = directory_to_analyse+'model_scores.png'
 
 model_scores = model_scores(directory_to_analyse)
-plot_scores(model_scores, plot_file)
+entropy = get_entropy(model_scores, inf_gain=False)
+inf_gain = get_entropy(model_scores, inf_gain=True)
+
+plot_scores(
+    scores = model_scores,
+    entropy = entropy, 
+    inf_gain = inf_gain, 
+    save_file = plot_file
+)
 
 
 
@@ -300,7 +365,10 @@ parameter_sweep_analysis(
 
 try:
     plot_tree_multi_QMD(results_csv = results_csv, 
-        all_bayes_csv = all_bayes_csv, save_to_file='multiQMD_tree.png'
+        all_bayes_csv = all_bayes_csv, 
+        entropy = entropy,
+        inf_gain = inf_gain,
+        save_to_file='multiQMD_tree.png'
     )
 
 except NameError:
@@ -309,6 +377,11 @@ except NameError:
         without error."
     )
 
+except ZeroDivisionError:
+    print("Can not plot multiQMD tree -- this might be because only \
+        one instance of QMD was performed. All other plots generated \
+        without error."
+    )
 
 
 

@@ -256,7 +256,7 @@ if global_variables.qhl_test:
             'qhl_parameter_estimates_'+ str(global_variables.long_id) +
             '.png')
         )
-
+        """
         qmd.plotExpecValuesQHLTrueModel(
             max_time=expec_val_plot_max_time, 
             t_interval=1,
@@ -264,6 +264,17 @@ if global_variables.qhl_test:
             global_variables.plots_directory+
             'qhl_expec_values_'+str(global_variables.long_id)+'.png')
         )
+        """
+        qmd.plotExpecValues(
+            model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
+            champ=False,
+            max_time = expec_val_plot_max_time, #in microsec
+            save_to_file=str( 
+            global_variables.plots_directory+
+            'qhl_expec_values_'+str(global_variables.long_id)+'.png')
+        )
+
+
 
         if DataBase.num_parameters_from_name(qmd.TrueOpName) == 1:
             qmd.plotVolumeQHL(

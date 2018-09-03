@@ -19,22 +19,17 @@ this_log="$long_dir/qmd.log"
 mkdir -p $long_dir
 #mkdir -p $directory
 
-"""
-declare -a qhl_operators=(
-'xTiPPzTiPPyTiPPzTzPPxTxPPyTyPPxTyPPyTzPPxTz' 
-)
-"""
-declare -a qhl_operators=(
-'z'
-)
 
 true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-qhl_test=1
+declare -a qhl_operators=(
+    $true_operator
+)
+qhl_test=0
 q_id=0
 exp_data=1
 use_rq=0
-prt=40
-exp=10
+prt=10
+exp=3
 if (($prt > 50)) || (($exp > 10))
 then
     use_rq=1
@@ -61,7 +56,7 @@ do
     python3 Exp.py -op=$true_operator -p=$prt -e=$exp -bt=$bt -rq=$use_rq -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data -cpr=$custom_prior -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
 done
 
-# Analyse results of QMD.
+# Analyse results of QMD. (Only after QMD, not QHL).
 if (( "$qhl_test" == "0" ))
 then 
     cd ../Libraries/QML_lib

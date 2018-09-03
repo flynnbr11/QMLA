@@ -87,10 +87,14 @@ def ExpectationValuesTrueSim(
     use_experimental_data = qmd.UseExperimentalData
     experimental_measurements_dict = qmd.ExperimentalMeasurements
     
+    try:
+        qmd.ChampID
+    except:
+        qmd.ChampID = qmd.HighestModelID+1
+
     if model_ids is None and champ == True:
         model_ids = [qmd.ChampID]
     elif model_ids is not None and champ == True:
-
         if type(model_ids) is not list:
             model_ids = [model_ids]
         if qmd.ChampID not in model_ids:
@@ -1161,6 +1165,7 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
                     e_alphas = [], nonadj_alpha=0.1, 
                     label_padding = 0.4, 
                     arrow_size = 0.02, widthscale=1.0,
+                    entropy=None, inf_gain=None,
                     pathstyle = "straight", id_labels = False,
                     save_to_file=None
 ):
@@ -1268,6 +1273,20 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
         legend_title='# QMD wins'
     plt.legend(handles, labels, title=legend_title)
 
+    plot_title = ''
+    if entropy is not None:
+        plot_title += str( 
+            '\t$\mathcal{S}$=' 
+            + str(round(entropy, 2))
+        )
+    if inf_gain is not None:
+        plot_title += str(
+            '\t $\mathcal{IG}$=' 
+            + str(round(inf_gain, 2))
+        )
+    if entropy is not None or inf_gain is not None: 
+        plt.title(plot_title)
+
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
@@ -1308,6 +1327,8 @@ def cumulativeQMDTreePlot(
         avg='means',
         only_adjacent_branches=True,
         directed=True,
+        entropy=None, 
+        inf_gain=None,
         save_to_file=None
     ):
     
@@ -1428,7 +1449,8 @@ def cumulativeQMDTreePlot(
     plotTreeDiagram(G,n_cmap = plt.cm.pink_r, e_cmap = plt.cm.Blues, 
                        nonadj_alpha = 0.1, e_alphas = [] , widthscale=10.5, 
                        label_padding = 0.4, pathstyle="curve",
-                       arrow_size=None
+                       arrow_size=None,
+                       entropy=entropy, inf_gain=inf_gain
        )   
 
     if save_to_file is not None:
