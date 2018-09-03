@@ -289,7 +289,7 @@ else:
 
 
     if global_variables.save_plots:
-
+        """
         qmd.plotVolumes(
             save_to_file=str(
             global_variables.plots_directory+
@@ -315,6 +315,12 @@ else:
                 'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
                 '.png')
             )
+        qmd.plotRadarDiagram(
+            save_to_file=str(
+            global_variables.plots_directory+
+            'radar_'+ str(global_variables.long_id)+ '.png')
+        )
+        """
             
 
         qmd.saveBayesCSV(
@@ -334,11 +340,6 @@ else:
             'expec_values_'+str(global_variables.long_id)+'.png')
         )
 
-        qmd.plotRadarDiagram(
-            save_to_file=str(
-            global_variables.plots_directory+
-            'radar_'+ str(global_variables.long_id)+ '.png')
-        )
 
 
     #        qmd.plotHintonAllModels(save_to_file=str(

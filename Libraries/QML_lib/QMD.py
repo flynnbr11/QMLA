@@ -1611,8 +1611,10 @@ class QMD():
         t_interval=0.3, save_to_file=None
     ):
     
-        PlotQMD.ExpectationValuesTrueSim(qmd=self, model_ids=model_ids, 
-            champ=champ, max_time=max_time, t_interval=t_interval,
+        PlotQMD.ExpectationValuesTrueSim(
+            qmd=self, 
+            model_ids=model_ids, champ=champ, 
+            max_time=max_time, t_interval=t_interval,
             upper_x_lim = max_time,
             save_to_file=save_to_file
         )
@@ -1624,12 +1626,25 @@ class QMD():
         debug_print=False,
         plus_probe=False 
     ):
+        """
+        # TODO use this updated function instead of old one
+        PlotQMD.ExpectationValuesTrueSim(
+            qmd=self, 
+            model_ids=model_ids, champ=champ, 
+            max_time=max_time, t_interval=t_interval,
+            upper_x_lim = max_time,
+            save_to_file=save_to_file
+        )
+        """
         PlotQMD.ExpectationValuesQHL_TrueModel(qmd=self, 
             max_time = max_time,
             t_interval = t_interval,
             save_to_file = save_to_file,
             debug_print = debug_print
         )
+
+
+
 
     def plotDistributionProgression(self, 
         show_means = True,

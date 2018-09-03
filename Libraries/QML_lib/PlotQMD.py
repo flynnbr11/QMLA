@@ -75,16 +75,17 @@ def latex_name_ising(name):
     
     return latex_term
 
-def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True, 
+def ExpectationValuesTrueSim(
+    qmd, 
+    model_ids=None, champ=True, 
     max_time=3, t_interval=0.01, 
     upper_x_lim=None,
     plus_probe=False,
-    true_plot_type='scatter', save_to_file=None
+    true_plot_type='scatter', 
+    save_to_file=None
 ):
-    import random
-    
-    experimental_measurements_dict = qmd.ExperimentalMeasurements
     use_experimental_data = qmd.UseExperimentalData
+    experimental_measurements_dict = qmd.ExperimentalMeasurements
     
     if model_ids is None and champ == True:
         model_ids = [qmd.ChampID]
@@ -104,15 +105,11 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour =  colors.cnames['lightsalmon'] #'b'
     true_colour =  'r' #'b'
-    
+
     champion_colour =  colors.cnames['cornflowerblue'] #'r'
     sim_colours = ['g', 'c', 'm', 'y', 'k']
-
+    global_min_time = 0
     plt.clf()
-    plt.xlabel('Time (microseconds)')
-    plt.ylabel('Expectation Value')
-
-    
     if (experimental_measurements_dict is not None) and (use_experimental_data==True):
         times = sorted(list(experimental_measurements_dict.keys()))
         true_expec_values = [
@@ -122,9 +119,8 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
         times = np.arange(0, max_time, t_interval)
         true = qmd.TrueOpName
         true_op = DataBase.operator(true)
-        
+
         true_params = qmd.TrueParamsList
-#        true_ops = true_op.constituents_operators
         true_ops = qmd.TrueOpList
         true_dim = true_op.num_qubits
         if plus_probe:
@@ -134,8 +130,8 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
 
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
         true_expec_values = []
-        
-        
+
+
         for t in times:
             if qmd.UseTimeDepTrueModel:
                 # Multiply time dependent parameters by time value
@@ -148,31 +144,24 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
                 true_ham = np.tensordot(params, true_ops, axes=1)
             else:
                 true_ham = time_ind_true_ham
-        
-            try:
-#                expec = evo.expectation_value(
-#                    ham=true_ham, 
-#                    t=t, 
-#                    state=true_probe,
-#                    log_file = qmd.log_file, 
-#                    log_identifier = '[PlotQMD]'
-#                )
 
+            try:
                 if use_experimental_data:
                     expec = evo.hahn_evolution(
                         ham = true_ham, 
                         t=t, 
                         state = true_probe
                     )
-                
+
                 else: # Tracing out second qubit and projecting on plus for simulated case.
+                    # TODO if simulated, have access to full measurement so plot that?
                     expec = evo.traced_expectation_value_project_one_qubit_plus(
                         ham = true_ham, 
                         t=t, 
                         state = true_probe
                     )
 
-                
+
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
                     "\nParams:", params, 
@@ -183,161 +172,149 @@ def ExpectationValuesTrueSim(qmd, model_ids=None, champ=True,
                 )
 
             true_expec_values.append(expec) 
-        
 
+
+    ax1 = plt.subplot(311)
     if true_plot_type=='plot': 
-        plt.plot(times, true_expec_values, label='True Expectation Value',
-                 color = true_colour
+    #        plt.subplot(211)
+        plt.plot(times, 
+            true_expec_values, 
+            label='True Expectation Value',
+            color = true_colour
         )
     else:
-        plt.scatter(times, true_expec_values, label='True Expectation Value',
-            marker='o', s=8, color = true_colour
+        plt.scatter(times, 
+            true_expec_values, 
+            label='True Expectation Value',
+            marker='o', s=2, color = true_colour
         )
 
-    ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
-    #print("Times:", times)
-    for i in range(len(model_ids)):
-        mod_id = model_ids[i]
-        sim = qmd.ModelNameIDs[mod_id]
-        sim_op  = DataBase.operator(sim)
-        mod = qmd.reducedModelInstanceFromID(mod_id)
-        sim_params = list(mod.FinalParams[:,0])
-        sim_ops = sim_op.constituents_operators
-        sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
-        sim_dim = sim_op.num_qubits
-        if plus_probe:
-            true_probe = plus_plus
-        else:
-            sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
-        colour_id = int(i%len(sim_colours))
-        sim_col = sim_colours[colour_id]
-#        print("sim model:", sim,"\nparams:\n", sim_params, "\nOps:\n", sim_ops)
-#        sim_expec_values = []
-#        for t in times: 
-#            try:
-#                expec = evo.expectation_value(
-#                    ham=sim_ham, 
-#                    t=t, 
-#                    state=sim_probe,
-#                    log_file = qmd.log_file, 
-#                    log_identifier = '[PlotQMD]'
-#                )
-#            except UnboundLocalError:
-#                print("[PlotQMD]\n Unbound local error for:",
-#                    "\nParams:", sim_params, 
-#                    "\nTimes:", times, 
-#                    "\ntrue_ham:", sim_ham,
-#                    "\nt=", t,
-#                    "\nstate=", sim_probe
-#                )
-#            sim_expec_values.append(expec) 
-#        print("going into sim expec list. Ham=", sim_ham, "\nTimes=", times)
-        
-        if use_experimental_data:
-            sim_expec_values = [
-                evo.hahn_evolution(
-                    ham=sim_ham, 
-                    t=t,
-                    state=sim_probe
-                ) for t in times
-            ]
-        else:
-            sim_expec_values = [
-                evo.traced_expectation_value_project_one_qubit_plus(
-                    ham=sim_ham, 
-                    t=t,
-                    state=sim_probe
-                ) for t in times
-            ]
-            
-        if mod_id == qmd.ChampID:
-            models_branch = ChampionsByBranch[mod_id]
-            sim_label = 'Champion Model'
-            sim_col = champion_colour
-        elif mod_id in list(qmd.BranchChampions.values()):
-            models_branch = ChampionsByBranch[mod_id]
-            sim_label = 'Branch '+str(models_branch)+' Champion'
-        else:
-            sim_label = 'Model '+str(mod_id)
 
-        plt.plot(times, sim_expec_values, label=sim_label, color=sim_col)
+        ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
+        for i in range(len(model_ids)):
+            mod_id = model_ids[i]
+            sim = qmd.ModelNameIDs[mod_id]
+            mod = qmd.reducedModelInstanceFromID(mod_id)
+            sim_ham = mod.LearnedHamiltonian
+            times_learned = mod.Times
+            sim_dim = DataBase.get_num_qubits(mod.Name)
+            if plus_probe:
+                true_probe = plus_plus
+            else:
+                sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
+            colour_id = int(i%len(sim_colours))
+            sim_col = sim_colours[colour_id]
 
-    ax = plt.subplot(111)
-    """
-    print("[PlotQMD]. \n True Params:", true_params, 
-        "\n sim model:", sim, 
-        "\n Sim Params:", sim_params
-        
-    )
-    """
+            sim_expec_values = []
+            present_expec_values_times = sorted(list(mod.expectation_values.keys()))
+            for t in times:
 
-    # Shrink current axis's height by 10% on the bottom
-    box = ax.get_position()
-    qty = 0.1
-    ax.set_position([box.x0, box.y0 + box.height * qty,
-                     box.width, box.height * (1.0-qty)])
+                try:
+                    sim_expec_values.append(
+                        mod.expectation_values[t]
+                    )
+                except:
+                    if use_experimental_data:
+                         expec = evo.hahn_evolution(
+                            ham=sim_ham, 
+                            t=t,
+                            state=sim_probe
+                        ) 
 
-    handles, labels = ax.get_legend_handles_labels()
-    label_list = list(labels)
-    handle_list = list(handles)
+                    else:
+                        expec = evo.traced_expectation_value_project_one_qubit_plus(
+                            ham=sim_ham, 
+                            t=t,
+                            state=sim_probe
+                        ) 
 
-    new_labels=[]
-    new_handles=[]
+                    sim_expec_values.append(expec)
+                    mod.expectation_values[t] = expec
 
-    special_labels=[]
-    special_handles=[]
+            if mod_id == qmd.ChampID:
+                models_branch = ChampionsByBranch[mod_id]
+                champ_sim_label = str(mod.LatexTerm + ' (Champion)')
+                sim_label = champ_sim_label
+                sim_col = champion_colour
+                time_hist_label = 'Times learned by Champion Model'
+            elif mod_id in list(qmd.BranchChampions.values()):
+                models_branch = ChampionsByBranch[mod_id]
+                # sim_label = 'Branch '+str(models_branch)+' Champion'
+                sim_label = mod.LatexTerm
+            else:
+                # sim_label = 'Model '+str(mod_id)
+                sim_label = mod.LatexTerm
 
-    special_terms = ['True Expectation Value', 'Champion Model']
-
-    for i in range(len(label_list)):
-        if label_list[i] in special_terms:
-            special_labels.append(label_list[i])
-            special_handles.append(handle_list[i])
-        else:
-            new_labels.append(label_list[i])
-            new_handles.append(handle_list[i])
+            plt.subplot(311)
+            plt.plot(
+                times, 
+                sim_expec_values, 
+                label=sim_label, 
+                color=sim_col
+            )
 
 
-    special_handles = tuple(special_handles)
-    special_labels = tuple(special_labels)
+            num_bins = len(set(times_learned))
+            unique_times_learned = sorted(list(set(times_learned)))
+            unique_times_count = []
+            if min(unique_times_learned) < global_min_time:
+                global_min_time = min(unique_times_learned)
 
-    extra_lgd = True
-    if len(new_handles) == 0:
-        print("No models other than champ/true")
-        extra_lgd=False
-        
-    new_handles = tuple(new_handles)
-    new_labels = tuple(new_labels)
+            for u in unique_times_learned:
+                unique_times_count.append(list(times_learned).count(u))
+            r_squared = mod.r_squared()
+            bar_hist = 'hist'
 
-    all_expec_values = sim_expec_values + true_expec_values
-    lower_y_lim = max(0,min(all_expec_values))
-    upper_y_lim = max(all_expec_values)
-    plt.ylim(lower_y_lim, upper_y_lim)
-
-    if upper_x_lim is not None:
-        plt.xlim(0,upper_x_lim)
-    else:
-        plt.xlim(0, max(times))
-    
-    if extra_lgd:
-        lgd_spec=ax.legend(special_handles, special_labels, 
-            loc='upper center', bbox_to_anchor=(1, 1),fancybox=True,
-            shadow=True, ncol=1
+            ax2 = plt.subplot(312, sharex=ax1)
+            if bar_hist == 'bar':
+                plt.bar(
+                    unique_times_learned, 
+                    unique_times_count, 
+                    color=sim_col, 
+                    label=str(mod.LatexTerm+' : ' +str(round(r_squared, 1))),                
+                    width=0.001
+                )
+            elif bar_hist == 'hist':
+                plt.hist(
+                    times_learned, 
+                    bins=num_bins,
+                    label=str(mod.LatexTerm+' : ' +str(round(r_squared,1))),                
+                    color=sim_col,
+                    histtype='step',
+                    fill=False
+                )
+        ax1.legend(
+            title='Expectation Values',
+            bbox_to_anchor=(1.0, 1.1),
+            loc=2
         )
-        lgd_new=ax.legend(new_handles, new_labels, 
-            loc='upper center', bbox_to_anchor=(1.15, 0.75),
-            fancybox=True, shadow=True, ncol=1
-        )
-        plt.gca().add_artist(lgd_spec)
-    else:
-        lgd_spec=ax.legend(special_handles, special_labels,
-            loc='upper center', bbox_to_anchor=(1, 1),fancybox=True, 
-            shadow=True, ncol=1
-        )
+        ax1.tick_params(
+            axis='x',          # changes apply to the x-axis
+            which='both',      # both major and minor ticks are affected
+            bottom=True,      # ticks along the bottom edge are off
+            top=False,         # ticks along the top edge are off
+            labelbottom=True) # labels along the bottom edge are off
         
-    if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        ax1.set_xlim(global_min_time, max(times))
 
+        ax1.set_ylabel('Exp Value')
+        ax2.set_ylabel('Occurences')
+        ax2.set_xlabel('Time (microseconds)')
+        ax2.set_yscale('log')
+
+        ax2.set_title(str('Times learned upon'))
+        ax2.legend(
+            title='$R^2$', 
+            bbox_to_anchor=(1.0, 1.1),
+            loc=2
+
+        )
+        ax2.axvline(0, color='black')
+        ax1.axvline(0, color='black')
+
+        plt.tight_layout()
+        if save_to_file is not None:
+            plt.savefig(save_to_file, bbox_inches='tight')    
     
 def ExpectationValuesQHL_TrueModel(qmd, 
     max_time=3, t_interval=0.01,

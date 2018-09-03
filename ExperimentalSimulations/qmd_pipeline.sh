@@ -32,9 +32,19 @@ true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 qhl_test=0
 q_id=0
 exp_data=1
-use_rq=1
-prt=40
-exp=400
+use_rq=0
+prt=400
+exp=100
+if (($prt > 50))
+then
+    use_rq=1
+fi
+
+if (($exp > 10))
+then
+    use_rq=1
+fi
+
 let bt="$exp-1"
 pgh=0.1
 ra=0.8
@@ -43,7 +53,7 @@ gaussian=1
 custom_prior=1
 dataset='NVB_HahnPeaks_Newdata'
 #dataset='NV05_HahnPeaks_expdataset'
-data_max_time=3000 # nanoseconds
+data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
 
 
