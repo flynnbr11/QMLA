@@ -103,11 +103,13 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
                 return (1.0/bayes_factor)
     else:
         
-        model_a = QML.modelClassForRemoteBayesFactor(modelID=model_a_id,
+        model_a = QML.modelClassForRemoteBayesFactor(
+            modelID=model_a_id,
             host_name=host_name, port_number=port_number, qid=qid, 
             log_file=log_file
         )
-        model_b = QML.modelClassForRemoteBayesFactor(modelID=model_b_id,
+        model_b = QML.modelClassForRemoteBayesFactor(
+            modelID=model_b_id,
             host_name=host_name, port_number=port_number, qid=qid, 
             log_file=log_file
         )
@@ -144,21 +146,25 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
                 for t in times_list
             ]
 
+            """
             log_print(
                 [
                 "Binning. Before times\n A:", times_a, 
                 "\nB:", times_b
                 ]
             )
+            """
 
             times_a = all_times
             times_b = all_times
+            """
             log_print(
                 [
                 ".After \n A:", times_a, 
                 "\nB:", times_b
                 ]
             )
+            """
 
 
 
@@ -226,7 +232,8 @@ def log_likelihood(model, times, binning=False):
     #print("log likelihood function. Model", model.ModelID, "\n Times:", times)
 
     if binning:
-        updater._renormalization_record = []    
+        updater._renormalization_record = []
+        updater.log_likelihood = 0     
 
     for i in range(len(times)):
         exp = get_exp(model, [times[i]])
