@@ -80,6 +80,7 @@ class QMD():
         max_num_qubits=7, #TODO change -- this may cause crashes somewhere
         gaussian=True,
         prior_specific_terms = None,
+        model_priors = None,
         bayes_lower = 1, 
         bayes_upper = 100,
         resample_threshold = 0.5,
@@ -188,6 +189,7 @@ class QMD():
         self.ExpComparisonTol = compare_linalg_exp_tol
         self.SigmaThreshold = sigma_threshold
         self.DebugDirectory = debug_directory
+        self.ModelPriors = model_priors
         self.ModelPointsDict = {}
         self.AllBayesFactors = {}
         self.BranchBayesComputed[0] = False
@@ -300,7 +302,8 @@ class QMD():
             'use_time_dep_true_params' : use_time_dep_true_model,
             'time_dep_true_params' : self.TimeDepParams,
             'num_time_dependent_true_params' : self.NumTimeDepTrueParams, 
-            'prior_specific_terms' : prior_specific_terms
+            'prior_specific_terms' : prior_specific_terms,
+            'model_priors' : model_priors
         }
         
         self.log_print(["RunParallel=", self.RunParallel])
@@ -524,7 +527,8 @@ class QMD():
         )
         if exists:
             modelID = DataBase.model_id_from_name(self.db, name = model_name)
-            branchID = DataBase.model_branch_from_model_id(self.db, 
+            branchID = DataBase.model_branch_from_model_id(
+                self.db, 
                 model_id=modelID
             )
             if self.RunParallel and use_rq:
@@ -1260,7 +1264,9 @@ class QMD():
     
         mod_to_learn = self.TrueOpName
         self.log_print(["QHL test on:", mod_to_learn])
-        self.learnModel(model_name=mod_to_learn, use_rq=self.use_rq, 
+        self.learnModel(
+            model_name=mod_to_learn,
+            use_rq=self.use_rq, 
             blocking=True
         )
                 
@@ -1274,9 +1280,41 @@ class QMD():
 
 
 
+    def runMultipleModelQHL(self, model_names=None):
+        if model_names is None:
+            model_names = self.InitialOpList
 
-    def runRemoteQMD(self, num_exp=40, num_spawns=1, max_branches= None,
-        max_num_qubits = None, max_num_models=None, spawn=True,
+        self.log_print(
+            [
+            'run multiple QHL. names:', model_names
+            ]
+        )
+
+        for mod_name in model_names:
+            self.learnModel(
+                model_name = mod_name,
+                use_rq = self.use_rq, 
+                blocking = False
+            )
+
+        learned_models_ids = self.RedisDataBases['active_branches_learning_models']
+        running_models = learned_models_ids.keys()
+        self.log_print(
+            [
+            'Running Models:', running_models
+            ]
+        )
+
+        for mod_name in model_names:
+            mod_id = DataBase.model_id_from_name(db=self.db, name=mod_name)
+            mod = self.reducedModelInstanceFromID(mod_id)
+            mod.updateLearnedValues()
+
+    def runRemoteQMD(
+        self, 
+        num_exp=40, num_spawns=1, 
+        max_branches= None, max_num_qubits = None,
+        max_num_models=None, spawn=True,
         just_given_models=False
     ):
 
@@ -1314,7 +1352,9 @@ class QMD():
                 ):
                     self.BranchComparisonsComplete[branchID] = True
                     self.compareModelsWithinBranch(branchID)
-                    max_spawn_depth_reached = self.spawnFromBranch(branchID,
+                    max_spawn_depth_reached = self.spawnFromBranch(
+                        # will return True if this brings it to self.MaxSpawnDepth
+                        branchID,
                         num_models=1
                     )
 
@@ -1358,12 +1398,17 @@ class QMD():
                     ):    
                             still_learning = False # i.e. break out of this while loop
 
-        ### Final functions at end of QMD
         final_winner, final_branch_winners = self.finalBayesComparisons()        
-
         self.ChampionName = final_winner
         self.ChampID = self.pullField(name=final_winner, field='ModelID')
         self.log_print(["Final winner = ", final_winner])
+
+        self.finaliseQMD()
+
+    def finaliseQMD(self):
+        ### Final functions at end of QMD
+        ### Fill in champions result dict for further analysis.
+
         self.updateDataBaseModelValues()
         for i in range(self.HighestModelID):
             # Dict of all Bayes factors for each model considered. 
@@ -1379,8 +1424,10 @@ class QMD():
         num_params_champ_model = champ_op.num_constituents
         
         correct_model = misfit = underfit = overfit = 0
-        self.log_print(["Num params - champ:", 
-            num_params_champ_model,"; \t true:", self.TrueOpNumParams]
+        self.log_print(
+            [
+            "Num params - champ:", num_params_champ_model,
+            "; \t true:", self.TrueOpNumParams]
         )
 
         if DataBase.alph(self.ChampionName) == DataBase.alph(self.TrueOpName):
@@ -1394,8 +1441,14 @@ class QMD():
         elif num_params_champ_model < self.TrueOpNumParams: 
             underfit=1
         
+        num_qubits_champ_model = DataBase.get_num_qubits(self.ChampionName)
+        self.LearnedParamsChamp = (
+            self.reducedModelInstanceFromID(self.ChampID).LearnedParameters
+        )
+
         num_exp_ham = (
-            self.NumParticles * (self.NumExperiments + self.NumTimesForBayesUpdates)
+            self.NumParticles * 
+            (self.NumExperiments + self.NumTimesForBayesUpdates)
         )
 
         config = str( 'config' + 
@@ -1417,7 +1470,6 @@ class QMD():
             '}H_{' + str(num_exp_ham) + 
             '}$'
             )
-
 
         time_now = time.time()
         time_taken = time_now - self.StartingTime
@@ -1441,15 +1493,16 @@ class QMD():
             'CorrectModel' : correct_model,
             'Underfit' : underfit,
             'Overfit' : overfit, 
-            'Misfit' : misfit
+            'Misfit' : misfit,
+            'NumQubits' : num_qubits_champ_model,
+            'NumParams' : num_params_champ_model,
+            'LearnedParameters' : self.LearnedParamsChamp
         }
-               
 
     def updateDataBaseModelValues(self):
         for mod_id in range(self.HighestModelID):
             mod = self.reducedModelInstanceFromID(mod_id)
             mod.updateLearnedValues()
-        
             
     def runQMD(self, num_exp = 20, max_branches= None, max_num_qubits = None,
         max_num_models=None, spawn=True, just_given_models=False

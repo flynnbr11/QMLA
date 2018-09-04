@@ -56,7 +56,11 @@ def log_print(to_print_list, log_file):
     print_strings = [str(s) for s in to_print_list]
     to_print = " ".join(print_strings)
     with open(log_file, 'a') as write_log_file:
-        print(identifier, str(to_print), file=write_log_file, flush=True)
+        print(identifier, 
+            str(to_print),
+            file=write_log_file,
+            flush=True
+        )
 
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
@@ -104,8 +108,10 @@ plt.clf()
 exp_times = sorted(experimental_measurements_dict.keys())
 exp_vals = [ experimental_measurements_dict[k] for k in exp_times ]
 
-
 initial_op_list = ['xTi', 'yTi', 'zTi']
+
+
+
 true_op = global_variables.true_operator
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 num_params = len(true_op_list)
@@ -169,6 +175,30 @@ if global_variables.custom_prior:
 else:
     prior_specific_terms = {}
 
+model_priors = None
+
+qhl_extension = True
+if global_variables.further_qhl == True:
+
+    qmd_results_model_scores_csv = str(
+        global_variables.results_directory + 'average_priors.p'
+    )
+    print("QMD results CSV in ", qmd_results_model_scores_csv)
+    model_priors = pickle.load(
+        open(
+            qmd_results_model_scores_csv,
+#            '/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Results/Sep_04/15_20/average_priors.p', 
+            'rb'
+        )
+    )
+    """
+    log_print(
+        ["model_priors:\n", model_priors],
+        log_file 
+    )
+    """
+    initial_op_list = list(model_priors.keys())
+
 
 num_ops = len(initial_op_list)
 do_qhl_plots = global_variables.qhl_test and False # TODO when to turn this on?
@@ -176,8 +206,9 @@ do_qhl_plots = global_variables.qhl_test and False # TODO when to turn this on?
 results_directory = global_variables.results_directory
 long_id = global_variables.long_id
     
-log_print(["\n QMD id", global_variables.qmd_id, " on host ",
-    global_variables.host_name, "and port", global_variables.port_number,
+log_print(["\n QMD id", global_variables.qmd_id, 
+    " on host ", global_variables.host_name, 
+    "and port", global_variables.port_number,
     "has seed", rds.get_seed(global_variables.host_name,
     global_variables.port_number, global_variables.qmd_id,
     print_status=True),"\n", global_variables.num_particles,
@@ -185,8 +216,8 @@ log_print(["\n QMD id", global_variables.qmd_id, " on host ",
     "experiments and ", global_variables.num_times_bayes,
     "bayes updates\n Gaussian=", global_variables.gaussian, 
     "\n RQ=", global_variables.use_rq, "RQ log:",
-     global_variables.log_file, "\n Bayes CSV:",
-     global_variables.cumulative_csv], log_file
+    global_variables.log_file, "\n Bayes CSV:",
+    global_variables.cumulative_csv], log_file
  )
 
 """ 
@@ -218,6 +249,7 @@ qmd = QMD(
     probe_dict = experimental_probe_dict, 
     gaussian = global_variables.gaussian, 
     prior_specific_terms = prior_specific_terms,    
+    model_priors = model_priors,
     use_experimental_data = global_variables.use_experimental_data,
     experimental_measurements = experimental_measurements_dict,
     max_num_branches = 0,
@@ -282,8 +314,20 @@ if global_variables.qhl_test:
                 global_variables.plots_directory+
                 'qhl_volume_'+str(global_variables.long_id)+'.png')
             )
-            
-    
+
+elif global_variables.further_qhl == True:
+    qmd.runMultipleModelQHL()
+
+    qmd.plotExpecValues(
+        model_ids = list(range(qmd.HighestModelID)), # hardcode to see full model for development
+        max_time = expec_val_plot_max_time, #in microsec
+        champ = False,
+        save_to_file=str( 
+            global_variables.plots_directory+
+            'further_qhl_expec_values.png'
+        )
+    )
+
 else:
     qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
 
@@ -297,7 +341,6 @@ else:
         qmd.delete_unpicklable_attributes()
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file , protocol=2)
-
 
     if global_variables.save_plots:
         """
@@ -332,7 +375,6 @@ else:
             'radar_'+ str(global_variables.long_id)+ '.png')
         )
         """
-            
 
         qmd.saveBayesCSV(
             save_to_file=str(
@@ -350,8 +392,6 @@ else:
             global_variables.plots_directory+
             'expec_values_'+str(global_variables.long_id)+'.png')
         )
-
-
 
     #        qmd.plotHintonAllModels(save_to_file=str(
     #            global_variables.results_directory,'hinton_', 
@@ -375,7 +415,11 @@ else:
     )
 
     results_file = global_variables.results_file
-    pickle.dump(qmd.ChampionResultsDict, open(results_file, "wb"), protocol=2)
+    pickle.dump(
+        qmd.ChampionResultsDict,
+        open(results_file, "wb"), 
+        protocol=2
+    )
         
     end = time.time()
     log_print(["Time taken:", end-start], log_file)

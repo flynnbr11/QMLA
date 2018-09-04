@@ -297,9 +297,10 @@ def ExpectationValuesTrueSim(
             which='both',      # both major and minor ticks are affected
             bottom=True,      # ticks along the bottom edge are off
             top=False,         # ticks along the top edge are off
-            labelbottom=True) # labels along the bottom edge are off
-        
-        ax1.set_xlim(global_min_time, max(times))
+            labelbottom=True # labels along the bottom edge are off
+        )
+
+        ax1.set_xlim(global_min_time, max(times)+0.1)
 
         ax1.set_ylabel('Exp Value')
         ax2.set_ylabel('Occurences')
@@ -315,6 +316,11 @@ def ExpectationValuesTrueSim(
         )
         ax2.axvline(0, color='black')
         ax1.axvline(0, color='black')
+        plot_title = str(
+            str(qmd.NumParticles) + ' particles.\n'  
+            + str(qmd.NumExperiments) + ' experiments.'
+        )
+        plt.title(plot_title)
 
         plt.tight_layout()
         if save_to_file is not None:

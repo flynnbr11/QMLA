@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=2
+num_tests=1
 let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)
@@ -13,6 +13,7 @@ bcsv="cumulative.csv"
 bayes_csv="$long_dir$bcsv"
 
 this_log="$long_dir/qmd.log"
+furhter_qhl_log="$long_dir/qhl_further.log"
 
 # rm -r $long_dir
 # rm $this_log
@@ -25,18 +26,22 @@ declare -a qhl_operators=(
     $true_operator
 )
 qhl_test=0
+do_further_qhl=1
+top_number_models=1
 q_id=0
 exp_data=1
 use_rq=0
-prt=10
-exp=3
-if (($prt > 50)) || (($exp > 10))
+prt=15
+exp=5
+further_qhl_factor=2
+if (($prt > 50)) || (($exp > 10)) || (( $qhl_test == 0 ))
 then
     use_rq=1
 fi
+use_rq=0
 
 let bt="$exp-1"
-pgh=0.1
+pgh=1.0
 ra=0.8
 rt=0.5
 gaussian=1
@@ -59,6 +64,15 @@ done
 # Analyse results of QMD. (Only after QMD, not QHL).
 if (( "$qhl_test" == "0" ))
 then 
-    cd ../Libraries/QML_lib
-    python3 AnalyseMultipleQMD.py -dir=$long_dir --bayes_csv=$bayes_csv
+    python3 ../Libraries/QML_lib/AnalyseMultipleQMD.py -dir=$long_dir --bayes_csv=$bayes_csv -top=$top_number_models
 fi
+
+
+if (( $do_further_qhl == 1 ))
+then
+    redis-cli flushall 
+    let particles="$further_qhl_factor * $prt"
+    let experiments="$further_qhl_factor * $exp"
+    python3 Exp.py -fq=$do_further_qhl -p=$particles -e=$experiments -bt=$bt -rq=$use_rq -g=$gaussian -qhl=0 -ra=$ra -rt=$rt -pgh=$pgh -dir=$long_dir -qid=$q_id -pt=1 -pkl=0 -log=$this_log -cb=$bayes_csv -exp=$exp_data -cpr=$custom_prior -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
+fi
+

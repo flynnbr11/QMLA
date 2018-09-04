@@ -61,6 +61,7 @@ default_cumulative_csv = 'cumulative_bayes.csv'
 default_experimental_data = False
 default_true_operator = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 default_qhl_test = 0
+default_further_qhl = 0
 default_dataset = 'NV_HahnPeaks_expdataset'
 default_data_max_useful_time = 2000 # nanoseconds
 default_data_time_offset = 180 # nanoseconds
@@ -70,6 +71,7 @@ class GlobalVariablesClass():
         self, 
         true_operator = default_true_operator,
         qhl_test = default_qhl_test,
+        further_qhl = default_qhl_test,
         use_rq = default_use_rq,
         do_iqle = default_do_iqle,
         do_qle = default_do_qle,
@@ -105,6 +107,7 @@ class GlobalVariablesClass():
     ):
         self.true_operator = true_operator
         self.qhl_test = qhl_test
+        self.further_qhl = further_qhl
         self.do_iqle = do_iqle
         self.do_qle = do_qle
         self.use_rq = use_rq
@@ -185,6 +188,14 @@ def parse_cmd_line_args(args):
       type=int,
       default=default_qhl_test
     )
+
+    parser.add_argument(
+      '-fq', '--further_qhl', 
+      help="Bool to perform further QHL on best models from previous run.",
+      type=int,
+      default=default_further_qhl
+    )
+
 
     ## QMD parameters -- fundamentals such as number of particles etc
     parser.add_argument(
@@ -400,6 +411,7 @@ def parse_cmd_line_args(args):
     
     true_operator = arguments.true_operator
     qhl_test = bool(arguments.qhl_test)
+    further_qhl = bool(arguments.further_qhl)
     do_iqle = bool(arguments.iqle)
     do_qle = bool(arguments.qle)
     use_rq = bool(arguments.use_rq)
@@ -437,6 +449,7 @@ def parse_cmd_line_args(args):
     global_variables = GlobalVariablesClass(
         true_operator = true_operator,
         qhl_test = qhl_test, 
+        further_qhl = further_qhl,
         do_iqle = do_iqle,
         do_qle = do_qle,
         use_rq = use_rq,

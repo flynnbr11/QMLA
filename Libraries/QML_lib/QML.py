@@ -161,7 +161,18 @@ class ModelLearningClass():
                 for i in range(len(self.TrueParams), num_params):
                     means.append(self.TrueParams[i%len(self.TrueParams)])
 #            self.Prior = Distributions.MultiVariateNormalDistributionNocov(num_params)
+            
             self.PriorSpecificTerms = qmd_info['prior_specific_terms']
+            
+            if (
+                qmd_info['model_priors'] is not None
+                and 
+                DB.alph(self.Name) in list(qmd_info['model_priors'].keys()) 
+            ):
+                self.PriorSpecificTerms = (
+                    qmd_info['model_priors'][DB.alph(self.Name)]
+                )
+
             self.Prior = Distributions.normal_distribution_ising(
                 term = self.Name,
                 specific_terms = self.PriorSpecificTerms
@@ -409,6 +420,7 @@ class ModelLearningClass():
                 if self.debugSave: 
                     self.debug_store()
         
+                self.LearnedParameters = {}
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [
                         np.mean(self.Particles[:,iterator,istep-1]), 
@@ -418,6 +430,9 @@ class ModelLearningClass():
                         'Final Parameters mean and stdev (term ',
                         self.SimOpsNames[iterator] , '):',
                         str(self.FinalParams[iterator])]
+                    )
+                    self.LearnedParameters[self.SimOpsNames[iterator]] = (
+                        self.FinalParams[iterator][0]
                     )
 
             
@@ -463,6 +478,7 @@ class ModelLearningClass():
         learned_info['track_eval'] = self.TrackEval
         learned_info['resample_epochs'] = self.ResampleEpochs
         learned_info['quadratic_losses'] = self.QLosses
+        learned_info['learned_parameters'] = self.LearnedParameters
         if self.StoreParticlesWeights or self.QHL_plots:
             learned_info ['particles'] = self.Particles
             learned_info['weights'] = self.Weights
@@ -641,6 +657,8 @@ class reducedModel():
         self.TrackEval = np.array(learned_info['track_eval'])
         self.ResampleEpochs = learned_info['resample_epochs']
         self.QuadraticLosses = learned_info['quadratic_losses']
+        self.LearnedParameters = learned_info['learned_parameters']
+
         try:
             self.Particles = np.array(learned_info['particles'])
             self.Weights = np.array(learned_info['weights'])

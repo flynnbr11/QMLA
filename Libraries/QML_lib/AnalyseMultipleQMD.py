@@ -150,12 +150,7 @@ def parameter_sweep_analysis(directory_name, results_csv, save_to_file=None, use
     )
     left_pts = [sum(x) for x in zip(left_pts, overfit)]
 
-
-
-
 #    ax.axvline(x=max_x/2, color='g', label='50% Models correct')   
-
-
     ax.set_yticks(ind)
     ax.set_yticklabels(configs, minor=False)
     ax.set_ylabel('Configurations')
@@ -170,6 +165,71 @@ def parameter_sweep_analysis(directory_name, results_csv, save_to_file=None, use
         plt.savefig(save_to_file, bbox_inches='tight')
         
         
+def average_parameters(results_path, 
+    top_number_models=3,
+    average_type='median'
+):
+
+    results = pandas.DataFrame.from_csv(
+        results_path,
+        index_col='QID'
+    )
+
+    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
+    rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
+    # from https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
+    
+    if len(all_winning_models) > top_number_models:
+        winning_models = rank_models(all_winning_models)[0:top_number_models]
+    else:
+        winning_models = list(set(all_winning_models))    
+
+
+    params_dict = {}
+    for mod in winning_models:
+        params_dict[mod] = {}
+        params = DataBase.get_constituent_names_from_name(mod)
+        for p in params:
+            params_dict[mod][p] = []
+
+    for i in range(len(winning_models)):
+        mod = winning_models[i]
+        learned_parameters = list(results[ results['NameAlphabetical']==mod ]['LearnedParameters'])
+        num_wins_for_mod = len(learned_parameters)
+        for i in range(num_wins_for_mod):
+            params = eval(learned_parameters[i])
+            for k in list(params.keys()):
+                params_dict[mod][k].append(params[k])
+
+    average_params_dict = {}
+    std_deviations = {}
+    learned_priors = {}
+    for mod in winning_models:
+        average_params_dict[mod] = {}
+        std_deviations[mod] = {}
+        learned_priors[mod] = {}
+        params = DataBase.get_constituent_names_from_name(mod)
+        for p in params:
+            if average_type == 'median':
+                average_params_dict[mod][p] = np.median(
+                    params_dict[mod][p]
+                )
+            else:
+                average_params_dict[mod][p] = np.mean(
+                    params_dict[mod][p]
+                )
+            if np.std(params_dict[mod][p]) > 0:                
+                std_deviations[mod][p] = np.std(params_dict[mod][p])
+            else:
+                # if only one winner, give relatively broad prior. 
+                std_deviations[mod][p] = 0.5 
+            
+            learned_priors[mod][p] = [
+                average_params_dict[mod][p], 
+                std_deviations[mod][p]
+            ]
+    
+    return learned_priors        
         
 def model_scores(directory_name):
 #    sys.path.append(directory_name)
@@ -198,7 +258,9 @@ def get_entropy(models_points, inf_gain=False):
     # TODO this calculation of entropy may not be correct
     # What is initial_entropy meant to be?
     num_qmd_instances = sum(list(models_points.values()))
-    num_possible_qmd_instances = len(ptq.ising_terms_rotation_hyperfine())
+    num_possible_qmd_instances = len(
+        ptq.ising_terms_rotation_hyperfine()
+    )
     # TODO don't always want ising terms only
 
     
@@ -308,6 +370,14 @@ parser.add_argument(
   default=os.getcwd()
 )
 
+parser.add_argument(
+  '-top', '--top_number_models', 
+  help="N, for top N models by number of QMD wins.",
+  type=int,
+  default=3
+)
+
+
 arguments = parser.parse_args()
 directory_to_analyse = arguments.results_directory
 all_bayes_csv = arguments.bayes_csv
@@ -331,8 +401,6 @@ plot_scores(
     save_file = plot_file
 )
 
-
-
 ptq.plotTrueModelBayesFactors_IsingRotationTerms(
     results_csv_path = all_bayes_csv,
     save_to_file = str(directory_to_analyse+'true_model_bayes_comparisons.png')
@@ -344,6 +412,17 @@ results_csv = directory_to_analyse+results_csv_name
 summariseResultsCSV(
     directory_name=directory_to_analyse, 
     csv_name=results_csv
+)
+
+
+average_priors = average_parameters(
+    results_path=results_csv,
+    top_number_models = arguments.top_number_models 
+)
+pickle.dump(
+    average_priors,
+    open('average_priors.p', 'wb'), 
+    protocol=2
 )
 
 
@@ -382,6 +461,8 @@ except ZeroDivisionError:
         one instance of QMD was performed. All other plots generated \
         without error."
     )
+
+
 
 
 

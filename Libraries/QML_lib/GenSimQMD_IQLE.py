@@ -295,22 +295,26 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 
             times = expparams['t']
             if self.QLE is True:
-                pr0 = get_pr0_array_qle(t_list=times, modelparams=params,
+                pr0 = get_pr0_array_qle(
+                    t_list=times, modelparams=params,
                     oplist=operators, probe=probe, 
                     use_experimental_data = self.use_experimental_data,
                     use_exp_custom=self.use_exp_custom,
                     exp_comparison_tol=self.exp_comparison_tol, 
                     enable_sparse = self.enable_sparse, 
-                    log_file=self.log_file, log_identifier=self.log_identifier
+                    log_file=self.log_file, 
+                    log_identifier=self.log_identifier
                 )
 
             else: 
-                pr0 = get_pr0_array_iqle(t_list=times, modelparams=params,
+                pr0 = get_pr0_array_iqle(
+                    t_list=times, modelparams=params,
                     oplist=operators, ham_minus=ham_minus, probe=probe,
                     use_exp_custom=self.use_exp_custom,
                     exp_comparison_tol=self.exp_comparison_tol, 
                     enable_sparse = self.enable_sparse, 
-                    log_file=self.log_file, log_identifier=self.log_identifier
+                    log_file=self.log_file, 
+                    log_identifier=self.log_identifier
                 )    
 
             if debug_log_print:
