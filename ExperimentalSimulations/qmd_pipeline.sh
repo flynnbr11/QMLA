@@ -33,12 +33,12 @@ exp_data=1
 use_rq=0
 prt=15
 exp=5
-further_qhl_factor=2
+further_qhl_factor=1
 if (($prt > 50)) || (($exp > 10)) || (( $qhl_test == 0 ))
 then
     use_rq=1
 fi
-use_rq=0
+use_rq=1
 
 let bt="$exp-1"
 pgh=1.0
@@ -58,13 +58,21 @@ for i in `seq 1 $max_qmd_id`;
 do
     redis-cli flushall
     let q_id="$q_id+1"
-    python3 Exp.py -op=$true_operator -p=$prt -e=$exp -bt=$bt -rq=$use_rq -g=$gaussian -qhl=$qhl_test -ra=$ra -rt=$rt -pgh=$pgh -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 -log=$this_log -cb=$bayes_csv -exp=$exp_data -cpr=$custom_prior -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
+    python3 Exp.py \
+        -op=$true_operator -p=$prt -e=$exp -bt=$bt \
+        -rq=$use_rq -g=$gaussian -qhl=$qhl_test \
+        -ra=$ra -rt=$rt -pgh=$pgh \
+        -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 \
+        -log=$this_log -cb=$bayes_csv \
+        -exp=$exp_data -cpr=$custom_prior \
+        -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
 done
 
 # Analyse results of QMD. (Only after QMD, not QHL).
 if (( "$qhl_test" == "0" ))
 then 
-    python3 ../Libraries/QML_lib/AnalyseMultipleQMD.py -dir=$long_dir --bayes_csv=$bayes_csv -top=$top_number_models
+    python3 ../Libraries/QML_lib/AnalyseMultipleQMD.py \
+        -dir=$long_dir --bayes_csv=$bayes_csv -top=$top_number_models
 fi
 
 
@@ -73,6 +81,15 @@ then
     redis-cli flushall 
     let particles="$further_qhl_factor * $prt"
     let experiments="$further_qhl_factor * $exp"
-    python3 Exp.py -fq=$do_further_qhl -p=$particles -e=$experiments -bt=$bt -rq=$use_rq -g=$gaussian -qhl=0 -ra=$ra -rt=$rt -pgh=$pgh -dir=$long_dir -qid=$q_id -pt=1 -pkl=0 -log=$this_log -cb=$bayes_csv -exp=$exp_data -cpr=$custom_prior -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
+#    let q_id="$q_id+1"
+    python3 Exp.py \
+        -fq=$do_further_qhl \
+        -p=$particles -e=$experiments -bt=$bt \
+        -rq=$use_rq -g=$gaussian -qhl=0 \
+        -ra=$ra -rt=$rt -pgh=$pgh \
+        -dir=$long_dir -qid=$q_id -pt=1 -pkl=0 \
+        -log=$this_log -cb=$bayes_csv \
+        -exp=$exp_data -cpr=$custom_prior \
+        -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
 fi
 

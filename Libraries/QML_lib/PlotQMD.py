@@ -315,6 +315,7 @@ def ExpectationValuesTrueSim(
 
         )
         ax2.axvline(0, color='black')
+        ax2.axhline(0, color='black')
         ax1.axvline(0, color='black')
         plot_title = str(
             str(qmd.NumParticles) + ' particles.\n'  

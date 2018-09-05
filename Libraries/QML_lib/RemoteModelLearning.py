@@ -198,15 +198,17 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
     # not entirely clear why this encoding is used
     try:
         learned_models_info.set(str(modelID), compressed_info)
-#        log_print(["Redis learned_models_info added to db for model:", modelID])
+        log_print(["Redis learned_models_info added to db for model:", str(modelID)])
+#        log_print(["Added:", compressed_info])
+
     except:
         log_print(["Failed to add learned_models_info \
             added to db for model:", modelID]
         )
-    learned_models_ids.set(str(modelID), True)
-#    log_print(["Redis SET learned_models_ids:", modelID, "; set True"])
     active_branches_learning_models.incr(int(branchID), 1)    
     time_end = time.time()
+    log_print(["Redis SET learned_models_ids:", modelID, "; set True"])
+    learned_models_ids.set(str(modelID), 1)
         
     if remote: 
         del updated_model_info

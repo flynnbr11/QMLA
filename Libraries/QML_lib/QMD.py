@@ -1290,20 +1290,36 @@ class QMD():
             ]
         )
 
+        learned_models_ids = self.RedisDataBases['learned_models_ids']
+
         for mod_name in model_names:
+
+            mod_id = DB.model_id_from_name(db=self.db, name=mod_name)
+            learned_models_ids.set(
+                str(mod_id), 0
+            )
             self.learnModel(
                 model_name = mod_name,
                 use_rq = self.use_rq, 
                 blocking = False
             )
 
-        learned_models_ids = self.RedisDataBases['active_branches_learning_models']
         running_models = learned_models_ids.keys()
         self.log_print(
             [
-            'Running Models:', running_models
+            'Running Models:', running_models,
             ]
         )
+        for k in running_models:
+            while int(learned_models_ids.get(k)) != 1:
+                sleep(0.01)
+
+        self.log_print(
+            [
+            'Finished waiting on queue, for all:', running_models,
+            ]
+        )
+
 
         for mod_name in model_names:
             mod_id = DataBase.model_id_from_name(db=self.db, name=mod_name)

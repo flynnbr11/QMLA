@@ -637,15 +637,24 @@ class reducedModel():
         
         """
 
-        rds_dbs = rds.databases_from_qmd_id(self.HostName, self.PortNumber, self.Q_id)
+        rds_dbs = rds.databases_from_qmd_id(
+            self.HostName, self.PortNumber, self.Q_id
+        )
         learned_models_info = rds_dbs['learned_models_info']
 
         if learned_info is None:
             model_id_float = float(self.ModelID)
             model_id_str = str(model_id_float)
-            learned_info = pickle.loads(
-                learned_models_info.get(model_id_str), encoding='latin1'
-            ) # TODO telling pickle which encoding was used, though I'm not sure why/where that encoding was given...        
+            try:
+                learned_info = pickle.loads(
+                    learned_models_info.get(model_id_str), 
+                    encoding='latin1'
+                ) # TODO telling pickle which encoding was used, though I'm not sure why/where that encoding was given...        
+            except:
+                print("model_id_str: ", model_id_str)
+                print("model id: ", self.ModelID)
+                print("learned info keys:, ", learned_models_info.keys())
+                print("learned info:, ", learned_models_info.get(model_id_str))
 
         self.Times = learned_info['times']
         self.FinalParams = learned_info['final_params'] # should be final params from learning process
