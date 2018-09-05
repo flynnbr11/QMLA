@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=1
+num_tests=5
 let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)
@@ -27,19 +27,18 @@ declare -a qhl_operators=(
 )
 qhl_test=0
 do_further_qhl=1
-top_number_models=1
+top_number_models=3
 q_id=0
 exp_data=1
 use_rq=0
 prt=15
-exp=5
+exp=14
 further_qhl_factor=1
 if (($prt > 50)) || (($exp > 10)) || (( $qhl_test == 0 ))
 then
     use_rq=1
 fi
-use_rq=1
-
+use_rq=0
 let bt="$exp-1"
 pgh=1.0
 ra=0.8

@@ -328,6 +328,17 @@ elif global_variables.further_qhl == True:
         )
     )
 
+    for mod_id in range(qmd.HighestModelID):
+        mod_name = qmd.ModelNameIDs[mod_id]
+        qmd.plotParameterEstimates(
+            model_id = mod_id, 
+            save_to_file= str(global_variables.plots_directory+
+            'further_qhl_parameter_estimates_'+ str(mod_name) +
+            '.png')
+        )
+
+
+
 else:
     qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
 
