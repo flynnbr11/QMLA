@@ -56,6 +56,7 @@ job_id=$PBS_JOBID
 
 job_number="$(cut -d'.' -f1 <<<"$job_id")"
 echo "Job id is $job_number"
+echo "$job_number" >> $RESULTS_DIR/job_ids_started.txt
 cd $running_dir
 mkdir -p $running_dir/logs
 mkdir -p $PBS_O_WORKDIR/logs
@@ -94,7 +95,7 @@ export nodes=`cat $PBS_NODEFILE`
 export nnodes=`cat $PBS_NODEFILE | wc -l`
 export confile=$QMD_LOG_DIR/node_info.$QMD_JOB.conf
 for i in $nodes; do
- echo ${i} >>$confile
+	echo ${i} >>$confile
 done
 # -------------------------------------
 
@@ -116,7 +117,7 @@ echo "Starting Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
 
 echo "CONFIG: -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -cb=$BAYES_CSV -pt=$PLOTS -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG"
 
-python3 Exp.py -rq=1 -op="$OP" -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=30000 -g=1 -exp=$EXP_DATA -qhl=$QHL -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -cb=$BAYES_CSV
+python3 Exp.py -rq=1 -op="$OP" -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=30000 -g=1 -exp=$EXP_DATA -qhl=$QHL -fq=$FURTHER_QHL -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -cb=$BAYES_CSV -cpr=$CUSTOM_PRIOR -ds="$DATASET" -dst=$DATA_MAX_TIME -dto=$DATA_TIME_OFFSET
 
 
 
@@ -125,4 +126,5 @@ sleep 1
 
 redis-cli -p $REDIS_PORT flushall
 redis-cli -p $REDIS_PORT shutdown
+echo "$job_number" >> $RESULTS_DIR/job_ids_completed.txt
 echo "QMD $QMD_ID Finished; end of script at Time: $(date +%H:%M:%S)"
