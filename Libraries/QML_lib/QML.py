@@ -697,6 +697,8 @@ class reducedModel():
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
 
+        ham = self.LearnedHamiltonian
+
         #print(exp_times)
         sum_of_residuals = 0
         

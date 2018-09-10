@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=5
+num_tests=1
 let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)
@@ -25,14 +25,14 @@ true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 declare -a qhl_operators=(
     $true_operator
 )
-qhl_test=0
-do_further_qhl=1
+qhl_test=1
+do_further_qhl=0
 top_number_models=3
 q_id=0
 exp_data=1
 use_rq=0
-prt=15
-exp=14
+prt=1600
+exp=1000
 further_qhl_factor=1
 if (($prt > 50)) || (($exp > 10)) || (( $qhl_test == 0 ))
 then
@@ -40,14 +40,14 @@ then
 fi
 use_rq=0
 let bt="$exp-1"
-pgh=1.0
+pgh=0.3
 ra=0.8
 rt=0.5
 gaussian=1
 custom_prior=1
-dataset='NVB_HahnPeaks_Newdata'
-#dataset='NV05_HahnPeaks_expdataset'
-data_max_time=5000 # nanoseconds
+#dataset='NVB_HahnPeaks_Newdata'
+dataset='NV05_HahnPeaks_expdataset'
+data_max_time=3500 # nanoseconds
 data_time_offset=205 # nanoseconds
 
 
