@@ -79,8 +79,9 @@ def ExpectationValuesTrueSim(
     qmd, 
     model_ids=None, champ=True, 
     max_time=3, t_interval=0.01, 
+    linspace_times=True,
     upper_x_lim=None,
-    plus_probe=False,
+    plus_probe=True,
     true_plot_type='scatter', 
     save_to_file=None
 ):
@@ -193,6 +194,14 @@ def ExpectationValuesTrueSim(
             marker='o', s=2, color = true_colour
         )
 
+        # If we want a linspace plot of expec value
+        if linspace_times:
+            max_exp_time = max(times)
+            min_exp_time = min(times)
+            num_times = len(times)
+            times = list(
+                np.linspace(min_exp_time, max_exp_time, num_times)
+            )
 
         ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
         for i in range(len(model_ids)):
@@ -203,7 +212,7 @@ def ExpectationValuesTrueSim(
             times_learned = mod.Times
             sim_dim = DataBase.get_num_qubits(mod.Name)
             if plus_probe:
-                true_probe = plus_plus
+                sim_probe = plus_plus
             else:
                 sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
             colour_id = int(i%len(sim_colours))
@@ -256,7 +265,6 @@ def ExpectationValuesTrueSim(
                 label=sim_label, 
                 color=sim_col
             )
-
 
             num_bins = len(set(times_learned))
             unique_times_learned = sorted(list(set(times_learned)))

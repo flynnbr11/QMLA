@@ -157,20 +157,29 @@ if global_variables.custom_prior:
         # 'zTi' : [1.0, 0.5],
 
         # Values below correspond to Andreas' inital QMD values for this data set
-        'xTx' : [-2.5, 0.3], # true value 2.7
-        'yTy' : [-2.5, 0.3], # true value 2.7
-        'zTz' : [-1.5, 0.3], # true value 2.14
-        'xTi' : [0.2, 0.3], # TODO Broaden, testing with small dist
-        'yTi' : [0.2, 0.3],
-        'zTi' : [0.1, 0.3],
+        'xTx' : [-2.0, 0.5], # true value 2.7
+        'yTy' : [-2.0, 0.5], # true value 2.7
+        'zTz' : [-2.0, 0.5], # true value 2.14
+        'xTi' : [0.5, 0.5], # TODO Broaden, testing with small dist
+        'yTi' : [0.5, 0.5],
+        'zTi' : [0.5, 0.5],
 
-        # Values below correspond to Andreas' final values for this data set
-        # 'xTx' : [-2.85, 0.3], # true value 2.7
-        # 'yTy' : [-2.76, 0.3], # true value 2.7
-        # 'zTz' : [-2.13, 0.3], # true value 2.14
-        # 'xTi' : [0.66, 0.3], # TODO Broaden, testing with small dist
-        # 'yTi' : [0.43, 0.3],
-        # 'zTi' : [0.55, 0.3],
+        # Values below correspond to Andreas' final values for the NV05_Hahn data set
+ #        'xTx' : [-2.85, 0.01], # true value 2.7
+ #        'yTy' : [-2.76, 0.01], # true value 2.7
+ #        'zTz' : [-2.13, 0.01], # true value 2.14
+ #        'xTi' : [0.66, 0.01], # TODO Broaden, testing with small dist
+ #        'yTi' : [0.43, 0.01],
+ #        'zTi' : [0.55, 0.01],
+
+
+        # Values below correspond to Andreas' final values for the NVB_Hahn data set
+#         'xTx' : [-2.85, 0.01], # true value 2.7
+#         'yTy' : [-2.76, 0.01], # true value 2.7
+#         'zTz' : [-2.13, 0.01], # true value 2.14
+#         'xTi' : [0.66, 0.01], # TODO Broaden, testing with small dist
+#         'yTi' : [0.43, 0.01],
+#         'zTi' : [0.55, 0.01],
     }
 else:
     prior_specific_terms = {}
@@ -314,6 +323,13 @@ if global_variables.qhl_test:
                 global_variables.plots_directory+
                 'qhl_volume_'+str(global_variables.long_id)+'.png')
             )
+
+        qmd.plotVolumeQHL(
+            save_to_file = str( 
+            global_variables.plots_directory+
+            'qhl_volume_'+str(global_variables.long_id)+'.png')
+        )
+
 
 elif global_variables.further_qhl == True:
     qmd.runMultipleModelQHL()
