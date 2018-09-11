@@ -10,7 +10,7 @@ import PlotQMD as ptq
 
 
 #This is a simple test comment
-
+"""
 def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
     import os, csv
     if not directory_name.endswith('/'):
@@ -40,7 +40,7 @@ def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
         for f in filenames:
             results = pickle.load(open(f, "rb"))
             writer.writerow(results)
-
+"""
 
 def parameter_sweep_analysis(directory_name, results_csv, save_to_file=None, use_log_times=False, use_percentage_models=False):
 
@@ -377,10 +377,17 @@ parser.add_argument(
   default=3
 )
 
+parser.add_argument(
+  '-qhl', '--qhl_mode', 
+  help="Whether QMD is being used in QHL mode.",
+  type=int,
+  default=0
+)
 
 arguments = parser.parse_args()
 directory_to_analyse = arguments.results_directory
 all_bayes_csv = arguments.bayes_csv
+qhl_mode = bool(arguments.qhl_mode)
 
 print("\nAnalysing and storing results in", directory_to_analyse)
 
@@ -388,79 +395,80 @@ print("\nAnalysing and storing results in", directory_to_analyse)
 if not directory_to_analyse.endswith('/'):
     directory_to_analyse += '/'
 
-plot_file = directory_to_analyse+'model_scores.png'
-
-model_scores = model_scores(directory_to_analyse)
-entropy = get_entropy(model_scores, inf_gain=False)
-inf_gain = get_entropy(model_scores, inf_gain=True)
-
-plot_scores(
-    scores = model_scores,
-    entropy = entropy, 
-    inf_gain = inf_gain, 
-    save_file = plot_file
-)
-
-ptq.plotTrueModelBayesFactors_IsingRotationTerms(
-    results_csv_path = all_bayes_csv,
-    save_to_file = str(directory_to_analyse+'true_model_bayes_comparisons.png')
-)
-
-
 results_csv_name = 'param_sweep.csv'
 results_csv = directory_to_analyse+results_csv_name
-summariseResultsCSV(
+ptq.summariseResultsCSV(
     directory_name=directory_to_analyse, 
     csv_name=results_csv
 )
 
-
-average_priors = average_parameters(
-    results_path=results_csv,
-    top_number_models = arguments.top_number_models 
-)
-pickle.dump(
-    average_priors,
-    open('average_priors.p', 'wb'), 
-    protocol=2
-)
-
-
-param_plot = str(directory_to_analyse+'param_analysis_total.png')
-param_percent_plot = str(directory_to_analyse+'param_analysis_percentage.png')
-
-parameter_sweep_analysis(
-    directory_name = directory_to_analyse, 
-    results_csv=results_csv, 
-    save_to_file=param_plot)
-parameter_sweep_analysis(
-    directory_name = directory_to_analyse,
-    results_csv=results_csv,
-    use_log_times=True,
-    use_percentage_models=True, 
-    save_to_file=param_percent_plot
-)
-
-
-try:
-    plot_tree_multi_QMD(results_csv = results_csv, 
-        all_bayes_csv = all_bayes_csv, 
-        entropy = entropy,
-        inf_gain = inf_gain,
-        save_to_file='multiQMD_tree.png'
+if qhl_mode==True:
+    r_squared_plot = str(directory_to_analyse + 'r_squared_QHL.png')
+    ptq.r_squared_plot(
+        results_csv_path = results_csv,
+        save_to_file = r_squared_plot
+    )
+else:
+    plot_file = directory_to_analyse+'model_scores.png'
+    model_scores = model_scores(directory_to_analyse)
+    entropy = get_entropy(model_scores, inf_gain=False)
+    inf_gain = get_entropy(model_scores, inf_gain=True)
+    plot_scores(
+        scores = model_scores,
+        entropy = entropy, 
+        inf_gain = inf_gain, 
+        save_file = plot_file
     )
 
-except NameError:
-    print("Can not plot multiQMD tree -- this might be because only \
-        one instance of QMD was performed. All other plots generated \
-        without error."
+    ptq.plotTrueModelBayesFactors_IsingRotationTerms(
+        results_csv_path = all_bayes_csv,
+        save_to_file = str(directory_to_analyse+'true_model_bayes_comparisons.png')
     )
 
-except ZeroDivisionError:
-    print("Can not plot multiQMD tree -- this might be because only \
-        one instance of QMD was performed. All other plots generated \
-        without error."
+    average_priors = average_parameters(
+        results_path=results_csv,
+        top_number_models = arguments.top_number_models 
     )
+    pickle.dump(
+        average_priors,
+        open('average_priors.p', 'wb'), 
+        protocol=2
+    )
+    param_plot = str(directory_to_analyse+'param_analysis_total.png')
+    param_percent_plot = str(directory_to_analyse+'param_analysis_percentage.png')
+
+    parameter_sweep_analysis(
+        directory_name = directory_to_analyse, 
+        results_csv=results_csv, 
+        save_to_file=param_plot)
+    parameter_sweep_analysis(
+        directory_name = directory_to_analyse,
+        results_csv=results_csv,
+        use_log_times=True,
+        use_percentage_models=True, 
+        save_to_file=param_percent_plot
+    )
+
+
+    try:
+        plot_tree_multi_QMD(results_csv = results_csv, 
+            all_bayes_csv = all_bayes_csv, 
+            entropy = entropy,
+            inf_gain = inf_gain,
+            save_to_file='multiQMD_tree.png'
+        )
+
+    except NameError:
+        print("Can not plot multiQMD tree -- this might be because only \
+            one instance of QMD was performed. All other plots generated \
+            without error."
+        )
+
+    except ZeroDivisionError:
+        print("Can not plot multiQMD tree -- this might be because only \
+            one instance of QMD was performed. All other plots generated \
+            without error."
+        )
 
 
 

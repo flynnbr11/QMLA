@@ -16,7 +16,7 @@ import pickle
 pickle.HIGHEST_PROTOCOL = 2
 sys.path.append(os.path.join("..", "Libraries","QML_lib"))
 
-## Parse input variables to use in QMD 
+## Parse input variables to use in QMD; store in class global_variables. 
 import GlobalVariables
 global_variables = GlobalVariables.parse_cmd_line_args(sys.argv[1:])
 
@@ -110,8 +110,6 @@ exp_vals = [ experimental_measurements_dict[k] for k in exp_times ]
 
 initial_op_list = ['xTi', 'yTi', 'zTi']
 
-
-
 true_op = global_variables.true_operator
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 num_params = len(true_op_list)
@@ -136,11 +134,9 @@ else: # i.e. purely random true parameters
         true_params.append(random.uniform(0,2))
 
 log_print(
-    ["True params:", true_params
-    ], 
+    ["True params:", true_params], 
     log_file
 )
-
 
 if global_variables.custom_prior:
 
@@ -277,7 +273,6 @@ qmd = QMD(
     log_file = global_variables.log_file
 )
 
-
 if global_variables.qhl_test:
     qmd.runQHLTest()
 
@@ -315,20 +310,41 @@ if global_variables.qhl_test:
             'qhl_expec_values_'+str(global_variables.long_id)+'.png')
         )
 
-
-
-        if DataBase.num_parameters_from_name(qmd.TrueOpName) == 1:
-            qmd.plotVolumeQHL(
-                save_to_file = str( 
-                global_variables.plots_directory+
-                'qhl_volume_'+str(global_variables.long_id)+'.png')
-            )
-
         qmd.plotVolumeQHL(
             save_to_file = str( 
             global_variables.plots_directory+
             'qhl_volume_'+str(global_variables.long_id)+'.png')
         )
+
+        true_mod_instance = qmd.reducedModelInstanceFromID(
+            qmd.TrueOpModelID
+        )
+        r_squared = (
+            true_mod_instance.r_squared()
+        )
+        """
+        import csv 
+        metrics = {
+            LatexConfig : qmd.LatexConfig,
+            r_squared : r_squared
+        }
+
+        metrics_file = str(
+            global_variables.results_directory
+            + 'metrics.csv'
+        )
+        metrics_record = str(qmd.LatexConfig + ',' + str(r_squared))
+        metrics_fields = list(metrics.keys())
+
+        # TODO write metrics file
+        """
+        results_file = global_variables.results_file
+        pickle.dump(
+            qmd.ResultsDict,
+            open(results_file, "wb"), 
+            protocol=2
+        )
+
 
 
 elif global_variables.further_qhl == True:
@@ -352,8 +368,6 @@ elif global_variables.further_qhl == True:
             'further_qhl_parameter_estimates_'+ str(mod_name) +
             '.png')
         )
-
-
 
 else:
     qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD

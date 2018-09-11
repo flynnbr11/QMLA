@@ -272,6 +272,22 @@ class QMD():
         else: 
             self.QLE_Type = 'IQLE'
     
+        num_exp_ham = (
+            self.NumParticles * 
+            (self.NumExperiments + self.NumTimesForBayesUpdates)
+        )
+        latex_config = str( 
+            '$P_{'+str(self.NumParticles) +
+            '}E_{' + str(self.NumExperiments) +
+            '}B_{' + str( self.NumTimesForBayesUpdates)  +
+            '}RT_{' + str(self.ResampleThreshold) +
+            '}RA_{' + str(self.ResamplerA) +
+            '}RP_{' + str(self.PGHPrefactor) +
+            '}H_{' + str(num_exp_ham) + 
+            '}$'
+            )
+        self.LatexConfig = latex_config
+
         self.QMDInfo = {
             # may need to take copies of these in case pointers accross nodes break
             'num_probes' : self.NumProbes,
@@ -1275,8 +1291,26 @@ class QMD():
         mod = self.reducedModelInstanceFromID(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
         mod.updateLearnedValues()
-#        self.updateDataBaseModelValues()
+
+
         #TODO write single QHL test
+        time_now = time.time()
+        time_taken = time_now - self.StartingTime
+        true_model_r_squared = self.reducedModelInstanceFromID(self.TrueOpModelID).r_squared()
+
+        self.ResultsDict = {
+            'NumParticles' : self.NumParticles,
+            'NumExperiments' : self.NumExperiments,
+            'NumBayesTimes' : self.NumTimesForBayesUpdates,
+            'ResampleThreshold' : self.ResampleThreshold,
+            'ResamplerA' : self.ResamplerA,
+            'PHGPrefactor' : self.PGHPrefactor,
+            'ConfigLatex' : self.LatexConfig,       
+            'Time': time_taken,
+            'QID' : self.Q_id,
+            'RSquaredTrueModel' : true_model_r_squared
+        }
+
 
 
 
@@ -1476,17 +1510,6 @@ class QMD():
             '_rp' + str(self.PGHPrefactor)
             )
 
-        latex_config = str( 
-            '$P_{'+str(self.NumParticles) +
-            '}E_{' + str(self.NumExperiments) +
-            '}B_{' + str( self.NumTimesForBayesUpdates)  +
-            '}RT_{' + str(self.ResampleThreshold) +
-            '}RA_{' + str(self.ResamplerA) +
-            '}RP_{' + str(self.PGHPrefactor) +
-            '}H_{' + str(num_exp_ham) + 
-            '}$'
-            )
-
         time_now = time.time()
         time_taken = time_now - self.StartingTime
         
@@ -1503,7 +1526,7 @@ class QMD():
             'PHGPrefactor' : self.PGHPrefactor,
             'LogFile' : self.log_file,
             'ParamConfiguration' : config,
-            'ConfigLatex' : latex_config,       
+            'ConfigLatex' : self.LatexConfig,       
             'Time': time_taken,
             'QID' : self.Q_id,
             'CorrectModel' : correct_model,

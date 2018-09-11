@@ -21,6 +21,8 @@ __pycache__/
 *.conf
 *~
 *.rdb
+*conflicted*
+
 
 # But want redis configuration:
 !Libraries/QML_lib/RedisConfig.conf

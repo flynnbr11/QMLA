@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import networkx as nx
+import pickle
 import matplotlib.pyplot as plt
 from matplotlib import collections
 from matplotlib import ticker
@@ -22,6 +23,7 @@ from matplotlib.path import Path
 from matplotlib.spines import Spine
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.projections import register_projection
+
 
 #from QMD import  *
 #from QML import *
@@ -756,6 +758,119 @@ def plotDistributionProgressionQML(
     plt.title(title)
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
+
+def r_squared_plot(
+    results_csv_path=None,
+    save_to_file=None
+):
+    # For use in QHL parameter sweep
+    qhl_results = pd.DataFrame.from_csv(results_csv_path, index_col='ConfigLatex')
+
+    piv = pd.pivot_table(qhl_results, 
+        values=[ 'Time', 'RSquaredTrueModel'], 
+        index=['ConfigLatex'], 
+        aggfunc={
+            'Time':[np.mean, np.median, min, max], 
+            'RSquaredTrueModel' : [np.median, np.mean] 
+        }
+    )
+
+    time_means = list(piv['Time']['mean'])
+    time_mins = list(piv['Time']['min'])
+    time_maxs = list(piv['Time']['max'])
+    time_medians = list(piv['Time']['median'])
+
+    r_squared_medians = list(piv['RSquaredTrueModel']['median'])
+    r_squared_means = list(piv['RSquaredTrueModel']['mean'])
+    num_models = len(time_medians)
+    configs = piv.index.tolist()
+
+
+    plt.clf()
+    fig, ax = plt.subplots()
+    if num_models <= 5 :
+        plot_height = num_models
+    else:
+        plot_height = num_models/2
+
+    fig.set_figheight(plot_height)
+    #fig.set_figwidth(num_models/4)
+
+    ax2 = ax.twiny()
+    width = 0.5 # the width of the bars 
+    ind = np.arange(len(r_squared_medians))  # the x locations for the groups
+    use_log_times=False
+    time_colour='b'
+    if use_log_times:
+        times_to_use = [np.log10(t) for t in time_medians]
+        ax2.set_xlabel('Time ($log_{10}$ seconds)')
+    else:
+        times_to_use = time_medians
+        ax2.set_xlabel('Median Time (seconds)')
+
+    ax2.barh(ind, times_to_use, width/4, color=time_colour, label='Time')
+
+    times_to_mark = [60,600, 3600, 14400, 36000]
+    if use_log_times:
+        times_to_mark = [np.log10(t) for t in times_to_mark]
+
+    max_time = max(times_to_use)
+    for t in times_to_mark:
+        if t < max_time:
+            ax2.axvline(x=t, color=time_colour)
+
+    ax.barh(ind, r_squared_medians, width, color='grey', align='center', 
+        label='$R^2$'
+    )
+    #    ax.axvline(x=max_x/2, color='g', label='50% Models correct')   
+    ax.set_yticks(ind)
+    ax.set_yticklabels(configs, minor=False)
+    ax.set_ylabel('Configurations')
+    ax.set_xlim(min(r_squared_medians)-0.2, 1)
+    ax.axvline(0, label='$R^2=0$')
+
+    lines, labels = ax.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(lines + lines2, labels + labels2, loc='upper center',
+        bbox_to_anchor=(0.5, -0.2), ncol=2
+    )
+    
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
+
+def summariseResultsCSV(
+    directory_name, 
+    csv_name='all_results.csv'
+):
+    import os, csv
+    if not directory_name.endswith('/'):
+        directory_name += '/'
+
+    if not csv_name.endswith('.csv'):
+        csv_name += '.csv'
+        
+    pickled_files = []
+    for file in os.listdir(directory_name):
+        if file.endswith(".p") and file.startswith("results"):
+            pickled_files.append(file)
+
+    filenames = [directory_name+str(f) for f in pickled_files ]
+    some_results = pickle.load(open(filenames[0], "rb"))
+    result_fields = list(some_results.keys())
+    
+    
+#    results_csv = str(directory_name+str(csv_name))
+    results_csv = str(csv_name)
+
+    
+    with open(results_csv, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=result_fields)
+        writer.writeheader()
+
+        for f in filenames:
+            results = pickle.load(open(f, "rb"))
+            writer.writerow(results)
 
 
 
