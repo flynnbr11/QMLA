@@ -145,28 +145,20 @@ if global_variables.custom_prior:
         'xTz' : [0.0,0.0001],
         'yTz' : [0.0,0.0001],
         # Values below correspond to simulated data
-        # 'xTx' : [2.0, 1.0], # true value 2.7
-        # 'yTy' : [2.0, 1.0], # true value 2.7
-        # 'zTz' : [2.0, 1.0], # true value 2.14
-        # 'xTi' : [1.0, 0.5], # TODO Broaden, testing with small dist
-        # 'yTi' : [1.0, 0.5],
-        # 'zTi' : [1.0, 0.5],
+        'xTx' : [-2.0, 1.0], # true value 2.7
+        'yTy' : [-2.0, 1.0], # true value 2.7
+        'zTz' : [-2.0, 1.0], # true value 2.14
+        'xTi' : [0.5, 1.0], # TODO Broaden, testing with small dist
+        'yTi' : [0.5, 1.0],
+        'zTi' : [0.5, 1.0],
 
         # Values below correspond to Andreas' inital QMD values for this data set
-        'xTx' : [-2.0, 0.5], # true value 2.7
-        'yTy' : [-2.0, 0.5], # true value 2.7
-        'zTz' : [-2.0, 0.5], # true value 2.14
-        'xTi' : [0.5, 0.5], # TODO Broaden, testing with small dist
-        'yTi' : [0.5, 0.5],
-        'zTi' : [0.5, 0.5],
-
-        # Values below correspond to Andreas' final values for the NV05_Hahn data set
- #        'xTx' : [-2.85, 0.01], # true value 2.7
- #        'yTy' : [-2.76, 0.01], # true value 2.7
- #        'zTz' : [-2.13, 0.01], # true value 2.14
- #        'xTi' : [0.66, 0.01], # TODO Broaden, testing with small dist
- #        'yTi' : [0.43, 0.01],
- #        'zTi' : [0.55, 0.01],
+#        'xTx' : [-1.59329862 , 0.19606237], # true value 2.7
+#        'yTy' : [-1.8172416  , 0.13556748], # true value 2.7
+#        'zTz' : [-3.14796181  ,0.02902302], # true value 2.14
+#        'xTi' : [ 0.33645139 , 0.09620414], # TODO Broaden, testing with small dist
+#        'yTi' : [ 0.66585614 , 0.07126715],
+#        'zTi' : [ 0.34865298  , 0.05232437],
 
 
         # Values below correspond to Andreas' final values for the NVB_Hahn data set

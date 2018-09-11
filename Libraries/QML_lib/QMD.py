@@ -1286,7 +1286,9 @@ class QMD():
             blocking=True
         )
                 
-        mod_id = DB.model_id_from_name(db=self.db, name=mod_to_learn)
+        mod_id = DB.model_id_from_name(
+            db=self.db, 
+            name=mod_to_learn)
         self.log_print(["Learned:", mod_to_learn, ". ID=", mod_id])
         mod = self.reducedModelInstanceFromID(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
@@ -1296,7 +1298,7 @@ class QMD():
         #TODO write single QHL test
         time_now = time.time()
         time_taken = time_now - self.StartingTime
-        true_model_r_squared = self.reducedModelInstanceFromID(self.TrueOpModelID).r_squared()
+#        true_model_r_squared = self.reducedModelInstanceFromID(self.TrueOpModelID).r_squared()
 
         self.ResultsDict = {
             'NumParticles' : self.NumParticles,
@@ -1308,7 +1310,9 @@ class QMD():
             'ConfigLatex' : self.LatexConfig,       
             'Time': time_taken,
             'QID' : self.Q_id,
-            'RSquaredTrueModel' : true_model_r_squared
+            'RSquaredTrueModel' : mod.r_squared(),
+            'NameAlphabetical' : DataBase.alph(mod.Name),
+            'LearnedParameters' : mod.LearnedParameters
         }
 
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=2
+num_tests=3
 let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)
@@ -26,19 +26,22 @@ declare -a qhl_operators=(
     $true_operator
 )
 qhl_test=1
-do_further_qhl=0
-top_number_models=3
+do_further_qhl=1
+top_number_models=1
 q_id=0
 exp_data=1
 use_rq=0
-prt=16
-exp=10
-further_qhl_factor=1
+prt=20
+exp=8
+further_qhl_factor=2
+use_rq=0
 if (($prt > 50)) || (($exp > 10)) || (( $qhl_test == 0 ))
 then
     use_rq=1
+else
+    use_rq=0
 fi
-use_rq=0
+# use_rq=0
 let bt="$exp-1"
 pgh=0.3
 ra=0.8
@@ -46,8 +49,9 @@ rt=0.5
 gaussian=1
 custom_prior=1
 #dataset='NVB_HahnPeaks_Newdata'
-dataset='NV05_HahnPeaks_expdataset'
-data_max_time=3500 # nanoseconds
+dataset='NV05_HahnEcho02'
+#dataset='NV05_HahnPeaks_expdataset'
+data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
 
 
@@ -55,10 +59,8 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Launch $num_tests instances of QMD 
 
 declare -a particle_counts=(
-10
-20
+$prt
 )
-
 for prt in  "${particle_counts[@]}";
 do
     for i in `seq 1 $max_qmd_id`;
@@ -74,14 +76,15 @@ do
             -exp=$exp_data -cpr=$custom_prior \
             -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
     done
-done 
+done
+
 # Analyse results of QMD. (Only after QMD, not QHL).
 python3 ../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -dir=$long_dir --bayes_csv=$bayes_csv \
     -top=$top_number_models -qhl=$qhl_test
 
 
-if (( $do_further_qhl == 1 ))
+if (( $do_further_qhl == 1 )) 
 then
     redis-cli flushall 
     let particles="$further_qhl_factor * $prt"

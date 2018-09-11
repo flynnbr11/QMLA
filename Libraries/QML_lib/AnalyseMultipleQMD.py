@@ -395,12 +395,26 @@ print("\nAnalysing and storing results in", directory_to_analyse)
 if not directory_to_analyse.endswith('/'):
     directory_to_analyse += '/'
 
-results_csv_name = 'param_sweep.csv'
+results_csv_name = 'summary_results.csv'
 results_csv = directory_to_analyse+results_csv_name
 ptq.summariseResultsCSV(
     directory_name=directory_to_analyse, 
     csv_name=results_csv
 )
+
+average_priors = average_parameters(
+    results_path=results_csv,
+    top_number_models = arguments.top_number_models 
+)
+
+avg_priors =str(directory_to_analyse+'average_priors.p')
+
+pickle.dump(
+    average_priors,
+    open(avg_priors, 'wb'), 
+    protocol=2
+)
+
 
 if qhl_mode==True:
     r_squared_plot = str(directory_to_analyse + 'r_squared_QHL.png')
@@ -425,15 +439,6 @@ else:
         save_to_file = str(directory_to_analyse+'true_model_bayes_comparisons.png')
     )
 
-    average_priors = average_parameters(
-        results_path=results_csv,
-        top_number_models = arguments.top_number_models 
-    )
-    pickle.dump(
-        average_priors,
-        open('average_priors.p', 'wb'), 
-        protocol=2
-    )
     param_plot = str(directory_to_analyse+'param_analysis_total.png')
     param_percent_plot = str(directory_to_analyse+'param_analysis_percentage.png')
 

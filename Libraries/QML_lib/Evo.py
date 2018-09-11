@@ -392,14 +392,24 @@ def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
         [0.+0.j, 0.+0.j, 0.+1.j, 0.+0.j],
         [0.+0.j, 0.+0.j, 0.+0.j, 0.+1.j]]
     )
+    even_time_split = False
+    if even_time_split:
 
-    unitary_time_evolution = h.exp_ham(ham, t)
+        unitary_time_evolution = h.exp_ham(ham, t)
 
-    total_evolution = np.dot(
-        unitary_time_evolution,
-        np.dot(inversion_gate,
-              unitary_time_evolution)
-    )
+        total_evolution = np.dot(
+            unitary_time_evolution,
+            np.dot(inversion_gate,
+                  unitary_time_evolution)
+        )
+    else:
+        first_unitary_time_evolution = h.exp_ham(ham, t)
+        second_unitary_time_evolution = h.exp_ham(ham, 2*t)
+        total_evolution = np.dot(
+            second_unitary_time_evolution,
+            np.dot(inversion_gate,
+                  first_unitary_time_evolution)
+        )
 
 
 #    print("total ev:\n", total_evolution)
