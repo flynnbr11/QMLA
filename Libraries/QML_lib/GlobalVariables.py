@@ -1,5 +1,6 @@
 import argparse
-import os, sys
+import os
+import sys
 import pickle 
 
 """
@@ -26,6 +27,30 @@ def get_directory_name_by_time(just_date=False):
         return name
     else: 
         return str(date+'/')
+
+def time_seconds():
+    import datetime
+    now =  datetime.date.today()
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    second = datetime.datetime.now().second
+    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    return time
+
+
+def log_print(to_print_list, log_file):
+    identifier = str(str(time_seconds()) +" [GLOBAL VARIABLES]")
+    if type(to_print_list)!=list:
+        to_print_list = list(to_print_list)
+
+    print_strings = [str(s) for s in to_print_list]
+    to_print = " ".join(print_strings)
+    with open(log_file, 'a') as write_log_file:
+        print(identifier, 
+            str(to_print),
+            file=write_log_file,
+            flush=True
+        )
 
 
 default_host_name = 'localhost'
@@ -493,6 +518,17 @@ def parse_cmd_line_args(args):
         data_time_offset = data_time_offset,
         growth_generation_rule = growth_generation_rule
     )
+
+    args_dict = vars(arguments)
+    for a in list(args_dict.keys()):
+      log_print(
+        [
+        a, 
+        ':', 
+        args_dict[a]
+        ],
+        log_file = global_variables.log_file
+      )
 
     return global_variables
 
