@@ -1,7 +1,7 @@
 #!/bin/bash
 
-test_description="QHL, non-Gaussian 5000prt;1500exp"
-num_tests=3
+test_description="qmd_runs"
+num_tests=1
 let max_qmd_id="$num_tests"
 
 day_time=$(date +%b_%d/%H_%M)
@@ -25,17 +25,19 @@ true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 declare -a qhl_operators=(
     $true_operator
 )
-qhl_test=1
+qhl_test=0
 do_further_qhl=1
 top_number_models=1
 q_id=0
 exp_data=1
+#growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 use_rq=0
 prt=20
 exp=8
 further_qhl_factor=2
 use_rq=0
-if (($prt > 50)) || (($exp > 10)) || (( $qhl_test == 0 ))
+if (($prt > 50)) || (($exp > 10)) || (( $qhl_test == 1 ))
 then
     use_rq=1
 else
@@ -74,7 +76,8 @@ do
             -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
             -exp=$exp_data -cpr=$custom_prior \
-            -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
+            -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
+            -ggr=$growth_rule
     done
 done
 
@@ -86,6 +89,7 @@ python3 ../Libraries/QML_lib/AnalyseMultipleQMD.py \
 
 if (( $do_further_qhl == 1 )) 
 then
+    pgh=0.5 # train on different set of data
     redis-cli flushall 
     let particles="$further_qhl_factor * $prt"
     let experiments="$further_qhl_factor * $exp"
@@ -98,6 +102,7 @@ then
         -dir=$long_dir -qid=$q_id -pt=1 -pkl=0 \
         -log=$this_log -cb=$bayes_csv \
         -exp=$exp_data -cpr=$custom_prior \
-        -ds=$dataset -dst=$data_max_time -dto=$data_time_offset
+        -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
+        -ggr=$growth_rule
 fi
 

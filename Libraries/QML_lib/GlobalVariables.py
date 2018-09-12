@@ -65,6 +65,7 @@ default_further_qhl = 0
 default_dataset = 'NV_HahnPeaks_expdataset'
 default_data_max_useful_time = 2000 # nanoseconds
 default_data_time_offset = 180 # nanoseconds
+default_growth_generation_rule = 'two_qubit_ising_rotation_hyperfine'
 
 class GlobalVariablesClass():
     def __init__(
@@ -102,8 +103,8 @@ class GlobalVariablesClass():
         experimental_data = default_experimental_data,
         dataset = default_dataset,
         data_max_time = default_data_max_useful_time,
-        data_time_offset = default_data_time_offset
-
+        data_time_offset = default_data_time_offset,
+        growth_generation_rule = default_growth_generation_rule
     ):
         self.true_operator = true_operator
         self.qhl_test = qhl_test
@@ -141,7 +142,7 @@ class GlobalVariablesClass():
         self.dataset = dataset
         self.data_time_offset = data_time_offset
         self.data_max_time = data_max_time 
-
+        self.growth_generation_rule = growth_generation_rule
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -406,6 +407,15 @@ def parse_cmd_line_args(args):
       default=default_data_time_offset
     )
 
+    parser.add_argument(
+      '-ggr', '--growth_generation_rule',
+      help='Rule applied for generation of new models during QMD. \
+        Corresponding functions must be built into ModelGeneration',
+      type=str,
+      default=default_growth_generation_rule
+    )
+
+
     # Process arguments from command line
     arguments = parser.parse_args(args)
     
@@ -444,7 +454,8 @@ def parse_cmd_line_args(args):
     dataset = arguments.dataset
     data_max_time = arguments.dataset_max_time    
     data_time_offset = arguments.data_time_offset
-    
+    growth_generation_rule = arguments.growth_generation_rule
+
     # Use arguments to initialise global variables class. 
     global_variables = GlobalVariablesClass(
         true_operator = true_operator,
@@ -479,7 +490,8 @@ def parse_cmd_line_args(args):
         experimental_data = use_experimental_data,
         dataset = dataset,
         data_max_time = data_max_time,
-        data_time_offset = data_time_offset
+        data_time_offset = data_time_offset,
+        growth_generation_rule = growth_generation_rule
     )
 
     return global_variables
