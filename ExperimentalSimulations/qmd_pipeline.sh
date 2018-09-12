@@ -1,9 +1,40 @@
 #!/bin/bash
 
 test_description="qmd_runs"
-num_tests=1
-let max_qmd_id="$num_tests"
 
+### ---------------------------------------------------###
+# Running QMD essentials
+### ---------------------------------------------------###
+num_tests=1
+qhl_test=1
+do_further_qhl=0
+
+### ---------------------------------------------------###
+# QHL parameters
+### ---------------------------------------------------###
+prt=10
+exp=2
+pgh=0.3
+ra=0.8
+rt=0.5
+gaussian=1
+
+### ---------------------------------------------------###
+# QMD settings
+### ---------------------------------------------------###
+exp_data=1
+growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# growth_rule='two_qubit_ising_rotation_hyperfine'
+use_rq=0
+further_qhl_factor=2
+use_rq=0
+number_best_models_further_qhl=1
+
+### ---------------------------------------------------###
+# Everything from here downwards uses the parameters
+# defined above to run QMD. 
+### ---------------------------------------------------###
+let max_qmd_id="$num_tests"
 day_time=$(date +%b_%d/%H_%M)
 directory="$day_time/"
 
@@ -14,45 +45,29 @@ bayes_csv="$long_dir$bcsv"
 
 this_log="$long_dir/qmd.log"
 furhter_qhl_log="$long_dir/qhl_further.log"
-
-# rm -r $long_dir
-# rm $this_log
 mkdir -p $long_dir
-#mkdir -p $directory
-
 
 true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 declare -a qhl_operators=(
     $true_operator
 )
-qhl_test=0
-do_further_qhl=1
-top_number_models=1
+declare -a particle_counts=(
+$prt
+)
 q_id=0
-exp_data=1
-#growth_rule='two_qubit_ising_rotation_hyperfine'
-growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-use_rq=0
-prt=20
-exp=8
-further_qhl_factor=2
-use_rq=0
+"""
 if (($prt > 50)) || (($exp > 10)) || (( $qhl_test == 1 ))
 then
     use_rq=1
 else
     use_rq=0
 fi
+"""
 # use_rq=0
 let bt="$exp-1"
-pgh=0.3
-ra=0.8
-rt=0.5
-gaussian=1
 custom_prior=1
-#dataset='NVB_HahnPeaks_Newdata'
-dataset='NV05_HahnEcho02'
-#dataset='NV05_HahnPeaks_expdataset'
+dataset='NVB_HahnPeaks_Newdata'
+#dataset='NV05_HahnEcho02'
 data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
 
@@ -60,9 +75,6 @@ data_time_offset=205 # nanoseconds
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Launch $num_tests instances of QMD 
 
-declare -a particle_counts=(
-$prt
-)
 for prt in  "${particle_counts[@]}";
 do
     for i in `seq 1 $max_qmd_id`;
@@ -84,7 +96,7 @@ done
 # Analyse results of QMD. (Only after QMD, not QHL).
 python3 ../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -dir=$long_dir --bayes_csv=$bayes_csv \
-    -top=$top_number_models -qhl=$qhl_test
+    -top=$number_best_models_further_qhl -qhl=$qhl_test
 
 
 if (( $do_further_qhl == 1 )) 
@@ -98,7 +110,7 @@ then
         -fq=$do_further_qhl \
         -p=$particles -e=$experiments -bt=$bt \
         -rq=$use_rq -g=$gaussian -qhl=0 \
-        -ra=$ra -rt=$rt -pgh=$pgh \
+        -ra=$ra -rt=$rt -pgh=1.0 \
         -dir=$long_dir -qid=$q_id -pt=1 -pkl=0 \
         -log=$this_log -cb=$bayes_csv \
         -exp=$exp_data -cpr=$custom_prior \

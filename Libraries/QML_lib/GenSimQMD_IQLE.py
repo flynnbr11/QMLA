@@ -82,6 +82,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self.QLE = qle
         self._trotter = trotter
         self._modelparams = modelparams
+        self.signs_of_inital_params = np.sign(modelparams)
         self._true_oplist = true_oplist
         self._trueparams = trueparams
         self._truename = truename
@@ -165,8 +166,18 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     ## METHODS ##
 
     def are_models_valid(self, modelparams):
-        return np.all(np.abs(modelparams) > self._min_freq, axis=1)
-    
+        # Before setting new distribution after resampling, 
+        # checks that all parameters have same sign as the 
+        # initial given parameter for that term. 
+        # Otherwise, redraws the distribution. 
+ #       validity = np.all(np.abs(modelparams) > self._min_freq, axis=1)
+        new_signs = np.sign(modelparams)
+        validity_by_signs=np.all(
+            np.sign(modelparams) == self.signs_of_inital_params,
+            axis=1
+        )
+        return validity_by_signs
+
     def n_outcomes(self, expparams):
         """
         Returns an array of dtype ``uint`` describing the number of outcomes

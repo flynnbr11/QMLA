@@ -239,7 +239,7 @@ def log_likelihood(model, times, binning=False):
         exp = get_exp(model, [times[i]])
     #    print("exp:", exp)
         params_array = np.array([[model.TrueParams[0]]]) # TODO this will cause an error for multiple parameters
-        datum = updater.model.simulate_experiment(params_array, exp, repeat=100)
+        datum = updater.model.simulate_experiment(params_array, exp, repeat=1)
         sum_data += datum   
         updater.update(datum, exp)
 

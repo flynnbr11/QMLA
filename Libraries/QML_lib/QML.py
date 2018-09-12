@@ -287,7 +287,7 @@ class ModelLearningClass():
             self.Datum = self.GenSimModel.simulate_experiment(
                 self.SimParams,
                 self.Experiment,
-                repeat=100
+                repeat=1
             ) # TODO reconsider repeat number
             after_datum = time.time()
             self.datum_gather_cumulative_time+=after_datum-before_datum

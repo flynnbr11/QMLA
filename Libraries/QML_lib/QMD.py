@@ -322,6 +322,7 @@ class QMD():
             'model_priors' : model_priors
         }
         
+        self.log_print(['Specific terms for prior', prior_specific_terms])
         self.log_print(["RunParallel=", self.RunParallel])
         compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
         compressed_probe_dict = pickle.dumps(self.ProbeDict, protocol=2)

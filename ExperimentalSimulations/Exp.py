@@ -136,16 +136,28 @@ log_print(
 if global_variables.custom_prior:
 
     prior_specific_terms = {
-        'xTy' : [0.0,1.0],
-        'xTz' : [0.0,1.0],
-        'yTz' : [0.0,1.0],
+        'xTy' : [1.0, 0.5],
+        'xTz' : [1.0, 0.5],
+        'yTz' : [1.0, 0.5],
         # Values below correspond to simulated data
-        'xTx' : [-2.0, 1.0], # true value 2.7
-        'yTy' : [-2.0, 1.0], # true value 2.7
-        'zTz' : [-2.0, 1.0], # true value 2.14
-        'xTi' : [0.5, 1.0], # TODO Broaden, testing with small dist
-        'yTi' : [0.5, 1.0],
-        'zTi' : [0.5, 1.0],
+        'xTx' : [-0.04, 0.01], # true value 2.7
+        'yTy' : [0.03, 0.01], # true value 2.7
+        'zTz' : [-1.94, 0.01], # true value 2.14
+        'xTi' : [0.17, 0.01], # TODO Broaden, testing with small dist
+        'yTi' : [0.77, 0.01],
+        'zTi' : [-0.08, 0.01],
+
+
+        # 'xTy' : [1.0, 0.5],
+        # 'xTz' : [1.0, 0.5],
+        # 'yTz' : [1.0, 0.5],
+        # # Values below correspond to simulated data
+        # 'xTx' : [-3.0, 0.3], # true value 2.7
+        # 'yTy' : [-3.0, 0.3], # true value 2.7
+        # 'zTz' : [-2.1, 0.3], # true value 2.14
+        # 'xTi' : [1.0, 0.5], # TODO Broaden, testing with small dist
+        # 'yTi' : [1.0, 0.5],
+        # 'zTi' : [1.0, 0.5],
 
         # Values below correspond to Andreas' inital QMD values for this data set
 #        'xTx' : [-1.59329862 , 0.19606237], # true value 2.7
@@ -169,7 +181,6 @@ else:
 
 model_priors = None
 
-qhl_extension = True
 if global_variables.further_qhl == True:
 
     qmd_results_model_scores_csv = str(
@@ -182,12 +193,10 @@ if global_variables.further_qhl == True:
             'rb'
         )
     )
-    """
     log_print(
-        ["model_priors:\n", model_priors],
+        ["Futher QHL. Model_priors:\n", model_priors],
         log_file 
     )
-    """
     initial_op_list = list(model_priors.keys())
 
 
@@ -451,7 +460,8 @@ else:
     log_print(["END: QMD id", global_variables.qmd_id, ":",
         global_variables.num_particles, " particles;",
         global_variables.num_experiments, "exp; ", 
-        global_variables.num_times_bayes, "bayes. Time:", end-start
+        global_variables.num_times_bayes, 
+        "bayes. Time:", end-start
         ], 
         log_file
     )

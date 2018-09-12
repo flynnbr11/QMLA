@@ -6,7 +6,7 @@ import os as os
 import sys as sys 
 import pandas as pd
 import warnings
-warnings.filterwarnings("ignore")
+# warnings.filterwarnings("ignore")
 import time as time
 import random
 from psutil import virtual_memory
@@ -124,16 +124,33 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
         probe_dict=probe_dict, qid=qid, log_file=log_file, modelID=modelID
     )
 
-    sim_pars = []
-    num_pars = op.num_constituents
-    if num_pars ==1 : #TODO Remove this fixing the prior
-      normal_dist=NormalDistribution(mean=true_params[0], var=0.1)
-    else:  
-      normal_dist = MultiVariateNormalDistributionNocov(num_pars)
-    
-    for j in range(op.num_constituents):
-      sim_pars.append(normal_dist.sample()[0,0])
-      
+    random_sim_pars=False
+    if random_sim_pars:
+        sim_pars = []
+        num_pars = op.num_constituents
+        if num_pars ==1 : #TODO Remove this fixing the prior
+            normal_dist=NormalDistribution(mean=true_params[0], var=0.1)
+        else:  
+            normal_dist = MultiVariateNormalDistributionNocov(num_pars)
+
+    else:
+        
+        model_priors = qmd_info['model_priors']
+        if (
+            model_priors is not None
+            and
+            DataBase.alph(name) in list(model_priors.keys())
+        ):
+            prior_specific_terms = model_priors[name] 
+        else:
+            prior_specific_terms = qmd_info['prior_specific_terms']
+
+        sim_pars = []
+        constituent_terms = DataBase.get_constituent_names_from_name(name)
+        for term in op.constituents_names:
+                initial_prior_centre = prior_specific_terms[term][0]
+                sim_pars.append(initial_prior_centre)
+
     # add model_db_new_row to model_db and running_database
     # Note: do NOT use pd.df.append() as this copies total DB,
     # appends and returns copy.
