@@ -94,19 +94,14 @@ else:
     expec_val_plot_max_time = 200    
 
 for t in list(experimental_measurements_dict.keys()):
-    # Shift t-values by 180ns so t=0 corresponds to Pr(0)=1
+    # Shift t-values by offset so t=0 corresponds to Pr(0)=1
     # Convert t from ns to ms; remove old records
 
     new_time = (t - global_variables.data_time_offset)/1000
     msmt = experimental_measurements_dict[t]
     experimental_measurements_dict.pop(t)
     experimental_measurements_dict[new_time] = msmt
-#    experimental_measurements_dict[new_time] = 1-msmt
 
-
-plt.clf()
-exp_times = sorted(experimental_measurements_dict.keys())
-exp_vals = [ experimental_measurements_dict[k] for k in exp_times ]
 
 initial_op_list = ['xTi', 'yTi', 'zTi']
 
@@ -141,9 +136,9 @@ log_print(
 if global_variables.custom_prior:
 
     prior_specific_terms = {
-        'xTy' : [0.0,0.0001],
-        'xTz' : [0.0,0.0001],
-        'yTz' : [0.0,0.0001],
+        'xTy' : [0.0,1.0],
+        'xTz' : [0.0,1.0],
+        'yTz' : [0.0,1.0],
         # Values below correspond to simulated data
         'xTx' : [-2.0, 1.0], # true value 2.7
         'yTy' : [-2.0, 1.0], # true value 2.7
@@ -184,7 +179,6 @@ if global_variables.further_qhl == True:
     model_priors = pickle.load(
         open(
             qmd_results_model_scores_csv,
-#            '/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Results/Sep_04/15_20/average_priors.p', 
             'rb'
         )
     )
