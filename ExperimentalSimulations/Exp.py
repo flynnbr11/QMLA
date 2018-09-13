@@ -140,13 +140,22 @@ if global_variables.custom_prior:
         'xTy' : [1.0, 0.5],
         'xTz' : [1.0, 0.5],
         'yTz' : [1.0, 0.5],
-        # Values below correspond to simulated data
-        'xTx' : [-1.5, 1.0], # true value 2.7
-        'yTy' : [-1.5, 1.0], # true value 2.7
-        'zTz' : [-1.5, 1.0], # true value 2.14
+
+
+        'xTx' : [-2.7, 0.1], # true value 2.7
+        'yTy' : [-2.7, 0.1], # true value 2.7
+        'zTz' : [-2.1, 0.1], # true value 2.14
         'xTi' : [1.5, 1.0], # TODO Broaden, testing with small dist
         'yTi' : [1.5, 1.0],
         'zTi' : [1.5, 1.0],
+
+        # Values below correspond to simulated data
+        # 'xTx' : [-1.5, 1.0], # true value 2.7
+        # 'yTy' : [-1.5, 1.0], # true value 2.7
+        # 'zTz' : [-1.5, 1.0], # true value 2.14
+        # 'xTi' : [1.5, 1.0], # TODO Broaden, testing with small dist
+        # 'yTi' : [1.5, 1.0],
+        # 'zTi' : [1.5, 1.0],
 
         # Values below correspond to Andreas' inital QMD values for this data set
 #        'xTx' : [-1.59329862 , 0.19606237], # true value 2.7
@@ -351,6 +360,15 @@ elif global_variables.further_qhl == True:
             '.png')
         )
 
+    if global_variables.pickle_qmd_class:
+        log_print(["QMD complete. Pickling result to",
+            global_variables.class_pickle_file], log_file
+        )
+        qmd.delete_unpicklable_attributes()
+        with open(global_variables.class_pickle_file, "wb") as pkl_file:
+            pickle.dump(qmd, pkl_file , protocol=2)
+
+
 else:
     qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
 
@@ -444,16 +462,16 @@ else:
         protocol=2
     )
         
-    end = time.time()
-    log_print(["Time taken:", end-start], log_file)
-    log_print(["END: QMD id", global_variables.qmd_id, ":",
-        global_variables.num_particles, " particles;",
-        global_variables.num_experiments, "exp; ", 
-        global_variables.num_times_bayes, 
-        "bayes. Time:", end-start
-        ], 
-        log_file
-    )
+end = time.time()
+log_print(["Time taken:", end-start], log_file)
+log_print(["END: QMD id", global_variables.qmd_id, ":",
+    global_variables.num_particles, " particles;",
+    global_variables.num_experiments, "exp; ", 
+    global_variables.num_times_bayes, 
+    "bayes. Time:", end-start
+    ], 
+    log_file
+)
     
 print("QMD finished - results in:", global_variables.results_directory)
 

@@ -277,6 +277,11 @@ def ExpectationValuesTrueSim(
             for u in unique_times_learned:
                 unique_times_count.append(list(times_learned).count(u))
             r_squared = mod.r_squared()
+            r_squared_of_t = mod.r_squared_of_t
+
+
+            exp_times = sorted(list(mod.r_squared_of_t.keys()))
+            r_sq_of_t = [mod.r_squared_of_t[t] for t in exp_times]
             bar_hist = 'hist'
 
             ax2 = plt.subplot(312, sharex=ax1)
@@ -285,18 +290,31 @@ def ExpectationValuesTrueSim(
                     unique_times_learned, 
                     unique_times_count, 
                     color=sim_col, 
-                    label=str(mod.LatexTerm+' : ' +str(round(r_squared, 1))),                
+                    label=str(mod.LatexTerm),                
                     width=0.001
                 )
             elif bar_hist == 'hist':
                 plt.hist(
                     times_learned, 
                     bins=num_bins,
-                    label=str(mod.LatexTerm+' : ' +str(round(r_squared,1))),                
+                    label='Occurences',                
                     color=sim_col,
                     histtype='step',
                     fill=False
                 )
+            ax3=ax2.twinx()
+            ax3.set_ylabel('$R^2$')
+            plt.plot(
+                exp_times, r_sq_of_t,
+                label='$R^2(t)$',
+                color=sim_col, 
+                linestyle='dashed'
+            )
+
+        ax3.legend(
+            bbox_to_anchor=(1.3, 0.5),
+            loc=2
+        )
         ax1.legend(
             title='Expectation Values',
             bbox_to_anchor=(1.0, 1.1),
@@ -319,8 +337,7 @@ def ExpectationValuesTrueSim(
 
         ax2.set_title(str('Times learned upon'))
         ax2.legend(
-            title='$R^2$', 
-            bbox_to_anchor=(1.0, 1.1),
+            bbox_to_anchor=(1.2, 1.1),
             loc=2
 
         )
@@ -332,6 +349,7 @@ def ExpectationValuesTrueSim(
             + str(qmd.NumExperiments) + ' experiments.'
         )
         plt.title(plot_title)
+#        plt.figlegend()
 
         plt.tight_layout()
         if save_to_file is not None:

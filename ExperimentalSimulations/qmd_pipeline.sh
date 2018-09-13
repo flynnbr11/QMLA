@@ -12,8 +12,8 @@ do_further_qhl=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
-exp=2
+prt=2000
+exp=1000
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -29,6 +29,11 @@ use_rq=0
 further_qhl_factor=2
 use_rq=0
 number_best_models_further_qhl=1
+custom_prior=1
+dataset='NVB_HahnPeaks_Newdata'
+#dataset='NV05_HahnEcho02'
+data_max_time=5000 # nanoseconds
+data_time_offset=205 # nanoseconds
 
 ### ---------------------------------------------------###
 # Everything from here downwards uses the parameters
@@ -55,22 +60,20 @@ declare -a particle_counts=(
 $prt
 )
 q_id=0
-"""
-if (($prt > 50)) || (($exp > 10)) || (( $qhl_test == 1 ))
+if (($prt > 50)) || (($exp > 10)) 
 then
     use_rq=1
 else
     use_rq=0
 fi
-"""
+
+if (( $qhl_test == 1 )) # For QHL test always do without rq
+then
+    use_rq=0
+fi
 # use_rq=0
 let bt="$exp-1"
-custom_prior=1
-dataset='NVB_HahnPeaks_Newdata'
-#dataset='NV05_HahnEcho02'
-data_max_time=5000 # nanoseconds
-data_time_offset=205 # nanoseconds
-
+printf "particles/experiments/qhl_test $prt/$exp/$qhl_test -> use_rq:$use_rq\n"
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Launch $num_tests instances of QMD 
@@ -101,8 +104,9 @@ python3 ../Libraries/QML_lib/AnalyseMultipleQMD.py \
 
 if (( $do_further_qhl == 1 )) 
 then
-    pgh=0.5 # train on different set of data
+    pgh=0.3 # train on different set of data
     redis-cli flushall 
+    let q_id="$q_id+1"
     let particles="$further_qhl_factor * $prt"
     let experiments="$further_qhl_factor * $exp"
 #    let q_id="$q_id+1"
@@ -111,7 +115,7 @@ then
         -p=$particles -e=$experiments -bt=$bt \
         -rq=$use_rq -g=$gaussian -qhl=0 \
         -ra=$ra -rt=$rt -pgh=1.0 \
-        -dir=$long_dir -qid=$q_id -pt=1 -pkl=0 \
+        -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 \
         -log=$this_log -cb=$bayes_csv \
         -exp=$exp_data -cpr=$custom_prior \
         -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \

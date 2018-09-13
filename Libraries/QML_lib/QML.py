@@ -16,6 +16,7 @@ import RedisSettings as rds
 import PlotQMD 
 import redis
 import pickle
+import matplotlib.pyplot as plt
 pickle.HIGHEST_PROTOCOL=2
 
 global debug_print
@@ -314,15 +315,15 @@ class ModelLearningClass():
 
             if len(self.Experiment[0]) < 3:
                 print_loc(global_print_loc)
-                covmat = self.Updater.est_covariance_mtx()
-                self.VolumeList = np.append(self.VolumeList, covmat)
+                self.covmat = self.Updater.est_covariance_mtx()
+                self.VolumeList = np.append(self.VolumeList, self.covmat)
                 print_loc(global_print_loc)
 
             else:
                 print_loc(global_print_loc)
-                covmat = self.Updater.est_covariance_mtx()
+                self.covmat = self.Updater.est_covariance_mtx()
                 self.VolumeList = np.append(self.VolumeList,  
-                    np.linalg.det( sp.linalg.sqrtm(covmat) )
+                    np.linalg.det( sp.linalg.sqrtm(self.covmat) )
                 )
                 print_loc(global_print_loc)
             
@@ -434,7 +435,7 @@ class ModelLearningClass():
                     self.LearnedParameters[self.SimOpsNames[iterator]] = (
                         self.FinalParams[iterator][0]
                     )
-
+#                plt.savefig(posterior_plot,'posterior.png')
             
 
             if debug_print:
@@ -479,6 +480,7 @@ class ModelLearningClass():
         learned_info['resample_epochs'] = self.ResampleEpochs
         learned_info['quadratic_losses'] = self.QLosses
         learned_info['learned_parameters'] = self.LearnedParameters
+        learned_info['cov_matrix'] = self.covmat
         if self.StoreParticlesWeights or self.QHL_plots:
             learned_info ['particles'] = self.Particles
             learned_info['weights'] = self.Weights
@@ -667,6 +669,7 @@ class reducedModel():
         self.ResampleEpochs = learned_info['resample_epochs']
         self.QuadraticLosses = learned_info['quadratic_losses']
         self.LearnedParameters = learned_info['learned_parameters']
+        self.cov_matrix = learned_info['cov_matrix']
 
         try:
             self.Particles = np.array(learned_info['particles'])
@@ -703,7 +706,7 @@ class reducedModel():
         sum_of_residuals = 0
         
         available_expectation_values = sorted(list(self.expectation_values.keys()))
-
+        self.r_squared_of_t = {}
         for t in exp_times:
             
             if t in available_expectation_values:
@@ -715,6 +718,7 @@ class reducedModel():
             true = self.ExperimentalMeasurements[t]
             diff_squared = (sim - true)**2
             sum_of_residuals += diff_squared
+            self.r_squared_of_t[t] = 1 - sum_of_residuals/datavar
 
         Rsq = 1 - sum_of_residuals/datavar
         
