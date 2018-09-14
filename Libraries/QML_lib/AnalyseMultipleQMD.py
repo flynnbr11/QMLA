@@ -262,9 +262,10 @@ def Bayes_t_test(
     else:
         winning_models = list(set(all_winning_models))    
 
-#    print("CURRENT:", os.getcwd())
     # Relies on this script being launched from ExperimentalSimulations -- not safe!!
-    os.chdir("Data/")
+    os.chdir(directory_name)
+#    print("CURRENT:", os.getcwd())
+    os.chdir("../../../Data/")
     experimental_measurements = pickle.load(
         open(str(dataset), 'rb')
     )
