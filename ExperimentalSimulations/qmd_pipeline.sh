@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
-qhl_test=1
+num_tests=6
+qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=2000
-exp=1000
+prt=10
+exp=5
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -23,15 +23,15 @@ gaussian=1
 # QMD settings
 ### ---------------------------------------------------###
 exp_data=1
-growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# growth_rule='two_qubit_ising_rotation_hyperfine'
+#growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+growth_rule='two_qubit_ising_rotation_hyperfine'
 use_rq=0
 further_qhl_factor=2
 use_rq=0
-number_best_models_further_qhl=1
+number_best_models_further_qhl=3
 custom_prior=1
-dataset='NVB_HahnPeaks_Newdata'
-#dataset='NV05_HahnEcho02'
+dataset='NVB_dataset.p'
+#dataset='NV05_dataset.p'
 data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
 
@@ -73,7 +73,6 @@ then
 fi
 # use_rq=0
 let bt="$exp-1"
-printf "particles/experiments/qhl_test $prt/$exp/$qhl_test -> use_rq:$use_rq\n"
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Launch $num_tests instances of QMD 
@@ -99,7 +98,8 @@ done
 # Analyse results of QMD. (Only after QMD, not QHL).
 python3 ../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -dir=$long_dir --bayes_csv=$bayes_csv \
-    -top=$number_best_models_further_qhl -qhl=$qhl_test
+    -top=$number_best_models_further_qhl -qhl=$qhl_test \
+    -data=$dataset
 
 
 if (( $do_further_qhl == 1 )) 

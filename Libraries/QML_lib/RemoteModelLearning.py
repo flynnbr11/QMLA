@@ -184,7 +184,6 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
         sigma_threshold = sigma_threshold
     )
 
-
     if qhl_plots:
         log_print(["Drawing plots for QHL"])
 

@@ -339,7 +339,6 @@ def ExpectationValuesTrueSim(
         ax2.legend(
             bbox_to_anchor=(1.2, 1.1),
             loc=2
-
         )
         ax2.axvline(0, color='black')
         ax2.axhline(0, color='black')

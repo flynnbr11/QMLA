@@ -337,7 +337,7 @@ class ModelLearningClass():
             )
             print_loc(global_print_loc)
             self.Particles[:, :, istep] = self.Updater.particle_locations
-            self.Weights[:, istep] = self.Updater.particle_weights
+            #self.Weights[:, istep] = self.Updater.particle_weights
 
             self.NewEval = self.Updater.est_mean()
             print_loc(global_print_loc)
@@ -359,7 +359,8 @@ class ModelLearningClass():
                     )
                     for iterator in range(len(self.FinalParams)):
                         self.FinalParams[iterator]= [
-                            np.mean(self.Particles[:,iterator,istep]), 
+                            #np.mean(self.Particles[:,iterator,istep]), 
+                            self.Updater.est_mean(),
                             np.std(self.Particles[:,iterator,istep])
                         ]
                         print('Final Parameters mean and stdev:'+
@@ -388,7 +389,8 @@ class ModelLearningClass():
                 self.log_print([' at Iteration Number ' , str(istep)]) 
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [
-                        np.mean(self.Particles[:,iterator,istep]), 
+#                        np.mean(self.Particles[:,iterator,istep]), 
+                        self.Updater.est_mean(),
                         np.std(self.Particles[:,iterator,istep])
                     ]
                     self.log_print(['Final Parameters mean and stdev:',
@@ -420,11 +422,12 @@ class ModelLearningClass():
                 #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.Updater), '\t GenSim:', asizeof.asizeof(self.GenSimModel) ])
                 if self.debugSave: 
                     self.debug_store()
-        
+                
                 self.LearnedParameters = {}
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [
-                        np.mean(self.Particles[:,iterator,istep-1]), 
+#                        np.mean(self.Particles[:,iterator,istep-1]), 
+                        self.Updater.est_mean()[iterator],
                         np.std(self.Particles[:,iterator,istep-1])
                     ]
                     self.log_print([
@@ -670,6 +673,16 @@ class reducedModel():
         self.QuadraticLosses = learned_info['quadratic_losses']
         self.LearnedParameters = learned_info['learned_parameters']
         self.cov_matrix = learned_info['cov_matrix']
+
+
+        self.TrackParameterEstimates = {}
+        num_params = np.shape(self.TrackEval)[1]
+        max_exp = np.shape(self.TrackEval)[0] -1
+        for i in range(num_params):
+            for term in self.LearnedParameters.keys():
+                if self.LearnedParameters[term] == self.TrackEval[max_exp][i]:
+                    self.TrackParameterEstimates[term] = self.TrackEval[:,i]
+
 
         try:
             self.Particles = np.array(learned_info['particles'])

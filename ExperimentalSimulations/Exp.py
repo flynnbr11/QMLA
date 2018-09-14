@@ -83,16 +83,23 @@ if global_variables.qhl_test:
 """
 
 # Load in experimental data
+"""
 experimental_measurements_dict = expdt.experimentalMeasurementDict(
     directory = str("Data/"+global_variables.dataset),
     max_time = global_variables.data_max_time + global_variables.data_time_offset
 )
+"""
+
+experimental_measurements_dict = pickle.load(
+    open(str('Data/'+global_variables.dataset), 'rb')
+)
 
 if global_variables.use_experimental_data is True:
-    expec_val_plot_max_time = global_variables.data_max_time/1000
+    expec_val_plot_max_time = global_variables.data_max_time
 else:
     expec_val_plot_max_time = 200    
 
+"""
 for t in list(experimental_measurements_dict.keys()):
     # Shift t-values by offset so t=0 corresponds to Pr(0)=1
     # Convert t from ns to ms; remove old records
@@ -101,6 +108,9 @@ for t in list(experimental_measurements_dict.keys()):
     msmt = experimental_measurements_dict[t]
     experimental_measurements_dict.pop(t)
     experimental_measurements_dict[new_time] = msmt
+"""
+
+
 
 
 initial_op_list = ['xTi', 'yTi', 'zTi']
@@ -339,6 +349,7 @@ if global_variables.qhl_test:
 
 
 elif global_variables.further_qhl == True:
+
     qmd.runMultipleModelQHL()
 
     qmd.plotExpecValues(

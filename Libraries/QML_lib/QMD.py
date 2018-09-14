@@ -1300,7 +1300,7 @@ class QMD():
         time_now = time.time()
         time_taken = time_now - self.StartingTime
 #        true_model_r_squared = self.reducedModelInstanceFromID(self.TrueOpModelID).r_squared()
-
+        
         self.ResultsDict = {
             'NumParticles' : self.NumParticles,
             'NumExperiments' : self.NumExperiments,
@@ -1313,11 +1313,10 @@ class QMD():
             'QID' : self.Q_id,
             'RSquaredTrueModel' : mod.r_squared(),
             'NameAlphabetical' : DataBase.alph(mod.Name),
-            'LearnedParameters' : mod.LearnedParameters
+            'LearnedParameters' : mod.LearnedParameters,
+            'TrackParameterEstimates' : mod.TrackParameterEstimates,
+            'ExpectationValues' : mod.expectation_values
         }
-
-
-
 
     def runMultipleModelQHL(self, model_names=None):
         if model_names is None:
@@ -1465,6 +1464,7 @@ class QMD():
         ### Fill in champions result dict for further analysis.
 
         self.updateDataBaseModelValues()
+        champ_model = self.reducedModelInstanceFromID(self.ChampID)
         for i in range(self.HighestModelID):
             # Dict of all Bayes factors for each model considered. 
             self.AllBayesFactors[i] = (
@@ -1472,7 +1472,7 @@ class QMD():
             )
 
         self.ChampionFinalParams = (
-            self.reducedModelInstanceFromID(self.ChampID).FinalParams
+            champ_model.FinalParams
         )
 
         champ_op = DataBase.operator(self.ChampionName)        
@@ -1540,7 +1540,8 @@ class QMD():
             'Misfit' : misfit,
             'NumQubits' : num_qubits_champ_model,
             'NumParams' : num_params_champ_model,
-            'LearnedParameters' : self.LearnedParamsChamp
+            'LearnedParameters' : self.LearnedParamsChamp,
+            'ExpectationValues' : champ_model.expectation_values
         }
 
     def updateDataBaseModelValues(self):

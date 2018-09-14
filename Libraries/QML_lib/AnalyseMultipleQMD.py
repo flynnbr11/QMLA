@@ -42,7 +42,13 @@ def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
             writer.writerow(results)
 """
 
-def parameter_sweep_analysis(directory_name, results_csv, save_to_file=None, use_log_times=False, use_percentage_models=False):
+def parameter_sweep_analysis(
+    directory_name, 
+    results_csv, 
+    save_to_file=None, 
+    use_log_times=False, 
+    use_percentage_models=False
+):
 
     import os, csv
     if not directory_name.endswith('/'):
@@ -230,6 +236,118 @@ def average_parameters(results_path,
             ]
     
     return learned_priors        
+
+def Bayes_t_test(
+    directory_name, 
+    dataset, 
+    results_path,
+    top_number_models=2,
+    save_to_file=None
+):
+
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    
+    results = pandas.DataFrame.from_csv(
+        results_path,
+        index_col='QID'
+    )
+
+    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
+    rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
+    # from https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
+    
+    if len(all_winning_models) > top_number_models:
+        winning_models = rank_models(all_winning_models)[0:top_number_models]
+    else:
+        winning_models = list(set(all_winning_models))    
+
+#    print("CURRENT:", os.getcwd())
+    # Relies on this script being launched from ExperimentalSimulations -- not safe!!
+    os.chdir("Data/")
+    experimental_measurements = pickle.load(
+        open(str(dataset), 'rb')
+    )
+    expectation_values_by_name = {}
+    
+    os.chdir(directory_name)
+    pickled_files = []
+    for file in os.listdir(directory_name):
+        if file.endswith(".p") and file.startswith("results"):
+            pickled_files.append(file)
+
+    for f in pickled_files:
+        fname = directory_name+'/'+str(f)
+        result = pickle.load(open(fname, 'rb'))
+        alph = result['NameAlphabetical']
+        expec_values = result['ExpectationValues']
+
+        if alph in expectation_values_by_name.keys():
+            expectation_values_by_name[alph].append(expec_values)
+        else:
+            expectation_values_by_name[alph] =[expec_values]
+
+    expectation_values = {}
+    for t in list(experimental_measurements.keys()):
+        expectation_values[t] = []
+
+    success_rate_by_term = {}
+    for term in winning_models:
+        num_sets_of_this_name = len(expectation_values_by_name[term])
+        for i in range(num_sets_of_this_name):
+            learned_expectation_values = expectation_values_by_name[term][i]
+
+            for t in list(experimental_measurements.keys()):
+                expectation_values[t].append(learned_expectation_values[t])
+
+        means = {}
+        std_dev = {}
+        true = {}
+        times = sorted(list(experimental_measurements.keys()))
+
+        for t in times:
+            means[t] = np.mean(expectation_values[t])
+            std_dev[t] = np.std(expectation_values[t])
+            true[t] = experimental_measurements[t]
+
+        num_runs = len(pickled_files)
+        success_rate = 0
+
+        for t in times: 
+
+            true_likelihood = true[t]
+            mean = means[t]
+            std = std_dev[t]
+            credible_region = ( 2/np.sqrt(num_runs) ) * std
+
+            if (
+                ( true_likelihood  < (mean + credible_region) )
+                and
+                ( true_likelihood > (mean - credible_region) ) 
+            ):
+                success_rate += 1/len(times)
+
+        mean_exp = [means[t] for t in times]
+        std_dev_exp = [std_dev[t] for t in times]
+        name=DataBase.latex_name_ising(result['NameAlphabetical'])
+        description = str(name + ' : ' + str(round(success_rate, 2)) )
+#        ax.errorbar(times, mean_exp, xerr=std_dev_exp, label=description)
+        ax.plot(times, mean_exp, label=description)
+
+        success_rate_by_term[term] = success_rate
+
+    plt.title('Mean Expectation Values')
+    plt.xlabel('Time')
+    plt.ylabel('Expectation Value')
+    true_exp = [true[t] for t in times]
+    ax.scatter(times, true_exp, color='r', s=5, label='True Expectation Value')
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), 
+        title=' Model : Bayes t-test'
+    )    
+    
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
         
 def model_scores(directory_name):
 #    sys.path.append(directory_name)
@@ -268,7 +386,7 @@ def get_entropy(models_points, inf_gain=False):
     for k in list(models_points.keys()):
         model_fractions[k] = models_points[k]/num_qmd_instances    
     
-    initial_entropy = np.log2(1/num_possible_qmd_instances)
+    initial_entropy = -1*np.log2(1/num_possible_qmd_instances)
     entropy = 0
     for i in list(models_points.keys()):
         success_prob = model_fractions[i]
@@ -278,7 +396,7 @@ def get_entropy(models_points, inf_gain=False):
         entropy -= partial_entropy
     
     if inf_gain:
-        information_gain = initial_entropy - entropy
+        information_gain = entropy -initial_entropy  
         return information_gain
     else:
         return entropy
@@ -384,6 +502,13 @@ parser.add_argument(
   default=0
 )
 
+parser.add_argument(
+  '-data', '--dataset', 
+  help="Which dataset QMD was run using..",
+  type=str,
+  default='NVB_dataset'
+)
+
 arguments = parser.parse_args()
 directory_to_analyse = arguments.results_directory
 all_bayes_csv = arguments.bayes_csv
@@ -415,6 +540,13 @@ pickle.dump(
     protocol=2
 )
 
+Bayes_t_test(
+    directory_name = directory_to_analyse, 
+    dataset = arguments.dataset, 
+    results_path = results_csv,
+    top_number_models = arguments.top_number_models ,
+    save_to_file=str(directory_to_analyse+'Avg_expec_bayes_t_test.png')
+)
 
 if qhl_mode==True:
     r_squared_plot = str(directory_to_analyse + 'r_squared_QHL.png')
