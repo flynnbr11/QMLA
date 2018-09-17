@@ -29,6 +29,7 @@ from matplotlib.projections import register_projection
 #from QML import *
 import DataBase
 import Evo as evo
+import ExperimentalDataFunctions as expdt
 
 #### Hinton Diagram ####
 
@@ -854,6 +855,71 @@ def r_squared_plot(
     
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
+
+
+def r_squared_from_epoch_list(
+    qmd, 
+    model_ids=[],
+    epochs=[],
+    min_time=0,
+    max_time=None,
+    save_to_file=None,
+):
+    exp_times = sorted(list(qmd.ExperimentalMeasurements.keys()))
+    if max_time is None:
+        max_time = max(exp_times)
+
+    min_time = expdt.nearestAvailableExpTime(exp_times, 0)
+    max_time = expdt.nearestAvailableExpTime(exp_times, max_time)
+    min_data_idx = exp_times.index(min_time)
+    max_data_idx = exp_times.index(max_time)
+    exp_times = exp_times[min_data_idx:max_data_idx]
+    exp_data = [
+        qmd.ExperimentalMeasurements[t] for t in exp_times
+    ]
+    probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
+
+    datamean = np.mean(exp_data[0:max_data_idx])
+    datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
+    
+
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    model_ids = list(set(model_ids))
+    for model_id in model_ids:
+        mod = qmd.reducedModelInstanceFromID( model_id )
+        r_squared_by_epoch = {}
+        
+        epochs.extend([0, qmd.NumExperiments-1])
+        if len(mod.ResampleEpochs) > 0:
+            epochs.extend(mod.ResampleEpochs)
+
+        epochs = sorted(set(epochs))
+        for epoch in epochs:
+            # Construct new Hamiltonian to get R^2 from
+            # Hamiltonian corresponds to parameters at that epoch
+            ham = np.tensordot(mod.TrackEval[ epoch ], mod.SimOpList , axes=1)
+            sum_of_residuals = 0
+            for t in exp_times:
+                sim = evo.hahn_evolution(ham, t, probe)
+                true = qmd.ExperimentalMeasurements[t]
+                diff_squared = (sim - true)**2
+                sum_of_residuals += diff_squared
+
+            Rsq = 1 - sum_of_residuals/datavar
+            r_squared_by_epoch[epoch] = Rsq
+
+        r_squareds = [ r_squared_by_epoch[e] for e in  epochs ]
+        
+        plot_label=str( mod.LatexTerm )
+        ax.plot(epochs, r_squareds, label=plot_label, marker='o')
+    ax.legend( bbox_to_anchor=(1, 0.5),)
+    ax.set_ylabel('$R^2$')
+    ax.set_xlabel('Epoch')
+    ax.set_title('$R^2$ Vs Epoch (with resampling epochs)')
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
 
 
 def summariseResultsCSV(

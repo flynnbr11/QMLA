@@ -1791,6 +1791,30 @@ class QMD():
             plot_title=plot_title
         )
 
+
+    def plotRSquaredVsEpoch(
+        self, 
+        modlist=None, 
+        save_to_file=None
+    ):
+        if modlist is None:
+            modlist = []
+            try:
+                modlist.append(self.ChampID)
+            except:
+                pass
+            try:
+                modlist.append(self.TrueOpModelID)
+            except:
+                pass
+
+
+        PlotQMD.r_squared_from_epoch_list(
+            qmd = self, 
+            model_ids = modlist, 
+            save_to_file = save_to_file
+        )
+
     def majorityVotingTally(self):
         mod_ids = DataBase.list_model_id_in_branch(self.db, 0)
         tally = {}

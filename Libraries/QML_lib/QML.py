@@ -692,9 +692,14 @@ class reducedModel():
             self.Weights = 'Weights not stored.'
         
         sim_params = list(self.FinalParams[:,0])
-        self.LearnedHamiltonian = np.tensordot(sim_params, self.SimOpList, axes=1)
+        self.LearnedHamiltonian = np.tensordot(
+            sim_params, 
+            self.SimOpList, 
+            axes=1
+        )
 
-    def r_squared(self, 
+    def r_squared(
+        self, 
         min_time = 0,
         max_time = None 
     ):
@@ -707,7 +712,9 @@ class reducedModel():
         min_data_idx = exp_times.index(min_time)
         max_data_idx = exp_times.index(max_time)
         exp_times = exp_times[min_data_idx:max_data_idx]
-        exp_data = [self.ExperimentalMeasurements[t] for t in exp_times]
+        exp_data = [
+            self.ExperimentalMeasurements[t] for t in exp_times
+        ]
         probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
 
         datamean = np.mean(exp_data[0:max_data_idx])

@@ -395,7 +395,6 @@ else:
             pickle.dump(qmd, pkl_file , protocol=2)
 
     if global_variables.save_plots:
-        """
         qmd.plotVolumes(
             save_to_file=str(
             global_variables.plots_directory+
@@ -426,7 +425,6 @@ else:
             global_variables.plots_directory+
             'radar_'+ str(global_variables.long_id)+ '.png')
         )
-        """
 
         qmd.saveBayesCSV(
             save_to_file=str(
@@ -461,6 +459,15 @@ else:
             (global_variables.plots_directory+
             'tree_diagram_'+ str(global_variables.long_id)+ '.png')
         )
+
+        qmd.plotRSquaredVsEpoch(
+            save_to_file = str(
+                global_variables.plots_directory +
+                'r_squared_by_epoch_' + str(global_variables.long_id) +
+                '.png'
+            )
+        )
+
 
     qmd.writeInterQMDBayesCSV(
         bayes_csv=str(global_variables.cumulative_csv)

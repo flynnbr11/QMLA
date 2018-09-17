@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=3
-qhl_test=1
+num_tests=5
+qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=800
-exp=100
+prt=20
+exp=20
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -71,6 +71,7 @@ if (( $qhl_test == 1 )) # For QHL test always do without rq
 then
     use_rq=0
 fi
+use_rq=0
 # use_rq=0
 let bt="$exp-1"
 
