@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=2
+num_tests=5
 qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=20
-exp=20
+prt=10
+exp=5
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -27,8 +27,9 @@ exp_data=1
 growth_rule='two_qubit_ising_rotation_hyperfine'
 use_rq=0
 further_qhl_factor=2
+plots=0
 use_rq=0
-number_best_models_further_qhl=3
+number_best_models_further_qhl=2
 custom_prior=1
 dataset='NVB_dataset.p'
 #dataset='NV05_dataset.p'
@@ -88,7 +89,7 @@ do
             -op=$true_operator -p=$prt -e=$exp -bt=$bt \
             -rq=$use_rq -g=$gaussian -qhl=$qhl_test \
             -ra=$ra -rt=$rt -pgh=$pgh \
-            -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 \
+            -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
             -exp=$exp_data -cpr=$custom_prior \
             -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
@@ -116,7 +117,7 @@ then
         -p=$particles -e=$experiments -bt=$bt \
         -rq=$use_rq -g=$gaussian -qhl=0 \
         -ra=$ra -rt=$rt -pgh=1.0 \
-        -dir=$long_dir -qid=$q_id -pt=1 -pkl=1 \
+        -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
         -log=$this_log -cb=$bayes_csv \
         -exp=$exp_data -cpr=$custom_prior \
         -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \

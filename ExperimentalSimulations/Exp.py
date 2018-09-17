@@ -302,14 +302,6 @@ if global_variables.qhl_test:
             'qhl_expec_values_'+str(global_variables.long_id)+'.png')
         )
         """
-        qmd.plotExpecValues(
-            model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
-            champ=False,
-            max_time = expec_val_plot_max_time, #in microsec
-            save_to_file=str( 
-            global_variables.plots_directory+
-            'qhl_expec_values_'+str(global_variables.long_id)+'.png')
-        )
 
         qmd.plotVolumeQHL(
             save_to_file = str( 
@@ -394,6 +386,16 @@ else:
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file , protocol=2)
 
+    # Need to do this so QML reduced class has expectation value
+    # dict... should be made unnecessary
+    qmd.plotExpecValues(
+        model_ids = [11], # hardcode to see full model for development
+        max_time = expec_val_plot_max_time, #in microsec
+        save_to_file=str( 
+        global_variables.plots_directory+
+        'expec_values_'+str(global_variables.long_id)+'.png')
+    )
+    
     if global_variables.save_plots:
         qmd.plotVolumes(
             save_to_file=str(
@@ -435,13 +437,6 @@ else:
 
 #        log_print(["Before expec value plot"], log_file)
 #        This causes BC to break and nothing after this happens for some reason, so commented out for now (Brian, Aug 16)
-        qmd.plotExpecValues(
-            model_ids = [11], # hardcode to see full model for development
-            max_time = expec_val_plot_max_time, #in microsec
-            save_to_file=str( 
-            global_variables.plots_directory+
-            'expec_values_'+str(global_variables.long_id)+'.png')
-        )
 
     #        qmd.plotHintonAllModels(save_to_file=str(
     #            global_variables.results_directory,'hinton_', 

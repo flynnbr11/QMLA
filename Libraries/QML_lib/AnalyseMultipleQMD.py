@@ -340,7 +340,6 @@ def average_parameter_estimates(
         plot_title= str('Average Parameter Estimates '+ str(DataBase.latex_name_ising(name)) )
         ax.set_ylabel('Parameter Esimate')
         ax.set_xlabel('Experiment')
-        ax.set_xticks(range(0, num_experiments))
         plt.title(plot_title)
         ax.legend(
             loc='center left', 
@@ -364,6 +363,7 @@ def Bayes_t_test(
     top_number_models=2,
     save_to_file=None
 ):
+    from matplotlib import cm
 
     fig = plt.figure()
     ax = plt.subplot(111)
@@ -381,6 +381,11 @@ def Bayes_t_test(
         winning_models = rank_models(all_winning_models)[0:top_number_models]
     else:
         winning_models = list(set(all_winning_models))    
+
+
+    cm_subsection = np.linspace(0,0.8,len(winning_models))
+#        colours = [ cm.magma(x) for x in cm_subsection ]
+    colours = [ cm.Spectral(x) for x in cm_subsection ]
 
     # Relies on Results folder structure -- not safe?!
     # ie ExperimentalSimulations/Results/Sep_10/14_32/results_001.p, etc
@@ -448,12 +453,24 @@ def Bayes_t_test(
             ):
                 success_rate += 1/len(times)
 
-        mean_exp = [means[t] for t in times]
-        std_dev_exp = [std_dev[t] for t in times]
+        mean_exp = np.array( [means[t] for t in times] )
+        std_dev_exp = np.array( [std_dev[t] for t in times] )
         name=DataBase.latex_name_ising(result['NameAlphabetical'])
         description = str(name + ' : ' + str(round(success_rate, 2)) )
 #        ax.errorbar(times, mean_exp, xerr=std_dev_exp, label=description)
-        ax.plot(times, mean_exp, label=description)
+        ax.plot(
+            times, 
+            mean_exp, 
+            c = colours[winning_models.index(term)],
+            label=description
+        )
+        ax.fill_between(
+            times, 
+            mean_exp-std_dev_exp, 
+            mean_exp+std_dev_exp, 
+            alpha=0.2,
+            facecolor = colours[winning_models.index(term)],
+        )
 
         success_rate_by_term[term] = success_rate
 
