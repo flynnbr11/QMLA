@@ -1541,7 +1541,8 @@ class QMD():
             'NumQubits' : num_qubits_champ_model,
             'NumParams' : num_params_champ_model,
             'LearnedParameters' : self.LearnedParamsChamp,
-            'ExpectationValues' : champ_model.expectation_values
+            'ExpectationValues' : champ_model.expectation_values,
+            'TrackParameterEstimates' : champ_model.TrackParameterEstimates,
         }
 
     def updateDataBaseModelValues(self):

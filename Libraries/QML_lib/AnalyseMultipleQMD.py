@@ -235,7 +235,108 @@ def average_parameters(results_path,
                 std_deviations[mod][p]
             ]
     
-    return learned_priors        
+    return learned_priors   
+
+def average_parameter_estimates(
+    directory_name, 
+    results_path, 
+    top_number_models=2,
+    save_to_file=None
+):
+    results = pandas.DataFrame.from_csv(
+        results_path,
+        index_col='QID'
+    )
+    print("directory:", directory_name)
+    print("results path:", results_path)
+
+    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
+    rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
+    # from https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
+
+    if len(all_winning_models) > top_number_models:
+        winning_models = rank_models(all_winning_models)[0:top_number_models]
+    else:
+        winning_models = list(set(all_winning_models))    
+
+    os.chdir(directory_name)
+    pickled_files = []
+    for file in os.listdir(directory_name):
+        if file.endswith(".p") and file.startswith("results"):
+            pickled_files.append(file)
+
+    parameter_estimates_from_qmd = {}        
+    for f in pickled_files:
+        fname = directory_name+'/'+str(f)
+        result = pickle.load(open(fname, 'rb'))
+        alph = result['NameAlphabetical']
+        track_parameter_estimates = result['TrackParameterEstimates']
+        num_experiments = result['NumExperiments']
+        if alph in parameter_estimates_from_qmd.keys():
+            parameter_estimates_from_qmd[alph].append(track_parameter_estimates)
+
+        else:
+            parameter_estimates_from_qmd[alph] = [track_parameter_estimates]
+
+    epochs = range(num_experiments)
+    latex_terms = {}
+
+    for name in winning_models:
+        plt.clf()
+        fig = plt.figure()
+        ax = plt.subplot(111)
+
+        parameters_for_this_name = parameter_estimates_from_qmd[name]
+
+        terms = DataBase.get_constituent_names_from_name(name)
+
+        parameters = {}
+
+        for t in terms:
+            parameters[t] = {}
+            latex_terms[t] = DataBase.latex_name_ising(t)
+
+            for e in range(num_experiments):
+                parameters[t][e] = []
+
+        for i in range( len( parameters_for_this_name )):
+            track_params =  parameters_for_this_name[i]
+            for t in terms:
+                for e in range(num_experiments):
+                    parameters[t][e].append( track_params[t][e] )
+
+        avg_parameters = {}
+        std_devs = {}
+        for p in terms :
+            avg_parameters[p] = {}
+            std_devs[p] = {}
+
+            for e in range(num_experiments):
+                avg_parameters[p][e] = np.mean(parameters[p][e])
+                std_devs[p][e] = np.std(parameters[p][e])
+
+        for term in terms:
+            averages = [ avg_parameters[term][e] for e in epochs  ]
+            ax.plot(epochs, averages, label=latex_terms[term])
+
+        plot_title= str('Average Parameter Estimates '+ str(DataBase.latex_name_ising(name)) )
+        ax.set_ylabel('Parameter Esimate')
+        ax.set_xlabel('Experiment')
+#        ax.set_xticks(range(0, num_experiments))
+        plt.title(plot_title)
+        ax.legend(
+            loc='center left', 
+            bbox_to_anchor=(1, 0.5), 
+            title='Parameter'
+        )    
+
+        if save_to_file is not None:
+            if save_to_file[-4:] == '.png':
+                partial_name = save_to_file[:-4]
+                save_file = str(partial_name + '_' + name + '.png')
+            else:
+                save_file = str(save_to_file + '_' + name + '.png')
+            plt.savefig(save_file, bbox_inches='tight')
 
 def Bayes_t_test(
     directory_name, 
@@ -262,9 +363,9 @@ def Bayes_t_test(
     else:
         winning_models = list(set(all_winning_models))    
 
-    # Relies on this script being launched from ExperimentalSimulations -- not safe!!
+    # Relies on Results folder structure -- not safe?!
+    # ie ExperimentalSimulations/Results/Sep_10/14_32/results_001.p, etc
     os.chdir(directory_name)
-#    print("CURRENT:", os.getcwd())
     os.chdir("../../../../ExperimentalSimulations/Data/")
     experimental_measurements = pickle.load(
         open(str(dataset), 'rb')
@@ -548,6 +649,18 @@ Bayes_t_test(
     top_number_models = arguments.top_number_models ,
     save_to_file=str(directory_to_analyse+'Avg_expec_bayes_t_test.png')
 )
+
+
+average_parameter_estimates(
+    directory_name = directory_to_analyse, 
+    results_path = results_csv, 
+    top_number_models = arguments.top_number_models,
+    save_to_file=  str(
+        directory_to_analyse + 
+        'avg_params.png'
+    )
+)
+
 
 if qhl_mode==True:
     r_squared_plot = str(directory_to_analyse + 'r_squared_QHL.png')

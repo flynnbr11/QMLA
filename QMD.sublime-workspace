@@ -1,0 +1,577 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Track",
+				"TrackParameterEstimates"
+			],
+			[
+				"poster",
+				"posterior_plot"
+			],
+			[
+				"poste",
+				"posterior_plot"
+			],
+			[
+				"cov",
+				"cov_matrix"
+			],
+			[
+				"log",
+				"log_print"
+			],
+			[
+				"cons",
+				"constituent_terms"
+			],
+			[
+				"con",
+				"constituents_names"
+			],
+			[
+				"valid",
+				"validity_by_signs"
+			],
+			[
+				"sign",
+				"signs_of_parameters"
+			],
+			[
+				"args",
+				"args_dict"
+			],
+			[
+				"global",
+				"global_variables"
+			],
+			[
+				"Lea",
+				"LearnedParameters"
+			],
+			[
+				"qhl",
+				"qhl_test"
+			],
+			[
+				"direct",
+				"directory_to_analyse"
+			],
+			[
+				"redu",
+				"reducedModelInstanceFromID"
+			],
+			[
+				"metrics_",
+				"metrics_file"
+			],
+			[
+				"True",
+				"TrueOpModelID"
+			],
+			[
+				"num",
+				"num_jobs_started"
+			],
+			[
+				"ex",
+				"experiments"
+			],
+			[
+				"model_id_",
+				"model_id_from_name"
+			],
+			[
+				"por",
+				"port_number"
+			],
+			[
+				"data",
+				"databases_from_qmd_id"
+			],
+			[
+				"Prior",
+				"PriorSpecificTerms"
+			],
+			[
+				"average",
+				"average_priors"
+			],
+			[
+				"prior",
+				"prior_specific_terms"
+			],
+			[
+				"num_qib",
+				"num_qubits_champ_model"
+			],
+			[
+				"save_",
+				"save_to_file"
+			],
+			[
+				"Cham",
+				"ChampID"
+			],
+			[
+				"experim",
+				"experimental_measurements"
+			],
+			[
+				"pres",
+				"present_expec_values_times"
+			],
+			[
+				"expectatino",
+				"expectation_values"
+			],
+			[
+				"uni",
+				"unique_times_count"
+			],
+			[
+				"uniqu",
+				"unique_times_learned"
+			],
+			[
+				"log_",
+				"log_likelihood"
+			],
+			[
+				"_",
+				"_renormalization_record"
+			],
+			[
+				"use",
+				"use_experimental_data"
+			],
+			[
+				"Experiment",
+				"ExperimentalMeasurements"
+			],
+			[
+				"default_data",
+				"default_data_max_useful_time"
+			],
+			[
+				"max",
+				"dataset_max_time"
+			],
+			[
+				"default_da",
+				"default_data_max_useful_time"
+			],
+			[
+				"bayes",
+				"bayes_lower"
+			],
+			[
+				"default_bayes",
+				"default_bayes_threshold_upper"
+			],
+			[
+				"default_ba",
+				"default_bayes_threshold_upper"
+			],
+			[
+				"cusom",
+				"custom_prior"
+			],
+			[
+				"custom",
+				"custom_prior"
+			],
+			[
+				"speci",
+				"specific_terms"
+			],
+			[
+				"result",
+				"results_directory"
+			],
+			[
+				"nu",
+				"num_times_to_use"
+			],
+			[
+				"tra",
+				"traced_state"
+			],
+			[
+				"desn",
+				"density_matrix"
+			],
+			[
+				"qubit",
+				"qubits_to_trace"
+			],
+			[
+				"density",
+				"density_matrix"
+			],
+			[
+				"parti",
+				"partial_trace_out_second_qubit"
+			],
+			[
+				"PGH",
+				"PGHPrefactor"
+			],
+			[
+				"Res",
+				"ResamplerThresh"
+			],
+			[
+				"Resamp",
+				"ResamplerThresh"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "ExperimentalSimulations/qmd_pipeline.sh",
+			"settings":
+			{
+				"buffer_size": 3226,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "ExperimentalSimulations/Exp.py",
+			"settings":
+			{
+				"buffer_size": 15544,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/QMD.py",
+			"settings":
+			{
+				"buffer_size": 74499,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"Bookmarks: Toggle"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 136.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '6f4c264a24d933ce70df5dedcf1dcaee' + 'ebe013ee18cced0ef93d5f746d80ef60'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib"
+	],
+	"file_history":
+	[
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExperimentalDataFunctions.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/qmd_pipeline.sh",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteModelLearning.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/AnalyseMultipleQMD.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/PlotQMD.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelGeneration.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Distrib.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteBayesFactor.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/DataBase.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RedisSettings.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Evo.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/another.sh",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/id_cycling.sh",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QML.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/test_ids.txt",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/test_ids_complete.txt",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Evo (Sebastian Knauer's conflicted copy 2018-09-07).py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GlobalVariables.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GenSimQMD_IQLE.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RedisDatabaseConfig.conf",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExperimentalDataFunctions (Brian Flynn's conflicted copy 2018-08-28).py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/multiPGH.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Exp.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/NV05_HahnPeaks_expdataset/04.csv",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/NV05_HahnPeaks_expdataset/01.csv",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/README.md",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/test_sublime.py",
+		"/home/bf16951/install_package_controller.py"
+	],
+	"find":
+	{
+		"height": 29.0
+	},
+	"find_in_files":
+	{
+		"height": 107.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"folders":
+	[
+		{
+			"path": "/home/bf16951/Dropbox/QML_share_stateofart/QMD"
+		}
+	],
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "ExperimentalSimulations/qmd_pipeline.sh",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3226,
+						"regions":
+						{
+							"bookmarks":
+							{
+								"flags": 144,
+								"icon": "bookmark",
+								"regions":
+								[
+									[
+										395,
+										395
+									]
+								],
+								"scope": "bookmarks"
+							}
+						},
+						"selection":
+						[
+							[
+								406,
+								406
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/ShellScript/Bash.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "ExperimentalSimulations/Exp.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15544,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								272,
+								272
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 2,
+					"file": "Libraries/QML_lib/QMD.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 74499,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 29.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.5,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "",
+	"replace":
+	{
+		"height": 54.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 236.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

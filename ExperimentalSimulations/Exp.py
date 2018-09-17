@@ -152,20 +152,20 @@ if global_variables.custom_prior:
         'yTz' : [1.0, 0.5],
 
 
-        'xTx' : [-2.7, 0.1], # true value 2.7
-        'yTy' : [-2.7, 0.1], # true value 2.7
-        'zTz' : [-2.1, 0.1], # true value 2.14
-        'xTi' : [1.5, 1.0], # TODO Broaden, testing with small dist
-        'yTi' : [1.5, 1.0],
-        'zTi' : [1.5, 1.0],
-
-        # Values below correspond to simulated data
-        # 'xTx' : [-1.5, 1.0], # true value 2.7
-        # 'yTy' : [-1.5, 1.0], # true value 2.7
-        # 'zTz' : [-1.5, 1.0], # true value 2.14
+        # 'xTx' : [-2.7, 0.1], # true value 2.7
+        # 'yTy' : [-2.7, 0.1], # true value 2.7
+        # 'zTz' : [-2.1, 0.1], # true value 2.14
         # 'xTi' : [1.5, 1.0], # TODO Broaden, testing with small dist
         # 'yTi' : [1.5, 1.0],
         # 'zTi' : [1.5, 1.0],
+
+        # Values below correspond to simulated data
+        'xTx' : [-1.5, 1.0], # true value 2.7
+        'yTy' : [-1.5, 1.0], # true value 2.7
+        'zTz' : [-1.5, 1.0], # true value 2.14
+        'xTi' : [1.5, 1.0], # TODO Broaden, testing with small dist
+        'yTi' : [1.5, 1.0],
+        'zTi' : [1.5, 1.0],
 
         # Values below correspond to Andreas' inital QMD values for this data set
 #        'xTx' : [-1.59329862 , 0.19606237], # true value 2.7
