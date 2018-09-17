@@ -243,12 +243,11 @@ def average_parameter_estimates(
     top_number_models=2,
     save_to_file=None
 ):
+    from matplotlib import cm
     results = pandas.DataFrame.from_csv(
         results_path,
         index_col='QID'
     )
-    print("directory:", directory_name)
-    print("results path:", results_path)
 
     all_winning_models = list(results.loc[:, 'NameAlphabetical'])
     rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
@@ -280,7 +279,8 @@ def average_parameter_estimates(
 
     epochs = range(num_experiments)
     latex_terms = {}
-
+            
+        
     for name in winning_models:
         plt.clf()
         fig = plt.figure()
@@ -289,12 +289,15 @@ def average_parameter_estimates(
         parameters_for_this_name = parameter_estimates_from_qmd[name]
 
         terms = DataBase.get_constituent_names_from_name(name)
+        
+        cm_subsection = np.linspace(0,0.8,len(terms))
+#        colours = [ cm.magma(x) for x in cm_subsection ]
+        colours = [ cm.Paired(x) for x in cm_subsection ]
 
         parameters = {}
 
         for t in terms:
             parameters[t] = {}
-            latex_terms[t] = DataBase.latex_name_ising(t)
 
             for e in range(num_experiments):
                 parameters[t][e] = []
@@ -316,13 +319,28 @@ def average_parameter_estimates(
                 std_devs[p][e] = np.std(parameters[p][e])
 
         for term in terms:
-            averages = [ avg_parameters[term][e] for e in epochs  ]
-            ax.plot(epochs, averages, label=latex_terms[term])
+            latex_terms[term] = DataBase.latex_name_ising(term)
+            averages = np.array( [ avg_parameters[term][e] for e in epochs  ])
+            standard_dev = np.array([ std_devs[term][e] for e in epochs])
+            ax.plot(
+                epochs, 
+                averages, 
+                label=latex_terms[term],
+                c=colours[terms.index(term)]
+            )
+            ax.fill_between(
+                epochs, 
+                averages-standard_dev, 
+                averages+standard_dev,
+                alpha=0.2, 
+                linewidth=0.0,
+                facecolor=colours[ terms.index(term) ]
+            )
 
         plot_title= str('Average Parameter Estimates '+ str(DataBase.latex_name_ising(name)) )
         ax.set_ylabel('Parameter Esimate')
         ax.set_xlabel('Experiment')
-#        ax.set_xticks(range(0, num_experiments))
+        ax.set_xticks(range(0, num_experiments))
         plt.title(plot_title)
         ax.legend(
             loc='center left', 
@@ -337,6 +355,7 @@ def average_parameter_estimates(
             else:
                 save_file = str(save_to_file + '_' + name + '.png')
             plt.savefig(save_file, bbox_inches='tight')
+
 
 def Bayes_t_test(
     directory_name, 
@@ -498,7 +517,8 @@ def get_entropy(models_points, inf_gain=False):
         entropy -= partial_entropy
     
     if inf_gain:
-        information_gain = entropy -initial_entropy  
+        # information gain is entropy loss
+        information_gain =  initial_entropy - entropy
         return information_gain
     else:
         return entropy

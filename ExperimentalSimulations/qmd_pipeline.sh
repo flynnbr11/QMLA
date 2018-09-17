@@ -5,7 +5,7 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=5
+num_tests=2
 qhl_test=0
 do_further_qhl=0
 
