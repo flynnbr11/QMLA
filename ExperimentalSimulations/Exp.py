@@ -315,28 +315,24 @@ if global_variables.qhl_test:
         r_squared = (
             true_mod_instance.r_squared()
         )
-        """
-        import csv 
-        metrics = {
-            LatexConfig : qmd.LatexConfig,
-            r_squared : r_squared
-        }
-
-        metrics_file = str(
-            global_variables.results_directory
-            + 'metrics.csv'
+    qmd.plotExpecValues(
+        model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
+        max_time = expec_val_plot_max_time, #in microsec
+        champ = False,
+        save_to_file=str( 
+            global_variables.plots_directory +
+            'expec_values_' + 
+            str(global_variables.long_id)+
+            '.png'
         )
-        metrics_record = str(qmd.LatexConfig + ',' + str(r_squared))
-        metrics_fields = list(metrics.keys())
+    )
 
-        # TODO write metrics file
-        """
-        results_file = global_variables.results_file
-        pickle.dump(
-            qmd.ResultsDict,
-            open(results_file, "wb"), 
-            protocol=2
-        )
+    results_file = global_variables.results_file
+    pickle.dump(
+        qmd.ResultsDict,
+        open(results_file, "wb"), 
+        protocol=2
+    )
 
 
 
@@ -474,7 +470,7 @@ else:
         open(results_file, "wb"), 
         protocol=2
     )
-        
+            
 end = time.time()
 log_print(["Time taken:", end-start], log_file)
 log_print(["END: QMD id", global_variables.qmd_id, ":",
