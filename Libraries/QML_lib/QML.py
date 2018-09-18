@@ -602,6 +602,7 @@ class reducedModel():
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.NumParticles = qmd_info['num_particles']
+        self.NumExperiments = qmd_info['num_experiments']
         self.NumProbes = qmd_info['num_probes']
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.ResamplerA = qmd_info['resampler_a']
@@ -707,7 +708,7 @@ class reducedModel():
         if max_time is None:
             max_time = max(exp_times)
 
-        min_time = expdt.nearestAvailableExpTime(exp_times, 0)
+        min_time = expdt.nearestAvailableExpTime(exp_times, min_time)
         max_time = expdt.nearestAvailableExpTime(exp_times, max_time)
         min_data_idx = exp_times.index(min_time)
         max_data_idx = exp_times.index(max_time)
@@ -745,6 +746,57 @@ class reducedModel():
         return Rsq
 
 
+    def r_squared_by_epoch(
+        self, 
+        min_time=0,
+        max_time=None,
+        num_points=10 # maximum number of epochs to take R^2 at
+    ):
+        exp_times = sorted(list(self.ExperimentalMeasurements.keys()))
+        if max_time is None:
+            max_time = max(exp_times)
+
+        min_time = expdt.nearestAvailableExpTime(exp_times, min_time)
+        max_time = expdt.nearestAvailableExpTime(exp_times, max_time)
+        min_data_idx = exp_times.index(min_time)
+        max_data_idx = exp_times.index(max_time)
+        exp_times = exp_times[min_data_idx:max_data_idx]
+        exp_data = [
+            self.ExperimentalMeasurements[t] for t in exp_times
+        ]
+        probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
+
+        datamean = np.mean(exp_data[0:max_data_idx])
+        datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
+        r_squared_by_epoch =  {}
+        spaced_epochs = np.round(
+            np.linspace(
+                0, 
+                self.NumExperiments-1, 
+                min(self.NumExperiments, num_points))
+        )
+        
+        for e in spaced_epochs:
+
+            ham = np.tensordot(
+                self.TrackEval[int(e)], 
+                self.SimOpList, 
+                axes=1
+            ) # the Hamiltonian this model held at epoch e
+            sum_of_residuals = 0
+            available_expectation_values = sorted(
+                list(self.expectation_values.keys())
+            )
+            for t in exp_times:
+                sim = evo.hahn_evolution(ham, t, probe)
+                true = self.ExperimentalMeasurements[t]
+                diff_squared = (sim - true)**2
+                sum_of_residuals += diff_squared
+
+            Rsq = 1 - sum_of_residuals/datavar
+            r_squared_by_epoch[e] = Rsq
+
+        return r_squared_by_epoch
 
 
     

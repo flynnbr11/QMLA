@@ -1315,7 +1315,8 @@ class QMD():
             'NameAlphabetical' : DataBase.alph(mod.Name),
             'LearnedParameters' : mod.LearnedParameters,
             'TrackParameterEstimates' : mod.TrackParameterEstimates,
-            'ExpectationValues' : mod.expectation_values
+            'ExpectationValues' : mod.expectation_values,
+            'RSquaredByEpoch' : mod.r_squared_by_epoch()
         }
 
     def runMultipleModelQHL(self, model_names=None):
@@ -1543,6 +1544,7 @@ class QMD():
             'LearnedParameters' : self.LearnedParamsChamp,
             'ExpectationValues' : champ_model.expectation_values,
             'TrackParameterEstimates' : champ_model.TrackParameterEstimates,
+            'RSquaredByEpoch' : champ_model.r_squared_by_epoch()
         }
 
     def updateDataBaseModelValues(self):

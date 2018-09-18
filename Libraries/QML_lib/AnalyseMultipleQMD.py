@@ -342,7 +342,7 @@ def average_parameter_estimates(
             str(DataBase.latex_name_ising(name)) +
             ' [' +
             str(num_wins_for_name) + # TODO - num times this model won 
-            ' instance].'
+            ' instances].'
         )
         ax.set_ylabel('Parameter Esimate')
         ax.set_xlabel('Experiment')
@@ -469,7 +469,7 @@ def Bayes_t_test(
         description = str(
                 name + ' : ' + 
                 str(round(success_rate, 2)) + 
-                ' [' + str(num_sets_of_this_name)  + ' instances].'
+                ' (' + str(num_sets_of_this_name)  + ').'
             )
 #        ax.errorbar(times, mean_exp, xerr=std_dev_exp, label=description)
         ax.plot(
@@ -502,11 +502,93 @@ def Bayes_t_test(
     ax.legend(
         loc='center left', 
         bbox_to_anchor=(1, 0.5), 
-        title=' Model : Bayes t-test'
+        title=' Model : Bayes t-test (instances)'
     )    
     
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
+
+
+def r_sqaured_average(
+    results_path, 
+    top_number_models=2,
+    save_to_file=None
+):
+    from matplotlib import cm
+    plt.clf()
+    fig = plt.figure()
+    ax = plt.subplot(111)
+
+    results = pandas.DataFrame.from_csv(
+        results_path,
+        index_col='QID'
+    )
+    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
+    rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
+    # from https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
+    
+    if len(all_winning_models) > top_number_models:
+        winning_models = rank_models(all_winning_models)[0:top_number_models]
+    else:
+        winning_models = list(set(all_winning_models))    
+
+    names = winning_models
+    num_models = len(names)
+    cm_subsection = np.linspace(0,0.8,num_models)
+    #        colours = [ cm.magma(x) for x in cm_subsection ]
+    colours = [ cm.Paired(x) for x in cm_subsection ]
+
+    i=0
+    for i in range(len(names)):
+        name = names[i]
+        r_squared_values = list(
+            results[ results['NameAlphabetical']==name]['RSquaredByEpoch']
+        )
+
+        r_squared_lists = {}
+        num_wins = len(r_squared_values)
+        for j in range(num_wins):
+            rs = eval(r_squared_values[j])
+            for t in list(rs.keys()):
+                try:
+                    r_squared_lists[t].append(rs[t])
+                except:
+                    r_squared_lists[t] = [rs[t]]
+
+        times = list(r_squared_lists.keys())
+        means = np.array(
+            [ np.mean(r_squared_lists[t]) for t in times]
+        )
+
+        std_dev = np.array(
+            [ np.std(r_squared_lists[t]) for t in times]
+        )
+
+        term = DataBase.latex_name_ising(name)
+        plot_label = str(term + ' ('+ str(num_wins) + ')')
+        colour = colours[ i ]
+        ax.plot(
+            times, 
+            means,
+            label=plot_label,
+            marker='o'
+        )
+        ax.fill_between(
+            times, 
+            means-std_dev,
+            means+std_dev,
+            alpha=0.2
+        )
+        ax.legend(
+            bbox_to_anchor=(1.0, 0.9), 
+            title='Model (instances)'
+        )
+    plt.title('$R^2$ average')
+
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
+
 
         
 def model_scores(directory_name):
@@ -717,6 +799,15 @@ average_parameter_estimates(
     save_to_file=  str(
         directory_to_analyse + 
         'param_avg.png'
+    )
+)
+
+r_sqaured_average(
+    results_path = results_csv,
+    top_number_models = arguments.top_number_models,
+    save_to_file=  str(
+        directory_to_analyse + 
+        'r_squared_averages.png'
     )
 )
 
