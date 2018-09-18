@@ -287,7 +287,7 @@ def average_parameter_estimates(
         ax = plt.subplot(111)
 
         parameters_for_this_name = parameter_estimates_from_qmd[name]
-
+        num_wins_for_name = len(parameters_for_this_name)
         terms = DataBase.get_constituent_names_from_name(name)
         
         cm_subsection = np.linspace(0,0.8,len(terms))
@@ -337,7 +337,13 @@ def average_parameter_estimates(
                 facecolor=colours[ terms.index(term) ]
             )
 
-        plot_title= str('Average Parameter Estimates '+ str(DataBase.latex_name_ising(name)) )
+        plot_title= str(
+            'Average Parameter Estimates '+ 
+            str(DataBase.latex_name_ising(name)) +
+            ' [' +
+            str(num_wins_for_name) + # TODO - num times this model won 
+            ' instance].'
+        )
         ax.set_ylabel('Parameter Esimate')
         ax.set_xlabel('Experiment')
         plt.title(plot_title)
@@ -411,20 +417,24 @@ def Bayes_t_test(
         if alph in expectation_values_by_name.keys():
             expectation_values_by_name[alph].append(expec_values)
         else:
-            expectation_values_by_name[alph] =[expec_values]
+            expectation_values_by_name[alph] = [expec_values]
 
-    expectation_values = {}
-    for t in list(experimental_measurements.keys()):
-        expectation_values[t] = []
+    # expectation_values = {}
+    # for t in list(experimental_measurements.keys()):
+    #     expectation_values[t] = []
 
     success_rate_by_term = {}
     for term in winning_models:
+        expectation_values = {}
         num_sets_of_this_name = len(expectation_values_by_name[term])
         for i in range(num_sets_of_this_name):
             learned_expectation_values = expectation_values_by_name[term][i]
 
             for t in list(experimental_measurements.keys()):
-                expectation_values[t].append(learned_expectation_values[t])
+                try:
+                    expectation_values[t].append(learned_expectation_values[t])
+                except:
+                    expectation_values[t] = [learned_expectation_values[t]]
 
         means = {}
         std_dev = {}
@@ -455,8 +465,12 @@ def Bayes_t_test(
 
         mean_exp = np.array( [means[t] for t in times] )
         std_dev_exp = np.array( [std_dev[t] for t in times] )
-        name=DataBase.latex_name_ising(result['NameAlphabetical'])
-        description = str(name + ' : ' + str(round(success_rate, 2)) )
+        name=DataBase.latex_name_ising(term)
+        description = str(
+                name + ' : ' + 
+                str(round(success_rate, 2)) + 
+                ' [' + str(num_sets_of_this_name)  + ' instances].'
+            )
 #        ax.errorbar(times, mean_exp, xerr=std_dev_exp, label=description)
         ax.plot(
             times, 
@@ -478,8 +492,16 @@ def Bayes_t_test(
     plt.xlabel('Time')
     plt.ylabel('Expectation Value')
     true_exp = [true[t] for t in times]
-    ax.scatter(times, true_exp, color='r', s=5, label='True Expectation Value')
-    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), 
+    ax.scatter(
+        times, 
+        true_exp, 
+        color='r', 
+        s=5, 
+        label='True Expectation Value'
+    )
+    ax.legend(
+        loc='center left', 
+        bbox_to_anchor=(1, 0.5), 
         title=' Model : Bayes t-test'
     )    
     
@@ -684,7 +706,7 @@ Bayes_t_test(
     dataset = arguments.dataset, 
     results_path = results_csv,
     top_number_models = arguments.top_number_models ,
-    save_to_file=str(directory_to_analyse+'Avg_expec_bayes_t_test.png')
+    save_to_file=str(directory_to_analyse+'expec_vals_avg_bayes_t_test.png')
 )
 
 
@@ -694,7 +716,7 @@ average_parameter_estimates(
     top_number_models = arguments.top_number_models,
     save_to_file=  str(
         directory_to_analyse + 
-        'avg_params.png'
+        'param_avg.png'
     )
 )
 
@@ -722,8 +744,8 @@ else:
         save_to_file = str(directory_to_analyse+'true_model_bayes_comparisons.png')
     )
 
-    param_plot = str(directory_to_analyse+'param_analysis_total.png')
-    param_percent_plot = str(directory_to_analyse+'param_analysis_percentage.png')
+    param_plot = str(directory_to_analyse+'sweep_param_total.png')
+    param_percent_plot = str(directory_to_analyse+'sweep_param_percentage.png')
 
     parameter_sweep_analysis(
         directory_name = directory_to_analyse, 

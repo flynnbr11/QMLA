@@ -5,7 +5,7 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=5
+num_tests=10
 qhl_test=0
 do_further_qhl=0
 
@@ -72,8 +72,8 @@ if (( $qhl_test == 1 )) # For QHL test always do without rq
 then
     use_rq=0
 fi
+#use_rq=0
 use_rq=0
-# use_rq=0
 let bt="$exp-1"
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
