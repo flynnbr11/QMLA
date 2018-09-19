@@ -235,7 +235,24 @@
 			"file": "ExperimentalSimulations/qmd_pipeline.sh",
 			"settings":
 			{
-				"buffer_size": 3226,
+				"buffer_size": 3252,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/ModelGeneration.py",
+			"settings":
+			{
+				"buffer_size": 16018,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/PlotQMD.py",
+			"settings":
+			{
+				"buffer_size": 81855,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -244,7 +261,16 @@
 			"file": "ExperimentalSimulations/Exp.py",
 			"settings":
 			{
-				"buffer_size": 15544,
+				"buffer_size": 15418,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/QML.py",
+			"settings":
+			{
+				"buffer_size": 38053,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -253,7 +279,16 @@
 			"file": "Libraries/QML_lib/QMD.py",
 			"settings":
 			{
-				"buffer_size": 74499,
+				"buffer_size": 75221,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
+			"settings":
+			{
+				"buffer_size": 26584,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -333,7 +368,7 @@
 	],
 	"find":
 	{
-		"height": 29.0
+		"height": 41.0
 	},
 	"find_in_files":
 	{
@@ -347,6 +382,42 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"self.FinalParams[iterator]",
+			"trackeval",
+			"plotparam",
+			"Bayes_t_test",
+			"parameterEstimates",
+			"plotpara",
+			"r_sqaured_average",
+			"top_number_models",
+			"champ_model",
+			"'RSquaredByEpoch'",
+			"mod",
+			"num_sets_of_this_name",
+			"fill_between",
+			"Generator  not recognised",
+			"generator not recognised",
+			"term",
+			"import mat",
+			"            \n",
+			"volume",
+			"Bayes_t_test",
+			"bayes",
+			"expdt",
+			"nearestAvailableExpTime",
+			"\n#",
+			"r_sq",
+			"plotParameterEstimates",
+			"\"\"\"",
+			"\"\"\"\n",
+			"LearnedHamiltonian",
+			"DataBase",
+			"latex_terms",
+			"\n):",
+			"TrackParameterEstimates",
+			".png",
+			"ax",
+			"print"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -370,7 +441,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -379,7 +450,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3226,
+						"buffer_size": 3252,
 						"regions":
 						{
 							"bookmarks":
@@ -399,8 +470,8 @@
 						"selection":
 						[
 							[
-								406,
-								406
+								196,
+								196
 							]
 						],
 						"settings":
@@ -413,24 +484,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "ExperimentalSimulations/Exp.py",
+					"file": "Libraries/QML_lib/ModelGeneration.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 15544,
+						"buffer_size": 16018,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								272,
-								272
+								3194,
+								3194
 							]
 						],
 						"settings":
@@ -440,10 +511,100 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1398.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Libraries/QML_lib/PlotQMD.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 81855,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								62028,
+								62028
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 37778.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "ExperimentalSimulations/Exp.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15418,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10137,
+								10137
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3098.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "Libraries/QML_lib/QML.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 38053,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								11806,
+								11806
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5458.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -453,20 +614,20 @@
 			"sheets":
 			[
 				{
-					"buffer": 2,
+					"buffer": 5,
 					"file": "Libraries/QML_lib/QMD.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 74499,
+						"buffer_size": 75221,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								68778,
+								68778
 							]
 						],
 						"settings":
@@ -476,10 +637,40 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 33478.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 26584,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								14310,
+								14310
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 7858.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
 					"type": "text"
 				}
 			]
@@ -513,7 +704,7 @@
 		"cols":
 		[
 			0.0,
-			0.5,
+			0.479216152019,
 			1.0
 		],
 		"rows":
@@ -569,7 +760,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 236.0,
+	"side_bar_width": 132.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

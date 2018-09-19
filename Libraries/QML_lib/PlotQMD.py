@@ -118,7 +118,11 @@ def ExpectationValuesTrueSim(
     sim_colours = ['g', 'c', 'm', 'y', 'k']
     global_min_time = 0
     plt.clf()
-    if (experimental_measurements_dict is not None) and (use_experimental_data==True):
+    if (
+        (experimental_measurements_dict is not None) 
+        and 
+        (use_experimental_data==True)
+    ):
         times = sorted(list(experimental_measurements_dict.keys()))
         true_expec_values = [
             experimental_measurements_dict[t] for t in times
@@ -1874,7 +1878,7 @@ def draw_networkx_arrows(G, pos,
 def parameterEstimates(qmd, modelID, 
     use_experimental_data=False,save_to_file=None
 ):
-
+    from matplotlib import cm
     mod = qmd.reducedModelInstanceFromID(modelID)
     name = mod.Name
         
@@ -1888,22 +1892,39 @@ def parameterEstimates(qmd, modelID,
 
     term_positions={}
     param_estimate_by_term = {}
+    std_devs = {}
 
     for t in range(num_terms):
         term_positions[terms[t]] = t 
         term = terms[t]
         param_position = term_positions[term]
         param_estimates = mod.TrackEval[:,param_position]
+        #std_dev = mod.cov_matrix[param_position,param_position]
+        std_dev = mod.TrackCovMatrices[:,param_position,param_position]
         param_estimate_by_term[term] = param_estimates    
+        std_devs[term] = std_dev
 
-    colours = ['b','r','g','orange', 'pink', 'grey']
+    cm_subsection = np.linspace(0,0.8,num_terms)
+    colours = [ cm.magma(x) for x in cm_subsection ]
+#    colours = [ cm.Set1(x) for x in cm_subsection ]
+
+#    colours = ['b','r','g','orange', 'pink', 'grey']
+
     # TODO use color map as list
     num_epochs = qmd.NumExperiments
     fig = plt.figure()
     ax = plt.subplot(111)
 
+    nrows=2
+    ncols=int(np.ceil( num_terms/2 ))
+    fig, axes = plt.subplots(figsize = (20, 10), nrows=nrows, ncols=ncols)
+    row = 0
+    col = 0
+    axes_so_far = 0
+
     i=0
     for term in list(param_estimate_by_term.keys()):
+        ax = axes[row,col]
         colour = colours[i%len(colours)]
         i+=1
         try:
@@ -1913,12 +1934,33 @@ def parameterEstimates(qmd, modelID,
                 ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
         except:
             pass
-        y = param_estimate_by_term[term]
+        y = np.array(param_estimate_by_term[term])
+        s = np.array(std_devs[term])
         x = range(1,1+len(param_estimate_by_term[term]))
         latex_term = DataBase.latex_name_ising(term)
-        ax.scatter(x,y, s=max(1,50/num_epochs), 
-            label=str(latex_term + ' Estimate'), color=colour
+        ax.scatter(
+            x,
+            y, 
+            s=max(1,50/num_epochs), 
+            label=str(latex_term + ' Estimate'), 
+            color=colour
         )
+        ax.fill_between(
+            x, 
+            y+s, 
+            y-s, 
+            alpha=0.1,
+            facecolor=colour
+
+        )
+        ax.legend(loc=1)
+        axes_so_far += 1
+        col += 1
+        if col == ncols:
+            col=0
+            row+=1
+#        ax.set_title(str(latex_term))
+
 
     plt.xlabel('Epoch')
     plt.ylabel('Parameter Estimate')

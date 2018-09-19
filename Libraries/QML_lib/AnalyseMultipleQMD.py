@@ -783,14 +783,6 @@ pickle.dump(
     protocol=2
 )
 
-Bayes_t_test(
-    directory_name = directory_to_analyse, 
-    dataset = arguments.dataset, 
-    results_path = results_csv,
-    top_number_models = arguments.top_number_models ,
-    save_to_file=str(directory_to_analyse+'expec_vals_avg_bayes_t_test.png')
-)
-
 
 average_parameter_estimates(
     directory_name = directory_to_analyse, 
@@ -802,6 +794,15 @@ average_parameter_estimates(
     )
 )
 
+"""
+Bayes_t_test(
+    directory_name = directory_to_analyse, 
+    dataset = arguments.dataset, 
+    results_path = results_csv,
+    top_number_models = arguments.top_number_models ,
+    save_to_file=str(directory_to_analyse+'expec_vals_avg_bayes_t_test.png')
+)
+"""
 r_sqaured_average(
     results_path = results_csv,
     top_number_models = arguments.top_number_models,

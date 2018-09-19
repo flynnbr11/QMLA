@@ -170,13 +170,14 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         # checks that all parameters have same sign as the 
         # initial given parameter for that term. 
         # Otherwise, redraws the distribution. 
- #       validity = np.all(np.abs(modelparams) > self._min_freq, axis=1)
-        new_signs = np.sign(modelparams)
-        validity_by_signs=np.all(
-            np.sign(modelparams) == self.signs_of_inital_params,
-            axis=1
-        )
-        return validity_by_signs
+        validity = np.all(np.abs(modelparams) > self._min_freq, axis=1)
+        return validity
+        # new_signs = np.sign(modelparams)
+        # validity_by_signs=np.all(
+        #     np.sign(modelparams) == self.signs_of_inital_params,
+        #     axis=1
+        # )
+        # return validity_by_signs
 
     def n_outcomes(self, expparams):
         """

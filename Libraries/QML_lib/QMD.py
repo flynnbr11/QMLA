@@ -1702,7 +1702,8 @@ class QMD():
         if true_model: 
             model_id = DataBase.model_id_from_name(db=self.db, name=self.TrueOpName)
 
-        PlotQMD.parameterEstimates(qmd=self, modelID = model_id, 
+        PlotQMD.parameterEstimates(qmd=self, 
+            modelID = model_id, 
             use_experimental_data = self.UseExperimentalData,
             save_to_file = save_to_file
         )

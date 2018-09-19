@@ -238,6 +238,7 @@ class ModelLearningClass():
             self.QLosses = np.empty(n_experiments)
         self.Covars= np.empty(n_experiments)
         self.TrackEval = []
+        self.TrackCovMatrices = []
         self.TrackTime =np.empty(n_experiments)#only for debugging
     
         self.Particles = np.empty([self.NumParticles, 
@@ -294,14 +295,6 @@ class ModelLearningClass():
             self.datum_gather_cumulative_time+=after_datum-before_datum
             
             exp_t = self.Experiment[0][0]
-#            self.log_print(
-#                [
-#                'True', self.ExperimentalMeasurements[exp_t],
-#                'Datum', np.mean(self.Datum),
-#               'Entering Updater'
-#                ]
-
-#                )
             before_upd = time.time()
             ## Call updater to update distribution based on datum
             self.Updater.update(self.Datum, self.Experiment)
@@ -330,7 +323,8 @@ class ModelLearningClass():
 #            if istep%50==0:
 #                self.log_print(['Step', istep, '\t Mean:', self.Updater.est_mean()])
             self.TrackEval.append(self.Updater.est_mean())
-            
+            self.TrackCovMatrices.append(self.Updater.est_covariance_mtx())
+
             print_loc(global_print_loc)
             self.Covars[istep] = np.linalg.norm(
                 self.Updater.est_covariance_mtx()
@@ -480,6 +474,7 @@ class ModelLearningClass():
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
+        learned_info['track_cov_matrices'] = self.TrackCovMatrices
         learned_info['resample_epochs'] = self.ResampleEpochs
         learned_info['quadratic_losses'] = self.QLosses
         learned_info['learned_parameters'] = self.LearnedParameters
@@ -670,6 +665,7 @@ class reducedModel():
         self.log_total_likelihod = learned_info['log_total_likelihood']
         self.VolumeList = learned_info['volume_list'] 
         self.TrackEval = np.array(learned_info['track_eval'])
+        self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
         self.ResampleEpochs = learned_info['resample_epochs']
         self.QuadraticLosses = learned_info['quadratic_losses']
         self.LearnedParameters = learned_info['learned_parameters']

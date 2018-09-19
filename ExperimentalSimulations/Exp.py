@@ -97,7 +97,7 @@ experimental_measurements_dict = pickle.load(
 if global_variables.use_experimental_data is True:
     expec_val_plot_max_time = global_variables.data_max_time
 else:
-    expec_val_plot_max_time = 200    
+    expec_val_plot_max_time = 100    
 
 """
 for t in list(experimental_measurements_dict.keys()):
@@ -158,14 +158,20 @@ if global_variables.custom_prior:
         # 'xTi' : [1.5, 1.0], # TODO Broaden, testing with small dist
         # 'yTi' : [1.5, 1.0],
         # 'zTi' : [1.5, 1.0],
+        'xTx' : [0.0, 2.0], # true value 2.7
+        'yTy' : [0.0, 2.0], # true value 2.7
+        'zTz' : [0.0, 2.0], # true value 2.14
+        'xTi' : [0.0, 2.0], # TODO Broaden, testing with small dist
+        'yTi' : [0.0, 2.0],
+        'zTi' : [0.0, 2.0],
 
-        # Values below correspond to simulated data
-        'xTx' : [-1.5, 1.0], # true value 2.7
-        'yTy' : [-1.5, 1.0], # true value 2.7
-        'zTz' : [-1.5, 1.0], # true value 2.14
-        'xTi' : [1.5, 1.0], # TODO Broaden, testing with small dist
-        'yTi' : [1.5, 1.0],
-        'zTi' : [1.5, 1.0],
+        # # Values below correspond to simulated data
+        # 'xTx' : [-1.5, 1.0], # true value 2.7
+        # 'yTy' : [-1.5, 1.0], # true value 2.7
+        # 'zTz' : [-1.5, 1.0], # true value 2.14
+        # 'xTi' : [1.5, 1.0], # TODO Broaden, testing with small dist
+        # 'yTi' : [1.5, 1.0],
+        # 'zTi' : [1.5, 1.0],
 
         # Values below correspond to Andreas' inital QMD values for this data set
 #        'xTx' : [-1.59329862 , 0.19606237], # true value 2.7
@@ -318,6 +324,7 @@ if global_variables.qhl_test:
     qmd.plotExpecValues(
         model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
         max_time = expec_val_plot_max_time, #in microsec
+        t_interval=0.5,
         champ = False,
         save_to_file=str( 
             global_variables.plots_directory +
