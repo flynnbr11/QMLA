@@ -141,6 +141,11 @@ if global_variables.custom_prior:
 
 else:
     prior_specific_terms = {}
+log_print(
+    ["Prior specific terms:", prior_specific_terms], 
+    log_file
+)
+
 
 model_priors = None
 
