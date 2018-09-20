@@ -91,6 +91,9 @@ default_dataset = 'NV_HahnPeaks_expdataset'
 default_data_max_useful_time = 2000 # nanoseconds
 default_data_time_offset = 180 # nanoseconds
 default_growth_generation_rule = 'two_qubit_ising_rotation_hyperfine'
+default_prior_pickle_file = None
+default_true_params_pickle_file = None
+
 
 class GlobalVariablesClass():
     def __init__(
@@ -129,7 +132,10 @@ class GlobalVariablesClass():
         dataset = default_dataset,
         data_max_time = default_data_max_useful_time,
         data_time_offset = default_data_time_offset,
-        growth_generation_rule = default_growth_generation_rule
+        growth_generation_rule = default_growth_generation_rule,
+        prior_pickle_file = default_prior_pickle_file,
+        true_params_pickle_file = default_true_params_pickle_file
+
     ):
         self.true_operator = true_operator
         self.qhl_test = qhl_test
@@ -168,6 +174,8 @@ class GlobalVariablesClass():
         self.data_time_offset = data_time_offset
         self.data_max_time = data_max_time 
         self.growth_generation_rule = growth_generation_rule
+        self.prior_pickle_file = prior_pickle_file
+        self.true_params_pickle_file = true_params_pickle_file
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -440,6 +448,19 @@ def parse_cmd_line_args(args):
       default=default_growth_generation_rule
     )
 
+    parser.add_argument(
+      '-prior_path', '--prior_pickle_file',
+      help='Path to save prior to.',
+      type=str,
+      default=default_prior_pickle_file
+    )
+    parser.add_argument(
+      '-true_params_path', '--true_params_pickle_file',
+      help='Path to save true params to.',
+      type=str,
+      default=default_true_params_pickle_file
+    )
+
 
     # Process arguments from command line
     arguments = parser.parse_args(args)
@@ -480,6 +501,8 @@ def parse_cmd_line_args(args):
     data_max_time = arguments.dataset_max_time    
     data_time_offset = arguments.data_time_offset
     growth_generation_rule = arguments.growth_generation_rule
+    prior_pickle_file = arguments.prior_pickle_file
+    true_params_pickle_file = arguments.true_params_pickle_file
 
     # Use arguments to initialise global variables class. 
     global_variables = GlobalVariablesClass(
@@ -516,7 +539,9 @@ def parse_cmd_line_args(args):
         dataset = dataset,
         data_max_time = data_max_time,
         data_time_offset = data_time_offset,
-        growth_generation_rule = growth_generation_rule
+        growth_generation_rule = growth_generation_rule,
+        prior_pickle_file = prior_pickle_file,
+        true_params_pickle_file = true_params_pickle_file
     )
 
     args_dict = vars(arguments)

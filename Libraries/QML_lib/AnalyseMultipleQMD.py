@@ -241,6 +241,7 @@ def average_parameter_estimates(
     directory_name, 
     results_path, 
     top_number_models=2,
+    true_params_dict=None,
     save_to_file=None
 ):
     from matplotlib import cm
@@ -288,9 +289,17 @@ def average_parameter_estimates(
 
         parameters_for_this_name = parameter_estimates_from_qmd[name]
         num_wins_for_name = len(parameters_for_this_name)
-        terms = DataBase.get_constituent_names_from_name(name)
-        
-        cm_subsection = np.linspace(0,0.8,len(terms))
+        terms = sorted(DataBase.get_constituent_names_from_name(name))
+        num_terms = len(terms)
+
+        nrows=int(np.ceil( num_terms/3 ))
+        ncols=int(np.ceil( num_terms/2 ))
+        fig, axes = plt.subplots(figsize = (10, 7), nrows=nrows, ncols=ncols)
+        row = 0
+        col = 0
+        axes_so_far = 0
+
+        cm_subsection = np.linspace(0,0.8,num_terms)
 #        colours = [ cm.magma(x) for x in cm_subsection ]
         colours = [ cm.Paired(x) for x in cm_subsection ]
 
@@ -319,12 +328,31 @@ def average_parameter_estimates(
                 std_devs[p][e] = np.std(parameters[p][e])
 
         for term in terms:
+            ax = axes[row, col]
+            axes_so_far += 1
+            col += 1
+            if col == ncols:
+                col=0
+                row+=1
             latex_terms[term] = DataBase.latex_name_ising(term)
             averages = np.array( [ avg_parameters[term][e] for e in epochs  ])
             standard_dev = np.array([ std_devs[term][e] for e in epochs])
-            ax.plot(
+            
+            try:
+                true_val = true_params_dict[term]
+                true_term_latex = DataBase.latex_name_ising(term)
+                ax.axhline(
+                    true_val, 
+                    label=str(true_term_latex+ ' True'), 
+                    color=colours[terms.index(term)]
+                )
+            except:
+                pass
+
+            ax.scatter(
                 epochs, 
                 averages, 
+                s=7,
                 label=latex_terms[term],
                 c=colours[terms.index(term)]
             )
@@ -336,7 +364,10 @@ def average_parameter_estimates(
                 linewidth=0.0,
                 facecolor=colours[ terms.index(term) ]
             )
+            latex_term = DataBase.latex_name_ising(term)
+            ax.set_title(str(latex_term))
 
+        """
         plot_title= str(
             'Average Parameter Estimates '+ 
             str(DataBase.latex_name_ising(name)) +
@@ -352,7 +383,7 @@ def average_parameter_estimates(
             bbox_to_anchor=(1, 0.5), 
             title='Parameter'
         )    
-
+        """
         if save_to_file is not None:
             if save_to_file[-4:] == '.png':
                 partial_name = save_to_file[:-4]
@@ -555,7 +586,7 @@ def r_sqaured_average(
                 except:
                     r_squared_lists[t] = [rs[t]]
 
-        times = list(r_squared_lists.keys())
+        times = sorted(list(r_squared_lists.keys()))
         means = np.array(
             [ np.mean(r_squared_lists[t]) for t in times]
         )
@@ -752,11 +783,52 @@ parser.add_argument(
   default='NVB_dataset'
 )
 
+parser.add_argument(
+  '-params', '--true_params',
+  help="Path to pickled true params info.",
+  type=str,
+  default=None
+)
+
+parser.add_argument(
+  '-exp', '--use_experimental_data',
+  help="Bool: whether or not to use experimental data.",
+  type=int,
+  default=0
+)
+
 arguments = parser.parse_args()
 directory_to_analyse = arguments.results_directory
 all_bayes_csv = arguments.bayes_csv
 qhl_mode = bool(arguments.qhl_mode)
+true_params_path = arguments.true_params
+exp_data = arguments.use_experimental_data
 
+if true_params_path is not None:
+    true_params_info = pickle.load(
+        open(
+            true_params_path, 
+            'rb'
+        )
+    )
+    true_params_dict = true_params_info['params_dict']
+else:
+    true_params_dict = None
+
+if exp_data is False:
+    name = true_params_info['true_op']
+    terms = DataBase.get_constituent_names_from_name(name)
+    params=[]
+    ops=[]
+    for t in terms:
+        params.append(true_params_dict[t])
+        ops.append( DataBase.compute(t) )
+        
+    true_ham = np.tensordot(params, ops, axes=1)
+
+#######################################
+### Now analyse the results. 
+#######################################
 print("\nAnalysing and storing results in", directory_to_analyse)
 
 
@@ -788,21 +860,24 @@ average_parameter_estimates(
     directory_name = directory_to_analyse, 
     results_path = results_csv, 
     top_number_models = arguments.top_number_models,
+    true_params_dict = true_params_dict,
     save_to_file=  str(
         directory_to_analyse + 
         'param_avg.png'
     )
 )
 
-"""
-Bayes_t_test(
-    directory_name = directory_to_analyse, 
-    dataset = arguments.dataset, 
-    results_path = results_csv,
-    top_number_models = arguments.top_number_models ,
-    save_to_file=str(directory_to_analyse+'expec_vals_avg_bayes_t_test.png')
-)
-"""
+
+
+if exp_data:
+    Bayes_t_test(
+        directory_name = directory_to_analyse, 
+        dataset = arguments.dataset, 
+        results_path = results_csv,
+        top_number_models = arguments.top_number_models ,
+        save_to_file=str(directory_to_analyse+'expec_vals_avg_bayes_t_test.png')
+    )
+
 r_sqaured_average(
     results_path = results_csv,
     top_number_models = arguments.top_number_models,

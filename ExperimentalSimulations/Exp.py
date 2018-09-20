@@ -93,11 +93,11 @@ experimental_measurements_dict = expdt.experimentalMeasurementDict(
 experimental_measurements_dict = pickle.load(
     open(str('Data/'+global_variables.dataset), 'rb')
 )
-
+num_datapoints_to_plot = 250 # to visualise in expec_val plot for simulated data
 if global_variables.use_experimental_data is True:
     expec_val_plot_max_time = global_variables.data_max_time
 else:
-    expec_val_plot_max_time = 100    
+    expec_val_plot_max_time = 20    
 
 """
 for t in list(experimental_measurements_dict.keys()):
@@ -110,33 +110,20 @@ for t in list(experimental_measurements_dict.keys()):
     experimental_measurements_dict[new_time] = msmt
 """
 
-
-
-
 initial_op_list = ['xTi', 'yTi', 'zTi']
 
 true_op = global_variables.true_operator
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 num_params = len(true_op_list)
-true_params = []
-random_true_params = False
 
-if(
-    global_variables.use_experimental_data==False and
-    random_true_params == False
-):
-    if true_op == 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz':
-        for i in range(3):
-            true_params.append(random.uniform(0,2)) # for xTi, yTi, zTi
-        true_params.append(random.uniform(2.0, 3.0))    #xTx
-        true_params.append(random.uniform(2.0, 3.0))    #yTy
-        true_params.append(random.uniform(2.0, 3.0))    #zTz
-    elif true_op == 'xTi':
-        true_params = [1.0]
+true_params_info = pickle.load(
+    open(
+        global_variables.true_params_pickle_file,
+        'rb'
+    )
+)
 
-else: # i.e. purely random true parameters
-    for i in range(num_params):
-        true_params.append(random.uniform(0,2))
+true_params = true_params_info['params_list']
 
 log_print(
     ["True params:", true_params], 
@@ -145,51 +132,13 @@ log_print(
 
 if global_variables.custom_prior:
 
-    prior_specific_terms = {
+    prior_specific_terms = pickle.load(
+        open(
+            global_variables.prior_pickle_file,
+            'rb'
+        )
+    )
 
-        'xTy' : [1.0, 0.5],
-        'xTz' : [1.0, 0.5],
-        'yTz' : [1.0, 0.5],
-
-
-        # 'xTx' : [-2.7, 0.1], # true value 2.7
-        # 'yTy' : [-2.7, 0.1], # true value 2.7
-        # 'zTz' : [-2.1, 0.1], # true value 2.14
-        # 'xTi' : [1.5, 1.0], # TODO Broaden, testing with small dist
-        # 'yTi' : [1.5, 1.0],
-        # 'zTi' : [1.5, 1.0],
-        'xTx' : [0.0, 2.0], # true value 2.7
-        'yTy' : [0.0, 2.0], # true value 2.7
-        'zTz' : [0.0, 2.0], # true value 2.14
-        'xTi' : [0.0, 2.0], # TODO Broaden, testing with small dist
-        'yTi' : [0.0, 2.0],
-        'zTi' : [0.0, 2.0],
-
-        # # Values below correspond to simulated data
-        # 'xTx' : [-1.5, 1.0], # true value 2.7
-        # 'yTy' : [-1.5, 1.0], # true value 2.7
-        # 'zTz' : [-1.5, 1.0], # true value 2.14
-        # 'xTi' : [1.5, 1.0], # TODO Broaden, testing with small dist
-        # 'yTi' : [1.5, 1.0],
-        # 'zTi' : [1.5, 1.0],
-
-        # Values below correspond to Andreas' inital QMD values for this data set
-#        'xTx' : [-1.59329862 , 0.19606237], # true value 2.7
-#        'yTy' : [-1.8172416  , 0.13556748], # true value 2.7
-#        'zTz' : [-3.14796181  ,0.02902302], # true value 2.14
-#        'xTi' : [ 0.33645139 , 0.09620414], # TODO Broaden, testing with small dist
-#        'yTi' : [ 0.66585614 , 0.07126715],
-#        'zTi' : [ 0.34865298  , 0.05232437],
-
-
-        # Values below correspond to Andreas' final values for the NVB_Hahn data set
-#         'xTx' : [-2.85, 0.01], # true value 2.7
-#         'yTy' : [-2.76, 0.01], # true value 2.7
-#         'zTz' : [-2.13, 0.01], # true value 2.14
-#         'xTi' : [0.66, 0.01], # TODO Broaden, testing with small dist
-#         'yTi' : [0.43, 0.01],
-#         'zTi' : [0.55, 0.01],
-    }
 else:
     prior_specific_terms = {}
 
@@ -324,7 +273,7 @@ if global_variables.qhl_test:
     qmd.plotExpecValues(
         model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
         max_time = expec_val_plot_max_time, #in microsec
-        t_interval=0.5,
+        t_interval=expec_val_plot_max_time/num_datapoints_to_plot,
         champ = False,
         save_to_file=str( 
             global_variables.plots_directory +

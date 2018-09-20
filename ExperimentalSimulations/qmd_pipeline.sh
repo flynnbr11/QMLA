@@ -13,7 +13,7 @@ do_further_qhl=0
 # QHL parameters
 ### ---------------------------------------------------###
 prt=1000
-exp=200
+exp=300
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -83,6 +83,16 @@ let bt="$exp-1"
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Launch $num_tests instances of QMD 
+prior_pickle_file="$long_dir/prior.p"
+true_params_pickle_file="$long_dir/true_params.p"
+
+python3 ../Libraries/QML_lib/SetQHLParams.py \
+    -true=$true_params_pickle_file \
+    -prior=$prior_pickle_file \
+    -op=$true_operator \
+    -exp=$exp_data \
+    -rand_t=1 -rand_p=0 # can make true params and prior random
+
 
 for prt in  "${particle_counts[@]}";
 do
@@ -97,6 +107,8 @@ do
             -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
             -exp=$exp_data -cpr=$custom_prior \
+            -prior_path=$prior_pickle_file \
+            -true_params_path=$true_params_pickle_file \
             -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
             -ggr=$growth_rule
     done
@@ -106,7 +118,8 @@ done
 python3 ../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -dir=$long_dir --bayes_csv=$bayes_csv \
     -top=$number_best_models_further_qhl -qhl=$qhl_test \
-    -data=$dataset
+    -exp=$exp_data \
+    -data=$dataset -params=$true_params_pickle_file 
 
 
 if (( $do_further_qhl == 1 )) 
@@ -125,6 +138,8 @@ then
         -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
         -log=$this_log -cb=$bayes_csv \
         -exp=$exp_data -cpr=$custom_prior \
+        -prior_path=$prior_pickle_file \
+        -true_params_path=$true_params_pickle_file \
         -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
         -ggr=$growth_rule
 fi

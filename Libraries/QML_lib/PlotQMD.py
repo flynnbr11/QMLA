@@ -1915,9 +1915,9 @@ def parameterEstimates(qmd, modelID,
     fig = plt.figure()
     ax = plt.subplot(111)
 
-    nrows=2
+    nrows=int(np.ceil( num_terms/3 ))
     ncols=int(np.ceil( num_terms/2 ))
-    fig, axes = plt.subplots(figsize = (20, 10), nrows=nrows, ncols=ncols)
+    fig, axes = plt.subplots(figsize = (10, 7), nrows=nrows, ncols=ncols)
     row = 0
     col = 0
     axes_so_far = 0
@@ -1953,23 +1953,24 @@ def parameterEstimates(qmd, modelID,
             facecolor=colour
 
         )
-        ax.legend(loc=1)
+#        ax.legend(loc=1)
         axes_so_far += 1
         col += 1
         if col == ncols:
             col=0
             row+=1
-#        ax.set_title(str(latex_term))
+        ax.set_title(str(latex_term))
 
-
-    plt.xlabel('Epoch')
-    plt.ylabel('Parameter Estimate')
-    plt.legend(bbox_to_anchor=(1.1, 1.05))
-    plt.title(str("Parameter estimation for model " +  
-        DataBase.latex_name_ising(name)+" ["+str(qmd.NumParticles)
-        +" prt;" + str(qmd.NumExperiments) + "exp]"
-        )
-    )
+#    ax = plt.subplot(111)
+    # plt.xlabel('Epoch')
+    # plt.ylabel('Parameter Estimate')
+    # plt.legend(bbox_to_anchor=(1.1, 1.05))
+    # # TODO put title at top; Epoch centred bottom; Estimate centre y-axis
+    # plt.title(str("Parameter estimation for model " +  
+    #     DataBase.latex_name_ising(name)+" ["+str(qmd.NumParticles)
+    #     +" prt;" + str(qmd.NumExperiments) + "exp]"
+    #     )
+    # )
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
