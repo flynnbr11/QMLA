@@ -356,7 +356,7 @@ def average_parameter_estimates(
                 label=latex_terms[term],
                 c=colours[terms.index(term)]
             )
-            ax.set_yscale('symlog')
+#            ax.set_yscale('symlog')
             ax.fill_between(
                 epochs, 
                 averages-standard_dev, 

@@ -1912,8 +1912,8 @@ def parameterEstimates(qmd, modelID,
 
     # TODO use color map as list
     num_epochs = qmd.NumExperiments
-    fig = plt.figure()
-    ax = plt.subplot(111)
+#    fig = plt.figure()
+#    ax = plt.subplot(111)
 
     nrows=int(np.ceil( num_terms/3 ))
     ncols=int(np.ceil( num_terms/2 ))

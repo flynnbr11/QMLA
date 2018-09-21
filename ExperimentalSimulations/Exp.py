@@ -99,7 +99,6 @@ if global_variables.use_experimental_data is True:
     expec_val_plot_max_time = global_variables.data_max_time
 else:
     expec_val_plot_max_time = 5    
-print("expec_time/numdatapoints:", expec_val_plot_max_time/num_datapoints_to_plot)
 
 """
 for t in list(experimental_measurements_dict.keys()):
