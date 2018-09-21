@@ -1875,8 +1875,11 @@ def draw_networkx_arrows(G, pos,
 ### Parameter Estimate Plot ###
 
 
-def parameterEstimates(qmd, modelID, 
-    use_experimental_data=False,save_to_file=None
+def parameterEstimates(
+    qmd, 
+    modelID, 
+    use_experimental_data=False,
+    save_to_file=None
 ):
     from matplotlib import cm
     mod = qmd.reducedModelInstanceFromID(modelID)
@@ -1915,15 +1918,16 @@ def parameterEstimates(qmd, modelID,
 #    fig = plt.figure()
 #    ax = plt.subplot(111)
 
-    nrows=int(np.ceil( num_terms/3 ))
-    ncols=int(np.ceil( num_terms/2 ))
+    ncols=3
+    nrows=int(np.ceil( num_terms/ncols ))
+
     fig, axes = plt.subplots(figsize = (10, 7), nrows=nrows, ncols=ncols)
     row = 0
     col = 0
     axes_so_far = 0
-
     i=0
-    for term in list(param_estimate_by_term.keys()):
+#    for term in list(param_estimate_by_term.keys()):
+    for term in terms:
         ax = axes[row,col]
         colour = colours[i%len(colours)]
         i+=1

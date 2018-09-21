@@ -292,11 +292,12 @@ def average_parameter_estimates(
         terms = sorted(DataBase.get_constituent_names_from_name(name))
         num_terms = len(terms)
 
-        nrows=int(np.ceil( num_terms/3 ))
-        ncols=int(np.ceil( num_terms/2 ))
+        ncols=3
+        nrows=int(np.ceil( num_terms/ncols ))
         fig, axes = plt.subplots(figsize = (10, 7), nrows=nrows, ncols=ncols)
         row = 0
         col = 0
+        print("nrow, ncols=", nrows, ncols)
         axes_so_far = 0
 
         cm_subsection = np.linspace(0,0.8,num_terms)
@@ -328,6 +329,7 @@ def average_parameter_estimates(
                 std_devs[p][e] = np.std(parameters[p][e])
 
         for term in terms:
+            print("getting axes[row,col]:", row, col)
             ax = axes[row, col]
             axes_so_far += 1
             col += 1
