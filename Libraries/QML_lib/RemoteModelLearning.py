@@ -148,8 +148,13 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
         sim_pars = []
         constituent_terms = DataBase.get_constituent_names_from_name(name)
         for term in op.constituents_names:
-                initial_prior_centre = prior_specific_terms[term][0]
-                sim_pars.append(initial_prior_centre)
+                try:
+                    initial_prior_centre = prior_specific_terms[term][0]
+                    sim_pars.append(initial_prior_centre)
+                except:
+                    # if prior not defined, start from 0 for all other params
+                    initial_prior_centre = 0 
+                    sim_pars.append(initial_prior_centre)
 
     # add model_db_new_row to model_db and running_database
     # Note: do NOT use pd.df.append() as this copies total DB,

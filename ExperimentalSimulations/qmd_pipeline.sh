@@ -5,8 +5,8 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=5
-qhl_test=1
+num_tests=1
+qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
@@ -28,8 +28,8 @@ then
     pgh=0.3
 fi
 
-#growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+#growth_rule='two_qubit_ising_rotation_hyperfine'
 use_rq=0
 further_qhl_factor=2
 plots=1
