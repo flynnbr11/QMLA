@@ -81,9 +81,9 @@ def create_prior(
 	rand_max=3,
 	exp_data=0
 ):
-	terms = DataBase.get_constituent_names_from_name(true_op)
+#	terms = DataBase.get_constituent_names_from_name(true_op)
 	specific_terms = {}
-	
+	terms = list(set_prior_specific_terms.keys())
 	if random_vals is True:
 		for term in terms:
 			val = random.uniform(rand_min, rand_max)
