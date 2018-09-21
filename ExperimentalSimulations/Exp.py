@@ -94,10 +94,12 @@ experimental_measurements_dict = pickle.load(
     open(str('Data/'+global_variables.dataset), 'rb')
 )
 num_datapoints_to_plot = 250 # to visualise in expec_val plot for simulated data
+
 if global_variables.use_experimental_data is True:
     expec_val_plot_max_time = global_variables.data_max_time
 else:
     expec_val_plot_max_time = 5    
+print("expec_time/numdatapoints:", expec_val_plot_max_time/num_datapoints_to_plot)
 
 """
 for t in list(experimental_measurements_dict.keys()):
@@ -278,7 +280,8 @@ if global_variables.qhl_test:
     qmd.plotExpecValues(
         model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
         max_time = expec_val_plot_max_time, #in microsec
-        t_interval=expec_val_plot_max_time/num_datapoints_to_plot,
+        t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
+#        t_interval=0.02,
         champ = False,
         save_to_file=str( 
             global_variables.plots_directory +
