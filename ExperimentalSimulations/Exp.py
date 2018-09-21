@@ -307,6 +307,7 @@ elif global_variables.further_qhl == True:
     qmd.plotExpecValues(
         model_ids = list(range(qmd.HighestModelID)), # hardcode to see full model for development
         max_time = expec_val_plot_max_time, #in microsec
+        t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
         champ = False,
         save_to_file=str( 
             global_variables.plots_directory+
@@ -351,6 +352,7 @@ else:
     qmd.plotExpecValues(
         model_ids = [11], # hardcode to see full model for development
         max_time = expec_val_plot_max_time, #in microsec
+        t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
         save_to_file=str( 
         global_variables.plots_directory+
         'expec_values_'+str(global_variables.long_id)+'.png')
