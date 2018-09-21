@@ -97,7 +97,7 @@ num_datapoints_to_plot = 250 # to visualise in expec_val plot for simulated data
 if global_variables.use_experimental_data is True:
     expec_val_plot_max_time = global_variables.data_max_time
 else:
-    expec_val_plot_max_time = 20    
+    expec_val_plot_max_time = 5    
 
 """
 for t in list(experimental_measurements_dict.keys()):

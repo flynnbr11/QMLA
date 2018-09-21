@@ -324,7 +324,7 @@ def average_parameter_estimates(
             std_devs[p] = {}
 
             for e in range(num_experiments):
-                avg_parameters[p][e] = np.mean(parameters[p][e])
+                avg_parameters[p][e] = np.median(parameters[p][e])
                 std_devs[p][e] = np.std(parameters[p][e])
 
         for term in terms:
@@ -356,6 +356,7 @@ def average_parameter_estimates(
                 label=latex_terms[term],
                 c=colours[terms.index(term)]
             )
+            ax.set_yscale('symlog')
             ax.fill_between(
                 epochs, 
                 averages-standard_dev, 

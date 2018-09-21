@@ -4,6 +4,38 @@
 		"selected_items":
 		[
 			[
+				"prior_",
+				"prior_specific_terms"
+			],
+			[
+				"exp",
+				"exp_data"
+			],
+			[
+				"lat",
+				"latex_name_ising"
+			],
+			[
+				"true_params",
+				"true_params_pickle_file"
+			],
+			[
+				"default_true_",
+				"default_true_params_pickle_file"
+			],
+			[
+				"prior",
+				"prior_pickle_file"
+			],
+			[
+				"track_",
+				"track_cov_matrices"
+			],
+			[
+				"learned",
+				"learned_info_dict"
+			],
+			[
 				"Track",
 				"TrackParameterEstimates"
 			],
@@ -98,10 +130,6 @@
 			[
 				"average",
 				"average_priors"
-			],
-			[
-				"prior",
-				"prior_specific_terms"
 			],
 			[
 				"num_qib",
@@ -235,16 +263,8 @@
 			"file": "ExperimentalSimulations/qmd_pipeline.sh",
 			"settings":
 			{
-				"buffer_size": 3252,
+				"buffer_size": 3870,
 				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Libraries/QML_lib/ModelGeneration.py",
-			"settings":
-			{
-				"buffer_size": 16018,
 				"line_ending": "Unix"
 			}
 		},
@@ -252,7 +272,7 @@
 			"file": "Libraries/QML_lib/PlotQMD.py",
 			"settings":
 			{
-				"buffer_size": 81855,
+				"buffer_size": 83045,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -261,25 +281,26 @@
 			"file": "ExperimentalSimulations/Exp.py",
 			"settings":
 			{
-				"buffer_size": 15418,
+				"buffer_size": 13756,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/QML.py",
+			"file": "Libraries/QML_lib/SetQHLParams.py",
 			"settings":
 			{
-				"buffer_size": 38053,
+				"buffer_size": 3704,
 				"encoding": "UTF-8",
-				"line_ending": "Windows"
+				"line_ending": "Unix",
+				"name": "import random"
 			}
 		},
 		{
 			"file": "Libraries/QML_lib/QMD.py",
 			"settings":
 			{
-				"buffer_size": 75221,
+				"buffer_size": 75234,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -288,7 +309,7 @@
 			"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
 			"settings":
 			{
-				"buffer_size": 26584,
+				"buffer_size": 28673,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -337,25 +358,25 @@
 	],
 	"file_history":
 	[
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/DataBase.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GlobalVariables.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelGeneration.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QML.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GenSimQMD_IQLE.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExperimentalDataFunctions.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/qmd_pipeline.sh",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteModelLearning.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/AnalyseMultipleQMD.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/PlotQMD.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelGeneration.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Distrib.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteBayesFactor.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/DataBase.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RedisSettings.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Evo.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/another.sh",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/id_cycling.sh",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QML.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/test_ids.txt",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/test_ids_complete.txt",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Evo (Sebastian Knauer's conflicted copy 2018-09-07).py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GlobalVariables.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GenSimQMD_IQLE.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RedisDatabaseConfig.conf",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExperimentalDataFunctions (Brian Flynn's conflicted copy 2018-08-28).py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/multiPGH.py",
@@ -382,6 +403,42 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"alpha=0.",
+			"average_parameter_estimates",
+			"expec_val_plot_max_time",
+			"create_qhl_params",
+			"Bayes_t_test",
+			"true_ham",
+			"expectation_value",
+			"after",
+			"Bayes_t_test",
+			"compute",
+			"Bayes_t_test",
+			"bayes_t_tes",
+			"average_parameters",
+			"true_params_dict",
+			"average_parameter_estimates",
+			"\"\"\"\n",
+			"3",
+			"r_sqaured_average",
+			"axes[row",
+			"parameteres",
+			"parameterEstimates",
+			"plotTrueModelBayesFactors_IsingRotationTerms",
+			"t_inter",
+			"colours",
+			"learned_info",
+			"self.TrackSigma",
+			"learned_info['track_sigma']",
+			".TrackSigma",
+			"self",
+			"learned_info['track_sigma",
+			"learned_info['track_sigma']",
+			"learned_info['track_eval']",
+			"self.TrackSigma",
+			"self.TrackEval",
+			"finalparams",
+			"expec_val_plot_max_time",
 			"self.FinalParams[iterator]",
 			"trackeval",
 			"plotparam",
@@ -441,7 +498,7 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -450,7 +507,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3252,
+						"buffer_size": 3870,
 						"regions":
 						{
 							"bookmarks":
@@ -460,8 +517,8 @@
 								"regions":
 								[
 									[
-										395,
-										395
+										399,
+										399
 									]
 								],
 								"scope": "bookmarks"
@@ -470,8 +527,8 @@
 						"selection":
 						[
 							[
-								196,
-								196
+								598,
+								598
 							]
 						],
 						"settings":
@@ -484,54 +541,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "Libraries/QML_lib/ModelGeneration.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 16018,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3194,
-								3194
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1398.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
 					"file": "Libraries/QML_lib/PlotQMD.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 81855,
+						"buffer_size": 83045,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								62028,
-								62028
+								64348,
+								64348
 							]
 						],
 						"settings":
@@ -541,7 +568,37 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 37778.0,
+						"translation.y": 38418.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "ExperimentalSimulations/Exp.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13756,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2711,
+								2711
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1708.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -549,85 +606,55 @@
 				},
 				{
 					"buffer": 3,
-					"file": "ExperimentalSimulations/Exp.py",
+					"file": "Libraries/QML_lib/SetQHLParams.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 15418,
+						"buffer_size": 3704,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								10137,
-								10137
+								810,
+								810
 							]
 						],
 						"settings":
 						{
+							"auto_name": "import random",
 							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 3098.0,
+						"translation.y": 858.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "Libraries/QML_lib/QML.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 38053,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								11806,
-								11806
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 5458.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
 					"type": "text"
 				}
 			]
 		},
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
-					"buffer": 5,
+					"buffer": 4,
 					"file": "Libraries/QML_lib/QMD.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 75221,
+						"buffer_size": 75234,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								68778,
-								68778
+								53769,
+								53769
 							]
 						],
 						"settings":
@@ -637,27 +664,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 33478.0,
+						"translation.y": 30438.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 26584,
+						"buffer_size": 28673,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								14310,
-								14310
+								11993,
+								11993
 							]
 						],
 						"settings":
@@ -667,7 +694,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 7858.0,
+						"translation.y": 4938.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
@@ -704,7 +731,7 @@
 		"cols":
 		[
 			0.0,
-			0.479216152019,
+			0.458423110064,
 			1.0
 		],
 		"rows":
@@ -760,7 +787,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 132.0,
+	"side_bar_width": 266.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

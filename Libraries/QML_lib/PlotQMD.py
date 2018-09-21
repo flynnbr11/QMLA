@@ -1945,11 +1945,12 @@ def parameterEstimates(qmd, modelID,
             label=str(latex_term + ' Estimate'), 
             color=colour
         )
+#        ax.set_yscale('symlog')
         ax.fill_between(
             x, 
             y+s, 
             y-s, 
-            alpha=0.1,
+            alpha=0.2,
             facecolor=colour
 
         )
