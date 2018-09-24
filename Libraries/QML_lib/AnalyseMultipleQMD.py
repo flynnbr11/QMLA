@@ -293,11 +293,11 @@ def average_parameter_estimates(
         num_terms = len(terms)
 
         ncols=3
-        nrows=int(np.ceil( num_terms/ncols ))
+        nrows=3 # TODO make safe
+#        nrows=int(np.ceil( num_terms/ncols ))
         fig, axes = plt.subplots(figsize = (10, 7), nrows=nrows, ncols=ncols)
         row = 0
         col = 0
-        print("nrow, ncols=", nrows, ncols)
         axes_so_far = 0
 
         cm_subsection = np.linspace(0,0.8,num_terms)
@@ -329,7 +329,6 @@ def average_parameter_estimates(
                 std_devs[p][e] = np.std(parameters[p][e])
 
         for term in terms:
-            print("getting axes[row,col]:", row, col)
             ax = axes[row, col]
             axes_so_far += 1
             col += 1
@@ -739,8 +738,10 @@ def plot_tree_multi_QMD(
     for mod in mods:
         winning_count[mod]=mods.count(mod)
 
-    ptq.cumulativeQMDTreePlot(cumulative_csv=all_bayes_csv, 
-        wins_per_mod=winning_count, only_adjacent_branches=True, 
+    ptq.cumulativeQMDTreePlot(
+        cumulative_csv=all_bayes_csv, 
+        wins_per_mod=winning_count, 
+        only_adjacent_branches=True, 
         avg=avg_type, entropy=entropy, inf_gain=inf_gain,
         save_to_file=save_to_file
     )        

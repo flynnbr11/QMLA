@@ -338,18 +338,17 @@ else:
     """
     Tidy up and analysis. 
     """
-    if global_variables.pickle_qmd_class:
-        log_print(["QMD complete. Pickling result to",
-            global_variables.class_pickle_file], log_file
-        )
-        qmd.delete_unpicklable_attributes()
-        with open(global_variables.class_pickle_file, "wb") as pkl_file:
-            pickle.dump(qmd, pkl_file , protocol=2)
 
     # Need to do this so QML reduced class has expectation value
     # dict... should be made unnecessary
+    plot_times = np.linspace(
+        0, 
+        expec_val_plot_max_time, 
+        num_datapoints_to_plot
+    )
     qmd.plotExpecValues(
         model_ids = [11], # hardcode to see full model for development
+        times=plot_times,
         max_time = expec_val_plot_max_time, #in microsec
         t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
         save_to_file=str( 
@@ -424,6 +423,13 @@ else:
             )
         )
 
+    if global_variables.pickle_qmd_class:
+        log_print(["QMD complete. Pickling result to",
+            global_variables.class_pickle_file], log_file
+        )
+        qmd.delete_unpicklable_attributes()
+        with open(global_variables.class_pickle_file, "wb") as pkl_file:
+            pickle.dump(qmd, pkl_file , protocol=2)
 
     qmd.writeInterQMDBayesCSV(
         bayes_csv=str(global_variables.cumulative_csv)

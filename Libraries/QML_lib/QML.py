@@ -695,6 +695,20 @@ class reducedModel():
             axes=1
         )
 
+
+    def compute_expectation_values(
+        self, 
+        times = [],
+        probe = np.array([0.5, 0.5, 0.5, 0.5+0j])
+    ):
+        for t in times:
+            self.expectation_values[t] = evo.hahn_evolution(
+                ham = self.LearnedHamiltonian, 
+                t = t,
+                state = probe
+            )
+
+
     def r_squared(
         self, 
         min_time = 0,
@@ -725,11 +739,12 @@ class reducedModel():
         available_expectation_values = sorted(list(self.expectation_values.keys()))
         self.r_squared_of_t = {}
         for t in exp_times:
-            
+            # TODO if use_experimental_data is False, call full expectatino value function isntead
             if t in available_expectation_values:
                 sim = self.expectation_values[t]
             else:
                 sim = evo.hahn_evolution(ham, t, probe)
+#                print("[r^2 ", self.Name, "] t=",t,":\t", sim)
                 self.expectation_values[t] = sim
 
             true = self.ExperimentalMeasurements[t]

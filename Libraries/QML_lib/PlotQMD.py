@@ -81,8 +81,9 @@ def latex_name_ising(name):
 def ExpectationValuesTrueSim(
     qmd, 
     model_ids=None, champ=True, 
+    times=None,
     max_time=3, t_interval=0.01, 
-    linspace_times=True,
+    linspace_times=False,
     upper_x_lim=None,
     plus_probe=True,
     true_plot_type='scatter', 
@@ -128,7 +129,10 @@ def ExpectationValuesTrueSim(
             experimental_measurements_dict[t] for t in times
         ]
     else:
-        times = np.arange(0, max_time, t_interval)
+        if times is None:
+            times = np.arange(0, max_time, t_interval)
+        else:
+            times = times
         true = qmd.TrueOpName
         true_op = DataBase.operator(true)
 
@@ -226,7 +230,9 @@ def ExpectationValuesTrueSim(
             sim_col = sim_colours[colour_id]
 
             sim_expec_values = []
-            present_expec_values_times = sorted(list(mod.expectation_values.keys()))
+            present_expec_values_times = sorted(
+                list(mod.expectation_values.keys())
+            )
             for t in times:
 
                 try:
@@ -250,6 +256,7 @@ def ExpectationValuesTrueSim(
 
                     sim_expec_values.append(expec)
                     mod.expectation_values[t] = expec
+                   # print("[",mod.Name,"] t=",t,":\t", expec)
 
             if mod_id == qmd.ChampID:
                 models_branch = ChampionsByBranch[mod_id]
@@ -1351,12 +1358,16 @@ def qmdclassTOnxobj(qmd, modlist=None, directed=True,
                             flipped = True
                             G.add_edge(vs[1], vs[0], 
                                 weight=thisweight, flipped=flipped, 
+                                winner=b,
+                                loser=a,
                                 adj=is_adj
                             )
                         else:
                             flipped = False
                             G.add_edge(vs[0], vs[1], 
                                 weight=thisweight, flipped=flipped, 
+                                winner=a,
+                                loser=b,
                                 adj=is_adj
                             )
     return G
@@ -1371,20 +1382,24 @@ def plotQMDTree(qmd, save_to_file=None,
         modlist=modlist)
     
     plotTreeDiagram(G, n_cmap = plt.cm.pink_r, 
-        e_cmap = plt.cm.Blues, arrow_size = 8.0,
+        e_cmap = plt.cm.Blues, 
+#        e_cmap = plt.cm.Paired, 
+        arrow_size = 8.0,
         nonadj_alpha = 0.1, e_alphas = [], 
         label_padding = 0.4, pathstyle="curve",
         id_labels=id_labels, save_to_file=save_to_file)
     
    
 
-def plotTreeDiagram(G, n_cmap, e_cmap, 
-                    e_alphas = [], nonadj_alpha=0.1, 
-                    label_padding = 0.4, 
-                    arrow_size = 0.02, widthscale=1.0,
-                    entropy=None, inf_gain=None,
-                    pathstyle = "straight", id_labels = False,
-                    save_to_file=None
+def plotTreeDiagram(
+    G, 
+    n_cmap, e_cmap, 
+    e_alphas = [], nonadj_alpha=0.1, 
+    label_padding = 0.4, 
+    arrow_size = 0.02, widthscale=1.0,
+    entropy=None, inf_gain=None,
+    pathstyle = "straight", id_labels = False,
+    save_to_file=None
 ):
     plt.clf()
     plt.figure(figsize=(6,11))   
@@ -1431,8 +1446,8 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
                 0.8 if list_of_edges[idx][2]["adj"] 
                 else nonadj_alpha 
             )
-    
     weights = tuple( [prop['weight'] for (u,v,prop) in list_of_edges] )
+
 
     nx.draw_networkx_nodes(
         G, with_labels = False, # labels=labels, 
@@ -1443,11 +1458,15 @@ def plotTreeDiagram(G, n_cmap, e_cmap,
         node_color = n_colours
     )  
     
-    edges_for_cmap = draw_networkx_arrows(G, edgelist=edge_tuples,
+    edges_for_cmap = draw_networkx_arrows(
+        G, 
+        edgelist=edge_tuples,
         pos=positions, arrows=True, 
         arrowstyle='->', width = arrow_size, widthscale=widthscale,
         pathstyle=pathstyle, alphas = e_alphas, edge_color= weights,
-        edge_cmap=e_cmap, edge_vmin=0.8, edge_vmax=0.85
+        edge_cmap=e_cmap, 
+        edge_vmin=None, #0.8, 
+        edge_vmax=None, #0.85
     )
     
     nx.draw_networkx_labels(G, label_positions, labels)
@@ -1638,6 +1657,13 @@ def cumulativeQMDTreePlot(
                     frequency = pair_freqs[pairing]/max_frequency
                     edges.append(pairing)
                     edge_frequencies.append(frequency)
+                    # if a=="$R_{x,y,z}HF_{x,y,z}$" or b=="$R_{x,y,z}HF_{x,y,z}$":
+                    #     print("Adding edge. \npairing:", pairing, "\n freq=", frequency)
+                    #     try:    
+                    #         print("bayes:", bayes_factors[a][b])
+                    #     except:
+                    #         print("no bayes")
+
                     vs = [a,b]
 
                     try:
@@ -1647,14 +1673,29 @@ def cumulativeQMDTreePlot(
 
                     if thisweight < 0:  
                         # flip negative valued edges and move them to positive
-                        thisweight = - thisweight 
+                        thisweight = -thisweight
                         flipped = True
-                        G.add_edge(b, a, weight=thisweight, flipped=flipped,
+                        if a=="$R_{x,y,z}HF_{x,y,z}$" or b=="$R_{x,y,z}HF_{x,y,z}$":
+                            print("flipped from negative weight")
+                            print("adding edge from ",b, "to ",a, "with weight", thisweight)
+                        G.add_edge(
+                            a, b, 
+                            weight=thisweight, 
+                            winner=b,
+                            loser=a,
+                            flipped=flipped,
                             adj = is_adj, freq=frequency
                         )
                     else:
                         flipped = False
-                        G.add_edge(a, b, weight=thisweight, flipped=flipped,
+                        if a=="$R_{x,y,z}HF_{x,y,z}$" or b=="$R_{x,y,z}HF_{x,y,z}$":
+                            print("adding edge from ",a, "to ",b, "with weight", thisweight)
+                        G.add_edge(
+                            b, a,
+                            winner=a,
+                            loser=b,
+                            weight=thisweight, 
+                            flipped=flipped,
                             adj=is_adj, freq=frequency
                         )
                         
@@ -1663,34 +1704,40 @@ def cumulativeQMDTreePlot(
     freq_scale = 10/max_freq
     edge_f = [i*freq_scale for i in edge_frequencies]
     
-    plotTreeDiagram(G,n_cmap = plt.cm.pink_r, e_cmap = plt.cm.Blues, 
-                       nonadj_alpha = 0.1, e_alphas = [] , widthscale=10.5, 
-                       label_padding = 0.4, pathstyle="curve",
-                       arrow_size=None,
-                       entropy=entropy, inf_gain=inf_gain
-       )   
+    plotTreeDiagram(G,
+        n_cmap = plt.cm.pink_r, 
+        e_cmap = plt.cm.Blues, 
+        #e_cmap = plt.cm.Paired,     
+        #e_cmap = plt.cm.rainbow,     
+        nonadj_alpha = 0.1, e_alphas = [] , widthscale=10.5, 
+        label_padding = 0.4, pathstyle="curve",
+        arrow_size=None,
+        entropy=entropy, inf_gain=inf_gain
+    )   
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
     return G, edges, edge_f   
     
-def draw_networkx_arrows(G, pos,
-                        edgelist=None,
-                        nodedim = 0.,
+def draw_networkx_arrows(
+    G, 
+    pos,
+    edgelist=None,
+    nodedim = 0.,
 #                        width=0.02,
-                        width=1.0,
-                        widthscale = 1.0,
-                        edge_color='k',
-                        style='solid',
-                        alphas=1.,
-                        edge_cmap=None,
-                        edge_vmin=None,
-                        edge_vmax=None,
-                        ax=None,
-                        label=[None],
-                        pathstyle='straight',
-                        **kwds):
-
+    width=1.0,
+    widthscale = 1.0,
+    edge_color='k',
+    style='solid',
+    alphas=1.,
+    edge_cmap=None,
+    edge_vmin=None,
+    edge_vmax=None,
+    ax=None,
+    label=[None],
+    pathstyle='straight',
+    **kwds
+):
     if ax is None:
         ax = plt.gca()
 
@@ -1753,8 +1800,10 @@ def draw_networkx_arrows(G, pos,
             list of exactly m colors where m is the number or edges'
         )
 
-    edge_collection = collections.LineCollection(edge_pos,
-        colors=edge_colors, linewidths=lw
+    edge_collection = collections.LineCollection(
+        edge_pos,
+        colors=edge_colors, 
+        linewidths=lw
     )
     edge_collection.set_zorder(1)  # edges go behind nodes
 
@@ -1770,6 +1819,9 @@ def draw_networkx_arrows(G, pos,
         else:
             edge_collection.autoscale()
     
+    max_bayes_value = max(edge_collection.get_clim())
+    # for i in range(len(edgelist)):
+    #     print(edgelist[i], ":", edge_color[i])
 
     for n in G:
         c=Circle(pos[n],radius=0.02,alpha=0.5)
@@ -1778,17 +1830,19 @@ def draw_networkx_arrows(G, pos,
         x,y=pos[n]
     seen={}
 
-    
+    # Rescale all weights between 0,1 so cmap can find the appropriate RGB value.
+    norm_edge_color = edge_color/max_bayes_value
+
     if G.is_directed():
         seen = {}
-        
         for idx in range(len(edgelist)):
-        
             if not cb.iterable(widthlist):
                 lw = widthlist
             else:
                 lw = widthlist[idx]
             
+            arrow_colour =  edge_cmap(norm_edge_color[idx])
+
             if pathstyle is "straight":
                 (src, dst) = edge_pos[idx]
                 x1, y1 = src
@@ -1808,50 +1862,69 @@ def draw_networkx_arrows(G, pos,
                 
                 thislabel = None if len(label)<len(edgelist) else label[idx]
 
-                
-                
                 ax.arrow(
                     x1,y1, dx,dy,
-                    facecolor=edge_cmap(edge_color[idx]), alpha = alphas[idx],
-                    linewidth = 0, antialiased = True,
-                    width= lw, head_width = 5*lw,
-                    overhang = -5*0.02/lw, length_includes_head=True, 
+                    facecolor=arrow_colour, 
+                    alpha = alphas[idx],
+                    linewidth = 0, 
+                    antialiased = True,
+                    width = lw, 
+                    head_width = 5*lw,
+                    overhang = -5*0.02/lw,
+                    length_includes_head=True, 
                     label=thislabel, zorder=1
-                    )
+                )
                     
             elif pathstyle is "curve":
                 
                 (u,v) = edgelist[idx]
-                n1=G.node[u]['patch']
-                n2=G.node[v]['patch']
-                rad=0.1
+                # (u,v,prop) = prop['weight'] for  in list_of_edges
+                # flipped = G.edge[(u,v)]
                 
+                winner = G.edges[(u,v)]['winner']
+                loser = G.edges[(u,v)]['loser']
+                n1=G.node[loser]['patch']
+                n2=G.node[winner]['patch']
+
+                # n1=G.node[u]['patch']
+                # n2=G.node[v]['patch']
+
+                rad=0.1
+
                 if (u,v) in seen:
                     rad=seen.get((u,v))
                     rad=(rad+np.sign(rad)*0.1)*-1
                 alpha=0.5
                 
-                kwargs = {'head_width': 5*lw, 
-                          #'overhang':-5*0.02/lw,  
-                          #'length_includes_head': True
-                          }
+                kwargs = {
+                    'head_width': 5*lw, 
+                      #'overhang':-5*0.02/lw,  
+                      #'length_includes_head': True
+                }
                           
-                          
-                arrow_style = ArrowStyle("->", head_length=1.9, head_width=1.9) # Can be accepted by fancy arrow patch to alter arrows
+                arrow_style = ArrowStyle(
+                    "->", 
+                    head_length=1.9, 
+                    head_width=1.9
+                ) # Can be accepted by fancy arrow patch to alter arrows
 
 #                arrow_style = ArrowStyle("-[", widthB=2.0, lengthB=1.0) # Can be accepted by fancy arrow patch to alter arrows
 
-                e = FancyArrowPatch(n1.center,n2.center,patchA=n1,patchB=n2,
-#                                    arrowstyle='-|>',
-#                                    capstyle='projecting',
-                                    arrowstyle=arrow_style,
-                                    connectionstyle='arc3,rad=%s'%rad,
-                                    mutation_scale=10.0,
-                                    lw=lw,   #AROUND 10 TO BE FEASIBLE
-                                    alpha=alphas[idx],
-                                    color=edge_cmap(edge_color[idx]),
-                            #        **kwargs
-                                    )
+                e = FancyArrowPatch(
+                    n1.center,
+                    n2.center,
+                    patchA=n1,
+                    patchB=n2,
+                    # arrowstyle='-|>',
+                    # capstyle='projecting',
+                    arrowstyle=arrow_style,
+                    connectionstyle='arc3,rad=%s'%rad,
+                    mutation_scale=10.0,
+                    lw=lw,   #AROUND 10 TO BE FEASIBLE
+                    alpha=alphas[idx],
+                    color=arrow_colour,
+            #        **kwargs
+                )
                 seen[(u,v)]=rad
                 ax.add_patch(e)
            
@@ -1919,7 +1992,8 @@ def parameterEstimates(
 #    ax = plt.subplot(111)
 
     ncols=3
-    nrows=int(np.ceil( num_terms/ncols ))
+    nrows=3 # TODO  -- make safe
+#    nrows=int(np.ceil( num_terms/ncols ))
 
     fig, axes = plt.subplots(figsize = (10, 7), nrows=nrows, ncols=ncols)
     row = 0

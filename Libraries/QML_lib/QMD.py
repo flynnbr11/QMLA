@@ -1316,7 +1316,8 @@ class QMD():
             'LearnedParameters' : mod.LearnedParameters,
             'TrackParameterEstimates' : mod.TrackParameterEstimates,
             'ExpectationValues' : mod.expectation_values,
-            'RSquaredByEpoch' : mod.r_squared_by_epoch()
+            'RSquaredByEpoch' : mod.r_squared_by_epoch(),
+            'LearnedHamiltonian' : mod.LearnedHamiltonian
         }
 
     def runMultipleModelQHL(self, model_names=None):
@@ -1544,7 +1545,8 @@ class QMD():
             'LearnedParameters' : self.LearnedParamsChamp,
             'ExpectationValues' : champ_model.expectation_values,
             'TrackParameterEstimates' : champ_model.TrackParameterEstimates,
-            'RSquaredByEpoch' : champ_model.r_squared_by_epoch()
+            'RSquaredByEpoch' : champ_model.r_squared_by_epoch(),
+            'LearnedHamiltonian' : champ_model.LearnedHamiltonian
         }
 
     def updateDataBaseModelValues(self):
@@ -1709,13 +1711,16 @@ class QMD():
         )
     
         
-    def plotExpecValues(self, model_ids=None, champ=True, max_time=1.8,
+    def plotExpecValues(self, model_ids=None, 
+        times=None,
+        champ=True, max_time=1.8,
         t_interval=0.3, save_to_file=None
     ):
     
         PlotQMD.ExpectationValuesTrueSim(
             qmd=self, 
             model_ids=model_ids, champ=champ, 
+            times=times, 
             max_time=max_time, t_interval=t_interval,
             upper_x_lim = max_time,
             save_to_file=save_to_file
