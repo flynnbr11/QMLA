@@ -596,6 +596,7 @@ class reducedModel():
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
+        self.UseExperimentalData = qmd_info['use_experimental_data']
         self.NumParticles = qmd_info['num_particles']
         self.NumExperiments = qmd_info['num_experiments']
         self.NumProbes = qmd_info['num_probes']
@@ -743,8 +744,12 @@ class reducedModel():
             if t in available_expectation_values:
                 sim = self.expectation_values[t]
             else:
-                sim = evo.hahn_evolution(ham, t, probe)
-#                print("[r^2 ", self.Name, "] t=",t,":\t", sim)
+                if self.UseExperimentalData==True:
+                    sim = evo.hahn_evolution(ham, t, probe)
+                else:
+                    sim = evo.traced_expectation_value_project_one_qubit_plus(
+                        ham=ham, t=t, state=probe
+                    )
                 self.expectation_values[t] = sim
 
             true = self.ExperimentalMeasurements[t]
@@ -763,6 +768,7 @@ class reducedModel():
         max_time=None,
         num_points=10 # maximum number of epochs to take R^2 at
     ):
+        
         exp_times = sorted(list(self.ExperimentalMeasurements.keys()))
         if max_time is None:
             max_time = max(exp_times)
@@ -799,7 +805,13 @@ class reducedModel():
                 list(self.expectation_values.keys())
             )
             for t in exp_times:
-                sim = evo.hahn_evolution(ham, t, probe)
+                if self.UseExperimentalData==True:
+                    sim = evo.hahn_evolution(ham, t, probe)
+                else:
+                    sim = evo.traced_expectation_value_project_one_qubit_plus(
+                        ham=ham, t=t, state=probe
+                    )
+
                 true = self.ExperimentalMeasurements[t]
                 diff_squared = (sim - true)**2
                 sum_of_residuals += diff_squared

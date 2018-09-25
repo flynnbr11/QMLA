@@ -1381,9 +1381,13 @@ def plotQMDTree(qmd, save_to_file=None,
         only_adjacent_branches=only_adjacent_branches, 
         modlist=modlist)
     
+
+    arr = np.linspace(0, 50, 100).reshape((10, 10))
+    cmap = plt.get_cmap('viridis')
+    new_cmap = truncate_colormap(cmap, 0.35, 1.0)
+
     plotTreeDiagram(G, n_cmap = plt.cm.pink_r, 
-        e_cmap = plt.cm.Blues, 
-#        e_cmap = plt.cm.Paired, 
+        e_cmap = new_cmap, 
         arrow_size = 8.0,
         nonadj_alpha = 0.1, e_alphas = [], 
         label_padding = 0.4, pathstyle="curve",
@@ -1657,12 +1661,6 @@ def cumulativeQMDTreePlot(
                     frequency = pair_freqs[pairing]/max_frequency
                     edges.append(pairing)
                     edge_frequencies.append(frequency)
-                    # if a=="$R_{x,y,z}HF_{x,y,z}$" or b=="$R_{x,y,z}HF_{x,y,z}$":
-                    #     print("Adding edge. \npairing:", pairing, "\n freq=", frequency)
-                    #     try:    
-                    #         print("bayes:", bayes_factors[a][b])
-                    #     except:
-                    #         print("no bayes")
 
                     vs = [a,b]
 
@@ -1675,9 +1673,6 @@ def cumulativeQMDTreePlot(
                         # flip negative valued edges and move them to positive
                         thisweight = -thisweight
                         flipped = True
-                        if a=="$R_{x,y,z}HF_{x,y,z}$" or b=="$R_{x,y,z}HF_{x,y,z}$":
-                            print("flipped from negative weight")
-                            print("adding edge from ",b, "to ",a, "with weight", thisweight)
                         G.add_edge(
                             a, b, 
                             weight=thisweight, 
@@ -1688,8 +1683,6 @@ def cumulativeQMDTreePlot(
                         )
                     else:
                         flipped = False
-                        if a=="$R_{x,y,z}HF_{x,y,z}$" or b=="$R_{x,y,z}HF_{x,y,z}$":
-                            print("adding edge from ",a, "to ",b, "with weight", thisweight)
                         G.add_edge(
                             b, a,
                             winner=a,
@@ -1703,10 +1696,15 @@ def cumulativeQMDTreePlot(
     
     freq_scale = 10/max_freq
     edge_f = [i*freq_scale for i in edge_frequencies]
-    
+
+    arr = np.linspace(0, 50, 100).reshape((10, 10))
+    cmap = plt.get_cmap('viridis')
+    new_cmap = truncate_colormap(cmap, 0.35, 1.0)
+
     plotTreeDiagram(G,
         n_cmap = plt.cm.pink_r, 
-        e_cmap = plt.cm.Blues, 
+        e_cmap = new_cmap,
+#        e_cmap = plt.cm.Blues, 
         #e_cmap = plt.cm.Paired,     
         #e_cmap = plt.cm.rainbow,     
         nonadj_alpha = 0.1, e_alphas = [] , widthscale=10.5, 
@@ -1719,6 +1717,16 @@ def cumulativeQMDTreePlot(
         plt.savefig(save_to_file, bbox_inches='tight')
     return G, edges, edge_f   
     
+
+
+def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    new_cmap = colors.LinearSegmentedColormap.from_list(
+        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+        cmap(np.linspace(minval, maxval, n)))
+    return new_cmap
+
+
+
 def draw_networkx_arrows(
     G, 
     pos,
@@ -1819,7 +1827,10 @@ def draw_networkx_arrows(
         else:
             edge_collection.autoscale()
     
+
+
     max_bayes_value = max(edge_collection.get_clim())
+    edge_collection.set_clim(0.5, max_bayes_value)
     # for i in range(len(edgelist)):
     #     print(edgelist[i], ":", edge_color[i])
 
@@ -1831,7 +1842,10 @@ def draw_networkx_arrows(
     seen={}
 
     # Rescale all weights between 0,1 so cmap can find the appropriate RGB value.
+    offset = 0.7
     norm_edge_color = edge_color/max_bayes_value
+
+
 
     if G.is_directed():
         seen = {}
