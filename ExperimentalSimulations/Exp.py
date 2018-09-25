@@ -382,12 +382,15 @@ else:
                 'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
                 '.png')
             )
+        """
+        # TODO radar plot not working - when used with RQ ???
+        # not finding TrueModelID when using ising_hyperfine generation rule 
         qmd.plotRadarDiagram(
             save_to_file=str(
             global_variables.plots_directory+
             'radar_'+ str(global_variables.long_id)+ '.png')
         )
-
+        """
         qmd.saveBayesCSV(
             save_to_file=str(
             global_variables.results_directory+ 
