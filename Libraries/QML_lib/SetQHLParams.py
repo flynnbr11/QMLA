@@ -6,15 +6,15 @@ import DataBase
 
 ### SET VALUES HERE ###
 set_prior_specific_terms = {
-	'xTi' : [0.0, 1.0], # TODO Broaden, testing with small dist
-	'yTi' : [0.0, 1.0],
-	'zTi' : [0.0, 1.0],
-	'xTx' : [0.0, 1.0], # true value 2.7
-	'yTy' : [0.0, 1.0], # true value 2.7
-	'zTz' : [0.0, 1.0], # true value 2.14
-	'xTy' : [0.0, 1.0],
-	'xTz' : [0.0, 1.0],
-	'yTz' : [0.0, 1.0],
+	'xTi' : [3.5, 1.0], # TODO Broaden, testing with small dist
+	'yTi' : [3.5, 1.0],
+	'zTi' : [3.5, 1.0],
+	'xTx' : [3.5, 1.0], # true value 2.7
+	'yTy' : [3.5, 1.0], # true value 2.7
+	'zTz' : [3.5, 1.0], # true value 2.14
+	'xTy' : [3.5, 1.0],
+	'xTz' : [3.5, 1.0],
+	'yTz' : [3.5, 1.0],
 }
 
 set_true_params = {
@@ -35,8 +35,8 @@ def create_qhl_params(
 	true_op, 
 	pickle_file=None,
 	random_vals=False, 
-	rand_min=-3, 
-	rand_max=3,
+	rand_min=0, 
+	rand_max=6,
 	exp_data=0
 ):
 	terms = DataBase.get_constituent_names_from_name(true_op)
@@ -77,8 +77,8 @@ def create_prior(
 	pickle_file=None,
 	random_vals=False, 
 	sigma=0.3,
-	rand_min=-3, 
-	rand_max=3,
+	rand_min=0, 
+	rand_max=6,
 	exp_data=0
 ):
 #	terms = DataBase.get_constituent_names_from_name(true_op)

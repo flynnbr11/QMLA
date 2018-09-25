@@ -255,7 +255,7 @@ def ExpectationValuesTrueSim(
                         ) 
 
                     sim_expec_values.append(expec)
-                    mod.expectation_values[t] = expec
+#                    mod.expectation_values[t] = expec
                    # print("[",mod.Name,"] t=",t,":\t", expec)
 
             if mod_id == qmd.ChampID:

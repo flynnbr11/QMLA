@@ -353,7 +353,7 @@ def average_parameter_estimates(
             ax.scatter(
                 epochs, 
                 averages, 
-                s=7,
+                s=max(1,50/num_experiments),
                 label=latex_terms[term],
                 c=colours[terms.index(term)]
             )

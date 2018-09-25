@@ -105,6 +105,7 @@ class QMD():
         parallel = False,
         use_experimental_data = False,
         experimental_measurements = None,
+        plot_times = [0,1],
         q_id = 0, # id for QMD instance to keep concurrent QMDs distinct on cluster
         host_name='localhost',
         port_number = 6379,
@@ -184,6 +185,7 @@ class QMD():
             )
         else: 
             self.ExperimentalMeasurementTimes=None
+        self.PlotTimes = plot_times
         self.UseExpCustom = use_exp_custom
         self.EnableSparse = enable_sparse
         self.ExpComparisonTol = compare_linalg_exp_tol
@@ -1294,13 +1296,15 @@ class QMD():
         mod = self.reducedModelInstanceFromID(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
         mod.updateLearnedValues()
-
+        mod.compute_expectation_values(times=self.PlotTimes)
 
         #TODO write single QHL test
         time_now = time.time()
         time_taken = time_now - self.StartingTime
 #        true_model_r_squared = self.reducedModelInstanceFromID(self.TrueOpModelID).r_squared()
         
+        
+
         self.ResultsDict = {
             'NumParticles' : self.NumParticles,
             'NumExperiments' : self.NumExperiments,
@@ -1472,6 +1476,8 @@ class QMD():
             self.AllBayesFactors[i] = (
                 self.reducedModelInstanceFromID(i).BayesFactors
             )
+
+        champ_model.compute_expectation_values(times=self.PlotTimes)
 
         self.ChampionFinalParams = (
             champ_model.FinalParams
@@ -1795,7 +1801,10 @@ class QMD():
         plot_title=str("Radar Plot QMD "+ str(self.Q_id))
         if modlist is None:
             modlist = list(self.BranchChampions.values())
-        PlotQMD.plotRadar(self, modlist, save_to_file=save_to_file,
+        PlotQMD.plotRadar(
+            self, 
+            modlist, 
+            save_to_file=save_to_file,
             plot_title=plot_title
         )
 

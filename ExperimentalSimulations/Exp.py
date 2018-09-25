@@ -26,6 +26,7 @@ import DataBase
 import ExperimentalDataFunctions as expdt
 from QMD import QMD #  class moved to QMD in Library
 import QML
+import Evo
 import ModelGeneration 
 import matplotlib.pyplot as plt
 #from pympler import asizeof
@@ -93,7 +94,7 @@ experimental_measurements_dict = expdt.experimentalMeasurementDict(
 experimental_measurements_dict = pickle.load(
     open(str('Data/'+global_variables.dataset), 'rb')
 )
-num_datapoints_to_plot = 250 # to visualise in expec_val plot for simulated data
+num_datapoints_to_plot = 500 # to visualise in expec_val plot for simulated data
 
 if global_variables.use_experimental_data is True:
     expec_val_plot_max_time = global_variables.data_max_time
@@ -111,10 +112,24 @@ for t in list(experimental_measurements_dict.keys()):
     experimental_measurements_dict[new_time] = msmt
 """
 
+plot_lower_time = 0
+plot_upper_time = expec_val_plot_max_time
+plot_number_times = num_datapoints_to_plot
+raw_times = list(np.linspace(
+    plot_lower_time, 
+    plot_upper_time, 
+    plot_number_times+1)
+)
+plot_times = [ np.round(a, 2 ) for a in raw_times ]
+plot_times = sorted(plot_times)
+if global_variables.use_experimental_data==True:
+    plot_times = sorted(list(experimental_measurements_dict.keys()))    
+
 initial_op_list = ['xTi', 'yTi', 'zTi']
 
 true_op = global_variables.true_operator
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
+true_op_matrices = [DataBase.compute(t) for t in true_op_list]
 num_params = len(true_op_list)
 
 true_params_info = pickle.load(
@@ -123,8 +138,41 @@ true_params_info = pickle.load(
         'rb'
     )
 )
-
 true_params = true_params_info['params_list']
+
+true_expectation_value_path = str(global_variables.results_directory + 'true_expectation_values.p')
+if os.path.isfile(true_expectation_value_path) == False:
+    true_ham = np.tensordot(
+        true_params, 
+        true_op_matrices, 
+        axes=1
+    )
+    true_expec_values = {}
+    # TODO this probe not always appropriate?
+    probe = np.array([0.5, 0.5, 0.5, 0.5+0j])
+    for t in plot_times:
+        if global_variables.use_experimental_data:
+            expec_val = Evo.hahn_evolution(
+                ham = true_ham,
+                t = t,
+                state = probe
+            )
+        else:
+            true_expec_values[t] = Evo.traced_expectation_value_project_one_qubit_plus(
+                ham = true_ham, 
+                t=t, 
+                state=probe
+            )
+    pickle.dump(
+        true_expec_values, 
+        open(true_expectation_value_path, 'wb')
+    )
+
+else:
+    true_expec_values = pickle.load(
+     open(true_expectation_value_path, 'rb')   
+    )
+
 
 log_print(
     ["True params:", true_params], 
@@ -221,6 +269,7 @@ qmd = QMD(
     model_priors = model_priors,
     use_experimental_data = global_variables.use_experimental_data,
     experimental_measurements = experimental_measurements_dict,
+    plot_times = plot_times,
     max_num_branches = 0,
     max_num_qubits = 10, 
     parallel = True,
@@ -341,11 +390,11 @@ else:
 
     # Need to do this so QML reduced class has expectation value
     # dict... should be made unnecessary
-    plot_times = np.linspace(
-        0, 
-        expec_val_plot_max_time, 
-        num_datapoints_to_plot
-    )
+    # plot_times = np.linspace(
+    #     0, 
+    #     expec_val_plot_max_time, 
+    #     num_datapoints_to_plot
+    # )
     qmd.plotExpecValues(
         model_ids = [11], # hardcode to see full model for development
         times=plot_times,

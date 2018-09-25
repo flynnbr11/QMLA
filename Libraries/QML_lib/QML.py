@@ -702,12 +702,24 @@ class reducedModel():
         times = [],
         probe = np.array([0.5, 0.5, 0.5, 0.5+0j])
     ):
+        # TODO expectation_values dict only for |++> probe as is.
         for t in times:
-            self.expectation_values[t] = evo.hahn_evolution(
-                ham = self.LearnedHamiltonian, 
-                t = t,
-                state = probe
-            )
+
+            if self.UseExperimentalData:
+                self.expectation_values[t] = evo.hahn_evolution(
+                    ham = self.LearnedHamiltonian, 
+                    t = t,
+                    state = probe
+                )
+
+            else:
+                self.expectation_values[t] = (
+                    evo.traced_expectation_value_project_one_qubit_plus(
+                        ham = self.LearnedHamiltonian, 
+                        t = t,
+                        state = probe
+                        )
+                )
 
 
     def r_squared(
@@ -750,7 +762,7 @@ class reducedModel():
                     sim = evo.traced_expectation_value_project_one_qubit_plus(
                         ham=ham, t=t, state=probe
                     )
-                self.expectation_values[t] = sim
+                # self.expectation_values[t] = sim
 
             true = self.ExperimentalMeasurements[t]
             diff_squared = (sim - true)**2
