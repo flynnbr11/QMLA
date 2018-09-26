@@ -353,18 +353,20 @@ elif global_variables.further_qhl == True:
         champ = False,
         save_to_file=str( 
             global_variables.plots_directory+
-            'further_qhl_expec_values.png'
+            'further_qhl_expec_values_'+
+            str(global_variables.long_id) + 
+            '.png'
         )
     )
 
-    for mod_id in range(qmd.HighestModelID):
-        mod_name = qmd.ModelNameIDs[mod_id]
-        qmd.plotParameterEstimates(
-            model_id = mod_id, 
-            save_to_file= str(global_variables.plots_directory+
-            'further_qhl_parameter_estimates_'+ str(mod_name) +
-            '.png')
-        )
+    # for mod_id in range(qmd.HighestModelID):
+    #     mod_name = qmd.ModelNameIDs[mod_id]
+    #     qmd.plotParameterEstimates(
+    #         model_id = mod_id, 
+    #         save_to_file= str(global_variables.plots_directory+
+    #         'further_qhl_parameter_estimates_'+ str(mod_name) +
+    #         '.png')
+    #     )
 
     if global_variables.pickle_qmd_class:
         log_print(["QMD complete. Pickling result to",
