@@ -943,7 +943,6 @@ def summariseResultsCSV(
         directory_name += '/'
 
         results_file_name_start
-    )
     if not csv_name.endswith('.csv'):
         csv_name += '.csv'
         
