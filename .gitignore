@@ -23,6 +23,8 @@ __pycache__/
 *.rdb
 *conflicted*
 
+ParallelDevelopment/*
+ExperimentalSimulations/*
 
 # But want redis configuration:
 !Libraries/QML_lib/RedisConfig.conf
