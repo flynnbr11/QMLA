@@ -884,7 +884,7 @@ if further_qhl_mode==True:
 else:
     results_csv_name = 'summary_results.csv'
     results_csv = directory_to_analyse+results_csv_name
-    results_file_name_start='further_qhl_results'
+    results_file_name_start='results'
     ptq.summariseResultsCSV(
         directory_name=directory_to_analyse, 
         results_file_name_start=results_file_name_start,
@@ -966,8 +966,11 @@ elif further_qhl_mode == False:
 
     ptq.plotTrueModelBayesFactors_IsingRotationTerms(
         results_csv_path = all_bayes_csv,
-        correct_mod=name,
-        save_to_file = str(directory_to_analyse+'true_model_bayes_comparisons.png')
+        correct_mod='xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
+        save_to_file = str(
+            directory_to_analyse+
+            'true_model_bayes_comparisons.png'
+        )
     )
 
     param_plot = str(directory_to_analyse+'sweep_param_total.png')

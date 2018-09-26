@@ -6,14 +6,14 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 do_further_qhl=1
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=2500
-exp=1000
+prt=15
+exp=10
 pgh=0.3
 ra=0.8
 rt=0.5
