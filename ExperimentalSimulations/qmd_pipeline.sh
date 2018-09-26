@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=5
-qhl_test=0
+num_tests=1
+qhl_test=1
 do_further_qhl=1
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=50
-exp=10
+prt=2500
+exp=1000
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -22,7 +22,7 @@ gaussian=1
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=0
+exp_data=1
 if (( "$exp_data" == 0 ))
 then
     pgh=0.3
@@ -33,8 +33,8 @@ then
     pgh=1.0
 fi
 
-#growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+#growth_rule='two_qubit_ising_rotation_hyperfine'
 use_rq=0
 further_qhl_factor=2
 plots=1

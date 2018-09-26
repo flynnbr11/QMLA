@@ -240,6 +240,7 @@ def average_parameters(results_path,
 def average_parameter_estimates(
     directory_name, 
     results_path, 
+    results_file_name_start='results',
     top_number_models=2,
     true_params_dict=None,
     save_to_file=None
@@ -262,7 +263,7 @@ def average_parameter_estimates(
     os.chdir(directory_name)
     pickled_files = []
     for file in os.listdir(directory_name):
-        if file.endswith(".p") and file.startswith("results"):
+        if file.endswith(".p") and file.startswith(results_file_name_start):
             pickled_files.append(file)
 
     parameter_estimates_from_qmd = {}        
@@ -872,9 +873,10 @@ if not directory_to_analyse.endswith('/'):
 if further_qhl_mode==True:
     results_csv_name = 'summary_further_qhl_results.csv'
     results_csv = directory_to_analyse+results_csv_name
+    results_file_name_start='further_qhl_results'
     ptq.summariseResultsCSV(
         directory_name=directory_to_analyse, 
-        results_file_name_start='further_qhl_results',
+        results_file_name_start=results_file_name_start,
         csv_name=results_csv
     )
     plot_desc='further_'
@@ -882,9 +884,10 @@ if further_qhl_mode==True:
 else:
     results_csv_name = 'summary_results.csv'
     results_csv = directory_to_analyse+results_csv_name
+    results_file_name_start='further_qhl_results'
     ptq.summariseResultsCSV(
         directory_name=directory_to_analyse, 
-        results_file_name_start='results',
+        results_file_name_start=results_file_name_start,
         csv_name=results_csv
     )
     plot_desc=''
@@ -907,6 +910,7 @@ average_parameter_estimates(
     directory_name = directory_to_analyse, 
     results_path = results_csv, 
     top_number_models = arguments.top_number_models,
+    results_file_name_start=results_file_name_start,
     true_params_dict = true_params_dict,
     save_to_file=  str(
         directory_to_analyse + 
@@ -962,6 +966,7 @@ elif further_qhl_mode == False:
 
     ptq.plotTrueModelBayesFactors_IsingRotationTerms(
         results_csv_path = all_bayes_csv,
+        correct_mod=name,
         save_to_file = str(directory_to_analyse+'true_model_bayes_comparisons.png')
     )
 
