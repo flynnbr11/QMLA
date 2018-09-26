@@ -140,7 +140,8 @@ true_params_info = pickle.load(
 )
 true_params = true_params_info['params_list']
 
-true_expectation_value_path = str(global_variables.results_directory + 'true_expectation_values.p')
+# true_expectation_value_path = str(global_variables.results_directory + 'true_expectation_values.p')
+true_expectation_value_path = global_variables.true_expec_path
 if os.path.isfile(true_expectation_value_path) == False:
     true_ham = np.tensordot(
         true_params, 

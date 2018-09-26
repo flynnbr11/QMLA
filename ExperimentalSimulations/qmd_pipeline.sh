@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
-qhl_test=1
+num_tests=10
+qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=1500
-exp=800
+prt=15
+exp=8
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -39,7 +39,7 @@ use_rq=0
 further_qhl_factor=2
 plots=1
 use_rq=0
-number_best_models_further_qhl=2
+number_best_models_further_qhl=5
 custom_prior=1
 dataset='NVB_dataset.p'
 #dataset='NV05_dataset.p'
@@ -58,6 +58,9 @@ cwd=$(pwd)
 long_dir="$cwd/Results/$day_time/"
 bcsv="cumulative.csv"
 bayes_csv="$long_dir$bcsv"
+true_expec_filename="true_expec_vals.p"
+true_expec_path="$long_dir$true_expec_filename"
+
 
 this_log="$long_dir/qmd.log"
 furhter_qhl_log="$long_dir/qhl_further.log"
@@ -114,18 +117,33 @@ do
             -exp=$exp_data -cpr=$custom_prior \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
+            -true_expec_path=$true_expec_path \
             -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
             -ggr=$growth_rule
     done
 done
 
+
+
+##
 # Analyse results of QMD. (Only after QMD, not QHL).
-python3 ../Libraries/QML_lib/AnalyseMultipleQMD.py \
+##
+
+analyse_filename='analyse.sh'
+analyse_script="$long_dir$analyse_filename"
+
+# write to a script so we can recall analysis later.
+echo "
+cd $long_dir
+python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -dir=$long_dir --bayes_csv=$bayes_csv \
     -top=$number_best_models_further_qhl -qhl=$qhl_test \
-    -exp=$exp_data \
+    -exp=$exp_data -true_expec=$true_expec_path \
     -data=$dataset -params=$true_params_pickle_file 
+" > $analyse_script
 
+chmod a+x $analyse_script
+sh $analyse_script
 
 if (( $do_further_qhl == 1 )) 
 then
@@ -145,6 +163,7 @@ then
         -exp=$exp_data -cpr=$custom_prior \
         -prior_path=$prior_pickle_file \
         -true_params_path=$true_params_pickle_file \
+        -true_expec_path=$true_expec_path \
         -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
         -ggr=$growth_rule
 fi

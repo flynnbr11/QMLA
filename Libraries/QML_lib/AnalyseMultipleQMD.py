@@ -399,6 +399,8 @@ def Bayes_t_test(
     directory_name, 
     dataset, 
     results_path,
+    use_experimental_data=False,
+    true_expectation_value_path=None,
     top_number_models=2,
     save_to_file=None
 ):
@@ -428,13 +430,24 @@ def Bayes_t_test(
 
     # Relies on Results folder structure -- not safe?!
     # ie ExperimentalSimulations/Results/Sep_10/14_32/results_001.p, etc
-    os.chdir(directory_name)
-    os.chdir("../../../../ExperimentalSimulations/Data/")
-    experimental_measurements = pickle.load(
-        open(str(dataset), 'rb')
-    )
+    if use_experimental_data == True:
+        os.chdir(directory_name)
+        os.chdir("../../../../ExperimentalSimulations/Data/")
+        experimental_measurements = pickle.load(
+            open(str(dataset), 'rb')
+        )
+    elif true_expectation_value_path is not None:
+        experimental_measurements = pickle.load(
+            open(str(true_expectation_value_path), 'rb')
+        )
+    else:
+        print("Either set \
+            use_experimental_data=True or \
+            provide true_expectation_value_path"
+        )
+        return False
+
     expectation_values_by_name = {}
-    
     os.chdir(directory_name)
     pickled_files = []
     for file in os.listdir(directory_name):
@@ -794,6 +807,14 @@ parser.add_argument(
   default=None
 )
 
+
+parser.add_argument(
+  '-true_expec', '--true_expectation_value_path',
+  help="Path to pickled true expectation values.",
+  type=str,
+  default=None
+)
+
 parser.add_argument(
   '-exp', '--use_experimental_data',
   help="Bool: whether or not to use experimental data.",
@@ -807,6 +828,7 @@ all_bayes_csv = arguments.bayes_csv
 qhl_mode = bool(arguments.qhl_mode)
 true_params_path = arguments.true_params
 exp_data = arguments.use_experimental_data
+true_expec_path = arguments.true_expectation_value_path
 
 if true_params_path is not None:
     true_params_info = pickle.load(
@@ -873,14 +895,16 @@ average_parameter_estimates(
 
 
 
-if exp_data:
-    Bayes_t_test(
-        directory_name = directory_to_analyse, 
-        dataset = arguments.dataset, 
-        results_path = results_csv,
-        top_number_models = arguments.top_number_models ,
-        save_to_file=str(directory_to_analyse+'expec_vals_avg_bayes_t_test.png')
-    )
+# if exp_data:
+Bayes_t_test(
+    directory_name = directory_to_analyse, 
+    dataset = arguments.dataset, 
+    results_path = results_csv,
+    use_experimental_data = exp_data, 
+    true_expectation_value_path = true_expec_path,
+    top_number_models = arguments.top_number_models ,
+    save_to_file=str(directory_to_analyse+'expec_vals_avg_bayes_t_test.png')
+)
 
 r_sqaured_average(
     results_path = results_csv,
