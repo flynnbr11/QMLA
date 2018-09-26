@@ -304,15 +304,6 @@ if global_variables.qhl_test:
             'qhl_parameter_estimates_'+ str(global_variables.long_id) +
             '.png')
         )
-        """
-        qmd.plotExpecValuesQHLTrueModel(
-            max_time=expec_val_plot_max_time, 
-            t_interval=1,
-            save_to_file = str( 
-            global_variables.plots_directory+
-            'qhl_expec_values_'+str(global_variables.long_id)+'.png')
-        )
-        """
 
         qmd.plotVolumeQHL(
             save_to_file = str( 
@@ -323,9 +314,10 @@ if global_variables.qhl_test:
         true_mod_instance = qmd.reducedModelInstanceFromID(
             qmd.TrueOpModelID
         )
-        r_squared = (
-            true_mod_instance.r_squared()
-        )
+        # r_squared = (
+        #     true_mod_instance.r_squared()
+        # )
+
     qmd.plotExpecValues(
         model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
         max_time = expec_val_plot_max_time, #in microsec
@@ -352,9 +344,10 @@ if global_variables.qhl_test:
 elif global_variables.further_qhl == True:
 
     qmd.runMultipleModelQHL()
-
+    model_ids = list(range(qmd.HighestModelID))
     qmd.plotExpecValues(
-        model_ids = list(range(qmd.HighestModelID)), # hardcode to see full model for development
+        model_ids = model_ids, # hardcode to see full model for development
+        times=plot_times,
         max_time = expec_val_plot_max_time, #in microsec
         t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
         champ = False,
@@ -380,6 +373,27 @@ elif global_variables.further_qhl == True:
         qmd.delete_unpicklable_attributes()
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file , protocol=2)
+
+    # results_file = global_variables.results_file
+
+    for mid in model_ids:
+        mod = qmd.reducedModelInstanceFromID(mid)
+        name = mod.Name
+
+        results_file=str(
+            global_variables.results_directory + 
+            'further_qhl_results_'+
+            str(name)+'_'+
+            str(global_variables.long_id)+
+            '.p'
+        )
+        print("results file:", results_file)
+
+        pickle.dump(
+            mod.results_dict,
+            open(results_file, "wb"), 
+            protocol=2
+        )
 
 
 else:

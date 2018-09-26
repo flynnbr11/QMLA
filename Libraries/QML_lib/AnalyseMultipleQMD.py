@@ -794,6 +794,12 @@ parser.add_argument(
 )
 
 parser.add_argument(
+  '-fqhl', '--further_qhl_mode', 
+  help="Whether in further QHL stage.",
+  type=int,
+  default=0
+)
+parser.add_argument(
   '-data', '--dataset', 
   help="Which dataset QMD was run using..",
   type=str,
@@ -826,6 +832,7 @@ arguments = parser.parse_args()
 directory_to_analyse = arguments.results_directory
 all_bayes_csv = arguments.bayes_csv
 qhl_mode = bool(arguments.qhl_mode)
+further_qhl_mode = bool(arguments.further_qhl_mode)
 true_params_path = arguments.true_params
 exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
@@ -861,12 +868,26 @@ print("\nAnalysing and storing results in", directory_to_analyse)
 if not directory_to_analyse.endswith('/'):
     directory_to_analyse += '/'
 
-results_csv_name = 'summary_results.csv'
-results_csv = directory_to_analyse+results_csv_name
-ptq.summariseResultsCSV(
-    directory_name=directory_to_analyse, 
-    csv_name=results_csv
-)
+
+if further_qhl_mode==True:
+    results_csv_name = 'summary_further_qhl_results.csv'
+    results_csv = directory_to_analyse+results_csv_name
+    ptq.summariseResultsCSV(
+        directory_name=directory_to_analyse, 
+        results_file_name_start='further_qhl_results',
+        csv_name=results_csv
+    )
+    plot_desc='further_'
+
+else:
+    results_csv_name = 'summary_results.csv'
+    results_csv = directory_to_analyse+results_csv_name
+    ptq.summariseResultsCSV(
+        directory_name=directory_to_analyse, 
+        results_file_name_start='results',
+        csv_name=results_csv
+    )
+    plot_desc=''
 
 average_priors = average_parameters(
     results_path=results_csv,
@@ -889,11 +910,10 @@ average_parameter_estimates(
     true_params_dict = true_params_dict,
     save_to_file=  str(
         directory_to_analyse + 
+        plot_desc + 
         'param_avg.png'
     )
 )
-
-
 
 # if exp_data:
 Bayes_t_test(
@@ -903,7 +923,11 @@ Bayes_t_test(
     use_experimental_data = exp_data, 
     true_expectation_value_path = true_expec_path,
     top_number_models = arguments.top_number_models ,
-    save_to_file=str(directory_to_analyse+'expec_vals_avg_bayes_t_test.png')
+    save_to_file=str(
+        directory_to_analyse+
+        plot_desc +
+        'expec_vals_avg_bayes_t_test.png'
+    )
 )
 
 r_sqaured_average(
@@ -911,6 +935,7 @@ r_sqaured_average(
     top_number_models = arguments.top_number_models,
     save_to_file=  str(
         directory_to_analyse + 
+        plot_desc +
         'r_squared_averages.png'
     )
 )
@@ -922,7 +947,8 @@ if qhl_mode==True:
         results_csv_path = results_csv,
         save_to_file = r_squared_plot
     )
-else:
+
+elif further_qhl_mode == False:
     plot_file = directory_to_analyse+'model_scores.png'
     model_scores = model_scores(directory_to_analyse)
     entropy = get_entropy(model_scores, inf_gain=False)

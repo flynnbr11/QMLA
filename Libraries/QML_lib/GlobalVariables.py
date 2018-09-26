@@ -197,12 +197,14 @@ class GlobalVariablesClass():
                 os.makedirs(self.plots_directory)
             except FileExistsError:
                 pass
-                        
-
 
         self.long_id ='{0:03d}'.format(self.qmd_id)
-        self.results_file = self.results_directory+'results_'+str(self.long_id)+'.p' #for pickling results into
-        self.class_pickle_file = self.results_directory+'qmd_class_'+str(self.long_id)+'.p'
+        if self.further_qhl==True:
+          self.results_file = self.results_directory+'further_qhl_results_'+str(self.long_id)+'.p' #for pickling results into
+          self.class_pickle_file = self.results_directory+'further_qhl_qmd_class_'+str(self.long_id)+'.p'
+        else:
+          self.results_file = self.results_directory+'results_'+str(self.long_id)+'.p' #for pickling results into
+          self.class_pickle_file = self.results_directory+'qmd_class_'+str(self.long_id)+'.p'
         
 
 

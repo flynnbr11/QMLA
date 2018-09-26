@@ -1302,8 +1302,6 @@ class QMD():
         time_now = time.time()
         time_taken = time_now - self.StartingTime
 #        true_model_r_squared = self.reducedModelInstanceFromID(self.TrueOpModelID).r_squared()
-        
-        
 
         self.ResultsDict = {
             'NumParticles' : self.NumParticles,
@@ -1364,11 +1362,32 @@ class QMD():
             ]
         )
 
-
+        time_now = time.time()
+        time_taken = time_now - self.StartingTime
         for mod_name in model_names:
             mod_id = DataBase.model_id_from_name(db=self.db, name=mod_name)
             mod = self.reducedModelInstanceFromID(mod_id)
             mod.updateLearnedValues()
+            mod.compute_expectation_values(times=self.PlotTimes)
+            mod.results_dict = {
+                'NumParticles' : self.NumParticles,
+                'NumExperiments' : self.NumExperiments,
+                'NumBayesTimes' : self.NumTimesForBayesUpdates,
+                'ResampleThreshold' : self.ResampleThreshold,
+                'ResamplerA' : self.ResamplerA,
+                'PHGPrefactor' : self.PGHPrefactor,
+                'ConfigLatex' : self.LatexConfig,       
+                'Time': time_taken,
+                'QID' : self.Q_id,
+                'RSquaredTrueModel' : mod.r_squared(),
+                'NameAlphabetical' : DataBase.alph(mod.Name),
+                'LearnedParameters' : mod.LearnedParameters,
+                'TrackParameterEstimates' : mod.TrackParameterEstimates,
+                'ExpectationValues' : mod.expectation_values,
+                'RSquaredByEpoch' : mod.r_squared_by_epoch(),
+                'LearnedHamiltonian' : mod.LearnedHamiltonian
+            }
+
 
     def runRemoteQMD(
         self, 

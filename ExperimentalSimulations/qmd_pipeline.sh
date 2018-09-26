@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=10
+num_tests=5
 qhl_test=0
-do_further_qhl=0
+do_further_qhl=1
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=15
-exp=8
+prt=50
+exp=10
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -137,7 +137,8 @@ echo "
 cd $long_dir
 python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -dir=$long_dir --bayes_csv=$bayes_csv \
-    -top=$number_best_models_further_qhl -qhl=$qhl_test \
+    -top=$number_best_models_further_qhl \
+    -qhl=$qhl_test -fqhl=0 \
     -exp=$exp_data -true_expec=$true_expec_path \
     -data=$dataset -params=$true_params_pickle_file 
 " > $analyse_script
@@ -147,24 +148,44 @@ sh $analyse_script
 
 if (( $do_further_qhl == 1 )) 
 then
-    pgh=0.3 # train on different set of data
-    redis-cli flushall 
-    let q_id="$q_id+1"
-    let particles="$further_qhl_factor * $prt"
-    let experiments="$further_qhl_factor * $exp"
-#    let q_id="$q_id+1"
-    python3 Exp.py \
-        -fq=$do_further_qhl \
-        -p=$particles -e=$experiments -bt=$bt \
-        -rq=$use_rq -g=$gaussian -qhl=0 \
-        -ra=$ra -rt=$rt -pgh=1.0 \
-        -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
-        -log=$this_log -cb=$bayes_csv \
-        -exp=$exp_data -cpr=$custom_prior \
-        -prior_path=$prior_pickle_file \
-        -true_params_path=$true_params_pickle_file \
-        -true_expec_path=$true_expec_path \
-        -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
-        -ggr=$growth_rule
+    for i in `seq 1 $max_qmd_id`;
+        do
+        pgh=0.3 # train on different set of data
+        redis-cli flushall 
+        let q_id="$q_id+1"
+        let particles="$further_qhl_factor * $prt"
+        let experiments="$further_qhl_factor * $exp"
+    #    let q_id="$q_id+1"
+        python3 Exp.py \
+            -fq=$do_further_qhl \
+            -p=$particles -e=$experiments -bt=$bt \
+            -rq=$use_rq -g=$gaussian -qhl=0 \
+            -ra=$ra -rt=$rt -pgh=1.0 \
+            -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
+            -log=$this_log -cb=$bayes_csv \
+            -exp=$exp_data -cpr=$custom_prior \
+            -prior_path=$prior_pickle_file \
+            -true_params_path=$true_params_pickle_file \
+            -true_expec_path=$true_expec_path \
+            -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
+            -ggr=$growth_rule
+    done
+
+    further_analyse_filename='analyse.sh'
+    further_analyse_script="$long_dir$further_analyse_filename"
+
+    # write to a script so we can recall analysis later.
+    echo "
+    cd $long_dir
+    python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
+        -dir=$long_dir --bayes_csv=$bayes_csv \
+        -top=$number_best_models_further_qhl \
+        -qhl=$qhl_test -fqhl=1 \
+        -exp=$exp_data -true_expec=$true_expec_path \
+        -data=$dataset -params=$true_params_pickle_file 
+    " > $further_analyse_script
+
+    chmod a+x $further_analyse_script
+    sh $further_analyse_script
 fi
 

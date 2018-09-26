@@ -935,6 +935,7 @@ def r_squared_from_epoch_list(
 
 def summariseResultsCSV(
     directory_name, 
+    results_file_name_start="results",
     csv_name='all_results.csv'
 ):
     import os, csv
@@ -946,7 +947,11 @@ def summariseResultsCSV(
         
     pickled_files = []
     for file in os.listdir(directory_name):
-        if file.endswith(".p") and file.startswith("results"):
+        if (
+            file.endswith(".p") 
+            and 
+            file.startswith(results_file_name_start)
+        ):
             pickled_files.append(file)
 
     filenames = [directory_name+str(f) for f in pickled_files ]
