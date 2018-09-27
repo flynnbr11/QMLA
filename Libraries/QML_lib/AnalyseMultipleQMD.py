@@ -426,7 +426,7 @@ def Bayes_t_test(
 
 
     cm_subsection = np.linspace(0,0.8,len(winning_models))
-    colours = [ cm.Paired(x) for x in cm_subsection ]
+    colours = [ cm.viridis(x) for x in cm_subsection ]
     # colours = [ cm.Spectral(x) for x in cm_subsection ]
 
     # Relies on Results folder structure -- not safe?!
@@ -578,7 +578,7 @@ def Bayes_t_test(
                 ),
                 color=colours[winning_models.index(term)],
                 linestyle='--',
-                alpha=0.2
+                alpha=0.5
             )
 
         ax.plot(
@@ -662,7 +662,7 @@ def r_sqaured_average(
     num_models = len(names)
     cm_subsection = np.linspace(0,0.8,num_models)
     #        colours = [ cm.magma(x) for x in cm_subsection ]
-    colours = [ cm.Paired(x) for x in cm_subsection ]
+    colours = [ cm.viridis(x) for x in cm_subsection ]
 
     i=0
     for i in range(len(names)):
