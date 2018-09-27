@@ -406,9 +406,8 @@ def Bayes_t_test(
     save_to_file=None
 ):
     from matplotlib import cm
+    from scipy import stats
 
-    fig = plt.figure()
-    ax = plt.subplot(111)
     
     results = pandas.DataFrame.from_csv(
         results_path,
@@ -472,6 +471,9 @@ def Bayes_t_test(
 
     success_rate_by_term = {}
     for term in winning_models:
+        plt.clf()
+        fig = plt.figure()
+        ax = plt.subplot(111)
         expectation_values = {}
         num_sets_of_this_name = len(expectation_values_by_name[term])
         for i in range(num_sets_of_this_name):
@@ -486,14 +488,39 @@ def Bayes_t_test(
         means = {}
         std_dev = {}
         true = {}
+        t_values = {}
         times = sorted(list(experimental_measurements.keys()))
+        flag=True
 
         for t in times:
             means[t] = np.mean(expectation_values[t])
             std_dev[t] = np.std(expectation_values[t])
             true[t] = experimental_measurements[t]
+            if num_sets_of_this_name > 1:
+                expec_values_array = np.array(
+                    [ [i] for i in expectation_values[t]]
+                )
+                # print("shape going into ttest:", np.shape(true_expec_values_array))
+                t_val = stats.ttest_1samp( 
+                    expec_values_array, # list of expec vals for this t
+                    true[t], # true expec val of t
+                    axis=0, 
+                    nan_policy='omit'
+                )
+                if flag==True and t>0:
+                    print("t=", t)
+                    print("true:", expec_values_array)
+                    print("true", true[t])
+                    print("t_val:", t_val)
+                    flag=False
 
-        num_runs = len(pickled_files)
+                if np.isnan(float(t_val[1]))==False:
+                    # t_values[t] = 1-t_val[1]
+                    t_values[t] = t_val[1]
+                else:
+                    print("t_val is nan for t=",t)
+
+        num_runs = num_sets_of_this_name # TODO should this be the number of times this model won???
         success_rate = 0
 
         for t in times: 
@@ -519,6 +546,24 @@ def Bayes_t_test(
                 ' (' + str(num_sets_of_this_name)  + ').'
             )
 #        ax.errorbar(times, mean_exp, xerr=std_dev_exp, label=description)
+        if num_sets_of_this_name > 1:
+            bayes_t_values_avail_times = sorted(list(t_values.keys()))
+            bayes_t_values = [t_values[t] for t in bayes_t_values_avail_times]
+            median_b_t_val = np.median(bayes_t_values)
+            # print("Bayes t values:", bayes_t_values)
+
+            ax.plot(
+                bayes_t_values_avail_times, 
+                bayes_t_values,
+                label=str(
+                    'Bayes t-value (median '+ 
+                    str(np.round(median_b_t_val,2))+
+                    ')'
+                ),
+                color=colours[winning_models.index(term)],
+                linestyle='--'
+            )
+
         ax.plot(
             times, 
             mean_exp, 
@@ -535,25 +580,42 @@ def Bayes_t_test(
 
         success_rate_by_term[term] = success_rate
 
-    plt.title('Mean Expectation Values')
-    plt.xlabel('Time')
-    plt.ylabel('Expectation Value')
-    true_exp = [true[t] for t in times]
-    ax.scatter(
-        times, 
-        true_exp, 
-        color='r', 
-        s=5, 
-        label='True Expectation Value'
-    )
-    ax.legend(
-        loc='center left', 
-        bbox_to_anchor=(1, 0.5), 
-        title=' Model : Bayes t-test (instances)'
-    )    
-    
-    if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        # plt.title('Mean Expectation Values')
+        # plt.xlabel('Time')
+        # plt.ylabel('Expectation Value')
+        # true_exp = [true[t] for t in times]
+        # ax.set_xlim(0,1)
+        # plt.xlim(0,1)
+
+
+        ax.set_title('Mean Expectation Values')
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Expectation Value')
+        true_exp = [true[t] for t in times]
+        # ax.set_xlim(0,1)
+        # plt.xlim(0,1)
+
+        ax.scatter(
+            times, 
+            true_exp, 
+            color='r', 
+            s=5, 
+            label='True Expectation Value'
+        )
+        ax.legend(
+            loc='center left', 
+            bbox_to_anchor=(1, 0.5), 
+            title=' Model : Bayes t-test (instances)'
+        )    
+        
+        if save_to_file is not None:
+            save_to_file = save_to_file[:-4]
+            save_to_file += str(
+                '_'+
+                str(term) + '.png'
+            )
+            print("Saving to ",save_to_file )
+            plt.savefig(save_to_file, bbox_inches='tight')
 
 
 def r_sqaured_average(

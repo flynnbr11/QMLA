@@ -956,7 +956,12 @@ def summariseResultsCSV(
             pickled_files.append(file)
 
     filenames = [directory_name+str(f) for f in pickled_files ]
-    some_results = pickle.load(open(filenames[0], "rb"))
+    try:
+        some_results = pickle.load(open(filenames[0], "rb"))
+    except:
+        print("Couldn't find results files beginning with ", 
+            results_file_name_start
+        )
     result_fields = list(some_results.keys())
     
     
