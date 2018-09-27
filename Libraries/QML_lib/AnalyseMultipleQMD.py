@@ -502,7 +502,7 @@ def Bayes_t_test(
                     [ [i] for i in expectation_values[t]]
                 )
                 # print("shape going into ttest:", np.shape(true_expec_values_array))
-                if one_sample==True:
+                if use_experimental_data==True:
                     t_val = stats.ttest_1samp( 
                         expec_values_array, # list of expec vals for this t
                         true[t], # true expec val of t
