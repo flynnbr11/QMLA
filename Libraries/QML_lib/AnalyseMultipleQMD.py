@@ -578,7 +578,7 @@ def Bayes_t_test(
                 ),
                 color=colours[winning_models.index(term)],
                 linestyle='--',
-                alpha=0.5
+                alpha=0.3
             )
 
         ax.plot(
