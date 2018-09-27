@@ -426,8 +426,8 @@ def Bayes_t_test(
 
 
     cm_subsection = np.linspace(0,0.8,len(winning_models))
-#        colours = [ cm.magma(x) for x in cm_subsection ]
-    colours = [ cm.Spectral(x) for x in cm_subsection ]
+    colours = [ cm.Paired(x) for x in cm_subsection ]
+    # colours = [ cm.Spectral(x) for x in cm_subsection ]
 
     # Relies on Results folder structure -- not safe?!
     # ie ExperimentalSimulations/Results/Sep_10/14_32/results_001.p, etc
@@ -577,7 +577,8 @@ def Bayes_t_test(
                     ')'
                 ),
                 color=colours[winning_models.index(term)],
-                linestyle='--'
+                linestyle='--',
+                alpha=0.2
             )
 
         ax.plot(
