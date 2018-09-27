@@ -329,7 +329,7 @@ def average_parameter_estimates(
                 avg_parameters[p][e] = np.median(parameters[p][e])
                 std_devs[p][e] = np.std(parameters[p][e])
 
-        for term in terms:
+        for term in sorted(terms):
             ax = axes[row, col]
             axes_so_far += 1
             col += 1
@@ -393,6 +393,7 @@ def average_parameter_estimates(
                 save_file = str(partial_name + '_' + name + '.png')
             else:
                 save_file = str(save_to_file + '_' + name + '.png')
+            plt.tight_layout()
             plt.savefig(save_file, bbox_inches='tight')
 
 
@@ -491,7 +492,7 @@ def Bayes_t_test(
         t_values = {}
         times = sorted(list(experimental_measurements.keys()))
         flag=True
-
+        one_sample=True
         for t in times:
             means[t] = np.mean(expectation_values[t])
             std_dev[t] = np.std(expectation_values[t])
@@ -501,18 +502,33 @@ def Bayes_t_test(
                     [ [i] for i in expectation_values[t]]
                 )
                 # print("shape going into ttest:", np.shape(true_expec_values_array))
-                t_val = stats.ttest_1samp( 
-                    expec_values_array, # list of expec vals for this t
-                    true[t], # true expec val of t
-                    axis=0, 
-                    nan_policy='omit'
-                )
-                if flag==True and t>0:
-                    print("t=", t)
-                    print("true:", expec_values_array)
-                    print("true", true[t])
-                    print("t_val:", t_val)
-                    flag=False
+                if one_sample==True:
+                    t_val = stats.ttest_1samp( 
+                        expec_values_array, # list of expec vals for this t
+                        true[t], # true expec val of t
+                        axis=0, 
+                        nan_policy='omit'
+                    )
+                else:
+                    true_dist = stats.norm.rvs(
+                        loc = true[t],
+                        scale=0.001,
+                        size=np.shape(expec_values_array)
+                    )
+                    t_val = stats.ttest_ind( 
+                        expec_values_array, # list of expec vals for this t
+                        true_dist, # true expec val of t
+                        axis=0, 
+                        nan_policy='omit'
+                    )
+
+
+                # if flag==True and t>0:
+                #     print("t=", t)
+                #     print("true:", expec_values_array)
+                #     print("true", true[t])
+                #     print("t_val:", t_val)
+                #     flag=False
 
                 if np.isnan(float(t_val[1]))==False:
                     # t_values[t] = 1-t_val[1]

@@ -5,7 +5,7 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=10
+num_tests=3
 qhl_test=1
 do_further_qhl=0
 
@@ -66,8 +66,8 @@ this_log="$long_dir/qmd.log"
 furhter_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
-# true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-true_operator='xTiPPzTi'
+true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+# true_operator='xTiPPzTi'
 declare -a qhl_operators=(
     $true_operator
 )
