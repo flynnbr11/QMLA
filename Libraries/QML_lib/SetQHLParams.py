@@ -6,15 +6,15 @@ import DataBase
 
 ### SET VALUES HERE ###
 set_prior_specific_terms = {
-	'xTi' : [3.5, 1.0], # TODO Broaden, testing with small dist
-	'yTi' : [3.5, 1.0],
-	'zTi' : [3.5, 1.0],
-	'xTx' : [3.5, 1.0], # true value 2.7
-	'yTy' : [3.5, 1.0], # true value 2.7
-	'zTz' : [3.5, 1.0], # true value 2.14
-	'xTy' : [3.5, 1.0],
-	'xTz' : [3.5, 1.0],
-	'yTz' : [3.5, 1.0],
+	'xTi' : [3.0, 2.0], # TODO Broaden, testing with small dist
+	'yTi' : [3.0, 2.0],
+	'zTi' : [3.0, 2.0],
+	'xTx' : [-3.0, 2.0], # true value 2.7
+	'yTy' : [-3.0, 2.0], # true value 2.7
+	'zTz' : [-3.0, 2.0], # true value 2.14
+	'xTy' : [3.0, 2.0],
+	'xTz' : [3.0, 2.0],
+	'yTz' : [3.0, 2.0],
 }
 
 set_true_params = {
