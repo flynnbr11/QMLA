@@ -25,25 +25,26 @@ import DataBase
 # 22:48:8 [QML 3] Final Parameters mean and stdev (term  yTy ): [-0.02375341  0.00765409]
 # 22:48:8 [QML 3] Final Parameters mean and stdev (term  zTz ): [-0.27888531  0.0200708 ]
 
+# results from QHL previous run which led us to think about kHz params for hyperfine.. (email to Seb 12 Sep 18)
+
 set_prior_specific_terms = {
-	'xTi' : [ 0.17888641 , 0.02239774], # TODO Broaden, testing with small dist
-	'yTi' : [ 5.50795523 , 0.0623826 ],
-	'zTi' : [ 0.60514502 , 0.12197497],
-	'xTx' : [-2.98859264 , 0.12430515], # true value 2.7
-	'yTy' : [-0.02375341 , 0.00765409], # true value 2.7
-	'zTz' : [-0.27888531 , 0.0200708 ], # true value 2.14
+	'xTi' : [ 0.17 , 0.5], # TODO Broaden, testing with small dist
+	'yTi' : [ 0.77 , 0.5 ],
+	'zTi' : [ -0.08 , 0.5],
+	'xTx' : [-0.05 , 0.5], # true value 2.7
+	'yTy' : [0.08 , 0.5], # true value 2.7
+	'zTz' : [-3.9 , 0.5 ], # true value 2.14
 	'xTy' : [3.0, 2.0],
 	'xTz' : [3.0, 2.0],
 	'yTz' : [3.0, 2.0],
 }
 
-
 set_true_params = {
-	'xTi' : 1.0,
+	'xTi' : 0.2,
 	'yTi' : 1.2,
-	'zTi' : 1.8,
-	'xTx' : 1.3,
-	'yTy' : 1.4,
+	'zTi' : -0.2,
+	'xTx' : 0.1,
+	'yTy' : 0.3,
 	'zTz' : 1.5,
 	'xTy' : 1.6,
 	'xTz' : 1.7,

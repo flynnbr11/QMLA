@@ -10,8 +10,8 @@ do_further_qhl=1 # perform further QHL parameter tuning on average values found 
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 
 # QHL parameters
-p=100 # particles
-e=25 # experiments
+p=1000 # particles
+e=250 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=0.1 # PGH factor
