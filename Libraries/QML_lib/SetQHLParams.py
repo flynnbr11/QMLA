@@ -5,17 +5,38 @@ import argparse
 import DataBase
 
 ### SET VALUES HERE ###
+# set_prior_specific_terms = {
+# 	'xTi' : [3.0, 2.0], # TODO Broaden, testing with small dist
+# 	'yTi' : [3.0, 2.0],
+# 	'zTi' : [3.0, 2.0],
+# 	'xTx' : [-3.0, 2.0], # true value 2.7
+# 	'yTy' : [-3.0, 2.0], # true value 2.7
+# 	'zTz' : [-3.0, 2.0], # true value 2.14
+# 	'xTy' : [3.0, 2.0],
+# 	'xTz' : [3.0, 2.0],
+# 	'yTz' : [3.0, 2.0],
+# }
+
+# from results of long QHL, Oct_01/12_08
+# 22:48:8 [QML 3] Final Parameters mean and stdev (term  xTi ): [ 0.17888641  0.02239774]
+# 22:48:8 [QML 3] Final Parameters mean and stdev (term  yTi ): [ 5.50795523  0.0623826 ]
+# 22:48:8 [QML 3] Final Parameters mean and stdev (term  zTi ): [ 0.60514502  0.12197497]
+# 22:48:8 [QML 3] Final Parameters mean and stdev (term  xTx ): [-2.98859264  0.12430515]
+# 22:48:8 [QML 3] Final Parameters mean and stdev (term  yTy ): [-0.02375341  0.00765409]
+# 22:48:8 [QML 3] Final Parameters mean and stdev (term  zTz ): [-0.27888531  0.0200708 ]
+
 set_prior_specific_terms = {
-	'xTi' : [3.0, 2.0], # TODO Broaden, testing with small dist
-	'yTi' : [3.0, 2.0],
-	'zTi' : [3.0, 2.0],
-	'xTx' : [-3.0, 2.0], # true value 2.7
-	'yTy' : [-3.0, 2.0], # true value 2.7
-	'zTz' : [-3.0, 2.0], # true value 2.14
+	'xTi' : [ 0.17888641 , 0.02239774], # TODO Broaden, testing with small dist
+	'yTi' : [ 5.50795523 , 0.0623826 ],
+	'zTi' : [ 0.60514502 , 0.12197497],
+	'xTx' : [-2.98859264 , 0.12430515], # true value 2.7
+	'yTy' : [-0.02375341 , 0.00765409], # true value 2.7
+	'zTz' : [-0.27888531 , 0.0200708 ], # true value 2.14
 	'xTy' : [3.0, 2.0],
 	'xTz' : [3.0, 2.0],
 	'yTz' : [3.0, 2.0],
 }
+
 
 set_true_params = {
 	'xTi' : 1.0,

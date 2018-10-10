@@ -186,6 +186,22 @@ class QMD():
         else: 
             self.ExperimentalMeasurementTimes=None
         self.PlotTimes = plot_times
+        if self.UseExperimentalData==False:
+            self.ExperimentalMeasurements = {}
+            self.TrueHamiltonian = np.tensordot(
+                self.TrueParamsList,
+                self.TrueOpList, 
+                axes=1
+            )
+
+            for t in self.PlotTimes:
+                self.ExperimentalMeasurements[t] = \
+                 evo.traced_expectation_value_project_one_qubit_plus(
+                    ham = self.TrueHamiltonian,
+                    t = t, 
+                    state = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe    
+                )
+
         self.UseExpCustom = use_exp_custom
         self.EnableSparse = enable_sparse
         self.ExpComparisonTol = compare_linalg_exp_tol

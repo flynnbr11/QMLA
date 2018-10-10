@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=3
+num_tests=10
 qhl_test=1
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=15
-exp=10
+prt=80
+exp=30
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -22,7 +22,7 @@ gaussian=1
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=0
+exp_data=1
 if (( "$exp_data" == 0 ))
 then
     pgh=0.3
@@ -67,7 +67,7 @@ furhter_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
 true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-# true_operator='xTiPPzTi'
+#true_operator='xTiPPyTiPPyTy'
 declare -a qhl_operators=(
     $true_operator
 )

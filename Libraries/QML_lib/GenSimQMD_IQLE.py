@@ -346,7 +346,6 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 )
 
 #        outcomes[[0]] = 1-outcomes[[0]]
-
         likelihood_array = (
             qi.FiniteOutcomeModel.pr0_to_likelihood_array(outcomes, pr0)
         )
