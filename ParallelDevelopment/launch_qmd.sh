@@ -1,16 +1,17 @@
 #!/bin/bash
 
-test_description="long_qhl_experimental_data_NO_restrict_to_positive_parameters_0_prior"
+#test_description="qhl_test_Gabi_params"
+test_description="test_multi_qhl_sim_data"
 
 ## Script essentials
-num_tests=100
+num_tests=4
 qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
 do_further_qhl=1 # perform further QHL parameter tuning on average values found by QMD. 
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 
 # QHL parameters
-p=10000 # particles
-e=2500 # experiments
+p=100 # particles
+e=25 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=0.1 # PGH factor
@@ -18,7 +19,7 @@ op='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 #op='xTiPPyTiPPzTiPPxTxPPyTyPPzTzPPxTyPPxTzPPyTz'
 
 # QMD settings
-experimental_data=1 # use experimental data -> 1; use fake data ->0
+experimental_data=0 # use experimental data -> 1; use fake data ->0
 #dataset='NVB_HahnPeaks_Newdata'
 #dataset='NV05_HahnEcho02'
 dataset='NVB_dataset.p'
@@ -27,13 +28,14 @@ data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
 top_number_models=2 # how many models to perform further QHL for
 further_qhl_resource_factor=1
-#growth_rule='two_qubit_ising_rotation_hyperfine'
-growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+growth_rule='two_qubit_ising_rotation_hyperfine'
+#growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
 do_plots=0
 pickle_class=0
 custom_prior=1
-true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+#true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+#true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTzPPxTyPPxTzPPyTz'
 if (( "$qhl" == 1 ))
 then	
 	rp=1.0
@@ -203,7 +205,7 @@ then
 	pgh=1.0 # further QHL on different times than initially trained on. 
 	rp=2.0
 
-	pbs_config=walltime=10:00:00,nodes=1:ppn=$top_number_models
+	pbs_config=walltime=20:00:00,nodes=1:ppn=$top_number_models
 
 	echo "
 qmd_id=$qmd_id
