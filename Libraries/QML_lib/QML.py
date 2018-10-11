@@ -470,7 +470,7 @@ class ModelLearningClass():
         learned_info['data_record'] = self.Updater.data_record
         learned_info['name'] = self.Name
         learned_info['model_id'] = self.ModelID
-        # learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
+        learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
@@ -661,7 +661,7 @@ class reducedModel():
         self.Times = learned_info['times']
         self.FinalParams = learned_info['final_params'] # should be final params from learning process
         self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
-        # self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
+        self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_info['normalization_record']
         self.log_total_likelihod = learned_info['log_total_likelihood']
         self.VolumeList = learned_info['volume_list'] 
@@ -706,7 +706,9 @@ class reducedModel():
         for t in times:
 
             if self.UseExperimentalData:
-                self.expectation_values[t] = evo.hahn_evolution(
+                # self.expectation_values[t] = evo.hahn_evolution(
+                self.expectation_values[t] = evo.expectation_value_wrapper(
+                    method='hahn',
                     ham = self.LearnedHamiltonian, 
                     t = t,
                     state = probe
@@ -714,11 +716,13 @@ class reducedModel():
 
             else:
                 self.expectation_values[t] = (
-                    evo.traced_expectation_value_project_one_qubit_plus(
+                    # evo.traced_expectation_value_project_one_qubit_plus(
+                    evo.expectation_value_wrapper(
+                        method='trace_all_but_first',
                         ham = self.LearnedHamiltonian, 
                         t = t,
                         state = probe
-                        )
+                    )
                 )
 
 
@@ -757,9 +761,16 @@ class reducedModel():
                 sim = self.expectation_values[t]
             else:
                 if self.UseExperimentalData==True:
-                    sim = evo.hahn_evolution(ham, t, probe)
+                    # sim = evo.hahn_evolution(
+                    sim = evo.expectation_value_wrapper(
+                        method='hahn',
+                        ham=ham, t=t, state=probe
+                    )
+
                 else:
-                    sim = evo.traced_expectation_value_project_one_qubit_plus(
+                    # sim = evo.traced_expectation_value_project_one_qubit_plus(
+                    sim = evo.expectation_value_wrapper(
+                        method='trace_all_but_first',
                         ham=ham, t=t, state=probe
                     )
                 # self.expectation_values[t] = sim
@@ -818,10 +829,20 @@ class reducedModel():
             )
             for t in exp_times:
                 if self.UseExperimentalData==True:
-                    sim = evo.hahn_evolution(ham, t, probe)
+                    # sim = evo.hahn_evolution(
+                    sim = evo.expectation_value_wrapper(
+                        method='hahn',
+                        ham=ham, 
+                        t=t, 
+                        state=probe
+                    )
                 else:
-                    sim = evo.traced_expectation_value_project_one_qubit_plus(
-                        ham=ham, t=t, state=probe
+                    # sim = evo.traced_expectation_value_project_one_qubit_plus(
+                    sim = evo.expectation_value_wrapper(
+                        method='trace_all_but_first',
+                        ham=ham, 
+                        t=t, 
+                        state=probe
                     )
 
                 true = self.ExperimentalMeasurements[t]
@@ -913,7 +934,7 @@ class modelClassForRemoteBayesFactor():
         self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
         self.InitialParams = learned_model_info['initial_params']
         
-        # self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
+        self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_model_info['normalization_record']
         self.log_likelihood = learned_model_info['log_total_likelihood']
         

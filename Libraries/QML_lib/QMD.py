@@ -195,11 +195,15 @@ class QMD():
             )
 
             for t in self.PlotTimes:
-                self.ExperimentalMeasurements[t] = \
-                 evo.traced_expectation_value_project_one_qubit_plus(
-                    ham = self.TrueHamiltonian,
-                    t = t, 
-                    state = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe    
+                # TODO is this the right expectation value func???
+                self.ExperimentalMeasurements[t] = (
+                    # evo.traced_expectation_value_project_one_qubit_plus(
+                    evo.expectation_value_wrapper(
+                        method='trace_all_but_first',
+                        ham = self.TrueHamiltonian,
+                        t = t, 
+                        state = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe    
+                    )
                 )
 
         self.UseExpCustom = use_exp_custom

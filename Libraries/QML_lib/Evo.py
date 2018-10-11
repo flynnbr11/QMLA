@@ -126,7 +126,9 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe,
                 
                 if use_experimental_data == True:
                     # TODO replace call to exp_val with call to Hahn exp val
-                    output[evoId][tId] = hahn_evolution(
+                    # output[evoId][tId] = hahn_evolution(
+                    output[evoId][tId] = expectation_value_wrapper(
+                        method='hahn',
                         ham = ham,
                         t = t,
                         state = probe,
@@ -135,7 +137,10 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe,
                     )
                     
                 else: 
-                    output[evoId][tId] = expectation_value(ham=ham, t=t, state=probe,
+                    # output[evoId][tId] = expectation_value(
+                    output[evoId][tId] = expectation_value_wrapper(
+                        method='full_access',
+                        ham=ham, t=t, state=probe,
                         use_exp_custom=use_exp_custom, 
                         compare_exp_fncs_tol=exp_comparison_tol,
                         enable_sparse=enable_sparse, log_file=log_file,
@@ -532,8 +537,14 @@ def iqle_evolve(ham, ham_minus, t, probe,
         if ham_dim == ham_minus_dim: 
             H = ham_minus - ham ##reversed because exp_ham function calculated e^{-iHt}
             print_loc(global_print_loc)
-            expec_value = expectation_value(H, t, state=probe,
-                use_exp_custom=use_exp_custom, enable_sparse=enable_sparse
+            # expec_value = expectation_value(
+            expec_value = expectation_value_wrapper(
+                method='full_access',
+                ham=H, 
+                t=t, 
+                state=probe,
+                use_exp_custom=use_exp_custom, 
+                enable_sparse=enable_sparse
             )
             print_loc(global_print_loc)
             return expec_value
@@ -576,4 +587,18 @@ def iqle_evolve(ham, ham_minus, t, probe,
             log_file=log_file, log_identifier=log_identifier
         )
  
- 
+##### ---------- -------------------- #####  
+"""
+Wrapper function for expectation value, relying on above defined functions
+"""
+expec_val_function_dict = {
+    'full_access' : expectation_value, 
+    'hahn' : hahn_evolution,
+    'trace_all_but_first' : traced_expectation_value_project_one_qubit_plus
+}
+
+    
+def expectation_value_wrapper(method, **kwargs):       
+    # print("method:", method)
+    expectation_value_function = expec_val_function_dict[method]
+    return expectation_value_function(**kwargs)
