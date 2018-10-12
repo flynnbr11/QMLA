@@ -128,6 +128,7 @@ class ModelLearningClass():
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.ExpComparisonTol = qmd_info['compare_linalg_exp_tol']
         self.UseExperimentalData = qmd_info['use_experimental_data']
+        self.MeasurementType = qmd_info['measurement_type']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
         self.SimOpsNames = simopnames
@@ -196,6 +197,7 @@ class ModelLearningClass():
             time_dep_true_params = self.TimeDepTrueParams,
             num_time_dep_true_params = self.NumTimeDepTrueParams,
             num_probes=self.NumProbes,
+            measurement_type = self.MeasurementType,
             use_experimental_data = self.UseExperimentalData,
             experimental_measurements = self.ExperimentalMeasurements,
             experimental_measurement_times=self.ExperimentalMeasurementTimes, 
@@ -470,7 +472,7 @@ class ModelLearningClass():
         learned_info['data_record'] = self.Updater.data_record
         learned_info['name'] = self.Name
         learned_info['model_id'] = self.ModelID
-        # learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
+        learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
@@ -595,6 +597,7 @@ class reducedModel():
         self.ModelID = modelID
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
+        self.MeasurementType = qmd_info['measurement_type']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.UseExperimentalData = qmd_info['use_experimental_data']
         self.NumParticles = qmd_info['num_particles']
@@ -661,7 +664,7 @@ class reducedModel():
         self.Times = learned_info['times']
         self.FinalParams = learned_info['final_params'] # should be final params from learning process
         self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
-        # self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
+        self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_info['normalization_record']
         self.log_total_likelihod = learned_info['log_total_likelihood']
         self.VolumeList = learned_info['volume_list'] 
@@ -704,22 +707,32 @@ class reducedModel():
     ):
         # TODO expectation_values dict only for |++> probe as is.
         for t in times:
-
-            if self.UseExperimentalData:
-                self.expectation_values[t] = evo.hahn_evolution(
+                self.expectation_values[t] = evo.expectation_value_wrapper(
+                    method=self.MeasurementType,
                     ham = self.LearnedHamiltonian, 
                     t = t,
                     state = probe
                 )
 
-            else:
-                self.expectation_values[t] = (
-                    evo.traced_expectation_value_project_one_qubit_plus(
-                        ham = self.LearnedHamiltonian, 
-                        t = t,
-                        state = probe
-                        )
-                )
+            # if self.UseExperimentalData:
+            #     # self.expectation_values[t] = evo.hahn_evolution(
+            #     self.expectation_values[t] = evo.expectation_value_wrapper(
+            #         method='hahn',
+            #         ham = self.LearnedHamiltonian, 
+            #         t = t,
+            #         state = probe
+            #     )
+
+            # else:
+            #     self.expectation_values[t] = (
+            #         # evo.traced_expectation_value_project_one_qubit_plus(
+            #         evo.expectation_value_wrapper(
+            #             method='trace_all_but_first',
+            #             ham = self.LearnedHamiltonian, 
+            #             t = t,
+            #             state = probe
+            #         )
+            #     )
 
 
     def r_squared(
@@ -756,13 +769,25 @@ class reducedModel():
             if t in available_expectation_values:
                 sim = self.expectation_values[t]
             else:
-                if self.UseExperimentalData==True:
-                    sim = evo.hahn_evolution(ham, t, probe)
-                else:
-                    sim = evo.traced_expectation_value_project_one_qubit_plus(
-                        ham=ham, t=t, state=probe
-                    )
-                # self.expectation_values[t] = sim
+                # if self.UseExperimentalData==True:
+                #     # sim = evo.hahn_evolution(
+                #     sim = evo.expectation_value_wrapper(
+                #         method='hahn',
+                #         ham=ham, t=t, state=probe
+                #     )
+
+                # else:
+                #     # sim = evo.traced_expectation_value_project_one_qubit_plus(
+                #     sim = evo.expectation_value_wrapper(
+                #         method='trace_all_but_first',
+                #         ham=ham, t=t, state=probe
+                #     )
+
+                sim = evo.expectation_value_wrapper(
+                    method=self.MeasurementType,
+                    ham=ham, t=t, state=probe
+                )
+                self.expectation_values[t] = sim
 
             true = self.ExperimentalMeasurements[t]
             diff_squared = (sim - true)**2
@@ -817,12 +842,29 @@ class reducedModel():
                 list(self.expectation_values.keys())
             )
             for t in exp_times:
-                if self.UseExperimentalData==True:
-                    sim = evo.hahn_evolution(ham, t, probe)
-                else:
-                    sim = evo.traced_expectation_value_project_one_qubit_plus(
-                        ham=ham, t=t, state=probe
-                    )
+                sim = evo.expectation_value_wrapper(
+                    method=self.MeasurementType,
+                    ham=ham, 
+                    t=t, 
+                    state=probe
+                )
+
+                # if self.UseExperimentalData==True:
+                #     # sim = evo.hahn_evolution(
+                #     sim = evo.expectation_value_wrapper(
+                #         method='hahn',
+                #         ham=ham, 
+                #         t=t, 
+                #         state=probe
+                #     )
+                # else:
+                #     # sim = evo.traced_expectation_value_project_one_qubit_plus(
+                #     sim = evo.expectation_value_wrapper(
+                #         method='trace_all_but_first',
+                #         ham=ham, 
+                #         t=t, 
+                #         state=probe
+                #     )
 
                 true = self.ExperimentalMeasurements[t]
                 diff_squared = (sim - true)**2
@@ -898,6 +940,7 @@ class modelClassForRemoteBayesFactor():
         self.TrueParams = qmd_info['true_params']
         self.TrueOpName  = qmd_info['true_name']
         self.UseExpCustom = qmd_info['use_exp_custom']
+        self.MeasurementType = qmd_info['measurement_type']
         self.UseExperimentalData = qmd_info['use_experimental_data']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
@@ -913,7 +956,7 @@ class modelClassForRemoteBayesFactor():
         self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
         self.InitialParams = learned_model_info['initial_params']
         
-        # self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
+        self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_model_info['normalization_record']
         self.log_likelihood = learned_model_info['log_total_likelihood']
         
@@ -924,6 +967,7 @@ class modelClassForRemoteBayesFactor():
             modelparams=self.SimParams_Final, 
             true_oplist = self.TrueOpList,
             trueparams = self.TrueParams, truename=self.TrueOpName,
+            measurement_type = self.MeasurementType,
             use_experimental_data = self.UseExperimentalData,
             experimental_measurements = self.ExperimentalMeasurements,
             experimental_measurement_times=(

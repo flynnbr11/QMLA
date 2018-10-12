@@ -103,6 +103,7 @@ class QMD():
         debug_directory = None,
         qle = True, # Set to False for IQLE
         parallel = False,
+        measurement_type='full_access',
         use_experimental_data = False,
         experimental_measurements = None,
         plot_times = [0,1],
@@ -177,6 +178,7 @@ class QMD():
         self.BranchBayesComputed = {}
         self.InterBranchChampions = {}
         self.GlobalEpoch = 0 
+        self.MeasurementType = measurement_type
         self.UseExperimentalData = use_experimental_data
         self.ExperimentalMeasurements = experimental_measurements
         if self.ExperimentalMeasurements is not None:
@@ -195,11 +197,15 @@ class QMD():
             )
 
             for t in self.PlotTimes:
-                self.ExperimentalMeasurements[t] = \
-                 evo.traced_expectation_value_project_one_qubit_plus(
-                    ham = self.TrueHamiltonian,
-                    t = t, 
-                    state = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe    
+                # TODO is this the right expectation value func???
+                self.ExperimentalMeasurements[t] = (
+                    # evo.traced_expectation_value_project_one_qubit_plus(
+                    evo.expectation_value_wrapper(
+                        method=self.MeasurementType,
+                        ham = self.TrueHamiltonian,
+                        t = t, 
+                        state = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe    
+                    )
                 )
 
         self.UseExpCustom = use_exp_custom
@@ -326,6 +332,7 @@ class QMD():
             'sigma_threshold' : self.SigmaThreshold,
             'true_name' : self.TrueOpName,
             'use_exp_custom' : self.UseExpCustom,
+            'measurement_type' : self.MeasurementType,
             'use_experimental_data' : self.UseExperimentalData,
             'experimental_measurements' : self.ExperimentalMeasurements,
             'experimental_measurement_times' : self.ExperimentalMeasurementTimes, 

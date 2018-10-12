@@ -83,6 +83,7 @@ default_rq_timeout = 3600
 default_log_file = 'default_log_file.log'
 default_save_plots = False
 default_cumulative_csv = 'cumulative_bayes.csv'
+default_measurement_type = 'full_access'
 default_experimental_data = False
 default_true_operator = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 default_qhl_test = 0
@@ -130,6 +131,7 @@ class GlobalVariablesClass():
         save_plots = default_save_plots,
         cumulative_csv = default_cumulative_csv,
         experimental_data = default_experimental_data,
+        measurement_type = default_measurement_type,
         dataset = default_dataset,
         data_max_time = default_data_max_useful_time,
         data_time_offset = default_data_time_offset,
@@ -172,6 +174,7 @@ class GlobalVariablesClass():
         self.save_plots = save_plots
         self.cumulative_csv = cumulative_csv
         self.use_experimental_data = experimental_data
+        self.measurement_type = measurement_type
         self.dataset = dataset
         self.data_time_offset = data_time_offset
         self.data_max_time = data_max_time 
@@ -423,6 +426,12 @@ def parse_cmd_line_args(args):
       type=int,
       default=default_experimental_data
     )
+    parser.add_argument(
+      '-meas', '--measurement_type',
+      help='Which measurement type to use. Must be written in Evo.py.',
+      type=str,
+      default=default_measurement_type
+    )
 
     parser.add_argument(
       '-ds', '--dataset',
@@ -510,6 +519,7 @@ def parse_cmd_line_args(args):
     log_file = arguments.logfile
     cumulative_csv = arguments.cumulative_bayes
     use_experimental_data = bool(arguments.experimental_data)
+    measurement_type = arguments.measurement_type
     dataset = arguments.dataset
     data_max_time = arguments.dataset_max_time    
     data_time_offset = arguments.data_time_offset
@@ -549,6 +559,7 @@ def parse_cmd_line_args(args):
         log_file = log_file,
         save_plots = all_plots,
         cumulative_csv = cumulative_csv,
+        measurement_type = measurement_type,
         experimental_data = use_experimental_data,
         dataset = dataset,
         data_max_time = data_max_time,

@@ -162,20 +162,32 @@ def ExpectationValuesTrueSim(
                 true_ham = time_ind_true_ham
 
             try:
-                if use_experimental_data:
-                    expec = evo.hahn_evolution(
+                    expec = evo.expectation_value_wrapper(
+                        method=qmd.MeasurementType,
                         ham = true_ham, 
                         t=t, 
                         state = true_probe
                     )
 
-                else: # Tracing out second qubit and projecting on plus for simulated case.
-                    # TODO if simulated, have access to full measurement so plot that?
-                    expec = evo.traced_expectation_value_project_one_qubit_plus(
-                        ham = true_ham, 
-                        t=t, 
-                        state = true_probe
-                    )
+
+                # if use_experimental_data:
+                #     # expec = evo.hahn_evolution(
+                #     expec = evo.expectation_value_wrapper(
+                #         method='hahn',
+                #         ham = true_ham, 
+                #         t=t, 
+                #         state = true_probe
+                #     )
+
+                # else: # Tracing out second qubit and projecting on plus for simulated case.
+                #     # TODO if simulated, have access to full measurement so plot that?
+                #     # expec = evo.traced_expectation_value_project_one_qubit_plus(
+                #     expec = evo.expectation_value_wrapper(
+                #         method='trace_all_but_first',
+                #         ham = true_ham, 
+                #         t=t, 
+                #         state = true_probe
+                #     )
 
 
             except UnboundLocalError:
@@ -240,21 +252,33 @@ def ExpectationValuesTrueSim(
                         mod.expectation_values[t]
                     )
                 except:
-                    if use_experimental_data:
-                         expec = evo.hahn_evolution(
+
+                        expec = evo.expectation_value_wrapper(
+                            method=qmd.MeasurementType,
                             ham=sim_ham, 
                             t=t,
                             state=sim_probe
                         ) 
 
-                    else:
-                        expec = evo.traced_expectation_value_project_one_qubit_plus(
-                            ham=sim_ham, 
-                            t=t,
-                            state=sim_probe
-                        ) 
+                        sim_expec_values.append(expec)
+                    # if use_experimental_data:
+                    #      # expec = evo.hahn_evolution(
+                    #      expec = evo.expectation_value_wrapper(
+                    #         method='hahn',
+                    #         ham=sim_ham, 
+                    #         t=t,
+                    #         state=sim_probe
+                    #     ) 
 
-                    sim_expec_values.append(expec)
+                    # else:
+                    #     # expec = evo.traced_expectation_value_project_one_qubit_plus(
+                    #     expec = evo.expectation_value_wrapper(
+                    #         method='trace_all_but_first',
+                    #         ham=sim_ham, 
+                    #         t=t,
+                    #         state=sim_probe
+                    #     ) 
+
 #                    mod.expectation_values[t] = expec
                    # print("[",mod.Name,"] t=",t,":\t", expec)
 
@@ -366,7 +390,8 @@ def ExpectationValuesTrueSim(
         if save_to_file is not None:
             plt.savefig(save_to_file, bbox_inches='tight')    
     
-def ExpectationValuesQHL_TrueModel(qmd, 
+def ExpectationValuesQHL_TrueModel(
+    qmd, 
     max_time=3, t_interval=0.01,
     upper_x_lim=None,
     true_plot_type='scatter',
@@ -425,27 +450,30 @@ def ExpectationValuesQHL_TrueModel(qmd,
                 true_ham = time_ind_true_ham
         
             try:
-#                expec = evo.expectation_value(
-#                    ham=true_ham, 
-#                    t=t, 
-#                    state=true_probe,
-#                    log_file = qmd.log_file, 
-#                    log_identifier = '[PlotQMD]'
-#                )
-
-                if use_experimental_data: 
-                    expec = evo.hahn_evolution(
+                    expec = evo.expectation_value_wrapper(
+                        method=qmd.MeasurementType,
                         ham = true_ham, 
                         t=t, 
                         state = true_probe
                     )
 
-                else:
-                    expec = evo.traced_expectation_value_project_one_qubit_plus(
-                        ham = true_ham, 
-                        t=t, 
-                        state = true_probe
-                    )
+                # if use_experimental_data: 
+                #     # expec = evo.hahn_evolution(
+                #     expec = evo.expectation_value_wrapper(
+                #         method='hahn',
+                #         ham = true_ham, 
+                #         t=t, 
+                #         state = true_probe
+                #     )
+
+                # else:
+                #     # expec = evo.traced_expectation_value_project_one_qubit_plus(
+                #     expec = evo.expectation_value_wrapper(
+                #         method='trace_all_but_first',
+                #         ham = true_ham, 
+                #         t=t, 
+                #         state = true_probe
+                #     )
                 
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
@@ -493,29 +521,43 @@ def ExpectationValuesQHL_TrueModel(qmd,
 #        print("[Expectation value function, QHL]\nSim probe:", sim_probe)
 #        print("Times =\n", times)
 
+        sim_expec_values = []
+        for t in times:
+            # ex_val = evo.hahn_evolution(
+            ex_val = evo.expectation_value_wrapper(
+                method=qmd.MeasurementType,
+                ham=sim_ham, 
+                t=t,
+                state=sim_probe
+            )
+            sim_expec_values.append(ex_val)
 
-        if use_experimental_data:
+ #        if use_experimental_data:
 
-            sim_expec_values = []
-            for t in times:
-                ex_val = evo.hahn_evolution(
-                    ham=sim_ham, 
-                    t=t,
-                    state=sim_probe
-                )
-                sim_expec_values.append(ex_val)
+ #            sim_expec_values = []
+ #            for t in times:
+ #                # ex_val = evo.hahn_evolution(
+ #                ex_val = evo.expectation_value_wrapper(
+ #                    method='hahn',
+ #                    ham=sim_ham, 
+ #                    t=t,
+ #                    state=sim_probe
+ #                )
+ #                sim_expec_values.append(ex_val)
 
- #               if t%10==0:
- #                   print("t=", t, "\nham=",sim_ham, "\nex_val=", ex_val)
+ # #               if t%10==0:
+ # #                   print("t=", t, "\nham=",sim_ham, "\nex_val=", ex_val)
             
-        else:
-            sim_expec_values = [
-                evo.traced_expectation_value_project_one_qubit_plus(
-                    ham=sim_ham, 
-                    t=t,
-                    state=sim_probe
-                ) for t in times
-            ]
+ #        else:
+ #            sim_expec_values = [
+ #                # evo.traced_expectation_value_project_one_qubit_plus(
+ #                evo.expectation_value_wrapper(
+ #                    method='trace_all_but_first',
+ #                    ham=sim_ham, 
+ #                    t=t,
+ #                    state=sim_probe
+ #                ) for t in times
+ #            ]
 
 
 #        print("sim expec values:\n", sim_expec_values)
@@ -912,7 +954,13 @@ def r_squared_from_epoch_list(
             ham = np.tensordot(mod.TrackEval[ epoch ], mod.SimOpList , axes=1)
             sum_of_residuals = 0
             for t in exp_times:
-                sim = evo.hahn_evolution(ham, t, probe)
+                # sim = evo.hahn_evolution(
+                sim = evo.expectation_value_wrapper(
+                    method=qmd.MeasurementType,
+                    ham=ham, 
+                    t=t, 
+                    state=probe
+                )
                 true = qmd.ExperimentalMeasurements[t]
                 diff_squared = (sim - true)**2
                 sum_of_residuals += diff_squared

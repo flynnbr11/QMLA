@@ -150,7 +150,7 @@ if os.path.isfile(true_expectation_value_path) == False:
     )
     true_expec_values = {}
     # TODO this probe not always appropriate?
-    probe = np.array([0.5, 0.5, 0.5, 0.5+0j])
+    probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe - use qmd.PlotProbe
     for t in plot_times:
         if global_variables.use_experimental_data:
             expec_val = Evo.hahn_evolution(
@@ -171,7 +171,7 @@ if os.path.isfile(true_expectation_value_path) == False:
 
 else:
     true_expec_values = pickle.load(
-     open(true_expectation_value_path, 'rb')   
+        open(true_expectation_value_path, 'rb')   
     )
 
 
@@ -268,6 +268,7 @@ qmd = QMD(
     gaussian = global_variables.gaussian, 
     prior_specific_terms = prior_specific_terms,    
     model_priors = model_priors,
+    measurement_type = global_variables.measurement_type,
     use_experimental_data = global_variables.use_experimental_data,
     experimental_measurements = experimental_measurements_dict,
     plot_times = plot_times,
