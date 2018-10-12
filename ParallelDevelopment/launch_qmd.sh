@@ -1,17 +1,18 @@
 #!/bin/bash
 
 #test_description="qhl_test_Gabi_params"
-test_description="test_multi_qhl_sim_data"
+#test_description="qhl_test_kHz_hyperfine_params_broad_prior"
+test_description="multi_qhl_sim_data_random_true_vals"
 
 ## Script essentials
-num_tests=4
+num_tests=100
 qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
-do_further_qhl=1 # perform further QHL parameter tuning on average values found by QMD. 
+do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 
 # QHL parameters
-p=1000 # particles
-e=250 # experiments
+p=7000 # particles
+e=3000 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=0.1 # PGH factor
@@ -31,6 +32,8 @@ further_qhl_resource_factor=1
 growth_rule='two_qubit_ising_rotation_hyperfine'
 #growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
+random_true_params=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
+random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
 do_plots=0
 pickle_class=0
 custom_prior=1
@@ -131,7 +134,7 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -prior=$prior_pickle_file \
     -op=$op \
     -exp=$experimental_data \
-    -rand_t=1 -rand_p=0 # can make true params and prior random
+    -rand_t=$random_true_params -rand_p=$random_prior # can make true params and prior random
 
 
 
