@@ -6,14 +6,14 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=51
-exp=10
+prt=500
+exp=50
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -22,18 +22,19 @@ gaussian=1
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=0
+exp_data=1
 sim_measurement_type='full_access'
 exp_measurement_type='hahn' # to use if not experimental
-
+measurement_type=$sim_measurement_type
 # Overwrite settings for specific cases
+"""
 if (( "$exp_data" == 1))
 then
     measurement_type=$exp_measurement_type
 else
     measurement_type=$sim_measurement_type
 fi
-
+"""
 
 if (( "$exp_data" == 0 ))
 then
@@ -49,7 +50,7 @@ fi
 growth_rule='two_qubit_ising_rotation_hyperfine'
 use_rq=0
 further_qhl_factor=2
-plots=0
+plots=1
 use_rq=0
 number_best_models_further_qhl=5
 custom_prior=1
@@ -78,8 +79,9 @@ this_log="$long_dir/qmd.log"
 furhter_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
-true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-#true_operator='xTiPPyTiPPyTy'
+# true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+# true_operator='xTiPPyTiPPyTy'
+true_operator='xTyTTyTTTzTTTTi'
 declare -a qhl_operators=(
     $true_operator
 )

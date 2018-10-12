@@ -71,6 +71,7 @@ if global_variables.use_experimental_data == True:
 # TODO reinstate regualar probes
 
     experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
+        max_num_qubits = 8,
         num_probes=num_probes
     )
 else:
@@ -125,9 +126,12 @@ plot_times = sorted(plot_times)
 if global_variables.use_experimental_data==True:
     plot_times = sorted(list(experimental_measurements_dict.keys()))    
 
-initial_op_list = ['xTi', 'yTi', 'zTi']
+# initial_op_list = ['xTi', 'yTi', 'zTi']
+initial_op_list = ['xTi', 'xTiPPyTi', 'zTiTTi']
+
 
 true_op = global_variables.true_operator
+true_num_qubits = DataBase.get_num_qubits(true_op)
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 true_op_matrices = [DataBase.compute(t) for t in true_op_list]
 num_params = len(true_op_list)
@@ -150,16 +154,19 @@ if os.path.isfile(true_expectation_value_path) == False:
     )
     true_expec_values = {}
     # TODO this probe not always appropriate?
-    probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe - use qmd.PlotProbe
+    # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe - use qmd.PlotProbe
+    probe = Evo.n_qubit_plus_state(true_num_qubits)
     for t in plot_times:
         if global_variables.use_experimental_data:
-            expec_val = Evo.hahn_evolution(
+            expec_val = Evo.expectation_value_wrapper(
+                method=global_variables.measurement_type,
                 ham = true_ham,
                 t = t,
                 state = probe
             )
         else:
-            true_expec_values[t] = Evo.traced_expectation_value_project_one_qubit_plus(
+            true_expec_values[t] = Evo.expectation_value_wrapper(
+                method=global_variables.measurement_type,
                 ham = true_ham, 
                 t=t, 
                 state=probe
@@ -319,6 +326,7 @@ if global_variables.qhl_test:
         #     true_mod_instance.r_squared()
         # )
 
+    print("plotting expectation values")
     qmd.plotExpecValues(
         model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
         max_time = expec_val_plot_max_time, #in microsec

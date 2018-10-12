@@ -85,8 +85,6 @@ def new_model_list(model_list, spawn_depth, model_dict, log_file,
         return hyperfine_like(model_list, spawn_step=spawn_depth,
         model_dict=model_dict, log_file=log_file
     )
-    
-    
     else:
         log_print(["Generator", generator, "not recognised"], log_file)        
 

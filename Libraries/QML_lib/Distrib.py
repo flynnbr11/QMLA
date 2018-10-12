@@ -1,5 +1,6 @@
 import qinfer as qi
 import numpy as np
+import DataBase
 
 #Function which generate a distribution of multiple uniformly [0,1] distributed values of length NumMulti
 #NumMulti usually is the number of uniform distributions we want to sample from dimultaneously, 
@@ -29,7 +30,8 @@ def MultiVariateNormalDistributionNocov(NumMulti, mean=None, sigmas=None):
 def means_sigmas_ising_term(term, specific_terms={}, 
     rotation_mean=0.5, rotation_sigma=2, 
     hyperfine_mean=2.5, hyperfine_sigma=0.5,
-    transverse_mean=0.5, transverse_sigma=1.0
+    transverse_mean=0.5, transverse_sigma=1.0,
+    default_mean=0.5, default_sigma=0.5
 ):
     """
     Get means and sigmas for models in Ising type configurations
@@ -39,7 +41,14 @@ def means_sigmas_ising_term(term, specific_terms={},
 
     """
 
-    individual_terms = term.split('PP')
+    num_qubits = DataBase.get_num_qubits(term)
+    plus_string = ''
+    for i in range(num_qubits):
+        plus_string+='P'
+    print("plus string:", plus_string)
+
+    # individual_terms = term.split('PP')
+    individual_terms = term.split(plus_string)
     num_params = len(individual_terms)
     means = []
     sigmas = []
@@ -63,6 +72,10 @@ def means_sigmas_ising_term(term, specific_terms={},
         elif k in transverse_terms:
             means.append(transverse_mean)
             sigmas.append(transverse_sigma)
+        else:
+            means.append(default_mean)
+            sigmas.append(default_sigma)
+
 
     return num_params, np.array(means), np.array(sigmas)
 

@@ -614,6 +614,7 @@ class reducedModel():
         self.StoreParticlesWeights = qmd_info['store_particles_weights']
         self.BayesFactors = {}
         self.LatexTerm = DB.latex_name_ising(self.Name)
+        self.NumQubits = DB.get_num_qubits(self.Name)
         self.HostName = host_name
         self.PortNumber = port_number
         self.Q_id = qid
@@ -703,9 +704,11 @@ class reducedModel():
     def compute_expectation_values(
         self, 
         times = [],
-        probe = np.array([0.5, 0.5, 0.5, 0.5+0j])
+        probe = None #  TODO generalise probe
     ):
         # TODO expectation_values dict only for |++> probe as is.
+        if probe is None:
+            probe  = evo.n_qubit_plus_state(self.NumQubits)
         for t in times:
                 self.expectation_values[t] = evo.expectation_value_wrapper(
                     method=self.MeasurementType,
@@ -752,7 +755,8 @@ class reducedModel():
         exp_data = [
             self.ExperimentalMeasurements[t] for t in exp_times
         ]
-        probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
+        # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
+        probe  = evo.n_qubit_plus_state(self.NumQubits)
 
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
@@ -818,7 +822,8 @@ class reducedModel():
         exp_data = [
             self.ExperimentalMeasurements[t] for t in exp_times
         ]
-        probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
+        # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
+        probe  = evo.n_qubit_plus_state(self.NumQubits)
 
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )

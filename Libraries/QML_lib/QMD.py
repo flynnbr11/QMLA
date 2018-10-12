@@ -196,6 +196,8 @@ class QMD():
                 axes=1
             )
 
+            # plot_probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe
+            plot_probe =  evo.n_qubit_plus_state(self.TrueOpDim)  # TODO generalise probe
             for t in self.PlotTimes:
                 # TODO is this the right expectation value func???
                 self.ExperimentalMeasurements[t] = (
@@ -204,7 +206,7 @@ class QMD():
                         method=self.MeasurementType,
                         ham = self.TrueHamiltonian,
                         t = t, 
-                        state = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe    
+                        state = plot_probe  
                     )
                 )
 

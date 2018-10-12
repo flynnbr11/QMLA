@@ -31,8 +31,10 @@ import DataBase
 import Evo as evo
 import ExperimentalDataFunctions as expdt
 
-#### Hinton Diagram ####
 
+
+#### Hinton Diagram ####
+"""
 def latex_name_ising(name):
     terms=name.split('PP')
     rotations = ['xTi', 'yTi', 'zTi']
@@ -77,6 +79,7 @@ def latex_name_ising(name):
     final_term = 'r$'+latex_term+'$'
     
     return latex_term
+"""
 
 def ExpectationValuesTrueSim(
     qmd, 
@@ -108,8 +111,8 @@ def ExpectationValuesTrueSim(
     if qmd.ChampID in model_ids and champ==False:
         model_ids.remove(qmd.ChampID)
 
-    plus_plus = np.array([0.5-0.j,  0.5-0.j, 0.5-0.j, 0.5-0.j]) #if probe for plot should be |+>|+>
-    probe_id = random.choice(range(qmd.NumProbes))
+    # plus_plus = np.array([0.5-0.j,  0.5-0.j, 0.5-0.j, 0.5-0.j]) # TODO generalise probe
+    # probe_id = random.choice(range(qmd.NumProbes))
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour =  colors.cnames['lightsalmon'] #'b'
@@ -139,15 +142,17 @@ def ExpectationValuesTrueSim(
         true_params = qmd.TrueParamsList
         true_ops = qmd.TrueOpList
         true_dim = true_op.num_qubits
+
         if plus_probe:
-            true_probe = plus_plus
+            # true_probe = plus_plus
+            true_probe = evo.n_qubit_plus_state(true_dim)
         else:
             true_probe = qmd.ProbeDict[(probe_id,true_dim)]
 
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
         true_expec_values = []
 
-
+        print("true ham:", time_ind_true_ham)
         for t in times:
             if qmd.UseTimeDepTrueModel:
                 # Multiply time dependent parameters by time value
@@ -235,7 +240,7 @@ def ExpectationValuesTrueSim(
             times_learned = mod.Times
             sim_dim = DataBase.get_num_qubits(mod.Name)
             if plus_probe:
-                sim_probe = plus_plus
+                sim_probe = evo.n_qubit_plus_state(sim_dim)
             else:
                 sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
             colour_id = int(i%len(sim_colours))
@@ -930,8 +935,9 @@ def r_squared_from_epoch_list(
     exp_data = [
         qmd.ExperimentalMeasurements[t] for t in exp_times
     ]
-    probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
-
+    # plus = 1/np.sqrt(2) * np.array([1,1])
+    # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe
+    # picking probe based on model instead
     datamean = np.mean(exp_data[0:max_data_idx])
     datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
     
@@ -943,6 +949,8 @@ def r_squared_from_epoch_list(
         mod = qmd.reducedModelInstanceFromID( model_id )
         r_squared_by_epoch = {}
         
+        mod_num_qubits = DataBase.get_num_qubits(mod.Name)
+        probe = evo.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.NumExperiments-1])
         if len(mod.ResampleEpochs) > 0:
             epochs.extend(mod.ResampleEpochs)
@@ -1260,7 +1268,7 @@ class QMDFuncFormatter(Formatter):
 def plotHinton(model_names, bayes_factors, save_to_file=None):
     hinton_mtx=BayF_IndexDictToMatrix(model_names, bayes_factors)
     log_hinton_mtx = np.log10(hinton_mtx)
-    labels = [latex_name_ising(name) for name in model_names.values()]
+    labels = [DataBase.latex_name_ising(name) for name in model_names.values()]
 
 
     fig, ax = plt.subplots(figsize=(7,7))

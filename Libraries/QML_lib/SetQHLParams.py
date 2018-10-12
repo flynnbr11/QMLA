@@ -72,6 +72,8 @@ set_prior_specific_terms = {
 	'xTy' : [3.0, 2.0],
 	'xTz' : [3.0, 2.0],
 	'yTz' : [3.0, 2.0],
+	'x' : [1.0, 0.5],
+	'z' : [1.0, 0.5],
 }
 
 set_true_params = {

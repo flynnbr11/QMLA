@@ -601,6 +601,15 @@ def iqle_evolve(ham, ham_minus, t, probe,
             log_file=log_file, log_identifier=log_identifier
         )
  
+## for easy access to plus states to plot against
+def n_qubit_plus_state(num_qubits):
+    one_qubit_plus = (1/np.sqrt(2) + 0j) * np.array([1,1])
+    plus_n = one_qubit_plus
+    for i in range(num_qubits-1):
+        plus_n = np.kron(plus_n, one_qubit_plus)
+    return plus_n
+
+ 
 ##### ---------- -------------------- #####  
 """
 Wrapper function for expectation value, relying on above defined functions
