@@ -66,6 +66,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         num_time_dep_true_params = 0,
         true_oplist = None, truename=None, num_probes=40, probe_dict=None, 
         trueparams = None, probelist = None, min_freq=0, solver='scipy', 
+        measurement_type = 'full_access',
         use_experimental_data = False, experimental_measurements = None,
         experimental_measurement_times=None,trotter=False, qle=True,
         use_exp_custom=True, exp_comparison_tol=None,
@@ -90,6 +91,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self.use_time_dep_true_model = use_time_dep_true_model
         self.time_dep_true_params = time_dep_true_params
         self.num_time_dep_true_params = num_time_dep_true_params
+        self.measurement_type = measurement_type
         self.use_experimental_data = use_experimental_data
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
@@ -313,6 +315,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 pr0 = get_pr0_array_qle(
                     t_list=times, modelparams=params,
                     oplist=operators, probe=probe, 
+                    measurement_type=self.measurement_type,
                     use_experimental_data = self.use_experimental_data,
                     use_exp_custom=self.use_exp_custom,
                     exp_comparison_tol=self.exp_comparison_tol, 

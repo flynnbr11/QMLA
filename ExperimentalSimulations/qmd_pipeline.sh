@@ -12,8 +12,8 @@ do_further_qhl=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
-exp=3
+prt=51
+exp=10
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -23,6 +23,18 @@ gaussian=1
 # QMD settings
 ### ---------------------------------------------------###
 exp_data=0
+sim_measurement_type='full_access'
+exp_measurement_type='hahn' # to use if not experimental
+
+# Overwrite settings for specific cases
+if (( "$exp_data" == 1))
+then
+    measurement_type=$exp_measurement_type
+else
+    measurement_type=$sim_measurement_type
+fi
+
+
 if (( "$exp_data" == 0 ))
 then
     pgh=0.3
@@ -86,8 +98,6 @@ if (( $qhl_test == 1 )) # For QHL test always do without rq
 then
     use_rq=0
 fi
-#use_rq=0
-use_rq=0
 let bt="$exp-1"
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
@@ -115,6 +125,7 @@ do
             -ra=$ra -rt=$rt -pgh=$pgh \
             -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
+            -meas=$measurement_type \
             -exp=$exp_data -cpr=$custom_prior \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
@@ -164,6 +175,7 @@ then
             -ra=$ra -rt=$rt -pgh=1.0 \
             -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
+            -meas=$measurement_type \
             -exp=$exp_data -cpr=$custom_prior \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \

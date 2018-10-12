@@ -28,12 +28,12 @@ import DataBase
 # results from QHL previous run which led us to think about kHz params for hyperfine.. (email to Seb 12 Sep 18)
 
 set_prior_specific_terms = {
-	'xTi' : [ 0.17 , 0.5], # TODO Broaden, testing with small dist
-	'yTi' : [ 0.77 , 0.5 ],
-	'zTi' : [ -0.08 , 0.5],
-	'xTx' : [-0.05 , 0.5], # true value 2.7
-	'yTy' : [0.08 , 0.5], # true value 2.7
-	'zTz' : [-3.9 , 0.5 ], # true value 2.14
+	'xTi' : [ 1 , 0.5], # TODO Broaden, testing with small dist
+	'yTi' : [ 1 , 0.5 ],
+	'zTi' : [ 1 , 0.5],
+	'xTx' : [-2.7 , 0.5], # true value 2.7
+	'yTy' : [-2.7 , 0.5], # true value 2.7
+	'zTz' : [-2.1 , 0.5 ], # true value 2.14
 	'xTy' : [3.0, 2.0],
 	'xTz' : [3.0, 2.0],
 	'yTz' : [3.0, 2.0],

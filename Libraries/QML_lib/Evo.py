@@ -95,7 +95,10 @@ def log_print(to_print_list, log_file, log_identifier=None):
         print(identifier, str(to_print), file=write_log_file)
  
  
-def get_pr0_array_qle(t_list, modelparams, oplist, probe,
+def get_pr0_array_qle(
+        t_list, modelparams, 
+        oplist, probe,
+        measurement_type='full_access',
         use_experimental_data=False, use_exp_custom=True,
         exp_comparison_tol=None, enable_sparse=True, 
         ham_list=None, log_file='QMDLog.log', log_identifier=None
@@ -123,29 +126,39 @@ def get_pr0_array_qle(t_list, modelparams, oplist, probe,
             t = t_list[tId]
             print_loc(global_print_loc)
             try:
-                
-                if use_experimental_data == True:
-                    # TODO replace call to exp_val with call to Hahn exp val
-                    # output[evoId][tId] = hahn_evolution(
                     output[evoId][tId] = expectation_value_wrapper(
-                        method='hahn',
+                        method=measurement_type,
                         ham = ham,
                         t = t,
                         state = probe,
                         log_file = log_file, 
                         log_identifier = log_identifier
                     )
+
+
+                
+            #     if use_experimental_data == True:
+            #         # TODO replace call to exp_val with call to Hahn exp val
+            #         # output[evoId][tId] = hahn_evolution(
+            #         output[evoId][tId] = expectation_value_wrapper(
+            #             method='hahn',
+            #             ham = ham,
+            #             t = t,
+            #             state = probe,
+            #             log_file = log_file, 
+            #             log_identifier = log_identifier
+            #         )
                     
-                else: 
-                    # output[evoId][tId] = expectation_value(
-                    output[evoId][tId] = expectation_value_wrapper(
-                        method='full_access',
-                        ham=ham, t=t, state=probe,
-                        use_exp_custom=use_exp_custom, 
-                        compare_exp_fncs_tol=exp_comparison_tol,
-                        enable_sparse=enable_sparse, log_file=log_file,
-                        log_identifier=log_identifier
-                    )
+            #     else: 
+            #         # output[evoId][tId] = expectation_value(
+            #         output[evoId][tId] = expectation_value_wrapper(
+            #             method='full_access',
+            #             ham=ham, t=t, state=probe,
+            #             use_exp_custom=use_exp_custom, 
+            #             compare_exp_fncs_tol=exp_comparison_tol,
+            #             enable_sparse=enable_sparse, log_file=log_file,
+            #             log_identifier=log_identifier
+            #         )
             except NameError:
                 log_print(["Error raised; unphysical expecation value.",
                     "\nHam:\n", ham,
@@ -525,6 +538,7 @@ def outer_product(state, as_qutip_object=False):
 #import qutip as qt
  
 def iqle_evolve(ham, ham_minus, t, probe, 
+    measurement_type='full_access',
     trotterize=True, use_exp_custom=True, enable_sparse=True, 
     log_file='QMDLog.log', log_identifier=None
 ):
@@ -539,7 +553,7 @@ def iqle_evolve(ham, ham_minus, t, probe,
             print_loc(global_print_loc)
             # expec_value = expectation_value(
             expec_value = expectation_value_wrapper(
-                method='full_access',
+                method=measurement_type,
                 ham=H, 
                 t=t, 
                 state=probe,
