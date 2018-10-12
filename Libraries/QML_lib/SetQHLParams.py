@@ -26,26 +26,62 @@ import DataBase
 # 22:48:8 [QML 3] Final Parameters mean and stdev (term  zTz ): [-0.27888531  0.0200708 ]
 
 # results from QHL previous run which led us to think about kHz params for hyperfine.. (email to Seb 12 Sep 18)
-
+"""
 set_prior_specific_terms = {
-	'xTi' : [ 0.17 , 0.5], # TODO Broaden, testing with small dist
-	'yTi' : [ 0.77 , 0.5 ],
-	'zTi' : [ -0.08 , 0.5],
-	'xTx' : [-0.05 , 0.5], # true value 2.7
-	'yTy' : [0.08 , 0.5], # true value 2.7
-	'zTz' : [-3.9 , 0.5 ], # true value 2.14
+	'xTi' : [ 0.17 , 2.0], # TODO Broaden, testing with small dist
+	'yTi' : [ 0.77 , 2.0 ],
+	'zTi' : [ -0.08 , 2.0],
+	'xTx' : [-0.05 , 1.5], # true value 2.7
+	'yTy' : [0.08 , 1.5], # true value 2.7
+	'zTz' : [-3.9 , 1.5 ], # true value 2.14
+	'xTy' : [3.0, 2.0],
+	'xTz' : [3.0, 2.0],
+	'yTz' : [3.0, 2.0],
+}
+set_prior_specific_terms = {
+	'xTi' : [ 0.5 , 1.5], # TODO Broaden, testing with small dist
+	'yTi' : [ 0.5, 1.5 ],
+	'zTi' : [ 0.5, 1.5],
+	'xTx' : [-2.7, 0.2], # true value 2.7
+	'yTy' : [-2.7, 0.2], # true value 2.7
+	'zTz' : [-2.1, 0.2], # true value 2.14
+	'xTy' : [3.0, 2.0],
+	'xTz' : [3.0, 2.0],
+	'yTz' : [3.0, 2.0],
+}
+set_prior_specific_terms = {
+	'xTi' : [ 0 , 1.0], # TODO Broaden, testing with small dist
+	'yTi' : [ 0 , 1.0 ],
+	'zTi' : [ 0 , 1.0],
+	'xTx' : [0 , 1.0], # true value 2.7
+	'yTy' : [0, 1.0], # true value 2.7
+	'zTz' : [0 , 1.0 ], # true value 2.14
+	'xTy' : [3.0, 2.0],
+	'xTz' : [3.0, 2.0],
+	'yTz' : [3.0, 2.0],
+}
+"""
+# random set generated using random.uniform(-10, 10) for purposes of QHL tests
+set_prior_specific_terms = {
+	'xTi' : [ 5.0, 2.0 ], # TODO Broaden, testing with small dist
+	'yTi' : [ 5.0, 2.0 ],
+	'zTi' : [ -5.0, 2.0 ],
+	'xTx' : [-5.0, 2.0], # true value 2.7
+	'yTy' : [5.0, 2.0], # true value 2.7
+	'zTz' : [-5.0, 2.0 ], # true value 2.14
 	'xTy' : [3.0, 2.0],
 	'xTz' : [3.0, 2.0],
 	'yTz' : [3.0, 2.0],
 }
 
 set_true_params = {
-	'xTi' : 0.2,
-	'yTi' : 1.2,
-	'zTi' : -0.2,
-	'xTx' : 0.1,
-	'yTy' : 0.3,
-	'zTz' : 1.5,
+
+	'xTi' : 0.7538085315,
+	'yTi' : 8.4442484,
+	'zTi' : -5.713337168736279,
+	'xTx' : -1.9632210928717253,
+	'yTy' : 2.7435186090389045,
+	'zTz' : -7.387456134515187,
 	'xTy' : 1.6,
 	'xTz' : 1.7,
 	'yTz' : 1.8
@@ -57,8 +93,8 @@ def create_qhl_params(
 	true_op, 
 	pickle_file=None,
 	random_vals=False, 
-	rand_min=0, 
-	rand_max=6,
+	rand_min=-3, 
+	rand_max=3,
 	exp_data=0
 ):
 	terms = DataBase.get_constituent_names_from_name(true_op)
