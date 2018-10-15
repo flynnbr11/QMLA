@@ -231,7 +231,9 @@ def ExpectationValuesTrueSim(
                 np.linspace(min_exp_time, max_exp_time, num_times)
             )
 
-        ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
+        ChampionsByBranch = {
+            v:k for k,v in qmd.BranchChampions.items()
+        }
         for i in range(len(model_ids)):
             mod_id = model_ids[i]
             sim = qmd.ModelNameIDs[mod_id]

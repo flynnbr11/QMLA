@@ -1184,6 +1184,8 @@ elif further_qhl_mode == False:
             one instance of QMD was performed. All other plots generated \
             without error."
         )
+    except:
+        print("Could not plot Multi QMD tree.")
 
 
 

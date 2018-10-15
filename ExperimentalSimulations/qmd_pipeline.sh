@@ -6,14 +6,14 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=500
-exp=50
+prt=20
+exp=5
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -46,8 +46,9 @@ then
     pgh=1.0
 fi
 
-#growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# growth_rule='two_qubit_ising_rotation_hyperfine'
+# growth_rule='test_multidimensional' 
 use_rq=0
 further_qhl_factor=2
 plots=1
@@ -79,9 +80,11 @@ this_log="$long_dir/qmd.log"
 furhter_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
-# true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 # true_operator='xTiPPyTiPPyTy'
-true_operator='xTyTTyTTTzTTTTi'
+# true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
+# true_operator='x'
+
 declare -a qhl_operators=(
     $true_operator
 )

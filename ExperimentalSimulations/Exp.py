@@ -126,8 +126,9 @@ plot_times = sorted(plot_times)
 if global_variables.use_experimental_data==True:
     plot_times = sorted(list(experimental_measurements_dict.keys()))    
 
-# initial_op_list = ['xTi', 'yTi', 'zTi']
-initial_op_list = ['xTi', 'xTiPPyTi', 'zTiTTi']
+# initial_op_list = ['xTx', 'xTy', 'xTz']
+# initial_op_list = ['xTi', 'xTiPPyTi', 'zTiTTi']
+initial_op_list = ['xTi', 'yTi', 'zTi']
 
 
 true_op = global_variables.true_operator
@@ -421,8 +422,16 @@ else:
     #     expec_val_plot_max_time, 
     #     num_datapoints_to_plot
     # )
+
+    expec_value_mods_to_plot = []
+    try:    
+        expec_value_mods_to_plot = [qmd.TrueOpModelID]
+    except:
+        pass
+    expec_value_mods_to_plot.append(qmd.ChampID)
+
     qmd.plotExpecValues(
-        model_ids = [11], # hardcode to see full model for development
+        model_ids = expec_value_mods_to_plot, # hardcode to see full model for development
         times=plot_times,
         max_time = expec_val_plot_max_time, #in microsec
         t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
@@ -443,20 +452,37 @@ else:
             'volumes_branch_champs_'+ str(global_variables.long_id)+
             '.png')
         )
-        
-        qmd.plotParameterEstimates(
-            model_id = qmd.TrueOpModelID, 
-            save_to_file= str(global_variables.plots_directory+
-            'true_model_parameter_estimates_'+ str(global_variables.long_id) +
-            '.png')
-        )
-        if qmd.ChampID != qmd.TrueOpModelID:
+
+
+        try:
+            if qmd.TrueOpModelID:
+                true_op_known = True
+        except:
+            true_op_known = False
+
+        if true_op_known==True:
+        # if QMD has knowledge of the "true" model, then plot params   
             qmd.plotParameterEstimates(
-                model_id = qmd.ChampID, 
+                model_id = qmd.TrueOpModelID, 
                 save_to_file= str(global_variables.plots_directory+
-                'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
+                'true_model_parameter_estimates_'+ str(global_variables.long_id) +
                 '.png')
             )
+            if qmd.ChampID != qmd.TrueOpModelID:
+                qmd.plotParameterEstimates(
+                    model_id = qmd.ChampID, 
+                    save_to_file= str(global_variables.plots_directory+
+                    'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
+                    '.png')
+                )
+        else:
+                qmd.plotParameterEstimates(
+                    model_id = qmd.ChampID, 
+                    save_to_file= str(global_variables.plots_directory+
+                    'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
+                    '.png')
+                )
+
         """
         # TODO radar plot not working - when used with RQ ???
         # not finding TrueModelID when using ising_hyperfine generation rule 
@@ -486,12 +512,22 @@ else:
     #            'hinton_champions_', str(global_variables.long_id), 
     #            '.png')
     #        )
-        
-        qmd.plotTreeDiagram(
-            save_to_file = str
-            (global_variables.plots_directory+
-            'tree_diagram_'+ str(global_variables.long_id)+ '.png')
-        )
+        if (
+            True # want to force it while fixing tree plot 
+            or 
+            global_variables.growth_generation_rule == 'two_qubit_ising_rotation_hyperfine'
+            or
+            global_variables.growth_generation_rule == 'two_qubit_ising_rotation_hyperfine_transverse'
+        ):
+            # TODO generalise so tree diagram can be used in all cases
+            # currently only useful for Ising growth 2 qubits. 
+            qmd.plotTreeDiagram(
+                save_to_file = str
+                (global_variables.plots_directory+
+                'tree_diagram_' + 
+                str(global_variables.long_id) + 
+                '.png')
+            )
 
         qmd.plotRSquaredVsEpoch(
             save_to_file = str(
@@ -509,9 +545,16 @@ else:
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file , protocol=2)
 
-    qmd.writeInterQMDBayesCSV(
-        bayes_csv=str(global_variables.cumulative_csv)
-    )
+    if (
+        global_variables.growth_generation_rule == 'two_qubit_ising_rotation_hyperfine'
+        or
+        global_variables.growth_generation_rule == 'two_qubit_ising_rotation_hyperfine_transverse'
+    ):
+        # TODO generalise so tree diagram can be used in all cases
+        # currently only useful for Ising growth 2 qubits. 
+        qmd.writeInterQMDBayesCSV(
+            bayes_csv=str(global_variables.cumulative_csv)
+        )
 
     results_file = global_variables.results_file
     pickle.dump(

@@ -585,53 +585,56 @@ def latex_name_ising(name):
         return '$'+name+'$'
 
     num_qubits = get_num_qubits(name)
-    if num_qubits == 2:
-        terms=name.split('PP')
-        rotations = ['xTi', 'yTi', 'zTi']
-        hartree_fock = ['xTx', 'yTy', 'zTz']
-        transverse = ['xTy', 'xTz', 'yTz']
-        
-        
-        present_r = []
-        present_hf = []
-        present_t = []
-        
-        for t in terms:
-            if t in rotations:
-                present_r.append(t[0])
-            elif t in hartree_fock:
-                present_hf.append(t[0])
-            elif t in transverse:
-                string = t[0]+t[-1]
-                present_t.append(string)
-            else:
-                print("Term",t,"doesn't belong to rotations, Hartree-Fock or transverse.")
-                print("Given name:", name)
-        present_r.sort()
-        present_hf.sort()
-        present_t.sort()
+    terms=name.split('PP')
+    rotations = ['xTi', 'yTi', 'zTi']
+    hartree_fock = ['xTx', 'yTy', 'zTz']
+    transverse = ['xTy', 'xTz', 'yTz']
+    
+    
+    present_r = []
+    present_hf = []
+    present_t = []
+    
+    for t in terms:
+        if t in rotations:
+            present_r.append(t[0])
+        elif t in hartree_fock:
+            present_hf.append(t[0])
+        elif t in transverse:
+            string = t[0]+t[-1]
+            present_t.append(string)
+        # else:
+        #     print("Term",t,"doesn't belong to rotations, Hartree-Fock or transverse.")
+        #     print("Given name:", name)
+    present_r.sort()
+    present_hf.sort()
+    present_t.sort()
 
-        r_terms = ','.join(present_r)
-        hf_terms = ','.join(present_hf)
-        t_terms = ','.join(present_t)
-        
-        
-        latex_term = ''
-        if len(present_r) > 0:
-            latex_term+='R_{'+r_terms+'}'
-        if len(present_hf) > 0:
-            latex_term+='HF_{'+hf_terms+'}'
-        if len(present_t) > 0:
-            latex_term+='T_{'+t_terms+'}'
-        
-        final_term = '$'+latex_term+'$'
-        
+    r_terms = ','.join(present_r)
+    hf_terms = ','.join(present_hf)
+    t_terms = ','.join(present_t)
+    
+    
+    latex_term = ''
+    if len(present_r) > 0:
+        latex_term+='R_{'+r_terms+'}'
+    if len(present_hf) > 0:
+        latex_term+='HF_{'+hf_terms+'}'
+    if len(present_t) > 0:
+        latex_term+='T_{'+t_terms+'}'
+    
+
+
+    final_term = '$'+latex_term+'$'
+    if final_term != '$$':
         return final_term
+
     else:
         plus_string = ''
         for i in range(num_qubits):
             plus_string+='P'
         individual_terms = name.split(plus_string)
+        individual_terms = sorted(individual_terms)
 
         latex_term = '+'.join(individual_terms)
         final_term = '$'+latex_term+'$'

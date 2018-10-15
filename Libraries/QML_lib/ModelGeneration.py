@@ -49,6 +49,7 @@ max_spawn_depth_info = {
     'two_qubit_ising_rotation' : 2,
     'two_qubit_ising_rotation_hyperfine' : 5,
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
+    'test_multidimensional' : 10
 }
 
 def log_print(to_print_list, log_file):
@@ -85,6 +86,12 @@ def new_model_list(model_list, spawn_depth, model_dict, log_file,
         return hyperfine_like(model_list, spawn_step=spawn_depth,
         model_dict=model_dict, log_file=log_file
     )
+    elif generator == 'test_multidimensional':
+        return test_multidimensional(
+            model_list=model_list, 
+            spawn_step=spawn_depth, 
+            log_file=log_file
+        )
     else:
         log_print(["Generator", generator, "not recognised"], log_file)        
 
@@ -532,4 +539,41 @@ def hyperfine_like(model_list, spawn_step, model_dict, log_file):
                     i+=1
     return new_models    
         
-        
+
+def test_multidimensional(model_list, spawn_step, log_file):
+    
+    new_models = []
+    
+    for m in model_list:
+        dim = DataBase.get_num_qubits(m)
+        num_terms = len(DataBase.get_constituent_names_from_name(m))
+        for i in range(2):
+            new_mod = random_model_name(dim, num_terms+1)
+            new_models.append(new_mod)
+    
+    log_print(
+        [
+        'Input models:', 
+        model_list,
+        'New models:', 
+        new_models
+        ],
+        log_file = log_file
+    )
+
+    if spawn_step==max_spawn_depth_info['test_multidimensional']:
+        log_print(
+            [
+            'Multidensional test at spawn step=', 
+            spawn_step
+            ],
+            log_file
+        )
+
+    return new_models
+
+
+
+
+
+
