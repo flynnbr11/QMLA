@@ -1137,15 +1137,17 @@ elif further_qhl_mode == False:
         inf_gain = inf_gain, 
         save_file = plot_file
     )
-
-    ptq.plotTrueModelBayesFactors_IsingRotationTerms(
-        results_csv_path = all_bayes_csv,
-        correct_mod='xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
-        save_to_file = str(
-            directory_to_analyse+
-            'true_model_bayes_comparisons.png'
+    try:
+        ptq.plotTrueModelBayesFactors_IsingRotationTerms(
+            results_csv_path = all_bayes_csv,
+            correct_mod='xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
+            save_to_file = str(
+                directory_to_analyse+
+                'true_model_bayes_comparisons.png'
+            )
         )
-    )
+    except:
+        pass
 
     param_plot = str(directory_to_analyse+'sweep_param_total.png')
     param_percent_plot = str(directory_to_analyse+'sweep_param_percentage.png')
