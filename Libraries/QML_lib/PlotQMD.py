@@ -2769,6 +2769,7 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
 def plotTrueModelBayesFactors_IsingRotationTerms(
     results_csv_path, 
     correct_mod="xTiPPyTiPPzTiPPxTxPPyTyPPzTz", 
+    growth_generator=None, 
     save_to_file=None
 ):
     from matplotlib import cm
@@ -2784,7 +2785,10 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
     results_csv = os.path.abspath(results_csv_path)
     qmd_res = pd.DataFrame.from_csv(results_csv)
 
-    mods = ising_terms_rotation_hyperfine()
+    # mods = ising_terms_rotation_hyperfine()
+    mods = ModelNames.get_all_model_names(
+        growth_generator = growth_generator
+    )
     mods.pop(mods.index(correct_mod))
     othermods = mods
     correct_subDB = qmd_res.ix[correct_mod]    

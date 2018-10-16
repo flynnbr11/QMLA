@@ -46,8 +46,8 @@ then
     pgh=1.0
 fi
 
-growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# growth_rule='two_qubit_ising_rotation_hyperfine'
+# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='test_multidimensional' 
 use_rq=0
 further_qhl_factor=2

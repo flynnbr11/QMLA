@@ -857,12 +857,19 @@ def model_scores(directory_name):
             scores[alph] = 1
     return scores
 
-def get_entropy(models_points, inf_gain=False):
+def get_entropy(
+    models_points, 
+    growth_generator=None,
+    inf_gain=False
+):
     # TODO this calculation of entropy may not be correct
     # What is initial_entropy meant to be?
     num_qmd_instances = sum(list(models_points.values()))
     num_possible_qmd_instances = len(
-        ptq.ising_terms_rotation_hyperfine()
+        # ptq.ising_terms_rotation_hyperfine()
+        ModelNames.get_all_model_names(
+            growth_generator = growth_generator
+        )
     )
     # TODO don't always want ising terms only
 
@@ -1172,8 +1179,15 @@ if qhl_mode==True:
 elif further_qhl_mode == False:
     plot_file = directory_to_analyse+'model_scores.png'
     model_scores = model_scores(directory_to_analyse)
-    entropy = get_entropy(model_scores, inf_gain=False)
-    inf_gain = get_entropy(model_scores, inf_gain=True)
+    entropy = get_entropy(model_scores, 
+        growth_generator = growth_generator, 
+        inf_gain=False
+    )
+    inf_gain = get_entropy(
+        model_scores, 
+        growth_generator  = growth_generator,
+        inf_gain=True
+    )
     plot_scores(
         scores = model_scores,
         entropy = entropy, 
@@ -1185,6 +1199,7 @@ elif further_qhl_mode == False:
         ptq.plotTrueModelBayesFactors_IsingRotationTerms(
             results_csv_path = all_bayes_csv,
             correct_mod='xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
+            growth_generator = growth_generator,
             save_to_file = str(
                 directory_to_analyse+
                 'true_model_bayes_comparisons.png'
