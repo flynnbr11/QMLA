@@ -7,7 +7,7 @@ import numpy as np
 import DataBase
 import pandas
 import PlotQMD as ptq
-
+import ModelNames
 
 #This is a simple test comment
 """
@@ -241,6 +241,7 @@ def average_parameter_estimates(
     directory_name, 
     results_path, 
     results_file_name_start='results',
+    growth_generator=None, 
     top_number_models=2,
     true_params_dict=None,
     save_to_file=None
@@ -341,13 +342,21 @@ def average_parameter_estimates(
             if col == ncols:
                 col=0
                 row+=1
-            latex_terms[term] = DataBase.latex_name_ising(term)
+            # latex_terms[term] = DataBase.latex_name_ising(term)
+            latex_terms[term] = ModelNames.get_latex_name(
+                name=term,
+                growth_generator = growth_generator
+            )
             averages = np.array( [ avg_parameters[term][e] for e in epochs  ])
             standard_dev = np.array([ std_devs[term][e] for e in epochs])
             
             try:
                 true_val = true_params_dict[term]
-                true_term_latex = DataBase.latex_name_ising(term)
+                # true_term_latex = DataBase.latex_name_ising(term)
+                true_term_latex = ModelNames.get_latex_name(
+                    name = term,
+                    growth_generator = growth_generator
+                )
                 ax.axhline(
                     true_val, 
                     label=str(true_term_latex+ ' True'), 
@@ -366,13 +375,17 @@ def average_parameter_estimates(
                 c='black'
             )
 
-            latex_term = DataBase.latex_name_ising(term)
+            # latex_term = DataBase.latex_name_ising(term)
+            latex_term = ModelNames.get_latex_name(
+                name = term,
+                growth_generator = growth_generator
+            )
             ax.set_title(str(latex_term))
             
         """
         plot_title= str(
             'Average Parameter Estimates '+ 
-            str(DataBase.latex_name_ising(name)) +
+            # str(DataBase.latex_name_ising(name)) +
             ' [' +
             str(num_wins_for_name) + # TODO - num times this model won 
             ' instances].'
@@ -402,6 +415,7 @@ def Bayes_t_test(
     results_path,
     use_experimental_data=False,
     true_expectation_value_path=None,
+    growth_generator = None, 
     top_number_models=2,
     save_to_file=None
 ):
@@ -554,7 +568,11 @@ def Bayes_t_test(
 
         mean_exp = np.array( [means[t] for t in times] )
         std_dev_exp = np.array( [std_dev[t] for t in times] )
-        name=DataBase.latex_name_ising(term)
+        # name=DataBase.latex_name_ising(term)
+        name=ModelNames.get_latex_name(
+            name = term,
+            growth_generator = growth_generator
+        )
         description = str(
                 name + ' : ' + 
                 str(round(success_rate, 2)) + 
@@ -785,7 +803,11 @@ def r_sqaured_average(
             [ np.std(r_squared_lists[t]) for t in times]
         )
 
-        term = DataBase.latex_name_ising(name)
+        # term = DataBase.latex_name_ising(name)
+        term = ModelNames.get_latex_name(
+            name = name,
+            growth_generator = growth_generator 
+        )
         plot_label = str(term + ' ('+ str(num_wins) + ')')
         colour = colours[ i ]
         ax.plot(
@@ -870,13 +892,18 @@ def plot_scores(
         scores, 
         entropy=None,
         inf_gain=None, 
+        growth_generator = None,
         save_file='model_scores.png'
     ):
     plt.clf()
     models = list(scores.keys())
     
     latex_model_names = [
-        DataBase.latex_name_ising(model) for model in models
+        # DataBase.latex_name_ising(model) for model in models
+        ModelNames.get_latex_name(
+            name=model, 
+            growth_generator=growth_generator
+        ) for model in models
     ]
 
     scores = list(scores.values())
@@ -941,67 +968,77 @@ parser = argparse.ArgumentParser(description='Pass variables for (I)QLE.')
 # Add parser arguments, ie command line arguments for QMD
 ## QMD parameters -- fundamentals such as number of particles etc
 parser.add_argument(
-  '-dir', '--results_directory', 
-  help="Directory where results of multiple QMD are held.",
-  type=str,
-  default=os.getcwd()
+    '-dir', '--results_directory', 
+    help="Directory where results of multiple QMD are held.",
+    type=str,
+    default=os.getcwd()
 )
 
 parser.add_argument(
-  '-bcsv', '--bayes_csv', 
-  help="CSV given to QMD to store all Bayes factors computed.",
-  type=str,
-  default=os.getcwd()
+    '-bcsv', '--bayes_csv', 
+    help="CSV given to QMD to store all Bayes factors computed.",
+    type=str,
+    default=os.getcwd()
 )
 
 parser.add_argument(
-  '-top', '--top_number_models', 
-  help="N, for top N models by number of QMD wins.",
-  type=int,
-  default=3
+    '-top', '--top_number_models', 
+    help="N, for top N models by number of QMD wins.",
+    type=int,
+    default=3
 )
 
 parser.add_argument(
-  '-qhl', '--qhl_mode', 
-  help="Whether QMD is being used in QHL mode.",
-  type=int,
-  default=0
+    '-qhl', '--qhl_mode', 
+    help="Whether QMD is being used in QHL mode.",
+    type=int,
+    default=0
 )
 
 parser.add_argument(
-  '-fqhl', '--further_qhl_mode', 
-  help="Whether in further QHL stage.",
-  type=int,
-  default=0
+    '-fqhl', '--further_qhl_mode', 
+    help="Whether in further QHL stage.",
+    type=int,
+    default=0
 )
 parser.add_argument(
-  '-data', '--dataset', 
-  help="Which dataset QMD was run using..",
-  type=str,
-  default='NVB_dataset'
+    '-data', '--dataset', 
+    help="Which dataset QMD was run using..",
+    type=str,
+    default='NVB_dataset'
 )
 
 parser.add_argument(
-  '-params', '--true_params',
-  help="Path to pickled true params info.",
-  type=str,
-  default=None
+    '-params', '--true_params',
+    help="Path to pickled true params info.",
+    type=str,
+    default=None
 )
 
 
 parser.add_argument(
-  '-true_expec', '--true_expectation_value_path',
-  help="Path to pickled true expectation values.",
-  type=str,
-  default=None
+    '-true_expec', '--true_expectation_value_path',
+    help="Path to pickled true expectation values.",
+    type=str,
+    default=None
 )
 
 parser.add_argument(
-  '-exp', '--use_experimental_data',
-  help="Bool: whether or not to use experimental data.",
-  type=int,
-  default=0
+    '-exp', '--use_experimental_data',
+    help="Bool: whether or not to use experimental data.",
+    type=int,
+    default=0
 )
+
+parser.add_argument(
+    '-ggr', '--growth_generation_rule',
+    help='Rule applied for generation of new models during QMD. \
+    Corresponding functions must be built into ModelGeneration',
+    type=str,
+    default=None
+)
+
+
 
 arguments = parser.parse_args()
 directory_to_analyse = arguments.results_directory
@@ -1011,6 +1048,8 @@ further_qhl_mode = bool(arguments.further_qhl_mode)
 true_params_path = arguments.true_params
 exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
+growth_generator = arguments.growth_generation_rule
+
 
 if true_params_path is not None:
     true_params_info = pickle.load(
@@ -1085,6 +1124,7 @@ average_parameter_estimates(
     results_path = results_csv, 
     top_number_models = arguments.top_number_models,
     results_file_name_start=results_file_name_start,
+    growth_generator = growth_generator,
     true_params_dict = true_params_dict,
     save_to_file=  str(
         directory_to_analyse + 
@@ -1100,6 +1140,7 @@ Bayes_t_test(
     results_path = results_csv,
     use_experimental_data = exp_data, 
     true_expectation_value_path = true_expec_path,
+    growth_generator = growth_generator, 
     top_number_models = arguments.top_number_models ,
     save_to_file=str(
         directory_to_analyse+
@@ -1134,6 +1175,7 @@ elif further_qhl_mode == False:
     plot_scores(
         scores = model_scores,
         entropy = entropy, 
+        growth_generator = growth_generator,
         inf_gain = inf_gain, 
         save_file = plot_file
     )

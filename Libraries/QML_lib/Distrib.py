@@ -45,7 +45,6 @@ def means_sigmas_ising_term(term, specific_terms={},
     plus_string = ''
     for i in range(num_qubits):
         plus_string+='P'
-    print("plus string:", plus_string)
 
     # individual_terms = term.split('PP')
     individual_terms = term.split(plus_string)

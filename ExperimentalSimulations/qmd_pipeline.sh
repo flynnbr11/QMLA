@@ -46,8 +46,8 @@ then
     pgh=1.0
 fi
 
-growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# growth_rule='two_qubit_ising_rotation_hyperfine'
+# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='test_multidimensional' 
 use_rq=0
 further_qhl_factor=2
@@ -157,6 +157,7 @@ python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -top=$number_best_models_further_qhl \
     -qhl=$qhl_test -fqhl=0 \
     -exp=$exp_data -true_expec=$true_expec_path \
+    -ggr=$growth_rule \
     -data=$dataset -params=$true_params_pickle_file 
 " > $analyse_script
 
@@ -199,6 +200,7 @@ then
         -dir=$long_dir --bayes_csv=$bayes_csv \
         -top=$number_best_models_further_qhl \
         -qhl=$qhl_test -fqhl=1 \
+        -ggr=$growth_rule \
         -exp=$exp_data -true_expec=$true_expec_path \
         -data=$dataset -params=$true_params_pickle_file 
     " > $further_analyse_script

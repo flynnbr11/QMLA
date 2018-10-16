@@ -27,6 +27,7 @@ import Evo as evo
 import DataBase 
 import QML
 import ModelGeneration
+import ModelNames
 import PlotQMD 
 from RemoteModelLearning import *
 from RemoteBayesFactor import * 
@@ -326,6 +327,7 @@ class QMD():
             'resampler_a' : self.ResamplerA,
             'pgh_prefactor' : self.PGHPrefactor,
             'store_particles_weights' : self.StoreParticlesWeights,
+            'growth_generator' : self.GrowthGenerator, 
             'qhl_plots' : self.QHL_plots, 
             'results_directory' : self.ResultsDirectory, 
             'long_id' : long_id, 
@@ -1574,7 +1576,11 @@ class QMD():
             'NameAlphabetical' : DataBase.alph(self.ChampionName),
             'NameNonAlph' : self.ChampionName,
             'FinalParams' : self.ChampionFinalParams,
-            'LatexName' : DataBase.latex_name_ising(self.ChampionName),
+            # 'LatexName' : DataBase.latex_name_ising(self.ChampionName),
+            'LatexName' : ModelNames.get_latex_name(
+                name = self.ChampionName,
+                growth_generator = self.GrowthGenerator
+            ),
             'NumParticles' : self.NumParticles,
             'NumExperiments' : self.NumExperiments,
             'NumBayesTimes' : self.NumTimesForBayesUpdates,
@@ -1718,8 +1724,11 @@ class QMD():
         PlotQMD.updateAllBayesCSV(self, bayes_csv)
 
     def plotHintonAllModels(self, save_to_file=None):
-        PlotQMD.plotHinton(model_names=self.ModelNameIDs,
-            bayes_factors=self.AllBayesFactors, save_to_file=save_to_file
+        PlotQMD.plotHinton(
+            model_names=self.ModelNameIDs,
+            bayes_factors=self.AllBayesFactors, 
+            growth_generator=self.GrowthGenerator,
+            save_to_file=save_to_file
         )
 
 
@@ -1743,8 +1752,11 @@ class QMD():
             model_name_dict[m] = DataBase.model_name_from_id(self.db, m)
         
         
-        PlotQMD.plotHinton(model_names=model_name_dict, 
-            bayes_factors=bayes_factors, save_to_file=save_to_file
+        PlotQMD.plotHinton(
+            model_names=model_name_dict, 
+            bayes_factors=bayes_factors, 
+            growth_generator = self.GrowthGenerator,
+            save_to_file=save_to_file
         )
         
     def plotParameterEstimates(self, model_id=0, true_model=False, 

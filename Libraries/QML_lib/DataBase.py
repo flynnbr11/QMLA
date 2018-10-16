@@ -578,7 +578,7 @@ def get_eigenvectors(name):
     eigvectors = np.linalg.eig(mtx)[0]
     return eigvectors
 
-
+"""
 def latex_name_ising(name):
     # TODO generalise this 
     if name=='x' or name=='y' or name=='z':
@@ -640,7 +640,7 @@ def latex_name_ising(name):
         final_term = '$'+latex_term+'$'
         return final_term
 
-
+"""
 
 """
 ------ ------ Database declaration and functions ------ ------

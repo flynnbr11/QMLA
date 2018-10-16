@@ -30,6 +30,7 @@ from matplotlib.projections import register_projection
 import DataBase
 import Evo as evo
 import ExperimentalDataFunctions as expdt
+import ModelNames
 
 
 
@@ -647,7 +648,11 @@ def ExpectationValuesQHL_TrueModel(
         )
         
     plt.title(str("QHL test for " + 
-        str(DataBase.latex_name_ising(qmd.TrueOpName))
+        # str(DataBase.latex_name_ising(qmd.TrueOpName))
+        str(ModelNames.get_latex_name(
+            name=qmd.TrueOpName, 
+            growth_generator=qmd.GrowthGenerator
+            ))
         +". [" + str(qmd.NumParticles) + " prt; "
         + str(qmd.NumExperiments) +"exp]"
         )
@@ -1267,11 +1272,19 @@ class QMDFuncFormatter(Formatter):
         """
         return self.func(x, pos, self.args)   
         
-def plotHinton(model_names, bayes_factors, save_to_file=None):
+def plotHinton(
+    model_names, 
+    bayes_factors, 
+    growth_generator=None, 
+    save_to_file=None
+):
     hinton_mtx=BayF_IndexDictToMatrix(model_names, bayes_factors)
     log_hinton_mtx = np.log10(hinton_mtx)
-    labels = [DataBase.latex_name_ising(name) for name in model_names.values()]
-
+    # labels = [DataBase.latex_name_ising(name) for name in model_names.values()]
+    labels = [
+        ModelNames.get_latex_name(name, growth_generator) 
+            for name in model_names.values()
+    ]
 
     fig, ax = plt.subplots(figsize=(7,7))
 
@@ -2091,14 +2104,22 @@ def parameterEstimates(
         try:
             if use_experimental_data==False:
                 y_true = qmd.TrueParamDict[term]
-                true_term_latex = DataBase.latex_name_ising(term)
+                # true_term_latex = DataBase.latex_name_ising(term)
+                true_term_latex = ModelNames.get_latex_name(
+                    name = term,
+                    growth_generator = qmd.GrowthGenerator
+                )
+
                 ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
         except:
             pass
         y = np.array(param_estimate_by_term[term])
         s = np.array(std_devs[term])
         x = range(1,1+len(param_estimate_by_term[term]))
-        latex_term = DataBase.latex_name_ising(term)
+        latex_term = ModelNames.get_latex_name(
+            name = term,
+            growth_generator = qmd.GrowthGenerator
+        )
         ax.scatter(
             x,
             y, 
@@ -2144,7 +2165,13 @@ def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
     from matplotlib import cm as colmap
 #    from viz_library_undev import radar_factory # TODO IS THIS THE RIGHT FUNCTION?
     
-    labels = [DataBase.latex_name_ising(qmd.ModelNameIDs[l]) for l in modlist]
+    labels = [
+        # DataBase.latex_name_ising(qmd.ModelNameIDs[l]) for l in modlist
+        ModelNames.get_latex_name(
+            name=qmd.ModelNameIDs[l], 
+            growth_generator=qmd.GrowthGenerator
+        ) for l in modlist    
+    ]
     size = len(modlist)
     theta = custom_radar_factory(size, frame='polygon') 
     
@@ -2405,10 +2432,18 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
 def get_bayes_latex_dict(qmd):
     latex_dict = {}
     for i in list(qmd.AllBayesFactors.keys()):
-        mod_a = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
+        # mod_a = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
+        mod_a = ModelNames.get_latex_name(
+            name = qmd.ModelNameIDs[i],
+            growth_generator = qmd.GrowthGenerator
+        )
         latex_dict[mod_a] = {}
         for j in list(qmd.AllBayesFactors[i].keys()):
-            mod_b = DataBase.latex_name_ising(qmd.ModelNameIDs[j])
+            # mod_b = DataBase.latex_name_ising(qmd.ModelNameIDs[j])
+            mod_b = ModelNames.get_latex_name(
+                name = qmd.ModelNameIDs[j],
+                growth_generator = qmd.GrowthGenerator
+            )
             latex_dict[mod_a][mod_b]= qmd.AllBayesFactors[i][j][-1]
     return latex_dict
 
@@ -2480,7 +2515,13 @@ def ising_terms_rotation_hyperfine(return_branch_dict=None):
                     branch_by_term_dict[triple_hf] = 5
 
     
-    latex_terms = [DataBase.latex_name_ising(i) for i in ising_terms]
+    # latex_terms = [DataBase.latex_name_ising(i) for i in ising_terms]
+    latex_terms = [
+        ModelNames.get_latex_name(
+            #  in this case this list is only generating ising type so hard code growth generator
+            name=i, growth_generator='two_qubit_ising_rotation'
+        ) for i in ising_terms
+    ]
     
     if return_branch_dict=='branches':
         return branches
@@ -2489,8 +2530,12 @@ def ising_terms_rotation_hyperfine(return_branch_dict=None):
 
     elif return_branch_dict == 'latex_terms':
         for k in list(branch_by_term_dict.keys()):
-            branch_by_term_dict[DataBase.latex_name_ising(k)]=(
-                branch_by_term_dict.pop(k)
+            # branch_by_term_dict[DataBase.latex_name_ising(k)]=(
+            branch_by_term_dict[
+                ModelNames.get_latex_name(
+                    #  in this case this list is only generating ising type so hard code growth generator
+                    name = k, growth_generator='two_qubit_ising_rotation')
+                ] = (branch_by_term_dict.pop(k)
             )
         return branch_by_term_dict
         
@@ -2592,7 +2637,14 @@ def ising_terms_full_list(return_branch_dict=None):
                     ising_terms.append(triple_hf_term)
 
     
-    latex_terms = [DataBase.latex_name_ising(i) for i in ising_terms]
+    latex_terms = [
+        # DataBase.latex_name_ising(i) for i in ising_terms
+        ModelNames.get_latex_name(
+            name=i, 
+            #  in this case this list is only generating ising type so hard code growth generator
+            growth_generator='two_qubit_ising_rotation' 
+        ) for i in ising_terms
+    ]
     
     if return_branch_dict=='branches':
         return branches
@@ -2601,8 +2653,10 @@ def ising_terms_full_list(return_branch_dict=None):
 
     elif return_branch_dict == 'latex_terms':
         for k in list(branch_by_term_dict.keys()):
-            branch_by_term_dict[DataBase.latex_name_ising(k)]=(
-                branch_by_term_dict.pop(k)
+            # branch_by_term_dict[DataBase.latex_name_ising(k)]=(
+            branch_by_term_dict[ModelNames.get_latex_name(
+                name=k, growth_generator=qmd.GrowthGenerator)
+                ]=(branch_by_term_dict.pop(k)
             )
         return branch_by_term_dict
         
@@ -2625,8 +2679,13 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
     import csv
     fields = ['ID', 'Name']
     if names_ids=='latex':
-        names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in 
-            range(qmd.HighestModelID)
+        # names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in 
+        names = [
+            ModelNames.get_latex_name(
+                name = qmd.ModelNameIDs[i],
+                growth_generator = qmd.GrowthGenerator
+            ) 
+            for i in range(qmd.HighestModelID)
         ]
     elif names_ids=='nonlatex':
         names = [qmd.ModelNameIDs[i] for i in range(qmd.HighestModelID)]
@@ -2648,7 +2707,11 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
             for j in qmd.AllBayesFactors[i].keys():
                 if names_ids=='latex':
                     other_model_name = (
-                        DataBase.latex_name_ising(qmd.ModelNameIDs[j])
+                        # DataBase.latex_name_ising(qmd.ModelNameIDs[j])
+                        ModelNames.get_latex_name(
+                            name=qmd.ModelNameIDs[j],
+                            growth_generator = qmd.GrowthGenerator
+                        )
                     )
                 elif names_ids=='nonlatex':
                     other_model_name = qmd.ModelNameIDs[j]
@@ -2657,7 +2720,11 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
                 model_bf[other_model_name] = qmd.AllBayesFactors[i][j][-1]
 
             if names_ids=='latex':
-                model_bf['Name'] = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
+                # model_bf['Name'] = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
+                model_bf['Name'] = ModelNames.get_latex_name(
+                    name = qmd.ModelNameIDs[i],
+                    growth_generator = qmd.GrowthGenerator
+                )
             else:
                 model_bf['Name'] = qmd.ModelNameIDs[i]
             model_bf['ID'] = i
@@ -2676,7 +2743,12 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
 
     # TODO saved fig is cut off on edges and don't have axes titles.
 
-    correct_mod = DataBase.latex_name_ising(correct_mod)
+    # correct_mod = DataBase.latex_name_ising(correct_mod)
+    correct_mod = ModelNames.get_latex_name(
+        # this function is exclusively for Ising plot so two qubit growth generator is hard coded.
+        name = correct_mod,
+        growth_generator = 'two_qubit_ising_rotation'
+    )
     results_csv = os.path.abspath(results_csv_path)
     qmd_res = pd.DataFrame.from_csv(results_csv)
 

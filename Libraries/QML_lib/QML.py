@@ -10,6 +10,7 @@ import GenSimQMD_IQLE as gsi
 import ExperimentalDataFunctions as expdt
 import multiPGH as mpgh
 import DataBase as DB
+import ModelNames
 from MemoryTest import print_loc
 from psutil import virtual_memory
 import RedisSettings as rds
@@ -68,7 +69,7 @@ class ModelLearningClass():
     ):
         self.VolumeList = np.array([])  
         self.Name = name
-        self.LatexTerm = DB.latex_name_ising(self.Name)
+        # self.LatexTerm = DB.latex_name_ising(self.Name)
         self.Dimension = DB.get_num_qubits(name)
         self.NumExperimentsToDate = 0
         self.BayesFactors = {}
@@ -613,7 +614,10 @@ class reducedModel():
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.StoreParticlesWeights = qmd_info['store_particles_weights']
         self.BayesFactors = {}
-        self.LatexTerm = DB.latex_name_ising(self.Name)
+        self.LatexTerm = ModelNames.get_latex_name(
+            name = self.Name,
+            growth_generator = qmd_info['growth_generator']
+        )
         self.NumQubits = DB.get_num_qubits(self.Name)
         self.HostName = host_name
         self.PortNumber = port_number
