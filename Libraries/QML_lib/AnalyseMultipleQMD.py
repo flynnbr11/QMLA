@@ -942,6 +942,7 @@ def plot_tree_multi_QMD(
         results_csv, 
         all_bayes_csv, 
         avg_type='medians',
+        growth_generator=None,
         entropy=None, 
         inf_gain=None, 
         save_to_file=None
@@ -956,6 +957,7 @@ def plot_tree_multi_QMD(
     ptq.cumulativeQMDTreePlot(
         cumulative_csv=all_bayes_csv, 
         wins_per_mod=winning_count, 
+        growth_generator=growth_generator,
         only_adjacent_branches=True, 
         avg=avg_type, entropy=entropy, inf_gain=inf_gain,
         save_to_file=save_to_file
@@ -1210,6 +1212,7 @@ elif further_qhl_mode == False:
     try:
         plot_tree_multi_QMD(results_csv = results_csv, 
             all_bayes_csv = all_bayes_csv, 
+            growth_generator=growth_generator,
             entropy = entropy,
             inf_gain = inf_gain,
             save_to_file='multiQMD_tree.png'

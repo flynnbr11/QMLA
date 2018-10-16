@@ -1613,7 +1613,11 @@ def plotTreeDiagram(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-def colour_dicts_from_win_count(winning_count, min_colour_value=0.1):
+def colour_dicts_from_win_count(
+    winning_count, 
+    growth_generator=None,
+    min_colour_value=0.1
+):
     max_wins=max(list(winning_count.values()))
     min_wins=min(list(winning_count.values()))
     min_col = min_colour_value
@@ -1627,8 +1631,13 @@ def colour_dicts_from_win_count(winning_count, min_colour_value=0.1):
     colour_by_win_count = {}
     colour_by_node_name = {}
     all_models=list(
-        ising_terms_full_list(return_branch_dict='latex_terms').keys()
+        # ising_terms_full_list(
+        ModelNames.get_all_model_names(
+            growth_generator=growth_generator,
+            return_branch_dict='latex_terms').keys(
+        )
     )
+    print("colour dict function. all_models:\n", all_models)
 
     for k in range(num_colours):
         colour_by_win_count[k] = col_space[k]
@@ -1648,6 +1657,7 @@ def cumulativeQMDTreePlot(
         wins_per_mod, 
         avg='means',
         only_adjacent_branches=True,
+        growth_generator=None,
         directed=True,
         entropy=None, 
         inf_gain=None,
@@ -1656,15 +1666,27 @@ def cumulativeQMDTreePlot(
     
     import networkx as nx
     import copy
-    means, medians, counts = multiQMDBayes(cumulative_csv)
+    means, medians, counts = multiQMDBayes(
+        cumulative_csv, 
+        growth_generator=growth_generator
+    )
     if avg=='means':
         bayes_factors = means #medians
     elif avg=='medians':
         bayes_factors = medians
 
-    modlist = ising_terms_full_list()
+    # modlist = ising_terms_full_list()
+    # term_branches = (
+    #     ising_terms_full_list(return_branch_dict='latex_terms')       
+    # ) 
+    modlist = ModelNames.get_all_model_names(
+        growth_generator = growth_generator    
+    )
     term_branches = (
-        ising_terms_full_list(return_branch_dict='latex_terms')       
+        ModelNames.get_all_model_names(
+            growth_generator = growth_generator,
+            return_branch_dict='latex_terms'
+        )       
     ) 
 
     pair_freqs={}
@@ -1695,7 +1717,11 @@ def cumulativeQMDTreePlot(
         branch_mod_count[i] =  0 
 
     colour_by_node_name, colour_by_count = (
-        colour_dicts_from_win_count(wins_per_mod, 0.4)
+        colour_dicts_from_win_count(
+            wins_per_mod, 
+            growth_generator=growth_generator, 
+            min_colour_value=0.4
+        )
     )
     min_colour = min(list(colour_by_node_name.values()))
     
@@ -2370,13 +2396,16 @@ def unit_poly_verts(theta):
 
 #### Cumulative Bayes CSV and InterQMD Tree plotting ####
 
-def multiQMDBayes(all_bayes_csv):
+def multiQMDBayes(all_bayes_csv, growth_generator=None):
     import csv, pandas
     cumulative_bayes = pandas.DataFrame.from_csv(all_bayes_csv)
     names=list(cumulative_bayes.keys())
 
     count_bayes={}
-    mod_names= ising_terms_full_list()
+    # mod_names= ising_terms_full_list()
+    mod_names= ModelNames.get_all_model_names(
+        growth_generator=growth_generator
+    )
 
     for mod in mod_names:
         count_bayes[mod] = {}
@@ -2413,7 +2442,10 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
     fields = ['ModelName']
     fields += names
     all_models= ['ModelName']
-    all_models += ising_terms_full_list()
+    # all_models += ising_terms_full_list()
+    all_models += ModelNames.get_all_model_names(
+        growth_generator = qmd.GrowthGenerator
+    )
     
     if os.path.isfile(all_bayes_csv) is False:
         with open(all_bayes_csv, 'a+') as bayes_csv:
@@ -2534,7 +2566,7 @@ def ising_terms_rotation_hyperfine(return_branch_dict=None):
             branch_by_term_dict[
                 ModelNames.get_latex_name(
                     #  in this case this list is only generating ising type so hard code growth generator
-                    name = k, growth_generator='two_qubit_ising_rotation')
+                    name = k, growth_generator='two_qubit_ising_rotation_hyperfine_transverse')
                 ] = (branch_by_term_dict.pop(k)
             )
         return branch_by_term_dict
@@ -2642,7 +2674,7 @@ def ising_terms_full_list(return_branch_dict=None):
         ModelNames.get_latex_name(
             name=i, 
             #  in this case this list is only generating ising type so hard code growth generator
-            growth_generator='two_qubit_ising_rotation' 
+            growth_generator='two_qubit_ising_rotation_hyperfine_transverse' 
         ) for i in ising_terms
     ]
     
