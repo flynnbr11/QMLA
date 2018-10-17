@@ -36,52 +36,6 @@ import ModelNames
 
 
 #### Hinton Diagram ####
-"""
-def latex_name_ising(name):
-    terms=name.split('PP')
-    rotations = ['xTi', 'yTi', 'zTi']
-    hartree_fock = ['xTx', 'yTy', 'zTz']
-    transverse = ['xTy', 'xTz', 'yTz']
-    
-    
-    present_r = []
-    present_hf = []
-    present_t = []
-    
-    for t in terms:
-        if t in rotations:
-            present_r.append(t[0])
-        elif t in hartree_fock:
-            present_hf.append(t[0])
-        elif t in transverse:
-            string = t[0]+t[-1]
-            present_t.append(string)
-        else:
-            print("Term",t,"doesn't belong to rotations, \
-                Hartree-Fock or transverse."
-            )
-            print("Given name:", name)
-    present_r.sort()
-    present_hf.sort()
-    present_t.sort()
-
-    r_terms = ','.join(present_r)
-    hf_terms = ','.join(present_hf)
-    t_terms = ','.join(present_t)
-    
-    
-    latex_term = ''
-    if len(present_r) > 0:
-        latex_term+='R_{'+r_terms+'}'
-    if len(present_hf) > 0:
-        latex_term+='HF_{'+hf_terms+'}'
-    if len(present_t) > 0:
-        latex_term+='T_{'+t_terms+'}'
-    
-    final_term = 'r$'+latex_term+'$'
-    
-    return latex_term
-"""
 
 def ExpectationValuesTrueSim(
     qmd, 
@@ -175,28 +129,6 @@ def ExpectationValuesTrueSim(
                         t=t, 
                         state = true_probe
                     )
-
-
-                # if use_experimental_data:
-                #     # expec = ExpectationValues.hahn_evolution(
-                #     expec = ExpectationValues.expectation_value_wrapper(
-                #         method='hahn',
-                #         ham = true_ham, 
-                #         t=t, 
-                #         state = true_probe
-                #     )
-
-                # else: # Tracing out second qubit and projecting on plus for simulated case.
-                #     # TODO if simulated, have access to full measurement so plot that?
-                #     # expec = ExpectationValues.traced_expectation_value_project_one_qubit_plus(
-                #     expec = ExpectationValues.expectation_value_wrapper(
-                #         method='trace_all_but_first',
-                #         ham = true_ham, 
-                #         t=t, 
-                #         state = true_probe
-                #     )
-
-
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
                     "\nParams:", params, 
@@ -270,23 +202,6 @@ def ExpectationValuesTrueSim(
                         ) 
 
                         sim_expec_values.append(expec)
-                    # if use_experimental_data:
-                    #      # expec = ExpectationValues.hahn_evolution(
-                    #      expec = ExpectationValues.expectation_value_wrapper(
-                    #         method='hahn',
-                    #         ham=sim_ham, 
-                    #         t=t,
-                    #         state=sim_probe
-                    #     ) 
-
-                    # else:
-                    #     # expec = ExpectationValues.traced_expectation_value_project_one_qubit_plus(
-                    #     expec = ExpectationValues.expectation_value_wrapper(
-                    #         method='trace_all_but_first',
-                    #         ham=sim_ham, 
-                    #         t=t,
-                    #         state=sim_probe
-                    #     ) 
 
 #                    mod.expectation_values[t] = expec
                    # print("[",mod.Name,"] t=",t,":\t", expec)
@@ -465,24 +380,6 @@ def ExpectationValuesQHL_TrueModel(
                         t=t, 
                         state = true_probe
                     )
-
-                # if use_experimental_data: 
-                #     # expec = ExpectationValues.hahn_evolution(
-                #     expec = ExpectationValues.expectation_value_wrapper(
-                #         method='hahn',
-                #         ham = true_ham, 
-                #         t=t, 
-                #         state = true_probe
-                #     )
-
-                # else:
-                #     # expec = ExpectationValues.traced_expectation_value_project_one_qubit_plus(
-                #     expec = ExpectationValues.expectation_value_wrapper(
-                #         method='trace_all_but_first',
-                #         ham = true_ham, 
-                #         t=t, 
-                #         state = true_probe
-                #     )
                 
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
@@ -541,37 +438,6 @@ def ExpectationValuesQHL_TrueModel(
             )
             sim_expec_values.append(ex_val)
 
- #        if use_experimental_data:
-
- #            sim_expec_values = []
- #            for t in times:
- #                # ex_val = ExpectationValues.hahn_evolution(
- #                ex_val = ExpectationValues.expectation_value_wrapper(
- #                    method='hahn',
- #                    ham=sim_ham, 
- #                    t=t,
- #                    state=sim_probe
- #                )
- #                sim_expec_values.append(ex_val)
-
- # #               if t%10==0:
- # #                   print("t=", t, "\nham=",sim_ham, "\nex_val=", ex_val)
-            
- #        else:
- #            sim_expec_values = [
- #                # ExpectationValues.traced_expectation_value_project_one_qubit_plus(
- #                ExpectationValues.expectation_value_wrapper(
- #                    method='trace_all_but_first',
- #                    ham=sim_ham, 
- #                    t=t,
- #                    state=sim_probe
- #                ) for t in times
- #            ]
-
-
-#        print("sim expec values:\n", sim_expec_values)
-
-        
         
         if mod_id == qmd.TrueOpModelID:
             sim_label = 'Simulated Model'
