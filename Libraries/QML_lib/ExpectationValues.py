@@ -25,10 +25,6 @@ if (use_linalg):
     # override and use linalg.expm even if hamiltonian_exponentiation is installed
     ham_exp_installed = False
 
-
-
-
-
      
 ## Partial trace functionality
  

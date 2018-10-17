@@ -8,6 +8,7 @@ import DataBase
 import pandas
 import PlotQMD as ptq
 import ModelNames
+import UserFunctions 
 
 #This is a simple test comment
 """
@@ -343,7 +344,7 @@ def average_parameter_estimates(
                 col=0
                 row+=1
             # latex_terms[term] = DataBase.latex_name_ising(term)
-            latex_terms[term] = ModelNames.get_latex_name(
+            latex_terms[term] = UserFunctions.get_latex_name(
                 name=term,
                 growth_generator = growth_generator
             )
@@ -353,7 +354,7 @@ def average_parameter_estimates(
             try:
                 true_val = true_params_dict[term]
                 # true_term_latex = DataBase.latex_name_ising(term)
-                true_term_latex = ModelNames.get_latex_name(
+                true_term_latex = UserFunctions.get_latex_name(
                     name = term,
                     growth_generator = growth_generator
                 )
@@ -376,7 +377,7 @@ def average_parameter_estimates(
             )
 
             # latex_term = DataBase.latex_name_ising(term)
-            latex_term = ModelNames.get_latex_name(
+            latex_term = UserFunctions.get_latex_name(
                 name = term,
                 growth_generator = growth_generator
             )
@@ -569,7 +570,7 @@ def Bayes_t_test(
         mean_exp = np.array( [means[t] for t in times] )
         std_dev_exp = np.array( [std_dev[t] for t in times] )
         # name=DataBase.latex_name_ising(term)
-        name=ModelNames.get_latex_name(
+        name=UserFunctions.get_latex_name(
             name = term,
             growth_generator = growth_generator
         )
@@ -804,7 +805,7 @@ def r_sqaured_average(
         )
 
         # term = DataBase.latex_name_ising(name)
-        term = ModelNames.get_latex_name(
+        term = UserFunctions.get_latex_name(
             name = name,
             growth_generator = growth_generator 
         )
@@ -867,7 +868,7 @@ def get_entropy(
     num_qmd_instances = sum(list(models_points.values()))
     num_possible_qmd_instances = len(
         # ptq.ising_terms_rotation_hyperfine()
-        ModelNames.get_all_model_names(
+        UserFunctions.get_all_model_names(
             growth_generator = growth_generator
         )
     )
@@ -907,7 +908,7 @@ def plot_scores(
     
     latex_model_names = [
         # DataBase.latex_name_ising(model) for model in models
-        ModelNames.get_latex_name(
+        UserFunctions.get_latex_name(
             name=model, 
             growth_generator=growth_generator
         ) for model in models

@@ -17,7 +17,7 @@ import DataBase
 import warnings
 
 global paulis_list
-paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
+# paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
 
 # Dict of max spawn depths, corresponding to different generation functions. 
 
@@ -591,21 +591,21 @@ def test_multidimensional(
 
 
 
-##### Wrapper function and dict
+# ##### Wrapper function and dict
 
-model_generation_functions = {
-    'simple_ising' : simple_ising,
-    'ising_non_transverse' : ising_non_transverse,
-    'ising_transverse' : ising_transverse,
-    'two_qubit_ising_rotation_hyperfine' : hyperfine_like,
-    'two_qubit_ising_rotation_hyperfine_transverse' : hyperfine_like,
-    'hyperfine_like' : hyperfine_like,
-    'test_multidimensional' : test_multidimensional,
-}
+# model_generation_functions = {
+#     'simple_ising' : simple_ising,
+#     'ising_non_transverse' : ising_non_transverse,
+#     'ising_transverse' : ising_transverse,
+#     'two_qubit_ising_rotation_hyperfine' : hyperfine_like,
+#     'two_qubit_ising_rotation_hyperfine_transverse' : hyperfine_like,
+#     'hyperfine_like' : hyperfine_like,
+#     'test_multidimensional' : test_multidimensional,
+# }
 
-def new_model_generator(generator, **kwargs):
-    model_func = model_generation_functions[generator]
-    print("Using model generation function:", model_func)
-    return model_func(**kwargs)
+# def new_model_generator(generator, **kwargs):
+#     model_func = model_generation_functions[generator]
+#     print("Using model generation function:", model_func)
+#     return model_func(**kwargs)
 
 

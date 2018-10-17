@@ -31,6 +31,8 @@ import ModelNames
 import PlotQMD 
 from RemoteModelLearning import *
 from RemoteBayesFactor import * 
+import ExpectationValues
+import UserFunctions
 # Class definition
 
 def time_seconds():
@@ -203,7 +205,7 @@ class QMD():
                 # TODO is this the right expectation value func???
                 self.ExperimentalMeasurements[t] = (
                     # ExpectationValues.traced_expectation_value_project_one_qubit_plus(
-                    ExpectationValues.expectation_value_wrapper(
+                    UserFunctions.expectation_value_wrapper(
                         method=self.MeasurementType,
                         ham = self.TrueHamiltonian,
                         t = t, 
@@ -1271,7 +1273,7 @@ class QMD():
         
         if single_champion:
             # new_models = ModelGeneration.new_model_list(
-            new_models = ModelGeneration.new_model_generator(
+            new_models = UserFunctions.new_model_generator(
                 generator='simple_ising',
                 model_list=[overall_champ],
                 model_dict=self.model_lists,
@@ -1280,7 +1282,7 @@ class QMD():
             )
         else: 
             # new_models = ModelGeneration.new_model_list(
-            new_models = ModelGeneration.new_model_generator(
+            new_models = UserFunctions.new_model_generator(
                 generator='simple_ising', 
                 model_list=branch_champions,
                 model_dict=self.model_lists,
@@ -1300,7 +1302,7 @@ class QMD():
             mod_id in best_models 
         ]
         # new_models = ModelGeneration.new_model_list(
-        new_models = ModelGeneration.new_model_generator(
+        new_models = UserFunctions.new_model_generator(
             generator=self.GrowthGenerator,
             model_list=best_model_names,
             spawn_step=self.SpawnDepth, 
@@ -1589,7 +1591,7 @@ class QMD():
             'NameNonAlph' : self.ChampionName,
             'FinalParams' : self.ChampionFinalParams,
             # 'LatexName' : DataBase.latex_name_ising(self.ChampionName),
-            'LatexName' : ModelNames.get_latex_name(
+            'LatexName' : UserFunctions.get_latex_name(
                 name = self.ChampionName,
                 growth_generator = self.GrowthGenerator
             ),

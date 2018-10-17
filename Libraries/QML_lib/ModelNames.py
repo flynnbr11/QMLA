@@ -161,10 +161,11 @@ def ising_terms_rotation_hyperfine(return_branch_dict=None):
     
     # latex_terms = [DataBase.latex_name_ising(i) for i in ising_terms]
     latex_terms = [
-        get_latex_name(
-            #  in this case this list is only generating ising type so hard code growth generator
-            name=i, growth_generator='two_qubit_ising_rotation_hyperfine_transverse'
-        ) for i in ising_terms
+        # get_latex_name(
+        #     #  in this case this list is only generating ising type so hard code growth generator
+        #     name=i, growth_generator='two_qubit_ising_rotation_hyperfine_transverse'
+        # ) for i in ising_terms
+        latex_name_ising(name=i) for i in ising_terms
     ]
     
     if return_branch_dict=='branches':
@@ -176,10 +177,11 @@ def ising_terms_rotation_hyperfine(return_branch_dict=None):
         for k in list(branch_by_term_dict.keys()):
             # branch_by_term_dict[DataBase.latex_name_ising(k)]=(
             branch_by_term_dict[
-                get_latex_name(
-                    #  in this case this list is only generating ising type so hard code growth generator
-                    name = k, growth_generator='two_qubit_ising_rotation_hyperfine_transverse')
-                ] = (branch_by_term_dict.pop(k)
+                # get_latex_name(
+                #     #  in this case this list is only generating ising type so hard code growth generator
+                #     name = k, growth_generator='two_qubit_ising_rotation_hyperfine_transverse')
+                # ] = (branch_by_term_dict.pop(k)
+                latex_name_ising(name = k)] = (branch_by_term_dict.pop(k)
             )
         return branch_by_term_dict
         
@@ -283,11 +285,12 @@ def ising_terms_full_list(return_branch_dict=None):
     
     latex_terms = [
         # DataBase.latex_name_ising(i) for i in ising_terms
-        get_latex_name(
-            name=i, 
-            #  in this case this list is only generating ising type so hard code growth generator
-            growth_generator='two_qubit_ising_rotation_hyperfine_transverse' 
-        ) for i in ising_terms
+        # get_latex_name(
+        #     name=i, 
+        #     #  in this case this list is only generating ising type so hard code growth generator
+        #     growth_generator='two_qubit_ising_rotation_hyperfine_transverse' 
+        # ) for i in ising_terms
+        latex_name_ising(name=i) for i in ising_terms
     ]
     
     if return_branch_dict=='branches':
@@ -298,10 +301,13 @@ def ising_terms_full_list(return_branch_dict=None):
     elif return_branch_dict == 'latex_terms':
         for k in list(branch_by_term_dict.keys()):
             # branch_by_term_dict[DataBase.latex_name_ising(k)]=(
-            branch_by_term_dict[get_latex_name(
-                name=k, 
-                growth_generator='two_qubit_ising_rotation_hyperfine_transverse'
-            	)] = (
+            branch_by_term_dict[
+            	# get_latex_name(
+	            #     name=k, 
+	            #     growth_generator='two_qubit_ising_rotation_hyperfine_transverse'
+            	# )
+            	latex_name_ising(name=k)
+            	] = (
             		branch_by_term_dict.pop(k)
             )
         return branch_by_term_dict
@@ -315,54 +321,54 @@ def ising_terms_full_list(return_branch_dict=None):
 #######################################
 
 
-"""
-Assign each generation rule a latex name mapping
-"""
-latex_naming_functions = {
-	None : default_latex_wrapping,
-	'two_qubit_ising_rotation_hyperfine' : 
-		latex_name_ising, 
-	'two_qubit_ising_rotation_hyperfine_transverse' : 
-		latex_name_ising, 
-}
+# """
+# Assign each generation rule a latex name mapping
+# """
+# latex_naming_functions = {
+# 	None : default_latex_wrapping,
+# 	'two_qubit_ising_rotation_hyperfine' : 
+# 		latex_name_ising, 
+# 	'two_qubit_ising_rotation_hyperfine_transverse' : 
+# 		latex_name_ising, 
+# }
 
-all_models_functions = {
-	None : ising_terms_rotation_hyperfine,
-	'two_qubit_ising_rotation_hyperfine' : 
-		ising_terms_rotation_hyperfine, 
-	'two_qubit_ising_rotation_hyperfine_transverse' : 
-		ising_terms_full_list, 
-}
-
-
-######
-### ----- Wrapper functions. ----- ###
-######
-
-def get_latex_name(
-    name, 
-    growth_generator=None,
-    **kwargs
-):
-	try:
-		# if mapping doesn't work, default to just wrap in $__$. 
-		latex_mapping = latex_naming_functions[growth_generator]
-		latex_representation = latex_mapping(name, **kwargs)
-	except:
-		latex_mapping = latex_naming_functions[None]
-		latex_representation = latex_mapping(name, **kwargs)
-	# print("Latex Mapping used", latex_mapping)
-
-	return latex_representation
+# all_models_functions = {
+# 	None : ising_terms_rotation_hyperfine,
+# 	'two_qubit_ising_rotation_hyperfine' : 
+# 		ising_terms_rotation_hyperfine, 
+# 	'two_qubit_ising_rotation_hyperfine_transverse' : 
+# 		ising_terms_full_list, 
+# }
 
 
-def get_all_model_names(
-	growth_generator = None,
-	**kwargs
-):
-	all_models = all_models_functions[growth_generator]
-	# print("all model function:", all_models)
-	return all_models(**kwargs)
+# ######
+# ### ----- Wrapper functions. ----- ###
+# ######
+
+# def get_latex_name(
+#     name, 
+#     growth_generator=None,
+#     **kwargs
+# ):
+# 	try:
+# 		# if mapping doesn't work, default to just wrap in $__$. 
+# 		latex_mapping = latex_naming_functions[growth_generator]
+# 		latex_representation = latex_mapping(name, **kwargs)
+# 	except:
+# 		latex_mapping = latex_naming_functions[None]
+# 		latex_representation = latex_mapping(name, **kwargs)
+# 	# print("Latex Mapping used", latex_mapping)
+
+# 	return latex_representation
+
+
+# def get_all_model_names(
+# 	growth_generator = None,
+# 	**kwargs
+# ):
+# 	all_models = all_models_functions[growth_generator]
+# 	# print("all model function:", all_models)
+# 	return all_models(**kwargs)
 
 
 	

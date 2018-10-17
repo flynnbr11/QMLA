@@ -9,7 +9,7 @@ import os as os
 from MemoryTest import print_loc
 import ExpectationValues
 # from UserFunctions import expectation_value_wrapper
-# import UserFunctions
+import UserFunctions
 sys.path.append((os.path.join("..")))
 
 global_print_loc = False 
@@ -51,8 +51,7 @@ def minusI():
 
 def identity():
     return np.array([[1+0.j, 0+0.j], [0+0.j, 1+0.j]])
- 
- 
+  
 def sigmaz():
     return np.array([[1+0.j, 0+0.j], [0+0.j, -1+0.j]])
  
@@ -129,8 +128,8 @@ def get_pr0_array_qle(
             t = t_list[tId]
             print_loc(global_print_loc)
             try:
-                    # output[evoId][tId] = UserFunctions.expectation_value_wrapper(
-                    output[evoId][tId] = ExpectationValues.expectation_value_wrapper(
+                    output[evoId][tId] = UserFunctions.expectation_value_wrapper(
+                    # output[evoId][tId] = ExpectationValues.expectation_value_wrapper(
                         method=measurement_type,
                         ham = ham,
                         t = t,

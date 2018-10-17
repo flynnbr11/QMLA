@@ -61,15 +61,28 @@ import warnings
 import hashlib
 
 import redis
-import Evo as evo
+# import Evo as evo
 from QML import *
 import ModelGeneration
 from qinfer import NormalDistribution
 from Distrib import MultiVariateNormalDistributionNocov
 
+def identity():
+    return np.array([[1+0.j, 0+0.j], [0+0.j, 1+0.j]])
+  
+def sigmaz():
+    return np.array([[1+0.j, 0+0.j], [0+0.j, -1+0.j]])
+ 
+def sigmax():
+    return np.array([[0+0.j, 1+0.j], [1+0.j, 0+0.j]])
+ 
+def sigmay():
+    return np.array([[0+0.j, 0-1.j], [0+1.j, 0+0.j]])
+
+
 global paulis_list
-paulis_list = {'i' : evo.identity(), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 
-    'z' : evo.sigmaz()
+paulis_list = {'i' : identity(), 'x' : sigmax(), 'y' : sigmay(), 
+    'z' : sigmaz()
 }
 
 
@@ -246,8 +259,8 @@ def get_num_qubits(name):
 
 def get_constituent_names_from_name(name):
     t_str, p_str, max_t, max_p = get_t_p_strings(name)
-    paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 
-        'y' : evo.sigmay(), 'z' : evo.sigmaz()
+    paulis_list = {'i' : np.eye(2), 'x' : sigmax(), 
+        'y' : sigmay(), 'z' : sigmaz()
     }
     if(max_t >= max_p):
         # if more T's than P's in name, it has only one constituent. 
@@ -595,8 +608,8 @@ QML parameters
 """
 n_particles = 2000
 n_experiments = 300
-#true_operator_list = [evo.sigmax(), evo.sigmay()]
-true_operator_list = np.array([evo.sigmax(), evo.sigmay()])
+#true_operator_list = [sigmax(), sigmay()]
+true_operator_list = np.array([sigmax(), sigmay()])
 
 #xtx = operator('xTx')
 ytz = operator('yTz')
@@ -860,8 +873,8 @@ def consider_new_model(model_lists, name, db):
 
 def num_parameters_from_name(name):
     t_str, p_str, max_t, max_p = DB.get_t_p_strings(name)
-    paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 
-        'y' : evo.sigmay(), 'z' : evo.sigmaz()
+    paulis_list = {'i' : np.eye(2), 'x' : sigmax(), 
+        'y' : sigmay(), 'z' : sigmaz()
     }
     if(max_t >= max_p):
         # if more T's than P's in name, it has only one constituent. 

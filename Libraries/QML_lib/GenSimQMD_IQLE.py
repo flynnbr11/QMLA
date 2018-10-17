@@ -5,7 +5,8 @@ import numpy as np
 import scipy as sp
 import warnings
 
-from Evo import * # TODO remove ALL import * calls across QMD
+# from Evo import * # TODO remove ALL import * calls across QMD
+import Evo
 import ExperimentalDataFunctions as expdt
 
 # from ProbeStates import *
@@ -312,7 +313,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 
             times = expparams['t']
             if self.QLE is True:
-                pr0 = get_pr0_array_qle(
+                pr0 = Evo.get_pr0_array_qle(
                     t_list=times, modelparams=params,
                     oplist=operators, probe=probe, 
                     measurement_type=self.measurement_type,
@@ -325,7 +326,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 )
 
             else: 
-                pr0 = get_pr0_array_iqle(
+                pr0 = Evo.get_pr0_array_iqle(
                     t_list=times, modelparams=params,
                     oplist=operators, ham_minus=ham_minus, probe=probe,
                     use_exp_custom=self.use_exp_custom,

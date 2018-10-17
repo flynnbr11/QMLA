@@ -6,7 +6,7 @@ import time
 import qinfer as qi
 import Evo
 import ExpectationValues
-# import UserFunctions
+import UserFunctions
 import Distrib as Distributions
 import GenSimQMD_IQLE as gsi
 import ExperimentalDataFunctions as expdt
@@ -616,7 +616,7 @@ class reducedModel():
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.StoreParticlesWeights = qmd_info['store_particles_weights']
         self.BayesFactors = {}
-        self.LatexTerm = ModelNames.get_latex_name(
+        self.LatexTerm = UserFunctions.get_latex_name(
             name = self.Name,
             growth_generator = qmd_info['growth_generator']
         )
@@ -716,7 +716,7 @@ class reducedModel():
         if probe is None:
             probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
         for t in times:
-                self.expectation_values[t] = ExpectationValues.expectation_value_wrapper(
+                self.expectation_values[t] = UserFunctions.expectation_value_wrapper(
                     method=self.MeasurementType,
                     ham = self.LearnedHamiltonian, 
                     t = t,
@@ -781,19 +781,19 @@ class reducedModel():
             else:
                 # if self.UseExperimentalData==True:
                 #     # sim = ExpectationValues.hahn_evolution(
-                #     sim = ExpectationValues.expectation_value_wrapper(
+                #     sim = UserFunctions.expectation_value_wrapper(
                 #         method='hahn',
                 #         ham=ham, t=t, state=probe
                 #     )
 
                 # else:
                 #     # sim = ExpectationValues.traced_expectation_value_project_one_qubit_plus(
-                #     sim = ExpectationValues.expectation_value_wrapper(
+                #     sim = UserFunctions.expectation_value_wrapper(
                 #         method='trace_all_but_first',
                 #         ham=ham, t=t, state=probe
                 #     )
 
-                sim = ExpectationValues.expectation_value_wrapper(
+                sim = UserFunctions.expectation_value_wrapper(
                     method=self.MeasurementType,
                     ham=ham, t=t, state=probe
                 )
@@ -853,7 +853,7 @@ class reducedModel():
                 list(self.expectation_values.keys())
             )
             for t in exp_times:
-                sim = ExpectationValues.expectation_value_wrapper(
+                sim = UserFunctions.expectation_value_wrapper(
                     method=self.MeasurementType,
                     ham=ham, 
                     t=t, 
@@ -862,7 +862,7 @@ class reducedModel():
 
                 # if self.UseExperimentalData==True:
                 #     # sim = ExpectationValues.hahn_evolution(
-                #     sim = ExpectationValues.expectation_value_wrapper(
+                #     sim = UserFunctions.expectation_value_wrapper(
                 #         method='hahn',
                 #         ham=ham, 
                 #         t=t, 
@@ -870,7 +870,7 @@ class reducedModel():
                 #     )
                 # else:
                 #     # sim = ExpectationValues.traced_expectation_value_project_one_qubit_plus(
-                #     sim = ExpectationValues.expectation_value_wrapper(
+                #     sim = UserFunctions.expectation_value_wrapper(
                 #         method='trace_all_but_first',
                 #         ham=ham, 
                 #         t=t, 
