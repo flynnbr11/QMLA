@@ -25,7 +25,8 @@ gaussian=1
 exp_data=1
 sim_measurement_type='full_access'
 exp_measurement_type='hahn' # to use if not experimental
-measurement_type=$sim_measurement_type
+measurement_type=$exp_measurement_type
+
 # Overwrite settings for specific cases
 """
 if (( "$exp_data" == 1))

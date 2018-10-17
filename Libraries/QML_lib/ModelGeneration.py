@@ -51,7 +51,6 @@ max_spawn_depth_info = {
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
     'test_multidimensional' : 10
 }
-
 def log_print(to_print_list, log_file):
     identifier = str(str(time_seconds()) +" [MOD_GEN]")
     if type(to_print_list)!=list:
@@ -62,6 +61,14 @@ def log_print(to_print_list, log_file):
     with open(log_file, 'a') as write_log_file:
         print(identifier, str(to_print), file=write_log_file, flush=True)
 
+
+def max_spawn_depth(generator, log_file):
+    if generator not in max_spawn_depth_info:
+        log_print(["Generator not recognised; does not have maximum spawn depth or generation function"], log_file)
+    else:
+        return max_spawn_depth_info[generator]
+
+"""
 def new_model_list(model_list, spawn_depth, model_dict, log_file, 
     options=['x', 'y', 'z'], generator='simple_ising'
 ):
@@ -95,11 +102,8 @@ def new_model_list(model_list, spawn_depth, model_dict, log_file,
     else:
         log_print(["Generator", generator, "not recognised"], log_file)        
 
-def max_spawn_depth(generator, log_file):
-    if generator not in max_spawn_depth_info:
-        log_print(["Generator not recognised; does not have maximum spawn depth or generation function"], log_file)
-    else:
-        return max_spawn_depth_info[generator]
+"""
+
 
 
 ##################################################################################
@@ -373,7 +377,12 @@ def simple_ising(generator_list, options=['x', 'y', 'z']):
 
 ### spawn function to match process followed during experimental QMD ###
 
-def single_pauli_multiple_dim(num_qubits, log_file, paulis=['x', 'y', 'z', 'i'], pauli=None):
+def single_pauli_multiple_dim(
+    num_qubits, 
+    log_file, 
+    paulis=['x', 'y', 'z', 'i'], 
+    pauli=None
+):
     import random
     t_str = ''
     running_str =''
@@ -540,8 +549,14 @@ def hyperfine_like(model_list, spawn_step, model_dict, log_file):
     return new_models    
         
 
-def test_multidimensional(model_list, spawn_step, log_file):
+def test_multidimensional(
+    model_list, 
+    spawn_step, 
+    log_file
+):
     
+    # a test generation rule to check if QMD still works across dimensions. 
+
     new_models = []
     
     for m in model_list:
@@ -575,5 +590,22 @@ def test_multidimensional(model_list, spawn_step, log_file):
 
 
 
+
+##### Wrapper function and dict
+
+model_generation_functions = {
+    'simple_ising' : simple_ising,
+    'ising_non_transverse' : ising_non_transverse,
+    'ising_transverse' : ising_transverse,
+    'two_qubit_ising_rotation_hyperfine' : hyperfine_like,
+    'two_qubit_ising_rotation_hyperfine_transverse' : hyperfine_like,
+    'hyperfine_like' : hyperfine_like,
+    'test_multidimensional' : test_multidimensional,
+}
+
+def new_model_generator(generator, **kwargs):
+    model_func = model_generation_functions[generator]
+    print("Using model generation function:", model_func)
+    return model_func(**kwargs)
 
 

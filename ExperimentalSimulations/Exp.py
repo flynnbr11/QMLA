@@ -27,6 +27,7 @@ import ExperimentalDataFunctions as expdt
 from QMD import QMD #  class moved to QMD in Library
 import QML
 import Evo
+import ExpectationValues
 import ModelGeneration 
 import matplotlib.pyplot as plt
 #from pympler import asizeof
@@ -156,17 +157,17 @@ if os.path.isfile(true_expectation_value_path) == False:
     true_expec_values = {}
     # TODO this probe not always appropriate?
     # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe - use qmd.PlotProbe
-    probe = Evo.n_qubit_plus_state(true_num_qubits)
+    probe = ExpectationValues.n_qubit_plus_state(true_num_qubits)
     for t in plot_times:
         if global_variables.use_experimental_data:
-            expec_val = Evo.expectation_value_wrapper(
+            expec_val = ExpectationValues.expectation_value_wrapper(
                 method=global_variables.measurement_type,
                 ham = true_ham,
                 t = t,
                 state = probe
             )
         else:
-            true_expec_values[t] = Evo.expectation_value_wrapper(
+            true_expec_values[t] = ExpectationValues.expectation_value_wrapper(
                 method=global_variables.measurement_type,
                 ham = true_ham, 
                 t=t, 

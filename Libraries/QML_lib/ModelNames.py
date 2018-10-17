@@ -320,14 +320,18 @@ Assign each generation rule a latex name mapping
 """
 latex_naming_functions = {
 	None : default_latex_wrapping,
-	'two_qubit_ising_rotation_hyperfine' : latex_name_ising, 
-	'two_qubit_ising_rotation_hyperfine_transverse' : latex_name_ising, 
+	'two_qubit_ising_rotation_hyperfine' : 
+		latex_name_ising, 
+	'two_qubit_ising_rotation_hyperfine_transverse' : 
+		latex_name_ising, 
 }
 
 all_models_functions = {
 	None : ising_terms_rotation_hyperfine,
-	'two_qubit_ising_rotation_hyperfine' : ising_terms_rotation_hyperfine, 
-	'two_qubit_ising_rotation_hyperfine_transverse' : ising_terms_full_list, 
+	'two_qubit_ising_rotation_hyperfine' : 
+		ising_terms_rotation_hyperfine, 
+	'two_qubit_ising_rotation_hyperfine_transverse' : 
+		ising_terms_full_list, 
 }
 
 
@@ -357,7 +361,7 @@ def get_all_model_names(
 	**kwargs
 ):
 	all_models = all_models_functions[growth_generator]
-	print("all model function:", all_models)
+	# print("all model function:", all_models)
 	return all_models(**kwargs)
 
 

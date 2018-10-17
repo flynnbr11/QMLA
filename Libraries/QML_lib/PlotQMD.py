@@ -28,10 +28,11 @@ from matplotlib.projections import register_projection
 #from QMD import  *
 #from QML import *
 import DataBase
-import Evo as evo
+import Evo 
+import ExpectationValues
 import ExperimentalDataFunctions as expdt
 import ModelNames
-
+# import UserFunctions
 
 
 #### Hinton Diagram ####
@@ -146,7 +147,7 @@ def ExpectationValuesTrueSim(
 
         if plus_probe:
             # true_probe = plus_plus
-            true_probe = evo.n_qubit_plus_state(true_dim)
+            true_probe = ExpectationValues.n_qubit_plus_state(true_dim)
         else:
             true_probe = qmd.ProbeDict[(probe_id,true_dim)]
 
@@ -168,7 +169,7 @@ def ExpectationValuesTrueSim(
                 true_ham = time_ind_true_ham
 
             try:
-                    expec = evo.expectation_value_wrapper(
+                    expec = ExpectationValues.expectation_value_wrapper(
                         method=qmd.MeasurementType,
                         ham = true_ham, 
                         t=t, 
@@ -177,8 +178,8 @@ def ExpectationValuesTrueSim(
 
 
                 # if use_experimental_data:
-                #     # expec = evo.hahn_evolution(
-                #     expec = evo.expectation_value_wrapper(
+                #     # expec = ExpectationValues.hahn_evolution(
+                #     expec = ExpectationValues.expectation_value_wrapper(
                 #         method='hahn',
                 #         ham = true_ham, 
                 #         t=t, 
@@ -187,8 +188,8 @@ def ExpectationValuesTrueSim(
 
                 # else: # Tracing out second qubit and projecting on plus for simulated case.
                 #     # TODO if simulated, have access to full measurement so plot that?
-                #     # expec = evo.traced_expectation_value_project_one_qubit_plus(
-                #     expec = evo.expectation_value_wrapper(
+                #     # expec = ExpectationValues.traced_expectation_value_project_one_qubit_plus(
+                #     expec = ExpectationValues.expectation_value_wrapper(
                 #         method='trace_all_but_first',
                 #         ham = true_ham, 
                 #         t=t, 
@@ -243,7 +244,7 @@ def ExpectationValuesTrueSim(
             times_learned = mod.Times
             sim_dim = DataBase.get_num_qubits(mod.Name)
             if plus_probe:
-                sim_probe = evo.n_qubit_plus_state(sim_dim)
+                sim_probe = ExpectationValues.n_qubit_plus_state(sim_dim)
             else:
                 sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
             colour_id = int(i%len(sim_colours))
@@ -261,7 +262,7 @@ def ExpectationValuesTrueSim(
                     )
                 except:
 
-                        expec = evo.expectation_value_wrapper(
+                        expec = ExpectationValues.expectation_value_wrapper(
                             method=qmd.MeasurementType,
                             ham=sim_ham, 
                             t=t,
@@ -270,8 +271,8 @@ def ExpectationValuesTrueSim(
 
                         sim_expec_values.append(expec)
                     # if use_experimental_data:
-                    #      # expec = evo.hahn_evolution(
-                    #      expec = evo.expectation_value_wrapper(
+                    #      # expec = ExpectationValues.hahn_evolution(
+                    #      expec = ExpectationValues.expectation_value_wrapper(
                     #         method='hahn',
                     #         ham=sim_ham, 
                     #         t=t,
@@ -279,8 +280,8 @@ def ExpectationValuesTrueSim(
                     #     ) 
 
                     # else:
-                    #     # expec = evo.traced_expectation_value_project_one_qubit_plus(
-                    #     expec = evo.expectation_value_wrapper(
+                    #     # expec = ExpectationValues.traced_expectation_value_project_one_qubit_plus(
+                    #     expec = ExpectationValues.expectation_value_wrapper(
                     #         method='trace_all_but_first',
                     #         ham=sim_ham, 
                     #         t=t,
@@ -458,7 +459,7 @@ def ExpectationValuesQHL_TrueModel(
                 true_ham = time_ind_true_ham
         
             try:
-                    expec = evo.expectation_value_wrapper(
+                    expec = ExpectationValues.expectation_value_wrapper(
                         method=qmd.MeasurementType,
                         ham = true_ham, 
                         t=t, 
@@ -466,8 +467,8 @@ def ExpectationValuesQHL_TrueModel(
                     )
 
                 # if use_experimental_data: 
-                #     # expec = evo.hahn_evolution(
-                #     expec = evo.expectation_value_wrapper(
+                #     # expec = ExpectationValues.hahn_evolution(
+                #     expec = ExpectationValues.expectation_value_wrapper(
                 #         method='hahn',
                 #         ham = true_ham, 
                 #         t=t, 
@@ -475,8 +476,8 @@ def ExpectationValuesQHL_TrueModel(
                 #     )
 
                 # else:
-                #     # expec = evo.traced_expectation_value_project_one_qubit_plus(
-                #     expec = evo.expectation_value_wrapper(
+                #     # expec = ExpectationValues.traced_expectation_value_project_one_qubit_plus(
+                #     expec = ExpectationValues.expectation_value_wrapper(
                 #         method='trace_all_but_first',
                 #         ham = true_ham, 
                 #         t=t, 
@@ -519,7 +520,7 @@ def ExpectationValuesQHL_TrueModel(
         sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
         colour_id = int(i%len(sim_colours))
         sim_col = sim_colours[colour_id]
-#        sim_expec_values = [evo.expectation_value(ham=sim_ham, t=t,
+#        sim_expec_values = [ExpectationValues.expectation_value(ham=sim_ham, t=t,
 #            state=sim_probe) for t in times
 #        ]
 
@@ -531,8 +532,8 @@ def ExpectationValuesQHL_TrueModel(
 
         sim_expec_values = []
         for t in times:
-            # ex_val = evo.hahn_evolution(
-            ex_val = evo.expectation_value_wrapper(
+            # ex_val = ExpectationValues.hahn_evolution(
+            ex_val = ExpectationValues.expectation_value_wrapper(
                 method=qmd.MeasurementType,
                 ham=sim_ham, 
                 t=t,
@@ -544,8 +545,8 @@ def ExpectationValuesQHL_TrueModel(
 
  #            sim_expec_values = []
  #            for t in times:
- #                # ex_val = evo.hahn_evolution(
- #                ex_val = evo.expectation_value_wrapper(
+ #                # ex_val = ExpectationValues.hahn_evolution(
+ #                ex_val = ExpectationValues.expectation_value_wrapper(
  #                    method='hahn',
  #                    ham=sim_ham, 
  #                    t=t,
@@ -558,8 +559,8 @@ def ExpectationValuesQHL_TrueModel(
             
  #        else:
  #            sim_expec_values = [
- #                # evo.traced_expectation_value_project_one_qubit_plus(
- #                evo.expectation_value_wrapper(
+ #                # ExpectationValues.traced_expectation_value_project_one_qubit_plus(
+ #                ExpectationValues.expectation_value_wrapper(
  #                    method='trace_all_but_first',
  #                    ham=sim_ham, 
  #                    t=t,
@@ -957,7 +958,7 @@ def r_squared_from_epoch_list(
         r_squared_by_epoch = {}
         
         mod_num_qubits = DataBase.get_num_qubits(mod.Name)
-        probe = evo.n_qubit_plus_state(mod_num_qubits)
+        probe = ExpectationValues.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.NumExperiments-1])
         if len(mod.ResampleEpochs) > 0:
             epochs.extend(mod.ResampleEpochs)
@@ -969,8 +970,8 @@ def r_squared_from_epoch_list(
             ham = np.tensordot(mod.TrackEval[ epoch ], mod.SimOpList , axes=1)
             sum_of_residuals = 0
             for t in exp_times:
-                # sim = evo.hahn_evolution(
-                sim = evo.expectation_value_wrapper(
+                # sim = ExpectationValues.hahn_evolution(
+                sim = ExpectationValues.expectation_value_wrapper(
                     method=qmd.MeasurementType,
                     ham=ham, 
                     t=t, 
@@ -1637,7 +1638,7 @@ def colour_dicts_from_win_count(
             return_branch_dict='latex_terms').keys(
         )
     )
-    print("colour dict function. all_models:\n", all_models)
+    # print("colour dict function. all_models:\n", all_models)
 
     for k in range(num_colours):
         colour_by_win_count[k] = col_space[k]
@@ -2480,7 +2481,7 @@ def get_bayes_latex_dict(qmd):
     return latex_dict
 
 
-
+"""
 def ising_terms_rotation_hyperfine(return_branch_dict=None):
     pauli_terms = ['x','y','z']
 
@@ -2694,6 +2695,7 @@ def ising_terms_full_list(return_branch_dict=None):
         
     else:
         return latex_terms
+"""
 
 def global_adjacent_branch_test(a,b, term_branches):
     branch_a = term_branches[a]

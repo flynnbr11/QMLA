@@ -198,12 +198,12 @@ class QMD():
             )
 
             # plot_probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe
-            plot_probe =  evo.n_qubit_plus_state(self.TrueOpDim)  # TODO generalise probe
+            plot_probe =  ExpectationValues.n_qubit_plus_state(self.TrueOpDim)  # TODO generalise probe
             for t in self.PlotTimes:
                 # TODO is this the right expectation value func???
                 self.ExperimentalMeasurements[t] = (
-                    # evo.traced_expectation_value_project_one_qubit_plus(
-                    evo.expectation_value_wrapper(
+                    # ExpectationValues.traced_expectation_value_project_one_qubit_plus(
+                    ExpectationValues.expectation_value_wrapper(
                         method=self.MeasurementType,
                         ham = self.TrueHamiltonian,
                         t = t, 
@@ -1270,15 +1270,23 @@ class QMD():
         options=['x', 'y', 'z'] # append best model with these options
         
         if single_champion:
-            new_models = ModelGeneration.new_model_list(model_list=[overall_champ],
-                generator='simple_ising',model_dict=self.model_lists,
-                log_file=self.log_file, options=options
+            # new_models = ModelGeneration.new_model_list(
+            new_models = ModelGeneration.new_model_generator(
+                generator='simple_ising',
+                model_list=[overall_champ],
+                model_dict=self.model_lists,
+                log_file=self.log_file, 
+                options=options
             )
         else: 
-            new_models = ModelGeneration.new_model_list(model_list=branch_champions,
-            generator='simple_ising', model_dict=self.model_lists,
-            log_file=self.log_file, options=options
-        )
+            # new_models = ModelGeneration.new_model_list(
+            new_models = ModelGeneration.new_model_generator(
+                generator='simple_ising', 
+                model_list=branch_champions,
+                model_dict=self.model_lists,
+                log_file=self.log_file, 
+                options=options
+            )
         
         self.log_print(["New models to add to new branch : ", new_models])
         self.newBranch(model_list=new_models) 
@@ -1291,9 +1299,13 @@ class QMD():
         best_model_names = [DataBase.model_name_from_id(self.db, mod_id) for
             mod_id in best_models 
         ]
-        new_models = ModelGeneration.new_model_list(model_list=best_model_names,
-            spawn_depth=self.SpawnDepth, model_dict=self.model_lists,
-            log_file=self.log_file, generator=self.GrowthGenerator
+        # new_models = ModelGeneration.new_model_list(
+        new_models = ModelGeneration.new_model_generator(
+            generator=self.GrowthGenerator,
+            model_list=best_model_names,
+            spawn_step=self.SpawnDepth, 
+            model_dict=self.model_lists,
+            log_file=self.log_file, 
         )
         
         self.log_print(["New models to add to new branch : ", new_models])

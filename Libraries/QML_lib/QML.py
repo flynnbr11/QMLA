@@ -4,7 +4,9 @@ import scipy as sp
 import os 
 import time
 import qinfer as qi
-import Evo as evo
+import Evo
+import ExpectationValues
+# import UserFunctions
 import Distrib as Distributions
 import GenSimQMD_IQLE as gsi
 import ExperimentalDataFunctions as expdt
@@ -712,9 +714,9 @@ class reducedModel():
     ):
         # TODO expectation_values dict only for |++> probe as is.
         if probe is None:
-            probe  = evo.n_qubit_plus_state(self.NumQubits)
+            probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
         for t in times:
-                self.expectation_values[t] = evo.expectation_value_wrapper(
+                self.expectation_values[t] = ExpectationValues.expectation_value_wrapper(
                     method=self.MeasurementType,
                     ham = self.LearnedHamiltonian, 
                     t = t,
@@ -722,8 +724,8 @@ class reducedModel():
                 )
 
             # if self.UseExperimentalData:
-            #     # self.expectation_values[t] = evo.hahn_evolution(
-            #     self.expectation_values[t] = evo.expectation_value_wrapper(
+            #     # self.expectation_values[t] = Evo.hahn_evolution(
+            #     self.expectation_values[t] = Evo.expectation_value_wrapper(
             #         method='hahn',
             #         ham = self.LearnedHamiltonian, 
             #         t = t,
@@ -732,8 +734,8 @@ class reducedModel():
 
             # else:
             #     self.expectation_values[t] = (
-            #         # evo.traced_expectation_value_project_one_qubit_plus(
-            #         evo.expectation_value_wrapper(
+            #         # Evo.traced_expectation_value_project_one_qubit_plus(
+            #         Evo.expectation_value_wrapper(
             #             method='trace_all_but_first',
             #             ham = self.LearnedHamiltonian, 
             #             t = t,
@@ -760,7 +762,7 @@ class reducedModel():
             self.ExperimentalMeasurements[t] for t in exp_times
         ]
         # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
-        probe  = evo.n_qubit_plus_state(self.NumQubits)
+        probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
 
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
@@ -778,20 +780,20 @@ class reducedModel():
                 sim = self.expectation_values[t]
             else:
                 # if self.UseExperimentalData==True:
-                #     # sim = evo.hahn_evolution(
-                #     sim = evo.expectation_value_wrapper(
+                #     # sim = ExpectationValues.hahn_evolution(
+                #     sim = ExpectationValues.expectation_value_wrapper(
                 #         method='hahn',
                 #         ham=ham, t=t, state=probe
                 #     )
 
                 # else:
-                #     # sim = evo.traced_expectation_value_project_one_qubit_plus(
-                #     sim = evo.expectation_value_wrapper(
+                #     # sim = ExpectationValues.traced_expectation_value_project_one_qubit_plus(
+                #     sim = ExpectationValues.expectation_value_wrapper(
                 #         method='trace_all_but_first',
                 #         ham=ham, t=t, state=probe
                 #     )
 
-                sim = evo.expectation_value_wrapper(
+                sim = ExpectationValues.expectation_value_wrapper(
                     method=self.MeasurementType,
                     ham=ham, t=t, state=probe
                 )
@@ -827,7 +829,7 @@ class reducedModel():
             self.ExperimentalMeasurements[t] for t in exp_times
         ]
         # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
-        probe  = evo.n_qubit_plus_state(self.NumQubits)
+        probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
 
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
@@ -851,7 +853,7 @@ class reducedModel():
                 list(self.expectation_values.keys())
             )
             for t in exp_times:
-                sim = evo.expectation_value_wrapper(
+                sim = ExpectationValues.expectation_value_wrapper(
                     method=self.MeasurementType,
                     ham=ham, 
                     t=t, 
@@ -859,16 +861,16 @@ class reducedModel():
                 )
 
                 # if self.UseExperimentalData==True:
-                #     # sim = evo.hahn_evolution(
-                #     sim = evo.expectation_value_wrapper(
+                #     # sim = ExpectationValues.hahn_evolution(
+                #     sim = ExpectationValues.expectation_value_wrapper(
                 #         method='hahn',
                 #         ham=ham, 
                 #         t=t, 
                 #         state=probe
                 #     )
                 # else:
-                #     # sim = evo.traced_expectation_value_project_one_qubit_plus(
-                #     sim = evo.expectation_value_wrapper(
+                #     # sim = ExpectationValues.traced_expectation_value_project_one_qubit_plus(
+                #     sim = ExpectationValues.expectation_value_wrapper(
                 #         method='trace_all_but_first',
                 #         ham=ham, 
                 #         t=t, 
