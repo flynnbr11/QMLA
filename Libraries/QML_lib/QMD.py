@@ -243,7 +243,8 @@ class QMD():
 
 
         self.write_log_file = open(self.log_file, 'a')
-        self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(
+        # self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(
+        self.MaxSpawnDepth = UserFunctions.max_spawn_depth(
             self.GrowthGenerator, log_file=self.log_file
         )
             

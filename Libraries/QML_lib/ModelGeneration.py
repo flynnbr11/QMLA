@@ -38,6 +38,17 @@ def time_seconds():
     time = str(str(hour)+':'+str(minute)+':'+str(second))
     return time
 
+def log_print(to_print_list, log_file):
+    identifier = str(str(time_seconds()) +" [MOD_GEN]")
+    if type(to_print_list)!=list:
+        to_print_list = list(to_print_list)
+
+    print_strings = [str(s) for s in to_print_list]
+    to_print = " ".join(print_strings)
+    with open(log_file, 'a') as write_log_file:
+        print(identifier, str(to_print), file=write_log_file, flush=True)
+
+"""
 
 max_spawn_depth_info = {
     'qhl_TEST' : 2, 
@@ -51,15 +62,7 @@ max_spawn_depth_info = {
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
     'test_multidimensional' : 10
 }
-def log_print(to_print_list, log_file):
-    identifier = str(str(time_seconds()) +" [MOD_GEN]")
-    if type(to_print_list)!=list:
-        to_print_list = list(to_print_list)
 
-    print_strings = [str(s) for s in to_print_list]
-    to_print = " ".join(print_strings)
-    with open(log_file, 'a') as write_log_file:
-        print(identifier, str(to_print), file=write_log_file, flush=True)
 
 
 def max_spawn_depth(generator, log_file):
@@ -68,7 +71,6 @@ def max_spawn_depth(generator, log_file):
     else:
         return max_spawn_depth_info[generator]
 
-"""
 def new_model_list(model_list, spawn_depth, model_dict, log_file, 
     options=['x', 'y', 'z'], generator='simple_ising'
 ):

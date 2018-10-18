@@ -29,6 +29,18 @@ import ModelGeneration
 import ModelNames 
 import ExpectationValues
 
+
+def log_print(to_print_list, log_file):
+    identifier = str(str(time_seconds()) +" [MOD_GEN]")
+    if type(to_print_list)!=list:
+        to_print_list = list(to_print_list)
+
+    print_strings = [str(s) for s in to_print_list]
+    to_print = " ".join(print_strings)
+    with open(log_file, 'a') as write_log_file:
+        print(identifier, str(to_print), file=write_log_file, flush=True)
+
+
 ##### ---------- -------------------- #####  
 # Measurement/Expectation Values
 ##### ---------- -------------------- #####  
@@ -50,12 +62,33 @@ def expectation_value_wrapper(method, **kwargs):
     expectation_value_function = expec_val_function_dict[method]
     return expectation_value_function(**kwargs)
 
-    
-
 
 ##### ---------- -------------------- #####  
 # Model Generation
+# Here you must also define how many growth steps to allow 
+# the decision tree to undergo, in max_spawn_depth_info. 
 ##### ---------- -------------------- #####  
+
+max_spawn_depth_info = {
+    'qhl_TEST' : 2, 
+    'simple_ising' : 1,
+    'hyperfine' : 3,
+    'ising_non_transverse' : 5,
+    'ising_transverse' : 11,
+    'hyperfine_like' : 8,
+    'two_qubit_ising_rotation' : 2,
+    'two_qubit_ising_rotation_hyperfine' : 5,
+    'two_qubit_ising_rotation_hyperfine_transverse' : 8,
+    'test_multidimensional' : 10
+}
+
+
+def max_spawn_depth(generator, log_file):
+    if generator not in max_spawn_depth_info:
+        log_print(["Generator not recognised; does not have maximum spawn depth or generation function"], log_file)
+    else:
+        return max_spawn_depth_info[generator]
+
 
 model_generation_functions = {
 	# growth_generation_rule : growth_function
@@ -77,14 +110,13 @@ model_generation_functions = {
 
 def new_model_generator(generator, **kwargs):
     model_func = model_generation_functions[generator]
-    print("[User funcs] Using model generation function:", model_func)
+    # print("[User funcs] Using model generation function:", model_func)
     return model_func(**kwargs)
 
 
 ##### ---------- -------------------- #####  
 # Mapping model name strings to latex representation
 ##### ---------- -------------------- #####  
-
 
 latex_naming_functions = {
 	# growth_generation_rule : latex_mapping_function
@@ -117,7 +149,6 @@ def get_latex_name(
 # All possible models according to this growth rule
 # primarily just for tree plotting
 ##### ---------- -------------------- #####  
-
 
 all_models_functions = {
 	None : 
