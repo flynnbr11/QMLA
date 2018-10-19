@@ -179,6 +179,9 @@ class QMD():
         self.BayesPointsByBranch ={}
         self.BranchRankings = {}
         self.BranchBayesComputed = {}
+        self.BranchModels = { 0 : self.InitialOpList}
+        self.BranchPrecomputedModels = {0 : []}
+        self.BranchModelIds = {0 : list(range(len(self.InitialOpList)))}
         self.InterBranchChampions = {}
         self.GlobalEpoch = 0 
         self.MeasurementType = measurement_type
@@ -230,6 +233,7 @@ class QMD():
         self.NumModelPairsPerBranch = {0 : num_pairs_in_list(len(self.InitialOpList))}
         self.BranchAllModelsLearned = { 0 : False}
         self.BranchComparisonsComplete = {0 : False}
+        self.BranchNumModelsPreComputed = {0 : 0}
         self.Q_id = q_id
         self.HostName = host_name
         self.PortNumber = port_number
@@ -448,6 +452,19 @@ class QMD():
             if DataBase.get_num_qubits(model) > self.HighestQubitNumber:
                 self.HighestQubitNumber = DataBase.get_num_qubits(model)
 
+        # retrieve model_id from database? or somewhere
+        model_id = DataBase.model_id_from_name(
+            db = self.db, 
+            name = model    
+        )
+
+        add_model_output = {
+            'is_new_model' : tryAddModel, 
+            'model_id' : model_id,
+        }
+
+        return add_model_output
+
     def delete_unpicklable_attributes(self):
         del self.redis_conn
         del self.rq_queue
@@ -464,8 +481,57 @@ class QMD():
         self.BranchAllModelsLearned[branchID] = False
         self.BranchComparisonsComplete[branchID] = False
         
+        self.log_print(
+            [
+            'Branch', branchID, 
+            'has', num_models, ' new models:',  
+            model_list
+            ]
+        )
+        pre_computed_models = []
+        num_models_already_computed_this_branch = 0
         for model in model_list:
-            self.addModel(model, branchID=branchID)
+            # addModel returns whether adding model was successful
+            # if false, that's because it's already been computed
+            add_model_info = self.addModel(model, branchID=branchID)
+            already_computed = not(
+                add_model_info['is_new_model']
+            )
+            model_id = add_model_info['model_id']
+
+            self.log_print(
+                [
+                'Model ', model, 
+                ' computed already: ', already_computed, 
+                'ID:', model_id
+                ]
+            )
+            num_models_already_computed_this_branch += bool(already_computed)
+            if already_computed==True: 
+                pre_computed_models.append(model)
+
+        model_id_list = []
+        for model in model_list:
+            m_id = DataBase.model_id_from_name(self.db, model)
+            model_id_list.append(m_id)
+
+        self.BranchNumModelsPreComputed[branchID] = num_models_already_computed_this_branch
+        self.BranchModels[branchID] = model_list
+        self.BranchPrecomputedModels[branchID] = pre_computed_models
+
+        self.BranchModelIds[branchID] = model_id_list
+
+        self.log_print(
+            [
+            'Num models already computed on branch ', 
+            branchID, 
+            '=', num_models_already_computed_this_branch,
+            # 'Branch model ids:', model_id_list
+            ]
+        )
+
+
+
         return branchID
     
     def printState(self):
@@ -546,18 +612,43 @@ class QMD():
         
 
     def learnModelFromBranchID(self, branchID, use_rq=True, blocking=False):
-        model_list = DataBase.model_names_on_branch(self.db, branchID)
+        # model_list = DataBase.model_names_on_branch(self.db, branchID)
+        model_list = self.BranchModels[branchID]
         active_branches_learning_models = \
             self.RedisDataBases['active_branches_learning_models']
-        active_branches_learning_models.set(int(branchID), 0)
+        num_models_already_set_this_branch = self.BranchNumModelsPreComputed[branchID]
+        # active_branches_learning_models.set(int(branchID), 0)
+        active_branches_learning_models.set(
+            int(branchID), 
+            num_models_already_set_this_branch
+        )
         active_branches_learning_models.set('LOCKED', 0)
 
-        for model_name in model_list:
+        unlearned_models_this_branch = list(
+            set(model_list) - 
+            set(self.BranchPrecomputedModels[branchID])
+        ) 
+        self.log_print(
+            [
+            "Branch ", branchID, 
+            "has unlearned models:", unlearned_models_this_branch
+           ]
+        )
+
+        # for model_name in model_list:
+        for model_name in unlearned_models_this_branch:
             self.log_print(["Model ", model_name, "being learned"])
             self.learnModel(model_name=model_name, use_rq=use_rq, blocking=blocking)
-            self.updateModelRecord(field='Completed', name=model_name, 
+            self.updateModelRecord(
+                field='Completed', 
+                name=model_name, 
                 new_value=True
             )
+        self.log_print(
+            [
+            'learnModelFromBranchID finished, branch', branchID
+            ]
+        )
 
         
     
@@ -699,13 +790,22 @@ class QMD():
             )
     
     def remoteBayesFromBranchID(self, branchID, remote=True, 
-        bayes_threshold=None #actually was 50
+        bayes_threshold=None, #actually was 50,
+        recompute=False
     ):
         if bayes_threshold is None: 
             bayes_threshold=self.BayesUpper
 
         active_branches_bayes = self.RedisDataBases['active_branches_bayes']
-        model_id_list = DataBase.active_model_ids_by_branch_id(self.db, branchID)
+        # model_id_list = DataBase.active_model_ids_by_branch_id(self.db, branchID)
+        model_id_list = self.BranchModelIds[branchID]
+        self.log_print(
+            [
+            'model id list, in remoteBayesFromBranchID',
+             model_id_list
+            ]
+        )
+        
         active_branches_bayes.set(int(branchID), 0) # set up branch 0
         num_models = len(model_id_list)
         for i in range(num_models):
@@ -898,9 +998,20 @@ class QMD():
                 return "b"
 
     def compareModelsWithinBranch(self, branchID, bayes_threshold=None):
-        active_models_in_branch = DataBase.active_model_ids_by_branch_id(self.db,
+
+        active_models_in_branch_old = DataBase.active_model_ids_by_branch_id(
+            self.db,
             branchID
         )
+        active_models_in_branch = self.BranchModelIds[branchID]
+        self.log_print(
+            [
+            'compareModelsWithinBranch', branchID,
+            'active_models_in_branch_old:', active_models_in_branch_old,
+            'active_models_in_branch_new:', active_models_in_branch,
+            ]
+        )
+
         if bayes_threshold is None:
             bayes_threshold=self.BayesLower
         
@@ -921,8 +1032,10 @@ class QMD():
                         models_points[mod2] += 1
                         # todo if more than one model has max points
         max_points = max(models_points.values())
-        max_points_branches = [key for key, val in models_points.items() 
-            if val==max_points]
+        max_points_branches = [
+            key for key, val in models_points.items() 
+            if val==max_points
+        ]
         
         if len(max_points_branches) > 1: 
             # todo: recompare. Fnc: compareListOfModels (rather than branch based)
@@ -1303,12 +1416,17 @@ class QMD():
             mod_id in best_models 
         ]
         # new_models = ModelGeneration.new_model_list(
+        current_champs = [
+            self.ModelNameIDs[i] for i in list(self.BranchChampions.values())
+        ]
+
         new_models = UserFunctions.new_model_generator(
             generator=self.GrowthGenerator,
             model_list=best_model_names,
             spawn_step=self.SpawnDepth, 
             model_dict=self.model_lists,
             log_file=self.log_file, 
+            current_champs = current_champs
         )
         
         self.log_print(["New models to add to new branch : ", new_models])
@@ -1457,7 +1575,8 @@ class QMD():
                     and self.BranchAllModelsLearned[branchID]==False
                 ):
                     
-                    self.log_print(["All models on branch", branchID, 
+                    self.log_print([
+                        "All models on branch", branchID, 
                         "have finished learning."]
                     )
                     self.BranchAllModelsLearned[branchID] = True

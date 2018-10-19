@@ -371,7 +371,10 @@ def ising_terms_full_list(return_branch_dict=None):
 # 	return all_models(**kwargs)
 
 
-	
+def test_return_champs_ALL_MODELS(**kwargs):
+	models = ['x', 'y', 'z', 'xPy', 'xPz', 'yPz', 'xPyPz']
+
+	return models
 	
 
 

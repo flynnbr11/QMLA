@@ -23,9 +23,6 @@ gaussian=1
 # QMD settings
 ### ---------------------------------------------------###
 exp_data=1
-sim_measurement_type='full_access'
-exp_measurement_type='hahn' # to use if not experimental
-measurement_type=$exp_measurement_type
 
 # Overwrite settings for specific cases
 """
@@ -47,9 +44,6 @@ then
     pgh=1.0
 fi
 
-# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-growth_rule='two_qubit_ising_rotation_hyperfine'
-# growth_rule='test_multidimensional' 
 use_rq=0
 further_qhl_factor=2
 plots=1
@@ -81,10 +75,21 @@ this_log="$long_dir/qmd.log"
 furhter_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
-true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# growth_rule='test_multidimensional' 
 # true_operator='xTiPPyTiPPyTy'
 # true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
+
+growth_rule='two_qubit_ising_rotation_hyperfine'
+true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+sim_measurement_type='full_access'
+exp_measurement_type='hahn' # to use if not experimental
+measurement_type=$sim_measurement_type
+
+# growth_rule='test_return_champs'
 # true_operator='x'
+# measurement_type='full_access'
+
 
 declare -a qhl_operators=(
     $true_operator

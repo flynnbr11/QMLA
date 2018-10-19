@@ -79,7 +79,8 @@ max_spawn_depth_info = {
     'two_qubit_ising_rotation' : 2,
     'two_qubit_ising_rotation_hyperfine' : 5,
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
-    'test_multidimensional' : 10
+    'test_multidimensional' : 10, 
+    'test_return_champs' : 3
 }
 
 
@@ -106,6 +107,8 @@ model_generation_functions = {
     	ModelGeneration.hyperfine_like,
     'test_multidimensional' : 
     	ModelGeneration.test_multidimensional,
+	'test_return_champs' : 
+		ModelGeneration.existing_branch_champs_test,
 }
 
 def new_model_generator(generator, **kwargs):
@@ -127,6 +130,8 @@ latex_naming_functions = {
 		ModelNames.latex_name_ising, 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		ModelNames.latex_name_ising, 
+	'test_return_champs' :
+		ModelNames.default_latex_wrapping
 }
 
 def get_latex_name(
@@ -157,6 +162,8 @@ all_models_functions = {
 		ModelNames.ising_terms_rotation_hyperfine, 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		ModelNames.ising_terms_full_list, 
+	'test_return_champs' :
+		ModelNames.test_return_champs_ALL_MODELS
 }
 def get_all_model_names(
 	growth_generator = None,

@@ -363,7 +363,11 @@ def dimensionalise_name_by_name_list(constituents, true_dim, return_operator=Fal
         return new_name
             
             
-def simple_ising(generator_list, options=['x', 'y', 'z']):
+def simple_ising(
+    generator_list, 
+    options=['x', 'y', 'z'],
+    **kwargs
+):
     new_options = []
 
     for gen in generator_list: 
@@ -403,7 +407,12 @@ def single_pauli_multiple_dim(
 
         return running_str
         
-def ising_non_transverse(model_list, spawn_step, log_file):
+def ising_non_transverse(
+    model_list, 
+    spawn_step, 
+    log_file,
+    **kwargs
+):
     single_qubit_terms = ['xTi', 'yTi', 'zTi']
     nontransverse_terms = ['xTx', 'yTy', 'zTz']
 
@@ -433,7 +442,12 @@ def ising_non_transverse(model_list, spawn_step, log_file):
     return new_models    
 
 
-def ising_transverse(model_list, spawn_step, log_file):
+def ising_transverse(
+    model_list, 
+    spawn_step, 
+    log_file,
+    **kwargs
+):
 # TODO before using this function, need to add a max_spawn_depth to the dict above for ising_transverse. How many spawns can it support?
     single_qubit_terms = ['xTi', 'yTi', 'zTi']
     nontransverse_terms = ['xTx', 'yTy', 'zTz']
@@ -474,7 +488,13 @@ def ising_transverse(model_list, spawn_step, log_file):
 
     return new_models    
 
-def hyperfine_like(model_list, spawn_step, model_dict, log_file):
+def hyperfine_like(
+    model_list, 
+    spawn_step, 
+    model_dict, 
+    log_file,
+    **kwargs
+):
 # TODO before using this function, need to add a max_spawn_depth to the dict above for ising_transverse. How many spawns can it support?
     import random
     single_qubit_terms = ['xTi', 'yTi', 'zTi']
@@ -554,7 +574,8 @@ def hyperfine_like(model_list, spawn_step, model_dict, log_file):
 def test_multidimensional(
     model_list, 
     spawn_step, 
-    log_file
+    log_file,
+    **kwargs
 ):
     
     # a test generation rule to check if QMD still works across dimensions. 
@@ -590,6 +611,51 @@ def test_multidimensional(
     return new_models
 
 
+def p_t_actions(name):
+    num_qubits = DataBase.get_num_qubits(name)
+
+    p_str = 'P'
+    t_str = ''
+
+    for i in range(num_qubits-1):
+        p_str+='P'
+        t_str+='T'
+
+    actions = {
+        'p' : p_str,
+        't' : t_str
+    }
+
+    return actions    
+
+
+
+def existing_branch_champs_test(    
+    model_list, 
+    spawn_step, 
+    model_dict, 
+    log_file,
+    current_champs
+):
+    new_models = []
+    
+    for name in model_list:
+        actions = p_t_actions(model_list)
+        p_str = actions['p']
+        one_qubit_terms = ['x', 'y', 'z']
+        individual_terms = name.split(p_str)
+        
+        remaining_terms = list( set(one_qubit_terms) - set(individual_terms) )
+        if spawn_step < 3 : 
+            for term in remaining_terms:
+                new_mod = str(name)
+                new_mod += str(p_str + term)
+                new_models.append(new_mod)
+        else: 
+            # current_champs.append('xPyPzPi')
+            return current_champs
+            
+    return new_models
 
 
 
