@@ -12,8 +12,8 @@ do_further_qhl=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=20
-exp=5
+prt=500
+exp=100
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -22,7 +22,7 @@ gaussian=1
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=1
+exp_data=0
 
 # Overwrite settings for specific cases
 """
@@ -80,15 +80,17 @@ mkdir -p $long_dir
 # true_operator='xTiPPyTiPPyTy'
 # true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
 
-growth_rule='two_qubit_ising_rotation_hyperfine'
-true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-sim_measurement_type='full_access'
-exp_measurement_type='hahn' # to use if not experimental
-measurement_type=$sim_measurement_type
+# growth_rule='two_qubit_ising_rotation_hyperfine'
+# true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+# sim_measurement_type='full_access'
+# exp_measurement_type='hahn' # to use if not experimental
+# measurement_type=$sim_measurement_type
 
 # growth_rule='test_return_champs'
 # true_operator='x'
-# measurement_type='full_access'
+growth_rule='non_interacting_ising'
+true_operator='xTx'
+measurement_type='full_access'
 
 
 declare -a qhl_operators=(
@@ -109,6 +111,7 @@ if (( $qhl_test == 1 )) # For QHL test always do without rq
 then
     use_rq=0
 fi
+use_rq=0
 let bt="$exp-1"
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log

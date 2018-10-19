@@ -377,6 +377,41 @@ def test_return_champs_ALL_MODELS(**kwargs):
 	return models
 	
 
+def non_interacting_model(core_pauli, num_qubits):
+    
+    t_str = ''
+    model = core_pauli
+    for i in range(num_qubits):
+        t_str+='T'
+        model += str(t_str +core_pauli)
+        
+    return model
+
+
+
+
+def non_interacting_ising_all_names(**kwargs):
+	core_paulis = ['x', 'y', 'z']
+	num_qubits = 5
+
+	models_on_branches ={}
+	for i in range(num_qubits):
+	    models_on_branches[i] = [non_interacting_model(p, i) for p in core_paulis]
+	
+	branch_values = list(models_on_branches.values())
+	all_models = [
+		item for sublist in branch_values 
+		for item in sublist
+	]	
+
+	try:
+		if return_branch_dict=='branches':
+		    return all_models
+		elif return_branch_dict=='terms':
+		    return models_on_branches
+	except:
+		return all_models		
+
 
 
 

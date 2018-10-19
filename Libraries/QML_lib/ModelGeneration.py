@@ -658,6 +658,18 @@ def existing_branch_champs_test(
     return new_models
 
 
+def non_interacting_ising(model_list, **kwargs):
+    new_models = []
+    for mod in model_list:
+        t_str = p_t_actions(mod)['t']
+        core_pauli = mod[0]
+        new_t_str = str( t_str + 'T')
+        new_model = str(mod + new_t_str + core_pauli)        
+
+        new_models.append(new_model)
+    return new_models
+
+
 
 # ##### Wrapper function and dict
 

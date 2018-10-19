@@ -80,7 +80,8 @@ max_spawn_depth_info = {
     'two_qubit_ising_rotation_hyperfine' : 5,
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
     'test_multidimensional' : 10, 
-    'test_return_champs' : 3
+    'test_return_champs' : 3,
+    'non_interacting_ising' : 3
 }
 
 
@@ -109,6 +110,8 @@ model_generation_functions = {
     	ModelGeneration.test_multidimensional,
 	'test_return_champs' : 
 		ModelGeneration.existing_branch_champs_test,
+	'non_interacting_ising': 
+		ModelGeneration.non_interacting_ising
 }
 
 def new_model_generator(generator, **kwargs):
@@ -116,11 +119,16 @@ def new_model_generator(generator, **kwargs):
     # print("[User funcs] Using model generation function:", model_func)
     return model_func(**kwargs)
 
+
+##### ---------- -------------------- #####  
+# Functions to check whether the tree being learned is completed. 
+# E.g. by checking if it is at maximum depth (spawn_depth).
+##### ---------- -------------------- #####  
+
 tree_finished_functions = {
 	None : 
 		ModelGeneration.spawn_depth_check
 }
-
 
 def tree_finished(generator, **kwargs):
 	try:
@@ -133,8 +141,8 @@ def tree_finished(generator, **kwargs):
 		max_spawn_depth_info = max_spawn_depth_info,
 		**kwargs
 	)
-	print("[tree finished] func:", tree_finished_check)
-	print("tree completed:", tree_completed)
+	# print("[tree finished] func:", tree_finished_check)
+	# print("tree completed:", tree_completed)
 	return tree_completed 		
 
 
@@ -184,7 +192,10 @@ all_models_functions = {
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		ModelNames.ising_terms_full_list, 
 	'test_return_champs' :
-		ModelNames.test_return_champs_ALL_MODELS
+		ModelNames.test_return_champs_ALL_MODELS,
+	'non_interacting_ising' :
+		ModelNames.non_interacting_ising_all_names  
+
 }
 def get_all_model_names(
 	growth_generator = None,

@@ -108,7 +108,7 @@ def ExpectationValuesTrueSim(
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
         true_expec_values = []
 
-        print("true ham:", time_ind_true_ham)
+        # print("true ham:", time_ind_true_ham)
         for t in times:
             if qmd.UseTimeDepTrueModel:
                 # Multiply time dependent parameters by time value

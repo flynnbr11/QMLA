@@ -230,7 +230,9 @@ class QMD():
         self.GrowthGenerator = growth_generator
         self.SpawnDepth = 0
         self.NumModelsPerBranch = {0:len(self.InitialOpList)}
-        self.NumModelPairsPerBranch = {0 : num_pairs_in_list(len(self.InitialOpList))}
+        self.NumModelPairsPerBranch = {
+            0 : num_pairs_in_list(len(self.InitialOpList))
+        }
         self.BranchAllModelsLearned = { 0 : False}
         self.BranchComparisonsComplete = {0 : False}
         self.BranchNumModelsPreComputed = {0 : 0}
@@ -248,9 +250,9 @@ class QMD():
 
         self.write_log_file = open(self.log_file, 'a')
         # self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(
-        self.MaxSpawnDepth = UserFunctions.max_spawn_depth(
-            self.GrowthGenerator, log_file=self.log_file
-        )
+        # self.MaxSpawnDepth = UserFunctions.max_spawn_depth(
+        #     self.GrowthGenerator, log_file=self.log_file
+        # )
             
         try:
             from rq import Connection, Queue, Worker

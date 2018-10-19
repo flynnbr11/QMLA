@@ -129,8 +129,8 @@ if global_variables.use_experimental_data==True:
 
 # initial_op_list = ['xTx', 'xTy', 'xTz']
 # initial_op_list = ['xTi', 'xTiPPyTi', 'zTiTTi']
-initial_op_list = ['xTi', 'yTi', 'zTi']
-# initial_op_list = ['x', 'y', 'z']
+# initial_op_list = ['xTi', 'yTi', 'zTi']
+initial_op_list = ['x', 'y', 'z']
 
 
 true_op = global_variables.true_operator
