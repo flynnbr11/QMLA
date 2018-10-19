@@ -116,6 +116,27 @@ def new_model_generator(generator, **kwargs):
     # print("[User funcs] Using model generation function:", model_func)
     return model_func(**kwargs)
 
+tree_finished_functions = {
+	None : 
+		ModelGeneration.spawn_depth_check
+}
+
+
+def tree_finished(generator, **kwargs):
+	try:
+		tree_finished_check = tree_finished_functions[generator]
+	except:
+		tree_finished_check = tree_finished_functions[None]
+
+	tree_completed = tree_finished_check(
+		generator = generator, 
+		max_spawn_depth_info = max_spawn_depth_info,
+		**kwargs
+	)
+	print("[tree finished] func:", tree_finished_check)
+	print("tree completed:", tree_completed)
+	return tree_completed 		
+
 
 ##### ---------- -------------------- #####  
 # Mapping model name strings to latex representation

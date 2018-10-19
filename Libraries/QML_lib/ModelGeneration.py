@@ -109,7 +109,7 @@ def new_model_list(model_list, spawn_depth, model_dict, log_file,
 
 
 ##################################################################################
-##################### Other Functions ############################################
+##################### Model Generation Functions ############################################
 ##################################################################################
 
 
@@ -675,5 +675,22 @@ def existing_branch_champs_test(
 #     model_func = model_generation_functions[generator]
 #     print("Using model generation function:", model_func)
 #     return model_func(**kwargs)
+
+
+##################################################################################
+##################### Tree Finished Functions ############################################
+##################################################################################
+
+
+def spawn_depth_check(
+    generator,
+    max_spawn_depth_info,
+    spawn_step, 
+):
+    if spawn_step == max_spawn_depth_info[generator]:
+        return True 
+    else:
+        return False
+
 
 

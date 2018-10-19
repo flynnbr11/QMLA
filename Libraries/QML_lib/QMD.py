@@ -1433,10 +1433,17 @@ class QMD():
         new_branch_id = self.newBranch(model_list=new_models) 
         self.learnModelFromBranchID(new_branch_id, blocking=False, use_rq=True)
         
-        if self.SpawnDepth == self.MaxSpawnDepth:
-            return True
-        else:
-            return False
+        tree_completed = UserFunctions.tree_finished(
+            generator =self.GrowthGenerator,
+            spawn_step = self.SpawnDepth
+        )
+        print("Tree completed:", tree_completed)
+        # if self.SpawnDepth == self.MaxSpawnDepth:
+        #     print("Spawn depth = max spawn depth")
+        #     return True
+        # else:
+        #     return False
+        return tree_completed            
         
 
     def runQHLTest(self):
