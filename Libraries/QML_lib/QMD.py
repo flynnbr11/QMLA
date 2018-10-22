@@ -1919,6 +1919,7 @@ class QMD():
     def plotExpecValues(self, model_ids=None, 
         times=None,
         champ=True, max_time=1.8,
+        plus_probe=False, 
         t_interval=0.3, save_to_file=None
     ):
     
@@ -1926,6 +1927,7 @@ class QMD():
             qmd=self, 
             model_ids=model_ids, champ=champ, 
             times=times, 
+            plus_probe=plus_probe,
             max_time=max_time, t_interval=t_interval,
             upper_x_lim = max_time,
             save_to_file=save_to_file

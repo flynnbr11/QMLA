@@ -103,7 +103,8 @@ def get_pr0_array_qle(
         measurement_type='full_access',
         use_experimental_data=False, use_exp_custom=True,
         exp_comparison_tol=None, enable_sparse=True, 
-        ham_list=None, log_file='QMDLog.log', log_identifier=None
+        ham_list=None, 
+        log_file='QMDLog.log', log_identifier=None
 ):
     from rq import timeouts
     print_loc(global_print_loc)
@@ -112,7 +113,9 @@ def get_pr0_array_qle(
     output = np.empty([num_particles, num_times])
     for evoId in range(num_particles): ## todo not sure about length/arrays here
         for tId in range(len(t_list)):
-            ham = np.tensordot(modelparams[evoId], oplist, axes=1)
+            ham = np.tensordot(
+                modelparams[evoId], oplist, axes=1
+            )
 
             """
             # Log print to prove True Hamiltonian is time dependent.
@@ -124,19 +127,27 @@ def get_pr0_array_qle(
                     log_file, log_identifier
                 )
             """
-                
+            
             t = t_list[tId]
             print_loc(global_print_loc)
             try:
-                    output[evoId][tId] = UserFunctions.expectation_value_wrapper(
-                    # output[evoId][tId] = ExpectationValues.expectation_value_wrapper(
-                        method=measurement_type,
-                        ham = ham,
-                        t = t,
-                        state = probe,
-                        log_file = log_file, 
-                        log_identifier = log_identifier
-                    )
+                # log_print(
+                #     [
+                #     "[getpr0] EvoID=", evoId,
+                #     "\n\tState=", probe
+                #     ], 
+                #     log_file, log_identifier
+                # )
+                output[evoId][tId] = \
+                    UserFunctions.expectation_value_wrapper(
+                # output[evoId][tId] = ExpectationValues.expectation_value_wrapper(
+                    method=measurement_type,
+                    ham = ham,
+                    t = t,
+                    state = probe,
+                    log_file = log_file, 
+                    log_identifier = log_identifier
+                )
             except NameError:
                 log_print(["Error raised; unphysical expecation value.",
                     "\nHam:\n", ham,

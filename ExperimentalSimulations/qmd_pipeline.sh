@@ -12,8 +12,8 @@ do_further_qhl=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=500
-exp=100
+prt=50
+exp=10
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -89,7 +89,7 @@ mkdir -p $long_dir
 # growth_rule='test_return_champs'
 # true_operator='x'
 growth_rule='non_interacting_ising'
-true_operator='xTx'
+true_operator='zTz'
 measurement_type='full_access'
 
 

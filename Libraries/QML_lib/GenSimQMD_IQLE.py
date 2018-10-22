@@ -21,8 +21,18 @@ global debug_log_print
 debug_log_print = False
 global likelihood_dev
 likelihood_dev = False
+def time_seconds():
+    import datetime
+    now =  datetime.date.today()
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    second = datetime.datetime.now().second
+    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    return time
 
 def log_print(to_print_list, log_file, log_identifier=None):
+    if log_identifier is None:
+        log_identifier='[GenSim]'
     identifier = str(str(time_seconds()) +" [GenSim ("+str(log_identifier)+")]")
     if type(to_print_list)!=list:
         to_print_list = list(to_print_list)
@@ -253,6 +263,16 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         ham_num_qubits = np.log2(operators[0].shape[0])
 
         # Now get pr0 and pass to likelihood function
+        # log_print(
+        #     [
+        #     '[Likelihood function]',
+        #     'true evo:', true_evo, 
+        #     'self._b=', self._b
+        #     ],
+        #     self.log_file, 
+        #     self.log_identifier
+        # )
+
 
         if true_evo and self.use_experimental_data:
             time = expparams['t']

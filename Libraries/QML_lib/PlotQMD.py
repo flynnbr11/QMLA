@@ -68,7 +68,7 @@ def ExpectationValuesTrueSim(
         model_ids.remove(qmd.ChampID)
 
     # plus_plus = np.array([0.5-0.j,  0.5-0.j, 0.5-0.j, 0.5-0.j]) # TODO generalise probe
-    # probe_id = random.choice(range(qmd.NumProbes))
+    probe_id = random.choice(range(qmd.NumProbes))
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour =  colors.cnames['lightsalmon'] #'b'

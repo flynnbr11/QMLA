@@ -131,7 +131,7 @@ if global_variables.use_experimental_data==True:
 # initial_op_list = ['xTi', 'xTiPPyTi', 'zTiTTi']
 # initial_op_list = ['xTi', 'yTi', 'zTi']
 initial_op_list = ['x', 'y', 'z']
-
+# initial_op_list = ['z']
 
 true_op = global_variables.true_operator
 true_num_qubits = DataBase.get_num_qubits(true_op)
@@ -523,13 +523,16 @@ else:
         ):
             # TODO generalise so tree diagram can be used in all cases
             # currently only useful for Ising growth 2 qubits. 
-            qmd.plotTreeDiagram(
-                save_to_file = str
-                (global_variables.plots_directory+
-                'tree_diagram_' + 
-                str(global_variables.long_id) + 
-                '.png')
-            )
+            try:
+                qmd.plotTreeDiagram(
+                    save_to_file = str
+                    (global_variables.plots_directory+
+                    'tree_diagram_' + 
+                    str(global_variables.long_id) + 
+                    '.png')
+                )
+            except:
+                pass
 
         qmd.plotRSquaredVsEpoch(
             save_to_file = str(

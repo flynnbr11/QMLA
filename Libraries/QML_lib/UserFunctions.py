@@ -31,7 +31,7 @@ import ExpectationValues
 
 
 def log_print(to_print_list, log_file):
-    identifier = str(str(time_seconds()) +" [MOD_GEN]")
+    identifier = str(str(time_seconds()) +" [USER FUNCTIONS]")
     if type(to_print_list)!=list:
         to_print_list = list(to_print_list)
 

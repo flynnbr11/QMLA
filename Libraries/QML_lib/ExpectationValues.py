@@ -25,6 +25,17 @@ if (use_linalg):
     # override and use linalg.expm even if hamiltonian_exponentiation is installed
     ham_exp_installed = False
 
+
+def log_print(to_print_list, log_file, log_identifier):
+    # identifier = str(str(time_seconds()) +" [Expectation Values]")
+    if type(to_print_list)!=list:
+        to_print_list = list(to_print_list)
+
+    print_strings = [str(s) for s in to_print_list]
+    to_print = " ".join(print_strings)
+    with open(log_file, 'a') as write_log_file:
+        print(log_identifier, str(to_print), file=write_log_file, flush=True)
+
      
 ## Partial trace functionality
  
@@ -42,6 +53,13 @@ def expectation_value(ham, t, state=None, choose_random_probe=False,
             either pass a state or set choose_random_probe=True"],
             log_file=log_file, log_identifier=log_identifier
         )
+ #    log_print(
+ #    	[
+ #    	'[Exp val func] Probe:', state
+ #    	],
+ #    	log_file=log_file,
+ #    	log_identifier=log_identifier
+	# )
     
     if compare_exp_fncs_tol is not None: # For testing custom ham-exp function
         u_psi_linalg = evolved_state(ham, t, state, 
