@@ -421,14 +421,11 @@ def non_interacting_ising_all_names(
 
     try:
         if return_branch_dict=='branches':
-            print("branches")
             return models_on_branches
         elif return_branch_dict=='terms':
-            print("all models")
             return all_models_latex
         elif return_branch_dict=='latex_terms':
-            print("latex")
-            latex_terms
+            return latex_terms
         elif return_branch_dict == 'term_branch_dict':
             return terms_by_branch
     except:

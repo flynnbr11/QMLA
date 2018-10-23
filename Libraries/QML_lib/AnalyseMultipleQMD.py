@@ -401,6 +401,7 @@ def average_parameter_estimates(
         )    
         """
         if save_to_file is not None:
+            save_file=''
             if save_to_file[-4:] == '.png':
                 partial_name = save_to_file[:-4]
                 save_file = str(partial_name + '_' + name + '.png')
@@ -496,9 +497,13 @@ def Bayes_t_test(
 
             for t in list(experimental_measurements.keys()):
                 try:
-                    expectation_values[t].append(learned_expectation_values[t])
+                    expectation_values[t].append(
+                        learned_expectation_values[t]
+                    )
                 except:
-                    expectation_values[t] = [learned_expectation_values[t]]
+                    expectation_values[t] = [
+                        learned_expectation_values[t]
+                    ]
 
         means = {}
         std_dev = {}
@@ -644,13 +649,15 @@ def Bayes_t_test(
         )    
         
         if save_to_file is not None:
-            save_to_file = save_to_file[:-4]
-            save_to_file += str(
+            save_file=''
+            save_file = save_to_file[:-4]
+            save_file = str(
+                save_to_file+
                 '_'+
                 str(term) + '.png'
             )
-            print("Saving to ",save_to_file )
-            plt.savefig(save_to_file, bbox_inches='tight')
+            # print("Saving to ",save_file )
+            plt.savefig(save_file, bbox_inches='tight')
 
 def fill_between_sigmas(
     ax, 

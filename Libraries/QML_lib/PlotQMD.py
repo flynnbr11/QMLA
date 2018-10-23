@@ -2316,7 +2316,7 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
         growth_generator = qmd.GrowthGenerator,
         return_branch_dict='latex_terms'
     )
-    # print("all models:", all_models)
+    print("all models:", all_models)
     
     if os.path.isfile(all_bayes_csv) is False:
         with open(all_bayes_csv, 'a+') as bayes_csv:
