@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=2
-qhl_test=0
+num_tests=3
+qhl_test=1
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=50
-exp=10
+prt=500
+exp=100
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -46,7 +46,7 @@ fi
 
 use_rq=0
 further_qhl_factor=2
-plots=1
+plots=0
 use_rq=0
 number_best_models_further_qhl=5
 custom_prior=1
@@ -87,7 +87,7 @@ mkdir -p $long_dir
 # measurement_type=$sim_measurement_type
 
 # growth_rule='test_return_champs'
-true_operator='zTy'
+true_operator='xTy'
 growth_rule='non_interacting_ising'
 # true_operator='xTi'
 measurement_type='full_access'

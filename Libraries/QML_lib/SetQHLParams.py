@@ -95,8 +95,8 @@ def create_qhl_params(
 	true_op, 
 	pickle_file=None,
 	random_vals=False, 
-	rand_min=-3, 
-	rand_max=3,
+	rand_min=0, 
+	rand_max=5,
 	exp_data=0
 ):
 	terms = DataBase.get_constituent_names_from_name(true_op)
@@ -141,9 +141,9 @@ def create_prior(
 	true_op, 
 	pickle_file=None,
 	random_vals=False, 
-	sigma=0.3,
+	sigma=1.5,
 	rand_min=0, 
-	rand_max=6,
+	rand_max=5,
 	exp_data=0
 ):
 #	terms = DataBase.get_constituent_names_from_name(true_op)
