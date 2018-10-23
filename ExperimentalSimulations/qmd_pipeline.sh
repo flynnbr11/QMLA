@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
+num_tests=2
 qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=500
-exp=100
+prt=50
+exp=10
 pgh=0.3
 ra=0.8
 rt=0.5
@@ -80,7 +80,7 @@ mkdir -p $long_dir
 # true_operator='xTiPPyTiPPyTy'
 # true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
 
-# growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine'
 # true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 # sim_measurement_type='full_access'
 # exp_measurement_type='hahn' # to use if not experimental
@@ -88,10 +88,10 @@ mkdir -p $long_dir
 
 # growth_rule='test_return_champs'
 # true_operator='x'
-growth_rule='non_interacting_ising'
-true_operator='xTz'
-measurement_type='full_access'
-
+# growth_rule='non_interacting_ising'
+true_operator='xTi'
+# measurement_type='full_access'
+measurement_type='hahn'
 
 declare -a qhl_operators=(
     $true_operator

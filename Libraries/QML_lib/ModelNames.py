@@ -172,8 +172,9 @@ def ising_terms_rotation_hyperfine(return_branch_dict=None):
         return branches
     elif return_branch_dict=='terms':
         return branch_by_term_dict
-
-    elif return_branch_dict == 'latex_terms':
+    elif return_branch_dict=='latex_terms':
+        return latex_terms
+    elif return_branch_dict=='term_branch_dict':
         for k in list(branch_by_term_dict.keys()):
             # branch_by_term_dict[DataBase.latex_name_ising(k)]=(
             branch_by_term_dict[
@@ -184,7 +185,6 @@ def ising_terms_rotation_hyperfine(return_branch_dict=None):
                 latex_name_ising(name = k)] = (branch_by_term_dict.pop(k)
             )
         return branch_by_term_dict
-        
     else:
         return latex_terms
 
@@ -297,8 +297,9 @@ def ising_terms_full_list(return_branch_dict=None):
         return branches
     elif return_branch_dict=='terms':
         return branch_by_term_dict
-
     elif return_branch_dict == 'latex_terms':
+        return latex_terms
+    elif return_branch_dict == 'term_branch_dict':
         for k in list(branch_by_term_dict.keys()):
             # branch_by_term_dict[DataBase.latex_name_ising(k)]=(
             branch_by_term_dict[
@@ -388,30 +389,47 @@ def non_interacting_model(core_pauli, num_qubits):
     return model
 
 
+def non_interacting_ising_all_names(
+    num_qubits=5, 
+    return_branch_dict='latex_terms', 
+    **kwargs
+):
+    paulis = ['x', 'y', 'z']
+    all_models=[]
+    models_on_branches = {0: ['']}
+    t_str = ''
+    for i in range(num_qubits):
+        models_on_branches[i+1] = []
+        for m in models_on_branches[i]:
+            for p in paulis:
+                new_mod = str(m + t_str + p)
+                models_on_branches[i+1].append(new_mod)
+                all_models.append(new_mod)
+        t_str += 'T'
 
+    models_on_branches.pop(0)
+    terms_by_branch = {}
+    for b in models_on_branches:
+        for v in list(models_on_branches[b]):
+            latex_term = default_latex_wrapping(v)
+            terms_by_branch[latex_term] = b
 
-def non_interacting_ising_all_names(**kwargs):
-	core_paulis = ['x', 'y', 'z']
-	num_qubits = 5
+    latex_terms = [
+        default_latex_wrapping(i)
+        for i in all_models
+    ]
 
-	models_on_branches ={}
-	for i in range(num_qubits):
-	    models_on_branches[i] = [non_interacting_model(p, i) for p in core_paulis]
-	
-	branch_values = list(models_on_branches.values())
-	all_models = [
-		item for sublist in branch_values 
-		for item in sublist
-	]	
-
-	try:
-		if return_branch_dict=='branches':
-		    return all_models
-		elif return_branch_dict=='terms':
-		    return models_on_branches
-	except:
-		return all_models		
-
-
-
-
+    try:
+        if return_branch_dict=='branches':
+            print("branches")
+            return models_on_branches
+        elif return_branch_dict=='terms':
+            print("all models")
+            return all_models_latex
+        elif return_branch_dict=='latex_terms':
+            print("latex")
+            latex_terms
+        elif return_branch_dict == 'term_branch_dict':
+            return terms_by_branch
+    except:
+        return latex_terms

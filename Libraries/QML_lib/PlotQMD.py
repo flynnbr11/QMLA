@@ -1501,7 +1501,7 @@ def colour_dicts_from_win_count(
         # ising_terms_full_list(
         UserFunctions.get_all_model_names(
             growth_generator=growth_generator,
-            return_branch_dict='latex_terms').keys(
+            return_branch_dict='term_branch_dict').keys(
         )
     )
     # print("colour dict function. all_models:\n", all_models)
@@ -1530,13 +1530,14 @@ def cumulativeQMDTreePlot(
         inf_gain=None,
         save_to_file=None
     ):
-    
+    print("[cumulative tree plot] start")
     import networkx as nx
     import copy
     means, medians, counts = multiQMDBayes(
         cumulative_csv, 
         growth_generator=growth_generator
     )
+    print("[cumulative tree plot] medians", medians)
     if avg=='means':
         bayes_factors = means #medians
     elif avg=='medians':
@@ -1547,14 +1548,15 @@ def cumulativeQMDTreePlot(
     #     ising_terms_full_list(return_branch_dict='latex_terms')       
     # ) 
     modlist = UserFunctions.get_all_model_names(
-        growth_generator = growth_generator    
+        growth_generator = growth_generator,
+        return_branch_dict = 'latex_terms'
     )
     term_branches = (
         UserFunctions.get_all_model_names(
             growth_generator = growth_generator,
-            return_branch_dict='latex_terms'
+            return_branch_dict='term_branch_dict'
         )       
-    ) 
+    )
 
     pair_freqs={}
     for c in list(counts.keys()):
@@ -2271,7 +2273,8 @@ def multiQMDBayes(all_bayes_csv, growth_generator=None):
     count_bayes={}
     # mod_names= ising_terms_full_list()
     mod_names= UserFunctions.get_all_model_names(
-        growth_generator=growth_generator
+        growth_generator=growth_generator,
+        return_branch_dict='latex_terms'
     )
 
     for mod in mod_names:
@@ -2303,7 +2306,6 @@ def multiQMDBayes(all_bayes_csv, growth_generator=None):
 
 def updateAllBayesCSV(qmd, all_bayes_csv):
     import os,csv
-    
     data = get_bayes_latex_dict(qmd)
     names = list(data.keys())
     fields = ['ModelName']
@@ -2311,8 +2313,10 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
     all_models= ['ModelName']
     # all_models += ising_terms_full_list()
     all_models += UserFunctions.get_all_model_names(
-        growth_generator = qmd.GrowthGenerator
+        growth_generator = qmd.GrowthGenerator,
+        return_branch_dict='latex_terms'
     )
+    # print("all models:", all_models)
     
     if os.path.isfile(all_bayes_csv) is False:
         with open(all_bayes_csv, 'a+') as bayes_csv:
@@ -2346,222 +2350,6 @@ def get_bayes_latex_dict(qmd):
             latex_dict[mod_a][mod_b]= qmd.AllBayesFactors[i][j][-1]
     return latex_dict
 
-
-"""
-def ising_terms_rotation_hyperfine(return_branch_dict=None):
-    pauli_terms = ['x','y','z']
-
-    branches= {}
-    branch_by_term_dict = {}
-    for i in range(9):
-        branches[i] = []
-    
-    rotation_terms = []
-    hf_terms = []
-    transverse_terms = []
-
-    for t in pauli_terms:
-        rotation_terms.append(t+'Ti')
-        hf_terms.append(t+'T'+t)
-        for k in pauli_terms:
-            if k>t:
-                transverse_terms.append(t+'T'+k)
-
-    ising_terms = []            
-    add = 'PP'
-
-    for r in rotation_terms:
-        ising_terms.append(r)
-        branches[0].append(r)
-        branch_by_term_dict[r] = 0
-        
-    for r in rotation_terms:
-        new_terms=[]
-        for i in rotation_terms:
-            if r<i:
-                branches[1].append(r+add+i)
-                branch_by_term_dict[r+add+i] = 1
-                new_terms.append(r+add+i)
-        ising_terms.extend(new_terms)
-
-    full_rotation = add.join(rotation_terms)
-    ising_terms.append(full_rotation)
-    branches[2].append(full_rotation)
-    branch_by_term_dict[full_rotation] = 2
-    
-
-    for t in hf_terms:
-        new_term = full_rotation+add+t
-        branches[3].append(new_term)
-        branch_by_term_dict[new_term] = 3
-        ising_terms.append(new_term)
-
-    for t in hf_terms:
-        for k in hf_terms:
-            if t<k:
-                dual_hf_term= full_rotation+add+t+add+k
-                branches[4].append(dual_hf_term)
-                branch_by_term_dict[dual_hf_term] = 4
-                ising_terms.append(dual_hf_term)
-
-    for t in hf_terms:
-        for l in hf_terms:
-            for k in hf_terms:
-                if t<k<l:
-                    triple_hf = full_rotation + add + t + add + k + add + l
-                    branches[5].append(triple_hf)
-                    ising_terms.append(triple_hf)
-                    branch_by_term_dict[triple_hf] = 5
-
-    
-    # latex_terms = [DataBase.latex_name_ising(i) for i in ising_terms]
-    latex_terms = [
-        UserFunctions.get_latex_name(
-            #  in this case this list is only generating ising type so hard code growth generator
-            name=i, growth_generator='two_qubit_ising_rotation'
-        ) for i in ising_terms
-    ]
-    
-    if return_branch_dict=='branches':
-        return branches
-    elif return_branch_dict=='terms':
-        return branch_by_term_dict
-
-    elif return_branch_dict == 'latex_terms':
-        for k in list(branch_by_term_dict.keys()):
-            # branch_by_term_dict[DataBase.latex_name_ising(k)]=(
-            branch_by_term_dict[
-                UserFunctions.get_latex_name(
-                    #  in this case this list is only generating ising type so hard code growth generator
-                    name = k, growth_generator='two_qubit_ising_rotation_hyperfine_transverse')
-                ] = (branch_by_term_dict.pop(k)
-            )
-        return branch_by_term_dict
-        
-    else:
-        return latex_terms
-
-
-
-
-def ising_terms_full_list(return_branch_dict=None):
-    pauli_terms = ['x','y','z']
-
-    branches= {}
-    branch_by_term_dict = {}
-    for i in range(9):
-        branches[i] = []
-    
-    rotation_terms = []
-    hf_terms = []
-    transverse_terms = []
-
-    for t in pauli_terms:
-        rotation_terms.append(t+'Ti')
-        hf_terms.append(t+'T'+t)
-        for k in pauli_terms:
-            if k>t:
-                transverse_terms.append(t+'T'+k)
-
-    ising_terms = []            
-    add = 'PP'
-
-    for r in rotation_terms:
-        ising_terms.append(r)
-        branches[0].append(r)
-        branch_by_term_dict[r] = 0
-        
-    for r in rotation_terms:
-        new_terms=[]
-        for i in rotation_terms:
-            if r<i:
-                branches[1].append(r+add+i)
-                branch_by_term_dict[r+add+i] = 1
-                new_terms.append(r+add+i)
-        ising_terms.extend(new_terms)
-
-    full_rotation = add.join(rotation_terms)
-    ising_terms.append(full_rotation)
-    branches[2].append(full_rotation)
-    branch_by_term_dict[full_rotation] = 2
-    
-
-    for t in hf_terms:
-        new_term = full_rotation+add+t
-        branches[3].append(new_term)
-        branch_by_term_dict[new_term] = 3
-        ising_terms.append(new_term)
-
-    for t in hf_terms:
-        for k in hf_terms:
-            if t<k:
-                dual_hf_term= full_rotation+add+t+add+k
-                branches[4].append(dual_hf_term)
-                branch_by_term_dict[dual_hf_term] = 4
-                ising_terms.append(dual_hf_term)
-
-    for t in hf_terms:
-        for l in hf_terms:
-            for k in hf_terms:
-                if t<k<l:
-                    triple_hf = full_rotation + add + t + add + k + add + l
-                    branches[5].append(triple_hf)
-                    ising_terms.append(triple_hf)
-                    branch_by_term_dict[triple_hf] = 5
-
-
-
-    for t in transverse_terms:
-        transverse_term= triple_hf+add+t
-        branches[6].append(transverse_term)
-        branch_by_term_dict[transverse_term] = 6
-        ising_terms.append(transverse_term)
-
-
-    for t in transverse_terms:
-        for k in transverse_terms:
-            if t<k:
-                dual_transverse_term= triple_hf+add+t+add+k
-                branches[7].append(dual_transverse_term)
-                branch_by_term_dict[dual_transverse_term] = 7
-                ising_terms.append(dual_transverse_term)
-
-    for t in transverse_terms:
-        for l in transverse_terms:
-            for k in transverse_terms:
-                if t<k<l:
-                    triple_hf_term= triple_hf+add+t+add+k+add+l
-                    branch_by_term_dict[triple_hf_term] = 8
-                    branches[8].append(triple_hf_term)
-                    ising_terms.append(triple_hf_term)
-
-    
-    latex_terms = [
-        # DataBase.latex_name_ising(i) for i in ising_terms
-        UserFunctions.get_latex_name(
-            name=i, 
-            #  in this case this list is only generating ising type so hard code growth generator
-            growth_generator='two_qubit_ising_rotation_hyperfine_transverse' 
-        ) for i in ising_terms
-    ]
-    
-    if return_branch_dict=='branches':
-        return branches
-    elif return_branch_dict=='terms':
-        return branch_by_term_dict
-
-    elif return_branch_dict == 'latex_terms':
-        for k in list(branch_by_term_dict.keys()):
-            # branch_by_term_dict[DataBase.latex_name_ising(k)]=(
-            branch_by_term_dict[UserFunctions.get_latex_name(
-                name=k, growth_generator=qmd.GrowthGenerator)
-                ]=(branch_by_term_dict.pop(k)
-            )
-        return branch_by_term_dict
-        
-    else:
-        return latex_terms
-"""
 
 def global_adjacent_branch_test(a,b, term_branches):
     branch_a = term_branches[a]

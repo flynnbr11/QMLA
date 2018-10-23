@@ -869,7 +869,8 @@ def get_entropy(
     num_possible_qmd_instances = len(
         # ptq.ising_terms_rotation_hyperfine()
         UserFunctions.get_all_model_names(
-            growth_generator = growth_generator
+            growth_generator = growth_generator,
+            return_branch_dict = 'latex_terms'
         )
     )
     # TODO don't always want ising terms only
@@ -1225,14 +1226,23 @@ elif further_qhl_mode == False:
     )
 
 
+    valid_growth_rules_for_multiQMD_tree_plot = [
+        'two_qubit_ising_rotation',
+        'two_qubit_ising_rotation_hyperfine', 
+        'two_qubit_ising_rotation_hyperfine_transverse' ,
+        'hyperfine_like'
+    ]
+
     try:
-        plot_tree_multi_QMD(results_csv = results_csv, 
-            all_bayes_csv = all_bayes_csv, 
-            growth_generator=growth_generator,
-            entropy = entropy,
-            inf_gain = inf_gain,
-            save_to_file='multiQMD_tree.png'
-        )
+        if growth_generator in valid_growth_rules_for_multiQMD_tree_plot:
+            plot_tree_multi_QMD(
+                results_csv = results_csv, 
+                all_bayes_csv = all_bayes_csv, 
+                growth_generator=growth_generator,
+                entropy = entropy,
+                inf_gain = inf_gain,
+                save_to_file='multiQMD_tree.png'
+            )
 
     except NameError:
         print("Can not plot multiQMD tree -- this might be because only \

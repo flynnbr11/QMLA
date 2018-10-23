@@ -77,11 +77,11 @@ max_spawn_depth_info = {
     'ising_transverse' : 11,
     'hyperfine_like' : 8,
     'two_qubit_ising_rotation' : 2,
-    'two_qubit_ising_rotation_hyperfine' : 5,
+    'two_qubit_ising_rotation_hyperfine' : 5, # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
     'test_multidimensional' : 10, 
     'test_return_champs' : 3,
-    'non_interacting_ising' : 3
+    'non_interacting_ising' : 1
 }
 
 

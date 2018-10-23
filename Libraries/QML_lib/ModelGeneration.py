@@ -152,7 +152,11 @@ def random_model_name(num_dimensions=1, num_terms=1):
     return summed_term
 
 
-def random_ising_chain(num_dimensions=1, include_identity = True, num_directions = 1):
+def random_ising_chain(
+    num_dimensions=1, 
+    include_identity = True, 
+    num_directions = 1
+):
     """
     Return a valid (simple) model name of given number of dimensions and terms. 
     """

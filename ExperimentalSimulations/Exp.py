@@ -129,8 +129,16 @@ if global_variables.use_experimental_data==True:
 
 # initial_op_list = ['xTx', 'xTy', 'xTz']
 # initial_op_list = ['xTi', 'xTiPPyTi', 'zTiTTi']
-# initial_op_list = ['xTi', 'yTi', 'zTi']
-initial_op_list = ['x', 'y', 'z']
+
+strictly_two_qubit_ising_growths = [
+    'two_qubit_ising_rotation_hyperfine',
+    'two_qubit_ising_rotation_hyperfine_transverse', 
+    'hyperfine_like'
+]
+if global_variables.growth_generation_rule in strictly_two_qubit_ising_growths:
+    initial_op_list = ['xTi', 'yTi', 'zTi']
+else:
+    initial_op_list = ['x', 'y', 'z']
 # initial_op_list = ['z']
 
 true_op = global_variables.true_operator
@@ -550,16 +558,11 @@ else:
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file , protocol=2)
 
-    if (
-        global_variables.growth_generation_rule == 'two_qubit_ising_rotation_hyperfine'
-        or
-        global_variables.growth_generation_rule == 'two_qubit_ising_rotation_hyperfine_transverse'
-    ):
-        # TODO generalise so tree diagram can be used in all cases
-        # currently only useful for Ising growth 2 qubits. 
-        qmd.writeInterQMDBayesCSV(
-            bayes_csv=str(global_variables.cumulative_csv)
-        )
+    # TODO generalise so tree diagram can be used in all cases
+    # currently only useful for Ising growth 2 qubits. 
+    qmd.writeInterQMDBayesCSV(
+        bayes_csv=str(global_variables.cumulative_csv)
+    )
 
     results_file = global_variables.results_file
     pickle.dump(
