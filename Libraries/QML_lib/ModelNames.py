@@ -390,7 +390,7 @@ def non_interacting_model(core_pauli, num_qubits):
 
 
 def non_interacting_ising_all_names(
-    num_qubits=5, 
+    num_qubits=3, 
     return_branch_dict='latex_terms', 
     **kwargs
 ):

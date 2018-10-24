@@ -650,13 +650,13 @@ def Bayes_t_test(
         
         if save_to_file is not None:
             save_file=''
-            save_file = save_to_file[:-4]
+            # save_file = save_to_file[:-4]
             save_file = str(
-                save_to_file+
+                save_to_file[:-4]+
                 '_'+
                 str(term) + '.png'
             )
-            # print("Saving to ",save_file )
+            print("Saving to ",save_file )
             plt.savefig(save_file, bbox_inches='tight')
 
 def fill_between_sigmas(

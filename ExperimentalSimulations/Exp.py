@@ -139,7 +139,9 @@ if global_variables.growth_generation_rule in strictly_two_qubit_ising_growths:
     initial_op_list = ['xTi', 'yTi', 'zTi']
 else:
     initial_op_list = ['x', 'y', 'z']
-# initial_op_list = ['z']
+
+
+# initial_op_list = ['y', 'yTz']
 
 true_op = global_variables.true_operator
 true_num_qubits = DataBase.get_num_qubits(true_op)

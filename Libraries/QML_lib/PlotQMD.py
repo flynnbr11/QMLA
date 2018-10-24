@@ -230,6 +230,7 @@ def ExpectationValuesTrueSim(
 
             num_bins = len(set(times_learned))
             unique_times_learned = sorted(list(set(times_learned)))
+            max_time_learned = max(unique_times_learned)
             unique_times_count = []
             if min(unique_times_learned) < global_min_time:
                 global_min_time = min(unique_times_learned)
@@ -244,7 +245,10 @@ def ExpectationValuesTrueSim(
             r_sq_of_t = [mod.r_squared_of_t[t] for t in exp_times]
             bar_hist = 'hist'
 
-            ax2 = plt.subplot(312, sharex=ax1)
+            ax2 = plt.subplot(
+                312, 
+                # sharex=ax1
+            )
             if bar_hist == 'bar':
                 plt.bar(
                     unique_times_learned, 
@@ -257,7 +261,10 @@ def ExpectationValuesTrueSim(
                 plt.hist(
                     times_learned, 
                     bins=num_bins,
-                    label='Occurences',                
+                    label=str('Occurences (max time:'+
+                        str(max_time_learned)+
+                        ')'
+                    ),                
                     color=sim_col,
                     histtype='step',
                     fill=False
@@ -288,7 +295,9 @@ def ExpectationValuesTrueSim(
             labelbottom=True # labels along the bottom edge are off
         )
 
-        ax1.set_xlim(global_min_time, max(times)+0.1)
+        max_time_plot = max(max(times), max_time_learned)
+        ax1.set_xlim(global_min_time, max(times))
+        ax2.set_xlim(global_min_time, max_time_plot+0.1)
 
         ax1.set_ylabel('Exp Value')
         ax2.set_ylabel('Occurences')
@@ -2290,7 +2299,9 @@ def multiQMDBayes(all_bayes_csv, growth_generator=None):
 
 
     piv = pandas.pivot_table(cumulative_bayes, 
-        index='ModelName', values=names, aggfunc=[np.mean, np.median]
+        index='ModelName', 
+        values=names, 
+        aggfunc=[np.mean, np.median]
     )
     means=piv['mean']
     medians=piv['median']
@@ -2316,7 +2327,6 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
         growth_generator = qmd.GrowthGenerator,
         return_branch_dict='latex_terms'
     )
-    print("all models:", all_models)
     
     if os.path.isfile(all_bayes_csv) is False:
         with open(all_bayes_csv, 'a+') as bayes_csv:

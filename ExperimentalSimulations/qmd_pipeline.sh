@@ -5,16 +5,16 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=3
+num_tests=1
 qhl_test=1
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=500
-exp=100
-pgh=0.3
+prt=200
+exp=50
+pgh=3.3
 ra=0.8
 rt=0.5
 gaussian=1
@@ -46,7 +46,7 @@ fi
 
 use_rq=0
 further_qhl_factor=2
-plots=0
+plots=1
 use_rq=0
 number_best_models_further_qhl=5
 custom_prior=1
@@ -87,7 +87,7 @@ mkdir -p $long_dir
 # measurement_type=$sim_measurement_type
 
 # growth_rule='test_return_champs'
-true_operator='xTy'
+true_operator='yTz'
 growth_rule='non_interacting_ising'
 # true_operator='xTi'
 measurement_type='full_access'
@@ -112,7 +112,8 @@ then
     use_rq=0
 fi
 use_rq=0
-let bt="$exp-1"
+# let bt="$exp-1"
+let bt="$exp"
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Launch $num_tests instances of QMD 
