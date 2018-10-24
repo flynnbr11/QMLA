@@ -262,7 +262,7 @@ def ExpectationValuesTrueSim(
                     times_learned, 
                     bins=num_bins,
                     label=str('Occurences (max time:'+
-                        str(max_time_learned)+
+                        str(np.round(max_time_learned, 2))+
                         ')'
                     ),                
                     color=sim_col,
@@ -295,8 +295,16 @@ def ExpectationValuesTrueSim(
             labelbottom=True # labels along the bottom edge are off
         )
 
-        max_time_plot = max(max(times), max_time_learned)
         ax1.set_xlim(global_min_time, max(times))
+        if max_time_learned  > max(times):
+            ax2.semilogx()
+            ax2.axvline(
+                max(times), 
+                color='red', 
+                label='Max exp. val. time shown'
+            )
+
+        max_time_plot = max(max(times), max_time_learned)
         ax2.set_xlim(global_min_time, max_time_plot+0.1)
 
         ax1.set_ylabel('Exp Value')
@@ -305,12 +313,12 @@ def ExpectationValuesTrueSim(
         ax2.set_yscale('log')
 
         ax2.set_title(str('Times learned upon'))
+        ax2.axvline(0, color='black')
+        ax2.axhline(0, color='black')
         ax2.legend(
             bbox_to_anchor=(1.2, 1.1),
             loc=2
         )
-        ax2.axvline(0, color='black')
-        ax2.axhline(0, color='black')
         ax1.axvline(0, color='black')
         plot_title = str(
             str(qmd.NumParticles) + ' particles.\n'  
