@@ -12,8 +12,8 @@ do_further_qhl=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=400
-exp=100
+prt=200
+exp=50
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -87,7 +87,7 @@ mkdir -p $long_dir
 # measurement_type=$sim_measurement_type
 
 # growth_rule='test_return_champs'
-true_operator='yTz'
+true_operator='yTy'
 growth_rule='non_interacting_ising'
 # true_operator='xTi'
 measurement_type='full_access'
