@@ -6,15 +6,15 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=4
-exp=2
-pgh=0.03
+prt=400
+exp=100
+pgh=0.5
 ra=0.8
 rt=0.5
 gaussian=1
@@ -34,15 +34,15 @@ else
 fi
 """
 
-if (( "$exp_data" == 0 ))
-then
-    pgh=0.3
-fi
+# if (( "$exp_data" == 0 ))
+# then
+#     pgh=0.3
+# fi
 
-if (( "$qhl_test" == 1 ))
-then
-    pgh=1.0
-fi
+# if (( "$qhl_test" == 1 ))
+# then
+#     pgh=1.0
+# fi
 
 use_rq=0
 further_qhl_factor=2

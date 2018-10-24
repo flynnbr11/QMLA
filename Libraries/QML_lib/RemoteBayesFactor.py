@@ -120,14 +120,19 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
         else:
             first_t_idx = len(model_a.Times) - num_times_to_use
 
-        if num_times_to_use == 'all' or len(model_a.Times) < num_times_to_use:
+        if (
+            num_times_to_use == 'all' 
+            or 
+            len(model_a.Times) < num_times_to_use
+        ):
             times_a = model_a.Times
             times_b = model_b.Times
         else:
             times_a = model_a.Times[first_t_idx:]
             times_b = model_b.Times[first_t_idx:]
         
-        if binning==True and use_experimental_data==True:
+        # if binning==True and use_experimental_data==True:
+        if binning==True:
             # TODO introduce binning for simulated data. 
             min_time = min(min(times_a), min(times_b))
             max_time = max(max(times_a), max(times_b))
@@ -239,7 +244,11 @@ def log_likelihood(model, times, binning=False):
         exp = get_exp(model, [times[i]])
     #    print("exp:", exp)
         params_array = np.array([[model.TrueParams[0]]]) # TODO this will cause an error for multiple parameters
-        datum = updater.model.simulate_experiment(params_array, exp, repeat=1)
+        datum = updater.model.simulate_experiment(
+            params_array, 
+            exp, 
+            repeat=1
+        )
         sum_data += datum   
         updater.update(datum, exp)
 

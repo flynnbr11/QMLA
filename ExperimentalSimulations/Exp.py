@@ -141,7 +141,7 @@ else:
     initial_op_list = ['x', 'y', 'z']
 
 
-# initial_op_list = ['y', 'yTz']
+initial_op_list = ['y', 'yTz']
 
 true_op = global_variables.true_operator
 true_num_qubits = DataBase.get_num_qubits(true_op)

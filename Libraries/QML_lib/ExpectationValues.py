@@ -39,10 +39,17 @@ def log_print(to_print_list, log_file, log_identifier):
      
 ## Partial trace functionality
  
-def expectation_value(ham, t, state=None, choose_random_probe=False,
-    use_exp_custom=True, enable_sparse=True, print_exp_details=False,
-    exp_fnc_cutoff=20, compare_exp_fncs_tol=None, log_file='QMDLog.log',
-    log_identifier=None, debug_plot_print=False
+def expectation_value(
+    ham, t, state=None, 
+    choose_random_probe=False,
+    use_exp_custom=True, 
+    enable_sparse=True, 
+    print_exp_details=False,
+    exp_fnc_cutoff=20, 
+    compare_exp_fncs_tol=None, 
+    log_file='QMDLog.log',
+    log_identifier=None, 
+    debug_plot_print=False
 ):
 
     if choose_random_probe is True: 
@@ -95,7 +102,9 @@ def expectation_value(ham, t, state=None, choose_random_probe=False,
                     log_identifier=log_identifier
                 )
         else:
-            u_psi = evolved_state(ham, t, state, use_exp_custom=False,
+            u_psi = evolved_state(
+                ham, t, state, 
+                use_exp_custom=False,
                 print_exp_details=print_exp_details, 
                 exp_fnc_cutoff=exp_fnc_cutoff
             )
