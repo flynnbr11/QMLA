@@ -168,6 +168,7 @@ def ExpectationValuesTrueSim(
         ChampionsByBranch = {
             v:k for k,v in qmd.BranchChampions.items()
         }
+        max_time_learned = 0 
         for i in range(len(model_ids)):
             mod_id = model_ids[i]
             sim = qmd.ModelNameIDs[mod_id]
@@ -230,7 +231,8 @@ def ExpectationValuesTrueSim(
 
             num_bins = len(set(times_learned))
             unique_times_learned = sorted(list(set(times_learned)))
-            max_time_learned = max(unique_times_learned)
+            if max(unique_times_learned) > max_time_learned:
+                max_time_learned = max(unique_times_learned)
             unique_times_count = []
             if min(unique_times_learned) < global_min_time:
                 global_min_time = min(unique_times_learned)
