@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
+num_tests=10
 qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=20
-exp=5
+prt=10
+exp=3
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -46,7 +46,7 @@ fi
 
 use_rq=0
 further_qhl_factor=2
-plots=1
+plots=0
 use_rq=0
 number_best_models_further_qhl=5
 custom_prior=1

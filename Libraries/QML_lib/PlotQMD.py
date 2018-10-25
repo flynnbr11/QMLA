@@ -2333,10 +2333,17 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
     fields += names
     all_models= ['ModelName']
     # all_models += ising_terms_full_list()
-    all_models += UserFunctions.get_all_model_names(
-        growth_generator = qmd.GrowthGenerator,
-        return_branch_dict='latex_terms'
-    )
+    # all_models += UserFunctions.get_all_model_names(
+    #     growth_generator = qmd.GrowthGenerator,
+    #     return_branch_dict='latex_terms'
+    # )
+
+    raw_names=list(qmd.ModelNameIDs.values())
+    all_models += [
+        UserFunctions.get_latex_name(name, growth_generator=qmd.GrowthGenerator)
+        for name in raw_names
+    ]
+
     
     if os.path.isfile(all_bayes_csv) is False:
         with open(all_bayes_csv, 'a+') as bayes_csv:

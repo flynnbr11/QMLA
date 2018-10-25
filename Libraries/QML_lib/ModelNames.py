@@ -396,6 +396,7 @@ def non_interacting_ising_all_names(
 ):
     from UserFunctions import max_spawn_depth_info
     num_qubits = max_spawn_depth_info['non_interacting_ising'] + 1
+    num_qubits=1 # deliberately cause crash to inspect error. 
     paulis = ['x', 'y', 'z']
     all_models=[]
     models_on_branches = {0: ['']}
