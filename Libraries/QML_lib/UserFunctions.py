@@ -208,6 +208,46 @@ def get_all_model_names(
 
 	
 	
+##### ---------- -------------------- #####  
+# Mapping model name strings to branch numbers
+##### ---------- -------------------- #####  
+
+name_branch_map_functions = {
+	# growth_generation_rule : latex_mapping_function
+
+	None : 
+		ModelNames.branch_is_num_params,
+	'two_qubit_ising_rotation_hyperfine' : 
+		ModelNames.branch_is_num_params, 
+	'two_qubit_ising_rotation_hyperfine_transverse' : 
+		ModelNames.branch_is_num_params, 
+	'test_return_champs' :
+		ModelNames.branch_is_num_params,
+	'non_interacting_ising' :
+		ModelNames.branch_is_num_dims
+}
+
+def get_name_branch_map(
+    latex_mapping_file, 
+    growth_generator=None,
+    **kwargs
+):
+	print("get name branch map. latex:", latex_mapping_file)
+	try:
+		# if mapping doesn't work, default to just wrap in $__$. 
+		branch_mapping = name_branch_map_functions[growth_generator]
+		name_branch_map = branch_mapping(
+			latex_mapping_file=latex_mapping_file, 
+			**kwargs)
+	except:
+		branch_mapping = name_branch_map_functions[None]
+		name_branch_map = branch_mapping(
+			latex_mapping_file=latex_mapping_file, 
+			**kwargs
+		)
+	# print("Latex Mapping used", latex_mapping)
+
+	return name_branch_map
 
 
 

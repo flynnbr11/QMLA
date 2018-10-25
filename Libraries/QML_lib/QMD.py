@@ -138,7 +138,9 @@ class QMD():
         
         
         self.TrueParamDict = {}
-        true_ops = DataBase.get_constituent_names_from_name(self.TrueOpName)
+        true_ops = DataBase.get_constituent_names_from_name(
+            self.TrueOpName
+        )
         for i in range(len(true_ops)):
             op_name = true_ops[i]
             param = self.TrueParamsList[i]
@@ -162,6 +164,10 @@ class QMD():
         self.ResultsDirectory = results_directory
         if not self.ResultsDirectory.endswith('/'):
             self.ResultsDirectory += '/'
+        self.LatexMappingFile = str(
+            self.ResultsDirectory + 'LatexMapping.txt'
+        )
+
         self.NumProbes = num_probes
         if probe_dict is None:
             self.ProbeDict = separable_probe_dict(max_num_qubits=

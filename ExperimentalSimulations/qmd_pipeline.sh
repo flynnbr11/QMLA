@@ -80,7 +80,7 @@ mkdir -p $long_dir
 # true_operator='xTiPPyTiPPyTy'
 # true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
 
-growth_rule='two_qubit_ising_rotation_hyperfine'
+# growth_rule='two_qubit_ising_rotation_hyperfine'
 # true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 # sim_measurement_type='full_access'
 # exp_measurement_type='hahn' # to use if not experimental
@@ -88,7 +88,7 @@ growth_rule='two_qubit_ising_rotation_hyperfine'
 
 # growth_rule='test_return_champs'
 true_operator='yTy'
-# growth_rule='non_interacting_ising'
+growth_rule='non_interacting_ising'
 # true_operator='xTi'
 measurement_type='full_access'
 # measurement_type='hahn'
@@ -127,7 +127,8 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -exp=$exp_data \
     -rand_t=1 -rand_p=0 # can make true params and prior random
 
-
+latex_mapping_filename='LatexMapping.txt'
+latex_mapping_file=$long_dir$latex_mapping_filename
 for prt in  "${particle_counts[@]}";
 do
     for i in `seq 1 $max_qmd_id`;
@@ -146,7 +147,8 @@ do
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
-            -ggr=$growth_rule
+            -ggr=$growth_rule \
+            
     done
 done
 
@@ -168,7 +170,8 @@ python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -qhl=$qhl_test -fqhl=0 \
     -exp=$exp_data -true_expec=$true_expec_path \
     -ggr=$growth_rule \
-    -data=$dataset -params=$true_params_pickle_file 
+    -data=$dataset -params=$true_params_pickle_file \
+    -latex=$latex_mapping_file
 " > $analyse_script
 
 chmod a+x $analyse_script
@@ -197,7 +200,8 @@ then
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
-            -ggr=$growth_rule
+            -ggr=$growth_rule \
+
     done
 
     further_analyse_filename='analyse.sh'
@@ -212,7 +216,8 @@ then
         -qhl=$qhl_test -fqhl=1 \
         -ggr=$growth_rule \
         -exp=$exp_data -true_expec=$true_expec_path \
-        -data=$dataset -params=$true_params_pickle_file 
+        -data=$dataset -params=$true_params_pickle_file \
+        -latex=$latex_mapping_file
     " > $further_analyse_script
 
     chmod a+x $further_analyse_script

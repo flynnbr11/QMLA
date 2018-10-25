@@ -433,3 +433,67 @@ def non_interacting_ising_all_names(
             return terms_by_branch
     except:
         return latex_terms
+
+
+
+############# Model to Branch convention functions ##########
+
+
+def branch_is_num_params(latex_mapping_file, **kwargs):
+    print(
+        "branch_is_num_params", 
+        latex_mapping_file
+    )
+    with open(latex_mapping_file) as f:
+        content = f.readlines()
+    # remove whitespace characters like `\n` at the end of each line
+    content = [x.strip() for x in content] 
+
+    latex_name_map = {}
+    for c in content:
+        this_tuple = eval(c)
+        model_string = this_tuple[0]
+        latex_name = this_tuple[1]
+        latex_name_map[model_string] = latex_name    # this mapping assigns models to branches with the number of parameters they have
+    
+    model_names = list(set(list(latex_name_map.keys())))
+    num_params_by_mod = {}
+    model_branches = {}
+
+    for mod in model_names:
+        num_params = len(DataBase.get_constituent_names_from_name(mod))
+        num_params_by_mod[mod] = num_params
+        latex_name = latex_name_map[mod]
+        model_branches[latex_name] = num_params
+
+    return model_branches
+
+
+def branch_is_num_dims(latex_mapping_file, **kwargs):
+    print(
+        "branch_is_num_dims. latex file:", 
+        latex_mapping_file
+    )
+    with open(latex_mapping_file) as f:
+        content = f.readlines()
+    # remove whitespace characters like `\n` at the end of each line
+    content = [x.strip() for x in content] 
+
+    latex_name_map = {}
+    for c in content:
+        this_tuple = eval(c)
+        model_string = this_tuple[0]
+        latex_name = this_tuple[1]
+        latex_name_map[model_string] = latex_name    # this mapping assigns models to branches with the number of parameters they have
+    
+    model_names = list(set(list(latex_name_map.keys())))
+    model_branches = {}
+
+    for mod in model_names:
+        # num_params = len(DataBase.get_constituent_names_from_name(mod))
+        num_qubits = DataBase.get_num_qubits(mod)
+        latex_name = latex_name_map[mod]
+        model_branches[latex_name] = num_qubits
+
+    return model_branches
+

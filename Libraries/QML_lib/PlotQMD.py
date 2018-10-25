@@ -1538,9 +1538,12 @@ def colour_dicts_from_win_count(
     return colour_by_node_name, colour_by_win_count
 
 
+
+
 def cumulativeQMDTreePlot(
         cumulative_csv, 
         wins_per_mod, 
+        latex_mapping_file,
         avg='means',
         only_adjacent_branches=True,
         growth_generator=None,
@@ -1552,11 +1555,12 @@ def cumulativeQMDTreePlot(
     print("[cumulative tree plot] start")
     import networkx as nx
     import copy
+    import csv
     means, medians, counts = multiQMDBayes(
         cumulative_csv, 
         growth_generator=growth_generator
     )
-    print("[cumulative tree plot] medians", medians)
+    print("[cumulative tree plot] medians")
     if avg=='means':
         bayes_factors = means #medians
     elif avg=='medians':
@@ -1566,16 +1570,31 @@ def cumulativeQMDTreePlot(
     # term_branches = (
     #     ising_terms_full_list(return_branch_dict='latex_terms')       
     # ) 
-    modlist = UserFunctions.get_all_model_names(
-        growth_generator = growth_generator,
-        return_branch_dict = 'latex_terms'
+    # modlist = UserFunctions.get_all_model_names(
+    #     growth_generator = growth_generator,
+    #     return_branch_dict = 'latex_terms'
+    # )
+    # term_branches = (
+    #     UserFunctions.get_all_model_names(
+    #         growth_generator = growth_generator,
+    #         return_branch_dict='term_branch_dict'
+    #     )       
+    # )
+    print("entering model map func")
+    term_branches = UserFunctions.get_name_branch_map(
+        latex_mapping_file = latex_mapping_file,
+        growth_generator = growth_generator
     )
-    term_branches = (
-        UserFunctions.get_all_model_names(
-            growth_generator = growth_generator,
-            return_branch_dict='term_branch_dict'
-        )       
-    )
+
+    # term_branches = model_name_to_branch_mapping(latex_mapping)
+    print("[cumulative tree plot] term branches:\n\t", term_branches)
+    # print("[cumulative tree plot] new term branches:\n\t", new_term_branches)
+    # print("[cumulative tree plot] latex mapping:\n\t", latex_mapping)
+    # print("cumulative csv:", cumulative_csv)
+    modlist = csv.DictReader(open(cumulative_csv)).fieldnames
+    if 'ModelName' in modlist:
+        modlist.remove('ModelName')
+    # print("[cummulative]alternative modlist:", modlist)
 
     pair_freqs={}
     for c in list(counts.keys()):
@@ -1594,9 +1613,9 @@ def cumulativeQMDTreePlot(
     branch_mod_count = {}
 
 #    max_branch_id = qmd.HighestBranchID # TODO: get this number without access to QMD class instance
- #   max_mod_id = qmd.HighestModelID
-    max_branch_id = 9 # TODO: this is hardcoded - is there an alternative?
-    max_mod_id = 17
+    # max_branch_id = 9 # TODO: this is hardcoded - is there an alternative?
+    max_branch_id = max( list(term_branches.values()) ) + 1
+    max_mod_id = len(modlist)
     
     
 
@@ -2296,6 +2315,8 @@ def multiQMDBayes(all_bayes_csv, growth_generator=None):
         return_branch_dict='latex_terms'
     )
 
+    mod_names = list(cumulative_bayes.keys())
+
     for mod in mod_names:
         count_bayes[mod] = {}
         model_results=cumulative_bayes[mod]
@@ -2313,6 +2334,7 @@ def multiQMDBayes(all_bayes_csv, growth_generator=None):
         values=names, 
         aggfunc=[np.mean, np.median]
     )
+
     means=piv['mean']
     medians=piv['median']
 
@@ -2339,15 +2361,14 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
     if os.path.isfile(all_bayes_csv) is False:
         # all_models += ['ModelName']
         # all_models += names
-        print("file exists:", os.path.isfile(all_bayes_csv))
-        print("creating CSV")
+        # print("file exists:", os.path.isfile(all_bayes_csv))
+        # print("creating CSV")
         with open(all_bayes_csv, 'a+') as bayes_csv:
             writer = csv.DictWriter(
                 bayes_csv, 
                 fieldnames=fields
             )
             writer.writeheader()
-
     else:
         # print("file exists:", os.path.isfile(all_bayes_csv))
         current_csv = csv.DictReader(open(all_bayes_csv))
@@ -2355,11 +2376,11 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
         new_models = list(
             set(fields) - set(current_fieldnames)
         )
-        # print("current:", current_fieldnames)
-        # print("fields:", fields)
 
         if len(new_models) > 0:
-            print("new models:", new_models)
+            # print("new models:", new_models)
+            # print("current:", current_fieldnames)
+            # print("fields:", fields)
             import pandas
             csv_input = pandas.read_csv(
                 all_bayes_csv, 
@@ -2371,6 +2392,9 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
 
             for new_col in new_models:
                 csv_input[new_col] = empty_list
+
+
+
             # print("writing new pandas CSV: ", csv_input)
             csv_input.to_csv(all_bayes_csv)
     with open(all_bayes_csv, 'a') as bayes_csv:
@@ -2387,6 +2411,22 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
 
 def get_bayes_latex_dict(qmd):
     latex_dict = {}
+    # print("get bayes latex dict")
+
+    latex_write_file  = open(
+        # str(qmd.ResultsDirectory + 'LatexMapping.txt'), 
+        qmd.LatexMappingFile, 
+        'a+'
+    )
+    for i in list(qmd.AllBayesFactors.keys()):
+        mod = qmd.ModelNameIDs[i]
+        latex_name = UserFunctions.get_latex_name(
+            name = mod,
+            growth_generator = qmd.GrowthGenerator
+        )
+        mapping = (mod, latex_name)
+        print(mapping, file=latex_write_file)
+
     for i in list(qmd.AllBayesFactors.keys()):
         # mod_a = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
         mod_a = UserFunctions.get_latex_name(

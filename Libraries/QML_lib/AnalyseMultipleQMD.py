@@ -957,6 +957,7 @@ def plot_scores(
 def plot_tree_multi_QMD(
         results_csv, 
         all_bayes_csv, 
+        latex_mapping_file,
         avg_type='medians',
         growth_generator=None,
         entropy=None, 
@@ -964,6 +965,7 @@ def plot_tree_multi_QMD(
         save_to_file=None
     ):
 #    res_csv="/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Results/multtestdir/param_sweep.csv"
+    print("[plot tree plot_tree_multi_QMD] start")
     qmd_res = pandas.DataFrame.from_csv(
         results_csv, 
         index_col='LatexName'
@@ -972,10 +974,14 @@ def plot_tree_multi_QMD(
     winning_count = {}
     for mod in mods:
         winning_count[mod]=mods.count(mod)
+    print("[plot tree plot_tree_multi_QMD] latex_mapping_file:", 
+        latex_mapping_file
+    )
 
     ptq.cumulativeQMDTreePlot(
         cumulative_csv=all_bayes_csv, 
-        wins_per_mod=winning_count, 
+        wins_per_mod=winning_count,
+        latex_mapping_file=latex_mapping_file, 
         growth_generator=growth_generator,
         only_adjacent_branches=True, 
         avg=avg_type, entropy=entropy, inf_gain=inf_gain,
@@ -1059,6 +1065,13 @@ parser.add_argument(
     default=None
 )
 
+parser.add_argument(
+    '-latex', '--latex_mapping_file',
+    help='File path to save tuples which give model \
+        string names and latex names.',
+    type=str,
+    default=None
+)
 
 
 arguments = parser.parse_args()
@@ -1070,7 +1083,9 @@ true_params_path = arguments.true_params
 exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
+latex_mapping_file = arguments.latex_mapping_file
 
+print("[analysemultiple] latex mapping file:", latex_mapping_file)
 
 if true_params_path is not None:
     true_params_info = pickle.load(
@@ -1244,15 +1259,17 @@ elif further_qhl_mode == False:
     ]
 
     try:
-        if growth_generator in valid_growth_rules_for_multiQMD_tree_plot:
-            plot_tree_multi_QMD(
-                results_csv = results_csv, 
-                all_bayes_csv = all_bayes_csv, 
-                growth_generator=growth_generator,
-                entropy = entropy,
-                inf_gain = inf_gain,
-                save_to_file='multiQMD_tree.png'
-            )
+        # if growth_generator in valid_growth_rules_for_multiQMD_tree_plot:
+
+        plot_tree_multi_QMD(
+            results_csv = results_csv, 
+            latex_mapping_file=latex_mapping_file, 
+            all_bayes_csv = all_bayes_csv, 
+            growth_generator=growth_generator,
+            entropy = entropy,
+            inf_gain = inf_gain,
+            save_to_file='multiQMD_tree.png'
+        )
 
     except NameError:
         print("Can not plot multiQMD tree -- this might be because only \
@@ -1265,8 +1282,8 @@ elif further_qhl_mode == False:
             one instance of QMD was performed. All other plots generated \
             without error."
         )
-    except:
-        print("Could not plot Multi QMD tree.")
+    # except:
+    #     print("Could not plot Multi QMD tree.")
 
 
 
