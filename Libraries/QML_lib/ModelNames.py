@@ -390,10 +390,12 @@ def non_interacting_model(core_pauli, num_qubits):
 
 
 def non_interacting_ising_all_names(
-    num_qubits=4, 
+    num_qubits=2, 
     return_branch_dict='latex_terms', 
     **kwargs
 ):
+    from UserFunctions import max_spawn_depth_info
+    num_qubits = max_spawn_depth_info['non_interacting_ising'] + 1
     paulis = ['x', 'y', 'z']
     all_models=[]
     models_on_branches = {0: ['']}
