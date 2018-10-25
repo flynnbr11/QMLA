@@ -964,7 +964,10 @@ def plot_tree_multi_QMD(
         save_to_file=None
     ):
 #    res_csv="/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Results/multtestdir/param_sweep.csv"
-    qmd_res = pandas.DataFrame.from_csv(results_csv, index_col='LatexName')
+    qmd_res = pandas.DataFrame.from_csv(
+        results_csv, 
+        index_col='LatexName'
+    )
     mods = list(qmd_res.index)
     winning_count = {}
     for mod in mods:

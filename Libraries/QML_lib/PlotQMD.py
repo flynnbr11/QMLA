@@ -2331,30 +2331,56 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
     names = list(data.keys())
     fields = ['ModelName']
     fields += names
-    all_models= ['ModelName']
-    # all_models += ising_terms_full_list()
     # all_models += UserFunctions.get_all_model_names(
     #     growth_generator = qmd.GrowthGenerator,
     #     return_branch_dict='latex_terms'
     # )
-
-    raw_names=list(qmd.ModelNameIDs.values())
-    all_models += [
-        UserFunctions.get_latex_name(name, growth_generator=qmd.GrowthGenerator)
-        for name in raw_names
-    ]
-
-    
+    all_models = []
     if os.path.isfile(all_bayes_csv) is False:
+        # all_models += ['ModelName']
+        # all_models += names
+        print("file exists:", os.path.isfile(all_bayes_csv))
+        print("creating CSV")
         with open(all_bayes_csv, 'a+') as bayes_csv:
-            writer = csv.DictWriter(bayes_csv, fieldnames=all_models)
+            writer = csv.DictWriter(
+                bayes_csv, 
+                fieldnames=fields
+            )
             writer.writeheader()
-    
-    with open(all_bayes_csv, 'a') as bayes_csv:
-        writer = csv.DictWriter(bayes_csv, fieldnames=all_models)
 
+    else:
+        # print("file exists:", os.path.isfile(all_bayes_csv))
+        current_csv = csv.DictReader(open(all_bayes_csv))
+        current_fieldnames = current_csv.fieldnames
+        new_models = list(
+            set(fields) - set(current_fieldnames)
+        )
+        # print("current:", current_fieldnames)
+        # print("fields:", fields)
+
+        if len(new_models) > 0:
+            print("new models:", new_models)
+            import pandas
+            csv_input = pandas.read_csv(
+                all_bayes_csv, 
+                index_col='ModelName'
+            )
+            a=list(csv_input.keys())
+            # print("pandas says existing models are:\n", a)
+            empty_list = [np.NaN]*len(list(csv_input[a[0]].values))
+
+            for new_col in new_models:
+                csv_input[new_col] = empty_list
+            # print("writing new pandas CSV: ", csv_input)
+            csv_input.to_csv(all_bayes_csv)
+    with open(all_bayes_csv, 'a') as bayes_csv:
+        writer = csv.DictWriter(
+            bayes_csv, 
+            fieldnames=fields,
+        )
         for f in names:
             single_model_dict = data[f]
+            # print("Model:", f, "\n dict:", single_model_dict)
             single_model_dict['ModelName']=f
             writer.writerow(single_model_dict)
 
