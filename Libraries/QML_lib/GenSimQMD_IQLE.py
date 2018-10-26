@@ -236,13 +236,6 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
             true_evo = True
             operators = self._true_oplist
-            if true_dim > sim_dim: 
-                operators = DataBase.reduced_operators(
-                    self._truename, 
-                    int(sim_dim)
-                )
-            else:
-                operators = self._true_oplist
             params = [copy.deepcopy(self._trueparams)]
             
             if self.use_time_dep_true_model:

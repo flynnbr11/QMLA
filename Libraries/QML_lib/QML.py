@@ -107,7 +107,8 @@ class ModelLearningClass():
         port_number=6379, qid=0, log_file='QMD_log.log'
     ):
        
-        self.log_print(["QID=", qid])
+        # self.log_print(["QID=", qid])
+        self.log_print(["QML for ", self.Name])
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db'] 
         init_model_print_loc = False
@@ -136,10 +137,12 @@ class ModelLearningClass():
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
         self.SimOpsNames = simopnames
         print_loc(print_location=init_model_print_loc)
-        self.log_print(["learning true params:", self.TrueParams])
         
         self.SimOpList  = np.asarray(simoplist)
         self.SimParams = np.asarray([simparams[0]])
+        self.log_print(["True oplist:", self.TrueOpList ])
+        self.log_print(["Sim oplist:", self.SimOpList])
+        self.log_print(["learning true params:", self.TrueParams])
         self.EnableSparse = enable_sparse
         self.checkQLoss = True
         print_loc(print_location=init_model_print_loc)

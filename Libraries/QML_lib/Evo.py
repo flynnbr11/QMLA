@@ -113,9 +113,19 @@ def get_pr0_array_qle(
     output = np.empty([num_particles, num_times])
     for evoId in range(num_particles): ## todo not sure about length/arrays here
         for tId in range(len(t_list)):
-            ham = np.tensordot(
-                modelparams[evoId], oplist, axes=1
-            )
+            try:
+                ham = np.tensordot(
+                    modelparams[evoId], oplist, axes=1
+                )
+            except:
+                log_print(
+                    [
+                    "Failed to build Hamiltonian.",
+                    "\nmodelparams:", modelparams[evoId], 
+                    "\noplist:", oplist
+                    ], 
+                    log_file, log_identifier
+                )
 
             """
             # Log print to prove True Hamiltonian is time dependent.

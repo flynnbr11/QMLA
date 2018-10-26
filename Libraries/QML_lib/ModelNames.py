@@ -517,3 +517,25 @@ def interacting_ising_nearest_neighbours_all_names(
     
     
     return all_models
+
+def nearest_neighbour_ising_latex_name(
+    name,
+    **kwargs
+):
+    num_qubits = DataBase.get_num_qubits(name)
+
+    paulis = ['x', 'y', 'z']
+
+    for p in paulis:
+        if p in name:
+            core_pauli = p
+
+    latex_rep = str(
+        '$' + 
+         core_pauli +   
+        '^{'+
+        '\\otimes' +
+        str(num_qubits) +
+        '}$'
+    )
+    return latex_rep
