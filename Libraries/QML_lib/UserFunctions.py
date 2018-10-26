@@ -82,7 +82,7 @@ max_spawn_depth_info = {
     'test_multidimensional' : 10, 
     'test_return_champs' : 3,
     'non_interacting_ising' : 3,
-    'interacting_nearest_neighbour_ising' : 2
+    'interacting_nearest_neighbour_ising' : 3
 }
 
 
@@ -256,7 +256,7 @@ def get_name_branch_map(
 			latex_mapping_file=latex_mapping_file, 
 			**kwargs
 		)
-	print("Latex Mapping used", branch_mapping)
+	# print("Latex Mapping used", branch_mapping)
 
 	return name_branch_map
 

@@ -2003,8 +2003,18 @@ class QMD():
             save_to_file = save_to_file
         )
 
-    def plotTreeDiagram(self, modlist=None, save_to_file=None):
-        PlotQMD.plotQMDTree(self, modlist=modlist, save_to_file=save_to_file)
+    def plotTreeDiagram(
+        self, 
+        modlist=None, 
+        only_adjacent_branches=True,
+        save_to_file=None
+    ):
+        PlotQMD.plotQMDTree(
+            self, 
+            modlist=modlist, 
+            only_adjacent_branches=only_adjacent_branches,
+            save_to_file=save_to_file
+        )
 
     def plotRadarDiagram(self, modlist=None, save_to_file=None):
         plot_title=str("Radar Plot QMD "+ str(self.Q_id))

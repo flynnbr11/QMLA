@@ -1238,7 +1238,10 @@ branch_champ_node_colour = 'b'
 overall_champ_node_colour = 'g'    
 
     
-def qmdclassTOnxobj(qmd, modlist=None, directed=True,
+def qmdclassTOnxobj(
+    qmd, 
+    modlist=None, 
+    directed=True,
     only_adjacent_branches=True
 ):
     
@@ -1672,7 +1675,11 @@ def cumulativeQMDTreePlot(
     for a in modlist:
         remaining_modlist = modlist[modlist.index(a)+1:]
         for b in remaining_modlist:
-            is_adj = global_adjacent_branch_test(a, b, term_branches)
+            is_adj = global_adjacent_branch_test(
+                a, 
+                b, 
+                term_branches
+            )
             if is_adj or not only_adjacent_branches:
                 if a!=b:
                     pairing = (a,b)

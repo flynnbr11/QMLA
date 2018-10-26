@@ -542,6 +542,7 @@ else:
             # currently only useful for Ising growth 2 qubits. 
             try:
                 qmd.plotTreeDiagram(
+                    only_adjacent_branhces=False, 
                     save_to_file = str
                     (global_variables.plots_directory+
                     'tree_diagram_' + 

@@ -979,7 +979,7 @@ def plot_tree_multi_QMD(
         wins_per_mod=winning_count,
         latex_mapping_file=latex_mapping_file, 
         growth_generator=growth_generator,
-        only_adjacent_branches=True, 
+        only_adjacent_branches=False, 
         avg=avg_type, entropy=entropy, inf_gain=inf_gain,
         save_to_file=save_to_file
     )        
