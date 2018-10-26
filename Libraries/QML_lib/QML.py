@@ -140,9 +140,9 @@ class ModelLearningClass():
         
         self.SimOpList  = np.asarray(simoplist)
         self.SimParams = np.asarray([simparams[0]])
-        self.log_print(["True oplist:", self.TrueOpList ])
-        self.log_print(["Sim oplist:", self.SimOpList])
-        self.log_print(["learning true params:", self.TrueParams])
+        # self.log_print(["True oplist:", self.TrueOpList ])
+        # self.log_print(["Sim oplist:", self.SimOpList])
+        # self.log_print(["learning true params:", self.TrueParams])
         self.EnableSparse = enable_sparse
         self.checkQLoss = True
         print_loc(print_location=init_model_print_loc)
