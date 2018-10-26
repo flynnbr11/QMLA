@@ -237,14 +237,15 @@ def get_name_branch_map(
 		branch_mapping = name_branch_map_functions[growth_generator]
 		name_branch_map = branch_mapping(
 			latex_mapping_file=latex_mapping_file, 
-			**kwargs)
+			**kwargs
+		)
 	except:
 		branch_mapping = name_branch_map_functions[None]
 		name_branch_map = branch_mapping(
 			latex_mapping_file=latex_mapping_file, 
 			**kwargs
 		)
-	# print("Latex Mapping used", latex_mapping)
+	print("Latex Mapping used", branch_mapping)
 
 	return name_branch_map
 
