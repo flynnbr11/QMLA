@@ -674,6 +674,139 @@ def non_interacting_ising(model_list, **kwargs):
             new_models.append(new_model)
     return new_models
 
+import copy
+def full_model_string(operations):
+    """
+    operations must be a dict with elements:
+    - 'dim' : number of qubits
+    - 'terms' : list of lists of tuple of the form, 
+        e.g. [ (1, 'x'), (2, 'y')]
+        i.e. tuples (qubit_id, pauli_operator)
+        Each nested list gives a term, which are all added together for the full model
+    Reconstructs unique model name for that Hamiltonian. 
+    """
+    
+    
+    # Note TODO: this doesn't give an error when tuples are given which aren't used. it should
+    terms = operations['terms']
+    num_qubits = operations['dim']
+    num_terms = len(terms)
+    all_terms = []
+    for i  in range(len(terms)):
+        single_term = terms[i]
+        single_term_dict = dict(single_term)
+
+        model_name = ''
+
+        t_str=''
+        for i in range(1, 1+num_qubits):
+            if i in single_term_dict:
+                pauli = single_term_dict[i]
+            else:
+                pauli ='i'
+            t_str+='T'
+            if i==num_qubits:
+                t_str = ''
+            model_name += str(pauli + t_str)
+
+        all_terms.append(model_name)
+
+    p_str = 'P'
+    for i in range(num_qubits-1):
+        p_str+='P'
+
+    full_model = p_str.join(all_terms)    
+    return full_model
+
+def operations_dict_from_name(mod_name):
+    constituents = DataBase.get_constituent_names_from_name(mod_name)
+    num_qubits = DataBase.get_num_qubits(mod_name)
+    initial_t_str = ''
+    all_terms = []
+    for j in range(num_qubits-1):
+        initial_t_str += 'T' 
+
+    for i in range(len(constituents)):
+        t_str = initial_t_str
+        single_term = constituents[i]
+        all_tuples_this_term = []
+        n_minus_1_qubit_operators = single_term
+        for k in range(num_qubits):
+            if len(t_str) > 0:
+                split_by_nth_qubit = n_minus_1_qubit_operators.split(t_str)
+                this_tuple = (num_qubits-k, split_by_nth_qubit[1])
+                n_minus_1_qubit_operators = split_by_nth_qubit[0]
+                t_str = t_str[:-1]
+            else:
+                this_tuple = (num_qubits-k, n_minus_1_qubit_operators)
+
+            all_tuples_this_term.append(this_tuple)
+
+        all_tuples_this_term = sorted(all_tuples_this_term)
+        all_terms.append(all_tuples_this_term)
+
+    operations = {
+        'dim' : num_qubits, 
+        'terms' : all_terms
+    }
+    
+    return operations
+
+
+def interacting_nearest_neighbour_ising(
+    model_list,
+    **kwargs
+):
+    new_models = []
+    paulis = ['x', 'y', 'z']
+    for mod in model_list:
+        potential_core_paulis = []
+        for p in paulis:
+            if p in mod and p not in potential_core_paulis:
+                potential_core_paulis.append(p)
+        if len(potential_core_paulis)==1:
+            core_pauli = potential_core_paulis[0]
+        else:
+            core_pauli = potential_core_paulis[0]
+            print("clashing potential core paulis in interacting \
+                nearest neighbour growth function from model", 
+                mod, 
+                ". Input model should only have one pauli type. \
+                Proceeding with core", 
+                core_pauli
+            )
+        operations_of_mod = operations_dict_from_name(mod)
+        previous_dim = operations_of_mod['dim']
+        new_dim = previous_dim + 1
+        present_terms = operations_of_mod['terms']
+        
+        num_terms = len(present_terms)
+        all_new_separate_terms = []
+
+        for t in present_terms:
+            new_terms = copy.copy(t)
+            new_terms.append( (new_dim, 'i') )
+
+            all_new_separate_terms.append(new_terms)
+
+        new_nn_term = []
+        for j in range(1, new_dim-1):
+            new_nn_term.append( (j, 'i') )
+        for j in range(new_dim-1, new_dim+1):
+            new_nn_term.append( (j, core_pauli) )    
+
+        all_new_separate_terms.append(new_nn_term)
+
+        new_mod_dict = {
+            'dim' : new_dim, 
+            'terms': all_new_separate_terms
+        }
+
+        new_mod_string = full_model_string(new_mod_dict)
+
+        new_models.append(new_mod_string)
+
+    return new_models
 
 
 # ##### Wrapper function and dict

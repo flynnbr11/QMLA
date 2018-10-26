@@ -135,8 +135,14 @@ strictly_two_qubit_ising_growths = [
     'two_qubit_ising_rotation_hyperfine_transverse', 
     'hyperfine_like'
 ]
+two_qubit_starting = [
+    'interacting_nearest_neighbour_ising'
+]
+
 if global_variables.growth_generation_rule in strictly_two_qubit_ising_growths:
     initial_op_list = ['xTi', 'yTi', 'zTi']
+elif global_variables.growth_generation_rule in two_qubit_starting:
+    initial_op_list = ['xTx', 'yTy', 'zTz']
 else:
     initial_op_list = ['x', 'y', 'z']
 

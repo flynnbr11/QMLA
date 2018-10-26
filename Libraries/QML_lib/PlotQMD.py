@@ -1501,6 +1501,7 @@ def plotTreeDiagram(
 
 def colour_dicts_from_win_count(
     winning_count, 
+    latex_mapping_file,
     growth_generator=None,
     min_colour_value=0.1
 ):
@@ -1516,13 +1517,22 @@ def colour_dicts_from_win_count(
     col_space = np.linspace(min_col, max_col, num_colours)
     colour_by_win_count = {}
     colour_by_node_name = {}
-    all_models=list(
-        # ising_terms_full_list(
-        UserFunctions.get_all_model_names(
-            growth_generator=growth_generator,
-            return_branch_dict='term_branch_dict').keys(
-        )
+    # all_models=list(
+    #     # ising_terms_full_list(
+    #     UserFunctions.get_all_model_names(
+    #         growth_generator=growth_generator,
+    #         return_branch_dict='term_branch_dict').keys(
+    #     )
+    # )
+    all_models = list(
+        UserFunctions.get_name_branch_map(
+            latex_mapping_file = latex_mapping_file,
+            growth_generator = growth_generator
+        ).keys()
     )
+
+
+
     # print("colour dict function. all_models:\n", all_models)
 
     for k in range(num_colours):
@@ -1618,6 +1628,7 @@ def cumulativeQMDTreePlot(
     colour_by_node_name, colour_by_count = (
         colour_dicts_from_win_count(
             wins_per_mod, 
+            latex_mapping_file=latex_mapping_file,
             growth_generator=growth_generator, 
             min_colour_value=0.4
         )

@@ -5,7 +5,7 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=2
+num_tests=5
 qhl_test=0
 do_further_qhl=0
 
@@ -88,7 +88,9 @@ mkdir -p $long_dir
 
 # growth_rule='test_return_champs'
 true_operator='yTy'
-growth_rule='non_interacting_ising'
+# growth_rule='non_interacting_ising'
+
+growth_rule='interacting_nearest_neighbour_ising'
 # true_operator='xTi'
 measurement_type='full_access'
 # measurement_type='hahn'

@@ -81,7 +81,8 @@ max_spawn_depth_info = {
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
     'test_multidimensional' : 10, 
     'test_return_champs' : 3,
-    'non_interacting_ising' : 3
+    'non_interacting_ising' : 3,
+    'interacting_nearest_neighbour_ising' : 4
 }
 
 
@@ -111,7 +112,10 @@ model_generation_functions = {
 	'test_return_champs' : 
 		ModelGeneration.existing_branch_champs_test,
 	'non_interacting_ising': 
-		ModelGeneration.non_interacting_ising
+		ModelGeneration.non_interacting_ising,
+	'interacting_nearest_neighbour_ising': 
+		ModelGeneration.interacting_nearest_neighbour_ising
+
 }
 
 def new_model_generator(generator, **kwargs):
@@ -194,7 +198,9 @@ all_models_functions = {
 	'test_return_champs' :
 		ModelNames.test_return_champs_ALL_MODELS,
 	'non_interacting_ising' :
-		ModelNames.non_interacting_ising_all_names  
+		ModelNames.non_interacting_ising_all_names,
+	'interacting_nearest_neighbour_ising':
+		ModelNames.interacting_ising_nearest_neighbours_all_names  
 
 }
 def get_all_model_names(
@@ -224,7 +230,10 @@ name_branch_map_functions = {
 	'test_return_champs' :
 		ModelNames.branch_is_num_params,
 	'non_interacting_ising' :
-		ModelNames.branch_is_num_dims
+		ModelNames.branch_is_num_dims,
+	'interacting_nearest_neighbour_ising' : 
+		ModelNames.branch_is_num_dims,
+
 }
 
 def get_name_branch_map(

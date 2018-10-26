@@ -493,3 +493,27 @@ def branch_is_num_dims(latex_mapping_file, **kwargs):
 
     return model_branches
 
+def interacting_ising_nearest_neighbours_all_names(
+    # growth_generator,
+    **kwargs
+):
+    import ModelGeneration
+    all_models = []
+
+    initial_models = ['xTx', 'yTy', 'zTz']
+    num_qubits = 5
+
+    models_on_branches = {
+        2 : initial_models
+    }
+
+    model_list = initial_models
+    for i in range(2, num_qubits+1):
+        new_models = ModelGeneration.interacting_nearest_neighbour_ising(model_list)
+        all_models.extend(new_models)
+        model_list = new_models
+        models_on_branches[i] = new_models
+    
+    
+    
+    return all_models
