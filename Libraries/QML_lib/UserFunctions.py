@@ -82,7 +82,7 @@ max_spawn_depth_info = {
     'test_multidimensional' : 10, 
     'test_return_champs' : 3,
     'non_interacting_ising' : 3,
-    'interacting_nearest_neighbour_ising' : 4
+    'interacting_nearest_neighbour_ising' : 3
 }
 
 
