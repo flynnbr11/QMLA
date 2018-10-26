@@ -470,10 +470,6 @@ def branch_is_num_params(latex_mapping_file, **kwargs):
 
 
 def branch_is_num_dims(latex_mapping_file, **kwargs):
-    print(
-        "branch_is_num_dims. latex file:", 
-        latex_mapping_file
-    )
     with open(latex_mapping_file) as f:
         content = f.readlines()
     # remove whitespace characters like `\n` at the end of each line

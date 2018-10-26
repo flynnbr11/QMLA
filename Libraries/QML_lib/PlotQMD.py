@@ -1552,7 +1552,6 @@ def cumulativeQMDTreePlot(
         inf_gain=None,
         save_to_file=None
     ):
-    print("[cumulative tree plot] start")
     import networkx as nx
     import copy
     import csv
@@ -1560,7 +1559,6 @@ def cumulativeQMDTreePlot(
         cumulative_csv, 
         growth_generator=growth_generator
     )
-    print("[cumulative tree plot] medians")
     if avg=='means':
         bayes_factors = means #medians
     elif avg=='medians':
@@ -1586,15 +1584,9 @@ def cumulativeQMDTreePlot(
         growth_generator = growth_generator
     )
 
-    # term_branches = model_name_to_branch_mapping(latex_mapping)
-    print("[cumulative tree plot] term branches:\n\t", term_branches)
-    # print("[cumulative tree plot] new term branches:\n\t", new_term_branches)
-    # print("[cumulative tree plot] latex mapping:\n\t", latex_mapping)
-    # print("cumulative csv:", cumulative_csv)
     modlist = csv.DictReader(open(cumulative_csv)).fieldnames
     if 'ModelName' in modlist:
         modlist.remove('ModelName')
-    # print("[cummulative]alternative modlist:", modlist)
 
     pair_freqs={}
     for c in list(counts.keys()):

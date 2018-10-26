@@ -146,7 +146,9 @@ do
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
-            -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
+            -ds=$dataset -dst=$data_max_time \
+            -dto=$data_time_offset \
+            -latex=$latex_mapping_file \
             -ggr=$growth_rule \
             
     done
@@ -199,7 +201,9 @@ then
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
-            -ds=$dataset -dst=$data_max_time -dto=$data_time_offset \
+            -ds=$dataset -dst=$data_max_time \
+            -dto=$data_time_offset \
+            -latex=$latex_mapping_file \
             -ggr=$growth_rule \
 
     done

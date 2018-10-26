@@ -116,6 +116,7 @@ class QMD():
         use_rq=True, 
         rq_timeout=36000,
         growth_generator='simple_ising',
+        latex_mapping_file='LatexMapping.txt',
         log_file = None
     ):
         self.StartingTime = time.time()
@@ -164,9 +165,7 @@ class QMD():
         self.ResultsDirectory = results_directory
         if not self.ResultsDirectory.endswith('/'):
             self.ResultsDirectory += '/'
-        self.LatexMappingFile = str(
-            self.ResultsDirectory + 'LatexMapping.txt'
-        )
+        self.LatexMappingFile = latex_mapping_file
 
         self.NumProbes = num_probes
         if probe_dict is None:

@@ -303,6 +303,7 @@ qmd = QMD(
     host_name = global_variables.host_name,
     port_number = global_variables.port_number,
     rq_timeout = global_variables.rq_timeout,
+    latex_mapping_file = global_variables.latex_mapping_file,
     log_file = global_variables.log_file
 )
 

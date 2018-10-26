@@ -232,7 +232,6 @@ def get_name_branch_map(
     growth_generator=None,
     **kwargs
 ):
-	print("get name branch map. latex:", latex_mapping_file)
 	try:
 		# if mapping doesn't work, default to just wrap in $__$. 
 		branch_mapping = name_branch_map_functions[growth_generator]

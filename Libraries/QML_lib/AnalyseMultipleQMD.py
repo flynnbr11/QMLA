@@ -964,8 +964,6 @@ def plot_tree_multi_QMD(
         inf_gain=None, 
         save_to_file=None
     ):
-#    res_csv="/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Results/multtestdir/param_sweep.csv"
-    print("[plot tree plot_tree_multi_QMD] start")
     qmd_res = pandas.DataFrame.from_csv(
         results_csv, 
         index_col='LatexName'
@@ -974,9 +972,6 @@ def plot_tree_multi_QMD(
     winning_count = {}
     for mod in mods:
         winning_count[mod]=mods.count(mod)
-    print("[plot tree plot_tree_multi_QMD] latex_mapping_file:", 
-        latex_mapping_file
-    )
 
     ptq.cumulativeQMDTreePlot(
         cumulative_csv=all_bayes_csv, 
@@ -1084,8 +1079,6 @@ exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
 latex_mapping_file = arguments.latex_mapping_file
-
-print("[analysemultiple] latex mapping file:", latex_mapping_file)
 
 if true_params_path is not None:
     true_params_info = pickle.load(

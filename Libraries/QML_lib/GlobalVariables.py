@@ -75,7 +75,9 @@ default_resample_threshold = 0.5
 default_resample_a = 0.95
 default_pgh_factor = 1.0
 default_qmd_id = 1
-default_results_directory = get_directory_name_by_time(just_date=False)
+default_results_directory = get_directory_name_by_time(
+  just_date=False
+)
 default_pickle_qmd_class = 0
 default_port_number = 6379
 default_host = 'localhost'
@@ -95,6 +97,10 @@ default_growth_generation_rule = 'two_qubit_ising_rotation_hyperfine'
 default_prior_pickle_file = None
 default_true_params_pickle_file = None
 default_true_expec_path = None
+default_latex_mapping_file = str(
+  default_results_directory +
+  '/LatexMapping.txt'
+)
 
 
 class GlobalVariablesClass():
@@ -138,7 +144,8 @@ class GlobalVariablesClass():
         growth_generation_rule = default_growth_generation_rule,
         prior_pickle_file = default_prior_pickle_file,
         true_params_pickle_file = default_true_params_pickle_file,
-        true_expec_path = default_true_expec_path
+        true_expec_path = default_true_expec_path,
+        latex_mapping_file = default_latex_mapping_file
 
     ):
         self.true_operator = true_operator
@@ -182,6 +189,7 @@ class GlobalVariablesClass():
         self.prior_pickle_file = prior_pickle_file
         self.true_params_pickle_file = true_params_pickle_file
         self.true_expec_path = true_expec_path
+        self.latex_mapping_file = latex_mapping_file
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -482,6 +490,12 @@ def parse_cmd_line_args(args):
       default=default_true_params_pickle_file
     )
 
+    parser.add_argument(
+      '-latex', '--latex_mapping_file',
+      help='Path to save list of terms latex/name maps to.',
+      type=str,
+      default=default_latex_mapping_file
+    )
 
 
     # Process arguments from command line
@@ -527,6 +541,7 @@ def parse_cmd_line_args(args):
     prior_pickle_file = arguments.prior_pickle_file
     true_params_pickle_file = arguments.true_params_pickle_file
     true_expec_path = arguments.true_expectation_values_path
+    latex_mapping_file = arguments.latex_mapping_file
 
     # Use arguments to initialise global variables class. 
     global_variables = GlobalVariablesClass(
@@ -567,7 +582,8 @@ def parse_cmd_line_args(args):
         growth_generation_rule = growth_generation_rule,
         prior_pickle_file = prior_pickle_file,
         true_params_pickle_file = true_params_pickle_file,
-        true_expec_path = true_expec_path
+        true_expec_path = true_expec_path,
+        latex_mapping_file = latex_mapping_file
     )
 
     args_dict = vars(arguments)
