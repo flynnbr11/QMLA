@@ -2,21 +2,24 @@
 
 #test_description="qhl_test_Gabi_params"
 #test_description="qhl_test_kHz_hyperfine_params_broad_prior"
-test_description="multi_qhl_sim_data_random_true_vals"
+#test_description="multi_qhl_sim_data_random_true_vals"
+test_description="interacting_ising_growth_test"
 
 ## Script essentials
-num_tests=100
-qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
+num_tests=15
+qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 
-# QHL parameters
-p=7000 # particles
-e=3000 # experiments
+# QHL paramebleueters
+p=500 # particles
+e=100 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
-rp=0.1 # PGH factor
-op='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+rp=1.0 # PGH factor
+op='xTxTTiPPPiTxTTx'
+#op='yTz'
+#op='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 #op='xTiPPyTiPPzTiPPxTxPPyTyPPzTzPPxTyPPxTzPPyTz'
 
 # QMD settings
@@ -25,16 +28,30 @@ experimental_data=0 # use experimental data -> 1; use fake data ->0
 #dataset='NV05_HahnEcho02'
 dataset='NVB_dataset.p'
 #dataset='NV05_dataset.p'
+sim_measurement_type='full_access'
+exp_measurement_type='hahn' # to use if not experimental
+
+# Overwrite settings for specific cases
+if (( "$experimental_data" == 1))
+then
+    measurement_type=$exp_measurement_type
+else
+    measurement_type=$sim_measurement_type
+fi
+
+
 data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
 top_number_models=2 # how many models to perform further QHL for
 further_qhl_resource_factor=1
-growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='interacting_nearest_neighbour_ising'
+#growth_rule='non_interacting_ising'
+#growth_rule='two_qubit_ising_rotation_hyperfine'
 #growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
-random_true_params=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
+random_true_params=1 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
 random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
-do_plots=0
+do_plots=1
 pickle_class=0
 custom_prior=1
 #true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
@@ -68,7 +85,8 @@ full_path_to_results=$(pwd)/Results/$results_dir
 all_qmd_bayes_csv="$full_path_to_results/multiQMD.csv"
 true_expec_filename="true_expec_vals.p"
 true_expec_path="$full_path_to_results/$true_expec_filename"
-
+latex_map_name='LatexMapping.txt'
+latex_mapping_file=$full_path_to_results/$latex_map_name
 
 OUT_LOG="$full_path_to_results/output_and_error_logs/"
 output_file="output_file"
@@ -153,10 +171,11 @@ do
 					do
 						for i in `seq $min_id $max_id`;
 						do
-							let bt="$e-1"
+							let bt="$e"
 							let qmd_id="$qmd_id+1"
 							let ham_exp="$e*$p + $p*$bt"
-							let expected_time="$ham_exp/20"
+#							let expected_time="$ham_exp/10"
+							let expected_time="$ham_exp"
 							let num_jobs_launched="$num_jobs_launched+1"
 							if [ "$qhl" == 1 ]
 							then
@@ -179,7 +198,7 @@ do
 							this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
 							printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd \n" >> QMD_all_tasks.log
 
-							qsub -v QMD_ID=$qmd_id,OP="$op",QHL=$qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+							qsub -v QMD_ID=$qmd_id,OP="$op",QHL=$qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
 
 						done
 					done
@@ -196,7 +215,8 @@ finalise_further_qhl_stage_script=$full_path_to_results/FURTHER_finalise.sh
 echo "
 #!/bin/bash 
 cd $lib_dir
-python3 AnalyseMultipleQMD.py -dir="$full_path_to_results" --bayes_csv=$all_qmd_bayes_csv -top=$top_number_models -qhl=$qhl -fqhl=0 -data=$dataset -exp=$experimental_data -params=$true_params_pickle_file -true_expec=$true_expec_path
+python3 AnalyseMultipleQMD.py -dir="$full_path_to_results" --bayes_csv=$all_qmd_bayes_csv -top=$top_number_models -qhl=$qhl -fqhl=0 -data=$dataset \
+	-exp=$experimental_data -params=$true_params_pickle_file -true_expec=$true_expec_path -latex=$latex_mapping_file -ggr=$growth_rule
 " > $finalise_qmd_script
 
 ### Further QHL on best performing models. Add section to analysis script, which launches futher_qhl stage.
@@ -216,14 +236,14 @@ cd $(pwd)
 for i in \`seq $min_id $max_id\`;
 do
 	let qmd_id="1+\$qmd_id"
-	qsub -v QMD_ID=\$qmd_id,OP="$op",QHL=0,FURTHER_QHL=1,EXP_DATA=$experimental_data,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path -N finalise_$test_description\_\$qmd_id -l $pbs_config -o $OUT_LOG/finalise_output.txt -e $OUT_LOG/finalise_error.txt run_qmd_instance.sh 
+	qsub -v QMD_ID=\$qmd_id,OP="$op",QHL=0,FURTHER_QHL=1,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path -N finalise_$test_description\_\$qmd_id -l $pbs_config -o $OUT_LOG/finalise_output.txt -e $OUT_LOG/finalise_error.txt run_qmd_instance.sh 
 done 
 	" >> $finalise_qmd_script
 
 	echo "
 		#!/bin/bash 
 		cd $lib_dir
-		python3 AnalyseMultipleQMD.py -dir="$full_path_to_results" --bayes_csv=$all_qmd_bayes_csv -top=$top_number_models -qhl=$qhl -fqhl=1 -data=$dataset -exp=$experimental_data -params=$true_params_pickle_file -true_expec=$true_expec_path
+		python3 AnalyseMultipleQMD.py -dir="$full_path_to_results" --bayes_csv=$all_qmd_bayes_csv -top=$top_number_models -qhl=$qhl -fqhl=1 -data=$dataset -exp=$experimental_data -latex==$latex_mapping_file -params=$true_params_pickle_file -true_expec=$true_expec_path -ggr=$growth_rule
 	" > $finalise_further_qhl_stage_script
 	chmod a+x $finalise_further_qhl_stage_script
 fi 
