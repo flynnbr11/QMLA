@@ -82,7 +82,7 @@ max_spawn_depth_info = {
     'test_multidimensional' : 10, 
     'test_return_champs' : 3,
     'non_interacting_ising' : 3,
-    'interacting_nearest_neighbour_ising' : 3
+    'interacting_nearest_neighbour_ising' : 2
 }
 
 
@@ -164,7 +164,9 @@ latex_naming_functions = {
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		ModelNames.latex_name_ising, 
 	'test_return_champs' :
-		ModelNames.default_latex_wrapping
+		ModelNames.default_latex_wrapping,
+	'interacting_nearest_neighbour_ising' : 
+		ModelNames.nearest_neighbour_ising_latex_name
 }
 
 def get_latex_name(
