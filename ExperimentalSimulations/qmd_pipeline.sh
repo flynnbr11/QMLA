@@ -5,7 +5,7 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=5
+num_tests=3
 qhl_test=0
 do_further_qhl=0
 
@@ -77,20 +77,22 @@ mkdir -p $long_dir
 
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='test_multidimensional' 
+# growth_rule='two_qubit_ising_rotation_hyperfine'
 # true_operator='xTiPPyTiPPyTy'
 # true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
 
-# growth_rule='two_qubit_ising_rotation_hyperfine'
 # true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 # sim_measurement_type='full_access'
 # exp_measurement_type='hahn' # to use if not experimental
 # measurement_type=$sim_measurement_type
 
 # growth_rule='test_return_champs'
-true_operator='yTy'
+# true_operator='yTi'
+# growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='non_interacting_ising'
-
 growth_rule='interacting_nearest_neighbour_ising'
+true_operator='xTxTTiPPPiTxTTx'
+
 # true_operator='xTi'
 measurement_type='full_access'
 # measurement_type='hahn'
