@@ -248,6 +248,7 @@ def average_parameter_estimates(
     save_to_file=None
 ):
     from matplotlib import cm
+    plt.switch_backend('agg') #  to try fix plt issue on BC
     results = pandas.DataFrame.from_csv(
         results_path,
         index_col='QID'
