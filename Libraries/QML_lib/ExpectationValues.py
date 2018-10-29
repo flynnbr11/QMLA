@@ -70,11 +70,13 @@ def expectation_value(
     
     if compare_exp_fncs_tol is not None: # For testing custom ham-exp function
         u_psi_linalg = evolved_state(ham, t, state, 
-            use_exp_custom=False, print_exp_details=print_exp_details,
+            use_exp_custom=False, 
+            print_exp_details=print_exp_details,
             exp_fnc_cutoff=exp_fnc_cutoff
         )
         u_psi_exp_custom = evolved_state(ham, t, state,
-            use_exp_custom=True, print_exp_details=print_exp_details,
+            use_exp_custom=True, 
+            print_exp_details=print_exp_details,
             exp_fnc_cutoff=exp_fnc_cutoff
         )
         
@@ -153,8 +155,12 @@ def expectation_value(
 
 
  
-def evolved_state(ham, t, state, use_exp_custom=True, 
-    enable_sparse=True, print_exp_details=False, exp_fnc_cutoff=10, log_file=None,
+def evolved_state(
+    ham, t, state, 
+    use_exp_custom=True, 
+    precision=1e-10, # precision to which we require custom exp_ham to match linalg.expm
+    enable_sparse=True, 
+    print_exp_details=False, exp_fnc_cutoff=10, log_file=None,
     log_identifier=None
 ):
     #import hamiltonian_exponentiation as h
@@ -173,7 +179,10 @@ def evolved_state(ham, t, state, use_exp_custom=True,
                 ["Using custom expm. Exponentiating\nt=",t, "\nHam=\n", ham],
                 log_file, log_identifier
             )
-        unitary = h.exp_ham(ham, t, enable_sparse_functionality=enable_sparse,
+        unitary = h.exp_ham(
+            ham, t, 
+            precision = precision, 
+            enable_sparse_functionality=enable_sparse,
             print_method=print_exp_details, scalar_cutoff=t+1
         )
     else:

@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=3
+num_tests=1
 qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
-exp=3
+prt=100
+exp=30
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -89,11 +89,14 @@ mkdir -p $long_dir
 # growth_rule='test_return_champs'
 # true_operator='yTi'
 # growth_rule='two_qubit_ising_rotation_hyperfine'
-# growth_rule='non_interacting_ising'
-growth_rule='interacting_nearest_neighbour_ising'
-true_operator='xTxTTiPPPiTxTTx'
+growth_rule='non_interacting_ising'
 
-# true_operator='xTi'
+# growth_rule='interacting_nearest_neighbour_ising'
+# true_operator='xTxTTiPPPiTxTTx'
+# true_operator='xTxTTiTTTiPPPPiTxTTxTTTiPPPPiTiTTxTTTx'
+# true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTi'
+# true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTiPPPPPiTiTTiTTTxTTTTx'
+true_operator='xTy'
 measurement_type='full_access'
 # measurement_type='hahn'
 
