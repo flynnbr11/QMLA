@@ -29,6 +29,7 @@ import QML
 import Evo
 import ExpectationValues
 import ModelGeneration 
+import UserFunctions
 import matplotlib.pyplot as plt
 #from pympler import asizeof
 import matplotlib.pyplot as plt
@@ -130,24 +131,51 @@ if global_variables.use_experimental_data==True:
 # initial_op_list = ['xTx', 'xTy', 'xTz']
 # initial_op_list = ['xTi', 'xTiPPyTi', 'zTiTTi']
 
-strictly_two_qubit_ising_growths = [
-    'two_qubit_ising_rotation_hyperfine',
-    'two_qubit_ising_rotation_hyperfine_transverse', 
-    'hyperfine_like'
-]
-two_qubit_starting = [
-    'interacting_nearest_neighbour_ising'
-]
+# strictly_two_qubit_ising_growths = [
+#     'two_qubit_ising_rotation_hyperfine',
+#     'two_qubit_ising_rotation_hyperfine_transverse', 
+#     'hyperfine_like'
+# ]
+# two_qubit_starting = [
+#     'interacting_nearest_neighbour_ising'
+# ]
 
-if global_variables.growth_generation_rule in strictly_two_qubit_ising_growths:
-    initial_op_list = ['xTi', 'yTi', 'zTi']
-elif global_variables.growth_generation_rule in two_qubit_starting:
-    initial_op_list = ['xTx', 'yTy', 'zTz']
-else:
-    initial_op_list = ['x', 'y', 'z']
+# if global_variables.growth_generation_rule in strictly_two_qubit_ising_growths:
+#     initial_op_list = ['xTi', 'yTi', 'zTi']
+# elif global_variables.growth_generation_rule in two_qubit_starting:
+#     initial_op_list = ['xTx', 'yTy', 'zTz']
+# else:
+#     initial_op_list = ['x', 'y', 'z']
 
 
-# initial_op_list = ['y']
+# initial_op_list = ['x']
+
+initial_op_list  = UserFunctions.get_initial_op_list(
+    growth_generator = global_variables.growth_generation_rule,
+    log_file = global_variables.log_file
+)
+
+if global_variables.growth_generation_rule == 'non_interacting_ising_single_axis':
+    paulis = ['x', 'y', 'z']
+    count_paulis = 0 
+    for p in paulis:
+        if p in global_variables.true_operator:
+            count_paulis += 1
+            core_pauli = p
+
+    if count_paulis > 1:
+        print(
+            "For growth rule ", 
+            global_variables.growth_generation_rule, 
+            "true operator", global_variables.true_opeator, 
+            "not valid"
+        )
+        sys.exit()
+
+    else:
+        initial_op_list = [core_pauli]
+
+
 
 true_op = global_variables.true_operator
 true_num_qubits = DataBase.get_num_qubits(true_op)
@@ -531,26 +559,19 @@ else:
     #            'hinton_champions_', str(global_variables.long_id), 
     #            '.png')
     #        )
-        if (
-            True # want to force it while fixing tree plot 
-            or 
-            global_variables.growth_generation_rule == 'two_qubit_ising_rotation_hyperfine'
-            or
-            global_variables.growth_generation_rule == 'two_qubit_ising_rotation_hyperfine_transverse'
-        ):
-            # TODO generalise so tree diagram can be used in all cases
-            # currently only useful for Ising growth 2 qubits. 
-            try:
-                qmd.plotTreeDiagram(
-                    only_adjacent_branhces=False, 
-                    save_to_file = str
-                    (global_variables.plots_directory+
-                    'tree_diagram_' + 
-                    str(global_variables.long_id) + 
-                    '.png')
-                )
-            except:
-                pass
+        # TODO generalise so tree diagram can be used in all cases
+        # currently only useful for Ising growth 2 qubits. 
+        try:
+            qmd.plotTreeDiagram(
+                only_adjacent_branhces=False, 
+                save_to_file = str
+                (global_variables.plots_directory+
+                'tree_diagram_' + 
+                str(global_variables.long_id) + 
+                '.png')
+            )
+        except:
+            pass
 
         qmd.plotRSquaredVsEpoch(
             save_to_file = str(

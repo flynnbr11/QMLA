@@ -29,6 +29,14 @@ import ModelGeneration
 import ModelNames 
 import ExpectationValues
 
+def time_seconds():
+    import datetime
+    now =  datetime.date.today()
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute
+    second = datetime.datetime.now().second
+    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    return time
 
 def log_print(to_print_list, log_file):
     identifier = str(str(time_seconds()) +" [USER FUNCTIONS]")
@@ -55,13 +63,6 @@ expec_val_function_dict = {
     	ExpectationValues.traced_expectation_value_project_one_qubit_plus
 }
 
-    
-def expectation_value_wrapper(method, **kwargs):       
-    # method means measurement_type flag, provided to QMD
-    # print("method:", method)
-    expectation_value_function = expec_val_function_dict[method]
-    return expectation_value_function(**kwargs)
-
 
 ##### ---------- -------------------- #####  
 # Model Generation
@@ -82,16 +83,9 @@ max_spawn_depth_info = {
     'test_multidimensional' : 10, 
     'test_return_champs' : 3,
     'non_interacting_ising' : 3,
+    'non_interacting_ising_single_axis' : 3,
     'interacting_nearest_neighbour_ising' : 3
 }
-
-
-def max_spawn_depth(generator, log_file):
-    if generator not in max_spawn_depth_info:
-        log_print(["Generator not recognised; does not have maximum spawn depth or generation function"], log_file)
-    else:
-        return max_spawn_depth_info[generator]
-
 
 model_generation_functions = {
 	# growth_generation_rule : growth_function
@@ -113,16 +107,12 @@ model_generation_functions = {
 		ModelGeneration.existing_branch_champs_test,
 	'non_interacting_ising': 
 		ModelGeneration.non_interacting_ising,
+	'non_interacting_ising_single_axis':
+		ModelGeneration.non_interacting_ising_single_axis,
 	'interacting_nearest_neighbour_ising': 
 		ModelGeneration.interacting_nearest_neighbour_ising
 
 }
-
-def new_model_generator(generator, **kwargs):
-    model_func = model_generation_functions[generator]
-    # print("[User funcs] Using model generation function:", model_func)
-    return model_func(**kwargs)
-
 
 ##### ---------- -------------------- #####  
 # Functions to check whether the tree being learned is completed. 
@@ -134,20 +124,29 @@ tree_finished_functions = {
 		ModelGeneration.spawn_depth_check
 }
 
-def tree_finished(generator, **kwargs):
-	try:
-		tree_finished_check = tree_finished_functions[generator]
-	except:
-		tree_finished_check = tree_finished_functions[None]
 
-	tree_completed = tree_finished_check(
-		generator = generator, 
-		max_spawn_depth_info = max_spawn_depth_info,
-		**kwargs
-	)
-	# print("[tree finished] func:", tree_finished_check)
-	# print("tree completed:", tree_completed)
-	return tree_completed 		
+##### ---------- -------------------- #####  
+# Mapping model name strings to branch numbers
+##### ---------- -------------------- #####  
+
+name_branch_map_functions = {
+	# growth_generation_rule : latex_mapping_function
+	None : 
+		ModelNames.branch_is_num_params,
+	'two_qubit_ising_rotation_hyperfine' : 
+		ModelNames.branch_is_num_params, 
+	'two_qubit_ising_rotation_hyperfine_transverse' : 
+		ModelNames.branch_is_num_params, 
+	'test_return_champs' :
+		ModelNames.branch_is_num_params,
+	'non_interacting_ising' :
+		ModelNames.branch_is_num_dims,
+	'interacting_nearest_neighbour_ising' : 
+		ModelNames.branch_is_num_dims,
+	'non_interacting_ising_single_axis':
+		ModelNames.branch_is_num_dims
+}
+
 
 
 ##### ---------- -------------------- #####  
@@ -169,21 +168,6 @@ latex_naming_functions = {
 		ModelNames.nearest_neighbour_ising_latex_name
 }
 
-def get_latex_name(
-    name, 
-    growth_generator=None,
-    **kwargs
-):
-	try:
-		# if mapping doesn't work, default to just wrap in $__$. 
-		latex_mapping = latex_naming_functions[growth_generator]
-		latex_representation = latex_mapping(name, **kwargs)
-	except:
-		latex_mapping = latex_naming_functions[None]
-		latex_representation = latex_mapping(name, **kwargs)
-	# print("Latex Mapping used", latex_mapping)
-
-	return latex_representation
 
 ##### ---------- -------------------- #####  
 # All possible models according to this growth rule
@@ -201,10 +185,93 @@ all_models_functions = {
 		ModelNames.test_return_champs_ALL_MODELS,
 	'non_interacting_ising' :
 		ModelNames.non_interacting_ising_all_names,
+	'non_interacting_ising_single_axis':
+		ModelNames.non_interacting_ising_all_names,
 	'interacting_nearest_neighbour_ising':
 		ModelNames.interacting_ising_nearest_neighbours_all_names  
-
 }
+
+
+initial_models = {
+	None :
+		['x', 'y', 'z'],
+	'two_qubit_ising_rotation_hyperfine' :
+		['xTi', 'yTi', 'zTi'],
+	'two_qubit_ising_rotation_hyperfine_transverse' : 
+		['xTi', 'yTi', 'zTi'],
+	'interacting_nearest_neighbour_ising' :
+		['xTx', 'yTy', 'zTz'],
+	'hyperfine_like' : 
+		['xTi', 'yTi', 'zTi'],
+}
+
+##### ---------- -------------------- #####  
+# Wrapper functions 
+##### ---------- -------------------- #####  
+
+
+def new_model_generator(generator, **kwargs):
+    model_func = model_generation_functions[generator]
+    # print("[User funcs] Using model generation function:", model_func)
+    return model_func(**kwargs)
+
+def expectation_value_wrapper(method, **kwargs):       
+    # method means measurement_type flag, provided to QMD
+    # print("method:", method)
+    expectation_value_function = expec_val_function_dict[method]
+    return expectation_value_function(**kwargs)
+
+
+def max_spawn_depth(generator, log_file):
+    if generator not in max_spawn_depth_info:
+        log_print(
+        	[
+        	"Generator not recognised; \
+        	does not have maximum spawn depth or \
+        	generation function"
+        	], 
+        	log_file
+    	)
+    else:
+        return max_spawn_depth_info[generator]
+
+
+
+def tree_finished(generator, **kwargs):
+	try:
+		tree_finished_check = tree_finished_functions[generator]
+	except:
+		tree_finished_check = tree_finished_functions[None]
+
+	tree_completed = tree_finished_check(
+		generator = generator, 
+		max_spawn_depth_info = max_spawn_depth_info,
+		**kwargs
+	)
+	# print("[tree finished] func:", tree_finished_check)
+	# print("tree completed:", tree_completed)
+	return tree_completed 		
+
+
+
+def get_latex_name(
+    name, 
+    growth_generator=None,
+    **kwargs
+):
+	try:
+		# if mapping doesn't work, default to just wrap in $__$. 
+		latex_mapping = latex_naming_functions[growth_generator]
+		latex_representation = latex_mapping(name, **kwargs)
+	except:
+		latex_mapping = latex_naming_functions[None]
+		latex_representation = latex_mapping(name, **kwargs)
+	# print("Latex Mapping used", latex_mapping)
+
+	return latex_representation
+
+
+
 def get_all_model_names(
 	growth_generator = None,
 	**kwargs
@@ -214,29 +281,6 @@ def get_all_model_names(
 	return all_models(**kwargs)
 
 
-	
-	
-##### ---------- -------------------- #####  
-# Mapping model name strings to branch numbers
-##### ---------- -------------------- #####  
-
-name_branch_map_functions = {
-	# growth_generation_rule : latex_mapping_function
-
-	None : 
-		ModelNames.branch_is_num_params,
-	'two_qubit_ising_rotation_hyperfine' : 
-		ModelNames.branch_is_num_params, 
-	'two_qubit_ising_rotation_hyperfine_transverse' : 
-		ModelNames.branch_is_num_params, 
-	'test_return_champs' :
-		ModelNames.branch_is_num_params,
-	'non_interacting_ising' :
-		ModelNames.branch_is_num_dims,
-	'interacting_nearest_neighbour_ising' : 
-		ModelNames.branch_is_num_dims,
-
-}
 
 def get_name_branch_map(
     latex_mapping_file, 
@@ -261,4 +305,21 @@ def get_name_branch_map(
 	return name_branch_map
 
 
-
+def get_initial_op_list(
+	growth_generator=None, 
+	log_file='qmd.log',
+	**kwargs
+):
+	try:
+		initial_ops = initial_models[growth_generator]
+	except:
+		initial_ops = initial_models[None]
+		log_print(
+			[
+			"Initial operators not known for generator", 
+			growth_generator, 
+			". Defaulting to:", initial_ops
+			],
+			log_file
+		)
+	return initial_ops

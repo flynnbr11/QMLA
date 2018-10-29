@@ -674,6 +674,23 @@ def non_interacting_ising(model_list, **kwargs):
             new_models.append(new_model)
     return new_models
 
+
+def non_interacting_ising_single_axis(model_list, **kwargs):
+    new_models = []
+    paulis = ['x', 'y', 'z']
+    for mod in model_list:
+        t_str = p_t_actions(mod)['t']
+        new_t_str = str( t_str + 'T')
+        for p in paulis:
+            if p in mod:
+                core_pauli = p
+                new_model = str(mod + new_t_str + core_pauli)        
+                new_models.append(new_model)
+    return new_models
+
+
+
+
 import copy
 def full_model_string(operations):
     """

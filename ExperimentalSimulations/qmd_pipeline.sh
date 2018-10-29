@@ -12,8 +12,8 @@ do_further_qhl=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=100
-exp=30
+prt=10
+exp=3
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -46,7 +46,7 @@ fi
 
 use_rq=0
 further_qhl_factor=2
-plots=0
+plots=1
 use_rq=0
 number_best_models_further_qhl=5
 custom_prior=1
@@ -90,13 +90,14 @@ mkdir -p $long_dir
 # true_operator='yTi'
 # growth_rule='two_qubit_ising_rotation_hyperfine'
 growth_rule='non_interacting_ising'
+# growth_rule='non_interacting_ising_single_axis'
 
 # growth_rule='interacting_nearest_neighbour_ising'
 # true_operator='xTxTTiPPPiTxTTx'
 # true_operator='xTxTTiTTTiPPPPiTxTTxTTTiPPPPiTiTTxTTTx'
 # true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTi'
 # true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTiPPPPPiTiTTiTTTxTTTTx'
-true_operator='xTy'
+true_operator='xTx'
 measurement_type='full_access'
 # measurement_type='hahn'
 
