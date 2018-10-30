@@ -1,29 +1,27 @@
 #!/bin/bash
 
-#test_description="qhl_test_Gabi_params"
-#test_description="qhl_test_kHz_hyperfine_params_broad_prior"
-#test_description="multi_qhl_sim_data_random_true_vals"
-test_description="interacting_ising_growth_test"
+test_description="experimental_data_reruns"
 
 ## Script essentials
-num_tests=15
+num_tests=100
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 
-# QHL paramebleueters
-p=500 # particles
-e=100 # experiments
+# QHL parameters
+p=4000 # particles
+e=2000 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
-op='xTxTTiPPPiTxTTx'
+#op='xTx'
+#op='xTxTTiPPPiTxTTx'
 #op='yTz'
-#op='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+op='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 #op='xTiPPyTiPPzTiPPxTxPPyTyPPzTzPPxTyPPxTzPPyTz'
 
 # QMD settings
-experimental_data=0 # use experimental data -> 1; use fake data ->0
+experimental_data=1 # use experimental data -> 1; use fake data ->0
 #dataset='NVB_HahnPeaks_Newdata'
 #dataset='NV05_HahnEcho02'
 dataset='NVB_dataset.p'
@@ -31,22 +29,16 @@ dataset='NVB_dataset.p'
 sim_measurement_type='full_access'
 exp_measurement_type='hahn' # to use if not experimental
 
-# Overwrite settings for specific cases
-if (( "$experimental_data" == 1))
-then
-    measurement_type=$exp_measurement_type
-else
-    measurement_type=$sim_measurement_type
-fi
 
 
 data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
-top_number_models=2 # how many models to perform further QHL for
+top_number_models=4 # how many models to perform further QHL for
 further_qhl_resource_factor=1
-growth_rule='interacting_nearest_neighbour_ising'
+#growth_rule='interacting_nearest_neighbour_ising'
+#growth_rule='interacting_nearest_neighbour_ising_single_axis'
 #growth_rule='non_interacting_ising'
-#growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine'
 #growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
 random_true_params=1 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
@@ -54,8 +46,17 @@ random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
 do_plots=1
 pickle_class=0
 custom_prior=1
-#true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-#true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTzPPxTyPPxTzPPyTz'
+# Overwrite settings for specific cases
+if (( "$experimental_data" == 1))
+then
+    measurement_type=$exp_measurement_type
+	rp=0.3
+	growth_rule='two_qubit_ising_rotation_hyperfine'
+#	growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+	op='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+else
+    measurement_type=$sim_measurement_type
+fi
 if (( "$qhl" == 1 ))
 then	
 	rp=1.0
@@ -174,8 +175,9 @@ do
 							let bt="$e"
 							let qmd_id="$qmd_id+1"
 							let ham_exp="$e*$p + $p*$bt"
+							let expected_time="$ham_exp/50"
 #							let expected_time="$ham_exp/10"
-							let expected_time="$ham_exp"
+#							let expected_time="$ham_exp"
 							let num_jobs_launched="$num_jobs_launched+1"
 							if [ "$qhl" == 1 ]
 							then

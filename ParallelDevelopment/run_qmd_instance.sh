@@ -61,27 +61,12 @@ cd $running_dir
 mkdir -p $running_dir/logs
 mkdir -p $PBS_O_WORKDIR/logs
 
-if [ "$QHL" == 1 ]
-then
-	true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-else
-	true_hamiltonian='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-fi
-
-
-echo "Nodelist"
-cat $confile 
 
 # The redis server is started on the first node.
 REDIS_URL=redis://$SERVER_HOST:$REDIS_PORT
-echo "REDIS_URL is $REDIS_URL"
-#TODO create a redis config
 
-echo "Running dir is $running_dir"
-echo "workers will log in $running_dir/logs"
-
-#QMD_LOG_DIR="$PBS_O_WORKDIR/logs/$DATETIME"
 QMD_LOG_DIR="$RESULTS_DIR/logs"
+OUTPUT_ERROR_DIR="$RESULTS_DIR/output_and_error_logs"
 mkdir -p $QMD_LOG_DIR
 QMD_JOB=$PBS_JOBNAME
 echo "PBS job name is $QMD_JOB"
@@ -93,7 +78,7 @@ QMD_LOG="$QMD_LOG_DIR/$QMD_JOB.qmd.$job_number.log"
 cat $PBS_NODEFILE
 export nodes=`cat $PBS_NODEFILE`
 export nnodes=`cat $PBS_NODEFILE | wc -l`
-export confile=$QMD_LOG_DIR/node_info.$QMD_JOB.conf
+export confile="$OUTPUT_ERROR_DIR/node_info.$QMD_JOB.conf"
 for i in $nodes; do
 	echo ${i} >>$confile
 done
