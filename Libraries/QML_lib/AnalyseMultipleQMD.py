@@ -367,7 +367,12 @@ def average_parameter_estimates(
             except:
                 pass
 
-            fill_between_sigmas(ax, parameters[term], epochs, legend=leg)
+            fill_between_sigmas(
+                ax, 
+                parameters[term], 
+                epochs, 
+                legend=leg
+            )
             
             ax.scatter(
                 epochs, 
@@ -586,24 +591,24 @@ def Bayes_t_test(
                 ' (' + str(num_sets_of_this_name)  + ').'
             )
 #        ax.errorbar(times, mean_exp, xerr=std_dev_exp, label=description)
-        if num_sets_of_this_name > 1:
-            bayes_t_values_avail_times = sorted(list(t_values.keys()))
-            bayes_t_values = [t_values[t] for t in bayes_t_values_avail_times]
-            median_b_t_val = np.median(bayes_t_values)
-            # print("Bayes t values:", bayes_t_values)
+        # if num_sets_of_this_name > 1:
+        #     bayes_t_values_avail_times = sorted(list(t_values.keys()))
+        #     bayes_t_values = [t_values[t] for t in bayes_t_values_avail_times]
+        #     median_b_t_val = np.median(bayes_t_values)
+        #     # print("Bayes t values:", bayes_t_values)
 
-            ax.plot(
-                bayes_t_values_avail_times, 
-                bayes_t_values,
-                label=str(
-                    'Bayes t-value (median '+ 
-                    str(np.round(median_b_t_val,2))+
-                    ')'
-                ),
-                color=colours[winning_models.index(term)],
-                linestyle='--',
-                alpha=0.3
-            )
+        #     ax.plot(
+        #         bayes_t_values_avail_times, 
+        #         bayes_t_values,
+        #         label=str(
+        #             'Bayes t-value (median '+ 
+        #             str(np.round(median_b_t_val,2))+
+        #             ')'
+        #         ),
+        #         color=colours[winning_models.index(term)],
+        #         linestyle='--',
+        #         alpha=0.3
+        #     )
 
         ax.plot(
             times, 
@@ -664,7 +669,8 @@ def fill_between_sigmas(
     ax, 
     distribution, 
     times, 
-    legend=False
+    legend=False,
+    only_one_sigma = True, 
 ):
     # to draw distributions on a given axis, ax.
     # where distribution must be a dict
@@ -691,7 +697,6 @@ def fill_between_sigmas(
     two_sigma_colour='red'
     three_sigma_colour='blue'
     four_sigma_colour='orange'
-    
     ax.fill_between(
         times,
         upper_one_sigma, 
@@ -700,53 +705,56 @@ def fill_between_sigmas(
         facecolor=one_sigma_colour,
         label='$1 \sigma$ '
     )
-    ax.fill_between(
-        times,
-        upper_two_sigma,
-        upper_one_sigma, 
-        alpha=fill_alpha,
-        facecolor=two_sigma_colour,
-        label='$2 \sigma$ '
-    )
-    ax.fill_between(
-        times,
-        lower_one_sigma, 
-        lower_two_sigma,
-        alpha=fill_alpha,
-        facecolor=two_sigma_colour,
-    )
 
-    ax.fill_between(
-        times,
-        upper_three_sigma,
-        upper_two_sigma, 
-        alpha=fill_alpha,
-        facecolor=three_sigma_colour,
-        label='$3 \sigma$ '
-    )
-    ax.fill_between(
-        times,
-        lower_two_sigma, 
-        lower_three_sigma,
-        alpha=fill_alpha,
-        facecolor=three_sigma_colour,
-    )
 
-    ax.fill_between(
-        times,
-        upper_four_sigma,
-        upper_three_sigma, 
-        alpha=fill_alpha,
-        facecolor=four_sigma_colour,
-        label='$4 \sigma$ '
-    )
-    ax.fill_between(
-        times,
-        lower_three_sigma, 
-        lower_four_sigma,
-        alpha=fill_alpha,
-        facecolor=four_sigma_colour,
-    )
+    if only_one_sigma == False:
+        ax.fill_between(
+            times,
+            upper_two_sigma,
+            upper_one_sigma, 
+            alpha=fill_alpha,
+            facecolor=two_sigma_colour,
+            label='$2 \sigma$ '
+        )
+        ax.fill_between(
+            times,
+            lower_one_sigma, 
+            lower_two_sigma,
+            alpha=fill_alpha,
+            facecolor=two_sigma_colour,
+        )
+
+        ax.fill_between(
+            times,
+            upper_three_sigma,
+            upper_two_sigma, 
+            alpha=fill_alpha,
+            facecolor=three_sigma_colour,
+            label='$3 \sigma$ '
+        )
+        ax.fill_between(
+            times,
+            lower_two_sigma, 
+            lower_three_sigma,
+            alpha=fill_alpha,
+            facecolor=three_sigma_colour,
+        )
+
+        ax.fill_between(
+            times,
+            upper_four_sigma,
+            upper_three_sigma, 
+            alpha=fill_alpha,
+            facecolor=four_sigma_colour,
+            label='$4 \sigma$ '
+        )
+        ax.fill_between(
+            times,
+            lower_three_sigma, 
+            lower_four_sigma,
+            alpha=fill_alpha,
+            facecolor=four_sigma_colour,
+        )
 
     if legend==True:
         ax.legend(

@@ -5,8 +5,8 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
-qhl_test=0
+num_tests=3
+qhl_test=1
 do_further_qhl=0
 
 ### ---------------------------------------------------###
@@ -23,27 +23,6 @@ gaussian=1
 # QMD settings
 ### ---------------------------------------------------###
 exp_data=0
-
-# Overwrite settings for specific cases
-"""
-if (( "$exp_data" == 1))
-then
-    measurement_type=$exp_measurement_type
-else
-    measurement_type=$sim_measurement_type
-fi
-"""
-
-# if (( "$exp_data" == 0 ))
-# then
-#     pgh=0.3
-# fi
-
-# if (( "$qhl_test" == 1 ))
-# then
-#     pgh=1.0
-# fi
-
 use_rq=0
 further_qhl_factor=2
 plots=1
@@ -70,36 +49,40 @@ bayes_csv="$long_dir$bcsv"
 true_expec_filename="true_expec_vals.p"
 true_expec_path="$long_dir$true_expec_filename"
 
-
 this_log="$long_dir/qmd.log"
 furhter_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
+
+# growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# growth_rule='test_multidimensional' 
-# growth_rule='two_qubit_ising_rotation_hyperfine'
-# true_operator='xTiPPyTiPPyTy'
-# true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
-
-# true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-# sim_measurement_type='full_access'
-# exp_measurement_type='hahn' # to use if not experimental
-# measurement_type=$sim_measurement_type
-
-# growth_rule='test_return_champs'
-# true_operator='yTi'
-# growth_rule='two_qubit_ising_rotation_hyperfine'
 growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
-
 # growth_rule='interacting_nearest_neighbour_ising'
+
+# true_operator='yTi'
 # true_operator='xTxTTiPPPiTxTTx'
 # true_operator='xTxTTiTTTiPPPPiTxTTxTTTiPPPPiTiTTxTTTx'
 # true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTi'
 # true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTiPPPPPiTiTTiTTTxTTTTx'
 true_operator='xTx'
-measurement_type='full_access'
-# measurement_type='hahn'
+# true_operator='xTiPPyTiPPyTy'
+# true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
+
+
+sim_measurement_type='full_access' # measurement to use during simulated cases. 
+exp_measurement_type='hahn' # to use if not experimental
+if (( "$exp_data" == 1))
+then
+    measurement_type=$exp_measurement_type
+    pgh=0.3
+    true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+    growth_rule='two_qubit_ising_rotation_hyperfine'
+    # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+
+else
+    measurement_type=$sim_measurement_type
+fi
 
 declare -a qhl_operators=(
     $true_operator
