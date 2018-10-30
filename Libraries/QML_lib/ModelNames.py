@@ -17,6 +17,88 @@ import Evo as evo
 import DataBase 
 import warnings
 
+""" 
+Useful functions
+""" 
+def full_model_string(operations):
+    """
+    operations must be a dict with elements:
+    - 'dim' : number of qubits
+    - 'terms' : list of lists of tuple of the form, 
+        e.g. [ (1, 'x'), (2, 'y')]
+        i.e. tuples (qubit_id, pauli_operator)
+        Each nested list gives a term, which are all added together for the full model
+    Reconstructs unique model name for that Hamiltonian. 
+    """
+    
+    
+    # Note TODO: this doesn't give an error when tuples are given which aren't used. it should
+    terms = operations['terms']
+    num_qubits = operations['dim']
+    num_terms = len(terms)
+    all_terms = []
+    for i  in range(len(terms)):
+        single_term = terms[i]
+        single_term_dict = dict(single_term)
+
+        model_name = ''
+
+        t_str=''
+        for i in range(1, 1+num_qubits):
+            if i in single_term_dict:
+                pauli = single_term_dict[i]
+            else:
+                pauli ='i'
+            t_str+='T'
+            if i==num_qubits:
+                t_str = ''
+            model_name += str(pauli + t_str)
+
+        all_terms.append(model_name)
+
+    p_str = 'P'
+    for i in range(num_qubits-1):
+        p_str+='P'
+
+    full_model = p_str.join(all_terms)    
+    return full_model
+
+def operations_dict_from_name(mod_name):
+    constituents = DataBase.get_constituent_names_from_name(mod_name)
+    num_qubits = DataBase.get_num_qubits(mod_name)
+    initial_t_str = ''
+    all_terms = []
+    for j in range(num_qubits-1):
+        initial_t_str += 'T' 
+
+    for i in range(len(constituents)):
+        t_str = initial_t_str
+        single_term = constituents[i]
+        all_tuples_this_term = []
+        n_minus_1_qubit_operators = single_term
+        for k in range(num_qubits):
+            if len(t_str) > 0:
+                split_by_nth_qubit = n_minus_1_qubit_operators.split(t_str)
+                this_tuple = (num_qubits-k, split_by_nth_qubit[1])
+                n_minus_1_qubit_operators = split_by_nth_qubit[0]
+                t_str = t_str[:-1]
+            else:
+                this_tuple = (num_qubits-k, n_minus_1_qubit_operators)
+
+            all_tuples_this_term.append(this_tuple)
+
+        all_tuples_this_term = sorted(all_tuples_this_term)
+        all_terms.append(all_tuples_this_term)
+
+    operations = {
+        'dim' : num_qubits, 
+        'terms' : all_terms
+    }
+    
+    return operations
+
+
+
 
 
 """
@@ -539,3 +621,48 @@ def nearest_neighbour_ising_latex_name(
         '}$'
     )
     return latex_rep
+
+def interaction_latex_name(
+    name, 
+    interacting_term = '\sigma', 
+    **kwargs
+):
+    name = DataBase.alph(name)
+    op_dict = operations_dict_from_name(name)
+    terms = op_dict['terms']
+    num_terms = len(terms)
+    full_model_string = ''
+    all_term_strings= []
+
+    for term in terms:
+        this_term_string = '' 
+        paulis = []
+        qubits = []
+
+        for j in range(len(term)):
+            action = term[j]
+            if action[1] != 'i':
+                qubits.append(action[0])
+                paulis.append(action[1])
+
+        if len(paulis) != len(qubits):
+            print("unmatching number of qubits to pauli operators in naming function.")
+
+        else:
+            this_term_string += interacting_term
+            this_term_string += '^{'
+
+            for p in paulis:
+                this_term_string += str(p)
+            this_term_string += '}'
+
+            this_term_string += '_{'
+            for q in qubits:
+                this_term_string += str(q)
+            this_term_string += '}'
+
+            all_term_strings.append(this_term_string)
+
+    final_string = ''.join(all_term_strings)
+    final_string = str('$' + final_string + '$')
+    return final_string

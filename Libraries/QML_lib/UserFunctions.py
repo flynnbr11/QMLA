@@ -157,15 +157,15 @@ latex_naming_functions = {
 	# growth_generation_rule : latex_mapping_function
 
 	None : 
-		ModelNames.default_latex_wrapping,
+		ModelNames.interaction_latex_name,
 	'two_qubit_ising_rotation_hyperfine' : 
 		ModelNames.latex_name_ising, 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		ModelNames.latex_name_ising, 
-	'test_return_champs' :
-		ModelNames.default_latex_wrapping,
-	'interacting_nearest_neighbour_ising' : 
-		ModelNames.nearest_neighbour_ising_latex_name
+	# 'test_return_champs' :
+	# 	ModelNames.default_latex_wrapping,
+	# 'interacting_nearest_neighbour_ising' : 
+	# 	ModelNames.nearest_neighbour_ising_latex_name
 }
 
 

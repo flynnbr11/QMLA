@@ -6,7 +6,7 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=3
-qhl_test=1
+qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
@@ -56,16 +56,16 @@ mkdir -p $long_dir
 
 # growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-growth_rule='non_interacting_ising'
+# growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
-# growth_rule='interacting_nearest_neighbour_ising'
+growth_rule='interacting_nearest_neighbour_ising'
 
 # true_operator='yTi'
-# true_operator='xTxTTiPPPiTxTTx'
+true_operator='xTxTTiPPPiTxTTx'
 # true_operator='xTxTTiTTTiPPPPiTxTTxTTTiPPPPiTiTTxTTTx'
 # true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTi'
 # true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTiPPPPPiTiTTiTTTxTTTTx'
-true_operator='xTx'
+# true_operator='xTxTTx'
 # true_operator='xTiPPyTiPPyTy'
 # true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
 
