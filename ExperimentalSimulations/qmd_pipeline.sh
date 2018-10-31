@@ -12,8 +12,8 @@ do_further_qhl=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
-exp=3
+prt=120
+exp=40
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -58,7 +58,8 @@ mkdir -p $long_dir
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
-growth_rule='interacting_nearest_neighbour_ising'
+# growth_rule='interacting_nearest_neighbour_ising'
+growth_rule='interacing_nn_ising_fixed_axis'
 
 # true_operator='yTi'
 true_operator='xTxTTiPPPiTxTTx'

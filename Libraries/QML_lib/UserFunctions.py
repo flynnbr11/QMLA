@@ -84,7 +84,8 @@ max_spawn_depth_info = {
     'test_return_champs' : 3,
     'non_interacting_ising' : 3,
     'non_interacting_ising_single_axis' : 3,
-    'interacting_nearest_neighbour_ising' : 3
+    'interacting_nearest_neighbour_ising' : 3,
+    'interacing_nn_ising_fixed_axis' : 5,
 }
 
 model_generation_functions = {
@@ -110,6 +111,8 @@ model_generation_functions = {
 	'non_interacting_ising_single_axis':
 		ModelGeneration.non_interacting_ising_single_axis,
 	'interacting_nearest_neighbour_ising': 
+		ModelGeneration.interacting_nearest_neighbour_ising,
+	'interacing_nn_ising_fixed_axis':
 		ModelGeneration.interacting_nearest_neighbour_ising
 
 }
@@ -144,6 +147,8 @@ name_branch_map_functions = {
 	'interacting_nearest_neighbour_ising' : 
 		ModelNames.branch_is_num_dims,
 	'non_interacting_ising_single_axis':
+		ModelNames.branch_is_num_dims,
+	'interacing_nn_ising_fixed_axis':
 		ModelNames.branch_is_num_dims
 }
 
@@ -158,6 +163,9 @@ latex_naming_functions = {
 
 	None : 
 		ModelNames.interaction_latex_name,
+	# None : 
+	# 	ModelNames.default_latex_wrapping,
+
 	'two_qubit_ising_rotation_hyperfine' : 
 		ModelNames.latex_name_ising, 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
@@ -188,6 +196,8 @@ all_models_functions = {
 	'non_interacting_ising_single_axis':
 		ModelNames.non_interacting_ising_all_names,
 	'interacting_nearest_neighbour_ising':
+		ModelNames.interacting_ising_nearest_neighbours_all_names,
+	'interacing_nn_ising_fixed_axis':
 		ModelNames.interacting_ising_nearest_neighbours_all_names  
 }
 
@@ -203,6 +213,8 @@ initial_models = {
 		['xTx', 'yTy', 'zTz'],
 	'hyperfine_like' : 
 		['xTi', 'yTi', 'zTi'],
+	'interacing_nn_ising_fixed_axis' :
+		['xTx', 'yTy', 'zTz']
 }
 
 ##### ---------- -------------------- #####  

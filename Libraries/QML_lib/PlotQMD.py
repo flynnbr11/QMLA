@@ -1396,23 +1396,30 @@ def plotTreeDiagram(
     
     label_positions = []   
     if id_labels is True:
-        labels = dict( zip( G.nodes(), tuple(  [n for (n,prop) in 
-            G.nodes(data=True)]  ) )
+        labels = dict( 
+            zip( 
+                G.nodes(), tuple(  [n for (n,prop) in 
+                G.nodes(data=True)]  ) 
+            )
         )
         for key in positions.keys():
             label_positions.append( tuple( np.array(positions[key]) -
             np.array([0., 0.]) ) 
         )
     else:
-        labels = dict( zip( G.nodes(), tuple(  [prop['label'] for 
-            (n,prop) in G.nodes(data=True)]  ) )
+        labels = dict( 
+            zip( G.nodes(), tuple(  [prop['label'] for 
+                (n,prop) in G.nodes(data=True)]  ) 
+            )
         )  
         for key in positions.keys():
             label_positions.append( tuple( np.array(positions[key])- 
                 np.array([0., label_padding]) ) 
         )
     
-    label_positions = dict(zip( positions.keys(), tuple(label_positions) ))
+    label_positions = dict(
+        zip( positions.keys(), tuple(label_positions) )
+    )
      
     
     if len(e_alphas) == 0: 
@@ -1421,7 +1428,9 @@ def plotTreeDiagram(
                 0.8 if list_of_edges[idx][2]["adj"] 
                 else nonadj_alpha 
             )
-    weights = tuple( [prop['weight'] for (u,v,prop) in list_of_edges] )
+    weights = tuple( 
+        [prop['weight'] for (u,v,prop) in list_of_edges] 
+    )
 
 
     nx.draw_networkx_nodes(

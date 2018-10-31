@@ -155,15 +155,29 @@ initial_op_list  = UserFunctions.get_initial_op_list(
     log_file = global_variables.log_file
 )
 
-if global_variables.growth_generation_rule == 'non_interacting_ising_single_axis':
+fixed_axis_generators = [
+    'non_interacting_ising_single_axis',
+    'interacing_nn_ising_fixed_axis'
+
+]
+
+if (
+    global_variables.use_experimental_data == False
+    and 
+    global_variables.growth_generation_rule  \
+        in fixed_axis_generators
+):
     paulis = ['x', 'y', 'z']
+    new_initial_ops = []
     count_paulis = 0 
     for p in paulis:
         if p in global_variables.true_operator:
-            count_paulis += 1
             core_pauli = p
+            for init_op in initial_op_list:
+                if core_pauli in init_op:
+                    new_initial_ops.append(init_op)
 
-    if count_paulis > 1:
+    if len(new_initial_ops) > 1:
         print(
             "For growth rule ", 
             global_variables.growth_generation_rule, 
@@ -173,7 +187,7 @@ if global_variables.growth_generation_rule == 'non_interacting_ising_single_axis
         sys.exit()
 
     else:
-        initial_op_list = [core_pauli]
+        initial_op_list = new_initial_ops
 
 
 

@@ -179,12 +179,16 @@ def evolved_state(
                 ["Using custom expm. Exponentiating\nt=",t, "\nHam=\n", ham],
                 log_file, log_identifier
             )
-        unitary = h.exp_ham(
-            ham, t, 
-            precision = precision, 
-            enable_sparse_functionality=enable_sparse,
-            print_method=print_exp_details, scalar_cutoff=t+1
-        )
+        try:
+            import qutip
+            unitary = qutip.Qobj(-1j*ham*t).expm().full()
+        except:
+            unitary = h.exp_ham(
+                ham, t, 
+                precision = precision, 
+                enable_sparse_functionality=enable_sparse,
+                print_method=print_exp_details, scalar_cutoff=t+1
+            )
     else:
         if log_file is not None:
             iht = (-1j*ham*t)
@@ -237,7 +241,12 @@ def traced_expectation_value_project_one_qubit_plus(
 
 # Expecactation value function using Hahn inversion gate:
 
-def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
+def hahn_evolution(
+    ham, t, state, 
+    precision=1e-10, 
+    log_file=None, 
+    log_identifier=None
+):
     import qutip 
     import numpy as np
 #    print("Hahn evo")
@@ -254,7 +263,11 @@ def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
     even_time_split = False
     if even_time_split:
 
-        unitary_time_evolution = h.exp_ham(ham, t)
+        unitary_time_evolution = h.exp_ham(
+            ham, 
+            t,
+            precision=precision
+        )
 
         total_evolution = np.dot(
             unitary_time_evolution,
@@ -262,8 +275,8 @@ def hahn_evolution(ham, t, state, log_file=None, log_identifier=None):
                   unitary_time_evolution)
         )
     else:
-        first_unitary_time_evolution = h.exp_ham(ham, t)
-        second_unitary_time_evolution = h.exp_ham(ham, 2*t)
+        first_unitary_time_evolution = h.exp_ham(ham, t, precision=precision)
+        second_unitary_time_evolution = h.exp_ham(ham, 2*t, precision=precision)
         total_evolution = np.dot(
             second_unitary_time_evolution,
             np.dot(inversion_gate,
