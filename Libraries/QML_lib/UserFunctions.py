@@ -69,6 +69,13 @@ expec_val_function_dict = {
 # Here you must also define how many growth steps to allow 
 # the decision tree to undergo, in max_spawn_depth_info. 
 ##### ---------- -------------------- #####  
+fixed_axis_generators = [
+    'non_interacting_ising_single_axis',
+    'interacing_nn_ising_fixed_axis',
+    'deterministic_noninteracting_ising_single_axis',
+    'deterministic_interacting_nn_ising_single_axis'
+]
+
 
 max_spawn_depth_info = {
     'qhl_TEST' : 2, 
@@ -86,11 +93,13 @@ max_spawn_depth_info = {
     'non_interacting_ising_single_axis' : 3,
     'interacting_nearest_neighbour_ising' : 3,
     'interacing_nn_ising_fixed_axis' : 5,
-    'deterministic_noninteracting_ising_single_axis' : 1
+    'deterministic_noninteracting_ising_single_axis' : 1,
+    'deterministic_interacting_nn_ising_single_axis' : 1
 }
 
 max_num_qubits_info = {
-    'deterministic_noninteracting_ising_single_axis' : 5	
+    'deterministic_noninteracting_ising_single_axis' : 5,
+    'deterministic_interacting_nn_ising_single_axis' : 5	
 }
 
 
@@ -122,7 +131,9 @@ model_generation_functions = {
 	'interacing_nn_ising_fixed_axis':
 		ModelGeneration.interacting_nearest_neighbour_ising,
 	'deterministic_noninteracting_ising_single_axis' : 
-		ModelGeneration.deterministic_noninteracting_ising_single_axis
+		ModelGeneration.deterministic_noninteracting_ising_single_axis,
+	'deterministic_interacting_nn_ising_single_axis' :
+		ModelGeneration.deterministic_interacting_nn_ising_single_axis
 
 }
 
@@ -160,8 +171,9 @@ name_branch_map_functions = {
 	'interacing_nn_ising_fixed_axis':
 		ModelNames.branch_is_num_dims,
 	'deterministic_noninteracting_ising_single_axis' :
-		ModelNames.branch_is_num_dims
-
+		ModelNames.branch_is_num_dims,
+	'deterministic_interacting_nn_ising_single_axis' :
+	 	ModelNames.branch_is_num_dims,
 }
 
 
@@ -227,7 +239,9 @@ initial_models = {
 		['xTi', 'yTi', 'zTi'],
 	'interacing_nn_ising_fixed_axis' :
 		['xTx', 'yTy', 'zTz'],
-	
+	'deterministic_interacting_nn_ising_single_axis' : 
+		['xTx', 'yTy', 'zTz']
+
 }
 
 ##### ---------- -------------------- #####  

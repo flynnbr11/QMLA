@@ -694,11 +694,9 @@ def deterministic_noninteracting_ising_single_axis(
     model_list,
     **kwargs
 ):
-    from UserFunctions import max_spawn_depth_info
     from UserFunctions import max_num_qubits_info   
     new_models = []
     num_qubits = max_num_qubits_info['deterministic_noninteracting_ising_single_axis']
-    print("num qubits:", )
     for mod in model_list:
         new = non_interacting_ising_single_axis([mod])
         new_models.extend(new)
@@ -766,7 +764,24 @@ def interacting_nearest_neighbour_ising(
 
     return new_models
 
+def deterministic_interacting_nn_ising_single_axis(
+    model_list,
+    **kwargs
+):
+    from UserFunctions import max_num_qubits_info   
+    new_models = []
+    num_qubits = max_num_qubits_info['deterministic_interacting_nn_ising_single_axis']
+    for mod in model_list:
+        new = interacting_nearest_neighbour_ising([mod])
+        new_models.extend(new)
+        dimension = DataBase.get_num_qubits(new)
+        while dimension < num_qubits:
+            new = interacting_nearest_neighbour_ising(new)
+            new_models.extend(new)
+            dimension = DataBase.get_num_qubits(new[0])
+    return list(set(new_models))
 
+    
 # ##### Wrapper function and dict
 
 # model_generation_functions = {

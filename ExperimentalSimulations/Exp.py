@@ -155,17 +155,11 @@ initial_op_list  = UserFunctions.get_initial_op_list(
     log_file = global_variables.log_file
 )
 
-fixed_axis_generators = [
-    'non_interacting_ising_single_axis',
-    'interacing_nn_ising_fixed_axis',
-    'deterministic_noninteracting_ising_single_axis'
-]
-
 if (
     global_variables.use_experimental_data == False
     and 
     global_variables.growth_generation_rule  \
-        in fixed_axis_generators
+        in UserFunctions.fixed_axis_generators
 ):
     paulis = ['x', 'y', 'z']
     new_initial_ops = []

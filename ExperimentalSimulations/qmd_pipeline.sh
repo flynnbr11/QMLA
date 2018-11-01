@@ -61,6 +61,7 @@ mkdir -p $long_dir
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='interacing_nn_ising_fixed_axis'
 growth_rule='deterministic_noninteracting_ising_single_axis'
+growth_rule='deterministic_interacting_nn_ising_single_axis'
 
 # true_operator='yTi'
 # true_operator='xTxTTiPPPiTxTTx'
