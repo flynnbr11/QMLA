@@ -690,6 +690,25 @@ def non_interacting_ising_single_axis(model_list, **kwargs):
                 new_models.append(new_model)
     return new_models
 
+def deterministic_noninteracting_ising_single_axis(
+    model_list,
+    **kwargs
+):
+    from UserFunctions import max_spawn_depth_info
+    from UserFunctions import max_num_qubits_info   
+    new_models = []
+    num_qubits = max_num_qubits_info['deterministic_noninteracting_ising_single_axis']
+    print("num qubits:", )
+    for mod in model_list:
+        new = non_interacting_ising_single_axis([mod])
+        new_models.extend(new)
+        dimension = DataBase.get_num_qubits(new)
+        while dimension < num_qubits:
+            new = non_interacting_ising_single_axis(new)
+            new_models.extend(new)
+            dimension = DataBase.get_num_qubits(new[0])
+    return list(set(new_models))
+        
 
 
 def interacting_nearest_neighbour_ising(

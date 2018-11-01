@@ -2329,10 +2329,10 @@ def multiQMDBayes(all_bayes_csv, growth_generator=None):
 
     count_bayes={}
     # mod_names= ising_terms_full_list()
-    mod_names= UserFunctions.get_all_model_names(
-        growth_generator=growth_generator,
-        return_branch_dict='latex_terms'
-    )
+    # mod_names= UserFunctions.get_all_model_names(
+    #     growth_generator=growth_generator,
+    #     return_branch_dict='latex_terms'
+    # )
 
     mod_names = list(cumulative_bayes.keys())
 

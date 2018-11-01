@@ -157,8 +157,8 @@ initial_op_list  = UserFunctions.get_initial_op_list(
 
 fixed_axis_generators = [
     'non_interacting_ising_single_axis',
-    'interacing_nn_ising_fixed_axis'
-
+    'interacing_nn_ising_fixed_axis',
+    'deterministic_noninteracting_ising_single_axis'
 ]
 
 if (

@@ -1208,15 +1208,18 @@ if qhl_mode==True:
 elif further_qhl_mode == False:
     plot_file = directory_to_analyse+'model_scores.png'
     model_scores = model_scores(directory_to_analyse)
-    entropy = get_entropy(model_scores, 
-        growth_generator = growth_generator, 
-        inf_gain=False
-    )
-    inf_gain = get_entropy(
-        model_scores, 
-        growth_generator  = growth_generator,
-        inf_gain=True
-    )
+    try:
+        entropy = get_entropy(model_scores, 
+            growth_generator = growth_generator, 
+            inf_gain=False
+        )
+        inf_gain = get_entropy(
+            model_scores, 
+            growth_generator  = growth_generator,
+            inf_gain=True
+        )
+    except:
+        entropy = inf_gain = 0.0
     plot_scores(
         scores = model_scores,
         entropy = entropy, 

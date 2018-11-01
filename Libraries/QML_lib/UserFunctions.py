@@ -86,7 +86,14 @@ max_spawn_depth_info = {
     'non_interacting_ising_single_axis' : 3,
     'interacting_nearest_neighbour_ising' : 3,
     'interacing_nn_ising_fixed_axis' : 5,
+    'deterministic_noninteracting_ising_single_axis' : 1
 }
+
+max_num_qubits_info = {
+    'deterministic_noninteracting_ising_single_axis' : 5	
+}
+
+
 
 model_generation_functions = {
 	# growth_generation_rule : growth_function
@@ -113,7 +120,9 @@ model_generation_functions = {
 	'interacting_nearest_neighbour_ising': 
 		ModelGeneration.interacting_nearest_neighbour_ising,
 	'interacing_nn_ising_fixed_axis':
-		ModelGeneration.interacting_nearest_neighbour_ising
+		ModelGeneration.interacting_nearest_neighbour_ising,
+	'deterministic_noninteracting_ising_single_axis' : 
+		ModelGeneration.deterministic_noninteracting_ising_single_axis
 
 }
 
@@ -149,7 +158,10 @@ name_branch_map_functions = {
 	'non_interacting_ising_single_axis':
 		ModelNames.branch_is_num_dims,
 	'interacing_nn_ising_fixed_axis':
+		ModelNames.branch_is_num_dims,
+	'deterministic_noninteracting_ising_single_axis' :
 		ModelNames.branch_is_num_dims
+
 }
 
 
@@ -214,7 +226,8 @@ initial_models = {
 	'hyperfine_like' : 
 		['xTi', 'yTi', 'zTi'],
 	'interacing_nn_ising_fixed_axis' :
-		['xTx', 'yTy', 'zTz']
+		['xTx', 'yTy', 'zTz'],
+	
 }
 
 ##### ---------- -------------------- #####  

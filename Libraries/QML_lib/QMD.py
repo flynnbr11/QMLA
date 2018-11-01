@@ -169,8 +169,9 @@ class QMD():
 
         self.NumProbes = num_probes
         if probe_dict is None:
-            self.ProbeDict = separable_probe_dict(max_num_qubits=
-                self.MaxQubitNumber, num_probes=self.NumProbes
+            self.ProbeDict = separable_probe_dict(
+                max_num_qubits=self.MaxQubitNumber, 
+                num_probes=self.NumProbes
             )
         else:
             self.ProbeDict = probe_dict
@@ -199,6 +200,7 @@ class QMD():
         else: 
             self.ExperimentalMeasurementTimes=None
         self.PlotTimes = plot_times
+        
         if self.UseExperimentalData==False:
             self.ExperimentalMeasurements = {}
             self.TrueHamiltonian = np.tensordot(
@@ -208,7 +210,9 @@ class QMD():
             )
 
             # plot_probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe
-            plot_probe =  ExpectationValues.n_qubit_plus_state(self.TrueOpDim)  # TODO generalise probe
+            plot_probe =  ExpectationValues.n_qubit_plus_state(
+                self.TrueOpDim
+            )  # TODO generalise probe
             for t in self.PlotTimes:
                 # TODO is this the right expectation value func???
                 self.ExperimentalMeasurements[t] = (
@@ -1931,6 +1935,9 @@ class QMD():
         t_interval=0.3, save_to_file=None
     ):
     
+        if plus_probe is False and self.UseExperimentalData is True:
+            plus_probe=True
+
         PlotQMD.ExpectationValuesTrueSim(
             qmd=self, 
             model_ids=model_ids, champ=champ, 

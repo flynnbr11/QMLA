@@ -718,6 +718,7 @@ class reducedModel():
         # TODO expectation_values dict only for |++> probe as is.
         if probe is None:
             probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
+        
         for t in times:
                 self.expectation_values[t] = UserFunctions.expectation_value_wrapper(
                     method=self.MeasurementType,

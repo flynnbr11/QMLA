@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=3
+num_tests=2
 qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=120
-exp=40
+prt=12
+exp=4
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -59,14 +59,15 @@ mkdir -p $long_dir
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
 # growth_rule='interacting_nearest_neighbour_ising'
-growth_rule='interacing_nn_ising_fixed_axis'
+# growth_rule='interacing_nn_ising_fixed_axis'
+growth_rule='deterministic_noninteracting_ising_single_axis'
 
 # true_operator='yTi'
-true_operator='xTxTTiPPPiTxTTx'
+# true_operator='xTxTTiPPPiTxTTx'
 # true_operator='xTxTTiTTTiPPPPiTxTTxTTTiPPPPiTiTTxTTTx'
 # true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTi'
 # true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTiPPPPPiTiTTiTTTxTTTTx'
-# true_operator='xTxTTx'
+true_operator='xTxTTx'
 # true_operator='xTiPPyTiPPyTy'
 # true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
 
