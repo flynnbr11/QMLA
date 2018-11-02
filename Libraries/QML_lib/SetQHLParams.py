@@ -1,7 +1,7 @@
 import random
 import pickle
 import argparse
-
+import UserFunctions
 import DataBase
 
 ### SET VALUES HERE ###
@@ -214,15 +214,26 @@ parser.add_argument(
   default=0
 )
 
+parser.add_argument(
+  '-ggr', '--growth_generation_rule', 
+  help="Generator of new models",
+  type=str,
+  default=0
+)
+
 arguments = parser.parse_args()
 random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
 exp_data = bool(arguments.use_experimental_data)
+growth_generation_rule = arguments.growth_generation_rule
+true_operator = UserFunctions.default_true_operators_by_generator[growth_generation_rule]
+
 
 ### Call functions to create picle files. 
 if arguments.true_params_file is not None:
 	create_qhl_params(
-		true_op = arguments.true_op, 
+		# true_op = arguments.true_op, 
+		true_op = true_operator,
 		pickle_file=arguments.true_params_file,
 		random_vals=random_true_params, 
 		exp_data=exp_data
@@ -230,7 +241,8 @@ if arguments.true_params_file is not None:
 
 if arguments.prior_file is not None:
 	create_prior(
-		true_op = arguments.true_op, 
+		# true_op = arguments.true_op,
+		true_op = true_operator, 
 		pickle_file = arguments.prior_file,
 		random_vals = random_prior, 
 		exp_data=exp_data

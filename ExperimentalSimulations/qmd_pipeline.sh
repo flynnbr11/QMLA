@@ -54,14 +54,14 @@ furhter_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
 
-# growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='interacing_nn_ising_fixed_axis'
-growth_rule='deterministic_noninteracting_ising_single_axis'
-growth_rule='deterministic_interacting_nn_ising_single_axis'
+# growth_rule='deterministic_noninteracting_ising_single_axis'
+# growth_rule='deterministic_interacting_nn_ising_single_axis'
 
 # true_operator='yTi'
 # true_operator='xTxTTiPPPiTxTTx'
@@ -117,6 +117,7 @@ true_params_pickle_file="$long_dir/true_params.p"
 python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \
     -prior=$prior_pickle_file \
+    -ggr=$growth_rule \
     -op=$true_operator \
     -exp=$exp_data \
     -rand_t=1 -rand_p=0 # can make true params and prior random

@@ -663,6 +663,7 @@ def interaction_latex_name(
 
             all_term_strings.append(this_term_string)
 
+    all_term_strings = sorted(all_term_strings)
     final_string = ''.join(all_term_strings)
     final_string = str('$' + final_string + '$')
     return final_string

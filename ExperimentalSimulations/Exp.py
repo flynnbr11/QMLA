@@ -185,7 +185,10 @@ if (
 
 
 
-true_op = global_variables.true_operator
+# true_op = global_variables.true_operator
+true_op = UserFunctions.default_true_operators_by_generator[
+    global_variables.growth_generation_rule
+]
 true_num_qubits = DataBase.get_num_qubits(true_op)
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 true_op_matrices = [DataBase.compute(t) for t in true_op_list]

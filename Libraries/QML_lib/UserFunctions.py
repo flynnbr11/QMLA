@@ -69,6 +69,23 @@ expec_val_function_dict = {
 # Here you must also define how many growth steps to allow 
 # the decision tree to undergo, in max_spawn_depth_info. 
 ##### ---------- -------------------- #####  
+
+default_true_operators_by_generator = {
+    'two_qubit_ising_rotation' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
+    'two_qubit_ising_rotation_hyperfine' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz', # for dev, should be 5 #TODO put back
+    'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
+    'test_multidimensional' : 'xTiPPiTy', 
+    'test_return_champs' : 'xTiPPiTy', 
+    'non_interacting_ising' : 'xTxTTx',
+    'non_interacting_ising_single_axis' : 'xTxTTx',
+    'deterministic_noninteracting_ising_single_axis' : 'xTxTTx',
+    'interacting_nearest_neighbour_ising' : 'xTxTTiPPPiTxTTx',
+    'interacing_nn_ising_fixed_axis' : 'xTxTTiPPPiTxTTx',
+    'deterministic_interacting_nn_ising_single_axis' : 'xTxTTiPPPiTxTTx',
+    'deterministic_transverse_ising_nn_fixed_axis' : 'zTiPPiTzPPxTx'
+}
+
+
 fixed_axis_generators = [
     'non_interacting_ising_single_axis',
     'interacing_nn_ising_fixed_axis',
@@ -76,6 +93,14 @@ fixed_axis_generators = [
     'deterministic_interacting_nn_ising_single_axis'
 ]
 
+
+fixed_axes_by_generator = {
+	None : 'x',
+    'interacing_nn_ising_fixed_axis' : 'x',
+    'deterministic_transverse_ising_nn_fixed_axis' : 'x',
+    'non_interacting_ising_single_axis' : 'x', 
+
+}
 
 max_spawn_depth_info = {
     'qhl_TEST' : 2, 
@@ -99,7 +124,8 @@ max_spawn_depth_info = {
 
 max_num_qubits_info = {
     'deterministic_noninteracting_ising_single_axis' : 5,
-    'deterministic_interacting_nn_ising_single_axis' : 5	
+    'deterministic_interacting_nn_ising_single_axis' : 5,
+    'deterministic_transverse_ising_nn_fixed_axis' : 5	
 }
 
 
