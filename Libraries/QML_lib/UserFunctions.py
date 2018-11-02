@@ -119,7 +119,8 @@ max_spawn_depth_info = {
     'interacting_nearest_neighbour_ising' : 3,
     'interacing_nn_ising_fixed_axis' : 5,
     'deterministic_noninteracting_ising_single_axis' : 1,
-    'deterministic_interacting_nn_ising_single_axis' : 1
+    'deterministic_interacting_nn_ising_single_axis' : 1,
+    'deterministic_transverse_ising_nn_fixed_axis' : 1
 }
 
 max_num_qubits_info = {
@@ -159,7 +160,9 @@ model_generation_functions = {
 	'deterministic_noninteracting_ising_single_axis' : 
 		ModelGeneration.deterministic_noninteracting_ising_single_axis,
 	'deterministic_interacting_nn_ising_single_axis' :
-		ModelGeneration.deterministic_interacting_nn_ising_single_axis
+		ModelGeneration.deterministic_interacting_nn_ising_single_axis,
+	'deterministic_transverse_ising_nn_fixed_axis' : 
+		ModelGeneration.deterministic_transverse_ising_nn_fixed_axis
 
 }
 
@@ -200,6 +203,8 @@ name_branch_map_functions = {
 		ModelNames.branch_is_num_dims,
 	'deterministic_interacting_nn_ising_single_axis' :
 	 	ModelNames.branch_is_num_dims,
+ 	'deterministic_transverse_ising_nn_fixed_axis' :
+ 		ModelNames.branch_is_num_dims
 }
 
 

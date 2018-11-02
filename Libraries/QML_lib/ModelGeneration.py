@@ -781,6 +781,96 @@ def deterministic_interacting_nn_ising_single_axis(
             dimension = DataBase.get_num_qubits(new[0])
     return list(set(new_models))
 
+
+
+def tensor_all_with_identity(name):
+    op_dict = operations_dict_from_name(name)
+    num_qubits = op_dict['dim']
+    terms = op_dict['terms']
+    new_terms = []
+    new_dimension = num_qubits + 1
+
+    for i in range(len(terms)):
+
+        new_term = terms[i]
+
+        new_term.append( (new_dimension, 'i'))
+        new_terms.append(new_term)
+
+
+    new_op_dict = {
+        'dim' : new_dimension, 
+        'terms' : new_terms
+    }
+    new_mod_name = full_model_string(new_op_dict)
+    return new_mod_name
+
+def add_fixed_axis_nn_interaction(name, fixed_axis):
+    dimension = DataBase.get_num_qubits(name)
+    op_dict = ModelNames.operations_dict_from_name(name)
+    new_terms = []
+    for i in range(1,dimension):
+        term_one = (i, fixed_axis)
+        term_two  = (i+1, fixed_axis)
+        total_term = [term_one, term_two]
+        new_terms.append(total_term)
+
+    op_dict['terms'].extend(new_terms)
+    new_name = ModelNames.full_model_string(op_dict)
+    return new_name
+
+def deterministic_transverse_ising_nn_fixed_axis(
+    model_list, 
+    **kwargs
+):
+    from UserFunctions import max_num_qubits_info
+    from UserFunctions import fixed_axes_by_generator
+    name = model_list[0] # for this growth rule, model_list should be of length 1, either x,y or z.
+    models = []
+    fixed_axis = fixed_axes_by_generator['deterministic_transverse_ising_nn_fixed_axis']
+    max_num_qubits = max_num_qubits_info['deterministic_transverse_ising_nn_fixed_axis']
+    one_qubit_larger_name = name
+    starting_dimension = DataBase.get_num_qubits(name)
+    for i in range(starting_dimension, max_num_qubits):
+        name = DataBase.alph(one_qubit_larger_name)
+        op_dict = ModelNames.operations_dict_from_name(name)
+        terms = op_dict['terms']
+        num_terms = len(terms)
+        # full_model_string = ''
+        all_term_strings= []
+
+        for term in terms:
+            this_term_string = '' 
+            paulis = []
+
+            for j in range(len(term)):
+                action = term[j]
+                if action[1] != 'i':
+                    paulis.append(action[1])
+            if len(paulis) == 1:
+                core_pauli = paulis[0]
+                break
+
+        new_dimension = op_dict['dim'] + 1
+
+        new_terms = []
+        for i in range(1, new_dimension+1):
+            this_term = []
+            this_term.append((i, core_pauli))
+            new_terms.append(this_term)
+
+        new_op_dict = {
+            'dim' : new_dimension,
+            'terms' : new_terms
+        }
+
+        one_qubit_larger_name = ModelNames.full_model_string(new_op_dict)
+        add_interaction = add_fixed_axis_nn_interaction(one_qubit_larger_name, fixed_axis)
+
+        models.extend(
+            [one_qubit_larger_name, add_interaction]
+        )
+    return models
     
 # ##### Wrapper function and dict
 
