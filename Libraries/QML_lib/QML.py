@@ -725,6 +725,11 @@ class reducedModel():
                 open(plot_probe_path, 'rb')
             )
             probe = plot_probe_dict[self.NumQubits]
+        self.log_print(
+            [
+            "Computing expectation values. \nProbe:", probe
+            ]
+        )
 
         for t in times:
                 self.expectation_values[t] = UserFunctions.expectation_value_wrapper(

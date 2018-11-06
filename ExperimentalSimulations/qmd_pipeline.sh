@@ -5,15 +5,15 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=3
+num_tests=1
 qhl_test=0
-do_further_qhl=0
+do_further_qhl=1
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=12
-exp=4
+prt=8
+exp=3
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -50,14 +50,14 @@ true_expec_filename="true_expec_vals.p"
 true_expec_path="$long_dir$true_expec_filename"
 
 this_log="$long_dir/qmd.log"
-furhter_qhl_log="$long_dir/qhl_further.log"
+further_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
 
-# growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-growth_rule='non_interacting_ising'
+# growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='interacing_nn_ising_fixed_axis'
@@ -173,7 +173,9 @@ python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -qhl=$qhl_test -fqhl=0 \
     -exp=$exp_data -true_expec=$true_expec_path \
     -ggr=$growth_rule \
-    -data=$dataset -params=$true_params_pickle_file \
+    -plot_probes=$plot_probe_file \
+    -data=$dataset \
+    -params=$true_params_pickle_file \
     -latex=$latex_mapping_file
 " > $analyse_script
 
@@ -202,6 +204,7 @@ then
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
+            -plot_probes=$plot_probe_file \
             -ds=$dataset -dst=$data_max_time \
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \
@@ -220,8 +223,11 @@ then
         -top=$number_best_models_further_qhl \
         -qhl=$qhl_test -fqhl=1 \
         -ggr=$growth_rule \
-        -exp=$exp_data -true_expec=$true_expec_path \
-        -data=$dataset -params=$true_params_pickle_file \
+        -exp=$exp_data \
+        -true_expec=$true_expec_path \
+        -plot_probes=$plot_probe_file \
+        -data=$dataset \
+        -params=$true_params_pickle_file \
         -latex=$latex_mapping_file
     " > $further_analyse_script
 

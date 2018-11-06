@@ -334,7 +334,6 @@ class QMD():
             )
         self.LatexConfig = latex_config
         self.PlotProbeFile = plot_probes_path
-        print("[QMD] plot probes path:", plot_probes_path)
         self.QMDInfo = {
             # may need to take copies of these in case pointers accross nodes break
             'num_probes' : self.NumProbes,

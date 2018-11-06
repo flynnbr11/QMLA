@@ -1078,7 +1078,7 @@ parser.add_argument(
     default=None
 )
 parser.add_argument(
-  '-probe', '--plot_probe_file', 
+  '-plot_probes', '--plot_probe_file', 
   help="File to pickle probes against which to plot expectation values.",
   type=str,
   default=None
