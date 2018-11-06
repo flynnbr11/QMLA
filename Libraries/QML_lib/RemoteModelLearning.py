@@ -50,8 +50,16 @@ def time_seconds():
 
 ## Single function call, given QMDInfo and a name, to learn model entirely. 
 
-def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
-    host_name='localhost', port_number=6379, qid=0, log_file='rq_output.log'
+def learnModelRemote(
+    name, 
+    modelID, 
+    branchID, 
+    qmd_info=None, 
+    remote=False,
+    host_name='localhost', 
+    port_number=6379, 
+    qid=0, 
+    log_file='rq_output.log'
 ):
     """
     This is a standalone function to perform QHL on individual 
@@ -99,6 +107,11 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
     true_params = qmd_info['true_params']
     num_particles = qmd_info['num_particles']
     num_experiments = qmd_info['num_experiments']
+    base_resources = qmd_info['base_resources']
+    base_num_qubits = base_resources['num_qubits']
+    base_num_terms = base_resources['num_terms']
+
+
     resampler_threshold = qmd_info['resampler_thresh']
     resampler_a = qmd_info['resampler_a']
     pgh_prefactor = qmd_info['pgh_prefactor']
@@ -120,8 +133,13 @@ def learnModelRemote(name, modelID, branchID, qmd_info=None, remote=False,
     
     # Generate model and learn
     op = DataBase.operator(name = name)
-    qml_instance = QML.ModelLearningClass(name=name, num_probes=num_probes,
-        probe_dict=probe_dict, qid=qid, log_file=log_file, modelID=modelID
+    qml_instance = QML.ModelLearningClass(
+        name=name, 
+        num_probes=num_probes,
+        probe_dict=probe_dict, 
+        qid=qid, 
+        log_file=log_file, 
+        modelID=modelID
     )
 
     random_sim_pars=False

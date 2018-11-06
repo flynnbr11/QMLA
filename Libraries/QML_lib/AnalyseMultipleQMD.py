@@ -270,23 +270,27 @@ def average_parameter_estimates(
             pickled_files.append(file)
 
     parameter_estimates_from_qmd = {}        
+    num_experiments_by_name = {}
     for f in pickled_files:
         fname = directory_name+'/'+str(f)
         result = pickle.load(open(fname, 'rb'))
         alph = result['NameAlphabetical']
         track_parameter_estimates = result['TrackParameterEstimates']
-        num_experiments = result['NumExperiments']
+        # num_experiments = result['NumExperiments']
         if alph in parameter_estimates_from_qmd.keys():
             parameter_estimates_from_qmd[alph].append(track_parameter_estimates)
-
         else:
             parameter_estimates_from_qmd[alph] = [track_parameter_estimates]
+            num_experiments_by_name[alph] = result['NumExperiments']
+            print("Setting num_experiments_by_name for ", alph, ":", result['NumExperiments'] )
 
-    epochs = range(num_experiments)
     latex_terms = {}
-            
-        
     for name in winning_models:
+        num_experiments = num_experiments_by_name[name]
+        print("[Analyse]", name, "has ", num_experiments, "experiments")
+        # epochs = range(1, 1+num_experiments)
+        epochs = range(num_experiments_by_name[name])
+
         plt.clf()
         fig = plt.figure()
         ax = plt.subplot(111)
@@ -313,13 +317,13 @@ def average_parameter_estimates(
         for t in terms:
             parameters[t] = {}
 
-            for e in range(num_experiments):
+            for e in epochs:
                 parameters[t][e] = []
 
         for i in range( len( parameters_for_this_name )):
             track_params =  parameters_for_this_name[i]
             for t in terms:
-                for e in range(num_experiments):
+                for e in epochs:
                     parameters[t][e].append( track_params[t][e] )
 
         avg_parameters = {}
@@ -328,7 +332,7 @@ def average_parameter_estimates(
             avg_parameters[p] = {}
             std_devs[p] = {}
 
-            for e in range(num_experiments):
+            for e in epochs:
                 avg_parameters[p][e] = np.median(parameters[p][e])
                 std_devs[p][e] = np.std(parameters[p][e])
 

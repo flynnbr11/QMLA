@@ -128,6 +128,23 @@ class QMD():
         self.InitialOpList = initial_op_list
         if qhl_test and self.TrueOpName not in self.InitialOpList: 
             self.InitialOpList.append(self.TrueOpName)
+
+        base_num_qubits = 3
+        base_num_terms = 3
+        for op in self.InitialOpList:
+            if DataBase.get_num_qubits(op) < base_num_qubits:
+                base_num_qubits = DataBase.get_num_qubits(op)
+            num_terms = len(DataBase.get_constituent_names_from_name(op))
+            if (
+                num_terms < base_num_terms
+            ):
+                base_num_terms = num_terms
+        self.BaseResources = {
+            'num_qubits' : base_num_qubits, 
+            'num_terms' : base_num_terms
+        }
+        print("[QMD] Base resources: ", self.BaseResources)
+
         self.TrueOpList = trueOp.constituents_operators
         self.TrueOpNumParams = trueOp.num_constituents
         if true_param_list is not None: 
@@ -367,7 +384,8 @@ class QMD():
             'time_dep_true_params' : self.TimeDepParams,
             'num_time_dependent_true_params' : self.NumTimeDepTrueParams, 
             'prior_specific_terms' : prior_specific_terms,
-            'model_priors' : model_priors
+            'model_priors' : model_priors,
+            'base_resources' : self.BaseResources,
         }
         self.log_print(
             ["Initial op list:", self.InitialOpList]
@@ -1490,7 +1508,7 @@ class QMD():
 
         self.ResultsDict = {
             'NumParticles' : self.NumParticles,
-            'NumExperiments' : self.NumExperiments,
+            'NumExperiments' : mod.NumExperiments,
             'NumBayesTimes' : self.NumTimesForBayesUpdates,
             'ResampleThreshold' : self.ResampleThreshold,
             'ResamplerA' : self.ResamplerA,
@@ -1559,7 +1577,7 @@ class QMD():
             )
             mod.results_dict = {
                 'NumParticles' : self.NumParticles,
-                'NumExperiments' : self.NumExperiments,
+                'NumExperiments' : mod.NumExperiments,
                 'NumBayesTimes' : self.NumTimesForBayesUpdates,
                 'ResampleThreshold' : self.ResampleThreshold,
                 'ResamplerA' : self.ResamplerA,
@@ -1750,7 +1768,7 @@ class QMD():
                 growth_generator = self.GrowthGenerator
             ),
             'NumParticles' : self.NumParticles,
-            'NumExperiments' : self.NumExperiments,
+            'NumExperiments' : champ_model.NumExperiments,
             'NumBayesTimes' : self.NumTimesForBayesUpdates,
             'ResampleThreshold' : self.ResampleThreshold,
             'ResamplerA' : self.ResamplerA,

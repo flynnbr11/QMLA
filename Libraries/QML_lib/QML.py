@@ -39,6 +39,35 @@ In this file are class definitions:
 
 """
 
+
+def resource_allocation(
+    base_qubits, 
+    base_terms, 
+    this_model_qubits, 
+    this_model_terms, 
+    num_experiments, 
+    num_particles
+):
+    new_resources = {}
+    
+    qubit_factor = float(this_model_qubits/base_qubits)
+    terms_factor = float(this_model_terms/base_terms)
+    
+    overall_factor = int(qubit_factor * terms_factor)
+    
+    # print("[QML:resource allocation] Factor: ", 
+    #     overall_factor
+    # )
+    if overall_factor > 1: 
+        new_resources['num_experiments'] = overall_factor * num_experiments
+        new_resources['num_particles'] = overall_factor * num_particles
+    else:
+        new_resources['num_experiments'] = num_experiments
+        new_resources['num_particles'] = num_particles
+        
+    return new_resources
+
+
 def time_seconds():
     # return time in h:m:s format for logging. 
     import datetime
@@ -115,6 +144,34 @@ class ModelLearningClass():
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.NumParticles = qmd_info['num_particles']
+        self.NumExperiments = qmd_info['num_experiments']
+
+        base_resources = qmd_info['base_resources']
+        base_num_qubits = base_resources['num_qubits']
+        base_num_terms = base_resources['num_terms']
+        this_model_num_qubits = DB.get_num_qubits(self.Name)
+        this_model_num_terms = len(
+            DB.get_constituent_names_from_name(self.Name)
+        )
+
+        new_resources = resource_allocation(
+            base_qubits = base_num_qubits, 
+            base_terms = base_num_terms, 
+            this_model_qubits = this_model_num_qubits, 
+            this_model_terms = this_model_num_terms, 
+            num_experiments = self.NumExperiments, 
+            num_particles = self.NumParticles
+        )
+
+        self.NumExperiments = new_resources['num_experiments']
+        self.NumParticles = new_resources['num_particles']
+        self.log_print(
+            [
+            'After resource reallocation, QML on', self.Name, 
+            '\n\tParticles:', self.NumParticles, 
+            '\n\tExperiments:', self.NumExperiments, 
+            ]
+        )
         self.NumProbes = qmd_info['num_probes']
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.ResamplerA = qmd_info['resampler_a']
@@ -214,8 +271,10 @@ class ModelLearningClass():
             log_file=self.log_file, log_identifier=log_identifier
         ) 
 
-        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles,
-            self.Prior, resample_thresh=self.ResamplerThresh , 
+        self.Updater = qi.SMCUpdater(
+            self.GenSimModel, self.NumParticles,
+            self.Prior, 
+            resample_thresh=self.ResamplerThresh , 
             resampler=qi.LiuWestResampler(a=self.ResamplerA),
             debug_resampling=False
         )
@@ -238,16 +297,20 @@ class ModelLearningClass():
         print_loc(print_location=init_model_print_loc)
         self.log_print(['Initialization Ready'])
 
-    def UpdateModel(self, n_experiments, sigma_threshold=10**-13,
+    def UpdateModel(
+        self, 
+        n_experiments=None, 
+        sigma_threshold=10**-13,
         checkloss=True
     ):
-        self.NumExperiments = n_experiments
+        # self.NumExperiments = n_experiments
+
         if self.checkQLoss == True: 
-            self.QLosses = np.empty(n_experiments)
-        self.Covars= np.empty(n_experiments)
+            self.QLosses = np.empty(self.NumExperiments)
+        self.Covars= np.empty(self.NumExperiments)
         self.TrackEval = []
         self.TrackCovMatrices = []
-        self.TrackTime =np.empty(n_experiments)#only for debugging
+        self.TrackTime =np.empty(self.NumExperiments)#only for debugging
     
         self.Particles = np.empty([self.NumParticles, 
             len(self.SimParams[0]), self.NumExperiments]
@@ -487,6 +550,8 @@ class ModelLearningClass():
         learned_info['quadratic_losses'] = self.QLosses
         learned_info['learned_parameters'] = self.LearnedParameters
         learned_info['cov_matrix'] = self.covmat
+        learned_info['num_particles'] = self.NumParticles
+        learned_info['num_experiments'] = self.NumExperiments
         if self.StoreParticlesWeights or self.QHL_plots:
             learned_info ['particles'] = self.Particles
             learned_info['weights'] = self.Weights
@@ -606,8 +671,8 @@ class reducedModel():
         self.MeasurementType = qmd_info['measurement_type']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.UseExperimentalData = qmd_info['use_experimental_data']
-        self.NumParticles = qmd_info['num_particles']
-        self.NumExperiments = qmd_info['num_experiments']
+        # self.NumParticles = qmd_info['num_particles']
+        # self.NumExperiments = qmd_info['num_experiments']
         self.NumProbes = qmd_info['num_probes']
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.ResamplerA = qmd_info['resampler_a']
@@ -670,6 +735,8 @@ class reducedModel():
                 print("model id: ", self.ModelID)
                 print("learned info keys:, ", learned_models_info.keys())
                 print("learned info:, ", learned_models_info.get(model_id_str))
+        self.NumParticles = learned_info['num_particles']
+        self.NumExperiments = learned_info['num_experiments']
 
         self.Times = learned_info['times']
         self.FinalParams = learned_info['final_params'] # should be final params from learning process

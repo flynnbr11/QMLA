@@ -593,13 +593,22 @@ else:
         except:
             pass
 
-        qmd.plotRSquaredVsEpoch(
-            save_to_file = str(
-                global_variables.plots_directory +
-                'r_squared_by_epoch_' + str(global_variables.long_id) +
-                '.png'
+        try:
+            qmd.plotRSquaredVsEpoch(
+                save_to_file = str(
+                    global_variables.plots_directory +
+                    'r_squared_by_epoch_' + str(global_variables.long_id) +
+                    '.png'
+                )
             )
-        )
+        except:
+            log_print(
+                [
+                "Failed to plot R squared vs epoch.", 
+                "Probably a problem caused by introducing rescaling",
+                "resources based on num qubits etc"
+                ]
+            )
 
     if global_variables.pickle_qmd_class:
         log_print(["QMD complete. Pickling result to",
