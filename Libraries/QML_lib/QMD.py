@@ -117,6 +117,7 @@ class QMD():
         rq_timeout=36000,
         growth_generator='simple_ising',
         latex_mapping_file='LatexMapping.txt',
+        plot_probes_path=None,
         log_file = None
     ):
         self.StartingTime = time.time()
@@ -332,7 +333,8 @@ class QMD():
             '}$'
             )
         self.LatexConfig = latex_config
-
+        self.PlotProbeFile = plot_probes_path
+        print("[QMD] plot probes path:", plot_probes_path)
         self.QMDInfo = {
             # may need to take copies of these in case pointers accross nodes break
             'num_probes' : self.NumProbes,
@@ -1477,7 +1479,10 @@ class QMD():
         mod = self.reducedModelInstanceFromID(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
         mod.updateLearnedValues()
-        mod.compute_expectation_values(times=self.PlotTimes)
+        mod.compute_expectation_values(
+            times = self.PlotTimes,
+            plot_probe_path = self.PlotProbeFile
+        )
 
         #TODO write single QHL test
         time_now = time.time()
@@ -1549,7 +1554,10 @@ class QMD():
             mod_id = DataBase.model_id_from_name(db=self.db, name=mod_name)
             mod = self.reducedModelInstanceFromID(mod_id)
             mod.updateLearnedValues()
-            mod.compute_expectation_values(times=self.PlotTimes)
+            mod.compute_expectation_values(
+                times=self.PlotTimes,
+                plot_probe_path = self.PlotProbeFile
+            )
             mod.results_dict = {
                 'NumParticles' : self.NumParticles,
                 'NumExperiments' : self.NumExperiments,
@@ -1620,9 +1628,12 @@ class QMD():
                     )
 
             if max_spawn_depth_reached:
-                self.log_print(["Max spawn depth reached; determining winner. \
+                self.log_print(
+                    [
+                    "Max spawn depth reached; determining winner. \
                     Entering while loop until all models/Bayes factors \
-                    remaining have finished."]
+                    remaining have finished."
+                    ]
                 )
                 still_learning = True
 
@@ -1678,7 +1689,10 @@ class QMD():
                 self.reducedModelInstanceFromID(i).BayesFactors
             )
 
-        champ_model.compute_expectation_values(times=self.PlotTimes)
+        champ_model.compute_expectation_values(
+            times=self.PlotTimes,
+            plot_probe_path = self.PlotProbeFile
+        )
 
         self.ChampionFinalParams = (
             champ_model.FinalParams
@@ -1930,12 +1944,17 @@ class QMD():
         
     def plotExpecValues(self, model_ids=None, 
         times=None,
-        champ=True, max_time=1.8,
+        champ=True, 
+        max_time=1.8,
         plus_probe=False, 
         t_interval=0.3, save_to_file=None
     ):
     
-        if plus_probe is False and self.UseExperimentalData is True:
+        if (
+            plus_probe == False 
+            and 
+            self.UseExperimentalData == True
+        ):
             plus_probe=True
 
         PlotQMD.ExpectationValuesTrueSim(

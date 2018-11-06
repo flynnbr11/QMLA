@@ -102,7 +102,7 @@ num_datapoints_to_plot = 500 # to visualise in expec_val plot for simulated data
 if global_variables.use_experimental_data is True:
     expec_val_plot_max_time = global_variables.data_max_time
 else:
-    expec_val_plot_max_time = 5    
+    expec_val_plot_max_time = 10    
 
 """
 for t in list(experimental_measurements_dict.keys()):
@@ -213,15 +213,23 @@ if os.path.isfile(true_expectation_value_path) == False:
     true_expec_values = {}
     # TODO this probe not always appropriate?
     # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe - use qmd.PlotProbe
-    probe = ExpectationValues.n_qubit_plus_state(true_num_qubits)
+    # probe = ExpectationValues.n_qubit_plus_state(true_num_qubits)
+    plot_probe_dict = pickle.load(
+        open(global_variables.plot_probe_file, 'rb')
+    )
+    probe = plot_probe_dict[true_num_qubits]
+
     for t in plot_times:
-        if global_variables.use_experimental_data:
-            expec_val = ExpectationValues.expectation_value_wrapper(
-                method=global_variables.measurement_type,
-                ham = true_ham,
-                t = t,
-                state = probe
-            )
+        if global_variables.use_experimental_data==True:
+            # expec_val = ExpectationValues.expectation_value_wrapper(
+            #     method=global_variables.measurement_type,
+            #     ham = true_ham,
+            #     t = t,
+            #     state = probe
+            # )
+            true_expec_values[t] = experimental_measurements_dict[t]
+        
+
         else:
             true_expec_values[t] = ExpectationValues.expectation_value_wrapper(
                 method=global_variables.measurement_type,
@@ -349,6 +357,7 @@ qmd = QMD(
     port_number = global_variables.port_number,
     rq_timeout = global_variables.rq_timeout,
     latex_mapping_file = global_variables.latex_mapping_file,
+    plot_probes_path = global_variables.plot_probe_file,
     log_file = global_variables.log_file
 )
 

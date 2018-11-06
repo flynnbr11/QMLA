@@ -92,13 +92,39 @@ set_true_params = {
 
 
 ### Functions ###
+
+
+def create_plot_probe(
+	plus_probe_for_plot = True,
+	max_num_qubits = 7, 
+	pickle_file = None
+):
+	import ExpectationValues
+	plot_probe_dict = {}
+	
+	for i in range(1,max_num_qubits):
+		if plus_probe_for_plot == True:
+			plot_probe_dict[i] = ExpectationValues.n_qubit_plus_state(i)
+		else:
+			plot_probe_dict[i] = ExpectationValues.random_probe(i)
+
+	if pickle_file is not None:
+		import pickle
+		pickle.dump(
+			plot_probe_dict,
+			open(pickle_file, 'wb') 
+		)
+			
+
+
 def create_qhl_params(
 	true_op, 
 	pickle_file=None,
 	random_vals=False, 
 	rand_min=0, 
 	rand_max=5,
-	exp_data=0
+	exp_data=0,
+	plus_probe_for_plot=False
 ):
 	terms = DataBase.get_constituent_names_from_name(true_op)
 	true_params = []
@@ -221,15 +247,30 @@ parser.add_argument(
   default=0
 )
 
+parser.add_argument(
+  '-probe', '--plot_probe_file', 
+  help="File to pickle probes against which to plot expectation values.",
+  type=str,
+  default=None
+)
+parser.add_argument(
+  '-plus', '--force_plus_probe', 
+  help="Whether to enforce plots to use |+>^n as probe.",
+  type=int,
+  default=0
+)
+
+
 arguments = parser.parse_args()
 random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
 exp_data = bool(arguments.use_experimental_data)
 growth_generation_rule = arguments.growth_generation_rule
 true_operator = UserFunctions.default_true_operators_by_generator[growth_generation_rule]
+plot_probe_file = arguments.plot_probe_file
+force_plus_probe = bool(arguments.force_plus_probe)
 
-
-### Call functions to create picle files. 
+### Call functions to create pickle files. 
 if arguments.true_params_file is not None:
 	create_qhl_params(
 		# true_op = arguments.true_op, 
@@ -247,3 +288,19 @@ if arguments.prior_file is not None:
 		random_vals = random_prior, 
 		exp_data=exp_data
 	)
+
+if (
+	force_plus_probe == True 
+	or 
+	exp_data == True
+):
+	force_plus = True
+else:
+	force_plus = False
+
+
+create_plot_probe(
+	plus_probe_for_plot = force_plus, 
+	pickle_file = plot_probe_file,
+	max_num_qubits = 10
+)

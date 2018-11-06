@@ -424,6 +424,7 @@ def Bayes_t_test(
     use_experimental_data=False,
     true_expectation_value_path=None,
     growth_generator = None, 
+    plot_probe_file = None,
     top_number_models=2,
     save_to_file=None
 ):
@@ -1076,6 +1077,20 @@ parser.add_argument(
     type=str,
     default=None
 )
+parser.add_argument(
+  '-probe', '--plot_probe_file', 
+  help="File to pickle probes against which to plot expectation values.",
+  type=str,
+  default=None
+)
+parser.add_argument(
+  '-plus', '--force_plus_probe', 
+  help="Whether to enforce plots to use |+>^n as probe.",
+  type=int,
+  default=0
+)
+
+
 
 
 arguments = parser.parse_args()
@@ -1088,6 +1103,8 @@ exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
 latex_mapping_file = arguments.latex_mapping_file
+plot_probe_file = arguments.plot_probe_file
+force_plus_probe = bool(arguments.force_plus_probe)
 
 if true_params_path is not None:
     true_params_info = pickle.load(
@@ -1179,7 +1196,8 @@ Bayes_t_test(
     use_experimental_data = exp_data, 
     true_expectation_value_path = true_expec_path,
     growth_generator = growth_generator, 
-    top_number_models = arguments.top_number_models ,
+    top_number_models = arguments.top_number_models,
+    plot_probe_file = plot_probe_file,
     save_to_file=str(
         directory_to_analyse+
         plot_desc +

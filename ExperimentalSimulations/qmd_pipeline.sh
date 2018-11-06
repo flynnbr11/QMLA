@@ -5,7 +5,7 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=2
+num_tests=3
 qhl_test=0
 do_further_qhl=0
 
@@ -55,9 +55,9 @@ mkdir -p $long_dir
 
 
 # growth_rule='two_qubit_ising_rotation_hyperfine'
-growth_rule='deterministic_transverse_ising_nn_fixed_axis'
+# growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# growth_rule='non_interacting_ising'
+growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='interacing_nn_ising_fixed_axis'
@@ -114,10 +114,14 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Launch $num_tests instances of QMD 
 prior_pickle_file="$long_dir/prior.p"
 true_params_pickle_file="$long_dir/true_params.p"
+plot_probe_file="$long_dir/plot_probes.p"
+force_plot_plus=0
 
 python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \
     -prior=$prior_pickle_file \
+    -probe=$plot_probe_file \
+    -plus=$force_plot_plus \
     -ggr=$growth_rule \
     -op=$true_operator \
     -exp=$exp_data \
@@ -142,6 +146,7 @@ do
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
+            -plot_probes=$plot_probe_file \
             -ds=$dataset -dst=$data_max_time \
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \

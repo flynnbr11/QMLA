@@ -713,12 +713,19 @@ class reducedModel():
     def compute_expectation_values(
         self, 
         times = [],
+        plot_probe_path = None,
         probe = None #  TODO generalise probe
     ):
         # TODO expectation_values dict only for |++> probe as is.
-        if probe is None:
+        if probe is None and plot_probe_path is None:
             probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
-        
+        else:
+
+            plot_probe_dict = pickle.load(
+                open(plot_probe_path, 'rb')
+            )
+            probe = plot_probe_dict[self.NumQubits]
+
         for t in times:
                 self.expectation_values[t] = UserFunctions.expectation_value_wrapper(
                     method=self.MeasurementType,

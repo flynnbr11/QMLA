@@ -68,6 +68,9 @@ def ExpectationValuesTrueSim(
         model_ids.remove(qmd.ChampID)
 
     # plus_plus = np.array([0.5-0.j,  0.5-0.j, 0.5-0.j, 0.5-0.j]) # TODO generalise probe
+    plot_probe_dict = pickle.load(
+        open(qmd.PlotProbeFile, 'rb')
+    )
     probe_id = random.choice(range(qmd.NumProbes))
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
@@ -99,11 +102,13 @@ def ExpectationValuesTrueSim(
         true_ops = qmd.TrueOpList
         true_dim = true_op.num_qubits
 
-        if plus_probe:
-            # true_probe = plus_plus
-            true_probe = ExpectationValues.n_qubit_plus_state(true_dim)
-        else:
-            true_probe = qmd.ProbeDict[(probe_id,true_dim)]
+        # if plus_probe:
+        #     # true_probe = plus_plus
+        #     true_probe = ExpectationValues.n_qubit_plus_state(true_dim)
+        # else:
+        #     true_probe = qmd.ProbeDict[(probe_id,true_dim)]
+
+        true_probe = plot_probe_dict[true_dim]
 
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
         true_expec_values = []
@@ -176,10 +181,11 @@ def ExpectationValuesTrueSim(
             sim_ham = mod.LearnedHamiltonian
             times_learned = mod.Times
             sim_dim = DataBase.get_num_qubits(mod.Name)
-            if plus_probe:
-                sim_probe = ExpectationValues.n_qubit_plus_state(sim_dim)
-            else:
-                sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
+            # if plus_probe:
+            #     sim_probe = ExpectationValues.n_qubit_plus_state(sim_dim)
+            # else:
+            #     sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
+            sim_probe = plot_probe_dict[sim_dim]
             colour_id = int(i%len(sim_colours))
             sim_col = sim_colours[colour_id]
 

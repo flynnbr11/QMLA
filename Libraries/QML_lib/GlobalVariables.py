@@ -101,7 +101,7 @@ default_latex_mapping_file = str(
   default_results_directory +
   '/LatexMapping.txt'
 )
-
+default_plot_probe_file = None
 
 class GlobalVariablesClass():
     def __init__(
@@ -145,8 +145,8 @@ class GlobalVariablesClass():
         prior_pickle_file = default_prior_pickle_file,
         true_params_pickle_file = default_true_params_pickle_file,
         true_expec_path = default_true_expec_path,
+        plot_probe_file = default_plot_probe_file,
         latex_mapping_file = default_latex_mapping_file
-
     ):
         self.true_operator = true_operator
         self.qhl_test = qhl_test
@@ -189,6 +189,7 @@ class GlobalVariablesClass():
         self.prior_pickle_file = prior_pickle_file
         self.true_params_pickle_file = true_params_pickle_file
         self.true_expec_path = true_expec_path
+        self.plot_probe_file = plot_probe_file
         self.latex_mapping_file = latex_mapping_file
 
         if self.results_directory[-1] != '/':
@@ -489,6 +490,13 @@ def parse_cmd_line_args(args):
       type=str,
       default=default_true_params_pickle_file
     )
+    parser.add_argument(
+      '-plot_probes', '--plot_probes_path',
+      help='Path where plot probe dict is pickled to.',
+      type=str,
+      default=default_plot_probe_file
+    )
+
 
     parser.add_argument(
       '-latex', '--latex_mapping_file',
@@ -541,6 +549,7 @@ def parse_cmd_line_args(args):
     prior_pickle_file = arguments.prior_pickle_file
     true_params_pickle_file = arguments.true_params_pickle_file
     true_expec_path = arguments.true_expectation_values_path
+    plot_probes_path = arguments.plot_probes_path
     latex_mapping_file = arguments.latex_mapping_file
 
     # Use arguments to initialise global variables class. 
@@ -583,6 +592,7 @@ def parse_cmd_line_args(args):
         prior_pickle_file = prior_pickle_file,
         true_params_pickle_file = true_params_pickle_file,
         true_expec_path = true_expec_path,
+        plot_probe_file = plot_probes_path,
         latex_mapping_file = latex_mapping_file
     )
 
