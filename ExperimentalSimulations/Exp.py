@@ -447,8 +447,12 @@ elif global_variables.further_qhl == True:
     #     )
 
     if global_variables.pickle_qmd_class:
-        log_print(["QMD complete. Pickling result to",
-            global_variables.class_pickle_file], log_file
+        log_print(
+            [
+            "QMD complete. Pickling result to",
+            global_variables.class_pickle_file
+            ], 
+            log_file
         )
         qmd.delete_unpicklable_attributes()
         with open(global_variables.class_pickle_file, "wb") as pkl_file:

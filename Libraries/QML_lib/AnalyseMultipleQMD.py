@@ -393,12 +393,14 @@ def average_parameter_estimates(
             fill_between_sigmas(
                 ax, 
                 parameters[term], 
+                # [e +1 for e in epochs],
                 epochs, 
                 legend=leg
             )
             
             ax.scatter(
-                epochs, 
+                [e +1 for e in epochs],
+#                epochs, 
                 averages, 
                 s=max(1,50/num_experiments),
                 label=latex_terms[term],
@@ -723,7 +725,8 @@ def fill_between_sigmas(
     three_sigma_colour='blue'
     four_sigma_colour='orange'
     ax.fill_between(
-        times,
+        # times, 
+        [t+1 for t in times],
         upper_one_sigma, 
         lower_one_sigma, 
         alpha=fill_alpha,
@@ -734,7 +737,8 @@ def fill_between_sigmas(
 
     if only_one_sigma == False:
         ax.fill_between(
-            times,
+            # times, 
+            [t+1 for t in times],
             upper_two_sigma,
             upper_one_sigma, 
             alpha=fill_alpha,
@@ -742,7 +746,8 @@ def fill_between_sigmas(
             label='$2 \sigma$ '
         )
         ax.fill_between(
-            times,
+            # times, 
+            [t+1 for t in times],
             lower_one_sigma, 
             lower_two_sigma,
             alpha=fill_alpha,
@@ -750,7 +755,8 @@ def fill_between_sigmas(
         )
 
         ax.fill_between(
-            times,
+            # times, 
+            [t+1 for t in times],
             upper_three_sigma,
             upper_two_sigma, 
             alpha=fill_alpha,
@@ -758,7 +764,8 @@ def fill_between_sigmas(
             label='$3 \sigma$ '
         )
         ax.fill_between(
-            times,
+            # times, 
+            [t+1 for t in times],
             lower_two_sigma, 
             lower_three_sigma,
             alpha=fill_alpha,
@@ -766,7 +773,8 @@ def fill_between_sigmas(
         )
 
         ax.fill_between(
-            times,
+            # times, 
+            [t+1 for t in times],
             upper_four_sigma,
             upper_three_sigma, 
             alpha=fill_alpha,
@@ -774,7 +782,8 @@ def fill_between_sigmas(
             label='$4 \sigma$ '
         )
         ax.fill_between(
-            times,
+            # times, 
+            [t+1 for t in times],
             lower_three_sigma, 
             lower_four_sigma,
             alpha=fill_alpha,

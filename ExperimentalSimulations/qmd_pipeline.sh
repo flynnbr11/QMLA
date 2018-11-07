@@ -5,9 +5,9 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
+num_tests=4
 qhl_test=0
-do_further_qhl=0
+do_further_qhl=1
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -24,7 +24,7 @@ gaussian=1
 ### ---------------------------------------------------###
 exp_data=0
 use_rq=0
-further_qhl_factor=2
+further_qhl_factor=1
 plots=1
 use_rq=0
 number_best_models_further_qhl=5

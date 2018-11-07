@@ -1571,7 +1571,9 @@ class QMD():
         time_now = time.time()
         time_taken = time_now - self.StartingTime
         for mod_name in model_names:
-            mod_id = DataBase.model_id_from_name(db=self.db, name=mod_name)
+            mod_id = DataBase.model_id_from_name(
+                db=self.db, name=mod_name
+            )
             mod = self.reducedModelInstanceFromID(mod_id)
             mod.updateLearnedValues()
             mod.compute_expectation_values(
@@ -1579,7 +1581,7 @@ class QMD():
                 plot_probe_path = self.PlotProbeFile
             )
             mod.results_dict = {
-                'NumParticles' : self.NumParticles,
+                'NumParticles' : mod.NumParticles,
                 'NumExperiments' : mod.NumExperiments,
                 'NumBayesTimes' : self.NumTimesForBayesUpdates,
                 'ResampleThreshold' : self.ResampleThreshold,
