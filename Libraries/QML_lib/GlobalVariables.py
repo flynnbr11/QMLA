@@ -102,6 +102,7 @@ default_latex_mapping_file = str(
   '/LatexMapping.txt'
 )
 default_plot_probe_file = None
+default_reallocate_resources=0
 
 class GlobalVariablesClass():
     def __init__(
@@ -146,7 +147,8 @@ class GlobalVariablesClass():
         true_params_pickle_file = default_true_params_pickle_file,
         true_expec_path = default_true_expec_path,
         plot_probe_file = default_plot_probe_file,
-        latex_mapping_file = default_latex_mapping_file
+        latex_mapping_file = default_latex_mapping_file,
+        reallocate_resources = default_reallocate_resources
     ):
         self.true_operator = true_operator
         self.qhl_test = qhl_test
@@ -191,6 +193,7 @@ class GlobalVariablesClass():
         self.true_expec_path = true_expec_path
         self.plot_probe_file = plot_probe_file
         self.latex_mapping_file = latex_mapping_file
+        self.reallocate_resources = reallocate_resources
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -505,6 +508,15 @@ def parse_cmd_line_args(args):
       default=default_latex_mapping_file
     )
 
+    parser.add_argument(
+      '-resource', '--reallocate_resources',
+      help='Bool: whether to reallocate resources scaling  \
+        with num qubits/terms to be learned during QHL.',
+      type=int,
+      default=default_reallocate_resources
+    )
+
+
 
     # Process arguments from command line
     arguments = parser.parse_args(args)
@@ -551,6 +563,7 @@ def parse_cmd_line_args(args):
     true_expec_path = arguments.true_expectation_values_path
     plot_probes_path = arguments.plot_probes_path
     latex_mapping_file = arguments.latex_mapping_file
+    reallocate_resources = bool(arguments.reallocate_resources)
 
     # Use arguments to initialise global variables class. 
     global_variables = GlobalVariablesClass(
@@ -593,7 +606,8 @@ def parse_cmd_line_args(args):
         true_params_pickle_file = true_params_pickle_file,
         true_expec_path = true_expec_path,
         plot_probe_file = plot_probes_path,
-        latex_mapping_file = latex_mapping_file
+        latex_mapping_file = latex_mapping_file,
+        reallocate_resources = reallocate_resources,
     )
 
     args_dict = vars(arguments)

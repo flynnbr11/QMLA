@@ -100,6 +100,7 @@ def create_plot_probe(
 	pickle_file = None
 ):
 	import ExpectationValues
+	import numpy as np
 	plot_probe_dict = {}
 	
 	for i in range(1,max_num_qubits):

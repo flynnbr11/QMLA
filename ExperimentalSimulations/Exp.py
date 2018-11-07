@@ -358,6 +358,7 @@ qmd = QMD(
     rq_timeout = global_variables.rq_timeout,
     latex_mapping_file = global_variables.latex_mapping_file,
     plot_probes_path = global_variables.plot_probe_file,
+    reallocate_resources = global_variables.reallocate_resources, 
     log_file = global_variables.log_file
 )
 

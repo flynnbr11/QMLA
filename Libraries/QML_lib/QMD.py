@@ -118,6 +118,7 @@ class QMD():
         growth_generator='simple_ising',
         latex_mapping_file='LatexMapping.txt',
         plot_probes_path=None,
+        reallocate_resources=False, 
         log_file = None
     ):
         self.StartingTime = time.time()
@@ -143,6 +144,7 @@ class QMD():
             'num_qubits' : base_num_qubits, 
             'num_terms' : base_num_terms
         }
+        self.ReallocateResources = reallocate_resources
         # print("[QMD] Base resources: ", self.BaseResources)
 
         self.TrueOpList = trueOp.constituents_operators
@@ -386,6 +388,7 @@ class QMD():
             'prior_specific_terms' : prior_specific_terms,
             'model_priors' : model_priors,
             'base_resources' : self.BaseResources,
+            'reallocate_resources' : self.ReallocateResources,
         }
         self.log_print(
             ["Initial op list:", self.InitialOpList]

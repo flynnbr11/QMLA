@@ -154,24 +154,25 @@ class ModelLearningClass():
             DB.get_constituent_names_from_name(self.Name)
         )
 
-        new_resources = resource_allocation(
-            base_qubits = base_num_qubits, 
-            base_terms = base_num_terms, 
-            this_model_qubits = this_model_num_qubits, 
-            this_model_terms = this_model_num_terms, 
-            num_experiments = self.NumExperiments, 
-            num_particles = self.NumParticles
-        )
+        if qmd_info['reallocate_resources']==True:
+            new_resources = resource_allocation(
+                base_qubits = base_num_qubits, 
+                base_terms = base_num_terms, 
+                this_model_qubits = this_model_num_qubits, 
+                this_model_terms = this_model_num_terms, 
+                num_experiments = self.NumExperiments, 
+                num_particles = self.NumParticles
+            )
 
-        self.NumExperiments = new_resources['num_experiments']
-        self.NumParticles = new_resources['num_particles']
-        self.log_print(
-            [
-            'After resource reallocation, QML on', self.Name, 
-            '\n\tParticles:', self.NumParticles, 
-            '\n\tExperiments:', self.NumExperiments, 
-            ]
-        )
+            self.NumExperiments = new_resources['num_experiments']
+            self.NumParticles = new_resources['num_particles']
+            self.log_print(
+                [
+                'After resource reallocation, QML on', self.Name, 
+                '\n\tParticles:', self.NumParticles, 
+                '\n\tExperiments:', self.NumExperiments, 
+                ]
+            )
         self.NumProbes = qmd_info['num_probes']
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.ResamplerA = qmd_info['resampler_a']

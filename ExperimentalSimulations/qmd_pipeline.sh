@@ -129,6 +129,9 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
 
 latex_mapping_filename='LatexMapping.txt'
 latex_mapping_file=$long_dir$latex_mapping_filename
+reallocate_resources=0
+
+
 for prt in  "${particle_counts[@]}";
 do
     for i in `seq 1 $max_qmd_id`;
@@ -150,6 +153,7 @@ do
             -ds=$dataset -dst=$data_max_time \
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \
+            -resource=$reallocate_resources \
             -ggr=$growth_rule \
             
     done
