@@ -34,7 +34,12 @@ def experimentalMeasurementDict(directory, max_time=1e4):
     return experimental_data
 
 
-def importExperimentalData(directory, max_time=1e4, rescale = False, clean_duplicates = True):
+def importExperimentalData(
+    directory, 
+    max_time=1e4, 
+    rescale=False, 
+    clean_duplicates=True
+):
     
     exp_data = []
     

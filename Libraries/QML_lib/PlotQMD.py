@@ -2041,7 +2041,8 @@ def parameterEstimates(
 #    colours = ['b','r','g','orange', 'pink', 'grey']
 
     # TODO use color map as list
-    num_epochs = qmd.NumExperiments
+    # num_epochs = qmd.NumExperiments
+    num_epochs = mod.NumExperiments
 #    fig = plt.figure()
 #    ax = plt.subplot(111)
 

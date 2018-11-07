@@ -106,7 +106,13 @@ def create_plot_probe(
 		if plus_probe_for_plot == True:
 			plot_probe_dict[i] = ExpectationValues.n_qubit_plus_state(i)
 		else:
-			plot_probe_dict[i] = ExpectationValues.random_probe(i)
+			if i==1:
+				plot_probe_dict[i] = ExpectationValues.random_probe(i)
+			else:
+				old_probe = plot_probe_dict[i-1]
+				new_probe = ExpectationValues.random_probe(1)
+				n_dim_probe = np.kron(old_probe, new_probe)
+				plot_probe_dict[i] = n_dim_probe
 
 	if pickle_file is not None:
 		import pickle
