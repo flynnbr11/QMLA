@@ -607,7 +607,8 @@ else:
                 "Failed to plot R squared vs epoch.", 
                 "Probably a problem caused by introducing rescaling",
                 "resources based on num qubits etc"
-                ]
+                ],
+                log_file
             )
 
     if global_variables.pickle_qmd_class:

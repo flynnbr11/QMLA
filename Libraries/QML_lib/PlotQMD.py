@@ -2045,11 +2045,19 @@ def parameterEstimates(
 #    fig = plt.figure()
 #    ax = plt.subplot(111)
 
-    ncols=3
-    nrows=3 # TODO  -- make safe
+    # ncols=3
+    # nrows=3 # TODO  -- make safe
+    ncols = int(np.ceil(np.sqrt(num_terms)))
+    nrows = int(np.ceil(num_terms/ncols))
+
 #    nrows=int(np.ceil( num_terms/ncols ))
 
-    fig, axes = plt.subplots(figsize = (10, 7), nrows=nrows, ncols=ncols)
+    fig, axes = plt.subplots(
+        figsize = (10, 7), 
+        nrows=nrows, 
+        ncols=ncols,
+        squeeze=False
+    )
     row = 0
     col = 0
     axes_so_far = 0

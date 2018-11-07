@@ -143,7 +143,7 @@ class QMD():
             'num_qubits' : base_num_qubits, 
             'num_terms' : base_num_terms
         }
-        print("[QMD] Base resources: ", self.BaseResources)
+        # print("[QMD] Base resources: ", self.BaseResources)
 
         self.TrueOpList = trueOp.constituents_operators
         self.TrueOpNumParams = trueOp.num_constituents
@@ -1470,7 +1470,7 @@ class QMD():
             generator =self.GrowthGenerator,
             spawn_step = self.SpawnDepth
         )
-        print("Tree completed:", tree_completed)
+        # print("Tree completed:", tree_completed)
         # if self.SpawnDepth == self.MaxSpawnDepth:
         #     print("Spawn depth = max spawn depth")
         #     return True

@@ -282,12 +282,10 @@ def average_parameter_estimates(
         else:
             parameter_estimates_from_qmd[alph] = [track_parameter_estimates]
             num_experiments_by_name[alph] = result['NumExperiments']
-            print("Setting num_experiments_by_name for ", alph, ":", result['NumExperiments'] )
 
     latex_terms = {}
     for name in winning_models:
         num_experiments = num_experiments_by_name[name]
-        print("[Analyse]", name, "has ", num_experiments, "experiments")
         # epochs = range(1, 1+num_experiments)
         epochs = range(num_experiments_by_name[name])
 
@@ -313,6 +311,8 @@ def average_parameter_estimates(
         else:
             ncols=3
             nrows=3 
+        ncols = int(np.ceil(np.sqrt(num_terms)))
+        nrows = int(np.ceil(num_terms/ncols))
 
         fig, axes = plt.subplots(
             figsize = (10, 7), 
@@ -320,8 +320,6 @@ def average_parameter_estimates(
             ncols=ncols,
             squeeze=False,
         )
-        print("[analyse]type axes:", type(axes))
-        print("axes:", np.shape(axes))
         row = 0
         col = 0
         axes_so_far = 0
@@ -383,8 +381,11 @@ def average_parameter_estimates(
                 )
                 ax.axhline(
                     true_val, 
-                    label=str(true_term_latex+ ' True'), 
-                    color=colours[terms.index(term)]
+                    # label=str(true_term_latex+ ' True'), 
+                    # color=colours[terms.index(term)]
+                    label=str('True value'), 
+                    color='black'
+
                 )
             except:
                 pass
@@ -401,7 +402,8 @@ def average_parameter_estimates(
                 averages, 
                 s=max(1,50/num_experiments),
                 label=latex_terms[term],
-                c='black'
+                # color=colours[terms.index(term)]
+                color='black'
             )
 
             # latex_term = DataBase.latex_name_ising(term)
