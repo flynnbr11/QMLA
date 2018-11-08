@@ -1,4 +1,7 @@
 import numpy as np
+import ExpectationValues
+
+
 
 ## Simluated Probes: random
 def separable_probe_dict(
@@ -163,3 +166,14 @@ def experimental_NVcentre_ising_probes(
                 )
     return seperable_probes
   
+
+def plus_probes_dict(
+    max_num_qubits, 
+    **kwargs
+):
+    probe_dict = {}
+
+    for i in range(1,1+max_num_qubits):
+        # dict key is tuple of form (0,i) for consistency with other probe dict generation functions. 
+        probe_dict[(0,i)] = ExpectationValues.n_qubit_plus_state(i)
+    return probe_dict 

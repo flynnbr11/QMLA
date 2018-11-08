@@ -422,6 +422,7 @@ def get_initial_op_list(
 def get_probe_dict(
 	experimental_data=False, 
 	growth_generator=None, 
+	plus_probes=False, 
 	**kwargs
 ):
 	print("[getProbeDict] kwargs:", kwargs)
@@ -435,6 +436,13 @@ def get_probe_dict(
 			probe_dict_function = experimental_probe_dict_generator[
 				None
 			]
+	elif (
+		experimental_data == False
+		and
+		plus_probes == True
+	):
+
+		probe_dict_function = ProbeGeneration.plus_probes_dict
 	else:
 		try:
 			probe_dict_function = simulated_probe_dict_generator[
@@ -444,6 +452,7 @@ def get_probe_dict(
 			probe_dict_function = simulated_probe_dict_generator[
 				None
 			]
+
 
 	try:
 		max_num_qubits = max_num_qubits_info[growth_generator]

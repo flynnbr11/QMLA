@@ -109,10 +109,13 @@ def create_plot_probe(
 	# print("[createPlotProbe] kwargs", kwargs)
 	# print("[createPlotProbe] exp data:", experimental_data )
 	# print("[createPlotProbe] ggr:",growth_generator )
+	
+
+	kwargs['num_probes'] = 1
 	plot_probe_dict = UserFunctions.get_probe_dict(
 		# experimental_data = experimental_data, 
 		# growth_generator = growth_generator,
-		num_probes = 1,
+		# num_probes = 1,
 		# plus_probe = plus_probe_for_plot,
 		**kwargs
 	)
@@ -331,7 +334,7 @@ kwargs_for_plot_probe_creation = {
 	'true_operator' : true_operator, 
 	'growth_generator' : growth_generation_rule,
 	'experimental_data' : exp_data,
-	'plus_probe_for_plot' : force_plus, 
+	'plus_probes' : force_plus, 
 
 }
 
