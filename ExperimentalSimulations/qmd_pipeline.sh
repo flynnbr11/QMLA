@@ -5,9 +5,9 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=4
+num_tests=1
 qhl_test=0
-do_further_qhl=1
+do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -22,7 +22,7 @@ gaussian=1
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=0
+exp_data=1
 use_rq=0
 further_qhl_factor=1
 plots=1
@@ -54,8 +54,8 @@ further_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
 
-growth_rule='two_qubit_ising_rotation_hyperfine'
-# growth_rule='deterministic_transverse_ising_nn_fixed_axis'
+# growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'

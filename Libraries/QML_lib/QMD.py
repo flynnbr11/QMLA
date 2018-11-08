@@ -122,6 +122,14 @@ class QMD():
         log_file = None
     ):
         self.StartingTime = time.time()
+        self.Q_id = q_id
+        self.HostName = host_name
+        self.PortNumber = port_number
+        if log_file is not None:
+            self.log_file = log_file
+        else:
+            self.log_file = str('QMD_'+str(q_id)+'.log')
+        
         self.QLE = qle # Set to False for IQLE
         trueOp = DataBase.operator(true_operator)
         self.TrueOpName = true_operator
@@ -189,11 +197,21 @@ class QMD():
 
         self.NumProbes = num_probes
         if probe_dict is None:
+            self.log_print(
+                [
+                "Generating probe dict."
+                ]
+            )
             self.ProbeDict = separable_probe_dict(
                 max_num_qubits=self.MaxQubitNumber, 
                 num_probes=self.NumProbes
             )
         else:
+            self.log_print(
+                [
+                "Probe dict provided to QMD."
+                ]
+            )
             self.ProbeDict = probe_dict
         self.HighestQubitNumber = int(0)
         self.MaxBranchID = max_num_branches
@@ -265,18 +283,9 @@ class QMD():
         self.BranchAllModelsLearned = { 0 : False}
         self.BranchComparisonsComplete = {0 : False}
         self.BranchNumModelsPreComputed = {0 : 0}
-        self.Q_id = q_id
-        self.HostName = host_name
-        self.PortNumber = port_number
         self.use_rq = use_rq
         self.rq_timeout = rq_timeout
-        if log_file is not None:
-            self.log_file = log_file
-        else:
-            self.log_file = str('QMD_'+str(q_id)+'.log')
         self.rq_log_file = self.log_file
-
-
         self.write_log_file = open(self.log_file, 'a')
         # self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(
         # self.MaxSpawnDepth = UserFunctions.max_spawn_depth(

@@ -28,6 +28,7 @@ The functions these pass into must be altered for new QMD applications.
 import ModelGeneration 
 import ModelNames 
 import ExpectationValues
+import ProbeGeneration
 
 def time_seconds():
     import datetime
@@ -124,9 +125,13 @@ max_spawn_depth_info = {
 }
 
 max_num_qubits_info = {
+    'two_qubit_ising_rotation' : 2,
+    'two_qubit_ising_rotation_hyperfine' : 2, # for dev, should be 5 #TODO put back
+    'two_qubit_ising_rotation_hyperfine_transverse' : 2,
     'deterministic_noninteracting_ising_single_axis' : 5,
     'deterministic_interacting_nn_ising_single_axis' : 5,
-    'deterministic_transverse_ising_nn_fixed_axis' : 5	
+    'deterministic_transverse_ising_nn_fixed_axis' : 5,
+
 }
 
 
@@ -262,6 +267,7 @@ initial_models = {
 		['x', 'y', 'z'],
 	'two_qubit_ising_rotation_hyperfine' :
 		['xTi', 'yTi', 'zTi'],
+		# ['yTi', 'zTi'],
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		['xTi', 'yTi', 'zTi'],
 	'interacting_nearest_neighbour_ising' :
@@ -273,6 +279,25 @@ initial_models = {
 	'deterministic_interacting_nn_ising_single_axis' : 
 		['xTx', 'yTy', 'zTz']
 
+}
+
+##### ---------- -------------------- #####  
+# Probe dict generation
+##### ---------- -------------------- #####  
+
+
+experimental_probe_dict_generator = {
+	None: 
+		ProbeGeneration.separable_probe_dict,
+	'two_qubit_ising_rotation' : 
+		ProbeGeneration.NV_centre_ising_probes_plus,
+	'two_qubit_ising_rotation_transverse' : 
+		ProbeGeneration.NV_centre_ising_probes_plus,
+}
+
+simulated_probe_dict_generator = {
+	None: 
+		ProbeGeneration.separable_probe_dict, 
 }
 
 ##### ---------- -------------------- #####  
@@ -393,3 +418,40 @@ def get_initial_op_list(
 			log_file
 		)
 	return initial_ops
+
+def get_probe_dict(
+	experimental_data=False, 
+	growth_generator=None, 
+	**kwargs
+):
+
+	if experimental_data == True:
+		try:
+			probe_dict_function = experimental_probe_dict_generator[
+				growth_generator
+			]
+		except:
+			probe_dict_function = experimental_probe_dict_generator[
+				None
+			]
+	else:
+		try:
+			probe_dict_function = simulated_probe_dict_generator[
+				growth_generator
+			]
+		except:
+			probe_dict_function = simulated_probe_dict_generator[
+				None
+			]
+
+	try:
+		max_num_qubits = max_num_qubits_info[growth_generator]
+	except:
+		max_num_qubits = max_num_qubits_info[None]
+
+
+	probe_dict = probe_dict_function(
+		max_num_qubits = max_num_qubits, 
+		**kwargs
+	)
+	return probe_dict

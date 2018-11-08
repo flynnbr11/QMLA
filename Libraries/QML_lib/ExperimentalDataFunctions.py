@@ -142,7 +142,10 @@ def nearestAvailableExpVal(times, experimental_data, t):
     
     return experimental_data[nearest]
 
-def experimental_NVcentre_ising_probes(max_num_qubits=2, num_probes=40):
+def experimental_NVcentre_ising_probes(
+    max_num_qubits=2, 
+    num_probes=40
+):
     """
     Returns a dict of separable probes where the first qubit always acts on 
     a plus state. 
@@ -162,11 +165,19 @@ def experimental_NVcentre_ising_probes(max_num_qubits=2, num_probes=40):
             if j==1:
                 seperable_probes[i,j] = seperable_probes[i,0]
             else: 
-                seperable_probes[i,j] = (np.tensordot(seperable_probes[i,j-1],
-                    random_probe(1), axes=0).flatten(order='c')
+                seperable_probes[i,j] = (
+                    np.tensordot(
+                        seperable_probes[i,j-1],
+                        random_probe(1), 
+                        axes=0
+                    ).flatten(order='c')
                 )
-            while (np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]), 
-                atol=1e-14) is  False
+            while (
+                np.isclose(
+                    1.0, 
+                    np.linalg.norm(seperable_probes[i,j]), 
+                    atol=1e-14
+                ) is  False
             ):
                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
                 # keep replacing until a unit-norm 

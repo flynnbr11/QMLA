@@ -267,9 +267,13 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         # )
 
 
-        if true_evo and self.use_experimental_data:
+        if (
+            true_evo == True
+            and 
+            self.use_experimental_data
+        ):
             time = expparams['t']
-            #print("[likelihood fnc] Experimental data being called.")
+            # print("[likelihood fnc] Experimental data being called.")
             if debug_log_print:
                 log_print(
                     [
@@ -302,9 +306,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 )
             pr0 = np.array([[experimental_expec_value]])
 
-
         else:        
-            #print("[likelihood fnc] Simulated data being called.")
             
             if self.inBayesUpdates:
                 if self.ideal_probe is not None:
@@ -317,6 +319,11 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 probe = self._probelist[
                     (self._b % int(self.NumProbes)), ham_num_qubits
                 ]
+            # print(
+            #     "[likelihood fnc] \
+            #     Simulated data being called.\
+            #     Probe:", probe
+            # )
             
             ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
             print_loc(global_print_loc)

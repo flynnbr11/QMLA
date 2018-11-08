@@ -67,21 +67,28 @@ def log_print(to_print_list, log_file):
 
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
-num_probes = 40
+num_probes = 2
 
-if global_variables.use_experimental_data == True:
-# TODO reinstate regualar probes
+generated_probe_dict = UserFunctions.get_probe_dict(
+    experimental_data = global_variables.use_experimental_data, 
+    growth_generator = global_variables.growth_generation_rule, 
+    noise_level = 0.0,
+    minimum_tolerable_noise = 1e-7,
+    num_probes = num_probes
+)
 
-    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes(
-        max_num_qubits = 8,
-        num_probes=num_probes
-    )
-else:
-    experimental_probe_dict = None
-
+log_print(
+    [
+    "probe dict keys:", sorted(
+        list(generated_probe_dict.keys())
+    ),
+    "\n Full Probe dict:", generated_probe_dict
+    ],
+    log_file = log_file     
+)
 """
 if global_variables.qhl_test:
-    experimental_probe_dict = expdt.experimental_NVcentre_ising_probes_plusplus(
+    generated_probe_dict = expdt.experimental_NVcentre_ising_probes_plusplus(
         num_probes=num_probes
     )
 """
@@ -126,29 +133,9 @@ raw_times = list(np.linspace(
 plot_times = [ np.round(a, 2 ) for a in raw_times ]
 plot_times = sorted(plot_times)
 if global_variables.use_experimental_data==True:
-    plot_times = sorted(list(experimental_measurements_dict.keys()))    
-
-# initial_op_list = ['xTx', 'xTy', 'xTz']
-# initial_op_list = ['xTi', 'xTiPPyTi', 'zTiTTi']
-
-# strictly_two_qubit_ising_growths = [
-#     'two_qubit_ising_rotation_hyperfine',
-#     'two_qubit_ising_rotation_hyperfine_transverse', 
-#     'hyperfine_like'
-# ]
-# two_qubit_starting = [
-#     'interacting_nearest_neighbour_ising'
-# ]
-
-# if global_variables.growth_generation_rule in strictly_two_qubit_ising_growths:
-#     initial_op_list = ['xTi', 'yTi', 'zTi']
-# elif global_variables.growth_generation_rule in two_qubit_starting:
-#     initial_op_list = ['xTx', 'yTy', 'zTz']
-# else:
-#     initial_op_list = ['x', 'y', 'z']
-
-
-# initial_op_list = ['x']
+    plot_times = sorted(
+        list(experimental_measurements_dict.keys())
+    )    
 
 initial_op_list  = UserFunctions.get_initial_op_list(
     growth_generator = global_variables.growth_generation_rule,
@@ -337,7 +324,7 @@ qmd = QMD(
     results_directory = results_directory,
     long_id = long_id, 
     num_probes=num_probes,
-    probe_dict = experimental_probe_dict, 
+    probe_dict = generated_probe_dict, 
     gaussian = global_variables.gaussian, 
     prior_specific_terms = prior_specific_terms,    
     model_priors = model_priors,
