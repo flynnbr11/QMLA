@@ -87,7 +87,8 @@ set_true_params = {
 	'zTz' : 2.43632654,
 	'xTy' : 1.6,
 	'xTz' : 1.7,
-	'yTz' : 1.8
+	'yTz' : 1.8,
+	'xTxTTx' : 1.2345
 }
 
 
@@ -278,6 +279,7 @@ plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
 
 ### Call functions to create pickle files. 
+## TODO check if these are already present?
 if arguments.true_params_file is not None:
 	create_qhl_params(
 		# true_op = arguments.true_op, 

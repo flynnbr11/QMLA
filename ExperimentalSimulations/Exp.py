@@ -67,7 +67,7 @@ def log_print(to_print_list, log_file):
 
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
-num_probes = 2
+num_probes = 20
 
 generated_probe_dict = UserFunctions.get_probe_dict(
     experimental_data = global_variables.use_experimental_data, 
@@ -77,29 +77,6 @@ generated_probe_dict = UserFunctions.get_probe_dict(
     num_probes = num_probes
 )
 
-log_print(
-    [
-    "probe dict keys:", sorted(
-        list(generated_probe_dict.keys())
-    ),
-    "\n Full Probe dict:", generated_probe_dict
-    ],
-    log_file = log_file     
-)
-"""
-if global_variables.qhl_test:
-    generated_probe_dict = expdt.experimental_NVcentre_ising_probes_plusplus(
-        num_probes=num_probes
-    )
-"""
-
-# Load in experimental data
-"""
-experimental_measurements_dict = expdt.experimentalMeasurementDict(
-    directory = str("Data/"+global_variables.dataset),
-    max_time = global_variables.data_max_time + global_variables.data_time_offset
-)
-"""
 
 experimental_measurements_dict = pickle.load(
     open(str('Data/'+global_variables.dataset), 'rb')
@@ -172,22 +149,26 @@ if (
 
 
 
+# true_params_info = pickle.load(
+#     open(
+#         global_variables.true_params_pickle_file,
+#         'rb'
+#     )
+# )
+# true_op = true_params_info['true_op']
+# true_params = true_params_info['params_list']
+true_op = global_variables.true_operator
+true_params = global_variables.true_params
 # true_op = global_variables.true_operator
-true_op = UserFunctions.default_true_operators_by_generator[
-    global_variables.growth_generation_rule
-]
+
+# true_op = UserFunctions.default_true_operators_by_generator[
+#     global_variables.growth_generation_rule
+# ]
 true_num_qubits = DataBase.get_num_qubits(true_op)
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 true_op_matrices = [DataBase.compute(t) for t in true_op_list]
 num_params = len(true_op_list)
 
-true_params_info = pickle.load(
-    open(
-        global_variables.true_params_pickle_file,
-        'rb'
-    )
-)
-true_params = true_params_info['params_list']
 
 # true_expectation_value_path = str(global_variables.results_directory + 'true_expectation_values.p')
 true_expectation_value_path = global_variables.true_expec_path
@@ -262,7 +243,8 @@ model_priors = None
 if global_variables.further_qhl == True:
 
     qmd_results_model_scores_csv = str(
-        global_variables.results_directory + 'average_priors.p'
+        global_variables.results_directory 
+        + 'average_priors.p'
     )
     print("QMD results CSV in ", qmd_results_model_scores_csv)
     model_priors = pickle.load(
@@ -458,7 +440,7 @@ elif global_variables.further_qhl == True:
             str(global_variables.long_id)+
             '.p'
         )
-        print("results file:", results_file)
+        print("[Exp] results file:", results_file)
 
         pickle.dump(
             mod.results_dict,

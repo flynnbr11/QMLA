@@ -7,7 +7,7 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 num_tests=1
 qhl_test=0
-do_further_qhl=0
+do_further_qhl=1
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -22,9 +22,10 @@ gaussian=1
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=1
+exp_data=0
 use_rq=0
 further_qhl_factor=1
+further_qhl_num_runs=$num_tests
 plots=1
 use_rq=0
 number_best_models_further_qhl=5
@@ -55,13 +56,13 @@ mkdir -p $long_dir
 
 
 # growth_rule='two_qubit_ising_rotation_hyperfine'
-growth_rule='deterministic_transverse_ising_nn_fixed_axis'
+# growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='interacing_nn_ising_fixed_axis'
-# growth_rule='deterministic_noninteracting_ising_single_axis'
+growth_rule='deterministic_noninteracting_ising_single_axis'
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
 
 # true_operator='yTi'
@@ -116,6 +117,9 @@ prior_pickle_file="$long_dir/prior.p"
 true_params_pickle_file="$long_dir/true_params.p"
 plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
+rand_true_params=0
+rand_prior=0
+
 
 python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \
@@ -125,7 +129,8 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -ggr=$growth_rule \
     -op=$true_operator \
     -exp=$exp_data \
-    -rand_t=1 -rand_p=0 # can make true params and prior random
+    -rand_t=$rand_true_params \
+    -rand_p=$rand_prior # can make true params and prior random
 
 latex_mapping_filename='LatexMapping.txt'
 latex_mapping_file=$long_dir$latex_mapping_filename
@@ -188,20 +193,28 @@ sh $analyse_script
 
 if (( $do_further_qhl == 1 )) 
 then
-    for i in `seq 1 $max_qmd_id`;
+    further_analyse_filename='analyse_further_qhl.sh'
+    further_analyse_script="$long_dir$further_analyse_filename"
+    let particles="$further_qhl_factor * $prt"
+    let experiments="$further_qhl_factor * $exp"
+
+    # write to a script so we can recall analysis later.
+    echo "
+    cd $long_dir
+    cd ../../../
+
+    for i in \`seq 1 $max_qmd_id\`;
         do
         pgh=0.3 # train on different set of data
         redis-cli flushall 
-        let q_id="$q_id+1"
-        let particles="$further_qhl_factor * $prt"
-        let experiments="$further_qhl_factor * $exp"
-    #    let q_id="$q_id+1"
+        #let q_id=\"\$q_id+1\"
+        q_id=\$((q_id+1))
         python3 Exp.py \
             -fq=$do_further_qhl \
             -p=$particles -e=$experiments -bt=$bt \
             -rq=$use_rq -g=$gaussian -qhl=0 \
             -ra=$ra -rt=$rt -pgh=1.0 \
-            -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
+            -dir=$long_dir -qid=\$q_id -pt=$plots -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
             -meas=$measurement_type \
             -exp=$exp_data -cpr=$custom_prior \
@@ -216,16 +229,12 @@ then
 
     done
 
-    further_analyse_filename='analyse.sh'
-    further_analyse_script="$long_dir$further_analyse_filename"
-
-    # write to a script so we can recall analysis later.
-    echo "
     cd $long_dir
     python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
         -dir=$long_dir --bayes_csv=$bayes_csv \
         -top=$number_best_models_further_qhl \
-        -qhl=$qhl_test -fqhl=1 \
+        -qhl=$qhl_test \
+        -fqhl=1 \
         -ggr=$growth_rule \
         -exp=$exp_data \
         -true_expec=$true_expec_path \

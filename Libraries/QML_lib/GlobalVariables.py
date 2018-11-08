@@ -3,6 +3,9 @@ import os
 import sys
 import pickle 
 
+
+import UserFunctions
+
 """
 This file is callable with *kwargs from a separate QMD program. 
 It returns an instance of the class GlobalVariablesClass, which has attributes 
@@ -87,6 +90,7 @@ default_save_plots = False
 default_cumulative_csv = 'cumulative_bayes.csv'
 default_measurement_type = 'full_access'
 default_experimental_data = False
+# NOTE true operator is set in dict in UserFunctions: default_true_operators_by_generator
 default_true_operator = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 default_qhl_test = 0
 default_further_qhl = 0
@@ -107,7 +111,7 @@ default_reallocate_resources=0
 class GlobalVariablesClass():
     def __init__(
         self, 
-        true_operator = default_true_operator,
+        # true_operator = default_true_operator,
         qhl_test = default_qhl_test,
         further_qhl = default_qhl_test,
         use_rq = default_use_rq,
@@ -148,9 +152,21 @@ class GlobalVariablesClass():
         true_expec_path = default_true_expec_path,
         plot_probe_file = default_plot_probe_file,
         latex_mapping_file = default_latex_mapping_file,
-        reallocate_resources = default_reallocate_resources
+        reallocate_resources = default_reallocate_resources,
+        **kwargs
     ):
-        self.true_operator = true_operator
+        # self.true_operator = true_operator
+        self.growth_generation_rule = growth_generation_rule
+        self.prior_pickle_file = prior_pickle_file
+        self.true_params_pickle_file = true_params_pickle_file
+        true_params_info = pickle.load(
+            open(self.true_params_pickle_file, 'rb')
+        )
+        self.true_operator = true_params_info['true_op']
+        self.true_params = true_params_info['params_list']
+        # self.true_operator = UserFunctions.default_true_operators_by_generator[
+        #     self.growth_generation_rule
+        # ]
         self.qhl_test = qhl_test
         self.further_qhl = further_qhl
         self.do_iqle = do_iqle
@@ -187,9 +203,6 @@ class GlobalVariablesClass():
         self.dataset = dataset
         self.data_time_offset = data_time_offset
         self.data_max_time = data_max_time 
-        self.growth_generation_rule = growth_generation_rule
-        self.prior_pickle_file = prior_pickle_file
-        self.true_params_pickle_file = true_params_pickle_file
         self.true_expec_path = true_expec_path
         self.plot_probe_file = plot_probe_file
         self.latex_mapping_file = latex_mapping_file

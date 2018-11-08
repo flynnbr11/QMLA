@@ -22,8 +22,11 @@ def separable_probe_dict(
                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
                 # keep replacing until a unit-norm 
                 seperable_probes[i,j] = (
-                    np.tensordot(seperable_probes[i,j-1], random_probe(1),
-                    axes=0).flatten(order='c')
+                    np.tensordot(
+                        seperable_probes[i,j-1], 
+                        random_probe(1),
+                        axes=0
+                    ).flatten(order='c')
                 )
     return seperable_probes
 

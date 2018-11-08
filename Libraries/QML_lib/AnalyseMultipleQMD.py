@@ -447,6 +447,7 @@ def Bayes_t_test(
     directory_name, 
     dataset, 
     results_path,
+    results_file_name_start='results',
     use_experimental_data=False,
     true_expectation_value_path=None,
     growth_generator = None, 
@@ -454,6 +455,7 @@ def Bayes_t_test(
     top_number_models=2,
     save_to_file=None
 ):
+    print("Drawing avg expectation values from file:", results_path)
     from matplotlib import cm
     from scipy import stats
 
@@ -500,7 +502,8 @@ def Bayes_t_test(
     os.chdir(directory_name)
     pickled_files = []
     for file in os.listdir(directory_name):
-        if file.endswith(".p") and file.startswith("results"):
+        # if file.endswith(".p") and file.startswith("results"):
+        if file.endswith(".p") and file.startswith(results_file_name_start):
             pickled_files.append(file)
 
     for f in pickled_files:
@@ -1227,6 +1230,7 @@ Bayes_t_test(
     dataset = arguments.dataset, 
     results_path = results_csv,
     use_experimental_data = exp_data, 
+    results_file_name_start = results_file_name_start,
     true_expectation_value_path = true_expec_path,
     growth_generator = growth_generator, 
     top_number_models = arguments.top_number_models,
