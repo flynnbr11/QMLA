@@ -424,6 +424,7 @@ def get_probe_dict(
 	growth_generator=None, 
 	**kwargs
 ):
+	print("[getProbeDict] kwargs:", kwargs)
 
 	if experimental_data == True:
 		try:
@@ -454,4 +455,5 @@ def get_probe_dict(
 		max_num_qubits = max_num_qubits, 
 		**kwargs
 	)
+	# print("[getProbeDict] func used:", probe_dict_function)
 	return probe_dict

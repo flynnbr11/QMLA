@@ -96,25 +96,44 @@ set_true_params = {
 
 
 def create_plot_probe(
-	plus_probe_for_plot = True,
 	max_num_qubits = 7, 
-	pickle_file = None
+	pickle_file = None,
+	# plus_probe_for_plot = True,
+	# experimental_data=True, 
+	# growth_generator=None,
+	**kwargs
 ):
-	import ExpectationValues
+	# import ExpectationValues
 	import numpy as np
-	plot_probe_dict = {}
+	# kwargs['test_fill'] = 98
+	# print("[createPlotProbe] kwargs", kwargs)
+	# print("[createPlotProbe] exp data:", experimental_data )
+	# print("[createPlotProbe] ggr:",growth_generator )
+	plot_probe_dict = UserFunctions.get_probe_dict(
+		# experimental_data = experimental_data, 
+		# growth_generator = growth_generator,
+		num_probes = 1,
+		# plus_probe = plus_probe_for_plot,
+		**kwargs
+	)
+	for k in list(plot_probe_dict.keys()):
+		# replace tuple like key returned, with just dimension. 
+	    plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
+
+
+	# plot_probe_dict = {}
 	
-	for i in range(1,max_num_qubits):
-		if plus_probe_for_plot == True:
-			plot_probe_dict[i] = ExpectationValues.n_qubit_plus_state(i)
-		else:
-			if i==1:
-				plot_probe_dict[i] = ExpectationValues.random_probe(i)
-			else:
-				old_probe = plot_probe_dict[i-1]
-				new_probe = ExpectationValues.random_probe(1)
-				n_dim_probe = np.kron(old_probe, new_probe)
-				plot_probe_dict[i] = n_dim_probe
+	# for i in range(1,max_num_qubits):
+	# 	if plus_probe_for_plot == True:
+	# 		plot_probe_dict[i] = ExpectationValues.n_qubit_plus_state(i)
+	# 	else:
+	# 		if i==1:
+	# 			plot_probe_dict[i] = ExpectationValues.random_probe(i)
+	# 		else:
+	# 			old_probe = plot_probe_dict[i-1]
+	# 			new_probe = ExpectationValues.random_probe(1)
+	# 			n_dim_probe = np.kron(old_probe, new_probe)
+	# 			plot_probe_dict[i] = n_dim_probe
 
 	if pickle_file is not None:
 		import pickle
@@ -308,8 +327,16 @@ else:
 	force_plus = False
 
 
+kwargs_for_plot_probe_creation = {
+	'true_operator' : true_operator, 
+	'growth_generator' : growth_generation_rule,
+	'experimental_data' : exp_data,
+	'plus_probe_for_plot' : force_plus, 
+
+}
+
 create_plot_probe(
-	plus_probe_for_plot = force_plus, 
 	pickle_file = plot_probe_file,
-	max_num_qubits = 10
+	max_num_qubits = 10,
+	**kwargs_for_plot_probe_creation
 )
