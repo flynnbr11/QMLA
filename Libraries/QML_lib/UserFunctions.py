@@ -300,6 +300,15 @@ simulated_probe_dict_generator = {
 		ProbeGeneration.separable_probe_dict, 
 }
 
+special_probe_functions = {
+	None: 
+		ProbeGeneration.separable_probe_dict, 
+	'plus':
+		ProbeGeneration.plus_probes_dict, 
+	'ideal' : 
+		ProbeGeneration.ideal_probe_dict,
+}
+
 ##### ---------- -------------------- #####  
 # Wrapper functions 
 ##### ---------- -------------------- #####  
@@ -422,12 +431,28 @@ def get_initial_op_list(
 def get_probe_dict(
 	experimental_data=False, 
 	growth_generator=None, 
-	plus_probes=False, 
+	special_probe=None, 
 	**kwargs
 ):
 	print("[getProbeDict] kwargs:", kwargs)
 
-	if experimental_data == True:
+	# elif ideal_probes == True:
+	# 	probe_dict_function = ProbeGeneration.ideal_probe_dict
+	# elif (
+	# 	experimental_data == False
+	# 	and
+	# 	plus_probes == True
+	# ):
+
+	# 	probe_dict_function = ProbeGeneration.plus_probes_dict
+
+	if special_probe is not None:
+		try:
+			probe_dict_function = special_probe_functions[special_probe]
+		except:
+			probe_dict_function = special_probe_functions[None]
+
+	elif experimental_data == True:
 		try:
 			probe_dict_function = experimental_probe_dict_generator[
 				growth_generator
@@ -436,13 +461,6 @@ def get_probe_dict(
 			probe_dict_function = experimental_probe_dict_generator[
 				None
 			]
-	elif (
-		experimental_data == False
-		and
-		plus_probes == True
-	):
-
-		probe_dict_function = ProbeGeneration.plus_probes_dict
 	else:
 		try:
 			probe_dict_function = simulated_probe_dict_generator[
@@ -464,5 +482,5 @@ def get_probe_dict(
 		max_num_qubits = max_num_qubits, 
 		**kwargs
 	)
-	# print("[getProbeDict] func used:", probe_dict_function)
+	print("[getProbeDict] func used:", probe_dict_function)
 	return probe_dict

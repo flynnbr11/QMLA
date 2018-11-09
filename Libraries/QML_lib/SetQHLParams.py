@@ -283,6 +283,14 @@ parser.add_argument(
   type=str,
   default=None
 )
+
+parser.add_argument(
+  '-sp', '--special_probe', 
+  help="Special type of probe, e.g. |+>, or ideal (sum of eigenstates).",
+  type=str,
+  default=None
+)
+
 parser.add_argument(
   '-plus', '--force_plus_probe', 
   help="Whether to enforce plots to use |+>^n as probe.",
@@ -299,6 +307,7 @@ growth_generation_rule = arguments.growth_generation_rule
 true_operator = UserFunctions.default_true_operators_by_generator[growth_generation_rule]
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
+special_probe = arguments.special_probe
 
 ### Call functions to create pickle files. 
 ## TODO check if these are already present?
@@ -334,7 +343,7 @@ kwargs_for_plot_probe_creation = {
 	'true_operator' : true_operator, 
 	'growth_generator' : growth_generation_rule,
 	'experimental_data' : exp_data,
-	'plus_probes' : force_plus, 
+	'special_probe' : special_probe, 
 
 }
 

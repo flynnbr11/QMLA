@@ -909,7 +909,6 @@ def summariseResultsCSV(
             file.startswith(results_file_name_start)
         ):
             pickled_files.append(file)
-    print("[PlotQMD] pickled files:", pickled_files)
     filenames = [directory_name+str(f) for f in pickled_files ]
     try:
         some_results = pickle.load(open(filenames[0], "rb"))

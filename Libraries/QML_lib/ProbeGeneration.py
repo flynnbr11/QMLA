@@ -1,6 +1,7 @@
 import numpy as np
+import qutip
 import ExpectationValues
-
+import DataBase
 
 
 ## Simluated Probes: random
@@ -167,6 +168,14 @@ def experimental_NVcentre_ising_probes(
     return seperable_probes
   
 
+def n_qubit_plus_state(num_qubits):
+    one_qubit_plus = (1/np.sqrt(2) + 0j) * np.array([1,1])
+    plus_n = one_qubit_plus
+    for i in range(num_qubits-1):
+        plus_n = np.kron(plus_n, one_qubit_plus)
+    return plus_n
+
+
 def plus_probes_dict(
     max_num_qubits, 
     **kwargs
@@ -175,5 +184,36 @@ def plus_probes_dict(
 
     for i in range(1,1+max_num_qubits):
         # dict key is tuple of form (0,i) for consistency with other probe dict generation functions. 
-        probe_dict[(0,i)] = ExpectationValues.n_qubit_plus_state(i)
+        probe_dict[(0,i)] = n_qubit_plus_state(i)
     return probe_dict 
+
+
+def ideal_probe_dict(
+    true_operator, 
+    max_num_qubits,
+    **kwargs
+):
+    probe_dict = {}
+    true_dim = DataBase.get_num_qubits(true_operator)
+    ideal_probe = DataBase.ideal_probe(true_operator)
+    qt_probe = qutip.Qobj(ideal_probe)
+    density_mtx = qutip.ket2dm(qt_probe)
+    
+    for i in range(1, 1+max_num_qubits):
+        dict_key = (0, i) # for consistency with other probe dict functions
+        if i==true_dim:
+            probe_dict[dict_key] = ideal_probe
+        elif i < true_dim:
+            # TODO trace out from density mtx and retrieve closest pure state for here. 
+            probe_dict[dict_key] = random_probe(i)
+        else:
+            # TODO replace this with traced out probe for 
+            # case where sim num qubits < true num qubits
+            rand = random_probe(1)
+            new_probe = np.kron(
+                probe_dict[(0, i-1)], 
+                rand,
+            )
+            probe_dict[dict_key] = new_probe
+    return probe_dict
+

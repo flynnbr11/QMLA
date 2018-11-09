@@ -6,13 +6,13 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 do_further_qhl=1
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=8
+prt=10
 exp=3
 pgh=0.5
 ra=0.8
@@ -24,7 +24,7 @@ gaussian=1
 ### ---------------------------------------------------###
 exp_data=0
 use_rq=0
-further_qhl_factor=1
+further_qhl_factor=10
 further_qhl_num_runs=$num_tests
 plots=1
 use_rq=0
@@ -119,13 +119,14 @@ plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 rand_true_params=0
 rand_prior=0
-
+special_probe='ideal' #'plus' #'ideal'
 
 python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \
     -prior=$prior_pickle_file \
     -probe=$plot_probe_file \
     -plus=$force_plot_plus \
+    -sp=$special_probe \
     -ggr=$growth_rule \
     -op=$true_operator \
     -exp=$exp_data \
@@ -159,8 +160,7 @@ do
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \
             -resource=$reallocate_resources \
-            -ggr=$growth_rule \
-            
+            -ggr=$growth_rule 
     done
 done
 

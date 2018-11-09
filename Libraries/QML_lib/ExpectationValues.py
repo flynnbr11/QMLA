@@ -234,7 +234,9 @@ def traced_expectation_value_project_one_qubit_plus(
     qstate = qutip.Qobj(ev_state)
     qstate.dims= [[2,2], [1,1]]
     traced_state = qstate.ptrace(0) # TODO: to generalise, make this exclude everything apart from 0th dimension ?
-    expect_value = np.abs(qutip.expect(traced_state, one_qubit_plus))**2
+    expect_value = np.abs(
+        qutip.expect(traced_state, one_qubit_plus)
+    )**2
     
     return expect_value
     
