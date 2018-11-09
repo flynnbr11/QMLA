@@ -321,7 +321,10 @@ def swap_vector_elements_positions(input_vector, pos1, pos2):
     
     return new_vector
 
-def partial_trace_out_second_qubit(global_rho, qubits_to_trace=[1]):
+def partial_trace_out_second_qubit(
+    global_rho, 
+    qubits_to_trace=[1]
+):
     
     # INPUTS
     """
