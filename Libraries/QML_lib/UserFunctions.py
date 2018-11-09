@@ -305,6 +305,8 @@ simulated_probe_dict_generator = {
 special_probe_functions = {
 	None: 
 		ProbeGeneration.separable_probe_dict, 
+	'random': 
+		ProbeGeneration.separable_probe_dict, 
 	'plus':
 		ProbeGeneration.plus_probes_dict, 
 	'ideal' : 

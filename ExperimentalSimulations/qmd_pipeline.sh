@@ -7,13 +7,13 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 num_tests=1
 qhl_test=0
-do_further_qhl=1
+do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
-exp=3
+prt=100
+exp=30
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -24,7 +24,7 @@ gaussian=1
 ### ---------------------------------------------------###
 exp_data=0
 use_rq=0
-further_qhl_factor=10
+further_qhl_factor=1
 further_qhl_num_runs=$num_tests
 plots=1
 use_rq=0
@@ -107,7 +107,7 @@ if (( $qhl_test == 1 )) # For QHL test always do without rq
 then
     use_rq=0
 fi
-use_rq=1
+use_rq=0
 # let bt="$exp-1"
 let bt="$exp"
 
@@ -119,7 +119,7 @@ plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 rand_true_params=0
 rand_prior=0
-special_probe='ideal' #'plus' #'ideal'
+special_probe='random' #'plus' #'ideal'
 
 python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \

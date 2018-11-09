@@ -105,12 +105,16 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
         
         model_a = QML.modelClassForRemoteBayesFactor(
             modelID=model_a_id,
-            host_name=host_name, port_number=port_number, qid=qid, 
+            host_name=host_name, 
+            port_number=port_number, 
+            qid=qid, 
             log_file=log_file
         )
         model_b = QML.modelClassForRemoteBayesFactor(
             modelID=model_b_id,
-            host_name=host_name, port_number=port_number, qid=qid, 
+            host_name=host_name, 
+            port_number=port_number, 
+            qid=qid, 
             log_file=log_file
         )
 
@@ -134,8 +138,20 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
         # if binning==True and use_experimental_data==True:
         if binning==True:
             # TODO introduce binning for simulated data. 
-            min_time = min(min(times_a), min(times_b))
-            max_time = max(max(times_a), max(times_b))
+            try:
+                min_time = min(min(times_a), min(times_b))
+                max_time = max(max(times_a), max(times_b))
+            except:
+                log_print(
+                    [
+                    "Can't find min/max of:", 
+                    "\ntimes_a:", times_a, 
+                    "\ntimes_b:", times_b,
+                    "\n Model IDs:", model_a_id, 
+                    ";\t", model_b_id
+                    ]
+                )
+
 
             times_list = np.linspace(
                 min_time,
