@@ -6,7 +6,7 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 do_further_qhl=1
 
 ### ---------------------------------------------------###
@@ -107,7 +107,7 @@ if (( $qhl_test == 1 )) # For QHL test always do without rq
 then
     use_rq=0
 fi
-use_rq=0
+use_rq=1
 # let bt="$exp-1"
 let bt="$exp"
 
