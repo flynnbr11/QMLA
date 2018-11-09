@@ -131,8 +131,9 @@ max_num_qubits_info = {
     'deterministic_noninteracting_ising_single_axis' : 5,
     'deterministic_interacting_nn_ising_single_axis' : 5,
     'deterministic_transverse_ising_nn_fixed_axis' : 5,
-    None : 8,
-
+    'non_interacting_ising_single_axis' : 5,
+    'non_interacting_ising' : 5, 
+    None : 5,
 }
 
 
