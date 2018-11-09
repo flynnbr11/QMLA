@@ -51,7 +51,10 @@ class multiPGH(qi.Heuristic):
             
         #print('Selected particles: #1 ' + repr(x) + ' #2 ' + repr(xp))
             
-        eps = np.empty((1,), dtype=self._updater.model.expparams_dtype)
+        eps = np.empty(
+            (1,),
+            dtype=self._updater.model.expparams_dtype
+        )
         
         idx_iter = 0 # modified in order to cycle through particle parameters with different names
         for field_i in self._x_:

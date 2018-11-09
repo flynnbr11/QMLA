@@ -143,7 +143,7 @@ def learnModelRemote(
     )
 
     random_sim_pars=False
-    if random_sim_pars:
+    if random_sim_pars==True:
         sim_pars = []
         num_pars = op.num_constituents
         if num_pars ==1 : #TODO Remove this fixing the prior

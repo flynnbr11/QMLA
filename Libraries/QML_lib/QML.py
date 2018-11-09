@@ -283,7 +283,10 @@ class ModelLearningClass():
         self.Inv_Field = [
             item[0] for item in self.GenSimModel.expparams_dtype[1:] 
         ]
-        self.Heuristic = mpgh.multiPGH(self.Updater, inv_field=self.Inv_Field)
+        self.Heuristic = mpgh.multiPGH(
+            self.Updater, 
+            inv_field=self.Inv_Field
+        )
         
         if checkloss == True or self.checkQLoss==True:     
             self.QLosses = np.array([])
@@ -490,6 +493,7 @@ class ModelLearningClass():
                     self.debug_store()
                 
                 self.LearnedParameters = {}
+                self.FinalSigmas  ={}
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [
 #                        np.mean(self.Particles[:,iterator,istep-1]), 
@@ -504,6 +508,10 @@ class ModelLearningClass():
                     self.LearnedParameters[self.SimOpsNames[iterator]] = (
                         self.FinalParams[iterator][0]
                     )
+                    self.FinalSigmas[self.SimOpsNames[iterator]] = (
+                        self.FinalParams[iterator][1]
+                    )
+
 #                plt.savefig(posterior_plot,'posterior.png')
             
 
@@ -550,6 +558,7 @@ class ModelLearningClass():
         learned_info['resample_epochs'] = self.ResampleEpochs
         learned_info['quadratic_losses'] = self.QLosses
         learned_info['learned_parameters'] = self.LearnedParameters
+        learned_info['final_sigmas'] = self.FinalSigmas
         learned_info['cov_matrix'] = self.covmat
         learned_info['num_particles'] = self.NumParticles
         learned_info['num_experiments'] = self.NumExperiments
@@ -751,6 +760,7 @@ class reducedModel():
         self.ResampleEpochs = learned_info['resample_epochs']
         self.QuadraticLosses = learned_info['quadratic_losses']
         self.LearnedParameters = learned_info['learned_parameters']
+        self.FinalSigmas = learned_info['final_sigmas']
         self.cov_matrix = learned_info['cov_matrix']
 
 

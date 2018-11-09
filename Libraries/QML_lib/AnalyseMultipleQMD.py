@@ -193,47 +193,82 @@ def average_parameters(results_path,
 
 
     params_dict = {}
+    sigmas_dict = {}
     for mod in winning_models:
         params_dict[mod] = {}
+        sigmas_dict[mod] = {}
         params = DataBase.get_constituent_names_from_name(mod)
         for p in params:
             params_dict[mod][p] = []
+            sigmas_dict[mod][p] = []
 
     for i in range(len(winning_models)):
         mod = winning_models[i]
-        learned_parameters = list(results[ results['NameAlphabetical']==mod ]['LearnedParameters'])
+        learned_parameters = list(
+            results[ results['NameAlphabetical']==mod ]
+            ['LearnedParameters']
+        )
+        final_sigmas = list(
+            results[ results['NameAlphabetical']==mod ]
+            ['FinalSigmas']
+        )
         num_wins_for_mod = len(learned_parameters)
         for i in range(num_wins_for_mod):
             params = eval(learned_parameters[i])
+            sigmas = eval(final_sigmas[i])
             for k in list(params.keys()):
                 params_dict[mod][k].append(params[k])
+                sigmas_dict[mod][k].append(sigmas[k])
 
     average_params_dict = {}
+    avg_sigmas_dict = {}
     std_deviations = {}
     learned_priors = {}
     for mod in winning_models:
         average_params_dict[mod] = {}
+        avg_sigmas_dict[mod] = {}
         std_deviations[mod] = {}
         learned_priors[mod] = {}
         params = DataBase.get_constituent_names_from_name(mod)
         for p in params:
-            if average_type == 'median':
-                average_params_dict[mod][p] = np.median(
-                    params_dict[mod][p]
-                )
-            else:
-                average_params_dict[mod][p] = np.mean(
-                    params_dict[mod][p]
-                )
-            if np.std(params_dict[mod][p]) > 0:                
-                std_deviations[mod][p] = np.std(params_dict[mod][p])
-            else:
-                # if only one winner, give relatively broad prior. 
-                std_deviations[mod][p] = 0.5 
+            # if average_type == 'median':
+            #     average_params_dict[mod][p] = np.median(
+            #         params_dict[mod][p]
+            #     )
+            # else:
+            #     average_params_dict[mod][p] = np.mean(
+            #         params_dict[mod][p]
+            #     )
+            # if np.std(params_dict[mod][p]) > 0:                
+            #     std_deviations[mod][p] = np.std(params_dict[mod][p])
+            # else:
+            #     # if only one winner, give relatively broad prior. 
+            #     std_deviations[mod][p] = 0.5 
             
+
+            # learned_priors[mod][p] = [
+            #     average_params_dict[mod][p], 
+            #     std_deviations[mod][p]
+            # ]
+
+
+            avg_sigmas_dict[mod][p] = np.median(sigmas_dict[mod][p])
+            averaging_weight = sigmas_dict[mod][p]
+            # print("[mod][p]:", mod, p)
+            # print("Attempting to avg this list:", params_dict[mod][p])
+            # print("with these weights:", averaging_weight)
+
+            average_params_dict[mod][p] = np.average(
+                params_dict[mod][p], 
+                weights=sigmas_dict[mod][p]
+            )
+            # print("avg sigmas dict type:", type(avg_sigmas_dict[mod][p]))
+            # print("type average_params_dict:", type(average_params_dict[mod][p]))
+            # print("avg sigmas dict[mod][p]:", avg_sigmas_dict[mod][p])
+            # print("average_params_dict[mod][p]:", average_params_dict[mod][p])
             learned_priors[mod][p] = [
                 average_params_dict[mod][p], 
-                std_deviations[mod][p]
+                avg_sigmas_dict[mod][p]
             ]
     
     return learned_priors   
@@ -369,8 +404,12 @@ def average_parameter_estimates(
                 name=term,
                 growth_generator = growth_generator
             )
-            averages = np.array( [ avg_parameters[term][e] for e in epochs  ])
-            standard_dev = np.array([ std_devs[term][e] for e in epochs])
+            averages = np.array( 
+                [ avg_parameters[term][e] for e in epochs  ]
+            )
+            standard_dev = np.array(
+                [ std_devs[term][e] for e in epochs]
+            )
             
             try:
                 true_val = true_params_dict[term]

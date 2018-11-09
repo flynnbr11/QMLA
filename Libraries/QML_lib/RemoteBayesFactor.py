@@ -158,8 +158,8 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
                     "\ntimes_b:", times_b,
                     "\n Model IDs:", model_a_id, 
                     ";\t", model_b_id,
-                    "moda.Times:", model_a.Times,
-                    "modb.Times:", model_b.Times,
+                    "\nmoda.Times:", model_a.Times,
+                    "\nmodb.Times:", model_b.Times,
                     ]
                 )
 

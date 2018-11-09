@@ -1531,6 +1531,7 @@ class QMD():
             'RSquaredTrueModel' : mod.r_squared(),
             'NameAlphabetical' : DataBase.alph(mod.Name),
             'LearnedParameters' : mod.LearnedParameters,
+            'FinalSigmas' : mod.FinalSigmas,
             'TrackParameterEstimates' : mod.TrackParameterEstimates,
             'ExpectationValues' : mod.expectation_values,
             'RSquaredByEpoch' : mod.r_squared_by_epoch(),
@@ -1602,6 +1603,7 @@ class QMD():
                 'RSquaredTrueModel' : mod.r_squared(),
                 'NameAlphabetical' : DataBase.alph(mod.Name),
                 'LearnedParameters' : mod.LearnedParameters,
+                'FinalSigmas' : mod.FinalSigmas, 
                 'TrackParameterEstimates' : mod.TrackParameterEstimates,
                 'ExpectationValues' : mod.expectation_values,
                 'RSquaredByEpoch' : mod.r_squared_by_epoch(),
@@ -1754,7 +1756,9 @@ class QMD():
         self.LearnedParamsChamp = (
             self.reducedModelInstanceFromID(self.ChampID).LearnedParameters
         )
-
+        self.FinalSigmasChamp = (
+            self.reducedModelInstanceFromID(self.ChampID).FinalSigmas
+        )
         num_exp_ham = (
             self.NumParticles * 
             (self.NumExperiments + self.NumTimesForBayesUpdates)
@@ -1799,6 +1803,7 @@ class QMD():
             'NumQubits' : num_qubits_champ_model,
             'NumParams' : num_params_champ_model,
             'LearnedParameters' : self.LearnedParamsChamp,
+            'FinalSigmas' : self.FinalSigmasChamp,
             'ExpectationValues' : champ_model.expectation_values,
             'TrackParameterEstimates' : champ_model.TrackParameterEstimates,
             'RSquaredByEpoch' : champ_model.r_squared_by_epoch(),
