@@ -253,7 +253,7 @@ def average_parameters(results_path,
 
 
             avg_sigmas_dict[mod][p] = np.median(sigmas_dict[mod][p])
-            averaging_weight = sigmas_dict[mod][p]
+            averaging_weight = [1/sig for sig in sigmas_dict[mod][p]]
             # print("[mod][p]:", mod, p)
             # print("Attempting to avg this list:", params_dict[mod][p])
             # print("with these weights:", averaging_weight)
