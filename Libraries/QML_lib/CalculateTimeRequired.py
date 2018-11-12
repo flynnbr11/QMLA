@@ -244,6 +244,7 @@ for a in list(args_dict.keys()):
 
 with open(variable_setting_script, 'a+') as script:
 	print(
+		"#!/bin/bash\n",
 		qmd_time_env_var, "=", time_reqd['qmd'], 
 		"\n", 
 		qhl_time_env_var, "=", time_reqd['qhl'],
