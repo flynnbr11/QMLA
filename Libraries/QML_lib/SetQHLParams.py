@@ -88,7 +88,6 @@ set_true_params = {
 	'xTy' : 1.6,
 	'xTz' : 1.7,
 	'yTz' : 1.8,
-	'xTxTTx' : 1.2345
 }
 
 

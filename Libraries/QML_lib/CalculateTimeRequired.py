@@ -83,21 +83,6 @@ parser.add_argument(
 )
 
 
-
-hamiltonian_exponentiation_times = {
-    1: 0.0010705208778381348,
-    2: 0.0005974793434143067,
-    3: 0.0017327165603637695,
-    4: 0.0013524317741394043,
-    5: 0.004202978610992432,
-    6: 0.0029761767387390136,
-    7: 0.024223911762237548,
-    8: 0.02105050325393677,
-    9: 0.08048738956451416,
-    10: 0.4869074869155884,
-    11: 2.693910768032074
-}    
-
 max_num_models_by_shape = {}
 
 max_num_models_by_shape['interacting_nearest_neighbour_ising'] = {
@@ -120,18 +105,18 @@ max_num_models_by_shape['two_qubit_ising_rotation_hyperfine'] = {
 
 
 hamiltonian_exponentiation_times = {
-    1: 0.0018267321586608886,
-    2: 0.001051054000854492,
-    3: 0.0012572455406188966,
-    4: 0.0013537836074829102,
-    5: 0.0016861772537231446,
-    6: 0.00345501184463501,
-    7: 0.010760598182678223,
-    8: 0.04647893905639648,
-    9: 0.15064536333084105
-}
-
-
+    1: 0.0010705208778381348,
+    2: 0.0005974793434143067,
+    3: 0.0017327165603637695,
+    4: 0.0013524317741394043,
+    5: 0.004202978610992432,
+    6: 0.0029761767387390136,
+    7: 0.024223911762237548,
+    8: 0.02105050325393677,
+    9: 0.08048738956451416,
+    10: 0.4869074869155884,
+    11: 2.693910768032074
+}    
 max_spawn_depth_info = {
     'qhl_TEST' : 2, 
     'simple_ising' : 1,
@@ -194,8 +179,11 @@ def time_required(
 	total_time_required = (
 		insurance_scale * np.round(total_time_required)
 	)
-
-	times_reqd['qmd'] = max(minimum_allowed_time, int(total_time_required))
+	print("Total time reqd [QMD]:", int(total_time_required))
+	times_reqd['qmd'] = max(
+		minimum_allowed_time, 
+		int(total_time_required)
+	)
 
 	# Get time for QHL
 	true_operator = UserFunctions.default_true_operators_by_generator[
@@ -209,6 +197,7 @@ def time_required(
 		*  num_hamiltonians_per_model
 	)
 
+	print("Total time reqd [QHL]:", int(qhl_time))
 	times_reqd['qhl'] = max(
 		minimum_allowed_time, 
 		int(2*qhl_time)
