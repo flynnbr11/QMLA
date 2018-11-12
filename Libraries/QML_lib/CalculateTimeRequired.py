@@ -75,6 +75,13 @@ parser.add_argument(
   default="QHL_TIME"
 )
 
+parser.add_argument(
+  '-mintime', '--minimum_allowed_time', 
+  help='Minimum time it is sensible to request',
+  type=int,
+  default=600
+)
+
 
 
 hamiltonian_exponentiation_times = {
@@ -220,6 +227,8 @@ resource_reallocation = bool(arguments.resource_reallocation)
 variable_setting_script = arguments.variable_setting_script
 qmd_time_env_var = arguments.qmd_time_env_var
 qhl_time_env_var = arguments.qhl_time_env_var
+minimum_allowed_time = arguments.minimum_allowed_time
+
 
 time_reqd = time_required(
 	growth_generator = growth_generator, 
@@ -228,7 +237,7 @@ time_reqd = time_required(
     num_processes = num_processes,
     resource_reallocation = resource_reallocation,
     num_bayes_times = num_bayes_times,
-    minimum_allowed_time = 600,
+    minimum_allowed_time = minimum_allowed_time,
 )
 
 print("based on inputs. setting time:", time_reqd)
