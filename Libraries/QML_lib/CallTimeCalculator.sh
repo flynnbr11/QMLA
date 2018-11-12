@@ -13,7 +13,8 @@ python3 CalculateTimeRequired.py \
 	-res=0 \
 	-scr=$script_path \
 	-qmdtenv="QMD_TIME" \
-	-qhltenv="QHL_TIME"
+	-qhltenv="QHL_TIME" \
+	-fqhltenv="FQHL_TIME"
 	# -ggr=$GGR \
 	# -e=$EXPERIMENTS \
 	# -p=$PARTICLES \
