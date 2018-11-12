@@ -104,6 +104,17 @@ max_num_models_by_shape['two_qubit_ising_rotation_hyperfine'] = {
 
 
 
+max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
+	1 : 0, 
+	(2,1) : 1,
+	(3,1) : 1, 
+	(4, 1) : 1, 
+	(5, 1) : 1, 
+	(6, 1) : 1, 
+	'other' : 0
+}
+
+
 hamiltonian_exponentiation_times = {
     1: 0.0010705208778381348,
     2: 0.0005974793434143067,
@@ -166,7 +177,6 @@ def time_required(
 	        num_models_this_dimension = max_num_models_by_shape[growth_generator][q]
 	    except:
 	        num_models_this_dimension = max_num_models_by_shape[growth_generator]['other']
-	        
 	    
 	    time_this_dimension = (
 	        num_hamiltonians_per_model * 
