@@ -1,6 +1,7 @@
 import sys, os
 import pickle
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import argparse
 import numpy as np
 
