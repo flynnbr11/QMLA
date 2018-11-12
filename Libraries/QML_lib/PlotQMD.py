@@ -2555,22 +2555,30 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
     save_to_file=None
 ):
     from matplotlib import cm
-
+    print("[Histogram] start")
     # TODO saved fig is cut off on edges and don't have axes titles.
 
     # correct_mod = DataBase.latex_name_ising(correct_mod)
     correct_mod = UserFunctions.get_latex_name(
         # this function is exclusively for Ising plot so two qubit growth generator is hard coded.
         name = correct_mod,
-        growth_generator = 'two_qubit_ising_rotation'
+        growth_generator = growth_generator
     )
+    print("[Histogram] correct mod", correct_mod)
     results_csv = os.path.abspath(results_csv_path)
     qmd_res = pd.DataFrame.from_csv(results_csv)
 
-    # mods = ising_terms_rotation_hyperfine()
-    mods = UserFunctions.get_all_model_names(
-        growth_generator = growth_generator
+    print("[Histogram] Trying to get mods list. Path:", results_csv)
+    mods = list(
+        set(list(
+            qmd_res.index
+        ))
     )
+    print("[Histogram] mods:", mods)
+    # mods = ising_terms_rotation_hyperfine()
+    # mods = UserFunctions.get_all_model_names(
+    #     growth_generator = growth_generator
+    # )
     mods.pop(mods.index(correct_mod))
     othermods = mods
     correct_subDB = qmd_res.ix[correct_mod]    

@@ -1189,8 +1189,12 @@ if true_params_path is not None:
         )
     )
     true_params_dict = true_params_info['params_dict']
+    true_operator = true_params_info['true_op']
 else:
     true_params_dict = None
+    true_operator = UserFunctions.default_true_operators_by_generator[
+        growth_generator
+    ]
 
 if exp_data is False:
     name = true_params_info['true_op']
@@ -1324,14 +1328,16 @@ elif further_qhl_mode == False:
     try:
         ptq.plotTrueModelBayesFactors_IsingRotationTerms(
             results_csv_path = all_bayes_csv,
-            correct_mod='xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
+            # correct_mod='xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
+            correct_mod = true_operator,
             growth_generator = growth_generator,
             save_to_file = str(
                 directory_to_analyse+
-                'true_model_bayes_comparisons.png'
+                'bayes_comparisons_true_model.png'
             )
         )
     except:
+        print("couldn't plot histogram")
         pass
 
     param_plot = str(directory_to_analyse+'sweep_param_total.png')
