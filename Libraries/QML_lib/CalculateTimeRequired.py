@@ -106,11 +106,10 @@ max_num_models_by_shape['two_qubit_ising_rotation_hyperfine'] = {
 
 max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
 	1 : 0, 
-	(2,1) : 1,
-	(3,1) : 1, 
-	(4, 1) : 1, 
-	(5, 1) : 1, 
-	(6, 1) : 1, 
+	2 : 1, 
+	3 : 1, 
+	4 : 1, 
+	5 : 1, 
 	'other' : 0
 }
 
@@ -156,6 +155,7 @@ def time_required(
     resource_reallocation=False,
     num_bayes_times=None,
     minimum_allowed_time = 100,
+    insurance_factor = 7,
     **kwargs
 ):
 	times_reqd = {}
@@ -168,28 +168,27 @@ def time_required(
 	)
     
 	total_time_required = 0
-	max_num_qubits = UserFunctions.max_spawn_depth_info[
+	max_num_qubits = UserFunctions.max_num_qubits_info[
 		growth_generator
 	]
 	for q in range(1,max_num_qubits):
-	    time_per_hamiltonian = hamiltonian_exponentiation_times[q]
-	    try:
-	        num_models_this_dimension = max_num_models_by_shape[growth_generator][q]
-	    except:
-	        num_models_this_dimension = max_num_models_by_shape[growth_generator]['other']
-	    
-	    time_this_dimension = (
-	        num_hamiltonians_per_model * 
-	        time_per_hamiltonian * 
-	        num_models_this_dimension
-	    )
-	    
-	    total_time_required +=  time_this_dimension
-	insurance_scale = float(3/num_processes)
+		time_per_hamiltonian = hamiltonian_exponentiation_times[q]
+		try:
+			num_models_this_dimension = max_num_models_by_shape[growth_generator][q]
+		except:
+			num_models_this_dimension = max_num_models_by_shape[growth_generator]['other']
+
+		time_this_dimension = (
+			num_hamiltonians_per_model * 
+			time_per_hamiltonian * 
+			num_models_this_dimension
+		)
+
+		total_time_required +=  time_this_dimension
+	
 	total_time_required = (
-		insurance_scale * np.round(total_time_required)
+		insurance_factor * np.round(total_time_required)
 	)
-	print("Total time reqd [QMD]:", int(total_time_required))
 	times_reqd['qmd'] = max(
 		minimum_allowed_time, 
 		int(total_time_required)
@@ -201,13 +200,11 @@ def time_required(
 	]
 
 	true_dimension = DataBase.get_num_qubits(true_operator)
-
-	qhl_time = 2*(
+	qhl_time = 3*(
 		hamiltonian_exponentiation_times[true_dimension]
 		*  num_hamiltonians_per_model
 	)
 
-	print("Total time reqd [QHL]:", int(qhl_time))
 	times_reqd['qhl'] = max(
 		minimum_allowed_time, 
 		int(2*qhl_time)
@@ -239,15 +236,15 @@ time_reqd = time_required(
     minimum_allowed_time = minimum_allowed_time,
 )
 
-print("based on inputs. setting time:", time_reqd)
+# print("based on inputs. setting times:", time_reqd)
 
-args_dict = vars(arguments)
-for a in list(args_dict.keys()):
-  print(
-    a, 
-    ':', 
-    args_dict[a]
-  )
+# args_dict = vars(arguments)
+# for a in list(args_dict.keys()):
+#   print(
+#     a, 
+#     ':', 
+#     args_dict[a]
+#   )
 
 
 with open(variable_setting_script, 'a+') as script:
