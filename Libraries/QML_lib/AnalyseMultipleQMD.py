@@ -1239,61 +1239,63 @@ else:
     )
     plot_desc=''
 
-average_priors = average_parameters(
-    results_path=results_csv,
-    top_number_models = arguments.top_number_models 
-)
+if False:
 
-avg_priors =str(directory_to_analyse+'average_priors.p')
-
-pickle.dump(
-    average_priors,
-    open(avg_priors, 'wb'), 
-    protocol=2
-)
-
-
-average_parameter_estimates(
-    directory_name = directory_to_analyse, 
-    results_path = results_csv, 
-    top_number_models = arguments.top_number_models,
-    results_file_name_start=results_file_name_start,
-    growth_generator = growth_generator,
-    true_params_dict = true_params_dict,
-    save_to_file=  str(
-        directory_to_analyse + 
-        plot_desc + 
-        'param_avg.png'
+    average_priors = average_parameters(
+        results_path=results_csv,
+        top_number_models = arguments.top_number_models 
     )
-)
 
-# if exp_data:
-Bayes_t_test(
-    directory_name = directory_to_analyse, 
-    dataset = arguments.dataset, 
-    results_path = results_csv,
-    use_experimental_data = exp_data, 
-    results_file_name_start = results_file_name_start,
-    true_expectation_value_path = true_expec_path,
-    growth_generator = growth_generator, 
-    top_number_models = arguments.top_number_models,
-    plot_probe_file = plot_probe_file,
-    save_to_file=str(
-        directory_to_analyse+
-        plot_desc +
-        'expec_vals_avg_bayes_t_test.png'
-    )
-)
+    avg_priors =str(directory_to_analyse+'average_priors.p')
 
-r_sqaured_average(
-    results_path = results_csv,
-    top_number_models = arguments.top_number_models,
-    save_to_file=  str(
-        directory_to_analyse + 
-        plot_desc +
-        'r_squared_averages.png'
+    pickle.dump(
+        average_priors,
+        open(avg_priors, 'wb'), 
+        protocol=2
     )
-)
+
+
+    average_parameter_estimates(
+        directory_name = directory_to_analyse, 
+        results_path = results_csv, 
+        top_number_models = arguments.top_number_models,
+        results_file_name_start=results_file_name_start,
+        growth_generator = growth_generator,
+        true_params_dict = true_params_dict,
+        save_to_file=  str(
+            directory_to_analyse + 
+            plot_desc + 
+            'param_avg.png'
+        )
+    )
+
+    # if exp_data:
+    Bayes_t_test(
+        directory_name = directory_to_analyse, 
+        dataset = arguments.dataset, 
+        results_path = results_csv,
+        use_experimental_data = exp_data, 
+        results_file_name_start = results_file_name_start,
+        true_expectation_value_path = true_expec_path,
+        growth_generator = growth_generator, 
+        top_number_models = arguments.top_number_models,
+        plot_probe_file = plot_probe_file,
+        save_to_file=str(
+            directory_to_analyse+
+            plot_desc +
+            'expec_vals_avg_bayes_t_test.png'
+        )
+    )
+
+    r_sqaured_average(
+        results_path = results_csv,
+        top_number_models = arguments.top_number_models,
+        save_to_file=  str(
+            directory_to_analyse + 
+            plot_desc +
+            'r_squared_averages.png'
+        )
+    )
 
 
 if qhl_mode==True:
