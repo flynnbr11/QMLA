@@ -2555,7 +2555,6 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
     save_to_file=None
 ):
     from matplotlib import cm
-    print("[Histogram] start")
     # TODO saved fig is cut off on edges and don't have axes titles.
 
     # correct_mod = DataBase.latex_name_ising(correct_mod)
@@ -2564,17 +2563,14 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
         name = correct_mod,
         growth_generator = growth_generator
     )
-    print("[Histogram] correct mod", correct_mod)
     results_csv = os.path.abspath(results_csv_path)
     qmd_res = pd.DataFrame.from_csv(results_csv)
 
-    print("[Histogram] Trying to get mods list. Path:", results_csv)
     mods = list(
         set(list(
             qmd_res.index
         ))
     )
-    print("[Histogram] mods:", mods)
     # mods = ising_terms_rotation_hyperfine()
     # mods = UserFunctions.get_all_model_names(
     #     growth_generator = growth_generator
@@ -2589,10 +2585,13 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
         BF_values = BF_values[~np.isnan(BF_values)]
 
         all_BFs.append(BF_values)
-
+    num_models = len(othermods)
     n_bins = 30
-    nrows=5
-    ncols=3
+    # nrows=5
+    # ncols=3
+    ncols = int(np.ceil(np.sqrt(num_models)))
+    nrows = int(np.ceil(num_models/ncols))
+
     fig, axes = plt.subplots(figsize = (20, 10), nrows=nrows, ncols=ncols)
     cm_subsection = np.linspace(0.1, 0.9, len(all_BFs)) 
     colors = [ cm.viridis(x) for x in cm_subsection ]

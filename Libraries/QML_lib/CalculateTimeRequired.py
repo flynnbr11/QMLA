@@ -228,7 +228,7 @@ time_reqd = time_required(
     num_processes = num_processes,
     resource_reallocation = resource_reallocation,
     num_bayes_times = num_bayes_times,
-    minimum_allowed_time = 400,
+    minimum_allowed_time = 600,
 )
 
 print("based on inputs. setting time:", time_reqd)

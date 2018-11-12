@@ -1337,8 +1337,7 @@ elif further_qhl_mode == False:
             )
         )
     except:
-        print("couldn't plot histogram")
-        pass
+        print("Could not plot histogram of Bayes factors for True model.")
 
     param_plot = str(directory_to_analyse+'sweep_param_total.png')
     param_percent_plot = str(directory_to_analyse+'sweep_param_percentage.png')
