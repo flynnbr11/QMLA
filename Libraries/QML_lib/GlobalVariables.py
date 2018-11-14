@@ -87,7 +87,7 @@ default_host = 'localhost'
 default_rq_timeout = 3600
 default_log_file = 'default_log_file.log'
 default_save_plots = False
-default_cumulative_csv = 'cumulative_bayes.csv'
+default_cumulative_csv = 'cumulative_csv.csv'
 default_measurement_type = 'full_access'
 default_experimental_data = False
 # NOTE true operator is set in dict in UserFunctions: default_true_operators_by_generator
@@ -111,54 +111,55 @@ default_reallocate_resources=0
 class GlobalVariablesClass():
     def __init__(
         self, 
+        arguments, 
         # true_operator = default_true_operator,
-        qhl_test = default_qhl_test,
-        further_qhl = default_qhl_test,
-        use_rq = default_use_rq,
-        do_iqle = default_do_iqle,
-        do_qle = default_do_qle,
-        num_runs = default_num_runs,
-        num_tests = default_num_tests,
-        num_qubits = default_num_qubits,
-        num_parameters = default_num_parameters,
-        num_experiments = default_num_experiments,
-        num_particles = default_num_particles,
-        num_times_bayes = default_bayes_times,
-        bayes_upper = default_bayes_threshold_upper,
-        bayes_lower = default_bayes_threshold_lower,
-        all_plots = default_do_plots,
-        gaussian = default_gaussian,
-        custom_prior = default_custom_prior,
-        resample_threshold = default_resample_threshold,
-        resample_a = default_resample_a,
-        pgh_factor = default_pgh_factor,
-        qmd_id = default_qmd_id,
-        host_name = default_host,
-        port_number = default_port_number,
-        results_directory = default_results_directory,
-        pickle_qmd_class = default_pickle_qmd_class,
-        rq_timeout = default_rq_timeout,
-        log_file = default_log_file,
-        save_plots = default_save_plots,
-        cumulative_csv = default_cumulative_csv,
-        experimental_data = default_experimental_data,
-        measurement_type = default_measurement_type,
-        dataset = default_dataset,
-        data_max_time = default_data_max_useful_time,
-        data_time_offset = default_data_time_offset,
-        growth_generation_rule = default_growth_generation_rule,
-        prior_pickle_file = default_prior_pickle_file,
-        true_params_pickle_file = default_true_params_pickle_file,
-        true_expec_path = default_true_expec_path,
-        plot_probe_file = default_plot_probe_file,
-        latex_mapping_file = default_latex_mapping_file,
-        reallocate_resources = default_reallocate_resources,
+        # qhl_test = default_qhl_test,
+        # further_qhl = default_qhl_test,
+        # use_rq = default_use_rq,
+        # do_iqle = default_do_iqle,
+        # do_qle = default_do_qle,
+        # num_runs = default_num_runs,
+        # num_tests = default_num_tests,
+        # num_qubits = default_num_qubits,
+        # num_parameters = default_num_parameters,
+        # num_experiments = default_num_experiments,
+        # num_particles = default_num_particles,
+        # num_times_bayes = default_bayes_times,
+        # bayes_upper = default_bayes_threshold_upper,
+        # bayes_lower = default_bayes_threshold_lower,
+        # save_plots = default_do_plots,
+        # gaussian = default_gaussian,
+        # custom_prior = default_custom_prior,
+        # resample_threshold = default_resample_threshold,
+        # resample_a = default_resample_a,
+        # pgh_factor = default_pgh_factor,
+        # qmd_id = default_qmd_id,
+        # host_name = default_host,
+        # port_number = default_port_number,
+        # results_directory = default_results_directory,
+        # pickle_qmd_class = default_pickle_qmd_class,
+        # rq_timeout = default_rq_timeout,
+        # log_file = default_log_file,
+        # save_plots = default_save_plots,
+        # cumulative_csv = default_cumulative_csv,
+        # experimental_data = default_experimental_data,
+        # measurement_type = default_measurement_type,
+        # dataset = default_dataset,
+        # data_max_time = default_data_max_useful_time,
+        # data_time_offset = default_data_time_offset,
+        # growth_generation_rule = default_growth_generation_rule,
+        # prior_pickle_file = default_prior_pickle_file,
+        # true_params_pickle_file = default_true_params_pickle_file,
+        # true_expec_path = default_true_expec_path,
+        # plot_probe_file = default_plot_probe_file,
+        # latex_mapping_file = default_latex_mapping_file,
+        # reallocate_resources = default_reallocate_resources,
         **kwargs
     ):
         # self.true_operator = true_operator
-        self.growth_generation_rule = growth_generation_rule
-        self.prior_pickle_file = prior_pickle_file
-        self.true_params_pickle_file = true_params_pickle_file
+        self.growth_generation_rule = arguments.growth_generation_rule
+        self.prior_pickle_file = arguments.prior_pickle_file
+        self.true_params_pickle_file = arguments.true_params_pickle_file
         true_params_info = pickle.load(
             open(self.true_params_pickle_file, 'rb')
         )
@@ -167,46 +168,46 @@ class GlobalVariablesClass():
         # self.true_operator = UserFunctions.default_true_operators_by_generator[
         #     self.growth_generation_rule
         # ]
-        self.qhl_test = qhl_test
-        self.further_qhl = further_qhl
-        self.do_iqle = do_iqle
-        self.do_qle = do_qle
-        self.use_rq = use_rq
-        self.num_runs = num_runs
-        self.num_tests = num_tests
-        self.num_qubits = num_qubits
-        self.num_parameters = num_parameters
-        self.num_experiments = num_experiments
-        self.num_particles = num_particles
-        self.num_times_bayes = num_times_bayes
-        self.bayes_lower = bayes_lower
-        self.bayes_upper = bayes_upper
-        self.all_plots = all_plots
-        self.gaussian = gaussian
-        self.custom_prior = custom_prior
-        self.resample_threshold = resample_threshold
-        self.resample_a = resample_a
-        self.pgh_factor = pgh_factor
-        self.pickle_qmd_class = pickle_qmd_class
-        self.qmd_id = qmd_id
-        self.host_name = host_name
-        self.port_number = port_number
+        self.qhl_test = bool(arguments.qhl_test)
+        self.further_qhl = bool(arguments.further_qhl)
+        self.do_iqle = bool(arguments.do_iqle)
+        self.do_qle = bool(arguments.do_qle)
+        self.use_rq = bool(arguments.use_rq)
+        self.num_runs = arguments.num_runs
+        self.num_tests = arguments.num_tests
+        self.num_qubits = arguments.num_qubits
+        self.num_parameters = arguments.num_parameters
+        self.num_experiments = arguments.num_experiments
+        self.num_particles = arguments.num_particles
+        self.num_times_bayes = arguments.num_times_bayes
+        self.bayes_lower = arguments.bayes_lower
+        self.bayes_upper = arguments.bayes_upper
+        self.save_plots = bool(arguments.save_plots)
+        self.gaussian = bool(arguments.gaussian)
+        self.custom_prior = bool(arguments.custom_prior)
+        self.resample_threshold = arguments.resample_threshold
+        self.resample_a = arguments.resample_a
+        self.pgh_factor = arguments.pgh_factor
+        self.pickle_qmd_class = bool(arguments.pickle_qmd_class)
+        self.qmd_id = arguments.qmd_id
+        self.host_name = arguments.host_name
+        self.port_number = arguments.port_number
 #        self.results_directory = 'Results/'+results_directory
-        self.results_directory = results_directory
+        self.results_directory = arguments.results_directory
 
-        self.rq_timeout = rq_timeout
-        self.log_file = log_file
-        self.save_plots = save_plots
-        self.cumulative_csv = cumulative_csv
-        self.use_experimental_data = experimental_data
-        self.measurement_type = measurement_type
-        self.dataset = dataset
-        self.data_time_offset = data_time_offset
-        self.data_max_time = data_max_time 
-        self.true_expec_path = true_expec_path
-        self.plot_probe_file = plot_probe_file
-        self.latex_mapping_file = latex_mapping_file
-        self.reallocate_resources = reallocate_resources
+        self.rq_timeout = arguments.rq_timeout
+        self.log_file = arguments.log_file
+        # self.save_plots = bool(arguments.save_plots)
+        self.cumulative_csv = arguments.cumulative_csv
+        self.use_experimental_data = bool(arguments.experimental_data)
+        self.measurement_type = arguments.measurement_type
+        self.dataset = arguments.dataset
+        self.data_time_offset = arguments.data_time_offset
+        self.data_max_time = arguments.data_max_time 
+        self.true_expec_path = arguments.true_expec_path
+        self.plot_probe_file = arguments.plot_probe_file
+        self.latex_mapping_file = arguments.latex_mapping_file
+        self.reallocate_resources = arguments.reallocate_resources
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -292,7 +293,7 @@ def parse_cmd_line_args(args):
       default=default_num_particles
     )
     parser.add_argument(
-      '-bt', '--bayes_times', 
+      '-bt', '--num_times_bayes', 
       help='Number of times to consider in Bayes function.',
       type=int,
       default=default_bayes_times
@@ -334,13 +335,13 @@ def parse_cmd_line_args(args):
 
     ## Whether to use QLE, IQLE or both (currently deprecated)
     parser.add_argument(
-      '-qle',
+      '-qle', '--do_qle',
       help='True to perform QLE, False otherwise.',
       type=int,
       default=default_do_qle
     )
     parser.add_argument(
-      '-iqle',
+      '-iqle', '--do_iqle',
       help='True to perform IQLE, False otherwise.',
       type=int,
       default=default_do_iqle
@@ -363,7 +364,7 @@ def parse_cmd_line_args(args):
 
     ## Include optional plots
     parser.add_argument(
-      '-pt', '--plots',
+      '-pt', '--save_plots',
       help='True: save all plots for this QMD; False: do not.',
       type=int,
       default=default_save_plots
@@ -392,13 +393,13 @@ def parse_cmd_line_args(args):
 
     ## Redis environment
     parser.add_argument(
-      '-host', '--redis_host',
+      '-host', '--host_name',
       help='Name of Redis host.',
       type=str,
       default=default_host
     )
     parser.add_argument(
-      '-port', '--redis_port_number',
+      '-port', '--port_number',
       help='Redis port number.',
       type=int,
       default=default_port_number
@@ -418,7 +419,7 @@ def parse_cmd_line_args(args):
       default=default_results_directory
     )
     parser.add_argument(
-      '-pkl', '--pickle_result_class',
+      '-pkl', '--pickle_qmd_class',
       help='Store QMD class in pickled file at end. Large memory requirement, recommend not to.',
       type=int,
       default=default_pickle_qmd_class
@@ -432,14 +433,14 @@ def parse_cmd_line_args(args):
     )
     
     parser.add_argument(
-      '-log', '--logfile',
+      '-log', '--log_file',
       help='File to log RQ workers.',
       type=str,
       default=default_log_file
     )
     
     parser.add_argument(
-      '-cb', '--cumulative_bayes',
+      '-cb', '--cumulative_csv',
       help='CSV to store Bayes factors of all QMDs.',
       type=str,
       default=default_cumulative_csv
@@ -466,7 +467,7 @@ def parse_cmd_line_args(args):
     )
 
     parser.add_argument(
-      '-dst', '--dataset_max_time',
+      '-dst', '--data_max_time',
       help='Maximum useful time in given data.',
       type=int,
       default=default_data_max_useful_time
@@ -501,13 +502,13 @@ def parse_cmd_line_args(args):
     )
 
     parser.add_argument(
-      '-true_expec_path', '--true_expectation_values_path',
+      '-true_expec_path', '--true_expec_path',
       help='Path to save true params to.',
       type=str,
       default=default_true_params_pickle_file
     )
     parser.add_argument(
-      '-plot_probes', '--plot_probes_path',
+      '-plot_probes', '--plot_probe_file',
       help='Path where plot probe dict is pickled to.',
       type=str,
       default=default_plot_probe_file
@@ -529,98 +530,127 @@ def parse_cmd_line_args(args):
       default=default_reallocate_resources
     )
 
+    parser.add_argument(
+      '-pmin', '--param_min',
+      help='Minimum valid paramater value.',
+      type=float,
+      default=0
+    )
+    parser.add_argument(
+      '-pmax', '--param_max',
+      help='Maximum valid paramater value.',
+      type=float,
+      default=1
+    )
+
+    parser.add_argument(
+      '-pmean', '--param_mean',
+      help='Default mean parameter value for normal distribution.',
+      type=float,
+      default=0.5
+    )
+
+    parser.add_argument(
+      '-psigma', '--param_sigma',
+      help='Default std dev on distribution',
+      type=float,
+      default=0.5
+    )
+
+
 
 
     # Process arguments from command line
     arguments = parser.parse_args(args)
     
-    true_operator = arguments.true_operator
-    qhl_test = bool(arguments.qhl_test)
-    further_qhl = bool(arguments.further_qhl)
-    do_iqle = bool(arguments.iqle)
-    do_qle = bool(arguments.qle)
-    use_rq = bool(arguments.use_rq)
-    num_runs = arguments.num_runs
-    num_tests = arguments.num_tests
-    num_qubits = arguments.num_qubits
-    num_parameters = arguments.num_parameters
-    num_experiments = arguments.num_experiments
-    num_particles = arguments.num_particles
-    num_times_bayes = arguments.bayes_times
-    if num_times_bayes > num_experiments:
-        num_times_bayes = num_experiments-1
-    bayes_upper = arguments.bayes_upper
-    bayes_lower = arguments.bayes_lower
-    all_plots = bool(arguments.plots)
-    gaussian = bool(arguments.gaussian)
-    custom_prior = bool(arguments.custom_prior)
-    resample_threshold = arguments.resample_threshold
-    resample_a = arguments.resample_a
-    pgh_factor = arguments.pgh_factor
-    qmd_id = arguments.qmd_id
-    host_name = arguments.redis_host
-    port_number = arguments.redis_port_number
-    results_directory = arguments.results_directory
-    pickle_qmd_class = bool(arguments.pickle_result_class)
-    rq_timeout = arguments.rq_timeout
-    log_file = arguments.logfile
-    cumulative_csv = arguments.cumulative_bayes
-    use_experimental_data = bool(arguments.experimental_data)
-    measurement_type = arguments.measurement_type
-    dataset = arguments.dataset
-    data_max_time = arguments.dataset_max_time    
-    data_time_offset = arguments.data_time_offset
-    growth_generation_rule = arguments.growth_generation_rule
-    prior_pickle_file = arguments.prior_pickle_file
-    true_params_pickle_file = arguments.true_params_pickle_file
-    true_expec_path = arguments.true_expectation_values_path
-    plot_probes_path = arguments.plot_probes_path
-    latex_mapping_file = arguments.latex_mapping_file
-    reallocate_resources = bool(arguments.reallocate_resources)
+    # true_operator = arguments.true_operator
+    # qhl_test = bool(arguments.qhl_test)
+    # further_qhl = bool(arguments.further_qhl)
+    # do_iqle = bool(arguments.do_iqle)
+    # do_qle = bool(arguments.do_qle)
+    # use_rq = bool(arguments.use_rq)
+    # num_runs = arguments.num_runs
+    # num_tests = arguments.num_tests
+    # num_qubits = arguments.num_qubits
+    # num_parameters = arguments.num_parameters
+    # num_experiments = arguments.num_experiments
+    # num_particles = arguments.num_particles
+    # num_times_bayes = arguments.bayes_times
+    # if num_times_bayes > num_experiments:
+    #     num_times_bayes = num_experiments-1
+    # bayes_upper = arguments.bayes_upper
+    # bayes_lower = arguments.bayes_lower
+    # save_plots = bool(arguments.plots)
+    # gaussian = bool(arguments.gaussian)
+    # custom_prior = bool(arguments.custom_prior)
+    # resample_threshold = arguments.resample_threshold
+    # resample_a = arguments.resample_a
+    # pgh_factor = arguments.pgh_factor
+    # qmd_id = arguments.qmd_id
+    # host_name = arguments.host_name
+    # port_number = arguments.port_number
+    # results_directory = arguments.results_directory
+    # pickle_qmd_class = bool(arguments.pickle_result_class)
+    # rq_timeout = arguments.rq_timeout
+    # log_file = arguments.log_file
+    # cumulative_csv = arguments.cumulative_csv
+    # experimental_data = bool(arguments.experimental_data)
+    # measurement_type = arguments.measurement_type
+    # dataset = arguments.dataset
+    # data_max_time = arguments.data_max_time    
+    # data_time_offset = arguments.data_time_offset
+    # growth_generation_rule = arguments.growth_generation_rule
+    # prior_pickle_file = arguments.prior_pickle_file
+    # true_params_pickle_file = arguments.true_params_pickle_file
+    # true_expec_path = arguments.true_expec_path
+    # plot_probe_file = arguments.plot_probe_file
+    # latex_mapping_file = arguments.latex_mapping_file
+    # reallocate_resources = bool(arguments.reallocate_resources)
 
     # Use arguments to initialise global variables class. 
     global_variables = GlobalVariablesClass(
-        true_operator = true_operator,
-        qhl_test = qhl_test, 
-        further_qhl = further_qhl,
-        do_iqle = do_iqle,
-        do_qle = do_qle,
-        use_rq = use_rq,
-        num_runs = num_runs,
-        num_tests = num_tests,
-        num_qubits = num_qubits,
-        num_parameters = num_parameters,
-        num_experiments = num_experiments,
-        num_particles = num_particles,
-        num_times_bayes = num_times_bayes,
-        bayes_lower = bayes_lower, 
-        bayes_upper = bayes_upper, 
-        resample_threshold = resample_threshold,
-        resample_a = resample_a,
-        pgh_factor = pgh_factor,
-        gaussian = gaussian,
-        custom_prior = custom_prior,
-        qmd_id = qmd_id, 
-        host_name = host_name,
-        port_number = port_number,
-        results_directory = results_directory,
-        pickle_qmd_class = pickle_qmd_class,
-        rq_timeout = rq_timeout,
-        log_file = log_file,
-        save_plots = all_plots,
-        cumulative_csv = cumulative_csv,
-        measurement_type = measurement_type,
-        experimental_data = use_experimental_data,
-        dataset = dataset,
-        data_max_time = data_max_time,
-        data_time_offset = data_time_offset,
-        growth_generation_rule = growth_generation_rule,
-        prior_pickle_file = prior_pickle_file,
-        true_params_pickle_file = true_params_pickle_file,
-        true_expec_path = true_expec_path,
-        plot_probe_file = plot_probes_path,
-        latex_mapping_file = latex_mapping_file,
-        reallocate_resources = reallocate_resources,
+        arguments,
+        # true_operator = true_operator,
+        # qhl_test = qhl_test, 
+        # further_qhl = further_qhl,
+        # do_iqle = do_iqle,
+        # do_qle = do_qle,
+        # use_rq = use_rq,
+        # num_runs = num_runs,
+        # num_tests = num_tests,
+        # num_qubits = num_qubits,
+        # num_parameters = num_parameters,
+        # num_experiments = num_experiments,
+        # num_particles = num_particles,
+        # num_times_bayes = num_times_bayes,
+        # bayes_lower = bayes_lower, 
+        # bayes_upper = bayes_upper, 
+        # resample_threshold = resample_threshold,
+        # resample_a = resample_a,
+        # pgh_factor = pgh_factor,
+        # gaussian = gaussian,
+        # custom_prior = custom_prior,
+        # qmd_id = qmd_id, 
+        # host_name = host_name,
+        # port_number = port_number,
+        # results_directory = results_directory,
+        # pickle_qmd_class = pickle_qmd_class,
+        # rq_timeout = rq_timeout,
+        # log_file = log_file,
+        # save_plots = save_plots,
+        # cumulative_csv = cumulative_csv,
+        # measurement_type = measurement_type,
+        # experimental_data = experimental_data,
+        # dataset = dataset,
+        # data_max_time = data_max_time,
+        # data_time_offset = data_time_offset,
+        # growth_generation_rule = growth_generation_rule,
+        # prior_pickle_file = prior_pickle_file,
+        # true_params_pickle_file = true_params_pickle_file,
+        # true_expec_path = true_expec_path,
+        # plot_probe_file = plot_probe_file,
+        # latex_mapping_file = latex_mapping_file,
+        # reallocate_resources = reallocate_resources,
     )
 
     args_dict = vars(arguments)
