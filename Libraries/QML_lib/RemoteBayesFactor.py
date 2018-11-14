@@ -34,7 +34,7 @@ import ModelGeneration
 import ExperimentalDataFunctions
 #import BayesF
 from qinfer import NormalDistribution
-from Distrib import MultiVariateNormalDistributionNocov
+# from Distrib import MultiVariateNormalDistributionNocov
 
 def time_seconds():
     import datetime
@@ -141,15 +141,6 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
             try:
                 min_time = min(min(times_a), min(times_b))
                 max_time = max(max(times_a), max(times_b))
-                log_print(
-                    [
-                    "FOUND min/max of:", 
-                    "\ntimes_a:", times_a, 
-                    "\ntimes_b:", times_b,
-                    "\n Model IDs:", model_a_id, 
-                    ";\t", model_b_id
-                    ]
-                )
             except:
                 log_print(
                     [
@@ -253,7 +244,12 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
                 "; set:True"]
             )
         time_end = time.time()
-        log_print(["Finished. rq time: ", str(time_end-time_start)])
+        log_print(
+            [
+            "Finished. rq time: ", 
+            str(time_end-time_start)
+            ]
+        )
     
         return bayes_factor
     

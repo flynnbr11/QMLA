@@ -65,7 +65,7 @@ import redis
 from QML import *
 import ModelGeneration
 from qinfer import NormalDistribution
-from Distrib import MultiVariateNormalDistributionNocov
+# from Distrib import MultiVariateNormalDistributionNocov
 
 def identity():
     return np.array([[1+0.j, 0+0.j], [0+0.j, 1+0.j]])
@@ -781,13 +781,16 @@ def add_model(model_name, running_database, model_lists,
         )
         sim_pars = []
         num_pars = op.num_constituents
-        if num_pars ==1 : #TODO Remove this fixing the prior
-          normal_dist = NormalDistribution(mean=true_params[0], var=0.1)
-        else:  
-          normal_dist = MultiVariateNormalDistributionNocov(num_pars)
+        # if num_pars ==1 : #TODO Remove this fixing the prior
+        #   normal_dist = NormalDistribution(
+        #     mean=true_params[0], 
+        #     var=0.1
+        # )
+        # else:  
+        #   normal_dist = MultiVariateNormalDistributionNocov(num_pars)
         
-        for j in range(op.num_constituents):
-          sim_pars.append(normal_dist.sample()[0,0])
+        # for j in range(op.num_constituents):
+        #   sim_pars.append(normal_dist.sample()[0,0])
           
         # add model_db_new_row to model_db and running_database
         # Note: do NOT use pd.df.append() as this copies total DB,
@@ -815,7 +818,7 @@ def add_model(model_name, running_database, model_lists,
             'Status' : 'Active',  #TODO 
             'Completed' : False, 
             'branchID' : int(branchID), #TODO make argument of add_model fnc,
-            'Param_Estimates' : sim_pars,
+            # 'Param_Estimates' : sim_pars,
             'Estimates_Dist_Width' : normal_dist_width,
             'Reduced_Model_Class_Instance' : reduced_qml_instance, 
             'Operator_Instance' : op,

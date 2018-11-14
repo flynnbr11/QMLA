@@ -4,6 +4,13 @@ import argparse
 import UserFunctions
 import DataBase
 
+
+def MIN_PARAM():
+	return -100
+
+def MAX_PARAM():
+	return -50
+
 ### SET VALUES HERE ###
 # set_prior_specific_terms = {
 # 	'xTi' : [3.0, 2.0], # TODO Broaden, testing with small dist
@@ -62,19 +69,25 @@ set_prior_specific_terms = {
 }
 """
 # random set generated using random.uniform(-10, 10) for purposes of QHL tests
-set_prior_specific_terms = {
-	'xTi' : [ 5.0, 2.0 ], # TODO Broaden, testing with small dist
-	'yTi' : [ 5.0, 2.0 ],
-	'zTi' : [ 5.0, 2.0 ],
-	'xTx' : [5.0, 2.0], # true value 2.7
+set_normal_prior_specific_terms = {
+	'xTi' : [ 1.0, 2.0 ], # TODO Broaden, testing with small dist
+	'yTi' : [ 2.0, 2.0 ],
+	'zTi' : [ 3.0, 2.0 ],
+	'xTx' : [4.0, 2.0], # true value 2.7
 	'yTy' : [5.0, 2.0], # true value 2.7
-	'zTz' : [3.0, 2.0 ], # true value 2.14
+	'zTz' : [6.0, 2.0 ], # true value 2.14
 	'xTy' : [5.0, 2.0],
 	'xTz' : [5.0, 2.0],
 	'yTz' : [5.0, 2.0],
 	'x' : [5.0, 2.0],
 	'z' : [5.0, 2.0],
 	'y' : [5.0, 2.0]
+}
+
+set_uniform_prior_specific_terms = {
+	'xTi' : [ 0, 10 ], # TODO Broaden, testing with small dist
+	'yTi' : [ 0, 2.0 ],
+	'zTi' : [ 0, 5.0 ],
 }
 
 set_true_params = {
@@ -150,11 +163,16 @@ def create_qhl_params(
 	true_op, 
 	pickle_file=None,
 	random_vals=False, 
-	rand_min=0, 
-	rand_max=5,
+	rand_min=None, 
+	rand_max=None,
 	exp_data=0,
 	plus_probe_for_plot=False
 ):
+	if rand_min is None:
+		rand_min = MIN_PARAM()
+	if rand_max is None:
+		rand_max = MAX_PARAM()
+
 	terms = DataBase.get_constituent_names_from_name(true_op)
 	true_params = []
 
@@ -195,29 +213,62 @@ def create_qhl_params(
 
 def create_prior(
 	true_op, 
+	gaussian, # whether to use normal or uniform prior
 	pickle_file=None,
 	random_vals=False, 
 	sigma=1.5,
-	rand_min=0, 
-	rand_max=5,
+	rand_min=None, 
+	rand_max=None,
 	exp_data=0
 ):
 #	terms = DataBase.get_constituent_names_from_name(true_op)
-	specific_terms = {}
-	terms = list(set_prior_specific_terms.keys())
-	if random_vals is True:
-		for term in terms:
-			val = random.uniform(rand_min, rand_max)
-			specific_terms[term] = [val, sigma]
+	
+	if rand_min is None:
+		rand_min = MIN_PARAM()
+	if rand_max is None:
+		rand_max = MAX_PARAM()
+
+	print("[SetParams] CREATE PRIOR:")
+	print("[SetParams] random vals:", random_vals, )
+	print("[SetParams] min/max", rand_min, rand_max)
+	print("[SetParams] Gaussian:", gaussian)
+
+	if gaussian ==  True:
+		set_prior_specific_terms = set_normal_prior_specific_terms
 	else:
+
+		set_prior_specific_terms = set_uniform_prior_specific_terms
+
+	specific_terms = {}
+	if random_vals is False:
+		# only fill this dict in if the user selects NOT 
+		# to use random values as parameters
+		terms = list(set_prior_specific_terms.keys())
 		for term in terms:
 			try:
+				print("[SetParams] setting", term, ":", set_prior_specific_terms[term])
 				specific_terms[term] = set_prior_specific_terms[term]
 			except: 
 				# in case term not in set_prior_specific_terms
 				val = random.uniform(rand_min, rand_max)
 				specific_terms[term] = [val, sigma]
-			
+	print("[SetParams] specific terms:", specific_terms)
+
+
+	# terms = list(set_prior_specific_terms.keys())
+	# if random_vals is True:
+	# 	for term in terms:
+	# 		val = random.uniform(rand_min, rand_max)
+	# 		specific_terms[term] = [val, sigma]
+	# else:
+	# 	for term in terms:
+	# 		try:
+	# 			specific_terms[term] = set_prior_specific_terms[term]
+	# 		except: 
+	# 			# in case term not in set_prior_specific_terms
+	# 			val = random.uniform(rand_min, rand_max)
+	# 			specific_terms[term] = [val, sigma]
+	# print("PRIOR:", specific_terms)
 	if pickle_file is not None:
 		import pickle
 		pickle.dump(
@@ -297,6 +348,41 @@ parser.add_argument(
   default=0
 )
 
+parser.add_argument(
+  '-g', '--gaussian', 
+  help="Whether to use normal (Gaussian) distribution. If False: uniform.",
+  type=int,
+  default=1
+)
+
+parser.add_argument(
+  '-min', '--param_min', 
+  help="Minimum valid parameter value",
+  type=float,
+  default=0.0
+)
+parser.add_argument(
+  '-max', '--param_max', 
+  help="Maximum valid parameter value",
+  type=float,
+  default=1.0
+)
+
+parser.add_argument(
+  '-mean', '--param_mean', 
+  help="Default mean of normal distribution for unspecified parameters.",
+  type=float,
+  default=0.5
+)
+parser.add_argument(
+  '-sigma', '--param_sigma', 
+  help="Default sigma of normal distribution for unspecified parameters.",
+  type=float,
+  default=0.25
+)
+
+
+
 
 arguments = parser.parse_args()
 random_true_params = bool(arguments.random_true_params)
@@ -307,6 +393,13 @@ true_operator = UserFunctions.default_true_operators_by_generator[growth_generat
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
 special_probe = arguments.special_probe
+gaussian = bool(arguments.gaussian)
+param_min = arguments.param_min
+param_max = arguments.param_max
+param_mean = arguments.param_mean
+param_sigma = arguments.param_sigma
+
+
 
 ### Call functions to create pickle files. 
 ## TODO check if these are already present?
@@ -316,6 +409,8 @@ if arguments.true_params_file is not None:
 		true_op = true_operator,
 		pickle_file=arguments.true_params_file,
 		random_vals=random_true_params, 
+		rand_min=param_min, 
+		rand_max=param_max,
 		exp_data=exp_data
 	)
 
@@ -323,6 +418,7 @@ if arguments.prior_file is not None:
 	create_prior(
 		# true_op = arguments.true_op,
 		true_op = true_operator, 
+		gaussian = gaussian, 
 		pickle_file = arguments.prior_file,
 		random_vals = random_prior, 
 		exp_data=exp_data

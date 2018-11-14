@@ -6,18 +6,18 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
+prt=6
 exp=3
 pgh=0.5
 ra=0.8
 rt=0.5
-gaussian=1
+gaussian=0
 
 ### ---------------------------------------------------###
 # QMD settings
@@ -117,21 +117,37 @@ prior_pickle_file="$long_dir/prior.p"
 true_params_pickle_file="$long_dir/true_params.p"
 plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
-rand_true_params=0
+param_min=0
+param_max=1
+param_mean=0.5
+param_sigma=0.25
+rand_true_params=1
 rand_prior=0
 special_probe='random' #'plus' #'ideal'
+if (( "$exp_data" == 1))
+then
+    special_probe='plus'
+fi
+
+
 
 python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \
     -prior=$prior_pickle_file \
     -probe=$plot_probe_file \
+    -g=$gaussian \
     -plus=$force_plot_plus \
     -sp=$special_probe \
     -ggr=$growth_rule \
     -op=$true_operator \
     -exp=$exp_data \
+    -min=$param_min \
+    -max=$param_max \
+    -mean=$param_mean \
+    -sigma=$param_sigma \
     -rand_t=$rand_true_params \
     -rand_p=$rand_prior # can make true params and prior random
+
 
 latex_mapping_filename='LatexMapping.txt'
 latex_mapping_file=$long_dir$latex_mapping_filename

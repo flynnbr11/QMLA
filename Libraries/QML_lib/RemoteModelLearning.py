@@ -34,7 +34,7 @@ import QML
 import ModelGeneration
 #import BayesF
 from qinfer import NormalDistribution
-from Distrib import MultiVariateNormalDistributionNocov
+# from Distrib import MultiVariateNormalDistributionNocov
 
 
 def time_seconds():
@@ -142,37 +142,37 @@ def learnModelRemote(
         modelID=modelID
     )
 
-    random_sim_pars=False
-    if random_sim_pars==True:
-        sim_pars = []
-        num_pars = op.num_constituents
-        if num_pars ==1 : #TODO Remove this fixing the prior
-            normal_dist=NormalDistribution(mean=true_params[0], var=0.1)
-        else:  
-            normal_dist = MultiVariateNormalDistributionNocov(num_pars)
+    # random_sim_pars=False
+    # if random_sim_pars==True:
+    #     sim_pars = []
+    #     num_pars = op.num_constituents
+    #     if num_pars ==1 : #TODO Remove this fixing the prior
+    #         normal_dist=NormalDistribution(mean=true_params[0], var=0.1)
+    #     else:  
+    #         normal_dist = MultiVariateNormalDistributionNocov(num_pars)
 
-    else:
+    # else:
         
-        model_priors = qmd_info['model_priors']
-        if (
-            model_priors is not None
-            and
-            DataBase.alph(name) in list(model_priors.keys())
-        ):
-            prior_specific_terms = model_priors[name] 
-        else:
-            prior_specific_terms = qmd_info['prior_specific_terms']
+    model_priors = qmd_info['model_priors']
+    if (
+        model_priors is not None
+        and
+        DataBase.alph(name) in list(model_priors.keys())
+    ):
+        prior_specific_terms = model_priors[name] 
+    else:
+        prior_specific_terms = qmd_info['prior_specific_terms']
 
-        sim_pars = []
-        constituent_terms = DataBase.get_constituent_names_from_name(name)
-        for term in op.constituents_names:
-                try:
-                    initial_prior_centre = prior_specific_terms[term][0]
-                    sim_pars.append(initial_prior_centre)
-                except:
-                    # if prior not defined, start from 0 for all other params
-                    initial_prior_centre = 0 
-                    sim_pars.append(initial_prior_centre)
+    sim_pars = []
+    constituent_terms = DataBase.get_constituent_names_from_name(name)
+    for term in op.constituents_names:
+            try:
+                initial_prior_centre = prior_specific_terms[term][0]
+                sim_pars.append(initial_prior_centre)
+            except:
+                # if prior not defined, start from 0 for all other params
+                initial_prior_centre = 0 
+                sim_pars.append(initial_prior_centre)
 
     # add model_db_new_row to model_db and running_database
     # Note: do NOT use pd.df.append() as this copies total DB,

@@ -71,56 +71,85 @@ class QMD():
 
     """
     def __init__(self,
+        global_variables,
         initial_op_list=['x'],
-        qhl_test = False,
         true_operator='x',
         true_param_list = None,
         use_time_dep_true_model = False,
         true_params_time_dep = None,
-        num_particles= 300,
-        num_experiments = 50,
         max_num_models=30, 
         max_num_qubits=7, #TODO change -- this may cause crashes somewhere
-        gaussian=True,
-        prior_specific_terms = None,
         model_priors = None,
-        bayes_lower = 1, 
-        bayes_upper = 100,
-        resample_threshold = 0.5,
-        resampler_a = 0.95,
-        pgh_prefactor = 1.0,
         store_particles_weights = False,
         bayes_time_binning = False,
         qhl_plots = False, 
+        experimental_measurements = None,
         results_directory = '', 
         long_id = '001', 
         num_probes = 20,
         probe_dict = None,  
-        num_times_for_bayes_updates = 'all',
         max_num_layers = 10,
         max_num_branches = 20, 
         use_exp_custom = True,
         enable_sparse = True,
         compare_linalg_exp_tol = None,
+        parallel = False,
+        plot_times = [0,1],
         sigma_threshold = 1e-13, 
         debug_directory = None,
-        qle = True, # Set to False for IQLE
-        parallel = False,
-        measurement_type='full_access',
-        use_experimental_data = False,
-        experimental_measurements = None,
-        plot_times = [0,1],
-        q_id = 0, # id for QMD instance to keep concurrent QMDs distinct on cluster
-        host_name='localhost',
-        port_number = 6379,
-        use_rq=True, 
-        rq_timeout=36000,
-        growth_generator='simple_ising',
-        latex_mapping_file='LatexMapping.txt',
-        plot_probes_path=None,
-        reallocate_resources=False, 
-        log_file = None
+        prior_specific_terms = None, 
+        qle=None,   
+        **kwargs
+#### global variables parameters
+        # qhl_test = False,
+        # num_particles= 300,
+        # num_experiments = 50,
+        # num_times_for_bayes_updates = 'all',
+        # bayes_lower = 1, 
+        # bayes_upper = 100,
+        # resample_threshold = 0.5,
+        # resampler_a = 0.95,
+        # pgh_prefactor = 1.0,
+        # qle = True, # Set to False for IQLE
+        # gaussian=True,
+        # prior_specific_terms = None,
+        # measurement_type='full_access',
+        # use_experimental_data = False,
+        # use_rq=True, 
+        # growth_generator='simple_ising',
+        # q_id = 0, # id for QMD instance to keep concurrent QMDs distinct on cluster
+        # host_name='localhost',
+        # port_number = 6379,
+        # rq_timeout=36000,
+        # latex_mapping_file='LatexMapping.txt',
+        # plot_probes_path=None,
+        # reallocate_resources=False, 
+        # log_file = None
     ):
+
+        qhl_test = global_variables.qhl_test
+        num_particles=global_variables.num_particles
+        num_experiments = global_variables.num_experiments
+        num_times_for_bayes_updates = global_variables.num_times_bayes
+        bayes_lower = global_variables.bayes_lower
+        bayes_upper = global_variables.bayes_upper
+        resample_threshold = global_variables.resample_threshold
+        resampler_a = global_variables.resample_a
+        pgh_prefactor = global_variables.pgh_factor
+        gaussian = global_variables.gaussian
+        measurement_type = global_variables.measurement_type
+        use_experimental_data = global_variables.use_experimental_data
+        use_rq = global_variables.use_rq
+        growth_generator = global_variables.growth_generation_rule
+        q_id = global_variables.qmd_id
+        host_name = global_variables.host_name
+        port_number = global_variables.port_number
+        rq_timeout = global_variables.rq_timeout
+        latex_mapping_file = global_variables.latex_mapping_file
+        plot_probes_path = global_variables.plot_probe_file
+        reallocate_resources = global_variables.reallocate_resources
+        log_file = global_variables.log_file
+
         self.StartingTime = time.time()
         self.Q_id = q_id
         self.HostName = host_name
@@ -176,6 +205,7 @@ class QMD():
             self.TrueParamDict[op_name] = param        
         
         self.MaxModNum = max_num_models #TODO: necessary?
+        print("[QMD] Gaussian:", gaussian)
         self.gaussian = gaussian
         self.NumModels = len(initial_op_list)
         self.NumParticles = num_particles
@@ -1501,7 +1531,7 @@ class QMD():
             blocking=True
         )
                 
-        mod_id = DB.model_id_from_name(
+        mod_id = DataBase.model_id_from_name(
             db=self.db, 
             name=mod_to_learn)
         self.log_print(["Learned:", mod_to_learn, ". ID=", mod_id])
@@ -1552,7 +1582,7 @@ class QMD():
 
         for mod_name in model_names:
 
-            mod_id = DB.model_id_from_name(db=self.db, name=mod_name)
+            mod_id = DataBase.model_id_from_name(db=self.db, name=mod_name)
             learned_models_ids.set(
                 str(mod_id), 0
             )

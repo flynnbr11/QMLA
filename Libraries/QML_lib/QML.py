@@ -11,7 +11,7 @@ import Distrib as Distributions
 import GenSimQMD_IQLE as gsi
 import ExperimentalDataFunctions as expdt
 import multiPGH as mpgh
-import DataBase as DB
+import DataBase 
 import ModelNames
 from MemoryTest import print_loc
 from psutil import virtual_memory
@@ -100,8 +100,8 @@ class ModelLearningClass():
     ):
         self.VolumeList = np.array([])  
         self.Name = name
-        # self.LatexTerm = DB.latex_name_ising(self.Name)
-        self.Dimension = DB.get_num_qubits(name)
+        # self.LatexTerm = DataBase.latex_name_ising(self.Name)
+        self.Dimension = DataBase.get_num_qubits(name)
         self.NumExperimentsToDate = 0
         self.BayesFactors = {}
         self.log_file = log_file
@@ -125,11 +125,13 @@ class ModelLearningClass():
         trueoplist,
         modeltrueparams,
         simoplist, 
-        simparams, simopnames, numparticles, modelID, 
+        simparams, simopnames, 
+        numparticles, modelID, 
         use_time_dep_true_params=False, 
         time_dep_true_params=None,
         resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0,
-        store_partices_weights=False, checkloss=True, gaussian=True,
+        store_partices_weights=False, checkloss=True, 
+        gaussian=True,
         use_exp_custom=True, enable_sparse=True,
         debug_directory=None, qle=True, 
         host_name='localhost', 
@@ -149,9 +151,9 @@ class ModelLearningClass():
         base_resources = qmd_info['base_resources']
         base_num_qubits = base_resources['num_qubits']
         base_num_terms = base_resources['num_terms']
-        this_model_num_qubits = DB.get_num_qubits(self.Name)
+        this_model_num_qubits = DataBase.get_num_qubits(self.Name)
         this_model_num_terms = len(
-            DB.get_constituent_names_from_name(self.Name)
+            DataBase.get_constituent_names_from_name(self.Name)
         )
 
         if qmd_info['reallocate_resources']==True:
@@ -196,8 +198,34 @@ class ModelLearningClass():
         self.SimOpsNames = simopnames
         print_loc(print_location=init_model_print_loc)
         
+
         self.SimOpList  = np.asarray(simoplist)
         self.SimParams = np.asarray([simparams[0]])
+
+        individual_terms_in_name = DataBase.get_constituent_names_from_name(
+            self.Name
+        )
+
+        for i in range(len(individual_terms_in_name)):
+            term = individual_terms_in_name[i]
+            term_mtx = DataBase.compute(term)
+            if np.all(term_mtx==self.SimOpList[i]) is False:
+                print("[QML] UNEQUAL SIM OP LIST / TERM MATRICES.")
+                print("==> INSPECT PRIORS ORDERING.")
+                self.log_print(
+                    [
+                    "Term", term, 
+                    "\ncalculated mtx:", term_mtx, 
+                    "\nSimOpList:", self.SimOpList[i]
+                    ]
+                )
+            # else:
+            #     print("term:", term)
+            #     print("calculated mtx:", term_mtx )
+            #     print("sim op list:", self.SimOpList[i] )
+
+
+
         # self.log_print(["True oplist:", self.TrueOpList ])
         # self.log_print(["Sim oplist:", self.SimOpList])
         # self.log_print(["learning true params:", self.TrueParams])
@@ -219,40 +247,55 @@ class ModelLearningClass():
         else:            
             self.debugSave = False
         num_params = len(self.SimOpList)
-        if gaussian:
-            # Use a normal distribution
-            self.log_print(["Normal distribution generated"])
-            means = self.TrueParams[0:num_params]
-            if num_params > len(self.TrueParams):
-                for i in range(len(self.TrueParams), num_params):
-                    means.append(self.TrueParams[i%len(self.TrueParams)])
-#            self.Prior = Distributions.MultiVariateNormalDistributionNocov(num_params)
-            
-            self.PriorSpecificTerms = qmd_info['prior_specific_terms']
-            
-            if (
-                qmd_info['model_priors'] is not None
-                and 
-                DB.alph(self.Name) in list(qmd_info['model_priors'].keys()) 
-            ):
-                self.PriorSpecificTerms = (
-                    qmd_info['model_priors'][DB.alph(self.Name)]
-                )
 
-            self.Prior = Distributions.normal_distribution_ising(
-                term = self.Name,
-                specific_terms = self.PriorSpecificTerms
-            )
-        else:
-            self.log_print(["Uniform distribution generated"])
+        self.PriorSpecificTerms = qmd_info['prior_specific_terms']
+#         if gaussian:
+#             # Use a normal distribution
+#             self.log_print(["Normal distribution generated"])
+#             means = self.TrueParams[0:num_params]
+#             if num_params > len(self.TrueParams):
+#                 for i in range(len(self.TrueParams), num_params):
+#                     means.append(self.TrueParams[i%len(self.TrueParams)])
+# #            self.Prior = Distributions.MultiVariateNormalDistributionNocov(num_params)
+            
+#             self.PriorSpecificTerms = qmd_info['prior_specific_terms']
+            
+#             if (
+#                 qmd_info['model_priors'] is not None
+#                 and 
+#                 DataBase.alph(self.Name) in list(qmd_info['model_priors'].keys()) 
+#             ):
+#                 self.PriorSpecificTerms = (
+#                     qmd_info['model_priors'][DataBase.alph(self.Name)]
+#                 )
+
+#             self.Prior = Distributions.normal_distribution_ising(
+#                 term = self.Name,
+#                 specific_terms = self.PriorSpecificTerms
+#             )
+#         else:
+#             self.log_print(["Uniform distribution generated"])
  
-            self.Prior = Distributions.uniform_distribution_ising(
-                term = self.Name
-            )
+#             self.Prior = Distributions.uniform_distribution_ising(
+#                 term = self.Name
+#             )
+        log_identifier=str("QML "+str(self.ModelID))
+
+        self.Prior = Distributions.get_prior(
+            model_name = self.Name, 
+            gaussian = gaussian, 
+            param_minimum = 0,
+            param_maximum = 10, 
+            param_normal_mean = 0.5, 
+            param_normal_sigma = 0.2, 
+            random_mean=False, 
+            specific_terms = self.PriorSpecificTerms, 
+            log_file = self.log_file, 
+            log_identifier = log_identifier
+        )
     
 #            self.Prior = Distributions.MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the simulator
 	  
-        log_identifier=str("QML "+str(self.ModelID))
         self.GenSimModel = gsi.GenSimQMD_IQLE(
             oplist=self.SimOpList, modelparams=self.SimParams, 
             true_oplist=self.TrueOpList, trueparams=self.TrueParams,
@@ -331,6 +374,14 @@ class ModelLearningClass():
         self.update_cumulative_time = 0
         
         for istep in range(self.NumExperiments):
+            if (istep%300 == 0):
+                # print so we can see how far along algorithm is. 
+                self.log_print(
+                    [
+                    "Experiment", istep
+                    ]
+                )
+
             self.Experiment =  self.Heuristic()
             print_loc(global_print_loc)
             self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
@@ -698,7 +749,7 @@ class reducedModel():
             name = self.Name,
             growth_generator = qmd_info['growth_generator']
         )
-        self.NumQubits = DB.get_num_qubits(self.Name)
+        self.NumQubits = DataBase.get_num_qubits(self.Name)
         self.HostName = host_name
         self.PortNumber = port_number
         self.Q_id = qid
@@ -1054,7 +1105,7 @@ class modelClassForRemoteBayesFactor():
         self.Q_id = qid
 
         self.Name = learned_model_info['name']
-        op = DB.operator(self.Name)
+        op = DataBase.operator(self.Name)
         self.SimOpList = op.constituents_operators # todo, put this in a lighter function
         self.Times = learned_model_info['times']
         self.FinalParams = learned_model_info['final_params'] 

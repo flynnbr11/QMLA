@@ -2617,3 +2617,92 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
 
     if save_to_file is not None:
         fig.savefig(save_to_file, bbox_inches='tight')
+
+
+
+#### 
+## Standalone function to redraw expectation values
+## of QHL given the params_dict it learned, and 
+## the path to the dict of true expectation values
+## it was emulating
+
+def replot_expectation_values(
+    params_dictionary_list, # list of params_dicts 
+    true_expec_vals_path,
+    plot_probe_path, 
+    growth_generator,
+    measurement_method = 'full_access',
+    upper_x_limit=None,
+    model_descriptions=None, 
+    save_to_file=None
+):
+    sim_colours = ['b', 'g', 'c', 'y', 'm',  'k']
+    plot_probes = pickle.load(open(plot_probe_path, 'rb'))
+    # true_expec_vals_path = str(
+    #     directory_name + 'true_expec_vals.p'
+    # )
+    print(
+        "Reconstructed QHL with expectation value method:", 
+        measurement_method
+    )
+    true_exp_vals = pickle.load(open(true_expec_vals_path, 'rb'))
+    exp_times = sorted(list(true_exp_vals.keys()))
+    
+    sim_times = exp_times
+    if (
+        upper_x_limit is not None 
+        and
+        upper_x_limit  > max(exp_times)
+    ):
+        additional_sim_times = np.linspace(max(exp_times), upper_x_limit, 30 )
+        sim_times.extend(additional_sim_times)
+        sim_times = sorted(sim_times)
+    
+    if type(params_dictionary_list) == dict:
+        params_dictionary_list = [params_dictionary_list]
+    
+    for params_dict in params_dictionary_list:
+        sim_ops_names = list(params_dict.keys())
+        sim_params = [params_dict[k] for k in sim_ops_names]
+        sim_ops = [DataBase.compute(k) for k in sim_ops_names]
+        sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
+
+        sim_num_qubits = DataBase.get_num_qubits(sim_ops_names[0])
+        p_str=''
+        for i in range(2):
+            p_str+='P'
+        probe = plot_probes[sim_num_qubits]
+
+        sim_exp_vals = {}
+        for t in sim_times:
+            sim_exp_vals[t] = UserFunctions.expectation_value_wrapper(
+                method=measurement_method, 
+                ham=sim_ham, 
+                state = probe, 
+                t = t
+            )
+
+        sim_exp = [sim_exp_vals[t] for t in sim_times]
+        list_id = params_dictionary_list.index(params_dict)
+        sim_colour = sim_colours[list_id % len(sim_colours)]
+        if model_descriptions is not None:
+            model_label = model_descriptions[list_id]
+        else:
+            sim_op_string = p_str.join(sim_ops_names)
+            latex_name = UserFunctions.get_latex_name(
+                name=sim_op_string, 
+                growth_generator=growth_generator
+            )
+            model_label = latex_name
+            
+        plt.plot(sim_times, sim_exp, label=model_label, color=sim_colour)
+    
+    true_exp = [true_exp_vals[t] for t in exp_times]    
+    plt.scatter(exp_times, true_exp, label='True', color='red', s=3)
+    plt.xlim(0,upper_x_limit)
+    plt.legend(loc=1)
+    
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+    else:
+        plt.show()

@@ -71,7 +71,9 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, oplist, modelparams, probecounter=None, 
+    def __init__(self, 
+        oplist, modelparams, 
+        probecounter=None, 
         use_time_dep_true_model = False,
         time_dep_true_params = None,
         num_time_dep_true_params = 0,

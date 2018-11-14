@@ -74,15 +74,15 @@ def NV_centre_ising_probes_plus(
     
     if minimum_tolerable_noise  > noise_level:
         noise_level = minimum_tolerable_noise
-        print("using minimum_tolerable_noise")
+        # print("using minimum_tolerable_noise")
     plus_state = np.array([1+0j, 1])/np.sqrt(2)
     random_noise = noise_level * random_probe(1)    
     noisy_plus = plus_state + random_noise
 
     norm_factor = np.linalg.norm(noisy_plus)
     noisy_plus = noisy_plus/norm_factor
-    print("\n\t noisy plus:", noisy_plus )
-    print("\n\t has type:", type(noisy_plus))
+    # print("\n\t noisy plus:", noisy_plus )
+    # print("\n\t has type:", type(noisy_plus))
     
     seperable_probes = {}
     for i in range(num_probes):
