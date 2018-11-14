@@ -208,7 +208,10 @@ class GlobalVariablesClass():
         self.plot_probe_file = arguments.plot_probe_file
         self.latex_mapping_file = arguments.latex_mapping_file
         self.reallocate_resources = arguments.reallocate_resources
-        # self.
+        self.param_min = arguments.param_min
+        self.param_max = arguments.param_max
+        self.param_mean = arguments.param_mean
+        self.param_sigma = arguments.param_sigma
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'

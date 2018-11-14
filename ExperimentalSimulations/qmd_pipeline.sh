@@ -6,23 +6,22 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=6
-exp=3
+prt=500
+exp=100
 pgh=0.5
 ra=0.8
 rt=0.5
-gaussian=0
 
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=1
+exp_data=0
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
@@ -117,12 +116,18 @@ prior_pickle_file="$long_dir/prior.p"
 true_params_pickle_file="$long_dir/true_params.p"
 plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
+gaussian=1
 param_min=0
 param_max=1
 param_mean=0.5
 param_sigma=0.25
-rand_true_params=1
-rand_prior=0
+rand_true_params=0
+# rand_prior:
+# if set to False (0), then uses any params specically 
+# set in SetQHLParams dictionaries.
+# All undefined params will be random according 
+# to above defined mean/sigmas
+rand_prior=0 
 special_probe='random' #'plus' #'ideal'
 if (( "$exp_data" == 1))
 then
@@ -154,6 +159,7 @@ latex_mapping_file=$long_dir$latex_mapping_filename
 reallocate_resources=0
 
 
+
 for prt in  "${particle_counts[@]}";
 do
     for i in `seq 1 $max_qmd_id`;
@@ -172,6 +178,8 @@ do
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
+            -pmin=$param_min -pmax=$param_max \
+            -pmean=$param_mean -psigma=$param_sigma \
             -ds=$dataset -dst=$data_max_time \
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \

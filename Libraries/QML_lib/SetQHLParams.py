@@ -95,12 +95,6 @@ set_true_params = {
 	'xTi' : 0.7538085315,
 	'yTi' : 8.4442484,
 	'zTi' : 5.713337168736279,
-	'xTx' : 1.9632210928717253,
-	'yTy' : 2.7435186090389045,
-	'zTz' : 2.43632654,
-	'xTy' : 1.6,
-	'xTz' : 1.7,
-	'yTz' : 1.8,
 }
 
 
@@ -178,21 +172,14 @@ def create_qhl_params(
 
 	true_params_dict = {}
 
-	if random_vals is True:
-		for term in terms:
-			val = random.uniform( rand_min, rand_max) 
-			true_params.append( val )
-			true_params_dict[term] = val
+	for term in terms:
+		try:
+			this_true_param = set_true_params[term]
+		except:
+			this_true_param = random.uniform( rand_min, rand_max)
 
-	else:
-		for term in terms:
-			try:
-				this_true_param = set_true_params[term]
-			except:
-				this_true_param = random.uniform( rand_min, rand_max)
-
-			true_params.append( this_true_param )
-			true_params_dict[term] = this_true_param
+		true_params.append( this_true_param )
+		true_params_dict[term] = this_true_param
 			
 	true_params_info = {
 		'params_list' : true_params,
@@ -421,6 +408,8 @@ if arguments.prior_file is not None:
 		gaussian = gaussian, 
 		pickle_file = arguments.prior_file,
 		random_vals = random_prior, 
+		rand_min=param_min, 
+		rand_max=param_max,
 		exp_data=exp_data
 	)
 

@@ -100,56 +100,9 @@ class QMD():
         prior_specific_terms = None, 
         qle=None,   
         **kwargs
-#### global variables parameters
-        # qhl_test = False,
-        # num_particles= 300,
-        # num_experiments = 50,
-        # num_times_for_bayes_updates = 'all',
-        # bayes_lower = 1, 
-        # bayes_upper = 100,
-        # resample_threshold = 0.5,
-        # resampler_a = 0.95,
-        # pgh_prefactor = 1.0,
-        # qle = True, # Set to False for IQLE
-        # gaussian=True,
-        # prior_specific_terms = None,
-        # measurement_type='full_access',
-        # use_experimental_data = False,
-        # use_rq=True, 
-        # growth_generator='simple_ising',
-        # q_id = 0, # id for QMD instance to keep concurrent QMDs distinct on cluster
-        # host_name='localhost',
-        # port_number = 6379,
-        # rq_timeout=36000,
-        # latex_mapping_file='LatexMapping.txt',
-        # plot_probes_path=None,
-        # reallocate_resources=False, 
-        # log_file = None
     ):
         self.GlobalVariables = global_variables
-        # TODO directly fill below into self._ variables, instead of this middle man step
         qhl_test = self.GlobalVariables.qhl_test
-        # num_particles=self.GlobalVariables.num_particles
-        # num_experiments = self.GlobalVariables.num_experiments
-        # num_times_for_bayes_updates = self.GlobalVariables.num_times_bayes
-        # bayes_lower = self.GlobalVariables.bayes_lower
-        # bayes_upper = self.GlobalVariables.bayes_upper
-        # resample_threshold = self.GlobalVariables.resample_threshold
-        # resampler_a = self.GlobalVariables.resample_a
-        # pgh_prefactor = self.GlobalVariables.pgh_factor
-        # gaussian = self.GlobalVariables.gaussian
-        # measurement_type = self.GlobalVariables.measurement_type
-        # use_experimental_data = self.GlobalVariables.use_experimental_data
-        # use_rq = self.GlobalVariables.use_rq
-        # growth_generator = self.GlobalVariables.growth_generation_rule
-        # q_id = self.GlobalVariables.qmd_id
-        # host_name = self.GlobalVariables.host_name
-        # port_number = self.GlobalVariables.port_number
-        # rq_timeout = self.GlobalVariables.rq_timeout
-        # latex_mapping_file = self.GlobalVariables.latex_mapping_file
-        # plot_probes_path = self.GlobalVariables.plot_probe_file
-        # reallocate_resources = self.GlobalVariables.reallocate_resources
-        # log_file = self.GlobalVariables.log_file
 
         self.StartingTime = time.time()
         self.Q_id = self.GlobalVariables.qmd_id
@@ -429,6 +382,10 @@ class QMD():
             'model_priors' : model_priors,
             'base_resources' : self.BaseResources,
             'reallocate_resources' : self.ReallocateResources,
+            'param_min' : self.GlobalVariables.param_min, 
+            'param_max' : self.GlobalVariables.param_max, 
+            'param_mean' : self.GlobalVariables.param_mean, 
+            'param_sigma' : self.GlobalVariables.param_sigma             
         }
         self.log_print(
             ["Initial op list:", self.InitialOpList]
