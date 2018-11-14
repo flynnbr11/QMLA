@@ -126,36 +126,37 @@ class QMD():
         # reallocate_resources=False, 
         # log_file = None
     ):
-
-        qhl_test = global_variables.qhl_test
-        num_particles=global_variables.num_particles
-        num_experiments = global_variables.num_experiments
-        num_times_for_bayes_updates = global_variables.num_times_bayes
-        bayes_lower = global_variables.bayes_lower
-        bayes_upper = global_variables.bayes_upper
-        resample_threshold = global_variables.resample_threshold
-        resampler_a = global_variables.resample_a
-        pgh_prefactor = global_variables.pgh_factor
-        gaussian = global_variables.gaussian
-        measurement_type = global_variables.measurement_type
-        use_experimental_data = global_variables.use_experimental_data
-        use_rq = global_variables.use_rq
-        growth_generator = global_variables.growth_generation_rule
-        q_id = global_variables.qmd_id
-        host_name = global_variables.host_name
-        port_number = global_variables.port_number
-        rq_timeout = global_variables.rq_timeout
-        latex_mapping_file = global_variables.latex_mapping_file
-        plot_probes_path = global_variables.plot_probe_file
-        reallocate_resources = global_variables.reallocate_resources
-        log_file = global_variables.log_file
+        self.GlobalVariables = global_variables
+        # TODO directly fill below into self._ variables, instead of this middle man step
+        qhl_test = self.GlobalVariables.qhl_test
+        # num_particles=self.GlobalVariables.num_particles
+        # num_experiments = self.GlobalVariables.num_experiments
+        # num_times_for_bayes_updates = self.GlobalVariables.num_times_bayes
+        # bayes_lower = self.GlobalVariables.bayes_lower
+        # bayes_upper = self.GlobalVariables.bayes_upper
+        # resample_threshold = self.GlobalVariables.resample_threshold
+        # resampler_a = self.GlobalVariables.resample_a
+        # pgh_prefactor = self.GlobalVariables.pgh_factor
+        # gaussian = self.GlobalVariables.gaussian
+        # measurement_type = self.GlobalVariables.measurement_type
+        # use_experimental_data = self.GlobalVariables.use_experimental_data
+        # use_rq = self.GlobalVariables.use_rq
+        # growth_generator = self.GlobalVariables.growth_generation_rule
+        # q_id = self.GlobalVariables.qmd_id
+        # host_name = self.GlobalVariables.host_name
+        # port_number = self.GlobalVariables.port_number
+        # rq_timeout = self.GlobalVariables.rq_timeout
+        # latex_mapping_file = self.GlobalVariables.latex_mapping_file
+        # plot_probes_path = self.GlobalVariables.plot_probe_file
+        # reallocate_resources = self.GlobalVariables.reallocate_resources
+        # log_file = self.GlobalVariables.log_file
 
         self.StartingTime = time.time()
-        self.Q_id = q_id
-        self.HostName = host_name
-        self.PortNumber = port_number
-        if log_file is not None:
-            self.log_file = log_file
+        self.Q_id = self.GlobalVariables.qmd_id
+        self.HostName = self.GlobalVariables.host_name
+        self.PortNumber = self.GlobalVariables.port_number
+        if self.GlobalVariables.log_file is not None:
+            self.log_file = self.GlobalVariables.log_file
         else:
             self.log_file = str('QMD_'+str(q_id)+'.log')
         
@@ -181,7 +182,7 @@ class QMD():
             'num_qubits' : base_num_qubits, 
             'num_terms' : base_num_terms
         }
-        self.ReallocateResources = reallocate_resources
+        self.ReallocateResources = self.GlobalVariables.reallocate_resources
         # print("[QMD] Base resources: ", self.BaseResources)
 
         self.TrueOpList = trueOp.constituents_operators
@@ -205,25 +206,25 @@ class QMD():
             self.TrueParamDict[op_name] = param        
         
         self.MaxModNum = max_num_models #TODO: necessary?
-        print("[QMD] Gaussian:", gaussian)
-        self.gaussian = gaussian
+        self.gaussian = self.GlobalVariables.gaussian
+        print("[QMD] Gaussian:", self.gaussian)
         self.NumModels = len(initial_op_list)
-        self.NumParticles = num_particles
-        self.NumExperiments = num_experiments
+        self.NumParticles = self.GlobalVariables.num_particles
+        self.NumExperiments = self.GlobalVariables.num_experiments
         self.MaxQubitNumber = max_num_qubits
-        self.NumTimesForBayesUpdates = num_times_for_bayes_updates
-        self.BayesLower = bayes_lower
-        self.BayesUpper = bayes_upper
-        self.ResampleThreshold = resample_threshold
-        self.ResamplerA = resampler_a
-        self.PGHPrefactor = pgh_prefactor
+        self.NumTimesForBayesUpdates = self.GlobalVariables.num_times_bayes
+        self.BayesLower = self.GlobalVariables.bayes_lower
+        self.BayesUpper = self.GlobalVariables.bayes_upper
+        self.ResampleThreshold = self.GlobalVariables.resample_threshold
+        self.ResamplerA = self.GlobalVariables.resample_a
+        self.PGHPrefactor = self.GlobalVariables.pgh_factor
         self.BayesTimeBinning = bayes_time_binning 
         self.StoreParticlesWeights = store_particles_weights
         self.QHL_plots = qhl_plots
         self.ResultsDirectory = results_directory
         if not self.ResultsDirectory.endswith('/'):
             self.ResultsDirectory += '/'
-        self.LatexMappingFile = latex_mapping_file
+        self.LatexMappingFile = self.GlobalVariables.latex_mapping_file
 
         self.NumProbes = num_probes
         if probe_dict is None:
@@ -258,8 +259,8 @@ class QMD():
         self.BranchModelIds = {0 : list(range(len(self.InitialOpList)))}
         self.InterBranchChampions = {}
         self.GlobalEpoch = 0 
-        self.MeasurementType = measurement_type
-        self.UseExperimentalData = use_experimental_data
+        self.MeasurementType = self.GlobalVariables.measurement_type
+        self.UseExperimentalData = self.GlobalVariables.use_experimental_data
         self.ExperimentalMeasurements = experimental_measurements
         if self.ExperimentalMeasurements is not None:
             self.ExperimentalMeasurementTimes = (
@@ -304,7 +305,7 @@ class QMD():
         self.BranchBayesComputed[0] = False
         self.BayesFactorsComputed = []
         self.ModelNameIDs = {}
-        self.GrowthGenerator = growth_generator
+        self.GrowthGenerator = self.GlobalVariables.growth_generation_rule
         self.SpawnDepth = 0
         self.NumModelsPerBranch = {0:len(self.InitialOpList)}
         self.NumModelPairsPerBranch = {
@@ -313,8 +314,8 @@ class QMD():
         self.BranchAllModelsLearned = { 0 : False}
         self.BranchComparisonsComplete = {0 : False}
         self.BranchNumModelsPreComputed = {0 : 0}
-        self.use_rq = use_rq
-        self.rq_timeout = rq_timeout
+        self.use_rq = self.GlobalVariables.use_rq
+        self.rq_timeout = self.GlobalVariables.rq_timeout
         self.rq_log_file = self.log_file
         self.write_log_file = open(self.log_file, 'a')
         # self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(
@@ -391,7 +392,7 @@ class QMD():
             '}$'
             )
         self.LatexConfig = latex_config
-        self.PlotProbeFile = plot_probes_path
+        self.PlotProbeFile = self.GlobalVariables.plot_probe_file
         self.QMDInfo = {
             # may need to take copies of these in case pointers accross nodes break
             'num_probes' : self.NumProbes,

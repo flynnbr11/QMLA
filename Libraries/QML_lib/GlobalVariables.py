@@ -208,6 +208,7 @@ class GlobalVariablesClass():
         self.plot_probe_file = arguments.plot_probe_file
         self.latex_mapping_file = arguments.latex_mapping_file
         self.reallocate_resources = arguments.reallocate_resources
+        # self.
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -563,94 +564,9 @@ def parse_cmd_line_args(args):
     # Process arguments from command line
     arguments = parser.parse_args(args)
     
-    # true_operator = arguments.true_operator
-    # qhl_test = bool(arguments.qhl_test)
-    # further_qhl = bool(arguments.further_qhl)
-    # do_iqle = bool(arguments.do_iqle)
-    # do_qle = bool(arguments.do_qle)
-    # use_rq = bool(arguments.use_rq)
-    # num_runs = arguments.num_runs
-    # num_tests = arguments.num_tests
-    # num_qubits = arguments.num_qubits
-    # num_parameters = arguments.num_parameters
-    # num_experiments = arguments.num_experiments
-    # num_particles = arguments.num_particles
-    # num_times_bayes = arguments.bayes_times
-    # if num_times_bayes > num_experiments:
-    #     num_times_bayes = num_experiments-1
-    # bayes_upper = arguments.bayes_upper
-    # bayes_lower = arguments.bayes_lower
-    # save_plots = bool(arguments.plots)
-    # gaussian = bool(arguments.gaussian)
-    # custom_prior = bool(arguments.custom_prior)
-    # resample_threshold = arguments.resample_threshold
-    # resample_a = arguments.resample_a
-    # pgh_factor = arguments.pgh_factor
-    # qmd_id = arguments.qmd_id
-    # host_name = arguments.host_name
-    # port_number = arguments.port_number
-    # results_directory = arguments.results_directory
-    # pickle_qmd_class = bool(arguments.pickle_result_class)
-    # rq_timeout = arguments.rq_timeout
-    # log_file = arguments.log_file
-    # cumulative_csv = arguments.cumulative_csv
-    # experimental_data = bool(arguments.experimental_data)
-    # measurement_type = arguments.measurement_type
-    # dataset = arguments.dataset
-    # data_max_time = arguments.data_max_time    
-    # data_time_offset = arguments.data_time_offset
-    # growth_generation_rule = arguments.growth_generation_rule
-    # prior_pickle_file = arguments.prior_pickle_file
-    # true_params_pickle_file = arguments.true_params_pickle_file
-    # true_expec_path = arguments.true_expec_path
-    # plot_probe_file = arguments.plot_probe_file
-    # latex_mapping_file = arguments.latex_mapping_file
-    # reallocate_resources = bool(arguments.reallocate_resources)
-
     # Use arguments to initialise global variables class. 
     global_variables = GlobalVariablesClass(
         arguments,
-        # true_operator = true_operator,
-        # qhl_test = qhl_test, 
-        # further_qhl = further_qhl,
-        # do_iqle = do_iqle,
-        # do_qle = do_qle,
-        # use_rq = use_rq,
-        # num_runs = num_runs,
-        # num_tests = num_tests,
-        # num_qubits = num_qubits,
-        # num_parameters = num_parameters,
-        # num_experiments = num_experiments,
-        # num_particles = num_particles,
-        # num_times_bayes = num_times_bayes,
-        # bayes_lower = bayes_lower, 
-        # bayes_upper = bayes_upper, 
-        # resample_threshold = resample_threshold,
-        # resample_a = resample_a,
-        # pgh_factor = pgh_factor,
-        # gaussian = gaussian,
-        # custom_prior = custom_prior,
-        # qmd_id = qmd_id, 
-        # host_name = host_name,
-        # port_number = port_number,
-        # results_directory = results_directory,
-        # pickle_qmd_class = pickle_qmd_class,
-        # rq_timeout = rq_timeout,
-        # log_file = log_file,
-        # save_plots = save_plots,
-        # cumulative_csv = cumulative_csv,
-        # measurement_type = measurement_type,
-        # experimental_data = experimental_data,
-        # dataset = dataset,
-        # data_max_time = data_max_time,
-        # data_time_offset = data_time_offset,
-        # growth_generation_rule = growth_generation_rule,
-        # prior_pickle_file = prior_pickle_file,
-        # true_params_pickle_file = true_params_pickle_file,
-        # true_expec_path = true_expec_path,
-        # plot_probe_file = plot_probe_file,
-        # latex_mapping_file = latex_mapping_file,
-        # reallocate_resources = reallocate_resources,
     )
 
     args_dict = vars(arguments)

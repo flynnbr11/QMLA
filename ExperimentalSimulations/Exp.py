@@ -308,28 +308,6 @@ qmd = QMD(
     use_exp_custom=True, 
     compare_linalg_exp_tol=None,
     prior_specific_terms = prior_specific_terms,    
-    # qhl_test = global_variables.qhl_test, 
-    # num_particles=global_variables.num_particles,
-    # num_experiments = global_variables.num_experiments, 
-    # num_times_for_bayes_updates = global_variables.num_times_bayes,
-    # bayes_lower = global_variables.bayes_lower,
-    # bayes_upper = global_variables.bayes_upper,
-    # resample_threshold = global_variables.resample_threshold,
-    # resampler_a = global_variables.resample_a, 
-    # pgh_prefactor = global_variables.pgh_factor,
-    # gaussian = global_variables.gaussian, 
-    # measurement_type = global_variables.measurement_type,
-    # use_experimental_data = global_variables.use_experimental_data,
-    # use_rq = global_variables.use_rq,
-    # growth_generator = global_variables.growth_generation_rule,
-    # q_id = global_variables.qmd_id,
-    # host_name = global_variables.host_name,
-    # port_number = global_variables.port_number,
-    # rq_timeout = global_variables.rq_timeout,
-    # latex_mapping_file = global_variables.latex_mapping_file,
-    # plot_probes_path = global_variables.plot_probe_file,
-    # reallocate_resources = global_variables.reallocate_resources, 
-    # log_file = global_variables.log_file
 )
 
 if global_variables.qhl_test:
