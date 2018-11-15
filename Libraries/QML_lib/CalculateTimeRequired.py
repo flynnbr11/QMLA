@@ -130,6 +130,7 @@ max_num_models_by_shape['deterministic_transverse_ising_nn_fixed_axis'] = {
 	2 : 3, 
 	3 : 3, 
 	4 : 3,
+	5 : 3,
 	'other' : 3 # not sure this is right?
 }
 
