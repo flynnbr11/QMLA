@@ -126,6 +126,10 @@ max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
 
 
 max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
+	1 : 3, 
+	2 : 3, 
+	3 : 3, 
+	4 : 3,
 	'other' : 3 # not sure this is right?
 }
 
