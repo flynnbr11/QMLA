@@ -125,6 +125,11 @@ max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
 }
 
 
+max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
+	'other' : 3 # not sure this is right?
+}
+
+
 # Hamiltonian exponentiation times from testing qutips
 # expm function 100 times for each qubit size. 
 hamiltonian_exponentiation_times = {

@@ -1605,7 +1605,7 @@ def cumulativeQMDTreePlot(
     #         return_branch_dict='term_branch_dict'
     #     )       
     # )
-    print("entering model map func")
+    print("[cumulative Tree] entering model map func")
     term_branches = UserFunctions.get_name_branch_map(
         latex_mapping_file = latex_mapping_file,
         growth_generator = growth_generator
@@ -2636,6 +2636,12 @@ def replot_expectation_values(
     model_descriptions=None, 
     save_to_file=None
 ):
+    print("[replot] "
+        true_expec_vals_path = "true_expec_vals_path",
+        plot_probe_path = "plot_probe_path", 
+        growth_generator = "growth_generator",
+        measurement_method = "measurement_method",
+    )
     sim_colours = ['b', 'g', 'c', 'y', 'm',  'k']
     plot_probes = pickle.load(open(plot_probe_path, 'rb'))
     # true_expec_vals_path = str(
@@ -2677,9 +2683,11 @@ def replot_expectation_values(
 
     true_exp = [true_exp_vals[t] for t in exp_times]    
 
+    print("[replot] plotted", model_label)
 
     for params_dict in params_dictionary_list:
         ax = axes[row,col]
+        print("[replot] row,col=", row, col)
 
         sim_ops_names = list(params_dict.keys())
         sim_params = [
@@ -2721,7 +2729,7 @@ def replot_expectation_values(
         ax.plot(
             sim_times, 
             sim_exp, 
-            # label=model_label, 
+            label=model_label, 
             color=sim_colour
         )
         ax.set_title(model_label)
@@ -2733,6 +2741,7 @@ def replot_expectation_values(
             s=3
         )
         ax.set_xlim(0,upper_x_limit)
+        print("[replot] plotted", model_label)
 
         col += 1
         # if col == ncols and row == 0:
@@ -2864,7 +2873,6 @@ def cluster_results_and_plot(
     term_colours = {}
     for i in range(len(all_possible_params)):
         term_colours[all_possible_params[i]] = plot_colours[i]
-    print("term colours:", term_colours)
     total_num_clusters=0
     for c in clusters:
         total_num_clusters += len(clusters[c])
