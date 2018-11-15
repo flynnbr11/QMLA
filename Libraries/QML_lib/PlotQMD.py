@@ -2636,7 +2636,7 @@ def replot_expectation_values(
     model_descriptions=None, 
     save_to_file=None
 ):
-    print("[replot] "
+    print("[replot] ",
         "true_expec_vals_path", true_expec_vals_path,
         "plot_probe_path", plot_probe_path,  
         "growth_generator", growth_generator,
@@ -2682,8 +2682,6 @@ def replot_expectation_values(
     col = 0
 
     true_exp = [true_exp_vals[t] for t in exp_times]    
-
-    print("[replot] plotted", model_label)
 
     for params_dict in params_dictionary_list:
         ax = axes[row,col]
