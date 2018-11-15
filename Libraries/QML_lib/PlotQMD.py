@@ -2735,8 +2735,8 @@ def replot_expectation_values(
         ax.set_xlim(0,upper_x_limit)
 
         col += 1
-        if col == ncols and row == 0:
-            ax.legend(bbox_to_anchor=(1.25, 1.05))
+        # if col == ncols and row == 0:
+        ax.legend(loc=1)
         if col == ncols:
             col=0
             row+=1
@@ -2904,8 +2904,8 @@ def cluster_results_and_plot(
             col += 1
             # TODO add legend for all individual params/colours... 
             # single legend accross subplots??
-            if col == ncols and row == 0:
-                ax.legend(bbox_to_anchor=(1.1, 1.05))
+            # if col == ncols and row == 0:
+            ax.legend(loc=1)
             if col == ncols:
                 col=0
                 row+=1
