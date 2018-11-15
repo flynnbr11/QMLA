@@ -2637,10 +2637,10 @@ def replot_expectation_values(
     save_to_file=None
 ):
     print("[replot] "
-        true_expec_vals_path = "true_expec_vals_path",
-        plot_probe_path = "plot_probe_path", 
-        growth_generator = "growth_generator",
-        measurement_method = "measurement_method",
+        "true_expec_vals_path", true_expec_vals_path,
+        "plot_probe_path", plot_probe_path,  
+        "growth_generator", growth_generator,
+        "measurement_method", measurement_method
     )
     sim_colours = ['b', 'g', 'c', 'y', 'm',  'k']
     plot_probes = pickle.load(open(plot_probe_path, 'rb'))
