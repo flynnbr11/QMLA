@@ -2782,7 +2782,9 @@ def cluster_results_and_plot(
     for p_list in champions_params.values():
         all_possible_params.extend(p_list)
 
-    all_possible_params = list(set(list(all_possible_params)))
+    all_possible_params = list(
+        set(list(all_possible_params))
+    )
     clusters = {}
     params_for_clustering = {}
     # this_champ = unique_champions[0]
@@ -2802,7 +2804,9 @@ def cluster_results_and_plot(
         params_for_clustering[this_champ] = params
 
     for this_champ in unique_champions:
-        num_results_for_this_champ = len(all_learned_params[this_champ])
+        num_results_for_this_champ = len(
+            all_learned_params[this_champ]
+        )
         try:
             ms = MeanShift()
             ms.fit(params_for_clustering[this_champ])
@@ -2840,23 +2844,30 @@ def cluster_results_and_plot(
                 name=mod, 
                 growth_generator=growth_generator
             )
-            cluster_description = str(latex_mod_name + '(' +  str(j)+')')
+            cluster_description = str(
+                latex_mod_name + ' (' +  str(j)+')'
+            )
             all_clusters_params.append(single_cluster)
-            all_clusters_descriptions.append(cluster_description)
+            all_clusters_descriptions.append(
+                cluster_description
+            )
             clusters_by_model[mod][cluster_description] = single_cluster
-            cluster_descriptions_by_model[mod].append(cluster_description)    
+            cluster_descriptions_by_model[mod].append(
+                cluster_description
+            )    
 
-    cm_subsection = np.linspace(0,0.8,len(all_possible_params))
+    cm_subsection = np.linspace(
+        0,0.8,len(all_possible_params)
+    )
     plot_colours = [ cm.Paired(x) for x in cm_subsection ]
 
     term_colours = {}
     for i in range(len(all_possible_params)):
         term_colours[all_possible_params[i]] = plot_colours[i]
-
+    print("term colours:", term_colours)
     total_num_clusters=0
     for c in clusters:
         total_num_clusters += len(clusters[c])
-
 
     ncols = int(np.ceil(np.sqrt(total_num_clusters)))
     nrows = int(np.ceil(total_num_clusters/ncols))
@@ -2870,25 +2881,29 @@ def cluster_results_and_plot(
     row = 0
     col = 0
     axes_so_far = 0
-    plot_idx=0
 
     # from here below has to be put on an array layout
     for mod in sorted(clusters_by_model):
-
-        for cluster_description in sorted(list(clusters_by_model[mod].keys())):
+        for cluster_description in sorted(
+            list(clusters_by_model[mod].keys())
+        ):
             cluster = clusters_by_model[mod][cluster_description]
             ax = axes[row,col]
-            plot_idx += 1
-
             for term in sorted(cluster.keys()):
                 label = UserFunctions.get_latex_name(
                     name = term, 
                     growth_generator = growth_generator
                 )
-                ax.axhline(cluster[term], label=label, color=term_colours[term])
+                ax.axhline(
+                    cluster[term], 
+                    label=label, 
+                    color=term_colours[term]
+                )
                 ax.set_title(cluster_description)
 
             col += 1
+            # TODO add legend for all individual params/colours... 
+            # single legend accross subplots??
             if col == ncols and row == 0:
                 ax.legend(bbox_to_anchor=(1.1, 1.05))
             if col == ncols:
@@ -2897,7 +2912,10 @@ def cluster_results_and_plot(
                 
                 
     if save_param_clusters_to_file is not None:
-        plt.savefig(save_param_clusters_to_file, bbox_to_inches='tight')
+        plt.savefig(
+            save_param_clusters_to_file, 
+            bbox_to_inches='tight'
+        )
 
     replot_expectation_values(
         params_dictionary_list = all_clusters_params, # list of params_dicts 

@@ -1408,7 +1408,7 @@ elif further_qhl_mode == False:
             plot_probe_path = plot_probe_file, 
             growth_generator = growth_generator, 
             measurement_type = arguments.measurement_type, 
-            save_param_clusters_to_file = str(plot_desc + 'clusters.png'),
+            save_param_clusters_to_file = str(plot_desc + 'clusters_params.png'),
             save_redrawn_expectation_values = str(plot_desc + 'clusters_expec_vals.png')
         )
     except:
