@@ -12,73 +12,16 @@ def MAX_PARAM():
 	return -50
 
 ### SET VALUES HERE ###
-# set_prior_specific_terms = {
-# 	'xTi' : [3.0, 2.0], # TODO Broaden, testing with small dist
-# 	'yTi' : [3.0, 2.0],
-# 	'zTi' : [3.0, 2.0],
-# 	'xTx' : [-3.0, 2.0], # true value 2.7
-# 	'yTy' : [-3.0, 2.0], # true value 2.7
-# 	'zTz' : [-3.0, 2.0], # true value 2.14
-# 	'xTy' : [3.0, 2.0],
-# 	'xTz' : [3.0, 2.0],
-# 	'yTz' : [3.0, 2.0],
-# }
-
-# from results of long QHL, Oct_01/12_08
-# 22:48:8 [QML 3] Final Parameters mean and stdev (term  xTi ): [ 0.17888641  0.02239774]
-# 22:48:8 [QML 3] Final Parameters mean and stdev (term  yTi ): [ 5.50795523  0.0623826 ]
-# 22:48:8 [QML 3] Final Parameters mean and stdev (term  zTi ): [ 0.60514502  0.12197497]
-# 22:48:8 [QML 3] Final Parameters mean and stdev (term  xTx ): [-2.98859264  0.12430515]
-# 22:48:8 [QML 3] Final Parameters mean and stdev (term  yTy ): [-0.02375341  0.00765409]
-# 22:48:8 [QML 3] Final Parameters mean and stdev (term  zTz ): [-0.27888531  0.0200708 ]
-
-# results from QHL previous run which led us to think about kHz params for hyperfine.. (email to Seb 12 Sep 18)
-"""
-set_prior_specific_terms = {
-	'xTi' : [ 0.17 , 2.0], # TODO Broaden, testing with small dist
-	'yTi' : [ 0.77 , 2.0 ],
-	'zTi' : [ -0.08 , 2.0],
-	'xTx' : [-0.05 , 1.5], # true value 2.7
-	'yTy' : [0.08 , 1.5], # true value 2.7
-	'zTz' : [-3.9 , 1.5 ], # true value 2.14
-	'xTy' : [3.0, 2.0],
-	'xTz' : [3.0, 2.0],
-	'yTz' : [3.0, 2.0],
-}
-set_prior_specific_terms = {
-	'xTi' : [ 0.5 , 1.5], # TODO Broaden, testing with small dist
-	'yTi' : [ 0.5, 1.5 ],
-	'zTi' : [ 0.5, 1.5],
-	'xTx' : [-2.7, 0.2], # true value 2.7
-	'yTy' : [-2.7, 0.2], # true value 2.7
-	'zTz' : [-2.1, 0.2], # true value 2.14
-	'xTy' : [3.0, 2.0],
-	'xTz' : [3.0, 2.0],
-	'yTz' : [3.0, 2.0],
-}
-set_prior_specific_terms = {
-	'xTi' : [ 0 , 1.0], # TODO Broaden, testing with small dist
-	'yTi' : [ 0 , 1.0 ],
-	'zTi' : [ 0 , 1.0],
-	'xTx' : [0 , 1.0], # true value 2.7
-	'yTy' : [0, 1.0], # true value 2.7
-	'zTz' : [0 , 1.0 ], # true value 2.14
-	'xTy' : [3.0, 2.0],
-	'xTz' : [3.0, 2.0],
-	'yTz' : [3.0, 2.0],
-}
-"""
-# random set generated using random.uniform(-10, 10) for purposes of QHL tests
 set_normal_prior_specific_terms = {
-	'xTi' : [ 1.0, 2.0 ], # TODO Broaden, testing with small dist
-	'yTi' : [ 2.0, 2.0 ],
-	'zTi' : [ 3.0, 2.0 ],
-	'xTx' : [4.0, 2.0], # true value 2.7
-	'yTy' : [5.0, 2.0], # true value 2.7
-	'zTz' : [6.0, 2.0 ], # true value 2.14
-	'xTy' : [5.0, 2.0],
-	'xTz' : [5.0, 2.0],
-	'yTz' : [5.0, 2.0],
+	# 'xTi' : [ 1.0, 2.0 ], # TODO Broaden, testing with small dist
+	# 'yTi' : [ 2.0, 2.0 ],
+	# 'zTi' : [ 3.0, 2.0 ],
+	# 'xTx' : [4.0, 2.0], # true value 2.7
+	# 'yTy' : [5.0, 2.0], # true value 2.7
+	# 'zTz' : [6.0, 2.0 ], # true value 2.14
+	# 'xTy' : [5.0, 2.0],
+	# 'xTz' : [5.0, 2.0],
+	# 'yTz' : [5.0, 2.0],
 	'x' : [5.0, 2.0],
 	'z' : [5.0, 2.0],
 	'y' : [5.0, 2.0]
@@ -91,7 +34,6 @@ set_uniform_prior_specific_terms = {
 }
 
 set_true_params = {
-
 	'xTi' : 0.7538085315,
 	'yTi' : 8.4442484,
 	'zTi' : 5.713337168736279,

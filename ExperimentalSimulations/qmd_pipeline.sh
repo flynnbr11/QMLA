@@ -6,14 +6,14 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=500
-exp=100
+prt=10
+exp=3
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -117,8 +117,8 @@ true_params_pickle_file="$long_dir/true_params.p"
 plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 gaussian=1
-param_min=0
-param_max=1
+param_min=10
+param_max=15
 param_mean=0.5
 param_sigma=0.25
 rand_true_params=0
@@ -140,12 +140,12 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \
     -prior=$prior_pickle_file \
     -probe=$plot_probe_file \
-    -g=$gaussian \
     -plus=$force_plot_plus \
     -sp=$special_probe \
     -ggr=$growth_rule \
     -op=$true_operator \
     -exp=$exp_data \
+    -g=$gaussian \
     -min=$param_min \
     -max=$param_max \
     -mean=$param_mean \
@@ -260,6 +260,7 @@ then
         -qhl=$qhl_test \
         -fqhl=1 \
         -ggr=$growth_rule \
+        -meas=$measurement_type \
         -exp=$exp_data \
         -true_expec=$true_expec_path \
         -plot_probes=$plot_probe_file \

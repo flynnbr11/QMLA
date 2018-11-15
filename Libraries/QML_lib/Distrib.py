@@ -44,7 +44,8 @@ def get_prior(
 
     log_print(
         [
-        "Getting prior. Specific terms:", specific_terms
+        "Getting prior for model:", model_name,
+        "Specific terms:", specific_terms
         ],
         log_file, 
         log_identifier
@@ -81,7 +82,9 @@ def get_prior(
     else:
         means = []
         sigmas = []
-        
+        # print("min/max:", param_minimum, param_maximum)
+        default_mean = np.mean([param_minimum, param_maximum])
+        default_sigma = default_mean/4 # TODO is this safe?        
         for term in individual_terms:
             if term in available_specific_terms:
                 means.append(specific_terms[term][0])
@@ -95,8 +98,10 @@ def get_prior(
                     print("rand mean:", rand_mean)
                     means.append(rand_mean)
                 else:
-                    means.append(param_normal_mean)
-                sigmas.append(param_normal_sigma)
+                    # means.append(param_normal_mean)
+                    means.append(default_mean)
+                # sigmas.append(param_normal_sigma)
+                sigmas.append(default_sigma)
                 
         means = np.array(means)
         sigmas = np.array(sigmas)

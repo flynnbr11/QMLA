@@ -1147,6 +1147,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
+  '-meas', '--measurement_type',
+  help='Which measurement type to use. Must be written in Evo.py.',
+  type=str,
+  default='full_access'
+)
+
+parser.add_argument(
     '-latex', '--latex_mapping_file',
     help='File path to save tuples which give model \
         string names and latex names.',
@@ -1389,6 +1396,24 @@ elif further_qhl_mode == False:
         )
     # except:
     #     print("Could not plot Multi QMD tree.")
+
+    try:
+
+        plot_desc
+
+
+        ptq.cluster_results_and_plot(
+            path_to_results = results_csv, 
+            true_expec_path = true_expec_path, 
+            plot_probe_path = plot_probe_file, 
+            growth_generator = growth_generator, 
+            measurement_type = arguments.measurement_type, 
+            save_param_clusters_to_file = str(plot_desc + 'clusters.png'),
+            save_redrawn_expectation_values = str(plot_desc + 'clusters_expec_vals.png')
+        )
+    except:
+        print("Failed to cluster and replot results.")
+        raise
 
 
 

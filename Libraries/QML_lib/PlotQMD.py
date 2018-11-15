@@ -2648,7 +2648,7 @@ def replot_expectation_values(
     true_exp_vals = pickle.load(open(true_expec_vals_path, 'rb'))
     exp_times = sorted(list(true_exp_vals.keys()))
     
-    sim_times = exp_times
+    sim_times = copy.copy(exp_times)
     if (
         upper_x_limit is not None 
         and
@@ -2661,10 +2661,33 @@ def replot_expectation_values(
     if type(params_dictionary_list) == dict:
         params_dictionary_list = [params_dictionary_list]
     
+
+    num_plots = len(params_dictionary_list)
+    ncols = int(np.ceil(np.sqrt(num_plots)))
+    nrows = int(np.ceil(num_plots/ncols))
+
+    fig, axes = plt.subplots(
+        figsize = (10, 7), 
+        nrows=nrows, 
+        ncols=ncols,
+        squeeze=False
+    )
+    row = 0
+    col = 0
+
+    true_exp = [true_exp_vals[t] for t in exp_times]    
+
+
     for params_dict in params_dictionary_list:
+        ax = axes[row,col]
+
         sim_ops_names = list(params_dict.keys())
-        sim_params = [params_dict[k] for k in sim_ops_names]
-        sim_ops = [DataBase.compute(k) for k in sim_ops_names]
+        sim_params = [
+            params_dict[k] for k in sim_ops_names
+        ]
+        sim_ops = [
+            DataBase.compute(k) for k in sim_ops_names
+        ]
         sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
 
         sim_num_qubits = DataBase.get_num_qubits(sim_ops_names[0])
@@ -2694,15 +2717,195 @@ def replot_expectation_values(
                 growth_generator=growth_generator
             )
             model_label = latex_name
-            
-        plt.plot(sim_times, sim_exp, label=model_label, color=sim_colour)
-    
-    true_exp = [true_exp_vals[t] for t in exp_times]    
-    plt.scatter(exp_times, true_exp, label='True', color='red', s=3)
-    plt.xlim(0,upper_x_limit)
-    plt.legend(loc=1)
+        
+        ax.plot(
+            sim_times, 
+            sim_exp, 
+            # label=model_label, 
+            color=sim_colour
+        )
+        ax.set_title(model_label)
+        ax.scatter(
+            exp_times, 
+            true_exp, 
+            label='True', 
+            color='red', 
+            s=3
+        )
+        ax.set_xlim(0,upper_x_limit)
+
+        col += 1
+        if col == ncols and row == 0:
+            ax.legend(bbox_to_anchor=(1.25, 1.05))
+        if col == ncols:
+            col=0
+            row+=1
+
+
+    # plt.legend(loc=1)
     
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
     else:
         plt.show()
+
+
+def cluster_results_and_plot(
+    path_to_results, # results_summary_csv to be clustered
+    true_expec_path,  
+    plot_probe_path,
+    growth_generator,
+    measurement_type,
+    upper_x_limit=None, 
+    save_param_clusters_to_file=None, 
+    save_redrawn_expectation_values=None, 
+):
+    from matplotlib import cm
+    results_csv = pd.read_csv(path_to_results)
+    unique_champions = list(
+        set(list(results_csv['NameAlphabetical']))
+    )
+
+    all_learned_params = {}
+    champions_params = {}
+
+    for i in range(len(unique_champions)):
+        champ = unique_champions[i]
+        all_learned_params[champ] = (
+            results_csv.loc[results_csv['NameAlphabetical']
+            ==champ]['LearnedParameters'].values
+        )
+        this_champs_params = sorted(list(eval(all_learned_params[champ][0]).keys()))
+        champions_params[champ] = this_champs_params
+
+    all_possible_params = []
+    for p_list in champions_params.values():
+        all_possible_params.extend(p_list)
+
+    all_possible_params = list(set(list(all_possible_params)))
+    clusters = {}
+    params_for_clustering = {}
+    # this_champ = unique_champions[0]
+    for this_champ in unique_champions:
+        num_results_for_this_champ = len(all_learned_params[this_champ])
+        params_this_champ = sorted(
+            list(eval(all_learned_params[this_champ][0]).keys())
+        )
+        params = np.empty([num_results_for_this_champ, len(champions_params[this_champ])])
+        for i in range(num_results_for_this_champ):
+            learned_param_dict = eval(all_learned_params[this_champ][i])
+            test_list = [i for i in champions_params[this_champ]]
+            params[i] = [ 
+                learned_param_dict[this_param] for this_param in champions_params[this_champ] 
+            ]
+
+        params_for_clustering[this_champ] = params
+
+    for this_champ in unique_champions:
+        num_results_for_this_champ = len(all_learned_params[this_champ])
+        try:
+            ms = MeanShift()
+            ms.fit(params_for_clustering[this_champ])
+            labels = ms.labels_
+            cluster_centers = ms.cluster_centers_
+
+            labels_unique = np.unique(labels)
+            n_clusters_ = len(labels_unique)
+
+            clusters[this_champ] = cluster_centers
+        except:
+            # NOTE: in case where clusters can't be formed, 
+            # that model is represented only by the first set of results..
+            # should they be averaged somehow?
+            clusters[this_champ] = np.array([params_for_clustering[this_champ][0]])
+
+    available_clustered_models = list(clusters.keys())
+    clustered_parameters_this_model = {}
+    clusters_by_model = {}
+    cluster_descriptions_by_model = {}
+    all_clusters_params = []
+    all_clusters_descriptions = []
+    for mod in available_clustered_models:
+        clusters_by_model[mod] = {}
+        cluster_descriptions_by_model[mod] = []
+        terms = champions_params[mod]
+        this_model_clusters = clusters[mod]
+
+        for j in range(len(this_model_clusters)): 
+            single_cluster = {}
+            for i in range(len(terms)):
+                single_cluster[terms[i]] = this_model_clusters[j][i]
+
+            latex_mod_name = UserFunctions.get_latex_name(
+                name=mod, 
+                growth_generator=growth_generator
+            )
+            cluster_description = str(latex_mod_name + '(' +  str(j)+')')
+            all_clusters_params.append(single_cluster)
+            all_clusters_descriptions.append(cluster_description)
+            clusters_by_model[mod][cluster_description] = single_cluster
+            cluster_descriptions_by_model[mod].append(cluster_description)    
+
+    cm_subsection = np.linspace(0,0.8,len(all_possible_params))
+    plot_colours = [ cm.Paired(x) for x in cm_subsection ]
+
+    term_colours = {}
+    for i in range(len(all_possible_params)):
+        term_colours[all_possible_params[i]] = plot_colours[i]
+
+    total_num_clusters=0
+    for c in clusters:
+        total_num_clusters += len(clusters[c])
+
+
+    ncols = int(np.ceil(np.sqrt(total_num_clusters)))
+    nrows = int(np.ceil(total_num_clusters/ncols))
+
+    fig, axes = plt.subplots(
+        figsize = (10, 7), 
+        nrows=nrows, 
+        ncols=ncols,
+        squeeze=False
+    )
+    row = 0
+    col = 0
+    axes_so_far = 0
+    plot_idx=0
+
+    # from here below has to be put on an array layout
+    for mod in sorted(clusters_by_model):
+
+        for cluster_description in sorted(list(clusters_by_model[mod].keys())):
+            cluster = clusters_by_model[mod][cluster_description]
+            ax = axes[row,col]
+            plot_idx += 1
+
+            for term in sorted(cluster.keys()):
+                label = UserFunctions.get_latex_name(
+                    name = term, 
+                    growth_generator = growth_generator
+                )
+                ax.axhline(cluster[term], label=label, color=term_colours[term])
+                ax.set_title(cluster_description)
+
+            col += 1
+            if col == ncols and row == 0:
+                ax.legend(bbox_to_anchor=(1.1, 1.05))
+            if col == ncols:
+                col=0
+                row+=1
+                
+                
+    if save_param_clusters_to_file is not None:
+        plt.savefig(save_param_clusters_to_file, bbox_to_inches='tight')
+
+    replot_expectation_values(
+        params_dictionary_list = all_clusters_params, # list of params_dicts 
+        model_descriptions = all_clusters_descriptions,
+        true_expec_vals_path = true_expec_path ,
+        plot_probe_path =plot_probe_path, 
+        growth_generator = growth_generator,
+        measurement_method = measurement_type,
+        upper_x_limit = upper_x_limit, # can play with this
+        save_to_file = save_redrawn_expectation_values
+    )                        
