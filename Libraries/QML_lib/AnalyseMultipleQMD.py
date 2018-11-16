@@ -1025,11 +1025,12 @@ def plot_scores(
         colours[true_idx] = 'green'
     except:
         print("True model", latex_true_op, "not in ", latex_model_names)
-        raise
-        # pass
+        # raise
+        pass
 
 
-    ax.barh(ind, scores, width, color="blue")
+    # ax.barh(ind, scores, width, color="blue")
+    ax.barh(ind, scores, width, color=colours)
     ax.set_yticks(ind+width/2)
     ax.set_yticklabels(latex_model_names, minor=False)
     
