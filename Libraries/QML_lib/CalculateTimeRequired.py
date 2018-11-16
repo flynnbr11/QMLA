@@ -97,6 +97,55 @@ parser.add_argument(
 
 max_num_models_by_shape = {}
 
+### 2 qubits Ising growth rules. as in experimental case. 
+
+max_num_models_by_shape['two_qubit_ising_rotation_hyperfine'] = {
+    1 : 0,
+    (2, 1) : 2,
+    (2, 2) : 2,
+    2 : 12,
+    'other' : 0
+}
+
+max_num_models_by_shape['two_qubit_ising_rotation'] = {
+    1 : 0,
+    (2, 1) : 2,
+    (2, 2) : 2,
+    2 : 12,
+    'other' : 0
+}
+
+
+max_num_models_by_shape['two_qubit_ising_rotation_hyperfine_transverse'] = {
+    1 : 0,
+    (2, 1) : 2,
+    (2, 2) : 2,
+    2 : 18,
+    'other' : 0
+}
+
+## More general Ising models
+
+# Noninteracting 
+max_num_models_by_shape['non_interacting_ising'] = {
+    # (number_qubits, number_terms) : max number of models with those dimensions
+    # number_qubits : max number models of any number terms not specifically given here
+    'other' : 1
+}
+
+max_num_models_by_shape['non_interacting_ising_single_axis'] = {
+    # (number_qubits, number_terms) : max number of models with those dimensions
+    # number_qubits : max number models of any number terms not specifically given here
+    'other' : 1
+}
+
+max_num_models_by_shape['deterministic_noninteracting_ising_single_axis'] = {
+    # (number_qubits, number_terms) : max number of models with those dimensions
+    # number_qubits : max number models of any number terms not specifically given here
+    'other' : 1
+}
+
+# Interacting Ising. interaction restricted to nearest neighbours
 max_num_models_by_shape['interacting_nearest_neighbour_ising'] = {
     # (number_qubits, number_terms) : max number of models with those dimensions
     # number_qubits : max number models of any number terms not specifically given here
@@ -107,12 +156,14 @@ max_num_models_by_shape['interacting_nearest_neighbour_ising'] = {
     'other' : 1
 }
 
-max_num_models_by_shape['two_qubit_ising_rotation_hyperfine'] = {
-    1 : 0,
-    (2, 1) : 2,
-    (2, 2) : 2,
-    2 : 11,
-    'other' : 0
+
+max_num_models_by_shape['interacing_nn_ising_fixed_axis'] = {
+	1 : 0, 
+	2 : 1, 
+	3 : 1, 
+	4 : 1, 
+	5 : 1, 
+	'other' : 0
 }
 
 max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
@@ -125,14 +176,12 @@ max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
 }
 
 
+
+# Transverse Ising
 max_num_models_by_shape['deterministic_transverse_ising_nn_fixed_axis'] = {
-	# 1 : 3, 
-	# 2 : 3, 
-	# 3 : 3, 
-	# 4 : 3,
-	# 5 : 3,
 	'other' : 3 # not sure this is right?
 }
+
 
 
 # Hamiltonian exponentiation times from testing qutips

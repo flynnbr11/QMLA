@@ -2928,8 +2928,6 @@ def cluster_results_and_plot(
     unique_latex_params = list(
         set(list(all_centroids_of_each_param.keys()))
     )
-    print("all possible params:", all_possible_params)
-    print("unique params:", unique_latex_params)
     total_num_params = len(unique_latex_params)
     ncols = int(np.ceil(np.sqrt(total_num_params)))
     nrows = int(np.ceil(total_num_params/ncols))

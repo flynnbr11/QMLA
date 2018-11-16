@@ -55,14 +55,16 @@ mkdir -p $long_dir
 
 
 # growth_rule='two_qubit_ising_rotation_hyperfine'
-# growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
+growth_rule='deterministic_noninteracting_ising_single_axis'
+
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='interacing_nn_ising_fixed_axis'
-growth_rule='deterministic_noninteracting_ising_single_axis'
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
+
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 
 # true_operator='yTi'
@@ -122,7 +124,7 @@ param_min=0
 param_max=1
 param_mean=0.5
 param_sigma=0.25
-rand_true_params=0
+rand_true_params=1
 # rand_prior:
 # if set to False (0), then uses any params specically 
 # set in SetQHLParams dictionaries.
