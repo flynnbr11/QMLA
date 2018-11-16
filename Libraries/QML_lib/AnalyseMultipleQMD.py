@@ -1025,7 +1025,8 @@ def plot_scores(
         colours[true_idx] = 'green'
     except:
         print("True model", latex_true_op, "not in ", latex_model_names)
-        pass
+        raise
+        # pass
 
 
     ax.barh(ind, scores, width, color="blue")
