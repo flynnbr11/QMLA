@@ -2760,6 +2760,7 @@ def cluster_results_and_plot(
     path_to_results, # results_summary_csv to be clustered
     true_expec_path,  
     plot_probe_path,
+    true_params_path,
     growth_generator,
     measurement_type,
     upper_x_limit=None, 
@@ -2773,6 +2774,25 @@ def cluster_results_and_plot(
         set(list(results_csv['NameAlphabetical']))
     )
 
+    true_info_dict = pickle.load(
+        open(true_params_path, 'rb')
+    )
+    print("KEYS:", true_info_dict.keys() )
+    try:
+        growth_generator = true_info_dict['growth_generator']
+    except:
+        pass
+        
+    true_params_dict = true_info_dict['params_dict']
+    if true_params_dict is not None:
+        for k in list(true_params_dict.keys()):
+            latex_key = UserFunctions.get_latex_name(
+                name = k, 
+                growth_generator = growth_generator
+            )
+            true_params_dict[latex_key] = true_params_dict[k]
+            true_params_dict.pop(k)
+    
     all_learned_params = {}
     champions_params = {}
 
@@ -2901,8 +2921,10 @@ def cluster_results_and_plot(
     total_num_clusters=0
     for c in clusters:
         total_num_clusters += len(clusters[c])
-
+    
+    #######
     # Plot centroids by parameter
+    #######
     unique_latex_params = list(
         set(list(all_centroids_of_each_param.keys()))
     )
@@ -2926,7 +2948,17 @@ def cluster_results_and_plot(
     for param in sorted(unique_latex_params):
         ax = axes[row,col]
         this_param_values = all_centroids_of_each_param[param]
-
+        try:
+            true_param = true_params_dict[param]
+            ax.axhline(
+                true_param, 
+                linestyle='--', 
+                label='True',
+                color=term_colours[param]
+            )
+        except:
+            pass
+        
         for v in this_param_values:
             if this_param_values.index(v)==0:
                 ax.axhline(

@@ -1406,6 +1406,7 @@ elif further_qhl_mode == False:
             path_to_results = results_csv, 
             true_expec_path = true_expec_path, 
             plot_probe_path = plot_probe_file, 
+            true_params_path = true_params_path,
             growth_generator = growth_generator, 
             measurement_type = arguments.measurement_type, 
             save_param_values_to_file = str(plot_desc + 'clusters_by_param.png'),

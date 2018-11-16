@@ -28,9 +28,6 @@ set_normal_prior_specific_terms = {
 }
 
 set_uniform_prior_specific_terms = {
-	'xTi' : [ 0, 10 ], # TODO Broaden, testing with small dist
-	'yTi' : [ 0, 2.0 ],
-	'zTi' : [ 0, 5.0 ],
 }
 
 set_true_params = {
@@ -99,6 +96,7 @@ def create_qhl_params(
 	true_op, 
 	pickle_file=None,
 	random_vals=False, 
+	growth_generator=None,
 	rand_min=None, 
 	rand_max=None,
 	exp_data=0,
@@ -132,7 +130,7 @@ def create_qhl_params(
 		true_params_info['params_dict'] = None
 
 	true_params_info['true_op'] = true_op
-
+	true_params_info['growth_generator'] = growth_generator
 	if pickle_file is not None:
 		import pickle
 		pickle.dump(
@@ -157,10 +155,10 @@ def create_prior(
 	if rand_max is None:
 		rand_max = MAX_PARAM()
 
-	print("[SetParams] CREATE PRIOR:")
-	print("[SetParams] random vals:", random_vals, )
-	print("[SetParams] min/max", rand_min, rand_max)
-	print("[SetParams] Gaussian:", gaussian)
+	# print("[SetParams] CREATE PRIOR:")
+	# print("[SetParams] random vals:", random_vals, )
+	# print("[SetParams] min/max", rand_min, rand_max)
+	# print("[SetParams] Gaussian:", gaussian)
 
 	if gaussian ==  True:
 		set_prior_specific_terms = set_normal_prior_specific_terms
@@ -175,13 +173,13 @@ def create_prior(
 		terms = list(set_prior_specific_terms.keys())
 		for term in terms:
 			try:
-				print("[SetParams] setting", term, ":", set_prior_specific_terms[term])
+				# print("[SetParams] setting", term, ":", set_prior_specific_terms[term])
 				specific_terms[term] = set_prior_specific_terms[term]
 			except: 
 				# in case term not in set_prior_specific_terms
 				val = random.uniform(rand_min, rand_max)
 				specific_terms[term] = [val, sigma]
-	print("[SetParams] specific terms:", specific_terms)
+	# print("[SetParams] specific terms:", specific_terms)
 
 
 	# terms = list(set_prior_specific_terms.keys())
@@ -337,6 +335,7 @@ if arguments.true_params_file is not None:
 		# true_op = arguments.true_op, 
 		true_op = true_operator,
 		pickle_file=arguments.true_params_file,
+		growth_generator=growth_generation_rule,
 		random_vals=random_true_params, 
 		rand_min=param_min, 
 		rand_max=param_max,

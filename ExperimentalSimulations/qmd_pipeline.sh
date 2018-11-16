@@ -54,14 +54,14 @@ further_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
 
-growth_rule='two_qubit_ising_rotation_hyperfine'
+# growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='interacing_nn_ising_fixed_axis'
-# growth_rule='deterministic_noninteracting_ising_single_axis'
+growth_rule='deterministic_noninteracting_ising_single_axis'
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 
@@ -118,8 +118,8 @@ true_params_pickle_file="$long_dir/true_params.p"
 plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 gaussian=1
-param_min=10
-param_max=15
+param_min=0
+param_max=1
 param_mean=0.5
 param_sigma=0.25
 rand_true_params=0
