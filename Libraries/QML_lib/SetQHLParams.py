@@ -13,27 +13,18 @@ def MAX_PARAM():
 
 ### SET VALUES HERE ###
 set_normal_prior_specific_terms = {
-	# 'xTi' : [ 1.0, 2.0 ], # TODO Broaden, testing with small dist
-	# 'yTi' : [ 2.0, 2.0 ],
-	# 'zTi' : [ 3.0, 2.0 ],
-	# 'xTx' : [4.0, 2.0], # true value 2.7
-	# 'yTy' : [5.0, 2.0], # true value 2.7
-	# 'zTz' : [6.0, 2.0 ], # true value 2.14
-	# 'xTy' : [5.0, 2.0],
-	# 'xTz' : [5.0, 2.0],
-	# 'yTz' : [5.0, 2.0],
-	'x' : [5.0, 2.0],
-	'z' : [5.0, 2.0],
-	'y' : [5.0, 2.0]
+	# 'x' : [5.0, 2.0],
+	# 'z' : [5.0, 2.0],
+	# 'y' : [5.0, 2.0]
 }
 
 set_uniform_prior_specific_terms = {
 }
 
 set_true_params = {
-	'xTi' : 0.7538085315,
-	'yTi' : 8.4442484,
-	'zTi' : 5.713337168736279,
+	# 'xTi' : 0.7538085315,
+	# 'yTi' : 8.4442484,
+	# 'zTi' : 5.713337168736279,
 }
 
 
