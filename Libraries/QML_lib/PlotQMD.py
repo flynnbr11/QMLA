@@ -1697,7 +1697,10 @@ def cumulativeQMDTreePlot(
             if is_adj or not only_adjacent_branches:
                 if a!=b:
                     pairing = (a,b)
-                    frequency = pair_freqs[pairing]/max_frequency
+                    try:
+                        frequency = pair_freqs[pairing]/max_frequency
+                    except:
+                        frequency = 1
                     edges.append(pairing)
                     edge_frequencies.append(frequency)
 

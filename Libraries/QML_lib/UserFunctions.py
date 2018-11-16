@@ -104,35 +104,37 @@ fixed_axes_by_generator = {
 }
 
 max_spawn_depth_info = {
-    'qhl_TEST' : 2, 
-    'simple_ising' : 1,
-    'hyperfine' : 3,
-    'ising_non_transverse' : 5,
-    'ising_transverse' : 11,
-    'hyperfine_like' : 8,
     'two_qubit_ising_rotation' : 2,
     'two_qubit_ising_rotation_hyperfine' : 5, # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
-    'test_multidimensional' : 10, 
-    'test_return_champs' : 3,
     'non_interacting_ising' : 3,
     'non_interacting_ising_single_axis' : 3,
-    'interacting_nearest_neighbour_ising' : 3,
-    'interacing_nn_ising_fixed_axis' : 5,
     'deterministic_noninteracting_ising_single_axis' : 1,
+    'interacting_nearest_neighbour_ising' : 3,
+    'interacing_nn_ising_fixed_axis' : 3,
     'deterministic_interacting_nn_ising_single_axis' : 1,
     'deterministic_transverse_ising_nn_fixed_axis' : 1
+    # 'ising_non_transverse' : 5,
+    # 'ising_transverse' : 11,
+    # 'hyperfine_like' : 8,
+    # 'test_multidimensional' : 10, 
+    # 'test_return_champs' : 3,
+    # 'qhl_TEST' : 2, 
+    # 'simple_ising' : 1,
+    # 'hyperfine' : 3,
 }
 
 max_num_qubits_info = {
     'two_qubit_ising_rotation' : 2,
     'two_qubit_ising_rotation_hyperfine' : 2, # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 2,
-    'deterministic_noninteracting_ising_single_axis' : 5,
-    'deterministic_interacting_nn_ising_single_axis' : 5,
-    'deterministic_transverse_ising_nn_fixed_axis' : 5,
     'non_interacting_ising_single_axis' : 5,
     'non_interacting_ising' : 5, 
+    'deterministic_noninteracting_ising_single_axis' : 5,
+	'interacting_nearest_neighbour_ising' : 5, 
+	'interacing_nn_ising_fixed_axis' : 6, 
+    'deterministic_interacting_nn_ising_single_axis' : 5,
+    'deterministic_transverse_ising_nn_fixed_axis' : 5,
     None : 5,
 }
 

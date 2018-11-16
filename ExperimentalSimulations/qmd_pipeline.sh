@@ -5,7 +5,7 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=10
+num_tests=1
 qhl_test=0
 do_further_qhl=0
 
@@ -59,10 +59,11 @@ mkdir -p $long_dir
 
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
-growth_rule='deterministic_noninteracting_ising_single_axis'
+# growth_rule='deterministic_noninteracting_ising_single_axis'
 
 # growth_rule='interacting_nearest_neighbour_ising'
-# growth_rule='interacing_nn_ising_fixed_axis'
+# TODO interacing_nn_ising_fixed_axis BROKEN!!!
+growth_rule='interacing_nn_ising_fixed_axis' 
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
 
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'

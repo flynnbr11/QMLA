@@ -1388,12 +1388,14 @@ elif further_qhl_mode == False:
             one instance of QMD was performed. All other plots generated \
             without error."
         )
+        raise
 
     except ZeroDivisionError:
         print("Can not plot multiQMD tree -- this might be because only \
             one instance of QMD was performed. All other plots generated \
             without error."
         )
+        raise
     # except:
     #     print("Could not plot Multi QMD tree.")
 

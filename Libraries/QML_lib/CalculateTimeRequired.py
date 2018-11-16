@@ -126,11 +126,12 @@ max_num_models_by_shape['two_qubit_ising_rotation_hyperfine_transverse'] = {
 
 ## More general Ising models
 
+###
 # Noninteracting 
 max_num_models_by_shape['non_interacting_ising'] = {
     # (number_qubits, number_terms) : max number of models with those dimensions
     # number_qubits : max number models of any number terms not specifically given here
-    'other' : 1
+    'other' : 3
 }
 
 max_num_models_by_shape['non_interacting_ising_single_axis'] = {
@@ -145,41 +146,32 @@ max_num_models_by_shape['deterministic_noninteracting_ising_single_axis'] = {
     'other' : 1
 }
 
+###
 # Interacting Ising. interaction restricted to nearest neighbours
 max_num_models_by_shape['interacting_nearest_neighbour_ising'] = {
     # (number_qubits, number_terms) : max number of models with those dimensions
     # number_qubits : max number models of any number terms not specifically given here
     1 : 0,
     2 : 3, 
-    3 : 1, 
-    4 : 1, 
     'other' : 1
 }
 
 
 max_num_models_by_shape['interacing_nn_ising_fixed_axis'] = {
-	1 : 0, 
-	2 : 1, 
-	3 : 1, 
-	4 : 1, 
-	5 : 1, 
-	'other' : 0
+	'other' : 1
 }
 
 max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
 	1 : 0, 
-	2 : 1, 
-	3 : 1, 
-	4 : 1, 
-	5 : 1, 
-	'other' : 0
+	'other' : 1
 }
 
 
 
 # Transverse Ising
 max_num_models_by_shape['deterministic_transverse_ising_nn_fixed_axis'] = {
-	'other' : 3 # not sure this is right?
+	1 : 3,
+	'other' : 2
 }
 
 
