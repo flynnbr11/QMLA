@@ -2685,7 +2685,6 @@ def replot_expectation_values(
 
     for params_dict in params_dictionary_list:
         ax = axes[row,col]
-        print("[replot] row,col=", row, col)
 
         sim_ops_names = list(params_dict.keys())
         sim_params = [
@@ -2739,7 +2738,6 @@ def replot_expectation_values(
             s=3
         )
         ax.set_xlim(0,upper_x_limit)
-        print("[replot] plotted", model_label)
 
         col += 1
         # if col == ncols and row == 0:
@@ -2757,6 +2755,7 @@ def replot_expectation_values(
         plt.show()
 
 
+
 def cluster_results_and_plot(
     path_to_results, # results_summary_csv to be clustered
     true_expec_path,  
@@ -2765,6 +2764,7 @@ def cluster_results_and_plot(
     measurement_type,
     upper_x_limit=None, 
     save_param_clusters_to_file=None, 
+    save_param_values_to_file=None, 
     save_redrawn_expectation_values=None, 
 ):
     from matplotlib import cm
@@ -2836,6 +2836,8 @@ def cluster_results_and_plot(
     cluster_descriptions_by_model = {}
     all_clusters_params = []
     all_clusters_descriptions = []
+    all_centroids_of_each_param = {}
+    
     for mod in available_clustered_models:
         clusters_by_model[mod] = {}
         cluster_descriptions_by_model[mod] = []
@@ -2846,13 +2848,19 @@ def cluster_results_and_plot(
             single_cluster = {}
             for i in range(len(terms)):
                 single_cluster[terms[i]] = this_model_clusters[j][i]
+                try: 
+                    all_centroids_of_each_param[terms[i]].append(this_model_clusters[j][i])
+                except:
+                    all_centroids_of_each_param[terms[i]] = [this_model_clusters[j][i]]
+                
+                
 
             latex_mod_name = UserFunctions.get_latex_name(
                 name=mod, 
                 growth_generator=growth_generator
             )
             cluster_description = str(
-                latex_mod_name + ' (' +  str(j)+')'
+                latex_mod_name + ' (' +  str(j) +')'
             )
             all_clusters_params.append(single_cluster)
             all_clusters_descriptions.append(
@@ -2863,18 +2871,90 @@ def cluster_results_and_plot(
                 cluster_description
             )    
 
+    for k in list(all_centroids_of_each_param.keys()):
+        latex_term = UserFunctions.get_latex_name(
+            name=k, 
+            growth_generator=growth_generator
+        )
+        all_centroids_of_each_param[latex_term] = all_centroids_of_each_param[k]
+        all_centroids_of_each_param.pop(k)
+    
+    
     cm_subsection = np.linspace(
         0,0.8,len(all_possible_params)
     )
     plot_colours = [ cm.Paired(x) for x in cm_subsection ]
 
     term_colours = {}
+    latex_terms = {}
+    for term in all_possible_params:
+        latex_rep = UserFunctions.get_latex_name(
+            name=term, 
+            growth_generator = growth_generator
+        )
+    
+        latex_terms[term] = latex_rep
+    
     for i in range(len(all_possible_params)):
-        term_colours[all_possible_params[i]] = plot_colours[i]
+        name = latex_terms[all_possible_params[i]]
+        term_colours[name] = plot_colours[i]
     total_num_clusters=0
     for c in clusters:
         total_num_clusters += len(clusters[c])
 
+    # Plot centroids by parameter
+    unique_latex_params = list(
+        set(list(all_centroids_of_each_param.keys()))
+    )
+    print("all possible params:", all_possible_params)
+    print("unique params:", unique_latex_params)
+    total_num_params = len(unique_latex_params)
+    ncols = int(np.ceil(np.sqrt(total_num_params)))
+    nrows = int(np.ceil(total_num_params/ncols))
+
+    fig, axes = plt.subplots(
+        figsize = (10, 7), 
+        nrows=nrows, 
+        ncols=ncols,
+        squeeze=False
+    )
+    row = 0
+    col = 0
+
+    # from here below has to be put on an array layout
+    
+    for param in sorted(unique_latex_params):
+        ax = axes[row,col]
+        this_param_values = all_centroids_of_each_param[param]
+
+        for v in this_param_values:
+            if this_param_values.index(v)==0:
+                ax.axhline(
+                    v, 
+                    color=term_colours[param],
+                    label=param
+                )
+            else:
+                ax.axhline(
+                    v, 
+                    color=term_colours[param],
+                )
+        ax.legend(loc=1)
+        col += 1
+        if col == ncols:
+            col=0
+            row+=1
+
+                
+    if save_param_values_to_file is not None:
+        plt.savefig(
+            save_param_values_to_file, 
+            bbox_to_inches='tight'
+        )
+
+        
+        
+    # Plot centroids by cluster 
     ncols = int(np.ceil(np.sqrt(total_num_clusters)))
     nrows = int(np.ceil(total_num_clusters/ncols))
 
@@ -2886,7 +2966,6 @@ def cluster_results_and_plot(
     )
     row = 0
     col = 0
-    axes_so_far = 0
 
     # from here below has to be put on an array layout
     for mod in sorted(clusters_by_model):
@@ -2903,7 +2982,7 @@ def cluster_results_and_plot(
                 ax.axhline(
                     cluster[term], 
                     label=label, 
-                    color=term_colours[term]
+                    color=term_colours[label]
                 )
                 ax.set_title(cluster_description)
 
