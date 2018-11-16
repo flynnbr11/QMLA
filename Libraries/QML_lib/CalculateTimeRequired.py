@@ -221,14 +221,7 @@ def time_required(
 		time_per_hamiltonian = hamiltonian_exponentiation_times[q]
 		try:
 			num_models_this_dimension = max_num_models_by_shape[growth_generator][q]
-			print("num models this dim:", num_models_this_dimension)
-			print("dim:", q)
 		except:
-			print(
-				growth_generator, 
-				"not in:", 
-				max_num_models_by_shape.keys()
-			)
 			num_models_this_dimension = max_num_models_by_shape[growth_generator]['other']
 
 		time_this_dimension = (
