@@ -63,8 +63,8 @@ mkdir -p $long_dir
 
 # growth_rule='interacting_nearest_neighbour_ising'
 # TODO interacing_nn_ising_fixed_axis BROKEN!!!
-growth_rule='interacing_nn_ising_fixed_axis' 
-# growth_rule='deterministic_interacting_nn_ising_single_axis'
+# growth_rule='interacing_nn_ising_fixed_axis' 
+growth_rule='deterministic_interacting_nn_ising_single_axis'
 
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 

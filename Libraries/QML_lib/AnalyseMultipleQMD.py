@@ -994,12 +994,18 @@ def plot_scores(
         scores, 
         entropy=None,
         inf_gain=None, 
+        true_operator = None, 
         growth_generator = None,
         save_file='model_scores.png'
     ):
     plt.clf()
     models = list(scores.keys())
     
+    latex_true_op = UserFunctions.get_latex_name(
+            name=true_operator, 
+            growth_generator=growth_generator
+    )   
+
     latex_model_names = [
         # DataBase.latex_name_ising(model) for model in models
         UserFunctions.get_latex_name(
@@ -1013,6 +1019,14 @@ def plot_scores(
     fig, ax = plt.subplots()    
     width = 0.75 # the width of the bars 
     ind = np.arange(len(scores))  # the x locations for the groups
+    colours = ['blue' for i in ind]
+    try:
+        true_idx = latex_model_names.index(latex_true_op)
+        colours[true_idx] = 'green'
+    except:
+        pass
+
+
     ax.barh(ind, scores, width, color="blue")
     ax.set_yticks(ind+width/2)
     ax.set_yticklabels(latex_model_names, minor=False)
@@ -1328,7 +1342,8 @@ elif further_qhl_mode == False:
         entropy = inf_gain = 0.0
     plot_scores(
         scores = model_scores,
-        entropy = entropy, 
+        entropy = entropy,
+        true_operator = true_operator, 
         growth_generator = growth_generator,
         inf_gain = inf_gain, 
         save_file = plot_file
