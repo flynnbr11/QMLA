@@ -12,8 +12,8 @@ do_further_qhl=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
-exp=3
+prt=1000
+exp=300
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -54,7 +54,7 @@ further_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
 
-# growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
 # growth_rule='non_interacting_ising'
@@ -64,7 +64,7 @@ mkdir -p $long_dir
 # growth_rule='interacting_nearest_neighbour_ising'
 # TODO interacing_nn_ising_fixed_axis BROKEN!!!
 # growth_rule='interacing_nn_ising_fixed_axis' 
-growth_rule='deterministic_interacting_nn_ising_single_axis'
+# growth_rule='deterministic_interacting_nn_ising_single_axis'
 
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 

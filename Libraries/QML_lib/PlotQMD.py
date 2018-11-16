@@ -2948,6 +2948,7 @@ def cluster_results_and_plot(
     
     for param in sorted(unique_latex_params):
         ax = axes[row,col]
+        ax.get_shared_y_axes().join(ax, axes[row, 0])
         this_param_values = all_centroids_of_each_param[param]
         try:
             true_param = true_params_dict[param]
