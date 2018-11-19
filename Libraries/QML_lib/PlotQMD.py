@@ -886,6 +886,42 @@ def r_squared_from_epoch_list(
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
+def plot_quadratic_loss(
+    qmd,
+    champs_or_all = 'champs',
+    save_to_file=None
+):
+
+    # plot Quad loss for single QMD instance
+    plt.clf()
+    ax = plt.subplot(111)
+
+    if qmd.QHLmode is True:
+        to_plot_quad_loss = [qmd.TrueOpModelID]
+        plot_title=str('Quadratic Loss for True operator (from QHL)')
+    elif champs_or_all == 'champs':
+        to_plot_quad_loss = qmd.BranchChampions.values()
+        plot_title=str('Quadratic Loss for Branch champions')
+    else:
+        to_plot_quad_loss = qmd.ModelNameIDs.keys()
+        plot_title=str('Quadratic Loss for all models')
+    
+    for i in sorted(list(to_plot_quad_loss)):
+        mod = qmd.reducedModelInstanceFromID(i)
+        if len(mod.QuadraticLosses) > 0:
+            epochs = range(1, len(mod.QuadraticLosses) + 1)
+            model_name = UserFunctions.get_latex_name(
+                name = qmd.ModelNameIDs[i], 
+                growth_generator = qmd.GrowthGenerator
+            )
+            ax.plot(epochs, mod.QuadraticLosses, label=str(model_name))
+    ax.legend(bbox_to_anchor=(1,1))
+
+    ax.set_title(plot_title)
+
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
 
 
 def summariseResultsCSV(
@@ -1786,237 +1822,6 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     return new_cmap
 
 
-
-# def draw_networkx_arrows(
-#     G, 
-#     pos,
-#     edgelist=None,
-#     nodedim = 0.,
-# #                        width=0.02,
-#     width=1.0,
-#     widthscale = 1.0,
-#     edge_color='k',
-#     style='solid',
-#     alphas=1.,
-#     edge_cmap=None,
-#     edge_vmin=None,
-#     edge_vmax=None,
-#     ax=None,
-#     label=[None],
-#     pathstyle='straight',
-#     **kwds
-# ):
-#     if ax is None:
-#         ax = plt.gca()
-
-#     if edgelist is None:
-#         edgelist = G.edges()
-        
-#     if width is None:
-#         try:
-#             widthlist = np.array(list(  [(widthscale*prop['freq']) for (u,v,prop) in G.edges(data=True)]  ))
-#             widthlist = widthscale*widthlist/np.max(widthlist)
-#             # widthlist = [(a+widthscale*0.1) for a in widthlist] ## this was giving colour to non-existent edges
-#         except:
-# #            widthlist = widthscale*0.02
-#             widthlist = widthscale
-            
-#     else:
-#         widthlist = width
-
-#     if not edgelist or len(edgelist) == 0:  # no edges!
-#         return None
-        
-#     if len(alphas)<len(edgelist):
-#         alphas = np.repeat(alphas, len(edgelist))
-
-#     # set edge positions
-#     edge_pos = np.asarray([(pos[e[0]], pos[e[1]]) for e in edgelist])
-    
-#     if not cb.iterable(widthlist):
-#         lw = (widthlist,)
-#     else:
-#         lw = widthlist
-
-#     if not cb.is_string_like(edge_color) \
-#            and cb.iterable(edge_color) \
-#            and len(edge_color) == len(edge_pos):
-#         if np.alltrue([cb.is_string_like(c)
-#                          for c in edge_color]):
-#             # (should check ALL elements)
-#             # list of color letters such as ['k','r','k',...]
-#             edge_colors = tuple([colorConverter.to_rgba(c)
-#                                  for c in edge_color])
-#         elif np.alltrue([not cb.is_string_like(c)
-#                            for c in edge_color]):
-#             # If color specs are given as (rgb) or (rgba) tuples, we're OK
-#             if np.alltrue([cb.iterable(c) and len(c) in (3, 4)
-#                              for c in edge_color]):
-#                 edge_colors = tuple(edge_color)
-#             else:
-#                 # numbers (which are going to be mapped with a colormap)
-#                 edge_colors = None
-#         else:
-#             raise ValueError('edge_color must consist of \
-#                 either color names or numbers'
-#             )
-#     else:
-#         if cb.is_string_like(edge_color) or len(edge_color) == 1:
-#             edge_colors = (colorConverter.to_rgba(edge_color), )
-#         else:
-#             raise ValueError('edge_color must be a single color or \
-#             list of exactly m colors where m is the number or edges'
-#         )
-
-#     edge_collection = collections.LineCollection(
-#         edge_pos,
-#         colors=edge_colors, 
-#         linewidths=lw
-#     )
-#     edge_collection.set_zorder(1)  # edges go behind nodes
-
-#     # ax.add_collection(edge_collection)
-
-#     if edge_colors is None:
-#         if edge_cmap is not None:
-#             assert(isinstance(edge_cmap, Colormap))
-#         edge_collection.set_array(np.asarray(edge_color))
-#         edge_collection.set_cmap(edge_cmap)
-#         if edge_vmin is not None or edge_vmax is not None:
-#             edge_collection.set_clim(edge_vmin, edge_vmax)
-#         else:
-#             edge_collection.autoscale()
-    
-
-
-#     max_bayes_value = max(edge_collection.get_clim())
-#     edge_collection.set_clim(0.5, max_bayes_value)
-#     # for i in range(len(edgelist)):
-#     #     print(edgelist[i], ":", edge_color[i])
-
-#     for n in G:
-#         c=Circle(pos[n],radius=0.02,alpha=0.5)
-#         ax.add_patch(c)
-#         G.node[n]['patch']=c
-#         x,y=pos[n]
-#     seen={}
-
-#     # Rescale all weights between 0,1 so cmap can find the appropriate RGB value.
-#     offset = 0.7
-#     norm_edge_color = edge_color/max_bayes_value
-
-
-
-#     if G.is_directed():
-#         seen = {}
-#         for idx in range(len(edgelist)):
-#             if not cb.iterable(widthlist):
-#                 lw = widthlist
-#             else:
-#                 lw = widthlist[idx]
-            
-#             arrow_colour =  edge_cmap(norm_edge_color[idx])
-
-#             if pathstyle is "straight":
-#                 (src, dst) = edge_pos[idx]
-#                 x1, y1 = src
-#                 x2, y2 = dst
-#                 delta = 0.2
-#                 theta = np.arctan((y2-y1)/(x2-x1))
-#                 # print(theta)
-#                 if x1==x2:
-#                     dx = x2-x1
-#                     dy = y2-y1 - np.sign(y2-y1)*delta
-#                 elif y1==y2:
-#                     dx = x2-x1 - np.sign(x2-x1)*delta
-#                     dy = y2-y1 
-#                 else:
-#                     dx = x2-x1 - np.sign(x2-x1)*np.abs(np.cos(theta)*delta)   # x offset
-#                     dy = y2-y1 - np.sign(y2-y1)*np.abs(np.sin(theta)*delta)   # y offset 
-                
-#                 thislabel = None if len(label)<len(edgelist) else label[idx]
-
-#                 ax.arrow(
-#                     x1,y1, dx,dy,
-#                     facecolor=arrow_colour, 
-#                     alpha = alphas[idx],
-#                     linewidth = 0, 
-#                     antialiased = True,
-#                     width = lw, 
-#                     head_width = 5*lw,
-#                     overhang = -5*0.02/lw,
-#                     length_includes_head=True, 
-#                     label=thislabel, zorder=1
-#                 )
-                    
-#             elif pathstyle is "curve":
-                
-#                 (u,v) = edgelist[idx]
-#                 # (u,v,prop) = prop['weight'] for  in list_of_edges
-#                 # flipped = G.edge[(u,v)]
-                
-#                 winner = G.edges[(u,v)]['winner']
-#                 loser = G.edges[(u,v)]['loser']
-#                 n1=G.node[loser]['patch']
-#                 n2=G.node[winner]['patch']
-
-#                 # n1=G.node[u]['patch']
-#                 # n2=G.node[v]['patch']
-
-#                 rad=0.1
-
-#                 if (u,v) in seen:
-#                     rad=seen.get((u,v))
-#                     rad=(rad+np.sign(rad)*0.1)*-1
-#                 alpha=0.5
-                
-#                 kwargs = {
-#                     'head_width': 5*lw, 
-#                       #'overhang':-5*0.02/lw,  
-#                       #'length_includes_head': True
-#                 }
-                          
-#                 arrow_style = ArrowStyle(
-#                     "->", 
-#                     head_length=1.9, 
-#                     head_width=1.9
-#                 ) # Can be accepted by fancy arrow patch to alter arrows
-
-# #                arrow_style = ArrowStyle("-[", widthB=2.0, lengthB=1.0) # Can be accepted by fancy arrow patch to alter arrows
-
-#                 e = FancyArrowPatch(
-#                     n1.center,
-#                     n2.center,
-#                     patchA=n1,
-#                     patchB=n2,
-#                     # arrowstyle='-|>',
-#                     # capstyle='projecting',
-#                     arrowstyle=arrow_style,
-#                     connectionstyle='arc3,rad=%s'%rad,
-#                     mutation_scale=10.0,
-#                     lw=lw,   #AROUND 10 TO BE FEASIBLE
-#                     alpha=alphas[idx],
-#                     color=arrow_colour,
-#             #        **kwargs
-#                 )
-#                 seen[(u,v)]=rad
-#                 ax.add_patch(e)
-           
-
-#     # update view
-#     minx = np.amin(np.ravel(edge_pos[:, :, 0]))
-#     maxx = np.amax(np.ravel(edge_pos[:, :, 0]))
-#     miny = np.amin(np.ravel(edge_pos[:, :, 1]))
-#     maxy = np.amax(np.ravel(edge_pos[:, :, 1]))
-
-#     w = maxx-minx
-#     h = maxy-miny
-#     padx,  pady = 0.05*w, 0.05*h
-#     corners = (minx-padx, miny-pady), (maxx+padx, maxy+pady)
-#     ax.update_datalim(corners)
-#     ax.autoscale_view()
-
-#     return edge_collection
 def draw_networkx_arrows(
     G, 
     pos,

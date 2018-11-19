@@ -336,6 +336,14 @@ if global_variables.qhl_test:
             'qhl_volume_'+str(global_variables.long_id)+'.png')
         )
 
+        qmd.plotQuadraticLoss(
+            save_to_file = str( 
+                global_variables.plots_directory+
+                'qhl_quadratic_loss_'
+                +str(global_variables.long_id)+'.png'
+            )
+        )
+
         true_mod_instance = qmd.reducedModelInstanceFromID(
             qmd.TrueOpModelID
         )
@@ -471,6 +479,13 @@ else:
             save_to_file=str(global_variables.plots_directory+
             'volumes_branch_champs_'+ str(global_variables.long_id)+
             '.png')
+        )
+        qmd.plotQuadraticLoss(
+            save_to_file= str(
+                global_variables.plots_directory+
+                'quadratic_loss_'+ str(global_variables.long_id)+
+                '.png'
+            )
         )
 
         true_op_known=False

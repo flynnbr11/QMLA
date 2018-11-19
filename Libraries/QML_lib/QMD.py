@@ -171,6 +171,7 @@ class QMD():
         self.ResampleThreshold = self.GlobalVariables.resample_threshold
         self.ResamplerA = self.GlobalVariables.resample_a
         self.PGHPrefactor = self.GlobalVariables.pgh_factor
+        self.QHLmode = self.GlobalVariables.qhl_test
         self.BayesTimeBinning = bayes_time_binning 
         self.StoreParticlesWeights = store_particles_weights
         self.QHL_plots = qhl_plots
@@ -1860,6 +1861,19 @@ class QMD():
                 num_times_to_use=num_exp
             )
         self.MajorityVotingScores = self.majorityVotingTally()
+
+
+    def plotQuadraticLoss(
+        self, 
+        save_to_file = None, 
+    ):
+        PlotQMD.plot_quadratic_loss(
+            qmd=self, 
+            champs_or_all = 'champs', 
+            save_to_file = save_to_file
+        )
+
+
 
     def plotVolumes(self, model_id_list=None, branch_champions=False, 
         branch_id=None, save_to_file=None

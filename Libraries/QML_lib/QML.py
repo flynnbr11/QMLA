@@ -393,14 +393,13 @@ class ModelLearningClass():
             term = true_params_names[i]
             true_param_val = self.TrueParams[i]
             self.TrueParamsDict[term] = true_param_val
-        if len(
-            set(self.SimOpsNames).intersection(
-                set(true_params_names))
-        ) > 0:
-            some_param_overlap_with_true_model = True
-        else:
-            some_param_overlap_with_true_model = False
 
+        all_params_for_q_loss = list(
+            set(true_params_names).union(self.SimOpsNames)
+        )
+        param_indices = {}
+        for op_name in self.SimOpsNames:
+            param_indices[op_name] = self.SimOpsNames.index(op_name)
 
 
         for istep in range(self.NumExperiments):
@@ -476,8 +475,6 @@ class ModelLearningClass():
                 )
                 print_loc(global_print_loc)
             
-#            if istep%50==0:
-#                self.log_print(['Step', istep, '\t Mean:', self.Updater.est_mean()])
             self.TrackEval.append(self.Updater.est_mean())
             self.TrackCovMatrices.append(self.Updater.est_covariance_mtx())
 
@@ -493,32 +490,25 @@ class ModelLearningClass():
             print_loc(global_print_loc)
 
 
-            #TODO this won't work -- what does iterator mean??
-#            self.DistributionMeans[istep] = self.Updater.est_mean()
-#            self.DistributionStdDevs[istep] = 
-                
+               
             if (
                 checkloss == True 
-                and 
-                some_param_overlap_with_true_model == True
+                # and istep%10 == 0
             ): 
                 quadratic_loss = 0
-                for i in range(len(self.NewEval)):
-                    op_name = self.SimOpsNames[i]
-                    # self.learned_est_means[] = 
-                # for op_name in self.learned_est_means:
+                for param in all_params_for_q_loss:
+                    if param in self.SimOpsNames:
+                        learned_param = self.NewEval[param_indices[param]]
+                    else:
+                        learned_param = 0
 
-                    if op_name in self.TrueParamsDict:
-                        learned_param_value =self.NewEval[i]
-                        diff_squared = (
-                            self.TrueParamsDict[op_name] 
-                            - learned_param_value
-                            # - self.learned_est_means[op_name]
-                        )**2
-                        quadratic_loss += diff_squared
-
-                if quadratic_loss > 0:
-                    self.QLosses.append(quadratic_loss)
+                    if param in true_params_names:
+                        true_param = self.TrueParamsDict[param]
+                    else:
+                        true_param = 0
+                    # print("[QML] param:", param, "learned param:", learned_param, "\t true param:", true_param)
+                    quadratic_loss += (learned_param - true_param)**2
+                self.QLosses.append(quadratic_loss)
 
                 if False: # can be reinstated to stop learning when volume converges
                     if self.debugSave: 
