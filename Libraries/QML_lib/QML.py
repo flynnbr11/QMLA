@@ -95,8 +95,14 @@ class ModelLearningClass():
     
     """
 
-    def __init__(self, name, num_probes=20, probe_dict=None, qid=0,
-        log_file='QMD_log.log', modelID=0
+    def __init__(
+        self, 
+        name, 
+        num_probes=20, 
+        probe_dict=None, 
+        qid=0,
+        log_file='QMD_log.log', 
+        modelID=0
     ):
         self.VolumeList = np.array([])  
         self.Name = name
@@ -298,7 +304,8 @@ class ModelLearningClass():
 	  
         self.GenSimModel = gsi.GenSimQMD_IQLE(
             oplist=self.SimOpList, modelparams=self.SimParams, 
-            true_oplist=self.TrueOpList, trueparams=self.TrueParams,
+            true_oplist=self.TrueOpList, 
+            trueparams=self.TrueParams,
             truename=self.TrueOpName, 
             use_time_dep_true_model = self.UseTimeDepTrueModel,
             time_dep_true_params = self.TimeDepTrueParams,
@@ -331,8 +338,9 @@ class ModelLearningClass():
             inv_field=self.Inv_Field
         )
         
-        if checkloss == True or self.checkQLoss==True:     
-            self.QLosses = np.array([])
+        # if checkloss == True or self.checkQLoss==True:     
+        #     self.QLosses = np.array([])
+        self.QLosses = []
         self.TrackLogTotLikelihood = np.array([])
         self.TrackTime = np.array([]) #only for debugging
         self.Particles = np.array([])
@@ -352,8 +360,8 @@ class ModelLearningClass():
     ):
         # self.NumExperiments = n_experiments
 
-        if self.checkQLoss == True: 
-            self.QLosses = np.empty(self.NumExperiments)
+        # if self.checkQLoss == True: 
+        #     self.QLosses = np.empty(self.NumExperiments)
         self.Covars= np.empty(self.NumExperiments)
         self.TrackEval = []
         self.TrackCovMatrices = []
@@ -372,7 +380,29 @@ class ModelLearningClass():
 
         self.datum_gather_cumulative_time = 0
         self.update_cumulative_time = 0
+        self.learned_est_means = {}
         
+        self.TrueParamsDict = {}
+        
+
+        true_params_names = DataBase.get_constituent_names_from_name(
+            self.TrueOpName
+        )
+
+        for i in range(len(true_params_names)):
+            term = true_params_names[i]
+            true_param_val = self.TrueParams[i]
+            self.TrueParamsDict[term] = true_param_val
+        if len(
+            set(self.SimOpsNames).intersection(
+                set(true_params_names))
+        ) > 0:
+            some_param_overlap_with_true_model = True
+        else:
+            some_param_overlap_with_true_model = False
+
+
+
         for istep in range(self.NumExperiments):
             if (istep%300 == 0):
                 # print so we can see how far along algorithm is. 
@@ -467,7 +497,29 @@ class ModelLearningClass():
 #            self.DistributionMeans[istep] = self.Updater.est_mean()
 #            self.DistributionStdDevs[istep] = 
                 
-            if checkloss == True: 
+            if (
+                checkloss == True 
+                and 
+                some_param_overlap_with_true_model == True
+            ): 
+                quadratic_loss = 0
+                for i in range(len(self.NewEval)):
+                    op_name = self.SimOpsNames[i]
+                    # self.learned_est_means[] = 
+                # for op_name in self.learned_est_means:
+
+                    if op_name in self.TrueParamsDict:
+                        learned_param_value =self.NewEval[i]
+                        diff_squared = (
+                            self.TrueParamsDict[op_name] 
+                            - learned_param_value
+                            # - self.learned_est_means[op_name]
+                        )**2
+                        quadratic_loss += diff_squared
+
+                if quadratic_loss > 0:
+                    self.QLosses.append(quadratic_loss)
+
                 if False: # can be reinstated to stop learning when volume converges
                     if self.debugSave: 
                         self.debug_store()
@@ -489,7 +541,7 @@ class ModelLearningClass():
                     self.LogTotLikelihood=(
                         self.Updater.log_total_likelihood                
                     )
-                    self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
+                    # self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
                     self.Covars=(np.resize(self.Covars, (1,istep)))[0]
                     self.Particles = self.Particles[:, :, 0:istep]
                     self.Weights = self.Weights[:, 0:istep]
@@ -517,8 +569,10 @@ class ModelLearningClass():
                         str(self.FinalParams[iterator])]
                     )
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
-                if checkloss == True: 
-                    self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
+                # if checkloss == True: 
+                #     self.QLosses=(
+                #         (np.resize(self.QLosses, (1,istep)))[0]
+                #     )
                 
                 self.Covars=(np.resize(self.Covars, (1,istep)))[0]
                 self.Particles = self.Particles[:, :, 0:istep]

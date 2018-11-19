@@ -28,14 +28,13 @@ from matplotlib.projections import register_projection
 #from QMD import  *
 #from QML import *
 import DataBase
-import Evo 
-import ExpectationValues
+import Evo as evo
 import ExperimentalDataFunctions as expdt
-import ModelNames
-import UserFunctions
+
 
 
 #### Hinton Diagram ####
+
 
 def ExpectationValuesTrueSim(
     qmd, 
@@ -68,10 +67,7 @@ def ExpectationValuesTrueSim(
         model_ids.remove(qmd.ChampID)
 
     # plus_plus = np.array([0.5-0.j,  0.5-0.j, 0.5-0.j, 0.5-0.j]) # TODO generalise probe
-    plot_probe_dict = pickle.load(
-        open(qmd.PlotProbeFile, 'rb')
-    )
-    probe_id = random.choice(range(qmd.NumProbes))
+    # probe_id = random.choice(range(qmd.NumProbes))
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour =  colors.cnames['lightsalmon'] #'b'
@@ -102,18 +98,16 @@ def ExpectationValuesTrueSim(
         true_ops = qmd.TrueOpList
         true_dim = true_op.num_qubits
 
-        # if plus_probe:
-        #     # true_probe = plus_plus
-        #     true_probe = ExpectationValues.n_qubit_plus_state(true_dim)
-        # else:
-        #     true_probe = qmd.ProbeDict[(probe_id,true_dim)]
-
-        true_probe = plot_probe_dict[true_dim]
+        if plus_probe:
+            # true_probe = plus_plus
+            true_probe = evo.n_qubit_plus_state(true_dim)
+        else:
+            true_probe = qmd.ProbeDict[(probe_id,true_dim)]
 
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
         true_expec_values = []
 
-        # print("true ham:", time_ind_true_ham)
+        print("true ham:", time_ind_true_ham)
         for t in times:
             if qmd.UseTimeDepTrueModel:
                 # Multiply time dependent parameters by time value
@@ -128,12 +122,34 @@ def ExpectationValuesTrueSim(
                 true_ham = time_ind_true_ham
 
             try:
-                    expec = UserFunctions.expectation_value_wrapper(
+                    expec = evo.expectation_value_wrapper(
                         method=qmd.MeasurementType,
                         ham = true_ham, 
                         t=t, 
                         state = true_probe
                     )
+
+
+                # if use_experimental_data:
+                #     # expec = evo.hahn_evolution(
+                #     expec = evo.expectation_value_wrapper(
+                #         method='hahn',
+                #         ham = true_ham, 
+                #         t=t, 
+                #         state = true_probe
+                #     )
+
+                # else: # Tracing out second qubit and projecting on plus for simulated case.
+                #     # TODO if simulated, have access to full measurement so plot that?
+                #     # expec = evo.traced_expectation_value_project_one_qubit_plus(
+                #     expec = evo.expectation_value_wrapper(
+                #         method='trace_all_but_first',
+                #         ham = true_ham, 
+                #         t=t, 
+                #         state = true_probe
+                #     )
+
+
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
                     "\nParams:", params, 
@@ -170,10 +186,7 @@ def ExpectationValuesTrueSim(
                 np.linspace(min_exp_time, max_exp_time, num_times)
             )
 
-        ChampionsByBranch = {
-            v:k for k,v in qmd.BranchChampions.items()
-        }
-        max_time_learned = 0 
+        ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
         for i in range(len(model_ids)):
             mod_id = model_ids[i]
             sim = qmd.ModelNameIDs[mod_id]
@@ -181,11 +194,10 @@ def ExpectationValuesTrueSim(
             sim_ham = mod.LearnedHamiltonian
             times_learned = mod.Times
             sim_dim = DataBase.get_num_qubits(mod.Name)
-            # if plus_probe:
-            #     sim_probe = ExpectationValues.n_qubit_plus_state(sim_dim)
-            # else:
-            #     sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
-            sim_probe = plot_probe_dict[sim_dim]
+            if plus_probe:
+                sim_probe = evo.n_qubit_plus_state(sim_dim)
+            else:
+                sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
             colour_id = int(i%len(sim_colours))
             sim_col = sim_colours[colour_id]
 
@@ -201,7 +213,7 @@ def ExpectationValuesTrueSim(
                     )
                 except:
 
-                        expec = UserFunctions.expectation_value_wrapper(
+                        expec = evo.expectation_value_wrapper(
                             method=qmd.MeasurementType,
                             ham=sim_ham, 
                             t=t,
@@ -209,6 +221,23 @@ def ExpectationValuesTrueSim(
                         ) 
 
                         sim_expec_values.append(expec)
+                    # if use_experimental_data:
+                    #      # expec = evo.hahn_evolution(
+                    #      expec = evo.expectation_value_wrapper(
+                    #         method='hahn',
+                    #         ham=sim_ham, 
+                    #         t=t,
+                    #         state=sim_probe
+                    #     ) 
+
+                    # else:
+                    #     # expec = evo.traced_expectation_value_project_one_qubit_plus(
+                    #     expec = evo.expectation_value_wrapper(
+                    #         method='trace_all_but_first',
+                    #         ham=sim_ham, 
+                    #         t=t,
+                    #         state=sim_probe
+                    #     ) 
 
 #                    mod.expectation_values[t] = expec
                    # print("[",mod.Name,"] t=",t,":\t", expec)
@@ -237,8 +266,6 @@ def ExpectationValuesTrueSim(
 
             num_bins = len(set(times_learned))
             unique_times_learned = sorted(list(set(times_learned)))
-            if max(unique_times_learned) > max_time_learned:
-                max_time_learned = max(unique_times_learned)
             unique_times_count = []
             if min(unique_times_learned) < global_min_time:
                 global_min_time = min(unique_times_learned)
@@ -253,10 +280,7 @@ def ExpectationValuesTrueSim(
             r_sq_of_t = [mod.r_squared_of_t[t] for t in exp_times]
             bar_hist = 'hist'
 
-            ax2 = plt.subplot(
-                312, 
-                # sharex=ax1
-            )
+            ax2 = plt.subplot(312, sharex=ax1)
             if bar_hist == 'bar':
                 plt.bar(
                     unique_times_learned, 
@@ -269,10 +293,7 @@ def ExpectationValuesTrueSim(
                 plt.hist(
                     times_learned, 
                     bins=num_bins,
-                    label=str('Occurences (max time:'+
-                        str(np.round(max_time_learned, 2))+
-                        ')'
-                    ),                
+                    label='Occurences',                
                     color=sim_col,
                     histtype='step',
                     fill=False
@@ -303,17 +324,7 @@ def ExpectationValuesTrueSim(
             labelbottom=True # labels along the bottom edge are off
         )
 
-        ax1.set_xlim(global_min_time, max(times))
-        if max_time_learned  > max(times):
-            ax2.semilogx()
-            ax2.axvline(
-                max(times), 
-                color='red', 
-                label='Max exp. val. time shown'
-            )
-
-        max_time_plot = max(max(times), max_time_learned)
-        ax2.set_xlim(global_min_time, max_time_plot+0.1)
+        ax1.set_xlim(global_min_time, max(times)+0.1)
 
         ax1.set_ylabel('Exp Value')
         ax2.set_ylabel('Occurences')
@@ -321,12 +332,12 @@ def ExpectationValuesTrueSim(
         ax2.set_yscale('log')
 
         ax2.set_title(str('Times learned upon'))
-        ax2.axvline(0, color='black')
-        ax2.axhline(0, color='black')
         ax2.legend(
             bbox_to_anchor=(1.2, 1.1),
             loc=2
         )
+        ax2.axvline(0, color='black')
+        ax2.axhline(0, color='black')
         ax1.axvline(0, color='black')
         plot_title = str(
             str(qmd.NumParticles) + ' particles.\n'  
@@ -399,12 +410,30 @@ def ExpectationValuesQHL_TrueModel(
                 true_ham = time_ind_true_ham
         
             try:
-                    expec = UserFunctions.expectation_value_wrapper(
+                    expec = evo.expectation_value_wrapper(
                         method=qmd.MeasurementType,
                         ham = true_ham, 
                         t=t, 
                         state = true_probe
                     )
+
+                # if use_experimental_data: 
+                #     # expec = evo.hahn_evolution(
+                #     expec = evo.expectation_value_wrapper(
+                #         method='hahn',
+                #         ham = true_ham, 
+                #         t=t, 
+                #         state = true_probe
+                #     )
+
+                # else:
+                #     # expec = evo.traced_expectation_value_project_one_qubit_plus(
+                #     expec = evo.expectation_value_wrapper(
+                #         method='trace_all_but_first',
+                #         ham = true_ham, 
+                #         t=t, 
+                #         state = true_probe
+                #     )
                 
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
@@ -442,7 +471,7 @@ def ExpectationValuesQHL_TrueModel(
         sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
         colour_id = int(i%len(sim_colours))
         sim_col = sim_colours[colour_id]
-#        sim_expec_values = [ExpectationValues.expectation_value(ham=sim_ham, t=t,
+#        sim_expec_values = [evo.expectation_value(ham=sim_ham, t=t,
 #            state=sim_probe) for t in times
 #        ]
 
@@ -454,8 +483,8 @@ def ExpectationValuesQHL_TrueModel(
 
         sim_expec_values = []
         for t in times:
-            # ex_val = ExpectationValues.hahn_evolution(
-            ex_val = UserFunctions.expectation_value_wrapper(
+            # ex_val = evo.hahn_evolution(
+            ex_val = evo.expectation_value_wrapper(
                 method=qmd.MeasurementType,
                 ham=sim_ham, 
                 t=t,
@@ -463,6 +492,37 @@ def ExpectationValuesQHL_TrueModel(
             )
             sim_expec_values.append(ex_val)
 
+ #        if use_experimental_data:
+
+ #            sim_expec_values = []
+ #            for t in times:
+ #                # ex_val = evo.hahn_evolution(
+ #                ex_val = evo.expectation_value_wrapper(
+ #                    method='hahn',
+ #                    ham=sim_ham, 
+ #                    t=t,
+ #                    state=sim_probe
+ #                )
+ #                sim_expec_values.append(ex_val)
+
+ # #               if t%10==0:
+ # #                   print("t=", t, "\nham=",sim_ham, "\nex_val=", ex_val)
+            
+ #        else:
+ #            sim_expec_values = [
+ #                # evo.traced_expectation_value_project_one_qubit_plus(
+ #                evo.expectation_value_wrapper(
+ #                    method='trace_all_but_first',
+ #                    ham=sim_ham, 
+ #                    t=t,
+ #                    state=sim_probe
+ #                ) for t in times
+ #            ]
+
+
+#        print("sim expec values:\n", sim_expec_values)
+
+        
         
         if mod_id == qmd.TrueOpModelID:
             sim_label = 'Simulated Model'
@@ -540,11 +600,7 @@ def ExpectationValuesQHL_TrueModel(
         )
         
     plt.title(str("QHL test for " + 
-        # str(DataBase.latex_name_ising(qmd.TrueOpName))
-        str(UserFunctions.get_latex_name(
-            name=qmd.TrueOpName, 
-            growth_generator=qmd.GrowthGenerator
-            ))
+        str(DataBase.latex_name_ising(qmd.TrueOpName))
         +". [" + str(qmd.NumParticles) + " prt; "
         + str(qmd.NumExperiments) +"exp]"
         )
@@ -849,7 +905,7 @@ def r_squared_from_epoch_list(
         r_squared_by_epoch = {}
         
         mod_num_qubits = DataBase.get_num_qubits(mod.Name)
-        probe = ExpectationValues.n_qubit_plus_state(mod_num_qubits)
+        probe = evo.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.NumExperiments-1])
         if len(mod.ResampleEpochs) > 0:
             epochs.extend(mod.ResampleEpochs)
@@ -861,8 +917,8 @@ def r_squared_from_epoch_list(
             ham = np.tensordot(mod.TrackEval[ epoch ], mod.SimOpList , axes=1)
             sum_of_residuals = 0
             for t in exp_times:
-                # sim = ExpectationValues.hahn_evolution(
-                sim = UserFunctions.expectation_value_wrapper(
+                # sim = evo.hahn_evolution(
+                sim = evo.expectation_value_wrapper(
                     method=qmd.MeasurementType,
                     ham=ham, 
                     t=t, 
@@ -897,7 +953,7 @@ def summariseResultsCSV(
     if not directory_name.endswith('/'):
         directory_name += '/'
 
-        # results_file_name_start
+        results_file_name_start
     if not csv_name.endswith('.csv'):
         csv_name += '.csv'
         
@@ -909,6 +965,7 @@ def summariseResultsCSV(
             file.startswith(results_file_name_start)
         ):
             pickled_files.append(file)
+
     filenames = [directory_name+str(f) for f in pickled_files ]
     try:
         some_results = pickle.load(open(filenames[0], "rb"))
@@ -1163,19 +1220,11 @@ class QMDFuncFormatter(Formatter):
         """
         return self.func(x, pos, self.args)   
         
-def plotHinton(
-    model_names, 
-    bayes_factors, 
-    growth_generator=None, 
-    save_to_file=None
-):
+def plotHinton(model_names, bayes_factors, save_to_file=None):
     hinton_mtx=BayF_IndexDictToMatrix(model_names, bayes_factors)
     log_hinton_mtx = np.log10(hinton_mtx)
-    # labels = [DataBase.latex_name_ising(name) for name in model_names.values()]
-    labels = [
-        UserFunctions.get_latex_name(name, growth_generator) 
-            for name in model_names.values()
-    ]
+    labels = [DataBase.latex_name_ising(name) for name in model_names.values()]
+
 
     fig, ax = plt.subplots(figsize=(7,7))
 
@@ -1243,10 +1292,7 @@ branch_champ_node_colour = 'b'
 overall_champ_node_colour = 'g'    
 
     
-def qmdclassTOnxobj(
-    qmd, 
-    modlist=None, 
-    directed=True,
+def qmdclassTOnxobj(qmd, modlist=None, directed=True,
     only_adjacent_branches=True
 ):
     
@@ -1364,8 +1410,7 @@ def plotQMDTree(qmd, save_to_file=None,
 
     plotTreeDiagram(G, n_cmap = plt.cm.pink_r, 
         e_cmap = new_cmap, 
-        arrow_size = 0.02,
-        # arrow_size = 8.0,
+        arrow_size = 8.0,
         nonadj_alpha = 0.1, e_alphas = [], 
         label_padding = 0.4, pathstyle="curve",
         id_labels=id_labels, save_to_file=save_to_file)
@@ -1402,30 +1447,23 @@ def plotTreeDiagram(
     
     label_positions = []   
     if id_labels is True:
-        labels = dict( 
-            zip( 
-                G.nodes(), tuple(  [n for (n,prop) in 
-                G.nodes(data=True)]  ) 
-            )
+        labels = dict( zip( G.nodes(), tuple(  [n for (n,prop) in 
+            G.nodes(data=True)]  ) )
         )
         for key in positions.keys():
             label_positions.append( tuple( np.array(positions[key]) -
             np.array([0., 0.]) ) 
         )
     else:
-        labels = dict( 
-            zip( G.nodes(), tuple(  [prop['label'] for 
-                (n,prop) in G.nodes(data=True)]  ) 
-            )
+        labels = dict( zip( G.nodes(), tuple(  [prop['label'] for 
+            (n,prop) in G.nodes(data=True)]  ) )
         )  
         for key in positions.keys():
             label_positions.append( tuple( np.array(positions[key])- 
                 np.array([0., label_padding]) ) 
         )
     
-    label_positions = dict(
-        zip( positions.keys(), tuple(label_positions) )
-    )
+    label_positions = dict(zip( positions.keys(), tuple(label_positions) ))
      
     
     if len(e_alphas) == 0: 
@@ -1434,9 +1472,7 @@ def plotTreeDiagram(
                 0.8 if list_of_edges[idx][2]["adj"] 
                 else nonadj_alpha 
             )
-    weights = tuple( 
-        [prop['weight'] for (u,v,prop) in list_of_edges] 
-    )
+    weights = tuple( [prop['weight'] for (u,v,prop) in list_of_edges] )
 
 
     nx.draw_networkx_nodes(
@@ -1452,8 +1488,7 @@ def plotTreeDiagram(
         G, 
         edgelist=edge_tuples,
         pos=positions, arrows=True, 
-        arrowstyle='->',
-        width = arrow_size, widthscale=widthscale,
+        arrowstyle='->', width = arrow_size, widthscale=widthscale,
         pathstyle=pathstyle, alphas = e_alphas, edge_color= weights,
         edge_cmap=e_cmap, 
         edge_vmin=None, #0.8, 
@@ -1494,25 +1529,11 @@ def plotTreeDiagram(
 
     lgd_handles=[]
     
-    # if 'Branch Champion' in labels:
-    #     legend_title='Champion Type'
-    # else:
-    #     legend_title='# QMD wins'
-    # plt.legend(handles, labels, title=legend_title)
     if 'Branch Champion' in labels:
         legend_title='Champion Type'
     else:
         legend_title='# QMD wins'
-    plt.legend(
-        handles, 
-        labels, 
-        title=legend_title, 
-        # mode="expand", 
-        ncol=min(6, len(handles)), 
-        loc='lower center'
-    )
-
-
+    plt.legend(handles, labels, title=legend_title)
 
     plot_title = ''
     if entropy is not None:
@@ -1532,12 +1553,7 @@ def plotTreeDiagram(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-def colour_dicts_from_win_count(
-    winning_count, 
-    latex_mapping_file,
-    growth_generator=None,
-    min_colour_value=0.1
-):
+def colour_dicts_from_win_count(winning_count, min_colour_value=0.1):
     max_wins=max(list(winning_count.values()))
     min_wins=min(list(winning_count.values()))
     min_col = min_colour_value
@@ -1550,23 +1566,9 @@ def colour_dicts_from_win_count(
     col_space = np.linspace(min_col, max_col, num_colours)
     colour_by_win_count = {}
     colour_by_node_name = {}
-    # all_models=list(
-    #     # ising_terms_full_list(
-    #     UserFunctions.get_all_model_names(
-    #         growth_generator=growth_generator,
-    #         return_branch_dict='term_branch_dict').keys(
-    #     )
-    # )
-    all_models = list(
-        UserFunctions.get_name_branch_map(
-            latex_mapping_file = latex_mapping_file,
-            growth_generator = growth_generator
-        ).keys()
+    all_models=list(
+        ising_terms_full_list(return_branch_dict='latex_terms').keys()
     )
-
-
-
-    # print("colour dict function. all_models:\n", all_models)
 
     for k in range(num_colours):
         colour_by_win_count[k] = col_space[k]
@@ -1581,55 +1583,29 @@ def colour_dicts_from_win_count(
     return colour_by_node_name, colour_by_win_count
 
 
-
-
 def cumulativeQMDTreePlot(
         cumulative_csv, 
         wins_per_mod, 
-        latex_mapping_file,
         avg='means',
         only_adjacent_branches=True,
-        growth_generator=None,
         directed=True,
         entropy=None, 
         inf_gain=None,
         save_to_file=None
     ):
+    
     import networkx as nx
     import copy
-    import csv
-    means, medians, counts = multiQMDBayes(
-        cumulative_csv, 
-        growth_generator=growth_generator
-    )
+    means, medians, counts = multiQMDBayes(cumulative_csv)
     if avg=='means':
         bayes_factors = means #medians
     elif avg=='medians':
         bayes_factors = medians
 
-    # modlist = ising_terms_full_list()
-    # term_branches = (
-    #     ising_terms_full_list(return_branch_dict='latex_terms')       
-    # ) 
-    # modlist = UserFunctions.get_all_model_names(
-    #     growth_generator = growth_generator,
-    #     return_branch_dict = 'latex_terms'
-    # )
-    # term_branches = (
-    #     UserFunctions.get_all_model_names(
-    #         growth_generator = growth_generator,
-    #         return_branch_dict='term_branch_dict'
-    #     )       
-    # )
-    print("[cumulative Tree] entering model map func")
-    term_branches = UserFunctions.get_name_branch_map(
-        latex_mapping_file = latex_mapping_file,
-        growth_generator = growth_generator
-    )
-
-    modlist = csv.DictReader(open(cumulative_csv)).fieldnames
-    if 'ModelName' in modlist:
-        modlist.remove('ModelName')
+    modlist = ising_terms_full_list()
+    term_branches = (
+        ising_terms_full_list(return_branch_dict='latex_terms')       
+    ) 
 
     pair_freqs={}
     for c in list(counts.keys()):
@@ -1648,9 +1624,9 @@ def cumulativeQMDTreePlot(
     branch_mod_count = {}
 
 #    max_branch_id = qmd.HighestBranchID # TODO: get this number without access to QMD class instance
-    # max_branch_id = 9 # TODO: this is hardcoded - is there an alternative?
-    max_branch_id = max( list(term_branches.values()) ) + 1
-    max_mod_id = len(modlist)
+ #   max_mod_id = qmd.HighestModelID
+    max_branch_id = 9 # TODO: this is hardcoded - is there an alternative?
+    max_mod_id = 17
     
     
 
@@ -1659,12 +1635,7 @@ def cumulativeQMDTreePlot(
         branch_mod_count[i] =  0 
 
     colour_by_node_name, colour_by_count = (
-        colour_dicts_from_win_count(
-            wins_per_mod, 
-            latex_mapping_file=latex_mapping_file,
-            growth_generator=growth_generator, 
-            min_colour_value=0.4
-        )
+        colour_dicts_from_win_count(wins_per_mod, 0.4)
     )
     min_colour = min(list(colour_by_node_name.values()))
     
@@ -1705,18 +1676,11 @@ def cumulativeQMDTreePlot(
     for a in modlist:
         remaining_modlist = modlist[modlist.index(a)+1:]
         for b in remaining_modlist:
-            is_adj = global_adjacent_branch_test(
-                a, 
-                b, 
-                term_branches
-            )
+            is_adj = global_adjacent_branch_test(a, b, term_branches)
             if is_adj or not only_adjacent_branches:
                 if a!=b:
                     pairing = (a,b)
-                    try:
-                        frequency = pair_freqs[pairing]/max_frequency
-                    except:
-                        frequency = 1
+                    frequency = pair_freqs[pairing]/max_frequency
                     edges.append(pairing)
                     edge_frequencies.append(frequency)
 
@@ -1765,9 +1729,7 @@ def cumulativeQMDTreePlot(
 #        e_cmap = plt.cm.Blues, 
         #e_cmap = plt.cm.Paired,     
         #e_cmap = plt.cm.rainbow,     
-        nonadj_alpha = 0.1, e_alphas = [] , 
-        # widthscale=10.5, 
-        widthscale=3, 
+        nonadj_alpha = 0.1, e_alphas = [] , widthscale=10.5, 
         label_padding = 0.4, pathstyle="curve",
         arrow_size=None,
         entropy=entropy, inf_gain=inf_gain
@@ -1787,242 +1749,13 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
 
 
 
-# def draw_networkx_arrows(
-#     G, 
-#     pos,
-#     edgelist=None,
-#     nodedim = 0.,
-# #                        width=0.02,
-#     width=1.0,
-#     widthscale = 1.0,
-#     edge_color='k',
-#     style='solid',
-#     alphas=1.,
-#     edge_cmap=None,
-#     edge_vmin=None,
-#     edge_vmax=None,
-#     ax=None,
-#     label=[None],
-#     pathstyle='straight',
-#     **kwds
-# ):
-#     if ax is None:
-#         ax = plt.gca()
-
-#     if edgelist is None:
-#         edgelist = G.edges()
-        
-#     if width is None:
-#         try:
-#             widthlist = np.array(list(  [(widthscale*prop['freq']) for (u,v,prop) in G.edges(data=True)]  ))
-#             widthlist = widthscale*widthlist/np.max(widthlist)
-#             # widthlist = [(a+widthscale*0.1) for a in widthlist] ## this was giving colour to non-existent edges
-#         except:
-# #            widthlist = widthscale*0.02
-#             widthlist = widthscale
-            
-#     else:
-#         widthlist = width
-
-#     if not edgelist or len(edgelist) == 0:  # no edges!
-#         return None
-        
-#     if len(alphas)<len(edgelist):
-#         alphas = np.repeat(alphas, len(edgelist))
-
-#     # set edge positions
-#     edge_pos = np.asarray([(pos[e[0]], pos[e[1]]) for e in edgelist])
-    
-#     if not cb.iterable(widthlist):
-#         lw = (widthlist,)
-#     else:
-#         lw = widthlist
-
-#     if not cb.is_string_like(edge_color) \
-#            and cb.iterable(edge_color) \
-#            and len(edge_color) == len(edge_pos):
-#         if np.alltrue([cb.is_string_like(c)
-#                          for c in edge_color]):
-#             # (should check ALL elements)
-#             # list of color letters such as ['k','r','k',...]
-#             edge_colors = tuple([colorConverter.to_rgba(c)
-#                                  for c in edge_color])
-#         elif np.alltrue([not cb.is_string_like(c)
-#                            for c in edge_color]):
-#             # If color specs are given as (rgb) or (rgba) tuples, we're OK
-#             if np.alltrue([cb.iterable(c) and len(c) in (3, 4)
-#                              for c in edge_color]):
-#                 edge_colors = tuple(edge_color)
-#             else:
-#                 # numbers (which are going to be mapped with a colormap)
-#                 edge_colors = None
-#         else:
-#             raise ValueError('edge_color must consist of \
-#                 either color names or numbers'
-#             )
-#     else:
-#         if cb.is_string_like(edge_color) or len(edge_color) == 1:
-#             edge_colors = (colorConverter.to_rgba(edge_color), )
-#         else:
-#             raise ValueError('edge_color must be a single color or \
-#             list of exactly m colors where m is the number or edges'
-#         )
-
-#     edge_collection = collections.LineCollection(
-#         edge_pos,
-#         colors=edge_colors, 
-#         linewidths=lw
-#     )
-#     edge_collection.set_zorder(1)  # edges go behind nodes
-
-#     # ax.add_collection(edge_collection)
-
-#     if edge_colors is None:
-#         if edge_cmap is not None:
-#             assert(isinstance(edge_cmap, Colormap))
-#         edge_collection.set_array(np.asarray(edge_color))
-#         edge_collection.set_cmap(edge_cmap)
-#         if edge_vmin is not None or edge_vmax is not None:
-#             edge_collection.set_clim(edge_vmin, edge_vmax)
-#         else:
-#             edge_collection.autoscale()
-    
-
-
-#     max_bayes_value = max(edge_collection.get_clim())
-#     edge_collection.set_clim(0.5, max_bayes_value)
-#     # for i in range(len(edgelist)):
-#     #     print(edgelist[i], ":", edge_color[i])
-
-#     for n in G:
-#         c=Circle(pos[n],radius=0.02,alpha=0.5)
-#         ax.add_patch(c)
-#         G.node[n]['patch']=c
-#         x,y=pos[n]
-#     seen={}
-
-#     # Rescale all weights between 0,1 so cmap can find the appropriate RGB value.
-#     offset = 0.7
-#     norm_edge_color = edge_color/max_bayes_value
-
-
-
-#     if G.is_directed():
-#         seen = {}
-#         for idx in range(len(edgelist)):
-#             if not cb.iterable(widthlist):
-#                 lw = widthlist
-#             else:
-#                 lw = widthlist[idx]
-            
-#             arrow_colour =  edge_cmap(norm_edge_color[idx])
-
-#             if pathstyle is "straight":
-#                 (src, dst) = edge_pos[idx]
-#                 x1, y1 = src
-#                 x2, y2 = dst
-#                 delta = 0.2
-#                 theta = np.arctan((y2-y1)/(x2-x1))
-#                 # print(theta)
-#                 if x1==x2:
-#                     dx = x2-x1
-#                     dy = y2-y1 - np.sign(y2-y1)*delta
-#                 elif y1==y2:
-#                     dx = x2-x1 - np.sign(x2-x1)*delta
-#                     dy = y2-y1 
-#                 else:
-#                     dx = x2-x1 - np.sign(x2-x1)*np.abs(np.cos(theta)*delta)   # x offset
-#                     dy = y2-y1 - np.sign(y2-y1)*np.abs(np.sin(theta)*delta)   # y offset 
-                
-#                 thislabel = None if len(label)<len(edgelist) else label[idx]
-
-#                 ax.arrow(
-#                     x1,y1, dx,dy,
-#                     facecolor=arrow_colour, 
-#                     alpha = alphas[idx],
-#                     linewidth = 0, 
-#                     antialiased = True,
-#                     width = lw, 
-#                     head_width = 5*lw,
-#                     overhang = -5*0.02/lw,
-#                     length_includes_head=True, 
-#                     label=thislabel, zorder=1
-#                 )
-                    
-#             elif pathstyle is "curve":
-                
-#                 (u,v) = edgelist[idx]
-#                 # (u,v,prop) = prop['weight'] for  in list_of_edges
-#                 # flipped = G.edge[(u,v)]
-                
-#                 winner = G.edges[(u,v)]['winner']
-#                 loser = G.edges[(u,v)]['loser']
-#                 n1=G.node[loser]['patch']
-#                 n2=G.node[winner]['patch']
-
-#                 # n1=G.node[u]['patch']
-#                 # n2=G.node[v]['patch']
-
-#                 rad=0.1
-
-#                 if (u,v) in seen:
-#                     rad=seen.get((u,v))
-#                     rad=(rad+np.sign(rad)*0.1)*-1
-#                 alpha=0.5
-                
-#                 kwargs = {
-#                     'head_width': 5*lw, 
-#                       #'overhang':-5*0.02/lw,  
-#                       #'length_includes_head': True
-#                 }
-                          
-#                 arrow_style = ArrowStyle(
-#                     "->", 
-#                     head_length=1.9, 
-#                     head_width=1.9
-#                 ) # Can be accepted by fancy arrow patch to alter arrows
-
-# #                arrow_style = ArrowStyle("-[", widthB=2.0, lengthB=1.0) # Can be accepted by fancy arrow patch to alter arrows
-
-#                 e = FancyArrowPatch(
-#                     n1.center,
-#                     n2.center,
-#                     patchA=n1,
-#                     patchB=n2,
-#                     # arrowstyle='-|>',
-#                     # capstyle='projecting',
-#                     arrowstyle=arrow_style,
-#                     connectionstyle='arc3,rad=%s'%rad,
-#                     mutation_scale=10.0,
-#                     lw=lw,   #AROUND 10 TO BE FEASIBLE
-#                     alpha=alphas[idx],
-#                     color=arrow_colour,
-#             #        **kwargs
-#                 )
-#                 seen[(u,v)]=rad
-#                 ax.add_patch(e)
-           
-
-#     # update view
-#     minx = np.amin(np.ravel(edge_pos[:, :, 0]))
-#     maxx = np.amax(np.ravel(edge_pos[:, :, 0]))
-#     miny = np.amin(np.ravel(edge_pos[:, :, 1]))
-#     maxy = np.amax(np.ravel(edge_pos[:, :, 1]))
-
-#     w = maxx-minx
-#     h = maxy-miny
-#     padx,  pady = 0.05*w, 0.05*h
-#     corners = (minx-padx, miny-pady), (maxx+padx, maxy+pady)
-#     ax.update_datalim(corners)
-#     ax.autoscale_view()
-
-#     return edge_collection
 def draw_networkx_arrows(
     G, 
     pos,
     edgelist=None,
     nodedim = 0.,
-    width=0.02,    #                        width=0.02, 1.0
+#                        width=0.02,
+    width=1.0,
     widthscale = 1.0,
     edge_color='k',
     style='solid',
@@ -2134,7 +1867,7 @@ def draw_networkx_arrows(
     offset = 0.7
     norm_edge_color = edge_color/max_bayes_value
 
-    # print("all color cmap values", norm_edge_color)
+
 
     if G.is_directed():
         seen = {}
@@ -2200,38 +1933,38 @@ def draw_networkx_arrows(
                 alpha=0.5
                 
                 kwargs = {
-                    # 'head_width': 5*lw, 
-                    'facecolor': arrow_colour[0:3]+(alphas[idx],),
-                    'edgecolor': (0,0,0,0.)
+                    'head_width': 5*lw, 
                       #'overhang':-5*0.02/lw,  
-                      #'length_includes_head': True,
-                      # capstyle='projecting',
+                      #'length_includes_head': True
                 }
                           
-                # Can be accepted by fancy arrow patch to alter arrows
-                arrow_style = ArrowStyle.Wedge(
-                    tail_width = lw,
-                    shrink_factor = 0.3
-                )
+                arrow_style = ArrowStyle(
+                    "->", 
+                    head_length=1.9, 
+                    head_width=1.9
+                ) # Can be accepted by fancy arrow patch to alter arrows
+
+#                arrow_style = ArrowStyle("-[", widthB=2.0, lengthB=1.0) # Can be accepted by fancy arrow patch to alter arrows
 
                 e = FancyArrowPatch(
                     n1.center,
                     n2.center,
                     patchA=n1,
                     patchB=n2,
+                    # arrowstyle='-|>',
+                    # capstyle='projecting',
                     arrowstyle=arrow_style,
                     connectionstyle='arc3,rad=%s'%rad,
                     mutation_scale=10.0,
                     lw=lw,   #AROUND 10 TO BE FEASIBLE
-                   **kwargs
+                    alpha=alphas[idx],
+                    color=arrow_colour,
+            #        **kwargs
                 )
                 seen[(u,v)]=rad
                 ax.add_patch(e)
            
-    # print("rad", rad)
-    # print("Node coordinates", n1, n2)
-    # print("arrowcolor", arrow_colour)
-    
+
     # update view
     minx = np.amin(np.ravel(edge_pos[:, :, 0]))
     maxx = np.amax(np.ravel(edge_pos[:, :, 0]))
@@ -2245,7 +1978,7 @@ def draw_networkx_arrows(
     ax.update_datalim(corners)
     ax.autoscale_view()
 
-    return edge_collection    
+    return edge_collection
 
 
 ### Parameter Estimate Plot ###
@@ -2290,24 +2023,15 @@ def parameterEstimates(
 #    colours = ['b','r','g','orange', 'pink', 'grey']
 
     # TODO use color map as list
-    # num_epochs = qmd.NumExperiments
-    num_epochs = mod.NumExperiments
+    num_epochs = qmd.NumExperiments
 #    fig = plt.figure()
 #    ax = plt.subplot(111)
 
-    # ncols=3
-    # nrows=3 # TODO  -- make safe
-    ncols = int(np.ceil(np.sqrt(num_terms)))
-    nrows = int(np.ceil(num_terms/ncols))
-
+    ncols=3
+    nrows=3 # TODO  -- make safe
 #    nrows=int(np.ceil( num_terms/ncols ))
 
-    fig, axes = plt.subplots(
-        figsize = (10, 7), 
-        nrows=nrows, 
-        ncols=ncols,
-        squeeze=False
-    )
+    fig, axes = plt.subplots(figsize = (10, 7), nrows=nrows, ncols=ncols)
     row = 0
     col = 0
     axes_so_far = 0
@@ -2320,22 +2044,14 @@ def parameterEstimates(
         try:
             if use_experimental_data==False:
                 y_true = qmd.TrueParamDict[term]
-                # true_term_latex = DataBase.latex_name_ising(term)
-                true_term_latex = UserFunctions.get_latex_name(
-                    name = term,
-                    growth_generator = qmd.GrowthGenerator
-                )
-
+                true_term_latex = DataBase.latex_name_ising(term)
                 ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
         except:
             pass
         y = np.array(param_estimate_by_term[term])
         s = np.array(std_devs[term])
         x = range(1,1+len(param_estimate_by_term[term]))
-        latex_term = UserFunctions.get_latex_name(
-            name = term,
-            growth_generator = qmd.GrowthGenerator
-        )
+        latex_term = DataBase.latex_name_ising(term)
         ax.scatter(
             x,
             y, 
@@ -2381,13 +2097,7 @@ def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
     from matplotlib import cm as colmap
 #    from viz_library_undev import radar_factory # TODO IS THIS THE RIGHT FUNCTION?
     
-    labels = [
-        # DataBase.latex_name_ising(qmd.ModelNameIDs[l]) for l in modlist
-        UserFunctions.get_latex_name(
-            name=qmd.ModelNameIDs[l], 
-            growth_generator=qmd.GrowthGenerator
-        ) for l in modlist    
-    ]
+    labels = [DataBase.latex_name_ising(qmd.ModelNameIDs[l]) for l in modlist]
     size = len(modlist)
     theta = custom_radar_factory(size, frame='polygon') 
     
@@ -2586,19 +2296,13 @@ def unit_poly_verts(theta):
 
 #### Cumulative Bayes CSV and InterQMD Tree plotting ####
 
-def multiQMDBayes(all_bayes_csv, growth_generator=None):
+def multiQMDBayes(all_bayes_csv):
     import csv, pandas
     cumulative_bayes = pandas.DataFrame.from_csv(all_bayes_csv)
     names=list(cumulative_bayes.keys())
 
     count_bayes={}
-    # mod_names= ising_terms_full_list()
-    # mod_names= UserFunctions.get_all_model_names(
-    #     growth_generator=growth_generator,
-    #     return_branch_dict='latex_terms'
-    # )
-
-    mod_names = list(cumulative_bayes.keys())
+    mod_names= ising_terms_full_list()
 
     for mod in mod_names:
         count_bayes[mod] = {}
@@ -2613,11 +2317,8 @@ def multiQMDBayes(all_bayes_csv, growth_generator=None):
 
 
     piv = pandas.pivot_table(cumulative_bayes, 
-        index='ModelName', 
-        values=names, 
-        aggfunc=[np.mean, np.median]
+        index='ModelName', values=names, aggfunc=[np.mean, np.median]
     )
-
     means=piv['mean']
     medians=piv['median']
 
@@ -2632,100 +2333,234 @@ def multiQMDBayes(all_bayes_csv, growth_generator=None):
 
 def updateAllBayesCSV(qmd, all_bayes_csv):
     import os,csv
+    
     data = get_bayes_latex_dict(qmd)
     names = list(data.keys())
     fields = ['ModelName']
     fields += names
-    # all_models += UserFunctions.get_all_model_names(
-    #     growth_generator = qmd.GrowthGenerator,
-    #     return_branch_dict='latex_terms'
-    # )
-    all_models = []
+    all_models= ['ModelName']
+    all_models += ising_terms_full_list()
+    
     if os.path.isfile(all_bayes_csv) is False:
-        # all_models += ['ModelName']
-        # all_models += names
-        # print("file exists:", os.path.isfile(all_bayes_csv))
-        # print("creating CSV")
         with open(all_bayes_csv, 'a+') as bayes_csv:
-            writer = csv.DictWriter(
-                bayes_csv, 
-                fieldnames=fields
-            )
+            writer = csv.DictWriter(bayes_csv, fieldnames=all_models)
             writer.writeheader()
-    else:
-        # print("file exists:", os.path.isfile(all_bayes_csv))
-        current_csv = csv.DictReader(open(all_bayes_csv))
-        current_fieldnames = current_csv.fieldnames
-        new_models = list(
-            set(fields) - set(current_fieldnames)
-        )
-
-        if len(new_models) > 0:
-            # print("new models:", new_models)
-            # print("current:", current_fieldnames)
-            # print("fields:", fields)
-            import pandas
-            csv_input = pandas.read_csv(
-                all_bayes_csv, 
-                index_col='ModelName'
-            )
-            a=list(csv_input.keys())
-            # print("pandas says existing models are:\n", a)
-            empty_list = [np.NaN]*len(list(csv_input[a[0]].values))
-
-            for new_col in new_models:
-                csv_input[new_col] = empty_list
-
-
-
-            # print("writing new pandas CSV: ", csv_input)
-            csv_input.to_csv(all_bayes_csv)
+    
     with open(all_bayes_csv, 'a') as bayes_csv:
-        writer = csv.DictWriter(
-            bayes_csv, 
-            fieldnames=fields,
-        )
+        writer = csv.DictWriter(bayes_csv, fieldnames=all_models)
+
         for f in names:
             single_model_dict = data[f]
-            # print("Model:", f, "\n dict:", single_model_dict)
             single_model_dict['ModelName']=f
             writer.writerow(single_model_dict)
 
 
 def get_bayes_latex_dict(qmd):
     latex_dict = {}
-    # print("get bayes latex dict")
-
-    latex_write_file  = open(
-        # str(qmd.ResultsDirectory + 'LatexMapping.txt'), 
-        qmd.LatexMappingFile, 
-        'a+'
-    )
     for i in list(qmd.AllBayesFactors.keys()):
-        mod = qmd.ModelNameIDs[i]
-        latex_name = UserFunctions.get_latex_name(
-            name = mod,
-            growth_generator = qmd.GrowthGenerator
-        )
-        mapping = (mod, latex_name)
-        print(mapping, file=latex_write_file)
-
-    for i in list(qmd.AllBayesFactors.keys()):
-        # mod_a = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
-        mod_a = UserFunctions.get_latex_name(
-            name = qmd.ModelNameIDs[i],
-            growth_generator = qmd.GrowthGenerator
-        )
+        mod_a = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
         latex_dict[mod_a] = {}
         for j in list(qmd.AllBayesFactors[i].keys()):
-            # mod_b = DataBase.latex_name_ising(qmd.ModelNameIDs[j])
-            mod_b = UserFunctions.get_latex_name(
-                name = qmd.ModelNameIDs[j],
-                growth_generator = qmd.GrowthGenerator
-            )
+            mod_b = DataBase.latex_name_ising(qmd.ModelNameIDs[j])
             latex_dict[mod_a][mod_b]= qmd.AllBayesFactors[i][j][-1]
     return latex_dict
 
+
+
+def ising_terms_rotation_hyperfine(return_branch_dict=None):
+    pauli_terms = ['x','y','z']
+
+    branches= {}
+    branch_by_term_dict = {}
+    for i in range(9):
+        branches[i] = []
+    
+    rotation_terms = []
+    hf_terms = []
+    transverse_terms = []
+
+    for t in pauli_terms:
+        rotation_terms.append(t+'Ti')
+        hf_terms.append(t+'T'+t)
+        for k in pauli_terms:
+            if k>t:
+                transverse_terms.append(t+'T'+k)
+
+    ising_terms = []            
+    add = 'PP'
+
+    for r in rotation_terms:
+        ising_terms.append(r)
+        branches[0].append(r)
+        branch_by_term_dict[r] = 0
+        
+    for r in rotation_terms:
+        new_terms=[]
+        for i in rotation_terms:
+            if r<i:
+                branches[1].append(r+add+i)
+                branch_by_term_dict[r+add+i] = 1
+                new_terms.append(r+add+i)
+        ising_terms.extend(new_terms)
+
+    full_rotation = add.join(rotation_terms)
+    ising_terms.append(full_rotation)
+    branches[2].append(full_rotation)
+    branch_by_term_dict[full_rotation] = 2
+    
+
+    for t in hf_terms:
+        new_term = full_rotation+add+t
+        branches[3].append(new_term)
+        branch_by_term_dict[new_term] = 3
+        ising_terms.append(new_term)
+
+    for t in hf_terms:
+        for k in hf_terms:
+            if t<k:
+                dual_hf_term= full_rotation+add+t+add+k
+                branches[4].append(dual_hf_term)
+                branch_by_term_dict[dual_hf_term] = 4
+                ising_terms.append(dual_hf_term)
+
+    for t in hf_terms:
+        for l in hf_terms:
+            for k in hf_terms:
+                if t<k<l:
+                    triple_hf = full_rotation + add + t + add + k + add + l
+                    branches[5].append(triple_hf)
+                    ising_terms.append(triple_hf)
+                    branch_by_term_dict[triple_hf] = 5
+
+    
+    latex_terms = [DataBase.latex_name_ising(i) for i in ising_terms]
+    
+    if return_branch_dict=='branches':
+        return branches
+    elif return_branch_dict=='terms':
+        return branch_by_term_dict
+
+    elif return_branch_dict == 'latex_terms':
+        for k in list(branch_by_term_dict.keys()):
+            branch_by_term_dict[DataBase.latex_name_ising(k)]=(
+                branch_by_term_dict.pop(k)
+            )
+        return branch_by_term_dict
+        
+    else:
+        return latex_terms
+
+
+
+
+def ising_terms_full_list(return_branch_dict=None):
+    pauli_terms = ['x','y','z']
+
+    branches= {}
+    branch_by_term_dict = {}
+    for i in range(9):
+        branches[i] = []
+    
+    rotation_terms = []
+    hf_terms = []
+    transverse_terms = []
+
+    for t in pauli_terms:
+        rotation_terms.append(t+'Ti')
+        hf_terms.append(t+'T'+t)
+        for k in pauli_terms:
+            if k>t:
+                transverse_terms.append(t+'T'+k)
+
+    ising_terms = []            
+    add = 'PP'
+
+    for r in rotation_terms:
+        ising_terms.append(r)
+        branches[0].append(r)
+        branch_by_term_dict[r] = 0
+        
+    for r in rotation_terms:
+        new_terms=[]
+        for i in rotation_terms:
+            if r<i:
+                branches[1].append(r+add+i)
+                branch_by_term_dict[r+add+i] = 1
+                new_terms.append(r+add+i)
+        ising_terms.extend(new_terms)
+
+    full_rotation = add.join(rotation_terms)
+    ising_terms.append(full_rotation)
+    branches[2].append(full_rotation)
+    branch_by_term_dict[full_rotation] = 2
+    
+
+    for t in hf_terms:
+        new_term = full_rotation+add+t
+        branches[3].append(new_term)
+        branch_by_term_dict[new_term] = 3
+        ising_terms.append(new_term)
+
+    for t in hf_terms:
+        for k in hf_terms:
+            if t<k:
+                dual_hf_term= full_rotation+add+t+add+k
+                branches[4].append(dual_hf_term)
+                branch_by_term_dict[dual_hf_term] = 4
+                ising_terms.append(dual_hf_term)
+
+    for t in hf_terms:
+        for l in hf_terms:
+            for k in hf_terms:
+                if t<k<l:
+                    triple_hf = full_rotation + add + t + add + k + add + l
+                    branches[5].append(triple_hf)
+                    ising_terms.append(triple_hf)
+                    branch_by_term_dict[triple_hf] = 5
+
+
+
+    for t in transverse_terms:
+        transverse_term= triple_hf+add+t
+        branches[6].append(transverse_term)
+        branch_by_term_dict[transverse_term] = 6
+        ising_terms.append(transverse_term)
+
+
+    for t in transverse_terms:
+        for k in transverse_terms:
+            if t<k:
+                dual_transverse_term= triple_hf+add+t+add+k
+                branches[7].append(dual_transverse_term)
+                branch_by_term_dict[dual_transverse_term] = 7
+                ising_terms.append(dual_transverse_term)
+
+    for t in transverse_terms:
+        for l in transverse_terms:
+            for k in transverse_terms:
+                if t<k<l:
+                    triple_hf_term= triple_hf+add+t+add+k+add+l
+                    branch_by_term_dict[triple_hf_term] = 8
+                    branches[8].append(triple_hf_term)
+                    ising_terms.append(triple_hf_term)
+
+    
+    latex_terms = [DataBase.latex_name_ising(i) for i in ising_terms]
+    
+    if return_branch_dict=='branches':
+        return branches
+    elif return_branch_dict=='terms':
+        return branch_by_term_dict
+
+    elif return_branch_dict == 'latex_terms':
+        for k in list(branch_by_term_dict.keys()):
+            branch_by_term_dict[DataBase.latex_name_ising(k)]=(
+                branch_by_term_dict.pop(k)
+            )
+        return branch_by_term_dict
+        
+    else:
+        return latex_terms
 
 def global_adjacent_branch_test(a,b, term_branches):
     branch_a = term_branches[a]
@@ -2743,13 +2578,8 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
     import csv
     fields = ['ID', 'Name']
     if names_ids=='latex':
-        # names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in 
-        names = [
-            UserFunctions.get_latex_name(
-                name = qmd.ModelNameIDs[i],
-                growth_generator = qmd.GrowthGenerator
-            ) 
-            for i in range(qmd.HighestModelID)
+        names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in 
+            range(qmd.HighestModelID)
         ]
     elif names_ids=='nonlatex':
         names = [qmd.ModelNameIDs[i] for i in range(qmd.HighestModelID)]
@@ -2771,11 +2601,7 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
             for j in qmd.AllBayesFactors[i].keys():
                 if names_ids=='latex':
                     other_model_name = (
-                        # DataBase.latex_name_ising(qmd.ModelNameIDs[j])
-                        UserFunctions.get_latex_name(
-                            name=qmd.ModelNameIDs[j],
-                            growth_generator = qmd.GrowthGenerator
-                        )
+                        DataBase.latex_name_ising(qmd.ModelNameIDs[j])
                     )
                 elif names_ids=='nonlatex':
                     other_model_name = qmd.ModelNameIDs[j]
@@ -2784,11 +2610,7 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
                 model_bf[other_model_name] = qmd.AllBayesFactors[i][j][-1]
 
             if names_ids=='latex':
-                # model_bf['Name'] = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
-                model_bf['Name'] = UserFunctions.get_latex_name(
-                    name = qmd.ModelNameIDs[i],
-                    growth_generator = qmd.GrowthGenerator
-                )
+                model_bf['Name'] = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
             else:
                 model_bf['Name'] = qmd.ModelNameIDs[i]
             model_bf['ID'] = i
@@ -2801,30 +2623,17 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
 def plotTrueModelBayesFactors_IsingRotationTerms(
     results_csv_path, 
     correct_mod="xTiPPyTiPPzTiPPxTxPPyTyPPzTz", 
-    growth_generator=None, 
     save_to_file=None
 ):
     from matplotlib import cm
+
     # TODO saved fig is cut off on edges and don't have axes titles.
 
-    # correct_mod = DataBase.latex_name_ising(correct_mod)
-    correct_mod = UserFunctions.get_latex_name(
-        # this function is exclusively for Ising plot so two qubit growth generator is hard coded.
-        name = correct_mod,
-        growth_generator = growth_generator
-    )
+    correct_mod = DataBase.latex_name_ising(correct_mod)
     results_csv = os.path.abspath(results_csv_path)
     qmd_res = pd.DataFrame.from_csv(results_csv)
 
-    mods = list(
-        set(list(
-            qmd_res.index
-        ))
-    )
-    # mods = ising_terms_rotation_hyperfine()
-    # mods = UserFunctions.get_all_model_names(
-    #     growth_generator = growth_generator
-    # )
+    mods = ising_terms_rotation_hyperfine()
     mods.pop(mods.index(correct_mod))
     othermods = mods
     correct_subDB = qmd_res.ix[correct_mod]    
@@ -2835,13 +2644,10 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
         BF_values = BF_values[~np.isnan(BF_values)]
 
         all_BFs.append(BF_values)
-    num_models = len(othermods)
-    n_bins = 30
-    # nrows=5
-    # ncols=3
-    ncols = int(np.ceil(np.sqrt(num_models)))
-    nrows = int(np.ceil(num_models/ncols))
 
+    n_bins = 30
+    nrows=5
+    ncols=3
     fig, axes = plt.subplots(figsize = (20, 10), nrows=nrows, ncols=ncols)
     cm_subsection = np.linspace(0.1, 0.9, len(all_BFs)) 
     colors = [ cm.viridis(x) for x in cm_subsection ]
@@ -2867,429 +2673,3 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
 
     if save_to_file is not None:
         fig.savefig(save_to_file, bbox_inches='tight')
-
-
-
-#### 
-## Standalone function to redraw expectation values
-## of QHL given the params_dict it learned, and 
-## the path to the dict of true expectation values
-## it was emulating
-
-def replot_expectation_values(
-    params_dictionary_list, # list of params_dicts 
-    true_expec_vals_path,
-    plot_probe_path, 
-    growth_generator,
-    measurement_method = 'full_access',
-    upper_x_limit=None,
-    model_descriptions=None, 
-    save_to_file=None
-):
-    print("[replot] ",
-        "true_expec_vals_path", true_expec_vals_path,
-        "plot_probe_path", plot_probe_path,  
-        "growth_generator", growth_generator,
-        "measurement_method", measurement_method
-    )
-    sim_colours = ['b', 'g', 'c', 'y', 'm',  'k']
-    plot_probes = pickle.load(open(plot_probe_path, 'rb'))
-    # true_expec_vals_path = str(
-    #     directory_name + 'true_expec_vals.p'
-    # )
-    print(
-        "Reconstructed QHL with expectation value method:", 
-        measurement_method
-    )
-    true_exp_vals = pickle.load(open(true_expec_vals_path, 'rb'))
-    exp_times = sorted(list(true_exp_vals.keys()))
-    
-    sim_times = copy.copy(exp_times)
-    if (
-        upper_x_limit is not None 
-        and
-        upper_x_limit  > max(exp_times)
-    ):
-        additional_sim_times = np.linspace(max(exp_times), upper_x_limit, 30 )
-        sim_times.extend(additional_sim_times)
-        sim_times = sorted(sim_times)
-    
-    if type(params_dictionary_list) == dict:
-        params_dictionary_list = [params_dictionary_list]
-    
-
-    num_plots = len(params_dictionary_list)
-    ncols = int(np.ceil(np.sqrt(num_plots)))
-    nrows = int(np.ceil(num_plots/ncols))
-
-    fig, axes = plt.subplots(
-        figsize = (10, 7), 
-        nrows=nrows, 
-        ncols=ncols,
-        squeeze=False
-    )
-    row = 0
-    col = 0
-
-    true_exp = [true_exp_vals[t] for t in exp_times]    
-
-    for params_dict in params_dictionary_list:
-        ax = axes[row,col]
-
-        sim_ops_names = list(params_dict.keys())
-        sim_params = [
-            params_dict[k] for k in sim_ops_names
-        ]
-        sim_ops = [
-            DataBase.compute(k) for k in sim_ops_names
-        ]
-        sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
-
-        sim_num_qubits = DataBase.get_num_qubits(sim_ops_names[0])
-        p_str=''
-        for i in range(2):
-            p_str+='P'
-        probe = plot_probes[sim_num_qubits]
-
-        sim_exp_vals = {}
-        for t in sim_times:
-            sim_exp_vals[t] = UserFunctions.expectation_value_wrapper(
-                method=measurement_method, 
-                ham=sim_ham, 
-                state = probe, 
-                t = t
-            )
-
-        sim_exp = [sim_exp_vals[t] for t in sim_times]
-        list_id = params_dictionary_list.index(params_dict)
-        sim_colour = sim_colours[list_id % len(sim_colours)]
-        if model_descriptions is not None:
-            model_label = model_descriptions[list_id]
-        else:
-            sim_op_string = p_str.join(sim_ops_names)
-            latex_name = UserFunctions.get_latex_name(
-                name=sim_op_string, 
-                growth_generator=growth_generator
-            )
-            model_label = latex_name
-        
-        ax.plot(
-            sim_times, 
-            sim_exp, 
-            label=model_label, 
-            color=sim_colour
-        )
-        ax.set_title(model_label)
-        ax.scatter(
-            exp_times, 
-            true_exp, 
-            label='True', 
-            color='red', 
-            s=3
-        )
-        ax.set_xlim(0,upper_x_limit)
-
-        col += 1
-        # if col == ncols and row == 0:
-        ax.legend(loc=1)
-        if col == ncols:
-            col=0
-            row+=1
-
-
-    # plt.legend(loc=1)
-    
-    if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
-    else:
-        plt.show()
-
-
-
-def cluster_results_and_plot(
-    path_to_results, # results_summary_csv to be clustered
-    true_expec_path,  
-    plot_probe_path,
-    true_params_path,
-    growth_generator,
-    measurement_type,
-    upper_x_limit=None, 
-    save_param_clusters_to_file=None, 
-    save_param_values_to_file=None, 
-    save_redrawn_expectation_values=None, 
-):
-    from matplotlib import cm
-    results_csv = pd.read_csv(path_to_results)
-    unique_champions = list(
-        set(list(results_csv['NameAlphabetical']))
-    )
-
-    true_info_dict = pickle.load(
-        open(true_params_path, 'rb')
-    )
-    print("KEYS:", true_info_dict.keys() )
-    try:
-        growth_generator = true_info_dict['growth_generator']
-    except:
-        pass
-        
-    true_params_dict = true_info_dict['params_dict']
-    if true_params_dict is not None:
-        for k in list(true_params_dict.keys()):
-            latex_key = UserFunctions.get_latex_name(
-                name = k, 
-                growth_generator = growth_generator
-            )
-            true_params_dict[latex_key] = true_params_dict[k]
-            true_params_dict.pop(k)
-    
-    all_learned_params = {}
-    champions_params = {}
-
-    for i in range(len(unique_champions)):
-        champ = unique_champions[i]
-        all_learned_params[champ] = (
-            results_csv.loc[results_csv['NameAlphabetical']
-            ==champ]['LearnedParameters'].values
-        )
-        this_champs_params = sorted(list(eval(all_learned_params[champ][0]).keys()))
-        champions_params[champ] = this_champs_params
-
-    all_possible_params = []
-    for p_list in champions_params.values():
-        all_possible_params.extend(p_list)
-
-    all_possible_params = list(
-        set(list(all_possible_params))
-    )
-    clusters = {}
-    params_for_clustering = {}
-    # this_champ = unique_champions[0]
-    for this_champ in unique_champions:
-        num_results_for_this_champ = len(all_learned_params[this_champ])
-        params_this_champ = sorted(
-            list(eval(all_learned_params[this_champ][0]).keys())
-        )
-        params = np.empty([num_results_for_this_champ, len(champions_params[this_champ])])
-        for i in range(num_results_for_this_champ):
-            learned_param_dict = eval(all_learned_params[this_champ][i])
-            test_list = [i for i in champions_params[this_champ]]
-            params[i] = [ 
-                learned_param_dict[this_param] for this_param in champions_params[this_champ] 
-            ]
-
-        params_for_clustering[this_champ] = params
-
-    for this_champ in unique_champions:
-        num_results_for_this_champ = len(
-            all_learned_params[this_champ]
-        )
-        try:
-            ms = MeanShift()
-            ms.fit(params_for_clustering[this_champ])
-            labels = ms.labels_
-            cluster_centers = ms.cluster_centers_
-
-            labels_unique = np.unique(labels)
-            n_clusters_ = len(labels_unique)
-
-            clusters[this_champ] = cluster_centers
-        except:
-            # NOTE: in case where clusters can't be formed, 
-            # that model is represented only by the first set of results..
-            # should they be averaged somehow?
-            clusters[this_champ] = np.array([params_for_clustering[this_champ][0]])
-
-    available_clustered_models = list(clusters.keys())
-    clustered_parameters_this_model = {}
-    clusters_by_model = {}
-    cluster_descriptions_by_model = {}
-    all_clusters_params = []
-    all_clusters_descriptions = []
-    all_centroids_of_each_param = {}
-    
-    for mod in available_clustered_models:
-        clusters_by_model[mod] = {}
-        cluster_descriptions_by_model[mod] = []
-        terms = champions_params[mod]
-        this_model_clusters = clusters[mod]
-
-        for j in range(len(this_model_clusters)): 
-            single_cluster = {}
-            for i in range(len(terms)):
-                single_cluster[terms[i]] = this_model_clusters[j][i]
-                try: 
-                    all_centroids_of_each_param[terms[i]].append(this_model_clusters[j][i])
-                except:
-                    all_centroids_of_each_param[terms[i]] = [this_model_clusters[j][i]]
-                
-                
-
-            latex_mod_name = UserFunctions.get_latex_name(
-                name=mod, 
-                growth_generator=growth_generator
-            )
-            cluster_description = str(
-                latex_mod_name + ' (' +  str(j) +')'
-            )
-            all_clusters_params.append(single_cluster)
-            all_clusters_descriptions.append(
-                cluster_description
-            )
-            clusters_by_model[mod][cluster_description] = single_cluster
-            cluster_descriptions_by_model[mod].append(
-                cluster_description
-            )    
-
-    for k in list(all_centroids_of_each_param.keys()):
-        latex_term = UserFunctions.get_latex_name(
-            name=k, 
-            growth_generator=growth_generator
-        )
-        all_centroids_of_each_param[latex_term] = all_centroids_of_each_param[k]
-        all_centroids_of_each_param.pop(k)
-    
-    
-    cm_subsection = np.linspace(
-        0,0.8,len(all_possible_params)
-    )
-    plot_colours = [ cm.Paired(x) for x in cm_subsection ]
-
-    term_colours = {}
-    latex_terms = {}
-    for term in all_possible_params:
-        latex_rep = UserFunctions.get_latex_name(
-            name=term, 
-            growth_generator = growth_generator
-        )
-    
-        latex_terms[term] = latex_rep
-    
-    for i in range(len(all_possible_params)):
-        name = latex_terms[all_possible_params[i]]
-        term_colours[name] = plot_colours[i]
-    total_num_clusters=0
-    for c in clusters:
-        total_num_clusters += len(clusters[c])
-    
-    #######
-    # Plot centroids by parameter
-    #######
-    unique_latex_params = list(
-        set(list(all_centroids_of_each_param.keys()))
-    )
-    total_num_params = len(unique_latex_params)
-    ncols = int(np.ceil(np.sqrt(total_num_params)))
-    nrows = int(np.ceil(total_num_params/ncols))
-
-    fig, axes = plt.subplots(
-        figsize = (10, 7), 
-        nrows=nrows, 
-        ncols=ncols,
-        squeeze=False
-    )
-    row = 0
-    col = 0
-
-    # from here below has to be put on an array layout
-    
-    for param in sorted(unique_latex_params):
-        ax = axes[row,col]
-        ax.get_shared_y_axes().join(ax, axes[row, 0])
-        this_param_values = all_centroids_of_each_param[param]
-        try:
-            true_param = true_params_dict[param]
-            ax.axhline(
-                true_param, 
-                linestyle='--', 
-                label='True',
-                color=term_colours[param]
-            )
-        except:
-            pass
-        
-        for v in this_param_values:
-            if this_param_values.index(v)==0:
-                ax.axhline(
-                    v, 
-                    color=term_colours[param],
-                    label=param
-                )
-            else:
-                ax.axhline(
-                    v, 
-                    color=term_colours[param],
-                )
-        ax.legend(loc=1)
-        col += 1
-        if col == ncols:
-            col=0
-            row+=1
-
-                
-    if save_param_values_to_file is not None:
-        plt.savefig(
-            save_param_values_to_file, 
-            bbox_to_inches='tight'
-        )
-
-        
-        
-    # Plot centroids by cluster 
-    ncols = int(np.ceil(np.sqrt(total_num_clusters)))
-    nrows = int(np.ceil(total_num_clusters/ncols))
-
-    fig, axes = plt.subplots(
-        figsize = (10, 7), 
-        nrows=nrows, 
-        ncols=ncols,
-        squeeze=False
-    )
-    row = 0
-    col = 0
-
-    # from here below has to be put on an array layout
-    for mod in sorted(clusters_by_model):
-        for cluster_description in sorted(
-            list(clusters_by_model[mod].keys())
-        ):
-            cluster = clusters_by_model[mod][cluster_description]
-            ax = axes[row,col]
-            for term in sorted(cluster.keys()):
-                label = UserFunctions.get_latex_name(
-                    name = term, 
-                    growth_generator = growth_generator
-                )
-                ax.axhline(
-                    cluster[term], 
-                    label=label, 
-                    color=term_colours[label]
-                )
-                ax.set_title(cluster_description)
-
-            col += 1
-            # TODO add legend for all individual params/colours... 
-            # single legend accross subplots??
-            # if col == ncols and row == 0:
-            ax.legend(loc=1)
-            if col == ncols:
-                col=0
-                row+=1
-                
-                
-    if save_param_clusters_to_file is not None:
-        plt.savefig(
-            save_param_clusters_to_file, 
-            bbox_to_inches='tight'
-        )
-
-    replot_expectation_values(
-        params_dictionary_list = all_clusters_params, # list of params_dicts 
-        model_descriptions = all_clusters_descriptions,
-        true_expec_vals_path = true_expec_path ,
-        plot_probe_path =plot_probe_path, 
-        growth_generator = growth_generator,
-        measurement_method = measurement_type,
-        upper_x_limit = upper_x_limit, # can play with this
-        save_to_file = save_redrawn_expectation_values
-    )                        
