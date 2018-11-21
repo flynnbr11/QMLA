@@ -813,6 +813,105 @@ def r_squared_plot(
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
+def average_quadratic_losses(
+    results_path,
+    growth_generator,
+    top_number_models = 2,
+    fill_alpha = 0.3, # to shade area of 1 std deviation
+    save_to_file=None
+):
+    from matplotlib import cm
+    results = pd.DataFrame.from_csv(
+        results_path,
+        index_col='QID'
+    )
+    sigmas = { # standard sigma values 
+        1 : 34.13,
+        2 : 13.59,
+        3 : 2.15, 
+        4 : 0.1,
+    }
+
+
+    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
+    rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
+    # from https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
+
+    if len(all_winning_models) > top_number_models:
+        winning_models = rank_models(all_winning_models)[0:top_number_models]
+    else:
+        winning_models = list(set(all_winning_models))    
+
+    cm_subsection = np.linspace(
+        0,0.8,top_number_models
+    )
+    colour_list = [ cm.Accent(x) for x in cm_subsection ]
+
+    plot_colours = {}
+    for mod in winning_models:
+        plot_colours[mod] = colour_list[winning_models.index(mod)]
+        winning_models_quadratic_losses = {}
+
+
+    fig = plt.figure()
+    plt.clf()
+    ax = plt.subplot(111)
+
+    for mod in winning_models:
+        winning_models_quadratic_losses[mod] = (
+            results.loc[results['NameAlphabetical']
+            ==mod]['QuadraticLosses'].values
+        )
+
+        list_this_models_q_losses = []
+        for i in range(len(winning_models_quadratic_losses[mod])):
+            list_this_models_q_losses.append(
+                eval(winning_models_quadratic_losses[mod][i])
+            )
+
+        list_this_models_q_losses = np.array(list_this_models_q_losses)    
+
+        num_experiments = np.shape(list_this_models_q_losses)[1]
+        avg_q_losses = np.empty(num_experiments)
+
+        for i in range(num_experiments):
+            avg_q_losses[i] = np.average(list_this_models_q_losses[:, i])
+
+
+        latex_name = UserFunctions.get_latex_name(
+            name = mod, 
+            growth_generator = growth_generator
+        )
+        epochs = range(1, num_experiments+1)
+
+        ax.plot(
+            epochs, 
+            avg_q_losses, 
+            label = latex_name,
+            color=plot_colours[mod]
+        )
+
+        upper_one_sigma = [
+            np.percentile(np.array(list_this_models_q_losses[:,t]), 50 + sigmas[1]) for t in range(num_experiments)
+        ] 
+        lower_one_sigma = [
+            np.percentile(np.array(list_this_models_q_losses[:,t]), 50 - sigmas[1]) for t in range(num_experiments)
+        ] 
+
+        ax.fill_between(
+            epochs, 
+            lower_one_sigma, 
+            upper_one_sigma, 
+            alpha=fill_alpha,
+            facecolor=plot_colours[mod],
+    #         label='$1 \sigma$ '
+        )
+
+    ax.set_xlim(1, num_experiments)
+    ax.legend(bbox_to_anchor=(1, 1))
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
 
 def r_squared_from_epoch_list(
     qmd, 
@@ -2054,6 +2153,111 @@ def draw_networkx_arrows(
 
 
 ### Parameter Estimate Plot ###
+def fill_between_sigmas(
+    ax, 
+    distribution, 
+    times, 
+    legend=False,
+    only_one_sigma = True, 
+):
+    # to draw distributions on a given axis, ax.
+    # where distribution must be a dict
+    # distribution[t] = [...], a list of values for the distribution at that time
+    
+    sigmas = { # standard sigma values 
+        1 : 34.13,
+        2 : 13.59,
+        3 : 2.15, 
+        4 : 0.1,
+    }
+
+    upper_one_sigma = [np.percentile(np.array(distribution[t]), 50 + sigmas[1]) for t in times] 
+    lower_one_sigma = [np.percentile(np.array(distribution[t]), 50 - sigmas[1]) for t in times] 
+    upper_two_sigma = [np.percentile(np.array(distribution[t]), 50 + sigmas[1] + sigmas[2]) for t in times] 
+    lower_two_sigma = [np.percentile(np.array(distribution[t]), 50 - sigmas[1] - sigmas[2]) for t in times] 
+    upper_three_sigma = [np.percentile(np.array(distribution[t]), 50 + sigmas[1] + sigmas[2] + sigmas[3]) for t in times] 
+    lower_three_sigma = [np.percentile(np.array(distribution[t]), 50 - sigmas[1] - sigmas[2] - sigmas[3]) for t in times] 
+    upper_four_sigma = [np.percentile(np.array(distribution[t]),  50 + sigmas[1] + sigmas[2] + sigmas[3] + sigmas[4]) for t in times] 
+    lower_four_sigma = [np.percentile(np.array(distribution[t]),  50 - sigmas[1] - sigmas[2] - sigmas[3] - sigmas[4]) for t in times] 
+
+    fill_alpha = 0.2
+    one_sigma_colour='green'
+    two_sigma_colour='red'
+    three_sigma_colour='blue'
+    four_sigma_colour='orange'
+    ax.fill_between(
+        # times, 
+        [t+1 for t in times],
+        upper_one_sigma, 
+        lower_one_sigma, 
+        alpha=fill_alpha,
+        facecolor=one_sigma_colour,
+        label='$1 \sigma$ '
+    )
+
+
+    if only_one_sigma == False:
+        ax.fill_between(
+            # times, 
+            [t+1 for t in times],
+            upper_two_sigma,
+            upper_one_sigma, 
+            alpha=fill_alpha,
+            facecolor=two_sigma_colour,
+            label='$2 \sigma$ '
+        )
+        ax.fill_between(
+            # times, 
+            [t+1 for t in times],
+            lower_one_sigma, 
+            lower_two_sigma,
+            alpha=fill_alpha,
+            facecolor=two_sigma_colour,
+        )
+
+        ax.fill_between(
+            # times, 
+            [t+1 for t in times],
+            upper_three_sigma,
+            upper_two_sigma, 
+            alpha=fill_alpha,
+            facecolor=three_sigma_colour,
+            label='$3 \sigma$ '
+        )
+        ax.fill_between(
+            # times, 
+            [t+1 for t in times],
+            lower_two_sigma, 
+            lower_three_sigma,
+            alpha=fill_alpha,
+            facecolor=three_sigma_colour,
+        )
+
+        ax.fill_between(
+            # times, 
+            [t+1 for t in times],
+            upper_four_sigma,
+            upper_three_sigma, 
+            alpha=fill_alpha,
+            facecolor=four_sigma_colour,
+            label='$4 \sigma$ '
+        )
+        ax.fill_between(
+            # times, 
+            [t+1 for t in times],
+            lower_three_sigma, 
+            lower_four_sigma,
+            alpha=fill_alpha,
+            facecolor=four_sigma_colour,
+        )
+
+    if legend==True:
+        ax.legend(
+            loc='center right', 
+            bbox_to_anchor=(1.5, 0.5), 
+#             title=''
+        )
+
 
 
 def parameterEstimates(
