@@ -1604,9 +1604,12 @@ class QMD():
 
     def runRemoteQMD(
         self, 
-        num_exp=40, num_spawns=1, 
-        max_branches= None, max_num_qubits = None,
-        max_num_models=None, spawn=True,
+        num_exp=40, 
+        num_spawns=1, 
+        max_branches= None, 
+        max_num_qubits = None,
+        max_num_models=None, 
+        spawn=True,
         just_given_models=False
     ):
 

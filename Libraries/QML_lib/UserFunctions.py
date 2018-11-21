@@ -246,24 +246,24 @@ latex_naming_functions = {
 # primarily just for tree plotting
 ##### ---------- -------------------- #####  
 
-all_models_functions = {
-	None : 
-		ModelNames.ising_terms_rotation_hyperfine,
-	'two_qubit_ising_rotation_hyperfine' : 
-		ModelNames.ising_terms_rotation_hyperfine, 
-	'two_qubit_ising_rotation_hyperfine_transverse' : 
-		ModelNames.ising_terms_full_list, 
-	'test_return_champs' :
-		ModelNames.test_return_champs_ALL_MODELS,
-	'non_interacting_ising' :
-		ModelNames.non_interacting_ising_all_names,
-	'non_interacting_ising_single_axis':
-		ModelNames.non_interacting_ising_all_names,
-	'interacting_nearest_neighbour_ising':
-		ModelNames.interacting_ising_nearest_neighbours_all_names,
-	'interacing_nn_ising_fixed_axis':
-		ModelNames.interacting_ising_nearest_neighbours_all_names  
-}
+# all_models_functions = {
+# 	None : 
+# 		ModelNames.ising_terms_rotation_hyperfine,
+# 	'two_qubit_ising_rotation_hyperfine' : 
+# 		ModelNames.ising_terms_rotation_hyperfine, 
+# 	'two_qubit_ising_rotation_hyperfine_transverse' : 
+# 		ModelNames.ising_terms_full_list, 
+# 	'test_return_champs' :
+# 		ModelNames.test_return_champs_ALL_MODELS,
+# 	'non_interacting_ising' :
+# 		ModelNames.non_interacting_ising_all_names,
+# 	'non_interacting_ising_single_axis':
+# 		ModelNames.non_interacting_ising_all_names,
+# 	'interacting_nearest_neighbour_ising':
+# 		ModelNames.interacting_ising_nearest_neighbours_all_names,
+# 	'interacing_nn_ising_fixed_axis':
+# 		ModelNames.interacting_ising_nearest_neighbours_all_names  
+# }
 
 
 initial_models = {

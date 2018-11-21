@@ -81,7 +81,10 @@ def sigmay():
 
 
 global paulis_list
-paulis_list = {'i' : identity(), 'x' : sigmax(), 'y' : sigmay(), 
+paulis_list = {
+    'i' : identity(), 
+    'x' : sigmax(), 
+    'y' : sigmay(), 
     'z' : sigmaz()
 }
 
