@@ -1483,19 +1483,19 @@ class QMD():
             [
             "Models to add to new branch (", 
             branch_id, 
-            "): "
+            "): ",
             new_models
             ]
         )
         new_branch_id = self.newBranch(model_list=new_models) 
+        
+        new_model_dimension = DataBase.get_num_qubits(
+            new_models[0]
+        )
         self.learnModelFromBranchID(
             new_branch_id, 
             blocking=False, 
             use_rq=True
-        )
-        
-        new_model_dimension = DataBase.get_num_qubits(
-            new_models[0]
         )
         tree_completed = UserFunctions.tree_finished(
             generator =self.GrowthGenerator,
