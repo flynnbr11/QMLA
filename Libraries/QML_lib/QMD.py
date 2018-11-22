@@ -1160,7 +1160,10 @@ class QMD():
                     )
                     self.log_print(
                         [
-                            "Ghost Branch"
+                            "Ghost Branch", 
+                            branchID,
+                            "Deactivating model", 
+                            losing_model_id
                         ]
                     )
                 except:
@@ -1234,22 +1237,16 @@ class QMD():
         for k in range( num_champs -1 ):
             mod1 = branch_champions[k]
             mod2 = branch_champions[k+1]
-            if (
-                mod1 not in self.GhostBranchList
-                and
-                mod2 not in self.GhostBranchList
-            ):
-                
-                # are_both_models_active ? 
+            # are_both_models_active ? 
 
-                job_list.append(
-                    self.remoteBayes(
-                        model_a_id=mod1, 
-                        model_b_id=mod2,
-                        return_job=True, 
-                        remote=self.use_rq
-                    )
+            job_list.append(
+                self.remoteBayes(
+                    model_a_id=mod1, 
+                    model_b_id=mod2,
+                    return_job=True, 
+                    remote=self.use_rq
                 )
+            )
             
         self.log_print(
             [
@@ -1281,68 +1278,63 @@ class QMD():
         for k in range(num_champs - 1):
             mod1 = branch_champions[k]
             mod2 = branch_champions[k+1]
-            if (
-                mod1 not in self.GhostBranchList
-                and
-                mod2 not in self.GhostBranchList
-            ):
-                pair_id = DataBase.unique_model_pair_identifier(
+            pair_id = DataBase.unique_model_pair_identifier(
+                mod1, 
+                mod2
+            )
+            bf_from_db = bayes_factors_db.get(pair_id)
+            bayes_factor = float(bf_from_db)
+        
+            if bayes_factor > interbranch_collapse_threshold:
+                # bayes_factor heavily favours mod1, so deactive mod2
+                self.log_print(
+                    [
+                    "Parent model,", 
                     mod1, 
+                    "stronger than spawned; deactivating model", 
                     mod2
+                    ]
                 )
-                bf_from_db = bayes_factors_db.get(pair_id)
-                bayes_factor = float(bf_from_db)
-            
-                if bayes_factor > interbranch_collapse_threshold:
-                    # bayes_factor heavily favours mod1, so deactive mod2
-                    self.log_print(
-                        [
-                        "Parent model,", 
-                        mod1, 
-                        "stronger than spawned; deactivating model", 
-                        mod2
-                        ]
-                    )
-                    self.updateModelRecord(
-                        model_id=mod2, 
-                        field='Status',
-                        new_value='Deactivated'
-                    )
-                    try:
-                        self.ActiveBranchChampList.remove(mod2)
-                    except:
-                        pass
-                elif bayes_factor < (1.0/interbranch_collapse_threshold):
-                    self.log_print(
-                        [
-                        "Spawned model", 
-                        mod2, 
-                        "stronger than parent; deactivating model", 
-                        mod1
-                        ]
-                    )
-                    self.updateModelRecord(
-                        model_id=mod1,
-                        field='Status',
-                        new_value='Deactivated'
-                    )
-                    try:
-                        self.ActiveBranchChampList.remove(mod1)
-                    except:
-                        pass
+                self.updateModelRecord(
+                    model_id=mod2, 
+                    field='Status',
+                    new_value='Deactivated'
+                )
+                try:
+                    self.ActiveBranchChampList.remove(mod2)
+                except:
+                    pass
+            elif bayes_factor < (1.0/interbranch_collapse_threshold):
+                self.log_print(
+                    [
+                    "Spawned model", 
+                    mod2, 
+                    "stronger than parent; deactivating model", 
+                    mod1
+                    ]
+                )
+                self.updateModelRecord(
+                    model_id=mod1,
+                    field='Status',
+                    new_value='Deactivated'
+                )
+                try:
+                    self.ActiveBranchChampList.remove(mod1)
+                except:
+                    pass
 
-                # Add bayes factors to BayesFactor dict for each model        
-                mod_a = self.reducedModelInstanceFromID(mod1)
-                mod_b = self.reducedModelInstanceFromID(mod2)
-                if mod2 in mod_a.BayesFactors:
-                    mod_a.BayesFactors[mod2].append(bayes_factor)
-                else:
-                    mod_a.BayesFactors[mod2] = [bayes_factor]
-                
-                if mod1 in mod_b.BayesFactors:
-                    mod_b.BayesFactors[mod1].append((1.0/bayes_factor))
-                else:
-                    mod_b.BayesFactors[mod1] = [(1.0/bayes_factor)]
+            # Add bayes factors to BayesFactor dict for each model        
+            mod_a = self.reducedModelInstanceFromID(mod1)
+            mod_b = self.reducedModelInstanceFromID(mod2)
+            if mod2 in mod_a.BayesFactors:
+                mod_a.BayesFactors[mod2].append(bayes_factor)
+            else:
+                mod_a.BayesFactors[mod2] = [bayes_factor]
+            
+            if mod1 in mod_b.BayesFactors:
+                mod_b.BayesFactors[mod1].append((1.0/bayes_factor))
+            else:
+                mod_b.BayesFactors[mod1] = [(1.0/bayes_factor)]
         
         
         
