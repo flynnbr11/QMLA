@@ -1478,16 +1478,16 @@ class QMD():
             log_file=self.log_file, 
             current_champs = current_champs
         )
-        
+
+        new_branch_id = self.newBranch(model_list=new_models) 
         self.log_print(
             [
             "Models to add to new branch (", 
-            branch_id, 
+            new_branch_id, 
             "): ",
             new_models
             ]
         )
-        new_branch_id = self.newBranch(model_list=new_models) 
         
         new_model_dimension = DataBase.get_num_qubits(
             new_models[0]
