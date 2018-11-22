@@ -1162,7 +1162,7 @@ class QMD():
                         [
                             "Ghost Branch", 
                             branchID,
-                            "Deactivating model", 
+                            "deactivating model", 
                             losing_model_id
                         ]
                     )
