@@ -174,6 +174,16 @@ max_num_models_by_shape['deterministic_transverse_ising_nn_fixed_axis'] = {
 	'other' : 2
 }
 
+# Heisenberg Models
+max_num_models_by_shape['heisnberg_nontransverse'] = {
+  1 : 0,
+  2 : 6, 
+  3 : 6
+  'other' : 6
+}
+
+
+
 # Hamiltonian exponentiation times from testing qutips
 # expm function 100 times for each qubit size. 
 hamiltonian_exponentiation_times = {
