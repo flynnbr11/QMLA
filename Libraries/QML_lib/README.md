@@ -1,18 +1,3 @@
-Jupyter Notebook
-QMD README
-Last Checkpoint: 44 minutes ago
-(unsaved changes)
-Python 3
-Python 3 
-File
-Edit
-View
-Insert
-Cell
-Kernel
-Help
-
-
 # QMD 
 Quantum Model Development framework. 
 ​
