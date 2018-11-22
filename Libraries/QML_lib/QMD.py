@@ -1344,10 +1344,10 @@ class QMD():
         )
         self.log_print(
             [
-            "After initial interbranch comparisons, \
-            remaining active branch champions:", 
-            active_models
-        ]
+                "After initial interbranch comparisons, \
+                remaining active branch champions:", 
+                active_models
+            ]
         )
         num_active_models = len(active_models)
         
@@ -1368,13 +1368,19 @@ class QMD():
             for j in range(i, num_active_models):
                 mod2 = active_models[j]
                 if mod1!=mod2:
-                    res = self.processRemoteBayesPair(a=mod1, b=mod2)
+                    res = self.processRemoteBayesPair(
+                        a=mod1, 
+                        b=mod2
+                    )
                     
                     if res == "a":
                         branch_champions_points[mod1] += 1
                     elif res == "b":
                         branch_champions_points[mod2] += 1
-        self.ranked_champions = sorted(branch_champions_points, reverse=True)
+        self.ranked_champions = sorted(
+            branch_champions_points, 
+            reverse=True
+        )
         
         max_points = max(branch_champions_points.values())
         max_points_branches = [key for key, val in branch_champions_points.items() 
@@ -1382,11 +1388,17 @@ class QMD():
         ]
         if len(max_points_branches) > 1: 
             # todo: recompare. Fnc: compareListOfModels (rather than branch based)
-            self.log_print(["No distinct champion, recomputing bayes \
-                factors between : ", max_points_branches]
+            self.log_print(
+                [
+                    "No distinct champion, recomputing bayes "
+                    "factors between : ",
+                    max_points_branches
+                ]
             )
-            champ_id = self.compareModelList(max_points_branches, 
-                bayes_threshold=self.BayesLower, models_points_dict=branch_champions_points
+            champ_id = self.compareModelList(
+                max_points_branches, 
+                bayes_threshold=self.BayesLower, 
+                models_points_dict=branch_champions_points
             )
         else: 
             champ_id = max(branch_champions_points, key=branch_champions_points.get)

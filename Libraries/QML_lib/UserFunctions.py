@@ -132,7 +132,7 @@ max_num_qubits_info = {
 	'interacing_nn_ising_fixed_axis' : 6, 
     'deterministic_interacting_nn_ising_single_axis' : 5,
     'deterministic_transverse_ising_nn_fixed_axis' : 5,
-	'heisenberg_nontransverse' : 4,
+	'heisenberg_nontransverse' : 5,
     None : 5,
 }
 

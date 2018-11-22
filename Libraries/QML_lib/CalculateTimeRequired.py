@@ -296,13 +296,13 @@ minimum_allowed_time = arguments.minimum_allowed_time
 
 
 time_reqd = time_required(
-	growth_generator = growth_generator, 
-	num_particles = num_particles, 
-	num_experiments = num_experiments, 
-    num_processes = num_processes,
-    resource_reallocation = resource_reallocation,
-    num_bayes_times = num_bayes_times,
-    minimum_allowed_time = minimum_allowed_time,
+  growth_generator = growth_generator, 
+  num_particles = num_particles, 
+  num_experiments = num_experiments, 
+  num_processes = num_processes,
+  resource_reallocation = resource_reallocation,
+  num_bayes_times = num_bayes_times,
+  minimum_allowed_time = minimum_allowed_time,
 )
 
 print(

@@ -921,7 +921,9 @@ def heisenberg_nontransverse(
                 print("new mod:", new_mod)
                 new_models.append(new_mod)
         elif len(base_terms_not_present) == 0:             
-                new_models = branch_champs_by_qubit_num[this_dimension]
+                new_models = branch_champs_by_qubit_num[
+                    this_dimension
+                ]
                 ghost_branches[this_dimension] = True
         elif len(base_terms_not_present) > 0:
             for b in base_terms_not_present:
@@ -934,12 +936,6 @@ def heisenberg_nontransverse(
             print("[heisenberg_nontransverse] none of conditions met")
 
     return new_models
-            
-    
-    
-    
-
-
 
 
 ##################################################################################
