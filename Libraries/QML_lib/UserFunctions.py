@@ -72,6 +72,7 @@ expec_val_function_dict = {
 ##### ---------- -------------------- #####  
 
 default_true_operators_by_generator = {
+    'test_changes_to_qmd' : 'x',
     'two_qubit_ising_rotation' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
     'two_qubit_ising_rotation_hyperfine' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz', # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
@@ -83,7 +84,8 @@ default_true_operators_by_generator = {
     'interacting_nearest_neighbour_ising' : 'xTxTTiPPPiTxTTx',
     'interacing_nn_ising_fixed_axis' : 'xTxTTiPPPiTxTTx',
     'deterministic_interacting_nn_ising_single_axis' : 'xTxTTiPPPiTxTTx',
-    'deterministic_transverse_ising_nn_fixed_axis' : 'zTiPPiTzPPxTx'
+    'deterministic_transverse_ising_nn_fixed_axis' : 'zTiPPiTzPPxTx',
+    'heisenberg_nontransverse' : 'xTxPPzTz'
 }
 
 
@@ -104,6 +106,7 @@ fixed_axes_by_generator = {
 }
 
 max_spawn_depth_info = {
+    'test_changes_to_qmd' : 1, 
     'two_qubit_ising_rotation' : 2,
     'two_qubit_ising_rotation_hyperfine' : 5, # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
@@ -113,18 +116,12 @@ max_spawn_depth_info = {
     'interacting_nearest_neighbour_ising' : 3,
     'interacing_nn_ising_fixed_axis' : 3,
     'deterministic_interacting_nn_ising_single_axis' : 1,
-    'deterministic_transverse_ising_nn_fixed_axis' : 1
-    # 'ising_non_transverse' : 5,
-    # 'ising_transverse' : 11,
-    # 'hyperfine_like' : 8,
-    # 'test_multidimensional' : 10, 
-    # 'test_return_champs' : 3,
-    # 'qhl_TEST' : 2, 
-    # 'simple_ising' : 1,
-    # 'hyperfine' : 3,
+    'deterministic_transverse_ising_nn_fixed_axis' : 1,
+	'heisenberg_nontransverse' : 8
 }
 
 max_num_qubits_info = {
+    'test_changes_to_qmd' : 2,
     'two_qubit_ising_rotation' : 2,
     'two_qubit_ising_rotation_hyperfine' : 2, # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 2,
@@ -135,6 +132,7 @@ max_num_qubits_info = {
 	'interacing_nn_ising_fixed_axis' : 6, 
     'deterministic_interacting_nn_ising_single_axis' : 5,
     'deterministic_transverse_ising_nn_fixed_axis' : 5,
+	'heisenberg_nontransverse' : 4,
     None : 5,
 }
 
@@ -142,6 +140,8 @@ max_num_qubits_info = {
 
 model_generation_functions = {
 	# growth_generation_rule : growth_function
+    'test_changes_to_qmd' :
+    	ModelGeneration.test_changes_to_qmd,
     'simple_ising' : 
     	ModelGeneration.simple_ising,
     'ising_non_transverse' : 
@@ -171,8 +171,9 @@ model_generation_functions = {
 	'deterministic_interacting_nn_ising_single_axis' :
 		ModelGeneration.deterministic_interacting_nn_ising_single_axis,
 	'deterministic_transverse_ising_nn_fixed_axis' : 
-		ModelGeneration.deterministic_transverse_ising_nn_fixed_axis
-
+		ModelGeneration.deterministic_transverse_ising_nn_fixed_axis,
+	'heisenberg_nontransverse' : 
+		ModelGeneration.heisenberg_nontransverse,
 }
 
 ##### ---------- -------------------- #####  
@@ -182,7 +183,10 @@ model_generation_functions = {
 
 tree_finished_functions = {
 	None : 
-		ModelGeneration.spawn_depth_check
+		ModelGeneration.spawn_depth_check,
+	'heisenberg_nontransverse' : 
+		ModelGeneration.max_num_qubits_reached_check
+
 }
 
 
@@ -193,7 +197,7 @@ tree_finished_functions = {
 name_branch_map_functions = {
 	# growth_generation_rule : latex_mapping_function
 	None : 
-		ModelNames.branch_is_num_params,
+		ModelNames.branch_is_num_dims,
 	'two_qubit_ising_rotation_hyperfine' : 
 		ModelNames.branch_is_num_params, 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
@@ -269,6 +273,8 @@ latex_naming_functions = {
 initial_models = {
 	None :
 		['x', 'y', 'z'],
+	'test_changes_to_qmd' :
+		['x', 'y'],
 	'two_qubit_ising_rotation_hyperfine' :
 		['xTi', 'yTi', 'zTi'],
 		# ['yTi', 'zTi'],
@@ -281,6 +287,8 @@ initial_models = {
 	'interacing_nn_ising_fixed_axis' :
 		['xTx', 'yTy', 'zTz'],
 	'deterministic_interacting_nn_ising_single_axis' : 
+		['xTx', 'yTy', 'zTz'],
+	'heisenberg_nontransverse' :
 		['xTx', 'yTy', 'zTz']
 
 }
@@ -325,6 +333,7 @@ special_probe_functions = {
 def new_model_generator(generator, **kwargs):
     model_func = model_generation_functions[generator]
     # print("[User funcs] Using model generation function:", model_func)
+    kwargs['generator'] = generator
     return model_func(**kwargs)
 
 def expectation_value_wrapper(method, **kwargs):       
@@ -358,6 +367,7 @@ def tree_finished(generator, **kwargs):
 	tree_completed = tree_finished_check(
 		generator = generator, 
 		max_spawn_depth_info = max_spawn_depth_info,
+		max_num_qubits_info = max_num_qubits_info,
 		**kwargs
 	)
 	# print("[tree finished] func:", tree_finished_check)

@@ -268,6 +268,8 @@ class QMD():
         self.BranchAllModelsLearned = { 0 : False}
         self.BranchComparisonsComplete = {0 : False}
         self.BranchNumModelsPreComputed = {0 : 0}
+        self.BranchChampsByNumQubits = {}
+        self.GhostBranches = {}
         self.use_rq = self.GlobalVariables.use_rq
         self.rq_timeout = self.GlobalVariables.rq_timeout
         self.rq_log_file = self.log_file
@@ -554,7 +556,6 @@ class QMD():
         self.BranchPrecomputedModels[branchID] = pre_computed_models
 
         self.BranchModelIds[branchID] = model_id_list
-
         self.log_print(
             [
             'Num models already computed on branch ', 
@@ -1089,9 +1090,19 @@ class QMD():
             champ_id = max(models_points, key=models_points.get)
         champ_name = DataBase.model_name_from_id(self.db, champ_id)
         
+        champ_num_qubits = DataBase.get_num_qubits(champ_name)
         self.BranchChampions[int(branchID)] = champ_id
+        try:
+            self.BranchChampsByNumQubits[champ_num_qubits].append(champ_name)
+        except:
+            self.BranchChampsByNumQubits[champ_num_qubits] = [champ_name]
+
+
+
         for model_id in active_models_in_branch:
-            self.updateModelRecord(model_id=model_id, field='Status',
+            self.updateModelRecord(
+                model_id=model_id, 
+                field='Status',
                 new_value='Deactivated'
             )
         self.updateModelRecord(name=DataBase.model_name_from_id(self.db, champ_id),
@@ -1400,46 +1411,48 @@ class QMD():
         self.log_print(["Champion of Champions is",  champ_name])
         
         
-    def spawn(self, 
-              branch_list = None, 
-              num_models_to_consider=1, 
-              single_champion=True, 
-              all_branches=False,
-              spawn_new = True
-             ):
-        if all_branches or branch_list is None: 
-            global_champion = True
+    # def spawn(self, 
+    #           branch_list = None, 
+    #           num_models_to_consider=1, 
+    #           single_champion=True, 
+    #           all_branches=False,
+    #           spawn_new = True
+    #          ):
+    #     if all_branches or branch_list is None: 
+    #         global_champion = True
             
-        overall_champ, branch_champions = \
-            self.interBranchChampion(branch_list=branch_list,
-            global_champion=global_champion
-        )
-        self.log_print(["Overall champion within spawn function:",
-            overall_champ]
-        )
-        options=['x', 'y', 'z'] # append best model with these options
+    #     overall_champ, branch_champions = \
+    #         self.interBranchChampion(branch_list=branch_list,
+    #         global_champion=global_champion
+    #     )
+    #     self.log_print(["Overall champion within spawn function:",
+    #         overall_champ]
+    #     )
+    #     options=['x', 'y', 'z'] # append best model with these options
         
-        if single_champion:
-            # new_models = ModelGeneration.new_model_list(
-            new_models = UserFunctions.new_model_generator(
-                generator='simple_ising',
-                model_list=[overall_champ],
-                model_dict=self.model_lists,
-                log_file=self.log_file, 
-                options=options
-            )
-        else: 
-            # new_models = ModelGeneration.new_model_list(
-            new_models = UserFunctions.new_model_generator(
-                generator='simple_ising', 
-                model_list=branch_champions,
-                model_dict=self.model_lists,
-                log_file=self.log_file, 
-                options=options
-            )
+    #     if single_champion:
+    #         # new_models = ModelGeneration.new_model_list(
+    #         new_models = UserFunctions.new_model_generator(
+    #             generator='simple_ising',
+    #             model_list=[overall_champ],
+    #             model_dict=self.model_lists,
+    #             champs_by_num_qubits = self.BranchChampsByNumQubits, 
+    #             log_file=self.log_file, 
+    #             options=options
+    #         )
+    #     else: 
+    #         # new_models = ModelGeneration.new_model_list(
+    #         new_models = UserFunctions.new_model_generator(
+    #             generator='simple_ising', 
+    #             model_list=branch_champions,
+    #             model_dict=self.model_lists,
+    #             champs_by_num_qubits = self.BranchChampsByNumQubits, 
+    #             log_file=self.log_file, 
+    #             options=options
+    #         )
         
-        self.log_print(["New models to add to new branch : ", new_models])
-        self.newBranch(model_list=new_models) 
+    #     self.log_print(["New models to add to new branch : ", new_models])
+    #     self.newBranch(model_list=new_models) 
 
 
     def spawnFromBranch(self, branchID, num_models=1):
@@ -1457,26 +1470,38 @@ class QMD():
         new_models = UserFunctions.new_model_generator(
             generator=self.GrowthGenerator,
             model_list=best_model_names,
+            champs_by_num_qubits = self.BranchChampsByNumQubits, 
             spawn_step=self.SpawnDepth, 
+            ghost_branches = self.GhostBranches, 
+            branch_champs_by_qubit_num = self.BranchChampsByNumQubits,
             model_dict=self.model_lists,
             log_file=self.log_file, 
             current_champs = current_champs
         )
         
-        self.log_print(["New models to add to new branch : ", new_models])
+        self.log_print(
+            [
+            "Models to add to new branch (", 
+            branch_id, 
+            "): "
+            new_models
+            ]
+        )
         new_branch_id = self.newBranch(model_list=new_models) 
-        self.learnModelFromBranchID(new_branch_id, blocking=False, use_rq=True)
+        self.learnModelFromBranchID(
+            new_branch_id, 
+            blocking=False, 
+            use_rq=True
+        )
         
+        new_model_dimension = DataBase.get_num_qubits(
+            new_models[0]
+        )
         tree_completed = UserFunctions.tree_finished(
             generator =self.GrowthGenerator,
-            spawn_step = self.SpawnDepth
+            spawn_step = self.SpawnDepth,
+            current_num_qubits = new_model_dimension
         )
-        # print("Tree completed:", tree_completed)
-        # if self.SpawnDepth == self.MaxSpawnDepth:
-        #     print("Spawn depth = max spawn depth")
-        #     return True
-        # else:
-        #     return False
         return tree_completed            
         
 

@@ -49,10 +49,6 @@ def create_plot_probe(
 
 	kwargs['num_probes'] = 1
 	plot_probe_dict = UserFunctions.get_probe_dict(
-		# experimental_data = experimental_data, 
-		# growth_generator = growth_generator,
-		# num_probes = 1,
-		# plus_probe = plus_probe_for_plot,
 		**kwargs
 	)
 	for k in list(plot_probe_dict.keys()):
@@ -60,19 +56,6 @@ def create_plot_probe(
 	    plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
 
 
-	# plot_probe_dict = {}
-	
-	# for i in range(1,max_num_qubits):
-	# 	if plus_probe_for_plot == True:
-	# 		plot_probe_dict[i] = ExpectationValues.n_qubit_plus_state(i)
-	# 	else:
-	# 		if i==1:
-	# 			plot_probe_dict[i] = ExpectationValues.random_probe(i)
-	# 		else:
-	# 			old_probe = plot_probe_dict[i-1]
-	# 			new_probe = ExpectationValues.random_probe(1)
-	# 			n_dim_probe = np.kron(old_probe, new_probe)
-	# 			plot_probe_dict[i] = n_dim_probe
 
 	if pickle_file is not None:
 		import pickle
@@ -80,8 +63,6 @@ def create_plot_probe(
 			plot_probe_dict,
 			open(pickle_file, 'wb') 
 		)
-			
-
 
 def create_qhl_params(
 	true_op, 

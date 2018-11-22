@@ -50,65 +50,6 @@ def log_print(to_print_list, log_file):
     with open(log_file, 'a') as write_log_file:
         print(identifier, str(to_print), file=write_log_file, flush=True)
 
-"""
-
-max_spawn_depth_info = {
-    'qhl_TEST' : 2, 
-    'simple_ising' : 1,
-    'hyperfine' : 3,
-    'ising_non_transverse' : 5,
-    'ising_transverse' : 11,
-    'hyperfine_like' : 8,
-    'two_qubit_ising_rotation' : 2,
-    'two_qubit_ising_rotation_hyperfine' : 5,
-    'two_qubit_ising_rotation_hyperfine_transverse' : 8,
-    'test_multidimensional' : 10
-}
-
-
-
-def max_spawn_depth(generator, log_file):
-    if generator not in max_spawn_depth_info:
-        log_print(["Generator not recognised; does not have maximum spawn depth or generation function"], log_file)
-    else:
-        return max_spawn_depth_info[generator]
-
-def new_model_list(model_list, spawn_depth, model_dict, log_file, 
-    options=['x', 'y', 'z'], generator='simple_ising'
-):
-    log_print(["Generating new models according to best of last round: ",
-        model_list, "; and options:", options], log_file
-    )
-    if generator == 'simple_ising':
-        return simple_ising(generator_list=model_list, options=options)
-    elif generator=='ising_non_transverse':
-        return ising_non_transverse(model_list, spawn_step=spawn_depth)
-    elif generator == 'ising_transverse':
-        return ising_transverse(model_list, spawn_step=spawn_depth)
-    elif generator == 'two_qubit_ising_rotation_hyperfine':
-        return hyperfine_like(model_list, spawn_step=spawn_depth,
-        model_dict=model_dict, log_file=log_file
-    )
-    elif generator == 'two_qubit_ising_rotation_hyperfine_transverse':
-        return hyperfine_like(model_list, spawn_step=spawn_depth,
-        model_dict=model_dict, log_file=log_file
-    )
-    elif generator == 'hyperfine_like':
-        return hyperfine_like(model_list, spawn_step=spawn_depth,
-        model_dict=model_dict, log_file=log_file
-    )
-    elif generator == 'test_multidimensional':
-        return test_multidimensional(
-            model_list=model_list, 
-            spawn_step=spawn_depth, 
-            log_file=log_file
-        )
-    else:
-        log_print(["Generator", generator, "not recognised"], log_file)        
-
-"""
-
-
 
 ##################################################################################
 ##################### Model Generation Functions ############################################
@@ -696,7 +637,9 @@ def deterministic_noninteracting_ising_single_axis(
 ):
     from UserFunctions import max_num_qubits_info   
     new_models = []
-    num_qubits = max_num_qubits_info['deterministic_noninteracting_ising_single_axis']
+    num_qubits = max_num_qubits_info[
+        'deterministic_noninteracting_ising_single_axis'
+    ]
     for mod in model_list:
         new = non_interacting_ising_single_axis([mod])
         new_models.extend(new)
@@ -783,8 +726,9 @@ def deterministic_interacting_nn_ising_single_axis(
 
 
 
-def tensor_all_with_identity(name):
-    op_dict = operations_dict_from_name(name)
+def tensor_all_with_identity_at_end(name):
+    import copy
+    op_dict = ModelNames.operations_dict_from_name(name)
     num_qubits = op_dict['dim']
     terms = op_dict['terms']
     new_terms = []
@@ -792,7 +736,7 @@ def tensor_all_with_identity(name):
 
     for i in range(len(terms)):
 
-        new_term = terms[i]
+        new_term = copy.copy(terms[i])
 
         new_term.append( (new_dimension, 'i'))
         new_terms.append(new_term)
@@ -802,7 +746,31 @@ def tensor_all_with_identity(name):
         'dim' : new_dimension, 
         'terms' : new_terms
     }
-    new_mod_name = full_model_string(new_op_dict)
+    new_mod_name = ModelNames.full_model_string(new_op_dict)
+    return new_mod_name
+
+def tensor_all_with_identity_at_start(name):
+    import copy
+    op_dict = ModelNames.operations_dict_from_name(name)
+    num_qubits = op_dict['dim']
+    terms = op_dict['terms']
+    new_terms = []
+    new_dimension = num_qubits + 1
+
+    new_terms = []
+    for term in op_dict['terms']:
+        new_term = [(1, 'i')]
+        for a in term:
+            new_tuple = (a[0]+1, a[1])
+            new_term.append(new_tuple)
+        new_terms.append(new_term)
+
+    new_op_dict = {
+        'dim' : new_dimension, 
+        'terms' : new_terms
+    }
+    new_mod_name = ModelNames.full_model_string(new_op_dict)
+
     return new_mod_name
 
 def add_fixed_axis_nn_interaction(name, fixed_axis):
@@ -827,8 +795,12 @@ def deterministic_transverse_ising_nn_fixed_axis(
     from UserFunctions import fixed_axes_by_generator
     name = model_list[0] # for this growth rule, model_list should be of length 1, either x,y or z.
     models = []
-    fixed_axis = fixed_axes_by_generator['deterministic_transverse_ising_nn_fixed_axis']
-    max_num_qubits = max_num_qubits_info['deterministic_transverse_ising_nn_fixed_axis']
+    fixed_axis = fixed_axes_by_generator[
+        'deterministic_transverse_ising_nn_fixed_axis'
+    ]
+    max_num_qubits = max_num_qubits_info[
+        'deterministic_transverse_ising_nn_fixed_axis'
+    ]
     one_qubit_larger_name = name
     starting_dimension = DataBase.get_num_qubits(name)
     for i in range(starting_dimension, max_num_qubits):
@@ -864,8 +836,13 @@ def deterministic_transverse_ising_nn_fixed_axis(
             'terms' : new_terms
         }
 
-        one_qubit_larger_name = ModelNames.full_model_string(new_op_dict)
-        add_interaction = add_fixed_axis_nn_interaction(one_qubit_larger_name, fixed_axis)
+        one_qubit_larger_name = ModelNames.full_model_string(
+            new_op_dict
+        )
+        add_interaction = add_fixed_axis_nn_interaction(
+            one_qubit_larger_name, 
+            fixed_axis
+        )
 
         models.extend(
             [one_qubit_larger_name, add_interaction]
@@ -889,6 +866,81 @@ def deterministic_transverse_ising_nn_fixed_axis(
 #     print("Using model generation function:", model_func)
 #     return model_func(**kwargs)
 
+def test_changes_to_qmd(
+    **kwargs
+):
+    model_list = kwargs['model_list']
+    new_models = []
+    for mod in model_list:
+        new_models.append(tensor_all_with_identity_at_end(mod))
+    return new_models
+
+def heisenberg_nontransverse(
+    **kwargs
+):
+    from UserFunctions import initial_models
+    # print("[ModGen] kwargs:", kwargs)
+    growth_generator = kwargs['generator']
+    # growth_generator = generator
+    model_list = kwargs['model_list']
+    spawn_step = kwargs['spawn_step']
+    ghost_branches = kwargs['ghost_branches']
+    branch_champs_by_qubit_num = kwargs['branch_champs_by_qubit_num']
+    
+    new_models = []
+    base_terms = initial_models[growth_generator]
+    
+    
+    this_dimension = DataBase.get_num_qubits(model_list[0])
+    base_dimension = DataBase.get_num_qubits(base_terms[0])
+
+    base_models_this_dim = []
+    if this_dimension == base_dimension:
+        base_models_this_dim = base_terms
+    else:
+        for b in base_terms:
+            new_mod = tensor_all_with_identity_at_start(b)
+            for i in range(base_dimension+1, this_dimension):
+                new_mod = tensor_all_with_identity_at_start(new_mod)
+
+            base_models_this_dim.append(new_mod)    
+    
+    for mod in model_list:
+        present_terms = DataBase.get_constituent_names_from_name(mod)
+        base_terms_not_present = list(
+            set(base_models_this_dim) - set(present_terms)
+        ) 
+        num_qubits = DataBase.get_num_qubits(mod)
+        p_str = ''
+        for i in range(num_qubits):
+            p_str += 'P'
+    
+
+        if this_dimension in list(ghost_branches.keys()):
+                new_mod = tensor_all_with_identity_at_end(mod)
+                print("new mod:", new_mod)
+                new_models.append(new_mod)
+        elif len(base_terms_not_present) == 0:             
+                new_models = branch_champs_by_qubit_num[this_dimension]
+                ghost_branches[this_dimension] = True
+        elif len(base_terms_not_present) > 0:
+            for b in base_terms_not_present:
+                new_mod = str(
+                    mod + p_str + b
+                )
+                new_models.append(new_mod)
+
+        else:
+            print("[heisenberg_nontransverse] none of conditions met")
+
+    return new_models
+            
+    
+    
+    
+
+
+
 
 ##################################################################################
 ##################### Tree Finished Functions ############################################
@@ -899,6 +951,7 @@ def spawn_depth_check(
     generator,
     max_spawn_depth_info,
     spawn_step, 
+    **kwargs
 ):
     if spawn_step == max_spawn_depth_info[generator]:
         return True 
@@ -906,4 +959,18 @@ def spawn_depth_check(
         return False
 
 
+def max_num_qubits_reached_check(
+    generator,
+    max_num_qubits_info, 
+    current_num_qubits, 
+    **kwargs
+):
+    if (
+        current_num_qubits 
+        == 
+        max_num_qubits_info[generator]
+    ):
+        return True 
+    else:
+        return False
 
