@@ -51,6 +51,8 @@ QMD cycles through a set of probes at each epoch to learn parameters during the 
 These are generated once and stored in a dict. 
 * `experimental_probe_dict_generator`: In the case experimental data is being used, the probes must correspond to the probes used during the experiment.
 * `simulated_probe_dict_generator` and `special_probe_functions`: In simulated data, there may be special cases where probes are specific, e.g. |+>^n. In general, random probes are used for simulated data. 
+#### Timing requirements
+* In `CalculateTimeRequired.py`, the dict `max_num_models_by_shape` tracks the maximum number of models of a given dimension this growth rule supports. This is used to work out roughly how much time is required by a parallel compute cluster to complete QMD for the growth rule, as clusters demand a specific time is requested for allocation purposes. 
 ​
 ​
 
