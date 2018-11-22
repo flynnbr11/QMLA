@@ -945,8 +945,13 @@ class QMD():
         self.GlobalEpoch += num_exp
             
         
-    def updateModelRecord(self, field, name=None, model_id=None, 
-        new_value=None, increment=None
+    def updateModelRecord(
+        self, 
+        field, 
+        name=None, 
+        model_id=None, 
+        new_value=None, 
+        increment=None
     ):
         DataBase.update_field(
             db=self.db, 
@@ -1246,8 +1251,14 @@ class QMD():
                     )
                 )
             
-        self.log_print(["Entering while loop in final bayes fnc."])
-        self.log_print(["num champs = ", num_champs])
+        self.log_print(
+            [
+                "Final Bayes Comparisons.", 
+                "\nEntering while loop in final bayes fnc.",
+                "\nactive branch champs: ", branch_champions
+
+            ]
+        )
         
         if self.use_rq:
             self.log_print(["Waiting on parent/child Bayes factors."])
