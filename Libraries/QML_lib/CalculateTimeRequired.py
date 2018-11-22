@@ -178,7 +178,7 @@ max_num_models_by_shape['deterministic_transverse_ising_nn_fixed_axis'] = {
 max_num_models_by_shape['heisnberg_nontransverse'] = {
   1 : 0,
   2 : 6, 
-  3 : 6
+  3 : 6,
   'other' : 6
 }
 
