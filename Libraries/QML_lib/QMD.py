@@ -1417,7 +1417,11 @@ class QMD():
         champ_name = DataBase.model_name_from_id(self.db, champ_id)
         self.log_print(["Champion of Champions is",  champ_name])
         
-    def spawnFromBranch(self, branchID, num_models=1):
+    def spawnFromBranch(
+        self, 
+        branchID, 
+        num_models=1
+    ):
         self.SpawnDepth+=1
         self.log_print(["Spawning, spawn depth:", self.SpawnDepth])
         best_models = self.BranchRankings[branchID][:num_models]
