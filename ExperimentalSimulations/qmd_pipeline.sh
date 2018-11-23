@@ -67,7 +67,7 @@ growth_rule='test_changes_to_qmd'
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
 
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
-growth_rule='heisenberg_nontransverse'
+# growth_rule='heisenberg_nontransverse'
 
 # true_operator='yTi'
 # true_operator='xTxTTiPPPiTxTTx'

@@ -26,7 +26,13 @@ databases_required  = [
     'active_interbranch_bayes'
 ]
 
-def databases_from_qmd_id(host_name, port_number, qmd_id, print_status=False):
+def databases_from_qmd_id(
+    host_name, 
+    port_number, 
+    qmd_id, 
+    tree_identifiers=None, 
+    print_status=False
+):
     database_dict = {}
     seed = get_seed(host_name=host_name, port_number=port_number, qmd_id=qmd_id)
 	
@@ -37,6 +43,16 @@ def databases_from_qmd_id(host_name, port_number, qmd_id, print_status=False):
         qid_seeds = redis.StrictRedis(host=host_name, port=port_number, db=0)
         print("QID seed dict has keys:", qid_seeds.keys())
 
+    # num_trees = len(tree_identifiers)
+    # for j in range(num_trees):
+    #     tree_id = tree_identifiers[j]
+    #     for i in range(len(databases_required)):
+    #         new_db = databases_required[i]
+    #         database_dict[tree_id][new_db] = redis.StrictRedis(
+    #             host=host_name,
+    #             port=port_number, 
+    #             db=seed+(j*num_trees)+i
+    #         )
     for i in range(len(databases_required)):
         new_db = databases_required[i]
         database_dict[new_db] = redis.StrictRedis(
@@ -44,6 +60,7 @@ def databases_from_qmd_id(host_name, port_number, qmd_id, print_status=False):
             port=port_number, 
             db=seed+i
         )
+
         
     return database_dict
 

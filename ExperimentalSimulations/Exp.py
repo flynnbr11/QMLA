@@ -285,9 +285,22 @@ log_print(["\n QMD id", global_variables.qmd_id,
 Launch and run QMD
 """
 
+
+generators = [
+    # 'test_changes_to_qmd',
+    global_variables.growth_generation_rule,
+    'two_qubit_ising_rotation_hyperfine'
+]
+
+generator_initial_models = {}
+for gen in generators:
+    generator_initial_models[gen] = UserFunctions.initial_models[gen]
+
+
 qmd = QMD(
     global_variables = global_variables, 
     initial_op_list=initial_op_list, 
+    generator_initial_models = generator_initial_models,
     true_operator=true_op, 
     true_param_list=true_params, 
     use_time_dep_true_model = False, 
@@ -438,7 +451,8 @@ elif global_variables.further_qhl == True:
 
 
 else:
-    qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
+    # qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
+    qmd.runRemoteQMD_MULTIPLE_GEN(num_spawns=3) #  Actually run QMD
 
     """
     Tidy up and analysis. 

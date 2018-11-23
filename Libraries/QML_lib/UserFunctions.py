@@ -274,7 +274,7 @@ initial_models = {
 	None :
 		['x', 'y', 'z'],
 	'test_changes_to_qmd' :
-		['x', 'y'],
+		['x', 'y', 'z'],
 	'two_qubit_ising_rotation_hyperfine' :
 		['xTi', 'yTi', 'zTi'],
 		# ['yTi', 'zTi'],
