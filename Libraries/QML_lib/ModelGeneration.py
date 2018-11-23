@@ -400,12 +400,17 @@ def ising_transverse(
     nontransverse_terms = ['xTx', 'yTy', 'zTz']
     all_transverse_terms = ['xTy', 'xTz', 'yTx', 'yTz', 'zTy', 'zTx']
     transverse_terms = ['xTy', 'xTz','yTz']
-    all_two_qubit_terms = ( single_qubit_terms
-        + nontransverse_terms  + transverse_terms
+    all_two_qubit_terms = ( 
+        single_qubit_terms
+        + nontransverse_terms 
+        + transverse_terms
     )
      
     if len(model_list) > 1:
-        log_print(["Only one model required for transverse Ising growth."],
+        log_print(
+            [
+            "Only one model required for transverse Ising growth."
+            ],
             log_file
         )
         return False
@@ -849,23 +854,6 @@ def deterministic_transverse_ising_nn_fixed_axis(
         )
     return models
     
-# ##### Wrapper function and dict
-
-# model_generation_functions = {
-#     'simple_ising' : simple_ising,
-#     'ising_non_transverse' : ising_non_transverse,
-#     'ising_transverse' : ising_transverse,
-#     'two_qubit_ising_rotation_hyperfine' : hyperfine_like,
-#     'two_qubit_ising_rotation_hyperfine_transverse' : hyperfine_like,
-#     'hyperfine_like' : hyperfine_like,
-#     'test_multidimensional' : test_multidimensional,
-# }
-
-# def new_model_generator(generator, **kwargs):
-#     model_func = model_generation_functions[generator]
-#     print("Using model generation function:", model_func)
-#     return model_func(**kwargs)
-
 def test_changes_to_qmd(
     **kwargs
 ):

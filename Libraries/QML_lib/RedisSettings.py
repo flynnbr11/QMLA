@@ -39,8 +39,10 @@ def databases_from_qmd_id(host_name, port_number, qmd_id, print_status=False):
 
     for i in range(len(databases_required)):
         new_db = databases_required[i]
-        database_dict[new_db] = redis.StrictRedis(host=host_name,
-            port=port_number, db=seed+i
+        database_dict[new_db] = redis.StrictRedis(
+            host=host_name,
+            port=port_number, 
+            db=seed+i
         )
         
     return database_dict
