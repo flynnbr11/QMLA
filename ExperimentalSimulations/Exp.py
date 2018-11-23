@@ -484,24 +484,27 @@ else:
     )
     
     if global_variables.save_plots:
-        qmd.plotVolumes(
-            save_to_file=str(
-            global_variables.plots_directory+
-            'volumes_all_models_'+ str(global_variables.long_id)+ '.png')
-        )
-        qmd.plotVolumes(
-            branch_champions=True,
-            save_to_file=str(global_variables.plots_directory+
-            'volumes_branch_champs_'+ str(global_variables.long_id)+
-            '.png')
-        )
-        qmd.plotQuadraticLoss(
-            save_to_file= str(
+        try:
+            qmd.plotVolumes(
+                save_to_file=str(
                 global_variables.plots_directory+
-                'quadratic_loss_'+ str(global_variables.long_id)+
-                '.png'
+                'volumes_all_models_'+ str(global_variables.long_id)+ '.png')
             )
-        )
+            qmd.plotVolumes(
+                branch_champions=True,
+                save_to_file=str(global_variables.plots_directory+
+                'volumes_branch_champs_'+ str(global_variables.long_id)+
+                '.png')
+            )
+            qmd.plotQuadraticLoss(
+                save_to_file= str(
+                    global_variables.plots_directory+
+                    'quadratic_loss_'+ str(global_variables.long_id)+
+                    '.png'
+                )
+            )
+        except:
+            print("Couldn't plot all individual QMD plots.")
 
         true_op_known=False
         try:

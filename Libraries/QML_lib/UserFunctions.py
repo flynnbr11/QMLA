@@ -280,6 +280,8 @@ initial_models = {
 		# ['yTi', 'zTi'],
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		['xTi', 'yTi', 'zTi'],
+	'non_interacting_ising' : 
+		['x', 'y', 'z'],
 	'interacting_nearest_neighbour_ising' :
 		['xTx', 'yTy', 'zTz'],
 	'hyperfine_like' : 

@@ -162,7 +162,6 @@ class QMD():
         self.MaxModNum = max_num_models #TODO: necessary?
         self.gaussian = self.GlobalVariables.gaussian
         print("[QMD] Gaussian:", self.gaussian)
-        self.NumModels = len(initial_op_list)
         self.NumParticles = self.GlobalVariables.num_particles
         self.NumExperiments = self.GlobalVariables.num_experiments
         self.MaxQubitNumber = max_num_qubits
@@ -295,13 +294,12 @@ class QMD():
         self.SpawnDepthByGrowthRule = {}
         self.TreesCompleted = {}
         self.InitialOpsAllBranches = []
-        self.IntialModelBranches = {}
+        self.InitialModelBranches = {}
         self.InitialModelIDs =  {}
         initial_id_counter = 0
         for i in range(len(self.GeneratorList)):
             # to match this newly created branch with corresponding dicts filled here
             
-            self.HighestBranchID = i 
             gen = self.GeneratorList[i]
             self.TreesCompleted[gen] = False
             print("Adding branch for ", gen)
@@ -314,12 +312,12 @@ class QMD():
             # ))
             self.BranchModelIds[i] = []
             for mod in initial_models_this_gen:
-                self.IntialModelBranches[mod] = i
+                self.InitialModelBranches[mod] = i
                 self.InitialModelIDs[mod] = initial_id_counter
                 self.BranchModelIds[i].append(initial_id_counter)
                 initial_id_counter += 1
 
-            self.HighestModelID += num_new_models
+            # self.HighestModelID += num_new_models
             self.BranchBayesComputed[i] = False
             self.BranchAllModelsLearned[i] = False
             self.BranchComparisonsComplete[i] = False
@@ -338,7 +336,10 @@ class QMD():
             self.SpawnDepthByGrowthRule[gen] = 0
             self.BranchGrowthRules[i] = gen
 
-        
+        self.HighestBranchID = max(self.InitialModelBranches.values())
+        self.HighestModelID = max(self.InitialModelIDs.values())
+        self.NumModels = len(self.InitialModelIDs.keys())
+
         print("[QMD] NumModelsPerBranch: ", self.NumModelsPerBranch)
         print("[QMD] NumModelPairsPerBranch: ", self.NumModelPairsPerBranch)
         print("[QMD] BranchAllModelsLearned: ", self.BranchAllModelsLearned)
@@ -348,7 +349,8 @@ class QMD():
         print("[QMD] BranchModelIds", self.BranchModelIds)
         print("[QMD] BranchGrowthRules:", self.BranchGrowthRules)
         print("[QMD] InitialOpsAllBranches:", self.InitialOpsAllBranches)
-        print("[QMD] self.IntialModelBranches:", self.IntialModelBranches)
+        print("[QMD] self.InitialModelBranches:", self.InitialModelBranches)
+        print("[QMD] self.HighestBranchID:", self.HighestBranchID)
 
         self.NumTrees = len(self.GeneratorList) # i.e. Trees only stem from unique generators
         print("[QMD] num trees:", self.NumTrees)
@@ -516,7 +518,7 @@ class QMD():
             DataBase.launch_db(
                 true_op_name = self.TrueOpName,
                 # gen_list = self.InitialOpList,
-                new_model_branches = self.IntialModelBranches, 
+                new_model_branches = self.InitialModelBranches, 
                 new_model_ids = self.InitialModelIDs, 
                 log_file = self.log_file, 
                 gen_list = self.InitialOpsAllBranches, 
@@ -538,12 +540,17 @@ class QMD():
                 port_number=self.PortNumber
             )
             
-        for i in range(len(self.InitialOpList)):
-            model = self.InitialOpList[i]
+        for mod in list(self.InitialModelIDs.keys()):
+            mod_id = self.InitialModelIDs[mod]
+            print("mod id:", mod_id)
+            self.ModelNameIDs[int(mod_id)] = mod
 
-            if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
-                self.TrueOpModelID = i
-            self.ModelNameIDs[i] = model
+        # for i in range(len(self.InitialOpList)):
+        #     model = self.InitialOpList[i]
+
+        #     if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
+        #         self.TrueOpModelID = i
+        #     self.ModelNameIDs[i] = model
             
     def addModel(self, model, branchID=0):
         #self.NumModels += 1
@@ -576,6 +583,7 @@ class QMD():
             if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
                 self.TrueOpModelID = self.NumModels
             self.HighestModelID += 1 
+            print("Setting model ", model, "to ID:", self.NumModels)
             self.ModelNameIDs[self.NumModels] = model
             self.NumModels += 1
             if DataBase.get_num_qubits(model) > self.HighestQubitNumber:
@@ -624,7 +632,10 @@ class QMD():
         for model in model_list:
             # addModel returns whether adding model was successful
             # if false, that's because it's already been computed
-            add_model_info = self.addModel(model, branchID=branchID)
+            add_model_info = self.addModel(
+                model, 
+                branchID=branchID
+            )
             already_computed = not(
                 add_model_info['is_new_model']
             )
@@ -749,7 +760,7 @@ class QMD():
     ):
         # model_list = DataBase.model_names_on_branch(self.db, branchID)
         model_list = self.BranchModels[branchID]
-        print("model ids on branch", branchID, ":", model_list)
+        print("models on branch", branchID, ":", model_list)
         active_branches_learning_models = (
             self.RedisDataBases['active_branches_learning_models']
         )
@@ -825,7 +836,12 @@ class QMD():
             db = self.db
         )
         if exists:
-            modelID = DataBase.model_id_from_name(self.db, name = model_name)
+            modelID = DataBase.model_id_from_name(
+                self.db, 
+                name = model_name
+            )
+
+            print("[QMD] ModelNameIDs:", self.ModelNameIDs)
             branchID = DataBase.model_branch_from_model_id(
                 self.db, 
                 model_id=modelID
@@ -1685,6 +1701,7 @@ class QMD():
             mod_id in best_models 
         ]
         # new_models = ModelGeneration.new_model_list(
+        print("model name ids:", self.ModelNameIDs)
         current_champs = [
             self.ModelNameIDs[i] for i in
             list(self.BranchChampions.values())
@@ -1915,23 +1932,12 @@ class QMD():
                     and 
                     self.BranchAllModelsLearned[branchID]==False
                 ):
-                    print(
-                        "All models on branch", branchID, 
-                        "have finished learning."
-                    )
-
                     self.log_print([
                         "All models on branch", branchID, 
                         "have finished learning."]
                     )
                     self.BranchAllModelsLearned[branchID] = True
                     self.remoteBayesFromBranchID(branchID)
-                else:
-                    print(
-                        "[QMD] num complete:", 
-                        active_branches_learning_models.get(
-                            branchID)
-                    )
 
             for branchID_bytes in active_branches_bayes.keys():
                 
@@ -1958,11 +1964,6 @@ class QMD():
                             self.TreesCompleted[this_branch_growth_rule] = True
                             self.NumTreesCompleted += 1
                             max_spawn_depth_reached = True
-                            print(
-                                "[QMD] num trees completed:", 
-                                self.NumTreesCompleted,
-                                "num trees:", self.NumTrees
-                            )
 
         self.log_print(
             [
