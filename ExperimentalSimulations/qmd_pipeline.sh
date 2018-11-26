@@ -53,8 +53,8 @@ this_log="$long_dir/qmd.log"
 further_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
-growth_rule='test_changes_to_qmd'
-# growth_rule='two_qubit_ising_rotation_hyperfine'
+# growth_rule='test_changes_to_qmd'
+growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
 # growth_rule='non_interacting_ising'
@@ -67,7 +67,7 @@ growth_rule='test_changes_to_qmd'
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
 
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
-growth_rule='heisenberg_nontransverse'
+# growth_rule='heisenberg_nontransverse'
 
 # true_operator='yTi'
 # true_operator='xTxTTiPPPiTxTTx'

@@ -1112,7 +1112,11 @@ class modelClassForRemoteBayesFactor():
             log_file='QMD_log.log'
         ):
 
-        rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
+        rds_dbs = rds.databases_from_qmd_id(
+            host_name, 
+            port_number, 
+            qid
+        )
         qmd_info_db = rds_dbs['qmd_info_db'] 
         learned_models_info = rds_dbs['learned_models_info']
     

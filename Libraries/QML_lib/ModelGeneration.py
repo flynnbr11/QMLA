@@ -857,10 +857,49 @@ def deterministic_transverse_ising_nn_fixed_axis(
 def test_changes_to_qmd(
     **kwargs
 ):
+    from UserFunctions import initial_models
+    growth_generator = kwargs['generator']
     model_list = kwargs['model_list']
     new_models = []
+
+
+    base_terms = initial_models[growth_generator]
+    this_dimension = DataBase.get_num_qubits(model_list[0])
+    base_dimension = DataBase.get_num_qubits(base_terms[0])
+
     for mod in model_list:
-        new_models.append(tensor_all_with_identity_at_end(mod))
+        present_terms = DataBase.get_constituent_names_from_name(mod)
+        base_models_this_dim = []
+        if this_dimension == base_dimension:
+            base_models_this_dim = base_terms
+        else:
+            for b in base_terms:
+                new_mod = tensor_all_with_identity_at_start(b)
+                for i in range(base_dimension+1, this_dimension):
+                    new_mod = tensor_all_with_identity_at_start(new_mod)
+
+                base_models_this_dim.append(new_mod)    
+
+        base_terms_not_present = list(
+            set(base_models_this_dim) - set(present_terms)
+        ) 
+        num_qubits = DataBase.get_num_qubits(mod)
+
+
+
+        p_str = ''
+        for i in range(num_qubits):
+            p_str += 'P'
+
+        for b in base_terms_not_present:
+            new_mod = str(
+                mod + p_str + b
+            )
+            new_models.append(new_mod)
+
+        # new_models.append(tensor_all_with_identity_at_end(mod))
+
+
     return new_models
 
 def heisenberg_nontransverse(
@@ -937,7 +976,16 @@ def spawn_depth_check(
     spawn_step, 
     **kwargs
 ):
+
+    # print(
+    #     "[ModGen] ", generator, 
+    #     "\tspawn step:", 
+    #     spawn_step, 
+    #     "\t max:", 
+    #     max_spawn_depth_info[generator]
+    # )
     if spawn_step == max_spawn_depth_info[generator]:
+        print("[ModGen] MAX SPAWN DEPTH REACHED FOR RULE ", generator)
         return True 
     else:
         return False
@@ -949,6 +997,13 @@ def max_num_qubits_reached_check(
     current_num_qubits, 
     **kwargs
 ):
+    # print(
+    #     "[ModGen] ", generator, 
+    #     "\tcurrent_num_qubits:", 
+    #     current_num_qubits, 
+    #     "\t max:", 
+    #     max_num_qubits_info[generator]
+    # )
     if (
         current_num_qubits 
         == 

@@ -271,7 +271,8 @@ log_print(["\n QMD id", global_variables.qmd_id,
     "and port", global_variables.port_number,
     "has seed", rds.get_seed(global_variables.host_name,
     global_variables.port_number, global_variables.qmd_id,
-    print_status=True),"\n", global_variables.num_particles,
+    print_status=True),
+    "\n", global_variables.num_particles,
     " particles for", global_variables.num_experiments, 
     "experiments and ", global_variables.num_times_bayes,
     "bayes updates\n Gaussian=", global_variables.gaussian, 
@@ -284,9 +285,30 @@ log_print(["\n QMD id", global_variables.qmd_id,
 Launch and run QMD
 """
 
+
+generators = [
+    # 'test_changes_to_qmd',
+    global_variables.growth_generation_rule,
+    'non_interacting_ising',
+    # 'two_qubit_ising_rotation_hyperfine',
+    # 'interacing_nn_ising_fixed_axis'
+    # 'deterministic_transverse_ising_nn_fixed_axis'
+    # 'heisenberg_nontransverse'
+]
+
+generator_initial_models = {}
+for gen in generators:
+    try:
+        generator_initial_models[gen] = UserFunctions.initial_models[gen]
+    except:
+        generator_initial_models[gen] = UserFunctions.initial_models[None]
+
+
+
 qmd = QMD(
     global_variables = global_variables, 
     initial_op_list=initial_op_list, 
+    generator_initial_models = generator_initial_models,
     true_operator=true_op, 
     true_param_list=true_params, 
     use_time_dep_true_model = False, 
@@ -437,7 +459,8 @@ elif global_variables.further_qhl == True:
 
 
 else:
-    qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
+    # qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
+    qmd.runRemoteQMD_MULTIPLE_GEN(num_spawns=3) #  Actually run QMD
 
     """
     Tidy up and analysis. 
@@ -469,24 +492,27 @@ else:
     )
     
     if global_variables.save_plots:
-        qmd.plotVolumes(
-            save_to_file=str(
-            global_variables.plots_directory+
-            'volumes_all_models_'+ str(global_variables.long_id)+ '.png')
-        )
-        qmd.plotVolumes(
-            branch_champions=True,
-            save_to_file=str(global_variables.plots_directory+
-            'volumes_branch_champs_'+ str(global_variables.long_id)+
-            '.png')
-        )
-        qmd.plotQuadraticLoss(
-            save_to_file= str(
+        try:
+            qmd.plotVolumes(
+                save_to_file=str(
                 global_variables.plots_directory+
-                'quadratic_loss_'+ str(global_variables.long_id)+
-                '.png'
+                'volumes_all_models_'+ str(global_variables.long_id)+ '.png')
             )
-        )
+            qmd.plotVolumes(
+                branch_champions=True,
+                save_to_file=str(global_variables.plots_directory+
+                'volumes_branch_champs_'+ str(global_variables.long_id)+
+                '.png')
+            )
+            qmd.plotQuadraticLoss(
+                save_to_file= str(
+                    global_variables.plots_directory+
+                    'quadratic_loss_'+ str(global_variables.long_id)+
+                    '.png'
+                )
+            )
+        except:
+            print("Couldn't plot all individual QMD plots.")
 
         true_op_known=False
         try:

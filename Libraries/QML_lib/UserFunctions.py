@@ -132,7 +132,7 @@ max_num_qubits_info = {
 	'interacing_nn_ising_fixed_axis' : 6, 
     'deterministic_interacting_nn_ising_single_axis' : 5,
     'deterministic_transverse_ising_nn_fixed_axis' : 5,
-	'heisenberg_nontransverse' : 5,
+	'heisenberg_nontransverse' : 3,
     None : 5,
 }
 
@@ -234,10 +234,10 @@ latex_naming_functions = {
 	# None : 
 	# 	ModelNames.default_latex_wrapping,
 
-	'two_qubit_ising_rotation_hyperfine' : 
-		ModelNames.latex_name_ising, 
-	'two_qubit_ising_rotation_hyperfine_transverse' : 
-		ModelNames.latex_name_ising, 
+	# 'two_qubit_ising_rotation_hyperfine' : 
+	# 	ModelNames.latex_name_ising, 
+	# 'two_qubit_ising_rotation_hyperfine_transverse' : 
+	# 	ModelNames.latex_name_ising, 
 	# 'test_return_champs' :
 	# 	ModelNames.default_latex_wrapping,
 	# 'interacting_nearest_neighbour_ising' : 
@@ -274,12 +274,14 @@ initial_models = {
 	None :
 		['x', 'y', 'z'],
 	'test_changes_to_qmd' :
-		['x', 'y'],
+		['x', 'y', 'z'],
 	'two_qubit_ising_rotation_hyperfine' :
 		['xTi', 'yTi', 'zTi'],
 		# ['yTi', 'zTi'],
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		['xTi', 'yTi', 'zTi'],
+	'non_interacting_ising' : 
+		['x', 'y', 'z'],
 	'interacting_nearest_neighbour_ising' :
 		['xTx', 'yTy', 'zTz'],
 	'hyperfine_like' : 
@@ -497,6 +499,9 @@ def get_probe_dict(
 	except:
 		max_num_qubits = max_num_qubits_info[None]
 
+	max_num_qubits = max(
+		list(max_num_qubits_info.values())
+	) # TODO this isn't strictly necessary. Take the highest of any of the growth rules in use. 
 
 	probe_dict = probe_dict_function(
 		max_num_qubits = max_num_qubits, 
