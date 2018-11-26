@@ -16,6 +16,15 @@ set_normal_prior_specific_terms = {
 	# 'x' : [5.0, 2.0],
 	# 'z' : [5.0, 2.0],
 	# 'y' : [5.0, 2.0]
+	'xTi' : [4.0, 1.5],
+	'yTi' : [4.0, 1.5],
+	'zTi' : [4.0, 1.5],
+	'xTx' : [4.0, 1.5],
+	'yTy' : [4.0, 1.5],
+	'zTz' : [4.0, 1.5],
+	'xTy' : [4.0, 1.5],
+	'xTz' : [4.0, 1.5],
+	'yTz' : [4.0, 1.5],
 }
 
 set_uniform_prior_specific_terms = {

@@ -1905,7 +1905,7 @@ def cumulativeQMDTreePlot(
 #        e_cmap = plt.cm.Blues, 
         #e_cmap = plt.cm.Paired,     
         #e_cmap = plt.cm.rainbow,     
-        nonadj_alpha = 0.1, e_alphas = [] , 
+        nonadj_alpha = 0.0, e_alphas = [] , 
         # widthscale=10.5, 
         widthscale=3, 
         label_padding = 0.4, pathstyle="curve",
