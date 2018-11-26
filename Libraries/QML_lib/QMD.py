@@ -255,6 +255,7 @@ class QMD():
 
 
         # Growth rule setup
+        self.BranchParents = {}
         self.GeneratorInitialModels = generator_initial_models
         self.GeneratorList = list(self.GeneratorInitialModels.keys())
         self.GrowthGenerator = self.GlobalVariables.growth_generation_rule
@@ -288,6 +289,7 @@ class QMD():
         self.BranchNumModelsPreComputed = {}
         self.BranchBayesComputed = {}
         self.BranchModels = {}
+        self.ModelsBranches = {}
         self.BranchPrecomputedModels = {}
         self.BranchModelIds = {}
         self.BranchGrowthRules = {}
@@ -315,6 +317,7 @@ class QMD():
                 self.InitialModelBranches[mod] = i
                 self.InitialModelIDs[mod] = initial_id_counter
                 self.BranchModelIds[i].append(initial_id_counter)
+                self.ModelsBranches[initial_id_counter] = i  
                 initial_id_counter += 1
 
             # self.HighestModelID += num_new_models
@@ -656,6 +659,7 @@ class QMD():
         for model in model_list:
             m_id = DataBase.model_id_from_name(self.db, model)
             model_id_list.append(m_id)
+            self.ModelsBranches[m_id] = branchID
 
         self.BranchNumModelsPreComputed[branchID] = num_models_already_computed_this_branch
         self.BranchModels[branchID] = model_list
@@ -1283,8 +1287,10 @@ class QMD():
                 field='Status',
                 new_value='Deactivated'
             )
-        self.updateModelRecord(name=DataBase.model_name_from_id(self.db, champ_id),
-            field='Status', new_value='Active'
+        self.updateModelRecord(
+            name=DataBase.model_name_from_id(self.db, champ_id),
+            field='Status', 
+            new_value='Active'
         )
         ranked_model_list = sorted(models_points, key=models_points.get, reverse=True)
 
@@ -1393,19 +1399,53 @@ class QMD():
         interbranch_collapse_threshold = 1e5 ## if a spawned model is this much better than its parent, parent is deactivated
         num_champs = len(branch_champions)
         
-        for k in range( num_champs -1 ):
-            mod1 = branch_champions[k]
-            mod2 = branch_champions[k+1]
+
+        children_branches = list(self.BranchParents.keys())
+        for k in children_branches:
+            print(
+                "Branch", k, 
+                "has parent branch ", self.BranchParents[k]
+            )
+
+
+        # for k in range( num_champs - 1 ):
+            # mod1 = branch_champions[k]
+            # mod2 = branch_champions[k+1]
             # are_both_models_active ? 
 
-            job_list.append(
-                self.remoteBayes(
-                    model_a_id=mod1, 
-                    model_b_id=mod2,
-                    return_job=True, 
-                    remote=self.use_rq
+        for child_id in branch_champions:
+            # child_id = branch_champions[k]
+            child_branch = self.ModelsBranches[child_id] # branch this child sits on
+            try:
+                parent_branch = self.BranchParents[child_branch] 
+                parent_id = self.BranchChampions[parent_branch]
+
+                print("Child:", child_id, "parent:", parent_id)
+                job_list.append(
+                    self.remoteBayes(
+                        model_a_id=mod1, 
+                        model_b_id=mod2,
+                        return_job=True, 
+                        remote=self.use_rq
+                    )
                 )
-            )
+
+                # job_list.append(
+                #     self.remoteBayes(
+                #         model_a_id=mod1, 
+                #         model_b_id=mod2,
+                #         return_job=True, 
+                #         remote=self.use_rq
+                #     )
+                # )
+            except:
+                self.log_print(
+                    [
+                    "Model", 
+                    child_id, 
+                    "doesn't have a parent to compare with."
+                    ]
+                )
             
         self.log_print(
             [
@@ -1434,66 +1474,82 @@ class QMD():
                 "Bayes calculated between branch champions"
             ]
         )
-        for k in range(num_champs - 1):
-            mod1 = branch_champions[k]
-            mod2 = branch_champions[k+1]
-            pair_id = DataBase.unique_model_pair_identifier(
-                mod1, 
-                mod2
-            )
-            bf_from_db = bayes_factors_db.get(pair_id)
-            bayes_factor = float(bf_from_db)
-        
-            if bayes_factor > interbranch_collapse_threshold:
-                # bayes_factor heavily favours mod1, so deactive mod2
-                self.log_print(
-                    [
-                    "Parent model,", 
-                    mod1, 
-                    "stronger than spawned; deactivating model", 
-                    mod2
-                    ]
-                )
-                self.updateModelRecord(
-                    model_id=mod2, 
-                    field='Status',
-                    new_value='Deactivated'
-                )
-                try:
-                    self.ActiveBranchChampList.remove(mod2)
-                except:
-                    pass
-            elif bayes_factor < (1.0/interbranch_collapse_threshold):
-                self.log_print(
-                    [
-                    "Spawned model", 
-                    mod2, 
-                    "stronger than parent; deactivating model", 
-                    mod1
-                    ]
-                )
-                self.updateModelRecord(
-                    model_id=mod1,
-                    field='Status',
-                    new_value='Deactivated'
-                )
-                try:
-                    self.ActiveBranchChampList.remove(mod1)
-                except:
-                    pass
+        # for k in range(num_champs - 1):
+        #     mod1 = branch_champions[k]
+        #     mod2 = branch_champions[k+1]
+        for child_id in branch_champions:
+            # child_id = branch_champions[k]
+            child_branch = self.ModelsBranches[child_id] # branch this child sits on
+            try:
+                parent_branch = self.BranchParents[child_branch] 
+                parent_id = self.BranchChampions[parent_branch]
 
-            # Add bayes factors to BayesFactor dict for each model        
-            mod_a = self.reducedModelInstanceFromID(mod1)
-            mod_b = self.reducedModelInstanceFromID(mod2)
-            if mod2 in mod_a.BayesFactors:
-                mod_a.BayesFactors[mod2].append(bayes_factor)
-            else:
-                mod_a.BayesFactors[mod2] = [bayes_factor]
+                mod1 = child_id
+                mod2 = parent_id
+
+                pair_id = DataBase.unique_model_pair_identifier(
+                    mod1, 
+                    mod2
+                )
+                bf_from_db = bayes_factors_db.get(pair_id)
+                bayes_factor = float(bf_from_db)
             
-            if mod1 in mod_b.BayesFactors:
-                mod_b.BayesFactors[mod1].append((1.0/bayes_factor))
-            else:
-                mod_b.BayesFactors[mod1] = [(1.0/bayes_factor)]
+                if bayes_factor > interbranch_collapse_threshold:
+                    # bayes_factor heavily favours mod1, so deactive mod2
+                    self.log_print(
+                        [
+                        "Parent model,", 
+                        mod1, 
+                        "stronger than spawned; deactivating model", 
+                        mod2
+                        ]
+                    )
+                    self.updateModelRecord(
+                        model_id=mod2, 
+                        field='Status',
+                        new_value='Deactivated'
+                    )
+                    try:
+                        self.ActiveBranchChampList.remove(mod2)
+                    except:
+                        pass
+                elif bayes_factor < (1.0/interbranch_collapse_threshold):
+                    self.log_print(
+                        [
+                        "Spawned model", 
+                        mod2, 
+                        "stronger than parent; deactivating model", 
+                        mod1
+                        ]
+                    )
+                    self.updateModelRecord(
+                        model_id=mod1,
+                        field='Status',
+                        new_value='Deactivated'
+                    )
+                    try:
+                        self.ActiveBranchChampList.remove(mod1)
+                    except:
+                        pass
+
+                # Add bayes factors to BayesFactor dict for each model        
+                mod_a = self.reducedModelInstanceFromID(mod1)
+                mod_b = self.reducedModelInstanceFromID(mod2)
+                if mod2 in mod_a.BayesFactors:
+                    mod_a.BayesFactors[mod2].append(bayes_factor)
+                else:
+                    mod_a.BayesFactors[mod2] = [bayes_factor]
+                
+                if mod1 in mod_b.BayesFactors:
+                    mod_b.BayesFactors[mod1].append((1.0/bayes_factor))
+                else:
+                    mod_b.BayesFactors[mod1] = [(1.0/bayes_factor)]
+            except:
+                self.log_print(
+                    [
+                    "child doesn't have active parent"
+                    ]
+                )                        
         
         
         
@@ -1739,7 +1795,10 @@ class QMD():
         new_branch_id = self.newBranch(
             model_list = new_models,
             growth_rule = growth_rule
-        ) 
+        )
+
+        self.BranchParents[new_branch_id] = branchID
+
         self.log_print(
             [
             "Models to add to new branch (", 

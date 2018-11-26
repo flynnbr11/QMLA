@@ -997,6 +997,13 @@ def max_num_qubits_reached_check(
     current_num_qubits, 
     **kwargs
 ):
+    print(
+        "[ModGen] ", generator, 
+        "\tcurrent_num_qubits:", 
+        current_num_qubits, 
+        "\t max:", 
+        max_num_qubits_info[generator]
+    )
     if (
         current_num_qubits 
         == 

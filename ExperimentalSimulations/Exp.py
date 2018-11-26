@@ -290,13 +290,19 @@ generators = [
     # 'test_changes_to_qmd',
     global_variables.growth_generation_rule,
     # 'non_interacting_ising',
-    'two_qubit_ising_rotation_hyperfine',
-    'heisenberg_nontransverse'
+    # 'two_qubit_ising_rotation_hyperfine',
+    # 'interacing_nn_ising_fixed_axis'
+    # 'deterministic_transverse_ising_nn_fixed_axis'
+    # 'heisenberg_nontransverse'
 ]
 
 generator_initial_models = {}
 for gen in generators:
-    generator_initial_models[gen] = UserFunctions.initial_models[gen]
+    try:
+        generator_initial_models[gen] = UserFunctions.initial_models[gen]
+    except:
+        generator_initial_models[gen] = UserFunctions.initial_models[None]
+
 
 
 qmd = QMD(
