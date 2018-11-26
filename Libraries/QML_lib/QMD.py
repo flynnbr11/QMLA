@@ -337,23 +337,23 @@ class QMD():
             self.BranchGrowthRules[i] = gen
 
         self.HighestBranchID = max(self.InitialModelBranches.values())
-        self.HighestModelID = max(self.InitialModelIDs.values())
+        self.HighestModelID = max(self.InitialModelIDs.values())+1 # to ensure everywhere we use range(qmd.HighestModelID) goes to the right number
         self.NumModels = len(self.InitialModelIDs.keys())
 
-        print("[QMD] NumModelsPerBranch: ", self.NumModelsPerBranch)
-        print("[QMD] NumModelPairsPerBranch: ", self.NumModelPairsPerBranch)
-        print("[QMD] BranchAllModelsLearned: ", self.BranchAllModelsLearned)
-        print("[QMD] BranchComparisonsComplete: ", self.BranchComparisonsComplete)
-        print("[QMD] BranchNumModelsPreComputed: ", self.BranchNumModelsPreComputed)
-        print("[QMD] BranchModels", self.BranchModels)
-        print("[QMD] BranchModelIds", self.BranchModelIds)
-        print("[QMD] BranchGrowthRules:", self.BranchGrowthRules)
-        print("[QMD] InitialOpsAllBranches:", self.InitialOpsAllBranches)
-        print("[QMD] self.InitialModelBranches:", self.InitialModelBranches)
-        print("[QMD] self.HighestBranchID:", self.HighestBranchID)
+        # print("[QMD] NumModelsPerBranch: ", self.NumModelsPerBranch)
+        # print("[QMD] NumModelPairsPerBranch: ", self.NumModelPairsPerBranch)
+        # print("[QMD] BranchAllModelsLearned: ", self.BranchAllModelsLearned)
+        # print("[QMD] BranchComparisonsComplete: ", self.BranchComparisonsComplete)
+        # print("[QMD] BranchNumModelsPreComputed: ", self.BranchNumModelsPreComputed)
+        # print("[QMD] BranchModels", self.BranchModels)
+        # print("[QMD] BranchModelIds", self.BranchModelIds)
+        # print("[QMD] BranchGrowthRules:", self.BranchGrowthRules)
+        # print("[QMD] InitialOpsAllBranches:", self.InitialOpsAllBranches)
+        # print("[QMD] self.InitialModelBranches:", self.InitialModelBranches)
+        # print("[QMD] self.HighestBranchID:", self.HighestBranchID)
 
         self.NumTrees = len(self.GeneratorList) # i.e. Trees only stem from unique generators
-        print("[QMD] num trees:", self.NumTrees)
+        # print("[QMD] num trees:", self.NumTrees)
         self.NumTreesCompleted = 0
 
         self.BranchChampsByNumQubits = {}
@@ -841,7 +841,7 @@ class QMD():
                 name = model_name
             )
 
-            print("[QMD] ModelNameIDs:", self.ModelNameIDs)
+            # print("[QMD] ModelNameIDs:", self.ModelNameIDs)
             branchID = DataBase.model_branch_from_model_id(
                 self.db, 
                 model_id=modelID
@@ -999,8 +999,24 @@ class QMD():
                         or recompute==True
                     ): #ie not yet considered
                         self.BayesFactorsComputed.append(unique_id)
-                        self.remoteBayes(a,b, remote=remote, 
-                            branchID=branchID, bayes_threshold=bayes_threshold
+                        self.remoteBayes(
+                            a,
+                            b, 
+                            remote=remote, 
+                            branchID=branchID, 
+                            bayes_threshold=bayes_threshold
+                        )
+                    elif unique_id in self.BayesFactorsComputed: 
+                        # if this already computed, so we need to tell this branch not to wait on it. 
+                        self.log_print(
+                            [
+                                "BF already computed for pair ", 
+                                unique_id
+                            ]
+                        )
+                        active_branches_bayes.incr(
+                            int(branchID), 
+                            1
                         )
 
     def blockingQMD(self):
@@ -1701,7 +1717,6 @@ class QMD():
             mod_id in best_models 
         ]
         # new_models = ModelGeneration.new_model_list(
-        print("model name ids:", self.ModelNameIDs)
         current_champs = [
             self.ModelNameIDs[i] for i in
             list(self.BranchChampions.values())
@@ -1756,7 +1771,12 @@ class QMD():
             spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
             current_num_qubits = new_model_dimension
         )
-        print("[spawnFromBranch] tree_completed:", tree_completed)
+        print(
+            "[spawnFromBranch] growth:", 
+            growth_rule, 
+            ";tree_completed:", 
+            tree_completed
+        )
         return tree_completed            
         
 
@@ -1911,8 +1931,8 @@ class QMD():
         all_comparisons_complete=False
 
         branch_ids_on_db = list(active_branches_learning_models.keys())
-        print("[QMD]before while loop, branches:", branch_ids_on_db)
-        print("[QMD] self.NumModelsPerBranch:", self.NumModelsPerBranch)
+        # print("[QMD]before while loop, branches:", branch_ids_on_db)
+        # print("[QMD] self.NumModelsPerBranch:", self.NumModelsPerBranch)
 
         # while max_spawn_depth_reached==False:
         while self.NumTreesCompleted < self.NumTrees:
@@ -1942,7 +1962,9 @@ class QMD():
             for branchID_bytes in active_branches_bayes.keys():
                 
                 branchID = int(branchID_bytes)
-                bayes_calculated = active_branches_bayes.get(branchID_bytes)
+                bayes_calculated = active_branches_bayes.get(
+                    branchID_bytes
+                )
                 if (int(bayes_calculated) ==  
                     self.NumModelPairsPerBranch[branchID] and
                     self.BranchComparisonsComplete[branchID]==False
@@ -1963,6 +1985,12 @@ class QMD():
                         if growth_rule_tree_complete==True:
                             self.TreesCompleted[this_branch_growth_rule] = True
                             self.NumTreesCompleted += 1
+                            print(
+                                "[QMD] Num trees now completed:", 
+                                self.NumTreesCompleted, 
+                                "Tree completed dict:",
+                                self.TreesCompleted
+                            )
                             max_spawn_depth_reached = True
 
         self.log_print(

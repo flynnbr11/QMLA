@@ -132,7 +132,7 @@ max_num_qubits_info = {
 	'interacing_nn_ising_fixed_axis' : 6, 
     'deterministic_interacting_nn_ising_single_axis' : 5,
     'deterministic_transverse_ising_nn_fixed_axis' : 5,
-	'heisenberg_nontransverse' : 5,
+	'heisenberg_nontransverse' : 3,
     None : 5,
 }
 
@@ -234,10 +234,10 @@ latex_naming_functions = {
 	# None : 
 	# 	ModelNames.default_latex_wrapping,
 
-	'two_qubit_ising_rotation_hyperfine' : 
-		ModelNames.latex_name_ising, 
-	'two_qubit_ising_rotation_hyperfine_transverse' : 
-		ModelNames.latex_name_ising, 
+	# 'two_qubit_ising_rotation_hyperfine' : 
+	# 	ModelNames.latex_name_ising, 
+	# 'two_qubit_ising_rotation_hyperfine_transverse' : 
+	# 	ModelNames.latex_name_ising, 
 	# 'test_return_champs' :
 	# 	ModelNames.default_latex_wrapping,
 	# 'interacting_nearest_neighbour_ising' : 

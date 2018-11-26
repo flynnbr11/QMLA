@@ -289,7 +289,9 @@ Launch and run QMD
 generators = [
     # 'test_changes_to_qmd',
     global_variables.growth_generation_rule,
-    'two_qubit_ising_rotation_hyperfine'
+    # 'non_interacting_ising',
+    'two_qubit_ising_rotation_hyperfine',
+    'heisenberg_nontransverse'
 ]
 
 generator_initial_models = {}

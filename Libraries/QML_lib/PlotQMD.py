@@ -2755,13 +2755,17 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
         # names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in 
         names = [
             UserFunctions.get_latex_name(
-                name = qmd.ModelNameIDs[i],
+                name = mod_name,
                 growth_generator = qmd.GrowthGenerator
             ) 
-            for i in range(qmd.HighestModelID)
+            for mod_name in list(qmd.ModelNameIDs.values())
         ]
     elif names_ids=='nonlatex':
-        names = [qmd.ModelNameIDs[i] for i in range(qmd.HighestModelID)]
+        names = [
+            qmd.ModelNameIDs[i] 
+            for i in 
+            range(qmd.HighestModelID)
+        ]
     elif names_ids=='ids':
         names=range(qmd.HighestModelID)
     else:
@@ -2772,7 +2776,10 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
     with open(save_to_file, 'w') as csvfile:
 
         fieldnames = fields
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer = csv.DictWriter(
+            csvfile, 
+            fieldnames=fieldnames
+        )
 
         writer.writeheader()
         for i in range(qmd.HighestModelID):
@@ -2792,13 +2799,15 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
                     other_model_name = j
                 model_bf[other_model_name] = qmd.AllBayesFactors[i][j][-1]
 
-            if names_ids=='latex':
+            # if names_ids=='latex':
                 # model_bf['Name'] = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
+            try:
                 model_bf['Name'] = UserFunctions.get_latex_name(
                     name = qmd.ModelNameIDs[i],
                     growth_generator = qmd.GrowthGenerator
                 )
-            else:
+            # else:
+            except:
                 model_bf['Name'] = qmd.ModelNameIDs[i]
             model_bf['ID'] = i
             writer.writerow(model_bf)
