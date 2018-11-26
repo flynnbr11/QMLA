@@ -119,8 +119,6 @@ class QMD():
         self.TrueOpName = true_operator
         self.TrueOpDim = trueOp.num_qubits
         self.InitialOpList = initial_op_list
-        if qhl_test and self.TrueOpName not in self.InitialOpList: 
-            self.InitialOpList.append(self.TrueOpName)
 
         base_num_qubits = 3
         base_num_terms = 3
@@ -503,6 +501,7 @@ class QMD():
             true_operator, " with parameters : ", self.TrueParamsList]
         )
         self.initiateDB()
+
         
 
     def log_print(self, to_print_list):
@@ -1847,6 +1846,16 @@ class QMD():
 
     def runQHLTest(self):
     
+        if (
+            self.QHLmode == True 
+            and 
+            self.TrueOpName not in list(self.ModelsBranches.keys())
+        ): 
+            self.newBranch(
+                growth_rule = self.GrowthGenerator, 
+                model_list = [self.TrueOpName]
+            )
+
         mod_to_learn = self.TrueOpName
         self.log_print(["QHL test on:", mod_to_learn])
         
@@ -1858,7 +1867,8 @@ class QMD():
                 
         mod_id = DataBase.model_id_from_name(
             db=self.db, 
-            name=mod_to_learn)
+            name=mod_to_learn
+        )
         self.TrueOpModelID = mod_id
         self.log_print(
             [
@@ -1905,7 +1915,20 @@ class QMD():
     def runMultipleModelQHL(self, model_names=None):
         if model_names is None:
             model_names = self.InitialOpList
+        print("Model Names for multiple QHL:", model_names)
 
+        current_models = list(
+            self.ModelsBranches.keys()
+        )
+        models_to_add = []
+        for mod in model_names:
+            if mod not in current_models:
+                models_to_add.append(mod)
+        if len(models_to_add) > 0:
+            self.newBranch(
+                growth_rule = self.GrowthGenerator, 
+                model_list = models_to_add
+            )
         self.log_print(
             [
             'run multiple QHL. names:', model_names
@@ -1915,8 +1938,11 @@ class QMD():
         learned_models_ids = self.RedisDataBases['learned_models_ids']
 
         for mod_name in model_names:
-
-            mod_id = DataBase.model_id_from_name(db=self.db, name=mod_name)
+            print("Trying to get mod id for", mod_name)
+            mod_id = DataBase.model_id_from_name(
+                db=self.db, 
+                name=mod_name
+            )
             learned_models_ids.set(
                 str(mod_id), 0
             )
@@ -2512,7 +2538,9 @@ class QMD():
         )
     
         
-    def plotExpecValues(self, model_ids=None, 
+    def plotExpecValues(
+        self, 
+        model_ids=None, 
         times=None,
         champ=True, 
         max_time=1.8,
@@ -2529,7 +2557,8 @@ class QMD():
 
         PlotQMD.ExpectationValuesTrueSim(
             qmd=self, 
-            model_ids=model_ids, champ=champ, 
+            model_ids=model_ids, 
+            champ=champ, 
             times=times, 
             plus_probe=plus_probe,
             max_time=max_time, t_interval=t_interval,

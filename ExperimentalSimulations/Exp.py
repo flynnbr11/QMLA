@@ -258,6 +258,7 @@ if global_variables.further_qhl == True:
         log_file 
     )
     initial_op_list = list(model_priors.keys())
+    further_qhl_models = list(model_priors.keys())
 
 
 num_ops = len(initial_op_list)
@@ -402,8 +403,15 @@ if global_variables.qhl_test:
 
 elif global_variables.further_qhl == True:
 
-    qmd.runMultipleModelQHL()
-    model_ids = list(range(qmd.HighestModelID))
+    qmd.runMultipleModelQHL(model_names = further_qhl_models)
+    # model_ids = list(range(qmd.HighestModelID))
+    model_ids = [
+        DataBase.model_id_from_name(
+            db=qmd.db, 
+            name=mod
+        ) for mod in further_qhl_models
+    ]
+
     qmd.plotExpecValues(
         model_ids = model_ids, # hardcode to see full model for development
         times=plot_times,
