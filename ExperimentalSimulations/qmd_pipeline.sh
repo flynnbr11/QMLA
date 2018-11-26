@@ -6,8 +6,8 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
-do_further_qhl=1
+qhl_test=0
+do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -54,8 +54,8 @@ further_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
 # growth_rule='test_changes_to_qmd'
-growth_rule='two_qubit_ising_rotation_hyperfine'
-# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
@@ -86,8 +86,8 @@ then
     measurement_type=$exp_measurement_type
     pgh=0.3
     true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-    growth_rule='two_qubit_ising_rotation_hyperfine'
-    # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+    # growth_rule='two_qubit_ising_rotation_hyperfine'
+    growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
 else
     measurement_type=$sim_measurement_type
