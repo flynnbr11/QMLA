@@ -1068,13 +1068,18 @@ def summariseResultsCSV(
 
 
 
-def plotVolumeQHL(qmd, model_id=None, 
-    true_model=True, show_resamplings=True,  
+def plotVolumeQHL(
+    qmd, 
+    model_id=None, 
+    true_model=True, 
+    show_resamplings=True,  
     save_to_file=None
 ):
     if true_model:
         try:
-            mod = qmd.reducedModelInstanceFromID(qmd.TrueOpModelID) 
+            mod = qmd.reducedModelInstanceFromID(
+                qmd.TrueOpModelID
+            ) 
         except:
             print("True model not present in QMD models.")
     elif model_id is not None:

@@ -354,8 +354,11 @@ if global_variables.qhl_test:
 
         qmd.plotVolumeQHL(
             save_to_file = str( 
-            global_variables.plots_directory+
-            'qhl_volume_'+str(global_variables.long_id)+'.png')
+                global_variables.plots_directory+
+                'qhl_volume_'+
+                str(global_variables.long_id)+
+                '.png'
+            )
         )
 
         qmd.plotQuadraticLoss(

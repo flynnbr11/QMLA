@@ -6,7 +6,7 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 do_further_qhl=0
 
 ### ---------------------------------------------------###
@@ -21,7 +21,7 @@ rt=0.5
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=0
+exp_data=1
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests

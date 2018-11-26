@@ -1849,6 +1849,7 @@ class QMD():
     
         mod_to_learn = self.TrueOpName
         self.log_print(["QHL test on:", mod_to_learn])
+        
         self.learnModel(
             model_name=mod_to_learn,
             use_rq=self.use_rq, 
@@ -1858,7 +1859,15 @@ class QMD():
         mod_id = DataBase.model_id_from_name(
             db=self.db, 
             name=mod_to_learn)
-        self.log_print(["Learned:", mod_to_learn, ". ID=", mod_id])
+        self.TrueOpModelID = mod_id
+        self.log_print(
+            [
+                "Learned:", 
+                mod_to_learn, 
+                ". ID=", 
+                mod_id
+            ]
+        )
         mod = self.reducedModelInstanceFromID(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
         mod.updateLearnedValues()
