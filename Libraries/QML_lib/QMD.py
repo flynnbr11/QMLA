@@ -1401,13 +1401,6 @@ class QMD():
         
 
         children_branches = list(self.BranchParents.keys())
-        for k in children_branches:
-            print(
-                "Branch", k, 
-                "has parent branch ", self.BranchParents[k]
-            )
-
-
         # for k in range( num_champs - 1 ):
             # mod1 = branch_champions[k]
             # mod2 = branch_champions[k+1]
@@ -1420,7 +1413,6 @@ class QMD():
                 parent_branch = self.BranchParents[child_branch] 
                 parent_id = self.BranchChampions[parent_branch]
 
-                print("Child:", child_id, "parent:", parent_id)
                 job_list.append(
                     self.remoteBayes(
                         model_a_id=mod1, 
@@ -1428,6 +1420,14 @@ class QMD():
                         return_job=True, 
                         remote=self.use_rq
                     )
+                )
+                self.log_print(
+                    [
+                        "Comparing child ",
+                        child_id, 
+                        "with parent", 
+                        parent_id
+                    ]
                 )
 
                 # job_list.append(

@@ -499,6 +499,9 @@ def get_probe_dict(
 	except:
 		max_num_qubits = max_num_qubits_info[None]
 
+	max_num_qubits = max(
+		list(max_num_qubits_info.values())
+	) # TODO this isn't strictly necessary. Take the highest of any of the growth rules in use. 
 
 	probe_dict = probe_dict_function(
 		max_num_qubits = max_num_qubits, 
