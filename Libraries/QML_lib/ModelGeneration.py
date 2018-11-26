@@ -977,13 +977,13 @@ def spawn_depth_check(
     **kwargs
 ):
 
-    print(
-        "[ModGen] ", generator, 
-        "\tspawn step:", 
-        spawn_step, 
-        "\t max:", 
-        max_spawn_depth_info[generator]
-    )
+    # print(
+    #     "[ModGen] ", generator, 
+    #     "\tspawn step:", 
+    #     spawn_step, 
+    #     "\t max:", 
+    #     max_spawn_depth_info[generator]
+    # )
     if spawn_step == max_spawn_depth_info[generator]:
         print("[ModGen] MAX SPAWN DEPTH REACHED FOR RULE ", generator)
         return True 
@@ -997,13 +997,13 @@ def max_num_qubits_reached_check(
     current_num_qubits, 
     **kwargs
 ):
-    print(
-        "[ModGen] ", generator, 
-        "\tcurrent_num_qubits:", 
-        current_num_qubits, 
-        "\t max:", 
-        max_num_qubits_info[generator]
-    )
+    # print(
+    #     "[ModGen] ", generator, 
+    #     "\tcurrent_num_qubits:", 
+    #     current_num_qubits, 
+    #     "\t max:", 
+    #     max_num_qubits_info[generator]
+    # )
     if (
         current_num_qubits 
         == 

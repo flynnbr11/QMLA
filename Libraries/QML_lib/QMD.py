@@ -586,7 +586,7 @@ class QMD():
             if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
                 self.TrueOpModelID = self.NumModels
             self.HighestModelID += 1 
-            print("Setting model ", model, "to ID:", self.NumModels)
+            # print("Setting model ", model, "to ID:", self.NumModels)
             self.ModelNameIDs[self.NumModels] = model
             self.NumModels += 1
             if DataBase.get_num_qubits(model) > self.HighestQubitNumber:
@@ -1413,31 +1413,37 @@ class QMD():
                 parent_branch = self.BranchParents[child_branch] 
                 parent_id = self.BranchChampions[parent_branch]
 
-                job_list.append(
-                    self.remoteBayes(
-                        model_a_id=mod1, 
-                        model_b_id=mod2,
-                        return_job=True, 
-                        remote=self.use_rq
-                    )
-                )
-                self.log_print(
-                    [
-                        "Comparing child ",
-                        child_id, 
-                        "with parent", 
-                        parent_id
-                    ]
-                )
+                if (
+                    child_id in self.ActiveBranchChampList
+                    and
+                    parent_id in self.ActiveBranchChampList
+                ):
 
-                # job_list.append(
-                #     self.remoteBayes(
-                #         model_a_id=mod1, 
-                #         model_b_id=mod2,
-                #         return_job=True, 
-                #         remote=self.use_rq
-                #     )
-                # )
+                    job_list.append(
+                        self.remoteBayes(
+                            model_a_id=child_id, 
+                            model_b_id=parent_id,
+                            return_job=True, 
+                            remote=self.use_rq
+                        )
+                    )
+
+                    self.log_print(
+                        [
+                            "Comparing child ",
+                            child_id, 
+                            "with parent", 
+                            parent_id
+                        ]
+                    )
+                else:
+                    self.log_print(
+                        [
+                        "Either parent or child not in ActiveBranchChampList",
+                        "Child:", child_id, 
+                        "Parent:", parent_id
+                        ]
+                    )
             except:
                 self.log_print(
                     [
@@ -1830,12 +1836,12 @@ class QMD():
             spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
             current_num_qubits = new_model_dimension
         )
-        print(
-            "[spawnFromBranch] growth:", 
-            growth_rule, 
-            ";tree_completed:", 
-            tree_completed
-        )
+        # print(
+        #     "[spawnFromBranch] growth:", 
+        #     growth_rule, 
+        #     ";tree_completed:", 
+        #     tree_completed
+        # )
         return tree_completed            
         
 
@@ -1972,14 +1978,14 @@ class QMD():
         just_given_models=False
     ):
 
-        print("[QMD runMult] start")
+        # print("[QMD runMult] start")
         active_branches_learning_models = (
             self.RedisDataBases['active_branches_learning_models']
         )
         active_branches_bayes = self.RedisDataBases['active_branches_bayes']
 
         for i in list(self.BranchModels.keys()):
-            print("[QMD runMult] launching branch ", i)
+            # print("[QMD runMult] launching branch ", i)
             # ie initial branches
             self.learnModelFromBranchID(
                 i, 
