@@ -185,7 +185,9 @@ def create_prior(
 		)
 			
 ### Parse arguments from bash
-parser = argparse.ArgumentParser(description='Pass files to pickel QHL parameters.')
+parser = argparse.ArgumentParser(
+	description='Pass files to pickel QHL parameters.'
+)
 
 parser.add_argument(
   '-true', '--true_params_file', 
@@ -200,13 +202,13 @@ parser.add_argument(
   default=0
 )
 
-
 parser.add_argument(
   '-prior', '--prior_file', 
   help="File to pickle prior specific terms to.",
   type=str,
   default=None
 )
+
 parser.add_argument(
   '-rand_p', '--random_prior_terms', 
   help="Bool: use random true parameters or those defined in this file.",
@@ -289,15 +291,14 @@ parser.add_argument(
   default=0.25
 )
 
-
-
-
 arguments = parser.parse_args()
 random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
 exp_data = bool(arguments.use_experimental_data)
 growth_generation_rule = arguments.growth_generation_rule
-true_operator = UserFunctions.default_true_operators_by_generator[growth_generation_rule]
+true_operator = UserFunctions.default_true_operators_by_generator[
+	growth_generation_rule
+]
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
 special_probe = arguments.special_probe
@@ -306,8 +307,6 @@ param_min = arguments.param_min
 param_max = arguments.param_max
 param_mean = arguments.param_mean
 param_sigma = arguments.param_sigma
-
-
 
 ### Call functions to create pickle files. 
 ## TODO check if these are already present?
@@ -350,7 +349,6 @@ kwargs_for_plot_probe_creation = {
 	'growth_generator' : growth_generation_rule,
 	'experimental_data' : exp_data,
 	'special_probe' : special_probe, 
-
 }
 
 create_plot_probe(

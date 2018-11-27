@@ -23,6 +23,14 @@ parser.add_argument(
     default='two_qubit_ising_rotation_hyperfine'
 )
 parser.add_argument(
+  '-agr', '--alternative_growth_rules',
+  help='Growth rules to form other trees.',
+  # type=str,
+  action='append',
+  default=[],
+)
+
+parser.add_argument(
   '-e', '--num_experiments', 
   help='Number of experiments to use for the learning process',
   type=int,
@@ -204,7 +212,8 @@ hamiltonian_exponentiation_times = {
 # Functions 
 
 def time_required(
-    growth_generator, 
+    growth_generator, # ie true growth generator for QHL
+    growth_rules, 
     num_particles, 
     num_experiments, 
     num_processes=1,
@@ -214,75 +223,80 @@ def time_required(
     insurance_factor = 2.5,
     **kwargs
 ):
-	times_reqd = {}
-	if num_bayes_times is None:
-		num_bayes_times = num_experiments
+  times_reqd = {}
+  if num_bayes_times is None:
+  	num_bayes_times = num_experiments
 
-	num_hamiltonians_per_model = (
-		num_particles *
-		(num_experiments + num_bayes_times)
-	)
-    
-	total_time_required = 0
-	max_num_qubits = UserFunctions.max_num_qubits_info[
-		growth_generator
-	]
-	for q in range(1,max_num_qubits+1):
-		time_per_hamiltonian = hamiltonian_exponentiation_times[q]
-		try:
-			num_models_this_dimension = max_num_models_by_shape[growth_generator][q]
-		except:
-			num_models_this_dimension = max_num_models_by_shape[growth_generator]['other']
+  num_hamiltonians_per_model = (
+  	num_particles *
+  	(num_experiments + num_bayes_times)
+  )
 
-		time_this_dimension = (
-			num_hamiltonians_per_model * 
-			time_per_hamiltonian * 
-			num_models_this_dimension
-		)
+  print("growth rules:", growth_rules)
+  total_time_required = 0
+  for gen in growth_rules:
+    max_num_qubits = UserFunctions.max_num_qubits_info[
+    	gen
+    ]
+    for q in range(1,max_num_qubits+1):
+      time_per_hamiltonian = hamiltonian_exponentiation_times[q]
+    try:
+      num_models_this_dimension = max_num_models_by_shape[gen][q]
+    except:
+      num_models_this_dimension = max_num_models_by_shape[gen]['other']
 
-		total_time_required +=  time_this_dimension
-	
-	total_time_required = (
-		insurance_factor * np.round(total_time_required)
-	)
-	times_reqd['qmd'] = max(
-		minimum_allowed_time, 
-		int(total_time_required)
-	)
+      time_this_dimension = (
+        num_hamiltonians_per_model * 
+        time_per_hamiltonian * 
+        num_models_this_dimension
+      )
 
-	# Get time for QHL
-	true_operator = UserFunctions.default_true_operators_by_generator[
-		growth_generator
-	]
+      total_time_required +=  time_this_dimension
 
-	true_dimension = DataBase.get_num_qubits(true_operator)
-	qhl_time = 2*(
-		hamiltonian_exponentiation_times[true_dimension]
-		*  num_hamiltonians_per_model
-	)
-	times_reqd['qhl'] = max(
-		minimum_allowed_time, 
-		int(qhl_time)
-	)
+    total_time_required = (
+      insurance_factor * np.round(total_time_required)
+    )
+    times_reqd['qmd'] = max(
+      minimum_allowed_time, 
+      int(total_time_required)
+    )
 
-	# For further qhl, want to account for possibility 
-	# that winning model is of maximum allowed dimension, 
-	# so need to request enough time for that case. 
-	further_qhl_time = 2*(
-		hamiltonian_exponentiation_times[max_num_qubits]
-		* num_hamiltonians_per_model
-	)
-	times_reqd['fqhl'] = max(
-		minimum_allowed_time, 
-		int(further_qhl_time)
-	)
+  # Get time for QHL
+  true_operator = UserFunctions.default_true_operators_by_generator[
+    growth_generator
+  ]
 
-	    
-	return times_reqd
+  true_dimension = DataBase.get_num_qubits(true_operator)
+  qhl_time = 2*(
+    hamiltonian_exponentiation_times[true_dimension]
+    * num_hamiltonians_per_model
+  )
+  times_reqd['qhl'] = max(
+    minimum_allowed_time, 
+    int(qhl_time)
+  )
+
+  # For further qhl, want to account for possibility 
+  # that winning model is of maximum allowed dimension, 
+  # so need to request enough time for that case. 
+  further_qhl_time = 2*(
+  	hamiltonian_exponentiation_times[max_num_qubits]
+  	* num_hamiltonians_per_model
+  )
+  times_reqd['fqhl'] = max(
+  	minimum_allowed_time, 
+  	int(further_qhl_time)
+  )
+
+      
+  return times_reqd
 
 
 arguments = parser.parse_args()
 growth_generator = arguments.growth_generation_rule
+alternative_growth_rules = arguments.alternative_growth_rules
+all_growth_rules = [growth_generator]
+all_growth_rules.extend(alternative_growth_rules)
 num_particles = arguments.num_particles
 num_experiments = arguments.num_experiments
 num_bayes_times = arguments.num_bayes_times
@@ -294,9 +308,11 @@ qhl_time_env_var = arguments.qhl_time_env_var
 fqhl_time_env_var = arguments.fqhl_time_env_var
 minimum_allowed_time = arguments.minimum_allowed_time
 
-
+print("all growth rules:", all_growth_rules)
+print("alternative_growth_rules:", alternative_growth_rules)
 time_reqd = time_required(
-  growth_generator = growth_generator, 
+  growth_generator = growth_generator, # true generator
+  growth_rules = all_growth_rules,
   num_particles = num_particles, 
   num_experiments = num_experiments, 
   num_processes = num_processes,

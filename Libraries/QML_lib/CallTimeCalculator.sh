@@ -6,6 +6,7 @@ script_path="$RESULTS_DIR/$script_name"
 # rm $script_path
 python3 CalculateTimeRequired.py \
 	-ggr='deterministic_transverse_ising_nn_fixed_axis' \
+	-agr='non_interacting_ising' \
 	-e=1500 \
 	-p=3000 \
 	-bt=1500 \
