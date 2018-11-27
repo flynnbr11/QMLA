@@ -108,6 +108,7 @@ default_latex_mapping_file = str(
 default_plot_probe_file = None
 default_reallocate_resources=0
 
+
 class GlobalVariablesClass():
     def __init__(
         self, 
@@ -116,6 +117,7 @@ class GlobalVariablesClass():
     ):
         # self.true_operator = true_operator
         self.growth_generation_rule = arguments.growth_generation_rule
+        self.alternative_growth_rules = arguments.alternative_growth_rules
         self.prior_pickle_file = arguments.prior_pickle_file
         self.true_params_pickle_file = arguments.true_params_pickle_file
         true_params_info = pickle.load(
@@ -448,6 +450,14 @@ def parse_cmd_line_args(args):
         Corresponding functions must be built into ModelGeneration',
       type=str,
       default=default_growth_generation_rule
+    )
+
+    parser.add_argument(
+      '-agr', '--alternative_growth_rules',
+      help='Growth rules to form other trees.',
+      # type=str,
+      action='append',
+      default=[],
     )
 
     parser.add_argument(

@@ -297,6 +297,11 @@ generators = [
     # 'heisenberg_nontransverse'
 ]
 
+generators.extend(
+    global_variables.alternative_growth_rules
+)
+
+print("All growth rules:", generators)
 # generators_from_global_vars = global_variables.
 
 generator_initial_models = {}

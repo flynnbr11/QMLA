@@ -12,7 +12,7 @@ do_further_qhl=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=4
+prt=8
 exp=3
 pgh=0.5
 ra=0.8
@@ -21,7 +21,7 @@ rt=0.5
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=1
+exp_data=0
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
@@ -56,6 +56,15 @@ mkdir -p $long_dir
 # growth_rule='test_changes_to_qmd'
 # growth_rule='two_qubit_ising_rotation_hyperfine'
 growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+alt_growth_rules=(
+    'non_interacting_ising'
+)
+
+growth_rules_command=""
+for item in ${alt_growth_rules[*]}
+do
+    growth_rules_command+=" -agr $item" 
+done
 
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
@@ -189,7 +198,8 @@ do
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \
             -resource=$reallocate_resources \
-            -ggr=$growth_rule 
+            -ggr=$growth_rule \
+            $growth_rules_command 
     done
 done
 
