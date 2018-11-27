@@ -1,16 +1,17 @@
 #!/bin/bash
-
-test_description="interacting_ising"
+# note monitor script currently turned off (at very bottom)
+test_description="test_pass_multiple_growth_rules"
 
 ## Script essentials
-num_tests=10
+num_tests=2
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
-do_further_qhl=1 # perform further QHL parameter tuning on average values found by QMD. 
+do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
 min_id=0 # update so instances don't clash and hit eachother's redis databases
+experimental_data=0 # use experimental data -> 1; use fake data ->0
 
 # QHL parameters
-p=3000 # particles
-e=1500 # experiments
+p=40 # particles
+e=10 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -22,10 +23,10 @@ op='xTxTTiPPPiTxTTx'
 #op='xTiPPyTiPPzTiPPxTxPPyTyPPzTzPPxTyPPxTzPPyTz'
 
 # QMD settings
-experimental_data=0 # use experimental data -> 1; use fake data ->0
 #dataset='NVB_HahnPeaks_Newdata'
 #dataset='NV05_HahnEcho02'
 dataset='NVB_dataset.p'
+#dataset='NVB_rescale_dataset.p'
 #dataset='NV05_dataset.p'
 sim_measurement_type='full_access'
 exp_measurement_type='hahn' # to use if not experimental
@@ -34,30 +35,51 @@ exp_measurement_type='hahn' # to use if not experimental
 
 data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
-top_number_models=4 # how many models to perform further QHL for
+top_number_models=3 # how many models to perform further QHL for
 further_qhl_resource_factor=1
-#growth_rule='interacting_nearest_neighbour_ising'
-#growth_rule='interacing_nn_ising_fixed_axis'
-#growth_rule='deterministic_noninteracting_ising_single_axis'
-growth_rule='deterministic_interacting_nn_ising_single_axis'
+growth_rule='two_qubit_ising_rotation_hyperfine'
+#growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 #growth_rule='non_interacting_ising_single_axis'
 #growth_rule='non_interacting_ising'
-#growth_rule='two_qubit_ising_rotation_hyperfine'
-#growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+#growth_rule='deterministic_noninteracting_ising_single_axis'
+#growth_rule='interacting_nearest_neighbour_ising'
+#growth_rule='interacing_nn_ising_fixed_axis'
+#growth_rule='deterministic_interacting_nn_ising_single_axis'
 #growth_rule='deterministic_transverse_ising_nn_fixed_axis'
+#growth_rule='heisenberg_nontransverse'
 
-random_true_params=1 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
-random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
-do_plots=0
+alt_growth_rules=(
+	'non_interacting_ising'
+)
+
+growth_rules_command=""
+for item in ${alt_growth_rules[*]}
+do
+    growth_rules_command+=" -agr $item" 
+done
+echo "GROWTH COMMAND: $growth_rules_command"
+
+
+
+do_plots=1
 pickle_class=0
 custom_prior=1
+
+gaussian=1 # set to 0 for uniform distribution, 1 for normal
+param_min=0
+param_max=8
+param_mean=0.5
+param_sigma=0.3
+random_true_params=1 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
+random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
+
 # Overwrite settings for specific cases
 if (( "$experimental_data" == 1))
 then
 	measurement_type=$exp_measurement_type
 	rp=0.3
-	growth_rule='two_qubit_ising_rotation_hyperfine'
-	#	growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+#	growth_rule='two_qubit_ising_rotation_
+	growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 	op='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 else
     measurement_type=$sim_measurement_type
@@ -160,19 +182,25 @@ special_probe='random' #'ideal'
 if (( "$experimental_data" == 1))
 then
 	force_plot_plus=1
+	special_probe='plus'
 fi
 
 
 python3 ../Libraries/QML_lib/SetQHLParams.py \
-    -true=$true_params_pickle_file \
-    -prior=$prior_pickle_file \
-    -probe=$plot_probe_file \
-    -plus=$force_plot_plus \
+	-true=$true_params_pickle_file \
+	-prior=$prior_pickle_file \
+	-probe=$plot_probe_file \
+	-plus=$force_plot_plus \
 	-sp=$special_probe \
-    -op=$op \
-    -exp=$experimental_data \
+	-g=$gaussian \
+	-min=$param_min \
+	-max=$param_max \
+	-mean=$param_mean \
+	-sigma=$param_sigma \
+	-op=$op \
+	-exp=$experimental_data \
 	-ggr=$growth_rule \
-    -rand_t=$random_true_params \
+	-rand_t=$random_true_params \
 	-rand_p=$random_prior # can make true params and prior random
 
 time_required_script="$full_path_to_results/set_time_env_vars.sh"
@@ -183,6 +211,7 @@ qmd_env_var="QMD_TIME"
 qhl_env_var="QHL_TIME"
 python3 ../Libraries/QML_lib/CalculateTimeRequired.py \
 	-ggr=$growth_rule \
+	$growth_rules_command \
 	-e=$e \
 	-p=$p \
 	-bt=$e \
@@ -218,7 +247,7 @@ do
 					do
 						for i in `seq $min_id $max_id`;
 						do
-							let bt="$e"
+							let bt="$e/2"
 							let qmd_id="$qmd_id+1"
 
 							if [ "$qhl" == 1 ]
@@ -235,7 +264,7 @@ do
 							this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
 							printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd \n" >> QMD_all_tasks.log
 
-							qsub -v QMD_ID=$qmd_id,OP="$op",QHL=$qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,RESOURCE_REALLOCATION=$resource_reallocation -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+							qsub -v QMD_ID=$qmd_id,OP="$op",QHL=$qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,RESOURCE_REALLOCATION=$resource_reallocation,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
 
 						done
 					done
@@ -252,8 +281,8 @@ finalise_further_qhl_stage_script=$full_path_to_results/FURTHER_finalise.sh
 echo "
 #!/bin/bash 
 cd $lib_dir
-python3 AnalyseMultipleQMD.py -dir="$full_path_to_results" --bayes_csv=$all_qmd_bayes_csv -top=$top_number_models -qhl=$qhl -fqhl=0 -data=$dataset \
-	-exp=$experimental_data -params=$true_params_pickle_file -true_expec=$true_expec_path -latex=$latex_mapping_file -ggr=$growth_rule
+python3 AnalyseMultipleQMD.py -dir="$full_path_to_results" --bayes_csv=$all_qmd_bayes_csv -top=$top_number_models -qhl=$qhl -fqhl=0 -data=$dataset -plot_probes=$plot_probe_file \
+	-exp=$experimental_data -meas=$measurement_type -params=$true_params_pickle_file -true_expec=$true_expec_path -latex=$latex_mapping_file -ggr=$growth_rule
 " > $finalise_qmd_script
 
 ### Further QHL on best performing models. Add section to analysis script, which launches futher_qhl stage.
@@ -273,14 +302,14 @@ cd $(pwd)
 for i in \`seq $min_id $max_id\`;
 do
 	let qmd_id="1+\$qmd_id"
-	qsub -v QMD_ID=\$qmd_id,OP="$op",QHL=0,FURTHER_QHL=1,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,RESOURCE_REALLOCATION=$resource_reallocation -N finalise_$test_description\_\$qmd_id -l $pbs_config -o $OUT_LOG/finalise_output.txt -e $OUT_LOG/finalise_error.txt run_qmd_instance.sh 
+	qsub -v QMD_ID=\$qmd_id,OP="$op",QHL=0,FURTHER_QHL=1,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,RESOURCE_REALLOCATION=$resource_reallocation,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma -N finalise_$test_description\_\$qmd_id -l $pbs_config -o $OUT_LOG/finalise_output.txt -e $OUT_LOG/finalise_error.txt run_qmd_instance.sh 
 done 
 	" >> $finalise_qmd_script
 
 	echo "
 		#!/bin/bash 
 		cd $lib_dir
-		python3 AnalyseMultipleQMD.py -dir="$full_path_to_results" --bayes_csv=$all_qmd_bayes_csv -top=$top_number_models -qhl=$qhl -fqhl=1 -data=$dataset -exp=$experimental_data -latex==$latex_mapping_file -params=$true_params_pickle_file -true_expec=$true_expec_path -ggr=$growth_rule -plot_probes=$plot_probe_file
+		python3 AnalyseMultipleQMD.py -dir="$full_path_to_results" --bayes_csv=$all_qmd_bayes_csv -top=$top_number_models -qhl=$qhl -fqhl=1 -data=$dataset -exp=$experimental_data -meas=$measurement_type -latex==$latex_mapping_file -params=$true_params_pickle_file -true_expec=$true_expec_path -ggr=$growth_rule -plot_probes=$plot_probe_file
 	" > $finalise_further_qhl_stage_script
 	chmod a+x $finalise_further_qhl_stage_script
 fi 
@@ -321,10 +350,9 @@ done
 sh $finalise_qmd_script
 " > $monitor_script
 
- 
+let max_seconds_reqd="$seconds_reqd + 15"
 chmod a+x $monitor_script
 chmod a+x $finalise_qmd_script
-let max_seconds_reqd="$qmd_time + 15"
-qsub -l walltime=00:00:$max_seconds_reqd,nodes=1:ppn=1 -N monitor_$test_description -o $OUT_LOG/monitor_output.txt -e $OUT_LOG/monitor_error.txt $monitor_script
+# qsub -l walltime=00:00:$max_seconds_reqd,nodes=1:ppn=1 -N monitor_$test_description -o $OUT_LOG/monitor_output.txt -e $OUT_LOG/monitor_error.txt $monitor_script
 
 
