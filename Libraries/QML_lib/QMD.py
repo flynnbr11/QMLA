@@ -610,7 +610,12 @@ class QMD():
         del self.RedisDataBases
         del self.write_log_file
 
-    def newBranch(self, growth_rule, model_list):
+    def newBranch(
+        self, 
+        growth_rule, 
+        model_list
+    ):
+        print("NEW BRANCH. gen=", growth_rule, "type:", type(growth_rule))
         self.HighestBranchID += 1
         branchID = self.HighestBranchID
         self.BranchBayesComputed[branchID] = False
@@ -673,9 +678,6 @@ class QMD():
             # 'Branch model ids:', model_id_list
             ]
         )
-
-
-
         return branchID
     
     def printState(self):
@@ -771,6 +773,10 @@ class QMD():
             self.BranchNumModelsPreComputed[branchID]
         )
 
+        print(
+            "learnModelFromBranchID. Setting active branches on redis for branch {} to {}".format(branchID, num_models_already_set_this_branch)
+        )
+
         active_branches_learning_models.set(
             int(branchID), 
             num_models_already_set_this_branch
@@ -815,9 +821,6 @@ class QMD():
             'learnModelFromBranchID finished, branch', branchID
             ]
         )
-
-        
-    
     
     def learnModelNameList(self, model_name_list, use_rq=True, blocking=False):
         for model_name in model_name_list:
@@ -938,8 +941,13 @@ class QMD():
                 qid=self.Q_id, log_file=self.rq_log_file
             )
             
-    def remoteBayesFromIDList(self, model_id_list, remote=True,
-        wait_on_result=False, recompute=False, bayes_threshold=None
+    def remoteBayesFromIDList(
+        self, 
+        model_id_list, 
+        remote=True,
+        wait_on_result=False, 
+        recompute=False, 
+        bayes_threshold=None
     ): 
         if bayes_threshold is None:
             bayes_threshold=self.BayesLower
@@ -956,24 +964,40 @@ class QMD():
                         or recompute==True
                     ): #ie not yet considered
                         self.BayesFactorsComputed.append(unique_id)
-                        remote_jobs.append(self.remoteBayes(a,b, remote=remote,
-                            return_job=wait_on_result,
-                            bayes_threshold=bayes_threshold)
+                        remote_jobs.append(
+                            self.remoteBayes(
+                                a,
+                                b, 
+                                remote=remote,
+                                return_job=wait_on_result,
+                                bayes_threshold=bayes_threshold
+                            )
                         )
 
         if wait_on_result and self.use_rq: # test_workers from RedisSettings
-            self.log_print(["Waiting on result of \
-                Bayes comparisons from given list:", model_id_list]
+            self.log_print(
+                [
+                    "Waiting on result of ",
+                    "Bayes comparisons from given list:", 
+                    model_id_list
+                ]
+
             )
             for job in remote_jobs:
                 while job.is_finished == False:
                     time.sleep(0.01)
         else:
-            self.log_print(["Not waiting on results \
-                since not using RQ workers."]
+            self.log_print(
+                [
+                    "Not waiting on results",
+                    "since not using RQ workers."
+                ]
             )
     
-    def remoteBayesFromBranchID(self, branchID, remote=True, 
+    def remoteBayesFromBranchID(
+        self, 
+        branchID, 
+        remote=True, 
         bayes_threshold=None, #actually was 50,
         recompute=False
     ):
@@ -1256,8 +1280,11 @@ class QMD():
             self.log_print(["Multiple models have same number of points within \
                 branch.\n", models_points]
             )
-            self.remoteBayesFromIDList(model_id_list=max_points_branches, 
-                remote=True, recompute=True, bayes_threshold=bayes_threshold,
+            self.remoteBayesFromIDList(
+                model_id_list=max_points_branches, 
+                remote=True, 
+                recompute=True, 
+                bayes_threshold=bayes_threshold,
                 wait_on_result=True
             )
 
@@ -1373,8 +1400,12 @@ class QMD():
             for i in max_points_branches:
                 self.log_print([DataBase.model_name_from_id(self.db, i)])
             self.log_print(["Points:\n", models_points])
-            self.remoteBayesFromIDList(model_id_list=max_points_branches,
-                remote=True, recompute=True, bayes_threshold=self.BayesLower, wait_on_result=True
+            self.remoteBayesFromIDList(
+                model_id_list=max_points_branches,
+                remote=True, 
+                recompute=True, 
+                bayes_threshold=self.BayesLower, 
+                wait_on_result=True
             )
             champ_id = self.compareModelList(max_points_branches, bayes_threshold=self.BayesLower)
         else: 
@@ -1398,7 +1429,12 @@ class QMD():
         interbranch_collapse_threshold = 1e5 ## if a spawned model is this much better than its parent, parent is deactivated
         num_champs = len(branch_champions)
         
-
+        self.log_print(
+            [
+                "Active branch champs at start of final Bayes comp:", 
+                self.ActiveBranchChampList
+            ]
+        )
         children_branches = list(self.BranchParents.keys())
         # for k in range( num_champs - 1 ):
             # mod1 = branch_champions[k]
@@ -1482,82 +1518,183 @@ class QMD():
         # for k in range(num_champs - 1):
         #     mod1 = branch_champions[k]
         #     mod2 = branch_champions[k+1]
-        for child_id in branch_champions:
-            # child_id = branch_champions[k]
-            child_branch = self.ModelsBranches[child_id] # branch this child sits on
-            try:
-                parent_branch = self.BranchParents[child_branch] 
-                parent_id = self.BranchChampions[parent_branch]
+        self.log_print(
+            [
+                "Active branch champs after ",
+                "parental collapse (final Bayes comp):", 
+                self.ActiveBranchChampList
+            ]
+        )
+        # make ghost branches of all individidual trees
+        # individual trees correspond to separate growth rules.
+        self.ActiveTreeBranchChamps = {}
+        for gen in self.GeneratorList:
+            self.ActiveTreeBranchChamps[gen] = []
 
-                mod1 = child_id
-                mod2 = parent_id
+        for active_champ in self.ActiveBranchChampList:
+            branch_id_of_champ = self.ModelsBranches[active_champ] 
+            gen = self.BranchGrowthRules[branch_id_of_champ]
+            self.ActiveTreeBranchChamps[gen].append(active_champ)
 
-                pair_id = DataBase.unique_model_pair_identifier(
-                    mod1, 
-                    mod2
-                )
-                bf_from_db = bayes_factors_db.get(pair_id)
-                bayes_factor = float(bf_from_db)
+        self.log_print(
+            [
+                "ActiveTreeBranchChamps:",
+                self.ActiveTreeBranchChamps
+            ]
+        )
+        self.FinalTrees = []
+        for gen in list(self.ActiveTreeBranchChamps.keys()):
+            print("1542. GEN:", gen)
+            models_for_tree_ghost_branch = self.ActiveTreeBranchChamps[gen]
+            mod_names = [
+                self.ModelNameIDs[m]
+                for m in models_for_tree_ghost_branch
+            ]
+            print("[1546] models:", mod_names)
+            new_branch_id = self.newBranch(
+                model_list = mod_names,
+                growth_rule = gen
+            )
+
+            self.FinalTrees.append(
+                new_branch_id
+            )
+            self.BranchAllModelsLearned[new_branch_id] = True
+            self.learnModelFromBranchID(new_branch_id)
+            self.remoteBayesFromBranchID(new_branch_id)
+            # self.remoteBayesFromBranchID(new_branch_id)
+
+        active_branches_learning_models = (
+            self.RedisDataBases[
+                'active_branches_learning_models'
+            ]
+        )
+        active_branches_bayes = self.RedisDataBases[
+            'active_branches_bayes'
+        ]
+        still_learning = True
+
+        print("[QMD]Entering final while loop")
+        while still_learning:
+            branch_ids_on_db = list(
+                active_branches_learning_models.keys()
+            )
+            for branchID_bytes in branch_ids_on_db:
+                branchID = int(branchID_bytes)
+                if ( 
+                    (int(active_branches_learning_models.get(branchID)) == 
+                    self.NumModelsPerBranch[branchID]) 
+                    and 
+                    (self.BranchAllModelsLearned[branchID]==False)
+                ):
+                    self.BranchAllModelsLearned[branchID] = True
+                    self.remoteBayesFromBranchID(branchID)
             
-                if bayes_factor > interbranch_collapse_threshold:
-                    # bayes_factor heavily favours mod1, so deactive mod2
-                    self.log_print(
-                        [
-                        "Parent model,", 
-                        mod1, 
-                        "stronger than spawned; deactivating model", 
-                        mod2
-                        ]
-                    )
-                    self.updateModelRecord(
-                        model_id=mod2, 
-                        field='Status',
-                        new_value='Deactivated'
-                    )
-                    try:
-                        self.ActiveBranchChampList.remove(mod2)
-                    except:
-                        pass
-                elif bayes_factor < (1.0/interbranch_collapse_threshold):
-                    self.log_print(
-                        [
-                        "Spawned model", 
-                        mod2, 
-                        "stronger than parent; deactivating model", 
-                        mod1
-                        ]
-                    )
-                    self.updateModelRecord(
-                        model_id=mod1,
-                        field='Status',
-                        new_value='Deactivated'
-                    )
-                    try:
-                        self.ActiveBranchChampList.remove(mod1)
-                    except:
-                        pass
-
-                # Add bayes factors to BayesFactor dict for each model        
-                mod_a = self.reducedModelInstanceFromID(mod1)
-                mod_b = self.reducedModelInstanceFromID(mod2)
-                if mod2 in mod_a.BayesFactors:
-                    mod_a.BayesFactors[mod2].append(bayes_factor)
-                else:
-                    mod_a.BayesFactors[mod2] = [bayes_factor]
                 
-                if mod1 in mod_b.BayesFactors:
-                    mod_b.BayesFactors[mod1].append((1.0/bayes_factor))
-                else:
-                    mod_b.BayesFactors[mod1] = [(1.0/bayes_factor)]
-            except:
-                self.log_print(
-                    [
-                    "child doesn't have active parent"
-                    ]
-                )                        
+                if branchID_bytes in active_branches_bayes.keys():
+                    branchID = int(branchID_bytes)
+                    num_bayes_done_on_branch = (
+                        active_branches_bayes.get(branchID_bytes)
+                    )
+
+                    if ( int(num_bayes_done_on_branch) ==
+                            self.NumModelPairsPerBranch[branchID] 
+                        and
+                        self.BranchComparisonsComplete[branchID]==False
+                    ):
+                        self.BranchComparisonsComplete[branchID] = True
+                        self.compareModelsWithinBranch(branchID)
+            
+            if (
+                np.all(
+                    np.array(list(self.BranchAllModelsLearned.values()))
+                    ==True
+                )
+                and
+                np.all(np.array(list(
+                    self.BranchComparisonsComplete.values()))==True
+                )
+            ):    
+                still_learning = False # i.e. break out of this while loop
+
+        self.log_print("Final tree comparisons complete.")
+
+        # for child_id in branch_champions:
+        #     # child_id = branch_champions[k]
+        #     child_branch = self.ModelsBranches[child_id] # branch this child sits on
+        #     try:
+        #         parent_branch = self.BranchParents[child_branch] 
+        #         parent_id = self.BranchChampions[parent_branch]
+
+        #         mod1 = child_id
+        #         mod2 = parent_id
+
+        #         pair_id = DataBase.unique_model_pair_identifier(
+        #             mod1, 
+        #             mod2
+        #         )
+        #         bf_from_db = bayes_factors_db.get(pair_id)
+        #         bayes_factor = float(bf_from_db)
+            
+        #         if bayes_factor > interbranch_collapse_threshold:
+        #             # bayes_factor heavily favours mod1, so deactive mod2
+        #             self.log_print(
+        #                 [
+        #                 "Parent model,", 
+        #                 mod1, 
+        #                 "stronger than spawned; deactivating model", 
+        #                 mod2
+        #                 ]
+        #             )
+        #             self.updateModelRecord(
+        #                 model_id=mod2, 
+        #                 field='Status',
+        #                 new_value='Deactivated'
+        #             )
+        #             try:
+        #                 self.ActiveBranchChampList.remove(mod2)
+        #             except:
+        #                 pass
+        #         elif bayes_factor < (1.0/interbranch_collapse_threshold):
+        #             self.log_print(
+        #                 [
+        #                 "Spawned model", 
+        #                 mod2, 
+        #                 "stronger than parent; deactivating model", 
+        #                 mod1
+        #                 ]
+        #             )
+        #             self.updateModelRecord(
+        #                 model_id=mod1,
+        #                 field='Status',
+        #                 new_value='Deactivated'
+        #             )
+        #             try:
+        #                 self.ActiveBranchChampList.remove(mod1)
+        #             except:
+        #                 pass
+
+        #         # Add bayes factors to BayesFactor dict for each model        
+        #         mod_a = self.reducedModelInstanceFromID(mod1)
+        #         mod_b = self.reducedModelInstanceFromID(mod2)
+        #         if mod2 in mod_a.BayesFactors:
+        #             mod_a.BayesFactors[mod2].append(bayes_factor)
+        #         else:
+        #             mod_a.BayesFactors[mod2] = [bayes_factor]
+                
+        #         if mod1 in mod_b.BayesFactors:
+        #             mod_b.BayesFactors[mod1].append((1.0/bayes_factor))
+        #         else:
+        #             mod_b.BayesFactors[mod1] = [(1.0/bayes_factor)]
+        #     except:
+        #         self.log_print(
+        #             [
+        #             "child doesn't have active parent"
+        #             ]
+        #         )                        
         
-        
-        
+        # Finally, compare all remaining active models, 
+        # which should just mean the tree champions at this point. 
         active_models = DataBase.all_active_model_ids(self.db)
         self.SurvivingChampions = DataBase.all_active_model_ids(
             self.db
@@ -1624,16 +1761,15 @@ class QMD():
             champ_id = max(branch_champions_points, key=branch_champions_points.get)
         champ_name = DataBase.model_name_from_id(self.db, champ_id)
         
-        branch_champ_names = [DataBase.model_name_from_id(self.db, mod_id) 
+        branch_champ_names = [
+            DataBase.model_name_from_id(self.db, mod_id) 
             for mod_id in active_models
         ]
         self.statusChangeModel(
             champ_name, 
             new_status = 'Active'
         )
-        
         return champ_name, branch_champ_names
-    
     
     def interBranchChampion(
         self, 
@@ -1642,10 +1778,8 @@ class QMD():
         global_champion=False, 
         bayes_threshold=None
     ):
-        
         if bayes_threshold is None:
             bayes_threshold=self.BayesLower
-
         all_branches = self.db['branchID'].unique()
         if global_champion == True: 
             branches = all_branches
@@ -1671,13 +1805,19 @@ class QMD():
                 self.compareModelsWithinBranch(branchID)
             )
 
-        self.remoteBayesFromIDList(model_id_list=champions_of_branches, 
-            remote=True, recompute=True, wait_on_result=True,
+        self.remoteBayesFromIDList(
+            model_id_list=champions_of_branches,
+            remote=True, 
+            recompute=True, 
+            wait_on_result=True,
             bayes_threshold=bayes_threshold
         )
 
-        self.log_print(["All jobs have finished while computing interbranch \
-            champion"]
+        self.log_print(
+            [
+            "All jobs have finished while computing", 
+            "interbranch champion"
+            ]
         )
         branch_champions_points = {}
         for c in champions_of_branches: 
@@ -1688,39 +1828,59 @@ class QMD():
             for j in range(i, num_branches):
                 mod2 = champions_of_branches[j]
                 if mod1!=mod2:
-                    res = self.processRemoteBayesPair(a=mod1, b=mod2)
+                    res = self.processRemoteBayesPair(
+                        a=mod1, 
+                        b=mod2
+                    )
                     
                     if res == "a":
                         branch_champions_points[mod1] += 1
                     elif res == "b":
                         branch_champions_points[mod2] += 1
-        self.ranked_champions = sorted(branch_champions_points, reverse=True)
+        self.ranked_champions = sorted(
+            branch_champions_points, 
+            reverse=True
+        )
         
         max_points = max(branch_champions_points.values())
-        max_points_branches = [key for key, val in branch_champions_points.items() 
+        max_points_branches = [
+            key for key, val in branch_champions_points.items() 
             if val==max_points
         ]
         if len(max_points_branches) > 1: 
             # todo: recompare. Fnc: compareListOfModels (rather than branch based)
-            self.log_print(["No distinct champion, recomputing bayes factors \
-                between : ", max_points_branches]
+            self.log_print(
+                [
+                    "No distinct champion;" 
+                    "recomputing bayes factors between: ", 
+                    max_points_branches
+                ]
             )
-            champ_id = self.compareModelList(max_points_branches, 
-                bayes_threshold=self.BayesLower, models_points_dict=branch_champions_points
+            champ_id = self.compareModelList(
+                max_points_branches, 
+                bayes_threshold=self.BayesLower, 
+                models_points_dict=branch_champions_points
             )
         else: 
-            champ_id = max(branch_champions_points, 
+            champ_id = max(
+                branch_champions_points, 
                 key=branch_champions_points.get
             )
         champ_name = DataBase.model_name_from_id(self.db, champ_id)
         
-        branch_champ_names = [DataBase.model_name_from_id(self.db, mod_id) for 
-            mod_id in champions_of_branches
+        branch_champ_names = [
+            DataBase.model_name_from_id(self.db, mod_id)  
+            for mod_id in champions_of_branches
         ]
-        self.statusChangeModel(champ_name, new_status = 'Active')
+        self.statusChangeModel(
+            champ_name, 
+            new_status='Active'
+        )
         
         interBranchChampListID = len(self.InterBranchChampions)
-        self.InterBranchChampions[interBranchChampListID] = [branches, champ_id]
+        self.InterBranchChampions[interBranchChampListID] = [
+            branches, champ_id
+        ]
         return champ_name, branch_champ_names
     
     def globalChampionCalculation(self):

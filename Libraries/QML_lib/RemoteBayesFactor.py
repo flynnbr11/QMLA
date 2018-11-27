@@ -48,10 +48,19 @@ def time_seconds():
 
 ## Single function call to compute Bayes Factor between models given their IDs
 
-def BayesFactorRemote(model_a_id, model_b_id, branchID=None, 
-    interbranch=False, num_times_to_use = 'all', check_db=False, 
-    trueModel=None, bayes_threshold=1, host_name='localhost', port_number=6379, 
-    qid=0, log_file='rq_output.log'
+def BayesFactorRemote(
+    model_a_id, 
+    model_b_id, 
+    branchID=None, 
+    interbranch=False, 
+    num_times_to_use='all', 
+    check_db=False, 
+    trueModel=None, 
+    bayes_threshold=1, 
+    host_name='localhost', 
+    port_number=6379, 
+    qid=0, 
+    log_file='rq_output.log'
 ):
     """
     This is a standalone function to compute Bayes factors without knowledge 
@@ -118,7 +127,7 @@ def BayesFactorRemote(model_a_id, model_b_id, branchID=None,
             log_file=log_file
         )
 
-        log_print(["Start"])
+        log_print(["Start. Branch", branchID])
         if num_times_to_use == 'all':
             first_t_idx = 0
         else:
