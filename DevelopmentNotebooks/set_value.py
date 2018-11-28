@@ -187,14 +187,17 @@ def time_required(
     insurance_scale = float(3/num_processes)
     total_time_required = (
     	insurance_scale * np.round(total_time_required)
-	)
+  	)
 
-    times_reqd['qmd'] = max(minimum_allowed_time, int(total_time_required))
+    times_reqd['qmd'] = max(
+      minimum_allowed_time, 
+      int(total_time_required)  
+    )
 
     # Get time for QHL
     true_operator = UserFunctions.default_true_operators_by_generator[
     	growth_generator
-	]
+    ]
 
 	true_dimension = DataBase.get_num_qubits(true_operator)
 
@@ -208,7 +211,7 @@ def time_required(
 		int(qhl_time)
 	)
         
-    return times_reqd
+  return times_reqd
 
 
 arguments = parser.parse_args()

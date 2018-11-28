@@ -5,12 +5,13 @@ script_name="call_time_script.sh"
 script_path="$RESULTS_DIR/$script_name"
 # rm $script_path
 
-# additional_growth="-agr=non_interacting_ising"
-additional_growth=""
+additional_growth="-agr=non_interacting_ising"
+# additional_growth=""
 
 python3 CalculateTimeRequired.py \
-	-ggr='deterministic_transverse_ising_nn_fixed_axis' \
-	 $additional_growth \
+	-ggr='two_qubit_ising_rotation_hyperfine_transverse' \
+	$additional_growth \
+	-use_agr=0 \
 	-e=1500 \
 	-p=3000 \
 	-bt=1500 \

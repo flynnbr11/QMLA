@@ -66,7 +66,7 @@ def random_model_name(num_dimensions=1, num_terms=1):
     Return a valid (simple) model name of given number of dimensions and terms. 
     """
     import random
-    paulis = DataBase.core_terms_with_identity
+    paulis = DataBase.pauli_cores_with_identity
     p_str = ''
     t_str = ''
     
@@ -104,7 +104,7 @@ def random_ising_chain(
     Return a valid (simple) model name of given number of dimensions and terms. 
     """
     import random
-    paulis_full  = DataBase.core_terms_no_identity
+    paulis_full  = DataBase.pauli_cores_no_identity
     if include_identity: paulis_full.append('i')
 
     if num_directions > len(paulis_full):
@@ -144,7 +144,7 @@ def generate_term(
     """
     For use only in random_model_name() function. 
     """
-    paulis = DataBase.core_terms_with_identity
+    paulis = DataBase.pauli_cores_with_identity
     import random
     t_str = ''
     running_str =''
@@ -169,7 +169,7 @@ def single_pauli_multiple_dim(
     For use only in random_model_name() function. 
     """
     import random
-    paulis = DataBase.core_terms_with_identity
+    paulis = DataBase.pauli_cores_with_identity
     t_str = ''
     running_str =''
     
@@ -322,7 +322,7 @@ def simple_ising(
     **kwargs
 ):
     new_options = []
-    options = DataBase.core_terms_no_identity,
+    options = DataBase.pauli_cores_no_identity,
     for gen in generator_list: 
         num_qubits = DataBase.get_num_qubits(gen)
         t_str = ''
@@ -342,7 +342,7 @@ def single_pauli_multiple_dim(
     pauli=None
 ):
     import random
-    paulis = DataBase.core_terms_with_identity 
+    paulis = DataBase.pauli_cores_with_identity 
     t_str = ''
     running_str =''
     
@@ -600,7 +600,7 @@ def existing_branch_champs_test(
     for name in model_list:
         actions = p_t_actions(model_list)
         p_str = actions['p']
-        one_qubit_terms  = DataBase.core_terms_no_identity
+        one_qubit_terms  = DataBase.pauli_cores_no_identity
         individual_terms = name.split(p_str)
         
         remaining_terms = list( set(one_qubit_terms) - set(individual_terms) )
@@ -618,7 +618,7 @@ def existing_branch_champs_test(
 
 def non_interacting_ising(model_list, **kwargs):
     new_models = []
-    paulis =  DataBase.core_terms_no_identity
+    paulis =  DataBase.pauli_cores_no_identity
     # paulis=['y']
     for mod in model_list:
         t_str = p_t_actions(mod)['t']
@@ -631,7 +631,7 @@ def non_interacting_ising(model_list, **kwargs):
 
 def non_interacting_ising_single_axis(model_list, **kwargs):
     new_models = []
-    paulis =  DataBase.core_terms_no_identity
+    paulis =  DataBase.pauli_cores_no_identity
     for mod in model_list:
         t_str = p_t_actions(mod)['t']
         new_t_str = str( t_str + 'T')
@@ -668,7 +668,7 @@ def interacting_nearest_neighbour_ising(
     **kwargs
 ):
     new_models = []
-    paulis =  DataBase.core_terms_no_identity
+    paulis =  DataBase.pauli_cores_no_identity
     for mod in model_list:
         potential_core_paulis = []
         for p in paulis:

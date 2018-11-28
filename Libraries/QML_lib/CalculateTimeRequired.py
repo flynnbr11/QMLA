@@ -23,6 +23,12 @@ parser.add_argument(
     default='two_qubit_ising_rotation_hyperfine'
 )
 parser.add_argument(
+    '-use_agr', '--use_alternative_growth_rules',
+    help='Whether to use the alternative growth rules provided.',
+    type=int,
+    default=1
+)
+parser.add_argument(
   '-agr', '--alternative_growth_rules',
   help='Growth rules to form other trees.',
   # type=str,
@@ -287,7 +293,6 @@ def time_required(
   	minimum_allowed_time, 
   	int(further_qhl_time)
   )
-
       
   return times_reqd
 
@@ -296,7 +301,11 @@ arguments = parser.parse_args()
 growth_generator = arguments.growth_generation_rule
 alternative_growth_rules = arguments.alternative_growth_rules
 all_growth_rules = [growth_generator]
-all_growth_rules.extend(alternative_growth_rules)
+use_alternative_growth_rules = bool(
+  arguments.use_alternative_growth_rules
+)
+if use_alternative_growth_rules == True:
+  all_growth_rules.extend(alternative_growth_rules)
 num_particles = arguments.num_particles
 num_experiments = arguments.num_experiments
 num_bayes_times = arguments.num_bayes_times
