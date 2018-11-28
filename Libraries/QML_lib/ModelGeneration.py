@@ -66,7 +66,7 @@ def random_model_name(num_dimensions=1, num_terms=1):
     Return a valid (simple) model name of given number of dimensions and terms. 
     """
     import random
-    paulis = ['x', 'y', 'z', 'i']
+    paulis = DataBase.paulis_names
     p_str = ''
     t_str = ''
     
@@ -90,7 +90,10 @@ def random_model_name(num_dimensions=1, num_terms=1):
         'iTiTTiTTTiTTTTiTTTTTiTTTTTTi' or 
         'iTiTTiTTTiTTTTiTTTTTiTTTTTTiTTTTTTTi'
     ):
-        summed_term = random_model_name(num_dimensions, num_terms) 
+        summed_term = random_model_name(
+            num_dimensions, 
+            num_terms
+        ) 
     
     return summed_term
 
@@ -104,8 +107,10 @@ def random_ising_chain(
     Return a valid (simple) model name of given number of dimensions and terms. 
     """
     import random
-    paulis_full = ['x', 'y', 'z']
-    if include_identity: paulis_full.append('i')
+    # paulis_full = ['x', 'y', 'z']
+    paulis_full = DataBase.paulis_names
+    if include_identity == False: 
+        paulis_full.remove('i')
 
     if num_directions > len(paulis_full):
         paulis = paulis_full
@@ -138,10 +143,14 @@ def random_ising_chain(
 
 
 
-def generate_term(num_dimensions, paulis=['x', 'y', 'z', 'i']):
+def generate_term(
+    num_dimensions, 
+):
     """
     For use only in random_model_name() function. 
     """
+
+    paulis = DataBase.paulis_names
     import random
     t_str = ''
     running_str =''
@@ -158,11 +167,16 @@ def generate_term(num_dimensions, paulis=['x', 'y', 'z', 'i']):
 
         return running_str
             
-def single_pauli_multiple_dim(num_dimensions, paulis=['x', 'y', 'z', 'i'], pauli=None):
+def single_pauli_multiple_dim(
+    num_dimensions, 
+    # paulis=['x', 'y', 'z', 'i'], 
+    pauli=None
+):
     """
     For use only in random_model_name() function. 
     """
     import random
+    paulis = DataBase.paulis_names
     t_str = ''
     running_str =''
     
@@ -188,7 +202,11 @@ Return strings corresponding to model names following naming convention.
 Use these strings with DataBase.operator class.
 """
 
-def interaction_ham(qubit_list, operator_list, num_qubits):
+def interaction_ham(
+    qubit_list, 
+    operator_list, 
+    num_qubits
+):
     
     t_str = ''
     running_str = ''
@@ -312,10 +330,13 @@ def dimensionalise_name_by_name_list(constituents, true_dim, return_operator=Fal
             
 def simple_ising(
     generator_list, 
-    options=['x', 'y', 'z'],
+    # options=['x', 'y', 'z'],
     **kwargs
 ):
+    options = DataBase.paulis_names
+    options.remove('i')
     new_options = []
+
 
     for gen in generator_list: 
         num_qubits = DataBase.get_num_qubits(gen)
@@ -333,10 +354,10 @@ def simple_ising(
 def single_pauli_multiple_dim(
     num_qubits, 
     log_file, 
-    paulis=['x', 'y', 'z', 'i'], 
     pauli=None
 ):
     import random
+    paulis = DataBase.paulis_names
     t_str = ''
     running_str =''
     
@@ -612,7 +633,7 @@ def existing_branch_champs_test(
 
 def non_interacting_ising(model_list, **kwargs):
     new_models = []
-    paulis = ['x', 'y', 'z']
+    paulis = DataBase.paulis_names
     # paulis=['y']
     for mod in model_list:
         t_str = p_t_actions(mod)['t']
@@ -625,7 +646,7 @@ def non_interacting_ising(model_list, **kwargs):
 
 def non_interacting_ising_single_axis(model_list, **kwargs):
     new_models = []
-    paulis = ['x', 'y', 'z']
+    paulis = DataBase.paulis_names
     for mod in model_list:
         t_str = p_t_actions(mod)['t']
         new_t_str = str( t_str + 'T')
@@ -662,7 +683,7 @@ def interacting_nearest_neighbour_ising(
     **kwargs
 ):
     new_models = []
-    paulis = ['x', 'y', 'z']
+    paulis = DataBase.paulis_names
     for mod in model_list:
         potential_core_paulis = []
         for p in paulis:

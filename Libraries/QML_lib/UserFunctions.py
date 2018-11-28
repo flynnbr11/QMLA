@@ -302,13 +302,16 @@ initial_models = {
 
 experimental_probe_dict_generator = {
 	None: 
-		ProbeGeneration.separable_probe_dict,
+		ProbeGeneration.NV_centre_ising_probes_plus,
+		# ProbeGeneration.separable_probe_dict,
 	'two_qubit_ising_rotation' : 
 		ProbeGeneration.NV_centre_ising_probes_plus,
 	'two_qubit_ising_rotation_transverse' : 
 		ProbeGeneration.NV_centre_ising_probes_plus,
 	'two_qubit_ising_rotation_hyperfine' : 
 		ProbeGeneration.NV_centre_ising_probes_plus,
+	'two_qubit_ising_rotation_hyperfine_transverse':
+		ProbeGeneration.NV_centre_ising_probes_plus,	
 }
 
 simulated_probe_dict_generator = {
@@ -454,9 +457,10 @@ def get_probe_dict(
 	special_probe=None, 
 	**kwargs
 ):
-	# print("[getProbeDict] kwargs:", kwargs)
-	# print("[getProbeDict] exp data:", experimental_data)
-	# print("Special probe:", special_probe)
+	print("[getProbeDict] kwargs:", kwargs)
+	print("[getProbeDict] growth_generator:", growth_generator)
+	print("[getProbeDict] exp data:", experimental_data)
+	print("Special probe:", special_probe)
 
 	# elif ideal_probes == True:
 	# 	probe_dict_function = ProbeGeneration.ideal_probe_dict

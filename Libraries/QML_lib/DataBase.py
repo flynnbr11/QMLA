@@ -79,15 +79,25 @@ def sigmax():
 def sigmay():
     return np.array([[0+0.j, 0-1.j], [0+1.j, 0+0.j]])
 
+def addition():
+    return (sigmax() + 1.j * sigmay())/2
+
+def subtraction():
+    return (sigmax() - 1.j * sigmay())/2
+
 
 global paulis_list
 paulis_list = {
     'i' : identity(), 
     'x' : sigmax(), 
     'y' : sigmay(), 
-    'z' : sigmaz()
+    'z' : sigmaz(),
+    # 'a' : addition(), 
+    # 's' : subtraction()
 }
 
+global paulis_names 
+paulis_names = list(paulis_list.keys())
 
 
 """
@@ -262,8 +272,11 @@ def get_num_qubits(name):
 
 def get_constituent_names_from_name(name):
     t_str, p_str, max_t, max_p = get_t_p_strings(name)
-    paulis_list = {'i' : np.eye(2), 'x' : sigmax(), 
-        'y' : sigmay(), 'z' : sigmaz()
+    paulis_list = {
+        'i' : np.eye(2), 
+        'x' : sigmax(), 
+        'y' : sigmay(), 
+        'z' : sigmaz()
     }
     if(max_t >= max_p):
         # if more T's than P's in name, it has only one constituent. 
@@ -619,13 +632,30 @@ ytz = operator('yTz')
 true_operator_list = np.array([ ytz.matrix] )
 
 
-def launch_db(true_op_name, new_model_branches, new_model_ids, 
-    log_file, RootN_Qbit=[0], N_Qubits=1,
-    gen_list=[], true_ops=[], true_params=[], num_particles=1000, qle=True,
-    redimensionalise=True, resample_threshold = 0.5, resampler_a = 0.95,
-    pgh_prefactor = 1.0, num_probes = None, probe_dict=None, 
-    use_exp_custom=True, enable_sparse=True, debug_directory = None,
-    qid=0, host_name='localhost', port_number=6379
+def launch_db(
+    true_op_name, 
+    new_model_branches, 
+    new_model_ids, 
+    log_file, 
+    RootN_Qbit=[0], 
+    N_Qubits=1,
+    gen_list=[], 
+    true_ops=[], 
+    true_params=[], 
+    num_particles=1000, 
+    qle=True,
+    redimensionalise=True, 
+    resample_threshold=0.5, 
+    resampler_a=0.95,
+    pgh_prefactor=1.0,
+    num_probes=None, 
+    probe_dict=None, 
+    use_exp_custom=True, 
+    enable_sparse=True, 
+    debug_directory=None,
+    qid=0, 
+    host_name='localhost', 
+    port_number=6379
 ):
     """
     Inputs:

@@ -12,8 +12,8 @@ do_further_qhl=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=2500
-exp=800
+prt=25
+exp=8
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -59,7 +59,7 @@ mkdir -p $long_dir
 growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 alt_growth_rules=(
-    'non_interacting_ising'
+    # 'non_interacting_ising'
 )
 
 growth_rules_command=""
@@ -150,7 +150,7 @@ then
     special_probe='plus'
 fi
 
-
+echo "special probe $special_probe"
 
 python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \
@@ -173,8 +173,6 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
 latex_mapping_filename='LatexMapping.txt'
 latex_mapping_file=$long_dir$latex_mapping_filename
 reallocate_resources=0
-
-
 
 for prt in  "${particle_counts[@]}";
 do
