@@ -6,14 +6,14 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=8
-exp=3
+prt=2500
+exp=800
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -21,7 +21,7 @@ rt=0.5
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=0
+exp_data=1
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
@@ -29,7 +29,9 @@ plots=1
 use_rq=0
 number_best_models_further_qhl=5
 custom_prior=1
-dataset='NVB_dataset.p'
+# dataset='NVB_dataset.p'
+dataset='NVB_rescale_dataset.p'
+
 #dataset='NV05_dataset.p'
 data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
