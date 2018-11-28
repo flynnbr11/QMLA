@@ -2067,6 +2067,8 @@ class QMD():
             'LearnedParameters' : mod.LearnedParameters,
             'FinalSigmas' : mod.FinalSigmas,
             'TrackParameterEstimates' : mod.TrackParameterEstimates,
+            'TrackVolume' : mod.VolumeList,
+            'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
             'ExpectationValues' : mod.expectation_values,
             'RSquaredByEpoch' : mod.r_squared_by_epoch(),
             'LearnedHamiltonian' : mod.LearnedHamiltonian
@@ -2156,6 +2158,8 @@ class QMD():
                 'LearnedParameters' : mod.LearnedParameters,
                 'FinalSigmas' : mod.FinalSigmas, 
                 'TrackParameterEstimates' : mod.TrackParameterEstimates,
+                'TrackVolume' : mod.VolumeList,
+                'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
                 'ExpectationValues' : mod.expectation_values,
                 'RSquaredByEpoch' : mod.r_squared_by_epoch(),
                 'LearnedHamiltonian' : mod.LearnedHamiltonian
@@ -2507,6 +2511,8 @@ class QMD():
             'QuadraticLosses' : champ_model.QuadraticLosses,
             'ExpectationValues' : champ_model.expectation_values,
             'TrackParameterEstimates' : champ_model.TrackParameterEstimates,
+            'TrackVolume' : champ_model.VolumeList,
+            'TrackCovarianceMatrices' : champ_model.TrackCovMatrices, 
             'RSquaredByEpoch' : champ_model.r_squared_by_epoch(),
             'LearnedHamiltonian' : champ_model.LearnedHamiltonian
         }

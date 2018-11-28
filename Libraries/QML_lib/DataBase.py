@@ -272,12 +272,12 @@ def get_num_qubits(name):
 
 def get_constituent_names_from_name(name):
     t_str, p_str, max_t, max_p = get_t_p_strings(name)
-    paulis_list = {
-        'i' : np.eye(2), 
-        'x' : sigmax(), 
-        'y' : sigmay(), 
-        'z' : sigmaz()
-    }
+    # paulis_list = {
+    #     'i' : np.eye(2), 
+    #     'x' : sigmax(), 
+    #     'y' : sigmay(), 
+    #     'z' : sigmaz()
+    # }
     if(max_t >= max_p):
         # if more T's than P's in name, it has only one constituent. 
         return [name]
@@ -932,9 +932,12 @@ def consider_new_model(model_lists, name, db):
 
 def num_parameters_from_name(name):
     t_str, p_str, max_t, max_p = DB.get_t_p_strings(name)
-    paulis_list = {'i' : np.eye(2), 'x' : sigmax(), 
-        'y' : sigmay(), 'z' : sigmaz()
-    }
+    # paulis_list = {
+    #     'i' : np.eye(2), 
+    #     'x' : sigmax(), 
+    #     'y' : sigmay(), 
+    #     'z' : sigmaz()
+    # }
     if(max_t >= max_p):
         # if more T's than P's in name, it has only one constituent. 
         return 1

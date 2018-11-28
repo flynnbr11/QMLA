@@ -762,7 +762,11 @@ class reducedModel():
         log_file='QMD_log.log'
     ):
 
-        rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
+        rds_dbs = rds.databases_from_qmd_id(
+            host_name, 
+            port_number, 
+            qid
+        )
         qmd_info_db = rds_dbs['qmd_info_db'] 
         #print("In reduced model. rds_dbs:", rds_dbs)
       #  print("QMD INFO DB has type", type(qmd_info_db), "\n", qmd_info_db)
@@ -787,7 +791,9 @@ class reducedModel():
         self.TrueOpName  = qmd_info['true_name']
         self.QLE = qmd_info['qle']
         self.UseExpCustom = qmd_info['use_exp_custom']
-        self.StoreParticlesWeights = qmd_info['store_particles_weights']
+        self.StoreParticlesWeights = qmd_info[
+            'store_particles_weights'
+        ]
         self.BayesFactors = {}
         self.LatexTerm = UserFunctions.get_latex_name(
             name = self.Name,

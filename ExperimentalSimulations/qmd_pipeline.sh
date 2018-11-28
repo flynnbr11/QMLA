@@ -6,13 +6,13 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 do_further_qhl=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=25
+prt=30
 exp=8
 pgh=0.5
 ra=0.8
@@ -55,8 +55,8 @@ this_log="$long_dir/qmd.log"
 further_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
-# growth_rule='test_changes_to_qmd'
-growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='test_changes_to_qmd'
+# growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 alt_growth_rules=(
     # 'non_interacting_ising'
