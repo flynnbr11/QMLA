@@ -231,13 +231,12 @@ latex_naming_functions = {
 
 	None : 
 		ModelNames.interaction_latex_name,
+	'two_qubit_ising_rotation_hyperfine' : 
+		ModelNames.latex_name_ising, 
+	'two_qubit_ising_rotation_hyperfine_transverse' : 
+		ModelNames.latex_name_ising, 
 	# None : 
 	# 	ModelNames.default_latex_wrapping,
-
-	# 'two_qubit_ising_rotation_hyperfine' : 
-	# 	ModelNames.latex_name_ising, 
-	# 'two_qubit_ising_rotation_hyperfine_transverse' : 
-	# 	ModelNames.latex_name_ising, 
 	# 'test_return_champs' :
 	# 	ModelNames.default_latex_wrapping,
 	# 'interacting_nearest_neighbour_ising' : 

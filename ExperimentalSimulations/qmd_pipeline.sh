@@ -60,6 +60,7 @@ growth_rule='test_changes_to_qmd'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 alt_growth_rules=(
     # 'non_interacting_ising'
+    ''
 )
 
 growth_rules_command=""
