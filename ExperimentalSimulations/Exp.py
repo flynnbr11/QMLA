@@ -187,24 +187,40 @@ if os.path.isfile(true_expectation_value_path) == False:
     )
     probe = plot_probe_dict[true_num_qubits]
 
+    log_print(
+        [
+            "for generating true data.",
+            "probe:", probe, 
+            "true_ham:", true_ham
+        ],
+        log_file
+    )
     for t in plot_times:
         if global_variables.use_experimental_data==True:
-            # expec_val = ExpectationValues.expectation_value_wrapper(
-            #     method=global_variables.measurement_type,
-            #     ham = true_ham,
-            #     t = t,
-            #     state = probe
-            # )
             true_expec_values[t] = experimental_measurements_dict[t]
-        
-
         else:
-            true_expec_values[t] = ExpectationValues.expectation_value_wrapper(
-                method=global_variables.measurement_type,
-                ham = true_ham, 
-                t=t, 
-                state=probe
-            )
+            try:
+                true_expec_values[t] = (
+                    ExpectationValues.expectation_value_wrapper(
+                        method=global_variables.measurement_type,
+                        ham = true_ham, 
+                        t=t, 
+                        state=probe
+                    )
+                )
+            except:
+                log_print(
+                    [
+                        "failure for", 
+                        "\ntrue ham:", true_ham, 
+                        "\nprobe:", probe,
+                        "t=",t
+                    ],
+                    log_file
+                )
+                raise
+
+
     pickle.dump(
         true_expec_values, 
         open(true_expectation_value_path, 'wb')

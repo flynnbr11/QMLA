@@ -1336,13 +1336,17 @@ ptq.average_quadratic_losses(
 )
 
 if qhl_mode==True:
-    r_squared_plot = str(directory_to_analyse + 'r_squared_QHL.png')
+    r_squared_plot = str(
+        directory_to_analyse + 
+        'r_squared_QHL.png'
+    )
     ptq.r_squared_plot(
         results_csv_path = results_csv,
         save_to_file = r_squared_plot
     )
 
-elif further_qhl_mode == False:
+if further_qhl_mode == False:
+    print("FURTHER QHL=FALSE. PLOTTING STUFF")
     plot_file = directory_to_analyse+'model_scores.png'
     model_scores = model_scores(directory_to_analyse)
     try:
@@ -1378,21 +1382,42 @@ elif further_qhl_mode == False:
         )
     except:
         print("Could not plot histogram of Bayes factors for True model.")
-
+        pass
     param_plot = str(directory_to_analyse+'sweep_param_total.png')
     param_percent_plot = str(directory_to_analyse+'sweep_param_percentage.png')
 
-    parameter_sweep_analysis(
-        directory_name = directory_to_analyse, 
-        results_csv=results_csv, 
-        save_to_file=param_plot)
-    parameter_sweep_analysis(
-        directory_name = directory_to_analyse,
-        results_csv=results_csv,
-        use_log_times=True,
-        use_percentage_models=True, 
-        save_to_file=param_percent_plot
-    )
+    try:
+        parameter_sweep_analysis(
+            directory_name = directory_to_analyse, 
+            results_csv=results_csv, 
+            save_to_file=param_plot)
+        parameter_sweep_analysis(
+            directory_name = directory_to_analyse,
+            results_csv=results_csv,
+            use_log_times=True,
+            use_percentage_models=True, 
+            save_to_file=param_percent_plot
+        )
+    except:
+        print("Parameter sweep analysis failed.")
+        pass
+
+    try:
+        ptq.cluster_results_and_plot(
+            path_to_results = results_csv, 
+            true_expec_path = true_expec_path, 
+            plot_probe_path = plot_probe_file, 
+            true_params_path = true_params_path,
+            growth_generator = growth_generator, 
+            measurement_type = arguments.measurement_type, 
+            save_param_values_to_file = str(plot_desc + 'clusters_by_param.png'),
+            save_param_clusters_to_file = str(plot_desc + 'clusters_by_model.png'),
+            save_redrawn_expectation_values = str(plot_desc + 'clusters_expec_vals.png')
+        )
+    except:
+        print("Failed to cluster and replot results.")
+        pass
+        # raise
 
 
     valid_growth_rules_for_multiQMD_tree_plot = [
@@ -1414,7 +1439,6 @@ elif further_qhl_mode == False:
             inf_gain = inf_gain,
             save_to_file='multiQMD_tree.png'
         )
-
     except NameError:
         print("Can not plot multiQMD tree -- this might be because only \
             one instance of QMD was performed. All other plots generated \
@@ -1428,28 +1452,10 @@ elif further_qhl_mode == False:
             without error."
         )
         raise
-    # except:
-    #     print("Could not plot Multi QMD tree.")
-
-    try:
-
-        plot_desc
-
-
-        ptq.cluster_results_and_plot(
-            path_to_results = results_csv, 
-            true_expec_path = true_expec_path, 
-            plot_probe_path = plot_probe_file, 
-            true_params_path = true_params_path,
-            growth_generator = growth_generator, 
-            measurement_type = arguments.measurement_type, 
-            save_param_values_to_file = str(plot_desc + 'clusters_by_param.png'),
-            save_param_clusters_to_file = str(plot_desc + 'clusters_by_model.png'),
-            save_redrawn_expectation_values = str(plot_desc + 'clusters_expec_vals.png')
-        )
     except:
-        print("Failed to cluster and replot results.")
+        print("Could not plot Multi QMD tree.")
         raise
+
 
 
 

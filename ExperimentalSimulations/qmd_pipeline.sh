@@ -6,14 +6,15 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 do_further_qhl=0
+exp_data=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=30
-exp=8
+prt=10
+exp=4
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -21,7 +22,7 @@ rt=0.5
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-exp_data=1
+
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
@@ -60,7 +61,6 @@ growth_rule='test_changes_to_qmd'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 alt_growth_rules=(
     # 'non_interacting_ising'
-    ''
 )
 
 growth_rules_command=""

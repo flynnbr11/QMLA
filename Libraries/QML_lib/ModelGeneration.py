@@ -18,7 +18,7 @@ import DataBase
 import warnings
 import ModelNames
 
-global paulis_list
+# global paulis_list
 # paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
 
 # Dict of max spawn depths, corresponding to different generation functions. 
@@ -66,7 +66,7 @@ def random_model_name(num_dimensions=1, num_terms=1):
     Return a valid (simple) model name of given number of dimensions and terms. 
     """
     import random
-    paulis = DataBase.paulis_names
+    paulis = DataBase.core_terms_with_identity
     p_str = ''
     t_str = ''
     
@@ -90,10 +90,7 @@ def random_model_name(num_dimensions=1, num_terms=1):
         'iTiTTiTTTiTTTTiTTTTTiTTTTTTi' or 
         'iTiTTiTTTiTTTTiTTTTTiTTTTTTiTTTTTTTi'
     ):
-        summed_term = random_model_name(
-            num_dimensions, 
-            num_terms
-        ) 
+        summed_term = random_model_name(num_dimensions, num_terms) 
     
     return summed_term
 
@@ -107,10 +104,8 @@ def random_ising_chain(
     Return a valid (simple) model name of given number of dimensions and terms. 
     """
     import random
-    # paulis_full = ['x', 'y', 'z']
-    paulis_full = DataBase.paulis_names
-    if include_identity == False: 
-        paulis_full.remove('i')
+    paulis_full  = DataBase.core_terms_no_identity
+    if include_identity: paulis_full.append('i')
 
     if num_directions > len(paulis_full):
         paulis = paulis_full
@@ -149,8 +144,7 @@ def generate_term(
     """
     For use only in random_model_name() function. 
     """
-
-    paulis = DataBase.paulis_names
+    paulis = DataBase.core_terms_with_identity
     import random
     t_str = ''
     running_str =''
@@ -169,14 +163,13 @@ def generate_term(
             
 def single_pauli_multiple_dim(
     num_dimensions, 
-    # paulis=['x', 'y', 'z', 'i'], 
     pauli=None
 ):
     """
     For use only in random_model_name() function. 
     """
     import random
-    paulis = DataBase.paulis_names
+    paulis = DataBase.core_terms_with_identity
     t_str = ''
     running_str =''
     
@@ -202,11 +195,7 @@ Return strings corresponding to model names following naming convention.
 Use these strings with DataBase.operator class.
 """
 
-def interaction_ham(
-    qubit_list, 
-    operator_list, 
-    num_qubits
-):
+def interaction_ham(qubit_list, operator_list, num_qubits):
     
     t_str = ''
     running_str = ''
@@ -330,14 +319,10 @@ def dimensionalise_name_by_name_list(constituents, true_dim, return_operator=Fal
             
 def simple_ising(
     generator_list, 
-    # options=['x', 'y', 'z'],
     **kwargs
 ):
-    options = DataBase.paulis_names
-    options.remove('i')
     new_options = []
-
-
+    options = DataBase.core_terms_no_identity,
     for gen in generator_list: 
         num_qubits = DataBase.get_num_qubits(gen)
         t_str = ''
@@ -357,7 +342,7 @@ def single_pauli_multiple_dim(
     pauli=None
 ):
     import random
-    paulis = DataBase.paulis_names
+    paulis = DataBase.core_terms_with_identity 
     t_str = ''
     running_str =''
     
@@ -615,7 +600,7 @@ def existing_branch_champs_test(
     for name in model_list:
         actions = p_t_actions(model_list)
         p_str = actions['p']
-        one_qubit_terms = ['x', 'y', 'z']
+        one_qubit_terms  = DataBase.core_terms_no_identity
         individual_terms = name.split(p_str)
         
         remaining_terms = list( set(one_qubit_terms) - set(individual_terms) )
@@ -633,7 +618,7 @@ def existing_branch_champs_test(
 
 def non_interacting_ising(model_list, **kwargs):
     new_models = []
-    paulis = DataBase.paulis_names
+    paulis =  DataBase.core_terms_no_identity
     # paulis=['y']
     for mod in model_list:
         t_str = p_t_actions(mod)['t']
@@ -646,7 +631,7 @@ def non_interacting_ising(model_list, **kwargs):
 
 def non_interacting_ising_single_axis(model_list, **kwargs):
     new_models = []
-    paulis = DataBase.paulis_names
+    paulis =  DataBase.core_terms_no_identity
     for mod in model_list:
         t_str = p_t_actions(mod)['t']
         new_t_str = str( t_str + 'T')
@@ -683,7 +668,7 @@ def interacting_nearest_neighbour_ising(
     **kwargs
 ):
     new_models = []
-    paulis = DataBase.paulis_names
+    paulis =  DataBase.core_terms_no_identity
     for mod in model_list:
         potential_core_paulis = []
         for p in paulis:

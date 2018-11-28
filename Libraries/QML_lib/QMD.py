@@ -617,7 +617,7 @@ class QMD():
     ):
         print("NEW BRANCH. gen=", growth_rule, "type:", type(growth_rule))
         self.HighestBranchID += 1
-        branchID = self.HighestBranchID
+        branchID = int(self.HighestBranchID)
         self.BranchBayesComputed[branchID] = False
         num_models = len(model_list)
         self.NumModelsPerBranch[branchID] = num_models

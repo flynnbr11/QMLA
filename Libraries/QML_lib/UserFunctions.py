@@ -273,6 +273,7 @@ initial_models = {
 	None :
 		['x', 'y', 'z'],
 	'test_changes_to_qmd' :
+		# ['a', 's'],
 		['x', 'y', 'z'],
 	'two_qubit_ising_rotation_hyperfine' :
 		['xTi', 'yTi', 'zTi'],
@@ -456,10 +457,10 @@ def get_probe_dict(
 	special_probe=None, 
 	**kwargs
 ):
-	print("[getProbeDict] kwargs:", kwargs)
-	print("[getProbeDict] growth_generator:", growth_generator)
-	print("[getProbeDict] exp data:", experimental_data)
-	print("Special probe:", special_probe)
+	# print("[getProbeDict] kwargs:", kwargs)
+	# print("[getProbeDict] growth_generator:", growth_generator)
+	# print("[getProbeDict] exp data:", experimental_data)
+	# print("Special probe:", special_probe)
 
 	# elif ideal_probes == True:
 	# 	probe_dict_function = ProbeGeneration.ideal_probe_dict
@@ -510,5 +511,5 @@ def get_probe_dict(
 		max_num_qubits = max_num_qubits, 
 		**kwargs
 	)
-	print("[getProbeDict] func used:", probe_dict_function)
+	print("[getProbeDict] Probe func used:", probe_dict_function)
 	return probe_dict

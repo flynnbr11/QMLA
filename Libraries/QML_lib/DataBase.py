@@ -53,7 +53,7 @@ from __future__ import print_function # so print doesn't show brackets
 
 import numpy as np
 import itertools as itr
-
+import copy
 import os as os
 import sys as sys 
 import pandas as pd
@@ -86,19 +86,25 @@ def subtraction():
     return (sigmax() - 1.j * sigmay())/2
 
 
-global paulis_list
-paulis_list = {
+# global core_operator_dict
+core_operator_dict = {
     'i' : identity(), 
     'x' : sigmax(), 
     'y' : sigmay(), 
     'z' : sigmaz(),
-    # 'a' : addition(), 
-    # 's' : subtraction()
+    'a' : addition(), 
+    's' : subtraction()
 }
 
 global paulis_names 
-paulis_names = list(paulis_list.keys())
-
+paulis_names = list(core_operator_dict.keys())
+core_terms_with_identity = list(core_operator_dict.keys())
+core_terms_no_identity = copy.copy(
+    list(core_operator_dict.keys())).remove('i')
+pauli_cores_with_identity = ['x', 'y', 'z', 'i']
+pauli_cores_no_identity = ['x', 'y', 'z', 'i']
+hubbard_cores_with_identity = ['a', 's', 'i']
+hubbard_cores_no_identity = ['a', 's']
 
 """
 ------ ------ Operator Class ------ ------
@@ -272,7 +278,7 @@ def get_num_qubits(name):
 
 def get_constituent_names_from_name(name):
     t_str, p_str, max_t, max_p = get_t_p_strings(name)
-    # paulis_list = {
+    # core_operator_dict = {
     #     'i' : np.eye(2), 
     #     'x' : sigmax(), 
     #     'y' : sigmay(), 
@@ -482,7 +488,7 @@ def compute_t(inp):
 
     if(max_p == 0 and max_t==0):
         pauli_symbol = inp
-        return paulis_list[pauli_symbol] 
+        return core_operator_dict[pauli_symbol] 
 
     elif(max_t==0):
         return compute(inp)
@@ -509,7 +515,7 @@ def compute_p(inp):
 
     if(max_p == 0 and max_t==0):
         pauli_symbol = inp
-        return paulis_list[pauli_symbol] 
+        return core_operator_dict[pauli_symbol] 
 
     elif max_p==0:
         return compute(inp)
@@ -546,7 +552,7 @@ def compute_m(inp):
 
     if(max_m == 0 and max_t==0 and max_p == 0 ):
         pauli_symbol = inp
-        return paulis_list[pauli_symbol] 
+        return core_operator_dict[pauli_symbol] 
 
     elif max_m ==0:
         return compute(inp)
@@ -582,7 +588,7 @@ def compute(inp):
 
     if(max_m == 0 and max_t==0 and max_p == 0):
         pauli_symbol = inp
-        return paulis_list[pauli_symbol] 
+        return core_operator_dict[pauli_symbol] 
     elif max_m > max_t:
         return compute_m(inp)
     elif max_t >= max_p:
@@ -932,7 +938,7 @@ def consider_new_model(model_lists, name, db):
 
 def num_parameters_from_name(name):
     t_str, p_str, max_t, max_p = DB.get_t_p_strings(name)
-    # paulis_list = {
+    # core_operator_dict = {
     #     'i' : np.eye(2), 
     #     'x' : sigmax(), 
     #     'y' : sigmay(), 
