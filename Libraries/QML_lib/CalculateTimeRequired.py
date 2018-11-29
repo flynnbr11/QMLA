@@ -331,7 +331,8 @@ time_reqd = time_required(
 )
 
 print(
-	"Times from timing heuristic function:", 
+	"Timing heuristic function:", 
+  "\nuse_alt_growth_rules:", use_alternative_growth_rules,
 	"\nQMD:", time_reqd['qmd'],
 	"\nQHL:", time_reqd['qhl'],
 	"\nFurtherQHL:", time_reqd['fqhl'],
