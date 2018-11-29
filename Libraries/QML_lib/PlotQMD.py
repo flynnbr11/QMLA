@@ -1428,7 +1428,8 @@ def qmdclassTOnxobj(
         name = mod.Name
         branch=qmd.pullField(name=name, field='branchID')
         num_models_this_branch = branch_mod_count[branch]
-        pos_list = available_position_list(num_models_this_branch,
+        pos_list = available_position_list(
+            num_models_this_branch,
             most_models_per_branch
         )
         branch_filled_so_far = branch_x_filled[branch]

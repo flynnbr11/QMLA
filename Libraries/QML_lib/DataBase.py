@@ -102,7 +102,7 @@ core_terms_with_identity = list(core_operator_dict.keys())
 core_terms_no_identity = copy.copy(
     list(core_operator_dict.keys())).remove('i')
 pauli_cores_with_identity = ['x', 'y', 'z', 'i']
-pauli_cores_no_identity = ['x', 'y', 'z', 'i']
+pauli_cores_no_identity = ['x', 'y', 'z']
 hubbard_cores_with_identity = ['a', 's', 'i']
 hubbard_cores_no_identity = ['a', 's']
 

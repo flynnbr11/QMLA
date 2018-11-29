@@ -88,14 +88,12 @@ default_true_operators_by_generator = {
     'heisenberg_nontransverse' : 'xTxPPzTz'
 }
 
-
 fixed_axis_generators = [
     'non_interacting_ising_single_axis',
     'interacing_nn_ising_fixed_axis',
     'deterministic_noninteracting_ising_single_axis',
     'deterministic_interacting_nn_ising_single_axis'
 ]
-
 
 fixed_axes_by_generator = {
 	None : 'x',
@@ -135,8 +133,6 @@ max_num_qubits_info = {
 	'heisenberg_nontransverse' : 3,
     None : 5,
 }
-
-
 
 model_generation_functions = {
 	# growth_generation_rule : growth_function
