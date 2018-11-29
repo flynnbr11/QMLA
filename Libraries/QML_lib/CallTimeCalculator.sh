@@ -11,9 +11,9 @@ additional_growth="-agr=non_interacting_ising"
 python3 CalculateTimeRequired.py \
 	-ggr='two_qubit_ising_rotation_hyperfine_transverse' \
 	$additional_growth \
-	-use_agr=0 \
-	-e=1500 \
-	-p=3000 \
+	-use_agr=1 \
+	-e=1000 \
+	-p=4000 \
 	-bt=1500 \
 	-proc=5 \
 	-res=0 \
