@@ -198,10 +198,7 @@ def BayesFactorRemote(
             )
             """
 
-
-
-
-        log_print(["Computing log likelihoods."])
+        # log_print(["Computing log likelihoods."])
         #print("Num times to use", num_times_to_use)
         #print("Model", model_a.ModelID, " Times:", times_a)
         #print("Model", model_b.ModelID, " Times:", times_b)
@@ -209,7 +206,7 @@ def BayesFactorRemote(
 
         log_l_a = log_likelihood(model_a, times_b, binning=binning)
         log_l_b = log_likelihood(model_b, times_a, binning=binning)     
-        log_print(["Log likelihoods computed."])
+        # log_print(["Log likelihoods computed."])
 
         bayes_factor = np.exp(log_l_a - log_l_b)
         if bayes_factor < 1e-160:
@@ -231,27 +228,27 @@ def BayesFactorRemote(
 
         if bayes_factor > bayes_threshold: 
             bayes_factors_winners_db.set(pair_id, 'a')
-            log_print(["Redis SET bayes_factors_winners_db, pair:", 
-                pair_id, "winner: a"]
-            )
+            # log_print(["Redis SET bayes_factors_winners_db, pair:", 
+            #     pair_id, "winner: a"]
+            # )
         elif bayes_factor < (1.0/bayes_threshold):
             bayes_factors_winners_db.set(pair_id, 'b')
-            log_print(["Redis SET bayes_factors_winners_db, pair:", 
-                pair_id, "winner: b"]
-            )
-        else:
-            log_print(["Neither model much better."])
+            # log_print(["Redis SET bayes_factors_winners_db, pair:", 
+            #     pair_id, "winner: b"]
+            # )
+        # else:
+        #     log_print(["Neither model much better."])
 
         
         if branchID is not None:    
             # only want to fill these lists when comparing models within branch
-            log_print(["Redis INCR active_branches_bayes branch:", branchID])
+            # log_print(["Redis INCR active_branches_bayes branch:", branchID])
             active_branches_bayes.incr(int(branchID), 1)  
         else:
             active_interbranch_bayes.set(pair_id, True)
-            log_print(["Redis SET active_interbranch_bayes pair:", pair_id, 
-                "; set:True"]
-            )
+            # log_print(["Redis SET active_interbranch_bayes pair:", pair_id, 
+            #     "; set:True"]
+            # )
         time_end = time.time()
         log_print(
             [

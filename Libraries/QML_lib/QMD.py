@@ -298,7 +298,7 @@ class QMD():
         self.InitialModelIDs =  {}
         self.BranchChampsByNumQubits = {}
         self.GhostBranches = {}
-        self.SpawnStage = []
+        self.SpawnStage = {}
 
         initial_id_counter = 0
         for i in range(len(self.GeneratorList)):
@@ -340,6 +340,7 @@ class QMD():
                 )
             )
             self.SpawnDepthByGrowthRule[gen] = 0
+            self.SpawnStage[gen] = [None]
             self.BranchGrowthRules[i] = gen
 
         self.HighestBranchID = max(self.InitialModelBranches.values())
@@ -619,6 +620,7 @@ class QMD():
         model_list
     ):
         print("NEW BRANCH. gen=", growth_rule, "type:", type(growth_rule))
+        model_list = list(set(model_list)) # remove possible duplicates
         self.HighestBranchID += 1
         branchID = int(self.HighestBranchID)
         self.BranchBayesComputed[branchID] = False
@@ -768,7 +770,12 @@ class QMD():
     ):
         # model_list = DataBase.model_names_on_branch(self.db, branchID)
         model_list = self.BranchModels[branchID]
-        print("models on branch", branchID, ":", model_list)
+        print(
+            "learnModelFromBranchID branch", 
+            branchID,
+            ":", 
+            model_list
+        )
         active_branches_learning_models = (
             self.RedisDataBases['active_branches_learning_models']
         )
@@ -777,7 +784,8 @@ class QMD():
         )
 
         print(
-            "learnModelFromBranchID. Setting active branches on redis for branch {} to {}".format(branchID, num_models_already_set_this_branch)
+            "learnModelFromBranchID.",
+            "Setting active branches on redis for branch {} to {}".format(branchID, num_models_already_set_this_branch)
         )
 
         active_branches_learning_models.set(
@@ -1012,7 +1020,9 @@ class QMD():
         model_id_list = self.BranchModelIds[branchID]
         self.log_print(
             [
-            'model id list, in remoteBayesFromBranchID',
+            'remoteBayesFromBranchID',
+            branchID,
+            'model id list:',
              model_id_list
             ]
         )
@@ -1024,11 +1034,21 @@ class QMD():
             for j in range(i,num_models):
                 b=model_id_list[j]
                 if a!=b:
+                    print("Bayes factors consider:", a, b)
                     unique_id = DataBase.unique_model_pair_identifier(a,b)
-                    if (unique_id not in self.BayesFactorsComputed
-                        or recompute==True
+                    if (
+                        unique_id not in self.BayesFactorsComputed
+                        or 
+                        recompute==True
                     ): #ie not yet considered
                         self.BayesFactorsComputed.append(unique_id)
+                        self.log_print(
+                            [
+                                "Computing BF for pair", 
+                                unique_id
+                            ]
+                        )
+
                         self.remoteBayes(
                             a,
                             b, 
@@ -1322,14 +1342,26 @@ class QMD():
             field='Status', 
             new_value='Active'
         )
-        ranked_model_list = sorted(models_points, key=models_points.get, reverse=True)
+        ranked_model_list = sorted(
+            models_points, 
+            key=models_points.get, 
+            reverse=True
+        )
 
         if self.BranchBayesComputed[int(float(branchID))] == False: 
         # only update self.BranchRankings the first time branch is considered
             self.BranchRankings[int(float(branchID))] = ranked_model_list
             self.BranchBayesComputed[int(float(branchID))] = True
             
-        self.log_print(["Champion of branch ", branchID, " is ", champ_name])
+        self.log_print(
+            [
+                "Champion of branch ", 
+                branchID, 
+                " is ", 
+                champ_name, 
+                "({})".format(champ_id)
+            ]
+        )
         self.BayesPointsByBranch[branchID] = models_points
 
 
@@ -1344,11 +1376,21 @@ class QMD():
             # So deactivate losers since they shouldn't
             # progress if they lose in a ghost branch. 
             for losing_model_id in models_to_deactivate:
-                self.updateModelRecord(
-                    model_id=losing_model_id, 
-                    field='Status',
-                    new_value='Deactivated'
-                )
+                try:
+                    self.updateModelRecord(
+                        model_id=losing_model_id, 
+                        field='Status',
+                        new_value='Deactivated'
+                    )
+                except:
+                    self.log_print(
+                        [
+                            "not deactivating",
+                            losing_model_id,
+                            "ActiveBranchChampList:", 
+                            self.ActiveBranchChampList
+                        ]
+                    )
                 try:
                     self.ActiveBranchChampList.remove(
                         losing_model_id
@@ -1969,7 +2011,13 @@ class QMD():
             model_dict=self.model_lists,
             log_file=self.log_file, 
             current_champs = current_champs,
-            spawn_stage = self.SpawnStage
+            spawn_stage = self.SpawnStage[growth_rule]
+        )
+        print(
+            "After model generation for growth rule", 
+            growth_rule, 
+            "SPAWN STAGE:", 
+            self.SpawnStage[growth_rule]
         )
 
         new_branch_id = self.newBranch(
@@ -2010,6 +2058,8 @@ class QMD():
             spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
             current_num_qubits = new_model_dimension
         )
+        if self.SpawnStage[growth_rule][-1]=='Complete':
+            tree_completed = True
         # print(
         #     "[spawnFromBranch] growth:", 
         #     growth_rule, 
@@ -2232,11 +2282,13 @@ class QMD():
                     self.BranchAllModelsLearned[branchID]==False
                 ):
                     self.log_print([
-                        "All models on branch", branchID, 
+                        "All models on branch", 
+                        branchID, 
                         "have finished learning."]
                     )
                     self.BranchAllModelsLearned[branchID] = True
                     self.remoteBayesFromBranchID(branchID)
+
 
             for branchID_bytes in active_branches_bayes.keys():
                 
@@ -2254,6 +2306,8 @@ class QMD():
                     # print("[QMD] dict:", self.BranchGrowthRules)
                     this_branch_growth_rule = self.BranchGrowthRules[branchID]
                     if self.TreesCompleted[this_branch_growth_rule]==False:
+                        print(
+                            "not finished tree for growth:", this_branch_growth_rule)
                         growth_rule_tree_complete = self.spawnFromBranch(
                             # will return True if this brings it to self.MaxSpawnDepth
                             branchID=branchID,
@@ -2261,7 +2315,9 @@ class QMD():
                             num_models=1
                         )
 
-                        if growth_rule_tree_complete==True:
+                        if (
+                            growth_rule_tree_complete==True
+                        ):
                             self.TreesCompleted[this_branch_growth_rule] = True
                             self.NumTreesCompleted += 1
                             print(
@@ -2271,6 +2327,17 @@ class QMD():
                                 self.TreesCompleted
                             )
                             max_spawn_depth_reached = True
+                # elif self.BranchComparisonsComplete[branchID]==False:
+                #     print(
+                #         "branchID:", branchID,
+                #         "num finished:",
+                #         int(bayes_calculated),
+                #         "NumModelPairsPerBranch:",
+                #         self.NumModelPairsPerBranch[branchID],
+                #         "BranchComparisonsComplete", 
+                #         self.BranchComparisonsComplete[branchID]
+                #     )
+
 
         self.log_print(
             [
@@ -2298,6 +2365,10 @@ class QMD():
                 if branchID_bytes in active_branches_bayes:
                     num_bayes_done_on_branch = (
                         active_branches_bayes.get(branchID_bytes)
+                    )
+                    print(
+                        "branch", branchID, 
+                        "num complete:", num_bayes_done_on_branch
                     )
                     if ( int(num_bayes_done_on_branch) == 
                         self.NumModelPairsPerBranch[branchID] and

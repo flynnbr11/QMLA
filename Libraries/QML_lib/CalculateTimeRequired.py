@@ -197,6 +197,12 @@ max_num_models_by_shape['heisenberg_nontransverse'] = {
 }
 
 
+max_num_models_by_shape['heisenberg_transverse'] = {
+  
+  1 : 0, 
+  'other' : 7
+}
+
 
 # Hamiltonian exponentiation times from testing qutips
 # expm function 100 times for each qubit size. 

@@ -59,8 +59,9 @@ mkdir -p $long_dir
 # growth_rule='test_changes_to_qmd'
 use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='two_qubit_ising_rotation_hyperfine'
-growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='heisenberg_nontransverse'
+# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+growth_rule='heisenberg_transverse'
 alt_growth_rules=(
 #    'non_interacting_ising'
 )

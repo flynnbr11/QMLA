@@ -56,11 +56,13 @@ def full_model_string(operations):
 
         all_terms.append(model_name)
 
+    all_terms = list(set(list(all_terms)))
     p_str = 'P'
     for i in range(num_qubits-1):
         p_str+='P'
 
     full_model = p_str.join(all_terms)    
+    full_model = DataBase.alph(full_model)
     return full_model
 
 def operations_dict_from_name(mod_name):
@@ -98,6 +100,17 @@ def operations_dict_from_name(mod_name):
     return operations
 
 
+def make_term_transverse(term, transverse_axis):
+    dimension = DataBase.get_num_qubits(term)
+        
+    transverse_terms = []
+    op_dict = operations_dict_from_name(term)
+    
+    for i in range(1, 1+dimension):
+        transverse_term = [(i, transverse_axis)]
+        op_dict['terms'].append(transverse_term)
+    term_with_transverse_components = full_model_string(op_dict)
+    return term_with_transverse_components
 
 
 
@@ -148,7 +161,7 @@ def latex_name_ising(name):
     
     latex_term = ''
     if len(present_r) > 0:
-        latex_term+='R_{'+r_terms+'}'
+        latex_term+='S_{'+r_terms+'}'
     if len(present_hf) > 0:
         latex_term+='HF_{'+hf_terms+'}'
     if len(present_t) > 0:

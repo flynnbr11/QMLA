@@ -85,7 +85,8 @@ default_true_operators_by_generator = {
     'interacing_nn_ising_fixed_axis' : 'xTxTTiPPPiTxTTx',
     'deterministic_interacting_nn_ising_single_axis' : 'xTxTTiPPPiTxTTx',
     'deterministic_transverse_ising_nn_fixed_axis' : 'zTiPPiTzPPxTx',
-    'heisenberg_nontransverse' : 'xTxPPzTz'
+    'heisenberg_nontransverse' : 'xTxPPzTz',
+    'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi'
 }
 
 fixed_axis_generators = [
@@ -96,11 +97,12 @@ fixed_axis_generators = [
 ]
 
 fixed_axes_by_generator = {
-	None : 'x',
+	None : 'z',
     'interacing_nn_ising_fixed_axis' : 'x',
     'deterministic_transverse_ising_nn_fixed_axis' : 'x',
     'non_interacting_ising_single_axis' : 'x', 
-
+    'heisenberg_transverse' : 'z',
+    'heisenberg_nontransverse' : 'z'
 }
 
 max_spawn_depth_info = {
@@ -115,7 +117,8 @@ max_spawn_depth_info = {
     'interacing_nn_ising_fixed_axis' : 3,
     'deterministic_interacting_nn_ising_single_axis' : 1,
     'deterministic_transverse_ising_nn_fixed_axis' : 1,
-	'heisenberg_nontransverse' : 8
+	'heisenberg_nontransverse' : 8,
+	'heisenberg_transverse' : 30
 }
 
 max_num_qubits_info = {
@@ -131,6 +134,7 @@ max_num_qubits_info = {
     'deterministic_interacting_nn_ising_single_axis' : 5,
     'deterministic_transverse_ising_nn_fixed_axis' : 5,
 	'heisenberg_nontransverse' : 3,
+	'heisenberg_transverse' : 3,
     None : 5,
 }
 
@@ -170,6 +174,8 @@ model_generation_functions = {
 		ModelGeneration.deterministic_transverse_ising_nn_fixed_axis,
 	'heisenberg_nontransverse' : 
 		ModelGeneration.heisenberg_nontransverse,
+	'heisenberg_transverse':
+		ModelGeneration.heisenberg_transverse,
 }
 
 ##### ---------- -------------------- #####  
@@ -181,8 +187,9 @@ tree_finished_functions = {
 	None : 
 		ModelGeneration.spawn_depth_check,
 	'heisenberg_nontransverse' : 
-		ModelGeneration.max_num_qubits_reached_check
-
+		ModelGeneration.max_num_qubits_reached_check,
+	# 'heisenberg_transverse':
+	# 	ModelGeneration.max_num_qubits_reached_check,
 }
 
 
@@ -287,8 +294,11 @@ initial_models = {
 	'deterministic_interacting_nn_ising_single_axis' : 
 		['xTx', 'yTy', 'zTz'],
 	'heisenberg_nontransverse' :
-		['xTx', 'yTy', 'zTz']
-
+		['xTx', 'yTy', 'zTz'],
+	# 'heisenberg_transverse' :
+	# 	['xTx', 'yTy', 'zTz'],
+	'heisenberg_transverse' :
+		['xTx', 'yTy'],
 }
 
 ##### ---------- -------------------- #####  

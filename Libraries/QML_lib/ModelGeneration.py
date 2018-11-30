@@ -976,6 +976,113 @@ def heisenberg_nontransverse(
 
     return new_models
 
+# from ModelGeneration import tensor_all_with_identity_at_end
+# from ModelGeneration import tensor_all_with_identity_at_start
+import ModelNames
+
+def heisenberg_transverse(
+    **kwargs
+):
+    from UserFunctions import initial_models, max_num_qubits_info, fixed_axes_by_generator
+    # print("[ModGen] kwargs:", kwargs)
+    growth_generator = kwargs['generator']
+    # growth_generator = generator
+    model_list = kwargs['model_list']
+    spawn_step = kwargs['spawn_step']
+    ghost_branches = kwargs['ghost_branches']
+    branch_champs_by_qubit_num = kwargs['branch_champs_by_qubit_num']
+    spawn_stage = kwargs['spawn_stage']
+    max_num_qubits = max_num_qubits_info[growth_generator]
+    
+    new_models = []
+    base_terms = initial_models[growth_generator]
+    
+    this_dimension = DataBase.get_num_qubits(model_list[0])
+    base_dimension = DataBase.get_num_qubits(base_terms[0])
+
+    base_models_this_dim = []
+    if this_dimension == base_dimension:
+        base_models_this_dim = base_terms
+    else:
+        for b in base_terms:
+            new_mod = tensor_all_with_identity_at_start(b)
+            for i in range(base_dimension+1, this_dimension):
+                new_mod = tensor_all_with_identity_at_start(new_mod)
+
+            base_models_this_dim.append(new_mod)    
+    
+    for mod in model_list:
+        present_terms = DataBase.get_constituent_names_from_name(mod)
+        base_terms_not_present = list(
+            set(base_models_this_dim) - set(present_terms)
+        ) 
+        num_qubits = DataBase.get_num_qubits(mod)
+        p_str = ''
+        for i in range(num_qubits):
+            p_str += 'P'
+
+    print("SPAWN STAGE:", spawn_stage)
+    if spawn_stage[-1] == None:
+        # ie grow the non transverse terms
+        ghost_branch_dims = list(ghost_branches.keys())
+        if this_dimension in ghost_branch_dims:
+            new_mod = tensor_all_with_identity_at_end(mod)
+            new_models.append(new_mod)
+            print("Ghost branch for dimension:", this_dimension)
+            if this_dimension == max_num_qubits:
+                print("APPENDING SPAWN STAGE")
+                spawn_stage.append('all_dimensions_learned')
+            
+        elif len(base_terms_not_present) == 0:             
+            new_models = branch_champs_by_qubit_num[
+                this_dimension
+            ]
+            ghost_branches[this_dimension] = True
+        elif len(base_terms_not_present) > 0:
+            for b in base_terms_not_present:
+                new_mod = str(
+                    mod + p_str + b
+                )
+                new_models.append(new_mod)
+    elif spawn_stage[-1] == 'all_dimensions_learned':
+        print("Final dimensional ghost branch being generated.")
+        all_champs = []
+        for v in list(branch_champs_by_qubit_num.values()):
+            all_champs.extend(v)
+        print("all champs:", all_champs)
+        new_models = all_champs
+        spawn_stage.append('nontransverse_ghost_branch_complete')
+    elif spawn_stage[-1] == 'nontransverse_ghost_branch_complete':
+        all_champs = []
+        for v in list(branch_champs_by_qubit_num.values()):
+            all_champs.extend(v)
+        try:
+            transverse_axis = fixed_axes_by_generator[
+                growth_generator
+            ]
+        except:
+            transverse_axis = fixed_axes_by_generator[
+                None
+            ]
+        all_champs = list(set(all_champs))
+
+        print("Making transverse terms out of all champs so far:",
+            all_champs
+        )
+        for champ in all_champs:
+            new_models.append(
+                ModelNames.make_term_transverse(
+                    term = champ,
+                    transverse_axis = transverse_axis
+                )
+            )
+        print("Made new models:", new_models)
+        spawn_stage.append('Complete')
+    
+    return new_models
+
+
+
 
 ##################################################################################
 ##################### Tree Finished Functions ############################################
