@@ -295,10 +295,8 @@ initial_models = {
 		['xTx', 'yTy', 'zTz'],
 	'heisenberg_nontransverse' :
 		['xTx', 'yTy', 'zTz'],
-	# 'heisenberg_transverse' :
-	# 	['xTx', 'yTy', 'zTz'],
 	'heisenberg_transverse' :
-		['xTx', 'yTy'],
+		['xTx', 'yTy', 'zTz'],
 }
 
 ##### ---------- -------------------- #####  
