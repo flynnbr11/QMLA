@@ -919,10 +919,16 @@ def heisenberg_nontransverse(
     spawn_step = kwargs['spawn_step']
     ghost_branches = kwargs['ghost_branches']
     branch_champs_by_qubit_num = kwargs['branch_champs_by_qubit_num']
-    
+    spawn_stage = kwargs['spawn_stage']
+    print("spawn stage", spawn_stage)
+    print("len:", len(spawn_stage))
+    if len(spawn_stage) == 0:
+        spawn_stage.append(0)
+    else:
+        spawn_stage.append(spawn_stage[-1]+1)
+
     new_models = []
     base_terms = initial_models[growth_generator]
-    
     
     this_dimension = DataBase.get_num_qubits(model_list[0])
     base_dimension = DataBase.get_num_qubits(base_terms[0])

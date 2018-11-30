@@ -65,6 +65,10 @@ def log_print(to_print_list, log_file):
             flush=True
         )
 
+
+# Note this should usually be False, True just for testing/some specific plots. 
+store_particles_weights = False
+
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
 num_probes = 20
@@ -327,6 +331,7 @@ for gen in generators:
     except:
         generator_initial_models[gen] = UserFunctions.initial_models[None]
 
+
 qmd = QMD(
     global_variables = global_variables, 
     initial_op_list=initial_op_list, 
@@ -336,7 +341,7 @@ qmd = QMD(
     use_time_dep_true_model = False, 
     true_params_time_dep = { 'xTi' : 0.01},
     qle=qle,
-    store_particles_weights = False,
+    store_particles_weights = store_particles_weights,
     bayes_time_binning=True, 
     qhl_plots=do_qhl_plots, 
     results_directory = results_directory,

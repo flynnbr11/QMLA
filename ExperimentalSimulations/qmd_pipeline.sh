@@ -13,8 +13,8 @@ exp_data=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
-exp=4
+prt=20
+exp=5
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -58,10 +58,11 @@ mkdir -p $long_dir
 
 # growth_rule='test_changes_to_qmd'
 use_alt_growth_rules=1 # note this is redundant locally, currently
-growth_rule='two_qubit_ising_rotation_hyperfine'
-# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# growth_rule='two_qubit_ising_rotation_hyperfine'
+growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# growth_rule='heisenberg_nontransverse'
 alt_growth_rules=(
-    'non_interacting_ising'
+#    'non_interacting_ising'
 )
 
 growth_rules_command=""
@@ -80,7 +81,6 @@ done
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
 
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
-# growth_rule='heisenberg_nontransverse'
 
 # true_operator='yTi'
 # true_operator='xTxTTiPPPiTxTTx'
