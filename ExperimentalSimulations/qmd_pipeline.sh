@@ -62,9 +62,10 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='heisenberg_nontransverse'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 growth_rule='interacting_nearest_neighbour_ising'
-growth_rule='heisenberg_transverse'
+# growth_rule='heisenberg_transverse'
 alt_growth_rules=(
     'heisenberg_transverse'
+    'interacing_nn_ising_fixed_axis'
    # 'non_interacting_ising'
 )
 

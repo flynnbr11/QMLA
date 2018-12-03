@@ -301,6 +301,7 @@ class QMD():
         self.SpawnStage = {}
 
         initial_id_counter = 0
+        models_already_added_to_a_branch = []
         for i in range(len(self.GeneratorList)):
             # to match this newly created branch with corresponding dicts filled here
             
@@ -316,20 +317,39 @@ class QMD():
             #     self.HighestModelID+num_new_models
             # ))
             self.BranchModelIds[i] = []
+            self.BranchModels[i] = []
+            self.BranchPrecomputedModels[i] = []
+            self.BranchNumModelsPreComputed[i]  = 0
+
             for mod in initial_models_this_gen:
-                self.InitialModelBranches[mod] = i
-                self.InitialModelIDs[mod] = initial_id_counter
-                self.BranchModelIds[i].append(initial_id_counter)
-                self.ModelsBranches[initial_id_counter] = i  
+                self.BranchModels[i].append(mod)
+                self.ModelsBranches[initial_id_counter] = i  # latest branch to claim it
+                self.HighestBranchID = i
+                # self.BranchModelIds[i].append(initial_id_counter)
+                if mod in models_already_added_to_a_branch:
+                    orig_mod_id = self.InitialModelIDs[mod]
+                    self.BranchModelIds[i].append(orig_mod_id)
+                    self.BranchPrecomputedModels[i].append(mod)
+                    self.BranchNumModelsPreComputed[i]+=1
+                else:
+                    self.log_print(
+                        [
+                            mod, 
+                            "not added yet. List:", 
+                            models_already_added_to_a_branch
+                        ]
+                    )
+                    self.BranchModelIds[i].append(initial_id_counter)
+                    self.InitialModelIDs[mod] = initial_id_counter
+                    self.InitialModelBranches[mod] = i
+                    models_already_added_to_a_branch.append(mod)
                 initial_id_counter += 1
+
 
             # self.HighestModelID += num_new_models
             self.BranchBayesComputed[i] = False
             self.BranchAllModelsLearned[i] = False
             self.BranchComparisonsComplete[i] = False
-            self.BranchNumModelsPreComputed[i]  = 0
-            self.BranchModels[i] = initial_models_this_gen
-            self.BranchPrecomputedModels[i] = []
 
             self.NumModelsPerBranch[i] = (
                 len(self.GeneratorInitialModels[gen])
@@ -343,9 +363,15 @@ class QMD():
             self.SpawnStage[gen] = [None]
             self.BranchGrowthRules[i] = gen
 
-        self.HighestBranchID = max(self.InitialModelBranches.values())
+        # self.HighestBranchID = max(self.InitialModelBranches.values())
         self.HighestModelID = max(self.InitialModelIDs.values())+1 # to ensure everywhere we use range(qmd.HighestModelID) goes to the right number
         self.NumModels = len(self.InitialModelIDs.keys())
+        self.log_print(
+            [
+                "After setting up initial branches, highest branch id:", 
+                self.HighestBranchID
+            ]
+        )   
 
         # print("[QMD] NumModelsPerBranch: ", self.NumModelsPerBranch)
         # print("[QMD] NumModelPairsPerBranch: ", self.NumModelPairsPerBranch)
@@ -656,8 +682,8 @@ class QMD():
             self.log_print(
                 [
                 'Model ', model, 
-                ' computed already: ', already_computed, 
-                'ID:', model_id
+                '\n\tcomputed already: ', already_computed, 
+                '\n\tID:', model_id
                 ]
             )
             num_models_already_computed_this_branch += bool(already_computed)
@@ -770,11 +796,13 @@ class QMD():
     ):
         # model_list = DataBase.model_names_on_branch(self.db, branchID)
         model_list = self.BranchModels[branchID]
-        print(
-            "learnModelFromBranchID branch", 
-            branchID,
-            ":", 
-            model_list
+        self.log_print(
+            [
+                "learnModelFromBranchID branch", 
+                branchID,
+                ":", 
+                model_list
+            ]
         )
         active_branches_learning_models = (
             self.RedisDataBases['active_branches_learning_models']
@@ -783,9 +811,15 @@ class QMD():
             self.BranchNumModelsPreComputed[branchID]
         )
 
-        print(
-            "learnModelFromBranchID.",
-            "Setting active branches on redis for branch {} to {}".format(branchID, num_models_already_set_this_branch)
+        self.log_print(
+            [
+                "learnModelFromBranchID.",
+                "Setting active branches on redis for branch",
+                branchID,
+                "to",
+                num_models_already_set_this_branch
+                
+            ]
         )
 
         active_branches_learning_models.set(
@@ -798,6 +832,12 @@ class QMD():
             set(self.BranchPrecomputedModels[branchID])
         )
 
+        self.log_print(
+            [
+            "branch", branchID,
+            "precomputed:", self.BranchPrecomputedModels[branchID]
+            ]
+        )
         if len(unlearned_models_this_branch) == 0:
             self.GhostBranchList.append(branchID) 
 
@@ -2296,7 +2336,9 @@ class QMD():
         max_spawn_depth_reached=False
         all_comparisons_complete=False
 
-        branch_ids_on_db = list(active_branches_learning_models.keys())
+        branch_ids_on_db = list(
+            active_branches_learning_models.keys()
+        )
         # print("[QMD]before while loop, branches:", branch_ids_on_db)
         # print("[QMD] self.NumModelsPerBranch:", self.NumModelsPerBranch)
 
@@ -2309,6 +2351,15 @@ class QMD():
             # print("[QMD] branches:", branch_ids_on_db)
             for branchID_bytes in branch_ids_on_db:
                 branchID = int(branchID_bytes)
+                # print(
+                #     "\n\tactive learning:",
+                #     active_branches_learning_models.get(branchID),
+                #     "\n\tnum mods on branch", 
+                #     self.NumModelsPerBranch[branchID],
+                #     "\n\tall learned:",
+                #     self.BranchAllModelsLearned[branchID]
+                # )
+
                 # print("[QMD] considering branch:", branchID)
                 if (
                     int(
@@ -2333,6 +2384,16 @@ class QMD():
                 bayes_calculated = active_branches_bayes.get(
                     branchID_bytes
                 )
+                # print(
+                #     "branch", branchID,
+                #     "\n\tbayes_calculated", bayes_calculated, 
+                #     "\n\tNumModelPairsPerBranch:",
+                #     self.NumModelPairsPerBranch[branchID],
+                #     "\n\tBranchComparisonsComplete", 
+                #     self.BranchComparisonsComplete[branchID],
+                # )
+
+
                 if (int(bayes_calculated) ==  
                     self.NumModelPairsPerBranch[branchID] and
                     self.BranchComparisonsComplete[branchID]==False
@@ -2344,7 +2405,9 @@ class QMD():
                     this_branch_growth_rule = self.BranchGrowthRules[branchID]
                     if self.TreesCompleted[this_branch_growth_rule]==False:
                         print(
-                            "not finished tree for growth:", this_branch_growth_rule)
+                            "not finished tree for growth:", 
+                            this_branch_growth_rule
+                        )
                         growth_rule_tree_complete = self.spawnFromBranch(
                             # will return True if this brings it to self.MaxSpawnDepth
                             branchID=branchID,
@@ -2435,107 +2498,107 @@ class QMD():
         self.finaliseQMD()
 
 
-    def runRemoteQMD(
-        self, 
-        num_exp=40, 
-        num_spawns=1, 
-        max_branches= None, 
-        max_num_qubits = None,
-        max_num_models=None, 
-        spawn=True,
-        just_given_models=False
-    ):
+    # def runRemoteQMD(
+    #     self, 
+    #     num_exp=40, 
+    #     num_spawns=1, 
+    #     max_branches= None, 
+    #     max_num_qubits = None,
+    #     max_num_models=None, 
+    #     spawn=True,
+    #     just_given_models=False
+    # ):
 
-        active_branches_learning_models = (
-            self.RedisDataBases['active_branches_learning_models']
-        )
-        active_branches_bayes = self.RedisDataBases['active_branches_bayes']
-        self.learnModelFromBranchID(0, blocking=False, use_rq=True)
-        max_spawn_depth_reached=False
-        all_comparisons_complete=False
+    #     active_branches_learning_models = (
+    #         self.RedisDataBases['active_branches_learning_models']
+    #     )
+    #     active_branches_bayes = self.RedisDataBases['active_branches_bayes']
+    #     self.learnModelFromBranchID(0, blocking=False, use_rq=True)
+    #     max_spawn_depth_reached=False
+    #     all_comparisons_complete=False
 
-        while max_spawn_depth_reached==False:
-            branch_ids_on_db = list(active_branches_learning_models.keys())
-            # branch_ids_on_db.remove(b'LOCKED')
-            for branchID_bytes in branch_ids_on_db:
-                branchID = int(branchID_bytes)
-                if (int(active_branches_learning_models.get(branchID)) == \
-                    self.NumModelsPerBranch[branchID] 
-                    and self.BranchAllModelsLearned[branchID]==False
-                ):
+    #     while max_spawn_depth_reached==False:
+    #         branch_ids_on_db = list(active_branches_learning_models.keys())
+    #         # branch_ids_on_db.remove(b'LOCKED')
+    #         for branchID_bytes in branch_ids_on_db:
+    #             branchID = int(branchID_bytes)
+    #             if (int(active_branches_learning_models.get(branchID)) == \
+    #                 self.NumModelsPerBranch[branchID] 
+    #                 and self.BranchAllModelsLearned[branchID]==False
+    #             ):
                     
-                    self.log_print([
-                        "All models on branch", branchID, 
-                        "have finished learning."]
-                    )
-                    self.BranchAllModelsLearned[branchID] = True
-                    self.remoteBayesFromBranchID(branchID)
+    #                 self.log_print([
+    #                     "All models on branch", branchID, 
+    #                     "have finished learning."]
+    #                 )
+    #                 self.BranchAllModelsLearned[branchID] = True
+    #                 self.remoteBayesFromBranchID(branchID)
 
-            for branchID_bytes in active_branches_bayes.keys():
+    #         for branchID_bytes in active_branches_bayes.keys():
                 
-                branchID = int(branchID_bytes)
-                bayes_calculated = active_branches_bayes.get(branchID_bytes)
-                if (int(bayes_calculated) ==  
-                    self.NumModelPairsPerBranch[branchID] and
-                    self.BranchComparisonsComplete[branchID]==False
-                ):
-                    self.BranchComparisonsComplete[branchID] = True
-                    self.compareModelsWithinBranch(branchID)
-                    max_spawn_depth_reached = self.spawnFromBranch(
-                        # will return True if this brings it to self.MaxSpawnDepth
-                        branchID,
-                        num_models=1
-                    )
+    #             branchID = int(branchID_bytes)
+    #             bayes_calculated = active_branches_bayes.get(branchID_bytes)
+    #             if (int(bayes_calculated) ==  
+    #                 self.NumModelPairsPerBranch[branchID] and
+    #                 self.BranchComparisonsComplete[branchID]==False
+    #             ):
+    #                 self.BranchComparisonsComplete[branchID] = True
+    #                 self.compareModelsWithinBranch(branchID)
+    #                 max_spawn_depth_reached = self.spawnFromBranch(
+    #                     # will return True if this brings it to self.MaxSpawnDepth
+    #                     branchID,
+    #                     num_models=1
+    #                 )
 
-            if max_spawn_depth_reached:
-                self.log_print(
-                    [
-                    "Max spawn depth reached; determining winner. \
-                    Entering while loop until all models/Bayes factors \
-                    remaining have finished."
-                    ]
-                )
-                still_learning = True
+    #         if max_spawn_depth_reached:
+    #             self.log_print(
+    #                 [
+    #                 "Max spawn depth reached; determining winner. \
+    #                 Entering while loop until all models/Bayes factors \
+    #                 remaining have finished."
+    #                 ]
+    #             )
+    #             still_learning = True
 
-                while still_learning:
-                    branch_ids_on_db = list(active_branches_learning_models.keys())
-                    # branch_ids_on_db.remove(b'LOCKED')
-                    for branchID_bytes in branch_ids_on_db:
-                        branchID = int(branchID_bytes)
-                        if ( 
-                            (int(active_branches_learning_models.get(branchID)) == 
-                            self.NumModelsPerBranch[branchID]) 
-                            and 
-                            (self.BranchAllModelsLearned[branchID]==False)
-                        ):
-                            self.BranchAllModelsLearned[branchID] = True
-                            self.remoteBayesFromBranchID(branchID)
+    #             while still_learning:
+    #                 branch_ids_on_db = list(active_branches_learning_models.keys())
+    #                 # branch_ids_on_db.remove(b'LOCKED')
+    #                 for branchID_bytes in branch_ids_on_db:
+    #                     branchID = int(branchID_bytes)
+    #                     if ( 
+    #                         (int(active_branches_learning_models.get(branchID)) == 
+    #                         self.NumModelsPerBranch[branchID]) 
+    #                         and 
+    #                         (self.BranchAllModelsLearned[branchID]==False)
+    #                     ):
+    #                         self.BranchAllModelsLearned[branchID] = True
+    #                         self.remoteBayesFromBranchID(branchID)
                             
-                        if branchID_bytes in active_branches_bayes:
-                            num_bayes_done_on_branch = (
-                                active_branches_bayes.get(branchID_bytes)
-                            )
-                            if ( int(num_bayes_done_on_branch) == 
-                                self.NumModelPairsPerBranch[branchID] and
-                                self.BranchComparisonsComplete[branchID]==False
-                            ):
-                                self.BranchComparisonsComplete[branchID] = True
-                                self.compareModelsWithinBranch(branchID)
+    #                     if branchID_bytes in active_branches_bayes:
+    #                         num_bayes_done_on_branch = (
+    #                             active_branches_bayes.get(branchID_bytes)
+    #                         )
+    #                         if ( int(num_bayes_done_on_branch) == 
+    #                             self.NumModelPairsPerBranch[branchID] and
+    #                             self.BranchComparisonsComplete[branchID]==False
+    #                         ):
+    #                             self.BranchComparisonsComplete[branchID] = True
+    #                             self.compareModelsWithinBranch(branchID)
                     
-                    if (np.all(
-                        np.array(list(self.BranchAllModelsLearned.values()))==True)
-                        and
-                        np.all(np.array(list(
-                        self.BranchComparisonsComplete.values()))==True)
-                    ):    
-                            still_learning = False # i.e. break out of this while loop
+    #                 if (np.all(
+    #                     np.array(list(self.BranchAllModelsLearned.values()))==True)
+    #                     and
+    #                     np.all(np.array(list(
+    #                     self.BranchComparisonsComplete.values()))==True)
+    #                 ):    
+    #                         still_learning = False # i.e. break out of this while loop
 
-        final_winner, final_branch_winners = self.finalBayesComparisons()        
-        self.ChampionName = final_winner
-        self.ChampID = self.pullField(name=final_winner, field='ModelID')
-        self.log_print(["Final winner = ", final_winner])
+    #     final_winner, final_branch_winners = self.finalBayesComparisons()        
+    #     self.ChampionName = final_winner
+    #     self.ChampID = self.pullField(name=final_winner, field='ModelID')
+    #     self.log_print(["Final winner = ", final_winner])
 
-        self.finaliseQMD()
+    #     self.finaliseQMD()
 
     def finaliseQMD(self):
         ### Final functions at end of QMD
