@@ -132,10 +132,10 @@ max_num_models_by_shape['two_qubit_ising_rotation'] = {
 
 max_num_models_by_shape['two_qubit_ising_rotation_hyperfine_transverse'] = {
     1 : 0,
-    (2, 1) : 2,
-    (2, 2) : 2,
+#    (2, 1) : 2,
+#    (2, 2) : 2,
     2 : 18,
-    'other' : 0
+    'other' : 1
 }
 
 ## More general Ising models
@@ -245,6 +245,7 @@ def time_required(
   )
 
   print("growth rules:", growth_rules)
+#  print("num models by shape:", max_num_models_by_shape)
   total_time_required = 0
   for gen in growth_rules:
     max_num_qubits = UserFunctions.max_num_qubits_info[
@@ -252,11 +253,13 @@ def time_required(
     ]
     for q in range(1,max_num_qubits+1):
       time_per_hamiltonian = hamiltonian_exponentiation_times[q]
-    try:
-      num_models_this_dimension = max_num_models_by_shape[gen][q]
-    except:
-      num_models_this_dimension = max_num_models_by_shape[gen]['other']
-
+      try:
+        num_models_this_dimension = max_num_models_by_shape[gen][q]
+      except:
+        num_models_this_dimension = max_num_models_by_shape[gen]['other']
+      print("Gen:", gen, "max num models for ", q, "qubits:", 
+        num_models_this_dimension
+      )
       time_this_dimension = (
         num_hamiltonians_per_model * 
         time_per_hamiltonian * 
