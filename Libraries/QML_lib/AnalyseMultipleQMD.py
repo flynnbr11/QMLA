@@ -1028,7 +1028,13 @@ def plot_scores(
         true_idx = latex_model_names.index(latex_true_op)
         colours[true_idx] = 'green'
     except:
-        print("True model", latex_true_op, "not in ", latex_model_names)
+        # print(
+        #     "[plot_scores]",
+        #     "True model", 
+        #     latex_true_op, 
+        #     "not in ", 
+        #     latex_model_names
+        # )
         # raise
         pass
 
@@ -1382,7 +1388,7 @@ if further_qhl_mode == False:
         )
     except:
         print("Could not plot histogram of Bayes factors for True model.")
-        pass
+        raise
     param_plot = str(directory_to_analyse+'sweep_param_total.png')
     param_percent_plot = str(directory_to_analyse+'sweep_param_percentage.png')
 

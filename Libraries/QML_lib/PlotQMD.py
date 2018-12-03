@@ -2845,6 +2845,13 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
             qmd_res.index
         ))
     )
+    if correct_mod not in mods:
+        print(
+            "[TrueModelBayesHistogram]",
+            "Correct model", correct_mod, 
+            "not present in", mods
+        )
+        return False
     # mods = ising_terms_rotation_hyperfine()
     # mods = UserFunctions.get_all_model_names(
     #     growth_generator = growth_generator

@@ -14,7 +14,7 @@ exp_data=0
 # QHL parameters
 ### ---------------------------------------------------###
 prt=20
-exp=5
+exp=4
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -61,9 +61,11 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='heisenberg_nontransverse'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+growth_rule='interacting_nearest_neighbour_ising'
 growth_rule='heisenberg_transverse'
 alt_growth_rules=(
-#    'non_interacting_ising'
+    'heisenberg_transverse'
+   # 'non_interacting_ising'
 )
 
 growth_rules_command=""
@@ -76,7 +78,6 @@ done
 # growth_rule='non_interacting_ising_single_axis'
 # growth_rule='deterministic_noninteracting_ising_single_axis'
 
-# growth_rule='interacting_nearest_neighbour_ising'
 # TODO interacing_nn_ising_fixed_axis BROKEN!!!
 # growth_rule='interacing_nn_ising_fixed_axis' 
 # growth_rule='deterministic_interacting_nn_ising_single_axis'

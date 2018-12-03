@@ -859,26 +859,44 @@ class QMD():
             )
 
             # print("[QMD] ModelNameIDs:", self.ModelNameIDs)
-            branchID = DataBase.model_branch_from_model_id(
-                self.db, 
-                model_id=modelID
-            )
+            # branchID = DataBase.model_branch_from_model_id(
+            #     self.db, 
+            #     model_id=modelID
+            # )
+
+            branchID = self.ModelsBranches[modelID]
+
             if self.RunParallel and use_rq:
             # i.e. use a job queue rather than sequentially doing it. 
                 from rq import Connection, Queue, Worker
-                queue = Queue(self.Q_id, connection=self.redis_conn,
-                async=self.use_rq, default_timeout=self.rq_timeout
-            ) # TODO is this timeout sufficient for ALL QMD jobs?
+                queue = Queue(
+                    self.Q_id, 
+                    connection=self.redis_conn,
+                    async=self.use_rq, 
+                    default_timeout=self.rq_timeout
+                ) # TODO is this timeout sufficient for ALL QMD jobs?
 
                 # add function call to RQ queue
                 queued_model = queue.enqueue(
                     learnModelRemote, model_name,
-                    modelID, branchID=branchID, remote=True, 
-                    host_name=self.HostName, port_number=self.PortNumber,
-                    qid=self.Q_id, log_file=self.rq_log_file, result_ttl=-1,
-                    timeout=self.rq_timeout) 
+                    modelID, 
+                    branchID=branchID, 
+                    remote=True, 
+                    host_name=self.HostName, 
+                    port_number=self.PortNumber,
+                    qid=self.Q_id, 
+                    log_file=self.rq_log_file, 
+                    result_ttl=-1,
+                    timeout=self.rq_timeout
+                ) 
                 
-                self.log_print(["Model", model_name, "added to queue."])
+                self.log_print(
+                    [
+                        "Model", 
+                        model_name, 
+                        "added to queue."
+                    ]
+                )
                 if blocking: # i.e. wait for result when called. 
                     while not queued_model.is_finished:
                         if queued_model.is_failed:
@@ -1311,13 +1329,19 @@ class QMD():
                 wait_on_result=True
             )
 
-            champ_id = self.compareModelList(max_points_branches,
+            champ_id = self.compareModelList(
+                max_points_branches,
                 bayes_threshold=bayes_threshold, 
                 models_points_dict=models_points
             )
         else: 
             champ_id = max(models_points, key=models_points.get)
-        champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        champ_id = int(champ_id)
+        # champ_name = DataBase.model_name_from_id(
+        #     self.db, 
+        #     champ_id
+        # )
+        champ_name = self.ModelNameIDs[champ_id]
         
         champ_num_qubits = DataBase.get_num_qubits(champ_name)
         self.BranchChampions[int(branchID)] = champ_id

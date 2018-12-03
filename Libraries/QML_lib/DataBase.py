@@ -1041,6 +1041,7 @@ def model_id_from_name(db, name):
 
 
 def model_name_from_id(db, model_id):
+    print("[DB] model_id:", model_id)
     return db.loc[db['ModelID']==model_id]['<Name>'].item()
 
 def index_from_name(db, name):
