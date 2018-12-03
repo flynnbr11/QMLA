@@ -325,9 +325,10 @@ class QMD():
                 self.BranchModels[i].append(mod)
                 self.ModelsBranches[initial_id_counter] = i  # latest branch to claim it
                 self.HighestBranchID = i
-                self.BranchModelIds[i].append(initial_id_counter)
+                # self.BranchModelIds[i].append(initial_id_counter)
                 if mod in models_already_added_to_a_branch:
                     orig_mod_id = self.InitialModelIDs[mod]
+                    self.BranchModelIds[i].append(orig_mod_id)
                     self.BranchPrecomputedModels[i].append(mod)
                     self.BranchNumModelsPreComputed[i]+=1
                 else:
@@ -338,6 +339,7 @@ class QMD():
                             models_already_added_to_a_branch
                         ]
                     )
+                    self.BranchModelIds[i].append(initial_id_counter)
                     self.InitialModelIDs[mod] = initial_id_counter
                     self.InitialModelBranches[mod] = i
                     models_already_added_to_a_branch.append(mod)
@@ -2346,7 +2348,7 @@ class QMD():
             branch_ids_on_db = list(
                 active_branches_learning_models.keys()
             )
-            print("[QMD] branches:", branch_ids_on_db)
+            # print("[QMD] branches:", branch_ids_on_db)
             for branchID_bytes in branch_ids_on_db:
                 branchID = int(branchID_bytes)
                 # print(

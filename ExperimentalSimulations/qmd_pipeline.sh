@@ -64,7 +64,7 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='heisenberg_transverse'
 alt_growth_rules=(
-   'heisenberg_transverse'
+#   'heisenberg_transverse'
  #  'interacing_nn_ising_fixed_axis'
    # 'non_interacting_ising'
 )
