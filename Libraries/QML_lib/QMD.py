@@ -322,6 +322,7 @@ class QMD():
             self.BranchNumModelsPreComputed[i]  = 0
 
             for mod in initial_models_this_gen:
+                mod = DataBase.alph(mod)
                 self.BranchModels[i].append(mod)
                 self.ModelsBranches[initial_id_counter] = i  # latest branch to claim it
                 self.HighestBranchID = i
@@ -586,6 +587,7 @@ class QMD():
             
     def addModel(self, model, branchID=0):
         #self.NumModels += 1
+        model = DataBase.alph(model)
         tryAddModel = DataBase.add_model(
             model_name = model,
             running_database = self.db,
@@ -622,10 +624,20 @@ class QMD():
                 self.HighestQubitNumber = DataBase.get_num_qubits(model)
 
         # retrieve model_id from database? or somewhere
-        model_id = DataBase.model_id_from_name(
-            db = self.db, 
-            name = model    
-        )
+        try:
+            model_id = DataBase.model_id_from_name(
+                db = self.db, 
+                name = model    
+            )
+        except:
+            self.log_print(
+                [
+                    "Couldn't find model id for model:", model,
+                    "model_names_ids:", 
+                    self.ModelNameIDs
+                ]
+            )
+            raise
 
         add_model_output = {
             'is_new_model' : tryAddModel, 
@@ -763,7 +775,11 @@ class QMD():
         if model in list(self.db['<Name>']):
             model_exists = True
         elif model in list(self.legacy_db['<Name>']):
-            print("Model ", model, " previously considered and retired.")
+            print(
+                "Model ", 
+                model, 
+                "previously considered and retired."
+            )
         
         has_model_finished = self.pullField(name=model, field='Completed')
         
@@ -2090,6 +2106,9 @@ class QMD():
             current_champs = current_champs,
             spawn_stage = self.SpawnStage[growth_rule]
         )
+
+        new_models = [DataBase.alph(mod) for mod in new_models]
+
         print(
             "After model generation for growth rule", 
             growth_rule, 
