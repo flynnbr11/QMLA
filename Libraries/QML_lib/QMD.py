@@ -1361,8 +1361,10 @@ class QMD():
                 field='Status',
                 new_value='Deactivated'
             )
+
         self.updateModelRecord(
-            name=DataBase.model_name_from_id(self.db, champ_id),
+            # name=DataBase.model_name_from_id(self.db, champ_id),
+            name=self.ModelNameIDs[champ_id],
             field='Status', 
             new_value='Active'
         )
@@ -1468,7 +1470,11 @@ class QMD():
             )
             self.log_print(["Recompute Bayes bw:"])
             for i in max_points_branches:
-                self.log_print([DataBase.model_name_from_id(self.db, i)])
+                self.log_print(
+                    [
+                        DataBase.model_name_from_id(self.db, i)
+                    ]
+                )
             self.log_print(["Points:\n", models_points])
             self.remoteBayesFromIDList(
                 model_id_list=max_points_branches,
@@ -1481,7 +1487,8 @@ class QMD():
         else: 
             self.log_print(["After comparing list:", models_points])
             champ_id = max(models_points, key=models_points.get)
-        champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        # champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        champ_name = self.ModelNameIDs[champ_id]
         
         return champ_id
     
@@ -1839,10 +1846,12 @@ class QMD():
             )
         else: 
             champ_id = max(branch_champions_points, key=branch_champions_points.get)
-        champ_name = DataBase.model_name_from_id(self.db, champ_id)
-        
+        # champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        champ_name = self.ModelNameIDs[champ_id]
+
         branch_champ_names = [
-            DataBase.model_name_from_id(self.db, mod_id) 
+            # DataBase.model_name_from_id(self.db, mod_id) 
+            self.ModelNameIDs[mod_id]            
             for mod_id in active_models
         ]
         self.statusChangeModel(
@@ -1946,10 +1955,12 @@ class QMD():
                 branch_champions_points, 
                 key=branch_champions_points.get
             )
-        champ_name = DataBase.model_name_from_id(self.db, champ_id)
-        
+        # champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        champ_name = self.ModelNameIDs[champ_id]
+
         branch_champ_names = [
-            DataBase.model_name_from_id(self.db, mod_id)  
+            # DataBase.model_name_from_id(self.db, mod_id)  
+            self.ModelNameIDs[mod_id]
             for mod_id in champions_of_branches
         ]
         self.statusChangeModel(
@@ -1993,7 +2004,8 @@ class QMD():
                         self.champions_points[mod2]+=1
         self.ranked_champions = sorted(self.champions_points, reverse=True)
         champ_id = max(self.champions_points, key=self.champions_points.get)
-        champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        # champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        champ_name = self.ModelNameIDs[champ_id]
         self.log_print(["Champion of Champions is",  champ_name])
         
     def spawnFromBranch(
@@ -2014,8 +2026,9 @@ class QMD():
         )
         best_models = self.BranchRankings[branchID][:num_models]
         best_model_names = [
-            DataBase.model_name_from_id(self.db, mod_id) for
-            mod_id in best_models 
+            # DataBase.model_name_from_id(self.db, mod_id) for
+            self.ModelNameIDs[mod_id]
+            for mod_id in best_models 
         ]
         # new_models = ModelGeneration.new_model_list(
         current_champs = [
