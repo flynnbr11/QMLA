@@ -878,6 +878,13 @@ class QMD():
                 use_rq=use_rq, 
                 blocking=blocking
             )
+            if blocking is True:
+                self.log_print(
+                    [
+                        "Blocking on; model finished:", 
+                        model_name
+                    ]
+                )
             self.updateModelRecord(
                 field='Completed', 
                 name=model_name, 
@@ -934,7 +941,8 @@ class QMD():
 
                 # add function call to RQ queue
                 queued_model = queue.enqueue(
-                    learnModelRemote, model_name,
+                    learnModelRemote, 
+                    model_name,
                     modelID, 
                     branchID=branchID, 
                     remote=True, 
@@ -953,16 +961,30 @@ class QMD():
                         "added to queue."
                     ]
                 )
-                if blocking: # i.e. wait for result when called. 
+                if blocking is True: # i.e. wait for result when called. 
+                    self.log_print(
+                        [
+                            "Blocking, ie waiting for",
+                            model_name, 
+                            "to finish on redis queue." 
+                        ]
+                    )
                     while not queued_model.is_finished:
                         if queued_model.is_failed:
                             self.log_print(["Model", model_name, 
                                 "has failed on remote worker"]
                             )
                             break
+                        # print(
+                        #     "in while loop for model", 
+                        #     model_name,
+                        #     "finished:", 
+                        #     queued_model.is_finished
+                        # )
+
                         time.sleep(0.1)
                     self.log_print(
-                    ['Blocking RQ model learned:', model_name]
+                        ['Blocking RQ model learned:', model_name]
                     )
 
             else:
@@ -1132,16 +1154,21 @@ class QMD():
                         )
                     elif unique_id in self.BayesFactorsComputed: 
                         # if this already computed, so we need to tell this branch not to wait on it. 
-                        self.log_print(
-                            [
-                                "BF already computed for pair ", 
-                                unique_id
-                            ]
-                        )
                         active_branches_bayes.incr(
                             int(branchID), 
                             1
                         )
+                        self.log_print(
+                            [
+                                "BF already computed for pair ", 
+                                unique_id,
+                                "now active branches bayes, br", 
+                                branchID,
+                                ":", 
+                                active_branches_bayes[branchID]
+                            ]
+                        )
+
 
     def blockingQMD(self):
         self.learnModelNameList(model_name_list=self.InitialOpList, 
@@ -2344,14 +2371,58 @@ class QMD():
         )
         active_branches_bayes = self.RedisDataBases['active_branches_bayes']
 
-        for i in list(self.BranchModels.keys()):
-            # print("[QMD runMult] launching branch ", i)
-            # ie initial branches
-            self.learnModelFromBranchID(
-                i, 
-                blocking=False, 
-                use_rq=True
-            )
+        print("[QMD] Going to learn initial models from branches.")
+        
+
+        if self.NumTrees > 1:
+            for i in list(self.BranchModels.keys()):
+                # print("[QMD runMult] launching branch ", i)
+                # ie initial branches
+                self.learnModelFromBranchID(
+                    i, 
+                    blocking=False, 
+                    use_rq=True
+                )
+                while(
+                    int(active_branches_learning_models.get(i))
+                        < self.NumModelsPerBranch[i] 
+                ):
+                    sleep(0.1) # don't do comparisons till all models on this branch are done
+                    # print("num models learned on br", i, 
+                    #     ":", int(active_branches_learning_models[i])
+                    # )
+                self.BranchAllModelsLearned[i] = True
+                self.remoteBayesFromBranchID(i)
+                while (
+                    int(active_branches_bayes.get(i))
+                        < self.NumModelPairsPerBranch[i]
+                ):#bayes comparisons not done
+                    # print(
+                    #     "num comparisons complete br", i, 
+                    #     ":", int(active_branches_bayes[i]),
+                    #     "should be", 
+                    #     self.NumModelPairsPerBranch[i]
+                    # )
+                    sleep(0.1)
+                # self.BranchComparisonsComplete[i] = True
+                self.log_print(
+                    [
+                        "Models computed and compared for branch", 
+                        i
+                    ]
+                )
+        else:
+            for i in list(self.BranchModels.keys()):
+                # print("[QMD runMult] launching branch ", i)
+                # ie initial branches
+                self.learnModelFromBranchID(
+                    i, 
+                    blocking=False, 
+                    use_rq=True
+                )
+
+
+
         max_spawn_depth_reached=False
         all_comparisons_complete=False
 
@@ -2360,7 +2431,11 @@ class QMD():
         )
         # print("[QMD]before while loop, branches:", branch_ids_on_db)
         # print("[QMD] self.NumModelsPerBranch:", self.NumModelsPerBranch)
-
+        self.log_print(
+            [
+                "Entering while loop of spawning/comparing."
+            ]
+        )
         # while max_spawn_depth_reached==False:
         while self.NumTreesCompleted < self.NumTrees:
             
@@ -2414,8 +2489,9 @@ class QMD():
 
 
                 if (int(bayes_calculated) ==  
-                    self.NumModelPairsPerBranch[branchID] and
-                    self.BranchComparisonsComplete[branchID]==False
+                        self.NumModelPairsPerBranch[branchID] 
+                    and
+                        self.BranchComparisonsComplete[branchID]==False
                 ):
                     self.BranchComparisonsComplete[branchID] = True
                     self.compareModelsWithinBranch(branchID)
@@ -2485,10 +2561,10 @@ class QMD():
                     num_bayes_done_on_branch = (
                         active_branches_bayes.get(branchID_bytes)
                     )
-                    print(
-                        "branch", branchID, 
-                        "num complete:", num_bayes_done_on_branch
-                    )
+                    # print(
+                    #     "branch", branchID, 
+                    #     "num complete:", num_bayes_done_on_branch
+                    # )
                     if ( int(num_bayes_done_on_branch) == 
                         self.NumModelPairsPerBranch[branchID] and
                         self.BranchComparisonsComplete[branchID]==False

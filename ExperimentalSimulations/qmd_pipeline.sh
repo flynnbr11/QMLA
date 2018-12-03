@@ -5,7 +5,7 @@ test_description="qmd_runs"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=10
+num_tests=1
 qhl_test=0
 do_further_qhl=0
 exp_data=0
@@ -127,7 +127,7 @@ if (( $qhl_test == 1 )) # For QHL test always do without rq
 then
     use_rq=0
 fi
-use_rq=0
+use_rq=1
 # let bt="$exp-1"
 let bt="$exp"
 
@@ -233,7 +233,7 @@ python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
 " > $analyse_script
 
 chmod a+x $analyse_script
-sh $analyse_script
+# sh $analyse_script
 
 if (( $do_further_qhl == 1 )) 
 then
