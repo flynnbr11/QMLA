@@ -8,7 +8,7 @@ test_description="qmd_runs"
 num_tests=1
 qhl_test=0
 do_further_qhl=0
-exp_data=0
+exp_data=1
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -64,7 +64,7 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='heisenberg_transverse'
 alt_growth_rules=(
-    'heisenberg_transverse'
+#    'heisenberg_transverse'
 #    'interacing_nn_ising_fixed_axis'
    # 'non_interacting_ising'
 )
@@ -127,7 +127,7 @@ if (( $qhl_test == 1 )) # For QHL test always do without rq
 then
     use_rq=0
 fi
-use_rq=1
+use_rq=0
 # let bt="$exp-1"
 let bt="$exp"
 
