@@ -1171,7 +1171,6 @@ class modelClassForRemoteBayesFactor():
         self.log_likelihood = learned_model_info['log_total_likelihood']
         
         log_identifier = str("Bayes "+str(self.ModelID)) 
-        
                 
         self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList,
             modelparams=self.SimParams_Final, 

@@ -53,6 +53,8 @@ set_uniform_prior_specific_terms = {
 }
 
 set_true_params = {
+	'a' : 0.44, 
+	's' : 0.44
 	# 'xTi' : 0.7538085315,
 	# 'yTi' : 8.4442484,
 	# 'zTi' : 5.713337168736279,

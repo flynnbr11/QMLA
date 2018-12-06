@@ -8,7 +8,7 @@ test_description="qmd_runs"
 num_tests=1
 qhl_test=0
 do_further_qhl=0
-exp_data=1
+exp_data=0
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -62,9 +62,10 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='heisenberg_nontransverse'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 growth_rule='interacting_nearest_neighbour_ising'
+# growth_rule='hubbard'
 # growth_rule='heisenberg_transverse'
 alt_growth_rules=(
-#    'heisenberg_transverse'
+   'heisenberg_transverse'
 #    'interacing_nn_ising_fixed_axis'
    # 'non_interacting_ising'
 )
@@ -142,7 +143,7 @@ param_min=0
 param_max=1
 param_mean=0.5
 param_sigma=0.25
-rand_true_params=1
+rand_true_params=0
 # rand_prior:
 # if set to False (0), then uses any params specically 
 # set in SetQHLParams dictionaries.

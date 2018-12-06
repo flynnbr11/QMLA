@@ -80,10 +80,10 @@ def sigmay():
     return np.array([[0+0.j, 0-1.j], [0+1.j, 0+0.j]])
 
 def addition():
-    return (sigmax() + 1.j * sigmay())/2
+    return np.array([[0+0.j, 1+0.j], [0+0.j, 0+0.j]])
 
 def subtraction():
-    return (sigmax() - 1.j * sigmay())/2
+    return np.array([[0+0.j, 0+0.j], [1+0.j, 0+0.j]])
 
 
 # global core_operator_dict
@@ -103,8 +103,8 @@ core_terms_no_identity = copy.copy(
     list(core_operator_dict.keys())).remove('i')
 pauli_cores_with_identity = ['x', 'y', 'z', 'i']
 pauli_cores_no_identity = ['x', 'y', 'z']
-hubbard_cores_with_identity = ['a', 's', 'i']
-hubbard_cores_no_identity = ['a', 's']
+plus_basis_with_identity = ['a', 's', 'i']
+plus_basis_no_identity = ['a', 's']
 
 """
 ------ ------ Operator Class ------ ------
