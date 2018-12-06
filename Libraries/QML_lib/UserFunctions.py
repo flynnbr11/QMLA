@@ -87,7 +87,7 @@ default_true_operators_by_generator = {
     'deterministic_transverse_ising_nn_fixed_axis' : 'zTiPPiTzPPxTx',
     'heisenberg_nontransverse' : 'xTxPPzTz',
     'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi',
-    'hubbard' : 'aPs'
+    'hubbard' : 'h_1_2_d2'
 }
 
 fixed_axis_generators = [
@@ -239,6 +239,8 @@ latex_naming_functions = {
 		ModelNames.latex_name_ising, 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		ModelNames.latex_name_ising, 
+	'hubbard': 
+		ModelNames.hubbard_latex, #TODO write a latex name fnc for Hubbard type models
 	# None : 
 	# 	ModelNames.default_latex_wrapping,
 	# 'test_return_champs' :
@@ -398,9 +400,12 @@ def get_latex_name(
 		latex_mapping = latex_naming_functions[growth_generator]
 		latex_representation = latex_mapping(name, **kwargs)
 	except:
+		
 		latex_mapping = latex_naming_functions[None]
+		print("In except of get_latex_name, mapping:", latex_mapping)
 		latex_representation = latex_mapping(name, **kwargs)
-	# print("Latex Mapping used", latex_mapping)
+		
+	print("Latex Mapping used", latex_mapping)
 
 	return latex_representation
 

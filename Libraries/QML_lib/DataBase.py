@@ -273,24 +273,30 @@ def get_num_qubits(name):
     """
     Parse string and determine number of qubits this operator acts on. 
     """
+    # TODO this function only supports Pauli and hopping types, should be generalised..
+    t_str, p_str, max_t, max_p = get_t_p_strings(name)
+    individual_terms = get_constituent_names_from_name(name)
+    for term in individual_terms:
+        if term[0] == 'h':
+            terms = term.split('_')
+            dim_term = terms[-1]
+            dim = int(dim_term[1:])
+            num_qubits = dim
+            return num_qubits
+    # if hopping term wasn't found in individual terms
     max_t_found = 0 
     t_str=''
     while name.count(t_str+'T')>0:
         t_str=t_str+'T'
-
     num_qubits = len(t_str) + 1
+
     return num_qubits
 
 def get_constituent_names_from_name(name):
     t_str, p_str, max_t, max_p = get_t_p_strings(name)
-    # core_operator_dict = {
-    #     'i' : np.eye(2), 
-    #     'x' : sigmax(), 
-    #     'y' : sigmay(), 
-    #     'z' : sigmaz()
-    # }
     if(max_t >= max_p):
-        # if more T's than P's in name, it has only one constituent. 
+        # if more T's than P's in name, 
+        # it has only one constituent. 
         return [name]
     else: 
         # More P's indicates a sum at the highest dimension. 
@@ -412,11 +418,13 @@ def empty_array_of_same_dim(name):
     Parse name to find size of system it acts on. 
     Produce an empty matrix of that dimension and return it. 
     """
-    t_str=''
-    while name.count(t_str+'T')>0:
-        t_str=t_str+'T'
+    # t_str=''
+    # while name.count(t_str+'T')>0:
+    #     t_str=t_str+'T'
 
-    num_qubits = len(t_str) +1
+    # num_qubits = len(t_str) +1
+    # dim = 2**num_qubits
+    num_qubits = get_num_qubits(name)
     dim = 2**num_qubits
     empty_mtx = np.zeros([dim, dim], dtype=np.complex128)
     return empty_mtx
@@ -592,14 +600,61 @@ def compute(inp):
     max_m, m_str = find_max_letter(inp, "M")
 
     if(max_m == 0 and max_t==0 and max_p == 0):
-        pauli_symbol = inp
-        return core_operator_dict[pauli_symbol] 
+        basic_operator = inp
+        # return core_operator_dict[basic_operator] 
+        return process_basic_operator(basic_operator)
     elif max_m > max_t:
         return compute_m(inp)
     elif max_t >= max_p:
         return compute_t(inp)
     else:
         return compute_p(inp)    
+
+def process_basic_operator(basic_operator):
+    # print("Processing basic opeator", basic_operator)
+    if basic_operator[0] == 'h':
+        mtx = hopping_matrix(basic_operator)
+    else:
+        mtx = core_operator_dict[basic_operator]
+
+    return mtx
+
+def hopping_matrix(term):
+    from ModelNames import full_model_string
+    split_term = term.split('_')
+    sites = []
+    for i in split_term:
+        if i[0] == 'd':
+            dim = int(i[1])
+        elif i != 'h': 
+            sites.append(int(i))
+    if max(sites) > dim:
+        raise ValueError(
+            "Hopping term", 
+            term, 
+            "has site index", 
+            max(sites), 
+            "higher than the dimension", 
+            dim
+        )
+    
+    term_1 = []
+    term_2  = []
+    
+    term_1.append((sites[0], 'a'))
+    term_1.append((sites[1], 's'))
+    term_2.append((sites[1], 'a'))
+    term_2.append((sites[0], 's'))
+
+    terms = [term_1, term_2]
+    op_dict = {
+        'dim' : dim, 
+        'terms' : terms
+    }
+    full_name = full_model_string(op_dict)
+    mtx = DataBase.operator(full_name).matrix
+    return mtx
+
 
 def ideal_probe(name):
     """
@@ -629,18 +684,18 @@ Initial distribution to sample from, normal_dist
 #TODO: change mean and var?
 normal_dist_width = 0.25
 
-"""
-QML parameters
-#TODO: maybe these need to be changed
-"""
-n_particles = 2000
-n_experiments = 300
-#true_operator_list = [sigmax(), sigmay()]
-true_operator_list = np.array([sigmax(), sigmay()])
+# """
+# QML parameters
+# #TODO: maybe these need to be changed
+# """
+# n_particles = 2000
+# n_experiments = 300
+# #true_operator_list = [sigmax(), sigmay()]
+# true_operator_list = np.array([sigmax(), sigmay()])
 
-#xtx = operator('xTx')
-ytz = operator('yTz')
-true_operator_list = np.array([ ytz.matrix] )
+# #xtx = operator('xTx')
+# ytz = operator('yTz')
+# true_operator_list = np.array([ ytz.matrix] )
 
 
 def launch_db(
@@ -886,7 +941,7 @@ def add_model(
             'Completed' : False, 
             'branchID' : int(branchID), #TODO make argument of add_model fnc,
             # 'Param_Estimates' : sim_pars,
-            'Estimates_Dist_Width' : normal_dist_width,
+            # 'Estimates_Dist_Width' : normal_dist_width,
             'Reduced_Model_Class_Instance' : reduced_qml_instance, 
             'Operator_Instance' : op,
             'Epoch_Start' : 0, #TODO fill in

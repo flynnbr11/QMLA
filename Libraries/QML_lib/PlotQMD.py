@@ -2277,7 +2277,9 @@ def parameterEstimates(
     name = mod.Name
         
     if name not in list(qmd.ModelNameIDs.values()):
-        print("True model ", name, " not in studied models", 
+        print(
+            "True model ", name, 
+            "not in studied models", 
             list(qmd.ModelNameIDs.values())
         )
         return False
@@ -2351,6 +2353,7 @@ def parameterEstimates(
             name = term,
             growth_generator = qmd.GrowthGenerator
         )
+        print("[pQMD] latex_term:", latex_term)
         ax.scatter(
             x,
             y, 
@@ -2359,6 +2362,7 @@ def parameterEstimates(
             color=colour
         )
 #        ax.set_yscale('symlog')
+        print("[pQMD] scatter done" )
         ax.fill_between(
             x, 
             y+s, 
@@ -2367,6 +2371,7 @@ def parameterEstimates(
             facecolor=colour
 
         )
+        print("[pQMD] fill between done")
 #        ax.legend(loc=1)
         axes_so_far += 1
         col += 1
@@ -2374,6 +2379,7 @@ def parameterEstimates(
             col=0
             row+=1
         ax.set_title(str(latex_term))
+        print("[pQMD] title set")
 
 #    ax = plt.subplot(111)
     # plt.xlabel('Epoch')
@@ -2387,7 +2393,9 @@ def parameterEstimates(
     # )
 
     if save_to_file is not None:
+        print("saving to file")
         plt.savefig(save_to_file, bbox_inches='tight')
+    print("[pQMD] complete")
 
 
 ### Radar Plot ###
@@ -3317,7 +3325,7 @@ def cluster_results_and_plot(
     replot_expectation_values(
         params_dictionary_list = all_clusters_params, # list of params_dicts 
         model_descriptions = all_clusters_descriptions,
-        true_expec_vals_path = true_expec_path ,
+        true_expec_vals_path = true_expec_path,
         plot_probe_path =plot_probe_path, 
         growth_generator = growth_generator,
         measurement_method = measurement_type,

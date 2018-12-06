@@ -25,6 +25,7 @@ __pycache__/
 
 ParallelDevelopment/*
 ExperimentalSimulations/*
+DevelopmentNotebooks/*
 
 # But want redis configuration:
 !Libraries/QML_lib/RedisConfig.conf

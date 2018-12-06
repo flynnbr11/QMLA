@@ -373,10 +373,14 @@ if global_variables.qhl_test:
     if global_variables.save_plots:
         
         print("Plotting things")
-        qmd.plotParameterEstimates(true_model=True, 
-            save_to_file= str(global_variables.plots_directory+
-            'qhl_parameter_estimates_'+ str(global_variables.long_id) +
-            '.png')
+        qmd.plotParameterEstimates(
+            true_model=True, 
+            save_to_file= str(
+                global_variables.plots_directory+
+                'qhl_parameter_estimates_'+ 
+                str(global_variables.long_id) +
+                '.png'
+            )
         )
 
         qmd.plotVolumeQHL(

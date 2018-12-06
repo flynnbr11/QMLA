@@ -2971,7 +2971,10 @@ class QMD():
             save_to_file=save_to_file
         )
         
-    def plotParameterEstimates(self, model_id=0, true_model=False, 
+    def plotParameterEstimates(
+        self, 
+        model_id=0, 
+        true_model=False, 
         save_to_file=None
     ):
     
