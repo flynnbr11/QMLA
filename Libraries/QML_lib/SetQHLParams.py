@@ -11,7 +11,20 @@ def MIN_PARAM():
 def MAX_PARAM():
 	return -50
 
-### SET VALUES HERE ###
+### SET VALUES HERE ####
+
+set_experimental_data_prior_specific_terms = {
+	'xTi' : [4.0, 1.5],
+	'yTi' : [4.0, 1.5],
+	'zTi' : [4.0, 1.5],
+	'xTx' : [4.0, 1.5],
+	'yTy' : [4.0, 1.5],
+	'zTz' : [4.0, 1.5],
+	'xTy' : [4.0, 1.5],
+	'xTz' : [4.0, 1.5],
+	'yTz' : [4.0, 1.5],
+}
+
 set_normal_prior_specific_terms = {
 	# 'x' : [5.0, 2.0],
 	# 'z' : [5.0, 2.0],
@@ -131,12 +144,12 @@ def create_qhl_params(
 def create_prior(
 	true_op, 
 	gaussian, # whether to use normal or uniform prior
+	exp_data=False,
 	pickle_file=None,
 	random_vals=False, 
 	sigma=1.5,
 	rand_min=None, 
 	rand_max=None,
-	exp_data=0
 ):
 #	terms = DataBase.get_constituent_names_from_name(true_op)
 	
@@ -150,10 +163,12 @@ def create_prior(
 	# print("[SetParams] min/max", rand_min, rand_max)
 	# print("[SetParams] Gaussian:", gaussian)
 
-	if gaussian ==  True:
+	# TODO should there be an experimental uniform option?
+	if exp_data is True:
+		set_prior_specific_terms = set_experimental_data_prior_specific_terms
+	elif gaussian ==  True:
 		set_prior_specific_terms = set_normal_prior_specific_terms
 	else:
-
 		set_prior_specific_terms = set_uniform_prior_specific_terms
 
 	specific_terms = {}
