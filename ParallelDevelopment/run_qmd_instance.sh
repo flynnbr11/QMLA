@@ -99,6 +99,11 @@ fi
 
 printf "In RUN script: $ALT_GROWTH" > $QMD_LOG
 
+if (( "$MULTIPLE_GROWTH_RULES" == 0))
+then
+	ALT_GROWTH=""
+fi
+
 
 sleep 5
 cd $script_dir

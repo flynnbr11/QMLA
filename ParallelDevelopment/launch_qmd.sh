@@ -1,17 +1,18 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="test_pass_multiple_growth_rules"
+#test_description="check_crash_hyperfine_growth_rule"
+test_description="transverse_QMD_optimal_pgh"
 
 ## Script essentials
-num_tests=2
+num_tests=30
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
 min_id=0 # update so instances don't clash and hit eachother's redis databases
-experimental_data=0 # use experimental data -> 1; use fake data ->0
+experimental_data=1 # use experimental data -> 1; use fake data ->0
 
 # QHL parameters
-p=40 # particles
-e=10 # experiments
+p=3000 # particles
+e=1000 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -25,8 +26,8 @@ op='xTxTTiPPPiTxTTx'
 # QMD settings
 #dataset='NVB_HahnPeaks_Newdata'
 #dataset='NV05_HahnEcho02'
-dataset='NVB_dataset.p'
-#dataset='NVB_rescale_dataset.p'
+#dataset='NVB_dataset.p'
+dataset='NVB_rescale_dataset.p'
 #dataset='NV05_dataset.p'
 sim_measurement_type='full_access'
 exp_measurement_type='hahn' # to use if not experimental
@@ -37,31 +38,30 @@ data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
 top_number_models=3 # how many models to perform further QHL for
 further_qhl_resource_factor=1
-growth_rule='two_qubit_ising_rotation_hyperfine'
+#growth_rule='two_qubit_ising_rotation_hyperfine'
 #growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 #growth_rule='non_interacting_ising_single_axis'
 #growth_rule='non_interacting_ising'
 #growth_rule='deterministic_noninteracting_ising_single_axis'
-#growth_rule='interacting_nearest_neighbour_ising'
+growth_rule='interacting_nearest_neighbour_ising'
 #growth_rule='interacing_nn_ising_fixed_axis'
 #growth_rule='deterministic_interacting_nn_ising_single_axis'
 #growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 #growth_rule='heisenberg_nontransverse'
+#growth_rule='heisenberg_transverse'
 
+multiple_growth_rules=1 # NOTE this is being manually passed to CalculateTimeRequired below #TODO make it acceot this arg
 alt_growth_rules=(
-	'non_interacting_ising'
+#	'non_interacting_ising'
+	'heisenberg_transverse'
 )
-
 growth_rules_command=""
 for item in ${alt_growth_rules[*]}
 do
     growth_rules_command+=" -agr $item" 
 done
-echo "GROWTH COMMAND: $growth_rules_command"
 
-
-
-do_plots=1
+do_plots=0
 pickle_class=0
 custom_prior=1
 
@@ -77,8 +77,9 @@ random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
 if (( "$experimental_data" == 1))
 then
 	measurement_type=$exp_measurement_type
-	rp=0.3
-#	growth_rule='two_qubit_ising_rotation_
+	rp=1.0
+	multiple_growth_rules=0
+#	growth_rule='two_qubit_ising_rotation_hyperfine'
 	growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 	op='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 else
@@ -94,7 +95,7 @@ fi
 
 if (( "$experimental_data" == 0 ))
 then	
-	rp=1.0
+	rp=0.75
 fi
 
 
@@ -151,6 +152,11 @@ $rt
 
 declare -a pgh_values=(
 $rp
+#0.3
+#0.5
+#0.75
+#1.0
+#1.5
 )
 
 declare -a particle_counts=(
@@ -211,6 +217,7 @@ qmd_env_var="QMD_TIME"
 qhl_env_var="QHL_TIME"
 python3 ../Libraries/QML_lib/CalculateTimeRequired.py \
 	-ggr=$growth_rule \
+	-use_agr=$multiple_growth_rules \
 	$growth_rules_command \
 	-e=$e \
 	-p=$p \
@@ -221,7 +228,7 @@ python3 ../Libraries/QML_lib/CalculateTimeRequired.py \
 	-qmdtenv="QMD_TIME" \
 	-qhltenv="QHL_TIME" \
 	-fqhltenv="FQHL_TIME" \
-	-mintime=1000
+	-mintime=1300
 
 source $time_required_script
 qmd_time=$QMD_TIME
@@ -264,7 +271,7 @@ do
 							this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
 							printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd \n" >> QMD_all_tasks.log
 
-							qsub -v QMD_ID=$qmd_id,OP="$op",QHL=$qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,RESOURCE_REALLOCATION=$resource_reallocation,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+							qsub -v QMD_ID=$qmd_id,OP="$op",QHL=$qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,RESOURCE_REALLOCATION=$resource_reallocation,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
 
 						done
 					done
@@ -353,6 +360,6 @@ sh $finalise_qmd_script
 let max_seconds_reqd="$seconds_reqd + 15"
 chmod a+x $monitor_script
 chmod a+x $finalise_qmd_script
-# qsub -l walltime=00:00:$max_seconds_reqd,nodes=1:ppn=1 -N monitor_$test_description -o $OUT_LOG/monitor_output.txt -e $OUT_LOG/monitor_error.txt $monitor_script
+#qsub -l walltime=00:00:$max_seconds_reqd,nodes=1:ppn=1 -N monitor_$test_description -o $OUT_LOG/monitor_output.txt -e $OUT_LOG/monitor_error.txt $monitor_script
 
 
