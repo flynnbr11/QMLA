@@ -265,11 +265,12 @@ def hahn_evolution(
     even_time_split = False
     if even_time_split:
 
-        unitary_time_evolution = h.exp_ham(
-            ham, 
-            t,
-            precision=precision
-        )
+        # unitary_time_evolution = h.exp_ham(
+        #     ham, 
+        #     t,
+        #     precision=precision
+        # )
+        unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
 
         total_evolution = np.dot(
             unitary_time_evolution,
@@ -277,8 +278,23 @@ def hahn_evolution(
                   unitary_time_evolution)
         )
     else:
-        first_unitary_time_evolution = h.exp_ham(ham, t, precision=precision)
-        second_unitary_time_evolution = h.exp_ham(ham, 2*t, precision=precision)
+        # TODO revisit custom exponentiation function and match with Qutip.
+        # first_unitary_time_evolution = h.exp_ham(
+        #     ham, 
+        #     t, 
+        #     precision=precision
+        # )
+        # second_unitary_time_evolution = h.exp_ham(
+        #     ham, 
+        #     2*t, 
+        #     precision=precision
+        # )
+
+        first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
+        second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
+
+
+
         total_evolution = np.dot(
             second_unitary_time_evolution,
             np.dot(inversion_gate,

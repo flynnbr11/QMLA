@@ -87,7 +87,7 @@ default_true_operators_by_generator = {
     'deterministic_transverse_ising_nn_fixed_axis' : 'zTiPPiTzPPxTx',
     'heisenberg_nontransverse' : 'xTxPPzTz',
     'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi',
-    'hubbard' : 'h_1_2_d2'
+    'hubbard' : 'h_1_2_d3PPh_1_3_d3PPh_2_3_d3'
 }
 
 fixed_axis_generators = [
