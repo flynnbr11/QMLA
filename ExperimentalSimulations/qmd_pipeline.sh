@@ -8,7 +8,7 @@ test_description="qmd_runs"
 num_tests=1
 qhl_test=0
 do_further_qhl=0
-exp_data=0
+exp_data=1
 
 ### ---------------------------------------------------###
 # QHL parameters

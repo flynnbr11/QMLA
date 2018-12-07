@@ -1393,6 +1393,13 @@ class QMD():
                     res = self.processRemoteBayesPair(a=mod1, b=mod2)
                     
                     models_points[res] += 1
+                    self.log_print(
+                        [
+                            "[compareModelsWithinBranch {}]".format(branchID),
+                            "Point to", res, 
+                            "(comparison {}/{})".format(mod1, mod2) 
+                        ]
+                    )
                     # if res == "a":
                     #     models_points[mod1] += 1
                     #     losing_model_id = mod2
@@ -1551,7 +1558,13 @@ class QMD():
 
                     res = self.processRemoteBayesPair(a=mod1, b=mod2)
                     models_points[res] += 1
-
+                    self.log_print(
+                        [
+                            "[compareModelList]",
+                            "Point to", res ,
+                            "(comparison {}/{})".format(mod1, mod2) 
+                        ]
+                    )
                     # if res == "a":
                     #     models_points[mod1] += 1
                     #     if models_points_dict is not None: 
@@ -1561,12 +1574,12 @@ class QMD():
                     #     if models_points_dict is not None: 
                     #         models_points_dict[mod2]+=1
 
-                    self.log_print(
-                        [
-                        "comparison bw", mod1, mod2, 
-                        "point to", res
-                        ]
-                    )
+                    # self.log_print(
+                    #     [
+                    #     "comparison bw", mod1, mod2, 
+                    #     "point to", res
+                    #     ]
+                    # )
 
         max_points = max(models_points.values())
         max_points_branches = [key for key, val in models_points.items() 
@@ -1934,6 +1947,13 @@ class QMD():
                         a=mod1, 
                         b=mod2
                     )
+                    self.log_print(
+                        [
+                            "[finalBayesComparisons]",
+                            "Point to", res, 
+                            "(comparison {}/{})".format(mod1, mod2) 
+                        ]
+                    )
 
                     branch_champions_points[res] += 1
                     # if res == "a":
@@ -2048,6 +2068,14 @@ class QMD():
                         b=mod2
                     )
                     branch_champions_points[res] += 1
+                    self.log_print(
+                        [
+                            "[interBranchChampion]",
+                            "Point to", res,
+                            "(comparison {}/{})".format(mod1, mod2) 
+                        ]
+                    )
+
                     
                     # if res == "a":
                     #     branch_champions_points[mod1] += 1
@@ -2125,7 +2153,15 @@ class QMD():
                 if mod1!=mod2:
                     res = self.processRemoteBayesPair(a=mod1, b=mod2)
 
-                    self.champions_points[res] += 1                
+                    self.champions_points[res] += 1  
+                    self.log_print(
+                        [
+                            "[globalChampionCalculation]",
+                            "Point to", res,
+                            "(comparison {}/{})".format(mod1, mod2) 
+                        ]
+                    )
+
                     # if res == "a":
                     #     self.champions_points[mod1] += 1
                     # elif res == "b":
