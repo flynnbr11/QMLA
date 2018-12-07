@@ -228,16 +228,16 @@ def BayesFactorRemote(
 
         if bayes_factor > bayes_threshold: 
             bayes_factors_winners_db.set(pair_id, 'a')
-            # log_print(["Redis SET bayes_factors_winners_db, pair:", 
-            #     pair_id, "winner: a"]
-            # )
+            log_print(["Redis SET bayes_factors_winners_db, pair:", 
+                pair_id, "winner:", model_a_id]
+            )
         elif bayes_factor < (1.0/bayes_threshold):
             bayes_factors_winners_db.set(pair_id, 'b')
-            # log_print(["Redis SET bayes_factors_winners_db, pair:", 
-            #     pair_id, "winner: b"]
-            # )
-        # else:
-        #     log_print(["Neither model much better."])
+            log_print(["Redis SET bayes_factors_winners_db, pair:", 
+                pair_id, "winner:", model_b_id]
+            )
+        else:
+            log_print(["Neither model much better."])
 
         
         if branchID is not None:    

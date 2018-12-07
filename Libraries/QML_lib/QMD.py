@@ -1203,7 +1203,13 @@ class QMD():
             self.processRemoteBayesPair(pair=pair)
 
 
-    def processRemoteBayesPair(self, a=None, b=None, pair=None, bayes_threshold=None):
+    def processRemoteBayesPair(
+        self, 
+        a=None, 
+        b=None, 
+        pair=None, 
+        bayes_threshold=None
+    ):
 
         if bayes_threshold is None: 
             bayes_threshold=self.BayesLower
@@ -1220,32 +1226,35 @@ class QMD():
             self.log_print(["Must pass either two model ids, or a \
                 pair name string, to process Bayes factors."]
             )
-            
-
-
         try:
             bayes_factor = float(bayes_factors_db.get(pair))
         except TypeError:
             self.log_print(["On bayes_factors_db for pair id", 
                 pair, "value=", bayes_factors_db.get(pair)]
             )
-            
-        mod_a = self.reducedModelInstanceFromID(a)
-        mod_b = self.reducedModelInstanceFromID(b)
-        if b in mod_a.BayesFactors:
-            mod_a.BayesFactors[b].append(bayes_factor)
-        else:
-            mod_a.BayesFactors[b] = [bayes_factor]
         
-        if a in mod_b.BayesFactors:
-            mod_b.BayesFactors[a].append((1.0/bayes_factor))
+        # bayes_factor refers to calculation BF(pair), where pair
+        # is defined (lower, higher) for continuity
+        lower_id = min(a,b)
+        higher_id = max(a,b)
+
+        mod_low = self.reducedModelInstanceFromID(lower_id)
+        mod_high = self.reducedModelInstanceFromID(higher_id)
+        if higher_id in mod_low.BayesFactors:
+            mod_low.BayesFactors[higher_id].append(bayes_factor)
         else:
-            mod_b.BayesFactors[a] = [(1.0/bayes_factor)]
-            
+            mod_low.BayesFactors[higher_id] = [bayes_factor]
+        
+        if lower_id in mod_high.BayesFactors:
+            mod_high.BayesFactors[lower_id].append((1.0/bayes_factor))
+        else:
+            mod_high.BayesFactors[lower_id] = [(1.0/bayes_factor)]
+
+                    
         if bayes_factor > bayes_threshold: 
-            return "a"
+            return mod_low.ModelID
         elif bayes_factor <  (1.0/bayes_threshold):
-            return "b"
+            return mod_high.ModelID
                         
 
     def runAllActiveModelsIQLE(self, num_exp):
@@ -1383,12 +1392,13 @@ class QMD():
                 if mod1!=mod2:
                     res = self.processRemoteBayesPair(a=mod1, b=mod2)
                     
-                    if res == "a":
-                        models_points[mod1] += 1
-                        losing_model_id = mod2
-                    elif res == "b":
-                        models_points[mod2] += 1
-                        losing_model_id = mod1
+                    models_points[res] += 1
+                    # if res == "a":
+                    #     models_points[mod1] += 1
+                    #     losing_model_id = mod2
+                    # elif res == "b":
+                    #     models_points[mod2] += 1
+                    #     losing_model_id = mod1
                         # todo if more than one model has max points
 
 
@@ -1464,6 +1474,12 @@ class QMD():
             
         self.log_print(
             [
+                "Model points for branch", branchID, 
+                models_points
+            ]
+        )
+        self.log_print(
+            [
                 "Champion of branch ", 
                 branchID, 
                 " is ", 
@@ -1532,24 +1548,37 @@ class QMD():
             for j in range(i, len(model_list)):
                 mod2 = model_list[j]
                 if mod1 != mod2:
+
                     res = self.processRemoteBayesPair(a=mod1, b=mod2)
-                    if res == "a":
-                        models_points[mod1] += 1
-                        if models_points_dict is not None: 
-                            models_points_dict[mod1]+=1
-                    elif res == "b":
-                        models_points[mod2]+=1
-                        if models_points_dict is not None: 
-                            models_points_dict[mod2]+=1
+                    models_points[res] += 1
+
+                    # if res == "a":
+                    #     models_points[mod1] += 1
+                    #     if models_points_dict is not None: 
+                    #         models_points_dict[mod1]+=1
+                    # elif res == "b":
+                    #     models_points[mod2]+=1
+                    #     if models_points_dict is not None: 
+                    #         models_points_dict[mod2]+=1
+
+                    self.log_print(
+                        [
+                        "comparison bw", mod1, mod2, 
+                        "point to", res
+                        ]
+                    )
 
         max_points = max(models_points.values())
         max_points_branches = [key for key, val in models_points.items() 
             if val==max_points]
         if len(max_points_branches) > 1: 
             # todo: recompare. Fnc: compareListOfModels (rather than branch based)
-            self.log_print(["Multiple models \
-                have same number of points in compareModelList:",
-                max_points_branches]
+            self.log_print(
+                [
+                    "Multiple models \
+                    have same number of points in compareModelList:",
+                    max_points_branches
+                ]
             )
             self.log_print(["Recompute Bayes bw:"])
             for i in max_points_branches:
@@ -1566,7 +1595,10 @@ class QMD():
                 bayes_threshold=self.BayesLower, 
                 wait_on_result=True
             )
-            champ_id = self.compareModelList(max_points_branches, bayes_threshold=self.BayesLower)
+            champ_id = self.compareModelList(
+                max_points_branches, 
+                bayes_threshold=self.BayesLower
+            )
         else: 
             self.log_print(["After comparing list:", models_points])
             champ_id = max(models_points, key=models_points.get)
@@ -1577,7 +1609,10 @@ class QMD():
     
     
     
-    def finalBayesComparisons(self, bayes_threshold=None):
+    def finalBayesComparisons(
+        self, 
+        bayes_threshold=None
+    ):
         if bayes_threshold is None: 
             bayes_threshold=self.BayesUpper
 
@@ -1686,8 +1721,8 @@ class QMD():
                 parent_branch = self.BranchParents[child_branch] 
                 parent_id = self.BranchChampions[parent_branch]
 
-                mod1 = parent_id
-                mod2 = child_id
+                mod1 = min(parent_id, child_id)
+                mod2 = max(parent_id, child_id)
 
                 pair_id = DataBase.unique_model_pair_identifier(
                     mod1, 
@@ -1899,18 +1934,26 @@ class QMD():
                         a=mod1, 
                         b=mod2
                     )
-                    
-                    if res == "a":
-                        branch_champions_points[mod1] += 1
-                    elif res == "b":
-                        branch_champions_points[mod2] += 1
+
+                    branch_champions_points[res] += 1
+                    # if res == "a":
+                    #     branch_champions_points[mod1] += 1
+                    # elif res == "b":
+                    #     branch_champions_points[mod2] += 1
         self.ranked_champions = sorted(
             branch_champions_points, 
             reverse=True
         )
+        self.log_print(
+            [
+            "After final Bayes comparisons (of branch champions)",
+            branch_champions_points
+            ]
+        )
         
         max_points = max(branch_champions_points.values())
-        max_points_branches = [key for key, val in branch_champions_points.items() 
+        max_points_branches = [
+            key for key, val in branch_champions_points.items() 
             if val==max_points
         ]
         if len(max_points_branches) > 1: 
@@ -2004,11 +2047,12 @@ class QMD():
                         a=mod1, 
                         b=mod2
                     )
+                    branch_champions_points[res] += 1
                     
-                    if res == "a":
-                        branch_champions_points[mod1] += 1
-                    elif res == "b":
-                        branch_champions_points[mod2] += 1
+                    # if res == "a":
+                    #     branch_champions_points[mod1] += 1
+                    # elif res == "b":
+                    #     branch_champions_points[mod2] += 1
         self.ranked_champions = sorted(
             branch_champions_points, 
             reverse=True
@@ -2080,11 +2124,12 @@ class QMD():
                 mod2 = self.champions_of_branches[j]
                 if mod1!=mod2:
                     res = self.processRemoteBayesPair(a=mod1, b=mod2)
-                
-                    if res == "a":
-                        self.champions_points[mod1] += 1
-                    elif res == "b":
-                        self.champions_points[mod2]+=1
+
+                    self.champions_points[res] += 1                
+                    # if res == "a":
+                    #     self.champions_points[mod1] += 1
+                    # elif res == "b":
+                    #     self.champions_points[mod2]+=1
         self.ranked_champions = sorted(self.champions_points, reverse=True)
         champ_id = max(self.champions_points, key=self.champions_points.get)
         # champ_name = DataBase.model_name_from_id(self.db, champ_id)

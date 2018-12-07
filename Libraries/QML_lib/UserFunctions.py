@@ -87,7 +87,7 @@ default_true_operators_by_generator = {
     'deterministic_transverse_ising_nn_fixed_axis' : 'zTiPPiTzPPxTx',
     'heisenberg_nontransverse' : 'xTxPPzTz',
     'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi',
-    'hubbard' : 'h_1_2_d3PPh_1_3_d3PPh_2_3_d3'
+    'hubbard' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
 }
 
 fixed_axis_generators = [
@@ -402,10 +402,10 @@ def get_latex_name(
 	except:
 		
 		latex_mapping = latex_naming_functions[None]
-		print("In except of get_latex_name, mapping:", latex_mapping)
+		# print("In except of get_latex_name, mapping:", latex_mapping)
 		latex_representation = latex_mapping(name, **kwargs)
 		
-	print("Latex Mapping used", latex_mapping)
+	# print("Latex Mapping used", latex_mapping)
 
 	return latex_representation
 
