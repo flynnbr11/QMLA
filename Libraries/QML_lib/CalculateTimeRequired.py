@@ -232,7 +232,7 @@ def time_required(
     resource_reallocation=False,
     num_bayes_times=None,
     minimum_allowed_time = 100,
-    insurance_factor = 2.5,
+    insurance_factor = 3.0,
     **kwargs
 ):
   times_reqd = {}
