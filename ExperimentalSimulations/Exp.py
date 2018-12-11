@@ -242,7 +242,6 @@ log_print(
 )
 
 if global_variables.custom_prior:
-
     prior_specific_terms = pickle.load(
         open(
             global_variables.prior_pickle_file,

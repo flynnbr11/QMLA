@@ -20,8 +20,12 @@ def separable_probe_dict(
                 seperable_probes[i,j] = (np.tensordot(seperable_probes[i,j-1],
                     random_probe(1), axes=0).flatten(order='c')
                 )
-            while (np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]), 
-                atol=1e-14) is  False
+            while (
+                np.isclose(
+                    1.0, 
+                    np.linalg.norm(seperable_probes[i,j]), 
+                    atol=1e-14
+                ) is  False
             ):
                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
                 # keep replacing until a unit-norm 

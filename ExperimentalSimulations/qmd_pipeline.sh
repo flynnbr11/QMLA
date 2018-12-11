@@ -13,8 +13,8 @@ exp_data=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=300
-exp=50
+prt=30
+exp=5
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -66,7 +66,7 @@ growth_rule='hubbard'
 # growth_rule='heisenberg_transverse'
 alt_growth_rules=(
    # 'heisenberg_transverse'
-#    'interacing_nn_ising_fixed_axis'
+   # 'interacing_nn_ising_fixed_axis'
    # 'non_interacting_ising'
 )
 

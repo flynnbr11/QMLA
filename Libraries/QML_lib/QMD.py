@@ -679,6 +679,8 @@ class QMD():
         )
         pre_computed_models = []
         num_models_already_computed_this_branch = 0
+        model_id_list = []
+
         for model in model_list:
             # addModel returns whether adding model was successful
             # if false, that's because it's already been computed
@@ -690,6 +692,8 @@ class QMD():
                 add_model_info['is_new_model']
             )
             model_id = add_model_info['model_id']
+            model_id_list.append(model_id)
+            self.ModelsBranches[model_id] = branchID
 
             self.log_print(
                 [
@@ -698,15 +702,27 @@ class QMD():
                 '\n\tID:', model_id
                 ]
             )
-            num_models_already_computed_this_branch += bool(already_computed)
-            if already_computed==True: 
+            num_models_already_computed_this_branch += bool(
+                already_computed
+            )
+            if bool(already_computed)==True: 
                 pre_computed_models.append(model)
 
-        model_id_list = []
-        for model in model_list:
-            m_id = DataBase.model_id_from_name(self.db, model)
-            model_id_list.append(m_id)
-            self.ModelsBranches[m_id] = branchID
+        # for model in model_list:
+        #     try:
+        #         m_id = DataBase.model_id_from_name(self.db, model)
+        #         self.log_print(["m_id:", m_id])
+        #         model_id_list.append(m_id)
+        #         self.log_print(["model id list:", model_id_list])
+        #         self.ModelsBranches[m_id] = branchID
+        #     except:
+        #         self.log_print(
+        #             [
+        #                 "can't get model id from database:\n", 
+        #                 self.db
+        #             ]
+        #         )
+        #         raise
 
         self.BranchNumModelsPreComputed[branchID] = num_models_already_computed_this_branch
         self.BranchModels[branchID] = model_list
@@ -1004,7 +1020,13 @@ class QMD():
 
                 del updated_model_info
         else:
-            self.log_print(["Model", model_name, "does not yet exist."])
+            self.log_print(
+                [
+                    "Model", 
+                    model_name, 
+                    "does not yet exist."
+                ]
+            )
 
     def remoteBayes(self, model_a_id, model_b_id, return_job=False, 
         branchID=None, interbranch=False, remote=True, bayes_threshold=None
