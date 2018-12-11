@@ -1,18 +1,17 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-#test_description="check_crash_hyperfine_growth_rule"
-test_description="transverse_QMD_optimal_pgh"
+test_description="hubbard_qhl_test"
 
 ## Script essentials
-num_tests=30
-qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
+num_tests=20
+qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
-min_id=0 # update so instances don't clash and hit eachother's redis databases
-experimental_data=1 # use experimental data -> 1; use fake data ->0
+min_id=200 # update so instances don't clash and hit eachother's redis databases
+experimental_data=0 # use experimental data -> 1; use fake data ->0
 
 # QHL parameters
-p=3000 # particles
-e=1000 # experiments
+p=2500 # particles
+e=400 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -43,14 +42,15 @@ further_qhl_resource_factor=1
 #growth_rule='non_interacting_ising_single_axis'
 #growth_rule='non_interacting_ising'
 #growth_rule='deterministic_noninteracting_ising_single_axis'
-growth_rule='interacting_nearest_neighbour_ising'
+#growth_rule='interacting_nearest_neighbour_ising'
 #growth_rule='interacing_nn_ising_fixed_axis'
 #growth_rule='deterministic_interacting_nn_ising_single_axis'
 #growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 #growth_rule='heisenberg_nontransverse'
 #growth_rule='heisenberg_transverse'
+growth_rule='hubbard'
 
-multiple_growth_rules=1 # NOTE this is being manually passed to CalculateTimeRequired below #TODO make it acceot this arg
+multiple_growth_rules=0 # NOTE this is being manually passed to CalculateTimeRequired below #TODO make it acceot this arg
 alt_growth_rules=(
 #	'non_interacting_ising'
 	'heisenberg_transverse'
@@ -67,35 +67,38 @@ custom_prior=1
 
 gaussian=1 # set to 0 for uniform distribution, 1 for normal
 param_min=0
-param_max=8
+param_max=1
 param_mean=0.5
 param_sigma=0.3
 random_true_params=1 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
 random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
 
 # Overwrite settings for specific cases
-if (( "$experimental_data" == 1))
+if (( "$experimental_data" == 1)) # NOTE use round brackets for arithmetic comparisons in bash; square brackets for strings
 then
+	echo "experimental data = $experimental_data "
 	measurement_type=$exp_measurement_type
 	rp=1.0
 	multiple_growth_rules=0
 #	growth_rule='two_qubit_ising_rotation_hyperfine'
 	growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 	op='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+elif [[ "$growth_rule" == 'two_qubit_ising_rotation_hyperfine' ]] 
+then
+	measurement_type=$exp_measurement_type
+elif [[ "$growth_rule" == 'two_qubit_ising_rotation_hyperfine_transverse' ]] 
+then
+	measurement_type=$exp_measurement_type
 else
     measurement_type=$sim_measurement_type
 fi
+
 if (( "$qhl" == 1 ))
 then	
 	rp=1.0
 	num_proc=1
 else
 	num_proc=5
-fi
-
-if (( "$experimental_data" == 0 ))
-then	
-	rp=0.75
 fi
 
 
