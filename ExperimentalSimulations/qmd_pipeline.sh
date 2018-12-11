@@ -6,15 +6,15 @@ test_description="qmd_runs"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 do_further_qhl=0
-exp_data=1
+exp_data=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=20
-exp=10
+prt=2000
+exp=300
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -58,11 +58,11 @@ mkdir -p $long_dir
 
 # growth_rule='test_changes_to_qmd'
 use_alt_growth_rules=1 # note this is redundant locally, currently
-growth_rule='two_qubit_ising_rotation_hyperfine'
+# growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='heisenberg_nontransverse'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='interacting_nearest_neighbour_ising'
-# growth_rule='hubbard'
+growth_rule='hubbard'
 # growth_rule='heisenberg_transverse'
 alt_growth_rules=(
    # 'heisenberg_transverse'

@@ -136,6 +136,7 @@ max_num_qubits_info = {
     'deterministic_transverse_ising_nn_fixed_axis' : 5,
 	'heisenberg_nontransverse' : 3,
 	'heisenberg_transverse' : 3,
+	'hubbard' : 5, 
     None : 5,
 }
 

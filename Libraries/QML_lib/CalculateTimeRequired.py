@@ -254,9 +254,15 @@ def time_required(
 #  print("num models by shape:", max_num_models_by_shape)
   total_time_required = 0
   for gen in growth_rules:
-    max_num_qubits = UserFunctions.max_num_qubits_info[
-    	gen
-    ]
+    try:
+      max_num_qubits = UserFunctions.max_num_qubits_info[
+      	gen
+      ]
+    except:
+      max_num_qubits = UserFunctions.max_num_qubits_info[
+        None
+      ]
+
     for q in range(1,max_num_qubits+1):
       time_per_hamiltonian = hamiltonian_exponentiation_times[q]
       try:
