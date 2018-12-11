@@ -134,7 +134,7 @@ max_num_models_by_shape['two_qubit_ising_rotation_hyperfine_transverse'] = {
     1 : 0,
 #    (2, 1) : 2,
 #    (2, 2) : 2,
-    2 : 18,
+    2 : 36, # TODO generalise insurance factors, this should be 18, with a higher insurance factor since two exp per particle in hahn expec val
     'other' : 1
 }
 
@@ -202,6 +202,12 @@ max_num_models_by_shape['heisenberg_transverse'] = {
   1 : 0, 
   'other' : 7
 }
+# Hubbard Models
+max_num_models_by_shape['hubbard'] = {
+    2 : 3,
+    'other' : 3
+}
+
 
 
 # Hamiltonian exponentiation times from testing qutips
