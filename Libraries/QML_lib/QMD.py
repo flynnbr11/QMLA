@@ -1011,9 +1011,13 @@ class QMD():
                     ]
                 )
                 self.QMDInfo['probe_dict'] = self.ProbeDict
-                updated_model_info = learnModelRemote(model_name,
-                    modelID, branchID=branchID, qmd_info=self.QMDInfo, 
-                    remote=True, host_name=self.HostName, 
+                updated_model_info = learnModelRemote(
+                    model_name,
+                    modelID, 
+                    branchID=branchID, 
+                    qmd_info=self.QMDInfo, 
+                    remote=True, 
+                    host_name=self.HostName, 
                     port_number=self.PortNumber,
                     qid=self.Q_id,log_file=self.rq_log_file
                 )

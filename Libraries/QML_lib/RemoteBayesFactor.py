@@ -27,11 +27,10 @@ import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 
 # Local files
-import Evo as evo
+# import Evo as evo
 import DataBase 
 import QML
-import ModelGeneration
-import ExperimentalDataFunctions
+# import ModelGeneration
 #import BayesF
 from qinfer import NormalDistribution
 # from Distrib import MultiVariateNormalDistributionNocov
@@ -146,6 +145,8 @@ def BayesFactorRemote(
         
         # if binning==True and use_experimental_data==True:
         if binning==True:
+            import ExperimentalDataFunctions
+
             # TODO introduce binning for simulated data. 
             try:
                 min_time = min(min(times_a), min(times_b))

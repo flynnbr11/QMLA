@@ -27,11 +27,11 @@ import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 
 # Local files
-import Evo as evo
+# import Evo as evo
 import DataBase 
-from QML import *
+# from QML import *
 import QML
-import ModelGeneration
+# import ModelGeneration
 #import BayesF
 from qinfer import NormalDistribution
 # from Distrib import MultiVariateNormalDistributionNocov

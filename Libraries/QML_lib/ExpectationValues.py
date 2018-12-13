@@ -54,8 +54,10 @@ def expectation_value(
 ):
 
     if choose_random_probe is True: 
+        from ProbeGeneration import random_probe
         num_qubits = int(np.log2(np.shape(ham)[0]))
-        state = ProbeGeneration.random_probe(num_qubits)
+        # state = ProbeGeneration.random_probe(num_qubits)
+        state = random_probe(num_qubits)
     elif choose_random_probe is False and state is None: 
         log_print(
             [
@@ -336,7 +338,9 @@ def hahn_evolution(
 
     plus_state = np.array([1, 1])/np.sqrt(2)
     noise_level = 0.00 # from 1000 counts - Poissonian noise = 1/sqrt(1000) # should be ~0.03
-    random_noise = noise_level * ProbeGeneration.random_probe(1)    
+    from ProbeGeneration import random_probe
+    random_noise = noise_level * random_probe(1)    
+    # random_noise = noise_level * ProbeGeneration.random_probe(1)    
     noisy_plus = plus_state + random_noise
     norm_factor = np.linalg.norm(noisy_plus)
     noisy_plus = noisy_plus/norm_factor

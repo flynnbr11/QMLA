@@ -63,7 +63,7 @@ import hashlib
 import redis
 # import Evo as evo
 from QML import *
-import ModelGeneration
+# import ModelGeneration
 from qinfer import NormalDistribution
 # from Distrib import MultiVariateNormalDistributionNocov
 
@@ -866,6 +866,7 @@ def add_model(
         model_lists[model_num_qubits].append(alph_model_name)
         
         if redimensionalise:
+            import ModelGeneration
             print("Redimensionalising") 
             true_dim = int(np.log2(np.shape(true_ops[0])[0]))
             sim_dim = get_num_qubits(model_name)
