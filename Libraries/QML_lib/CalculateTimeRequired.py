@@ -213,6 +213,11 @@ max_num_models_by_shape['hubbard_chain_just_hopping'] = {
     'other' : 1
 }
 
+max_num_models_by_shape['hubbard_chain'] = {
+    'other' : 2
+}
+
+
 
 
 
