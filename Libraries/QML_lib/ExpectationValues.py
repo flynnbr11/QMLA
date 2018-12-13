@@ -6,6 +6,7 @@ import inspect
 import time
 import sys as sys
 import os as os
+import ProbeGeneration
 from MemoryTest import print_loc
 sys.path.append((os.path.join("..")))
 
@@ -54,11 +55,15 @@ def expectation_value(
 
     if choose_random_probe is True: 
         num_qubits = int(np.log2(np.shape(ham)[0]))
-        state = random_probe(num_qubits)
-    elif random_probe is False and state is None: 
-        log_print(["expectation value function: you need to \
-            either pass a state or set choose_random_probe=True"],
-            log_file=log_file, log_identifier=log_identifier
+        state = ProbeGeneration.random_probe(num_qubits)
+    elif choose_random_probe is False and state is None: 
+        log_print(
+            [
+                "expectation value function: you need to \
+                either pass a state or set choose_random_probe=True"
+            ],
+            log_file=log_file, 
+            log_identifier=log_identifier
         )
  #    log_print(
  #    	[
@@ -118,9 +123,10 @@ def expectation_value(
         log_print(
             [
             "UnboundLocalError when exponentiating Hamiltonian. t=", t, 
-            "\nHam:\n", ham,
-            "\nProbe: ", state
-            ], log_file=log_file,
+            "\nHam:\n", repr(ham),
+            "\nProbe: ", repr(state)
+            ], 
+            log_file=log_file,
             log_identifier=log_identifier
         )
         raise
@@ -130,20 +136,36 @@ def expectation_value(
     expec_value_limit=1.10000000001 # maximum permitted expectation value
     
     if expec_value > expec_value_limit:
-        log_print(["expectation value function has value ", 
-            np.abs(psi_u_psi**2)], log_file=log_file, 
+        log_print(
+            [
+                "expectation value function has value ", 
+                np.abs(psi_u_psi**2)
+            ], 
+            log_file=log_file, 
             log_identifier=log_identifier
         )
-        log_print(["t=", t, "\nham = \n ", ham, "\nprobe : \n", state, 
-            "\nprobe normalisation:", np.linalg.norm(state), "\nU|p>:", 
-            u_psi, "\nnormalisation of U|p>:", np.linalg.norm(u_psi), 
-            "\n<p|U|p>:", psi_u_psi, "\nExpec val:", expec_value],
-            log_file=log_file, log_identifier=log_identifier
+        log_print(
+            [
+                "t=", t, "\nham = \n ", repr(ham), 
+                "\nprobe : \n", repr(state), 
+                "\nprobe normalisation:", np.linalg.norm(state), 
+                "\nU|p>:", repr(u_psi), 
+                "\nnormalisation of U|p>:", np.linalg.norm(u_psi), 
+                "\n<p|U|p>:", psi_u_psi, 
+                "\nExpec val:", expec_value
+            ],
+            log_file=log_file, 
+            log_identifier=log_identifier
         )
-        log_print(["Recalculating expectation value using linalg."],
-            log_file=log_file, log_identifier=log_identifier
+        log_print(
+            [
+                "Recalculating expectation value using linalg."
+            ],
+            log_file=log_file, 
+            log_identifier=log_identifier
         )
-        u_psi = evolved_state(ham, t, state, 
+        u_psi = evolved_state(
+            ham, t, state, 
             use_exp_custom=False, log_file=log_file, 
             log_identifier=log_identifier
         )
@@ -314,7 +336,7 @@ def hahn_evolution(
 
     plus_state = np.array([1, 1])/np.sqrt(2)
     noise_level = 0.00 # from 1000 counts - Poissonian noise = 1/sqrt(1000) # should be ~0.03
-    random_noise = noise_level * random_probe(1)    
+    random_noise = noise_level * ProbeGeneration.random_probe(1)    
     noisy_plus = plus_state + random_noise
     norm_factor = np.linalg.norm(noisy_plus)
     noisy_plus = noisy_plus/norm_factor
@@ -372,24 +394,32 @@ def partial_trace_out_second_qubit(
     return output_matrix
     
 
-def random_probe(num_qubits):
-    dim = 2**num_qubits
-    real = []
-    imaginary = []
-    complex_vectors = []
-    for i in range(dim):
-        real.append(np.random.uniform(low=-1, high=1))
-        imaginary.append(np.random.uniform(low=-1, high=1))
-        complex_vectors.append(real[i] + 1j*imaginary[i])
+# def random_probe(num_qubits):
+#     dim = 2**num_qubits
+#     real = []
+#     imaginary = []
+#     complex_vectors = []
+#     for i in range(dim):
+#         real.append(np.random.uniform(low=-1, high=1))
+#         imaginary.append(np.random.uniform(low=-1, high=1))
+#         complex_vectors.append(real[i] + 1j*imaginary[i])
 
-    a=np.array(complex_vectors)
-    norm_factor = np.linalg.norm(a)
-    probe = complex_vectors/norm_factor
-    if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
-        print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
-        return random_probe(num_qubits)
+#     a=np.array(complex_vectors)
+#     norm_factor = np.linalg.norm(a)
+#     probe = complex_vectors/norm_factor
+#     # if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
+#     #     print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
+#     #     return ProbeGeneration.random_probe(num_qubits)
+#     while (
+#         np.abs( np.linalg.norm(probe) ) - 1
+#         > 
+#         1e-14 
+#     ):
+#         print("generating new random probe..")
+#         probe = ProbeGeneration.random_probe(num_qubits)
 
-    return probe
+#     print("random probe generated with norm:", np.linalg.norm(probe))
+#     return probe
 
 
 ## for easy access to plus states to plot against

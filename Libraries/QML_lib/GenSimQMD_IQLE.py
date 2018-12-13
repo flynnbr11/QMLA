@@ -11,6 +11,7 @@ import ExperimentalDataFunctions as expdt
 
 # from ProbeStates import *
 from MemoryTest import print_loc
+import ProbeGeneration
 from psutil import virtual_memory
 import DataBase
 
@@ -136,7 +137,8 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
        
         self.NumProbes = num_probes
         if probe_dict is None: 
-            self._probelist = seperable_probe_dict(max_num_qubits=12, 
+            self._probelist = ProbeGeneration.seperable_probe_dict(
+                max_num_qubits=12, 
                 num_probes = self.NumProbes
             ) # TODO -- make same as number of qubits in model.
         else:
@@ -389,37 +391,37 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         return likelihood_array
 
 
-def seperable_probe_dict(max_num_qubits, num_probes):
-    seperable_probes = {}
-    for i in range(num_probes):
-        seperable_probes[i,0] = random_probe(1)
-        for j in range(1, 1+max_num_qubits):
-            if j==1:
-                seperable_probes[i,j] = seperable_probes[i,0]
-            else: 
-                seperable_probes[i,j] = np.tensordot(
-                    seperable_probes[i,j-1], random_probe(1), 
-                    axes=0).flatten(order='c')
-            if ( np.linalg.norm(seperable_probes[i,j]) < 0.999999999 
-                or np.linalg.norm(seperable_probes[i,j]) > 1.0000000000001
-            ):
-                print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
-    return seperable_probes
+# def seperable_probe_dict(max_num_qubits, num_probes):
+#     seperable_probes = {}
+#     for i in range(num_probes):
+#         seperable_probes[i,0] = ProbeGeneration.random_probe(1)
+#         for j in range(1, 1+max_num_qubits):
+#             if j==1:
+#                 seperable_probes[i,j] = seperable_probes[i,0]
+#             else: 
+#                 seperable_probes[i,j] = np.tensordot(
+#                     seperable_probes[i,j-1], random_probe(1), 
+#                     axes=0).flatten(order='c')
+#             if ( np.linalg.norm(seperable_probes[i,j]) < 0.999999999 
+#                 or np.linalg.norm(seperable_probes[i,j]) > 1.0000000000001
+#             ):
+#                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
+#     return seperable_probes
 
-def random_probe(num_qubits):
-    dim = 2**num_qubits
-    real = []
-    imaginary = []
-    complex_vectors = []
-    for i in range(dim):
-        real.append(np.random.uniform(low=-1, high=1))
-        imaginary.append(np.random.uniform(low=-1, high=1))
-        complex_vectors.append(real[i] + 1j*imaginary[i])
+# def random_probe(num_qubits):
+#     dim = 2**num_qubits
+#     real = []
+#     imaginary = []
+#     complex_vectors = []
+#     for i in range(dim):
+#         real.append(np.random.uniform(low=-1, high=1))
+#         imaginary.append(np.random.uniform(low=-1, high=1))
+#         complex_vectors.append(real[i] + 1j*imaginary[i])
 
-    a=np.array(complex_vectors)
-    norm_factor = np.linalg.norm(a)
-    probe = complex_vectors/norm_factor
-    if np.linalg.norm(probe) -1  > 1e-10:
-        print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
-    return probe
+#     a=np.array(complex_vectors)
+#     norm_factor = np.linalg.norm(a)
+#     probe = complex_vectors/norm_factor
+#     if np.linalg.norm(probe) -1  > 1e-10:
+#         print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
+#     return probe
         

@@ -32,7 +32,9 @@ def full_model_string(operations):
     """
     
     
-    # Note TODO: this doesn't give an error when tuples are given which aren't used. it should
+    # Note TODO: this doesn't give an error when tuples are 
+    # given which aren't used. it should
+    from DataBase import alph
     terms = operations['terms']
     num_qubits = operations['dim']
     num_terms = len(terms)
@@ -62,7 +64,8 @@ def full_model_string(operations):
         p_str+='P'
 
     full_model = p_str.join(all_terms)    
-    full_model = DataBase.alph(full_model)
+    # full_model = DataBase.alph(full_model)
+    full_model = alph(full_model)
     return full_model
 
 def operations_dict_from_name(mod_name):

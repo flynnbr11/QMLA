@@ -1066,7 +1066,8 @@ def heisenberg_transverse(
             ]
         all_champs = list(set(all_champs))
 
-        print("Making transverse terms out of all champs so far:",
+        print(
+            "Making transverse terms out of all champs so far:",
             all_champs
         )
         for champ in all_champs:
@@ -1081,6 +1082,95 @@ def heisenberg_transverse(
     
     return new_models
 
+
+
+## Hubbard rules
+
+def hubbard_chain_increase_dimension_full_chain(mod):
+    # if going up a dimension and want to consider all newly available hopping terms one by one
+    import copy
+    orig_mod = deconstruct_hopping_term(mod)
+    orig_sites = orig_mod['sites']
+    this_num_qubits = orig_mod['dim']
+
+    individual_terms = DataBase.get_constituent_names_from_name(mod)
+    new_num_qubits = this_num_qubits + 1
+
+    new_site_list = []
+    for i in range(1, new_num_qubits):
+        new_site = [i, new_num_qubits]
+        new_site_list.append(new_site)
+
+    new_models = [] 
+    new_model_sites = copy.copy(orig_sites)
+    for new_site in new_site_list:
+        new_model_sites.append(new_site)
+    new_model_string = generate_hopping_term(
+        {
+            'sites' : new_model_sites, 
+            'dim' : new_num_qubits
+        }
+    )
+    new_models.append(new_model_string)
+    return new_models
+
+def hubbard_full_chain(**kwargs):
+    model_list = kwargs['model_list']
+
+    new_models = []
+    for mod in model_list:
+        new_mods = hubbard_chain_increase_dimension_full_chain(mod)
+        new_models.extend(new_mods)
+    return new_models
+def generate_hopping_term(deconstructed):
+    sites_list = deconstructed['sites']
+    dim = deconstructed['dim']
+    
+    if type(sites_list[0]) != list:
+        sites_list = [sites_list]
+    p_str = ''
+    for i in range(dim):
+        p_str += 'P'
+        
+    overall_term = ''
+    first_term = True
+
+    for sites in sites_list:
+        hopping_string = 'h'
+        for s in sites:
+            hopping_string += '_'
+            hopping_string += str(s)
+        hopping_string += str( '_d' + str(dim)) 
+    
+        if first_term == False:
+            overall_term += p_str 
+        else:
+            first_term = False
+        overall_term += str(hopping_string)
+        
+    return overall_term
+
+def deconstruct_hopping_term(hopping_string):
+    
+    dim = DataBase.get_num_qubits(hopping_string)
+    individual_terms = DataBase.get_constituent_names_from_name(hopping_string)
+    
+    deconstructed = {
+        'sites' : [], 
+        'dim' : dim
+    }
+    
+    for term in individual_terms:
+        split_term = term.split('_')
+        sites = []
+        for i in split_term:
+            if i[0] == 'd':
+                dim = int(i[1])
+            elif i != 'h': 
+                sites.append(int(i))
+        deconstructed['sites'].append(sites)
+
+    return deconstructed
 
 
 

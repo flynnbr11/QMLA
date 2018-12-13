@@ -115,8 +115,8 @@ class QMD():
             self.log_file = str('QMD_'+str(q_id)+'.log')
         
         self.QLE = qle # Set to False for IQLE
-        trueOp = DataBase.operator(true_operator)
-        self.TrueOpName = true_operator
+        trueOp = DataBase.operator(DataBase.alph(true_operator))
+        self.TrueOpName = DataBase.alph(true_operator)
         self.TrueOpDim = trueOp.num_qubits
         self.InitialOpList = initial_op_list
 
@@ -2226,7 +2226,7 @@ class QMD():
             # generator=self.GrowthGenerator,
             generator = growth_rule, 
             model_list=best_model_names,
-            champs_by_num_qubits = self.BranchChampsByNumQubits, 
+            # champs_by_num_qubits = self.BranchChampsByNumQubits, 
             # spawn_step=self.SpawnDepth, 
             spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
             ghost_branches = self.GhostBranches, 
@@ -2239,11 +2239,13 @@ class QMD():
 
         new_models = [DataBase.alph(mod) for mod in new_models]
 
-        print(
-            "After model generation for growth rule", 
-            growth_rule, 
-            "SPAWN STAGE:", 
-            self.SpawnStage[growth_rule]
+        self.log_print(
+            [
+                "After model generation for growth rule", 
+                growth_rule, 
+                "SPAWN STAGE:", 
+                self.SpawnStage[growth_rule]
+            ]
         )
 
         new_branch_id = self.newBranch(
@@ -3286,43 +3288,43 @@ def num_pairs_in_list(num_models):
     
     return a/b
 
-def separable_probe_dict(max_num_qubits, num_probes):
-    seperable_probes = {}
-    for i in range(num_probes):
-        seperable_probes[i,0] = random_probe(1)
-        for j in range(1, 1+max_num_qubits):
-            if j==1:
-                seperable_probes[i,j] = seperable_probes[i,0]
-            else: 
-                seperable_probes[i,j] = (np.tensordot(seperable_probes[i,j-1],
-                    random_probe(1), axes=0).flatten(order='c')
-                )
-            while (np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]), 
-                atol=1e-14) is  False
-            ):
-                print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
-                # keep replacing until a unit-norm 
-                seperable_probes[i,j] = (
-                    np.tensordot(seperable_probes[i,j-1], random_probe(1),
-                    axes=0).flatten(order='c')
-                )
-    return seperable_probes
+# def separable_probe_dict(max_num_qubits, num_probes):
+#     seperable_probes = {}
+#     for i in range(num_probes):
+#         seperable_probes[i,0] = random_probe(1)
+#         for j in range(1, 1+max_num_qubits):
+#             if j==1:
+#                 seperable_probes[i,j] = seperable_probes[i,0]
+#             else: 
+#                 seperable_probes[i,j] = (np.tensordot(seperable_probes[i,j-1],
+#                     random_probe(1), axes=0).flatten(order='c')
+#                 )
+#             while (np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]), 
+#                 atol=1e-14) is  False
+#             ):
+#                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
+#                 # keep replacing until a unit-norm 
+#                 seperable_probes[i,j] = (
+#                     np.tensordot(seperable_probes[i,j-1], random_probe(1),
+#                     axes=0).flatten(order='c')
+#                 )
+#     return seperable_probes
 
-def random_probe(num_qubits):
-    dim = 2**num_qubits
-    real = []
-    imaginary = []
-    complex_vectors = []
-    for i in range(dim):
-        real.append(np.random.uniform(low=-1, high=1))
-        imaginary.append(np.random.uniform(low=-1, high=1))
-        complex_vectors.append(real[i] + 1j*imaginary[i])
+# def random_probe(num_qubits):
+#     dim = 2**num_qubits
+#     real = []
+#     imaginary = []
+#     complex_vectors = []
+#     for i in range(dim):
+#         real.append(np.random.uniform(low=-1, high=1))
+#         imaginary.append(np.random.uniform(low=-1, high=1))
+#         complex_vectors.append(real[i] + 1j*imaginary[i])
 
-    a=np.array(complex_vectors)
-    norm_factor = np.linalg.norm(a)
-    probe = complex_vectors/norm_factor
-    if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
-        print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
-        return random_probe(num_qubits)
+#     a=np.array(complex_vectors)
+#     norm_factor = np.linalg.norm(a)
+#     probe = complex_vectors/norm_factor
+#     if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
+#         print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
+#         return random_probe(num_qubits)
 
-    return probe
+#     return probe

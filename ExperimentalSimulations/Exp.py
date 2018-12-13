@@ -194,8 +194,9 @@ if os.path.isfile(true_expectation_value_path) == False:
     log_print(
         [
             "for generating true data.",
-            "probe:", probe, 
-            "true_ham:", true_ham
+            "\n\tprobe:\n", repr(probe), 
+            "\n\t(with 1-norm:)", np.abs(1-np.linalg.norm(probe)),
+            "\n\n\ttrue_ham:\n", repr(true_ham)
         ],
         log_file
     )
@@ -209,15 +210,17 @@ if os.path.isfile(true_expectation_value_path) == False:
                         method=global_variables.measurement_type,
                         ham = true_ham, 
                         t=t, 
-                        state=probe
+                        state=probe,
+                        log_file=log_file,
+                        log_identifier='[Exp - Getting true expec vals for plotting]'
                     )
                 )
             except:
                 log_print(
                     [
                         "failure for", 
-                        "\ntrue ham:", true_ham, 
-                        "\nprobe:", probe,
+                        "\ntrue ham:", repr(true_ham), 
+                        "\nprobe:", repr(probe),
                         "t=",t
                     ],
                     log_file

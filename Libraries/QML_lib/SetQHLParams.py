@@ -53,11 +53,11 @@ set_uniform_prior_specific_terms = {
 }
 
 set_true_params = {
-	'a' : 0.44, 
-	's' : 0.44,
-	'h_1_2_d3' : 0.6428,
-	'h_1_3_d3' : 0.9098, 
-	'h_2_3_d3' : 0.9051
+	# 'a' : 0.44, 
+	# 's' : 0.44,
+	# 'h_1_2_d3' : 0.6428,
+	# 'h_1_3_d3' : 0.9098, 
+	# 'h_2_3_d3' : 0.9051
 	# 'xTi' : 0.7538085315,
 	# 'yTi' : 8.4442484,
 	# 'zTi' : 5.713337168736279,
@@ -90,8 +90,6 @@ def create_plot_probe(
 	for k in list(plot_probe_dict.keys()):
 		# replace tuple like key returned, with just dimension. 
 	    plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
-
-
 
 	if pickle_file is not None:
 		import pickle

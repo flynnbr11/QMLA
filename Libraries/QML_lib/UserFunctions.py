@@ -87,8 +87,10 @@ default_true_operators_by_generator = {
     'deterministic_transverse_ising_nn_fixed_axis' : 'zTiPPiTzPPxTx',
     'heisenberg_nontransverse' : 'xTxPPzTz',
     'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi',
-    'hubbard' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
-    # 'hubbard' : 'h_1_2_d2'
+    # 'hubbard' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
+    'hubbard' : 'h_1_2_d2PPiTzPPzTi',
+    'hubbard_full_chain' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
+    # 'hubbard_full_chain' : 'h_1_2_d2'
 }
 
 fixed_axis_generators = [
@@ -120,7 +122,8 @@ max_spawn_depth_info = {
     'deterministic_interacting_nn_ising_single_axis' : 1,
     'deterministic_transverse_ising_nn_fixed_axis' : 1,
 	'heisenberg_nontransverse' : 8,
-	'heisenberg_transverse' : 30
+	'heisenberg_transverse' : 30,
+	'hubbard_full_chain' : 10,
 }
 
 max_num_qubits_info = {
@@ -138,6 +141,7 @@ max_num_qubits_info = {
 	'heisenberg_nontransverse' : 3,
 	'heisenberg_transverse' : 3,
 	'hubbard' : 5, 
+	'hubbard_full_chain' : 5,
     None : 5,
 }
 
@@ -179,6 +183,8 @@ model_generation_functions = {
 		ModelGeneration.heisenberg_nontransverse,
 	'heisenberg_transverse':
 		ModelGeneration.heisenberg_transverse,
+	'hubbard_full_chain' :
+		ModelGeneration.hubbard_full_chain,
 }
 
 ##### ---------- -------------------- #####  
@@ -190,6 +196,8 @@ tree_finished_functions = {
 	None : 
 		ModelGeneration.spawn_depth_check,
 	'heisenberg_nontransverse' : 
+		ModelGeneration.max_num_qubits_reached_check,
+	'hubbard_full_chain' :
 		ModelGeneration.max_num_qubits_reached_check,
 	# 'heisenberg_transverse':
 	# 	ModelGeneration.max_num_qubits_reached_check,
@@ -223,7 +231,9 @@ name_branch_map_functions = {
 	'deterministic_interacting_nn_ising_single_axis' :
 	 	ModelNames.branch_is_num_dims,
  	'deterministic_transverse_ising_nn_fixed_axis' :
- 		ModelNames.branch_is_num_dims
+ 		ModelNames.branch_is_num_dims,
+	'hubbard_full_chain' :
+		ModelNames.branch_is_num_dims,
 }
 
 
@@ -242,7 +252,9 @@ latex_naming_functions = {
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		ModelNames.latex_name_ising, 
 	'hubbard': 
-		ModelNames.hubbard_latex, #TODO write a latex name fnc for Hubbard type models
+		ModelNames.hubbard_latex, 
+	'hubbard_full_chain' :	
+		ModelNames.hubbard_latex,
 	# None : 
 	# 	ModelNames.default_latex_wrapping,
 	# 'test_return_champs' :
@@ -304,6 +316,10 @@ initial_models = {
 		['xTx', 'yTy', 'zTz'],
 	'hubbard' :
 		['a', 's', 'z'],
+	'hubbard' :
+		['h_1_2_d2', 'h_1_2_d2PPzTiPPiTz'],
+	'hubbard_full_chain' :
+		['h_1_2_d2']
 }
 
 ##### ---------- -------------------- #####  

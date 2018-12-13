@@ -10,33 +10,42 @@ def separable_probe_dict(
     num_probes,
     **kwargs
 ):
-    seperable_probes = {}
+    separable_probes = {}
     for i in range(num_probes):
-        seperable_probes[i,0] = random_probe(1)
+        separable_probes[i,0] = random_probe(1)
         for j in range(1, 1+max_num_qubits):
             if j==1:
-                seperable_probes[i,j] = seperable_probes[i,0]
+                separable_probes[i,j] = separable_probes[i,0]
             else: 
-                seperable_probes[i,j] = (np.tensordot(seperable_probes[i,j-1],
-                    random_probe(1), axes=0).flatten(order='c')
-                )
-            while (
-                np.isclose(
-                    1.0, 
-                    np.linalg.norm(seperable_probes[i,j]), 
-                    atol=1e-14
-                ) is  False
-            ):
-                print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
-                # keep replacing until a unit-norm 
-                seperable_probes[i,j] = (
+                separable_probes[i,j] = (
                     np.tensordot(
-                        seperable_probes[i,j-1], 
+                        separable_probes[i,j-1],
+                        random_probe(1), 
+                        axes=0
+                    ).flatten(order='c')
+                )
+            norm = np.linalg.norm(separable_probes[i,j])
+            while (
+                np.abs( norm -1) >
+                1e-13
+
+            ):
+                print(
+                    "non-unit norm: ", 
+                    norm
+                )
+                # keep replacing until a unit-norm 
+                separable_probes[i,j] = (
+                    np.tensordot(
+                        separable_probes[i,j-1], 
                         random_probe(1),
                         axes=0
                     ).flatten(order='c')
                 )
-    return seperable_probes
+                norm = np.linalg.norm(separable_probes[i,j])
+            # print("unit norm:", np.abs(1-norm) )
+
+    return separable_probes
 
 def random_probe(num_qubits):
     dim = 2**num_qubits
@@ -51,10 +60,18 @@ def random_probe(num_qubits):
     a=np.array(complex_vectors)
     norm_factor = np.linalg.norm(a)
     probe = complex_vectors/norm_factor
-    if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
-        print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
-        return random_probe(num_qubits)
+    # if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
+    #     print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
+    #     return random_probe(num_qubits)
+    while (
+        np.abs( np.linalg.norm(probe) ) - 1
+        > 
+        1e-14 
+    ):
+        print("generating new random probe..")
+        probe = random_probe(num_qubits)
 
+    # print("random probe generated with norm:", np.linalg.norm(probe))
     return probe
 
 
@@ -88,17 +105,17 @@ def NV_centre_ising_probes_plus(
     # print("\n\t noisy plus:", noisy_plus )
     # print("\n\t has type:", type(noisy_plus))
     
-    seperable_probes = {}
+    separable_probes = {}
     for i in range(num_probes):
-#        seperable_probes[i,0] = plus_state
-        seperable_probes[i,0] = noisy_plus
+#        separable_probes[i,0] = plus_state
+        separable_probes[i,0] = noisy_plus
         for j in range(1, 1+max_num_qubits):
             if j==1:
-                seperable_probes[i,j] = seperable_probes[i,0]
+                separable_probes[i,j] = separable_probes[i,0]
             else: 
-                seperable_probes[i,j] = (
+                separable_probes[i,j] = (
                     np.tensordot(
-                        seperable_probes[i,j-1],
+                        separable_probes[i,j-1],
                         noisy_plus, 
                         axes=0
                     ).flatten(order='c')
@@ -106,22 +123,22 @@ def NV_centre_ising_probes_plus(
             while (
                 np.isclose(
                     1.0, 
-                    np.linalg.norm(seperable_probes[i,j]), 
+                    np.linalg.norm(separable_probes[i,j]), 
                     atol=1e-14
                 ) is  False
             ):
                 print("non-unit norm: ", 
-                    np.linalg.norm(seperable_probes[i,j])
+                    np.linalg.norm(separable_probes[i,j])
                 )
                 # keep replacing until a unit-norm 
-                seperable_probes[i,j] = (
+                separable_probes[i,j] = (
                     np.tensordot(
-                        seperable_probes[i,j-1],
+                        separable_probes[i,j-1],
                         random_probe(1),
                         axes=0
                     ).flatten(order='c')
                 )
-    return seperable_probes
+    return separable_probes
     
     
 
@@ -141,17 +158,17 @@ def experimental_NVcentre_ising_probes(
     norm_factor = np.linalg.norm(noisy_plus)
     noisy_plus = noisy_plus/norm_factor
     
-    seperable_probes = {}
+    separable_probes = {}
     for i in range(num_probes):
-#        seperable_probes[i,0] = plus_state
-        seperable_probes[i,0] = noisy_plus
+#        separable_probes[i,0] = plus_state
+        separable_probes[i,0] = noisy_plus
         for j in range(1, 1+max_num_qubits):
             if j==1:
-                seperable_probes[i,j] = seperable_probes[i,0]
+                separable_probes[i,j] = separable_probes[i,0]
             else: 
-                seperable_probes[i,j] = (
+                separable_probes[i,j] = (
                     np.tensordot(
-                        seperable_probes[i,j-1],
+                        separable_probes[i,j-1],
                         random_probe(1), 
                         axes=0
                     ).flatten(order='c')
@@ -159,17 +176,17 @@ def experimental_NVcentre_ising_probes(
             while (
                 np.isclose(
                     1.0, 
-                    np.linalg.norm(seperable_probes[i,j]), 
+                    np.linalg.norm(separable_probes[i,j]), 
                     atol=1e-14
                 ) is  False
             ):
-                print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
+                print("non-unit norm: ", np.linalg.norm(separable_probes[i,j]))
                 # keep replacing until a unit-norm 
-                seperable_probes[i,j] = (
-                    np.tensordot(seperable_probes[i,j-1], random_probe(1),
+                separable_probes[i,j] = (
+                    np.tensordot(separable_probes[i,j-1], random_probe(1),
                     axes=0).flatten(order='c')
                 )
-    return seperable_probes
+    return separable_probes
   
 
 def n_qubit_plus_state(num_qubits):

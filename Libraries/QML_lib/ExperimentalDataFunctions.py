@@ -150,9 +150,10 @@ def experimental_NVcentre_ising_probes(
     Returns a dict of separable probes where the first qubit always acts on 
     a plus state. 
     """
+    print("[experimental_NVcentre_ising_probes]")
     plus_state = np.array([1, 1])/np.sqrt(2)
     noise_level = 0.03 # from 1000 counts - Poissonian noise = 1/sqrt(1000)
-    random_noise = noise_level * random_probe(1)    
+    random_noise = noise_level * ProbeGeneration.random_probe(1)    
     noisy_plus = plus_state + random_noise
     norm_factor = np.linalg.norm(noisy_plus)
     noisy_plus = noisy_plus/norm_factor
@@ -168,7 +169,7 @@ def experimental_NVcentre_ising_probes(
                 seperable_probes[i,j] = (
                     np.tensordot(
                         seperable_probes[i,j-1],
-                        random_probe(1), 
+                        ProbeGeneration.random_probe(1), 
                         axes=0
                     ).flatten(order='c')
                 )
@@ -182,7 +183,7 @@ def experimental_NVcentre_ising_probes(
                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
                 # keep replacing until a unit-norm 
                 seperable_probes[i,j] = (
-                    np.tensordot(seperable_probes[i,j-1], random_probe(1),
+                    np.tensordot(seperable_probes[i,j-1], ProbeGeneration.random_probe(1),
                     axes=0).flatten(order='c')
                 )
     return seperable_probes
@@ -190,14 +191,18 @@ def experimental_NVcentre_ising_probes(
     
     
 
-def experimental_NVcentre_ising_probes_plusplus(max_num_qubits=2, num_probes=40):
+def experimental_NVcentre_ising_probes_plusplus(
+    max_num_qubits=2, 
+    num_probes=40
+):
     """
     Returns a dict of separable probes where the first qubit always acts on 
     a plus state. 
     """
+    print("[experimental_NVcentre_ising_probes_plusplus]")
     plus_state = np.array([1, 1])/np.sqrt(2)
     noise_level = 0.03 # from 1000 counts - Poissonian noise = 1/sqrt(1000)
-    random_noise = noise_level * random_probe(1)    
+    random_noise = noise_level * ProbeGeneration.random_probe(1)    
     noisy_plus = plus_state + random_noise
     norm_factor = np.linalg.norm(noisy_plus)
     noisy_plus = noisy_plus/norm_factor
@@ -219,7 +224,7 @@ def experimental_NVcentre_ising_probes_plusplus(max_num_qubits=2, num_probes=40)
                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
                 # keep replacing until a unit-norm 
                 seperable_probes[i,j] = (
-                    np.tensordot(seperable_probes[i,j-1], random_probe(1),
+                    np.tensordot(seperable_probes[i,j-1], ProbeGeneration.random_probe(1),
                     axes=0).flatten(order='c')
                 )
     return seperable_probes
@@ -227,21 +232,21 @@ def experimental_NVcentre_ising_probes_plusplus(max_num_qubits=2, num_probes=40)
     
 
 
-def random_probe(num_qubits):
-    dim = 2**num_qubits
-    real = []
-    imaginary = []
-    complex_vectors = []
-    for i in range(dim):
-        real.append(np.random.uniform(low=-1, high=1))
-        imaginary.append(np.random.uniform(low=-1, high=1))
-        complex_vectors.append(real[i] + 1j*imaginary[i])
+# def random_probe(num_qubits):
+#     dim = 2**num_qubits
+#     real = []
+#     imaginary = []
+#     complex_vectors = []
+#     for i in range(dim):
+#         real.append(np.random.uniform(low=-1, high=1))
+#         imaginary.append(np.random.uniform(low=-1, high=1))
+#         complex_vectors.append(real[i] + 1j*imaginary[i])
 
-    a=np.array(complex_vectors)
-    norm_factor = np.linalg.norm(a)
-    probe = complex_vectors/norm_factor
-    if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
-        print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
-        return random_probe(num_qubits)
+#     a=np.array(complex_vectors)
+#     norm_factor = np.linalg.norm(a)
+#     probe = complex_vectors/norm_factor
+#     if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
+#         print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
+#         return ProbeGeneration.random_probe(num_qubits)
 
-    return probe    
+#     return probe    
