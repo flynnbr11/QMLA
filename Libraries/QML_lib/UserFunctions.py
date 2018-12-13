@@ -89,8 +89,9 @@ default_true_operators_by_generator = {
     'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi',
     # 'hubbard' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
     'hubbard' : 'h_1_2_d2PPiTzPPzTi',
-    'hubbard_chain_just_hopping' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
+    'hubbard_chain_just_hopping' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3',
     # 'hubbard_chain_just_hopping' : 'h_1_2_d2'
+	'hubbard_chain' : 'h_1_2_d2PPzTiPPiTz'
 }
 
 fixed_axis_generators = [
@@ -124,6 +125,7 @@ max_spawn_depth_info = {
 	'heisenberg_nontransverse' : 8,
 	'heisenberg_transverse' : 30,
 	'hubbard_chain_just_hopping' : 10,
+	'hubbard_chain' : 10,
 }
 
 max_num_qubits_info = {
@@ -142,6 +144,7 @@ max_num_qubits_info = {
 	'heisenberg_transverse' : 3,
 	'hubbard' : 5, 
 	'hubbard_chain_just_hopping' : 5,
+	'hubbard_chain' : 5,
     None : 5,
 }
 
@@ -185,6 +188,8 @@ model_generation_functions = {
 		ModelGeneration.heisenberg_transverse,
 	'hubbard_chain_just_hopping' :
 		ModelGeneration.hubbard_chain_just_hopping,
+	'hubbard_chain' : 
+		ModelGeneration.hubbard_chain,
 }
 
 ##### ---------- -------------------- #####  
@@ -199,6 +204,8 @@ tree_finished_functions = {
 		ModelGeneration.max_num_qubits_reached_check,
 	'hubbard_chain_just_hopping' :
 		ModelGeneration.max_num_qubits_reached_check,
+	'hubbard_chain' :
+		ModelGeneration.max_num_qubits_reached_check
 	# 'heisenberg_transverse':
 	# 	ModelGeneration.max_num_qubits_reached_check,
 }
@@ -234,6 +241,8 @@ name_branch_map_functions = {
  		ModelNames.branch_is_num_dims,
 	'hubbard_chain_just_hopping' :
 		ModelNames.branch_is_num_dims,
+	'hubbard_chain' : 
+		ModelNames.branch_is_num_dims,
 }
 
 
@@ -254,6 +263,8 @@ latex_naming_functions = {
 	'hubbard': 
 		ModelNames.hubbard_latex, 
 	'hubbard_chain_just_hopping' :	
+		ModelNames.hubbard_latex,
+	'hubbard_chain' : 
 		ModelNames.hubbard_latex,
 	# None : 
 	# 	ModelNames.default_latex_wrapping,
@@ -319,7 +330,9 @@ initial_models = {
 	'hubbard' :
 		['h_1_2_d2', 'h_1_2_d2PPzTiPPiTz'],
 	'hubbard_chain_just_hopping' :
-		['h_1_2_d2']
+		['h_1_2_d2'],
+	'hubbard_chain' : 
+		['h_1_2_d2'],
 }
 
 ##### ---------- -------------------- #####  

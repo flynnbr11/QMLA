@@ -1122,7 +1122,11 @@ def hubbard_chain_just_hopping(**kwargs):
         new_mods = hubbard_chain_increase_dimension_full_chain(mod)
         new_models.extend(new_mods)
     return new_models
-def generate_hopping_term(deconstructed):
+
+def generate_hopping_term(
+    deconstructed, 
+    include_interaction_energy=False
+):
     sites_list = deconstructed['sites']
     dim = deconstructed['dim']
     
@@ -1147,6 +1151,25 @@ def generate_hopping_term(deconstructed):
         else:
             first_term = False
         overall_term += str(hopping_string)
+
+    if include_interaction_energy == True:
+        interaction_energy = ''
+        p_str = ''
+        for i in range(dim):
+            p_str += 'P'
+
+        for i in range(1, dim+1):
+
+            op_dict = {
+                'terms' : [[(i, 'z')]],
+                'dim' : dim
+            }
+            new_term = ModelNames.full_model_string(op_dict)
+
+            interaction_energy += p_str
+            interaction_energy += new_term
+        overall_term += interaction_energy
+        
         
     return overall_term
 
@@ -1171,6 +1194,44 @@ def deconstruct_hopping_term(hopping_string):
         deconstructed['sites'].append(sites)
 
     return deconstructed
+
+def generate_hubbard_chain(
+    num_qubits, 
+    include_interaction_energy=False
+):
+    sites = []
+    for i in range(1,num_qubits):
+        new_site = [i,i+1]
+        sites.append(new_site)
+    chain_dict = {
+        'dim' : num_qubits,
+        'sites' : sites
+    }
+    model_string = generate_hopping_term(
+        chain_dict, 
+        include_interaction_energy = include_interaction_energy
+    )
+    return model_string
+
+def hubbard_chain(**kwargs):
+    model_list = kwargs['model_list']
+    spawn_stage = kwargs['spawn_stage']
+    growth_generator = kwargs['generator']
+    from UserFunctions import max_num_qubits_info
+    max_num_qubits = max_num_qubits_info[growth_generator]
+    new_models = []
+    for mod in model_list:
+        if spawn_stage[-1] == None:
+            for i in range(2, max_num_qubits+1):
+                new_mod = generate_hubbard_chain(i)
+                new_models.append(new_mod)
+            spawn_stage.append('just_hopping_complete')
+        elif spawn_stage[-1] == 'just_hopping_complete':
+            for i in range(2, max_num_qubits+1):
+                new_mod = generate_hubbard_chain(i, include_interaction_energy=True)
+                new_models.append(new_mod)
+            spawn_stage.append('Complete')
+    return new_models
 
 
 

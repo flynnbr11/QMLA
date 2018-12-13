@@ -23,7 +23,7 @@ import redis
 import RedisSettings as rds
 
 # Local files
-import Evo as evo
+# import Evo as evo
 import DataBase 
 import QML
 import ModelGeneration
