@@ -208,6 +208,12 @@ max_num_models_by_shape['hubbard'] = {
     'other' : 3
 }
 
+max_num_models_by_shape['hubbard_chain_just_hopping'] = {
+    2 : 1,
+    'other' : 1
+}
+
+
 
 
 # Hamiltonian exponentiation times from testing qutips

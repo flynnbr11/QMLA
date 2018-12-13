@@ -2353,7 +2353,7 @@ def parameterEstimates(
             name = term,
             growth_generator = qmd.GrowthGenerator
         )
-        print("[pQMD] latex_term:", latex_term)
+        # print("[pQMD] latex_term:", latex_term)
         ax.scatter(
             x,
             y, 
@@ -2362,7 +2362,7 @@ def parameterEstimates(
             color=colour
         )
 #        ax.set_yscale('symlog')
-        print("[pQMD] scatter done" )
+        # print("[pQMD] scatter done" )
         ax.fill_between(
             x, 
             y+s, 
@@ -2371,7 +2371,7 @@ def parameterEstimates(
             facecolor=colour
 
         )
-        print("[pQMD] fill between done")
+        # print("[pQMD] fill between done")
 #        ax.legend(loc=1)
         axes_so_far += 1
         col += 1
@@ -2379,7 +2379,7 @@ def parameterEstimates(
             col=0
             row+=1
         ax.set_title(str(latex_term))
-        print("[pQMD] title set")
+        # print("[pQMD] title set")
 
 #    ax = plt.subplot(111)
     # plt.xlabel('Epoch')
@@ -2395,7 +2395,7 @@ def parameterEstimates(
     if save_to_file is not None:
         print("saving to file")
         plt.savefig(save_to_file, bbox_inches='tight')
-    print("[pQMD] complete")
+    # print("[pQMD] complete")
 
 
 ### Radar Plot ###

@@ -1114,7 +1114,7 @@ def hubbard_chain_increase_dimension_full_chain(mod):
     new_models.append(new_model_string)
     return new_models
 
-def hubbard_full_chain(**kwargs):
+def hubbard_chain_just_hopping(**kwargs):
     model_list = kwargs['model_list']
 
     new_models = []

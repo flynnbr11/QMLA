@@ -74,7 +74,7 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 
 # growth_rule='hubbard'
-growth_rule='hubbard_full_chain'
+growth_rule='hubbard_chain_just_hopping'
 
 
 alt_growth_rules=(
