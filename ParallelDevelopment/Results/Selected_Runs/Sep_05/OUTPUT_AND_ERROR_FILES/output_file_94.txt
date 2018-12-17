@@ -1,0 +1,29 @@
+QMD ID =94; REDIS_PORT=6394
+Global server: newblue1
+BC backend identified
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+70851:C 05 Sep 19:41:07.121 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+70851:C 05 Sep 19:41:07.121 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=70851, just started
+70851:C 05 Sep 19:41:07.121 # Configuration loaded
+70851:M 05 Sep 19:41:07.124 * Running mode=standalone, port=6394.
+70851:M 05 Sep 19:41:07.125 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+70851:M 05 Sep 19:41:07.125 # Server initialized
+70851:M 05 Sep 19:41:07.125 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+70851:M 05 Sep 19:41:07.125 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+70851:M 05 Sep 19:41:07.125 * Ready to accept connections
+Job id is 7411936
+Nodelist
+REDIS_URL is redis://node34-048:6394
+Running dir is /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
+workers will log in /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
+PBS job name is test_tidied_launch_qhl_94
+node34-048
+node34-048
+node34-048
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 19:41:19; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52
+CONFIG: -p=2000 -e=1000 -bt=999 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/multiQMD.csv -pt=1 -pgh=0.1 -qid=94 -rqt=10000 -pkl=0 -host=node34-048 -port=6394 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/logs/test_tidied_launch_qhl_94.qmd.7411936.log
+70851:signal-handler (1536219920) Received SIGTERM scheduling shutdown...
+70851:M 06 Sep 08:45:20.826 # User requested shutdown...
+70851:M 06 Sep 08:45:20.826 # Redis is now ready to exit, bye bye...

@@ -1,0 +1,59 @@
+rm: cannot remove `dump.rdb': No such file or directory
+Could not connect to Redis at 127.0.0.1:6388: Connection refused
++ job_id=7411930.master.cm.cluster
+++ cut -d. -f1
++ job_number=7411930
++ echo 'Job id is 7411930'
++ cd /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ '[' 0 == 1 ']'
++ true_hamiltonian=xTiPPyTiPPzTiPPxTxPPyTyPPzTz
++ echo Nodelist
++ cat
++ REDIS_URL=redis://node33-016:6388
++ echo 'REDIS_URL is redis://node33-016:6388'
++ echo 'Running dir is /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment'
++ echo 'workers will log in /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs'
++ QMD_LOG_DIR=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/logs
++ QMD_JOB=test_tidied_launch_qhl_88
++ echo 'PBS job name is test_tidied_launch_qhl_88'
++ QMD_LOG=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/logs/test_tidied_launch_qhl_88.qmd.7411930.log
++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7411930.master.cm.cluster
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7411930.master.cm.cluster
++ export 'nodes=node33-016
+node33-016
+node33-016'
++ nodes='node33-016
+node33-016
+node33-016'
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7411930.master.cm.cluster
+++ wc -l
++ export nnodes=3
++ nnodes=3
++ export confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/logs/node_info.test_tidied_launch_qhl_88.conf
++ confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/logs/node_info.test_tidied_launch_qhl_88.conf
++ for i in '$nodes'
++ echo node33-016
++ for i in '$nodes'
++ echo node33-016
++ for i in '$nodes'
++ echo node33-016
++ cd /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
++ [[ node33-016 == \n\o\d\e* ]]
++ echo 'Launching RQ worker on remote nodes using mpirun'
++ sleep 5
++ mpirun -np 3 -machinefile /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/logs/node_info.test_tidied_launch_qhl_88.conf rq worker 88 -u redis://node33-016:6388
++ cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+++ date +%H:%M:%S
++ echo 'Starting Exp.py at 19:28:33; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52'
++ echo 'CONFIG: -p=2000 -e=1000 -bt=999 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/multiQMD.csv -pt=1 -pgh=0.1 -qid=88 -rqt=10000 -pkl=0 -host=node33-016 -port=6388 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/logs/test_tidied_launch_qhl_88.qmd.7411930.log'
++ python3 Exp.py -rq=1 -op=xTiPPyTiPPzTiPPxTxPPyTyPPzTz -p=2000 -e=1000 -bt=999 -rt=0.5 -ra=0.8 -pgh=0.1 -qid=88 -rqt=30000 -g=1 -exp=1 -qhl=0 -fq=0 -pt=1 -pkl=0 -host=node33-016 -port=6388 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/logs/test_tidied_launch_qhl_88.qmd.7411930.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52/multiQMD.csv -cpr=1 -ds=NVB_HahnPeaks_Newdata -dst=5000 -dto=205
+++ date +%H:%M:%S
++ echo 'Finished Exp.py at 05:13:30; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_05/17_52'
++ sleep 1
++ redis-cli -p 6388 flushall
++ redis-cli -p 6388 shutdown
+++ date +%H:%M:%S
++ echo 'QMD 88 Finished; end of script at Time: 05:13:31'
