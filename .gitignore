@@ -27,7 +27,7 @@ ParallelDevelopment/*
 ExperimentalSimulations/*
 DevelopmentNotebooks/*
 
-!ParallelDevelopment/Results/SelectedRuns/*
+!ParallelDevelopment/Results/Selected_Runs/*
 !ParallelDevelopment/launch_qmd.sh
 !ParallelDevelopment/run_qmd_instance.sh
 
