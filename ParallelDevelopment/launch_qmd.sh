@@ -1,17 +1,17 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="hubbard_qhl_test"
+test_description="experimental_transverse_extra_runs_to_ensure_100_instances"
 
 ## Script essentials
-num_tests=20
-qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
-do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
-min_id=200 # update so instances don't clash and hit eachother's redis databases
-experimental_data=0 # use experimental data -> 1; use fake data ->0
+num_tests=15
+qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
+do_further_qhl=1 # perform further QHL parameter tuning on average values found by QMD. 
+min_id=100 # update so instances don't clash and hit eachother's redis databases
+experimental_data=1 # use experimental data -> 1; use fake data ->0
 
 # QHL parameters
 p=2500 # particles
-e=400 # experiments
+e=750 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -38,7 +38,7 @@ data_time_offset=205 # nanoseconds
 top_number_models=3 # how many models to perform further QHL for
 further_qhl_resource_factor=1
 #growth_rule='two_qubit_ising_rotation_hyperfine'
-#growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 #growth_rule='non_interacting_ising_single_axis'
 #growth_rule='non_interacting_ising'
 #growth_rule='deterministic_noninteracting_ising_single_axis'
@@ -48,7 +48,9 @@ further_qhl_resource_factor=1
 #growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 #growth_rule='heisenberg_nontransverse'
 #growth_rule='heisenberg_transverse'
-growth_rule='hubbard'
+#growth_rule='hubbard'
+#growth_rule='hubbard_chain_just_hopping'
+#growth_rule='hubbard_chain'
 
 multiple_growth_rules=0 # NOTE this is being manually passed to CalculateTimeRequired below #TODO make it acceot this arg
 alt_growth_rules=(

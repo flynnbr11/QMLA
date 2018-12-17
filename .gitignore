@@ -27,6 +27,11 @@ ParallelDevelopment/*
 ExperimentalSimulations/*
 DevelopmentNotebooks/*
 
+!ParallelDevelopment/Results/SelectedRuns/*
+!ParallelDevelopment/launch_qmd.sh
+!ParallelDevelopment/run_qmd_instance.sh
+
+
 # But want redis configuration:
 !Libraries/QML_lib/RedisConfig.conf
 !Libraries/QML_lib/RedisDatabaseConfig.conf
