@@ -91,7 +91,7 @@ default_true_operators_by_generator = {
     'hubbard' : 'h_1_2_d2PPiTzPPzTi',
     'hubbard_chain_just_hopping' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3',
     # 'hubbard_chain_just_hopping' : 'h_1_2_d2'
-	'hubbard_chain' : 'h_1_2_d2PPzTiPPiTz'
+	'hubbard_chain' : 'h_1_2_d2PPiTzPPzTi'
 }
 
 fixed_axis_generators = [
