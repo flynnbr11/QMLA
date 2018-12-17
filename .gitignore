@@ -30,7 +30,7 @@ DevelopmentNotebooks/*
 !ParallelDevelopment/Results/
 ParallelDevelopment/Results/*
 !ParallelDevelopment/Results/Selected_Runs/*
-!ParallelDevelopment/Results/Selected_Runs/*.p
+!ParallelDevelopment/Results/Selected_Runs/*/*.p
 
 !ParallelDevelopment/launch_qmd.sh
 !ParallelDevelopment/run_qmd_instance.sh
