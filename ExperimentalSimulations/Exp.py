@@ -71,12 +71,16 @@ store_particles_weights = False
 
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
-num_probes = 20
+if global_variables.special_probe == 'plus':
+    num_probes=1
+else:
+    num_probes = 20
 
 generated_probe_dict = UserFunctions.get_probe_dict(
     experimental_data = global_variables.use_experimental_data, 
     growth_generator = global_variables.growth_generation_rule, 
     noise_level = 0.0,
+    special_probe = global_variables.special_probe, 
     minimum_tolerable_noise = 1e-7,
     num_probes = num_probes
 )

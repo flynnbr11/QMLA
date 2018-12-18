@@ -130,9 +130,9 @@ max_spawn_depth_info = {
 
 max_num_qubits_info = {
     'test_changes_to_qmd' : 2,
-    'two_qubit_ising_rotation' : 2,
-    'two_qubit_ising_rotation_hyperfine' : 2, # for dev, should be 5 #TODO put back
-    'two_qubit_ising_rotation_hyperfine_transverse' : 2,
+    'two_qubit_ising_rotation' : 3,
+    'two_qubit_ising_rotation_hyperfine' : 3, # for dev, should be 5 #TODO put back
+    'two_qubit_ising_rotation_hyperfine_transverse' : 3,
     'non_interacting_ising_single_axis' : 5,
     'non_interacting_ising' : 5, 
     'deterministic_noninteracting_ising_single_axis' : 5,

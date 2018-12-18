@@ -6,7 +6,7 @@ test_description="test_with_only_plus_probe"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 do_further_qhl=0
 exp_data=0
 
@@ -204,6 +204,7 @@ do
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
+            -special_probe=$special_probe \
             -pmin=$param_min -pmax=$param_max \
             -pmean=$param_mean -psigma=$param_sigma \
             -ds=$dataset -dst=$data_max_time \

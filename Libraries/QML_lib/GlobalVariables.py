@@ -166,6 +166,7 @@ class GlobalVariablesClass():
         self.data_max_time = arguments.data_max_time 
         self.true_expec_path = arguments.true_expec_path
         self.plot_probe_file = arguments.plot_probe_file
+        self.special_probe = arguments.special_probe_for_learning
         self.latex_mapping_file = arguments.latex_mapping_file
         self.reallocate_resources = arguments.reallocate_resources
         self.param_min = arguments.param_min
@@ -486,6 +487,12 @@ def parse_cmd_line_args(args):
       default=default_plot_probe_file
     )
 
+    parser.add_argument(
+      '-special_probe', '--special_probe_for_learning',
+      help='Specify type of probe to use during learning.',
+      type=str,
+      default=None
+    )
 
     parser.add_argument(
       '-latex', '--latex_mapping_file',
