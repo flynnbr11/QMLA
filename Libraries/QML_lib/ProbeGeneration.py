@@ -207,7 +207,10 @@ def plus_probes_dict(
         # dict key is tuple of form (0,i) for consistency with other probe dict generation functions. 
         new_probe =  n_qubit_plus_state(i)
         noisy_state = random_probe(i) * noise_level
-        probe_dict[(0,i)] = new_probe + noisy_state
+        noisy_probe = new_probe + noisy_state
+        norm = np.linalg.norm(noisy_probe)
+        noisy_probe = noisy_probe/norm
+        probe_dict[(0,i)] = noisy_probe
     return probe_dict 
 
 
