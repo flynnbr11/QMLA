@@ -6,15 +6,15 @@ test_description="test_with_only_plus_probe"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 do_further_qhl=0
-exp_data=0
+exp_data=1
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=30
-exp=5
+prt=10
+exp=2
 pgh=0.5
 ra=0.8
 rt=0.5

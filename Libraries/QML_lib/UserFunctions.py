@@ -76,6 +76,7 @@ default_true_operators_by_generator = {
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
     'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiP',
     'test_multidimensional' : 'xTiPPiTy', 
     'test_return_champs' : 'xTiPPiTy', 
     'non_interacting_ising' : 'xTxTTx',
