@@ -73,9 +73,9 @@ expec_val_function_dict = {
 
 default_true_operators_by_generator = {
     'test_changes_to_qmd' : 'x',
-    'two_qubit_ising_rotation' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
-    'two_qubit_ising_rotation_hyperfine' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz', # for dev, should be 5 #TODO put back
-    'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
+    'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+    'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # for dev, should be 5 #TODO put back
+    'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
     'test_multidimensional' : 'xTiPPiTy', 
     'test_return_champs' : 'xTiPPiTy', 
     'non_interacting_ising' : 'xTxTTx',

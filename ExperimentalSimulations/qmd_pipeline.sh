@@ -6,7 +6,7 @@ test_description="test_with_only_plus_probe"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 do_further_qhl=0
 exp_data=0
 
@@ -160,6 +160,7 @@ if (( "$exp_data" == 1))
 then
     special_probe='plus'
 fi
+measurement_type=$exp_measurement_type
 special_probe='plus' #'plus' #'ideal' # TODO this is just for a test, remove!!
 
 echo "special probe $special_probe"
