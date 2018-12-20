@@ -1471,6 +1471,7 @@ def deconstruct_hopping_term(hopping_string):
                 sites = [int(a) for a in sites]
                 deconstructed['sites'].append(sites)
     return deconstructed
+
 def generate_hubbard_chain(
     num_qubits, 
     include_interaction_energy=False

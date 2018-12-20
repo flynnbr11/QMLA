@@ -1,20 +1,20 @@
 #!/bin/bash
 
-test_description="test_with_only_plus_probe"
+test_description="multiple_growth_rules_include_hubbard"
 
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 do_further_qhl=0
 exp_data=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=20
-exp=5
+prt=1000
+exp=200
 pgh=0.5
 ra=0.8
 rt=0.5

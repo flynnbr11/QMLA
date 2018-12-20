@@ -99,7 +99,9 @@ default_true_operators_by_generator = {
 	# 'hubbard_square_lattice_generalised' : 'h_1_2_d6PPPPPPh_1_3_d6PPPPPPh_2_4_d6PPPPPPh_2_5_d6PPPPPPh_3_4_d6PPPPPPh_4_6_d6PPPPPPh_5_6_d6PPPPPPzTiTTiTTTiTTTTiTTTTTiPPPPPPiTzTTiTTTiTTTTiTTTTTiPPPPPPiTiTTzTTTiTTTTiTTTTTiPPPPPPiTiTTiTTTzTTTTiTTTTTiPPPPPPiTiTTiTTTiTTTTzTTTTTiPPPPPPiTiTTiTTTiTTTTiTTTTTz'
 	# 'hubbard_square_lattice_generalised' : 'h_1_2_d6PPPPPPh_1_3_d6PPPPPPh_2_4_d6PPPPPPh_2_5_d6PPPPPPh_3_4_d6PPPPPPh_4_6_d6PPPPPPh_5_6_d6PPPPPPzTiTTiTTTiTTTTiTTTTTiPPPPPPiTzTTiTTTiTTTTiTTTTTiPPPPPPiTiTTzTTTiTTTTiTTTTTiPPPPPPiTiTTiTTTzTTTTiTTTTTiPPPPPPiTiTTiTTTiTTTTzTTTTTiPPPPPPiTiTTiTTTiTTTTiTTTTTz'
 	'hubbard_square_lattice_generalised' : 
-		'h_1h2_d6PPPPPPh_1h3_d6PPPPPPh_2h4_d6PPPPPPh_3h4_d6PPPPPPh_2h5_d6PPPPPPh_4h6_d6PPPPPPh_5h6_d6PPPPPPh_e_d6',
+		'h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4',
+		# 'h_1h2_1h3_2h4_3h4_2h5_4h6_5h6_d6PPPPPPh_e_d6',
+		# 'h_1h2_d6PPPPPPh_1h3_d6PPPPPPh_2h4_d6PPPPPPh_3h4_d6PPPPPPh_2h5_d6PPPPPPh_4h6_d6PPPPPPh_5h6_d6PPPPPPh_e_d6',
 }
 
 fixed_axis_generators = [
@@ -154,7 +156,7 @@ max_num_qubits_info = {
 	'hubbard' : 5, 
 	'hubbard_chain_just_hopping' : 5,
 	'hubbard_chain' : 5,
-	'hubbard_square_lattice_generalised' : 9,
+	'hubbard_square_lattice_generalised' : 6,
     None : 5,
 }
 
@@ -354,7 +356,8 @@ initial_models = {
 		# ['h_1_2_d2'],
 		['h_1h2_d2'],
 	'hubbard_square_lattice_generalised' :
-		['h_1h2_d4PPPPh_1h3_d4PPPPh_2h4_d4PPPPh_3h4_d4PPPPh_e_d4']
+		['h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4']
+		# ['h_1h2_d4PPPPh_1h3_d4PPPPh_2h4_d4PPPPh_3h4_d4PPPPh_e_d4']
 		# ['h_1_2_d4PPPPh_1_3_d4PPPPh_2_4_d4PPPPh_3_4_d4PPPPzTiTTiTTTiPPPPiTzTTiTTTiPPPPiTiTTzTTTiPPPPiTiTTiTTTz'],
 }
 
