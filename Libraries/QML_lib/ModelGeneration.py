@@ -1086,6 +1086,107 @@ def heisenberg_transverse(
 
 ## Hubbard rules
 
+
+def hubbard_square_lattice_generalised(**kwargs):
+    from UserFunctions import initial_models, max_num_qubits_info, fixed_axes_by_generator
+    growth_generator = kwargs['generator']
+    model_list = kwargs['model_list']
+    spawn_stage = kwargs['spawn_stage']
+    max_num_qubits = max_num_qubits_info[growth_generator]
+    
+    new_models = []
+    misc = kwargs['miscellaneous']
+    if spawn_stage[-1] == None:
+        topology = initialise_topology_2x2_square_lattice()
+        misc['topology'] = topology
+        
+        # now get new model name and update topology in same step
+        new_mod = new_hubbard_model_from_square_lattice(misc['topology'])
+        new_models.append(new_mod)
+        spawn_stage.append('topology_generated')
+    elif spawn_stage[-1] == 'topology_generated':
+        print("generating new topology. Starting from:\n", misc['topology'])
+        new_mod = new_hubbard_model_from_square_lattice(misc['topology'])
+        new_models.append(new_mod)
+    
+    if np.any(
+        np.array([DataBase.get_num_qubits(mod) for mod in new_models]) >= 
+        max_num_qubits
+    ):
+        print("Max num qubits {} reached".format(max_num_qubits))
+        spawn_stage.append('Complete')
+
+    return new_models
+
+# def process_hubbard_operator(
+#     term
+# ):
+#     # for use in computing base level terms in a model, used in DataBase.
+#     return hopping_matrix(term)
+
+
+
+def hopping_matrix(term):
+    # to get a matrix given a term consisting of Hopping type terms
+    # e.g. h_1_2_d3PPPh_1_3_d3
+    from ModelNames import full_model_string
+    print("hopping_matrix func. term:", term)
+    split_term = term.split('_')
+    sites = []
+    for i in split_term:
+        print("ind term:", i)
+        if i[0] == 'd':
+            dim = int(i[1])
+        elif i[0] == 'e':
+            energy_term = True
+            hopping_term = False
+        elif i != 'h': 
+            hopping_term = True
+            energy_term = False
+            sites.append(int(i))
+    
+    if (len(sites) > 0 and max(sites) > dim):
+        raise ValueError(
+            "Hopping term", 
+            term, 
+            "has site index", 
+            max(sites), 
+            "higher than the dimension", 
+            dim
+        )
+    print(
+        "Hopping matrix. term:", term, 
+        "\nenergy term:", energy_term, 
+        "\n hopping_term:", hopping_term,
+        "dimension:", dim
+    )
+
+    if energy_term is True:
+        full_name = interaction_energy_pauli_term(dim)
+
+    elif hopping_term is True:
+        term_1 = []
+        term_2  = []
+        
+        term_1.append((sites[0], 'a'))
+        term_1.append((sites[1], 's'))
+        term_2.append((sites[1], 'a'))
+        term_2.append((sites[0], 's'))
+
+        terms = [term_1, term_2]
+        op_dict = {
+            'dim' : dim, 
+            'terms' : terms
+        }
+        full_name = full_model_string(op_dict)
+    # mtx = DataBase.operator(full_name).matrix
+
+    mtx = DataBase.compute(full_name)
+
+    return mtx
+
+
+
 def hubbard_chain_increase_dimension_full_chain(mod):
     # if going up a dimension and want to consider all newly available hopping terms one by one
     import copy
@@ -1123,64 +1224,238 @@ def hubbard_chain_just_hopping(**kwargs):
         new_models.extend(new_mods)
     return new_models
 
+# def generate_hopping_term(
+#     deconstructed, 
+#     include_interaction_energy=False
+# ):
+#     sites_list = deconstructed['sites']
+#     dim = deconstructed['dim']
+    
+#     if type(sites_list[0]) != list:
+#         sites_list = [sites_list]
+#     p_str = ''
+#     for i in range(dim):
+#         p_str += 'P'
+        
+#     overall_term = ''
+#     first_term = True
+
+#     for sites in sites_list:
+#         hopping_string = 'h'
+#         for s in sites:
+#             # hopping_string += '_'
+#             hopping_string += 'h'
+#             hopping_string += str(s)
+#         hopping_string += str( '_d' + str(dim)) 
+    
+#         if first_term == False:
+#             overall_term += p_str 
+#         else:
+#             first_term = False
+#         overall_term += str(hopping_string)
+
+#     if include_interaction_energy == True:
+#         overall_term += str(
+#             p_str 
+#             + 
+#             interaction_energy_pauli_term(dim)
+#         )
+#     return overall_term
+
+def interaction_energy_pauli_term(dim):
+    interaction_energy = ''
+    p_str = ''
+    for i in range(dim):
+        p_str += 'P'
+
+    first_term = True
+    for i in range(1, dim+1):
+
+        op_dict = {
+            'terms' : [[(i, 'z')]],
+            'dim' : dim
+        }
+        new_term = ModelNames.full_model_string(op_dict)
+
+        if first_term == False:
+            interaction_energy += p_str
+        else:
+            first_term = False
+        interaction_energy += new_term
+    return interaction_energy    
+
+
+# def deconstruct_hopping_term(hopping_string):
+    
+#     dim = DataBase.get_num_qubits(hopping_string)
+#     individual_terms = DataBase.get_constituent_names_from_name(hopping_string)
+    
+#     deconstructed = {
+#         'sites' : [], 
+#         'dim' : dim
+#     }
+    
+#     for term in individual_terms:
+#         split_term = term.split('_')
+#         sites = []
+#         for i in split_term:
+#             if i[0] == 'd':
+#                 dim = int(i[1])
+#             elif i != 'h': 
+#                 sites.append(int(i))
+#         deconstructed['sites'].append(sites)
+
+#     return deconstructed
+
+# def deconstruct_hopping_term(hopping_string):
+    
+#     dim = DataBase.get_num_qubits(hopping_string)
+#     individual_terms = DataBase.get_constituent_names_from_name(hopping_string)
+    
+#     deconstructed = {
+#         'sites' : [], 
+#         'dim' : dim
+#     }
+    
+#     for term in individual_terms:
+#         split_term = term.split('_')
+#         sites = []
+#         for i in split_term:
+#             if i[0] == 'd':
+#                 dim = int(i[1])
+#             elif i != 'h':
+#                 print("i=", i)
+#                 sites = i.split('h')
+#                 sites = [int(a) for a in sites]
+# #                 sites.append(int(i))
+#                 deconstructed['sites'].append(sites)
+
+#     return deconstructed
+
+def process_hubbard_operator(
+    term
+):
+    # for use in computing base level terms in a model, used in DataBase.
+    return base_hubbard_grouped_term(term)
+
+
+def base_hubbard_grouped_term(term):
+    from ModelGeneration import interaction_energy_pauli_term
+    from ModelNames import full_model_string
+
+    split_term = term.split('_')
+    sites = []
+    all_sites = []
+    for i in split_term:
+        if i[0] == 'd':
+            # dim = int(i[1])
+            dim = int(i.replace('d', ''))
+        elif i[0] == 'e':
+            energy_term = True
+            hopping_term = False
+        elif i != 'h': 
+            hopping_sites = i.split('h')
+            hopping_sites = [int(s) for s in hopping_sites]
+            all_sites.append(hopping_sites)
+            hopping_term = True
+            energy_term = False
+    #             sites.append(int(i))
+
+    if (len(sites) > 0 and max(sites) > dim):
+        raise ValueError(
+            "Hopping term", 
+            term, 
+            "has site index", 
+            max(sites), 
+            "higher than the dimension", 
+            dim
+        )
+    if energy_term is True:
+        full_name = interaction_energy_pauli_term(dim)
+        mtx = DataBase.compute(full_name)
+
+
+    elif hopping_term is True:
+        matrices = []
+        mtx = None
+        for sites in all_sites:
+            term_1 = []
+            term_2  = []
+
+            term_1.append((sites[0], 'a'))
+            term_1.append((sites[1], 's'))
+            term_2.append((sites[1], 'a'))
+            term_2.append((sites[0], 's'))
+
+            terms = [term_1, term_2]
+            op_dict = {
+                'dim' : dim, 
+                'terms' : terms
+            }
+            full_name = full_model_string(op_dict)
+
+            this_mtx = DataBase.operator(full_name).matrix
+            if mtx is None:
+                mtx = this_mtx
+            else:
+                mtx += this_mtx
+
+    return mtx
+
 def generate_hopping_term(
     deconstructed, 
     include_interaction_energy=False
 ):
     sites_list = deconstructed['sites']
     dim = deconstructed['dim']
+    try:
+        interaction_energy = deconstructed['interaction_energy']
+    except:
+        interaction_energy = include_interaction_energy
     
     if type(sites_list[0]) != list:
         sites_list = [sites_list]
     p_str = ''
     for i in range(dim):
         p_str += 'P'
-        
     overall_term = ''
     first_term = True
+    
+    hopping_string = 'h'
 
     for sites in sites_list:
-        hopping_string = 'h'
-        for s in sites:
-            hopping_string += '_'
-            hopping_string += str(s)
-        hopping_string += str( '_d' + str(dim)) 
+        hopping_string += str(
+            '_' + 
+            str(sites[0]) + 
+            'h' + 
+            str(sites[1])
+        )
     
-        if first_term == False:
-            overall_term += p_str 
-        else:
-            first_term = False
-        overall_term += str(hopping_string)
+    hopping_string += str( '_d' + str(dim)) 
+    overall_term += hopping_string
 
-    if include_interaction_energy == True:
-        interaction_energy = ''
-        p_str = ''
-        for i in range(dim):
-            p_str += 'P'
-
-        for i in range(1, dim+1):
-
-            op_dict = {
-                'terms' : [[(i, 'z')]],
-                'dim' : dim
-            }
-            new_term = ModelNames.full_model_string(op_dict)
-
-            interaction_energy += p_str
-            interaction_energy += new_term
-        overall_term += interaction_energy
-        
-        
+    if interaction_energy == True:
+        interaction_term = str(
+            'h_e_d' + str(dim) 
+        )
+        overall_term += str(
+            p_str +
+            interaction_term
+        )
+#         overall_term += str(
+#             p_str 
+#             + 
+#             interaction_energy_pauli_term(dim)
+#         )
     return overall_term
 
 def deconstruct_hopping_term(hopping_string):
-    
     dim = DataBase.get_num_qubits(hopping_string)
     individual_terms = DataBase.get_constituent_names_from_name(hopping_string)
-    
     deconstructed = {
         'sites' : [], 
-        'dim' : dim
+        'dim' : dim,
+        'interaction_energy' : False
     }
     
     for term in individual_terms:
@@ -1189,12 +1464,13 @@ def deconstruct_hopping_term(hopping_string):
         for i in split_term:
             if i[0] == 'd':
                 dim = int(i[1])
-            elif i != 'h': 
-                sites.append(int(i))
-        deconstructed['sites'].append(sites)
-
+            elif 'e' in i:
+                deconstructed['interaction_energy'] = True
+            elif i != 'h':
+                sites = i.split('h')
+                sites = [int(a) for a in sites]
+                deconstructed['sites'].append(sites)
     return deconstructed
-
 def generate_hubbard_chain(
     num_qubits, 
     include_interaction_energy=False
@@ -1228,12 +1504,187 @@ def hubbard_chain(**kwargs):
             spawn_stage.append('just_hopping_complete')
         elif spawn_stage[-1] == 'just_hopping_complete':
             for i in range(2, max_num_qubits+1):
-                new_mod = generate_hubbard_chain(i, include_interaction_energy=True)
+                new_mod = generate_hubbard_chain(
+                    i, 
+                    include_interaction_energy=True
+                )
                 new_models.append(new_mod)
             spawn_stage.append('Complete')
     return new_models
 
+def check_nearest_neighbour_sites(site_1, site_2):
+    # simply checks whether sites are adjacent (or comptues distance)
+    # assumes Cartesian coordinates
+    if len(site_1) != len(site_2):
+        print(
+            "Site distance calculation: both sites must have same number of dimensions.",
+            "Given:", site_1, site_2
+        )
+        raise NameError('Unequal site dimensions.')
+    
+    dim = len(site_1)
+    dist = 0 
+    for d in range(dim):
+        dist += np.abs(site_1[d] - site_2[d])
+        
+    if dist == 1:
+        return True
+    else:
+        return False
+    
+def get_nearest_neighbour_list(topology):
+    coordinates = topology['coordinates']
+    site_indices = list(coordinates.keys())
+    nearest_neighbours = []
+    
+    for i in range(len(site_indices)):
+        idx_1 = site_indices[i]
+        for j in range(i, len(site_indices)):
+            idx_2 = site_indices[j]
+            nn = check_nearest_neighbour_sites(
+                site_1 = coordinates[idx_1],
+                site_2 = coordinates[idx_2],
+            )
+            if nn is True:
+                nearest_neighbours.append( (idx_1, idx_2) )
+                
+    return nearest_neighbours
 
+
+def add_new_coordinate_2d_lattice(topology):
+    rows = topology['occupation']['rows']
+    cols = topology['occupation']['cols']
+
+    row_values = rows.keys()
+    col_values = cols.keys() 
+    min_span_row = None
+    min_span_col = None        
+
+    for row_idx in rows:
+        span = max(rows[row_idx]) - min(rows[row_idx])
+        if (
+            min_span_row is None 
+            or
+            span < min_span_row
+        ):
+            min_span_row = span
+            min_span_row_idx = row_idx
+
+    for col_idx in cols:
+        span = max(cols[col_idx]) - min(cols[col_idx])
+        if (
+            min_span_col is None 
+            or
+            span < min_span_col
+        ):
+            min_span_col = span
+            min_span_col_idx = col_idx
+
+    if min_span_col < min_span_row:
+        # growing downward in y-axis
+        new_row = max(cols[min_span_col_idx]) + 1
+        new_col = min_span_col_idx
+    else:
+        # growing rightward in x-axis
+        new_col = max(rows[min_span_row_idx]) + 1
+        new_row = min_span_row_idx
+
+    new_coordinate = [new_row, new_col]
+    print("new coordinate:", new_coordinate)
+
+    try:
+        topology['occupation']['rows'][new_row].append(new_col)
+    except:
+        topology['occupation']['rows'][new_row] = [new_col]
+
+    try:
+        topology['occupation']['cols'][new_col].append(new_row)
+    except:
+        topology['occupation']['cols'][new_col] = [new_row]
+
+
+    max_site_idx = max(list(topology['coordinates'].keys()))
+    new_site_idx = max_site_idx + 1
+    topology['coordinates'][new_site_idx] = new_coordinate
+    return new_site_idx
+
+
+def add_sites_to_topology(topology):
+    all_sites_greater_than_2_nearest_neighbours = False
+    while all_sites_greater_than_2_nearest_neighbours == False:
+        new_site_idx = add_new_coordinate_2d_lattice(topology)
+        site_indices = list(topology['coordinates'].keys())
+
+        new_coords  = topology['coordinates'][new_site_idx] 
+        topology['nearest_neighbours'][new_site_idx] = []
+
+        for i in site_indices:
+            other_coords = topology['coordinates'][i] 
+
+            nearest_neighbour = check_nearest_neighbour_sites(
+                site_1 = new_coords,
+                site_2 = other_coords
+            )
+
+            if nearest_neighbour is True:
+                if i not in topology['nearest_neighbours'][new_site_idx]:
+                    topology['nearest_neighbours'][new_site_idx].append(i)
+                if new_site_idx not in topology['nearest_neighbours'][i]:
+                    topology['nearest_neighbours'][i].append(new_site_idx)
+
+        nn_lists = list(topology['nearest_neighbours'].values())
+        num_nearest_neighbours = np.array([len(a) for a in nn_lists])
+        all_sites_greater_than_2_nearest_neighbours = np.all(num_nearest_neighbours >= 2)
+
+def initialise_topology_2x2_square_lattice():
+    # Initialises a 2x2 square lattice
+    topology = {
+        'lattice_dimension' : 2,
+        'span' : [0,0],
+        'occupation' : {
+            'rows' : {
+                1 : [1, 2],
+                2 : [1, 2]
+            },
+            'cols' : {
+                1 : [1, 2], 
+                2 : [1, 2]
+            }
+        },
+        'coordinates' : {
+            1 : [1,1],
+            2 : [1,2], 
+            3 : [2,1],
+            4 : [2,2]
+        },
+        'nearest_neighbours' : {
+            1 : [2,3],
+            2 : [1,4], 
+            3 : [1,4], 
+            4 : [2,3]
+        }
+    }
+    
+    return topology
+
+
+def new_hubbard_model_from_square_lattice(topology):
+
+    add_sites_to_topology(topology)
+    nearest_neighbours_list = get_nearest_neighbour_list(topology)
+    nearest_neighbours_list = [list(a) for a in nearest_neighbours_list]
+    num_qubits = len(topology['coordinates'])
+
+    hubbard_model_dict = {
+        'sites' : nearest_neighbours_list, 
+        'dim' : num_qubits
+    }
+
+    new_model = generate_hopping_term(
+        hubbard_model_dict, 
+        include_interaction_energy=True, 
+    )
+    return new_model
 
 ##################################################################################
 ##################### Tree Finished Functions ############################################

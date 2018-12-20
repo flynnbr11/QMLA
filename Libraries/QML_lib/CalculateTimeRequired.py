@@ -217,6 +217,13 @@ max_num_models_by_shape['hubbard_chain'] = {
     'other' : 2
 }
 
+max_num_models_by_shape['hubbard_square_lattice_generalised'] = {
+    4 : 2,
+    6 : 2, 
+    8 : 2, 
+    9 : 2,
+    'other' : 0
+}
 
 
 

@@ -637,34 +637,78 @@ def nearest_neighbour_ising_latex_name(
         '}$'
     )
     return latex_rep
-    
+
+# def hubbard_latex(name):
+#     individual_terms = DataBase.get_constituent_names_from_name(name)
+#     latex_term = ''
+#     for term in individual_terms:
+#         if term[0] == 'h':
+#             split_term = term.split('_')
+#             sites = []
+#             for st in split_term:
+#                 if st[0] not in ['h', 'd']:
+#                     sites.append(st)
+#             latex_this_term = str(
+#                 'H_{' + 
+#                 sites[0] + 
+#                 ',' + sites[1] + 
+#                 '}'
+#             )
+#             latex_term += latex_this_term
+#         else:
+#             latex_this_term = interaction_latex_name(term)
+#             list_letters = list(latex_this_term)
+#             while '$' in list_letters:
+#                 list_letters.remove('$')
+#             new_latex_term = ''
+#             for l in list_letters:
+#                 new_latex_term += l
+#             latex_term += new_latex_term
+        
+#     latex_term = str('$' + latex_term + '$')
+#     return latex_term
+
+
+
 def hubbard_latex(name):
     individual_terms = DataBase.get_constituent_names_from_name(name)
     latex_term = ''
-    for term in individual_terms:
-        if term[0] == 'h':
-            split_term = term.split('_')
-            sites = []
-            for st in split_term:
-                if st[0] not in ['h', 'd']:
-                    sites.append(st)
-            latex_this_term = str(
-                'H_{' + 
-                sites[0] + 
-                ',' + sites[1] + 
-                '}'
+
+    hopping_terms = []
+    interaction_energy = False
+    for constituent in individual_terms:
+        components = constituent.split('_')
+        for term in components: 
+            if term != 'h': #ie entire term not just 'h'
+                if 'h' in term: # ie a hopping term eg 1_1h2_d3, hopping sites 1-2, total num sites 3
+                    split_term = term.split('h')
+                    hopping_terms.append(split_term)
+
+                elif 'e' in term:
+                    interaction_energy = True
+                elif 'd' in term:
+                    dim = int(term.replace('d', ''))
+
+    hopping_latex = 'H_{'
+    for site_pair in hopping_terms:
+        hopping_latex += str(
+            '({},{})'.format(
+                str(site_pair[0]), 
+                str(site_pair[1])
             )
-            latex_term += latex_this_term
-        else:
-            latex_this_term = interaction_latex_name(term)
-            list_letters = list(latex_this_term)
-            while '$' in list_letters:
-                list_letters.remove('$')
-            new_latex_term = ''
-            for l in list_letters:
-                new_latex_term += l
-            latex_term += new_latex_term
-        
+        )
+
+    hopping_latex += '}'
+
+    latex_term += hopping_latex
+
+    if interaction_energy is True:
+        latex_term += str(
+            '\sigma_{z}^{\otimes'
+            +str(dim)
+            +'}'
+        )
+
     latex_term = str('$' + latex_term + '$')
     return latex_term
 

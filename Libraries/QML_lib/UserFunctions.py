@@ -89,10 +89,17 @@ default_true_operators_by_generator = {
     'heisenberg_nontransverse' : 'xTxPPzTz',
     'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi',
     # 'hubbard' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
-    'hubbard' : 'h_1_2_d2PPiTzPPzTi',
-    'hubbard_chain_just_hopping' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3',
+    # 'hubbard' : 'h_1_2_d2PPiTzPPzTi',
+    'hubbard' : 'h_1h2_d2PPiTzPPzTi',
+    # 'hubbard_chain_just_hopping' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3',
+    'hubbard_chain_just_hopping' : 'h_1h2_d3PPPh_1h3_d3PPPh_2h3_d3',
     # 'hubbard_chain_just_hopping' : 'h_1_2_d2'
-	'hubbard_chain' : 'h_1_2_d2PPiTzPPzTi'
+	# 'hubbard_chain' : 'h_1_2_d2PPiTzPPzTi',
+	'hubbard_chain' : 'h_1h2_d2PPh_e_d2',
+	# 'hubbard_square_lattice_generalised' : 'h_1_2_d6PPPPPPh_1_3_d6PPPPPPh_2_4_d6PPPPPPh_2_5_d6PPPPPPh_3_4_d6PPPPPPh_4_6_d6PPPPPPh_5_6_d6PPPPPPzTiTTiTTTiTTTTiTTTTTiPPPPPPiTzTTiTTTiTTTTiTTTTTiPPPPPPiTiTTzTTTiTTTTiTTTTTiPPPPPPiTiTTiTTTzTTTTiTTTTTiPPPPPPiTiTTiTTTiTTTTzTTTTTiPPPPPPiTiTTiTTTiTTTTiTTTTTz'
+	# 'hubbard_square_lattice_generalised' : 'h_1_2_d6PPPPPPh_1_3_d6PPPPPPh_2_4_d6PPPPPPh_2_5_d6PPPPPPh_3_4_d6PPPPPPh_4_6_d6PPPPPPh_5_6_d6PPPPPPzTiTTiTTTiTTTTiTTTTTiPPPPPPiTzTTiTTTiTTTTiTTTTTiPPPPPPiTiTTzTTTiTTTTiTTTTTiPPPPPPiTiTTiTTTzTTTTiTTTTTiPPPPPPiTiTTiTTTiTTTTzTTTTTiPPPPPPiTiTTiTTTiTTTTiTTTTTz'
+	'hubbard_square_lattice_generalised' : 
+		'h_1h2_d6PPPPPPh_1h3_d6PPPPPPh_2h4_d6PPPPPPh_3h4_d6PPPPPPh_2h5_d6PPPPPPh_4h6_d6PPPPPPh_5h6_d6PPPPPPh_e_d6',
 }
 
 fixed_axis_generators = [
@@ -127,6 +134,7 @@ max_spawn_depth_info = {
 	'heisenberg_transverse' : 30,
 	'hubbard_chain_just_hopping' : 10,
 	'hubbard_chain' : 10,
+	'hubbard_square_lattice_generalised' : 10,
 }
 
 max_num_qubits_info = {
@@ -146,6 +154,7 @@ max_num_qubits_info = {
 	'hubbard' : 5, 
 	'hubbard_chain_just_hopping' : 5,
 	'hubbard_chain' : 5,
+	'hubbard_square_lattice_generalised' : 9,
     None : 5,
 }
 
@@ -191,6 +200,8 @@ model_generation_functions = {
 		ModelGeneration.hubbard_chain_just_hopping,
 	'hubbard_chain' : 
 		ModelGeneration.hubbard_chain,
+	'hubbard_square_lattice_generalised' : 
+		ModelGeneration.hubbard_square_lattice_generalised,
 }
 
 ##### ---------- -------------------- #####  
@@ -206,7 +217,9 @@ tree_finished_functions = {
 	'hubbard_chain_just_hopping' :
 		ModelGeneration.max_num_qubits_reached_check,
 	'hubbard_chain' :
-		ModelGeneration.max_num_qubits_reached_check
+		ModelGeneration.max_num_qubits_reached_check,
+	'hubbard_square_lattice_generalised' :
+		ModelGeneration.max_num_qubits_reached_check,
 	# 'heisenberg_transverse':
 	# 	ModelGeneration.max_num_qubits_reached_check,
 }
@@ -244,6 +257,8 @@ name_branch_map_functions = {
 		ModelNames.branch_is_num_dims,
 	'hubbard_chain' : 
 		ModelNames.branch_is_num_dims,
+	'hubbard_square_lattice_generalised' : 
+		ModelNames.branch_is_num_dims,
 }
 
 
@@ -266,6 +281,8 @@ latex_naming_functions = {
 	'hubbard_chain_just_hopping' :	
 		ModelNames.hubbard_latex,
 	'hubbard_chain' : 
+		ModelNames.hubbard_latex,
+	'hubbard_square_lattice_generalised' : 
 		ModelNames.hubbard_latex,
 	# None : 
 	# 	ModelNames.default_latex_wrapping,
@@ -329,11 +346,16 @@ initial_models = {
 	'hubbard' :
 		['a', 's', 'z'],
 	'hubbard' :
-		['h_1_2_d2', 'h_1_2_d2PPzTiPPiTz'],
+		# ['h_1_2_d2', 'h_1_2_d2PPzTiPPiTz'],
+		['h_1h2_d2', 'h_1h2_d2PPh_e_d2'],
 	'hubbard_chain_just_hopping' :
-		['h_1_2_d2'],
+		['h_1h2_d2'],
 	'hubbard_chain' : 
-		['h_1_2_d2'],
+		# ['h_1_2_d2'],
+		['h_1h2_d2'],
+	'hubbard_square_lattice_generalised' :
+		['h_1h2_d4PPPPh_1h3_d4PPPPh_2h4_d4PPPPh_3h4_d4PPPPh_e_d4']
+		# ['h_1_2_d4PPPPh_1_3_d4PPPPh_2_4_d4PPPPh_3_4_d4PPPPzTiTTiTTTiPPPPiTzTTiTTTiPPPPiTiTTzTTTiPPPPiTiTTiTTTz'],
 }
 
 ##### ---------- -------------------- #####  

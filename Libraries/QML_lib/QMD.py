@@ -299,6 +299,7 @@ class QMD():
         self.BranchChampsByNumQubits = {}
         self.GhostBranches = {}
         self.SpawnStage = {}
+        self.MiscellaneousGrowthInfo = {}
 
         initial_id_counter = 0
         models_already_added_to_a_branch = []
@@ -362,6 +363,7 @@ class QMD():
             )
             self.SpawnDepthByGrowthRule[gen] = 0
             self.SpawnStage[gen] = [None]
+            self.MiscellaneousGrowthInfo[gen] = {}
             self.BranchGrowthRules[i] = gen
 
         # self.HighestBranchID = max(self.InitialModelBranches.values())
@@ -2238,7 +2240,8 @@ class QMD():
             model_dict=self.model_lists,
             log_file=self.log_file, 
             current_champs = current_champs,
-            spawn_stage = self.SpawnStage[growth_rule]
+            spawn_stage = self.SpawnStage[growth_rule],
+            miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
         )
 
         new_models = [DataBase.alph(mod) for mod in new_models]

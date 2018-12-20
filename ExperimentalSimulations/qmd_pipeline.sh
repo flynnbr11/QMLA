@@ -8,7 +8,7 @@ test_description="test_with_only_plus_probe"
 num_tests=1
 qhl_test=0
 do_further_qhl=0
-exp_data=1
+exp_data=0
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -60,7 +60,7 @@ mkdir -p $long_dir
 use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='heisenberg_nontransverse'
-growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='heisenberg_transverse'
 # growth_rule='non_interacting_ising'
@@ -76,6 +76,7 @@ growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='hubbard'
 # growth_rule='hubbard_chain_just_hopping'
 # growth_rule='hubbard_chain'
+growth_rule='hubbard_square_lattice_generalised'
 
 
 alt_growth_rules=(
@@ -145,7 +146,7 @@ plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 gaussian=1
 param_min=0
-param_max=8
+param_max=1
 param_mean=0.5
 param_sigma=0.25
 rand_true_params=0
@@ -160,8 +161,8 @@ if (( "$exp_data" == 1))
 then
     special_probe='plus'
 fi
-measurement_type=$exp_measurement_type
-special_probe='plus' #'plus' #'ideal' # TODO this is just for a test, remove!!
+# measurement_type=$exp_measurement_type
+# special_probe='plus' #'plus' #'ideal' # TODO this is just for a test, remove!!
 
 echo "special probe $special_probe"
 

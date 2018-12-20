@@ -613,47 +613,51 @@ def compute(inp):
 def process_basic_operator(basic_operator):
     # print("Processing basic opeator", basic_operator)
     if basic_operator[0] == 'h':
-        mtx = hopping_matrix(basic_operator)
+        import ModelGeneration
+        mtx = ModelGeneration.process_hubbard_operator(
+            basic_operator
+        )
+        # hopping_matrix(basic_operator)
     else:
         mtx = core_operator_dict[basic_operator]
 
     return mtx
 
-def hopping_matrix(term):
-    from ModelNames import full_model_string
-    split_term = term.split('_')
-    sites = []
-    for i in split_term:
-        if i[0] == 'd':
-            dim = int(i[1])
-        elif i != 'h': 
-            sites.append(int(i))
-    if max(sites) > dim:
-        raise ValueError(
-            "Hopping term", 
-            term, 
-            "has site index", 
-            max(sites), 
-            "higher than the dimension", 
-            dim
-        )
+# def hopping_matrix(term):
+#     from ModelNames import full_model_string
+#     split_term = term.split('_')
+#     sites = []
+#     for i in split_term:
+#         if i[0] == 'd':
+#             dim = int(i[1])
+#         elif i != 'h': 
+#             sites.append(int(i))
+#     if max(sites) > dim:
+#         raise ValueError(
+#             "Hopping term", 
+#             term, 
+#             "has site index", 
+#             max(sites), 
+#             "higher than the dimension", 
+#             dim
+#         )
     
-    term_1 = []
-    term_2  = []
+#     term_1 = []
+#     term_2  = []
     
-    term_1.append((sites[0], 'a'))
-    term_1.append((sites[1], 's'))
-    term_2.append((sites[1], 'a'))
-    term_2.append((sites[0], 's'))
+#     term_1.append((sites[0], 'a'))
+#     term_1.append((sites[1], 's'))
+#     term_2.append((sites[1], 'a'))
+#     term_2.append((sites[0], 's'))
 
-    terms = [term_1, term_2]
-    op_dict = {
-        'dim' : dim, 
-        'terms' : terms
-    }
-    full_name = full_model_string(op_dict)
-    mtx = DataBase.operator(full_name).matrix
-    return mtx
+#     terms = [term_1, term_2]
+#     op_dict = {
+#         'dim' : dim, 
+#         'terms' : terms
+#     }
+#     full_name = full_model_string(op_dict)
+#     mtx = DataBase.operator(full_name).matrix
+#     return mtx
 
 
 def ideal_probe(name):
