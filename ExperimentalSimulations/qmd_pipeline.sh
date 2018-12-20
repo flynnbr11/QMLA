@@ -60,7 +60,7 @@ mkdir -p $long_dir
 use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='heisenberg_nontransverse'
-# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='heisenberg_transverse'
 # growth_rule='non_interacting_ising'
@@ -76,7 +76,7 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='hubbard'
 # growth_rule='hubbard_chain_just_hopping'
 # growth_rule='hubbard_chain'
-growth_rule='hubbard_square_lattice_generalised'
+#growth_rule='hubbard_square_lattice_generalised'
 
 
 alt_growth_rules=(
@@ -156,10 +156,12 @@ rand_true_params=0
 # All undefined params will be random according 
 # to above defined mean/sigmas
 rand_prior=0 
-special_probe='random' #'plus' #'ideal'
+# special_probe='random' #'plus' #'ideal'
+special_probe='plus_random' #'plus' #'ideal'
 if (( "$exp_data" == 1))
 then
-    special_probe='plus'
+#    special_probe='plus'
+    special_probe='plus_random'
 fi
 # measurement_type=$exp_measurement_type
 # special_probe='plus' #'plus' #'ideal' # TODO this is just for a test, remove!!

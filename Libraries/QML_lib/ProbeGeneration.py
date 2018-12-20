@@ -82,7 +82,7 @@ def NV_centre_ising_probes_plus(
     max_num_qubits=2, 
     num_probes=40,
     noise_level=0.03, #from 1000 counts - Poissonian noise = 1/sqrt(1000)
-    minimum_tolerable_noise = 1e-7,
+    minimum_tolerable_noise = 1e-6,
     # minimum_tolerable_noise needed
     # or else run the risk of having 
     # exact eigenstate and no learning occurs, and crashes. 
@@ -116,7 +116,7 @@ def NV_centre_ising_probes_plus(
                 separable_probes[i,j] = (
                     np.tensordot(
                         separable_probes[i,j-1],
-                        noisy_plus, 
+                        random_probe(1),
                         axes=0
                     ).flatten(order='c')
                 )
@@ -183,8 +183,11 @@ def experimental_NVcentre_ising_probes(
                 print("non-unit norm: ", np.linalg.norm(separable_probes[i,j]))
                 # keep replacing until a unit-norm 
                 separable_probes[i,j] = (
-                    np.tensordot(separable_probes[i,j-1], random_probe(1),
-                    axes=0).flatten(order='c')
+                    np.tensordot(
+                        separable_probes[i,j-1], 
+                        random_probe(1),
+                        axes=0
+                    ).flatten(order='c')
                 )
     return separable_probes
   

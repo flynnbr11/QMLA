@@ -2726,26 +2726,31 @@ def get_bayes_latex_dict(qmd):
     )
     for i in list(qmd.AllBayesFactors.keys()):
         mod = qmd.ModelNameIDs[i]
-        latex_name = UserFunctions.get_latex_name(
-            name = mod,
-            growth_generator = qmd.GrowthGenerator
-        )
+        # latex_name = UserFunctions.get_latex_name(
+        #     name = mod,
+        #     growth_generator = qmd.GrowthGenerator
+        # )
+        # latex_name = mod.LatexTerm
+        latex_name = qmd.reducedModelInstanceFromID(i).LatexTerm
         mapping = (mod, latex_name)
         print(mapping, file=latex_write_file)
 
     for i in list(qmd.AllBayesFactors.keys()):
         # mod_a = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
-        mod_a = UserFunctions.get_latex_name(
-            name = qmd.ModelNameIDs[i],
-            growth_generator = qmd.GrowthGenerator
-        )
+        # mod_a = UserFunctions.get_latex_name(
+        #     name = qmd.ModelNameIDs[i],
+        #     growth_generator = qmd.GrowthGenerator
+        # )
+        mod_a = qmd.reducedModelInstanceFromID(i).LatexTerm
         latex_dict[mod_a] = {}
         for j in list(qmd.AllBayesFactors[i].keys()):
             # mod_b = DataBase.latex_name_ising(qmd.ModelNameIDs[j])
-            mod_b = UserFunctions.get_latex_name(
-                name = qmd.ModelNameIDs[j],
-                growth_generator = qmd.GrowthGenerator
-            )
+            mod_b = qmd.reducedModelInstanceFromID(j).LatexTerm
+
+            # mod_b = UserFunctions.get_latex_name(
+            #     name = qmd.ModelNameIDs[j],
+            #     growth_generator = qmd.GrowthGenerator
+            # )
             latex_dict[mod_a][mod_b]= qmd.AllBayesFactors[i][j][-1]
     return latex_dict
 

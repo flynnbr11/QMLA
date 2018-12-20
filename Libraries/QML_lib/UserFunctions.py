@@ -392,6 +392,8 @@ special_probe_functions = {
 		ProbeGeneration.separable_probe_dict, 
 	'plus':
 		ProbeGeneration.plus_probes_dict, 
+	'plus_random' :
+		ProbeGeneration.NV_centre_ising_probes_plus,
 	'ideal' : 
 		ProbeGeneration.ideal_probe_dict,
 }
@@ -529,7 +531,7 @@ def get_probe_dict(
 	# print("[getProbeDict] kwargs:", kwargs)
 	# print("[getProbeDict] growth_generator:", growth_generator)
 	# print("[getProbeDict] exp data:", experimental_data)
-	# print("Special probe:", special_probe)
+	print("[getProbeDict] Special probe:", special_probe)
 
 	# elif ideal_probes == True:
 	# 	probe_dict_function = ProbeGeneration.ideal_probe_dict
