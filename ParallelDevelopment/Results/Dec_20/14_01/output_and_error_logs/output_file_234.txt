@@ -1,0 +1,80 @@
+QMD ID =234; REDIS_PORT=6534
+Global server: newblue4
+BC backend identified
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+98201:C 20 Dec 14:01:19.021 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+98201:C 20 Dec 14:01:19.021 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=98201, just started
+98201:C 20 Dec 14:01:19.021 # Configuration loaded
+98201:M 20 Dec 14:01:19.023 * Running mode=standalone, port=6534.
+98201:M 20 Dec 14:01:19.023 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+98201:M 20 Dec 14:01:19.023 # Server initialized
+98201:M 20 Dec 14:01:19.023 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+98201:M 20 Dec 14:01:19.023 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+98201:M 20 Dec 14:01:19.023 * Ready to accept connections
+Job id is 7894540
+PBS job name is test_multiple_growth_rules_including_grouped_hubbard_234
+node44-011
+node44-011
+node44-011
+node44-011
+node44-011
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 14:01:31; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01
+CONFIG: -p=10 -e=3 -bt=1 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/cumulative.csv -pt=0 -pgh=1.0 -qid=234 -rqt=10000 -pkl=0 -host=node44-011 -port=6534 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_234.qmd.7894540.log cpr=1 -ds=NVB_rescale_dataset.p -dst=5000 -dto=205 -ggr=hubbard_square_lattice_generalised
+[getProbeDict] Probe func used: <function separable_probe_dict at 0x2aaadeb55ae8>
+Seed requested for host/port/id node44-011 / 6534 / 234 ;has seed 1
+Seed keys ['rq:worker:node44-011.98231', 'rq:worker:node44-011.98233', 'rq:worker:node44-011.98232', 'rq:worker:node44-011.98230', 'rq:worker:node44-011.98229', 'rq:workers']
+All growth rules: ['hubbard_square_lattice_generalised', 'non_interacting_ising']
+[QMD] Gaussian: True
+Gen list: ['hubbard_square_lattice_generalised', 'non_interacting_ising']
+Adding branch for  hubbard_square_lattice_generalised
+Adding branch for  non_interacting_ising
+mod id: 0
+mod id: 1
+mod id: 2
+mod id: 3
+[QMD] Going to learn initial models from branches.
+Bayes factors consider: 1 2
+Bayes factors consider: 1 3
+Bayes factors consider: 2 3
+not finished tree for growth: non_interacting_ising
+NEW BRANCH. gen= non_interacting_ising type: <class 'str'>
+not finished tree for growth: hubbard_square_lattice_generalised
+new coordinate: [1, 3]
+new coordinate: [2, 3]
+Max num qubits 6 reached
+NEW BRANCH. gen= hubbard_square_lattice_generalised type: <class 'str'>
+[QMD] Num trees now completed: 1 Tree completed dict: {'hubbard_square_lattice_generalised': True, 'non_interacting_ising': False}
+Bayes factors consider: 4.0 5.0
+Bayes factors consider: 4.0 6.0
+Bayes factors consider: 5.0 6.0
+not finished tree for growth: non_interacting_ising
+NEW BRANCH. gen= non_interacting_ising type: <class 'str'>
+Bayes factors consider: 8.0 9.0
+Bayes factors consider: 8.0 10.0
+Bayes factors consider: 9.0 10.0
+not finished tree for growth: non_interacting_ising
+NEW BRANCH. gen= non_interacting_ising type: <class 'str'>
+[ModGen] MAX SPAWN DEPTH REACHED FOR RULE  non_interacting_ising
+[QMD] Num trees now completed: 2 Tree completed dict: {'hubbard_square_lattice_generalised': True, 'non_interacting_ising': True}
+Bayes factors consider: 11.0 12.0
+Bayes factors consider: 11.0 13.0
+Bayes factors consider: 12.0 13.0
+[QMD runRemoteMult] Finalising QMD.
+NEW BRANCH. gen= hubbard_square_lattice_generalised type: <class 'str'>
+Bayes factors consider: 0.0 7.0
+NEW BRANCH. gen= non_interacting_ising type: <class 'str'>
+Bayes factors consider: 4.0 3.0
+Bayes factors consider: 4.0 11.0
+Bayes factors consider: 4.0 10.0
+Bayes factors consider: 3.0 11.0
+Bayes factors consider: 3.0 10.0
+Bayes factors consider: 11.0 10.0
+[QMD]Entering final while loop
+QMD finished - results in: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/
+Finished Exp.py at 14:02:54; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01
+OK
+98201:M 20 Dec 14:02:55.806 # User requested shutdown...
+98201:M 20 Dec 14:02:55.806 # Redis is now ready to exit, bye bye...
+QMD 234 Finished; end of script at Time: 14:02:55

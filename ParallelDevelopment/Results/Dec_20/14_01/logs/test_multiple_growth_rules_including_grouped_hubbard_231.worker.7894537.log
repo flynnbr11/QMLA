@@ -1,0 +1,299 @@
+14:01:26 RQ worker 'rq:worker:node35-025.22121' started, version 0.8.1
+14:01:26 RQ worker 'rq:worker:node35-025.22122' started, version 0.8.1
+14:01:26 RQ worker 'rq:worker:node35-025.22124' started, version 0.8.1
+14:01:26 RQ worker 'rq:worker:node35-025.22125' started, version 0.8.1
+14:01:26 RQ worker 'rq:worker:node35-025.22123' started, version 0.8.1
+14:01:26 Cleaning registries for queue: 231
+14:01:26 Cleaning registries for queue: 231
+14:01:26 Cleaning registries for queue: 231
+14:01:26 Cleaning registries for queue: 231
+14:01:26 Cleaning registries for queue: 231
+14:01:26 
+14:01:26 *** Listening on 231...
+14:01:26 
+14:01:26 
+14:01:26 
+14:01:26 
+14:01:26 *** Listening on 231...
+14:01:26 *** Listening on 231...
+14:01:26 *** Listening on 231...
+14:01:26 *** Listening on 231...
+14:01:38 231: RemoteModelLearning.learnModelRemote('h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4', 0.0, branchID=0, growth_generator='hubbard_square_lattice_generalised', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (f995918c-a3fc-4a93-b77b-ad90b9ed208e)
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (9.993378409363588). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (4.466262341283847). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (9.988936633027059). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:01:43 231: Job OK (f995918c-a3fc-4a93-b77b-ad90b9ed208e)
+14:01:43 Result will never expire, clean up result key manually
+14:01:43 
+14:01:43 *** Listening on 231...
+14:01:43 231: RemoteModelLearning.learnModelRemote('y', 2.0, branchID=1, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (7dde47f2-e273-446c-b475-26f3b785d0ef)
+14:01:43 231: RemoteModelLearning.learnModelRemote('x', 1.0, branchID=1, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (98fd41ae-3596-4974-bd0f-8fb8a77ae1ae)
+14:01:43 231: RemoteModelLearning.learnModelRemote('z', 3.0, branchID=1, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (946fd35e-6ef8-4c71-9a19-7a3f8e6b4682)
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.649760214926494). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (4.444095394661955). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (5.385071587850305). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:01:47 231: Job OK (946fd35e-6ef8-4c71-9a19-7a3f8e6b4682)
+14:01:47 Result will never expire, clean up result key manually
+14:01:47 
+14:01:47 *** Listening on 231...
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (5.136270139464122). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (3.3699955911905124). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (5.190804893231137). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:01:47 231: Job OK (98fd41ae-3596-4974-bd0f-8fb8a77ae1ae)
+14:01:47 Result will never expire, clean up result key manually
+14:01:47 
+14:01:47 *** Listening on 231...
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.73857805985162). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.207716255853261). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (3.4708782581311666). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:01:48 231: Job OK (7dde47f2-e273-446c-b475-26f3b785d0ef)
+14:01:48 Result will never expire, clean up result key manually
+14:01:48 
+14:01:48 *** Listening on 231...
+14:01:48 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=1, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=1, model_b_id=3, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (c7119c95-8c10-4b90-b16a-edc727232ac6)
+14:01:48 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=1, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=1, model_b_id=2, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (3a9d02c5-6ae5-4eed-acc7-38734b722f10)
+14:01:48 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=1, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=2, model_b_id=3, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (7b535eeb-a451-4910-ac48-4a04defea5b3)
+14:01:52 231: Job OK (7b535eeb-a451-4910-ac48-4a04defea5b3)
+14:01:52 Result will never expire, clean up result key manually
+14:01:52 
+14:01:52 *** Listening on 231...
+14:01:52 231: Job OK (3a9d02c5-6ae5-4eed-acc7-38734b722f10)
+14:01:52 Result will never expire, clean up result key manually
+14:01:52 
+14:01:52 *** Listening on 231...
+14:01:53 231: Job OK (c7119c95-8c10-4b90-b16a-edc727232ac6)
+14:01:53 Result will never expire, clean up result key manually
+14:01:53 
+14:01:53 *** Listening on 231...
+14:01:53 231: RemoteModelLearning.learnModelRemote('h_1h2_1h3_2h4_2h5_3h4_4h6_5h6_d6PPPPPPh_e_d6', 4.0, branchID=2, growth_generator='hubbard_square_lattice_generalised', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (3fcb4083-32e8-4ad6-92dc-816567aaab4c)
+14:01:53 231: RemoteModelLearning.learnModelRemote('yTy', 5.0, branchID=3, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (db20545e-89d9-454b-a0be-e7bf5804b59a)
+14:01:53 231: RemoteModelLearning.learnModelRemote('yTz', 6.0, branchID=3, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (5c7d0cec-723c-4ad1-8473-96a5258af4e6)
+14:01:53 231: RemoteModelLearning.learnModelRemote('yTx', 7.0, branchID=3, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (f6876cbc-f7d5-42f9-b84b-4ee7faf7221e)
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (7.434802822332263). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (5.852672403923075). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (3.0751138714992043). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:01:58 231: Job OK (db20545e-89d9-454b-a0be-e7bf5804b59a)
+14:01:58 Result will never expire, clean up result key manually
+14:01:58 
+14:01:58 *** Listening on 231...
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (5.82687410769952). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (8.573354315642684). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.068248662715195). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:01:58 231: Job OK (f6876cbc-f7d5-42f9-b84b-4ee7faf7221e)
+14:01:58 Result will never expire, clean up result key manually
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (7.029956085436232). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (4.094837710589053). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (7.912193758141711). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:01:58 231: Job OK (5c7d0cec-723c-4ad1-8473-96a5258af4e6)
+14:01:58 Result will never expire, clean up result key manually
+14:01:58 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=3, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=5.0, model_b_id=6.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (62e80359-fc69-457a-bef7-802c1b41b2b9)
+14:01:58 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=3, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=5.0, model_b_id=7.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (c8ae9f25-5ee5-4224-93fe-06a6f905e0bb)
+14:01:58 
+14:01:58 *** Listening on 231...
+14:01:58 
+14:01:58 *** Listening on 231...
+14:01:58 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=3, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=6.0, model_b_id=7.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (81fd3c01-5295-4564-bdfa-4a20d31ab5fc)
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (3.3197973917103516). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (9.99927905381897). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (9.997357431027124). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:01:58 231: Job OK (3fcb4083-32e8-4ad6-92dc-816567aaab4c)
+14:01:58 Result will never expire, clean up result key manually
+14:01:58 
+14:01:58 *** Listening on 231...
+14:02:02 231: Job OK (c8ae9f25-5ee5-4224-93fe-06a6f905e0bb)
+14:02:02 Result will never expire, clean up result key manually
+14:02:02 
+14:02:02 *** Listening on 231...
+14:02:02 231: Job OK (62e80359-fc69-457a-bef7-802c1b41b2b9)
+14:02:02 Result will never expire, clean up result key manually
+14:02:02 
+14:02:02 *** Listening on 231...
+14:02:03 231: Job OK (81fd3c01-5295-4564-bdfa-4a20d31ab5fc)
+14:02:03 Result will never expire, clean up result key manually
+14:02:03 
+14:02:03 *** Listening on 231...
+14:02:03 231: RemoteModelLearning.learnModelRemote('yTyTTx', 9.0, branchID=4, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (148ad246-d284-419e-8008-984be5909901)
+14:02:03 231: RemoteModelLearning.learnModelRemote('yTyTTz', 8.0, branchID=4, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (6f96e5d0-e0d2-4c39-a460-a5ab29396d3d)
+14:02:03 231: RemoteModelLearning.learnModelRemote('yTyTTy', 10.0, branchID=4, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (3ee854b2-9bbc-4230-bbb0-15b93c9cb5b7)
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.353886495433355). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (3.855984292142518). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.1382091880886485). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:02:08 231: Job OK (3ee854b2-9bbc-4230-bbb0-15b93c9cb5b7)
+14:02:08 Result will never expire, clean up result key manually
+14:02:08 
+14:02:08 *** Listening on 231...
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (8.208727548672108). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.282191317726136). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (4.7730105401398655). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:02:09 231: Job OK (6f96e5d0-e0d2-4c39-a460-a5ab29396d3d)
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (8.672258159421421). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (5.523449735285609). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (5.106548862610207). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:02:09 231: Job OK (148ad246-d284-419e-8008-984be5909901)
+14:02:09 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=4, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=9.0, model_b_id=10.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (4bf6088d-e44b-42c3-8d9c-b9d823c9084e)
+14:02:09 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=4, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=8.0, model_b_id=9.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (6ff6d99e-e70c-4e95-8ab3-55daa13f848b)
+14:02:09 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=4, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=8.0, model_b_id=10.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (f5d56ce4-e5c8-4e1b-91b4-c3b4f5b24073)
+14:02:09 Result will never expire, clean up result key manually
+14:02:09 Result will never expire, clean up result key manually
+14:02:09 
+14:02:09 
+14:02:09 *** Listening on 231...
+14:02:09 *** Listening on 231...
+14:02:13 231: Job OK (f5d56ce4-e5c8-4e1b-91b4-c3b4f5b24073)
+14:02:13 Result will never expire, clean up result key manually
+14:02:13 231: Job OK (6ff6d99e-e70c-4e95-8ab3-55daa13f848b)
+14:02:13 Result will never expire, clean up result key manually
+14:02:13 
+14:02:13 *** Listening on 231...
+14:02:13 231: Job OK (4bf6088d-e44b-42c3-8d9c-b9d823c9084e)
+14:02:13 Result will never expire, clean up result key manually
+14:02:13 
+14:02:13 *** Listening on 231...
+14:02:13 
+14:02:13 *** Listening on 231...
+14:02:13 231: RemoteModelLearning.learnModelRemote('yTyTTzTTTx', 11.0, branchID=5, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (cd4df287-b593-4c5a-a525-22bf9c9ab481)
+14:02:13 231: RemoteModelLearning.learnModelRemote('yTyTTzTTTz', 12.0, branchID=5, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (a5622760-7261-43c2-a9b6-1216c38b43b0)
+14:02:13 231: RemoteModelLearning.learnModelRemote('yTyTTzTTTy', 13.0, branchID=5, growth_generator='non_interacting_ising', host_name='node35-025', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', port_number=6531, qid=231, remote=True) (a735f9b2-10d8-47c7-b66c-2207b8fa3e58)
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.092081305436441). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (3.8914914118923156). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (9.126014496944896). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:02:18 231: Job OK (cd4df287-b593-4c5a-a525-22bf9c9ab481)
+14:02:18 Result will never expire, clean up result key manually
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.366428890494445). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.037556578168063). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (5.660333321838139). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:02:18 231: Job OK (a735f9b2-10d8-47c7-b66c-2207b8fa3e58)
+14:02:18 Result will never expire, clean up result key manually
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (4.129495957676673). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (9.655229974969252). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/qinfer/smc.py:285: ApproximationWarning: Extremely small n_ess encountered (6.5567445564774784). Resampling is likely to fail. Consider adding particles, or resampling more often.
+  ApproximationWarning
+14:02:18 231: Job OK (a5622760-7261-43c2-a9b6-1216c38b43b0)
+14:02:18 Result will never expire, clean up result key manually
+14:02:18 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=5, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=11.0, model_b_id=12.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (fff498d0-b2eb-4f4a-b1be-ca3e9a3a5b1b)
+14:02:18 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=5, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=11.0, model_b_id=13.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (a72ff078-d980-42db-b6e0-311b0e6ea060)
+14:02:18 
+14:02:18 *** Listening on 231...
+14:02:18 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=5, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=12.0, model_b_id=13.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (81ad3cff-6c84-441d-a052-c51f17777a58)
+14:02:18 
+14:02:18 *** Listening on 231...
+14:02:18 
+14:02:18 *** Listening on 231...
+14:02:22 231: Job OK (fff498d0-b2eb-4f4a-b1be-ca3e9a3a5b1b)
+14:02:22 Result will never expire, clean up result key manually
+14:02:22 
+14:02:22 *** Listening on 231...
+14:02:22 231: Job OK (a72ff078-d980-42db-b6e0-311b0e6ea060)
+14:02:22 Result will never expire, clean up result key manually
+14:02:22 
+14:02:22 *** Listening on 231...
+14:02:23 231: Job OK (81ad3cff-6c84-441d-a052-c51f17777a58)
+14:02:23 Result will never expire, clean up result key manually
+14:02:23 
+14:02:23 *** Listening on 231...
+14:02:23 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=None, host_name='node35-025', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=0, model_b_id=4, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (53ad1bdb-d563-4700-9e1b-8b0f3f969cee)
+14:02:23 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=None, host_name='node35-025', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=2, model_b_id=5, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (e83f296c-b3cb-4a63-8f92-4617195a1cd7)
+14:02:23 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=None, host_name='node35-025', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=5, model_b_id=8, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (b718df48-e7c5-4374-944e-a924a97ab767)
+14:02:23 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=None, host_name='node35-025', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=8, model_b_id=11, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (858df20c-d33d-4a23-80f7-2caac00644bd)
+14:02:27 231: Job OK (b718df48-e7c5-4374-944e-a924a97ab767)
+14:02:27 Result will never expire, clean up result key manually
+14:02:27 
+14:02:27 *** Listening on 231...
+14:02:27 231: Job OK (858df20c-d33d-4a23-80f7-2caac00644bd)
+14:02:27 Result will never expire, clean up result key manually
+14:02:27 
+14:02:27 *** Listening on 231...
+14:02:28 231: Job OK (e83f296c-b3cb-4a63-8f92-4617195a1cd7)
+14:02:28 Result will never expire, clean up result key manually
+14:02:28 
+14:02:28 *** Listening on 231...
+14:02:28 231: Job OK (53ad1bdb-d563-4700-9e1b-8b0f3f969cee)
+14:02:28 Result will never expire, clean up result key manually
+14:02:28 
+14:02:28 *** Listening on 231...
+14:02:28 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=6, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=0.0, model_b_id=4.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (1a7d2d49-4320-4415-a1c0-50d995240c7a)
+14:02:28 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=7, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=5.0, model_b_id=8.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (2d92cda1-eae1-4235-9654-2ba3d86bc248)
+14:02:28 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=7, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=5.0, model_b_id=2.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (2e2ddf82-3da9-418c-9952-51ac62eb1c07)
+14:02:28 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=7, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=5.0, model_b_id=11.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (a94a21d6-4abf-401d-b498-0304e1cc806c)
+14:02:28 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=7, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=8.0, model_b_id=2.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (653012c6-3c4d-4768-9317-8ec77196596f)
+14:02:32 231: Job OK (653012c6-3c4d-4768-9317-8ec77196596f)
+14:02:32 Result will never expire, clean up result key manually
+14:02:33 
+14:02:33 *** Listening on 231...
+14:02:33 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=7, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=8.0, model_b_id=11.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (ada1591a-87b3-49ab-b2de-d5892a85f6ff)
+14:02:33 231: Job OK (2d92cda1-eae1-4235-9654-2ba3d86bc248)
+14:02:33 Result will never expire, clean up result key manually
+14:02:33 
+14:02:33 *** Listening on 231...
+14:02:33 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=7, host_name='node35-025', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=2.0, model_b_id=11.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (83321151-8d9b-4380-bdce-4d5cb41ef7a7)
+14:02:33 231: Job OK (2e2ddf82-3da9-418c-9952-51ac62eb1c07)
+14:02:33 Result will never expire, clean up result key manually
+14:02:33 
+14:02:33 *** Listening on 231...
+14:02:33 231: Job OK (a94a21d6-4abf-401d-b498-0304e1cc806c)
+14:02:33 Result will never expire, clean up result key manually
+14:02:33 
+14:02:33 *** Listening on 231...
+14:02:33 231: Job OK (1a7d2d49-4320-4415-a1c0-50d995240c7a)
+14:02:33 Result will never expire, clean up result key manually
+14:02:33 
+14:02:33 *** Listening on 231...
+14:02:38 231: Job OK (83321151-8d9b-4380-bdce-4d5cb41ef7a7)
+14:02:38 Result will never expire, clean up result key manually
+14:02:38 
+14:02:38 *** Listening on 231...
+14:02:38 231: Job OK (ada1591a-87b3-49ab-b2de-d5892a85f6ff)
+14:02:38 Result will never expire, clean up result key manually
+14:02:38 
+14:02:38 *** Listening on 231...
+14:02:38 231: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, branchID=None, host_name='node35-025', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/14_01/logs/test_multiple_growth_rules_including_grouped_hubbard_231.qmd.7894537.log', model_a_id=0.0, model_b_id=8.0, num_times_to_use=1, port_number=6531, qid=231, trueModel='h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4') (88346afa-142f-4b8b-9e64-26b3412f87b7)
+14:02:42 231: Job OK (88346afa-142f-4b8b-9e64-26b3412f87b7)
+14:02:42 Result will never expire, clean up result key manually
+14:02:42 
+14:02:42 *** Listening on 231...
+Error 111 connecting to node35-025:6531. Connection refused.
+Error 111 connecting to node35-025:6531. Connection refused.
+Error 111 connecting to node35-025:6531. Connection refused.
+Error 111 connecting to node35-025:6531. Connection refused.
+Error 111 connecting to node35-025:6531. Connection refused.
