@@ -6,15 +6,15 @@ test_description="multiple_growth_rules_include_hubbard"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 do_further_qhl=0
 exp_data=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=1000
-exp=200
+prt=10
+exp=4
 pgh=0.5
 ra=0.8
 rt=0.5

@@ -133,6 +133,7 @@ class ModelLearningClass():
         simoplist, 
         simparams, simopnames, 
         numparticles, modelID, 
+        growth_generator,
         use_time_dep_true_params=False, 
         time_dep_true_params=None,
         resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0,
@@ -153,6 +154,7 @@ class ModelLearningClass():
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.NumParticles = qmd_info['num_particles']
         self.NumExperiments = qmd_info['num_experiments']
+        self.GrowthGenerator = growth_generator
 
         base_resources = qmd_info['base_resources']
         base_num_qubits = base_resources['num_qubits']
@@ -657,6 +659,7 @@ class ModelLearningClass():
         learned_info['cov_matrix'] = self.covmat
         learned_info['num_particles'] = self.NumParticles
         learned_info['num_experiments'] = self.NumExperiments
+        learned_info['growth_generator'] = self.GrowthGenerator
         if self.StoreParticlesWeights or self.QHL_plots:
             learned_info ['particles'] = self.Particles
             learned_info['weights'] = self.Weights
@@ -795,10 +798,6 @@ class reducedModel():
             'store_particles_weights'
         ]
         self.BayesFactors = {}
-        self.LatexTerm = UserFunctions.get_latex_name(
-            name = self.Name,
-            growth_generator = qmd_info['growth_generator']
-        )
         self.NumQubits = DataBase.get_num_qubits(self.Name)
         self.HostName = host_name
         self.PortNumber = port_number
@@ -863,7 +862,12 @@ class reducedModel():
         self.LearnedParameters = learned_info['learned_parameters']
         self.FinalSigmas = learned_info['final_sigmas']
         self.cov_matrix = learned_info['cov_matrix']
+        self.GrowthGenerator = learned_info['growth_generator']
 
+        self.LatexTerm = UserFunctions.get_latex_name(
+            name = self.Name,
+            growth_generator = self.GrowthGenerator
+        )
 
         self.TrackParameterEstimates = {}
         num_params = np.shape(self.TrackEval)[1]

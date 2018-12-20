@@ -659,14 +659,21 @@ class QMD():
         growth_rule, 
         model_list
     ):
-        print("NEW BRANCH. gen=", growth_rule, "type:", type(growth_rule))
+        print(
+            "NEW BRANCH. gen=",
+            growth_rule, 
+            "type:", 
+            type(growth_rule)
+        )
         model_list = list(set(model_list)) # remove possible duplicates
         self.HighestBranchID += 1
         branchID = int(self.HighestBranchID)
         self.BranchBayesComputed[branchID] = False
         num_models = len(model_list)
         self.NumModelsPerBranch[branchID] = num_models
-        self.NumModelPairsPerBranch[branchID] = num_pairs_in_list(num_models)
+        self.NumModelPairsPerBranch[branchID] = num_pairs_in_list(
+            num_models
+        )
         self.BranchAllModelsLearned[branchID] = False
         self.BranchComparisonsComplete[branchID] = False
         self.BranchGrowthRules[branchID] = growth_rule
@@ -962,6 +969,7 @@ class QMD():
                     learnModelRemote, 
                     model_name,
                     modelID, 
+                    growth_generator = self.BranchGrowthRules[branchID],
                     branchID=branchID, 
                     remote=True, 
                     host_name=self.HostName, 
@@ -1016,6 +1024,7 @@ class QMD():
                 updated_model_info = learnModelRemote(
                     model_name,
                     modelID, 
+                    growth_generator = self.BranchGrowthRules[branchID],
                     branchID=branchID, 
                     qmd_info=self.QMDInfo, 
                     remote=True, 
@@ -2350,7 +2359,8 @@ class QMD():
         time_now = time.time()
         time_taken = time_now - self.StartingTime
 #        true_model_r_squared = self.reducedModelInstanceFromID(self.TrueOpModelID).r_squared()
-
+    
+    
         self.ResultsDict = {
             'NumParticles' : self.NumParticles,
             'NumExperiments' : mod.NumExperiments,
@@ -2371,7 +2381,9 @@ class QMD():
             'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
             'ExpectationValues' : mod.expectation_values,
             'RSquaredByEpoch' : mod.r_squared_by_epoch(),
-            'LearnedHamiltonian' : mod.LearnedHamiltonian
+            'LearnedHamiltonian' : mod.LearnedHamiltonian,
+            'GrowthGenerator' : mod.GrowthGenerator, 
+            'ChampLatex' : mod.LatexTerm,
         }
 
     def runMultipleModelQHL(self, model_names=None):
@@ -2484,7 +2496,6 @@ class QMD():
         active_branches_bayes = self.RedisDataBases['active_branches_bayes']
 
         print("[QMD] Going to learn initial models from branches.")
-        
 
         if self.NumTrees > 1:
             for i in list(self.BranchModels.keys()):
@@ -2907,7 +2918,9 @@ class QMD():
             'TrackVolume' : champ_model.VolumeList,
             'TrackCovarianceMatrices' : champ_model.TrackCovMatrices, 
             'RSquaredByEpoch' : champ_model.r_squared_by_epoch(),
-            'LearnedHamiltonian' : champ_model.LearnedHamiltonian
+            'LearnedHamiltonian' : champ_model.LearnedHamiltonian,
+            'GrowthGenerator' : champ_model.GrowthGenerator, 
+            'ChampLatex' : champ_model.LatexTerm,
         }
 
     def updateDataBaseModelValues(self):

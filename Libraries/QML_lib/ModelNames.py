@@ -700,7 +700,8 @@ def hubbard_latex(name):
 
     hopping_latex += '}'
 
-    latex_term += hopping_latex
+    if hopping_latex != 'H_{}':
+        latex_term += hopping_latex
 
     if interaction_energy is True:
         latex_term += str(
