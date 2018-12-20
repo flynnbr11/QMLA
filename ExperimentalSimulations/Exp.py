@@ -94,7 +94,7 @@ num_datapoints_to_plot = 500 # to visualise in expec_val plot for simulated data
 if global_variables.use_experimental_data is True:
     expec_val_plot_max_time = global_variables.data_max_time
 else:
-    expec_val_plot_max_time = 4    
+    expec_val_plot_max_time = 15    
 
 """
 for t in list(experimental_measurements_dict.keys()):
@@ -570,26 +570,52 @@ else:
 
         if true_op_known==True:
         # if QMD has knowledge of the "true" model, then plot params   
-            qmd.plotParameterEstimates(
-                model_id = qmd.TrueOpModelID, 
-                save_to_file= str(global_variables.plots_directory+
-                'true_model_parameter_estimates_'+ str(global_variables.long_id) +
-                '.png')
-            )
+            try:
+                qmd.plotParameterEstimates(
+                    model_id = qmd.TrueOpModelID, 
+                    save_to_file= str(
+                        global_variables.plots_directory+
+                        'true_model_parameter_estimates_'+ 
+                        str(global_variables.long_id) +
+                        '.png'
+                    )
+                )
+            except:
+                print(
+                    "Failed to plot parameter estimates for true model:", 
+                    qmd.TrueOpName
+                )
+
             if qmd.ChampID != qmd.TrueOpModelID:
-                qmd.plotParameterEstimates(
-                    model_id = qmd.ChampID, 
-                    save_to_file= str(global_variables.plots_directory+
-                    'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
-                    '.png')
-                )
+                try:
+                    qmd.plotParameterEstimates(
+                        model_id = qmd.ChampID, 
+                        save_to_file= str(global_variables.plots_directory+
+                        'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
+                        '.png')
+                    )
+                except:
+                    print(
+                        "Failed to plot parameter estimates for ", 
+                        "champ model:", 
+                        qmd.ChampID
+                    )
+
+
         else:
-                qmd.plotParameterEstimates(
-                    model_id = qmd.ChampID, 
-                    save_to_file= str(global_variables.plots_directory+
-                    'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
-                    '.png')
+            try:
+                    qmd.plotParameterEstimates(
+                        model_id = qmd.ChampID, 
+                        save_to_file= str(global_variables.plots_directory+
+                        'champ_model_parameter_estimates_'+ str(global_variables.long_id) +
+                        '.png')
+                    )
+            except:
+                print(
+                    "Failed to plot parameter estimates for champ model:", 
+                    qmd.ChampID
                 )
+
 
         """
         # TODO radar plot not working - when used with RQ ???

@@ -307,11 +307,16 @@ def average_parameter_estimates(
 
     parameter_estimates_from_qmd = {}        
     num_experiments_by_name = {}
+
+    latex_terms = {}
+    growth_rules = {}
+
     for f in pickled_files:
         fname = directory_name+'/'+str(f)
         result = pickle.load(open(fname, 'rb'))
         alph = result['NameAlphabetical']
         track_parameter_estimates = result['TrackParameterEstimates']
+        
         # num_experiments = result['NumExperiments']
         if alph in parameter_estimates_from_qmd.keys():
             parameter_estimates_from_qmd[alph].append(track_parameter_estimates)
@@ -319,7 +324,12 @@ def average_parameter_estimates(
             parameter_estimates_from_qmd[alph] = [track_parameter_estimates]
             num_experiments_by_name[alph] = result['NumExperiments']
 
-    latex_terms = {}
+        if alph not in list(growth_rules.keys()):
+            growth_rules[alph] = result['GrowthGenerator']
+
+
+    print("[Analyse; avg params] growth_rules:", growth_rules)
+
     for name in winning_models:
         num_experiments = num_experiments_by_name[name]
         # epochs = range(1, 1+num_experiments)
@@ -403,7 +413,7 @@ def average_parameter_estimates(
             # latex_terms[term] = DataBase.latex_name_ising(term)
             latex_terms[term] = UserFunctions.get_latex_name(
                 name=term,
-                growth_generator = growth_generator
+                growth_generator = growth_rules[name]
             )
             averages = np.array( 
                 [ avg_parameters[term][e] for e in epochs  ]
@@ -451,8 +461,9 @@ def average_parameter_estimates(
             # latex_term = DataBase.latex_name_ising(term)
             latex_term = UserFunctions.get_latex_name(
                 name = term,
-                growth_generator = growth_generator
+                growth_generator = growth_rules[name]
             )
+            # latex_term = latex_terms[term]
             ax.set_title(str(latex_term))
             
         """
@@ -546,6 +557,7 @@ def Bayes_t_test(
         if file.endswith(".p") and file.startswith(results_file_name_start):
             pickled_files.append(file)
 
+    growth_rules = {}
     for f in pickled_files:
         fname = directory_name+'/'+str(f)
         result = pickle.load(open(fname, 'rb'))
@@ -556,6 +568,10 @@ def Bayes_t_test(
             expectation_values_by_name[alph].append(expec_values)
         else:
             expectation_values_by_name[alph] = [expec_values]
+
+        if alph not in list(growth_rules.keys()):
+            growth_rules[alph] = result['GrowthGenerator']
+
 
     # expectation_values = {}
     # for t in list(experimental_measurements.keys()):
@@ -657,7 +673,7 @@ def Bayes_t_test(
         # name=DataBase.latex_name_ising(term)
         name=UserFunctions.get_latex_name(
             name = term,
-            growth_generator = growth_generator
+            growth_generator = growth_rules[term]
         )
         description = str(
                 name + ' : ' + 
@@ -938,6 +954,7 @@ def model_scores(directory_name):
     os.chdir(directory_name)
 
     scores = {}
+    growth_rules = {}
 
     pickled_files = []
     for file in os.listdir(directory_name):
@@ -953,7 +970,11 @@ def model_scores(directory_name):
             scores[alph] += 1
         else:
             scores[alph] = 1
-    return scores
+
+        if alph not in list(growth_rules.keys()):
+            growth_rules[alph] = result['GrowthGenerator']
+
+    return scores, growth_rules
 
 def get_entropy(
     models_points, 
@@ -996,6 +1017,7 @@ def get_entropy(
 
 def plot_scores(
         scores, 
+        growth_rules, 
         entropy=None,
         inf_gain=None, 
         true_operator = None, 
@@ -1014,7 +1036,7 @@ def plot_scores(
         # DataBase.latex_name_ising(model) for model in models
         UserFunctions.get_latex_name(
             name=model, 
-            growth_generator=growth_generator
+            growth_generator=growth_rules[model]
         ) for model in models
     ]
 
@@ -1279,7 +1301,7 @@ average_priors = average_parameters(
     top_number_models = arguments.top_number_models 
 )
 
-avg_priors =str(directory_to_analyse+'average_priors.p')
+avg_priors = str(directory_to_analyse+'average_priors.p')
 
 pickle.dump(
     average_priors,
@@ -1320,6 +1342,7 @@ Bayes_t_test( # average expected values
     )
 )
 
+"""
 r_sqaured_average(
     results_path = results_csv,
     top_number_models = arguments.top_number_models,
@@ -1340,7 +1363,7 @@ ptq.average_quadratic_losses(
         'quadratic_losses_avg.png'
     )
 )
-
+"""
 if qhl_mode==True:
     r_squared_plot = str(
         directory_to_analyse + 
@@ -1354,7 +1377,9 @@ if qhl_mode==True:
 if further_qhl_mode == False:
     print("FURTHER QHL=FALSE. PLOTTING STUFF")
     plot_file = directory_to_analyse+'model_scores.png'
-    model_scores = model_scores(directory_to_analyse)
+    model_scores, growth_rules = model_scores(directory_to_analyse)
+    
+    print("GROWth RULES:", growth_rules, "\n\n\n")
     try:
         entropy = get_entropy(model_scores, 
             growth_generator = growth_generator, 
@@ -1372,6 +1397,7 @@ if further_qhl_mode == False:
         entropy = entropy,
         true_operator = true_operator, 
         growth_generator = growth_generator,
+        growth_rules = growth_rules, 
         inf_gain = inf_gain, 
         save_file = plot_file
     )
