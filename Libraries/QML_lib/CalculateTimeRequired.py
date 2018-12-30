@@ -312,7 +312,7 @@ def time_required(
   ]
 
   true_dimension = DataBase.get_num_qubits(true_operator)
-  qhl_time = 2*(
+  qhl_time = insurance_factor*(
     hamiltonian_exponentiation_times[true_dimension]
     * num_hamiltonians_per_model
   )
@@ -324,7 +324,7 @@ def time_required(
   # For further qhl, want to account for possibility 
   # that winning model is of maximum allowed dimension, 
   # so need to request enough time for that case. 
-  further_qhl_time = 2*(
+  further_qhl_time = insurance_factor*(
   	hamiltonian_exponentiation_times[max_num_qubits]
   	* num_hamiltonians_per_model
   )
