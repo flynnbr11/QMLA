@@ -1,0 +1,65 @@
+rm: cannot remove `dump.rdb': No such file or directory
+Could not connect to Redis at 127.0.0.1:6432: Connection refused
++ job_id=7895186.master.cm.cluster
+++ cut -d. -f1
++ job_number=7895186
++ echo 'Job id is 7895186'
++ echo 7895186
++ cd /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ REDIS_URL=redis://node45-003:6432
++ QMD_LOG_DIR=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/logs
++ OUTPUT_ERROR_DIR=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/output_and_error_logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/logs
++ QMD_JOB=growth_ising_heis_hub_132
++ echo 'PBS job name is growth_ising_heis_hub_132'
++ QMD_LOG=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/logs/growth_ising_heis_hub_132.qmd.7895186.log
++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7895186.master.cm.cluster
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7895186.master.cm.cluster
++ export 'nodes=node45-003
+node45-003
+node45-003
+node45-003
+node45-003'
++ nodes='node45-003
+node45-003
+node45-003
+node45-003
+node45-003'
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7895186.master.cm.cluster
+++ wc -l
++ export nnodes=5
++ nnodes=5
++ export confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/output_and_error_logs/node_info.growth_ising_heis_hub_132.conf
++ confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/output_and_error_logs/node_info.growth_ising_heis_hub_132.conf
++ for i in '$nodes'
++ echo node45-003
++ for i in '$nodes'
++ echo node45-003
++ for i in '$nodes'
++ echo node45-003
++ for i in '$nodes'
++ echo node45-003
++ for i in '$nodes'
++ echo node45-003
++ cd /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
++ [[ node45-003 == \n\o\d\e* ]]
++ echo 'Launching RQ worker on remote nodes using mpirun'
++ printf 'In RUN script:  -agr interacing_nn_ising_fixed_axis -agr heisenberg_transverse'
++ mpirun -np 5 -machinefile /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/output_and_error_logs/node_info.growth_ising_heis_hub_132.conf rq worker 132 -u redis://node45-003:6432
++ ((  1 == 0 ))
++ sleep 5
++ cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+++ date +%H:%M:%S
++ echo 'Starting Exp.py at 20:48:29; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24'
++ echo 'CONFIG: -p=800 -e=200 -bt=100 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/cumulative.csv -pt=0 -pgh=1.0 -qid=132 -rqt=10000 -pkl=0 -host=node45-003 -port=6432 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/logs/growth_ising_heis_hub_132.qmd.7895186.log cpr=1 -ds=NVB_rescale_dataset.p -dst=5000 -dto=205 -ggr=hubbard_square_lattice_generalised'
++ python3 Exp.py -rq=1 -op=xTxTTiPPPiTxTTx -p=800 -e=200 -bt=100 -rt=0.5 -ra=0.8 -pgh=1.0 -qid=132 -rqt=200000 -g=1 -exp=0 -meas=full_access -qhl=0 -fq=0 -pt=0 -pkl=0 -host=node45-003 -port=6432 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/logs/growth_ising_heis_hub_132.qmd.7895186.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/cumulative.csv -cpr=1 -ds=NVB_rescale_dataset.p -dst=5000 -dto=205 -ggr=hubbard_square_lattice_generalised -agr interacing_nn_ising_fixed_axis -agr heisenberg_transverse -latex=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/LatexMapping.txt -prior_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/prior.p -true_params_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/true_params.p -plot_probes=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/plot_probes.p -special_probe=random -true_expec_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24/true_expec_vals.p -pmin=0 -pmax=8 -pmean=0.5 -psigma=0.3 -resource=0
+++ date +%H:%M:%S
++ echo 'Finished Exp.py at 04:45:01; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_20/17_24'
++ sleep 1
++ redis-cli -p 6432 flushall
++ redis-cli -p 6432 shutdown
++ echo 7895186
+++ date +%H:%M:%S
++ echo 'QMD 132 Finished; end of script at Time: 04:45:02'

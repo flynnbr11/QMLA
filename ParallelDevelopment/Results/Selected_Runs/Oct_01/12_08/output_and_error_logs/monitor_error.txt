@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "AnalyseMultipleQMD.py", line 997, in <module>
+    'param_avg.png'
+  File "AnalyseMultipleQMD.py", line 287, in average_parameter_estimates
+    plt.clf()
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/matplotlib/pyplot.py", line 673, in clf
+    gcf().clf()
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/matplotlib/pyplot.py", line 588, in gcf
+    return figure()
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/matplotlib/pyplot.py", line 534, in figure
+    **kwargs)
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/matplotlib/backend_bases.py", line 170, in new_figure_manager
+    return cls.new_figure_manager_given_figure(num, fig)
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/matplotlib/backend_bases.py", line 176, in new_figure_manager_given_figure
+    canvas = cls.FigureCanvas(figure)
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/matplotlib/backends/backend_qt5agg.py", line 35, in __init__
+    super(FigureCanvasQTAggBase, self).__init__(figure=figure)
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/matplotlib/backends/backend_qt5.py", line 235, in __init__
+    _create_qApp()
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/matplotlib/backends/backend_qt5.py", line 122, in _create_qApp
+    raise RuntimeError('Invalid DISPLAY variable')
+RuntimeError: Invalid DISPLAY variable

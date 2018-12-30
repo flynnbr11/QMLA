@@ -1,0 +1,186 @@
+QMD ID =98; REDIS_PORT=6398
+Global server: newblue2
+BC backend identified
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+8355:C 08 Dec 10:59:44.227 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+8355:C 08 Dec 10:59:44.227 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=8355, just started
+8355:C 08 Dec 10:59:44.227 # Configuration loaded
+8355:M 08 Dec 10:59:44.228 * Running mode=standalone, port=6398.
+8355:M 08 Dec 10:59:44.228 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+8355:M 08 Dec 10:59:44.228 # Server initialized
+8355:M 08 Dec 10:59:44.228 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+8355:M 08 Dec 10:59:44.228 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+8355:M 08 Dec 10:59:44.229 * Ready to accept connections
+Job id is 7791185
+PBS job name is multiple_growth_rules_98
+node32-001
+node32-001
+node32-001
+node32-001
+node32-001
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 11:00:04; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24
+CONFIG: -p=1500 -e=500 -bt=250 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/cumulative.csv -pt=0 -pgh=0.75 -qid=98 -rqt=10000 -pkl=0 -host=node32-001 -port=6398 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/logs/multiple_growth_rules_98.qmd.7791185.log cpr=1 -ds=NVB_rescale_dataset.p -dst=5000 -dto=205 -ggr=interacting_nearest_neighbour_ising
+[getProbeDict] Probe func used: <function separable_probe_dict at 0x2aaae007f620>
+Seed requested for host/port/id node32-001 / 6398 / 98 ;has seed 1
+Seed keys ['rq:worker:node32-001.8389', 'rq:worker:node32-001.8388', 'rq:worker:node32-001.8390', 'rq:worker:node32-001.8386', 'rq:worker:node32-001.8387', 'rq:workers']
+All growth rules: ['interacting_nearest_neighbour_ising', 'heisenberg_transverse']
+[QMD] Gaussian: True
+Gen list: ['interacting_nearest_neighbour_ising', 'heisenberg_transverse']
+Adding branch for  interacting_nearest_neighbour_ising
+Adding branch for  heisenberg_transverse
+mod id: 0
+mod id: 1
+mod id: 2
+[QMD] Going to learn initial models from branches.
+Bayes factors consider: 0 1
+Bayes factors consider: 0 2
+Bayes factors consider: 1 2
+Bayes factors consider: 0 1
+Bayes factors consider: 0 2
+Bayes factors consider: 1 2
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None]
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+not finished tree for growth: interacting_nearest_neighbour_ising
+After model generation for growth rule interacting_nearest_neighbour_ising SPAWN STAGE: [None]
+NEW BRANCH. gen= interacting_nearest_neighbour_ising type: <class 'str'>
+not finished tree for growth: interacting_nearest_neighbour_ising
+After model generation for growth rule interacting_nearest_neighbour_ising SPAWN STAGE: [None]
+NEW BRANCH. gen= interacting_nearest_neighbour_ising type: <class 'str'>
+Bayes factors consider: 3.0 4.0
+not finished tree for growth: interacting_nearest_neighbour_ising
+After model generation for growth rule interacting_nearest_neighbour_ising SPAWN STAGE: [None]
+NEW BRANCH. gen= interacting_nearest_neighbour_ising type: <class 'str'>
+[ModGen] MAX SPAWN DEPTH REACHED FOR RULE  interacting_nearest_neighbour_ising
+[QMD] Num trees now completed: 1 Tree completed dict: {'interacting_nearest_neighbour_ising': True, 'heisenberg_transverse': False}
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None]
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None]
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+Bayes factors consider: 3.0 8.0
+Bayes factors consider: 3.0 2.0
+Bayes factors consider: 8.0 2.0
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None]
+Ghost branch for dimension: 2
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None]
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+Bayes factors consider: 10.0 11.0
+Bayes factors consider: 10.0 12.0
+Bayes factors consider: 11.0 12.0
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None]
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+Bayes factors consider: 13.0 14.0
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None]
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None]
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+Bayes factors consider: 10.0 15.0
+Bayes factors consider: 10.0 14.0
+Bayes factors consider: 10.0 9.0
+Bayes factors consider: 15.0 14.0
+Bayes factors consider: 15.0 9.0
+Bayes factors consider: 14.0 9.0
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None]
+Ghost branch for dimension: 3
+APPENDING SPAWN STAGE
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None, 'all_dimensions_learned']
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None, 'all_dimensions_learned']
+Final dimensional ghost branch being generated.
+all champs: ['zTz', 'xTxPPzTz', 'xTxPPyTyPPzTz', 'xTxPPyTyPPzTz', 'xTxTTiPPPyTyTTiPPPzTzTTi', 'iTxTTxPPPxTxTTiPPPyTyTTiPPPzTzTTi', 'iTxTTxPPPiTzTTzPPPxTxTTiPPPyTyTTiPPPzTzTTi', 'iTxTTxPPPiTyTTyPPPiTzTTzPPPxTxTTiPPPyTyTTiPPPzTzTTi', 'iTxTTxPPPxTxTTiPPPyTyTTiPPPzTzTTi', 'iTxTTxTTTiPPPPxTxTTiTTTiPPPPyTyTTiTTTiPPPPzTzTTiTTTi']
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None, 'all_dimensions_learned', 'nontransverse_ghost_branch_complete']
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+Bayes factors consider: 8.0 16.0
+Bayes factors consider: 8.0 10.0
+Bayes factors consider: 8.0 14.0
+Bayes factors consider: 8.0 9.0
+Bayes factors consider: 8.0 15.0
+Bayes factors consider: 8.0 3.0
+Bayes factors consider: 8.0 2.0
+Bayes factors consider: 16.0 10.0
+Bayes factors consider: 16.0 14.0
+Bayes factors consider: 16.0 9.0
+Bayes factors consider: 16.0 15.0
+Bayes factors consider: 16.0 3.0
+Bayes factors consider: 16.0 2.0
+Bayes factors consider: 10.0 14.0
+Bayes factors consider: 10.0 9.0
+Bayes factors consider: 10.0 15.0
+Bayes factors consider: 10.0 3.0
+Bayes factors consider: 10.0 2.0
+Bayes factors consider: 14.0 9.0
+Bayes factors consider: 14.0 15.0
+Bayes factors consider: 14.0 3.0
+Bayes factors consider: 14.0 2.0
+Bayes factors consider: 9.0 15.0
+Bayes factors consider: 9.0 3.0
+Bayes factors consider: 9.0 2.0
+Bayes factors consider: 15.0 3.0
+Bayes factors consider: 15.0 2.0
+Bayes factors consider: 3.0 2.0
+not finished tree for growth: heisenberg_transverse
+SPAWN STAGE: [None, 'all_dimensions_learned', 'nontransverse_ghost_branch_complete']
+Making transverse terms out of all champs so far: ['xTxPPyTyPPzTz', 'iTxTTxTTTiPPPPxTxTTiTTTiPPPPyTyTTiTTTiPPPPzTzTTiTTTi', 'iTxTTxPPPxTxTTiPPPyTyTTiPPPzTzTTi', 'iTxTTxPPPiTzTTzPPPxTxTTiPPPyTyTTiPPPzTzTTi', 'xTxTTiPPPyTyTTiPPPzTzTTi', 'iTxTTxPPPiTyTTyPPPiTzTTzPPPxTxTTiPPPyTyTTiPPPzTzTTi', 'xTxPPzTz', 'zTz']
+Made new models: ['iTzPPxTxPPyTyPPzTiPPzTz', 'iTiTTiTTTzPPPPiTiTTzTTTiPPPPiTxTTxTTTiPPPPiTzTTiTTTiPPPPxTxTTiTTTiPPPPyTyTTiTTTiPPPPzTiTTiTTTiPPPPzTzTTiTTTi', 'iTiTTzPPPiTxTTxPPPiTzTTiPPPxTxTTiPPPyTyTTiPPPzTiTTiPPPzTzTTi', 'iTiTTzPPPiTxTTxPPPiTzTTiPPPiTzTTzPPPxTxTTiPPPyTyTTiPPPzTiTTiPPPzTzTTi', 'iTiTTzPPPiTzTTiPPPxTxTTiPPPyTyTTiPPPzTiTTiPPPzTzTTi', 'iTiTTzPPPiTxTTxPPPiTyTTyPPPiTzTTiPPPiTzTTzPPPxTxTTiPPPyTyTTiPPPzTiTTiPPPzTzTTi', 'iTzPPxTxPPzTiPPzTz', 'iTzPPzTiPPzTz']
+After model generation for growth rule heisenberg_transverse SPAWN STAGE: [None, 'all_dimensions_learned', 'nontransverse_ghost_branch_complete', 'Complete']
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+[QMD] Num trees now completed: 2 Tree completed dict: {'interacting_nearest_neighbour_ising': True, 'heisenberg_transverse': True}
+Bayes factors consider: 17.0 18.0
+Bayes factors consider: 17.0 19.0
+Bayes factors consider: 17.0 20.0
+Bayes factors consider: 17.0 21.0
+Bayes factors consider: 17.0 22.0
+Bayes factors consider: 17.0 23.0
+Bayes factors consider: 17.0 24.0
+Bayes factors consider: 18.0 19.0
+Bayes factors consider: 18.0 20.0
+Bayes factors consider: 18.0 21.0
+Bayes factors consider: 18.0 22.0
+Bayes factors consider: 18.0 23.0
+Bayes factors consider: 18.0 24.0
+Bayes factors consider: 19.0 20.0
+Bayes factors consider: 19.0 21.0
+Bayes factors consider: 19.0 22.0
+Bayes factors consider: 19.0 23.0
+Bayes factors consider: 19.0 24.0
+Bayes factors consider: 20.0 21.0
+Bayes factors consider: 20.0 22.0
+Bayes factors consider: 20.0 23.0
+Bayes factors consider: 20.0 24.0
+Bayes factors consider: 21.0 22.0
+Bayes factors consider: 21.0 23.0
+Bayes factors consider: 21.0 24.0
+Bayes factors consider: 22.0 23.0
+Bayes factors consider: 22.0 24.0
+Bayes factors consider: 23.0 24.0
+[QMD runRemoteMult] Finalising QMD.
+NEW BRANCH. gen= interacting_nearest_neighbour_ising type: <class 'str'>
+Bayes factors consider: 6.0 7.0
+NEW BRANCH. gen= heisenberg_transverse type: <class 'str'>
+[QMD]Entering final while loop
+QMD finished - results in: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/
+Finished Exp.py at 09:27:21; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24
+OK
+8355:M 09 Dec 09:27:22.681 # User requested shutdown...
+8355:M 09 Dec 09:27:22.681 # Redis is now ready to exit, bye bye...
+QMD 98 Finished; end of script at Time: 09:27:22

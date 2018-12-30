@@ -1,0 +1,47 @@
+QMD ID =86; REDIS_PORT=6386
+Global server: newblue1
+BC backend identified
+Going in to launch redis script
+5529:C 28 Nov 15:29:46.791 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+If this fails -- ensure permission enabled on RedisLaunch script in library
+5529:C 28 Nov 15:29:46.791 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=5529, just started
+5529:C 28 Nov 15:29:46.791 # Configuration loaded
+5529:M 28 Nov 15:29:46.793 * Running mode=standalone, port=6386.
+5529:M 28 Nov 15:29:46.793 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+5529:M 28 Nov 15:29:46.793 # Server initialized
+5529:M 28 Nov 15:29:46.793 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+5529:M 28 Nov 15:29:46.793 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+5529:M 28 Nov 15:29:46.793 * Ready to accept connections
+Job id is 7742781
+PBS job name is very_long_qhl_experimental_data_86
+node46-002
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 15:29:58; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Nov_28/15_14
+CONFIG: -p=20000 -e=3000 -bt=1500 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Nov_28/15_14/cumulative.csv -pt=1 -pgh=1.0 -qid=86 -rqt=10000 -pkl=0 -host=node46-002 -port=6386 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Nov_28/15_14 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Nov_28/15_14/logs/very_long_qhl_experimental_data_86.qmd.7742781.log cpr=1 -ds=NVB_rescale_dataset.p -dst=5000 -dto=205 -ggr=two_qubit_ising_rotation_hyperfine_transverse
+[getProbeDict] kwargs: {'noise_level': 0.0, 'minimum_tolerable_noise': 1e-07, 'num_probes': 20}
+[getProbeDict] growth_generator: two_qubit_ising_rotation_hyperfine_transverse
+[getProbeDict] exp data: True
+Special probe: None
+[getProbeDict] func used: <function NV_centre_ising_probes_plus at 0x2aaae48271e0>
+Seed requested for host/port/id node46-002 / 6386 / 86 ;has seed 1
+Seed keys ['rq:worker:node46-002.5612', 'rq:workers']
+All growth rules: ['two_qubit_ising_rotation_hyperfine_transverse', 'non_interacting_ising']
+[QMD] Gaussian: True
+Gen list: ['two_qubit_ising_rotation_hyperfine_transverse', 'non_interacting_ising']
+Adding branch for  two_qubit_ising_rotation_hyperfine_transverse
+Adding branch for  non_interacting_ising
+mod id: 0
+mod id: 1
+mod id: 2
+mod id: 3
+mod id: 4
+mod id: 5
+NEW BRANCH. gen= two_qubit_ising_rotation_hyperfine_transverse type: <class 'str'>
+Plotting things
+plotting expectation values
+QMD finished - results in: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Nov_28/15_14/
+Finished Exp.py at 18:17:02; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Nov_28/15_14
+OK
+5529:M 29 Nov 18:17:03.501 # User requested shutdown...
+5529:M 29 Nov 18:17:03.501 # Redis is now ready to exit, bye bye...
+QMD 86 Finished; end of script at Time: 18:17:03

@@ -1,0 +1,92 @@
+QMD ID =45; REDIS_PORT=6345
+Global server: newblue2
+BC backend identified
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+50935:C 10 Dec 18:02:40.306 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+50935:C 10 Dec 18:02:40.306 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=50935, just started
+50935:C 10 Dec 18:02:40.306 # Configuration loaded
+50935:M 10 Dec 18:02:40.308 * Running mode=standalone, port=6345.
+50935:M 10 Dec 18:02:40.308 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+50935:M 10 Dec 18:02:40.308 # Server initialized
+50935:M 10 Dec 18:02:40.308 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+50935:M 10 Dec 18:02:40.308 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+50935:M 10 Dec 18:02:40.308 * Ready to accept connections
+Job id is 7804571
+PBS job name is exp_growth_rule_sim_data_transverse_45
+node32-012
+node32-012
+node32-012
+node32-012
+node32-012
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 18:02:52; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_10/14_36
+CONFIG: -p=2500 -e=750 -bt=375 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_10/14_36/cumulative.csv -pt=0 -pgh=0.75 -qid=45 -rqt=10000 -pkl=0 -host=node32-012 -port=6345 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_10/14_36 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_10/14_36/logs/exp_growth_rule_sim_data_transverse_45.qmd.7804571.log cpr=1 -ds=NVB_rescale_dataset.p -dst=5000 -dto=205 -ggr=two_qubit_ising_rotation_hyperfine_transverse
+[getProbeDict] Probe func used: <function separable_probe_dict at 0x2aaae007f620>
+Seed requested for host/port/id node32-012 / 6345 / 45 ;has seed 1
+Seed keys ['rq:worker:node32-012.50968', 'rq:worker:node32-012.50969', 'rq:worker:node32-012.50967', 'rq:worker:node32-012.50966', 'rq:workers', 'rq:worker:node32-012.50965']
+All growth rules: ['two_qubit_ising_rotation_hyperfine_transverse']
+[QMD] Gaussian: True
+Gen list: ['two_qubit_ising_rotation_hyperfine_transverse']
+Adding branch for  two_qubit_ising_rotation_hyperfine_transverse
+mod id: 0
+mod id: 1
+mod id: 2
+[QMD] Going to learn initial models from branches.
+Bayes factors consider: 0 1
+Bayes factors consider: 0 2
+Bayes factors consider: 1 2
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= two_qubit_ising_rotation_hyperfine_transverse type: <class 'str'>
+Bayes factors consider: 3.0 4.0
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= two_qubit_ising_rotation_hyperfine_transverse type: <class 'str'>
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= two_qubit_ising_rotation_hyperfine_transverse type: <class 'str'>
+Bayes factors consider: 6.0 7.0
+Bayes factors consider: 6.0 8.0
+Bayes factors consider: 7.0 8.0
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= two_qubit_ising_rotation_hyperfine_transverse type: <class 'str'>
+Bayes factors consider: 9.0 10.0
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= two_qubit_ising_rotation_hyperfine_transverse type: <class 'str'>
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= two_qubit_ising_rotation_hyperfine_transverse type: <class 'str'>
+Bayes factors consider: 12.0 13.0
+Bayes factors consider: 12.0 14.0
+Bayes factors consider: 13.0 14.0
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= two_qubit_ising_rotation_hyperfine_transverse type: <class 'str'>
+Bayes factors consider: 15.0 16.0
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None]
+NEW BRANCH. gen= two_qubit_ising_rotation_hyperfine_transverse type: <class 'str'>
+[ModGen] MAX SPAWN DEPTH REACHED FOR RULE  two_qubit_ising_rotation_hyperfine_transverse
+[QMD] Num trees now completed: 1 Tree completed dict: {'two_qubit_ising_rotation_hyperfine_transverse': True}
+[QMD runRemoteMult] Finalising QMD.
+NEW BRANCH. gen= two_qubit_ising_rotation_hyperfine_transverse type: <class 'str'>
+Bayes factors consider: 17.0 12.0
+Bayes factors consider: 17.0 2.0
+Bayes factors consider: 17.0 11.0
+Bayes factors consider: 17.0 8.0
+Bayes factors consider: 12.0 2.0
+Bayes factors consider: 12.0 11.0
+Bayes factors consider: 12.0 8.0
+Bayes factors consider: 2.0 11.0
+Bayes factors consider: 2.0 8.0
+Bayes factors consider: 11.0 8.0
+[QMD]Entering final while loop
+QMD finished - results in: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_10/14_36/
+Finished Exp.py at 00:54:34; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_10/14_36
+OK
+50935:M 13 Dec 00:54:35.394 # User requested shutdown...
+50935:M 13 Dec 00:54:35.394 # Redis is now ready to exit, bye bye...
+QMD 45 Finished; end of script at Time: 00:54:35

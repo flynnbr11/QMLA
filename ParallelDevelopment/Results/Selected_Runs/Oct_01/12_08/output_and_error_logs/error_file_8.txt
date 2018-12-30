@@ -1,0 +1,53 @@
+rm: cannot remove `dump.rdb': No such file or directory
+Could not connect to Redis at 127.0.0.1:6308: Connection refused
++ job_id=7473252.master.cm.cluster
+++ cut -d. -f1
++ job_number=7473252
++ echo 'Job id is 7473252'
++ echo 7473252
++ cd /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ '[' 1 == 1 ']'
++ true_hamiltonian=xTiPPyTiPPzTiPPxTxPPyTyPPzTz
++ echo Nodelist
++ cat
++ REDIS_URL=redis://node33-045:6308
++ echo 'REDIS_URL is redis://node33-045:6308'
++ echo 'Running dir is /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment'
++ echo 'workers will log in /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs'
++ QMD_LOG_DIR=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/logs
++ QMD_JOB=long_qhl_experimental_data_NO_restrict_to_positive_parameters_0_prior_8
++ echo 'PBS job name is long_qhl_experimental_data_NO_restrict_to_positive_parameters_0_prior_8'
++ QMD_LOG=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/logs/long_qhl_experimental_data_NO_restrict_to_positive_parameters_0_prior_8.qmd.7473252.log
++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7473252.master.cm.cluster
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7473252.master.cm.cluster
++ export nodes=node33-045
++ nodes=node33-045
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7473252.master.cm.cluster
+++ wc -l
++ export nnodes=1
++ nnodes=1
++ export confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/logs/node_info.long_qhl_experimental_data_NO_restrict_to_positive_parameters_0_prior_8.conf
++ confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/logs/node_info.long_qhl_experimental_data_NO_restrict_to_positive_parameters_0_prior_8.conf
++ for i in '$nodes'
++ echo node33-045
++ cd /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
++ [[ node33-045 == \n\o\d\e* ]]
++ echo 'Launching RQ worker on remote nodes using mpirun'
++ sleep 5
++ mpirun -np 1 -machinefile /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/logs/node_info.long_qhl_experimental_data_NO_restrict_to_positive_parameters_0_prior_8.conf rq worker 8 -u redis://node33-045:6308
++ cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+++ date +%H:%M:%S
++ echo 'Starting Exp.py at 12:27:56; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08'
++ echo 'CONFIG: -p=10000 -e=2500 -bt=2499 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/multiQMD.csv -pt=0 -pgh=1.0 -qid=8 -rqt=10000 -pkl=0 -host=node33-045 -port=6308 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/logs/long_qhl_experimental_data_NO_restrict_to_positive_parameters_0_prior_8.qmd.7473252.log cpr=1 -ds=NVB_dataset.p -dst=5000 -dto=205 -ggr=two_qubit_ising_rotation_hyperfine_transverse'
++ python3 Exp.py -rq=1 -op=xTiPPyTiPPzTiPPxTxPPyTyPPzTz -p=10000 -e=2500 -bt=2499 -rt=0.5 -ra=0.8 -pgh=1.0 -qid=8 -rqt=75000 -g=1 -exp=1 -qhl=1 -fq=0 -pt=0 -pkl=0 -host=node33-045 -port=6308 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/logs/long_qhl_experimental_data_NO_restrict_to_positive_parameters_0_prior_8.qmd.7473252.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/multiQMD.csv -cpr=1 -ds=NVB_dataset.p -dst=5000 -dto=205 -ggr=two_qubit_ising_rotation_hyperfine_transverse -prior_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/prior.p -true_params_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/true_params.p -true_expec_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08/true_expec_vals.p
+++ date +%H:%M:%S
++ echo 'Finished Exp.py at 23:07:15; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_08'
++ sleep 1
++ redis-cli -p 6308 flushall
++ redis-cli -p 6308 shutdown
++ echo 7473252
+++ date +%H:%M:%S
++ echo 'QMD 8 Finished; end of script at Time: 23:07:16'

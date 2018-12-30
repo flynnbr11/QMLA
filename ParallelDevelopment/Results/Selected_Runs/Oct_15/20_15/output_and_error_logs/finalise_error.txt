@@ -1,0 +1,57 @@
+rm: cannot remove `dump.rdb': No such file or directory
+Could not connect to Redis at 127.0.0.1:6469: Connection refused
++ job_id=7553913.master.cm.cluster
+++ cut -d. -f1
++ job_number=7553913
++ echo 'Job id is 7553913'
++ echo 7553913
++ cd /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ '[' 0 == 1 ']'
++ true_hamiltonian=xTiPPyTiPPzTiPPxTxPPyTyPPzTz
++ echo Nodelist
++ cat
++ REDIS_URL=redis://node35-046:6469
++ echo 'REDIS_URL is redis://node35-046:6469'
++ echo 'Running dir is /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment'
++ echo 'workers will log in /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs'
++ QMD_LOG_DIR=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/logs
++ QMD_JOB=finalise_optimised_params_long_qmd_exp_data_169
++ echo 'PBS job name is finalise_optimised_params_long_qmd_exp_data_169'
++ QMD_LOG=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/logs/finalise_optimised_params_long_qmd_exp_data_169.qmd.7553913.log
++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7553913.master.cm.cluster
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7553913.master.cm.cluster
++ export 'nodes=node35-046
+node35-046'
++ nodes='node35-046
+node35-046'
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7553913.master.cm.cluster
+++ wc -l
++ export nnodes=2
++ nnodes=2
++ export confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/logs/node_info.finalise_optimised_params_long_qmd_exp_data_169.conf
++ confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/logs/node_info.finalise_optimised_params_long_qmd_exp_data_169.conf
++ for i in '$nodes'
++ echo node35-046
++ for i in '$nodes'
++ echo node35-046
++ cd /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
++ [[ node35-046 == \n\o\d\e* ]]
++ echo 'Launching RQ worker on remote nodes using mpirun'
++ sleep 5
++ mpirun -np 2 -machinefile /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/logs/node_info.finalise_optimised_params_long_qmd_exp_data_169.conf rq worker 169 -u redis://node35-046:6469
++ cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+++ date +%H:%M:%S
++ echo 'Starting Exp.py at 19:07:29; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15'
++ echo 'CONFIG: -p=6000 -e=2000 -bt=799 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/multiQMD.csv -pt=0 -pgh=1.2 -qid=169 -rqt=10000 -pkl=0 -host=node35-046 -port=6469 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/logs/finalise_optimised_params_long_qmd_exp_data_169.qmd.7553913.log cpr=1 -ds=NVB_dataset.p -dst=5000 -dto=205 -ggr=two_qubit_ising_rotation_hyperfine'
++ python3 Exp.py -rq=1 -op=xTiPPyTiPPzTiPPxTxPPyTyPPzTz -p=6000 -e=2000 -bt=799 -rt=0.5 -ra=0.8 -pgh=1.2 -qid=169 -rqt=75000 -g=1 -exp=1 -meas=hahn -qhl=0 -fq=1 -pt=0 -pkl=0 -host=node35-046 -port=6469 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/logs/finalise_optimised_params_long_qmd_exp_data_169.qmd.7553913.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/multiQMD.csv -cpr=1 -ds=NVB_dataset.p -dst=5000 -dto=205 -ggr=two_qubit_ising_rotation_hyperfine -prior_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/prior.p -true_params_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/true_params.p -true_expec_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/true_expec_vals.p
+++ date +%H:%M:%S
++ echo 'Finished Exp.py at 07:52:26; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15'
++ sleep 1
++ redis-cli -p 6469 flushall
++ redis-cli -p 6469 shutdown
++ echo 7553913
+++ date +%H:%M:%S
++ echo 'QMD 169 Finished; end of script at Time: 07:52:27'

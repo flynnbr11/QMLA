@@ -1,0 +1,57 @@
+rm: cannot remove `dump.rdb': No such file or directory
+Could not connect to Redis at 127.0.0.1:6370: Connection refused
++ job_id=7791157.master.cm.cluster
+++ cut -d. -f1
++ job_number=7791157
++ echo 'Job id is 7791157'
++ echo 7791157
++ cd /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ REDIS_URL=redis://node35-035:6370
++ QMD_LOG_DIR=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/logs
++ OUTPUT_ERROR_DIR=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/output_and_error_logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/logs
++ QMD_JOB=multiple_growth_rules_70
++ echo 'PBS job name is multiple_growth_rules_70'
++ QMD_LOG=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/logs/multiple_growth_rules_70.qmd.7791157.log
++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7791157.master.cm.cluster
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7791157.master.cm.cluster
++ export 'nodes=node35-035
+node35-035
+node35-035
+node35-035
+node35-035'
++ nodes='node35-035
+node35-035
+node35-035
+node35-035
+node35-035'
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//7791157.master.cm.cluster
+++ wc -l
++ export nnodes=5
++ nnodes=5
++ export confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/output_and_error_logs/node_info.multiple_growth_rules_70.conf
++ confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/output_and_error_logs/node_info.multiple_growth_rules_70.conf
++ for i in '$nodes'
++ echo node35-035
++ for i in '$nodes'
++ echo node35-035
++ for i in '$nodes'
++ echo node35-035
++ for i in '$nodes'
++ echo node35-035
++ for i in '$nodes'
++ echo node35-035
++ cd /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
++ [[ node35-035 == \n\o\d\e* ]]
++ echo 'Launching RQ worker on remote nodes using mpirun'
++ printf 'In RUN script:  -agr heisenberg_transverse'
++ mpirun -np 5 -machinefile /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/output_and_error_logs/node_info.multiple_growth_rules_70.conf rq worker 70 -u redis://node35-035:6370
++ ((  1 == 0 ))
++ sleep 5
++ cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+++ date +%H:%M:%S
++ echo 'Starting Exp.py at 07:20:51; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24'
++ echo 'CONFIG: -p=1500 -e=500 -bt=250 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/cumulative.csv -pt=0 -pgh=0.75 -qid=70 -rqt=10000 -pkl=0 -host=node35-035 -port=6370 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/logs/multiple_growth_rules_70.qmd.7791157.log cpr=1 -ds=NVB_rescale_dataset.p -dst=5000 -dto=205 -ggr=interacting_nearest_neighbour_ising'
++ python3 Exp.py -rq=1 -op=xTxTTiPPPiTxTTx -p=1500 -e=500 -bt=250 -rt=0.5 -ra=0.8 -pgh=0.75 -qid=70 -rqt=200000 -g=1 -exp=0 -meas=full_access -qhl=0 -fq=0 -pt=0 -pkl=0 -host=node35-035 -port=6370 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/logs/multiple_growth_rules_70.qmd.7791157.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/cumulative.csv -cpr=1 -ds=NVB_rescale_dataset.p -dst=5000 -dto=205 -ggr=interacting_nearest_neighbour_ising -agr heisenberg_transverse -latex=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/LatexMapping.txt -prior_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/prior.p -true_params_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/true_params.p -plot_probes=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/plot_probes.p -true_expec_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/true_expec_vals.p -pmin=0 -pmax=1 -pmean=0.5 -psigma=0.3 -resource=0

@@ -1,0 +1,36 @@
+QMD ID =63; REDIS_PORT=6363
+Global server: newblue4
+BC backend identified
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+70809:C 16 Oct 02:19:13.417 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+70809:C 16 Oct 02:19:13.417 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=70809, just started
+70809:C 16 Oct 02:19:13.417 # Configuration loaded
+70809:M 16 Oct 02:19:13.418 * Running mode=standalone, port=6363.
+70809:M 16 Oct 02:19:13.419 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+70809:M 16 Oct 02:19:13.419 # Server initialized
+70809:M 16 Oct 02:19:13.419 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+70809:M 16 Oct 02:19:13.419 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+70809:M 16 Oct 02:19:13.419 * Ready to accept connections
+Job id is 7532581
+Nodelist
+REDIS_URL is redis://node35-016:6363
+Running dir is /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
+workers will log in /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
+PBS job name is optimised_params_long_qmd_exp_data_63
+node35-016
+node35-016
+node35-016
+node35-016
+node35-016
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 02:19:25; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15
+CONFIG: -p=2500 -e=800 -bt=799 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/multiQMD.csv -pt=0 -pgh=0.5 -qid=63 -rqt=10000 -pkl=0 -host=node35-016 -port=6363 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/logs/optimised_params_long_qmd_exp_data_63.qmd.7532581.log cpr=1 -ds=NVB_dataset.p -dst=5000 -dto=205 -ggr=two_qubit_ising_rotation_hyperfine
+Seed requested for host/port/id node35-016 / 6363 / 63 ;has seed 1
+Seed keys ['rq:worker:node35-016.70838', 'rq:worker:node35-016.70842', 'rq:worker:node35-016.70840', 'rq:workers', 'rq:worker:node35-016.70839', 'rq:worker:node35-016.70841']
+QMD finished - results in: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15/
+Finished Exp.py at 00:16:28; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_15/20_15
+OK
+70809:M 17 Oct 00:16:29.252 # User requested shutdown...
+70809:M 17 Oct 00:16:29.252 # Redis is now ready to exit, bye bye...
+QMD 63 Finished; end of script at Time: 00:16:29

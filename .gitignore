@@ -31,6 +31,7 @@ DevelopmentNotebooks/*
 ParallelDevelopment/Results/*
 !ParallelDevelopment/Results/Selected_Runs/
 !ParallelDevelopment/Results/Selected_Runs/*/*/*
+!ParallelDevelopment/Results/Selected_Runs/*/*/*/*
 
 
 !ParallelDevelopment/launch_qmd.sh

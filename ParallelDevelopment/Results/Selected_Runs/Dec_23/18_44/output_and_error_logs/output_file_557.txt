@@ -1,0 +1,31 @@
+QMD ID =557; REDIS_PORT=6857
+Global server: newblue2
+BC backend identified
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+19965:C 26 Dec 17:22:43.319 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+19965:C 26 Dec 17:22:43.319 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=19965, just started
+19965:C 26 Dec 17:22:43.319 # Configuration loaded
+19965:M 26 Dec 17:22:43.321 * Running mode=standalone, port=6857.
+19965:M 26 Dec 17:22:43.321 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+19965:M 26 Dec 17:22:43.321 # Server initialized
+19965:M 26 Dec 17:22:43.321 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+19965:M 26 Dec 17:22:43.321 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+19965:M 26 Dec 17:22:43.321 * Ready to accept connections
+Job id is 7908725
+PBS job name is param_sweep_exp_data_557
+node45-008
+node45-008
+node45-008
+node45-008
+node45-008
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 17:22:55; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_23/18_44
+CONFIG: -p=2000 -e=500 -bt=250 -rt=0.5 -ra=0.98 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_23/18_44/cumulative.csv -pt=0 -pgh=0.75 -qid=557 -rqt=10000 -pkl=0 -host=node45-008 -port=6857 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_23/18_44 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_23/18_44/logs/param_sweep_exp_data_557.qmd.7908725.log cpr=1 -ds=NVB_rescale_dataset.p -dst=5000 -dto=205 -ggr=two_qubit_ising_rotation_hyperfine_transverse
+19965:signal-handler (1545984431) Received SIGTERM scheduling shutdown...
+19965:signal-handler (1545984431) Received SIGTERM scheduling shutdown...
+19965:signal-handler (1545984431) Received SIGTERM scheduling shutdown...
+19965:signal-handler (1545984431) Received SIGTERM scheduling shutdown...
+19965:signal-handler (1545984431) Received SIGTERM scheduling shutdown...
+19965:M 28 Dec 08:07:11.378 # User requested shutdown...
+19965:M 28 Dec 08:07:11.378 # Redis is now ready to exit, bye bye...

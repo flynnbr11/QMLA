@@ -1,0 +1,30 @@
+QMD ID =70; REDIS_PORT=6370
+Global server: newblue2
+BC backend identified
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+114738:C 08 Dec 07:20:39.233 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+114738:C 08 Dec 07:20:39.233 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=114738, just started
+114738:C 08 Dec 07:20:39.233 # Configuration loaded
+114738:M 08 Dec 07:20:39.235 * Running mode=standalone, port=6370.
+114738:M 08 Dec 07:20:39.235 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+114738:M 08 Dec 07:20:39.235 # Server initialized
+114738:M 08 Dec 07:20:39.235 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+114738:M 08 Dec 07:20:39.235 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+114738:M 08 Dec 07:20:39.235 * Ready to accept connections
+Job id is 7791157
+PBS job name is multiple_growth_rules_70
+node35-035
+node35-035
+node35-035
+node35-035
+node35-035
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 07:20:51; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24
+CONFIG: -p=1500 -e=500 -bt=250 -rt=0.5 -ra=0.8 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/cumulative.csv -pt=0 -pgh=0.75 -qid=70 -rqt=10000 -pkl=0 -host=node35-035 -port=6370 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Dec_07/17_24/logs/multiple_growth_rules_70.qmd.7791157.log cpr=1 -ds=NVB_rescale_dataset.p -dst=5000 -dto=205 -ggr=interacting_nearest_neighbour_ising
+114738:signal-handler (1544444690) Received SIGTERM scheduling shutdown...
+114738:signal-handler (1544444690) Received SIGTERM scheduling shutdown...
+114738:signal-handler (1544444690) Received SIGTERM scheduling shutdown...
+114738:signal-handler (1544444690) Received SIGTERM scheduling shutdown...
+114738:M 10 Dec 12:24:50.727 # User requested shutdown...
+114738:M 10 Dec 12:24:50.727 # Redis is now ready to exit, bye bye...
