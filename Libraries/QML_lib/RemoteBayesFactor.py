@@ -99,6 +99,8 @@ def BayesFactorRemote(
     use_experimental_data = info_dict['use_experimental_data']
     experimental_data_times = info_dict['experimental_measurement_times']
     binning = info_dict['bayes_factors_time_binning']
+    use_all_exp_times_for_bayes_factors = True # TODO make this a QMD input
+
 
 
     if check_db: # built in to only compute once and always return the stored value.
@@ -144,7 +146,25 @@ def BayesFactorRemote(
             times_b = model_b.Times[first_t_idx:]
         
         # if binning==True and use_experimental_data==True:
-        if binning==True:
+        
+        if (
+            use_experimental_data is True
+            and
+            use_all_exp_times_for_bayes_factors is True
+        ):
+          
+            times_a = experimental_data_times
+            times_b = experimental_data_times
+            
+            log_print(
+                [
+                    "Using all exp data times:",
+                    experimental_data_times
+                ]
+            )
+
+        
+        elif binning==True:
             import ExperimentalDataFunctions
 
             # TODO introduce binning for simulated data. 
@@ -178,6 +198,7 @@ def BayesFactorRemote(
                 ) 
                 for t in times_list
             ]
+            
 
             """
             log_print(
