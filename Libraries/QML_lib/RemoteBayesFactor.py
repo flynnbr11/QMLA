@@ -153,13 +153,12 @@ def BayesFactorRemote(
             use_all_exp_times_for_bayes_factors is True
         ):
           
-            times_a = experimental_data_times
-            times_b = experimental_data_times
-            
+            times_a = copy.deepcopy(experimental_data_times)
+            times_b = copy.deepcopy(experimental_data_times)
+        
             log_print(
                 [
-                    "Using all exp data times:",
-                    experimental_data_times
+                    "Using all exp data times:"                
                 ]
             )
 
