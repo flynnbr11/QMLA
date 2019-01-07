@@ -8,15 +8,16 @@ script_path="$RESULTS_DIR/$script_name"
 additional_growth="-agr=non_interacting_ising"
 # additional_growth=""
 
+#	-ggr='two_qubit_ising_rotation_hyperfine' \
 #	-ggr='two_qubit_ising_rotation_hyperfine_transverse' \
 python3 CalculateTimeRequired.py \
 	-ggr='two_qubit_ising_rotation_hyperfine_transverse' \
 	$additional_growth \
 	-use_agr=0 \
-	-e=500 \
-	-p=2000 \
-	-bt=1500 \
-	-proc=5 \
+	-e=100 \
+	-p=1000 \
+	-bt=425 \
+	-proc=1 \
 	-res=0 \
 	-scr=$script_path \
 	-qmdtenv="QMD_TIME" \
