@@ -1,21 +1,21 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="+r_probe_sim"
+test_description="old_data_short_nontransverse_all_times_bayes_factors"
 
 ## Script essentials
-num_tests=100
+num_tests=30
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
-min_id=200 # update so instances don't clash and hit eachother's redis databases
-experimental_data=0 # use experimental data -> 1; use fake data ->0
-simulate_experiment=1
+min_id=0 # update so instances don't clash and hit eachother's redis databases
+experimental_data=1 # use experimental data -> 1; use fake data ->0
+simulate_experiment=0
 
 # QHL parameters
-p=2000 # particles
-e=500 # experiments
+p=500 # particles
+e=50 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
-rp=1.0 # PGH factor
+rp=0.5 # PGH factor
 #op='xTxTTx'
 op='xTxTTiPPPiTxTTx'
 #op='xTxTTiPPPiTxTTx'
@@ -26,8 +26,8 @@ op='xTxTTiPPPiTxTTx'
 # QMD settings
 #dataset='NVB_HahnPeaks_Newdata'
 #dataset='NV05_HahnEcho02'
-#dataset='NVB_dataset.p'
-dataset='NVB_rescale_dataset.p'
+dataset='NVB_dataset.p'
+#dataset='NVB_rescale_dataset.p'
 #dataset='NV05_dataset.p'
 sim_measurement_type='full_access'
 exp_measurement_type='hahn' # to use if not experimental
@@ -85,8 +85,8 @@ then
 	measurement_type=$exp_measurement_type
 	rp=1.0
 	multiple_growth_rules=0
-#	growth_rule='two_qubit_ising_rotation_hyperfine'
-	growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+	growth_rule='two_qubit_ising_rotation_hyperfine'
+#	growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 	op='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
 elif [[ "$growth_rule" == 'two_qubit_ising_rotation_hyperfine' ]] 
 then
@@ -236,14 +236,16 @@ chmod a+x $time_required_script
 
 qmd_env_var="QMD_TIME"
 qhl_env_var="QHL_TIME"
+let temp_bayes_times="$p" # TODO fix time calculator
+
 python3 ../Libraries/QML_lib/CalculateTimeRequired.py \
 	-ggr=$growth_rule \
 	-use_agr=$multiple_growth_rules \
 	$growth_rules_command \
 	-e=$e \
 	-p=$p \
-	-bt=$e \
-	-proc=$num_proc \
+	-bt=$temp_bayes_times \
+	-proc=1 \
 	-res=$resource_reallocation \
 	-scr=$time_required_script \
 	-qmdtenv="QMD_TIME" \
