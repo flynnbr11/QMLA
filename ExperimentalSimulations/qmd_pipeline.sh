@@ -8,7 +8,7 @@ test_description="multiple_growth_rules_include_hubbard"
 num_tests=1
 qhl_test=0
 do_further_qhl=0
-exp_data=0
+exp_data=1
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -60,7 +60,7 @@ mkdir -p $long_dir
 use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='heisenberg_nontransverse'
-# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='heisenberg_transverse'
 # growth_rule='non_interacting_ising'
@@ -76,12 +76,12 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='hubbard'
 # growth_rule='hubbard_chain_just_hopping'
 # growth_rule='hubbard_chain'
-growth_rule='hubbard_square_lattice_generalised'
+#growth_rule='hubbard_square_lattice_generalised'
 
 
 alt_growth_rules=(
-   'heisenberg_transverse'
-   'interacing_nn_ising_fixed_axis'
+   # 'heisenberg_transverse'
+   # 'interacing_nn_ising_fixed_axis'
    # 'non_interacting_ising'
 )
 
@@ -109,8 +109,8 @@ then
     measurement_type=$exp_measurement_type
     pgh=0.3
     true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-    # growth_rule='two_qubit_ising_rotation_hyperfine'
-    growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+    growth_rule='two_qubit_ising_rotation_hyperfine'
+    # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
 else
     measurement_type=$sim_measurement_type

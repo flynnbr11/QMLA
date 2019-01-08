@@ -99,7 +99,7 @@ def BayesFactorRemote(
     use_experimental_data = info_dict['use_experimental_data']
     experimental_data_times = info_dict['experimental_measurement_times']
     binning = info_dict['bayes_factors_time_binning']
-    use_all_exp_times_for_bayes_factors = True # TODO make this a QMD input
+    use_all_exp_times_for_bayes_factors = False # TODO make this a QMD input
 
 
 
