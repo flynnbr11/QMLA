@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="old_data_short_nontransverse_all_times_bayes_factors"
+test_description="custom_ham_exp_new_code"
 
 ## Script essentials
 num_tests=30
@@ -11,8 +11,8 @@ experimental_data=1 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters
-p=500 # particles
-e=50 # experiments
+p=1000 # particles
+e=100 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=0.5 # PGH factor
@@ -125,6 +125,11 @@ true_expec_path="$full_path_to_results/$true_expec_filename"
 latex_map_name='LatexMapping.txt'
 latex_mapping_file=$full_path_to_results/$latex_map_name
 resource_reallocation=0
+
+copied_launch_file="$full_path_to_results/launched_script.txt"
+touch $copied_launch_file
+cat $(pwd)/launch_qmd.sh > $copied_launch_file
+echo "copied launch script to results directory"
 
 OUT_LOG="$full_path_to_results/output_and_error_logs/"
 output_file="output_file"
