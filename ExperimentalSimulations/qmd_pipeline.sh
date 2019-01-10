@@ -8,13 +8,13 @@ test_description="multiple_growth_rules_include_hubbard"
 num_tests=1
 qhl_test=0
 do_further_qhl=0
-exp_data=1
+exp_data=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
-exp=4
+prt=30
+exp=5
 pgh=0.5
 ra=0.8
 rt=0.5
@@ -27,7 +27,6 @@ use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
 plots=1
-use_rq=0
 number_best_models_further_qhl=5
 custom_prior=1
 # dataset='NVB_dataset.p'
@@ -59,19 +58,17 @@ mkdir -p $long_dir
 # growth_rule='test_changes_to_qmd'
 use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='two_qubit_ising_rotation_hyperfine'
-# growth_rule='heisenberg_nontransverse'
-growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='interacting_nearest_neighbour_ising'
-# growth_rule='heisenberg_transverse'
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
 # growth_rule='deterministic_noninteracting_ising_single_axis'
-
-# TODO interacing_nn_ising_fixed_axis BROKEN!!!
 # growth_rule='interacing_nn_ising_fixed_axis' 
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
-
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
+
+# growth_rule='heisenberg_nontransverse'
+growth_rule='heisenberg_transverse'
 
 # growth_rule='hubbard'
 # growth_rule='hubbard_chain_just_hopping'
@@ -123,18 +120,19 @@ declare -a particle_counts=(
 $prt
 )
 q_id=0
+"""
 if (($prt > 50)) || (($exp > 10)) 
 then
     use_rq=1
 else
     use_rq=0
 fi
-
+"""
 if (( $qhl_test == 1 )) # For QHL test always do without rq
 then
     use_rq=0
 fi
-use_rq=0
+# use_rq=1
 # let bt="$exp-1"
 let bt="$exp"
 

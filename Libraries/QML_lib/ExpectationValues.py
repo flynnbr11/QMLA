@@ -314,10 +314,10 @@ def hahn_evolution(
         #     precision=precision
         # )
 
-        # first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
-        # second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
-        first_unitary_time_evolution = h.exp_ham(ham, t)
-        second_unitary_time_evolution = h.exp_ham(ham, 2*t)
+        first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
+        second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
+        # first_unitary_time_evolution = h.exp_ham(ham, t)
+        # second_unitary_time_evolution = h.exp_ham(ham, 2*t)
 
         total_evolution = np.dot(
             second_unitary_time_evolution,
