@@ -1,9 +1,9 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="custom_ham_exp_new_code"
+test_description="new_code_same_exp_prt_as_oct_15"
 
 ## Script essentials
-num_tests=30
+num_tests=50
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
 min_id=0 # update so instances don't clash and hit eachother's redis databases
@@ -11,8 +11,8 @@ experimental_data=1 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters
-p=1000 # particles
-e=100 # experiments
+p=2500 # particles
+e=800 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=0.5 # PGH factor
@@ -83,7 +83,7 @@ if (( "$experimental_data" == 1)) # NOTE use round brackets for arithmetic compa
 then
 	echo "experimental data = $experimental_data "
 	measurement_type=$exp_measurement_type
-	rp=1.0
+#	rp=$rp
 	multiple_growth_rules=0
 	growth_rule='two_qubit_ising_rotation_hyperfine'
 #	growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
@@ -126,19 +126,24 @@ latex_map_name='LatexMapping.txt'
 latex_mapping_file=$full_path_to_results/$latex_map_name
 resource_reallocation=0
 
-copied_launch_file="$full_path_to_results/launched_script.txt"
-touch $copied_launch_file
-cat $(pwd)/launch_qmd.sh > $copied_launch_file
-echo "copied launch script to results directory"
+
+
 
 OUT_LOG="$full_path_to_results/output_and_error_logs/"
 output_file="output_file"
 error_file="error_file" 
 
 mkdir -p $full_path_to_results
-mkdir -p "$(pwd)/logs"
+#mkdir -p "$(pwd)/logs"
 mkdir -p $OUT_LOG
 mkdir -p results_dir
+
+copied_launch_file="$full_path_to_results/launched_script.txt"
+#touch $copied_launch_file
+#cat $(pwd)/launch_qmd.sh > $copied_launch_file
+#echo "copied launch script to results directory"
+cp $(pwd)/launch_qmd.sh $copied_launch_file
+
 
 global_server=$(hostname)
 test_time="walltime=00:90:00"
@@ -241,7 +246,7 @@ chmod a+x $time_required_script
 
 qmd_env_var="QMD_TIME"
 qhl_env_var="QHL_TIME"
-let temp_bayes_times="$p" # TODO fix time calculator
+let temp_bayes_times="2*$p" # TODO fix time calculator
 
 python3 ../Libraries/QML_lib/CalculateTimeRequired.py \
 	-ggr=$growth_rule \
