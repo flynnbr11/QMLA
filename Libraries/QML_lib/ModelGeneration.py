@@ -13,7 +13,7 @@ import pandas as pd
 import warnings
 import copy
 import time as time
-import Evo as evo
+#import Evo as evo
 import DataBase 
 import warnings
 import ModelNames
@@ -59,7 +59,161 @@ def log_print(to_print_list, log_file):
 
 """
 Functions for generation of random model names for testing/debugging.
+Ising type models
 """
+
+def process_1d_ising(term):
+    components = term.split('_')
+    components.remove('1Dising')
+    include_transverse_component = include_chain_component = False
+    
+    for l in components:
+        if l[0] == 'd':
+            dim = int(l.replace('d', ''))
+        elif l[0] == 'i':
+            chain_axis = str(l.replace('i', ''))
+            include_chain_component = True
+        elif l[0] == 't' : 
+            include_transverse_component = True
+            transverse_axis = str(l.replace('t', ''))
+
+
+    if include_chain_component == True:
+        return ising_interaction_component(
+            num_qubits = dim, 
+            interaction_axis = chain_axis
+        )
+
+    elif include_transverse_component == True:
+        return ising_transverse_component(
+            num_qubits = dim, 
+            transverse_axis = transverse_axis
+        )
+
+def ising_transverse_component(
+    num_qubits, 
+    transverse_axis
+):
+    
+    individual_transverse_terms = []
+
+    for i in range(1, 1+num_qubits):
+        single_term = ''
+        t_str = 'T'
+        for q in range(1, 1+num_qubits):
+            if i == q : 
+                single_term += transverse_axis
+            else:
+                single_term += 'i'
+            
+            if q != num_qubits:
+                single_term += t_str
+                t_str += 'T'
+                
+        individual_transverse_terms.append(single_term)
+        
+        
+    running_mtx = DataBase.compute(individual_transverse_terms[0])
+    
+    for term in individual_transverse_terms[1:]:
+        running_mtx += DataBase.compute(term)
+        
+        
+    return running_mtx
+            
+def ising_interaction_component(num_qubits, interaction_axis):
+    
+    individual_interaction_terms = []
+
+    for i in range(1, num_qubits):
+        single_term = ''
+        t_str = 'T'
+        for q in range(1, num_qubits+1):
+            if i == q or i+1 == q :
+                
+                single_term += interaction_axis
+            else:
+                single_term += 'i'
+            
+            if q != num_qubits:
+                single_term += t_str
+                t_str += 'T'
+                
+        individual_interaction_terms.append(single_term)
+        
+    running_mtx = DataBase.compute(individual_interaction_terms[0])
+    
+    for term in individual_interaction_terms[1:]:
+        running_mtx += DataBase.compute(term)
+        
+    return running_mtx
+
+
+def ising_1d_chain_name(
+    num_qubits, 
+    interaction_axis, 
+    include_transverse=False, 
+    transverse_axis=None,
+    ring=False
+):
+    model_identifier = '1Dising_'
+    model_name = ''
+    dimension_term = str( '_d' + str(num_qubits))
+
+    interaction_term = str(model_identifier + 'i' + interaction_axis + dimension_term )
+    p_str = 'P'*num_qubits
+    
+    
+    full_model = interaction_term
+    if include_transverse == True:
+        transverse_term = str(model_identifier +  't' + transverse_axis + dimension_term)
+        full_model += str( p_str + transverse_term)
+    return full_model
+    
+    
+def generate_models_ising_1d_chain(
+    **kwargs
+):
+    from UserFunctions import initial_models, max_num_qubits_info, fixed_axes_by_generator, transverse_axis_by_generator
+    growth_generator = kwargs['generator']
+    model_list = kwargs['model_list']
+    spawn_stage = kwargs['spawn_stage']
+    max_num_qubits = max_num_qubits_info[growth_generator]
+    interaction_axis = fixed_axes_by_generator[growth_generator]
+    transverse_axis = transverse_axis_by_generator[growth_generator]
+    
+    largest_mod_num_qubits = max( [  
+            DataBase.get_num_qubits(mod) for mod in model_list
+        ] 
+    )
+    
+    new_models = []
+
+    if spawn_stage[-1] == None:
+        for q in range(2, max_num_qubits+1): 
+            # include qubit number = 1 so compared against all others fairly 
+            new_models.append(
+                ising_1d_chain_name(
+                    num_qubits = q, 
+                    interaction_axis = interaction_axis, 
+                    include_transverse = False
+                )
+            )
+        spawn_stage.append('non-transverse complete')
+    elif spawn_stage[-1] == 'non-transverse complete':
+        for q in range(2, max_num_qubits+1): 
+            new_models.append(
+                ising_1d_chain_name(
+                    num_qubits = q, 
+                    interaction_axis = interaction_axis, 
+                    include_transverse = True, 
+                    transverse_axis = transverse_axis
+                )
+            )
+        spawn_stage.append('Complete')
+    return new_models
+        
+
         
 def random_model_name(num_dimensions=1, num_terms=1):
     """
@@ -1136,7 +1290,8 @@ def hopping_matrix(term):
     for i in split_term:
         print("ind term:", i)
         if i[0] == 'd':
-            dim = int(i[1])
+            # dim = int(i[1])
+            dim = int(i.replace('d', ''))
         elif i[0] == 'e':
             energy_term = True
             hopping_term = False
@@ -1463,7 +1618,8 @@ def deconstruct_hopping_term(hopping_string):
         sites = []
         for i in split_term:
             if i[0] == 'd':
-                dim = int(i[1])
+                # dim = int(i[1])
+                dim = dim = int(i.replace('d', ''))
             elif 'e' in i:
                 deconstructed['interaction_energy'] = True
             elif i != 'h':

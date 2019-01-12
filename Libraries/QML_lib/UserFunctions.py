@@ -86,6 +86,8 @@ default_true_operators_by_generator = {
     'interacing_nn_ising_fixed_axis' : 'xTxTTiPPPiTxTTx',
     'deterministic_interacting_nn_ising_single_axis' : 'xTxTTiPPPiTxTTx',
     'deterministic_transverse_ising_nn_fixed_axis' : 'zTiPPiTzPPxTx',
+    'ising_1d_chain' : '1Dising_ix_d2PP1Dising_tz_d2',
+
     'heisenberg_nontransverse' : 'xTxPPzTz',
     'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi',
     # 'hubbard' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
@@ -117,7 +119,12 @@ fixed_axes_by_generator = {
     'deterministic_transverse_ising_nn_fixed_axis' : 'x',
     'non_interacting_ising_single_axis' : 'x', 
     'heisenberg_transverse' : 'z',
-    'heisenberg_nontransverse' : 'z'
+    'heisenberg_nontransverse' : 'z',
+	'ising_1d_chain' : 'x'
+}
+
+transverse_axis_by_generator = {
+	'ising_1d_chain' : 'z'
 }
 
 max_spawn_depth_info = {
@@ -137,6 +144,7 @@ max_spawn_depth_info = {
 	'hubbard_chain_just_hopping' : 10,
 	'hubbard_chain' : 10,
 	'hubbard_square_lattice_generalised' : 10,
+	'ising_1d_chain' : 5
 }
 
 max_num_qubits_info = {
@@ -157,6 +165,7 @@ max_num_qubits_info = {
 	'hubbard_chain_just_hopping' : 5,
 	'hubbard_chain' : 5,
 	'hubbard_square_lattice_generalised' : 8,
+	'ising_1d_chain' : 5,
     None : 5,
 }
 
@@ -194,6 +203,8 @@ model_generation_functions = {
 		ModelGeneration.deterministic_interacting_nn_ising_single_axis,
 	'deterministic_transverse_ising_nn_fixed_axis' : 
 		ModelGeneration.deterministic_transverse_ising_nn_fixed_axis,
+	'ising_1d_chain' : 
+		ModelGeneration.generate_models_ising_1d_chain,
 	'heisenberg_nontransverse' : 
 		ModelGeneration.heisenberg_nontransverse,
 	'heisenberg_transverse':
@@ -221,6 +232,8 @@ tree_finished_functions = {
 	'hubbard_chain' :
 		ModelGeneration.max_num_qubits_reached_check,
 	'hubbard_square_lattice_generalised' :
+		ModelGeneration.max_num_qubits_reached_check,
+	'ising_1d_chain' : 
 		ModelGeneration.max_num_qubits_reached_check,
 	# 'heisenberg_transverse':
 	# 	ModelGeneration.max_num_qubits_reached_check,
@@ -261,6 +274,8 @@ name_branch_map_functions = {
 		ModelNames.branch_is_num_dims,
 	'hubbard_square_lattice_generalised' : 
 		ModelNames.branch_is_num_dims,
+	'ising_1d_chain' : 
+		ModelNames.branch_is_num_dims,
 }
 
 
@@ -278,6 +293,8 @@ latex_naming_functions = {
 		ModelNames.latex_name_ising, 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
 		ModelNames.latex_name_ising, 
+	'ising_1d_chain' : 
+		ModelNames.latex_name_1d_ising_chain,
 	'hubbard': 
 		ModelNames.hubbard_latex, 
 	'hubbard_chain_just_hopping' :	
@@ -341,6 +358,12 @@ initial_models = {
 		['xTx', 'yTy', 'zTz'],
 	'deterministic_interacting_nn_ising_single_axis' : 
 		['xTx', 'yTy', 'zTz'],
+	'ising_1d_chain' : 
+		[
+			'1Dising_ix_d2',
+			'1Dising_ix_d2PP1Dising_tz_d2', 
+		],
+
 	'heisenberg_nontransverse' :
 		['xTx', 'yTy', 'zTz'],
 	'heisenberg_transverse' :

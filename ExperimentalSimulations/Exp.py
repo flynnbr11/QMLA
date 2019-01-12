@@ -79,7 +79,7 @@ else:
 generated_probe_dict = UserFunctions.get_probe_dict(
     experimental_data = global_variables.use_experimental_data, 
     growth_generator = global_variables.growth_generation_rule, 
-    noise_level = 0.0,
+    noise_level = 0.03,
     special_probe = global_variables.special_probe, 
     minimum_tolerable_noise = 0.03,
     # minimum_tolerable_noise = 1e-7,

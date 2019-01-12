@@ -62,7 +62,9 @@ import hashlib
 
 import redis
 # import Evo as evo
-from QML import *
+# from QML import *
+# import QML ## trying to figure out what is actually used from QML
+from QML import ModelLearningClass, reducedModel
 # import ModelGeneration
 from qinfer import NormalDistribution
 # from Distrib import MultiVariateNormalDistributionNocov
@@ -277,12 +279,17 @@ def get_num_qubits(name):
     t_str, p_str, max_t, max_p = get_t_p_strings(name)
     individual_terms = get_constituent_names_from_name(name)
     for term in individual_terms:
-        if term[0] == 'h':
+        if (
+            term[0] == 'h'
+            or
+            '1Dising' in term
+        ):
             terms = term.split('_')
             dim_term = terms[-1]
             dim = int(dim_term[1:])
             num_qubits = dim
             return num_qubits
+
     # if hopping term wasn't found in individual terms
     max_t_found = 0 
     t_str=''
@@ -618,6 +625,11 @@ def process_basic_operator(basic_operator):
             basic_operator
         )
         # hopping_matrix(basic_operator)
+    elif '1Dising' in basic_operator:
+        import ModelGeneration
+        mtx = ModelGeneration.process_1d_ising(
+            basic_operator
+        )
     else:
         mtx = core_operator_dict[basic_operator]
 

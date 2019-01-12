@@ -187,7 +187,57 @@ def latex_name_ising(name):
         final_term = '$'+latex_term+'$'
         return final_term
 
-
+def latex_name_1d_ising_chain(name):
+    
+    individual_terms = DataBase.get_constituent_names_from_name(name)
+    chain_axis = transverse_axis = None
+    
+    for term in individual_terms:
+        components = term.split('_')
+        components.remove('1Dising')
+        for c in components:
+            if c[0] == 'd':
+                dim = int(c.replace('d', ''))
+            elif c[0] == 'i':
+                chain_axis = str(c.replace('i', ''))
+                include_chain_component = True
+            elif c[0] == 't' : 
+                include_transverse_component = True
+                transverse_axis = str(c.replace('t', ''))
+    print(
+        "dim:", dim, 
+        "\nchain_axis:", chain_axis,
+        "\ntransverse axis:", transverse_axis
+     )
+            
+    latex_term = '$('
+    if chain_axis is not None:
+        chain_term = str(
+            '\sigma_{'
+            + chain_axis
+            + ','
+            + chain_axis
+            +'}'
+        )
+        latex_term += chain_term
+        
+    if transverse_axis is not None:
+        transverse_term = str(
+            '\sigma_{'
+            + transverse_axis
+            +'}'
+        )
+        latex_term += transverse_term
+    
+    
+    latex_term += str( 
+        ')^{\otimes'
+        + str(dim)
+        + '}$'
+    )
+        
+    return latex_term
+ 
 
 
 ##### All possible model list functions ######

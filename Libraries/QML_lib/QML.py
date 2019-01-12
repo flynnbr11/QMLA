@@ -4,7 +4,7 @@ import scipy as sp
 import os 
 import time
 import qinfer as qi
-import Evo
+# import Evo
 import ExpectationValues
 import UserFunctions
 import Distrib as Distributions

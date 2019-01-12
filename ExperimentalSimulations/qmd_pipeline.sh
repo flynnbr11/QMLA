@@ -59,16 +59,17 @@ mkdir -p $long_dir
 use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='non_interacting_ising'
 # growth_rule='non_interacting_ising_single_axis'
 # growth_rule='deterministic_noninteracting_ising_single_axis'
 # growth_rule='interacing_nn_ising_fixed_axis' 
+# growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
+growth_rule='ising_1d_chain'
 
 # growth_rule='heisenberg_nontransverse'
-growth_rule='heisenberg_transverse'
+# growth_rule='heisenberg_transverse'
 
 # growth_rule='hubbard'
 # growth_rule='hubbard_chain_just_hopping'
