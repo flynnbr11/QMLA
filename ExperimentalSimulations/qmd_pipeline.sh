@@ -66,10 +66,11 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
-growth_rule='ising_1d_chain'
+# growth_rule='ising_1d_chain'
 
 # growth_rule='heisenberg_nontransverse'
 # growth_rule='heisenberg_transverse'
+growth_rule='heisenberg_xyz'
 
 # growth_rule='hubbard'
 # growth_rule='hubbard_chain_just_hopping'

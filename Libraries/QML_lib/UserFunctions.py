@@ -90,6 +90,9 @@ default_true_operators_by_generator = {
 
     'heisenberg_nontransverse' : 'xTxPPzTz',
     'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi',
+    'heisenberg_xyz' : 'Heis_ix_d3PPPHeis_iy_d3PPPHeis_iz_d3PPPHeis_tz_d3',
+
+
     # 'hubbard' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
     # 'hubbard' : 'h_1_2_d2PPiTzPPzTi',
     'hubbard' : 'h_1h2_d2PPiTzPPzTi',
@@ -120,11 +123,12 @@ fixed_axes_by_generator = {
     'non_interacting_ising_single_axis' : 'x', 
     'heisenberg_transverse' : 'z',
     'heisenberg_nontransverse' : 'z',
-	'ising_1d_chain' : 'x'
+	'ising_1d_chain' : 'x',
 }
 
 transverse_axis_by_generator = {
-	'ising_1d_chain' : 'z'
+	'ising_1d_chain' : 'z',
+	'heisenberg_xyz' : 'z'
 }
 
 max_spawn_depth_info = {
@@ -144,7 +148,8 @@ max_spawn_depth_info = {
 	'hubbard_chain_just_hopping' : 10,
 	'hubbard_chain' : 10,
 	'hubbard_square_lattice_generalised' : 10,
-	'ising_1d_chain' : 5
+	'ising_1d_chain' : 5,
+	'heisenberg_xyz' : 5,
 }
 
 max_num_qubits_info = {
@@ -166,6 +171,7 @@ max_num_qubits_info = {
 	'hubbard_chain' : 5,
 	'hubbard_square_lattice_generalised' : 8,
 	'ising_1d_chain' : 5,
+    'heisenberg_xyz' : 5,
     None : 5,
 }
 
@@ -209,6 +215,8 @@ model_generation_functions = {
 		ModelGeneration.heisenberg_nontransverse,
 	'heisenberg_transverse':
 		ModelGeneration.heisenberg_transverse,
+	'heisenberg_xyz' :
+		ModelGeneration.generate_models_heisenberg_xyz,
 	'hubbard_chain_just_hopping' :
 		ModelGeneration.hubbard_chain_just_hopping,
 	'hubbard_chain' : 
@@ -235,6 +243,9 @@ tree_finished_functions = {
 		ModelGeneration.max_num_qubits_reached_check,
 	'ising_1d_chain' : 
 		ModelGeneration.max_num_qubits_reached_check,
+	'heisenberg_xyz' :
+		ModelGeneration.max_num_qubits_reached_check
+
 	# 'heisenberg_transverse':
 	# 	ModelGeneration.max_num_qubits_reached_check,
 }
@@ -303,6 +314,8 @@ latex_naming_functions = {
 		ModelNames.hubbard_latex,
 	'hubbard_square_lattice_generalised' : 
 		ModelNames.hubbard_latex,
+	'heisenberg_xyz' : 
+		ModelNames.latex_name_heisenberg_xyz
 	# None : 
 	# 	ModelNames.default_latex_wrapping,
 	# 'test_return_champs' :
@@ -368,6 +381,12 @@ initial_models = {
 		['xTx', 'yTy', 'zTz'],
 	'heisenberg_transverse' :
 		['xTx', 'yTy', 'zTz'],
+	'heisenberg_xyz' : 
+		[
+			'Heis_ix_d2PPHeis_iy_d2PPHeis_iy_d2',
+			'Heis_ix_d2PPHeis_iy_d2PPHeis_iy_d2PPHeis_tz_d2'
+		],
+
 	'hubbard' :
 		['a', 's', 'z'],
 	'hubbard' :

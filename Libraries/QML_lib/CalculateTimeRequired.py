@@ -111,6 +111,7 @@ parser.add_argument(
 
 max_num_models_by_shape = {}
 
+
 ### 2 qubits Ising growth rules. as in experimental case. 
 
 max_num_models_by_shape['two_qubit_ising_rotation_hyperfine'] = {
@@ -138,7 +139,9 @@ max_num_models_by_shape['two_qubit_ising_rotation_hyperfine_transverse'] = {
     'other' : 1
 }
 
+##########
 ## More general Ising models
+##########
 
 ###
 # Noninteracting 
@@ -182,13 +185,23 @@ max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
 
 
 
+
 # Transverse Ising
 max_num_models_by_shape['deterministic_transverse_ising_nn_fixed_axis'] = {
 	1 : 3,
 	'other' : 2
 }
 
+max_num_models_by_shape['ising_1d_chain'] = {
+  1 : 0,
+  'other' : 2, 
+}
+
+
+##########
 # Heisenberg Models
+##########
+
 max_num_models_by_shape['heisenberg_nontransverse'] = {
   1 : 0,
   2 : 6, 
@@ -202,7 +215,17 @@ max_num_models_by_shape['heisenberg_transverse'] = {
   1 : 0, 
   'other' : 7
 }
+
+max_num_models_by_shape['heisenberg_xyz'] = {
+  1 : 0,
+  'other' : 2, 
+}
+
+
+
+##########
 # Hubbard Models
+##########
 max_num_models_by_shape['hubbard'] = {
     2 : 3,
     'other' : 3

@@ -1236,6 +1236,170 @@ def heisenberg_transverse(
     
     return new_models
 
+def process_heisenberg_xyz(term):
+    components = term.split('_')
+    components.remove('Heis')
+    include_transverse_component = include_chain_component = False
+    
+    for l in components:
+        if l[0] == 'd':
+            dim = int(l.replace('d', ''))
+        elif l[0] == 'i':
+            chain_axis = str(l.replace('i', ''))
+            include_chain_component = True
+        elif l[0] == 't' : 
+            include_transverse_component = True
+            transverse_axis = str(l.replace('t', ''))
+
+    if include_chain_component == True:
+        return single_axis_nearest_neighbour_interaction_chain(
+            num_qubits = dim, 
+            interaction_axis = chain_axis
+        )
+
+    elif include_transverse_component == True:
+        return single_axis_transverse_component(
+            num_qubits = dim, 
+            transverse_axis = transverse_axis
+        )
+
+            
+def single_axis_nearest_neighbour_interaction_chain(
+    num_qubits, 
+    interaction_axis='x'
+):
+    
+    individual_interaction_terms = []
+
+    for i in range(1, num_qubits):
+        single_term = ''
+        t_str = 'T'
+        for q in range(1, num_qubits+1):
+            if i == q or i+1 == q :
+                
+                single_term += interaction_axis
+            else:
+                single_term += 'i'
+            
+            if q != num_qubits:
+                single_term += t_str
+                t_str += 'T'
+                
+        individual_interaction_terms.append(single_term)
+        
+    running_mtx = DataBase.compute(individual_interaction_terms[0])
+    
+    for term in individual_interaction_terms[1:]:
+        running_mtx += DataBase.compute(term)
+        
+    print(individual_interaction_terms)
+        
+    return running_mtx
+
+def single_axis_transverse_component(
+    num_qubits, 
+    transverse_axis='z'
+):
+    
+    individual_transverse_terms = []
+
+    for i in range(1, 1+num_qubits):
+        single_term = ''
+        t_str = 'T'
+        for q in range(1, 1+num_qubits):
+            if i == q : 
+                single_term += transverse_axis
+            else:
+                single_term += 'i'
+            
+            if q != num_qubits:
+                single_term += t_str
+                t_str += 'T'
+                
+        individual_transverse_terms.append(single_term)
+        
+        
+    running_mtx = DataBase.compute(individual_transverse_terms[0])
+    
+    for term in individual_transverse_terms[1:]:
+        running_mtx += DataBase.compute(term)
+        
+        
+    return running_mtx
+
+def get_heisenberg_xyz_name(
+    num_qubits, 
+    transverse_axis='z',
+    include_transverse=False
+):
+    model_identifier = 'Heis_'
+    model_name = ''
+    dimension_term = str( '_d' + str(num_qubits))
+
+    interaction_terms = []
+    for axis in ['x', 'y', 'z']:
+        axis_interaction_term = str(
+            model_identifier +
+            'i' +
+            axis +
+            dimension_term
+        )
+        interaction_terms.append(axis_interaction_term)
+    p_str = 'P'*num_qubits
+    print(interaction_terms)
+    
+    full_model = ''
+    for term in interaction_terms:
+        if interaction_terms.index(term)>0:
+            full_model += str( p_str )
+        full_model += str(   term )
+    
+    if include_transverse == True:
+        transverse_term = str(model_identifier +  't' + transverse_axis + dimension_term)
+        full_model += str( p_str + transverse_term)
+    return full_model
+
+
+def generate_models_heisenberg_xyz(
+    **kwargs
+):
+    from UserFunctions import initial_models, max_num_qubits_info, fixed_axes_by_generator, transverse_axis_by_generator
+    growth_generator = kwargs['generator']
+    model_list = kwargs['model_list']
+    spawn_stage = kwargs['spawn_stage']
+    max_num_qubits = max_num_qubits_info[growth_generator]
+#     interaction_axis = fixed_axes_by_generator[growth_generator]
+    transverse_axis = transverse_axis_by_generator[growth_generator]
+
+    new_models = []
+    if spawn_stage[-1] == None:
+        for q in range(2, max_num_qubits+1): 
+            # include qubit number = 1 so compared against all others fairly 
+            new_models.append(
+                get_heisenberg_xyz_name(
+                    num_qubits = q, 
+#                     interaction_axis = interaction_axis, 
+                    include_transverse = False
+                )
+            )
+        spawn_stage.append('non-transverse complete')
+    elif spawn_stage[-1] == 'non-transverse complete':
+        for q in range(2, max_num_qubits+1): 
+            new_models.append(
+                get_heisenberg_xyz_name(
+                    num_qubits = q, 
+#                     interaction_axis = interaction_axis, 
+                    include_transverse = True, 
+                    transverse_axis = transverse_axis
+                )
+            )
+        spawn_stage.append('Complete')
+    return new_models
+    
+        
+    
+
+
 
 
 ## Hubbard rules
