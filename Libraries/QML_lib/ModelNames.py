@@ -240,7 +240,13 @@ def latex_name_heisenberg_xyz(name):
     
     for term in individual_terms:
         components = term.split('_')
-        components.remove('Heis')
+        try:
+            components.remove('Heis')
+        except:
+            print(
+                "Can not remove 'Heis'. Components:", 
+                components
+            )
         for c in components:
             if c[0] == 'd':
                 dim = int(c.replace('d', ''))

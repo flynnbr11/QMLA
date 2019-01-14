@@ -86,9 +86,18 @@ generated_probe_dict = UserFunctions.get_probe_dict(
     num_probes = num_probes
 )
 
-training_probes_path = str(
+probes_dir = str(
     global_variables.results_directory
-    + 'training_probes.p'
+    +'training_probes/'
+)
+if not os.path.exists(probes_dir):
+    os.makedirs(probes_dir)
+
+training_probes_path = str( 
+    probes_dir
+    + 'probes_'
+    + str(global_variables.long_id)
+    +'.p'
 )
 
 pickle.dump(
