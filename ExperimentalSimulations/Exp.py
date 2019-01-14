@@ -86,6 +86,15 @@ generated_probe_dict = UserFunctions.get_probe_dict(
     num_probes = num_probes
 )
 
+training_probes_path = str(
+    global_variables.results_directory
+    + 'training_probes.p'
+)
+
+pickle.dump(
+    generated_probe_dict, 
+    open(training_probes_path, 'wb')
+)
 
 experimental_measurements_dict = pickle.load(
     open(str('Data/'+global_variables.dataset), 'rb')
