@@ -169,7 +169,7 @@ max_num_qubits_info = {
 	'hubbard' : 5, 
 	'hubbard_chain_just_hopping' : 5,
 	'hubbard_chain' : 5,
-	'hubbard_square_lattice_generalised' : 8,
+	'hubbard_square_lattice_generalised' : 6,
 	'ising_1d_chain' : 5,
     'heisenberg_xyz' : 5,
     None : 5,
