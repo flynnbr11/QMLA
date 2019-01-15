@@ -8,7 +8,7 @@ test_description="multiple_growth_rules_include_hubbard"
 num_tests=1
 qhl_test=0
 do_further_qhl=0
-exp_data=1
+exp_data=0
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -82,7 +82,7 @@ alt_growth_rules=(
    # 'heisenberg_transverse'
    # 'interacing_nn_ising_fixed_axis'
    # 'non_interacting_ising'
-#   'ising_1d_chain'
+  'ising_1d_chain'
 #   'hubbard_square_lattice_generalised'
 )
 
@@ -222,7 +222,11 @@ do
     done
 done
 
+echo "
 
+------ QMD finished learning ------
+
+"
 
 ##
 # Analyse results of QMD. (Only after QMD, not QHL).

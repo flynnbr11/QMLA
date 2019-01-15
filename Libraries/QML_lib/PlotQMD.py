@@ -1011,7 +1011,8 @@ def plot_quadratic_loss(
             epochs = range(1, len(mod.QuadraticLosses) + 1)
             model_name = UserFunctions.get_latex_name(
                 name = qmd.ModelNameIDs[i], 
-                growth_generator = qmd.GrowthGenerator
+                # growth_generator = qmd.GrowthGenerator
+                growth_generator = mod.GrowthGenerator
             )
             ax.plot(epochs, mod.QuadraticLosses, label=str(model_name))
     ax.legend(bbox_to_anchor=(1,1))
@@ -2340,7 +2341,8 @@ def parameterEstimates(
                 # true_term_latex = DataBase.latex_name_ising(term)
                 true_term_latex = UserFunctions.get_latex_name(
                     name = term,
-                    growth_generator = qmd.GrowthGenerator
+                    # growth_generator = qmd.GrowthGenerator
+                    growth_generator = mod.GrowthGenerator
                 )
 
                 ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
@@ -2775,7 +2777,13 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
         names = [
             UserFunctions.get_latex_name(
                 name = mod_name,
-                growth_generator = qmd.GrowthGenerator
+                # growth_generator = qmd.GrowthGenerator
+                growth_generator = qmd.BranchGrowthRules[
+                    qmd.ModelsBranches[
+                        qmd.ModelIDNames[mod_name]
+                    ]
+                ]
+
             ) 
             for mod_name in list(qmd.ModelNameIDs.values())
         ]
@@ -2809,7 +2817,12 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
                         # DataBase.latex_name_ising(qmd.ModelNameIDs[j])
                         UserFunctions.get_latex_name(
                             name=qmd.ModelNameIDs[j],
-                            growth_generator = qmd.GrowthGenerator
+                            # growth_generator = qmd.GrowthGenerator
+                            growth_generator = qmd.BranchGrowthRules[
+                                qmd.ModelsBranches[
+                                    j
+                                ]
+                            ]
                         )
                     )
                 elif names_ids=='nonlatex':
@@ -2823,7 +2836,12 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
             try:
                 model_bf['Name'] = UserFunctions.get_latex_name(
                     name = qmd.ModelNameIDs[i],
-                    growth_generator = qmd.GrowthGenerator
+                    growth_generator = qmd.BranchGrowthRules[
+                        qmd.ModelsBranches[
+                            i
+                        ]
+                    ]
+                    # growth_generator = qmd.GrowthGenerator
                 )
             # else:
             except:

@@ -527,6 +527,7 @@ elif global_variables.further_qhl == True:
 else:
     # qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
     qmd.runRemoteQMD_MULTIPLE_GEN(num_spawns=3) #  Actually run QMD
+    print(" \n\n------QMD learned ------\n\n")
 
     """
     Tidy up and analysis. 
@@ -547,6 +548,7 @@ else:
         pass
     expec_value_mods_to_plot.append(qmd.ChampID)
 
+    print("plotExpecValues")
     qmd.plotExpecValues(
         model_ids = expec_value_mods_to_plot, # hardcode to see full model for development
         times=plot_times,
@@ -559,17 +561,20 @@ else:
     
     if global_variables.save_plots:
         try:
+            print("plotVolumes")
             qmd.plotVolumes(
                 save_to_file=str(
                 global_variables.plots_directory+
                 'volumes_all_models_'+ str(global_variables.long_id)+ '.png')
             )
+            print("plotExpecValues2")
             qmd.plotVolumes(
                 branch_champions=True,
                 save_to_file=str(global_variables.plots_directory+
                 'volumes_branch_champs_'+ str(global_variables.long_id)+
                 '.png')
             )
+            print("plotQuadLoss")
             qmd.plotQuadraticLoss(
                 save_to_file= str(
                     global_variables.plots_directory+
@@ -590,6 +595,7 @@ else:
         if true_op_known==True:
         # if QMD has knowledge of the "true" model, then plot params   
             try:
+                print("plotParameterEstimates")
                 qmd.plotParameterEstimates(
                     model_id = qmd.TrueOpModelID, 
                     save_to_file= str(
@@ -607,6 +613,7 @@ else:
 
             if qmd.ChampID != qmd.TrueOpModelID:
                 try:
+                    print("plotParameterEstimates champ id != true id")
                     qmd.plotParameterEstimates(
                         model_id = qmd.ChampID, 
                         save_to_file= str(global_variables.plots_directory+
@@ -623,6 +630,7 @@ else:
 
         else:
             try:
+                    print("else plotParameterEstimates")
                     qmd.plotParameterEstimates(
                         model_id = qmd.ChampID, 
                         save_to_file= str(global_variables.plots_directory+
@@ -645,6 +653,8 @@ else:
             'radar_'+ str(global_variables.long_id)+ '.png')
         )
         """
+        print("saveBayesCSV")
+
         qmd.saveBayesCSV(
             save_to_file=str(
             global_variables.results_directory+ 
@@ -668,6 +678,7 @@ else:
         # TODO generalise so tree diagram can be used in all cases
         # currently only useful for Ising growth 2 qubits. 
         try:
+            print("plotTreeDiagram")
             qmd.plotTreeDiagram(
                 only_adjacent_branhces=False, 
                 save_to_file = str
@@ -680,6 +691,7 @@ else:
             pass
 
         try:
+            print("plotRSquaredVsEpoch")
             qmd.plotRSquaredVsEpoch(
                 save_to_file = str(
                     global_variables.plots_directory +

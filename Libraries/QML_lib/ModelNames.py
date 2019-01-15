@@ -237,6 +237,7 @@ def latex_name_heisenberg_xyz(name):
     
     individual_terms = DataBase.get_constituent_names_from_name(name)
     chain_axis = transverse_axis = None
+    chain_axes = []
     
     for term in individual_terms:
         components = term.split('_')
@@ -252,21 +253,25 @@ def latex_name_heisenberg_xyz(name):
                 dim = int(c.replace('d', ''))
             elif c[0] == 'i':
                 chain_axis = str(c.replace('i', ''))
+                chain_axes.append(chain_axis)
                 include_chain_component = True
             elif c[0] == 't' : 
                 include_transverse_component = True
                 transverse_axis = str(c.replace('t', ''))
-            
+    chain_axes = list(sorted(set(chain_axes)))
+    # print("[latex term, XYZ] Chain axes:", chain_axes)
     latex_term = '$('
-    if chain_axis is not None:
-        chain_term = str(
+    # if chain_axis is not None:
+    chain_term = ''
+    for chain_axis in chain_axes:
+        chain_term += str(
             '\sigma_{'
             + chain_axis
             + ','
             + chain_axis
             +'}'
         )
-        latex_term += chain_term
+    latex_term += chain_term
         
     if transverse_axis is not None:
         transverse_term = str(

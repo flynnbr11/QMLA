@@ -2849,6 +2849,12 @@ class QMD():
             "; \t true:", self.TrueOpNumParams]
         )
 
+        self.ModelIDNames = {}
+        for k in self.ModelNameIDs:
+            v = self.ModelNameIDs[k]
+            self.ModelIDNames[v] = k
+
+
         if DataBase.alph(self.ChampionName) == DataBase.alph(self.TrueOpName):
             correct_model = 1
         elif ( num_params_champ_model ==  self.TrueOpNumParams and
@@ -2891,7 +2897,7 @@ class QMD():
             # 'LatexName' : DataBase.latex_name_ising(self.ChampionName),
             'LatexName' : UserFunctions.get_latex_name(
                 name = self.ChampionName,
-                growth_generator = self.GrowthGenerator
+                growth_generator = champ_model.GrowthGenerator
             ),
             'NumParticles' : self.NumParticles,
             'NumExperiments' : champ_model.NumExperiments,
