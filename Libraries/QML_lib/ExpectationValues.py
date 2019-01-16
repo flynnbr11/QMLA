@@ -205,7 +205,17 @@ def evolved_state(
             )
         try:
             import qutip
-            unitary = qutip.Qobj(-1j*ham*t).expm().full()
+            unitary = linalg.expm(-1j*ham*t)
+        
+
+            # unitary = h.exp_ham(
+            #     ham, t, 
+            #     precision = precision, 
+            #     enable_sparse_functionality=enable_sparse,
+            #     print_method=print_exp_details, scalar_cutoff=t+1
+            # )
+
+            # unitary = qutip.Qobj(-1j*ham*t).expm().full()
         except:
             unitary = h.exp_ham(
                 ham, t, 
@@ -221,6 +231,7 @@ def evolved_state(
                 type(iht[0][0]), "\nMtx type:", type(iht)], 
                 log_file, log_identifier
             )
+        print("Getting expm from linalg")
         unitary = linalg.expm(-1j*ham*t)
         
         if log_file is not None:

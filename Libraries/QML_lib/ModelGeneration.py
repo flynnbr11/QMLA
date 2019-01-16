@@ -1292,8 +1292,6 @@ def single_axis_nearest_neighbour_interaction_chain(
     for term in individual_interaction_terms[1:]:
         running_mtx += DataBase.compute(term)
         
-    print(individual_interaction_terms)
-        
     return running_mtx
 
 def single_axis_transverse_component(

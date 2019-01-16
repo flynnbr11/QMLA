@@ -83,7 +83,7 @@ alt_growth_rules=(
    # 'interacing_nn_ising_fixed_axis'
    # 'non_interacting_ising'
   'ising_1d_chain'
-#   'hubbard_square_lattice_generalised'
+  'hubbard_square_lattice_generalised'
 )
 
 growth_rules_command=""
@@ -198,7 +198,9 @@ do
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        python3 Exp.py \
+        python3 -m cProfile \
+            -o "Profile_linalg_long_run.txt" \
+            Exp.py \
             -op=$true_operator -p=$prt -e=$exp -bt=$bt \
             -rq=$use_rq -g=$gaussian -qhl=$qhl_test \
             -ra=$ra -rt=$rt -pgh=$pgh \

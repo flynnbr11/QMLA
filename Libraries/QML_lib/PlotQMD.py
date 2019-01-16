@@ -2353,7 +2353,8 @@ def parameterEstimates(
         x = range(1,1+len(param_estimate_by_term[term]))
         latex_term = UserFunctions.get_latex_name(
             name = term,
-            growth_generator = qmd.GrowthGenerator
+            # growth_generator = qmd.GrowthGenerator
+            growth_generator = mod.GrowthGenerator
         )
         # print("[pQMD] latex_term:", latex_term)
         ax.scatter(
