@@ -108,7 +108,7 @@ parser.add_argument(
 parser.add_argument(
   '-time_insurance', '--time_insurance_factor', 
   help='Factor to multiple time calculated by, to safely have enough time to finish.',
-  type=int,
+  type=float,
   default=2
 )
 
@@ -386,7 +386,7 @@ qmd_time_env_var = arguments.qmd_time_env_var
 qhl_time_env_var = arguments.qhl_time_env_var
 fqhl_time_env_var = arguments.fqhl_time_env_var
 minimum_allowed_time = arguments.minimum_allowed_time
-time_insurance_factor = arguments.time_insurance_factor
+time_insurance_factor = float(arguments.time_insurance_factor)
 
 # print("all growth rules:", all_growth_rules)
 # print("alternative_growth_rules:", alternative_growth_rules)
@@ -404,6 +404,7 @@ time_reqd = time_required(
 
 print(
 	"Timing heuristic function:", 
+  "\nInsurance factor:", time_insurance_factor,
   "\nuse_alt_growth_rules:", use_alternative_growth_rules,
 	"\nQMD:", time_reqd['qmd'],
 	"\nQHL:", time_reqd['qhl'],
