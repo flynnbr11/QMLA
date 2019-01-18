@@ -147,12 +147,12 @@ def BayesFactorRemote(
         
         # if binning==True and use_experimental_data==True:
 
-        log_print(
-            [
-            "Binning. Before times\n A:", times_a, 
-            "\nB:", times_b
-            ]
-        )
+        # log_print(
+        #     [
+        #     "Binning. Before times\n A:", times_a, 
+        #     "\nB:", times_b
+        #     ]
+        # )
 
         
         if (
@@ -217,12 +217,12 @@ def BayesFactorRemote(
                 times_b = times_list            
 
 
-        log_print(
-            [
-            ".After \n A:", times_a, 
-            "\nB:", times_b
-            ]
-        )
+        # log_print(
+        #     [
+        #     ".After \n A:", times_a, 
+        #     "\nB:", times_b
+        #     ]
+        # )
 
         # log_print(["Computing log likelihoods."])
         #print("Num times to use", num_times_to_use)
