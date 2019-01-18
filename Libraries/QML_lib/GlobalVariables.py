@@ -107,6 +107,8 @@ default_latex_mapping_file = str(
 )
 default_plot_probe_file = None
 default_reallocate_resources=0
+default_bayes_time_binning=0
+
 
 
 class GlobalVariablesClass():
@@ -173,6 +175,7 @@ class GlobalVariablesClass():
         self.param_max = arguments.param_max
         self.param_mean = arguments.param_mean
         self.param_sigma = arguments.param_sigma
+        self.bayes_time_binning = arguments.bayes_time_binning
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -443,6 +446,13 @@ def parse_cmd_line_args(args):
       help='Offset to ensure at t=0, Pr=1.',
       type=int,
       default=default_data_time_offset
+    )
+
+    parser.add_argument(
+      '-bintimes', '--bayes_time_binning',
+      help='Store QMD class in pickled file at end. Large memory requirement, recommend not to.',
+      type=int,
+      default=default_bayes_time_binning
     )
 
     parser.add_argument(

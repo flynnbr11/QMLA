@@ -29,6 +29,7 @@ further_qhl_num_runs=$num_tests
 plots=1
 number_best_models_further_qhl=5
 custom_prior=1
+bintimes=0
 # dataset='NVB_dataset.p'
 dataset='NVB_rescale_dataset.p'
 
@@ -216,6 +217,7 @@ do
             -pmin=$param_min -pmax=$param_max \
             -pmean=$param_mean -psigma=$param_sigma \
             -ds=$dataset -dst=$data_max_time \
+            -bintimes=$bintimes \
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \
             -resource=$reallocate_resources \

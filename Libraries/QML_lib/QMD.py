@@ -82,7 +82,7 @@ class QMD():
         max_num_qubits=7, #TODO change -- this may cause crashes somewhere
         model_priors = None,
         store_particles_weights = False,
-        bayes_time_binning = False,
+        # bayes_time_binning = False,
         qhl_plots = False, 
         experimental_measurements = None,
         results_directory = '', 
@@ -170,7 +170,7 @@ class QMD():
         self.ResamplerA = self.GlobalVariables.resample_a
         self.PGHPrefactor = self.GlobalVariables.pgh_factor
         self.QHLmode = self.GlobalVariables.qhl_test
-        self.BayesTimeBinning = bayes_time_binning 
+        # self.BayesTimeBinning = self.GlobalVariables.bayes_time_binning 
         self.StoreParticlesWeights = store_particles_weights
         self.QHL_plots = qhl_plots
         self.ResultsDirectory = results_directory
@@ -501,7 +501,8 @@ class QMD():
             'experimental_measurement_times' : self.ExperimentalMeasurementTimes, 
             'compare_linalg_exp_tol' : self.ExpComparisonTol,
             'gaussian' : self.gaussian,
-            'bayes_factors_time_binning' : self.BayesTimeBinning,
+            # 'bayes_factors_time_binning' : self.BayesTimeBinning,
+            'bayes_factors_time_binning' : self.GlobalVariables.bayes_time_binning,
             'q_id' : self.Q_id,
             'use_time_dep_true_params' : use_time_dep_true_model,
             'time_dep_true_params' : self.TimeDepParams,
