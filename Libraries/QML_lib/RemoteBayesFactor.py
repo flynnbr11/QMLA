@@ -146,6 +146,14 @@ def BayesFactorRemote(
             times_b = model_b.Times[first_t_idx:]
         
         # if binning==True and use_experimental_data==True:
+
+        log_print(
+            [
+            "Binning. Before times\n A:", times_a, 
+            "\nB:", times_b
+            ]
+        )
+
         
         if (
             use_experimental_data is True
@@ -190,34 +198,31 @@ def BayesFactorRemote(
                 2*num_times_to_use # learning from scratch so need twice the number of times.
             )
 
-            all_times = [
-                ExperimentalDataFunctions.nearestAvailableExpTime(
-                    times = experimental_data_times,
-                    t=t
-                ) 
-                for t in times_list
+
+            if use_experimental_data == True:
+
+
+                all_times = [
+                    ExperimentalDataFunctions.nearestAvailableExpTime(
+                        times = experimental_data_times,
+                        t=t
+                    ) 
+                    for t in times_list
+                ]
+                times_a = all_times
+                times_b = all_times
+
+            else:
+                times_a = times_list
+                times_b = times_list            
+
+
+        log_print(
+            [
+            ".After \n A:", times_a, 
+            "\nB:", times_b
             ]
-            
-
-            """
-            log_print(
-                [
-                "Binning. Before times\n A:", times_a, 
-                "\nB:", times_b
-                ]
-            )
-            """
-
-            times_a = all_times
-            times_b = all_times
-            """
-            log_print(
-                [
-                ".After \n A:", times_a, 
-                "\nB:", times_b
-                ]
-            )
-            """
+        )
 
         # log_print(["Computing log likelihoods."])
         #print("Num times to use", num_times_to_use)

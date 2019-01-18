@@ -344,19 +344,6 @@ def average_parameter_estimates(
         terms = sorted(DataBase.get_constituent_names_from_name(name))
         num_terms = len(terms)
 
-#        nrows=int(np.ceil( num_terms/ncols ))
-        # ncols = 3
-        # nrows = 3
-    # TODO make safer -- what if more than 9 terms? do something generically.
-        # if num_terms<=3:
-        #     ncols=num_terms
-        #     nrows=1
-        # elif num_terms>=3 and num_terms<=6:
-        #     ncols=3
-        #     nrows=2
-        # else:
-        #     ncols=3
-        #     nrows=3 
         ncols = int(np.ceil(np.sqrt(num_terms)))
         nrows = int(np.ceil(num_terms/ncols))
 

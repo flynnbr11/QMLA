@@ -67,7 +67,7 @@ def log_print(to_print_list, log_file):
 
 
 # Note this should usually be False, True just for testing/some specific plots. 
-store_particles_weights = False
+store_particles_weights = True
 
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
@@ -367,7 +367,7 @@ qmd = QMD(
     true_params_time_dep = { 'xTi' : 0.01},
     qle=qle,
     store_particles_weights = store_particles_weights,
-    bayes_time_binning=True, 
+    bayes_time_binning=False, 
     qhl_plots=do_qhl_plots, 
     results_directory = results_directory,
     long_id = long_id, 
