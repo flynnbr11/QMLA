@@ -105,6 +105,14 @@ parser.add_argument(
   default=600
 )
 
+parser.add_argument(
+  '-time_insurance', '--time_insurance_factor', 
+  help='Factor to multiple time calculated by, to safely have enough time to finish.',
+  type=int,
+  default=2
+)
+
+
 
 # Fill a dictionary of maximum number of models by qubit number/shape
 ## shape more generally of form (num_qubits, num_terms)
@@ -279,7 +287,7 @@ def time_required(
     resource_reallocation=False,
     num_bayes_times=None,
     minimum_allowed_time = 100,
-    insurance_factor = 4.0,
+    insurance_factor = 2.5,
     **kwargs
 ):
   times_reqd = {}
@@ -378,6 +386,7 @@ qmd_time_env_var = arguments.qmd_time_env_var
 qhl_time_env_var = arguments.qhl_time_env_var
 fqhl_time_env_var = arguments.fqhl_time_env_var
 minimum_allowed_time = arguments.minimum_allowed_time
+time_insurance_factor = arguments.time_insurance_factor
 
 # print("all growth rules:", all_growth_rules)
 # print("alternative_growth_rules:", alternative_growth_rules)
@@ -385,6 +394,7 @@ time_reqd = time_required(
   growth_generator = growth_generator, # true generator
   growth_rules = all_growth_rules,
   num_particles = num_particles, 
+  insurance_factor = time_insurance_factor, 
   num_experiments = num_experiments, 
   num_processes = num_processes,
   resource_reallocation = resource_reallocation,
