@@ -71,10 +71,13 @@ store_particles_weights = True
 
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
-if global_variables.special_probe == 'plus':
-    num_probes=1
-else:
-    num_probes = 20
+# if global_variables.special_probe == 'plus':
+#     num_probes=1
+# else:
+#     num_probes = 20
+
+# using 40 probes for training - randomly generated
+num_probes = 40
 
 generated_probe_dict = UserFunctions.get_probe_dict(
     experimental_data = global_variables.use_experimental_data, 
