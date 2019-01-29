@@ -1,21 +1,22 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="new_code_same_exp_prt_as_oct_15"
+test_description="long_QHL_experimental_data_best_models"
 
 ## Script essentials
 num_tests=50
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
+multiple_qhl=1
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 experimental_data=1 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters
-p=2500 # particles
-e=800 # experiments
+p=5000 # particles
+e=1000 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
-rp=0.5 # PGH factor
+rp=1.0 # PGH factor
 #op='xTxTTx'
 op='xTxTTiPPPiTxTTx'
 #op='xTxTTiPPPiTxTTx'
@@ -26,12 +27,12 @@ op='xTxTTiPPPiTxTTx'
 # QMD settings
 #dataset='NVB_HahnPeaks_Newdata'
 #dataset='NV05_HahnEcho02'
-dataset='NVB_dataset.p'
-#dataset='NVB_rescale_dataset.p'
+#dataset='NVB_dataset.p'
+dataset='NVB_rescale_dataset.p'
 #dataset='NV05_dataset.p'
 sim_measurement_type='full_access'
 exp_measurement_type='hahn' # to use if not experimental
-
+bin_times_bayes_factors=0
 
 
 data_max_time=5000 # nanoseconds
@@ -39,7 +40,7 @@ data_time_offset=205 # nanoseconds
 top_number_models=3 # how many models to perform further QHL for
 further_qhl_resource_factor=1
 #growth_rule='two_qubit_ising_rotation_hyperfine'
-growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+#growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 #growth_rule='non_interacting_ising_single_axis'
 #growth_rule='non_interacting_ising'
 #growth_rule='deterministic_noninteracting_ising_single_axis'
@@ -47,18 +48,21 @@ growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 #growth_rule='interacing_nn_ising_fixed_axis'
 #growth_rule='deterministic_interacting_nn_ising_single_axis'
 #growth_rule='deterministic_transverse_ising_nn_fixed_axis'
+#growth_rule='ising_1d_chain'
 #growth_rule='heisenberg_nontransverse'
 #growth_rule='heisenberg_transverse'
+growth_rule='heisenberg_xyz'
 #growth_rule='hubbard'
 #growth_rule='hubbard_chain_just_hopping'
 #growth_rule='hubbard_chain'
 #growth_rule='hubbard_square_lattice_generalised'
 
 
-multiple_growth_rules=0 # NOTE this is being manually passed to CalculateTimeRequired below #TODO make it acceot this arg
+multiple_growth_rules=1 # NOTE this is being manually passed to CalculateTimeRequired below #TODO make it accept this arg
 alt_growth_rules=(
-	'interacing_nn_ising_fixed_axis'
-	'heisenberg_transverse'
+	'ising_1d_chain'
+#	'heisenberg_xyz'
+	'hubbard_square_lattice_generalised'
 )
 growth_rules_command=""
 for item in ${alt_growth_rules[*]}
@@ -72,10 +76,10 @@ custom_prior=1
 
 gaussian=1 # set to 0 for uniform distribution, 1 for normal
 param_min=0
-param_max=8
+param_max=1
 param_mean=0.5
 param_sigma=0.3
-random_true_params=1 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
+random_true_params=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
 random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
 
 # Overwrite settings for specific cases
@@ -185,10 +189,20 @@ $rp
 
 declare -a particle_counts=(
 $p
+#300
+#500
+#1000
+#2000
+#3000
 )
 
 declare -a experiment_counts=(
 $e
+#50
+#100
+#200
+#300
+#500
 )
 
 if (( "$qhl" == 1 ))
@@ -213,8 +227,10 @@ if (( "$simulate_experiment" == 1))
 then
 #	special_probe='plus' # test simulation using plus probe only.
 	special_probe='plus_random' # test simulation using plus probe only.
-	growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+#	growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+	growth_rule='two_qubit_ising_rotation_hyperfine'
 	measurement_type=$exp_measurement_type
+	multiple_growth_rules=0
  
 elif (( "$experimental_data" == 1))
 then
@@ -246,7 +262,7 @@ chmod a+x $time_required_script
 
 qmd_env_var="QMD_TIME"
 qhl_env_var="QHL_TIME"
-let temp_bayes_times="2*$p" # TODO fix time calculator
+let temp_bayes_times="2*$e" # TODO fix time calculator
 
 python3 ../Libraries/QML_lib/CalculateTimeRequired.py \
 	-ggr=$growth_rule \
@@ -258,6 +274,7 @@ python3 ../Libraries/QML_lib/CalculateTimeRequired.py \
 	-proc=1 \
 	-res=$resource_reallocation \
 	-scr=$time_required_script \
+	-time_insurance=3 \
 	-qmdtenv="QMD_TIME" \
 	-qhltenv="QHL_TIME" \
 	-fqhltenv="FQHL_TIME" \
@@ -290,7 +307,7 @@ do
 							let bt="$e/2"
 							let qmd_id="$qmd_id+1"
 
-							if [ "$qhl" == 1 ]
+							if [ "$qhl" == 1 ] || [ "$multiple_qhl" == 1 ] 
 							then
 								let seconds_reqd="$qhl_time"
 							else
@@ -304,7 +321,7 @@ do
 							this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
 							printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd \n" >> QMD_all_tasks.log
 
-							qsub -v QMD_ID=$qmd_id,OP="$op",QHL=$qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,SPECIAL_PROBE=$special_probe,RESOURCE_REALLOCATION=$resource_reallocation,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+							qsub -v QMD_ID=$qmd_id,OP="$op",QHL=$qhl,MULTIPLE_QHL=$multiple_qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,SPECIAL_PROBE=$special_probe,RESOURCE_REALLOCATION=$resource_reallocation,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma,BIN_TIMES_BAYES=$bin_times_bayes_factors -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
 
 						done
 					done
