@@ -7,15 +7,15 @@ test_description="multiple_growth_rules_include_hubbard"
 ### ---------------------------------------------------###
 num_tests=5
 qhl_test=0
-multiple_qhl=0
+multiple_qhl=1
 do_further_qhl=0
-exp_data=1
+exp_data=0
 simulate_experiment=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=4
+prt=5
 exp=3
 pgh=1.0
 ra=0.8
@@ -59,7 +59,7 @@ further_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
 # growth_rule='test_changes_to_qmd'
-use_alt_growth_rules=1 # note this is redundant locally, currently
+# use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='two_qubit_ising_rotation_hyperfine'
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='non_interacting_ising'
@@ -69,11 +69,11 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
-growth_rule='ising_1d_chain'
+# growth_rule='ising_1d_chain'
 
 # growth_rule='heisenberg_nontransverse'
 # growth_rule='heisenberg_transverse'
-# growth_rule='heisenberg_xyz'
+growth_rule='heisenberg_xyz'
 
 # growth_rule='hubbard'
 # growth_rule='hubbard_chain_just_hopping'

@@ -469,12 +469,10 @@ elif (
         # note models are only for true growth generation rule
         # models to QHL can be declared in 
         # UserFunctions.qhl_models_by_generator dict
-        qhl_models = UserFunctions.qhl_models_by_generator[
+        qhl_models = UserFunctions.get_qhl_models(
             global_variables.growth_generation_rule
-        ]
+        )
         
-        if type(qhl_models) != list:
-            qhl_models = list(qhl_models)
         output_prefix = 'multi_qhl_'
 
     else:

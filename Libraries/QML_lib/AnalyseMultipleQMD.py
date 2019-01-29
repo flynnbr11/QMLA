@@ -572,6 +572,9 @@ def Bayes_t_test(
     # expectation_values = {}
     # for t in list(experimental_measurements.keys()):
     #     expectation_values[t] = []
+    true_model = UserFunctions.default_true_operators_by_generator[
+        growth_generator
+    ]
 
     success_rate_by_term = {}
     nmod = len(winning_models)  
@@ -609,6 +612,7 @@ def Bayes_t_test(
     # full_plot_axis = axes[0,0]
     full_plot_axis = fig.add_subplot(gs[0,:])
     # i=0
+
 
     for term in winning_models:
         # plt.clf()
@@ -710,8 +714,10 @@ def Bayes_t_test(
         )
         description = str(
                 name + 
-                ' (' + str(num_sets_of_this_name)  + ').'
+                ' (' + str(num_sets_of_this_name)  + ')'
             )
+        if term == true_model:
+            description += ' (True)'
 
         description_w_bayes_t_value = str(
                 name + ' : ' + 
@@ -797,12 +803,18 @@ def Bayes_t_test(
         
         # fill in "master" plot
 
+        high_level_label = str(name)
+        if term == true_model:
+            high_level_label += ' (True)'
+
+
         full_plot_axis.plot(
             times, 
             mean_exp, 
             c = colours[winning_models.index(term)],
-            label=str(name)
+            label=high_level_label
         )
+        """
         full_plot_axis.fill_between(
             times, 
             mean_exp-std_dev_exp, 
@@ -810,6 +822,7 @@ def Bayes_t_test(
             alpha=0.2,
             facecolor = colours[winning_models.index(term)],
         )
+        """
         if axes_so_far == 1:
             full_plot_axis.scatter(
                 times, 
@@ -859,12 +872,39 @@ def Bayes_t_test(
     # fig.set_xlabel('Time')
     # fig.set_ylabel('Expectation Value')
 
-    fig.text(0.5, -0.04, 'Time', ha='center')
+    fig.text(0.45, -0.04, 'Time', ha='center')
     fig.text(-0.04, 0.5, 'Expectation Value', va='center', rotation='vertical')
     
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
+
+    # Also save an image of the true expectation values without overlaying results
+    plt.clf()
+    plt.scatter(
+        times, 
+        true_exp, 
+        color='r', 
+        s=5, 
+        label='True Expectation Value'
+    )
+    # plt.plot(
+    #     times, 
+    #     true_exp, 
+    #     color='r', 
+    #     alpha = 0.3
+    # )
+    plt.xlabel('Time')
+    plt.ylabel('Expectation Value')
+    plt.legend()
+    true_only_fig_file = str(
+        save_to_file[:-4]
+        + '_true_expec_vals.png'
+    )
+    plt.savefig(
+        true_only_fig_file,
+        bbox_inches='tight'
+    )
 
 # def fill_between_sigmas(
 #     ax, 
@@ -1590,7 +1630,7 @@ if further_qhl_mode == False:
             one instance of QMD was performed. All other plots generated \
             without error."
         )
-        raise
+        # raise
 
     except ZeroDivisionError:
         print("Can not plot multiQMD tree -- this might be because only \
@@ -1600,7 +1640,7 @@ if further_qhl_mode == False:
         raise
     except:
         print("Could not plot Multi QMD tree.")
-        raise
+        # raise
 
 
 
