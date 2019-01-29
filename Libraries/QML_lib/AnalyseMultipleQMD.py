@@ -588,10 +588,15 @@ def Bayes_t_test(
 
     fig = plt.figure(
         figsize = (15, 8), 
-        # constrained_layout=True
+        # constrained_layout=True,
+        tight_layout=True
     )
     from matplotlib.gridspec import GridSpec
-    gs = GridSpec(nrows, ncols, figure=fig)
+    gs = GridSpec(
+        nrows, 
+        ncols, 
+        # figure=fig # not available on matplotlib 2.1.1 (on BC)
+    )
 
     row = 1
     col = 0
