@@ -821,10 +821,14 @@ def Bayes_t_test(
                 alpha = 0.3
             )
         full_plot_axis.legend(
-            ncol = ncols,
-            loc='lower center', 
-            bbox_to_anchor=(0.5, -1.3), 
+            loc='center left', 
+            bbox_to_anchor=(1, 0), 
         )
+        # full_plot_axis.legend(
+        #     ncol = ncols,
+        #     loc='lower center', 
+        #     bbox_to_anchor=(0.5, -1.3), 
+        # )
         full_plot_axis.set_ylim(0,1)
         full_plot_axis.set_xlim(0,max(times))
 
