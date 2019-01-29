@@ -326,7 +326,10 @@ def average_parameter_estimates(
             num_experiments_by_name[alph] = result['NumExperiments']
 
         if alph not in list(growth_rules.keys()):
-            growth_rules[alph] = result['GrowthGenerator']
+            try:
+                growth_rules[alph] = result['GrowthGenerator']
+            except:
+                growth_rules[alph] = growth_generator
 
 
     print("[Analyse; avg params] growth_rules:", growth_rules)
