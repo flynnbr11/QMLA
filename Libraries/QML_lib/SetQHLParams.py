@@ -100,6 +100,7 @@ def create_plot_probe(
 	
 
 	kwargs['num_probes'] = 1
+	print("plot probe generated with kwargs:", kwargs)
 	plot_probe_dict = UserFunctions.get_probe_dict(
 		**kwargs
 	)

@@ -584,11 +584,10 @@ def Bayes_t_test(
 
     fig = plt.figure(
         figsize = (15, 8), 
-        constrained_layout=True
+        # constrained_layout=True
     )
     from matplotlib.gridspec import GridSpec
     gs = GridSpec(nrows, ncols, figure=fig)
-
 
     row = 1
     col = 0
@@ -728,9 +727,6 @@ def Bayes_t_test(
         #         alpha=0.3
         #     )
 
-
-
-
         ax.plot(
             times, 
             mean_exp, 
@@ -744,6 +740,8 @@ def Bayes_t_test(
             alpha=0.2,
             facecolor = colours[winning_models.index(term)],
         )
+        ax.set_ylim(0,1)
+        ax.set_xlim(0,max(times))
 
         success_rate_by_term[term] = success_rate
 
@@ -818,6 +816,8 @@ def Bayes_t_test(
             loc='lower center', 
             bbox_to_anchor=(0.5, -1.3), 
         )
+        full_plot_axis.set_ylim(0,1)
+        full_plot_axis.set_xlim(0,max(times))
 
         axes_so_far += 1
         col += 1

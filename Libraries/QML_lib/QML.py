@@ -590,7 +590,7 @@ class ModelLearningClass():
                     self.debug_store()
                 
                 self.LearnedParameters = {}
-                self.FinalSigmas  ={}
+                self.FinalSigmas  = {}
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [
 #                        np.mean(self.Particles[:,iterator,istep-1]), 

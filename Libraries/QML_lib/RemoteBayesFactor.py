@@ -288,7 +288,7 @@ def BayesFactorRemote(
     
 def log_likelihood(model, times, binning=False):
     updater = model.Updater
-    sum_data = 0
+    # sum_data = 0
     #print("log likelihood function. Model", model.ModelID, "\n Times:", times)
 
     if binning:
@@ -304,7 +304,7 @@ def log_likelihood(model, times, binning=False):
             exp, 
             repeat=1
         )
-        sum_data += datum   
+        # sum_data += datum   
         updater.update(datum, exp)
 
 

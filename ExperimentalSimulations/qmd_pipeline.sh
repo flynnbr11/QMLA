@@ -5,16 +5,17 @@ test_description="multiple_growth_rules_include_hubbard"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
+num_tests=2
 qhl_test=0
 do_further_qhl=0
-exp_data=0
+exp_data=1
+simulate_experiment=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=15
-exp=5
+prt=4
+exp=3
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -26,7 +27,7 @@ rt=0.5
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
-plots=1
+plots=0
 number_best_models_further_qhl=5
 custom_prior=1
 bintimes=0
@@ -67,11 +68,11 @@ use_alt_growth_rules=1 # note this is redundant locally, currently
 # growth_rule='interacting_nearest_neighbour_ising'
 # growth_rule='deterministic_interacting_nn_ising_single_axis'
 # growth_rule='deterministic_transverse_ising_nn_fixed_axis'
-# growth_rule='ising_1d_chain'
+growth_rule='ising_1d_chain'
 
 # growth_rule='heisenberg_nontransverse'
 # growth_rule='heisenberg_transverse'
-growth_rule='heisenberg_xyz'
+# growth_rule='heisenberg_xyz'
 
 # growth_rule='hubbard'
 # growth_rule='hubbard_chain_just_hopping'
@@ -109,11 +110,16 @@ exp_measurement_type='hahn' # to use if not experimental
 if (( "$exp_data" == 1))
 then
     measurement_type=$exp_measurement_type
-    pgh=0.3
+    # pgh=0.3
     true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
     growth_rule='two_qubit_ising_rotation_hyperfine'
     # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-
+elif (( "$simulate_experiment" == 1)) 
+then
+    measurement_type=$exp_measurement_type
+    # pgh=0.3
+    true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+    growth_rule='two_qubit_ising_rotation_hyperfine'
 else
     measurement_type=$sim_measurement_type
 fi
@@ -149,9 +155,9 @@ plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 gaussian=1
 param_min=0
-param_max=1
+param_max=8
 param_mean=0.5
-param_sigma=0.25
+param_sigma=2
 rand_true_params=0
 # rand_prior:
 # if set to False (0), then uses any params specically 
@@ -165,7 +171,11 @@ if (( "$exp_data" == 1))
 then
 #    special_probe='plus'
     special_probe='plus_random'
+elif (( "$simulate_experiment" == 1)) 
+then 
+    special_probe='plus_random'
 fi
+
 # measurement_type=$exp_measurement_type
 # special_probe='plus' #'plus' #'ideal' # TODO this is just for a test, remove!!
 
@@ -199,8 +209,9 @@ do
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        python3 -m cProfile \
-            -o "Profile_linalg_long_run.txt" \
+        # python3 -m cProfile \
+            # -o "Profile_linalg_long_run.txt" \
+        python3 \
             Exp.py \
             -op=$true_operator -p=$prt -e=$exp -bt=$bt \
             -rq=$use_rq -g=$gaussian -qhl=$qhl_test \
