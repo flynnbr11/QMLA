@@ -1390,19 +1390,22 @@ else:
     )
     plot_desc=''
 
-average_priors = average_parameters(
-    results_path=results_csv,
-    top_number_models = arguments.top_number_models 
-)
+try:
+    average_priors = average_parameters(
+        results_path=results_csv,
+        top_number_models = arguments.top_number_models 
+    )
 
-avg_priors = str(directory_to_analyse+'average_priors.p')
+    avg_priors = str(directory_to_analyse+'average_priors.p')
 
-pickle.dump(
-    average_priors,
-    open(avg_priors, 'wb'), 
-    protocol=2
-)
-
+    pickle.dump(
+        average_priors,
+        open(avg_priors, 'wb'), 
+        protocol=2
+    )
+except:
+    # for compatability with old versions
+    pass
 
 average_parameter_estimates(
     directory_name = directory_to_analyse, 
