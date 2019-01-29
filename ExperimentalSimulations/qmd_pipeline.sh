@@ -5,8 +5,9 @@ test_description="multiple_growth_rules_include_hubbard"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=2
+num_tests=5
 qhl_test=0
+multiple_qhl=0
 do_further_qhl=0
 exp_data=1
 simulate_experiment=0
@@ -104,6 +105,10 @@ true_operator='xTxTTx'
 # true_operator='xTiPPyTiPPyTy'
 # true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
 
+qhl_operators=(
+    'xTx'
+    'yTy'
+)
 
 sim_measurement_type='full_access' # measurement to use during simulated cases. 
 exp_measurement_type='hahn' # to use if not experimental
@@ -213,6 +218,7 @@ do
             # -o "Profile_linalg_long_run.txt" \
         python3 \
             Exp.py \
+            -mqhl=$multiple_qhl \
             -op=$true_operator -p=$prt -e=$exp -bt=$bt \
             -rq=$use_rq -g=$gaussian -qhl=$qhl_test \
             -ra=$ra -rt=$rt -pgh=$pgh \

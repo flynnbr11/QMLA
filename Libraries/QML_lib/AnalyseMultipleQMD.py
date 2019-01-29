@@ -546,7 +546,11 @@ def Bayes_t_test(
     pickled_files = []
     for file in os.listdir(directory_name):
         # if file.endswith(".p") and file.startswith("results"):
-        if file.endswith(".p") and file.startswith(results_file_name_start):
+        if (
+            file.endswith(".p") 
+            and 
+            file.startswith(results_file_name_start)
+        ):
             pickled_files.append(file)
 
     growth_rules = {}
@@ -1448,7 +1452,7 @@ Bayes_t_test( # average expected values
     save_to_file=str(
         directory_to_analyse+
         plot_desc +
-        'expec_vals_avg_bayes_t_test.png'
+        'expec_vals.png'
     )
 )
 

@@ -109,6 +109,55 @@ default_true_operators_by_generator = {
 		# 'h_1h2_d6PPPPPPh_1h3_d6PPPPPPh_2h4_d6PPPPPPh_3h4_d6PPPPPPh_2h5_d6PPPPPPh_4h6_d6PPPPPPh_5h6_d6PPPPPPh_e_d6',
 }
 
+qhl_models_by_generator = {
+    'test_changes_to_qmd' : 'x',
+    'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+    'two_qubit_ising_rotation_hyperfine' : 
+    	[
+    		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+    		'xTiPPxTxPPyTiPPyTyPPzTi',
+    		'xTiPPyTiPPzTiPPzTz',
+    	],
+    'two_qubit_ising_rotation_hyperfine_transverse' : 
+    	[
+    		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+    		'xTiPPxTxPPyTiPPyTyPPzTi',
+    		'xTiPPyTiPPzTiPPzTz',
+    	],
+    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiP',
+    'test_multidimensional' : 'xTiPPiTy', 
+    'test_return_champs' : 'xTiPPiTy', 
+    'non_interacting_ising' : 'xTxTTx',
+    'non_interacting_ising_single_axis' : 'xTxTTx',
+    'deterministic_noninteracting_ising_single_axis' : 'xTxTTx',
+    'interacting_nearest_neighbour_ising' : 'xTxTTiPPPiTxTTx',
+    'interacing_nn_ising_fixed_axis' : 'xTxTTiPPPiTxTTx',
+    'deterministic_interacting_nn_ising_single_axis' : 'xTxTTiPPPiTxTTx',
+    'deterministic_transverse_ising_nn_fixed_axis' : 'zTiPPiTzPPxTx',
+    'ising_1d_chain' : '1Dising_ix_d2PP1Dising_tz_d2',
+
+    'heisenberg_nontransverse' : 'xTxPPzTz',
+    'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi',
+    'heisenberg_xyz' : 'Heis_ix_d3PPPHeis_iy_d3PPPHeis_iz_d3PPPHeis_tz_d3',
+
+
+    # 'hubbard' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
+    # 'hubbard' : 'h_1_2_d2PPiTzPPzTi',
+    'hubbard' : 'h_1h2_d2PPiTzPPzTi',
+    # 'hubbard_chain_just_hopping' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3',
+    'hubbard_chain_just_hopping' : 'h_1h2_d3PPPh_1h3_d3PPPh_2h3_d3',
+    # 'hubbard_chain_just_hopping' : 'h_1_2_d2'
+	# 'hubbard_chain' : 'h_1_2_d2PPiTzPPzTi',
+	'hubbard_chain' : 'h_1h2_d2PPh_e_d2',
+	# 'hubbard_square_lattice_generalised' : 'h_1_2_d6PPPPPPh_1_3_d6PPPPPPh_2_4_d6PPPPPPh_2_5_d6PPPPPPh_3_4_d6PPPPPPh_4_6_d6PPPPPPh_5_6_d6PPPPPPzTiTTiTTTiTTTTiTTTTTiPPPPPPiTzTTiTTTiTTTTiTTTTTiPPPPPPiTiTTzTTTiTTTTiTTTTTiPPPPPPiTiTTiTTTzTTTTiTTTTTiPPPPPPiTiTTiTTTiTTTTzTTTTTiPPPPPPiTiTTiTTTiTTTTiTTTTTz'
+	# 'hubbard_square_lattice_generalised' : 'h_1_2_d6PPPPPPh_1_3_d6PPPPPPh_2_4_d6PPPPPPh_2_5_d6PPPPPPh_3_4_d6PPPPPPh_4_6_d6PPPPPPh_5_6_d6PPPPPPzTiTTiTTTiTTTTiTTTTTiPPPPPPiTzTTiTTTiTTTTiTTTTTiPPPPPPiTiTTzTTTiTTTTiTTTTTiPPPPPPiTiTTiTTTzTTTTiTTTTTiPPPPPPiTiTTiTTTiTTTTzTTTTTiPPPPPPiTiTTiTTTiTTTTiTTTTTz'
+	'hubbard_square_lattice_generalised' : 
+		'h_1h2_1h3_2h4_3h4_d4PPPPh_e_d4',
+		# 'h_1h2_1h3_2h4_3h4_2h5_4h6_5h6_d6PPPPPPh_e_d6',
+		# 'h_1h2_d6PPPPPPh_1h3_d6PPPPPPh_2h4_d6PPPPPPh_3h4_d6PPPPPPh_2h5_d6PPPPPPh_4h6_d6PPPPPPh_5h6_d6PPPPPPh_e_d6',
+}
+
+
 fixed_axis_generators = [
     'non_interacting_ising_single_axis',
     'interacing_nn_ising_fixed_axis',

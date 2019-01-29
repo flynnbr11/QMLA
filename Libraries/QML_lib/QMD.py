@@ -2475,7 +2475,8 @@ class QMD():
                 'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
                 'ExpectationValues' : mod.expectation_values,
                 'RSquaredByEpoch' : mod.r_squared_by_epoch(),
-                'LearnedHamiltonian' : mod.LearnedHamiltonian
+                'LearnedHamiltonian' : mod.LearnedHamiltonian,
+                'GrowthGenerator' : mod.GrowthGenerator
             }
 
 

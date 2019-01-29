@@ -459,16 +459,42 @@ if global_variables.qhl_test:
 
 
 
-elif global_variables.further_qhl == True:
+elif (
+    global_variables.further_qhl == True
+    or global_variables.multiQHL == True
+):
 
-    qmd.runMultipleModelQHL(model_names = further_qhl_models)
+
+    if global_variables.multiQHL == True:
+        # note models are only for true growth generation rule
+        # models to QHL can be declared in 
+        # UserFunctions.qhl_models_by_generator dict
+        qhl_models = UserFunctions.qhl_models_by_generator[
+            global_variables.growth_generation_rule
+        ]
+        
+        if type(qhl_models) != list:
+            qhl_models = list(qhl_models)
+        output_prefix = 'multi_qhl_'
+
+    else:
+        qhl_models = further_qhl_models 
+        output_prefix = 'further_qhl_'
+
+    print("QHL Models:", qhl_models)    
+
+    qmd.runMultipleModelQHL(
+        model_names = qhl_models
+    )
     # model_ids = list(range(qmd.HighestModelID))
     model_ids = [
         DataBase.model_id_from_name(
             db=qmd.db, 
             name=mod
-        ) for mod in further_qhl_models
+        # ) for mod in further_qhl_models
+        ) for mod in qhl_models
     ]
+
 
     qmd.plotExpecValues(
         model_ids = model_ids, # hardcode to see full model for development
@@ -478,7 +504,8 @@ elif global_variables.further_qhl == True:
         champ = False,
         save_to_file=str( 
             global_variables.plots_directory+
-            'further_qhl_expec_values_'+
+            output_prefix + 
+            'expec_values_'+
             str(global_variables.long_id) + 
             '.png'
         )
@@ -506,6 +533,7 @@ elif global_variables.further_qhl == True:
             pickle.dump(qmd, pkl_file , protocol=2)
 
     # results_file = global_variables.results_file
+    
 
     for mid in model_ids:
         mod = qmd.reducedModelInstanceFromID(mid)
@@ -513,7 +541,8 @@ elif global_variables.further_qhl == True:
 
         results_file=str(
             global_variables.results_directory + 
-            'further_qhl_results_'+
+            # output_prefix + 
+            'results_'+
             str(name)+'_'+
             str(global_variables.long_id)+
             '.p'

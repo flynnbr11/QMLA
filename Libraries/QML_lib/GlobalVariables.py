@@ -120,6 +120,8 @@ class GlobalVariablesClass():
         # self.true_operator = true_operator
         self.growth_generation_rule = arguments.growth_generation_rule
         self.alternative_growth_rules = arguments.alternative_growth_rules
+        self.multiQHL = bool(arguments.multiQHL)
+        self.models_for_qhl = arguments.models_for_qhl
         self.prior_pickle_file = arguments.prior_pickle_file
         self.true_params_pickle_file = arguments.true_params_pickle_file
         true_params_info = pickle.load(
@@ -469,6 +471,21 @@ def parse_cmd_line_args(args):
       # type=str,
       action='append',
       default=[],
+    )
+
+    parser.add_argument(
+      '-qhl_mods', '--models_for_qhl',
+      help='Models on which to run QHL.',
+      # type=str,
+      action='append',
+      default=[],
+    )
+    
+    parser.add_argument(
+      '-mqhl', '--multiQHL',
+      help='Run QHL test on multiple (provided) models.',
+      type=int,
+      default=0
     )
 
     parser.add_argument(
