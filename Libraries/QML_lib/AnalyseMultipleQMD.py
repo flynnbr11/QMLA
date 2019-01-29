@@ -173,7 +173,8 @@ def parameter_sweep_analysis(
         plt.savefig(save_to_file, bbox_inches='tight')
         
         
-def average_parameters(results_path, 
+def average_parameters(
+    results_path, 
     top_number_models=3,
     average_type='median'
 ):
@@ -565,10 +566,43 @@ def Bayes_t_test(
     #     expectation_values[t] = []
 
     success_rate_by_term = {}
+    nmod = len(winning_models)  
+    ncols = int(np.ceil(np.sqrt(nmod)))
+    nrows = int(np.ceil(nmod/ncols)) + 1 # 1 extra row for "master"
+
+    # fig = plt.figure()
+    # ax = plt.subplot(111)
+
+    # fig, axes = plt.subplots(
+    #     figsize = (20, 10), 
+    #     nrows=nrows, 
+    #     ncols=ncols,
+    #     squeeze=False,
+    #     sharex='col',
+    #     sharey='row'
+    # )
+
+    fig = plt.figure(
+        figsize = (15, 8), 
+        constrained_layout=True
+    )
+    from matplotlib.gridspec import GridSpec
+    gs = GridSpec(nrows, ncols, figure=fig)
+
+
+    row = 1
+    col = 0
+
+    axes_so_far = 1
+    # full_plot_axis = axes[0,0]
+    full_plot_axis = fig.add_subplot(gs[0,:])
+    # i=0
+
     for term in winning_models:
-        plt.clf()
-        fig = plt.figure()
-        ax = plt.subplot(111)
+        # plt.clf()
+        # ax.clf()
+        # ax = axes[row, col]
+        ax = fig.add_subplot(gs[row, col])
         expectation_values = {}
         num_sets_of_this_name = len(
             expectation_values_by_name[term]
@@ -663,10 +697,17 @@ def Bayes_t_test(
             growth_generator = growth_rules[term]
         )
         description = str(
+                name + 
+                ' (' + str(num_sets_of_this_name)  + ').'
+            )
+
+        description_w_bayes_t_value = str(
                 name + ' : ' + 
                 str(round(success_rate, 2)) + 
                 ' (' + str(num_sets_of_this_name)  + ').'
             )
+
+
 #        ax.errorbar(times, mean_exp, xerr=std_dev_exp, label=description)
         # if num_sets_of_this_name > 1:
         #     bayes_t_values_avail_times = sorted(list(t_values.keys()))
@@ -686,6 +727,9 @@ def Bayes_t_test(
         #         linestyle='--',
         #         alpha=0.3
         #     )
+
+
+
 
         ax.plot(
             times, 
@@ -712,8 +756,10 @@ def Bayes_t_test(
 
 
         ax.set_title('Mean Expectation Values')
-        ax.set_xlabel('Time')
-        ax.set_ylabel('Expectation Value')
+        # if col == 0:
+        #     ax.set_ylabel('Expectation Value')
+        # if row == nrows-1:
+        #     ax.set_xlabel('Time')
         true_exp = [true[t] for t in times]
         # ax.set_xlim(0,1)
         # plt.xlim(0,1)
@@ -725,22 +771,83 @@ def Bayes_t_test(
             s=5, 
             label='True Expectation Value'
         )
-        ax.legend(
-            loc='center left', 
-            bbox_to_anchor=(1, 0.5), 
-            title=' Model : Bayes t-test (instances)'
-        )    
+        ax.plot(
+            times, 
+            true_exp, 
+            color='r', 
+            alpha = 0.3
+        )
+
+        # ax.legend(
+        #     loc='center left', 
+        #     bbox_to_anchor=(1, 0.5), 
+        #     title=' Model : Bayes t-test (instances)'
+        # )    
         
-        if save_to_file is not None:
-            save_file=''
-            # save_file = save_to_file[:-4]
-            save_file = str(
-                save_to_file[:-4]+
-                '_'+
-                str(term) + '.png'
+        # fill in "master" plot
+
+        full_plot_axis.plot(
+            times, 
+            mean_exp, 
+            c = colours[winning_models.index(term)],
+            label=str(name)
+        )
+        full_plot_axis.fill_between(
+            times, 
+            mean_exp-std_dev_exp, 
+            mean_exp+std_dev_exp, 
+            alpha=0.2,
+            facecolor = colours[winning_models.index(term)],
+        )
+        if axes_so_far == 1:
+            full_plot_axis.scatter(
+                times, 
+                true_exp, 
+                color='r', 
+                s=5, 
+                label='True Expectation Value'
             )
-            print("Saving to ",save_file )
-            plt.savefig(save_file, bbox_inches='tight')
+            full_plot_axis.plot(
+                times, 
+                true_exp, 
+                color='r', 
+                alpha = 0.3
+            )
+        full_plot_axis.legend(
+            ncol = ncols,
+            loc='lower center', 
+            bbox_to_anchor=(0.5, -1.3), 
+        )
+
+        axes_so_far += 1
+        col += 1
+        if col == ncols:
+            col=0
+            row+=1
+        # ax.set_title(str(name))
+        ax.set_title(description)
+
+
+        # if save_to_file is not None:
+        #     save_file=''
+        #     # save_file = save_to_file[:-4]
+        #     save_file = str(
+        #         save_to_file[:-4]+
+        #         '_'+
+        #         str(term) + '.png'
+        #     )
+        #     print("Saving to ",save_file )
+        #     plt.savefig(save_file, bbox_inches='tight')
+
+    # fig.set_xlabel('Time')
+    # fig.set_ylabel('Expectation Value')
+
+    fig.text(0.5, -0.04, 'Time', ha='center')
+    fig.text(-0.04, 0.5, 'Expectation Value', va='center', rotation='vertical')
+    
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
 
 # def fill_between_sigmas(
 #     ax, 
