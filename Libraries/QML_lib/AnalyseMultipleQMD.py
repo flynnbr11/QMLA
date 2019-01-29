@@ -497,6 +497,7 @@ def Bayes_t_test(
     top_number_models=2,
     save_to_file=None
 ):
+    plt.switch_backend('agg')
     print("Drawing avg expectation values from file:", results_path)
     from matplotlib import cm
     from scipy import stats
