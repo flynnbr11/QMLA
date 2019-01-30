@@ -256,6 +256,21 @@ max_num_models_by_shape['hubbard_square_lattice_generalised'] = {
     'other' : 0
 }
 
+##########
+# Topology learning/Hopping
+##########
+max_num_models_by_shape['hopping_topology'] = {
+    2 : 1,
+    3 : 3, 
+    4 : 6, 
+    5 : 10,
+    6 : 15, 
+    7 : 21, 
+    8 : 29, 
+    9 : 38
+    'other' : 0
+}
+
 
 
 
