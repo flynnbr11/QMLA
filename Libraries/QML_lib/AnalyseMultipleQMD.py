@@ -634,15 +634,20 @@ def Bayes_t_test(
                         learned_expectation_values[t]
                     )
                 except:
-                    expectation_values[t] = [
-                        learned_expectation_values[t]
-                    ]
+                    try:
+                        expectation_values[t] = [
+                            learned_expectation_values[t]
+                        ]
+                    except:
+                        # if t can't be found, move on
+                        pass
 
         means = {}
         std_dev = {}
         true = {}
         t_values = {}
-        times = sorted(list(experimental_measurements.keys()))
+        # times = sorted(list(experimental_measurements.keys()))
+        times = sorted(list(expectation_values.keys()))
         flag=True
         one_sample=True
         for t in times:
