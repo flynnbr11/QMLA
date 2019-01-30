@@ -267,7 +267,7 @@ max_num_models_by_shape['hopping_topology'] = {
     6 : 15, 
     7 : 21, 
     8 : 29, 
-    9 : 38
+    9 : 38,
     'other' : 0
 }
 
