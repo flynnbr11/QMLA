@@ -175,7 +175,7 @@ max_spawn_depth_info = {
 	'hubbard_square_lattice_generalised' : 10,
 	'ising_1d_chain' : 5,
 	'heisenberg_xyz' : 5,
-	'hopping_topology' : 6,
+	'hopping_topology' : 100,
 }
 
 max_num_qubits_info = {
@@ -199,7 +199,7 @@ max_num_qubits_info = {
 	'ising_1d_chain' : 5,
     'heisenberg_xyz' : 5,
     None : 5,
-    'hopping_topology' : 6,
+    'hopping_topology' : 7,
 }
 
 model_generation_functions = {
@@ -250,8 +250,8 @@ model_generation_functions = {
 		ModelGeneration.hubbard_chain,
 	'hubbard_square_lattice_generalised' : 
 		ModelGeneration.hubbard_square_lattice_generalised,
-	# 'hopping_topology' : 
-	# 	ModelGeneration.generate_models_hopping_topology, 
+	'hopping_topology' : 
+		ModelGeneration.generate_models_hopping_topology, 
 }
 
 ##### ---------- -------------------- #####  
@@ -347,7 +347,7 @@ latex_naming_functions = {
 	'heisenberg_xyz' : 
 		ModelNames.latex_name_heisenberg_xyz,
 	'hopping_topology' : 
-		ModelNames.latex_name_heisenberg_xyz
+		ModelNames.hubbard_latex
 	# None : 
 	# 	ModelNames.default_latex_wrapping,
 	# 'test_return_champs' :

@@ -1839,8 +1839,6 @@ class QMD():
                     ]
                 )                        
 
-
-
         self.log_print(
             [
                 "Parent/child comparisons and deactivations complete."

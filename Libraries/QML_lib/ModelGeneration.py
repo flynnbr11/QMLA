@@ -2006,6 +2006,180 @@ def new_hubbard_model_from_square_lattice(topology):
     return new_model
 
 ##################################################################################
+##################### Nondeterministic growth rules ############################################
+##################################################################################
+def possible_hopping_terms_new_site(site_id):
+    new_terms = []
+    dim = site_id
+    for i in range(1, site_id):
+        new_term = str(
+            'h_' + 
+            str(i) + 'h' + str(site_id)
+            + '_d'+str(dim)
+        )
+        new_terms.append(new_term)
+        
+    return new_terms
+
+def append_model_with_new_terms(mod, new_terms):
+    dimension = DataBase.get_num_qubits(mod)
+    p_str = 'P'*dimension
+    
+    new_mods = []
+    
+    for term in new_terms:
+        new = str(
+            mod + p_str
+            + term
+        )
+        new_mods.append(new)
+    return new_mods
+
+def increase_dimension_maintain_distinct_interactions(
+    mod, 
+    dim_inc=1
+):
+    # here distinct means EVERY pair of sites corresponds to a separate parameter.
+    dec = deconstruct_hopping_term(mod)
+    new_dim = dec['dim'] + dim_inc
+    sites = dec['sites']
+    p_str = 'P'*new_dim
+    
+    overall_model = ''
+    for site in sites:
+        new_model_dec = {
+            'dim' : new_dim,
+            'sites' : [site]
+        }
+        new_term = generate_hopping_term(new_model_dec)
+        if sites.index(site) != 0:
+            overall_model += p_str
+        overall_model += str(new_term)
+        
+    return overall_model
+
+def generate_models_hopping_topology(
+    **kwargs
+):
+    from UserFunctions import \
+        initial_models, max_num_qubits_info, \
+        fixed_axes_by_generator, transverse_axis_by_generator
+        
+    growth_generator = kwargs['generator']
+    model_list = kwargs['model_list']
+    spawn_stage = kwargs['spawn_stage']
+    max_dimension = max_num_qubits_info[growth_generator]
+    branch_champs_by_qubit_num = kwargs['branch_champs_by_qubit_num']
+#     interaction_axis = fixed_axes_by_generator[growth_generator]
+#     transverse_axis = transverse_axis_by_generator[growth_generator]
+    
+    new_models = []
+    mod = model_list[0]
+
+    if spawn_stage[-1] == None:
+        # return [h_1h2_d3PPPh_1h3_d3, h_1h2_d3PPPh_2h3_d3]
+        # spawn stage -> (3,1)
+        dim = DataBase.get_num_qubits(mod)
+        new_dim = dim + 1
+        increased_dim_model = increase_dimension_maintain_distinct_interactions(mod)
+        new_terms = possible_hopping_terms_new_site(new_dim)
+        new_models = append_model_with_new_terms(increased_dim_model, new_terms)
+        spawn_stage.append((dim+1,1))
+
+    elif type(spawn_stage[-1]) == tuple:
+        dim = spawn_stage[-1][0]
+        num_branches_this_dim = spawn_stage[-1][1] # either a number or 'c'
+        
+        if dim == max_dimension:
+            at_max_dim = True
+        else:
+            at_max_dim = False
+        if spawn_stage[-1][1] == 'c':
+            this_dimension_complete = True # champ this dim found
+        else:
+            this_dimension_complete = False
+        if spawn_stage[-1][1] == dim - 1 :
+            this_dimension_exhausted = True # all possible models this dim considered
+        else:
+            this_dimension_exhausted = False
+
+        # now complete logic depending on which spawn_stage passed
+        if (
+            this_dimension_exhausted == False
+            and 
+            this_dimension_complete == False
+        ):
+            # add one parameter to given mod, 
+            # return a list
+            # spawn_stage -> (N, num_branches+1)
+            present_terms = DataBase.get_constituent_names_from_name(mod)
+            possible_new_terms_this_dimension = possible_hopping_terms_new_site(dim)
+            nonpresent_possible_terms = list(
+                set(possible_new_terms_this_dimension)
+                - set(present_terms)
+            )
+            new_models = append_model_with_new_terms(mod, nonpresent_possible_terms)
+            spawn_stage.append( (dim, num_branches_this_dim+1) )
+        elif (
+            this_dimension_complete == False
+            and
+            this_dimension_exhausted == True
+        ):
+            
+            new_models = branch_champs_by_qubit_num[dim]
+            spawn_stage.append((dim, 'c'))
+            
+            # return branch champs corresponding to this num qubits
+            # to form a ghost branch
+            # spawn_stage -> (N, 'c')
+        
+        elif (
+            this_dimension_complete == True
+            and
+            at_max_dim == False
+        ):
+            increased_dim = increase_dimension_maintain_distinct_interactions(mod)
+            new_models = [increased_dim]
+            spawn_stage.append((dim+1, 1))
+            
+            # this num qubits complete, 
+            # move up to higher dimension
+            # return mod, since that was the winner of previous branch
+            # and therefore winner for this num_qubits
+            # spawn_stage -> (N+1, 1)
+        elif (
+            at_max_dim == True
+            and
+            this_dimension_complete == True
+        ):
+            spawn_stage.append('Complete')
+#             new_models = branch champions which won their ghost as well
+            
+            all_branch_champions = []
+            for q in range(2, max_dimension+1):
+                all_branch_champions.extend(
+                    branch_champs_by_qubit_num[q]
+                )
+            unique_branch_champs = list(set(all_branch_champions))
+            won_multiple_branches = []
+            for m in unique_branch_champs:
+                if all_branch_champions.count(m) >= 2:
+                    won_multiple_branches.append(m)
+
+            min_dim = min(
+                branch_champs_by_qubit_num.keys()
+            )
+            won_multiple_branches.extend(
+                branch_champs_by_qubit_num[min_dim]
+            )
+            new_models = won_multiple_branches
+    
+    return new_models
+
+    
+
+
+##################################################################################
 ##################### Tree Finished Functions ############################################
 ##################################################################################
 

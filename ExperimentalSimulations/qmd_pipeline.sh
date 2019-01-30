@@ -5,9 +5,9 @@ test_description="multiple_growth_rules_include_hubbard"
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=5
+num_tests=1
 qhl_test=0
-multiple_qhl=1
+multiple_qhl=0
 do_further_qhl=0
 exp_data=0
 simulate_experiment=0
@@ -73,12 +73,14 @@ mkdir -p $long_dir
 
 # growth_rule='heisenberg_nontransverse'
 # growth_rule='heisenberg_transverse'
-growth_rule='heisenberg_xyz'
+# growth_rule='heisenberg_xyz'
 
 # growth_rule='hubbard'
 # growth_rule='hubbard_chain_just_hopping'
 # growth_rule='hubbard_chain'
 #growth_rule='hubbard_square_lattice_generalised'
+
+growth_rule='hopping_topology'
 
 
 alt_growth_rules=(
