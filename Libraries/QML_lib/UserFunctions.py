@@ -92,7 +92,6 @@ default_true_operators_by_generator = {
     'heisenberg_transverse' : 'xTxPPyTyPPiTzPPzTi',
     'heisenberg_xyz' : 'Heis_ix_d3PPPHeis_iy_d3PPPHeis_iz_d3PPPHeis_tz_d3',
 
-
     # 'hubbard' : 'h_1_2_d3PPPh_1_3_d3PPPh_2_3_d3'
     # 'hubbard' : 'h_1_2_d2PPiTzPPzTi',
     'hubbard' : 'h_1h2_d2PPiTzPPzTi',
@@ -109,7 +108,7 @@ default_true_operators_by_generator = {
 		# 'h_1h2_d6PPPPPPh_1h3_d6PPPPPPh_2h4_d6PPPPPPh_3h4_d6PPPPPPh_2h5_d6PPPPPPh_4h6_d6PPPPPPh_5h6_d6PPPPPPh_e_d6',
 
 	'hopping_topology' : 
-		'h_1h2_d3PPPh_1h3_d3',
+		'h_1h2_d4PPPPh_2h4_d4',
 }
 
 
@@ -199,7 +198,7 @@ max_num_qubits_info = {
 	'ising_1d_chain' : 5,
     'heisenberg_xyz' : 5,
     None : 5,
-    'hopping_topology' : 7,
+    'hopping_topology' : 5,
 }
 
 model_generation_functions = {
