@@ -118,7 +118,8 @@ qhl_models_by_generator = {
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
     		# 'xTiPPxTxPPyTiPPyTyPPzTi',
-    		'xTiPPyTiPPzTiPPzTz',
+    		'xTiPPyTiPPyTyPPzTi',
+#    		'xTiPPyTiPPzTiPPzTz',
     	],
     'two_qubit_ising_rotation_hyperfine_transverse' : 
     	[
