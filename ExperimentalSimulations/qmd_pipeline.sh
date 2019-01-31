@@ -9,14 +9,14 @@ num_tests=1
 qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
-exp_data=0
+exp_data=1
 simulate_experiment=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=5
-exp=3
+prt=100
+exp=5
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -28,7 +28,7 @@ rt=0.5
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
-plots=0
+plots=1
 number_best_models_further_qhl=5
 custom_prior=1
 bintimes=0
@@ -208,7 +208,7 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
 
 latex_mapping_filename='LatexMapping.txt'
 latex_mapping_file=$long_dir$latex_mapping_filename
-reallocate_resources=0
+reallocate_resources=1
 
 for prt in  "${particle_counts[@]}";
 do

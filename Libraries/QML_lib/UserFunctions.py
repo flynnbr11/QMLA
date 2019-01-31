@@ -132,6 +132,29 @@ qhl_models_by_generator = {
 	]
 }
 
+max_num_parameter_estimate = {
+    'test_changes_to_qmd' : 3, 
+    'two_qubit_ising_rotation' : 6,
+    'two_qubit_ising_rotation_hyperfine' : 6, 
+    'two_qubit_ising_rotation_hyperfine_transverse' : 9,
+    'non_interacting_ising' : 6,
+    'non_interacting_ising_single_axis' : 6,
+    'deterministic_noninteracting_ising_single_axis' : 6,
+    'interacting_nearest_neighbour_ising' : 6,
+    'interacing_nn_ising_fixed_axis' : 6,
+    'deterministic_interacting_nn_ising_single_axis' : 6,
+    'deterministic_transverse_ising_nn_fixed_axis' : 6,
+	'heisenberg_nontransverse' : 8,
+	'heisenberg_transverse' : 8,
+	'hubbard_chain_just_hopping' : 10,
+	'hubbard_chain' : 10,
+	'hubbard_square_lattice_generalised' : 2,
+	'ising_1d_chain' : 2,
+	'heisenberg_xyz' : 2,
+	'hopping_topology' : 8,
+}
+
+
 
 fixed_axis_generators = [
     'non_interacting_ising_single_axis',

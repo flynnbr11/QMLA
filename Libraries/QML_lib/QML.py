@@ -43,28 +43,50 @@ In this file are class definitions:
 def resource_allocation(
     base_qubits, 
     base_terms, 
+    max_num_params, 
     this_model_qubits, 
     this_model_terms, 
     num_experiments, 
-    num_particles
+    num_particles,
+    given_resource_as_cap=True
 ):
     new_resources = {}
-    
-    qubit_factor = float(this_model_qubits/base_qubits)
-    terms_factor = float(this_model_terms/base_terms)
-    
-    overall_factor = int(qubit_factor * terms_factor)
-    
-    # print("[QML:resource allocation] Factor: ", 
-    #     overall_factor
-    # )
-    if overall_factor > 1: 
-        new_resources['num_experiments'] = overall_factor * num_experiments
-        new_resources['num_particles'] = overall_factor * num_particles
+    if given_resource_as_cap == True:
+        # i.e. reduce number particles for models with fewer params    
+        proportion_of_particles_to_receive = (
+            this_model_terms/max_num_params
+        )
+        print(
+            "Model gets proportion of particles:", 
+            proportion_of_particles_to_receive
+        )
+
+        if proportion_of_particles_to_receive < 1: 
+            new_resources['num_experiments'] = num_experiments
+            new_resources['num_particles'] = int(
+                proportion_of_particles_to_receive
+                * num_particles
+            )
+        else:
+            new_resources['num_experiments'] = num_experiments
+            new_resources['num_particles'] = num_particles
+
     else:
-        new_resources['num_experiments'] = num_experiments
-        new_resources['num_particles'] = num_particles
+        # increase proportional to number params/qubits 
+        qubit_factor = float(this_model_qubits/base_qubits)
+        terms_factor = float(this_model_terms/base_terms)
         
+
+        overall_factor = int(qubit_factor * terms_factor)
+
+        if overall_factor > 1: 
+            new_resources['num_experiments'] = overall_factor * num_experiments
+            new_resources['num_particles'] = overall_factor * num_particles
+        else:
+            new_resources['num_experiments'] = num_experiments
+            new_resources['num_particles'] = num_particles
+        
+    print("New resources:", new_resources)
     return new_resources
 
 
@@ -164,10 +186,15 @@ class ModelLearningClass():
             DataBase.get_constituent_names_from_name(self.Name)
         )
 
+        max_num_params = UserFunctions.max_num_parameter_estimate[
+            self.GrowthGenerator
+        ]
+
         if qmd_info['reallocate_resources']==True:
             new_resources = resource_allocation(
                 base_qubits = base_num_qubits, 
                 base_terms = base_num_terms, 
+                max_num_params = max_num_params, 
                 this_model_qubits = this_model_num_qubits, 
                 this_model_terms = this_model_num_terms, 
                 num_experiments = self.NumExperiments, 

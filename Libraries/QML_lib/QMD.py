@@ -130,9 +130,10 @@ class QMD():
                 num_terms < base_num_terms
             ):
                 base_num_terms = num_terms
+        
         self.BaseResources = {
             'num_qubits' : base_num_qubits, 
-            'num_terms' : base_num_terms
+            'num_terms' : base_num_terms,
         }
         self.ReallocateResources = self.GlobalVariables.reallocate_resources
         # print("[QMD] Base resources: ", self.BaseResources)
