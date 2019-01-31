@@ -2138,8 +2138,15 @@ def generate_models_hopping_topology(
             and
             at_max_dim == False
         ):
-            increased_dim = increase_dimension_maintain_distinct_interactions(mod)
-            new_models = [increased_dim]
+            increased_dim_model = increase_dimension_maintain_distinct_interactions(
+                mod
+            )
+            new_terms = possible_hopping_terms_new_site(dim+1)
+            new_models = append_model_with_new_terms(
+                increased_dim_model, 
+                new_terms
+            )
+            # new_models = [increased_dim]
             spawn_stage.append((dim+1, 1))
             
             # this num qubits complete, 
