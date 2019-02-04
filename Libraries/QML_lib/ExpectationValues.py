@@ -284,6 +284,11 @@ def hahn_evolution(
     log_file=None, 
     log_identifier=None
 ):
+    # print(
+    #     "using hahn evolution function.\nGiven hamiltonian:\n", 
+    #     repr(ham),
+    #     "\nstate:", repr(state)
+    # )
     import qutip 
     import numpy as np
 #    print("Hahn evo")

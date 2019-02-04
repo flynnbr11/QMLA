@@ -231,6 +231,7 @@ if os.path.isfile(true_expectation_value_path) == False:
             true_expec_values[t] = experimental_measurements_dict[t]
         else:
             try:
+                # print("[EXP] GETTING TRUE EXPEC VALS FOR PLOTS")
                 true_expec_values[t] = (
                     ExpectationValues.expectation_value_wrapper(
                         method=global_variables.measurement_type,

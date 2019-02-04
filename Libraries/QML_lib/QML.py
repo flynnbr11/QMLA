@@ -937,7 +937,11 @@ class reducedModel():
             probe = plot_probe_dict[self.NumQubits]
         self.log_print(
             [
-            "Computing expectation values. \nProbe:", probe
+            "Computing expectation values.", 
+            "\nMeasurement Type:", self.MeasurementType, 
+            "\nLearnedHamiltonian", self.LearnedHamiltonian,
+            "\nPlotProbePath:", plot_probe_path, 
+            "\nProbe:", probe
             ]
         )
 

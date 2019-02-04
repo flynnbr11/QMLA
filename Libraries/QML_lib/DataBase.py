@@ -954,7 +954,8 @@ def add_model(
           qle = qle,
           qid=qid,
           host_name=host_name,
-          port_number=port_number
+          port_number=port_number,
+          log_file=log_file
         )
         
         # Add to running_database, same columns as initial gen_list

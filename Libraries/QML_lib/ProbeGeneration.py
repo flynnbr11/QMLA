@@ -204,16 +204,18 @@ def plus_probes_dict(
     max_num_qubits, 
     **kwargs
 ):
+    num_probes = kwargs['num_probes']
     probe_dict = {}
     noise_level = 0.03
-    for i in range(1,1+max_num_qubits):
-        # dict key is tuple of form (0,i) for consistency with other probe dict generation functions. 
-        new_probe =  n_qubit_plus_state(i)
-        noisy_state = random_probe(i) * noise_level
-        noisy_probe = new_probe + noisy_state
-        norm = np.linalg.norm(noisy_probe)
-        noisy_probe = noisy_probe/norm
-        probe_dict[(0,i)] = noisy_probe
+    for j in range(num_probes):
+        for i in range(1,1+max_num_qubits):
+            # dict key is tuple of form (0,i) for consistency with other probe dict generation functions. 
+            new_probe =  n_qubit_plus_state(i)
+            noisy_state = random_probe(i) * noise_level
+            noisy_probe = new_probe + noisy_state
+            norm = np.linalg.norm(noisy_probe)
+            noisy_probe = noisy_probe/norm
+            probe_dict[(j,i)] = noisy_probe
     return probe_dict 
 
 

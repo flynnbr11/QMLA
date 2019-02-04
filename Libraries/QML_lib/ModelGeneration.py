@@ -2077,16 +2077,17 @@ def generate_models_hopping_topology(
     mod = model_list[0]
 
     if spawn_stage[-1] == None:
+        spawn_stage.append((2,'c'))
         # return [h_1h2_d3PPPh_1h3_d3, h_1h2_d3PPPh_2h3_d3]
         # spawn stage -> (3,1)
-        dim = DataBase.get_num_qubits(mod)
-        new_dim = dim + 1
-        increased_dim_model = increase_dimension_maintain_distinct_interactions(mod)
-        new_terms = possible_hopping_terms_new_site(new_dim)
-        new_models = append_model_with_new_terms(increased_dim_model, new_terms)
-        spawn_stage.append((dim+1,1))
+        # dim = DataBase.get_num_qubits(mod)
+        # new_dim = dim + 1
+        # increased_dim_model = increase_dimension_maintain_distinct_interactions(mod)
+        # new_terms = possible_hopping_terms_new_site(new_dim)
+        # new_models = append_model_with_new_terms(increased_dim_model, new_terms)
+        # spawn_stage.append((dim+1,1))
 
-    elif type(spawn_stage[-1]) == tuple:
+    if type(spawn_stage[-1]) == tuple:
         dim = spawn_stage[-1][0]
         num_branches_this_dim = spawn_stage[-1][1] # either a number or 'c'
         
@@ -2141,13 +2142,14 @@ def generate_models_hopping_topology(
             increased_dim_model = increase_dimension_maintain_distinct_interactions(
                 mod
             )
-            new_terms = possible_hopping_terms_new_site(dim+1)
-            new_models = append_model_with_new_terms(
-                increased_dim_model, 
-                new_terms
-            )
-            # new_models = [increased_dim]
-            spawn_stage.append((dim+1, 1))
+            # new_terms = possible_hopping_terms_new_site(dim+1)
+            # new_models = append_model_with_new_terms(
+            #     increased_dim_model, 
+            #     new_terms
+            # )
+            new_models = [increased_dim_model]
+            spawn_stage.append((dim+1, 0))
+            # spawn_stage.append((dim+1, 1))
             
             # this num qubits complete, 
             # move up to higher dimension
