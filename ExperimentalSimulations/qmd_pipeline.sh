@@ -6,11 +6,11 @@ test_description="multiple_growth_rules_include_hubbard"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=0
+simulate_experiment=1
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -161,10 +161,10 @@ true_params_pickle_file="$long_dir/true_params.p"
 plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 gaussian=1
-param_min=0
-param_max=1
+param_min=-4
+param_max=4
 param_mean=0.5
-param_sigma=2
+param_sigma=3
 
 rand_true_params=0
 # rand_prior:
@@ -185,7 +185,7 @@ elif (( "$simulate_experiment" == 1))
 then 
     # special_probe='plus_random'
     special_probe='plus'
-    param_max=8
+    # param_max=8
     rand_true_params=0
 fi
 

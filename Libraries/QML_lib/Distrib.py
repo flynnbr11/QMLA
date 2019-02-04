@@ -84,7 +84,7 @@ def get_prior(
         sigmas = []
         # print("min/max:", param_minimum, param_maximum)
         default_mean = np.mean([param_minimum, param_maximum])
-        default_sigma = default_mean/4 # TODO is this safe?        
+        default_sigma = (param_maximum - param_minimum)/4 # TODO is this safe?        
         for term in individual_terms:
             if term in available_specific_terms:
                 means.append(specific_terms[term][0])
@@ -116,7 +116,7 @@ def get_prior(
             means,
             "\nCov mtx:",
             cov_mtx,
-            "\n Samples:", samples
+            "\nSamples:", samples
             ],
             log_file = log_file, 
             log_identifier = log_identifier
