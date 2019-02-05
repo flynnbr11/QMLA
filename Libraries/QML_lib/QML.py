@@ -63,9 +63,12 @@ def resource_allocation(
 
         if proportion_of_particles_to_receive < 1: 
             new_resources['num_experiments'] = num_experiments
-            new_resources['num_particles'] = int(
-                proportion_of_particles_to_receive
-                * num_particles
+            new_resources['num_particles'] = max(
+                int(
+                    proportion_of_particles_to_receive
+                    * num_particles
+                ),
+                10
             )
         else:
             new_resources['num_experiments'] = num_experiments

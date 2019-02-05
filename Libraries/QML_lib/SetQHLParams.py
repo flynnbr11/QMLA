@@ -83,6 +83,7 @@ set_true_params = {
 	# From  BC /Jan_29/17_58/results_007
 	'xTi': -0.15493082869796826, 
 	'xTx': -1.2914966893450925, 
+	# 'xTx': -0.24, # seems to be degeneracy on these values for xTx
 	'yTi': 5.996392378378391, 
 	'yTy': 0.32964763301295075, 
 	'zTi': -0.21973259068334058, 

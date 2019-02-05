@@ -336,6 +336,21 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 modelparams = modelparams[..., np.newaxis]
                 
             times = expparams['t']
+
+            if self.use_experimental_data == True:
+                # sanity check that all times to be computed are available experimentally
+                all_avail = np.all(
+                    [
+                    t in self.experimental_measurement_times
+                    for t in times
+                    ]
+                )
+                if all_avail == False:
+                    print(
+                        "[likelihood fnc]", 
+                        "All times NOT available experimentally originally"
+                    )
+
             if self.QLE is True:
                 pr0 = Evo.get_pr0_array_qle(
                     t_list=times, modelparams=params,

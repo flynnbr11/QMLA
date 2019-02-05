@@ -128,29 +128,38 @@ def BayesFactorRemote(
             log_file=log_file
         )
 
+        # By default, use times the other model trained on, 
+        # up to t_idx given. 
+        # And inherit renormalization record from QML updater
+        # In special cases, eg experimental data, change these defaults below.
         log_print(["Start. Branch", branchID])
         if num_times_to_use == 'all':
             first_t_idx = 0
         else:
             first_t_idx = len(model_a.Times) - num_times_to_use
 
-        if (
-            num_times_to_use == 'all' 
-            or 
-            len(model_a.Times) < num_times_to_use
-        ):
-            times_a = model_a.Times
-            times_b = model_b.Times
-        else:
-            times_a = model_a.Times[first_t_idx:]
-            times_b = model_b.Times[first_t_idx:]
+        update_times_model_a = model_b.Times[first_t_idx:]
+        update_times_model_b = model_a.Times[first_t_idx:]
+        set_renorm_record_to_zero = False
+
+
+        # if (
+        #     num_times_to_use == 'all' 
+        #     or 
+        #     len(model_a.Times) < num_times_to_use
+        # ):
+        #     times_a = model_a.Times
+        #     times_b = model_b.Times
+        # else:
+        #     times_a = model_a.Times[first_t_idx:]
+        #     times_b = model_b.Times[first_t_idx:]
         
-        # if binning==True and use_experimental_data==True:
+        # # if binning==True and use_experimental_data==True:
 
         # log_print(
         #     [
-        #     "Binning. Before times\n A:", times_a, 
-        #     "\nB:", times_b
+        #     "Binning. Before times\n A:", repr(times_a), 
+        #     "\nB:", repr(times_b)
         #     ]
         # )
 
@@ -160,61 +169,108 @@ def BayesFactorRemote(
             and
             use_all_exp_times_for_bayes_factors is True
         ):
-          
-            times_a = copy.deepcopy(experimental_data_times)
-            times_b = copy.deepcopy(experimental_data_times)
+            experimental_data_times = info_dict[
+                'experimental_measurement_times'
+            ]
+            update_times_model_a = copy.copy(
+                experimental_data_times
+            )
+            update_times_model_b = copy.copy(
+                experimental_data_times
+            )
         
             log_print(
                 [
-                    "Using all exp data times:"                
+                    "Using all exp data times for Bayes factors."                
+                ]
+            )
+            set_renorm_record_to_zero = True
+
+        elif (
+            binning == True
+        ):
+            time_list = set( model_a.Times + model_b.Times)
+
+            all_times = np.concatenate(
+                [
+                    model_a.Times, 
+                    model_b.Times
                 ]
             )
 
-        
-        elif binning==True:
-            import ExperimentalDataFunctions
+            num_unique_times = len(np.unique(
+                all_times
+            ))  
 
-            # TODO introduce binning for simulated data. 
-            try:
-                min_time = min(min(times_a), min(times_b))
-                max_time = max(max(times_a), max(times_b))
-            except:
-                log_print(
+            binned_times = balance_times_by_binning(
+                data = all_times, 
+                all_times_used = True, 
+                num_bins = num_unique_times
+            )
+            update_times_model_a = list(binned_times)
+            update_times_model_b = list(binned_times)
+            set_renorm_record_to_zero = True
+            if use_experimental_data:
+                experimental_data_times = info_dict[
+                    'experimental_measurement_times'
+                ]
+
+                all_times_in_exp_data = np.all(
                     [
-                    "Can't find min/max of:", 
-                    "\ntimes_a:", times_a, 
-                    "\ntimes_b:", times_b,
-                    "\n Model IDs:", model_a_id, 
-                    ";\t", model_b_id,
-                    "\nmoda.Times:", model_a.Times,
-                    "\nmodb.Times:", model_b.Times,
+                        d in experimental_data_times
+                        for d in binned_times
                     ]
                 )
 
 
-            times_list = np.linspace(
-                min_time,
-                max_time, 
-                2*num_times_to_use # learning from scratch so need twice the number of times.
-            )
+                not_present = set(binned_times) - set(experimental_data_times)
+                init_times = set(all_times)
 
 
-            if use_experimental_data == True:
+        # elif binning==True:
+        #     import ExperimentalDataFunctions
+
+        #     # TODO introduce binning for simulated data. 
+        #     try:
+        #         min_time = min(min(times_a), min(times_b))
+        #         max_time = max(max(times_a), max(times_b))
+        #     except:
+        #         log_print(
+        #             [
+        #             "Can't find min/max of:", 
+        #             "\ntimes_a:", times_a, 
+        #             "\ntimes_b:", times_b,
+        #             "\n Model IDs:", model_a_id, 
+        #             ";\t", model_b_id,
+        #             "\nmoda.Times:", model_a.Times,
+        #             "\nmodb.Times:", model_b.Times,
+        #             ]
+        #         )
 
 
-                all_times = [
-                    ExperimentalDataFunctions.nearestAvailableExpTime(
-                        times = experimental_data_times,
-                        t=t
-                    ) 
-                    for t in times_list
-                ]
-                times_a = all_times
-                times_b = all_times
+        #     times_list = np.linspace(
+        #         min_time,
+        #         max_time, 
+        #         2*num_times_to_use # learning from scratch so need twice the number of times.
+        #     )
 
-            else:
-                times_a = times_list
-                times_b = times_list            
+
+        #     if use_experimental_data == True:
+
+
+        #         all_times = [
+        #             ExperimentalDataFunctions.nearestAvailableExpTime(
+        #                 times = experimental_data_times,
+        #                 t=t
+        #             ) 
+        #             for t in times_list
+        #         ]
+        #         times_a = all_times
+        #         times_b = all_times
+
+        #     else:
+        #         times_a = times_list
+        #         times_b = times_list            
 
 
         # log_print(
@@ -229,9 +285,48 @@ def BayesFactorRemote(
         #print("Model", model_a.ModelID, " Times:", times_a)
         #print("Model", model_b.ModelID, " Times:", times_b)
 
+        ## shouldn't have to do this -- remove when processing func doesn't return times not available experimentally
+        import ExperimentalDataFunctions
+        experimental_data_times = info_dict[
+            'experimental_measurement_times'
+        ]
 
-        log_l_a = log_likelihood(model_a, times_b, binning=binning)
-        log_l_b = log_likelihood(model_b, times_a, binning=binning)     
+        all_avail = np.all(
+            [
+                d in experimental_data_times
+                for d in binned_times
+            ]
+        )
+        if all_avail is False:
+            log_print(
+                [
+                    "all NOT experimentally available."
+                ]
+            )
+
+        update_times_model_a = sorted(update_times_model_a)
+        update_times_model_b = sorted(update_times_model_b)
+        log_print(
+            [
+                "Binning:", binning,
+                "\n\t", model_a.Name, 
+                "\n\tInitial \n\t", repr(model_a.Times),
+                "\n\tUpdate \n\t", update_times_model_a,
+                "\n\t", model_b.Name, 
+                "\n\tInitial \n\t", model_b.Times, 
+                "\n\tUpdate \n\t", update_times_model_b,
+            ]
+        )
+        log_l_a = log_likelihood(
+            model_a, 
+            update_times_model_a, 
+            binning=set_renorm_record_to_zero
+        )
+        log_l_b = log_likelihood(
+            model_b, 
+            update_times_model_b, 
+            binning=set_renorm_record_to_zero
+        )     
         # log_print(["Log likelihoods computed."])
 
         bayes_factor = np.exp(log_l_a - log_l_b)
@@ -320,3 +415,56 @@ def get_exp(model, time):
         col_name = 'w_'+str(i)
         exp[col_name] = model.FinalParams[i-1,0] 
     return exp
+
+
+
+######### 
+# Functions for rescaling times to be used during Bayes factor calculation
+#########
+
+def balance_times_by_binning(
+    data, 
+    num_bins, 
+    all_times_used=False, 
+    log_base=2
+):
+
+    bins = np.linspace(min(data), max(data), num_bins)
+    if all_times_used == True:
+        bins = np.array(sorted(np.unique(data))) # all exp data points become a bin
+    # bins -= 0.00000001
+    # print("Bins:", bins, "\nTimes:", sorted(data))
+    digitized = np.digitize(data, bins)
+    bincount = np.bincount(digitized)
+
+    # scaling by log to remove exponential preference observed for some times
+    # remove error cases where log will cause errors (ie log(1) and log(0))
+    bincount[np.where( bincount == 1)] = log_base # ratio goes -> 1, bins overrepresented but not critically
+    bincount[np.where( bincount == 0)] = 1 # so ratio goes -> 0 and bins don't count
+    
+    log_bincount = np.log(bincount)/np.log(log_base)
+    log_bincount[ np.where( log_bincount == -np.inf ) ] = 0
+    log_bincount[ np.where( log_bincount == -np.nan ) ] = 0
+    ratio = [ int(np.ceil(i)) for i in log_bincount ]
+    
+    sum_ratio = np.sum(ratio)
+    median_bincount = np.median( bincount[np.where(bincount!=0)] )
+    mean_bincount = np.mean( bincount[ np.where(bincount != 0 ) ] )
+    base_num_elements_per_bin = int(mean_bincount)
+    nonzero_bincounts = bincount[ np.where(bincount != 0 ) ]
+    base_num_elements_per_bin = int(np.average(bincount, weights=ratio))
+    base_num_elements_per_bin = int(len(data)/sum_ratio)
+    newdata = []
+
+    for binid in range(1, len(bincount)):
+    # for binid in range(len(bincount)):
+        num_elements_in_this_bin = bincount[binid] 
+        num_element_to_return_this_bin = base_num_elements_per_bin * ratio[binid]
+        if num_elements_in_this_bin > 0:
+            multiples = np.where(digitized == binid) # indices of data array which fit in this bin
+            for i in range(num_element_to_return_this_bin):
+                single = np.random.choice(multiples[0]) # a single random data array index in this bin
+                newdata.append(data[single])
+    newdata = np.array(newdata)
+
+    return newdata

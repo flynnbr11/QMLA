@@ -112,21 +112,25 @@ def get_pr0_array_qle(
     num_times = len(t_list)
     output = np.empty([num_particles, num_times])
     for evoId in range(num_particles): ## todo not sure about length/arrays here
-        for tId in range(len(t_list)):
-            try:
-                ham = np.tensordot(
-                    modelparams[evoId], oplist, axes=1
-                )
-            except:
-                log_print(
-                    [
-                    "Failed to build Hamiltonian.",
-                    "\nmodelparams:", modelparams[evoId], 
-                    "\noplist:", oplist
-                    ], 
-                    log_file, log_identifier
-                )
 
+        try:
+            ham = np.tensordot(
+                modelparams[evoId], oplist, axes=1
+            )
+        except:
+            log_print(
+                [
+                "Failed to build Hamiltonian.",
+                "\nmodelparams:", modelparams[evoId], 
+                "\noplist:", oplist
+                ], 
+                log_file, log_identifier
+            )
+            raise
+        outputs_this_ham = {}
+        unique_times_considered_this_ham = []
+
+        for tId in range(len(t_list)):
             """
             # Log print to prove True Hamiltonian is time dependent.
             if num_particles == 1: 
@@ -139,7 +143,11 @@ def get_pr0_array_qle(
             """
             
             t = t_list[tId]
-            print_loc(global_print_loc)
+            # print("[EVO]t=", t)
+            # if t in unique_times_considered_this_ham:
+            #     output[evoId][tId] = outputs_this_ham[t]
+            #     print("saved calc")
+            # else:
             try:
                 # log_print(
                 #     [
@@ -148,8 +156,7 @@ def get_pr0_array_qle(
                 #     ], 
                 #     log_file, log_identifier
                 # )
-                output[evoId][tId] = \
-                    UserFunctions.expectation_value_wrapper(
+                likel = UserFunctions.expectation_value_wrapper(
                 # output[evoId][tId] = ExpectationValues.expectation_value_wrapper(
                     method=measurement_type,
                     ham = ham,
@@ -158,6 +165,10 @@ def get_pr0_array_qle(
                     log_file = log_file, 
                     log_identifier = log_identifier
                 )
+                output[evoId][tId] = likel
+                # unique_times_considered_this_ham.append(t)
+                # outputs_this_ham[t] = likel
+
             except NameError:
                 log_print(["Error raised; unphysical expecation value.",
                     "\nHam:\n", ham,
@@ -175,12 +186,24 @@ def get_pr0_array_qle(
 #                raise
                 
             if output[evoId][tId] < 0:
-                log_print(["[QLE] Negative probability : \t \t probability = ", 
-                    output[evoId][tId]], log_file, log_identifier
+                log_print(
+                    [
+                        "[QLE] Negative probability : \
+                        \t \t probability = ", 
+                        output[evoId][tId]
+                    ], 
+                    log_file, log_identifier
+
                 )
             elif output[evoId][tId] > 1.001: 
-                log_print(["[QLE] Probability > 1: \t \t probability = ", 
-                    output[evoId][tId]], log_file, log_identifier
+                log_print(
+                    [
+                        "[QLE] Probability > 1: \
+                        \t \t probability = ", 
+                        output[evoId][tId]
+                    ], 
+                    log_file, 
+                    log_identifier
                 )
     return output
  

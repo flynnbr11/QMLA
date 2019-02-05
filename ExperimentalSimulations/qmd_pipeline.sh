@@ -6,17 +6,17 @@ test_description="multiple_growth_rules_include_hubbard"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
-exp_data=0
-simulate_experiment=1
+exp_data=1
+simulate_experiment=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=30
-exp=5
+prt=15
+exp=10
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -31,7 +31,7 @@ further_qhl_num_runs=$num_tests
 plots=1
 number_best_models_further_qhl=5
 custom_prior=1
-bintimes=0
+bintimes=1
 # dataset='NVB_dataset.p'
 dataset='NVB_rescale_dataset.p'
 
@@ -161,8 +161,8 @@ true_params_pickle_file="$long_dir/true_params.p"
 plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 gaussian=1
-param_min=-4
-param_max=4
+param_min=0
+param_max=1
 param_mean=0.5
 param_sigma=3
 
@@ -178,14 +178,16 @@ special_probe='random' #'plus' #'ideal'
 if (( "$exp_data" == 1))
 then
 #    special_probe='plus'
-    param_max=8
+    param_min=-4
+    param_max=4
     rand_true_params=0
     special_probe='plus_random'
 elif (( "$simulate_experiment" == 1)) 
 then 
     # special_probe='plus_random'
     special_probe='plus'
-    # param_max=8
+    param_min=-4
+    param_max=4
     rand_true_params=0
 fi
 
