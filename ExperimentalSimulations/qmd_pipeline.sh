@@ -9,14 +9,14 @@ num_tests=1
 qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
-exp_data=1
-simulate_experiment=0
+exp_data=0
+simulate_experiment=1
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=15
-exp=10
+prt=100
+exp=30
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -184,8 +184,8 @@ then
     special_probe='plus_random'
 elif (( "$simulate_experiment" == 1)) 
 then 
-    # special_probe='plus_random'
-    special_probe='plus'
+    special_probe='plus_random'
+    # special_probe='plus'
     param_min=-4
     param_max=4
     rand_true_params=0
