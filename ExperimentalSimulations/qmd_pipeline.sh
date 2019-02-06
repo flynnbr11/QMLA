@@ -6,11 +6,11 @@ test_description="multiple_growth_rules_include_hubbard"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
-exp_data=1
-simulate_experiment=0
+exp_data=0
+simulate_experiment=1
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -174,6 +174,7 @@ rand_true_params=0
 # to above defined mean/sigmas
 rand_prior=0 
 special_probe='random' #'plus' #'ideal'
+special_probe_plot='random'
 # special_probe='plus_random' #'plus' #'ideal'
 if (( "$exp_data" == 1))
 then
@@ -182,10 +183,11 @@ then
     param_max=4
     rand_true_params=0
     special_probe='plus_random'
+    special_probe_plot='plus'
 elif (( "$simulate_experiment" == 1)) 
 then 
     special_probe='plus_random'
-    # special_probe='plus'
+    special_probe_plot='plus'
     param_min=-4
     param_max=4
     rand_true_params=0
@@ -201,7 +203,7 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -prior=$prior_pickle_file \
     -probe=$plot_probe_file \
     -plus=$force_plot_plus \
-    -sp=$special_probe \
+    -sp=$special_probe_plot \
     -ggr=$growth_rule \
     -op=$true_operator \
     -exp=$exp_data \

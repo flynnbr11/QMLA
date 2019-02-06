@@ -111,7 +111,7 @@ pickle.dump(
 experimental_measurements_dict = pickle.load(
     open(str('Data/'+global_variables.dataset), 'rb')
 )
-num_datapoints_to_plot = 500 # to visualise in expec_val plot for simulated data
+num_datapoints_to_plot = 1000 # to visualise in expec_val plot for simulated data
 
 if global_variables.use_experimental_data is True:
     expec_val_plot_max_time = global_variables.data_max_time
@@ -216,6 +216,10 @@ if os.path.isfile(true_expectation_value_path) == False:
         open(global_variables.plot_probe_file, 'rb')
     )
     probe = plot_probe_dict[true_num_qubits]
+    print(
+        "Generating true expectation values with probe", 
+        probe
+    )
 
     log_print(
         [
