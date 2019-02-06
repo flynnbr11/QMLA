@@ -210,22 +210,6 @@ def BayesFactorRemote(
             update_times_model_a = list(binned_times)
             update_times_model_b = list(binned_times)
             set_renorm_record_to_zero = True
-            if use_experimental_data:
-                experimental_data_times = info_dict[
-                    'experimental_measurement_times'
-                ]
-
-                all_times_in_exp_data = np.all(
-                    [
-                        d in experimental_data_times
-                        for d in binned_times
-                    ]
-                )
-
-
-                not_present = set(binned_times) - set(experimental_data_times)
-                init_times = set(all_times)
-
 
         # elif binning==True:
         #     import ExperimentalDataFunctions
@@ -286,37 +270,46 @@ def BayesFactorRemote(
         #print("Model", model_b.ModelID, " Times:", times_b)
 
         ## shouldn't have to do this -- remove when processing func doesn't return times not available experimentally
-        import ExperimentalDataFunctions
-        experimental_data_times = info_dict[
-            'experimental_measurement_times'
-        ]
-
-        all_avail = np.all(
-            [
-                d in experimental_data_times
-                for d in binned_times
-            ]
-        )
-        if all_avail is False:
-            log_print(
-                [
-                    "all NOT experimentally available."
-                ]
-            )
 
         update_times_model_a = sorted(update_times_model_a)
         update_times_model_b = sorted(update_times_model_b)
-        log_print(
-            [
-                "Binning:", binning,
-                "\n\t", model_a.Name, 
-                "\n\tInitial \n\t", repr(model_a.Times),
-                "\n\tUpdate \n\t", update_times_model_a,
-                "\n\t", model_b.Name, 
-                "\n\tInitial \n\t", model_b.Times, 
-                "\n\tUpdate \n\t", update_times_model_b,
+
+        if use_experimental_data is True:
+            experimental_data_times = info_dict[
+                'experimental_measurement_times'
             ]
-        )
+
+            all_times_in_exp_data = np.all(
+                [
+                    d in experimental_data_times
+                    for d in binned_times
+                ]
+            )
+            all_avail = np.all(
+                [
+                    d in experimental_data_times
+                    for d in binned_times
+                ]
+            )
+            if all_avail is False:
+                log_print(
+                    [
+                        "all NOT experimentally available."
+                    ]
+                )
+
+            num_times_to_print = min(len(update_times_model_a), 5)
+            log_print(
+                [
+                    "Binning:", binning,
+                    "\n\t", model_a.Name, 
+                    "\n\tInitial \n\t", repr(model_a.Times[1:num_times_to_print]),
+                    "\n\tUpdate \n\t", repr(update_times_model_a[1:num_times_to_print]),
+                    "\n\t", model_b.Name, 
+                    "\n\tInitial \n\t", repr(model_b.Times[1:num_times_to_print]), 
+                    "\n\tUpdate \n\t", repr(update_times_model_b[1:num_times_to_print]),
+                ]
+            )
         log_l_a = log_likelihood(
             model_a, 
             update_times_model_a, 
