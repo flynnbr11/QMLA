@@ -123,8 +123,9 @@ qhl_models_by_generator = {
     	],
     'two_qubit_ising_rotation_hyperfine_transverse' : 
     	[
+    		'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
-    		'xTiPPxTxPPyTiPPyTyPPzTi',
+    		# 'xTiPPxTxPPyTiPPyTyPPzTi',
     		# 'xTiPPyTiPPzTiPPzTz',
     	],
 	'heisenberg_xyz' : [
