@@ -335,7 +335,8 @@ class ModelLearningClass():
 #            self.Prior = Distributions.MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the simulator
 	  
         self.GenSimModel = gsi.GenSimQMD_IQLE(
-            oplist=self.SimOpList, modelparams=self.SimParams, 
+            oplist=self.SimOpList, 
+            modelparams=self.SimParams, 
             true_oplist=self.TrueOpList, 
             trueparams=self.TrueParams,
             truename=self.TrueOpName, 
@@ -355,7 +356,8 @@ class ModelLearningClass():
         ) 
 
         self.Updater = qi.SMCUpdater(
-            self.GenSimModel, self.NumParticles,
+            self.GenSimModel, 
+            self.NumParticles,
             self.Prior, 
             resample_thresh=self.ResamplerThresh , 
             resampler=qi.LiuWestResampler(a=self.ResamplerA),

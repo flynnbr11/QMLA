@@ -53,6 +53,7 @@ def BayesFactorRemote(
     branchID=None, 
     interbranch=False, 
     num_times_to_use='all', 
+    times_record='BayesFactorsTimes.txt', 
     check_db=False, 
     trueModel=None, 
     bayes_threshold=1, 
@@ -274,6 +275,25 @@ def BayesFactorRemote(
         update_times_model_a = sorted(update_times_model_a)
         update_times_model_b = sorted(update_times_model_b)
 
+        with open(times_record, 'a') as write_log_file:
+            print(
+                "\n\nModels {}/{}".format(
+                    model_a.ModelID,
+                    model_b.ModelID
+                ), 
+                "\n\tID {} [len {}]: {}".format(
+                    model_a.ModelID, 
+                    len(update_times_model_a),
+                    [np.round(val, 2) for val in update_times_model_a]
+                ),
+                "\n\tID {} [len {}]: {}".format(
+                    model_b.ModelID, 
+                    len(update_times_model_b),
+                    [np.round(val, 2) for val in update_times_model_b]
+                ),
+                file = write_log_file
+            )
+
         if use_experimental_data is True:
             experimental_data_times = info_dict[
                 'experimental_measurement_times'
@@ -304,10 +324,12 @@ def BayesFactorRemote(
                     "Binning:", binning,
                     "\n\t", model_a.Name, 
                     "\n\tInitial \n\t", repr(model_a.Times[1:num_times_to_print]),
-                    "\n\tUpdate \n\t", repr(update_times_model_a[1:num_times_to_print]),
+                    "\n\tUpdate (len ", len(update_times_model_a), ")", 
+                    "\n\t", repr(update_times_model_a[1:num_times_to_print]),
                     "\n\t", model_b.Name, 
                     "\n\tInitial \n\t", repr(model_b.Times[1:num_times_to_print]), 
-                    "\n\tUpdate \n\t", repr(update_times_model_b[1:num_times_to_print]),
+                    "\n\tUpdate (len ", len(update_times_model_b), ")", 
+                    "\n\t", repr(update_times_model_b[1:num_times_to_print])
                 ]
             )
         log_l_a = log_likelihood(
@@ -376,6 +398,9 @@ def BayesFactorRemote(
     
 def log_likelihood(model, times, binning=False):
     updater = model.Updater
+    # print(
+    #     "\n[log likel] Log likelihood for model", model.Name
+    # )
     # sum_data = 0
     #print("log likelihood function. Model", model.ModelID, "\n Times:", times)
 
@@ -386,13 +411,23 @@ def log_likelihood(model, times, binning=False):
     for i in range(len(times)):
         exp = get_exp(model, [times[i]])
     #    print("exp:", exp)
-        params_array = np.array([[model.TrueParams[0]]]) # TODO this will cause an error for multiple parameters
+        params_array = np.array([[model.TrueParams[:]]]) # TODO this will cause an error for multiple parameters
+        
+        # print(
+        #     "log likelihood", model.Name, 
+        #     "\n\ttime:", times[i], 
+        #     "\n\tModel.TrueParams:", model.TrueParams,
+        #     "\n\tparams array:", params_array, 
+        #     "\n\texp:", exp
+        # )
+        # print("Datum")
         datum = updater.model.simulate_experiment(
             params_array, 
             exp, 
             repeat=1
         )
         # sum_data += datum   
+        # print("Upater")
         updater.update(datum, exp)
 
 
@@ -419,6 +454,7 @@ def balance_times_by_binning(
     data, 
     num_bins, 
     all_times_used=False, 
+    fraction_times_to_use=0.5, 
     log_base=2
 ):
 
@@ -440,13 +476,24 @@ def balance_times_by_binning(
     log_bincount[ np.where( log_bincount == -np.nan ) ] = 0
     ratio = [ int(np.ceil(i)) for i in log_bincount ]
     
-    sum_ratio = np.sum(ratio)
+    sum_ratio = np.sum(ratio) 
     median_bincount = np.median( bincount[np.where(bincount!=0)] )
     mean_bincount = np.mean( bincount[ np.where(bincount != 0 ) ] )
-    base_num_elements_per_bin = int(mean_bincount)
-    nonzero_bincounts = bincount[ np.where(bincount != 0 ) ]
-    base_num_elements_per_bin = int(np.average(bincount, weights=ratio))
+    # nonzero_bincounts = bincount[ np.where(bincount != 0 ) ]
+    # base_num_elements_per_bin = int(mean_bincount)
+    # base_num_elements_per_bin = int(
+    #     np.average(bincount, weights=ratio)
+    # )
     base_num_elements_per_bin = int(len(data)/sum_ratio)
+    # print("sum ratio: ", sum_ratio)    
+    # print("base num elements before", base_num_elements_per_bin )
+    # print("frac to use:", fraction_times_to_use)
+
+    base_num_elements_per_bin = max(
+        1, 
+        int(fraction_times_to_use * base_num_elements_per_bin)
+    )
+    # print("base num elements after", base_num_elements_per_bin )
     newdata = []
 
     for binid in range(1, len(bincount)):

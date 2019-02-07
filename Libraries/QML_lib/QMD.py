@@ -87,7 +87,7 @@ class QMD():
         experimental_measurements = None,
         results_directory = '', 
         long_id = '001', 
-        num_probes = 20,
+        # num_probes = 20,
         probe_dict = None,  
         max_num_layers = 10,
         max_num_branches = 20, 
@@ -178,8 +178,12 @@ class QMD():
         if not self.ResultsDirectory.endswith('/'):
             self.ResultsDirectory += '/'
         self.LatexMappingFile = self.GlobalVariables.latex_mapping_file
+        self.BayesFactorsTimeFile = str(
+            self.ResultsDirectory
+            + 'BayesFactorsPairsTimes.txt'
+        )
 
-        self.NumProbes = num_probes
+        self.NumProbes = global_variables.num_probes
         if probe_dict is None:
             self.log_print(
                 [
@@ -1065,6 +1069,7 @@ class QMD():
             job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id,
                 model_b_id=model_b_id, branchID=branchID, 
                 interbranch=interbranch, 
+                times_record=self.BayesFactorsTimeFile,
                 num_times_to_use = self.NumTimesForBayesUpdates, 
                 trueModel=self.TrueOpName, bayes_threshold=bayes_threshold,
                 host_name=self.HostName, port_number=self.PortNumber, 
@@ -1080,6 +1085,7 @@ class QMD():
 
             BayesFactorRemote(model_a_id=model_a_id, model_b_id=model_b_id,
                 trueModel=self.TrueOpName, 
+                times_record=self.BayesFactorsTimeFile,
                 num_times_to_use = self.NumTimesForBayesUpdates,
                 branchID=branchID,
                 interbranch=interbranch, bayes_threshold=bayes_threshold,

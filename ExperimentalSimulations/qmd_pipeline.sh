@@ -6,7 +6,7 @@ test_description="multiple_growth_rules_include_hubbard"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
@@ -16,7 +16,7 @@ simulate_experiment=1
 # QHL parameters
 ### ---------------------------------------------------###
 prt=20
-exp=11
+exp=100
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -156,6 +156,7 @@ let bt="$exp"
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Launch $num_tests instances of QMD 
+num_probes=4
 prior_pickle_file="$long_dir/prior.p"
 true_params_pickle_file="$long_dir/true_params.p"
 plot_probe_file="$long_dir/plot_probes.p"
@@ -238,6 +239,7 @@ do
             -log=$this_log -cb=$bayes_csv \
             -meas=$measurement_type \
             -exp=$exp_data -cpr=$custom_prior \
+            -nprobes=$num_probes \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \

@@ -917,8 +917,12 @@ def add_model(
         else: 
             sim_name = model_name
     
-        log_print(["Model ", model_name, 
-            " not previously considered -- adding."], log_file
+        log_print(
+            [
+                "Model ", model_name, 
+                " not previously considered -- adding."
+            ], 
+            log_file
         )
         op = operator(name = sim_name, undimensionalised_name = model_name)
         num_rows = len(running_database)

@@ -111,6 +111,12 @@ def get_pr0_array_qle(
     num_particles = len(modelparams)
     num_times = len(t_list)
     output = np.empty([num_particles, num_times])
+    # print(
+    #     "[Evo] pr0 array",
+    #     "\n\t modelparams:", modelparams, 
+    #     "\n\t oplist:", oplist, 
+    # )
+
     for evoId in range(num_particles): ## todo not sure about length/arrays here
 
         try:

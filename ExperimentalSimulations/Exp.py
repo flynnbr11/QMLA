@@ -77,7 +77,7 @@ qle = global_variables.do_qle # True for QLE, False for IQLE
 #     num_probes = 20
 
 # using 40 probes for training - randomly generated
-num_probes = 40
+# num_probes = 40
 
 generated_probe_dict = UserFunctions.get_probe_dict(
     experimental_data = global_variables.use_experimental_data, 
@@ -86,7 +86,7 @@ generated_probe_dict = UserFunctions.get_probe_dict(
     special_probe = global_variables.special_probe, 
     minimum_tolerable_noise = 0.03,
     # minimum_tolerable_noise = 1e-7,
-    num_probes = num_probes
+    num_probes = global_variables.num_probes
 )
 
 probes_dir = str(
@@ -217,7 +217,7 @@ if os.path.isfile(true_expectation_value_path) == False:
     )
     probe = plot_probe_dict[true_num_qubits]
     print(
-        "Generating true expectation values with probe", 
+        "Generating true expectation values (for plots) with probe", 
         probe
     )
 
@@ -379,7 +379,7 @@ qmd = QMD(
     qhl_plots=do_qhl_plots, 
     results_directory = results_directory,
     long_id = long_id, 
-    num_probes=num_probes,
+    # num_probes=num_probes,
     probe_dict = generated_probe_dict, 
     model_priors = model_priors,
     experimental_measurements = experimental_measurements_dict,

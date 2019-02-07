@@ -178,6 +178,7 @@ class GlobalVariablesClass():
         self.param_mean = arguments.param_mean
         self.param_sigma = arguments.param_sigma
         self.bayes_time_binning = arguments.bayes_time_binning
+        self.num_probes = arguments.num_probes
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -561,6 +562,13 @@ def parse_cmd_line_args(args):
       help='Default std dev on distribution',
       type=float,
       default=0.5
+    )
+
+    parser.add_argument(
+      '-nprobes', '--num_probes',
+      help='How many probe states in rota for learning parameters.',
+      type=int,
+      default=20
     )
 
 

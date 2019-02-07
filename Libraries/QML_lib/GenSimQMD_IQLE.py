@@ -72,8 +72,12 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
     
     ## INITIALIZER ##
 
-    def __init__(self, 
-        oplist, modelparams, 
+    def __init__(
+        self, 
+        oplist, 
+        modelparams,
+        # num_experiments=None, 
+        # num_particles=None,  
         probecounter=None, 
         use_time_dep_true_model = False,
         time_dep_true_params = None,
@@ -237,6 +241,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         sim_dim = np.log2(self._oplist[0].shape[0])
         
         if  num_particles == 1:
+            # print("[likelihood] true_evo. outcomes", outcomes)
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
             true_evo = True
             operators = self._true_oplist
@@ -253,6 +258,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                     params[0][i] *=  time
             
         else:
+            # print("[likelihood] sim_evo. outcomes", outcomes)
             sample = np.array([expparams.item(0)[1:]])
             true_evo = False
             operators = self._oplist
