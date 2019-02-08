@@ -108,7 +108,7 @@ default_true_operators_by_generator = {
 		# 'h_1h2_d6PPPPPPh_1h3_d6PPPPPPh_2h4_d6PPPPPPh_3h4_d6PPPPPPh_2h5_d6PPPPPPh_4h6_d6PPPPPPh_5h6_d6PPPPPPh_e_d6',
 
 	'hopping_topology' : 
-		'h_1h2_d4PPPPh_2h4_d4',
+		'h_1h2_d4PPPPh_3h4_d4',
 }
 
 
