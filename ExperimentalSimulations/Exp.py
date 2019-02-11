@@ -82,10 +82,11 @@ qle = global_variables.do_qle # True for QLE, False for IQLE
 generated_probe_dict = UserFunctions.get_probe_dict(
     experimental_data = global_variables.use_experimental_data, 
     growth_generator = global_variables.growth_generation_rule, 
-    noise_level = 0.03,
     special_probe = global_variables.special_probe, 
-    minimum_tolerable_noise = 0.03,
-    # minimum_tolerable_noise = 1e-7,
+    # noise_level = 0.03,
+    # minimum_tolerable_noise = 0.03,
+    noise_level = 0.0,
+    minimum_tolerable_noise = 1e-7, # to match dec_14/09_55 run # TODO remove!!!
     num_probes = global_variables.num_probes
 )
 
