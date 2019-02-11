@@ -441,19 +441,30 @@ if global_variables.qhl_test:
         # )
 
     print("plotting expectation values")
-    qmd.plotExpecValues(
-        model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
-        max_time = expec_val_plot_max_time, #in microsec
-        t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
-#        t_interval=0.02,
-        champ = False,
+
+
+    qmd.plotDynamics(
         save_to_file=str( 
             global_variables.plots_directory +
-            'expec_values_' + 
+            'dynamics_' + 
             str(global_variables.long_id)+
             '.png'
         )
     )
+
+#     qmd.plotExpecValues(
+#         model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
+#         max_time = expec_val_plot_max_time, #in microsec
+#         t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
+# #        t_interval=0.02,
+#         champ = False,
+#         save_to_file=str( 
+#             global_variables.plots_directory +
+#             'expec_values_' + 
+#             str(global_variables.long_id)+
+#             '.png'
+#         )
+#     )
 
     results_file = global_variables.results_file
     pickle.dump(
@@ -584,16 +595,24 @@ else:
     expec_value_mods_to_plot.append(qmd.ChampID)
 
     print("plotExpecValues")
-    qmd.plotExpecValues(
-        model_ids = expec_value_mods_to_plot, # hardcode to see full model for development
-        times=plot_times,
-        max_time = expec_val_plot_max_time, #in microsec
-        t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
+    # qmd.plotExpecValues(
+    #     model_ids = expec_value_mods_to_plot, # hardcode to see full model for development
+    #     times=plot_times,
+    #     max_time = expec_val_plot_max_time, #in microsec
+    #     t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
+    #     save_to_file=str( 
+    #     global_variables.plots_directory+
+    #     'expec_values_'+str(global_variables.long_id)+'.png')
+    # )
+    qmd.plotDynamics(
         save_to_file=str( 
-        global_variables.plots_directory+
-        'expec_values_'+str(global_variables.long_id)+'.png')
+            global_variables.plots_directory +
+            'dynamics_' + 
+            str(global_variables.long_id)+
+            '.png'
+        )
     )
-    
+
     if global_variables.save_plots:
         try:
             print("plotVolumes")

@@ -319,19 +319,19 @@ def BayesFactorRemote(
                 )
 
             num_times_to_print = min(len(update_times_model_a), 5)
-            log_print(
-                [
-                    "Binning:", binning,
-                    "\n\t", model_a.Name, 
-                    "\n\tInitial \n\t", repr(model_a.Times[1:num_times_to_print]),
-                    "\n\tUpdate (len ", len(update_times_model_a), ")", 
-                    "\n\t", repr(update_times_model_a[1:num_times_to_print]),
-                    "\n\t", model_b.Name, 
-                    "\n\tInitial \n\t", repr(model_b.Times[1:num_times_to_print]), 
-                    "\n\tUpdate (len ", len(update_times_model_b), ")", 
-                    "\n\t", repr(update_times_model_b[1:num_times_to_print])
-                ]
-            )
+            # log_print(
+            #     [
+            #         "Binning:", binning,
+            #         "\n\t", model_a.Name, 
+            #         "\n\tInitial \n\t", repr(model_a.Times[1:num_times_to_print]),
+            #         "\n\tUpdate (len ", len(update_times_model_a), ")", 
+            #         "\n\t", repr(update_times_model_a[1:num_times_to_print]),
+            #         "\n\t", model_b.Name, 
+            #         "\n\tInitial \n\t", repr(model_b.Times[1:num_times_to_print]), 
+            #         "\n\tUpdate (len ", len(update_times_model_b), ")", 
+            #         "\n\t", repr(update_times_model_b[1:num_times_to_print])
+            #     ]
+            # )
         log_l_a = log_likelihood(
             model_a, 
             update_times_model_a, 

@@ -178,9 +178,20 @@ class QMD():
         if not self.ResultsDirectory.endswith('/'):
             self.ResultsDirectory += '/'
         self.LatexMappingFile = self.GlobalVariables.latex_mapping_file
-        self.BayesFactorsTimeFile = str(
+        
+        bayes_factors_time_dir = str(
             self.ResultsDirectory
-            + 'BayesFactorsPairsTimes.txt'
+            + 'BayesFactorsTimeRecords/'
+        )
+        if not os.path.exists(bayes_factors_time_dir):
+            os.makedirs(bayes_factors_time_dir)
+
+
+        self.BayesFactorsTimeFile = str(
+            bayes_factors_time_dir
+            + 'BayesFactorsPairsTimes_'
+            + str(self.GlobalVariables.long_id)
+            +'.txt'
         )
 
         self.NumProbes = global_variables.num_probes
@@ -1066,14 +1077,21 @@ class QMD():
             queue = Queue(self.Q_id, connection=self.redis_conn, 
                 async=self.use_rq, default_timeout=self.rq_timeout
             ) 
-            job = queue.enqueue(BayesFactorRemote, model_a_id=model_a_id,
-                model_b_id=model_b_id, branchID=branchID, 
+            job = queue.enqueue(
+                BayesFactorRemote, 
+                model_a_id=model_a_id,
+                model_b_id=model_b_id, 
+                branchID=branchID, 
                 interbranch=interbranch, 
                 times_record=self.BayesFactorsTimeFile,
                 num_times_to_use = self.NumTimesForBayesUpdates, 
-                trueModel=self.TrueOpName, bayes_threshold=bayes_threshold,
-                host_name=self.HostName, port_number=self.PortNumber, 
-                qid=self.Q_id, log_file=self.rq_log_file, result_ttl=-1,
+                trueModel=self.TrueOpName, 
+                bayes_threshold=bayes_threshold,
+                host_name=self.HostName, 
+                port_number=self.PortNumber, 
+                qid=self.Q_id, 
+                log_file=self.rq_log_file, 
+                result_ttl=-1,
                 timeout=self.rq_timeout
             ) 
             self.log_print(["Bayes factor calculation queued. Model IDs",
@@ -1083,14 +1101,19 @@ class QMD():
                 return job
         else:
 
-            BayesFactorRemote(model_a_id=model_a_id, model_b_id=model_b_id,
+            BayesFactorRemote(
+                model_a_id=model_a_id, 
+                model_b_id=model_b_id,
                 trueModel=self.TrueOpName, 
                 times_record=self.BayesFactorsTimeFile,
                 num_times_to_use = self.NumTimesForBayesUpdates,
                 branchID=branchID,
-                interbranch=interbranch, bayes_threshold=bayes_threshold,
-                host_name=self.HostName, port_number=self.PortNumber, 
-                qid=self.Q_id, log_file=self.rq_log_file
+                interbranch=interbranch, 
+                bayes_threshold=bayes_threshold,
+                host_name=self.HostName, 
+                port_number=self.PortNumber, 
+                qid=self.Q_id, 
+                log_file=self.rq_log_file
             )
             
     def remoteBayesFromIDList(
@@ -3125,6 +3148,16 @@ class QMD():
             save_to_file = save_to_file
         )
     
+
+    def plotDynamics(
+        self, 
+        model_ids=None, 
+        save_to_file=None, 
+    ):
+        PlotQMD.plotDynamicsLearnedModels(
+            qmd = self, 
+            save_to_file = save_to_file,
+        )
         
     def plotExpecValues(
         self, 
