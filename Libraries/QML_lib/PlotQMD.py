@@ -474,15 +474,19 @@ def plotDynamicsLearnedModels(
             bf_oppopents = []
             for b in model_ids:
                 if b != mod_id:
-                    # bf_oppopents.append(
-                    #     qmd.reducedModelInstanceFromID(b).LatexTerm
-                    # )
-                    bf_oppopents.append(b)
-                    bayes_factors_this_mod.append(
-                        np.log10(
-                            all_bayes_factors[mod_id][b][-1]
+                    try:
+                        # bf_oppopents.append(
+                        #     qmd.reducedModelInstanceFromID(b).LatexTerm
+                        # )
+                        bf_oppopents.append(b)
+                        bayes_factors_this_mod.append(
+                            np.log10(
+                                all_bayes_factors[mod_id][b][-1]
+                            )
                         )
-                    )
+                    except:
+                        # if these models were never compared, don't include
+                        pass
             ax = fig.add_subplot(gs[row, col])
             ax.bar(
                 bf_oppopents, 

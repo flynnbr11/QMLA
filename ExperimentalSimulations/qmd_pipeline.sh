@@ -9,14 +9,14 @@ num_tests=1
 qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
-exp_data=0
-simulate_experiment=1
+exp_data=1
+simulate_experiment=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=20
-exp=7
+prt=500
+exp=100
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -138,7 +138,6 @@ declare -a qhl_operators=(
 )
 declare -a particle_counts=(
 $prt
-22
 )
 q_id=0
 """
