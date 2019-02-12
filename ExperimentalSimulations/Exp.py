@@ -95,7 +95,11 @@ probes_dir = str(
     +'training_probes/'
 )
 if not os.path.exists(probes_dir):
-    os.makedirs(probes_dir)
+    try:
+        os.makedirs(probes_dir)
+    except:
+        # if already exists (ie created by another QMD since if test ran...)
+        pass
 
 training_probes_path = str( 
     probes_dir
