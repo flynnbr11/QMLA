@@ -179,6 +179,7 @@ class GlobalVariablesClass():
         self.param_sigma = arguments.param_sigma
         self.bayes_time_binning = arguments.bayes_time_binning
         self.num_probes = arguments.num_probes
+        self.probe_noise_level = arguments.probe_noise_level
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -571,8 +572,12 @@ def parse_cmd_line_args(args):
       default=20
     )
 
-
-
+    parser.add_argument(
+      '-pnoise', '--probe_noise_level',
+      help='Noise level to add to probe for learning',
+      type=float,
+      default=0.03
+    )
 
     # Process arguments from command line
     arguments = parser.parse_args(args)

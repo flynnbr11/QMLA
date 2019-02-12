@@ -164,6 +164,7 @@ true_params_pickle_file="$long_dir/true_params.p"
 plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 gaussian=1
+probe_noise=0.00001
 param_min=0
 param_max=1
 param_mean=0.5
@@ -242,6 +243,7 @@ do
             -meas=$measurement_type \
             -exp=$exp_data -cpr=$custom_prior \
             -nprobes=$num_probes \
+            -pnoise=$probe_noise \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \

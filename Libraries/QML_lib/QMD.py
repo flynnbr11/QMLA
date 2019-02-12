@@ -486,9 +486,12 @@ class QMD():
             '}RA_{' + str(self.ResamplerA) +
             '}RP_{' + str(self.PGHPrefactor) +
             '}H_{' + str(num_exp_ham) + 
+            '}PN_{' + str(self.GlobalVariables.probe_noise_level) + 
+            '}#|\psi>_{' + str(self.NumProbes) +             
             '}$'
-            )
+        )
         self.LatexConfig = latex_config
+        print("[QMD] latex config:", self.LatexConfig)
         self.PlotProbeFile = self.GlobalVariables.plot_probe_file
         self.QMDInfo = {
             # may need to take copies of these in case pointers accross nodes break
