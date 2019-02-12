@@ -59,7 +59,8 @@ def parameter_sweep_analysis(
     qmd_cumulative_results = pandas.DataFrame.from_csv(results_csv,
         index_col='ConfigLatex'
     )
-    piv = pandas.pivot_table(qmd_cumulative_results, 
+    piv = pandas.pivot_table(
+        qmd_cumulative_results, 
         values=['CorrectModel', 'Time', 'Overfit', 'Underfit', 'Misfit'], 
         index=['ConfigLatex'], 
         aggfunc={

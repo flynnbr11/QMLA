@@ -486,8 +486,8 @@ class QMD():
             '}RA_{' + str(self.ResamplerA) +
             '}RP_{' + str(self.PGHPrefactor) +
             '}H_{' + str(num_exp_ham) + 
+            '}|\psi>_{' + str(self.NumProbes) +             
             '}PN_{' + str(self.GlobalVariables.probe_noise_level) + 
-            '}#|\psi>_{' + str(self.NumProbes) +             
             '}$'
         )
         self.LatexConfig = latex_config

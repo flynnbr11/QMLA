@@ -396,6 +396,7 @@ def plotDynamicsLearnedModels(
         reduced = qmd.reducedModelInstanceFromID(mod_id)
 #         growth_generator = reduced.GrowthGenerator
         desc = str(
+            "ID:{}\n".format(mod_id) + 
             reduced.LatexTerm 
         )
 
@@ -473,9 +474,10 @@ def plotDynamicsLearnedModels(
             bf_oppopents = []
             for b in model_ids:
                 if b != mod_id:
-                    bf_oppopents.append(
-                        qmd.reducedModelInstanceFromID(b).LatexTerm
-                    )
+                    # bf_oppopents.append(
+                    #     qmd.reducedModelInstanceFromID(b).LatexTerm
+                    # )
+                    bf_oppopents.append(b)
                     bayes_factors_this_mod.append(
                         np.log10(
                             all_bayes_factors[mod_id][b][-1]
@@ -511,9 +513,9 @@ def plotDynamicsLearnedModels(
             times_learned_over = reduced.Times
             ax.hist(
                 times_learned_over,
-                histtype='step',
+                # histtype='step',
                 color = plot_colour, 
-                fill=False,
+                # fill=False,
                 label=desc
             )
             ax.legend()
