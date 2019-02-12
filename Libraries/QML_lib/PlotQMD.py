@@ -379,7 +379,7 @@ def plotDynamicsLearnedModels(
     nrows = num_models_to_plot 
     
     fig = plt.figure(
-        figsize = (15, 8), 
+        figsize = (20, 12), 
         # constrained_layout=True,
         tight_layout=True
     )
@@ -611,7 +611,7 @@ def plotDynamicsLearnedModels(
                 row+=1
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
-                        
+
 
     
 def ExpectationValuesQHL_TrueModel(
