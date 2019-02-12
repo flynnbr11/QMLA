@@ -342,24 +342,21 @@ def ExpectationValuesTrueSim(
 from matplotlib.gridspec import GridSpec
 
 
+from matplotlib.gridspec import GridSpec
+from matplotlib import cm
+
+
 def plotDynamicsLearnedModels(
     qmd, 
-    model_ids=None,
-    ensure_true_and_champ=True, 
+    model_ids = None,
+    include_expec_vals=True,
+    include_bayes_factors=True, 
+    include_times_learned=True, 
+    include_param_estimates=False,
     save_to_file=None
 ):
     if model_ids is None:
         model_ids = list(sorted(set(qmd.BranchChampions.values())))
-    
-    if ensure_true_and_champ == True:
-        try:
-            if qmd.TrueOpModelID not in model_ids:
-                model_ids.append(qmd.TrueOpModelID)
-            if qmd.ChampID not in model_ids:
-                model_ids.append(qmd.ChampID)
-        except:
-            pass
-
     true_expec_vals = pickle.load(open(qmd.GlobalVariables.true_expec_path, 'rb'))
     times_to_plot = list(sorted(true_expec_vals.keys()))
     true_exp = [true_expec_vals[t] for t in times_to_plot]
@@ -367,11 +364,18 @@ def plotDynamicsLearnedModels(
     num_models_to_plot = len(model_ids)
     all_bayes_factors = qmd.AllBayesFactors
     max_time = max(times_to_plot)
-
+    individual_terms_already_in_legend = []
+    
 #     ncols = int(np.ceil(np.sqrt(num_models_to_plot)))
 #     nrows = 3*int(np.ceil(num_models_to_plot/ncols)) + 1 # 1 extra row for "master"
     
-    ncols = 3
+    ncols = (
+        include_expec_vals +
+        include_bayes_factors + 
+        include_times_learned + 
+        include_param_estimates
+    )
+#     ncols = 4
     nrows = num_models_to_plot 
     
     fig = plt.figure(
@@ -419,112 +423,195 @@ def plotDynamicsLearnedModels(
             desc += str('\n[True]')
         
 
-        # reproduce dynamics in left column (col 0)
-        ham = reduced.LearnedHamiltonian
-        dim = np.log2(np.shape(ham)[0])
-        probe = plot_probes[dim]
-        expec_vals = {}
-        
-        for t in times_to_plot:
-            expec_vals[t] = ExpectationValues.expectation_value_wrapper(
-                method = qmd.MeasurementType,
-                ham = ham, 
-                t = t, 
-                state = probe
-            )
-        ## choose an axis to plot on
-        ax = fig.add_subplot(gs[row, col])
-        ## first plot true dynamics
-        ax.plot(
-            times_to_plot, 
-            true_exp, 
-            c = 'r'
-        )
+        ############ --------------- ############
+        ############ Plot dynamics in left most column ############
+        ############ --------------- ############
+        if include_expec_vals is True:
+            ham = reduced.LearnedHamiltonian
+            dim = np.log2(np.shape(ham)[0])
+            probe = plot_probes[dim]
+            expec_vals = {}
 
-        ## now plot learned dynamics
-        sim_exp = [expec_vals[t] for t in times_to_plot]
-        ax.plot(
-            times_to_plot, 
-            sim_exp, 
-            c = plot_colour,
-            label = dynamics_label
-        )
-#         ax.legend()
-        
-        if row == 0:
-            ax.set_title('Expectation Values')
-        
-        # Plot Bayes factors of this model, in barplot
-        col += 1
-        if col == ncols:
-            col=0
-            row+=1
-            
-        bayes_factors_this_mod =[] 
-        bf_oppopents = []
-        for b in model_ids:
-            if b != mod_id:
-                bf_oppopents.append(
-                    qmd.reducedModelInstanceFromID(b).LatexTerm
+            for t in times_to_plot:
+                expec_vals[t] = ExpectationValues.expectation_value_wrapper(
+                    method = qmd.MeasurementType,
+                    ham = ham, 
+                    t = t, 
+                    state = probe
                 )
-                bayes_factors_this_mod.append(
-                    np.log10(
-                        all_bayes_factors[mod_id][b][-1]
+            ## choose an axis to plot on
+            ax = fig.add_subplot(gs[row, col])
+            ## first plot true dynamics
+            ax.plot(
+                times_to_plot, 
+                true_exp, 
+                c = 'r'
+            )
+
+            ## now plot learned dynamics
+            sim_exp = [expec_vals[t] for t in times_to_plot]
+            ax.plot(
+                times_to_plot, 
+                sim_exp, 
+                c = plot_colour,
+                label = dynamics_label
+            )
+    #         ax.legend()
+
+            if row == 0:
+                ax.set_title('Expectation Values')
+
+            col += 1
+            if col == ncols:
+                col=0
+                row+=1
+        ############ --------------- ############
+        ############ Plot Bayes factors ############
+        ############ --------------- ############
+        if include_bayes_factors == True:
+            bayes_factors_this_mod =[] 
+            bf_oppopents = []
+            for b in model_ids:
+                if b != mod_id:
+                    bf_oppopents.append(
+                        qmd.reducedModelInstanceFromID(b).LatexTerm
                     )
-                )
-        ax = fig.add_subplot(gs[row, col])
-        ax.bar(
-            bf_oppopents, 
-            bayes_factors_this_mod,
-            color = plot_colour
-        )
-        if row == 0:
-            ax.set_title('Bayes Factors [$log_{10}$]')
-        
-        # Plot times learned over as hist
-        col += 1
-        if col == ncols:
-            col=0
-            row+=1
-        ax = fig.add_subplot(gs[row, col])
-        if row == 0:
-            ax.set_title('Times learned')
-#         ax.set_ylabel(
-#             desc, 
-#             color=name_colour, 
-#             rotation=0,
-#         )
-        ax.yaxis.set_label_position("right")
-
-        times_learned_over = reduced.Times
-        ax.hist(
-            times_learned_over,
-            histtype='step',
-            color = plot_colour, 
-            fill=False,
-            label=desc
-        )
-        ax.semilogy()
-        x_max = max(max(times_learned_over), max_time)
-        ax.set_xlim(0, x_max)
-        if x_max > max_time:
-            ax.axvline(
-                max_time, 
-                color = 'red',
-                label = 'Highest exp.time'
+                    bayes_factors_this_mod.append(
+                        np.log10(
+                            all_bayes_factors[mod_id][b][-1]
+                        )
+                    )
+            ax = fig.add_subplot(gs[row, col])
+            ax.bar(
+                bf_oppopents, 
+                bayes_factors_this_mod,
+                color = plot_colour
             )
-        ax.legend()
-        col += 1
-        if col == ncols:
-            col=0
-            row+=1
-        
-#     fig.text(0.45, -0.04, 'Time', ha='center')
-#     fig.text(-0.04, 0.2, 'Expectation Value', va='center', rotation='vertical')
+            if row == 0:
+                ax.set_title('Bayes Factors [$log_{10}$]')
 
+            col += 1
+            if col == ncols:
+                col=0
+                row+=1
+        ############ --------------- ############
+        ############ Plot times learned over ############
+        ############ --------------- ############
+        if include_times_learned == True:
+            ax = fig.add_subplot(gs[row, col])
+            if row == 0:
+                ax.set_title('Times learned')
+    #         ax.set_ylabel(
+    #             desc, 
+    #             color=name_colour, 
+    #             rotation=0,
+    #         )
+            ax.yaxis.set_label_position("right")
+
+            times_learned_over = reduced.Times
+            ax.hist(
+                times_learned_over,
+                histtype='step',
+                color = plot_colour, 
+                fill=False,
+                label=desc
+            )
+            ax.legend()
+            ax.semilogy()
+            ax.set_xlim(0, max_time)
+
+            col += 1
+            if col == ncols:
+                col=0
+                row+=1
+        ############ --------------- ############
+        ############ Plot parameters estimates ############
+        ############ --------------- ############
+        if include_param_estimates == True:
+            ax = fig.add_subplot(gs[row, col])
+            name = reduced.Name
+            terms = DataBase.get_constituent_names_from_name(name)
+            num_terms = len(terms) 
+
+            term_positions={}
+            param_estimate_by_term = {}
+            std_devs = {}
+
+            for t in range(num_terms):
+                term_positions[terms[t]] = t 
+                term = terms[t]
+                param_position = term_positions[term]
+                param_estimates = reduced.TrackEval[:,param_position]
+                #std_dev = mod.cov_matrix[param_position,param_position]
+                std_dev = reduced.TrackCovMatrices[:,param_position,param_position]
+                param_estimate_by_term[term] = param_estimates    
+                std_devs[term] = std_dev
+
+            cm_subsection = np.linspace(0,0.8,num_terms)
+            colours = [ cm.magma(x) for x in cm_subsection ]
+            # TODO use color map as list
+            num_epochs = reduced.NumExperiments
+
+            i=0
+        #    for term in list(param_estimate_by_term.keys()):
+            for term in terms:
+                colour = colours[i%len(colours)]
+                i+=1
+                try:
+                    if use_experimental_data==False:
+                        y_true = qmd.TrueParamDict[term]
+                        # true_term_latex = DataBase.latex_name_ising(term)
+                        true_term_latex = UserFunctions.get_latex_name(
+                            name = term,
+                            # growth_generator = qmd.GrowthGenerator
+                            growth_generator = reduced.GrowthGenerator
+                        )
+
+                        ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
+                except:
+                    pass
+                y = np.array(param_estimate_by_term[term])
+                s = np.array(std_devs[term])
+                x = range(1,1+len(param_estimate_by_term[term]))
+                latex_term = UserFunctions.get_latex_name(
+                    name = term,
+                    # growth_generator = qmd.GrowthGenerator
+                    growth_generator = reduced.GrowthGenerator
+                )
+                if latex_term not in individual_terms_already_in_legend:
+                    individual_terms_already_in_legend.append(latex_term)
+                    plot_label = str(latex_term)
+                else:
+                    plot_label = ''
+                # print("[pQMD] latex_term:", latex_term)
+                ax.plot(
+                    x,
+                    y, 
+    #                 s=max(1,50/num_epochs), 
+                    label=plot_label, 
+                    color=colour
+                )
+        #        ax.set_yscale('symlog')
+                # print("[pQMD] scatter done" )
+    #             ax.fill_between(
+    #                 x, 
+    #                 y+s, 
+    #                 y-s, 
+    #                 alpha=0.2,
+    #                 facecolor=colour
+    #             )
+
+                ax.legend()
+            if row == 0:
+                ax.set_title('Parameter Estimates')
+
+            col += 1
+            if col == ncols:
+                col=0
+                row+=1
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
-            
+                        
 
     
 def ExpectationValuesQHL_TrueModel(
