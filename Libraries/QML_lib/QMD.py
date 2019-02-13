@@ -1063,8 +1063,15 @@ class QMD():
                 ]
             )
 
-    def remoteBayes(self, model_a_id, model_b_id, return_job=False, 
-        branchID=None, interbranch=False, remote=True, bayes_threshold=None
+    def remoteBayes(
+        self, 
+        model_a_id, 
+        model_b_id, 
+        return_job=False, 
+        branchID=None, 
+        interbranch=False, 
+        remote=True, 
+        bayes_threshold=None
     ):
         # only do this when both models have learned. TODO add check for this. 
         

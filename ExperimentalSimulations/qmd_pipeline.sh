@@ -114,8 +114,8 @@ qhl_operators=(
 
 sim_measurement_type='full_access' # measurement to use during simulated cases. 
 exp_measurement_type='hahn' # to use if not experimental
-exp_growth_rule='two_qubit_ising_rotation_hyperfine'
-#exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
 if (( "$exp_data" == 1))
 then

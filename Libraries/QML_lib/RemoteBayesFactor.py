@@ -281,12 +281,12 @@ def BayesFactorRemote(
                     model_a.ModelID,
                     model_b.ModelID
                 ), 
-                "\n\tID {} [len {}]: {}".format(
+                "\n\tID_A {} [len {}]: {}".format(
                     model_a.ModelID, 
                     len(update_times_model_a),
                     [np.round(val, 2) for val in update_times_model_a]
                 ),
-                "\n\tID {} [len {}]: {}".format(
+                "\n\tID_B {} [len {}]: {}".format(
                     model_b.ModelID, 
                     len(update_times_model_b),
                     [np.round(val, 2) for val in update_times_model_b]
@@ -345,32 +345,60 @@ def BayesFactorRemote(
         # log_print(["Log likelihoods computed."])
 
         bayes_factor = np.exp(log_l_a - log_l_b)
+
+        log_print(
+            [
+                "BF computed:", bayes_factor
+            ]
+        )
         if bayes_factor < 1e-160:
             bayes_factor = 1e-160
         
-        pair_id = DataBase.unique_model_pair_identifier(model_a_id, model_b_id)
+        pair_id = DataBase.unique_model_pair_identifier(
+            model_a_id, model_b_id
+        )
         print("Bayes Factor:", pair_id)
         if float(model_a_id) < float(model_b_id):
             # so that BF in db always refers to (a/b), not (b/a). 
             bayes_factors_db.set(pair_id, bayes_factor)
-            log_print(["Redis SET bayes_factors_db, pair:", pair_id,
-                "bayes:", bayes_factor]
+            log_print(
+                [
+                    "Redis SET bayes_factors_db, pair:", 
+                    pair_id,
+                    "bayes:",
+                    bayes_factor
+                ]
             )
         else:
             bayes_factors_db.set(pair_id, (1.0/bayes_factor))
-            log_print(["Redis SET bayes_factors_db, pair:", pair_id, 
-                "bayes:", (1.0/bayes_factor)]
+            log_print(
+                [
+                    "Redis SET bayes_factors_db, pair:", 
+                    pair_id, 
+                    "bayes:", 
+                    (1.0/bayes_factor)
+                ]
             )
 
         if bayes_factor > bayes_threshold: 
             bayes_factors_winners_db.set(pair_id, 'a')
-            log_print(["Redis SET bayes_factors_winners_db, pair:", 
-                pair_id, "winner:", model_a_id]
+            log_print(
+                [
+                    "Redis SET bayes_factors_winners_db, pair:", 
+                    pair_id, 
+                    "winner:", 
+                    model_a_id
+                ]
             )
         elif bayes_factor < (1.0/bayes_threshold):
             bayes_factors_winners_db.set(pair_id, 'b')
-            log_print(["Redis SET bayes_factors_winners_db, pair:", 
-                pair_id, "winner:", model_b_id]
+            log_print(
+                [
+                    "Redis SET bayes_factors_winners_db, pair:", 
+                    pair_id, 
+                    "winner:", 
+                    model_b_id
+                ]
             )
         else:
             log_print(["Neither model much better."])

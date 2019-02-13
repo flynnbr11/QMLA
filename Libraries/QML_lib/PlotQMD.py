@@ -379,7 +379,7 @@ def plotDynamicsLearnedModels(
     nrows = num_models_to_plot 
     
     fig = plt.figure(
-        figsize = (20, 12), 
+        figsize = (18, 10), 
         # constrained_layout=True,
         tight_layout=True
     )
@@ -490,6 +490,7 @@ def plotDynamicsLearnedModels(
                 bayes_factors_this_mod,
                 color = plot_colour
             )
+            ax.axhline(0, color='black')
             if row == 0:
                 ax.set_title('Bayes Factors [$log_{10}$]')
 
