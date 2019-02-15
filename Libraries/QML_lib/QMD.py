@@ -495,6 +495,8 @@ class QMD():
             '}H_{' + str(num_exp_ham) + 
             '}|\psi>_{' + str(self.NumProbes) +             
             '}PN_{' + str(self.GlobalVariables.probe_noise_level) + 
+            '}BF^{bin }_{' + str(self.GlobalVariables.bayes_time_binning) +             
+            '}BF^{all }_{' + str(self.GlobalVariables.bayes_factors_use_all_exp_times) +             
             '}$'
         )
         self.LatexConfig = latex_config
