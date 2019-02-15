@@ -356,7 +356,8 @@ def plotDynamicsLearnedModels(
     save_to_file=None
 ):
     if model_ids is None:
-        model_ids = list(sorted(set(qmd.BranchChampions.values())))
+        model_ids = list(qmd.BranchChampions.values())
+    model_ids = list(sorted(set(model_ids))) # only uniques values
     true_expec_vals = pickle.load(open(qmd.GlobalVariables.true_expec_path, 'rb'))
     times_to_plot = list(sorted(true_expec_vals.keys()))
     true_exp = [true_expec_vals[t] for t in times_to_plot]
@@ -403,10 +404,14 @@ def plotDynamicsLearnedModels(
         plot_colour = 'blue'
         name_colour = 'black'
         dynamics_label = str(mod_id)
+        try:
+            true_model_id = qmd.TrueOpModelID
+        except:
+            true_model_id = -1
         if (
             mod_id == qmd.ChampID 
             and 
-            mod_id == qmd.TrueOpModelID
+            mod_id == true_model_id
         ):
             plot_colour = 'green'
             name_colour = 'green'
@@ -417,7 +422,7 @@ def plotDynamicsLearnedModels(
             name_colour = 'orange'
             dynamics_label += ' [champ]'
             desc += str('\n[Champ]')
-        elif mod_id == qmd.TrueOpModelID:
+        elif mod_id == true_model_id:
             plot_colour = 'green'
             name_colour = 'green'
             dynamics_label += ' [true]'
@@ -471,22 +476,18 @@ def plotDynamicsLearnedModels(
         ############ --------------- ############
         if include_bayes_factors == True:
             bayes_factors_this_mod =[] 
-            bf_oppopents = []
+            bf_opponents = []
             for b in model_ids:
                 if b != mod_id:
                     if b in list(all_bayes_factors[mod_id].keys()):
-                        # bf_oppopents.append(
+                        # bf_opponents.append(
                         #     qmd.reducedModelInstanceFromID(b).LatexTerm
                         # )
-                        bayes_factors_this_mod.append(
-                            np.log10(
-                                all_bayes_factors[mod_id][b][-1]
-                            )
-                        )
-                        bf_oppopents.append(str(b))
+                        bayes_factors_this_mod.append(np.log10(all_bayes_factors[mod_id][b][-1]))
+                        bf_opponents.append(str(b))
             ax = fig.add_subplot(gs[row, col])
             ax.bar(
-                bf_oppopents, 
+                bf_opponents, 
                 bayes_factors_this_mod,
                 color = plot_colour
             )
@@ -521,7 +522,7 @@ def plotDynamicsLearnedModels(
                 label=desc
             )
             ax.legend()
-            ax.semilogy()
+            # ax.semilogy()
             ax.set_xlim(0, max_time)
 
             col += 1

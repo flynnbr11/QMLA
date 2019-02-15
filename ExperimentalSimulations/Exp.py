@@ -87,7 +87,7 @@ generated_probe_dict = UserFunctions.get_probe_dict(
     minimum_tolerable_noise = 0.0,
     # noise_level = 0.0,
     # minimum_tolerable_noise = 1e-7, # to match dec_14/09_55 run # TODO remove!!!
-    # num_probes = global_variables.num_probes
+    num_probes = global_variables.num_probes
 )
 
 probes_dir = str(
@@ -609,7 +609,12 @@ else:
     #     global_variables.plots_directory+
     #     'expec_values_'+str(global_variables.long_id)+'.png')
     # )
+    if global_variables.growth_generation_rule == 'NV_centre_experiment_debug':
+        plot_dynamics_all_models = True 
+    else:
+        plot_dynamics_all_models = False
     qmd.plotDynamics(
+        all_models = plot_dynamics_all_models, 
         save_to_file=str( 
             global_variables.plots_directory +
             'dynamics_' + 

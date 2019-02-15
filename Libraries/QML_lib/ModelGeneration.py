@@ -683,6 +683,18 @@ def hyperfine_like(
     return new_models    
         
 
+def NV_centre_experiment_debug(
+    model_list, 
+    **kwargs 
+):
+    spawn_stage = kwargs['spawn_stage']
+    spawn_stage.append('Complete')
+    return model_list
+
+
+
+
+
 def test_multidimensional(
     model_list, 
     spawn_step, 

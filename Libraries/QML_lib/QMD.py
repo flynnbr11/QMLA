@@ -597,6 +597,8 @@ class QMD():
             
         for mod in list(self.InitialModelIDs.keys()):
             mod_id = self.InitialModelIDs[mod]
+            if DataBase.alph(mod) == self.TrueOpName:
+                self.TrueOpModelID = mod_id
             print("mod id:", mod_id)
             self.ModelNameIDs[int(mod_id)] = mod
 
@@ -1301,7 +1303,9 @@ class QMD():
             b=float(b)
             pair = DataBase.unique_model_pair_identifier(a,b)
         else:
-            self.log_print(["Must pass either two model ids, or a \
+            self.log_print(
+                [
+                "Must pass either two model ids, or a \
                 pair name string, to process Bayes factors."]
             )
         try:
@@ -1330,9 +1334,20 @@ class QMD():
 
                     
         if bayes_factor > bayes_threshold: 
-            return mod_low.ModelID
+            champ =  mod_low.ModelID
         elif bayes_factor <  (1.0/bayes_threshold):
-            return mod_high.ModelID
+            champ = mod_high.ModelID
+
+        # self.log_print(
+        #     [
+        #         "Champ of pair {}: {}".format(
+        #             pair, 
+        #             champ
+        #         )
+        #     ]
+        # )
+
+        return champ
                         
 
     def runAllActiveModelsIQLE(self, num_exp):
@@ -1469,13 +1484,12 @@ class QMD():
                 mod2 = active_models_in_branch[j]
                 if mod1!=mod2:
                     res = self.processRemoteBayesPair(a=mod1, b=mod2)
-                    
                     models_points[res] += 1
                     self.log_print(
                         [
                             "[compareModelsWithinBranch {}]".format(branchID),
                             "Point to", res, 
-                            "(comparison {}/{})".format(mod1, mod2) 
+                            "(comparison {}/{})".format(mod1, mod2), 
                         ]
                     )
                     # if res == "a":
@@ -1559,7 +1573,8 @@ class QMD():
             
         self.log_print(
             [
-                "Model points for branch", branchID, 
+                "Model points for branch",
+                branchID, 
                 models_points
             ]
         )
@@ -1635,12 +1650,16 @@ class QMD():
                 if mod1 != mod2:
 
                     res = self.processRemoteBayesPair(a=mod1, b=mod2)
+                    if res == mod1:
+                        loser = mod2
+                    elif res == mod2:
+                        loser = mod1
                     models_points[res] += 1
                     self.log_print(
                         [
                             "[compareModelList]",
                             "Point to", res ,
-                            "(comparison {}/{})".format(mod1, mod2) 
+                            "(comparison {}/{})".format(mod1, mod2)
                         ]
                     )
                     # if res == "a":
@@ -3161,11 +3180,16 @@ class QMD():
 
     def plotDynamics(
         self, 
+        all_models=False, 
         model_ids=None, 
         save_to_file=None, 
     ):
+        if all_models==True:
+            model_ids = list(sorted(self.ModelNameIDs.keys()))
+
         PlotQMD.plotDynamicsLearnedModels(
             qmd = self, 
+            model_ids = model_ids, 
             save_to_file = save_to_file,
         )
         

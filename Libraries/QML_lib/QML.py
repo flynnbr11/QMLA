@@ -1212,10 +1212,12 @@ class modelClassForRemoteBayesFactor():
         
         log_identifier = str("Bayes "+str(self.ModelID)) 
                 
-        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList,
+        self.GenSimModel = gsi.GenSimQMD_IQLE(
+            oplist=self.SimOpList,
             modelparams=self.SimParams_Final, 
             true_oplist = self.TrueOpList,
-            trueparams = self.TrueParams, truename=self.TrueOpName,
+            trueparams = self.TrueParams, 
+            truename=self.TrueOpName,
             measurement_type = self.MeasurementType,
             use_experimental_data = self.UseExperimentalData,
             experimental_measurements = self.ExperimentalMeasurements,
@@ -1226,14 +1228,24 @@ class modelClassForRemoteBayesFactor():
             probe_dict=self.ProbeDict, log_file=self.log_file,
             log_identifier=log_identifier
         )    
-
-        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles,
-            self.Prior, resample_thresh=self.ResamplerThresh , 
+        self.Updater = qi.SMCUpdater(
+            self.GenSimModel, 
+            self.NumParticles,
+            self.Prior, 
+            resample_thresh=self.ResamplerThresh , 
             resampler=qi.LiuWestResampler(a=self.ResamplerA), 
             debug_resampling=False
         )
         self.Updater._normalization_record = self._normalization_record
         self.Updater.log_likelihood = self.log_likelihood
+        # print(
+        #     "Providing prior to BF model instance {}:\n{}".format(
+        #             self.ModelID, 
+        #             self.Prior
+        #         ),
+        #     "\n updater.est_mean():", self.Updater.est_mean()
+        # )
+
 
         #self.GenSimModel = pickle.loads(learned_model_info['gen_sim_model'])
         #self.Updater = pickle.loads(learned_model_info['updater'])

@@ -276,6 +276,9 @@ def BayesFactorRemote(
         update_times_model_b = sorted(update_times_model_b)
 
         with open(times_record, 'a') as write_log_file:
+            np.set_printoptions(
+                precision=2
+            )
             print(
                 "\n\nModels {}/{}".format(
                     model_a.ModelID,
@@ -348,7 +351,11 @@ def BayesFactorRemote(
 
         log_print(
             [
-                "BF computed:", bayes_factor
+                "BF computed: A:{}; B:{}; BF:{}".format(
+                        model_a_id, 
+                        model_b_id, 
+                        np.round(bayes_factor, 2)
+                    )
             ]
         )
         if bayes_factor < 1e-160:

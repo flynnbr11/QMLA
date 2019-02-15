@@ -73,6 +73,7 @@ expec_val_function_dict = {
 
 default_true_operators_by_generator = {
     'test_changes_to_qmd' : 'x',
+    'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
     'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
@@ -114,6 +115,11 @@ default_true_operators_by_generator = {
 
 qhl_models_by_generator = {
 	# for growth rules to run multiQHL test on models other than true model
+    'NV_centre_experiment_debug' : 
+    	[
+    		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' 
+		],
+
     'two_qubit_ising_rotation_hyperfine' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
@@ -136,6 +142,7 @@ qhl_models_by_generator = {
 
 max_num_parameter_estimate = {
     'test_changes_to_qmd' : 3, 
+    'NV_centre_experiment_debug' : 7 ,
     'two_qubit_ising_rotation' : 6,
     'two_qubit_ising_rotation_hyperfine' : 6, 
     'two_qubit_ising_rotation_hyperfine_transverse' : 9,
@@ -155,8 +162,6 @@ max_num_parameter_estimate = {
 	'heisenberg_xyz' : 2,
 	'hopping_topology' : 8,
 }
-
-
 
 fixed_axis_generators = [
     'non_interacting_ising_single_axis',
@@ -182,6 +187,7 @@ transverse_axis_by_generator = {
 
 max_spawn_depth_info = {
     'test_changes_to_qmd' : 1, 
+    'NV_centre_experiment_debug' : 1,
     'two_qubit_ising_rotation' : 2,
     'two_qubit_ising_rotation_hyperfine' : 5, # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
@@ -204,6 +210,7 @@ max_spawn_depth_info = {
 
 max_num_qubits_info = {
     'test_changes_to_qmd' : 2,
+    'NV_centre_experiment_debug' : 2,
     'two_qubit_ising_rotation' : 3,
     'two_qubit_ising_rotation_hyperfine' : 3, # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 3,
@@ -230,6 +237,8 @@ model_generation_functions = {
 	# growth_generation_rule : growth_function
     'test_changes_to_qmd' :
     	ModelGeneration.test_changes_to_qmd,
+    'NV_centre_experiment_debug' : 
+    	ModelGeneration.NV_centre_experiment_debug, 
     'simple_ising' : 
     	ModelGeneration.simple_ising,
     'ising_non_transverse' : 
@@ -312,6 +321,8 @@ name_branch_map_functions = {
 	# growth_generation_rule : latex_mapping_function
 	None : 
 		ModelNames.branch_is_num_dims,
+    'NV_centre_experiment_debug' : 
+    	ModelNames.branch_is_num_params,
 	'two_qubit_ising_rotation_hyperfine' : 
 		ModelNames.branch_is_num_params, 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
@@ -354,6 +365,8 @@ latex_naming_functions = {
 
 	None : 
 		ModelNames.interaction_latex_name,
+    'NV_centre_experiment_debug' : 
+    	ModelNames.latex_name_ising,
 	'two_qubit_ising_rotation_hyperfine' : 
 		ModelNames.latex_name_ising, 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 
@@ -412,6 +425,12 @@ initial_models = {
 	'test_changes_to_qmd' :
 		# ['a', 's'],
 		['x', 'y', 'z'],
+    'NV_centre_experiment_debug' : 
+    	[
+    		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+    		'xTiPPyTiPPyTyPPzTiPPzTz',
+    		'xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz',
+		],
 	'two_qubit_ising_rotation_hyperfine' :
 		['xTi', 'yTi', 'zTi'],
 		# ['yTi', 'zTi'],
@@ -471,6 +490,8 @@ experimental_probe_dict_generator = {
 	None: 
 		ProbeGeneration.NV_centre_ising_probes_plus,
 		# ProbeGeneration.separable_probe_dict,
+    'NV_centre_experiment_debug' : 
+		ProbeGeneration.NV_centre_ising_probes_plus,
 	'two_qubit_ising_rotation' : 
 		ProbeGeneration.NV_centre_ising_probes_plus,
 	'two_qubit_ising_rotation_transverse' : 

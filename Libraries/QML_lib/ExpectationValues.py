@@ -74,7 +74,6 @@ def expectation_value(
  #    	log_file=log_file,
  #    	log_identifier=log_identifier
 	# )
-    
     if compare_exp_fncs_tol is not None: # For testing custom ham-exp function
         u_psi_linalg = evolved_state(ham, t, state, 
             use_exp_custom=False, 
@@ -101,10 +100,12 @@ def expectation_value(
     else: # compute straight away; don't compare exponentiations
         if use_exp_custom and ham_exp_installed: 
             try:
-              u_psi = evolved_state(ham, t, state, use_exp_custom=True,
-                  print_exp_details=print_exp_details, 
-                  exp_fnc_cutoff=exp_fnc_cutoff
-              )
+                u_psi = evolved_state(
+                    ham, t, state, 
+                    use_exp_custom=True,
+                    print_exp_details=print_exp_details, 
+                    exp_fnc_cutoff=exp_fnc_cutoff
+                )
             except ValueError:
                 log_print(["Value error when exponentiating Hamiltonian. Ham:\n",
                     ham, "\nProbe: ", state], log_file=log_file,
