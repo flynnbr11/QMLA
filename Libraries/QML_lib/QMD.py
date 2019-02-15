@@ -323,7 +323,10 @@ class QMD():
             # to match this newly created branch with corresponding dicts filled here
             
             gen = self.GeneratorList[i]
-            self.TreesCompleted[gen] = False
+            # self.TreesCompleted[gen] = False
+            self.TreesCompleted[gen] = UserFunctions.get_tree_completed_initial_value(
+                growth_generator = gen
+            )
             self.BranchChampsByNumQubits[gen] = {}
             print("Adding branch for ", gen)
             initial_models_this_gen = self.GeneratorInitialModels[gen]
@@ -406,7 +409,11 @@ class QMD():
 
         self.NumTrees = len(self.GeneratorList) # i.e. Trees only stem from unique generators
         # print("[QMD] num trees:", self.NumTrees)
-        self.NumTreesCompleted = 0
+        self.NumTreesCompleted = np.sum(
+            list(self.TreesCompleted.values())
+        )
+        print("Num trees complete at start:", self.NumTreesCompleted)
+
 
 
 
@@ -534,7 +541,8 @@ class QMD():
             'param_max' : self.GlobalVariables.param_max, 
             'param_mean' : self.GlobalVariables.param_mean, 
             'param_sigma' : self.GlobalVariables.param_sigma,
-            'tree_identifiers' : self.TreeIdentifiers,           
+            'tree_identifiers' : self.TreeIdentifiers,     
+            'bayes_factors_time_all_exp_times' : global_variables.bayes_factors_use_all_exp_times,      
         }
         self.log_print(
             ["Initial op list:", self.InitialOpList]
@@ -2704,6 +2712,11 @@ class QMD():
                                 self.TreesCompleted
                             )
                             max_spawn_depth_reached = True
+                    else:
+                        print(
+                            "\n\n\nFinished tree for growth:", 
+                            this_branch_growth_rule
+                        )
                 # elif self.BranchComparisonsComplete[branchID]==False:
                 #     print(
                 #         "branchID:", branchID,

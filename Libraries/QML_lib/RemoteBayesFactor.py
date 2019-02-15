@@ -100,7 +100,8 @@ def BayesFactorRemote(
     use_experimental_data = info_dict['use_experimental_data']
     experimental_data_times = info_dict['experimental_measurement_times']
     binning = info_dict['bayes_factors_time_binning']
-    use_all_exp_times_for_bayes_factors = False # TODO make this a QMD input
+    # use_all_exp_times_for_bayes_factors = False # TODO make this a QMD input
+    use_all_exp_times_for_bayes_factors = info_dict['bayes_factors_time_all_exp_times'] # TODO make this a QMD input
 
 
 
@@ -173,6 +174,14 @@ def BayesFactorRemote(
             experimental_data_times = info_dict[
                 'experimental_measurement_times'
             ]
+            num_times_learned_over = max(
+                len(model_a.Times), 
+                len(model_b.Times)
+            )
+            if len(experimental_data_times) > num_times_learned_over:
+                experimental_data_times = experimental_data_times[:num_times_learned_over]
+
+
             update_times_model_a = copy.copy(
                 experimental_data_times
             )
@@ -212,65 +221,45 @@ def BayesFactorRemote(
             update_times_model_b = list(binned_times)
             set_renorm_record_to_zero = True
 
-        # elif binning==True:
-        #     import ExperimentalDataFunctions
+            if use_experimental_data is True:
+                experimental_data_times = info_dict[
+                    'experimental_measurement_times'
+                ]
 
-        #     # TODO introduce binning for simulated data. 
-        #     try:
-        #         min_time = min(min(times_a), min(times_b))
-        #         max_time = max(max(times_a), max(times_b))
-        #     except:
-        #         log_print(
-        #             [
-        #             "Can't find min/max of:", 
-        #             "\ntimes_a:", times_a, 
-        #             "\ntimes_b:", times_b,
-        #             "\n Model IDs:", model_a_id, 
-        #             ";\t", model_b_id,
-        #             "\nmoda.Times:", model_a.Times,
-        #             "\nmodb.Times:", model_b.Times,
-        #             ]
-        #         )
+                all_times_in_exp_data = np.all(
+                    [
+                        d in experimental_data_times
+                        for d in binned_times
+                    ]
+                )
+                all_avail = np.all(
+                    [
+                        d in experimental_data_times
+                        for d in binned_times
+                    ]
+                )
+                if all_avail is False:
+                    log_print(
+                        [
+                            "all NOT experimentally available."
+                        ]
+                    )
 
+                num_times_to_print = min(len(update_times_model_a), 5)
+                # log_print(
+                #     [
+                #         "Binning:", binning,
+                #         "\n\t", model_a.Name, 
+                #         "\n\tInitial \n\t", repr(model_a.Times[1:num_times_to_print]),
+                #         "\n\tUpdate (len ", len(update_times_model_a), ")", 
+                #         "\n\t", repr(update_times_model_a[1:num_times_to_print]),
+                #         "\n\t", model_b.Name, 
+                #         "\n\tInitial \n\t", repr(model_b.Times[1:num_times_to_print]), 
+                #         "\n\tUpdate (len ", len(update_times_model_b), ")", 
+                #         "\n\t", repr(update_times_model_b[1:num_times_to_print])
+                #     ]
+                # )
 
-        #     times_list = np.linspace(
-        #         min_time,
-        #         max_time, 
-        #         2*num_times_to_use # learning from scratch so need twice the number of times.
-        #     )
-
-
-        #     if use_experimental_data == True:
-
-
-        #         all_times = [
-        #             ExperimentalDataFunctions.nearestAvailableExpTime(
-        #                 times = experimental_data_times,
-        #                 t=t
-        #             ) 
-        #             for t in times_list
-        #         ]
-        #         times_a = all_times
-        #         times_b = all_times
-
-        #     else:
-        #         times_a = times_list
-        #         times_b = times_list            
-
-
-        # log_print(
-        #     [
-        #     ".After \n A:", times_a, 
-        #     "\nB:", times_b
-        #     ]
-        # )
-
-        # log_print(["Computing log likelihoods."])
-        #print("Num times to use", num_times_to_use)
-        #print("Model", model_a.ModelID, " Times:", times_a)
-        #print("Model", model_b.ModelID, " Times:", times_b)
-
-        ## shouldn't have to do this -- remove when processing func doesn't return times not available experimentally
 
         update_times_model_a = sorted(update_times_model_a)
         update_times_model_b = sorted(update_times_model_b)
@@ -297,44 +286,6 @@ def BayesFactorRemote(
                 file = write_log_file
             )
 
-        if use_experimental_data is True:
-            experimental_data_times = info_dict[
-                'experimental_measurement_times'
-            ]
-
-            all_times_in_exp_data = np.all(
-                [
-                    d in experimental_data_times
-                    for d in binned_times
-                ]
-            )
-            all_avail = np.all(
-                [
-                    d in experimental_data_times
-                    for d in binned_times
-                ]
-            )
-            if all_avail is False:
-                log_print(
-                    [
-                        "all NOT experimentally available."
-                    ]
-                )
-
-            num_times_to_print = min(len(update_times_model_a), 5)
-            # log_print(
-            #     [
-            #         "Binning:", binning,
-            #         "\n\t", model_a.Name, 
-            #         "\n\tInitial \n\t", repr(model_a.Times[1:num_times_to_print]),
-            #         "\n\tUpdate (len ", len(update_times_model_a), ")", 
-            #         "\n\t", repr(update_times_model_a[1:num_times_to_print]),
-            #         "\n\t", model_b.Name, 
-            #         "\n\tInitial \n\t", repr(model_b.Times[1:num_times_to_print]), 
-            #         "\n\tUpdate (len ", len(update_times_model_b), ")", 
-            #         "\n\t", repr(update_times_model_b[1:num_times_to_print])
-            #     ]
-            # )
         log_l_a = log_likelihood(
             model_a, 
             update_times_model_a, 

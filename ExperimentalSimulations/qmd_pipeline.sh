@@ -32,6 +32,7 @@ plots=0
 number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
+bf_all_times=1
 # dataset='NVB_dataset.p'
 dataset='NVB_rescale_dataset.p'
 
@@ -255,6 +256,7 @@ do
             -pmean=$param_mean -psigma=$param_sigma \
             -ds=$dataset -dst=$data_max_time \
             -bintimes=$bintimes \
+            -bftimesall=$bf_all_times \
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \
             -resource=$reallocate_resources \

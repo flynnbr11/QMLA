@@ -177,7 +177,8 @@ class GlobalVariablesClass():
         self.param_max = arguments.param_max
         self.param_mean = arguments.param_mean
         self.param_sigma = arguments.param_sigma
-        self.bayes_time_binning = arguments.bayes_time_binning
+        self.bayes_time_binning = bool(arguments.bayes_time_binning)
+        self.bayes_factors_use_all_exp_times = bool(arguments.bayes_factors_use_all_exp_times)
         self.num_probes = arguments.num_probes
         self.probe_noise_level = arguments.probe_noise_level
 
@@ -457,6 +458,13 @@ def parse_cmd_line_args(args):
       help='Store QMD class in pickled file at end. Large memory requirement, recommend not to.',
       type=int,
       default=default_bayes_time_binning
+    )
+
+    parser.add_argument(
+      '-bftimesall', '--bayes_factors_use_all_exp_times',
+      help='Store QMD class in pickled file at end. Large memory requirement, recommend not to.',
+      type=int,
+      default=0
     )
 
     parser.add_argument(

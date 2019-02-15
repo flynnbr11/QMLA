@@ -287,6 +287,13 @@ model_generation_functions = {
 		ModelGeneration.generate_models_hopping_topology, 
 }
 
+
+
+tree_completed_initial = {
+	'NV_centre_experiment_debug' : True, 
+	None: False
+}
+
 ##### ---------- -------------------- #####  
 # Functions to check whether the tree being learned is completed. 
 # E.g. by checking if it is at maximum depth (spawn_depth).
@@ -652,6 +659,16 @@ def get_initial_op_list(
 			log_file
 		)
 	return initial_ops
+
+def get_tree_completed_initial_value(
+	growth_generator = None, 
+):
+	try:
+		tree_completed = tree_completed_initial[growth_generator]
+	except:
+		tree_completed = tree_completed_initial[None]
+	return tree_completed
+
 
 def get_probe_dict(
 	experimental_data=False, 
