@@ -199,8 +199,6 @@ def BayesFactorRemote(
         elif (
             binning == True
         ):
-            time_list = set( model_a.Times + model_b.Times)
-
             all_times = np.concatenate(
                 [
                     model_a.Times, 
@@ -208,44 +206,68 @@ def BayesFactorRemote(
                 ]
             )
 
-            num_unique_times = len(np.unique(
-                all_times
-            ))  
+            # num_unique_times = len(np.unique(
+            #     all_times
+            # ))  
 
-            binned_times = balance_times_by_binning(
-                data = all_times, 
-                all_times_used = True, 
-                num_bins = num_unique_times
+            # binned_times = balance_times_by_binning(
+            #     data = all_times, 
+            #     all_times_used = True, 
+            #     num_bins = num_unique_times
+            # )
+            # update_times_model_a = list(binned_times)
+            # update_times_model_b = list(binned_times)
+
+
+            # reusing old method (as used in successful Dec_14/09_55 run)
+            # where times are linspaced, then mapped to experimental times
+            # use 2*num_times_to_use since renormalisation record is set to zero
+            max_time = max(all_times)
+            min_time = min(all_times)
+            linspaced_times = np.linspace(
+                min_time, 
+                max_time, 
+                2*num_times_to_use
             )
-            update_times_model_a = list(binned_times)
-            update_times_model_b = list(binned_times)
+            if use_experimental_data==True:
+                mapped_to_exp_times = [
+                    ExperimentalDataFunctions.nearestAvailableExpTime(
+                        times = experimental_data_times,
+                        t = t
+                    ) for t in linspaced_times
+                ]
+                update_times_model_a = list(sorted(mapped_to_exp_times))
+                update_times_model_b = list(sorted(mapped_to_exp_times))
+            else:
+                update_times_model_a = linspaced_times
+                update_times_model_b = linspaced_times
             set_renorm_record_to_zero = True
 
-            if use_experimental_data is True:
-                experimental_data_times = info_dict[
-                    'experimental_measurement_times'
-                ]
+            # if use_experimental_data is True:
+            #     experimental_data_times = info_dict[
+            #         'experimental_measurement_times'
+            #     ]
 
-                all_times_in_exp_data = np.all(
-                    [
-                        d in experimental_data_times
-                        for d in binned_times
-                    ]
-                )
-                all_avail = np.all(
-                    [
-                        d in experimental_data_times
-                        for d in binned_times
-                    ]
-                )
-                if all_avail is False:
-                    log_print(
-                        [
-                            "all NOT experimentally available."
-                        ]
-                    )
+            #     all_times_in_exp_data = np.all(
+            #         [
+            #             d in experimental_data_times
+            #             for d in binned_times
+            #         ]
+            #     )
+            #     all_avail = np.all(
+            #         [
+            #             d in experimental_data_times
+            #             for d in binned_times
+            #         ]
+            #     )
+            #     if all_avail is False:
+            #         log_print(
+            #             [
+            #                 "all NOT experimentally available."
+            #             ]
+            #         )
 
-                num_times_to_print = min(len(update_times_model_a), 5)
+            #     num_times_to_print = min(len(update_times_model_a), 5)
                 # log_print(
                 #     [
                 #         "Binning:", binning,
