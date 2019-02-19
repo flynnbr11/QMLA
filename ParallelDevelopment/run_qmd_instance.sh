@@ -8,48 +8,24 @@ let REDIS_PORT="6300 + $QMD_ID"
 echo "QMD ID =$QMD_ID; REDIS_PORT=$REDIS_PORT"
 echo "Global server: $GLOBAL_SERVER"
 host=$(hostname)
+running_dir=$RUNNING_DIR
+lib_dir=$LIBRARY_DIR
+script_dir=$SCRIPT_DIR
 
-if [ "$host" == "IT067176" ]
-then
-    echo "Brian's laptop identified"
-    running_dir=$(pwd)
-    lib_dir="/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib"
-    script_dir="/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations"
-    SERVER_HOST='localhost'
-        
-elif [[ "$host" == "newblue"* ]]
-then
-    echo "BC frontend identified"
-    running_dir=$(pwd)
-    lib_dir="/panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib"
-    script_dir="/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations"
-    module load tools/redis-4.0.8
-    module load mvapich/gcc/64/1.2.0-qlc
-    echo "launching redis"
-    SERVER_HOST='localhost'
+# assumed to be running on backend, where redis is loaded as below
+module load tools/redis-4.0.8
+module load languages/intel-compiler-16-u2
 
-elif [[ "$host" == "node"* ]]
-then
-    echo "BC backend identified"
-	running_dir="/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment"
-    lib_dir="/panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib"
-    script_dir="/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations"
-    module load tools/redis-4.0.8
-    module load languages/intel-compiler-16-u2
-	
-    SERVER_HOST=$(head -1 "$PBS_NODEFILE")
-	cd $lib_dir
-	redis-server RedisDatabaseConfig.conf --protected-mode no --port $REDIS_PORT & 
-	redis-cli -p $REDIS_PORT flushall
-else
-    echo "Neither local machine (Brian's university laptop) or blue crystal identified." 
-fi
+SERVER_HOST=$(head -1 "$PBS_NODEFILE")
+cd $lib_dir
+redis-server RedisDatabaseConfig.conf --protected-mode no --port $REDIS_PORT & 
+redis-cli -p $REDIS_PORT flushall
 
 cd $lib_dir
 echo "Going in to launch redis script"
 echo "If this fails -- ensure permission enabled on RedisLaunch script in library"
 
-sleep 7
+sleep 4 # this might need to be increased?
 
 set -x
 job_id=$PBS_JOBID

@@ -1,9 +1,9 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="attempt_reproduce_dec_13_low_noise_all_times_BF_no_resource_realloc"
+test_description="test_change_to_launch_script"
 
 ## Script essentials
-num_tests=20
+num_tests=1
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 multiple_qhl=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
@@ -12,8 +12,8 @@ experimental_data=1 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters
-p=2500 # particles
-e=800 # experiments
+p=1500 # particles
+e=500 # experiments
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -32,8 +32,8 @@ dataset='NVB_rescale_dataset.p'
 #dataset='NV05_dataset.p'
 sim_measurement_type='full_access'
 exp_measurement_type='hahn' # to use if not experimental
-bin_times_bayes_factors_default=0
-use_all_times_bf_default=1
+bin_times_bayes_factors_default=1 # binning here means linspacing the times of both models for BF calc
+use_all_times_bf_default=0
 
 
 data_max_time=5000 # nanoseconds
@@ -133,8 +133,15 @@ let max_id="$min_id + $num_tests - 1 "
 this_dir=$(hostname)
 day_time=$(date +%b_%d/%H_%M)
 
-script_dir="/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations"
-lib_dir="/panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib"
+running_dir="$(pwd)"
+
+qmd_dir="${running_dir%/ParallelDevelopment}" # chop off ParallelDevelopment to get qmd folder path
+lib_dir="$qmd_dir/Libraries/QML_lib"
+script_dir="$qmd_dir/ExperimentalSimulations"
+
+#script_dir="/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations"
+#lib_dir="/panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib"
+
 results_dir=$day_time
 full_path_to_results=$(pwd)/Results/$results_dir
 all_qmd_bayes_csv="$full_path_to_results/cumulative.csv"
@@ -144,7 +151,8 @@ latex_map_name='LatexMapping.txt'
 latex_mapping_file=$full_path_to_results/$latex_map_name
 resource_reallocation=0
 num_probes=20
-probe_noise_level_default=0.0000001
+#probe_noise_level_default=0.0000001
+probe_noise_level_default=0.0001
 
 OUT_LOG="$full_path_to_results/output_and_error_logs/"
 output_file="output_file"
@@ -376,7 +384,7 @@ do
 										this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
 										printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd; noise=$probe_noise_level; bintimesBF=$bin_times_bayes_factors \n" >> QMD_all_tasks.log
 
-										qsub -v QMD_ID=$qmd_id,OP="$op",QHL=$qhl,MULTIPLE_QHL=$multiple_qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,NUM_PROBES=$num_probes,SPECIAL_PROBE=$special_probe,PROBE_NOISE=$probe_noise_level,RESOURCE_REALLOCATION=$resource_reallocation,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma,BIN_TIMES_BAYES=$bin_times_bayes_factors,BF_ALL_TIMES=$use_all_times_bf -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+										qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,QMD_ID=$qmd_id,OP="$op",QHL=$qhl,MULTIPLE_QHL=$multiple_qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,MEAS=$measurement_type,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATASET=$dataset,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,NUM_PROBES=$num_probes,SPECIAL_PROBE=$special_probe,PROBE_NOISE=$probe_noise_level,RESOURCE_REALLOCATION=$resource_reallocation,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma,BIN_TIMES_BAYES=$bin_times_bayes_factors,BF_ALL_TIMES=$use_all_times_bf -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
 
 									done
 								done
