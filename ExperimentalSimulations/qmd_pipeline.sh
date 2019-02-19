@@ -141,6 +141,7 @@ declare -a qhl_operators=(
 )
 declare -a particle_counts=(
 $prt
+43
 )
 q_id=0
 """
