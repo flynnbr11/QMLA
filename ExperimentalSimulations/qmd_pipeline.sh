@@ -15,8 +15,8 @@ simulate_experiment=0
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=20
-exp=4
+prt=500
+exp=100
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -116,8 +116,8 @@ qhl_operators=(
 sim_measurement_type='full_access' # measurement to use during simulated cases. 
 exp_measurement_type='hahn' # to use if not experimental
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
-exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# exp_growth_rule='NV_centre_experiment_debug'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+exp_growth_rule='NV_centre_experiment_debug'
 
 
 if (( "$exp_data" == 1))

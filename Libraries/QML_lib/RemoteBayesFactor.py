@@ -54,6 +54,7 @@ def BayesFactorRemote(
     branchID=None, 
     interbranch=False, 
     num_times_to_use='all', 
+    bf_data_folder=None, 
     times_record='BayesFactorsTimes.txt', 
     check_db=False, 
     trueModel=None, 
@@ -103,6 +104,7 @@ def BayesFactorRemote(
     binning = info_dict['bayes_factors_time_binning']
     # use_all_exp_times_for_bayes_factors = False # TODO make this a QMD input
     use_all_exp_times_for_bayes_factors = info_dict['bayes_factors_time_all_exp_times'] # TODO make this a QMD input
+    true_mod_name = info_dict['true_name']
 
 
 
@@ -321,7 +323,36 @@ def BayesFactorRemote(
         )     
         # log_print(["Log likelihoods computed."])
 
+        # after learning, want to see what dynamics are like after further updaters
+
+
         bayes_factor = np.exp(log_l_a - log_l_b)
+
+        
+        if (
+            DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name)
+            or 
+            DataBase.alph(model_b.Name) == DataBase.alph(true_mod_name)
+        ):
+            try:
+                plot_path = str(
+                    bf_data_folder + 
+                    '/BF_{}__{}_{}.png'.format(
+                        str(qid), 
+                        str(model_a.ModelID), 
+                        str(model_b.ModelID)
+                    )
+                )
+                plot_expec_vals_of_models(
+                    model_a, 
+                    model_b, 
+                    bayes_factor = bayes_factor, 
+                    save_to_file = plot_path
+                )
+            except:
+                raise
+                # pass
+
 
         log_print(
             [
@@ -517,3 +548,72 @@ def balance_times_by_binning(
     newdata = np.array(newdata)
 
     return newdata
+
+
+
+def plot_expec_vals_of_models(
+    model_a, 
+    model_b, 
+    bayes_factor,
+    save_to_file=None
+):
+    import UserFunctions
+
+    exp_msmts = model_a.ExperimentalMeasurements
+    times = list(sorted(exp_msmts.keys()))
+    experimental_exp_vals = [
+        exp_msmts[t] for t in times
+    ]
+    plt.clf()
+    plt.scatter(
+        times, 
+        experimental_exp_vals, 
+        label='Exp data',
+        color='red',
+        alpha=0.6,
+        s=5
+    )
+    # plt.legend()
+    plot_probes = pickle.load(
+        open(model_a.PlotProbePath, 'rb')
+    )
+
+    for mod in [model_a, model_b]:
+        # TODO get final learned params, 
+        # generate hamiltonian from mod.SimOpList
+        # get exp vals against times list
+        # plot using different colour
+
+        final_params = mod.Updater.est_mean()
+        final_ham = np.tensordot(
+            final_params, 
+            mod.SimOpList, 
+            axes=1
+        )
+        dim = int(np.log2(np.shape(final_ham)[0]))
+        plot_probe = plot_probes[dim]
+
+        mod_exp_vals = []
+        for t in times:
+            # print("Getting exp for t=", t)
+            exp_val = UserFunctions.expectation_value_wrapper(
+                    method = mod.MeasurementType,
+                    ham = final_ham, 
+                    t = t, 
+                    state = plot_probe
+            )
+            mod_exp_vals.append(exp_val)
+            # mod_exp_vals.append(t)
+            # print("exp val found for t={}:{}".format(t, exp_val))
+        plt.plot(
+            times, 
+            mod_exp_vals, 
+            label=str(mod.ModelID)
+        )
+    plt.title(
+        "BF:" + str(np.round(bayes_factor, 2))
+    )
+    plt.legend()
+
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')    

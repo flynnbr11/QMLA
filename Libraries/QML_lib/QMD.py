@@ -179,16 +179,16 @@ class QMD():
             self.ResultsDirectory += '/'
         self.LatexMappingFile = self.GlobalVariables.latex_mapping_file
         
-        bayes_factors_time_dir = str(
+        self.BayesFactorsFolder = str(
             self.ResultsDirectory
             + 'BayesFactorsTimeRecords/'
         )
-        if not os.path.exists(bayes_factors_time_dir):
-            os.makedirs(bayes_factors_time_dir)
+        if not os.path.exists(self.BayesFactorsFolder):
+            os.makedirs(self.BayesFactorsFolder)
 
 
         self.BayesFactorsTimeFile = str(
-            bayes_factors_time_dir
+            self.BayesFactorsFolder
             + 'BayesFactorsPairsTimes_'
             + str(self.GlobalVariables.long_id)
             +'.txt'
@@ -506,6 +506,7 @@ class QMD():
             # may need to take copies of these in case pointers accross nodes break
             'num_probes' : self.NumProbes,
             #          'probe_dict' : self.ProbeDict, # possibly include here?
+            'plot_probe_file' : self.PlotProbeFile,
             'true_oplist' : self.TrueOpList,
             'true_params' : self.TrueParamsList,  
             'num_particles' : self.NumParticles,
@@ -1106,6 +1107,7 @@ class QMD():
                 branchID=branchID, 
                 interbranch=interbranch, 
                 times_record=self.BayesFactorsTimeFile,
+                bf_data_folder=self.BayesFactorsFolder,
                 num_times_to_use = self.NumTimesForBayesUpdates, 
                 trueModel=self.TrueOpName, 
                 bayes_threshold=bayes_threshold,
@@ -1127,6 +1129,7 @@ class QMD():
                 model_a_id=model_a_id, 
                 model_b_id=model_b_id,
                 trueModel=self.TrueOpName, 
+                bf_data_folder=self.BayesFactorsFolder,
                 times_record=self.BayesFactorsTimeFile,
                 num_times_to_use = self.NumTimesForBayesUpdates,
                 branchID=branchID,

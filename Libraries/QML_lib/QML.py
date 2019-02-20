@@ -1170,7 +1170,8 @@ class modelClassForRemoteBayesFactor():
         model_id_str = str(model_id_float)
         try:
             learned_model_info = pickle.loads(
-                learned_models_info.get(model_id_str), encoding='latin1'
+                learned_models_info.get(model_id_str), 
+                encoding='latin1'
             )        
         except:
             learned_model_info = pickle.loads(
@@ -1183,6 +1184,7 @@ class modelClassForRemoteBayesFactor():
         self.ModelID = modelID
         self.NumParticles = qmd_info['num_particles']
         self.NumProbes = qmd_info['num_probes']
+        self.PlotProbePath = qmd_info['plot_probe_file']
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.ResamplerA = qmd_info['resampler_a']
         self.PGHPrefactor = qmd_info['pgh_prefactor']
