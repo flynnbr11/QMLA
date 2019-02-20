@@ -347,6 +347,7 @@ def BayesFactorRemote(
                     model_a, 
                     model_b, 
                     bayes_factor = bayes_factor, 
+                    bf_times = update_times_model_a,
                     save_to_file = plot_path
                 )
             except:
@@ -555,6 +556,7 @@ def plot_expec_vals_of_models(
     model_a, 
     model_b, 
     bayes_factor,
+    bf_times, 
     save_to_file=None
 ):
     import UserFunctions
@@ -564,14 +566,18 @@ def plot_expec_vals_of_models(
     experimental_exp_vals = [
         exp_msmts[t] for t in times
     ]
-    plt.clf()
-    plt.scatter(
+    # plt.clf()
+    fig, ax1 = plt.subplots()
+    # ax1 = plt.plot()
+
+    ax1.set_ylabel('Exp Val')
+    ax1.plot(
         times, 
         experimental_exp_vals, 
         label='Exp data',
         color='red',
         alpha=0.6,
-        s=5
+        # s=5
     )
     # plt.legend()
     plot_probes = pickle.load(
@@ -605,15 +611,30 @@ def plot_expec_vals_of_models(
             mod_exp_vals.append(exp_val)
             # mod_exp_vals.append(t)
             # print("exp val found for t={}:{}".format(t, exp_val))
-        plt.plot(
+        ax1.plot(
             times, 
             mod_exp_vals, 
             label=str(mod.ModelID)
         )
+    ax2 = ax1.twinx()
+
+    num_times = int(len(times)) - 1 
+    ax2.hist(
+        bf_times, 
+        bins = num_times, 
+        # histtype='bar',
+        histtype='stepfilled',
+        fill=False,
+        color='black',
+        alpha=0.3
+    )
+
+    ax2.set_ylabel('Frequency of time updated')
+
     plt.title(
         "BF:" + str(np.round(bayes_factor, 2))
     )
-    plt.legend()
+    ax1.legend()
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')    
