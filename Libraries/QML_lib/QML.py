@@ -3,6 +3,7 @@ import numpy as np
 import scipy as sp
 import os 
 import time
+import copy
 import qinfer as qi
 # import Evo
 import ExpectationValues
@@ -364,6 +365,7 @@ class ModelLearningClass():
             debug_resampling=False
         )
 
+        self.InitialPrior = self.Updater.posterior_marginal()
         self.Inv_Field = [
             item[0] for item in self.GenSimModel.expparams_dtype[1:] 
         ]
@@ -474,6 +476,7 @@ class ModelLearningClass():
 #                'Getting Datum'
 #                ]
 #            )
+
 
             self.Datum = self.GenSimModel.simulate_experiment(
                 self.SimParams,
@@ -671,6 +674,11 @@ class ModelLearningClass():
         This can be used to recreate the model on another node. 
         
         """
+
+        all_post_margs = []
+        for i in range(len(self.FinalParams)):
+            all_post_margs.append(self.Updater.posterior_marginal(idx_param=i))
+
         learned_info = {}
         learned_info['times'] = self.TrackTime
         learned_info['final_params'] = self.FinalParams
@@ -680,6 +688,9 @@ class ModelLearningClass():
         learned_info['name'] = self.Name
         learned_info['model_id'] = self.ModelID
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
+        learned_info['initial_prior'] = self.InitialPrior
+
+        learned_info['posterior_marginal'] = all_post_margs
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
@@ -1209,6 +1220,8 @@ class modelClassForRemoteBayesFactor():
         self.InitialParams = learned_model_info['initial_params']
         
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
+        self.PosteriorMarginal = learned_model_info['posterior_marginal']
+        self.InitialPrior = learned_model_info['initial_prior']
         self._normalization_record = learned_model_info['normalization_record']
         self.log_likelihood = learned_model_info['log_total_likelihood']
         

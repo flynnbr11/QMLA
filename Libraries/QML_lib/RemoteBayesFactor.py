@@ -354,6 +354,60 @@ def BayesFactorRemote(
                 raise
                 # pass
 
+        if DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name):
+            print("\n\nBF UPDATE Model {}".format(model_a.Name))
+            
+            old_post_marg = model_a.PosteriorMarginal
+            new_post_marg = []
+            for i in range(len(old_post_marg)):
+                new_post_marg.append(model_a.Updater.posterior_marginal(idx_param=i))
+                # new_post_marg = model_a.Updater.posterior_marginal(1)
+            
+
+            # init_post_marg = model_a.InitialPrior
+
+            print("OLD:", old_post_marg)
+            print("NEw:", new_post_marg)
+            param_of_interest = 1
+            
+            for param_of_interest in range(len(old_post_marg)):
+                posterior_plot_path = str(
+                    bf_data_folder + 
+                    '/posterior_marginal_{}_mod{}_param{}.png'.format(
+                        str(qid), 
+                        str(model_a.ModelID), 
+                        str(param_of_interest)
+                    )
+                )
+                if  os.path.exists(posterior_plot_path):
+                    # ie a previous BF calculation has drawn these for the true model
+                    break
+                plt.clf()
+                plt.plot(
+                    new_post_marg[param_of_interest][0], 
+                    new_post_marg[param_of_interest][1],
+                    color='blue', 
+                    label='Start BF'
+
+                )
+                # plt.plot(
+                #     init_post_marg[0], 
+                #     init_post_marg[1],
+                #     color='green', 
+                #     label='Initial',
+                #     alpha=0.4,
+                # )
+                plt.plot(
+                    old_post_marg[param_of_interest][0], 
+                    old_post_marg[param_of_interest][1],
+                    color='red', 
+                    label='End QML'
+                )
+                plt.legend()
+
+                plt.savefig(posterior_plot_path)
+
+
 
         log_print(
             [
@@ -439,11 +493,14 @@ def BayesFactorRemote(
     
 def log_likelihood(model, times, binning=False):
     updater = model.Updater
+
+
     # print(
     #     "\n[log likel] Log likelihood for model", model.Name
     # )
     # sum_data = 0
     #print("log likelihood function. Model", model.ModelID, "\n Times:", times)
+
 
     if binning:
         updater._renormalization_record = []
