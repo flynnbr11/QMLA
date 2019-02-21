@@ -571,13 +571,13 @@ def plot_expec_vals_of_models(
     # ax1 = plt.plot()
 
     ax1.set_ylabel('Exp Val')
-    ax1.plot(
+    ax1.scatter(
         times, 
         experimental_exp_vals, 
         label='Exp data',
         color='red',
         alpha=0.6,
-        # s=5
+        s=5
     )
     # plt.legend()
     plot_probes = pickle.load(
@@ -626,15 +626,19 @@ def plot_expec_vals_of_models(
         histtype='stepfilled',
         fill=False,
         color='black',
+        label = str( "{} times total".format(len(bf_times))),
         alpha=0.3
     )
 
     ax2.set_ylabel('Frequency of time updated')
+    bf = np.log10(bayes_factor)
 
     plt.title(
-        "BF:" + str(np.round(bayes_factor, 2))
+        "[$log_{10}$ Bayes Factor]: " + str(np.round(bf , 2))
     )
-    ax1.legend()
+    # ax1.legend()
+    # ax2.legend()
+    plt.figlegend()
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')    
