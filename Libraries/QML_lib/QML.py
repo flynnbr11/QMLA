@@ -153,7 +153,8 @@ class ModelLearningClass():
 
 
     
-    def InitialiseNewModel(self, 
+    def InitialiseNewModel(
+        self, 
         trueoplist,
         modeltrueparams,
         simoplist, 
@@ -706,6 +707,18 @@ class ModelLearningClass():
         if self.StoreParticlesWeights or self.QHL_plots:
             learned_info ['particles'] = self.Particles
             learned_info['weights'] = self.Weights
+
+        if DataBase.alph(self.Name) == DataBase.alph(self.TrueOpName):
+            pickle.dump(
+                self.Updater, 
+                open(
+                    str(
+                        self.ResultsDirectory
+                        + '/TrueModUpdater.p'
+                    ),
+                    'wb'
+                )
+            )
 
         return learned_info
         

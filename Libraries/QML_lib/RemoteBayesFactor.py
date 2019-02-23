@@ -102,7 +102,7 @@ def BayesFactorRemote(
     use_experimental_data = info_dict['use_experimental_data']
     experimental_data_times = info_dict['experimental_measurement_times']
     binning = info_dict['bayes_factors_time_binning']
-    # use_all_exp_times_for_bayes_factors = False # TODO make this a QMD input
+    # use_all_exmodel_id_strp_times_for_bayes_factors = False # TODO make this a QMD input
     use_all_exp_times_for_bayes_factors = info_dict['bayes_factors_time_all_exp_times'] # TODO make this a QMD input
     true_mod_name = info_dict['true_name']
 
@@ -310,7 +310,80 @@ def BayesFactorRemote(
                 ),
                 file = write_log_file
             )
+        if DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name):
+            try:
+                print("\n\nBF UPDATE Model {}".format(model_a.Name))
+                
+                old_post_marg = model_a.PosteriorMarginal
+                new_post_marg = []
 
+                posterior_plot_path = str(
+                    bf_data_folder + 
+                    '/posterior_marginal_pickle_{}_{}.p'.format(
+                        str(qid), 
+                        str(model_a.ModelID), 
+                    )
+                )
+
+                pickle.dump(
+                    model_a.Updater,
+                    open(
+                        posterior_plot_path, 
+                        'wb'    
+                    )
+                )
+
+
+                for i in range(len(old_post_marg)):
+                    new_post_marg.append(model_a.Updater.posterior_marginal(idx_param=i))
+                    # new_post_marg = model_a.Updater.posterior_marginal(1)
+                
+
+                # init_post_marg = model_a.InitialPrior
+
+                # print("OLD:", old_post_marg)
+                # print("NEW:", new_post_marg)
+                param_of_interest = 1
+                
+                for param_of_interest in range(len(old_post_marg)):
+                    posterior_plot_path = str(
+                        bf_data_folder + 
+                        '/posterior_marginal_{}_mod{}_param{}.png'.format(
+                            str(qid), 
+                            str(model_a.ModelID), 
+                            str(param_of_interest)
+                        )
+                    )
+                    if  os.path.exists(posterior_plot_path):
+                        # ie a previous BF calculation has drawn these for the true model
+                        break
+                    plt.clf()
+                    plt.plot(
+                        new_post_marg[param_of_interest][0], 
+                        new_post_marg[param_of_interest][1],
+                        color='blue', 
+                        label='Start BF'
+
+                    )
+                    # plt.plot(
+                    #     init_post_marg[0], 
+                    #     init_post_marg[1],
+                    #     color='green', 
+                    #     label='Initial',
+                    #     alpha=0.4,
+                    # )
+                    plt.plot(
+                        old_post_marg[param_of_interest][0], 
+                        old_post_marg[param_of_interest][1],
+                        color='red', 
+                        label='End QML'
+                    )
+                    plt.legend()
+
+                    plt.savefig(posterior_plot_path)
+            except:
+                pass
+            
         log_l_a = log_likelihood(
             model_a, 
             update_times_model_a, 
@@ -324,11 +397,7 @@ def BayesFactorRemote(
         # log_print(["Log likelihoods computed."])
 
         # after learning, want to see what dynamics are like after further updaters
-
-
         bayes_factor = np.exp(log_l_a - log_l_b)
-
-        
         if (
             DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name)
             or 
@@ -354,58 +423,6 @@ def BayesFactorRemote(
                 raise
                 # pass
 
-        if DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name):
-            print("\n\nBF UPDATE Model {}".format(model_a.Name))
-            
-            old_post_marg = model_a.PosteriorMarginal
-            new_post_marg = []
-            for i in range(len(old_post_marg)):
-                new_post_marg.append(model_a.Updater.posterior_marginal(idx_param=i))
-                # new_post_marg = model_a.Updater.posterior_marginal(1)
-            
-
-            # init_post_marg = model_a.InitialPrior
-
-            print("OLD:", old_post_marg)
-            print("NEw:", new_post_marg)
-            param_of_interest = 1
-            
-            for param_of_interest in range(len(old_post_marg)):
-                posterior_plot_path = str(
-                    bf_data_folder + 
-                    '/posterior_marginal_{}_mod{}_param{}.png'.format(
-                        str(qid), 
-                        str(model_a.ModelID), 
-                        str(param_of_interest)
-                    )
-                )
-                if  os.path.exists(posterior_plot_path):
-                    # ie a previous BF calculation has drawn these for the true model
-                    break
-                plt.clf()
-                plt.plot(
-                    new_post_marg[param_of_interest][0], 
-                    new_post_marg[param_of_interest][1],
-                    color='blue', 
-                    label='Start BF'
-
-                )
-                # plt.plot(
-                #     init_post_marg[0], 
-                #     init_post_marg[1],
-                #     color='green', 
-                #     label='Initial',
-                #     alpha=0.4,
-                # )
-                plt.plot(
-                    old_post_marg[param_of_interest][0], 
-                    old_post_marg[param_of_interest][1],
-                    color='red', 
-                    label='End QML'
-                )
-                plt.legend()
-
-                plt.savefig(posterior_plot_path)
 
 
 
@@ -518,7 +535,7 @@ def log_likelihood(model, times, binning=False):
         #     "\n\tparams array:", params_array, 
         #     "\n\texp:", exp
         # )
-        # print("Datum")
+        # print("Getting Datum")
         datum = updater.model.simulate_experiment(
             params_array, 
             exp, 
