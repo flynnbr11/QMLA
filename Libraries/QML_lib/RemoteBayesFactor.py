@@ -339,7 +339,6 @@ def BayesFactorRemote(
                     # new_post_marg = model_a.Updater.posterior_marginal(1)
                 
 
-                # init_post_marg = model_a.InitialPrior
 
                 # print("OLD:", old_post_marg)
                 # print("NEW:", new_post_marg)
@@ -365,13 +364,14 @@ def BayesFactorRemote(
                         label='Start BF'
 
                     )
-                    # plt.plot(
-                    #     init_post_marg[0], 
-                    #     init_post_marg[1],
-                    #     color='green', 
-                    #     label='Initial',
-                    #     alpha=0.4,
-                    # )
+                    init_post_marg = model_a.InitialPrior[param_of_interest]
+                    plt.plot(
+                        init_post_marg[0], 
+                        init_post_marg[1],
+                        color='green', 
+                        label='Initial',
+                        alpha=0.4,
+                    )
                     plt.plot(
                         old_post_marg[param_of_interest][0], 
                         old_post_marg[param_of_interest][1],
@@ -382,7 +382,8 @@ def BayesFactorRemote(
 
                     plt.savefig(posterior_plot_path)
             except:
-                pass
+                raise
+                # pass
             
         log_l_a = log_likelihood(
             model_a, 

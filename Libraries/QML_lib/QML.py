@@ -366,7 +366,12 @@ class ModelLearningClass():
             debug_resampling=False
         )
 
-        self.InitialPrior = self.Updater.posterior_marginal()
+        self.InitialPrior = []
+        for i in range(len(self.SimParams[0])):
+            self.InitialPrior.append(
+                self.Updater.posterior_marginal(idx_param=i)
+            )
+
         self.Inv_Field = [
             item[0] for item in self.GenSimModel.expparams_dtype[1:] 
         ]
@@ -678,7 +683,9 @@ class ModelLearningClass():
 
         all_post_margs = []
         for i in range(len(self.FinalParams)):
-            all_post_margs.append(self.Updater.posterior_marginal(idx_param=i))
+            all_post_margs.append(
+                self.Updater.posterior_marginal(idx_param=i)
+            )
 
         learned_info = {}
         learned_info['times'] = self.TrackTime
