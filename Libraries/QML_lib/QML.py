@@ -697,6 +697,11 @@ class ModelLearningClass():
         learned_info['model_id'] = self.ModelID
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_prior'] = self.InitialPrior
+	"""
+	 1st is still the initial prior! that object does not get updated by the learning!
+		modify e.g. using the functions defined in /QML_lib/Distrib.py
+	 2nd is fine
+	"""
 
         learned_info['posterior_marginal'] = all_post_margs
         learned_info['initial_params'] = self.SimParams
@@ -1273,6 +1278,10 @@ class modelClassForRemoteBayesFactor():
         )
         self.Updater._normalization_record = self._normalization_record
         self.Updater.log_likelihood = self.log_likelihood
+	"""
+	 normalization_record and log_likelihood should be reset when the new model is created for BF calculation
+	 why are they inherited from the old ones?
+	"""
         # print(
         #     "Providing prior to BF model instance {}:\n{}".format(
         #             self.ModelID, 
