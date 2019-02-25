@@ -16,7 +16,7 @@ simulate_experiment=1
 # QHL parameters
 ### ---------------------------------------------------###
 prt=1000
-exp=100
+exp=10
 pgh=1.0
 ra=0.8
 rt=0.5
