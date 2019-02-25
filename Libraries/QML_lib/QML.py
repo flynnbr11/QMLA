@@ -1279,10 +1279,10 @@ class modelClassForRemoteBayesFactor():
 #         )
 #         self.Updater._normalization_record = self._normalization_record
 #         self.Updater.log_likelihood = self.log_likelihood
-	"""
-	 normalization_record and log_likelihood should be reset when the new model is created for BF calculation
-	 why are they inherited from the old ones?
-	"""
+        """
+         normalization_record and log_likelihood should be reset when the new model is created for BF calculation
+         why are they inherited from the old ones?
+        """
         # print(
         #     "Providing prior to BF model instance {}:\n{}".format(
         #             self.ModelID, 
