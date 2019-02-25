@@ -698,11 +698,11 @@ class ModelLearningClass():
         learned_info['updater'] = self.Updater # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_prior'] = self.InitialPrior
-	"""
-	 1st is still the initial prior! that object does not get updated by the learning!
-		modify e.g. using the functions defined in /QML_lib/Distrib.py
-	 2nd is fine
-	"""
+        """
+         1st is still the initial prior! that object does not get updated by the learning!
+        	modify e.g. using the functions defined in /QML_lib/Distrib.py
+         2nd is fine
+        """
 
         learned_info['posterior_marginal'] = all_post_margs
         learned_info['initial_params'] = self.SimParams
