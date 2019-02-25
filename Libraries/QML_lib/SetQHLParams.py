@@ -80,6 +80,14 @@ set_true_params = {
 	# 'zTi': 2.7674066823006291,
 	# 'zTz': 4.2811650247256994,
 
+	# To test posterior transmission from QML to BF, want distinct true params
+	'xTi': 5.906251, 
+	'xTx': 1.8309156, 
+	'yTi': -6.19606907, 
+	'yTy': -2.610886, 
+	'zTi': 0.25689271, 
+	'zTz': -1.48673637,
+
 	# From BC/Feb_12/18_30/results_007
 	'xTi': 0.05906251, 
 	'xTx': 0.18309156, 
@@ -87,7 +95,6 @@ set_true_params = {
 	'yTy': -0.2610886, 
 	'zTi': 0.25689271, 
 	'zTz': -0.48673637,
-
 
 
 	# From  BC /Jan_29/17_58/results_007

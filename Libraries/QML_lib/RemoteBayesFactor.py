@@ -335,7 +335,9 @@ def BayesFactorRemote(
 
 
                 for i in range(len(old_post_marg)):
-                    new_post_marg.append(model_a.Updater.posterior_marginal(idx_param=i))
+                    new_post_marg.append(
+                        model_a.Updater.posterior_marginal(idx_param=i)
+                    )
                     # new_post_marg = model_a.Updater.posterior_marginal(1)
                 
 
