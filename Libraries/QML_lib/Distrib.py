@@ -3,6 +3,9 @@ import random
 import numpy as np
 import DataBase
 
+from scipy.stats import norm
+from scipy.optimize import curve_fit
+
 def time_seconds():
     # return time in h:m:s format for logging. 
     import datetime
@@ -122,9 +125,33 @@ def get_prior(
             log_identifier = log_identifier
         )
         return dist
+
+
+def Gaussian(x, mean = 0., sigma = 1.):
+    """
+    returns a 1D Gaussian distribution from the input vector of positions x
+    """
+    return norm.pdf(x, loc = mean, scale = sigma)
+
+def get_posterior_fromMarginals(
+    all_post_marginals
+):  
+    """
+    from an input list of posterior marginals from qinfer.update.posterior_marginal
+    returns a qinfer posterior MVNormal distribution (as such it already deals with multiple parameters)
+    """
     
+    posterior_fits = []
+
+    for idx_param in range(len(all_post_marginals)):
+
+        post_marginal = all_post_marginals[idx_param]
+        p0 = [np.mean(post_marginal[0]), np.std(post_marginal[0])]
+        posterior_fits.append( curve_fit(Gaussian, post_marginal[0], post_marginal[1], p0=p0)[0]  )
+        
+    posterior = qinfer.MultivariateNormalDistribution(np.array(posterior_fits)[:,0], np.diag(np.array(posterior_fits)[:,1])**2)
     
-    
+    return posterior   
 
 
 #Function which generate a distribution of multiple uniformly [0,1] distributed values of length NumMulti
