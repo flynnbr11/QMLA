@@ -544,6 +544,11 @@ def log_likelihood(model, times, binning=False):
             exp, 
             repeat=1
         )
+        """
+        why updater.model ???
+         this is non standard, compare e.g. with QML_lib/QML.py
+         >>>> self.Datum = self.GenSimModel.simulate_experiment
+        """
         # sum_data += datum   
         # print("Upater")
         updater.update(datum, exp)

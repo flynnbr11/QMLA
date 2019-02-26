@@ -662,11 +662,9 @@ class ModelLearningClass():
 
 
     def resetPrior(self):
-        print("[QML]\n\n\n\n\IN RESET PRIOR\n\n\n")
         self.Updater.prior = self.Prior
         self.Updater = qi.SMCUpdater(self.GenSimModel,
-            self.NumParticles, self.Prior, 
-            resample_thresh=self.ResamplerThresh,
+            self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh,
             resampler = qi.LiuWestResampler(a=self.ResamplerA),
             debug_resampling=False
         )
@@ -724,15 +722,6 @@ class ModelLearningClass():
             learned_info['weights'] = self.Weights
 
         if DataBase.alph(self.Name) == DataBase.alph(self.TrueOpName):
-            print(
-                "[QML] End of learning. Model", 
-                self.ModelID, 
-                "Prior mean", self.Updater.est_mean()
-            )
-            print("Samples from prior:", 
-                self.Prior.sample(10)
-            )
-
             pickle.dump(
                 self.Updater, 
                 open(
@@ -1280,7 +1269,6 @@ class modelClassForRemoteBayesFactor():
             probe_dict=self.ProbeDict, log_file=self.log_file,
             log_identifier=log_identifier
         )    
-
 #         self.Updater = qi.SMCUpdater(
 #             self.GenSimModel, 
 #             self.NumParticles,

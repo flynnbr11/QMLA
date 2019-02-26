@@ -700,11 +700,6 @@ class ModelLearningClass():
         learned_info['updater'] = pickle.dumps(self.Updater, protocol=2) # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_prior'] = self.InitialPrior
-        """
-         1st is still the initial prior! that object does not get updated by the learning!
-        	modify e.g. using the functions defined in /QML_lib/Distrib.py
-         2nd is fine
-        """
 
         learned_info['posterior_marginal'] = all_post_margs
         learned_info['initial_params'] = self.SimParams
@@ -1280,21 +1275,25 @@ class modelClassForRemoteBayesFactor():
             probe_dict=self.ProbeDict, log_file=self.log_file,
             log_identifier=log_identifier
         )    
-
-#         self.Updater = qi.SMCUpdater(
-#             self.GenSimModel, 
-#             self.NumParticles,
-#             self.Prior, 
-#             resample_thresh=self.ResamplerThresh , 
-#             resampler=qi.LiuWestResampler(a=self.ResamplerA), 
-#             debug_resampling=False
-#         )
-#         self.Updater._normalization_record = self._normalization_record
-#         self.Updater.log_likelihood = self.log_likelihood
-        """
-         normalization_record and log_likelihood should be reset when the new model is created for BF calculation
-         why are they inherited from the old ones?
-        """
+        self.Updater = qi.SMCUpdater(
+            self.GenSimModel, 
+            self.NumParticles,
+            self.Prior, 
+            resample_thresh=self.ResamplerThresh , 
+            resampler=qi.LiuWestResampler(a=self.ResamplerA), 
+            debug_resampling=False
+        )
+        if DataBase.alph(self.Name) == DataBase.alph(self.TrueOpName):
+            print(
+                "[QML] modelForBF Model", self.ModelID, 
+                "Prior mean:", 
+                self.Updater.est_mean()
+            )
+            print("Samples from prior:", 
+                self.Prior.sample(10)
+            )
+        self.Updater._normalization_record = self._normalization_record
+        self.Updater.log_likelihood = self.log_likelihood
         # print(
         #     "Providing prior to BF model instance {}:\n{}".format(
         #             self.ModelID, 
@@ -1305,7 +1304,7 @@ class modelClassForRemoteBayesFactor():
 
 
         #self.GenSimModel = pickle.loads(learned_model_info['gen_sim_model'])
-        self.Updater = pickle.loads(learned_model_info['updater'])
+        # self.Updater = pickle.loads(learned_model_info['updater'])
         # TODO not clear which is quicker: generating new instance of classes/updater or unpickling every time.
         del qmd_info, learned_model_info
         
