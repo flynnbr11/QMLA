@@ -116,7 +116,8 @@ def NV_centre_ising_probes_plus(
                 separable_probes[i,j] = (
                     np.tensordot(
                         separable_probes[i,j-1],
-                        random_probe(1),
+                        nosiy_plus,
+                        # random_probe(1),
                         axes=0
                     ).flatten(order='c')
                 )

@@ -6,7 +6,7 @@ test_description="multiple_growth_rules_include_hubbard"
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
@@ -15,8 +15,8 @@ simulate_experiment=1
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=200
-exp=60
+prt=1000
+exp=300
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -168,8 +168,8 @@ plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 gaussian=1
 probe_noise=0.00001
-param_min=10
-param_max=20
+param_min=-4
+param_max=4
 param_mean=0.5
 param_sigma=3
 
