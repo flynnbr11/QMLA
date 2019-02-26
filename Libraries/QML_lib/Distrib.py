@@ -39,7 +39,6 @@ def get_prior(
     specific_terms = None, 
     log_file = 'qmd.log',
     log_identifier = None
-
 ):
 
     log_print(

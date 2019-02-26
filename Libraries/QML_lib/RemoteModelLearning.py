@@ -212,7 +212,18 @@ def learnModelRemote(
     if qhl_plots:
         log_print(["Drawing plots for QHL"])
 
-        with open(str(results_directory+"qml_instance.p"), "wb") as pkl_file:
+        with (
+            open(
+                str(
+                    "{}/plots/qmd_{}_qml_{}.p".format(
+                        results_directory, 
+                        qid, 
+                        modelID
+                    )
+                ),
+                "wb"
+            ) 
+        ) as pkl_file:
             pickle.dump(qml_instance, pkl_file , protocol=2)
 
         if len(true_ops) == 1:
@@ -229,7 +240,9 @@ def learnModelRemote(
                 +'qhl_distribution_progression_uniform_'+str(long_id) + '.png')
             )
 
-    updated_model_info = copy.deepcopy(qml_instance.learned_info_dict()) 
+    updated_model_info = copy.deepcopy(
+        qml_instance.learned_info_dict()
+    ) 
 
     del qml_instance
 

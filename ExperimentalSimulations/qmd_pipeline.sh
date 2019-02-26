@@ -15,8 +15,8 @@ simulate_experiment=1
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=1000
-exp=10
+prt=200
+exp=60
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -168,8 +168,8 @@ plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 gaussian=1
 probe_noise=0.00001
-param_min=0
-param_max=1
+param_min=10
+param_max=20
 param_mean=0.5
 param_sigma=3
 
@@ -195,8 +195,8 @@ elif (( "$simulate_experiment" == 1))
 then 
     special_probe='plus_random'
     special_probe_plot='plus'
-    param_min=-4
-    param_max=4
+    # param_min=-4
+    # param_max=4
     rand_true_params=0
 fi
 

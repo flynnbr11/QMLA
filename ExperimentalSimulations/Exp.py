@@ -320,7 +320,8 @@ if global_variables.further_qhl == True:
 
 
 num_ops = len(initial_op_list)
-do_qhl_plots = global_variables.qhl_test and False # TODO when to turn this on?
+# do_qhl_plots = global_variables.qhl_test and False # TODO when to turn this on?
+do_qhl_plots = True # testing posterior transition # TODO turn off usually
     
 results_directory = global_variables.results_directory
 long_id = global_variables.long_id
