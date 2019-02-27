@@ -283,6 +283,15 @@ max_num_models_by_shape['hopping_topology'] = {
 }
 
 
+##########
+# Other/Miscellaneous
+##########
+max_num_models_by_shape['PT_Effective_Hamiltonian'] = {
+    2 : 1,
+    'other' : 0
+}
+
+
 
 
 # Hamiltonian exponentiation times from testing qutips
