@@ -1315,12 +1315,12 @@ parser.add_argument(
     type=int,
     default=0
 )
-parser.add_argument(
-    '-data', '--dataset', 
-    help="Which dataset QMD was run using..",
-    type=str,
-    default='NVB_dataset'
-)
+# parser.add_argument(
+#     '-data', '--dataset', 
+#     help="Which dataset QMD was run using..",
+#     type=str,
+#     default='NVB_dataset'
+# )
 
 parser.add_argument(
     '-params', '--true_params',
@@ -1352,12 +1352,12 @@ parser.add_argument(
     default=None
 )
 
-parser.add_argument(
-  '-meas', '--measurement_type',
-  help='Which measurement type to use. Must be written in Evo.py.',
-  type=str,
-  default='full_access'
-)
+# parser.add_argument(
+#   '-meas', '--measurement_type',
+#   help='Which measurement type to use. Must be written in Evo.py.',
+#   type=str,
+#   default='full_access'
+# )
 
 parser.add_argument(
     '-latex', '--latex_mapping_file',
@@ -1391,9 +1391,12 @@ true_params_path = arguments.true_params
 exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
+dataset = UserFunctions.get_experimental_dataset(growth_generator)
 latex_mapping_file = arguments.latex_mapping_file
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
+measurement_type = UserFunctions.get_measurement_type(growth_generator)
+
 
 if true_params_path is not None:
     true_params_info = pickle.load(
@@ -1601,7 +1604,7 @@ if further_qhl_mode == False:
             plot_probe_path = plot_probe_file, 
             true_params_path = true_params_path,
             growth_generator = growth_generator, 
-            measurement_type = arguments.measurement_type, 
+            measurement_type = measurement_type, 
             save_param_values_to_file = str(plot_desc + 'clusters_by_param.png'),
             save_param_clusters_to_file = str(plot_desc + 'clusters_by_model.png'),
             save_redrawn_expectation_values = str(plot_desc + 'clusters_expec_vals.png')

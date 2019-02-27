@@ -164,8 +164,14 @@ class GlobalVariablesClass():
         # self.save_plots = bool(arguments.save_plots)
         self.cumulative_csv = arguments.cumulative_csv
         self.use_experimental_data = bool(arguments.experimental_data)
-        self.measurement_type = arguments.measurement_type
-        self.dataset = arguments.dataset
+        # self.measurement_type = arguments.measurement_type
+        self.measurement_type = UserFunctions.get_measurement_type(
+          growth_generator = self.growth_generation_rule
+        )
+        # self.dataset = arguments.dataset
+        self.dataset = UserFunctions.get_experimental_dataset(
+          growth_generator = self.growth_generation_rule
+        )
         self.data_time_offset = arguments.data_time_offset
         self.data_max_time = arguments.data_max_time 
         self.true_expec_path = arguments.true_expec_path
@@ -216,12 +222,12 @@ def parse_cmd_line_args(args):
 
     # Add parser arguments, ie command line arguments for QMD
 
-    parser.add_argument(
-      '-op', '--true_operator', 
-      help="True operator to be simulated and learned against.",
-      type=str,
-      default=default_true_operator
-    )
+    # parser.add_argument(
+    #   '-op', '--true_operator', 
+    #   help="True operator to be simulated and learned against.",
+    #   type=str,
+    #   default=default_true_operator
+    # )
 
     parser.add_argument(
       '-qhl', '--qhl_test', 
@@ -425,19 +431,19 @@ def parse_cmd_line_args(args):
       type=int,
       default=default_experimental_data
     )
-    parser.add_argument(
-      '-meas', '--measurement_type',
-      help='Which measurement type to use. Must be written in Evo.py.',
-      type=str,
-      default=default_measurement_type
-    )
+    # parser.add_argument(
+    #   '-meas', '--measurement_type',
+    #   help='Which measurement type to use. Must be written in Evo.py.',
+    #   type=str,
+    #   default=default_measurement_type
+    # )
 
-    parser.add_argument(
-      '-ds', '--dataset',
-      help='Dataset to use',
-      type=str,
-      default=default_dataset
-    )
+    # parser.add_argument(
+    #   '-ds', '--dataset',
+    #   help='Dataset to use',
+    #   type=str,
+    #   default=default_dataset
+    # )
 
     parser.add_argument(
       '-dst', '--data_max_time',
@@ -595,7 +601,9 @@ def parse_cmd_line_args(args):
         arguments,
     )
 
-    args_dict = vars(arguments)
+    # args_dict = vars(arguments)
+    args_dict = vars(global_variables)
+
     for a in list(args_dict.keys()):
       log_print(
         [

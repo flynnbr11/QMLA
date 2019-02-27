@@ -9,14 +9,14 @@ num_tests=1
 qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
-exp_data=0
-simulate_experiment=1
+exp_data=1
+simulate_experiment=0
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=1000
-exp=300
+prt=100
+exp=30
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -82,10 +82,24 @@ mkdir -p $long_dir
 # growth_rule='hubbard_chain'
 #growth_rule='hubbard_square_lattice_generalised'
 
-# growth_rule='hopping_topology'
+growth_rule='hopping_topology'
 
-growth_rule='PT_Effective_Hamiltonian'
+### Experimental growth rules 
+### which will overwrite growth_rule if exp_data==1
 
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+exp_growth_rule='NV_centre_experiment_debug'
+# exp_growth_rule='PT_Effective_Hamiltonian'
+
+if (( $exp_data == 1 ))
+then
+    echo "SETTING GROWTH RULE TO: $exp_growth_rule"
+    growth_rule=$exp_growth_rule
+
+else
+    echo "NOT RESETTING GROWTH RULE; $growth_rule"
+fi
 
 alt_growth_rules=(
    # 'heisenberg_transverse'
@@ -102,47 +116,24 @@ do
 done
 
 
-# true_operator='yTi'
-# true_operator='xTxTTiPPPiTxTTx'
-# true_operator='xTxTTiTTTiPPPPiTxTTxTTTiPPPPiTiTTxTTTx'
-# true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTi'
-# true_operator='xTxTTiTTTiTTTTiPPPPPiTxTTxTTTiTTTTiPPPPPiTiTTxTTTxTTTTiPPPPPiTiTTiTTTxTTTTx'
 true_operator='xTxTTx'
-# true_operator='xTiPPyTiPPyTy'
-# true_operator='xTyTTyTTTzTTTTiPPPPPxTyTTyTTTyTTTTyPPPPPxTyTTzTTTxTTTTiPPPPPiTyTTiTTTyTTTTy'
 
-qhl_operators=(
-    'xTx'
-    'yTy'
-)
+# if (( "$exp_data" == 1)) || (( "$simulate_experiment" == 1)) 
+# then
+#     measurement_type=$exp_measurement_type
+#     true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+#     growth_rule=$exp_growth_rule
+# elif 
+# then
+#     measurement_type=$exp_measurement_type
+#     # pgh=0.3
+#     true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+#     growth_rule=$exp_growth_rule
+# else
+#     measurement_type=$sim_measurement_type
+# fi
 
-sim_measurement_type='full_access' # measurement to use during simulated cases. 
-exp_measurement_type='hahn' # to use if not experimental
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine'
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-exp_growth_rule='NV_centre_experiment_debug'
-exp_growth_rule='PT_Effective_Hamiltonian'
 
-
-if (( "$exp_data" == 1))
-then
-    measurement_type=$exp_measurement_type
-    # pgh=0.3
-    true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-    growth_rule=$exp_growth_rule
-elif (( "$simulate_experiment" == 1)) 
-then
-    measurement_type=$exp_measurement_type
-    # pgh=0.3
-    true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-    growth_rule=$exp_growth_rule
-else
-    measurement_type=$sim_measurement_type
-fi
-
-declare -a qhl_operators=(
-    $true_operator
-)
 declare -a particle_counts=(
 $prt
 )
@@ -224,7 +215,6 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -plus=$force_plot_plus \
     -sp=$special_probe_plot \
     -ggr=$growth_rule \
-    -op=$true_operator \
     -exp=$exp_data \
     -g=$gaussian \
     -min=$param_min \
@@ -232,8 +222,7 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -mean=$param_mean \
     -sigma=$param_sigma \
     -rand_t=$rand_true_params \
-    -rand_p=$rand_prior # can make true params and prior random
-
+    -rand_p=$rand_prior \
 
 latex_mapping_filename='LatexMapping.txt'
 latex_mapping_file=$long_dir$latex_mapping_filename
@@ -250,12 +239,11 @@ do
         python3 \
             Exp.py \
             -mqhl=$multiple_qhl \
-            -op=$true_operator -p=$prt -e=$exp -bt=$bt \
+            -p=$prt -e=$exp -bt=$bt \
             -rq=$use_rq -g=$gaussian -qhl=$qhl_test \
             -ra=$ra -rt=$rt -pgh=$pgh \
             -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
-            -meas=$measurement_type \
             -exp=$exp_data -cpr=$custom_prior \
             -nprobes=$num_probes \
             -pnoise=$probe_noise \
@@ -266,7 +254,7 @@ do
             -special_probe=$special_probe \
             -pmin=$param_min -pmax=$param_max \
             -pmean=$param_mean -psigma=$param_sigma \
-            -ds=$dataset -dst=$data_max_time \
+            -dst=$data_max_time \
             -bintimes=$bintimes \
             -bftimesall=$bf_all_times \
             -dto=$data_time_offset \
@@ -300,7 +288,6 @@ python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -exp=$exp_data -true_expec=$true_expec_path \
     -ggr=$growth_rule \
     -plot_probes=$plot_probe_file \
-    -data=$dataset \
     -params=$true_params_pickle_file \
     -latex=$latex_mapping_file
 " > $analyse_script
@@ -333,13 +320,12 @@ then
             -ra=$ra -rt=$rt -pgh=1.0 \
             -dir=$long_dir -qid=\$q_id -pt=$plots -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
-            -meas=$measurement_type \
             -exp=$exp_data -cpr=$custom_prior \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
-            -ds=$dataset -dst=$data_max_time \
+            -dst=$data_max_time \
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \
             -ggr=$growth_rule \
@@ -353,11 +339,9 @@ then
         -qhl=$qhl_test \
         -fqhl=1 \
         -ggr=$growth_rule \
-        -meas=$measurement_type \
         -exp=$exp_data \
         -true_expec=$true_expec_path \
         -plot_probes=$plot_probe_file \
-        -data=$dataset \
         -params=$true_params_pickle_file \
         -latex=$latex_mapping_file
     " > $further_analyse_script

@@ -296,13 +296,31 @@ model_generation_functions = {
 		ModelGeneration.generate_models_hopping_topology, 
 }
 
-
-
 tree_completed_initial = {
     'PT_Effective_Hamiltonian' : True,
 	'NV_centre_experiment_debug' : True, 
 	None: False
 }
+
+experimental_dataset = {
+	# strings of paths relative to QMD/ExperimentalSimulations/Data/
+    'PT_Effective_Hamiltonian' : 'test_PT_data.p',
+	'NV_centre_experiment_debug' : 'NVB_rescale_dataset.p', 
+	# 'NV_centre_experiment_debug' : 'NV05_dataset.p', 
+	'two_qubit_ising_rotation_hyperfine' : 'NVB_rescale_dataset.p', 
+	'two_qubit_ising_rotation_hyperfine_transverse' : 'NVB_rescale_dataset.p', 
+	None: 'NVB_rescale_dataset.p'
+}
+
+
+measurement_type = {
+    'PT_Effective_Hamiltonian' : 'full_access',
+	'NV_centre_experiment_debug' : 'hahn', 
+	'two_qubit_ising_rotation_hyperfine' : 'hahn', 
+	'two_qubit_ising_rotation_hyperfine_transverse' : 'hahn', 
+	None: 'full_access'
+}
+
 
 ##### ---------- -------------------- #####  
 # Functions to check whether the tree being learned is completed. 
@@ -756,3 +774,19 @@ def get_probe_dict(
 	)
 	print("[getProbeDict] Probe func used:", probe_dict_function)
 	return probe_dict
+
+def get_experimental_dataset(growth_generator):
+	try:
+		ds = experimental_dataset[growth_generator]
+	except:
+		ds = experimental_dataset[None]
+	return ds
+
+def get_measurement_type(growth_generator):
+	try:
+		meas = measurement_type[growth_generator]
+	except:
+		meas = measurement_type[None]
+	return meas
+
+

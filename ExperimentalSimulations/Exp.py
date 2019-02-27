@@ -113,8 +113,18 @@ pickle.dump(
     open(training_probes_path, 'wb')
 )
 
+# dataset = UserFunctions.get_experimental_dataset(
+#     global_variables.growth_generation_rule
+# )
+
+dataset = global_variables.dataset
+
+print("[EXP] For  growth rule {}; use dataset {}".format(
+    global_variables.growth_generation_rule, dataset       
+    )
+)
 experimental_measurements_dict = pickle.load(
-    open(str('Data/'+global_variables.dataset), 'rb')
+    open(str('Data/'+dataset), 'rb')
 )
 
 num_datapoints_to_plot = 1000 # to visualise in expec_val plot for simulated data
