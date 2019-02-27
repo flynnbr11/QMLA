@@ -1490,7 +1490,7 @@ average_parameter_estimates(
 # if exp_data:
 Bayes_t_test( # average expected values
     directory_name = directory_to_analyse, 
-    dataset = arguments.dataset, 
+    dataset = dataset, 
     results_path = results_csv,
     use_experimental_data = exp_data, 
     results_file_name_start = results_file_name_start,
