@@ -249,3 +249,20 @@ def ideal_probe_dict(
             probe_dict[dict_key] = new_probe
     return probe_dict
 
+def PT_Effective_Hamiltonian_probe_dict(
+    **kwargs
+):
+    # for development
+    # TODO make this more robust
+    import pickle
+    probes = pickle.load(
+        open(
+            "/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Data/test_PT_probedict.p", 
+            'rb'
+        )
+    )
+
+    return probes
+    
+
+

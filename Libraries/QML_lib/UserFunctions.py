@@ -73,6 +73,7 @@ expec_val_function_dict = {
 
 default_true_operators_by_generator = {
     'test_changes_to_qmd' : 'x',
+    'PT_Effective_Hamiltonian' : 'zTxPPyTxPPxTiPPxTz' ,
     'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
     'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # for dev, should be 5 #TODO put back
@@ -115,6 +116,9 @@ default_true_operators_by_generator = {
 
 qhl_models_by_generator = {
 	# for growth rules to run multiQHL test on models other than true model
+    'PT_Effective_Hamiltonian' : 
+    	['zTxPPyTxPPxTiPPxTz'],
+
     'NV_centre_experiment_debug' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' 
@@ -142,6 +146,7 @@ qhl_models_by_generator = {
 
 max_num_parameter_estimate = {
     'test_changes_to_qmd' : 3, 
+    'PT_Effective_Hamiltonian' : 4,
     'NV_centre_experiment_debug' : 7 ,
     'two_qubit_ising_rotation' : 6,
     'two_qubit_ising_rotation_hyperfine' : 6, 
@@ -187,6 +192,7 @@ transverse_axis_by_generator = {
 
 max_spawn_depth_info = {
     'test_changes_to_qmd' : 1, 
+    'PT_Effective_Hamiltonian' : 1,
     'NV_centre_experiment_debug' : 1,
     'two_qubit_ising_rotation' : 2,
     'two_qubit_ising_rotation_hyperfine' : 5, # for dev, should be 5 #TODO put back
@@ -210,6 +216,7 @@ max_spawn_depth_info = {
 
 max_num_qubits_info = {
     'test_changes_to_qmd' : 2,
+    'PT_Effective_Hamiltonian' : 2 ,
     'NV_centre_experiment_debug' : 2,
     'two_qubit_ising_rotation' : 3,
     'two_qubit_ising_rotation_hyperfine' : 3, # for dev, should be 5 #TODO put back
@@ -237,6 +244,8 @@ model_generation_functions = {
 	# growth_generation_rule : growth_function
     'test_changes_to_qmd' :
     	ModelGeneration.test_changes_to_qmd,
+    'PT_Effective_Hamiltonian' : 
+    	ModelGeneration.NV_centre_experiment_debug, # ie NO spawning, just run first model
     'NV_centre_experiment_debug' : 
     	ModelGeneration.NV_centre_experiment_debug, 
     'simple_ising' : 
@@ -290,6 +299,7 @@ model_generation_functions = {
 
 
 tree_completed_initial = {
+    'PT_Effective_Hamiltonian' : True,
 	'NV_centre_experiment_debug' : True, 
 	None: False
 }
@@ -328,6 +338,8 @@ name_branch_map_functions = {
 	# growth_generation_rule : latex_mapping_function
 	None : 
 		ModelNames.branch_is_num_dims,
+    'PT_Effective_Hamiltonian' : 
+    	ModelNames.branch_is_num_dims,
     'NV_centre_experiment_debug' : 
     	ModelNames.branch_is_num_params,
 	'two_qubit_ising_rotation_hyperfine' : 
@@ -372,6 +384,8 @@ latex_naming_functions = {
 
 	None : 
 		ModelNames.interaction_latex_name,
+    'PT_Effective_Hamiltonian' : 
+    	ModelNames.latex_name_ising,
     'NV_centre_experiment_debug' : 
     	ModelNames.latex_name_ising,
 	'two_qubit_ising_rotation_hyperfine' : 
@@ -432,6 +446,11 @@ initial_models = {
 	'test_changes_to_qmd' :
 		# ['a', 's'],
 		['x', 'y', 'z'],
+    'PT_Effective_Hamiltonian' : 
+    	[
+    		'zTxPPyTxPPxTiPPxTz'
+    	],
+
     'NV_centre_experiment_debug' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
@@ -497,6 +516,8 @@ experimental_probe_dict_generator = {
 	None: 
 		ProbeGeneration.NV_centre_ising_probes_plus,
 		# ProbeGeneration.separable_probe_dict,
+    'PT_Effective_Hamiltonian' : 
+    	ProbeGeneration.PT_Effective_Hamiltonian_probe_dict,
     'NV_centre_experiment_debug' : 
 		ProbeGeneration.NV_centre_ising_probes_plus,
 	'two_qubit_ising_rotation' : 
@@ -679,7 +700,6 @@ def get_probe_dict(
 	# print("[getProbeDict] kwargs:", kwargs)
 	# print("[getProbeDict] growth_generator:", growth_generator)
 	# print("[getProbeDict] exp data:", experimental_data)
-	print("[getProbeDict] Special probe:", special_probe)
 
 	# elif ideal_probes == True:
 	# 	probe_dict_function = ProbeGeneration.ideal_probe_dict
@@ -690,6 +710,10 @@ def get_probe_dict(
 	# ):
 
 	# 	probe_dict_function = ProbeGeneration.plus_probes_dict
+
+	if special_probe == 'None':
+		special_probe = None
+	print("[getProbeDict] Special probe:", special_probe)
 
 	if special_probe is not None:
 		try:

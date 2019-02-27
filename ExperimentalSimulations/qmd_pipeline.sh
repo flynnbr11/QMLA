@@ -34,7 +34,8 @@ custom_prior=1
 bintimes=1
 bf_all_times=1
 # dataset='NVB_dataset.p'
-dataset='NVB_rescale_dataset.p'
+# dataset='NVB_rescale_dataset.p'
+dataset='test_PT_data.p'
 
 #dataset='NV05_dataset.p'
 data_max_time=5000 # nanoseconds
@@ -81,7 +82,9 @@ mkdir -p $long_dir
 # growth_rule='hubbard_chain'
 #growth_rule='hubbard_square_lattice_generalised'
 
-growth_rule='hopping_topology'
+# growth_rule='hopping_topology'
+
+growth_rule='PT_Effective_Hamiltonian'
 
 
 alt_growth_rules=(
@@ -118,6 +121,7 @@ exp_measurement_type='hahn' # to use if not experimental
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 exp_growth_rule='NV_centre_experiment_debug'
+exp_growth_rule='PT_Effective_Hamiltonian'
 
 
 if (( "$exp_data" == 1))
@@ -161,7 +165,7 @@ let bt="$exp"
 
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Launch $num_tests instances of QMD 
-num_probes=4
+num_probes=1
 prior_pickle_file="$long_dir/prior.p"
 true_params_pickle_file="$long_dir/true_params.p"
 plot_probe_file="$long_dir/plot_probes.p"
@@ -200,10 +204,18 @@ then
     rand_true_params=0
 fi
 
+if [[ "$growth_rule" == "PT_Effective_Hamiltonian" ]] 
+then
+    echo "In if statement for PT_Effective_Hamiltonian"
+    special_probe='None'
+    special_probe_plot='None'
+fi
+
 # measurement_type=$exp_measurement_type
 # special_probe='plus' #'plus' #'ideal' # TODO this is just for a test, remove!!
 
 echo "special probe $special_probe"
+echo "growth rule: $growth_rule"
 
 python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \

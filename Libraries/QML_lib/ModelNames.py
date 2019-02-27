@@ -135,7 +135,7 @@ def latex_name_ising(name):
     terms=name.split('PP')
     rotations = ['xTi', 'yTi', 'zTi']
     hartree_fock = ['xTx', 'yTy', 'zTz']
-    transverse = ['xTy', 'xTz', 'yTz']
+    transverse = ['xTy', 'xTz', 'yTz', 'yTx', 'zTx', 'zTy']
     
     
     present_r = []

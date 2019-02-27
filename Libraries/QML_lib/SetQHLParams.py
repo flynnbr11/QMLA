@@ -385,6 +385,10 @@ growth_generation_rule = arguments.growth_generation_rule
 true_operator = UserFunctions.default_true_operators_by_generator[
 	growth_generation_rule
 ]
+print(
+	"[SETQHL] true op:", 
+	true_operator
+)
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
 special_probe = arguments.special_probe
