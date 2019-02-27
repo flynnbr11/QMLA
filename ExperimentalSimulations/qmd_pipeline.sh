@@ -1,6 +1,7 @@
 #!/bin/bash
 
 test_description="multiple_growth_rules_include_hubbard"
+printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 
 ### ---------------------------------------------------###
 # Running QMD essentials
@@ -11,6 +12,7 @@ multiple_qhl=0
 do_further_qhl=0
 exp_data=1
 simulate_experiment=0
+q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
@@ -24,7 +26,6 @@ rt=0.5
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
@@ -33,11 +34,6 @@ number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
 bf_all_times=1
-# dataset='NVB_dataset.p'
-# dataset='NVB_rescale_dataset.p'
-dataset='test_PT_data.p'
-
-#dataset='NV05_dataset.p'
 data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
 
@@ -45,44 +41,49 @@ data_time_offset=205 # nanoseconds
 # Everything from here downwards uses the parameters
 # defined above to run QMD. 
 ### ---------------------------------------------------###
-let max_qmd_id="$num_tests"
-day_time=$(date +%b_%d/%H_%M)
-directory="$day_time/"
+let max_qmd_id="$num_tests + $q_id"
 
+# Files where output will be stored
 cwd=$(pwd)
+day_time=$(date +%b_%d/%H_%M)
 long_dir="$cwd/Results/$day_time/"
 bcsv="cumulative.csv"
 bayes_csv="$long_dir$bcsv"
 true_expec_filename="true_expec_vals.p"
 true_expec_path="$long_dir$true_expec_filename"
-
+prior_pickle_file="$long_dir/prior.p"
+true_params_pickle_file="$long_dir/true_params.p"
+plot_probe_file="$long_dir/plot_probes.p"
+latex_mapping_filename='LatexMapping.txt'
+latex_mapping_file=$long_dir$latex_mapping_filename
+analyse_filename='analyse.sh'
+analyse_script="$long_dir$analyse_filename"
 this_log="$long_dir/qmd.log"
 further_qhl_log="$long_dir/qhl_further.log"
 mkdir -p $long_dir
 
-# growth_rule='test_changes_to_qmd'
+# Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
-# growth_rule='two_qubit_ising_rotation_hyperfine'
-# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# growth_rule='non_interacting_ising'
-# growth_rule='non_interacting_ising_single_axis'
-# growth_rule='deterministic_noninteracting_ising_single_axis'
-# growth_rule='interacing_nn_ising_fixed_axis' 
-# growth_rule='interacting_nearest_neighbour_ising'
-# growth_rule='deterministic_interacting_nn_ising_single_axis'
-# growth_rule='deterministic_transverse_ising_nn_fixed_axis'
-# growth_rule='ising_1d_chain'
 
-# growth_rule='heisenberg_nontransverse'
-# growth_rule='heisenberg_transverse'
-# growth_rule='heisenberg_xyz'
-
-# growth_rule='hubbard'
-# growth_rule='hubbard_chain_just_hopping'
-# growth_rule='hubbard_chain'
-#growth_rule='hubbard_square_lattice_generalised'
-
-growth_rule='hopping_topology'
+# sim_growth_rule='test_changes_to_qmd'
+# sim_growth_rule='two_qubit_ising_rotation_hyperfine'
+# sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# sim_growth_rule='non_interacting_ising'
+# sim_growth_rule='non_interacting_ising_single_axis'
+# sim_growth_rule='deterministic_noninteracting_ising_single_axis'
+# sim_growth_rule='interacing_nn_ising_fixed_axis' 
+# sim_growth_rule='interacting_nearest_neighbour_ising'
+# sim_growth_rule='deterministic_interacting_nn_ising_single_axis'
+# sim_growth_rule='deterministic_transverse_ising_nn_fixed_axis'
+# sim_growth_rule='ising_1d_chain'
+# sim_growth_rule='heisenberg_nontransverse'
+# sim_growth_rule='heisenberg_transverse'
+# sim_growth_rule='heisenberg_xyz'
+# sim_growth_rule='hubbard'
+# sim_growth_rule='hubbard_chain_just_hopping'
+# sim_growth_rule='hubbard_chain'
+#sim_growth_rule='hubbard_square_lattice_generalised'
+sim_growth_rule='hopping_topology'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
@@ -92,14 +93,13 @@ growth_rule='hopping_topology'
 exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='PT_Effective_Hamiltonian'
 
-if (( $exp_data == 1 ))
+if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
 then
-    echo "SETTING GROWTH RULE TO: $exp_growth_rule"
     growth_rule=$exp_growth_rule
-
 else
-    echo "NOT RESETTING GROWTH RULE; $growth_rule"
+    growth_rule=$sim_growth_rule
 fi
+echo "SETTING GROWTH RULE TO: $growth_rule"
 
 alt_growth_rules=(
    # 'heisenberg_transverse'
@@ -115,51 +115,7 @@ do
     growth_rules_command+=" -agr $item" 
 done
 
-
-true_operator='xTxTTx'
-
-# if (( "$exp_data" == 1)) || (( "$simulate_experiment" == 1)) 
-# then
-#     measurement_type=$exp_measurement_type
-#     true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-#     growth_rule=$exp_growth_rule
-# elif 
-# then
-#     measurement_type=$exp_measurement_type
-#     # pgh=0.3
-#     true_operator='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-#     growth_rule=$exp_growth_rule
-# else
-#     measurement_type=$sim_measurement_type
-# fi
-
-
-declare -a particle_counts=(
-$prt
-)
-q_id=0
-"""
-if (($prt > 50)) || (($exp > 10)) 
-then
-    use_rq=1
-else
-    use_rq=0
-fi
-"""
-if (( $qhl_test == 1 )) # For QHL test always do without rq
-then
-    use_rq=0
-fi
-# use_rq=1
-# let bt="$exp-1"
-let bt="$exp"
-
-printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
-# Launch $num_tests instances of QMD 
 num_probes=1
-prior_pickle_file="$long_dir/prior.p"
-true_params_pickle_file="$long_dir/true_params.p"
-plot_probe_file="$long_dir/plot_probes.p"
 force_plot_plus=0
 gaussian=1
 probe_noise=0.00001
@@ -167,8 +123,9 @@ param_min=-4
 param_max=4
 param_mean=0.5
 param_sigma=3
-
 rand_true_params=0
+reallocate_resources=1
+
 # rand_prior:
 # if set to False (0), then uses any params specically 
 # set in SetQHLParams dictionaries.
@@ -178,7 +135,8 @@ rand_prior=0
 special_probe='random' #'plus' #'ideal'
 special_probe_plot='random'
 # special_probe='plus_random' #'plus' #'ideal'
-if (( "$exp_data" == 1))
+
+if (( "$exp_data" == 1)) || (( "$simulate_experiment" == 1)) 
 then
 #    special_probe='plus'
     param_min=-4
@@ -186,13 +144,6 @@ then
     rand_true_params=0
     special_probe='plus_random'
     special_probe_plot='plus'
-elif (( "$simulate_experiment" == 1)) 
-then 
-    special_probe='plus_random'
-    special_probe_plot='plus'
-    # param_min=-4
-    # param_max=4
-    rand_true_params=0
 fi
 
 if [[ "$growth_rule" == "PT_Effective_Hamiltonian" ]] 
@@ -208,6 +159,22 @@ fi
 echo "special probe $special_probe"
 echo "growth rule: $growth_rule"
 
+
+
+declare -a particle_counts=(
+$prt
+)
+
+if (( $qhl_test == 1 )) # For QHL test always do without rq
+then
+    use_rq=0
+fi
+let bt="$exp"
+
+
+# Launch $num_tests instances of QMD 
+
+# First set up parameters/data to be used by all instances of QMD for this run. 
 python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \
     -prior=$prior_pickle_file \
@@ -224,9 +191,6 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -rand_t=$rand_true_params \
     -rand_p=$rand_prior \
 
-latex_mapping_filename='LatexMapping.txt'
-latex_mapping_file=$long_dir$latex_mapping_filename
-reallocate_resources=1
 
 for prt in  "${particle_counts[@]}";
 do
@@ -275,8 +239,6 @@ echo "
 # Analyse results of QMD. (Only after QMD, not QHL).
 ##
 
-analyse_filename='analyse.sh'
-analyse_script="$long_dir$analyse_filename"
 
 # write to a script so we can recall analysis later.
 echo "
