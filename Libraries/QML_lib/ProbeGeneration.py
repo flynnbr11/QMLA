@@ -255,12 +255,20 @@ def PT_Effective_Hamiltonian_probe_dict(
     # for development
     # TODO make this more robust
     import pickle
-    probes = pickle.load(
-        open(
-            "/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Data/test_PT_probedict.p", 
-            'rb'
+    try:
+        probes = pickle.load(
+            open(
+                "/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Data/test_PT_probedict.p", 
+                'rb'
+            )
         )
-    )
+    except:
+        probes = pickle.load(
+            open(
+                "/panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations/Data/test_PT_probedict.p", 
+                'rb'
+            )
+        )
 
     return probes
     
