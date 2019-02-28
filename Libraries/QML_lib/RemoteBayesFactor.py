@@ -539,16 +539,16 @@ def log_likelihood(model, times, binning=False):
         #     "\n\texp:", exp
         # )
         # print("Getting Datum")
-        # datum = updater.model.simulate_experiment(
-        #     params_array, 
-        #     exp, 
-        #     repeat=1
-        # )
-        datum = model.GenSimModel.simulate_experiment(
+        datum = updater.model.simulate_experiment(
             params_array, 
             exp, 
             repeat=1
         )
+        # datum = model.GenSimModel.simulate_experiment(
+        #     params_array, 
+        #     exp, 
+        #     repeat=1
+        # )
         """
         why updater.model ???
          this is non standard, compare e.g. with QML_lib/QML.py

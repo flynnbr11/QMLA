@@ -532,6 +532,7 @@ class QMD():
             'gaussian' : self.gaussian,
             # 'bayes_factors_time_binning' : self.BayesTimeBinning,
             'bayes_factors_time_binning' : self.GlobalVariables.bayes_time_binning,
+            'updater_from_prior' : self.GlobalVariables.updater_from_prior,
             'q_id' : self.Q_id,
             'use_time_dep_true_params' : use_time_dep_true_model,
             'time_dep_true_params' : self.TimeDepParams,

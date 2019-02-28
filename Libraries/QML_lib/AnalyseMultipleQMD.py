@@ -1542,7 +1542,7 @@ if further_qhl_mode == False:
     plot_file = directory_to_analyse+'model_scores.png'
     model_scores, growth_rules = model_scores(directory_to_analyse)
     
-    print("GROWth RULES:", growth_rules, "\n\n\n")
+    print("GROWTH RULES:", growth_rules, "\n\n\n")
     try:
         entropy = get_entropy(model_scores, 
             growth_generator = growth_generator, 

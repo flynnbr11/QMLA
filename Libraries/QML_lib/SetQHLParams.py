@@ -302,12 +302,12 @@ parser.add_argument(
   default=0
 )
 
-parser.add_argument(
-  '-op', '--true_op', 
-  help="Operator to generate true params and prior for.",
-  type=str,
-  default='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-)
+# parser.add_argument(
+#   '-op', '--true_op', 
+#   help="Operator to generate true params and prior for.",
+#   type=str,
+#   default='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
+# )
 
 parser.add_argument(
   '-exp', '--use_experimental_data', 

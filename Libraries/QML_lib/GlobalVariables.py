@@ -187,6 +187,8 @@ class GlobalVariablesClass():
         self.bayes_factors_use_all_exp_times = bool(arguments.bayes_factors_use_all_exp_times)
         self.num_probes = arguments.num_probes
         self.probe_noise_level = arguments.probe_noise_level
+        self.updater_from_prior = bool(arguments.updater_from_prior)
+
 
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
@@ -592,6 +594,14 @@ def parse_cmd_line_args(args):
       type=float,
       default=0.03
     )
+
+    parser.add_argument(
+      '-updprior', '--updater_from_prior',
+      help='Whether or not to use the prior to generate new updater for Bayes Factor calculation',
+      type=int,
+      default=0
+    )
+
 
     # Process arguments from command line
     arguments = parser.parse_args(args)

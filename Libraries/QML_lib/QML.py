@@ -1244,6 +1244,7 @@ class modelClassForRemoteBayesFactor():
         self.UseExperimentalData = qmd_info['use_experimental_data']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
+        updater_from_prior = qmd_info['updater_from_prior']
 
         self.log_file = log_file
         self.Q_id = qid
@@ -1280,17 +1281,23 @@ class modelClassForRemoteBayesFactor():
             probe_dict=self.ProbeDict, log_file=self.log_file,
             log_identifier=log_identifier
         )    
+        print("[QML] upd from prior:", updater_from_prior)
+        if updater_from_prior == True:
+            self.Updater = qi.SMCUpdater(
+                self.GenSimModel, 
+                self.NumParticles,
+                self.Prior, 
+                resample_thresh=self.ResamplerThresh , 
+                resampler=qi.LiuWestResampler(a=self.ResamplerA), 
+                debug_resampling=False
+            )
+            self.Updater._normalization_record = self._normalization_record
+            self.Updater.log_likelihood = self.log_likelihood
+        else:
+            self.Updater = pickle.loads(
+                learned_model_info['updater']
+            )
 
-#         self.Updater = qi.SMCUpdater(
-#             self.GenSimModel, 
-#             self.NumParticles,
-#             self.Prior, 
-#             resample_thresh=self.ResamplerThresh , 
-#             resampler=qi.LiuWestResampler(a=self.ResamplerA), 
-#             debug_resampling=False
-#         )
-#         self.Updater._normalization_record = self._normalization_record
-#         self.Updater.log_likelihood = self.log_likelihood
         """
          normalization_record and log_likelihood should be reset when the new model is created for BF calculation
          why are they inherited from the old ones?
@@ -1305,7 +1312,6 @@ class modelClassForRemoteBayesFactor():
 
 
         #self.GenSimModel = pickle.loads(learned_model_info['gen_sim_model'])
-        self.Updater = pickle.loads(learned_model_info['updater'])
         # TODO not clear which is quicker: generating new instance of classes/updater or unpickling every time.
         del qmd_info, learned_model_info
         

@@ -7,7 +7,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=1
@@ -125,6 +125,7 @@ param_mean=0.5
 param_sigma=3
 rand_true_params=0
 reallocate_resources=1
+updater_from_prior=0
 
 # rand_prior:
 # if set to False (0), then uses any params specically 
@@ -224,6 +225,7 @@ do
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \
             -resource=$reallocate_resources \
+            --updater_from_prior=$updater_from_prior \
             -ggr=$growth_rule \
             $growth_rules_command 
     done
@@ -291,6 +293,7 @@ then
             -dto=$data_time_offset \
             -latex=$latex_mapping_file \
             -ggr=$growth_rule \
+            --updater_from_prior=$updater_from_prior
 
     done
 
