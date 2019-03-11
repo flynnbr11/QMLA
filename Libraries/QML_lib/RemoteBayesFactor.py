@@ -105,7 +105,7 @@ def BayesFactorRemote(
     # use_all_exmodel_id_strp_times_for_bayes_factors = False # TODO make this a QMD input
     use_all_exp_times_for_bayes_factors = info_dict['bayes_factors_time_all_exp_times'] # TODO make this a QMD input
     true_mod_name = info_dict['true_name']
-
+    save_plots_of_posteriors = True
 
 
     if check_db: # built in to only compute once and always return the stored value.
@@ -246,46 +246,6 @@ def BayesFactorRemote(
                 update_times_model_b = linspaced_times
             set_renorm_record_to_zero = True
 
-            # if use_experimental_data is True:
-            #     experimental_data_times = info_dict[
-            #         'experimental_measurement_times'
-            #     ]
-
-            #     all_times_in_exp_data = np.all(
-            #         [
-            #             d in experimental_data_times
-            #             for d in binned_times
-            #         ]
-            #     )
-            #     all_avail = np.all(
-            #         [
-            #             d in experimental_data_times
-            #             for d in binned_times
-            #         ]
-            #     )
-            #     if all_avail is False:
-            #         log_print(
-            #             [
-            #                 "all NOT experimentally available."
-            #             ]
-            #         )
-
-            #     num_times_to_print = min(len(update_times_model_a), 5)
-                # log_print(
-                #     [
-                #         "Binning:", binning,
-                #         "\n\t", model_a.Name, 
-                #         "\n\tInitial \n\t", repr(model_a.Times[1:num_times_to_print]),
-                #         "\n\tUpdate (len ", len(update_times_model_a), ")", 
-                #         "\n\t", repr(update_times_model_a[1:num_times_to_print]),
-                #         "\n\t", model_b.Name, 
-                #         "\n\tInitial \n\t", repr(model_b.Times[1:num_times_to_print]), 
-                #         "\n\tUpdate (len ", len(update_times_model_b), ")", 
-                #         "\n\t", repr(update_times_model_b[1:num_times_to_print])
-                #     ]
-                # )
-
-
         update_times_model_a = sorted(update_times_model_a)
         update_times_model_b = sorted(update_times_model_b)
 
@@ -310,7 +270,11 @@ def BayesFactorRemote(
                 ),
                 file = write_log_file
             )
-        if DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name):
+        if (
+            save_plots_of_posteriors == True
+            and
+            DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name)
+        ):
             try:
                 print("\n\nBF UPDATE Model {}".format(model_a.Name))
                 

@@ -7,7 +7,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
 exp_data=1
@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=100
-exp=30
+prt=20
+exp=10
 pgh=1.0
 ra=0.8
 rt=0.5
@@ -118,7 +118,7 @@ done
 num_probes=1
 force_plot_plus=0
 gaussian=1
-probe_noise=0.00001
+probe_noise=0.00000001
 param_min=-4
 param_max=4
 param_mean=0.5
@@ -143,7 +143,8 @@ then
     param_min=-4
     param_max=4
     rand_true_params=0
-    special_probe='plus_random'
+    # special_probe='plus_random'
+    special_probe='plus'
     special_probe_plot='plus'
 fi
 

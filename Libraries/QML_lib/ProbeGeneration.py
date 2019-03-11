@@ -203,11 +203,17 @@ def n_qubit_plus_state(num_qubits):
 
 def plus_probes_dict(
     max_num_qubits, 
+    noise_level=0.03, #from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    minimum_tolerable_noise = 1e-6,
     **kwargs
 ):
     num_probes = kwargs['num_probes']
+    if minimum_tolerable_noise  > noise_level:
+        noise_level = minimum_tolerable_noise
+        # print("using minimum_tolerable_noise")
+    print("noise level in plus probe:", noise_level)
     probe_dict = {}
-    noise_level = 0.03
+    # noise_level = 0.03
     for j in range(num_probes):
         for i in range(1,1+max_num_qubits):
             # dict key is tuple of form (0,i) for consistency with other probe dict generation functions. 

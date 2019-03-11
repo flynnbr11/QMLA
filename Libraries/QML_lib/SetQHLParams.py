@@ -136,12 +136,12 @@ def create_plot_probe(
 	# import ExpectationValues
 	import numpy as np
 	# kwargs['test_fill'] = 98
-	# print("[createPlotProbe] kwargs", kwargs)
+	print("[createPlotProbe] kwargs", kwargs)
 	# print("[createPlotProbe] exp data:", experimental_data )
 	# print("[createPlotProbe] ggr:",growth_generator )
 	
 
-	kwargs['num_probes'] = 1
+	kwargs['num_probes'] = 1 # only want a single probe for plotting purposes
 	print("\nPlot probe generated with kwargs:", kwargs, "\n")
 	plot_probe_dict = UserFunctions.get_probe_dict(
 		**kwargs
