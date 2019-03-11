@@ -377,6 +377,14 @@ parser.add_argument(
   default=0.25
 )
 
+parser.add_argument(
+  '-pnoise', '--probe_noise_level',
+  help='Noise level to add to probe for learning',
+  type=float,
+  default=0.03
+)
+
+
 arguments = parser.parse_args()
 random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
@@ -397,6 +405,7 @@ param_min = arguments.param_min
 param_max = arguments.param_max
 param_mean = arguments.param_mean
 param_sigma = arguments.param_sigma
+probe_noise_level = arguments.probe_noise_level
 
 ### Call functions to create pickle files. 
 ## TODO check if these are already present?
@@ -433,16 +442,29 @@ if (
 else:
 	force_plus = False
 
+###
+# Now generate a probe dict to be used by all instances 
+# of QMD within this run, when plotting results.
+# Store it in the provided argument, plot_probe_dict. 
+### 
 
-kwargs_for_plot_probe_creation = {
-	'true_operator' : true_operator, 
-	'growth_generator' : growth_generation_rule,
-	'experimental_data' : exp_data,
-	'special_probe' : special_probe, 
-}
-
-create_plot_probe(
-	pickle_file = plot_probe_file,
-	max_num_qubits = 10,
-	**kwargs_for_plot_probe_creation
+plot_probe_dict = UserFunctions.get_probe_dict(
+	# **kwargs
+	true_operator = true_operator, 
+	growth_generator = growth_generation_rule,
+	experimental_data = exp_data,
+	special_probe = special_probe, 
+	num_probes = 1, 
+	noise_level = probe_noise_level, 
 )
+for k in list(plot_probe_dict.keys()):
+	# replace tuple like key returned, with just dimension. 
+    plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
+
+if plot_probe_file is not None:
+	import pickle
+	pickle.dump(
+		plot_probe_dict,
+		open(plot_probe_file, 'wb') 
+	)
+

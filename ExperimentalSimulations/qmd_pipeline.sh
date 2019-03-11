@@ -118,7 +118,7 @@ done
 num_probes=1
 force_plot_plus=0
 gaussian=1
-probe_noise=0.00000001
+probe_noise=0.0001
 param_min=-4
 param_max=4
 param_mean=0.5
@@ -182,6 +182,7 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -prior=$prior_pickle_file \
     -probe=$plot_probe_file \
     -plus=$force_plot_plus \
+    -pnoise=$probe_noise \
     -sp=$special_probe_plot \
     -ggr=$growth_rule \
     -exp=$exp_data \

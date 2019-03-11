@@ -724,14 +724,14 @@ class ModelLearningClass():
             learned_info['weights'] = self.Weights
 
         if DataBase.alph(self.Name) == DataBase.alph(self.TrueOpName):
-            print(
-                "[QML] End of learning. Model", 
-                self.ModelID, 
-                "Prior mean", self.Updater.est_mean()
-            )
-            print("Samples from prior:", 
-                self.Prior.sample(10)
-            )
+            # print(
+            #     "[QML] End of learning. Model", 
+            #     self.ModelID, 
+            #     "Prior mean", self.Updater.est_mean()
+            # )
+            # print("Samples from prior:", 
+            #     self.Prior.sample(10)
+            # )
 
             pickle.dump(
                 self.Updater, 

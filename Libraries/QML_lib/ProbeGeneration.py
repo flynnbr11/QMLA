@@ -86,13 +86,18 @@ def NV_centre_ising_probes_plus(
     # minimum_tolerable_noise needed
     # or else run the risk of having 
     # exact eigenstate and no learning occurs, and crashes. 
+    # *args, 
     **kwargs    
 ):
     """
     Returns a dict of separable probes where the first qubit always acts on 
     a plus state. 
     """
-    
+    print(
+        "[NV_centre_ising_probes_plus] min tol noise:", 
+        minimum_tolerable_noise, 
+        "noise level:", noise_level
+    )
     if minimum_tolerable_noise  > noise_level:
         noise_level = minimum_tolerable_noise
         # print("using minimum_tolerable_noise")
@@ -203,11 +208,19 @@ def n_qubit_plus_state(num_qubits):
 
 def plus_probes_dict(
     max_num_qubits, 
-    noise_level=0.03, #from 1000 counts - Poissonian noise = 1/sqrt(1000)
-    minimum_tolerable_noise = 1e-6,
+    noise_level=0.0, #from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    minimum_tolerable_noise = 0,
     **kwargs
 ):
+    print("[Plus probe dict] Locals:", locals())
     num_probes = kwargs['num_probes']
+
+    print(
+        "[plus_probes_dict] min tol noise:", 
+        minimum_tolerable_noise, 
+        "noise level:", noise_level
+    )
+
     if minimum_tolerable_noise  > noise_level:
         noise_level = minimum_tolerable_noise
         # print("using minimum_tolerable_noise")
