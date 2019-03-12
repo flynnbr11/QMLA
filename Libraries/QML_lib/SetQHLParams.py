@@ -178,9 +178,12 @@ def create_qhl_params(
 	true_params_dict = {}
 
 	for term in terms:
-		try:
-			this_true_param = set_true_params[term]
-		except:
+		if random_vals == False:
+			try:
+				this_true_param = set_true_params[term]
+			except:
+				this_true_param = random.uniform( rand_min, rand_max)
+		else:
 			this_true_param = random.uniform( rand_min, rand_max)
 
 		true_params.append( this_true_param )

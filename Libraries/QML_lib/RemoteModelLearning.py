@@ -212,19 +212,19 @@ def learnModelRemote(
     if qhl_plots:
         log_print(["Drawing plots for QHL"])
 
-        with (
-            open(
-                str(
-                    "{}/plots/qmd_{}_qml_{}.p".format(
-                        results_directory, 
-                        qid, 
-                        modelID
-                    )
-                ),
-                "wb"
-            ) 
-        ) as pkl_file:
-            pickle.dump(qml_instance, pkl_file , protocol=2)
+        # with (
+        #     open(
+        #         str(
+        #             "{}/plots/qmd_{}_qml_{}.p".format(
+        #                 results_directory, 
+        #                 qid, 
+        #                 modelID
+        #             )
+        #         ),
+        #         "wb"
+        #     ) 
+        # ) as pkl_file:
+        #     pickle.dump(qml_instance, pkl_file , protocol=2)
 
         if len(true_ops) == 1:
             qml_instance.plotDistributionProgression(

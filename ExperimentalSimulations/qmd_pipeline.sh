@@ -7,7 +7,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=1
@@ -123,7 +123,7 @@ param_min=-4
 param_max=4
 param_mean=0.5
 param_sigma=3
-rand_true_params=0
+rand_true_params=1
 reallocate_resources=1
 updater_from_prior=0
 
@@ -140,9 +140,9 @@ special_probe_plot='random'
 if (( "$exp_data" == 1)) || (( "$simulate_experiment" == 1)) 
 then
 #    special_probe='plus'
-    param_min=-4
-    param_max=4
-    rand_true_params=0
+    param_min=2
+    param_max=6
+    # rand_true_params=0
     # special_probe='plus_random'
     special_probe='plus'
     special_probe_plot='plus'

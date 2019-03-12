@@ -495,7 +495,17 @@ class ModelLearningClass():
             exp_t = self.Experiment[0][0]
             before_upd = time.time()
             ## Call updater to update distribution based on datum
-            self.Updater.update(self.Datum, self.Experiment)
+            try:
+                self.Updater.update(self.Datum, self.Experiment)
+            except RuntimeError:
+                self.log_print(
+                    "RuntimeError from updater on model ID ", 
+                    self.ModelID, 
+                    ":",
+                    self.Name
+                )
+                sys.exit()
+
             after_upd = time.time()
             self.update_cumulative_time+=after_upd-before_upd
             
