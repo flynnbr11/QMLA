@@ -156,6 +156,14 @@ max_num_models_by_shape['NV_centre_experiment_debug'] = {
 }
 
 
+max_num_models_by_shape['NV_centre_experiment_debug'] = {
+    1 : 0,
+#    (2, 1) : 2,
+#    (2, 2) : 2,
+    2 : 7, # TODO generalise insurance factors, this should be 18, with a higher insurance factor since two exp per particle in hahn expec val
+    'other' : 1
+}
+
 
 
 ##########

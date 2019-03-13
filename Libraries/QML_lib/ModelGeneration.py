@@ -691,7 +691,25 @@ def NV_centre_experiment_debug(
     spawn_stage.append('Complete')
     return model_list
 
-
+def reduced_nv_experimental_method(
+    model_list, 
+    spawn_step, 
+    model_dict, 
+    log_file,
+    **kwargs
+):
+    """
+    For use only during development to minimise time taken for testing.
+    """
+    if spawn_step == 1:
+        return ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+    elif spawn_step == 2:
+        kwargs['spawn_stage'].append('Complete')
+        return [
+            'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz',
+            'xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz',
+            'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz'
+        ]
 
 
 

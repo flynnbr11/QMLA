@@ -74,6 +74,7 @@ expec_val_function_dict = {
 default_true_operators_by_generator = {
     'test_changes_to_qmd' : 'x',
     'PT_Effective_Hamiltonian' : 'zTxPPyTxPPxTiPPxTz' ,
+    'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
     'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # for dev, should be 5 #TODO put back
@@ -123,7 +124,10 @@ qhl_models_by_generator = {
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' 
 		],
-
+    'reduced_nv_experiment' : 
+    	[
+    		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' 
+		],
     'two_qubit_ising_rotation_hyperfine' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
@@ -148,6 +152,7 @@ max_num_parameter_estimate = {
     'test_changes_to_qmd' : 3, 
     'PT_Effective_Hamiltonian' : 4,
     'NV_centre_experiment_debug' : 7 ,
+    'reduced_nv_experiment' : 7,
     'two_qubit_ising_rotation' : 6,
     'two_qubit_ising_rotation_hyperfine' : 6, 
     'two_qubit_ising_rotation_hyperfine_transverse' : 9,
@@ -193,6 +198,7 @@ transverse_axis_by_generator = {
 max_spawn_depth_info = {
     'test_changes_to_qmd' : 1, 
     'PT_Effective_Hamiltonian' : 1,
+    'reduced_nv_experiment' : 3,
     'NV_centre_experiment_debug' : 1,
     'two_qubit_ising_rotation' : 2,
     'two_qubit_ising_rotation_hyperfine' : 5, # for dev, should be 5 #TODO put back
@@ -218,6 +224,7 @@ max_num_qubits_info = {
     'test_changes_to_qmd' : 2,
     'PT_Effective_Hamiltonian' : 2 ,
     'NV_centre_experiment_debug' : 2,
+    'reduced_nv_experiment' : 2,
     'two_qubit_ising_rotation' : 3,
     'two_qubit_ising_rotation_hyperfine' : 3, # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 3,
@@ -246,6 +253,8 @@ model_generation_functions = {
     	ModelGeneration.test_changes_to_qmd,
     'PT_Effective_Hamiltonian' : 
     	ModelGeneration.NV_centre_experiment_debug, # ie NO spawning, just run first model
+    'reduced_nv_experiment' : 
+    	ModelGeneration.reduced_nv_experimental_method,
     'NV_centre_experiment_debug' : 
     	ModelGeneration.NV_centre_experiment_debug, 
     'simple_ising' : 
@@ -306,6 +315,7 @@ experimental_dataset = {
 	# strings of paths relative to QMD/ExperimentalSimulations/Data/
     'PT_Effective_Hamiltonian' : 'test_PT_data.p',
 	'NV_centre_experiment_debug' : 'NVB_rescale_dataset.p', 
+    'reduced_nv_experiment' : 'NVB_rescale_dataset.p',
 	# 'NV_centre_experiment_debug' : 'NV05_dataset.p', 
 	'two_qubit_ising_rotation_hyperfine' : 'NVB_rescale_dataset.p', 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 'NVB_rescale_dataset.p', 
@@ -315,6 +325,7 @@ experimental_dataset = {
 
 measurement_type = {
     'PT_Effective_Hamiltonian' : 'full_access',
+    'reduced_nv_experiment' : 'hahn' ,
 	'NV_centre_experiment_debug' : 'hahn', 
 	'two_qubit_ising_rotation_hyperfine' : 'hahn', 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 'hahn', 
@@ -359,6 +370,8 @@ name_branch_map_functions = {
     'PT_Effective_Hamiltonian' : 
     	ModelNames.branch_is_num_dims,
     'NV_centre_experiment_debug' : 
+    	ModelNames.branch_is_num_params,
+    'reduced_nv_experiment' : 
     	ModelNames.branch_is_num_params,
 	'two_qubit_ising_rotation_hyperfine' : 
 		ModelNames.branch_is_num_params, 
@@ -405,6 +418,8 @@ latex_naming_functions = {
     'PT_Effective_Hamiltonian' : 
     	ModelNames.latex_name_ising,
     'NV_centre_experiment_debug' : 
+    	ModelNames.latex_name_ising,
+    'reduced_nv_experiment' : 
     	ModelNames.latex_name_ising,
 	'two_qubit_ising_rotation_hyperfine' : 
 		ModelNames.latex_name_ising, 
@@ -468,7 +483,12 @@ initial_models = {
     	[
     		'zTxPPyTxPPxTiPPxTz'
     	],
-
+    'reduced_nv_experiment' : 
+    	[
+    		'xTiPPxTxPPyTiPPyTyPPzTi', 
+    		'xTiPPxTxPPyTiPPzTiPPzTz',
+    		'xTiPPyTiPPyTyPPzTiPPzTz' 
+		],
     'NV_centre_experiment_debug' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
@@ -536,6 +556,8 @@ experimental_probe_dict_generator = {
 		# ProbeGeneration.separable_probe_dict,
     'PT_Effective_Hamiltonian' : 
     	ProbeGeneration.PT_Effective_Hamiltonian_probe_dict,
+    'reduced_nv_experiment' : 
+    	ProbeGeneration.NV_centre_ising_probes_plus,
     'NV_centre_experiment_debug' : 
 		ProbeGeneration.NV_centre_ising_probes_plus,
 	'two_qubit_ising_rotation' : 

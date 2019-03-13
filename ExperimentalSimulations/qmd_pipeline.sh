@@ -90,7 +90,8 @@ sim_growth_rule='hopping_topology'
 
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-exp_growth_rule='NV_centre_experiment_debug'
+# exp_growth_rule='NV_centre_experiment_debug'
+exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='PT_Effective_Hamiltonian'
 
 if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
