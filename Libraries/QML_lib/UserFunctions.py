@@ -577,7 +577,9 @@ simulated_probe_dict_generator = {
 
 special_probe_functions = {
 	None: 
-		ProbeGeneration.separable_probe_dict, 
+		ProbeGeneration.separable_probe_dict,
+	'dec_13_exp' : 
+		ProbeGeneration.restore_dec_13_probe_generation, 
 	'random': 
 		ProbeGeneration.separable_probe_dict, 
 	'plus':

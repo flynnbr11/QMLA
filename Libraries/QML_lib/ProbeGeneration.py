@@ -146,6 +146,72 @@ def NV_centre_ising_probes_plus(
                 )
     return separable_probes
     
+def restore_dec_13_probe_generation(
+    max_num_qubits=2, 
+    num_probes=40,
+    noise_level=0.03, #from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    minimum_tolerable_noise = 1e-7,
+    # minimum_tolerable_noise needed
+    # or else run the risk of having 
+    # exact eigenstate and no learning occurs, and crashes. 
+    **kwargs    
+):
+    """
+    Returns a dict of separable probes where the first qubit always acts on 
+    a plus state. 
+    """
+    print(
+        "[restore_dec_13_probe_generation] min tol noise:", 
+        minimum_tolerable_noise, 
+        "noise level:", noise_level
+    )
+
+    if minimum_tolerable_noise  > noise_level:
+        noise_level = minimum_tolerable_noise
+        # print("using minimum_tolerable_noise")
+    plus_state = np.array([1+0j, 1])/np.sqrt(2)
+    random_noise = noise_level * random_probe(1)    
+    noisy_plus = plus_state + random_noise
+
+    norm_factor = np.linalg.norm(noisy_plus)
+    noisy_plus = noisy_plus/norm_factor
+    # print("\n\t noisy plus:", noisy_plus )
+    # print("\n\t has type:", type(noisy_plus))
+    
+    separable_probes = {}
+    for i in range(num_probes):
+#        separable_probes[i,0] = plus_state
+        separable_probes[i,0] = noisy_plus
+        for j in range(1, 1+max_num_qubits):
+            if j==1:
+                separable_probes[i,j] = separable_probes[i,0]
+            else: 
+                separable_probes[i,j] = (
+                    np.tensordot(
+                        separable_probes[i,j-1],
+                        noisy_plus, 
+                        axes=0
+                    ).flatten(order='c')
+                )
+            while (
+                np.isclose(
+                    1.0, 
+                    np.linalg.norm(separable_probes[i,j]), 
+                    atol=1e-14
+                ) is  False
+            ):
+                print("non-unit norm: ", 
+                    np.linalg.norm(separable_probes[i,j])
+                )
+                # keep replacing until a unit-norm 
+                separable_probes[i,j] = (
+                    np.tensordot(
+                        separable_probes[i,j-1],
+                        random_probe(1),
+                        axes=0
+                    ).flatten(order='c')
+                )
+    return separable_probes
     
 
 
@@ -218,7 +284,8 @@ def plus_probes_dict(
     print(
         "[plus_probes_dict] min tol noise:", 
         minimum_tolerable_noise, 
-        "noise level:", noise_level
+        "noise level:", noise_level,
+        "num probes:", num_probes
     )
 
     if minimum_tolerable_noise  > noise_level:

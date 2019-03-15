@@ -116,10 +116,10 @@ do
     growth_rules_command+=" -agr $item" 
 done
 
-num_probes=1
+num_probes=10
 force_plot_plus=0
 gaussian=1
-probe_noise=0.0001
+probe_noise=0.0000001
 param_min=-4
 param_max=4
 param_mean=0.5
@@ -145,7 +145,8 @@ then
     param_max=6
     # rand_true_params=0
     # special_probe='plus_random'
-    special_probe='plus'
+    # special_probe='plus'
+    special_probe='dec_13_exp'
     special_probe_plot='plus'
 fi
 
