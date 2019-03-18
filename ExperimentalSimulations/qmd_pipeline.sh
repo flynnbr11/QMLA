@@ -7,11 +7,11 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
-exp_data=1
-simulate_experiment=0
+exp_data=0
+simulate_experiment=1
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -20,6 +20,7 @@ q_id=0 # can start from other ID if desired
 prt=20
 exp=10
 pgh=1.0
+pgh_exponent=0.8
 ra=0.8
 rt=0.5
 
@@ -124,7 +125,7 @@ param_min=-4
 param_max=4
 param_mean=0.5
 param_sigma=3
-rand_true_params=1
+rand_true_params=0
 reallocate_resources=1
 updater_from_prior=0
 
@@ -211,6 +212,7 @@ do
             -p=$prt -e=$exp -bt=$bt \
             -rq=$use_rq -g=$gaussian -qhl=$qhl_test \
             -ra=$ra -rt=$rt -pgh=$pgh \
+            -pgh_exp=$pgh_exponent \
             -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
             -exp=$exp_data -cpr=$custom_prior \

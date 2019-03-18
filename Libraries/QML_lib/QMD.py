@@ -170,6 +170,7 @@ class QMD():
         self.ResampleThreshold = self.GlobalVariables.resample_threshold
         self.ResamplerA = self.GlobalVariables.resample_a
         self.PGHPrefactor = self.GlobalVariables.pgh_factor
+        self.PGHExponent = self.GlobalVariables.pgh_exponent
         self.QHLmode = self.GlobalVariables.qhl_test
         # self.BayesTimeBinning = self.GlobalVariables.bayes_time_binning 
         self.StoreParticlesWeights = store_particles_weights
@@ -514,6 +515,7 @@ class QMD():
             'resampler_thresh' : self.ResampleThreshold,
             'resampler_a' : self.ResamplerA,
             'pgh_prefactor' : self.PGHPrefactor,
+            'pgh_exponent' : self.PGHExponent, 
             'store_particles_weights' : self.StoreParticlesWeights,
             'growth_generator' : self.GrowthGenerator, 
             'qhl_plots' : self.QHL_plots, 

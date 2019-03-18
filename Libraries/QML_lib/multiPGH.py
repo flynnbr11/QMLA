@@ -3,6 +3,9 @@ import numpy as np
 import scipy as sp
 
 from Evo import *
+from inspect import currentframe, getframeinfo
+
+frameinfo = getframeinfo(currentframe())
 
 def singvalnorm(matrix):
     return np.real(max(np.sqrt(np.linalg.eig(np.dot(
@@ -17,10 +20,16 @@ def identity(arg): return arg
 
 class multiPGH(qi.Heuristic):
     
-    def __init__(self, updater, oplist=None, norm='Frobenius', 
-        inv_field='x_', t_field='t',
+    def __init__(
+        self, 
+        updater, 
+        oplist=None, 
+        norm='Frobenius', 
+        inv_field='x_', 
+        t_field='t',
         inv_func=identity,
         t_func=identity,
+        pgh_exponent=1,
         maxiters=10,
         other_fields=None
      ):
@@ -33,7 +42,9 @@ class multiPGH(qi.Heuristic):
         self._t_func = t_func
         self._maxiters = maxiters
         self._other_fields = other_fields if other_fields is not None else {}
-        
+        self._pgh_exponent = pgh_exponent
+        print("[multipgh] PGH exponent ", self._pgh_exponent)
+
     def __call__(self):
         idx_iter = 0
         while idx_iter < self._maxiters:
@@ -45,7 +56,8 @@ class multiPGH(qi.Heuristic):
                 idx_iter += 1
                 
         if self._updater.model.distance(x, xp) == 0:
-            raise RuntimeError("PGH did not find distinct particles in \
+            raise RuntimeError(
+                "PGH did not find distinct particles in \
                 {} iterations.".format(self._maxiters)
             )
             
@@ -55,27 +67,42 @@ class multiPGH(qi.Heuristic):
             (1,),
             dtype=self._updater.model.expparams_dtype
         )
+        # print (frameinfo.filename, frameinfo.lineno)
         
         idx_iter = 0 # modified in order to cycle through particle parameters with different names
         for field_i in self._x_:
             eps[field_i] = self._inv_func(x)[0][idx_iter]
             idx_iter += 1
         if self._oplist is None:   #Standard QInfer geom distance
-            eps[self._t]  = self._t_func(1 / self._updater.model.distance(x, xp))
+            sigma = self._updater.model.distance(x, xp)
+            # print("sigma = ", sigma)
+            eps[self._t]  = self._t_func(
+                1 / sigma**self._pgh_exponent
+            )
+
         else:
             deltaH = getH(x, self._oplist)-getH(xp, self._oplist)
             if self._norm=='Frobenius':
+                print (frameinfo.filename, frameinfo.lineno)
                 eps[self._t] = 1/np.linalg.norm(deltaH)   #Frobenius norm
             elif self._norm=='MinSingVal':
+                print (frameinfo.filename, frameinfo.lineno)
                 eps[self._t] = 1/minsingvalnorm(deltaH)   #Min SingVal norm
             elif self._norm=='SingVal':
+                print (frameinfo.filename, frameinfo.lineno)
                 eps[self._t] = 1/singvalnorm(deltaH)   #Max SingVal
             else:
+                print (frameinfo.filename, frameinfo.lineno)
                 eps[self._t] = 1/np.linalg.norm(deltaH)
                 raise RuntimeError("Unknown Norm: using Frobenius norm instead")
         for field, value in self._other_fields.items():
-            eps[field] = value
-        
+            eps[field] = value**self._pgh_exponent
+        # print(
+        #     "[multipgh] returning [shape ", 
+        #     np.shape(eps), 
+        #     "] eps: ", 
+        #     repr(eps)
+        # )
         return eps
         
         

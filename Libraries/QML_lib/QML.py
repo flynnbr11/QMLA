@@ -219,6 +219,7 @@ class ModelLearningClass():
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.ResamplerA = qmd_info['resampler_a']
         self.PGHPrefactor = qmd_info['pgh_prefactor']
+        self.PGHExponent = qmd_info['pgh_exponent']
         self.StoreParticlesWeights = qmd_info['store_particles_weights']
         self.QHL_plots = qmd_info['qhl_plots']
         self.ResultsDirectory = qmd_info['results_directory']
@@ -377,7 +378,8 @@ class ModelLearningClass():
         ]
         self.Heuristic = mpgh.multiPGH(
             self.Updater, 
-            inv_field=self.Inv_Field
+            inv_field=self.Inv_Field, 
+            pgh_exponent = self.PGHExponent
         )
         
         # if checkloss == True or self.checkQLoss==True:     
@@ -453,6 +455,7 @@ class ModelLearningClass():
                     ]
                 )
 
+            # print("[QML] Calling heuristic")
             self.Experiment =  self.Heuristic()
             print_loc(global_print_loc)
             self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor

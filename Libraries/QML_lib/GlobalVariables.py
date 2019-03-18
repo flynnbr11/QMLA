@@ -152,6 +152,7 @@ class GlobalVariablesClass():
         self.resample_threshold = arguments.resample_threshold
         self.resample_a = arguments.resample_a
         self.pgh_factor = arguments.pgh_factor
+        self.pgh_exponent = arguments.pgh_exponent
         self.pickle_qmd_class = bool(arguments.pickle_qmd_class)
         self.qmd_id = arguments.qmd_id
         self.host_name = arguments.host_name
@@ -371,6 +372,12 @@ def parse_cmd_line_args(args):
       default=default_pgh_factor
     )
 
+    parser.add_argument(
+      '-pgh_exp', '--pgh_exponent',
+      help='for use in time heuristic according to 1/sigma**exponent',
+      type=float,
+      default=1.0
+    )
 
     ## Redis environment
     parser.add_argument(
