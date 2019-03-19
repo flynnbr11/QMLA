@@ -206,7 +206,7 @@ def evolved_state(
             )
         try:
             import qutip
-            unitary = linalg.expm(-1j*ham*t)
+            # unitary = linalg.expm(-1j*ham*t)
         
 
             # unitary = h.exp_ham(
@@ -216,7 +216,7 @@ def evolved_state(
             #     print_method=print_exp_details, scalar_cutoff=t+1
             # )
 
-            # unitary = qutip.Qobj(-1j*ham*t).expm().full()
+            unitary = qutip.Qobj(-1j*ham*t).expm().full()
         except:
             unitary = h.exp_ham(
                 ham, t, 

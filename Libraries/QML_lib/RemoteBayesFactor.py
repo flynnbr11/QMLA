@@ -249,6 +249,43 @@ def BayesFactorRemote(
         update_times_model_a = sorted(update_times_model_a)
         update_times_model_b = sorted(update_times_model_b)
 
+        recreate_dec_13_times_list_method = True
+        if recreate_dec_13_times_list_method == True:
+            try:
+                min_time = min(min(model_a.Times), min(model_b.Times))
+                max_time = max(max(model_a.Times), max(model_b.Times))
+            except:
+                log_print(
+                    [
+                    "Can't find min/max of:", 
+                    "\ntimes_a:", times_a, 
+                    "\ntimes_b:", times_b,
+                    "\n Model IDs:", model_a_id, 
+                    ";\t", model_b_id,
+                    "\nmoda.Times:", model_a.Times,
+                    "\nmodb.Times:", model_b.Times,
+                    ]
+                )
+                raise
+
+
+            times_list = np.linspace(
+                min_time,
+                max_time, 
+                2*num_times_to_use # learning from scratch so need twice the number of times.
+            )
+
+            all_times = [
+                ExperimentalDataFunctions.nearestAvailableExpTime(
+                    times = experimental_data_times,
+                    t=t
+                ) 
+                for t in times_list
+            ]
+            update_times_model_a = sorted(all_times)
+            update_times_model_b = sorted(all_times)
+
+
         with open(times_record, 'a') as write_log_file:
             np.set_printoptions(
                 precision=2

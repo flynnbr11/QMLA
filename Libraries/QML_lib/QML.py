@@ -502,10 +502,12 @@ class ModelLearningClass():
                 self.Updater.update(self.Datum, self.Experiment)
             except RuntimeError:
                 self.log_print(
-                    "RuntimeError from updater on model ID ", 
-                    self.ModelID, 
-                    ":",
-                    self.Name
+                    [
+                        "RuntimeError from updater on model ID ", 
+                        self.ModelID, 
+                        ":",
+                        self.Name
+                    ]
                 )
                 sys.exit()
 
