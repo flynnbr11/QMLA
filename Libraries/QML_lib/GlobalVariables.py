@@ -147,6 +147,7 @@ class GlobalVariablesClass():
         self.bayes_lower = arguments.bayes_lower
         self.bayes_upper = arguments.bayes_upper
         self.save_plots = bool(arguments.save_plots)
+        self.store_particles_weights = bool(arguments.store_particles_weights)
         self.gaussian = bool(arguments.gaussian)
         self.custom_prior = bool(arguments.custom_prior)
         self.resample_threshold = arguments.resample_threshold
@@ -351,6 +352,15 @@ def parse_cmd_line_args(args):
       type=int,
       default=default_save_plots
     )
+
+
+    parser.add_argument(
+      '-prtwt', '--store_particles_weights',
+      help='True: Store all particles and weights from learning.',
+      type=int,
+      default=0
+    )
+
 
     ## QInfer parameters, i.e. resampling a and resamping threshold, pgh prefactor.
     parser.add_argument(

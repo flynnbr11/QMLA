@@ -695,7 +695,6 @@ class ModelLearningClass():
         """
         Place essential information after learning has occured into a dict. 
         This can be used to recreate the model on another node. 
-        
         """
 
         all_post_margs = []
@@ -734,31 +733,42 @@ class ModelLearningClass():
         learned_info['num_particles'] = self.NumParticles
         learned_info['num_experiments'] = self.NumExperiments
         learned_info['growth_generator'] = self.GrowthGenerator
-        if self.StoreParticlesWeights or self.QHL_plots:
+        if self.StoreParticlesWeights:
+            self.log_print(
+                [
+                    "Storing particles and weights for model", 
+                    self.ModelID
+                ]
+            )
             learned_info ['particles'] = self.Particles
             learned_info['weights'] = self.Weights
 
-        if DataBase.alph(self.Name) == DataBase.alph(self.TrueOpName):
-            # print(
-            #     "[QML] End of learning. Model", 
-            #     self.ModelID, 
-            #     "Prior mean", self.Updater.est_mean()
-            # )
-            # print("Samples from prior:", 
-            #     self.Prior.sample(10)
-            # )
+        # if DataBase.alph(self.Name) == DataBase.alph(self.TrueOpName):
+        #     # print(
+        #     #     "[QML] End of learning. Model", 
+        #     #     self.ModelID, 
+        #     #     "Prior mean", self.Updater.est_mean()
+        #     # )
+        #     # print("Samples from prior:", 
+        #     #     self.Prior.sample(10)
+        #     # )
 
-            pickle.dump(
-                self.Updater, 
-                open(
-                    str(
-                        self.ResultsDirectory
-                        + '/TrueModUpdater.p'
-                    ),
-                    'wb'
-                )
-            )
+        #     pickle.dump(
+        #         self.Updater, 
+        #         open(
+        #             str(
+        #                 self.ResultsDirectory
+        #                 + '/TrueModUpdater.p'
+        #             ),
+        #             'wb'
+        #         )
+        #     )
 
+        # self.log_print(
+        #     [
+        #         "learned_info dict successfully generated in QML instance."
+        #     ]
+        # )
         return learned_info
         
         
@@ -936,10 +946,15 @@ class reducedModel():
                     encoding='latin1'
                 ) # TODO telling pickle which encoding was used, though I'm not sure why/where that encoding was given...        
             except:
-                print("model_id_str: ", model_id_str)
-                print("model id: ", self.ModelID)
-                print("learned info keys:, ", learned_models_info.keys())
-                print("learned info:, ", learned_models_info.get(model_id_str))
+                self.log_print(
+                    [
+                        "Unable to load learned info", 
+                        "model_id_str: ", model_id_str,
+                        "model id: ", self.ModelID,
+                        "learned info keys:, ", learned_models_info.keys(),
+                        "learned info:, ", learned_models_info.get(model_id_str)
+                    ]
+                )
         self.NumParticles = learned_info['num_particles']
         self.NumExperiments = learned_info['num_experiments']
 

@@ -496,6 +496,7 @@ def Bayes_t_test(
     growth_generator = None, 
     plot_probe_file = None,
     top_number_models=2,
+    save_true_expec_vals_alone_plot=False,
     save_to_file=None
 ):
     plt.switch_backend('agg')
@@ -886,31 +887,32 @@ def Bayes_t_test(
 
 
     # Also save an image of the true expectation values without overlaying results
-    plt.clf()
-    plt.scatter(
-        times, 
-        true_exp, 
-        color='r', 
-        s=5, 
-        label='True Expectation Value'
-    )
-    # plt.plot(
-    #     times, 
-    #     true_exp, 
-    #     color='r', 
-    #     alpha = 0.3
-    # )
-    plt.xlabel('Time')
-    plt.ylabel('Expectation Value')
-    plt.legend()
-    true_only_fig_file = str(
-        save_to_file[:-4]
-        + '_true_expec_vals.png'
-    )
-    plt.savefig(
-        true_only_fig_file,
-        bbox_inches='tight'
-    )
+    if save_true_expec_vals_alone_plot == True:
+        plt.clf()
+        plt.scatter(
+            times, 
+            true_exp, 
+            color='r', 
+            s=5, 
+            label='True Expectation Value'
+        )
+        # plt.plot(
+        #     times, 
+        #     true_exp, 
+        #     color='r', 
+        #     alpha = 0.3
+        # )
+        plt.xlabel('Time')
+        plt.ylabel('Expectation Value')
+        plt.legend()
+        true_only_fig_file = str(
+            save_to_file[:-4]
+            + '_true_expec_vals.png'
+        )
+        plt.savefig(
+            true_only_fig_file,
+            bbox_inches='tight'
+        )
 
 # def fill_between_sigmas(
 #     ax, 

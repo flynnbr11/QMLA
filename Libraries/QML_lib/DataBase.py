@@ -285,6 +285,8 @@ def get_num_qubits(name):
             '1Dising' in term
             or 
             'Heis' in term
+            or 
+            'nv' in term
         ):
             terms = term.split('_')
             dim_term = terms[-1]
@@ -635,6 +637,11 @@ def process_basic_operator(basic_operator):
     elif 'Heis' in basic_operator:
         import ModelGeneration
         mtx = ModelGeneration.process_heisenberg_xyz(
+            basic_operator
+        )
+    elif 'nv' in basic_operator:
+        import ModelGeneration
+        mtx = ModelGeneration.process_n_qubit_NV_centre_spin(
             basic_operator
         )
     else:

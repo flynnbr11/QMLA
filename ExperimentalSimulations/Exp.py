@@ -67,7 +67,7 @@ def log_print(to_print_list, log_file):
 
 
 # Note this should usually be False, True just for testing/some specific plots. 
-store_particles_weights = True
+store_particles_weights = False
 
 log_file = global_variables.log_file
 qle = global_variables.do_qle # True for QLE, False for IQLE
@@ -253,7 +253,8 @@ if os.path.isfile(true_expectation_value_path) == False:
             try:
                 # print("[EXP] GETTING TRUE EXPEC VALS FOR PLOTS")
                 true_expec_values[t] = (
-                    ExpectationValues.expectation_value_wrapper(
+                    # ExpectationValues.expectation_value_wrapper(
+                    UserFunctions.expectation_value_wrapper(
                         method=global_variables.measurement_type,
                         ham = true_ham, 
                         t=t, 

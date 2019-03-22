@@ -164,6 +164,13 @@ max_num_models_by_shape['reduced_nv_experiment'] = {
     'other' : 1
 }
 
+max_num_models_by_shape['NV_centre_spin_large_bath'] = {
+    8 : 1,
+    'other' : 0
+}
+
+
+
 
 
 ##########

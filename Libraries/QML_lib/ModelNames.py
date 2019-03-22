@@ -868,3 +868,44 @@ def interaction_latex_name(
     final_string = ''.join(all_term_strings)
     final_string = str('$' + final_string + '$')
     return final_string
+
+def large_spin_bath_nv_system_name(term):
+    num_qubits = DataBase.get_num_qubits(term)
+    t_str = 'T' * (num_qubits-1)
+    p_str = 'P' * num_qubits
+    separate_terms = term.split(p_str)
+    
+    spin_terms = []
+    interaction_terms = []
+    
+    for t in separate_terms:
+        components = t.split('_')
+        components.remove('nv')
+        components.remove( str('d'+str(num_qubits)) )
+        if 'spin' in components:
+            components.remove('spin')
+            spin_terms.append(components[0])
+        elif 'interaction' in components:
+            components.remove('interaction')
+            interaction_terms.append(components[0])
+            
+    latex_name = '('
+    if len(spin_terms) > 0:
+        latex_name += 'S_{'
+        for s in spin_terms:
+            latex_name += str(s)
+        latex_name += '}'
+    if len(interaction_terms) > 0:
+        latex_name += 'I_{'
+        for s in interaction_terms:
+            latex_name += str(s)
+        latex_name += '}'
+
+    latex_name += str(
+        ')^{\otimes'
+        +str(num_qubits)
+        +'}'
+    )
+        
+        
+    return '$' + latex_name + '$'

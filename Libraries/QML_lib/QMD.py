@@ -173,7 +173,7 @@ class QMD():
         self.PGHExponent = self.GlobalVariables.pgh_exponent
         self.QHLmode = self.GlobalVariables.qhl_test
         # self.BayesTimeBinning = self.GlobalVariables.bayes_time_binning 
-        self.StoreParticlesWeights = store_particles_weights
+        self.StoreParticlesWeights = self.GlobalVariables.store_particles_weights
         self.QHL_plots = qhl_plots
         self.ResultsDirectory = results_directory
         if not self.ResultsDirectory.endswith('/'):

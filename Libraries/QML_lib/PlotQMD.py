@@ -439,7 +439,8 @@ def plotDynamicsLearnedModels(
             expec_vals = {}
 
             for t in times_to_plot:
-                expec_vals[t] = ExpectationValues.expectation_value_wrapper(
+                # expec_vals[t] = ExpectationValues.expectation_value_wrapper(
+                expec_vals[t] = UserFunctions.expectation_value_wrapper(
                     method = qmd.MeasurementType,
                     ham = ham, 
                     t = t, 

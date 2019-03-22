@@ -60,6 +60,8 @@ expec_val_function_dict = {
     	ExpectationValues.expectation_value, 
     'hahn' : 
     	ExpectationValues.hahn_evolution,
+	'n_qubit_hahn' : 
+    	ExpectationValues.n_qubit_hahn_evolution,
     'trace_all_but_first' : 
     	ExpectationValues.traced_expectation_value_project_one_qubit_plus
 }
@@ -74,6 +76,7 @@ expec_val_function_dict = {
 default_true_operators_by_generator = {
     'test_changes_to_qmd' : 'x',
     'PT_Effective_Hamiltonian' : 'zTxPPyTxPPxTiPPxTz' ,
+    'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPnv_interaction_x_d3',
     'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
@@ -124,6 +127,10 @@ qhl_models_by_generator = {
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' 
 		],
+    'NV_centre_spin_large_bath' : 
+    	[
+    		'nv_spin_x_d3PPnv_interaction_x_d3',
+		],
     'reduced_nv_experiment' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' 
@@ -151,7 +158,8 @@ qhl_models_by_generator = {
 max_num_parameter_estimate = {
     'test_changes_to_qmd' : 3, 
     'PT_Effective_Hamiltonian' : 4,
-    'NV_centre_experiment_debug' : 7 ,
+    'NV_centre_experiment_debug' : 7,
+    'NV_centre_spin_large_bath' : 6,
     'reduced_nv_experiment' : 7,
     'two_qubit_ising_rotation' : 6,
     'two_qubit_ising_rotation_hyperfine' : 6, 
@@ -198,6 +206,7 @@ transverse_axis_by_generator = {
 max_spawn_depth_info = {
     'test_changes_to_qmd' : 1, 
     'PT_Effective_Hamiltonian' : 1,
+    'NV_centre_spin_large_bath' : 1,
     'reduced_nv_experiment' : 3,
     'NV_centre_experiment_debug' : 1,
     'two_qubit_ising_rotation' : 2,
@@ -223,6 +232,7 @@ max_spawn_depth_info = {
 max_num_qubits_info = {
     'test_changes_to_qmd' : 2,
     'PT_Effective_Hamiltonian' : 2 ,
+    'NV_centre_spin_large_bath' : 8,
     'NV_centre_experiment_debug' : 2,
     'reduced_nv_experiment' : 2,
     'two_qubit_ising_rotation' : 3,
@@ -253,6 +263,8 @@ model_generation_functions = {
     	ModelGeneration.test_changes_to_qmd,
     'PT_Effective_Hamiltonian' : 
     	ModelGeneration.NV_centre_experiment_debug, # ie NO spawning, just run first model
+    'NV_centre_spin_large_bath' : 
+    	ModelGeneration.NV_centre_spin_large_bath,
     'reduced_nv_experiment' : 
     	ModelGeneration.reduced_nv_experimental_method,
     'NV_centre_experiment_debug' : 
@@ -308,6 +320,8 @@ model_generation_functions = {
 tree_completed_initial = {
     'PT_Effective_Hamiltonian' : True,
 	'NV_centre_experiment_debug' : True, 
+    'NV_centre_spin_large_bath' : True,
+
 	None: False
 }
 
@@ -316,6 +330,7 @@ experimental_dataset = {
     'PT_Effective_Hamiltonian' : 'test_PT_data.p',
 	'NV_centre_experiment_debug' : 'NVB_rescale_dataset.p', 
     'reduced_nv_experiment' : 'NVB_rescale_dataset.p',
+    'NV_centre_spin_large_bath' : 'NVB_rescale_dataset.p',
 	# 'NV_centre_experiment_debug' : 'NV05_dataset.p', 
 	'two_qubit_ising_rotation_hyperfine' : 'NVB_rescale_dataset.p', 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 'NVB_rescale_dataset.p', 
@@ -325,6 +340,7 @@ experimental_dataset = {
 
 measurement_type = {
     'PT_Effective_Hamiltonian' : 'full_access',
+    'NV_centre_spin_large_bath' : 'n_qubit_hahn',    
     'reduced_nv_experiment' : 'hahn' ,
 	'NV_centre_experiment_debug' : 'hahn', 
 	'two_qubit_ising_rotation_hyperfine' : 'hahn', 
@@ -369,6 +385,8 @@ name_branch_map_functions = {
 		ModelNames.branch_is_num_dims,
     'PT_Effective_Hamiltonian' : 
     	ModelNames.branch_is_num_dims,
+    'NV_centre_spin_large_bath' : 
+    	ModelNames.branch_is_num_params,
     'NV_centre_experiment_debug' : 
     	ModelNames.branch_is_num_params,
     'reduced_nv_experiment' : 
@@ -417,6 +435,8 @@ latex_naming_functions = {
 		ModelNames.interaction_latex_name,
     'PT_Effective_Hamiltonian' : 
     	ModelNames.latex_name_ising,
+    'NV_centre_spin_large_bath' : 
+    	ModelNames.large_spin_bath_nv_system_name,
     'NV_centre_experiment_debug' : 
     	ModelNames.latex_name_ising,
     'reduced_nv_experiment' : 
@@ -483,6 +503,10 @@ initial_models = {
     	[
     		'zTxPPyTxPPxTiPPxTz'
     	],
+    'NV_centre_spin_large_bath' : 
+    	[
+    		'nv_interaction_x_d3PPPnv_spin_x_d3'
+		],
     'reduced_nv_experiment' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTi', 
@@ -556,6 +580,8 @@ experimental_probe_dict_generator = {
 		# ProbeGeneration.separable_probe_dict,
     'PT_Effective_Hamiltonian' : 
     	ProbeGeneration.PT_Effective_Hamiltonian_probe_dict,
+    'NV_centre_spin_large_bath' : 
+    	ProbeGeneration.NV_centre_ising_probes_plus,
     'reduced_nv_experiment' : 
     	ProbeGeneration.NV_centre_ising_probes_plus,
     'NV_centre_experiment_debug' : 

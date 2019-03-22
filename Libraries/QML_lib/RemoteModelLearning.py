@@ -246,18 +246,30 @@ def learnModelRemote(
 
     del qml_instance
 
-    compressed_info = pickle.dumps(updated_model_info, protocol=2) 
+    compressed_info = pickle.dumps(
+        updated_model_info, 
+        protocol=2
+    ) 
     # TODO is there a way to use higher protocol when using python3 for faster
     # pickling? this seems to need to be decoded using encoding='latin1'.... 
     # not entirely clear why this encoding is used
     try:
-        learned_models_info.set(str(modelID), compressed_info)
-        log_print(["Redis learned_models_info added to db for model:", str(modelID)])
-#        log_print(["Added:", compressed_info])
-
+        learned_models_info.set(
+            str(modelID), 
+            compressed_info
+        )
+        log_print(
+            [
+                "Redis learned_models_info added to db for model:", 
+                str(modelID)
+            ]
+        )
     except:
-        log_print(["Failed to add learned_models_info \
-            added to db for model:", modelID]
+        log_print(
+            [
+                "Failed to add learned_models_info for model:",
+                modelID
+            ]
         )
     active_branches_learning_models.incr(int(branchID), 1)    
     time_end = time.time()

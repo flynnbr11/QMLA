@@ -7,7 +7,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
 exp_data=1
@@ -30,11 +30,11 @@ rt=0.5
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
-plots=0
+plots=1
 number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
-bf_all_times=1
+bf_all_times=0
 data_max_time=5000 # nanoseconds
 data_time_offset=205 # nanoseconds
 
@@ -91,6 +91,7 @@ sim_growth_rule='hopping_topology'
 
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='PT_Effective_Hamiltonian'
@@ -128,6 +129,7 @@ param_sigma=3
 rand_true_params=0
 reallocate_resources=1
 updater_from_prior=0
+store_prt_wt=0 # store all particles and weights after learning
 
 # rand_prior:
 # if set to False (0), then uses any params specically 
@@ -216,6 +218,7 @@ do
             -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
             -exp=$exp_data -cpr=$custom_prior \
+            -prtwt=$store_prt_wt \
             -nprobes=$num_probes \
             -pnoise=$probe_noise \
             -prior_path=$prior_pickle_file \

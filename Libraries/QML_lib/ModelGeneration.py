@@ -55,6 +55,52 @@ def log_print(to_print_list, log_file):
 ##################### Model Generation Functions ############################################
 ##################################################################################
 
+"""
+Functions for generation of random model names for testing/debugging.
+Functions for NV centre spin. 
+"""
+
+
+def process_n_qubit_NV_centre_spin(term): 
+    
+    components = term.split('_')
+    
+    for l in components:
+        if l[0] == 'd':
+            dim = int(l.replace('d', ''))
+        elif l == 'spin':
+            term_type = 'spin'
+        elif l == 'interaction' : 
+            term_type = 'interaction'
+        elif l in ['x', 'y', 'z']:
+            pauli = l
+    
+    if term_type == 'spin':
+        t_str = 'T'
+        op_name = str(pauli)
+        
+        for d in range(dim - 1):
+            op_name += str( t_str + 'i')
+            t_str += 'T'
+    elif term_type == 'interaction':
+        p_str = 'P'*dim
+        op_name = ''
+        for d in range(dim - 1):
+            t_str = 'T'
+            single_term_name = str(pauli)
+            for j in range(dim - 1):
+                single_term_name += str(t_str)
+                if d == j:
+                    single_term_name += pauli
+                else:
+                    single_term_name += 'i'
+                t_str += 'T'
+            op_name += single_term_name
+            if d < (dim-2):
+                op_name += p_str
+                    
+    # print("Type {} ; name {}".format(term_type, op_name))
+    return DataBase.compute(op_name)
 
 
 """
@@ -239,7 +285,8 @@ def random_model_name(num_dimensions=1, num_terms=1):
     
     
     # Don't allow returning just identity in any dimension #TODO?
-    while summed_term == ('i' or 'iTi' or 'iTiTTi' or 'iTiTTiTTTi' or
+    while summed_term == (
+        'i' or 'iTi' or 'iTiTTi' or 'iTiTTiTTTi' or
         'iTiTTiTTTiTTTTi' or 'iTiTTiTTTiTTTTiTTTTTi' or 
         'iTiTTiTTTiTTTTiTTTTTiTTTTTTi' or 
         'iTiTTiTTTiTTTTiTTTTTiTTTTTTiTTTTTTTi'
@@ -1092,6 +1139,19 @@ def test_changes_to_qmd(
 
     return new_models
 
+def NV_centre_spin_large_bath(
+    **kwargs
+):
+    model_list = kwargs['model_list']
+    spawn_step = kwargs['spawn_step']
+    spawn_stage = kwargs['spawn_stage']    
+
+    return model_list
+    spawn_stage.append('Complete')
+
+        
+
+
 def heisenberg_nontransverse(
     **kwargs
 ):
@@ -1104,8 +1164,8 @@ def heisenberg_nontransverse(
     ghost_branches = kwargs['ghost_branches']
     branch_champs_by_qubit_num = kwargs['branch_champs_by_qubit_num']
     spawn_stage = kwargs['spawn_stage']
-    print("spawn stage", spawn_stage)
-    print("len:", len(spawn_stage))
+    # print("spawn stage", spawn_stage)
+    # print("len:", len(spawn_stage))
     if len(spawn_stage) == 0:
         spawn_stage.append(0)
     else:

@@ -249,8 +249,11 @@ def BayesFactorRemote(
         update_times_model_a = sorted(update_times_model_a)
         update_times_model_b = sorted(update_times_model_b)
 
+
+        ### Verbatim code used in december version, though functionally equivalent to elif binning case above
         recreate_dec_13_times_list_method = True
         if recreate_dec_13_times_list_method == True:
+            # print("[BF calculation] Generating times as in Dec")
             try:
                 min_time = min(min(model_a.Times), min(model_b.Times))
                 max_time = max(max(model_a.Times), max(model_b.Times))
@@ -447,7 +450,7 @@ def BayesFactorRemote(
         )
         print("Bayes Factor:", pair_id)
         if float(model_a_id) < float(model_b_id):
-            # so that BF in db always refers to (a/b), not (b/a). 
+            # so that BF in db always refers to (low/high), not (high/low). 
             bayes_factors_db.set(pair_id, bayes_factor)
             log_print(
                 [
@@ -525,7 +528,10 @@ def log_likelihood(model, times, binning=False):
 
     if binning:
         updater._renormalization_record = []
-        updater.log_likelihood = 0     
+        updater.log_likelihood = 0 
+    #     print("BINNING")
+    # else:
+    #     print("NOT BINNING")    
 
     for i in range(len(times)):
         exp = get_exp(model, [times[i]])
