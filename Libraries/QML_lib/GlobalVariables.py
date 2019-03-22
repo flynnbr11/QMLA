@@ -180,7 +180,7 @@ class GlobalVariablesClass():
         self.plot_probe_file = arguments.plot_probe_file
         self.special_probe = arguments.special_probe_for_learning
         self.latex_mapping_file = arguments.latex_mapping_file
-        self.reallocate_resources = arguments.reallocate_resources
+        self.reallocate_resources = bool(arguments.reallocate_resources)
         self.param_min = arguments.param_min
         self.param_max = arguments.param_max
         self.param_mean = arguments.param_mean

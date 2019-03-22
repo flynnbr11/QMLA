@@ -396,13 +396,19 @@ def n_qubit_hahn_evolution(
     
     num_qubits = int(np.log2(np.shape(ham)[0]))
 #     inversion_gate = (np.pi/2) * DataBase.sigmaz()
-    inversion_gate = DataBase.sigmaz()
+    # inversion_gate = DataBase.sigmaz()
 
-    for d in range(num_qubits - 1):
-        inversion_gate = np.kron(
-            inversion_gate, 
-            DataBase.identity()
-        ) 
+    # for d in range(num_qubits - 1):
+    #     inversion_gate = np.kron(
+    #         inversion_gate, 
+    #         DataBase.identity()
+    #     ) 
+    hahn_angle = np.pi / 2
+    hahn_gate = np.kron(    
+        hahn_angle * DataBase.sigmaz(), 
+        np.eye(2**(num_qubits-1))
+    )
+    inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()
     # first_unitary_time_evolution = h.exp_ham(
     #     ham, 
     #     t, 

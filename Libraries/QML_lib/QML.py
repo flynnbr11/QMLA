@@ -158,18 +158,27 @@ class ModelLearningClass():
         trueoplist,
         modeltrueparams,
         simoplist, 
-        simparams, simopnames, 
-        numparticles, modelID, 
+        simparams, 
+        simopnames, 
+        numparticles, 
+        modelID, 
         growth_generator,
         use_time_dep_true_params=False, 
         time_dep_true_params=None,
-        resample_thresh=0.5, resampler_a = 0.95, pgh_prefactor = 1.0,
-        store_partices_weights=False, checkloss=True, 
+        resample_thresh=0.5, 
+        resampler_a = 0.95, 
+        pgh_prefactor = 1.0,
+        store_partices_weights=False, 
+        checkloss=True, 
         gaussian=True,
-        use_exp_custom=True, enable_sparse=True,
-        debug_directory=None, qle=True, 
+        use_exp_custom=True, 
+        enable_sparse=True,
+        debug_directory=None, 
+        qle=True, 
         host_name='localhost', 
-        port_number=6379, qid=0, log_file='QMD_log.log'
+        port_number=6379, 
+        qid=0, 
+        log_file='QMD_log.log'
     ):
        
         # self.log_print(["QID=", qid])
@@ -334,6 +343,42 @@ class ModelLearningClass():
             log_file = self.log_file, 
             log_identifier = log_identifier
         )
+        prior_dir = str(
+            self.ResultsDirectory + 
+            'priors/'
+        )
+
+        if not os.path.exists(prior_dir):
+            try:
+                os.makedirs(prior_dir)
+            except:
+                # if already exists (ie created by another QMD since if test ran...)
+                pass
+        prior_file = str(
+            prior_dir + 'prior_' + str(self.ModelID) + '.png'
+        )
+
+        # pickle.dump(
+        #     self.Prior, 
+        #     open(
+        #         prior_file,
+        #         'wb'
+        #     )
+        # )
+
+        samples = self.Prior.sample(100000)
+        dev = np.round(np.std(samples), 2)
+        mean = np.round(np.mean(samples), 2)
+        plt.axvline(mean, color='red')
+
+        to_label = str(
+            '$\mu=' + str(mean) + ';  \sigma=' + str(dev) + '$'
+        )
+        plt.hist(samples, label=to_label)
+        plt.legend()
+        plt.title('Samples from prior for this QML')
+        plt.savefig(prior_file)
+        plt.clf()
     
 #            self.Prior = Distributions.MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the simulator
 	  

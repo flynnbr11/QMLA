@@ -130,6 +130,8 @@ qhl_models_by_generator = {
     'NV_centre_spin_large_bath' : 
     	[
     		'nv_spin_x_d3PPnv_interaction_x_d3',
+    		'nv_spin_x_d2PPnv_interaction_x_d2',
+    		'nv_spin_x_d4PPnv_interaction_x_d4',
 		],
     'reduced_nv_experiment' : 
     	[
