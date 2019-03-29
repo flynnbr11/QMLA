@@ -17,6 +17,7 @@ set_experimental_data_prior_specific_terms = {
 	'xTi' : [4.0, 1.5],
 	'yTi' : [4.0, 1.5],
 	'zTi' : [4.0, 1.5],
+	# 'zTi' : [2.5, 1.0],  # FOR BQIT19 Poster #TODO REMOVE
 	'xTx' : [4.0, 1.5],
 	'yTy' : [4.0, 1.5],
 	'zTz' : [4.0, 1.5],
@@ -87,6 +88,10 @@ set_true_params = {
 	# 'yTy': -2.610886, 
 	# 'zTi': 0.25689271, 
 	# 'zTz': -1.48673637,
+
+	# # FOR BQIT19 Poster #TODO REMOVE
+	# 'zTi' : 1.1
+
 
 	# From BC/Feb_12/18_30/results_007
 	'xTi': 0.05906251, 

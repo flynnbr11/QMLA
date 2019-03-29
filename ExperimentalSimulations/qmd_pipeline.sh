@@ -7,18 +7,18 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
-exp_data=1
-simulate_experiment=0
+exp_data=0
+simulate_experiment=1
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
-exp=3
+prt=50
+exp=10
 pgh=1.0
 pgh_exponent=1.0
 ra=0.8
@@ -30,7 +30,7 @@ rt=0.5
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
-plots=1
+plots=0
 number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
@@ -89,9 +89,9 @@ sim_growth_rule='hopping_topology'
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-exp_growth_rule='two_qubit_ising_rotation_hyperfine'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# exp_growth_rule='NV_centre_spin_large_bath'
+exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='PT_Effective_Hamiltonian'
@@ -122,8 +122,8 @@ num_probes=10
 force_plot_plus=0
 gaussian=1
 probe_noise=0.0000001
-param_min=10
-param_max=20
+param_min=0
+param_max=5
 param_mean=0.5
 param_sigma=3
 rand_true_params=0
@@ -136,7 +136,7 @@ store_prt_wt=0 # store all particles and weights after learning
 # set in SetQHLParams dictionaries.
 # All undefined params will be random according 
 # to above defined mean/sigmas
-rand_prior=0 
+rand_prior=0
 special_probe='random' #'plus' #'ideal'
 special_probe_plot='random'
 # special_probe='plus_random' #'plus' #'ideal'
@@ -144,12 +144,12 @@ special_probe_plot='random'
 if (( "$exp_data" == 1)) || (( "$simulate_experiment" == 1)) 
 then
 #    special_probe='plus'
-    param_min=10
-    param_max=20
+    # param_min=10
+    # param_max=20
     # rand_true_params=0
     # special_probe='plus_random'
     # special_probe='plus'
-    special_probe='dec_13_exp'
+    # special_probe='dec_13_exp'
     special_probe_plot='plus'
 fi
 

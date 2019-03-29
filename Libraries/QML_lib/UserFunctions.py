@@ -76,8 +76,10 @@ expec_val_function_dict = {
 default_true_operators_by_generator = {
     'test_changes_to_qmd' : 'x',
     'PT_Effective_Hamiltonian' : 'zTxPPyTxPPxTiPPxTz' ,
-    'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPnv_interaction_x_d3',
-    'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
+    # 'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_interaction_x_d3PPPnv_spin_y_d3PPPnv_interaction_y_d3PPPnv_spin_z_d3PPPnv_interaction_z_d3',
+    'NV_centre_spin_large_bath' : 'nv_spin_z_d3PPPnv_interaction_z_d3',
+    # 'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
+    'reduced_nv_experiment' : 'zTi' ,
     'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
     'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # for dev, should be 5 #TODO put back

@@ -128,6 +128,9 @@ def default_latex_wrapping(name):
 
 def latex_name_ising(name):
     # TODO generalise this 
+    # if name == 'zTi': # FOR BQIT19 Poster #TODO REMOVE
+    #     return '$\Omega$'
+
     if name=='x' or name=='y' or name=='z':
         return '$'+name+'$'
 
@@ -877,7 +880,8 @@ def large_spin_bath_nv_system_name(term):
     
     spin_terms = []
     interaction_terms = []
-    
+
+
     for t in separate_terms:
         components = t.split('_')
         components.remove('nv')

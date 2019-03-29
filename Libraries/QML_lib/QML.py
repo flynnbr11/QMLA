@@ -246,6 +246,11 @@ class ModelLearningClass():
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
         self.SimOpsNames = simopnames
+        self.LatexTerm = UserFunctions.get_latex_name(
+            name = self.Name,
+            growth_generator = self.GrowthGenerator
+        )
+        
         print_loc(print_location=init_model_print_loc)
         
 
@@ -267,6 +272,16 @@ class ModelLearningClass():
                     "Term", term, 
                     "\ncalculated mtx:", term_mtx, 
                     "\nSimOpList:", self.SimOpList[i]
+                    ]
+                )
+            elif term != self.SimOpsNames[i]:
+                print("!!! Check log -- QML", self.Name)
+
+                self.log_print(
+                    [
+                        "term {} != SimOpsNames[i] {}".format(
+                            term, self.SimOpsNames[i]
+                        )
                     ]
                 )
             # else:
@@ -1018,7 +1033,6 @@ class reducedModel():
         self.FinalSigmas = learned_info['final_sigmas']
         self.cov_matrix = learned_info['cov_matrix']
         self.GrowthGenerator = learned_info['growth_generator']
-
         self.LatexTerm = UserFunctions.get_latex_name(
             name = self.Name,
             growth_generator = self.GrowthGenerator
@@ -1356,7 +1370,7 @@ class modelClassForRemoteBayesFactor():
             probe_dict=self.ProbeDict, log_file=self.log_file,
             log_identifier=log_identifier
         )    
-        print("[QML] upd from prior:", updater_from_prior)
+        # print("[QML] upd from prior:", updater_from_prior)
         if updater_from_prior == True:
             self.Updater = qi.SMCUpdater(
                 self.GenSimModel, 

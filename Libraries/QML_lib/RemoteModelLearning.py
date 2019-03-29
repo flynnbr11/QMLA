@@ -124,6 +124,7 @@ def learnModelRemote(
     store_particles_weights = qmd_info['store_particles_weights']
     qhl_plots = qmd_info['qhl_plots']
     results_directory = qmd_info['results_directory']
+    plots_directory = qmd_info['plots_directory']
     long_id = qmd_info['long_id']
 #    use_time_dep_true_params = qmd_info['use_time_dep_true_params']
 #    time_dep_true_params = qmd_info['time_dep_true_params']
@@ -226,20 +227,22 @@ def learnModelRemote(
         # ) as pkl_file:
         #     pickle.dump(qml_instance, pkl_file , protocol=2)
 
-        if len(true_ops) == 1:
-            qml_instance.plotDistributionProgression(
-                save_to_file = str(
-                results_directory
-                +'qhl_distribution_progression_'+str(long_id) + '.png')
-            )
-        
-            qml_instance.plotDistributionProgression(
-                renormalise=False, 
-                save_to_file = str(
-                results_directory
-                +'qhl_distribution_progression_uniform_'+str(long_id) + '.png')
-            )
-
+        try:
+            if len(true_ops) == 1: #TODO buggy
+                qml_instance.plotDistributionProgression(
+                    save_to_file = str(
+                    plots_directory
+                    +'qhl_distribution_progression_'+str(long_id) + '.png')
+                )
+            
+                qml_instance.plotDistributionProgression(
+                    renormalise=False, 
+                    save_to_file = str(
+                    plots_directory
+                    +'qhl_distribution_progression_uniform_'+str(long_id) + '.png')
+                )
+        except:
+            pass
     updated_model_info = copy.deepcopy(
         qml_instance.learned_info_dict()
     ) 

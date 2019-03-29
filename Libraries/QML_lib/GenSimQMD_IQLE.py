@@ -148,6 +148,15 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         else:
             self._probelist = probe_dict    
 
+        log_print(
+            [
+                "probe[(0,1)]", 
+                self._probelist[(0,1)]
+            ],
+            self.log_file, 
+            self.log_identifier
+        )
+
     ## PROPERTIES ##
     @property
     def n_modelparams(self):
@@ -327,7 +336,8 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                     print("Either ideal_probe or ideal_probes must be given")
             else:
                 probe = self._probelist[
-                    (self._b % int(self.NumProbes)), ham_num_qubits
+                    (self._b % int(self.NumProbes)), 
+                    ham_num_qubits
                 ]
             # print(
             #     "[likelihood fnc] \

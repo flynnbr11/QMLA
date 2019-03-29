@@ -355,8 +355,20 @@ def plotDynamicsLearnedModels(
     include_param_estimates=False,
     save_to_file=None
 ):
-    if model_ids is None:
+    if qmd.QHLmode == True:
+        model_ids = [qmd.TrueOpModelID]
+        include_bayes_factors = False
+    elif qmd.multiQHLMode == True:
+        model_ids = list(qmd.multiQHL_model_ids)
+        include_bayes_factors = False
+    elif model_ids is None:
         model_ids = list(qmd.BranchChampions.values())
+
+    print(
+        "[plotDynamicsLearnedModels]",
+        "model id list:", model_ids
+    )
+
     model_ids = list(sorted(set(model_ids))) # only uniques values
     true_expec_vals = pickle.load(open(qmd.GlobalVariables.true_expec_path, 'rb'))
     times_to_plot = list(sorted(true_expec_vals.keys()))
@@ -394,6 +406,10 @@ def plotDynamicsLearnedModels(
     col = 0
 
     for mod_id in model_ids:
+        print(
+            "[plotDynamicsLearnedModels]",
+            "mod id:", mod_id
+        )
         reduced = qmd.reducedModelInstanceFromID(mod_id)
 #         growth_generator = reduced.GrowthGenerator
         desc = str(
@@ -616,7 +632,10 @@ def plotDynamicsLearnedModels(
                 col=0
                 row+=1
     if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        plt.savefig(
+            save_to_file, 
+            bbox_inches='tight'
+        )
 
 
     
@@ -931,13 +950,15 @@ def plotDistributionProgression(
 
 def plotDistributionProgressionQML(
     mod, 
-    num_steps_to_show=2, show_means=True,
+    num_steps_to_show=2, 
+    show_means=True,
     renormalise=True,
     save_to_file=None
 ):
     # Plots initial and final prior distribution over parameter space
     # with num_steps_to_show intermediate distributions 
     # Note only safe/tested for QHL, ie on true model (single parameter). 
+    
     from scipy import stats
     plt.clf()
 
@@ -947,11 +968,16 @@ def plotDistributionProgressionQML(
     num_intervals_to_show = num_steps_to_show
     increment = int(num_experiments/num_intervals_to_show)
 
+
     nearest_five = round(increment/5)*5
     if nearest_five == 0:
         nearest_five = 1
 
-    steps_to_show = list(range(0,num_experiments,nearest_five))
+    # steps_to_show = list(range(0,num_experiments,nearest_five))
+
+    resampled_epochs = mod.ResampleEpochs
+    steps_to_show = list(range(0,resampled_epochs,num_steps_to_show))    
+    steps_to_show = [int(s) for s in steps_to_show]
 
     if max_exp_num not in steps_to_show:
         steps_to_show.append(max_exp_num)
@@ -962,55 +988,134 @@ def plotDistributionProgressionQML(
     initial_colour = 'b'
     final_colour = 'r'
     steps_to_show = sorted(steps_to_show)
+    print(
+        "[plotDistributionProgression]", 
+        "num exp:", num_experiments, 
+        "increment:", increment, 
+        "steps to show", steps_to_show,
+        "resampled epochs:", mod.ResampleEpochs,
+    )
 
     ax = plt.subplot(111)
     
     if show_means:
         for t in true_parameters:
-            ax.axvline(t, label='True param', c=true_colour, linestyle='dashed')
+            ax.axvline(
+                t, 
+                label='True param', 
+                c=true_colour, 
+                linestyle='dashed'
+            )
 
     for i in steps_to_show:
-        j = steps_to_show.index(i) - 1 # previous step which is shown on plot already
-        if not np.all(mod.Particles[:,:,i] == mod.Particles[:,:,j]):
-            # don't display identical distributions between steps
-            particles = mod.Particles[:,:,i]
-            particles = sorted(particles)
-            colour = colours[i%len(colours)]
+        print(
+            "[plotDistributionProgression]", 
+            "i,", i
+        )
+        
+        particles = mod.Particles[:,:,i]
+        particles = sorted(particles)
+        colour = colours[i%len(colours)]
 
-            # TODO if renormalise False, DON'T use a stat.pdf to model distribution
+        # TODO if renormalise False, DON'T use a stat.pdf to model distribution
+        if renormalise:
+            fit = stats.norm.pdf(
+                particles, 
+                np.mean(particles), 
+                np.std(particles)
+            )
+            max_fit = max(fit)
+            fit = fit/max_fit
+        else:
+            fit = mod.Weights[:,i]
             
-            
-            if renormalise:
-                fit = stats.norm.pdf(particles, np.mean(particles), np.std(particles))
-                max_fit = max(fit)
-                fit = fit/max_fit
-            else:
-                fit = mod.Weights[:,i]
-                
-                
-            if i==max_exp_num:
-                colour = final_colour
-                label = 'Final distribution'
-                if show_means: 
-                    ax.axvline(np.mean(particles), 
-                        label='Final Mean', color=colour, linestyle='dashed'
-                    )
-            elif i==min(steps_to_show):
-                colour = initial_colour
-                if show_means:
-                    ax.axvline(np.mean(particles), label='Initial Mean',
-                        color=colour, linestyle='dashed'
-                    )
-                label='Initial distribution'
-            else:
-                label=str('Step '+str(i))
+        if i==max_exp_num:
+            colour = final_colour
+            label = 'Final distribution'
+            if show_means: 
+                ax.axvline(
+                    np.mean(particles), 
+                    label='Final Mean', 
+                    color=colour, 
+                    linestyle='dashed'
+                )
+        elif i==min(steps_to_show):
+            colour = initial_colour
+            if show_means:
+                ax.axvline(
+                    np.mean(particles), 
+                    label='Initial Mean',
+                    color=colour, 
+                    linestyle='dashed'
+                )
+            label='Initial distribution'
+        else:
+            label=str('Step '+str(i))
 
-            ax.plot(particles, fit, label=label, color=colour)
+        ax.plot(particles, fit, label=label, color=colour)
+
+
+    # for i in steps_to_show:
+    #     j = steps_to_show.index(i) - 1 # previous step which is shown on plot already
+    #     if (
+    #         steps_to_show.index(i)==0 
+    #         or 
+    #         not np.all(mod.Particles[:,:,i] == mod.Particles[:,:,j])
+    #     ):
+    #         # don't display identical distributions between steps
+    #         print(
+    #             "[plotDistributionProgression]", 
+    #             "i,j:", i,j  
+    #         )
+            
+    #         particles = mod.Particles[:,:,i]
+    #         particles = sorted(particles)
+    #         colour = colours[i%len(colours)]
+
+    #         # TODO if renormalise False, DON'T use a stat.pdf to model distribution
+    #         if renormalise:
+    #             fit = stats.norm.pdf(
+    #                 particles, 
+    #                 np.mean(particles), 
+    #                 np.std(particles)
+    #             )
+    #             max_fit = max(fit)
+    #             fit = fit/max_fit
+    #         else:
+    #             fit = mod.Weights[:,i]
+                
+    #         if i==max_exp_num:
+    #             colour = final_colour
+    #             label = 'Final distribution'
+    #             if show_means: 
+    #                 ax.axvline(
+    #                     np.mean(particles), 
+    #                     label='Final Mean', 
+    #                     color=colour, 
+    #                     linestyle='dashed'
+    #                 )
+    #         elif i==min(steps_to_show):
+    #             colour = initial_colour
+    #             if show_means:
+    #                 ax.axvline(
+    #                     np.mean(particles), 
+    #                     label='Initial Mean',
+    #                     color=colour, 
+    #                     linestyle='dashed'
+    #                 )
+    #             label='Initial distribution'
+    #         else:
+    #             label=str('Step '+str(i))
+
+    #         ax.plot(particles, fit, label=label, color=colour)
 
     plt.legend(bbox_to_anchor=(1.02, 1.02), ncol=1)
     plt.xlabel('Parameter estimate')
     plt.ylabel('Probability Density (relative)')
-    title=str('Probability density function of parameter for '+mod.LatexTerm)
+    title=str(
+        'Probability density function of parameter for '+
+        mod.LatexTerm
+    )
     plt.title(title)
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
@@ -2625,8 +2730,14 @@ def parameterEstimates(
                     # growth_generator = qmd.GrowthGenerator
                     growth_generator = mod.GrowthGenerator
                 )
+                true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
 
-                ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
+                ax.axhline(
+                    y_true, 
+                    label=str(true_term_latex), 
+                    color='red',
+                    linestyle='--'
+                )
         except:
             pass
         y = np.array(param_estimate_by_term[term])
@@ -2637,12 +2748,13 @@ def parameterEstimates(
             # growth_generator = qmd.GrowthGenerator
             growth_generator = mod.GrowthGenerator
         )
+        latex_term = latex_term[:-1] + '^{\prime}' + '$'
         # print("[pQMD] latex_term:", latex_term)
         ax.scatter(
             x,
             y, 
             s=max(1,50/num_epochs), 
-            label=str(latex_term + ' Estimate'), 
+            label=str(latex_term), 
             color=colour
         )
 #        ax.set_yscale('symlog')
@@ -2652,22 +2764,23 @@ def parameterEstimates(
             y+s, 
             y-s, 
             alpha=0.2,
-            facecolor=colour
+            facecolor='green',
+            # label='$\sigma$'
 
         )
         # print("[pQMD] fill between done")
-#        ax.legend(loc=1)
+        ax.legend(loc=1, fontsize=20)
         axes_so_far += 1
         col += 1
         if col == ncols:
             col=0
             row+=1
-        ax.set_title(str(latex_term))
+        # ax.set_title(str(latex_term))
         # print("[pQMD] title set")
 
 #    ax = plt.subplot(111)
-    # plt.xlabel('Epoch')
-    # plt.ylabel('Parameter Estimate')
+    plt.xlabel('Epoch', fontsize=20)
+    plt.ylabel('Parameter Estimate', fontsize=15)
     # plt.legend(bbox_to_anchor=(1.1, 1.05))
     # # TODO put title at top; Epoch centred bottom; Estimate centre y-axis
     # plt.title(str("Parameter estimation for model " +  

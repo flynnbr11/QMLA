@@ -520,6 +520,7 @@ class QMD():
             'growth_generator' : self.GrowthGenerator, 
             'qhl_plots' : self.QHL_plots, 
             'results_directory' : self.ResultsDirectory, 
+            'plots_directory' : self.GlobalVariables.plots_directory,
             'long_id' : long_id, 
             'debug_directory' : self.DebugDirectory,
             'qle' : self.QLE,
@@ -2401,7 +2402,7 @@ class QMD():
 
         mod_to_learn = self.TrueOpName
         self.log_print(["QHL test on:", mod_to_learn])
-        
+
         self.learnModel(
             model_name=mod_to_learn,
             use_rq=self.use_rq, 
@@ -2413,6 +2414,7 @@ class QMD():
             name=mod_to_learn
         )
         self.TrueOpModelID = mod_id
+        self.ChampID = mod_id
         self.log_print(
             [
                 "Learned:", 
@@ -2464,7 +2466,6 @@ class QMD():
         if model_names is None:
             model_names = self.InitialOpList
         print("Model Names for multiple QHL:", model_names)
-
         current_models = list(
             self.ModelsBranches.keys()
         )
@@ -2477,6 +2478,14 @@ class QMD():
                 growth_rule = self.GrowthGenerator, 
                 model_list = models_to_add
             )
+        self.multiQHLMode = True
+        self.multiQHL_model_ids = [
+            DataBase.model_id_from_name(
+                db=self.db, 
+                name=mod_name
+            ) for mod_name in model_names
+        ]
+
         self.log_print(
             [
             'run multiple QHL. names:', model_names
