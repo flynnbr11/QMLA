@@ -82,8 +82,9 @@ default_true_operators_by_generator = {
     'reduced_nv_experiment' : 'zTi' ,
     'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
-    'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # for dev, should be 5 #TODO put back
-    'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+    'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 
+    'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
+    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # TODO reinstate -- testing whether alphetisation of true model affects December/new code
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiP',
     'test_multidimensional' : 'xTiPPiTy', 
     'test_return_champs' : 'xTiPPiTy', 

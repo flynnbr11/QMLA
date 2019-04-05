@@ -30,7 +30,7 @@ rt=0.5
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
-plots=0
+plots=1
 number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
@@ -128,7 +128,7 @@ param_mean=0.5
 param_sigma=3
 rand_true_params=0
 reallocate_resources=1
-updater_from_prior=1
+updater_from_prior=0
 store_prt_wt=0 # store all particles and weights after learning
 
 # rand_prior:
