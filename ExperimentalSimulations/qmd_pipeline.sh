@@ -7,18 +7,18 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=50
-exp=10
+prt=200
+exp=20
 pgh=1.0
 pgh_exponent=1.0
 ra=0.8
@@ -123,12 +123,12 @@ force_plot_plus=0
 gaussian=1
 probe_noise=0.0000001
 param_min=0
-param_max=5
+param_max=1
 param_mean=0.5
 param_sigma=3
 rand_true_params=0
 reallocate_resources=1
-updater_from_prior=0
+updater_from_prior=1
 store_prt_wt=0 # store all particles and weights after learning
 
 # rand_prior:
@@ -136,7 +136,7 @@ store_prt_wt=0 # store all particles and weights after learning
 # set in SetQHLParams dictionaries.
 # All undefined params will be random according 
 # to above defined mean/sigmas
-rand_prior=0
+rand_prior=1
 special_probe='random' #'plus' #'ideal'
 special_probe_plot='random'
 # special_probe='plus_random' #'plus' #'ideal'

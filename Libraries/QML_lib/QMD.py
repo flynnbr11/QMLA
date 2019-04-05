@@ -172,6 +172,7 @@ class QMD():
         self.PGHPrefactor = self.GlobalVariables.pgh_factor
         self.PGHExponent = self.GlobalVariables.pgh_exponent
         self.QHLmode = self.GlobalVariables.qhl_test
+        self.multiQHLMode = False
         # self.BayesTimeBinning = self.GlobalVariables.bayes_time_binning 
         self.StoreParticlesWeights = self.GlobalVariables.store_particles_weights
         self.QHL_plots = qhl_plots

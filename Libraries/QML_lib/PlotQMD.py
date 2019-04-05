@@ -364,11 +364,6 @@ def plotDynamicsLearnedModels(
     elif model_ids is None:
         model_ids = list(qmd.BranchChampions.values())
 
-    print(
-        "[plotDynamicsLearnedModels]",
-        "model id list:", model_ids
-    )
-
     model_ids = list(sorted(set(model_ids))) # only uniques values
     true_expec_vals = pickle.load(open(qmd.GlobalVariables.true_expec_path, 'rb'))
     times_to_plot = list(sorted(true_expec_vals.keys()))

@@ -76,8 +76,8 @@ expec_val_function_dict = {
 default_true_operators_by_generator = {
     'test_changes_to_qmd' : 'x',
     'PT_Effective_Hamiltonian' : 'zTxPPyTxPPxTiPPxTz' ,
-    # 'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_interaction_x_d3PPPnv_spin_y_d3PPPnv_interaction_y_d3PPPnv_spin_z_d3PPPnv_interaction_z_d3',
-    'NV_centre_spin_large_bath' : 'nv_spin_z_d3PPPnv_interaction_z_d3',
+    'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_interaction_x_d3PPPnv_spin_y_d3PPPnv_interaction_y_d3PPPnv_spin_z_d3PPPnv_interaction_z_d3',
+    # 'NV_centre_spin_large_bath' : 'nv_spin_z_d3PPPnv_interaction_z_d3',
     # 'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'reduced_nv_experiment' : 'zTi' ,
     'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
@@ -116,7 +116,8 @@ default_true_operators_by_generator = {
 		# 'h_1h2_d6PPPPPPh_1h3_d6PPPPPPh_2h4_d6PPPPPPh_3h4_d6PPPPPPh_2h5_d6PPPPPPh_4h6_d6PPPPPPh_5h6_d6PPPPPPh_e_d6',
 
 	'hopping_topology' : 
-		'h_1h2_d4PPPPh_3h4_d4',
+        'h_1h2_d2'
+		# 'h_1h2_d4PPPPh_3h4_d4',
 }
 
 
@@ -258,7 +259,7 @@ max_num_qubits_info = {
 	'ising_1d_chain' : 5,
     'heisenberg_xyz' : 5,
     None : 5,
-    'hopping_topology' : 5,
+    'hopping_topology' : 4,
 }
 
 model_generation_functions = {
