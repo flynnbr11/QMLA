@@ -260,7 +260,7 @@ max_num_qubits_info = {
 	'ising_1d_chain' : 5,
     'heisenberg_xyz' : 5,
     None : 5,
-    'hopping_topology' : 5,
+    'hopping_topology' : 4,
 }
 
 model_generation_functions = {
