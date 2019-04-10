@@ -126,6 +126,10 @@ set_true_params = {
 	# 'yTy': 3.3947103726744356, 
 	# 'zTi': 2.0898730632155673, 
 	# 'zTz': 3.1023680134103575,
+
+	# For non-deterministic hopping learning
+	'h_1h2_d2' : 0.8103045,
+	'h_1h2_d3' : 0.8103045,
 }
 ### Functions ###
 
