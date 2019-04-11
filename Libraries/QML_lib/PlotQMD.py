@@ -368,7 +368,9 @@ def plotDynamicsLearnedModels(
     true_expec_vals = pickle.load(open(qmd.GlobalVariables.true_expec_path, 'rb'))
     times_to_plot = list(sorted(true_expec_vals.keys()))
     true_exp = [true_expec_vals[t] for t in times_to_plot]
-    plot_probes = pickle.load(open(qmd.GlobalVariables.plot_probe_file, 'rb'))
+    plot_probes = pickle.load(
+        open(qmd.GlobalVariables.plot_probe_file, 'rb')
+    )
     num_models_to_plot = len(model_ids)
     all_bayes_factors = qmd.AllBayesFactors
     max_time = max(times_to_plot)
