@@ -310,6 +310,25 @@ def BayesFactorRemote(
                 ),
                 file = write_log_file
             )
+
+        updater_a_copy = copy.deepcopy(model_a.Updater)
+        # updater_b_copy = copy.deepcopy(model_b.updater)
+        log_l_a = log_likelihood(
+            model_a, 
+            update_times_model_a, 
+            binning=set_renorm_record_to_zero
+        )
+        log_l_b = log_likelihood(
+            model_b, 
+            update_times_model_b, 
+            binning=set_renorm_record_to_zero
+        )     
+        # log_print(["Log likelihoods computed."])
+
+        # after learning, want to see what dynamics are like after further updaters
+        bayes_factor = np.exp(log_l_a - log_l_b)
+
+
         if (
             save_plots_of_posteriors == True
             and
@@ -319,6 +338,7 @@ def BayesFactorRemote(
                 print("\n\nBF UPDATE Model {}".format(model_a.Name))
                 
                 old_post_marg = model_a.PosteriorMarginal
+                before_bf_updates = []
                 new_post_marg = []
 
                 posterior_plot_path = str(
@@ -337,15 +357,16 @@ def BayesFactorRemote(
                     )
                 )
 
-
                 for i in range(len(old_post_marg)):
+                    before_bf_updates.append(
+                        updater_a_copy.posterior_marginal(idx_param=i)
+                    )                    
+
                     new_post_marg.append(
                         model_a.Updater.posterior_marginal(idx_param=i)
                     )
                     # new_post_marg = model_a.Updater.posterior_marginal(1)
                 
-
-
                 # print("OLD:", old_post_marg)
                 # print("NEW:", new_post_marg)
                 param_of_interest = 1
@@ -364,10 +385,19 @@ def BayesFactorRemote(
                         break
                     plt.clf()
                     plt.plot(
+                        before_bf_updates[param_of_interest][0], 
+                        before_bf_updates[param_of_interest][1],
+                        color='blue',
+                        linestyle = '--',  
+                        label='Start BF'
+
+                    )
+                    plt.plot(
                         new_post_marg[param_of_interest][0], 
                         new_post_marg[param_of_interest][1],
-                        color='blue', 
-                        label='Start BF'
+                        color='y',
+                        linestyle = '--',  
+                        label='End BF'
 
                     )
                     init_post_marg = model_a.InitialPrior[param_of_interest]
@@ -375,13 +405,14 @@ def BayesFactorRemote(
                         init_post_marg[0], 
                         init_post_marg[1],
                         color='green', 
-                        label='Initial',
+                        label='Start QML',
                         alpha=0.4,
                     )
                     plt.plot(
                         old_post_marg[param_of_interest][0], 
                         old_post_marg[param_of_interest][1],
                         color='red', 
+                        linestyle='-.',
                         label='End QML'
                     )
                     plt.legend()
@@ -390,21 +421,23 @@ def BayesFactorRemote(
             except:
                 raise
                 # pass
-            
-        log_l_a = log_likelihood(
-            model_a, 
-            update_times_model_a, 
-            binning=set_renorm_record_to_zero
-        )
-        log_l_b = log_likelihood(
-            model_b, 
-            update_times_model_b, 
-            binning=set_renorm_record_to_zero
-        )     
-        # log_print(["Log likelihoods computed."])
 
-        # after learning, want to see what dynamics are like after further updaters
-        bayes_factor = np.exp(log_l_a - log_l_b)
+        # TODO this is the original position of getting log likelihood + bayes factor; 
+        # moving above so we can plot posterior before and after BF updates.             
+        # log_l_a = log_likelihood(
+        #     model_a, 
+        #     update_times_model_a, 
+        #     binning=set_renorm_record_to_zero
+        # )
+        # log_l_b = log_likelihood(
+        #     model_b, 
+        #     update_times_model_b, 
+        #     binning=set_renorm_record_to_zero
+        # )     
+        # # log_print(["Log likelihoods computed."])
+
+        # # after learning, want to see what dynamics are like after further updaters
+        # bayes_factor = np.exp(log_l_a - log_l_b)
         if (
             DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name)
             or 

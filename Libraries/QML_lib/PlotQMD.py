@@ -449,6 +449,13 @@ def plotDynamicsLearnedModels(
             ham = reduced.LearnedHamiltonian
             dim = np.log2(np.shape(ham)[0])
             probe = plot_probes[dim]
+            print(
+                "[plotDynamicsLearnedModels]",
+                "\n\tModel ", reduced.LatexTerm, 
+                "\n\tnum qubits:", dim, 
+                "\n\tprobe:", probe
+
+            )
             expec_vals = {}
 
             for t in times_to_plot:
