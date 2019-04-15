@@ -30,6 +30,7 @@ class multiPGH(qi.Heuristic):
         inv_func=identity,
         t_func=identity,
         pgh_exponent=1,
+        increase_time=False, 
         maxiters=10,
         other_fields=None
      ):
@@ -43,9 +44,16 @@ class multiPGH(qi.Heuristic):
         self._maxiters = maxiters
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
+        self._increase_time = increase_time
         print("[multipgh] PGH exponent ", self._pgh_exponent)
 
-    def __call__(self):
+    def __call__(
+        self,
+        epoch_id = 0,
+        num_params = 1,
+        test_param = None, 
+    ):
+
         idx_iter = 0
         while idx_iter < self._maxiters:
                 
@@ -62,7 +70,7 @@ class multiPGH(qi.Heuristic):
             )
             
         #print('Selected particles: #1 ' + repr(x) + ' #2 ' + repr(xp))
-            
+        test_pgh = True
         eps = np.empty(
             (1,),
             dtype=self._updater.model.expparams_dtype
@@ -74,18 +82,48 @@ class multiPGH(qi.Heuristic):
             eps[field_i] = self._inv_func(x)[0][idx_iter]
             idx_iter += 1
         if self._oplist is None:   #Standard QInfer geom distance
+            # print("[multipgh] oplist is None")
+
             sigma = self._updater.model.distance(x, xp)
             # print("sigma = ", sigma)
-            eps[self._t]  = self._t_func(
-                1 / sigma**self._pgh_exponent
-            )
+            if self._increase_time == True:
+                # TODO get num params (len some oplist?)
+                # todo get which epoch this is
+                #TODO make test_pgh flag
+                # epoch_id = self._updater.model.
+                orig_time = self._t_func(
+                    (1 / sigma**self._pgh_exponent)
+                )
+
+                new_time = self._t_func(
+                    (1 / sigma**self._pgh_exponent)
+                    + ((1/sigma) * epoch_id * num_params)/50
+                )
+                # print(
+                #     "[multipgh]", 
+                #     "\norig time:", orig_time, 
+                #     "\nnew_time:", new_time
+                # )
+                eps[self._t] = new_time
+            else:
+                new_time = self._t_func(
+                    1 / sigma**self._pgh_exponent
+                )
+                # print(
+                #     "[multipgh]", 
+                #     "\nnew_time:", new_time
+                # )
+                eps[self._t] = new_time 
+
 
         else:
             deltaH = getH(x, self._oplist)-getH(xp, self._oplist)
             if self._norm=='Frobenius':
+                print("[multipgh] Froebenius")
                 print (frameinfo.filename, frameinfo.lineno)
                 eps[self._t] = 1/np.linalg.norm(deltaH)   #Frobenius norm
             elif self._norm=='MinSingVal':
+                print("[multipgh] MinSingVal")
                 print (frameinfo.filename, frameinfo.lineno)
                 eps[self._t] = 1/minsingvalnorm(deltaH)   #Min SingVal norm
             elif self._norm=='SingVal':

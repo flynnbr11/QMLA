@@ -2794,8 +2794,15 @@ def parameterEstimates(
     # )
 
     if save_to_file is not None:
-        print("saving to file")
-        plt.savefig(save_to_file, bbox_inches='tight')
+        print(
+            "[parameterEstimates] saving to file", 
+            save_to_file,
+            "type:", type(save_to_file)
+        )
+        plt.savefig(
+            save_to_file, 
+            bbox_inches='tight'
+        )
     # print("[pQMD] complete")
 
 

@@ -424,24 +424,29 @@ if global_variables.qhl_test:
     if global_variables.save_plots:
         
         print("Plotting things")
-        qmd.plotParameterEstimates(
-            true_model=True, 
-            save_to_file= str(
-                global_variables.plots_directory+
-                'qhl_parameter_estimates_'+ 
-                str(global_variables.long_id) +
-                '.png'
-            )
-        )
 
-        qmd.plotVolumeQHL(
-            save_to_file = str( 
-                global_variables.plots_directory+
-                'qhl_volume_'+
-                str(global_variables.long_id)+
-                '.png'
+        try:
+            qmd.plotParameterEstimates(
+                true_model=True, 
+                save_to_file= str(
+                    global_variables.plots_directory+
+                    'qhl_parameter_estimates_'+ 
+                    str(global_variables.long_id) +
+                    '.png'
+                )
             )
-        )
+        except: pass
+
+        try:
+            qmd.plotVolumeQHL(
+                save_to_file = str( 
+                    global_variables.plots_directory+
+                    'qhl_volume_'+
+                    str(global_variables.long_id)+
+                    '.png'
+                )
+            )
+        except: pass
 
         qmd.plotQuadraticLoss(
             save_to_file = str( 

@@ -154,6 +154,7 @@ class GlobalVariablesClass():
         self.resample_a = arguments.resample_a
         self.pgh_factor = arguments.pgh_factor
         self.pgh_exponent = arguments.pgh_exponent
+        self.increase_pgh_time = bool(arguments.increase_pgh_time)
         self.pickle_qmd_class = bool(arguments.pickle_qmd_class)
         self.qmd_id = arguments.qmd_id
         self.host_name = arguments.host_name
@@ -388,6 +389,14 @@ def parse_cmd_line_args(args):
       type=float,
       default=1.0
     )
+
+    parser.add_argument(
+      '-pgh_incr', '--increase_pgh_time',
+      help='Boost times found by PGH heursitic. Bool.',
+      type=int,
+      default=0
+    )
+
 
     ## Redis environment
     parser.add_argument(

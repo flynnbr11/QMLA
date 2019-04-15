@@ -517,6 +517,7 @@ class QMD():
             'resampler_a' : self.ResamplerA,
             'pgh_prefactor' : self.PGHPrefactor,
             'pgh_exponent' : self.PGHExponent, 
+            'increase_pgh_time' : self.GlobalVariables.increase_pgh_time, 
             'store_particles_weights' : self.StoreParticlesWeights,
             'growth_generator' : self.GrowthGenerator, 
             'qhl_plots' : self.QHL_plots, 

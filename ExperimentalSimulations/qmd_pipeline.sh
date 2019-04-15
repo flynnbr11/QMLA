@@ -7,11 +7,11 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=0
+simulate_experiment=1
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -21,6 +21,7 @@ prt=10
 exp=3
 pgh=1.0
 pgh_exponent=1.0
+pgh_increase=0 # whether to add to time found by PGH (bool)
 ra=0.8
 rt=0.5
 
@@ -90,8 +91,8 @@ sim_growth_rule='hopping_topology'
 ### which will overwrite growth_rule if exp_data==1
 
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-exp_growth_rule='NV_centre_spin_large_bath'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='PT_Effective_Hamiltonian'
@@ -215,6 +216,7 @@ do
             -rq=$use_rq -g=$gaussian -qhl=$qhl_test \
             -ra=$ra -rt=$rt -pgh=$pgh \
             -pgh_exp=$pgh_exponent \
+            -pgh_incr=$pgh_increase \
             -dir=$long_dir -qid=$q_id -pt=$plots -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
             -exp=$exp_data -cpr=$custom_prior \
