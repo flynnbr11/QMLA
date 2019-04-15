@@ -313,6 +313,7 @@ def BayesFactorRemote(
 
         updater_a_copy = copy.deepcopy(model_a.Updater)
         # updater_b_copy = copy.deepcopy(model_b.updater)
+
         log_l_a = log_likelihood(
             model_a, 
             update_times_model_a, 
@@ -472,7 +473,9 @@ def BayesFactorRemote(
                         model_a_id, 
                         model_b_id, 
                         np.round(bayes_factor, 2)
-                    )
+                ),
+                "\tReset remormalisation record:", 
+                set_renorm_record_to_zero
             ]
         )
         if bayes_factor < 1e-160:
@@ -562,9 +565,9 @@ def log_likelihood(model, times, binning=False):
     if binning:
         updater._renormalization_record = []
         updater.log_likelihood = 0 
-    #     print("BINNING")
-    # else:
-    #     print("NOT BINNING")    
+        print("BINNING")
+    else:
+        print("NOT BINNING")    
 
     for i in range(len(times)):
         exp = get_exp(model, [times[i]])

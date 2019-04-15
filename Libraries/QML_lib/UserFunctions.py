@@ -152,6 +152,7 @@ qhl_models_by_generator = {
     	[
     		'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+            'zTi'
     		# 'xTiPPxTxPPyTiPPyTyPPzTi',
     		# 'xTiPPyTiPPzTiPPzTz',
     	],

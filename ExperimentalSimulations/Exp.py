@@ -532,21 +532,29 @@ elif (
         ) for mod in qhl_models
     ]
 
-
-    qmd.plotExpecValues(
-        model_ids = model_ids, # hardcode to see full model for development
-        times=plot_times,
-        max_time = expec_val_plot_max_time, #in microsec
-        t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
-        champ = False,
+    qmd.plotDynamics(
         save_to_file=str( 
-            global_variables.plots_directory+
-            output_prefix + 
-            'expec_values_'+
-            str(global_variables.long_id) + 
+            global_variables.plots_directory +
+            'dynamics_' + 
+            str(global_variables.long_id)+
             '.png'
         )
     )
+
+    # qmd.plotExpecValues(
+    #     model_ids = model_ids, # hardcode to see full model for development
+    #     times=plot_times,
+    #     max_time = expec_val_plot_max_time, #in microsec
+    #     t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
+    #     champ = False,
+    #     save_to_file=str( 
+    #         global_variables.plots_directory+
+    #         output_prefix + 
+    #         'expec_values_'+
+    #         str(global_variables.long_id) + 
+    #         '.png'
+    #     )
+    # )
 
     # for mod_id in range(qmd.HighestModelID):
     #     mod_name = qmd.ModelNameIDs[mod_id]

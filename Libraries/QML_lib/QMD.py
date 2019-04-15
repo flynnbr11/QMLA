@@ -2481,6 +2481,7 @@ class QMD():
                 model_list = models_to_add
             )
         self.multiQHLMode = True
+        self.ChampID = -1, # TODO just so not to crash during dynamics plot
         self.multiQHL_model_ids = [
             DataBase.model_id_from_name(
                 db=self.db, 
@@ -2549,6 +2550,7 @@ class QMD():
                 'ConfigLatex' : self.LatexConfig,       
                 'Time': time_taken,
                 'QID' : self.Q_id,
+                'ChampID' : self.ChampID, 
                 'QuadraticLosses' : mod.QuadraticLosses,
                 'RSquaredTrueModel' : mod.r_squared(),
                 'NameAlphabetical' : DataBase.alph(mod.Name),
