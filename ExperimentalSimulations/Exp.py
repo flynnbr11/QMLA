@@ -412,10 +412,18 @@ qmd = QMD(
 
 if global_variables.qhl_test:
     qmd.runQHLTest()
-
+    log_print(
+        [
+            "QHL complete",
+        ], 
+        log_file
+    )
     if global_variables.pickle_qmd_class:
-        log_print(["QMD complete. Pickling result to",
-            global_variables.class_pickle_file], log_file
+        log_print(
+            [
+                "QMD complete. Pickling result to",
+                global_variables.class_pickle_file
+            ], log_file
         )
         qmd.delete_unpicklable_attributes()
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
@@ -426,6 +434,12 @@ if global_variables.qhl_test:
         print("[Exp.py] Plotting things")
 
         try:
+            log_print(
+                [
+                    "Plotting parameter estimates",
+                ], 
+                log_file
+            )
             qmd.plotParameterEstimates(
                 true_model=True, 
                 save_to_file= str(
@@ -438,6 +452,12 @@ if global_variables.qhl_test:
         except: pass
 
         try:
+            log_print(
+                [
+                    "Plotting volumes",
+                ], 
+                log_file
+            )
             qmd.plotVolumeQHL(
                 save_to_file = str( 
                     global_variables.plots_directory+
@@ -447,6 +467,12 @@ if global_variables.qhl_test:
                 )
             )
         except: pass
+        log_print(
+            [
+                "Plotting Quadratic Losses",
+            ], 
+            log_file
+        )
 
         qmd.plotQuadraticLoss(
             save_to_file = str( 
@@ -465,7 +491,12 @@ if global_variables.qhl_test:
 
     print("plotting expectation values")
 
-    
+    log_print(
+        [
+            "Plotting Dynamics",
+        ], 
+        log_file
+    )
     qmd.plotDynamics(
         save_to_file=str( 
             global_variables.plots_directory +
@@ -473,6 +504,12 @@ if global_variables.qhl_test:
             str(global_variables.long_id)+
             '.png'
         )
+    )
+    log_print(
+        [
+            "Finished plotting dynamics",
+        ], 
+        log_file
     )
 
 #     qmd.plotExpecValues(
