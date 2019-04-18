@@ -7,8 +7,8 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
-multiple_qhl=1
+qhl_test=1
+multiple_qhl=0
 do_further_qhl=0
 exp_data=1
 simulate_experiment=0
@@ -91,8 +91,8 @@ sim_growth_rule='hopping_topology'
 ### which will overwrite growth_rule if exp_data==1
 
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
-exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# exp_growth_rule='NV_centre_spin_large_bath'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='PT_Effective_Hamiltonian'
@@ -150,7 +150,7 @@ then
     # rand_true_params=0
     # special_probe='plus_random'
     # special_probe='plus'
-    # special_probe='dec_13_exp'
+    special_probe='dec_13_exp'
     special_probe_plot='plus'
 fi
 

@@ -70,7 +70,6 @@ class multiPGH(qi.Heuristic):
             )
             
         #print('Selected particles: #1 ' + repr(x) + ' #2 ' + repr(xp))
-        test_pgh = True
         eps = np.empty(
             (1,),
             dtype=self._updater.model.expparams_dtype
@@ -87,17 +86,16 @@ class multiPGH(qi.Heuristic):
             sigma = self._updater.model.distance(x, xp)
             # print("sigma = ", sigma)
             if self._increase_time == True:
-                # TODO get num params (len some oplist?)
-                # todo get which epoch this is
-                #TODO make test_pgh flag
-                # epoch_id = self._updater.model.
+                # Increase time 
+                # ie get 1/sigma and add another time factor on top
+                # to reach higher times
                 orig_time = self._t_func(
                     (1 / sigma**self._pgh_exponent)
                 )
 
                 new_time = self._t_func(
                     (1 / sigma**self._pgh_exponent)
-                    + ((1/sigma) * epoch_id * num_params)/50
+                    + ((1/sigma) * epoch_id * num_params)/10
                 )
                 # print(
                 #     "[multipgh]", 

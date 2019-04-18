@@ -76,7 +76,9 @@ expec_val_function_dict = {
 default_true_operators_by_generator = {
     'test_changes_to_qmd' : 'x',
     'PT_Effective_Hamiltonian' : 'zTxPPyTxPPxTiPPxTz' ,
-    'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_interaction_x_d3PPPnv_spin_y_d3PPPnv_interaction_y_d3PPPnv_spin_z_d3PPPnv_interaction_z_d3',
+    'NV_centre_spin_large_bath' : 'nv_spin_x_d10PPPPPPPPPPnv_interaction_x_d10PPPPPPPPPPnv_spin_y_d10PPPPPPPPPPnv_interaction_y_d10PPPPPPPPPPnv_spin_z_d10PPPPPPPPPPnv_interaction_z_d10',
+    # 'NV_centre_spin_large_bath' : 'nv_spin_x_d9PPPPPPPPPnv_interaction_x_d9PPPPPPPPPnv_spin_y_d9PPPPPPPPPnv_interaction_y_d9PPPPPPPPPnv_spin_z_d9PPPPPPPPPnv_interaction_z_d9',
+    # 'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_interaction_x_d3PPPnv_spin_y_d3PPPnv_interaction_y_d3PPPnv_spin_z_d3PPPnv_interaction_z_d3',
     # 'NV_centre_spin_large_bath' : 'nv_spin_z_d3PPPnv_interaction_z_d3',
     # 'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'reduced_nv_experiment' : 'zTi' ,
@@ -239,7 +241,7 @@ max_spawn_depth_info = {
 max_num_qubits_info = {
     'test_changes_to_qmd' : 2,
     'PT_Effective_Hamiltonian' : 2 ,
-    'NV_centre_spin_large_bath' : 8,
+    'NV_centre_spin_large_bath' : 10,
     'NV_centre_experiment_debug' : 2,
     'reduced_nv_experiment' : 2,
     'two_qubit_ising_rotation' : 3,
@@ -785,6 +787,7 @@ def get_probe_dict(
 	# ):
 
 	# 	probe_dict_function = ProbeGeneration.plus_probes_dict
+    # max_num_qubits = 
 
 	if special_probe == 'None':
 		special_probe = None
