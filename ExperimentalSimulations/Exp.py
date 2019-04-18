@@ -423,7 +423,7 @@ if global_variables.qhl_test:
 
     if global_variables.save_plots:
         
-        print("Plotting things")
+        print("[Exp.py] Plotting things")
 
         try:
             qmd.plotParameterEstimates(
@@ -465,7 +465,7 @@ if global_variables.qhl_test:
 
     print("plotting expectation values")
 
-
+    
     qmd.plotDynamics(
         save_to_file=str( 
             global_variables.plots_directory +

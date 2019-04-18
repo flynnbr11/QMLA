@@ -2428,10 +2428,43 @@ class QMD():
         mod = self.reducedModelInstanceFromID(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
         mod.updateLearnedValues()
+        
+        n_qubits = DataBase.get_num_qubits(mod.Name)
+        if n_qubits >= 3:
+            # only compute subset of points for plot
+            # otherwise takes too long
+            self.log_print(
+                [
+                    "getting new set of times to plot expectation values for"
+                ]
+            )
+            expec_val_plot_times = self.PlotTimes[0::100]
+        else:
+            self.log_print(
+                [
+                    "Using default times to plot expectation values for",
+                    "num qubits:", n_qubits
+                ]
+            )
+            expec_val_plot_times = self.PlotTimes
+
+        self.log_print(
+            [
+                "times to plot for expetation values:", 
+                expec_val_plot_times
+            ]
+        )
+
         mod.compute_expectation_values(
-            times = self.PlotTimes,
+            times = expec_val_plot_times,
             plot_probe_path = self.PlotProbeFile
         )
+        self.log_print(
+            [
+                "Finished computing expectation values for", mod.Name
+            ]
+        )
+
 
         #TODO write single QHL test
         time_now = time.time()
