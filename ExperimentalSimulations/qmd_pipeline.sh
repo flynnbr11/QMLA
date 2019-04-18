@@ -6,7 +6,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
+num_tests=5
 qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
@@ -123,8 +123,8 @@ num_probes=10
 force_plot_plus=0
 gaussian=1
 probe_noise=0.0000001
-param_min=0
-param_max=1
+param_min=2
+param_max=6
 param_mean=0.5
 param_sigma=3
 rand_true_params=0

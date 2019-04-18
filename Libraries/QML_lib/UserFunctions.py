@@ -78,6 +78,7 @@ default_true_operators_by_generator = {
     'PT_Effective_Hamiltonian' : 'zTxPPyTxPPxTiPPxTz' ,
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d10PPPPPPPPPPnv_interaction_x_d10PPPPPPPPPPnv_spin_y_d10PPPPPPPPPPnv_interaction_y_d10PPPPPPPPPPnv_spin_z_d10PPPPPPPPPPnv_interaction_z_d10',
     'NV_centre_spin_large_bath' : 'nv_spin_x_d9PPPPPPPPPnv_interaction_x_d9PPPPPPPPPnv_spin_y_d9PPPPPPPPPnv_interaction_y_d9PPPPPPPPPnv_spin_z_d9PPPPPPPPPnv_interaction_z_d9',
+    # 'NV_centre_spin_large_bath' : 'nv_spin_x_d4PPPPnv_interaction_x_d4PPPPnv_spin_y_d4PPPPnv_interaction_y_d4PPPPnv_spin_z_d4PPPPnv_interaction_z_d4',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_interaction_x_d3PPPnv_spin_y_d3PPPnv_interaction_y_d3PPPnv_spin_z_d3PPPnv_interaction_z_d3',
     # 'NV_centre_spin_large_bath' : 'nv_spin_z_d3PPPnv_interaction_z_d3',
     # 'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,

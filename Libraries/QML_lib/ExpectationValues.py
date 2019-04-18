@@ -405,7 +405,7 @@ def n_qubit_hahn_evolution(
     #     ) 
     hahn_angle = np.pi / 2
     hahn_gate = np.kron(    
-        DataBase.sigmaz(), 
+        hahn_angle * DataBase.sigmaz(), 
         np.eye(2**(num_qubits-1))
     )
     inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()
