@@ -232,10 +232,10 @@ if os.path.isfile(true_expectation_value_path) == False:
         open(global_variables.plot_probe_file, 'rb')
     )
     probe = plot_probe_dict[true_num_qubits]
-    print(
-        "Generating true expectation values (for plots) with probe", 
-        probe
-    )
+    # print(
+    #     "Generating true expectation values (for plots) with probe", 
+    #     probe
+    # )
 
     log_print(
         [
@@ -303,7 +303,9 @@ if global_variables.custom_prior:
 else:
     prior_specific_terms = {}
 log_print(
-    ["Prior specific terms:", prior_specific_terms], 
+    [
+        "Prior specific terms:", prior_specific_terms
+    ], 
     log_file
 )
 

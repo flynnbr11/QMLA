@@ -14,26 +14,18 @@ def MAX_PARAM():
 ### SET VALUES HERE ####
 
 set_experimental_data_prior_specific_terms = {
-	'xTi' : [4.0, 1.5],
-	'yTi' : [4.0, 1.5],
-	'zTi' : [4.0, 1.5],
-	# 'zTi' : [2.5, 1.0],  # FOR BQIT19 Poster #TODO REMOVE
-	'xTx' : [4.0, 1.5],
-	'yTy' : [4.0, 1.5],
-	'zTz' : [4.0, 1.5],
-	'xTy' : [4.0, 1.5],
-	'xTz' : [4.0, 1.5],
-	'yTz' : [4.0, 1.5],
-	# 'xTi': [5.0, 2.0], 
-	# 'xTy': [3.0, 2.0], 
-	# 'zTi': [-5.0, 2.0], 
-	# 'xTx': [-5.0, 2.0], 
-	# 'zTz': [-5.0, 2.0], 
-	# 'z': [1.0, 0.5], 
-	# 'xTz': [3.0, 2.0], 
-	# 'yTi': [5.0, 2.0], 
-	# 'x': [1.0, 0.5], 
-	# 'yTz': [3.0, 2.0], 
+	# 'xTi' : [4.0, 1.5],
+	# 'yTi' : [4.0, 1.5],
+	# 'zTi' : [4.0, 1.5],
+	# # 'zTi' : [2.5, 1.0],  # FOR BQIT19 Poster #TODO REMOVE
+	# 'xTx' : [4.0, 1.5],
+	# 'yTy' : [4.0, 1.5],
+	# 'zTz' : [4.0, 1.5],
+	# 'xTy' : [4.0, 1.5],
+	# 'xTz' : [4.0, 1.5],
+	# 'yTz' : [4.0, 1.5],
+
+
 
 	# for QHL tests on 9 qubit case
 	'nv_interaction_z_d9' : [2.5, 1.0],
@@ -253,6 +245,11 @@ def create_prior(
 	else:
 		set_prior_specific_terms = set_uniform_prior_specific_terms
 
+	print(
+		"[setQHLParams - create_prior]",
+		"\t prior specific terms:", set_prior_specific_terms
+	)
+
 	specific_terms = {}
 	if random_vals is False:
 		# only fill this dict in if the user selects NOT 
@@ -266,6 +263,11 @@ def create_prior(
 				# in case term not in set_prior_specific_terms
 				val = random.uniform(rand_min, rand_max)
 				specific_terms[term] = [val, sigma]
+	else:
+		print(
+			"\n\n [SetQHLParams - create_prior]"
+			"random vals:", random_vals
+		)
 	# print("[SetParams] specific terms:", specific_terms)
 
 
@@ -285,6 +287,11 @@ def create_prior(
 	# print("PRIOR:", specific_terms)
 	if pickle_file is not None:
 		import pickle
+		print(
+			"\n\n storing specific terms to", pickle_file, 
+			"\n", specific_terms, 
+			"\n\n"
+		)
 		pickle.dump(
 			specific_terms, 
 			open(pickle_file, 'wb')

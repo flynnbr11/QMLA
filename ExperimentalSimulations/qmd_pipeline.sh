@@ -80,12 +80,12 @@ mkdir -p $long_dir
 # sim_growth_rule='ising_1d_chain'
 # sim_growth_rule='heisenberg_nontransverse'
 # sim_growth_rule='heisenberg_transverse'
-# sim_growth_rule='heisenberg_xyz'
+sim_growth_rule='heisenberg_xyz'
 # sim_growth_rule='hubbard'
 # sim_growth_rule='hubbard_chain_just_hopping'
 # sim_growth_rule='hubbard_chain'
-#sim_growth_rule='hubbard_square_lattice_generalised'
-sim_growth_rule='hopping_topology'
+# sim_growth_rule='hubbard_square_lattice_generalised'
+# sim_growth_rule='hopping_topology'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
@@ -106,11 +106,8 @@ fi
 echo "SETTING GROWTH RULE TO: $growth_rule"
 
 alt_growth_rules=(
-   # 'heisenberg_transverse'
-   # 'interacing_nn_ising_fixed_axis'
-   # 'non_interacting_ising'
-#  'ising_1d_chain'
- # 'hubbard_square_lattice_generalised'
+    # 'interacing_nn_ising_fixed_axis'
+    # 'hubbard_square_lattice_generalised'
 )
 
 growth_rules_command=""
@@ -137,7 +134,7 @@ store_prt_wt=0 # store all particles and weights after learning
 # set in SetQHLParams dictionaries.
 # All undefined params will be random according 
 # to above defined mean/sigmas
-rand_prior=1
+rand_prior=0
 special_probe='random' #'plus' #'ideal'
 special_probe_plot='random'
 # special_probe='plus_random' #'plus' #'ideal'
