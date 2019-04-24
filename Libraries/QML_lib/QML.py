@@ -1124,10 +1124,22 @@ class reducedModel():
 
     def r_squared(
         self, 
+        times=None, 
         min_time = 0,
         max_time = None 
     ):
-        exp_times = sorted(list(self.ExperimentalMeasurements.keys()))
+        # TODO recheck R squared functions eg which probe used
+        self.log_print(
+            [
+                "R squared function for", self.Name
+            ]
+        )
+        if times == None:
+            exp_times = sorted(
+                list(self.ExperimentalMeasurements.keys())
+            )
+        else:
+            exp_times = times
         if max_time is None:
             max_time = max(exp_times)
 
@@ -1189,12 +1201,22 @@ class reducedModel():
 
     def r_squared_by_epoch(
         self, 
+        times=None, 
         min_time=0,
         max_time=None,
         num_points=10 # maximum number of epochs to take R^2 at
     ):
+        # TODO recheck R squared functions eg which probe used
+        self.log_print(
+            [
+                "R squared by epoch function for", self.Name
+            ]
+        )
         
-        exp_times = sorted(list(self.ExperimentalMeasurements.keys()))
+        if times == None:
+            exp_times = sorted(list(self.ExperimentalMeasurements.keys()))
+        else:
+            exp_times = times
         if max_time is None:
             max_time = max(exp_times)
 

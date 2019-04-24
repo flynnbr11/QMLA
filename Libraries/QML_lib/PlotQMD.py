@@ -367,6 +367,8 @@ def plotDynamicsLearnedModels(
     model_ids = list(sorted(set(model_ids))) # only uniques values
     true_expec_vals = pickle.load(open(qmd.GlobalVariables.true_expec_path, 'rb'))
     times_to_plot = list(sorted(true_expec_vals.keys())) 
+    # times_to_plot = list(sorted(qmd.plot_times))
+
     # TODO this is overwritten within for loop below so that large Hamiltonians don't have to work out each time step
     true_exp = [true_expec_vals[t] for t in times_to_plot]
     plot_probes = pickle.load(
@@ -465,14 +467,18 @@ def plotDynamicsLearnedModels(
                 print("Not reducing number of times for plots")
 
 
-            for t in times_to_plot:
-                # expec_vals[t] = ExpectationValues.expectation_value_wrapper(
-                expec_vals[t] = UserFunctions.expectation_value_wrapper(
-                    method = qmd.MeasurementType,
-                    ham = ham, 
-                    t = t, 
-                    state = probe
-                )
+            # for t in times_to_plot:
+            #     # expec_vals[t] = ExpectationValues.expectation_value_wrapper(
+            #     expec_vals[t] = UserFunctions.expectation_value_wrapper(
+            #         method = qmd.MeasurementType,
+            #         ham = ham, 
+            #         t = t, 
+            #         state = probe
+            #     )
+            expec_vals = reduced.expectation_values
+            times_to_plot = sorted(list(expec_vals.keys()))
+            true_exp = [true_expec_vals[t] for t in times_to_plot]
+
             ## choose an axis to plot on
             ax = fig.add_subplot(gs[row, col])
             ## first plot true dynamics

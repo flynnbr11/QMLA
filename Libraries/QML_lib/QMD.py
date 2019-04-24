@@ -2403,7 +2403,11 @@ class QMD():
             )
 
         mod_to_learn = self.TrueOpName
-        self.log_print(["QHL test on:", mod_to_learn])
+        self.log_print(
+            [
+                "QHL test on:", mod_to_learn
+            ]
+        )
 
         self.learnModel(
             model_name=mod_to_learn,
@@ -2461,9 +2465,11 @@ class QMD():
         )
         self.log_print(
             [
-                "Finished computing expectation values for", mod.Name
+                "Finished computing expectation values for", mod.Name,
+                mod.expectation_values
             ]
         )
+
 
 
         #TODO write single QHL test
@@ -2482,7 +2488,9 @@ class QMD():
             'ConfigLatex' : self.LatexConfig,       
             'Time': time_taken,
             'QID' : self.Q_id,
-            'RSquaredTrueModel' : mod.r_squared(),
+            'RSquaredTrueModel' : mod.r_squared(
+                times = expec_val_plot_times
+            ),
             'QuadraticLosses' : mod.QuadraticLosses,
             'NameAlphabetical' : DataBase.alph(mod.Name),
             'LearnedParameters' : mod.LearnedParameters,
@@ -2491,11 +2499,19 @@ class QMD():
             'TrackVolume' : mod.VolumeList,
             'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
             'ExpectationValues' : mod.expectation_values,
-            'RSquaredByEpoch' : mod.r_squared_by_epoch(),
+            # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
+            #     times = expec_val_plot_times
+            # ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
             'LearnedHamiltonian' : mod.LearnedHamiltonian,
             'GrowthGenerator' : mod.GrowthGenerator, 
             'ChampLatex' : mod.LatexTerm,
         }
+
+        self.log_print(
+            [
+                "Stored results dict. Finished testQHL function"
+            ]
+        )
 
     def runMultipleModelQHL(self, model_names=None):
         if model_names is None:

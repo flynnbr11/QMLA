@@ -84,8 +84,9 @@ def learnModelRemote(
     active_branches_learning_models = rds_dbs['active_branches_learning_models']
 
     def log_print(to_print_list):
-        identifier = str(str(time_seconds()) + " [RQ Learn "+
-            str(modelID)+"]"
+        identifier = str(
+            str(time_seconds()) + 
+            " [RQ Learn " + str(modelID)+"]"
         )
         if type(to_print_list)!=list:
             to_print_list = list(to_print_list)
