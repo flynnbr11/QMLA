@@ -2434,7 +2434,7 @@ class QMD():
         mod.updateLearnedValues()
         
         n_qubits = DataBase.get_num_qubits(mod.Name)
-        if n_qubits >= 3:
+        if n_qubits > 3:
             # only compute subset of points for plot
             # otherwise takes too long
             self.log_print(
@@ -2442,7 +2442,7 @@ class QMD():
                     "getting new set of times to plot expectation values for"
                 ]
             )
-            expec_val_plot_times = self.PlotTimes[0::100]
+            expec_val_plot_times = self.PlotTimes[0::10]
         else:
             self.log_print(
                 [
@@ -3269,9 +3269,14 @@ class QMD():
     ):
         if all_models==True:
             model_ids = list(sorted(self.ModelNameIDs.keys()))
+        if self.QHLmode == False and self.multiQHLMode ==False:
+            include_bayes_factors_in_dynamics_plots = False
+        else:
+            include_bayes_factors_in_dynamics_plots = True 
 
         PlotQMD.plotDynamicsLearnedModels(
             qmd = self, 
+            include_bayes_factors = include_bayes_factors_in_dynamics_plots,
             model_ids = model_ids, 
             save_to_file = save_to_file,
         )

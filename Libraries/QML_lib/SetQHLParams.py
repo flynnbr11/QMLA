@@ -34,6 +34,14 @@ set_experimental_data_prior_specific_terms = {
 	# 'yTi': [5.0, 2.0], 
 	# 'x': [1.0, 0.5], 
 	# 'yTz': [3.0, 2.0], 
+
+	# for QHL tests on 9 qubit case
+	'nv_interaction_z_d9' : [2.5, 1.0],
+	'nv_spin_z_d9' : [2.5, 1.0],
+	'nv_spin_x_d9' : [2.5, 1.0],
+	'nv_interaction_x_d9' : [2.5, 1.0],
+	'nv_spin_y_d9' : [2.5, 1.0],
+	'nv_interaction_y_d9' : [2.5, 1.0],
 }
 
 set_normal_prior_specific_terms = {

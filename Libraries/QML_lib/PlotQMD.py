@@ -493,6 +493,8 @@ def plotDynamicsLearnedModels(
             ax.plot(
                 times_to_plot, 
                 sim_exp, 
+                marker = 'o', 
+                markevery = 10, 
                 c = plot_colour,
                 label = dynamics_label
             )
@@ -3385,7 +3387,7 @@ def replot_expectation_values(
     true_exp_vals = pickle.load(open(true_expec_vals_path, 'rb'))
     exp_times = sorted(list(true_exp_vals.keys()))
     
-    sim_times = copy.copy(exp_times)
+    sim_times = copy.copy(exp_times)[0::10]
     if (
         upper_x_limit is not None 
         and
@@ -3457,6 +3459,8 @@ def replot_expectation_values(
         ax.plot(
             sim_times, 
             sim_exp, 
+            marker = 'o', 
+            s=3,
             label=model_label, 
             color=sim_colour
         )

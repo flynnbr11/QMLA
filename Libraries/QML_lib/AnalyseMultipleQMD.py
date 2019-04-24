@@ -1599,21 +1599,23 @@ if further_qhl_mode == False:
         print("Parameter sweep analysis failed.")
         pass
 
-    try:
-        ptq.cluster_results_and_plot(
-            path_to_results = results_csv, 
-            true_expec_path = true_expec_path, 
-            plot_probe_path = plot_probe_file, 
-            true_params_path = true_params_path,
-            growth_generator = growth_generator, 
-            measurement_type = measurement_type, 
-            save_param_values_to_file = str(plot_desc + 'clusters_by_param.png'),
-            save_param_clusters_to_file = str(plot_desc + 'clusters_by_model.png'),
-            save_redrawn_expectation_values = str(plot_desc + 'clusters_expec_vals.png')
-        )
-    except:
-        print("Failed to cluster and replot results.")
-        pass
+    do_clustering = True
+    if do_clustering:
+        try:
+            ptq.cluster_results_and_plot(
+                path_to_results = results_csv, 
+                true_expec_path = true_expec_path, 
+                plot_probe_path = plot_probe_file, 
+                true_params_path = true_params_path,
+                growth_generator = growth_generator, 
+                measurement_type = measurement_type, 
+                save_param_values_to_file = str(plot_desc + 'clusters_by_param.png'),
+                save_param_clusters_to_file = str(plot_desc + 'clusters_by_model.png'),
+                save_redrawn_expectation_values = str(plot_desc + 'clusters_expec_vals.png')
+            )
+        except:
+            print("Failed to cluster and replot results.")
+            pass
         # raise
 
 
