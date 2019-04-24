@@ -395,6 +395,7 @@ def time_required(
 
   true_dimension = DataBase.get_num_qubits(true_operator)
   qhl_time = 5.5*(
+    insurance_factor * 
     hamiltonian_exponentiation_times[true_dimension]
     * num_hamiltonians_per_model
   )

@@ -507,9 +507,13 @@ class ModelLearningClass():
         for op_name in self.SimOpsNames:
             param_indices[op_name] = self.SimOpsNames.index(op_name)
 
+        print_frequency = max(
+            int(self.NumExperiments/10), 
+            5
+        )
 
         for istep in range(self.NumExperiments):
-            if (istep%300 == 0):
+            if (istep%print_frequency == 0):
                 # print so we can see how far along algorithm is. 
                 self.log_print(
                     [
