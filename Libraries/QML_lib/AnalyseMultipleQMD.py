@@ -1097,8 +1097,10 @@ def r_sqaured_average(
         )
         ax.legend(
             bbox_to_anchor=(1.0, 0.9), 
-            title='Model (instances)'
+            title='Model (# instances)'
         )
+    plt.xlabel('Epoch')
+    plt.ylabel('$R^2$')
     plt.title('$R^2$ average')
 
     if save_to_file is not None:
@@ -1507,7 +1509,6 @@ Bayes_t_test( # average expected values
     )
 )
 
-"""
 r_sqaured_average(
     results_path = results_csv,
     top_number_models = arguments.top_number_models,
@@ -1517,7 +1518,7 @@ r_sqaured_average(
         'r_squared_averages.png'
     )
 )
-
+"""
 ptq.average_quadratic_losses(
     results_path = results_csv, 
     growth_generator = growth_generator, 
@@ -1528,7 +1529,6 @@ ptq.average_quadratic_losses(
         'quadratic_losses_avg.png'
     )
 )
-"""
 if qhl_mode==True:
     r_squared_plot = str(
         directory_to_analyse + 
@@ -1538,6 +1538,7 @@ if qhl_mode==True:
         results_csv_path = results_csv,
         save_to_file = r_squared_plot
     )
+"""
 
 if further_qhl_mode == False:
     print("FURTHER QHL=FALSE. PLOTTING STUFF")

@@ -232,8 +232,13 @@ class QMD():
             )
         else: 
             self.ExperimentalMeasurementTimes=None
+        self.PlotProbeFile = self.GlobalVariables.plot_probe_file
         self.PlotTimes = plot_times
-        
+        self.PlotProbes = pickle.load(
+            open(self.PlotProbeFile, 'rb')
+        )
+
+
         if self.UseExperimentalData==False:
             self.ExperimentalMeasurements = {}
             self.TrueHamiltonian = np.tensordot(
@@ -243,9 +248,11 @@ class QMD():
             )
 
             # plot_probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe
-            plot_probe =  ExpectationValues.n_qubit_plus_state(
-                self.TrueOpDim
-            )  # TODO generalise probe
+            # plot_probe =  ExpectationValues.n_qubit_plus_state(
+            #     self.TrueOpDim
+            # )  # TODO generalise probe
+
+
             for t in self.PlotTimes:
                 # TODO is this the right expectation value func???
                 self.ExperimentalMeasurements[t] = (
@@ -254,7 +261,7 @@ class QMD():
                         method=self.MeasurementType,
                         ham = self.TrueHamiltonian,
                         t = t, 
-                        state = plot_probe  
+                        state = self.PlotProbes[self.TrueOpDim]  
                     )
                 )
 
@@ -503,7 +510,7 @@ class QMD():
         )
         self.LatexConfig = latex_config
         print("[QMD] latex config:", self.LatexConfig)
-        self.PlotProbeFile = self.GlobalVariables.plot_probe_file
+        
         self.QMDInfo = {
             # may need to take copies of these in case pointers accross nodes break
             'num_probes' : self.NumProbes,
@@ -2461,7 +2468,7 @@ class QMD():
 
         mod.compute_expectation_values(
             times = expec_val_plot_times,
-            plot_probe_path = self.PlotProbeFile
+            # plot_probe_path = self.PlotProbeFile
         )
         self.log_print(
             [
@@ -2489,7 +2496,8 @@ class QMD():
             'Time': time_taken,
             'QID' : self.Q_id,
             'RSquaredTrueModel' : mod.r_squared(
-                times = expec_val_plot_times
+                times = expec_val_plot_times,
+                plot_probes = self.PlotProbes
             ),
             'QuadraticLosses' : mod.QuadraticLosses,
             'NameAlphabetical' : DataBase.alph(mod.Name),
@@ -2499,9 +2507,10 @@ class QMD():
             'TrackVolume' : mod.VolumeList,
             'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
             'ExpectationValues' : mod.expectation_values,
-            # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
-            #     times = expec_val_plot_times
-            # ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
+            'RSquaredByEpoch' : mod.r_squared_by_epoch(
+                times = expec_val_plot_times,
+                plot_probes = self.PlotProbes
+            ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
             'LearnedHamiltonian' : mod.LearnedHamiltonian,
             'GrowthGenerator' : mod.GrowthGenerator, 
             'ChampLatex' : mod.LatexTerm,
@@ -2576,6 +2585,24 @@ class QMD():
             'Finished waiting on queue, for all:', running_models,
             ]
         )
+        n_qubits = DataBase.get_num_qubits(mod.Name)
+        if n_qubits > 3:
+            # only compute subset of points for plot
+            # otherwise takes too long
+            self.log_print(
+                [
+                    "getting new set of times to plot expectation values for"
+                ]
+            )
+            expec_val_plot_times = self.PlotTimes[0::10]
+        else:
+            self.log_print(
+                [
+                    "Using default times to plot expectation values for",
+                    "num qubits:", n_qubits
+                ]
+            )
+            expec_val_plot_times = self.PlotTimes
 
         time_now = time.time()
         time_taken = time_now - self.StartingTime
@@ -2587,7 +2614,7 @@ class QMD():
             mod.updateLearnedValues()
             mod.compute_expectation_values(
                 times=self.PlotTimes,
-                plot_probe_path = self.PlotProbeFile
+                # plot_probe_path = self.PlotProbeFile
             )
             mod.results_dict = {
                 'NumParticles' : mod.NumParticles,
@@ -2601,7 +2628,9 @@ class QMD():
                 'QID' : self.Q_id,
                 'ChampID' : self.ChampID, 
                 'QuadraticLosses' : mod.QuadraticLosses,
-                'RSquaredTrueModel' : mod.r_squared(),
+                'RSquaredTrueModel' : mod.r_squared(
+                    times = expec_val_plot_times
+                ),
                 'NameAlphabetical' : DataBase.alph(mod.Name),
                 'LearnedParameters' : mod.LearnedParameters,
                 'FinalSigmas' : mod.FinalSigmas, 
@@ -2609,7 +2638,10 @@ class QMD():
                 'TrackVolume' : mod.VolumeList,
                 'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
                 'ExpectationValues' : mod.expectation_values,
-                'RSquaredByEpoch' : mod.r_squared_by_epoch(),
+                'RSquaredByEpoch' : mod.r_squared_by_epoch(
+                    times = expec_val_plot_times,
+                    plot_probes = self.PlotProbes
+                ),
                 'LearnedHamiltonian' : mod.LearnedHamiltonian,
                 'GrowthGenerator' : mod.GrowthGenerator
             }
@@ -2974,7 +3006,7 @@ class QMD():
 
         champ_model.compute_expectation_values(
             times=self.PlotTimes,
-            plot_probe_path = self.PlotProbeFile
+            # plot_probe_path = self.PlotProbeFile
         )
 
         self.ChampionFinalParams = (
@@ -3031,6 +3063,27 @@ class QMD():
 
         time_now = time.time()
         time_taken = time_now - self.StartingTime
+
+        n_qubits = DataBase.get_num_qubits(mod.Name)
+        if n_qubits > 3:
+            # only compute subset of points for plot
+            # otherwise takes too long
+            self.log_print(
+                [
+                    "getting new set of times to plot expectation values for"
+                ]
+            )
+            expec_val_plot_times = self.PlotTimes[0::10]
+        else:
+            self.log_print(
+                [
+                    "Using default times to plot expectation values for",
+                    "num qubits:", n_qubits
+                ]
+            )
+            expec_val_plot_times = self.PlotTimes
+
+
         
         self.ChampionResultsDict = {
             'NameAlphabetical' : DataBase.alph(self.ChampionName),
@@ -3065,7 +3118,10 @@ class QMD():
             'TrackParameterEstimates' : champ_model.TrackParameterEstimates,
             'TrackVolume' : champ_model.VolumeList,
             'TrackCovarianceMatrices' : champ_model.TrackCovMatrices, 
-            'RSquaredByEpoch' : champ_model.r_squared_by_epoch(),
+            'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
+                plot_probes = self.PlotProbes,
+                times = expec_val_plot_times
+            ),
             'LearnedHamiltonian' : champ_model.LearnedHamiltonian,
             'GrowthGenerator' : champ_model.GrowthGenerator, 
             'ChampLatex' : champ_model.LatexTerm,

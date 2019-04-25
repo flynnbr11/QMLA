@@ -967,6 +967,9 @@ class reducedModel():
         self.TrueOpList = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
         self.TrueOpName  = qmd_info['true_name']
+        self.PlotProbes = pickle.load(
+            open(qmd_info['plot_probe_file'], 'rb')
+        )
         self.QLE = qmd_info['qle']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.StoreParticlesWeights = qmd_info[
@@ -1075,24 +1078,27 @@ class reducedModel():
     def compute_expectation_values(
         self, 
         times = [],
-        plot_probe_path = None,
-        probe = None #  TODO generalise probe
+        # plot_probe_path = None,
+        # probe = None #  TODO generalise probe
     ):
         # TODO expectation_values dict only for |++> probe as is.
-        if probe is None and plot_probe_path is None:
-            probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
-        else:
+        # if probe is None and plot_probe_path is None:
+        #     probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
+        # else:
 
-            plot_probe_dict = pickle.load(
-                open(plot_probe_path, 'rb')
-            )
-            probe = plot_probe_dict[self.NumQubits]
+        #     plot_probe_dict = pickle.load(
+        #         open(plot_probe_path, 'rb')
+        #     )
+        #     probe = plot_probe_dict[self.NumQubits]
+
+        probe = self.PlotProbes[self.NumQubits]
+        
         self.log_print(
             [
             "Computing expectation values.", 
             "\nMeasurement Type:", self.MeasurementType, 
             "\nLearnedHamiltonian", self.LearnedHamiltonian,
-            "\nPlotProbePath:", plot_probe_path, 
+            # "\nPlotProbePath:", plot_probe_path, 
             "\nProbe:", probe
             ]
         )
@@ -1128,6 +1134,7 @@ class reducedModel():
 
     def r_squared(
         self, 
+        plot_probes,
         times=None, 
         min_time = 0,
         max_time = None 
@@ -1156,7 +1163,9 @@ class reducedModel():
             self.ExperimentalMeasurements[t] for t in exp_times
         ]
         # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
-        probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
+        # probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
+        # probe = plot_probes[self.NumQubits]
+        probe = self.PlotProbes[self.NumQubits]
 
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
@@ -1189,7 +1198,9 @@ class reducedModel():
 
                 sim = UserFunctions.expectation_value_wrapper(
                     method=self.MeasurementType,
-                    ham=ham, t=t, state=probe
+                    ham=ham, 
+                    t=t, 
+                    state=probe
                 )
                 self.expectation_values[t] = sim
 
@@ -1205,6 +1216,7 @@ class reducedModel():
 
     def r_squared_by_epoch(
         self, 
+        plot_probes, 
         times=None, 
         min_time=0,
         max_time=None,
@@ -1213,7 +1225,10 @@ class reducedModel():
         # TODO recheck R squared functions eg which probe used
         self.log_print(
             [
-                "R squared by epoch function for", self.Name
+                "R squared by epoch function for", 
+                self.Name,
+                "Times passed:", 
+                times
             ]
         )
         
@@ -1221,23 +1236,41 @@ class reducedModel():
             exp_times = sorted(list(self.ExperimentalMeasurements.keys()))
         else:
             exp_times = times
+
+
         if max_time is None:
             max_time = max(exp_times)
 
-        min_time = expdt.nearestAvailableExpTime(exp_times, min_time)
-        max_time = expdt.nearestAvailableExpTime(exp_times, max_time)
+        min_time = expdt.nearestAvailableExpTime(
+            exp_times, 
+            min_time
+        )
+        max_time = expdt.nearestAvailableExpTime(
+            exp_times, 
+            max_time
+        )
         min_data_idx = exp_times.index(min_time)
         max_data_idx = exp_times.index(max_time)
         exp_times = exp_times[min_data_idx:max_data_idx]
+
         exp_data = [
-            self.ExperimentalMeasurements[t] for t in exp_times
+            self.ExperimentalMeasurements[t] 
+            for t in exp_times
         ]
+
+        # exp_data = exp_data[0::10]
         # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
-        probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
+        # probe  = plot_probes[self.NumQubits]
+        probe = self.PlotProbes[self.NumQubits]
 
         datamean = np.mean(exp_data[0:max_data_idx])
-        datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
+        datavar = np.sum( 
+            (exp_data[0:max_data_idx] - datamean)**2  
+        )
         r_squared_by_epoch =  {}
+
+        # only use subset of epochs in case there are a large 
+        # num experiments due to heavy computational overhead
         spaced_epochs = np.round(
             np.linspace(
                 0, 
@@ -1287,7 +1320,7 @@ class reducedModel():
 
             Rsq = 1 - sum_of_residuals/datavar
             r_squared_by_epoch[e] = Rsq
-
+        self.r_squared_by_epoch = r_squared_by_epoch
         return r_squared_by_epoch
 
 

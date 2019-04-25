@@ -789,7 +789,12 @@ def ExpectationValuesQHL_TrueModel(
         else:
             sim_label = 'Model '+str(mod_id)
 
-        plt.plot(times, sim_expec_values, label=sim_label, color=sim_col)
+        plt.plot(
+            times, 
+            sim_expec_values, 
+            label=sim_label, 
+            color=sim_col
+        )
 
     ax = plt.subplot(111)
 
