@@ -11,7 +11,7 @@ import UserFunctions
 import Distrib as Distributions
 import GenSimQMD_IQLE as gsi
 import ExperimentalDataFunctions as expdt
-import multiPGH as mpgh
+# import multiPGH as mpgh
 import DataBase 
 import ModelNames
 from MemoryTest import print_loc
@@ -240,6 +240,7 @@ class ModelLearningClass():
         self.TimeDepTrueParams = qmd_info['time_dep_true_params']
         self.NumTimeDepTrueParams = qmd_info['num_time_dependent_true_params']
         self.QLE = qmd_info['qle']
+        self.PlotTimes = qmd_info['plot_times']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.ExpComparisonTol = qmd_info['compare_linalg_exp_tol']
         self.UseExperimentalData = qmd_info['use_experimental_data']
@@ -435,15 +436,27 @@ class ModelLearningClass():
             )
 
         self.Inv_Field = [
-            item[0] for item in self.GenSimModel.expparams_dtype[1:] 
+            item[0] 
+            for item 
+            in self.GenSimModel.expparams_dtype[1:] 
         ]
-        self.Heuristic = mpgh.multiPGH(
-            self.Updater, 
-            inv_field=self.Inv_Field, 
-            increase_time = self.IncreasePGHTime,
-            pgh_exponent = self.PGHExponent
-        )
+        # self.Heuristic = mpgh.multiPGH(
+        #     growth_generator = self.GrowthGenerator, 
+        #     self.Updater, 
+        #     inv_field=self.Inv_Field, 
+        #     increase_time = self.IncreasePGHTime,
+        #     pgh_exponent = self.PGHExponent
+        # )
         
+        self.Heuristic = UserFunctions.get_heuristic(
+            growth_generator = self.GrowthGenerator,
+            updater = self.Updater, 
+            inv_field = self.Inv_Field, 
+            increase_time = self.IncreasePGHTime, 
+            pgh_exponent = self.PGHExponent, 
+            time_list = self.PlotTimes
+        )
+
         # if checkloss == True or self.checkQLoss==True:     
         #     self.QLosses = np.array([])
         self.QLosses = []
@@ -511,7 +524,7 @@ class ModelLearningClass():
             int(self.NumExperiments/10), 
             5
         )
-
+        # print("[QML] STARTING QHL UPDATES")
         for istep in range(self.NumExperiments):
             if (istep%print_frequency == 0):
                 # print so we can see how far along algorithm is. 
@@ -565,12 +578,13 @@ class ModelLearningClass():
             after_datum = time.time()
             self.datum_gather_cumulative_time+=after_datum-before_datum
             
-            exp_t = self.Experiment[0][0]
+            # exp_t = self.Experiment[0][0]
             before_upd = time.time()
             ## Call updater to update distribution based on datum
             try:
                 self.Updater.update(self.Datum, self.Experiment)
             except RuntimeError:
+                import sys
                 self.log_print(
                     [
                         "RuntimeError from updater on model ID ", 
@@ -579,12 +593,13 @@ class ModelLearningClass():
                         self.Name
                     ]
                 )
+                print("\n\nEXITING; Inspect log\n\n")
                 sys.exit()
 
             after_upd = time.time()
             self.update_cumulative_time+=after_upd-before_upd
             
-            if self.Updater.just_resampled:
+            if self.Updater.just_resampled is True:
                 self.ResampleEpochs.append(istep)
             
             print_loc(global_print_loc)
@@ -746,19 +761,22 @@ class ModelLearningClass():
                 )
 
 
-    def resetPrior(self):
-        print("[QML]\n\n\n\n\IN RESET PRIOR\n\n\n")
-        self.Updater.prior = self.Prior
-        self.Updater = qi.SMCUpdater(self.GenSimModel,
-            self.NumParticles, self.Prior, 
-            resample_thresh=self.ResamplerThresh,
-            resampler = qi.LiuWestResampler(a=self.ResamplerA),
-            debug_resampling=False
-        )
-        self.Heuristic = mpgh.multiPGH(self.Updater, 
-            self.SimOpList, inv_field=self.Inv_Field
-        )
-        return 1
+    # def resetPrior(self):
+    #     print("[QML]\n\n\n\n\IN RESET PRIOR\n\n\n")
+    #     self.Updater.prior = self.Prior
+    #     self.Updater = qi.SMCUpdater(self.GenSimModel,
+    #         self.NumParticles, self.Prior, 
+    #         resample_thresh=self.ResamplerThresh,
+    #         resampler = qi.LiuWestResampler(a=self.ResamplerA),
+    #         debug_resampling=False
+    #     )
+    # # TODO  use UserFunctions.get_heuristic() instead
+    #     self.Heuristic = mpgh.multiPGH(
+    #         self.Updater, 
+    #         self.SimOpList, 
+    #         inv_field=self.Inv_Field
+    #     )
+    #     return 1
         
         
     def learned_info_dict(self):
@@ -970,6 +988,7 @@ class reducedModel():
         self.PlotProbes = pickle.load(
             open(qmd_info['plot_probe_file'], 'rb')
         )
+        self.PlotTimes = qmd_info['plot_times']
         self.QLE = qmd_info['qle']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.StoreParticlesWeights = qmd_info[

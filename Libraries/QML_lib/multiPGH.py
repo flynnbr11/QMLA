@@ -1,3 +1,5 @@
+## Deprecated -- instead using Heursitics file
+
 import qinfer as qi
 import numpy as np
 import scipy as sp
@@ -18,6 +20,7 @@ def minsingvalnorm(matrix):
 
 def identity(arg): return arg
 
+
 class multiPGH(qi.Heuristic):
     
     def __init__(
@@ -32,7 +35,8 @@ class multiPGH(qi.Heuristic):
         pgh_exponent=1,
         increase_time=False, 
         maxiters=10,
-        other_fields=None
+        other_fields=None,
+        **kwargs
      ):
         super(multiPGH, self).__init__(updater)
         self._oplist = oplist

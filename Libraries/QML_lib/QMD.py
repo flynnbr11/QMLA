@@ -516,6 +516,7 @@ class QMD():
             'num_probes' : self.NumProbes,
             #          'probe_dict' : self.ProbeDict, # possibly include here?
             'plot_probe_file' : self.PlotProbeFile,
+            'plot_times' : self.PlotTimes, 
             'true_oplist' : self.TrueOpList,
             'true_params' : self.TrueParamsList,  
             'num_particles' : self.NumParticles,
@@ -3327,12 +3328,15 @@ class QMD():
             model_ids = list(sorted(self.ModelNameIDs.keys()))
         if self.QHLmode == False and self.multiQHLMode ==False:
             include_bayes_factors_in_dynamics_plots = False
+            include_param_estimates_in_dynamics_plots = False
         else:
             include_bayes_factors_in_dynamics_plots = True 
+            include_param_estimates_in_dynamics_plots = True
 
         PlotQMD.plotDynamicsLearnedModels(
             qmd = self, 
             include_bayes_factors = include_bayes_factors_in_dynamics_plots,
+            include_param_estimates = include_param_estimates_in_dynamics_plots,
             model_ids = model_ids, 
             save_to_file = save_to_file,
         )

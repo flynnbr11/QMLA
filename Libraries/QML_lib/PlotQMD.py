@@ -550,15 +550,25 @@ def plotDynamicsLearnedModels(
             ax.yaxis.set_label_position("right")
 
             times_learned_over = reduced.Times
-            ax.hist(
+            n, bins, patches = ax.hist(
                 times_learned_over,
                 # histtype='step',
                 color = plot_colour, 
                 # fill=False,
                 label=desc
             )
+            print(
+                "[plotDynamicsLearnedModels]",
+                "bins:", bins
+            )
             ax.legend()
             # ax.semilogy()
+            for bin_value in bins:
+                ax.axvline(
+                    bin_value, 
+                    linestyle='--', 
+                    alpha=0.3
+                )
             ax.set_xlim(0, max_time)
 
             col += 1

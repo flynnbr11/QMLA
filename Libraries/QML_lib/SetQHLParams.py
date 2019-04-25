@@ -25,8 +25,6 @@ set_experimental_data_prior_specific_terms = {
 	# 'xTz' : [4.0, 1.5],
 	# 'yTz' : [4.0, 1.5],
 
-
-
 	# for QHL tests on 9 qubit case
 	'nv_interaction_z_d9' : [2.5, 1.0],
 	'nv_spin_z_d9' : [2.5, 1.0],
@@ -73,6 +71,15 @@ set_true_params = {
 	# 'yTi' : 8.4442484,
 	# 'zTi' : 5.713337168736279,	
 
+	# from Dec_13/.../Mar_22/18_13 simulation
+	'xTi':  0.7194027780807557, 
+	'xTx': 0.2127958438308013, 
+	'yTi': 0.3211052268427873, 
+	'yTy': 0.22058434787757564, 
+	'zTi': 0.47843100387017157,
+	'zTz': 0.5957696838755958,
+
+
 	# From 3000exp/20000prt, BC SelectedRuns/Nov_28/15_14/average_priors
 	# 'xTi': -0.57330033068583841, 
 	# 'xTx': 5.1275507795542854, 
@@ -94,12 +101,12 @@ set_true_params = {
 
 
 	# From BC/Feb_12/18_30/results_007
-	'xTi': 0.05906251, 
-	'xTx': 0.18309156, 
-	'yTi': 6.19606907, 
-	'yTy': 0.2610886, 
-	'zTi': 0.25689271, 
-	'zTz': 0.48673637,
+	# 'xTi': 0.05906251, 
+	# 'xTx': 0.18309156, 
+	# 'yTi': 6.19606907, 
+	# 'yTy': 0.2610886, 
+	# 'zTi': 0.25689271, 
+	# 'zTz': 0.48673637,
 
 
 	# From  BC /Jan_29/17_58/results_007
@@ -151,6 +158,7 @@ def create_plot_probe(
 	
 
 	kwargs['num_probes'] = 1 # only want a single probe for plotting purposes
+	# kwargs['noise_level'] = 1e-7
 	print("\nPlot probe generated with kwargs:", kwargs, "\n")
 	plot_probe_dict = UserFunctions.get_probe_dict(
 		**kwargs

@@ -127,12 +127,15 @@ experimental_measurements_dict = pickle.load(
     open(str('Data/'+dataset), 'rb')
 )
 
-num_datapoints_to_plot = 1000 # to visualise in expec_val plot for simulated data
+num_datapoints_to_plot = 100 # to visualise in expec_val plot for simulated data
 
 if global_variables.use_experimental_data is True:
-    expec_val_plot_max_time = global_variables.data_max_time
+    expec_val_plot_max_time = max(
+        list(experimental_measurements_dict.keys())
+    )
+    # expec_val_plot_max_time = global_variables.data_max_time
 else:
-    expec_val_plot_max_time = 5    
+    expec_val_plot_max_time = global_variables.data_max_time   
 
 """
 for t in list(experimental_measurements_dict.keys()):

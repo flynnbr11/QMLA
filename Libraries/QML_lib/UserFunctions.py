@@ -579,6 +579,20 @@ initial_models = {
 		['h_1h2_d2']
 }
 
+
+##### ---------- -------------------- #####  
+# Heuristic choice 
+# i.e. how times are chosen for each experiment during QHL
+##### ---------- -------------------- #####  
+
+import Heuristics
+heuristic_classes = {
+    'two_qubit_ising_rotation_hyperfine_transverse' : 
+        Heuristics.time_from_list,
+    None : Heuristics.multiPGH
+}
+
+
 ##### ---------- -------------------- #####  
 # Probe dict generation
 ##### ---------- -------------------- #####  
@@ -837,11 +851,31 @@ def get_probe_dict(
 	return probe_dict
 
 def get_experimental_dataset(growth_generator):
-	try:
-		ds = experimental_dataset[growth_generator]
-	except:
-		ds = experimental_dataset[None]
-	return ds
+    try:
+        ds = experimental_dataset[growth_generator]
+    except:
+        ds = experimental_dataset[None]
+    return ds
+
+
+def get_heuristic(
+        growth_generator,
+        **kwargs
+    ):
+    print(
+        "[UserFunctions - get_heuristic]",
+    )
+    try:
+        heur_fnc = heuristic_classes[growth_generator]
+    except:
+        heur_fnc = heuristic_classes[None]
+
+    print(
+        "[UserFunctions - get_heuristic]",
+        "Heuristic:", heur_fnc
+    )
+    heuristic = heur_fnc(**kwargs)
+    return heuristic
 
 def get_measurement_type(growth_generator):
 	try:
