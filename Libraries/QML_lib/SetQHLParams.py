@@ -14,16 +14,16 @@ def MAX_PARAM():
 ### SET VALUES HERE ####
 
 set_experimental_data_prior_specific_terms = {
-	# 'xTi' : [4.0, 1.5],
-	# 'yTi' : [4.0, 1.5],
-	# 'zTi' : [4.0, 1.5],
-	# # 'zTi' : [2.5, 1.0],  # FOR BQIT19 Poster #TODO REMOVE
-	# 'xTx' : [4.0, 1.5],
-	# 'yTy' : [4.0, 1.5],
-	# 'zTz' : [4.0, 1.5],
-	# 'xTy' : [4.0, 1.5],
-	# 'xTz' : [4.0, 1.5],
-	# 'yTz' : [4.0, 1.5],
+	'xTi' : [4.0, 1.5],
+	'yTi' : [4.0, 1.5],
+	'zTi' : [4.0, 1.5],
+	# 'zTi' : [2.5, 1.0],  # FOR BQIT19 Poster #TODO REMOVE
+	'xTx' : [4.0, 1.5],
+	'yTy' : [4.0, 1.5],
+	'zTz' : [4.0, 1.5],
+	'xTy' : [4.0, 1.5],
+	'xTz' : [4.0, 1.5],
+	'yTz' : [4.0, 1.5],
 
 	# for QHL tests on 9 qubit case
 	'nv_interaction_z_d9' : [2.5, 1.0],
@@ -35,6 +35,16 @@ set_experimental_data_prior_specific_terms = {
 }
 
 set_normal_prior_specific_terms = {
+	'xTi' : [4.0, 1.5],
+	'yTi' : [4.0, 1.5],
+	'zTi' : [4.0, 1.5],
+	# 'zTi' : [2.5, 1.0],  # FOR BQIT19 Poster #TODO REMOVE
+	'xTx' : [4.0, 1.5],
+	'yTy' : [4.0, 1.5],
+	'zTz' : [4.0, 1.5],
+	'xTy' : [4.0, 1.5],
+	'xTz' : [4.0, 1.5],
+	'yTz' : [4.0, 1.5],
 	# 'x' : [5.0, 2.0],
 	# 'z' : [5.0, 2.0],
 	# 'y' : [5.0, 2.0]
