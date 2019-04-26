@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="new_version_qhl_w_pgh_exponent1.0_test"
+test_description="pgh_multiPGH_inspecct_r-squared_simulation"
 
 
 ### ---------------------------------------------------###
@@ -9,7 +9,7 @@ test_description="new_version_qhl_w_pgh_exponent1.0_test"
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=10
+num_tests=5
 num_processes_to_request=5
 qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
@@ -20,13 +20,13 @@ experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=1
 
 # QHL parameters.
-p=3000 # particles
-e=1000 # experiments
+e=85 # experiments
+p=250 # particles
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
-pgh_exp=1.0 # exponent to use in time heuristic 
-
+pgh_exp=1.0 # exponent to use in  time particle guess heuristic (PGH)
+pgh_increase=0 # whether or not to increase the times found by PGH
 
 ### ---------------------------------------------------###
 # Choose growth rule 
@@ -57,6 +57,7 @@ sim_growth_rule='interacting_nearest_neighbour_ising'
 # Experimental growth rules
 #experimental_growth_rule='two_qubit_ising_rotation_hyperfine'
 experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+#experimental_growth_rule='NV_centre_spin_large_bath'
 #experimental_growth_rule='NV_centre_experiment_debug'
 #experimental_growth_rule='reduced_nv_experiment'
 
@@ -92,8 +93,7 @@ bin_times_bayes_factors_default=1 # binning here means linspacing the times of b
 num_probes=40
 probe_noise_level_default=0.0000001
 use_all_times_bf_default=0
-data_max_time=5000 # nanoseconds
-data_time_offset=205 # nanoseconds
+data_max_time=20 # to show in plots
 top_number_models=3 # how many models to perform further QHL for
 further_qhl_resource_factor=1
 do_plots=0
@@ -101,13 +101,14 @@ pickle_class=1
 custom_prior=1
 gaussian=1 # set to 0 for uniform distribution, 1 for normal
 param_min=0
-param_max=8
+param_max=1
 param_mean=0.5
 param_sigma=2
-random_true_params=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
-random_prior=1 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
+random_true_params=1 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
+random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
 resource_reallocation=0 # whether to weight num particles given to model based on number parameters it has
 updater_from_prior=1 # 1->incorrect method of getting initial prior; 0->correct method copying entire updater
+store_particles_weights=0
 
 # Change requested time. e.g. if running QHL , don't need as many nodes. 
 if (( "$qhl" == 1 )) || [[ "$experimental_growth_rule" == 'PT_Effective_Hamiltonian' ]]
@@ -117,7 +118,7 @@ then
 elif (( "multiple_qhl"  == 1 ))
 then 
 	rp=1.0
-	num_proc=2
+	num_proc=3
 else
 	num_proc=$num_processes_to_request
 fi
@@ -214,22 +215,28 @@ printf "$day_time: \t $test_description \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; r
 force_plot_plus=0
 special_probe='random' #'ideal'
 special_probe_plot='random'
-time_request_insurance_factor=4
+time_request_insurance_factor=1
 
 if (( "$bin_times_bayes_factors" == 1))
 then
 	let time_request_insurance_factor="2*$time_request_insurance_factor"
 fi
 
-if (( "$experimental_data" == 1)) || (( "$simulate_experiment" == 1))
+if (( "$experimental_data" == 1))  
 then
 	force_plot_plus=1
 #	special_probe='plus_random'
 	special_probe='dec_13_exp'
+#	special_probe='random'
 #	special_probe='plus'
 	special_probe_plot='plus' # test simulation using plus probe only.
 	multiple_growth_rules=0
 #	random_true_params=0
+elif (( "$simulate_experiment" == 1))
+then
+	force_plot_plus=1
+	multiple_growth_rules=0
+	special_probe='random'
 fi
 
 ### First set up parameters/data to be used by all instances of QMD for this run. 
@@ -313,7 +320,7 @@ do
 									this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
 									printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd; noise=$probe_noise_level; bintimesBF=$bin_times_bayes_factors \n" >> QMD_all_tasks.log
 
-									qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,QMD_ID=$qmd_id,QHL=$qhl,MULTIPLE_QHL=$multiple_qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PGH_EXPONENT=$pgh_exp,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,DATA_MAX_TIME=$data_max_time,DATA_TIME_OFFSET=$data_time_offset,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,NUM_PROBES=$num_probes,SPECIAL_PROBE=$special_probe,PROBE_NOISE=$probe_noise_level,RESOURCE_REALLOCATION=$resource_reallocation,UPDATER_FROM_PRIOR=$updater_from_prior,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma,BIN_TIMES_BAYES=$bin_times_bayes_factors,BF_ALL_TIMES=$use_all_times_bf -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+									qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,QMD_ID=$qmd_id,QHL=$qhl,MULTIPLE_QHL=$multiple_qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PGH_EXPONENT=$pgh_exp,PGH_INCREASE=$pgh_increase,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,STORE_PARTICLES_WEIGHTS=$store_particles_weights,DATA_MAX_TIME=$data_max_time,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,NUM_PROBES=$num_probes,SPECIAL_PROBE=$special_probe,PROBE_NOISE=$probe_noise_level,RESOURCE_REALLOCATION=$resource_reallocation,UPDATER_FROM_PRIOR=$updater_from_prior,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma,BIN_TIMES_BAYES=$bin_times_bayes_factors,BF_ALL_TIMES=$use_all_times_bf -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
 
 								done
 							done

@@ -587,8 +587,8 @@ initial_models = {
 
 import Heuristics
 heuristic_classes = {
-    'two_qubit_ising_rotation_hyperfine_transverse' : 
-        Heuristics.time_from_list,
+#    'two_qubit_ising_rotation_hyperfine_transverse' : 
+#        Heuristics.time_from_list,
     None : Heuristics.multiPGH
 }
 

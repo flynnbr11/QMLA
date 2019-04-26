@@ -5,12 +5,16 @@ rm dump.rdb
 
 let NUM_WORKERS="$PBS_NUM_NODES * $PBS_NUM_PPN"
 let REDIS_PORT="6300 + $QMD_ID"
-echo "QMD ID =$QMD_ID; REDIS_PORT=$REDIS_PORT"
-echo "Global server: $GLOBAL_SERVER"
 host=$(hostname)
 running_dir=$RUNNING_DIR
 lib_dir=$LIBRARY_DIR
 script_dir=$SCRIPT_DIR
+echo "QMD ID =$QMD_ID; REDIS_PORT=$REDIS_PORT"
+echo "Global server: $GLOBAL_SERVER"
+echo "Running directory: $running_dir"
+echo "Library directory: $lib_dir"
+echo "Script directory: $script_dir"
+
 
 # assumed to be running on backend, where redis is loaded as below
 module load tools/redis-4.0.8
@@ -85,9 +89,9 @@ sleep 5
 cd $script_dir
 echo "Starting Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
 
-echo "CONFIG: -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -cb=$BAYES_CSV -pt=$PLOTS -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG cpr=$CUSTOM_PRIOR -dst=$DATA_MAX_TIME -dto=$DATA_TIME_OFFSET -ggr=$GROWTH"
+echo "CONFIG: -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -cb=$BAYES_CSV -pt=$PLOTS -pgh=$RESAMPLE_PGH -qid=$QMD_ID -rqt=10000 -pkl=0 -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG cpr=$CUSTOM_PRIOR -dst=$DATA_MAX_TIME -ggr=$GROWTH"
 
-python3 Exp.py -mqhl=$MULTIPLE_QHL -rq=1 -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -pgh_exp=$PGH_EXPONENT -qid=$QMD_ID -rqt=200000 -g=$GAUSSIAN -exp=$EXP_DATA -qhl=$QHL -fq=$FURTHER_QHL -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -cb=$BAYES_CSV -cpr=$CUSTOM_PRIOR  -dst=$DATA_MAX_TIME -dto=$DATA_TIME_OFFSET -ggr=$GROWTH $ALT_GROWTH -bintimes=$BIN_TIMES_BAYES -bftimesall=$BF_ALL_TIMES -latex=$LATEX_MAP_FILE -nprobes=$NUM_PROBES -prior_path=$PRIOR_FILE -true_params_path=$TRUE_PARAMS_FILE -plot_probes=$PLOT_PROBES -special_probe=$SPECIAL_PROBE -pnoise=$PROBE_NOISE -true_expec_path=$TRUE_EXPEC_PATH -pmin=$PARAM_MIN -pmax=$PARAM_MAX -pmean=$PARAM_MEAN -psigma=$PARAM_SIGMA -resource=$RESOURCE_REALLOCATION --updater_from_prior=$UPDATER_FROM_PRIOR  
+python3 Exp.py -mqhl=$MULTIPLE_QHL -rq=1 -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -pgh_exp=$PGH_EXPONENT -pgh_incr=$PGH_INCREASE -qid=$QMD_ID -rqt=200000 -g=$GAUSSIAN -exp=$EXP_DATA -qhl=$QHL -fq=$FURTHER_QHL -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -cb=$BAYES_CSV -cpr=$CUSTOM_PRIOR -prtwt=$STORE_PARTICLES_WEIGHTS -dst=$DATA_MAX_TIME -ggr=$GROWTH $ALT_GROWTH -bintimes=$BIN_TIMES_BAYES -bftimesall=$BF_ALL_TIMES -latex=$LATEX_MAP_FILE -nprobes=$NUM_PROBES -prior_path=$PRIOR_FILE -true_params_path=$TRUE_PARAMS_FILE -plot_probes=$PLOT_PROBES -special_probe=$SPECIAL_PROBE -pnoise=$PROBE_NOISE -true_expec_path=$TRUE_EXPEC_PATH -pmin=$PARAM_MIN -pmax=$PARAM_MAX -pmean=$PARAM_MEAN -psigma=$PARAM_SIGMA -resource=$RESOURCE_REALLOCATION --updater_from_prior=$UPDATER_FROM_PRIOR  
 
 
 
