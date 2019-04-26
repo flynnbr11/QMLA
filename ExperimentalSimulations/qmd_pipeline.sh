@@ -18,7 +18,7 @@ q_id=0 # can start from other ID if desired
 # QHL parameters
 ### ---------------------------------------------------###
 prt=10
-exp=425
+exp=42
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -36,8 +36,8 @@ number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
 bf_all_times=0
-data_max_time=30 # nanoseconds
-data_time_offset=205 # nanoseconds
+data_max_time=3 # nanoseconds
+# data_time_offset=205 # nanoseconds
 
 ### ---------------------------------------------------###
 # Everything from here downwards uses the parameters
@@ -230,7 +230,6 @@ do
             -dst=$data_max_time \
             -bintimes=$bintimes \
             -bftimesall=$bf_all_times \
-            -dto=$data_time_offset \
             -latex=$latex_mapping_file \
             -resource=$reallocate_resources \
             --updater_from_prior=$updater_from_prior \

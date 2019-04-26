@@ -280,7 +280,9 @@ def traced_expectation_value_project_one_qubit_plus(
 # Expecactation value function using Hahn inversion gate:
 
 def hahn_evolution(
-    ham, t, state, 
+    ham, 
+    t, 
+    state, 
     precision=1e-10, 
     log_file=None, 
     log_identifier=None
@@ -373,12 +375,125 @@ def hahn_evolution(
     noisy_plus = noisy_plus/norm_factor
 #    noisy_plus = np.array([1, 1])/np.sqrt(2)
     bra = noisy_plus.conj().T
+
     rho_state = np.dot(reduced_matrix, noisy_plus)
     expect_value = np.abs(np.dot(bra, rho_state))
 #    print("Hahn. Time=",t, "\t ex = ", expect_value)
     # print("[Hahn evolution] projecting onto:", repr(bra))
     return 1-expect_value
 #    return expect_value
+
+def hahn_evolution_project_first_qubit(
+    ham, 
+    t, 
+    state, 
+    precision=1e-10, 
+    log_file=None, 
+    log_identifier=None
+):
+    # TODO  #### IN DEVELOPMENT ### 
+    # make sure the method of tracing out subsystem is safe. 
+    import qutip 
+    import numpy as np
+    #    print("Hahn evo")
+    #hahn_angle = np.pi/2
+    #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))
+    #inversion_gate = linalg.expm(-1j*hahn)
+    # inversion gate generated as above, done once and hardocded since this doesn't change.
+    inversion_gate = np.array([
+        [0.-1.j, 0.+0.j, 0.+0.j, 0.+0.j],
+        [0.+0.j, 0.-1.j, 0.+0.j, 0.+0.j],
+        [0.+0.j, 0.+0.j, 0.+1.j, 0.+0.j],
+        [0.+0.j, 0.+0.j, 0.+0.j, 0.+1.j]]
+    )
+
+    # TODO Hahn gate here does not include pi/2 term
+    # is it meant to???? as below
+    # inversion_gate = inversion_gate * np.pi/2
+    even_time_split = False
+    if even_time_split:
+
+        # unitary_time_evolution = h.exp_ham(
+        #     ham, 
+        #     t,
+        #     precision=precision
+        # )
+        unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
+
+        total_evolution = np.dot(
+            unitary_time_evolution,
+            np.dot(
+                inversion_gate,
+                unitary_time_evolution
+            )
+        )
+    else:
+        # TODO revisit custom exponentiation function and match with Qutip.
+        # first_unitary_time_evolution = h.exp_ham(
+        #     ham, 
+        #     t, 
+        #     precision=precision
+        # )
+        # second_unitary_time_evolution = h.exp_ham(
+        #     ham, 
+        #     2*t, 
+        #     precision=precision
+        # )
+
+        first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
+        second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
+        # first_unitary_time_evolution = h.exp_ham(ham, t)
+        # second_unitary_time_evolution = h.exp_ham(ham, 2*t)
+
+        total_evolution = np.dot(
+            second_unitary_time_evolution,
+            np.dot(inversion_gate,
+                  first_unitary_time_evolution)
+        )
+
+
+    #    print("total ev:\n", total_evolution)
+    ev_state = np.dot(total_evolution, state)
+
+    nm = np.linalg.norm(ev_state)
+    if np.abs(1-nm) > 1e-10:
+        print("[hahn] norm ev state:", nm)
+
+    density_matrix = np.kron( ev_state, (ev_state.T).conj() )
+    density_matrix = np.reshape(density_matrix, [4,4])
+    reduced_matrix = partial_trace_out_second_qubit(
+        density_matrix,
+        qubits_to_trace = [1]
+    )
+
+    density_mtx_initial_state = np.kron(
+        state, 
+        state.conj()
+    )
+
+    density_mtx_initial_state = np.reshape(density_mtx_initial_state, [4,4])
+    reduced_density_mtx_initial_state = partial_trace_out_second_qubit(
+        density_mtx_initial_state, 
+        qubits_to_trace = [1]
+    )
+
+#     projection_onto_initial_den_mtx = np.dot(
+#         reduced_matrix, 
+#         reduced_density_mtx_initial_state
+#     )
+#     expec_val = 1 - np.trace(projection_onto_initial_den_mtx)
+
+    projection_onto_initial_den_mtx = np.dot(
+        reduced_density_mtx_initial_state,
+        reduced_matrix
+
+    )
+    
+    expec_val = np.trace(projection_onto_initial_den_mtx)
+    # return ( 1 - expec_val )
+    # in experimental case which corresponds to 
+    # P(0), ie projecting onto |->. 
+    return 1 - expec_val
 
 
 def n_qubit_hahn_evolution(

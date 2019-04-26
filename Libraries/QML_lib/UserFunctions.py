@@ -58,8 +58,10 @@ expec_val_function_dict = {
 	# measurement_type : expectation_value_function_for_that_meas
     'full_access' : 
     	ExpectationValues.expectation_value, 
+    # 'hahn' : 
+    #     ExpectationValues.hahn_evolution,
     'hahn' : 
-    	ExpectationValues.hahn_evolution,
+    	ExpectationValues.hahn_evolution_project_first_qubit,
 	'n_qubit_hahn' : 
     	ExpectationValues.n_qubit_hahn_evolution,
     'trace_all_but_first' : 

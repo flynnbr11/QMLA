@@ -47,9 +47,6 @@ class multiPGH(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
-        print(
-            "[Heuristics - multiPGH]",
-        )
 
     def __call__(
         self,
@@ -137,12 +134,6 @@ class multiPGH(qi.Heuristic):
                 raise RuntimeError("Unknown Norm: using Frobenius norm instead")
         for field, value in self._other_fields.items():
             eps[field] = value**self._pgh_exponent
-        print(
-            "[multipgh] returning [shape ", 
-            np.shape(eps), 
-            "] eps: ", 
-            repr(eps)
-        )
 
         return eps
         
