@@ -133,6 +133,14 @@ def expectation_value(
             log_identifier=log_identifier
         )
         raise
+    # print(
+    #     "[Expec Vals] full access",
+    #     "\nham:", ham, 
+    #     "\nt=", t,
+    #     "\ninput state:", state,
+    #     "\nbra:", probe_bra
+    # )
+
     
     expec_value = np.abs(psi_u_psi)**2 ## TODO MAKE 100% sure about this!!
     
@@ -395,6 +403,7 @@ def hahn_evolution_project_first_qubit(
     # make sure the method of tracing out subsystem is safe. 
     import qutip 
     import numpy as np
+    # print("[Expec Vals] Hahn project on first qubit")
     #    print("Hahn evo")
     #hahn_angle = np.pi/2
     #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))

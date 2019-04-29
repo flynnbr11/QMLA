@@ -89,12 +89,12 @@ default_true_operators_by_generator = {
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
     'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
-    'two_qubit_ising_rotation_hyperfine_transverse' : 'yTi', # 1 param
+    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'yTi', # 1 param
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'yTiPPzTi', # 2 param
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTi', #3 params
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPzTi', # 4 params # TODO reinstate -- testing whether alphetisation of true model affects December/new code
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTi', # 5 params # TODO reinstate -- testing whether alphetisation of true model affects December/new code
-    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # 6 params - full model # TODO reinstate -- testing whether alphetisation of true model affects December/new code
+    'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # 6 params - full model # TODO reinstate -- testing whether alphetisation of true model affects December/new code
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiP',
     'test_multidimensional' : 'xTiPPiTy', 
     'test_return_champs' : 'xTiPPiTy', 

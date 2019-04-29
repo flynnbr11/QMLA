@@ -82,13 +82,25 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         use_time_dep_true_model = False,
         time_dep_true_params = None,
         num_time_dep_true_params = 0,
-        true_oplist = None, truename=None, num_probes=40, probe_dict=None, 
-        trueparams = None, probelist = None, min_freq=0, solver='scipy', 
+        true_oplist = None, 
+        truename=None, 
+        num_probes=40, 
+        probe_dict=None, 
+        trueparams=None, 
+        probelist=None, 
+        min_freq=0, 
+        solver='scipy', 
         measurement_type = 'full_access',
-        use_experimental_data = False, experimental_measurements = None,
-        experimental_measurement_times=None,trotter=False, qle=True,
-        use_exp_custom=True, exp_comparison_tol=None,
-        enable_sparse=True, model_name=None, log_file='QMDLog.log',
+        use_experimental_data=False, 
+        experimental_measurements = None,
+        experimental_measurement_times=None,
+        trotter=False, 
+        qle=True,
+        use_exp_custom=True, 
+        exp_comparison_tol=None,
+        enable_sparse=True, 
+        model_name=None,
+        log_file='QMDLog.log',
         log_identifier=None
     ):
         self._solver = solver 
@@ -292,7 +304,10 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             self.use_experimental_data
         ):
             time = expparams['t']
-            # print("[likelihood fnc] Experimental data being called.")
+            # print(
+            #     "[likelihood fnc] Experimental data being called.",
+            #     "\nProbe", probe
+            # )
             if debug_log_print:
                 log_print(
                     [
@@ -333,16 +348,19 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 elif self.ideal_probelist is not None: 
                     probe = self.ideal_probelist[self._b % 2] # this won't work
                 else:
-                    print("Either ideal_probe or ideal_probes must be given")
+                    print(
+                        "Either ideal_probe or ideal_probes \
+                        must be given"
+                    )
             else:
                 probe = self._probelist[
                     (self._b % int(self.NumProbes)), 
                     ham_num_qubits
                 ]
             # print(
-            #     "[likelihood fnc] \
-            #     Simulated data being called.\
-            #     Probe:", probe
+            #     "\n\n[likelihood fnc] Simulated data being called.",
+            #     "\n True evo:", true_evo, 
+            #     "\nProbe", probe, "\n\n"
             # )
             
             ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
