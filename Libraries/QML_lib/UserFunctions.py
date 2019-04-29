@@ -88,8 +88,13 @@ default_true_operators_by_generator = {
     'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
     'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 
-    'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
-    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # TODO reinstate -- testing whether alphetisation of true model affects December/new code
+    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
+    'two_qubit_ising_rotation_hyperfine_transverse' : 'yTi', # 1 param
+    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'yTiPPzTi', # 2 param
+    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTi', #3 params
+    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPzTi', # 4 params # TODO reinstate -- testing whether alphetisation of true model affects December/new code
+    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTi', # 5 params # TODO reinstate -- testing whether alphetisation of true model affects December/new code
+    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # 6 params - full model # TODO reinstate -- testing whether alphetisation of true model affects December/new code
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiP',
     'test_multidimensional' : 'xTiPPiTy', 
     'test_return_champs' : 'xTiPPiTy', 
@@ -356,7 +361,7 @@ measurement_type = {
     'reduced_nv_experiment' : 'hahn' ,
 	'NV_centre_experiment_debug' : 'hahn', 
 	'two_qubit_ising_rotation_hyperfine' : 'hahn', 
-#	'two_qubit_ising_rotation_hyperfine_transverse' : 'hahn', 
+	# 'two_qubit_ising_rotation_hyperfine_transverse' : 'hahn', 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 'full_access', 
 	None: 'full_access'
 }
