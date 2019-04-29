@@ -356,7 +356,8 @@ measurement_type = {
     'reduced_nv_experiment' : 'hahn' ,
 	'NV_centre_experiment_debug' : 'hahn', 
 	'two_qubit_ising_rotation_hyperfine' : 'hahn', 
-	'two_qubit_ising_rotation_hyperfine_transverse' : 'hahn', 
+#	'two_qubit_ising_rotation_hyperfine_transverse' : 'hahn', 
+	'two_qubit_ising_rotation_hyperfine_transverse' : 'full_access', 
 	None: 'full_access'
 }
 
