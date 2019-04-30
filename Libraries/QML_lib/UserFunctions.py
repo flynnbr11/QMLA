@@ -597,6 +597,11 @@ import Heuristics
 heuristic_classes = {
    # 'two_qubit_ising_rotation_hyperfine_transverse' : 
    #     Heuristics.time_from_list,
+
+   'two_qubit_ising_rotation_hyperfine_transverse' : 
+       Heuristics.one_over_sigma_then_linspace,
+
+
     None : Heuristics.multiPGH
 }
 

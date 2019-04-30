@@ -454,7 +454,8 @@ class ModelLearningClass():
             inv_field = self.Inv_Field, 
             increase_time = self.IncreasePGHTime, 
             pgh_exponent = self.PGHExponent, 
-            time_list = self.PlotTimes
+            time_list = self.PlotTimes,
+            num_experiments = self.NumExperiments,
         )
 
         # if checkloss == True or self.checkQLoss==True:     

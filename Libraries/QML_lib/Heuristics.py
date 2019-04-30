@@ -242,6 +242,7 @@ class time_from_list(qi.Heuristic):
         for field_i in self._x_:
             eps[field_i] = self._inv_func(x)[0][idx_iter]
             idx_iter += 1
+
         
         time_id = epoch_id % self._len_time_list
         new_time = self._time_list[time_id] 
@@ -271,9 +272,10 @@ class one_over_sigma_then_linspace(qi.Heuristic):
         maxiters=10,
         other_fields=None,
         time_list=None,
+        num_experiments=200,
         **kwargs
      ):
-        super(time_from_list, self).__init__(updater)
+        super(one_over_sigma_then_linspace, self).__init__(updater)
         self._oplist = oplist
         self._norm = norm
         self._x_ = inv_field
@@ -284,11 +286,16 @@ class one_over_sigma_then_linspace(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
+        self._num_experiments = num_experiments
+
         # self._time_list = kwargs['time_list'] 
         self._time_list = time_list 
         self._len_time_list = len(self._time_list)
+        self.num_epochs_for_first_phase = self._num_experiments/2
+
         print(
-            "[Heuristics - time_from_list]",
+            "[Heuristics - 1/sigma then linspace]",
+            "num epochs for first phase:", self.num_epochs_for_first_phase,
             "\n kwargs:", **kwargs 
         )
 
@@ -299,7 +306,7 @@ class one_over_sigma_then_linspace(qi.Heuristic):
         num_params = 1,
         test_param = None, 
     ):
-
+        
         idx_iter = 0
         while idx_iter < self._maxiters:
                 
@@ -327,14 +334,18 @@ class one_over_sigma_then_linspace(qi.Heuristic):
             eps[field_i] = self._inv_func(x)[0][idx_iter]
             idx_iter += 1
         
-        time_id = epoch_id % self._len_time_list
-        new_time = self._time_list[time_id] 
+        if epoch_id < self.num_epochs_for_first_phase : 
+            sigma = self._updater.model.distance(x, xp)
+            new_time = self._t_func(
+                1 / sigma**self._pgh_exponent
+            )
+        else:
+            time_id = epoch_id % self._len_time_list
+            new_time = self._time_list[time_id] 
+        print(
+            "[Hueristic] 1/sigma then linspace", 
+            "\t time:", new_time
+        )
         eps[self._t] = new_time 
-
-        # print("[Hueristic - time list] time idx {}  chosen {}:".format(
-        #         time_id, 
-        #         eps[self._t]
-        #     )
-        # )
         return eps
 
