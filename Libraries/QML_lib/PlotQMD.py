@@ -1289,7 +1289,9 @@ def average_quadratic_losses(
                 eval(winning_models_quadratic_losses[mod][i])
             )
 
-        list_this_models_q_losses = np.array(list_this_models_q_losses)    
+        list_this_models_q_losses = np.array(
+            list_this_models_q_losses
+        )    
 
         num_experiments = np.shape(list_this_models_q_losses)[1]
         avg_q_losses = np.empty(num_experiments)

@@ -110,13 +110,22 @@ set_true_params = {
 	# 'zTi' : 1.1
 
 
-	# From BC/Feb_12/18_30/results_007
-	'xTi': 0.05906251, 
-	'xTx': 0.18309156, 
-	'yTi': 6.19606907, 
-	'yTy': 0.2610886, 
-	'zTi': 0.25689271, 
-	'zTz': 0.48673637,
+	# TEST: below values (realistic decoherence) reduced by factor 10
+	'xTi': 0.005906251, 
+	'xTx': 0.018309156, 
+	'yTi': 0.619606907, 
+	'yTy': 0.02610886, 
+	'zTi': 0.025689271, 
+	'zTz': 0.048673637,
+
+
+	# # From BC/Feb_12/18_30/results_007
+	# 'xTi': 0.05906251, 
+	# 'xTx': 0.18309156, 
+	# 'yTi': 6.19606907, 
+	# 'yTy': 0.2610886, 
+	# 'zTi': 0.25689271, 
+	# 'zTz': 0.48673637,
 
 
 	# From  BC /Jan_29/17_58/results_007

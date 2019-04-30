@@ -1519,7 +1519,6 @@ r_sqaured_average(
         'r_squared_averages.png'
     )
 )
-"""
 ptq.average_quadratic_losses(
     results_path = results_csv, 
     growth_generator = growth_generator, 
@@ -1530,6 +1529,9 @@ ptq.average_quadratic_losses(
         'quadratic_losses_avg.png'
     )
 )
+
+"""
+
 if qhl_mode==True:
     r_squared_plot = str(
         directory_to_analyse + 

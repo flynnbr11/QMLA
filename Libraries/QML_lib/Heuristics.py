@@ -342,10 +342,10 @@ class one_over_sigma_then_linspace(qi.Heuristic):
         else:
             time_id = epoch_id % self._len_time_list
             new_time = self._time_list[time_id] 
-        print(
-            "[Hueristic] 1/sigma then linspace", 
-            "\t time:", new_time
-        )
+        # print(
+        #     "[Hueristic] 1/sigma then linspace", 
+        #     "\t time:", new_time
+        # )
         eps[self._t] = new_time 
         return eps
 
