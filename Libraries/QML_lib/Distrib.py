@@ -88,7 +88,8 @@ def get_prior(
         default_mean = np.mean([param_minimum, param_maximum])
         # TODO reconsider how default sigma is generated
         # default_sigma = (param_maximum - param_minimum)/4 # TODO is this safe?        
-        default_sigma = default_mean/4 # TODO is this safe?        
+        # default_sigma = default_mean/4 # TODO is this safe?        
+        default_sigma = default_mean/2 # TODO is this safe?        
         for term in individual_terms:
             if term in available_specific_terms:
                 means.append(specific_terms[term][0])

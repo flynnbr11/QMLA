@@ -253,3 +253,88 @@ class time_from_list(qi.Heuristic):
         #     )
         # )
         return eps
+
+
+class one_over_sigma_then_linspace(qi.Heuristic):
+    
+    def __init__(
+        self, 
+        updater, 
+        oplist=None, 
+        pgh_exponent=1,
+        increase_time=False, 
+        norm='Frobenius', 
+        inv_field='x_', 
+        t_field='t',
+        inv_func=identity,
+        t_func=identity,
+        maxiters=10,
+        other_fields=None,
+        time_list=None,
+        **kwargs
+     ):
+        super(time_from_list, self).__init__(updater)
+        self._oplist = oplist
+        self._norm = norm
+        self._x_ = inv_field
+        self._t = t_field
+        self._inv_func = inv_func
+        self._t_func = t_func
+        self._maxiters = maxiters
+        self._other_fields = other_fields if other_fields is not None else {}
+        self._pgh_exponent = pgh_exponent
+        self._increase_time = increase_time
+        # self._time_list = kwargs['time_list'] 
+        self._time_list = time_list 
+        self._len_time_list = len(self._time_list)
+        print(
+            "[Heuristics - time_from_list]",
+            "\n kwargs:", **kwargs 
+        )
+
+
+    def __call__(
+        self,
+        epoch_id = 0,
+        num_params = 1,
+        test_param = None, 
+    ):
+
+        idx_iter = 0
+        while idx_iter < self._maxiters:
+                
+            x, xp = self._updater.sample(n=2)[:, np.newaxis, :]
+            if self._updater.model.distance(x, xp) > 0:
+                break
+            else:
+                idx_iter += 1
+                
+        if self._updater.model.distance(x, xp) == 0:
+            raise RuntimeError(
+                "PGH did not find distinct particles in \
+                {} iterations.".format(self._maxiters)
+            )
+            
+        #print('Selected particles: #1 ' + repr(x) + ' #2 ' + repr(xp))
+        eps = np.empty(
+            (1,),
+            dtype=self._updater.model.expparams_dtype
+        )
+        # print (frameinfo.filename, frameinfo.lineno)
+        
+        idx_iter = 0 # modified in order to cycle through particle parameters with different names
+        for field_i in self._x_:
+            eps[field_i] = self._inv_func(x)[0][idx_iter]
+            idx_iter += 1
+        
+        time_id = epoch_id % self._len_time_list
+        new_time = self._time_list[time_id] 
+        eps[self._t] = new_time 
+
+        # print("[Hueristic - time list] time idx {}  chosen {}:".format(
+        #         time_id, 
+        #         eps[self._t]
+        #     )
+        # )
+        return eps
+
