@@ -499,7 +499,6 @@ def Bayes_t_test(
     save_true_expec_vals_alone_plot=False,
     save_to_file=None
 ):
-    save_true_expec_vals_alone_plot = True
     plt.switch_backend('agg')
     print("Drawing avg expectation values from file:", results_path)
     from matplotlib import cm

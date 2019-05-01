@@ -35,6 +35,17 @@ set_experimental_data_prior_specific_terms = {
 }
 
 set_normal_prior_specific_terms = {
+
+	# REALISTIC, DECOHERING CASE FOR EXPERIMENTAL MODEL WHEN TRACED OUT
+	'xTi': [0.0, 0.1], 
+	'xTx': [0.15, 0.1], 
+	'yTi': [6.1, 0.1], 
+	'yTy': [0.26, 0.1], 
+	'zTi': [0.25, 0.1], 
+	'zTz': [0.5, 0.1],
+
+
+
 	# 'xTi' : [4.0, 1.5],
 	# 'yTi' : [4.0, 1.5],
 	# 'zTi' : [4.0, 1.5],
@@ -111,21 +122,22 @@ set_true_params = {
 
 
 	# TEST: below values (realistic decoherence) reduced by factor 10
-	'xTi': 0.005906251, 
-	'xTx': 0.018309156, 
-	'yTi': 0.619606907, 
-	'yTy': 0.02610886, 
-	'zTi': 0.025689271, 
-	'zTz': 0.048673637,
+	# 'xTi': 0.005906251, 
+	# 'xTx': 0.018309156, 
+	# 'yTi': 0.619606907, 
+	# 'yTy': 0.02610886, 
+	# 'zTi': 0.025689271, 
+	# 'zTz': 0.048673637,
 
 
-	# # From BC/Feb_12/18_30/results_007
-	# 'xTi': 0.05906251, 
-	# 'xTx': 0.18309156, 
-	# 'yTi': 6.19606907, 
-	# 'yTy': 0.2610886, 
-	# 'zTi': 0.25689271, 
-	# 'zTz': 0.48673637,
+	# From BC/Feb_12/18_30/results_007
+	# REALISTIC, DECOHERING CASE FOR EXPERIMENTAL MODEL WHEN TRACED OUT
+	'xTi': 0.05906251, 
+	'xTx': 0.18309156, 
+	'yTi': 6.19606907, 
+	'yTy': 0.2610886, 
+	'zTi': 0.25689271, 
+	'zTz': 0.48673637,
 
 
 	# From  BC /Jan_29/17_58/results_007

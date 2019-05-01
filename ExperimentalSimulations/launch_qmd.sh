@@ -17,7 +17,7 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
+prt=100
 exp=30
 pgh=1.0
 pgh_exponent=1.0
@@ -36,7 +36,7 @@ number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
 bf_all_times=0
-data_max_time=1 # nanoseconds
+data_max_time=10 # nanoseconds
 # data_time_offset=205 # nanoseconds
 
 ### ---------------------------------------------------###
@@ -136,7 +136,7 @@ param_min=0
 param_max=1
 param_mean=0.5
 param_sigma=3
-rand_true_params=1
+rand_true_params=0
 reallocate_resources=1
 updater_from_prior=0
 store_prt_wt=0 # store all particles and weights after learning
