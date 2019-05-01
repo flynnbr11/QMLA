@@ -3389,21 +3389,21 @@ def replot_expectation_values(
     save_to_file=None
 ):
 
-    print("[replot] ",
-        "\ntrue_expec_vals_path", true_expec_vals_path,
-        "\nplot_probe_path", plot_probe_path,  
-        "\ngrowth_generator", growth_generator,
-        "\nmeasurement_method", measurement_method
-    )
+    # print("[replot] ",
+    #     "\ntrue_expec_vals_path", true_expec_vals_path,
+    #     "\nplot_probe_path", plot_probe_path,  
+    #     "\ngrowth_generator", growth_generator,
+    #     "\nmeasurement_method", measurement_method
+    # )
     sim_colours = ['b', 'g', 'c', 'y', 'm',  'k']
     plot_probes = pickle.load(open(plot_probe_path, 'rb'))
     # true_expec_vals_path = str(
     #     directory_name + 'true_expec_vals.p'
     # )
-    print(
-        "Reconstructed QHL with expectation value method:", 
-        measurement_method
-    )
+    # print(
+    #     "Reconstructed QHL with expectation value method:", 
+    #     measurement_method
+    # )
 
     print (getframeinfo(currentframe()).filename, getframeinfo(currentframe()).lineno)
     true_exp_vals = pickle.load(open(true_expec_vals_path, 'rb'))
@@ -3491,11 +3491,6 @@ def replot_expectation_values(
             markevery=5,
             label=str(model_label), 
             color=sim_colour
-        )
-        print(
-            "[PlotQMD]\n", 
-            "\nmax exp time:", max(exp_times), 
-            "\nmax sim time:", max(sim_times)
         )
         ax.set_title(model_label)
         ax.scatter(

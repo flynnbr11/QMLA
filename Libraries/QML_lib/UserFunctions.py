@@ -84,6 +84,7 @@ default_true_operators_by_generator = {
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d2PPnv_interaction_x_d2PPnv_spin_y_d2PPnv_interaction_y_d2PPnv_spin_z_d2PPnv_interaction_z_d2',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_interaction_x_d3PPPnv_spin_y_d3PPPnv_interaction_y_d3PPPnv_spin_z_d3PPPnv_interaction_z_d3',    # 'NV_centre_spin_large_bath' : 'nv_spin_z_d3PPPnv_interaction_z_d3',
     # 'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
+    'NV_spin_full_access' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 
     'reduced_nv_experiment' : 'zTi' ,
     'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
@@ -147,10 +148,15 @@ qhl_models_by_generator = {
     		'nv_spin_x_d2PPnv_interaction_x_d2',
     		'nv_spin_x_d4PPnv_interaction_x_d4',
 		],
+
     'reduced_nv_experiment' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' 
 		],
+
+    'NV_spin_full_access' : 
+        ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz'], 
+
     'two_qubit_ising_rotation_hyperfine' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
@@ -178,6 +184,7 @@ max_num_parameter_estimate = {
     'NV_centre_experiment_debug' : 7,
     'NV_centre_spin_large_bath' : 6,
     'reduced_nv_experiment' : 7,
+    'NV_spin_full_access' : 6, 
     'two_qubit_ising_rotation' : 6,
     'two_qubit_ising_rotation_hyperfine' : 6, 
     'two_qubit_ising_rotation_hyperfine_transverse' : 9,
@@ -226,6 +233,7 @@ max_spawn_depth_info = {
     'NV_centre_spin_large_bath' : 1,
     'reduced_nv_experiment' : 3,
     'NV_centre_experiment_debug' : 1,
+    'NV_spin_full_access' : 8, 
     'two_qubit_ising_rotation' : 2,
     'two_qubit_ising_rotation_hyperfine' : 5, # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 8,
@@ -252,6 +260,7 @@ max_num_qubits_info = {
     'NV_centre_spin_large_bath' : 10,
     'NV_centre_experiment_debug' : 2,
     'reduced_nv_experiment' : 2,
+    'NV_spin_full_access' : 3, 
     'two_qubit_ising_rotation' : 3,
     'two_qubit_ising_rotation_hyperfine' : 3, # for dev, should be 5 #TODO put back
     'two_qubit_ising_rotation_hyperfine_transverse' : 3,
@@ -286,6 +295,8 @@ model_generation_functions = {
     	ModelGeneration.reduced_nv_experimental_method,
     'NV_centre_experiment_debug' : 
     	ModelGeneration.NV_centre_experiment_debug, 
+    'NV_spin_full_access' : 
+        ModelGeneration.hyperfine_like, 
     'simple_ising' : 
     	ModelGeneration.simple_ising,
     'ising_non_transverse' : 
@@ -351,6 +362,7 @@ experimental_dataset = {
 	# 'NV_centre_experiment_debug' : 'NV05_dataset.p', 
 	'two_qubit_ising_rotation_hyperfine' : 'NVB_rescale_dataset.p', 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 'NVB_rescale_dataset.p', 
+    'NV_spin_full_access' : 'NVB_rescale_dataset.p', 
 	None: 'NVB_rescale_dataset.p'
 }
 
@@ -362,6 +374,7 @@ measurement_type = {
 	'NV_centre_experiment_debug' : 'hahn', 
 	'two_qubit_ising_rotation_hyperfine' : 'hahn', 
 	'two_qubit_ising_rotation_hyperfine_transverse' : 'hahn', 
+    'NV_spin_full_access' : 'full_access', 
 	# 'two_qubit_ising_rotation_hyperfine_transverse' : 'full_access', 
 	None: 'full_access'
 }
@@ -407,6 +420,8 @@ name_branch_map_functions = {
     	ModelNames.branch_is_num_params,
     'NV_centre_experiment_debug' : 
     	ModelNames.branch_is_num_params,
+    'NV_spin_full_access' : 
+        ModelNames.branch_is_num_params, 
     'reduced_nv_experiment' : 
     	ModelNames.branch_is_num_params,
 	'two_qubit_ising_rotation_hyperfine' : 
@@ -457,6 +472,8 @@ latex_naming_functions = {
     	ModelNames.large_spin_bath_nv_system_name,
     'NV_centre_experiment_debug' : 
     	ModelNames.latex_name_ising,
+    'NV_spin_full_access' : 
+        ModelNames.latex_name_ising, 
     'reduced_nv_experiment' : 
     	ModelNames.latex_name_ising,
 	'two_qubit_ising_rotation_hyperfine' : 
@@ -525,6 +542,12 @@ initial_models = {
     	[
     		'nv_interaction_x_d3PPPnv_spin_x_d3'
 		],
+
+    'NV_spin_full_access' : 
+        [
+            'xTi', 'yTi', 'zTi'
+        ], 
+
     'reduced_nv_experiment' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTi', 
@@ -623,6 +646,8 @@ experimental_probe_dict_generator = {
     	ProbeGeneration.NV_centre_ising_probes_plus,
     'NV_centre_experiment_debug' : 
 		ProbeGeneration.NV_centre_ising_probes_plus,
+    'NV_spin_full_access' : 
+        ProbeGeneration.NV_centre_ising_probes_plus,
 	'two_qubit_ising_rotation' : 
 		ProbeGeneration.NV_centre_ising_probes_plus,
 	'two_qubit_ising_rotation_transverse' : 
