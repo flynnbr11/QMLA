@@ -24,6 +24,8 @@ from matplotlib.spines import Spine
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.projections import register_projection
 
+from inspect import currentframe, getframeinfo
+frameinfo = getframeinfo(currentframe())
 
 #from QMD import  *
 #from QML import *
@@ -3386,11 +3388,12 @@ def replot_expectation_values(
     model_descriptions=None, 
     save_to_file=None
 ):
+
     print("[replot] ",
-        "true_expec_vals_path", true_expec_vals_path,
-        "plot_probe_path", plot_probe_path,  
-        "growth_generator", growth_generator,
-        "measurement_method", measurement_method
+        "\ntrue_expec_vals_path", true_expec_vals_path,
+        "\nplot_probe_path", plot_probe_path,  
+        "\ngrowth_generator", growth_generator,
+        "\nmeasurement_method", measurement_method
     )
     sim_colours = ['b', 'g', 'c', 'y', 'm',  'k']
     plot_probes = pickle.load(open(plot_probe_path, 'rb'))
@@ -3401,10 +3404,17 @@ def replot_expectation_values(
         "Reconstructed QHL with expectation value method:", 
         measurement_method
     )
+
+    print (getframeinfo(currentframe()).filename, getframeinfo(currentframe()).lineno)
     true_exp_vals = pickle.load(open(true_expec_vals_path, 'rb'))
     exp_times = sorted(list(true_exp_vals.keys()))
     
-    sim_times = copy.copy(exp_times)[0::10]
+    sim_times = copy.copy(exp_times)[0::5]
+
+    num_times = len(exp_times)
+    max_time = max(exp_times)
+    sim_times = list(sorted(np.linspace(0, 2*max_time, num_times)))
+
     if (
         upper_x_limit is not None 
         and
@@ -3432,10 +3442,8 @@ def replot_expectation_values(
     col = 0
 
     true_exp = [true_exp_vals[t] for t in exp_times]    
-
     for params_dict in params_dictionary_list:
         ax = axes[row,col]
-
         sim_ops_names = list(params_dict.keys())
         sim_params = [
             params_dict[k] for k in sim_ops_names
@@ -3446,9 +3454,10 @@ def replot_expectation_values(
         sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
 
         sim_num_qubits = DataBase.get_num_qubits(sim_ops_names[0])
-        p_str=''
-        for i in range(2):
-            p_str+='P'
+        # p_str=''
+        # for i in range(2):
+        #     p_str+='P'
+        p_str = 'P'*sim_num_qubits
         probe = plot_probes[sim_num_qubits]
 
         sim_exp_vals = {}
@@ -3463,6 +3472,7 @@ def replot_expectation_values(
         sim_exp = [sim_exp_vals[t] for t in sim_times]
         list_id = params_dictionary_list.index(params_dict)
         sim_colour = sim_colours[list_id % len(sim_colours)]
+     
         if model_descriptions is not None:
             model_label = model_descriptions[list_id]
         else:
@@ -3477,9 +3487,15 @@ def replot_expectation_values(
             sim_times, 
             sim_exp, 
             marker = 'o', 
-            s=3,
-            label=model_label, 
+            markersize=3,
+            markevery=5,
+            label=str(model_label), 
             color=sim_colour
+        )
+        print(
+            "[PlotQMD]\n", 
+            "\nmax exp time:", max(exp_times), 
+            "\nmax sim time:", max(sim_times)
         )
         ax.set_title(model_label)
         ax.scatter(
@@ -3500,7 +3516,6 @@ def replot_expectation_values(
 
 
     # plt.legend(loc=1)
-    
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
     else:

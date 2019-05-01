@@ -1618,7 +1618,8 @@ if further_qhl_mode == False:
             )
         except:
             print("Failed to cluster and replot results.")
-            pass
+            raise
+            # pass
         # raise
 
 

@@ -6,7 +6,6 @@ import scipy as sp
 
 from Evo import *
 from inspect import currentframe, getframeinfo
-
 frameinfo = getframeinfo(currentframe())
 
 def singvalnorm(matrix):
