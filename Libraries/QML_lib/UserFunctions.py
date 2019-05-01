@@ -624,7 +624,9 @@ heuristic_classes = {
    # 'two_qubit_ising_rotation_hyperfine_transverse' : 
    #     Heuristics.one_over_sigma_then_linspace,
 
-
+   'NV_spin_full_access' : 
+       Heuristics.time_from_list,
+   
     None : Heuristics.multiPGH
 }
 
