@@ -147,6 +147,15 @@ max_num_models_by_shape['two_qubit_ising_rotation_hyperfine_transverse'] = {
     'other' : 1
 }
 
+max_num_models_by_shape['NV_spin_full_access'] = {
+    1 : 0,
+#    (2, 1) : 2,
+#    (2, 2) : 2,
+    2 : 36, # TODO generalise insurance factors, this should be 18, with a higher insurance factor since two exp per particle in hahn expec val
+    'other' : 1
+}
+
+
 max_num_models_by_shape['NV_centre_experiment_debug'] = {
     1 : 0,
 #    (2, 1) : 2,
