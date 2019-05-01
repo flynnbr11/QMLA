@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="pgh_multiPGH_inspecct_r-squared_simulation"
+test_description="qmd_sim_broad_prior_test"
 
 
 ### ---------------------------------------------------###
@@ -9,9 +9,9 @@ test_description="pgh_multiPGH_inspecct_r-squared_simulation"
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=5
+num_tests=1
 num_processes_to_request=5
-qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
+qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 multiple_qhl=0
 multiple_growth_rules=0
@@ -20,8 +20,8 @@ experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=1
 
 # QHL parameters.
-e=85 # experiments
-p=250 # particles
+e=7 # experiments
+p=25 # particles
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -40,14 +40,14 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 #sim_growth_rule='non_interacting_ising_single_axis'
 #sim_growth_rule='non_interacting_ising'
 #sim_growth_rule='deterministic_noninteracting_ising_single_axis'
-sim_growth_rule='interacting_nearest_neighbour_ising'
+#sim_growth_rule='interacting_nearest_neighbour_ising'
 #sim_growth_rule='interacing_nn_ising_fixed_axis'
 #sim_growth_rule='deterministic_interacting_nn_ising_single_axis'
 #sim_growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 #sim_growth_rule='ising_1d_chain'
 #sim_growth_rule='heisenberg_nontransverse'
 #sim_growth_rule='heisenberg_transverse'
-#sim_growth_rule='heisenberg_xyz'
+sim_growth_rule='heisenberg_xyz'
 #sim_growth_rule='hubbard'
 #sim_growth_rule='hubbard_chain_just_hopping'
 #sim_growth_rule='hubbard_chain'
@@ -93,7 +93,7 @@ bin_times_bayes_factors_default=1 # binning here means linspacing the times of b
 num_probes=40
 probe_noise_level_default=0.0000001
 use_all_times_bf_default=0
-data_max_time=20 # to show in plots
+data_max_time=10 # to show in plots
 top_number_models=3 # how many models to perform further QHL for
 further_qhl_resource_factor=1
 do_plots=0
@@ -215,7 +215,7 @@ printf "$day_time: \t $test_description \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; r
 force_plot_plus=0
 special_probe='random' #'ideal'
 special_probe_plot='random'
-time_request_insurance_factor=1
+time_request_insurance_factor=2
 
 if (( "$bin_times_bayes_factors" == 1))
 then
@@ -236,7 +236,9 @@ elif (( "$simulate_experiment" == 1))
 then
 	force_plot_plus=1
 	multiple_growth_rules=0
-	special_probe='random'
+#	special_probe='dec_13_exp'
+	special_probe_plot='plus' # test simulation using plus probe only.
+#	special_probe='random'
 fi
 
 ### First set up parameters/data to be used by all instances of QMD for this run. 

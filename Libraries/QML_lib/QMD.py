@@ -3065,7 +3065,7 @@ class QMD():
         time_now = time.time()
         time_taken = time_now - self.StartingTime
 
-        n_qubits = DataBase.get_num_qubits(mod.Name)
+        n_qubits = DataBase.get_num_qubits(champ_model.Name)
         if n_qubits > 3:
             # only compute subset of points for plot
             # otherwise takes too long
