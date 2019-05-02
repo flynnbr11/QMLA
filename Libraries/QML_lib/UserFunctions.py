@@ -625,8 +625,8 @@ heuristic_classes = {
    #     Heuristics.one_over_sigma_then_linspace,
 
    'NV_spin_full_access' : 
-       Heuristics.time_from_list,
-       # Heuristics.one_over_sigma_then_linspace,
+       # Heuristics.time_from_list,
+       Heuristics.one_over_sigma_then_linspace,
    
     None : Heuristics.multiPGH
 }
