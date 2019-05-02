@@ -145,6 +145,18 @@ set_true_params = {
 	'zTi': 0.25689271, 
 	'zTz': 0.48673637,
 
+	# Randomly set but within 0.5 +- 0.35, so that reasonable for initial 
+	# prior 0.5 +- 0.25 to learn. 
+	# TODO make params automatically chosen within 2*sigma of prior
+	# 'xTi': 0.16933027, 
+	# 'xTx': 0.27654145, 
+	# 'yTi': 0.38375263, 
+	# 'yTy': 0.49096381, 
+	# 'zTi': 0.59817499, 
+	# 'zTz': 0.70538616,
+
+
+
 
 	# From  BC /Jan_29/17_58/results_007
 	# 'xTi': -0.15493082869796826, 

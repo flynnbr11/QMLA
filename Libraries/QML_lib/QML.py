@@ -1123,7 +1123,19 @@ class reducedModel():
             ]
         )
 
-        for t in times:
+        present_expec_val_times = sorted(
+            list(self.expectation_values.keys())
+        )
+
+        required_times = sorted(
+            list( set(times) - set(present_expec_val_times) )
+        )
+
+        print(
+            "[QML - compute expectation values]", 
+            "times to compute:", required_times
+        )
+        for t in required_times:
                 self.expectation_values[t] = UserFunctions.expectation_value_wrapper(
                     method=self.MeasurementType,
                     ham = self.LearnedHamiltonian, 

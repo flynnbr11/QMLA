@@ -649,6 +649,7 @@ def Bayes_t_test(
         true = {}
         t_values = {}
         # times = sorted(list(experimental_measurements.keys()))
+        true_times = sorted(list(expectation_values.keys()))
         times = sorted(list(expectation_values.keys()))
         flag=True
         one_sample=True
