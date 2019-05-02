@@ -517,6 +517,32 @@ if global_variables.qhl_test:
         log_file
     )
 
+    true_mod = qmd.reducedModelInstanceFromID(
+        qmd.TrueOpModelID
+    )
+    extend_dynamics_plot_times = [
+        t*2 for t in qmd.PlotTimes  
+    ]
+    print(
+        "[Exp.py - QHL]", 
+        "Computing more expectation values"
+    )
+    true_mod.compute_expectation_values(
+        times = extend_dynamics_plot_times
+    )  
+
+    qmd.plotDynamics(
+        model_ids = [qmd.TrueOpModelID], 
+        save_to_file=str( 
+            global_variables.plots_directory +
+            'extended_dynamics_' + 
+            str(global_variables.long_id)+
+            '.png'
+        )
+    )
+
+
+
 #     qmd.plotExpecValues(
 #         model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
 #         max_time = expec_val_plot_max_time, #in microsec
