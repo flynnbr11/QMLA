@@ -565,9 +565,9 @@ def log_likelihood(model, times, binning=False):
     if binning:
         updater._renormalization_record = []
         updater.log_likelihood = 0 
-        print("BINNING")
-    else:
-        print("NOT BINNING")    
+        # print("BINNING")
+    # else:
+    #     print("NOT BINNING")    
 
     for i in range(len(times)):
         exp = get_exp(model, [times[i]])

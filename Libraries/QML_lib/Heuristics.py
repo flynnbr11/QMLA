@@ -47,6 +47,10 @@ class multiPGH(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
+        print(
+            "[Hueirstic] - multipgh\n", 
+            "kwargs:", kwargs
+        )
 
     def __call__(
         self,
@@ -203,11 +207,18 @@ class time_from_list(qi.Heuristic):
         # self._time_list = kwargs['time_list'] 
         self._time_list = time_list 
         self._len_time_list = len(self._time_list)
-        print(
-            "[Heuristics - time_from_list]",
-            "\n kwargs:", **kwargs 
-        )
 
+        # print(
+        #     "[Heuristics - time_from_list]",
+        #     # "num experiments:", self._num_experiments,
+        #     "\n kwargs:", kwargs 
+        # )
+
+        try:
+            self._num_experiments = kwargs.get('num_experiments')
+            print("self.num_experiments:", self._num_experiments)
+        except:
+            print("Can't find num_experiments in kwargs")
 
     def __call__(
         self,
@@ -272,7 +283,7 @@ class one_over_sigma_then_linspace(qi.Heuristic):
         maxiters=10,
         other_fields=None,
         time_list=None,
-        num_experiments=200,
+        # num_experiments=200,
         **kwargs
      ):
         super(one_over_sigma_then_linspace, self).__init__(updater)
@@ -286,18 +297,25 @@ class one_over_sigma_then_linspace(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
-        self._num_experiments = num_experiments
+        self._num_experiments = kwargs.get('num_experiments', 200)
 
         # self._time_list = kwargs['time_list'] 
         self._time_list = time_list 
         self._len_time_list = len(self._time_list)
         self.num_epochs_for_first_phase = self._num_experiments/2
 
-        print(
-            "[Heuristics - 1/sigma then linspace]",
-            "num epochs for first phase:", self.num_epochs_for_first_phase,
-            "\n kwargs:", **kwargs 
-        )
+        
+
+        # print(
+        #     "[Heuristics - 1/sigma then linspace]",
+        #     "num epochs for first phase:", self.num_epochs_for_first_phase,
+        #     "\n kwargs:", kwargs 
+        # )
+        # try:
+        #     self._num_experiments = kwargs.get('num_experiments')
+        #     print("self.num_experiments:", self._num_experiments)
+        # except:
+        #     print("Can't find num_experiments in kwargs")
 
 
     def __call__(

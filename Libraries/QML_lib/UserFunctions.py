@@ -626,6 +626,7 @@ heuristic_classes = {
 
    'NV_spin_full_access' : 
        Heuristics.time_from_list,
+       # Heuristics.one_over_sigma_then_linspace,
    
     None : Heuristics.multiPGH
 }
@@ -912,7 +913,8 @@ def get_heuristic(
 
     print(
         "[UserFunctions - get_heuristic]",
-        "Heuristic:", heur_fnc
+        "Heuristic:", heur_fnc,
+        "kwargs:", kwargs
     )
     heuristic = heur_fnc(**kwargs)
     return heuristic
