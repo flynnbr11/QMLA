@@ -3322,20 +3322,24 @@ class QMD():
         self, 
         all_models=False, 
         model_ids=None, 
+        include_bayes_factors_in_dynamics_plots=True, 
+        include_param_estimates_in_dynamics_plots=False,
+        include_times_learned_in_dynamics_plots=True, 
         save_to_file=None, 
     ):
         if all_models==True:
             model_ids = list(sorted(self.ModelNameIDs.keys()))
-        if self.QHLmode == False and self.multiQHLMode ==False:
-            include_bayes_factors_in_dynamics_plots = False
-            include_param_estimates_in_dynamics_plots = False
-        else:
-            include_bayes_factors_in_dynamics_plots = True 
-            include_param_estimates_in_dynamics_plots = True
+        # if self.QHLmode == False and self.multiQHLMode ==False:
+        #     include_bayes_factors_in_dynamics_plots = False
+        #     include_param_estimates_in_dynamics_plots = False
+        # else:
+        #     include_bayes_factors_in_dynamics_plots = True 
+        #     include_param_estimates_in_dynamics_plots = True
 
         PlotQMD.plotDynamicsLearnedModels(
             qmd = self, 
             include_bayes_factors = include_bayes_factors_in_dynamics_plots,
+            include_times_learned = include_times_learned_in_dynamics_plots, 
             include_param_estimates = include_param_estimates_in_dynamics_plots,
             model_ids = model_ids, 
             save_to_file = save_to_file,

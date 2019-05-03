@@ -503,6 +503,9 @@ if global_variables.qhl_test:
         log_file
     )
     qmd.plotDynamics(
+        include_bayes_factors_in_dynamics_plots=False, 
+        include_param_estimates_in_dynamics_plots=True,
+        include_times_learned_in_dynamics_plots=True, 
         save_to_file=str( 
             global_variables.plots_directory +
             'dynamics_' + 
@@ -532,7 +535,10 @@ if global_variables.qhl_test:
     )  
 
     qmd.plotDynamics(
-        model_ids = [qmd.TrueOpModelID], 
+        model_ids = [qmd.TrueOpModelID],
+        include_bayes_factors_in_dynamics_plots=False, 
+        include_param_estimates_in_dynamics_plots=False,
+        include_times_learned_in_dynamics_plots=False, 
         save_to_file=str( 
             global_variables.plots_directory +
             'extended_dynamics_' + 
