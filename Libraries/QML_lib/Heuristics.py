@@ -47,10 +47,10 @@ class multiPGH(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
-        print(
-            "[Hueirstic] - multipgh\n", 
-            "kwargs:", kwargs
-        )
+        # print(
+        #     "[Hueirstic] - multipgh\n", 
+        #     "kwargs:", kwargs
+        # )
 
     def __call__(
         self,

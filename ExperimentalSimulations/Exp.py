@@ -723,6 +723,34 @@ else:
         )
     )
 
+
+    champ_mod = qmd.reducedModelInstanceFromID(
+        qmd.ChampID
+    )
+    extend_dynamics_plot_times = [
+        t*2 for t in qmd.PlotTimes  
+    ]
+    print(
+        "[Exp.py - QHL]", 
+        "Computing more expectation values"
+    )
+    champ_mod.compute_expectation_values(
+        times = extend_dynamics_plot_times
+    )  
+
+    qmd.plotDynamics(
+        model_ids = [qmd.ChampID],
+        include_bayes_factors_in_dynamics_plots=False, 
+        include_param_estimates_in_dynamics_plots=False,
+        include_times_learned_in_dynamics_plots=False, 
+        save_to_file=str( 
+            global_variables.plots_directory +
+            'extended_dynamics_' + 
+            str(global_variables.long_id)+
+            '.png'
+        )
+    )
+
     if global_variables.save_plots:
         try:
             print("plotVolumes")

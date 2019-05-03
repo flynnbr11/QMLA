@@ -503,12 +503,15 @@ def plotDynamicsLearnedModels(
                 marker = 'o', 
                 markevery = 10, 
                 c = plot_colour,
-                label = dynamics_label
+                # label = dynamics_label
+                label = desc
             )
     #         ax.legend()
 
             if row == 0:
                 ax.set_title('Expectation Values')
+            if ncols == 1:
+                ax.legend()
 
             col += 1
             if col == ncols:

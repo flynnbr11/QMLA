@@ -911,11 +911,11 @@ def get_heuristic(
     except:
         heur_fnc = heuristic_classes[None]
 
-    print(
-        "[UserFunctions - get_heuristic]",
-        "Heuristic:", heur_fnc,
-        "kwargs:", kwargs
-    )
+    # print(
+    #     "[UserFunctions - get_heuristic]",
+    #     "Heuristic:", heur_fnc,
+    #     "kwargs:", kwargs
+    # )
     heuristic = heur_fnc(**kwargs)
     return heuristic
 
