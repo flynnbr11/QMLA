@@ -413,6 +413,9 @@ def plotDynamicsLearnedModels(
             "mod id:", mod_id
         )
         reduced = qmd.reducedModelInstanceFromID(mod_id)
+        reduced.compute_expectation_values(
+            times = qmd.PlotTimes
+        )
 #         growth_generator = reduced.GrowthGenerator
         desc = str(
             "ID:{}\n".format(mod_id) + 
@@ -497,6 +500,12 @@ def plotDynamicsLearnedModels(
             expec_vals = reduced.expectation_values
             sim_times = sorted(list(expec_vals.keys()))
             sim_exp = [expec_vals[t] for t in sim_times]
+
+            # print(
+            #     "[plotDynamics]",
+            #     "\nsim exp:", sim_exp, 
+            #     "\nsim_times:", sim_times
+            # )
             ax.plot(
                 sim_times, 
                 sim_exp, 

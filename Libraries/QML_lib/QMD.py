@@ -1174,10 +1174,13 @@ class QMD():
                 b=model_id_list[j]
                 if a!=b:
                     unique_id = DataBase.unique_model_pair_identifier(a,b)
-                    if (unique_id not in self.BayesFactorsComputed 
+                    if (
+                        unique_id not in self.BayesFactorsComputed 
                         or recompute==True
                     ): #ie not yet considered
-                        self.BayesFactorsComputed.append(unique_id)
+                        self.BayesFactorsComputed.append(
+                            unique_id
+                        )
                         remote_jobs.append(
                             self.remoteBayes(
                                 a,
@@ -1336,10 +1339,17 @@ class QMD():
                 pair name string, to process Bayes factors."]
             )
         try:
-            bayes_factor = float(bayes_factors_db.get(pair))
+            bayes_factor = float(
+                bayes_factors_db.get(pair)
+            )
         except TypeError:
-            self.log_print(["On bayes_factors_db for pair id", 
-                pair, "value=", bayes_factors_db.get(pair)]
+            self.log_print(
+                [
+                    "On bayes_factors_db for pair id", 
+                    pair, 
+                    "value=", 
+                    bayes_factors_db.get(pair)
+                ]
             )
         
         # bayes_factor refers to calculation BF(pair), where pair
@@ -1537,8 +1547,12 @@ class QMD():
         
         if len(max_points_branches) > 1: 
             # todo: recompare. Fnc: compareListOfModels (rather than branch based)
-            self.log_print(["Multiple models have same number of points within \
-                branch.\n", models_points]
+            self.log_print(
+                [
+                    "Multiple models have same number of points within \
+                    branch.\n", 
+                    models_points
+                ]
             )
             self.remoteBayesFromIDList(
                 model_id_list=max_points_branches, 
@@ -3329,6 +3343,12 @@ class QMD():
     ):
         if all_models==True:
             model_ids = list(sorted(self.ModelNameIDs.keys()))
+        elif model_ids is None: 
+            model_ids = list(
+                sorted(self.BranchChampions.values())
+            )
+
+        print("[QMD - Plot Dynamics] model ids:", model_ids)
         # if self.QHLmode == False and self.multiQHLMode ==False:
         #     include_bayes_factors_in_dynamics_plots = False
         #     include_param_estimates_in_dynamics_plots = False
