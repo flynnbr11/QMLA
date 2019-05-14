@@ -10,8 +10,8 @@ num_tests=1
 qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
-exp_data=1
-simulate_experiment=0
+exp_data=0
+simulate_experiment=1
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -80,7 +80,7 @@ cp $qhl_settings_lib_file $qhl_settings
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='test_changes_to_qmd'
-# sim_growth_rule='two_qubit_ising_rotation_hyperfine'
+sim_growth_rule='two_qubit_ising_rotation_hyperfine'
 # sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # sim_growth_rule='non_interacting_ising'
 # sim_growth_rule='non_interacting_ising_single_axis'
@@ -92,7 +92,7 @@ cp $qhl_settings_lib_file $qhl_settings
 # sim_growth_rule='ising_1d_chain'
 # sim_growth_rule='heisenberg_nontransverse'
 # sim_growth_rule='heisenberg_transverse'
-sim_growth_rule='heisenberg_xyz'
+# sim_growth_rule='heisenberg_xyz'
 # sim_growth_rule='hubbard'
 # sim_growth_rule='hubbard_chain_just_hopping'
 # sim_growth_rule='hubbard_chain'
@@ -104,10 +104,10 @@ sim_growth_rule='heisenberg_xyz'
 
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_spin_full_access'
-exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_centre_experiment_debug'
-# exp_growth_rule='reduced_nv_experiment'
+exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='PT_Effective_Hamiltonian'
 
 if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
@@ -138,7 +138,7 @@ param_max=8
 param_mean=0.5
 param_sigma=3
 rand_true_params=0
-reallocate_resources=1
+reallocate_resources=0
 updater_from_prior=0
 store_prt_wt=0 # store all particles and weights after learning
 
@@ -147,7 +147,7 @@ store_prt_wt=0 # store all particles and weights after learning
 # set in SetQHLParams dictionaries.
 # All undefined params will be random according 
 # to above defined mean/sigmas
-rand_prior=1
+rand_prior=0
 special_probe='random' #'plus' #'ideal'
 special_probe_plot='random'
 # special_probe='plus_random' #'plus' #'ideal'

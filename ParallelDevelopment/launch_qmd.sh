@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="qmd__sim-data__decohering-params__traced-out__random-probes__bf-times-opponent-model__broad-prior"
+test_description="qmd__sim-data__decohering-params__random-probes__bf-times-opponent-model__broad-prior__full-access"
 
 
 ### ---------------------------------------------------###
@@ -9,7 +9,7 @@ test_description="qmd__sim-data__decohering-params__traced-out__random-probes__b
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=3
+num_tests=50
 num_processes_to_request=5
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
@@ -20,8 +20,8 @@ experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=1
 
 # QHL parameters.
-e=7 # experiments
-p=25 # particles
+e=750 # experiments
+p=2500 # particles
 ra=0.8 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -56,8 +56,8 @@ sim_growth_rule='heisenberg_xyz'
 
 # Experimental growth rules
 #experimental_growth_rule='two_qubit_ising_rotation_hyperfine'
-experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-#experimental_growth_rule='NV_spin_full_access'
+#experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+experimental_growth_rule='NV_spin_full_access'
 #experimental_growth_rule='NV_centre_spin_large_bath'
 #experimental_growth_rule='NV_centre_experiment_debug'
 #experimental_growth_rule='reduced_nv_experiment'
@@ -94,7 +94,7 @@ bin_times_bayes_factors_default=1 # binning here means linspacing the times of b
 num_probes=40
 probe_noise_level_default=0.0000001
 use_all_times_bf_default=0
-data_max_time=15 # to show in plots
+data_max_time=20 # to show in plots
 top_number_models=3 # how many models to perform further QHL for
 further_qhl_resource_factor=1
 do_plots=0
@@ -306,7 +306,8 @@ do
 							do
 								for i in `seq $min_id $max_id`;
 								do
-									let bt="$e/2"
+#									let bt="$e/2"
+									let bt="$e"
 									let qmd_id="$qmd_id+1"
 
 									if [ "$qhl" == 1 ] || [ "$multiple_qhl" == 1 ] 

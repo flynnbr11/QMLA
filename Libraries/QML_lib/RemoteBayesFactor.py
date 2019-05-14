@@ -104,6 +104,8 @@ def BayesFactorRemote(
     binning = info_dict['bayes_factors_time_binning']
     # use_all_exmodel_id_strp_times_for_bayes_factors = False # TODO make this a QMD input
     use_all_exp_times_for_bayes_factors = info_dict['bayes_factors_time_all_exp_times'] # TODO make this a QMD input
+    linspace_times_for_bayes_factor_comparison = False
+    use_opponent_learned_times = True
     true_mod_name = info_dict['true_name']
     save_plots_of_posteriors = True
 
@@ -143,36 +145,16 @@ def BayesFactorRemote(
         else:
             first_t_idx = len(model_a.Times) - num_times_to_use
 
-        update_times_model_a = model_b.Times[first_t_idx:]
-        update_times_model_b = model_a.Times[first_t_idx:]
-        set_renorm_record_to_zero = False
-
-
-        # if (
-        #     num_times_to_use == 'all' 
-        #     or 
-        #     len(model_a.Times) < num_times_to_use
-        # ):
-        #     times_a = model_a.Times
-        #     times_b = model_b.Times
-        # else:
-        #     times_a = model_a.Times[first_t_idx:]
-        #     times_b = model_b.Times[first_t_idx:]
+        if use_opponent_learned_times == True:
+            # by default, just use the times learned by the other model
+            update_times_model_a = model_b.Times[first_t_idx:]
+            update_times_model_b = model_a.Times[first_t_idx:]
+            set_renorm_record_to_zero = False
         
-        # # if binning==True and use_experimental_data==True:
-
-        # log_print(
-        #     [
-        #     "Binning. Before times\n A:", repr(times_a), 
-        #     "\nB:", repr(times_b)
-        #     ]
-        # )
-
-        
-        if (
-            use_experimental_data is True
+        elif (
+            use_experimental_data == True
             and
-            use_all_exp_times_for_bayes_factors is True
+            use_all_exp_times_for_bayes_factors == True
         ):
             experimental_data_times = info_dict[
                 'experimental_measurement_times'
@@ -241,17 +223,22 @@ def BayesFactorRemote(
                 ]
                 update_times_model_a = list(sorted(mapped_to_exp_times))
                 update_times_model_b = list(sorted(mapped_to_exp_times))
-            else:
+            elif linspace_times_for_bayes_factor_comparison == True:
                 update_times_model_a = linspaced_times
                 update_times_model_b = linspaced_times
+
             set_renorm_record_to_zero = True
 
-        update_times_model_a = sorted(update_times_model_a)
-        update_times_model_b = sorted(update_times_model_b)
+        update_times_model_a = sorted(
+            update_times_model_a
+        )
+        update_times_model_b = sorted(
+            update_times_model_b
+        )
 
 
         ### Verbatim code used in december version, though functionally equivalent to elif binning case above
-        recreate_dec_13_times_list_method = True
+        recreate_dec_13_times_list_method = False
         if recreate_dec_13_times_list_method == True:
             # print("[BF calculation] Generating times as in Dec")
             try:

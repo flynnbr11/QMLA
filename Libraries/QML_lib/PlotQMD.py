@@ -588,7 +588,18 @@ def plotDynamicsLearnedModels(
                     linestyle='--', 
                     alpha=0.3
                 )
+            plot_time_max = max(times_to_plot)
+            max_time = max(times_learned_over)
+            if max_time > plot_time_max:
+                ax.axvline(
+                    plot_time_max, 
+                    color='red', 
+                    linestyle='--', 
+                    label='Dynamics plot cutoff'
+                )
+                ax.legend()
             ax.set_xlim(0, max_time)
+
 
             col += 1
             if col == ncols:
