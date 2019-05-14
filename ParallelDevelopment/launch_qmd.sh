@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="qmd_sim_broad_prior_test"
+test_description="qmd__sim-data__decohering-params__traced-out__random-probes__bf-times-opponent-model__broad-prior"
 
 
 ### ---------------------------------------------------###
@@ -9,7 +9,7 @@ test_description="qmd_sim_broad_prior_test"
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=1
+num_tests=3
 num_processes_to_request=5
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
@@ -57,6 +57,7 @@ sim_growth_rule='heisenberg_xyz'
 # Experimental growth rules
 #experimental_growth_rule='two_qubit_ising_rotation_hyperfine'
 experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+#experimental_growth_rule='NV_spin_full_access'
 #experimental_growth_rule='NV_centre_spin_large_bath'
 #experimental_growth_rule='NV_centre_experiment_debug'
 #experimental_growth_rule='reduced_nv_experiment'
@@ -93,7 +94,7 @@ bin_times_bayes_factors_default=1 # binning here means linspacing the times of b
 num_probes=40
 probe_noise_level_default=0.0000001
 use_all_times_bf_default=0
-data_max_time=10 # to show in plots
+data_max_time=15 # to show in plots
 top_number_models=3 # how many models to perform further QHL for
 further_qhl_resource_factor=1
 do_plots=0
@@ -101,13 +102,13 @@ pickle_class=1
 custom_prior=1
 gaussian=1 # set to 0 for uniform distribution, 1 for normal
 param_min=0
-param_max=1
+param_max=8
 param_mean=0.5
 param_sigma=2
-random_true_params=1 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
-random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
+random_true_params=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
+random_prior=1 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
 resource_reallocation=0 # whether to weight num particles given to model based on number parameters it has
-updater_from_prior=1 # 1->incorrect method of getting initial prior; 0->correct method copying entire updater
+updater_from_prior=0 # 1->incorrect method of getting initial prior; 0->correct method copying entire updater
 store_particles_weights=0
 
 # Change requested time. e.g. if running QHL , don't need as many nodes. 
