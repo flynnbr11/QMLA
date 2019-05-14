@@ -4,15 +4,123 @@
 		"selected_items":
 		[
 			[
+				"expectation_va",
+				"expectation_values"
+			],
+			[
+				"num",
+				"num_experiments"
+			],
+			[
+				"exper",
+				"experimental_measurements_dict"
+			],
+			[
+				"mluti",
+				"multiPGH"
+			],
+			[
+				"plot",
+				"plot_probe_path"
+			],
+			[
+				"r_squared",
+				"r_squared_by_epoch"
+			],
+			[
+				"r_squ",
+				"r_squared_by_epoch"
+			],
+			[
+				"Num",
+				"NumExperiments"
+			],
+			[
+				"num_",
+				"num_experiments"
+			],
+			[
+				"specific",
+				"specific_terms"
+			],
+			[
+				"set_",
+				"set_prior_specific_terms"
+			],
+			[
+				"mul",
+				"multiQHLMode"
+			],
+			[
+				"times_t",
+				"times_to_plot"
+			],
+			[
+				"expe",
+				"expectation_values"
+			],
+			[
+				"expec",
+				"expec_val_plot_times"
+			],
+			[
+				"epoc",
+				"epoch_id"
+			],
+			[
+				"Mi",
+				"MinSingVal"
+			],
+			[
+				"sepa",
+				"separate_terms"
+			],
+			[
+				"steo",
+				"steps_to_show"
+			],
+			[
+				"Res",
+				"ResultsDirectory"
+			],
+			[
+				"n_",
+				"n_qubit_hahn_evolution"
+			],
+			[
+				"NV_c",
+				"NV_centre_spin_large_bath"
+			],
+			[
+				"basic",
+				"basic_operator"
+			],
+			[
+				"exp",
+				"exp_growth_rule"
+			],
+			[
+				"NV",
+				"NV_centre_ising_probes_plus"
+			],
+			[
+				"Proeb",
+				"ProbeGeneration"
+			],
+			[
+				"latex_",
+				"latex_name_ising"
+			],
+			[
+				"branch",
+				"branch_is_num_params"
+			],
+			[
 				"Init",
 				"InitialOpList"
 			],
 			[
 				"latex_m",
-				"latex_mapping_file"
-			],
-			[
-				"latex_",
 				"latex_mapping_file"
 			],
 			[
@@ -152,10 +260,6 @@
 				"true_operator"
 			],
 			[
-				"n_",
-				"n_qubit_plus_state"
-			],
-			[
 				"log",
 				"log_identifier"
 			],
@@ -164,15 +268,7 @@
 				"qmd_info"
 			],
 			[
-				"expec",
-				"expectation_value_wrapper"
-			],
-			[
 				"expectation_value",
-				"expectation_value_wrapper"
-			],
-			[
-				"expe",
 				"expectation_value_wrapper"
 			],
 			[
@@ -246,10 +342,6 @@
 			[
 				"prior_",
 				"prior_specific_terms"
-			],
-			[
-				"exp",
-				"exp_data"
 			],
 			[
 				"lat",
@@ -340,10 +432,6 @@
 				"TrueOpModelID"
 			],
 			[
-				"num",
-				"num_jobs_started"
-			],
-			[
 				"ex",
 				"experiments"
 			],
@@ -426,121 +514,25 @@
 			[
 				"bayes",
 				"bayes_lower"
-			],
-			[
-				"default_bayes",
-				"default_bayes_threshold_upper"
-			],
-			[
-				"default_ba",
-				"default_bayes_threshold_upper"
-			],
-			[
-				"cusom",
-				"custom_prior"
-			],
-			[
-				"custom",
-				"custom_prior"
-			],
-			[
-				"speci",
-				"specific_terms"
-			],
-			[
-				"result",
-				"results_directory"
-			],
-			[
-				"nu",
-				"num_times_to_use"
-			],
-			[
-				"tra",
-				"traced_state"
-			],
-			[
-				"desn",
-				"density_matrix"
-			],
-			[
-				"qubit",
-				"qubits_to_trace"
-			],
-			[
-				"density",
-				"density_matrix"
-			],
-			[
-				"parti",
-				"partial_trace_out_second_qubit"
-			],
-			[
-				"PGH",
-				"PGHPrefactor"
-			],
-			[
-				"Res",
-				"ResamplerThresh"
-			],
-			[
-				"Resamp",
-				"ResamplerThresh"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "ExperimentalSimulations/qmd_pipeline.sh",
+			"file": "ExperimentalSimulations/launch_qmd.sh",
 			"settings":
 			{
-				"buffer_size": 7239,
+				"buffer_size": 10587,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/QML.py",
+			"file": "Libraries/QML_lib/Heuristics.py",
 			"settings":
 			{
-				"buffer_size": 45281,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
-			"settings":
-			{
-				"buffer_size": 42225,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "ExperimentalSimulations/Exp.py",
-			"settings":
-			{
-				"buffer_size": 19472,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Libraries/QML_lib/QMD.py",
-			"settings":
-			{
-				"buffer_size": 85112,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Libraries/QML_lib/ModelGeneration.py",
-			"settings":
-			{
-				"buffer_size": 26002,
+				"buffer_size": 11656,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -549,7 +541,43 @@
 			"file": "Libraries/QML_lib/UserFunctions.py",
 			"settings":
 			{
-				"buffer_size": 14351,
+				"buffer_size": 30034,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/Distrib.py",
+			"settings":
+			{
+				"buffer_size": 10258,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "ExperimentalSimulations/Exp.py",
+			"settings":
+			{
+				"buffer_size": 27731,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/QML.py",
+			"settings":
+			{
+				"buffer_size": 57716,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/CalculateTimeRequired.py",
+			"settings":
+			{
+				"buffer_size": 11764,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -558,24 +586,34 @@
 			"file": "Libraries/QML_lib/PlotQMD.py",
 			"settings":
 			{
-				"buffer_size": 84161,
+				"buffer_size": 122350,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/Evo.py",
+			"file": "Libraries/QML_lib/multiPGH.py",
 			"settings":
 			{
-				"buffer_size": 6999,
+				"buffer_size": 5884,
+				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/ModelNames.py",
+			"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
 			"settings":
 			{
-				"buffer_size": 18876,
+				"buffer_size": 50435,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/SetQHLParams.py",
+			"settings":
+			{
+				"buffer_size": 13438,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -619,29 +657,37 @@
 	"expanded_folders":
 	[
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib"
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ParallelDevelopment"
 	],
 	"file_history":
 	[
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GlobalVariables.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GenSimQMD_IQLE.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/AnalyseMultipleQMD.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/PlotQMD.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExpectationValues.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteBayesFactor.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Exp.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/SetQHLParams.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelGeneration.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/DataBase.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Evo.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QML.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelNames.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteModelLearning.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/UserFunctions.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QMD.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Heuristics.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GenSimQMD_IQLE.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Distrib.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExperimentalDataFunctions.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExpectationValues.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/qmd_pipeline.sh",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/UserFunctions.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteModelLearning.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/AnalyseMultipleQMD.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/SetQHLParams.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/multiPGH.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GlobalVariables.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/CalculateTimeRequired.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/CallTimeCalculator.sh",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelGeneration.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelNames.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Exp.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QML.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/PlotQMD.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/DataBase.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ProbeGeneration.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Evo.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExperimentalDataFunctions.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RedisSettings.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/another.sh",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/id_cycling.sh",
@@ -650,7 +696,6 @@
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Evo (Sebastian Knauer's conflicted copy 2018-09-07).py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RedisDatabaseConfig.conf",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExperimentalDataFunctions (Brian Flynn's conflicted copy 2018-08-28).py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/multiPGH.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/NV05_HahnPeaks_expdataset/04.csv",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/NV05_HahnPeaks_expdataset/01.csv",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/README.md",
@@ -659,7 +704,7 @@
 	],
 	"find":
 	{
-		"height": 40.0
+		"height": 45.0
 	},
 	"find_in_files":
 	{
@@ -673,134 +718,134 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"cumulative",
-			"only_adjacent_branches",
-			"global_adjacent_branch_test",
-			"global_ad",
-			"\n\t\t",
-			"operators",
-			"self.InitialOpList",
-			"get_name_branch_map",
-			"colour_dicts_from_win_count",
-			"get_name_branch_map",
-			"colour_dicts_from_win_count",
-			"ModelGeneration",
-			"initial_op",
-			"entering model",
-			"get name branch map.",
-			"plot tree plot_tree_multi_",
-			"[cumul",
-			"[anal",
-			"global_variables",
-			"def cum",
-			"latex_mapping_file",
-			"plot_tree_multi_QMD",
-			"def cum",
-			"get_bayes_latex_dict",
-			"get bayes latex",
-			"plot_tree_multi_QMD",
-			"latex_mapping_file",
-			"plot_tree_multi_QMD",
-			"cumulativeQMDTreePlot",
-			"cumulative_qmd_",
-			"model_name_to",
-			"resultsdirec",
-			"log_print",
-			"plot_tree_multi_QMD",
-			"def cumulat",
-			"cumulat",
-			"cumulate",
-			"import pandas",
-			"summariseResultsCSV",
-			"finalise",
-			"cumulativeQMDTreePlot",
-			".fieldnames",
-			"dictwrite",
-			"[cumul",
-			"[cum",
-			"multiQMDBayes",
-			"[cumu",
-			"get_bayes_latex_dict",
-			"from_csv",
-			"qmd_res",
-			"cumulativeQMDTreePlot",
-			"plot_tree_multi_QMD",
-			"cumulative_csv",
-			"writeInterQMDBayesCSV",
-			"true_hami",
-			"max_time_learned",
+			"realloc",
+			"realloca",
+			"reallocate",
+			"save_true_expec_vals_alone_plot",
+			"expec_val",
+			"default_true",
+			"compute_ex",
+			"plotdynamics",
+			"compute_expectation",
+			"compute_Exp",
+			"finaliseQMD",
+			"num_tests",
+			"branchcham",
+			"bayes_thresh",
+			"remoteBayesFromIDList",
+			"bayes_threshold",
+			"heuristic_classes",
+			" - multip!",
+			" - multip",
+			"[heur",
+			"finaliseQMD",
+			"runRemoteQMD_MULTIPLE_GEN",
+			"runQHLTest",
+			"ChampID",
+			"dynamics",
+			"bayes_t_",
+			"compute_expectation_values",
+			"BINNING",
+			"heuristic_classes",
+			"heur",
+			"kwargs",
+			"heur",
+			"get_heu",
+			"heurist",
+			"rand_prior",
+			"random_prior",
+			"NVB_rescale_dataset",
+			"hahn",
+			"exp_times",
+			"p_str",
+			"5",
+			"sim_colour",
+			"frameinfo",
+			"replot_expectation_values",
+			"save_true_expec_vals_alone_plot",
+			"_true",
+			"QLosses",
+			"quadratic_losses",
+			"results_d",
+			"get_heu",
+			"heuristic_classes",
+			"heuristic",
+			"pgh",
+			"heuristic",
+			"maxiters",
+			"hahn",
+			"0.78975978309",
+			"20",
+			"long_dir",
+			"expec vals",
+			"hahn",
+			"hahn_evolution_project_first_qubit",
+			"hahn",
 			"expectation_value",
-			"occurence",
-			"occurences",
-			"multi",
-			"n_qubit_plus_state",
-			"use_experimental_data",
+			"full_access",
+			"hahn",
+			"expec_val_function_dict",
+			"expectation_value_wrapper",
+			"expectation_value",
+			"hahn_",
+			"partial_trace_out_second_qubit",
+			"data_time_offset",
+			"random_prior",
+			"data_max_time",
+			"global_variables.data_max_time",
+			"20",
+			"self._t",
+			"get_heuris",
+			"self._norm",
+			"heuristic_classes",
+			"exp_t",
+			"self.Heuristic",
+			"kwargs",
+			"__init",
+			"self.PlotTimes",
+			"get_heuristic",
+			"self.PlotTimes",
+			"plot_times",
+			"self.PlotTimes",
+			"multipgh",
+			"multiPGH",
+			"separable_probe_dict",
+			"special_probe_functions",
+			"plot_probe",
+			"save_true_expec_vals_alone_plot",
+			"bayes_t_test",
+			"bayes_t",
+			"max_time",
+			"= 5",
+			"5",
+			"dynamics",
+			"r_sqaured_average",
+			"compute_expectation_values",
+			"plot_probe_path",
+			"plot_probe_file",
+			"plot_probe_path",
+			"self.expectation_values",
+			"PlotProbeFile",
+			"r_squared_by",
+			"self.PlotProbes",
+			"plotprob",
+			"plot_probes",
+			"self.PlotProbes",
+			"datamean",
+			"r_squared_by_",
+			"r_squared_",
+			"r_squared_per_",
+			"def plotExpe",
+			"calculate_exp",
+			"experimental_measurements",
+			"true[",
+			"true =",
+			"true",
 			"true_exp",
-			"expectation",
-			"average_expec",
-			"average_parameters",
-			"name",
-			"average_parameter_estimates",
-			"s",
-			"multiQMDBayes",
-			"latex_terms",
-			"get_all_model_names",
-			"ising_terms_rotation_hyperfine",
-			"multiQMDBayes",
-			"return_branch_dict==",
-			"elif return_branch_dict=",
-			"return_branch_dict='latex_terms'",
-			"return_branch_dict = 'latex_terms'",
-			"elif return_branch_dict == 'latex_terms'",
-			"ising_terms_rotation_hyperfine",
-			"plot_tree_multi_QMD",
-			"cumulative",
-			"multiQMDBayes",
-			"csv",
-			"multiQMDBayes",
-			"cumulativeQMDTreePlot",
-			"plot_tree_multi_QMD",
-			"default_latex",
-			"branch_by_term_dict",
-			"return_branch_dict",
-			"get_all_model_names",
-			"random_ising",
-			"initial_op_list",
-			"probe_id",
-			"plus_probe",
-			"log_print",
-			"likelihood(",
-			"self._b",
-			"initial_op_list",
-			"def log_print",
-			"return_branch_dict",
-			"print(\"true ham",
-			"self.MaxSpawnDepth",
-			"initial_op",
-			"BranchModelIds",
-			"self.BranchPrecomputedModels",
-			"newBranch",
-			"remoteBayesFromBranchID",
-			"self.BranchModels",
-			"tryAddModel",
-			"newbranch",
-			"self.BranchModels",
-			"newBranch",
-			"self.BranchModels",
-			"self.BranchModels ",
-			"learnModelFromBranchID",
-			"newBranch",
-			"Alph_Name",
-			"alph(",
-			"Alph_Name",
-			"alph",
-			"addmodel",
-			"get_model_id",
-			"addModel",
-			"all models on bra",
-			"already computed",
-			")\n",
-			"newBranch"
+			"bayes_t_Test",
+			"insurance_factor",
+			"time_insurance_factor",
+			"random_prior_terms"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -808,6 +853,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"full_path_to_results",
+			"plot_probe_file",
 			"UserFunctions.get_all_model_names",
 			"UserFunctions.get_latex_name",
 			"UserFunctions.new_model_generator",
@@ -850,19 +897,19 @@
 			[
 				{
 					"buffer": 0,
-					"file": "ExperimentalSimulations/qmd_pipeline.sh",
+					"file": "ExperimentalSimulations/launch_qmd.sh",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7239,
+						"buffer_size": 10587,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								301,
+								301
 							]
 						],
 						"settings":
@@ -880,19 +927,19 @@
 				},
 				{
 					"buffer": 1,
-					"file": "Libraries/QML_lib/QML.py",
+					"file": "Libraries/QML_lib/Heuristics.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 45281,
+						"buffer_size": 11656,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1235,
+								1235
 							]
 						],
 						"settings":
@@ -902,27 +949,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1886.0,
+						"translation.y": 852.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
+					"file": "Libraries/QML_lib/UserFunctions.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 42225,
+						"buffer_size": 30034,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								4060,
+								4060
 							]
 						],
 						"settings":
@@ -932,27 +979,57 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 18081.0,
+						"translation.y": 1894.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
+					"file": "Libraries/QML_lib/Distrib.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10258,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2817,
+								2817
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 216.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
 					"file": "ExperimentalSimulations/Exp.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 19472,
+						"buffer_size": 27731,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								24976,
+								24976
 							]
 						],
 						"settings":
@@ -962,43 +1039,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 9569.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 4,
-					"file": "Libraries/QML_lib/QMD.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 85112,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 37632.0,
+						"translation.y": 20110.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -1006,19 +1047,19 @@
 				},
 				{
 					"buffer": 5,
-					"file": "Libraries/QML_lib/ModelGeneration.py",
+					"file": "Libraries/QML_lib/QML.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 26002,
+						"buffer_size": 57716,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								6202,
+								6202
 							]
 						],
 						"settings":
@@ -1028,38 +1069,46 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 13533.0,
+						"translation.y": 4558.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 4,
 					"type": "text"
-				},
+				}
+			]
+		},
+		{
+			"selected": 4,
+			"sheets":
+			[
 				{
 					"buffer": 6,
-					"file": "Libraries/QML_lib/UserFunctions.py",
+					"file": "Libraries/QML_lib/CalculateTimeRequired.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 14351,
+						"buffer_size": 11764,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								3403,
+								3403
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.sublime-syntax"
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4363.0,
+						"translation.y": 9360.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -1068,15 +1117,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 84161,
+						"buffer_size": 122350,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								15475,
+								15475
 							]
 						],
 						"settings":
@@ -1086,27 +1135,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 25111.0,
+						"translation.y": 11364.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
 					"buffer": 8,
-					"file": "Libraries/QML_lib/Evo.py",
+					"file": "Libraries/QML_lib/multiPGH.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6999,
+						"buffer_size": 5884,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2462,
-								2462
+								3852,
+								3852
 							]
 						],
 						"settings":
@@ -1116,27 +1165,31 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1864.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
 					"buffer": 9,
-					"file": "Libraries/QML_lib/ModelNames.py",
+					"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 18876,
+						"buffer_size": 50435,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								15482,
+								15482
+							],
+							[
+								16151,
+								16151
 							]
 						],
 						"settings":
@@ -1146,10 +1199,39 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 9543.0,
+						"translation.y": 11278.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "Libraries/QML_lib/SetQHLParams.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13438,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3302,
+								3302
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2795.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -1157,7 +1239,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 28.0
+		"height": 33.0
 	},
 	"input":
 	{
@@ -1183,7 +1265,7 @@
 		"cols":
 		[
 			0.0,
-			0.494942643082,
+			0.477871139781,
 			1.0
 		],
 		"rows":
@@ -1201,7 +1283,7 @@
 	"project": "",
 	"replace":
 	{
-		"height": 72.0
+		"height": 62.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1239,7 +1321,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 246.0,
+	"side_bar_width": 287.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

@@ -37,12 +37,12 @@ set_experimental_data_prior_specific_terms = {
 set_normal_prior_specific_terms = {
 
 	# REALISTIC, DECOHERING CASE FOR EXPERIMENTAL MODEL WHEN TRACED OUT
-	'xTi': [0.0, 0.1], 
-	'xTx': [0.15, 0.1], 
-	'yTi': [6.1, 0.1], 
-	'yTy': [0.26, 0.1], 
-	'zTi': [0.25, 0.1], 
-	'zTz': [0.5, 0.1],
+	# 'xTi': [0.0, 0.1], 
+	# 'xTx': [0.15, 0.1], 
+	# 'yTi': [6.1, 0.1], 
+	# 'yTy': [0.26, 0.1], 
+	# 'zTi': [0.25, 0.1], 
+	# 'zTz': [0.5, 0.1],
 
 	# 'xTi': 0.05906251, 
 	# 'xTx': 0.18309156, 
@@ -144,6 +144,8 @@ set_true_params = {
 	'yTy': 0.2610886, 
 	'zTi': 0.25689271, 
 	'zTz': 0.48673637,
+
+
 
 	# Randomly set but within 0.5 +- 0.35, so that reasonable for initial 
 	# prior 0.5 +- 0.25 to learn. 

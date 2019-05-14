@@ -890,19 +890,21 @@ def Bayes_t_test(
     # Also save an image of the true expectation values without overlaying results
     if save_true_expec_vals_alone_plot == True:
         plt.clf()
-        plt.scatter(
-            times, 
-            true_exp, 
-            color='r', 
-            s=5, 
-            label='True Expectation Value'
-        )
-        # plt.plot(
+        # plt.scatter(
         #     times, 
         #     true_exp, 
         #     color='r', 
-        #     alpha = 0.3
+        #     s=5, 
+        #     label='True Expectation Value'
         # )
+        plt.plot(
+            times, 
+            true_exp, 
+            marker='o',
+            color='r', 
+            label='True System'
+            # alpha = 0.3
+        )
         plt.xlabel('Time')
         plt.ylabel('Expectation Value')
         plt.legend()

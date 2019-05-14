@@ -88,7 +88,8 @@ default_true_operators_by_generator = {
     'reduced_nv_experiment' : 'zTi' ,
     'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
-    'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 
+    # 'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 
+    'two_qubit_ising_rotation_hyperfine' : 'zTi', 
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'yTi', # 1 param
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'yTiPPzTi', # 2 param
@@ -160,8 +161,9 @@ qhl_models_by_generator = {
     'two_qubit_ising_rotation_hyperfine' : 
     	[
     		'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+            'zTi'
     		# 'xTiPPxTxPPyTiPPyTyPPzTi',
-    		'xTiPPyTiPPyTyPPzTi',
+    		# 'xTiPPyTiPPyTyPPzTi',
 #    		'xTiPPyTiPPzTiPPzTz',
     	],
     'two_qubit_ising_rotation_hyperfine_transverse' : 
