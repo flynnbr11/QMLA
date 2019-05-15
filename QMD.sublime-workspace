@@ -523,7 +523,16 @@
 			"file": "ExperimentalSimulations/launch_qmd.sh",
 			"settings":
 			{
-				"buffer_size": 10587,
+				"buffer_size": 10582,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/RemoteBayesFactor.py",
+			"settings":
+			{
+				"buffer_size": 25562,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -586,7 +595,7 @@
 			"file": "Libraries/QML_lib/PlotQMD.py",
 			"settings":
 			{
-				"buffer_size": 122350,
+				"buffer_size": 122716,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -604,7 +613,7 @@
 			"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
 			"settings":
 			{
-				"buffer_size": 50435,
+				"buffer_size": 50496,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -613,7 +622,7 @@
 			"file": "Libraries/QML_lib/SetQHLParams.py",
 			"settings":
 			{
-				"buffer_size": 13438,
+				"buffer_size": 13384,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -718,6 +727,17 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"default_tr",
+			"param_max",
+			"0",
+			"max_time",
+			"save_true_expec_vals_alone_plot",
+			"bayes",
+			"44",
+			"save_true_expec_vals_alone_plot",
+			"two_qubit_ising_rotation_hyperfine'",
+			"two_qubit_ising_rotation_hyperfine",
+			"true_",
 			"realloc",
 			"realloca",
 			"reallocate",
@@ -834,18 +854,7 @@
 			"datamean",
 			"r_squared_by_",
 			"r_squared_",
-			"r_squared_per_",
-			"def plotExpe",
-			"calculate_exp",
-			"experimental_measurements",
-			"true[",
-			"true =",
-			"true",
-			"true_exp",
-			"bayes_t_Test",
-			"insurance_factor",
-			"time_insurance_factor",
-			"random_prior_terms"
+			"r_squared_per_"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -892,7 +901,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -901,15 +910,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10587,
+						"buffer_size": 10582,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								301,
-								301
+								562,
+								562
 							]
 						],
 						"settings":
@@ -919,14 +928,44 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 720.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
+					"file": "Libraries/QML_lib/RemoteBayesFactor.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 25562,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5113,
+								5113
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3236.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
 					"file": "Libraries/QML_lib/Heuristics.py",
 					"semi_transient": false,
 					"settings":
@@ -952,11 +991,11 @@
 						"translation.y": 852.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 3,
 					"file": "Libraries/QML_lib/UserFunctions.py",
 					"semi_transient": false,
 					"settings":
@@ -968,8 +1007,8 @@
 						"selection":
 						[
 							[
-								4060,
-								4060
+								22255,
+								22255
 							]
 						],
 						"settings":
@@ -978,15 +1017,15 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 1894.0,
+						"translation.x": 24.0,
+						"translation.y": 14326.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 4,
 					"file": "Libraries/QML_lib/Distrib.py",
 					"semi_transient": false,
 					"settings":
@@ -1012,11 +1051,11 @@
 						"translation.y": 216.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"file": "ExperimentalSimulations/Exp.py",
 					"semi_transient": false,
 					"settings":
@@ -1042,11 +1081,11 @@
 						"translation.y": 20110.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 6,
 					"file": "Libraries/QML_lib/QML.py",
 					"semi_transient": false,
 					"settings":
@@ -1072,7 +1111,7 @@
 						"translation.y": 4558.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 9,
 					"type": "text"
 				}
 			]
@@ -1082,7 +1121,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 6,
+					"buffer": 7,
 					"file": "Libraries/QML_lib/CalculateTimeRequired.py",
 					"semi_transient": false,
 					"settings":
@@ -1108,24 +1147,24 @@
 						"translation.y": 9360.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 8,
 					"file": "Libraries/QML_lib/PlotQMD.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 122350,
+						"buffer_size": 122716,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								15475,
-								15475
+								19651,
+								19651
 							]
 						],
 						"settings":
@@ -1135,14 +1174,14 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 11364.0,
+						"translation.y": 13846.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 9,
 					"file": "Libraries/QML_lib/multiPGH.py",
 					"semi_transient": false,
 					"settings":
@@ -1168,28 +1207,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
+					"buffer": 10,
 					"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 50435,
+						"buffer_size": 50496,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								15482,
-								15482
-							],
-							[
-								16151,
-								16151
+								27808,
+								27808
 							]
 						],
 						"settings":
@@ -1199,27 +1234,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 11278.0,
+						"translation.y": 20638.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 10,
+					"buffer": 11,
 					"file": "Libraries/QML_lib/SetQHLParams.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 13438,
+						"buffer_size": 13384,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3302,
-								3302
+								2773,
+								2773
 							]
 						],
 						"settings":
@@ -1228,10 +1263,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2795.0,
+						"translation.y": 2808.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 4,
 					"type": "text"
 				}
 			]

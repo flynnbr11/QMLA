@@ -558,7 +558,10 @@ def n_qubit_hahn_evolution(
     if np.abs(1-nm) > 1e-10:
         print("[Hahn] norm ev state:", nm)
     
-    density_matrix = np.kron( ev_state, (ev_state.T).conj() )
+    density_matrix = np.kron( 
+        ev_state, 
+        (ev_state.T).conj() 
+    )
     dim_hilbert_space = 2**num_qubits
     density_matrix = np.reshape(
         density_matrix, 
@@ -578,6 +581,11 @@ def n_qubit_hahn_evolution(
     bra = noisy_plus.conj().T
     rho_state = np.dot(reduced_matrix, noisy_plus)
     expect_value = np.abs(np.dot(bra, rho_state))    
+    
+
+    # expect_value is projection onto |+>
+    # for this case Pr(0) refers to projection onto |->
+    # so return 1 - expect_value
     return 1-expect_value
 #    return expect_value
 
