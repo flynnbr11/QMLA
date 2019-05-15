@@ -249,12 +249,20 @@ if os.path.isfile(true_expectation_value_path) == False:
         ],
         log_file
     )
-    for t in plot_times:
-        if global_variables.use_experimental_data==True:
-            true_expec_values[t] = experimental_measurements_dict[t]
-        else:
+    if global_variables.use_experimental_data==True:
+        true_expec_values = experimental_measurements_dict
+    else:
+        log_print(
+            [
+                "Getting true expectation values (for plotting)"
+                "\nTimes computed(len {}): {}\n".format(
+                    len(plot_times), plot_times
+                ) 
+            ],
+            log_file
+        )
+        for t in plot_times:
             try:
-                # print("[EXP] GETTING TRUE EXPEC VALS FOR PLOTS")
                 true_expec_values[t] = (
                     # ExpectationValues.expectation_value_wrapper(
                     UserFunctions.expectation_value_wrapper(
