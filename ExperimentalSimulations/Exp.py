@@ -296,18 +296,22 @@ log_print(
 )
 
 if global_variables.custom_prior:
-    prior_specific_terms = pickle.load(
+    prior_data = pickle.load(
         open(
             global_variables.prior_pickle_file,
             'rb'
         )
     )
+    prior_specific_terms = prior_data['specific_terms']
 
 else:
     prior_specific_terms = {}
+
+
 log_print(
     [
-        "Prior specific terms:", prior_specific_terms
+        "Prior specific terms:", 
+        prior_specific_terms
     ], 
     log_file
 )
@@ -410,8 +414,8 @@ qmd = QMD(
     max_num_branches = 0,
     max_num_qubits = 10, 
     parallel = True,
-    use_exp_custom=True, 
-    compare_linalg_exp_tol=None,
+    use_exp_custom = True, 
+    compare_linalg_exp_tol = None,
     prior_specific_terms = prior_specific_terms,    
 )
 

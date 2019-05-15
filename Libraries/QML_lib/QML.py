@@ -360,9 +360,10 @@ class ModelLearningClass():
             log_file = self.log_file, 
             log_identifier = log_identifier
         )
+
         prior_dir = str(
             self.ResultsDirectory + 
-            'priors/'
+            'priors/QMD_{}/'.format(self.Q_id)
         )
 
         if not os.path.exists(prior_dir):
@@ -372,33 +373,35 @@ class ModelLearningClass():
                 # if already exists (ie created by another QMD since if test ran...)
                 pass
         prior_file = str(
-            prior_dir + 'prior_' + str(self.ModelID) + '.png'
+            prior_dir + 
+            'prior_' + 
+            str(self.ModelID) + 
+            '.png'
         )
 
-        # pickle.dump(
-        #     self.Prior, 
-        #     open(
-        #         prior_file,
-        #         'wb'
-        #     )
-        # )
+        latex_terms = [
+            UserFunctions.get_latex_name(
+                name = term, 
+                growth_generator = self.GrowthGenerator
+            )
+            for term in individual_terms_in_name
+        ]
 
-        samples = self.Prior.sample(100000)
-        dev = np.round(np.std(samples), 2)
-        mean = np.round(np.mean(samples), 2)
-        plt.axvline(mean, color='red')
-
-        to_label = str(
-            '$\mu=' + str(mean) + ';  \sigma=' + str(dev) + '$'
+        Distributions.plot_prior(
+            model_name = self.LatexTerm, 
+            model_name_individual_terms = latex_terms, 
+            prior = self.Prior, 
+            plot_file = prior_file, 
         )
-        plt.hist(samples, label=to_label)
-        plt.legend()
-        plt.title('Samples from prior for this QML')
-        plt.savefig(prior_file)
-        plt.clf()
-    
-#            self.Prior = Distributions.MultiVariateUniformDistribution(num_params) #the prior distribution is on the model we want to test i.e. the one implemented in the simulator
-	  
+
+        # # pickle.dump(
+        # #     self.Prior, 
+        # #     open(
+        # #         prior_file,
+        # #         'wb'
+        # #     )
+        # # )
+
         self.GenSimModel = gsi.GenSimQMD_IQLE(
             oplist=self.SimOpList, 
             modelparams=self.SimParams, 

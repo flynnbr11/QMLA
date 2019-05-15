@@ -17,7 +17,7 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=100
+prt=10
 exp=20
 pgh=1.0
 pgh_exponent=1.0
@@ -104,8 +104,8 @@ sim_growth_rule='two_qubit_ising_rotation_hyperfine'
 
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_spin_full_access'
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-exp_growth_rule='NV_centre_spin_large_bath'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='PT_Effective_Hamiltonian'
@@ -222,6 +222,8 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -sigma=$param_sigma \
     -rand_t=$rand_true_params \
     -rand_p=$rand_prior \
+    -dir=$full_path_to_results \
+    -log=$this_log
 
 
 for prt in  "${particle_counts[@]}";

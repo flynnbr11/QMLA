@@ -550,6 +550,7 @@ class QMD():
             'use_time_dep_true_params' : use_time_dep_true_model,
             'time_dep_true_params' : self.TimeDepParams,
             'num_time_dependent_true_params' : self.NumTimeDepTrueParams, 
+            'prior_pickle_file' : self.GlobalVariables.prior_pickle_file, 
             'prior_specific_terms' : prior_specific_terms,
             'model_priors' : model_priors,
             'base_resources' : self.BaseResources,

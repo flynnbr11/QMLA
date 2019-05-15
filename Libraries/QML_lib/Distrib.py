@@ -2,6 +2,8 @@ import qinfer
 import random
 import numpy as np
 import DataBase
+import matplotlib.pyplot as plt
+
 
 from scipy.stats import norm
 from scipy.optimize import curve_fit
@@ -16,7 +18,11 @@ def time_seconds():
     time = str(str(hour)+':'+str(minute)+':'+str(second))
     return time
 
-def log_print(to_print_list, log_file, log_identifier=None):
+def log_print(
+    to_print_list, 
+    log_file, 
+    log_identifier=None
+):
     if log_identifier is None:
         log_identifier='[Distrib]'
     if type(to_print_list)!=list:
@@ -58,7 +64,6 @@ def get_prior(
     num_terms = len(individual_terms)
     available_specific_terms = list(specific_terms.keys())
     if gaussian==False:
-        
         min_max = np.empty([num_terms, 2])
         for i in range(num_terms):
             if individual_terms[i] in available_specific_terms:
@@ -112,7 +117,10 @@ def get_prior(
         sigmas = np.array(sigmas)
         cov_mtx = np.diag(sigmas**2)
         
-        dist = qinfer.MultivariateNormalDistribution(means, cov_mtx)
+        dist = qinfer.MultivariateNormalDistribution(
+            means, 
+            cov_mtx
+        )
         samples = dist.sample(10)
         log_print(
             [
@@ -127,6 +135,75 @@ def get_prior(
             log_identifier = log_identifier
         )
         return dist
+
+def plot_prior(
+    model_name, 
+    model_name_individual_terms,
+    prior,
+    plot_file,
+    true_params=None, 
+):
+    from itertools import cycle
+    from matplotlib import cm
+    lines = ["-","--","-.",":"]
+    linecycler = cycle(lines)
+
+    samples = prior.sample(int(1e5))
+    num_params = np.shape(samples)[1]
+
+    cm_subsection = np.linspace(0,0.8,num_params)
+    #        colours = [ cm.magma(x) for x in cm_subsection ]
+    colours = [ cm.viridis(x) for x in cm_subsection ]
+
+    for i in range(num_params):
+        this_param_samples = samples[:, i]
+        this_param_mean = np.mean(this_param_samples)
+        this_param_dev = np.std(this_param_samples)
+        this_param_colour = colours[i%len(colours)]
+        latex_term = model_name_individual_terms[i]
+        param_label = str(
+            latex_term + 
+            '  ({} $\pm$ {})'.format(
+                np.round(this_param_mean, 2), 
+                np.round(this_param_dev, 2)
+            ) 
+        )
+        spacing = np.linspace(min(this_param_samples), max(this_param_samples))
+        distribution = norm.pdf(spacing, this_param_mean, this_param_dev)
+        ls = next(linecycler)
+        # plt.plot(
+        #     spacing, 
+        #     distribution, 
+        #     label=param_label,
+        #     linestyle=ls
+        # )
+        plt.hist(
+            this_param_samples, 
+            histtype='step', 
+            fill=False,
+            label=param_label
+        )
+
+
+        if true_params is not None:
+            try:
+                true_param = true_params[latex_term]
+                plt.axvline(
+                    true_param, 
+                    color=this_param_colour,
+                    alpha=1, 
+                    # linestyle = ls
+                )
+            except:
+                pass # i.e. this parameter not in true params
+
+
+    plt.legend()
+    plt.title('Prior for {}'.format(model_name))
+    plt.savefig(plot_file)
+    plt.clf()
+
+
 
 
 def Gaussian(x, mean = 0., sigma = 1.):
