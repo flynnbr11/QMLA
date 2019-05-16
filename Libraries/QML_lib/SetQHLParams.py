@@ -623,7 +623,7 @@ param_sigma = arguments.param_sigma
 probe_noise_level = arguments.probe_noise_level
 log_file = arguments.log_file
 results_directory = arguments.results_directory
-true_prior_plot_file = str(results_directory  + 'prior_true_params.png')
+true_prior_plot_file = str(results_directory  + '/prior_true_params.png')
 ### Call functions to create pickle files. 
 ## TODO check if these are already present?
 
