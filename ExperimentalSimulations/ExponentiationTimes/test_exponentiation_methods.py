@@ -213,9 +213,9 @@ avg_diff = {
 }
 
 for qubit_num in range(min_num_qubits, max_num_qubits):
-    q_avg = np.min(times_by_method_and_q_num['qutip'][qubit_num])
-    c_avg = np.min(times_by_method_and_q_num['custom'][qubit_num])
-    l_avg = np.min(times_by_method_and_q_num['linalg'][qubit_num])
+    q_avg = np.median(times_by_method_and_q_num['qutip'][qubit_num])
+    c_avg = np.median(times_by_method_and_q_num['custom'][qubit_num])
+    l_avg = np.median(times_by_method_and_q_num['linalg'][qubit_num])
 
     avg_times['qutip'][qubit_num] = q_avg
     avg_times['custom'][qubit_num] = c_avg
