@@ -258,7 +258,7 @@ plt.title(
 plt.savefig(
 	str(
 		plot_dir + 
-		'ExponentiationTimeComparison' + 
+		'/Exponentiation_Time_Comparison' + 
 		plot_descriptor + '.png'
 	)
 )
@@ -290,7 +290,7 @@ plt.title(
 plt.savefig(
 	str(
 		plot_dir + 
-		'ExponentiationDifference' + 
+		'Exponentiation_Difference' + 
 		plot_descriptor + '.png'
 	)
 )
