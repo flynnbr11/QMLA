@@ -118,6 +118,8 @@ max_num_qubits = arguments.max_num_qubits
 plot_dir = str(
 	arguments.plot_directory
 )
+if not plot_dir.endswith('/'):
+    plot_dir += '/'
 
 if (
 	not os.path.exists(plot_dir)
@@ -261,13 +263,14 @@ plt.title(
 	)
 
 )
-plt.savefig(
-	str(
-		plot_dir + 
-		'/Exponentiation_Time_Comparison' + 
-		plot_descriptor + '.png'
-	)
+
+time_plot_path=str(
+	plot_dir + 
+	'/Exponentiation_Time_Comparison' + 
+	plot_descriptor + '.png'
 )
+print("Saving time plot to:", time_plot_path)
+plt.savefig(time_plot_path)
 
 # Plot Differences
 plt.clf()
@@ -293,10 +296,10 @@ plt.title(
 
 )
 
-plt.savefig(
-	str(
-		plot_dir + 
-		'Exponentiation_Difference' + 
-		plot_descriptor + '.png'
-	)
+diff_plot_path = str(
+	plot_dir + 
+	'Exponentiation_Difference' + 
+	plot_descriptor + '.png'
 )
+print("Saving diff_plot_path:", diff_plot_path)
+plt.savefig(diff_plot_path)
