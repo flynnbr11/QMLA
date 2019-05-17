@@ -12,6 +12,38 @@ import time
 import scipy
 import random 
 
+import argparse
+
+### Parse arguments from bash
+parser = argparse.ArgumentParser(
+	description='Pass files to pickel QHL parameters.'
+)
+
+parser.add_argument(
+  '-min_q', '--min_num_qubits', 
+  help="Lowest number of qubits to time.",
+  type=int,
+  default=1
+)
+
+parser.add_argument(
+  '-max_q', '--max_num_qubits', 
+  help="Highest number of qubits to time.",
+  type=int,
+  default=5
+)
+
+parser.add_argument(
+  '-tests', '--num_tests', 
+  help="Number of iterations to average times over.",
+  type=int,
+  default=10
+)
+
+
+
+
+
 def generate_term(
     num_dimensions, 
 ):
@@ -70,14 +102,14 @@ def random_model_name(num_dimensions=1, num_terms=1):
     
     return summed_term
 
-
+arguments = parser.parse_args()
+num_tests = arguments.num_tests
+min_num_qubits = arguments.min_num_qubits
+max_num_qubits = arguments.max_num_qubits
 
 qubit_num = 1
 qutip_time=0
 custom_time = 0
-num_tests = 10
-min_num_qubits = 1
-max_num_qubits = 5
 max_num_qubits = max_num_qubits + 1 # index runs to N-1
 times_by_method_and_q_num = {
     'qutip' : {},
@@ -177,7 +209,10 @@ qubit_numbers = range(min_num_qubits, max_num_qubits)
 ratio = [avg_times['qutip'][q]/avg_times['custom'][q] for q in range(min_num_qubits, max_num_qubits)]
 
 
-plot_descriptor = "_{}_qubits__{}_tests".format(max_num_qubits, num_tests)
+plot_descriptor = "_{}_qubits__{}_tests".format(
+	arguments.max_num_qubits, 
+	num_tests
+)
 plot_dir = 'ExponentiationTimes/'
 if not os.path.exists(plot_dir):
     os.makedirs(plot_dir)            
