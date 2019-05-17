@@ -252,6 +252,15 @@ class QMD():
             #     self.TrueOpDim
             # )  # TODO generalise probe
 
+            self.log_print(
+                [
+                "Getting expectation values for simulated model", 
+                "(len {})".format(len(self.PlotTimes)),
+                "\n Times computed:\n", self.PlotTimes
+                ]
+            )
+
+
 
             for t in self.PlotTimes:
                 # TODO is this the right expectation value func???
@@ -264,6 +273,11 @@ class QMD():
                         state = self.PlotProbes[self.TrueOpDim]  
                     )
                 )
+            self.log_print(
+                [
+                "Expectation values computed", 
+                ]
+            )
 
         self.UseExpCustom = use_exp_custom
         self.EnableSparse = enable_sparse
