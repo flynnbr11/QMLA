@@ -8,6 +8,7 @@ import DataBase
 # from ModelGeneration import random_model_name
 
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import time
 import scipy
 import random 
