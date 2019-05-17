@@ -116,7 +116,6 @@ min_num_qubits = arguments.min_num_qubits
 max_num_qubits = arguments.max_num_qubits
 
 plot_dir = str(
-	os.getcwd() + '/' +  
 	arguments.plot_directory
 )
 
