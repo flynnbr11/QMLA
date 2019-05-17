@@ -470,6 +470,8 @@ def hahn_evolution_project_first_qubit(
 
     density_matrix = np.kron( ev_state, (ev_state.T).conj() )
     density_matrix = np.reshape(density_matrix, [4,4])
+    # TODO this will only work for 2 qubit systems; 
+    # needs to be extended to N qubits
     reduced_matrix = partial_trace_out_second_qubit(
         density_matrix,
         qubits_to_trace = [1]
@@ -480,7 +482,10 @@ def hahn_evolution_project_first_qubit(
         state.conj()
     )
 
-    density_mtx_initial_state = np.reshape(density_mtx_initial_state, [4,4])
+    density_mtx_initial_state = np.reshape(
+        density_mtx_initial_state, 
+        [4,4]
+    )
     reduced_density_mtx_initial_state = partial_trace_out_second_qubit(
         density_mtx_initial_state, 
         qubits_to_trace = [1]
@@ -495,10 +500,11 @@ def hahn_evolution_project_first_qubit(
     projection_onto_initial_den_mtx = np.dot(
         reduced_density_mtx_initial_state,
         reduced_matrix
-
     )
     
-    expec_val = np.trace(projection_onto_initial_den_mtx)
+    expec_val = np.trace(
+        projection_onto_initial_den_mtx
+    )
     # return ( 1 - expec_val )
     # in experimental case which corresponds to 
     # P(0), ie projecting onto |->. 

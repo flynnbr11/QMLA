@@ -114,13 +114,20 @@ arguments = parser.parse_args()
 num_tests = arguments.num_tests
 min_num_qubits = arguments.min_num_qubits
 max_num_qubits = arguments.max_num_qubits
-plot_dir = arguments.plot_directory
+
+plot_dir = str(
+	os.getcwd() + 
+	arguments.plot_directory
+)
+
 if (
 	not os.path.exists(plot_dir)
 	and 
 	plot_dir != ''
 ):
     os.makedirs(plot_dir)            
+
+print("Plot directory:", plot_dir)
 
 qubit_num = 1
 qutip_time=0
