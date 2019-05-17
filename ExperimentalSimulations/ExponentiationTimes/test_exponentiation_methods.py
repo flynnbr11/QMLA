@@ -2,7 +2,7 @@ import numpy as np
 import qutip
 import hamiltonian_exponentiation as h
 import sys, os
-sys.path.append(os.path.join("..","Libraries","QML_lib"))
+sys.path.append(os.path.join("..","..","Libraries","QML_lib"))
 import DataBase
 # import ModelGeneration
 # from ModelGeneration import random_model_name
