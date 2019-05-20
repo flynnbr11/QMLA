@@ -311,3 +311,7 @@ avg_times_file = str(
     'Average_Times' + 
     plot_descriptor + '.p'
 )
+pickle.dump(
+    avg_times, 
+    open(avg_times_file, 'wb')
+)
