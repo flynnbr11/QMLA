@@ -432,6 +432,13 @@ def average_parameter_estimates(
             except:
                 pass
 
+            ax.axhline(
+                0, 
+                linestyle='--', 
+                alpha=0.5, 
+                color='black', 
+                label='0'
+            )
             ptq.fill_between_sigmas(
                 ax, 
                 parameters[term], 
@@ -496,7 +503,7 @@ def Bayes_t_test(
     growth_generator = None, 
     plot_probe_file = None,
     top_number_models=2,
-    save_true_expec_vals_alone_plot=False,
+    save_true_expec_vals_alone_plot=True,
     save_to_file=None
 ):
     plt.switch_backend('agg')

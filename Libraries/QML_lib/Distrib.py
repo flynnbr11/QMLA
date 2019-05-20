@@ -151,6 +151,104 @@ def plot_prior(
     samples = prior.sample(int(1e5))
     num_params = np.shape(samples)[1]
 
+    ncols = int(np.ceil(np.sqrt(num_params)))
+    nrows = int(np.ceil(num_params/ncols))
+
+    fig, axes = plt.subplots(
+        figsize = (10, 7), 
+        nrows=nrows, 
+        ncols=ncols,
+        squeeze=False,
+    )
+    row = 0
+    col = 0
+    axes_so_far = 0
+
+    cm_subsection = np.linspace(0,0.8,num_params)
+    #        colours = [ cm.magma(x) for x in cm_subsection ]
+    colours = [ cm.viridis(x) for x in cm_subsection ]
+
+    for i in range(num_params):
+        ax = axes[row, col]
+        axes_so_far += 1
+        col += 1
+        if col == ncols:
+            col=0
+            row+=1
+
+        this_param_samples = samples[:, i]
+        this_param_mean = np.mean(this_param_samples)
+        this_param_dev = np.std(this_param_samples)
+        this_param_colour = colours[i%len(colours)]
+        latex_term = model_name_individual_terms[i]
+        param_label = str(
+            latex_term + 
+            '\n({} $\pm$ {})'.format(
+                np.round(this_param_mean, 2), 
+                np.round(this_param_dev, 2)
+            ) 
+        )
+        spacing = np.linspace(min(this_param_samples), max(this_param_samples))
+        distribution = norm.pdf(spacing, this_param_mean, this_param_dev)
+        ls = next(linecycler)
+        # plt.plot(
+        #     spacing, 
+        #     distribution, 
+        #     label=param_label,
+        #     linestyle=ls
+        # )
+        ax.hist(
+            this_param_samples, 
+            histtype='step', 
+            fill=False,
+            density=True, 
+            # label=param_label,
+            color=this_param_colour
+        )
+
+
+        if true_params is not None:
+            try:
+                true_param = true_params[latex_term]
+                ax.axvline(
+                    true_param, 
+                    color=this_param_colour,
+                    alpha=1, 
+                    label='True'
+                    # linestyle = ls
+                )
+            except:
+                pass # i.e. this parameter not in true params
+        ax.set_title(param_label)
+        ax.legend()
+
+    # plt.legend()
+    fig.suptitle('Initial prior for {}'.format(model_name))
+    fig.subplots_adjust(
+        # top = 0.99, 
+        # bottom=0.01, 
+        hspace=0.3, 
+        wspace=0.4
+    )
+    fig.savefig(plot_file)
+    plt.clf()
+
+
+def old_plot_prior(
+    model_name, 
+    model_name_individual_terms,
+    prior,
+    plot_file,
+    true_params=None, 
+):
+    from itertools import cycle
+    from matplotlib import cm
+    lines = ["-","--","-.",":"]
+    linecycler = cycle(lines)
+
+    samples = prior.sample(int(1e5))
+    num_params = np.shape(samples)[1]
+
     cm_subsection = np.linspace(0,0.8,num_params)
     #        colours = [ cm.magma(x) for x in cm_subsection ]
     colours = [ cm.viridis(x) for x in cm_subsection ]
@@ -202,6 +300,7 @@ def plot_prior(
     plt.title('Prior for {}'.format(model_name))
     plt.savefig(plot_file)
     plt.clf()
+
 
 
 

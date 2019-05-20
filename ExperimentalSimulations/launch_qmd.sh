@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=10
-exp=20
+prt=1000
+exp=250
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -36,7 +36,7 @@ number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
 bf_all_times=0
-data_max_time=10 # nanoseconds
+data_max_time=100 # nanoseconds
 # data_time_offset=205 # nanoseconds
 
 ### ---------------------------------------------------###
@@ -80,8 +80,8 @@ cp $qhl_settings_lib_file $qhl_settings
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='test_changes_to_qmd'
-sim_growth_rule='two_qubit_ising_rotation_hyperfine'
-# sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# sim_growth_rule='two_qubit_ising_rotation_hyperfine'
+sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # sim_growth_rule='non_interacting_ising'
 # sim_growth_rule='non_interacting_ising_single_axis'
 # sim_growth_rule='deterministic_noninteracting_ising_single_axis'
@@ -104,8 +104,8 @@ sim_growth_rule='two_qubit_ising_rotation_hyperfine'
 
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_spin_full_access'
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-exp_growth_rule='NV_centre_spin_large_bath'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='PT_Effective_Hamiltonian'

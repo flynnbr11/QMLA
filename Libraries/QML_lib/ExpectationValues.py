@@ -107,7 +107,9 @@ def expectation_value(
                     exp_fnc_cutoff=exp_fnc_cutoff
                 )
             except ValueError:
-                log_print(["Value error when exponentiating Hamiltonian. Ham:\n",
+                log_print(
+                    [
+                    "Value error when exponentiating Hamiltonian. Ham:\n",
                     ham, "\nProbe: ", state], log_file=log_file,
                     log_identifier=log_identifier
                 )

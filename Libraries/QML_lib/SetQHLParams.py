@@ -149,14 +149,23 @@ set_true_params = {
 	# 'zTz': 0.048673637,
 
 
+	# TESTING -- trying to find set which decohere realistically
+	'xTi': 0.005906251, 
+	'xTx': 0.018309156, 
+	'yTi': 0.619606907, 
+	'yTy': 0.02610886, 
+	'zTi': 0.025689271, 
+	'zTz': 0.048673637,
+
+
 	# From BC/Feb_12/18_30/results_007
 	# REALISTIC, DECOHERING CASE FOR EXPERIMENTAL MODEL WHEN TRACED OUT
-	'xTi': 0.05906251, 
-	'xTx': 0.18309156, 
-	'yTi': 6.19606907, 
-	'yTy': 0.2610886, 
-	'zTi': 0.25689271, 
-	'zTz': 0.48673637,
+	# 'xTi': 0.05906251, 
+	# 'xTx': 0.18309156, 
+	# 'yTi': 6.19606907, 
+	# 'yTy': 0.2610886, 
+	# 'zTi': 0.25689271, 
+	# 'zTz': 0.48673637,
 
 
 
@@ -281,12 +290,23 @@ def create_qhl_params(
 	true_prior.__setattr__('cov', new_cov_mtx)
 	sampled_list = true_prior.sample()
 
+	print("[setQHL] set_true_params:", set_true_params)
+
 	for i in range(num_terms):
-		true_param = sampled_list[0][i]
+		if random_vals == True:
+			print("[setQHL] using random vals")
+			true_param = sampled_list[0][i]
+		else:
+			try:
+				term = terms[i]
+				true_param = set_true_params[term]
+			except:
+				true_param = sampled_list[0][i]		
 		true_params.append(true_param)
 		true_params_dict[terms[i]] = true_param
 		true_params_dict_latex_names[latex_terms[i]] = true_param
 
+	true_prior.__setattr__('cov', old_cov_mtx)
 	Distrib.plot_prior(
 		model_name = true_op_latex, 
 		model_name_individual_terms = latex_terms,
@@ -294,7 +314,6 @@ def create_qhl_params(
 		plot_file = true_prior_plot_file,
 		true_params = true_params_dict_latex_names
 	)
-
 
 	# for term in terms:
 	# 	if random_vals == False:
