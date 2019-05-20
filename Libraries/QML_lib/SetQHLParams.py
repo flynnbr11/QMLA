@@ -646,7 +646,11 @@ param_sigma = arguments.param_sigma
 probe_noise_level = arguments.probe_noise_level
 log_file = arguments.log_file
 results_directory = arguments.results_directory
-print("Results directory passed to SetQHL:", results_directory)
+print(
+	"Results directory passed to SetQHL:", 
+	results_directory,
+	"\nLog file:", log_file
+)
 true_prior_plot_file = str(
 	results_directory  +
 	'/prior_true_params.png'
