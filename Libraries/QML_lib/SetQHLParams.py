@@ -307,6 +307,10 @@ def create_qhl_params(
 		true_params_dict_latex_names[latex_terms[i]] = true_param
 
 	true_prior.__setattr__('cov', old_cov_mtx)
+	print(
+		"Plotting prior to", 
+		true_prior_plot_file
+	)
 	Distrib.plot_prior(
 		model_name = true_op_latex, 
 		model_name_individual_terms = latex_terms,
