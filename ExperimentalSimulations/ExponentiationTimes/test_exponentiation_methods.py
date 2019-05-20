@@ -304,3 +304,10 @@ diff_plot_path = str(
 )
 print("Saving diff_plot_path:", diff_plot_path)
 plt.savefig(diff_plot_path)
+
+import pickle
+avg_times_file = str(
+    plot_dir + 
+    'Average_Times' + 
+    plot_descriptor + '.p'
+)
