@@ -454,6 +454,7 @@ class ModelLearningClass():
         self.Heuristic = UserFunctions.get_heuristic(
             growth_generator = self.GrowthGenerator,
             updater = self.Updater, 
+            oplist = self.SimOpList, 
             inv_field = self.Inv_Field, 
             increase_time = self.IncreasePGHTime, 
             pgh_exponent = self.PGHExponent, 
@@ -469,7 +470,7 @@ class ModelLearningClass():
         self.Particles = np.array([])
         self.Weights = np.array([])
         self.ResampleEpochs = []
-        self.Experiment = self.Heuristic()   
+        # self.Experiment = self.Heuristic()   
         self.ExperimentsHistory = np.array([])
         self.FinalParams = np.empty([len(self.SimOpList),2]) #average and standard deviation at the final step of the parameters inferred distributions
         print_loc(print_location=init_model_print_loc)
@@ -497,7 +498,7 @@ class ModelLearningClass():
         self.DistributionMeans = np.empty([self.NumExperiments])
         self.DistributionStdDevs = np.empty([self.NumExperiments])
         
-        self.Experiment = self.Heuristic()    
+        # self.Experiment = self.Heuristic()    
         self.SigmaThresh = sigma_threshold   #This is the value of the Norm of the COvariance matrix which stops the IQLE 
         self.LogTotLikelihood=[] #log_total_likelihood
 
@@ -529,6 +530,7 @@ class ModelLearningClass():
             5
         )
         # print("[QML] STARTING QHL UPDATES")
+        true_params = np.array([[self.TrueParams[0]]])
         for istep in range(self.NumExperiments):
             if (istep%print_frequency == 0):
                 # print so we can see how far along algorithm is. 
@@ -539,13 +541,18 @@ class ModelLearningClass():
                 )
 
             # print("[QML] Calling heuristic")
+            if istep==0: 
+                param_estimates = self.Updater.est_mean()
+            else:
+                param_estimates = self.TrackEval[-1]
             self.Experiment =  self.Heuristic(
                 test_param = "from QML",
                 num_params = len(self.SimOpsNames), 
                 epoch_id = istep, 
+                current_params = param_estimates
             )
             print_loc(global_print_loc)
-            self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
+            self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor # TODO prefactor, if used, should be inside specific heuristic
             if self.UseExperimentalData:
                 t = self.Experiment[0][0]
                 nearest = expdt.nearestAvailableExpTime(
@@ -563,7 +570,6 @@ class ModelLearningClass():
                 )
             
             self.TrackTime[istep] = self.Experiment[0][0]
-            true_params = np.array([[self.TrueParams[0]]])
             
             before_datum = time.time()
 
@@ -572,7 +578,6 @@ class ModelLearningClass():
 #                'Getting Datum'
 #                ]
 #            )
-
 
             self.Datum = self.GenSimModel.simulate_experiment(
                 self.SimParams,
@@ -586,7 +591,11 @@ class ModelLearningClass():
             before_upd = time.time()
             ## Call updater to update distribution based on datum
             try:
-                self.Updater.update(self.Datum, self.Experiment)
+                # print("[QML] calling updater")
+                self.Updater.update(
+                    self.Datum, 
+                    self.Experiment
+                )
             except RuntimeError:
                 import sys
                 self.log_print(
@@ -617,7 +626,8 @@ class ModelLearningClass():
             else:
                 print_loc(global_print_loc)
                 self.covmat = self.Updater.est_covariance_mtx()
-                self.VolumeList = np.append(self.VolumeList,  
+                self.VolumeList = np.append(
+                    self.VolumeList,  
                     np.linalg.det( sp.linalg.sqrtm(self.covmat) )
                 )
                 print_loc(global_print_loc)

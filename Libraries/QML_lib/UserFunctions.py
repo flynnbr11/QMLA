@@ -93,13 +93,7 @@ default_true_operators_by_generator = {
     # 'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 
     'two_qubit_ising_rotation_hyperfine' : 'zTi', 
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
-    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'yTi', # 1 param
-    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'yTiPPzTi', # 2 param
-    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPyTiPPzTi', #3 params
-    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPzTi', # 4 params # TODO reinstate -- testing whether alphetisation of true model affects December/new code
-    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTi', # 5 params # TODO reinstate -- testing whether alphetisation of true model affects December/new code
     'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', # 6 params - full model # TODO reinstate -- testing whether alphetisation of true model affects December/new code
-    # 'two_qubit_ising_rotation_hyperfine_transverse' : 'xTiP',
     'test_multidimensional' : 'xTiPPiTy', 
     'test_return_champs' : 'xTiPPiTy', 
     'non_interacting_ising' : 'xTxTTx',
@@ -627,6 +621,9 @@ heuristic_classes = {
 
    # 'two_qubit_ising_rotation_hyperfine_transverse' : 
    #     Heuristics.one_over_sigma_then_linspace,
+
+   'two_qubit_ising_rotation_hyperfine_transverse' : 
+       Heuristics.inverse_min_eigvalue,
 
    'NV_spin_full_access' : 
        # Heuristics.time_from_list,

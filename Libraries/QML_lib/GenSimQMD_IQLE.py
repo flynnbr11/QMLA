@@ -306,7 +306,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             time = expparams['t']
             # print(
             #     "[likelihood fnc] Experimental data being called.",
-            #     "\nProbe", probe
+            #     # "\nProbe", probe
             # )
             if debug_log_print:
                 log_print(
@@ -340,8 +340,12 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                 )
             pr0 = np.array([[experimental_expec_value]])
 
-        else:        
-            
+        else:  
+            # print(
+            #     "[likelihood fnc] Simulator being called.",
+            #     # "\nProbe", probe
+            # )
+
             if self.inBayesUpdates:
                 if self.ideal_probe is not None:
                     probe = self.ideal_probe # this won't work
