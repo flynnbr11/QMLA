@@ -2,6 +2,8 @@ import sys, os
 import pickle
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
+from matplotlib.lines import Line2D
+
 import argparse
 import numpy as np
 
@@ -1241,13 +1243,13 @@ def plot_scores(
     fig, ax = plt.subplots()    
     width = 0.75 # the width of the bars 
     ind = np.arange(len(scores))  # the x locations for the groups
-    colours = ['red' for i in ind]
+    colours = ['blue' for i in ind]
 
     for mod in batch_correct_models: 
         print("[AnalyseMultiple] batch mod:", mod)
 
         mod_idx = latex_model_names.index(mod)
-        colours[mod_idx] = 'yellow'
+        colours[mod_idx] = 'orange'
 
     try:
         true_idx = latex_model_names.index(
@@ -1270,6 +1272,14 @@ def plot_scores(
     ax.barh(ind, scores, width, color=colours)
     ax.set_yticks(ind+width/2)
     ax.set_yticklabels(latex_model_names, minor=False)
+    custom_lines = [
+        Line2D([0], [0], color='green', lw=4),
+        Line2D([0], [0], color='orange', lw=4),
+        Line2D([0], [0], color='blue', lw=4),
+    ]
+    custom_handles = [
+        'True', 'Close', 'Other'
+    ]
     
     plot_title = str(
         'Number of QMD instances won by models.' 
@@ -1285,7 +1295,7 @@ def plot_scores(
             '\t $\mathcal{IG}$=' 
             + str(round(inf_gain, 2))
         )
-
+    plt.legend(custom_lines, custom_handles)
     plt.title(plot_title)
     plt.ylabel('Model')
     plt.xlabel('Number of wins')
