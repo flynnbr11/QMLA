@@ -1238,24 +1238,36 @@ def plot_scores(
                     ) 
                 )
 
+    mod_scores = scores
     scores = list(scores.values())
-
+    num_runs = sum(scores)
     fig, ax = plt.subplots()    
     width = 0.75 # the width of the bars 
     ind = np.arange(len(scores))  # the x locations for the groups
     colours = ['blue' for i in ind]
-
+    batch_success_rate = correct_success_rate = 0
     for mod in batch_correct_models: 
         print("[AnalyseMultiple] batch mod:", mod)
 
         mod_idx = latex_model_names.index(mod)
         colours[mod_idx] = 'orange'
+        batch_success_rate += mod_scores[mod]
+    if true_operator in models:
+        batch_success_rate += mod_scores[true_operator]
+        correct_success_rate = mod_scores[true_operator]
+
+    batch_success_rate /= num_runs
+    correct_success_rate /= num_runs
+    batch_success_rate *= 100
+    correct_success_rate *= 100 #percent
+
 
     try:
         true_idx = latex_model_names.index(
             latex_true_op
         )
         colours[true_idx] = 'green'
+
     except:
         # print(
         #     "[plot_scores]",
@@ -1278,7 +1290,9 @@ def plot_scores(
         Line2D([0], [0], color='blue', lw=4),
     ]
     custom_handles = [
-        'True', 'Close', 'Other'
+        'True ({}%)'.format(correct_success_rate), 
+        'True/Close ({}%)'.format(batch_success_rate), 
+        'Other'
     ]
     
     plot_title = str(
