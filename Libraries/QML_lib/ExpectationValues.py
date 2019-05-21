@@ -406,6 +406,7 @@ def hahn_evolution_project_first_qubit(
     # make sure the method of tracing out subsystem is safe. 
     import qutip 
     import numpy as np
+    from scipy import linalg
     # print("[Expec Vals] Hahn project on first qubit")
     #    print("Hahn evo")
     #hahn_angle = np.pi/2
