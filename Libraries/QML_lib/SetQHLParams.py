@@ -149,13 +149,22 @@ set_true_params = {
 	# 'zTz': 0.048673637,
 
 
+	# SIMULATION params
+	'xTi': 0.6, 
+	'xTx': 0.234, 
+	'yTi': 0.903356, 
+	'yTy': 0.164, 
+	'zTi': 0.152, 
+	'zTz': 0.986,
+
+
 	# TESTING -- trying to find set which decohere realistically
-	'xTi': 0.005906251, 
-	'xTx': 0.018309156, 
-	'yTi': 0.619606907, 
-	'yTy': 0.02610886, 
-	'zTi': 0.025689271, 
-	'zTz': 0.048673637,
+	# 'xTi': 0.005906251, 
+	# 'xTx': 0.018309156, 
+	# 'yTi': 0.619606907, 
+	# 'yTy': 0.02610886, 
+	# 'zTi': 0.025689271, 
+	# 'zTz': 0.048673637,
 
 
 	# From BC/Feb_12/18_30/results_007

@@ -503,7 +503,7 @@ def Bayes_t_test(
     growth_generator = None, 
     plot_probe_file = None,
     top_number_models=2,
-    save_true_expec_vals_alone_plot=False,
+    save_true_expec_vals_alone_plot=True,
     save_to_file=None
 ):
     plt.switch_backend('agg')
@@ -1197,6 +1197,10 @@ def plot_scores(
     ):
     plt.clf()
     models = list(scores.keys())
+    print("[AnalyseMult] models:", models)
+
+    # for mod in models:
+        
     
     latex_true_op = UserFunctions.get_latex_name(
             name=true_operator, 
@@ -1218,7 +1222,9 @@ def plot_scores(
     ind = np.arange(len(scores))  # the x locations for the groups
     colours = ['blue' for i in ind]
     try:
-        true_idx = latex_model_names.index(latex_true_op)
+        true_idx = latex_model_names.index(
+            latex_true_op
+        )
         colours[true_idx] = 'green'
     except:
         # print(
