@@ -1193,14 +1193,12 @@ def plot_scores(
         inf_gain=None, 
         true_operator = None, 
         growth_generator = None,
+        batch_nearest_num_params_as_winners = True,
         save_file='model_scores.png'
     ):
     plt.clf()
     models = list(scores.keys())
-    print("[AnalyseMult] models:", models)
 
-    # for mod in models:
-        
     
     latex_true_op = UserFunctions.get_latex_name(
             name=true_operator, 
@@ -1215,12 +1213,38 @@ def plot_scores(
         ) for model in models
     ]
 
+    batch_correct_models = []
+    if batch_nearest_num_params_as_winners == True:
+        num_true_params = len(
+            DataBase.get_constituent_names_from_name(
+                true_operator
+            )
+        )
+        for mod in models:
+            num_params = len(
+                DataBase.get_constituent_names_from_name(mod)
+            )
+
+            if num_true_params - num_params == 1:
+                # must be exactly one parameter smaller
+                batch_correct_models.append(
+                    UserFunctions.get_latex_name(
+                        name=mod, 
+                        growth_generator=growth_rules[model]
+                    ) for model in models
+                )
+
     scores = list(scores.values())
 
     fig, ax = plt.subplots()    
     width = 0.75 # the width of the bars 
     ind = np.arange(len(scores))  # the x locations for the groups
-    colours = ['blue' for i in ind]
+    colours = ['red' for i in ind]
+
+    for mod in batch_correct_models: 
+        mod_idx = latex_model_names.index(mod)
+        colours[mod_idx] = 'yellow'
+
     try:
         true_idx = latex_model_names.index(
             latex_true_op
