@@ -1225,13 +1225,15 @@ def plot_scores(
                 DataBase.get_constituent_names_from_name(mod)
             )
 
-            if num_true_params - num_params == 1:
+            if (
+                num_true_params - num_params == 1
+            ):
                 # must be exactly one parameter smaller
                 batch_correct_models.append(
                     UserFunctions.get_latex_name(
                         name=mod, 
-                        growth_generator=growth_rules[model]
-                    ) for model in models
+                        growth_generator=growth_rules[mod]
+                    ) 
                 )
 
     scores = list(scores.values())
@@ -1242,6 +1244,8 @@ def plot_scores(
     colours = ['red' for i in ind]
 
     for mod in batch_correct_models: 
+        print("[AnalyseMultiple] batch mod:", mod)
+
         mod_idx = latex_model_names.index(mod)
         colours[mod_idx] = 'yellow'
 
