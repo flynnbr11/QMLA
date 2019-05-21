@@ -503,7 +503,7 @@ def Bayes_t_test(
     growth_generator = None, 
     plot_probe_file = None,
     top_number_models=2,
-    save_true_expec_vals_alone_plot=True,
+    save_true_expec_vals_alone_plot=False,
     save_to_file=None
 ):
     plt.switch_backend('agg')

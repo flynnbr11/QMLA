@@ -216,17 +216,14 @@ def evolved_state(
             )
         try:
             import qutip
-            # unitary = linalg.expm(-1j*ham*t)
-        
-
+            unitary = linalg.expm(-1j*ham*t)
             # unitary = h.exp_ham(
             #     ham, t, 
             #     precision = precision, 
             #     enable_sparse_functionality=enable_sparse,
             #     print_method=print_exp_details, scalar_cutoff=t+1
             # )
-
-            unitary = qutip.Qobj(-1j*ham*t).expm().full()
+            # unitary = qutip.Qobj(-1j*ham*t).expm().full()
         except:
             unitary = h.exp_ham(
                 ham, t, 
@@ -302,7 +299,7 @@ def hahn_evolution(
     #     repr(ham),
     #     "\nstate:", repr(state)
     # )
-    import qutip 
+    # import qutip 
     import numpy as np
 #    print("Hahn evo")
     #hahn_angle = np.pi/2
@@ -349,8 +346,12 @@ def hahn_evolution(
         #     precision=precision
         # )
 
-        first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
-        second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
+        first_unitary_time_evolution = linalg.expm(-1j*ham*t)
+        second_unitary_time_evolution = np.linalg.matrix_power(
+            first_unitary_time_evolution, 2
+        )
+        # first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
+        # second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
         # first_unitary_time_evolution = h.exp_ham(ham, t)
         # second_unitary_time_evolution = h.exp_ham(ham, 2*t)
 
@@ -429,7 +430,9 @@ def hahn_evolution_project_first_qubit(
         #     t,
         #     precision=precision
         # )
-        unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
+        # unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
+        # Seems linalg fastest on backend BC (up to 6 qubits at least)
+        unitary_time_evolution = linalg.expm(-1j*ham*t)
 
         total_evolution = np.dot(
             unitary_time_evolution,
@@ -451,10 +454,16 @@ def hahn_evolution_project_first_qubit(
         #     precision=precision
         # )
 
-        first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
-        second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
+        # first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
+        # second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
         # first_unitary_time_evolution = h.exp_ham(ham, t)
         # second_unitary_time_evolution = h.exp_ham(ham, 2*t)
+        first_unitary_time_evolution = linalg.expm(-1j*ham*t)
+        second_unitary_time_evolution = np.linalg.matrix_power(
+            first_unitary_time_evolution, 
+            2
+        )
+        # second_unitary_time_evolution = linalg.expm(-1j*ham*2*t)
 
         total_evolution = np.dot(
             second_unitary_time_evolution,
