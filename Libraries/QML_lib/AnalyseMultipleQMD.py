@@ -1266,8 +1266,8 @@ def all_times_learned_histogram(
         plt.hist(
             times_this_model,
             color=model_colour,
-            histtype='stepfilled',
-            # histtype='step',
+            # histtype='stepfilled',
+            histtype='step',
             # histtype='bar',
             fill=False,
             label=model_label
