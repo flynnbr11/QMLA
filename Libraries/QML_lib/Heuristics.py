@@ -86,57 +86,70 @@ class multiPGH(qi.Heuristic):
         for field_i in self._x_:
             eps[field_i] = self._inv_func(x)[0][idx_iter]
             idx_iter += 1
-        if self._oplist is None:   #Standard QInfer geom distance
-            # print("[multipgh] oplist is None")
-
-            sigma = self._updater.model.distance(x, xp)
-            # print("sigma = ", sigma)
-            if self._increase_time == True:
-                # Increase time 
-                # ie get 1/sigma and add another time factor on top
-                # to reach higher times
-                orig_time = self._t_func(
-                    (1 / sigma**self._pgh_exponent)
-                )
-
-                new_time = self._t_func(
-                    (1 / sigma**self._pgh_exponent)
-                    + ((1/sigma) * epoch_id * num_params)/10
-                )
-                # print(
-                #     "[multipgh]", 
-                #     "\norig time:", orig_time, 
-                #     "\nnew_time:", new_time
-                # )
-                eps[self._t] = new_time
-            else:
-                new_time = self._t_func(
-                    1 / sigma**self._pgh_exponent
-                )
-                # print(
-                #     "[multipgh]", 
-                #     "\nnew_time:", new_time
-                # )
-                eps[self._t] = new_time 
 
 
-        else:
-            deltaH = getH(x, self._oplist)-getH(xp, self._oplist)
-            if self._norm=='Frobenius':
-                print("[multipgh] Froebenius")
-                print (frameinfo.filename, frameinfo.lineno)
-                eps[self._t] = 1/np.linalg.norm(deltaH)   #Frobenius norm
-            elif self._norm=='MinSingVal':
-                print("[multipgh] MinSingVal")
-                print (frameinfo.filename, frameinfo.lineno)
-                eps[self._t] = 1/minsingvalnorm(deltaH)   #Min SingVal norm
-            elif self._norm=='SingVal':
-                print (frameinfo.filename, frameinfo.lineno)
-                eps[self._t] = 1/singvalnorm(deltaH)   #Max SingVal
-            else:
-                print (frameinfo.filename, frameinfo.lineno)
-                eps[self._t] = 1/np.linalg.norm(deltaH)
-                raise RuntimeError("Unknown Norm: using Frobenius norm instead")
+        sigma = self._updater.model.distance(x, xp)
+        new_time = self._t_func(
+            1 / sigma**self._pgh_exponent
+        )
+        # print(
+        #     "[multipgh]", 
+        #     "\nnew_time:", new_time
+        # )
+        eps[self._t] = new_time 
+
+
+        # if self._oplist is None:   #Standard QInfer geom distance
+        #     # print("[multipgh] oplist is None")
+
+        #     sigma = self._updater.model.distance(x, xp)
+        #     # print("sigma = ", sigma)
+        #     if self._increase_time == True:
+        #         # Increase time 
+        #         # ie get 1/sigma and add another time factor on top
+        #         # to reach higher times
+        #         orig_time = self._t_func(
+        #             (1 / sigma**self._pgh_exponent)
+        #         )
+
+        #         new_time = self._t_func(
+        #             (1 / sigma**self._pgh_exponent)
+        #             + ((1/sigma) * epoch_id * num_params)/10
+        #         )
+        #         # print(
+        #         #     "[multipgh]", 
+        #         #     "\norig time:", orig_time, 
+        #         #     "\nnew_time:", new_time
+        #         # )
+        #         eps[self._t] = new_time
+        #     else:
+        #         new_time = self._t_func(
+        #             1 / sigma**self._pgh_exponent
+        #         )
+        #         # print(
+        #         #     "[multipgh]", 
+        #         #     "\nnew_time:", new_time
+        #         # )
+        #         eps[self._t] = new_time 
+
+
+        # else:
+        #     deltaH = getH(x, self._oplist)-getH(xp, self._oplist)
+        #     if self._norm=='Frobenius':
+        #         print("[multipgh] Froebenius")
+        #         print (frameinfo.filename, frameinfo.lineno)
+        #         eps[self._t] = 1/np.linalg.norm(deltaH)   #Frobenius norm
+        #     elif self._norm=='MinSingVal':
+        #         print("[multipgh] MinSingVal")
+        #         print (frameinfo.filename, frameinfo.lineno)
+        #         eps[self._t] = 1/minsingvalnorm(deltaH)   #Min SingVal norm
+        #     elif self._norm=='SingVal':
+        #         print (frameinfo.filename, frameinfo.lineno)
+        #         eps[self._t] = 1/singvalnorm(deltaH)   #Max SingVal
+        #     else:
+        #         print (frameinfo.filename, frameinfo.lineno)
+        #         eps[self._t] = 1/np.linalg.norm(deltaH)
+        #         raise RuntimeError("Unknown Norm: using Frobenius norm instead")
         for field, value in self._other_fields.items():
             eps[field] = value**self._pgh_exponent
 

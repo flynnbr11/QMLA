@@ -505,7 +505,7 @@ def Bayes_t_test(
     growth_generator = None, 
     plot_probe_file = None,
     top_number_models=2,
-    save_true_expec_vals_alone_plot=True,
+    save_true_expec_vals_alone_plot=False,
     save_to_file=None
 ):
     plt.switch_backend('agg')
@@ -1120,6 +1120,95 @@ def r_sqaured_average(
 
 
 
+def volume_average(
+    results_path, 
+    top_number_models=2,
+    save_to_file=None
+):
+    from matplotlib import cm
+    plt.clf()
+    fig = plt.figure()
+    ax = plt.subplot(111)
+
+    results = pandas.DataFrame.from_csv(
+        results_path,
+        index_col='QID'
+    )
+    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
+    rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
+    # from https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
+    
+    if len(all_winning_models) > top_number_models:
+        winning_models = rank_models(all_winning_models)[0:top_number_models]
+    else:
+        winning_models = list(set(all_winning_models))    
+
+    names = winning_models
+    num_models = len(names)
+    cm_subsection = np.linspace(0,0.8,num_models)
+    #        colours = [ cm.magma(x) for x in cm_subsection ]
+    colours = [ cm.viridis(x) for x in cm_subsection ]
+
+    i=0
+    for i in range(len(names)):
+        name = names[i]
+        volume_values = list(
+            results[ results['NameAlphabetical']==name]['TrackVolume']
+        )
+
+        volume_lists = {}
+        num_wins = len(volume_values)
+        for j in range(num_wins):
+            rs = eval(volume_values[j])
+            for t in list(rs.keys()):
+                try:
+                    volume_lists[t].append(rs[t])
+                except:
+                    volume_lists[t] = [rs[t]]
+
+        times = sorted(list(volume_lists.keys()))
+        means = np.array(
+            [ np.mean(volume_lists[t]) for t in times]
+        )
+
+        std_dev = np.array(
+            [ np.std(volume_lists[t]) for t in times]
+        )
+
+        # term = DataBase.latex_name_ising(name)
+        term = UserFunctions.get_latex_name(
+            name = name,
+            growth_generator = growth_generator 
+        )
+        plot_label = str(term + ' ('+ str(num_wins) + ')')
+        colour = colours[ i ]
+        ax.plot(
+            times, 
+            means,
+            label=plot_label,
+            marker='o'
+        )
+        ax.fill_between(
+            times, 
+            means-std_dev,
+            means+std_dev,
+            alpha=0.2
+        )
+        ax.legend(
+            bbox_to_anchor=(1.0, 0.9), 
+            title='Model (# instances)'
+        )
+    plt.semilogy()
+    plt.xlabel('Epoch')
+    plt.ylabel('Volume')
+    plt.title('Volume average')
+
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
+
+
+
         
 def model_scores(directory_name):
 #    sys.path.append(directory_name)
@@ -1289,8 +1378,8 @@ def plot_scores(
         Line2D([0], [0], color='blue', lw=4),
     ]
     custom_handles = [
-        'True ({}%)'.format(correct_success_rate), 
-        'True/Close ({}%)'.format(batch_success_rate), 
+        'True ({}%)'.format(int(correct_success_rate)), 
+        'True/Close ({}%)'.format(int(batch_success_rate)), 
         'Other'
     ]
     
@@ -1585,6 +1674,7 @@ r_sqaured_average(
         'r_squared_averages.png'
     )
 )
+
 ptq.average_quadratic_losses(
     results_path = results_csv, 
     growth_generator = growth_generator, 
@@ -1593,6 +1683,17 @@ ptq.average_quadratic_losses(
         directory_to_analyse + 
         plot_desc +
         'quadratic_losses_avg.png'
+    )
+)
+
+
+volume_average(
+    results_path = results_csv,
+    top_number_models = arguments.top_number_models,
+    save_to_file=  str(
+        directory_to_analyse + 
+        plot_desc +
+        'volume_averages.png'
     )
 )
 

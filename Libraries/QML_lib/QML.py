@@ -1070,7 +1070,11 @@ class reducedModel():
         self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self._normalization_record = learned_info['normalization_record']
         self.log_total_likelihod = learned_info['log_total_likelihood']
-        self.VolumeList = learned_info['volume_list'] 
+        self.RawVolumeList = learned_info['volume_list'] 
+        self.VolumeList = {}
+        for i in range(len(self.RawVolumeList)):
+            self.VolumeList[i] = self.RawVolumeList[i]
+
         self.TrackEval = np.array(learned_info['track_eval'])
         self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
         self.ResampleEpochs = learned_info['resample_epochs']
