@@ -2616,25 +2616,6 @@ class QMD():
             'Finished waiting on queue, for all:', running_models,
             ]
         )
-        n_qubits = DataBase.get_num_qubits(mod.Name)
-        if n_qubits > 3:
-            # only compute subset of points for plot
-            # otherwise takes too long
-            self.log_print(
-                [
-                    "getting new set of times to plot expectation values for"
-                ]
-            )
-            expec_val_plot_times = self.PlotTimes[0::10]
-        else:
-            self.log_print(
-                [
-                    "Using default times to plot expectation values for",
-                    "num qubits:", n_qubits
-                ]
-            )
-            expec_val_plot_times = self.PlotTimes
-
         time_now = time.time()
         time_taken = time_now - self.StartingTime
         for mod_name in model_names:
@@ -2643,10 +2624,32 @@ class QMD():
             )
             mod = self.reducedModelInstanceFromID(mod_id)
             mod.updateLearnedValues()
+
+            n_qubits = DataBase.get_num_qubits(mod.Name)
+            if n_qubits > 5:
+                # only compute subset of points for plot
+                # otherwise takes too long
+                self.log_print(
+                    [
+                        "getting new set of times to plot expectation values for"
+                    ]
+                )
+                expec_val_plot_times = self.PlotTimes[0::10]
+            else:
+                self.log_print(
+                    [
+                        "Using default times to plot expectation values for",
+                        "num qubits:", n_qubits
+                    ]
+                )
+                expec_val_plot_times = self.PlotTimes
+
+
             mod.compute_expectation_values(
-                times=self.PlotTimes,
+                times=expec_val_plot_times,
                 # plot_probe_path = self.PlotProbeFile
             )
+            # equivalent to self.ResultsDict
             mod.results_dict = {
                 'NumParticles' : mod.NumParticles,
                 'NumExperiments' : mod.NumExperiments,
@@ -2660,6 +2663,7 @@ class QMD():
                 'ChampID' : self.ChampID, 
                 'QuadraticLosses' : mod.QuadraticLosses,
                 'RSquaredTrueModel' : mod.r_squared(
+                    plot_probes = self.PlotProbes, 
                     times = expec_val_plot_times
                 ),
                 'NameAlphabetical' : DataBase.alph(mod.Name),
@@ -2675,7 +2679,8 @@ class QMD():
                     plot_probes = self.PlotProbes
                 ),
                 'LearnedHamiltonian' : mod.LearnedHamiltonian,
-                'GrowthGenerator' : mod.GrowthGenerator
+                'GrowthGenerator' : mod.GrowthGenerator,
+                'ChampLatex' : mod.LatexTerm
             }
 
 
