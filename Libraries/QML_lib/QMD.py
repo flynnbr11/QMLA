@@ -3164,7 +3164,7 @@ class QMD():
             ),
             'LearnedHamiltonian' : champ_model.LearnedHamiltonian,
             'GrowthGenerator' : champ_model.GrowthGenerator, 
-            'Heuristic' : mod.HeuristicType, 
+            'Heuristic' : champ_model.HeuristicType, 
             'ChampLatex' : champ_model.LatexTerm,
         }
 
