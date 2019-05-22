@@ -461,6 +461,8 @@ class ModelLearningClass():
             time_list = self.PlotTimes,
             num_experiments = self.NumExperiments,
         )
+        self.HeuristicType = self.Heuristic.__class__.__name__
+
 
         # if checkloss == True or self.checkQLoss==True:     
         #     self.QLosses = np.array([])
@@ -835,6 +837,7 @@ class ModelLearningClass():
         learned_info['num_particles'] = self.NumParticles
         learned_info['num_experiments'] = self.NumExperiments
         learned_info['growth_generator'] = self.GrowthGenerator
+        learned_info['heuristic'] = self.HeuristicType
         if self.StoreParticlesWeights:
             self.log_print(
                 [
@@ -1082,6 +1085,7 @@ class reducedModel():
         self.FinalSigmas = learned_info['final_sigmas']
         self.cov_matrix = learned_info['cov_matrix']
         self.GrowthGenerator = learned_info['growth_generator']
+        self.HeuristicType = learned_info['heuristic']
         self.LatexTerm = UserFunctions.get_latex_name(
             name = self.Name,
             growth_generator = self.GrowthGenerator

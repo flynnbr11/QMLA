@@ -2544,6 +2544,7 @@ class QMD():
             ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
             'LearnedHamiltonian' : mod.LearnedHamiltonian,
             'GrowthGenerator' : mod.GrowthGenerator, 
+            'Heuristic' : mod.HeuristicType, 
             'ChampLatex' : mod.LatexTerm,
         }
 
@@ -2680,6 +2681,7 @@ class QMD():
                 ),
                 'LearnedHamiltonian' : mod.LearnedHamiltonian,
                 'GrowthGenerator' : mod.GrowthGenerator,
+                'Heuristic' : mod.HeuristicType, 
                 'ChampLatex' : mod.LatexTerm
             }
 
@@ -3121,7 +3123,7 @@ class QMD():
             expec_val_plot_times = self.PlotTimes
 
 
-        
+        # equivalent to self.ResultsDict
         self.ChampionResultsDict = {
             'NameAlphabetical' : DataBase.alph(self.ChampionName),
             'NameNonAlph' : self.ChampionName,
@@ -3162,6 +3164,7 @@ class QMD():
             ),
             'LearnedHamiltonian' : champ_model.LearnedHamiltonian,
             'GrowthGenerator' : champ_model.GrowthGenerator, 
+            'Heuristic' : mod.HeuristicType, 
             'ChampLatex' : champ_model.LatexTerm,
         }
 

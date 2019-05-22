@@ -1186,7 +1186,8 @@ def volume_average(
             times, 
             means,
             label=plot_label,
-            marker='o'
+            marker='o',
+            markevery=10
         )
         ax.fill_between(
             times, 
@@ -1238,6 +1239,8 @@ def all_times_learned_histogram(
     cm_subsection = np.linspace(0,0.8,num_models)
     #        colours = [ cm.magma(x) for x in cm_subsection ]
     colours = [ cm.viridis(x) for x in cm_subsection ]
+    print("[Time histogram] names:", names)
+    print("[Time histogram] colours:", colours)
 
     times_by_model = {}
     max_time = 0
@@ -1263,13 +1266,18 @@ def all_times_learned_histogram(
         plt.hist(
             times_this_model,
             color=model_colour,
-            histtype='step',
+            histtype='stepfilled',
+            # histtype='step',
+            # histtype='bar',
             fill=False,
             label=model_label
         )
 
+    # presuming all models used same heuristics .... TODO change if models can use ones
+    heuristic_type = list(results[results['NameAlphabetical']==names[0]]['Heuristic'])[0]
+
     plt.legend()    
-    plt.title("Times learned on")
+    plt.title("Times learned on [{}]".format(heuristic_type))
     plt.xlabel("Time")
     plt.ylabel("Frequency")
     plt.show()
