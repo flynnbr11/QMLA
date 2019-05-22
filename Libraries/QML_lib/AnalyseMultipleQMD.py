@@ -1207,6 +1207,74 @@ def volume_average(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
+def all_times_learned_histogram(
+    results_path = "summary_results.csv",
+    top_number_models=2,
+    save_to_file=None
+):
+    print("\n\n\n[ANALYSE] all_times_learned_histogram",
+        "saving to:", save_to_file
+    )
+    from matplotlib import cm
+    plt.clf()
+    fig = plt.figure()
+    ax = plt.subplot(111)
+
+    results = pandas.DataFrame.from_csv(
+        results_path,
+        index_col='QID'
+    )
+    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
+    rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
+    # from https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
+
+    if len(all_winning_models) > top_number_models:
+        winning_models = rank_models(all_winning_models)[0:top_number_models]
+    else:
+        winning_models = list(set(all_winning_models))    
+
+    names = winning_models
+    num_models = len(names)
+    cm_subsection = np.linspace(0,0.8,num_models)
+    #        colours = [ cm.magma(x) for x in cm_subsection ]
+    colours = [ cm.viridis(x) for x in cm_subsection ]
+
+    times_by_model = {}
+    for i in range(len(names)):
+        name = names[i]
+        model_colour = colours[i]
+        times_by_model[name] = []
+        this_model_times_separate_runs = list(
+            results[ results['NameAlphabetical']==name]['TrackTimesLearned']
+        )
+
+        num_wins = len(this_model_times_separate_runs)
+        for j in range(num_wins):
+            this_run_times = eval(this_model_times_separate_runs[j])
+            times_by_model[name].extend(this_run_times)
+
+        times_this_model = times_by_model[name]
+        model_label = str(
+            list(results[results['NameAlphabetical']==name]['ChampLatex'])[0]
+        )
+
+        plt.hist(
+            times_this_model,
+            color=model_colour,
+            histtype='step',
+            fill=False,
+            label=model_label
+        )
+
+    plt.legend()    
+    plt.title("Times learned on")
+    plt.xlabel("Time")
+    plt.ylabel("Frequency")
+    plt.show()
+    if save_to_file is not None:
+        plt.savefig(save_to_file, bbox_inches='tight')
+
+
 
 
         
@@ -1696,6 +1764,18 @@ volume_average(
         'volume_averages.png'
     )
 )
+
+all_times_learned_histogram(
+    results_path = results_csv,
+    top_number_models = arguments.top_number_models,
+    save_to_file=  str(
+        directory_to_analyse + 
+        plot_desc +
+        'times_histogram.png'
+    )
+)
+
+
 
 """
 

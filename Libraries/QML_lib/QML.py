@@ -1063,8 +1063,7 @@ class reducedModel():
                 )
         self.NumParticles = learned_info['num_particles']
         self.NumExperiments = learned_info['num_experiments']
-
-        self.Times = learned_info['times']
+        self.Times = list(learned_info['times'])
         self.FinalParams = learned_info['final_params'] # should be final params from learning process
         self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
         self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?

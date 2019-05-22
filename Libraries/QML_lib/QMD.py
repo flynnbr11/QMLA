@@ -2535,6 +2535,7 @@ class QMD():
             'FinalSigmas' : mod.FinalSigmas,
             'TrackParameterEstimates' : mod.TrackParameterEstimates,
             'TrackVolume' : mod.VolumeList,
+            'TrackTimesLearned' : mod.Times, 
             'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
             'ExpectationValues' : mod.expectation_values,
             'RSquaredByEpoch' : mod.r_squared_by_epoch(
@@ -2666,6 +2667,7 @@ class QMD():
                 'FinalSigmas' : mod.FinalSigmas, 
                 'TrackParameterEstimates' : mod.TrackParameterEstimates,
                 'TrackVolume' : mod.VolumeList,
+                'TrackTimesLearned' : mod.Times, 
                 'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
                 'ExpectationValues' : mod.expectation_values,
                 'RSquaredByEpoch' : mod.r_squared_by_epoch(
@@ -3147,6 +3149,7 @@ class QMD():
             'ExpectationValues' : champ_model.expectation_values,
             'TrackParameterEstimates' : champ_model.TrackParameterEstimates,
             'TrackVolume' : champ_model.VolumeList,
+            'TrackTimesLearned' : champ_model.Times, 
             'TrackCovarianceMatrices' : champ_model.TrackCovMatrices, 
             'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
                 plot_probes = self.PlotProbes,
