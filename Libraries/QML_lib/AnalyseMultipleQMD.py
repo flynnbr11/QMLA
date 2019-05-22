@@ -1240,6 +1240,7 @@ def all_times_learned_histogram(
     colours = [ cm.viridis(x) for x in cm_subsection ]
 
     times_by_model = {}
+    max_time = 0
     for i in range(len(names)):
         name = names[i]
         model_colour = colours[i]
@@ -1252,7 +1253,8 @@ def all_times_learned_histogram(
         for j in range(num_wins):
             this_run_times = eval(this_model_times_separate_runs[j])
             times_by_model[name].extend(this_run_times)
-
+            if max(this_run_times) > max_time:
+                max_time = max(this_run_times)
         times_this_model = times_by_model[name]
         model_label = str(
             list(results[results['NameAlphabetical']==name]['ChampLatex'])[0]
@@ -1271,6 +1273,9 @@ def all_times_learned_histogram(
     plt.xlabel("Time")
     plt.ylabel("Frequency")
     plt.show()
+    plt.semilogy()
+    if max_time > 100:
+        plt.semilogx()
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
