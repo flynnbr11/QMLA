@@ -7,8 +7,8 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
-multiple_qhl=1
+qhl_test=1
+multiple_qhl=0
 do_further_qhl=0
 exp_data=0
 simulate_experiment=1
@@ -36,7 +36,7 @@ number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
 bf_all_times=0
-data_max_time=100 # nanoseconds
+data_max_time=150 # nanoseconds
 # data_time_offset=205 # nanoseconds
 
 ### ---------------------------------------------------###

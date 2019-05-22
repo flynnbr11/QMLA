@@ -107,65 +107,6 @@ set_true_params = {
 	# 'h_1_2_d3' : 0.6428,
 	# 'h_1_3_d3' : 0.9098, 
 	# 'h_2_3_d3' : 0.9051
-	# 'xTi' : 0.7538085315,
-	# 'yTi' : 8.4442484,
-	# 'zTi' : 5.713337168736279,	
-
-	# from Dec_13/.../Mar_22/18_13 simulation
-	# 'xTi':  0.7194027780807557, 
-	# 'xTx': 0.2127958438308013, 
-	# 'yTi': 0.3211052268427873, 
-	# 'yTy': 0.22058434787757564, 
-	# 'zTi': 0.47843100387017157,
-	# 'zTz': 0.5957696838755958,
-
-
-	# From 3000exp/20000prt, BC SelectedRuns/Nov_28/15_14/average_priors
-	# 'xTi': -0.57330033068583841, 
-	# 'xTx': 5.1275507795542854, 
-	# 'yTi': 6.2520709139461959, 
-	# 'yTy': 3.3194961601144444, 
-	# 'zTi': 2.7674066823006291,
-	# 'zTz': 4.2811650247256994,
-
-	# To test posterior transmission from QML to BF, want distinct true params
-	# 'xTi': 5.906251, 
-	# 'xTx': 1.8309156, 
-	# 'yTi': -6.19606907, 
-	# 'yTy': -2.610886, 
-	# 'zTi': 0.25689271, 
-	# 'zTz': -1.48673637,
-
-	# # FOR BQIT19 Poster #TODO REMOVE
-	# 'zTi' : 1.1
-
-
-	# TEST: below values (realistic decoherence) reduced by factor 10
-	# 'xTi': 0.005906251, 
-	# 'xTx': 0.018309156, 
-	# 'yTi': 0.619606907, 
-	# 'yTy': 0.02610886, 
-	# 'zTi': 0.025689271, 
-	# 'zTz': 0.048673637,
-
-
-	# SIMULATION params
-	'xTi': 0.6, 
-	'xTx': 0.234, 
-	'yTi': 0.903356, 
-	'yTy': 0.164, 
-	'zTi': 0.152, 
-	'zTz': 0.986,
-
-
-	# TESTING -- trying to find set which decohere realistically
-	# 'xTi': 0.005906251, 
-	# 'xTx': 0.018309156, 
-	# 'yTi': 0.619606907, 
-	# 'yTy': 0.02610886, 
-	# 'zTi': 0.025689271, 
-	# 'zTz': 0.048673637,
-
 
 	# From BC/Feb_12/18_30/results_007
 	# REALISTIC, DECOHERING CASE FOR EXPERIMENTAL MODEL WHEN TRACED OUT
@@ -176,45 +117,20 @@ set_true_params = {
 	# 'zTi': 0.25689271, 
 	# 'zTz': 0.48673637,
 
-
-
-	# Randomly setf but within 0.5 +- 0.35, so that reasonable for initial 
-	# prior 0.5 +- 0.25 to learn. 
-	# TODO make params automatically chosen within 2*sigma of prior
-	# 'xTi': 0.16933027, 
-	# 'xTx': 0.27654145, 
-	# 'yTi': 0.38375263, 
-	# 'yTy': 0.49096381, 
-	# 'zTi': 0.59817499, 
-	# 'zTz': 0.70538616,
-
-
-
-
-	# From  BC /Jan_29/17_58/results_007
-	# 'xTi': -0.15493082869796826, 
-	# 'xTx': -1.2914966893450925, 
-	# # 'xTx': -0.24, # seems to be degeneracy on these values for xTx
-	# 'yTi': 5.996392378378391, 
-	# 'yTy': 0.32964763301295075, 
-	# 'zTi': -0.21973259068334058, 
-	# 'zTz': -0.0083048687787120271,
 	# From 3000exp/20000prt, BC SelectedRuns/Nov_28/15_14/results_049
 	# 'xTi': -0.98288958683093952, 
 	# 'yTi': 6.4842202054983122, 
 	# 'zTi': 0.96477790489201143, 
 	# 'xTx': 6.7232235286284681, 
 	# 'yTy': 2.7377867056770397, 
-	# 'zTz': 1.6034234519563935,	# 'xTi': 0.20535428954933724, 
+	# 'zTz': 1.6034234519563935,	
 
-	# From Dec_14/09_55
-
-	# 'xTi': -0.83026591549841933, 
-	# 'xTx': 5.4727229452029729, 
-	# 'yTi': 6.9156299041669582, 
-	# 'yTy': 3.3947103726744356, 
-	# 'zTi': 2.0898730632155673, 
-	# 'zTz': 3.1023680134103575,
+	'xTi': -0.098288958683093952, 
+	'xTx': 0.67232235286284681, 
+	'yTi': 0.64842202054983122, 
+	'yTy': 0.27377867056770397, 
+	'zTi': 0.096477790489201143, 
+	'zTz': 0.16034234519563935,	
 
 	# For non-deterministic hopping learning
 	'h_1h2_d2' : 0.8103045,
