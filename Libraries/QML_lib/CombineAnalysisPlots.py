@@ -83,7 +83,7 @@ def combine_analysis_plots(
     pdf.set_text_color(r=0, g=0, b=0) # reset to black
 
     image_list = [
-        str(results_directory + '/' + a) 
+        str(results_directory  + a) 
         for a in os.listdir(results_directory) 
         if '.png' in a
     ]
