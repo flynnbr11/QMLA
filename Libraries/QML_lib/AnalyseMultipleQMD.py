@@ -488,17 +488,18 @@ def average_parameter_estimates(
             growth_generator = growth_rules[name]
         )
 
-        plt.title(
-            'Parameter Esimates for {}'.format(name)
-        )
         if save_to_file is not None:
+            fig.suptitle(
+                'Parameter Esimates for {}'.format(latex_name)
+            )
             save_file=''
             if save_to_file[-4:] == '.png':
                 partial_name = save_to_file[:-4]
                 save_file = str(partial_name + '_' + name + '.png')
             else:
                 save_file = str(save_to_file + '_' + name + '.png')
-            plt.tight_layout()
+            # plt.tight_layout()
+            fig.tight_layout(rect=[0, 0.03, 1, 0.95])
             plt.savefig(save_file, bbox_inches='tight')
 
 
@@ -900,6 +901,8 @@ def Bayes_t_test(
     fig.text(-0.04, 0.5, 'Expectation Value', va='center', rotation='vertical')
     
     if save_to_file is not None:
+        fig.suptitle("Expectation Values of learned models.")
+        fig.tight_layout(rect=[0, 0.03, 1, 0.95])
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
@@ -928,6 +931,7 @@ def Bayes_t_test(
             save_to_file[:-4]
             + '_true_expec_vals.png'
         )
+        plt.title("Expectation Values of True model.")
         plt.savefig(
             true_only_fig_file,
             bbox_inches='tight'

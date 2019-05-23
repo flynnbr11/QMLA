@@ -3395,7 +3395,7 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
 #    fig.text(0.07, 0.5, 'Occurences', va='center', rotation='vertical')
 #    fig.text(0.5, 0.07, '$log_{10}$ Bayes Factor', ha='center')
 
-
+    plt.title("Bayes factors of true model.")
     if save_to_file is not None:
         fig.savefig(save_to_file, bbox_inches='tight')
 
@@ -3540,6 +3540,7 @@ def replot_expectation_values(
 
 
     # plt.legend(loc=1)
+    plt.title("Expectation Value of clustered parameters.")
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
     else:
@@ -3568,7 +3569,6 @@ def cluster_results_and_plot(
     true_info_dict = pickle.load(
         open(true_params_path, 'rb')
     )
-    print("KEYS:", true_info_dict.keys() )
     try:
         growth_generator = true_info_dict['growth_generator']
     except:
@@ -3819,6 +3819,7 @@ def cluster_results_and_plot(
                 
                 
     if save_param_clusters_to_file is not None:
+        plt.title('Parameter clusters')
         plt.savefig(
             save_param_clusters_to_file, 
             bbox_to_inches='tight'

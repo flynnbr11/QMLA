@@ -79,7 +79,6 @@ def combine_analysis_plots(
             8, 
             str(str(variables[k]) + '\n')
         )
-    pdf.add_page()
     pdf.set_text_color(r=0, g=0, b=0) # reset to black
 
     image_list = [
@@ -89,6 +88,7 @@ def combine_analysis_plots(
     ]
 
     for new_img in image_list:
+        pdf.add_page()
         pdf.image(
             new_img, 
             w=200
