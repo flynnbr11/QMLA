@@ -79,12 +79,8 @@ def combine_analysis_plots(
     pdf.add_page()
     pdf.set_text_color(r=0, g=0, b=0) # reset to black
 
-    mod_scores_path = str(results_directory + 'model_scores.png')
-    prior_path = str( results_directory + 'prior_true_params.png')
-
-    image_list = [prior_path, mod_scores_path]
     image_list = [
-        str(results_directory + a) 
+        str(results_directory + '/' + a) 
         for a in os.listdir(results_directory) 
         if '.png' in a
     ]
