@@ -68,12 +68,12 @@ def combine_analysis_plots(
     for k in variables.keys():
         pdf.set_text_color(r=255, g=0, b=0)
         pdf.write(
-            5, 
+            8, 
             str(str(k) + ' : ')
         )
         pdf.set_text_color(r=0, g=0, b=0)
         pdf.write(
-            5, 
+            8, 
             str(str(variables[k]) + '\n')
         )
     pdf.add_page()
@@ -182,7 +182,7 @@ parser.add_argument(
   '-t', '--num_tests', 
   help="Number of complete tests to average over.",
   type=int,
-  default=default_num_tests
+  default=1
 )
 
 
