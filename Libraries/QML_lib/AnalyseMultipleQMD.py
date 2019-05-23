@@ -335,8 +335,6 @@ def average_parameter_estimates(
                 growth_rules[alph] = growth_generator
 
 
-    print("[Analyse; avg params] growth_rules:", growth_rules)
-
     for name in winning_models:
         num_experiments = num_experiments_by_name[name]
         # epochs = range(1, 1+num_experiments)
@@ -484,6 +482,15 @@ def average_parameter_estimates(
             title='Parameter'
         )    
         """
+        
+        latex_name = UserFunctions.get_latex_name(
+            name=name,
+            growth_generator = growth_rules[name]
+        )
+
+        plt.title(
+            'Parameter Esimates for {}'.format(name)
+        )
         if save_to_file is not None:
             save_file=''
             if save_to_file[-4:] == '.png':

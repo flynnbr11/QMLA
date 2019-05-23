@@ -1361,6 +1361,7 @@ def average_quadratic_losses(
 
     ax.set_xlim(1, num_experiments)
     ax.legend(bbox_to_anchor=(1, 1))
+    plt.title('Quadratic Losses Averages')
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
