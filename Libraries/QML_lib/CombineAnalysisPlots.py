@@ -56,7 +56,10 @@ def combine_analysis_plots(
         'Results/(.*)/',
         results_directory
     ).group(1)
-    
+
+    if not results_directory.endswith('/'):
+        results_directory += '/'
+
     pdf.set_descriptors(
         run_directory = run_dir 
     )
