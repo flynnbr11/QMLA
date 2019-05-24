@@ -53,10 +53,16 @@ def combine_analysis_plots(
     pdf = PDF()
     
     run_dir = re.search(
-        'Results/(.*)/',
+        # 'Results/(.*)/',
+        'Results/(.*)',
         results_directory
     ).group(1)
-
+    
+    output_desc = str(
+        run_dir.split('/')[0] + 
+        '__' + 
+        run_dir.split('/')[1]
+    )
     if not results_directory.endswith('/'):
         results_directory += '/'
 
@@ -93,9 +99,14 @@ def combine_analysis_plots(
             new_img, 
             w=200
         )
+    output_file_name = str(
+        output_desc + '_' + output_file_name
+    )
 
-
-    output_file = str(results_directory + output_file_name)
+    output_file = str(
+        results_directory + 
+        output_file_name
+    )
     print("Saving to :", output_file)
     pdf.output(output_file, 'F')
 
