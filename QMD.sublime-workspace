@@ -4,12 +4,104 @@
 		"selected_items":
 		[
 			[
-				"expectation_va",
-				"expectation_values"
+				"output_fil",
+				"output_file_name"
+			],
+			[
+				"out",
+				"output_desc"
+			],
+			[
+				"store",
+				"store_variables"
+			],
+			[
+				"run",
+				"run_description"
+			],
+			[
+				"desc",
+				"description_this_run"
+			],
+			[
+				"Huerist",
+				"HeuristicType"
+			],
+			[
+				"learned",
+				"learned_info"
 			],
 			[
 				"num",
-				"num_experiments"
+				"num_terms"
+			],
+			[
+				"current",
+				"current_params"
+			],
+			[
+				"time_fr",
+				"new_time_from_eigvals"
+			],
+			[
+				"curre",
+				"current_params"
+			],
+			[
+				"avg",
+				"avg_times"
+			],
+			[
+				"plot",
+				"plot_descriptor"
+			],
+			[
+				"set_",
+				"set_true_params"
+			],
+			[
+				"max_",
+				"max_num_qubits"
+			],
+			[
+				"min",
+				"min_num_qubits"
+			],
+			[
+				"max",
+				"max_num_qubits"
+			],
+			[
+				"random",
+				"random_model_name"
+			],
+			[
+				"get_",
+				"get_latex_name"
+			],
+			[
+				"Q",
+				"QID"
+			],
+			[
+				"indi",
+				"individual_terms_in_name"
+			],
+			[
+				"results",
+				"results_directory"
+			],
+			[
+				"log",
+				"log_file"
+			],
+			[
+				"QMD",
+				"QMDInfo"
+			],
+			[
+				"expectation_va",
+				"expectation_values"
 			],
 			[
 				"exper",
@@ -18,10 +110,6 @@
 			[
 				"mluti",
 				"multiPGH"
-			],
-			[
-				"plot",
-				"plot_probe_path"
 			],
 			[
 				"r_squared",
@@ -42,10 +130,6 @@
 			[
 				"specific",
 				"specific_terms"
-			],
-			[
-				"set_",
-				"set_prior_specific_terms"
 			],
 			[
 				"mul",
@@ -132,16 +216,8 @@
 				"term_branches"
 			],
 			[
-				"curre",
-				"current_fieldnames"
-			],
-			[
 				"field",
 				"fieldnames"
-			],
-			[
-				"current",
-				"current_fieldnames"
 			],
 			[
 				"curr",
@@ -236,10 +312,6 @@
 				"growth_generator"
 			],
 			[
-				"indi",
-				"individual_terms"
-			],
-			[
 				"expec_va",
 				"expec_value_mods_to_plot"
 			],
@@ -258,10 +330,6 @@
 			[
 				"true_",
 				"true_operator"
-			],
-			[
-				"log",
-				"log_identifier"
 			],
 			[
 				"qmd",
@@ -364,10 +432,6 @@
 				"track_cov_matrices"
 			],
 			[
-				"learned",
-				"learned_info_dict"
-			],
-			[
 				"Track",
 				"TrackParameterEstimates"
 			],
@@ -450,70 +514,6 @@
 			[
 				"Prior",
 				"PriorSpecificTerms"
-			],
-			[
-				"average",
-				"average_priors"
-			],
-			[
-				"num_qib",
-				"num_qubits_champ_model"
-			],
-			[
-				"save_",
-				"save_to_file"
-			],
-			[
-				"Cham",
-				"ChampID"
-			],
-			[
-				"experim",
-				"experimental_measurements"
-			],
-			[
-				"pres",
-				"present_expec_values_times"
-			],
-			[
-				"expectatino",
-				"expectation_values"
-			],
-			[
-				"uni",
-				"unique_times_count"
-			],
-			[
-				"uniqu",
-				"unique_times_learned"
-			],
-			[
-				"_",
-				"_renormalization_record"
-			],
-			[
-				"use",
-				"use_experimental_data"
-			],
-			[
-				"Experiment",
-				"ExperimentalMeasurements"
-			],
-			[
-				"default_data",
-				"default_data_max_useful_time"
-			],
-			[
-				"max",
-				"dataset_max_time"
-			],
-			[
-				"default_da",
-				"default_data_max_useful_time"
-			],
-			[
-				"bayes",
-				"bayes_lower"
 			]
 		]
 	},
@@ -523,17 +523,16 @@
 			"file": "ExperimentalSimulations/launch_qmd.sh",
 			"settings":
 			{
-				"buffer_size": 10582,
+				"buffer_size": 10995,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/RemoteBayesFactor.py",
+			"file": "Libraries/QML_lib/GlobalVariables.py",
 			"settings":
 			{
-				"buffer_size": 25562,
-				"encoding": "UTF-8",
+				"buffer_size": 19415,
 				"line_ending": "Unix"
 			}
 		},
@@ -541,25 +540,16 @@
 			"file": "Libraries/QML_lib/Heuristics.py",
 			"settings":
 			{
-				"buffer_size": 11656,
+				"buffer_size": 15774,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/UserFunctions.py",
+			"file": "Libraries/QML_lib/ExpectationValues.py",
 			"settings":
 			{
-				"buffer_size": 30034,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Libraries/QML_lib/Distrib.py",
-			"settings":
-			{
-				"buffer_size": 10258,
+				"buffer_size": 22493,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -568,43 +558,51 @@
 			"file": "ExperimentalSimulations/Exp.py",
 			"settings":
 			{
-				"buffer_size": 27731,
+				"buffer_size": 27979,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/QMD.py",
+			"settings":
+			{
+				"buffer_size": 132886,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/DataBase.py",
+			"settings":
+			{
+				"buffer_size": 35587,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/CombineAnalysisPlots.py",
+			"settings":
+			{
+				"buffer_size": 4764,
+				"encoding": "UTF-8",
+				"line_ending": "Unix",
+				"name": "def combine_analysis_plots("
+			}
+		},
+		{
+			"file": "Libraries/QML_lib/SetQHLParams.py",
+			"settings":
+			{
+				"buffer_size": 15371,
+				"line_ending": "Unix"
 			}
 		},
 		{
 			"file": "Libraries/QML_lib/QML.py",
 			"settings":
 			{
-				"buffer_size": 57716,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Libraries/QML_lib/CalculateTimeRequired.py",
-			"settings":
-			{
-				"buffer_size": 11764,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Libraries/QML_lib/PlotQMD.py",
-			"settings":
-			{
-				"buffer_size": 122716,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Libraries/QML_lib/multiPGH.py",
-			"settings":
-			{
-				"buffer_size": 5884,
+				"buffer_size": 58356,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -613,16 +611,16 @@
 			"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
 			"settings":
 			{
-				"buffer_size": 50496,
+				"buffer_size": 58513,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/SetQHLParams.py",
+			"file": "Libraries/QML_lib/PlotQMD.py",
 			"settings":
 			{
-				"buffer_size": 13384,
+				"buffer_size": 122861,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -667,32 +665,34 @@
 	[
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/ExponentiationTimes",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ParallelDevelopment"
 	],
 	"file_history":
 	[
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteBayesFactor.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/SetQHLParams.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/UserFunctions.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QMD.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GlobalVariables.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Heuristics.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelGeneration.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GenSimQMD_IQLE.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Distrib.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExpectationValues.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/qmd_pipeline.sh",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/UserFunctions.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteModelLearning.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/AnalyseMultipleQMD.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/SetQHLParams.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/multiPGH.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GlobalVariables.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/CalculateTimeRequired.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/CallTimeCalculator.sh",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelGeneration.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelNames.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Exp.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QML.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/ExponentiationTimes/test_exponentiation_methods.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/PlotQMD.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/CalculateTimeRequired.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExpectationValues.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteBayesFactor.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/multiPGH.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Exp.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/qmd_pipeline.sh",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteModelLearning.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/CallTimeCalculator.sh",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelNames.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QML.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/DataBase.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ProbeGeneration.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Evo.py",
@@ -727,134 +727,134 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"default_tr",
-			"param_max",
-			"0",
-			"max_time",
-			"save_true_expec_vals_alone_plot",
-			"bayes",
-			"44",
-			"save_true_expec_vals_alone_plot",
-			"two_qubit_ising_rotation_hyperfine'",
-			"two_qubit_ising_rotation_hyperfine",
-			"true_",
-			"realloc",
-			"realloca",
-			"reallocate",
-			"save_true_expec_vals_alone_plot",
-			"expec_val",
-			"default_true",
-			"compute_ex",
-			"plotdynamics",
-			"compute_expectation",
-			"compute_Exp",
-			"finaliseQMD",
-			"num_tests",
-			"branchcham",
-			"bayes_thresh",
-			"remoteBayesFromIDList",
-			"bayes_threshold",
-			"heuristic_classes",
-			" - multip!",
-			" - multip",
-			"[heur",
-			"finaliseQMD",
-			"runRemoteQMD_MULTIPLE_GEN",
-			"runQHLTest",
-			"ChampID",
-			"dynamics",
-			"bayes_t_",
-			"compute_expectation_values",
-			"BINNING",
-			"heuristic_classes",
-			"heur",
-			"kwargs",
-			"heur",
-			"get_heu",
-			"heurist",
-			"rand_prior",
-			"random_prior",
-			"NVB_rescale_dataset",
-			"hahn",
-			"exp_times",
-			"p_str",
-			"5",
-			"sim_colour",
-			"frameinfo",
-			"replot_expectation_values",
-			"save_true_expec_vals_alone_plot",
-			"_true",
-			"QLosses",
-			"quadratic_losses",
-			"results_d",
-			"get_heu",
-			"heuristic_classes",
-			"heuristic",
-			"pgh",
-			"heuristic",
-			"maxiters",
-			"hahn",
-			"0.78975978309",
-			"20",
-			"long_dir",
-			"expec vals",
-			"hahn",
-			"hahn_evolution_project_first_qubit",
-			"hahn",
-			"expectation_value",
-			"full_access",
-			"hahn",
-			"expec_val_function_dict",
-			"expectation_value_wrapper",
-			"expectation_value",
-			"hahn_",
-			"partial_trace_out_second_qubit",
-			"data_time_offset",
-			"random_prior",
-			"data_max_time",
-			"global_variables.data_max_time",
-			"20",
-			"self._t",
-			"get_heuris",
-			"self._norm",
-			"heuristic_classes",
-			"exp_t",
-			"self.Heuristic",
-			"kwargs",
-			"__init",
-			"self.PlotTimes",
-			"get_heuristic",
-			"self.PlotTimes",
-			"plot_times",
-			"self.PlotTimes",
-			"multipgh",
-			"multiPGH",
-			"separable_probe_dict",
-			"special_probe_functions",
-			"plot_probe",
-			"save_true_expec_vals_alone_plot",
-			"bayes_t_test",
+			"expectation value of cluster",
 			"bayes_t",
-			"max_time",
-			"= 5",
-			"5",
-			"dynamics",
+			"output_file_name",
+			"suptitle",
+			"parameter est",
+			"bayes_t_test",
+			"plotTrueModelBayesFactors_IsingRotationTerms",
+			"bayes_",
+			"if not",
+			"git_com",
+			"num_test",
+			"special",
+			"description_this_run",
+			"-ggr",
+			"-special",
+			"set_descriptors",
+			"direc",
+			"plot_quadratic_loss",
+			".HeuristicType",
+			"ResultsDict",
+			"self.ResultsDict",
+			"reduced",
+			"reducedmodel",
+			"heuristic",
+			"num_times",
+			"_expec",
+			"r_squared(",
+			"self.PlotProbes",
+			"self.ResultsDict",
+			"LearnedParameters",
+			"resultsdict",
+			"all_times_learned_histogram",
+			"dict",
+			"mod_result",
+			"mod_results",
+			"champlatex",
+			"hist",
+			".Times",
+			"volume_lists",
+			"volume_values",
+			"TrackVolume",
+			"ResultsDict",
+			"r_squared_lists",
+			"r_squared_values",
+			".VolumeList",
+			"i",
+			"volume",
+			"average_volume",
+			"volumelist",
 			"r_sqaured_average",
-			"compute_expectation_values",
-			"plot_probe_path",
-			"plot_probe_file",
-			"plot_probe_path",
-			"self.expectation_values",
-			"PlotProbeFile",
-			"r_squared_by",
-			"self.PlotProbes",
-			"plotprob",
-			"plot_probes",
-			"self.PlotProbes",
-			"datamean",
-			"r_squared_by_",
-			"r_squared_",
-			"r_squared_per_"
+			"r_squared_lists",
+			"VolumeList",
+			"_expec",
+			"constituents_names",
+			"num_terms",
+			"plot_scores",
+			"model_scores",
+			"true_only_fig_file",
+			"true_",
+			"max_param",
+			"default_true_operators_by_generator",
+			"self.SimOpList",
+			"self.Heuristic",
+			"self.Experiment",
+			"heuristic(",
+			"heuristi",
+			"likelihood",
+			"self.Updater",
+			"self.TrackEval",
+			"true_params",
+			"heurist",
+			"num_datapoints_to_plot",
+			"pickle_file",
+			"storing specific",
+			"true_prior_plot_file",
+			"this_log",
+			"setqhl",
+			"default_true_operators_by_generator",
+			"[\n",
+			"leg=",
+			"'full_access'",
+			"full_access",
+			"time",
+			"] create_prior",
+			"create prior",
+			"true_param",
+			"'hahn'",
+			"backend",
+			"'/'",
+			"if not os.",
+			"'/'",
+			"expectation_value",
+			"hahn_evolution_project_first_qubit",
+			"random_model_name",
+			"random",
+			" (",
+			"random_model",
+			"not added yet",
+			"Probe dict prov",
+			"prior_true",
+			"default_tr",
+			"log_print",
+			"for generatin",
+			"widen",
+			"width",
+			"true_prior'",
+			"true_prior",
+			"hist",
+			"plotdynamics",
+			"dynamics",
+			"colours",
+			"create_qhl_params",
+			"colours",
+			"colo",
+			"Distrib",
+			"sample",
+			"create_prior",
+			"create_qhl_params",
+			"create_prior",
+			"create_qhl_params",
+			"plot_prior",
+			"matplotlib",
+			"self.QID",
+			"latex_terms",
+			"numpy",
+			"results_di",
+			"import os",
+			"results_dire"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -862,6 +862,12 @@
 		"regex": false,
 		"replace_history":
 		[
+			"time_lists",
+			"time_values",
+			"volume_lists",
+			"volume_values",
+			"volume_lists",
+			"all_volumes_list",
 			"full_path_to_results",
 			"plot_probe_file",
 			"UserFunctions.get_all_model_names",
@@ -901,7 +907,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -910,15 +916,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10582,
+						"buffer_size": 10995,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								562,
-								562
+								274,
+								274
 							]
 						],
 						"settings":
@@ -928,7 +934,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 720.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
@@ -936,32 +942,32 @@
 				},
 				{
 					"buffer": 1,
-					"file": "Libraries/QML_lib/RemoteBayesFactor.py",
+					"file": "Libraries/QML_lib/GlobalVariables.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 25562,
+						"buffer_size": 19415,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5113,
-								5113
+								9369,
+								9369
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
+							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3236.0,
+						"translation.y": 6214.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
@@ -970,15 +976,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11656,
+						"buffer_size": 15774,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1235,
-								1235
+								4915,
+								4915
 							]
 						],
 						"settings":
@@ -988,27 +994,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 852.0,
+						"translation.y": 2999.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "Libraries/QML_lib/UserFunctions.py",
+					"file": "Libraries/QML_lib/ExpectationValues.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 30034,
+						"buffer_size": 22493,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								22255,
-								22255
+								12576,
+								12576
 							]
 						],
 						"settings":
@@ -1017,58 +1023,28 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 24.0,
-						"translation.y": 14326.0,
+						"translation.x": 0.0,
+						"translation.y": 9336.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "Libraries/QML_lib/Distrib.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 10258,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2817,
-								2817
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 216.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
 					"file": "ExperimentalSimulations/Exp.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 27731,
+						"buffer_size": 27979,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								24976,
-								24976
+								13913,
+								13913
 							]
 						],
 						"settings":
@@ -1078,7 +1054,37 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 20110.0,
+						"translation.y": 10822.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "Libraries/QML_lib/QMD.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 132886,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								120950,
+								120950
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 77230.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 8,
@@ -1086,19 +1092,19 @@
 				},
 				{
 					"buffer": 6,
-					"file": "Libraries/QML_lib/QML.py",
+					"file": "Libraries/QML_lib/DataBase.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 57716,
+						"buffer_size": 35587,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6202,
-								6202
+								5765,
+								5765
 							]
 						],
 						"settings":
@@ -1108,10 +1114,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4558.0,
+						"translation.y": 3742.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 10,
 					"type": "text"
 				}
 			]
@@ -1122,139 +1128,50 @@
 			[
 				{
 					"buffer": 7,
-					"file": "Libraries/QML_lib/CalculateTimeRequired.py",
+					"file": "Libraries/QML_lib/CombineAnalysisPlots.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11764,
+						"buffer_size": 4764,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3403,
-								3403
+								2465,
+								2465
 							]
 						],
 						"settings":
 						{
+							"auto_name": "def combine_analysis_plots(",
 							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 2,
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 9360.0,
+						"translation.y": 1727.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
 					"buffer": 8,
-					"file": "Libraries/QML_lib/PlotQMD.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 122716,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								19651,
-								19651
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 13846.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "Libraries/QML_lib/multiPGH.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5884,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3852,
-								3852
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 50496,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								27808,
-								27808
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 20638.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
 					"file": "Libraries/QML_lib/SetQHLParams.py",
-					"semi_transient": false,
+					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 13384,
+						"buffer_size": 15371,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2773,
-								2773
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1263,10 +1180,100 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2808.0,
+						"translation.y": 2520.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "Libraries/QML_lib/QML.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 58356,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								41668,
+								41668
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 25654.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 58513,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								28880,
+								28880
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 21214.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "Libraries/QML_lib/PlotQMD.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 122861,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								109390,
+								109415
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 81742.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -1300,7 +1307,7 @@
 		"cols":
 		[
 			0.0,
-			0.477871139781,
+			0.498775260257,
 			1.0
 		],
 		"rows":
@@ -1318,7 +1325,7 @@
 	"project": "",
 	"replace":
 	{
-		"height": 62.0
+		"height": 82.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1348,7 +1355,7 @@
 		],
 		"width": 0.0
 	},
-	"selected_group": 0,
+	"selected_group": 1,
 	"settings":
 	{
 	},
@@ -1356,7 +1363,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 287.0,
+	"side_bar_width": 220.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

@@ -902,7 +902,7 @@ def Bayes_t_test(
     
     if save_to_file is not None:
         fig.suptitle("Expectation Values of learned models.")
-        fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+        # fig.tight_layout(rect=[0, 0.03, 1, 0.95])
         plt.savefig(save_to_file, bbox_inches='tight')
 
 

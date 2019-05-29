@@ -382,7 +382,6 @@ def parse_cmd_line_args(args):
       type=float,
       default=default_pgh_factor
     )
-
     parser.add_argument(
       '-pgh_exp', '--pgh_exponent',
       help='for use in time heuristic according to 1/sigma**exponent',

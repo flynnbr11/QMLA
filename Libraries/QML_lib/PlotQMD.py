@@ -3442,7 +3442,9 @@ def replot_expectation_values(
 
     num_times = len(exp_times)
     max_time = max(exp_times)
-    sim_times = list(sorted(np.linspace(0, 2*max_time, num_times)))
+    # sim_times = list(sorted(
+    #     np.linspace(0, 2*max_time, num_times))
+    # )
 
     if (
         upper_x_limit is not None 
@@ -3540,7 +3542,7 @@ def replot_expectation_values(
 
 
     # plt.legend(loc=1)
-    plt.title("Expectation Value of clustered parameters.")
+    fig.suptitle("Expectation Value of clustered parameters.")
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
     else:

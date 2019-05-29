@@ -6,9 +6,9 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=3
-qhl_test=1
-multiple_qhl=1
+num_tests=1
+qhl_test=0
+multiple_qhl=0
 do_further_qhl=0
 exp_data=0
 simulate_experiment=1
@@ -300,9 +300,15 @@ python3 ../../../../Libraries/QML_lib/CombineAnalysisPlots.py \
     -pnoise=$probe_noise \
     -special_probe=$special_probe \
     -ggr=$growth_rule \
-    -run_desc=$test_description\
-    -git_commit=$git_commit
-
+    -run_desc=$test_description \
+    -git_commit=$git_commit \
+    -ra=$ra \
+    -rt=$rt \
+    -pgh=$pgh \
+    -qhl=$qhl_test \
+    -mqhl=$multiple_qhl \
+    -cb=$bayes_csv \
+    -exp=$exp_data
 " > $analyse_script
 
 

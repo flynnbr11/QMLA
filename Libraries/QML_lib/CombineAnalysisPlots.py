@@ -194,6 +194,49 @@ parser.add_argument(
   type=int,
   default=1
 )
+parser.add_argument(
+  '-rt', '--resample_threshold',
+  help='Resampling threshold for QInfer.',
+  type=float,
+  default=0.5
+)
+parser.add_argument(
+  '-ra', '--resample_a',
+  help='Resampling a for QInfer.',
+  type=float,
+  default=0.98
+)
+parser.add_argument(
+  '-pgh', '--pgh_factor',
+  help='Resampling threshold for QInfer.',
+  type=float,
+  default=1.0
+)
+parser.add_argument(
+  '-qhl', '--qhl_test', 
+  help="Bool to test QHL on given true operator only.",
+  type=int,
+  default=0
+)
+parser.add_argument(
+  '-mqhl', '--multiQHL',
+  help='Run QHL test on multiple (provided) models.',
+  type=int,
+  default=0
+)
+parser.add_argument(
+  '-cb', '--cumulative_csv',
+  help='CSV to store Bayes factors of all QMDs.',
+  type=str,
+  default='Unknown'
+)
+
+parser.add_argument(
+  '-exp', '--experimental_data',
+  help='Use experimental data if provided',
+  type=int,
+  default=0
+)
 
 
 

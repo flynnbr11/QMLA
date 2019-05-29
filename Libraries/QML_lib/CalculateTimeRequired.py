@@ -463,23 +463,14 @@ time_reqd = time_required(
   minimum_allowed_time = minimum_allowed_time,
 )
 
-print(
-	"Timing heuristic function:", 
-  "\nInsurance factor:", time_insurance_factor,
-  "\nuse_alt_growth_rules:", use_alternative_growth_rules,
-	"\nQMD:", time_reqd['qmd'],
-	"\nQHL:", time_reqd['qhl'],
-	"\nFurtherQHL:", time_reqd['fqhl'],
-)
-# print("based on inputs. setting times:", time_reqd)
-
-# args_dict = vars(arguments)
-# for a in list(args_dict.keys()):
-#   print(
-#     a, 
-#     ':', 
-#     args_dict[a]
-#   )
+# print(
+# 	"Timing heuristic function:", 
+#   "\nInsurance factor:", time_insurance_factor,
+#   "\nuse_alt_growth_rules:", use_alternative_growth_rules,
+# 	"\nQMD:", time_reqd['qmd'],
+# 	"\nQHL:", time_reqd['qhl'],
+# 	"\nFurtherQHL:", time_reqd['fqhl'],
+# )
 
 
 with open(variable_setting_script, 'a+') as script:
