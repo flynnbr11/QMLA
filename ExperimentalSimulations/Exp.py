@@ -222,11 +222,40 @@ num_params = len(true_op_list)
 # true_expectation_value_path = str(global_variables.results_directory + 'true_expectation_values.p')
 true_expectation_value_path = global_variables.true_expec_path
 if os.path.isfile(true_expectation_value_path) == False:
-    true_ham = np.tensordot(
-        true_params, 
-        true_op_matrices, 
-        axes=1
-    )
+    # true_ham = np.tensordot(
+    #     true_params, 
+    #     true_op_matrices, 
+    #     axes=1
+    # )
+    # true_ham = None
+    # true_params_dict = global_variables.true_params_dict
+    # for k in list(true_params_dict.keys()):
+    #     param = true_params_dict[k]
+    #     mtx = DataBase.compute(k)
+    #     if true_ham is not None:
+    #         log_print(
+    #             [
+    #             "[Exp - set true_ham] adding {}*{}:\n{}".format(
+    #             np.round(param,2), 
+    #             k, 
+    #             param*mtx)
+    #             ], 
+    #             log_file
+    #         )
+    #         true_ham += param*mtx  
+    #     else:
+    #         log_print(
+    #             [
+    #             "[Exp - set true_ham] SETTING {}*{}:\n{}".format(
+    #             np.round(param,2), 
+    #             k, 
+    #             param*mtx)
+    #             ], 
+    #             log_file
+    #         )
+    #         true_ham = param*mtx
+
+    true_ham = global_variables.true_hamiltonian
     true_expec_values = {}
     # TODO this probe not always appropriate?
     # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe - use qmd.PlotProbe
@@ -405,7 +434,7 @@ qmd = QMD(
     initial_op_list=initial_op_list, 
     generator_initial_models = generator_initial_models,
     true_operator=true_op, 
-    true_param_list=true_params, 
+    # true_param_list=true_params, 
     use_time_dep_true_model = False, 
     true_params_time_dep = { 'xTi' : 0.01},
     qle=qle,

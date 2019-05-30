@@ -75,7 +75,7 @@ class QMD():
         generator_initial_models, 
         initial_op_list=['x'],
         true_operator='x',
-        true_param_list = None,
+        # true_param_list = None,
         use_time_dep_true_model = False,
         true_params_time_dep = None,
         max_num_models=30, 
@@ -115,9 +115,9 @@ class QMD():
             self.log_file = str('QMD_'+str(q_id)+'.log')
         
         self.QLE = qle # Set to False for IQLE
-        trueOp = DataBase.operator(DataBase.alph(true_operator))
-        self.TrueOpName = DataBase.alph(true_operator)
-        self.TrueOpDim = trueOp.num_qubits
+        # trueOp = self.GlobalVariables.true_operator_class
+        self.TrueOpName = self.GlobalVariables.true_op_name
+        self.TrueOpDim = DataBase.get_num_qubits(self.TrueOpName)
         self.InitialOpList = initial_op_list
 
         base_num_qubits = 3
@@ -138,26 +138,30 @@ class QMD():
         self.ReallocateResources = self.GlobalVariables.reallocate_resources
         # print("[QMD] Base resources: ", self.BaseResources)
 
-        self.TrueOpList = trueOp.constituents_operators
-        self.TrueOpNumParams = trueOp.num_constituents
-        if true_param_list is not None: 
-            self.TrueParamsList = true_param_list
-        else:
-            print("No parameters passed, randomising")
-            self.TrueParamsList = [random.random() for i in self.TrueOpList] # TODO: actual true params?
-        # todo set true parmams properly
+        # self.TrueOpList = trueOp.constituents_operators
+        self.TrueOpList = self.GlobalVariables.true_op_list
+        self.TrueOpNumParams = self.GlobalVariables.true_operator_class.num_constituents
+        self.TrueParamsList = self.GlobalVariables.true_params_list
+        self.TrueParamDict = self.GlobalVariables.true_params_dict
+        # if true_param_list is not None: 
+        #     self.TrueParamsList = true_param_list
+        # else:
+        #     print("No parameters passed, randomising")
+        #     self.TrueParamsList = [random.random() for i in self.TrueOpList] # TODO: actual true params?
+        # # todo set true parmams properly
         #self.TrueParamsList = [0.75 for i in self.TrueOpList] # TODO: actual true params?
         
         
-        self.TrueParamDict = {}
-        true_ops = DataBase.get_constituent_names_from_name(
-            self.TrueOpName
-        )
-        for i in range(len(true_ops)):
-            op_name = true_ops[i]
-            param = self.TrueParamsList[i]
-            self.TrueParamDict[op_name] = param        
+        # self.TrueParamDict = {}
+        # true_ops = DataBase.get_constituent_names_from_name(
+        #     self.TrueOpName
+        # )
+        # for i in range(len(true_ops)):
+        #     op_name = true_ops[i]
+        #     param = self.TrueParamsList[i]
+        #     self.TrueParamDict[op_name] = param        
         
+
         self.MaxModNum = max_num_models #TODO: necessary?
         self.gaussian = self.GlobalVariables.gaussian
         print("[QMD] Gaussian:", self.gaussian)
@@ -241,11 +245,12 @@ class QMD():
 
         if self.UseExperimentalData==False:
             self.ExperimentalMeasurements = {}
-            self.TrueHamiltonian = np.tensordot(
-                self.TrueParamsList,
-                self.TrueOpList, 
-                axes=1
-            )
+            self.TrueHamiltonian = self.GlobalVariables.true_hamiltonian
+            # self.TrueHamiltonian = np.tensordot(
+            #     self.TrueParamsList,
+            #     self.TrueOpList, 
+            #     axes=1
+            # )
 
             # plot_probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe
             # plot_probe =  ExpectationValues.n_qubit_plus_state(

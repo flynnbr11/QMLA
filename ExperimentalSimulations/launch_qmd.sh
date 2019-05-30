@@ -11,7 +11,7 @@ qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=0
+simulate_experiment=1
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -36,7 +36,7 @@ number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
 bf_all_times=0
-data_max_time=15 # nanoseconds
+data_max_time=5 # nanoseconds
 # data_time_offset=205 # nanoseconds
 
 ### ---------------------------------------------------###
@@ -83,9 +83,9 @@ echo "GIT COMMIT: $git_commit"
 
 # sim_growth_rule='test_changes_to_qmd'
 # sim_growth_rule='two_qubit_ising_rotation_hyperfine'
-sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+sim_growth_rule='NV_centre_spin_large_bath'
 # sim_growth_rule='NV_spin_full_access'
-# sim_growth_rule='NV_centre_spin_large_bath'
 # sim_growth_rule='non_interacting_ising'
 # sim_growth_rule='non_interacting_ising_single_axis'
 # sim_growth_rule='deterministic_noninteracting_ising_single_axis'
@@ -108,8 +108,8 @@ sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_spin_full_access'
-exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# exp_growth_rule='NV_centre_spin_large_bath'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='PT_Effective_Hamiltonian'
@@ -138,7 +138,7 @@ force_plot_plus=0
 gaussian=1
 probe_noise=0.0000001
 param_min=0
-param_max=1
+param_max=10
 param_mean=0.5
 param_sigma=3
 rand_true_params=0

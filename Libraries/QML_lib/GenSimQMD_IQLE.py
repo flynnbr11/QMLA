@@ -137,11 +137,15 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self.log_file = log_file
         self.log_identifier = log_identifier
         if true_oplist is not None and trueparams is None:
-            raise(ValueError('\nA system Hamiltonian with unknown \
-                parameters was requested')
+            raise(
+                ValueError(
+                    '\nA system Hamiltonian with unknown \
+                    parameters was requested'
+                )
             )
         if true_oplist is None:
-            warnings.warn("\nI am assuming the Model and System \
+            warnings.warn(
+                "\nI am assuming the Model and System \
                 Hamiltonians to be the same", UserWarning
             )
             self._trueHam = None
@@ -367,7 +371,11 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
             #     "\nProbe", probe, "\n\n"
             # )
             
-            ham_minus = np.tensordot(sample, self._oplist, axes=1)[0]
+            ham_minus = np.tensordot(
+                sample, 
+                self._oplist, 
+                axes=1
+            )[0]
             print_loc(global_print_loc)
 
             if len(modelparams.shape) == 1:

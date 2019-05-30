@@ -238,13 +238,42 @@ parser.add_argument(
   default=0
 )
 
-
+import UserFunctions
 
 arguments = parser.parse_args()
 results_directory = arguments.results_directory
 output_file_name = arguments.output_file_name
 
 variables = vars(arguments)
+# and some others arguments not explicitly set in launch script
+try:
+  variables['measurement_type'] = UserFunctions.measurement_type[
+    arguments.growth_generation_rule
+  ]
+except:
+  variables['measurement_type'] = UserFunctions.measurement_type[
+    None
+  ]
+
+try:
+  variables['exp_val'] = UserFunctions.expec_val_function_dict[
+    variables['measurement_type']
+  ]
+except:
+  variables['expectation_value_func'] = UserFunctions.expec_val_function_dict[
+    None
+  ]
+
+try:
+  variables['heuristic'] = UserFunctions.heuristic_classes[
+    arguments.growth_generation_rule
+  ]
+except:
+  variables['heuristic'] = UserFunctions.heuristic_classes[
+    None
+  ]
+
+
 
 combine_analysis_plots(
     results_directory = results_directory,

@@ -5,6 +5,7 @@ import pickle
 
 
 import UserFunctions
+import DataBase
 
 """
 This file is callable with *kwargs from a separate QMD program. 
@@ -129,9 +130,29 @@ class GlobalVariablesClass():
         )
         self.true_operator = true_params_info['true_op']
         self.true_params = true_params_info['params_list']
+        self.true_params_dict = true_params_info['params_dict']
+        true_ham = None
+        for k in list(self.true_params_dict.keys()):
+          param = self.true_params_dict[k]
+          mtx = DataBase.compute(k)
+          if true_ham is not None:
+              true_ham += param*mtx  
+          else:
+              true_ham = param*mtx
+        self.true_hamiltonian = true_ham
         # self.true_operator = UserFunctions.default_true_operators_by_generator[
         #     self.growth_generation_rule
         # ]
+        self.true_op_name = DataBase.alph(self.true_operator)
+        self.true_operator_class = DataBase.operator(
+          self.true_op_name
+        )
+        self.true_op_list = self.true_operator_class.constituents_operators
+        self.true_params_list = [
+          self.true_params_dict[p] 
+          for p in self.true_operator_class.constituents_names
+        ]
+
         self.qhl_test = bool(arguments.qhl_test)
         self.further_qhl = bool(arguments.further_qhl)
         self.do_iqle = bool(arguments.do_iqle)

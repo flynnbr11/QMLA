@@ -1224,9 +1224,6 @@ def all_times_learned_histogram(
     top_number_models=2,
     save_to_file=None
 ):
-    print("\n\n\n[ANALYSE] all_times_learned_histogram",
-        "saving to:", save_to_file
-    )
     from matplotlib import cm
     plt.clf()
     fig = plt.figure()
@@ -1250,8 +1247,6 @@ def all_times_learned_histogram(
     cm_subsection = np.linspace(0,0.8,num_models)
     #        colours = [ cm.magma(x) for x in cm_subsection ]
     colours = [ cm.viridis(x) for x in cm_subsection ]
-    print("[Time histogram] names:", names)
-    print("[Time histogram] colours:", colours)
 
     times_by_model = {}
     max_time = 0

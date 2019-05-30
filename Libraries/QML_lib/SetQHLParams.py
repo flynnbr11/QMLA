@@ -56,21 +56,21 @@ set_true_params = {
 	'zTi': 0.96477790489201143, # 0.096477790489201143, 
 	'zTz': 1.6034234519563935, #0.16034234519563935,
 
+	'nv_spin_x_d2' : -0.98288958683093952, 
+	'nv_interaction_x_d2' : 6.7232235286284681, 
+	'nv_spin_y_d2' : 6.4842202054983122, 
+	'nv_interaction_y_d2' :  2.7377867056770397, 
+	'nv_interaction_z_d2' : 1.6034234519563935, 
+	'nv_spin_z_d2' : 0.96477790489201143, 
 
-	'nv_spin_x_d2' : -0.098288958683093952, 
-	'nv_spin_y_d2' : 0.67232235286284681, 
-	'nv_spin_z_d2' : 0.64842202054983122, 
-	'nv_interaction_x_d2' : 0.27377867056770397, 
-	'nv_interaction_y_d2' :  0.096477790489201143, 
-	'nv_interaction_z_d2' : 0.16034234519563935, 
+	'nv_interaction_x_d3' : -0.98288958683093952, 
+	'nv_interaction_y_d3' : 6.4842202054983122, 
+	'nv_interaction_z_d3' : 0.96477790489201143, 
+	'nv_spin_x_d3' : 6.7232235286284681, 
+	'nv_spin_y_d3' :  2.7377867056770397, 
+	'nv_spin_z_d3' : 1.6034234519563935, 
 
 
-	'nv_spin_x_d4' : 0.2,
-	'nv_spin_y_d4' : 0.1,
-	'nv_spin_z_d4' : 0.9309,
-	'nv_interaction_x_d4' : 0.05,
-	'nv_interaction_y_d4' : 0.05,
-	'nv_interaction_z_d4' : 0.05
 }
 
 ### Functions ###
