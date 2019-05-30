@@ -81,7 +81,9 @@ default_true_operators_by_generator = {
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d10PPPPPPPPPPnv_interaction_x_d10PPPPPPPPPPnv_spin_y_d10PPPPPPPPPPnv_interaction_y_d10PPPPPPPPPPnv_spin_z_d10PPPPPPPPPPnv_interaction_z_d10',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d6PPPPPPnv_interaction_z_d6',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d9PPPPPPPPPnv_interaction_x_d9PPPPPPPPPnv_spin_y_d9PPPPPPPPPnv_interaction_y_d9PPPPPPPPPnv_spin_z_d9PPPPPPPPPnv_interaction_z_d9',
-    'NV_centre_spin_large_bath' : 'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4PPPPnv_interaction_z_d4',
+    # 'NV_centre_spin_large_bath' : 'nv_interaction_z_d4',
+    'NV_centre_spin_large_bath' : 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2',
+    # 'NV_centre_spin_large_bath' : 'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4PPPPnv_interaction_z_d4',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d4PPPPnv_interaction_x_d4PPPPnv_spin_y_d4PPPPnv_interaction_y_d4PPPPnv_spin_z_d4PPPPnv_interaction_z_d4',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d2PPnv_interaction_x_d2PPnv_spin_y_d2PPnv_interaction_y_d2PPnv_spin_z_d2PPnv_interaction_z_d2',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_interaction_x_d3PPPnv_spin_y_d3PPPnv_interaction_y_d3PPPnv_spin_z_d3PPPnv_interaction_z_d3',    # 'NV_centre_spin_large_bath' : 'nv_spin_z_d3PPPnv_interaction_z_d3',
@@ -367,7 +369,8 @@ experimental_dataset = {
 
 measurement_type = {
     'PT_Effective_Hamiltonian' : 'full_access',
-    'NV_centre_spin_large_bath' : 'n_qubit_hahn',    
+    # 'NV_centre_spin_large_bath' : 'n_qubit_hahn',    
+    'NV_centre_spin_large_bath' : 'hahn',    
     'reduced_nv_experiment' : 'hahn' ,
 	'NV_centre_experiment_debug' : 'hahn', 
 	'two_qubit_ising_rotation_hyperfine' : 'hahn', 

@@ -7,11 +7,11 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -36,7 +36,7 @@ number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
 bf_all_times=0
-data_max_time=150 # nanoseconds
+data_max_time=15 # nanoseconds
 # data_time_offset=205 # nanoseconds
 
 ### ---------------------------------------------------###
@@ -84,6 +84,8 @@ echo "GIT COMMIT: $git_commit"
 # sim_growth_rule='test_changes_to_qmd'
 # sim_growth_rule='two_qubit_ising_rotation_hyperfine'
 sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# sim_growth_rule='NV_spin_full_access'
+# sim_growth_rule='NV_centre_spin_large_bath'
 # sim_growth_rule='non_interacting_ising'
 # sim_growth_rule='non_interacting_ising_single_axis'
 # sim_growth_rule='deterministic_noninteracting_ising_single_axis'
@@ -151,7 +153,7 @@ store_prt_wt=0 # store all particles and weights after learning
 # to above defined mean/sigmas
 rand_prior=0
 special_probe='random' #'plus' #'ideal'
-special_probe_plot='random'
+special_probe_plot='plus' #'random'
 # special_probe='plus_random' #'plus' #'ideal'
 
 if (( "$exp_data" == 1))  
