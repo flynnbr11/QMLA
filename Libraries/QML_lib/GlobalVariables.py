@@ -119,39 +119,57 @@ class GlobalVariablesClass():
         **kwargs
     ):
         # self.true_operator = true_operator
+        self.use_experimental_data = bool(arguments.experimental_data)
+        # self.measurement_type = arguments.measurement_type
         self.growth_generation_rule = arguments.growth_generation_rule
+        self.measurement_type = UserFunctions.get_measurement_type(
+          growth_generator = self.growth_generation_rule
+        )
+        # self.dataset = arguments.dataset
+        self.dataset = UserFunctions.get_experimental_dataset(
+          growth_generator = self.growth_generation_rule
+        )
         self.alternative_growth_rules = arguments.alternative_growth_rules
         self.multiQHL = bool(arguments.multiQHL)
         self.models_for_qhl = arguments.models_for_qhl
         self.prior_pickle_file = arguments.prior_pickle_file
         self.true_params_pickle_file = arguments.true_params_pickle_file
+
         true_params_info = pickle.load(
             open(self.true_params_pickle_file, 'rb')
         )
         self.true_operator = true_params_info['true_op']
-        self.true_params = true_params_info['params_list']
-        self.true_params_dict = true_params_info['params_dict']
-        true_ham = None
-        for k in list(self.true_params_dict.keys()):
-          param = self.true_params_dict[k]
-          mtx = DataBase.compute(k)
-          if true_ham is not None:
-              true_ham += param*mtx  
-          else:
-              true_ham = param*mtx
-        self.true_hamiltonian = true_ham
-        # self.true_operator = UserFunctions.default_true_operators_by_generator[
-        #     self.growth_generation_rule
-        # ]
         self.true_op_name = DataBase.alph(self.true_operator)
         self.true_operator_class = DataBase.operator(
           self.true_op_name
         )
         self.true_op_list = self.true_operator_class.constituents_operators
-        self.true_params_list = [
-          self.true_params_dict[p] 
-          for p in self.true_operator_class.constituents_names
-        ]
+        self.true_params = true_params_info['params_list']
+        if self.use_experimental_data == True:
+          # so it
+          true_ham = None
+          self.true_params_dict = None
+          self.true_params_list = []
+        else:
+          self.true_params_dict = true_params_info['params_dict']
+          self.true_params_list = [
+            self.true_params_dict[p] 
+            for p in self.true_operator_class.constituents_names
+          ]
+          # generate true hamiltonian for simulated case
+          true_ham = None
+          for k in list(self.true_params_dict.keys()):
+            param = self.true_params_dict[k]
+            mtx = DataBase.compute(k)
+            if true_ham is not None:
+                true_ham += param*mtx  
+            else:
+                true_ham = param*mtx
+
+        self.true_hamiltonian = true_ham
+        # self.true_operator = UserFunctions.default_true_operators_by_generator[
+        #     self.growth_generation_rule
+        # ]
 
         self.qhl_test = bool(arguments.qhl_test)
         self.further_qhl = bool(arguments.further_qhl)
@@ -187,15 +205,6 @@ class GlobalVariablesClass():
         self.log_file = arguments.log_file
         # self.save_plots = bool(arguments.save_plots)
         self.cumulative_csv = arguments.cumulative_csv
-        self.use_experimental_data = bool(arguments.experimental_data)
-        # self.measurement_type = arguments.measurement_type
-        self.measurement_type = UserFunctions.get_measurement_type(
-          growth_generator = self.growth_generation_rule
-        )
-        # self.dataset = arguments.dataset
-        self.dataset = UserFunctions.get_experimental_dataset(
-          growth_generator = self.growth_generation_rule
-        )
         self.data_time_offset = arguments.data_time_offset
         self.data_max_time = arguments.data_max_time 
         self.true_expec_path = arguments.true_expec_path

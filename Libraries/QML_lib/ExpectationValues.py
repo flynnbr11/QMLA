@@ -604,6 +604,92 @@ def n_qubit_hahn_evolution(
     # expect_value is projection onto |+>
     # for this case Pr(0) refers to projection onto |->
     # so return 1 - expect_value
+    return 1 - expect_value
+#    return expect_value
+
+
+
+def OLD_n_qubit_hahn_evolution(
+    ham, t, state, 
+    precision=1e-10, 
+    log_file=None, 
+    log_identifier=None
+):
+    import qutip 
+    import numpy as np
+    import DataBase
+    #hahn_angle = np.pi/2
+    #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))
+    #inversion_gate = linalg.expm(-1j*hahn)
+    
+    num_qubits = int(np.log2(np.shape(ham)[0]))
+#     inversion_gate = (np.pi/2) * DataBase.sigmaz()
+    # inversion_gate = DataBase.sigmaz()
+
+    # for d in range(num_qubits - 1):
+    #     inversion_gate = np.kron(
+    #         inversion_gate, 
+    #         DataBase.identity()
+    #     ) 
+    hahn_angle = np.pi / 2
+    hahn_gate = np.kron(    
+        hahn_angle * DataBase.sigmaz(), 
+        np.eye(2**(num_qubits-1))
+    )
+    inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()
+    # first_unitary_time_evolution = h.exp_ham(
+    #     ham, 
+    #     t, 
+    #     precision=precision
+    # )
+    # second_unitary_time_evolution = h.exp_ham(
+    #     ham, 
+    #     2*t, 
+    #     precision=precision
+    # )
+
+    first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
+    second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
+
+    total_evolution = np.dot(
+        second_unitary_time_evolution,
+        np.dot(inversion_gate,
+              first_unitary_time_evolution)
+    )
+
+    ev_state = np.dot(total_evolution, state)
+    nm = np.linalg.norm(ev_state)
+    if np.abs(1-nm) > 1e-10:
+        print("[Hahn] norm ev state:", nm)
+    
+    density_matrix = np.kron( 
+        ev_state, 
+        (ev_state.T).conj() 
+    )
+    dim_hilbert_space = 2**num_qubits
+    density_matrix = np.reshape(
+        density_matrix, 
+        [dim_hilbert_space,dim_hilbert_space]
+    )
+    qdm = qutip.Qobj(density_matrix, dims=[[2],[2]])
+    reduced_matrix = qdm.ptrace(0).full()
+
+    plus_state = np.array([1, 1])/np.sqrt(2)
+    noise_level = 0.00 # from 1000 counts - Poissonian noise = 1/sqrt(1000) # should be ~0.03
+    from ProbeGeneration import random_probe
+    random_noise = noise_level * random_probe(1)    
+    noisy_plus = plus_state + random_noise
+    norm_factor = np.linalg.norm(noisy_plus)
+    noisy_plus = noisy_plus/norm_factor
+    #    noisy_plus = np.array([1, 1])/np.sqrt(2)
+    bra = noisy_plus.conj().T
+    rho_state = np.dot(reduced_matrix, noisy_plus)
+    expect_value = np.abs(np.dot(bra, rho_state))    
+    
+
+    # expect_value is projection onto |+>
+    # for this case Pr(0) refers to projection onto |->
+    # so return 1 - expect_value
     return 1-expect_value
 #    return expect_value
 

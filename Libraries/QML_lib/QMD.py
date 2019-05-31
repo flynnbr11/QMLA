@@ -246,17 +246,6 @@ class QMD():
         if self.UseExperimentalData==False:
             self.ExperimentalMeasurements = {}
             self.TrueHamiltonian = self.GlobalVariables.true_hamiltonian
-            # self.TrueHamiltonian = np.tensordot(
-            #     self.TrueParamsList,
-            #     self.TrueOpList, 
-            #     axes=1
-            # )
-
-            # plot_probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe
-            # plot_probe =  ExpectationValues.n_qubit_plus_state(
-            #     self.TrueOpDim
-            # )  # TODO generalise probe
-
             self.log_print(
                 [
                 "Getting expectation values for simulated model", 
@@ -264,8 +253,6 @@ class QMD():
                 "\n Times computed:\n", self.PlotTimes
                 ]
             )
-
-
 
             for t in self.PlotTimes:
                 # TODO is this the right expectation value func???

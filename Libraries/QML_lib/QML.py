@@ -514,11 +514,11 @@ class ModelLearningClass():
         true_params_names = DataBase.get_constituent_names_from_name(
             self.TrueOpName
         )
-
-        for i in range(len(true_params_names)):
-            term = true_params_names[i]
-            true_param_val = self.TrueParams[i]
-            self.TrueParamsDict[term] = true_param_val
+        if self.UseExperimentalData == False:
+            for i in range(len(true_params_names)):
+                term = true_params_names[i]
+                true_param_val = self.TrueParams[i]
+                self.TrueParamsDict[term] = true_param_val
 
         all_params_for_q_loss = list(
             set(true_params_names).union(self.SimOpsNames)
@@ -532,7 +532,7 @@ class ModelLearningClass():
             5
         )
         # print("[QML] STARTING QHL UPDATES")
-        true_params = np.array([[self.TrueParams[0]]])
+        # true_params = np.array([[self.TrueParams[0]]])
         for istep in range(self.NumExperiments):
             if (istep%print_frequency == 0):
                 # print so we can see how far along algorithm is. 
@@ -652,6 +652,8 @@ class ModelLearningClass():
                
             if (
                 checkloss == True 
+                and
+                self.UseExperimentalData == False
                 # and istep%10 == 0
             ): 
                 quadratic_loss = 0

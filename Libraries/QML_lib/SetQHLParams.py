@@ -196,8 +196,11 @@ def create_qhl_params(
 		'params_dict' : true_params_dict
 	}
 	if exp_data: 
+		print("\n\n\n[SetQHL] EXPDATA -- dont store true vals")
 		# so as not to plot "true" params for exp data
 		true_params_info['params_dict'] = None
+		true_params_info['params_list'] = []
+		print("true params info:\n",true_params_info)
 
 	true_params_info['true_op'] = true_op
 	true_params_info['growth_generator'] = growth_generator
