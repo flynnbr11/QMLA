@@ -294,13 +294,9 @@ def hahn_evolution(
     log_file=None, 
     log_identifier=None
 ):
-    # print(
-    #     "using hahn evolution function.\nGiven hamiltonian:\n", 
-    #     repr(ham),
-    #     "\nstate:", repr(state)
-    # )
-    # import qutip 
+    # NOTE this is always projecting onto |+>
     import numpy as np
+    from scipy import linalg
 #    print("Hahn evo")
     #hahn_angle = np.pi/2
     #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))
@@ -484,10 +480,16 @@ def hahn_evolution_project_first_qubit(
     density_matrix = np.reshape(density_matrix, [4,4])
     # TODO this will only work for 2 qubit systems; 
     # needs to be extended to N qubits
+    # reduced_matrix = partial_trace(
+    #     density_matrix,
+    #     trace_systems = [1]
+    # )
+
     reduced_matrix = partial_trace_out_second_qubit(
         density_matrix,
         qubits_to_trace = [1]
     )
+
 
     density_mtx_initial_state = np.kron(
         state, 
@@ -498,20 +500,53 @@ def hahn_evolution_project_first_qubit(
         density_mtx_initial_state, 
         [4,4]
     )
+    print(
+        "[ExpVal - HahnProj]",
+        "state:\n", state
+    )
+    print(
+        "[ExpVal - HahnProj]",
+        "ev_state:\n", ev_state
+    )
+
+    # print(
+    #     "[ExpVal - HahnProj]",
+    #     "density mtx init state:\n", density_mtx_initial_state
+    # )
     reduced_density_mtx_initial_state = partial_trace_out_second_qubit(
         density_mtx_initial_state, 
         qubits_to_trace = [1]
     )
 
+    print(
+        "[ExpVal - HahnProj]",
+        "density mtx ev state :\n", repr(density_matrix)
+    )
 #     projection_onto_initial_den_mtx = np.dot(
 #         reduced_matrix, 
 #         reduced_density_mtx_initial_state
 #     )
 #     expec_val = 1 - np.trace(projection_onto_initial_den_mtx)
+    print(
+        "[ExpVal - Nqubit]",
+        "reduced density mtx init state:\n", 
+        reduced_density_mtx_initial_state
+    )
+    print(
+        "[ExpVal - Nqubit]",
+        "reduced density mtx ev state:\n", 
+        reduced_matrix
+    )
 
     projection_onto_initial_den_mtx = np.dot(
         reduced_density_mtx_initial_state,
         reduced_matrix
+    )
+
+    print(
+        "[ExpVal - HahnProj]",
+        "projection_onto_initial_den_mtx :\n", 
+        projection_onto_initial_den_mtx
     )
     
     expec_val = np.trace(
@@ -532,6 +567,7 @@ def n_qubit_hahn_evolution(
     import qutip 
     import numpy as np
     import DataBase
+    from scipy import linalg
     #hahn_angle = np.pi/2
     #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))
     #inversion_gate = linalg.expm(-1j*hahn)
@@ -585,8 +621,47 @@ def n_qubit_hahn_evolution(
         density_matrix, 
         [dim_hilbert_space,dim_hilbert_space]
     )
+
     qdm = qutip.Qobj(density_matrix, dims=[[2],[2]])
-    reduced_matrix = qdm.ptrace(0).full()
+    # reduced_matrix_qutip = qdm.ptrace(0).full()
+
+    # beloew methods give different results for reduced_matrix
+    # reduced_matrix = qdm.ptrace(0).full()
+
+    to_trace = list(range(num_qubits-1))
+    reduced_matrix = partial_trace(
+        density_matrix, 
+        to_trace
+    )
+
+
+
+    # print(
+    # "[ExpVal - Nqubit]",
+    # "state:\n", state
+    # )
+    # print(
+    #     "[ExpVal - Nqubit]",
+    #     "ev_state:\n", ev_state
+    # )
+
+    # print(
+    #     "[ExpVal - Nqubit]",
+    #     "density mtx ev state:\n", repr(density_matrix)
+    # )
+    # print(
+    #     "[ExpVal - Nqubit]",
+    #     "qdm:\n", 
+    #     qdm, 
+    #     "\ngives reduced mtx:", 
+    #     reduced_matrix_qutip
+    # )
+    # print(
+    #     "[ExpVal - Nqubit]",
+    #     "to trace:", to_trace, 
+    #     "reduced density mtx ev state:\n", 
+    #     reduced_matrix
+    # )
 
     plus_state = np.array([1, 1])/np.sqrt(2)
     noise_level = 0.00 # from 1000 counts - Poissonian noise = 1/sqrt(1000) # should be ~0.03
@@ -597,7 +672,21 @@ def n_qubit_hahn_evolution(
     noisy_plus = noisy_plus/norm_factor
     #    noisy_plus = np.array([1, 1])/np.sqrt(2)
     bra = noisy_plus.conj().T
-    rho_state = np.dot(reduced_matrix, noisy_plus)
+    try:
+        rho_state = np.dot(reduced_matrix, noisy_plus)
+    except:
+        # debugging
+        print("[ExpVal]--failed")
+        print(
+            "[ExpVal - Nqubit]",
+            "ev_state:\n", ev_state
+        )
+        print(
+            "[ExpVal - Nqubit]",
+            "reduced mtx:\n", reduced_matrix,
+            "noisy plus:\n", noisy_plus 
+        )
+
     expect_value = np.abs(np.dot(bra, rho_state))    
     
 
@@ -702,6 +791,67 @@ def swap_vector_elements_positions(input_vector, pos1, pos2):
     new_vector[pos2] = input_vector[pos1]
     
     return new_vector
+
+def partial_trace(
+    mat, 
+    trace_systems, 
+    dimensions=None, 
+    reverse=True
+):
+    """
+    taken from https://github.com/Qiskit/qiskit-terra/blob/master/qiskit/tools/qi/qi.py#L177
+    Partial trace over subsystems of multi-partite matrix.
+    Note that subsystems are ordered as rho012 = rho0(x)rho1(x)rho2.
+    Args:
+        mat (matrix_like): a matrix NxN.
+        trace_systems (list(int)): a list of subsystems (starting from 0) to
+                                  trace over.
+        dimensions (list(int)): a list of the dimensions of the subsystems.
+                                If this is not set it will assume all
+                                subsystems are qubits.
+        reverse (bool): ordering of systems in operator.
+            If True system-0 is the right most system in tensor product.
+            If False system-0 is the left most system in tensor product.
+    Returns:
+        ndarray: A density matrix with the appropriate subsystems traced over.
+    """
+    if dimensions is None:  # compute dims if not specified
+        length = np.shape(mat)[0]
+        num_qubits = int(np.log2(length))
+        dimensions = [2 for _ in range(num_qubits)]
+        if length != 2 ** num_qubits:
+            raise Exception("Input is not a multi-qubit state, "
+                            "specify input state dims")
+    else:
+        dimensions = list(dimensions)
+
+    trace_systems = sorted(trace_systems, reverse=True)
+    for j in trace_systems:
+        # Partition subsystem dimensions
+        dimension_trace = int(dimensions[j])  # traced out system
+        if reverse:
+            left_dimensions = dimensions[j + 1:]
+            right_dimensions = dimensions[:j]
+            dimensions = right_dimensions + left_dimensions
+        else:
+            left_dimensions = dimensions[:j]
+            right_dimensions = dimensions[j + 1:]
+            dimensions = left_dimensions + right_dimensions
+        # Contract remaining dimensions
+        dimension_left = int(np.prod(left_dimensions))
+        dimension_right = int(np.prod(right_dimensions))
+
+        # Reshape input array into tri-partite system with system to be
+        # traced as the middle index
+        mat = mat.reshape([dimension_left, dimension_trace, dimension_right,
+                           dimension_left, dimension_trace, dimension_right])
+        # trace out the middle system and reshape back to a matrix
+        mat = mat.trace(axis1=1, axis2=4).reshape(
+            dimension_left * dimension_right,
+            dimension_left * dimension_right)
+    return mat
+
+
 
 def partial_trace_out_second_qubit(
     global_rho, 

@@ -63,12 +63,19 @@ set_true_params = {
 	'nv_interaction_z_d2' : 1.6034234519563935, 
 	'nv_spin_z_d2' : 0.96477790489201143, 
 
-	'nv_interaction_x_d3' : -0.98288958683093952, 
-	'nv_interaction_y_d3' : 6.4842202054983122, 
-	'nv_interaction_z_d3' : 0.96477790489201143, 
-	'nv_spin_x_d3' : 6.7232235286284681, 
-	'nv_spin_y_d3' :  2.7377867056770397, 
-	'nv_spin_z_d3' : 1.6034234519563935, 
+	'nv_spin_x_d3' : -0.98288958683093952, 
+	'nv_interaction_x_d3' : 6.7232235286284681, 
+	'nv_spin_y_d3' : 6.4842202054983122, 
+	'nv_interaction_y_d3' :  2.7377867056770397, 
+	'nv_interaction_z_d3' : 1.6034234519563935, 
+	'nv_spin_z_d3' : 0.96477790489201143, 
+
+	'nv_spin_x_d10' : -0.98288958683093952, 
+	'nv_interaction_x_d10' : 6.7232235286284681, 
+	'nv_spin_y_d10' : 6.4842202054983122, 
+	'nv_interaction_y_d10' :  2.7377867056770397, 
+	'nv_interaction_z_d10' : 1.6034234519563935, 
+	'nv_spin_z_d10' : 0.96477790489201143, 
 
 
 }
@@ -150,8 +157,6 @@ def create_qhl_params(
 	true_prior.__setattr__('cov', new_cov_mtx)
 	sampled_list = true_prior.sample()
 
-	print("[setQHL] set_true_params:", set_true_params)
-
 	for i in range(num_terms):
 		if random_vals == True:
 			print("[setQHL] using random vals")
@@ -167,10 +172,6 @@ def create_qhl_params(
 		true_params_dict_latex_names[latex_terms[i]] = true_param
 
 	true_prior.__setattr__('cov', old_cov_mtx)
-	print(
-		"Plotting prior to", 
-		true_prior_plot_file
-	)
 	Distrib.plot_prior(
 		model_name = true_op_latex, 
 		model_name_individual_terms = latex_terms,

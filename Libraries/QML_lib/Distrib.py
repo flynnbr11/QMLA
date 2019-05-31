@@ -150,7 +150,6 @@ def plot_prior(
 
     samples = prior.sample(int(1e5))
     num_params = np.shape(samples)[1]
-
     ncols = int(np.ceil(np.sqrt(num_params)))
     nrows = int(np.ceil(num_params/ncols))
 
@@ -231,6 +230,7 @@ def plot_prior(
         wspace=0.4
     )
     fig.savefig(plot_file)
+    print("[Distrib - plot prior] fig saved")
     plt.clf()
 
 

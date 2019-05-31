@@ -523,7 +523,7 @@
 			"file": "ExperimentalSimulations/launch_qmd.sh",
 			"settings":
 			{
-				"buffer_size": 10995,
+				"buffer_size": 11222,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -532,7 +532,7 @@
 			"file": "Libraries/QML_lib/GlobalVariables.py",
 			"settings":
 			{
-				"buffer_size": 19415,
+				"buffer_size": 20455,
 				"line_ending": "Unix"
 			}
 		},
@@ -549,7 +549,7 @@
 			"file": "Libraries/QML_lib/ExpectationValues.py",
 			"settings":
 			{
-				"buffer_size": 22493,
+				"buffer_size": 29589,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -558,7 +558,7 @@
 			"file": "ExperimentalSimulations/Exp.py",
 			"settings":
 			{
-				"buffer_size": 27979,
+				"buffer_size": 27614,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -567,7 +567,7 @@
 			"file": "Libraries/QML_lib/QMD.py",
 			"settings":
 			{
-				"buffer_size": 132886,
+				"buffer_size": 132858,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -584,7 +584,7 @@
 			"file": "Libraries/QML_lib/CombineAnalysisPlots.py",
 			"settings":
 			{
-				"buffer_size": 4764,
+				"buffer_size": 6317,
 				"encoding": "UTF-8",
 				"line_ending": "Unix",
 				"name": "def combine_analysis_plots("
@@ -594,7 +594,7 @@
 			"file": "Libraries/QML_lib/SetQHLParams.py",
 			"settings":
 			{
-				"buffer_size": 15371,
+				"buffer_size": 14454,
 				"line_ending": "Unix"
 			}
 		},
@@ -602,7 +602,7 @@
 			"file": "Libraries/QML_lib/QML.py",
 			"settings":
 			{
-				"buffer_size": 58356,
+				"buffer_size": 58489,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -611,7 +611,7 @@
 			"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
 			"settings":
 			{
-				"buffer_size": 58513,
+				"buffer_size": 58323,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -620,7 +620,7 @@
 			"file": "Libraries/QML_lib/PlotQMD.py",
 			"settings":
 			{
-				"buffer_size": 122861,
+				"buffer_size": 122884,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -916,15 +916,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10995,
+						"buffer_size": 11222,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								274,
-								274
+								0,
+								0
 							]
 						],
 						"settings":
@@ -946,15 +946,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 19415,
+						"buffer_size": 20455,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9369,
-								9369
+								0,
+								0
 							]
 						],
 						"settings":
@@ -964,7 +964,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 6214.0,
+						"translation.y": 3628.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 7,
@@ -994,7 +994,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2999.0,
+						"translation.y": 1753.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 9,
@@ -1006,7 +1006,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 22493,
+						"buffer_size": 29589,
 						"regions":
 						{
 						},
@@ -1024,7 +1024,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 9336.0,
+						"translation.y": 5446.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 11,
@@ -1036,15 +1036,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 27979,
+						"buffer_size": 27614,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								13913,
-								13913
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1054,7 +1054,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 10822.0,
+						"translation.y": 6316.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
@@ -1066,15 +1066,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 132886,
+						"buffer_size": 132858,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								120950,
-								120950
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1084,7 +1084,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 77230.0,
+						"translation.y": 45054.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 8,
@@ -1114,7 +1114,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3742.0,
+						"translation.y": 2186.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 10,
@@ -1132,15 +1132,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4764,
+						"buffer_size": 6317,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2465,
-								2465
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1151,7 +1151,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1727.0,
+						"translation.y": 1011.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
@@ -1160,10 +1160,10 @@
 				{
 					"buffer": 8,
 					"file": "Libraries/QML_lib/SetQHLParams.py",
-					"semi_transient": true,
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 15371,
+						"buffer_size": 14454,
 						"regions":
 						{
 						},
@@ -1180,7 +1180,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2520.0,
+						"translation.y": 1470.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -1192,7 +1192,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 58356,
+						"buffer_size": 58489,
 						"regions":
 						{
 						},
@@ -1210,7 +1210,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 25654.0,
+						"translation.y": 14968.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 6,
@@ -1222,15 +1222,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 58513,
+						"buffer_size": 58323,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								28880,
-								28880
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1240,7 +1240,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 21214.0,
+						"translation.y": 12378.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -1252,15 +1252,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 122861,
+						"buffer_size": 122884,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								109390,
-								109415
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1270,7 +1270,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 81742.0,
+						"translation.y": 47686.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
