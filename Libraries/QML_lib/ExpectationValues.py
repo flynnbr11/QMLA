@@ -500,14 +500,6 @@ def hahn_evolution_project_first_qubit(
         density_mtx_initial_state, 
         [4,4]
     )
-    print(
-        "[ExpVal - HahnProj]",
-        "state:\n", state
-    )
-    print(
-        "[ExpVal - HahnProj]",
-        "ev_state:\n", ev_state
-    )
 
     # print(
     #     "[ExpVal - HahnProj]",
@@ -518,36 +510,44 @@ def hahn_evolution_project_first_qubit(
         qubits_to_trace = [1]
     )
 
-    print(
-        "[ExpVal - HahnProj]",
-        "density mtx ev state :\n", repr(density_matrix)
-    )
 #     projection_onto_initial_den_mtx = np.dot(
 #         reduced_matrix, 
 #         reduced_density_mtx_initial_state
 #     )
 #     expec_val = 1 - np.trace(projection_onto_initial_den_mtx)
-    print(
-        "[ExpVal - Nqubit]",
-        "reduced density mtx init state:\n", 
-        reduced_density_mtx_initial_state
-    )
-    print(
-        "[ExpVal - Nqubit]",
-        "reduced density mtx ev state:\n", 
-        reduced_matrix
-    )
+    # print(
+    #     "[ExpVal - HahnProj]",
+    #     "state:\n", state
+    # )
+    # print(
+    #     "[ExpVal - HahnProj]",
+    #     "ev_state:\n", ev_state
+    # )
+    # print(
+    #     "[ExpVal - HahnProj]",
+    #     "density mtx ev state :\n", repr(density_matrix)
+    # )
+    # print(
+    #     "[ExpVal - HahnProj]",
+    #     "reduced density mtx init state:\n", 
+    #     reduced_density_mtx_initial_state
+    # )
+    # print(
+    #     "[ExpVal - HahnProj]",
+    #     "reduced density mtx ev state:\n", 
+    #     reduced_matrix
+    # )
 
     projection_onto_initial_den_mtx = np.dot(
         reduced_density_mtx_initial_state,
         reduced_matrix
     )
 
-    print(
-        "[ExpVal - HahnProj]",
-        "projection_onto_initial_den_mtx :\n", 
-        projection_onto_initial_den_mtx
-    )
+    # print(
+    #     "[ExpVal - HahnProj]",
+    #     "projection_onto_initial_den_mtx :\n", 
+    #     projection_onto_initial_den_mtx
+    # )
     
     expec_val = np.trace(
         projection_onto_initial_den_mtx
