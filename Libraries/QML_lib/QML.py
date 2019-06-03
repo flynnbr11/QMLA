@@ -386,13 +386,14 @@ class ModelLearningClass():
             )
             for term in individual_terms_in_name
         ]
-
-        Distributions.plot_prior(
-            model_name = self.LatexTerm, 
-            model_name_individual_terms = latex_terms, 
-            prior = self.Prior, 
-            plot_file = prior_file, 
-        )
+        plot_all_priors = False
+        if plot_all_priors == True:
+            Distributions.plot_prior(
+                model_name = self.LatexTerm, 
+                model_name_individual_terms = latex_terms, 
+                prior = self.Prior, 
+                plot_file = prior_file, 
+            )
 
         # # pickle.dump(
         # #     self.Prior, 

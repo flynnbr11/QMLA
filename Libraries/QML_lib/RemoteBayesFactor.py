@@ -107,8 +107,8 @@ def BayesFactorRemote(
     linspace_times_for_bayes_factor_comparison = False
     use_opponent_learned_times = True
     true_mod_name = info_dict['true_name']
-    save_plots_of_posteriors = True
-
+    save_plots_of_posteriors = False
+    plot_true_mod_post_bayes_factor_dynamics = False
 
     if check_db: # built in to only compute once and always return the stored value.
         if pair_id in bayes_factors_db.keys():
@@ -427,9 +427,13 @@ def BayesFactorRemote(
         # # after learning, want to see what dynamics are like after further updaters
         # bayes_factor = np.exp(log_l_a - log_l_b)
         if (
-            DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name)
-            or 
-            DataBase.alph(model_b.Name) == DataBase.alph(true_mod_name)
+            (
+                DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name)
+                or 
+                DataBase.alph(model_b.Name) == DataBase.alph(true_mod_name)
+            )
+            and
+            plot_true_mod_post_bayes_factor_dynamics == True
         ):
             try:
                 plot_path = str(
