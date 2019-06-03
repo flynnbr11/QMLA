@@ -1146,11 +1146,32 @@ def NV_centre_spin_large_bath(
     spawn_step = kwargs['spawn_step']
     spawn_stage = kwargs['spawn_stage']    
 
-    return model_list
-    spawn_stage.append('Complete')
 
-        
+    print(
+        "[ModelGeneration.NV_centre_spin_large_bath]",
+        "Spawn stage:", spawn_stage
+    )
 
+
+    max_num_qubits = max(
+        [DataBase.get_num_qubits(mod) for mod in model_list]
+    )
+    new_gali_model = gali_model_nv_centre_spin(max_num_qubits + 1)
+    return [new_gali_model]
+
+
+def gali_model_nv_centre_spin(num_qubits):
+    axes = ['x', 'y', 'z']
+    p_str = 'P' * num_qubits
+    model_terms = []
+    for axis in axes:
+        for contribution in ['interaction', 'spin']:
+            model_terms.append(
+                'nv_{}_{}_d{}'.format(contribution, axis, num_qubits)
+            )
+            
+    model = p_str.join(model_terms)
+    return model
 
 def heisenberg_nontransverse(
     **kwargs
@@ -1220,9 +1241,6 @@ def heisenberg_nontransverse(
 
     return new_models
 
-# from ModelGeneration import tensor_all_with_identity_at_end
-# from ModelGeneration import tensor_all_with_identity_at_start
-import ModelNames
 
 def heisenberg_transverse(
     **kwargs

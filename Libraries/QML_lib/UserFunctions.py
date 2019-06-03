@@ -93,7 +93,7 @@ default_true_operators_by_generator = {
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d9PPPPPPPPPnv_interaction_x_d9PPPPPPPPPnv_spin_y_d9PPPPPPPPPnv_interaction_y_d9PPPPPPPPPnv_spin_z_d9PPPPPPPPPnv_interaction_z_d9',
     # 'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'NV_spin_full_access' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 
-    'reduced_nv_experiment' : 'zTi' ,
+    'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'NV_centre_experiment_debug' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'two_qubit_ising_rotation' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
     # 'two_qubit_ising_rotation_hyperfine' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 
@@ -234,7 +234,7 @@ transverse_axis_by_generator = {
 max_spawn_depth_info = {
     'test_changes_to_qmd' : 1, 
     'PT_Effective_Hamiltonian' : 1,
-    'NV_centre_spin_large_bath' : 1,
+    'NV_centre_spin_large_bath' : 4,
     'reduced_nv_experiment' : 3,
     'NV_centre_experiment_debug' : 1,
     'NV_spin_full_access' : 8, 
@@ -352,8 +352,7 @@ model_generation_functions = {
 tree_completed_initial = {
     'PT_Effective_Hamiltonian' : True,
 	'NV_centre_experiment_debug' : True, 
-    'NV_centre_spin_large_bath' : True,
-
+    # 'NV_centre_spin_large_bath' : True,
 	None: False
 }
 
@@ -545,7 +544,7 @@ initial_models = {
     	],
     'NV_centre_spin_large_bath' : 
     	[
-    		'nv_interaction_x_d3PPPnv_spin_x_d3'
+    		'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
 		],
 
     'NV_spin_full_access' : 
@@ -855,7 +854,6 @@ def get_probe_dict(
 
 	if special_probe == 'None':
 		special_probe = None
-	print("[getProbeDict] Special probe:", special_probe)
 
 	if special_probe is not None:
 		try:
@@ -896,7 +894,7 @@ def get_probe_dict(
 		max_num_qubits = max_num_qubits, 
 		**kwargs
 	)
-	print("[getProbeDict] Probe func used:", probe_dict_function)
+	print("[getProbeDict] Probe func used:", probe_dict_function) # todo store in log file
 	return probe_dict
 
 def get_experimental_dataset(growth_generator):

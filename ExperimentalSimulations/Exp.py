@@ -871,7 +871,7 @@ else:
         try:
             print("plotTreeDiagram")
             qmd.plotTreeDiagram(
-                only_adjacent_branhces=False, 
+                only_adjacent_branches=False, 
                 save_to_file = str
                 (global_variables.plots_directory+
                 'tree_diagram_' + 
@@ -879,7 +879,8 @@ else:
                 '.png')
             )
         except:
-            pass
+            print("Failed to plot tree for ", global_variables.long_id)
+            raise
 
         try:
             print("plotRSquaredVsEpoch")

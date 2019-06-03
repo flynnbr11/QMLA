@@ -164,7 +164,6 @@ class QMD():
 
         self.MaxModNum = max_num_models #TODO: necessary?
         self.gaussian = self.GlobalVariables.gaussian
-        print("[QMD] Gaussian:", self.gaussian)
         self.NumParticles = self.GlobalVariables.num_particles
         self.NumExperiments = self.GlobalVariables.num_experiments
         self.MaxQubitNumber = max_num_qubits
@@ -343,7 +342,6 @@ class QMD():
                 growth_generator = gen
             )
             self.BranchChampsByNumQubits[gen] = {}
-            print("Adding branch for ", gen)
             initial_models_this_gen = self.GeneratorInitialModels[gen]
             self.InitialOpsAllBranches.extend(initial_models_this_gen)
             num_new_models = len(initial_models_this_gen)
@@ -427,10 +425,6 @@ class QMD():
         self.NumTreesCompleted = np.sum(
             list(self.TreesCompleted.values())
         )
-        print("Num trees complete at start:", self.NumTreesCompleted)
-
-
-
 
         self.use_rq = self.GlobalVariables.use_rq
         self.rq_timeout = self.GlobalVariables.rq_timeout
@@ -2008,7 +2002,7 @@ class QMD():
         ]
         still_learning = True
 
-        print("[QMD]Entering final while loop")
+        # print("[QMD]Entering final while loop")
         while still_learning:
             branch_ids_on_db = list(
                 active_branches_learning_models.keys()
@@ -3366,7 +3360,6 @@ class QMD():
                 sorted(self.BranchChampions.values())
             )
 
-        print("[QMD - Plot Dynamics] model ids:", model_ids)
         # if self.QHLmode == False and self.multiQHLMode ==False:
         #     include_bayes_factors_in_dynamics_plots = False
         #     include_param_estimates_in_dynamics_plots = False

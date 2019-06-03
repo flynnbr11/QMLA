@@ -230,7 +230,6 @@ def plot_prior(
         wspace=0.4
     )
     fig.savefig(plot_file)
-    print("[Distrib - plot prior] fig saved")
     plt.clf()
 
 

@@ -7,7 +7,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
@@ -31,7 +31,7 @@ rt=0.5
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
-plots=0
+plots=1
 number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
@@ -76,7 +76,6 @@ qhl_settings_lib_file="$lib_dir/SetQHLParams.py"
 qhl_settings="$full_path_to_results/SetQHLParams.py"
 cp $qhl_settings_lib_file $qhl_settings
 git_commit=$(git rev-parse HEAD)
-echo "GIT COMMIT: $git_commit"
 
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
@@ -107,11 +106,11 @@ sim_growth_rule='NV_centre_spin_large_bath'
 ### which will overwrite growth_rule if exp_data==1
 
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-exp_growth_rule='NV_centre_spin_large_bath'
+# exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_experiment_debug'
-# exp_growth_rule='reduced_nv_experiment'
+exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='PT_Effective_Hamiltonian'
 
 if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
@@ -120,7 +119,6 @@ then
 else
     growth_rule=$sim_growth_rule
 fi
-echo "SETTING GROWTH RULE TO: $growth_rule"
 
 alt_growth_rules=(
     # 'interacing_nn_ising_fixed_axis'
@@ -190,11 +188,6 @@ fi
 
 # measurement_type=$exp_measurement_type
 # special_probe='plus' #'plus' #'ideal' # TODO this is just for a test, remove!!
-
-echo "special probe $special_probe"
-echo "growth rule: $growth_rule"
-
-
 
 declare -a particle_counts=(
 $prt

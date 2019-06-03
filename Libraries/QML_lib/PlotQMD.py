@@ -408,10 +408,6 @@ def plotDynamicsLearnedModels(
     col = 0
 
     for mod_id in model_ids:
-        print(
-            "[plotDynamicsLearnedModels]",
-            "mod id:", mod_id
-        )
         reduced = qmd.reducedModelInstanceFromID(mod_id)
         reduced.compute_expectation_values(
             times = qmd.PlotTimes

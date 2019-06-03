@@ -265,10 +265,10 @@ def create_prior(
 	else:
 		set_prior_specific_terms = set_uniform_prior_specific_terms
 
-	print(
-		"[setQHLParams - create_prior]",
-		"\t prior specific terms:", set_prior_specific_terms
-	)
+	# print(
+	# 	"[setQHLParams - create_prior]",
+	# 	"\t prior specific terms:", set_prior_specific_terms
+	# )
 
 	specific_terms = {}
 	if random_vals is False:
@@ -283,11 +283,6 @@ def create_prior(
 				# in case term not in set_prior_specific_terms
 				val = random.uniform(rand_min, rand_max)
 				specific_terms[term] = [val, sigma]
-	else:
-		print(
-			"\n\n [SetQHLParams - create_prior]"
-			"random vals:", random_vals
-		)
 	# print("[SetParams] specific terms:", specific_terms)
 
 
@@ -326,12 +321,12 @@ def create_prior(
 
 	if pickle_file is not None:
 		import pickle
-		print(
-			"\n\n storing specific terms to", 
-			pickle_file, 
-			"\n", prior_data, 
-			"\n\n"
-		)
+		# print(
+		# 	"\n\n storing specific terms to", 
+		# 	pickle_file, 
+		# 	"\n", prior_data, 
+		# 	"\n\n"
+		# )
 		pickle.dump(
 			prior_data, 
 			open(pickle_file, 'wb')
@@ -514,10 +509,6 @@ growth_generation_rule = arguments.growth_generation_rule
 true_operator = UserFunctions.default_true_operators_by_generator[
 	growth_generation_rule
 ]
-print(
-	"[SETQHL] true op:", 
-	true_operator
-)
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
 special_probe = arguments.special_probe
@@ -529,11 +520,11 @@ param_sigma = arguments.param_sigma
 probe_noise_level = arguments.probe_noise_level
 log_file = arguments.log_file
 results_directory = arguments.results_directory
-print(
-	"Results directory passed to SetQHL:", 
-	results_directory,
-	"\nLog file:", log_file
-)
+# print(
+# 	"Results directory passed to SetQHL:", 
+# 	results_directory,
+# 	"\nLog file:", log_file
+# )
 true_prior_plot_file = str(
 	results_directory  +
 	'/prior_true_params.png'
