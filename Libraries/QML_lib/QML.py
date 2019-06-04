@@ -439,6 +439,7 @@ class ModelLearningClass():
             num_time_dep_true_params = self.NumTimeDepTrueParams,
             num_probes=self.NumProbes,
             measurement_type = self.MeasurementType,
+            growth_generation_rule = self.GrowthGenerator, 
             use_experimental_data = self.UseExperimentalData,
             experimental_measurements = self.ExperimentalMeasurements,
             experimental_measurement_times=self.ExperimentalMeasurementTimes, 
@@ -1533,6 +1534,7 @@ class modelClassForRemoteBayesFactor():
             trueparams = self.TrueParams, 
             truename=self.TrueOpName,
             measurement_type = self.MeasurementType,
+            growth_generation_rule = self.GrowthGenerator, 
             use_experimental_data = self.UseExperimentalData,
             experimental_measurements = self.ExperimentalMeasurements,
             experimental_measurement_times=(

@@ -8,7 +8,7 @@ import warnings
 # from Evo import * # TODO remove ALL import * calls across QMD
 import Evo
 import ExperimentalDataFunctions as expdt
-
+import GrowthRules
 # from ProbeStates import *
 from MemoryTest import print_loc
 import ProbeGeneration
@@ -91,6 +91,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         min_freq=0, 
         solver='scipy', 
         measurement_type = 'full_access',
+        growth_generation_rule = None, 
         use_experimental_data=False, 
         experimental_measurements = None,
         experimental_measurement_times=None,
@@ -122,6 +123,14 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         self.time_dep_true_params = time_dep_true_params
         self.num_time_dep_true_params = num_time_dep_true_params
         self.measurement_type = measurement_type
+        self.growth_generation_rule = growth_generation_rule
+        try:
+            self.growth_class = GrowthRules.get_growth_generator_class(
+                growth_generation_rule = self.growth_generation_rule
+            )
+        except:
+            self.growth_class = None
+
         self.use_experimental_data = use_experimental_data
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
@@ -402,6 +411,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
                     t_list=times, modelparams=params,
                     oplist=operators, probe=probe, 
                     measurement_type=self.measurement_type,
+                    growth_class = self.growth_class,  
                     use_experimental_data = self.use_experimental_data,
                     use_exp_custom=self.use_exp_custom,
                     exp_comparison_tol=self.exp_comparison_tol, 

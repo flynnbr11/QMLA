@@ -101,6 +101,7 @@ def get_pr0_array_qle(
         t_list, modelparams, 
         oplist, probe,
         measurement_type='full_access',
+        growth_class=None, 
         use_experimental_data=False, use_exp_custom=True,
         exp_comparison_tol=None, enable_sparse=True, 
         ham_list=None, 
@@ -162,15 +163,25 @@ def get_pr0_array_qle(
                 #     ], 
                 #     log_file, log_identifier
                 # )
-                likel = UserFunctions.expectation_value_wrapper(
-                # output[evoId][tId] = ExpectationValues.expectation_value_wrapper(
-                    method=measurement_type,
-                    ham = ham,
-                    t = t,
-                    state = probe,
-                    log_file = log_file, 
-                    log_identifier = log_identifier
-                )
+                try:
+                    likel = growth_class.expectation_value(
+                        ham = ham,
+                        t = t,
+                        state = probe,
+                        log_file = log_file, 
+                        log_identifier = log_identifier
+                    )
+                except:         
+                    raise       
+                    likel = UserFunctions.expectation_value_wrapper(
+                    # output[evoId][tId] = ExpectationValues.expectation_value_wrapper(
+                        method=measurement_type,
+                        ham = ham,
+                        t = t,
+                        state = probe,
+                        log_file = log_file, 
+                        log_identifier = log_identifier
+                    )
                 output[evoId][tId] = likel
                 # unique_times_considered_this_ham.append(t)
                 # outputs_this_ham[t] = likel
