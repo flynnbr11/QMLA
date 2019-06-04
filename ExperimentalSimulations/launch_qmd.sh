@@ -7,7 +7,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
@@ -31,7 +31,7 @@ rt=0.5
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
-plots=1
+plots=0
 number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
@@ -105,8 +105,8 @@ sim_growth_rule='NV_centre_spin_large_bath'
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-exp_growth_rule='NV_centre_spin_large_bath'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_experiment_debug'

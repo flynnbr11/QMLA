@@ -103,6 +103,7 @@ class QMD():
         **kwargs
     ):
         self.GlobalVariables = global_variables
+        self.GrowthClass = self.GlobalVariables.growth_generator_class
         qhl_test = self.GlobalVariables.qhl_test
 
         self.StartingTime = time.time()
@@ -255,15 +256,27 @@ class QMD():
 
             for t in self.PlotTimes:
                 # TODO is this the right expectation value func???
-                self.ExperimentalMeasurements[t] = (
-                    # ExpectationValues.traced_expectation_value_project_one_qubit_plus(
-                    UserFunctions.expectation_value_wrapper(
-                        method=self.MeasurementType,
-                        ham = self.TrueHamiltonian,
-                        t = t, 
-                        state = self.PlotProbes[self.TrueOpDim]  
+                
+                try:
+                    self.ExperimentalMeasurements[t] = (
+                        self.GrowthClass.expectation_value(
+                            ham = self.TrueHamiltonian, 
+                            t = t, 
+                            state = self.PlotProbes[self.TrueOpDim]  
+                        )
+
                     )
-                )
+                except:
+                    raise
+                    self.ExperimentalMeasurements[t] = (
+                        # ExpectationValues.traced_expectation_value_project_one_qubit_plus(
+                        UserFunctions.expectation_value_wrapper(
+                            method=self.MeasurementType,
+                            ham = self.TrueHamiltonian,
+                            t = t, 
+                            state = self.PlotProbes[self.TrueOpDim]  
+                        )
+                    )
             self.log_print(
                 [
                 "Expectation values computed", 
@@ -284,7 +297,7 @@ class QMD():
 
         # Growth rule setup
         self.BranchParents = {}
-        self.GeneratorInitialModels = generator_initial_models
+        self.GeneratorInitialModels = generator_initial_models # TODO get from class
         self.GeneratorList = list(self.GeneratorInitialModels.keys())
         self.GrowthGenerator = self.GlobalVariables.growth_generation_rule
         self.SpawnDepth = 0
@@ -338,9 +351,12 @@ class QMD():
             
             gen = self.GeneratorList[i]
             # self.TreesCompleted[gen] = False
-            self.TreesCompleted[gen] = UserFunctions.get_tree_completed_initial_value(
-                growth_generator = gen
-            )
+            try:
+                self.TreesCompleted[gen] = self.GrowthClass.tree_completed_initially
+            except:
+                self.TreesCompleted[gen] = UserFunctions.get_tree_completed_initial_value(
+                    growth_generator = gen
+                )
             self.BranchChampsByNumQubits[gen] = {}
             initial_models_this_gen = self.GeneratorInitialModels[gen]
             self.InitialOpsAllBranches.extend(initial_models_this_gen)
@@ -408,18 +424,6 @@ class QMD():
             ]
         )   
 
-        # print("[QMD] NumModelsPerBranch: ", self.NumModelsPerBranch)
-        # print("[QMD] NumModelPairsPerBranch: ", self.NumModelPairsPerBranch)
-        # print("[QMD] BranchAllModelsLearned: ", self.BranchAllModelsLearned)
-        # print("[QMD] BranchComparisonsComplete: ", self.BranchComparisonsComplete)
-        # print("[QMD] BranchNumModelsPreComputed: ", self.BranchNumModelsPreComputed)
-        # print("[QMD] BranchModels", self.BranchModels)
-        # print("[QMD] BranchModelIds", self.BranchModelIds)
-        # print("[QMD] BranchGrowthRules:", self.BranchGrowthRules)
-        # print("[QMD] InitialOpsAllBranches:", self.InitialOpsAllBranches)
-        # print("[QMD] self.InitialModelBranches:", self.InitialModelBranches)
-        # print("[QMD] self.HighestBranchID:", self.HighestBranchID)
-
         self.NumTrees = len(self.GeneratorList) # i.e. Trees only stem from unique generators
         # print("[QMD] num trees:", self.NumTrees)
         self.NumTreesCompleted = np.sum(
@@ -430,10 +434,6 @@ class QMD():
         self.rq_timeout = self.GlobalVariables.rq_timeout
         self.rq_log_file = self.log_file
         self.write_log_file = open(self.log_file, 'a')
-        # self.MaxSpawnDepth = ModelGeneration.max_spawn_depth(
-        # self.MaxSpawnDepth = UserFunctions.max_spawn_depth(
-        #     self.GrowthGenerator, log_file=self.log_file
-        # )
             
         try:
             from rq import Connection, Queue, Worker
@@ -2337,21 +2337,35 @@ class QMD():
             list(self.BranchChampions.values())
         ]
 
-        new_models = UserFunctions.new_model_generator(
+        try:
+            new_models = self.GrowthClass.generate_models(
+                # generator = growth_rule, 
+                model_list=best_model_names,
+                spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
+                ghost_branches = self.GhostBranches, 
+                branch_champs_by_qubit_num = self.BranchChampsByNumQubits[growth_rule],
+                model_dict=self.model_lists,
+                log_file=self.log_file, 
+                current_champs = current_champs,
+                spawn_stage = self.SpawnStage[growth_rule],
+                miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
+            )
+        except:
+            new_models = UserFunctions.new_model_generator(
             # generator=self.GrowthGenerator,
-            generator = growth_rule, 
-            model_list=best_model_names,
-            # champs_by_num_qubits = self.BranchChampsByNumQubits, 
-            # spawn_step=self.SpawnDepth, 
-            spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
-            ghost_branches = self.GhostBranches, 
-            branch_champs_by_qubit_num = self.BranchChampsByNumQubits[growth_rule],
-            model_dict=self.model_lists,
-            log_file=self.log_file, 
-            current_champs = current_champs,
-            spawn_stage = self.SpawnStage[growth_rule],
-            miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
-        )
+                generator = growth_rule, 
+                model_list=best_model_names,
+                # champs_by_num_qubits = self.BranchChampsByNumQubits, 
+                # spawn_step=self.SpawnDepth, 
+                spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
+                ghost_branches = self.GhostBranches, 
+                branch_champs_by_qubit_num = self.BranchChampsByNumQubits[growth_rule],
+                model_dict=self.model_lists,
+                log_file=self.log_file, 
+                current_champs = current_champs,
+                spawn_stage = self.SpawnStage[growth_rule],
+                miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
+            )
 
         new_models = [DataBase.alph(mod) for mod in new_models]
 
@@ -2395,13 +2409,20 @@ class QMD():
             blocking=False, 
             use_rq=True
         )
-        tree_completed = UserFunctions.tree_finished(
-            # generator =self.GrowthGenerator,
-            # spawn_step = self.SpawnDepth,
-            generator = growth_rule,
-            spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
-            current_num_qubits = new_model_dimension
-        )
+        try:
+            tree_completed = self.GrowthClass.check_tree_completed(
+                spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
+                current_num_qubits = new_model_dimension
+            )
+        except:
+            tree_completed = UserFunctions.tree_finished(
+                # generator =self.GrowthGenerator,
+                # spawn_step = self.SpawnDepth,
+                generator = growth_rule,
+                spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
+                current_num_qubits = new_model_dimension
+            )
+
         if self.SpawnStage[growth_rule][-1]=='Complete':
             tree_completed = True
         # print(
@@ -3110,15 +3131,13 @@ class QMD():
 
 
         # equivalent to self.ResultsDict
+
         self.ChampionResultsDict = {
             'NameAlphabetical' : DataBase.alph(self.ChampionName),
             'NameNonAlph' : self.ChampionName,
             'FinalParams' : self.ChampionFinalParams,
+            'LatexName' : champ_model.LatexTerm,
             # 'LatexName' : DataBase.latex_name_ising(self.ChampionName),
-            'LatexName' : UserFunctions.get_latex_name(
-                name = self.ChampionName,
-                growth_generator = champ_model.GrowthGenerator
-            ),
             'NumParticles' : self.NumParticles,
             'NumExperiments' : champ_model.NumExperiments,
             'NumBayesTimes' : self.NumTimesForBayesUpdates,
