@@ -11,8 +11,8 @@ import NV_centre_experiment_growth_rules
 
 
 growth_classes = {
-    'test_growth_class' : 
-        SuperClassGrowthRule.default_growth, 
+    # 'test_growth_class' : 
+    #     SuperClassGrowthRule.default_growth, 
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 
     #     SuperClassGrowthRule.default_growth, 
     'two_qubit_ising_rotation_hyperfine_transverse' : 
@@ -24,7 +24,7 @@ def get_growth_generator_class(
     growth_generation_rule,
     **kwargs
 ):
-    print("Trying to find growth class for ", growth_generation_rule)
+    # print("Trying to find growth class for ", growth_generation_rule)
     try:
         gr = growth_classes[growth_generation_rule](
             growth_generation_rule = growth_generation_rule, 

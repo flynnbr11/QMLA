@@ -723,12 +723,20 @@ def plot_expec_vals_of_models(
         mod_exp_vals = []
         for t in times:
             # print("Getting exp for t=", t)
-            exp_val = UserFunctions.expectation_value_wrapper(
+            try:
+                # todo get this from GenSimModel of mod instead of instantiating class every time
+                exp_val = mod.GrowthClass.expectation_value(
+                    ham = final_ham, 
+                    t = t, 
+                    state = plot_probe
+                )
+            except: 
+                exp_val = UserFunctions.expectation_value_wrapper(
                     method = mod.MeasurementType,
                     ham = final_ham, 
                     t = t, 
                     state = plot_probe
-            )
+                )
             mod_exp_vals.append(exp_val)
             # mod_exp_vals.append(t)
             # print("exp val found for t={}:{}".format(t, exp_val))

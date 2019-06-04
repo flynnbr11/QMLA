@@ -11,7 +11,7 @@ class nv_spin_experiment_full_tree(GrowthRuleSuper):
         growth_generation_rule, 
         **kwargs
     ):
-        print("[Growth Rules] init nv_spin_experiment_full_tree")
+        # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule = growth_generation_rule,
             **kwargs
@@ -126,7 +126,7 @@ class nv_spin_experiment_full_tree(GrowthRuleSuper):
         self,
         name
     ):
-        print("[Growth Rules] Latex Name fnc")        
+        # print("[Growth Rules] NV centre Latex Name fnc")        
         # TODO generalise this 
         # if name == 'zTi': # FOR BQIT19 Poster #TODO REMOVE
         #     return '$\Omega$'
@@ -197,10 +197,27 @@ class nv_spin_experiment_full_tree(GrowthRuleSuper):
         t,
         state
     ):      
-        print("[Growth Rules] Expectation Values") 
+        # print("[Growth Rules] Expectation Values") 
         exp_val = ExpectationValues.n_qubit_hahn_evolution(
             ham = ham, 
             t = t, 
             state = state,
         )
         return exp_val
+
+
+    def probe_generator(
+        self,
+        **kwargs
+    ):
+        import ProbeGeneration
+        # TODO class for simulation which inherits from this class
+        # but generates random probes
+        print("[Growth Rules] probe generation") 
+        return ProbeGeneration.NV_centre_ising_probes_plus(
+            max_num_qubits = self.max_num_qubits,
+            **kwargs
+        )
+
+
+

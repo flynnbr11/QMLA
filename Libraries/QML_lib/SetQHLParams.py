@@ -5,6 +5,8 @@ import argparse
 import UserFunctions
 import DataBase
 import Distrib
+import  GrowthRules 
+
 import os
 import matplotlib.pyplot as plt
 pickle.HIGHEST_PROTOCOL=2
@@ -102,6 +104,7 @@ set_true_params = {
 def create_plot_probe(
 	max_num_qubits = 7, 
 	pickle_file = None,
+	growth_class = None, 
 	# plus_probe_for_plot = True,
 	# experimental_data=True, 
 	# growth_generator=None,
@@ -118,9 +121,17 @@ def create_plot_probe(
 	kwargs['num_probes'] = 1 # only want a single probe for plotting purposes
 	# kwargs['noise_level'] = 1e-7
 	print("\nPlot probe generated with kwargs:", kwargs, "\n")
-	plot_probe_dict = UserFunctions.get_probe_dict(
-		**kwargs
-	)
+	
+	try:
+		plot_probe_dict = growth_class.probe_generator(
+			**kwargs
+		)
+	except:
+		raise
+		plot_probe_dict = UserFunctions.get_probe_dict(
+			**kwargs
+		)
+
 	for k in list(plot_probe_dict.keys()):
 		# replace tuple like key returned, with just dimension. 
 	    plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
@@ -141,6 +152,7 @@ def create_qhl_params(
 	rand_min=None, 
 	rand_max=None,
 	exp_data=0,
+	growth_class = None, 
 	plus_probe_for_plot=False,
 	true_prior_plot_file=None, 
 ):
@@ -152,17 +164,30 @@ def create_qhl_params(
 	terms = DataBase.get_constituent_names_from_name(
 		true_op
 	)
-	latex_terms = [
-		UserFunctions.get_latex_name(
-			name = term, 
+
+	try:
+		latex_terms = []
+		for term in terms:
+			lt = growth_class.latex_name(
+				name = term 
+			)
+			latex_terms.append(lt)
+		true_op_latex = growth_class.latex_name(
+			name = true_op, 
+		)
+	except:
+		latex_terms = []
+		for term in terms:
+			lt = UserFunctions.get_latex_name(
+				name = term, 
+				growth_generator = growth_generator
+			)
+			latex_terms.append(lt)
+		true_op_latex = UserFunctions.get_latex_name(
+			name = true_op, 
 			growth_generator = growth_generator
 		)
-		for term in terms
-	]
-	true_op_latex = UserFunctions.get_latex_name(
-		name = true_op, 
-		growth_generator = growth_generator
-	)
+
 	num_terms = len(terms)
 	true_params = []
 	true_params_dict = {}
@@ -242,6 +267,7 @@ def create_prior(
 	param_mean=None, 
 	param_sigma=None,
 	results_directory=None, 
+	growth_class = None, 
 	log_file=None, 
 ):
 #	terms = DataBase.get_constituent_names_from_name(true_op)
@@ -505,9 +531,16 @@ random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
 exp_data = bool(arguments.use_experimental_data)
 growth_generation_rule = arguments.growth_generation_rule
-true_operator = UserFunctions.default_true_operators_by_generator[
-	growth_generation_rule
-]
+growth_class = GrowthRules.get_growth_generator_class(
+	growth_generation_rule = growth_generation_rule
+)
+
+try:
+	true_operator = growth_class.true_operator
+except:
+	true_operator = UserFunctions.default_true_operators_by_generator[
+		growth_generation_rule
+	]
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
 special_probe = arguments.special_probe
@@ -543,6 +576,7 @@ specific_terms, true_prior = create_prior(
 	param_sigma = param_sigma,
 	exp_data=exp_data,
 	results_directory=results_directory,
+	growth_class = growth_class, 
 	log_file=log_file
 )
 
@@ -557,6 +591,7 @@ if arguments.true_params_file is not None:
 		rand_min=param_min, 
 		rand_max=param_max,
 		exp_data=exp_data,
+		growth_class = growth_class, 
 		true_prior_plot_file=true_prior_plot_file 
 	)
 
@@ -578,15 +613,32 @@ else:
 # Store it in the provided argument, plot_probe_dict. 
 ### 
 
-plot_probe_dict = UserFunctions.get_probe_dict(
-	# **kwargs
-	true_operator = true_operator, 
-	growth_generator = growth_generation_rule,
-	experimental_data = exp_data,
-	special_probe = special_probe, 
-	num_probes = 1, 
-	noise_level = probe_noise_level, 
-)
+print("Generating probe dict for plotting")
+
+# TODO 
+try:
+	plot_probe_dict = growth_class.plot_probe_generator(
+		true_operator = true_operator, 
+		growth_generator = growth_generation_rule,
+		experimental_data = exp_data,
+		special_probe = special_probe, 
+		num_probes = 1, 
+		noise_level = probe_noise_level, 
+	)
+
+except:
+	raise
+	plot_probe_dict = UserFunctions.get_probe_dict(
+		# **kwargs
+		true_operator = true_operator, 
+		growth_generator = growth_generation_rule,
+		experimental_data = exp_data,
+		special_probe = special_probe, 
+		num_probes = 1, 
+		noise_level = probe_noise_level, 
+	)
+print("Generated probe dict for plotting")
+
 for k in list(plot_probe_dict.keys()):
 	# replace tuple like key returned, with just dimension. 
     plot_probe_dict[k[1]] = plot_probe_dict.pop(k)

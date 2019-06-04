@@ -2,6 +2,7 @@ import sys, os
 sys.path.append(os.path.abspath('..'))
 import DataBase
 import ExpectationValues
+import ProbeGeneration
 
 class GrowthRuleSuper():
     # superclass for growth generation rules
@@ -79,24 +80,29 @@ class GrowthRuleSuper():
         self,
         **kwargs
     ):
-        return True
+        import Heuristics
+        print("[Growth Rules] Default heuristic")
+        heuristic = Heuristics.multiPGH(**kwargs)
+        return heuristic
         
     def probe_generator(
         self,
         **kwargs
     ):
-        return True
-        
+        return ProbeGeneration.separable_probe_dict(
+            max_num_qubits = self.max_num_qubits,
+            **kwargs
+        )
 
-
-class default_growth(GrowthRuleSuper):
-    def __init__(
+    def plot_probe_generator(
         self, 
-        growth_generation_rule, 
         **kwargs
     ):
-        print("[Growth Rules] Default growth rule")
-        super().__init__(
-    		growth_generation_rule = growth_generation_rule,
-        	**kwargs
-    	)
+        return ProbeGeneration.plus_probes_dict(
+            max_num_qubits = self.max_num_qubits,
+            **kwargs
+        )
+
+
+
+
