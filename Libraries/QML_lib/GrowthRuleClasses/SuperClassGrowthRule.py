@@ -71,6 +71,7 @@ class GrowthRuleSuper():
     
     def latex_name(
         self,
+        name, 
         **kwargs
     ):  
         # name: string to be formatted for latex

@@ -12,6 +12,7 @@ import pandas
 import PlotQMD as ptq
 import ModelNames
 import UserFunctions 
+import GrowthRules
 
 #This is a simple test comment
 """
@@ -334,6 +335,24 @@ def average_parameter_estimates(
             except:
                 growth_rules[alph] = growth_generator
 
+    unique_growth_rules = list(set(list(growth_rules.values())))
+    unique_growth_classes = {}
+    for g in unique_growth_rules:
+        try:
+            unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
+                growth_generation_rule = g
+            )
+        except:
+            unique_growth_classes[g] = None
+    growth_classes = {}
+    for g in list(growth_rules.keys()):
+        try:
+            growth_classes[g] = unique_growth_classes[growth_rules[g]]
+        except:
+            growth_classes[g] = None
+    # print("[AnalyseMultiple - param avg] unique_growth_rules:", unique_growth_rules)
+    # print("[AnalyseMultiple - param avg] unique_growth_classes:", unique_growth_classes)
+    # print("[AnalyseMultiple - param avg] growth classes:", growth_classes)
 
     for name in winning_models:
         num_experiments = num_experiments_by_name[name]
@@ -403,10 +422,13 @@ def average_parameter_estimates(
                 col=0
                 row+=1
             # latex_terms[term] = DataBase.latex_name_ising(term)
-            latex_terms[term] = UserFunctions.get_latex_name(
-                name=term,
-                growth_generator = growth_rules[name]
-            )
+            try:
+                latex_terms[term] = growth_classes[name].latex_name(term)
+            except:
+                latex_terms[term] = UserFunctions.get_latex_name(
+                    name=term,
+                    growth_generator = growth_rules[name]
+                )
             averages = np.array( 
                 [ avg_parameters[term][e] for e in epochs  ]
             )
@@ -417,10 +439,13 @@ def average_parameter_estimates(
             try:
                 true_val = true_params_dict[term]
                 # true_term_latex = DataBase.latex_name_ising(term)
-                true_term_latex = UserFunctions.get_latex_name(
-                    name = term,
-                    growth_generator = growth_generator
-                )
+                try:
+                    true_term_latex = growth_classes[name].latex_name(term)
+                except:
+                    true_term_latex = UserFunctions.get_latex_name(
+                        name = term,
+                        growth_generator = growth_generator
+                    )
                 ax.axhline(
                     true_val, 
                     # label=str(true_term_latex+ ' True'), 
@@ -458,10 +483,14 @@ def average_parameter_estimates(
             )
 
             # latex_term = DataBase.latex_name_ising(term)
-            latex_term = UserFunctions.get_latex_name(
-                name = term,
-                growth_generator = growth_rules[name]
-            )
+            try:
+                latex_term = growth_classes[name].latex_name(term)
+            except:
+                # raise
+                latex_term = UserFunctions.get_latex_name(
+                    name = term,
+                    growth_generator = growth_rules[name]
+                )
             # latex_term = latex_terms[term]
             ax.set_title(str(latex_term))
             
@@ -483,10 +512,14 @@ def average_parameter_estimates(
         )    
         """
         
-        latex_name = UserFunctions.get_latex_name(
-            name=name,
-            growth_generator = growth_rules[name]
-        )
+        try:
+            latex_name = growth_classes[name].latex_name(term)
+        except:
+            # raise
+            latex_name = UserFunctions.get_latex_name(
+                name=name,
+                growth_generator = growth_rules[name]
+            )
 
         if save_to_file is not None:
             fig.suptitle(
@@ -587,13 +620,32 @@ def Bayes_t_test(
         if alph not in list(growth_rules.keys()):
             growth_rules[alph] = result['GrowthGenerator']
 
+    unique_growth_rules = list(set(list(growth_rules.values())))
+    unique_growth_classes = {}
+    for g in unique_growth_rules:
+        try:
+            unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
+                growth_generation_rule = g
+            )
+        except:
+            unique_growth_classes[g] = None
+    growth_classes = {}
+    for g in list(growth_rules.keys()):
+        try:
+            growth_classes[g] = unique_growth_classes[growth_rules[g]]
+        except:
+            growth_classes[g] = None
 
-    # expectation_values = {}
-    # for t in list(experimental_measurements.keys()):
-    #     expectation_values[t] = []
-    true_model = UserFunctions.default_true_operators_by_generator[
-        growth_generator
-    ]
+    # print("[BayesTTest - param avg] unique_growth_rules:", unique_growth_rules)
+    # print("[BayesTTest - param avg] unique_growth_classes:", unique_growth_classes)
+    # print("[BayesTTest - param avg] growth classes:", growth_classes)
+    try:
+        true_model = unique_growth_classes[growth_generator].true_operator
+    except:
+        # raise
+        true_model = UserFunctions.default_true_operators_by_generator[
+            growth_generator
+        ]
 
     success_rate_by_term = {}
     nmod = len(winning_models)  
@@ -733,10 +785,15 @@ def Bayes_t_test(
         mean_exp = np.array( [means[t] for t in times] )
         std_dev_exp = np.array( [std_dev[t] for t in times] )
         # name=DataBase.latex_name_ising(term)
-        name=UserFunctions.get_latex_name(
-            name = term,
-            growth_generator = growth_rules[term]
-        )
+
+        try:
+            name = growth_classes[term].latex_name(term)
+        except:
+            name = UserFunctions.get_latex_name(
+                name = term,
+                growth_generator = growth_rules[term]
+            )
+
         description = str(
                 name + 
                 ' (' + str(num_sets_of_this_name)  + ')'
@@ -1046,6 +1103,7 @@ def Bayes_t_test(
 
 def r_sqaured_average(
     results_path, 
+    growth_class, 
     top_number_models=2,
     save_to_file=None
 ):
@@ -1100,10 +1158,14 @@ def r_sqaured_average(
         )
 
         # term = DataBase.latex_name_ising(name)
-        term = UserFunctions.get_latex_name(
-            name = name,
-            growth_generator = growth_generator 
-        )
+        try:
+            term = growth_class.latex_name(name)
+        except:
+            raise
+            term = UserFunctions.get_latex_name(
+                name = name,
+                growth_generator = growth_generator 
+            )
         plot_label = str(term + ' ('+ str(num_wins) + ')')
         colour = colours[ i ]
         ax.plot(
@@ -1133,6 +1195,7 @@ def r_sqaured_average(
 
 def volume_average(
     results_path, 
+    growth_class, 
     top_number_models=2,
     save_to_file=None
 ):
@@ -1187,10 +1250,13 @@ def volume_average(
         )
 
         # term = DataBase.latex_name_ising(name)
-        term = UserFunctions.get_latex_name(
-            name = name,
-            growth_generator = growth_generator 
-        )
+        try:
+            term = growth_class.latex_name(name)
+        except:
+            term = UserFunctions.get_latex_name(
+                name = name,
+                growth_generator = growth_generator 
+            )
         plot_label = str(term + ' ('+ str(num_wins) + ')')
         colour = colours[ i ]
         ax.plot(
@@ -1322,8 +1388,23 @@ def model_scores(directory_name):
 
         if alph not in list(growth_rules.keys()):
             growth_rules[alph] = result['GrowthGenerator']
+    unique_growth_rules = list(set(list(growth_rules.values())))
+    unique_growth_classes = {}
+    for g in unique_growth_rules:
+        try:
+            unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
+                growth_generation_rule = g
+            )
+        except:
+            unique_growth_classes[g] = None
+    growth_classes = {}
+    for g in list(growth_rules.keys()):
+        try:
+            growth_classes[g] = unique_growth_classes[growth_rules[g]]
+        except:
+            growth_classes[g] = None
 
-    return scores, growth_rules
+    return scores, growth_rules, growth_classes, unique_growth_classes
 
 def get_entropy(
     models_points, 
@@ -1366,6 +1447,8 @@ def get_entropy(
 
 def plot_scores(
         scores, 
+        growth_classes, 
+        unique_growth_classes, 
         growth_rules, 
         entropy=None,
         inf_gain=None, 
@@ -1377,19 +1460,27 @@ def plot_scores(
     plt.clf()
     models = list(scores.keys())
 
-    
-    latex_true_op = UserFunctions.get_latex_name(
-            name=true_operator, 
-            growth_generator=growth_generator
-    )   
+    try:
+        latex_true_op = unique_growth_classes.latex_name(name = true_operator)    
+    except:
+        latex_true_op = UserFunctions.get_latex_name(
+                name=true_operator, 
+                growth_generator=growth_generator
+        )   
 
-    latex_model_names = [
-        # DataBase.latex_name_ising(model) for model in models
-        UserFunctions.get_latex_name(
-            name=model, 
-            growth_generator=growth_rules[model]
-        ) for model in models
-    ]
+    try:
+        latex_model_names = [
+            growth_classes[model].latex_name(model)
+            for model in models
+        ]
+    except:
+        # raise
+        latex_model_names = [
+            UserFunctions.get_latex_name(
+                name=model, 
+                growth_generator=growth_rules[model]
+            ) for model in models
+        ]
 
     batch_correct_models = []
     if batch_nearest_num_params_as_winners == True:
@@ -1420,10 +1511,14 @@ def plot_scores(
     colours = ['blue' for i in ind]
     batch_success_rate = correct_success_rate = 0
     for mod in batch_correct_models: 
-        mod_latex = UserFunctions.get_latex_name(
-            name=mod, 
-            growth_generator=growth_rules[mod]
-        ) 
+        try:
+            mod_latex = growth_classes[mod].latex_name(mod)
+        except:
+            raise
+            mod_latex = UserFunctions.get_latex_name(
+                name=mod, 
+                growth_generator=growth_rules[mod]
+            ) 
         mod_idx = latex_model_names.index(mod_latex)
         colours[mod_idx] = 'orange'
         batch_success_rate += mod_scores[mod]
@@ -1444,14 +1539,6 @@ def plot_scores(
         colours[true_idx] = 'green'
 
     except:
-        # print(
-        #     "[plot_scores]",
-        #     "True model", 
-        #     latex_true_op, 
-        #     "not in ", 
-        #     latex_model_names
-        # )
-        # raise
         pass
 
 
@@ -1638,11 +1725,18 @@ true_params_path = arguments.true_params
 exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
-dataset = UserFunctions.get_experimental_dataset(growth_generator)
+true_growth_class = GrowthRules.get_growth_generator_class(growth_generator)
+try:
+    dataset = true_growth_class.experimental_dataset
+    measurement_type = true_growth_class.measurement_type
+except:
+    # raise
+    dataset = UserFunctions.get_experimental_dataset(growth_generator)
+    measurement_type = UserFunctions.get_measurement_type(growth_generator)
 latex_mapping_file = arguments.latex_mapping_file
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
-measurement_type = UserFunctions.get_measurement_type(growth_generator)
+
 
 
 if true_params_path is not None:
@@ -1656,9 +1750,13 @@ if true_params_path is not None:
     true_operator = true_params_info['true_op']
 else:
     true_params_dict = None
-    true_operator = UserFunctions.default_true_operators_by_generator[
-        growth_generator
-    ]
+    try:
+        true_operator = true_growth_class.true_operator
+    except:
+        # raise
+        true_operator = UserFunctions.default_true_operators_by_generator[
+            growth_generator
+        ]
 
 if exp_data is False:
     name = true_params_info['true_op']
@@ -1754,6 +1852,7 @@ Bayes_t_test( # average expected values
 
 r_sqaured_average(
     results_path = results_csv,
+    growth_class = true_growth_class, 
     top_number_models = arguments.top_number_models,
     save_to_file=  str(
         directory_to_analyse + 
@@ -1776,6 +1875,7 @@ ptq.average_quadratic_losses(
 
 volume_average(
     results_path = results_csv,
+    growth_class = true_growth_class, 
     top_number_models = arguments.top_number_models,
     save_to_file=  str(
         directory_to_analyse + 
@@ -1812,28 +1912,29 @@ if qhl_mode==True:
 if further_qhl_mode == False:
     print("FURTHER QHL=FALSE. PLOTTING STUFF")
     plot_file = directory_to_analyse+'model_scores.png'
-    model_scores, growth_rules = model_scores(directory_to_analyse)
+    model_scores, growth_rules, growth_classes, unique_growth_classes = model_scores(directory_to_analyse)
     
-    print("GROWTH RULES:", growth_rules, "\n\n\n")
-    try:
-        entropy = get_entropy(model_scores, 
-            growth_generator = growth_generator, 
-            inf_gain=False
-        )
-        inf_gain = get_entropy(
-            model_scores, 
-            growth_generator  = growth_generator,
-            inf_gain=True
-        )
-    except:
-        entropy = inf_gain = 0.0
+    # print("GROWTH RULES:", growth_rules, "\n\n\n")
+    # try:
+    #     entropy = get_entropy(model_scores, 
+    #         growth_generator = growth_generator, 
+    #         inf_gain=False
+    #     )
+    #     inf_gain = get_entropy(
+    #         model_scores, 
+    #         growth_generator  = growth_generator,
+    #         inf_gain=True
+    #     )
+    # except:
+    #     entropy = inf_gain = 0.0
+    entropy = inf_gain = 0.0
     plot_scores(
         scores = model_scores,
-        entropy = entropy,
+        growth_classes = growth_classes, 
+        unique_growth_classes = unique_growth_classes, 
+        growth_rules = growth_rules, 
         true_operator = true_operator, 
         growth_generator = growth_generator,
-        growth_rules = growth_rules, 
-        inf_gain = inf_gain, 
         save_file = plot_file
     )
     try:
