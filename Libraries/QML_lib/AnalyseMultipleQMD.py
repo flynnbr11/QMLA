@@ -1,6 +1,7 @@
 import sys, os
 import pickle
 import matplotlib.pyplot as plt
+import pandas
 plt.switch_backend('agg')
 from matplotlib.lines import Line2D
 
@@ -8,7 +9,6 @@ import argparse
 import numpy as np
 
 import DataBase
-import pandas
 import PlotQMD as ptq
 import ModelNames
 import UserFunctions 
@@ -16,39 +16,6 @@ import GrowthRules
 
 global test_growth_class_implementation
 test_growth_class_implementation = True
-
-#This is a simple test comment
-"""
-def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
-    import os, csv
-    if not directory_name.endswith('/'):
-        directory_name += '/'
-
-    if not csv_name.endswith('.csv'):
-        csv_name += '.csv'
-        
-    pickled_files = []
-    for file in os.listdir(directory_name):
-        if file.endswith(".p") and file.startswith("results"):
-            pickled_files.append(file)
-
-    filenames = [directory_name+str(f) for f in pickled_files ]
-    some_results = pickle.load(open(filenames[0], "rb"))
-    result_fields = list(some_results.keys())
-    
-    
-#    results_csv = str(directory_name+str(csv_name))
-    results_csv = str(csv_name)
-
-    
-    with open(results_csv, 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=result_fields)
-        writer.writeheader()
-
-        for f in filenames:
-            results = pickle.load(open(f, "rb"))
-            writer.writerow(results)
-"""
 
 def parameter_sweep_analysis(
     directory_name, 
@@ -1474,8 +1441,8 @@ def plot_scores(
     except:
         if test_growth_class_implementation == True: raise
         latex_true_op = UserFunctions.get_latex_name(
-                name=true_operator, 
-                growth_generator=growth_generator
+            name=true_operator, 
+            growth_generator=growth_generator
         )   
 
     try:

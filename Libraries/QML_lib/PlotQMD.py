@@ -2202,6 +2202,10 @@ def colour_dicts_from_win_count(
     growth_generator=None,
     min_colour_value=0.1
 ):
+    growth_class = GrowthRules.get_growth_generator_class(
+        growth_generation_rule = growth_generator
+    )
+
     max_wins=max(list(winning_count.values()))
     min_wins=min(list(winning_count.values()))
     min_col = min_colour_value
@@ -2214,12 +2218,19 @@ def colour_dicts_from_win_count(
     col_space = np.linspace(min_col, max_col, num_colours)
     colour_by_win_count = {}
     colour_by_node_name = {}
-    all_models = list(
-        UserFunctions.get_name_branch_map(
+    
+    try:
+        all_models = growth_class.name_branch_map(
             latex_mapping_file = latex_mapping_file,
-            growth_generator = growth_generator
         ).keys()
-    )
+    except:
+        if test_growth_class_implementation == True: raise
+        all_models = list(
+            UserFunctions.get_name_branch_map(
+                latex_mapping_file = latex_mapping_file,
+                growth_generator = growth_generator
+            ).keys()
+        )
 
 
 
@@ -2264,11 +2275,20 @@ def cumulativeQMDTreePlot(
     elif avg=='medians':
         bayes_factors = medians
 
-    print("[cumulative Tree] entering model map func")
-    term_branches = UserFunctions.get_name_branch_map(
-        latex_mapping_file = latex_mapping_file,
-        growth_generator = growth_generator
+    growth_class = GrowthRules.get_growth_generator_class(
+        growth_generation_rule = growth_generator
     )
+
+    try:
+        term_branches = growth_class.name_branch_map(
+            latex_mapping_file = latex_mapping_file,
+        )
+    except:
+        if test_growth_class_implementation == True: raise
+        term_branches = UserFunctions.get_name_branch_map(
+            latex_mapping_file = latex_mapping_file,
+            growth_generator = growth_generator
+        )
 
     modlist = csv.DictReader(open(cumulative_csv)).fieldnames
     if 'ModelName' in modlist:

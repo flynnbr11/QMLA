@@ -199,12 +199,6 @@ class nv_spin_experiment_full_tree(GrowthRuleSuper):
         **kwargs
     ):      
         # print("[Growth Rules - NV] Expectation Values")
-        # print("[Growth Rules] Expectation Values\n ham {} \n t {} \n state {} ".format(
-        #     ham, 
-        #     t, 
-        #     state
-        #     )
-        # ) 
         exp_val = ExpectationValues.n_qubit_hahn_evolution(
             ham = ham, 
             t = t, 

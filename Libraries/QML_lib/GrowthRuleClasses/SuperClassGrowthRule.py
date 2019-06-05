@@ -67,11 +67,16 @@ class GrowthRuleSuper():
             return False
         return True
 
-    def branch_index(
+    def name_branch_map(
         self,
+        latex_mapping_file, 
         **kwargs
     ):
-        return True
+        return ModelNames.branch_is_num_params(
+            latex_mapping_file = latex_mapping_file,
+            **kwargs
+        )
+
     
     def latex_name(
         self,
