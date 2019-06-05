@@ -9,6 +9,9 @@ import NV_centre_experiment_growth_rules
 import NV_centre_full_access
 import NV_centre_large_spin_bath
 import NV_centre_experiment_without_transverse_terms
+import Reduced_NV_experiment
+import IsingChain
+import Hubbard
 
 
 growth_classes = {
@@ -24,6 +27,12 @@ growth_classes = {
         NV_centre_full_access.NVCentreSpinFullAccess,
     'NV_centre_spin_large_bath' : 
         NV_centre_large_spin_bath.NVCentreLargeSpinBath,
+    'reduced_nv_experiment' : 
+        Reduced_NV_experiment.reducedNVExperiment,
+    'ising_1d_chain' : 
+        IsingChain.isingChain,
+    'hubbard_square_lattice_generalised' : 
+        Hubbard.hubbardSquare
 }
 
 
@@ -38,7 +47,7 @@ def get_growth_generator_class(
             **kwargs
         )
     except:
-        print("{} growth class not found.".format(growth_generation_rule))
+        # print("{} growth class not found.".format(growth_generation_rule))
         # raise
         gr = None
 

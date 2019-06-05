@@ -16,4 +16,10 @@ class NVCentreSpinExperimentalMethodWithoutTransvereTerms(
         )
         self.max_num_parameter_estimate = 6
         self.max_spawn_depth = 5
+        self.max_num_models_by_shape = {
+            1 : 0,
+            2 : 12,
+            'other' : 0
+        }
+
 

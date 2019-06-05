@@ -60,7 +60,6 @@ class GrowthRuleSuper():
         spawn_step, 
         **kwargs
     ):
-        print("[default growth class] checking tree completed")
         if spawn_step == self.max_spawn_depth:
             print("[default growth class] MAX SPAWN DEPTH REACHED FOR RULE ", self.growth_generation_rule)
             return True 

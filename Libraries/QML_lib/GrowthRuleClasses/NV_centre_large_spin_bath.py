@@ -19,7 +19,6 @@ class NVCentreLargeSpinBath(
         growth_generation_rule, 
         **kwargs
     ):
-        # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule = growth_generation_rule,
             **kwargs
@@ -44,7 +43,6 @@ class NVCentreLargeSpinBath(
 
         self.max_num_models_by_shape = {
             1 : 0,
-            2 : 18, 
             'other' : 1
         }
 
