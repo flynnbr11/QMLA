@@ -33,6 +33,10 @@ print_mem_status = True
 global_print_loc = False
 
 
+global test_growth_class_implementation
+test_growth_class_implementation = True
+
+
 """
 In this file are class definitions:
     - ModelLearningClass
@@ -213,6 +217,7 @@ class ModelLearningClass():
         try:
             max_num_params = self.GrowthClass.max_num_parameter_estimate
         except:
+            if test_growth_class_implementation == True: raise
             max_num_params = UserFunctions.max_num_parameter_estimate[
                 self.GrowthGenerator
             ]
@@ -267,6 +272,7 @@ class ModelLearningClass():
                 name = self.Nameame
             )
         except:
+            if test_growth_class_implementation == True: raise
             self.LatexTerm = UserFunctions.get_latex_name(
                 name = self.Name,
                 growth_generator = self.GrowthGenerator
@@ -405,6 +411,7 @@ class ModelLearningClass():
                     name = term
                 )
             except:
+                if test_growth_class_implementation == True: raise
                 lt = UserFunctions.get_latex_name(
                     name = term, 
                     growth_generator = self.GrowthGenerator
@@ -488,7 +495,7 @@ class ModelLearningClass():
                 num_experiments = self.NumExperiments,
             )
         except:
-            raise
+            if test_growth_class_implementation == True: raise
             self.Heuristic = UserFunctions.get_heuristic(
                 growth_generator = self.GrowthGenerator,
                 updater = self.Updater, 
@@ -1139,6 +1146,7 @@ class reducedModel():
                 name = self.Name
             )
         except:
+            if test_growth_class_implementation == True: raise
             self.LatexTerm = UserFunctions.get_latex_name(
                 name = self.Name,
                 growth_generator = self.GrowthGenerator
@@ -1216,6 +1224,7 @@ class reducedModel():
                     state = probe
                 )
             except:
+                if test_growth_class_implementation == True: raise
                 self.expectation_values[t] = UserFunctions.expectation_value_wrapper(
                     method=self.MeasurementType,
                     ham = self.LearnedHamiltonian, 
@@ -1294,6 +1303,7 @@ class reducedModel():
                         state=probe
                     )
                 except:
+                    if test_growth_class_implementation == True: raise
                     sim = UserFunctions.expectation_value_wrapper(
                         method=self.MeasurementType,
                         ham=ham, 
@@ -1395,6 +1405,7 @@ class reducedModel():
                     state=probe
                     )
                 except:
+                    if test_growth_class_implementation == True: raise
                     sim = UserFunctions.expectation_value_wrapper(
                         method=self.MeasurementType,
                         ham=ham, 

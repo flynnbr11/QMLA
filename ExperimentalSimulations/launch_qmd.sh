@@ -6,12 +6,12 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=2
+num_tests=1
 qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -82,8 +82,8 @@ git_commit=$(git rev-parse HEAD)
 
 # sim_growth_rule='test_changes_to_qmd'
 # sim_growth_rule='two_qubit_ising_rotation_hyperfine'
-# sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-sim_growth_rule='NV_centre_spin_large_bath'
+sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# sim_growth_rule='NV_centre_spin_large_bath'
 # sim_growth_rule='NV_spin_full_access'
 # sim_growth_rule='non_interacting_ising'
 # sim_growth_rule='non_interacting_ising_single_axis'
@@ -152,6 +152,9 @@ store_prt_wt=0 # store all particles and weights after learning
 rand_prior=0
 special_probe='random' #'plus' #'ideal'
 special_probe_plot='plus' #'random'
+# special_probe_plot='random' #'random'
+# special_probe_plot='zero' #'random'
+
 # special_probe='plus_random' #'plus' #'ideal'
 
 if (( "$exp_data" == 1))  

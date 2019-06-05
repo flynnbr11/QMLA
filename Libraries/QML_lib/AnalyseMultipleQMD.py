@@ -14,6 +14,9 @@ import ModelNames
 import UserFunctions 
 import GrowthRules
 
+global test_growth_class_implementation
+test_growth_class_implementation = True
+
 #This is a simple test comment
 """
 def summariseResultsCSV(directory_name, csv_name='all_results.csv'):
@@ -425,6 +428,7 @@ def average_parameter_estimates(
             try:
                 latex_terms[term] = growth_classes[name].latex_name(term)
             except:
+                if test_growth_class_implementation == True: raise
                 latex_terms[term] = UserFunctions.get_latex_name(
                     name=term,
                     growth_generator = growth_rules[name]
@@ -442,6 +446,7 @@ def average_parameter_estimates(
                 try:
                     true_term_latex = growth_classes[name].latex_name(term)
                 except:
+                    if test_growth_class_implementation == True: raise
                     true_term_latex = UserFunctions.get_latex_name(
                         name = term,
                         growth_generator = growth_generator
@@ -486,7 +491,7 @@ def average_parameter_estimates(
             try:
                 latex_term = growth_classes[name].latex_name(term)
             except:
-                # raise
+                if test_growth_class_implementation == True: raise
                 latex_term = UserFunctions.get_latex_name(
                     name = term,
                     growth_generator = growth_rules[name]
@@ -515,7 +520,7 @@ def average_parameter_estimates(
         try:
             latex_name = growth_classes[name].latex_name(term)
         except:
-            # raise
+            if test_growth_class_implementation == True: raise
             latex_name = UserFunctions.get_latex_name(
                 name=name,
                 growth_generator = growth_rules[name]
@@ -642,7 +647,7 @@ def Bayes_t_test(
     try:
         true_model = unique_growth_classes[growth_generator].true_operator
     except:
-        # raise
+        if test_growth_class_implementation == True: raise
         true_model = UserFunctions.default_true_operators_by_generator[
             growth_generator
         ]
@@ -789,6 +794,7 @@ def Bayes_t_test(
         try:
             name = growth_classes[term].latex_name(term)
         except:
+            if test_growth_class_implementation == True: raise
             name = UserFunctions.get_latex_name(
                 name = term,
                 growth_generator = growth_rules[term]
@@ -1161,7 +1167,7 @@ def r_sqaured_average(
         try:
             term = growth_class.latex_name(name)
         except:
-            raise
+            if test_growth_class_implementation == True: raise
             term = UserFunctions.get_latex_name(
                 name = name,
                 growth_generator = growth_generator 
@@ -1253,6 +1259,7 @@ def volume_average(
         try:
             term = growth_class.latex_name(name)
         except:
+            if test_growth_class_implementation == True: raise
             term = UserFunctions.get_latex_name(
                 name = name,
                 growth_generator = growth_generator 
@@ -1363,7 +1370,7 @@ def all_times_learned_histogram(
 
 
         
-def model_scores(directory_name):
+def get_model_scores(directory_name):
 #    sys.path.append(directory_name)
 
     os.chdir(directory_name)
@@ -1463,6 +1470,7 @@ def plot_scores(
     try:
         latex_true_op = unique_growth_classes.latex_name(name = true_operator)    
     except:
+        if test_growth_class_implementation == True: raise
         latex_true_op = UserFunctions.get_latex_name(
                 name=true_operator, 
                 growth_generator=growth_generator
@@ -1474,7 +1482,7 @@ def plot_scores(
             for model in models
         ]
     except:
-        # raise
+        if test_growth_class_implementation == True: raise
         latex_model_names = [
             UserFunctions.get_latex_name(
                 name=model, 
@@ -1514,7 +1522,7 @@ def plot_scores(
         try:
             mod_latex = growth_classes[mod].latex_name(mod)
         except:
-            raise
+            if test_growth_class_implementation == True: raise
             mod_latex = UserFunctions.get_latex_name(
                 name=mod, 
                 growth_generator=growth_rules[mod]
@@ -1730,7 +1738,7 @@ try:
     dataset = true_growth_class.experimental_dataset
     measurement_type = true_growth_class.measurement_type
 except:
-    # raise
+    if test_growth_class_implementation == True: raise
     dataset = UserFunctions.get_experimental_dataset(growth_generator)
     measurement_type = UserFunctions.get_measurement_type(growth_generator)
 latex_mapping_file = arguments.latex_mapping_file
@@ -1753,7 +1761,7 @@ else:
     try:
         true_operator = true_growth_class.true_operator
     except:
-        # raise
+        if test_growth_class_implementation == True: raise
         true_operator = UserFunctions.default_true_operators_by_generator[
             growth_generator
         ]
@@ -1818,6 +1826,11 @@ except:
     # for compatability with old versions
     pass
 
+# first get model scores
+
+model_scores, growth_rules, growth_classes, unique_growth_classes = get_model_scores(directory_to_analyse)
+
+
 average_parameter_estimates(
     directory_name = directory_to_analyse, 
     results_path = results_csv, 
@@ -1863,6 +1876,7 @@ r_sqaured_average(
 
 ptq.average_quadratic_losses(
     results_path = results_csv, 
+    growth_classes = unique_growth_classes, 
     growth_generator = growth_generator, 
     top_number_models = arguments.top_number_models,
     save_to_file=  str(
@@ -1912,7 +1926,7 @@ if qhl_mode==True:
 if further_qhl_mode == False:
     print("FURTHER QHL=FALSE. PLOTTING STUFF")
     plot_file = directory_to_analyse+'model_scores.png'
-    model_scores, growth_rules, growth_classes, unique_growth_classes = model_scores(directory_to_analyse)
+    # model_scores, growth_rules, growth_classes, unique_growth_classes = model_scores(directory_to_analyse)
     
     # print("GROWTH RULES:", growth_rules, "\n\n\n")
     # try:

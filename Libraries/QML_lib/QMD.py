@@ -23,7 +23,6 @@ import redis
 import RedisSettings as rds
 
 # Local files
-# import Evo as evo
 import DataBase 
 import QML
 import ModelGeneration
@@ -34,7 +33,11 @@ from RemoteBayesFactor import *
 import ExpectationValues
 import UserFunctions
 import GrowthRules
-# Class definition
+
+global test_growth_class_implementation
+test_growth_class_implementation = True
+
+
 
 def time_seconds():
     import datetime
@@ -273,8 +276,8 @@ class QMD():
 
                     )
                 except:
+                    if test_growth_class_implementation == True: raise
                     self.ExperimentalMeasurements[t] = (
-                        # ExpectationValues.traced_expectation_value_project_one_qubit_plus(
                         UserFunctions.expectation_value_wrapper(
                             method=self.MeasurementType,
                             ham = self.TrueHamiltonian,
@@ -341,6 +344,8 @@ class QMD():
         self.BranchPrecomputedModels = {}
         self.BranchModelIds = {}
         self.BranchGrowthRules = {}
+        self.UniqueGrowthClasses = {} # to save making many instances
+        self.BranchGrowthClasses = {}
         self.SpawnDepthByGrowthRule = {}
         self.TreesCompleted = {}
         self.InitialOpsAllBranches = []
@@ -365,7 +370,7 @@ class QMD():
                 self.TreesCompleted[gen] = growth_class_gen.tree_completed_initially
                 self.GeneratorInitialModels[gen] = growth_class_gen.initial_models
             except:
-                raise
+                if test_growth_class_implementation == True: raise
                 self.TreesCompleted[gen] = UserFunctions.get_tree_completed_initial_value(
                     growth_generator = gen
                 )
@@ -430,6 +435,8 @@ class QMD():
             self.SpawnStage[gen] = [None]
             self.MiscellaneousGrowthInfo[gen] = {}
             self.BranchGrowthRules[i] = gen
+            self.BranchGrowthClasses[i] = growth_class_gen
+            self.UniqueGrowthClasses[gen] = growth_class_gen
 
         # self.HighestBranchID = max(self.InitialModelBranches.values())
         self.HighestModelID = max(self.InitialModelIDs.values())+1 # to ensure everywhere we use range(qmd.HighestModelID) goes to the right number
@@ -742,6 +749,7 @@ class QMD():
         self.BranchAllModelsLearned[branchID] = False
         self.BranchComparisonsComplete[branchID] = False
         self.BranchGrowthRules[branchID] = growth_rule
+        self.BranchGrowthClasses[branchID] = self.UniqueGrowthClasses[growth_rule]
 
         self.log_print(
             [
@@ -2368,6 +2376,7 @@ class QMD():
                 miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
             )
         except:
+            if test_growth_class_implementation == True: raise
             new_models = UserFunctions.new_model_generator(
             # generator=self.GrowthGenerator,
                 generator = growth_rule, 
@@ -2432,6 +2441,7 @@ class QMD():
                 current_num_qubits = new_model_dimension
             )
         except:
+            if test_growth_class_implementation == True: raise
             tree_completed = UserFunctions.tree_finished(
                 # generator =self.GrowthGenerator,
                 # spawn_step = self.SpawnDepth,

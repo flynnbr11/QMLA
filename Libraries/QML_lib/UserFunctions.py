@@ -83,14 +83,14 @@ default_true_operators_by_generator = {
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d2PPnv_interaction_x_d2',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2',
-    # 'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3',
+    'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4PPPPnv_interaction_x_d4PPPPnv_interaction_y_d4PPPPnv_interaction_z_d4',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d5PPPPPnv_spin_y_d5PPPPPnv_spin_z_d5PPPPPnv_interaction_x_d5PPPPPnv_interaction_y_d5PPPPPnv_interaction_z_d5',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d6PPPPPPnv_interaction_z_d6',
     # 'NV_centre_spin_large_bath' : 'nv_spin_x_d10PPPPPPPPPPnv_interaction_x_d10PPPPPPPPPPnv_spin_y_d10PPPPPPPPPPnv_interaction_y_d10PPPPPPPPPPnv_spin_z_d10PPPPPPPPPPnv_interaction_z_d10',
-    'NV_centre_spin_large_bath' : 'nv_spin_x_d9PPPPPPPPPnv_interaction_x_d9PPPPPPPPPnv_spin_y_d9PPPPPPPPPnv_interaction_y_d9PPPPPPPPPnv_spin_z_d9PPPPPPPPPnv_interaction_z_d9',
+    # 'NV_centre_spin_large_bath' : 'nv_spin_x_d9PPPPPPPPPnv_interaction_x_d9PPPPPPPPPnv_spin_y_d9PPPPPPPPPnv_interaction_y_d9PPPPPPPPPnv_spin_z_d9PPPPPPPPPnv_interaction_z_d9',
     # 'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
     'NV_spin_full_access' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 
     'reduced_nv_experiment' : 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz' ,
@@ -686,6 +686,8 @@ special_probe_functions = {
 		ProbeGeneration.NV_centre_ising_probes_plus,
 	'ideal' : 
 		ProbeGeneration.ideal_probe_dict,
+    'zero' : 
+        ProbeGeneration.zero_state_probes, 
 }
 
 ##### ---------- -------------------- #####  

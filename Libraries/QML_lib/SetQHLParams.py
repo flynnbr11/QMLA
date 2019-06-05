@@ -10,6 +10,8 @@ import  GrowthRules
 import os
 import matplotlib.pyplot as plt
 pickle.HIGHEST_PROTOCOL=2
+global test_growth_class_implementation
+test_growth_class_implementation = True
 
 
 def MIN_PARAM():
@@ -127,7 +129,7 @@ def create_plot_probe(
 			**kwargs
 		)
 	except:
-		raise
+		if test_growth_class_implementation == True: raise
 		plot_probe_dict = UserFunctions.get_probe_dict(
 			**kwargs
 		)
@@ -176,6 +178,7 @@ def create_qhl_params(
 			name = true_op, 
 		)
 	except:
+		if test_growth_class_implementation == True: raise
 		latex_terms = []
 		for term in terms:
 			lt = UserFunctions.get_latex_name(
@@ -538,6 +541,7 @@ growth_class = GrowthRules.get_growth_generator_class(
 try:
 	true_operator = growth_class.true_operator
 except:
+	if test_growth_class_implementation == True: raise
 	true_operator = UserFunctions.default_true_operators_by_generator[
 		growth_generation_rule
 	]
@@ -627,7 +631,7 @@ try:
 	)
 
 except:
-	raise
+	if test_growth_class_implementation == True: raise
 	plot_probe_dict = UserFunctions.get_probe_dict(
 		# **kwargs
 		true_operator = true_operator, 

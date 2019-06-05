@@ -184,7 +184,7 @@ try:
     initial_op_list = growth_class.initial_models
     print("[Exp] Retrieved initial op list from growth class")
 except:
-    raise
+    # raise
     initial_op_list  = UserFunctions.get_initial_op_list(
         growth_generator = global_variables.growth_generation_rule,
         log_file = global_variables.log_file

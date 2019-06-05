@@ -31,6 +31,10 @@ class GrowthRuleSuper():
                 2 : 1,
                 'other' : 0
         }
+
+        # TODO set true params for simulation here
+        # self.true_params = {
+        # }
        
     def generate_models(
         self, 

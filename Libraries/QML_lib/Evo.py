@@ -15,6 +15,9 @@ sys.path.append((os.path.join("..")))
 global_print_loc = False 
 use_linalg = False
 use_sparse = False 
+
+global test_growth_class_implementation
+test_growth_class_implementation = True
  
 try: 
     import hamiltonian_exponentiation as h
@@ -172,7 +175,7 @@ def get_pr0_array_qle(
                         log_identifier = log_identifier
                     )
                 except:         
-                    raise       
+                    if test_growth_class_implementation == True: raise
                     likel = UserFunctions.expectation_value_wrapper(
                     # output[evoId][tId] = ExpectationValues.expectation_value_wrapper(
                         method=measurement_type,

@@ -24,7 +24,7 @@ def get_growth_generator_class(
     growth_generation_rule,
     **kwargs
 ):
-    print("Trying to find growth class for ", growth_generation_rule)
+    # print("Trying to find growth class for ", growth_generation_rule)
     try:
         gr = growth_classes[growth_generation_rule](
             growth_generation_rule = growth_generation_rule, 
@@ -32,7 +32,7 @@ def get_growth_generator_class(
         )
     except:
         print("{} growth class not found.".format(growth_generation_rule))
-        raise
+        # raise
         gr = None
     return gr
 

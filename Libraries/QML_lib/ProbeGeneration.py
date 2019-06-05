@@ -305,6 +305,17 @@ def plus_probes_dict(
             probe_dict[(j,i)] = noisy_probe
     return probe_dict 
 
+def zero_state_probes(max_num_qubits=9, **kwargs):
+    zero = np.array([1+0j, 0])
+    probes = {}
+    
+    for q in range(1, 1+max_num_qubits):
+        state = zero
+        for i in range(q-1):
+            state = np.tensordot(state, zero, axes=0).flatten('c')
+        probes[(0, q)] = state
+
+    return probes
 
 def ideal_probe_dict(
     true_operator, 
