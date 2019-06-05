@@ -1334,8 +1334,6 @@ def average_quadratic_losses(
         4 : 0.1,
     }
 
-    print("[plotQMD - average_quadratic_losses] growth_classes:", growth_classes)
-
     all_winning_models = list(results.loc[:, 'NameAlphabetical'])
     rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
     # from https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency

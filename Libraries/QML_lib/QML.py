@@ -269,7 +269,7 @@ class ModelLearningClass():
 
         try:
             self.LatexTerm = self.GrowthClass.latex_name(
-                name = self.Nameame
+                name = self.Name
             )
         except:
             if test_growth_class_implementation == True: raise

@@ -1467,8 +1467,10 @@ def plot_scores(
     plt.clf()
     models = list(scores.keys())
 
+    # print("[AnalyseMultiple - plot_scores] growth classes:",growth_classes )
+    # print("[AnalyseMultiple - plot_scores] unique_growth_classes:",unique_growth_classes )
     try:
-        latex_true_op = unique_growth_classes.latex_name(name = true_operator)    
+        latex_true_op = unique_growth_classes[growth_generator].latex_name(name = true_operator)    
     except:
         if test_growth_class_implementation == True: raise
         latex_true_op = UserFunctions.get_latex_name(
