@@ -31,7 +31,7 @@ def get_growth_generator_class(
             **kwargs
         )
     except:
-        print("Not found.")
+        print("{} growth class not found.".format(growth_generation_rule))
         raise
         gr = None
     return gr

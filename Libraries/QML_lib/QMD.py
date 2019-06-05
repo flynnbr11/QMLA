@@ -33,6 +33,7 @@ from RemoteModelLearning import *
 from RemoteBayesFactor import * 
 import ExpectationValues
 import UserFunctions
+import GrowthRules
 # Class definition
 
 def time_seconds():
@@ -72,8 +73,9 @@ class QMD():
     """
     def __init__(self,
         global_variables,
-        generator_initial_models, 
+        # generator_initial_models, 
         initial_op_list=['x'],
+        generator_list=[], 
         true_operator='x',
         # true_param_list = None,
         use_time_dep_true_model = False,
@@ -103,7 +105,7 @@ class QMD():
         **kwargs
     ):
         self.GlobalVariables = global_variables
-        self.GrowthClass = self.GlobalVariables.growth_generator_class
+        self.GrowthClass = self.GlobalVariables.growth_class
         qhl_test = self.GlobalVariables.qhl_test
 
         self.StartingTime = time.time()
@@ -119,7 +121,11 @@ class QMD():
         # trueOp = self.GlobalVariables.true_operator_class
         self.TrueOpName = self.GlobalVariables.true_op_name
         self.TrueOpDim = DataBase.get_num_qubits(self.TrueOpName)
+        # TODO  self.InitialOpList isn't needed but is called a few times. Remove.
+        # it is replaced by loop over generator list
+
         self.InitialOpList = initial_op_list
+        print("[QMD] self.InitialOpList:", self.InitialOpList)
 
         base_num_qubits = 3
         base_num_terms = 3
@@ -267,7 +273,6 @@ class QMD():
 
                     )
                 except:
-                    raise
                     self.ExperimentalMeasurements[t] = (
                         # ExpectationValues.traced_expectation_value_project_one_qubit_plus(
                         UserFunctions.expectation_value_wrapper(
@@ -297,8 +302,10 @@ class QMD():
 
         # Growth rule setup
         self.BranchParents = {}
-        self.GeneratorInitialModels = generator_initial_models # TODO get from class
-        self.GeneratorList = list(self.GeneratorInitialModels.keys())
+        # self.GeneratorInitialModels = generator_initial_models # TODO get from class
+        # self.GeneratorList = list(self.GeneratorInitialModels.keys())
+        self.GeneratorInitialModels = {}
+        self.GeneratorList = generator_list
         self.GrowthGenerator = self.GlobalVariables.growth_generation_rule
         self.SpawnDepth = 0
         self.TreeIdentifiers = [self.GrowthGenerator]
@@ -350,13 +357,23 @@ class QMD():
             # to match this newly created branch with corresponding dicts filled here
             
             gen = self.GeneratorList[i]
+            growth_class_gen = GrowthRules.get_growth_generator_class(
+                gen
+            )
             # self.TreesCompleted[gen] = False
             try:
-                self.TreesCompleted[gen] = self.GrowthClass.tree_completed_initially
+                self.TreesCompleted[gen] = growth_class_gen.tree_completed_initially
+                self.GeneratorInitialModels[gen] = growth_class_gen.initial_models
             except:
+                raise
                 self.TreesCompleted[gen] = UserFunctions.get_tree_completed_initial_value(
                     growth_generator = gen
                 )
+                self.GeneratorInitialModels[gen] = UserFunctions.get_initial_op_list(
+                    growth_generator = gen, 
+                    log_file = self.log_file
+                )
+
             self.BranchChampsByNumQubits[gen] = {}
             initial_models_this_gen = self.GeneratorInitialModels[gen]
             self.InitialOpsAllBranches.extend(initial_models_this_gen)

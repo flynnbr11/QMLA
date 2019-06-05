@@ -198,6 +198,7 @@ class nv_spin_experiment_full_tree(GrowthRuleSuper):
         state,
         **kwargs
     ):      
+        # print("[Growth Rules - NV] Expectation Values")
         # print("[Growth Rules] Expectation Values\n ham {} \n t {} \n state {} ".format(
         #     ham, 
         #     t, 
@@ -220,11 +221,10 @@ class nv_spin_experiment_full_tree(GrowthRuleSuper):
         import ProbeGeneration
         # TODO class for simulation which inherits from this class
         # but generates random probes
-        print("[Growth Rules] probe generation") 
+        print("[Growth Rules - NV] probe generation") 
         return ProbeGeneration.NV_centre_ising_probes_plus(
             max_num_qubits = self.max_num_qubits,
             **kwargs
         )
-
 
 

@@ -19,6 +19,8 @@ sys.path.append(os.path.join("..", "Libraries","QML_lib"))
 ## Parse input variables to use in QMD; store in class global_variables. 
 import GlobalVariables
 global_variables = GlobalVariables.parse_cmd_line_args(sys.argv[1:])
+growth_class = global_variables.growth_class
+
 
 import RedisSettings as rds
 import Evo as evo
@@ -79,16 +81,30 @@ qle = global_variables.do_qle # True for QLE, False for IQLE
 # using 40 probes for training - randomly generated
 # num_probes = 40
 
-generated_probe_dict = UserFunctions.get_probe_dict(
-    experimental_data = global_variables.use_experimental_data, 
-    growth_generator = global_variables.growth_generation_rule, 
-    special_probe = global_variables.special_probe, 
-    noise_level = global_variables.probe_noise_level,
-    minimum_tolerable_noise = 0.0,
-    # noise_level = 0.0,
-    # minimum_tolerable_noise = 1e-7, # to match dec_14/09_55 run # TODO remove!!!
-    num_probes = global_variables.num_probes
-)
+try:
+    generated_probe_dict = growth_class.probe_generator(
+        experimental_data = global_variables.use_experimental_data, 
+        # growth_generator = global_variables.growth_generation_rule, 
+        special_probe = global_variables.special_probe, 
+        noise_level = global_variables.probe_noise_level,
+        minimum_tolerable_noise = 0.0,
+        # noise_level = 0.0,
+        # minimum_tolerable_noise = 1e-7, # to match dec_14/09_55 run # TODO remove!!!
+        num_probes = global_variables.num_probes
+    )
+    print("Generated probe dict from growth class")
+except:
+    generated_probe_dict = UserFunctions.get_probe_dict(
+        experimental_data = global_variables.use_experimental_data, 
+        growth_generator = global_variables.growth_generation_rule, 
+        special_probe = global_variables.special_probe, 
+        noise_level = global_variables.probe_noise_level,
+        minimum_tolerable_noise = 0.0,
+        # noise_level = 0.0,
+        # minimum_tolerable_noise = 1e-7, # to match dec_14/09_55 run # TODO remove!!!
+        num_probes = global_variables.num_probes
+    )
+    print("Generated probe dict user functions")
 
 probes_dir = str(
     global_variables.results_directory
@@ -163,63 +179,57 @@ if global_variables.use_experimental_data==True:
         list(experimental_measurements_dict.keys())
     )    
 
-initial_op_list  = UserFunctions.get_initial_op_list(
-    growth_generator = global_variables.growth_generation_rule,
-    log_file = global_variables.log_file
-)
 
-if (
-    global_variables.use_experimental_data == False
-    and 
-    global_variables.growth_generation_rule  \
-        in UserFunctions.fixed_axis_generators
-):
-    paulis = ['x', 'y', 'z']
-    new_initial_ops = []
-    count_paulis = 0 
-    for p in paulis:
-        if p in global_variables.true_operator:
-            core_pauli = p
-            for init_op in initial_op_list:
-                if core_pauli in init_op:
-                    new_initial_ops.append(init_op)
+try:
+    initial_op_list = growth_class.initial_models
+    print("[Exp] Retrieved initial op list from growth class")
+except:
+    raise
+    initial_op_list  = UserFunctions.get_initial_op_list(
+        growth_generator = global_variables.growth_generation_rule,
+        log_file = global_variables.log_file
+    )
+    print("[Exp] Retrieved initial op list from user functions")
+print("[Exp] initial models:", initial_op_list)
 
-    if len(new_initial_ops) > 1:
-        print(
-            "For growth rule ", 
-            global_variables.growth_generation_rule, 
-            "true operator", global_variables.true_opeator, 
-            "not valid"
-        )
-        sys.exit()
+# TODO fixed axes stuff should be done within growth rule; 
+# this block doesn't seem to do anything since initial_op_list is not used by QMD
+# if (
+#     global_variables.use_experimental_data == False
+#     and 
+#     global_variables.growth_generation_rule  \
+#         in UserFunctions.fixed_axis_generators
+# ):
+#     paulis = ['x', 'y', 'z']
+#     new_initial_ops = []
+#     count_paulis = 0 
+#     for p in paulis:
+#         if p in global_variables.true_operator:
+#             core_pauli = p
+#             for init_op in initial_op_list:
+#                 if core_pauli in init_op:
+#                     new_initial_ops.append(init_op)
 
-    else:
-        initial_op_list = new_initial_ops
+#     if len(new_initial_ops) > 1:
+#         print(
+#             "For growth rule ", 
+#             global_variables.growth_generation_rule, 
+#             "true operator", global_variables.true_opeator, 
+#             "not valid"
+#         )
+#         sys.exit()
+
+#     else:
+#         initial_op_list = new_initial_ops
 
 
 
-# true_params_info = pickle.load(
-#     open(
-#         global_variables.true_params_pickle_file,
-#         'rb'
-#     )
-# )
-# true_op = true_params_info['true_op']
-# true_params = true_params_info['params_list']
 true_op = global_variables.true_operator
 true_params = global_variables.true_params
-# true_op = global_variables.true_operator
-
-# true_op = UserFunctions.default_true_operators_by_generator[
-#     global_variables.growth_generation_rule
-# ]
 true_num_qubits = DataBase.get_num_qubits(true_op)
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 true_op_matrices = [DataBase.compute(t) for t in true_op_list]
 num_params = len(true_op_list)
-
-
-# true_expectation_value_path = str(global_variables.results_directory + 'true_expectation_values.p')
 true_expectation_value_path = global_variables.true_expec_path
 if os.path.isfile(true_expectation_value_path) == False:
     true_ham = global_variables.true_hamiltonian
@@ -252,9 +262,7 @@ if os.path.isfile(true_expectation_value_path) == False:
         for t in plot_times:
             try:
                 true_expec_values[t] = (
-                    # ExpectationValues.expectation_value_wrapper(
-                    UserFunctions.expectation_value_wrapper(
-                        method=global_variables.measurement_type,
+                    growth_class.expectation_value(
                         ham = true_ham, 
                         t=t, 
                         state=probe,
@@ -262,17 +270,31 @@ if os.path.isfile(true_expectation_value_path) == False:
                         log_identifier='[Exp - Getting true expec vals for plotting]'
                     )
                 )
+
             except:
-                log_print(
-                    [
-                        "failure for", 
-                        "\ntrue ham:", repr(true_ham), 
-                        "\nprobe:", repr(probe),
-                        "t=",t
-                    ],
-                    log_file
-                )
-                raise
+                try:
+                    true_expec_values[t] = (
+                        # ExpectationValues.expectation_value_wrapper(
+                        UserFunctions.expectation_value_wrapper(
+                            method=global_variables.measurement_type,
+                            ham = true_ham, 
+                            t=t, 
+                            state=probe,
+                            log_file=log_file,
+                            log_identifier='[Exp - Getting true expec vals for plotting]'
+                        )
+                    )
+                except:
+                    log_print(
+                        [
+                            "failure for", 
+                            "\ntrue ham:", repr(true_ham), 
+                            "\nprobe:", repr(probe),
+                            "t=",t
+                        ],
+                        log_file
+                    )
+                    raise
 
     pickle.dump(
         true_expec_values, 
@@ -379,18 +401,19 @@ generators.extend(
 print("All growth rules:", generators)
 # generators_from_global_vars = global_variables.
 
-generator_initial_models = {}
-for gen in generators:
-    try:
-        generator_initial_models[gen] = UserFunctions.initial_models[gen]
-    except:
-        generator_initial_models[gen] = UserFunctions.initial_models[None]
+# generator_initial_models = {}
+# for gen in generators:
+#     try:
+#         generator_initial_models[gen] = UserFunctions.initial_models[gen]
+#     except:
+#         generator_initial_models[gen] = UserFunctions.initial_models[None]
 
-
+print("[Exp] before qmd class, intial op", initial_op_list)
 qmd = QMD(
     global_variables = global_variables, 
     initial_op_list=initial_op_list, 
-    generator_initial_models = generator_initial_models,
+    # generator_initial_models = generator_initial_models,
+    generator_list = generators, 
     true_operator=true_op, 
     # true_param_list=true_params, 
     use_time_dep_true_model = False, 
@@ -581,9 +604,12 @@ elif (
         # note models are only for true growth generation rule
         # models to QHL can be declared in 
         # UserFunctions.qhl_models_by_generator dict
-        qhl_models = UserFunctions.get_qhl_models(
-            global_variables.growth_generation_rule
-        )
+        try:
+            qhl_models = growth_class.qhl_models
+        except:
+            qhl_models = UserFunctions.get_qhl_models(
+                global_variables.growth_generation_rule
+            )
         
         output_prefix = 'multi_qhl_'
 

@@ -6,7 +6,7 @@ import numpy as np
 
 import UserFunctions
 import DataBase
-
+import GrowthRules
 # Information needed
 
 
@@ -360,24 +360,35 @@ def time_required(
   )
 
   print("growth rules:", growth_rules)
-#  print("num models by shape:", max_num_models_by_shape)
+#  print("num models by shape:", generator_max_num_models_by_shape)
   total_time_required = 0
   for gen in growth_rules:
     try:
-      max_num_qubits = UserFunctions.max_num_qubits_info[
-      	gen
-      ]
+      growth_class = GrowthRules.get_growth_generator_class(
+        growth_generation_rule = gen
+      )
+      generator_max_num_models_by_shape = growth_class.max_num_models_by_shape
     except:
-      max_num_qubits = UserFunctions.max_num_qubits_info[
-        None
-      ]
+      generator_max_num_models_by_shape = max_num_models_by_shape[gen]
+
+    try:
+      max_num_qubits = growth_class.max_num_qubits
+    except:
+      try:
+        max_num_qubits = UserFunctions.max_num_qubits_info[
+        	gen
+        ]
+      except:
+        max_num_qubits = UserFunctions.max_num_qubits_info[
+          None
+        ]
 
     for q in range(1,max_num_qubits+1):
       time_per_hamiltonian = hamiltonian_exponentiation_times[q]
       try:
-        num_models_this_dimension = max_num_models_by_shape[gen][q]
+        num_models_this_dimension = generator_max_num_models_by_shape[q]
       except:
-        num_models_this_dimension = max_num_models_by_shape[gen]['other']
+        num_models_this_dimension = generator_max_num_models_by_shape['other']
       print("Gen:", gen, "max num models for ", q, "qubits:", 
         num_models_this_dimension
       )
@@ -398,9 +409,12 @@ def time_required(
     )
 
   # Get time for QHL
-  true_operator = UserFunctions.default_true_operators_by_generator[
-    growth_generator
-  ]
+  try:
+    true_operator = growth_class.true_operator
+  except: 
+    true_operator = UserFunctions.default_true_operators_by_generator[
+      growth_generator
+    ]
 
   true_dimension = DataBase.get_num_qubits(true_operator)
   qhl_time = 5.5*(
