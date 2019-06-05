@@ -6,8 +6,9 @@ sys.path.append((os.path.join(this_dir, "GrowthRuleClasses")))
 
 import SuperClassGrowthRule
 import NV_centre_experiment_growth_rules
-
-
+import NV_centre_full_access
+import NV_centre_large_spin_bath
+import NV_centre_experiment_without_transverse_terms
 
 
 growth_classes = {
@@ -16,7 +17,13 @@ growth_classes = {
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 
     #     SuperClassGrowthRule.default_growth, 
     'two_qubit_ising_rotation_hyperfine_transverse' : 
-        NV_centre_experiment_growth_rules.nv_spin_experiment_full_tree,
+        NV_centre_experiment_growth_rules.NVCentreSpinExperimentalMethod,
+    'two_qubit_ising_rotation_hyperfine' : 
+        NV_centre_experiment_without_transverse_terms.NVCentreSpinExperimentalMethodWithoutTransvereTerms,
+    'NV_spin_full_access' : 
+        NV_centre_full_access.NVCentreSpinFullAccess,
+    'NV_centre_spin_large_bath' : 
+        NV_centre_large_spin_bath.NVCentreLargeSpinBath,
 }
 
 
@@ -34,6 +41,7 @@ def get_growth_generator_class(
         print("{} growth class not found.".format(growth_generation_rule))
         # raise
         gr = None
+
     return gr
 
     

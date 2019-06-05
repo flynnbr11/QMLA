@@ -27,9 +27,9 @@ class GrowthRuleSuper():
         self.fixed_axis = 'z' # e.g. transverse axis
         
         self.max_num_models_by_shape = {
-                1 : 0,
-                2 : 1,
-                'other' : 0
+            1 : 0,
+            2 : 1,
+            'other' : 0
         }
 
         # TODO set true params for simulation here
@@ -38,6 +38,7 @@ class GrowthRuleSuper():
        
     def generate_models(
         self, 
+        model_list, 
         **kwargs
     ):
         # default is to just return given model list and set spawn stage to complete

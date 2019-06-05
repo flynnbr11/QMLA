@@ -6,7 +6,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=2
+num_tests=1
 qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
@@ -81,8 +81,8 @@ git_commit=$(git rev-parse HEAD)
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='test_changes_to_qmd'
-# sim_growth_rule='two_qubit_ising_rotation_hyperfine'
-sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+sim_growth_rule='two_qubit_ising_rotation_hyperfine'
+# sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # sim_growth_rule='NV_centre_spin_large_bath'
 # sim_growth_rule='NV_spin_full_access'
 # sim_growth_rule='non_interacting_ising'
