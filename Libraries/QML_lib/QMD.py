@@ -2772,7 +2772,7 @@ class QMD():
                 active_branches_learning_models.keys()
             )
             # print("[QMD] branches:", branch_ids_on_db)
-            if self.RedisDataBases['any_job_failed']['Status'] == -1:
+            if self.RedisDataBases['any_job_failed']['Status'] == b'1':
                 self.log_print(
                     [
                         "Failure on remote node. Terminating QMD."
