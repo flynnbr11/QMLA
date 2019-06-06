@@ -466,6 +466,13 @@ class QMD():
             tree_identifiers = self.TreeIdentifiers
         )
         self.RedisDataBases['any_job_failed'].set('Status', '')
+        self.log_print(
+            [
+                "any job failed db:", self.RedisDataBases['any_job_failed'].keys(),
+                "Status:", self.RedisDataBases['any_job_failed']['Status']
+
+            ]
+        )
         
 #        rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.
  
@@ -2765,6 +2772,22 @@ class QMD():
                 active_branches_learning_models.keys()
             )
             # print("[QMD] branches:", branch_ids_on_db)
+            if self.RedisDataBases['any_job_failed']['Status'] == 'Failed':
+                self.log_print(
+                    [
+                        "Failure on remote node. Terminating QMD."
+                    ]
+                )
+                raise NameError('Remote QML Failure')
+            # else:
+            #     self.log_print(
+            #         [
+            #             "job failure not reported. db:", 
+            #             self.RedisDataBases['any_job_failed']['Status']
+            #         ]
+            #     )
+
+
             for branchID_bytes in branch_ids_on_db:
                 branchID = int(branchID_bytes)
                 # print(
@@ -2792,12 +2815,6 @@ class QMD():
                     )
                     self.BranchAllModelsLearned[branchID] = True
                     self.remoteBayesFromBranchID(branchID)
-                elif self.RedisDataBases['any_job_failed']['Status'] == 'Failed':
-                    self.log_print(
-                        [
-                            "Failure on remote node. Terminating QMD."
-                        ]
-                    )
 
 
 

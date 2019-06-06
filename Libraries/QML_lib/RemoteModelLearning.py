@@ -215,12 +215,18 @@ def learnModelRemote(
     except NameError:
         log_print(
             [
-                "QHL failed for model id {}".format(modelID)
+                "QHL failed for model id {}. Setting job failure database.".format(modelID)
             ]
         )
         any_job_failed_db.set('Status', 'Failed')
+        log_print(
+            [
+                "any_job_failed_db:", any_job_failed_db['Status']
+            ]
+        )
+
         raise
-        sys.exit()
+        # sys.exit()
 
 
     if qhl_plots:
