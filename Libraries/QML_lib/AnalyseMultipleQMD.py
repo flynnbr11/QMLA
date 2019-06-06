@@ -11,7 +11,7 @@ import numpy as np
 import DataBase
 import PlotQMD as ptq
 import ModelNames
-import UserFunctions 
+# import UserFunctions 
 import GrowthRules
 
 global test_growth_class_implementation
@@ -392,14 +392,7 @@ def average_parameter_estimates(
                 col=0
                 row+=1
             # latex_terms[term] = DataBase.latex_name_ising(term)
-            try:
-                latex_terms[term] = growth_classes[name].latex_name(term)
-            except:
-                if test_growth_class_implementation == True: raise
-                latex_terms[term] = UserFunctions.get_latex_name(
-                    name=term,
-                    growth_generator = growth_rules[name]
-                )
+            latex_terms[term] = growth_classes[name].latex_name(term)
             averages = np.array( 
                 [ avg_parameters[term][e] for e in epochs  ]
             )
@@ -410,14 +403,7 @@ def average_parameter_estimates(
             try:
                 true_val = true_params_dict[term]
                 # true_term_latex = DataBase.latex_name_ising(term)
-                try:
-                    true_term_latex = growth_classes[name].latex_name(term)
-                except:
-                    if test_growth_class_implementation == True: raise
-                    true_term_latex = UserFunctions.get_latex_name(
-                        name = term,
-                        growth_generator = growth_generator
-                    )
+                true_term_latex = growth_classes[name].latex_name(term)
                 ax.axhline(
                     true_val, 
                     # label=str(true_term_latex+ ' True'), 
@@ -455,14 +441,7 @@ def average_parameter_estimates(
             )
 
             # latex_term = DataBase.latex_name_ising(term)
-            try:
-                latex_term = growth_classes[name].latex_name(term)
-            except:
-                if test_growth_class_implementation == True: raise
-                latex_term = UserFunctions.get_latex_name(
-                    name = term,
-                    growth_generator = growth_rules[name]
-                )
+            latex_term = growth_classes[name].latex_name(term)
             # latex_term = latex_terms[term]
             ax.set_title(str(latex_term))
             
@@ -484,14 +463,7 @@ def average_parameter_estimates(
         )    
         """
         
-        try:
-            latex_name = growth_classes[name].latex_name(term)
-        except:
-            if test_growth_class_implementation == True: raise
-            latex_name = UserFunctions.get_latex_name(
-                name=name,
-                growth_generator = growth_rules[name]
-            )
+        latex_name = growth_classes[name].latex_name(term)
 
         if save_to_file is not None:
             fig.suptitle(
@@ -611,13 +583,7 @@ def Bayes_t_test(
     # print("[BayesTTest - param avg] unique_growth_rules:", unique_growth_rules)
     # print("[BayesTTest - param avg] unique_growth_classes:", unique_growth_classes)
     # print("[BayesTTest - param avg] growth classes:", growth_classes)
-    try:
-        true_model = unique_growth_classes[growth_generator].true_operator
-    except:
-        if test_growth_class_implementation == True: raise
-        true_model = UserFunctions.default_true_operators_by_generator[
-            growth_generator
-        ]
+    true_model = unique_growth_classes[growth_generator].true_operator
 
     success_rate_by_term = {}
     nmod = len(winning_models)  
@@ -758,15 +724,7 @@ def Bayes_t_test(
         std_dev_exp = np.array( [std_dev[t] for t in times] )
         # name=DataBase.latex_name_ising(term)
 
-        try:
-            name = growth_classes[term].latex_name(term)
-        except:
-            if test_growth_class_implementation == True: raise
-            name = UserFunctions.get_latex_name(
-                name = term,
-                growth_generator = growth_rules[term]
-            )
-
+        name = growth_classes[term].latex_name(term)
         description = str(
                 name + 
                 ' (' + str(num_sets_of_this_name)  + ')'
@@ -1131,14 +1089,7 @@ def r_sqaured_average(
         )
 
         # term = DataBase.latex_name_ising(name)
-        try:
-            term = growth_class.latex_name(name)
-        except:
-            if test_growth_class_implementation == True: raise
-            term = UserFunctions.get_latex_name(
-                name = name,
-                growth_generator = growth_generator 
-            )
+        term = growth_class.latex_name(name)
         plot_label = str(term + ' ('+ str(num_wins) + ')')
         colour = colours[ i ]
         ax.plot(
@@ -1223,14 +1174,7 @@ def volume_average(
         )
 
         # term = DataBase.latex_name_ising(name)
-        try:
-            term = growth_class.latex_name(name)
-        except:
-            if test_growth_class_implementation == True: raise
-            term = UserFunctions.get_latex_name(
-                name = name,
-                growth_generator = growth_generator 
-            )
+        term = growth_class.latex_name(name)
         plot_label = str(term + ' ('+ str(num_wins) + ')')
         colour = colours[ i ]
         ax.plot(
@@ -1436,29 +1380,12 @@ def plot_scores(
 
     # print("[AnalyseMultiple - plot_scores] growth classes:",growth_classes )
     # print("[AnalyseMultiple - plot_scores] unique_growth_classes:",unique_growth_classes )
-    try:
-        latex_true_op = unique_growth_classes[growth_generator].latex_name(name = true_operator)    
-    except:
-        if test_growth_class_implementation == True: raise
-        latex_true_op = UserFunctions.get_latex_name(
-            name=true_operator, 
-            growth_generator=growth_generator
-        )   
+    latex_true_op = unique_growth_classes[growth_generator].latex_name(name = true_operator)    
 
-    try:
-        latex_model_names = [
-            growth_classes[model].latex_name(model)
-            for model in models
-        ]
-    except:
-        if test_growth_class_implementation == True: raise
-        latex_model_names = [
-            UserFunctions.get_latex_name(
-                name=model, 
-                growth_generator=growth_rules[model]
-            ) for model in models
-        ]
-
+    latex_model_names = [
+        growth_classes[model].latex_name(model)
+        for model in models
+    ]
     batch_correct_models = []
     if batch_nearest_num_params_as_winners == True:
         num_true_params = len(
@@ -1488,14 +1415,7 @@ def plot_scores(
     colours = ['blue' for i in ind]
     batch_success_rate = correct_success_rate = 0
     for mod in batch_correct_models: 
-        try:
-            mod_latex = growth_classes[mod].latex_name(mod)
-        except:
-            if test_growth_class_implementation == True: raise
-            mod_latex = UserFunctions.get_latex_name(
-                name=mod, 
-                growth_generator=growth_rules[mod]
-            ) 
+        mod_latex = growth_classes[mod].latex_name(mod)
         mod_idx = latex_model_names.index(mod_latex)
         colours[mod_idx] = 'orange'
         batch_success_rate += mod_scores[mod]
@@ -1703,13 +1623,8 @@ exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
 true_growth_class = GrowthRules.get_growth_generator_class(growth_generator)
-try:
-    dataset = true_growth_class.experimental_dataset
-    measurement_type = true_growth_class.measurement_type
-except:
-    if test_growth_class_implementation == True: raise
-    dataset = UserFunctions.get_experimental_dataset(growth_generator)
-    measurement_type = UserFunctions.get_measurement_type(growth_generator)
+dataset = true_growth_class.experimental_dataset
+measurement_type = true_growth_class.measurement_type
 latex_mapping_file = arguments.latex_mapping_file
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
@@ -1727,13 +1642,7 @@ if true_params_path is not None:
     true_operator = true_params_info['true_op']
 else:
     true_params_dict = None
-    try:
-        true_operator = true_growth_class.true_operator
-    except:
-        if test_growth_class_implementation == True: raise
-        true_operator = UserFunctions.default_true_operators_by_generator[
-            growth_generator
-        ]
+    true_operator = true_growth_class.true_operator
 
 if exp_data is False:
     name = true_params_info['true_op']
@@ -1792,6 +1701,7 @@ try:
         protocol=2
     )
 except:
+    raise
     # for compatability with old versions
     pass
 

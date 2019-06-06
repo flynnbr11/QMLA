@@ -134,20 +134,11 @@ def ExpectationValuesTrueSim(
                 true_ham = time_ind_true_ham
 
             try:
-                try:
-                    expec = qmd.GrowthClass.expectation_value(
-                        ham = true_ham, 
-                        t=t, 
-                        state = true_probe
-                    )
-                except:
-                    if test_growth_class_implementation == True: raise
-                    expec = UserFunctions.expectation_value_wrapper(
-                        method=qmd.MeasurementType,
-                        ham = true_ham, 
-                        t=t, 
-                        state = true_probe
-                    )
+                expec = qmd.GrowthClass.expectation_value(
+                    ham = true_ham, 
+                    t=t, 
+                    state = true_probe
+                )
 
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
@@ -215,25 +206,14 @@ def ExpectationValuesTrueSim(
                         mod.expectation_values[t]
                     )
                 except:
-                        try:
-                            expec = qmd.GrowthClass.expectation_value(
-                                ham=sim_ham, 
-                                t=t,
-                                state=sim_probe
-                            )
-                        except:
-                            if test_growth_class_implementation == True: raise
-                            expec = UserFunctions.expectation_value_wrapper(
-                                method=qmd.MeasurementType,
-                                ham=sim_ham, 
-                                t=t,
-                                state=sim_probe
-                            ) 
+                    expec = qmd.GrowthClass.expectation_value(
+                        ham=sim_ham, 
+                        t=t,
+                        state=sim_probe
+                    )
 
-                        sim_expec_values.append(expec)
+                    sim_expec_values.append(expec)
 
-#                    mod.expectation_values[t] = expec
-                   # print("[",mod.Name,"] t=",t,":\t", expec)
 
             if mod_id == qmd.ChampID:
                 models_branch = ChampionsByBranch[mod_id]
@@ -491,14 +471,6 @@ def plotDynamicsLearnedModels(
                 print("Not reducing number of times for plots")
 
 
-            # for t in times_to_plot:
-            #     # expec_vals[t] = ExpectationValues.expectation_value_wrapper(
-            #     expec_vals[t] = UserFunctions.expectation_value_wrapper(
-            #         method = qmd.MeasurementType,
-            #         ham = ham, 
-            #         t = t, 
-            #         state = probe
-            #     )
             times_to_plot = sorted(list(true_expec_vals.keys()))
             true_exp = [true_expec_vals[t] for t in times_to_plot]
 
@@ -658,17 +630,9 @@ def plotDynamicsLearnedModels(
                     if use_experimental_data==False:
                         y_true = qmd.TrueParamDict[term]
                         # true_term_latex = DataBase.latex_name_ising(term)
-                        try:
-                            true_term_latex = qmd.GrowthClass.latex_name(
-                                name = term
-                            )
-                        except:
-                            if test_growth_class_implementation == True: raise
-                            true_term_latex = UserFunctions.get_latex_name(
-                                name = term,
-                                # growth_generator = qmd.GrowthGenerator
-                                growth_generator = reduced.GrowthGenerator
-                            )
+                        true_term_latex = qmd.GrowthClass.latex_name(
+                            name = term
+                        )
 
                         ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
                 except:
@@ -676,17 +640,9 @@ def plotDynamicsLearnedModels(
                 y = np.array(param_estimate_by_term[term])
                 s = np.array(std_devs[term])
                 x = range(1,1+len(param_estimate_by_term[term]))
-                try:
-                    latex_term = qmd.GrowthClass.latex_name(
-                        name = term
-                    )
-                except:
-                    if test_growth_class_implementation == True: raise
-                    latex_term = UserFunctions.get_latex_name(
-                        name = term,
-                        # growth_generator = qmd.GrowthGenerator
-                        growth_generator = reduced.GrowthGenerator
-                    )
+                latex_term = qmd.GrowthClass.latex_name(
+                    name = term
+                )
                 if latex_term not in individual_terms_already_in_legend:
                     individual_terms_already_in_legend.append(latex_term)
                     plot_label = str(latex_term)
@@ -786,20 +742,11 @@ def ExpectationValuesQHL_TrueModel(
                 true_ham = time_ind_true_ham
         
             try:
-                try:
-                    expec = qmd.GrowthClass.expectation_value(
-                        ham = true_ham, 
-                        t=t, 
-                        state = true_probe
-                    )
-                except:
-                    if test_growth_class_implementation == True: raise
-                    expec = UserFunctions.expectation_value_wrapper(
-                        method=qmd.MeasurementType,
-                        ham = true_ham, 
-                        t=t, 
-                        state = true_probe
-                    )
+                expec = qmd.GrowthClass.expectation_value(
+                    ham = true_ham, 
+                    t=t, 
+                    state = true_probe
+                )
                 
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
@@ -850,20 +797,11 @@ def ExpectationValuesQHL_TrueModel(
         sim_expec_values = []
         for t in times:
             # ex_val = ExpectationValues.hahn_evolution(
-            try:
-                ex_val = qmd.GrowthClass.expectation_value(
-                    ham=sim_ham, 
-                    t=t,
-                    state=sim_probe
-                )
-            except:
-                if test_growth_class_implementation == True: raise
-                ex_val = UserFunctions.expectation_value_wrapper(
-                    method=qmd.MeasurementType,
-                    ham=sim_ham, 
-                    t=t,
-                    state=sim_probe
-                )
+            ex_val = qmd.GrowthClass.expectation_value(
+                ham=sim_ham, 
+                t=t,
+                state=sim_probe
+            )
             sim_expec_values.append(ex_val)
 
         
@@ -948,14 +886,7 @@ def ExpectationValuesQHL_TrueModel(
         )
         
 
-    try:
-        latex_name_for_title = qmd.GrowthClass.latex_name(name = qmd.TrueOpName)
-    except:
-        if test_growth_class_implementation == True: raise
-        latex_name_for_title = str(UserFunctions.get_latex_name(
-            name=qmd.TrueOpName, 
-            growth_generator=qmd.GrowthGenerator
-        ))
+    latex_name_for_title = qmd.GrowthClass.latex_name(name = qmd.TrueOpName)
     plt.title(
         str(
             "QHL test for " + 
@@ -1381,14 +1312,7 @@ def average_quadratic_losses(
             avg_q_losses[i] = np.average(list_this_models_q_losses[:, i])
 
 
-        try:
-            latex_name = growth_classes[growth_generator].latex_name(name = mod)
-        except:
-            if test_growth_class_implementation == True: raise
-            latex_name = UserFunctions.get_latex_name(
-                name = mod, 
-                growth_generator = growth_generator
-            )
+        latex_name = growth_classes[growth_generator].latex_name(name = mod)
         epochs = range(1, num_experiments+1)
 
         ax.plot(
@@ -1469,20 +1393,11 @@ def r_squared_from_epoch_list(
             sum_of_residuals = 0
             for t in exp_times:
                 # sim = ExpectationValues.hahn_evolution(
-                try:
-                    sim = qmd.GrowthClass.expectation-value(
-                        ham=ham, 
-                        t=t, 
-                        state=probe
-                    )
-                except:
-                    if test_growth_class_implementation == True: raise
-                    sim = UserFunctions.expectation_value_wrapper(
-                        method=qmd.MeasurementType,
-                        ham=ham, 
-                        t=t, 
-                        state=probe
-                    )
+                sim = qmd.GrowthClass.expectation-value(
+                    ham=ham, 
+                    t=t, 
+                    state=probe
+                )
                 true = qmd.ExperimentalMeasurements[t]
                 diff_squared = (sim - true)**2
                 sum_of_residuals += diff_squared
@@ -1525,17 +1440,9 @@ def plot_quadratic_loss(
         mod = qmd.reducedModelInstanceFromID(i)
         if len(mod.QuadraticLosses) > 0:
             epochs = range(1, len(mod.QuadraticLosses) + 1)
-            try:
-                model_name = mod.GrowthClass.latex_name(
-                    name = qmd.ModelNameIDs[i] 
-                )
-            except:
-                if test_growth_class_implementation == True: raise
-                model_name = UserFunctions.get_latex_name(
-                    name = qmd.ModelNameIDs[i], 
-                    # growth_generator = qmd.GrowthGenerator
-                    growth_generator = mod.GrowthGenerator
-                )
+            model_name = mod.GrowthClass.latex_name(
+                name = qmd.ModelNameIDs[i] 
+            )
             ax.plot(epochs, mod.QuadraticLosses, label=str(model_name))
     ax.legend(bbox_to_anchor=(1,1))
 
@@ -2219,18 +2126,9 @@ def colour_dicts_from_win_count(
     colour_by_win_count = {}
     colour_by_node_name = {}
     
-    try:
-        all_models = growth_class.name_branch_map(
-            latex_mapping_file = latex_mapping_file,
-        ).keys()
-    except:
-        if test_growth_class_implementation == True: raise
-        all_models = list(
-            UserFunctions.get_name_branch_map(
-                latex_mapping_file = latex_mapping_file,
-                growth_generator = growth_generator
-            ).keys()
-        )
+    all_models = growth_class.name_branch_map(
+        latex_mapping_file = latex_mapping_file,
+    ).keys()
 
 
 
@@ -2279,16 +2177,9 @@ def cumulativeQMDTreePlot(
         growth_generation_rule = growth_generator
     )
 
-    try:
-        term_branches = growth_class.name_branch_map(
-            latex_mapping_file = latex_mapping_file,
-        )
-    except:
-        if test_growth_class_implementation == True: raise
-        term_branches = UserFunctions.get_name_branch_map(
-            latex_mapping_file = latex_mapping_file,
-            growth_generator = growth_generator
-        )
+    term_branches = growth_class.name_branch_map(
+        latex_mapping_file = latex_mapping_file,
+    )
 
     modlist = csv.DictReader(open(cumulative_csv)).fieldnames
     if 'ModelName' in modlist:
@@ -2860,17 +2751,9 @@ def parameterEstimates(
             if use_experimental_data==False:
                 y_true = qmd.TrueParamDict[term]
                 # true_term_latex = DataBase.latex_name_ising(term)
-                try:
-                    true_term_latex = qmd.GrowthClass.latex_name(
-                        name = term
-                    )
-                except:
-                    if test_growth_class_implementation == True: raise
-                    true_term_latex = UserFunctions.get_latex_name(
-                        name = term,
-                        # growth_generator = qmd.GrowthGenerator
-                        growth_generator = mod.GrowthGenerator
-                    )
+                true_term_latex = qmd.GrowthClass.latex_name(
+                    name = term
+                )
                 true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
 
                 ax.axhline(
@@ -2884,15 +2767,7 @@ def parameterEstimates(
         y = np.array(param_estimate_by_term[term])
         s = np.array(std_devs[term])
         x = range(1,1+len(param_estimate_by_term[term]))
-        try:
-            latex_term = mod.GrowthClass.latex_name(term)
-        except:
-            if test_growth_class_implementation == True: raise
-            latex_term = UserFunctions.get_latex_name(
-                name = term,
-                # growth_generator = qmd.GrowthGenerator
-                growth_generator = mod.GrowthGenerator
-            )
+        latex_term = mod.GrowthClass.latex_name(term)
         latex_term = latex_term[:-1] + '^{\prime}' + '$'
         # print("[pQMD] latex_term:", latex_term)
         ax.scatter(
@@ -3298,28 +3173,13 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
 
         names = []
         for mod_name in list(qmd.ModelNameIDs.values()):
-            try:
-                names.append(
-                    qmd.BranchGrowthClasses[
-                        qmd.ModelsBranches[
-                            qmd.ModelIDNames[mod_name]
-                        ]
-                    ].latex_name(name=mod_name)
-                )
-            except:
-                if test_growth_class_implementation == True: raise
-                names.append(
-                    UserFunctions.get_latex_name(
-                        name = mod_name,
-                        # growth_generator = qmd.GrowthGenerator
-                        growth_generator = qmd.BranchGrowthRules[
-                            qmd.ModelsBranches[
-                                qmd.ModelIDNames[mod_name]
-                            ]
-                        ]
-
-                    ) 
-                )
+            names.append(
+                qmd.BranchGrowthClasses[
+                    qmd.ModelsBranches[
+                        qmd.ModelIDNames[mod_name]
+                    ]
+                ].latex_name(name=mod_name)
+            )
 
     elif names_ids=='nonlatex':
         names = [
@@ -3347,23 +3207,10 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
             model_bf = {}
             for j in qmd.AllBayesFactors[i].keys():
                 if names_ids=='latex':
-                    try:
-                        other_model_name = qmd.BranchGrowthClasses[
-                            qmd.ModelsBranches[j]
-                        ].latex_name(name = qmd.ModelNameIDs[j])
+                    other_model_name = qmd.BranchGrowthClasses[
+                        qmd.ModelsBranches[j]
+                    ].latex_name(name = qmd.ModelNameIDs[j])
 
-                    except:
-                        if test_growth_class_implementation: raise
-                        other_model_name = (
-                            # DataBase.latex_name_ising(qmd.ModelNameIDs[j])
-                            UserFunctions.get_latex_name(
-                                name=qmd.ModelNameIDs[j],
-                                # growth_generator = qmd.GrowthGenerator
-                                growth_generator = qmd.BranchGrowthRules[
-                                    qmd.ModelsBranches[j]
-                                ]
-                            )
-                        )
                 elif names_ids=='nonlatex':
                     other_model_name = qmd.ModelNameIDs[j]
                 elif names_ids=='ids':
@@ -3373,21 +3220,9 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
             # if names_ids=='latex':
                 # model_bf['Name'] = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
             try:
-                try:
-                    model_bf['Name'] = qmd.BranchGrowthClasses[
-                        qmd.ModelsBranches[i]
-                    ].latex_name(name=qmd.ModelNameIDs[i])
-                except:    
-                    if test_growth_class_implementation: raise
-                    model_bf['Name'] = UserFunctions.get_latex_name(
-                        name = qmd.ModelNameIDs[i],
-                        growth_generator = qmd.BranchGrowthRules[
-                            qmd.ModelsBranches[
-                                i
-                            ]
-                        ]
-                        # growth_generator = qmd.GrowthGenerator
-                    )
+                model_bf['Name'] = qmd.BranchGrowthClasses[
+                    qmd.ModelsBranches[i]
+                ].latex_name(name=qmd.ModelNameIDs[i])
             except:
                 model_bf['Name'] = qmd.ModelNameIDs[i]
             model_bf['ID'] = i
@@ -3412,17 +3247,9 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
         growth_generation_rule = growth_generator
     )
 
-    try:
-        correct_mod = growth_class.latex_name(
-            name = correct_mod
-        )
-    except:
-        if test_growth_class_implementation==True: raise        
-        correct_mod = UserFunctions.get_latex_name(
-            # this function is exclusively for Ising plot so two qubit growth generator is hard coded.
-            name = correct_mod,
-            growth_generator = growth_generator
-        )
+    correct_mod = growth_class.latex_name(
+        name = correct_mod
+    )
     results_csv = os.path.abspath(results_csv_path)
     qmd_res = pd.DataFrame.from_csv(results_csv)
 
@@ -3579,20 +3406,11 @@ def replot_expectation_values(
 
         sim_exp_vals = {}
         for t in sim_times:
-            try:
-                sim_exp_vals[t] = growth_class.expectation_value(
-                    ham=sim_ham, 
-                    state = probe, 
-                    t = t
-                )
-            except:
-                if test_growth_class_implementation == True: raise
-                sim_exp_vals[t] = UserFunctions.expectation_value_wrapper(
-                    method=measurement_method, 
-                    ham=sim_ham, 
-                    state = probe, 
-                    t = t
-                )
+            sim_exp_vals[t] = growth_class.expectation_value(
+                ham=sim_ham, 
+                state = probe, 
+                t = t
+            )
 
         sim_exp = [sim_exp_vals[t] for t in sim_times]
         list_id = params_dictionary_list.index(params_dict)
@@ -3602,13 +3420,7 @@ def replot_expectation_values(
             model_label = model_descriptions[list_id]
         else:
             sim_op_string = p_str.join(sim_ops_names)
-            try:
-                latex_name = growth_class.latex_name(name = sim_op_string)
-            except:
-                latex_name = UserFunctions.get_latex_name(
-                    name=sim_op_string, 
-                    growth_generator=growth_generator
-                )
+            latex_name = growth_class.latex_name(name = sim_op_string)
             model_label = latex_name
         
         ax.plot(
@@ -3677,16 +3489,9 @@ def cluster_results_and_plot(
     true_params_dict = true_info_dict['params_dict']
     if true_params_dict is not None:
         for k in list(true_params_dict.keys()):
-            try:
-                latex_key = growth_class.latex_name(
-                    name = k
-                )
-            except:
-                if test_growth_class_implementation == True: raise
-                latex_key = UserFunctions.get_latex_name(
-                    name = k, 
-                    growth_generator = growth_generator
-                )
+            latex_key = growth_class.latex_name(
+                name = k
+            )
             true_params_dict[latex_key] = true_params_dict[k]
             true_params_dict.pop(k)
     
@@ -3771,16 +3576,9 @@ def cluster_results_and_plot(
                     all_centroids_of_each_param[terms[i]] = [this_model_clusters[j][i]]
                 
                 
-            try:
-                latex_mod_name = growth_class.latex_name(
-                    name = mod
-                )
-            except:
-                if test_growth_class_implementation == True: raise
-                latex_mod_name = UserFunctions.get_latex_name(
-                    name=mod, 
-                    growth_generator=growth_generator
-                )
+            latex_mod_name = growth_class.latex_name(
+                name = mod
+            )
             cluster_description = str(
                 latex_mod_name + ' (' +  str(j) +')'
             )
@@ -3794,14 +3592,7 @@ def cluster_results_and_plot(
             )    
 
     for k in list(all_centroids_of_each_param.keys()):
-        try:
-            latex_term = growth_class.latex_name(name = k)
-        except:
-            if test_growth_class_implementation == True: raise
-            latex_term = UserFunctions.get_latex_name(
-                name=k, 
-                growth_generator=growth_generator
-            )
+        latex_term = growth_class.latex_name(name = k)
         all_centroids_of_each_param[latex_term] = all_centroids_of_each_param[k]
         all_centroids_of_each_param.pop(k)
     
@@ -3814,14 +3605,7 @@ def cluster_results_and_plot(
     term_colours = {}
     latex_terms = {}
     for term in all_possible_params:
-        try:
-            latex_rep = growth_class.latex_name(name=term)
-        except:
-            if test_growth_class_implementation==True: raise
-            latex_rep = UserFunctions.get_latex_name(
-                name=term, 
-                growth_generator = growth_generator
-            )
+        latex_rep = growth_class.latex_name(name=term)
     
         latex_terms[term] = latex_rep
     
@@ -3916,16 +3700,9 @@ def cluster_results_and_plot(
             cluster = clusters_by_model[mod][cluster_description]
             ax = axes[row,col]
             for term in sorted(cluster.keys()):
-                try:
-                    label = growth_class.latex_name(
-                        name = term
-                    )
-                except:
-                    if test_growth_class_implementation == True: raise
-                    label = UserFunctions.get_latex_name(
-                        name = term, 
-                        growth_generator = growth_generator
-                    )
+                label = growth_class.latex_name(
+                    name = term
+                )
                 ax.axhline(
                     cluster[term], 
                     label=label, 
