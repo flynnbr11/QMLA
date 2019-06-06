@@ -465,7 +465,7 @@ class QMD():
             self.Q_id,
             tree_identifiers = self.TreeIdentifiers
         )
-        self.RedisDataBases['any_job_failed'].set('Status', '')
+        self.RedisDataBases['any_job_failed'].set('Status', 0)
         self.log_print(
             [
                 "any job failed db:", self.RedisDataBases['any_job_failed'].keys(),
@@ -2772,7 +2772,7 @@ class QMD():
                 active_branches_learning_models.keys()
             )
             # print("[QMD] branches:", branch_ids_on_db)
-            if self.RedisDataBases['any_job_failed']['Status'] == 'Failed':
+            if self.RedisDataBases['any_job_failed']['Status'] == -1:
                 self.log_print(
                     [
                         "Failure on remote node. Terminating QMD."
