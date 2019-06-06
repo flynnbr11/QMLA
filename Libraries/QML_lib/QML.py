@@ -607,8 +607,7 @@ class ModelLearningClass():
             ## Call updater to update distribution based on datum
             try:
                 # print("[QML] calling updater")
-                raise NameError("FailedQinferUpdate") # test
-
+                raise NameError("Qinfer update failure")
                 self.Updater.update(
                     self.Datum, 
                     self.Experiment
@@ -626,7 +625,7 @@ class ModelLearningClass():
                     ]
                 )
                 print("\n\nEXITING; Inspect log\n\n")
-                raise NameError("FailedQinferUpdate")
+                raise NameError("Qinfer update failure")
                 sys.exit()
 
 

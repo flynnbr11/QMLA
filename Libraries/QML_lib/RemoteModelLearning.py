@@ -218,6 +218,7 @@ def learnModelRemote(
             ]
         )
         raise
+        sys.exit()
 
 
     if qhl_plots:

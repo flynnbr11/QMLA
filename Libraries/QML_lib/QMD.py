@@ -1060,6 +1060,7 @@ class QMD():
                                     "has failed on remote worker."
                                 ]
                             )
+                            raise NameError("Remote QML failure")
                             break
                         time.sleep(0.1)
                     self.log_print(
@@ -1208,6 +1209,8 @@ class QMD():
             )
             for job in remote_jobs:
                 while job.is_finished == False:
+                    if job.is_failed == True:
+                        raise NameError("Remote QML failure")
                     time.sleep(0.01)
         else:
             self.log_print(
@@ -1862,6 +1865,8 @@ class QMD():
                     ]
                 )
                 while job_list[k].is_finished == False:
+                    if job.is_failed == True:
+                        raise NameError("Remote QML failure")
                     sleep(0.01)
         else:
             self.log_print(
