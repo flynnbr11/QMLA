@@ -82,6 +82,7 @@ def learnModelRemote(
     learned_models_info = rds_dbs['learned_models_info']
     learned_models_ids = rds_dbs['learned_models_ids']
     active_branches_learning_models = rds_dbs['active_branches_learning_models']
+    any_job_failed_db = rds_dbs['any_job_failed']
 
     def log_print(to_print_list):
         identifier = str(
@@ -217,6 +218,7 @@ def learnModelRemote(
                 "QHL failed for model id {}".format(modelID)
             ]
         )
+        any_job_failed_db.set('Status', 'Failed')
         raise
         sys.exit()
 
