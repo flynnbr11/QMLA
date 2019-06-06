@@ -83,7 +83,7 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='test_changes_to_qmd'
 # sim_growth_rule='reduced_nv_experiment'
 # sim_growth_rule='two_qubit_ising_rotation_hyperfine'
-# sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # sim_growth_rule='NV_centre_spin_large_bath'
 # sim_growth_rule='NV_spin_full_access'
 # sim_growth_rule='non_interacting_ising'
@@ -101,7 +101,7 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='hubbard_chain_just_hopping'
 # sim_growth_rule='hubbard_chain'
 # sim_growth_rule='hubbard_square_lattice_generalised'
-sim_growth_rule='hopping_topology'
+# sim_growth_rule='hopping_topology'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1

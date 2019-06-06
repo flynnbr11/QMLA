@@ -199,7 +199,11 @@ class QMD():
             + 'BayesFactorsTimeRecords/'
         )
         if not os.path.exists(self.BayesFactorsFolder):
-            os.makedirs(self.BayesFactorsFolder)
+            try:
+                os.makedirs(self.BayesFactorsFolder)
+            except:
+                # reached at exact same time as another process; don't cause crash
+                pass
 
 
         self.BayesFactorsTimeFile = str(

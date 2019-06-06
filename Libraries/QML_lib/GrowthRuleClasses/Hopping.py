@@ -235,9 +235,7 @@ class hopping(
         return latex_term
 
 
-
-
-
+## Supporting functions
 
 def possible_hopping_terms_new_site(site_id):
     new_terms = []

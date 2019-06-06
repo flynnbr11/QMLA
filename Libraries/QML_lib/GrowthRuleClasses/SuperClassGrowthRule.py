@@ -91,7 +91,7 @@ class GrowthRuleSuper():
         **kwargs
     ):
         import Heuristics
-        print("[Growth Rules] Default heuristic")
+        # print("[Growth Rules] Default heuristic")
         heuristic = Heuristics.multiPGH(**kwargs)
         return heuristic
         
