@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import argparse
 import numpy as np
 
-import UserFunctions
+# import UserFunctions
 import DataBase
 import GrowthRules
 # Information needed
@@ -371,17 +371,7 @@ def time_required(
     except:
       generator_max_num_models_by_shape = max_num_models_by_shape[gen]
 
-    try:
-      max_num_qubits = growth_class.max_num_qubits
-    except:
-      try:
-        max_num_qubits = UserFunctions.max_num_qubits_info[
-        	gen
-        ]
-      except:
-        max_num_qubits = UserFunctions.max_num_qubits_info[
-          None
-        ]
+    max_num_qubits = growth_class.max_num_qubits
 
     for q in range(1,max_num_qubits+1):
       time_per_hamiltonian = hamiltonian_exponentiation_times[q]

@@ -9,7 +9,7 @@ import os as os
 from MemoryTest import print_loc
 import ExpectationValues
 # from UserFunctions import expectation_value_wrapper
-import UserFunctions
+# import UserFunctions
 sys.path.append((os.path.join("..")))
 
 global_print_loc = False 
@@ -159,32 +159,13 @@ def get_pr0_array_qle(
             #     print("saved calc")
             # else:
             try:
-                # log_print(
-                #     [
-                #     "[getpr0] EvoID=", evoId,
-                #     "\n\tState=", probe
-                #     ], 
-                #     log_file, log_identifier
-                # )
-                try:
-                    likel = growth_class.expectation_value(
-                        ham = ham,
-                        t = t,
-                        state = probe,
-                        log_file = log_file, 
-                        log_identifier = log_identifier
-                    )
-                except:         
-                    if test_growth_class_implementation == True: raise
-                    likel = UserFunctions.expectation_value_wrapper(
-                    # output[evoId][tId] = ExpectationValues.expectation_value_wrapper(
-                        method=measurement_type,
-                        ham = ham,
-                        t = t,
-                        state = probe,
-                        log_file = log_file, 
-                        log_identifier = log_identifier
-                    )
+                likel = growth_class.expectation_value(
+                    ham = ham,
+                    t = t,
+                    state = probe,
+                    log_file = log_file, 
+                    log_identifier = log_identifier
+                )
                 output[evoId][tId] = likel
                 # unique_times_considered_this_ham.append(t)
                 # outputs_this_ham[t] = likel

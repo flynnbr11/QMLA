@@ -242,7 +242,7 @@ parser.add_argument(
   default=0
 )
 
-import UserFunctions
+# import UserFunctions
 
 arguments = parser.parse_args()
 results_directory = arguments.results_directory
@@ -256,45 +256,12 @@ growth_class = GrowthRules.get_growth_generator_class(
 
 variables = vars(arguments)
 # and some others arguments not explicitly set in launch script
-try:
-  # TODO is it possible to get the names of methods called by wrappers in growth class wrappers?
-  variables['measurement_type'] = growth_class.measurement_type
-  variables['expectation_value_func'] = growth_class.expectation_value_function.__name__
-  # variables['heuristic'] = growth_class.heuristic_function.__name__
-  variables['probe_generation_function'] = growth_class.probe_generation_function.__name__
-  variables['plot_probe_generation_function'] = growth_class.plot_probe_generation_function.__name__
 
-
-except:
-  if test_growth_class_implementation == True: raise
-  try:
-    variables['measurement_type'] = UserFunctions.measurement_type[
-      arguments.growth_generation_rule
-    ]
-  except:
-    variables['measurement_type'] = UserFunctions.measurement_type[
-      None
-    ]
-
-  try:
-    variables['expectation_value_func'] = UserFunctions.expec_val_function_dict[
-      variables['measurement_type']
-    ]
-  except:
-    variables['expectation_value_func'] = UserFunctions.expec_val_function_dict[
-      None
-    ]
-
-  try:
-    variables['heuristic'] = UserFunctions.heuristic_classes[
-      arguments.growth_generation_rule
-    ]
-  except:
-    variables['heuristic'] = UserFunctions.heuristic_classes[
-      None
-    ]
-
-
+variables['measurement_type'] = growth_class.measurement_type
+variables['expectation_value_func'] = growth_class.expectation_value_function.__name__
+variables['heuristic'] = growth_class.heuristic_function.__name__
+variables['probe_generation_function'] = growth_class.probe_generation_function.__name__
+variables['plot_probe_generation_function'] = growth_class.plot_probe_generation_function.__name__
 
 combine_analysis_plots(
     results_directory = results_directory,

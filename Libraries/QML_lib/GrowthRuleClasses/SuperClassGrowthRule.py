@@ -13,6 +13,8 @@ class GrowthRuleSuper():
         growth_generation_rule,
         **kwargs
     ): 
+        import Heuristics
+
         self.growth_generation_rule = growth_generation_rule
         if 'use_experimental_data' in kwargs:
             self.use_experimental_data = kwargs['use_experimental_data']
@@ -26,7 +28,6 @@ class GrowthRuleSuper():
         self.probe_generation_function = ProbeGeneration.separable_probe_dict
         self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
         self.expectation_value_function = ExpectationValues.expectation_value
-        import Heuristics
         self.heuristic_function = Heuristics.multiPGH
 
         # Parameters specific to the growth rule

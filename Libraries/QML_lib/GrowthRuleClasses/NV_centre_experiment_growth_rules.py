@@ -18,12 +18,14 @@ class NVCentreSpinExperimentalMethod(
         growth_generation_rule, 
         **kwargs
     ):
+        import Heuristics
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
         self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
+        self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         self.measurement_type = 'hahn'
         
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'

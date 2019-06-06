@@ -31,7 +31,7 @@ import PlotQMD
 from RemoteModelLearning import *
 from RemoteBayesFactor import * 
 import ExpectationValues
-import UserFunctions
+# import UserFunctions
 import GrowthRules
 
 global test_growth_class_implementation
@@ -270,25 +270,14 @@ class QMD():
             for t in self.PlotTimes:
                 # TODO is this the right expectation value func???
                 
-                try:
-                    self.ExperimentalMeasurements[t] = (
-                        self.GrowthClass.expectation_value(
-                            ham = self.TrueHamiltonian, 
-                            t = t, 
-                            state = self.PlotProbes[self.TrueOpDim]  
-                        )
+                self.ExperimentalMeasurements[t] = (
+                    self.GrowthClass.expectation_value(
+                        ham = self.TrueHamiltonian, 
+                        t = t, 
+                        state = self.PlotProbes[self.TrueOpDim]  
+                    )
 
-                    )
-                except:
-                    if test_growth_class_implementation == True: raise
-                    self.ExperimentalMeasurements[t] = (
-                        UserFunctions.expectation_value_wrapper(
-                            method=self.MeasurementType,
-                            ham = self.TrueHamiltonian,
-                            t = t, 
-                            state = self.PlotProbes[self.TrueOpDim]  
-                        )
-                    )
+                )
             self.log_print(
                 [
                 "Expectation values computed", 
@@ -371,18 +360,8 @@ class QMD():
                 use_experimental_data = self.UseExperimentalData
             )
             # self.TreesCompleted[gen] = False
-            try:
-                self.TreesCompleted[gen] = growth_class_gen.tree_completed_initially
-                self.GeneratorInitialModels[gen] = growth_class_gen.initial_models
-            except:
-                if test_growth_class_implementation == True: raise
-                self.TreesCompleted[gen] = UserFunctions.get_tree_completed_initial_value(
-                    growth_generator = gen
-                )
-                self.GeneratorInitialModels[gen] = UserFunctions.get_initial_op_list(
-                    growth_generator = gen, 
-                    log_file = self.log_file
-                )
+            self.TreesCompleted[gen] = growth_class_gen.tree_completed_initially
+            self.GeneratorInitialModels[gen] = growth_class_gen.initial_models
 
             self.BranchChampsByNumQubits[gen] = {}
             initial_models_this_gen = self.GeneratorInitialModels[gen]
@@ -2367,37 +2346,18 @@ class QMD():
             list(self.BranchChampions.values())
         ]
 
-        try:
-            new_models = self.GrowthClass.generate_models(
-                # generator = growth_rule, 
-                model_list=best_model_names,
-                spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
-                ghost_branches = self.GhostBranches, 
-                branch_champs_by_qubit_num = self.BranchChampsByNumQubits[growth_rule],
-                model_dict=self.model_lists,
-                log_file=self.log_file, 
-                current_champs = current_champs,
-                spawn_stage = self.SpawnStage[growth_rule],
-                miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
-            )
-        except:
-            if test_growth_class_implementation == True: raise
-            new_models = UserFunctions.new_model_generator(
-            # generator=self.GrowthGenerator,
-                generator = growth_rule, 
-                model_list=best_model_names,
-                # champs_by_num_qubits = self.BranchChampsByNumQubits, 
-                # spawn_step=self.SpawnDepth, 
-                spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
-                ghost_branches = self.GhostBranches, 
-                branch_champs_by_qubit_num = self.BranchChampsByNumQubits[growth_rule],
-                model_dict=self.model_lists,
-                log_file=self.log_file, 
-                current_champs = current_champs,
-                spawn_stage = self.SpawnStage[growth_rule],
-                miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
-            )
-
+        new_models = self.GrowthClass.generate_models(
+            # generator = growth_rule, 
+            model_list=best_model_names,
+            spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
+            ghost_branches = self.GhostBranches, 
+            branch_champs_by_qubit_num = self.BranchChampsByNumQubits[growth_rule],
+            model_dict=self.model_lists,
+            log_file=self.log_file, 
+            current_champs = current_champs,
+            spawn_stage = self.SpawnStage[growth_rule],
+            miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
+        )
         new_models = [DataBase.alph(mod) for mod in new_models]
 
         self.log_print(
@@ -2440,20 +2400,10 @@ class QMD():
             blocking=False, 
             use_rq=True
         )
-        try:
-            tree_completed = self.GrowthClass.check_tree_completed(
-                spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
-                current_num_qubits = new_model_dimension
-            )
-        except:
-            if test_growth_class_implementation == True: raise
-            tree_completed = UserFunctions.tree_finished(
-                # generator =self.GrowthGenerator,
-                # spawn_step = self.SpawnDepth,
-                generator = growth_rule,
-                spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
-                current_num_qubits = new_model_dimension
-            )
+        tree_completed = self.GrowthClass.check_tree_completed(
+            spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
+            current_num_qubits = new_model_dimension
+        )
 
         if self.SpawnStage[growth_rule][-1]=='Complete':
             tree_completed = True

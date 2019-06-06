@@ -2,7 +2,7 @@ import numpy as np
 import random
 import pickle
 import argparse
-import UserFunctions
+# import UserFunctions
 import DataBase
 import Distrib
 import  GrowthRules 
@@ -88,29 +88,15 @@ def create_qhl_params(
 		true_op
 	)
 
-	try:
-		latex_terms = []
-		for term in terms:
-			lt = growth_class.latex_name(
-				name = term 
-			)
-			latex_terms.append(lt)
-		true_op_latex = growth_class.latex_name(
-			name = true_op, 
+	latex_terms = []
+	for term in terms:
+		lt = growth_class.latex_name(
+			name = term 
 		)
-	except:
-		if test_growth_class_implementation == True: raise
-		latex_terms = []
-		for term in terms:
-			lt = UserFunctions.get_latex_name(
-				name = term, 
-				growth_generator = growth_generator
-			)
-			latex_terms.append(lt)
-		true_op_latex = UserFunctions.get_latex_name(
-			name = true_op, 
-			growth_generator = growth_generator
-		)
+		latex_terms.append(lt)
+	true_op_latex = growth_class.latex_name(
+		name = true_op, 
+	)
 
 	num_terms = len(terms)
 	true_params = []
@@ -395,13 +381,7 @@ growth_class = GrowthRules.get_growth_generator_class(
 	use_experimental_data = exp_data
 )
 
-try:
-	true_operator = growth_class.true_operator
-except:
-	if test_growth_class_implementation == True: raise
-	true_operator = UserFunctions.default_true_operators_by_generator[
-		growth_generation_rule
-	]
+true_operator = growth_class.true_operator
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
 special_probe = arguments.special_probe
@@ -477,27 +457,14 @@ else:
 print("Generating probe dict for plotting")
 
 # TODO 
-try:
-	plot_probe_dict = growth_class.plot_probe_generator(
-		true_operator = true_operator, 
-		growth_generator = growth_generation_rule,
-		experimental_data = exp_data,
-		# special_probe = special_probe, 
-		num_probes = 1, 
-		noise_level = probe_noise_level, 
-	)
-
-except:
-	if test_growth_class_implementation == True: raise
-	plot_probe_dict = UserFunctions.get_probe_dict(
-		# **kwargs
-		true_operator = true_operator, 
-		growth_generator = growth_generation_rule,
-		experimental_data = exp_data,
-		special_probe = special_probe, 
-		num_probes = 1, 
-		noise_level = probe_noise_level, 
-	)
+plot_probe_dict = growth_class.plot_probe_generator(
+	true_operator = true_operator, 
+	growth_generator = growth_generation_rule,
+	experimental_data = exp_data,
+	# special_probe = special_probe, 
+	num_probes = 1, 
+	noise_level = probe_noise_level, 
+)
 print("Generated probe dict for plotting")
 
 for k in list(plot_probe_dict.keys()):
