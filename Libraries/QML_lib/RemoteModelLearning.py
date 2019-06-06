@@ -221,7 +221,8 @@ def learnModelRemote(
         any_job_failed_db.set('Status', 1)
         log_print(
             [
-                "any_job_failed_db:", any_job_failed_db['Status']
+                "any_job_failed_db:", any_job_failed_db['Status'],
+                "\n (type{})".format(type(any_job_failed_db['Status']))
             ]
         )
 
