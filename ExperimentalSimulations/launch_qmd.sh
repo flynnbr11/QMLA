@@ -100,8 +100,8 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='hubbard'
 # sim_growth_rule='hubbard_chain_just_hopping'
 # sim_growth_rule='hubbard_chain'
-sim_growth_rule='hubbard_square_lattice_generalised'
-# sim_growth_rule='hopping_topology'
+# sim_growth_rule='hubbard_square_lattice_generalised'
+sim_growth_rule='hopping_topology'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1

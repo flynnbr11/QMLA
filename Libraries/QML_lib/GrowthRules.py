@@ -12,6 +12,9 @@ import NV_centre_experiment_without_transverse_terms
 import Reduced_NV_experiment
 import IsingChain
 import Hubbard
+import Heisenberg
+import Hopping
+
 
 
 growth_classes = {
@@ -32,7 +35,11 @@ growth_classes = {
     'ising_1d_chain' : 
         IsingChain.isingChain,
     'hubbard_square_lattice_generalised' : 
-        Hubbard.hubbardSquare
+        Hubbard.hubbardSquare,
+    'heisenberg_xyz' : 
+        Heisenberg.heisenbergXYZ, 
+    'hopping_topology' : 
+        Hopping.hopping
 }
 
 
