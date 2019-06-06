@@ -22,128 +22,49 @@ def MAX_PARAM():
 
 ### SET VALUES HERE ####
 
-set_experimental_data_prior_specific_terms = {
-	'xTi' : [4.0, 1.5],
-	'yTi' : [4.0, 1.5],
-	'zTi' : [4.0, 1.5],
-	# 'zTi' : [2.5, 1.0],  # FOR BQIT19 Poster #TODO REMOVE
-	'xTx' : [4.0, 1.5],
-	'yTy' : [4.0, 1.5],
-	'zTz' : [4.0, 1.5],
-	'xTy' : [4.0, 1.5],
-	'xTz' : [4.0, 1.5],
-	'yTz' : [4.0, 1.5],
+# set_experimental_data_prior_specific_terms = {
+# }
 
-	# for QHL tests on 9 qubit case
-	'nv_interaction_z_d9' : [2.5, 1.0],
-	'nv_spin_z_d9' : [2.5, 1.0],
-	'nv_spin_x_d9' : [2.5, 1.0],
-	'nv_interaction_x_d9' : [2.5, 1.0],
-	'nv_spin_y_d9' : [2.5, 1.0],
-	'nv_interaction_y_d9' : [2.5, 1.0],
-}
-
-set_normal_prior_specific_terms = {
-}
+# set_normal_prior_specific_terms = {
+# }
 
 
-set_uniform_prior_specific_terms = {
-}
+# set_uniform_prior_specific_terms = {
+# }
 
-set_true_params = {
-	# Decohering param set
-	# From 3000exp/20000prt, BC SelectedRuns/Nov_28/15_14/results_049
-	'xTi': -0.98288958683093952, # -0.098288958683093952
-	'xTx': 6.7232235286284681, # 0.67232235286284681,  
-	'yTi': 6.4842202054983122,  # 0.64842202054983122, # 
-	'yTy': 2.7377867056770397,  # 0.27377867056770397, 
-	'zTi': 0.96477790489201143, # 0.096477790489201143, 
-	'zTz': 1.6034234519563935, #0.16034234519563935,
-
-	# for testing tracing and compring with May_31/16_51
-	# 'nv_spin_x_d2' : -0.98288958683093952, 
-	# 'nv_spin_y_d2' : 0.4842202054983122, 
-	# 'nv_spin_z_d2' : 4.96477790489201143, 
-
-	# 'nv_spin_x_d6' : -0.98288958683093952, 
-	# 'nv_spin_y_d6' : 0.4842202054983122, 
-	# 'nv_spin_z_d6' : 4.96477790489201143, 
-
-
-	'nv_spin_x_d2' : -0.98288958683093952, 
-	'nv_spin_y_d2' : 6.4842202054983122, 
-	'nv_spin_z_d2' : 0.96477790489201143, 
-	'nv_interaction_x_d2' : 6.7232235286284681, 
-	'nv_interaction_y_d2' :  2.7377867056770397, 
-	'nv_interaction_z_d2' : 1.6034234519563935, 
-
-	'nv_spin_x_d3' : -0.98288958683093952, 
-	'nv_spin_y_d3' : 6.4842202054983122, 
-	'nv_spin_z_d3' : 0.96477790489201143, 
-	'nv_interaction_x_d3' : 6.7232235286284681, 
-	'nv_interaction_y_d3' :  2.7377867056770397, 
-	'nv_interaction_z_d3' : 1.6034234519563935, 
-
-	'nv_spin_x_d6' : -0.98288958683093952, 
-	'nv_interaction_x_d6' : 6.7232235286284681, 
-	'nv_spin_y_d6' : 6.4842202054983122, 
-	'nv_interaction_y_d6' :  2.7377867056770397, 
-	'nv_interaction_z_d6' : 1.6034234519563935, 
-	'nv_spin_z_d6' : 0.96477790489201143, 
-
-
-	'nv_spin_x_d10' : -0.98288958683093952, 
-	'nv_interaction_x_d10' : 6.7232235286284681, 
-	'nv_spin_y_d10' : 6.4842202054983122, 
-	'nv_interaction_y_d10' :  2.7377867056770397, 
-	'nv_interaction_z_d10' : 1.6034234519563935, 
-	'nv_spin_z_d10' : 0.96477790489201143, 
-
-
-}
+# set_true_params = {
+# }
 
 ### Functions ###
-def create_plot_probe(
-	max_num_qubits = 7, 
-	pickle_file = None,
-	growth_class = None, 
-	# plus_probe_for_plot = True,
-	# experimental_data=True, 
-	# growth_generator=None,
-	**kwargs
-):
-	# import ExpectationValues
-
-	# kwargs['test_fill'] = 98
-	print("[createPlotProbe] kwargs", kwargs)
-	# print("[createPlotProbe] exp data:", experimental_data )
-	# print("[createPlotProbe] ggr:",growth_generator )
+# def create_plot_probe(
+# 	max_num_qubits = 7, 
+# 	pickle_file = None,
+# 	growth_class = None, 
+# 	**kwargs
+# ):
+# 	kwargs['num_probes'] = 1 # only want a single probe for plotting purposes
+# 	print("\nPlot probe generated with kwargs:", kwargs, "\n")
 	
+# 	try:
+# 		plot_probe_dict = growth_class.plot_probe_generator(
+# 			**kwargs
+# 		)
+# 	except:
+# 		if test_growth_class_implementation == True: raise
+# 		plot_probe_dict = UserFunctions.get_probe_dict(
+# 			**kwargs
+# 		)
 
-	kwargs['num_probes'] = 1 # only want a single probe for plotting purposes
-	# kwargs['noise_level'] = 1e-7
-	print("\nPlot probe generated with kwargs:", kwargs, "\n")
-	
-	try:
-		plot_probe_dict = growth_class.probe_generator(
-			**kwargs
-		)
-	except:
-		if test_growth_class_implementation == True: raise
-		plot_probe_dict = UserFunctions.get_probe_dict(
-			**kwargs
-		)
+# 	for k in list(plot_probe_dict.keys()):
+# 		# replace tuple like key returned, with just dimension. 
+# 	    plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
 
-	for k in list(plot_probe_dict.keys()):
-		# replace tuple like key returned, with just dimension. 
-	    plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
-
-	if pickle_file is not None:
-		import pickle
-		pickle.dump(
-			plot_probe_dict,
-			open(pickle_file, 'wb') 
-		)
+# 	if pickle_file is not None:
+# 		import pickle
+# 		pickle.dump(
+# 			plot_probe_dict,
+# 			open(pickle_file, 'wb') 
+# 		)
 
 def create_qhl_params(
 	true_op, 
@@ -202,6 +123,10 @@ def create_qhl_params(
 	new_cov_mtx = widen_prior_factor*old_cov_mtx 
 	true_prior.__setattr__('cov', new_cov_mtx)
 	sampled_list = true_prior.sample()
+	try:
+		fixed_true_params = growth_class.true_params
+	except:
+		fixed_true_params = set_true_params
 
 	for i in range(num_terms):
 		if random_vals == True:
@@ -210,7 +135,7 @@ def create_qhl_params(
 		else:
 			try:
 				term = terms[i]
-				true_param = set_true_params[term]
+				true_param = fixed_true_params[term]
 			except:
 				true_param = sampled_list[0][i]		
 		true_params.append(true_param)
@@ -279,24 +204,7 @@ def create_prior(
 		rand_min = MIN_PARAM()
 	if rand_max is None:
 		rand_max = MAX_PARAM()
-
-	# print("[SetParams] CREATE PRIOR:")
-	# print("[SetParams] random vals:", random_vals, )
-	# print("[SetParams] min/max", rand_min, rand_max)
-	# print("[SetParams] Gaussian:", gaussian)
-
-	# TODO should there be an experimental uniform option?
-	if exp_data is True:
-		set_prior_specific_terms = set_experimental_data_prior_specific_terms
-	elif gaussian ==  True:
-		set_prior_specific_terms = set_normal_prior_specific_terms
-	else:
-		set_prior_specific_terms = set_uniform_prior_specific_terms
-
-	# print(
-	# 	"[setQHLParams - create_prior]",
-	# 	"\t prior specific terms:", set_prior_specific_terms
-	# )
+	set_prior_specific_terms = growth_class.gaussian_prior_means_and_widths	
 
 	specific_terms = {}
 	if random_vals is False:
@@ -311,23 +219,6 @@ def create_prior(
 				# in case term not in set_prior_specific_terms
 				val = random.uniform(rand_min, rand_max)
 				specific_terms[term] = [val, sigma]
-	# print("[SetParams] specific terms:", specific_terms)
-
-
-	# terms = list(set_prior_specific_terms.keys())
-	# if random_vals is True:
-	# 	for term in terms:
-	# 		val = random.uniform(rand_min, rand_max)
-	# 		specific_terms[term] = [val, sigma]
-	# else:
-	# 	for term in terms:
-	# 		try:
-	# 			specific_terms[term] = set_prior_specific_terms[term]
-	# 		except: 
-	# 			# in case term not in set_prior_specific_terms
-	# 			val = random.uniform(rand_min, rand_max)
-	# 			specific_terms[term] = [val, sigma]
-	# print("PRIOR:", specific_terms)
 	
 	true_prior = Distrib.get_prior(
 		model_name = true_op, 
@@ -365,41 +256,6 @@ def create_prior(
 		# )
 	return specific_terms, true_prior
 			
-
-def plot_prior(
-	results_directory, 
-	prior
-):
-    prior_file = str(
-        results_directory + '/prior.png'
-    )
-
-    print("\n\n\nPlotting prior to", prior_file)
-    samples = prior.sample(100000)
-
-
-
-    # dev = np.round(np.std(samples), 2)
-    # mean = np.round(np.mean(samples), 2)
-    # plt.axvline(mean, color='red')
-
-    # to_label = str(
-    #     '$\mu=' + 
-    #     str(mean) + 
-    #     ';  \sigma=' + 
-    #     str(dev) + 
-    #     '$'
-    # )
-    # plt.hist(samples, label=to_label)
-    # plt.legend()
-    # plt.title('Samples from prior for this QML')
-    # plt.savefig(prior_file)
-    # plt.clf()
-
-
-
-
-
 
 ### Parse arguments from bash
 parser = argparse.ArgumentParser(
@@ -535,7 +391,8 @@ random_prior = bool(arguments.random_prior_terms)
 exp_data = bool(arguments.use_experimental_data)
 growth_generation_rule = arguments.growth_generation_rule
 growth_class = GrowthRules.get_growth_generator_class(
-	growth_generation_rule = growth_generation_rule
+	growth_generation_rule = growth_generation_rule,
+	use_experimental_data = exp_data
 )
 
 try:
@@ -625,7 +482,7 @@ try:
 		true_operator = true_operator, 
 		growth_generator = growth_generation_rule,
 		experimental_data = exp_data,
-		special_probe = special_probe, 
+		# special_probe = special_probe, 
 		num_probes = 1, 
 		noise_level = probe_noise_level, 
 	)

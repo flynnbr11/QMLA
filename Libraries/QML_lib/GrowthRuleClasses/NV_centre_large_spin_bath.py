@@ -2,7 +2,7 @@ import sys, os
 sys.path.append(os.path.abspath('..'))
 import DataBase
 import ExpectationValues
-
+import ProbeGeneration
 
 from NV_centre_full_access import NVCentreSpinFullAccess
 
@@ -24,7 +24,9 @@ class NVCentreLargeSpinBath(
             **kwargs
         )
 
-        self.true_operator = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
+        # self.true_operator = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
+        self.true_operator = 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6'
+        # self.true_operator = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
         self.initial_models = [
         	'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
     	] 
@@ -33,7 +35,7 @@ class NVCentreLargeSpinBath(
         	'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
         ]
         self.max_num_parameter_estimate = 6
-        self.max_spawn_depth = 4
+        self.max_spawn_depth = 9
         self.max_num_qubits = 10
         self.tree_completed_initially = False
         self.experimental_dataset = 'NVB_rescale_dataset.p'
@@ -44,6 +46,37 @@ class NVCentreLargeSpinBath(
         self.max_num_models_by_shape = {
             1 : 0,
             'other' : 1
+        }
+
+        self.true_params = {
+            'nv_spin_x_d2' : -0.98288958683093952, 
+            'nv_spin_y_d2' : 6.4842202054983122, 
+            'nv_spin_z_d2' : 0.96477790489201143, 
+            'nv_interaction_x_d2' : 6.7232235286284681, 
+            'nv_interaction_y_d2' :  2.7377867056770397, 
+            'nv_interaction_z_d2' : 1.6034234519563935, 
+
+            'nv_spin_x_d3' : -0.98288958683093952, 
+            'nv_spin_y_d3' : 6.4842202054983122, 
+            'nv_spin_z_d3' : 0.96477790489201143, 
+            'nv_interaction_x_d3' : 6.7232235286284681, 
+            'nv_interaction_y_d3' :  2.7377867056770397, 
+            'nv_interaction_z_d3' : 1.6034234519563935, 
+
+            'nv_spin_x_d6' : -0.98288958683093952, 
+            'nv_interaction_x_d6' : 6.7232235286284681, 
+            'nv_spin_y_d6' : 6.4842202054983122, 
+            'nv_interaction_y_d6' :  2.7377867056770397, 
+            'nv_interaction_z_d6' : 1.6034234519563935, 
+            'nv_spin_z_d6' : 0.96477790489201143, 
+
+
+            'nv_spin_x_d10' : -0.98288958683093952, 
+            'nv_interaction_x_d10' : 6.7232235286284681, 
+            'nv_spin_y_d10' : 6.4842202054983122, 
+            'nv_interaction_y_d10' :  2.7377867056770397, 
+            'nv_interaction_z_d10' : 1.6034234519563935, 
+            'nv_spin_z_d10' : 0.96477790489201143, 
         }
 
     def expectation_value(
@@ -105,6 +138,26 @@ class NVCentreLargeSpinBath(
             **kwargs
         )
         return name_map
+
+    def probe_generator(
+        self,
+        **kwargs
+    ):
+        probes = ProbeGeneration.zero_state_probes(
+            max_num_qubits = self.max_num_qubits,
+            **kwargs
+        )
+        return probes
+
+    def plot_probe_generator(
+        self, 
+        **kwargs
+    ):
+        probes = ProbeGeneration.zero_state_probes(
+            max_num_qubits = self.max_num_qubits,
+            **kwargs
+        )
+        return probes
 
 
 

@@ -3,6 +3,7 @@ sys.path.append(os.path.abspath('..'))
 import DataBase
 import ExpectationValues
 import ProbeGeneration
+# import Heuristics
 
 class GrowthRuleSuper():
     # superclass for growth generation rules
@@ -13,7 +14,22 @@ class GrowthRuleSuper():
         **kwargs
     ): 
         self.growth_generation_rule = growth_generation_rule
-        
+        if 'use_experimental_data' in kwargs:
+            self.use_experimental_data = kwargs['use_experimental_data']
+        else:
+            self.use_experimental_data = False
+
+        # by changing the function object these point to, 
+        # determine how probes are generated and expectation values are computed
+        # these can be directly overwritten within class definition
+        # by writing self.probe_generator and self.expectation_value methods         
+        self.probe_generation_function = ProbeGeneration.separable_probe_dict
+        self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
+        self.expectation_value_function = ExpectationValues.expectation_value
+        import Heuristics
+        self.heuristic_function = Heuristics.multiPGH
+
+        # Parameters specific to the growth rule
         self.true_operator = 'xTi'
         self.qhl_models = ['xTi', 'yTi', 'zTi'] 
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
@@ -32,28 +48,24 @@ class GrowthRuleSuper():
             'other' : 0
         }
 
+        self.gaussian_prior_means_and_widths = {
+        }
+
         # TODO set true params for simulation here
-        # self.true_params = {
-        # }
+        self.true_params = {
+        }
        
     def generate_models(
         self, 
         model_list, 
         **kwargs
     ):
-        # default is to just return given model list and set spawn stage to complete
-        
+        # default is to just return given model list and set spawn stage to complete        
         spawn_stage = kwargs['spawn_stage']
         spawn_stage.append('Complete')
         return model_list
         
         
-    def expectation_value(
-        self,
-        **kwargs
-    ):
-        exp_val = ExpectationValues.expectation_value(**kwargs)
-        return exp_val
 
     def check_tree_completed(
         self,
@@ -61,7 +73,6 @@ class GrowthRuleSuper():
         **kwargs
     ):
         if spawn_step == self.max_spawn_depth:
-            print("[default growth class] MAX SPAWN DEPTH REACHED FOR RULE ", self.growth_generation_rule)
             return True 
         else:
             return False
@@ -72,6 +83,7 @@ class GrowthRuleSuper():
         latex_mapping_file, 
         **kwargs
     ):
+        import ModelNames
         return ModelNames.branch_is_num_params(
             latex_mapping_file = latex_mapping_file,
             **kwargs
@@ -85,21 +97,30 @@ class GrowthRuleSuper():
     ):  
         # name: string to be formatted for latex
         return str('${}$'.format(name))
-        
+
+
+    # General wrappers 
+
+    def expectation_value(
+        self,
+        **kwargs
+    ):
+        return self.expectation_value_function(
+            **kwargs
+        )
     def heuristic(
         self,
         **kwargs
     ):
-        import Heuristics
-        # print("[Growth Rules] Default heuristic")
-        heuristic = Heuristics.multiPGH(**kwargs)
-        return heuristic
+        return self.heuristic_function(
+            **kwargs
+        )
         
     def probe_generator(
         self,
         **kwargs
     ):
-        return ProbeGeneration.separable_probe_dict(
+        return self.probe_generation_function(
             max_num_qubits = self.max_num_qubits,
             **kwargs
         )
@@ -108,11 +129,8 @@ class GrowthRuleSuper():
         self, 
         **kwargs
     ):
-        return ProbeGeneration.plus_probes_dict(
+        return self.plot_probe_generation_function(
             max_num_qubits = self.max_num_qubits,
             **kwargs
         )
-
-
-
 

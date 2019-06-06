@@ -29,7 +29,7 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
         self.max_num_qubits = 3
         self.tree_completed_initially = False
         self.experimental_dataset = 'NVB_rescale_dataset.p'
-        self.measurement_type = 'hahn'
+        self.measurement_type = 'full_access'
         self.fixed_axis_generator = False
         self.fixed_axis = 'z' # e.g. transverse axis
 
@@ -37,6 +37,17 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
             1 : 0,
             2 : 18, 
             'other' : 1
+        }
+
+        self.true_params = {
+            # Decohering param set
+            # From 3000exp/20000prt, BC SelectedRuns/Nov_28/15_14/results_049
+            'xTi': -0.98288958683093952, # -0.098288958683093952
+            'xTx': 6.7232235286284681, # 0.67232235286284681,  
+            'yTi': 6.4842202054983122,  # 0.64842202054983122, # 
+            'yTy': 2.7377867056770397,  # 0.27377867056770397, 
+            'zTi': 0.96477790489201143, # 0.096477790489201143, 
+            'zTz': 1.6034234519563935, #0.16034234519563935,
         }
 
     def generate_models(
@@ -198,10 +209,17 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
         # TODO class for simulation which inherits from this class
         # but generates random probes
         print("[Growth Rules - NV] probe generation") 
-        return ProbeGeneration.NV_centre_ising_probes_plus(
-            max_num_qubits = self.max_num_qubits,
-            **kwargs
-        )
+        
+        if self.use_experimental_data == True:
+            return ProbeGeneration.NV_centre_ising_probes_plus(
+                max_num_qubits = self.max_num_qubits,
+                **kwargs
+            )
 
+        else:
+            return ProbeGeneration.separable_probe_dict(
+                max_num_qubits = self.max_num_qubits,
+                **kwargs
+            )
 
 

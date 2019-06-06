@@ -124,12 +124,12 @@ def get_prior(
         samples = dist.sample(10)
         log_print(
             [
-            "Normal Prior",
-            "\nMeans:", 
-            means,
-            "\nCov mtx:",
-            cov_mtx,
-            "\nSamples:", samples
+                "Normal Prior",
+                "\nMeans:", 
+                means,
+                "\nCov mtx:",
+                cov_mtx,
+                "\nSamples:", samples
             ],
             log_file = log_file, 
             log_identifier = log_identifier

@@ -26,7 +26,7 @@ import RedisSettings as rds
 import Evo as evo
 import DataBase 
 import ExperimentalDataFunctions as expdt
-from QMD import QMD #  class moved to QMD in Library
+from QMD import QMD # QMD class in Library
 import QML
 import Evo
 import ExpectationValues
@@ -85,7 +85,7 @@ try:
     generated_probe_dict = growth_class.probe_generator(
         experimental_data = global_variables.use_experimental_data, 
         # growth_generator = global_variables.growth_generation_rule, 
-        special_probe = global_variables.special_probe, 
+        # special_probe = global_variables.special_probe, 
         noise_level = global_variables.probe_noise_level,
         minimum_tolerable_noise = 0.0,
         # noise_level = 0.0,
@@ -383,48 +383,25 @@ log_print(["\n QMD id", global_variables.qmd_id,
 Launch and run QMD
 """
 
-
 generators = [
-    # 'test_changes_to_qmd',
     global_variables.growth_generation_rule,
-    # 'non_interacting_ising',
-    # 'two_qubit_ising_rotation_hyperfine',
-    # 'interacing_nn_ising_fixed_axis'
-    # 'deterministic_transverse_ising_nn_fixed_axis'
-    # 'heisenberg_nontransverse'
 ]
 
 generators.extend(
     global_variables.alternative_growth_rules
 )
-
-print("All growth rules:", generators)
-# generators_from_global_vars = global_variables.
-
-# generator_initial_models = {}
-# for gen in generators:
-#     try:
-#         generator_initial_models[gen] = UserFunctions.initial_models[gen]
-#     except:
-#         generator_initial_models[gen] = UserFunctions.initial_models[None]
-
-print("[Exp] before qmd class, intial op", initial_op_list)
 qmd = QMD(
     global_variables = global_variables, 
     initial_op_list=initial_op_list, 
-    # generator_initial_models = generator_initial_models,
     generator_list = generators, 
     true_operator=true_op, 
-    # true_param_list=true_params, 
     use_time_dep_true_model = False, 
     true_params_time_dep = { 'xTi' : 0.01},
     qle=qle,
     store_particles_weights = store_particles_weights,
-    # bayes_time_binning=global_variables.bayes_time_binning, 
     qhl_plots=do_qhl_plots, 
     results_directory = results_directory,
     long_id = long_id, 
-    # num_probes=num_probes,
     probe_dict = generated_probe_dict, 
     model_priors = model_priors,
     experimental_measurements = experimental_measurements_dict,

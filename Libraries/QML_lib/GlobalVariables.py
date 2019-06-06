@@ -124,11 +124,13 @@ class GlobalVariablesClass():
         self.growth_generation_rule = arguments.growth_generation_rule
         try:
           self.growth_class = GrowthRules.get_growth_generator_class(
-            growth_generation_rule = self.growth_generation_rule
+            growth_generation_rule = self.growth_generation_rule,
+            use_experimental_data = self.use_experimental_data
           )
         except:
           raise
           self.growth_class = None
+        
         ## Switching to using class for growth generators rather than UserFunctions
         try:
           self.measurement_type = self.growth_class.measurement_type

@@ -47,15 +47,20 @@ def get_growth_generator_class(
     growth_generation_rule,
     **kwargs
 ):
+    # TODO: note that in most places, this is called with use_experimental_data.
+    # in some plotting functions this is not known, but it should not matter unless
+    # called to get probes etc. 
+
     # print("Trying to find growth class for ", growth_generation_rule)
+    # print("kwargs:", kwargs)
     try:
         gr = growth_classes[growth_generation_rule](
             growth_generation_rule = growth_generation_rule, 
             **kwargs
         )
     except:
+        raise
         # print("{} growth class not found.".format(growth_generation_rule))
-        # raise
         gr = None
 
     return gr

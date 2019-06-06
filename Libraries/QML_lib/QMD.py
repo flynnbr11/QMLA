@@ -367,7 +367,8 @@ class QMD():
             
             gen = self.GeneratorList[i]
             growth_class_gen = GrowthRules.get_growth_generator_class(
-                gen
+                growth_generation_rule = gen, 
+                use_experimental_data = self.UseExperimentalData
             )
             # self.TreesCompleted[gen] = False
             try:

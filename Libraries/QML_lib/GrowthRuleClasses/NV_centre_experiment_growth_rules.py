@@ -2,6 +2,7 @@ import sys, os
 sys.path.append(os.path.abspath('..'))
 import DataBase
 import ExpectationValues
+import ProbeGeneration
 
 from NV_centre_full_access import NVCentreSpinFullAccess
 
@@ -22,7 +23,9 @@ class NVCentreSpinExperimentalMethod(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-
+        self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
+        self.measurement_type = 'hahn'
+        
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
         self.qhl_models =    	[
@@ -35,29 +38,29 @@ class NVCentreSpinExperimentalMethod(
         self.max_num_qubits = 3
         self.tree_completed_initially = False
         self.experimental_dataset = 'NVB_rescale_dataset.p'
-        self.measurement_type = 'hahn'
         self.fixed_axis_generator = False
         self.fixed_axis = 'z' # e.g. transverse axis
+        if self.use_experimental_data == True:
+            # probes, prior etc specific to using experimental data
+            self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+            self.gaussian_prior_means_and_widths = {
+                # 'xTi' : [4.0, 1.5],
+                # 'yTi' : [4.0, 1.5],
+                # 'zTi' : [4.0, 1.5],
+                # 'xTx' : [4.0, 1.5],
+                # 'yTy' : [4.0, 1.5],
+                # 'zTz' : [4.0, 1.5],
+                # 'xTy' : [4.0, 1.5],
+                # 'xTz' : [4.0, 1.5],
+                # 'yTz' : [4.0, 1.5],                
+            }
+        else:
+            self.gaussian_prior_means_and_widths = {
+            }
+
 
         self.max_num_models_by_shape = {
             1 : 0,
             2 : 18, 
             'other' : 1
         }
-
-    def expectation_value(
-        self, 
-        ham,
-        t,
-        state,
-        **kwargs
-    ):      
-        # print("[Growth Rules - NV] Expectation Values")
-        exp_val = ExpectationValues.n_qubit_hahn_evolution(
-            ham = ham, 
-            t = t, 
-            state = state, 
-            **kwargs
-        )
-        return exp_val
-

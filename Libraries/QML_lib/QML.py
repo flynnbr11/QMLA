@@ -192,6 +192,7 @@ class ModelLearningClass():
         qmd_info_db = rds_dbs['qmd_info_db'] 
         init_model_print_loc = False
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
+        self.UseExperimentalData = qmd_info['use_experimental_data']
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.NumParticles = qmd_info['num_particles']
         self.NumExperiments = qmd_info['num_experiments']
@@ -199,7 +200,8 @@ class ModelLearningClass():
 
         try:
             self.GrowthClass = GrowthRules.get_growth_generator_class(
-                growth_generation_rule = self.GrowthGenerator
+                growth_generation_rule = self.GrowthGenerator,
+                use_experimental_data = self.UseExperimentalData
             )
         except:
             # raise
@@ -261,7 +263,6 @@ class ModelLearningClass():
         self.PlotTimes = qmd_info['plot_times']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.ExpComparisonTol = qmd_info['compare_linalg_exp_tol']
-        self.UseExperimentalData = qmd_info['use_experimental_data']
         self.MeasurementType = qmd_info['measurement_type']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
@@ -1134,7 +1135,8 @@ class reducedModel():
         self.GrowthGenerator = learned_info['growth_generator']
         try:
             self.GrowthClass = GrowthRules.get_growth_generator_class(
-                growth_generation_rule = self.GrowthGenerator
+                growth_generation_rule = self.GrowthGenerator,
+                use_experimental_data = self.UseExperimentalData
             )
         except:
             # raise
@@ -1528,7 +1530,8 @@ class modelClassForRemoteBayesFactor():
         self.InitialParams = learned_model_info['initial_params']
         self.GrowthGenerator = learned_model_info['growth_generator']
         self.GrowthClass = GrowthRules.get_growth_generator_class(
-            growth_generation_rule = self.GrowthGenerator
+            growth_generation_rule = self.GrowthGenerator,
+            use_experimental_data = self.UseExperimentalData
         )
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self.PosteriorMarginal = learned_model_info['posterior_marginal']

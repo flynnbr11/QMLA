@@ -250,18 +250,21 @@ output_file_name = arguments.output_file_name
 
 growth_generation_rule = arguments.growth_generation_rule
 growth_class = GrowthRules.get_growth_generator_class(
-  growth_generation_rule = growth_generation_rule
+  growth_generation_rule = growth_generation_rule,
+  use_experimental_data = arguments.experimental_data
 )
-
-
 
 variables = vars(arguments)
 # and some others arguments not explicitly set in launch script
 try:
   # TODO is it possible to get the names of methods called by wrappers in growth class wrappers?
   variables['measurement_type'] = growth_class.measurement_type
-  variables['expectation_value_func'] = growth_class.expectation_value.__name__
-  variables['heuristic'] = growth_class.heuristic.__name__
+  variables['expectation_value_func'] = growth_class.expectation_value_function.__name__
+  # variables['heuristic'] = growth_class.heuristic_function.__name__
+  variables['probe_generation_function'] = growth_class.probe_generation_function.__name__
+  variables['plot_probe_generation_function'] = growth_class.plot_probe_generation_function.__name__
+
+
 except:
   if test_growth_class_implementation == True: raise
   try:

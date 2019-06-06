@@ -307,13 +307,15 @@ def plus_probes_dict(
 
 def zero_state_probes(max_num_qubits=9, **kwargs):
     zero = np.array([1+0j, 0])
+    num_probes = kwargs['num_probes']
     probes = {}
     
     for q in range(1, 1+max_num_qubits):
-        state = zero
-        for i in range(q-1):
-            state = np.tensordot(state, zero, axes=0).flatten('c')
-        probes[(0, q)] = state
+        for j in range(num_probes):
+            state = zero
+            for i in range(q-1):
+                state = np.tensordot(state, zero, axes=0).flatten('c')
+            probes[(j, q)] = state
 
     return probes
 
