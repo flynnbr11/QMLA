@@ -23,7 +23,8 @@ databases_required  = [
     'bayes_factors_winners_db',
     'active_branches_learning_models',
     'active_branches_bayes',
-    'active_interbranch_bayes'
+    'active_interbranch_bayes',
+    'any_job_failed'
 ]
 
 def databases_from_qmd_id(

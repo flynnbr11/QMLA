@@ -465,6 +465,7 @@ class QMD():
             self.Q_id,
             tree_identifiers = self.TreeIdentifiers
         )
+        self.RedisDataBases['any_job_failed'].set('Status', '')
         
 #        rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.
  
@@ -2791,6 +2792,13 @@ class QMD():
                     )
                     self.BranchAllModelsLearned[branchID] = True
                     self.remoteBayesFromBranchID(branchID)
+                elif self.RedisDataBases['any_job_failed']['Status'] == 'Failed':
+                    self.log_print(
+                        [
+                            "Failure on remote node. Terminating QMD."
+                        ]
+                    )
+
 
 
             for branchID_bytes in active_branches_bayes.keys():
@@ -2908,7 +2916,7 @@ class QMD():
                     self.BranchComparisonsComplete.values()))==True
                 )
             ):    
-                            still_learning = False # i.e. break out of this while loop
+                still_learning = False # i.e. break out of this while loop
 
         print("[QMD runRemoteMult] Finalising QMD.")
         final_winner, final_branch_winners = self.finalBayesComparisons()        
