@@ -1052,7 +1052,7 @@ class QMD():
                         "added to queue."
                     ]
                 )
-                if blocking is True: # i.e. wait for result when called. 
+                if blocking ==  True: # i.e. wait for result when called. 
                     self.log_print(
                         [
                             "Blocking, ie waiting for",
@@ -2609,6 +2609,7 @@ class QMD():
         for k in running_models:
             while int(learned_models_ids.get(k)) != 1:
                 sleep(0.01)
+                self.inspect_remote_job_crashes()
 
         self.log_print(
             [
@@ -2682,6 +2683,18 @@ class QMD():
                 'Heuristic' : mod.HeuristicType, 
                 'ChampLatex' : mod.LatexTerm
             }
+
+    def inspect_remote_job_crashes(self):
+        if self.RedisDataBases['any_job_failed']['Status'] == b'1':
+            # TODO better way to detect errors? For some reason the   
+            # log print isn't being hit, but raising error seems to be.               
+            self.log_print(
+                [
+                    "Failure on remote node. Terminating QMD."
+                ]
+            )
+            raise NameError('Remote QML Failure')
+
 
 
     def runRemoteQMD_MULTIPLE_GEN(
@@ -2767,25 +2780,12 @@ class QMD():
         )
         # while max_spawn_depth_reached==False:
         while self.NumTreesCompleted < self.NumTrees:
-            
             branch_ids_on_db = list(
                 active_branches_learning_models.keys()
             )
+
             # print("[QMD] branches:", branch_ids_on_db)
-            if self.RedisDataBases['any_job_failed']['Status'] == b'1':
-                self.log_print(
-                    [
-                        "Failure on remote node. Terminating QMD."
-                    ]
-                )
-                raise NameError('Remote QML Failure')
-            # else:
-            #     self.log_print(
-            #         [
-            #             "job failure not reported. db:", 
-            #             self.RedisDataBases['any_job_failed']['Status']
-            #         ]
-            #     )
+            self.inspect_remote_job_crashes()
 
 
             for branchID_bytes in branch_ids_on_db:
