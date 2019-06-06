@@ -206,10 +206,19 @@ def learnModelRemote(
     )
 
     log_print(["Updating model."])
-    qml_instance.UpdateModel(
-        n_experiments=num_experiments,
-        sigma_threshold = sigma_threshold
-    )
+    try:
+        qml_instance.UpdateModel(
+            n_experiments=num_experiments,
+            sigma_threshold = sigma_threshold
+        )
+    except NameError:
+        log_print(
+            [
+                "QHL failed for model id {}".format(modelID)
+            ]
+        )
+        raise
+
 
     if qhl_plots:
         log_print(["Drawing plots for QHL"])

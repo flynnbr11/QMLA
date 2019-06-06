@@ -16,6 +16,10 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
+        if self.use_experimental_data == True:
+            import ProbeGeneration
+            self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+
 
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
@@ -200,26 +204,4 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
             latex_term = '+'.join(individual_terms)
             final_term = '$'+latex_term+'$'
             return final_term
-
-    def probe_generator(
-        self,
-        **kwargs
-    ):
-        import ProbeGeneration
-        # TODO class for simulation which inherits from this class
-        # but generates random probes
-        print("[Growth Rules - NV] probe generation") 
-        
-        if self.use_experimental_data == True:
-            return ProbeGeneration.NV_centre_ising_probes_plus(
-                max_num_qubits = self.max_num_qubits,
-                **kwargs
-            )
-
-        else:
-            return ProbeGeneration.separable_probe_dict(
-                max_num_qubits = self.max_num_qubits,
-                **kwargs
-            )
-
 

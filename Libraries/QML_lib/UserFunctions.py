@@ -23,6 +23,47 @@ The functions these pass into must be altered for new QMD applications.
 """
 ##### ---------- -------------------- #####  
 
+"""
+## --  Deprecated. -- ##
+## Retained in case need to reconstruct old growth rules.
+# All growth rules in launch script before 6/6/19:
+
+sim_growth_rule='test_changes_to_qmd'
+sim_growth_rule='reduced_nv_experiment'
+sim_growth_rule='two_qubit_ising_rotation_hyperfine'
+sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+sim_growth_rule='NV_centre_spin_large_bath'
+sim_growth_rule='NV_spin_full_access'
+sim_growth_rule='non_interacting_ising'
+sim_growth_rule='non_interacting_ising_single_axis'
+sim_growth_rule='deterministic_noninteracting_ising_single_axis'
+sim_growth_rule='interacing_nn_ising_fixed_axis' 
+sim_growth_rule='interacting_nearest_neighbour_ising'
+sim_growth_rule='deterministic_interacting_nn_ising_single_axis'
+sim_growth_rule='deterministic_transverse_ising_nn_fixed_axis'
+sim_growth_rule='ising_1d_chain'
+sim_growth_rule='heisenberg_nontransverse'
+sim_growth_rule='heisenberg_transverse'
+sim_growth_rule='heisenberg_xyz'
+sim_growth_rule='hubbard'
+sim_growth_rule='hubbard_chain_just_hopping'
+sim_growth_rule='hubbard_chain'
+sim_growth_rule='hubbard_square_lattice_generalised'
+sim_growth_rule='hopping_topology'
+
+### Experimental growth rules 
+
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+exp_growth_rule='NV_centre_spin_large_bath'
+exp_growth_rule='NV_spin_full_access'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine'
+exp_growth_rule='NV_centre_experiment_debug'
+exp_growth_rule='reduced_nv_experiment'
+exp_growth_rule='PT_Effective_Hamiltonian'
+
+"""
+
+
 
 
 import ModelGeneration 

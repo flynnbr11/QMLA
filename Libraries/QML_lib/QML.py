@@ -607,22 +607,28 @@ class ModelLearningClass():
             ## Call updater to update distribution based on datum
             try:
                 # print("[QML] calling updater")
+                raise NameError("FailedQinferUpdate") # test
+
                 self.Updater.update(
                     self.Datum, 
                     self.Experiment
                 )
-            except RuntimeError:
+            except RuntimeError as e:
                 import sys
                 self.log_print(
                     [
                         "RuntimeError from updater on model ID ", 
                         self.ModelID, 
                         ":",
-                        self.Name
+                        self.Name,
+                        "\nError:\n", 
+                        str(e)
                     ]
                 )
                 print("\n\nEXITING; Inspect log\n\n")
+                raise NameError("FailedQinferUpdate")
                 sys.exit()
+
 
             after_upd = time.time()
             self.update_cumulative_time+=after_upd-before_upd

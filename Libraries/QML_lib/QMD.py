@@ -1054,17 +1054,13 @@ class QMD():
                     )
                     while not queued_model.is_finished:
                         if queued_model.is_failed:
-                            self.log_print(["Model", model_name, 
-                                "has failed on remote worker"]
+                            self.log_print(
+                                [
+                                    "Model", model_name, 
+                                    "has failed on remote worker."
+                                ]
                             )
                             break
-                        # print(
-                        #     "in while loop for model", 
-                        #     model_name,
-                        #     "finished:", 
-                        #     queued_model.is_finished
-                        # )
-
                         time.sleep(0.1)
                     self.log_print(
                         ['Blocking RQ model learned:', model_name]

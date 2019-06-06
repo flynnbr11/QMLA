@@ -139,27 +139,6 @@ class NVCentreLargeSpinBath(
         )
         return name_map
 
-    def probe_generator(
-        self,
-        **kwargs
-    ):
-        probes = ProbeGeneration.zero_state_probes(
-            max_num_qubits = self.max_num_qubits,
-            **kwargs
-        )
-        return probes
-
-    def plot_probe_generator(
-        self, 
-        **kwargs
-    ):
-        probes = ProbeGeneration.zero_state_probes(
-            max_num_qubits = self.max_num_qubits,
-            **kwargs
-        )
-        return probes
-
-
 
 
 ## Supporting functions

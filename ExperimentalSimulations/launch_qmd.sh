@@ -7,10 +7,10 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
-exp_data=0
+exp_data=1
 simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
@@ -31,7 +31,7 @@ rt=0.5
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
-plots=1
+plots=0
 number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
@@ -80,26 +80,8 @@ git_commit=$(git rev-parse HEAD)
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
-# sim_growth_rule='test_changes_to_qmd'
-# sim_growth_rule='reduced_nv_experiment'
-# sim_growth_rule='two_qubit_ising_rotation_hyperfine'
-# sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# sim_growth_rule='NV_centre_spin_large_bath'
-sim_growth_rule='NV_spin_full_access'
-# sim_growth_rule='non_interacting_ising'
-# sim_growth_rule='non_interacting_ising_single_axis'
-# sim_growth_rule='deterministic_noninteracting_ising_single_axis'
-# sim_growth_rule='interacing_nn_ising_fixed_axis' 
-# sim_growth_rule='interacting_nearest_neighbour_ising'
-# sim_growth_rule='deterministic_interacting_nn_ising_single_axis'
-# sim_growth_rule='deterministic_transverse_ising_nn_fixed_axis'
 # sim_growth_rule='ising_1d_chain'
-# sim_growth_rule='heisenberg_nontransverse'
-# sim_growth_rule='heisenberg_transverse'
 # sim_growth_rule='heisenberg_xyz'
-# sim_growth_rule='hubbard'
-# sim_growth_rule='hubbard_chain_just_hopping'
-# sim_growth_rule='hubbard_chain'
 # sim_growth_rule='hubbard_square_lattice_generalised'
 # sim_growth_rule='hopping_topology'
 
@@ -107,12 +89,11 @@ sim_growth_rule='NV_spin_full_access'
 ### which will overwrite growth_rule if exp_data==1
 
 exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_experiment_debug'
 #exp_growth_rule='reduced_nv_experiment'
-# exp_growth_rule='PT_Effective_Hamiltonian'
 
 if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
 then
