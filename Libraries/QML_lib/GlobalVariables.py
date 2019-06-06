@@ -3,7 +3,7 @@ import os
 import sys
 import pickle 
 
-
+import GrowthRules
 import UserFunctions
 import DataBase
 
@@ -122,13 +122,25 @@ class GlobalVariablesClass():
         self.use_experimental_data = bool(arguments.experimental_data)
         # self.measurement_type = arguments.measurement_type
         self.growth_generation_rule = arguments.growth_generation_rule
-        self.measurement_type = UserFunctions.get_measurement_type(
-          growth_generator = self.growth_generation_rule
-        )
-        # self.dataset = arguments.dataset
-        self.dataset = UserFunctions.get_experimental_dataset(
-          growth_generator = self.growth_generation_rule
-        )
+        try:
+          self.growth_class = GrowthRules.get_growth_generator_class(
+            growth_generation_rule = self.growth_generation_rule
+          )
+        except:
+          raise
+          self.growth_class = None
+        ## Switching to using class for growth generators rather than UserFunctions
+        try:
+          self.measurement_type = self.growth_class.measurement_type
+          self.dataset = self.growth_class.experimental_dataset
+        except:
+          self.measurement_type = UserFunctions.get_measurement_type(
+            growth_generator = self.growth_generation_rule
+          )
+          self.dataset = UserFunctions.get_experimental_dataset(
+            growth_generator = self.growth_generation_rule
+          )
+
         self.alternative_growth_rules = arguments.alternative_growth_rules
         self.multiQHL = bool(arguments.multiQHL)
         self.models_for_qhl = arguments.models_for_qhl

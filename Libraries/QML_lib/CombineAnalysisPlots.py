@@ -1,5 +1,9 @@
 import argparse
 import os
+import GrowthRules
+
+global test_growth_class_implementation
+test_growth_class_implementation = True
 
 class store_variables():
     def __init__(self, **kwargs):
@@ -244,34 +248,48 @@ arguments = parser.parse_args()
 results_directory = arguments.results_directory
 output_file_name = arguments.output_file_name
 
+growth_generation_rule = arguments.growth_generation_rule
+growth_class = GrowthRules.get_growth_generator_class(
+  growth_generation_rule = growth_generation_rule
+)
+
+
+
 variables = vars(arguments)
 # and some others arguments not explicitly set in launch script
 try:
-  variables['measurement_type'] = UserFunctions.measurement_type[
-    arguments.growth_generation_rule
-  ]
+  # TODO is it possible to get the names of methods called by wrappers in growth class wrappers?
+  variables['measurement_type'] = growth_class.measurement_type
+  variables['expectation_value_func'] = growth_class.expectation_value.__name__
+  variables['heuristic'] = growth_class.heuristic.__name__
 except:
-  variables['measurement_type'] = UserFunctions.measurement_type[
-    None
-  ]
+  if test_growth_class_implementation == True: raise
+  try:
+    variables['measurement_type'] = UserFunctions.measurement_type[
+      arguments.growth_generation_rule
+    ]
+  except:
+    variables['measurement_type'] = UserFunctions.measurement_type[
+      None
+    ]
 
-try:
-  variables['exp_val'] = UserFunctions.expec_val_function_dict[
-    variables['measurement_type']
-  ]
-except:
-  variables['expectation_value_func'] = UserFunctions.expec_val_function_dict[
-    None
-  ]
+  try:
+    variables['expectation_value_func'] = UserFunctions.expec_val_function_dict[
+      variables['measurement_type']
+    ]
+  except:
+    variables['expectation_value_func'] = UserFunctions.expec_val_function_dict[
+      None
+    ]
 
-try:
-  variables['heuristic'] = UserFunctions.heuristic_classes[
-    arguments.growth_generation_rule
-  ]
-except:
-  variables['heuristic'] = UserFunctions.heuristic_classes[
-    None
-  ]
+  try:
+    variables['heuristic'] = UserFunctions.heuristic_classes[
+      arguments.growth_generation_rule
+    ]
+  except:
+    variables['heuristic'] = UserFunctions.heuristic_classes[
+      None
+    ]
 
 
 

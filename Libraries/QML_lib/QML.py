@@ -7,6 +7,7 @@ import copy
 import qinfer as qi
 # import Evo
 import ExpectationValues
+import GrowthRules
 import UserFunctions
 import Distrib as Distributions
 import GenSimQMD_IQLE as gsi
@@ -30,6 +31,10 @@ debug_log_print = True
 debug_print = False
 print_mem_status = True
 global_print_loc = False
+
+
+global test_growth_class_implementation
+test_growth_class_implementation = True
 
 
 """
@@ -192,6 +197,15 @@ class ModelLearningClass():
         self.NumExperiments = qmd_info['num_experiments']
         self.GrowthGenerator = growth_generator
 
+        try:
+            self.GrowthClass = GrowthRules.get_growth_generator_class(
+                growth_generation_rule = self.GrowthGenerator
+            )
+        except:
+            # raise
+            self.GrowthClass = None
+
+
         base_resources = qmd_info['base_resources']
         base_num_qubits = base_resources['num_qubits']
         base_num_terms = base_resources['num_terms']
@@ -200,9 +214,13 @@ class ModelLearningClass():
             DataBase.get_constituent_names_from_name(self.Name)
         )
 
-        max_num_params = UserFunctions.max_num_parameter_estimate[
-            self.GrowthGenerator
-        ]
+        try:
+            max_num_params = self.GrowthClass.max_num_parameter_estimate
+        except:
+            if test_growth_class_implementation == True: raise
+            max_num_params = UserFunctions.max_num_parameter_estimate[
+                self.GrowthGenerator
+            ]
 
         if qmd_info['reallocate_resources']==True:
             new_resources = resource_allocation(
@@ -248,10 +266,17 @@ class ModelLearningClass():
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
         self.SimOpsNames = simopnames
-        self.LatexTerm = UserFunctions.get_latex_name(
-            name = self.Name,
-            growth_generator = self.GrowthGenerator
-        )
+
+        try:
+            self.LatexTerm = self.GrowthClass.latex_name(
+                name = self.Name
+            )
+        except:
+            if test_growth_class_implementation == True: raise
+            self.LatexTerm = UserFunctions.get_latex_name(
+                name = self.Name,
+                growth_generator = self.GrowthGenerator
+            )
         
         print_loc(print_location=init_model_print_loc)
         
@@ -379,13 +404,20 @@ class ModelLearningClass():
             '.png'
         )
 
-        latex_terms = [
-            UserFunctions.get_latex_name(
-                name = term, 
-                growth_generator = self.GrowthGenerator
-            )
-            for term in individual_terms_in_name
-        ]
+        latex_terms = []
+        for term in individual_terms_in_name:
+            try:
+                lt = self.GrowthClass.latex_name(
+                    name = term
+                )
+            except:
+                if test_growth_class_implementation == True: raise
+                lt = UserFunctions.get_latex_name(
+                    name = term, 
+                    growth_generator = self.GrowthGenerator
+                )
+            latex_terms.append(lt)
+
         plot_all_priors = False
         if plot_all_priors == True:
             Distributions.plot_prior(
@@ -414,6 +446,7 @@ class ModelLearningClass():
             num_time_dep_true_params = self.NumTimeDepTrueParams,
             num_probes=self.NumProbes,
             measurement_type = self.MeasurementType,
+            growth_generation_rule = self.GrowthGenerator, 
             use_experimental_data = self.UseExperimentalData,
             experimental_measurements = self.ExperimentalMeasurements,
             experimental_measurement_times=self.ExperimentalMeasurementTimes, 
@@ -451,17 +484,28 @@ class ModelLearningClass():
         #     increase_time = self.IncreasePGHTime,
         #     pgh_exponent = self.PGHExponent
         # )
-        
-        self.Heuristic = UserFunctions.get_heuristic(
-            growth_generator = self.GrowthGenerator,
-            updater = self.Updater, 
-            oplist = self.SimOpList, 
-            inv_field = self.Inv_Field, 
-            increase_time = self.IncreasePGHTime, 
-            pgh_exponent = self.PGHExponent, 
-            time_list = self.PlotTimes,
-            num_experiments = self.NumExperiments,
-        )
+        try:
+            self.Heuristic = self.GrowthClass.heuristic(
+                updater = self.Updater, 
+                oplist = self.SimOpList, 
+                inv_field = self.Inv_Field, 
+                increase_time = self.IncreasePGHTime, 
+                pgh_exponent = self.PGHExponent, 
+                time_list = self.PlotTimes,
+                num_experiments = self.NumExperiments,
+            )
+        except:
+            if test_growth_class_implementation == True: raise
+            self.Heuristic = UserFunctions.get_heuristic(
+                growth_generator = self.GrowthGenerator,
+                updater = self.Updater, 
+                oplist = self.SimOpList, 
+                inv_field = self.Inv_Field, 
+                increase_time = self.IncreasePGHTime, 
+                pgh_exponent = self.PGHExponent, 
+                time_list = self.PlotTimes,
+                num_experiments = self.NumExperiments,
+            )
         self.HeuristicType = self.Heuristic.__class__.__name__
 
 
@@ -1088,11 +1132,25 @@ class reducedModel():
         self.FinalSigmas = learned_info['final_sigmas']
         self.cov_matrix = learned_info['cov_matrix']
         self.GrowthGenerator = learned_info['growth_generator']
+        try:
+            self.GrowthClass = GrowthRules.get_growth_generator_class(
+                growth_generation_rule = self.GrowthGenerator
+            )
+        except:
+            # raise
+            self.GrowthClass = None
         self.HeuristicType = learned_info['heuristic']
-        self.LatexTerm = UserFunctions.get_latex_name(
-            name = self.Name,
-            growth_generator = self.GrowthGenerator
-        )
+
+        try:
+            self.LatexTerm = self.GrowthClass.latex_name(
+                name = self.Name
+            )
+        except:
+            if test_growth_class_implementation == True: raise
+            self.LatexTerm = UserFunctions.get_latex_name(
+                name = self.Name,
+                growth_generator = self.GrowthGenerator
+            )
 
         self.TrackParameterEstimates = {}
         num_params = np.shape(self.TrackEval)[1]
@@ -1159,33 +1217,20 @@ class reducedModel():
         #     "times to compute:", required_times
         # )
         for t in required_times:
+            try:
+                self.expectation_values[t] = self.GrowthClass.expectation_value(
+                    ham = self.LearnedHamiltonian, 
+                    t = t,
+                    state = probe
+                )
+            except:
+                if test_growth_class_implementation == True: raise
                 self.expectation_values[t] = UserFunctions.expectation_value_wrapper(
                     method=self.MeasurementType,
                     ham = self.LearnedHamiltonian, 
                     t = t,
                     state = probe
                 )
-
-            # if self.UseExperimentalData:
-            #     # self.expectation_values[t] = Evo.hahn_evolution(
-            #     self.expectation_values[t] = Evo.expectation_value_wrapper(
-            #         method='hahn',
-            #         ham = self.LearnedHamiltonian, 
-            #         t = t,
-            #         state = probe
-            #     )
-
-            # else:
-            #     self.expectation_values[t] = (
-            #         # Evo.traced_expectation_value_project_one_qubit_plus(
-            #         Evo.expectation_value_wrapper(
-            #             method='trace_all_but_first',
-            #             ham = self.LearnedHamiltonian, 
-            #             t = t,
-            #             state = probe
-            #         )
-            #     )
-
 
     def r_squared(
         self, 
@@ -1251,12 +1296,20 @@ class reducedModel():
                 #         ham=ham, t=t, state=probe
                 #     )
 
-                sim = UserFunctions.expectation_value_wrapper(
-                    method=self.MeasurementType,
-                    ham=ham, 
-                    t=t, 
-                    state=probe
-                )
+                try:
+                    sim = self.GrowthClass.expectation_value(
+                        ham=ham, 
+                        t=t, 
+                        state=probe
+                    )
+                except:
+                    if test_growth_class_implementation == True: raise
+                    sim = UserFunctions.expectation_value_wrapper(
+                        method=self.MeasurementType,
+                        ham=ham, 
+                        t=t, 
+                        state=probe
+                    )
                 self.expectation_values[t] = sim
 
             true = self.ExperimentalMeasurements[t]
@@ -1345,12 +1398,20 @@ class reducedModel():
                 list(self.expectation_values.keys())
             )
             for t in exp_times:
-                sim = UserFunctions.expectation_value_wrapper(
-                    method=self.MeasurementType,
+                try:
+                    sim = self.GrowthClass.expectation_value(
                     ham=ham, 
                     t=t, 
                     state=probe
-                )
+                    )
+                except:
+                    if test_growth_class_implementation == True: raise
+                    sim = UserFunctions.expectation_value_wrapper(
+                        method=self.MeasurementType,
+                        ham=ham, 
+                        t=t, 
+                        state=probe
+                    )
 
                 # if self.UseExperimentalData==True:
                 #     # sim = ExpectationValues.hahn_evolution(
@@ -1465,7 +1526,10 @@ class modelClassForRemoteBayesFactor():
         self.FinalParams = learned_model_info['final_params'] 
         self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
         self.InitialParams = learned_model_info['initial_params']
-        
+        self.GrowthGenerator = learned_model_info['growth_generator']
+        self.GrowthClass = GrowthRules.get_growth_generator_class(
+            growth_generation_rule = self.GrowthGenerator
+        )
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self.PosteriorMarginal = learned_model_info['posterior_marginal']
         self.InitialPrior = learned_model_info['initial_prior']
@@ -1481,6 +1545,7 @@ class modelClassForRemoteBayesFactor():
             trueparams = self.TrueParams, 
             truename=self.TrueOpName,
             measurement_type = self.MeasurementType,
+            growth_generation_rule = self.GrowthGenerator, 
             use_experimental_data = self.UseExperimentalData,
             experimental_measurements = self.ExperimentalMeasurements,
             experimental_measurement_times=(

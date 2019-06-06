@@ -6,12 +6,12 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
-qhl_test=1
+num_tests=2
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -31,7 +31,7 @@ rt=0.5
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
-plots=1
+plots=0
 number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
@@ -81,9 +81,10 @@ git_commit=$(git rev-parse HEAD)
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='test_changes_to_qmd'
+# sim_growth_rule='reduced_nv_experiment'
 # sim_growth_rule='two_qubit_ising_rotation_hyperfine'
 # sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-sim_growth_rule='NV_centre_spin_large_bath'
+# sim_growth_rule='NV_centre_spin_large_bath'
 # sim_growth_rule='NV_spin_full_access'
 # sim_growth_rule='non_interacting_ising'
 # sim_growth_rule='non_interacting_ising_single_axis'
@@ -100,13 +101,13 @@ sim_growth_rule='NV_centre_spin_large_bath'
 # sim_growth_rule='hubbard_chain_just_hopping'
 # sim_growth_rule='hubbard_chain'
 # sim_growth_rule='hubbard_square_lattice_generalised'
-# sim_growth_rule='hopping_topology'
+sim_growth_rule='hopping_topology'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-exp_growth_rule='NV_centre_spin_large_bath'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_experiment_debug'
@@ -152,6 +153,9 @@ store_prt_wt=0 # store all particles and weights after learning
 rand_prior=0
 special_probe='random' #'plus' #'ideal'
 special_probe_plot='plus' #'random'
+# special_probe_plot='random' #'random'
+# special_probe_plot='zero' #'random'
+
 # special_probe='plus_random' #'plus' #'ideal'
 
 if (( "$exp_data" == 1))  
