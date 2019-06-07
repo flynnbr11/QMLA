@@ -36,7 +36,7 @@ class NVCentreLargeSpinBath(
         ]
         self.max_num_parameter_estimate = 6
         self.max_spawn_depth = 9
-        self.max_num_qubits = 6
+        self.max_num_qubits = 8
         self.plot_probe_generation_function = ProbeGeneration.zero_state_probes
 
         self.max_num_models_by_shape = {
