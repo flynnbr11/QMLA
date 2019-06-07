@@ -1872,7 +1872,7 @@ class QMD():
                     ]
                 )
                 while job_list[k].is_finished == False:
-                    if job.is_failed == True:
+                    if job_list[k].is_failed == True:
                         raise NameError("Remote QML failure")
                     sleep(0.01)
         else:
