@@ -28,7 +28,7 @@ class hubbardSquare(GrowthRuleSuper):
 
         self.max_num_parameter_estimate = 2
         self.max_spawn_depth = 10
-        self.max_num_qubits = 8
+        self.max_num_qubits = 6
         
         self.max_num_models_by_shape = {
             4 : 2,

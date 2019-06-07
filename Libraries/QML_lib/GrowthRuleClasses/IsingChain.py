@@ -30,7 +30,7 @@ class isingChain(
         ]
         self.max_num_parameter_estimate = 2
         self.max_spawn_depth = 5
-        self.max_num_qubits = 5
+        self.max_num_qubits = 6
         self.fixed_axis_generator = True
         self.fixed_axis = 'x' # e.g. transverse axis
         self.transverse_axis = 'z'
