@@ -219,6 +219,13 @@ def learnModelRemote(
             ]
         )
         any_job_failed_db.set('Status', 1)
+    except:
+        log_print(
+            [
+                "QHL failed for model id {}. Setting job failure database.".format(modelID)
+            ]
+        )
+        any_job_failed_db.set('Status', 1)
         # raise
         # sys.exit()
 
