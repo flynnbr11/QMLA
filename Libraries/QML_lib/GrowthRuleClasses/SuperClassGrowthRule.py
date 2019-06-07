@@ -37,6 +37,7 @@ class GrowthRuleSuper():
         self.max_num_parameter_estimate = 2
         self.max_spawn_depth = 10
         self.max_num_qubits = 5
+        self.max_num_probe_qubits = 11
         self.tree_completed_initially = False
         self.experimental_dataset = 'NVB_rescale_dataset.p'
         self.measurement_type = 'full_access'
@@ -122,7 +123,7 @@ class GrowthRuleSuper():
         **kwargs
     ):
         return self.probe_generation_function(
-            max_num_qubits = self.max_num_qubits,
+            max_num_qubits = self.max_num_probe_qubits,
             **kwargs
         )
 
@@ -131,7 +132,7 @@ class GrowthRuleSuper():
         **kwargs
     ):
         return self.plot_probe_generation_function(
-            max_num_qubits = self.max_num_qubits,
+            max_num_qubits = self.max_num_probe_qubits,
             **kwargs
         )
 

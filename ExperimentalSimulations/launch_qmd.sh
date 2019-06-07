@@ -7,10 +7,10 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
-exp_data=1
+exp_data=0
 simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
@@ -81,14 +81,14 @@ git_commit=$(git rev-parse HEAD)
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='ising_1d_chain'
-# sim_growth_rule='heisenberg_xyz'
+sim_growth_rule='heisenberg_xyz'
 # sim_growth_rule='hubbard_square_lattice_generalised'
 # sim_growth_rule='hopping_topology'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'
@@ -103,8 +103,9 @@ else
 fi
 
 alt_growth_rules=(
-    # 'interacing_nn_ising_fixed_axis'
-    # 'hubbard_square_lattice_generalised'
+    'two_qubit_ising_rotation_hyperfine'
+    'ising_1d_chain'
+    'hubbard_square_lattice_generalised'
 )
 
 growth_rules_command=""

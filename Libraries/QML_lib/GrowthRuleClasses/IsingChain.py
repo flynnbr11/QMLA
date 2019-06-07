@@ -116,18 +116,22 @@ class isingChain(
         individual_terms = DataBase.get_constituent_names_from_name(name)
         chain_axis = transverse_axis = None
         
-        for term in individual_terms:
-            components = term.split('_')
-            components.remove('1Dising')
-            for c in components:
-                if c[0] == 'd':
-                    dim = int(c.replace('d', ''))
-                elif c[0] == 'i':
-                    chain_axis = str(c.replace('i', ''))
-                    include_chain_component = True
-                elif c[0] == 't' : 
-                    include_transverse_component = True
-                    transverse_axis = str(c.replace('t', ''))
+        try:
+            for term in individual_terms:
+                components = term.split('_')
+                components.remove('1Dising')
+                for c in components:
+                    if c[0] == 'd':
+                        dim = int(c.replace('d', ''))
+                    elif c[0] == 'i':
+                        chain_axis = str(c.replace('i', ''))
+                        include_chain_component = True
+                    elif c[0] == 't' : 
+                        include_transverse_component = True
+                        transverse_axis = str(c.replace('t', ''))
+        except:
+            print("Can't find latex name using Ising method for model ", name)
+            raise
                 
         latex_term = '$('
         if chain_axis is not None:

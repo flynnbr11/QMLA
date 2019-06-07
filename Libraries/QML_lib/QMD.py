@@ -723,15 +723,12 @@ class QMD():
         growth_rule, 
         model_list
     ):
-        print(
-            "NEW BRANCH. gen=",
-            growth_rule, 
-            "type:", 
-            type(growth_rule)
-        )
         model_list = list(set(model_list)) # remove possible duplicates
         self.HighestBranchID += 1
         branchID = int(self.HighestBranchID)
+        print(
+            "NEW BRANCH {}. growth rule= {}".format(branchID, growth_rule)
+        )
         self.BranchBayesComputed[branchID] = False
         num_models = len(model_list)
         self.NumModelsPerBranch[branchID] = num_models
@@ -745,10 +742,12 @@ class QMD():
 
         self.log_print(
             [
-            'Branch', branchID,
-            'growth rule:', growth_rule,  
-            'has', num_models, ' new models:',  
-            model_list
+                'Branch {} growth rule {} has {} new models {}'.format(
+                    branchID, 
+                    growth_rule, 
+                    num_models, 
+                    model_list
+                )
             ]
         )
         pre_computed_models = []
@@ -2339,8 +2338,10 @@ class QMD():
         # self.log_print(["Spawning, spawn depth:", self.SpawnDepth])
         self.log_print(
             [
-                "Spawning. Growth rule:", growth_rule, 
-                ". Depth:", self.SpawnDepthByGrowthRule[growth_rule]
+                "Spawning. Growth rule: {}. Depth: {}".format(
+                    growth_rule,
+                    self.SpawnDepthByGrowthRule[growth_rule]
+                )
             ]
         )
         best_models = self.BranchRankings[branchID][:num_models]
@@ -2355,7 +2356,8 @@ class QMD():
             list(self.BranchChampions.values())
         ]
 
-        new_models = self.GrowthClass.generate_models(
+        
+        new_models = self.BranchGrowthClasses[branchID].generate_models(
             # generator = growth_rule, 
             model_list=best_model_names,
             spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
@@ -2409,7 +2411,7 @@ class QMD():
             blocking=False, 
             use_rq=True
         )
-        tree_completed = self.GrowthClass.check_tree_completed(
+        tree_completed = self.BranchGrowthClasses[branchID].check_tree_completed(
             spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
             current_num_qubits = new_model_dimension
         )
