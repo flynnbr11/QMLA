@@ -238,8 +238,12 @@ def BayesFactorRemote(
 
 
         ### Verbatim code used in december version, though functionally equivalent to elif binning case above
-        recreate_dec_13_times_list_method = False
-        if recreate_dec_13_times_list_method == True:
+        recreate_dec_13_times_list_method = True
+        if (
+            use_experimental_data == True
+            and 
+            recreate_dec_13_times_list_method == True
+        ):
             # print("[BF calculation] Generating times as in Dec")
             try:
                 min_time = min(min(model_a.Times), min(model_b.Times))
@@ -322,93 +326,18 @@ def BayesFactorRemote(
             and
             DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name)
         ):
+
+
             try:
-                print("\n\nBF UPDATE Model {}".format(model_a.Name))
-                
-                old_post_marg = model_a.PosteriorMarginal
-                before_bf_updates = []
-                new_post_marg = []
-
-                posterior_plot_path = str(
-                    bf_data_folder + 
-                    '/posterior_marginal_pickle_{}_{}.p'.format(
-                        str(qid), 
-                        str(model_a.ModelID), 
-                    )
+                print("\n\nBF UPDATE Model {}".format(model_a.Name))               
+                plot_posterior_marginals(
+                    model_a = model_a, 
+                    qid = qid,
+                    updater_a_copy = updater_a_copy, 
+                    bf_data_folder = bf_data_folder
                 )
-
-                pickle.dump(
-                    model_a.Updater,
-                    open(
-                        posterior_plot_path, 
-                        'wb'    
-                    )
-                )
-
-                for i in range(len(old_post_marg)):
-                    before_bf_updates.append(
-                        updater_a_copy.posterior_marginal(idx_param=i)
-                    )                    
-
-                    new_post_marg.append(
-                        model_a.Updater.posterior_marginal(idx_param=i)
-                    )
-                    # new_post_marg = model_a.Updater.posterior_marginal(1)
-                
-                # print("OLD:", old_post_marg)
-                # print("NEW:", new_post_marg)
-                param_of_interest = 1
-                
-                for param_of_interest in range(len(old_post_marg)):
-                    posterior_plot_path = str(
-                        bf_data_folder + 
-                        '/posterior_marginal_{}_mod{}_param{}.png'.format(
-                            str(qid), 
-                            str(model_a.ModelID), 
-                            str(param_of_interest)
-                        )
-                    )
-                    if  os.path.exists(posterior_plot_path):
-                        # ie a previous BF calculation has drawn these for the true model
-                        break
-                    plt.clf()
-                    plt.plot(
-                        before_bf_updates[param_of_interest][0], 
-                        before_bf_updates[param_of_interest][1],
-                        color='blue',
-                        linestyle = '--',  
-                        label='Start BF'
-
-                    )
-                    plt.plot(
-                        new_post_marg[param_of_interest][0], 
-                        new_post_marg[param_of_interest][1],
-                        color='y',
-                        linestyle = '--',  
-                        label='End BF'
-
-                    )
-                    init_post_marg = model_a.InitialPrior[param_of_interest]
-                    plt.plot(
-                        init_post_marg[0], 
-                        init_post_marg[1],
-                        color='green', 
-                        label='Start QML',
-                        alpha=0.4,
-                    )
-                    plt.plot(
-                        old_post_marg[param_of_interest][0], 
-                        old_post_marg[param_of_interest][1],
-                        color='red', 
-                        linestyle='-.',
-                        label='End QML'
-                    )
-                    plt.legend()
-
-                    plt.savefig(posterior_plot_path)
             except:
                 raise
-                # pass
 
         # TODO this is the original position of getting log likelihood + bayes factor; 
         # moving above so we can plot posterior before and after BF updates.             
@@ -771,3 +700,92 @@ def plot_expec_vals_of_models(
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')    
+
+
+def plot_posterior_marginals(
+    model_a,
+    updater_a_copy,
+    qid, 
+    bf_data_folder
+):
+    old_post_marg = model_a.PosteriorMarginal
+    before_bf_updates = []
+    new_post_marg = []
+
+    posterior_plot_path = str(
+        bf_data_folder + 
+        '/posterior_marginal_pickle_{}_{}.p'.format(
+            str(qid), 
+            str(model_a.ModelID), 
+        )
+    )
+
+    pickle.dump(
+        model_a.Updater,
+        open(
+            posterior_plot_path, 
+            'wb'    
+        )
+    )
+
+    for i in range(len(old_post_marg)):
+        before_bf_updates.append(
+            updater_a_copy.posterior_marginal(idx_param=i)
+        )                    
+
+        new_post_marg.append(
+            model_a.Updater.posterior_marginal(idx_param=i)
+        )
+        # new_post_marg = model_a.Updater.posterior_marginal(1)
+    
+    # print("OLD:", old_post_marg)
+    # print("NEW:", new_post_marg)
+    param_of_interest = 1
+    
+    for param_of_interest in range(len(old_post_marg)):
+        posterior_plot_path = str(
+            bf_data_folder + 
+            '/posterior_marginal_{}_mod{}_param{}.png'.format(
+                str(qid), 
+                str(model_a.ModelID), 
+                str(param_of_interest)
+            )
+        )
+        if  os.path.exists(posterior_plot_path):
+            # ie a previous BF calculation has drawn these for the true model
+            break
+        plt.clf()
+        plt.plot(
+            before_bf_updates[param_of_interest][0], 
+            before_bf_updates[param_of_interest][1],
+            color='blue',
+            linestyle = '--',  
+            label='Start BF'
+
+        )
+        plt.plot(
+            new_post_marg[param_of_interest][0], 
+            new_post_marg[param_of_interest][1],
+            color='y',
+            linestyle = '--',  
+            label='End BF'
+
+        )
+        init_post_marg = model_a.InitialPrior[param_of_interest]
+        plt.plot(
+            init_post_marg[0], 
+            init_post_marg[1],
+            color='green', 
+            label='Start QML',
+            alpha=0.4,
+        )
+        plt.plot(
+            old_post_marg[param_of_interest][0], 
+            old_post_marg[param_of_interest][1],
+            color='red', 
+            linestyle='-.',
+            label='End QML'
+        )
+        plt.legend()
+
+        plt.savefig(posterior_plot_path)

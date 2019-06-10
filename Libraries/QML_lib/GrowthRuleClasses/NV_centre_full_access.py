@@ -37,6 +37,9 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
         self.fixed_axis_generator = False
         self.fixed_axis = 'z' # e.g. transverse axis
 
+        self.min_param = 0
+        self.max_param = 10
+
         self.max_num_models_by_shape = {
             1 : 0,
             2 : 18, 

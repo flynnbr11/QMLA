@@ -190,6 +190,7 @@ def create_prior(
 		rand_min = MIN_PARAM()
 	if rand_max is None:
 		rand_max = MAX_PARAM()
+	sigma = growth_class.max_param - growth_class.min_param
 	set_prior_specific_terms = growth_class.gaussian_prior_means_and_widths	
 
 	specific_terms = {}
@@ -203,14 +204,16 @@ def create_prior(
 				specific_terms[term] = set_prior_specific_terms[term]
 			except: 
 				# in case term not in set_prior_specific_terms
-				val = random.uniform(rand_min, rand_max)
+				val = random.uniform(growth_class.min_param, growth_class.max_param)
 				specific_terms[term] = [val, sigma]
 	
 	true_prior = Distrib.get_prior(
 		model_name = true_op, 
 	    gaussian = True, 
-	    param_minimum = rand_min,
-	    param_maximum = rand_max,
+	    # param_minimum = rand_min,
+	    # param_maximum = rand_max,
+	    param_minimum = growth_class.min_param,
+	    param_maximum = growth_class.max_param,
 	    param_normal_mean = param_mean, 
 	    param_normal_sigma = param_sigma,
 	    random_mean = False, # if set to true, chooses a random mean between given uniform min/max
@@ -462,7 +465,7 @@ plot_probe_dict = growth_class.plot_probe_generator(
 	growth_generator = growth_generation_rule,
 	experimental_data = exp_data,
 	# special_probe = special_probe, 
-	num_probes = 1, 
+	# num_probes = 1, 
 	noise_level = probe_noise_level, 
 )
 print("Generated probe dict for plotting")

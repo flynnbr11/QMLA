@@ -89,7 +89,7 @@ generated_probe_dict = growth_class.probe_generator(
     minimum_tolerable_noise = 0.0,
     # noise_level = 0.0,
     # minimum_tolerable_noise = 1e-7, # to match dec_14/09_55 run # TODO remove!!!
-    num_probes = global_variables.num_probes
+    # num_probes = global_variables.num_probes
 )
 print("Generated probe dict from growth class")
 

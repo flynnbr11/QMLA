@@ -7,11 +7,11 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
-exp_data=0
-simulate_experiment=1
+exp_data=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -89,8 +89,8 @@ git_commit=$(git rev-parse HEAD)
 ### which will overwrite growth_rule if exp_data==1
 
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine'
-exp_growth_rule='NV_centre_spin_large_bath'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine'
+# exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='NV_centre_experiment_debug'
 #exp_growth_rule='reduced_nv_experiment'
@@ -134,30 +134,14 @@ store_prt_wt=0 # store all particles and weights after learning
 rand_prior=1
 special_probe='random' #'plus' #'ideal'
 special_probe_plot='plus' #'random'
-# special_probe_plot='random' #'random'
-# special_probe_plot='zero' #'random'
-
-# special_probe='plus_random' #'plus' #'ideal'
 
 if (( "$exp_data" == 1))  
 then
-#    special_probe='plus'
-    # param_min=10
-    # param_max=20
-    # rand_true_params=0
-    # special_probe='plus_random'
-    # special_probe='plus'
     special_probe='dec_13_exp'
     special_probe_plot='plus'
 elif (( "$simulate_experiment" == 1)) 
 then
-#    special_probe='plus'
-    # param_min=10
-    # param_max=20
-    # rand_true_params=0
     special_probe='random'
-    # special_probe='plus'
-    # special_probe='dec_13_exp'
     special_probe_plot='plus'
 fi
 
@@ -194,20 +178,20 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -true=$true_params_pickle_file \
     -prior=$prior_pickle_file \
     -probe=$plot_probe_file \
-    -plus=$force_plot_plus \
     -pnoise=$probe_noise \
-    -sp=$special_probe_plot \
     -ggr=$growth_rule \
     -exp=$exp_data \
     -g=$gaussian \
-    -min=$param_min \
-    -max=$param_max \
     -mean=$param_mean \
     -sigma=$param_sigma \
     -rand_t=$rand_true_params \
     -rand_p=$rand_prior \
     -dir=$full_path_to_results \
-    -log=$this_log
+    -log=$this_log \
+    -min=$param_min \
+    -max=$param_max \
+    -plus=$force_plot_plus \
+    -sp=$special_probe_plot \
 
 
 for prt in  "${particle_counts[@]}";
@@ -222,23 +206,24 @@ do
             Exp.py \
             -mqhl=$multiple_qhl \
             -p=$prt -e=$exp -bt=$bt \
-            -rq=$use_rq -g=$gaussian -qhl=$qhl_test \
+            -rq=$use_rq \
+            -g=$gaussian \
+            -qhl=$qhl_test \
             -ra=$ra -rt=$rt -pgh=$pgh \
             -pgh_exp=$pgh_exponent \
             -pgh_incr=$pgh_increase \
-            -dir=$full_path_to_results -qid=$q_id -pt=$plots -pkl=1 \
+            -dir=$full_path_to_results \
+            -qid=$q_id \
+            -pt=$plots \
+            -pkl=1 \
             -log=$this_log -cb=$bayes_csv \
             -exp=$exp_data -cpr=$custom_prior \
             -prtwt=$store_prt_wt \
-            -nprobes=$num_probes \
             -pnoise=$probe_noise \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
-            -special_probe=$special_probe \
-            -pmin=$param_min -pmax=$param_max \
-            -pmean=$param_mean -psigma=$param_sigma \
             -dst=$data_max_time \
             -bintimes=$bintimes \
             -bftimesall=$bf_all_times \
@@ -246,6 +231,10 @@ do
             -resource=$reallocate_resources \
             --updater_from_prior=$updater_from_prior \
             -ggr=$growth_rule \
+            -nprobes=$num_probes \
+            -pmin=$param_min -pmax=$param_max \
+            -pmean=$param_mean -psigma=$param_sigma \
+            -special_probe=$special_probe \
             $growth_rules_command 
     done
 done

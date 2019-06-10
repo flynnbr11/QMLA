@@ -52,6 +52,9 @@ class GrowthRuleSuper():
 
         self.gaussian_prior_means_and_widths = {
         }
+        self.num_probes = 40
+        self.min_param = 0
+        self.max_param = 1
 
         # TODO set true params for simulation here
         self.true_params = {
@@ -124,6 +127,7 @@ class GrowthRuleSuper():
     ):
         return self.probe_generation_function(
             max_num_qubits = self.max_num_probe_qubits,
+            num_probes = self.num_probes, 
             **kwargs
         )
 
@@ -133,6 +137,7 @@ class GrowthRuleSuper():
     ):
         return self.plot_probe_generation_function(
             max_num_qubits = self.max_num_probe_qubits,
+            num_probes = 1,
             **kwargs
         )
 
