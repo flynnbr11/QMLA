@@ -16,9 +16,10 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        if self.use_experimental_data == True:
-            import ProbeGeneration
-            self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+        # if self.use_experimental_data == True:
+        #     import ProbeGeneration
+        #     # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+        #     self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
 
 
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
