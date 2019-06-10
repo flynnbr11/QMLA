@@ -168,7 +168,7 @@ initial_op_list = growth_class.initial_models
 print("[Exp] Retrieved initial op list from growth class")
 
 true_op = global_variables.true_operator
-true_params = global_variables.true_params
+# true_params = global_variables.true_params
 true_num_qubits = DataBase.get_num_qubits(true_op)
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 true_op_matrices = [DataBase.compute(t) for t in true_op_list]
@@ -235,12 +235,10 @@ else:
     true_expec_values = pickle.load(
         open(true_expectation_value_path, 'rb')   
     )
-
-
-log_print(
-    ["True params:", true_params], 
-    log_file
-)
+# log_print(
+#     ["True params:", true_params], 
+#     log_file
+# )
 
 if global_variables.custom_prior:
     prior_data = pickle.load(

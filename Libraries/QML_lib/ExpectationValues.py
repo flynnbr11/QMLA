@@ -558,6 +558,21 @@ def hahn_evolution_project_first_qubit(
     return 1 - expec_val
 
 
+def sigmaz():
+    return np.array([[1+0.j, 0+0.j], [0+0.j, -1+0.j]])
+ 
+def make_inversion_gate(num_qubits):
+    from scipy import linalg
+    hahn_angle = np.pi / 2
+    hahn_gate = np.kron(    
+        hahn_angle * sigmaz(), 
+        np.eye(2**(num_qubits-1))
+    )
+    # inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()
+    inversion_gate = linalg.expm(-1j*hahn_gate)
+
+    return inversion_gate
+
 def n_qubit_hahn_evolution(
     ham, t, state, 
     precision=1e-10, 
@@ -568,38 +583,20 @@ def n_qubit_hahn_evolution(
     import numpy as np
     import DataBase
     from scipy import linalg
-    #hahn_angle = np.pi/2
-    #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))
-    #inversion_gate = linalg.expm(-1j*hahn)
-    
+    # print("n qubit hahn")
     num_qubits = int(np.log2(np.shape(ham)[0]))
-#     inversion_gate = (np.pi/2) * DataBase.sigmaz()
-    # inversion_gate = DataBase.sigmaz()
 
-    # for d in range(num_qubits - 1):
-    #     inversion_gate = np.kron(
-    #         inversion_gate, 
-    #         DataBase.identity()
-    #     ) 
-    hahn_angle = np.pi / 2
-    hahn_gate = np.kron(    
-        hahn_angle * DataBase.sigmaz(), 
-        np.eye(2**(num_qubits-1))
+    try:
+        import hahn_inversion_gates
+        inversion_gate = hahn_inversion_gates.hahn_inversion_gates[num_qubits]
+    except:
+        inversion_gate = make_inversion_gate(num_qubits)
+
+    first_unitary_time_evolution = linalg.expm(-1j*ham*t)
+    second_unitary_time_evolution = np.linalg.matrix_power(
+        first_unitary_time_evolution, 
+        2
     )
-    inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()
-    # first_unitary_time_evolution = h.exp_ham(
-    #     ham, 
-    #     t, 
-    #     precision=precision
-    # )
-    # second_unitary_time_evolution = h.exp_ham(
-    #     ham, 
-    #     2*t, 
-    #     precision=precision
-    # )
-
-    first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
-    second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
 
     total_evolution = np.dot(
         second_unitary_time_evolution,
@@ -622,10 +619,10 @@ def n_qubit_hahn_evolution(
         [dim_hilbert_space,dim_hilbert_space]
     )
 
-    qdm = qutip.Qobj(density_matrix, dims=[[2],[2]])
+    # qdm = qutip.Qobj(density_matrix, dims=[[2],[2]])
     # reduced_matrix_qutip = qdm.ptrace(0).full()
 
-    # beloew methods give different results for reduced_matrix
+    # below methods give different results for reduced_matrix
     # reduced_matrix = qdm.ptrace(0).full()
 
     to_trace = list(range(num_qubits-1))
@@ -635,66 +632,32 @@ def n_qubit_hahn_evolution(
     )
 
 
+    density_mtx_initial_state = np.kron(
+        state, 
+        state.conj()
+    )
 
-    # print(
-    # "[ExpVal - Nqubit]",
-    # "state:\n", state
-    # )
-    # print(
-    #     "[ExpVal - Nqubit]",
-    #     "ev_state:\n", ev_state
-    # )
-
-    # print(
-    #     "[ExpVal - Nqubit]",
-    #     "density mtx ev state:\n", repr(density_matrix)
-    # )
-    # print(
-    #     "[ExpVal - Nqubit]",
-    #     "qdm:\n", 
-    #     qdm, 
-    #     "\ngives reduced mtx:", 
-    #     reduced_matrix_qutip
-    # )
-    # print(
-    #     "[ExpVal - Nqubit]",
-    #     "to trace:", to_trace, 
-    #     "reduced density mtx ev state:\n", 
-    #     reduced_matrix
-    # )
-
-    plus_state = np.array([1, 1])/np.sqrt(2)
-    noise_level = 0.00 # from 1000 counts - Poissonian noise = 1/sqrt(1000) # should be ~0.03
-    from ProbeGeneration import random_probe
-    random_noise = noise_level * random_probe(1)    
-    noisy_plus = plus_state + random_noise
-    norm_factor = np.linalg.norm(noisy_plus)
-    noisy_plus = noisy_plus/norm_factor
-    #    noisy_plus = np.array([1, 1])/np.sqrt(2)
-    bra = noisy_plus.conj().T
-    try:
-        rho_state = np.dot(reduced_matrix, noisy_plus)
-    except:
-        # debugging
-        print("[ExpVal]--failed")
-        print(
-            "[ExpVal - Nqubit]",
-            "ev_state:\n", ev_state
-        )
-        print(
-            "[ExpVal - Nqubit]",
-            "reduced mtx:\n", reduced_matrix,
-            "noisy plus:\n", noisy_plus 
-        )
-
-    expect_value = np.abs(np.dot(bra, rho_state))    
-    
+    density_mtx_initial_state = np.reshape(
+        density_mtx_initial_state, 
+        [dim_hilbert_space,dim_hilbert_space]
+    )
+    reduced_density_mtx_initial_state = partial_trace(
+        density_mtx_initial_state, 
+        to_trace
+    )
+    projection_onto_initial_den_mtx = np.dot(
+        reduced_density_mtx_initial_state,
+        reduced_matrix
+    )
+    expect_value = np.trace(
+        projection_onto_initial_den_mtx
+    )
 
     # expect_value is projection onto |+>
     # for this case Pr(0) refers to projection onto |->
     # so return 1 - expect_value
-    return 1 - expect_value
-#    return expect_value
+    # return 1 - expect_value
+    return expect_value
 
 
 
@@ -943,4 +906,3 @@ def n_qubit_plus_state(num_qubits):
 #     expectation_value_function = expec_val_function_dict[method]
 #     return expectation_value_function(**kwargs)
 
-#     

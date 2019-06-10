@@ -3,6 +3,7 @@ sys.path.append(os.path.abspath('..'))
 import DataBase
 import ExpectationValues
 import ProbeGeneration
+import Heuristics
 
 from NV_centre_full_access import NVCentreSpinFullAccess
 
@@ -23,10 +24,17 @@ class NVCentreLargeSpinBath(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
+        self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
 
-        self.true_operator = 'nv_spin_x_d5PPPPPnv_spin_y_d5PPPPPnv_spin_z_d5PPPPPnv_interaction_x_d5PPPPPnv_interaction_y_d5PPPPPnv_interaction_z_d5'
+        # self.true_operator = 'nv_spin_x_d5PPPPPnv_spin_y_d5PPPPPnv_spin_z_d5PPPPPnv_interaction_x_d5PPPPPnv_interaction_y_d5PPPPPnv_interaction_z_d5'
         # self.true_operator = 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6'
         # self.true_operator = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
+
+        # self.true_operator = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2'
+        # self.true_operator = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3'
+        self.true_operator = 'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4'
+
+
         self.initial_models = [
         	'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
     	] 
@@ -45,19 +53,32 @@ class NVCentreLargeSpinBath(
         }
 
         self.true_params = {
-            'nv_spin_x_d2' : -0.98288958683093952, 
-            'nv_spin_y_d2' : 6.4842202054983122, 
-            'nv_spin_z_d2' : 0.96477790489201143, 
-            'nv_interaction_x_d2' : 6.7232235286284681, 
-            'nv_interaction_y_d2' :  2.7377867056770397, 
-            'nv_interaction_z_d2' : 1.6034234519563935, 
+            # test tracing out
+            'nv_spin_x_d2' : -2.98288958683093952, 
+            'nv_spin_y_d2' : 3.4842202054983122, 
+            'nv_spin_z_d2' : 4.96477790489201143, 
 
-            'nv_spin_x_d3' : -0.98288958683093952, 
-            'nv_spin_y_d3' : 6.4842202054983122, 
-            'nv_spin_z_d3' : 0.96477790489201143, 
-            'nv_interaction_x_d3' : 6.7232235286284681, 
-            'nv_interaction_y_d3' :  2.7377867056770397, 
-            'nv_interaction_z_d3' : 1.6034234519563935, 
+            'nv_spin_x_d3' : -2.98288958683093952, 
+            'nv_spin_y_d3' : 3.4842202054983122, 
+            'nv_spin_z_d3' : 4.96477790489201143, 
+
+            'nv_spin_x_d4' : -2.98288958683093952, 
+            'nv_spin_y_d4' : 3.4842202054983122, 
+            'nv_spin_z_d4' : 4.96477790489201143, 
+
+            # 'nv_spin_x_d2' : -0.98288958683093952, 
+            # 'nv_spin_y_d2' : 6.4842202054983122, 
+            # 'nv_spin_z_d2' : 0.96477790489201143, 
+            # 'nv_interaction_x_d2' : 6.7232235286284681, 
+            # 'nv_interaction_y_d2' :  2.7377867056770397, 
+            # 'nv_interaction_z_d2' : 1.6034234519563935, 
+
+            # 'nv_spin_x_d3' : -0.98288958683093952, 
+            # 'nv_spin_y_d3' : 6.4842202054983122, 
+            # 'nv_spin_z_d3' : 0.96477790489201143, 
+            # 'nv_interaction_x_d3' : 6.7232235286284681, 
+            # 'nv_interaction_y_d3' :  2.7377867056770397, 
+            # 'nv_interaction_z_d3' : 1.6034234519563935, 
 
             'nv_spin_x_d5' : -0.98288958683093952, 
             'nv_spin_y_d5' : 6.4842202054983122, 
@@ -82,21 +103,6 @@ class NVCentreLargeSpinBath(
             'nv_spin_z_d10' : 0.96477790489201143, 
         }
 
-    def expectation_value(
-        self, 
-        ham,
-        t,
-        state,
-        **kwargs
-    ):      
-        # print("[Growth Rules - NV] Expectation Values")
-        exp_val = ExpectationValues.n_qubit_hahn_evolution(
-            ham = ham, 
-            t = t, 
-            state = state, 
-            **kwargs
-        )
-        return exp_val
 
     def generate_models(
         self, 
