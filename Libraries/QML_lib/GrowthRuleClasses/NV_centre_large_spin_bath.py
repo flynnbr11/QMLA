@@ -28,11 +28,11 @@ class NVCentreLargeSpinBath(
 
         # self.true_operator = 'nv_spin_x_d5PPPPPnv_spin_y_d5PPPPPnv_spin_z_d5PPPPPnv_interaction_x_d5PPPPPnv_interaction_y_d5PPPPPnv_interaction_z_d5'
         # self.true_operator = 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6'
-        # self.true_operator = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
+        self.true_operator = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
 
         # self.true_operator = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2'
         # self.true_operator = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3'
-        self.true_operator = 'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4'
+        # self.true_operator = 'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4'
 
 
         self.initial_models = [
@@ -54,17 +54,17 @@ class NVCentreLargeSpinBath(
 
         self.true_params = {
             # test tracing out
-            'nv_spin_x_d2' : -2.98288958683093952, 
-            'nv_spin_y_d2' : 3.4842202054983122, 
-            'nv_spin_z_d2' : 4.96477790489201143, 
+            # 'nv_spin_x_d2' : -2.98288958683093952, 
+            # 'nv_spin_y_d2' : 3.4842202054983122, 
+            # 'nv_spin_z_d2' : 4.96477790489201143, 
 
-            'nv_spin_x_d3' : -2.98288958683093952, 
-            'nv_spin_y_d3' : 3.4842202054983122, 
-            'nv_spin_z_d3' : 4.96477790489201143, 
+            # 'nv_spin_x_d3' : -2.98288958683093952, 
+            # 'nv_spin_y_d3' : 3.4842202054983122, 
+            # 'nv_spin_z_d3' : 4.96477790489201143, 
 
-            'nv_spin_x_d4' : -2.98288958683093952, 
-            'nv_spin_y_d4' : 3.4842202054983122, 
-            'nv_spin_z_d4' : 4.96477790489201143, 
+            # 'nv_spin_x_d4' : -2.98288958683093952, 
+            # 'nv_spin_y_d4' : 3.4842202054983122, 
+            # 'nv_spin_z_d4' : 4.96477790489201143, 
 
             # 'nv_spin_x_d2' : -0.98288958683093952, 
             # 'nv_spin_y_d2' : 6.4842202054983122, 
