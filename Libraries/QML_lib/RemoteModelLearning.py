@@ -205,12 +205,26 @@ def learnModelRemote(
 #      use_time_dep_true_params = use_time_dep_true_params,
 #      time_dep_true_params = time_dep_true_params
     )
-
+    log_print(
+        [
+            "Time to unpickle and initialise QML class: {}".format(
+                time.time() - time_start
+            )
+        ]
+    )
     log_print(["Updating model."])
     try:
+        update_timer_start = time.time()
         qml_instance.UpdateModel(
             n_experiments=num_experiments,
             sigma_threshold = sigma_threshold
+        )
+        log_print(
+            [
+                "Time for update alone: {}".format(
+                    time.time() - update_timer_start
+                )
+            ]
         )
     except NameError:
         log_print(
