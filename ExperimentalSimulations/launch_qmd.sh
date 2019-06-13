@@ -80,7 +80,7 @@ git_commit=$(git rev-parse HEAD)
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
-# sim_growth_rule='ising_1d_chain'
+sim_growth_rule='ising_1d_chain'
 # sim_growth_rule='heisenberg_xyz'
 # sim_growth_rule='hubbard_square_lattice_generalised'
 # sim_growth_rule='hopping_topology'

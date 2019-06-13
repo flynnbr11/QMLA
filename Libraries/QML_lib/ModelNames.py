@@ -669,9 +669,6 @@ def branch_is_num_params(latex_mapping_file, **kwargs):
 
     for mod in model_names:
         num_params = len(DataBase.get_constituent_names_from_name(mod))
-        print("mod:", mod)
-        print("constituents:", DataBase.get_constituent_names_from_name(mod))
-        print("num_params:", num_params)
         num_params_by_mod[mod] = num_params
         latex_name = latex_name_map[mod]
         model_branches[latex_name] = num_params

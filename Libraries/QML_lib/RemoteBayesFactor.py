@@ -278,7 +278,7 @@ def BayesFactorRemote(
             ]
             update_times_model_a = sorted(all_times)
             update_times_model_b = sorted(all_times)
-            set_renorm_record_to_zero = True
+            set_renorm_record_to_zero = False # in old method, where binning is False (as in Apr_10/18_28)
 
         with open(times_record, 'a') as write_log_file:
             np.set_printoptions(
