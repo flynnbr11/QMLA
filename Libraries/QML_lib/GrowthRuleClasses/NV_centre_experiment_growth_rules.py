@@ -28,7 +28,6 @@ class NVCentreSpinExperimentalMethod(
         # self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         self.measurement_type = 'hahn'
         
-        self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
         self.qhl_models =    	[
             'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',

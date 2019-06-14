@@ -649,13 +649,16 @@ def n_qubit_hahn_evolution(
         reduced_density_mtx_initial_state,
         reduced_matrix
     )
-    expect_value = np.trace(
-        projection_onto_initial_den_mtx
+    expect_value = np.abs(
+        np.trace(
+            projection_onto_initial_den_mtx
+        )
     )
 
     # expect_value is projection onto |+>
     # for this case Pr(0) refers to projection onto |->
     # so return 1 - expect_value
+    
     return 1 - expect_value
     # return expect_value
 
