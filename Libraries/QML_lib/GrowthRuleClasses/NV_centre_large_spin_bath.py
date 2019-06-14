@@ -24,8 +24,7 @@ class NVCentreLargeSpinBath(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        # self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
-        self.expectation_value_function = ExpectationValues.hahn_evolution
+        self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
 
         # self.true_operator = 'nv_spin_x_d5PPPPPnv_spin_y_d5PPPPPnv_spin_z_d5PPPPPnv_interaction_x_d5PPPPPnv_interaction_y_d5PPPPPnv_interaction_z_d5'
         # self.true_operator = 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6'

@@ -24,7 +24,10 @@ class NVCentreSpinExperimentalMethod(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
+        # self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
+        
+        self.true_operator = 'xTi'
+        self.expectation_value_function = ExpectationValues.hahn_evolution
         # self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         self.measurement_type = 'hahn'
         

@@ -21,8 +21,7 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
         #     # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
         #     self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
 
-        self.true_operator = 'xTi'
-        # self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
+        self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
         self.qhl_models =    	[
             'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
