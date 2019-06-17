@@ -1920,9 +1920,13 @@ def qmdclassTOnxobj(
     return G
     
     
-def plotQMDTree(qmd, save_to_file=None, 
-                only_adjacent_branches=True, id_labels=False,
-                modlist=None):
+def plotQMDTree(
+    qmd, 
+    save_to_file=None, 
+    only_adjacent_branches=True, 
+    id_labels=True,
+    modlist=None
+):
 
     G = qmdclassTOnxobj(qmd, 
         only_adjacent_branches=only_adjacent_branches, 
@@ -1950,7 +1954,8 @@ def plotTreeDiagram(
     label_padding = 0.4, 
     arrow_size = 0.02, widthscale=1.0,
     entropy=None, inf_gain=None,
-    pathstyle = "straight", id_labels = False,
+    pathstyle = "straight", 
+    id_labels = True,
     save_to_file=None
 ):
     plt.clf()
@@ -1975,23 +1980,25 @@ def plotTreeDiagram(
     if id_labels is True:
         labels = dict( 
             zip( 
-                G.nodes(), tuple(  [n for (n,prop) in 
-                G.nodes(data=True)]  ) 
+                G.nodes(), 
+                tuple(  [prop['mod_id'] for (n,prop) in G.nodes(data=True)]  ) 
+                # tuple(  [n for (n,prop) in G.nodes(data=True)]  ) 
             )
         )
         for key in positions.keys():
-            label_positions.append( tuple( np.array(positions[key]) -
-            np.array([0., 0.]) ) 
+            label_positions.append(
+                tuple( np.array(positions[key]) - np.array([0., 0.]) 
+            ) 
         )
     else:
         labels = dict( 
-            zip( G.nodes(), tuple(  [prop['label'] for 
-                (n,prop) in G.nodes(data=True)]  ) 
+            zip( 
+                G.nodes(), 
+                tuple(  [prop['label'] for (n,prop) in G.nodes(data=True)]  ) 
             )
         )  
         for key in positions.keys():
-            label_positions.append( tuple( np.array(positions[key])- 
-                np.array([0., label_padding]) ) 
+            label_positions.append( tuple( np.array(positions[key]) - np.array([0., label_padding]) ) 
         )
     
     label_positions = dict(
@@ -2022,18 +2029,27 @@ def plotTreeDiagram(
     edges_for_cmap = draw_networkx_arrows(
         G, 
         edgelist=edge_tuples,
-        pos=positions, arrows=True, 
+        pos=positions, 
+        arrows=True, 
         arrowstyle='->',
-        width = arrow_size, widthscale=widthscale,
-        pathstyle=pathstyle, alphas = e_alphas, edge_color= weights,
+        width = arrow_size, 
+        widthscale=widthscale,
+        pathstyle=pathstyle, 
+        alphas = e_alphas, 
+        edge_color= weights,
         edge_cmap=e_cmap, 
         edge_vmin=None, #0.8, 
         edge_vmax=None, #0.85
     )
     
+
+    # Whether or not to include node/model labels -- comment/uncomment this line
+    print(
+        "[PlotQMD - plotTreeDiagram] id_labels= {}  labels:{}".format(id_labels, labels)
+    )
     nx.draw_networkx_labels(G, label_positions, labels)
-    plt.tight_layout()
     
+    plt.tight_layout()
     plt.gca().invert_yaxis() # so branch 0 on top
     plt.gca().get_xaxis().set_visible(False)
     plt.ylabel('Branch')
@@ -2042,8 +2058,11 @@ def plotTreeDiagram(
     xmax = max( np.array(list(label_positions.values()))[:,0] )
     plt.xlim(xmin -0.8, xmax +0.8)
     
-    plt.colorbar(edges_for_cmap, orientation="horizontal", 
-        pad= 0, label=r'$\log_{10}$ Bayes factor'
+    plt.colorbar(
+        edges_for_cmap, 
+        orientation="horizontal", 
+        pad= 0, 
+        label=r'$\log_{10}$ Bayes factor'
     ) 
 
     nodes=list(G.nodes)
@@ -2173,6 +2192,8 @@ def cumulativeQMDTreePlot(
     elif avg=='medians':
         bayes_factors = medians
 
+    max_bayes_factor = max([max(bayes_factors[k].values()) for k in bayes_factors.keys()])
+
     growth_class = GrowthRules.get_growth_generator_class(
         growth_generation_rule = growth_generator
     )
@@ -2205,9 +2226,6 @@ def cumulativeQMDTreePlot(
     # max_branch_id = 9 # TODO: this is hardcoded - is there an alternative?
     max_branch_id = max( list(term_branches.values()) ) + 1
     max_mod_id = len(modlist)
-    
-    
-
     for i in range(max_branch_id+1):
         branch_x_filled[i] = 0
         branch_mod_count[i] =  0 
@@ -2232,17 +2250,21 @@ def cumulativeQMDTreePlot(
             G.nodes[m]['wins']=wins_per_mod[m]
             G.nodes[m]['info']=wins_per_mod[m]
             
-            
         except:
             G.nodes[m]['status']=min_colour
             G.nodes[m]['info']=0
             
             
     max_num_mods_any_branch=max(list(branch_mod_count.values()))
+    # get the cordinates to display this model's node at
+    
+    
     for m in modlist:
+        
         branch = term_branches[m]
         num_mods_this_branch = branch_mod_count[branch]
-        pos_list = available_position_list(num_mods_this_branch,
+        pos_list = available_position_list(
+            num_mods_this_branch,
             max_num_mods_any_branch
         )
         branch_filled_so_far = branch_x_filled[branch]
@@ -2250,12 +2272,29 @@ def cumulativeQMDTreePlot(
 
         x_pos = pos_list[branch_filled_so_far]
         y_pos = branch
-        positions[i] = (x_pos, y_pos)
+        positions[m] = (x_pos, y_pos)
         G.node[m]['pos'] = (x_pos, y_pos)
+        
+
+
+    sorted_positions = sorted(positions.values(), key=lambda x: (x[1], x[0]))
+    mod_id = 0
+    model_ids_names = {}
+    pos_keys = list(positions.keys())
+    for p in sorted_positions:
+        mod_id += 1
+        idx = list(positions.values()).index(p)
+        corresponding_model = pos_keys[idx]
+        G.node[corresponding_model]['mod_id'] = mod_id
+        model_ids_names[mod_id] = G.node[m]['label']
 
     edges = []
     edge_frequencies=[]
     max_frequency = max(list(pair_freqs.values()))
+    frequency_markers = list(np.linspace(0, max_frequency, 4, dtype=int))
+
+    even_arrow_width = True
+    # setting the thickness if the arrows
     for a in modlist:
         remaining_modlist = modlist[modlist.index(a)+1:]
         for b in remaining_modlist:
@@ -2269,8 +2308,15 @@ def cumulativeQMDTreePlot(
                     pairing = (a,b)
                     try:
                         frequency = pair_freqs[pairing]/max_frequency
+                        if frequency_markers[0] <= frequency < frequency_markers[1]:
+                            frequency = 1 # thin 
+                        elif frequency_markers[1] <= frequency < frequency_markers[2]:
+                            frequency = 2 # medium 
+                        else: 
+                            frequency = 3 # thick
                     except:
                         frequency = 1
+                    
                     edges.append(pairing)
                     edge_frequencies.append(frequency)
 
@@ -2291,7 +2337,8 @@ def cumulativeQMDTreePlot(
                             winner=b,
                             loser=a,
                             flipped=flipped,
-                            adj = is_adj, freq=frequency
+                            adj = is_adj, 
+                            freq=frequency
                         )
                     else:
                         flipped = False
@@ -3047,7 +3094,10 @@ def unit_poly_verts(theta):
 
 #### Cumulative Bayes CSV and InterQMD Tree plotting ####
 
-def multiQMDBayes(all_bayes_csv, growth_generator=None):
+def multiQMDBayes(
+    all_bayes_csv, 
+    growth_generator=None
+):
     import csv, pandas
     cumulative_bayes = pandas.DataFrame.from_csv(all_bayes_csv)
     names=list(cumulative_bayes.keys())
@@ -3067,7 +3117,8 @@ def multiQMDBayes(all_bayes_csv, growth_generator=None):
 
 
 
-    piv = pandas.pivot_table(cumulative_bayes, 
+    piv = pandas.pivot_table(
+        cumulative_bayes, 
         index='ModelName', 
         values=names, 
         aggfunc=[np.mean, np.median]
@@ -3113,9 +3164,7 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
         )
 
         if len(new_models) > 0:
-            # print("new models:", new_models)
-            # print("current:", current_fieldnames)
-            # print("fields:", fields)
+            # print("[PlotQMD - updateAllBayesCSV] Adding new models")
             import pandas
             csv_input = pandas.read_csv(
                 all_bayes_csv, 
@@ -3127,11 +3176,15 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
 
             for new_col in new_models:
                 csv_input[new_col] = empty_list
-
-
-
             # print("writing new pandas CSV: ", csv_input)
             csv_input.to_csv(all_bayes_csv)
+
+    with open(all_bayes_csv) as bayes_csv:
+        reader = csv.DictReader(
+            bayes_csv, 
+        )
+        fields = reader.fieldnames
+
     with open(all_bayes_csv, 'a') as bayes_csv:
         writer = csv.DictWriter(
             bayes_csv, 
@@ -3139,7 +3192,6 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
         )
         for f in names:
             single_model_dict = data[f]
-            # print("Model:", f, "\n dict:", single_model_dict)
             single_model_dict['ModelName']=f
             writer.writerow(single_model_dict)
 
