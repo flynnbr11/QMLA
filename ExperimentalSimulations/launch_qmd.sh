@@ -6,19 +6,19 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
-qhl_test=1
+num_tests=2
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
-exp_data=1
-simulate_experiment=0
+exp_data=0
+simulate_experiment=1
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=250
-exp=1000
+prt=3
+exp=10
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -94,7 +94,7 @@ exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='NV_centre_experiment_debug'
-#exp_growth_rule='reduced_nv_experiment'
+# exp_growth_rule='reduced_nv_experiment'
 
 if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
 then

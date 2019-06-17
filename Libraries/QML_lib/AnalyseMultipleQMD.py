@@ -1903,21 +1903,23 @@ if further_qhl_mode == False:
             save_to_file='multiQMD_tree.png'
         )
     except NameError:
-        print("Can not plot multiQMD tree -- this might be because only \
+        print(
+            "Can not plot multiQMD tree -- this might be because only \
             one instance of QMD was performed. All other plots generated \
             without error."
         )
-        # raise
+        raise
 
     except ZeroDivisionError:
-        print("Can not plot multiQMD tree -- this might be because only \
+        print(
+            "Can not plot multiQMD tree -- this might be because only \
             one instance of QMD was performed. All other plots generated \
             without error."
         )
         raise
     except:
-        print("Could not plot Multi QMD tree.")
-        # raise
+        # print("[AnalyseMultipleQMD] Could not plot Multi QMD tree.")
+        raise
 
 
 

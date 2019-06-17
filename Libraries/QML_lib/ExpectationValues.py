@@ -362,8 +362,9 @@ def hahn_evolution(
     ev_state = np.dot(total_evolution, state)
 
     nm = np.linalg.norm(ev_state)
-    if np.abs(1-nm) > 1e-10:
+    if np.abs(1-nm) > 1e-5:
         print("[hahn] norm ev state:", nm)
+        raise NameError("Non-unit norm")
 
     density_matrix = np.kron( ev_state, (ev_state.T).conj() )
     density_matrix = np.reshape(density_matrix, [4,4])

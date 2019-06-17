@@ -2366,7 +2366,11 @@ def draw_networkx_arrows(
         
     if width is None:
         try:
-            widthlist = np.array(list(  [(widthscale*prop['freq']) for (u,v,prop) in G.edges(data=True)]  ))
+            widthlist = np.array(
+                list(
+                    [(widthscale*prop['freq']) for (u,v,prop) in G.edges(data=True)]  
+                )
+            )
             widthlist = widthscale*widthlist/np.max(widthlist)
             # widthlist = [(a+widthscale*0.1) for a in widthlist] ## this was giving colour to non-existent edges
         except:
@@ -2390,20 +2394,27 @@ def draw_networkx_arrows(
     else:
         lw = widthlist
 
-    if not cb.is_string_like(edge_color) \
-           and cb.iterable(edge_color) \
-           and len(edge_color) == len(edge_pos):
-        if np.alltrue([cb.is_string_like(c)
-                         for c in edge_color]):
+    if (
+        # not cb.is_string_like(edge_color) 
+        type(edge_color) != str 
+        and cb.iterable(edge_color) 
+        and len(edge_color) == len(edge_pos)
+    ):
+        if np.alltrue(
+            [type(c)==str for c in edge_color]
+        ):
             # (should check ALL elements)
             # list of color letters such as ['k','r','k',...]
             edge_colors = tuple([colorConverter.to_rgba(c)
                                  for c in edge_color])
-        elif np.alltrue([not cb.is_string_like(c)
-                           for c in edge_color]):
+        elif np.alltrue(
+            # [not cb.is_string_like(c) for c in edge_color]
+            [type(c)!=str for c in edge_color]
+        ):
             # If color specs are given as (rgb) or (rgba) tuples, we're OK
-            if np.alltrue([cb.iterable(c) and len(c) in (3, 4)
-                             for c in edge_color]):
+            if np.alltrue(
+                [cb.iterable(c) and len(c) in (3, 4) for c in edge_color]
+            ):
                 edge_colors = tuple(edge_color)
             else:
                 # numbers (which are going to be mapped with a colormap)
@@ -2413,7 +2424,11 @@ def draw_networkx_arrows(
                 either color names or numbers'
             )
     else:
-        if cb.is_string_like(edge_color) or len(edge_color) == 1:
+        if (
+            # cb.is_string_like(edge_color) 
+            type(edge_color) == str
+            or len(edge_color) == 1
+        ):
             edge_colors = (colorConverter.to_rgba(edge_color), )
         else:
             raise ValueError('edge_color must be a single color or \
