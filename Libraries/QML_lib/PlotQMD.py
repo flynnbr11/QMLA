@@ -3411,7 +3411,7 @@ def global_adjacent_branch_test(a,b, term_branches):
     if (
         branch_a_idx==branch_b_idx) 
         or (branch_a_idx==branch_b_idx+1) 
-        or (branch_a_idx==branch_b_idx-1
+        or (branch_a_idx==branch_b_idx-1)
     ):
         return True
     else:
