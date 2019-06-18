@@ -2084,7 +2084,7 @@ def plotTreeDiagram(
             handles.append(mpatches.Patch(color=col))
             labels.append(info)
     print("[plotQMD] Before: \n handles{} \n labels {}".format(handles, labels))
-    labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: t[0]))
+    labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: int(t[0]) ))
     print("[plotQMD] After: \n handles{} \n labels {}".format(handles, labels))
     lgd_handles=[]
     
