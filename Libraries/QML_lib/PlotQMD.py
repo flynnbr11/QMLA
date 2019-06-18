@@ -3409,7 +3409,7 @@ def global_adjacent_branch_test(a,b, term_branches):
     branch_b_idx = available_branches.index(branch_b)
 
     if (
-        branch_a_idx==branch_b_idx) 
+        (branch_a_idx==branch_b_idx) 
         or (branch_a_idx==branch_b_idx+1) 
         or (branch_a_idx==branch_b_idx-1)
     ):
