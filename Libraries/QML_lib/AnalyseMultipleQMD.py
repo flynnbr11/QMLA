@@ -1487,10 +1487,20 @@ def plot_tree_multi_QMD(
         inf_gain=None, 
         save_to_file=None
     ):
-    qmd_res = pandas.DataFrame.from_csv(
-        results_csv, 
-        index_col='LatexName'
-    )
+    try:
+        qmd_res = pandas.DataFrame.from_csv(
+            results_csv, 
+            index_col='LatexName'
+        )
+    except ValueError:
+        print(
+            "Latex Name not in results CSV keys.", 
+            "There aren't enough data for a tree of multiple QMD."
+            "This may be because this run was for QHL rather than QMD."
+        )
+        raise
+
+
     mods = list(qmd_res.index)
     winning_count = {}
     for mod in mods:
@@ -1902,6 +1912,9 @@ if further_qhl_mode == False:
             inf_gain = inf_gain,
             save_to_file='multiQMD_tree.png'
         )
+    except ValueError:
+        pass
+
     except NameError:
         print(
             "Can not plot multiQMD tree -- this might be because only \

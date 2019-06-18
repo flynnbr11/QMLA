@@ -1930,7 +1930,8 @@ def plotQMDTree(
     modlist=None
 ):
 
-    G = qmdclassTOnxobj(qmd, 
+    G = qmdclassTOnxobj(
+        qmd, 
         only_adjacent_branches=only_adjacent_branches, 
         modlist=modlist)
     
@@ -1939,7 +1940,9 @@ def plotQMDTree(
     cmap = plt.get_cmap('viridis')
     new_cmap = truncate_colormap(cmap, 0.35, 1.0)
 
-    plotTreeDiagram(G, n_cmap = plt.cm.pink_r, 
+    plotTreeDiagram(
+        G, 
+        n_cmap = plt.cm.pink_r, 
         e_cmap = new_cmap, 
         arrow_size = 0.02,
         # arrow_size = 8.0,
@@ -2083,9 +2086,7 @@ def plotTreeDiagram(
             col = tuple( n_cmap(G.nodes[n]['status']) )
             handles.append(mpatches.Patch(color=col))
             labels.append(info)
-    print("[plotQMD] Before: \n handles{} \n labels {}".format(handles, labels))
     labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: int(t[0]) ))
-    print("[plotQMD] After: \n handles{} \n labels {}".format(handles, labels))
     lgd_handles=[]
     
     # if 'Branch Champion' in labels:
@@ -2295,6 +2296,7 @@ def cumulativeQMDTreePlot(
     growth_class = GrowthRules.get_growth_generator_class(
         growth_generation_rule = growth_generator
     )
+    true_model = growth_class.true_operator_latex
 
     term_branches = growth_class.name_branch_map(
         latex_mapping_file = latex_mapping_file,
@@ -2343,6 +2345,12 @@ def cumulativeQMDTreePlot(
         branch_mod_count[branch]+=1
         G.add_node(m)
         G.nodes[m]['label']=str(m)
+
+        if m == true_model:
+            G.nodes[m]['relation_to_true_model'] = 'true'
+        else:
+            G.nodes[m]['relation_to_true_model'] = 'none'
+
         try:
             G.nodes[m]['status']=colour_by_node_name[m]
             G.nodes[m]['wins']=wins_per_mod[m]
@@ -2693,10 +2701,8 @@ def draw_networkx_arrows(
                 # Can be accepted by fancy arrow patch to alter arrows
                 arrow_style = ArrowStyle.Wedge(
                     tail_width = lw,
-                    shrink_factor = 0.3
+                    shrink_factor = 0.2
                 )
-
-
 
                 # arrow_style = mpatches.ArrowStyle.Curve(
                 # )
@@ -2707,11 +2713,12 @@ def draw_networkx_arrows(
                     n2.center,
                     patchA=n1,
                     patchB=n2,
-                    # arrowstyle=arrow_style,
-                    arrowstyle='simple',
+                    arrowstyle=arrow_style,
+                    # arrowstyle='simple',
                     # arrowstyle='curveb',
                     connectionstyle='arc3,rad=%s'%rad,
-                    mutation_scale=10.0,
+                    mutation_scale=4.0,
+                    # alpha=0.5,
                     lw=lw,   #AROUND 10 TO BE FEASIBLE
                    **kwargs
                 )
