@@ -2420,13 +2420,10 @@ def cumulativeQMDTreePlot(
                     try:
                         frequency = pair_freqs[pairing]/max_frequency
                         if frequency_markers[0] <= frequency < frequency_markers[1]:
-                            print("THIN")
                             frequency = 1 # thin 
                         elif frequency_markers[1] <= frequency < frequency_markers[2]:
-                            print("MEDIUM")
                             frequency = 2 # medium 
                         else: 
-                            print("THICK")
                             frequency = 3 # thick
                     except:
                         frequency = 1
@@ -2470,8 +2467,8 @@ def cumulativeQMDTreePlot(
                             )
                         )
                         G.add_edge(
-                            winner, 
                             loser, 
+                            winner, 
                             weight=weight, 
                             winner=winner,
                             loser=loser,
@@ -2483,10 +2480,7 @@ def cumulativeQMDTreePlot(
 
                     except:
                         bf = 0 
-                        print("Could not find [{}][{}] in keys:{}".format(
-                            a, b, list(bayes_factors.keys())
-                            )
-                        )
+   
                         # thisweight=0 #TODO is this right?
                         # raise
                     if bf == 0:
@@ -2739,8 +2733,12 @@ def draw_networkx_arrows(
                 
                 winner = G.edges[(u,v)]['winner']
                 loser = G.edges[(u,v)]['loser']
-                n1=G.node[loser]['patch']
-                n2=G.node[winner]['patch']
+
+                n1=G.node[winner]['patch']
+                n2=G.node[loser]['patch']
+
+                # n1=G.node[loser]['patch']
+                # n2=G.node[winner]['patch']
 
                 # n1=G.node[u]['patch']
                 # n2=G.node[v]['patch']
@@ -2764,12 +2762,16 @@ def draw_networkx_arrows(
                 # Can be accepted by fancy arrow patch to alter arrows
                 arrow_style = ArrowStyle.Wedge(
                     tail_width = lw,
-                    shrink_factor = 0.2
+                    shrink_factor = 0.4
                 )
 
                 # arrow_style = mpatches.ArrowStyle.Curve(
                 # )
 
+                print("Edge{}".format(edgelist[idx]))
+                print(
+                    "loser {} -> winner {}".format( G.edges[(u,v)]['loser'],  G.edges[(u,v)]['winner'])
+                )
 
                 e = FancyArrowPatch(
                     n1.center,
@@ -2780,7 +2782,7 @@ def draw_networkx_arrows(
                     # arrowstyle='simple',
                     # arrowstyle='curveb',
                     connectionstyle='arc3,rad=%s'%rad,
-                    mutation_scale=4.0,
+                    mutation_scale=5.0,
                     # alpha=0.5,
                     lw=lw,   #AROUND 10 TO BE FEASIBLE
                    **kwargs
@@ -3400,7 +3402,7 @@ def global_adjacent_branch_test(a,b, term_branches):
     branch_b = term_branches[b]
 
     available_branches = sorted(list(set(term_branches.values())))
-    
+    print("[plotQMD] available_branches", available_branches)
     branch_a_idx = available_branches.index(branch_a)
     branch_b_idx = available_branches.index(branch_b)
 

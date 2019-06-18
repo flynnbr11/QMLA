@@ -1905,16 +1905,16 @@ if further_qhl_mode == False:
     try:
         # if growth_generator in valid_growth_rules_for_multiQMD_tree_plot:
 
-        plot_tree_multi_QMD(
-            results_csv = results_csv, 
-            latex_mapping_file=latex_mapping_file, 
-            avg_type='means', 
-            all_bayes_csv = all_bayes_csv, 
-            growth_generator=growth_generator,
-            entropy = entropy,
-            inf_gain = inf_gain,
-            save_to_file='multiQMD_tree_mean_bayes_factors.png'
-        )
+        # plot_tree_multi_QMD(
+        #     results_csv = results_csv, 
+        #     latex_mapping_file=latex_mapping_file, 
+        #     avg_type='means', 
+        #     all_bayes_csv = all_bayes_csv, 
+        #     growth_generator=growth_generator,
+        #     entropy = entropy,
+        #     inf_gain = inf_gain,
+        #     save_to_file='multiQMD_tree_mean_bayes_factors.png'
+        # )
 
         plot_tree_multi_QMD(
             results_csv = results_csv, 
