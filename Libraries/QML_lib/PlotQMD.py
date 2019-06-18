@@ -11,6 +11,7 @@ from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib.ticker import Formatter
 from matplotlib import colors as mcolors
 
+
 import copy
 import random
 import matplotlib.cbook as cb
@@ -1949,7 +1950,8 @@ def plotQMDTree(
 
 def plotTreeDiagram(
     G, 
-    n_cmap, e_cmap, 
+    n_cmap, 
+    e_cmap, 
     e_alphas = [], nonadj_alpha=0.1, 
     label_padding = 0.4, 
     arrow_size = 0.02, widthscale=1.0,
@@ -2018,7 +2020,8 @@ def plotTreeDiagram(
 
 
     nx.draw_networkx_nodes(
-        G, with_labels = False, # labels=labels, 
+        G, 
+        with_labels = False, # labels=labels, 
         pos=positions, 
         k=1.5, #node spacing
         width=None, 
@@ -2041,12 +2044,8 @@ def plotTreeDiagram(
         edge_vmin=None, #0.8, 
         edge_vmax=None, #0.85
     )
-    
 
-    # Whether or not to include node/model labels -- comment/uncomment this line
-    print(
-        "[PlotQMD - plotTreeDiagram] id_labels= {}  labels:{}".format(id_labels, labels)
-    )
+
     nx.draw_networkx_labels(G, label_positions, labels)
     
     plt.tight_layout()
@@ -2065,11 +2064,16 @@ def plotTreeDiagram(
         label=r'$\log_{10}$ Bayes factor'
     ) 
 
+
     nodes=list(G.nodes)
     distinct_status=[]
+
+    model_ids_names = {}
+
     labels=[]
     handles=[]
     for n in nodes:
+        model_ids_names[G.nodes[n]['mod_id']] = G.nodes[n]['label']
         stat = G.nodes[n]['status'] # only for status not yet represented in legend
         if stat not in distinct_status:
             distinct_status.append(stat)
@@ -2080,8 +2084,6 @@ def plotTreeDiagram(
             handles.append(mpatches.Patch(color=col))
             labels.append(info)
     labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: t[0]))
-
-
     lgd_handles=[]
     
     # if 'Branch Champion' in labels:
@@ -2093,7 +2095,8 @@ def plotTreeDiagram(
         legend_title='Champion Type'
     else:
         legend_title='# QMD wins'
-    plt.legend(
+
+    legend_num_wins = plt.legend(
         handles, 
         labels, 
         title=legend_title, 
@@ -2102,24 +2105,118 @@ def plotTreeDiagram(
         loc='lower center'
     )
 
+    mod_id_handles = list(sorted(list(model_ids_names.keys())))
+    mod_id_labels = [model_ids_names[k] for k in mod_id_handles]
+    
+    mod_id_labels, mod_id_handles = zip(
+        *sorted(
+            zip(
+                mod_id_labels, 
+                mod_id_handles
+            ), 
+            key=lambda t: t[0]
+        )
+    )
+
+    model_handles = []
+    model_labels = []
+    handler_map = {}
+
+    # mod_handle = textHandleModelID(
+    #     "ID",
+    #     "black"
+    # )
+    # model_handles.append(mod_handle)
+    # handler_map[mod_handle] = textObjectHandler()
 
 
-    plot_title = ''
-    if entropy is not None:
-        plot_title += str( 
-            '\t$\mathcal{S}$=' 
-            + str(round(entropy, 2))
+    for mid in mod_id_handles:
+        mod_str = model_ids_names[mid]
+        num_wins = G.nodes[mod_str]['wins']
+
+        mod_lab = "  {}".format(
+            str(mod_str)
+        ) 
+
+
+        model_labels.append(mod_lab)
+        mod_colour = "black"  # if true/champ can change colour
+        # mod_colour =n_cmap(G.nodes[mod_str]['status'])
+        mod_handle = textHandleModelID(
+            mid,
+            num_wins,
+            mod_colour
         )
-    if inf_gain is not None:
-        plot_title += str(
-            '\t $\mathcal{IG}$=' 
-            + str(round(inf_gain, 2))
-        )
-    if entropy is not None or inf_gain is not None: 
-        plt.title(plot_title)
+        model_handles.append(mod_handle)
+        handler_map[mod_handle] = textObjectHandler()
+
+    model_labels, model_handles = zip(
+        *sorted(zip(model_labels, model_handles), key=lambda t: int(t[1].model_id))
+    )
+
+    model_legend_title = str("ID (Wins)     Model")
+    plt.legend(
+        model_handles, 
+        model_labels,
+        bbox_to_anchor=(0.4, 0.8, 1, 0 ),
+        handler_map=handler_map, 
+        loc=1,
+        title = model_legend_title
+    )._legend_box.align='left'
+
+    plt.gca().add_artist(legend_num_wins)
+    
+    plot_title = str(
+        "Quantum Model Development Tree"
+    )
+    plt.title(plot_title)
+
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
+
+
+import matplotlib.text as mpl_text
+
+class textHandleModelID(object):
+    def __init__(self, model_id, num_wins, color):
+
+        self.model_id = model_id
+        self.num_wins = num_wins
+        if num_wins >= 0:
+            self.my_text = str(
+                "{} ({}) ".format(model_id,num_wins)
+            )
+        else:
+            self.my_text = str("{}        ".format(model_id))
+        self.my_color = color
+
+class textObjectHandler(object):
+    def legend_artist(
+        self, 
+        legend, 
+        orig_handle, 
+        fontsize, 
+        handlebox
+    ):
+        x0, y0 = handlebox.xdescent, handlebox.ydescent
+        width, height = handlebox.width, handlebox.height
+        patch = mpl_text.Text(
+            x=0, y=0, 
+            text=orig_handle.my_text, 
+            color=orig_handle.my_color, 
+            verticalalignment=u'baseline', 
+            horizontalalignment=u'left', 
+            multialignment=None, 
+            fontproperties=None, 
+#             rotation=45, 
+            linespacing=None, 
+            rotation_mode=None
+        )
+        handlebox.add_artist(patch)
+        return patch
+
+
 
 
 def colour_dicts_from_win_count(
@@ -2251,6 +2348,7 @@ def cumulativeQMDTreePlot(
             G.nodes[m]['info']=wins_per_mod[m]
             
         except:
+            G.nodes[m]['wins'] = 0
             G.nodes[m]['status']=min_colour
             G.nodes[m]['info']=0
             
@@ -2500,8 +2598,6 @@ def draw_networkx_arrows(
             edge_collection.set_clim(edge_vmin, edge_vmax)
         else:
             edge_collection.autoscale()
-    
-
 
     max_bayes_value = max(edge_collection.get_clim())
     edge_collection.set_clim(0.5, max_bayes_value)
@@ -2599,12 +2695,18 @@ def draw_networkx_arrows(
                     shrink_factor = 0.3
                 )
 
+                # arrow_style = ArrowStyle.Curve(
+                # )
+
+
                 e = FancyArrowPatch(
                     n1.center,
                     n2.center,
                     patchA=n1,
                     patchB=n2,
                     arrowstyle=arrow_style,
+                    # arrowstyle='simple',
+                    # arrowstyle='curveb',
                     connectionstyle='arc3,rad=%s'%rad,
                     mutation_scale=10.0,
                     lw=lw,   #AROUND 10 TO BE FEASIBLE

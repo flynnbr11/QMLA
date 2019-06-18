@@ -647,10 +647,6 @@ def non_interacting_ising_all_names(
 
 
 def branch_is_num_params(latex_mapping_file, **kwargs):
-    print(
-        "[ModelNames]branch_given by", 
-        latex_mapping_file       
-    )
     with open(latex_mapping_file) as f:
         content = f.readlines()
     # remove whitespace characters like `\n` at the end of each line
@@ -672,7 +668,6 @@ def branch_is_num_params(latex_mapping_file, **kwargs):
         num_params_by_mod[mod] = num_params
         latex_name = latex_name_map[mod]
         model_branches[latex_name] = num_params
-    print("\n\nmodel_branches:\n", model_branches)
 
     return model_branches
 
