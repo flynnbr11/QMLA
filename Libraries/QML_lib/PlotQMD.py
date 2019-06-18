@@ -3398,8 +3398,8 @@ def get_bayes_latex_dict(qmd):
 
 
 def global_adjacent_branch_test(a,b, term_branches):
-    branch_a = term_branches[a]
-    branch_b = term_branches[b]
+    branch_a = int(term_branches[a])
+    branch_b = int(term_branches[b])
 
     available_branches = sorted(list(set(term_branches.values())))
     branch_a_idx = available_branches.index(branch_a)
