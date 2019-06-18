@@ -2420,10 +2420,13 @@ def cumulativeQMDTreePlot(
                     try:
                         frequency = pair_freqs[pairing]/max_frequency
                         if frequency_markers[0] <= frequency < frequency_markers[1]:
+                            print("THIN")
                             frequency = 1 # thin 
                         elif frequency_markers[1] <= frequency < frequency_markers[2]:
+                            print("MEDIUM")
                             frequency = 2 # medium 
                         else: 
+                            print("THICK")
                             frequency = 3 # thick
                     except:
                         frequency = 1
@@ -2436,8 +2439,8 @@ def cumulativeQMDTreePlot(
                     try:
                         bf = bayes_factors[a][b]
 
-                        if bf < 0: # ie model b has won
-                            bf = -bf
+                        if bf < 1: # ie model b has won
+                            bf = float(1/bf)
                             weight = np.log10(bf)
                             winner = b 
                             loser = a
@@ -2447,6 +2450,25 @@ def cumulativeQMDTreePlot(
                             loser = b
 
 
+                        # thisweight = np.log10(bayes_factors[a][b])
+                        print(
+                            "\n\t pair {},  \
+                            \n\t BF[a,b]:{} \
+                            \n\t BF[b,a]:{}\
+                            \n\t weight:{} \
+                            \n\t bf:{} \
+                            \n\t freq:{} \
+                            \n\t pair freq {}".format(
+                            pairing, 
+                            str(bayes_factors[a][b]),
+                            str(bayes_factors[b][a]),
+                            str(weight), 
+                            str(bf),
+                            frequency,
+                            pair_freqs[pairing]
+
+                            )
+                        )
                         G.add_edge(
                             winner, 
                             loser, 
@@ -2459,17 +2481,14 @@ def cumulativeQMDTreePlot(
                         )
 
 
-                        # thisweight = np.log10(bayes_factors[a][b])
-                        # print("\npair {},  \nBF[a,b]:{} \n\tBF[b,a]\n\tweight:".format(
-                        #     pairing, 
-                        #     bayes_factors[a][b],
-                        #     bayes_factors[b][a],
-                        #     thisweight
-                        #     )
-                        # )
                     except:
                         bf = 0 
+                        print("Could not find [{}][{}] in keys:{}".format(
+                            a, b, list(bayes_factors.keys())
+                            )
+                        )
                         # thisweight=0 #TODO is this right?
+                        # raise
                     if bf == 0:
                         weight = 0 
 
@@ -2504,20 +2523,25 @@ def cumulativeQMDTreePlot(
 
     arr = np.linspace(0, 50, 100).reshape((10, 10))
     cmap = plt.get_cmap('viridis')
+    cmap = plt.cm.Blues
     new_cmap = truncate_colormap(cmap, 0.35, 1.0)
+    # new_cmap = cmap
 
     plotTreeDiagram(G,
         n_cmap = plt.cm.pink_r, 
         e_cmap = new_cmap,
-#        e_cmap = plt.cm.Blues, 
-        #e_cmap = plt.cm.Paired,     
-        #e_cmap = plt.cm.rainbow,     
-        nonadj_alpha = 0.0, e_alphas = [] , 
+       # e_cmap = plt.cm.Blues, 
+        # e_cmap = plt.cm.Paired,     
+        # e_cmap = plt.cm.rainbow,     
+        nonadj_alpha = 0.0, 
+        e_alphas = [] , 
         # widthscale=10.5, 
         widthscale=3, 
-        label_padding = 0.4, pathstyle="curve",
+        label_padding = 0.4, 
+        pathstyle="curve",
         arrow_size=None,
-        entropy=entropy, inf_gain=inf_gain
+        entropy=entropy, 
+        inf_gain=inf_gain
     )   
 
     if save_to_file is not None:
@@ -3374,8 +3398,13 @@ def get_bayes_latex_dict(qmd):
 def global_adjacent_branch_test(a,b, term_branches):
     branch_a = term_branches[a]
     branch_b = term_branches[b]
+
+    available_branches = sorted(list(set(term_branches.values())))
     
-    if (branch_a==branch_b) or (branch_a==branch_b+1) or (branch_a==branch_b-1):
+    branch_a_idx = available_branches.index(branch_a)
+    branch_b_idx = available_branches.index(branch_b)
+
+    if (branch_a_idx==branch_b_idx) or (branch_a_idx==branch_b_idx+1) or (branch_a_idx==branch_b_idx-1):
         return True
     else:
         return False

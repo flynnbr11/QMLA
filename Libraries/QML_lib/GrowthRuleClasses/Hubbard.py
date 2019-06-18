@@ -103,6 +103,9 @@ class hubbardSquare(GrowthRuleSuper):
             latex_mapping_file = latex_mapping_file,
             **kwargs
         )
+
+        print("[Hubbard] name map:", name_map)
+
         return name_map
 
     def latex_name(
