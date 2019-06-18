@@ -10,6 +10,7 @@ from matplotlib import transforms
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib.ticker import Formatter
 from matplotlib import colors as mcolors
+import matplotlib.text as mpl_text
 
 
 import copy
@@ -2134,10 +2135,10 @@ def plotTreeDiagram(
         mod_str = model_ids_names[mid]
         num_wins = G.nodes[mod_str]['wins']
 
-        mod_lab = "  {}".format(
+        mod_lab = "({}) \t {}".format(
+            num_wins, 
             str(mod_str)
         ) 
-
 
         model_labels.append(mod_lab)
         mod_colour = "black"  # if true/champ can change colour
@@ -2154,11 +2155,11 @@ def plotTreeDiagram(
         *sorted(zip(model_labels, model_handles), key=lambda t: int(t[1].model_id))
     )
 
-    model_legend_title = str("ID (Wins)     Model")
+    model_legend_title = str("ID    (Wins)     Model")
     plt.legend(
         model_handles, 
         model_labels,
-        bbox_to_anchor=(0.4, 0.8, 1, 0 ),
+        bbox_to_anchor=(0.5, 0.8, 1, 0 ),
         handler_map=handler_map, 
         loc=1,
         title = model_legend_title
@@ -2176,19 +2177,18 @@ def plotTreeDiagram(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-import matplotlib.text as mpl_text
 
 class textHandleModelID(object):
     def __init__(self, model_id, num_wins, color):
 
         self.model_id = model_id
         self.num_wins = num_wins
-        if num_wins >= 0:
+        if num_wins < 0:
             self.my_text = str(
                 "{} ({}) ".format(model_id,num_wins)
             )
         else:
-            self.my_text = str("{}        ".format(model_id))
+            self.my_text = str("{}".format(model_id))
         self.my_color = color
 
 class textObjectHandler(object):
