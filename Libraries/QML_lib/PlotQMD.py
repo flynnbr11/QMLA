@@ -3402,11 +3402,11 @@ def global_adjacent_branch_test(a,b, term_branches):
     branch_b = term_branches[b]
 
     available_branches = sorted(list(set(term_branches.values())))
-    print("[plotQMD] available_branches", available_branches)
-    print("{} on branch {}".format(a, branch_a))
-    print("{} on branch {}".format(b, branch_b))
     branch_a_idx = available_branches.index(branch_a)
     branch_b_idx = available_branches.index(branch_b)
+    print("[plotQMD] available_branches", available_branches)
+    print("{} on branch {} w/ idx {}".format(a, branch_a, branch_a_idx))
+    print("{} on branch {} w/ idx {}".format(b, branch_b, branch_b_idx))
 
     if (
         (branch_a_idx==branch_b_idx) 
