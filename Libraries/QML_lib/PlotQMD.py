@@ -1317,7 +1317,7 @@ def average_quadratic_losses(
         latex_name = growth_classes[growth_generator].latex_name(name = mod)
         epochs = range(1, num_experiments+1)
 
-        ax.plot(
+        ax.semilogy(
             epochs, 
             avg_q_losses, 
             label = latex_name,
@@ -2287,8 +2287,12 @@ def cumulativeQMDTreePlot(
         growth_generator=growth_generator
     )
     if avg=='means':
+        print("[cumulativeQMDTreePlot] USING MEANS")
+        print(means)
         bayes_factors = means #medians
     elif avg=='medians':
+        print("[cumulativeQMDTreePlot] USING MEDIANS")
+        print(medians)
         bayes_factors = medians
 
     max_bayes_factor = max([max(bayes_factors[k].values()) for k in bayes_factors.keys()])
@@ -2430,33 +2434,68 @@ def cumulativeQMDTreePlot(
                     vs = [a,b]
 
                     try:
-                        thisweight = np.log10(bayes_factors[a][b])
-                    except:
-                        thisweight=0 #TODO is this right?
+                        bf = bayes_factors[a][b]
 
-                    if thisweight < 0:  
-                        # flip negative valued edges and move them to positive
-                        thisweight = -thisweight
-                        flipped = True
+                        if bf < 0: # ie model b has won
+                            bf = -bf
+                            weight = np.log10(bf)
+                            winner = b 
+                            loser = a
+                        else: 
+                            weight = np.log10(bf)
+                            winner = a
+                            loser = b
+
+
                         G.add_edge(
-                            a, b, 
-                            weight=thisweight, 
-                            winner=b,
-                            loser=a,
-                            flipped=flipped,
+                            winner, 
+                            loser, 
+                            weight=weight, 
+                            winner=winner,
+                            loser=loser,
+                            # flipped=flipped,
                             adj = is_adj, 
                             freq=frequency
                         )
-                    else:
-                        flipped = False
-                        G.add_edge(
-                            b, a,
-                            winner=a,
-                            loser=b,
-                            weight=thisweight, 
-                            flipped=flipped,
-                            adj=is_adj, freq=frequency
-                        )
+
+
+                        # thisweight = np.log10(bayes_factors[a][b])
+                        # print("\npair {},  \nBF[a,b]:{} \n\tBF[b,a]\n\tweight:".format(
+                        #     pairing, 
+                        #     bayes_factors[a][b],
+                        #     bayes_factors[b][a],
+                        #     thisweight
+                        #     )
+                        # )
+                    except:
+                        bf = 0 
+                        # thisweight=0 #TODO is this right?
+                    if bf == 0:
+                        weight = 0 
+
+                    # if thisweight < 0:  
+                    #     # flip negative valued edges and move them to positive
+                    #     thisweight = -thisweight
+                    #     flipped = True
+                    #     G.add_edge(
+                    #         a, b, 
+                    #         weight=thisweight, 
+                    #         winner=b,
+                    #         loser=a,
+                    #         flipped=flipped,
+                    #         adj = is_adj, 
+                    #         freq=frequency
+                    #     )
+                    # else:
+                    #     flipped = False
+                    #     G.add_edge(
+                    #         b, a,
+                    #         winner=a,
+                    #         loser=b,
+                    #         weight=thisweight, 
+                    #         flipped=flipped,
+                    #         adj=is_adj, freq=frequency
+                    #     )
                         
     max_freq = max(edge_frequencies)
     

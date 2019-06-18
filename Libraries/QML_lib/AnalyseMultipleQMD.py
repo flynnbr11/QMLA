@@ -1512,7 +1512,9 @@ def plot_tree_multi_QMD(
         latex_mapping_file=latex_mapping_file, 
         growth_generator=growth_generator,
         only_adjacent_branches=False, 
-        avg=avg_type, entropy=entropy, inf_gain=inf_gain,
+        avg=avg_type, 
+        entropy=entropy, 
+        inf_gain=inf_gain,
         save_to_file=save_to_file
     )        
 
@@ -1906,12 +1908,26 @@ if further_qhl_mode == False:
         plot_tree_multi_QMD(
             results_csv = results_csv, 
             latex_mapping_file=latex_mapping_file, 
+            avg_type='means', 
             all_bayes_csv = all_bayes_csv, 
             growth_generator=growth_generator,
             entropy = entropy,
             inf_gain = inf_gain,
-            save_to_file='multiQMD_tree.png'
+            save_to_file='multiQMD_tree_mean_bayes_factors.png'
         )
+
+        plot_tree_multi_QMD(
+            results_csv = results_csv, 
+            latex_mapping_file=latex_mapping_file, 
+            avg_type='medians', 
+            all_bayes_csv = all_bayes_csv, 
+            growth_generator=growth_generator,
+            entropy = entropy,
+            inf_gain = inf_gain,
+            save_to_file='multiQMD_tree_median_bayes_factors.png'
+        )
+
+
     except ValueError:
         pass
 

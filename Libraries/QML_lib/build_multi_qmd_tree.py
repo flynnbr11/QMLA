@@ -180,6 +180,7 @@ plot_tree_multi_QMD(
     latex_mapping_file=latex_mapping_file, 
     all_bayes_csv = all_bayes_csv, 
     growth_generator=growth_generator,
+    avg_type='means',
     entropy = None,
     inf_gain = None,
     save_to_file='multiQMD_tree.png'

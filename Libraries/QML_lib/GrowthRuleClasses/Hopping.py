@@ -223,6 +223,10 @@ class hopping(
 
         if hopping_latex != 'H_{}':
             latex_term += hopping_latex
+            latex_term += str(
+                "^{ \otimes"
+                 + str(dim) + "}"
+            )
 
         if interaction_energy is True:
             latex_term += str(
