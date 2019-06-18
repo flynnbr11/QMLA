@@ -2079,12 +2079,13 @@ def plotTreeDiagram(
         if stat not in distinct_status:
             distinct_status.append(stat)
             # node colour encodes either number wins or branch champion
-            info=str(G.nodes[n]['info']) 
+            info=str(G.nodes[n]['wins']) 
             col = tuple( n_cmap(G.nodes[n]['status']) )
-
             handles.append(mpatches.Patch(color=col))
             labels.append(info)
+    print("[plotQMD] Before: \n handles{} \n labels {}".format(handles, labels))
     labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: t[0]))
+    print("[plotQMD] After: \n handles{} \n labels {}".format(handles, labels))
     lgd_handles=[]
     
     # if 'Branch Champion' in labels:
@@ -2695,7 +2696,9 @@ def draw_networkx_arrows(
                     shrink_factor = 0.3
                 )
 
-                # arrow_style = ArrowStyle.Curve(
+
+
+                # arrow_style = mpatches.ArrowStyle.Curve(
                 # )
 
 
@@ -2704,8 +2707,8 @@ def draw_networkx_arrows(
                     n2.center,
                     patchA=n1,
                     patchB=n2,
-                    arrowstyle=arrow_style,
-                    # arrowstyle='simple',
+                    # arrowstyle=arrow_style,
+                    arrowstyle='simple',
                     # arrowstyle='curveb',
                     connectionstyle='arc3,rad=%s'%rad,
                     mutation_scale=10.0,
