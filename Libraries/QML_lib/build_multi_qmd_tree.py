@@ -141,7 +141,7 @@ latex_mapping_file = arguments.latex_mapping_file
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
 
-results_csv_name = 'summary_results.csv'
+results_csv_name = '/summary_results.csv'
 results_csv = directory_to_analyse+results_csv_name
 
 
