@@ -2431,7 +2431,7 @@ def cumulativeQMDTreePlot(
                         elif low <= frequency < mid:
                             frequency = 10 # medium 
                         else: 
-                            frequency = 100 # thick
+                            frequency = 50 # thick
                     except:
                         print("couldn't assign frequency")
                         frequency = 1
