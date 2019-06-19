@@ -2287,13 +2287,16 @@ def cumulativeQMDTreePlot(
         growth_generator=growth_generator
     )
     if avg=='means':
-        print("[cumulativeQMDTreePlot] USING MEANS")
-        print(means)
+        # print("[cumulativeQMDTreePlot] USING MEANS")
+        # print(means)
         bayes_factors = means #medians
     elif avg=='medians':
-        print("[cumulativeQMDTreePlot] USING MEDIANS")
-        print(medians)
+        # print("[cumulativeQMDTreePlot] USING MEDIANS")
+        # print(medians)
         bayes_factors = medians
+
+    print("COUNTS", counts)
+
 
     max_bayes_factor = max([max(bayes_factors[k].values()) for k in bayes_factors.keys()])
     growth_class = GrowthRules.get_growth_generator_class(
@@ -2414,23 +2417,26 @@ def cumulativeQMDTreePlot(
                 term_branches
             )
             if is_adj or not only_adjacent_branches:
-                print(
-                    "[plotQMD] edge being considered. is_adj={}, only_adjacent_branches={}".format(is_adj, only_adjacent_branches)
-                )
                 if a!=b :
                     pairing = (a,b)
                     try:
-                        frequency = pair_freqs[pairing]/max_frequency
+                        # frequency = pair_freqs[pairing]/max_frequency
+                        frequency = pair_freqs[pairing]
                         if frequency_markers[0] <= frequency < frequency_markers[1]:
+                            print("Thin")
                             frequency = 1 # thin 
                         elif frequency_markers[1] <= frequency < frequency_markers[2]:
-                            frequency = 2 # medium 
+                            print("medium")
+                            frequency = 3 # medium 
                         else: 
-                            frequency = 3 # thick
+                            print("Thick")
+                            frequency = 5 # thick
                     except:
+                        print("couldn't assign frequency")
                         frequency = 1
                     
                     edges.append(pairing)
+                    print("pair {} freq {}".format(pairing, frequency))
                     edge_frequencies.append(frequency)
 
                     vs = [a,b]
@@ -2454,11 +2460,6 @@ def cumulativeQMDTreePlot(
 
                         # thisweight = np.log10(bayes_factors[a][b])
                         try:
-                            print(
-                                "[plotQMD] Adding edge", 
-                                "pair", pairing, 
-                                "weight:", weight       
-                            )
                             # print(
                             #     "\n\t pair {},  \
                             #     \n\t BF[a,b]:{} \
@@ -2494,51 +2495,23 @@ def cumulativeQMDTreePlot(
 
                     elif bf == 0:
                         weight = 0 
-                        print("BF == 0 for a,b = {} / {}".format(a, b))
-                        # print("BF[a][b] = ", bayes_factors[a][b])
-   
-                        # thisweight=0 #TODO is this right?
-                        # raise
-
-                    # if thisweight < 0:  
-                    #     # flip negative valued edges and move them to positive
-                    #     thisweight = -thisweight
-                    #     flipped = True
-                    #     G.add_edge(
-                    #         a, b, 
-                    #         weight=thisweight, 
-                    #         winner=b,
-                    #         loser=a,
-                    #         flipped=flipped,
-                    #         adj = is_adj, 
-                    #         freq=frequency
-                    #     )
-                    # else:
-                    #     flipped = False
-                    #     G.add_edge(
-                    #         b, a,
-                    #         winner=a,
-                    #         loser=b,
-                    #         weight=thisweight, 
-                    #         flipped=flipped,
-                    #         adj=is_adj, freq=frequency
-                    #     )
-                else:
-                    print("Not considering edge because a==b: {}=={}".format(a,b) )
-            else:
-                print(
-                    "[plotQMD] edge not being considered. is_adj={}, only_adjacent_branches={}".format(is_adj, only_adjacent_branches)
-                )
 
     max_freq = max(edge_frequencies)
+    print("edge freqs:", edge_frequencies)
+    print("freq markers:", frequency_markers)
+    print("[plotQMD]max freq:", max_freq)
     
-    freq_scale = 10/max_freq
+    try:
+        freq_scale = 10/max_freq
+    except:
+        freq_scale = 0 
+
     edge_f = [i*freq_scale for i in edge_frequencies]
 
     arr = np.linspace(0, 50, 100).reshape((10, 10))
     cmap = plt.get_cmap('viridis')
-    # cmap = plt.cm.Blues
-    cmap = plt.cm.rainbow
+    cmap = plt.cm.Blues
+    # cmap = plt.cm.rainbow
     new_cmap = truncate_colormap(cmap, 0.35, 1.0)
     # new_cmap = cmap
 
@@ -2788,11 +2761,6 @@ def draw_networkx_arrows(
 
                 # arrow_style = mpatches.ArrowStyle.Curve(
                 # )
-
-                print("Edge{}".format(edgelist[idx]))
-                print(
-                    "loser {} -> winner {}".format( G.edges[(u,v)]['loser'],  G.edges[(u,v)]['winner'])
-                )
 
                 e = FancyArrowPatch(
                     n1.center,
@@ -3335,7 +3303,7 @@ def multiQMDBayes(
 
 
 def updateAllBayesCSV(qmd, all_bayes_csv):
-    print("[PlotQMD] updateAllBayesCSV function:")
+    print("[PlotQMD] updateAllBayesCSV function. all_bayes_csv:", all_bayes_csv)
     import os,csv
     data = get_bayes_latex_dict(qmd)
     names = list(data.keys())
@@ -3433,24 +3401,18 @@ def global_adjacent_branch_test(a,b, term_branches):
     branch_a_idx = available_branches.index(branch_a)
     branch_b_idx = available_branches.index(branch_b)
 
+    # closeness conditions
     c1 = (branch_a_idx==branch_b_idx)
     c2 =  (branch_a_idx==branch_b_idx+1)
     c3 = (branch_a_idx==branch_b_idx-1)
-
-    print("[plotQMD] available_branches", available_branches)
-    print("{} on branch {} w/ idx {}".format(a, branch_a, branch_a_idx))
-    print("{} on branch {} w/ idx {}".format(b, branch_b, branch_b_idx))
-    print("c1={},  c2={},  c3={}".format(c1,c2,c3))
 
     if (
         c1 == True
         or  c2 == True
         or c3 == True
     ):
-        print("Returning True")
         return True
     else:
-        print("Returning False")
         return False
 
     
