@@ -175,13 +175,30 @@ def plot_tree_multi_QMD(
     )        
 
 
+# plot_tree_multi_QMD(
+#     results_csv = results_csv, 
+#     latex_mapping_file=latex_mapping_file, 
+#     all_bayes_csv = all_bayes_csv, 
+#     growth_generator=growth_generator,
+#     avg_type='means',
+#     entropy = None,
+#     inf_gain = None,
+#     save_to_file='multiQMD_tree.png'
+# )
+
+
+tree_plot_log = str(directory_to_analyse + 'tree_plot_log.txt')
+sys.stdout = open(
+    'tree_plot_log', 'w'
+)
+
 plot_tree_multi_QMD(
     results_csv = results_csv, 
     latex_mapping_file=latex_mapping_file, 
+    avg_type='medians', 
     all_bayes_csv = all_bayes_csv, 
     growth_generator=growth_generator,
-    avg_type='means',
     entropy = None,
     inf_gain = None,
-    save_to_file='multiQMD_tree.png'
+    save_to_file='multiQMD_tree_median_bayes_factors.png'
 )

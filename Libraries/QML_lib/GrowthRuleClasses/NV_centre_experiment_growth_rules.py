@@ -67,7 +67,7 @@ class NVCentreSpinExperimentalMethod(
             }
         else:
             # TODO remove below setting probes -- used fir a test where simulation only uses |+>
-            self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
+            # self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
             self.gaussian_prior_means_and_widths = {
             }
 

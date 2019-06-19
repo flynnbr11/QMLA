@@ -1905,6 +1905,11 @@ if further_qhl_mode == False:
     try:
         # if growth_generator in valid_growth_rules_for_multiQMD_tree_plot:
 
+        tree_plot_log = str(directory_to_analyse + 'tree_plot_log.txt')
+        sys.stdout = open(
+            'tree_plot_log', 'w'
+        )
+
         # plot_tree_multi_QMD(
         #     results_csv = results_csv, 
         #     latex_mapping_file=latex_mapping_file, 
@@ -1926,6 +1931,9 @@ if further_qhl_mode == False:
             inf_gain = inf_gain,
             save_to_file='multiQMD_tree_median_bayes_factors.png'
         )
+
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
 
 
     except ValueError:

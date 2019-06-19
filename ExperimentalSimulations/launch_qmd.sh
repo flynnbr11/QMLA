@@ -88,13 +88,13 @@ sim_growth_rule='hubbard_square_lattice_generalised'
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # exp_growth_rule='NV_centre_revivals'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='NV_centre_experiment_debug'
-exp_growth_rule='reduced_nv_experiment'
+# exp_growth_rule='reduced_nv_experiment'
 
 if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
 then

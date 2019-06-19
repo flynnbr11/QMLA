@@ -2435,7 +2435,10 @@ def cumulativeQMDTreePlot(
 
                     try:
                         bf = bayes_factors[a][b]
+                    except:
+                        bf = 0 
 
+                    if bf != 0:
                         if bf < 1: # ie model b has won
                             bf = float(1/bf)
                             weight = np.log10(bf)
@@ -2448,43 +2451,55 @@ def cumulativeQMDTreePlot(
 
 
                         # thisweight = np.log10(bayes_factors[a][b])
-                        print(
-                            "\n\t pair {},  \
-                            \n\t BF[a,b]:{} \
-                            \n\t BF[b,a]:{}\
-                            \n\t weight:{} \
-                            \n\t bf:{} \
-                            \n\t freq:{} \
-                            \n\t pair freq {}".format(
-                            pairing, 
-                            str(bayes_factors[a][b]),
-                            str(bayes_factors[b][a]),
-                            str(weight), 
-                            str(bf),
-                            frequency,
-                            pair_freqs[pairing]
-
+                        try:
+                            print(
+                                "[plotQMD] Adding edge", 
+                                "pair", pairing, 
+                                "weight:", weight       
                             )
-                        )
-                        G.add_edge(
-                            loser, 
-                            winner, 
-                            weight=weight, 
-                            winner=winner,
-                            loser=loser,
-                            # flipped=flipped,
-                            adj = is_adj, 
-                            freq=frequency
-                        )
 
 
-                    except:
-                        bf = 0 
+                            # print(
+                            #     "\n\t pair {},  \
+                            #     \n\t BF[a,b]:{} \
+                            #     \n\t BF[b,a]:{}\
+                            #     \n\t weight:{} \
+                            #     \n\t bf:{} \
+                            #     \n\t freq:{} \
+                            #     \n\t pair freq {}".format(
+                            #     pairing, 
+                            #     str(bayes_factors[a][b]),
+                            #     str(bayes_factors[b][a]),
+                            #     str(weight), 
+                            #     str(bf),
+                            #     frequency,
+                            #     pair_freqs[pairing]
+
+                            #     )
+                            # )
+                            G.add_edge(
+                                loser, 
+                                winner, 
+                                weight=weight, 
+                                winner=winner,
+                                loser=loser,
+                                # flipped=flipped,
+                                adj = is_adj, 
+                                freq=frequency
+                            )
+                        except:
+                            print(
+                                "[plotQMD] failed to add edge", pairing
+                            )
+                            raise
+
+                    elif bf == 0:
+                        weight = 0 
+
+
    
                         # thisweight=0 #TODO is this right?
                         # raise
-                    if bf == 0:
-                        weight = 0 
 
                     # if thisweight < 0:  
                     #     # flip negative valued edges and move them to positive
@@ -3404,14 +3419,20 @@ def global_adjacent_branch_test(a,b, term_branches):
     available_branches = sorted(list(set(term_branches.values())))
     branch_a_idx = available_branches.index(branch_a)
     branch_b_idx = available_branches.index(branch_b)
+
+    c1 = (branch_a_idx==branch_b_idx)
+    c2 =  (branch_a_idx==branch_b_idx+1)
+    c3 = (branch_a_idx==branch_b_idx-1)
+
     print("[plotQMD] available_branches", available_branches)
     print("{} on branch {} w/ idx {}".format(a, branch_a, branch_a_idx))
     print("{} on branch {} w/ idx {}".format(b, branch_b, branch_b_idx))
+    print("c1={},  c2={},  c3={}".format(c1,c2,c3))
 
     if (
-        (branch_a_idx==branch_b_idx) 
-        or (branch_a_idx==branch_b_idx+1) 
-        or (branch_a_idx==branch_b_idx-1)
+        c1 == True
+        or  c2 == True
+        or c3 == True
     ):
         return True
     else:
