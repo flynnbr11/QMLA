@@ -2418,7 +2418,7 @@ def cumulativeQMDTreePlot(
                 print(
                     "[plotQMD] edge being considered. is_adj={}, only_adjacent_branches={}".format(is_adj, only_adjacent_branches)
                 )
-                if a!=b:
+                if a!=b :
                     pairing = (a,b)
                     try:
                         frequency = pair_freqs[pairing]/max_frequency
@@ -2460,8 +2460,6 @@ def cumulativeQMDTreePlot(
                                 "pair", pairing, 
                                 "weight:", weight       
                             )
-
-
                             # print(
                             #     "\n\t pair {},  \
                             #     \n\t BF[a,b]:{} \
@@ -2477,7 +2475,6 @@ def cumulativeQMDTreePlot(
                             #     str(bf),
                             #     frequency,
                             #     pair_freqs[pairing]
-
                             #     )
                             # )
                             G.add_edge(
@@ -2498,8 +2495,8 @@ def cumulativeQMDTreePlot(
 
                     elif bf == 0:
                         weight = 0 
-
-
+                        print("BF == 0 for a,b = {} / {}".format(a, b))
+                        # print("BF[a][b] = ", bayes_factors[a][b])
    
                         # thisweight=0 #TODO is this right?
                         # raise
@@ -2527,6 +2524,8 @@ def cumulativeQMDTreePlot(
                     #         flipped=flipped,
                     #         adj=is_adj, freq=frequency
                     #     )
+                else:
+                    print("Not considering edge because a==b: {}=={}".format(a,b) )
             else:
                 print(
                     "[plotQMD] edge not being considered. is_adj={}, only_adjacent_branches={}".format(is_adj, only_adjacent_branches)
