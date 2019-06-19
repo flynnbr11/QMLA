@@ -2404,7 +2404,11 @@ def cumulativeQMDTreePlot(
     edges = []
     edge_frequencies=[]
     max_frequency = max(list(pair_freqs.values()))
-    frequency_markers = list(np.linspace(0, max_frequency, 4, dtype=int))
+
+    low = int(np.percentile(range(0,max_frequency), q=20  ))
+    mid = int(np.percentile(range(0,max_frequency), q=60  ))
+    high = max_frequency
+    # frequency_markers = list(np.linspace(0, max_frequency, 4, dtype=int))
 
     even_arrow_width = True
     # setting the thickness if the arrows
@@ -2422,15 +2426,12 @@ def cumulativeQMDTreePlot(
                     try:
                         # frequency = pair_freqs[pairing]/max_frequency
                         frequency = pair_freqs[pairing]
-                        if frequency_markers[0] <= frequency < frequency_markers[1]:
-                            print("Thin")
+                        if frequency < low:
                             frequency = 1 # thin 
-                        elif frequency_markers[1] <= frequency < frequency_markers[2]:
-                            print("medium")
-                            frequency = 3 # medium 
+                        elif low <= frequency < mid:
+                            frequency = 10 # medium 
                         else: 
-                            print("Thick")
-                            frequency = 5 # thick
+                            frequency = 100 # thick
                     except:
                         print("couldn't assign frequency")
                         frequency = 1
@@ -2498,14 +2499,15 @@ def cumulativeQMDTreePlot(
 
     max_freq = max(edge_frequencies)
     print("edge freqs:", edge_frequencies)
-    print("freq markers:", frequency_markers)
+    # print("freq markers:", frequency_markers)
     print("[plotQMD]max freq:", max_freq)
     
-    try:
-        freq_scale = 10/max_freq
-    except:
-        freq_scale = 0 
+    # try:
+    #     freq_scale = 10/max_freq
+    # except:
+    #     freq_scale = 0 
 
+    freq_scale = 1
     edge_f = [i*freq_scale for i in edge_frequencies]
 
     arr = np.linspace(0, 50, 100).reshape((10, 10))
