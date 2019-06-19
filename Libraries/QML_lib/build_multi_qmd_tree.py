@@ -169,7 +169,7 @@ def plot_tree_multi_QMD(
         wins_per_mod=winning_count,
         latex_mapping_file=latex_mapping_file, 
         growth_generator=growth_generator,
-        only_adjacent_branches=False, 
+        only_adjacent_branches=True, 
         avg=avg_type, entropy=entropy, inf_gain=inf_gain,
         save_to_file=save_to_file
     )        
@@ -189,7 +189,7 @@ def plot_tree_multi_QMD(
 
 tree_plot_log = str(directory_to_analyse + 'tree_plot_log.txt')
 sys.stdout = open(
-    'tree_plot_log', 'w'
+    tree_plot_log, 'w'
 )
 
 plot_tree_multi_QMD(

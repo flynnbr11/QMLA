@@ -2415,6 +2415,9 @@ def cumulativeQMDTreePlot(
                 term_branches
             )
             if is_adj or not only_adjacent_branches:
+                print(
+                    "[plotQMD] edge being considered. is_adj={}, only_adjacent_branches={}".format(is_adj, only_adjacent_branches)
+                )
                 if a!=b:
                     pairing = (a,b)
                     try:
@@ -2524,7 +2527,11 @@ def cumulativeQMDTreePlot(
                     #         flipped=flipped,
                     #         adj=is_adj, freq=frequency
                     #     )
-                        
+            else:
+                print(
+                    "[plotQMD] edge not being considered. is_adj={}, only_adjacent_branches={}".format(is_adj, only_adjacent_branches)
+                )
+
     max_freq = max(edge_frequencies)
     
     freq_scale = 10/max_freq
@@ -3434,8 +3441,10 @@ def global_adjacent_branch_test(a,b, term_branches):
         or  c2 == True
         or c3 == True
     ):
+        print("Returning True")
         return True
     else:
+        print("Returning False")
         return False
 
     
