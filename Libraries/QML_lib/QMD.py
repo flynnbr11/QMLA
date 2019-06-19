@@ -3318,6 +3318,7 @@ class QMD():
         PlotQMD.BayesFactorsCSV(self, save_to_file, names_ids=names_ids)
 
     def writeInterQMDBayesCSV(self, bayes_csv):
+        print("[QMD] writing Bayes CSV")
         PlotQMD.updateAllBayesCSV(self, bayes_csv)
 
     def plotHintonAllModels(self, save_to_file=None):

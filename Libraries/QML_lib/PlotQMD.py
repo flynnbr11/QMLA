@@ -2296,7 +2296,6 @@ def cumulativeQMDTreePlot(
         bayes_factors = medians
 
     max_bayes_factor = max([max(bayes_factors[k].values()) for k in bayes_factors.keys()])
-
     growth_class = GrowthRules.get_growth_generator_class(
         growth_generation_rule = growth_generator
     )
@@ -2538,7 +2537,8 @@ def cumulativeQMDTreePlot(
 
     arr = np.linspace(0, 50, 100).reshape((10, 10))
     cmap = plt.get_cmap('viridis')
-    cmap = plt.cm.Blues
+    # cmap = plt.cm.Blues
+    cmap = plt.cm.rainbow
     new_cmap = truncate_colormap(cmap, 0.35, 1.0)
     # new_cmap = cmap
 
@@ -3335,6 +3335,7 @@ def multiQMDBayes(
 
 
 def updateAllBayesCSV(qmd, all_bayes_csv):
+    print("[PlotQMD] updateAllBayesCSV function:")
     import os,csv
     data = get_bayes_latex_dict(qmd)
     names = list(data.keys())
@@ -3362,7 +3363,8 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
         )
 
         if len(new_models) > 0:
-            # print("[PlotQMD - updateAllBayesCSV] Adding new models")
+
+            print("[PlotQMD - updateAllBayesCSV] Adding new models:", new_models)
             import pandas
             csv_input = pandas.read_csv(
                 all_bayes_csv, 
@@ -3382,6 +3384,11 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
             bayes_csv, 
         )
         fields = reader.fieldnames
+
+    print(
+        "[PlotQMD] fields (ordered):", fields,
+        "\n\nAdding dict:", data
+    )
 
     with open(all_bayes_csv, 'a') as bayes_csv:
         writer = csv.DictWriter(
