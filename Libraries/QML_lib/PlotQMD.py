@@ -566,10 +566,6 @@ def plotDynamicsLearnedModels(
                 # fill=False,
                 label=desc
             )
-            print(
-                "[plotDynamicsLearnedModels]",
-                "bins:", bins
-            )
             ax.legend()
             # ax.semilogy()
             for bin_value in bins:
@@ -2405,9 +2401,16 @@ def cumulativeQMDTreePlot(
     edge_frequencies=[]
     max_frequency = max(list(pair_freqs.values()))
 
-    low = int(np.percentile(range(0,max_frequency), q=20  ))
-    mid = int(np.percentile(range(0,max_frequency), q=60  ))
-    high = max_frequency
+    try:
+        low = int(np.percentile(range(0,max_frequency), q=20  ))
+        mid = int(np.percentile(range(0,max_frequency), q=60  ))
+        high = max_frequency
+    except:
+        low = max_frequency
+        mid = max_frequency
+        high = max_frequency
+
+
     # frequency_markers = list(np.linspace(0, max_frequency, 4, dtype=int))
 
     even_arrow_width = True
@@ -3305,7 +3308,6 @@ def multiQMDBayes(
 
 
 def updateAllBayesCSV(qmd, all_bayes_csv):
-    print("[PlotQMD] updateAllBayesCSV function. all_bayes_csv:", all_bayes_csv)
     import os,csv
     data = get_bayes_latex_dict(qmd)
     names = list(data.keys())
@@ -3334,7 +3336,6 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
 
         if len(new_models) > 0:
 
-            print("[PlotQMD - updateAllBayesCSV] Adding new models:", new_models)
             import pandas
             csv_input = pandas.read_csv(
                 all_bayes_csv, 
@@ -3354,11 +3355,6 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
             bayes_csv, 
         )
         fields = reader.fieldnames
-
-    print(
-        "[PlotQMD] fields (ordered):", fields,
-        "\n\nAdding dict:", data
-    )
 
     with open(all_bayes_csv, 'a') as bayes_csv:
         writer = csv.DictWriter(

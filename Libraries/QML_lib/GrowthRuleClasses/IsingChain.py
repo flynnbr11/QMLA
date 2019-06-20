@@ -24,7 +24,7 @@ class isingChain(
             '1Dising_ix_d2',
             '1Dising_ix_d2PP1Dising_tz_d2', 
         ] 
-        self.qhl_models =    	[
+        self.qhl_models = [
             '1Dising_ix_d2',
             '1Dising_ix_d2PP1Dising_tz_d2', 
         ]

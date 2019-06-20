@@ -30,7 +30,7 @@ class NVCentreSpinExperimentalMethod(
             self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
 
         # self.true_operator = 'xTi'
-        # self.heuristic_function = Heuristics.one_over_sigma_then_linspace
+        self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         self.measurement_type = 'hahn'
         
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
