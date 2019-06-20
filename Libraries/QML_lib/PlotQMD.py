@@ -1974,8 +1974,10 @@ def plotTreeDiagram(
     positions = dict( zip( G.nodes(), tuple(  [prop['pos'] for
         (n,prop) in G.nodes(data=True)]  ) )
     )
-    n_colours = tuple( [ n_cmap(prop['status']) for (n,prop) 
-        in G.nodes(data=True)]   
+    n_colours = tuple( 
+        [ 
+            n_cmap(prop['status']) for (n,prop) in G.nodes(data=True)
+        ]   
     )
     
     label_positions = []   
@@ -2019,34 +2021,14 @@ def plotTreeDiagram(
     )
 
 
-    nx.draw_networkx_nodes(
+
+    nx.draw_networkx_labels(
         G, 
-        with_labels = False, # labels=labels, 
-        pos=positions, 
-        k=1.5, #node spacing
-        width=None, 
-        node_size=700, #node_shape='8',
-        node_color = n_colours
-    )  
-    
-    edges_for_cmap = draw_networkx_arrows(
-        G, 
-        edgelist=edge_tuples,
-        pos=positions, 
-        arrows=True, 
-        arrowstyle='->',
-        width = arrow_size, 
-        widthscale=widthscale,
-        pathstyle=pathstyle, 
-        alphas = e_alphas, 
-        edge_color= weights,
-        edge_cmap=e_cmap, 
-        edge_vmin=None, #0.8, 
-        edge_vmax=None, #0.85
+        label_positions, 
+        labels,
+        font_color='black',
+        font_weight='bold'
     )
-
-
-    nx.draw_networkx_labels(G, label_positions, labels)
     
     plt.tight_layout()
     plt.gca().invert_yaxis() # so branch 0 on top
@@ -2057,12 +2039,6 @@ def plotTreeDiagram(
     xmax = max( np.array(list(label_positions.values()))[:,0] )
     plt.xlim(xmin -0.8, xmax +0.8)
     
-    plt.colorbar(
-        edges_for_cmap, 
-        orientation="horizontal", 
-        pad= 0, 
-        label=r'$\log_{10}$ Bayes factor'
-    ) 
 
 
     nodes=list(G.nodes)
@@ -2132,6 +2108,7 @@ def plotTreeDiagram(
     for mid in mod_id_handles:
         mod_str = model_ids_names[mid]
         num_wins = G.nodes[mod_str]['wins']
+        relation_to_true_model = G.nodes[mod_str]['relation_to_true_model']
 
         mod_lab = "({}) \t {}".format(
             num_wins, 
@@ -2143,6 +2120,7 @@ def plotTreeDiagram(
         # mod_colour =n_cmap(G.nodes[mod_str]['status'])
         mod_handle = textHandleModelID(
             mid,
+            relation_to_true_model, 
             num_wins,
             mod_colour
         )
@@ -2150,10 +2128,54 @@ def plotTreeDiagram(
         handler_map[mod_handle] = textObjectHandler()
 
     model_labels, model_handles = zip(
-        *sorted(zip(model_labels, model_handles), key=lambda t: int(t[1].model_id))
+        *sorted(
+            zip(
+                model_labels, 
+                model_handles
+            ), 
+            key=lambda t: int(t[1].model_id)
+        )
     )
 
     model_legend_title = str("ID    (Wins)     Model")
+
+    node_boundary_colours = []
+
+    # for n in G.nodes:
+    #     if G[n]['relation_to_true_model'] == 'true':
+    #         node_boundary_colours.append('green')
+    #     else:
+    #         node_boundary_colours.append('black')
+
+
+    nx.draw_networkx_nodes(
+        G, 
+        with_labels = True, # labels=labels, 
+        pos=positions, 
+        k=1.5, #node spacing
+        width=None, 
+        alpha = 0.5, 
+        node_size=700, #node_shape='8',
+        node_color = n_colours,
+        edgecolors = node_boundary_colours, 
+    )  
+    
+    edges_for_cmap = draw_networkx_arrows(
+        G, 
+        edgelist=edge_tuples,
+        pos=positions, 
+        arrows=True, 
+        arrowstyle='->',
+        width = arrow_size, 
+        widthscale=widthscale,
+        pathstyle=pathstyle, 
+        alphas = e_alphas, 
+        edge_color= weights,
+        edge_cmap=e_cmap, 
+        edge_vmin=None, #0.8, 
+        edge_vmax=None, #0.85
+    )
+
     plt.legend(
         model_handles, 
         model_labels,
@@ -2164,7 +2186,13 @@ def plotTreeDiagram(
     )._legend_box.align='left'
 
     plt.gca().add_artist(legend_num_wins)
-    
+    plt.colorbar(
+        edges_for_cmap, 
+        orientation="horizontal", 
+        pad= 0, 
+        label=r'$\log_{10}$ Bayes factor'
+    ) 
+   
     plot_title = str(
         "Quantum Model Development Tree"
     )
@@ -2177,17 +2205,30 @@ def plotTreeDiagram(
 
 
 class textHandleModelID(object):
-    def __init__(self, model_id, num_wins, color):
+    def __init__(
+        self, 
+        model_id, 
+        relation_to_true_model, 
+        num_wins, 
+        color
+    ):
 
         self.model_id = model_id
         self.num_wins = num_wins
+        self.relation_to_true_model = relation_to_true_model
         if num_wins < 0:
             self.my_text = str(
                 "{} ({}) ".format(model_id,num_wins)
             )
         else:
             self.my_text = str("{}".format(model_id))
-        self.my_color = color
+
+        if relation_to_true_model == 'true':
+            self.my_color = 'green'
+            self.text_weight = 'bold'
+        else:
+            self.my_color = color
+            self.text_weight = 'normal'
 
 class textObjectHandler(object):
     def legend_artist(
@@ -2203,6 +2244,7 @@ class textObjectHandler(object):
             x=0, y=0, 
             text=orig_handle.my_text, 
             color=orig_handle.my_color, 
+            fontweight = orig_handle.text_weight, 
             verticalalignment=u'baseline', 
             horizontalalignment=u'left', 
             multialignment=None, 
@@ -2298,7 +2340,7 @@ def cumulativeQMDTreePlot(
     growth_class = GrowthRules.get_growth_generator_class(
         growth_generation_rule = growth_generator
     )
-    true_model = growth_class.true_operator_latex
+    true_model = growth_class.true_operator_latex()
 
     term_branches = growth_class.name_branch_map(
         latex_mapping_file = latex_mapping_file,
@@ -2520,7 +2562,8 @@ def cumulativeQMDTreePlot(
     new_cmap = truncate_colormap(cmap, 0.35, 1.0)
     # new_cmap = cmap
 
-    plotTreeDiagram(G,
+    plotTreeDiagram(
+        G,
         n_cmap = plt.cm.pink_r, 
         e_cmap = new_cmap,
        # e_cmap = plt.cm.Blues, 
@@ -2533,8 +2576,8 @@ def cumulativeQMDTreePlot(
         label_padding = 0.4, 
         pathstyle="curve",
         arrow_size=None,
-        entropy=entropy, 
-        inf_gain=inf_gain
+        entropy=None, 
+        inf_gain=None
     )   
 
     if save_to_file is not None:

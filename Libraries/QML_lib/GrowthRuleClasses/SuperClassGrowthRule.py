@@ -32,7 +32,6 @@ class GrowthRuleSuper():
 
         # Parameters specific to the growth rule
         self.true_operator = 'xTi'
-        self.true_operator_latex = self.latex_name(self.true_operator)
         self.qhl_models = ['xTi', 'yTi', 'zTi'] 
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
         self.max_num_parameter_estimate = 2
@@ -62,7 +61,8 @@ class GrowthRuleSuper():
         }
            
 
-
+    def true_operator_latex(self):
+        return self.latex_name(self.true_operator)
 
     def generate_models(
         self, 

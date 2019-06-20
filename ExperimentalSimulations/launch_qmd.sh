@@ -8,7 +8,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 num_tests=1
 qhl_test=0
-multiple_qhl=0
+multiple_qhl=1
 do_further_qhl=0
 exp_data=1
 simulate_experiment=0
@@ -81,15 +81,15 @@ git_commit=$(git rev-parse HEAD)
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='ising_1d_chain'
-sim_growth_rule='heisenberg_xyz'
+# sim_growth_rule='heisenberg_xyz'
 # sim_growth_rule='hubbard_square_lattice_generalised'
-# sim_growth_rule='hopping_topology'
+sim_growth_rule='hopping_topology'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# exp_growth_rule='NV_centre_revivals'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+exp_growth_rule='NV_centre_revivals'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'

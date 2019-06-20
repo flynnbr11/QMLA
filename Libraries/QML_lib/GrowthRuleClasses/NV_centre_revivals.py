@@ -5,9 +5,11 @@ import ExpectationValues
 import ProbeGeneration
 
 from NV_centre_experiment_growth_rules import NVCentreSpinExperimentalMethod
+# from NV_centre_large_spin_bath import NVCentreLargeSpinBath
+import NV_centre_large_spin_bath
 
 class NVCentreRevivalData(
-    NVCentreSpinExperimentalMethod # inherit from this
+    NV_centre_large_spin_bath.NVCentreLargeSpinBath # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
@@ -25,5 +27,21 @@ class NVCentreRevivalData(
             **kwargs
         )
         self.experimental_dataset = 'NV_revivals.p'
+        self.true_operator = 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6'
+        
+        self.qhl_models = [
+            NV_centre_large_spin_bath.gali_model_nv_centre_spin(2),
+            NV_centre_large_spin_bath.gali_model_nv_centre_spin(6),
+            NV_centre_large_spin_bath.gali_model_nv_centre_spin(7),
+            NV_centre_large_spin_bath.gali_model_nv_centre_spin(8),
+            # 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3',
+            # 'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4PPPPnv_interaction_x_d4PPPPnv_interaction_y_d4PPPPnv_interaction_z_d4',
+            # 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6',
+            # 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6',
+        ]
+
+        self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
+
+
 
  

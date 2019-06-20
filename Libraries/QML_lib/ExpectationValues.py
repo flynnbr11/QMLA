@@ -660,8 +660,8 @@ def n_qubit_hahn_evolution(
     # for this case Pr(0) refers to projection onto |->
     # so return 1 - expect_value
     
-    return 1 - expect_value
-    # return expect_value
+    # return 1 - expect_value
+    return expect_value
 
 
 

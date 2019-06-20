@@ -104,7 +104,6 @@ class heisenbergXYZ(
         name, 
         **kwargs
     ):
-
         individual_terms = DataBase.get_constituent_names_from_name(name)
         chain_axis = transverse_axis = None
         chain_axes = []
