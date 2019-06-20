@@ -132,16 +132,17 @@ class GlobalVariablesClass():
           self.growth_class = None
         
         ## Switching to using class for growth generators rather than UserFunctions
-        try:
-          self.measurement_type = self.growth_class.measurement_type
-          self.dataset = self.growth_class.experimental_dataset
-        except:
-          self.measurement_type = UserFunctions.get_measurement_type(
-            growth_generator = self.growth_generation_rule
-          )
-          self.dataset = UserFunctions.get_experimental_dataset(
-            growth_generator = self.growth_generation_rule
-          )
+        # try:
+          # self.measurement_type = self.growth_class.measurement_type
+        self.measurement_type = self.growth_class.expectation_value_function.__name__
+        self.dataset = self.growth_class.experimental_dataset
+        # except:
+        #   self.measurement_type = UserFunctions.get_measurement_type(
+        #     growth_generator = self.growth_generation_rule
+        #   )
+        #   self.dataset = UserFunctions.get_experimental_dataset(
+        #     growth_generator = self.growth_generation_rule
+        #   )
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
         self.multiQHL = bool(arguments.multiQHL)
