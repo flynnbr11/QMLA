@@ -41,7 +41,8 @@ class NVCentreRevivalData(
         ]
 
         self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
-
+        if self.use_experimental_data == True:
+            self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
 
 
  

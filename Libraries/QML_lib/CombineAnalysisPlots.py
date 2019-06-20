@@ -257,7 +257,7 @@ growth_class = GrowthRules.get_growth_generator_class(
 variables = vars(arguments)
 # and some others arguments not explicitly set in launch script
 
-variables['measurement_type'] = growth_class.measurement_type
+# variables['measurement_type'] = growth_class.measurement_type
 variables['expectation_value_func'] = growth_class.expectation_value_function.__name__
 variables['heuristic'] = growth_class.heuristic_function.__name__
 variables['probe_generation_function'] = growth_class.probe_generation_function.__name__
