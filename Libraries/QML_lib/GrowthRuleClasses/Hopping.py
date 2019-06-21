@@ -58,17 +58,51 @@ class hopping(
         else:
             return False
 
+    # def name_branch_map(
+    #     self,
+    #     latex_mapping_file, 
+    #     **kwargs
+    # ):
+    #     import ModelNames
+    #     name_map = ModelNames.branch_is_num_dims(
+    #         latex_mapping_file = latex_mapping_file,
+    #         **kwargs
+    #     )
+    #     return name_map
+
     def name_branch_map(
-        self,
+        self, 
         latex_mapping_file, 
         **kwargs
     ):
-        import ModelNames
-        name_map = ModelNames.branch_is_num_dims(
-            latex_mapping_file = latex_mapping_file,
-            **kwargs
-        )
-        return name_map
+        with open(latex_mapping_file) as f:
+            content = f.readlines()
+        # remove whitespace characters like `\n` at the end of each line
+        content = [x.strip() for x in content] 
+
+        latex_name_map = {}
+        for c in content:
+            this_tuple = eval(c)
+            model_string = this_tuple[0]
+            latex_name = this_tuple[1]
+            latex_name_map[model_string] = latex_name    # this mapping assigns models to branches with the number of parameters they have
+        
+        model_names = list(set(list(latex_name_map.keys())))
+        model_branches = {}
+
+        for mod in model_names:
+            # num_params = len(DataBase.get_constituent_names_from_name(mod))
+            num_qubits = DataBase.get_num_qubits(mod)
+            max_num_params_this_num_sites = 1            
+            num_params = len(
+                DataBase.get_constituent_names_from_name(mod)
+            )
+            latex_name = latex_name_map[mod]
+            branch_num = (max_num_params_this_num_sites * num_qubits) + num_params
+            model_branches[latex_name] = branch_num
+
+        return model_branches
+
 
 
     def generate_models(
