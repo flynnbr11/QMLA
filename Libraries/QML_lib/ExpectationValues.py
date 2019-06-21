@@ -580,6 +580,7 @@ def n_qubit_hahn_evolution(
     log_file=None, 
     log_identifier=None
 ):
+    # print("n qubit hahn")
     import qutip 
     import numpy as np
     import DataBase
@@ -592,6 +593,8 @@ def n_qubit_hahn_evolution(
         inversion_gate = hahn_inversion_gates.hahn_inversion_gates[num_qubits]
     except:
         inversion_gate = make_inversion_gate(num_qubits)
+
+
 
     first_unitary_time_evolution = linalg.expm(-1j*ham*t)
     second_unitary_time_evolution = np.linalg.matrix_power(
@@ -607,7 +610,7 @@ def n_qubit_hahn_evolution(
 
     ev_state = np.dot(total_evolution, state)
     nm = np.linalg.norm(ev_state)
-    if np.abs(1-nm) > 1e-10:
+    if np.abs(1-nm) > 1e-5:
         print("[Hahn] norm ev state:", nm)
     
     density_matrix = np.kron( 
@@ -660,8 +663,8 @@ def n_qubit_hahn_evolution(
     # for this case Pr(0) refers to projection onto |->
     # so return 1 - expect_value
     
-    # return 1 - expect_value
-    return expect_value
+    return 1 - expect_value
+    # return expect_value
 
 
 

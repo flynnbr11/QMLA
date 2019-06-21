@@ -250,7 +250,10 @@ class QMD():
         else: 
             self.ExperimentalMeasurementTimes=None
         self.PlotProbeFile = self.GlobalVariables.plot_probe_file
+        
         self.PlotTimes = plot_times
+        self.ReducedPlotTimes = self.PlotTimes[0::10]
+
         self.PlotProbes = pickle.load(
             open(self.PlotProbeFile, 'rb')
         )
@@ -2479,7 +2482,7 @@ class QMD():
                     "getting new set of times to plot expectation values for"
                 ]
             )
-            expec_val_plot_times = self.PlotTimes[0::10]
+            expec_val_plot_times = self.ReducedPlotTimes
         else:
             self.log_print(
                 [
@@ -2636,7 +2639,7 @@ class QMD():
                         "getting new set of times to plot expectation values for"
                     ]
                 )
-                expec_val_plot_times = self.PlotTimes[0::10]
+                expec_val_plot_times = self.ReducedPlotTimes
             else:
                 self.log_print(
                     [
@@ -3129,7 +3132,7 @@ class QMD():
                     "getting new set of times to plot expectation values for"
                 ]
             )
-            expec_val_plot_times = self.PlotTimes[0::10]
+            expec_val_plot_times = self.ReducedPlotTimes
         else:
             self.log_print(
                 [
