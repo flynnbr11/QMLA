@@ -1765,7 +1765,7 @@ def process_hubbard_operator(
 
 
 def base_hubbard_grouped_term(term):
-    from ModelGeneration import interaction_energy_pauli_term
+    # from ModelGeneration import interaction_energy_pauli_term
     from ModelNames import full_model_string
 
     split_term = term.split('_')
@@ -1796,6 +1796,7 @@ def base_hubbard_grouped_term(term):
             dim
         )
     if energy_term is True:
+        # self energy
         full_name = interaction_energy_pauli_term(dim)
         mtx = DataBase.compute(full_name)
 
@@ -1818,8 +1819,10 @@ def base_hubbard_grouped_term(term):
                 'terms' : terms
             }
             full_name = full_model_string(op_dict)
+            # print("[base hopping process] op dict:", op_dict)
+            # this_mtx = DataBase.operator(full_name).matrix
 
-            this_mtx = DataBase.operator(full_name).matrix
+            this_mtx = DataBase.compute(full_name)
             if mtx is None:
                 mtx = this_mtx
             else:

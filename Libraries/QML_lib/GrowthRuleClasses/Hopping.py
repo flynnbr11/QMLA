@@ -19,7 +19,8 @@ class hopping(
             **kwargs
         )
 
-        self.true_operator = 'h_1h2_d2'
+        # self.true_operator = 'h_1h2_d2'
+        self.true_operator = 'h_1h2_d4PPPPh_3h4_d4'
         self.initial_models = [
             'h_1h2_d2'
         ] 
@@ -28,7 +29,7 @@ class hopping(
         ]
         self.max_num_parameter_estimate = 8
         self.max_spawn_depth = 20
-        self.max_num_qubits = 4
+        self.max_num_qubits = 5
 
         self.max_num_models_by_shape = {
             2 : 1,
