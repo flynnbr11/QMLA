@@ -36,7 +36,7 @@ number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
 bf_all_times=0
-data_max_time=15 # nanoseconds
+data_max_time=5 # nanoseconds
 # data_time_offset=205 # nanoseconds
 
 ### ---------------------------------------------------###
