@@ -168,6 +168,7 @@ def plot_prior(
     colours = [ cm.viridis(x) for x in cm_subsection ]
 
     for i in range(num_params):
+
         ax = axes[row, col]
         axes_so_far += 1
         col += 1

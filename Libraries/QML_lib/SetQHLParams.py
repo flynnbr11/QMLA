@@ -129,13 +129,17 @@ def create_qhl_params(
         true_params_dict_latex_names[latex_terms[i]] = true_param
 
     true_prior.__setattr__('cov', old_cov_mtx)
-    Distrib.plot_prior(
+    try:
+      Distrib.plot_prior(
         model_name = true_op_latex, 
         model_name_individual_terms = latex_terms,
         prior = true_prior, 
         plot_file = true_prior_plot_file,
         true_params = true_params_dict_latex_names
-    )
+      )
+    except:
+      print("[SetQHLParams]plotting prior failed \n\n\n")
+      pass
 
     # for term in terms:
     #   if random_vals == False:

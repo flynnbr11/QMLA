@@ -55,11 +55,40 @@ def log_print(to_print_list, log_file):
 ##################### Model Generation Functions ############################################
 ##################################################################################
 
+
+
 """
 Functions for generation of random model names for testing/debugging.
 Functions for NV centre spin. 
 """
+def process_multipauli_term(term):
+    # term of form pauliSet_aJb_iJk_dN
+    # where a is operator on site i
+    # b is operator on site k
+    # N is total number of sites
+    # e.g. pauliSet_xJy_1J3_d4
+    
+    components = term.split('_')
+    components.remove('pauliSet')
+    core_operators = list(sorted(DataBase.core_operator_dict.keys()))
+    for l in components:
+        if l[0] == 'd':
+            dim = int(l.replace('d', ''))
+        elif l[0] in core_operators:
+            operators = l.split('J')
+        else:
+            sites = l.split('J')
+    sites = [int(s) for s in sites] # get strings when splitting the list elements
+    all_terms = list(zip(sites, operators)) # want tuples of (site, operator) for dict logic
 
+    term_dict = {
+        'dim' : dim,
+        'terms' : [all_terms]
+    }
+
+    full_mod_str = ModelNames.full_model_string(term_dict)
+#     print("Getting full matrix corresponding to:", full_mod_str)
+    return DataBase.compute(full_mod_str)
 
 def process_n_qubit_NV_centre_spin(term): 
     

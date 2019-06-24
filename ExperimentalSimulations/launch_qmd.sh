@@ -7,11 +7,11 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -69,21 +69,22 @@ mkdir -p $full_path_to_results
 # Copy some files into results directory
 copied_launch_file="$full_path_to_results/launched_script.txt"
 cp $(pwd)/launch_qmd.sh $copied_launch_file
-user_configurations_file="$full_path_to_results/UserFunctions.py"
-user_config="$lib_dir/UserFunctions.py"
-cp $user_config $user_configurations_file
-qhl_settings_lib_file="$lib_dir/SetQHLParams.py"
-qhl_settings="$full_path_to_results/SetQHLParams.py"
-cp $qhl_settings_lib_file $qhl_settings
+#user_configurations_file="$full_path_to_results/UserFunctions.py"
+#user_config="$lib_dir/UserFunctions.py"
+#cp $user_config $user_configurations_file
+#qhl_settings_lib_file="$lib_dir/SetQHLParams.py"
+#qhl_settings="$full_path_to_results/SetQHLParams.py"
+#cp $qhl_settings_lib_file $qhl_settings
 git_commit=$(git rev-parse HEAD)
 
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='ising_1d_chain'
+sim_growth_rule='ising_multi_axis'
 # sim_growth_lrule='heisenberg_xyz'
 # sim_growth_rule='hubbard_square_lattice_generalised'
-sim_growth_rule='hopping_topology'
+#sim_growth_rule='hopping_topology'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1

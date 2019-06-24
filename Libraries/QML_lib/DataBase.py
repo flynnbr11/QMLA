@@ -287,6 +287,8 @@ def get_num_qubits(name):
             'Heis' in term
             or 
             'nv' in term
+            or 
+            'pauliSet' in term
         ):
             terms = term.split('_')
             dim_term = terms[-1]
@@ -643,6 +645,11 @@ def process_basic_operator(basic_operator):
         import ModelGeneration
         mtx = ModelGeneration.process_n_qubit_NV_centre_spin(
             basic_operator
+        )
+    elif 'pauliSet' in basic_operator:
+        import ModelGeneration
+        mtx = ModelGeneration.process_multipauli_term(
+            term = basic_operator
         )
     else:
         mtx = core_operator_dict[basic_operator]

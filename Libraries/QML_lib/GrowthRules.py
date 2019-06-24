@@ -15,7 +15,7 @@ import IsingChain
 import Hubbard
 import Heisenberg
 import Hopping
-
+import IsingMultiAxis
 
 
 growth_classes = {
@@ -37,6 +37,8 @@ growth_classes = {
         Reduced_NV_experiment.reducedNVExperiment,
     'ising_1d_chain' : 
         IsingChain.isingChain,
+    'ising_multi_axis' : 
+        IsingMultiAxis.isingChainMultiAxis, 
     'hubbard_square_lattice_generalised' : 
         Hubbard.hubbardSquare,
     'heisenberg_xyz' : 
