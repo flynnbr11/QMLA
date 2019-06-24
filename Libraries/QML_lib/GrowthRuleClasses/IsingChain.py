@@ -1,6 +1,7 @@
 import sys, os
 sys.path.append(os.path.abspath('..'))
 import DataBase
+import ProbeGeneration
 
 from SuperClassGrowthRule import GrowthRuleSuper
 
