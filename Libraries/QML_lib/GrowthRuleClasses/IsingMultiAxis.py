@@ -41,7 +41,7 @@ class isingChainMultiAxis(
         self.transverse_axis = 'z'
 
         self.max_num_models_by_shape = {
-            'other' : 2, 
+            'other' : 9, 
         }
         self.plot_probe_generation_function = ProbeGeneration.zero_state_probes
 
