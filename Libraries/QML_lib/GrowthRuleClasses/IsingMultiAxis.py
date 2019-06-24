@@ -24,7 +24,6 @@ class isingChainMultiAxis(
             **kwargs
         )
 
-
         self.true_operator = 'pauliSet_xJx_1J2_d2'
         # print("[isingChainMultiAxis] true op set" )
         self.initial_models = [
@@ -44,6 +43,7 @@ class isingChainMultiAxis(
         self.max_num_models_by_shape = {
             'other' : 2, 
         }
+        self.plot_probe_generation_function = ProbeGeneration.zero_state_probes
 
 
     def generate_models(
