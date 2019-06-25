@@ -32,6 +32,12 @@ class reducedNVExperiment(
         }
 
 
+
+        self.overwrite_growth_class_methods(
+            **kwargs    
+        )
+
+
     def generate_models(
         self, 
         model_list, 

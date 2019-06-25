@@ -383,9 +383,18 @@ random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
 exp_data = bool(arguments.use_experimental_data)
 growth_generation_rule = arguments.growth_generation_rule
+
+import ProbeGeneration
+growth_class_attributes = {
+  'use_experimental_data' : exp_data, 
+  # 'probe_generator' : ProbeGeneration.restore_dec_13_probe_generation,
+  # 'test_growth_class_att' : True
+}
+
 growth_class = GrowthRules.get_growth_generator_class(
     growth_generation_rule = growth_generation_rule,
-    use_experimental_data = exp_data
+    **growth_class_attributes
+    # use_experimental_data = exp_data
 )
 
 true_operator = growth_class.true_operator

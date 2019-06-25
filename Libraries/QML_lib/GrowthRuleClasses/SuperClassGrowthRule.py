@@ -13,8 +13,9 @@ class GrowthRuleSuper():
         growth_generation_rule,
         **kwargs
     ): 
-        import Heuristics
+        print("[GrowthRuleSuper] init. kwargs", kwargs)
 
+        import Heuristics
         self.growth_generation_rule = growth_generation_rule
         if 'use_experimental_data' in kwargs:
             self.use_experimental_data = kwargs['use_experimental_data']
@@ -60,6 +61,23 @@ class GrowthRuleSuper():
         self.true_params = {
         }
            
+
+    def overwrite_growth_class_methods(
+        self, 
+        **kwargs
+    ):
+        print("[GrowthRuleSuper] overwrite_growth_class_methods. kwargs", kwargs)
+        kw = list(kwargs.keys())
+
+        attributes = [
+            'probe_generator'
+        ]
+
+        for att in attributes:
+
+            if att in kw and kwargs[att] is not None:
+                print("Resetting {} to {}".format(att, kwargs[att]))
+                self.__setattr__(att, kwargs[att])
 
     def true_operator_latex(self):
         return self.latex_name(self.true_operator)

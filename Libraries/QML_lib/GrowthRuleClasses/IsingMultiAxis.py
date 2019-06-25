@@ -24,7 +24,8 @@ class isingChainMultiAxis(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-
+        # self.true_operator = 'xTz'
+        # self.true_operator = 'pauliSet_xJz_1J2_d2'
         self.true_operator = 'pauliSet_xJx_1J2_d2'
         # print("[isingChainMultiAxis] true op set" )
         self.initial_models = [
@@ -45,6 +46,12 @@ class isingChainMultiAxis(
             'other' : 9, 
         }
         self.plot_probe_generation_function = ProbeGeneration.zero_state_probes
+        self.min_param = 5
+        self.max_param = 10
+
+        self.true_params = {
+            # 'pauliSet_xJz_1J2_d2' : 1
+        }
 
 
     def generate_models(
