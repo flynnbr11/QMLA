@@ -420,7 +420,7 @@ def time_required(
   # For further qhl, want to account for possibility 
   # that winning model is of maximum allowed dimension, 
   # so need to request enough time for that case. 
-  further_qhl_time = 5.5*(
+  further_qhl_time = 2*(
   	hamiltonian_exponentiation_times[max_num_qubits]
   	* num_hamiltonians_per_model
   )
