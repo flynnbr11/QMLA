@@ -46,13 +46,15 @@ class NVCentreSpinExperimentalMethod(
         self.experimental_dataset = 'NVB_rescale_dataset.p'
         self.fixed_axis_generator = False
         self.fixed_axis = 'z' # e.g. transverse axis
+        self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+
         if self.use_experimental_data == True:
             # probes, prior etc specific to using experimental data
             # print(
             #     "[{}] Experimental data = true".format(
             #     os.path.basename(__file__))
             # )
-            self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
+            # self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
             # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
             self.gaussian_prior_means_and_widths = {
                 'xTi' : [4.0, 1.5],

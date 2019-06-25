@@ -26,7 +26,7 @@ class isingChainMultiAxis(
         )
         # self.true_operator = 'xTz'
         # self.true_operator = 'pauliSet_xJz_1J2_d2'
-        self.true_operator = 'pauliSet_xJx_1J2_d2'
+        self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_yJz_1J2_d2'
         # print("[isingChainMultiAxis] true op set" )
         self.initial_models = [
             'pauliSet_x_1_d1',
@@ -50,7 +50,8 @@ class isingChainMultiAxis(
         self.max_param = 10
 
         self.true_params = {
-            # 'pauliSet_xJz_1J2_d2' : 1
+            'pauliSet_xJz_1J2_d2' : 3.5,
+            'pauliSet_xJz_1J2_d2' : 6.8
         }
 
 

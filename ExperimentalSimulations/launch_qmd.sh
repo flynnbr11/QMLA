@@ -11,7 +11,7 @@ qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=0
+simulate_experiment=1
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -89,11 +89,11 @@ sim_growth_rule='ising_multi_axis'
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # exp_growth_rule='NV_centre_revivals'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_spin_large_bath'
-exp_growth_rule='NV_spin_full_access'
+# exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
 
@@ -119,7 +119,7 @@ num_probes=10
 force_plot_plus=0
 gaussian=1
 #probe_noise=0.0000001
-probe_noise=0.1
+probe_noise=0.0000001
 param_min=0
 param_max=10
 param_mean=0.5
