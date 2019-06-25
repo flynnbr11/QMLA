@@ -21,13 +21,15 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
         #     # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
         #     self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
 
-        self.true_operator = 'xTz'
-        # self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
+        # self.true_operator = 'xTz'
+        self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
         self.qhl_models =    	[
-            'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
+            'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz',
+            'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz',
+            # 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
             'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
-            'zTi'
+            # 'zTi'
         ]
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
