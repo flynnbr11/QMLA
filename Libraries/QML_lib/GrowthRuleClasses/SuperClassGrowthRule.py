@@ -13,7 +13,7 @@ class GrowthRuleSuper():
         growth_generation_rule,
         **kwargs
     ): 
-        print("[GrowthRuleSuper] init. kwargs", kwargs)
+        # print("[GrowthRuleSuper] init. kwargs", kwargs)
 
         import Heuristics
         self.growth_generation_rule = growth_generation_rule
@@ -66,7 +66,7 @@ class GrowthRuleSuper():
         self, 
         **kwargs
     ):
-        print("[GrowthRuleSuper] overwrite_growth_class_methods. kwargs", kwargs)
+        # print("[GrowthRuleSuper] overwrite_growth_class_methods. kwargs", kwargs)
         kw = list(kwargs.keys())
 
         attributes = [

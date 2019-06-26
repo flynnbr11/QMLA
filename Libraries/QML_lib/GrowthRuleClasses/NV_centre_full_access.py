@@ -2,6 +2,8 @@ import sys, os
 sys.path.append(os.path.abspath('..'))
 import DataBase
 import ExpectationValues
+import Heuristics
+
 
 from SuperClassGrowthRule import GrowthRuleSuper
 
@@ -29,8 +31,10 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
             'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz',
             # 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
             'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+         
             # 'zTi'
         ]
+        self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         self.max_num_qubits = 3

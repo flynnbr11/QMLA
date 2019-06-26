@@ -26,20 +26,24 @@ class isingChainMultiAxis(
         )
         # self.true_operator = 'xTz'
         # self.true_operator = 'pauliSet_xJz_1J2_d2'
-        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJz_2J3_d2'
+        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJz_2J3_d2'
+        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJz_2J3_d2'
         # print("[isingChainMultiAxis] true op set" )
+        self.true_operator = 'pauliSet_xJx_1J2_d3PPPpauliSet_xJx_2J3_d3'
         self.initial_models = [
-            'pauliSet_x_1_d1',
-            'pauliSet_y_1_d1', 
-            'pauliSet_z_1_d1', 
+            'pauliSet_xJx_1J2_d2'
+            # 'pauliSet_x_1_d1',
+            # 'pauliSet_y_1_d1', 
+            # 'pauliSet_z_1_d1', 
         ] 
         self.qhl_models = [
             'pauliSet_xJy_1J2_d2',
         ]
-        self.available_axes = ['x','y','z']
+        # self.available_axes = ['x','y','z']
+        self.available_axes = ['x']
         self.max_num_parameter_estimate = 2
-        self.max_spawn_depth = 5
-        self.max_num_qubits = 4
+        self.max_spawn_depth = 6
+        self.max_num_qubits = 8
         self.transverse_axis = 'z'
 
         self.max_num_models_by_shape = {

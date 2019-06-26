@@ -31,6 +31,7 @@ class NVCentreSpinExperimentalMethod(
 
         # self.true_operator = 'xTi'
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
+        print("NVCentreSpinExperimentalMethod heuristic_function:", self.heuristic_function)
         self.measurement_type = 'hahn'
         
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
