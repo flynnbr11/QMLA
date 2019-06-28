@@ -625,30 +625,35 @@ def compute(inp):
 
 def process_basic_operator(basic_operator):
     # print("Processing basic opeator", basic_operator)
+    import ModelGeneration
+
     if basic_operator[0] == 'h':
-        import ModelGeneration
+        # import ModelGeneration
         mtx = ModelGeneration.process_hubbard_operator(
             basic_operator
         )
         # hopping_matrix(basic_operator)
     elif '1Dising' in basic_operator:
-        import ModelGeneration
+        # import ModelGeneration
         mtx = ModelGeneration.process_1d_ising(
             basic_operator
         )
     elif 'Heis' in basic_operator:
-        import ModelGeneration
+        # import ModelGeneration
         mtx = ModelGeneration.process_heisenberg_xyz(
             basic_operator
         )
     elif 'nv' in basic_operator:
-        import ModelGeneration
+        # import ModelGeneration
         mtx = ModelGeneration.process_n_qubit_NV_centre_spin(
             basic_operator
         )
     elif 'pauliSet' in basic_operator:
-        import ModelGeneration
         mtx = ModelGeneration.process_multipauli_term(
+            term = basic_operator
+        )
+    elif 'transverse' in basic_operator:
+        mtx = ModelGeneration.process_transverse_term(
             term = basic_operator
         )
     else:

@@ -30,6 +30,8 @@ class GrowthRuleSuper():
         self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
         self.expectation_value_function = ExpectationValues.expectation_value
         self.heuristic_function = Heuristics.multiPGH
+        self.highest_num_qubits = 1
+        self.spawn_stage = [None]
 
         # Parameters specific to the growth rule
         self.true_operator = 'xTi'

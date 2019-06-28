@@ -340,7 +340,9 @@ class QMD():
         self.BranchPrecomputedModels = {}
         self.BranchModelIds = {}
         self.BranchGrowthRules = {}
-        self.UniqueGrowthClasses = {} # to save making many instances
+        self.UniqueGrowthClasses = {
+            self.GrowthGenerator : self.GrowthClass
+        } # to save making many instances
         self.BranchGrowthClasses = {}
         self.SpawnDepthByGrowthRule = {}
         self.TreesCompleted = {}
@@ -422,8 +424,10 @@ class QMD():
             self.SpawnStage[gen] = [None]
             self.MiscellaneousGrowthInfo[gen] = {}
             self.BranchGrowthRules[i] = gen
-            self.BranchGrowthClasses[i] = growth_class_gen
-            self.UniqueGrowthClasses[gen] = growth_class_gen
+            # self.BranchGrowthClasses[i] = growth_class_gen
+            if gen not in list(self.UniqueGrowthClasses.keys()):
+                self.UniqueGrowthClasses[gen] = growth_class_gen
+            self.BranchGrowthClasses[i] = self.UniqueGrowthClasses[gen]
 
         # self.HighestBranchID = max(self.InitialModelBranches.values())
         self.HighestModelID = max(self.InitialModelIDs.values())+1 # to ensure everywhere we use range(qmd.HighestModelID) goes to the right number
@@ -687,10 +691,15 @@ class QMD():
                 self.TrueOpModelID = self.NumModels
             self.HighestModelID += 1 
             # print("Setting model ", model, "to ID:", self.NumModels)
-            self.ModelNameIDs[self.NumModels] = model
+            mod_id = self.NumModels
+            self.ModelNameIDs[mod_id] = model
             self.NumModels += 1
             if DataBase.get_num_qubits(model) > self.HighestQubitNumber:
+                print("[QMD] new model has highest num qubits so far")
                 self.HighestQubitNumber = DataBase.get_num_qubits(model)
+                self.BranchGrowthClasses[branchID].highest_num_qubits = DataBase.get_num_qubits(model)
+                # self.GrowthClass.highest_num_qubits = DataBase.get_num_qubits(model)
+                print("self.GrowthClass.highest_num_qubits", self.BranchGrowthClasses[branchID])
 
         # retrieve model_id from database? or somewhere
         try:

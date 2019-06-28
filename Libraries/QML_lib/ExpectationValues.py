@@ -295,6 +295,7 @@ def hahn_evolution(
     log_identifier=None
 ):
     # NOTE this is always projecting onto |+>
+    # okay for experimental data with spins in NV centre
     import numpy as np
     from scipy import linalg
 #    print("Hahn evo")
@@ -314,7 +315,6 @@ def hahn_evolution(
     # inversion_gate = inversion_gate * np.pi/2
     even_time_split = False
     if even_time_split:
-
         # unitary_time_evolution = h.exp_ham(
         #     ham, 
         #     t,
@@ -354,7 +354,8 @@ def hahn_evolution(
         total_evolution = np.dot(
             second_unitary_time_evolution,
             np.dot(inversion_gate,
-                  first_unitary_time_evolution)
+                first_unitary_time_evolution
+            )
         )
 
 

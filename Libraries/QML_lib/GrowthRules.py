@@ -16,7 +16,7 @@ import Hubbard
 import Heisenberg
 import Hopping
 import IsingMultiAxis
-
+import Ising2D 
 
 growth_classes = {
     # 'test_growth_class' : 
@@ -39,6 +39,8 @@ growth_classes = {
         IsingChain.isingChain,
     'ising_multi_axis' : 
         IsingMultiAxis.isingChainMultiAxis, 
+    'ising_2d' : 
+        Ising2D.ising2D,
     'hubbard_square_lattice_generalised' : 
         Hubbard.hubbardSquare,
     'heisenberg_xyz' : 

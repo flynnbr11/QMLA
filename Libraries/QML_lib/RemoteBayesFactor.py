@@ -145,140 +145,145 @@ def BayesFactorRemote(
         else:
             first_t_idx = len(model_a.Times) - num_times_to_use
 
-        if use_opponent_learned_times == True:
-            # by default, just use the times learned by the other model
-            update_times_model_a = model_b.Times[first_t_idx:]
-            update_times_model_b = model_a.Times[first_t_idx:]
-            set_renorm_record_to_zero = False
+        update_times_model_a = model_b.Times[first_t_idx:]
+        update_times_model_b = model_a.Times[first_t_idx:]
+        set_renorm_record_to_zero = False
+
+
+        # if use_opponent_learned_times == True:
+        #     # by default, just use the times learned by the other model
+        #     update_times_model_a = model_b.Times[first_t_idx:]
+        #     update_times_model_b = model_a.Times[first_t_idx:]
+        #     set_renorm_record_to_zero = False
         
-        elif (
-            use_experimental_data == True
-            and
-            use_all_exp_times_for_bayes_factors == True
-        ):
-            experimental_data_times = info_dict[
-                'experimental_measurement_times'
-            ]
-            num_times_learned_over = max(
-                len(model_a.Times), 
-                len(model_b.Times)
-            )
-            if len(experimental_data_times) > num_times_learned_over:
-                experimental_data_times = experimental_data_times[:num_times_learned_over]
+        # elif (
+        #     use_experimental_data == True
+        #     and
+        #     use_all_exp_times_for_bayes_factors == True
+        # ):
+        #     experimental_data_times = info_dict[
+        #         'experimental_measurement_times'
+        #     ]
+        #     num_times_learned_over = max(
+        #         len(model_a.Times), 
+        #         len(model_b.Times)
+        #     )
+        #     if len(experimental_data_times) > num_times_learned_over:
+        #         experimental_data_times = experimental_data_times[:num_times_learned_over]
 
 
-            update_times_model_a = copy.copy(
-                experimental_data_times
-            )
-            update_times_model_b = copy.copy(
-                experimental_data_times
-            )
+        #     update_times_model_a = copy.copy(
+        #         experimental_data_times
+        #     )
+        #     update_times_model_b = copy.copy(
+        #         experimental_data_times
+        #     )
         
-            log_print(
-                [
-                    "Using all exp data times for Bayes factors."                
-                ]
-            )
-            set_renorm_record_to_zero = True
+        #     log_print(
+        #         [
+        #             "Using all exp data times for Bayes factors."                
+        #         ]
+        #     )
+        #     set_renorm_record_to_zero = True
 
-        elif (
-            binning == True
-        ):
-            all_times = np.concatenate(
-                [
-                    model_a.Times, 
-                    model_b.Times
-                ]
-            )
+        # elif (
+        #     binning == True
+        # ):
+        #     all_times = np.concatenate(
+        #         [
+        #             model_a.Times, 
+        #             model_b.Times
+        #         ]
+        #     )
 
-            # num_unique_times = len(np.unique(
-            #     all_times
-            # ))  
+        #     # num_unique_times = len(np.unique(
+        #     #     all_times
+        #     # ))  
 
-            # binned_times = balance_times_by_binning(
-            #     data = all_times, 
-            #     all_times_used = True, 
-            #     num_bins = num_unique_times
-            # )
-            # update_times_model_a = list(binned_times)
-            # update_times_model_b = list(binned_times)
-
-
-            # reusing old method (as used in successful Dec_14/09_55 run)
-            # where times are linspaced, then mapped to experimental times
-            # use 2*num_times_to_use since renormalisation record is set to zero
-            max_time = max(all_times)
-            min_time = min(all_times)
-            linspaced_times = np.linspace(
-                min_time, 
-                max_time, 
-                2*num_times_to_use
-            )
-            if use_experimental_data==True:
-                mapped_to_exp_times = [
-                    ExperimentalDataFunctions.nearestAvailableExpTime(
-                        times = experimental_data_times,
-                        t = t
-                    ) for t in linspaced_times
-                ]
-                update_times_model_a = list(sorted(mapped_to_exp_times))
-                update_times_model_b = list(sorted(mapped_to_exp_times))
-            elif linspace_times_for_bayes_factor_comparison == True:
-                update_times_model_a = linspaced_times
-                update_times_model_b = linspaced_times
-
-            set_renorm_record_to_zero = True
-
-        update_times_model_a = sorted(
-            update_times_model_a
-        )
-        update_times_model_b = sorted(
-            update_times_model_b
-        )
+        #     # binned_times = balance_times_by_binning(
+        #     #     data = all_times, 
+        #     #     all_times_used = True, 
+        #     #     num_bins = num_unique_times
+        #     # )
+        #     # update_times_model_a = list(binned_times)
+        #     # update_times_model_b = list(binned_times)
 
 
-        ### Verbatim code used in december version, though functionally equivalent to elif binning case above
-        recreate_dec_13_times_list_method = True
-        if (
-            use_experimental_data == True
-            and 
-            recreate_dec_13_times_list_method == True
-        ):
-            # print("[BF calculation] Generating times as in Dec")
-            try:
-                min_time = min(min(model_a.Times), min(model_b.Times))
-                max_time = max(max(model_a.Times), max(model_b.Times))
-            except:
-                log_print(
-                    [
-                    "Can't find min/max of:", 
-                    "\ntimes_a:", times_a, 
-                    "\ntimes_b:", times_b,
-                    "\n Model IDs:", model_a_id, 
-                    ";\t", model_b_id,
-                    "\nmoda.Times:", model_a.Times,
-                    "\nmodb.Times:", model_b.Times,
-                    ]
-                )
-                raise
+        #     # reusing old method (as used in successful Dec_14/09_55 run)
+        #     # where times are linspaced, then mapped to experimental times
+        #     # use 2*num_times_to_use since renormalisation record is set to zero
+        #     max_time = max(all_times)
+        #     min_time = min(all_times)
+        #     linspaced_times = np.linspace(
+        #         min_time, 
+        #         max_time, 
+        #         2*num_times_to_use
+        #     )
+        #     if use_experimental_data==True:
+        #         mapped_to_exp_times = [
+        #             ExperimentalDataFunctions.nearestAvailableExpTime(
+        #                 times = experimental_data_times,
+        #                 t = t
+        #             ) for t in linspaced_times
+        #         ]
+        #         update_times_model_a = list(sorted(mapped_to_exp_times))
+        #         update_times_model_b = list(sorted(mapped_to_exp_times))
+        #     elif linspace_times_for_bayes_factor_comparison == True:
+        #         update_times_model_a = linspaced_times
+        #         update_times_model_b = linspaced_times
+
+        #     set_renorm_record_to_zero = True
+
+        # update_times_model_a = sorted(
+        #     update_times_model_a
+        # )
+        # update_times_model_b = sorted(
+        #     update_times_model_b
+        # )
 
 
-            times_list = np.linspace(
-                min_time,
-                max_time, 
-                num_times_to_use # learning from scratch so need twice the number of times.
-            )
+        # ### Verbatim code used in december version, though functionally equivalent to elif binning case above
+        # recreate_dec_13_times_list_method = True
+        # if (
+        #     use_experimental_data == True
+        #     and 
+        #     recreate_dec_13_times_list_method == True
+        # ):
+        #     # print("[BF calculation] Generating times as in Dec")
+        #     try:
+        #         min_time = min(min(model_a.Times), min(model_b.Times))
+        #         max_time = max(max(model_a.Times), max(model_b.Times))
+        #     except:
+        #         log_print(
+        #             [
+        #             "Can't find min/max of:", 
+        #             "\ntimes_a:", times_a, 
+        #             "\ntimes_b:", times_b,
+        #             "\n Model IDs:", model_a_id, 
+        #             ";\t", model_b_id,
+        #             "\nmoda.Times:", model_a.Times,
+        #             "\nmodb.Times:", model_b.Times,
+        #             ]
+        #         )
+        #         raise
 
-            all_times = [
-                ExperimentalDataFunctions.nearestAvailableExpTime(
-                    times = experimental_data_times,
-                    t=t
-                ) 
-                for t in times_list
-            ]
-            update_times_model_a = sorted(all_times)
-            update_times_model_b = sorted(all_times)
-            set_renorm_record_to_zero = False # in old method, where binning is False (as in Apr_10/18_28)
+
+        #     times_list = np.linspace(
+        #         min_time,
+        #         max_time, 
+        #         num_times_to_use # learning from scratch so need twice the number of times.
+        #     )
+
+        #     all_times = [
+        #         ExperimentalDataFunctions.nearestAvailableExpTime(
+        #             times = experimental_data_times,
+        #             t=t
+        #         ) 
+        #         for t in times_list
+        #     ]
+        #     update_times_model_a = sorted(all_times)
+        #     update_times_model_b = sorted(all_times)
+        #     set_renorm_record_to_zero = False # in old method, where binning is False (as in Apr_10/18_28)
 
         with open(times_record, 'a') as write_log_file:
             np.set_printoptions(

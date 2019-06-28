@@ -31,7 +31,6 @@ class NVCentreSpinExperimentalMethod(
 
         # self.true_operator = 'xTi'
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
-        print("NVCentreSpinExperimentalMethod heuristic_function:", self.heuristic_function)
         self.measurement_type = 'hahn'
         
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
@@ -55,8 +54,8 @@ class NVCentreSpinExperimentalMethod(
             #     "[{}] Experimental data = true".format(
             #     os.path.basename(__file__))
             # )
-            self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
-            # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+            # self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
+            self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
             self.gaussian_prior_means_and_widths = {
                 'xTi' : [4.0, 1.5],
                 'yTi' : [4.0, 1.5],

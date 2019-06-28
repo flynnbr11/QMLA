@@ -61,6 +61,27 @@ def log_print(to_print_list, log_file):
 Functions for generation of random model names for testing/debugging.
 Functions for NV centre spin. 
 """
+
+def process_transverse_term(term):
+    # transverse matrix is a single matrix of form,.e.g
+    # XII + IXI + IIX
+    # where num qubits=3, transverse axis=X
+    
+    components = term.split('_')
+    components.remove('transverse')
+    core_operators = list(sorted(DataBase.core_operator_dict.keys()))
+
+    for l in components:
+        if l[0] == 'd':
+            dim = int(l.replace('d', ''))
+        elif l in core_operators:
+            transverse_axis = l
+    mtx = transverse_axis_matrix(
+        num_qubits = dim, 
+        transverse_axis = transverse_axis
+    )
+    return mtx
+
 def process_multipauli_term(term):
     # term of form pauliSet_aJb_iJk_dN
     # where a is operator on site i
@@ -91,9 +112,7 @@ def process_multipauli_term(term):
     return DataBase.compute(full_mod_str)
 
 def process_n_qubit_NV_centre_spin(term): 
-    
     components = term.split('_')
-    
     for l in components:
         if l[0] == 'd':
             dim = int(l.replace('d', ''))
@@ -165,13 +184,11 @@ def process_1d_ising(term):
             transverse_axis = transverse_axis
         )
 
-def ising_transverse_component(
+def transverse_axis_matrix(
     num_qubits, 
     transverse_axis
 ):
-    
     individual_transverse_terms = []
-
     for i in range(1, 1+num_qubits):
         single_term = ''
         t_str = 'T'
@@ -186,15 +203,18 @@ def ising_transverse_component(
                 t_str += 'T'
                 
         individual_transverse_terms.append(single_term)
-        
-        
-    running_mtx = DataBase.compute(individual_transverse_terms[0])
-    
+    running_mtx = DataBase.compute(individual_transverse_terms[0])    
     for term in individual_transverse_terms[1:]:
         running_mtx += DataBase.compute(term)
-        
-        
     return running_mtx
+
+
+def ising_transverse_component(
+    num_qubits, 
+    transverse_axis
+):
+    return transverse_axis_matrix(num_qubits, transverse_axis)
+
             
 def ising_interaction_component(num_qubits, interaction_axis):
     
@@ -2011,6 +2031,7 @@ def get_nearest_neighbour_list(topology):
 
 
 def add_new_coordinate_2d_lattice(topology):
+    # grows in a manner which minimises area of the topology
     rows = topology['occupation']['rows']
     cols = topology['occupation']['cols']
 
@@ -2093,7 +2114,9 @@ def add_sites_to_topology(topology):
 
         nn_lists = list(topology['nearest_neighbours'].values())
         num_nearest_neighbours = np.array([len(a) for a in nn_lists])
-        all_sites_greater_than_2_nearest_neighbours = np.all(num_nearest_neighbours >= 2)
+        all_sites_greater_than_2_nearest_neighbours = np.all(
+            num_nearest_neighbours >= 2
+        )
 
 def initialise_topology_2x2_square_lattice():
     # Initialises a 2x2 square lattice
