@@ -10,6 +10,7 @@ import NV_centre_full_access
 import NV_centre_large_spin_bath
 import NV_centre_experiment_without_transverse_terms
 import NV_centre_revivals
+import NV_grow_by_fitness
 import Reduced_NV_experiment
 import IsingChain
 import Hubbard
@@ -27,6 +28,8 @@ growth_classes = {
         NV_centre_experiment_growth_rules.NVCentreSpinExperimentalMethod,
     'two_qubit_ising_rotation_hyperfine' : 
         NV_centre_experiment_without_transverse_terms.NVCentreSpinExperimentalMethodWithoutTransvereTerms,
+    'NV_fitness_growth' : 
+        NV_grow_by_fitness.NVFitnessGrowth, 
     'NV_centre_revivals' : 
         NV_centre_revivals.NVCentreRevivalData,
     'NV_spin_full_access' : 

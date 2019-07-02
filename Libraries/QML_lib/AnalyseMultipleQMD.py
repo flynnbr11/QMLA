@@ -491,6 +491,7 @@ def Bayes_t_test(
     plot_probe_file = None,
     top_number_models=2,
     save_true_expec_vals_alone_plot=True,
+    collective_analysis_pickle_file=None, 
     save_to_file=None
 ):
     plt.switch_backend('agg')
@@ -585,6 +586,13 @@ def Bayes_t_test(
     # print("[BayesTTest - param avg] growth classes:", growth_classes)
     true_model = unique_growth_classes[growth_generator].true_operator
 
+    collect_expectation_values = {
+        'means' : {},
+        'medians' : {},
+        'true' : {},
+        'mean_std_dev' : {},
+        'success_rate' : {},
+    }
     success_rate_by_term = {}
     nmod = len(winning_models)  
     ncols = int(np.ceil(np.sqrt(nmod)))
@@ -703,6 +711,7 @@ def Bayes_t_test(
                 else:
                     print("t_val is nan for t=",t)
 
+        true_exp = [true[t] for t in times]
         num_runs = num_sets_of_this_name # TODO should this be the number of times this model won???
         success_rate = 0
 
@@ -723,11 +732,38 @@ def Bayes_t_test(
         mean_exp = np.array( [means[t] for t in times] )
         std_dev_exp = np.array( [std_dev[t] for t in times] )
         # name=DataBase.latex_name_ising(term)
+        residuals = (mean_exp - true_exp)**2
+        sum_residuals = np.sum(residuals)
+        mean_true_val = np.mean(true_exp)
+        true_mean_minus_val = (true_exp - mean_true_val)**2 
+        sum_of_squares = np.sum(
+            true_mean_minus_val
+        )
+        final_r_squared = 1 - sum_residuals/sum_of_squares
+        # print(
+        #     "[Analyse - avg dynamics]\n",
+        #     "\nmean_true_val", mean_true_val,
+        #     "\ntrue", true_exp[0:10],
+        #     "\nmean", mean_exp[0:10],
+        #     "\nresiduals", residuals[0:10],
+        #     "\nsum of residuals", sum_residuals,
+        #     "\ntrue_mean_minus_val", true_mean_minus_val, 
+        #     "\nsum of square", sum_of_squares,
+        # )
 
         name = growth_classes[term].latex_name(term)
         description = str(
                 name + 
                 ' (' + str(num_sets_of_this_name)  + ')'
+                + ' [$R^2=$' +
+                str(
+                    # np.round(final_r_squared, 2)
+                    np.format_float_scientific(
+                        final_r_squared, 
+                        precision=2
+                    )
+                ) 
+                + ']'
             )
         if term == true_model:
             description += ' (True)'
@@ -738,6 +774,10 @@ def Bayes_t_test(
                 ' (' + str(num_sets_of_this_name)  + ').'
             )
 
+
+        collect_expectation_values['means'][name] = mean_exp
+        collect_expectation_values['mean_std_dev'][name] = std_dev_exp
+        collect_expectation_values['success_rate'][name] = success_rate
 
 #        ax.errorbar(times, mean_exp, xerr=std_dev_exp, label=description)
         # if num_sets_of_this_name > 1:
@@ -790,7 +830,6 @@ def Bayes_t_test(
         #     ax.set_ylabel('Expectation Value')
         # if row == nrows-1:
         #     ax.set_xlabel('Time')
-        true_exp = [true[t] for t in times]
         # ax.set_xlim(0,1)
         # plt.xlim(0,1)
 
@@ -815,6 +854,8 @@ def Bayes_t_test(
         # )    
         
         # fill in "master" plot
+
+
 
         high_level_label = str(name)
         if term == true_model:
@@ -925,116 +966,37 @@ def Bayes_t_test(
             bbox_inches='tight'
         )
 
-# def fill_between_sigmas(
-#     ax, 
-#     distribution, 
-#     times, 
-#     legend=False,
-#     only_one_sigma = True, 
-# ):
-#     # to draw distributions on a given axis, ax.
-#     # where distribution must be a dict
-#     # distribution[t] = [...], a list of values for the distribution at that time
-    
-#     sigmas = { # standard sigma values 
-#         1 : 34.13,
-#         2 : 13.59,
-#         3 : 2.15, 
-#         4 : 0.1,
-#     }
-
-#     upper_one_sigma = [np.percentile(np.array(distribution[t]), 50 + sigmas[1]) for t in times] 
-#     lower_one_sigma = [np.percentile(np.array(distribution[t]), 50 - sigmas[1]) for t in times] 
-#     upper_two_sigma = [np.percentile(np.array(distribution[t]), 50 + sigmas[1] + sigmas[2]) for t in times] 
-#     lower_two_sigma = [np.percentile(np.array(distribution[t]), 50 - sigmas[1] - sigmas[2]) for t in times] 
-#     upper_three_sigma = [np.percentile(np.array(distribution[t]), 50 + sigmas[1] + sigmas[2] + sigmas[3]) for t in times] 
-#     lower_three_sigma = [np.percentile(np.array(distribution[t]), 50 - sigmas[1] - sigmas[2] - sigmas[3]) for t in times] 
-#     upper_four_sigma = [np.percentile(np.array(distribution[t]),  50 + sigmas[1] + sigmas[2] + sigmas[3] + sigmas[4]) for t in times] 
-#     lower_four_sigma = [np.percentile(np.array(distribution[t]),  50 - sigmas[1] - sigmas[2] - sigmas[3] - sigmas[4]) for t in times] 
-
-#     fill_alpha = 0.2
-#     one_sigma_colour='green'
-#     two_sigma_colour='red'
-#     three_sigma_colour='blue'
-#     four_sigma_colour='orange'
-#     ax.fill_between(
-#         # times, 
-#         [t+1 for t in times],
-#         upper_one_sigma, 
-#         lower_one_sigma, 
-#         alpha=fill_alpha,
-#         facecolor=one_sigma_colour,
-#         label='$1 \sigma$ '
-#     )
+    # add the combined analysis dict
+    collect_expectation_values['times'] = true_times
+    collect_expectation_values['true'] = true_exp
 
 
-#     if only_one_sigma == False:
-#         ax.fill_between(
-#             # times, 
-#             [t+1 for t in times],
-#             upper_two_sigma,
-#             upper_one_sigma, 
-#             alpha=fill_alpha,
-#             facecolor=two_sigma_colour,
-#             label='$2 \sigma$ '
-#         )
-#         ax.fill_between(
-#             # times, 
-#             [t+1 for t in times],
-#             lower_one_sigma, 
-#             lower_two_sigma,
-#             alpha=fill_alpha,
-#             facecolor=two_sigma_colour,
-#         )
+    if os.path.isfile(collective_analysis_pickle_file) is False:
+        combined_analysis = {
+            'expectation_values' : collect_expectation_values
+        }
+        pickle.dump(
+            combined_analysis,
+            open(collective_analysis_pickle_file, 'wb')
+        )
+    else:
+        # load current analysis dict, add to it and rewrite it. 
+        combined_analysis = pickle.load(
+            open(collective_analysis_pickle_file, 'rb')
+        ) 
+        combined_analysis['expectation_values'] = collect_expectation_values
+        pickle.dump(
+            combined_analysis,
+            open(collective_analysis_pickle_file, 'wb')
+        )
 
-#         ax.fill_between(
-#             # times, 
-#             [t+1 for t in times],
-#             upper_three_sigma,
-#             upper_two_sigma, 
-#             alpha=fill_alpha,
-#             facecolor=three_sigma_colour,
-#             label='$3 \sigma$ '
-#         )
-#         ax.fill_between(
-#             # times, 
-#             [t+1 for t in times],
-#             lower_two_sigma, 
-#             lower_three_sigma,
-#             alpha=fill_alpha,
-#             facecolor=three_sigma_colour,
-#         )
-
-#         ax.fill_between(
-#             # times, 
-#             [t+1 for t in times],
-#             upper_four_sigma,
-#             upper_three_sigma, 
-#             alpha=fill_alpha,
-#             facecolor=four_sigma_colour,
-#             label='$4 \sigma$ '
-#         )
-#         ax.fill_between(
-#             # times, 
-#             [t+1 for t in times],
-#             lower_three_sigma, 
-#             lower_four_sigma,
-#             alpha=fill_alpha,
-#             facecolor=four_sigma_colour,
-#         )
-
-#     if legend==True:
-#         ax.legend(
-#             loc='center right', 
-#             bbox_to_anchor=(1.5, 0.5), 
-# #             title=''
-#         )
 
 
 
 def r_sqaured_average(
     results_path, 
     growth_class, 
+    growth_classes_by_name,
     top_number_models=2,
     save_to_file=None
 ):
@@ -1051,6 +1013,8 @@ def r_sqaured_average(
     rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
     # from https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
     
+    r_sq_by_model = {}
+
     if len(all_winning_models) > top_number_models:
         winning_models = rank_models(all_winning_models)[0:top_number_models]
     else:
@@ -1083,13 +1047,15 @@ def r_sqaured_average(
         means = np.array(
             [ np.mean(r_squared_lists[t]) for t in times]
         )
-
         std_dev = np.array(
             [ np.std(r_squared_lists[t]) for t in times]
         )
 
         # term = DataBase.latex_name_ising(name)
-        term = growth_class.latex_name(name)
+        gr_class = growth_classes_by_name[name]
+        term = gr_class.latex_name(name) # TODO need growth rule of given name to get proper latex term
+        # term = growth_class.latex_name(name) # TODO need growth rule of given name to get proper latex term
+        r_sq_by_model[term] = means
         plot_label = str(term + ' ('+ str(num_wins) + ')')
         colour = colours[ i ]
         ax.plot(
@@ -1108,6 +1074,9 @@ def r_sqaured_average(
             bbox_to_anchor=(1.0, 0.9), 
             title='Model (# instances)'
         )
+    print("[AnalyseMultiple - r sq] r_sq_by_model:", r_sq_by_model)
+
+
     plt.xlabel('Epoch')
     plt.ylabel('$R^2$')
     plt.title('$R^2$ average')
@@ -1373,6 +1342,7 @@ def plot_scores(
         true_operator = None, 
         growth_generator = None,
         batch_nearest_num_params_as_winners = True,
+        collective_analysis_pickle_file =  None, 
         save_file='model_scores.png'
     ):
     plt.clf()
@@ -1380,12 +1350,20 @@ def plot_scores(
 
     # print("[AnalyseMultiple - plot_scores] growth classes:",growth_classes )
     # print("[AnalyseMultiple - plot_scores] unique_growth_classes:",unique_growth_classes )
-    latex_true_op = unique_growth_classes[growth_generator].latex_name(name = true_operator)    
+    latex_true_op = unique_growth_classes[growth_generator].latex_name(
+        name = true_operator
+    )    
 
     latex_model_names = [
         growth_classes[model].latex_name(model)
         for model in models
     ]
+
+    latex_scores_dict = {}
+    for mod in models:
+        latex_mod = growth_classes[mod].latex_name(mod)
+        latex_scores_dict[latex_mod] = scores[mod]
+
     batch_correct_models = []
     if batch_nearest_num_params_as_winners == True:
         num_true_params = len(
@@ -1427,6 +1405,42 @@ def plot_scores(
     correct_success_rate /= num_runs
     batch_success_rate *= 100
     correct_success_rate *= 100 #percent
+
+    results_collection = {
+        'type' : growth_generator, 
+        'true_model' : latex_true_op, 
+        'scores' : latex_scores_dict
+    }
+    print("[Analyse] results_collection", results_collection)
+
+    # if save_results_collection is not None:
+    #     print("[Analyse] save results collection:", save_results_collection)
+    #     pickle.dump(
+    #         results_collection, 
+    #         open(
+    #             save_results_collection, 
+    #             'wb'
+    #         )
+    #     )
+    if os.path.isfile(collective_analysis_pickle_file) is False:
+        combined_analysis = {
+            'scores' : results_collection
+        }
+        pickle.dump(
+            combined_analysis,
+            open(collective_analysis_pickle_file, 'wb')
+        )
+    else:
+        # load current analysis dict, add to it and rewrite it. 
+        combined_analysis = pickle.load(
+            open(collective_analysis_pickle_file, 'rb')
+        ) 
+        combined_analysis['scores'] = results_collection
+        pickle.dump(
+            combined_analysis,
+            open(collective_analysis_pickle_file, 'wb')
+        )
+
 
 
     try:
@@ -1640,6 +1654,9 @@ measurement_type = true_growth_class.measurement_type
 latex_mapping_file = arguments.latex_mapping_file
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
+results_collection_file = "{}/collect_analyses.p".format(
+    directory_to_analyse
+)
 
 
 
@@ -1666,6 +1683,9 @@ if exp_data is False:
         ops.append( DataBase.compute(t) )
         
     true_ham = np.tensordot(params, ops, axes=1)
+
+
+
 
 #######################################
 ### Now analyse the results. 
@@ -1717,8 +1737,53 @@ except:
     # for compatability with old versions
     pass
 
-# first get model scores
 
+os.chdir(directory_to_analyse)
+pickled_files = []
+for file in os.listdir(directory_to_analyse):
+    # if file.endswith(".p") and file.startswith("results"):
+    if (
+        file.endswith(".p") 
+        and 
+        file.startswith(results_file_name_start)
+    ):
+        pickled_files.append(file)
+
+growth_rules = {}
+for f in pickled_files:
+    fname = directory_to_analyse+'/'+str(f)
+    result = pickle.load(open(fname, 'rb'))
+    alph = result['NameAlphabetical']
+    # expec_values = result['ExpectationValues']
+
+    # if alph in expectation_values_by_name.keys():
+    #     expectation_values_by_name[alph].append(expec_values)
+    # else:
+    #     expectation_values_by_name[alph] = [expec_values]
+
+    if alph not in list(growth_rules.keys()):
+        growth_rules[alph] = result['GrowthGenerator']
+
+unique_growth_rules = list(set(list(growth_rules.values())))
+unique_growth_classes = {}
+for g in unique_growth_rules:
+    try:
+        unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
+            growth_generation_rule = g
+        )
+    except:
+        unique_growth_classes[g] = None
+growth_classes = {}
+for g in list(growth_rules.keys()):
+    try:
+        growth_classes[g] = unique_growth_classes[growth_rules[g]]
+    except:
+        growth_classes[g] = None
+
+
+
+
+# first get model scores
 model_scores, growth_rules, growth_classes, unique_growth_classes = get_model_scores(directory_to_analyse)
 
 
@@ -1747,6 +1812,7 @@ Bayes_t_test( # average expected values
     growth_generator = growth_generator, 
     top_number_models = arguments.top_number_models,
     plot_probe_file = plot_probe_file,
+    collective_analysis_pickle_file = results_collection_file,
     save_to_file=str(
         directory_to_analyse+
         plot_desc +
@@ -1758,6 +1824,7 @@ r_sqaured_average(
     results_path = results_csv,
     growth_class = true_growth_class, 
     top_number_models = arguments.top_number_models,
+    growth_classes_by_name = growth_classes,
     save_to_file=  str(
         directory_to_analyse + 
         plot_desc +
@@ -1817,6 +1884,10 @@ if qhl_mode==True:
 if further_qhl_mode == False:
     print("FURTHER QHL=FALSE. PLOTTING STUFF")
     plot_file = directory_to_analyse+'model_scores.png'
+    # results_collection_file = "{}/scores_{}.p".format(
+    #     directory_to_analyse,
+    #     growth_generator
+    # )
     # model_scores, growth_rules, growth_classes, unique_growth_classes = model_scores(directory_to_analyse)
     
     # print("GROWTH RULES:", growth_rules, "\n\n\n")
@@ -1840,6 +1911,7 @@ if further_qhl_mode == False:
         growth_rules = growth_rules, 
         true_operator = true_operator, 
         growth_generator = growth_generator,
+        collective_analysis_pickle_file = results_collection_file, 
         save_file = plot_file
     )
     try:

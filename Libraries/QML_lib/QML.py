@@ -1037,6 +1037,7 @@ class reducedModel():
         self.Q_id = qid
         self.log_file = log_file
         self.expectation_values = {}
+        self.values_updated = False
         
         
     def log_print(self, to_print_list):
@@ -1053,94 +1054,103 @@ class reducedModel():
     
         
         
-    def updateLearnedValues(self, learned_info=None):
+    def updateLearnedValues(
+        self, 
+        fitness_parameters, 
+        learned_info=None
+    ):
         """
         Pass a dict, learned_info, with essential info on 
         reconstructing the state of the model, updater and GenSimModel
         
         """
-
-        rds_dbs = rds.databases_from_qmd_id(
-            self.HostName, self.PortNumber, self.Q_id
-        )
-        learned_models_info = rds_dbs['learned_models_info']
-
-        if learned_info is None:
-            model_id_float = float(self.ModelID)
-            model_id_str = str(model_id_float)
-            try:
-                learned_info = pickle.loads(
-                    learned_models_info.get(model_id_str), 
-                    encoding='latin1'
-                ) # TODO telling pickle which encoding was used, though I'm not sure why/where that encoding was given...        
-            except:
-                self.log_print(
-                    [
-                        "Unable to load learned info", 
-                        "model_id_str: ", model_id_str,
-                        "model id: ", self.ModelID,
-                        "learned info keys:, ", learned_models_info.keys(),
-                        "learned info:, ", learned_models_info.get(model_id_str)
-                    ]
-                )
-        self.NumParticles = learned_info['num_particles']
-        self.NumExperiments = learned_info['num_experiments']
-        self.Times = list(learned_info['times'])
-        self.FinalParams = learned_info['final_params'] # should be final params from learning process
-        self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
-        self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
-        self._normalization_record = learned_info['normalization_record']
-        self.log_total_likelihod = learned_info['log_total_likelihood']
-        self.RawVolumeList = learned_info['volume_list'] 
-        self.VolumeList = {}
-        for i in range(len(self.RawVolumeList)):
-            self.VolumeList[i] = self.RawVolumeList[i]
-
-        self.TrackEval = np.array(learned_info['track_eval'])
-        self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
-        self.ResampleEpochs = learned_info['resample_epochs']
-        self.QuadraticLosses = learned_info['quadratic_losses']
-        self.LearnedParameters = learned_info['learned_parameters']
-        self.FinalSigmas = learned_info['final_sigmas']
-        self.cov_matrix = learned_info['cov_matrix']
-        self.GrowthGenerator = learned_info['growth_generator']
-        try:
-            self.GrowthClass = GrowthRules.get_growth_generator_class(
-                growth_generation_rule = self.GrowthGenerator,
-                use_experimental_data = self.UseExperimentalData
+        if self.values_updated == False:
+            print("[QML] Updating learned values for model ", self.ModelID)
+            self.values_updated = True
+            rds_dbs = rds.databases_from_qmd_id(
+                self.HostName, self.PortNumber, self.Q_id
             )
-        except:
-            # raise
-            self.GrowthClass = None
-        self.HeuristicType = learned_info['heuristic']
+            learned_models_info = rds_dbs['learned_models_info']
 
-        self.LatexTerm = self.GrowthClass.latex_name(
-            name = self.Name
-        )
+            if learned_info is None:
+                model_id_float = float(self.ModelID)
+                model_id_str = str(model_id_float)
+                try:
+                    learned_info = pickle.loads(
+                        learned_models_info.get(model_id_str), 
+                        encoding='latin1'
+                    ) # TODO telling pickle which encoding was used, though I'm not sure why/where that encoding was given...        
+                except:
+                    self.log_print(
+                        [
+                            "Unable to load learned info", 
+                            "model_id_str: ", model_id_str,
+                            "model id: ", self.ModelID,
+                            "learned info keys:, ", learned_models_info.keys(),
+                            "learned info:, ", learned_models_info.get(model_id_str)
+                        ]
+                    )
+            self.NumParticles = learned_info['num_particles']
+            self.NumExperiments = learned_info['num_experiments']
+            self.Times = list(learned_info['times'])
+            self.FinalParams = learned_info['final_params'] # should be final params from learning process
+            self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
+            self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
+            self._normalization_record = learned_info['normalization_record']
+            self.log_total_likelihod = learned_info['log_total_likelihood']
+            self.RawVolumeList = learned_info['volume_list'] 
+            self.VolumeList = {}
+            for i in range(len(self.RawVolumeList)):
+                self.VolumeList[i] = self.RawVolumeList[i]
 
-        self.TrackParameterEstimates = {}
-        num_params = np.shape(self.TrackEval)[1]
-        max_exp = np.shape(self.TrackEval)[0] -1
-        for i in range(num_params):
-            for term in self.LearnedParameters.keys():
-                if self.LearnedParameters[term] == self.TrackEval[max_exp][i]:
-                    self.TrackParameterEstimates[term] = self.TrackEval[:,i]
+            self.TrackEval = np.array(learned_info['track_eval'])
+            self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
+            self.ResampleEpochs = learned_info['resample_epochs']
+            self.QuadraticLosses = learned_info['quadratic_losses']
+            self.LearnedParameters = learned_info['learned_parameters']
+            self.FinalSigmas = learned_info['final_sigmas']
+            self.cov_matrix = learned_info['cov_matrix']
+            self.GrowthGenerator = learned_info['growth_generator']
+            try:
+                self.GrowthClass = GrowthRules.get_growth_generator_class(
+                    growth_generation_rule = self.GrowthGenerator,
+                    use_experimental_data = self.UseExperimentalData
+                )
+            except:
+                # raise
+                self.GrowthClass = None
+            self.HeuristicType = learned_info['heuristic']
+
+            self.LatexTerm = self.GrowthClass.latex_name(
+                name = self.Name
+            )
+
+            self.TrackParameterEstimates = {}
+            num_params = np.shape(self.TrackEval)[1]
+            max_exp = np.shape(self.TrackEval)[0] -1
+            for i in range(num_params):
+                for term in self.LearnedParameters.keys():
+                    if self.LearnedParameters[term] == self.TrackEval[max_exp][i]:
+                        self.TrackParameterEstimates[term] = self.TrackEval[:,i]
 
 
-        try:
-            self.Particles = np.array(learned_info['particles'])
-            self.Weights = np.array(learned_info['weights'])
-        except:
-            self.Particles = 'Particles not stored.'
-            self.Weights = 'Weights not stored.'
-        
-        sim_params = list(self.FinalParams[:,0])
-        self.LearnedHamiltonian = np.tensordot(
-            sim_params, 
-            self.SimOpList, 
-            axes=1
-        )
+            try:
+                self.Particles = np.array(learned_info['particles'])
+                self.Weights = np.array(learned_info['weights'])
+            except:
+                self.Particles = 'Particles not stored.'
+                self.Weights = 'Weights not stored.'
+            
+            sim_params = list(self.FinalParams[:,0])
+            self.LearnedHamiltonian = np.tensordot(
+                sim_params, 
+                self.SimOpList, 
+                axes=1
+            )
 
+            if self.ModelID not in sorted(fitness_parameters.keys()):
+                fitness_parameters[self.ModelID] = {}
+            fitness_parameters[self.ModelID]['r_squared'] =  0.75
 
     def compute_expectation_values(
         self, 

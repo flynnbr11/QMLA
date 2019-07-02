@@ -324,7 +324,7 @@ class QMD():
 
         print("Gen list:", self.GeneratorList)
         
-
+        self.FitnessParameters = {}
         self.BranchChampions = {}
         self.ActiveBranchChampList = []
         self.HighestBranchID = 0
@@ -699,7 +699,7 @@ class QMD():
                 self.HighestQubitNumber = DataBase.get_num_qubits(model)
                 self.BranchGrowthClasses[branchID].highest_num_qubits = DataBase.get_num_qubits(model)
                 # self.GrowthClass.highest_num_qubits = DataBase.get_num_qubits(model)
-                print("self.GrowthClass.highest_num_qubits", self.BranchGrowthClasses[branchID])
+                print("self.GrowthClass.highest_num_qubits", self.BranchGrowthClasses[branchID].highest_num_qubits)
 
         # retrieve model_id from database? or somewhere
         try:
@@ -1657,7 +1657,7 @@ class QMD():
             ]
         )
         self.BayesPointsByBranch[branchID] = models_points
-
+        # self.BranchGrowthRules[branchID]
 
         if branchID in self.GhostBranchList:
             models_to_deactivate = list(
@@ -1702,8 +1702,12 @@ class QMD():
         return models_points, champ_id
 
     
-    def compareModelList(self, model_list, bayes_threshold=None, 
-        models_points_dict=None, num_times_to_use = 'all'
+    def compareModelList(
+        self, 
+        model_list, 
+        bayes_threshold=None,
+        models_points_dict=None, 
+        num_times_to_use='all'
     ):
         if bayes_threshold is None:
             bayes_threshold = self.BayesLower
@@ -2356,6 +2360,7 @@ class QMD():
                 )
             ]
         )
+        all_models_this_branch = self.BranchRankings[branchID]
         best_models = self.BranchRankings[branchID][:num_models]
         best_model_names = [
             # DataBase.model_name_from_id(self.db, mod_id) for
@@ -2367,7 +2372,7 @@ class QMD():
             self.ModelNameIDs[i] for i in
             list(self.BranchChampions.values())
         ]
-
+        print("[QMD] fitness parameters:", self.FitnessParameters)
         
         new_models = self.BranchGrowthClasses[branchID].generate_models(
             # generator = growth_rule, 
@@ -2379,8 +2384,12 @@ class QMD():
             log_file=self.log_file, 
             current_champs = current_champs,
             spawn_stage = self.SpawnStage[growth_rule],
+            fitness_parameters = self.FitnessParameters, 
+            branch_model_points = self.BayesPointsByBranch[branchID],
+            model_names_ids = self.ModelNameIDs, 
             miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
         )
+        new_models = list(set(new_models))
         new_models = [DataBase.alph(mod) for mod in new_models]
 
         self.log_print(
@@ -2480,7 +2489,9 @@ class QMD():
         )
         mod = self.reducedModelInstanceFromID(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
-        mod.updateLearnedValues()
+        mod.updateLearnedValues(
+            fitness_parameters = self.FitnessParameters
+        )
         
         n_qubits = DataBase.get_num_qubits(mod.Name)
         if n_qubits > 3:
@@ -2637,7 +2648,9 @@ class QMD():
                 db=self.db, name=mod_name
             )
             mod = self.reducedModelInstanceFromID(mod_id)
-            mod.updateLearnedValues()
+            mod.updateLearnedValues(
+                fitness_parameters = self.FitnessParameters
+            )
 
             n_qubits = DataBase.get_num_qubits(mod.Name)
             if n_qubits > 5:
@@ -2828,7 +2841,16 @@ class QMD():
                         "have finished learning."]
                     )
                     self.BranchAllModelsLearned[branchID] = True
+                    models_this_branch = self.BranchModelIds[branchID]
+                    for mod_id in models_this_branch:
+                        mod = self.reducedModelInstanceFromID(mod_id)
+                        mod.updateLearnedValues(
+                            fitness_parameters = self.FitnessParameters
+                        )
+
                     self.remoteBayesFromBranchID(branchID)
+
+
 
 
 
@@ -3198,7 +3220,9 @@ class QMD():
     def updateDataBaseModelValues(self):
         for mod_id in range(self.HighestModelID):
             mod = self.reducedModelInstanceFromID(mod_id)
-            mod.updateLearnedValues()
+            mod.updateLearnedValues(
+                fitness_parameters = self.FitnessParameters
+            )
             
     def runQMD(
         self, 
