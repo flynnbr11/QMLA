@@ -1,0 +1,36 @@
+QMD ID =1; REDIS_PORT=6301
+Global server: newblue1
+Running directory: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
+Library directory: /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
+Script directory: /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+42295:C 07 Jun 14:17:18.900 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+42295:C 07 Jun 14:17:18.900 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=42295, just started
+42295:C 07 Jun 14:17:18.900 # Configuration loaded
+42295:M 07 Jun 14:17:18.902 * Running mode=standalone, port=6301.
+42295:M 07 Jun 14:17:18.902 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+42295:M 07 Jun 14:17:18.902 # Server initialized
+42295:M 07 Jun 14:17:18.902 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+42295:M 07 Jun 14:17:18.902 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+42295:M 07 Jun 14:17:18.902 * Ready to accept connections
+Job id is 8515223
+PBS job name is test__multi-dim__gali-model__qml_1
+node34-003
+node34-003
+node34-003
+node34-003
+node34-003
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 14:17:27; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Jun_07/13_03
+CONFIG: -p=2000 -e=500 -bt=500 -rt=0.5 -ra=0.98 -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Jun_07/13_03/cumulative.csv -pt=0 -pgh=1.0 -qid=1 -rqt=10000 -pkl=0 -host=node34-003 -port=6301 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Jun_07/13_03 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Jun_07/13_03/logs/test__multi-dim__gali-model__qml_1.qmd.8515223.log cpr=1 -dst=15 -ggr=NV_centre_spin_large_bath
+42295:signal-handler (1560182227) Received SIGTERM scheduling shutdown...
+42295:signal-handler (1560182227) Received SIGTERM scheduling shutdown...
+42295:signal-handler (1560182227) Received SIGTERM scheduling shutdown...
+42295:signal-handler (1560182227) Received SIGTERM scheduling shutdown...
+42295:signal-handler (1560182227) Received SIGTERM scheduling shutdown...
+42295:signal-handler (1560182227) Received SIGTERM scheduling shutdown...
+42295:signal-handler (1560182227) Received SIGTERM scheduling shutdown...
+42295:signal-handler (1560182227) Received SIGTERM scheduling shutdown...
+42295:M 10 Jun 16:57:07.816 # User requested shutdown...
+42295:M 10 Jun 16:57:07.816 # Redis is now ready to exit, bye bye...
