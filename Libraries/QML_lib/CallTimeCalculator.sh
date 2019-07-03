@@ -14,7 +14,8 @@ additional_growth="-agr=ising_1d_chain -agr=hubbard_square_lattice_generalised"
 # -ggr='ising_1d_chain' \
 # -ggr='hubbard_square_lattice_generalised' \
 
-growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+growth_rule='NV_fitness_growth'
 num_experiments=10
 num_particles=10
 

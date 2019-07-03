@@ -42,6 +42,7 @@ class NVFitnessGrowth(
         self.available_mods_by_generation = {}
         self.models_to_build_on = {}
         self.model_generation_strictness = 0
+        self.num_processes_to_parallelise_over = 10
 
         self.max_num_models_by_shape = {
             1 : 7,
