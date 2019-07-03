@@ -96,6 +96,12 @@ parser.add_argument(
   default="QHL_TIME"
 )
 
+parser.add_argument(
+  '-num_proc_env', '--num_processes_env_var', 
+  help='How many processes to request when running in parallel.',
+  type=str,
+  default="NUM_PROC"
+)
 
 
 parser.add_argument(
@@ -111,6 +117,7 @@ parser.add_argument(
   type=float,
   default=2
 )
+
 
 
 
@@ -359,6 +366,8 @@ def time_required(
   	(num_experiments + num_bayes_times)
   )
 
+  parallelisability = {}
+
   print("growth rules:", growth_rules)
 #  print("num models by shape:", generator_max_num_models_by_shape)
   total_time_required = 0
@@ -371,6 +380,7 @@ def time_required(
     except:
       generator_max_num_models_by_shape = max_num_models_by_shape[gen]
 
+    parallelisability[gen] = growth_class.num_processes_to_parallelise_over
     max_num_qubits = growth_class.max_num_qubits
 
     for q in range(1,max_num_qubits+1):
@@ -405,6 +415,9 @@ def time_required(
     true_operator = UserFunctions.default_true_operators_by_generator[
       growth_generator
     ]
+
+  highest_parallelisability = max(parallelisability.values())
+  times_reqd['num_processes'] = highest_parallelisability 
 
   true_dimension = DataBase.get_num_qubits(true_operator)
   qhl_time = 2*(
@@ -450,6 +463,7 @@ variable_setting_script = arguments.variable_setting_script
 qmd_time_env_var = arguments.qmd_time_env_var
 qhl_time_env_var = arguments.qhl_time_env_var
 fqhl_time_env_var = arguments.fqhl_time_env_var
+num_processes_env_var = arguments.num_processes_env_var
 minimum_allowed_time = arguments.minimum_allowed_time
 time_insurance_factor = float(arguments.time_insurance_factor)
 
@@ -466,6 +480,7 @@ time_reqd = time_required(
   num_bayes_times = num_bayes_times,
   minimum_allowed_time = minimum_allowed_time,
 )
+
 
 # print(
 # 	"Timing heuristic function:", 
@@ -485,6 +500,8 @@ with open(variable_setting_script, 'a+') as script:
 		qhl_time_env_var, "=", time_reqd['qhl'],
 		"\n", 
 		fqhl_time_env_var, "=", time_reqd['fqhl'],
+    "\n", 
+    num_processes_env_var, "=", time_reqd['num_processes'],
 		sep='',
 		file=script
 	)

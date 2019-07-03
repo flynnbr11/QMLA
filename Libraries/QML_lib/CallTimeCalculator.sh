@@ -32,4 +32,5 @@ python3 CalculateTimeRequired.py \
 	-scr=$script_path \
 	-qmdtenv="QMD_TIME" \
 	-qhltenv="QHL_TIME" \
-	-fqhltenv="FQHL_TIME"
+	-fqhltenv="FQHL_TIME" \
+	-num_proc_env="NUM_PROC"

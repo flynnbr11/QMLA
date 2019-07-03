@@ -3,6 +3,7 @@ import itertools
 import sys, os
 sys.path.append(os.path.abspath('..'))
 import DataBase
+import ProbeGeneration
 
 from SuperClassGrowthRule import GrowthRuleSuper
 import NV_centre_large_spin_bath
@@ -31,6 +32,7 @@ class NVFitnessGrowth(
         self.initial_models = all_unique_addition_combinations(self.base_models)
         self.available_axes = ['x', 'y', 'z']
         self.true_operator = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
+        self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
         self.max_num_qubits = 4
         self.num_top_models_to_build_on = 2 # at each generation
         self.generation_DAG = 0 

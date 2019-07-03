@@ -46,6 +46,7 @@ class GrowthRuleSuper():
         self.measurement_type = 'full_access'
         self.fixed_axis_generator = False
         self.fixed_axis = 'z' # e.g. transverse axis
+        self.num_processes_to_parallelise_over = 5
         
         self.max_num_models_by_shape = {
             1 : 0,
