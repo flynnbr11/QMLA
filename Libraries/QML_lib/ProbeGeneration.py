@@ -1,5 +1,5 @@
 import numpy as np
-import qutip
+#import qutip
 # import ExpectationValues
 import DataBase
 

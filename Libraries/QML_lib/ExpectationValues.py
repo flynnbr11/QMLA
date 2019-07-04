@@ -215,7 +215,7 @@ def evolved_state(
                 log_file, log_identifier
             )
         try:
-            import qutip
+            # import qutip
             unitary = linalg.expm(-1j*ham*t)
             # unitary = h.exp_ham(
             #     ham, t, 
@@ -266,7 +266,7 @@ def traced_expectation_value_project_one_qubit_plus(
     Expectation value tracing out all but 
     first qubit to project onto plus state
     """
-    import qutip 
+    # import qutip 
     import numpy as np
     
     one_over_sqrt_two = 1/np.sqrt(2) + 0j 
@@ -402,7 +402,7 @@ def hahn_evolution_project_first_qubit(
 ):
     # TODO  #### IN DEVELOPMENT ### 
     # make sure the method of tracing out subsystem is safe. 
-    import qutip 
+    # import qutip 
     import numpy as np
     from scipy import linalg
     # print("[Expec Vals] Hahn project on first qubit")
@@ -582,7 +582,7 @@ def n_qubit_hahn_evolution(
     log_identifier=None
 ):
     # print("n qubit hahn")
-    import qutip 
+    # import qutip 
     import numpy as np
     import DataBase
     from scipy import linalg
@@ -675,7 +675,7 @@ def OLD_n_qubit_hahn_evolution(
     log_file=None, 
     log_identifier=None
 ):
-    import qutip 
+    # import qutip 
     import numpy as np
     import DataBase
     #hahn_angle = np.pi/2

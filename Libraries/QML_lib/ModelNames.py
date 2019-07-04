@@ -696,6 +696,41 @@ def branch_is_num_dims(latex_mapping_file, **kwargs):
 
     return model_branches
 
+def branch_is_num_params_and_qubits(
+    latex_mapping_file,
+    **kwargs
+):
+    with open(latex_mapping_file) as f:
+        content = f.readlines()
+    # remove whitespace characters like `\n` at the end of each line
+    content = [x.strip() for x in content] 
+
+    latex_name_map = {}
+    for c in content:
+        this_tuple = eval(c)
+        model_string = this_tuple[0]
+        latex_name = this_tuple[1]
+        latex_name_map[model_string] = latex_name    # this mapping assigns models to branches with the number of parameters they have
+    
+    model_names = list(set(list(latex_name_map.keys())))
+    model_branches = {}
+
+    for mod in model_names:
+        # num_params = len(DataBase.get_constituent_names_from_name(mod))
+        num_qubits = DataBase.get_num_qubits(mod)
+        max_num_params_this_num_sites = 1            
+        num_params = len(
+            DataBase.get_constituent_names_from_name(mod)
+        )
+        latex_name = latex_name_map[mod]
+        branch_num = (max_num_params_this_num_sites * num_qubits) + num_params
+        model_branches[latex_name] = branch_num
+
+    return model_branches
+
+
+
+
 def interacting_ising_nearest_neighbours_all_names(
     # growth_generator,
     **kwargs
@@ -884,7 +919,12 @@ def large_spin_bath_nv_system_name(term):
         elif 'interaction' in components:
             components.remove('interaction')
             interaction_terms.append(components[0])
-            
+        # elif 'pauliSet' in components
+        #     components.remove('pauliSet')
+        #     for c in components: 
+        #         if len(set(paulis) & set(list(c)))
+
+
     latex_name = '('
     if len(spin_terms) > 0:
         latex_name += 'S_{'
@@ -905,3 +945,71 @@ def large_spin_bath_nv_system_name(term):
         
         
     return '$' + latex_name + '$'
+
+
+
+def pauliSet_latex_name(
+    name, 
+    **kwargs
+):
+    core_operators = list(sorted(DataBase.core_operator_dict.keys()))
+    num_sites = DataBase.get_num_qubits(name)
+    p_str = 'P'*num_sites
+    separate_terms = name.split(p_str)
+
+    latex_terms = []
+    term_type_markers = ['pauliSet', 'transverse']
+    for term in separate_terms:
+        components = term.split('_')
+        if 'pauliSet' in components:
+            components.remove('pauliSet')
+
+            for l in components:
+                if l[0] == 'd':
+                    dim = int(l.replace('d', ''))
+                elif l[0] in core_operators:
+                    operators = l.split('J')
+                else:
+                    sites = l.split('J')
+
+            latex_str = '\sigma'
+
+            latex_str += '^{'
+            for s in sites:
+                latex_str += str( '{},'.format(s) )
+
+            latex_str = latex_str[0:-1]
+            latex_str += '}'
+
+            latex_str += '_{'
+            for o in operators:
+                latex_str += str( '{},'.format(o) )
+            latex_str = latex_str[0:-1] # remove final comma
+            latex_str += '}'
+
+        elif 'transverse' in components:
+            components.remove('transverse')
+            for l in components:
+                if l[0] == 'd':
+                    dim = int(l.replace('d', ''))
+                else:
+                    transverse_axis = str(l)
+
+            latex_str = '\sigma'
+
+            latex_str += '^{\otimes'
+            latex_str += str(dim)
+            latex_str += '}'
+
+            latex_str += '_{'
+            latex_str += str(transverse_axis)
+            latex_str += '}'
+
+        latex_terms.append(latex_str)
+
+    latex_terms = sorted(latex_terms)
+    full_latex_term = ''.join(latex_terms)
+    full_latex_term = str( '$' +  full_latex_term +'$' )
+
+
+    return full_latex_term

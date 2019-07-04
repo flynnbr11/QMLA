@@ -3,6 +3,7 @@ sys.path.append(os.path.abspath('..'))
 import DataBase
 import ExpectationValues
 import ProbeGeneration
+import Heuristics
 # import Heuristics
 
 class GrowthRuleSuper():
@@ -15,7 +16,7 @@ class GrowthRuleSuper():
     ): 
         # print("[GrowthRuleSuper] init. kwargs", kwargs)
 
-        import Heuristics
+        
         self.growth_generation_rule = growth_generation_rule
         if 'use_experimental_data' in kwargs:
             self.use_experimental_data = kwargs['use_experimental_data']

@@ -2,6 +2,7 @@ import sys, os
 sys.path.append(os.path.abspath('..'))
 import DataBase
 import ProbeGeneration
+import ModelNames
 
 # from SuperClassGrowthRule import GrowthRuleSuper
 import SuperClassGrowthRule
@@ -138,67 +139,72 @@ class isingChainMultiAxis(
         name, 
         **kwargs
     ):
-        core_operators = list(sorted(DataBase.core_operator_dict.keys()))
-        num_sites = DataBase.get_num_qubits(name)
-        p_str = 'P'*num_sites
-        separate_terms = name.split(p_str)
+        return ModelNames.pauliSet_latex_name(
+            name, 
+            **kwargs
+        )
 
-        latex_terms = []
-        term_type_markers = ['pauliSet', 'transverse']
-        for term in separate_terms:
-            components = term.split('_')
-            if 'pauliSet' in components:
-                components.remove('pauliSet')
+        # core_operators = list(sorted(DataBase.core_operator_dict.keys()))
+        # num_sites = DataBase.get_num_qubits(name)
+        # p_str = 'P'*num_sites
+        # separate_terms = name.split(p_str)
 
-                for l in components:
-                    if l[0] == 'd':
-                        dim = int(l.replace('d', ''))
-                    elif l[0] in core_operators:
-                        operators = l.split('J')
-                    else:
-                        sites = l.split('J')
+        # latex_terms = []
+        # term_type_markers = ['pauliSet', 'transverse']
+        # for term in separate_terms:
+        #     components = term.split('_')
+        #     if 'pauliSet' in components:
+        #         components.remove('pauliSet')
 
-                latex_str = '\sigma'
+        #         for l in components:
+        #             if l[0] == 'd':
+        #                 dim = int(l.replace('d', ''))
+        #             elif l[0] in core_operators:
+        #                 operators = l.split('J')
+        #             else:
+        #                 sites = l.split('J')
 
-                latex_str += '^{'
-                for s in sites:
-                    latex_str += str( '{},'.format(s) )
+        #         latex_str = '\sigma'
 
-                latex_str = latex_str[0:-1]
-                latex_str += '}'
+        #         latex_str += '^{'
+        #         for s in sites:
+        #             latex_str += str( '{},'.format(s) )
 
-                latex_str += '_{'
-                for o in operators:
-                    latex_str += str( '{},'.format(o) )
-                latex_str = latex_str[0:-1] # remove final comma
-                latex_str += '}'
+        #         latex_str = latex_str[0:-1]
+        #         latex_str += '}'
 
-            elif 'transverse' in components:
-                components.remove('transverse')
-                for l in components:
-                    if l[0] == 'd':
-                        dim = int(l.replace('d', ''))
-                    else:
-                        transverse_axis = str(l)
+        #         latex_str += '_{'
+        #         for o in operators:
+        #             latex_str += str( '{},'.format(o) )
+        #         latex_str = latex_str[0:-1] # remove final comma
+        #         latex_str += '}'
 
-                latex_str = '\sigma'
+        #     elif 'transverse' in components:
+        #         components.remove('transverse')
+        #         for l in components:
+        #             if l[0] == 'd':
+        #                 dim = int(l.replace('d', ''))
+        #             else:
+        #                 transverse_axis = str(l)
 
-                latex_str += '^{\otimes'
-                latex_str += str(dim)
-                latex_str += '}'
+        #         latex_str = '\sigma'
 
-                latex_str += '_{'
-                latex_str += str(transverse_axis)
-                latex_str += '}'
+        #         latex_str += '^{\otimes'
+        #         latex_str += str(dim)
+        #         latex_str += '}'
 
-            latex_terms.append(latex_str)
+        #         latex_str += '_{'
+        #         latex_str += str(transverse_axis)
+        #         latex_str += '}'
 
-        latex_terms = sorted(latex_terms)
-        full_latex_term = ''.join(latex_terms)
-        full_latex_term = str( '$' +  full_latex_term +'$' )
+        #     latex_terms.append(latex_str)
+
+        # latex_terms = sorted(latex_terms)
+        # full_latex_term = ''.join(latex_terms)
+        # full_latex_term = str( '$' +  full_latex_term +'$' )
 
 
-        return full_latex_term
+        # return full_latex_term
 
 
 

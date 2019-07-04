@@ -7,11 +7,11 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1
+qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -85,7 +85,9 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='ising_2d'
 # sim_growth_rule='heisenberg_xyz'
 # sim_growth_rule='hubbard_square_lattice_generalised'
-sim_growth_rule='hopping_topology'
+# sim_growth_rule='hopping_topology'
+sim_growth_rule='probabilistic_spin'
+
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
@@ -97,7 +99,8 @@ sim_growth_rule='hopping_topology'
 # exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
-exp_growth_rule='NV_fitness_growth'
+# exp_growth_rule='NV_fitness_growth'
+
 
 if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
 then

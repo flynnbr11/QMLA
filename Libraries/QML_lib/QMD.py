@@ -2342,6 +2342,20 @@ class QMD():
         champ_name = self.ModelNameIDs[champ_id]
         self.log_print(["Champion of Champions is",  champ_name])
         
+    def checkBranchGrowthRuleCompleted(
+        self, 
+        branchID, 
+        growth_rule,
+    ):
+
+        tree_completed = self.BranchGrowthClasses[branchID].check_tree_completed(
+            spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
+            current_num_qubits = new_model_dimension
+        )
+        return tree_completed    
+
+
+
     def spawnFromBranch(
         self, 
         branchID, 
@@ -2372,7 +2386,7 @@ class QMD():
             self.ModelNameIDs[i] for i in
             list(self.BranchChampions.values())
         ]
-        print("[QMD] fitness parameters:", self.FitnessParameters)
+        # print("[QMD] fitness parameters:", self.FitnessParameters)
         
         new_models = self.BranchGrowthClasses[branchID].generate_models(
             # generator = growth_rule, 
@@ -2885,6 +2899,7 @@ class QMD():
                             "not finished tree for growth:", 
                             this_branch_growth_rule
                         )
+
                         growth_rule_tree_complete = self.spawnFromBranch(
                             # will return True if this brings it to self.MaxSpawnDepth
                             branchID=branchID,
@@ -3608,7 +3623,7 @@ class QMD():
 
     def one_qubit_probes_bloch_sphere(self):
         print("In jupyter, include the following to view sphere: %matplotlib inline")
-        import qutip as qt
+        # import qutip as qt
         bloch = qt.Bloch()
         for i in range(self.NumProbes):
             state = self.ProbeDict[i,1]

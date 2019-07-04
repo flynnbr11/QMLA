@@ -11,13 +11,16 @@ import NV_centre_large_spin_bath
 import NV_centre_experiment_without_transverse_terms
 import NV_centre_revivals
 import NV_grow_by_fitness
+import NV_probabilistic
 import Reduced_NV_experiment
+import Spin_probabilistic
 import IsingChain
 import Hubbard
 import Heisenberg
 import Hopping
 import IsingMultiAxis
 import Ising2D 
+
 
 growth_classes = {
     # 'test_growth_class' : 
@@ -38,6 +41,8 @@ growth_classes = {
         NV_centre_large_spin_bath.NVCentreLargeSpinBath,
     'reduced_nv_experiment' : 
         Reduced_NV_experiment.reducedNVExperiment,
+    'probabilistic_spin' :
+        Spin_probabilistic.SpinProbabilistic,
     'ising_1d_chain' : 
         IsingChain.isingChain,
     'ising_multi_axis' : 
