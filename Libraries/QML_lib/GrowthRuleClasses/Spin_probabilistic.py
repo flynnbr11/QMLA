@@ -26,7 +26,9 @@ class SpinProbabilistic(
             **kwargs
         )
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
-        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
+        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
+        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
+        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.qhl_models = ['pauliSet_x_1_d1']
         self.base_terms = [
             'x', 
@@ -39,8 +41,8 @@ class SpinProbabilistic(
         )
 
         self.generation_DAG = 1 
-        self.max_num_generations = 3
-        self.num_top_models_to_build_on = 1 # at each generation
+        self.max_num_generations = 2
+        self.num_top_models_to_build_on = 2 # 'all' # at each generation
         self.available_mods_by_generation = {}
         self.max_num_sub_generations_per_generation = {}
         self.num_sub_generations_per_generation = {}
@@ -61,6 +63,12 @@ class SpinProbabilistic(
         
         
         self.model_fitness = {}
+        self.models_rejected = {
+            self.generation_DAG : []
+        }
+        self.models_accepted = {
+            self.generation_DAG : []
+        }
         # self._fitness_parameters = {}
         self.generational_fitness_parameters = {}
         self.models_to_build_on = {}
@@ -102,7 +110,10 @@ class SpinProbabilistic(
             key=model_points.get, 
             reverse=True
         )
-        models_to_build_on = ranked_model_list[:self.num_top_models_to_build_on]
+        if self.num_top_models_to_build_on == 'all':
+            models_to_build_on = ranked_model_list
+        else:
+            models_to_build_on = ranked_model_list[:self.num_top_models_to_build_on]
         self.models_to_build_on[self.generation_DAG] = models_to_build_on
         new_models = []
         self.sub_generation_idx += 1 
@@ -125,6 +136,8 @@ class SpinProbabilistic(
 
             self.spawn_stage.append('make_new_gen')
             self.generation_DAG += 1
+            self.models_accepted[self.generation_DAG] = []
+            self.models_rejected[self.generation_DAG] = []
             self.sub_generation_idx = 0
             if self.generation_DAG == self.max_num_generations:
                 self.spawn_stage.append('Complete')
@@ -172,13 +185,17 @@ class SpinProbabilistic(
                 # new_num_qubits = num_qubits + 1
                 # mod_name_increased_dim = increase_dimension_pauli_set(mod_name) 
                 for new_term in possible_new_terms: 
+                    new_mod = str(
+                        mod_name + 
+                        p_str +
+                        new_term
+                    )
                     if self.determine_whether_to_include_model(mod_id) == True:
-                        new_mod = str(
-                            mod_name + 
-                            p_str +
-                            new_term
-                        )
                         new_models.append(new_mod)
+                        self.models_accepted[self.generation_DAG].append(new_mod)
+                    else:
+                        self.models_rejected[self.generation_DAG].append(new_mod)
+
             self.spawn_stage.append(None)
             self.num_sub_generations_per_generation[self.generation_DAG] += 1
 
@@ -307,6 +324,8 @@ class SpinProbabilistic(
                 # win_ratio * fitness_parameters['r_squared']
             )**2
             # fitness = 1
+        elif self.model_generation_strictness == -1:
+            fitness = 1
         else:
             # only consider the best model
             # turn off all others
