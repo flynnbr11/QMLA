@@ -26,8 +26,8 @@ class SpinProbabilistic(
             **kwargs
         )
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
-        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
-        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
+        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
+        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.qhl_models = ['pauliSet_x_1_d1']
         self.base_terms = [
@@ -41,7 +41,7 @@ class SpinProbabilistic(
         )
 
         self.generation_DAG = 1 
-        self.max_num_generations = 2
+        self.max_num_generations = 3
         self.num_top_models_to_build_on = 2 # 'all' # at each generation
         self.available_mods_by_generation = {}
         self.max_num_sub_generations_per_generation = {}
@@ -72,7 +72,7 @@ class SpinProbabilistic(
         # self._fitness_parameters = {}
         self.generational_fitness_parameters = {}
         self.models_to_build_on = {}
-        self.model_generation_strictness = 0
+        self.model_generation_strictness = -1
 
         self.max_num_parameter_estimate = 9
         self.max_num_qubits = 4
