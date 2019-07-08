@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="test__std-growth-rule-simulation"
+test_description="probabilistic-spin__grow-top-2-models"
 
 
 ### ---------------------------------------------------###
@@ -9,7 +9,7 @@ test_description="test__std-growth-rule-simulation"
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=1
+num_tests=30
 num_processes_to_request=5
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
@@ -17,11 +17,11 @@ multiple_qhl=0
 multiple_growth_rules=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
 experimental_data=0 # use experimental data -> 1; use fake data ->0
-simulate_experiment=1
+simulate_experiment=0
 
 # QHL parameters.
-e=25 # experiments
-p=75 # particles
+e=100 # experiments
+p=400 # particles
 ra=0.98 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -40,21 +40,23 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 #sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 #sim_growth_rule='NV_centre_spin_large_bath'
 #sim_growth_rule='ising_1d_chain'
-sim_growth_rule='ising_multi_axis'
+#sim_growth_rule='ising_multi_axis'
 #sim_growth_rule='heisenberg_xyz'
 #sim_growth_rule='hubbard_square_lattice_generalised'
 #sim_growth_rule='hopping_topology'
 #sim_growth_rule='NV_centre_spin_large_bath'
+sim_growth_rule='probabilistic_spin'
+
 
 # Experimental growth rules
 #experimental_growth_rule='two_qubit_ising_rotation_hyperfine'
-#experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 #experimental_growth_rule='NV_centre_revivals'
 #experimental_growth_rule='NV_spin_full_access'
 #experimental_growth_rule='NV_centre_spin_large_bath'
 #experimental_growth_rule='NV_centre_experiment_debug'
 #experimental_growth_rule='reduced_nv_experiment'
-experimental_growth_rule='NV_fitness_growth'
+#experimental_growth_rule='NV_fitness_growth'
 
 
 #experimental_growth_rule='PT_Effective_Hamiltonian'
