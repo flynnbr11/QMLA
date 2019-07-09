@@ -379,7 +379,8 @@ class SpinProbabilistic(
 
 
 def possible_pauli_combinations(base_terms, num_sites):
-    possible_terms_tuples = list(itertools.combinations_with_replacement(base_terms, num_sites))
+    # possible_terms_tuples = list(itertools.combinations_with_replacement(base_terms, num_sites))
+    possible_terms_tuples = list(itertools.combinations(base_terms, num_sites))
     possible_terms = []
 
     for term in possible_terms_tuples:

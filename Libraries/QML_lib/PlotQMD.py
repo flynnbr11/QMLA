@@ -2179,7 +2179,8 @@ def plotTreeDiagram(
     plt.legend(
         model_handles, 
         model_labels,
-        bbox_to_anchor=(0.5, 0.8, 1, 0 ),
+        bbox_to_anchor=(0.5, 0.0, 1, 0 ),
+        # bbox_to_anchor=(1.1, 1.05),
         handler_map=handler_map, 
         loc=1,
         title = model_legend_title
