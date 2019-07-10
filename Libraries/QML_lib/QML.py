@@ -504,6 +504,7 @@ class ModelLearningClass():
         self.Covars= np.empty(self.NumExperiments)
         self.TrackEval = []
         self.TrackCovMatrices = []
+        self.TrackPosterior = []
         self.TrackPriorMeans = []
         self.TrackPriorStdDev = []
         # self.TrackPosteriorMarginal = np.empty(self.NumExperiments, self.NumParameters)
@@ -656,9 +657,17 @@ class ModelLearningClass():
             
             self.TrackEval.append(self.Updater.est_mean())
             self.TrackCovMatrices.append(self.Updater.est_covariance_mtx())
-            prior_sample = self.Updater.sample(int(1e5))
-            self.TrackPriorMeans.append(np.mean(prior_sample))
-            self.TrackPriorStdDev.append(np.std(prior_sample))
+            prior_sample = self.Updater.sample(int(5))
+
+            these_means = []
+            these_std= []
+            for i in range(len(self.SimOpList)):
+                these_means.append(np.mean(prior_sample[:,i]))
+                these_std.append( np.std(prior_sample[:,i]))
+
+            self.TrackPosterior.append(prior_sample)
+            self.TrackPriorMeans.append(these_means)
+            self.TrackPriorStdDev.append(these_std)
             # self.TrackPosteriorMarginal.append(self.Updater.posterior_marginal())
 
 
@@ -845,6 +854,7 @@ class ModelLearningClass():
         learned_info['updater'] = pickle.dumps(self.Updater, protocol=2) # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_prior'] = self.InitialPrior
+        learned_info['sim_op_names'] = self.SimOpsNames
         """
          1st is still the initial prior! that object does not get updated by the learning!
         	modify e.g. using the functions defined in /QML_lib/Distrib.py
@@ -856,6 +866,7 @@ class ModelLearningClass():
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
         learned_info['track_cov_matrices'] = self.TrackCovMatrices
+        learned_info['track_posterior'] = self.TrackPosterior
         learned_info['track_prior_means'] = self.TrackPriorMeans
         learned_info['track_prior_std_devs'] = self.TrackPriorStdDev
         # learned_info['track_posterior_marginal'] = self.TrackPosteriorMarginal
@@ -1106,6 +1117,7 @@ class reducedModel():
             self.Times = list(learned_info['times'])
             self.FinalParams = learned_info['final_params'] # should be final params from learning process
             self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
+            self.SimOpNames = learned_info['sim_op_names']
             self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
             self._normalization_record = learned_info['normalization_record']
             self.log_total_likelihod = learned_info['log_total_likelihood']
@@ -1117,6 +1129,7 @@ class reducedModel():
             self.TrackEval = np.array(learned_info['track_eval'])
             self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
             self.TrackPriorMeans = np.array(learned_info['track_prior_means'])
+            self.TrackPosterior = np.array(learned_info['track_posterior'])
             self.TrackPriorStdDev = np.array(learned_info['track_prior_std_devs'])
             # self.TrackPosteriorMarginal = np.array(learned_info['track_posterior_marginal'])
 
