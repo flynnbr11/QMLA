@@ -2724,6 +2724,12 @@ class QMD():
                 'Heuristic' : mod.HeuristicType, 
                 'ChampLatex' : mod.LatexTerm
             }
+            self.ModelIDNames = {}
+            for k in self.ModelNameIDs:
+                v = self.ModelNameIDs[k]
+                self.ModelIDNames[v] = k
+
+
 
     def inspect_remote_job_crashes(self):
         if self.RedisDataBases['any_job_failed']['Status'] == b'1':

@@ -41,7 +41,7 @@ class SpinProbabilistic(
         )
 
         self.generation_DAG = 1 
-        self.max_num_generations = 3
+        self.max_num_generations = 2
         self.num_top_models_to_build_on = 2 # 'all' # at each generation
         self.available_mods_by_generation = {}
         self.max_num_sub_generations_per_generation = {}

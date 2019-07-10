@@ -8,16 +8,16 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 num_tests=1
 qhl_test=0
-multiple_qhl=1
+multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=20
+prt=30
 exp=10
 pgh=1.0
 pgh_exponent=1.0

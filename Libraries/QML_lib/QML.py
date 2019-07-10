@@ -504,6 +504,9 @@ class ModelLearningClass():
         self.Covars= np.empty(self.NumExperiments)
         self.TrackEval = []
         self.TrackCovMatrices = []
+        self.TrackPriorMeans = []
+        self.TrackPriorStdDev = []
+        # self.TrackPosteriorMarginal = np.empty(self.NumExperiments, self.NumParameters)
         self.TrackTime =np.empty(self.NumExperiments)#only for debugging
     
         self.Particles = np.empty([self.NumParticles, 
@@ -653,6 +656,11 @@ class ModelLearningClass():
             
             self.TrackEval.append(self.Updater.est_mean())
             self.TrackCovMatrices.append(self.Updater.est_covariance_mtx())
+            prior_sample = self.Updater.sample(int(1e5))
+            self.TrackPriorMeans.append(np.mean(prior_sample))
+            self.TrackPriorStdDev.append(np.std(prior_sample))
+            # self.TrackPosteriorMarginal.append(self.Updater.posterior_marginal())
+
 
             print_loc(global_print_loc)
             self.Covars[istep] = np.linalg.norm(
@@ -848,6 +856,9 @@ class ModelLearningClass():
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
         learned_info['track_cov_matrices'] = self.TrackCovMatrices
+        learned_info['track_prior_means'] = self.TrackPriorMeans
+        learned_info['track_prior_std_devs'] = self.TrackPriorStdDev
+        # learned_info['track_posterior_marginal'] = self.TrackPosteriorMarginal
         learned_info['resample_epochs'] = self.ResampleEpochs
         learned_info['quadratic_losses'] = self.QLosses
         learned_info['learned_parameters'] = self.LearnedParameters
@@ -1105,6 +1116,10 @@ class reducedModel():
 
             self.TrackEval = np.array(learned_info['track_eval'])
             self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
+            self.TrackPriorMeans = np.array(learned_info['track_prior_means'])
+            self.TrackPriorStdDev = np.array(learned_info['track_prior_std_devs'])
+            # self.TrackPosteriorMarginal = np.array(learned_info['track_posterior_marginal'])
+
             self.ResampleEpochs = learned_info['resample_epochs']
             self.QuadraticLosses = learned_info['quadratic_losses']
             self.LearnedParameters = learned_info['learned_parameters']

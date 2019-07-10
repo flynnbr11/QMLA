@@ -33,12 +33,16 @@ class NVCentreSpinExperimentalMethod(
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         self.measurement_type = 'hahn'
         
+        self.true_operator = 'yTiPPzTi'
+
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
-        # self.qhl_models =    	[
-        #     'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
-        #     'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
-        #     'zTi'
-        # ]
+        self.qhl_models =    	[
+            # 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
+            # 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+            # 'xTiPPxTxPPyTiPPzTi',
+            'xTiPPyTiPPyTyPPzTi',
+            'yTi'
+        ]
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         self.max_num_qubits = 3
@@ -67,11 +71,41 @@ class NVCentreSpinExperimentalMethod(
                 'xTz' : [4.0, 1.5],
                 'yTz' : [4.0, 1.5],                
             }
-        else:
+        # else:
+            # self.true_params = {
+            #     # 'yTi' : 0.44
+            # }
+            # self.gaussian_prior_means_and_widths = {
+            #     # 'yTi' : [0.5, 0.1]
+            # }
             # TODO remove below setting probes -- used fir a test where simulation only uses |+>
-            self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
-            self.gaussian_prior_means_and_widths = {
-            }
+            # self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
+            # self.gaussian_prior_means_and_widths = {
+            # }
+            # self.gaussian_prior_means_and_widths = {
+            #     # fix close to true vals for conference plot
+            #     'xTi' : [-1, 0.1],
+            #     'yTi' : [6.5, 0.1],
+            #     'zTi' : [0.96, 0.1],
+            #     'xTx' : [6.71, 0.1],
+            #     'yTy' : [2.7, 0.1],
+            #     'zTz' : [1.6, 0.1],
+            #     'xTy' : [4.0, 1.5],
+            #     'xTz' : [4.0, 1.5],
+            #     'yTz' : [4.0, 1.5],                
+            # }
+            # self.true_params = {
+            #     'zTi' : 2
+            # }
+
+            # self.gaussian_prior_means_and_widths = {
+            #     'xTi': [0.37, 0.2], 
+            #     # 'yTi': [3.34, 0.2], 
+            #     'yTy': [3.07, 0.2],
+            #     # 'zTi': [1.9, 0.1], 
+            #     # 'zTz': [1.9898222688414018, 0.36198177893564248]
+            # }
+
 
 
         self.max_num_models_by_shape = {
