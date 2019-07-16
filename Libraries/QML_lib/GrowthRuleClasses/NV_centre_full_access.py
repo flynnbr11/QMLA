@@ -194,7 +194,7 @@ class NVCentreSpinFullAccess(GrowthRuleSuper):
         if len(present_r) > 0:
             latex_term+='S_{'+r_terms+'}'
         if len(present_hf) > 0:
-            latex_term+='I_{'+hf_terms+'}'
+            latex_term+='HF_{'+hf_terms+'}'
         if len(present_t) > 0:
             latex_term+='T_{'+t_terms+'}'
         
