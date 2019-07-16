@@ -43,7 +43,7 @@ class SpinProbabilistic(
 
         self.generation_DAG = 1 
         self.max_num_generations = 3
-        self.num_top_models_to_build_on = 2 # 'all' # at each generation
+        self.num_top_models_to_build_on = 'all' # at each generation
         self.available_mods_by_generation = {}
         self.max_num_sub_generations_per_generation = {}
         self.num_sub_generations_per_generation = {}
@@ -73,12 +73,14 @@ class SpinProbabilistic(
         # self._fitness_parameters = {}
         self.generational_fitness_parameters = {}
         self.models_to_build_on = {}
-        self.model_generation_strictness = -1
+        self.model_generation_strictness = 0 #-1
 
         self.max_num_parameter_estimate = 9
         self.max_num_qubits = 4
-        self.num_processes_to_parallelise_over = 10
-        
+        if self.num_top_models_to_build_on == 'all':
+            self.num_processes_to_parallelise_over = 15
+        else:   
+            self.num_processes_to_parallelise_over = 5
         self.max_num_models_by_shape = {
             1 : 7,
             2 : 20,
