@@ -28,7 +28,8 @@ class SpinProbabilistic(
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
-        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
+        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
+        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_zJz_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.qhl_models = ['pauliSet_x_1_d1']
         self.base_terms = [
@@ -383,7 +384,12 @@ class SpinProbabilistic(
 
 def possible_pauli_combinations(base_terms, num_sites):
     # possible_terms_tuples = list(itertools.combinations_with_replacement(base_terms, num_sites))
-    possible_terms_tuples = list(itertools.combinations(base_terms, num_sites))
+    # possible_terms_tuples = list(itertools.combinations(base_terms, num_sites))
+    possible_terms_tuples = [
+        (a,)*num_sites for a in base_terms
+    ] # only hyerfine type terms; no transverse
+
+
     possible_terms = []
 
     for term in possible_terms_tuples:

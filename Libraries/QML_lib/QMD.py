@@ -1268,7 +1268,6 @@ class QMD():
             for j in range(i,num_models):
                 b=model_id_list[j]
                 if a!=b:
-                    print("Bayes factors consider:", a, b)
                     unique_id = DataBase.unique_model_pair_identifier(a,b)
                     if (
                         unique_id not in self.BayesFactorsComputed
