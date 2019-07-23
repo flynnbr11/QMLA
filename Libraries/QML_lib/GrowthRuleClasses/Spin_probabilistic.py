@@ -11,6 +11,8 @@ import SuperClassGrowthRule
 import NV_centre_large_spin_bath
 import NV_grow_by_fitness
 
+
+
 class SpinProbabilistic(
     SuperClassGrowthRule.GrowthRuleSuper
 ):
@@ -43,8 +45,8 @@ class SpinProbabilistic(
         )
 
         self.generation_DAG = 1 
-        self.max_num_generations = 3
-        self.num_top_models_to_build_on = 'all' # at each generation
+        self.max_num_generations = 3 # within a DAG there can be multiple branches - IN this case a generation corresponds to a fixed number of qubits
+        self.num_top_models_to_build_on = 'all' # at each generation Badassness parameter
         self.available_mods_by_generation = {}
         self.max_num_sub_generations_per_generation = {}
         self.num_sub_generations_per_generation = {}
@@ -74,7 +76,7 @@ class SpinProbabilistic(
         # self._fitness_parameters = {}
         self.generational_fitness_parameters = {}
         self.models_to_build_on = {}
-        self.model_generation_strictness = 0 #-1
+        self.model_generation_strictness = 0 #-1 
 
         self.max_num_parameter_estimate = 9
         self.max_num_qubits = 4
@@ -302,7 +304,9 @@ class SpinProbabilistic(
         latex_str = "${}$".format(latex_str)
         return latex_str
 
-
+#23/July Comment: The model fitness at the moment is considering only the win ratio of the operator on the first qubit
+#This might need to be changed to a case where both (all) operators scores in the composite model are taken into account
+# But only depending on performance.
     def model_fitness_calculation(
         self, 
         model_id, 
