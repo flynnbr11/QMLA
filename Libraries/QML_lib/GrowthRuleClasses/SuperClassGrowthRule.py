@@ -70,7 +70,7 @@ class GrowthRuleSuper():
         self, 
         **kwargs
     ):
-        # print("[GrowthRuleSuper] overwrite_growth_class_methods. kwargs", kwargs)
+        print("[GrowthRuleSuper] overwrite_growth_class_methods. kwargs", kwargs)
         kw = list(kwargs.keys())
 
         attributes = [

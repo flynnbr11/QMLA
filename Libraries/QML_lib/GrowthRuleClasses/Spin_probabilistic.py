@@ -35,7 +35,7 @@ class SpinProbabilistic(
         self.base_terms = [
             'x', 
             'y', 
-            'z'
+            # 'z'
         ]
         self.initial_models = possible_pauli_combinations(
             base_terms = self.base_terms, 
@@ -43,7 +43,7 @@ class SpinProbabilistic(
         )
 
         self.generation_DAG = 1 
-        self.max_num_generations = 3
+        self.max_num_generations = 2
         self.num_top_models_to_build_on = 'all' # at each generation
         self.available_mods_by_generation = {}
         self.max_num_sub_generations_per_generation = {}
