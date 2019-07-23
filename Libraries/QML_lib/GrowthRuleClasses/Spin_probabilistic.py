@@ -37,7 +37,7 @@ class SpinProbabilistic(
         self.base_terms = [
             'x', 
             'y', 
-            # 'z'
+            'z'
         ]
         self.initial_models = possible_pauli_combinations(
             base_terms = self.base_terms, 
