@@ -36,16 +36,20 @@ class GrowthRuleSuper():
 
         # Parameters specific to the growth rule
         self.true_operator = 'xTi'
+        #qhl_models is the list of models used in a fixed QHL case, where we are not running any QML
         self.qhl_models = ['xTi', 'yTi', 'zTi'] 
+        #initial_models is the first branch of models in QML 
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
         self.max_num_parameter_estimate = 2
+        # max_spawn_depth is the maximum number of spawns/branches in a run
         self.max_spawn_depth = 10
         self.max_num_qubits = 5
         self.max_num_probe_qubits = 11
+        # If you want to do just Bayes facotr calculation on a deterministic initial set you set tree_completed_initially to True
         self.tree_completed_initially = False
         self.experimental_dataset = 'NVB_rescale_dataset.p'
-        self.measurement_type = 'full_access'
-        self.fixed_axis_generator = False
+        self.measurement_type = 'full_access' #deprecated
+        self.fixed_axis_generator = False # if you have a transverse axis and you want to generate on that axis than set it to True
         self.fixed_axis = 'z' # e.g. transverse axis
         self.num_processes_to_parallelise_over = 5
         
