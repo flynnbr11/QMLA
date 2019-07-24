@@ -180,9 +180,25 @@ if exp_data is False:
 #######################################
 print("\nAnalysing and storing results in", directory_to_analyse)
 
-
 if not directory_to_analyse.endswith('/'):
     directory_to_analyse += '/'
+
+
+
+count_model_occurences(
+    latex_map = latex_mapping_file,
+    true_operator_latex = true_growth_class.latex_name(
+        true_operator
+    ),
+    save_counts_dict = str(
+        directory_to_analyse + 
+        "count_model_occurences.p"
+    ),
+    save_to_file = str(
+        directory_to_analyse + 
+        "occurences_of_models.png"
+    )
+)
 
 
 if further_qhl_mode==True:

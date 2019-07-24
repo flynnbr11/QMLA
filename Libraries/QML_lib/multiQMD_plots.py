@@ -1538,3 +1538,60 @@ def plot_tree_multi_QMD(
         inf_gain=inf_gain,
         save_to_file=save_to_file
     )        
+
+
+def count_model_occurences(
+    latex_map, 
+    true_operator_latex,
+    save_counts_dict=None,
+    save_to_file=None
+):
+    f = open(latex_map, 'r')
+    l = str(f.read())
+    terms = l.split("',")
+
+    for t in ["(", ")", "'", " "]:
+        terms = [a.replace(t, '') for a in terms]
+
+    sep_terms = []
+    for t in terms:
+        sep_terms.extend(t.split("\n"))
+
+    unique_models = list(set([s for s in sep_terms if "$" in s]))
+    counts = {}
+    for ln in unique_models:
+        counts[ln] = sep_terms.count(ln)
+    unique_models = sorted(unique_models)
+    model_counts = [counts[m] for m in unique_models]
+    max_count = max(model_counts)
+    integer_ticks = list(range(max_count+1))
+    colours = ['blue' for m in unique_models]
+    
+    if true_operator_latex in unique_models:
+        true_idx = unique_models.index(unique_models[0])
+        colours[true_idx] = 'green'
+    
+    fig, ax = plt.subplots(figsize=(max_count*2,len(unique_models)/4))
+    ax.plot(kind='barh')
+    ax.barh(
+        unique_models, 
+        model_counts,
+        color = colours
+    )
+    ax.set_xticks(integer_ticks)
+    ax.set_title('# times each model generated')
+    ax.set_xlabel('# occurences')
+    ax.tick_params(top='on', direction='in') 
+    if save_counts_dict is not None:
+        import pickle
+        pickle.dump(
+            counts, 
+            open(
+                save_counts_dict,
+                'wb'
+            )
+        )
+    
+    if save_to_file is not None:
+        plt.savefig(save_to_file)
+    

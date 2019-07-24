@@ -28,10 +28,10 @@ class SpinProbabilistic(
             **kwargs
         )
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
-        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
+        # self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_zJz_1_d2'
+        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
-        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_zJz_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.qhl_models = ['pauliSet_x_1_d1']
         self.base_terms = [
