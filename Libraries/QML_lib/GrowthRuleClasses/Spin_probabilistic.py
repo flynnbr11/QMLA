@@ -28,8 +28,8 @@ class SpinProbabilistic(
             **kwargs
         )
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
-        # self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_zJz_1_d2'
-        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
+        self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_zJz_1_d2'
+        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
@@ -77,7 +77,7 @@ class SpinProbabilistic(
         self.generational_fitness_parameters = {}
         self.models_to_build_on = {}
         self.model_generation_strictness = 0 #-1 
-
+        self.fitness_win_ratio_exponent = 1
         self.max_num_parameter_estimate = 9
         self.max_num_qubits = 4
         if self.num_top_models_to_build_on == 'all':
@@ -128,7 +128,7 @@ class SpinProbabilistic(
         # if self.spawn_stage[-1] == None:
         
         if self.spawn_stage[-1] == 'end_generation':
-            print("[spin prob] Enf of gen {}; making new gen".format(self.generation_DAG))
+            print("[spin prob] End of gen {}; making new gen".format(self.generation_DAG))
             print("gen champs:", self.generation_champs[self.generation_DAG])
             new_mod_ids = list( # now a list of lists 
                 self.generation_champs[self.generation_DAG].values()
@@ -330,7 +330,7 @@ class SpinProbabilistic(
             fitness = (
                 win_ratio
                 # win_ratio * fitness_parameters['r_squared']
-            )**2
+            )**self.fitness_win_ratio_exponent
             # fitness = 1
         elif self.model_generation_strictness == -1:
             fitness = 1
