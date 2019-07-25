@@ -1568,7 +1568,7 @@ def count_model_occurences(
     colours = ['blue' for m in unique_models]
     
     if true_operator_latex in unique_models:
-        true_idx = unique_models.index(unique_models[0])
+        true_idx = unique_models.index(true_operator_latex)
         colours[true_idx] = 'green'
     
     fig, ax = plt.subplots(figsize=(max_count*2,len(unique_models)/4))
