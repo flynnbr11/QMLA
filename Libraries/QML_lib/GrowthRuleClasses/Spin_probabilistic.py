@@ -33,6 +33,7 @@ class SpinProbabilistic(
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
+        self.self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = ['pauliSet_x_1_d1']
         self.base_terms = [
             'x', 
@@ -109,7 +110,6 @@ class SpinProbabilistic(
         fitness = kwargs['fitness_parameters']
         model_points = kwargs['branch_model_points']
         branch_models = list(model_points.keys())
-
         # keep track of generation_DAG
         ranked_model_list = sorted(
             model_points, 
@@ -130,24 +130,30 @@ class SpinProbabilistic(
         if self.spawn_stage[-1] == 'end_generation':
             print("[spin prob] End of gen {}; making new gen".format(self.generation_DAG))
             print("gen champs:", self.generation_champs[self.generation_DAG])
+
+            # get new mod ids using current generation DAG before increasing it. 
             new_mod_ids = list( # now a list of lists 
                 self.generation_champs[self.generation_DAG].values()
             )
-
             new_mod_ids = sorted([i for sublist in new_mod_ids for i in sublist])            
 
-            new_models = [ 
-                kwargs['model_names_ids'][mod_id] for mod_id in new_mod_ids
-            ] 
 
             self.spawn_stage.append('make_new_gen')
             self.generation_DAG += 1
             self.models_accepted[self.generation_DAG] = []
             self.models_rejected[self.generation_DAG] = []
             self.sub_generation_idx = 0
+
+
             if self.generation_DAG == self.max_num_generations:
                 self.spawn_stage.append('Complete')
-            # return new_models
+                current_champs = kwargs['current_champs']
+                print("QMD complete; comparing all branch champs so far:", current_champs)
+                new_models = current_champs
+            else:
+                new_models = [ 
+                    kwargs['model_names_ids'][mod_id] for mod_id in new_mod_ids
+                ] 
         
         elif self.spawn_stage[-1] in [None, 'make_new_gen']:
 
@@ -347,7 +353,7 @@ class SpinProbabilistic(
 
         if model_id not in sorted(self.model_fitness.keys()):
             self.model_fitness[model_id] = {}
-        print("Setting fitness for {} to {}".format(model_id, fitness))
+        # print("Setting fitness for {} to {}".format(model_id, fitness))
         self.model_fitness[model_id][self.generation_DAG] = fitness            
 
 
