@@ -10,11 +10,11 @@ import Heuristics
 import SuperClassGrowthRule
 import NV_centre_large_spin_bath
 import NV_grow_by_fitness
+import Spin_probabilistic
 
 
-
-class SpinProbabilistic(
-    SuperClassGrowthRule.GrowthRuleSuper
+class PauliPairwiseProbabilistic(
+    Spin_probabilistic.SpinProbabilistic
 ):
 
     def __init__(
@@ -28,35 +28,32 @@ class SpinProbabilistic(
             **kwargs
         )
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
-        # self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_zJz_1_d2'
-        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
-        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
-        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
-        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
+        self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_yJx_1J2_d2'
         self.true_operator = DataBase.alph(self.true_operator)
-        self.qhl_models = ['pauliSet_x_1_d1']
+
+        self.qhl_models = ['pauliSet_xJx_1J2_d2']
         self.base_terms = [
             'x', 
             'y', 
             'z'
         ]
-        self.initial_models = possible_pauli_combinations(
-            base_terms = self.base_terms, 
-            num_sites = 1
-        )
+        self.num_top_models_to_build_on = 1 # 'all' # at each generation Badassness parameter
+        self.model_generation_strictness = 1 #-1 
 
-        self.generation_DAG = 1 
-        self.max_num_generations = 3 # within a DAG there can be multiple branches - IN this case a generation corresponds to a fixed number of qubits
-        self.num_top_models_to_build_on = 'all' # at each generation Badassness parameter
-        self.available_mods_by_generation = {}
-        self.max_num_sub_generations_per_generation = {}
-        self.num_sub_generations_per_generation = {}
-        self.generation_champs = {}
-        self.sub_generation_idx = 0 
-        for i in range(self.generation_DAG, self.max_num_generations+1):
-            possible_terms = possible_pauli_combinations(
+        self.initial_models = pairwise_pauli_terms(
+            base_terms = self.base_terms, 
+            new_site = 2
+        )
+        # self.generation_DAG = 2
+        self.num_sites = 2
+
+        for i in range(
+            self.generation_DAG, 
+            self.max_num_generations+1
+        ):
+            possible_terms = pairwise_pauli_terms(
                 base_terms = self.base_terms, 
-                num_sites = i
+                new_site = i + 1
             )
             self.available_mods_by_generation[i] = possible_terms
             self.max_num_sub_generations_per_generation[i] = len(possible_terms)
@@ -64,41 +61,6 @@ class SpinProbabilistic(
             self.generation_champs[i] = {}
 
 
-        # print("[SpinProbabilistic] AVAIL MODS BY GEN:", self.available_mods_by_generation)
-        
-        
-        self.model_fitness = {}
-        self.models_rejected = {
-            self.generation_DAG : []
-        }
-        self.models_accepted = {
-            self.generation_DAG : []
-        }
-        # self._fitness_parameters = {}
-        self.generational_fitness_parameters = {}
-        self.models_to_build_on = {}
-        self.model_generation_strictness = 0 #-1 
-        self.fitness_win_ratio_exponent = 1
-        self.max_num_parameter_estimate = 9
-        self.max_num_qubits = 4
-        if self.num_top_models_to_build_on == 'all':
-            self.num_processes_to_parallelise_over = 10
-        else:   
-            self.num_processes_to_parallelise_over = 5
-        self.max_num_models_by_shape = {
-            1 : 7,
-            2 : 20,
-            'other' : 0
-        }
-
-        self.true_params = {
-            'pauliSet_x_1_d2' : -0.98288958683093952, 
-            'pauliSet_y_1_d2' : 6.4842202054983122, 
-            'pauliSet_z_1_d2' : 0.96477790489201143, 
-            'pauliSet_xJx_1J2_d2' : 6.7232235286284681, 
-            'pauliSet_yJy_1J2_d2' :  2.7377867056770397, 
-            'pauliSet_zJz_1J2_d2' : 1.6034234519563935, 
-        }
 
 
     def generate_models(
@@ -166,9 +128,10 @@ class SpinProbabilistic(
                     print("generation:", self.generation_DAG, "has available mods:", 
                         self.available_mods_by_generation[self.generation_DAG]
                     )
-                    mod_name = increase_dimension_pauli_set(
+                    self.num_sites += 1
+                    mod_name = Spin_probabilistic.increase_dimension_pauli_set(
                         mod_name,
-                        new_dimension = self.generation_DAG
+                        new_dimension = self.num_sites
                     )
                     print("Increased dimension. model now:", mod_name)
                 present_terms = DataBase.get_constituent_names_from_name(mod_name)
@@ -262,10 +225,10 @@ class SpinProbabilistic(
                 if len(operators) == 1:
                     # i.e only one operator, it's a rotation term
                     rotation_terms.append(operators[0])
-                elif len(set(operators)) == 1:
-                    # multiple sites but single axis -- interaction term
-                    interaction_terms.append(operators[0])
-                    interaction_sites.append(sites)
+                # elif len(set(operators)) == 1:
+                #     # multiple sites but single axis -- interaction term
+                #     interaction_terms.append(operators[0])
+                #     interaction_sites.append(sites)
                 else:
                     transverse_terms.append(operators)
                     transverse_sites.append(sites)
@@ -310,136 +273,25 @@ class SpinProbabilistic(
         latex_str = "${}$".format(latex_str)
         return latex_str
 
-#23/July Comment: The model fitness at the moment is considering only the win ratio of the operator on the first qubit
-#This might need to be changed to a case where both (all) operators scores in the composite model are taken into account
-# But only depending on performance.
-    def model_fitness_calculation(
-        self, 
-        model_id, 
-        fitness_parameters, # of this model_id
-        model_points, 
-        **kwargs
-    ):
-        # TODO make fitness parameters within QMD 
-        # pass 
-        # print("model fitness function. fitness params:", fitness_parameters)
-        print("[prob spin] model fitness. model points:", model_points)
-        ranked_model_list = sorted(
-            model_points, 
-            key=model_points.get, 
-            reverse=True
-        )
-
-        try:
-            max_wins_model_points = max(model_points.values())
-            win_ratio = model_points[model_id] / max_wins_model_points
-        except:
-            win_ratio = 1
-
-        if self.model_generation_strictness == 0:
-            # keep all models and work out relative fitness
-            fitness = (
-                win_ratio
-                # win_ratio * fitness_parameters['r_squared']
-            )**self.fitness_win_ratio_exponent
-            # fitness = 1
-        elif self.model_generation_strictness == -1:
-            fitness = 1
-        else:
-            # only consider the best model
-            # turn off all others
-            if model_id == ranked_model_list[0]:
-                fitness = 1
-            else:
-                fitness = 0
 
 
 
+def pairwise_pauli_terms(base_terms, new_site, num_sites=None):
+    if num_sites is None:
+        num_sites = new_site
+    pairs = list(itertools.combinations_with_replacement(base_terms, 2))
+    pairs.extend(list(itertools.permutations(base_terms, 2)))
+    pairs = list(set(pairs))
 
-        if model_id not in sorted(self.model_fitness.keys()):
-            self.model_fitness[model_id] = {}
-        # print("Setting fitness for {} to {}".format(model_id, fitness))
-        self.model_fitness[model_id][self.generation_DAG] = fitness            
-
-
-    def determine_whether_to_include_model(
-        self, 
-        model_id    
-    ):
-        # biased coin flip
-        fitness = self.model_fitness[model_id][self.generation_DAG]
-        rand = np.random.rand()
-        to_generate = ( rand < fitness ) 
-        return to_generate
-
-    def check_tree_completed(
-        self,
-        spawn_step, 
-        **kwargs
-    ):
-        if self.spawn_stage[-1] == 'Complete':
-            return True 
-        else:
-            return False
-        return True
-
-    def name_branch_map(
-        self,
-        latex_mapping_file, 
-        **kwargs
-    ):
-        import ModelNames
-        return ModelNames.branch_is_num_params_and_qubits(
-            latex_mapping_file = latex_mapping_file,
-            **kwargs
-        )
-
-
-
-
-def possible_pauli_combinations(base_terms, num_sites):
-    # possible_terms_tuples = list(itertools.combinations_with_replacement(base_terms, num_sites))
-    # possible_terms_tuples = list(itertools.combinations(base_terms, num_sites))
-    possible_terms_tuples = [
-        (a,)*num_sites for a in base_terms
-    ] # only hyerfine type terms; no transverse
-
+    new_nearest_neighbours = [new_site-1, new_site]
 
     possible_terms = []
-
-    for term in possible_terms_tuples:
+    for term in pairs:
         pauli_terms = 'J'.join(list(term))
-        acted_on_sites = [str(i) for i in range(1,num_sites+1) ]
+        acted_on_sites = [str(i) for i in new_nearest_neighbours ]
+    #     acted_on_sites = new_nearest_neighbours
         acted_on = 'J'.join(acted_on_sites)
         mod = "pauliSet_{}_{}_d{}".format(pauli_terms, acted_on, num_sites)
 
         possible_terms.append(mod)
     return possible_terms
-
-def increase_dimension_pauli_set(initial_model, new_dimension=None):
-    print("[spin prob incr dim] initial model:", initial_model, "new dim:", new_dimension)
-    individual_terms = DataBase.get_constituent_names_from_name(initial_model)
-    separate_terms = []
-    
-    for model in individual_terms:
-        components = model.split('_')
-
-        for c in components:
-            if c[0] == 'd':
-                current_dim = int(c.replace('d', ''))
-                components.remove(c)
-
-        if new_dimension == None:
-            new_dimension = current_dim + 1
-        new_component = "d{}".format(new_dimension)
-        components.append(new_component)
-        new_mod = '_'.join(components)
-        separate_terms.append(new_mod)
-
-    p_str = 'P'*(new_dimension)
-    full_model = p_str.join(separate_terms)
-    
-    return full_model
-    
-    
-    

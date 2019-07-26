@@ -20,7 +20,7 @@ import Heisenberg
 import Hopping
 import IsingMultiAxis
 import Ising2D 
-
+import Pauli_pairwise_probabilistic_nearest_neighbour
 
 growth_classes = {
     # 'test_growth_class' : 
@@ -54,7 +54,9 @@ growth_classes = {
     'heisenberg_xyz' : 
         Heisenberg.heisenbergXYZ, 
     'hopping_topology' : 
-        Hopping.hopping
+        Hopping.hopping,
+    'pairwise_pauli_probabilistic_nearest_neighbour' : 
+        Pauli_pairwise_probabilistic_nearest_neighbour.PauliPairwiseNearestNeighbourProbabilistic
 }
 
 

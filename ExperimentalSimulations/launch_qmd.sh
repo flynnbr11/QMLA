@@ -86,7 +86,8 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='heisenberg_xyz'
 # sim_growth_rule='hubbard_square_lattice_generalised'
 # sim_growth_rule='hopping_topology'
-sim_growth_rule='probabilistic_spin'
+# sim_growth_rule='probabilistic_spin'
+sim_growth_rule='pairwise_pauli_probabilistic_nearest_neighbour'
 
 
 ### Experimental growth rules 
