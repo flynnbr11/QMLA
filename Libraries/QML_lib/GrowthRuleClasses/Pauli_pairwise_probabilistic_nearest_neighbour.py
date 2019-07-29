@@ -29,7 +29,7 @@ class PauliPairwiseNearestNeighbourProbabilistic(
         )
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         # self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_yJx_1J2_d2'
-        self.true_operator = 'pauliSet_xJx_1J2_d3PPPpauliSet_yJz_2J3_d3'
+        self.true_operator = 'pauliSet_xJx_1J2_d3PPPpauliSet_yJy_2J3_d3'
         self.true_operator = DataBase.alph(self.true_operator)
 
         self.qhl_models = ['pauliSet_xJx_1J2_d2']
@@ -41,8 +41,8 @@ class PauliPairwiseNearestNeighbourProbabilistic(
         self.num_top_models_to_build_on = 1 # 'all' # at each generation Badassness parameter
         self.model_generation_strictness = 1 #-1 
 
-        # self.initial_models = pairwise_pauli_like_like_terms(
-        self.initial_models = pairwise_pauli_terms(
+        self.initial_models = pairwise_pauli_like_like_terms(
+        # self.initial_models = pairwise_pauli_terms(
             base_terms = self.base_terms, 
             new_site = 2
         )
@@ -54,8 +54,8 @@ class PauliPairwiseNearestNeighbourProbabilistic(
             self.generation_DAG, 
             self.max_num_generations+1
         ):
-            # possible_terms = pairwise_pauli_like_like_terms(
-            possible_terms = pairwise_pauli_terms(
+            possible_terms = pairwise_pauli_like_like_terms(
+            # possible_terms = pairwise_pauli_terms(
 
                 base_terms = self.base_terms, 
                 new_site = i + 1
