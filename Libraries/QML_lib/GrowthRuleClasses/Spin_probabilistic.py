@@ -31,7 +31,8 @@ class SpinProbabilistic(
         # self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_zJz_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2'
-        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
+        # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2PPpauliSet_zJz_1_d2'
+        self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_z_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         # self.true_operator = 'pauliSet_x_1_d2PPpauliSet_y_1_d2PPpauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = ['pauliSet_x_1_d1']
@@ -47,7 +48,6 @@ class SpinProbabilistic(
 
         self.generation_DAG = 1 
         self.max_num_generations = 3 # within a DAG there can be multiple branches - IN this case a generation corresponds to a fixed number of qubits
-        self.num_top_models_to_build_on = 'all' # at each generation Badassness parameter
         self.available_mods_by_generation = {}
         self.max_num_sub_generations_per_generation = {}
         self.num_sub_generations_per_generation = {}
@@ -77,6 +77,7 @@ class SpinProbabilistic(
         # self._fitness_parameters = {}
         self.generational_fitness_parameters = {}
         self.models_to_build_on = {}
+        self.num_top_models_to_build_on = 'all' # at each generation Badassness parameter
         self.model_generation_strictness = 0 #-1 
         self.fitness_win_ratio_exponent = 1
         self.max_num_parameter_estimate = 9
