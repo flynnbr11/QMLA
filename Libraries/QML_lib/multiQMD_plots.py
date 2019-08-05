@@ -1563,6 +1563,10 @@ def count_model_occurences(
         counts[ln] = sep_terms.count(ln)
     unique_models = sorted(unique_models)
     model_counts = [counts[m] for m in unique_models]
+    unique_models = [
+        a.replace("\\\\", "\\")
+        for a in unique_models
+    ] # in case some models have too many slashes. 
     max_count = max(model_counts)
     integer_ticks = list(range(max_count+1))
     colours = ['blue' for m in unique_models]
@@ -1571,7 +1575,11 @@ def count_model_occurences(
         true_idx = unique_models.index(true_operator_latex)
         colours[true_idx] = 'green'
     
-    fig, ax = plt.subplots(figsize=(max_count*2,len(unique_models)/4))
+    fig, ax = plt.subplots(
+        figsize=(
+            max(max_count*2, 5),
+            len(unique_models)/4)
+        )
     ax.plot(kind='barh')
     ax.barh(
         unique_models, 
@@ -1581,7 +1589,10 @@ def count_model_occurences(
     ax.set_xticks(integer_ticks)
     ax.set_title('# times each model generated')
     ax.set_xlabel('# occurences')
-    ax.tick_params(top='on', direction='in') 
+    ax.tick_params(
+        top=True, 
+        direction='in'
+    ) 
     if save_counts_dict is not None:
         import pickle
         pickle.dump(
@@ -1592,6 +1603,13 @@ def count_model_occurences(
             )
         )
     
-    if save_to_file is not None:
-        plt.savefig(save_to_file)
-    
+    try:
+        if save_to_file is not None:
+            plt.savefig(save_to_file)
+    except:
+        print(
+            "[AnalyseMultiple - count model occurences] couldn't save plot to file", 
+            save_to_file
+
+        )
+        raise

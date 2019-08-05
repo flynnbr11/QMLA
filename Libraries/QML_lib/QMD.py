@@ -3653,7 +3653,7 @@ def num_pairs_in_list(num_models):
         a= math.factorial(n) / math.factorial(k)
         b= math.factorial(n-k)
     except:
-        print("n=",n,"\t k=",k)
+        print("Numbers too large to compute number pairs. n=",n,"\t k=",k)
     
     return a/b
 

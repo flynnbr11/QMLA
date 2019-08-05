@@ -183,25 +183,32 @@ print("\nAnalysing and storing results in", directory_to_analyse)
 if not directory_to_analyse.endswith('/'):
     directory_to_analyse += '/'
 
+print("Counting model occurences.")
 
-
-count_model_occurences(
-    latex_map = latex_mapping_file,
-    true_operator_latex = true_growth_class.latex_name(
-        true_operator
-    ),
-    save_counts_dict = str(
-        directory_to_analyse + 
-        "count_model_occurences.p"
-    ),
-    save_to_file = str(
-        directory_to_analyse + 
-        "occurences_of_models.png"
+try:
+    count_model_occurences(
+        latex_map = latex_mapping_file,
+        true_operator_latex = true_growth_class.latex_name(
+            true_operator
+        ),
+        save_counts_dict = str(
+            directory_to_analyse + 
+            "count_model_occurences.p"
+        ),
+        save_to_file = str(
+            directory_to_analyse + 
+            "occurences_of_models.png"
+        )
     )
-)
+except:
+    print("Failed to plot # occurences of each model.")
+    raise
+
 
 
 if further_qhl_mode==True:
+    print("further_qhl_model = True.")
+
     results_csv_name = 'summary_further_qhl_results.csv'
     results_csv = directory_to_analyse+results_csv_name
     results_file_name_start='further_qhl_results'
@@ -289,6 +296,7 @@ for g in list(growth_rules.keys()):
 
 # first get model scores
 model_scores, growth_rules, growth_classes, unique_growth_classes = get_model_scores(directory_to_analyse)
+print("Average param estimates")
 
 
 average_parameter_estimates(
@@ -306,6 +314,8 @@ average_parameter_estimates(
 )
 
 # if exp_data:
+print("dynamics plots")
+
 Bayes_t_test( # average expected values
     directory_name = directory_to_analyse, 
     dataset = dataset, 

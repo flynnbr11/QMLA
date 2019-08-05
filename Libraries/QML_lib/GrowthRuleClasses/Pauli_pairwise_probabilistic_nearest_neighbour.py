@@ -38,9 +38,9 @@ class PauliPairwiseNearestNeighbourProbabilistic(
             'y', 
             'z'
         ]
-        self.num_top_models_to_build_on = 1 # 'all' # at each generation Badassness parameter
-        self.model_generation_strictness = 1 #-1 
-
+        self.num_top_models_to_build_on = 'all' # at each generation Badassness parameter
+        self.model_generation_strictness = 0 #1 #-1 
+        self.fitness_win_ratio_exponent = 0.25
         self.initial_models = pairwise_pauli_like_like_terms(
         # self.initial_models = pairwise_pauli_terms(
             base_terms = self.base_terms, 
@@ -66,8 +66,6 @@ class PauliPairwiseNearestNeighbourProbabilistic(
             self.num_sub_generations_per_generation[i] = 0
             self.generation_champs[i] = {}
         self.max_num_sub_generations_per_generation[1] = 1
-
-
 
     def generate_models(
         self, 
@@ -122,7 +120,10 @@ class PauliPairwiseNearestNeighbourProbabilistic(
         #     else:
         #         new_models = [ 
         #             kwargs['model_names_ids'][mod_id] for mod_id in new_mod_ids
-        #         ] 
+        #         ]
+
+        if  self.spawn_stage[-1] == 'make_new_gen':
+            self.num_sites += 1
         
         if self.spawn_stage[-1] in [None, 'make_new_gen']:
 
@@ -135,7 +136,9 @@ class PauliPairwiseNearestNeighbourProbabilistic(
                     print("generation:", self.generation_DAG, "has available mods:", 
                         self.available_mods_by_generation[self.generation_DAG]
                     )
-                    self.num_sites += 1
+                    print("Increasing num sites; before:", self.num_sites)
+                    # self.num_sites += 1
+                    print("Increasing num sites; after:", self.num_sites)
                     mod_name = Spin_probabilistic.increase_dimension_pauli_set(
                         mod_name,
                         new_dimension = self.num_sites

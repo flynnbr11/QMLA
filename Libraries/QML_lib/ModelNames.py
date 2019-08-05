@@ -997,7 +997,7 @@ def pauliSet_latex_name(
 
             latex_str = '\sigma'
 
-            latex_str += '^{\otimes'
+            latex_str += '^{\otimes '
             latex_str += str(dim)
             latex_str += '}'
 
@@ -1009,7 +1009,7 @@ def pauliSet_latex_name(
 
     latex_terms = sorted(latex_terms)
     full_latex_term = ''.join(latex_terms)
-    full_latex_term = str( '$' +  full_latex_term +'$' )
-
-
+    full_latex_term = str( '$' + full_latex_term +'$' )
+    full_latex_term = str("'{}'".format(full_latex_term))
+    # print("LATEX NAME:", full_latex_term)
     return full_latex_term
