@@ -40,13 +40,17 @@ class NVCentreLargeSpinBath(
         	'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
     	] 
         self.qhl_models = [
+            'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2',
         	'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3', 
-        	'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
+            'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4PPPPnv_interaction_x_d4PPPPnv_interaction_y_d4PPPPnv_interaction_z_d4',
+        	'nv_spin_x_d5PPPPPnv_spin_y_d5PPPPPnv_spin_z_d5PPPPPnv_interaction_x_d5PPPPPnv_interaction_y_d5PPPPPnv_interaction_z_d5',
+            'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6',
+            'nv_spin_x_d7PPPPPPPnv_spin_y_d7PPPPPPPnv_spin_z_d7PPPPPPPnv_interaction_x_d7PPPPPPPnv_interaction_y_d7PPPPPPPnv_interaction_z_d7',
         ]
         self.max_num_parameter_estimate = 6
         self.max_spawn_depth = 9
         self.max_num_qubits = 6
-        self.plot_probe_generation_function = ProbeGeneration.zero_state_probes
+        # self.plot_probe_generation_function = ProbeGeneration.zero_state_probes
 
         self.max_num_models_by_shape = {
             1 : 0,

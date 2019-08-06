@@ -202,7 +202,7 @@ try:
     )
 except:
     print("Failed to plot # occurences of each model.")
-    raise
+    # raise
 
 
 
