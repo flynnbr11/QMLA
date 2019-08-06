@@ -108,6 +108,10 @@ class NVCentreLargeSpinBath(
             'nv_spin_z_d10' : 0.96477790489201143, 
         }
 
+        self.max_num_models_by_shape = {
+            'other' : 2, 
+        }
+
 
     def generate_models(
         self, 

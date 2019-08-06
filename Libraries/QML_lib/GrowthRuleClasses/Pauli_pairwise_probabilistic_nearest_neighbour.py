@@ -48,7 +48,7 @@ class PauliPairwiseNearestNeighbourProbabilistic(
         )
         self.generation_DAG = 1
         self.num_sites = 2
-        self.max_num_generations = 5
+        self.max_num_generations = 4
 
         for i in range(
             self.generation_DAG, 
@@ -66,6 +66,13 @@ class PauliPairwiseNearestNeighbourProbabilistic(
             self.num_sub_generations_per_generation[i] = 0
             self.generation_champs[i] = {}
         self.max_num_sub_generations_per_generation[1] = 1
+        self.max_num_qubits = self.max_num_generations
+
+        self.max_num_models_by_shape = {
+            1 : 0,
+            'other' : 4
+        }
+
 
     def generate_models(
         self, 
