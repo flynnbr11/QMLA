@@ -1550,7 +1550,8 @@ def count_model_occurences(
     l = str(f.read())
     terms = l.split("',")
 
-    for t in ["(", ")", "'", " "]:
+    # for t in ["(", ")", "'", " "]:
+    for t in ["'", " "]:
         terms = [a.replace(t, '') for a in terms]
 
     sep_terms = []

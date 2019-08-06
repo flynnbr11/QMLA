@@ -232,6 +232,7 @@ class PauliPairwiseNearestNeighbourProbabilistic(
         #     name, 
         #     **kwargs
         # )
+
         core_operators = list(sorted(DataBase.core_operator_dict.keys()))
         num_sites = DataBase.get_num_qubits(name)
         p_str = 'P'*num_sites
