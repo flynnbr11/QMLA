@@ -2578,6 +2578,7 @@ class QMD():
                 times = expec_val_plot_times,
                 plot_probes = self.PlotProbes
             ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
+            'FinalRSquared' : mod.final_r_squared,
             'LearnedHamiltonian' : mod.LearnedHamiltonian,
             'GrowthGenerator' : mod.GrowthGenerator, 
             'Heuristic' : mod.HeuristicType, 
@@ -2718,6 +2719,7 @@ class QMD():
                     times = expec_val_plot_times,
                     plot_probes = self.PlotProbes
                 ),
+                'FinalRSquared' : mod.final_r_squared,
                 'LearnedHamiltonian' : mod.LearnedHamiltonian,
                 'GrowthGenerator' : mod.GrowthGenerator,
                 'Heuristic' : mod.HeuristicType, 
@@ -3231,6 +3233,7 @@ class QMD():
                 plot_probes = self.PlotProbes,
                 times = expec_val_plot_times
             ),
+            'FinalRSquared' : champ_model.final_r_squared,
             'LearnedHamiltonian' : champ_model.LearnedHamiltonian,
             'GrowthGenerator' : champ_model.GrowthGenerator, 
             'Heuristic' : champ_model.HeuristicType, 

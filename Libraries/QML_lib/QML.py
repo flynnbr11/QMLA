@@ -1382,6 +1382,7 @@ class reducedModel():
             Rsq = 1 - sum_of_residuals/datavar
             r_squared_by_epoch[e] = Rsq
         self.r_squared_by_epoch = r_squared_by_epoch
+        self.final_r_squared = Rsq
         return r_squared_by_epoch
 
 

@@ -295,7 +295,9 @@ for g in list(growth_rules.keys()):
 
 
 # first get model scores
-model_scores, growth_rules, growth_classes, unique_growth_classes = get_model_scores(directory_to_analyse)
+model_scores, growth_rules, growth_classes, unique_growth_classes, median_coeff_determination = get_model_scores(directory_to_analyse)
+
+# print("Avg coeff if determination", avg_coeff_determination)
 print("Average param estimates")
 
 
@@ -423,6 +425,7 @@ if further_qhl_mode == False:
         growth_classes = growth_classes, 
         unique_growth_classes = unique_growth_classes, 
         growth_rules = growth_rules, 
+        coefficients_of_determination = median_coeff_determination, 
         true_operator = true_operator, 
         growth_generator = growth_generator,
         collective_analysis_pickle_file = results_collection_file, 

@@ -1270,18 +1270,30 @@ def get_model_scores(directory_name):
         if file.endswith(".p") and file.startswith("results"):
             pickled_files.append(file)
     
+    coeff_of_determination = {}
+    avg_coeff_determination = {}
+
     for f in pickled_files:
         fname = directory_name+'/'+str(f)
         result = pickle.load(open(fname, 'rb'))
         alph = result['NameAlphabetical']
+        
 
         if alph in scores.keys():
             scores[alph] += 1
+            coeff_of_determination[alph].append(result['FinalRSquared'])
         else:
             scores[alph] = 1
+            coeff_of_determination[alph] = [ result['FinalRSquared'] ]
 
         if alph not in list(growth_rules.keys()):
             growth_rules[alph] = result['GrowthGenerator']
+    
+    for alph in list(scores.keys()):
+        avg_coeff_determination[alph] = np.median(
+            coeff_of_determination[alph]
+        )
+
     unique_growth_rules = list(set(list(growth_rules.values())))
     unique_growth_classes = {}
     for g in unique_growth_rules:
@@ -1298,7 +1310,7 @@ def get_model_scores(directory_name):
         except:
             growth_classes[g] = None
 
-    return scores, growth_rules, growth_classes, unique_growth_classes
+    return scores, growth_rules, growth_classes, unique_growth_classes, avg_coeff_determination
 
 def get_entropy(
     models_points, 
@@ -1344,6 +1356,7 @@ def plot_scores(
         growth_classes, 
         unique_growth_classes, 
         growth_rules, 
+        coefficients_of_determination=None, 
         entropy=None,
         inf_gain=None, 
         true_operator = None, 
@@ -1364,6 +1377,17 @@ def plot_scores(
     latex_model_names = [
         growth_classes[model].latex_name(model)
         for model in models
+    ]
+    print("[multiQMD plots]coefficients_of_determination:", coefficients_of_determination)
+
+    coefficient_determination_latex_name = {}
+    for mod in list(coefficients_of_determination.keys()):
+        coefficient_determination_latex_name[
+            growth_classes[mod].latex_name(mod)
+        ] = coefficients_of_determination[mod]
+
+    coeff_of_determination = [
+        coefficient_determination_latex_name[latex_mod] for latex_mod in latex_model_names
     ]
 
     latex_scores_dict = {}
@@ -1460,7 +1484,7 @@ def plot_scores(
     except:
         pass
 
-    fig, ax = plt.subplots(
+    fig, ax1 = plt.subplots(
         figsize=(
             max( max(scores), 5),
             max( (len(scores)/4) , 3)
@@ -1468,15 +1492,16 @@ def plot_scores(
     )
 
     # ax.barh(ind, scores, width, color="blue")
-    ax.barh(ind, scores, width, color=colours)
-    ax.set_yticks(ind+width/2)
-    ax.set_yticklabels(
+    ax1.barh(ind, scores, width, color=colours)
+    ax1.set_yticks(ind+width/2)
+    ax1.set_yticklabels(
         latex_model_names, 
         minor=False
     )
+    ax1.set_xlabel('Number wins')
     xticks_pos = list(range(max(scores)+1))
     print("[MODEL SCORES] xticks:", xticks_pos)
-    ax.set_xticks(
+    ax1.set_xticks(
         xticks_pos,
         minor=False
     )
@@ -1484,15 +1509,34 @@ def plot_scores(
         Line2D([0], [0], color='green', lw=4),
         Line2D([0], [0], color='orange', lw=4),
         Line2D([0], [0], color='blue', lw=4),
+        # Line2D([0], [0], color='black', lw=4, ls='--'),
     ]
     custom_handles = [
         'True ({}%)'.format(int(correct_success_rate)), 
         'True/Close ({}%)'.format(int(batch_success_rate)), 
-        'Other'
+        'Other',
+        # '$R^2$'
     ]
     
+    ax2 = ax1.twiny()
+    ax2.barh(
+        ind, 
+        coeff_of_determination, 
+        width/2, 
+        color=colours, 
+        label='$R^2$', 
+        linestyle='--',
+        fill=False, 
+    )
+    # ax2.invert_xaxis()
+    ax2.set_xlabel('$R^2$')
+    ax2.xaxis.tick_top()
+    ax2.legend(
+        bbox_to_anchor=(1.0, 0.9), 
+    )
+
     plot_title = str(
-        'Number of QMD instances won by models.' 
+        'Number of QMD instances won by models with $R^2$.' 
     )
 
     if entropy is not None:
@@ -1505,10 +1549,19 @@ def plot_scores(
             '\t $\mathcal{IG}$=' 
             + str(round(inf_gain, 2))
         )
-    plt.legend(custom_lines, custom_handles)
+    ax1.legend(
+        custom_lines, 
+        custom_handles,
+        bbox_to_anchor=(1.0, 0.4), 
+    )
+    
+    # plt.legend(
+    #     custom_lines, 
+    #     custom_handles
+    # )
     plt.title(plot_title)
     plt.ylabel('Model')
-    plt.xlabel('Number of wins')
+    # plt.xlabel('Number of wins')
     #plt.bar(scores, latex_model_names)
     
     plt.savefig(save_file, bbox_inches='tight')
