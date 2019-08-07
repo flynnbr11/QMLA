@@ -1394,7 +1394,8 @@ def plot_scores(
     mod_scores = scores
     scores = list(scores.values())
     num_runs = sum(scores)
-    fig, ax = plt.subplots()    
+
+    # fig, ax = plt.subplots()    
     width = 0.75 # the width of the bars 
     ind = np.arange(len(scores))  # the x locations for the groups
     colours = ['blue' for i in ind]
@@ -1459,11 +1460,26 @@ def plot_scores(
     except:
         pass
 
+    fig, ax = plt.subplots(
+        figsize=(
+            max( max(scores), 5),
+            max( (len(scores)/4) , 3)
+        )
+    )
 
     # ax.barh(ind, scores, width, color="blue")
     ax.barh(ind, scores, width, color=colours)
     ax.set_yticks(ind+width/2)
-    ax.set_yticklabels(latex_model_names, minor=False)
+    ax.set_yticklabels(
+        latex_model_names, 
+        minor=False
+    )
+    xticks_pos = list(range(max(scores)+1))
+    print("[MODEL SCORES] xticks:", xticks_pos)
+    ax.set_xticks(
+        xticks_pos,
+        minor=False
+    )
     custom_lines = [
         Line2D([0], [0], color='green', lw=4),
         Line2D([0], [0], color='orange', lw=4),
