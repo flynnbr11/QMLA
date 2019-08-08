@@ -43,8 +43,8 @@ class NVCentreLargeSpinBath(
     	] 
         self.qhl_models = [
             'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2',
-        	'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3', 
-            'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4PPPPnv_interaction_x_d4PPPPnv_interaction_y_d4PPPPnv_interaction_z_d4',
+        	# 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3', 
+            # 'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4PPPPnv_interaction_x_d4PPPPnv_interaction_y_d4PPPPnv_interaction_z_d4',
         	# 'nv_spin_x_d5PPPPPnv_spin_y_d5PPPPPnv_spin_z_d5PPPPPnv_interaction_x_d5PPPPPnv_interaction_y_d5PPPPPnv_interaction_z_d5',
          #    'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6',
             # 'nv_spin_x_d7PPPPPPPnv_spin_y_d7PPPPPPPnv_spin_z_d7PPPPPPPnv_interaction_x_d7PPPPPPPnv_interaction_y_d7PPPPPPPnv_interaction_z_d7',
@@ -73,6 +73,25 @@ class NVCentreLargeSpinBath(
             # 'nv_spin_y_d4' : 3.4842202054983122, 
             # 'nv_spin_z_d4' : 4.96477790489201143, 
 
+
+            # TEST BC result
+            # 'nv_spin_x_d2' : -0.29627351871261692, 
+            # 'nv_spin_y_d2' : 6.0469105229387585, 
+            # 'nv_spin_z_d2' : 1.4620596579495875, 
+            # 'nv_interaction_x_d2' : 6.4175839502356062, 
+            # 'nv_interaction_y_d2' :  3.4929106217322978, 
+            # 'nv_interaction_z_d2' : 1.8283790959959856, 
+
+            # 'nv_spin_x_d2' : -0.19154543341577981, 
+            # 'nv_spin_y_d2' : 6.5164820324203241, 
+            # 'nv_spin_z_d2' : 1.0849269715625818, 
+            # 'nv_interaction_x_d2' : 6.0533305968705937, 
+            # 'nv_interaction_y_d2' :  2.9629568717976205, 
+            # 'nv_interaction_z_d2' : 1.8599206790493994, 
+
+            
+
+            # values for simulation
             'nv_spin_x_d2' : -0.98288958683093952, 
             'nv_spin_y_d2' : 6.4842202054983122, 
             'nv_spin_z_d2' : 0.96477790489201143, 

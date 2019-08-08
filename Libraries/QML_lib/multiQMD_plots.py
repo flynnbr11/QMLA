@@ -1531,6 +1531,13 @@ def plot_scores(
     # ax2.invert_xaxis()
     ax2.set_xlabel('$R^2$')
     ax2.xaxis.tick_top()
+    
+    r_sq_x_ticks = [
+        min(coeff_of_determination), 
+        0, 
+        1
+    ]
+    ax2.set_xticks(r_sq_x_ticks)
     ax2.legend(
         bbox_to_anchor=(1.0, 0.9), 
     )
@@ -1559,7 +1566,7 @@ def plot_scores(
     #     custom_lines, 
     #     custom_handles
     # )
-    plt.title(plot_title)
+    # plt.title(plot_title)
     plt.ylabel('Model')
     # plt.xlabel('Number of wins')
     #plt.bar(scores, latex_model_names)
