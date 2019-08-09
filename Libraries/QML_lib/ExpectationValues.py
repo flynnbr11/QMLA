@@ -596,7 +596,8 @@ def n_qubit_hahn_evolution(
         inversion_gate = make_inversion_gate(num_qubits)
 
 
-
+    # print("[expectation values] N qubit Hahn evolution. dimension {}".format(np.shape(ham)))
+    # print("state:", state)
     first_unitary_time_evolution = linalg.expm(-1j*ham*t)
     second_unitary_time_evolution = np.linalg.matrix_power(
         first_unitary_time_evolution, 

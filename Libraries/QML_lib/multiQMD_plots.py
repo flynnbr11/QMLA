@@ -1500,7 +1500,6 @@ def plot_scores(
     )
     ax1.set_xlabel('Number wins')
     xticks_pos = list(range(max(scores)+1))
-    print("[MODEL SCORES] xticks:", xticks_pos)
     ax1.set_xticks(
         xticks_pos,
         minor=False

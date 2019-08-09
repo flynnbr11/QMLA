@@ -21,6 +21,7 @@ import Hopping
 import IsingMultiAxis
 import Ising2D 
 import Pauli_pairwise_probabilistic_nearest_neighbour
+import Nearest_neighbour_pauli_2D
 
 growth_classes = {
     # 'test_growth_class' : 
@@ -56,7 +57,10 @@ growth_classes = {
     'hopping_topology' : 
         Hopping.hopping,
     'pairwise_pauli_probabilistic_nearest_neighbour' : 
-        Pauli_pairwise_probabilistic_nearest_neighbour.PauliPairwiseNearestNeighbourProbabilistic
+        Pauli_pairwise_probabilistic_nearest_neighbour.PauliPairwiseNearestNeighbourProbabilistic,
+    'nearest_neighbour_pauli_2D' : 
+        Nearest_neighbour_pauli_2D.nearestNeighbourPauli2D
+
 }
 
 

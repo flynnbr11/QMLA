@@ -40,7 +40,7 @@ class PauliPairwiseNearestNeighbourProbabilistic(
         ]
         self.num_top_models_to_build_on = 'all' # at each generation Badassness parameter
         self.model_generation_strictness = 0 #1 #-1 
-        self.fitness_win_ratio_exponent = 0.1
+        self.fitness_win_ratio_exponent = 0.5
         self.initial_models = pairwise_pauli_like_like_terms(
         # self.initial_models = pairwise_pauli_terms(
             base_terms = self.base_terms, 

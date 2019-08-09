@@ -324,7 +324,7 @@ class SpinProbabilistic(
         # TODO make fitness parameters within QMD 
         # pass 
         # print("model fitness function. fitness params:", fitness_parameters)
-        print("[prob spin] model fitness. model points:", model_points)
+        # print("[prob spin] model fitness. model points:", model_points)
         ranked_model_list = sorted(
             model_points, 
             key=model_points.get, 

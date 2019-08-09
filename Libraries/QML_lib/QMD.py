@@ -2410,7 +2410,9 @@ class QMD():
                 "After model generation for growth rule", 
                 growth_rule, 
                 "SPAWN STAGE:", 
-                self.SpawnStage[growth_rule]
+                self.SpawnStage[growth_rule],
+                "\nnew models:", 
+                new_models
             ]
         )
 
@@ -2594,9 +2596,15 @@ class QMD():
     def runMultipleModelQHL(self, model_names=None):
         if model_names is None:
             model_names = self.InitialOpList
-        print("Model Names for multiple QHL:", model_names)
+        
         current_models = list(
             self.ModelsBranches.keys()
+        )
+        self.log_print(
+            [
+            "Model Names for multiple QHL:", model_names,
+            "current models:", current_models
+            ]
         )
         models_to_add = []
         for mod in model_names:
@@ -2618,7 +2626,8 @@ class QMD():
 
         self.log_print(
             [
-            'run multiple QHL. names:', model_names
+            'run multiple QHL. names:', model_names,
+            "model ids:", self.multiQHL_model_ids
             ]
         )
 
