@@ -30,8 +30,8 @@ class nearestNeighbourPauli2D(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        self.lattice_dimension = 1
-        self.initial_num_sites = 3
+        self.lattice_dimension = 2
+        self.initial_num_sites = 2
 
         self.topology = ModelGeneration.topology_grid(
             dimension = self.lattice_dimension,
@@ -55,13 +55,13 @@ class nearestNeighbourPauli2D(
         )
 
         # fitness calculation parameters. fitness calculation inherited.
-        self.num_top_models_to_build_on = 'all' # at each generation Badassness parameter
+        self.num_top_models_to_build_on = 1 # 'all' # at each generation Badassness parameter
         self.model_generation_strictness = 0 #1 #-1 
-        self.fitness_win_ratio_exponent = 0.5
+        self.fitness_win_ratio_exponent = 3
 
         self.generation_DAG = 1
         
-        self.max_num_generations = 4
+        self.max_num_generations = 3
 
 
         self.model_fitness = {}
@@ -74,7 +74,8 @@ class nearestNeighbourPauli2D(
 
         self.tree_completed_initially = False
         self.spawn_stage = [None]
-
+        # if len(self.initial_models) == 1:
+        #     self.spawn_stage.append('make_new_generation')
         self.available_mods_by_generation = {}
         self.available_mods_by_generation[self.generation_DAG] = pauli_like_like_terms_connected_sites(
             connected_sites = self.initially_connected_sites, 
@@ -92,7 +93,7 @@ class nearestNeighbourPauli2D(
         self.generation_champs = {
             self.generation_DAG : {}
         }
-        self.sub_generation_idx = 1 
+        self.sub_generation_idx = 0 
         self.counter =0
 
         self.max_num_models_by_shape = {
@@ -158,34 +159,34 @@ class nearestNeighbourPauli2D(
         if self.spawn_stage[-1] == None:
             # within dimension; just add each term in available terms to 
             # old models (probabilistically). 
-            for mod_id in self.models_to_build_on[self.generation_DAG][self.sub_generation_idx]:
-                mod_name = kwargs['model_names_ids'][mod_id]
 
-                present_terms = DataBase.get_constituent_names_from_name(mod_name)
-                possible_new_terms = list(
-                    set(self.available_mods_by_generation[self.generation_DAG])
-                    - set(present_terms)
-                )
+            if self.sub_generation_idx == self.max_num_sub_generations_per_generation[self.generation_DAG]:
+                # give back champs from this generation and indicate to make new generation
+                print("exhausted this generation.")
+                print("generation champs:", self.generation_champs[self.generation_DAG])
+                self.spawn_stage.append('make_new_generation')
+                new_models = [
+                    self.generation_champs[self.generation_DAG][k] for k in 
+                    list(self.generation_champs[self.generation_DAG].keys())
+                ]
+                new_models = flatten(new_models)
+                print("new mods:", new_models)
 
+                if self.generation_DAG == self.max_num_generations:
+                    # this was the final generation to learn.
+                    # instead of building new generation, skip straight to Complete stage
+                    self.spawn_stage.append('Complete')
 
-                if self.sub_generation_idx == self.max_num_sub_generations_per_generation[self.generation_DAG]:
-                    # give back champs from this generation and indicate to make new generation
-                    print("exhausted this generation.")
-                    print("generation champs:", self.generation_champs[self.generation_DAG])
-                    self.spawn_stage.append('make_new_generation')
-                    new_models = [
-                        self.generation_champs[self.generation_DAG][k] for k in 
-                        list(self.generation_champs[self.generation_DAG].keys())
-                    ]
-                    new_models = flatten(new_models)
-                    print("new mods:", new_models)
+            else:
+                for mod_id in self.models_to_build_on[self.generation_DAG][self.sub_generation_idx]:
+                    mod_name = kwargs['model_names_ids'][mod_id]
 
-                    if self.generation_DAG == self.max_num_generations:
-                        # this was the final generation to learn.
-                        # instead of building new generation, skip straight to Complete stage
-                        self.spawn_stage.append('Complete')
+                    present_terms = DataBase.get_constituent_names_from_name(mod_name)
+                    possible_new_terms = list(
+                        set(self.available_mods_by_generation[self.generation_DAG])
+                        - set(present_terms)
+                    )
 
-                else:
                     # print("mod_name:", mod_name)
                     # print("available terms:", self.available_mods_by_generation[self.generation_DAG])
                     # print("present terms:", present_terms)
@@ -215,7 +216,7 @@ class nearestNeighbourPauli2D(
                             self.models_rejected[self.generation_DAG].append(new_mod)
         elif self.spawn_stage[-1] == 'make_new_generation':
             self.generation_DAG += 1
-            self.sub_generation_idx = 1 
+            self.sub_generation_idx = 0 
 
             self.models_to_build_on = {
                 self.generation_DAG : {}
@@ -276,6 +277,9 @@ class nearestNeighbourPauli2D(
                         self.models_rejected[self.generation_DAG].append(new_mod)
 
             self.spawn_stage.append(None)
+            # if self.max_num_sub_generations_per_generation[self.generation_DAG] == 1:
+            #     self.spawn_stage.append('make_new_generation')
+
 
 
         elif self.spawn_stage[-1] == 'Complete':
@@ -347,6 +351,17 @@ class nearestNeighbourPauli2D(
                 latex_term += this_term
         latex_term = "${}$".format(latex_term)
         return latex_term
+
+    def name_branch_map(
+        self,
+        latex_mapping_file, 
+        **kwargs
+    ):
+        import ModelNames
+        return ModelNames.branch_is_num_params_and_qubits(
+            latex_mapping_file = latex_mapping_file,
+            **kwargs
+        )
 
 
 

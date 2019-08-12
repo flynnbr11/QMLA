@@ -2558,7 +2558,6 @@ class topology_grid():
             new_row = min_span_row_idx
 
         new_coordinate = [new_row, new_col]
-        print("new coordinate:", new_coordinate)
 
         try:
             self.occupation['rows'][new_row].append(new_col)
@@ -2575,7 +2574,6 @@ class topology_grid():
         new_site_idx = max_site_idx + 1
         self.nearest_neighbours[new_site_idx] = []
         for i in self.site_indices:
-            print("site idx: ", i)
             other_coords = self.coordinates[i] 
             nearest_neighbour = self.check_nearest_neighbour_sites(
                 site_1 = new_coordinate,
