@@ -217,7 +217,8 @@ def restore_dec_13_probe_generation(
 
 def experimental_NVcentre_ising_probes(
     max_num_qubits=2, 
-    num_probes=40
+    num_probes=40,
+    **kwargs
 ):
     """
     Returns a dict of separable probes where the first qubit always acts on 
