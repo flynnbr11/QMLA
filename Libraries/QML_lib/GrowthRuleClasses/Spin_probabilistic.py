@@ -389,7 +389,10 @@ class SpinProbabilistic(
         latex_mapping_file, 
         **kwargs
     ):
+
         import ModelNames
+        # TODO get generation idx + sub generation idx
+
         return ModelNames.branch_is_num_params_and_qubits(
             latex_mapping_file = latex_mapping_file,
             **kwargs

@@ -30,7 +30,7 @@ class nearestNeighbourPauli2D(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        self.lattice_dimension = 2
+        self.lattice_dimension = 1
         self.initial_num_sites = 2
 
         self.topology = ModelGeneration.topology_grid(
@@ -43,8 +43,8 @@ class nearestNeighbourPauli2D(
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
-            'x', 
-            'y', 
+            # 'x', 
+            # 'y', 
             'z'
         ]
 
@@ -60,8 +60,8 @@ class nearestNeighbourPauli2D(
         self.fitness_win_ratio_exponent = 3
 
         self.generation_DAG = 1
-        
-        self.max_num_generations = 3
+        self.max_num_sites = 4
+        self.max_num_generations = self.max_num_sites - self.initial_num_sites + self.generation_DAG
 
 
         self.model_fitness = {}
@@ -351,18 +351,6 @@ class nearestNeighbourPauli2D(
                 latex_term += this_term
         latex_term = "${}$".format(latex_term)
         return latex_term
-
-    def name_branch_map(
-        self,
-        latex_mapping_file, 
-        **kwargs
-    ):
-        import ModelNames
-        return ModelNames.branch_is_num_params_and_qubits(
-            latex_mapping_file = latex_mapping_file,
-            **kwargs
-        )
-
 
 
 

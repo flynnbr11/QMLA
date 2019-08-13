@@ -29,8 +29,9 @@ class NVCentreLargeSpinBath(
         else:
             self.use_experimental_data = False
         if self.use_experimental_data == True:
-            self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+            # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
             # self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
+            self.probe_generation_function = ProbeGeneration.plus_probes_dict
 
         self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
 
