@@ -5,11 +5,10 @@ sys.path.append(os.path.abspath('..'))
 import DataBase
 import ProbeGeneration
 
-from SuperClassGrowthRule import GrowthRuleSuper
-import NV_centre_large_spin_bath
+import NVCentreLargeSpinBath
 
-class NVFitnessGrowth(
-    NV_centre_large_spin_bath.NVCentreLargeSpinBath
+class nv_fitness_growth(
+    NVCentreLargeSpinBath.nv_centre_large_spin_bath
 ):
 
     def __init__(
@@ -55,7 +54,7 @@ class NVFitnessGrowth(
         model_list, 
         **kwargs
     ):
-        fitness = kwargs['fitness_parameters']
+        # fitness = kwargs['fitness_parameters']
         model_points = kwargs['branch_model_points']
         branch_models = list(model_points.keys())
 
@@ -73,7 +72,7 @@ class NVFitnessGrowth(
             for mod_id in self.models_to_build_on[self.generation_DAG]:
                 self.model_fitness_calculation(
                     model_id = mod_id,
-                    fitness_parameters = fitness[mod_id],
+                    # fitness_parameters = fitness[mod_id],
                     model_points = model_points
                 )
                 mod_name = kwargs['model_names_ids'][mod_id]
@@ -114,7 +113,7 @@ class NVFitnessGrowth(
     def model_fitness_calculation(
         self, 
         model_id, 
-        fitness_parameters, # of this model_id
+        # fitness_parameters, # of this model_id
         model_points, 
         **kwargs
     ):

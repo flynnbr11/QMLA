@@ -584,7 +584,15 @@ def Bayes_t_test(
     # print("[BayesTTest - param avg] unique_growth_rules:", unique_growth_rules)
     # print("[BayesTTest - param avg] unique_growth_classes:", unique_growth_classes)
     # print("[BayesTTest - param avg] growth classes:", growth_classes)
-    true_model = unique_growth_classes[growth_generator].true_operator
+    try:
+        true_model = unique_growth_classes[growth_generator].true_operator
+    except:
+        print("Couldn't find growth rule of {} in \n {}".format(
+            growth_generator, 
+            unique_growth_classes
+            )
+        )
+        raise
 
     collect_expectation_values = {
         'means' : {},

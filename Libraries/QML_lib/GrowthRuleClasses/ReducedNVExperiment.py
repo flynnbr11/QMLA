@@ -1,11 +1,10 @@
 import sys, os
 sys.path.append(os.path.abspath('..'))
 
-from NV_centre_full_access import NVCentreSpinFullAccess
+import NVCentreFullAccess
 
-
-class reducedNVExperiment(
-    NVCentreSpinFullAccess
+class reduced_nv_experiment(
+    NVCentreFullAccess.nv_centre_spin_full_access
 ):
     def __init__(
         self, 

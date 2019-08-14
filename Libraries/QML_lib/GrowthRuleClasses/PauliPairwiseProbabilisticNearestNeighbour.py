@@ -7,14 +7,11 @@ import ProbeGeneration
 import ModelNames
 import Heuristics
 
-import SuperClassGrowthRule
-import NV_centre_large_spin_bath
-import NV_grow_by_fitness
-import Spin_probabilistic
+import SpinProbabilistic
 
 
-class PauliPairwiseNearestNeighbourProbabilistic(
-    Spin_probabilistic.SpinProbabilistic
+class pauli_pairwise_nearest_neighbour_probabilistic(
+    SpinProbabilistic.spin_probabilistic
 ):
 
     def __init__(

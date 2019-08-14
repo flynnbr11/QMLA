@@ -3,10 +3,10 @@ sys.path.append(os.path.abspath('..'))
 import DataBase
 import ProbeGeneration
 
-from SuperClassGrowthRule import GrowthRuleSuper
+import SuperClassGrowthRule
 
-class isingChain(
-	GrowthRuleSuper
+class ising_chain(
+    SuperClassGrowthRule.growth_rule_super_class
 ):
 
     def __init__(

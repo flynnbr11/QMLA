@@ -5,9 +5,11 @@ import ExpectationValues
 import Heuristics
 
 
-from SuperClassGrowthRule import GrowthRuleSuper
+import SuperClassGrowthRule 
 
-class NVCentreSpinFullAccess(GrowthRuleSuper):
+class nv_centre_spin_full_access(
+    SuperClassGrowthRule.growth_rule_super_class
+):
     def __init__(
         self, 
         growth_generation_rule, 

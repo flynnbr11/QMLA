@@ -1,8 +1,8 @@
-import NV_centre_experiment_growth_rules
+import NVCentreExperimentGrowthRules
 
 
-class NVCentreSpinExperimentalMethodWithoutTransvereTerms(
-	NV_centre_experiment_growth_rules.NVCentreSpinExperimentalMethod
+class nv_centre_spin_experimental_method_without_transvere_terms(
+	NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method
 ):
     def __init__(
         self, 

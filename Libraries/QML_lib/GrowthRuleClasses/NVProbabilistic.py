@@ -5,12 +5,10 @@ sys.path.append(os.path.abspath('..'))
 import DataBase
 import ProbeGeneration
 
-from SuperClassGrowthRule import GrowthRuleSuper
-import NV_centre_large_spin_bath
-import NV_grow_by_fitness
+import NVGrowByFitness
 
-class NVProbabilistic(
-    NV_grow_by_fitness.NVFitnessGrowth
+class nv_probabilistic(
+    NVGrowByFitness.nv_fitness_growth
 ):
 
     def __init__(

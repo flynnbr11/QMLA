@@ -5,23 +5,26 @@ this_dir = str(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append((os.path.join(this_dir, "GrowthRuleClasses")))
 
 import SuperClassGrowthRule
-import NV_centre_experiment_growth_rules
-import NV_centre_full_access
-import NV_centre_large_spin_bath
-import NV_centre_experiment_without_transverse_terms
-import NV_centre_revivals
-import NV_grow_by_fitness
-import NV_probabilistic
-import Reduced_NV_experiment
-import Spin_probabilistic
+import NVCentreExperimentGrowthRules
+import NVCentreFullAccess
+import NVCentreLargeSpinBath
+import NVCentreExperimentWithoutTransverseTerms
+import NVCentreRevivals
+import NVGrowByFitness
+import NVProbabilistic
+import ReducedNVExperiment
+import SpinProbabilistic
 import IsingChain
 import Hubbard
 import Heisenberg
 import Hopping
 import IsingMultiAxis
 import Ising2D 
-import Pauli_pairwise_probabilistic_nearest_neighbour
-import Nearest_neighbour_pauli_2D
+import PauliPairwiseProbabilisticNearestNeighbour
+import ConnectedLattice
+import HoppingProbabilistic
+import IsingProbabilistic
+import HeisenbergXYZProbabilistic
 
 growth_classes = {
     # 'test_growth_class' : 
@@ -29,38 +32,43 @@ growth_classes = {
     # 'two_qubit_ising_rotation_hyperfine_transverse' : 
     #     SuperClassGrowthRule.default_growth, 
     'two_qubit_ising_rotation_hyperfine_transverse' : 
-        NV_centre_experiment_growth_rules.NVCentreSpinExperimentalMethod,
+        NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method,
     'two_qubit_ising_rotation_hyperfine' : 
-        NV_centre_experiment_without_transverse_terms.NVCentreSpinExperimentalMethodWithoutTransvereTerms,
+        NVCentreExperimentWithoutTransverseTerms.nv_centre_spin_experimental_method_without_transvere_terms,
     'NV_fitness_growth' : 
-        NV_grow_by_fitness.NVFitnessGrowth, 
+        NVGrowByFitness.nv_fitness_growth, 
     'NV_centre_revivals' : 
-        NV_centre_revivals.NVCentreRevivalData,
+        NVCentreRevivals.nv_centre_revival_data,
     'NV_spin_full_access' : 
-        NV_centre_full_access.NVCentreSpinFullAccess,
+        NVCentreFullAccess.nv_centre_spin_full_access,
     'NV_centre_spin_large_bath' : 
-        NV_centre_large_spin_bath.NVCentreLargeSpinBath,
+        NVCentreLargeSpinBath.nv_centre_large_spin_bath,
     'reduced_nv_experiment' : 
-        Reduced_NV_experiment.reducedNVExperiment,
+        ReducedNVExperiment.reduced_nv_experiment,
     'probabilistic_spin' :
-        Spin_probabilistic.SpinProbabilistic,
+        SpinProbabilistic.spin_probabilistic,
     'ising_1d_chain' : 
-        IsingChain.isingChain,
+        IsingChain.ising_chain,
     'ising_multi_axis' : 
-        IsingMultiAxis.isingChainMultiAxis, 
+        IsingMultiAxis.ising_chain_multi_axis, 
     'ising_2d' : 
-        Ising2D.ising2D,
+        Ising2D.ising_2D,
     'hubbard_square_lattice_generalised' : 
-        Hubbard.hubbardSquare,
+        Hubbard.hubbard_square,
     'heisenberg_xyz' : 
-        Heisenberg.heisenbergXYZ, 
+        Heisenberg.heisenberg_XYZ, 
     'hopping_topology' : 
         Hopping.hopping,
     'pairwise_pauli_probabilistic_nearest_neighbour' : 
-        Pauli_pairwise_probabilistic_nearest_neighbour.PauliPairwiseNearestNeighbourProbabilistic,
+        PauliPairwiseProbabilisticNearestNeighbour.pauli_pairwise_nearest_neighbour_probabilistic,
     'nearest_neighbour_pauli_2D' : 
-        Nearest_neighbour_pauli_2D.nearestNeighbourPauli2D
-
+        ConnectedLattice.connected_lattice,
+    'hopping_probabilistic' : 
+        HoppingProbabilistic.hopping_probabilistic,
+    'ising_probabilistic' : 
+        IsingProbabilistic.ising_chain_probabilistic,
+    'heisenberg_xyz_probabilistic' :
+        HeisenbergXYZProbabilistic.heisenberg_xyz_probabilistic
 }
 
 

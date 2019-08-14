@@ -8,13 +8,9 @@ import ModelNames
 import Heuristics
 
 import SuperClassGrowthRule
-import NV_centre_large_spin_bath
-import NV_grow_by_fitness
 
-
-
-class SpinProbabilistic(
-    SuperClassGrowthRule.GrowthRuleSuper
+class spin_probabilistic(
+    SuperClassGrowthRule.growth_rule_super_class
 ):
 
     def __init__(
@@ -317,7 +313,7 @@ class SpinProbabilistic(
     def model_fitness_calculation(
         self, 
         model_id, 
-        fitness_parameters, # of this model_id
+        # fitness_parameters, # of this model_id
         model_points, 
         **kwargs
     ):

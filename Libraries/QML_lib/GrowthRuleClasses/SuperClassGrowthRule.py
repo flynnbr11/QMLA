@@ -6,7 +6,7 @@ import ProbeGeneration
 import Heuristics
 # import Heuristics
 
-class GrowthRuleSuper():
+class growth_rule_super_class():
     # superclass for growth generation rules
     
     def __init__(

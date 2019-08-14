@@ -2,10 +2,10 @@ import sys, os
 sys.path.append(os.path.abspath('..'))
 import DataBase
 
-from SuperClassGrowthRule import GrowthRuleSuper
+import SuperClassGrowthRule
 
-class heisenbergXYZ(
-    GrowthRuleSuper
+class heisenberg_XYZ(
+    SuperClassGrowthRule.growth_rule_super_class
 ):
 
     def __init__(

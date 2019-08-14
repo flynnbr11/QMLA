@@ -3,10 +3,12 @@ import numpy as np
 sys.path.append(os.path.abspath('..'))
 import DataBase
 
-from SuperClassGrowthRule import GrowthRuleSuper
+import SuperClassGrowthRule
 
 
-class hubbardSquare(GrowthRuleSuper):
+class hubbard_square(
+    SuperClassGrowthRule.growth_rule_super_class
+):
     def __init__(
         self, 
         growth_generation_rule, 

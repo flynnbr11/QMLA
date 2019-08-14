@@ -4,15 +4,12 @@ import DataBase
 import ProbeGeneration
 import ModelNames
 
-# from SuperClassGrowthRule import GrowthRuleSuper
-import SuperClassGrowthRule
 import IsingChain 
 
 
 
-class isingChainMultiAxis(
-	# SuperClassGrowthRule.GrowthRuleSuper
-    IsingChain.isingChain
+class ising_chain_multi_axis(
+    IsingChain.ising_chain
 ):
 
     def __init__(

@@ -4,10 +4,10 @@ import DataBase
 import ExpectationValues
 import ProbeGeneration
 
-from NV_centre_full_access import NVCentreSpinFullAccess
+import NVCentreFullAccess 
 
-class NVCentreSpinExperimentalMethod(
-    NVCentreSpinFullAccess # inherit from this
+class nv_centre_spin_experimental_method(
+    NVCentreFullAccess.nv_centre_spin_full_access # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations

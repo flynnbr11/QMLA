@@ -4,16 +4,13 @@ import DataBase
 import ProbeGeneration
 import ModelGeneration
 
-# from SuperClassGrowthRule import GrowthRuleSuper
-import SuperClassGrowthRule
-import IsingChain 
 import IsingMultiAxis
 
 
 
-class ising2D(
+class ising_2D(
     # SuperClassGrowthRule.GrowthRuleSuper
-    IsingMultiAxis.isingChainMultiAxis
+    IsingMultiAxis.ising_chain_multi_axis
 ):
 
     def __init__(

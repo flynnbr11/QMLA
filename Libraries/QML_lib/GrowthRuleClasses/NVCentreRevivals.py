@@ -4,12 +4,10 @@ import DataBase
 import ExpectationValues
 import ProbeGeneration
 
-from NV_centre_experiment_growth_rules import NVCentreSpinExperimentalMethod
-# from NV_centre_large_spin_bath import NVCentreLargeSpinBath
-import NV_centre_large_spin_bath
+import NVCentreLargeSpinBath
 
-class NVCentreRevivalData(
-    NV_centre_large_spin_bath.NVCentreLargeSpinBath # inherit from this
+class nv_centre_revival_data(
+    NVCentreLargeSpinBath.nv_centre_large_spin_bath # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations

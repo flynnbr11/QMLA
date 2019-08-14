@@ -5,10 +5,10 @@ import ExpectationValues
 import ProbeGeneration
 import Heuristics
 
-from NV_centre_full_access import NVCentreSpinFullAccess
+import NVCentreFullAccess
 
-class NVCentreLargeSpinBath(
-    NVCentreSpinFullAccess # inherit from this
+class nv_centre_large_spin_bath(
+    NVCentreFullAccess.nv_centre_spin_full_access # inherit from this
 ):
     # Uses some of the same functionality as
     # default NV centre spin experiments/simulations

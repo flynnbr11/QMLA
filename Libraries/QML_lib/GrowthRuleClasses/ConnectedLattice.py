@@ -6,18 +6,16 @@ import DataBase
 import ProbeGeneration
 import ModelNames
 import ModelGeneration
+import SystemTopology
 import Heuristics
 
-import SuperClassGrowthRule
-import NV_centre_large_spin_bath
-import NV_grow_by_fitness
-import Spin_probabilistic
+import SpinProbabilistic
 
 flatten = lambda l: [item for sublist in l for item in sublist]  # flatten list of lists
 
 
-class nearestNeighbourPauli2D(
-    Spin_probabilistic.SpinProbabilistic
+class connected_lattice(
+    SpinProbabilistic.spin_probabilistic
 ):
 
     def __init__(
@@ -30,30 +28,20 @@ class nearestNeighbourPauli2D(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        self.lattice_dimension = 1
+        self.lattice_dimension = 2
         self.initial_num_sites = 2
-
-        self.topology = ModelGeneration.topology_grid(
-            dimension = self.lattice_dimension,
-            num_sites = self.initial_num_sites
-        )
-        self.initially_connected_sites = self.topology.get_nearest_neighbour_list()
+        self.lattice_connectivity_max_distance = 1
+        self.lattice_connectivity_linear_only = True
+        self.lattice_full_connectivity = False
 
         self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
-            # 'x', 
-            # 'y', 
+            'x', 
+            'y', 
             'z'
         ]
-
-        self.initial_models = pauli_like_like_terms_connected_sites(
-            connected_sites = self.initially_connected_sites, 
-            base_terms = self.base_terms, 
-            num_sites = self.topology.num_sites() 
-        )
-
         # fitness calculation parameters. fitness calculation inherited.
         self.num_top_models_to_build_on = 1 # 'all' # at each generation Badassness parameter
         self.model_generation_strictness = 0 #1 #-1 
@@ -61,8 +49,31 @@ class nearestNeighbourPauli2D(
 
         self.generation_DAG = 1
         self.max_num_sites = 4
-        self.max_num_generations = self.max_num_sites - self.initial_num_sites + self.generation_DAG
+        self.tree_completed_initially = False
+        self.num_processes_to_parallelise_over = 10
+        self.max_num_models_by_shape = {
+            'other' : 10
+        }
 
+
+        self.setup_growth_class()
+
+    def setup_growth_class(self):
+        self.max_num_generations = self.max_num_sites - self.initial_num_sites + self.generation_DAG
+        self.topology = SystemTopology.topology_grid(
+            dimension = self.lattice_dimension,
+            num_sites = self.initial_num_sites,
+            maximum_connection_distance = self.lattice_connectivity_max_distance, # nearest neighbours only, 
+            linear_connections_only = self.lattice_connectivity_linear_only, 
+            all_sites_connected = self.lattice_full_connectivity, 
+        )
+        self.initially_connected_sites = self.topology.get_connected_site_list()
+
+        self.initial_models = self.generate_terms_from_new_site(
+            connected_sites = self.initially_connected_sites, 
+            base_terms = self.base_terms, 
+            num_sites = self.topology.num_sites() 
+        )
 
         self.model_fitness = {}
         self.models_rejected = {
@@ -72,12 +83,9 @@ class nearestNeighbourPauli2D(
             self.generation_DAG : []
         }
 
-        self.tree_completed_initially = False
         self.spawn_stage = [None]
-        # if len(self.initial_models) == 1:
-        #     self.spawn_stage.append('make_new_generation')
         self.available_mods_by_generation = {}
-        self.available_mods_by_generation[self.generation_DAG] = pauli_like_like_terms_connected_sites(
+        self.available_mods_by_generation[self.generation_DAG] = self.generate_terms_from_new_site(
             connected_sites = self.initially_connected_sites, 
             base_terms = self.base_terms, 
             num_sites = self.topology.num_sites() 
@@ -86,7 +94,6 @@ class nearestNeighbourPauli2D(
         self.max_num_sub_generations_per_generation = {
             self.generation_DAG : len(self.available_mods_by_generation[self.generation_DAG])
         }
-        # self.num_sub_generations_per_generation = {}
         self.models_to_build_on = {
             self.generation_DAG : {}
         }
@@ -95,14 +102,6 @@ class nearestNeighbourPauli2D(
         }
         self.sub_generation_idx = 0 
         self.counter =0
-
-        self.max_num_models_by_shape = {
-            'other' : 10
-        }
-        self.num_processes_to_parallelise_over = 10
-
-
-
 
 
 
@@ -128,7 +127,7 @@ class nearestNeighbourPauli2D(
         cases are indicated by self.spawn_stage
         """
 
-        fitness = kwargs['fitness_parameters']
+        # fitness = kwargs['fitness_parameters']
         model_points = kwargs['branch_model_points']
         branch_models = list(model_points.keys())
         # keep track of generation_DAG
@@ -150,11 +149,6 @@ class nearestNeighbourPauli2D(
 
         self.counter+=1
         new_models = []
-
-        # print("[generate models] counter", self.counter)
-        # print("[generate models] input model list", model_list)
-        # print("[generate models] ranked model list", models_to_build_on)
-        # print("[generate models] mods to build on:", [self.latex_name(kwargs['model_names_ids'][m]) for m in models_to_build_on])
 
         if self.spawn_stage[-1] == None:
             # within dimension; just add each term in available terms to 
@@ -187,13 +181,9 @@ class nearestNeighbourPauli2D(
                         - set(present_terms)
                     )
 
-                    # print("mod_name:", mod_name)
-                    # print("available terms:", self.available_mods_by_generation[self.generation_DAG])
-                    # print("present terms:", present_terms)
-                    # print("possible_new_terms:", possible_new_terms)
                     self.model_fitness_calculation(
                         model_id = mod_id,
-                        fitness_parameters = fitness[mod_id],
+                        # fitness_parameters = fitness[mod_id],
                         model_points = model_points
                     )
                     
@@ -231,12 +221,13 @@ class nearestNeighbourPauli2D(
                 self.generation_DAG : []
             }
             self.topology.add_site()
-            nearest_neighbours = self.topology.get_nearest_neighbour_list()
-            new_connections = list(
-                set(nearest_neighbours) - set(self.site_connections_considered)
-            )
+            # nearest_neighbours = self.topology.get_nearest_neighbour_list()
+            # new_connections = list(
+            #     set(nearest_neighbours) - set(self.site_connections_considered)
+            # )
+            new_connections = self.topology.new_connections[-1]
             self.site_connections_considered.extend(new_connections)
-            possible_new_terms = pauli_like_like_terms_connected_sites(
+            possible_new_terms = self.generate_terms_from_new_site(
                 connected_sites = new_connections, 
                 base_terms = self.base_terms,
                 num_sites = self.topology.num_sites()
@@ -250,14 +241,14 @@ class nearestNeighbourPauli2D(
             for mod_id in models_to_build_on:
                 new_num_sites = self.topology.num_sites()
                 mod_name = kwargs['model_names_ids'][mod_id]
-                mod_name = Spin_probabilistic.increase_dimension_pauli_set(
+                mod_name = SpinProbabilistic.increase_dimension_pauli_set(
                     mod_name,
                     new_dimension = new_num_sites
                 )
 
                 self.model_fitness_calculation(
                     model_id = mod_id,
-                    fitness_parameters = fitness[mod_id],
+                    # fitness_parameters = fitness[mod_id],
                     model_points = model_points
                 )
 
@@ -351,6 +342,19 @@ class nearestNeighbourPauli2D(
                 latex_term += this_term
         latex_term = "${}$".format(latex_term)
         return latex_term
+
+    def generate_terms_from_new_site(
+        self, 
+        base_terms, 
+        connected_sites,
+        num_sites 
+    ):
+
+        return pauli_like_like_terms_connected_sites(
+            connected_sites = connected_sites, 
+            base_terms = base_terms, 
+            num_sites = num_sites
+        )
 
 
 
