@@ -275,8 +275,24 @@ for f in pickled_files:
     if alph not in list(growth_rules.keys()):
         growth_rules[alph] = result['GrowthGenerator']
 
-unique_growth_rules = list(set(list(growth_rules.values())))
+# unique_growth_rules = list(set(list(growth_rules.values())))
+# unique_growth_classes = {}
+# for g in unique_growth_rules:
+#     try:
+#         unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
+#             growth_generation_rule = g
+#         )
+#     except:
+#         unique_growth_classes[g] = None
+# growth_classes = {}
+# for g in list(growth_rules.keys()):
+#     try:
+#         growth_classes[g] = unique_growth_classes[growth_rules[g]]
+#     except:
+#         growth_classes[g] = None
+
 unique_growth_classes = {}
+unique_growth_rules = true_params_info['all_growth_classes']
 for g in unique_growth_rules:
     try:
         unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
@@ -284,18 +300,16 @@ for g in unique_growth_rules:
         )
     except:
         unique_growth_classes[g] = None
-growth_classes = {}
-for g in list(growth_rules.keys()):
-    try:
-        growth_classes[g] = unique_growth_classes[growth_rules[g]]
-    except:
-        growth_classes[g] = None
 
 
+print("[AnalyseMultipleQMD] unique growth classes:", unique_growth_classes)
 
 
 # first get model scores
-model_scores, growth_rules, growth_classes, unique_growth_classes, median_coeff_determination = get_model_scores(directory_to_analyse)
+model_scores, growth_rules, growth_classes, unique_growth_classes, median_coeff_determination = get_model_scores(
+    directory_name = directory_to_analyse,
+    unique_growth_classes = unique_growth_classes
+)
 
 # print("Avg coeff if determination", avg_coeff_determination)
 print("Average param estimates")
@@ -307,6 +321,7 @@ average_parameter_estimates(
     top_number_models = arguments.top_number_models,
     results_file_name_start=results_file_name_start,
     growth_generator = growth_generator,
+    unique_growth_classes = unique_growth_classes,
     true_params_dict = true_params_dict,
     save_to_file=  str(
         directory_to_analyse + 
@@ -326,6 +341,7 @@ Bayes_t_test( # average expected values
     results_file_name_start = results_file_name_start,
     true_expectation_value_path = true_expec_path,
     growth_generator = growth_generator, 
+    unique_growth_classes = unique_growth_classes,
     top_number_models = arguments.top_number_models,
     plot_probe_file = plot_probe_file,
     collective_analysis_pickle_file = results_collection_file,

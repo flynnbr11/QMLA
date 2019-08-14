@@ -72,6 +72,8 @@ def create_qhl_params(
     pickle_file=None,
     random_vals=False, 
     growth_generator=None,
+    unique_growth_classes=None, 
+    all_growth_classes=None, 
     rand_min=None, 
     rand_max=None,
     exp_data=0,
@@ -155,7 +157,8 @@ def create_qhl_params(
             
     true_params_info = {
         'params_list' : true_params,
-        'params_dict' : true_params_dict
+        'params_dict' : true_params_dict,
+        'all_growth_classes' : all_growth_classes,
     }
     if exp_data: 
         print("\n\n\n[SetQHL] EXPDATA -- dont store true vals")
@@ -302,6 +305,15 @@ parser.add_argument(
   type=str,
   default=0
 )
+
+parser.add_argument(
+  '-agr', '--alternative_growth_rules',
+  help='Growth rules to form other trees.',
+  # type=str,
+  action='append',
+  default=[],
+)
+
 parser.add_argument(
   '-log', '--log_file',
   help='File to log RQ workers.',
@@ -397,6 +409,25 @@ growth_class = GrowthRules.get_growth_generator_class(
     # use_experimental_data = exp_data
 )
 
+all_growth_classes = [growth_generation_rule]
+alternative_growth_rules = arguments.alternative_growth_rules
+all_growth_classes.extend(alternative_growth_rules)
+
+print("[SETQHLPARAMS] growth generation rule:", growth_generation_rule)
+print("[SETQHLPARAMS] all growth classes:", all_growth_classes)
+
+unique_growth_classes = {}
+for g in all_growth_classes:
+    try:
+        unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
+            growth_generation_rule = g
+        )
+    except:
+        unique_growth_classes[g] = None
+
+
+
+
 true_operator = growth_class.true_operator
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
@@ -444,6 +475,8 @@ if arguments.true_params_file is not None:
         true_prior = true_prior,
         pickle_file=arguments.true_params_file,
         growth_generator=growth_generation_rule,
+        unique_growth_classes=unique_growth_classes,
+        all_growth_classes=all_growth_classes,
         random_vals=random_true_params, 
         rand_min=param_min, 
         rand_max=param_max,

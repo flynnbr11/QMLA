@@ -254,6 +254,7 @@ def average_parameter_estimates(
     results_path, 
     results_file_name_start='results',
     growth_generator=None, 
+    unique_growth_classes=None,
     top_number_models=2,
     true_params_dict=None,
     save_to_file=None
@@ -306,14 +307,6 @@ def average_parameter_estimates(
                 growth_rules[alph] = growth_generator
 
     unique_growth_rules = list(set(list(growth_rules.values())))
-    unique_growth_classes = {}
-    for g in unique_growth_rules:
-        try:
-            unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
-                growth_generation_rule = g
-            )
-        except:
-            unique_growth_classes[g] = None
     growth_classes = {}
     for g in list(growth_rules.keys()):
         try:
@@ -488,14 +481,16 @@ def Bayes_t_test(
     use_experimental_data=False,
     true_expectation_value_path=None,
     growth_generator = None, 
+    unique_growth_classes = None,
     plot_probe_file = None,
     top_number_models=2,
     save_true_expec_vals_alone_plot=True,
     collective_analysis_pickle_file=None, 
     save_to_file=None
 ):
+    print("[Bayes t test] unique_growth_classes:", unique_growth_classes)
+
     plt.switch_backend('agg')
-    print("Drawing avg expectation values from file:", results_path)
     from matplotlib import cm
     from scipy import stats
 
@@ -565,15 +560,6 @@ def Bayes_t_test(
         if alph not in list(growth_rules.keys()):
             growth_rules[alph] = result['GrowthGenerator']
 
-    unique_growth_rules = list(set(list(growth_rules.values())))
-    unique_growth_classes = {}
-    for g in unique_growth_rules:
-        try:
-            unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
-                growth_generation_rule = g
-            )
-        except:
-            unique_growth_classes[g] = None
     growth_classes = {}
     for g in list(growth_rules.keys()):
         try:
@@ -1265,7 +1251,7 @@ def all_times_learned_histogram(
 
 
         
-def get_model_scores(directory_name):
+def get_model_scores(directory_name, unique_growth_classes):
 #    sys.path.append(directory_name)
 
     os.chdir(directory_name)
@@ -1303,14 +1289,7 @@ def get_model_scores(directory_name):
         )
 
     unique_growth_rules = list(set(list(growth_rules.values())))
-    unique_growth_classes = {}
-    for g in unique_growth_rules:
-        try:
-            unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
-                growth_generation_rule = g
-            )
-        except:
-            unique_growth_classes[g] = None
+
     growth_classes = {}
     for g in list(growth_rules.keys()):
         try:

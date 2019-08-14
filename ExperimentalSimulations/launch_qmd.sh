@@ -206,6 +206,7 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -max=$param_max \
     -plus=$force_plot_plus \
     -sp=$special_probe_plot \
+    $growth_rules_command 
 
 
 for prt in  "${particle_counts[@]}";
