@@ -945,7 +945,9 @@ def add_model(
         )
         op = operator(name = sim_name, undimensionalised_name = model_name)
         num_rows = len(running_database)
-        qml_instance = ModelLearningClass(name=op.name, num_probes = num_probes,
+        qml_instance = ModelLearningClass(
+            name=op.name, 
+            num_probes = num_probes,
             probe_dict=probe_dict
         )
         sim_pars = []

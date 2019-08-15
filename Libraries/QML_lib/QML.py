@@ -1078,8 +1078,9 @@ class reducedModel():
         
     def updateLearnedValues(
         self, 
-        fitness_parameters, 
-        learned_info=None
+        # fitness_parameters, 
+        learned_info=None,
+        **kwargs
     ):
         """
         Pass a dict, learned_info, with essential info on 
@@ -1170,15 +1171,26 @@ class reducedModel():
                 self.Weights = 'Weights not stored.'
             
             sim_params = list(self.FinalParams[:,0])
-            self.LearnedHamiltonian = np.tensordot(
-                sim_params, 
-                self.SimOpList, 
-                axes=1
-            )
+            try:
+                self.LearnedHamiltonian = np.tensordot(
+                    sim_params, 
+                    self.SimOpList, 
+                    axes=1
+                )
+            except:
+                print(
+                    "[QML] trying to build learned hamiltonian for ",
+                    self.ModelID, " : ",
+                    self.Name, 
+                    "\nsim_params:", sim_params, 
+                    "\nsim op list", self.SimOpList
+                )
+                raise
 
-            if self.ModelID not in sorted(fitness_parameters.keys()):
-                fitness_parameters[self.ModelID] = {}
-            fitness_parameters[self.ModelID]['r_squared'] =  0.75
+
+            # if self.ModelID not in sorted(fitness_parameters.keys()):
+            #     fitness_parameters[self.ModelID] = {}
+            # fitness_parameters[self.ModelID]['r_squared'] =  0.75
 
     def compute_expectation_values(
         self, 

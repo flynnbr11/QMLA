@@ -324,6 +324,13 @@ class QMD():
 
         print("Gen list:", self.GeneratorList)
         
+        self.log_print(
+            [
+                "generator list after ensuring true generator is first:", 
+                self.GeneratorList
+            ]
+        )
+
         self.FitnessParameters = {}
         self.BranchChampions = {}
         self.ActiveBranchChampList = []
@@ -358,7 +365,6 @@ class QMD():
         models_already_added_to_a_branch = []
         for i in range(len(self.GeneratorList)):
             # to match this newly created branch with corresponding dicts filled here
-            
             gen = self.GeneratorList[i]
             growth_class_gen = GrowthRules.get_growth_generator_class(
                 growth_generation_rule = gen, 
@@ -370,6 +376,14 @@ class QMD():
 
             self.BranchChampsByNumQubits[gen] = {}
             initial_models_this_gen = self.GeneratorInitialModels[gen]
+            self.log_print(
+                [
+                    "initialising generator {} with models: {}".format(
+                        gen, 
+                        initial_models_this_gen) 
+
+                ]
+            )
             self.InitialOpsAllBranches.extend(initial_models_this_gen)
             num_new_models = len(initial_models_this_gen)
             # self.BranchModelIds[i] = list(range(
@@ -389,6 +403,13 @@ class QMD():
                 # self.BranchModelIds[i].append(initial_id_counter)
                 if mod in models_already_added_to_a_branch:
                     orig_mod_id = self.InitialModelIDs[mod]
+                    self.log_print(
+                        [
+                            mod, 
+                            "already added as", 
+                            orig_mod_id
+                        ]
+                    )
                     self.BranchModelIds[i].append(orig_mod_id)
                     self.BranchPrecomputedModels[i].append(mod)
                     self.BranchNumModelsPreComputed[i]+=1
@@ -404,8 +425,7 @@ class QMD():
                     self.InitialModelIDs[mod] = initial_id_counter
                     self.InitialModelBranches[mod] = i
                     models_already_added_to_a_branch.append(mod)
-                initial_id_counter += 1
-
+                    initial_id_counter += 1
 
             # self.HighestModelID += num_new_models
             self.BranchBayesComputed[i] = False
@@ -435,7 +455,9 @@ class QMD():
         self.log_print(
             [
                 "After setting up initial branches, highest branch id:", 
-                self.HighestBranchID
+                self.HighestBranchID,
+                "highest model id:", self.HighestModelID,
+                "initial models:", self.ModelNameIDs
             ]
         )   
 
@@ -651,6 +673,13 @@ class QMD():
             print("mod id:", mod_id)
             self.ModelNameIDs[int(mod_id)] = mod
 
+
+
+        self.log_print(
+            [
+                "After initiating DB, models:", self.ModelNameIDs
+            ]
+        )
         # for i in range(len(self.InitialOpList)):
         #     model = self.InitialOpList[i]
 
@@ -2397,7 +2426,7 @@ class QMD():
             log_file=self.log_file, 
             current_champs = current_champs,
             spawn_stage = self.SpawnStage[growth_rule],
-            fitness_parameters = self.FitnessParameters, 
+            # fitness_parameters = self.FitnessParameters, 
             branch_model_points = self.BayesPointsByBranch[branchID],
             model_names_ids = self.ModelNameIDs, 
             miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
@@ -2505,7 +2534,7 @@ class QMD():
         mod = self.reducedModelInstanceFromID(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
         mod.updateLearnedValues(
-            fitness_parameters = self.FitnessParameters
+            # fitness_parameters = self.FitnessParameters
         )
         
         n_qubits = DataBase.get_num_qubits(mod.Name)
@@ -2875,7 +2904,7 @@ class QMD():
                     for mod_id in models_this_branch:
                         mod = self.reducedModelInstanceFromID(mod_id)
                         mod.updateLearnedValues(
-                            fitness_parameters = self.FitnessParameters
+                            # fitness_parameters = self.FitnessParameters
                         )
 
                     self.remoteBayesFromBranchID(branchID)

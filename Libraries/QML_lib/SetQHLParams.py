@@ -412,6 +412,7 @@ growth_class = GrowthRules.get_growth_generator_class(
 all_growth_classes = [growth_generation_rule]
 alternative_growth_rules = arguments.alternative_growth_rules
 all_growth_classes.extend(alternative_growth_rules)
+all_growth_classes = list(set(all_growth_classes))
 
 print("[SETQHLPARAMS] growth generation rule:", growth_generation_rule)
 print("[SETQHLPARAMS] all growth classes:", all_growth_classes)

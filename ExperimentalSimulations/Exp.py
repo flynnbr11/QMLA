@@ -292,19 +292,23 @@ do_qhl_plots = False # testing posterior transition # TODO turn off usually
 results_directory = global_variables.results_directory
 long_id = global_variables.long_id
     
-log_print(["\n QMD id", global_variables.qmd_id, 
-    " on host ", global_variables.host_name, 
-    "and port", global_variables.port_number,
-    "has seed", rds.get_seed(global_variables.host_name,
-    global_variables.port_number, global_variables.qmd_id,
-    print_status=True),
-    "\n", global_variables.num_particles,
-    " particles for", global_variables.num_experiments, 
-    "experiments and ", global_variables.num_times_bayes,
-    "bayes updates\n Gaussian=", global_variables.gaussian, 
-    "\n RQ=", global_variables.use_rq, "RQ log:",
-    global_variables.log_file, "\n Bayes CSV:",
-    global_variables.cumulative_csv], log_file
+log_print(
+    [
+        "\n QMD id", global_variables.qmd_id, 
+        " on host ", global_variables.host_name, 
+        "and port", global_variables.port_number,
+        "has seed", rds.get_seed(global_variables.host_name,
+        global_variables.port_number, global_variables.qmd_id,
+        print_status=True),
+        "\n", global_variables.num_particles,
+        " particles for", global_variables.num_experiments, 
+        "experiments and ", global_variables.num_times_bayes,
+        "bayes updates\n Gaussian=", global_variables.gaussian, 
+        "\n RQ=", global_variables.use_rq, "RQ log:",
+        global_variables.log_file, "\n Bayes CSV:",
+        global_variables.cumulative_csv
+    ], 
+    log_file
  )
 
 """ 
@@ -318,6 +322,16 @@ generators = [
 generators.extend(
     global_variables.alternative_growth_rules
 )
+generators = list(set(generators))
+
+log_print(
+    [
+    "Generators:", generators
+    ],
+    log_file
+
+)
+
 qmd = QMD(
     global_variables = global_variables, 
     initial_op_list=initial_op_list, 
