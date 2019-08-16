@@ -52,6 +52,8 @@ class nv_centre_spin_experimental_method(
         self.fixed_axis = 'z' # e.g. transverse axis
         # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
 
+        self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+
         if self.use_experimental_data == True:
             # probes, prior etc specific to using experimental data
             # print(

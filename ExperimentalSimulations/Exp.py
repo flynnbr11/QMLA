@@ -840,10 +840,15 @@ else:
                 log_file
             )
 
-    if global_variables.pickle_qmd_class:
+    if (
+        global_variables.pickle_qmd_class
+        # or 
+        # global_variables.true_operator == qmd.ChampLatex
+    ):
         log_print(["QMD complete. Pickling result to",
             global_variables.class_pickle_file], log_file
         )
+        # pickle in cases where true model found
         qmd.delete_unpicklable_attributes()
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file , protocol=2)

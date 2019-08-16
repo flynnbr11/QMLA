@@ -11,13 +11,13 @@ qhl_test=0
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=0
+simulate_experiment=1
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=7
+prt=20
 exp=2
 pgh=1.0
 pgh_exponent=1.0
@@ -116,8 +116,8 @@ fi
 alt_growth_rules=(
     # 'ising_1d_chain'
     # 'hubbard_square_lattice_generalised'
-    'ising_probabilistic' 
-    'hopping_probabilistic'
+    # 'ising_probabilistic' 
+    # 'hopping_probabilistic'
     # 'heisenberg_xyz_probabilistic'
 )
 

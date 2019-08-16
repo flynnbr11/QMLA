@@ -3233,8 +3233,8 @@ class QMD():
             )
             expec_val_plot_times = self.PlotTimes
 
-
-        # equivalent to self.ResultsDict
+        self.ChampLatex = champ_model.LatexTerm
+        # equivalent to sleepf.ResultsDict
 
         self.ChampionResultsDict = {
             'NameAlphabetical' : DataBase.alph(self.ChampionName),
