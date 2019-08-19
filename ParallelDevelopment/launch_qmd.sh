@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="probabilistic-spin__grow-top-2-models"
+test_description="probabilistic-rules__ising-chain__tests"
 
 
 ### ---------------------------------------------------###
@@ -12,7 +12,7 @@ test_description="probabilistic-spin__grow-top-2-models"
 num_tests=30
 num_processes_to_request=5
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
-min_id=0 # update so instances don't clash and hit eachother's redis databases
+min_id=1 # update so instances don't clash and hit eachother's redis databases
 multiple_qhl=0
 multiple_growth_rules=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
@@ -20,8 +20,8 @@ experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters.
-e=100 # experiments
-p=400 # particles
+e=250 # experiments
+p=1200 # particles
 ra=0.98 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -45,7 +45,13 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 #sim_growth_rule='hubbard_square_lattice_generalised'
 #sim_growth_rule='hopping_topology'
 #sim_growth_rule='NV_centre_spin_large_bath'
-sim_growth_rule='probabilistic_spin'
+#sim_growth_rule='probabilistic_spin'
+#sim_growth_rule='pairwise_pauli_probabilistic_nearest_neighbour'
+# sim_growth_rule='hopping_probabilistic'
+sim_growth_rule='ising_probabilistic'
+#sim_growth_rule='heisenberg_xyz_probabilistic'
+
+
 
 
 # Experimental growth rules
@@ -71,8 +77,11 @@ fi
 
 # Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_growth_rules set to 1 above
 alt_growth_rules=(  
-	'ising_1d_chain'
-	'hubbard_square_lattice_generalised'
+#	'ising_1d_chain'
+#	'hubbard_square_lattice_generalised'
+	'hopping_probabilistic'
+	'ising_probabilistic'
+
 )
 growth_rules_command=""
 for item in ${alt_growth_rules[*]}
@@ -96,7 +105,7 @@ data_max_time=15 # to show in plots
 top_number_models=3 # how many models to perform further QHL for
 further_qhl_resource_factor=1
 do_plots=0
-pickle_class=1
+pickle_class=0
 custom_prior=1
 gaussian=1 # set to 0 for uniform distribution, 1 for normal
 param_min=0
@@ -210,8 +219,7 @@ printf "$day_time: \t $test_description \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; r
 force_plot_plus=0
 special_probe='random' #'ideal'
 special_probe_plot='random'
-time_request_insurance_factor=1.5
-
+time_request_insurance_factor=2
 if (( "$bin_times_bayes_factors" == 1))
 then
 	let time_request_insurance_factor="2*$time_request_insurance_factor"
@@ -254,7 +262,8 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
 	-exp=$experimental_data \
 	-ggr=$growth_rule \
 	-rand_t=$random_true_params \
-	-rand_p=$random_prior # can make true params and prior random
+	-rand_p=$random_prior \
+	$growth_rules_command
 
 
 ### Call script to determine how much time is needed based on above params. Store in QMD_TIME, QHL_TIME, etc. 
@@ -286,7 +295,7 @@ then
 	num_proc=1
 elif (( "multiple_qhl"  == 1 ))
 then 
-	num_proc=3
+	num_proc=4
 else
 	num_proc=$num_processes
 fi

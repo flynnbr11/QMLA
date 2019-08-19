@@ -1,0 +1,74 @@
+QMD ID = 27; REDIS_PORT=6327
+Global server: newblue1
+Running directory: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
+Library directory: /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
+Script directory: /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+57807:C 17 Aug 08:26:28.632 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+57807:C 17 Aug 08:26:28.632 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=57807, just started
+57807:C 17 Aug 08:26:28.632 # Configuration loaded
+57807:M 17 Aug 08:26:28.636 * Running mode=standalone, port=6327.
+57807:M 17 Aug 08:26:28.636 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+57807:M 17 Aug 08:26:28.636 # Server initialized
+57807:M 17 Aug 08:26:28.636 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+57807:M 17 Aug 08:26:28.636 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+57807:M 17 Aug 08:26:28.636 * Ready to accept connections
+Job id is 8630188
+PBS job name is simulate-nv-experiment__+R-probe_27
+node34-047
+node34-047
+node34-047
+node34-047
+node34-047
+node34-047
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 08:26:37; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/17_58
+
+run qmd script Doing::
+
+cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+
+python3 Exp.py -mqhl=0 -rq=1 -p=2500 -e=750 -bt=750 -rt=0.5 -ra=0.98 -pgh=1.0 -pgh_exp=1.0 -pgh_incr=0 -qid=27 -rqt=200000 -g=1 -exp=0 -qhl=0 -fq=0 -pt=0 -pkl=0 -host=node34-047 -port=6327 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/17_58 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/17_58/logs/simulate-nv-experiment__+R-probe_27.qmd.8630188.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/17_58/cumulative.csv -cpr=1 -prtwt=0 -dst=15 -ggr=two_qubit_ising_rotation_hyperfine_transverse  -bintimes=1 -bftimesall=0 -latex=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/17_58/LatexMapping.txt -nprobes=40 -prior_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/17_58/prior.p -true_params_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/17_58/true_params.p -plot_probes=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/17_58/plot_probes.p -special_probe=random -pnoise=0.001 -true_expec_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/17_58/true_expec_vals.p -pmin=0 -pmax=10 -pmean=0.5 -psigma=2 -resource=0 --updater_from_prior=0  
+
+[NV_centre_ising_probes_plus] min tol noise: 0.0 noise level: 0.001
+noise level in plus probe: 0.001
+
+	 noisy plus: [ 0.70754785+0.00022958j  0.70666522+0.00051457j]
+Generated probe dict from growth class
+[EXP] For  growth rule two_qubit_ising_rotation_hyperfine_transverse; use dataset NVB_rescale_dataset.p
+[Exp] Retrieved initial op list from growth class
+Seed requested for host/port/id node34-047 / 6327 / 27 ;has seed 1
+Seed keys ['rq:worker:node34-047.57836', 'rq:workers', 'rq:worker:node34-047.57837', 'rq:worker:node34-047.57838', 'rq:worker:node34-047.57839', 'rq:worker:node34-047.57835', 'rq:worker:node34-047.57834']
+[QMD] self.InitialOpList: ['xTi', 'yTi', 'zTi']
+Gen list: ['two_qubit_ising_rotation_hyperfine_transverse']
+[QMD] latex config: $P_{2500}E_{750}B_{750}RT_{0.5}RA_{0.98}RP_{1.0}H_{3750000}|\psi>_{40}PN_{0.001}BF^{bin }_{True}BF^{all }_{False}$
+mod id: 0
+mod id: 1
+mod id: 2
+[QMD] Going to learn initial models from branches.
+[QML] Updating learned values for model  0
+[QML] Updating learned values for model  1
+[QML] Updating learned values for model  2
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 1. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QMD] new model has highest num qubits so far
+self.GrowthClass.highest_num_qubits 2
+[QML] Updating learned values for model  3
+[QML] Updating learned values for model  4
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 2. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QML] Updating learned values for model  5
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 3. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QML] Updating learned values for model  6
+[QML] Updating learned values for model  7
+[QML] Updating learned values for model  8
+Finished Exp.py at 23:22:20; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/17_58
+OK
+57807:M 17 Aug 23:22:21.078 # User requested shutdown...
+57807:M 17 Aug 23:22:21.079 # Redis is now ready to exit, bye bye...
+QMD 27 Finished; end of script at Time: 23:22:21

@@ -1,0 +1,37 @@
+QMD ID = 27; REDIS_PORT=6327
+Global server: newblue1
+Running directory: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
+Library directory: /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
+Script directory: /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+OK
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+27280:C 17 Aug 23:22:19.491 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+27280:C 17 Aug 23:22:19.491 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=27280, just started
+27280:C 17 Aug 23:22:19.491 # Configuration loaded
+27280:M 17 Aug 23:22:19.493 # Creating Server TCP listening socket *:6327: bind: Address already in use
+Job id is 8630304
+PBS job name is simulate-nv-experiment__+R-probe_27
+node34-047
+node34-047
+node34-047
+node34-047
+node34-047
+node34-047
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 23:22:28; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00
+
+run qmd script Doing::
+
+cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+
+python3 Exp.py -mqhl=0 -rq=1 -p=2500 -e=750 -bt=750 -rt=0.5 -ra=0.98 -pgh=1.0 -pgh_exp=1.0 -pgh_incr=0 -qid=27 -rqt=200000 -g=1 -exp=1 -qhl=0 -fq=0 -pt=0 -pkl=0 -host=node34-047 -port=6327 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/logs/simulate-nv-experiment__+R-probe_27.qmd.8630304.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/cumulative.csv -cpr=1 -prtwt=0 -dst=15 -ggr=two_qubit_ising_rotation_hyperfine_transverse  -bintimes=1 -bftimesall=0 -latex=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/LatexMapping.txt -nprobes=40 -prior_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/prior.p -true_params_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/true_params.p -plot_probes=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/plot_probes.p -special_probe=dec_13_exp -pnoise=0.001 -true_expec_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/true_expec_vals.p -pmin=0 -pmax=10 -pmean=0.5 -psigma=2 -resource=0 --updater_from_prior=0  
+
+[Plus probe dict] Locals: {'kwargs': {'num_probes': 40, 'experimental_data': True}, 'minimum_tolerable_noise': 0.0, 'noise_level': 0.001, 'max_num_qubits': 11}
+[plus_probes_dict] min tol noise: 0.0 noise level: 0.001 num probes: 40
+noise level in plus probe: 0.001
+Generated probe dict from growth class
+[EXP] For  growth rule two_qubit_ising_rotation_hyperfine_transverse; use dataset NVB_rescale_dataset.p
+[Exp] Retrieved initial op list from growth class
+Finished Exp.py at 23:22:42; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00
+QMD 27 Finished; end of script at Time: 23:22:43

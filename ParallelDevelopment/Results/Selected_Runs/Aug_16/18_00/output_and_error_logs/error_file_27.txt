@@ -1,0 +1,130 @@
+/cm/local/apps/torque/4.2.4.1/spool/mom_priv/jobs/8630304.master.cm.cluster.SC: line 4: print_passed_variables: command not found
+/cm/local/apps/torque/4.2.4.1/spool/mom_priv/jobs/8630304.master.cm.cluster.SC: line 5: ((: == 1 : syntax error: operand expected (error token is "== 1 ")
+rm: cannot remove `dump.rdb': No such file or directory
++ job_id=8630304.master.cm.cluster
+++ cut -d. -f1
++ job_number=8630304
++ echo 'Job id is 8630304'
++ echo 8630304
++ cd /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/logs
++ mkdir -p /newhome/bf16951/QMD/ParallelDevelopment/logs
++ REDIS_URL=redis://node34-047:6327
++ QMD_LOG_DIR=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/logs
++ OUTPUT_ERROR_DIR=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/output_and_error_logs
++ mkdir -p /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/logs
++ QMD_JOB=simulate-nv-experiment__+R-probe_27
++ echo 'PBS job name is simulate-nv-experiment__+R-probe_27'
++ QMD_LOG=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/logs/simulate-nv-experiment__+R-probe_27.qmd.8630304.log
++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//8630304.master.cm.cluster
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//8630304.master.cm.cluster
++ export 'nodes=node34-047
+node34-047
+node34-047
+node34-047
+node34-047
+node34-047'
++ nodes='node34-047
+node34-047
+node34-047
+node34-047
+node34-047
+node34-047'
+++ cat /cm/local/apps/torque/4.2.4.1/spool/aux//8630304.master.cm.cluster
+++ wc -l
++ export nnodes=6
++ nnodes=6
++ export confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/output_and_error_logs/node_info.simulate-nv-experiment__+R-probe_27.conf
++ confile=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/output_and_error_logs/node_info.simulate-nv-experiment__+R-probe_27.conf
++ for i in '$nodes'
++ echo node34-047
++ for i in '$nodes'
++ echo node34-047
++ for i in '$nodes'
++ echo node34-047
++ for i in '$nodes'
++ echo node34-047
++ for i in '$nodes'
++ echo node34-047
++ for i in '$nodes'
++ echo node34-047
++ cd /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
++ [[ node34-047 == \n\o\d\e* ]]
++ echo 'Launching RQ worker on remote nodes using mpirun'
++ printf 'In RUN script:  -agr hopping_probabilistic -agr ising_probabilistic'
++ mpirun -np 6 -machinefile /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/output_and_error_logs/node_info.simulate-nv-experiment__+R-probe_27.conf rq worker 27 -u redis://node34-047:6327
++ ((  0 == 0 ))
++ ALT_GROWTH=
++ sleep 5
++ cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+++ date +%H:%M:%S
++ echo 'Starting Exp.py at 23:22:28; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00'
++ echo '
+run qmd script Doing::
+
+cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+
+python3 Exp.py -mqhl=0 -rq=1 -p=2500 -e=750 -bt=750 -rt=0.5 -ra=0.98 -pgh=1.0 -pgh_exp=1.0 -pgh_incr=0 -qid=27 -rqt=200000 -g=1 -exp=1 -qhl=0 -fq=0 -pt=0 -pkl=0 -host=node34-047 -port=6327 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/logs/simulate-nv-experiment__+R-probe_27.qmd.8630304.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/cumulative.csv -cpr=1 -prtwt=0 -dst=15 -ggr=two_qubit_ising_rotation_hyperfine_transverse  -bintimes=1 -bftimesall=0 -latex=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/LatexMapping.txt -nprobes=40 -prior_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/prior.p -true_params_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/true_params.p -plot_probes=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/plot_probes.p -special_probe=dec_13_exp -pnoise=0.001 -true_expec_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/true_expec_vals.p -pmin=0 -pmax=10 -pmean=0.5 -psigma=2 -resource=0 --updater_from_prior=0  
+'
++ python3 Exp.py -mqhl=0 -rq=1 -p=2500 -e=750 -bt=750 -rt=0.5 -ra=0.98 -pgh=1.0 -pgh_exp=1.0 -pgh_incr=0 -qid=27 -rqt=200000 -g=1 -exp=1 -qhl=0 -fq=0 -pt=0 -pkl=0 -host=node34-047 -port=6327 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/logs/simulate-nv-experiment__+R-probe_27.qmd.8630304.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/cumulative.csv -cpr=1 -prtwt=0 -dst=15 -ggr=two_qubit_ising_rotation_hyperfine_transverse -bintimes=1 -bftimesall=0 -latex=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/LatexMapping.txt -nprobes=40 -prior_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/prior.p -true_params_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/true_params.p -plot_probes=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/plot_probes.p -special_probe=dec_13_exp -pnoise=0.001 -true_expec_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00/true_expec_vals.p -pmin=0 -pmax=10 -pmean=0.5 -psigma=2 -resource=0 --updater_from_prior=0
+Traceback (most recent call last):
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/client.py", line 667, in execute_command
+    connection.send_command(*args)
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 610, in send_command
+    self.send_packed_command(self.pack_command(*args))
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to node34-047:6327. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "Exp.py", line 302, in <module>
+    print_status=True),
+  File "../Libraries/QML_lib/RedisSettings.py", line 71, in get_seed
+    seed_db_keys = [a.decode() for a in qid_seeds.keys()]
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/client.py", line 1032, in keys
+    return self.execute_command('KEYS', pattern)
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/client.py", line 673, in execute_command
+    connection.send_command(*args)
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 610, in send_command
+    self.send_packed_command(self.pack_command(*args))
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/cm/shared/languages/Anaconda3-5.0.1-PHYS015202/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to node34-047:6327. Connection refused.
+++ date +%H:%M:%S
++ echo 'Finished Exp.py at 23:22:42; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Aug_16/18_00'
++ sleep 1
++ redis-cli -p 6327 flushall
+Could not connect to Redis at 127.0.0.1:6327: Connection refused
++ redis-cli -p 6327 shutdown
+Could not connect to Redis at 127.0.0.1:6327: Connection refused
++ echo 8630304
+++ date +%H:%M:%S
++ echo 'QMD 27 Finished; end of script at Time: 23:22:43'
