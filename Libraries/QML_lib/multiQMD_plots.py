@@ -486,6 +486,7 @@ def Bayes_t_test(
     top_number_models=2,
     save_true_expec_vals_alone_plot=True,
     collective_analysis_pickle_file=None, 
+    return_results=False, 
     save_to_file=None
 ):
     print("[Bayes t test] unique_growth_classes:", unique_growth_classes)
@@ -931,7 +932,11 @@ def Bayes_t_test(
 
 
     # Also save an image of the true expectation values without overlaying results
-    if save_true_expec_vals_alone_plot == True:
+    if (
+        save_true_expec_vals_alone_plot == True
+        and 
+        save_to_file is not None
+    ):
         plt.clf()
         # plt.scatter(
         #     times, 
@@ -965,25 +970,33 @@ def Bayes_t_test(
     collect_expectation_values['times'] = true_times
     collect_expectation_values['true'] = true_exp
 
+    if collective_analysis_pickle_file is not None:
+        if os.path.isfile(collective_analysis_pickle_file) is False:
+            combined_analysis = {
+                'expectation_values' : collect_expectation_values
+            }
+            pickle.dump(
+                combined_analysis,
+                open(collective_analysis_pickle_file, 'wb')
+            )
+        else:
+            # load current analysis dict, add to it and rewrite it. 
+            combined_analysis = pickle.load(
+                open(collective_analysis_pickle_file, 'rb')
+            ) 
+            combined_analysis['expectation_values'] = collect_expectation_values
+            pickle.dump(
+                combined_analysis,
+                open(collective_analysis_pickle_file, 'wb')
+            )
+    if return_results == True:
+        expectation_values_by_latex_name = {}
+        for term in winning_models:
+            latex_name = unique_growth_classes[growth_generator].latex_name(term)
+            expectation_values_by_latex_name[latex_name] = expectation_values_by_name[term]
 
-    if os.path.isfile(collective_analysis_pickle_file) is False:
-        combined_analysis = {
-            'expectation_values' : collect_expectation_values
-        }
-        pickle.dump(
-            combined_analysis,
-            open(collective_analysis_pickle_file, 'wb')
-        )
-    else:
-        # load current analysis dict, add to it and rewrite it. 
-        combined_analysis = pickle.load(
-            open(collective_analysis_pickle_file, 'rb')
-        ) 
-        combined_analysis['expectation_values'] = collect_expectation_values
-        pickle.dump(
-            combined_analysis,
-            open(collective_analysis_pickle_file, 'wb')
-        )
+
+        return times, mean_exp, std_dev_exp, winning_models, term, true, description, expectation_values_by_latex_name, expectation_values_by_name
 
 
 def format_exponent(n):

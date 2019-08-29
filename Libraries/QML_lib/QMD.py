@@ -807,7 +807,8 @@ class QMD():
             )
             model_id = add_model_info['model_id']
             model_id_list.append(model_id)
-            self.ModelsBranches[model_id] = branchID
+            if already_computed == False: # first instance of this model
+                self.ModelsBranches[model_id] = branchID
 
             self.log_print(
                 [
@@ -1164,6 +1165,19 @@ class QMD():
             interbranch=True            
         # print("[QMD remoteBayes] self.NumTimesForBayesUpdates: ", self.NumTimesForBayesUpdates)
         
+        unique_id = DataBase.unique_model_pair_identifier(
+            model_a_id,
+            model_b_id
+        )
+        if (
+            unique_id not in self.BayesFactorsComputed 
+        ): #ie not yet considered
+            self.BayesFactorsComputed.append(
+                unique_id
+            )
+
+
+
         if self.use_rq:
             from rq import Connection, Queue, Worker
             queue = Queue(self.Q_id, connection=self.redis_conn, 
@@ -1233,9 +1247,9 @@ class QMD():
                         unique_id not in self.BayesFactorsComputed 
                         or recompute==True
                     ): #ie not yet considered
-                        self.BayesFactorsComputed.append(
-                            unique_id
-                        )
+                        # self.BayesFactorsComputed.append(
+                        #     unique_id
+                        # )
                         remote_jobs.append(
                             self.remoteBayes(
                                 a,
@@ -1303,7 +1317,7 @@ class QMD():
                         or 
                         recompute==True
                     ): #ie not yet considered
-                        self.BayesFactorsComputed.append(unique_id)
+                        # self.BayesFactorsComputed.append(unique_id)
                         self.log_print(
                             [
                                 "Computing BF for pair", 
@@ -1832,7 +1846,8 @@ class QMD():
         branch_champions = self.ActiveBranchChampList
         job_list = []
         job_finished_count = 0
-        interbranch_collapse_threshold = 1e5 ## if a spawned model is this much better than its parent, parent is deactivated
+        # interbranch_collapse_threshold = 1e5 ## if a spawned model is this much better than its parent, parent is deactivated
+        interbranch_collapse_threshold = 3 ## if a spawned model is this much better than its parent, parent is deactivated
         num_champs = len(branch_champions)
         
         self.log_print(
@@ -1919,6 +1934,12 @@ class QMD():
                     if job_list[k].is_failed == True:
                         raise NameError("Remote QML failure")
                     sleep(0.01)
+            self.log_print(
+                [
+                    "Parent/child Bayes factors jobs all launched."
+                ]
+            )
+
         else:
             self.log_print(
                 [
@@ -1943,7 +1964,16 @@ class QMD():
                 )
                 bf_from_db = bayes_factors_db.get(pair_id)
                 bayes_factor = float(bf_from_db)
-            
+                self.log_print(
+                    [
+                        "parent/child {}/{} has bf {}".format(
+                            parent_id, 
+                            child_id, 
+                            bayes_factor
+                        )
+                    ]
+                )
+
                 if bayes_factor > interbranch_collapse_threshold:
                     # bayes_factor heavily favours mod1, so deactive mod2
                     self.log_print(
@@ -1994,12 +2024,23 @@ class QMD():
                     mod_b.BayesFactors[mod1].append((1.0/bayes_factor))
                 else:
                     mod_b.BayesFactors[mod1] = [(1.0/bayes_factor)]
-            except:
+            except Exception as exc:
                 self.log_print(
                     [
-                    "child doesn't have active parent"
+                    "child doesn't have active parent",
+                    "\t child id ", child_id, 
+                    "\t parent id ", parent_id,
+                    "\n\tchild branch:", child_branch,
+                    "\tparent branch:", parent_branch
+
                     ]
-                )                        
+                )
+                self.log_print(
+                    [
+                    "Error:", exc
+                    ]
+                )    
+                # raise                    
 
         self.log_print(
             [
@@ -2189,7 +2230,10 @@ class QMD():
                 models_points_dict=branch_champions_points
             )
         else: 
-            champ_id = max(branch_champions_points, key=branch_champions_points.get)
+            champ_id = max(
+                branch_champions_points, 
+                key=branch_champions_points.get
+            )
         # champ_name = DataBase.model_name_from_id(self.db, champ_id)
         champ_name = self.ModelNameIDs[champ_id]
 
