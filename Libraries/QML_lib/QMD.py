@@ -1846,8 +1846,8 @@ class QMD():
         branch_champions = self.ActiveBranchChampList
         job_list = []
         job_finished_count = 0
-        # interbranch_collapse_threshold = 1e5 ## if a spawned model is this much better than its parent, parent is deactivated
-        interbranch_collapse_threshold = 3 ## if a spawned model is this much better than its parent, parent is deactivated
+        interbranch_collapse_threshold = 1e5 ## if a spawned model is this much better than its parent, parent is deactivated
+        # interbranch_collapse_threshold = 3 ## if a spawned model is this much better than its parent, parent is deactivated
         num_champs = len(branch_champions)
         
         self.log_print(
@@ -1865,7 +1865,9 @@ class QMD():
         for child_id in branch_champions:
             # child_id = branch_champions[k]
             child_branch = self.ModelsBranches[child_id] # branch this child sits on
+
             try:
+                # TODO make parent relationships more explicit by model rather than alway parent branch champ
                 parent_branch = self.BranchParents[child_branch] 
                 parent_id = self.BranchChampions[parent_branch]
 
@@ -1947,7 +1949,7 @@ class QMD():
                 ]
             )
         # now deactivate parent/children based on those bayes factors
-
+        models_to_remove = []
         for child_id in branch_champions:
             # child_id = branch_champions[k]
             child_branch = self.ModelsBranches[child_id] # branch this child sits on
@@ -1990,7 +1992,8 @@ class QMD():
                         new_value='Deactivated'
                     )
                     try:
-                        self.ActiveBranchChampList.remove(mod2)
+                        models_to_remove.append(mod2)
+                        # self.ActiveBranchChampList.remove(mod2)
                     except:
                         pass
                 elif bayes_factor < (1.0/interbranch_collapse_threshold):
@@ -2008,7 +2011,8 @@ class QMD():
                         new_value='Deactivated'
                     )
                     try:
-                        self.ActiveBranchChampList.remove(mod1)
+                        models_to_remove.append(mod1)
+                        # self.ActiveBranchChampList.remove(mod1)
                     except:
                         pass
 
@@ -2041,7 +2045,10 @@ class QMD():
                     ]
                 )    
                 # raise                    
-
+        self.ActiveBranchChampList = list(
+            set(self.ActiveBranchChampList) - 
+            set(models_to_remove)
+        )
         self.log_print(
             [
                 "Parent/child comparisons and deactivations complete."
