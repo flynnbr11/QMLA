@@ -2656,11 +2656,17 @@ class QMD():
             'TrackTimesLearned' : mod.Times, 
             'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
             'ExpectationValues' : mod.expectation_values,
-            'RSquaredByEpoch' : mod.r_squared_by_epoch(
-                times = expec_val_plot_times,
-                plot_probes = self.PlotProbes
-            ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
+            # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
+            #     times = expec_val_plot_times,
+            #     plot_probes = self.PlotProbes
+            # ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
+            # 'FinalRSquared' : mod.final_r_squared,
+            # 'FinalRSquared' : mod.r_squared(
+            #     plot_probes = self.PlotProbes,
+            #     times = expec_val_plot_times
+            # ),
             'FinalRSquared' : mod.final_r_squared,
+            'p-value' : mod.p_value, 
             'LearnedHamiltonian' : mod.LearnedHamiltonian,
             'GrowthGenerator' : mod.GrowthGenerator, 
             'Heuristic' : mod.HeuristicType, 
@@ -2804,11 +2810,16 @@ class QMD():
                 'TrackTimesLearned' : mod.Times, 
                 'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
                 'ExpectationValues' : mod.expectation_values,
-                'RSquaredByEpoch' : mod.r_squared_by_epoch(
-                    times = expec_val_plot_times,
-                    plot_probes = self.PlotProbes
+                # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
+                #     times = expec_val_plot_times,
+                #     plot_probes = self.PlotProbes
+                # ),
+                # 'FinalRSquared' : mod.final_r_squared,
+                'FinalRSquared' : mod.r_squared(
+                    plot_probes = self.PlotProbes,
+                    times = expec_val_plot_times
                 ),
-                'FinalRSquared' : mod.final_r_squared,
+                'p-value' : mod.p_value, 
                 'LearnedHamiltonian' : mod.LearnedHamiltonian,
                 'GrowthGenerator' : mod.GrowthGenerator,
                 'Heuristic' : mod.HeuristicType, 
@@ -3318,11 +3329,15 @@ class QMD():
             'TrackVolume' : champ_model.VolumeList,
             'TrackTimesLearned' : champ_model.Times, 
             'TrackCovarianceMatrices' : champ_model.TrackCovMatrices, 
-            'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
+            # 'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
+            #     plot_probes = self.PlotProbes,
+            #     times = expec_val_plot_times
+            # ),
+            'FinalRSquared' : champ_model.r_squared(
                 plot_probes = self.PlotProbes,
                 times = expec_val_plot_times
             ),
-            'FinalRSquared' : champ_model.final_r_squared,
+            'p-value' : champ_model.p_value, 
             'LearnedHamiltonian' : champ_model.LearnedHamiltonian,
             'GrowthGenerator' : champ_model.GrowthGenerator, 
             'Heuristic' : champ_model.HeuristicType, 

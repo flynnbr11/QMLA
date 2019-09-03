@@ -29,7 +29,7 @@ class nv_centre_spin_experimental_method(
         else:
             self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
 
-        # self.true_operator = 'xTi'
+        # self.true_operator = 'xTiPPyTy'
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         self.measurement_type = 'hahn'
         
@@ -54,6 +54,18 @@ class nv_centre_spin_experimental_method(
 
         self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
 
+        # params for testing p value calculation
+        # self.gaussian_prior_means_and_widths = {
+        #     'xTi' : [0.6, 0.1],
+        #     'yTy' : [0.8, 0.1],
+        # }
+
+        # self.true_params = {
+        #     'xTi' : 0.602, 
+        #     'yTy' : 0.799
+
+        # }
+
         if self.use_experimental_data == True:
             # probes, prior etc specific to using experimental data
             # print(
@@ -63,7 +75,7 @@ class nv_centre_spin_experimental_method(
             # self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
             # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
 
-            self.probe_generation_function = ProbeGeneration.plus_probes_dict
+            # self.probe_generation_function = ProbeGeneration.plus_probes_dict
             self.gaussian_prior_means_and_widths = {
                 'xTi' : [4.0, 1.5],
                 'yTi' : [4.0, 1.5],

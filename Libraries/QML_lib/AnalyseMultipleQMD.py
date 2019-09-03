@@ -351,18 +351,23 @@ Bayes_t_test( # average expected values
         'expec_vals.png'
     )
 )
-
-r_sqaured_average(
-    results_path = results_csv,
-    growth_class = true_growth_class, 
-    top_number_models = arguments.top_number_models,
-    growth_classes_by_name = growth_classes,
-    save_to_file=  str(
-        directory_to_analyse + 
-        plot_desc +
-        'r_squared_averages.png'
+try:
+    r_sqaured_average(
+        results_path = results_csv,
+        growth_class = true_growth_class, 
+        top_number_models = arguments.top_number_models,
+        growth_classes_by_name = growth_classes,
+        save_to_file=  str(
+            directory_to_analyse + 
+            plot_desc +
+            'r_squared_averages.png'
+        )
     )
-)
+except:
+    print(
+        "Unable to plot average R^2 over epochs.", 
+        "R^2 at each epoch not stored in QMD (method in QML)."
+    )
 
 ptq.average_quadratic_losses(
     results_path = results_csv, 

@@ -194,11 +194,11 @@ class nv_centre_spin_full_access(
         
         latex_term = ''
         if len(present_r) > 0:
-            latex_term+='S_{'+r_terms+'}'
+            latex_term+='\hat{S}_{'+r_terms+'}'
         if len(present_hf) > 0:
-            latex_term+='HF_{'+hf_terms+'}'
+            latex_term+='\hat{A}_{'+hf_terms+'}'
         if len(present_t) > 0:
-            latex_term+='T_{'+t_terms+'}'
+            latex_term+='\hat{T}_{'+t_terms+'}'
         
 
 

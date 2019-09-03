@@ -25,6 +25,7 @@ import ConnectedLattice
 import HoppingProbabilistic
 import IsingProbabilistic
 import HeisenbergXYZProbabilistic
+import BasicLindbladian
 
 growth_classes = {
     # 'test_growth_class' : 
@@ -68,7 +69,9 @@ growth_classes = {
     'ising_probabilistic' : 
         IsingProbabilistic.ising_chain_probabilistic,
     'heisenberg_xyz_probabilistic' :
-        HeisenbergXYZProbabilistic.heisenberg_xyz_probabilistic
+        HeisenbergXYZProbabilistic.heisenberg_xyz_probabilistic,
+    'basic_lindbladian' :
+        BasicLindbladian.basic_lindbladian
 }
 
 

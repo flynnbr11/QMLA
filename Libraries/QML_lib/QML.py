@@ -1278,7 +1278,14 @@ class reducedModel():
         probe = self.PlotProbes[self.NumQubits]
 
         datamean = np.mean(exp_data[0:max_data_idx])
-        datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
+        # datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
+
+        total_sum_of_squares = 0
+        for d in exp_data:
+            total_sum_of_squares += (d - datamean)**2
+        self.true_exp_val_mean = datamean
+        self.total_sum_of_squares = total_sum_of_squares
+
 
         ham = self.LearnedHamiltonian
 
@@ -1286,6 +1293,8 @@ class reducedModel():
         sum_of_residuals = 0
         
         available_expectation_values = sorted(list(self.expectation_values.keys()))
+
+        chi_squared = 0        
         self.r_squared_of_t = {}
         for t in exp_times:
             # TODO if use_experimental_data is False, call full expectatino value function isntead
@@ -1300,13 +1309,22 @@ class reducedModel():
                 self.expectation_values[t] = sim
 
             true = self.ExperimentalMeasurements[t]
-            diff_squared = (sim - true)**2
+            diff_squared = (true - sim)**2
             sum_of_residuals += diff_squared
-            self.r_squared_of_t[t] = 1 - sum_of_residuals/datavar
-
-        Rsq = 1 - sum_of_residuals/datavar
+            self.r_squared_of_t[t] = 1 - (sum_of_residuals/total_sum_of_squares)
+            chi_squared += diff_squared/true
         
-        return Rsq
+        self.final_r_squared = 1 - (sum_of_residuals/total_sum_of_squares)
+        self.sum_of_residuals = sum_of_residuals
+        self.chi_squared = chi_squared
+        self.p_value = (
+            1 - 
+            sp.stats.chi2.cdf(
+                self.chi_squared, 
+                len(exp_times)-1 # number of degrees of freedom
+            )
+        )
+        return self.final_r_squared
 
 
     def r_squared_by_epoch(
@@ -1362,6 +1380,7 @@ class reducedModel():
         datavar = np.sum( 
             (exp_data[0:max_data_idx] - datamean)**2  
         )
+
         r_squared_by_epoch =  {}
 
         # only use subset of epochs in case there are a large 
@@ -1395,6 +1414,7 @@ class reducedModel():
                 sum_of_residuals += diff_squared
 
             Rsq = 1 - sum_of_residuals/datavar
+
             r_squared_by_epoch[e] = Rsq
         self.r_squared_by_epoch = r_squared_by_epoch
         self.final_r_squared = Rsq
