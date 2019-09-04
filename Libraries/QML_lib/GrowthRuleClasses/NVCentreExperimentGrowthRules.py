@@ -32,7 +32,7 @@ class nv_centre_spin_experimental_method(
         # self.true_operator = 'xTiPPyTy'
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         self.measurement_type = 'hahn'
-        
+        self.true_operator = 'xTiPPyTiPPzTiPPzTz'
         # self.true_operator = 'yTi'
 
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
@@ -65,7 +65,12 @@ class nv_centre_spin_experimental_method(
         #     'yTy' : 0.799
 
         # }
-
+        self.true_params = { # from Jul_05/16_40
+            'xTi': 0.92450565,
+            'yTi': 6.00664336, 
+            'zTi': 1.65998543, 
+            'zTz': 0.76546868,
+        }
         if self.use_experimental_data == True:
             # probes, prior etc specific to using experimental data
             # print(

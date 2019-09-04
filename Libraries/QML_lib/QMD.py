@@ -2625,6 +2625,9 @@ class QMD():
             ]
         )
 
+        self.compute_f_score(
+            model_id = mod_id
+        )
 
 
         #TODO write single QHL test
@@ -2666,6 +2669,9 @@ class QMD():
             #     times = expec_val_plot_times
             # ),
             'FinalRSquared' : mod.final_r_squared,
+            'F-score' : self.FScore,
+            'Precision' : self.Precision, 
+            'Sensitivity' : self.Sensitivity,
             'p-value' : mod.p_value, 
             'LearnedHamiltonian' : mod.LearnedHamiltonian,
             'GrowthGenerator' : mod.GrowthGenerator, 
@@ -2760,6 +2766,9 @@ class QMD():
             mod.updateLearnedValues(
                 fitness_parameters = self.FitnessParameters
             )
+            self.compute_f_score(
+                model_id = mod_id
+            )
 
             n_qubits = DataBase.get_num_qubits(mod.Name)
             if n_qubits > 5:
@@ -2820,6 +2829,9 @@ class QMD():
                     times = expec_val_plot_times
                 ),
                 'p-value' : mod.p_value, 
+                'F-score' : self.FScore,
+                'Precision' : self.Precision, 
+                'Sensitivity' : self.Sensitivity,
                 'LearnedHamiltonian' : mod.LearnedHamiltonian,
                 'GrowthGenerator' : mod.GrowthGenerator,
                 'Heuristic' : mod.HeuristicType, 
@@ -3220,6 +3232,9 @@ class QMD():
             times=self.PlotTimes,
             # plot_probe_path = self.PlotProbeFile
         )
+        self.compute_f_score(
+            model_id = self.ChampID
+        )
 
         self.ChampionFinalParams = (
             champ_model.FinalParams
@@ -3227,7 +3242,9 @@ class QMD():
 
         champ_op = DataBase.operator(self.ChampionName)        
         num_params_champ_model = champ_op.num_constituents
-        
+
+
+
         correct_model = misfit = underfit = overfit = 0
         self.log_print(
             [
@@ -3337,6 +3354,9 @@ class QMD():
                 plot_probes = self.PlotProbes,
                 times = expec_val_plot_times
             ),
+            'F-score' : self.FScore,
+            'Precision' : self.Precision, 
+            'Sensitivity' : self.Sensitivity,
             'p-value' : champ_model.p_value, 
             'LearnedHamiltonian' : champ_model.LearnedHamiltonian,
             'GrowthGenerator' : champ_model.GrowthGenerator, 
@@ -3350,6 +3370,40 @@ class QMD():
             mod.updateLearnedValues(
                 fitness_parameters = self.FitnessParameters
             )
+
+    def compute_f_score(
+        self,
+        model_id,
+        beta = 1 # beta=1 for F1-score. Beta is relative importance of sensitivity to precision    
+    ):
+
+        true_set = self.GrowthClass.true_operator_terms
+
+        growth_class = self.reducedModelInstanceFromID(model_id).GrowthClass
+        terms = [
+            growth_class.latex_name(
+                term
+            )
+            for term in 
+            DataBase.get_constituent_names_from_name(
+                self.ModelNameIDs[model_id]
+            )
+        ]
+        learned_set = set(sorted(terms))
+        self.TotalPositives = len(true_set)
+        self.TruePositives = len(true_set.intersection(learned_set))
+        self.FalsePositives = len(learned_set - true_set)
+        self.false_negatives = len(true_set - learned_set)
+        self.Precision = self.TruePositives / (self.TruePositives + self.FalsePositives)
+        self.Sensitivity = self.TruePositives/self.TotalPositives
+
+        self.FScore = (
+            (1 + beta**2) * (
+                (self.Precision * self.Sensitivity) /
+                (beta**2 * self.Precision + self.Sensitivity) 
+            )
+        ) 
+        return self.FScore
             
     def runQMD(
         self, 

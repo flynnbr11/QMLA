@@ -171,3 +171,18 @@ class growth_rule_super_class():
             **kwargs
         )
 
+    @property
+    def true_operator_terms(self):
+        true_terms = DataBase.get_constituent_names_from_name(
+            self.true_operator
+        )
+
+        latex_true_terms = [
+            self.latex_name(term) for term in true_terms
+        ]
+
+        self.true_op_terms = set(sorted(latex_true_terms))
+
+        return self.true_op_terms
+    
+

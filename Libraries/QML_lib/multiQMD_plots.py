@@ -1264,7 +1264,10 @@ def all_times_learned_histogram(
 
 
         
-def get_model_scores(directory_name, unique_growth_classes):
+def get_model_scores(
+    directory_name, 
+    unique_growth_classes
+):
 #    sys.path.append(directory_name)
 
     os.chdir(directory_name)
@@ -1279,6 +1282,9 @@ def get_model_scores(directory_name, unique_growth_classes):
     
     coeff_of_determination = {}
     avg_coeff_determination = {}
+    f_scores = {}
+    precisions = {}
+    sensitivities = {}
 
     for f in pickled_files:
         fname = directory_name+'/'+str(f)
@@ -1289,9 +1295,13 @@ def get_model_scores(directory_name, unique_growth_classes):
         if alph in scores.keys():
             scores[alph] += 1
             coeff_of_determination[alph].append(result['FinalRSquared'])
+
         else:
             scores[alph] = 1
             coeff_of_determination[alph] = [ result['FinalRSquared'] ]
+            f_scores[alph] = result['F-score']
+            sensitivities[alph] = result['Sensitivity']
+            precisions[alph] = result['Precision']
 
         if alph not in list(growth_rules.keys()):
             growth_rules[alph] = result['GrowthGenerator']
@@ -1310,7 +1320,33 @@ def get_model_scores(directory_name, unique_growth_classes):
         except:
             growth_classes[g] = None
 
-    return scores, growth_rules, growth_classes, unique_growth_classes, avg_coeff_determination
+    latex_f_scores = {}
+    latex_coeff_det = {}
+    wins = {}
+    for mod in list(scores.keys()):
+        latex_name = unique_growth_classes[growth_rules[mod]].latex_name(mod)
+        latex_f_scores[latex_name] = f_scores[mod]
+        latex_coeff_det[latex_name] = avg_coeff_determination[mod]
+        precisions[latex_name] = precisions[mod]
+        precisions.pop(mod)
+        sensitivities[latex_name] = sensitivities[mod]
+        sensitivities.pop(mod)
+        wins[latex_name] = scores[mod]
+
+    results = {
+        'scores' : scores, 
+        'growth_rules' : growth_rules, 
+        'growth_classes' : growth_classes, 
+        'unique_growth_classes' : unique_growth_classes, 
+        'avg_coeff_determination' : avg_coeff_determination, 
+        'f_scores' : latex_f_scores,
+        'latex_coeff_det' : latex_coeff_det,
+        'precisions' : precisions, 
+        'sensitivities' : sensitivities,
+        'wins' : wins
+    }
+
+    return results
 
 def get_entropy(
     models_points, 
@@ -1357,6 +1393,10 @@ def plot_scores(
         unique_growth_classes, 
         growth_rules, 
         coefficients_of_determination=None, 
+        coefficient_determination_latex_name=None,
+        f_scores=None, 
+        plot_r_squared=False, 
+        plot_f_scores=True,
         entropy=None,
         inf_gain=None, 
         true_operator = None, 
@@ -1379,15 +1419,26 @@ def plot_scores(
         for model in models
     ]
     print("[multiQMD plots]coefficients_of_determination:", coefficients_of_determination)
+    print("[multiQMD plots]f scores:", f_scores)
 
-    coefficient_determination_latex_name = {}
-    for mod in list(coefficients_of_determination.keys()):
-        coefficient_determination_latex_name[
-            growth_classes[mod].latex_name(mod)
-        ] = coefficients_of_determination[mod]
+    # coefficient_determination_latex_name = {}
+    # f_score_latex_name = {}
+    # for mod in list(coefficients_of_determination.keys()):
+    #     coefficient_determination_latex_name[
+    #         growth_classes[mod].latex_name(mod)
+    #     ] = coefficients_of_determination[mod]
+
+    #     f_score_latex_name[
+    #         growth_classes[mod].latex_name(mod)
+    #     ] = f_scores[mod]
 
     coeff_of_determination = [
-        coefficient_determination_latex_name[latex_mod] for latex_mod in latex_model_names
+        coefficient_determination_latex_name[latex_mod]
+        for latex_mod in latex_model_names
+    ]
+    f_scores_list = [
+        f_scores[latex_mod]
+        for latex_mod in latex_model_names
     ]
 
     latex_scores_dict = {}
@@ -1517,29 +1568,55 @@ def plot_scores(
         # '$R^2$'
     ]
     
-    ax2 = ax1.twiny()
-    ax2.barh(
-        ind, 
-        coeff_of_determination, 
-        width/2, 
-        color=colours, 
-        label='$R^2$', 
-        linestyle='--',
-        fill=False, 
-    )
-    # ax2.invert_xaxis()
-    ax2.set_xlabel('$R^2$')
-    ax2.xaxis.tick_top()
-    
-    r_sq_x_ticks = [
-        min(coeff_of_determination), 
-        0, 
-        1
-    ]
-    ax2.set_xticks(r_sq_x_ticks)
-    ax2.legend(
-        bbox_to_anchor=(1.0, 0.9), 
-    )
+    if plot_r_squared == True:
+        ax2 = ax1.twiny()
+        ax2.barh(
+            ind, 
+            coeff_of_determination, 
+            width/2, 
+            color=colours, 
+            label='$R^2$', 
+            linestyle='--',
+            fill=False, 
+        )
+        # ax2.invert_xaxis()
+        ax2.set_xlabel('$R^2$')
+        ax2.xaxis.tick_top()
+        
+        r_sq_x_ticks = [
+            min(coeff_of_determination), 
+            0, 
+            1
+        ]
+        ax2.set_xticks(r_sq_x_ticks)
+        ax2.legend(
+            bbox_to_anchor=(1.0, 0.9), 
+        )
+    elif plot_f_scores == True:
+        ax2 = ax1.twiny()
+        ax2.barh(
+            ind, 
+            f_scores_list, 
+            width/2, 
+            color=colours, 
+            label='F-score', 
+            linestyle='--',
+            fill=False, 
+        )
+        # ax2.invert_xaxis()
+        ax2.set_xlabel('F-score')
+        ax2.xaxis.tick_top()
+        
+        f_score_x_ticks = [
+            # min(coeff_of_determination), 
+            0, 
+            1
+        ]
+        ax2.set_xticks(f_score_x_ticks)
+        ax2.legend(
+            bbox_to_anchor=(1.0, 0.9), 
+        )
+
 
     plot_title = str(
         'Number of QMD instances won by models with $R^2$.' 

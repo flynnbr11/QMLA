@@ -306,10 +306,17 @@ print("[AnalyseMultipleQMD] unique growth classes:", unique_growth_classes)
 
 
 # first get model scores
-model_scores, growth_rules, growth_classes, unique_growth_classes, median_coeff_determination = get_model_scores(
+model_score_results = get_model_scores(
     directory_name = directory_to_analyse,
     unique_growth_classes = unique_growth_classes
 )
+model_scores = model_score_results['scores']
+growth_rules = model_score_results['growth_rules']
+growth_classes = model_score_results['growth_classes']
+unique_growth_classes =model_score_results['unique_growth_classes']
+median_coeff_determination = model_score_results['avg_coeff_determination']
+f_scores = model_score_results['f_scores']
+latex_coeff_det = model_score_results['latex_coeff_det']
 
 # print("Avg coeff if determination", avg_coeff_determination)
 print("Average param estimates")
@@ -441,12 +448,15 @@ if further_qhl_mode == False:
     # except:
     #     entropy = inf_gain = 0.0
     entropy = inf_gain = 0.0
+    print("[AnalyseMultipleQMD] f scores before plot scores:", f_scores)
     plot_scores(
         scores = model_scores,
         growth_classes = growth_classes, 
         unique_growth_classes = unique_growth_classes, 
         growth_rules = growth_rules, 
         coefficients_of_determination = median_coeff_determination, 
+        coefficient_determination_latex_name = latex_coeff_det,
+        f_scores = f_scores, 
         true_operator = true_operator, 
         growth_generator = growth_generator,
         collective_analysis_pickle_file = results_collection_file, 
