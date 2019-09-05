@@ -450,6 +450,12 @@ class QMD():
             self.BranchGrowthClasses[i] = self.UniqueGrowthClasses[gen]
 
         # self.HighestBranchID = max(self.InitialModelBranches.values())
+        self.log_print(
+            [
+                "After initial branches. InitialModelIDs:",
+                self.InitialModelIDs 
+            ]
+        )
         self.HighestModelID = max(self.InitialModelIDs.values())+1 # to ensure everywhere we use range(qmd.HighestModelID) goes to the right number
         self.NumModels = len(self.InitialModelIDs.keys())
         self.log_print(

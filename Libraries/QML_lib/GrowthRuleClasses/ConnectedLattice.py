@@ -105,6 +105,7 @@ class connected_lattice(
 
 
 
+
     @property
     def num_sites(self):
         return self.topology.num_sites

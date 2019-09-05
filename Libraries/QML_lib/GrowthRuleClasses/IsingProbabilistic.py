@@ -27,10 +27,10 @@ class ising_chain_probabilistic(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        
+
         self.lattice_dimension = 1
-        self.initial_num_sites = 1
-        self.lattice_connectivity_max_distance = 2
+        self.initial_num_sites = 2
+        self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
 
