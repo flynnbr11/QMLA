@@ -1395,8 +1395,8 @@ def plot_scores(
         coefficients_of_determination=None, 
         coefficient_determination_latex_name=None,
         f_scores=None, 
-        plot_r_squared=False, 
-        plot_f_scores=True,
+        plot_r_squared=True, 
+        plot_f_scores=False,
         entropy=None,
         inf_gain=None, 
         true_operator = None, 
@@ -1766,3 +1766,157 @@ def count_model_occurences(
 
         )
         raise
+
+
+
+def plot_statistics(
+    to_plot, # list of dictionaries of statistics to plot 
+    models, # list of models to plot results for,
+    true_operator, 
+    colourmap = plt.cm.tab20c,
+    save_to_file = None
+):
+
+    num_models = len(models)
+    num_cases = len(to_plot)
+    widths = {}
+    b=0
+    w = 0 
+    width = 1/(num_cases + 1)
+    for l in to_plot:
+        l['width'] = w    
+        w -= width
+
+    indices = np.arange(num_models)
+    cm_subsection = np.linspace(0,0.8,len(to_plot))
+    colours = [ colourmap(x) for x in cm_subsection ]
+    custom_lines = []
+    custom_handles = []
+    max_top_range = 0
+
+    plt.clf()
+    fig, top_ax = plt.subplots(
+        figsize=(15, 2*len(models))
+    )
+
+    bottom_ax = top_ax.twiny()
+
+    top_ax.tick_params(
+        top=True, 
+        bottom=False,
+        labeltop=True, 
+        labelbottom=False
+    )
+    bottom_ax.tick_params(
+        top=False, 
+        bottom=True,
+        labeltop=False, 
+        labelbottom=True
+    )
+
+    top_labels = []
+    bottom_labels = []
+    alpha = 1
+    fill = True
+    for dataset in to_plot:
+        if dataset['range'] == 'cap_1':
+            ax = bottom_ax
+            bottom_labels.append(dataset['title'])
+            ls = '-'
+            fill = True
+            this_width = width
+            alpha = 1
+            lw = 2
+        else:
+            ax = top_ax
+            top_labels.append(dataset['title'])
+            if dataset['title'] == '# Wins':
+                top_colour = colours[to_plot.index(dataset) ]
+                this_width = 1 * width
+                alpha = 1.0
+                ls = '--'
+                lw = 3
+                fill = True
+#                 this_width = num_cases* width ## to make this bar go underneath all stats for this model
+#                 dataset['width'] = 0.5
+        res = dataset['res']
+        colour = colours[to_plot.index(dataset) ]
+        ax.barh(
+            indices + dataset['width'], 
+            res, 
+            this_width,
+            color=colour,
+            alpha = alpha,
+            ls = ls, 
+            fill = fill,
+            linewidth=lw
+        )
+
+        custom_lines.append(
+            Line2D([0], [0], color=colour, lw=4),
+        )
+        custom_handles.append(dataset['title'])
+
+
+    label_size = 25
+
+    bottom_ax.set_xlabel( 
+        '; '.join(bottom_labels),
+        fontsize = label_size, 
+    )
+    bottom_ax.xaxis.set_label_position('bottom')
+    bottom_ax.set_xticks([0,0.5,1])
+    bottom_ax.set_xticklabels(
+        [0, 0.5, 1], 
+        fontsize = label_size
+    )
+
+
+    top_ax.set_xlabel( 
+        '; '.join(top_labels),
+        fontsize = label_size, 
+        color = top_colour,
+        fontweight='bold'
+    )
+    top_ax.xaxis.set_label_position('top')
+    top_ax.xaxis
+    xticks = list(set([int(i) for i in top_ax.get_xticks()]))
+    top_ax.set_xticks(
+       xticks ,
+    )
+    top_ax.set_xticklabels(
+        xticks,
+        fontsize=label_size
+    )
+    
+    min_xlim = min( min(bottom_ax.get_xlim()), 0)
+    max_xlim = max( max(top_ax.get_xlim()), 1)
+    xlim = (min_xlim, max_xlim)
+    top_ax.set_xlim(xlim)
+
+
+    top_ax.set_yticklabels(models, fontsize=label_size)
+    top_ax.set_yticks(indices+0.1)
+    model_label_colours = ['black' for m in models]
+    
+    try:
+        true_idx = models.index(str(true_operator))
+        top_ax.get_yticklabels()[true_idx].set_color('green')
+    except:
+        pass
+
+    plt.legend(
+        custom_lines, 
+        custom_handles,
+        bbox_to_anchor=(1.0, 0.4), 
+        fontsize=20
+    )    
+    
+    if save_to_file is not None:
+        plt.savefig(
+            save_to_file,
+            bbox_inches='tight'
+        )
+
+
+    

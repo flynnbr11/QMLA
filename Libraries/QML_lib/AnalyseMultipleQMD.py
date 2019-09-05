@@ -160,6 +160,10 @@ if true_params_path is not None:
 else:
     true_params_dict = None
     true_operator = true_growth_class.true_operator
+true_operator_latex = true_growth_class.latex_name(
+    true_operator
+)
+
 
 if exp_data is False:
     name = true_params_info['true_op']
@@ -427,7 +431,7 @@ if qhl_mode==True:
 
 if further_qhl_mode == False:
     print("FURTHER QHL=FALSE. PLOTTING STUFF")
-    plot_file = directory_to_analyse+'model_scores.png'
+    plot_file = directory_to_analyse+'model_wins.png'
     # results_collection_file = "{}/scores_{}.p".format(
     #     directory_to_analyse,
     #     growth_generator
@@ -462,6 +466,51 @@ if further_qhl_mode == False:
         collective_analysis_pickle_file = results_collection_file, 
         save_file = plot_file
     )
+
+
+    # results from get_model_scores above
+    models = sorted(model_score_results['wins'].keys())
+    models.reverse()
+
+    f_score = {
+        'title' : 'F-score',
+        'res' : [model_score_results['f_scores'][m] for m in models],
+        'range' : 'cap_1',
+    }
+    r_squared = {
+        'title' : '$R^2$',
+        'res' : [model_score_results['latex_coeff_det'][m] for m in models],
+        'range' : 'cap_1',    
+    }
+
+    sensitivity = {
+        'title' : 'Sensitivity',
+        'res' : [model_score_results['sensitivities'][m] for m in models],
+        'range' : 'cap_1',
+    }
+    precision = {
+        'title' : 'Precision', 
+        'res' : [model_score_results['precisions'][m] for m in models],
+        'range' : 'cap_1',
+    }
+    wins = {
+        'title' : '# Wins',
+        'res' : [model_score_results['wins'][m] for m in models],
+        'range' : 'uncapped',
+    }
+
+    to_plot = [wins, f_score, precision, sensitivity]    
+
+    plot_statistics(
+        to_plot, 
+        models,
+        true_operator = true_operator_latex,
+        save_to_file = str(
+            directory_to_analyse + 
+            'model_stats.png'
+        )
+    )
+
     try:
         ptq.plotTrueModelBayesFactors_IsingRotationTerms(
             results_csv_path = all_bayes_csv,
