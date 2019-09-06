@@ -131,9 +131,11 @@ class ModelLearningClass():
         name, 
         num_probes=20, 
         probe_dict=None, 
+        sim_probe_dict=None,
         qid=0,
         log_file='QMD_log.log', 
-        modelID=0
+        modelID=0,
+        **kwargs
     ):
         self.VolumeList = np.array([])  
         self.Name = name
@@ -193,7 +195,8 @@ class ModelLearningClass():
         init_model_print_loc = False
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
         self.UseExperimentalData = qmd_info['use_experimental_data']
-        self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
+        self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])        
+        self.SimProbeDict = pickle.loads(qmd_info_db['SimProbeDict'])
         self.NumParticles = qmd_info['num_particles']
         self.NumExperiments = qmd_info['num_experiments']
         self.GrowthGenerator = growth_generator
@@ -430,12 +433,19 @@ class ModelLearningClass():
             growth_generation_rule = self.GrowthGenerator, 
             use_experimental_data = self.UseExperimentalData,
             experimental_measurements = self.ExperimentalMeasurements,
-            experimental_measurement_times=self.ExperimentalMeasurementTimes, 
-            probe_dict=self.ProbeDict, probecounter=0, solver='scipy',
-            trotter=True, qle=self.QLE, use_exp_custom=self.UseExpCustom,
+            experimental_measurement_times = self.ExperimentalMeasurementTimes, 
+            probe_dict = self.ProbeDict, 
+            sim_probe_dict = self.SimProbeDict,
+            probecounter=0, 
+            solver = 'scipy',
+            trotter = True, 
+            qle = self.QLE, 
+            use_exp_custom = self.UseExpCustom,
             exp_comparison_tol = self.ExpComparisonTol,
-            enable_sparse=self.EnableSparse, model_name=self.Name,
-            log_file=self.log_file, log_identifier=log_identifier
+            enable_sparse = self.EnableSparse, 
+            model_name = self.Name,
+            log_file = self.log_file, 
+            log_identifier = log_identifier
         ) 
 
         self.Updater = qi.SMCUpdater(
@@ -1031,6 +1041,7 @@ class reducedModel():
         self.ModelID = modelID
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
+        self.SimProbeDict = pickle.loads(qmd_info_db['SimProbeDict'])
         self.MeasurementType = qmd_info['measurement_type']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.UseExperimentalData = qmd_info['use_experimental_data']
@@ -1480,6 +1491,8 @@ class modelClassForRemoteBayesFactor():
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
 
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
+        self.SimProbeDict = pickle.loads(qmd_info_db['SimProbeDict'])
+
         self.ModelID = modelID
         self.NumParticles = qmd_info['num_particles']
         self.NumProbes = qmd_info['num_probes']
@@ -1525,7 +1538,7 @@ class modelClassForRemoteBayesFactor():
             modelparams=self.SimParams_Final, 
             true_oplist = self.TrueOpList,
             trueparams = self.TrueParams, 
-            truename=self.TrueOpName,
+            truename = self.TrueOpName,
             measurement_type = self.MeasurementType,
             growth_generation_rule = self.GrowthGenerator, 
             use_experimental_data = self.UseExperimentalData,
@@ -1533,8 +1546,11 @@ class modelClassForRemoteBayesFactor():
             experimental_measurement_times=(
                 self.ExperimentalMeasurementTimes
             ),             
-            model_name=self.Name, num_probes = self.NumProbes, 
-            probe_dict=self.ProbeDict, log_file=self.log_file,
+            model_name = self.Name, 
+            num_probes = self.NumProbes, 
+            probe_dict = self.ProbeDict, 
+            sim_probe_dict = self.SimProbeDict, 
+            log_file=self.log_file,
             log_identifier=log_identifier
         )    
         # print("[QML] upd from prior:", updater_from_prior)

@@ -28,6 +28,8 @@ class growth_rule_super_class():
         # these can be directly overwritten within class definition
         # by writing self.probe_generator and self.expectation_value methods         
         self.probe_generation_function = ProbeGeneration.separable_probe_dict
+        self.simulator_probe_generation_function = self.probe_generation_function # unless specifically different set of probes required
+        self.shared_probes = True # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
         self.expectation_value_function = ExpectationValues.expectation_value
         self.heuristic_function = Heuristics.multiPGH
@@ -152,14 +154,37 @@ class growth_rule_super_class():
         )
         
     def probe_generator(
+        # system probes
         self,
         **kwargs
     ):
-        return self.probe_generation_function(
+        self.system_probes = self.probe_generation_function(
             max_num_qubits = self.max_num_probe_qubits,
             num_probes = self.num_probes, 
             **kwargs
         )
+        return self.system_probes
+
+    def simulator_probe_generator(
+        # system probes
+        self,
+        shared_probes = None,
+        **kwargs
+    ):
+        if shared_probes == None:
+            shared_probes = self.shared_probes
+
+        if shared_probes == True:
+            self.simulator_probes = self.system_probes
+        else:
+            self.simulator_probes = self.simulator_probe_generation_function(
+                max_num_qubits = self.max_num_probe_qubits,
+                num_probes = self.num_probes, 
+                **kwargs
+            )
+        return self.simulator_probes
+
+
 
     def plot_probe_generator(
         self, 

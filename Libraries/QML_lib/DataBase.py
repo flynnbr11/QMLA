@@ -948,7 +948,8 @@ def add_model(
         qml_instance = ModelLearningClass(
             name=op.name, 
             num_probes = num_probes,
-            probe_dict=probe_dict
+            # probe_dict = probe_dict,
+            # sim_probe_dict = sim_probe_dict,
         )
         sim_pars = []
         num_pars = op.num_constituents

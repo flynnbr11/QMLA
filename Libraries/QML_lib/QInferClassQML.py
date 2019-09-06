@@ -85,7 +85,8 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         true_oplist = None, 
         truename=None, 
         num_probes=40, 
-        probe_dict=None, 
+        probe_dict=None,
+        sim_probe_dict=None, 
         trueparams=None, 
         probelist=None, 
         min_freq=0, 
@@ -167,17 +168,21 @@ class QInferModelQML(qi.FiniteOutcomeModel):
        
         self.NumProbes = num_probes
         if probe_dict is None: 
-            self._probelist = ProbeGeneration.seperable_probe_dict(
+            self.probe_dict = ProbeGeneration.seperable_probe_dict(
                 max_num_qubits=12, 
                 num_probes = self.NumProbes
             ) # TODO -- make same as number of qubits in model.
+            self.sim_probe_dict = self.probe_dict
         else:
-            self._probelist = probe_dict    
+            self.probe_dict = probe_dict   
+            self.sim_probe_dict = sim_probe_dict
 
         log_print(
             [
-                "probe[(0,1)]", 
-                self._probelist[(0,1)]
+                "probe[(0,1)]:", 
+                self.probe_dict[(0,1)],
+                "\nsim probe[(0,1)]:", 
+                self.sim_probe_dict[(0,1)],
             ],
             self.log_file, 
             self.log_identifier
@@ -250,10 +255,15 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         return 2
         
 
-    def likelihood(self, outcomes, modelparams, expparams):
+    def likelihood(
+        self, 
+        outcomes, 
+        modelparams, 
+        expparams
+    ):
         super(QInferModelQML, self).likelihood(
             outcomes, modelparams, expparams
-        )
+        ) # TODO BF: @AAG why is super.likelihood called?
         """
         log_print(
             [
@@ -360,23 +370,35 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             #     # "\nProbe", probe
             # )
 
-            if self.inBayesUpdates:
-                if self.ideal_probe is not None:
-                    probe = self.ideal_probe # this won't work
-                elif self.ideal_probelist is not None: 
-                    probe = self.ideal_probelist[self._b % 2] # this won't work
-                else:
-                    print(
-                        "Either ideal_probe or ideal_probes \
-                        must be given"
-                    )
-            else:
-                probe = self._probelist[
+            # if self.inBayesUpdates:
+            #     if self.ideal_probe is not None:
+            #         probe = self.ideal_probe # this won't work
+            #     elif self.ideal_probelist is not None: 
+            #         probe = self.ideal_probelist[self._b % 2] # this won't work
+            #     else:
+            #         print(
+            #             "Either ideal_probe or ideal_probes \
+            #             must be given"
+            #         )
+            # else:
+            #     probe = self.probe_dict[
+            #         (self._b % int(self.NumProbes)), 
+            #         ham_num_qubits
+            #     ]
+
+            if true_evo == True:
+                probe = self.probe_dict[
                     (self._b % int(self.NumProbes)), 
                     ham_num_qubits
                 ]
+            else:
+                probe = self.sim_probe_dict[
+                    (self._b % int(self.NumProbes)), 
+                    ham_num_qubits
+                ]
+
             # print(
-            #     "\n\n[likelihood fnc] Simulated data being called.",
+            #     "\n\n[likelihood fnc]",
             #     "\n True evo:", true_evo, 
             #     "\nProbe", probe, "\n\n"
             # )
@@ -409,8 +431,10 @@ class QInferModelQML(qi.FiniteOutcomeModel):
 
             if self.QLE is True:
                 pr0 = Evo.get_pr0_array_qle(
-                    t_list=times, modelparams=params,
-                    oplist=operators, probe=probe, 
+                    t_list=times, 
+                    modelparams=params,
+                    oplist=operators, 
+                    probe=probe, 
                     measurement_type=self.measurement_type,
                     growth_class = self.growth_class,  
                     use_experimental_data = self.use_experimental_data,
@@ -422,9 +446,13 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                 )
 
             else: 
+                # Built for IQLE but not in use/tested so unlikely to work. 
                 pr0 = Evo.get_pr0_array_iqle(
-                    t_list=times, modelparams=params,
-                    oplist=operators, ham_minus=ham_minus, probe=probe,
+                    t_list=times, 
+                    modelparams=params,
+                    oplist=operators, 
+                    ham_minus=ham_minus, 
+                    probe=probe,
                     use_exp_custom=self.use_exp_custom,
                     exp_comparison_tol=self.exp_comparison_tol, 
                     enable_sparse = self.enable_sparse, 

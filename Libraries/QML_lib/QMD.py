@@ -81,29 +81,30 @@ class QMD():
         generator_list=[], 
         true_operator='x',
         # true_param_list = None,
-        use_time_dep_true_model = False,
-        true_params_time_dep = None,
+        use_time_dep_true_model=False,
+        true_params_time_dep=None,
         max_num_models=30, 
         max_num_qubits=7, #TODO change -- this may cause crashes somewhere
-        model_priors = None,
-        store_particles_weights = False,
+        model_priors=None,
+        store_particles_weights=False,
         # bayes_time_binning = False,
-        qhl_plots = False, 
-        experimental_measurements = None,
-        results_directory = '', 
-        long_id = '001', 
+        qhl_plots=False, 
+        experimental_measurements=None,
+        results_directory='', 
+        long_id='001', 
         # num_probes = 20,
-        probe_dict = None,  
-        max_num_layers = 10,
-        max_num_branches = 20, 
-        use_exp_custom = True,
-        enable_sparse = True,
-        compare_linalg_exp_tol = None,
-        parallel = False,
-        plot_times = [0,1],
-        sigma_threshold = 1e-13, 
-        debug_directory = None,
-        prior_specific_terms = None, 
+        probe_dict=None,  
+        sim_probe_dict=None,
+        max_num_layers=10,
+        max_num_branches=20, 
+        use_exp_custom=True,
+        enable_sparse=True,
+        compare_linalg_exp_tol=None,
+        parallel=False,
+        plot_times=[0,1],
+        sigma_threshold=1e-13, 
+        debug_directory=None,
+        prior_specific_terms=None, 
         qle=None,   
         **kwargs
     ):
@@ -224,6 +225,7 @@ class QMD():
                 max_num_qubits=self.MaxQubitNumber, 
                 num_probes=self.NumProbes
             )
+            self.SimProbeDict = self.ProbeDict
         else:
             self.log_print(
                 [
@@ -231,6 +233,7 @@ class QMD():
                 ]
             )
             self.ProbeDict = probe_dict
+            self.SimProbeDict = sim_probe_dict
         self.HighestQubitNumber = int(0)
         self.MaxBranchID = max_num_branches
         self.MaxLayerNumber = max_num_layers
@@ -621,10 +624,12 @@ class QMD():
         self.log_print(["RunParallel=", self.RunParallel])
         compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
         compressed_probe_dict = pickle.dumps(self.ProbeDict, protocol=2)
+        compressed_sim_probe_dict = pickle.dumps(self.SimProbeDict, protocol=2)
         qmd_info_db = self.RedisDataBases['qmd_info_db']
         self.log_print(["Saving qmd info db to ", qmd_info_db])
         qmd_info_db.set('QMDInfo', compressed_qmd_info)
         qmd_info_db.set('ProbeDict', compressed_probe_dict)
+        qmd_info_db.set('SimProbeDict', compressed_sim_probe_dict)
 
         # Initialise database and lists.
         self.log_print(["Running ", self.QLE_Type, " for true operator ",

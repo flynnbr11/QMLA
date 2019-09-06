@@ -101,14 +101,19 @@ def log_print(to_print_list, log_file, log_identifier=None):
  
  
 def get_pr0_array_qle(
-        t_list, modelparams, 
-        oplist, probe,
-        measurement_type='full_access',
-        growth_class=None, 
-        use_experimental_data=False, use_exp_custom=True,
-        exp_comparison_tol=None, enable_sparse=True, 
-        ham_list=None, 
-        log_file='QMDLog.log', log_identifier=None
+    t_list, 
+    modelparams, 
+    oplist, 
+    probe,
+    measurement_type='full_access',
+    growth_class=None, 
+    use_experimental_data=False, 
+    use_exp_custom=True,
+    exp_comparison_tol=None, 
+    enable_sparse=True, 
+    ham_list=None, 
+    log_file='QMDLog.log', 
+    log_identifier=None
 ):
     from rq import timeouts
     print_loc(global_print_loc)
@@ -171,17 +176,27 @@ def get_pr0_array_qle(
                 # outputs_this_ham[t] = likel
 
             except NameError:
-                log_print(["Error raised; unphysical expecation value.",
-                    "\nHam:\n", ham,
-                    "\nt=", t,
-                    "\nState=", probe
+                log_print(
+                    [
+                        "Error raised; unphysical expecation value.",
+                        "\nHam:\n", ham,
+                        "\nt=", t,
+                        "\nState=", probe
                     ], 
-                    log_file, log_identifier
+                    log_file, 
+                    log_identifier
                 )
                 sys.exit()
             except timeouts.JobTimeoutException:
-                log_print(["RQ Time exception. \nprobe=", probe,
-                    "\nt=", t,"\nHam=", ham], log_file, log_identifier
+                log_print(
+                    [
+                        "RQ Time exception. \nprobe=", 
+                        probe,
+                        "\nt=", t,"\nHam=", 
+                        ham
+                    ], 
+                    log_file, 
+                    log_identifier
                 )
                 sys.exit()
 #                raise

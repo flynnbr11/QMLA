@@ -91,6 +91,18 @@ generated_probe_dict = growth_class.probe_generator(
     # minimum_tolerable_noise = 1e-7, # to match dec_14/09_55 run # TODO remove!!!
     # num_probes = global_variables.num_probes
 )
+simulator_probe_dict = growth_class.simulator_probe_generator(
+    # shared_probes = shared_probes, # TODO get from global variables or growth class? 
+    experimental_data = global_variables.use_experimental_data, 
+    # growth_generator = global_variables.growth_generation_rule, 
+    # special_probe = global_variables.special_probe, 
+    noise_level = global_variables.probe_noise_level,
+    minimum_tolerable_noise = 0.0,
+    # noise_level = 0.0,
+    # minimum_tolerable_noise = 1e-7, # to match dec_14/09_55 run # TODO remove!!!
+    # num_probes = global_variables.num_probes
+)
+
 print("Generated probe dict from growth class")
 
 probes_dir = str(
@@ -345,6 +357,7 @@ qmd = QMD(
     results_directory = results_directory,
     long_id = long_id, 
     probe_dict = generated_probe_dict, 
+    sim_probe_dict = simulator_probe_dict, 
     model_priors = model_priors,
     experimental_measurements = experimental_measurements_dict,
     plot_times = plot_times,
