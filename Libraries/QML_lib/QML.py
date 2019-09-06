@@ -10,7 +10,7 @@ import ExpectationValues
 import GrowthRules
 # import UserFunctions
 import Distrib as Distributions
-import GenSimQMD_IQLE as gsi
+import QInferClassQML as qml_qi
 import ExperimentalDataFunctions as expdt
 # import multiPGH as mpgh
 import DataBase 
@@ -416,7 +416,7 @@ class ModelLearningClass():
         # #     )
         # # )
 
-        self.GenSimModel = gsi.GenSimQMD_IQLE(
+        self.GenSimModel = qml_qi.QInferModelQML(
             oplist=self.SimOpList, 
             modelparams=self.SimParams, 
             true_oplist=self.TrueOpList, 
@@ -1422,7 +1422,7 @@ class reducedModel():
 
 
     
-#        self.GenSimModel = gsi.GenSimQMD_IQLE(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,
+#        self.GenSimModel = qml_qi.QInferClassQML(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,
 #            experimental_measurements = self.ExperimentalMeasurements,
 #            experimental_measurement_times=(
 #                self.ExperimentalMeasurementTimes
@@ -1520,7 +1520,7 @@ class modelClassForRemoteBayesFactor():
         
         log_identifier = str("Bayes "+str(self.ModelID)) 
                 
-        self.GenSimModel = gsi.GenSimQMD_IQLE(
+        self.GenSimModel = qml_qi.QInferModelQML(
             oplist=self.SimOpList,
             modelparams=self.SimParams_Final, 
             true_oplist = self.TrueOpList,

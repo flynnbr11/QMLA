@@ -1731,7 +1731,7 @@ def count_model_occurences(
     fig, ax = plt.subplots(
         figsize=(
             max(max_count*2, 5),
-            len(unique_models)/4)
+            len(unique_models)/2)
         )
     ax.plot(kind='barh')
     ax.barh(
@@ -1758,7 +1758,10 @@ def count_model_occurences(
     
     try:
         if save_to_file is not None:
-            plt.savefig(save_to_file)
+            plt.savefig(
+                save_to_file,
+                bbox_inches='tight'
+            )
     except:
         print(
             "[AnalyseMultiple - count model occurences] couldn't save plot to file", 

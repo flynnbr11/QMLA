@@ -45,7 +45,7 @@ def log_print(to_print_list, log_file, log_identifier=None):
 
 
 
-class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
+class QInferModelQML(qi.FiniteOutcomeModel):
     r"""
     Describes the free evolution of a single qubit prepared in the
     :param np.array : :math:`\left|+\Psi\rangle` state under 
@@ -162,7 +162,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         else:
             self._trueHam = None
 
-        super(GenSimQMD_IQLE, self).__init__(self._oplist)
+        super(QInferModelQML, self).__init__(self._oplist)
         
        
         self.NumProbes = num_probes
@@ -251,7 +251,7 @@ class GenSimQMD_IQLE(qi.FiniteOutcomeModel):
         
 
     def likelihood(self, outcomes, modelparams, expparams):
-        super(GenSimQMD_IQLE, self).likelihood(
+        super(QInferModelQML, self).likelihood(
             outcomes, modelparams, expparams
         )
         """
