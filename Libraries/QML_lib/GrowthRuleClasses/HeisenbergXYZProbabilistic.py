@@ -37,7 +37,7 @@ class heisenberg_xyz_probabilistic(
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
 
-        self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_2J4_d4PPPPpauliSet_yJy_3J4_d4'
+        self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_2J3_d4PPPPpauliSet_yJy_3J4_d4'
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
