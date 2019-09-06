@@ -103,7 +103,7 @@ sim_growth_rule='heisenberg_xyz_probabilistic'
 # exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
-exp_growth_rule='NV_alternative_model'
+exp_growth_rule='NV_alternative_model_2'
 # exp_growth_rule='NV_fitness_growth'
 
 

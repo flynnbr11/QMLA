@@ -39,6 +39,8 @@ growth_classes = {
         NVCentreExperimentWithoutTransverseTerms.nv_centre_spin_experimental_method_without_transvere_terms,
     'NV_alternative_model' : 
         NVCentreAlternativeTrueModel.nv_centre_spin_experimental_method_alternative_true_model,
+    'NV_alternative_model_2' : 
+        NVCentreAlternativeTrueModel.nv_centre_spin_experimental_method_alternative_true_model_second,
     'NV_fitness_growth' : 
         NVGrowByFitness.nv_fitness_growth, 
     'NV_centre_revivals' : 
