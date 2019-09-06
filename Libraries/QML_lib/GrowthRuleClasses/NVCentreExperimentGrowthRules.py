@@ -52,9 +52,12 @@ class nv_centre_spin_experimental_method(
         self.fixed_axis = 'z' # e.g. transverse axis
         # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
 
-        self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
-        self.shared_probes = False
-        self.simulator_probe_generation_function = self.probe_generation_function
+        # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+        # self.shared_probes = False
+        # self.simulator_probe_generation_function = self.probe_generation_function
+
+        self.probe_generation_function = ProbeGeneration.separable_probe_dict
+
         # params for testing p value calculation
         # self.gaussian_prior_means_and_widths = {
         #     'xTi' : [0.6, 0.1],

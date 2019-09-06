@@ -10,6 +10,7 @@ import NVCentreFullAccess
 import NVCentreLargeSpinBath
 import NVCentreExperimentWithoutTransverseTerms
 import NVCentreRevivals
+import NVCentreAlternativeTrueModel
 import NVGrowByFitness
 import NVProbabilistic
 import ReducedNVExperiment
@@ -36,6 +37,8 @@ growth_classes = {
         NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method,
     'two_qubit_ising_rotation_hyperfine' : 
         NVCentreExperimentWithoutTransverseTerms.nv_centre_spin_experimental_method_without_transvere_terms,
+    'NV_alternative_model' : 
+        NVCentreAlternativeTrueModel.nv_centre_spin_experimental_method_alternative_true_model,
     'NV_fitness_growth' : 
         NVGrowByFitness.nv_fitness_growth, 
     'NV_centre_revivals' : 

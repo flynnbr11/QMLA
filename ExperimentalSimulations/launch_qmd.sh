@@ -96,13 +96,14 @@ sim_growth_rule='heisenberg_xyz_probabilistic'
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # exp_growth_rule='NV_centre_revivals'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='NV_centre_experiment_debug'
 # exp_growth_rule='reduced_nv_experiment'
+exp_growth_rule='NV_alternative_model'
 # exp_growth_rule='NV_fitness_growth'
 
 
@@ -302,17 +303,19 @@ python3 ../../../../Libraries/QML_lib/CombineAnalysisPlots.py \
 
 
 chmod a+x $analyse_script
-# sh $analyse_script
 
 if (( $do_further_qhl == 1 )) 
 then
+    sh $analyse_script
+
     further_analyse_filename='analyse_further_qhl.sh'
     further_analyse_script="$full_path_to_results$further_analyse_filename"
     let particles="$further_qhl_factor * $prt"
     let experiments="$further_qhl_factor * $exp"
+    echo "------ Launching further QHL instance(s) ------"
+    let max_qmd_id="$num_tests + 1"
 
     # write to a script so we can recall analysis later.
-    echo "
     cd $full_path_to_results
     cd ../../../
 
@@ -320,43 +323,65 @@ then
         do
         pgh=0.3 # train on different set of data
         redis-cli flushall 
-        #let q_id=\"\$q_id+1\"
-        q_id=\$((q_id+1))
+        # let q_id=\"\$q_id+1\"
+        # q_id=\$((q_id+1))
+        let q_id="$q_id + 1"
+        echo "QID: $q_id"
         python3 Exp.py \
             -fq=$do_further_qhl \
-            -p=$particles -e=$experiments -bt=$bt \
-            -rq=$use_rq -g=$gaussian -qhl=0 \
+            -p=$particles \
+            -e=$experiments \
+            -bt=$bt \
+            -rq=$use_rq \
+            -g=$gaussian \
+            -qhl=0 \
             -ra=$ra -rt=$rt -pgh=1.0 \
-            -dir=$full_path_to_results -qid=\$q_id -pt=$plots -pkl=1 \
-            -log=$this_log -cb=$bayes_csv \
-            -exp=$exp_data -cpr=$custom_prior \
+            -pgh_exp=$pgh_exponent \
+            -pgh_incr=$pgh_increase \
+            -dir=$full_path_to_results \
+            -qid=$q_id \
+            -pt=$plots \
+            -pkl=1 \
+            -log=$this_log \
+            -cb=$bayes_csv \
+            -exp=$exp_data \
+            -cpr=$custom_prior \
+            -prtwt=$store_prt_wt \
+            -pnoise=$probe_noise \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
             -dst=$data_max_time \
-            -dto=$data_time_offset \
+            -bintimes=$bintimes \
+            -bftimesall=$bf_all_times \
             -latex=$latex_mapping_file \
             -ggr=$growth_rule \
-            --updater_from_prior=$updater_from_prior
+            --updater_from_prior=$updater_from_prior \
+            -resource=$reallocate_resources \
+            -ggr=$growth_rule \
+            -nprobes=$num_probes \
+            $growth_rules_command 
 
     done
-
+    echo "
     cd $full_path_to_results
     python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
-        -dir=$full_path_to_results --bayes_csv=$bayes_csv \
+        -dir=$full_path_to_results \
+        --bayes_csv=$bayes_csv \
         -top=$number_best_models_further_qhl \
         -qhl=$qhl_test \
         -fqhl=1 \
-        -ggr=$growth_rule \
         -exp=$exp_data \
         -true_expec=$true_expec_path \
+        -ggr=$growth_rule \
         -plot_probes=$plot_probe_file \
         -params=$true_params_pickle_file \
         -latex=$latex_mapping_file
     " > $further_analyse_script
 
     chmod a+x $further_analyse_script
-    sh $further_analyse_script
+    echo "------ Launching analyse further QHL ------"
+    # sh $further_analyse_script
 fi
 
