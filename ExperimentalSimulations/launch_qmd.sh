@@ -11,7 +11,7 @@ qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -328,14 +328,16 @@ then
         let q_id="$q_id + 1"
         echo "QID: $q_id"
         python3 Exp.py \
-            -fq=$do_further_qhl \
+            -fq=1 \
             -p=$particles \
             -e=$experiments \
             -bt=$bt \
             -rq=$use_rq \
             -g=$gaussian \
             -qhl=0 \
-            -ra=$ra -rt=$rt -pgh=1.0 \
+            -ra=$ra \
+            -rt=$rt \
+            -pgh=1.0 \
             -pgh_exp=$pgh_exponent \
             -pgh_incr=$pgh_increase \
             -dir=$full_path_to_results \
@@ -370,7 +372,7 @@ then
         -dir=$full_path_to_results \
         --bayes_csv=$bayes_csv \
         -top=$number_best_models_further_qhl \
-        -qhl=$qhl_test \
+        -qhl=0 \
         -fqhl=1 \
         -exp=$exp_data \
         -true_expec=$true_expec_path \
@@ -384,4 +386,3 @@ then
     echo "------ Launching analyse further QHL ------"
     # sh $further_analyse_script
 fi
-

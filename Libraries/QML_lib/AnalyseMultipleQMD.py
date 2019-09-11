@@ -432,25 +432,7 @@ if qhl_mode==True:
 if further_qhl_mode == False:
     print("FURTHER QHL=FALSE. PLOTTING STUFF")
     plot_file = directory_to_analyse+'model_wins.png'
-    # results_collection_file = "{}/scores_{}.p".format(
-    #     directory_to_analyse,
-    #     growth_generator
-    # )
-    # model_scores, growth_rules, growth_classes, unique_growth_classes = model_scores(directory_to_analyse)
-    
-    # print("GROWTH RULES:", growth_rules, "\n\n\n")
-    # try:
-    #     entropy = get_entropy(model_scores, 
-    #         growth_generator = growth_generator, 
-    #         inf_gain=False
-    #     )
-    #     inf_gain = get_entropy(
-    #         model_scores, 
-    #         growth_generator  = growth_generator,
-    #         inf_gain=True
-    #     )
-    # except:
-    #     entropy = inf_gain = 0.0
+
     entropy = inf_gain = 0.0
     print("[AnalyseMultipleQMD] f scores before plot scores:", f_scores)
     plot_scores(

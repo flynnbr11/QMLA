@@ -587,6 +587,7 @@ def Bayes_t_test(
         'true' : {},
         'mean_std_dev' : {},
         'success_rate' : {},
+        'r_squared' : {}
     }
     success_rate_by_term = {}
     nmod = len(winning_models)  
@@ -624,6 +625,7 @@ def Bayes_t_test(
     # full_plot_axis = axes[0,0]
     full_plot_axis = fig.add_subplot(gs[0,:])
     # i=0
+    r_squared_by_models = {}
 
 
     for term in winning_models:
@@ -774,7 +776,7 @@ def Bayes_t_test(
         collect_expectation_values['means'][name] = mean_exp
         collect_expectation_values['mean_std_dev'][name] = std_dev_exp
         collect_expectation_values['success_rate'][name] = success_rate
-
+        collect_expectation_values['r_squared'][name] = final_r_squared
 #        ax.errorbar(times, mean_exp, xerr=std_dev_exp, label=description)
         # if num_sets_of_this_name > 1:
         #     bayes_t_values_avail_times = sorted(list(t_values.keys()))

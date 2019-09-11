@@ -611,7 +611,7 @@ elif (
 
         results_file=str(
             global_variables.results_directory + 
-            # output_prefix + 
+            output_prefix + 
             'results_'+
             str(name)+'_'+
             str(global_variables.long_id)+
