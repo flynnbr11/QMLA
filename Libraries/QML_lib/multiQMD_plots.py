@@ -650,6 +650,7 @@ def analyse_and_plot_dynamics_multiple_models(
         # times = sorted(list(experimental_measurements.keys()))
         true_times = sorted(list(expectation_values.keys()))
         times = sorted(list(expectation_values.keys()))
+        times = [np.round(t, 2) for t in times]
         flag=True
         one_sample=True
         for t in times:
@@ -1254,6 +1255,7 @@ def get_model_scores(
     f_scores = {}
     precisions = {}
     sensitivities = {}
+    volumes = {}
     model_results = {}
 
     for f in pickled_files:
@@ -1265,6 +1267,7 @@ def get_model_scores(
         if alph in scores.keys():
             scores[alph] += 1
             coeff_of_determination[alph].append(result['FinalRSquared'])
+            volumes[alph].append(result['TrackVolume'])
 
         else:
             scores[alph] = 1
@@ -1272,6 +1275,7 @@ def get_model_scores(
             f_scores[alph] = result['F-score']
             sensitivities[alph] = result['Sensitivity']
             precisions[alph] = result['Precision']
+            volumes[alph] = [(result['TrackVolume'])]
 
         if alph not in list(growth_rules.keys()):
             growth_rules[alph] = result['GrowthGenerator']
@@ -1308,7 +1312,9 @@ def get_model_scores(
             'precision' : precisions[latex_name], 
             'sensitivity' : sensitivities[latex_name], 
             'f_score' : latex_f_scores[latex_name],
-            'median_r_squared' : latex_coeff_det[latex_name]
+            'median_r_squared' : latex_coeff_det[latex_name],
+            'r_squared_individual_instances' : coeff_of_determination[mod],
+            'volumes' : volumes[mod]
         }
 
 
@@ -1342,7 +1348,7 @@ def get_model_scores(
             # combined_analysis['results'] = results
             for model in list(model_results.keys()):
                 for res in list(model_results[model].keys()):
-                    combined_analysis[res] = model_results[model][res]
+                    combined_analysis[model][res] = model_results[model][res]
             pickle.dump(
                 combined_analysis,
                 open(collective_analysis_pickle_file, 'wb')

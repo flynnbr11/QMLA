@@ -313,7 +313,7 @@ print("[AnalyseMultipleQMD] unique growth classes:", unique_growth_classes)
 model_score_results = get_model_scores(
     directory_name = directory_to_analyse,
     unique_growth_classes = unique_growth_classes,
-    # collective_analysis_pickle_file = results_collection_file, 
+    collective_analysis_pickle_file = results_collection_file, 
 )
 model_scores = model_score_results['scores']
 growth_rules = model_score_results['growth_rules']
