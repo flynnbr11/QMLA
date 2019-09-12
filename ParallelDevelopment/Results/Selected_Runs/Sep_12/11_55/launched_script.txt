@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="short-run-data-for-generating-plots__exp-data-pr-probe"
+test_description="short-run-data-for-generating-plots__simulation-pr-probe"
 
 
 ### ---------------------------------------------------###
@@ -16,8 +16,8 @@ min_id=1 # update so instances don't clash and hit eachother's redis databases
 multiple_qhl=0
 multiple_growth_rules=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
-experimental_data=1 # use experimental data -> 1; use fake data ->0
-simulate_experiment=0
+experimental_data=0 # use experimental data -> 1; use fake data ->0
+simulate_experiment=1
 
 # QHL parameters.
 e=10 # experiments
