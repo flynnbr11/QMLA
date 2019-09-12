@@ -1262,12 +1262,13 @@ def get_model_scores(
         fname = directory_name+'/'+str(f)
         result = pickle.load(open(fname, 'rb'))
         alph = result['NameAlphabetical']
-        
+        vol = result['TrackVolume']
+        vol_list = [vol[e] for e in list(sorted(result['TrackVolume'].keys()))]
 
         if alph in scores.keys():
             scores[alph] += 1
             coeff_of_determination[alph].append(result['FinalRSquared'])
-            volumes[alph].append(result['TrackVolume'])
+            volumes[alph].append(vol_list)
 
         else:
             scores[alph] = 1
@@ -1275,7 +1276,7 @@ def get_model_scores(
             f_scores[alph] = result['F-score']
             sensitivities[alph] = result['Sensitivity']
             precisions[alph] = result['Precision']
-            volumes[alph] = [(result['TrackVolume'])]
+            volumes[alph] = [vol_list]
 
         if alph not in list(growth_rules.keys()):
             growth_rules[alph] = result['GrowthGenerator']
