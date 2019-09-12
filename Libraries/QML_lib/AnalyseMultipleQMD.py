@@ -312,7 +312,8 @@ print("[AnalyseMultipleQMD] unique growth classes:", unique_growth_classes)
 # first get model scores
 model_score_results = get_model_scores(
     directory_name = directory_to_analyse,
-    unique_growth_classes = unique_growth_classes
+    unique_growth_classes = unique_growth_classes,
+    # collective_analysis_pickle_file = results_collection_file, 
 )
 model_scores = model_score_results['scores']
 growth_rules = model_score_results['growth_rules']
@@ -344,7 +345,7 @@ average_parameter_estimates(
 # if exp_data:
 print("dynamics plots")
 
-Bayes_t_test( # average expected values
+analyse_and_plot_dynamics_multiple_models( # average expected values
     directory_name = directory_to_analyse, 
     dataset = dataset, 
     results_path = results_csv,
@@ -445,7 +446,7 @@ if further_qhl_mode == False:
         f_scores = f_scores, 
         true_operator = true_operator, 
         growth_generator = growth_generator,
-        collective_analysis_pickle_file = results_collection_file, 
+        # collective_analysis_pickle_file = results_collection_file, 
         save_file = plot_file
     )
 

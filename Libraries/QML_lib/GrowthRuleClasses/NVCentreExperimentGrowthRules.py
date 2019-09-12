@@ -32,8 +32,8 @@ class nv_centre_spin_experimental_method(
         # self.true_operator = 'xTiPPyTy'
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         self.measurement_type = 'hahn'
-        self.true_operator = 'xTiPPyTiPPzTiPPzTz'
-        # self.true_operator = 'yTi'
+        # self.true_operator = 'xTiPPyTiPPzTiPPzTz'
+        self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
 
         self.initial_models = ['xTi', 'yTi', 'zTi'] 
         self.qhl_models =    	[
@@ -52,11 +52,11 @@ class nv_centre_spin_experimental_method(
         self.fixed_axis = 'z' # e.g. transverse axis
         # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
 
-        # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+        self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
         # self.shared_probes = False
         # self.simulator_probe_generation_function = self.probe_generation_function
 
-        self.probe_generation_function = ProbeGeneration.separable_probe_dict
+        # self.probe_generation_function = ProbeGeneration.separable_probe_dict
 
         # params for testing p value calculation
         # self.gaussian_prior_means_and_widths = {
@@ -69,12 +69,13 @@ class nv_centre_spin_experimental_method(
         #     'yTy' : 0.799
 
         # }
-        self.true_params = { # from Jul_05/16_40
-            'xTi': 0.92450565,
-            'yTi': 6.00664336, 
-            'zTi': 1.65998543, 
-            'zTz': 0.76546868,
-        }
+        if self.true_operator == 'xTiPPyTiPPzTiPPzTz':
+            self.true_params = { # from Jul_05/16_40
+                'xTi': 0.92450565,
+                'yTi': 6.00664336, 
+                'zTi': 1.65998543, 
+                'zTz': 0.76546868,
+            }
         if self.use_experimental_data == True:
             # probes, prior etc specific to using experimental data
             # print(
@@ -82,7 +83,7 @@ class nv_centre_spin_experimental_method(
             #     os.path.basename(__file__))
             # )
             # self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
-            # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+            self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
 
             # self.probe_generation_function = ProbeGeneration.plus_probes_dict
             self.gaussian_prior_means_and_widths = {

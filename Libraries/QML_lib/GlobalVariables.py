@@ -221,7 +221,7 @@ class GlobalVariablesClass():
         # self.save_plots = bool(arguments.save_plots)
         self.cumulative_csv = arguments.cumulative_csv
         self.data_time_offset = arguments.data_time_offset
-        self.data_max_time = arguments.data_max_time 
+        self.data_max_time = self.growth_class.max_time_to_consider # arguments.data_max_time 
         self.true_expec_path = arguments.true_expec_path
         self.plot_probe_file = arguments.plot_probe_file
         self.special_probe = arguments.special_probe_for_learning

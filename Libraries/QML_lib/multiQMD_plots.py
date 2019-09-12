@@ -473,7 +473,7 @@ def average_parameter_estimates(
             plt.savefig(save_file, bbox_inches='tight')
 
 
-def Bayes_t_test(
+def analyse_and_plot_dynamics_multiple_models(
     directory_name, 
     dataset, 
     results_path,
@@ -545,7 +545,7 @@ def Bayes_t_test(
             file.startswith(results_file_name_start)
         ):
             pickled_files.append(file)
-
+    num_results_files = len(pickled_files)
     growth_rules = {}
     for f in pickled_files:
         fname = directory_name+'/'+str(f)
@@ -568,9 +568,6 @@ def Bayes_t_test(
         except:
             growth_classes[g] = None
 
-    # print("[BayesTTest - param avg] unique_growth_rules:", unique_growth_rules)
-    # print("[BayesTTest - param avg] unique_growth_classes:", unique_growth_classes)
-    # print("[BayesTTest - param avg] growth classes:", growth_classes)
     try:
         true_model = unique_growth_classes[growth_generator].true_operator
     except:
@@ -594,18 +591,6 @@ def Bayes_t_test(
     ncols = int(np.ceil(np.sqrt(nmod)))
     nrows = int(np.ceil(nmod/ncols)) + 1 # 1 extra row for "master"
 
-    # fig = plt.figure()
-    # ax = plt.subplot(111)
-
-    # fig, axes = plt.subplots(
-    #     figsize = (20, 10), 
-    #     nrows=nrows, 
-    #     ncols=ncols,
-    #     squeeze=False,
-    #     sharex='col',
-    #     sharey='row'
-    # )
-
     fig = plt.figure(
         figsize = (15, 8), 
         # constrained_layout=True,
@@ -625,8 +610,7 @@ def Bayes_t_test(
     # full_plot_axis = axes[0,0]
     full_plot_axis = fig.add_subplot(gs[0,:])
     # i=0
-    r_squared_by_models = {}
-
+    model_statistics = {}    
 
     for term in winning_models:
         # plt.clf()
@@ -694,14 +678,6 @@ def Bayes_t_test(
                         nan_policy='omit'
                     )
 
-
-                # if flag==True and t>0:
-                #     print("t=", t)
-                #     print("true:", expec_values_array)
-                #     print("true", true[t])
-                #     print("t_val:", t_val)
-                #     flag=False
-
                 if np.isnan(float(t_val[1]))==False:
                     # t_values[t] = 1-t_val[1]
                     t_values[t] = t_val[1]
@@ -737,16 +713,6 @@ def Bayes_t_test(
             true_mean_minus_val
         )
         final_r_squared = 1 - sum_residuals/sum_of_squares
-        # print(
-        #     "[Analyse - avg dynamics]\n",
-        #     "\nmean_true_val", mean_true_val,
-        #     "\ntrue", true_exp[0:10],
-        #     "\nmean", mean_exp[0:10],
-        #     "\nresiduals", residuals[0:10],
-        #     "\nsum of residuals", sum_residuals,
-        #     "\ntrue_mean_minus_val", true_mean_minus_val, 
-        #     "\nsum of square", sum_of_squares,
-        # )
 
         name = growth_classes[term].latex_name(term)
         description = str(
@@ -776,26 +742,15 @@ def Bayes_t_test(
         collect_expectation_values['means'][name] = mean_exp
         collect_expectation_values['mean_std_dev'][name] = std_dev_exp
         collect_expectation_values['success_rate'][name] = success_rate
-        collect_expectation_values['r_squared'][name] = final_r_squared
-#        ax.errorbar(times, mean_exp, xerr=std_dev_exp, label=description)
-        # if num_sets_of_this_name > 1:
-        #     bayes_t_values_avail_times = sorted(list(t_values.keys()))
-        #     bayes_t_values = [t_values[t] for t in bayes_t_values_avail_times]
-        #     median_b_t_val = np.median(bayes_t_values)
-        #     # print("Bayes t values:", bayes_t_values)
+        model_statistics[name] = {
+            'r_squared_median_exp_val' : final_r_squared, 
+            'mean_expectation_values' : mean_exp, 
+            'mean_std_dev' : std_dev_exp,
+            'success_rate_t_test' : success_rate, 
+            'num_wins' : num_sets_of_this_name,
+            'win_percentage'  : int(100*num_sets_of_this_name/num_results_files), 
+        }
 
-        #     ax.plot(
-        #         bayes_t_values_avail_times, 
-        #         bayes_t_values,
-        #         label=str(
-        #             'Bayes t-value (median '+ 
-        #             str(np.round(median_b_t_val,2))+
-        #             ')'
-        #         ),
-        #         color=colours[winning_models.index(term)],
-        #         linestyle='--',
-        #         alpha=0.3
-        #     )
 
         ax.plot(
             times, 
@@ -866,15 +821,6 @@ def Bayes_t_test(
             c = colours[winning_models.index(term)],
             label=high_level_label
         )
-        """
-        full_plot_axis.fill_between(
-            times, 
-            mean_exp-std_dev_exp, 
-            mean_exp+std_dev_exp, 
-            alpha=0.2,
-            facecolor = colours[winning_models.index(term)],
-        )
-        """
         if axes_so_far == 1:
             full_plot_axis.scatter(
                 times, 
@@ -910,20 +856,6 @@ def Bayes_t_test(
         ax.set_title(description)
 
 
-        # if save_to_file is not None:
-        #     save_file=''
-        #     # save_file = save_to_file[:-4]
-        #     save_file = str(
-        #         save_to_file[:-4]+
-        #         '_'+
-        #         str(term) + '.png'
-        #     )
-        #     print("Saving to ",save_file )
-        #     plt.savefig(save_file, bbox_inches='tight')
-
-    # fig.set_xlabel('Time')
-    # fig.set_ylabel('Expectation Value')
-
     fig.text(0.45, -0.04, 'Time', ha='center')
     fig.text(-0.04, 0.5, 'Expectation Value', va='center', rotation='vertical')
     
@@ -940,13 +872,6 @@ def Bayes_t_test(
         save_to_file is not None
     ):
         plt.clf()
-        # plt.scatter(
-        #     times, 
-        #     true_exp, 
-        #     color='r', 
-        #     s=5, 
-        #     label='True Expectation Value'
-        # )
         plt.plot(
             times, 
             true_exp, 
@@ -974,19 +899,29 @@ def Bayes_t_test(
 
     if collective_analysis_pickle_file is not None:
         if os.path.isfile(collective_analysis_pickle_file) is False:
-            combined_analysis = {
-                'expectation_values' : collect_expectation_values
-            }
+            # combined_analysis = {
+            #     # 'expectation_values' : collect_expectation_values,
+            #     # 'statistics' : model_statistics, 
+            #     'model_statistics' : model_statistics, 
+            # }
             pickle.dump(
-                combined_analysis,
+                model_statistics,
                 open(collective_analysis_pickle_file, 'wb')
             )
         else:
             # load current analysis dict, add to it and rewrite it. 
             combined_analysis = pickle.load(
-                open(collective_analysis_pickle_file, 'rb')
+                open(
+                    collective_analysis_pickle_file, 
+                    'rb'
+                )
             ) 
-            combined_analysis['expectation_values'] = collect_expectation_values
+            # combined_analysis['expectation_values'] = collect_expectation_values
+            # combined_analysis['statistics'] = model_statistics
+            for model in model_statistics.keys():
+                for key in model_statistics[model].keys():
+                    combined_analysis[model][key] = model_statistics[model][key]
+
             pickle.dump(
                 combined_analysis,
                 open(collective_analysis_pickle_file, 'wb')
@@ -1268,7 +1203,8 @@ def all_times_learned_histogram(
         
 def get_model_scores(
     directory_name, 
-    unique_growth_classes
+    unique_growth_classes,
+    collective_analysis_pickle_file =  None, 
 ):
 #    sys.path.append(directory_name)
 
@@ -1287,6 +1223,7 @@ def get_model_scores(
     f_scores = {}
     precisions = {}
     sensitivities = {}
+    model_results = {}
 
     for f in pickled_files:
         fname = directory_name+'/'+str(f)
@@ -1313,7 +1250,9 @@ def get_model_scores(
             coeff_of_determination[alph]
         )
 
-    unique_growth_rules = list(set(list(growth_rules.values())))
+    unique_growth_rules = list(
+        set(list(growth_rules.values()))
+    )
 
     growth_classes = {}
     for g in list(growth_rules.keys()):
@@ -1334,6 +1273,13 @@ def get_model_scores(
         sensitivities[latex_name] = sensitivities[mod]
         sensitivities.pop(mod)
         wins[latex_name] = scores[mod]
+        model_results[latex_name] = {
+            'precision' : precisions[latex_name], 
+            'sensitivity' : sensitivities[latex_name], 
+            'f_score' : latex_f_scores[latex_name],
+            'median_r_squared' : latex_coeff_det[latex_name]
+        }
+
 
     results = {
         'scores' : scores, 
@@ -1347,6 +1293,30 @@ def get_model_scores(
         'sensitivities' : sensitivities,
         'wins' : wins
     }
+
+    if collective_analysis_pickle_file is not None :
+        if os.path.isfile(collective_analysis_pickle_file) is False:
+            # combined_analysis = {
+            #     'results' : results
+            # }
+            pickle.dump(
+                model_results,
+                open(collective_analysis_pickle_file, 'wb')
+            )
+        else:
+            # load current analysis dict, add to it and rewrite it. 
+            combined_analysis = pickle.load(
+                open(collective_analysis_pickle_file, 'rb')
+            ) 
+            # combined_analysis['results'] = results
+            for model in list(model_results.keys()):
+                for res in list(model_results[model].keys()):
+                    combined_analysis[res] = model_results[model][res]
+            pickle.dump(
+                combined_analysis,
+                open(collective_analysis_pickle_file, 'wb')
+            )
+
 
     return results
 
@@ -1507,24 +1477,26 @@ def plot_scores(
     #             'wb'
     #         )
     #     )
-    if os.path.isfile(collective_analysis_pickle_file) is False:
-        combined_analysis = {
-            'scores' : results_collection
-        }
-        pickle.dump(
-            combined_analysis,
-            open(collective_analysis_pickle_file, 'wb')
-        )
-    else:
-        # load current analysis dict, add to it and rewrite it. 
-        combined_analysis = pickle.load(
-            open(collective_analysis_pickle_file, 'rb')
-        ) 
-        combined_analysis['scores'] = results_collection
-        pickle.dump(
-            combined_analysis,
-            open(collective_analysis_pickle_file, 'wb')
-        )
+    if collective_analysis_pickle_file is not None:
+        # no longer used/accessed by this function
+        if os.path.isfile(collective_analysis_pickle_file) is False:
+            combined_analysis = {
+                'scores' : results_collection
+            }
+            pickle.dump(
+                combined_analysis,
+                open(collective_analysis_pickle_file, 'wb')
+            )
+        else:
+            # load current analysis dict, add to it and rewrite it. 
+            combined_analysis = pickle.load(
+                open(collective_analysis_pickle_file, 'rb')
+            ) 
+            combined_analysis['scores'] = results_collection
+            pickle.dump(
+                combined_analysis,
+                open(collective_analysis_pickle_file, 'wb')
+            )
 
 
 

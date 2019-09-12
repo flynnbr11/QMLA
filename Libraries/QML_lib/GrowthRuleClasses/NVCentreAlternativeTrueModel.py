@@ -47,8 +47,8 @@ class nv_centre_spin_experimental_method_alternative_true_model_second(
         )
 
         self.true_operator = 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz'
-        self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
-        # self.probe_generation_function = ProbeGeneration.separable_probe_dict
+        # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+        self.probe_generation_function = ProbeGeneration.separable_probe_dict
 
 
 
