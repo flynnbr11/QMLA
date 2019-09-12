@@ -776,6 +776,7 @@ def analyse_and_plot_dynamics_multiple_models(
             'success_rate_t_test' : success_rate, 
             'num_wins' : num_sets_of_this_name,
             'win_percentage'  : int(100*num_sets_of_this_name/num_results_files), 
+            'num_instances' : num_results_files,
             'lower_iqr_exp_val' : lower_iqr_exp, 
             'higher_iqr_exp_val' : higher_iqr_exp, 
             'lower_iqr_r_sq' : lower_iqr_r_sq,
@@ -936,12 +937,14 @@ def analyse_and_plot_dynamics_multiple_models(
             #     # 'statistics' : model_statistics, 
             #     'model_statistics' : model_statistics, 
             # }
+            print("[analyse] Saving collective analysis. \nfile:", collective_analysis_pickle_file)
             pickle.dump(
                 model_statistics,
                 open(collective_analysis_pickle_file, 'wb')
             )
         else:
             # load current analysis dict, add to it and rewrite it. 
+            print("[analyse]  Reading in, appending and saving collective analysis. \nfile:", collective_analysis_pickle_file)
             combined_analysis = pickle.load(
                 open(
                     collective_analysis_pickle_file, 
@@ -958,6 +961,10 @@ def analyse_and_plot_dynamics_multiple_models(
                 combined_analysis,
                 open(collective_analysis_pickle_file, 'wb')
             )
+    else:
+        print("[analyse] collective analysis path:", collective_analysis_pickle_file)
+
+
     if return_results == True:
         expectation_values_by_latex_name = {}
         for term in winning_models:
@@ -1238,8 +1245,7 @@ def get_model_scores(
     unique_growth_classes,
     collective_analysis_pickle_file =  None, 
 ):
-#    sys.path.append(directory_name)
-
+    
     os.chdir(directory_name)
 
     scores = {}
@@ -1334,6 +1340,7 @@ def get_model_scores(
 
     if collective_analysis_pickle_file is not None :
         if os.path.isfile(collective_analysis_pickle_file) is False:
+            print("[get_model_scores] Saving collective analysis. \nfile:", collective_analysis_pickle_file)
             # combined_analysis = {
             #     'results' : results
             # }
@@ -1343,18 +1350,20 @@ def get_model_scores(
             )
         else:
             # load current analysis dict, add to it and rewrite it. 
+            print("[get_model_scores] Reading in, appending and saving collective analysis. \nfile:", collective_analysis_pickle_file)
             combined_analysis = pickle.load(
                 open(collective_analysis_pickle_file, 'rb')
             ) 
-            # combined_analysis['results'] = results
+
+            # print("[get_model_scores] Combined analysis so far:\n", combined_analysis)
             for model in list(model_results.keys()):
                 for res in list(model_results[model].keys()):
                     combined_analysis[model][res] = model_results[model][res]
+            # print("[get_model_scores] Combined analysis before rewriting:\n", combined_analysis)
             pickle.dump(
                 combined_analysis,
                 open(collective_analysis_pickle_file, 'wb')
             )
-
 
     return results
 
