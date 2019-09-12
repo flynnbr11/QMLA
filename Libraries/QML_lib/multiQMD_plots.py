@@ -953,10 +953,13 @@ def analyse_and_plot_dynamics_multiple_models(
             ) 
             # combined_analysis['expectation_values'] = collect_expectation_values
             # combined_analysis['statistics'] = model_statistics
+            print("[analyse] Combined analysis so far:\n", combined_analysis)
             for model in model_statistics.keys():
-                for key in model_statistics[model].keys():
+                new_keys = list(model_statistics[model].keys())
+                for key in new_keys:
                     combined_analysis[model][key] = model_statistics[model][key]
-
+            print("[analyse] new keys:", new_keys)
+            print("[analyse] Combined analysis after additions:\n", combined_analysis)
             pickle.dump(
                 combined_analysis,
                 open(collective_analysis_pickle_file, 'wb')

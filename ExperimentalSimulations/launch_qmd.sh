@@ -6,7 +6,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=10
+num_tests=2
 qhl_test=1
 multiple_qhl=0
 do_further_qhl=0

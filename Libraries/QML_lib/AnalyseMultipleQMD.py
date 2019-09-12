@@ -342,27 +342,31 @@ average_parameter_estimates(
     )
 )
 
-# if exp_data:
-print("dynamics plots")
+print("Analysis/dynamics starting")
 
-analyse_and_plot_dynamics_multiple_models( # average expected values
-    directory_name = directory_to_analyse, 
-    dataset = dataset, 
-    results_path = results_csv,
-    use_experimental_data = exp_data, 
-    results_file_name_start = results_file_name_start,
-    true_expectation_value_path = true_expec_path,
-    growth_generator = growth_generator, 
-    unique_growth_classes = unique_growth_classes,
-    top_number_models = arguments.top_number_models,
-    plot_probe_file = plot_probe_file,
-    collective_analysis_pickle_file = results_collection_file,
-    save_to_file=str(
-        directory_to_analyse+
-        plot_desc +
-        'expec_vals.png'
+try:
+    analyse_and_plot_dynamics_multiple_models( # average expected values
+        directory_name = directory_to_analyse, 
+        dataset = dataset, 
+        results_path = results_csv,
+        use_experimental_data = exp_data, 
+        results_file_name_start = results_file_name_start,
+        true_expectation_value_path = true_expec_path,
+        growth_generator = growth_generator, 
+        unique_growth_classes = unique_growth_classes,
+        top_number_models = arguments.top_number_models,
+        plot_probe_file = plot_probe_file,
+        collective_analysis_pickle_file = results_collection_file,
+        save_to_file=str(
+            directory_to_analyse+
+            plot_desc +
+            'expec_vals.png'
+        )
     )
-)
+except:
+    raise
+print("Analysis/dynamics plot finished")
+
 try:
     r_sqaured_average(
         results_path = results_csv,
