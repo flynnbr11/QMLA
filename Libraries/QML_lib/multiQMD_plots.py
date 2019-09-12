@@ -644,6 +644,9 @@ def analyse_and_plot_dynamics_multiple_models(
         std_dev = {}
         true = {}
         t_values = {}
+        lower_iqr_expectation_values = {}
+        higher_iqr_expectation_values = {}
+
         # times = sorted(list(experimental_measurements.keys()))
         true_times = sorted(list(expectation_values.keys()))
         times = sorted(list(expectation_values.keys()))
@@ -652,6 +655,8 @@ def analyse_and_plot_dynamics_multiple_models(
         for t in times:
             means[t] = np.mean(expectation_values[t])
             std_dev[t] = np.std(expectation_values[t])
+            lower_iqr_expectation_values[t] = np.percentile(expectation_values[t], 25)
+            higher_iqr_expectation_values[t] = np.percentile(expectation_values[t], 75)
             true[t] = experimental_measurements[t]
             if num_sets_of_this_name > 1:
                 expec_values_array = np.array(
@@ -704,6 +709,8 @@ def analyse_and_plot_dynamics_multiple_models(
 
         mean_exp = np.array( [means[t] for t in times] )
         std_dev_exp = np.array( [std_dev[t] for t in times] )
+        lower_iqr_exp = np.array([lower_iqr_expectation_values[t] for t in times])
+        higher_iqr_exp = np.array([higher_iqr_expectation_values[t] for t in times])
         # name=DataBase.latex_name_ising(term)
         residuals = (mean_exp - true_exp)**2
         sum_residuals = np.sum(residuals)
@@ -713,6 +720,25 @@ def analyse_and_plot_dynamics_multiple_models(
             true_mean_minus_val
         )
         final_r_squared = 1 - sum_residuals/sum_of_squares
+
+        # R^2 for interquartile range
+        lower_iqr_sum_residuals = np.sum(
+            (lower_iqr_exp - true_exp)**2
+        )
+        lower_iqr_sum_of_squares = np.sum(
+            ( lower_iqr_exp - np.mean(lower_iqr_exp) )**2
+        )
+        lower_iqr_r_sq = 1 - (lower_iqr_sum_residuals/lower_iqr_sum_of_squares)
+        higher_iqr_sum_residuals = np.sum(
+            (higher_iqr_exp - true_exp)**2
+        )
+        higher_iqr_sum_of_squares = np.sum(
+            ( higher_iqr_exp - np.mean(higher_iqr_exp) )**2
+        )
+        higher_iqr_r_sq = 1 - (higher_iqr_sum_residuals/higher_iqr_sum_of_squares)
+
+
+
 
         name = growth_classes[term].latex_name(term)
         description = str(
@@ -749,6 +775,11 @@ def analyse_and_plot_dynamics_multiple_models(
             'success_rate_t_test' : success_rate, 
             'num_wins' : num_sets_of_this_name,
             'win_percentage'  : int(100*num_sets_of_this_name/num_results_files), 
+            'lower_iqr_exp_val' : lower_iqr_exp, 
+            'higher_iqr_exp_val' : higher_iqr_exp, 
+            'lower_iqr_r_sq' : lower_iqr_r_sq,
+            'higher_iqr_r_sq' : higher_iqr_r_sq,
+            'times' : times
         }
 
 

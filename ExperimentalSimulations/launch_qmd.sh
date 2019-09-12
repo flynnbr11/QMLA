@@ -6,7 +6,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
+num_tests=10
 qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
@@ -36,7 +36,7 @@ number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
 bf_all_times=0
-data_max_time=5 # nanoseconds
+# data_max_time=5 # nanoseconds
 # data_time_offset=205 # nanoseconds
 
 ### ---------------------------------------------------###
@@ -241,7 +241,6 @@ do
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
-            -dst=$data_max_time \
             -bintimes=$bintimes \
             -bftimesall=$bf_all_times \
             -latex=$latex_mapping_file \
@@ -354,7 +353,6 @@ then
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
-            -dst=$data_max_time \
             -bintimes=$bintimes \
             -bftimesall=$bf_all_times \
             -latex=$latex_mapping_file \
