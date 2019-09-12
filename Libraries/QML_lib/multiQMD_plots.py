@@ -1355,11 +1355,11 @@ def get_model_scores(
                 open(collective_analysis_pickle_file, 'rb')
             ) 
 
-            # print("[get_model_scores] Combined analysis so far:\n", combined_analysis)
+            print("[get_model_scores] Combined analysis so far:\n", combined_analysis)
             for model in list(model_results.keys()):
                 for res in list(model_results[model].keys()):
                     combined_analysis[model][res] = model_results[model][res]
-            # print("[get_model_scores] Combined analysis before rewriting:\n", combined_analysis)
+            print("[get_model_scores] Combined analysis before rewriting:\n", combined_analysis)
             pickle.dump(
                 combined_analysis,
                 open(collective_analysis_pickle_file, 'wb')
