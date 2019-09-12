@@ -937,29 +937,22 @@ def analyse_and_plot_dynamics_multiple_models(
             #     # 'statistics' : model_statistics, 
             #     'model_statistics' : model_statistics, 
             # }
-            print("[analyse] Saving collective analysis. \nfile:", collective_analysis_pickle_file)
             pickle.dump(
                 model_statistics,
                 open(collective_analysis_pickle_file, 'wb')
             )
         else:
             # load current analysis dict, add to it and rewrite it. 
-            print("[analyse]  Reading in, appending and saving collective analysis. \nfile:", collective_analysis_pickle_file)
             combined_analysis = pickle.load(
                 open(
                     collective_analysis_pickle_file, 
                     'rb'
                 )
             ) 
-            # combined_analysis['expectation_values'] = collect_expectation_values
-            # combined_analysis['statistics'] = model_statistics
-            print("[analyse] Combined analysis so far:\n", combined_analysis)
             for model in model_statistics.keys():
                 new_keys = list(model_statistics[model].keys())
                 for key in new_keys:
                     combined_analysis[model][key] = model_statistics[model][key]
-            print("[analyse] new keys:", new_keys)
-            print("[analyse] Combined analysis after additions:\n", combined_analysis)
             pickle.dump(
                 combined_analysis,
                 open(collective_analysis_pickle_file, 'wb')
@@ -1344,25 +1337,19 @@ def get_model_scores(
     if collective_analysis_pickle_file is not None :
         if os.path.isfile(collective_analysis_pickle_file) is False:
             print("[get_model_scores] Saving collective analysis. \nfile:", collective_analysis_pickle_file)
-            # combined_analysis = {
-            #     'results' : results
-            # }
             pickle.dump(
                 model_results,
                 open(collective_analysis_pickle_file, 'wb')
             )
         else:
             # load current analysis dict, add to it and rewrite it. 
-            print("[get_model_scores] Reading in, appending and saving collective analysis. \nfile:", collective_analysis_pickle_file)
             combined_analysis = pickle.load(
                 open(collective_analysis_pickle_file, 'rb')
             ) 
 
-            print("[get_model_scores] Combined analysis so far:\n", combined_analysis)
             for model in list(model_results.keys()):
                 for res in list(model_results[model].keys()):
                     combined_analysis[model][res] = model_results[model][res]
-            print("[get_model_scores] Combined analysis before rewriting:\n", combined_analysis)
             pickle.dump(
                 combined_analysis,
                 open(collective_analysis_pickle_file, 'wb')
