@@ -9,7 +9,7 @@ test_description="short-run-data-for-generating-plots__exp-data-pr-probe"
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=15
+num_tests=5
 num_processes_to_request=6
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=1 # update so instances don't clash and hit eachother's redis databases
