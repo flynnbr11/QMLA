@@ -146,4 +146,37 @@ def generate_hopping_models_from_connected_sites(
     
     return new_terms
     
+
+
+class hopping_predetermined(
+    hopping_probabilistic
+):
+
+    def __init__(
+        self, 
+        growth_generation_rule, 
+        **kwargs
+    ):
+        # print("[Growth Rules] init nv_spin_experiment_full_tree")
+        super().__init__(
+            growth_generation_rule = growth_generation_rule,
+            **kwargs
+        )
+        self.true_operator = 'h_1h2_d4PPPPh_1h3_d4PPPPh_2h3_d4PPPPh_3h4_d4'
+        self.tree_completed_initially = True
+        if self.tree_completed_initially == True:
+            # to manually fix the models to be considered
+            self.initial_models = [
+                'h_1h2_d2',
+                'h_1h2_d3PPPh_1h3_d3',
+                'h_1h2_d3PPPh_2h3_d3',
+                'h_1h2_d3PPPh_1h3_d3PPPh_2h3_d3',
+                'h_1h2_d4PPPPh_1h3_d4PPPPh_2h3_d4PPPPh_2h4_d4',
+                'h_1h2_d4PPPPh_1h3_d4PPPPh_2h3_d4PPPPh_3h4_d4',
+                'h_1h2_d4PPPPh_1h3_d4PPPPh_1h4_d4PPPPh_2h3_d4',
+                'h_1h2_d4PPPPh_1h3_d4PPPPh_1h4_d4PPPPh_2h3_d4PPPPh_2h4_d4',
+                'h_1h2_d4PPPPh_1h3_d4PPPPh_1h4_d4PPPPh_2h3_d4PPPPh_3h4_d4',
+                'h_1h2_d4PPPPh_1h3_d4PPPPh_1h4_d4PPPPh_2h3_d4PPPPh_2h4_d4PPPPh_3h4_d4'
+            ]
+
         

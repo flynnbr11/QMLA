@@ -65,14 +65,16 @@ growth_classes = {
         Hubbard.hubbard_square,
     'heisenberg_xyz' : 
         Heisenberg.heisenberg_XYZ, 
-    'hopping_topology' : 
-        Hopping.hopping,
     'pairwise_pauli_probabilistic_nearest_neighbour' : 
         PauliPairwiseProbabilisticNearestNeighbour.pauli_pairwise_nearest_neighbour_probabilistic,
     'nearest_neighbour_pauli_2D' : 
         ConnectedLattice.connected_lattice,
+    'hopping_topology' : 
+        Hopping.hopping,
     'hopping_probabilistic' : 
         HoppingProbabilistic.hopping_probabilistic,
+    'hopping_predetermined' : 
+        HoppingProbabilistic.hopping_predetermined,
     'ising_probabilistic' : 
         IsingProbabilistic.ising_chain_probabilistic,
     'heisenberg_xyz_probabilistic' :

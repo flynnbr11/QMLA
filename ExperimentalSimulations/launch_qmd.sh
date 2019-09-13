@@ -90,8 +90,9 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='pairwise_pauli_probabilistic_nearest_neighbour'
 # sim_growth_rule='nearest_neighbour_pauli_2D'
 # sim_growth_rule='hopping_probabilistic'
+sim_growth_rule='hopping_predetermined'
 # sim_growth_rule='ising_probabilistic'
-sim_growth_rule='ising_predetermined'
+# sim_growth_rule='ising_predetermined'
 # sim_growth_rule='heisenberg_xyz_probabilistic'
 # sim_growth_rule='heisenberg_xyz_predetermined'
 
