@@ -2191,7 +2191,7 @@ def plotTreeDiagram(
     plt.legend(
         model_handles, 
         model_labels,
-        bbox_to_anchor=(0.5, 0.0, 1, 0 ),
+        bbox_to_anchor=(0.5, 1.0, 1, 0 ),
         # bbox_to_anchor=(1.1, 1.05),
         handler_map=handler_map, 
         loc=1,
@@ -2346,7 +2346,7 @@ def cumulativeQMDTreePlot(
         # print(medians)
         bayes_factors = medians
 
-    print("COUNTS", counts)
+    print("[cumulativeQMDTreePlot] COUNTS", counts)
 
 
     max_bayes_factor = max([max(bayes_factors[k].values()) for k in bayes_factors.keys()])
@@ -2418,7 +2418,7 @@ def cumulativeQMDTreePlot(
             G.nodes[m]['status']=min_colour
             G.nodes[m]['info']=0
             
-            
+    print("[cumulativeQMDTreePlot] nodes added.")
     max_num_mods_any_branch=max(list(branch_mod_count.values()))
     # get the cordinates to display this model's node at
     
@@ -2441,6 +2441,7 @@ def cumulativeQMDTreePlot(
         
 
 
+    print("[cumulativeQMDTreePlot] node positions added.")
     sorted_positions = sorted(positions.values(), key=lambda x: (x[1], x[0]))
     mod_id = 0
     model_ids_names = {}
@@ -2467,6 +2468,9 @@ def cumulativeQMDTreePlot(
 
 
     # frequency_markers = list(np.linspace(0, max_frequency, 4, dtype=int))
+    print("[cumulativeQMDTreePlot] setting edges.")
+    print("[cumulativeQMDTreePlot] modelist:", modlist)
+    # only_adjacent_branches = False
 
     even_arrow_width = True
     # setting the thickness if the arrows
@@ -2519,23 +2523,23 @@ def cumulativeQMDTreePlot(
 
                         # thisweight = np.log10(bayes_factors[a][b])
                         try:
-                            # print(
-                            #     "\n\t pair {},  \
-                            #     \n\t BF[a,b]:{} \
-                            #     \n\t BF[b,a]:{}\
-                            #     \n\t weight:{} \
-                            #     \n\t bf:{} \
-                            #     \n\t freq:{} \
-                            #     \n\t pair freq {}".format(
-                            #     pairing, 
-                            #     str(bayes_factors[a][b]),
-                            #     str(bayes_factors[b][a]),
-                            #     str(weight), 
-                            #     str(bf),
-                            #     frequency,
-                            #     pair_freqs[pairing]
-                            #     )
-                            # )
+                            print(
+                                "\n\t pair {},  \
+                                \n\t BF[a,b]:{} \
+                                \n\t BF[b,a]:{}\
+                                \n\t weight:{} \
+                                \n\t bf:{} \
+                                \n\t freq:{} \
+                                \n\t pair freq {}".format(
+                                pairing, 
+                                str(bayes_factors[a][b]),
+                                str(bayes_factors[b][a]),
+                                str(weight), 
+                                str(bf),
+                                frequency,
+                                pair_freqs[pairing]
+                                )
+                            )
                             G.add_edge(
                                 loser, 
                                 winner, 
@@ -2548,15 +2552,18 @@ def cumulativeQMDTreePlot(
                             )
                         except:
                             print(
-                                "[plotQMD] failed to add edge", pairing
+                                "[plotQMD - cumulativeQMDTreePlot] failed to add edge", pairing
                             )
                             raise
 
                     elif bf == 0:
                         weight = 0 
+            else:
+                print("not adding edge {}/{}".format(a,b))
 
-    max_freq = max(edge_frequencies)
+    print("[cumulativeQMDTreePlot] edges added.")
     print("edge freqs:", edge_frequencies)
+    max_freq = max(edge_frequencies)
     # print("freq markers:", frequency_markers)
     print("[plotQMD]max freq:", max_freq)
     

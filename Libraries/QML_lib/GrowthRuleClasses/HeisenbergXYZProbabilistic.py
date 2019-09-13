@@ -9,6 +9,7 @@ import ModelGeneration
 import SystemTopology
 import Heuristics
 
+
 import SuperClassGrowthRule
 import NVCentreLargeSpinBath
 import NVGrowByFitness
@@ -58,3 +59,51 @@ class heisenberg_xyz_probabilistic(
             'other' : 2
         }
         self.setup_growth_class()
+
+class heisenberg_xyz_predetermined(
+    ConnectedLattice.connected_lattice
+):
+    
+    def __init__(
+        self, 
+        growth_generation_rule, 
+        **kwargs
+    ):
+        # print("[Growth Rules] init nv_spin_experiment_full_tree")
+        super().__init__(
+            growth_generation_rule = growth_generation_rule,
+            **kwargs
+        )
+
+        self.tree_completed_initially = True
+        self.setup_growth_class()
+
+        if self.tree_completed_initially == True:
+            # to manually fix the models to be considered
+            models = []
+            list_connections = [
+                [(1,2)], # pair of sites
+                [(1,2), (2,3)],  # chain length 3
+                [(1,2), (1,3), (2,3), (2,4)], # square, 
+                [(1,2), (2,3), (3,4)], # chain     
+            ]
+            for connected_sites in list_connections:
+                
+                system_size = max(max(connected_sites))
+                terms = ConnectedLattice.pauli_like_like_terms_connected_sites(
+                    connected_sites = connected_sites, 
+                    base_terms = ['x', 'y','z'],
+                    num_sites = system_size
+                )
+                
+                p_str = 'P'*system_size
+                models.append(p_str.join(terms))
+                
+
+            self.initial_models = models
+
+            if self.true_operator not in self.initial_models:
+                self.initial_models.append(self.true_operator)
+
+            print("[heisenberg_xyz_predetermined] computed models:", models)
+            print("[heisenberg_xyz_predetermined] initial models:", self.initial_models)

@@ -594,8 +594,13 @@ if further_qhl_mode == False:
         sys.stderr = sys.__stderr__
 
 
-    except ValueError:
+    # except ValueError:
         pass
+    except Exception as exc:
+        print("Error plotting multi QMD tree.")
+        print(exc)
+        pass
+        
 
     except NameError:
         print(

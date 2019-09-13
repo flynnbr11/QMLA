@@ -2043,11 +2043,10 @@ class QMD():
                 self.log_print(
                     [
                     "child doesn't have active parent",
-                    "\t child id ", child_id, 
-                    "\t parent id ", parent_id,
-                    "\n\tchild branch:", child_branch,
-                    "\tparent branch:", parent_branch
-
+                    # "\t child id ", child_id, 
+                    # "\t parent id ", parent_id,
+                    # "\n\tchild branch:", child_branch,
+                    # "\tparent branch:", parent_branch
                     ]
                 )
                 self.log_print(
@@ -3407,13 +3406,17 @@ class QMD():
         self.false_negatives = len(true_set - learned_set)
         self.Precision = self.TruePositives / (self.TruePositives + self.FalsePositives)
         self.Sensitivity = self.TruePositives/self.TotalPositives
+        try:
+            self.FScore = (
+                (1 + beta**2) * (
+                    (self.Precision * self.Sensitivity) /
+                    (beta**2 * self.Precision + self.Sensitivity) 
+                )
+            ) 
+        except:
+            # both precision and sensitivity=0 as true_positives=0
+            self.FScore = 0 
 
-        self.FScore = (
-            (1 + beta**2) * (
-                (self.Precision * self.Sensitivity) /
-                (beta**2 * self.Precision + self.Sensitivity) 
-            )
-        ) 
         return self.FScore
             
     def runQMD(

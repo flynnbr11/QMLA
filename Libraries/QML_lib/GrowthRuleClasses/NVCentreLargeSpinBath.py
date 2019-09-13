@@ -64,6 +64,7 @@ class nv_centre_large_spin_bath(
         # self.plot_probe_generation_function = ProbeGeneration.zero_state_probes
         self.min_param = 0
         self.max_param = 10
+        # self.dataset = 'NV_revivals.p'
 
         self.max_num_models_by_shape = {
             1 : 0,

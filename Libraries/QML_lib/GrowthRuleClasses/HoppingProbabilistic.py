@@ -37,7 +37,6 @@ class hopping_probabilistic(
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = True
 
-        # self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.true_operator = 'h_1h2_d3PPPh_2h3_d3'
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]

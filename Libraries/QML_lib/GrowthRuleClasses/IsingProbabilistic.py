@@ -34,7 +34,7 @@ class ising_chain_probabilistic(
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
 
-        self.true_operator = 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3'
+        self.true_operator = 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3'
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
@@ -54,4 +54,58 @@ class ising_chain_probabilistic(
         self.max_num_models_by_shape = {
             'other' : 2
         }
+
         self.setup_growth_class()
+
+        self.tree_completed_initially = False
+        if self.tree_completed_initially == True:
+            # to manually fix the models to be considered
+            self.initial_models = [
+                self.true_operator,
+                'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
+                
+            ]
+
+
+
+class ising_chain_predetermined(
+    ising_chain_probabilistic
+):
+    def __init__(
+        self, 
+        growth_generation_rule, 
+        **kwargs
+    ):
+
+        super().__init__(
+            growth_generation_rule = growth_generation_rule,
+            **kwargs
+        )
+        # keep these fixed to enforce 1d Ising chain up to 7 sites
+        self.lattice_dimension = 1
+        self.initial_num_sites = 2
+        self.lattice_connectivity_max_distance = 1
+        self.max_num_sites = 7
+        self.lattice_connectivity_linear_only = True
+        self.lattice_full_connectivity = False
+        self.true_operator = 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3'
+        self.true_operator = DataBase.alph(self.true_operator)
+        self.qhl_models = [self.true_operator]
+        self.base_terms = [
+            'z'
+        ]
+        self.setup_growth_class()
+        self.tree_completed_initially = True
+        if self.tree_completed_initially == True:
+            # to manually fix the models to be considered
+            self.initial_models = [
+                'pauliSet_zJz_1J2_d2',
+                'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3',
+                'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4',
+                'pauliSet_zJz_1J2_d5PPPPPpauliSet_zJz_2J3_d5PPPPPpauliSet_zJz_3J4_d5PPPPPpauliSet_zJz_4J5_d5',
+                'pauliSet_zJz_1J2_d6PPPPPPpauliSet_zJz_2J3_d6PPPPPPpauliSet_zJz_3J4_d6PPPPPPpauliSet_zJz_4J5_d6',
+                'pauliSet_zJz_1J2_d7PPPPPPPpauliSet_zJz_2J3_d7PPPPPPPpauliSet_zJz_3J4_d7PPPPPPPpauliSet_zJz_4J5_d7',
+            ]
+
+            if self.true_operator not in self.initial_models:
+                self.initial_models.append(self.true_operator)

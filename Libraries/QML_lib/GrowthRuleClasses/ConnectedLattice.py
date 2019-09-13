@@ -59,7 +59,11 @@ class connected_lattice(
         self.setup_growth_class()
 
     def setup_growth_class(self):
-        self.max_num_generations = self.max_num_sites - self.initial_num_sites + self.generation_DAG
+        self.max_num_generations = (
+            self.max_num_sites - 
+            self.initial_num_sites + 
+            self.generation_DAG
+        )
         self.topology = SystemTopology.topology_grid(
             dimension = self.lattice_dimension,
             num_sites = self.initial_num_sites,

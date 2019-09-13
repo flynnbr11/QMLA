@@ -59,6 +59,8 @@ growth_classes = {
         IsingMultiAxis.ising_chain_multi_axis, 
     'ising_2d' : 
         Ising2D.ising_2D,
+    'ising_predetermined' : 
+        IsingProbabilistic.ising_chain_predetermined,
     'hubbard_square_lattice_generalised' : 
         Hubbard.hubbard_square,
     'heisenberg_xyz' : 
@@ -75,6 +77,8 @@ growth_classes = {
         IsingProbabilistic.ising_chain_probabilistic,
     'heisenberg_xyz_probabilistic' :
         HeisenbergXYZProbabilistic.heisenberg_xyz_probabilistic,
+    'heisenberg_xyz_predetermined' : 
+        HeisenbergXYZProbabilistic.heisenberg_xyz_predetermined,
     'basic_lindbladian' :
         BasicLindbladian.basic_lindbladian
 }
