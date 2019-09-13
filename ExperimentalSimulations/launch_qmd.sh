@@ -91,9 +91,9 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='nearest_neighbour_pauli_2D'
 # sim_growth_rule='hopping_probabilistic'
 # sim_growth_rule='ising_probabilistic'
-# sim_growth_rule='ising_predetermined'
+sim_growth_rule='ising_predetermined'
 # sim_growth_rule='heisenberg_xyz_probabilistic'
-sim_growth_rule='heisenberg_xyz_predetermined'
+# sim_growth_rule='heisenberg_xyz_predetermined'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1

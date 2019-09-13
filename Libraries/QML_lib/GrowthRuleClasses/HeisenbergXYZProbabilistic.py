@@ -104,6 +104,3 @@ class heisenberg_xyz_predetermined(
 
             if self.true_operator not in self.initial_models:
                 self.initial_models.append(self.true_operator)
-
-            print("[heisenberg_xyz_predetermined] computed models:", models)
-            print("[heisenberg_xyz_predetermined] initial models:", self.initial_models)
