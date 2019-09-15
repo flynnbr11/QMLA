@@ -462,15 +462,33 @@ def average_parameter_estimates(
             fig.suptitle(
                 'Parameter Esimates for {}'.format(latex_name)
             )
-            save_file=''
-            if save_to_file[-4:] == '.png':
-                partial_name = save_to_file[:-4]
-                save_file = str(partial_name + '_' + name + '.png')
-            else:
-                save_file = str(save_to_file + '_' + name + '.png')
-            # plt.tight_layout()
-            fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-            plt.savefig(save_file, bbox_inches='tight')
+            try:
+                save_file=''
+                if save_to_file[-4:] == '.png':
+                    partial_name = save_to_file[:-4]
+                    save_file = str(partial_name + '_' + name + '.png')
+                else:
+                    save_file = str(save_to_file + '_' + name + '.png')
+                # plt.tight_layout()
+                fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+                plt.savefig(save_file, bbox_inches='tight')
+            except:
+                print("Filename too long. Defaulting to idx")
+                save_file=''
+                if save_to_file[-4:] == '.png':
+                    partial_name = save_to_file[:-4]
+                    save_file = str(
+                        partial_name + 
+                        '_' + 
+                        str(winning_models.index(name)) + 
+                        '.png'
+                    )
+                else:
+                    save_file = str(save_to_file + '_' + name + '.png')
+                # plt.tight_layout()
+                fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+                plt.savefig(save_file, bbox_inches='tight')
+
 
 
 def analyse_and_plot_dynamics_multiple_models(
