@@ -111,22 +111,35 @@ probes_dir = str(
 )
 if not os.path.exists(probes_dir):
     try:
+        # store probes used for training by the first QMLA instance to be generated.
         os.makedirs(probes_dir)
+        system_probes_path = str( 
+            probes_dir
+            + 'system_probes_'
+            + str(global_variables.long_id)
+            +'.p'
+        )
+        if growth_class.shared_probes == False:
+            simulator_probes_path = str(
+                probes_dir
+                + 'simulator_probes_'
+                + str(global_variables.long_id)
+                +'.p'
+            )
     except:
         # if already exists (ie created by another QMD since if test ran...)
         pass
 
-training_probes_path = str( 
-    probes_dir
-    + 'probes_'
-    + str(global_variables.long_id)
-    +'.p'
-)
 
 pickle.dump(
     generated_probe_dict, 
-    open(training_probes_path, 'wb')
+    open(system_probes_path, 'wb')
 )
+pickle.dump(
+    simulator_probe_dict, 
+    open(simulator_probes_path, 'wb')
+)
+
 
 
 dataset = global_variables.dataset
