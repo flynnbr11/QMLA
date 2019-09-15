@@ -78,7 +78,7 @@ class connected_lattice(
             base_terms = self.base_terms, 
             num_sites = self.topology.num_sites() 
         )
-
+        self.true_operator = DataBase.alph(self.true_operator)
         self.model_fitness = {}
         self.models_rejected = {
             self.generation_DAG : []

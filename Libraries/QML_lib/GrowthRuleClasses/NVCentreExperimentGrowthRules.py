@@ -84,7 +84,7 @@ class nv_centre_spin_experimental_method(
             #     os.path.basename(__file__))
             # )
             # self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
-            self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+            # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
 
             # self.probe_generation_function = ProbeGeneration.plus_probes_dict
             self.gaussian_prior_means_and_widths = {

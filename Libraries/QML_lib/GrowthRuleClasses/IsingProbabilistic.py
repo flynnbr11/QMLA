@@ -52,8 +52,10 @@ class ising_chain_probabilistic(
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10
         self.max_num_models_by_shape = {
-            'other' : 2
+            'other' : 3
         }
+        self.min_param = 0
+        self.max_param = 10
 
         self.setup_growth_class()
 

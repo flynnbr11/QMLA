@@ -31,6 +31,9 @@ class heisenberg_xyz_probabilistic(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
+
+        self.min_param = 0
+        self.max_param = 10
         
         self.lattice_dimension = 2
         self.initial_num_sites = 2
@@ -61,7 +64,7 @@ class heisenberg_xyz_probabilistic(
         self.setup_growth_class()
 
 class heisenberg_xyz_predetermined(
-    ConnectedLattice.connected_lattice
+    heisenberg_xyz_probabilistic
 ):
     
     def __init__(
@@ -74,9 +77,14 @@ class heisenberg_xyz_predetermined(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
+        self.true_operator = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_yJy_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_yJy_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_yJy_d4PPPPpauliSet_3J4_zJz_d4'
 
         self.tree_completed_initially = True
         self.setup_growth_class()
+        self.max_num_sites = 6
+        self.max_num_models_by_shape = {
+            'other' : 3
+        }
 
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
@@ -85,7 +93,10 @@ class heisenberg_xyz_predetermined(
                 [(1,2)], # pair of sites
                 [(1,2), (2,3)],  # chain length 3
                 [(1,2), (1,3), (2,3), (2,4)], # square, 
-                [(1,2), (2,3), (3,4)], # chain     
+                [(1,2), (2,3), (3,4)], # chain,
+                [(1,2), (2,3), (3,4), (4,5)], # chain,
+                [(1,2), (2,3), (3,4), (4,5), (5,6)], # chain,
+                [(1,2), (1,4), (2,3), (2,5), (3,6), (4,5), (5,6)] #3x2 grid     
             ]
             for connected_sites in list_connections:
                 
@@ -99,7 +110,6 @@ class heisenberg_xyz_predetermined(
                 p_str = 'P'*system_size
                 models.append(p_str.join(terms))
                 
-
             self.initial_models = models
 
             if self.true_operator not in self.initial_models:
