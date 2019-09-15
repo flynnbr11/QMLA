@@ -119,6 +119,10 @@ if not os.path.exists(probes_dir):
             + str(global_variables.long_id)
             +'.p'
         )
+        pickle.dump(
+            generated_probe_dict, 
+            open(system_probes_path, 'wb')
+        )
         if growth_class.shared_probes == False:
             simulator_probes_path = str(
                 probes_dir
@@ -126,19 +130,16 @@ if not os.path.exists(probes_dir):
                 + str(global_variables.long_id)
                 +'.p'
             )
+            pickle.dump(
+                simulator_probe_dict, 
+                open(simulator_probes_path, 'wb')
+            )
+            
     except:
         # if already exists (ie created by another QMD since if test ran...)
         pass
 
 
-pickle.dump(
-    generated_probe_dict, 
-    open(system_probes_path, 'wb')
-)
-pickle.dump(
-    simulator_probe_dict, 
-    open(simulator_probes_path, 'wb')
-)
 
 
 
