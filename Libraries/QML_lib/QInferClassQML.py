@@ -325,7 +325,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         if (
             true_evo == True
             and 
-            self.use_experimental_data
+            self.use_experimental_data == True
         ):
             time = expparams['t']
             # print(

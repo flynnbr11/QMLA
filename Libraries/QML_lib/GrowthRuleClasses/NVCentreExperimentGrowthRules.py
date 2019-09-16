@@ -52,7 +52,8 @@ class nv_centre_spin_experimental_method(
         self.fixed_axis = 'z' # e.g. transverse axis
         # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
 
-        self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+        # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+        self.probe_generation_function = ProbeGeneration.plus_plus_with_phase_difference
         self.max_time_to_consider = 5 
         self.shared_probes = False
         self.simulator_probe_generation_function = self.probe_generation_function

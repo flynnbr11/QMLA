@@ -264,7 +264,94 @@ def experimental_NVcentre_ising_probes(
                 )
     return separable_probes
   
+def plus_plus_with_phase_difference(
+    max_num_qubits=2, 
+    num_probes=40,
+    noise_level=0.03, #from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    minimum_tolerable_noise = 1e-6,
+    # minimum_tolerable_noise needed
+    # or else run the risk of having 
+    # exact eigenstate and no learning occurs, and crashes. 
+    # *args, 
+    **kwargs    
+):
+    """
+    1 qubit  : |+>
+    2 qubits : |+>|+'>, where |+> = |0> + e^{iR}|1> (normalised, R = random phase)
+    N qubits : |+> |+'> ... |+'>
+    To be used for NV centre experimental data. 
+    """
+    print(
+        "[NV_centre_ising_probes_plus] min tol noise:", 
+        minimum_tolerable_noise, 
+        "noise level:", noise_level
+    )
+    if minimum_tolerable_noise  > noise_level:
+        noise_level = minimum_tolerable_noise
+    plus_state = np.array([1+0j, 1])/np.sqrt(2)
+    random_noise = noise_level * random_probe(1)    
+    noisy_plus = plus_state + random_noise
+    norm_factor = np.linalg.norm(noisy_plus)
+    noisy_plus = noisy_plus/norm_factor
+   
+    separable_probes = {}
+    for i in range(num_probes):
+        separable_probes[i,0] = noisy_plus
+        for j in range(1, 1+max_num_qubits):
+            if j==1:
+                separable_probes[i,j] = separable_probes[i,0]
+            else: 
+                separable_probes[i,j] = (
+                    np.tensordot(
+                        separable_probes[i,j-1],
+                        # noisy_plus,
+                        random_phase_plus(noise_level=noise_level),
+                        axes=0
+                    ).flatten(order='c')
+                )
+            while (
+                np.isclose(
+                    1.0, 
+                    np.linalg.norm(separable_probes[i,j]), 
+                    atol=1e-14
+                ) is  False
+            ):
+                print("non-unit norm: ", 
+                    np.linalg.norm(separable_probes[i,j])
+                )
+                # keep replacing until a unit-norm 
+                separable_probes[i,j] = (
+                    np.tensordot(
+                        separable_probes[i,j-1],
+                        random_phase_plus(noise_level=noise_level),
+                        axes=0
+                    ).flatten(order='c')
+                )
+    return separable_probes
 
+def random_phase_plus(
+    noise_level = 1e-5
+):
+    import random
+    random_phase = random.uniform(0, np.pi)
+    print("Random phase:", random_phase)
+    rand_phase_plus = np.array(
+        [
+            1.0+0.j, 
+            np.exp(1.0j*random_phase)
+        ]
+    )/np.sqrt(2)
+    
+    noisy_state = noise_level*random_probe(1)
+    rand_phase_plus += noisy_state
+    norm = np.linalg.norm(rand_phase_plus)
+    rand_phase_plus = rand_phase_plus/norm
+    return rand_phase_plus
+
+
+
+
+# General purpose probe dictionaries
 def n_qubit_plus_state(num_qubits):
     one_qubit_plus = (1/np.sqrt(2) + 0j) * np.array([1,1])
     plus_n = one_qubit_plus
