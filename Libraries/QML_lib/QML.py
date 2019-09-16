@@ -367,8 +367,10 @@ class ModelLearningClass():
         self.Prior = Distributions.get_prior(
             model_name = self.Name, 
             gaussian = gaussian, 
-            param_minimum = qmd_info['param_min'],
-            param_maximum = qmd_info['param_max'], 
+            # param_minimum = qmd_info['param_min'],
+            # param_maximum = qmd_info['param_max'], 
+            param_minimum = self.GrowthClass.min_param,
+            param_maximum = self.GrowthClass.max_param, 
             param_normal_mean = qmd_info['param_mean'], 
             param_normal_sigma = qmd_info['param_sigma'], 
             random_mean=False, 
