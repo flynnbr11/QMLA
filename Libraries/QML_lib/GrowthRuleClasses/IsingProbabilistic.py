@@ -96,6 +96,9 @@ class ising_chain_predetermined(
         self.base_terms = [
             'z'
         ]
+        self.min_param = 0
+        self.max_param = 1
+
         self.setup_growth_class()
         self.tree_completed_initially = True
         if self.tree_completed_initially == True:

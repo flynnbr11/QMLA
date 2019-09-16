@@ -168,6 +168,9 @@ class hopping_predetermined(
         )
         self.true_operator = 'h_1h2_d4PPPPh_1h3_d4PPPPh_2h3_d4PPPPh_3h4_d4'
         self.tree_completed_initially = True
+        self.min_param = 0
+        self.max_param = 1
+
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
             self.initial_models = [

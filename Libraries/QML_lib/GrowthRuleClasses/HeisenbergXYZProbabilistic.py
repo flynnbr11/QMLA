@@ -85,6 +85,8 @@ class heisenberg_xyz_predetermined(
         self.max_num_models_by_shape = {
             'other' : 3
         }
+        self.min_param = 0
+        self.max_param = 1
 
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
