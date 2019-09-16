@@ -1367,7 +1367,12 @@ def get_model_scores(
 
             for model in list(model_results.keys()):
                 for res in list(model_results[model].keys()):
-                    combined_analysis[model][res] = model_results[model][res]
+                    try:
+                        combined_analysis[model][res] = model_results[model][res]
+                    except:
+                        combined_analysis[model] = {
+                            res : model_results[model][res]
+                        }
             pickle.dump(
                 combined_analysis,
                 open(collective_analysis_pickle_file, 'wb')

@@ -281,11 +281,6 @@ def plus_plus_with_phase_difference(
     N qubits : |+> |+'> ... |+'>
     To be used for NV centre experimental data. 
     """
-    print(
-        "[NV_centre_ising_probes_plus] min tol noise:", 
-        minimum_tolerable_noise, 
-        "noise level:", noise_level
-    )
     if minimum_tolerable_noise  > noise_level:
         noise_level = minimum_tolerable_noise
     plus_state = np.array([1+0j, 1])/np.sqrt(2)
@@ -334,7 +329,6 @@ def random_phase_plus(
 ):
     import random
     random_phase = random.uniform(0, np.pi)
-    print("Random phase:", random_phase)
     rand_phase_plus = np.array(
         [
             1.0+0.j, 
