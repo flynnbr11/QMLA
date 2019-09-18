@@ -1,6 +1,7 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="short-run-data-for-generating-plots__exp-data-pr-probe"
+#test_description="NV-exp-method-sim__probe-with-phase__same-probe"
+test_description="THEO__qhl__heis-predetermined"
 
 
 ### ---------------------------------------------------###
@@ -11,17 +12,17 @@ test_description="short-run-data-for-generating-plots__exp-data-pr-probe"
 ## Type/number of QMD(s) to run.
 num_tests=5
 num_processes_to_request=6
-qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
+qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=1 # update so instances don't clash and hit eachother's redis databases
 multiple_qhl=0
 multiple_growth_rules=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
-experimental_data=1 # use experimental data -> 1; use fake data ->0
+experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters.
-e=10 # experiments
-p=30 # particles
+e=600 # experiments
+p=1000 # particles
 ra=0.98 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -47,16 +48,19 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 #sim_growth_rule='NV_centre_spin_large_bath'
 #sim_growth_rule='probabilistic_spin'
 #sim_growth_rule='pairwise_pauli_probabilistic_nearest_neighbour'
-# sim_growth_rule='hopping_probabilistic'
+#sim_growth_rule='hopping_probabilistic'
+#sim_growth_rule='hopping_predetermined'
 #sim_growth_rule='ising_probabilistic'
-sim_growth_rule='heisenberg_xyz_probabilistic'
+#sim_growth_rule='ising_predetermined'
+#sim_growth_rule='heisenberg_xyz_probabilistic'
+sim_growth_rule='heisenberg_xyz_predetermined'
 
 
 
 
 # Experimental growth rules
-#experimental_growth_rule='two_qubit_ising_rotation_hyperfine'
 experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+#experimental_growth_rule='two_qubit_ising_rotation_hyperfine'
 #experimental_growth_rule='NV_alternative_model'
 #experimental_growth_rule='NV_alternative_model_2'
 #experimental_growth_rule='NV_centre_revivals'
@@ -81,9 +85,10 @@ fi
 alt_growth_rules=(  
 #	'ising_1d_chain'
 #	'hubbard_square_lattice_generalised'
-	'hopping_probabilistic'
-	'ising_probabilistic'
-
+#	'hopping_probabilistic'
+#	'ising_probabilistic'
+	'ising_predetermined' 
+	'heisenberg_xyz_predetermined'
 )
 growth_rules_command=""
 for item in ${alt_growth_rules[*]}

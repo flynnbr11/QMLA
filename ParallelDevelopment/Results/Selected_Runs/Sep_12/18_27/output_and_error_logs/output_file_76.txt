@@ -1,0 +1,36 @@
+QMD ID = 76; REDIS_PORT=6376
+Global server: newblue1
+Running directory: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
+Library directory: /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
+Script directory: /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+103319:C 13 Sep 19:38:33.482 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+103319:C 13 Sep 19:38:33.482 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=103319, just started
+103319:C 13 Sep 19:38:33.482 # Configuration loaded
+103319:M 13 Sep 19:38:33.485 * Running mode=standalone, port=6376.
+103319:M 13 Sep 19:38:33.485 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+103319:M 13 Sep 19:38:33.485 # Server initialized
+103319:M 13 Sep 19:38:33.486 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+103319:M 13 Sep 19:38:33.486 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+103319:M 13 Sep 19:38:33.486 * Ready to accept connections
+Job id is 8692273
+PBS job name is PAPER-DATA__long-run__sim-data-pr-probe_76
+node34-048
+node34-048
+node34-048
+node34-048
+node34-048
+node34-048
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 19:38:42; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_12/18_27
+
+run qmd script Doing::
+
+cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+
+python3 Exp.py -mqhl=0 -rq=1 -p=2500 -e=750 -bt=750 -rt=0.5 -ra=0.98 -pgh=1.0 -pgh_exp=1.0 -pgh_incr=0 -qid=76 -rqt=200000 -g=1 -exp=0 -qhl=0 -fq=0 -pt=0 -pkl=0 -host=node34-048 -port=6376 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_12/18_27 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_12/18_27/logs/PAPER-DATA__long-run__sim-data-pr-probe_76.qmd.8692273.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_12/18_27/cumulative.csv -cpr=1 -prtwt=0 -dst=5 -ggr=two_qubit_ising_rotation_hyperfine_transverse  -bintimes=1 -bftimesall=0 -latex=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_12/18_27/LatexMapping.txt -nprobes=40 -prior_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_12/18_27/prior.p -true_params_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_12/18_27/true_params.p -plot_probes=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_12/18_27/plot_probes.p -special_probe=random -pnoise=0.001 -true_expec_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_12/18_27/true_expec_vals.p -pmin=0 -pmax=10 -pmean=0.5 -psigma=2 -resource=0 --updater_from_prior=0  
+
+103319:signal-handler (1568470159) Received SIGTERM scheduling shutdown...
+103319:M 14 Sep 15:09:19.293 # User requested shutdown...
+103319:M 14 Sep 15:09:19.293 # Redis is now ready to exit, bye bye...
