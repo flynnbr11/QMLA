@@ -7,11 +7,11 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0
+qhl_test=1
 multiple_qhl=0
 do_further_qhl=0
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -92,9 +92,9 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='hopping_probabilistic'
 # sim_growth_rule='hopping_predetermined'
 # sim_growth_rule='ising_probabilistic'
-sim_growth_rule='ising_predetermined'
+# sim_growth_rule='ising_predetermined'
 # sim_growth_rule='heisenberg_xyz_probabilistic'
-# sim_growth_rule='heisenberg_xyz_predetermined'
+sim_growth_rule='heisenberg_xyz_predetermined'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
