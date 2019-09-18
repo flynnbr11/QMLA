@@ -133,8 +133,7 @@ if not os.path.exists(probes_dir):
             pickle.dump(
                 simulator_probe_dict, 
                 open(simulator_probes_path, 'wb')
-            )
-            
+            )            
     except:
         # if already exists (ie created by another QMD since if test ran...)
         pass

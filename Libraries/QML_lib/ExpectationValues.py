@@ -209,7 +209,8 @@ def evolved_state(
     
 #        t=1e6 # TODO PUT BACK IN. testing high t to find bug. 
 
-    if use_exp_custom and ham_exp_installed:
+    # if use_exp_custom and ham_exp_installed:
+    if use_exp_custom == True:
         if log_file is not None:
             log_print(
                 ["Using custom expm. Exponentiating\nt=",t, "\nHam=\n", ham],

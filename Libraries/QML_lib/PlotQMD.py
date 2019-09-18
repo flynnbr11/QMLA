@@ -345,9 +345,6 @@ def ExpectationValuesTrueSim(
             plt.savefig(save_to_file, bbox_inches='tight')    
 
 from matplotlib.gridspec import GridSpec
-
-
-from matplotlib.gridspec import GridSpec
 from matplotlib import cm
 
 
