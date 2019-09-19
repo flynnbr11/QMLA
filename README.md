@@ -22,6 +22,7 @@ TODO: add package installations used
 * redis-py-cluster 1.3.4
 * itertools (standard)
 * psutil 5.4.3
+* fpdf
 * networkx 2.3
 * ipyparallel 6.0.2
 * scikit-learn 0.19.1
