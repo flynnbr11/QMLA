@@ -1082,6 +1082,7 @@ class QMD():
                 ) # TODO is this timeout sufficient for ALL QMD jobs?
 
                 # add function call to RQ queue
+                print("[QMD 1085] RQ used")
                 queued_model = queue.enqueue(
                     learnModelRemote, 
                     model_name,

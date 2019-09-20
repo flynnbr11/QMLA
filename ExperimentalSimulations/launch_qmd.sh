@@ -83,7 +83,7 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='ising_1d_chain'
 # sim_growth_rule='ising_multi_axis'
 # sim_growth_rule='ising_2d'
-sim_growth_rule='heisenberg_xyz'
+# sim_growth_rule='heisenberg_xyz'
 # sim_growth_rule='hubbard_square_lattice_generalised'
 # sim_growth_rule='hopping_topology'
 # sim_growth_rule='probabilistic_spin'
@@ -92,15 +92,15 @@ sim_growth_rule='heisenberg_xyz'
 # sim_growth_rule='hopping_probabilistic'
 # sim_growth_rule='hopping_predetermined'
 # sim_growth_rule='ising_probabilistic'
-# sim_growth_rule='ising_predetermined'
+sim_growth_rule='ising_predetermined'
 # sim_growth_rule='heisenberg_xyz_probabilistic'
 # sim_growth_rule='heisenberg_xyz_predetermined'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-exp_growth_rule='NV_alternative_model'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='NV_alternative_model'
 # exp_growth_rule='NV_centre_revivals'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_spin_large_bath'
@@ -123,6 +123,8 @@ alt_growth_rules=(
     # 'ising_probabilistic' 
     # 'hopping_probabilistic'
     # 'heisenberg_xyz_probabilistic'
+    'heisenberg_xyz_predetermined'
+    'hopping_predetermined'
 )
 
 growth_rules_command=""

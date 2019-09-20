@@ -166,7 +166,7 @@ class hopping_predetermined(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        self.true_operator = 'h_1h2_d4PPPPh_1h3_d4PPPPh_2h3_d4PPPPh_3h4_d4'
+        self.true_operator = 'h_1h2_d4PPPPh_1h3_d4PPPPh_2h4_d4PPPPh_3h4_d4' # nn-connected square
         self.tree_completed_initially = True
         self.min_param = 0
         self.max_param = 1
