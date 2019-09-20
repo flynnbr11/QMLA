@@ -1,0 +1,918 @@
+QMD ID = 8; REDIS_PORT=6308
+Global server: newblue1
+Running directory: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment
+Library directory: /panfs/panasas01/phys/bf16951/QMD/Libraries/QML_lib
+Script directory: /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+Going in to launch redis script
+If this fails -- ensure permission enabled on RedisLaunch script in library
+69301:C 17 Sep 04:50:16.572 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+69301:C 17 Sep 04:50:16.572 # Redis version=4.0.8, bits=64, commit=00000000, modified=0, pid=69301, just started
+69301:C 17 Sep 04:50:16.572 # Configuration loaded
+69301:M 17 Sep 04:50:16.573 * Running mode=standalone, port=6308.
+69301:M 17 Sep 04:50:16.573 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+69301:M 17 Sep 04:50:16.573 # Server initialized
+69301:M 17 Sep 04:50:16.573 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+69301:M 17 Sep 04:50:16.573 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+69301:M 17 Sep 04:50:16.574 * Ready to accept connections
+Job id is 8696630
+PBS job name is NV-exp__probe-with-phase__QHL_8
+node36-029
+node36-029
+node36-029
+node36-029
+node36-029
+node36-029
+Launching RQ worker on remote nodes using mpirun
+Starting Exp.py at 04:50:25; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42
+
+run qmd script Doing::
+
+cd /panfs/panasas01/phys/bf16951/QMD/ExperimentalSimulations
+
+python3 Exp.py -mqhl=0 -rq=1 -p=2500 -e=750 -bt=750 -rt=0.5 -ra=0.98 -pgh=1.0 -pgh_exp=1.0 -pgh_incr=0 -qid=8 -rqt=200000 -g=1 -exp=1 -qhl=0 -fq=0 -pt=0 -pkl=0 -host=node36-029 -port=6308 -dir=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42 -log=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42/logs/NV-exp__probe-with-phase__QHL_8.qmd.8696630.log -cb=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42/cumulative.csv -cpr=1 -prtwt=0 -dst=5 -ggr=two_qubit_ising_rotation_hyperfine_transverse  -bintimes=1 -bftimesall=0 -latex=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42/LatexMapping.txt -nprobes=40 -prior_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42/prior.p -true_params_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42/true_params.p -plot_probes=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42/plot_probes.p -special_probe=dec_13_exp -pnoise=0.001 -true_expec_path=/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42/true_expec_vals.p -pmin=0 -pmax=10 -pmean=0.5 -psigma=2 -resource=0 --updater_from_prior=0  
+
+[NV_centre_ising_probes_plus] min tol noise: 0.0 noise level: 0.001
+Random phase: 0.3793430396015158
+Random phase: 1.4624883491547123
+Random phase: 1.0537486888359169
+Random phase: 2.193214364798392
+Random phase: 1.0141413894482016
+Random phase: 2.7157445781143963
+Random phase: 0.07029260453608169
+Random phase: 2.0105594480331934
+Random phase: 0.997462070363052
+Random phase: 0.058375701828896606
+Random phase: 2.9978741647319813
+Random phase: 2.659701429622897
+Random phase: 0.8865002200669019
+Random phase: 3.1202206242266013
+Random phase: 1.2107266755502724
+Random phase: 1.7865383262334897
+Random phase: 1.4468215241053148
+Random phase: 0.36199003087762854
+Random phase: 1.693979944073326
+Random phase: 0.9762423326094483
+Random phase: 0.8488584428671808
+Random phase: 1.030969385672048
+Random phase: 0.9623207951479604
+Random phase: 0.4796101754107972
+Random phase: 1.8319237034932987
+Random phase: 2.204039154169904
+Random phase: 1.2014390863713154
+Random phase: 1.3717236520768918
+Random phase: 2.2356867957188755
+Random phase: 1.0348645167826938
+Random phase: 0.6263494644267233
+Random phase: 2.747123241212833
+Random phase: 2.0632625971446332
+Random phase: 2.459543392755687
+Random phase: 2.5615044429921894
+Random phase: 0.541376770733359
+Random phase: 3.0007397411889865
+Random phase: 0.35170095190288875
+Random phase: 1.7573843334458912
+Random phase: 1.4726943828145045
+Random phase: 3.0895634976619255
+Random phase: 2.2344720690275905
+Random phase: 0.8218048693898345
+Random phase: 2.806859760557673
+Random phase: 0.21582676920429394
+Random phase: 1.3430440814512226
+Random phase: 1.1628972873049015
+Random phase: 0.03593352104514813
+Random phase: 1.260476743093886
+Random phase: 1.9917671186689485
+Random phase: 1.5470315947668982
+Random phase: 1.6163229365793519
+Random phase: 1.6771568109652606
+Random phase: 2.8224609319033998
+Random phase: 3.051447629221951
+Random phase: 2.427807392460366
+Random phase: 0.1998420554427568
+Random phase: 1.1585871679839244
+Random phase: 0.11423203930596817
+Random phase: 3.073058353157539
+Random phase: 1.768326653856064
+Random phase: 1.0071165683857282
+Random phase: 2.2072699869354246
+Random phase: 2.495858618486134
+Random phase: 0.37860759221665913
+Random phase: 2.082278054113308
+Random phase: 1.9378296017110686
+Random phase: 1.2406378090200703
+Random phase: 0.6004841972089928
+Random phase: 1.5853320564042104
+Random phase: 2.6132848587898194
+Random phase: 0.3645933809783597
+Random phase: 0.12102128724230704
+Random phase: 0.7955470658867577
+Random phase: 1.1919844716764232
+Random phase: 0.3328249581952743
+Random phase: 0.3592101829234103
+Random phase: 1.6352859474893757
+Random phase: 1.4211942357451928
+Random phase: 1.6857979499124722
+Random phase: 1.237255440367839
+Random phase: 2.4758589437190204
+Random phase: 1.4788460065061892
+Random phase: 0.30911374360656957
+Random phase: 2.2730992647520187
+Random phase: 2.0802409289717465
+Random phase: 2.0069226402929283
+Random phase: 1.1691476056811965
+Random phase: 1.0303795477340196
+Random phase: 0.5408448668852932
+Random phase: 2.866905592125251
+Random phase: 1.3845857662732488
+Random phase: 1.2001720591193425
+Random phase: 0.473622200388281
+Random phase: 1.9749137819228868
+Random phase: 3.13618580691717
+Random phase: 2.8421902132581027
+Random phase: 1.1239023910503272
+Random phase: 0.4315335312337565
+Random phase: 2.7427955315285373
+Random phase: 1.6476605718490647
+Random phase: 2.7091420435111977
+Random phase: 2.5921741175499244
+Random phase: 0.920956207168585
+Random phase: 2.0786067975299107
+Random phase: 1.4425236040675617
+Random phase: 2.002627802087925
+Random phase: 2.2651529582210634
+Random phase: 1.1131524341442671
+Random phase: 1.506978167051973
+Random phase: 1.4664545126766702
+Random phase: 1.8329138832352585
+Random phase: 1.7795707576035948
+Random phase: 1.4968881630360313
+Random phase: 1.9855349786031975
+Random phase: 2.9757005675134347
+Random phase: 1.399910848422781
+Random phase: 1.371692966725424
+Random phase: 1.4899391015305108
+Random phase: 2.8924386195137957
+Random phase: 0.800324692066045
+Random phase: 0.07648206822483378
+Random phase: 2.4531773347016097
+Random phase: 3.1129236943566463
+Random phase: 1.4826337853100606
+Random phase: 0.3825191635470394
+Random phase: 0.5720176953311121
+Random phase: 1.541702803322085
+Random phase: 0.8964022555124654
+Random phase: 1.7539878244566625
+Random phase: 0.9364821535342535
+Random phase: 2.3965046569914508
+Random phase: 2.3562046829576304
+Random phase: 1.6119661758630535
+Random phase: 0.8427979638976036
+Random phase: 0.9288482577768667
+Random phase: 2.817903614392999
+Random phase: 0.8760273758913636
+Random phase: 2.7187543348466483
+Random phase: 0.026330608013346808
+Random phase: 0.3470182938672947
+Random phase: 1.3682269180809068
+Random phase: 0.6488900170377292
+Random phase: 2.1981951623182296
+Random phase: 1.73985794472904
+Random phase: 1.1371912189947375
+Random phase: 0.9193273743815823
+Random phase: 1.4177214595660852
+Random phase: 2.6358036607860984
+Random phase: 2.8456236481391115
+Random phase: 1.7529802953831333
+Random phase: 3.1171680819238867
+Random phase: 1.1728976589237532
+Random phase: 1.487882006893161
+Random phase: 1.87062467531568
+Random phase: 2.6954117580914008
+Random phase: 0.5104052303143534
+Random phase: 0.8762524975236714
+Random phase: 2.84719238562957
+Random phase: 2.338254717424657
+Random phase: 1.731344057051228
+Random phase: 2.0601893936509366
+Random phase: 0.03716628762713126
+Random phase: 0.946507686142554
+Random phase: 1.9179983981329987
+Random phase: 2.0834819162714338
+Random phase: 0.7945578563213448
+Random phase: 2.402925061049047
+Random phase: 0.07750869357411548
+Random phase: 0.7437971588169404
+Random phase: 2.5542199382494033
+Random phase: 0.826121074276365
+Random phase: 1.447633710488464
+Random phase: 0.26715413603565874
+Random phase: 0.22756405908323965
+Random phase: 1.2362801099195844
+Random phase: 2.9334928237139253
+Random phase: 0.4759334016117947
+Random phase: 2.4547899079419464
+Random phase: 2.6576181891425668
+Random phase: 1.272420318934076
+Random phase: 2.3971950138103666
+Random phase: 1.3358123724808704
+Random phase: 0.32206866312144816
+Random phase: 2.1115904359487447
+Random phase: 2.4726286178046313
+Random phase: 0.4290874874833632
+Random phase: 2.9871092341376606
+Random phase: 1.6317813774380907
+Random phase: 2.2057177623544457
+Random phase: 1.2443107429027236
+Random phase: 1.6840901742958718
+Random phase: 1.6519370986209942
+Random phase: 0.725434041080211
+Random phase: 1.3832576492765756
+Random phase: 0.590066573846325
+Random phase: 0.015140097789751514
+Random phase: 1.5954042906205257
+Random phase: 0.5858893052155778
+Random phase: 2.331220448125436
+Random phase: 0.2599519182541754
+Random phase: 1.7181644856055875
+Random phase: 1.37369968665349
+Random phase: 0.30439927238174896
+Random phase: 1.7510772471235023
+Random phase: 1.1093909238282726
+Random phase: 1.6052581882661259
+Random phase: 1.9813930570112679
+Random phase: 0.032407019784050806
+Random phase: 2.222000936415058
+Random phase: 1.4257081408526884
+Random phase: 2.2280347487283336
+Random phase: 1.1192744160567385
+Random phase: 2.4722955968237947
+Random phase: 1.0465955466754695
+Random phase: 2.1137334122894433
+Random phase: 2.6231105349100243
+Random phase: 0.7442576292174489
+Random phase: 0.9311632472789949
+Random phase: 0.417048408362476
+Random phase: 1.6425467370435909
+Random phase: 0.9380567233625863
+Random phase: 2.3065911447835212
+Random phase: 1.1042617665842618
+Random phase: 1.115379719009846
+Random phase: 0.6499852749915166
+Random phase: 0.7182509766838935
+Random phase: 2.6160129897277633
+Random phase: 1.9688917559201495
+Random phase: 0.37134696111872
+Random phase: 0.27006715717534235
+Random phase: 1.6255041410299977
+Random phase: 1.380657274227477
+Random phase: 2.1149785654021147
+Random phase: 1.228081640835488
+Random phase: 1.9761567206651014
+Random phase: 0.8925663042899402
+Random phase: 0.3111916882311724
+Random phase: 0.691704621385968
+Random phase: 1.9608523350604363
+Random phase: 0.8739614317606488
+Random phase: 2.555992036395539
+Random phase: 1.4286428511060565
+Random phase: 0.8753260069629607
+Random phase: 0.8951549536425107
+Random phase: 2.613608448793849
+Random phase: 2.094833604948995
+Random phase: 0.5353155969404231
+Random phase: 2.5018055154299
+Random phase: 0.02257970238265647
+Random phase: 1.299779771378903
+Random phase: 2.3280071740596338
+Random phase: 3.0599474072284867
+Random phase: 2.7501357082564915
+Random phase: 1.7335328171627347
+Random phase: 0.5037311170882883
+Random phase: 2.1987883019909393
+Random phase: 0.7006796013998772
+Random phase: 0.4742593942727653
+Random phase: 2.5629158915041845
+Random phase: 0.8736074102738077
+Random phase: 0.7329631705313842
+Random phase: 1.586891476703654
+Random phase: 0.7293379085915427
+Random phase: 2.144638032630322
+Random phase: 1.3389707423175152
+Random phase: 0.6351112753276069
+Random phase: 2.7999369542812316
+Random phase: 2.9847787366523777
+Random phase: 2.8111713400865956
+Random phase: 0.5593623183287904
+Random phase: 1.2001564550049626
+Random phase: 2.7994397890779417
+Random phase: 2.688362147906629
+Random phase: 0.19416206127909935
+Random phase: 1.7529777286965416
+Random phase: 3.0280880277707416
+Random phase: 0.5832272223737313
+Random phase: 1.8351275359216996
+Random phase: 0.4085673457864193
+Random phase: 1.6860043836227454
+Random phase: 0.17821966610110287
+Random phase: 0.7853968566018193
+Random phase: 0.5313509499267994
+Random phase: 1.217689213220031
+Random phase: 2.9118417011679294
+Random phase: 1.3410770607368399
+Random phase: 2.8510825524162864
+Random phase: 2.333619794729983
+Random phase: 0.23200863791229137
+Random phase: 2.4407573261444164
+Random phase: 3.1026250193110485
+Random phase: 0.525245023371456
+Random phase: 1.3885289562827376
+Random phase: 2.2000716655661283
+Random phase: 1.7882631794999804
+Random phase: 1.2910559032980315
+Random phase: 1.3956291145976183
+Random phase: 2.852192029356848
+Random phase: 2.6923370759211096
+Random phase: 0.9460314500388147
+Random phase: 3.045818800317155
+Random phase: 2.6215935375693933
+Random phase: 2.314234133670399
+Random phase: 1.6798229064086039
+Random phase: 2.7626423985422006
+Random phase: 1.9657841480330316
+Random phase: 2.0819252676857856
+Random phase: 2.6155054169392677
+Random phase: 2.9989639149644955
+Random phase: 0.6424396162979784
+Random phase: 1.6430955313469384
+Random phase: 2.572243577401681
+Random phase: 0.26241740926073204
+Random phase: 3.1207071868245406
+Random phase: 0.6398176447638712
+Random phase: 1.4040872216949385
+Random phase: 2.266540383522822
+Random phase: 1.030108632423134
+Random phase: 0.5062435695708841
+Random phase: 1.2262935522193086
+Random phase: 3.059474279076759
+Random phase: 1.4023805044094917
+Random phase: 1.5489074736519695
+Random phase: 2.5556224653728177
+Random phase: 2.4890571113811935
+Random phase: 2.4349205179197075
+Random phase: 3.0499292803978593
+Random phase: 0.44666571098577945
+Random phase: 1.228834510007191
+Random phase: 1.579529310081001
+Random phase: 2.7621673497348396
+Random phase: 1.9239077191740535
+Random phase: 2.3066363171785427
+Random phase: 0.03916799554317877
+Random phase: 2.6056027936740067
+Random phase: 0.6050906633380174
+Random phase: 1.098764271424211
+Random phase: 1.5161330743154209
+Random phase: 2.441579326923953
+Random phase: 2.731986156259852
+Random phase: 2.5873202285219894
+Random phase: 2.2556368328482828
+Random phase: 1.045913233987699
+Random phase: 2.4933222265331425
+Random phase: 1.4214153870910586
+Random phase: 1.048428009148526
+Random phase: 0.5656838654984714
+Random phase: 1.139580808519352
+Random phase: 2.676891440156628
+Random phase: 2.3494302783830623
+Random phase: 0.9469691103050422
+Random phase: 1.7627958056269457
+Random phase: 1.4743503431339653
+Random phase: 0.32512683100946105
+Random phase: 1.5966915616543365
+Random phase: 1.319531740753566
+Random phase: 1.1094714422054999
+Random phase: 3.050843318240972
+Random phase: 0.657012496276508
+Random phase: 2.202545222382153
+Random phase: 0.6749475605710018
+Random phase: 1.5488761587462303
+Random phase: 0.8417812527701628
+Random phase: 2.8068605541133884
+Random phase: 1.468891648238707
+Random phase: 1.6298577196306023
+Random phase: 0.4868091421583979
+Random phase: 0.6008240783465519
+Random phase: 0.660144325309298
+Random phase: 0.49589260469124374
+Random phase: 2.4307517044562093
+Random phase: 1.829567605985248
+Random phase: 1.5108004996530087
+Random phase: 0.7121859246131111
+Random phase: 2.5344961781581947
+Random phase: 2.252646243676807
+Random phase: 2.470564052948492
+Random phase: 1.1084928861620407
+Random phase: 2.9374729699989843
+Random phase: 2.2861646796385724
+Random phase: 2.0177036879410806
+Random phase: 2.4977631910061913
+Random phase: 2.5770770729962904
+Random phase: 0.7014913725253773
+Random phase: 2.1320058288713204
+Random phase: 2.6578705173839494
+Random phase: 1.4828196648640701
+Random phase: 0.7936878829986114
+Random phase: 2.880361115057266
+Random phase: 1.4519373070844226
+Random phase: 0.5167990924755709
+Random phase: 3.1154524005032447
+Random phase: 0.9919254480283619
+Random phase: 0.624337601339583
+Random phase: 0.4669862344441446
+Random phase: 1.2948137455068771
+Random phase: 1.3851142235928198
+Random phase: 1.3154221730886837
+Random phase: 2.873430259439595
+[NV_centre_ising_probes_plus] min tol noise: 0.0 noise level: 0.001
+Random phase: 0.4465244102668443
+Random phase: 0.151361991728614
+Random phase: 0.3285565775672852
+Random phase: 1.5083564819249438
+Random phase: 2.5098975266185213
+Random phase: 2.1182017360374044
+Random phase: 0.5757068279035438
+Random phase: 2.8644195193394055
+Random phase: 1.9193088704187058
+Random phase: 0.32182337123524063
+Random phase: 2.1872671917466477
+Random phase: 3.03749755145448
+Random phase: 0.6391580022659334
+Random phase: 0.3213730323443548
+Random phase: 2.1234754032773497
+Random phase: 2.6080438029194295
+Random phase: 0.5765362919690041
+Random phase: 2.828171238600274
+Random phase: 1.9667092553849064
+Random phase: 2.2125360723645695
+Random phase: 1.7738064846785615
+Random phase: 0.5014023313049492
+Random phase: 2.5772296771472147
+Random phase: 2.1864689200611176
+Random phase: 1.1342800656972256
+Random phase: 3.065554528631466
+Random phase: 2.8727994380795594
+Random phase: 3.0169714903657954
+Random phase: 0.02041387772432369
+Random phase: 0.8534038825480416
+Random phase: 0.484467331849059
+Random phase: 2.41209526939218
+Random phase: 2.366215015105675
+Random phase: 1.5134073502612935
+Random phase: 0.5570465941169849
+Random phase: 1.1735172857896394
+Random phase: 1.9822042589956541
+Random phase: 0.876197723015332
+Random phase: 2.314414109471625
+Random phase: 2.75113065392348
+Random phase: 2.146456146880291
+Random phase: 1.2716869730158056
+Random phase: 0.6431960146339949
+Random phase: 2.520015185410162
+Random phase: 1.9744379478225866
+Random phase: 1.302372068774525
+Random phase: 1.6989171148775366
+Random phase: 2.5435196946728333
+Random phase: 1.0249951297835624
+Random phase: 1.8249968418688443
+Random phase: 2.397077433066608
+Random phase: 1.2609588023007476
+Random phase: 1.8226144520188339
+Random phase: 1.2330660371880597
+Random phase: 1.0599715527634221
+Random phase: 1.511041002745646
+Random phase: 2.705751503497265
+Random phase: 0.6808861356784007
+Random phase: 1.196715864898065
+Random phase: 2.673016347844268
+Random phase: 1.4480270023322328
+Random phase: 0.7154747157591127
+Random phase: 1.2175643698909415
+Random phase: 2.5003406743339083
+Random phase: 1.6491198413884358
+Random phase: 2.81857135424205
+Random phase: 2.061848205947452
+Random phase: 0.5260779322493598
+Random phase: 2.3637917493522815
+Random phase: 3.004539451836661
+Random phase: 1.7659544082467489
+Random phase: 0.28110327497495563
+Random phase: 1.47653327103885
+Random phase: 2.613397950701655
+Random phase: 2.6021423708338887
+Random phase: 2.9788020512782105
+Random phase: 0.08944727529784471
+Random phase: 3.1128993937261793
+Random phase: 2.75990692789766
+Random phase: 1.5254649251524053
+Random phase: 3.0044326185638544
+Random phase: 1.4738311452913742
+Random phase: 0.7188667900944253
+Random phase: 0.4055401348096295
+Random phase: 0.5256110411310431
+Random phase: 1.771729583583585
+Random phase: 1.4469773453174692
+Random phase: 1.3224876855522403
+Random phase: 2.912996946357825
+Random phase: 0.4565249269929672
+Random phase: 2.545841059624763
+Random phase: 1.1758021248278745
+Random phase: 2.623951109137486
+Random phase: 1.9887159250938924
+Random phase: 2.6621335845951846
+Random phase: 2.4400259249415326
+Random phase: 0.08941640129565474
+Random phase: 3.077736214316078
+Random phase: 2.1771772989864355
+Random phase: 0.8459573450022388
+Random phase: 1.1114038856127235
+Random phase: 1.3196776717036098
+Random phase: 0.49144445085806326
+Random phase: 1.4925371153509273
+Random phase: 1.1769995217252776
+Random phase: 2.487334462158582
+Random phase: 1.613246616008492
+Random phase: 1.6840245536527465
+Random phase: 2.2444100512473866
+Random phase: 2.6000774643473985
+Random phase: 1.345891628924065
+Random phase: 1.1720912180789445
+Random phase: 1.2452069450708128
+Random phase: 2.1419230297897696
+Random phase: 1.0958481802743252
+Random phase: 2.9359042347320456
+Random phase: 0.6593996015403008
+Random phase: 0.5673877963119602
+Random phase: 0.28544249771657765
+Random phase: 1.0105796220484822
+Random phase: 0.4658787511749756
+Random phase: 1.9374517529559323
+Random phase: 1.3098995625776488
+Random phase: 2.912111101222051
+Random phase: 2.984412025149904
+Random phase: 1.3370884105139804
+Random phase: 1.4277352822151403
+Random phase: 1.362965758913245
+Random phase: 2.619588206175478
+Random phase: 0.010650288108319346
+Random phase: 2.1779469971013703
+Random phase: 1.434346567332519
+Random phase: 1.3797541778461109
+Random phase: 0.9911309797751799
+Random phase: 2.8187561053108183
+Random phase: 2.948998769837195
+Random phase: 2.460879503548375
+Random phase: 0.08985803881465255
+Random phase: 1.557553883993051
+Random phase: 1.2657110300407304
+Random phase: 1.969097866331837
+Random phase: 2.0938257753724807
+Random phase: 0.42771460317922916
+Random phase: 1.1512514724710081
+Random phase: 1.2412932262470344
+Random phase: 2.9122499250405722
+Random phase: 2.0445073548501975
+Random phase: 1.3356306000355733
+Random phase: 0.41401737440619446
+Random phase: 1.1232088782437604
+Random phase: 0.1798532752509727
+Random phase: 2.9528095264651233
+Random phase: 2.0599392664391765
+Random phase: 2.6414495097173756
+Random phase: 0.15442946460918996
+Random phase: 0.2884422230226223
+Random phase: 1.543841171382952
+Random phase: 0.331072620784499
+Random phase: 0.8094686125389844
+Random phase: 0.6921297420146607
+Random phase: 0.032067354871721875
+Random phase: 0.35078542156846954
+Random phase: 0.45097586175369114
+Random phase: 0.07401706088299055
+Random phase: 0.5230426444698376
+Random phase: 1.4515350196610062
+Random phase: 2.197857079366606
+Random phase: 2.8026701638961136
+Random phase: 0.9722647705470823
+Random phase: 0.1436351080717148
+Random phase: 0.12946590882070175
+Random phase: 0.08988319823808402
+Random phase: 2.7484876412006227
+Random phase: 2.844114389750802
+Random phase: 0.9988198447997058
+Random phase: 2.547381603677724
+Random phase: 2.6172065174598997
+Random phase: 1.9429173282244259
+Random phase: 0.8756360331966562
+Random phase: 1.5660612462969494
+Random phase: 2.8608600340361003
+Random phase: 2.65740750554906
+Random phase: 3.1151337804805515
+Random phase: 0.3614935142817015
+Random phase: 2.373058527430628
+Random phase: 2.753034051404359
+Random phase: 1.4728630612600382
+Random phase: 2.809664281155644
+Random phase: 1.0249118555420806
+Random phase: 0.8718570747964537
+Random phase: 2.6660998570304404
+Random phase: 0.23510755097656477
+Random phase: 2.7130486818746533
+Random phase: 2.4543632453849358
+Random phase: 2.4707222742238817
+Random phase: 1.4472639855536396
+Random phase: 1.0770644709456227
+Random phase: 1.189107565198887
+Random phase: 0.10815201488805301
+Random phase: 1.8105216533945827
+Random phase: 2.852118476142718
+Random phase: 1.4287110764693975
+Random phase: 1.9830191974463267
+Random phase: 0.6056962872760517
+Random phase: 1.1903709117496224
+Random phase: 0.25766716433769027
+Random phase: 2.5611243775779284
+Random phase: 0.016083599842795566
+Random phase: 0.39025879261294083
+Random phase: 0.11312136944544009
+Random phase: 1.8420273697362344
+Random phase: 2.193654079357748
+Random phase: 1.7318735486316537
+Random phase: 2.576876456371653
+Random phase: 1.1301783498166722
+Random phase: 1.9434619418079528
+Random phase: 2.5795640499558905
+Random phase: 1.455490847031673
+Random phase: 2.5540378000840542
+Random phase: 1.2393804261901227
+Random phase: 1.4566756208662712
+Random phase: 0.1903251015745183
+Random phase: 2.504773611812234
+Random phase: 1.4478625737448476
+Random phase: 2.614169645204683
+Random phase: 0.5628563115022905
+Random phase: 1.5379129479408482
+Random phase: 0.851533401694786
+Random phase: 3.014571740401225
+Random phase: 1.7943297516732368
+Random phase: 1.6143225380116002
+Random phase: 2.7245486634795184
+Random phase: 2.787661931244187
+Random phase: 0.3876806855533328
+Random phase: 1.7955936334264369
+Random phase: 1.9483910038045102
+Random phase: 1.4705681209533312
+Random phase: 1.7620728079040227
+Random phase: 0.344652221504199
+Random phase: 0.09421951094408532
+Random phase: 0.2194003434048906
+Random phase: 0.6656663106876365
+Random phase: 0.31985760518939904
+Random phase: 1.575684024009717
+Random phase: 3.1112947741914323
+Random phase: 0.47766030074238985
+Random phase: 1.8946052268916542
+Random phase: 0.02346865049924864
+Random phase: 0.8833004407757683
+Random phase: 2.298074604002268
+Random phase: 2.9330889048556363
+Random phase: 2.9003657495484343
+Random phase: 0.7944921831536415
+Random phase: 2.5917108623483553
+Random phase: 1.8856111711903474
+Random phase: 2.939677622440098
+Random phase: 0.9015429780316645
+Random phase: 2.5072459192127026
+Random phase: 2.276524171992071
+Random phase: 2.156560670839623
+Random phase: 1.0904050285498679
+Random phase: 1.0629837169655192
+Random phase: 1.2609943452125827
+Random phase: 0.4718477877056023
+Random phase: 2.1717517562889994
+Random phase: 3.0380201371170457
+Random phase: 2.0523570597626755
+Random phase: 2.1322443428335673
+Random phase: 1.327428227698683
+Random phase: 1.9105780360126305
+Random phase: 1.8285300014867705
+Random phase: 0.976218157319098
+Random phase: 1.2279445738700105
+Random phase: 2.130730769230454
+Random phase: 2.342462631870233
+Random phase: 0.43759738221829225
+Random phase: 1.7656094101148205
+Random phase: 0.39946205799009554
+Random phase: 2.133339004932693
+Random phase: 0.7004112228287
+Random phase: 2.914588085237986
+Random phase: 1.1461927396426688
+Random phase: 2.8684502249277615
+Random phase: 1.6900387342766825
+Random phase: 1.631949471005726
+Random phase: 1.1275327640782857
+Random phase: 1.3359679789447803
+Random phase: 0.2632531634973271
+Random phase: 1.903564583379114
+Random phase: 0.32075470762969416
+Random phase: 1.2693910687299714
+Random phase: 1.2055357337876438
+Random phase: 0.07567473762888587
+Random phase: 1.780299987247511
+Random phase: 0.7070511369665272
+Random phase: 0.49906518367384456
+Random phase: 3.1003102316739057
+Random phase: 2.9355267913050693
+Random phase: 2.7511364348143346
+Random phase: 2.850061964287933
+Random phase: 0.08694850463125678
+Random phase: 2.4235404193540955
+Random phase: 2.1557006939194294
+Random phase: 0.11828199660116902
+Random phase: 1.949986714295667
+Random phase: 1.3350007452958776
+Random phase: 2.182135159702933
+Random phase: 2.4766656309190025
+Random phase: 1.1357788722438988
+Random phase: 2.0729720286283317
+Random phase: 1.9841081251091528
+Random phase: 1.2707821530734693
+Random phase: 2.7658564392609546
+Random phase: 2.149516425043722
+Random phase: 2.292894669833517
+Random phase: 0.08881451901866594
+Random phase: 0.3634427673005518
+Random phase: 0.41084831027489355
+Random phase: 1.8235882546228006
+Random phase: 2.4646550583244813
+Random phase: 1.4288431635558356
+Random phase: 1.4986346781829027
+Random phase: 1.8652573827081012
+Random phase: 1.793349797286925
+Random phase: 2.31173874730796
+Random phase: 1.0585462589725565
+Random phase: 0.16351946564212955
+Random phase: 2.4113039138353445
+Random phase: 2.905232694307111
+Random phase: 1.884723513433465
+Random phase: 2.149858485794155
+Random phase: 2.102149472210746
+Random phase: 1.0022038968400822
+Random phase: 0.5259944861598789
+Random phase: 1.8790055176727825
+Random phase: 2.3125249421896155
+Random phase: 2.8546958685198978
+Random phase: 1.528800196279011
+Random phase: 0.47735509213248856
+Random phase: 0.8290293688743398
+Random phase: 0.4192176008773062
+Random phase: 1.6898040977611049
+Random phase: 1.5160763774397457
+Random phase: 0.593619325450527
+Random phase: 1.1088868387180457
+Random phase: 1.3016082778679965
+Random phase: 2.335889157489208
+Random phase: 0.04196292323375019
+Random phase: 2.217709734856388
+Random phase: 3.020045423520179
+Random phase: 2.2464115793067676
+Random phase: 2.35753300040425
+Random phase: 0.26883279383200115
+Random phase: 0.6808884607701615
+Random phase: 0.47260288974104897
+Random phase: 2.3521606538682875
+Random phase: 0.21294072745760362
+Random phase: 1.833995710851298
+Random phase: 2.0097887183668104
+Random phase: 1.6421728127345292
+Random phase: 0.37559783520469775
+Random phase: 2.184004669498857
+Random phase: 1.7479957882746238
+Random phase: 2.122016069431116
+Random phase: 0.6324689028459347
+Random phase: 2.4055676880875754
+Random phase: 2.768586369022218
+Random phase: 1.4643426915033182
+Random phase: 2.828719356941751
+Random phase: 1.10490119426261
+Random phase: 0.8892335936407992
+Random phase: 2.7085960263914983
+Random phase: 2.1183099637219267
+Random phase: 2.553797273957797
+Random phase: 2.8825149774745102
+Random phase: 1.4096357182398376
+Random phase: 0.08658508988917883
+Random phase: 2.7610880133600646
+Random phase: 2.68626480852941
+Random phase: 0.0543058637241283
+Random phase: 0.6363425894992869
+Random phase: 0.7409921955969315
+Random phase: 0.5849209481791394
+Random phase: 2.9270318126123085
+Random phase: 2.5070044430447562
+Random phase: 1.268000055953748
+Random phase: 1.2977692771068423
+Random phase: 1.6988685598745519
+Random phase: 2.5739150783062814
+Random phase: 2.452263143388319
+Random phase: 2.878973162217511
+Random phase: 1.001793942010576
+Random phase: 3.045485659101549
+Random phase: 0.9209101022792497
+Random phase: 2.5032361764355575
+Random phase: 1.7974252561450013
+Random phase: 2.3432620142337233
+Random phase: 2.341053660267697
+Random phase: 0.8642537577587713
+Random phase: 1.4885390243735555
+Generated probe dict from growth class
+[EXP] For  growth rule two_qubit_ising_rotation_hyperfine_transverse; use dataset NVB_rescale_dataset.p
+[Exp] Retrieved initial op list from growth class
+Seed requested for host/port/id node36-029 / 6308 / 8 ;has seed 1
+Seed keys ['rq:worker:node36-029.69330', 'rq:worker:node36-029.69332', 'rq:worker:node36-029.69331', 'rq:worker:node36-029.69328', 'rq:worker:node36-029.69329', 'rq:worker:node36-029.69333', 'rq:workers']
+[QMD] self.InitialOpList: ['xTi', 'yTi', 'zTi']
+Gen list: ['two_qubit_ising_rotation_hyperfine_transverse']
+[QMD] latex config: $P_{2500}E_{750}B_{750}RT_{0.5}RA_{0.98}RP_{1.0}H_{3750000}|\psi>_{40}PN_{0.001}BF^{bin }_{True}BF^{all }_{False}$
+mod id: 0
+mod id: 1
+mod id: 2
+[QMD] Going to learn initial models from branches.
+[QML] Updating learned values for model  0
+[QML] Updating learned values for model  1
+[QML] Updating learned values for model  2
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 1. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QMD] new model has highest num qubits so far
+self.GrowthClass.highest_num_qubits 2
+[QML] Updating learned values for model  3
+[QML] Updating learned values for model  4
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 2. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QML] Updating learned values for model  5
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 3. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QML] Updating learned values for model  6
+[QML] Updating learned values for model  7
+[QML] Updating learned values for model  8
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 4. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QML] Updating learned values for model  9
+[QML] Updating learned values for model  10
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 5. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QML] Updating learned values for model  11
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 6. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QML] Updating learned values for model  12
+[QML] Updating learned values for model  13
+[QML] Updating learned values for model  14
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 7. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QML] Updating learned values for model  15
+[QML] Updating learned values for model  16
+not finished tree for growth: two_qubit_ising_rotation_hyperfine_transverse
+[Growth Rules] NV MODEL GENERATION
+NEW BRANCH 8. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QMD] Num trees now completed: 1 Tree completed dict: {'two_qubit_ising_rotation_hyperfine_transverse': True}
+[QMD runRemoteMult] Finalising QMD.
+NEW BRANCH 9. growth rule= two_qubit_ising_rotation_hyperfine_transverse
+[QML] Updating learned values for model  17
+ 
+
+------QMD learned ------
+
+
+plotExpecValues
+Not reducing number of times for plots
+Not reducing number of times for plots
+Not reducing number of times for plots
+Not reducing number of times for plots
+Not reducing number of times for plots
+Not reducing number of times for plots
+Not reducing number of times for plots
+Not reducing number of times for plots
+Not reducing number of times for plots
+[Exp.py - QHL] Computing more expectation values
+Not reducing number of times for plots
+[QMD] writing Bayes CSV
+QMD finished - results in: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42/
+Finished Exp.py at 17:15:10; results dir: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Sep_16/17_42
+OK
+69301:M 17 Sep 17:15:11.510 # User requested shutdown...
+69301:M 17 Sep 17:15:11.510 # Redis is now ready to exit, bye bye...
+QMD 8 Finished; end of script at Time: 17:15:11
