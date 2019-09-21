@@ -56,7 +56,7 @@ class nv_centre_spin_experimental_method(
         self.probe_generation_function = ProbeGeneration.plus_plus_with_phase_difference
         
         self.max_time_to_consider = 15 
-        self.shared_probes = True
+        self.shared_probes = False
         self.simulator_probe_generation_function = self.probe_generation_function
 
         # self.probe_generation_function = ProbeGeneration.separable_probe_dict
