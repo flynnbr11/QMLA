@@ -11,14 +11,14 @@ qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### ---------------------------------------------------###
-prt=15
-exp=4
+prt=10
+exp=20
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -92,15 +92,17 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='hopping_probabilistic'
 # sim_growth_rule='hopping_predetermined'
 # sim_growth_rule='ising_probabilistic'
-sim_growth_rule='ising_predetermined'
+# sim_growth_rule='ising_predetermined'
 # sim_growth_rule='heisenberg_xyz_probabilistic'
 # sim_growth_rule='heisenberg_xyz_predetermined'
+sim_growth_rule='example'
+
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# exp_growth_rule='NV_alternative_model'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+exp_growth_rule='NV_alternative_model'
 # exp_growth_rule='NV_centre_revivals'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_spin_large_bath'
@@ -123,8 +125,8 @@ alt_growth_rules=(
     # 'ising_probabilistic' 
     # 'hopping_probabilistic'
     # 'heisenberg_xyz_probabilistic'
-    'heisenberg_xyz_predetermined'
-    'hopping_predetermined'
+    # 'heisenberg_xyz_predetermined'
+    # 'hopping_predetermined'
 )
 
 growth_rules_command=""
@@ -183,12 +185,6 @@ declare -a particle_counts=(
 $prt
 )
 
-if (( $qhl_test == 1 )) # For QHL test always do without rq
-then
-    use_rq=0
-fi
-
-use_rq=0
 let bt="$exp"
 
 

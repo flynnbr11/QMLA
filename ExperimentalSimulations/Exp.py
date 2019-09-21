@@ -81,18 +81,7 @@ qle = global_variables.do_qle # True for QLE, False for IQLE
 # using 40 probes for training - randomly generated
 # num_probes = 40
 
-generated_probe_dict = growth_class.probe_generator(
-    experimental_data = global_variables.use_experimental_data, 
-    # growth_generator = global_variables.growth_generation_rule, 
-    # special_probe = global_variables.special_probe, 
-    noise_level = global_variables.probe_noise_level,
-    minimum_tolerable_noise = 0.0,
-    # noise_level = 0.0,
-    # minimum_tolerable_noise = 1e-7, # to match dec_14/09_55 run # TODO remove!!!
-    # num_probes = global_variables.num_probes
-)
-simulator_probe_dict = growth_class.simulator_probe_generator(
-    # shared_probes = shared_probes, # TODO get from global variables or growth class? 
+growth_class.generate_probes(
     experimental_data = global_variables.use_experimental_data, 
     # growth_generator = global_variables.growth_generation_rule, 
     # special_probe = global_variables.special_probe, 
@@ -103,6 +92,8 @@ simulator_probe_dict = growth_class.simulator_probe_generator(
     # num_probes = global_variables.num_probes
 )
 
+system_probes = growth_class.system_probes
+simulator_probe_dict = growth_class.simulator_probes
 print("Generated probe dict from growth class")
 
 probes_dir = str(
@@ -120,20 +111,19 @@ if not os.path.exists(probes_dir):
             +'.p'
         )
         pickle.dump(
-            generated_probe_dict, 
+            system_probes, 
             open(system_probes_path, 'wb')
         )
-        if growth_class.shared_probes == False:
-            simulator_probes_path = str(
-                probes_dir
-                + 'simulator_probes_'
-                + str(global_variables.long_id)
-                +'.p'
-            )
-            pickle.dump(
-                simulator_probe_dict, 
-                open(simulator_probes_path, 'wb')
-            )            
+        simulator_probes_path = str(
+            probes_dir
+            + 'simulator_probes_'
+            + str(global_variables.long_id)
+            +'.p'
+        )
+        pickle.dump(
+            simulator_probe_dict, 
+            open(simulator_probes_path, 'wb')
+        )            
     except:
         # if already exists (ie created by another QMD since if test ran...)
         pass
@@ -369,7 +359,7 @@ qmd = QMD(
     qhl_plots=do_qhl_plots, 
     results_directory = results_directory,
     long_id = long_id, 
-    probe_dict = generated_probe_dict, 
+    probe_dict = system_probes, 
     sim_probe_dict = simulator_probe_dict, 
     model_priors = model_priors,
     experimental_measurements = experimental_measurements_dict,

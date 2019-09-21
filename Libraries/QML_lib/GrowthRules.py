@@ -27,6 +27,7 @@ import HoppingProbabilistic
 import IsingProbabilistic
 import HeisenbergXYZProbabilistic
 import BasicLindbladian
+import ExampleGrowthRule
 
 growth_classes = {
     # 'test_growth_class' : 
@@ -82,7 +83,9 @@ growth_classes = {
     'heisenberg_xyz_predetermined' : 
         HeisenbergXYZProbabilistic.heisenberg_xyz_predetermined,
     'basic_lindbladian' :
-        BasicLindbladian.basic_lindbladian
+        BasicLindbladian.basic_lindbladian,
+    'example' : 
+        ExampleGrowthRule.example_growth
 }
 
 

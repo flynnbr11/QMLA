@@ -940,7 +940,11 @@ class QMD():
         unfinished_model_names = DataBase.all_unfinished_model_names(self.db)
         for model_name in unfinished_model_names:
             print("Model ", model_name, "being learned")
-            self.learnModel(model_name=model_name, use_rq=use_rq, blocking=blocking)
+            self.learnModel(
+                model_name=model_name, 
+                use_rq=self.use_rq, 
+                blocking=blocking
+            )
             self.updateModelRecord(field='Completed', 
                 name=model_name,  new_value=True
             )
@@ -1017,7 +1021,7 @@ class QMD():
             )
             self.learnModel(
                 model_name=model_name, 
-                use_rq=use_rq, 
+                use_rq=self.use_rq, 
                 blocking=blocking
             )
             if blocking is True:
@@ -1040,7 +1044,7 @@ class QMD():
     
     def learnModelNameList(self, model_name_list, use_rq=True, blocking=False):
         for model_name in model_name_list:
-            self.learnModel(model_name=model_name, use_rq=use_rq, blocking=blocking)
+            self.learnModel(model_name=model_name, use_rq=self.use_rq, blocking=blocking)
             self.updateModelRecord(field='Completed', name=model_name,
                 new_value=True
             )
@@ -1049,7 +1053,7 @@ class QMD():
     def learnModel(
         self, 
         model_name, 
-        use_rq = True, 
+        use_rq=True, 
         blocking=False
     ): 
         exists = DataBase.check_model_exists(
@@ -1063,16 +1067,10 @@ class QMD():
                 name = model_name
             )
 
-            # print("[QMD] ModelNameIDs:", self.ModelNameIDs)
-            # branchID = DataBase.model_branch_from_model_id(
-            #     self.db, 
-            #     model_id=modelID
-            # )
-
             branchID = self.ModelsBranches[modelID]
 
             if self.RunParallel and use_rq:
-            # i.e. use a job queue rather than sequentially doing it. 
+                # i.e. use a job queue rather than sequentially doing it. 
                 from rq import Connection, Queue, Worker
                 queue = Queue(
                     self.Q_id, 
@@ -1135,6 +1133,7 @@ class QMD():
                         "model:", model_name
                     ]
                 )
+                print("[QMD 1136] Locally doing QML")
                 self.QMDInfo['probe_dict'] = self.ProbeDict
                 updated_model_info = learnModelRemote(
                     model_name,
@@ -2574,9 +2573,9 @@ class QMD():
         )
 
         self.learnModel(
-            model_name=mod_to_learn,
-            use_rq=self.use_rq, 
-            blocking=True
+            model_name = mod_to_learn,
+            use_rq = self.use_rq, 
+            blocking = True
         )
                 
         mod_id = DataBase.model_id_from_name(
@@ -2745,7 +2744,7 @@ class QMD():
             learned_models_ids.set(
                 str(mod_id), 0
             )
-            self.learnModel(
+            self.learnModel(    
                 model_name = mod_name,
                 use_rq = self.use_rq, 
                 blocking = False

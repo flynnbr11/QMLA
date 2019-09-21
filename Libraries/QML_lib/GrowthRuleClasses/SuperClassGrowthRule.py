@@ -154,6 +154,25 @@ class growth_rule_super_class():
             **kwargs
         )
         
+    def generate_probes(
+        # system probes
+        self,
+        **kwargs
+    ):
+        self.system_probes = self.probe_generation_function(
+            max_num_qubits = self.max_num_probe_qubits,
+            num_probes = self.num_probes, 
+            **kwargs
+        )
+        if self.shared_probes == True:
+            self.simulator_probes = self.system_probes
+        else:
+            self.simulator_probes = self.simulator_probe_generation_function(
+                max_num_qubits = self.max_num_probe_qubits,
+                num_probes = self.num_probes, 
+                **kwargs
+            )
+
     def probe_generator(
         # system probes
         self,
@@ -164,7 +183,17 @@ class growth_rule_super_class():
             num_probes = self.num_probes, 
             **kwargs
         )
+        if self.shared_probes == True:
+            self.simulator_probes = self.system_probes
+        else:
+            self.simulator_probes = self.simulator_probe_generation_function(
+                max_num_qubits = self.max_num_probe_qubits,
+                num_probes = self.num_probes, 
+                **kwargs
+            )
         return self.system_probes
+
+
 
     def simulator_probe_generator(
         # system probes
