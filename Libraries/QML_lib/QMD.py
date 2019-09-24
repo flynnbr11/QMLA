@@ -698,7 +698,12 @@ class QMD():
         #         self.TrueOpModelID = i
         #     self.ModelNameIDs[i] = model
             
-    def addModel(self, model, branchID=0):
+    def addModel(
+        self, 
+        model, 
+        branchID=0,
+        force_create_model=False
+    ):
         #self.NumModels += 1
         model = DataBase.alph(model)
         tryAddModel = DataBase.add_model(
@@ -724,7 +729,8 @@ class QMD():
             host_name = self.HostName, 
             port_number = self.PortNumber, 
             qid = self.Q_id,
-            log_file = self.log_file
+            log_file = self.log_file,
+            force_create_model=force_create_model, 
         )
         if tryAddModel == True: ## keep track of how many models/branches in play
             if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
@@ -3116,115 +3122,17 @@ class QMD():
                 still_learning = False # i.e. break out of this while loop
 
         print("[QMD runRemoteMult] Finalising QMD.")
-        final_winner, final_branch_winners = self.finalBayesComparisons()        
+        final_winner, final_branch_winners = self.finalBayesComparisons()
         self.ChampionName = final_winner
         self.ChampID = self.pullField(name=final_winner, field='ModelID')
+
+        # Check if final winner has parameters close to 0; potentially change champ
+        # self.checkChampReducability()
         self.log_print(["Final winner = ", final_winner])
 
         self.finaliseQMD()
 
 
-    # def runRemoteQMD(
-    #     self, 
-    #     num_exp=40, 
-    #     num_spawns=1, 
-    #     max_branches= None, 
-    #     max_num_qubits = None,
-    #     max_num_models=None, 
-    #     spawn=True,
-    #     just_given_models=False
-    # ):
-
-    #     active_branches_learning_models = (
-    #         self.RedisDataBases['active_branches_learning_models']
-    #     )
-    #     active_branches_bayes = self.RedisDataBases['active_branches_bayes']
-    #     self.learnModelFromBranchID(0, blocking=False, use_rq=True)
-    #     max_spawn_depth_reached=False
-    #     all_comparisons_complete=False
-
-    #     while max_spawn_depth_reached==False:
-    #         branch_ids_on_db = list(active_branches_learning_models.keys())
-    #         # branch_ids_on_db.remove(b'LOCKED')
-    #         for branchID_bytes in branch_ids_on_db:
-    #             branchID = int(branchID_bytes)
-    #             if (int(active_branches_learning_models.get(branchID)) == \
-    #                 self.NumModelsPerBranch[branchID] 
-    #                 and self.BranchAllModelsLearned[branchID]==False
-    #             ):
-                    
-    #                 self.log_print([
-    #                     "All models on branch", branchID, 
-    #                     "have finished learning."]
-    #                 )
-    #                 self.BranchAllModelsLearned[branchID] = True
-    #                 self.remoteBayesFromBranchID(branchID)
-
-    #         for branchID_bytes in active_branches_bayes.keys():
-                
-    #             branchID = int(branchID_bytes)
-    #             bayes_calculated = active_branches_bayes.get(branchID_bytes)
-    #             if (int(bayes_calculated) ==  
-    #                 self.NumModelPairsPerBranch[branchID] and
-    #                 self.BranchComparisonsComplete[branchID]==False
-    #             ):
-    #                 self.BranchComparisonsComplete[branchID] = True
-    #                 self.compareModelsWithinBranch(branchID)
-    #                 max_spawn_depth_reached = self.spawnFromBranch(
-    #                     # will return True if this brings it to self.MaxSpawnDepth
-    #                     branchID,
-    #                     num_models=1
-    #                 )
-
-    #         if max_spawn_depth_reached:
-    #             self.log_print(
-    #                 [
-    #                 "Max spawn depth reached; determining winner. \
-    #                 Entering while loop until all models/Bayes factors \
-    #                 remaining have finished."
-    #                 ]
-    #             )
-    #             still_learning = True
-
-    #             while still_learning:
-    #                 branch_ids_on_db = list(active_branches_learning_models.keys())
-    #                 # branch_ids_on_db.remove(b'LOCKED')
-    #                 for branchID_bytes in branch_ids_on_db:
-    #                     branchID = int(branchID_bytes)
-    #                     if ( 
-    #                         (int(active_branches_learning_models.get(branchID)) == 
-    #                         self.NumModelsPerBranch[branchID]) 
-    #                         and 
-    #                         (self.BranchAllModelsLearned[branchID]==False)
-    #                     ):
-    #                         self.BranchAllModelsLearned[branchID] = True
-    #                         self.remoteBayesFromBranchID(branchID)
-                            
-    #                     if branchID_bytes in active_branches_bayes:
-    #                         num_bayes_done_on_branch = (
-    #                             active_branches_bayes.get(branchID_bytes)
-    #                         )
-    #                         if ( int(num_bayes_done_on_branch) == 
-    #                             self.NumModelPairsPerBranch[branchID] and
-    #                             self.BranchComparisonsComplete[branchID]==False
-    #                         ):
-    #                             self.BranchComparisonsComplete[branchID] = True
-    #                             self.compareModelsWithinBranch(branchID)
-                    
-    #                 if (np.all(
-    #                     np.array(list(self.BranchAllModelsLearned.values()))==True)
-    #                     and
-    #                     np.all(np.array(list(
-    #                     self.BranchComparisonsComplete.values()))==True)
-    #                 ):    
-    #                         still_learning = False # i.e. break out of this while loop
-
-    #     final_winner, final_branch_winners = self.finalBayesComparisons()        
-    #     self.ChampionName = final_winner
-    #     self.ChampID = self.pullField(name=final_winner, field='ModelID')
-    #     self.log_print(["Final winner = ", final_winner])
-
-    #     self.finaliseQMD()
 
     def finaliseQMD(self):
         ### Final functions at end of QMD
@@ -3374,12 +3282,87 @@ class QMD():
             'ChampLatex' : champ_model.LatexTerm,
         }
 
+
+    def checkChampReducability(
+        self,
+    ):
+
+        self.log_print(
+            [
+                "Checking if champion model can be reduced due to negligible parameters.",
+                "Champ ID:", self.ChampID,
+                "Name:", self.ChampionName
+            ]
+        )
+
+        champ_mod = self.reducedModelInstanceFromID(self.ChampID)
+        params = list(champ_mod.LearnedParameters.keys())
+        to_remove = []
+
+        idx = 0
+        for p in params:
+            if np.abs(champ_mod.LearnedParameters[p]) < self.GrowthClass.learned_param_limit_for_reduction:
+                to_remove.append(p)
+            elif idx == 2:
+                # for testing
+                to_remove.append(p)
+            idx += 1
+
+        if len(to_remove) > 0 :
+            new_model_terms = list(
+                set(params) - set(to_remove)
+            )
+            dim = DataBase.get_num_qubits(new_model_terms[0])
+            p_str = 'P'*dim            
+            new_mod = p_str.join(new_model_terms)
+            new_mod = DataBase.alph(new_mod)            
+
+            self.log_print(
+                [
+                    "new model suggested:", new_mod
+                ]
+            )
+
+            reduced_mod_info = self.addModel(
+                model = new_mod,
+                force_create_model = True
+            )
+            reduced_mod_id = reduced_mod_info['model_id']
+            reduced_mod_instance = self.reducedModelInstanceFromID(reduced_mod_id)
+
+            champ_attributes = list(champ_mod.__dict__.keys())
+            # Here we need to fill in learned_info dict on redis with required attributes
+            # fill in rds_dbs['learned_models_info'][reduced_mod_id]
+            for att in champ_attributes:
+                reduced_mod_instance.__setattr__(
+                    att,
+                    champ_mod.__getattribute__(att)
+                )
+
+
+        else:
+            self.log_print(
+                [
+                    "Parameters non-negligible; not replacing champion model."
+                ]
+            )
+
+
+
+
+
+
+
     def updateDataBaseModelValues(self):
         for mod_id in range(self.HighestModelID):
-            mod = self.reducedModelInstanceFromID(mod_id)
-            mod.updateLearnedValues(
-                fitness_parameters = self.FitnessParameters
-            )
+            try:
+                # TODO remove this try/except when reduced-champ-model instance is update-able
+                mod = self.reducedModelInstanceFromID(mod_id)
+                mod.updateLearnedValues(
+                    fitness_parameters = self.FitnessParameters
+                )
+            except:
+                pass
 
     def compute_f_score(
         self,

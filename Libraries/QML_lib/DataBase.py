@@ -875,7 +875,8 @@ def add_model(
     qle=True, 
     qid=0, 
     host_name='localhost', 
-    port_number=6379
+    port_number=6379,
+    force_create_model=False,
 ):
     """
     Function to add a model to the existing databases. 
@@ -904,7 +905,11 @@ def add_model(
     alph_model_name = alph(model_name)
     model_num_qubits = get_num_qubits(model_name)
 
-    if consider_new_model(model_lists, model_name, running_database)=='New':
+    if (
+        consider_new_model(model_lists, model_name, running_database)=='New'
+        or
+        force_create_model == True
+    ):
         model_lists[model_num_qubits].append(alph_model_name)
         
         if redimensionalise:
@@ -973,11 +978,11 @@ def add_model(
           sim_oplist = op.constituents_operators, 
           true_oplist = true_ops, 
           true_params = true_params, 
-          numparticles = num_particles,
           modelID = int(modelID), 
-          resample_thresh = resample_threshold,
-          resample_a = resampler_a,
-          qle = qle,
+          # numparticles = num_particles,
+          # resample_thresh = resample_threshold,
+          # resample_a = resampler_a,
+          # qle = qle,
           qid=qid,
           host_name=host_name,
           port_number=port_number,
@@ -1002,7 +1007,14 @@ def add_model(
         running_database.loc[num_rows] = running_db_new_row      
         return True
     else:
-        log_print(["Model", alph_model_name, " previously considered."], log_file) 
+        log_print(
+            [
+                "Model", 
+                alph_model_name, 
+                " previously considered."
+            ], 
+            log_file
+        ) 
         return False
 
 

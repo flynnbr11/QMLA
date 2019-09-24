@@ -172,8 +172,6 @@ def BayesFactorRemote(
             )
 
         updater_a_copy = copy.deepcopy(model_a.Updater)
-        # updater_b_copy = copy.deepcopy(model_b.updater)
-
         log_l_a = log_likelihood(
             model_a, 
             update_times_model_a, 
@@ -195,6 +193,9 @@ def BayesFactorRemote(
             and
             DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name)
         ):
+
+            
+            # updater_b_copy = copy.deepcopy(model_b.updater)
 
 
             try:
@@ -342,10 +343,12 @@ def BayesFactorRemote(
         return bayes_factor
     
     
-def log_likelihood(model, times, binning=False):
+def log_likelihood(
+    model, 
+    times, 
+    binning=False
+):
     updater = model.Updater
-
-
     # print(
     #     "\n[log likel] Log likelihood for model", model.Name
     # )
@@ -592,7 +595,8 @@ def plot_posterior_marginals(
     )
 
     pickle.dump(
-        model_a.Updater,
+        # model_a.Updater,
+        updater_a_copy,
         open(
             posterior_plot_path, 
             'wb'    
@@ -630,31 +634,32 @@ def plot_posterior_marginals(
             before_bf_updates[param_of_interest][0], 
             before_bf_updates[param_of_interest][1],
             color='blue',
-            linestyle = '--',  
-            label='Start BF'
-
+            linestyle = '-',  
+            label='Start BF',
+            alpha=0.5
         )
-        plt.plot(
-            new_post_marg[param_of_interest][0], 
-            new_post_marg[param_of_interest][1],
-            color='y',
-            linestyle = '--',  
-            label='End BF'
-
-        )
+        # plt.plot(
+        #     new_post_marg[param_of_interest][0], 
+        #     new_post_marg[param_of_interest][1],
+        #     color='y',
+        #     linestyle = '-.',  
+        #     label='End BF',
+        #     # alpha=0.5,
+        # )
         init_post_marg = model_a.InitialPrior[param_of_interest]
-        plt.plot(
-            init_post_marg[0], 
-            init_post_marg[1],
-            color='green', 
-            label='Start QML',
-            alpha=0.4,
-        )
+        # plt.plot(
+        #     init_post_marg[0], 
+        #     init_post_marg[1],
+        #     color='green', 
+        #     label='Start QML',
+        #     linestyle='-',
+        #     alpha=0.4,
+        # )
         plt.plot(
             old_post_marg[param_of_interest][0], 
             old_post_marg[param_of_interest][1],
             color='red', 
-            linestyle='-.',
+            linestyle=':',
             label='End QML'
         )
         plt.legend()

@@ -726,11 +726,15 @@ class ModelLearningClass():
                     print('Exiting learning for Reaching Num. Prec. \
                          -  Iteration Number ' + str(istep)
                     )
+
                     for iterator in range(len(self.FinalParams)):
                         self.FinalParams[iterator]= [
+                            # final params and sigmas
                             #np.mean(self.Particles[:,iterator,istep]), 
+                            # TODO should this be gotten from updater.est_covariance_mtx()?
+                            # np.std(self.Particles[:,iterator,istep]) 
                             self.Updater.est_mean(),
-                            np.std(self.Particles[:,iterator,istep])
+                            np.sqrt(np.diag(updater.est_covariance_mtx()))
                         ]
                         print('Final Parameters mean and stdev:'+
                             str(self.FinalParams[iterator])
@@ -796,11 +800,15 @@ class ModelLearningClass():
                 
                 self.LearnedParameters = {}
                 self.FinalSigmas  = {}
+                cov_mat = self.Updater.est_covariance_mtx()
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator]= [
 #                        np.mean(self.Particles[:,iterator,istep-1]), 
                         self.Updater.est_mean()[iterator],
-                        np.std(self.Particles[:,iterator,istep-1])
+                        np.sqrt(cov_mat[iterator][iterator])                        
+                        # np.std(self.Particles[:,iterator,istep-1])
+                        # self.Updater.est_mean(),
+                        # np.sqrt(np.diag(updater.est_covariance_mtx()))
                     ]
                     self.log_print([
                         'Final Parameters mean and stdev (term ',
@@ -867,10 +875,13 @@ class ModelLearningClass():
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_prior'] = self.InitialPrior
         learned_info['sim_op_names'] = self.SimOpsNames
+        learned_info['final_cov_mat'] = self.Updater.est_covariance_mtx()
+        learned_info['est_mean'] = self.Updater.est_mean()
         """
-         1st is still the initial prior! that object does not get updated by the learning!
-        	modify e.g. using the functions defined in /QML_lib/Distrib.py
-         2nd is fine
+        1st is still the initial prior! 
+        that object does not get updated by the learning!
+        modify e.g. using the functions defined in /QML_lib/Distrib.py
+        2nd is fine
         """
 
         learned_info['posterior_marginal'] = all_post_margs
@@ -901,32 +912,6 @@ class ModelLearningClass():
             learned_info ['particles'] = self.Particles
             learned_info['weights'] = self.Weights
 
-        # if DataBase.alph(self.Name) == DataBase.alph(self.TrueOpName):
-        #     # print(
-        #     #     "[QML] End of learning. Model", 
-        #     #     self.ModelID, 
-        #     #     "Prior mean", self.Updater.est_mean()
-        #     # )
-        #     # print("Samples from prior:", 
-        #     #     self.Prior.sample(10)
-        #     # )
-
-        #     pickle.dump(
-        #         self.Updater, 
-        #         open(
-        #             str(
-        #                 self.ResultsDirectory
-        #                 + '/TrueModUpdater.p'
-        #             ),
-        #             'wb'
-        #         )
-        #     )
-
-        # self.log_print(
-        #     [
-        #         "learned_info dict successfully generated in QML instance."
-        #     ]
-        # )
         return learned_info
         
         
@@ -1019,12 +1004,19 @@ class reducedModel():
     """
     def __init__(
         self, 
-        model_name, sim_oplist, 
-        true_oplist, true_params,
-        numparticles, modelID, 
-        resample_thresh=0.5, resample_a=0.9, qle=True,
-        probe_dict= None, qid=0,
-        host_name='localhost', port_number=6379,
+        model_name, 
+        sim_oplist, 
+        true_oplist, 
+        true_params,
+        modelID, 
+        # numparticles, 
+        # resample_thresh=0.5, 
+        # resample_a=0.9, 
+        # qle=True,
+        # probe_dict= None, 
+        qid=0,
+        host_name='localhost', 
+        port_number=6379,
         log_file='QMD_log.log'
     ):
 
@@ -1104,7 +1096,9 @@ class reducedModel():
             print("[QML] Updating learned values for model ", self.ModelID)
             self.values_updated = True
             rds_dbs = rds.databases_from_qmd_id(
-                self.HostName, self.PortNumber, self.Q_id
+                self.HostName, 
+                self.PortNumber, 
+                self.Q_id
             )
             learned_models_info = rds_dbs['learned_models_info']
 
@@ -1133,7 +1127,7 @@ class reducedModel():
             self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
             self.SimOpNames = learned_info['sim_op_names']
             self.Prior = learned_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
-            self._normalization_record = learned_info['normalization_record']
+            self.NormalizationRecord = learned_info['normalization_record']
             self.log_total_likelihod = learned_info['log_total_likelihood']
             self.RawVolumeList = learned_info['volume_list'] 
             self.VolumeList = {}
@@ -1204,6 +1198,70 @@ class reducedModel():
             # if self.ModelID not in sorted(fitness_parameters.keys()):
             #     fitness_parameters[self.ModelID] = {}
             # fitness_parameters[self.ModelID]['r_squared'] =  0.75
+
+    def learned_info_dict(self):
+        """
+        Place essential information after learning has occured into a dict. 
+        This can be used to recreate the model on another node. 
+        """
+
+        learned_info = {}
+
+
+        # all_post_margs = []
+        # for i in range(len(self.FinalParams)):
+        #     all_post_margs.append(
+        #         self.Updater.posterior_marginal(idx_param=i)
+        #     )
+
+        learned_info['times'] = self.Times
+        learned_info['final_params'] = self.FinalParams
+        learned_info['normalization_record'] = self.NormalizationRecord
+        learned_info['log_total_likelihood'] = self.log_total_likelihood
+        # learned_info['data_record'] = self.Updater.data_record
+        learned_info['name'] = self.Name
+        learned_info['model_id'] = self.ModelID
+        # learned_info['updater'] = pickle.dumps(self.Updater, protocol=2) # TODO regenerate this from mean and std_dev instead of saving it
+        # learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
+        # learned_info['initial_prior'] = self.InitialPrior
+        # learned_info['sim_op_names'] = self.SimOpsNames
+        # """
+        # 1st is still the initial prior! 
+        # that object does not get updated by the learning!
+        # modify e.g. using the functions defined in /QML_lib/Distrib.py
+        # 2nd is fine
+        # """
+
+        # learned_info['posterior_marginal'] = all_post_margs
+        # learned_info['initial_params'] = self.SimParams
+        # learned_info['volume_list'] = self.VolumeList
+        # learned_info['track_eval'] = self.TrackEval
+        # learned_info['track_cov_matrices'] = self.TrackCovMatrices
+        # learned_info['track_posterior'] = self.TrackPosterior
+        # learned_info['track_prior_means'] = self.TrackPriorMeans
+        # learned_info['track_prior_std_devs'] = self.TrackPriorStdDev
+        # # learned_info['track_posterior_marginal'] = self.TrackPosteriorMarginal
+        # learned_info['resample_epochs'] = self.ResampleEpochs
+        # learned_info['quadratic_losses'] = self.QLosses
+        # learned_info['learned_parameters'] = self.LearnedParameters
+        # learned_info['final_sigmas'] = self.FinalSigmas
+        # learned_info['cov_matrix'] = self.covmat
+        # learned_info['num_particles'] = self.NumParticles
+        # learned_info['num_experiments'] = self.NumExperiments
+        # learned_info['growth_generator'] = self.GrowthGenerator
+        # learned_info['heuristic'] = self.HeuristicType
+        # if self.StoreParticlesWeights:
+        #     self.log_print(
+        #         [
+        #             "Storing particles and weights for model", 
+        #             self.ModelID
+        #         ]
+        #     )
+        #     learned_info ['particles'] = self.Particles
+        #     learned_info['weights'] = self.Weights
+
+        return learned_info
+ 
 
     def compute_expectation_values(
         self, 
@@ -1442,7 +1500,7 @@ class reducedModel():
 #            ),             
 #model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.TrueOpList,
 #        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
-#        self.Updater._normalization_record = self._normalization_record
+#        self.Updater.NormalizationRecord = self.NormalizationRecord
  
         
         
@@ -1510,6 +1568,7 @@ class modelClassForRemoteBayesFactor():
         self.UseExperimentalData = qmd_info['use_experimental_data']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
+        self.ResultsDirectory = qmd_info['results_directory']
         updater_from_prior = qmd_info['updater_from_prior']
 
         self.log_file = log_file
@@ -1530,9 +1589,11 @@ class modelClassForRemoteBayesFactor():
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self.PosteriorMarginal = learned_model_info['posterior_marginal']
         self.InitialPrior = learned_model_info['initial_prior']
-        self._normalization_record = learned_model_info['normalization_record']
-        self.log_likelihood = learned_model_info['log_total_likelihood']
-        
+        self.NormalizationRecord = learned_model_info['normalization_record']
+        self.log_total_likelihood = learned_model_info['log_total_likelihood']
+        self.LearnedParameters = learned_model_info['learned_parameters']
+        self.FinalSigmas = learned_model_info['final_sigmas']
+        self.FinalCovarianceMatrix = learned_model_info['final_cov_mat']
         log_identifier = str("Bayes "+str(self.ModelID)) 
                 
         self.GenSimModel = qml_qi.QInferModelQML(
@@ -1555,22 +1616,53 @@ class modelClassForRemoteBayesFactor():
             log_file=self.log_file,
             log_identifier=log_identifier
         )    
-        # print("[QML] upd from prior:", updater_from_prior)
-        if updater_from_prior == True:
-            self.Updater = qi.SMCUpdater(
-                self.GenSimModel, 
-                self.NumParticles,
-                self.Prior, 
-                resample_thresh=self.ResamplerThresh , 
-                resampler=qi.LiuWestResampler(a=self.ResamplerA), 
-                debug_resampling=False
-            )
-            self.Updater._normalization_record = self._normalization_record
-            self.Updater.log_likelihood = self.log_likelihood
-        else:
-            self.Updater = pickle.loads(
-                learned_model_info['updater']
-            )
+
+        # recreate prior using final params instead of pickling
+        posterior_distribution = qi.MultivariateNormalDistribution(
+            # final_params, 
+            learned_model_info['est_mean'],
+            self.FinalCovarianceMatrix
+            # final_cov_mat
+        )
+
+        # Plot posterior distribution after learning. 
+        # model_terms = DataBase.get_constituent_names_from_name(
+        #     self.Name
+        # )
+        # model_name_individual_terms = [
+        #     self.GrowthClass.latex_name(t)
+        #     for t in model_terms
+        # ]
+
+        # Distributions.plot_prior(
+        #     model_name = self.Name, 
+        #     model_name_individual_terms = model_name_individual_terms,
+        #     prior = posterior_distribution,
+        #     plot_file = str(
+        #         self.ResultsDirectory 
+        #         + '/priors/posterior_{}_{}.png'.format(
+        #             self.Q_id,
+        #             int(self.ModelID)
+        #         )
+        #     )
+        # )
+
+        self.Updater = qi.SMCUpdater(
+            model = self.GenSimModel, 
+            n_particles = self.NumParticles, 
+            prior = posterior_distribution,
+            resample_thresh = self.ResamplerThresh, 
+            resampler = qi.LiuWestResampler(
+                a = self.ResamplerA
+            ),
+            debug_resampling = False
+        )
+        self.Updater._normalization_record = self.NormalizationRecord
+        self.Updater._log_total_likelihood = self.log_total_likelihood
+
+        # self.Updater = pickle.loads(
+        #     learned_model_info['updater']
+        # )
 
         # print(
         #     "Providing prior to BF model instance {}:\n{}".format(
@@ -1579,9 +1671,6 @@ class modelClassForRemoteBayesFactor():
         #         ),
         #     "\n updater.est_mean():", self.Updater.est_mean()
         # )
-
-
-        #self.GenSimModel = pickle.loads(learned_model_info['gen_sim_model'])
         # TODO not clear which is quicker: generating new instance of classes/updater or unpickling every time.
         del qmd_info, learned_model_info
         
