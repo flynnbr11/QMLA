@@ -135,19 +135,12 @@ def BayesFactorRemote(
             qid=qid, 
             log_file=log_file
         )
-
-        log_print(
-            ["Got model a. Getting model b ({}) instance".format(model_b_id) ]
-        )
         model_b = QML.modelClassForRemoteBayesFactor(
             modelID=model_b_id,
             host_name=host_name, 
             port_number=port_number, 
             qid=qid, 
             log_file=log_file
-        )
-        log_print(
-            ["Got model b"]
         )
 
         # By default, use times the other model trained on, 

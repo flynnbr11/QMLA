@@ -1217,70 +1217,6 @@ class reducedModel():
             #     fitness_parameters[self.ModelID] = {}
             # fitness_parameters[self.ModelID]['r_squared'] =  0.75
 
-    def learned_info_dict(self):
-        """
-        Place essential information after learning has occured into a dict. 
-        This can be used to recreate the model on another node. 
-        """
-
-        learned_info = {}
-
-
-        # all_post_margs = []
-        # for i in range(len(self.FinalParams)):
-        #     all_post_margs.append(
-        #         self.Updater.posterior_marginal(idx_param=i)
-        #     )
-
-        learned_info['times'] = self.Times
-        learned_info['final_params'] = self.FinalParams
-        learned_info['normalization_record'] = self.NormalizationRecord
-        learned_info['log_total_likelihood'] = self.log_total_likelihood
-        # learned_info['data_record'] = self.Updater.data_record
-        learned_info['name'] = self.Name
-        learned_info['model_id'] = self.ModelID
-        # learned_info['updater'] = pickle.dumps(self.Updater, protocol=2) # TODO regenerate this from mean and std_dev instead of saving it
-        # learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
-        # learned_info['initial_prior'] = self.InitialPrior
-        # learned_info['sim_op_names'] = self.SimOpsNames
-        # """
-        # 1st is still the initial prior! 
-        # that object does not get updated by the learning!
-        # modify e.g. using the functions defined in /QML_lib/Distrib.py
-        # 2nd is fine
-        # """
-
-        # learned_info['posterior_marginal'] = all_post_margs
-        # learned_info['initial_params'] = self.SimParams
-        # learned_info['volume_list'] = self.VolumeList
-        # learned_info['track_eval'] = self.TrackEval
-        # learned_info['track_cov_matrices'] = self.TrackCovMatrices
-        # learned_info['track_posterior'] = self.TrackPosterior
-        # learned_info['track_prior_means'] = self.TrackPriorMeans
-        # learned_info['track_prior_std_devs'] = self.TrackPriorStdDev
-        # # learned_info['track_posterior_marginal'] = self.TrackPosteriorMarginal
-        # learned_info['resample_epochs'] = self.ResampleEpochs
-        # learned_info['quadratic_losses'] = self.QLosses
-        # learned_info['learned_parameters'] = self.LearnedParameters
-        # learned_info['final_sigmas'] = self.FinalSigmas
-        # learned_info['cov_matrix'] = self.covmat
-        # learned_info['num_particles'] = self.NumParticles
-        # learned_info['num_experiments'] = self.NumExperiments
-        # learned_info['growth_generator'] = self.GrowthGenerator
-        # learned_info['heuristic'] = self.HeuristicType
-        # if self.StoreParticlesWeights:
-        #     self.log_print(
-        #         [
-        #             "Storing particles and weights for model", 
-        #             self.ModelID
-        #         ]
-        #     )
-        #     learned_info ['particles'] = self.Particles
-        #     learned_info['weights'] = self.Weights
-
-        return learned_info
- 
-
     def compute_expectation_values(
         self, 
         times = [],
@@ -1615,12 +1551,12 @@ class modelClassForRemoteBayesFactor():
         self.SimParams_Final = np.array(self.FinalParams) # TODO this won't work for multiple parameters    
         # self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
 
-        print("[QML {}] \nSimParams_Final: {} \nSimOpList: {}".format(
-            self.Name,
-            self.SimParams_Final,
-            self.SimOpList
-            )
-        )
+        # print("[QML {}] \nSimParams_Final: {} \nSimOpList: {}".format(
+        #     self.Name,
+        #     self.SimParams_Final,
+        #     self.SimOpList
+        #     )
+        # )
         self.InitialParams = learned_model_info['initial_params']
         self.GrowthGenerator = learned_model_info['growth_generator']
         self.GrowthClass = GrowthRules.get_growth_generator_class(

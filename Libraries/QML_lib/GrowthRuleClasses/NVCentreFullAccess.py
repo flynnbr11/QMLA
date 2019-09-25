@@ -153,11 +153,6 @@ class nv_centre_spin_full_access(
         self,
         name
     ):
-        # print("[Growth Rules] NV centre Latex Name fnc")        
-        # TODO generalise this 
-        # if name == 'zTi': # FOR BQIT19 Poster #TODO REMOVE
-        #     return '$\Omega$'
-
         if name=='x' or name=='y' or name=='z':
             return '$'+name+'$'
 

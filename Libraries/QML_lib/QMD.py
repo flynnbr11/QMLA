@@ -486,8 +486,11 @@ class QMD():
             from rq import Connection, Queue, Worker
             self.redis_conn = redis.Redis(host=self.HostName, port=self.PortNumber)
             test_workers=self.use_rq
-            self.rq_queue = Queue(self.Q_id, connection=self.redis_conn,
-                async=test_workers, default_timeout=self.rq_timeout
+            self.rq_queue = Queue(
+                self.Q_id,
+                connection=self.redis_conn,
+                async=test_workers, 
+                default_timeout=self.rq_timeout
             ) # TODO is this timeout sufficient for ALL QMD jobs?
 
             parallel_enabled = True
@@ -742,7 +745,6 @@ class QMD():
             self.ModelNameIDs[mod_id] = model
             self.NumModels += 1
             if DataBase.get_num_qubits(model) > self.HighestQubitNumber:
-                print("[QMD] new model has highest num qubits so far")
                 self.HighestQubitNumber = DataBase.get_num_qubits(model)
                 self.BranchGrowthClasses[branchID].highest_num_qubits = DataBase.get_num_qubits(model)
                 # self.GrowthClass.highest_num_qubits = DataBase.get_num_qubits(model)
@@ -1172,7 +1174,8 @@ class QMD():
         branchID=None, 
         interbranch=False, 
         remote=True, 
-        bayes_threshold=None
+        bayes_threshold=None,
+        wait_on_result=False
     ):
         # only do this when both models have learned. TODO add check for this. 
         
@@ -1226,10 +1229,14 @@ class QMD():
                     model_b_id
                 ]
             )
-            if return_job:
+            if wait_on_result == True:
+                while job.is_finished == False:
+                    if job.is_failed== True:
+                        raise("Remote BF failure")
+                    sleep(0.1)                        
+            elif return_job == True:
                 return job
         else:
-
             BayesFactorRemote(
                 model_a_id=model_a_id, 
                 model_b_id=model_b_id,
@@ -1245,7 +1252,20 @@ class QMD():
                 qid=self.Q_id, 
                 log_file=self.rq_log_file
             )
-            
+        if wait_on_result == True:
+            pair_id = DataBase.unique_model_pair_identifier(
+                model_a_id, 
+                model_b_id
+            )
+            bf_from_db = self.RedisDataBases['bayes_factors_db'].get(pair_id)
+            bayes_factor = float(bf_from_db)
+
+            return bayes_factor
+
+
+
+
+
     def remoteBayesFromIDList(
         self, 
         model_id_list, 
@@ -3079,7 +3099,8 @@ class QMD():
         self.log_print(
             [
                 "All trees have completed.", 
-                "Num complete:", self.NumTreesCompleted
+                "Num complete:", 
+                self.NumTreesCompleted
             ]
         )
         # let any branches which have just started finish before moving to analysis
@@ -3140,7 +3161,7 @@ class QMD():
         self.checkChampReducability()
         self.log_print(
             [
-                "Final winner = ", final_winner
+                "Final winner = ", self.ChampionName
             ]
         )
 
@@ -3314,15 +3335,19 @@ class QMD():
         champ_mod = self.reducedModelInstanceFromID(self.ChampID)
         params = list(champ_mod.LearnedParameters.keys())
         to_remove = []
-
+        removed_params = {}
         idx = 0
         for p in params:
-            if np.abs(champ_mod.LearnedParameters[p]) < self.GrowthClass.learned_param_limit_for_reduction:
+            if (
+                np.abs(champ_mod.LearnedParameters[p]) 
+                < self.GrowthClass.learned_param_limit_for_negligibility
+            ):
                 to_remove.append(p)
-            elif idx == 1:
-                # for testing
-                to_remove.append(p)
-            idx += 1
+                removed_params[p] = champ_mod.LearnedParameters[p]
+            # elif idx == 1:
+            #     # for testing
+            #     to_remove.append(p)
+            # idx += 1
 
         if len(to_remove) > 0 :
             new_model_terms = list(
@@ -3335,7 +3360,7 @@ class QMD():
 
             self.log_print(
                 [
-                    "new model suggested:", new_mod
+                    "Reduced champion model suggested:", new_mod
                 ]
             )
 
@@ -3344,7 +3369,9 @@ class QMD():
                 force_create_model = True
             )
             reduced_mod_id = reduced_mod_info['model_id']
-            reduced_mod_instance = self.reducedModelInstanceFromID(reduced_mod_id)
+            reduced_mod_instance = self.reducedModelInstanceFromID(
+                reduced_mod_id
+            )
 
             reduced_mod_terms = sorted(
                 DataBase.get_constituent_names_from_name(
@@ -3352,14 +3379,14 @@ class QMD():
                 )
             )
 
-            champ_attributes = list(champ_mod.__dict__.keys())
+            # champ_attributes = list(champ_mod.__dict__.keys())
             # Here we need to fill in learned_info dict on redis with required attributes
             # fill in rds_dbs['learned_models_info'][reduced_mod_id]
-            for att in champ_attributes:
-                reduced_mod_instance.__setattr__(
-                    att,
-                    champ_mod.__getattribute__(att)
-                )
+            # for att in champ_attributes:
+            #     reduced_mod_instance.__setattr__(
+            #         att,
+            #         champ_mod.__getattribute__(att)
+            #     )
 
             # get champion leared info
             reduced_champion_info = pickle.loads(
@@ -3402,33 +3429,65 @@ class QMD():
             )
 
             # TODO fill in values for reducedModel
-            print("[QMD] Setting Redis DB with reduced champ model")
-
             self.RedisDataBases['learned_models_info'].set(
                 str(float(reduced_mod_id)), 
                 compressed_reduced_champ_info
             )
 
-            print("[QMD] Sending BF calculation b/w champ and reduced champ models.")
-            print("IDs:", int(self.ChampID), ";", reduced_mod_id)
+            self.reducedModelInstanceFromID(reduced_mod_id).updateLearnedValues()
 
-            self.remoteBayes(
+            bayes_factor = self.remoteBayes(
                 model_a_id = int(self.ChampID),
-                model_b_id = int(reduced_mod_id)
+                model_b_id = int(reduced_mod_id),
+                wait_on_result = True
+            )
+            self.log_print(
+                [
+                    "[QMD] BF b/w champ and reduced champ models:", 
+                    bayes_factor
+                ]
             )
 
-            print("[QMD] Sent BF calculation b/w champ and reduced champ models.")
+            if (
+                (
+                    (1.0/bayes_factor)
+                    < self.GrowthClass.reduce_champ_bayes_factor_threshold
+                ) 
+                # or True
+            ):
+                # overwrite champ id etc
+
+                self.log_print(
+                    [
+                        "Replacing champion model ({}) with reduced champion model ({} - {})".format(
+                            self.ChampID, 
+                            reduced_mod_id,
+                            new_mod
+                        ), 
+                        "\n i.e. removing negligible parameter terms:\n{}".format(
+                            removed_params
+                        )
+
+                    ]
+                )
+                original_champ_id = self.ChampID
+                self.ChampID = reduced_mod_id
+                self.ChampionName = new_mod
+
+                self.reducedModelInstanceFromID(self.ChampID).BayesFactors = (
+                    self.reducedModelInstanceFromID(original_champ_id).BayesFactors
+                )
+
+            # TODO check if BF > threshold; if so, reassign self.ChampID and self.ChampionName
+
+
+
         else:
             self.log_print(
                 [
                     "Parameters non-negligible; not replacing champion model."
                 ]
             )
-
-
-
-
-
 
 
     def updateDataBaseModelValues(self):
@@ -3470,8 +3529,8 @@ class QMD():
         try:
             self.FScore = (
                 (1 + beta**2) * (
-                    (self.Precision * self.Sensitivity) /
-                    (beta**2 * self.Precision + self.Sensitivity) 
+                    (self.Precision * self.Sensitivity)
+                    / (beta**2 * self.Precision + self.Sensitivity) 
                 )
             ) 
         except:

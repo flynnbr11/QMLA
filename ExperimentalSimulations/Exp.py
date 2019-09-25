@@ -21,7 +21,6 @@ import GlobalVariables
 global_variables = GlobalVariables.parse_cmd_line_args(sys.argv[1:])
 growth_class = global_variables.growth_class
 
-
 import RedisSettings as rds
 import Evo as evo
 import DataBase 

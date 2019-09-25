@@ -189,18 +189,18 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             self.probe_dict = probe_dict   
             self.sim_probe_dict = sim_probe_dict
 
-        log_print(
-            [
-                "Mod name:", self.ModelName,
-                "n_modelparams:", self.n_modelparams,
-                "probe[(0,1)]:", 
-                self.probe_dict[(0,1)],
-                "\nsim probe[(0,1)]:", 
-                self.sim_probe_dict[(0,1)],
-            ],
-            self.log_file, 
-            self.log_identifier
-        )
+        # log_print(
+        #     [
+        #         "Mod name:", self.ModelName,
+        #         "n_modelparams:", self.n_modelparams,
+        #         "probe[(0,1)]:", 
+        #         self.probe_dict[(0,1)],
+        #         "\nsim probe[(0,1)]:", 
+        #         self.sim_probe_dict[(0,1)],
+        #     ],
+        #     self.log_file, 
+        #     self.log_identifier
+        # )
 
     ## PROPERTIES ##
     @property
