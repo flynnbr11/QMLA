@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 import math
 
+import qinfer 
 import redis
 import RedisSettings as rds
 
@@ -3124,11 +3125,18 @@ class QMD():
         print("[QMD runRemoteMult] Finalising QMD.")
         final_winner, final_branch_winners = self.finalBayesComparisons()
         self.ChampionName = final_winner
-        self.ChampID = self.pullField(name=final_winner, field='ModelID')
+        self.ChampID = self.pullField(
+            name=final_winner, 
+            field='ModelID'
+        )
 
         # Check if final winner has parameters close to 0; potentially change champ
         # self.checkChampReducability()
-        self.log_print(["Final winner = ", final_winner])
+        self.log_print(
+            [
+                "Final winner = ", final_winner
+            ]
+        )
 
         self.finaliseQMD()
 
@@ -3146,10 +3154,13 @@ class QMD():
                 self.reducedModelInstanceFromID(i).BayesFactors
             )
 
+        self.log_print(["computing expect vals for mod ", champ_model.ModelID])
         champ_model.compute_expectation_values(
             times=self.PlotTimes,
             # plot_probe_path = self.PlotProbeFile
         )
+        self.log_print(["computed expect vals"])
+
         self.compute_f_score(
             model_id = self.ChampID
         )
@@ -3263,7 +3274,7 @@ class QMD():
             'TrackParameterEstimates' : champ_model.TrackParameterEstimates,
             'TrackVolume' : champ_model.VolumeList,
             'TrackTimesLearned' : champ_model.Times, 
-            'TrackCovarianceMatrices' : champ_model.TrackCovMatrices, 
+            # 'TrackCovarianceMatrices' : champ_model.TrackCovMatrices, 
             # 'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
             #     plot_probes = self.PlotProbes,
             #     times = expec_val_plot_times
@@ -3303,7 +3314,7 @@ class QMD():
         for p in params:
             if np.abs(champ_mod.LearnedParameters[p]) < self.GrowthClass.learned_param_limit_for_reduction:
                 to_remove.append(p)
-            elif idx == 2:
+            elif idx == 1:
                 # for testing
                 to_remove.append(p)
             idx += 1
@@ -3330,6 +3341,12 @@ class QMD():
             reduced_mod_id = reduced_mod_info['model_id']
             reduced_mod_instance = self.reducedModelInstanceFromID(reduced_mod_id)
 
+            reduced_mod_terms = sorted(
+                DataBase.get_constituent_names_from_name(
+                    new_mod
+                )
+            )
+
             champ_attributes = list(champ_mod.__dict__.keys())
             # Here we need to fill in learned_info dict on redis with required attributes
             # fill in rds_dbs['learned_models_info'][reduced_mod_id]
@@ -3339,7 +3356,54 @@ class QMD():
                     champ_mod.__getattribute__(att)
                 )
 
+            # get champion leared info
+            reduced_champion_info = pickle.loads(
+                self.RedisDataBases['learned_models_info'].get(str(self.ChampID))
+            )
 
+            reduced_params = {}
+            reduced_sigmas = {}
+            for term in reduced_mod_terms:
+                reduced_params[term] = champ_mod.LearnedParameters[term]
+                reduced_sigmas[term] = champ_mod.FinalSigmas[term]
+
+            learned_params = [reduced_params[t] for t in reduced_mod_terms]
+            sigmas = np.array([reduced_sigmas[t] for t in reduced_mod_terms])
+            new_cov_mat = np.diag(
+                sigmas**2
+            )
+            new_prior = qinfer.MultivariateNormalDistribution(
+                learned_params, 
+                new_cov_mat
+            )
+
+            # reduce learned info where appropriate
+            reduced_champion_info['Name'] = new_mod
+            reduced_champion_info['sim_op_names'] = reduced_mod_terms
+            reduced_champion_info['final_cov_mat'] = new_cov_mat
+            reduced_champion_info['final_params'] = learned_params
+            reduced_champion_info['learned_params'] = reduced_params
+            reduced_champion_info['model_id'] = reduced_mod_id
+            reduced_champion_info['final_prior'] = new_prior
+            reduced_champion_info['est_mean'] = new_prior.est_mean()
+            reduced_champion_info['final_sigmas'] = reduced_sigmas
+
+            compressed_reduced_champ_info = pickle.dumps(
+                reduced_champion_info, 
+                protocol=2
+            )
+            self.RedisDataBases['learned_models_info'].set(
+                str(int(reduced_mod_id)), 
+                compressed_reduced_champ_info
+            )
+
+
+            self.remoteBayes(
+                model_a_id = self.ChampID, 
+                model_b_id = reduced_mod_id
+            )
+
+            print("[QMD] Sent BF calculation b/w champ and reduced champ models.")
         else:
             self.log_print(
                 [

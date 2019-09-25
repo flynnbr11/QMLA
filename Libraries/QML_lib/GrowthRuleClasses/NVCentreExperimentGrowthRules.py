@@ -36,13 +36,13 @@ class nv_centre_spin_experimental_method(
         # self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
 
         # self.initial_models = ['xTi', 'yTi', 'zTi'] 
-        self.initial_models = ['xTiPPzTi', 'yTi', ] 
+        self.initial_models = ['xTiPPzTi', 'xTiPPyTiPPzTiPPzTz', ] 
         self.qhl_models =    	[
             # 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
             # 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
-            # 'xTiPPxTxPPyTiPPzTi',
+            'xTiPPxTxPPyTiPPzTi',
             'xTiPPyTiPPzTiPPzTz',
-            'yTi'
+            # 'yTi'
         ]
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8

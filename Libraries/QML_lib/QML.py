@@ -604,17 +604,18 @@ class ModelLearningClass():
             
             before_datum = time.time()
 
-#            self.log_print(
-#                [
-#                'Getting Datum'
-#                ]
-#            )
+            self.log_print(
+               [
+               'Getting Datum'
+               ]
+            )
 
             self.Datum = self.GenSimModel.simulate_experiment(
                 self.SimParams,
                 self.Experiment,
                 repeat=1
             ) # TODO reconsider repeat number
+
             after_datum = time.time()
             self.datum_gather_cumulative_time+=after_datum-before_datum
             
@@ -651,24 +652,19 @@ class ModelLearningClass():
                 self.ResampleEpochs.append(istep)
             
             print_loc(global_print_loc)
-
-            if len(self.Experiment[0]) < 3:
-                print_loc(global_print_loc)
-                self.covmat = self.Updater.est_covariance_mtx()
-                self.VolumeList = np.append(self.VolumeList, self.covmat)
-                print_loc(global_print_loc)
-
-            else:
-                print_loc(global_print_loc)
-                self.covmat = self.Updater.est_covariance_mtx()
-                self.VolumeList = np.append(
-                    self.VolumeList,  
-                    np.linalg.det( sp.linalg.sqrtm(self.covmat) )
+            # self.covmat = self.Updater.est_covariance_mtx()
+            self.VolumeList = np.append(
+                self.VolumeList,  
+                np.linalg.det( 
+                    sp.linalg.sqrtm(
+                        # self.covmat
+                        self.Updater.est_covariance_mtx()
+                    ) # TODO seems unnecessary to do this every epoch - every 10th would be enough for plot
                 )
-                print_loc(global_print_loc)
+            )
             
             self.TrackEval.append(self.Updater.est_mean())
-            self.TrackCovMatrices.append(self.Updater.est_covariance_mtx())
+            # self.TrackCovMatrices.append(self.Updater.est_covariance_mtx()) # TODO this doesn't seem necessary to store
             prior_sample = self.Updater.sample(int(5))
 
             these_means = []
@@ -679,7 +675,7 @@ class ModelLearningClass():
 
             self.TrackPosterior.append(prior_sample)
             self.TrackPriorMeans.append(these_means)
-            self.TrackPriorStdDev.append(these_std)
+            self.TrackPriorStdDev.append(these_std) # TODO get this from self.Updater.est_mean()
             # self.TrackPosteriorMarginal.append(self.Updater.posterior_marginal())
 
 
@@ -784,14 +780,20 @@ class ModelLearningClass():
             
             if istep == self.NumExperiments-1:
                 self.log_print(["Results for QHL on ", self.Name])
-                self.log_print(['Final time selected >',
-                    str(self.Experiment[0][0])]
+                self.log_print(
+                    [
+                        'Final time selected >',
+                        str(self.Experiment[0][0])
+                    ]
                 )
                 self.LogTotLikelihood=self.Updater.log_total_likelihood
                 #from pympler import asizeof
-                self.log_print(['Cumulative time.\t Datum:',
-                    self.datum_gather_cumulative_time, '\t Update:',
-                    self.update_cumulative_time]
+                self.log_print(
+                    [
+                        'Cumulative time.\t Datum:',
+                        self.datum_gather_cumulative_time, '\t Update:',
+                        self.update_cumulative_time
+                    ]
                 )
         
                 #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.Updater), '\t GenSim:', asizeof.asizeof(self.GenSimModel) ])
@@ -871,7 +873,7 @@ class ModelLearningClass():
         learned_info['data_record'] = self.Updater.data_record
         learned_info['name'] = self.Name
         learned_info['model_id'] = self.ModelID
-        learned_info['updater'] = pickle.dumps(self.Updater, protocol=2) # TODO regenerate this from mean and std_dev instead of saving it
+        # learned_info['updater'] = pickle.dumps(self.Updater, protocol=2) # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_prior'] = self.InitialPrior
         learned_info['sim_op_names'] = self.SimOpsNames
@@ -888,7 +890,7 @@ class ModelLearningClass():
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
-        learned_info['track_cov_matrices'] = self.TrackCovMatrices
+        # learned_info['track_cov_matrices'] = self.TrackCovMatrices
         learned_info['track_posterior'] = self.TrackPosterior
         learned_info['track_prior_means'] = self.TrackPriorMeans
         learned_info['track_prior_std_devs'] = self.TrackPriorStdDev
@@ -897,7 +899,7 @@ class ModelLearningClass():
         learned_info['quadratic_losses'] = self.QLosses
         learned_info['learned_parameters'] = self.LearnedParameters
         learned_info['final_sigmas'] = self.FinalSigmas
-        learned_info['cov_matrix'] = self.covmat
+        learned_info['cov_matrix'] = self.Updater.est_covariance_mtx()
         learned_info['num_particles'] = self.NumParticles
         learned_info['num_experiments'] = self.NumExperiments
         learned_info['growth_generator'] = self.GrowthGenerator
@@ -1101,6 +1103,11 @@ class reducedModel():
                 self.Q_id
             )
             learned_models_info = rds_dbs['learned_models_info']
+            self.log_print(
+                [
+                    "Updating learned info for model {}".format(self.ModelID),
+                ]
+            )
 
             if learned_info is None:
                 model_id_float = float(self.ModelID)
@@ -1135,7 +1142,7 @@ class reducedModel():
                 self.VolumeList[i] = self.RawVolumeList[i]
 
             self.TrackEval = np.array(learned_info['track_eval'])
-            self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
+            # self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
             self.TrackPriorMeans = np.array(learned_info['track_prior_means'])
             self.TrackPosterior = np.array(learned_info['track_posterior'])
             self.TrackPriorStdDev = np.array(learned_info['track_prior_std_devs'])
@@ -1145,6 +1152,7 @@ class reducedModel():
             self.QuadraticLosses = learned_info['quadratic_losses']
             self.LearnedParameters = learned_info['learned_parameters']
             self.FinalSigmas = learned_info['final_sigmas']
+            
             self.cov_matrix = learned_info['cov_matrix']
             self.GrowthGenerator = learned_info['growth_generator']
             try:
@@ -1186,13 +1194,20 @@ class reducedModel():
                 )
             except:
                 print(
-                    "[QML] trying to build learned hamiltonian for ",
+                    "[QML] (failed) trying to build learned hamiltonian for ",
                     self.ModelID, " : ",
                     self.Name, 
                     "\nsim_params:", sim_params, 
                     "\nsim op list", self.SimOpList
                 )
                 raise
+
+            self.log_print(
+                [
+                    "Updated learned info for model {}".format(self.ModelID),
+
+                ]
+            )
 
 
             # if self.ModelID not in sorted(fitness_parameters.keys()):
@@ -1525,7 +1540,8 @@ class modelClassForRemoteBayesFactor():
             host_name='localhost',
             port_number=6379,
             qid=0,
-            log_file='QMD_log.log'
+            log_file='QMD_log.log',
+            learned_model_info=None, 
         ):
 
         rds_dbs = rds.databases_from_qmd_id(
@@ -1533,23 +1549,12 @@ class modelClassForRemoteBayesFactor():
             port_number, 
             qid
         )
+        self.log_file = log_file
+        self.Q_id = qid
+
         qmd_info_db = rds_dbs['qmd_info_db'] 
-        learned_models_info = rds_dbs['learned_models_info']
-    
-        model_id_float = float(modelID)
-        model_id_str = str(model_id_float)
-        try:
-            learned_model_info = pickle.loads(
-                learned_models_info.get(model_id_str), 
-                encoding='latin1'
-            )        
-        except:
-            learned_model_info = pickle.loads(
-                learned_models_info.get(model_id_str)
-            )        
 
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
-
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.SimProbeDict = pickle.loads(qmd_info_db['SimProbeDict'])
 
@@ -1571,8 +1576,19 @@ class modelClassForRemoteBayesFactor():
         self.ResultsDirectory = qmd_info['results_directory']
         updater_from_prior = qmd_info['updater_from_prior']
 
-        self.log_file = log_file
-        self.Q_id = qid
+        # Get model specific data
+        learned_models_info = rds_dbs['learned_models_info']
+        model_id_float = float(modelID)
+        model_id_str = str(model_id_float)
+        try:
+            learned_model_info = pickle.loads(
+                learned_models_info.get(model_id_str), 
+                encoding='latin1'
+            )        
+        except:
+            learned_model_info = pickle.loads(
+                learned_models_info.get(model_id_str)
+            )        
 
         self.Name = learned_model_info['name']
         op = DataBase.operator(self.Name)
@@ -1580,6 +1596,13 @@ class modelClassForRemoteBayesFactor():
         self.Times = learned_model_info['times']
         self.FinalParams = learned_model_info['final_params'] 
         self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
+
+        print("[QML {}] \nSimParams_Final: {} \nSimOpList: {}".format(
+            self.Name,
+            self.SimParams_Final,
+            self.SimOpList
+            )
+        )
         self.InitialParams = learned_model_info['initial_params']
         self.GrowthGenerator = learned_model_info['growth_generator']
         self.GrowthClass = GrowthRules.get_growth_generator_class(

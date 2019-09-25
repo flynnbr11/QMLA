@@ -75,9 +75,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
     def __init__(
         self, 
         oplist, 
-        modelparams,
-        # num_experiments=None, 
-        # num_particles=None,  
+        modelparams, # modelparams not needed (used) for this class # TODO remove unneeded inputs
         probecounter=None, 
         use_time_dep_true_model = False,
         time_dep_true_params = None,
@@ -115,6 +113,11 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.QLE = qle
         self._trotter = trotter
         self._modelparams = modelparams
+        # print("[QInferModelQML] \n Oplist: {} \n params: {}".format(
+        #     self._oplist, 
+        #     self._modelparams
+        #     )
+        # )
         self.signs_of_inital_params = np.sign(modelparams)
         self._true_oplist = true_oplist
         self._trueparams = trueparams
