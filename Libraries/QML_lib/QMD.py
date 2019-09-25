@@ -3485,7 +3485,8 @@ class QMD():
         else:
             self.log_print(
                 [
-                    "Parameters non-negligible; not replacing champion model."
+                    "Parameters non-negligible; not replacing champion model.",
+                    "Params:\n", champ_mod.LearnedParameters
                 ]
             )
 
