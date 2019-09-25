@@ -77,8 +77,13 @@ def BayesFactorRemote(
 
     write_log_file = open(log_file, 'a')
     def log_print(to_print_list):
-        identifier = str(str(time_seconds()) + " [RQ Bayes "
-            +str(model_a_id)+"/"+str(model_b_id)+"]"
+        identifier = str(
+            str(time_seconds()) 
+            + " [RQ Bayes "
+            + str(model_a_id)
+            + "/"
+            + str(model_b_id)
+            + "]"
         )
         if type(to_print_list)!=list:
             to_print_list = list(to_print_list)
@@ -119,7 +124,10 @@ def BayesFactorRemote(
             else:
                 return (1.0/bayes_factor)
     else:
-        
+
+        log_print(
+            ["Getting model a ({}) instance".format(model_a_id) ]
+        )
         model_a = QML.modelClassForRemoteBayesFactor(
             modelID=model_a_id,
             host_name=host_name, 
@@ -127,12 +135,19 @@ def BayesFactorRemote(
             qid=qid, 
             log_file=log_file
         )
+
+        log_print(
+            ["Got model a. Getting model b ({}) instance".format(model_b_id) ]
+        )
         model_b = QML.modelClassForRemoteBayesFactor(
             modelID=model_b_id,
             host_name=host_name, 
             port_number=port_number, 
             qid=qid, 
             log_file=log_file
+        )
+        log_print(
+            ["Got model b"]
         )
 
         # By default, use times the other model trained on, 
@@ -400,13 +415,21 @@ def log_likelihood(
     return log_likelihood        
 
 def get_exp(model, time):
-    gen = model.Updater.model # or gen=model.GenSimModel
-    exp = np.empty(len(time), dtype=gen.expparams_dtype)
+    # gen = model.Updater.model # or gen=model.GenSimModel
+    gen = model.GenSimModel
+    exp = np.empty(
+        len(time), 
+        dtype=gen.expparams_dtype
+    )
     exp['t'] = time
 
-    for i in range(1, len(gen.expparams_dtype)):
-        col_name = 'w_'+str(i)
-        exp[col_name] = model.FinalParams[i-1,0] 
+    try:
+        for i in range(1, len(gen.expparams_dtype)):
+            col_name = 'w_'+str(i)
+            exp[col_name] = model.FinalParams[i-1,0] 
+    except:
+        print("failed to get exp. \nFinal params:", model.FinalParams)
+
     return exp
 
 

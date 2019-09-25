@@ -1219,8 +1219,12 @@ class QMD():
                 result_ttl=-1,
                 timeout=self.rq_timeout
             ) 
-            self.log_print(["Bayes factor calculation queued. Model IDs",
-                model_a_id, model_b_id]
+            self.log_print(
+                [
+                    "Bayes factor calculation queued. Model IDs",
+                    model_a_id, 
+                    model_b_id
+                ]
             )
             if return_job:
                 return job
@@ -3131,7 +3135,9 @@ class QMD():
         )
 
         # Check if final winner has parameters close to 0; potentially change champ
-        # self.checkChampReducability()
+        self.updateDataBaseModelValues()
+
+        self.checkChampReducability()
         self.log_print(
             [
                 "Final winner = ", final_winner
@@ -3146,7 +3152,6 @@ class QMD():
         ### Final functions at end of QMD
         ### Fill in champions result dict for further analysis.
 
-        self.updateDataBaseModelValues()
         champ_model = self.reducedModelInstanceFromID(self.ChampID)
         for i in range(self.HighestModelID):
             # Dict of all Bayes factors for each model considered. 
@@ -3369,6 +3374,8 @@ class QMD():
 
             learned_params = [reduced_params[t] for t in reduced_mod_terms]
             sigmas = np.array([reduced_sigmas[t] for t in reduced_mod_terms])
+            final_params = np.array(list(zip(learned_params, sigmas)))
+
             new_cov_mat = np.diag(
                 sigmas**2
             )
@@ -3378,29 +3385,36 @@ class QMD():
             )
 
             # reduce learned info where appropriate
-            reduced_champion_info['Name'] = new_mod
+            reduced_champion_info['name'] = new_mod
             reduced_champion_info['sim_op_names'] = reduced_mod_terms
             reduced_champion_info['final_cov_mat'] = new_cov_mat
-            reduced_champion_info['final_params'] = learned_params
-            reduced_champion_info['learned_params'] = reduced_params
+            reduced_champion_info['final_params'] = final_params
+            reduced_champion_info['learned_parameters'] = reduced_params
             reduced_champion_info['model_id'] = reduced_mod_id
             reduced_champion_info['final_prior'] = new_prior
-            reduced_champion_info['est_mean'] = new_prior.est_mean()
+            reduced_champion_info['est_mean'] = np.array(learned_params)
             reduced_champion_info['final_sigmas'] = reduced_sigmas
+            reduced_champion_info['initial_params'] = reduced_sigmas
 
             compressed_reduced_champ_info = pickle.dumps(
                 reduced_champion_info, 
                 protocol=2
             )
+
+            # TODO fill in values for reducedModel
+            print("[QMD] Setting Redis DB with reduced champ model")
+
             self.RedisDataBases['learned_models_info'].set(
-                str(int(reduced_mod_id)), 
+                str(float(reduced_mod_id)), 
                 compressed_reduced_champ_info
             )
 
+            print("[QMD] Sending BF calculation b/w champ and reduced champ models.")
+            print("IDs:", int(self.ChampID), ";", reduced_mod_id)
 
             self.remoteBayes(
-                model_a_id = self.ChampID, 
-                model_b_id = reduced_mod_id
+                model_a_id = int(self.ChampID),
+                model_b_id = int(reduced_mod_id)
             )
 
             print("[QMD] Sent BF calculation b/w champ and reduced champ models.")

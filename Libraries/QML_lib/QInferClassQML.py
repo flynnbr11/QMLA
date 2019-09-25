@@ -31,10 +31,19 @@ def time_seconds():
     time = str(str(hour)+':'+str(minute)+':'+str(second))
     return time
 
-def log_print(to_print_list, log_file, log_identifier=None):
+def log_print(
+    to_print_list, 
+    log_file, 
+    log_identifier=None
+):
     if log_identifier is None:
         log_identifier='[GenSim]'
-    identifier = str(str(time_seconds()) +" [GenSim ("+str(log_identifier)+")]")
+    identifier = str(
+        str(time_seconds()) 
+        + " [QML-Qinfer] ("
+        + str(log_identifier) 
+        + ")]"
+    )
     if type(to_print_list)!=list:
         to_print_list = list(to_print_list)
 
@@ -182,6 +191,8 @@ class QInferModelQML(qi.FiniteOutcomeModel):
 
         log_print(
             [
+                "Mod name:", self.ModelName,
+                "n_modelparams:", self.n_modelparams,
                 "probe[(0,1)]:", 
                 self.probe_dict[(0,1)],
                 "\nsim probe[(0,1)]:", 

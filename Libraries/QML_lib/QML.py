@@ -148,7 +148,10 @@ class ModelLearningClass():
         self.ModelID = int(modelID)
  
     
-    def log_print(self, to_print_list):
+    def log_print(
+        self, 
+        to_print_list
+    ):
         identifier = str(str(time_seconds()) +" [QML "+ str(self.ModelID) +"]")
         if type(to_print_list)!=list:
             to_print_list = list(to_print_list)
@@ -1578,6 +1581,15 @@ class modelClassForRemoteBayesFactor():
 
         # Get model specific data
         learned_models_info = rds_dbs['learned_models_info']
+        self.log_print(
+            [
+                "Instantiating model for BF for mod ", 
+                str(modelID), 
+                "RDS learned models available:", 
+                learned_models_info.keys()
+            ]
+        )
+
         model_id_float = float(modelID)
         model_id_str = str(model_id_float)
         try:
@@ -1591,11 +1603,17 @@ class modelClassForRemoteBayesFactor():
             )        
 
         self.Name = learned_model_info['name']
+        self.log_print(
+            [
+                "Name:", self.Name
+            ]
+        )
         op = DataBase.operator(self.Name)
         self.SimOpList = op.constituents_operators # todo, put this in a lighter function
         self.Times = learned_model_info['times']
         self.FinalParams = learned_model_info['final_params'] 
-        self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
+        self.SimParams_Final = np.array(self.FinalParams) # TODO this won't work for multiple parameters    
+        # self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO this won't work for multiple parameters
 
         print("[QML {}] \nSimParams_Final: {} \nSimOpList: {}".format(
             self.Name,
