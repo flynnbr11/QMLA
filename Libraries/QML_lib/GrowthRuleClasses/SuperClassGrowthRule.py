@@ -55,7 +55,7 @@ class growth_rule_super_class():
         self.fixed_axis_generator = False # if you have a transverse axis and you want to generate on that axis than set it to True
         self.fixed_axis = 'z' # e.g. transverse axis
         self.num_processes_to_parallelise_over = 6
-        self.learned_param_limit_for_negligibility = 0.03
+        self.learned_param_limit_for_negligibility = 0.05
         self.reduce_champ_bayes_factor_threshold = 1e2
 
         self.max_num_models_by_shape = {
