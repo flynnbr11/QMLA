@@ -9,7 +9,7 @@ import qinfer as qi
 import ExpectationValues
 import GrowthRules
 # import UserFunctions
-import Distrib as Distributions
+import Distributions
 import QInferClassQML as qml_qi
 import ExperimentalDataFunctions as expdt
 # import multiPGH as mpgh
@@ -368,7 +368,8 @@ class ModelLearningClass():
 #             )
         log_identifier=str("QML "+str(self.ModelID))
 
-        self.Prior = Distributions.get_prior(
+        # self.Prior = Distributions.get_prior(
+        self.Prior = self.GrowthClass.get_prior(
             model_name = self.Name, 
             gaussian = gaussian, 
             # param_minimum = qmd_info['param_min'],

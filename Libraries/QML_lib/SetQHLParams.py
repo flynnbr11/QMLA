@@ -4,7 +4,7 @@ import pickle
 import argparse
 # import UserFunctions
 import DataBase
-import Distrib
+import Distributions
 import  GrowthRules 
 
 import os
@@ -132,7 +132,7 @@ def create_qhl_params(
 
     true_prior.__setattr__('cov', old_cov_mtx)
     try:
-      Distrib.plot_prior(
+      Distributions.plot_prior(
         model_name = true_op_latex, 
         model_name_individual_terms = latex_terms,
         prior = true_prior, 
@@ -214,7 +214,8 @@ def create_prior(
                 val = random.uniform(growth_class.min_param, growth_class.max_param)
                 specific_terms[term] = [val, sigma]
    
-    true_prior = Distrib.get_prior(
+    # true_prior = Distributions.get_prior(
+    true_prior = growth_class.get_prior(
         model_name = true_op, 
         gaussian = True, 
         # param_minimum = rand_min,

@@ -4,6 +4,7 @@ import DataBase
 import ExpectationValues
 import ProbeGeneration
 import Heuristics
+import Distributions
 # import Heuristics
 
 class growth_rule_super_class():
@@ -38,6 +39,7 @@ class growth_rule_super_class():
         self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
         self.expectation_value_function = ExpectationValues.expectation_value
         self.heuristic_function = Heuristics.multiPGH
+        self.prior_distribution_generator = Distributions.gaussian_prior
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
 
@@ -159,6 +161,15 @@ class growth_rule_super_class():
         return self.heuristic_function(
             **kwargs
         )
+
+    def get_prior(
+        self, 
+        **kwargs
+    ):
+        self.prior = self.prior_distribution_generator(
+            **kwargs
+        )
+        return self.prior
         
     def generate_probes(
         # system probes
@@ -263,6 +274,8 @@ class growth_rule_super_class():
                 file=write_log_file, 
                 flush=True
             )
+
+
 
 
     

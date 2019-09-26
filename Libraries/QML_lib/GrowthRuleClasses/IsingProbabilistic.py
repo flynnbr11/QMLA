@@ -48,7 +48,7 @@ class ising_chain_probabilistic(
         self.fitness_win_ratio_exponent = 3
 
         self.generation_DAG = 1
-        self.max_num_sites = 7
+        self.max_num_sites = 4
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10
         self.max_num_models_by_shape = {
