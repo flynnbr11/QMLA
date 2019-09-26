@@ -11,7 +11,7 @@ qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
@@ -91,10 +91,10 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='nearest_neighbour_pauli_2D'
 # sim_growth_rule='hopping_probabilistic'
 # sim_growth_rule='hopping_predetermined'
-# sim_growth_rule='ising_probabilistic'
+sim_growth_rule='ising_probabilistic'
 # sim_growth_rule='ising_predetermined'
 # sim_growth_rule='heisenberg_xyz_probabilistic'
-sim_growth_rule='heisenberg_xyz_predetermined'
+# sim_growth_rule='heisenberg_xyz_predetermined'
 # sim_growth_rule='example'
 
 
@@ -272,6 +272,7 @@ echo "
 cd $full_path_to_results
 python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -dir=$full_path_to_results --bayes_csv=$bayes_csv \
+    -log=$this_log \
     -top=$number_best_models_further_qhl \
     -qhl=$qhl_test -fqhl=0 \
     -exp=$exp_data -true_expec=$true_expec_path \
@@ -284,6 +285,7 @@ python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
 python3 ../../../../Libraries/QML_lib/CombineAnalysisPlots.py \
     -dir=$full_path_to_results \
     -p=$prt -e=$exp -bt=$bt -t=$num_tests \
+    -log=$this_log \
     -nprobes=$num_probes \
     -pnoise=$probe_noise \
     -special_probe=$special_probe \
@@ -370,6 +372,7 @@ then
     python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
         -dir=$full_path_to_results \
         --bayes_csv=$bayes_csv \
+        -log=$this_log \
         -top=$number_best_models_further_qhl \
         -qhl=0 \
         -fqhl=1 \

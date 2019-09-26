@@ -608,8 +608,11 @@ def plotDynamicsLearnedModels(
                 param_position = term_positions[term]
                 param_estimates = reduced.TrackEval[:,param_position]
                 #std_dev = mod.cov_matrix[param_position,param_position]
-                std_dev = reduced.TrackCovMatrices[:,param_position,param_position]
-                param_estimate_by_term[term] = param_estimates    
+                # std_dev = reduced.TrackCovMatrices[
+                #     :,param_position,param_position
+                # ]
+                std_dev = reduced.TrackParamSigmas[:, param_position]
+                param_estimate_by_term[term] = param_estimates   
                 std_devs[term] = std_dev
 
             cm_subsection = np.linspace(0,0.8,num_terms)

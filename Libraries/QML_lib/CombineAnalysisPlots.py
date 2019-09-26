@@ -217,6 +217,13 @@ parser.add_argument(
   default=1.0
 )
 parser.add_argument(
+  '-log', '--log_file',
+  help='File to log RQ workers.',
+  type=str,
+  default='qmd.log'
+)
+
+parser.add_argument(
   '-qhl', '--qhl_test', 
   help="Bool to test QHL on given true operator only.",
   type=int,
@@ -251,7 +258,8 @@ output_file_name = arguments.output_file_name
 growth_generation_rule = arguments.growth_generation_rule
 growth_class = GrowthRules.get_growth_generator_class(
   growth_generation_rule = growth_generation_rule,
-  use_experimental_data = arguments.experimental_data
+  use_experimental_data = arguments.experimental_data,
+  log_file = arguments.log_file
 )
 
 variables = vars(arguments)

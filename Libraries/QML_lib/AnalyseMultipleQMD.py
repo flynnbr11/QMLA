@@ -32,6 +32,12 @@ parser.add_argument(
     type=str,
     default=os.getcwd()
 )
+parser.add_argument(
+  '-log', '--log_file',
+  help='File to log RQ workers.',
+  type=str,
+  default='.default_qmd_log.log'
+)
 
 parser.add_argument(
     '-bcsv', '--bayes_csv', 
@@ -129,6 +135,7 @@ parser.add_argument(
 
 arguments = parser.parse_args()
 directory_to_analyse = arguments.results_directory
+log_file = arguments.log_file
 all_bayes_csv = arguments.bayes_csv
 qhl_mode = bool(arguments.qhl_mode)
 further_qhl_mode = bool(arguments.further_qhl_mode)
@@ -136,7 +143,11 @@ true_params_path = arguments.true_params
 exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
-true_growth_class = GrowthRules.get_growth_generator_class(growth_generator)
+true_growth_class = GrowthRules.get_growth_generator_class(
+    growth_generation_rule = growth_generator,
+    use_experimental_data = exp_data,
+    log_file = log_file
+)
 dataset = true_growth_class.experimental_dataset
 measurement_type = true_growth_class.measurement_type
 latex_mapping_file = arguments.latex_mapping_file

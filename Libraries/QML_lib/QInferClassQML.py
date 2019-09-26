@@ -137,11 +137,13 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.num_time_dep_true_params = num_time_dep_true_params
         self.measurement_type = measurement_type
         self.use_experimental_data = use_experimental_data
+        self.log_file = log_file
         self.growth_generation_rule = growth_generation_rule
         try:
             self.growth_class = GrowthRules.get_growth_generator_class(
                 growth_generation_rule = self.growth_generation_rule,
-                use_experimental_data = self.use_experimental_data
+                use_experimental_data = self.use_experimental_data,
+                log_file = self.log_file
             )
         except:
             self.growth_class = None
@@ -157,7 +159,6 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.ideal_probe = None
         self.IdealProbe = DataBase.ideal_probe(self.ModelName)
         self.ideal_probelist = None
-        self.log_file = log_file
         self.log_identifier = log_identifier
         if true_oplist is not None and trueparams is None:
             raise(

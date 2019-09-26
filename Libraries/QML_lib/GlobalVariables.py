@@ -122,10 +122,12 @@ class GlobalVariablesClass():
         self.use_experimental_data = bool(arguments.experimental_data)
         # self.measurement_type = arguments.measurement_type
         self.growth_generation_rule = arguments.growth_generation_rule
+        self.log_file = arguments.log_file
         try:
           self.growth_class = GrowthRules.get_growth_generator_class(
             growth_generation_rule = self.growth_generation_rule,
-            use_experimental_data = self.use_experimental_data
+            use_experimental_data = self.use_experimental_data,
+            log_file = self.log_file
           )
         except:
           raise
@@ -217,7 +219,7 @@ class GlobalVariablesClass():
         self.results_directory = arguments.results_directory
 
         self.rq_timeout = arguments.rq_timeout
-        self.log_file = arguments.log_file
+        
         # self.save_plots = bool(arguments.save_plots)
         self.cumulative_csv = arguments.cumulative_csv
         self.data_time_offset = arguments.data_time_offset

@@ -372,7 +372,8 @@ class QMD():
             gen = self.GeneratorList[i]
             growth_class_gen = GrowthRules.get_growth_generator_class(
                 growth_generation_rule = gen, 
-                use_experimental_data = self.UseExperimentalData
+                use_experimental_data = self.UseExperimentalData,
+                log_file = self.log_file
             )
             # self.TreesCompleted[gen] = False
             self.TreesCompleted[gen] = growth_class_gen.tree_completed_initially
@@ -1142,7 +1143,6 @@ class QMD():
                         "model:", model_name
                     ]
                 )
-                print("[QMD 1136] Locally doing QML")
                 self.QMDInfo['probe_dict'] = self.ProbeDict
                 updated_model_info = learnModelRemote(
                     model_name,
@@ -2698,7 +2698,7 @@ class QMD():
             'TrackParameterEstimates' : mod.TrackParameterEstimates,
             'TrackVolume' : mod.VolumeList,
             'TrackTimesLearned' : mod.Times, 
-            'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
+            # 'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
             'ExpectationValues' : mod.expectation_values,
             # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
             #     times = expec_val_plot_times,

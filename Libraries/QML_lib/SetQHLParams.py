@@ -395,12 +395,15 @@ random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
 exp_data = bool(arguments.use_experimental_data)
 growth_generation_rule = arguments.growth_generation_rule
+log_file = arguments.log_file
+results_directory = arguments.results_directory
 
 import ProbeGeneration
 growth_class_attributes = {
-  'use_experimental_data' : exp_data, 
-  # 'probe_generator' : ProbeGeneration.restore_dec_13_probe_generation,
-  # 'test_growth_class_att' : True
+    'use_experimental_data' : exp_data, 
+    'log_file' : log_file
+    # 'probe_generator' : ProbeGeneration.restore_dec_13_probe_generation,
+    # 'test_growth_class_att' : True
 }
 
 growth_class = GrowthRules.get_growth_generator_class(
@@ -421,7 +424,8 @@ unique_growth_classes = {}
 for g in all_growth_classes:
     try:
         unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
-            growth_generation_rule = g
+            growth_generation_rule = g,
+            **growth_class_attributes
         )
     except:
         unique_growth_classes[g] = None
@@ -439,8 +443,6 @@ param_max = arguments.param_max
 param_mean = arguments.param_mean
 param_sigma = arguments.param_sigma
 probe_noise_level = arguments.probe_noise_level
-log_file = arguments.log_file
-results_directory = arguments.results_directory
 # print(
 #   "Results directory passed to SetQHL:", 
 #   results_directory,

@@ -23,6 +23,11 @@ class growth_rule_super_class():
         else:
             self.use_experimental_data = False
 
+        if 'log_file' in kwargs:
+            self.log_file = kwargs['log_file']
+        else:
+            self.log_file = '.default_qmd_log.log'
+
         # by changing the function object these point to, 
         # determine how probes are generated and expectation values are computed
         # these can be directly overwritten within class definition
@@ -73,7 +78,6 @@ class growth_rule_super_class():
         # TODO set true params for simulation here
         self.true_params = {
         }
-           
 
     def overwrite_growth_class_methods(
         self, 
@@ -241,5 +245,25 @@ class growth_rule_super_class():
         self.true_op_terms = set(sorted(latex_true_terms))
 
         return self.true_op_terms
+
+    def log_print(
+        self, 
+        to_print_list
+    ):
+        identifier = "[Growth: {}]".format(self.growth_generation_rule)
+        if type(to_print_list)!=list:
+            to_print_list = list(to_print_list)
+
+        print_strings = [str(s) for s in to_print_list]
+        to_print = " ".join(print_strings)
+        with open(self.log_file, 'a') as write_log_file:
+            print(
+                identifier, 
+                str(to_print), 
+                file=write_log_file, 
+                flush=True
+            )
+
+
     
 

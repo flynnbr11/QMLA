@@ -125,9 +125,6 @@ def BayesFactorRemote(
                 return (1.0/bayes_factor)
     else:
 
-        log_print(
-            ["Getting model a ({}) instance".format(model_a_id) ]
-        )
         model_a = QML.modelClassForRemoteBayesFactor(
             modelID=model_a_id,
             host_name=host_name, 
@@ -288,45 +285,13 @@ def BayesFactorRemote(
         if float(model_a_id) < float(model_b_id):
             # so that BF in db always refers to (low/high), not (high/low). 
             bayes_factors_db.set(pair_id, bayes_factor)
-            log_print(
-                [
-                    "Redis SET bayes_factors_db, pair:", 
-                    pair_id,
-                    "bayes:",
-                    bayes_factor
-                ]
-            )
         else:
             bayes_factors_db.set(pair_id, (1.0/bayes_factor))
-            log_print(
-                [
-                    "Redis SET bayes_factors_db, pair:", 
-                    pair_id, 
-                    "bayes:", 
-                    (1.0/bayes_factor)
-                ]
-            )
 
         if bayes_factor > bayes_threshold: 
             bayes_factors_winners_db.set(pair_id, 'a')
-            log_print(
-                [
-                    "Redis SET bayes_factors_winners_db, pair:", 
-                    pair_id, 
-                    "winner:", 
-                    model_a_id
-                ]
-            )
         elif bayes_factor < (1.0/bayes_threshold):
             bayes_factors_winners_db.set(pair_id, 'b')
-            log_print(
-                [
-                    "Redis SET bayes_factors_winners_db, pair:", 
-                    pair_id, 
-                    "winner:", 
-                    model_b_id
-                ]
-            )
         else:
             log_print(["Neither model much better."])
 

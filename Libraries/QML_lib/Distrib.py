@@ -72,18 +72,6 @@ def get_prior(
                 min_max[i] = [ param_minimum , param_maximum]
         dist = qinfer.UniformDistribution(min_max)
         samples = dist.sample(10)
-        log_print(
-            [
-            "Uniform Prior",
-            "\nterms:", individual_terms, 
-            "\nCorresponding Min/Max:", 
-            min_max,
-            "\nSamples:", samples
-            ],
-            log_file = log_file, 
-            log_identifier = log_identifier
-        )
-
         return dist
     
     else:
@@ -122,18 +110,6 @@ def get_prior(
             cov_mtx
         )
         samples = dist.sample(10)
-        log_print(
-            [
-                "Normal Prior",
-                "\nMeans:", 
-                means,
-                "\nCov mtx:",
-                cov_mtx,
-                "\nSamples:", samples
-            ],
-            log_file = log_file, 
-            log_identifier = log_identifier
-        )
         return dist
 
 def plot_prior(

@@ -207,7 +207,8 @@ class ModelLearningClass():
         try:
             self.GrowthClass = GrowthRules.get_growth_generator_class(
                 growth_generation_rule = self.GrowthGenerator,
-                use_experimental_data = self.UseExperimentalData
+                use_experimental_data = self.UseExperimentalData,
+                log_file = self.log_file
             )
         except:
             # raise
@@ -519,6 +520,7 @@ class ModelLearningClass():
         self.Covars= np.empty(self.NumExperiments)
         self.TrackEval = []
         self.TrackCovMatrices = []
+        self.TrackParamSigmas = []
         self.TrackPosterior = []
         self.TrackPriorMeans = []
         self.TrackPriorStdDev = []
@@ -607,11 +609,11 @@ class ModelLearningClass():
             
             before_datum = time.time()
 
-            self.log_print(
-               [
-               'Getting Datum'
-               ]
-            )
+            # self.log_print(
+            #    [
+            #    'Getting Datum'
+            #    ]
+            # )
 
             self.Datum = self.GenSimModel.simulate_experiment(
                 self.SimParams,
@@ -667,6 +669,11 @@ class ModelLearningClass():
             )
             
             self.TrackEval.append(self.Updater.est_mean())
+            self.TrackParamSigmas.append(
+                np.sqrt(
+                    np.diag(self.Updater.est_covariance_mtx())
+                )
+            )
             # self.TrackCovMatrices.append(self.Updater.est_covariance_mtx()) # TODO this doesn't seem necessary to store
             prior_sample = self.Updater.sample(int(5))
 
@@ -893,9 +900,10 @@ class ModelLearningClass():
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
-        # learned_info['track_cov_matrices'] = self.TrackCovMatrices
+        # learned_info['track_cov_matrices'] = self.
+        learned_info['track_param_sigmas'] = self.TrackParamSigmas
         learned_info['track_posterior'] = self.TrackPosterior
-        learned_info['track_prior_means'] = self.TrackPriorMeans
+        learned_info['track_prior_means'] = self.TrackPriorMeans # repeat of track param sigmas?
         learned_info['track_prior_std_devs'] = self.TrackPriorStdDev
         # learned_info['track_posterior_marginal'] = self.TrackPosteriorMarginal
         learned_info['resample_epochs'] = self.ResampleEpochs
@@ -1146,6 +1154,7 @@ class reducedModel():
 
             self.TrackEval = np.array(learned_info['track_eval'])
             # self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
+            self.TrackParamSigmas = np.array(learned_info['track_param_sigmas'])
             self.TrackPriorMeans = np.array(learned_info['track_prior_means'])
             self.TrackPosterior = np.array(learned_info['track_posterior'])
             self.TrackPriorStdDev = np.array(learned_info['track_prior_std_devs'])
@@ -1161,7 +1170,8 @@ class reducedModel():
             try:
                 self.GrowthClass = GrowthRules.get_growth_generator_class(
                     growth_generation_rule = self.GrowthGenerator,
-                    use_experimental_data = self.UseExperimentalData
+                    use_experimental_data = self.UseExperimentalData,
+                    log_file = self.log_file
                 )
             except:
                 # raise
@@ -1517,15 +1527,6 @@ class modelClassForRemoteBayesFactor():
 
         # Get model specific data
         learned_models_info = rds_dbs['learned_models_info']
-        self.log_print(
-            [
-                "Instantiating model for BF for mod ", 
-                str(modelID), 
-                "RDS learned models available:", 
-                learned_models_info.keys()
-            ]
-        )
-
         model_id_float = float(modelID)
         model_id_str = str(model_id_float)
         try:
@@ -1561,7 +1562,8 @@ class modelClassForRemoteBayesFactor():
         self.GrowthGenerator = learned_model_info['growth_generator']
         self.GrowthClass = GrowthRules.get_growth_generator_class(
             growth_generation_rule = self.GrowthGenerator,
-            use_experimental_data = self.UseExperimentalData
+            use_experimental_data = self.UseExperimentalData,
+            log_file = self.log_file
         )
         self.Prior = learned_model_info['final_prior'] # TODO this can be recreated from finalparams, but how for multiple params?
         self.PosteriorMarginal = learned_model_info['posterior_marginal']
