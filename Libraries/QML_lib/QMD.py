@@ -105,7 +105,7 @@ class QMD():
         plot_times=[0,1],
         sigma_threshold=1e-13, 
         debug_directory=None,
-        prior_specific_terms=None, 
+        # prior_specific_terms=None, 
         qle=None,   
         **kwargs
     ):
@@ -610,7 +610,7 @@ class QMD():
             'time_dep_true_params' : self.TimeDepParams,
             'num_time_dependent_true_params' : self.NumTimeDepTrueParams, 
             'prior_pickle_file' : self.GlobalVariables.prior_pickle_file, 
-            'prior_specific_terms' : prior_specific_terms,
+            'prior_specific_terms' : self.GrowthClass.gaussian_prior_means_and_widths,
             'model_priors' : model_priors,
             'base_resources' : self.BaseResources,
             'reallocate_resources' : self.ReallocateResources,
@@ -625,7 +625,7 @@ class QMD():
             ["Initial op list:", self.InitialOpList]
         )
 
-        self.log_print(['Specific terms for prior', prior_specific_terms])
+        self.log_print(['Specific terms for prior', self.GrowthClass.gaussian_prior_means_and_widths])
         self.log_print(["RunParallel=", self.RunParallel])
         compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
         compressed_probe_dict = pickle.dumps(self.ProbeDict, protocol=2)

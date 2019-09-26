@@ -262,26 +262,26 @@ else:
 #     log_file
 # )
 
-if global_variables.custom_prior:
-    prior_data = pickle.load(
-        open(
-            global_variables.prior_pickle_file,
-            'rb'
-        )
-    )
-    prior_specific_terms = prior_data['specific_terms']
+# if global_variables.custom_prior:
+#     prior_data = pickle.load(
+#         open(
+#             global_variables.prior_pickle_file,
+#             'rb'
+#         )
+#     )
+#     prior_specific_terms = prior_data['specific_terms']
 
-else:
-    prior_specific_terms = {}
+# else:
+#     prior_specific_terms = {}
 
 
-log_print(
-    [
-        "Prior specific terms:", 
-        prior_specific_terms
-    ], 
-    log_file
-)
+# log_print(
+#     [
+#         "Prior specific terms:", 
+#         prior_specific_terms
+#     ], 
+#     log_file
+# )
 
 
 model_priors = None
@@ -376,7 +376,7 @@ qmd = QMD(
     parallel = True,
     use_exp_custom = True, 
     compare_linalg_exp_tol = None,
-    prior_specific_terms = prior_specific_terms,    
+    # prior_specific_terms = prior_specific_terms,    
 )
 
 if global_variables.qhl_test:

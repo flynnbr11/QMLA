@@ -72,13 +72,14 @@ class growth_rule_super_class():
         }
 
         self.gaussian_prior_means_and_widths = {
+            # term : (mean, sigma)
         }
         self.num_probes = 40
         self.min_param = 0
         self.max_param = 1
-
-        # TODO set true params for simulation here
+        self.prior_random_mean = True
         self.true_params = {
+            # term : true_param
         }
 
     def overwrite_growth_class_methods(
@@ -164,9 +165,15 @@ class growth_rule_super_class():
 
     def get_prior(
         self, 
+        model_name,
         **kwargs
     ):
         self.prior = self.prior_distribution_generator(
+            model_name = model_name, 
+            prior_specific_terms = self.gaussian_prior_means_and_widths,
+            param_minimum = self.min_param, 
+            param_maximum = self.max_param, 
+            random_mean = self.prior_random_mean,
             **kwargs
         )
         return self.prior

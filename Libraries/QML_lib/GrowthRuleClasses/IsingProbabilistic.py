@@ -55,9 +55,13 @@ class ising_chain_probabilistic(
             'other' : 3
         }
         self.min_param = 0
-        self.max_param = 10
+        self.max_param = 1
 
         self.setup_growth_class()
+        self.gaussian_prior_means_and_widths = {
+            # 'pauliSet_zJz_1J2_d3' : (2, 0.01), 
+            # 'pauliSet_zJz_2J3_d3' : (8, 0.1)             
+        }
 
         self.tree_completed_initially = False
         if self.tree_completed_initially == True:

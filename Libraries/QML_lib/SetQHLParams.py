@@ -20,51 +20,6 @@ def MIN_PARAM():
 def MAX_PARAM():
     return -50
 
-### SET VALUES HERE ####
-
-# set_experimental_data_prior_specific_terms = {
-# }
-
-# set_normal_prior_specific_terms = {
-# }
-
-
-# set_uniform_prior_specific_terms = {
-# }
-
-# set_true_params = {
-# }
-
-### Functions ###
-# def create_plot_probe(
-#   max_num_qubits = 7, 
-#   pickle_file = None,
-#   growth_class = None, 
-#   **kwargs
-# ):
-#   kwargs['num_probes'] = 1 # only want a single probe for plotting purposes
-#   print("\nPlot probe generated with kwargs:", kwargs, "\n")
-    
-#   try:
-#       plot_probe_dict = growth_class.plot_probe_generator(
-#           **kwargs
-#       )
-#   except:
-#       if test_growth_class_implementation == True: raise
-#       plot_probe_dict = UserFunctions.get_probe_dict(
-#           **kwargs
-#       )
-
-#   for k in list(plot_probe_dict.keys()):
-#       # replace tuple like key returned, with just dimension. 
-#       plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
-
-#   if pickle_file is not None:
-#       import pickle
-#       pickle.dump(
-#           plot_probe_dict,
-#           open(pickle_file, 'wb') 
-#       )
 
 def create_qhl_params(
     true_op, 
@@ -140,21 +95,9 @@ def create_qhl_params(
         true_params = true_params_dict_latex_names
       )
     except:
-      print("[SetQHLParams]plotting prior failed \n\n\n")
+      print("[SetQHLParams] plotting prior failed \n\n\n")
       pass
 
-    # for term in terms:
-    #   if random_vals == False:
-    #       try:
-    #           this_true_param = set_true_params[term]
-    #       except:
-    #           this_true_param = random.uniform( rand_min, rand_max)
-    #   else:
-    #       this_true_param = random.uniform( rand_min, rand_max)
-
-    #   true_params.append( this_true_param )
-    #   true_params_dict[term] = this_true_param
-            
     true_params_info = {
         'params_list' : true_params,
         'params_dict' : true_params_dict,
@@ -176,83 +119,7 @@ def create_qhl_params(
             open(pickle_file, 'wb')
         )
 
-def create_prior(
-    true_op, 
-    gaussian, # whether to use normal or uniform prior
-    exp_data=False,
-    pickle_file=None,
-    random_vals=False, 
-    sigma=1.5,
-    rand_min=None, 
-    rand_max=None,
-    param_mean=None, 
-    param_sigma=None,
-    results_directory=None, 
-    growth_class = None, 
-    log_file=None, 
-):
-#   terms = DataBase.get_constituent_names_from_name(true_op)
     
-    if rand_min is None:
-        rand_min = MIN_PARAM()
-    if rand_max is None:
-        rand_max = MAX_PARAM()
-    sigma = growth_class.max_param - growth_class.min_param
-    set_prior_specific_terms = growth_class.gaussian_prior_means_and_widths 
-
-    specific_terms = {}
-    if random_vals is False:
-        # only fill this dict in if the user selects NOT 
-        # to use random values as parameters
-        terms = list(set_prior_specific_terms.keys())
-        for term in terms:
-            try:
-                # print("[SetParams] setting", term, ":", set_prior_specific_terms[term])
-                specific_terms[term] = set_prior_specific_terms[term]
-            except: 
-                # in case term not in set_prior_specific_terms
-                val = random.uniform(growth_class.min_param, growth_class.max_param)
-                specific_terms[term] = [val, sigma]
-   
-    # true_prior = Distributions.get_prior(
-    true_prior = growth_class.get_prior(
-        model_name = true_op, 
-        gaussian = True, 
-        # param_minimum = rand_min,
-        # param_maximum = rand_max,
-        param_minimum = growth_class.min_param,
-        param_maximum = growth_class.max_param,
-        param_normal_mean = param_mean, 
-        param_normal_sigma = param_sigma,
-        random_mean = False, # if set to true, chooses a random mean between given uniform min/max
-        specific_terms = specific_terms, 
-        log_file = log_file,
-        log_identifier = '[SetQHLParams]'
-    )
-
-    prior_data = {
-        'specific_terms' : specific_terms, 
-        'true_prior' : true_prior
-    }
-
-    if pickle_file is not None:
-        import pickle
-        # print(
-        #   "\n\n storing specific terms to", 
-        #   pickle_file, 
-        #   "\n", prior_data, 
-        #   "\n\n"
-        # )
-        pickle.dump(
-            prior_data, 
-            open(pickle_file, 'wb')
-        )
-        # pickle.dump(
-        #   specific_terms, 
-        #   open(pickle_file, 'wb')
-        # )
-    return specific_terms, true_prior
-            
 
 ### Parse arguments from bash
 parser = argparse.ArgumentParser(
@@ -418,9 +285,6 @@ alternative_growth_rules = arguments.alternative_growth_rules
 all_growth_classes.extend(alternative_growth_rules)
 all_growth_classes = list(set(all_growth_classes))
 
-print("[SETQHLPARAMS] growth generation rule:", growth_generation_rule)
-print("[SETQHLPARAMS] all growth classes:", all_growth_classes)
-
 unique_growth_classes = {}
 for g in all_growth_classes:
     try:
@@ -430,9 +294,6 @@ for g in all_growth_classes:
         )
     except:
         unique_growth_classes[g] = None
-
-
-
 
 true_operator = growth_class.true_operator
 plot_probe_file = arguments.plot_probe_file
@@ -444,33 +305,28 @@ param_max = arguments.param_max
 param_mean = arguments.param_mean
 param_sigma = arguments.param_sigma
 probe_noise_level = arguments.probe_noise_level
-# print(
-#   "Results directory passed to SetQHL:", 
-#   results_directory,
-#   "\nLog file:", log_file
-# )
+
 true_prior_plot_file = str(
     results_directory  +
     '/prior_true_params.png'
 )
-### Call functions to create pickle files. 
-## TODO check if these are already present?
 
-specific_terms, true_prior = create_prior(
-    # true_op = arguments.true_op,
-    true_op = true_operator, 
-    gaussian = gaussian, 
-    pickle_file = arguments.prior_file,
-    random_vals = random_prior, 
-    rand_min=param_min, 
-    rand_max=param_max,
-    param_mean = param_mean, 
-    param_sigma = param_sigma,
-    exp_data=exp_data,
-    results_directory=results_directory,
-    growth_class = growth_class, 
-    log_file=log_file
+true_prior = growth_class.get_prior(
+    model_name = true_operator, 
+    log_file = log_file,
+    log_identifier = '[SetQHLParams]'
 )
+prior_data = {
+    'true_prior' : true_prior
+}
+
+pickle_file = arguments.prior_file
+if pickle_file is not None:
+    import pickle
+    pickle.dump(
+        prior_data, 
+        open(pickle_file, 'wb')
+    )
 
 if arguments.true_params_file is not None:
     create_qhl_params(

@@ -38,21 +38,19 @@ def log_print(
 
 def gaussian_prior(
     model_name, 
-    gaussian = True, 
     param_minimum = 0,
     param_maximum = 1,
-    param_normal_mean = 0.5, 
-    param_normal_sigma = 0.25,
     random_mean = False, # if set to true, chooses a random mean between given uniform min/max
-    specific_terms = None, 
+    prior_specific_terms = None, 
     log_file = 'qmd.log',
-    log_identifier = None
+    log_identifier = None,
+    **kwargs
 ):
 
     log_print(
         [
         "Getting prior for model:", model_name,
-        "Specific terms:", specific_terms
+        "Specific terms:", prior_specific_terms,
         ],
         log_file, 
         log_identifier
@@ -61,31 +59,26 @@ def gaussian_prior(
         model_name
     )
     num_terms = len(individual_terms)
-    available_specific_terms = list(specific_terms.keys())
+    available_specific_terms = list(prior_specific_terms.keys())
     means = []
     sigmas = []
-    # print("min/max:", param_minimum, param_maximum)
     default_mean = np.mean([param_minimum, param_maximum])
     # TODO reconsider how default sigma is generated
-    # default_sigma = (param_maximum - param_minimum)/4 # TODO is this safe?        
-    # default_sigma = default_mean/4 # TODO is this safe?        
-    default_sigma = default_mean/2 # TODO is this safe?        
+    # default_sigma = default_mean/2 # TODO is this safe?        
+    default_sigma = (param_maximum - param_minimum) / 2
     for term in individual_terms:
         if term in available_specific_terms:
-            means.append(specific_terms[term][0])
-            sigmas.append(specific_terms[term][1])
+            means.append(prior_specific_terms[term][0])
+            sigmas.append(prior_specific_terms[term][1])
         else:
             if random_mean:
                 rand_mean = random.uniform(
                     param_minimum, 
                     param_maximum
                 )
-                print("rand mean:", rand_mean)
                 means.append(rand_mean)
             else:
-                # means.append(param_normal_mean)
                 means.append(default_mean)
-            # sigmas.append(param_normal_sigma)
             sigmas.append(default_sigma)
             
     means = np.array(means)
@@ -96,7 +89,6 @@ def gaussian_prior(
         means, 
         cov_mtx
     )
-    samples = dist.sample(10)
     return dist
 
 def plot_prior(
