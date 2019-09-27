@@ -77,7 +77,7 @@ class growth_rule_super_class():
         self.num_probes = 40
         self.min_param = 0
         self.max_param = 1
-        self.prior_random_mean = True
+        self.prior_random_mean = False
         self.true_params = {
             # term : true_param
         }

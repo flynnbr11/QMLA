@@ -137,7 +137,6 @@ class connected_lattice(
                 (here generation directly corresponds to number of sites)
         cases are indicated by self.spawn_stage
         """
-        print("[Connected Lattice] Generate Models fnc")
 
         # fitness = kwargs['fitness_parameters']
         model_points = kwargs['branch_model_points']
@@ -153,7 +152,9 @@ class connected_lattice(
         else:
             models_to_build_on = ranked_model_list[:self.num_top_models_to_build_on]
         self.sub_generation_idx += 1 
-        self.models_to_build_on[self.generation_DAG][self.sub_generation_idx] = models_to_build_on
+        self.models_to_build_on[self.generation_DAG][self.sub_generation_idx] =  (
+            models_to_build_on
+        )
         # self.generation_champs[self.generation_DAG][self.sub_generation_idx] = models_to_build_on
         self.generation_champs[self.generation_DAG][self.sub_generation_idx] = [
             kwargs['model_names_ids'][models_to_build_on[0]]
@@ -166,7 +167,10 @@ class connected_lattice(
             # within dimension; just add each term in available terms to 
             # old models (probabilistically). 
 
-            if self.sub_generation_idx == self.max_num_sub_generations_per_generation[self.generation_DAG]:
+            if (
+                self.sub_generation_idx 
+                == self.max_num_sub_generations_per_generation[self.generation_DAG]
+            ):
                 # give back champs from this generation and indicate to make new generation
                 self.log_print(
                     [
@@ -193,7 +197,9 @@ class connected_lattice(
                     self.spawn_stage.append('Complete')
 
             else:
-                for mod_id in self.models_to_build_on[self.generation_DAG][self.sub_generation_idx]:
+                for mod_id in \
+                        self.models_to_build_on[self.generation_DAG][self.sub_generation_idx]:
+
                     mod_name = kwargs['model_names_ids'][mod_id]
 
                     present_terms = DataBase.get_constituent_names_from_name(mod_name)
@@ -257,7 +263,7 @@ class connected_lattice(
             )
             self.log_print(
                 [
-                    "Making generation ",  self.generation_DAG,
+                    "Making generation",  self.generation_DAG,
                     "\nNew connections:", new_connections, 
                     "\nPossible new terms:", possible_new_terms
                 ]
