@@ -944,7 +944,8 @@ def add_model(
         log_print(
             [
                 "Model ", model_name, 
-                " not previously considered -- adding."
+                " not previously considered -- adding.",
+                "ID:", modelID
             ], 
             log_file
         )

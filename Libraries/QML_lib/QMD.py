@@ -742,8 +742,8 @@ class QMD():
                 self.TrueOpModelID = self.NumModels
             self.HighestModelID += 1 
             # print("Setting model ", model, "to ID:", self.NumModels)
-            mod_id = self.NumModels
-            self.ModelNameIDs[mod_id] = model
+            model_id = self.NumModels
+            self.ModelNameIDs[model_id] = model
             self.NumModels += 1
             if DataBase.get_num_qubits(model) > self.HighestQubitNumber:
                 self.HighestQubitNumber = DataBase.get_num_qubits(model)
@@ -752,20 +752,21 @@ class QMD():
                 print("self.GrowthClass.highest_num_qubits", self.BranchGrowthClasses[branchID].highest_num_qubits)
 
         # retrieve model_id from database? or somewhere
-        try:
-            model_id = DataBase.model_id_from_name(
-                db = self.db, 
-                name = model    
-            )
-        except:
-            self.log_print(
-                [
-                    "Couldn't find model id for model:", model,
-                    "model_names_ids:", 
-                    self.ModelNameIDs
-                ]
-            )
-            raise
+        else:
+            try:
+                model_id = DataBase.model_id_from_name(
+                    db = self.db, 
+                    name = model    
+                )
+            except:
+                self.log_print(
+                    [
+                        "Couldn't find model id for model:", model,
+                        "model_names_ids:", 
+                        self.ModelNameIDs
+                    ]
+                )
+                raise
 
         add_model_output = {
             'is_new_model' : tryAddModel, 
@@ -3158,7 +3159,7 @@ class QMD():
         # Check if final winner has parameters close to 0; potentially change champ
         self.updateDataBaseModelValues()
 
-        self.checkChampReducability()
+        self.checkChampReducibility()
         self.log_print(
             [
                 "Final winner = ", self.ChampionName
@@ -3320,15 +3321,16 @@ class QMD():
         }
 
 
-    def checkChampReducability(
+    def checkChampReducibility(
         self,
     ):
 
         self.log_print(
             [
-                "Checking if champion model can be reduced due to negligible parameters.",
-                "Champ ID:", self.ChampID,
-                "Name:", self.ChampionName
+                "Checking if champion model can be reduced ", 
+                "due to negligible parameters.",
+                "\nChamp ID:", self.ChampID,
+                "\nName:", self.ChampionName
             ]
         )
 
@@ -3343,7 +3345,9 @@ class QMD():
                 < self.GrowthClass.learned_param_limit_for_negligibility
             ):
                 to_remove.append(p)
-                removed_params[p] = champ_mod.LearnedParameters[p]
+                removed_params[p] = np.round(
+                    champ_mod.LearnedParameters[p],2
+                )
             # elif idx == 1:
             #     # for testing
             #     to_remove.append(p)
@@ -3360,7 +3364,8 @@ class QMD():
 
             self.log_print(
                 [
-                    "Reduced champion model suggested:", new_mod
+                    "Some neglibible parameters found:", removed_params, 
+                    "\nReduced champion model suggested:", new_mod
                 ]
             )
 

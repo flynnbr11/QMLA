@@ -66,10 +66,9 @@ class nv_centre_spin_experimental_method(
         # self.probe_generation_function = ProbeGeneration.separable_probe_dict
 
         # params for testing p value calculation
-        # self.gaussian_prior_means_and_widths = {
-        #     'xTi' : [0.6, 0.1],
-        #     'yTy' : [0.8, 0.1],
-        # }
+        self.gaussian_prior_means_and_widths = {
+            'yTy' : [0.0, 0.01],
+        }
 
         # self.true_params = {
         #     'xTi' : 0.602, 
