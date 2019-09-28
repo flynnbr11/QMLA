@@ -3455,8 +3455,8 @@ class QMD():
 
             if (
                 (
-                    (1.0/bayes_factor)
-                    < self.GrowthClass.reduce_champ_bayes_factor_threshold
+                    bayes_factor
+                    < (1.0 / self.GrowthClass.reduce_champ_bayes_factor_threshold)
                 ) 
                 # or True
             ):
