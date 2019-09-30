@@ -320,7 +320,7 @@ def average_parameter_estimates(
     for name in winning_models:
         num_experiments = num_experiments_by_name[name]
         # epochs = range(1, 1+num_experiments)
-        epochs = range(num_experiments_by_name[name])
+        epochs = range(num_experiments_by_name[name] + 1)
 
         plt.clf()
         fig = plt.figure()
@@ -424,7 +424,7 @@ def average_parameter_estimates(
             )
             
             ax.scatter(
-                [e +1 for e in epochs],
+                [e + 1 for e in epochs],
 #                epochs, 
                 averages, 
                 s=max(1,50/num_experiments),

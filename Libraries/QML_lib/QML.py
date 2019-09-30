@@ -510,7 +510,7 @@ class ModelLearningClass():
         # if self.checkQLoss == True: 
         #     self.QLosses = np.empty(self.NumExperiments)
         self.Covars= np.empty(self.NumExperiments)
-        self.TrackEval = []
+        self.TrackEval = [self.Updater.est_mean()]
         self.TrackCovMatrices = []
         self.TrackParamSigmas = []
         self.TrackPosterior = []
