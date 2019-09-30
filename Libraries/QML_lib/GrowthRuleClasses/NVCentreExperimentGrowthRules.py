@@ -54,14 +54,13 @@ class nv_centre_spin_experimental_method(
         self.experimental_dataset = 'NVB_rescale_dataset.p'
         self.fixed_axis_generator = False
         self.fixed_axis = 'z' # e.g. transverse axis
-        # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
 
         # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+        # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
         self.probe_generation_function = ProbeGeneration.plus_plus_with_phase_difference
-        
-        self.max_time_to_consider = 5 
-        self.shared_probes = False
         self.simulator_probe_generation_function = self.probe_generation_function
+        self.shared_probes = False
+        self.max_time_to_consider = 5 
 
         # self.probe_generation_function = ProbeGeneration.separable_probe_dict
 
@@ -103,41 +102,6 @@ class nv_centre_spin_experimental_method(
                 'xTz' : [4.0, 1.5],
                 'yTz' : [4.0, 1.5],                
             }
-        # else:
-            # self.true_params = {
-            #     # 'yTi' : 0.44
-            # }
-            # self.gaussian_prior_means_and_widths = {
-            #     # 'yTi' : [0.5, 0.1]
-            # }
-            # TODO remove below setting probes -- used fir a test where simulation only uses |+>
-            # self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
-            # self.gaussian_prior_means_and_widths = {
-            # }
-            # self.gaussian_prior_means_and_widths = {
-            #     # fix close to true vals for conference plot
-            #     'xTi' : [-1, 0.1],
-            #     'yTi' : [6.5, 0.1],
-            #     'zTi' : [0.96, 0.1],
-            #     'xTx' : [6.71, 0.1],
-            #     'yTy' : [2.7, 0.1],
-            #     'zTz' : [1.6, 0.1],
-            #     'xTy' : [4.0, 1.5],
-            #     'xTz' : [4.0, 1.5],
-            #     'yTz' : [4.0, 1.5],                
-            # }
-            # self.true_params = {
-            #     'zTi' : 2
-            # }
-
-            # self.gaussian_prior_means_and_widths = {
-            #     'xTi': [0.37, 0.2], 
-            #     # 'yTi': [3.34, 0.2], 
-            #     'yTy': [3.07, 0.2],
-            #     # 'zTi': [1.9, 0.1], 
-            #     # 'zTz': [1.9898222688414018, 0.36198177893564248]
-            # }
-
 
 
         self.max_num_models_by_shape = {

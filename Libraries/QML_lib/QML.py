@@ -400,7 +400,7 @@ class ModelLearningClass():
             )
             latex_terms.append(lt)
 
-        plot_all_priors = False
+        plot_all_priors = True
         if plot_all_priors == True:
             Distributions.plot_prior(
                 model_name = self.LatexTerm, 
