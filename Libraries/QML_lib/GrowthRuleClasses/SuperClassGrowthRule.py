@@ -57,6 +57,7 @@ class growth_rule_super_class():
         self.max_time_to_consider = 15 # arbitrary time units
         # If you want to do just Bayes facotr calculation on a deterministic initial set you set tree_completed_initially to True
         self.tree_completed_initially = False
+        self.check_champion_reducibility = True
         self.experimental_dataset = 'NVB_rescale_dataset.p'
         self.measurement_type = 'full_access' #deprecated
         self.fixed_axis_generator = False # if you have a transverse axis and you want to generate on that axis than set it to True

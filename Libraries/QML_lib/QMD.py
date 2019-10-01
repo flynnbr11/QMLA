@@ -604,7 +604,6 @@ class QMD():
             'gaussian' : self.gaussian,
             # 'bayes_factors_time_binning' : self.BayesTimeBinning,
             'bayes_factors_time_binning' : self.GlobalVariables.bayes_time_binning,
-            'updater_from_prior' : self.GlobalVariables.updater_from_prior,
             'q_id' : self.Q_id,
             'use_time_dep_true_params' : use_time_dep_true_model,
             'time_dep_true_params' : self.TimeDepParams,
@@ -3159,7 +3158,13 @@ class QMD():
         # Check if final winner has parameters close to 0; potentially change champ
         self.updateDataBaseModelValues()
 
-        self.checkChampReducibility()
+        if (
+            self.GrowthClass.check_champion_reducibility == True
+            and
+            self.GrowthClass.tree_completed_initially == False
+        ):
+            self.checkChampReducibility()
+        
         self.log_print(
             [
                 "Final winner = ", self.ChampionName
@@ -3327,10 +3332,8 @@ class QMD():
 
         self.log_print(
             [
-                "Checking if champion model can be reduced ", 
-                "due to negligible parameters.",
-                "\nChamp ID:", self.ChampID,
-                "\nName:", self.ChampionName
+                "Checking reducibility of champ model:",
+                self.ChampionName                
             ]
         )
 

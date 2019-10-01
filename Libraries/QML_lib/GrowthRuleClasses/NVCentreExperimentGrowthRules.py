@@ -40,6 +40,7 @@ class nv_centre_spin_experimental_method(
         #     'xTiPPyTiPPzTiPPzTz',
         #     'xTiPPyTiPPyTyPPzTiPPzTz',                    
         # ] 
+        self.tree_completed_initially = False
         self.qhl_models = [
             # 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
             # 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
@@ -50,7 +51,6 @@ class nv_centre_spin_experimental_method(
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         self.max_num_qubits = 3
-        self.tree_completed_initially = False
         self.experimental_dataset = 'NVB_rescale_dataset.p'
         self.fixed_axis_generator = False
         self.fixed_axis = 'z' # e.g. transverse axis
@@ -66,7 +66,6 @@ class nv_centre_spin_experimental_method(
 
         # params for testing p value calculation
         self.gaussian_prior_means_and_widths = {
-            'yTy' : [0.0, 0.01],
         }
 
         # self.true_params = {

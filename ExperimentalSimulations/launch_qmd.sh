@@ -17,7 +17,7 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=10
+prt=20
 exp=5
 pgh=1.0
 pgh_exponent=1.0

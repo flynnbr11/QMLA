@@ -875,7 +875,7 @@ class ModelLearningClass():
         learned_info['data_record'] = self.Updater.data_record
         learned_info['name'] = self.Name
         learned_info['model_id'] = self.ModelID
-        # learned_info['updater'] = pickle.dumps(self.Updater, protocol=2) # TODO regenerate this from mean and std_dev instead of saving it
+        learned_info['updater'] = pickle.dumps(self.Updater, protocol=2) # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['final_prior'] = self.Updater.prior # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['initial_prior'] = self.InitialPrior
         learned_info['sim_op_names'] = self.SimOpsNames
@@ -1237,16 +1237,16 @@ class reducedModel():
 
         probe = self.PlotProbes[self.NumQubits]
         
-        self.log_print(
-            [
-            "Computing expectation values.", 
-            "\nMeasurement Type:", self.MeasurementType, 
-            "\nLearnedHamiltonian", self.LearnedHamiltonian,
-            # "\nPlotProbePath:", plot_probe_path, 
-            "\nProbe:", probe,
-            "\nTimes:", times
-            ]
-        )
+        # self.log_print(
+        #     [
+        #     "Computing expectation values.", 
+        #     "\nMeasurement Type:", self.MeasurementType, 
+        #     "\nLearnedHamiltonian", self.LearnedHamiltonian,
+        #     # "\nPlotProbePath:", plot_probe_path, 
+        #     "\nProbe:", probe,
+        #     "\nTimes:", times
+        #     ]
+        # )
 
         present_expec_val_times = sorted(
             list(self.expectation_values.keys())
@@ -1515,7 +1515,6 @@ class modelClassForRemoteBayesFactor():
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
         self.ResultsDirectory = qmd_info['results_directory']
-        updater_from_prior = qmd_info['updater_from_prior']
 
         # Get model specific data
         learned_models_info = rds_dbs['learned_models_info']
@@ -1589,12 +1588,6 @@ class modelClassForRemoteBayesFactor():
         )    
 
         # recreate prior using final params instead of pickling
-        posterior_distribution = qi.MultivariateNormalDistribution(
-            # final_params, 
-            learned_model_info['est_mean'],
-            self.FinalCovarianceMatrix
-            # final_cov_mat
-        )
 
         # Plot posterior distribution after learning. 
         # model_terms = DataBase.get_constituent_names_from_name(
@@ -1617,35 +1610,57 @@ class modelClassForRemoteBayesFactor():
         #         )
         #     )
         # )
+        self.reconstruct_updater = False
+        time_s = time.time()
+        if self.reconstruct_updater == True:
+            posterior_distribution = qi.MultivariateNormalDistribution(
+                # final_params, 
+                learned_model_info['est_mean'],
+                self.FinalCovarianceMatrix
+                # final_cov_mat
+            )
 
-        self.Updater = qi.SMCUpdater(
-            model = self.GenSimModel, 
-            n_particles = self.NumParticles, 
-            prior = posterior_distribution,
-            resample_thresh = self.ResamplerThresh, 
-            resampler = qi.LiuWestResampler(
-                a = self.ResamplerA
-            ),
-            debug_resampling = False
+            self.Updater = qi.SMCUpdater(
+                model = self.GenSimModel, 
+                n_particles = self.NumParticles, 
+                prior = posterior_distribution,
+                # prior = self.Prior,
+                resample_thresh = self.ResamplerThresh, 
+                resampler = qi.LiuWestResampler(
+                    a = self.ResamplerA
+                ),
+                debug_resampling = False
+            )
+            self.Updater._normalization_record = self.NormalizationRecord
+            self.Updater._log_total_likelihood = self.log_total_likelihood
+            time_taken = time.time() - time_s
+            self.log_print(
+                [
+                    "Time to reconstruct updater: {}".format(
+                        time_taken
+                    )
+                ]
+            )
+
+        else:
+            time_s = time.time()
+            self.Updater = pickle.loads(
+                learned_model_info['updater']
+            )
+            time_taken = time.time() - time_s
+            self.log_print(
+                [
+                    "Time to unpickle updater: {}".format(
+                        time_taken
+                    )
+                ]
+            )
+        self.log_print(
+            [
+                "Prior mean:", self.Updater.est_mean()
+            ]
         )
-        self.Updater._normalization_record = self.NormalizationRecord
-        self.Updater._log_total_likelihood = self.log_total_likelihood
-
-        # self.Updater = pickle.loads(
-        #     learned_model_info['updater']
-        # )
-
-        # print(
-        #     "Providing prior to BF model instance {}:\n{}".format(
-        #             self.ModelID, 
-        #             self.Prior
-        #         ),
-        #     "\n updater.est_mean():", self.Updater.est_mean()
-        # )
-        # TODO not clear which is quicker: generating new instance of classes/updater or unpickling every time.
         del qmd_info, learned_model_info
-        
-        # could pickle updaters to a redis db for updaters, but first construct these model classes each time a BF is to be computed. 
 
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) +

@@ -112,7 +112,7 @@ def BayesFactorRemote(
     linspace_times_for_bayes_factor_comparison = False
     use_opponent_learned_times = True
     true_mod_name = info_dict['true_name']
-    save_plots_of_posteriors = False
+    save_plots_of_posteriors = True
     plot_true_mod_post_bayes_factor_dynamics = False
 
     if check_db: # built in to only compute once and always return the stored value.
@@ -331,7 +331,8 @@ def log_likelihood(
 
     if binning:
         updater._renormalization_record = []
-        updater.log_likelihood = 0 
+        updater.log_total_likelihood = 0 
+        # updater.log_likelihood = 0 
         # print("BINNING")
     # else:
     #     print("NOT BINNING")    
