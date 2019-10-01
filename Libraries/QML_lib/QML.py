@@ -1610,7 +1610,7 @@ class modelClassForRemoteBayesFactor():
         #         )
         #     )
         # )
-        self.reconstruct_updater = False
+        self.reconstruct_updater = True
         time_s = time.time()
         if self.reconstruct_updater == True:
             posterior_distribution = qi.MultivariateNormalDistribution(
