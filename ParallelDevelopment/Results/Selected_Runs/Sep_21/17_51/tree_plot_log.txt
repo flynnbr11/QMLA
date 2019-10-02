@@ -1,0 +1,610 @@
+[cumulativeQMDTreePlot] COUNTS {'$\\hat{S}_{x}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 102, '$\\hat{S}_{z}$': 102, '$\\hat{S}_{y,z}$': 0, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 0, '$\\hat{S}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 0}, '$\\hat{S}_{y}$': {'$\\hat{S}_{x}$': 102, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 102, '$\\hat{S}_{y,z}$': 34, '$\\hat{S}_{x,y}$': 8, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 0, '$\\hat{S}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 0}, '$\\hat{S}_{z}$': {'$\\hat{S}_{x}$': 102, '$\\hat{S}_{y}$': 102, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 2, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 0, '$\\hat{S}_{x,z}$': 58, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 0}, '$\\hat{S}_{y,z}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 34, '$\\hat{S}_{z}$': 2, '$\\hat{S}_{y,z}$': 0, '$\\hat{S}_{x,y}$': 42, '$\\hat{S}_{x,y,z}$': 36, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 18, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 8, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 5, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 8, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 11, '$\\hat{S}_{x,z}$': 60, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 0}, '$\\hat{S}_{x,y}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 8, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 42, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 8, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 0, '$\\hat{S}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 0}, '$\\hat{S}_{x,y,z}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 36, '$\\hat{S}_{x,y}$': 8, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 7, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 93, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 1, '$\\hat{S}_{x,z}$': 58, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 0}, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 1, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 0, '$\\hat{S}_{x,z}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 1}, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 0, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 7, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 0, '$\\hat{S}_{x,z}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 3}, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 18, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 93, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 48, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 44, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 7, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 6, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 12, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 9, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 22, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 27, '$\\hat{S}_{x,z}$': 31, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 1}, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 8, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 48, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 91, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 49, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 12, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 10, '$\\hat{S}_{x,z}$': 12, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 3}, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 4, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 44, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 91, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 48, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 9, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 8, '$\\hat{S}_{x,z}$': 16, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 8}, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 2, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 7, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 49, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 48, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 36, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 27, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 39, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 4, '$\\hat{S}_{x,z}$': 7, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 5}, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 5, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 6, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 36, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 5, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 31, '$\\hat{S}_{x,z}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 0}, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 3, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 12, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 27, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 17, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 10, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 8, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 0, '$\\hat{S}_{x,z}$': 9, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 1}, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 3, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 9, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 39, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 102, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 8, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 7, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 31, '$\\hat{S}_{x,z}$': 9, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 0}, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 3, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 5, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 17, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 27, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 22, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 35, '$\\hat{S}_{x,z}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 0}, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 0, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 10, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 8, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 27, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 18, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 40, '$\\hat{S}_{x,z}$': 5, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 1}, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 8, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 22, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 12, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 9, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 2, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 8, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 7, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 22, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 18, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 62, '$\\hat{S}_{x,z}$': 22, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 1}, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 11, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 27, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 10, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 8, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 4, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 31, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 31, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 35, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 40, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 62, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 0, '$\\hat{S}_{x,z}$': 20, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 1}, '$\\hat{S}_{x,z}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 58, '$\\hat{S}_{y,z}$': 60, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 58, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 31, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 12, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 16, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 7, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 9, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 9, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 5, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 22, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 20, '$\\hat{S}_{x,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 3}, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': {'$\\hat{S}_{x}$': 0, '$\\hat{S}_{y}$': 0, '$\\hat{S}_{z}$': 0, '$\\hat{S}_{y,z}$': 0, '$\\hat{S}_{x,y}$': 0, '$\\hat{S}_{x,y,z}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{y}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{z}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$': 8, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$': 5, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$': 0, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$': 1, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$': 1, '$\\hat{S}_{x,z}$': 3, '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$': 0}}
+[cumulativeQMDTreePlot] nodes added.
+[cumulativeQMDTreePlot] node positions added.
+[cumulativeQMDTreePlot] setting edges.
+[cumulativeQMDTreePlot] modelist: ['$\\hat{S}_{x}$', '$\\hat{S}_{y}$', '$\\hat{S}_{z}$', '$\\hat{S}_{y,z}$', '$\\hat{S}_{x,y}$', '$\\hat{S}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y}$', '$\\hat{S}_{x,y,z}\\hat{A}_{z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$', '$\\hat{S}_{x,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$']
+pair ('$\\hat{S}_{x}$', '$\\hat{S}_{y}$') freq 50
+
+	 pair ('$\\hat{S}_{x}$', '$\\hat{S}_{y}$'),                                  
+	 BF[a,b]:1e-160                                 
+	 BF[b,a]:1e+160                                
+	 weight:160.0                                 
+	 bf:1.0000000000000003e+160                                 
+	 freq:50                                 
+	 pair freq 102
+pair ('$\\hat{S}_{x}$', '$\\hat{S}_{z}$') freq 50
+
+	 pair ('$\\hat{S}_{x}$', '$\\hat{S}_{z}$'),                                  
+	 BF[a,b]:1e-160                                 
+	 BF[b,a]:1e+160                                
+	 weight:160.0                                 
+	 bf:1.0000000000000003e+160                                 
+	 freq:50                                 
+	 pair freq 102
+pair ('$\\hat{S}_{x}$', '$\\hat{S}_{y,z}$') freq 1
+pair ('$\\hat{S}_{x}$', '$\\hat{S}_{x,y}$') freq 1
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{y}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{z}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,z}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{y,z}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+pair ('$\\hat{S}_{x}$', '$\\hat{S}_{x,z}$') freq 1
+not adding edge $\hat{S}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{y}$', '$\\hat{S}_{z}$') freq 50
+
+	 pair ('$\\hat{S}_{y}$', '$\\hat{S}_{z}$'),                                  
+	 BF[a,b]:1.05617212737e-12                                 
+	 BF[b,a]:2.425586463e+16                                
+	 weight:11.9762652978                                 
+	 bf:946815366625.3751                                 
+	 freq:50                                 
+	 pair freq 102
+pair ('$\\hat{S}_{y}$', '$\\hat{S}_{y,z}$') freq 10
+
+	 pair ('$\\hat{S}_{y}$', '$\\hat{S}_{y,z}$'),                                  
+	 BF[a,b]:3.89188241745e-146                                 
+	 BF[b,a]:4.82218934495e+147                                
+	 weight:145.409840289                                 
+	 bf:2.5694506995267454e+145                                 
+	 freq:10                                 
+	 pair freq 34
+pair ('$\\hat{S}_{y}$', '$\\hat{S}_{x,y}$') freq 1
+
+	 pair ('$\\hat{S}_{y}$', '$\\hat{S}_{x,y}$'),                                  
+	 BF[a,b]:1.05978846145e-107                                 
+	 BF[b,a]:1.70476944106e+132                                
+	 weight:106.974780813                                 
+	 bf:9.435845325520283e+106                                 
+	 freq:1                                 
+	 pair freq 8
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{y}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{z}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,z}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{y,z}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+pair ('$\\hat{S}_{y}$', '$\\hat{S}_{x,z}$') freq 1
+not adding edge $\hat{S}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{z}$', '$\\hat{S}_{y,z}$') freq 1
+
+	 pair ('$\\hat{S}_{z}$', '$\\hat{S}_{y,z}$'),                                  
+	 BF[a,b]:4.4572133019e-129                                 
+	 BF[b,a]:3.21862567149e+150                                
+	 weight:128.350936582                                 
+	 bf:2.243554284410497e+128                                 
+	 freq:1                                 
+	 pair freq 2
+pair ('$\\hat{S}_{z}$', '$\\hat{S}_{x,y}$') freq 1
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{y}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{z}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,z}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{y,z}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+pair ('$\\hat{S}_{z}$', '$\\hat{S}_{x,z}$') freq 10
+
+	 pair ('$\\hat{S}_{z}$', '$\\hat{S}_{x,z}$'),                                  
+	 BF[a,b]:1e-160                                 
+	 BF[b,a]:1e+160                                
+	 weight:160.0                                 
+	 bf:1.0000000000000003e+160                                 
+	 freq:10                                 
+	 pair freq 58
+not adding edge $\hat{S}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{y,z}$', '$\\hat{S}_{x,y}$') freq 10
+
+	 pair ('$\\hat{S}_{y,z}$', '$\\hat{S}_{x,y}$'),                                  
+	 BF[a,b]:3.52381873833e+39                                 
+	 BF[b,a]:3.22432978571e-39                                
+	 weight:39.5470135606                                 
+	 bf:3.52381873833e+39                                 
+	 freq:10                                 
+	 pair freq 42
+pair ('$\\hat{S}_{y,z}$', '$\\hat{S}_{x,y,z}$') freq 10
+
+	 pair ('$\\hat{S}_{y,z}$', '$\\hat{S}_{x,y,z}$'),                                  
+	 BF[a,b]:212673427.06                                 
+	 BF[b,a]:4.9426466746e-09                                
+	 weight:8.32771322943                                 
+	 bf:212673427.06                                 
+	 freq:10                                 
+	 pair freq 36
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{y}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{z}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,z}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{y,z}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+pair ('$\\hat{S}_{y,z}$', '$\\hat{S}_{x,z}$') freq 50
+
+	 pair ('$\\hat{S}_{y,z}$', '$\\hat{S}_{x,z}$'),                                  
+	 BF[a,b]:1.52587554066e-52                                 
+	 BF[b,a]:1.08391469756e+52                                
+	 weight:51.8164808885                                 
+	 bf:6.553614455141604e+51                                 
+	 freq:50                                 
+	 pair freq 60
+not adding edge $\hat{S}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{x,y}$', '$\\hat{S}_{x,y,z}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y}$', '$\\hat{S}_{x,y,z}$'),                                  
+	 BF[a,b]:4.12458620239e-18                                 
+	 BF[b,a]:1.96943209447e+27                                
+	 weight:17.3846196154                                 
+	 bf:2.4244856354829952e+17                                 
+	 freq:1                                 
+	 pair freq 8
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{y}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{z}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x,z}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{y,z}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+pair ('$\\hat{S}_{x,y}$', '$\\hat{S}_{x,z}$') freq 1
+not adding edge $\hat{S}_{x,y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x}$'),                                  
+	 BF[a,b]:3.78518436535e-29                                 
+	 BF[b,a]:1.83405690509e+108                                
+	 weight:28.4219129624                                 
+	 bf:2.641879241479011e+28                                 
+	 freq:1                                 
+	 pair freq 2
+pair ('$\\hat{S}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y}$'),                                  
+	 BF[a,b]:6.26692698455e-61                                 
+	 BF[b,a]:1.59567839623e+60                                
+	 weight:60.2029453652                                 
+	 bf:1.5956783962304608e+60                                 
+	 freq:1                                 
+	 pair freq 7
+pair ('$\\hat{S}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{z}$') freq 50
+
+	 pair ('$\\hat{S}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{z}$'),                                  
+	 BF[a,b]:3.26999376296e-86                                 
+	 BF[b,a]:3.05810980842e+85                                
+	 weight:85.4854530757                                 
+	 bf:3.0581098084230502e+85                                 
+	 freq:50                                 
+	 pair freq 93
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,z}$
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{y,z}$
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+pair ('$\\hat{S}_{x,y,z}$', '$\\hat{S}_{x,z}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}$', '$\\hat{S}_{x,z}$'),                                  
+	 BF[a,b]:2.69603306545e-46                                 
+	 BF[b,a]:1.11367646885e+46                                
+	 weight:45.5692747857                                 
+	 bf:3.70915332164893e+45                                 
+	 freq:10                                 
+	 pair freq 58
+not adding edge $\hat{S}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y}$') freq 50
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y}$'),                                  
+	 BF[a,b]:2.5756373924e-16                                 
+	 BF[b,a]:5.03093699307e+15                                
+	 weight:15.5891152786                                 
+	 bf:3882534097966372.0                                 
+	 freq:50                                 
+	 pair freq 102
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x}$', '$\\hat{S}_{x,y,z}\\hat{A}_{z}$') freq 50
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x}$', '$\\hat{S}_{x,y,z}\\hat{A}_{z}$'),                                  
+	 BF[a,b]:1.28884125158e-50                                 
+	 BF[b,a]:1.84359264263e+50                                
+	 weight:49.889800572                                 
+	 bf:7.758907458718617e+49                                 
+	 freq:50                                 
+	 pair freq 102
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$'),                                  
+	 BF[a,b]:7.8101796104e+46                                 
+	 BF[b,a]:1.28038028558e-47                                
+	 weight:46.8926610214                                 
+	 bf:7.8101796104e+46                                 
+	 freq:1                                 
+	 pair freq 1
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$') freq 1
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x}$/$\hat{S}_{x,z}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$'),                                  
+	 BF[a,b]:0.0606253252479                                 
+	 BF[b,a]:16.4947568679                                
+	 weight:1.21734591844                                 
+	 bf:16.494756867879914                                 
+	 freq:1                                 
+	 pair freq 1
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y}$', '$\\hat{S}_{x,y,z}\\hat{A}_{z}$') freq 50
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y}$', '$\\hat{S}_{x,y,z}\\hat{A}_{z}$'),                                  
+	 BF[a,b]:2.37278035734e-32                                 
+	 BF[b,a]:6.40759477754e+31                                
+	 weight:31.6247424615                                 
+	 bf:4.2144650974868835e+31                                 
+	 freq:50                                 
+	 pair freq 102
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$') freq 1
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$'),                                  
+	 BF[a,b]:4.65120488374e-12                                 
+	 BF[b,a]:2.06943983521e+25                                
+	 weight:11.3324345296                                 
+	 bf:214998054266.77002                                 
+	 freq:1                                 
+	 pair freq 4
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y}$/$\hat{S}_{x,z}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$'),                                  
+	 BF[a,b]:4.55838699564e-08                                 
+	 BF[b,a]:21937584.5218                                
+	 weight:7.34118880708                                 
+	 bf:21937584.521839105                                 
+	 freq:1                                 
+	 pair freq 3
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$'),                                  
+	 BF[a,b]:23501.8151334                                 
+	 BF[b,a]:0.000127301392116                                
+	 weight:4.37110140576                                 
+	 bf:23501.8151334                                 
+	 freq:10                                 
+	 pair freq 48
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$'),                                  
+	 BF[a,b]:1.82661847933e+13                                 
+	 BF[b,a]:8.6503970363e-12                                
+	 weight:13.261647847                                 
+	 bf:1.82661847933e+13                                 
+	 freq:10                                 
+	 pair freq 44
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{z}$/$\hat{S}_{x,z}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$'),                                  
+	 BF[a,b]:1717.55261031                                 
+	 BF[b,a]:0.000582223795648                                
+	 weight:3.2349100488                                 
+	 bf:1717.55261031                                 
+	 freq:1                                 
+	 pair freq 1
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$') freq 50
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$'),                                  
+	 BF[a,b]:16.8883159918                                 
+	 BF[b,a]:0.0592125348962                                
+	 weight:1.22758634632                                 
+	 bf:16.8883159918                                 
+	 freq:50                                 
+	 pair freq 91
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$'),                                  
+	 BF[a,b]:6.88714900976e+29                                 
+	 BF[b,a]:1.4519796197e-30                                
+	 weight:29.8380394794                                 
+	 bf:6.88714900976e+29                                 
+	 freq:10                                 
+	 pair freq 49
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,z}$/$\hat{S}_{x,z}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$'),                                  
+	 BF[a,b]:2.7726466629e-09                                 
+	 BF[b,a]:360666223.136                                
+	 weight:8.55710547198                                 
+	 bf:360666223.1363306                                 
+	 freq:1                                 
+	 pair freq 3
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$'),                                  
+	 BF[a,b]:2.32821517516e+37                                 
+	 BF[b,a]:1.12235892569e-36                                
+	 weight:37.3670231156                                 
+	 bf:2.32821517516e+37                                 
+	 freq:10                                 
+	 pair freq 48
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{y,z}$/$\hat{S}_{x,z}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$'),                                  
+	 BF[a,b]:4.22259072073e+22                                 
+	 BF[b,a]:3.02666747597e-11                                
+	 weight:22.625578989                                 
+	 bf:4.22259072073e+22                                 
+	 freq:1                                 
+	 pair freq 8
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$'),                                  
+	 BF[a,b]:126238.938708                                 
+	 BF[b,a]:26.5579013179                                
+	 weight:5.10119333476                                 
+	 bf:126238.938708                                 
+	 freq:10                                 
+	 pair freq 36
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$'),                                  
+	 BF[a,b]:1.94773947283e-17                                 
+	 BF[b,a]:5.13415687237e+16                                
+	 weight:16.7104691343                                 
+	 bf:5.134156872370716e+16                                 
+	 freq:10                                 
+	 pair freq 27
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$'),                                  
+	 BF[a,b]:6.58170426266e-19                                 
+	 BF[b,a]:1.51936331396e+18                                
+	 weight:18.1816616359                                 
+	 bf:1.5193633139574676e+18                                 
+	 freq:10                                 
+	 pair freq 39
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}$/$\hat{S}_{x,z}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y}$'),                                  
+	 BF[a,b]:5.90328639784e-14                                 
+	 BF[b,a]:1.69397168392e+13                                
+	 weight:13.2289061465                                 
+	 bf:16939716839169.416                                 
+	 freq:1                                 
+	 pair freq 5
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$') freq 50
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$'),                                  
+	 BF[a,b]:19323421.4666                                 
+	 BF[b,a]:2.48499357117e-07                                
+	 weight:7.28608402645                                 
+	 bf:19323421.4666                                 
+	 freq:50                                 
+	 pair freq 102
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$') freq 50
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$'),                                  
+	 BF[a,b]:438.144306204                                 
+	 BF[b,a]:0.0508179221128                                
+	 weight:2.6416171723                                 
+	 bf:438.144306204                                 
+	 freq:50                                 
+	 pair freq 102
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$'),                                  
+	 BF[a,b]:322428605.527                                 
+	 BF[b,a]:3.10146178986e-09                                
+	 weight:8.50843356499                                 
+	 bf:322428605.527                                 
+	 freq:1                                 
+	 pair freq 5
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$') freq 1
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$'),                                  
+	 BF[a,b]:3.37277986961e-17                                 
+	 BF[b,a]:2.96491333161e+16                                
+	 weight:16.4720120029                                 
+	 bf:2.9649133316082036e+16                                 
+	 freq:10                                 
+	 pair freq 31
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$/$\hat{S}_{x,z}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$') freq 50
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$'),                                  
+	 BF[a,b]:5.61178691231e-11                                 
+	 BF[b,a]:18320447955.2                                
+	 weight:10.2508988281                                 
+	 bf:17819635984.504105                                 
+	 freq:50                                 
+	 pair freq 102
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$'),                                  
+	 BF[a,b]:341279141.589                                 
+	 BF[b,a]:2.93015270533e-09                                
+	 weight:8.53310974574                                 
+	 bf:341279141.589                                 
+	 freq:1                                 
+	 pair freq 17
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$'),                                  
+	 BF[a,b]:3.59891461623e+21                                 
+	 BF[b,a]:97.5699171874                                
+	 weight:21.5561715432                                 
+	 bf:3.59891461623e+21                                 
+	 freq:1                                 
+	 pair freq 10
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$') freq 1
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$/$\hat{S}_{x,z}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{yz}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$') freq 1
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$'),                                  
+	 BF[a,b]:1.40777542968e+29                                 
+	 BF[b,a]:6.23303428674e-13                                
+	 weight:29.1485333811                                 
+	 bf:1.40777542968e+29                                 
+	 freq:1                                 
+	 pair freq 8
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$/$\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$'),                                  
+	 BF[a,b]:2.17008327871e-13                                 
+	 BF[b,a]:4.6081180838e+12                                
+	 weight:12.6635235994                                 
+	 bf:4608118083802.885                                 
+	 freq:10                                 
+	 pair freq 31
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$/$\hat{S}_{x,z}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$'),                                  
+	 BF[a,b]:286054.822992                                 
+	 BF[b,a]:3.49583338446e-06                                
+	 weight:5.45644927453                                 
+	 bf:286054.822992                                 
+	 freq:10                                 
+	 pair freq 27
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$'),                                  
+	 BF[a,b]:3771241811.6                                 
+	 BF[b,a]:1.1419997713e-09                                
+	 weight:9.57648438021                                 
+	 bf:3771241811.6                                 
+	 freq:10                                 
+	 pair freq 22
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xz,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$'),                                  
+	 BF[a,b]:3.63185929384e-21                                 
+	 BF[b,a]:2.75341063377e+20                                
+	 weight:20.4398709853                                 
+	 bf:2.7534106337677758e+20                                 
+	 freq:10                                 
+	 pair freq 35
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$/$\hat{S}_{x,z}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xz,yz}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$') freq 1
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$'),                                  
+	 BF[a,b]:1.33242733916e-07                                 
+	 BF[b,a]:451892783818.0                                
+	 weight:6.8753564649                                 
+	 bf:7505099.6824647365                                 
+	 freq:1                                 
+	 pair freq 18
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$') freq 10
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$'),                                  
+	 BF[a,b]:8.2003756278e-25                                 
+	 BF[b,a]:1.7644096906e+26                                
+	 weight:24.0861662538                                 
+	 bf:1.2194563339384044e+24                                 
+	 freq:10                                 
+	 pair freq 40
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$/$\hat{S}_{x,z}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,yz}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$') freq 50
+
+	 pair ('$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz,yz}$', '$\\hat{S}_{x,y,z}\\hat{A}_{x,y,z}\\hat{T}_{xy,xz}$'),                                  
+	 BF[a,b]:2.29191185266e-15                                 
+	 BF[b,a]:7.10561320879e+14                                
+	 weight:14.6398020894                                 
+	 bf:436316954703292.5                                 
+	 freq:50                                 
+	 pair freq 62
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$/$\hat{S}_{x,z}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz,yz}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$/$\hat{S}_{x,z}$
+not adding edge $\hat{S}_{x,y,z}\hat{A}_{x,y,z}\hat{T}_{xy,xz}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+not adding edge $\hat{S}_{x,z}$/$\hat{S}_{x,y,z}\hat{A}_{x,y}$
+[cumulativeQMDTreePlot] edges added.
+edge freqs: [50, 50, 1, 1, 1, 50, 10, 1, 1, 1, 1, 10, 10, 10, 50, 1, 1, 1, 1, 50, 10, 50, 50, 1, 1, 1, 50, 1, 1, 1, 10, 10, 1, 50, 10, 1, 10, 1, 10, 10, 10, 1, 50, 50, 1, 1, 10, 50, 1, 1, 1, 1, 1, 10, 10, 10, 10, 1, 10, 50]
+[plotQMD]max freq: 50
