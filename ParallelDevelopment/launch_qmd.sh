@@ -1,8 +1,8 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="NV-exp-method-sim__probe-with-phase__different-probe__reduced-true-mod"
-#test_description="THEO__qhl__heis-predetermined"
-
+test_description="NV-exp-method-sim__random--probe__QMLA"
+#test_description="THEO__qmd__mult-growth__heis-true"
+#test_description="test__removing-negligible-params"
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -10,12 +10,12 @@ test_description="NV-exp-method-sim__probe-with-phase__different-probe__reduced-
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=50
+num_tests=102
 num_processes_to_request=6
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
-min_id=1 # update so instances don't clash and hit eachother's redis databases
+min_id=0 # update so instances don't clash and hit eachother's redis databases
 multiple_qhl=0
-multiple_growth_rules=0
+multiple_growth_rules=1
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
 experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=1
@@ -60,9 +60,8 @@ sim_growth_rule='heisenberg_xyz_predetermined'
 
 # Experimental growth rules
 #experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-experimental_growth_rule='NV_alternative_model'
 #experimental_growth_rule='two_qubit_ising_rotation_hyperfine'
-#experimental_growth_rule='NV_alternative_model'
+experimental_growth_rule='NV_alternative_model'
 #experimental_growth_rule='NV_alternative_model_2'
 #experimental_growth_rule='NV_centre_revivals'
 #experimental_growth_rule='NV_spin_full_access'
@@ -90,6 +89,7 @@ alt_growth_rules=(
 #	'ising_probabilistic'
 	'ising_predetermined' 
 	'heisenberg_xyz_predetermined'
+	'hopping_predetermined'
 )
 growth_rules_command=""
 for item in ${alt_growth_rules[*]}
@@ -375,6 +375,7 @@ echo "
 cd $lib_dir
 python3 AnalyseMultipleQMD.py \
 	-dir="$full_path_to_results" \
+	-log=$multi_qmd_log \
 	--bayes_csv=$all_qmd_bayes_csv \
 	-top=$top_number_models \
 	-qhl=$qhl \
@@ -435,6 +436,7 @@ echo "
 	cd $lib_dir
 	python3 AnalyseMultipleQMD.py \
 		-dir="$full_path_to_results" \
+		-log=$multi_qmd_log \
 		--bayes_csv=$all_qmd_bayes_csv \
 		-top=$top_number_models 
 		-qhl=$qhl \
