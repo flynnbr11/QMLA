@@ -537,7 +537,8 @@ def analyse_and_plot_dynamics_multiple_models(
     # ie ExperimentalSimulations/Results/Sep_10/14_32/results_001.p, etc
     if use_experimental_data == True:
         os.chdir(directory_name)
-        os.chdir("../../../../ExperimentalSimulations/Data/")
+        # os.chdir("../../../../ExperimentalSimulations/Data/")
+        os.chdir("../../../../Launch/Data/")
         experimental_measurements = pickle.load(
             open(str(dataset), 'rb')
         )

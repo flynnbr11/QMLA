@@ -1,0 +1,7 @@
+
+cd /home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13/
+python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py     -dir=/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13/ --bayes_csv=/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13/cumulative.csv     -log=/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13//qmd.log     -top=5     -qhl=0 -fqhl=0     -exp=0 -true_expec=/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13/true_expec_vals.p     -ggr=reduced_nv_experiment     -plot_probes=/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13//plot_probes.p     -params=/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13//true_params.p     -latex=/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13/LatexMapping.txt
+
+
+python3 ../../../../Libraries/QML_lib/CombineAnalysisPlots.py     -dir=/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13/     -p=20 -e=5 -bt=5 -t=1     -log=/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13//qmd.log     -nprobes=10     -pnoise=0.0000001     -special_probe=random     -ggr=reduced_nv_experiment     -run_desc=development     -git_commit=da4dfe953bf2306e6b93387aa46dad91adbd11c5     -ra=0.98     -rt=0.5     -pgh=1.0     -qhl=0     -mqhl=0     -cb=/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_02/17_13/cumulative.csv     -exp=0
+
