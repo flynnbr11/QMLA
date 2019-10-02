@@ -1,0 +1,1295 @@
+In RUN script:  -agr ising_predetermined -agr heisenberg_xyz_predetermined -agr hopping_predetermined12:44:34 [GLOBAL VARIABLES] use_experimental_data : False
+12:44:34 [GLOBAL VARIABLES] growth_generation_rule : two_qubit_ising_rotation_hyperfine_transverse
+12:44:34 [GLOBAL VARIABLES] log_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/logs/NV-exp-method-sim__random-phase--probe__QMLA_23.qmd.8794620.log
+12:44:34 [GLOBAL VARIABLES] growth_class : <NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method object at 0x2aaae0572e10>
+12:44:34 [GLOBAL VARIABLES] measurement_type : n_qubit_hahn_evolution
+12:44:34 [GLOBAL VARIABLES] dataset : NVB_rescale_dataset.p
+12:44:34 [GLOBAL VARIABLES] alternative_growth_rules : []
+12:44:34 [GLOBAL VARIABLES] multiQHL : False
+12:44:34 [GLOBAL VARIABLES] models_for_qhl : []
+12:44:34 [GLOBAL VARIABLES] prior_pickle_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/prior.p
+12:44:34 [GLOBAL VARIABLES] true_params_pickle_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/true_params.p
+12:44:34 [GLOBAL VARIABLES] true_operator : xTiPPyTiPPzTiPPzTz
+12:44:34 [GLOBAL VARIABLES] true_op_name : xTiPPyTiPPzTiPPzTz
+12:44:34 [GLOBAL VARIABLES] true_operator_class : <DataBase.operator object at 0x2aaae0572a90>
+12:44:34 [GLOBAL VARIABLES] true_op_list : [array([[ 0.+0.j,  0.+0.j,  1.+0.j,  0.+0.j],
+       [ 0.+0.j,  0.+0.j,  0.+0.j,  1.+0.j],
+       [ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
+       [ 0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j]]), array([[ 0.+0.j,  0.+0.j,  0.-1.j,  0.+0.j],
+       [ 0.+0.j,  0.+0.j,  0.+0.j,  0.-1.j],
+       [ 0.+1.j,  0.+0.j,  0.+0.j,  0.+0.j],
+       [ 0.+0.j,  0.+1.j,  0.+0.j,  0.+0.j]]), array([[ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
+       [ 0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j],
+       [ 0.+0.j,  0.+0.j, -1.+0.j, -0.+0.j],
+       [ 0.+0.j,  0.+0.j, -0.+0.j, -1.+0.j]]), array([[ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
+       [ 0.+0.j, -1.+0.j,  0.+0.j, -0.+0.j],
+       [ 0.+0.j,  0.+0.j, -1.+0.j, -0.+0.j],
+       [ 0.+0.j, -0.+0.j, -0.+0.j,  1.-0.j]])]
+12:44:34 [GLOBAL VARIABLES] true_params : [0.92450565, 6.00664336, 1.65998543, 0.76546868]
+12:44:34 [GLOBAL VARIABLES] true_params_dict : {'xTi': 0.92450565, 'yTi': 6.00664336, 'zTi': 1.65998543, 'zTz': 0.76546868}
+12:44:34 [GLOBAL VARIABLES] true_params_list : [0.92450565, 6.00664336, 1.65998543, 0.76546868]
+12:44:34 [GLOBAL VARIABLES] true_hamiltonian : [[ 2.42545411+0.j          0.00000000+0.j          0.92450565-6.00664336j
+   0.00000000+0.j        ]
+ [ 0.00000000+0.j          0.89451675+0.j          0.00000000+0.j
+   0.92450565-6.00664336j]
+ [ 0.92450565+6.00664336j  0.00000000+0.j         -2.42545411+0.j
+   0.00000000+0.j        ]
+ [ 0.00000000+0.j          0.92450565+6.00664336j  0.00000000+0.j
+  -0.89451675+0.j        ]]
+12:44:34 [GLOBAL VARIABLES] qhl_test : False
+12:44:34 [GLOBAL VARIABLES] further_qhl : False
+12:44:34 [GLOBAL VARIABLES] do_iqle : False
+12:44:34 [GLOBAL VARIABLES] do_qle : True
+12:44:34 [GLOBAL VARIABLES] use_rq : True
+12:44:34 [GLOBAL VARIABLES] num_runs : 1
+12:44:34 [GLOBAL VARIABLES] num_tests : 1
+12:44:34 [GLOBAL VARIABLES] num_qubits : 2
+12:44:34 [GLOBAL VARIABLES] num_parameters : 2
+12:44:34 [GLOBAL VARIABLES] num_experiments : 750
+12:44:34 [GLOBAL VARIABLES] num_particles : 2500
+12:44:34 [GLOBAL VARIABLES] num_times_bayes : 750
+12:44:34 [GLOBAL VARIABLES] bayes_lower : 1
+12:44:34 [GLOBAL VARIABLES] bayes_upper : 100
+12:44:34 [GLOBAL VARIABLES] save_plots : False
+12:44:34 [GLOBAL VARIABLES] store_particles_weights : False
+12:44:34 [GLOBAL VARIABLES] gaussian : True
+12:44:34 [GLOBAL VARIABLES] custom_prior : True
+12:44:34 [GLOBAL VARIABLES] resample_threshold : 0.5
+12:44:34 [GLOBAL VARIABLES] resample_a : 0.98
+12:44:34 [GLOBAL VARIABLES] pgh_factor : 1.0
+12:44:34 [GLOBAL VARIABLES] pgh_exponent : 1.0
+12:44:34 [GLOBAL VARIABLES] increase_pgh_time : False
+12:44:34 [GLOBAL VARIABLES] pickle_qmd_class : False
+12:44:34 [GLOBAL VARIABLES] qmd_id : 23
+12:44:34 [GLOBAL VARIABLES] host_name : node46-019
+12:44:34 [GLOBAL VARIABLES] port_number : 6323
+12:44:34 [GLOBAL VARIABLES] results_directory : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/
+12:44:34 [GLOBAL VARIABLES] rq_timeout : 200000
+12:44:34 [GLOBAL VARIABLES] cumulative_csv : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/cumulative.csv
+12:44:34 [GLOBAL VARIABLES] data_time_offset : 180
+12:44:34 [GLOBAL VARIABLES] data_max_time : 5
+12:44:34 [GLOBAL VARIABLES] true_expec_path : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/true_expec_vals.p
+12:44:34 [GLOBAL VARIABLES] plot_probe_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/plot_probes.p
+12:44:34 [GLOBAL VARIABLES] special_probe : random
+12:44:34 [GLOBAL VARIABLES] latex_mapping_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/LatexMapping.txt
+12:44:34 [GLOBAL VARIABLES] reallocate_resources : False
+12:44:34 [GLOBAL VARIABLES] param_min : 0.0
+12:44:34 [GLOBAL VARIABLES] param_max : 10.0
+12:44:34 [GLOBAL VARIABLES] param_mean : 0.5
+12:44:34 [GLOBAL VARIABLES] param_sigma : 2.0
+12:44:34 [GLOBAL VARIABLES] bayes_time_binning : True
+12:44:34 [GLOBAL VARIABLES] bayes_factors_use_all_exp_times : False
+12:44:34 [GLOBAL VARIABLES] num_probes : 40
+12:44:34 [GLOBAL VARIABLES] probe_noise_level : 0.001
+12:44:34 [GLOBAL VARIABLES] updater_from_prior : False
+12:44:34 [GLOBAL VARIABLES] plots_directory : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/plots/
+12:44:34 [GLOBAL VARIABLES] long_id : 023
+12:44:34 [GLOBAL VARIABLES] results_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/results_023.p
+12:44:34 [GLOBAL VARIABLES] class_pickle_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/qmd_class_023.p
+12:44:35 [EXP] 
+ QMD id 23  on host  node46-019 and port 6323 has seed 1 
+ 2500  particles for 750 experiments and  750 bayes updates
+ Gaussian= True 
+ RQ= True RQ log: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/logs/NV-exp-method-sim__random-phase--probe__QMLA_23.qmd.8794620.log 
+ Bayes CSV: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_39/cumulative.csv
+12:44:35 [EXP] Generators: ['two_qubit_ising_rotation_hyperfine_transverse']
+12:44:35 [QMD 23] Probe dict provided to QMD.
+12:44:35 [QMD 23] Getting expectation values for simulated model (len 301) 
+ Times computed:
+ [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+12:44:35 [QMD 23] Expectation values computed
+12:44:35 [QMD 23] generator list after ensuring true generator is first: ['two_qubit_ising_rotation_hyperfine_transverse']
+12:44:35 [QMD 23] initialising generator two_qubit_ising_rotation_hyperfine_transverse with models: ['xTi', 'yTi', 'zTi']
+12:44:35 [QMD 23] xTi not added yet. List: []
+12:44:35 [QMD 23] yTi not added yet. List: ['xTi']
+12:44:35 [QMD 23] zTi not added yet. List: ['xTi', 'yTi']
+12:44:35 [QMD 23] After initial branches. InitialModelIDs: {'xTi': 0, 'yTi': 1, 'zTi': 2}
+12:44:35 [QMD 23] After setting up initial branches, highest branch id: 0 highest model id: 3 initial models: {}
+12:44:35 [QMD 23] Retrieving databases from redis
+12:44:35 [QMD 23] any job failed db: [b'Status'] Status: b'0'
+12:44:35 [QMD 23] Initial op list: ['xTi', 'yTi', 'zTi']
+12:44:35 [QMD 23] Specific terms for prior {}
+12:44:35 [QMD 23] RunParallel= True
+12:44:35 [QMD 23] Saving qmd info db to  StrictRedis<ConnectionPool<Connection<host=node46-019,port=6323,db=1>>>
+12:44:35 [QMD 23] Running  QLE  for true operator  xTiPPyTiPPzTiPPzTz  with parameters :  [0.92450565, 6.00664336, 1.65998543, 0.76546868]
+12:44:35 [DB] Model  xTi  not previously considered -- adding. ID: 0
+12:44:35 [DB] Model  yTi  not previously considered -- adding. ID: 1
+12:44:35 [DB] Model  zTi  not previously considered -- adding. ID: 2
+12:44:35 [QMD 23] After initiating DB, models: {0: 'xTi', 1: 'yTi', 2: 'zTi'}
+12:44:35 [QMD 23] learnModelFromBranchID branch 0 : ['xTi', 'yTi', 'zTi']
+12:44:35 [QMD 23] learnModelFromBranchID. Setting active branches on redis for branch 0 to 0
+12:44:35 [QMD 23] branch 0 precomputed: []
+12:44:35 [QMD 23] Branch  0 has unlearned models: ['yTi', 'zTi', 'xTi']
+12:44:35 [QMD 23] Model  yTi being passed to learnModel function
+12:44:35 [QMD 23] Model yTi added to queue.
+12:44:35 [QMD 23] Model  zTi being passed to learnModel function
+12:44:35 [QMD 23] Model zTi added to queue.
+12:44:35 [QMD 23] Model  xTi being passed to learnModel function
+12:44:35 [QMD 23] Model xTi added to queue.
+12:44:35 [QMD 23] learnModelFromBranchID finished, branch 0
+12:44:35 [QMD 23] Entering while loop of spawning/comparing.
+12:44:39 [QML 2] QML for  zTi
+12:44:39 [QML 0] QML for  xTi
+12:44:40 [QML 1] QML for  yTi
+12:44:40 [QML 2] Getting prior for model: zTi Specific terms: {}
+12:44:40 [QML 0] Getting prior for model: xTi Specific terms: {}
+12:44:40 [QML 1] Getting prior for model: yTi Specific terms: {}
+12:44:40 [QML 2] Initialization Ready
+12:44:40 [RQ Learn 2.0] Time to unpickle and initialise QML class: 0.4462463855743408
+12:44:40 [RQ Learn 2.0] Updating model.
+12:44:40 [QML 2] Experiment 0
+12:44:40 [QML 2] Initial time selected >  0.25962180478
+12:44:40 [QML 0] Initialization Ready
+12:44:40 [RQ Learn 0.0] Time to unpickle and initialise QML class: 0.43396711349487305
+12:44:40 [RQ Learn 0.0] Updating model.
+12:44:40 [QML 0] Experiment 0
+12:44:40 [QML 0] Initial time selected >  0.402061896988
+12:44:40 [QML 1] Initialization Ready
+12:44:40 [RQ Learn 1.0] Time to unpickle and initialise QML class: 0.4334449768066406
+12:44:40 [RQ Learn 1.0] Updating model.
+12:44:40 [QML 1] Experiment 0
+12:44:40 [QML 1] Initial time selected >  0.406428278336
+12:47:54 [QML 1] Experiment 75
+12:48:4 [QML 0] Experiment 75
+12:48:38 [QML 2] Experiment 75
+12:50:37 [QML 1] Experiment 150
+12:50:49 [QML 0] Experiment 150
+12:52:24 [QML 2] Experiment 150
+12:53:21 [QML 1] Experiment 225
+12:53:35 [QML 0] Experiment 225
+12:56:6 [QML 1] Experiment 300
+12:56:23 [QML 0] Experiment 300
+12:56:26 [QML 2] Experiment 225
+12:58:51 [QML 1] Experiment 375
+12:59:9 [QML 0] Experiment 375
+13:0:41 [QML 2] Experiment 300
+13:1:31 [QML 1] Experiment 450
+13:1:53 [QML 0] Experiment 450
+13:4:22 [QML 1] Experiment 525
+13:4:44 [QML 0] Experiment 525
+13:5:12 [QML 2] Experiment 375
+13:7:3 [QML 1] Experiment 600
+13:7:28 [QML 0] Experiment 600
+13:8:51 [QML 2] Experiment 450
+13:9:45 [QML 1] Experiment 675
+13:10:10 [QML 0] Experiment 675
+13:12:28 [QML 1] Results for QHL on  yTi
+13:12:28 [QML 1] Final time selected > 2.45
+13:12:28 [QML 1] Cumulative time.	 Datum: 0.8644084930419922 	 Update: 1666.3958637714386
+13:12:28 [QML 1] Final Parameters mean and stdev (term  yTi ): [  6.53588076e+00   1.10260665e-03]
+13:12:28 [RQ Learn 1.0] Time for update alone: 1668.3071904182434
+13:12:28 [RQ Learn 1.0] Redis learned_models_info added to db for model: 1.0
+13:12:28 [RQ Learn 1.0] Redis SET learned_models_ids: 1.0 ; set True
+13:12:28 [RQ Learn 1.0] Learned. rq time: 1668.9081842899323
+13:12:34 [QML 2] Experiment 525
+13:12:54 [QML 0] Results for QHL on  xTi
+13:12:54 [QML 0] Final time selected > 2.45
+13:12:54 [QML 0] Cumulative time.	 Datum: 0.9034426212310791 	 Update: 1692.4714088439941
+13:12:54 [QML 0] Final Parameters mean and stdev (term  xTi ): [  6.55493798e+00   6.04529678e-03]
+13:12:54 [RQ Learn 0.0] Time for update alone: 1694.4347231388092
+13:12:54 [RQ Learn 0.0] Redis learned_models_info added to db for model: 0.0
+13:12:54 [RQ Learn 0.0] Redis SET learned_models_ids: 0.0 ; set True
+13:12:55 [RQ Learn 0.0] Learned. rq time: 1695.0435845851898
+13:16:12 [QML 2] Experiment 600
+13:19:16 [QML 2] Experiment 675
+13:23:1 [QML 2] Results for QHL on  zTi
+13:23:1 [QML 2] Final time selected > 2.45
+13:23:1 [QML 2] Cumulative time.	 Datum: 0.9032073020935059 	 Update: 2299.3481237888336
+13:23:1 [QML 2] Final Parameters mean and stdev (term  zTi ): [ 2.07871235  0.00420989]
+13:23:1 [RQ Learn 2.0] Time for update alone: 2301.3754057884216
+13:23:1 [RQ Learn 2.0] Redis learned_models_info added to db for model: 2.0
+13:23:1 [QMD 23] All models on branch 0 have finished learning.
+13:23:1[QML:Reduced 0; QMD 23] Updating learned info for model 0
+13:23:1 [RQ Learn 2.0] Redis SET learned_models_ids: 2.0 ; set True
+13:23:1 [RQ Learn 2.0] Learned. rq time: 2302.0392150878906
+13:23:2[QML:Reduced 0; QMD 23] Updated learned info for model 0
+13:23:2[QML:Reduced 1; QMD 23] Updating learned info for model 1
+13:23:2[QML:Reduced 1; QMD 23] Updated learned info for model 1
+13:23:2[QML:Reduced 2; QMD 23] Updating learned info for model 2
+13:23:2[QML:Reduced 2; QMD 23] Updated learned info for model 2
+13:23:2 [QMD 23] remoteBayesFromBranchID 0 model id list: [0, 1, 2]
+13:23:2 [QMD 23] Computing BF for pair 0,1
+13:23:2 [QMD 23] Bayes factor calculation queued. Model IDs 0 1
+13:23:2 [QMD 23] Computing BF for pair 0,2
+13:23:2 [QMD 23] Bayes factor calculation queued. Model IDs 0 2
+13:23:2 [QMD 23] Computing BF for pair 1,2
+13:23:2 [QMD 23] Bayes factor calculation queued. Model IDs 1 2
+13:23:9[QML:Bayes 1; QMD 23] Name: yTi
+13:23:9[QML:Bayes 1; QMD 23] Time to unpickle updater: 0.03761148452758789
+13:23:9[QML:Bayes 1; QMD 23] Prior mean: [ 6.53588076]
+13:23:10[QML:Bayes 2; QMD 23] Name: zTi
+13:23:10[QML:Bayes 2; QMD 23] Time to unpickle updater: 0.03720259666442871
+13:23:10[QML:Bayes 2; QMD 23] Prior mean: [ 2.07871235]
+13:23:10 [RQ Bayes 1/2] Start. Branch 0
+13:23:16[QML:Bayes 0; QMD 23] Name: xTi
+13:23:16[QML:Bayes 0; QMD 23] Time to unpickle updater: 0.04427170753479004
+13:23:16[QML:Bayes 0; QMD 23] Prior mean: [ 6.55493798]
+13:23:16[QML:Bayes 1; QMD 23] Name: yTi
+13:23:16[QML:Bayes 1; QMD 23] Time to unpickle updater: 0.03855562210083008
+13:23:16[QML:Bayes 1; QMD 23] Prior mean: [ 6.53588076]
+13:23:16 [RQ Bayes 0/1] Start. Branch 0
+13:23:22[QML:Bayes 0; QMD 23] Name: xTi
+13:23:22[QML:Bayes 0; QMD 23] Time to unpickle updater: 0.05402946472167969
+13:23:22[QML:Bayes 0; QMD 23] Prior mean: [ 6.55493798]
+13:23:22[QML:Bayes 2; QMD 23] Name: zTi
+13:23:23[QML:Bayes 2; QMD 23] Time to unpickle updater: 0.03828597068786621
+13:23:23[QML:Bayes 2; QMD 23] Prior mean: [ 2.07871235]
+13:23:23 [RQ Bayes 0/2] Start. Branch 0
+14:33:9 [Evo (QML 2)] [QLE] Negative probability :                         	 	 probability =  -2.22044604925e-16
+14:33:10 [Evo (QML 2)] [QLE] Negative probability :                         	 	 probability =  -4.4408920985e-16
+14:37:35 [RQ Bayes 0/1] BF computed: A:0; B:1; BF:0.0 	Reset remormalisation record: False
+14:37:35 [RQ Bayes 0/1] Finished. rq time:  4459.170825719833
+14:50:44 [RQ Bayes 1/2] BF computed: A:1; B:2; BF:0.0 	Reset remormalisation record: False
+14:50:44 [RQ Bayes 1/2] Finished. rq time:  5255.195209980011
+14:55:24 [RQ Bayes 0/2] BF computed: A:0; B:2; BF:0.0 	Reset remormalisation record: False
+14:55:24 [RQ Bayes 0/2] Finished. rq time:  5522.038206100464
+14:55:24 [QMD 23] compareModelsWithinBranch 0 active_models_in_branch_old: [0.0, 1.0, 2.0] active_models_in_branch_new: [0, 1, 2]
+14:55:24 [QMD 23] [compareModelsWithinBranch 0] Point to 1 (comparison 0/1)
+14:55:24 [QMD 23] [compareModelsWithinBranch 0] Point to 2 (comparison 0/2)
+14:55:24 [QMD 23] [compareModelsWithinBranch 0] Point to 2 (comparison 1/2)
+14:55:24 [QMD 23] Model points for branch 0 {0: 0, 1: 1, 2: 2}
+14:55:24 [QMD 23] Champion of branch  0  is  zTi (2)
+14:55:24 [QMD 23] Spawning. Growth rule: two_qubit_ising_rotation_hyperfine_transverse. Depth: 1
+14:55:24 [QMD 23] After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None] 
+new models: ['xTiPPzTi', 'yTiPPzTi']
+14:55:24 [QMD 23] Branch 1 growth rule two_qubit_ising_rotation_hyperfine_transverse has 2 new models ['yTiPPzTi', 'xTiPPzTi']
+14:55:24 [DB] Model  yTiPPzTi  not previously considered -- adding. ID: 3
+14:55:24 [QMD 23] Model  yTiPPzTi 
+	computed already:  False 
+	ID: 3
+14:55:24 [DB] Model  xTiPPzTi  not previously considered -- adding. ID: 4
+14:55:24 [QMD 23] Model  xTiPPzTi 
+	computed already:  False 
+	ID: 4
+14:55:24 [QMD 23] Num models already computed on branch  1 = 0
+14:55:24 [QMD 23] Models to add to new branch ( 1 ):  ['xTiPPzTi', 'yTiPPzTi']
+14:55:24 [QMD 23] learnModelFromBranchID branch 1 : ['yTiPPzTi', 'xTiPPzTi']
+14:55:24 [QMD 23] learnModelFromBranchID. Setting active branches on redis for branch 1 to 0
+14:55:24 [QMD 23] branch 1 precomputed: []
+14:55:24 [QMD 23] Branch  1 has unlearned models: ['yTiPPzTi', 'xTiPPzTi']
+14:55:24 [QMD 23] Model  yTiPPzTi being passed to learnModel function
+14:55:24 [QMD 23] Model yTiPPzTi added to queue.
+14:55:24 [QMD 23] Model  xTiPPzTi being passed to learnModel function
+14:55:24 [QMD 23] Model xTiPPzTi added to queue.
+14:55:24 [QMD 23] learnModelFromBranchID finished, branch 1
+14:55:34 [QML 4] QML for  xTiPPzTi
+14:55:34 [QML 3] QML for  yTiPPzTi
+14:55:34 [QML 4] Getting prior for model: xTiPPzTi Specific terms: {}
+14:55:34 [QML 3] Getting prior for model: yTiPPzTi Specific terms: {}
+14:55:35 [QML 4] Initialization Ready
+14:55:35 [RQ Learn 4.0] Time to unpickle and initialise QML class: 1.0821809768676758
+14:55:35 [RQ Learn 4.0] Updating model.
+14:55:35 [QML 4] Experiment 0
+14:55:35 [QML 4] Initial time selected >  0.0839513391487
+14:55:35 [QML 3] Initialization Ready
+14:55:35 [RQ Learn 3.0] Time to unpickle and initialise QML class: 1.1453142166137695
+14:55:35 [RQ Learn 3.0] Updating model.
+14:55:35 [QML 3] Experiment 0
+14:55:35 [QML 3] Initial time selected >  0.156208226591
+15:0:45 [QML 4] Experiment 75
+15:0:57 [QML 3] Experiment 75
+15:5:58 [QML 4] Experiment 150
+15:6:11 [QML 3] Experiment 150
+15:8:55 [QML 4] Experiment 225
+15:9:8 [QML 3] Experiment 225
+15:11:48 [QML 4] Experiment 300
+15:12:1 [QML 3] Experiment 300
+15:14:26 [QML 4] Experiment 375
+15:14:43 [QML 3] Experiment 375
+15:17:6 [QML 4] Experiment 450
+15:17:24 [QML 3] Experiment 450
+15:19:46 [QML 4] Experiment 525
+15:20:6 [QML 3] Experiment 525
+15:22:26 [QML 4] Experiment 600
+15:23:6 [QML 3] Experiment 600
+15:27:23 [QML 4] Experiment 675
+15:28:23 [QML 3] Experiment 675
+15:32:48 [QML 4] Results for QHL on  xTiPPzTi
+15:32:48 [QML 4] Final time selected > 2.45
+15:32:48 [QML 4] Cumulative time.	 Datum: 1.2056632041931152 	 Update: 2229.161581993103
+15:32:48 [QML 4] Final Parameters mean and stdev (term  xTi ): [-0.53152986  0.25647356]
+15:32:48 [QML 4] Final Parameters mean and stdev (term  zTi ): [ 2.00686011  0.00926145]
+15:32:48 [RQ Learn 4.0] Time for update alone: 2232.8511040210724
+15:32:48 [RQ Learn 4.0] Redis learned_models_info added to db for model: 4.0
+15:32:48 [RQ Learn 4.0] Redis SET learned_models_ids: 4.0 ; set True
+15:32:48 [RQ Learn 4.0] Learned. rq time: 2234.174260854721
+15:33:52 [QML 3] Results for QHL on  yTiPPzTi
+15:33:52 [QML 3] Final time selected > 2.45
+15:33:52 [QML 3] Cumulative time.	 Datum: 1.2015571594238281 	 Update: 2292.9174926280975
+15:33:52 [QML 3] Final Parameters mean and stdev (term  yTi ): [ 5.05307242  0.09641289]
+15:33:52 [QML 3] Final Parameters mean and stdev (term  zTi ): [ 3.6963142   0.13476574]
+15:33:52 [RQ Learn 3.0] Time for update alone: 2296.566602230072
+15:33:52 [RQ Learn 3.0] Redis learned_models_info added to db for model: 3.0
+15:33:52 [RQ Learn 3.0] Redis SET learned_models_ids: 3.0 ; set True
+15:33:52 [QMD 23] All models on branch 1 have finished learning.
+15:33:52 [RQ Learn 3.0] Learned. rq time: 2298.1530878543854
+15:33:52[QML:Reduced 3; QMD 23] Updating learned info for model 3
+15:33:53[QML:Reduced 3; QMD 23] Updated learned info for model 3
+15:33:53[QML:Reduced 4; QMD 23] Updating learned info for model 4
+15:33:53[QML:Reduced 4; QMD 23] Updated learned info for model 4
+15:33:53 [QMD 23] remoteBayesFromBranchID 1 model id list: [3, 4]
+15:33:53 [QMD 23] Computing BF for pair 3,4
+15:33:53 [QMD 23] Bayes factor calculation queued. Model IDs 3 4
+15:34:4[QML:Bayes 3; QMD 23] Name: yTiPPzTi
+15:34:4[QML:Bayes 3; QMD 23] Time to unpickle updater: 0.037694454193115234
+15:34:4[QML:Bayes 3; QMD 23] Prior mean: [ 5.05307242  3.6963142 ]
+15:34:4[QML:Bayes 4; QMD 23] Name: xTiPPzTi
+15:34:4[QML:Bayes 4; QMD 23] Time to unpickle updater: 0.0946037769317627
+15:34:4[QML:Bayes 4; QMD 23] Prior mean: [-0.53152986  2.00686011]
+15:34:4 [RQ Bayes 3/4] Start. Branch 1
+16:28:29 [RQ Bayes 3/4] BF computed: A:3; B:4; BF:0.0 	Reset remormalisation record: False
+16:28:29 [RQ Bayes 3/4] Finished. rq time:  3265.5211114883423
+16:28:29 [QMD 23] compareModelsWithinBranch 1 active_models_in_branch_old: [3.0, 4.0] active_models_in_branch_new: [3, 4]
+16:28:29 [QMD 23] [compareModelsWithinBranch 1] Point to 4 (comparison 3/4)
+16:28:29 [QMD 23] Model points for branch 1 {3: 0, 4: 1}
+16:28:29 [QMD 23] Champion of branch  1  is  xTiPPzTi (4)
+16:28:29 [QMD 23] Spawning. Growth rule: two_qubit_ising_rotation_hyperfine_transverse. Depth: 2
+16:28:29 [QMD 23] After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None] 
+new models: ['xTiPPyTiPPzTi']
+16:28:29 [QMD 23] Branch 2 growth rule two_qubit_ising_rotation_hyperfine_transverse has 1 new models ['xTiPPyTiPPzTi']
+16:28:29 [DB] Model  xTiPPyTiPPzTi  not previously considered -- adding. ID: 5
+16:28:29 [QMD 23] Model  xTiPPyTiPPzTi 
+	computed already:  False 
+	ID: 5
+16:28:29 [QMD 23] Num models already computed on branch  2 = 0
+16:28:29 [QMD 23] Models to add to new branch ( 2 ):  ['xTiPPyTiPPzTi']
+16:28:29 [QMD 23] learnModelFromBranchID branch 2 : ['xTiPPyTiPPzTi']
+16:28:29 [QMD 23] learnModelFromBranchID. Setting active branches on redis for branch 2 to 0
+16:28:29 [QMD 23] branch 2 precomputed: []
+16:28:29 [QMD 23] Branch  2 has unlearned models: ['xTiPPyTiPPzTi']
+16:28:29 [QMD 23] Model  xTiPPyTiPPzTi being passed to learnModel function
+16:28:29 [QMD 23] Model xTiPPyTiPPzTi added to queue.
+16:28:29 [QMD 23] learnModelFromBranchID finished, branch 2
+16:28:39 [QML 5] QML for  xTiPPyTiPPzTi
+16:28:39 [QML 5] Getting prior for model: xTiPPyTiPPzTi Specific terms: {}
+16:28:40 [QML 5] Initialization Ready
+16:28:40 [RQ Learn 5.0] Time to unpickle and initialise QML class: 0.7796390056610107
+16:28:40 [RQ Learn 5.0] Updating model.
+16:28:40 [QML 5] Experiment 0
+16:28:40 [QML 5] Initial time selected >  0.620773319791
+16:31:5 [QML 5] Experiment 75
+16:34:7 [QML 5] Experiment 150
+16:39:33 [QML 5] Experiment 225
+16:45:6 [QML 5] Experiment 300
+16:50:43 [QML 5] Experiment 375
+16:54:30 [QML 5] Experiment 450
+16:57:5 [QML 5] Experiment 525
+16:59:40 [QML 5] Experiment 600
+17:4:49 [QML 5] Experiment 675
+17:10:24 [QML 5] Results for QHL on  xTiPPyTiPPzTi
+17:10:24 [QML 5] Final time selected > 2.45
+17:10:24 [QML 5] Cumulative time.	 Datum: 1.3420748710632324 	 Update: 2500.295970439911
+17:10:24 [QML 5] Final Parameters mean and stdev (term  xTi ): [-0.54903676  0.17511491]
+17:10:24 [QML 5] Final Parameters mean and stdev (term  yTi ): [ 5.32687381  0.12711906]
+17:10:24 [QML 5] Final Parameters mean and stdev (term  zTi ): [ 3.2789115   0.20140001]
+17:10:24 [RQ Learn 5.0] Time for update alone: 2504.801926136017
+17:10:25 [RQ Learn 5.0] Redis learned_models_info added to db for model: 5.0
+17:10:25 [RQ Learn 5.0] Redis SET learned_models_ids: 5.0 ; set True
+17:10:25 [QMD 23] All models on branch 2 have finished learning.
+17:10:25[QML:Reduced 5; QMD 23] Updating learned info for model 5
+17:10:25 [RQ Learn 5.0] Learned. rq time: 2505.8142099380493
+17:10:25[QML:Reduced 5; QMD 23] Updated learned info for model 5
+17:10:25 [QMD 23] remoteBayesFromBranchID 2 model id list: [5]
+17:10:25 [QMD 23] compareModelsWithinBranch 2 active_models_in_branch_old: [5.0] active_models_in_branch_new: [5]
+17:10:25 [QMD 23] Model points for branch 2 {5: 0}
+17:10:25 [QMD 23] Champion of branch  2  is  xTiPPyTiPPzTi (5)
+17:10:25 [QMD 23] Spawning. Growth rule: two_qubit_ising_rotation_hyperfine_transverse. Depth: 3
+17:10:25 [QMD 23] After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None] 
+new models: ['xTiPPyTiPPyTyPPzTi', 'xTiPPxTxPPyTiPPzTi', 'xTiPPyTiPPzTiPPzTz']
+17:10:25 [QMD 23] Branch 3 growth rule two_qubit_ising_rotation_hyperfine_transverse has 3 new models ['xTiPPxTxPPyTiPPzTi', 'xTiPPyTiPPzTiPPzTz', 'xTiPPyTiPPyTyPPzTi']
+17:10:25 [DB] Model  xTiPPxTxPPyTiPPzTi  not previously considered -- adding. ID: 6
+17:10:25 [QMD 23] Model  xTiPPxTxPPyTiPPzTi 
+	computed already:  False 
+	ID: 6
+17:10:25 [DB] Model  xTiPPyTiPPzTiPPzTz  not previously considered -- adding. ID: 7
+17:10:25 [QMD 23] Model  xTiPPyTiPPzTiPPzTz 
+	computed already:  False 
+	ID: 7
+17:10:25 [DB] Model  xTiPPyTiPPyTyPPzTi  not previously considered -- adding. ID: 8
+17:10:25 [QMD 23] Model  xTiPPyTiPPyTyPPzTi 
+	computed already:  False 
+	ID: 8
+17:10:25 [QMD 23] Num models already computed on branch  3 = 0
+17:10:25 [QMD 23] Models to add to new branch ( 3 ):  ['xTiPPyTiPPyTyPPzTi', 'xTiPPxTxPPyTiPPzTi', 'xTiPPyTiPPzTiPPzTz']
+17:10:25 [QMD 23] learnModelFromBranchID branch 3 : ['xTiPPxTxPPyTiPPzTi', 'xTiPPyTiPPzTiPPzTz', 'xTiPPyTiPPyTyPPzTi']
+17:10:25 [QMD 23] learnModelFromBranchID. Setting active branches on redis for branch 3 to 0
+17:10:25 [QMD 23] branch 3 precomputed: []
+17:10:25 [QMD 23] Branch  3 has unlearned models: ['xTiPPxTxPPyTiPPzTi', 'xTiPPyTiPPzTiPPzTz', 'xTiPPyTiPPyTyPPzTi']
+17:10:25 [QMD 23] Model  xTiPPxTxPPyTiPPzTi being passed to learnModel function
+17:10:25 [QMD 23] Model xTiPPxTxPPyTiPPzTi added to queue.
+17:10:25 [QMD 23] Model  xTiPPyTiPPzTiPPzTz being passed to learnModel function
+17:10:25 [QMD 23] Model xTiPPyTiPPzTiPPzTz added to queue.
+17:10:25 [QMD 23] Model  xTiPPyTiPPyTyPPzTi being passed to learnModel function
+17:10:25 [QMD 23] Model xTiPPyTiPPyTyPPzTi added to queue.
+17:10:25 [QMD 23] learnModelFromBranchID finished, branch 3
+17:10:36 [QML 8] QML for  xTiPPyTiPPyTyPPzTi
+17:10:36 [QML 7] QML for  xTiPPyTiPPzTiPPzTz
+17:10:36 [QML 6] QML for  xTiPPxTxPPyTiPPzTi
+17:10:36 [QML 8] Getting prior for model: xTiPPyTiPPyTyPPzTi Specific terms: {}
+17:10:36 [QML 7] Getting prior for model: xTiPPyTiPPzTiPPzTz Specific terms: {}
+17:10:36 [QML 6] Getting prior for model: xTiPPxTxPPyTiPPzTi Specific terms: {}
+17:10:37 [QML 8] Initialization Ready
+17:10:37 [RQ Learn 8.0] Time to unpickle and initialise QML class: 1.5353448390960693
+17:10:37 [RQ Learn 8.0] Updating model.
+17:10:37 [QML 8] Experiment 0
+17:10:37 [QML 8] Initial time selected >  0.115404258469
+17:10:37 [QML 7] Initialization Ready
+17:10:37 [RQ Learn 7.0] Time to unpickle and initialise QML class: 1.5550262928009033
+17:10:37 [RQ Learn 7.0] Updating model.
+17:10:37 [QML 7] Experiment 0
+17:10:37 [QML 7] Initial time selected >  0.111575648194
+17:10:38 [QML 6] Initialization Ready
+17:10:38 [RQ Learn 6.0] Time to unpickle and initialise QML class: 1.6334152221679688
+17:10:38 [RQ Learn 6.0] Updating model.
+17:10:38 [QML 6] Experiment 0
+17:10:38 [QML 6] Initial time selected >  0.070359592701
+17:15:37 [QML 8] Experiment 75
+17:15:49 [QML 6] Experiment 75
+17:15:52 [QML 7] Experiment 75
+17:20:41 [QML 8] Experiment 150
+17:21:9 [QML 6] Experiment 150
+17:21:12 [QML 7] Experiment 150
+17:24:48 [QML 8] Experiment 225
+17:25:7 [QML 6] Experiment 225
+17:25:8 [QML 7] Experiment 225
+17:27:21 [QML 8] Experiment 300
+17:27:44 [QML 6] Experiment 300
+17:27:48 [QML 7] Experiment 300
+17:29:58 [QML 8] Experiment 375
+17:30:21 [QML 6] Experiment 375
+17:30:32 [QML 7] Experiment 375
+17:32:42 [QML 8] Experiment 450
+17:33:0 [QML 6] Experiment 450
+17:33:18 [QML 7] Experiment 450
+17:35:31 [QML 8] Experiment 525
+17:35:38 [QML 6] Experiment 525
+17:36:10 [QML 7] Experiment 525
+17:38:17 [QML 6] Experiment 600
+17:38:24 [QML 8] Experiment 600
+17:39:15 [QML 7] Experiment 600
+17:41:21 [QML 6] Experiment 675
+17:41:34 [QML 8] Experiment 675
+17:42:15 [QML 7] Experiment 675
+17:44:6 [QML 6] Results for QHL on  xTiPPxTxPPyTiPPzTi
+17:44:6 [QML 6] Final time selected > 2.45
+17:44:6 [QML 6] Cumulative time.	 Datum: 1.143639326095581 	 Update: 2004.2920303344727
+17:44:6 [QML 6] Final Parameters mean and stdev (term  xTi ): [ 1.09366738  0.13119012]
+17:44:6 [QML 6] Final Parameters mean and stdev (term  xTx ): [ 1.17831585  0.15933398]
+17:44:6 [QML 6] Final Parameters mean and stdev (term  yTi ): [ 5.60466984  0.1026552 ]
+17:44:6 [QML 6] Final Parameters mean and stdev (term  zTi ): [ 2.4477899   0.22737333]
+17:44:6 [RQ Learn 6.0] Time for update alone: 2008.4367744922638
+17:44:6 [RQ Learn 6.0] Redis learned_models_info added to db for model: 6.0
+17:44:6 [RQ Learn 6.0] Redis SET learned_models_ids: 6.0 ; set True
+17:44:6 [RQ Learn 6.0] Learned. rq time: 2010.3499355316162
+17:44:18 [QML 8] Results for QHL on  xTiPPyTiPPyTyPPzTi
+17:44:18 [QML 8] Final time selected > 2.45
+17:44:18 [QML 8] Cumulative time.	 Datum: 1.1049115657806396 	 Update: 2015.927526473999
+17:44:18 [QML 8] Final Parameters mean and stdev (term  xTi ): [ 1.64716971  0.4959735 ]
+17:44:18 [QML 8] Final Parameters mean and stdev (term  yTi ): [-0.0099982   0.33284037]
+17:44:18 [QML 8] Final Parameters mean and stdev (term  yTy ): [ 5.8795861   0.32771644]
+17:44:18 [QML 8] Final Parameters mean and stdev (term  zTi ): [ 0.96071868  0.69348724]
+17:44:18 [RQ Learn 8.0] Time for update alone: 2020.1114201545715
+17:44:18 [RQ Learn 8.0] Redis learned_models_info added to db for model: 8.0
+17:44:18 [RQ Learn 8.0] Redis SET learned_models_ids: 8.0 ; set True
+17:44:18 [RQ Learn 8.0] Learned. rq time: 2021.9452159404755
+17:45:22 [QML 7] Results for QHL on  xTiPPyTiPPzTiPPzTz
+17:45:22 [QML 7] Final time selected > 2.45
+17:45:22 [QML 7] Cumulative time.	 Datum: 1.1149814128875732 	 Update: 2080.0131180286407
+17:45:22 [QML 7] Final Parameters mean and stdev (term  xTi ): [ 0.50741124  0.3903951 ]
+17:45:22 [QML 7] Final Parameters mean and stdev (term  yTi ): [ 5.99630538  0.07062258]
+17:45:22 [QML 7] Final Parameters mean and stdev (term  zTi ): [ 1.58135967  0.36619714]
+17:45:22 [QML 7] Final Parameters mean and stdev (term  zTz ): [-0.34853345  0.95924366]
+17:45:22 [RQ Learn 7.0] Time for update alone: 2084.1795835494995
+17:45:22 [RQ Learn 7.0] Redis learned_models_info added to db for model: 7.0
+17:45:22 [RQ Learn 7.0] Redis SET learned_models_ids: 7.0 ; set True
+17:45:22 [QMD 23] All models on branch 3 have finished learning.
+17:45:22 [RQ Learn 7.0] Learned. rq time: 2086.0121536254883
+17:45:22[QML:Reduced 6; QMD 23] Updating learned info for model 6
+17:45:22[QML:Reduced 6; QMD 23] Updated learned info for model 6
+17:45:22[QML:Reduced 7; QMD 23] Updating learned info for model 7
+17:45:22[QML:Reduced 7; QMD 23] Updated learned info for model 7
+17:45:22[QML:Reduced 8; QMD 23] Updating learned info for model 8
+17:45:23[QML:Reduced 8; QMD 23] Updated learned info for model 8
+17:45:23 [QMD 23] remoteBayesFromBranchID 3 model id list: [6, 7, 8]
+17:45:23 [QMD 23] Computing BF for pair 6,7
+17:45:23 [QMD 23] Bayes factor calculation queued. Model IDs 6 7
+17:45:23 [QMD 23] Computing BF for pair 6,8
+17:45:23 [QMD 23] Bayes factor calculation queued. Model IDs 6 8
+17:45:23 [QMD 23] Computing BF for pair 7,8
+17:45:23 [QMD 23] Bayes factor calculation queued. Model IDs 7 8
+17:45:35[QML:Bayes 6; QMD 23] Name: xTiPPxTxPPyTiPPzTi
+17:45:35[QML:Bayes 6; QMD 23] Name: xTiPPxTxPPyTiPPzTi
+17:45:35[QML:Bayes 6; QMD 23] Time to unpickle updater: 0.11791372299194336
+17:45:35[QML:Bayes 6; QMD 23] Prior mean: [ 1.09366738  1.17831585  5.60466984  2.4477899 ]
+17:45:35[QML:Bayes 6; QMD 23] Time to unpickle updater: 0.12133073806762695
+17:45:35[QML:Bayes 6; QMD 23] Prior mean: [ 1.09366738  1.17831585  5.60466984  2.4477899 ]
+17:45:36[QML:Bayes 7; QMD 23] Name: xTiPPyTiPPzTiPPzTz
+17:45:36[QML:Bayes 8; QMD 23] Name: xTiPPyTiPPyTyPPzTi
+17:45:36[QML:Bayes 7; QMD 23] Time to unpickle updater: 0.12802505493164062
+17:45:36[QML:Bayes 7; QMD 23] Prior mean: [ 0.50741124  5.99630538  1.58135967 -0.34853345]
+17:45:36 [RQ Bayes 6/7] Start. Branch 3
+17:45:36[QML:Bayes 8; QMD 23] Time to unpickle updater: 0.10017204284667969
+17:45:36[QML:Bayes 8; QMD 23] Prior mean: [ 1.64716971 -0.0099982   5.8795861   0.96071868]
+17:45:36 [RQ Bayes 6/8] Start. Branch 3
+17:45:36[QML:Bayes 7; QMD 23] Name: xTiPPyTiPPzTiPPzTz
+17:45:36[QML:Bayes 7; QMD 23] Time to unpickle updater: 0.19192147254943848
+17:45:36[QML:Bayes 7; QMD 23] Prior mean: [ 0.50741124  5.99630538  1.58135967 -0.34853345]
+17:45:37[QML:Bayes 8; QMD 23] Name: xTiPPyTiPPyTyPPzTi
+17:45:37[QML:Bayes 8; QMD 23] Time to unpickle updater: 0.07395148277282715
+17:45:37[QML:Bayes 8; QMD 23] Prior mean: [ 1.64716971 -0.0099982   5.8795861   0.96071868]
+17:45:37 [RQ Bayes 7/8] Start. Branch 3
+18:48:44 [RQ Bayes 6/8] BF computed: A:6; B:8; BF:0.0 	Reset remormalisation record: False
+18:48:44 [RQ Bayes 6/8] Finished. rq time:  3789.4900422096252
+18:48:50 [RQ Bayes 7/8] BF computed: A:7; B:8; BF:33.21 	Reset remormalisation record: False
+18:48:50 [RQ Bayes 7/8] Neither model much better.
+18:48:50 [RQ Bayes 7/8] Finished. rq time:  3794.6561255455017
+18:48:53 [RQ Bayes 6/7] BF computed: A:6; B:7; BF:0.0 	Reset remormalisation record: False
+18:48:53 [RQ Bayes 6/7] Finished. rq time:  3798.6320934295654
+18:48:53 [QMD 23] compareModelsWithinBranch 3 active_models_in_branch_old: [6.0, 7.0, 8.0] active_models_in_branch_new: [6, 7, 8]
+18:48:53 [QMD 23] [compareModelsWithinBranch 3] Point to 7 (comparison 6/7)
+18:48:53 [QMD 23] [compareModelsWithinBranch 3] Point to 8 (comparison 6/8)
+18:48:53 [QMD 23] [compareModelsWithinBranch 3] Point to 7 (comparison 7/8)
+18:48:53 [QMD 23] Model points for branch 3 {6: 0, 7: 2, 8: 1}
+18:48:53 [QMD 23] Champion of branch  3  is  xTiPPyTiPPzTiPPzTz (7)
+18:48:53 [QMD 23] Spawning. Growth rule: two_qubit_ising_rotation_hyperfine_transverse. Depth: 4
+18:48:53 [QMD 23] After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None] 
+new models: ['xTiPPxTxPPyTiPPzTiPPzTz', 'xTiPPyTiPPyTyPPzTiPPzTz']
+18:48:53 [QMD 23] Branch 4 growth rule two_qubit_ising_rotation_hyperfine_transverse has 2 new models ['xTiPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPzTiPPzTz']
+18:48:53 [DB] Model  xTiPPyTiPPyTyPPzTiPPzTz  not previously considered -- adding. ID: 9
+18:48:53 [QMD 23] Model  xTiPPyTiPPyTyPPzTiPPzTz 
+	computed already:  False 
+	ID: 9
+18:48:53 [DB] Model  xTiPPxTxPPyTiPPzTiPPzTz  not previously considered -- adding. ID: 10
+18:48:53 [QMD 23] Model  xTiPPxTxPPyTiPPzTiPPzTz 
+	computed already:  False 
+	ID: 10
+18:48:53 [QMD 23] Num models already computed on branch  4 = 0
+18:48:53 [QMD 23] Models to add to new branch ( 4 ):  ['xTiPPxTxPPyTiPPzTiPPzTz', 'xTiPPyTiPPyTyPPzTiPPzTz']
+18:48:53 [QMD 23] learnModelFromBranchID branch 4 : ['xTiPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPzTiPPzTz']
+18:48:53 [QMD 23] learnModelFromBranchID. Setting active branches on redis for branch 4 to 0
+18:48:53 [QMD 23] branch 4 precomputed: []
+18:48:53 [QMD 23] Branch  4 has unlearned models: ['xTiPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPzTiPPzTz']
+18:48:53 [QMD 23] Model  xTiPPyTiPPyTyPPzTiPPzTz being passed to learnModel function
+18:48:53 [QMD 23] Model xTiPPyTiPPyTyPPzTiPPzTz added to queue.
+18:48:53 [QMD 23] Model  xTiPPxTxPPyTiPPzTiPPzTz being passed to learnModel function
+18:48:53 [QMD 23] Model xTiPPxTxPPyTiPPzTiPPzTz added to queue.
+18:48:53 [QMD 23] learnModelFromBranchID finished, branch 4
+18:49:0 [QML 9] QML for  xTiPPyTiPPyTyPPzTiPPzTz
+18:49:0 [QML 10] QML for  xTiPPxTxPPyTiPPzTiPPzTz
+18:49:0 [QML 9] Getting prior for model: xTiPPyTiPPyTyPPzTiPPzTz Specific terms: {}
+18:49:0 [QML 10] Getting prior for model: xTiPPxTxPPyTiPPzTiPPzTz Specific terms: {}
+18:49:1 [QML 9] Initialization Ready
+18:49:1 [RQ Learn 9.0] Time to unpickle and initialise QML class: 0.9532701969146729
+18:49:1 [RQ Learn 9.0] Updating model.
+18:49:1 [QML 9] Experiment 0
+18:49:1 [QML 9] Initial time selected >  0.0783702335911
+18:49:1 [QML 10] Initialization Ready
+18:49:1 [RQ Learn 10.0] Time to unpickle and initialise QML class: 1.6497771739959717
+18:49:1 [RQ Learn 10.0] Updating model.
+18:49:1 [QML 10] Experiment 0
+18:49:1 [QML 10] Initial time selected >  0.0719335834071
+18:51:17 [QML 9] Experiment 75
+18:51:42 [QML 10] Experiment 75
+18:53:41 [QML 9] Experiment 150
+18:54:9 [QML 10] Experiment 150
+18:56:7 [QML 9] Experiment 225
+18:56:37 [QML 10] Experiment 225
+18:58:34 [QML 9] Experiment 300
+18:59:6 [QML 10] Experiment 300
+19:1:1 [QML 9] Experiment 375
+19:1:37 [QML 10] Experiment 375
+19:3:40 [QML 9] Experiment 450
+19:4:22 [QML 10] Experiment 450
+19:6:19 [QML 9] Experiment 525
+19:7:9 [QML 10] Experiment 525
+19:8:55 [QML 9] Experiment 600
+19:9:56 [QML 10] Experiment 600
+19:11:26 [QML 9] Experiment 675
+19:12:30 [QML 10] Experiment 675
+19:14:18 [QML 9] Results for QHL on  xTiPPyTiPPyTyPPzTiPPzTz
+19:14:18 [QML 9] Final time selected > 2.45
+19:14:18 [QML 9] Cumulative time.	 Datum: 0.8646748065948486 	 Update: 1513.966639995575
+19:14:18 [QML 9] Final Parameters mean and stdev (term  xTi ): [ 1.6640725   0.26295915]
+19:14:18 [QML 9] Final Parameters mean and stdev (term  yTi ): [ 2.57889454  1.68691964]
+19:14:18 [QML 9] Final Parameters mean and stdev (term  yTy ): [ 3.12091448  1.65374054]
+19:14:18 [QML 9] Final Parameters mean and stdev (term  zTi ): [ 2.3823876   0.43015978]
+19:14:18 [QML 9] Final Parameters mean and stdev (term  zTz ): [ 0.27348972  0.40036842]
+19:14:18 [RQ Learn 9.0] Time for update alone: 1517.508858680725
+19:14:19 [RQ Learn 9.0] Redis learned_models_info added to db for model: 9.0
+19:14:19 [RQ Learn 9.0] Redis SET learned_models_ids: 9.0 ; set True
+19:14:19 [RQ Learn 9.0] Learned. rq time: 1518.8069694042206
+19:15:1 [QML 10] Results for QHL on  xTiPPxTxPPyTiPPzTiPPzTz
+19:15:1 [QML 10] Final time selected > 2.45
+19:15:1 [QML 10] Cumulative time.	 Datum: 0.9410936832427979 	 Update: 1555.8941159248352
+19:15:1 [QML 10] Final Parameters mean and stdev (term  xTi ): [ 1.43591594  0.35633523]
+19:15:1 [QML 10] Final Parameters mean and stdev (term  xTx ): [ 0.7255438   0.53811906]
+19:15:1 [QML 10] Final Parameters mean and stdev (term  yTi ): [ 5.43562906  0.17346826]
+19:15:1 [QML 10] Final Parameters mean and stdev (term  zTi ): [ 0.37946558  0.1181012 ]
+19:15:1 [QML 10] Final Parameters mean and stdev (term  zTz ): [ 2.24542925  0.40035446]
+19:15:1 [RQ Learn 10.0] Time for update alone: 1559.6436414718628
+19:15:1 [RQ Learn 10.0] Redis learned_models_info added to db for model: 10.0
+19:15:1 [RQ Learn 10.0] Redis SET learned_models_ids: 10.0 ; set True
+19:15:1 [QMD 23] All models on branch 4 have finished learning.
+19:15:1[QML:Reduced 9; QMD 23] Updating learned info for model 9
+19:15:1 [RQ Learn 10.0] Learned. rq time: 1561.5891122817993
+19:15:1[QML:Reduced 9; QMD 23] Updated learned info for model 9
+19:15:1[QML:Reduced 10; QMD 23] Updating learned info for model 10
+19:15:2[QML:Reduced 10; QMD 23] Updated learned info for model 10
+19:15:2 [QMD 23] remoteBayesFromBranchID 4 model id list: [9, 10]
+19:15:2 [QMD 23] Computing BF for pair 9,10
+19:15:2 [QMD 23] Bayes factor calculation queued. Model IDs 9 10
+19:15:9[QML:Bayes 9; QMD 23] Name: xTiPPyTiPPyTyPPzTiPPzTz
+19:15:9[QML:Bayes 9; QMD 23] Time to unpickle updater: 0.03929591178894043
+19:15:9[QML:Bayes 9; QMD 23] Prior mean: [ 1.6640725   2.57889454  3.12091448  2.3823876   0.27348972]
+19:15:9[QML:Bayes 10; QMD 23] Name: xTiPPxTxPPyTiPPzTiPPzTz
+19:15:9[QML:Bayes 10; QMD 23] Time to unpickle updater: 0.03930187225341797
+19:15:9[QML:Bayes 10; QMD 23] Prior mean: [ 1.43591594  0.7255438   5.43562906  0.37946558  2.24542925]
+19:15:9 [RQ Bayes 9/10] Start. Branch 4
+20:13:26 [RQ Bayes 9/10] BF computed: A:9; B:10; BF:5986.56 	Reset remormalisation record: False
+20:13:26 [RQ Bayes 9/10] Finished. rq time:  3497.823328971863
+20:13:26 [QMD 23] compareModelsWithinBranch 4 active_models_in_branch_old: [9.0, 10.0] active_models_in_branch_new: [9, 10]
+20:13:26 [QMD 23] [compareModelsWithinBranch 4] Point to 9 (comparison 9/10)
+20:13:26 [QMD 23] Model points for branch 4 {9: 1, 10: 0}
+20:13:26 [QMD 23] Champion of branch  4  is  xTiPPyTiPPyTyPPzTiPPzTz (9)
+20:13:26 [QMD 23] Spawning. Growth rule: two_qubit_ising_rotation_hyperfine_transverse. Depth: 5
+20:13:26 [QMD 23] After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None] 
+new models: ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+20:13:26 [QMD 23] Branch 5 growth rule two_qubit_ising_rotation_hyperfine_transverse has 1 new models ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+20:13:26 [DB] Model  xTiPPxTxPPyTiPPyTyPPzTiPPzTz  not previously considered -- adding. ID: 11
+20:13:26 [QMD 23] Model  xTiPPxTxPPyTiPPyTyPPzTiPPzTz 
+	computed already:  False 
+	ID: 11
+20:13:26 [QMD 23] Num models already computed on branch  5 = 0
+20:13:26 [QMD 23] Models to add to new branch ( 5 ):  ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+20:13:26 [QMD 23] learnModelFromBranchID branch 5 : ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+20:13:26 [QMD 23] learnModelFromBranchID. Setting active branches on redis for branch 5 to 0
+20:13:26 [QMD 23] branch 5 precomputed: []
+20:13:26 [QMD 23] Branch  5 has unlearned models: ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+20:13:26 [QMD 23] Model  xTiPPxTxPPyTiPPyTyPPzTiPPzTz being passed to learnModel function
+20:13:26 [QMD 23] Model xTiPPxTxPPyTiPPyTyPPzTiPPzTz added to queue.
+20:13:26 [QMD 23] learnModelFromBranchID finished, branch 5
+20:13:33 [QML 11] QML for  xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+20:13:33 [QML 11] Getting prior for model: xTiPPxTxPPyTiPPyTyPPzTiPPzTz Specific terms: {}
+20:13:34 [QML 11] Initialization Ready
+20:13:34 [RQ Learn 11.0] Time to unpickle and initialise QML class: 1.030219316482544
+20:13:34 [RQ Learn 11.0] Updating model.
+20:13:34 [QML 11] Experiment 0
+20:13:34 [QML 11] Initial time selected >  0.0601246331507
+20:15:49 [QML 11] Experiment 75
+20:18:7 [QML 11] Experiment 150
+20:20:28 [QML 11] Experiment 225
+20:22:52 [QML 11] Experiment 300
+20:25:42 [QML 11] Experiment 375
+20:28:27 [QML 11] Experiment 450
+20:31:12 [QML 11] Experiment 525
+20:33:56 [QML 11] Experiment 600
+20:36:27 [QML 11] Experiment 675
+20:39:5 [QML 11] Results for QHL on  xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+20:39:5 [QML 11] Final time selected > 2.45
+20:39:5 [QML 11] Cumulative time.	 Datum: 0.8839943408966064 	 Update: 1527.6551501750946
+20:39:5 [QML 11] Final Parameters mean and stdev (term  xTi ): [ 0.52899829  0.17428102]
+20:39:5 [QML 11] Final Parameters mean and stdev (term  xTx ): [ 0.06481351  0.13646539]
+20:39:5 [QML 11] Final Parameters mean and stdev (term  yTi ): [ 5.6533965   0.12762603]
+20:39:5 [QML 11] Final Parameters mean and stdev (term  yTy ): [-0.00707231  0.04192875]
+20:39:5 [QML 11] Final Parameters mean and stdev (term  zTi ): [ 2.70740854  0.27499286]
+20:39:5 [QML 11] Final Parameters mean and stdev (term  zTz ): [ 0.43248048  0.06352963]
+20:39:5 [RQ Learn 11.0] Time for update alone: 1531.6078131198883
+20:39:6 [RQ Learn 11.0] Redis learned_models_info added to db for model: 11.0
+20:39:6 [RQ Learn 11.0] Redis SET learned_models_ids: 11.0 ; set True
+20:39:6 [QMD 23] All models on branch 5 have finished learning.
+20:39:6 [RQ Learn 11.0] Learned. rq time: 1532.9328541755676
+20:39:6[QML:Reduced 11; QMD 23] Updating learned info for model 11
+20:39:6[QML:Reduced 11; QMD 23] Updated learned info for model 11
+20:39:6 [QMD 23] remoteBayesFromBranchID 5 model id list: [11]
+20:39:6 [QMD 23] compareModelsWithinBranch 5 active_models_in_branch_old: [11.0] active_models_in_branch_new: [11]
+20:39:6 [QMD 23] Model points for branch 5 {11: 0}
+20:39:6 [QMD 23] Champion of branch  5  is  xTiPPxTxPPyTiPPyTyPPzTiPPzTz (11)
+20:39:6 [QMD 23] Spawning. Growth rule: two_qubit_ising_rotation_hyperfine_transverse. Depth: 6
+20:39:6 [QMD 23] After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None] 
+new models: ['xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz']
+20:39:6 [QMD 23] Branch 6 growth rule two_qubit_ising_rotation_hyperfine_transverse has 3 new models ['xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz']
+20:39:6 [DB] Model  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz  not previously considered -- adding. ID: 12
+20:39:6 [QMD 23] Model  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz 
+	computed already:  False 
+	ID: 12
+20:39:6 [DB] Model  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz  not previously considered -- adding. ID: 13
+20:39:6 [QMD 23] Model  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz 
+	computed already:  False 
+	ID: 13
+20:39:6 [DB] Model  xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz  not previously considered -- adding. ID: 14
+20:39:6 [QMD 23] Model  xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz 
+	computed already:  False 
+	ID: 14
+20:39:6 [QMD 23] Num models already computed on branch  6 = 0
+20:39:6 [QMD 23] Models to add to new branch ( 6 ):  ['xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz']
+20:39:6 [QMD 23] learnModelFromBranchID branch 6 : ['xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz']
+20:39:6 [QMD 23] learnModelFromBranchID. Setting active branches on redis for branch 6 to 0
+20:39:6 [QMD 23] branch 6 precomputed: []
+20:39:6 [QMD 23] Branch  6 has unlearned models: ['xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz']
+20:39:6 [QMD 23] Model  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz being passed to learnModel function
+20:39:6 [QMD 23] Model xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz added to queue.
+20:39:6 [QMD 23] Model  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz being passed to learnModel function
+20:39:6 [QMD 23] Model xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz added to queue.
+20:39:6 [QMD 23] Model  xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz being passed to learnModel function
+20:39:6 [QMD 23] Model xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz added to queue.
+20:39:6 [QMD 23] learnModelFromBranchID finished, branch 6
+20:39:13 [QML 12] QML for  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz
+20:39:13 [QML 14] QML for  xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz
+20:39:13 [QML 13] QML for  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz
+20:39:13 [QML 12] Getting prior for model: xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz Specific terms: {}
+20:39:13 [QML 13] Getting prior for model: xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz Specific terms: {}
+20:39:13 [QML 14] Getting prior for model: xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz Specific terms: {}
+20:39:15 [QML 12] Initialization Ready
+20:39:15 [RQ Learn 12.0] Time to unpickle and initialise QML class: 1.5372893810272217
+20:39:15 [QML 14] Initialization Ready
+20:39:15 [RQ Learn 12.0] Updating model.
+20:39:15 [RQ Learn 14.0] Time to unpickle and initialise QML class: 1.547224998474121
+20:39:15 [RQ Learn 14.0] Updating model.
+20:39:15 [QML 12] Experiment 0
+20:39:15 [QML 14] Experiment 0
+20:39:15 [QML 12] Initial time selected >  0.0498272521131
+20:39:15 [QML 14] Initial time selected >  0.0713400682845
+20:39:15 [QML 13] Initialization Ready
+20:39:15 [RQ Learn 13.0] Time to unpickle and initialise QML class: 1.64693284034729
+20:39:15 [RQ Learn 13.0] Updating model.
+20:39:15 [QML 13] Experiment 0
+20:39:15 [QML 13] Initial time selected >  0.0356466970519
+20:41:40 [QML 14] Experiment 75
+20:41:42 [QML 13] Experiment 75
+20:41:44 [QML 12] Experiment 75
+20:44:4 [QML 14] Experiment 150
+20:44:8 [QML 13] Experiment 150
+20:44:14 [QML 12] Experiment 150
+20:46:31 [QML 14] Experiment 225
+20:46:38 [QML 13] Experiment 225
+20:46:42 [QML 12] Experiment 225
+20:48:58 [QML 14] Experiment 300
+20:49:6 [QML 13] Experiment 300
+20:49:8 [QML 12] Experiment 300
+20:51:36 [QML 14] Experiment 375
+20:51:36 [QML 12] Experiment 375
+20:51:45 [QML 13] Experiment 375
+20:55:24 [QML 14] Experiment 450
+20:55:30 [QML 12] Experiment 450
+20:55:48 [QML 13] Experiment 450
+21:0:59 [QML 14] Experiment 525
+21:1:12 [QML 12] Experiment 525
+21:1:31 [QML 13] Experiment 525
+21:6:2 [QML 14] Experiment 600
+21:6:21 [QML 12] Experiment 600
+21:6:40 [QML 13] Experiment 600
+21:10:19 [QML 14] Experiment 675
+21:10:33 [QML 12] Experiment 675
+21:10:42 [QML 13] Experiment 675
+21:12:59 [QML 14] Results for QHL on  xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz
+21:12:59 [QML 14] Final time selected > 2.45
+21:12:59 [QML 14] Cumulative time.	 Datum: 1.1040024757385254 	 Update: 2018.7972948551178
+21:12:59 [QML 14] Final Parameters mean and stdev (term  xTi ): [ 1.11458009  0.09804558]
+21:12:59 [QML 14] Final Parameters mean and stdev (term  xTx ): [ 2.10782237  0.45426451]
+21:12:59 [QML 14] Final Parameters mean and stdev (term  xTy ): [ 5.53679565  0.17000818]
+21:12:59 [QML 14] Final Parameters mean and stdev (term  yTi ): [ 5.05307336  0.14774174]
+21:12:59 [QML 14] Final Parameters mean and stdev (term  yTy ): [ 0.31676797  0.14115887]
+21:12:59 [QML 14] Final Parameters mean and stdev (term  zTi ): [ 1.46357179  0.12160922]
+21:12:59 [QML 14] Final Parameters mean and stdev (term  zTz ): [ 2.4364446   0.07324008]
+21:12:59 [RQ Learn 14.0] Time for update alone: 2024.5071647167206
+21:13:0 [RQ Learn 14.0] Redis learned_models_info added to db for model: 14.0
+21:13:0 [RQ Learn 14.0] Redis SET learned_models_ids: 14.0 ; set True
+21:13:0 [RQ Learn 14.0] Learned. rq time: 2026.3291058540344
+21:13:17 [QML 12] Results for QHL on  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz
+21:13:17 [QML 12] Final time selected > 2.45
+21:13:17 [QML 12] Cumulative time.	 Datum: 1.1257710456848145 	 Update: 2035.9022097587585
+21:13:17 [QML 12] Final Parameters mean and stdev (term  xTi ): [ 2.58419378  0.1958862 ]
+21:13:17 [QML 12] Final Parameters mean and stdev (term  xTx ): [ 3.15294366  0.6537988 ]
+21:13:17 [QML 12] Final Parameters mean and stdev (term  yTi ): [ 1.56996181  0.38887518]
+21:13:17 [QML 12] Final Parameters mean and stdev (term  yTy ): [ 4.14615164  0.31632066]
+21:13:17 [QML 12] Final Parameters mean and stdev (term  yTz ): [ 3.73415053  0.36531045]
+21:13:17 [QML 12] Final Parameters mean and stdev (term  zTi ): [ 0.3869575   0.31600136]
+21:13:17 [QML 12] Final Parameters mean and stdev (term  zTz ): [-0.03636511  0.0353135 ]
+21:13:17 [RQ Learn 12.0] Time for update alone: 2041.6707246303558
+21:13:17 [RQ Learn 12.0] Redis learned_models_info added to db for model: 12.0
+21:13:17 [RQ Learn 12.0] Redis SET learned_models_ids: 12.0 ; set True
+21:13:17 [RQ Learn 12.0] Learned. rq time: 2043.4850914478302
+21:13:34 [QML 13] Results for QHL on  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz
+21:13:34 [QML 13] Final time selected > 2.45
+21:13:34 [QML 13] Cumulative time.	 Datum: 1.1253955364227295 	 Update: 2053.7208955287933
+21:13:34 [QML 13] Final Parameters mean and stdev (term  xTi ): [ 5.77277268  0.57959039]
+21:13:34 [QML 13] Final Parameters mean and stdev (term  xTx ): [ 1.55917835  0.60849949]
+21:13:34 [QML 13] Final Parameters mean and stdev (term  xTz ): [ 6.55338921  0.66165403]
+21:13:34 [QML 13] Final Parameters mean and stdev (term  yTi ): [ 6.18148851  0.09815023]
+21:13:34 [QML 13] Final Parameters mean and stdev (term  yTy ): [-1.28191629  0.38020632]
+21:13:34 [QML 13] Final Parameters mean and stdev (term  zTi ): [ 2.94446944  0.55733033]
+21:13:34 [QML 13] Final Parameters mean and stdev (term  zTz ): [ 4.54442712  0.45217566]
+21:13:34 [RQ Learn 13.0] Time for update alone: 2059.500282049179
+21:13:35 [RQ Learn 13.0] Redis learned_models_info added to db for model: 13.0
+21:13:35 [RQ Learn 13.0] Redis SET learned_models_ids: 13.0 ; set True
+21:13:35 [QMD 23] All models on branch 6 have finished learning.
+21:13:35 [RQ Learn 13.0] Learned. rq time: 2061.6278195381165
+21:13:35[QML:Reduced 12; QMD 23] Updating learned info for model 12
+21:13:35[QML:Reduced 12; QMD 23] Updated learned info for model 12
+21:13:35[QML:Reduced 13; QMD 23] Updating learned info for model 13
+21:13:36[QML:Reduced 13; QMD 23] Updated learned info for model 13
+21:13:36[QML:Reduced 14; QMD 23] Updating learned info for model 14
+21:13:36[QML:Reduced 14; QMD 23] Updated learned info for model 14
+21:13:36 [QMD 23] remoteBayesFromBranchID 6 model id list: [12, 13, 14]
+21:13:36 [QMD 23] Computing BF for pair 12,13
+21:13:36 [QMD 23] Bayes factor calculation queued. Model IDs 12 13
+21:13:36 [QMD 23] Computing BF for pair 12,14
+21:13:36 [QMD 23] Bayes factor calculation queued. Model IDs 12 14
+21:13:36 [QMD 23] Computing BF for pair 13,14
+21:13:36 [QMD 23] Bayes factor calculation queued. Model IDs 13 14
+21:13:47[QML:Bayes 12; QMD 23] Name: xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz
+21:13:47[QML:Bayes 13; QMD 23] Name: xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz
+21:13:47[QML:Bayes 13; QMD 23] Time to unpickle updater: 0.037650108337402344
+21:13:47[QML:Bayes 13; QMD 23] Prior mean: [ 5.77277268  1.55917835  6.55338921  6.18148851 -1.28191629  2.94446944
+  4.54442712]
+21:13:47[QML:Bayes 12; QMD 23] Time to unpickle updater: 0.03781557083129883
+21:13:47[QML:Bayes 12; QMD 23] Prior mean: [ 2.58419378  3.15294366  1.56996181  4.14615164  3.73415053  0.3869575
+ -0.03636511]
+21:13:47[QML:Bayes 13; QMD 23] Name: xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz
+21:13:47[QML:Bayes 14; QMD 23] Name: xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz
+21:13:47[QML:Bayes 13; QMD 23] Time to unpickle updater: 0.06614255905151367
+21:13:47[QML:Bayes 13; QMD 23] Prior mean: [ 5.77277268  1.55917835  6.55338921  6.18148851 -1.28191629  2.94446944
+  4.54442712]
+21:13:47 [RQ Bayes 12/13] Start. Branch 6
+21:13:47[QML:Bayes 14; QMD 23] Time to unpickle updater: 0.07024645805358887
+21:13:47[QML:Bayes 14; QMD 23] Prior mean: [ 1.11458009  2.10782237  5.53679565  5.05307336  0.31676797  1.46357179
+  2.4364446 ]
+21:13:47 [RQ Bayes 13/14] Start. Branch 6
+21:13:49[QML:Bayes 12; QMD 23] Name: xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz
+21:13:49[QML:Bayes 12; QMD 23] Time to unpickle updater: 0.0975804328918457
+21:13:49[QML:Bayes 12; QMD 23] Prior mean: [ 2.58419378  3.15294366  1.56996181  4.14615164  3.73415053  0.3869575
+ -0.03636511]
+21:13:49[QML:Bayes 14; QMD 23] Name: xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz
+21:13:49[QML:Bayes 14; QMD 23] Time to unpickle updater: 0.07480621337890625
+21:13:49[QML:Bayes 14; QMD 23] Prior mean: [ 1.11458009  2.10782237  5.53679565  5.05307336  0.31676797  1.46357179
+  2.4364446 ]
+21:13:49 [RQ Bayes 12/14] Start. Branch 6
+22:15:18 [RQ Bayes 12/13] BF computed: A:12; B:13; BF:6.098133428278921e+25 	Reset remormalisation record: False
+22:15:18 [RQ Bayes 12/13] Finished. rq time:  3691.5103266239166
+22:15:36 [RQ Bayes 13/14] BF computed: A:13; B:14; BF:2214649.76 	Reset remormalisation record: False
+22:15:36 [RQ Bayes 13/14] Finished. rq time:  3709.277871131897
+22:17:41 [RQ Bayes 12/14] BF computed: A:12; B:14; BF:6.385913317867001e+42 	Reset remormalisation record: False
+22:17:41 [RQ Bayes 12/14] Finished. rq time:  3833.183940887451
+22:17:41 [QMD 23] compareModelsWithinBranch 6 active_models_in_branch_old: [12.0, 13.0, 14.0] active_models_in_branch_new: [12, 13, 14]
+22:17:41 [QMD 23] [compareModelsWithinBranch 6] Point to 12 (comparison 12/13)
+22:17:41 [QMD 23] [compareModelsWithinBranch 6] Point to 12 (comparison 12/14)
+22:17:41 [QMD 23] [compareModelsWithinBranch 6] Point to 13 (comparison 13/14)
+22:17:41 [QMD 23] Model points for branch 6 {12: 2, 13: 1, 14: 0}
+22:17:41 [QMD 23] Champion of branch  6  is  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz (12)
+22:17:41 [QMD 23] Spawning. Growth rule: two_qubit_ising_rotation_hyperfine_transverse. Depth: 7
+22:17:41 [QMD 23] After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None] 
+new models: ['xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz']
+22:17:41 [QMD 23] Branch 7 growth rule two_qubit_ising_rotation_hyperfine_transverse has 2 new models ['xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+22:17:41 [DB] Model  xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz  not previously considered -- adding. ID: 15
+22:17:41 [QMD 23] Model  xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz 
+	computed already:  False 
+	ID: 15
+22:17:41 [DB] Model  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz  not previously considered -- adding. ID: 16
+22:17:41 [QMD 23] Model  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz 
+	computed already:  False 
+	ID: 16
+22:17:41 [QMD 23] Num models already computed on branch  7 = 0
+22:17:41 [QMD 23] Models to add to new branch ( 7 ):  ['xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz']
+22:17:41 [QMD 23] learnModelFromBranchID branch 7 : ['xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+22:17:41 [QMD 23] learnModelFromBranchID. Setting active branches on redis for branch 7 to 0
+22:17:41 [QMD 23] branch 7 precomputed: []
+22:17:41 [QMD 23] Branch  7 has unlearned models: ['xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+22:17:41 [QMD 23] Model  xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz being passed to learnModel function
+22:17:41 [QMD 23] Model xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz added to queue.
+22:17:41 [QMD 23] Model  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz being passed to learnModel function
+22:17:41 [QMD 23] Model xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz added to queue.
+22:17:41 [QMD 23] learnModelFromBranchID finished, branch 7
+22:17:47 [QML 15] QML for  xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz
+22:17:48 [QML 15] Getting prior for model: xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz Specific terms: {}
+22:17:49 [QML 15] Initialization Ready
+22:17:49 [RQ Learn 15.0] Time to unpickle and initialise QML class: 1.636620044708252
+22:17:49 [RQ Learn 15.0] Updating model.
+22:17:49 [QML 15] Experiment 0
+22:17:49 [QML 15] Initial time selected >  0.0487852933095
+22:17:50 [QML 16] QML for  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+22:17:50 [QML 16] Getting prior for model: xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz Specific terms: {}
+22:17:52 [QML 16] Initialization Ready
+22:17:52 [RQ Learn 16.0] Time to unpickle and initialise QML class: 1.8010690212249756
+22:17:52 [RQ Learn 16.0] Updating model.
+22:17:52 [QML 16] Experiment 0
+22:17:52 [QML 16] Initial time selected >  0.047474207191
+22:20:7 [QML 15] Experiment 75
+22:20:36 [QML 16] Experiment 75
+22:22:26 [QML 15] Experiment 150
+22:23:16 [QML 16] Experiment 150
+22:24:45 [QML 15] Experiment 225
+22:25:58 [QML 16] Experiment 225
+22:27:3 [QML 15] Experiment 300
+22:28:36 [QML 16] Experiment 300
+22:29:21 [QML 15] Experiment 375
+22:31:11 [QML 16] Experiment 375
+22:32:0 [QML 15] Experiment 450
+22:33:57 [QML 16] Experiment 450
+22:34:48 [QML 15] Experiment 525
+22:36:39 [QML 16] Experiment 525
+22:37:38 [QML 15] Experiment 600
+22:39:20 [QML 16] Experiment 600
+22:40:23 [QML 15] Experiment 675
+22:41:59 [QML 16] Experiment 675
+22:43:11 [QML 15] Results for QHL on  xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz
+22:43:11 [QML 15] Final time selected > 2.45
+22:43:11 [QML 15] Cumulative time.	 Datum: 0.9120187759399414 	 Update: 1516.552346944809
+22:43:11 [QML 15] Final Parameters mean and stdev (term  xTi ): [ 2.49027072  0.6107953 ]
+22:43:11 [QML 15] Final Parameters mean and stdev (term  xTx ): [ 9.16059867  1.20134783]
+22:43:11 [QML 15] Final Parameters mean and stdev (term  xTy ): [ 7.70085897  1.5083238 ]
+22:43:11 [QML 15] Final Parameters mean and stdev (term  yTi ): [ 3.27688822  1.32733087]
+22:43:11 [QML 15] Final Parameters mean and stdev (term  yTy ): [-0.00493155  0.33856527]
+22:43:11 [QML 15] Final Parameters mean and stdev (term  yTz ): [ 5.33543333  0.45740723]
+22:43:11 [QML 15] Final Parameters mean and stdev (term  zTi ): [ 0.55696302  1.17885131]
+22:43:11 [QML 15] Final Parameters mean and stdev (term  zTz ): [ 3.31441924  0.39747743]
+22:43:11 [RQ Learn 15.0] Time for update alone: 1521.6053850650787
+22:43:11 [RQ Learn 15.0] Redis learned_models_info added to db for model: 15.0
+22:43:11 [RQ Learn 15.0] Redis SET learned_models_ids: 15.0 ; set True
+22:43:11 [RQ Learn 15.0] Learned. rq time: 1523.5137972831726
+22:44:40 [QML 16] Results for QHL on  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+22:44:40 [QML 16] Final time selected > 2.45
+22:44:40 [QML 16] Cumulative time.	 Datum: 0.9821834564208984 	 Update: 1603.2231078147888
+22:44:40 [QML 16] Final Parameters mean and stdev (term  xTi ): [ 0.27795131  0.32274507]
+22:44:40 [QML 16] Final Parameters mean and stdev (term  xTx ): [ 7.65980562  0.41489019]
+22:44:40 [QML 16] Final Parameters mean and stdev (term  xTz ): [ 6.8563637  0.188564 ]
+22:44:40 [QML 16] Final Parameters mean and stdev (term  yTi ): [ 3.98017199  0.42951919]
+22:44:40 [QML 16] Final Parameters mean and stdev (term  yTy ): [ 4.51071963  0.24237276]
+22:44:40 [QML 16] Final Parameters mean and stdev (term  yTz ): [ 6.34809761  0.31689316]
+22:44:40 [QML 16] Final Parameters mean and stdev (term  zTi ): [-0.10236294  0.22280407]
+22:44:40 [QML 16] Final Parameters mean and stdev (term  zTz ): [-0.02569577  0.0559185 ]
+22:44:40 [RQ Learn 16.0] Time for update alone: 1608.7733931541443
+22:44:41 [RQ Learn 16.0] Redis learned_models_info added to db for model: 16.0
+22:44:41 [RQ Learn 16.0] Redis SET learned_models_ids: 16.0 ; set True
+22:44:41 [QMD 23] All models on branch 7 have finished learning.
+22:44:41 [RQ Learn 16.0] Learned. rq time: 1610.87167429924
+22:44:41[QML:Reduced 15; QMD 23] Updating learned info for model 15
+22:44:41[QML:Reduced 15; QMD 23] Updated learned info for model 15
+22:44:41[QML:Reduced 16; QMD 23] Updating learned info for model 16
+22:44:41[QML:Reduced 16; QMD 23] Updated learned info for model 16
+22:44:41 [QMD 23] remoteBayesFromBranchID 7 model id list: [15, 16]
+22:44:41 [QMD 23] Computing BF for pair 15,16
+22:44:41 [QMD 23] Bayes factor calculation queued. Model IDs 15 16
+22:44:50[QML:Bayes 15; QMD 23] Name: xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz
+22:44:50[QML:Bayes 15; QMD 23] Time to unpickle updater: 0.037004709243774414
+22:44:50[QML:Bayes 15; QMD 23] Prior mean: [  2.49027072e+00   9.16059867e+00   7.70085897e+00   3.27688822e+00
+  -4.93155093e-03   5.33543333e+00   5.56963021e-01   3.31441924e+00]
+22:44:50[QML:Bayes 16; QMD 23] Name: xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+22:44:51[QML:Bayes 16; QMD 23] Time to unpickle updater: 0.03606891632080078
+22:44:51[QML:Bayes 16; QMD 23] Prior mean: [ 0.27795131  7.65980562  6.8563637   3.98017199  4.51071963  6.34809761
+ -0.10236294 -0.02569577]
+22:44:51 [RQ Bayes 15/16] Start. Branch 7
+23:39:37 [RQ Bayes 15/16] BF computed: A:15; B:16; BF:0.0 	Reset remormalisation record: False
+23:39:37 [RQ Bayes 15/16] Finished. rq time:  3286.4891765117645
+23:39:37 [QMD 23] compareModelsWithinBranch 7 active_models_in_branch_old: [15.0, 16.0] active_models_in_branch_new: [15, 16]
+23:39:37 [QMD 23] [compareModelsWithinBranch 7] Point to 16 (comparison 15/16)
+23:39:37 [QMD 23] Model points for branch 7 {15: 0, 16: 1}
+23:39:37 [QMD 23] Champion of branch  7  is  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz (16)
+23:39:37 [QMD 23] Spawning. Growth rule: two_qubit_ising_rotation_hyperfine_transverse. Depth: 8
+23:39:37 [QMD 23] After model generation for growth rule two_qubit_ising_rotation_hyperfine_transverse SPAWN STAGE: [None] 
+new models: ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+23:39:37 [QMD 23] Branch 8 growth rule two_qubit_ising_rotation_hyperfine_transverse has 1 new models ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+23:39:37 [DB] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz  not previously considered -- adding. ID: 17
+23:39:37 [QMD 23] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz 
+	computed already:  False 
+	ID: 17
+23:39:37 [QMD 23] Num models already computed on branch  8 = 0
+23:39:37 [QMD 23] Models to add to new branch ( 8 ):  ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+23:39:37 [QMD 23] learnModelFromBranchID branch 8 : ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+23:39:37 [QMD 23] learnModelFromBranchID. Setting active branches on redis for branch 8 to 0
+23:39:37 [QMD 23] branch 8 precomputed: []
+23:39:37 [QMD 23] Branch  8 has unlearned models: ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+23:39:37 [QMD 23] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz being passed to learnModel function
+23:39:37 [QMD 23] Model xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz added to queue.
+23:39:37 [QMD 23] learnModelFromBranchID finished, branch 8
+23:39:37 [QMD 23] All trees have completed. Num complete: 1
+23:39:43 [QML 17] QML for  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+23:39:43 [QML 17] Getting prior for model: xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz Specific terms: {}
+23:39:44 [QML 17] Initialization Ready
+23:39:44 [RQ Learn 17.0] Time to unpickle and initialise QML class: 1.3932812213897705
+23:39:44 [RQ Learn 17.0] Updating model.
+23:39:44 [QML 17] Experiment 0
+23:39:44 [QML 17] Initial time selected >  0.0469689183525
+23:41:57 [QML 17] Experiment 75
+23:44:12 [QML 17] Experiment 150
+23:46:27 [QML 17] Experiment 225
+23:48:43 [QML 17] Experiment 300
+23:51:10 [QML 17] Experiment 375
+23:53:49 [QML 17] Experiment 450
+23:56:38 [QML 17] Experiment 525
+0:1:30 [QML 17] Experiment 600
+0:7:5 [QML 17] Experiment 675
+0:12:46 [QML 17] Results for QHL on  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+0:12:46 [QML 17] Final time selected > 2.45
+0:12:46 [QML 17] Cumulative time.	 Datum: 1.1556103229522705 	 Update: 1974.8198325634003
+0:12:46 [QML 17] Final Parameters mean and stdev (term  xTi ): [ 3.32818031  1.20474435]
+0:12:46 [QML 17] Final Parameters mean and stdev (term  xTx ): [ 7.71096934  1.48993606]
+0:12:46 [QML 17] Final Parameters mean and stdev (term  xTy ): [ 0.80827565  1.89423786]
+0:12:46 [QML 17] Final Parameters mean and stdev (term  xTz ): [ 2.65065572  1.19543381]
+0:12:46 [QML 17] Final Parameters mean and stdev (term  yTi ): [ 9.2506883   1.15951865]
+0:12:46 [QML 17] Final Parameters mean and stdev (term  yTy ): [-0.36445522  1.06019888]
+0:12:46 [QML 17] Final Parameters mean and stdev (term  yTz ): [ 5.68738205  0.35655055]
+0:12:46 [QML 17] Final Parameters mean and stdev (term  zTi ): [ 1.51291074  0.70004361]
+0:12:46 [QML 17] Final Parameters mean and stdev (term  zTz ): [ 2.1696735   0.69849173]
+0:12:46 [RQ Learn 17.0] Time for update alone: 1981.7938113212585
+0:12:47 [RQ Learn 17.0] Redis learned_models_info added to db for model: 17.0
+0:12:47 [RQ Learn 17.0] Redis SET learned_models_ids: 17.0 ; set True
+0:12:47 [QMD 23] remoteBayesFromBranchID 8 model id list: [17]
+0:12:47 [RQ Learn 17.0] Learned. rq time: 1983.8621656894684
+0:12:47 [QMD 23] compareModelsWithinBranch 8 active_models_in_branch_old: [17.0] active_models_in_branch_new: [17]
+0:12:47 [QMD 23] Model points for branch 8 {17: 0}
+0:12:47 [QMD 23] Champion of branch  8  is  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz (17)
+0:12:47 [QMD 23] Active branch champs at start of final Bayes comp: [2, 4, 5, 7, 9, 11, 12, 16, 17]
+0:12:47 [QMD 23] Model 2 doesn't have a parent to compare with.
+0:12:47 [QMD 23] Bayes factor calculation queued. Model IDs 2 4
+0:12:47 [QMD 23] Comparing child  4 with parent 2
+0:12:47 [QMD 23] Bayes factor calculation queued. Model IDs 4 5
+0:12:47 [QMD 23] Comparing child  5 with parent 4
+0:12:47 [QMD 23] Bayes factor calculation queued. Model IDs 5 7
+0:12:47 [QMD 23] Comparing child  7 with parent 5
+0:12:47 [QMD 23] Bayes factor calculation queued. Model IDs 7 9
+0:12:47 [QMD 23] Comparing child  9 with parent 7
+0:12:47 [QMD 23] Bayes factor calculation queued. Model IDs 9 11
+0:12:47 [QMD 23] Comparing child  11 with parent 9
+0:12:47 [QMD 23] Bayes factor calculation queued. Model IDs 11 12
+0:12:47 [QMD 23] Comparing child  12 with parent 11
+0:12:47 [QMD 23] Bayes factor calculation queued. Model IDs 12 16
+0:12:47 [QMD 23] Comparing child  16 with parent 12
+0:12:47 [QMD 23] Bayes factor calculation queued. Model IDs 16 17
+0:12:47 [QMD 23] Comparing child  17 with parent 16
+0:12:47 [QMD 23] Final Bayes Comparisons. 
+Entering while loop in final bayes fnc. 
+active branch champs:  [2, 4, 5, 7, 9, 11, 12, 16, 17]
+0:12:47 [QMD 23] Waiting on parent/child Bayes factors.
+0:12:47 [QMD 23] Waiting on parent/child Bayes factors.
+0:12:58[QML:Bayes 4; QMD 23] Name: xTiPPzTi
+0:12:58[QML:Bayes 2; QMD 23] Name: zTi
+0:12:58[QML:Bayes 7; QMD 23] Name: xTiPPyTiPPzTiPPzTz
+0:12:58[QML:Bayes 4; QMD 23] Time to reconstruct updater: 0.001287698745727539
+0:12:58[QML:Bayes 4; QMD 23] Prior mean: [-0.53025272  2.00699268]
+0:12:58[QML:Bayes 11; QMD 23] Name: xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+0:12:58[QML:Bayes 7; QMD 23] Time to reconstruct updater: 0.0016870498657226562
+0:12:58[QML:Bayes 7; QMD 23] Prior mean: [ 0.50914343  5.99683     1.58052744 -0.35191109]
+0:12:58[QML:Bayes 2; QMD 23] Time to reconstruct updater: 0.0009658336639404297
+0:12:58[QML:Bayes 2; QMD 23] Prior mean: [ 2.07860138]
+0:12:58[QML:Bayes 11; QMD 23] Time to reconstruct updater: 0.004851102828979492
+0:12:58[QML:Bayes 11; QMD 23] Prior mean: [  5.30113061e-01   6.65079752e-02   5.65318489e+00  -5.49316145e-03
+   2.70772465e+00   4.31714699e-01]
+0:12:59[QML:Bayes 5; QMD 23] Name: xTiPPyTiPPzTi
+0:12:59[QML:Bayes 5; QMD 23] Time to reconstruct updater: 0.0029380321502685547
+0:12:59[QML:Bayes 5; QMD 23] Prior mean: [-0.54989651  5.32989396  3.27354894]
+0:12:59 [RQ Bayes 4/5] Start. Branch None
+0:12:59[QML:Bayes 4; QMD 23] Name: xTiPPzTi
+0:12:59[QML:Bayes 9; QMD 23] Name: xTiPPyTiPPyTyPPzTiPPzTz
+0:12:59[QML:Bayes 4; QMD 23] Time to reconstruct updater: 0.0025053024291992188
+0:12:59[QML:Bayes 4; QMD 23] Prior mean: [-0.52616397  2.00646274]
+0:12:59 [RQ Bayes 2/4] Start. Branch None
+0:12:59[QML:Bayes 9; QMD 23] Time to reconstruct updater: 0.0035352706909179688
+0:12:59[QML:Bayes 9; QMD 23] Prior mean: [ 1.66506722  2.55682584  3.14468703  2.38226776  0.26546103]
+0:12:59 [RQ Bayes 7/9] Start. Branch None
+0:12:59[QML:Bayes 9; QMD 23] Name: xTiPPyTiPPyTyPPzTiPPzTz
+0:12:59[QML:Bayes 12; QMD 23] Name: xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz
+0:12:59[QML:Bayes 9; QMD 23] Time to reconstruct updater: 0.004736900329589844
+0:12:59[QML:Bayes 9; QMD 23] Prior mean: [ 1.66442225  2.56521792  3.13582772  2.37500988  0.27767903]
+0:12:59[QML:Bayes 12; QMD 23] Time to reconstruct updater: 0.004619121551513672
+0:12:59[QML:Bayes 12; QMD 23] Prior mean: [ 2.57983397  3.16117249  1.57041954  4.13983653  3.74167916  0.38876679
+ -0.03633264]
+0:12:59 [RQ Bayes 11/12] Start. Branch None
+0:12:59[QML:Bayes 5; QMD 23] Name: xTiPPyTiPPzTi
+0:12:59[QML:Bayes 5; QMD 23] Time to reconstruct updater: 0.0036132335662841797
+0:12:59[QML:Bayes 5; QMD 23] Prior mean: [-0.54533059  5.32768149  3.27852751]
+0:12:59[QML:Bayes 11; QMD 23] Name: xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+0:12:59[QML:Bayes 11; QMD 23] Time to reconstruct updater: 0.004116535186767578
+0:12:59[QML:Bayes 11; QMD 23] Prior mean: [ 0.5312943   0.06191028  5.65305453 -0.00650121  2.70582369  0.43172717]
+0:12:59 [RQ Bayes 9/11] Start. Branch None
+0:12:59[QML:Bayes 7; QMD 23] Name: xTiPPyTiPPzTiPPzTz
+0:12:59[QML:Bayes 7; QMD 23] Time to reconstruct updater: 0.0031576156616210938
+0:12:59[QML:Bayes 7; QMD 23] Prior mean: [ 0.50286203  5.99686492  1.57613898 -0.33851121]
+0:12:59 [RQ Bayes 5/7] Start. Branch None
+1:8:8 [RQ Bayes 9/11] BF computed: A:9; B:11; BF:325857050091.83 	Reset remormalisation record: False
+1:8:8 [RQ Bayes 9/11] Finished. rq time:  3309.91747379303
+1:8:15[QML:Bayes 12; QMD 23] Name: xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz
+1:8:15[QML:Bayes 12; QMD 23] Time to reconstruct updater: 0.0023598670959472656
+1:8:15[QML:Bayes 12; QMD 23] Prior mean: [ 2.58485272  3.14943405  1.56457772  4.15039661  3.72895675  0.38783079
+ -0.03610327]
+1:8:16[QML:Bayes 16; QMD 23] Name: xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+1:8:16[QML:Bayes 16; QMD 23] Time to reconstruct updater: 0.0021390914916992188
+1:8:16[QML:Bayes 16; QMD 23] Prior mean: [ 0.27585827  7.6607014   6.85303418  3.99228212  4.50465549  6.35638972
+ -0.10166389 -0.02639021]
+1:8:16 [RQ Bayes 12/16] Start. Branch None
+1:8:20 [RQ Bayes 11/12] BF computed: A:11; B:12; BF:29.24 	Reset remormalisation record: False
+1:8:20 [RQ Bayes 11/12] Neither model much better.
+1:8:20 [RQ Bayes 11/12] Finished. rq time:  3321.48024392128
+1:8:40[QML:Bayes 16; QMD 23] Name: xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+1:8:40[QML:Bayes 16; QMD 23] Time to reconstruct updater: 0.0024683475494384766
+1:8:40[QML:Bayes 16; QMD 23] Prior mean: [ 0.27017303  7.66575973  6.85198877  3.98794072  4.50636795  6.35518877
+ -0.10492637 -0.02598236]
+1:8:40[QML:Bayes 17; QMD 23] Name: xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+1:8:40[QML:Bayes 17; QMD 23] Time to reconstruct updater: 0.002299070358276367
+1:8:40[QML:Bayes 17; QMD 23] Prior mean: [ 3.3328675   7.7049686   0.81618769  2.6663902   9.24733368 -0.3622856
+  5.68353663  1.52395506  2.17634661]
+1:8:40 [RQ Bayes 16/17] Start. Branch None
+1:9:31 [RQ Bayes 7/9] BF computed: A:7; B:9; BF:7183783598.01 	Reset remormalisation record: False
+1:9:31 [RQ Bayes 7/9] Finished. rq time:  3392.5651404857635
+1:9:51 [RQ Bayes 5/7] BF computed: A:5; B:7; BF:0.0 	Reset remormalisation record: False
+1:9:51 [RQ Bayes 5/7] Finished. rq time:  3412.700984477997
+1:10:4 [RQ Bayes 4/5] BF computed: A:4; B:5; BF:6.0751988823500905e+41 	Reset remormalisation record: False
+1:10:4 [RQ Bayes 4/5] Finished. rq time:  3425.714525461197
+1:18:20 [RQ Bayes 2/4] BF computed: A:2; B:4; BF:0.0 	Reset remormalisation record: False
+1:18:20 [RQ Bayes 2/4] Finished. rq time:  3921.6069853305817
+1:18:20 [QMD 23] Waiting on parent/child Bayes factors.
+1:18:20 [QMD 23] Waiting on parent/child Bayes factors.
+1:18:20 [QMD 23] Waiting on parent/child Bayes factors.
+1:18:20 [QMD 23] Waiting on parent/child Bayes factors.
+1:18:20 [QMD 23] Waiting on parent/child Bayes factors.
+1:18:20 [QMD 23] Waiting on parent/child Bayes factors.
+2:4:36 [RQ Bayes 12/16] BF computed: A:12; B:16; BF:0.0 	Reset remormalisation record: False
+2:4:36 [RQ Bayes 12/16] Finished. rq time:  3380.994733810425
+2:4:36 [QMD 23] Waiting on parent/child Bayes factors.
+2:4:40 [RQ Bayes 16/17] BF computed: A:16; B:17; BF:0.01 	Reset remormalisation record: False
+2:4:40 [RQ Bayes 16/17] Neither model much better.
+2:4:40 [RQ Bayes 16/17] Finished. rq time:  3361.022538423538
+2:4:40 [QMD 23] Parent/child Bayes factors jobs all launched.
+2:4:40 [QMD 23] child doesn't have active parent
+2:4:40 [QMD 23] Error: 0
+2:4:40 [QMD 23] parent/child 2/4 has bf 3.983670511061779e-65
+2:4:40 [QMD 23] Spawned model 4 stronger than parent; deactivating model 2
+2:4:40 [QMD 23] parent/child 4/5 has bf 6.0751988823500905e+41
+2:4:40 [QMD 23] Parent model, 4 stronger than spawned; deactivating model 5
+2:4:40 [QMD 23] parent/child 5/7 has bf 9.417344207342498e-52
+2:4:40 [QMD 23] Spawned model 7 stronger than parent; deactivating model 5
+2:4:40 [QMD 23] parent/child 7/9 has bf 7183783598.012283
+2:4:40 [QMD 23] Parent model, 7 stronger than spawned; deactivating model 9
+2:4:40 [QMD 23] parent/child 9/11 has bf 325857050091.83234
+2:4:40 [QMD 23] Parent model, 9 stronger than spawned; deactivating model 11
+2:4:40 [QMD 23] parent/child 11/12 has bf 29.237143367146764
+2:4:40 [QMD 23] parent/child 12/16 has bf 3.436225401906813e-14
+2:4:40 [QMD 23] Spawned model 16 stronger than parent; deactivating model 12
+2:4:40 [QMD 23] parent/child 16/17 has bf 0.010069827963978517
+2:4:40 [QMD 23] Parent/child comparisons and deactivations complete.
+2:4:40 [QMD 23] Active branch champs after  parental collapse (final Bayes comp): [16, 17, 4, 7]
+2:4:40 [QMD 23] ActiveTreeBranchChamps: {'two_qubit_ising_rotation_hyperfine_transverse': [16, 17, 4, 7]}
+2:4:40 [QMD 23] Branch 9 growth rule two_qubit_ising_rotation_hyperfine_transverse has 4 new models ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPzTi', 'xTiPPyTiPPzTiPPzTz']
+2:4:40 [DB] Model xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz  previously considered.
+2:4:40 [QMD 23] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz 
+	computed already:  True 
+	ID: 17.0
+2:4:40 [DB] Model xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz  previously considered.
+2:4:40 [QMD 23] Model  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz 
+	computed already:  True 
+	ID: 16.0
+2:4:40 [DB] Model xTiPPzTi  previously considered.
+2:4:40 [QMD 23] Model  xTiPPzTi 
+	computed already:  True 
+	ID: 4.0
+2:4:40 [DB] Model xTiPPyTiPPzTiPPzTz  previously considered.
+2:4:40 [QMD 23] Model  xTiPPyTiPPzTiPPzTz 
+	computed already:  True 
+	ID: 7.0
+2:4:40 [QMD 23] Num models already computed on branch  9 = 4
+2:4:40 [QMD 23] learnModelFromBranchID branch 9 : ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPzTi', 'xTiPPyTiPPzTiPPzTz']
+2:4:40 [QMD 23] learnModelFromBranchID. Setting active branches on redis for branch 9 to 4
+2:4:40 [QMD 23] branch 9 precomputed: ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPzTi', 'xTiPPyTiPPzTiPPzTz']
+2:4:40 [QMD 23] Branch  9 has unlearned models: []
+2:4:40 [QMD 23] learnModelFromBranchID finished, branch 9
+2:4:40 [QMD 23] remoteBayesFromBranchID 9 model id list: [17.0, 16.0, 4.0, 7.0]
+2:4:40 [QMD 23] BF already computed for pair  16,17 now active branches bayes, br 9 : b'1'
+2:4:40 [QMD 23] Computing BF for pair 4,17
+2:4:40 [QMD 23] Bayes factor calculation queued. Model IDs 17.0 4.0
+2:4:40 [QMD 23] Computing BF for pair 7,17
+2:4:40 [QMD 23] Bayes factor calculation queued. Model IDs 17.0 7.0
+2:4:40 [QMD 23] Computing BF for pair 4,16
+2:4:40 [QMD 23] Bayes factor calculation queued. Model IDs 16.0 4.0
+2:4:40 [QMD 23] Computing BF for pair 7,16
+2:4:40 [QMD 23] Bayes factor calculation queued. Model IDs 16.0 7.0
+2:4:40 [QMD 23] Computing BF for pair 4,7
+2:4:40 [QMD 23] Bayes factor calculation queued. Model IDs 4.0 7.0
+2:4:47[QML:Bayes 4.0; QMD 23] Name: xTiPPzTi
+2:4:47[QML:Bayes 4.0; QMD 23] Time to reconstruct updater: 0.0012850761413574219
+2:4:47[QML:Bayes 16.0; QMD 23] Name: xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+2:4:47[QML:Bayes 4.0; QMD 23] Prior mean: [-0.53531223  2.00721194]
+2:4:47[QML:Bayes 16.0; QMD 23] Time to reconstruct updater: 0.002449512481689453
+2:4:47[QML:Bayes 16.0; QMD 23] Prior mean: [ 0.27814226  7.65708308  6.85953207  3.97574915  4.51120795  6.35028494
+ -0.1012634  -0.02551854]
+2:4:47[QML:Bayes 16.0; QMD 23] Name: xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+2:4:47[QML:Bayes 16.0; QMD 23] Time to reconstruct updater: 0.0025985240936279297
+2:4:47[QML:Bayes 16.0; QMD 23] Prior mean: [ 0.26536082  7.67357196  6.863501    3.99333967  4.51656907  6.3357304
+ -0.10430092 -0.0229885 ]
+2:4:47[QML:Bayes 17.0; QMD 23] Name: xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+2:4:47[QML:Bayes 17.0; QMD 23] Time to reconstruct updater: 0.0027370452880859375
+2:4:47[QML:Bayes 17.0; QMD 23] Prior mean: [ 3.35692627  7.69034984  0.79613119  2.65388778  9.26233088 -0.36316837
+  5.67877481  1.51983805  2.18409747]
+2:4:47[QML:Bayes 17.0; QMD 23] Name: xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+2:4:47[QML:Bayes 17.0; QMD 23] Time to reconstruct updater: 0.0027642250061035156
+2:4:47[QML:Bayes 17.0; QMD 23] Prior mean: [ 3.31350693  7.72092613  0.810101    2.63975482  9.25303405 -0.35609999
+  5.69533718  1.49760236  2.14963507]
+2:4:47[QML:Bayes 4.0; QMD 23] Name: xTiPPzTi
+2:4:47[QML:Bayes 4.0; QMD 23] Time to reconstruct updater: 0.0009744167327880859
+2:4:47[QML:Bayes 7.0; QMD 23] Name: xTiPPyTiPPzTiPPzTz
+2:4:47[QML:Bayes 4.0; QMD 23] Prior mean: [-0.52719598  2.00668487]
+2:4:47 [RQ Bayes 16.0/4.0] Start. Branch 9
+2:4:47[QML:Bayes 7.0; QMD 23] Time to reconstruct updater: 0.001416921615600586
+2:4:47[QML:Bayes 7.0; QMD 23] Prior mean: [ 0.5024056   5.99619058  1.57661008 -0.33489837]
+2:4:47 [RQ Bayes 4.0/7.0] Start. Branch 9
+2:4:47[QML:Bayes 7.0; QMD 23] Name: xTiPPyTiPPzTiPPzTz
+2:4:47[QML:Bayes 7.0; QMD 23] Time to reconstruct updater: 0.001352548599243164
+2:4:47[QML:Bayes 7.0; QMD 23] Prior mean: [ 0.50052321  5.99821583  1.57315711 -0.35166042]
+2:4:47 [RQ Bayes 16.0/7.0] Start. Branch 9
+2:4:47[QML:Bayes 4.0; QMD 23] Name: xTiPPzTi
+2:4:47[QML:Bayes 4.0; QMD 23] Time to reconstruct updater: 0.0010061264038085938
+2:4:47[QML:Bayes 4.0; QMD 23] Prior mean: [-0.535932    2.00701034]
+2:4:47 [RQ Bayes 17.0/4.0] Start. Branch 9
+2:4:47[QML:Bayes 7.0; QMD 23] Name: xTiPPyTiPPzTiPPzTz
+2:4:47[QML:Bayes 7.0; QMD 23] Time to reconstruct updater: 0.0013375282287597656
+2:4:47[QML:Bayes 7.0; QMD 23] Prior mean: [ 0.51125878  5.99450413  1.58091687 -0.3332313 ]
+2:4:47 [RQ Bayes 17.0/7.0] Start. Branch 9
+2:57:59 [RQ Bayes 4.0/7.0] BF computed: A:4.0; B:7.0; BF:0.0 	Reset remormalisation record: False
+2:57:59 [RQ Bayes 4.0/7.0] Finished. rq time:  3192.4146666526794
+2:58:0 [RQ Bayes 16.0/4.0] BF computed: A:16.0; B:4.0; BF:2326383020.61 	Reset remormalisation record: False
+2:58:0 [RQ Bayes 16.0/4.0] Finished. rq time:  3193.626717567444
+2:58:11 [RQ Bayes 17.0/4.0] BF computed: A:17.0; B:4.0; BF:9.584974925264459e+19 	Reset remormalisation record: False
+2:58:11 [RQ Bayes 17.0/4.0] Finished. rq time:  3204.5735244750977
+2:58:28 [RQ Bayes 17.0/7.0] BF computed: A:17.0; B:7.0; BF:0.0 	Reset remormalisation record: False
+2:58:28 [RQ Bayes 17.0/7.0] Finished. rq time:  3221.8974261283875
+2:58:42 [RQ Bayes 16.0/7.0] BF computed: A:16.0; B:7.0; BF:0.0 	Reset remormalisation record: False
+2:58:42 [RQ Bayes 16.0/7.0] Finished. rq time:  3235.911000728607
+2:58:42 [QMD 23] compareModelsWithinBranch 9 active_models_in_branch_old: [] active_models_in_branch_new: [17.0, 16.0, 4.0, 7.0]
+2:58:42 [QMD 23] [compareModelsWithinBranch 9] Point to 17 (comparison 17.0/16.0)
+2:58:42 [QMD 23] [compareModelsWithinBranch 9] Point to 17 (comparison 17.0/4.0)
+2:58:42 [QMD 23] [compareModelsWithinBranch 9] Point to 7 (comparison 17.0/7.0)
+2:58:42 [QMD 23] [compareModelsWithinBranch 9] Point to 16 (comparison 16.0/4.0)
+2:58:42 [QMD 23] [compareModelsWithinBranch 9] Point to 7 (comparison 16.0/7.0)
+2:58:42 [QMD 23] [compareModelsWithinBranch 9] Point to 7 (comparison 4.0/7.0)
+2:58:42 [QMD 23] Model points for branch 9 {17.0: 2, 16.0: 1, 4.0: 0, 7.0: 3}
+2:58:42 [QMD 23] Champion of branch  9  is  xTiPPyTiPPzTiPPzTz (7)
+2:58:42 [QMD 23] Ghost Branch 9 deactivating model 16.0
+2:58:42 [QMD 23] Ghost Branch 9 deactivating model 17.0
+2:58:42 [QMD 23] Ghost Branch 9 deactivating model 4.0
+2:58:42 [QMD 23] F i n a l   t r e e   c o m p a r i s o n s   c o m p l e t e .
+2:58:42 [QMD 23] After initial interbranch comparisons,                 remaining active branch champions: [7.0]
+2:58:42 [QMD 23] Waiting on result of  Bayes comparisons from given list: [7.0]
+2:58:42 [QMD 23] After final Bayes comparisons (of branch champions) {7.0: 0}
+2:58:42[QML:Reduced 17; QMD 23] Updating learned info for model 17
+2:58:43[QML:Reduced 17; QMD 23] Updated learned info for model 17
+2:58:43 [QMD 23] Checking reducibility of champ model: xTiPPyTiPPzTiPPzTz
+2:58:43 [QMD 23] Parameters non-negligible; not replacing champion model. Params:
+ {'xTi': 0.50741123796607324, 'yTi': 5.9963053769879116, 'zTi': 1.5813596718722629, 'zTz': -0.3485334480308771}
+2:58:43 [QMD 23] Final winner =  xTiPPyTiPPzTiPPzTz
+2:58:43 [QMD 23] computing expect vals for mod  7
+2:58:43[QML:Reduced 7; QMD 23] [compute expectation values] times to compute: [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+2:58:43 [QMD 23] computed expect vals
+2:58:43 [QMD 23] Num params - champ: 4 ; 	 true: 4
+2:58:43 [QMD 23] Using default times to plot expectation values for num qubits: 2
+2:58:43[QML:Reduced 7; QMD 23] R squared function for xTiPPyTiPPzTiPPzTz
+2:58:43[QML:Reduced 2; QMD 23] [compute expectation values] times to compute: [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+2:58:43[QML:Reduced 4; QMD 23] [compute expectation values] times to compute: [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+2:58:44[QML:Reduced 5; QMD 23] [compute expectation values] times to compute: [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+2:58:44[QML:Reduced 7; QMD 23] [compute expectation values] times to compute: []
+2:58:44[QML:Reduced 9; QMD 23] [compute expectation values] times to compute: [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+2:58:45[QML:Reduced 11; QMD 23] [compute expectation values] times to compute: [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+2:58:45[QML:Reduced 12; QMD 23] [compute expectation values] times to compute: [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+2:58:45[QML:Reduced 16; QMD 23] [compute expectation values] times to compute: [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+2:58:46[QML:Reduced 17; QMD 23] [compute expectation values] times to compute: [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+2:58:49[QML:Reduced 7; QMD 23] [compute expectation values] times to compute: [0.040000000000000001, 0.059999999999999998, 0.14000000000000001, 0.16, 0.23999999999999999, 0.26000000000000001, 0.34000000000000002, 0.35999999999999999, 0.44, 0.46000000000000002, 0.54000000000000004, 0.56000000000000005, 0.64000000000000001, 0.66000000000000003, 0.73999999999999999, 0.76000000000000001, 0.83999999999999997, 0.85999999999999999, 0.93999999999999995, 0.95999999999999996, 1.04, 1.0600000000000001, 1.1399999999999999, 1.1599999999999999, 1.24, 1.26, 1.3400000000000001, 1.3600000000000001, 1.4399999999999999, 1.46, 1.54, 1.5600000000000001, 1.6399999999999999, 1.6599999999999999, 1.74, 1.76, 1.8400000000000001, 1.8600000000000001, 1.9399999999999999, 1.96, 2.04, 2.0600000000000001, 2.1400000000000001, 2.1600000000000001, 2.2400000000000002, 2.2599999999999998, 2.3399999999999999, 2.3599999999999999, 2.4399999999999999, 2.46, 2.54, 2.5600000000000001, 2.6400000000000001, 2.6600000000000001, 2.7400000000000002, 2.7599999999999998, 2.8399999999999999, 2.8599999999999999, 2.9399999999999999, 2.96, 3.04, 3.0600000000000001, 3.1400000000000001, 3.1600000000000001, 3.2400000000000002, 3.2599999999999998, 3.3399999999999999, 3.3599999999999999, 3.4399999999999999, 3.46, 3.54, 3.5600000000000001, 3.6400000000000001, 3.6600000000000001, 3.7400000000000002, 3.7599999999999998, 3.8399999999999999, 3.8599999999999999, 3.9399999999999999, 3.96, 4.04, 4.0599999999999996, 4.1399999999999997, 4.1600000000000001, 4.2400000000000002, 4.2599999999999998, 4.3399999999999999, 4.3600000000000003, 4.4400000000000004, 4.46, 4.54, 4.5599999999999996, 4.6399999999999997, 4.6600000000000001, 4.7400000000000002, 4.7599999999999998, 4.8399999999999999, 4.8600000000000003, 4.9400000000000004, 4.96, 5.04, 5.0599999999999996, 5.0999999999999996, 5.1399999999999997, 5.1600000000000001, 5.2000000000000002, 5.2400000000000002, 5.2599999999999998, 5.2999999999999998, 5.3399999999999999, 5.3600000000000003, 5.4000000000000004, 5.4400000000000004, 5.46, 5.5, 5.54, 5.5599999999999996, 5.5999999999999996, 5.6399999999999997, 5.6600000000000001, 5.7000000000000002, 5.7400000000000002, 5.7599999999999998, 5.7999999999999998, 5.8399999999999999, 5.8600000000000003, 5.9000000000000004, 5.9400000000000004, 5.96, 6.0, 6.04, 6.0599999999999996, 6.0999999999999996, 6.1399999999999997, 6.1600000000000001, 6.2000000000000002, 6.2400000000000002, 6.2599999999999998, 6.2999999999999998, 6.3399999999999999, 6.3600000000000003, 6.4000000000000004, 6.4400000000000004, 6.46, 6.5, 6.54, 6.5599999999999996, 6.5999999999999996, 6.6399999999999997, 6.6600000000000001, 6.7000000000000002, 6.7400000000000002, 6.7599999999999998, 6.7999999999999998, 6.8399999999999999, 6.8600000000000003, 6.9000000000000004, 6.9400000000000004, 6.96, 7.0, 7.04, 7.0599999999999996, 7.0999999999999996, 7.1399999999999997, 7.1600000000000001, 7.2000000000000002, 7.2400000000000002, 7.2599999999999998, 7.2999999999999998, 7.3399999999999999, 7.3600000000000003, 7.4000000000000004, 7.4400000000000004, 7.46, 7.5, 7.54, 7.5599999999999996, 7.5999999999999996, 7.6399999999999997, 7.6600000000000001, 7.7000000000000002, 7.7400000000000002, 7.7599999999999998, 7.7999999999999998, 7.8399999999999999, 7.8600000000000003, 7.9000000000000004, 7.9400000000000004, 7.96, 8.0, 8.0399999999999991, 8.0600000000000005, 8.0999999999999996, 8.1400000000000006, 8.1600000000000001, 8.1999999999999993, 8.2400000000000002, 8.2599999999999998, 8.3000000000000007, 8.3399999999999999, 8.3599999999999994, 8.4000000000000004, 8.4399999999999995, 8.4600000000000009, 8.5, 8.5399999999999991, 8.5600000000000005, 8.5999999999999996, 8.6400000000000006, 8.6600000000000001, 8.6999999999999993, 8.7400000000000002, 8.7599999999999998, 8.8000000000000007, 8.8399999999999999, 8.8599999999999994, 8.9000000000000004, 8.9399999999999995, 8.9600000000000009, 9.0, 9.0399999999999991, 9.0600000000000005, 9.0999999999999996, 9.1400000000000006, 9.1600000000000001, 9.1999999999999993, 9.2400000000000002, 9.2599999999999998, 9.3000000000000007, 9.3399999999999999, 9.3599999999999994, 9.4000000000000004, 9.4399999999999995, 9.4600000000000009, 9.5, 9.5399999999999991, 9.5600000000000005, 9.5999999999999996, 9.6400000000000006, 9.6600000000000001, 9.6999999999999993, 9.7400000000000002, 9.7599999999999998, 9.8000000000000007, 9.8399999999999999, 9.8599999999999994, 9.9000000000000004, 9.9399999999999995, 9.9600000000000009, 10.0]
+2:58:49[QML:Reduced 7; QMD 23] [compute expectation values] times to compute: []
+2:58:50 [EXP] Time taken: 51255.43208694458
+2:58:50 [EXP] END: QMD id 23 : 2500  particles; 750 exp;  750 bayes. Time: 51255.43208694458

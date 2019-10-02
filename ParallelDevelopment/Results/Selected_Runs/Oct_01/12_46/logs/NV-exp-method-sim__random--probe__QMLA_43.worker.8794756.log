@@ -1,0 +1,288 @@
+00:34:11 RQ worker 'rq:worker:node44-019.122014' started, version 0.8.1
+00:34:11 RQ worker 'rq:worker:node44-019.122015' started, version 0.8.1
+00:34:11 RQ worker 'rq:worker:node44-019.122016' started, version 0.8.1
+00:34:11 RQ worker 'rq:worker:node44-019.122017' started, version 0.8.1
+00:34:11 RQ worker 'rq:worker:node44-019.122018' started, version 0.8.1
+00:34:11 RQ worker 'rq:worker:node44-019.122020' started, version 0.8.1
+00:34:11 Cleaning registries for queue: 43
+00:34:11 Cleaning registries for queue: 43
+00:34:11 Cleaning registries for queue: 43
+00:34:11 Cleaning registries for queue: 43
+00:34:11 Cleaning registries for queue: 43
+00:34:11 Cleaning registries for queue: 43
+00:34:11 
+00:34:11 
+00:34:11 
+00:34:11 
+00:34:11 
+00:34:11 
+00:34:11 *** Listening on 43...
+00:34:11 *** Listening on 43...
+00:34:11 *** Listening on 43...
+00:34:11 *** Listening on 43...
+00:34:11 *** Listening on 43...
+00:34:11 *** Listening on 43...
+00:34:23 43: RemoteModelLearning.learnModelRemote('yTi', 1.0, branchID=0, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (efdd18b1-9f33-4acb-9453-a5ed608d36f8)
+00:34:23 43: RemoteModelLearning.learnModelRemote('xTi', 0.0, branchID=0, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (019b4da4-d2f5-4ff1-b4e6-858977bad997)
+00:34:23 43: RemoteModelLearning.learnModelRemote('zTi', 2.0, branchID=0, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (9f8a9187-9dc9-4285-b607-66aa6e8d4bc8)
+01:01:22 43: Job OK (019b4da4-d2f5-4ff1-b4e6-858977bad997)
+01:01:22 Result will never expire, clean up result key manually
+01:01:22 
+01:01:22 *** Listening on 43...
+01:01:27 43: Job OK (efdd18b1-9f33-4acb-9453-a5ed608d36f8)
+01:01:27 Result will never expire, clean up result key manually
+01:01:27 
+01:01:27 *** Listening on 43...
+01:12:01 43: Job OK (9f8a9187-9dc9-4285-b607-66aa6e8d4bc8)
+01:12:01 Result will never expire, clean up result key manually
+01:12:01 
+01:12:01 *** Listening on 43...
+01:12:01 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=0, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=0, model_b_id=1, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (ce1c37ce-de52-4a09-8957-47ec79783bba)
+01:12:01 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=0, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=0, model_b_id=2, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (76b39a98-cb5e-43bc-884a-cf2e7bedffba)
+01:12:01 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=0, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=1, model_b_id=2, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (d093fda4-ca55-45a7-a70a-2eb6fdd550db)
+02:04:41 43: Job OK (ce1c37ce-de52-4a09-8957-47ec79783bba)
+02:04:41 Result will never expire, clean up result key manually
+02:04:41 Cleaning registries for queue: 43
+02:04:41 
+02:04:41 *** Listening on 43...
+02:17:29 43: Job OK (76b39a98-cb5e-43bc-884a-cf2e7bedffba)
+02:17:29 Result will never expire, clean up result key manually
+02:17:29 Cleaning registries for queue: 43
+02:17:29 
+02:17:29 *** Listening on 43...
+02:20:11 43: Job OK (d093fda4-ca55-45a7-a70a-2eb6fdd550db)
+02:20:11 Result will never expire, clean up result key manually
+02:20:11 Cleaning registries for queue: 43
+02:20:11 
+02:20:11 *** Listening on 43...
+02:20:11 43: RemoteModelLearning.learnModelRemote('xTiPPyTi', 3.0, branchID=1, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (c979b9ee-fe3a-427c-8af0-d0dcd3c1a503)
+02:20:11 43: RemoteModelLearning.learnModelRemote('yTiPPzTi', 4.0, branchID=1, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (3afab145-556c-4dfb-b109-2d134f4c0a7b)
+02:46:33 43: Job OK (c979b9ee-fe3a-427c-8af0-d0dcd3c1a503)
+02:46:33 Result will never expire, clean up result key manually
+02:46:33 Cleaning registries for queue: 43
+02:46:33 
+02:46:33 *** Listening on 43...
+02:46:37 43: Job OK (3afab145-556c-4dfb-b109-2d134f4c0a7b)
+02:46:37 Result will never expire, clean up result key manually
+02:46:37 Cleaning registries for queue: 43
+02:46:37 
+02:46:37 *** Listening on 43...
+02:46:37 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=1, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=3, model_b_id=4, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (8c6d7e50-846c-4d82-9fab-fb78709dd0ce)
+03:37:41 43: Job OK (8c6d7e50-846c-4d82-9fab-fb78709dd0ce)
+03:37:41 Result will never expire, clean up result key manually
+03:37:41 Cleaning registries for queue: 43
+03:37:41 
+03:37:41 *** Listening on 43...
+03:37:41 43: RemoteModelLearning.learnModelRemote('xTiPPyTiPPzTi', 5.0, branchID=2, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (7ed27df6-dcbb-478a-a640-5f5262888f50)
+04:03:10 43: Job OK (7ed27df6-dcbb-478a-a640-5f5262888f50)
+04:03:10 Result will never expire, clean up result key manually
+04:03:10 Cleaning registries for queue: 43
+04:03:10 
+04:03:10 *** Listening on 43...
+04:03:10 43: RemoteModelLearning.learnModelRemote('xTiPPxTxPPyTiPPzTi', 6.0, branchID=3, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (02956b02-5fe9-4f19-ad17-4b42e77555f9)
+04:03:10 43: RemoteModelLearning.learnModelRemote('xTiPPyTiPPyTyPPzTi', 7.0, branchID=3, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (5ddbac37-ab27-438e-9738-dff299db36ec)
+04:03:10 43: RemoteModelLearning.learnModelRemote('xTiPPyTiPPzTiPPzTz', 8.0, branchID=3, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (08b96aca-5aa1-4521-ac22-a855059ade9c)
+04:29:10 43: Job OK (5ddbac37-ab27-438e-9738-dff299db36ec)
+04:29:10 Result will never expire, clean up result key manually
+04:29:10 Cleaning registries for queue: 43
+04:29:10 
+04:29:10 *** Listening on 43...
+04:29:12 43: Job OK (02956b02-5fe9-4f19-ad17-4b42e77555f9)
+04:29:12 Result will never expire, clean up result key manually
+04:29:12 Cleaning registries for queue: 43
+04:29:12 
+04:29:12 *** Listening on 43...
+04:29:28 43: Job OK (08b96aca-5aa1-4521-ac22-a855059ade9c)
+04:29:28 Result will never expire, clean up result key manually
+04:29:28 Cleaning registries for queue: 43
+04:29:28 
+04:29:28 *** Listening on 43...
+04:29:28 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=3, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=6, model_b_id=7, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (23a0460e-799c-4a89-9552-66cd5e7fc72f)
+04:29:28 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=3, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=6, model_b_id=8, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (3b04a48d-8962-4eb5-9610-7d3466b0c590)
+04:29:28 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=3, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=7, model_b_id=8, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (c549a69c-624b-439a-b627-456b48078924)
+05:21:28 43: Job OK (c549a69c-624b-439a-b627-456b48078924)
+05:21:28 Result will never expire, clean up result key manually
+05:21:28 Cleaning registries for queue: 43
+05:21:28 
+05:21:28 *** Listening on 43...
+05:21:54 43: Job OK (23a0460e-799c-4a89-9552-66cd5e7fc72f)
+05:21:54 Result will never expire, clean up result key manually
+05:21:54 Cleaning registries for queue: 43
+05:21:54 
+05:21:54 *** Listening on 43...
+05:22:23 43: Job OK (3b04a48d-8962-4eb5-9610-7d3466b0c590)
+05:22:23 Result will never expire, clean up result key manually
+05:22:23 Cleaning registries for queue: 43
+05:22:23 
+05:22:23 *** Listening on 43...
+05:22:24 43: RemoteModelLearning.learnModelRemote('xTiPPxTxPPyTiPPzTiPPzTz', 9.0, branchID=4, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (8fcf96fd-caf8-4f7d-83ef-6365a656d110)
+05:22:24 43: RemoteModelLearning.learnModelRemote('xTiPPyTiPPyTyPPzTiPPzTz', 10.0, branchID=4, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (7fe6d6b9-c491-424b-836c-1e47409d1381)
+05:47:44 43: Job OK (7fe6d6b9-c491-424b-836c-1e47409d1381)
+05:47:44 Result will never expire, clean up result key manually
+05:47:44 Cleaning registries for queue: 43
+05:47:44 
+05:47:44 *** Listening on 43...
+05:47:50 43: Job OK (8fcf96fd-caf8-4f7d-83ef-6365a656d110)
+05:47:50 Result will never expire, clean up result key manually
+05:47:50 Cleaning registries for queue: 43
+05:47:50 
+05:47:50 *** Listening on 43...
+05:47:50 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=4, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=9, model_b_id=10, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (2f56edf8-3d93-4125-82a4-adbcfac0be62)
+06:38:44 43: Job OK (2f56edf8-3d93-4125-82a4-adbcfac0be62)
+06:38:44 Result will never expire, clean up result key manually
+06:38:44 Cleaning registries for queue: 43
+06:38:44 
+06:38:44 *** Listening on 43...
+06:38:44 43: RemoteModelLearning.learnModelRemote('xTiPPxTxPPyTiPPyTyPPzTiPPzTz', 11.0, branchID=5, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (0abe5035-889c-4fcc-846f-51aad4054f55)
+07:03:17 43: Job OK (0abe5035-889c-4fcc-846f-51aad4054f55)
+07:03:17 Result will never expire, clean up result key manually
+07:03:17 Cleaning registries for queue: 43
+07:03:17 
+07:03:17 *** Listening on 43...
+07:03:17 43: RemoteModelLearning.learnModelRemote('xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz', 12.0, branchID=6, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (a2c34361-50c5-4ec6-ad1a-c99ec405a8bb)
+07:03:17 43: RemoteModelLearning.learnModelRemote('xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz', 13.0, branchID=6, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (2d86d03b-5e03-4b8d-ab02-a937762b451c)
+07:03:17 43: RemoteModelLearning.learnModelRemote('xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz', 14.0, branchID=6, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (38245fa6-bc24-468f-ab14-16a72a1e0b7c)
+07:28:32 43: Job OK (a2c34361-50c5-4ec6-ad1a-c99ec405a8bb)
+07:28:32 Result will never expire, clean up result key manually
+07:28:32 Cleaning registries for queue: 43
+07:28:32 
+07:28:32 *** Listening on 43...
+07:29:07 43: Job OK (2d86d03b-5e03-4b8d-ab02-a937762b451c)
+07:29:07 Result will never expire, clean up result key manually
+07:29:07 Cleaning registries for queue: 43
+07:29:07 
+07:29:07 *** Listening on 43...
+07:29:18 43: Job OK (38245fa6-bc24-468f-ab14-16a72a1e0b7c)
+07:29:18 Result will never expire, clean up result key manually
+07:29:18 Cleaning registries for queue: 43
+07:29:18 
+07:29:18 *** Listening on 43...
+07:29:18 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=6, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=12, model_b_id=13, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (293b7f08-234f-46eb-82c8-b24967466f85)
+07:29:18 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=6, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=13, model_b_id=14, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (bbfb498c-3efe-4e17-b86d-bf6af7d79c59)
+07:29:18 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=6, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=12, model_b_id=14, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (e323afe2-8fa4-44c6-bfd1-7b1a74ab616a)
+08:20:30 43: Job OK (e323afe2-8fa4-44c6-bfd1-7b1a74ab616a)
+08:20:30 Result will never expire, clean up result key manually
+08:20:30 Cleaning registries for queue: 43
+08:20:30 
+08:20:30 *** Listening on 43...
+08:20:32 43: Job OK (bbfb498c-3efe-4e17-b86d-bf6af7d79c59)
+08:20:32 Result will never expire, clean up result key manually
+08:20:32 Cleaning registries for queue: 43
+08:20:32 
+08:20:32 *** Listening on 43...
+08:20:52 43: Job OK (293b7f08-234f-46eb-82c8-b24967466f85)
+08:20:52 Result will never expire, clean up result key manually
+08:20:52 Cleaning registries for queue: 43
+08:20:52 
+08:20:52 *** Listening on 43...
+08:20:52 43: RemoteModelLearning.learnModelRemote('xTiPPxTxPPxTyPPyTiPPyTyPPyTzPPzTiPPzTz', 15.0, branchID=7, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (89414f56-41f6-486d-b417-dfbae462fa2a)
+08:20:52 43: RemoteModelLearning.learnModelRemote('xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz', 16.0, branchID=7, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (db1f34fe-b30b-419d-b782-2f9e631b2caa)
+08:45:08 43: Job OK (89414f56-41f6-486d-b417-dfbae462fa2a)
+08:45:08 Result will never expire, clean up result key manually
+08:45:08 Cleaning registries for queue: 43
+08:45:08 
+08:45:08 *** Listening on 43...
+08:45:19 43: Job OK (db1f34fe-b30b-419d-b782-2f9e631b2caa)
+08:45:19 Result will never expire, clean up result key manually
+08:45:19 Cleaning registries for queue: 43
+08:45:19 
+08:45:19 *** Listening on 43...
+08:45:19 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=7, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=15, model_b_id=16, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (afe9ee43-ed0d-4941-964a-e0ff7db8cc3e)
+09:35:10 43: Job OK (afe9ee43-ed0d-4941-964a-e0ff7db8cc3e)
+09:35:10 Result will never expire, clean up result key manually
+09:35:10 Cleaning registries for queue: 43
+09:35:10 
+09:35:10 *** Listening on 43...
+09:35:10 43: RemoteModelLearning.learnModelRemote('xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 17.0, branchID=8, growth_generator='NV_alternative_model', host_name='node44-019', log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', port_number=6343, qid=43, remote=True) (065d19f0-23d4-425a-9ac3-4099da9ce5ba)
+10:00:21 43: Job OK (065d19f0-23d4-425a-9ac3-4099da9ce5ba)
+10:00:21 Result will never expire, clean up result key manually
+10:00:21 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=1, model_b_id=4, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (70f3655e-630b-46d6-9811-6eb9e3af6e7c)
+10:00:21 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=4, model_b_id=5, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (7fe2b917-516a-431b-863d-23d9629d685b)
+10:00:21 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=8, model_b_id=9, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (6a3b962f-5e88-493d-bbbb-9f11a294f0ac)
+10:00:21 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=9, model_b_id=11, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (e50f1671-9fad-4848-9023-4e618044bb4f)
+10:00:21 Cleaning registries for queue: 43
+10:00:21 
+10:00:21 *** Listening on 43...
+10:00:21 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=11, model_b_id=12, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (993c8ce4-cf3d-4e48-a465-1f100bb500a5)
+10:00:21 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=5, model_b_id=8, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (a096a5e1-f81f-442b-879a-88db14bdca43)
+10:51:18 43: Job OK (993c8ce4-cf3d-4e48-a465-1f100bb500a5)
+10:51:18 Result will never expire, clean up result key manually
+10:51:18 
+10:51:18 *** Listening on 43...
+10:51:18 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=12, model_b_id=15, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (81001420-3bb8-44e6-aed3-1f8ee2ce3f08)
+10:51:31 43: Job OK (e50f1671-9fad-4848-9023-4e618044bb4f)
+10:51:31 Result will never expire, clean up result key manually
+10:51:31 Cleaning registries for queue: 43
+10:51:31 
+10:51:31 *** Listening on 43...
+10:51:31 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=15, model_b_id=17, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (42824c4c-59d8-4438-95b4-f51b895cd352)
+10:53:42 43: Job OK (6a3b962f-5e88-493d-bbbb-9f11a294f0ac)
+10:53:42 Result will never expire, clean up result key manually
+10:53:42 Cleaning registries for queue: 43
+10:53:42 
+10:53:42 *** Listening on 43...
+10:53:59 43: Job OK (a096a5e1-f81f-442b-879a-88db14bdca43)
+10:53:59 Result will never expire, clean up result key manually
+10:53:59 Cleaning registries for queue: 43
+10:53:59 
+10:53:59 *** Listening on 43...
+10:54:02 43: Job OK (70f3655e-630b-46d6-9811-6eb9e3af6e7c)
+10:54:02 Result will never expire, clean up result key manually
+10:54:02 Cleaning registries for queue: 43
+10:54:02 
+10:54:02 *** Listening on 43...
+10:54:39 43: Job OK (7fe2b917-516a-431b-863d-23d9629d685b)
+10:54:39 Result will never expire, clean up result key manually
+10:54:39 Cleaning registries for queue: 43
+10:54:39 
+10:54:39 *** Listening on 43...
+11:40:56 43: Job OK (42824c4c-59d8-4438-95b4-f51b895cd352)
+11:40:56 Result will never expire, clean up result key manually
+11:40:56 
+11:40:56 *** Listening on 43...
+11:41:37 43: Job OK (81001420-3bb8-44e6-aed3-1f8ee2ce3f08)
+11:41:37 Result will never expire, clean up result key manually
+11:41:37 Cleaning registries for queue: 43
+11:41:37 
+11:41:37 *** Listening on 43...
+11:41:37 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=9, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=9.0, model_b_id=4.0, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (7a3fcf5f-bda9-4dd1-a365-52da5cf1e932)
+11:41:37 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=9, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=11.0, model_b_id=4.0, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (c38a8162-565b-4ac9-96e6-31d901e26406)
+11:41:37 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=9, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=11.0, model_b_id=8.0, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (cc7febf5-ca26-449f-891c-22373f50c5b2)
+11:41:37 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=9, host_name='node44-019', interbranch=False, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=4.0, model_b_id=8.0, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (92187bff-8145-4ef3-aa92-23930a6495be)
+12:34:20 43: Job OK (cc7febf5-ca26-449f-891c-22373f50c5b2)
+12:34:20 Result will never expire, clean up result key manually
+12:34:20 Cleaning registries for queue: 43
+12:34:20 
+12:34:20 *** Listening on 43...
+12:34:58 43: Job OK (c38a8162-565b-4ac9-96e6-31d901e26406)
+12:34:58 Result will never expire, clean up result key manually
+12:34:58 Cleaning registries for queue: 43
+12:34:58 
+12:34:58 *** Listening on 43...
+12:35:50 43: Job OK (7a3fcf5f-bda9-4dd1-a365-52da5cf1e932)
+12:35:50 Result will never expire, clean up result key manually
+12:35:50 Cleaning registries for queue: 43
+12:35:50 
+12:35:50 *** Listening on 43...
+12:35:52 43: Job OK (92187bff-8145-4ef3-aa92-23930a6495be)
+12:35:52 Result will never expire, clean up result key manually
+12:35:52 Cleaning registries for queue: 43
+12:35:52 
+12:35:52 *** Listening on 43...
+12:35:52 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=1, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=9.0, model_b_id=8.0, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (da9f06d8-6b81-4bf2-b84b-6c5cc9d3a5b1)
+12:35:52 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=1, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=11.0, model_b_id=8.0, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (ab3c18db-70cf-4efa-bd75-e2a43d5f055a)
+12:35:52 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=1, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=9.0, model_b_id=11.0, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (27552933-64d7-4137-9573-bd920ab29691)
+13:25:20 43: Job OK (27552933-64d7-4137-9573-bd920ab29691)
+13:25:20 Result will never expire, clean up result key manually
+13:25:20 
+13:25:20 *** Listening on 43...
+13:25:43 43: Job OK (ab3c18db-70cf-4efa-bd75-e2a43d5f055a)
+13:25:43 Result will never expire, clean up result key manually
+13:25:43 Cleaning registries for queue: 43
+13:25:43 
+13:25:43 *** Listening on 43...
+13:26:16 43: Job OK (da9f06d8-6b81-4bf2-b84b-6c5cc9d3a5b1)
+13:26:16 Result will never expire, clean up result key manually
+13:26:16 
+13:26:16 *** Listening on 43...
+13:26:16 43: RemoteBayesFactor.BayesFactorRemote(bayes_threshold=100, bf_data_folder='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/', branchID=None, host_name='node44-019', interbranch=True, log_file='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_43.qmd.8794756.log', model_a_id=9, model_b_id=18, num_times_to_use=750, port_number=6343, qid=43, times_record='/panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/BayesFactorsTimeRecords/BayesFactorsPairsTimes_043.txt', trueModel='xTiPPyTiPPzTiPPzTz') (e487238c-b8ef-4407-8be4-453821b0625c)

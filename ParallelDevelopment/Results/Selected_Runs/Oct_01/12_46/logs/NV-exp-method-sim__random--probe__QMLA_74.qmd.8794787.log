@@ -1,0 +1,1250 @@
+In RUN script:  -agr ising_predetermined -agr heisenberg_xyz_predetermined -agr hopping_predetermined1:34:38 [GLOBAL VARIABLES] use_experimental_data : False
+1:34:38 [GLOBAL VARIABLES] growth_generation_rule : NV_alternative_model
+1:34:38 [GLOBAL VARIABLES] log_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_74.qmd.8794787.log
+1:34:38 [GLOBAL VARIABLES] growth_class : <NVCentreAlternativeTrueModel.nv_centre_spin_experimental_method_alternative_true_model object at 0x2aaae0572eb8>
+1:34:38 [GLOBAL VARIABLES] measurement_type : n_qubit_hahn_evolution
+1:34:38 [GLOBAL VARIABLES] dataset : NVB_rescale_dataset.p
+1:34:38 [GLOBAL VARIABLES] alternative_growth_rules : []
+1:34:38 [GLOBAL VARIABLES] multiQHL : False
+1:34:38 [GLOBAL VARIABLES] models_for_qhl : []
+1:34:38 [GLOBAL VARIABLES] prior_pickle_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/prior.p
+1:34:38 [GLOBAL VARIABLES] true_params_pickle_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/true_params.p
+1:34:38 [GLOBAL VARIABLES] true_operator : xTiPPyTiPPzTiPPzTz
+1:34:38 [GLOBAL VARIABLES] true_op_name : xTiPPyTiPPzTiPPzTz
+1:34:38 [GLOBAL VARIABLES] true_operator_class : <DataBase.operator object at 0x2aaae0572b38>
+1:34:38 [GLOBAL VARIABLES] true_op_list : [array([[ 0.+0.j,  0.+0.j,  1.+0.j,  0.+0.j],
+       [ 0.+0.j,  0.+0.j,  0.+0.j,  1.+0.j],
+       [ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
+       [ 0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j]]), array([[ 0.+0.j,  0.+0.j,  0.-1.j,  0.+0.j],
+       [ 0.+0.j,  0.+0.j,  0.+0.j,  0.-1.j],
+       [ 0.+1.j,  0.+0.j,  0.+0.j,  0.+0.j],
+       [ 0.+0.j,  0.+1.j,  0.+0.j,  0.+0.j]]), array([[ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
+       [ 0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j],
+       [ 0.+0.j,  0.+0.j, -1.+0.j, -0.+0.j],
+       [ 0.+0.j,  0.+0.j, -0.+0.j, -1.+0.j]]), array([[ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
+       [ 0.+0.j, -1.+0.j,  0.+0.j, -0.+0.j],
+       [ 0.+0.j,  0.+0.j, -1.+0.j, -0.+0.j],
+       [ 0.+0.j, -0.+0.j, -0.+0.j,  1.-0.j]])]
+1:34:38 [GLOBAL VARIABLES] true_params : [0.92450565, 6.00664336, 1.65998543, 0.76546868]
+1:34:38 [GLOBAL VARIABLES] true_params_dict : {'xTi': 0.92450565, 'yTi': 6.00664336, 'zTi': 1.65998543, 'zTz': 0.76546868}
+1:34:38 [GLOBAL VARIABLES] true_params_list : [0.92450565, 6.00664336, 1.65998543, 0.76546868]
+1:34:38 [GLOBAL VARIABLES] true_hamiltonian : [[ 2.42545411+0.j          0.00000000+0.j          0.92450565-6.00664336j
+   0.00000000+0.j        ]
+ [ 0.00000000+0.j          0.89451675+0.j          0.00000000+0.j
+   0.92450565-6.00664336j]
+ [ 0.92450565+6.00664336j  0.00000000+0.j         -2.42545411+0.j
+   0.00000000+0.j        ]
+ [ 0.00000000+0.j          0.92450565+6.00664336j  0.00000000+0.j
+  -0.89451675+0.j        ]]
+1:34:38 [GLOBAL VARIABLES] qhl_test : False
+1:34:38 [GLOBAL VARIABLES] further_qhl : False
+1:34:38 [GLOBAL VARIABLES] do_iqle : False
+1:34:38 [GLOBAL VARIABLES] do_qle : True
+1:34:38 [GLOBAL VARIABLES] use_rq : True
+1:34:38 [GLOBAL VARIABLES] num_runs : 1
+1:34:38 [GLOBAL VARIABLES] num_tests : 1
+1:34:38 [GLOBAL VARIABLES] num_qubits : 2
+1:34:38 [GLOBAL VARIABLES] num_parameters : 2
+1:34:38 [GLOBAL VARIABLES] num_experiments : 750
+1:34:38 [GLOBAL VARIABLES] num_particles : 2500
+1:34:38 [GLOBAL VARIABLES] num_times_bayes : 750
+1:34:38 [GLOBAL VARIABLES] bayes_lower : 1
+1:34:38 [GLOBAL VARIABLES] bayes_upper : 100
+1:34:38 [GLOBAL VARIABLES] save_plots : False
+1:34:38 [GLOBAL VARIABLES] store_particles_weights : False
+1:34:38 [GLOBAL VARIABLES] gaussian : True
+1:34:38 [GLOBAL VARIABLES] custom_prior : True
+1:34:38 [GLOBAL VARIABLES] resample_threshold : 0.5
+1:34:38 [GLOBAL VARIABLES] resample_a : 0.98
+1:34:38 [GLOBAL VARIABLES] pgh_factor : 1.0
+1:34:38 [GLOBAL VARIABLES] pgh_exponent : 1.0
+1:34:38 [GLOBAL VARIABLES] increase_pgh_time : False
+1:34:38 [GLOBAL VARIABLES] pickle_qmd_class : False
+1:34:38 [GLOBAL VARIABLES] qmd_id : 74
+1:34:38 [GLOBAL VARIABLES] host_name : node35-003
+1:34:38 [GLOBAL VARIABLES] port_number : 6374
+1:34:38 [GLOBAL VARIABLES] results_directory : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/
+1:34:38 [GLOBAL VARIABLES] rq_timeout : 200000
+1:34:38 [GLOBAL VARIABLES] cumulative_csv : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/cumulative.csv
+1:34:38 [GLOBAL VARIABLES] data_time_offset : 180
+1:34:38 [GLOBAL VARIABLES] data_max_time : 5
+1:34:38 [GLOBAL VARIABLES] true_expec_path : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/true_expec_vals.p
+1:34:38 [GLOBAL VARIABLES] plot_probe_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/plot_probes.p
+1:34:38 [GLOBAL VARIABLES] special_probe : random
+1:34:38 [GLOBAL VARIABLES] latex_mapping_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/LatexMapping.txt
+1:34:38 [GLOBAL VARIABLES] reallocate_resources : False
+1:34:38 [GLOBAL VARIABLES] param_min : 0.0
+1:34:38 [GLOBAL VARIABLES] param_max : 10.0
+1:34:38 [GLOBAL VARIABLES] param_mean : 0.5
+1:34:38 [GLOBAL VARIABLES] param_sigma : 2.0
+1:34:38 [GLOBAL VARIABLES] bayes_time_binning : True
+1:34:38 [GLOBAL VARIABLES] bayes_factors_use_all_exp_times : False
+1:34:38 [GLOBAL VARIABLES] num_probes : 40
+1:34:38 [GLOBAL VARIABLES] probe_noise_level : 0.001
+1:34:38 [GLOBAL VARIABLES] updater_from_prior : False
+1:34:38 [GLOBAL VARIABLES] plots_directory : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/plots/
+1:34:38 [GLOBAL VARIABLES] long_id : 074
+1:34:38 [GLOBAL VARIABLES] results_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/results_074.p
+1:34:38 [GLOBAL VARIABLES] class_pickle_file : /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/qmd_class_074.p
+1:34:38 [EXP] 
+ QMD id 74  on host  node35-003 and port 6374 has seed 1 
+ 2500  particles for 750 experiments and  750 bayes updates
+ Gaussian= True 
+ RQ= True RQ log: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/logs/NV-exp-method-sim__random--probe__QMLA_74.qmd.8794787.log 
+ Bayes CSV: /panfs/panasas01/phys/bf16951/QMD/ParallelDevelopment/Results/Oct_01/12_46/cumulative.csv
+1:34:38 [EXP] Generators: ['NV_alternative_model']
+1:34:38 [QMD 74] Probe dict provided to QMD.
+1:34:38 [QMD 74] Getting expectation values for simulated model (len 301) 
+ Times computed:
+ [0.0, 0.02, 0.029999999999999999, 0.050000000000000003, 0.070000000000000007, 0.080000000000000002, 0.10000000000000001, 0.12, 0.13, 0.14999999999999999, 0.17000000000000001, 0.17999999999999999, 0.20000000000000001, 0.22, 0.23000000000000001, 0.25, 0.27000000000000002, 0.28000000000000003, 0.29999999999999999, 0.32000000000000001, 0.33000000000000002, 0.34999999999999998, 0.37, 0.38, 0.40000000000000002, 0.41999999999999998, 0.42999999999999999, 0.45000000000000001, 0.46999999999999997, 0.47999999999999998, 0.5, 0.52000000000000002, 0.53000000000000003, 0.55000000000000004, 0.56999999999999995, 0.57999999999999996, 0.59999999999999998, 0.62, 0.63, 0.65000000000000002, 0.67000000000000004, 0.68000000000000005, 0.69999999999999996, 0.71999999999999997, 0.72999999999999998, 0.75, 0.77000000000000002, 0.78000000000000003, 0.80000000000000004, 0.81999999999999995, 0.82999999999999996, 0.84999999999999998, 0.87, 0.88, 0.90000000000000002, 0.92000000000000004, 0.93000000000000005, 0.94999999999999996, 0.96999999999999997, 0.97999999999999998, 1.0, 1.02, 1.03, 1.05, 1.0700000000000001, 1.0800000000000001, 1.1000000000000001, 1.1200000000000001, 1.1299999999999999, 1.1499999999999999, 1.1699999999999999, 1.1799999999999999, 1.2, 1.22, 1.23, 1.25, 1.27, 1.28, 1.3, 1.3200000000000001, 1.3300000000000001, 1.3500000000000001, 1.3700000000000001, 1.3799999999999999, 1.3999999999999999, 1.4199999999999999, 1.4299999999999999, 1.45, 1.47, 1.48, 1.5, 1.52, 1.53, 1.55, 1.5700000000000001, 1.5800000000000001, 1.6000000000000001, 1.6200000000000001, 1.6299999999999999, 1.6499999999999999, 1.6699999999999999, 1.6799999999999999, 1.7, 1.72, 1.73, 1.75, 1.77, 1.78, 1.8, 1.8200000000000001, 1.8300000000000001, 1.8500000000000001, 1.8700000000000001, 1.8799999999999999, 1.8999999999999999, 1.9199999999999999, 1.9299999999999999, 1.95, 1.97, 1.98, 2.0, 2.02, 2.0299999999999998, 2.0499999999999998, 2.0699999999999998, 2.0800000000000001, 2.1000000000000001, 2.1200000000000001, 2.1299999999999999, 2.1499999999999999, 2.1699999999999999, 2.1800000000000002, 2.2000000000000002, 2.2200000000000002, 2.23, 2.25, 2.27, 2.2799999999999998, 2.2999999999999998, 2.3199999999999998, 2.3300000000000001, 2.3500000000000001, 2.3700000000000001, 2.3799999999999999, 2.3999999999999999, 2.4199999999999999, 2.4300000000000002, 2.4500000000000002, 2.4700000000000002, 2.48, 2.5, 2.52, 2.5299999999999998, 2.5499999999999998, 2.5699999999999998, 2.5800000000000001, 2.6000000000000001, 2.6200000000000001, 2.6299999999999999, 2.6499999999999999, 2.6699999999999999, 2.6800000000000002, 2.7000000000000002, 2.7200000000000002, 2.73, 2.75, 2.77, 2.7799999999999998, 2.7999999999999998, 2.8199999999999998, 2.8300000000000001, 2.8500000000000001, 2.8700000000000001, 2.8799999999999999, 2.8999999999999999, 2.9199999999999999, 2.9300000000000002, 2.9500000000000002, 2.9700000000000002, 2.98, 3.0, 3.02, 3.0299999999999998, 3.0499999999999998, 3.0699999999999998, 3.0800000000000001, 3.1000000000000001, 3.1200000000000001, 3.1299999999999999, 3.1499999999999999, 3.1699999999999999, 3.1800000000000002, 3.2000000000000002, 3.2200000000000002, 3.23, 3.25, 3.27, 3.2799999999999998, 3.2999999999999998, 3.3199999999999998, 3.3300000000000001, 3.3500000000000001, 3.3700000000000001, 3.3799999999999999, 3.3999999999999999, 3.4199999999999999, 3.4300000000000002, 3.4500000000000002, 3.4700000000000002, 3.48, 3.5, 3.52, 3.5299999999999998, 3.5499999999999998, 3.5699999999999998, 3.5800000000000001, 3.6000000000000001, 3.6200000000000001, 3.6299999999999999, 3.6499999999999999, 3.6699999999999999, 3.6800000000000002, 3.7000000000000002, 3.7200000000000002, 3.73, 3.75, 3.77, 3.7799999999999998, 3.7999999999999998, 3.8199999999999998, 3.8300000000000001, 3.8500000000000001, 3.8700000000000001, 3.8799999999999999, 3.8999999999999999, 3.9199999999999999, 3.9300000000000002, 3.9500000000000002, 3.9700000000000002, 3.98, 4.0, 4.0199999999999996, 4.0300000000000002, 4.0499999999999998, 4.0700000000000003, 4.0800000000000001, 4.0999999999999996, 4.1200000000000001, 4.1299999999999999, 4.1500000000000004, 4.1699999999999999, 4.1799999999999997, 4.2000000000000002, 4.2199999999999998, 4.2300000000000004, 4.25, 4.2699999999999996, 4.2800000000000002, 4.2999999999999998, 4.3200000000000003, 4.3300000000000001, 4.3499999999999996, 4.3700000000000001, 4.3799999999999999, 4.4000000000000004, 4.4199999999999999, 4.4299999999999997, 4.4500000000000002, 4.4699999999999998, 4.4800000000000004, 4.5, 4.5199999999999996, 4.5300000000000002, 4.5499999999999998, 4.5700000000000003, 4.5800000000000001, 4.5999999999999996, 4.6200000000000001, 4.6299999999999999, 4.6500000000000004, 4.6699999999999999, 4.6799999999999997, 4.7000000000000002, 4.7199999999999998, 4.7300000000000004, 4.75, 4.7699999999999996, 4.7800000000000002, 4.7999999999999998, 4.8200000000000003, 4.8300000000000001, 4.8499999999999996, 4.8700000000000001, 4.8799999999999999, 4.9000000000000004, 4.9199999999999999, 4.9299999999999997, 4.9500000000000002, 4.9699999999999998, 4.9800000000000004, 5.0]
+1:34:38 [QMD 74] Expectation values computed
+1:34:38 [QMD 74] generator list after ensuring true generator is first: ['NV_alternative_model']
+1:34:38 [QMD 74] initialising generator NV_alternative_model with models: ['xTi', 'yTi', 'zTi']
+1:34:38 [QMD 74] xTi not added yet. List: []
+1:34:38 [QMD 74] yTi not added yet. List: ['xTi']
+1:34:38 [QMD 74] zTi not added yet. List: ['xTi', 'yTi']
+1:34:38 [QMD 74] After initial branches. InitialModelIDs: {'xTi': 0, 'yTi': 1, 'zTi': 2}
+1:34:38 [QMD 74] After setting up initial branches, highest branch id: 0 highest model id: 3 initial models: {}
+1:34:38 [QMD 74] Retrieving databases from redis
+1:34:38 [QMD 74] any job failed db: [b'Status'] Status: b'0'
+1:34:38 [QMD 74] Initial op list: ['xTi', 'yTi', 'zTi']
+1:34:38 [QMD 74] Specific terms for prior {}
+1:34:38 [QMD 74] RunParallel= True
+1:34:38 [QMD 74] Saving qmd info db to  StrictRedis<ConnectionPool<Connection<host=node35-003,port=6374,db=1>>>
+1:34:38 [QMD 74] Running  QLE  for true operator  xTiPPyTiPPzTiPPzTz  with parameters :  [0.92450565, 6.00664336, 1.65998543, 0.76546868]
+1:34:38 [DB] Model  xTi  not previously considered -- adding. ID: 0
+1:34:38 [DB] Model  yTi  not previously considered -- adding. ID: 1
+1:34:38 [DB] Model  zTi  not previously considered -- adding. ID: 2
+1:34:38 [QMD 74] After initiating DB, models: {0: 'xTi', 1: 'yTi', 2: 'zTi'}
+1:34:38 [QMD 74] learnModelFromBranchID branch 0 : ['xTi', 'yTi', 'zTi']
+1:34:38 [QMD 74] learnModelFromBranchID. Setting active branches on redis for branch 0 to 0
+1:34:38 [QMD 74] branch 0 precomputed: []
+1:34:38 [QMD 74] Branch  0 has unlearned models: ['xTi', 'yTi', 'zTi']
+1:34:38 [QMD 74] Model  xTi being passed to learnModel function
+1:34:38 [QMD 74] Model xTi added to queue.
+1:34:38 [QMD 74] Model  yTi being passed to learnModel function
+1:34:38 [QMD 74] Model yTi added to queue.
+1:34:38 [QMD 74] Model  zTi being passed to learnModel function
+1:34:38 [QMD 74] Model zTi added to queue.
+1:34:38 [QMD 74] learnModelFromBranchID finished, branch 0
+1:34:38 [QMD 74] Entering while loop of spawning/comparing.
+1:34:42 [QML 0] QML for  xTi
+1:34:43 [QML 1] QML for  yTi
+1:34:43 [QML 0] Getting prior for model: xTi Specific terms: {}
+1:34:43 [QML 1] Getting prior for model: yTi Specific terms: {}
+1:34:43 [QML 2] QML for  zTi
+1:34:43 [QML 0] Initialization Ready
+1:34:43 [RQ Learn 0.0] Time to unpickle and initialise QML class: 0.4296138286590576
+1:34:43 [RQ Learn 0.0] Updating model.
+1:34:43 [QML 0] Experiment 0
+1:34:43 [QML 0] Initial time selected >  0.384028360415
+1:34:43 [QML 1] Initialization Ready
+1:34:43 [RQ Learn 1.0] Time to unpickle and initialise QML class: 0.4272475242614746
+1:34:43 [RQ Learn 1.0] Updating model.
+1:34:43 [QML 1] Experiment 0
+1:34:43 [QML 1] Initial time selected >  0.765784997951
+1:34:43 [QML 2] Getting prior for model: zTi Specific terms: {}
+1:34:43 [QML 2] Initialization Ready
+1:34:43 [RQ Learn 2.0] Time to unpickle and initialise QML class: 0.46190619468688965
+1:34:43 [RQ Learn 2.0] Updating model.
+1:34:43 [QML 2] Experiment 0
+1:34:43 [QML 2] Initial time selected >  0.293142786186
+1:37:10 [QML 0] Experiment 75
+1:37:21 [QML 1] Experiment 75
+1:37:51 [QML 2] Experiment 75
+1:39:40 [QML 0] Experiment 150
+1:40:6 [QML 1] Experiment 150
+1:41:2 [QML 2] Experiment 150
+1:42:15 [QML 0] Experiment 225
+1:42:52 [QML 1] Experiment 225
+1:44:6 [QML 2] Experiment 225
+1:44:47 [QML 0] Experiment 300
+1:45:39 [QML 1] Experiment 300
+1:47:1 [QML 2] Experiment 300
+1:47:19 [QML 0] Experiment 375
+1:48:27 [QML 1] Experiment 375
+1:49:31 [QML 0] Experiment 450
+1:50:0 [QML 2] Experiment 375
+1:51:10 [QML 1] Experiment 450
+1:51:44 [QML 0] Experiment 525
+1:52:32 [QML 2] Experiment 450
+1:53:54 [QML 1] Experiment 525
+1:53:56 [QML 0] Experiment 600
+1:55:5 [QML 2] Experiment 525
+1:56:9 [QML 0] Experiment 675
+1:56:38 [QML 1] Experiment 600
+1:57:39 [QML 2] Experiment 600
+1:58:22 [QML 0] Results for QHL on  xTi
+1:58:22 [QML 0] Final time selected > 2.45
+1:58:22 [QML 0] Cumulative time.	 Datum: 0.8290143013000488 	 Update: 1417.0515608787537
+1:58:22 [QML 0] Final Parameters mean and stdev (term  xTi ): [  1.51194152e-04   4.69303936e-05]
+1:58:22 [RQ Learn 0.0] Time for update alone: 1418.8741216659546
+1:58:22 [RQ Learn 0.0] Redis learned_models_info added to db for model: 0.0
+1:58:22 [RQ Learn 0.0] Redis SET learned_models_ids: 0.0 ; set True
+1:58:22 [RQ Learn 0.0] Learned. rq time: 1419.4764523506165
+1:59:14 [QML 1] Experiment 675
+2:0:10 [QML 2] Experiment 675
+2:1:56 [QML 1] Results for QHL on  yTi
+2:1:56 [QML 1] Final time selected > 2.45
+2:1:56 [QML 1] Cumulative time.	 Datum: 0.8299343585968018 	 Update: 1631.71595454216
+2:1:56 [QML 1] Final Parameters mean and stdev (term  yTi ): [  6.55738292e+00   5.54459426e-03]
+2:1:56 [RQ Learn 1.0] Time for update alone: 1633.5514070987701
+2:1:57 [RQ Learn 1.0] Redis learned_models_info added to db for model: 1.0
+2:1:57 [RQ Learn 1.0] Redis SET learned_models_ids: 1.0 ; set True
+2:1:57 [RQ Learn 1.0] Learned. rq time: 1634.1504471302032
+2:2:42 [QML 2] Results for QHL on  zTi
+2:2:42 [QML 2] Final time selected > 2.45
+2:2:42 [QML 2] Cumulative time.	 Datum: 0.8670797348022461 	 Update: 1676.470413684845
+2:2:42 [QML 2] Final Parameters mean and stdev (term  zTi ): [-0.01604608  0.03910023]
+2:2:42 [RQ Learn 2.0] Time for update alone: 1678.3535161018372
+2:2:42 [RQ Learn 2.0] Redis learned_models_info added to db for model: 2.0
+2:2:42 [RQ Learn 2.0] Redis SET learned_models_ids: 2.0 ; set True
+2:2:42 [QMD 74] All models on branch 0 have finished learning.
+2:2:42 [RQ Learn 2.0] Learned. rq time: 1678.988846063614
+2:2:42[QML:Reduced 0; QMD 74] Updating learned info for model 0
+2:2:42[QML:Reduced 0; QMD 74] Updated learned info for model 0
+2:2:42[QML:Reduced 1; QMD 74] Updating learned info for model 1
+2:2:42[QML:Reduced 1; QMD 74] Updated learned info for model 1
+2:2:42[QML:Reduced 2; QMD 74] Updating learned info for model 2
+2:2:42[QML:Reduced 2; QMD 74] Updated learned info for model 2
+2:2:42 [QMD 74] remoteBayesFromBranchID 0 model id list: [0, 1, 2]
+2:2:42 [QMD 74] Computing BF for pair 0,1
+2:2:42 [QMD 74] Bayes factor calculation queued. Model IDs 0 1
+2:2:42 [QMD 74] Computing BF for pair 0,2
+2:2:42 [QMD 74] Bayes factor calculation queued. Model IDs 0 2
+2:2:42 [QMD 74] Computing BF for pair 1,2
+2:2:42 [QMD 74] Bayes factor calculation queued. Model IDs 1 2
+2:2:48[QML:Bayes 0; QMD 74] Name: xTi
+2:2:48[QML:Bayes 0; QMD 74] Name: xTi
+2:2:48[QML:Bayes 1; QMD 74] Name: yTi
+2:2:48[QML:Bayes 0; QMD 74] Time to reconstruct updater: 0.0009026527404785156
+2:2:48[QML:Bayes 0; QMD 74] Time to reconstruct updater: 0.000881195068359375
+2:2:48[QML:Bayes 0; QMD 74] Prior mean: [ 0.00015005]
+2:2:48[QML:Bayes 1; QMD 74] Time to reconstruct updater: 0.0009086132049560547
+2:2:48[QML:Bayes 1; QMD 74] Prior mean: [ 6.55725432]
+2:2:48[QML:Bayes 0; QMD 74] Prior mean: [ 0.0001503]
+2:2:49[QML:Bayes 2; QMD 74] Name: zTi
+2:2:49[QML:Bayes 2; QMD 74] Time to reconstruct updater: 0.0006887912750244141
+2:2:49[QML:Bayes 2; QMD 74] Prior mean: [-0.01700314]
+2:2:49 [RQ Bayes 1/2] Start. Branch 0
+2:2:49[QML:Bayes 2; QMD 74] Name: zTi
+2:2:49[QML:Bayes 2; QMD 74] Time to reconstruct updater: 0.0006878376007080078
+2:2:49[QML:Bayes 2; QMD 74] Prior mean: [-0.01500994]
+2:2:49 [RQ Bayes 0/2] Start. Branch 0
+2:2:49[QML:Bayes 1; QMD 74] Name: yTi
+2:2:49[QML:Bayes 1; QMD 74] Time to reconstruct updater: 0.0006630420684814453
+2:2:49[QML:Bayes 1; QMD 74] Prior mean: [ 6.55739135]
+2:2:49 [RQ Bayes 0/1] Start. Branch 0
+2:51:29 [RQ Bayes 0/2] BF computed: A:0; B:2; BF:0.0 	Reset remormalisation record: False
+2:51:29 [RQ Bayes 0/2] Finished. rq time:  2921.1354241371155
+2:52:51 [RQ Bayes 0/1] BF computed: A:0; B:1; BF:0.0 	Reset remormalisation record: False
+2:52:51 [RQ Bayes 0/1] Finished. rq time:  3003.1958837509155
+2:55:24 [RQ Bayes 1/2] BF computed: A:1; B:2; BF:7.611143452071915e+67 	Reset remormalisation record: False
+2:55:24 [RQ Bayes 1/2] Finished. rq time:  3155.646327018738
+2:55:24 [QMD 74] compareModelsWithinBranch 0 active_models_in_branch_old: [0.0, 1.0, 2.0] active_models_in_branch_new: [0, 1, 2]
+2:55:24 [QMD 74] [compareModelsWithinBranch 0] Point to 1 (comparison 0/1)
+2:55:24 [QMD 74] [compareModelsWithinBranch 0] Point to 2 (comparison 0/2)
+2:55:24 [QMD 74] [compareModelsWithinBranch 0] Point to 1 (comparison 1/2)
+2:55:24 [QMD 74] Model points for branch 0 {0: 0, 1: 2, 2: 1}
+2:55:24 [QMD 74] Champion of branch  0  is  yTi (1)
+2:55:24 [QMD 74] Spawning. Growth rule: NV_alternative_model. Depth: 1
+2:55:24 [QMD 74] After model generation for growth rule NV_alternative_model SPAWN STAGE: [None] 
+new models: ['yTiPPzTi', 'xTiPPyTi']
+2:55:24 [QMD 74] Branch 1 growth rule NV_alternative_model has 2 new models ['xTiPPyTi', 'yTiPPzTi']
+2:55:24 [DB] Model  xTiPPyTi  not previously considered -- adding. ID: 3
+2:55:24 [QMD 74] Model  xTiPPyTi 
+	computed already:  False 
+	ID: 3
+2:55:24 [DB] Model  yTiPPzTi  not previously considered -- adding. ID: 4
+2:55:24 [QMD 74] Model  yTiPPzTi 
+	computed already:  False 
+	ID: 4
+2:55:24 [QMD 74] Num models already computed on branch  1 = 0
+2:55:24 [QMD 74] Models to add to new branch ( 1 ):  ['yTiPPzTi', 'xTiPPyTi']
+2:55:24 [QMD 74] learnModelFromBranchID branch 1 : ['xTiPPyTi', 'yTiPPzTi']
+2:55:24 [QMD 74] learnModelFromBranchID. Setting active branches on redis for branch 1 to 0
+2:55:24 [QMD 74] branch 1 precomputed: []
+2:55:24 [QMD 74] Branch  1 has unlearned models: ['xTiPPyTi', 'yTiPPzTi']
+2:55:24 [QMD 74] Model  xTiPPyTi being passed to learnModel function
+2:55:24 [QMD 74] Model xTiPPyTi added to queue.
+2:55:24 [QMD 74] Model  yTiPPzTi being passed to learnModel function
+2:55:24 [QMD 74] Model yTiPPzTi added to queue.
+2:55:24 [QMD 74] learnModelFromBranchID finished, branch 1
+2:55:31 [QML 3] QML for  xTiPPyTi
+2:55:31 [QML 4] QML for  yTiPPzTi
+2:55:31 [QML 3] Getting prior for model: xTiPPyTi Specific terms: {}
+2:55:31 [QML 4] Getting prior for model: yTiPPzTi Specific terms: {}
+2:55:31 [QML 4] Initialization Ready
+2:55:31 [RQ Learn 4.0] Time to unpickle and initialise QML class: 0.5994133949279785
+2:55:31 [RQ Learn 4.0] Updating model.
+2:55:31 [QML 4] Experiment 0
+2:55:31 [QML 4] Initial time selected >  0.16566669032
+2:55:31 [QML 3] Initialization Ready
+2:55:31 [RQ Learn 3.0] Time to unpickle and initialise QML class: 0.6085801124572754
+2:55:31 [RQ Learn 3.0] Updating model.
+2:55:31 [QML 3] Experiment 0
+2:55:31 [QML 3] Initial time selected >  0.177614606994
+2:58:12 [QML 4] Experiment 75
+2:58:13 [QML 3] Experiment 75
+3:0:57 [QML 4] Experiment 150
+3:0:59 [QML 3] Experiment 150
+3:3:42 [QML 4] Experiment 225
+3:3:46 [QML 3] Experiment 225
+3:6:27 [QML 4] Experiment 300
+3:6:32 [QML 3] Experiment 300
+3:9:13 [QML 4] Experiment 375
+3:9:18 [QML 3] Experiment 375
+3:11:57 [QML 4] Experiment 450
+3:12:3 [QML 3] Experiment 450
+3:14:42 [QML 4] Experiment 525
+3:14:49 [QML 3] Experiment 525
+3:17:27 [QML 4] Experiment 600
+3:17:36 [QML 3] Experiment 600
+3:20:6 [QML 4] Experiment 675
+3:20:16 [QML 3] Experiment 675
+3:22:55 [QML 4] Results for QHL on  yTiPPzTi
+3:22:55 [QML 4] Final time selected > 2.45
+3:22:55 [QML 4] Cumulative time.	 Datum: 0.8709416389465332 	 Update: 1641.5845324993134
+3:22:55 [QML 4] Final Parameters mean and stdev (term  yTi ): [ 6.2005075   0.04075615]
+3:22:55 [QML 4] Final Parameters mean and stdev (term  zTi ): [ 2.01297707  0.12576538]
+3:22:55 [RQ Learn 4.0] Time for update alone: 1644.2358229160309
+3:22:56 [RQ Learn 4.0] Redis learned_models_info added to db for model: 4.0
+3:22:56 [RQ Learn 4.0] Redis SET learned_models_ids: 4.0 ; set True
+3:22:56 [RQ Learn 4.0] Learned. rq time: 1645.0283117294312
+3:23:2 [QML 3] Results for QHL on  xTiPPyTi
+3:23:2 [QML 3] Final time selected > 2.45
+3:23:2 [QML 3] Cumulative time.	 Datum: 0.9071564674377441 	 Update: 1648.4136621952057
+3:23:2 [QML 3] Final Parameters mean and stdev (term  xTi ): [ 0.24265035  0.0797891 ]
+3:23:2 [QML 3] Final Parameters mean and stdev (term  yTi ): [ 6.12176604  0.01744558]
+3:23:2 [RQ Learn 3.0] Time for update alone: 1651.068627357483
+3:23:2 [RQ Learn 3.0] Redis learned_models_info added to db for model: 3.0
+3:23:2 [RQ Learn 3.0] Redis SET learned_models_ids: 3.0 ; set True
+3:23:2 [QMD 74] All models on branch 1 have finished learning.
+3:23:2 [RQ Learn 3.0] Learned. rq time: 1651.8652811050415
+3:23:2[QML:Reduced 3; QMD 74] Updating learned info for model 3
+3:23:2[QML:Reduced 3; QMD 74] Updated learned info for model 3
+3:23:2[QML:Reduced 4; QMD 74] Updating learned info for model 4
+3:23:3[QML:Reduced 4; QMD 74] Updated learned info for model 4
+3:23:3 [QMD 74] remoteBayesFromBranchID 1 model id list: [3, 4]
+3:23:3 [QMD 74] Computing BF for pair 3,4
+3:23:3 [QMD 74] Bayes factor calculation queued. Model IDs 3 4
+3:23:9[QML:Bayes 3; QMD 74] Name: xTiPPyTi
+3:23:9[QML:Bayes 3; QMD 74] Time to reconstruct updater: 0.0013041496276855469
+3:23:9[QML:Bayes 3; QMD 74] Prior mean: [ 0.23938542  6.12268311]
+3:23:10[QML:Bayes 4; QMD 74] Name: yTiPPzTi
+3:23:10[QML:Bayes 4; QMD 74] Time to reconstruct updater: 0.0009751319885253906
+3:23:10[QML:Bayes 4; QMD 74] Prior mean: [ 6.19914309  2.01687049]
+3:23:10 [RQ Bayes 3/4] Start. Branch 1
+4:17:25 [RQ Bayes 3/4] BF computed: A:3; B:4; BF:0.0 	Reset remormalisation record: False
+4:17:25 [RQ Bayes 3/4] Finished. rq time:  3255.6429381370544
+4:17:25 [QMD 74] compareModelsWithinBranch 1 active_models_in_branch_old: [3.0, 4.0] active_models_in_branch_new: [3, 4]
+4:17:25 [QMD 74] [compareModelsWithinBranch 1] Point to 4 (comparison 3/4)
+4:17:25 [QMD 74] Model points for branch 1 {3: 0, 4: 1}
+4:17:25 [QMD 74] Champion of branch  1  is  yTiPPzTi (4)
+4:17:25 [QMD 74] Spawning. Growth rule: NV_alternative_model. Depth: 2
+4:17:25 [QMD 74] After model generation for growth rule NV_alternative_model SPAWN STAGE: [None] 
+new models: ['xTiPPyTiPPzTi']
+4:17:25 [QMD 74] Branch 2 growth rule NV_alternative_model has 1 new models ['xTiPPyTiPPzTi']
+4:17:25 [DB] Model  xTiPPyTiPPzTi  not previously considered -- adding. ID: 5
+4:17:25 [QMD 74] Model  xTiPPyTiPPzTi 
+	computed already:  False 
+	ID: 5
+4:17:25 [QMD 74] Num models already computed on branch  2 = 0
+4:17:25 [QMD 74] Models to add to new branch ( 2 ):  ['xTiPPyTiPPzTi']
+4:17:25 [QMD 74] learnModelFromBranchID branch 2 : ['xTiPPyTiPPzTi']
+4:17:25 [QMD 74] learnModelFromBranchID. Setting active branches on redis for branch 2 to 0
+4:17:25 [QMD 74] branch 2 precomputed: []
+4:17:25 [QMD 74] Branch  2 has unlearned models: ['xTiPPyTiPPzTi']
+4:17:25 [QMD 74] Model  xTiPPyTiPPzTi being passed to learnModel function
+4:17:25 [QMD 74] Model xTiPPyTiPPzTi added to queue.
+4:17:25 [QMD 74] learnModelFromBranchID finished, branch 2
+4:17:31 [QML 5] QML for  xTiPPyTiPPzTi
+4:17:31 [QML 5] Getting prior for model: xTiPPyTiPPzTi Specific terms: {}
+4:17:32 [QML 5] Initialization Ready
+4:17:32 [RQ Learn 5.0] Time to unpickle and initialise QML class: 0.8110644817352295
+4:17:32 [RQ Learn 5.0] Updating model.
+4:17:32 [QML 5] Experiment 0
+4:17:32 [QML 5] Initial time selected >  0.230449826307
+4:20:7 [QML 5] Experiment 75
+4:22:50 [QML 5] Experiment 150
+4:25:32 [QML 5] Experiment 225
+4:28:18 [QML 5] Experiment 300
+4:31:0 [QML 5] Experiment 375
+4:33:42 [QML 5] Experiment 450
+4:36:30 [QML 5] Experiment 525
+4:39:18 [QML 5] Experiment 600
+4:42:0 [QML 5] Experiment 675
+4:44:45 [QML 5] Results for QHL on  xTiPPyTiPPzTi
+4:44:45 [QML 5] Final time selected > 2.45
+4:44:45 [QML 5] Cumulative time.	 Datum: 0.9200084209442139 	 Update: 1629.873366355896
+4:44:45 [QML 5] Final Parameters mean and stdev (term  xTi ): [ 0.50085102  0.30510964]
+4:44:45 [QML 5] Final Parameters mean and stdev (term  yTi ): [ 6.19960989  0.05449731]
+4:44:45 [QML 5] Final Parameters mean and stdev (term  zTi ): [ 1.79940138  0.15471296]
+4:44:45 [RQ Learn 5.0] Time for update alone: 1633.1484243869781
+4:44:45 [RQ Learn 5.0] Redis learned_models_info added to db for model: 5.0
+4:44:45 [RQ Learn 5.0] Redis SET learned_models_ids: 5.0 ; set True
+4:44:45 [QMD 74] All models on branch 2 have finished learning.
+4:44:45 [RQ Learn 5.0] Learned. rq time: 1634.164973974228
+4:44:45[QML:Reduced 5; QMD 74] Updating learned info for model 5
+4:44:45[QML:Reduced 5; QMD 74] Updated learned info for model 5
+4:44:45 [QMD 74] remoteBayesFromBranchID 2 model id list: [5]
+4:44:45 [QMD 74] compareModelsWithinBranch 2 active_models_in_branch_old: [5.0] active_models_in_branch_new: [5]
+4:44:45 [QMD 74] Model points for branch 2 {5: 0}
+4:44:45 [QMD 74] Champion of branch  2  is  xTiPPyTiPPzTi (5)
+4:44:45 [QMD 74] Spawning. Growth rule: NV_alternative_model. Depth: 3
+4:44:45 [QMD 74] After model generation for growth rule NV_alternative_model SPAWN STAGE: [None] 
+new models: ['xTiPPxTxPPyTiPPzTi', 'xTiPPyTiPPzTiPPzTz', 'xTiPPyTiPPyTyPPzTi']
+4:44:45 [QMD 74] Branch 3 growth rule NV_alternative_model has 3 new models ['xTiPPyTiPPyTyPPzTi', 'xTiPPyTiPPzTiPPzTz', 'xTiPPxTxPPyTiPPzTi']
+4:44:45 [DB] Model  xTiPPyTiPPyTyPPzTi  not previously considered -- adding. ID: 6
+4:44:45 [QMD 74] Model  xTiPPyTiPPyTyPPzTi 
+	computed already:  False 
+	ID: 6
+4:44:45 [DB] Model  xTiPPyTiPPzTiPPzTz  not previously considered -- adding. ID: 7
+4:44:46 [QMD 74] Model  xTiPPyTiPPzTiPPzTz 
+	computed already:  False 
+	ID: 7
+4:44:46 [DB] Model  xTiPPxTxPPyTiPPzTi  not previously considered -- adding. ID: 8
+4:44:46 [QMD 74] Model  xTiPPxTxPPyTiPPzTi 
+	computed already:  False 
+	ID: 8
+4:44:46 [QMD 74] Num models already computed on branch  3 = 0
+4:44:46 [QMD 74] Models to add to new branch ( 3 ):  ['xTiPPxTxPPyTiPPzTi', 'xTiPPyTiPPzTiPPzTz', 'xTiPPyTiPPyTyPPzTi']
+4:44:46 [QMD 74] learnModelFromBranchID branch 3 : ['xTiPPyTiPPyTyPPzTi', 'xTiPPyTiPPzTiPPzTz', 'xTiPPxTxPPyTiPPzTi']
+4:44:46 [QMD 74] learnModelFromBranchID. Setting active branches on redis for branch 3 to 0
+4:44:46 [QMD 74] branch 3 precomputed: []
+4:44:46 [QMD 74] Branch  3 has unlearned models: ['xTiPPyTiPPyTyPPzTi', 'xTiPPyTiPPzTiPPzTz', 'xTiPPxTxPPyTiPPzTi']
+4:44:46 [QMD 74] Model  xTiPPyTiPPyTyPPzTi being passed to learnModel function
+4:44:46 [QMD 74] Model xTiPPyTiPPyTyPPzTi added to queue.
+4:44:46 [QMD 74] Model  xTiPPyTiPPzTiPPzTz being passed to learnModel function
+4:44:46 [QMD 74] Model xTiPPyTiPPzTiPPzTz added to queue.
+4:44:46 [QMD 74] Model  xTiPPxTxPPyTiPPzTi being passed to learnModel function
+4:44:46 [QMD 74] Model xTiPPxTxPPyTiPPzTi added to queue.
+4:44:46 [QMD 74] learnModelFromBranchID finished, branch 3
+4:44:52 [QML 7] QML for  xTiPPyTiPPzTiPPzTz
+4:44:52 [QML 6] QML for  xTiPPyTiPPyTyPPzTi
+4:44:52 [QML 8] QML for  xTiPPxTxPPyTiPPzTi
+4:44:52 [QML 7] Getting prior for model: xTiPPyTiPPzTiPPzTz Specific terms: {}
+4:44:52 [QML 6] Getting prior for model: xTiPPyTiPPyTyPPzTi Specific terms: {}
+4:44:52 [QML 8] Getting prior for model: xTiPPxTxPPyTiPPzTi Specific terms: {}
+4:44:53 [QML 6] Initialization Ready
+4:44:53 [QML 7] Initialization Ready
+4:44:53 [QML 8] Initialization Ready
+4:44:53 [RQ Learn 6.0] Time to unpickle and initialise QML class: 0.8967583179473877
+4:44:53 [RQ Learn 7.0] Time to unpickle and initialise QML class: 0.8984489440917969
+4:44:53 [RQ Learn 6.0] Updating model.
+4:44:53 [RQ Learn 7.0] Updating model.
+4:44:53 [QML 6] Experiment 0
+4:44:53 [RQ Learn 8.0] Time to unpickle and initialise QML class: 0.9003524780273438
+4:44:53 [QML 7] Experiment 0
+4:44:53 [QML 6] Initial time selected >  0.0553139549206
+4:44:53 [QML 7] Initial time selected >  0.0691127044441
+4:44:53 [RQ Learn 8.0] Updating model.
+4:44:53 [QML 8] Experiment 0
+4:44:53 [QML 8] Initial time selected >  0.0793157070239
+4:47:19 [QML 6] Experiment 75
+4:47:23 [QML 7] Experiment 75
+4:47:24 [QML 8] Experiment 75
+4:49:50 [QML 6] Experiment 150
+4:49:59 [QML 7] Experiment 150
+4:50:2 [QML 8] Experiment 150
+4:52:31 [QML 6] Experiment 225
+4:52:38 [QML 8] Experiment 225
+4:52:39 [QML 7] Experiment 225
+4:55:13 [QML 6] Experiment 300
+4:55:21 [QML 8] Experiment 300
+4:55:21 [QML 7] Experiment 300
+4:57:56 [QML 6] Experiment 375
+4:58:4 [QML 7] Experiment 375
+4:58:6 [QML 8] Experiment 375
+5:0:39 [QML 6] Experiment 450
+5:0:48 [QML 7] Experiment 450
+5:0:50 [QML 8] Experiment 450
+5:3:24 [QML 6] Experiment 525
+5:3:34 [QML 7] Experiment 525
+5:3:36 [QML 8] Experiment 525
+5:6:7 [QML 6] Experiment 600
+5:6:18 [QML 7] Experiment 600
+5:6:22 [QML 8] Experiment 600
+5:8:44 [QML 6] Experiment 675
+5:8:57 [QML 7] Experiment 675
+5:9:0 [QML 8] Experiment 675
+5:11:27 [QML 6] Results for QHL on  xTiPPyTiPPyTyPPzTi
+5:11:27 [QML 6] Final time selected > 2.45
+5:11:27 [QML 6] Cumulative time.	 Datum: 0.8834705352783203 	 Update: 1590.7920408248901
+5:11:27 [QML 6] Final Parameters mean and stdev (term  xTi ): [ 1.17324263  0.1263191 ]
+5:11:27 [QML 6] Final Parameters mean and stdev (term  yTi ): [ 5.96625087  0.02535992]
+5:11:27 [QML 6] Final Parameters mean and stdev (term  yTy ): [-0.19907869  0.01993334]
+5:11:27 [QML 6] Final Parameters mean and stdev (term  zTi ): [ 1.77239687  0.109672  ]
+5:11:27 [RQ Learn 6.0] Time for update alone: 1594.084977388382
+5:11:28 [RQ Learn 6.0] Redis learned_models_info added to db for model: 6.0
+5:11:28 [RQ Learn 6.0] Redis SET learned_models_ids: 6.0 ; set True
+5:11:28 [RQ Learn 6.0] Learned. rq time: 1595.266901731491
+5:11:41 [QML 7] Results for QHL on  xTiPPyTiPPzTiPPzTz
+5:11:41 [QML 7] Final time selected > 2.45
+5:11:41 [QML 7] Cumulative time.	 Datum: 0.8770997524261475 	 Update: 1604.7309701442719
+5:11:41 [QML 7] Final Parameters mean and stdev (term  xTi ): [ 1.12601126  0.23196406]
+5:11:41 [QML 7] Final Parameters mean and stdev (term  yTi ): [ 5.94872337  0.04695295]
+5:11:41 [QML 7] Final Parameters mean and stdev (term  zTi ): [ 1.6010716   0.17716538]
+5:11:41 [QML 7] Final Parameters mean and stdev (term  zTz ): [ 0.92358342  0.12269296]
+5:11:41 [RQ Learn 7.0] Time for update alone: 1607.984581232071
+5:11:42 [RQ Learn 7.0] Redis learned_models_info added to db for model: 7.0
+5:11:42 [RQ Learn 7.0] Redis SET learned_models_ids: 7.0 ; set True
+5:11:42 [RQ Learn 7.0] Learned. rq time: 1609.1764488220215
+5:11:45 [QML 8] Results for QHL on  xTiPPxTxPPyTiPPzTi
+5:11:45 [QML 8] Final time selected > 2.45
+5:11:45 [QML 8] Cumulative time.	 Datum: 0.9420583248138428 	 Update: 1608.6160657405853
+5:11:45 [QML 8] Final Parameters mean and stdev (term  xTi ): [ 1.81726935  0.44323161]
+5:11:45 [QML 8] Final Parameters mean and stdev (term  xTx ): [-0.07490031  0.71632103]
+5:11:45 [QML 8] Final Parameters mean and stdev (term  yTi ): [ 5.8210717   0.02905135]
+5:11:45 [QML 8] Final Parameters mean and stdev (term  zTi ): [ 1.73348161  0.10121196]
+5:11:45 [RQ Learn 8.0] Time for update alone: 1611.957014799118
+5:11:46 [RQ Learn 8.0] Redis learned_models_info added to db for model: 8.0
+5:11:46 [RQ Learn 8.0] Redis SET learned_models_ids: 8.0 ; set True
+5:11:46 [QMD 74] All models on branch 3 have finished learning.
+5:11:46 [RQ Learn 8.0] Learned. rq time: 1613.1565663814545
+5:11:46[QML:Reduced 6; QMD 74] Updating learned info for model 6
+5:11:46[QML:Reduced 6; QMD 74] Updated learned info for model 6
+5:11:46[QML:Reduced 7; QMD 74] Updating learned info for model 7
+5:11:46[QML:Reduced 7; QMD 74] Updated learned info for model 7
+5:11:46[QML:Reduced 8; QMD 74] Updating learned info for model 8
+5:11:46[QML:Reduced 8; QMD 74] Updated learned info for model 8
+5:11:46 [QMD 74] remoteBayesFromBranchID 3 model id list: [6, 7, 8]
+5:11:46 [QMD 74] Computing BF for pair 6,7
+5:11:46 [QMD 74] Bayes factor calculation queued. Model IDs 6 7
+5:11:46 [QMD 74] Computing BF for pair 6,8
+5:11:46 [QMD 74] Bayes factor calculation queued. Model IDs 6 8
+5:11:46 [QMD 74] Computing BF for pair 7,8
+5:11:46 [QMD 74] Bayes factor calculation queued. Model IDs 7 8
+5:11:52[QML:Bayes 7; QMD 74] Name: xTiPPyTiPPzTiPPzTz
+5:11:52[QML:Bayes 6; QMD 74] Name: xTiPPyTiPPyTyPPzTi
+5:11:52[QML:Bayes 6; QMD 74] Name: xTiPPyTiPPyTyPPzTi
+5:11:52[QML:Bayes 6; QMD 74] Time to reconstruct updater: 0.0017168521881103516
+5:11:52[QML:Bayes 6; QMD 74] Time to reconstruct updater: 0.0015568733215332031
+5:11:52[QML:Bayes 6; QMD 74] Prior mean: [ 1.16845028  5.96646812 -0.19909342  1.77540656]
+5:11:52[QML:Bayes 7; QMD 74] Time to reconstruct updater: 0.0017490386962890625
+5:11:53[QML:Bayes 7; QMD 74] Prior mean: [ 1.12352555  5.94799685  1.60063575  0.92547262]
+5:11:53[QML:Bayes 6; QMD 74] Prior mean: [ 1.16995222  5.96648809 -0.19948552  1.77138237]
+5:11:53[QML:Bayes 8; QMD 74] Name: xTiPPxTxPPyTiPPzTi
+5:11:53[QML:Bayes 8; QMD 74] Time to reconstruct updater: 0.0013370513916015625
+5:11:53[QML:Bayes 8; QMD 74] Prior mean: [ 1.828608   -0.05153116  5.82149571  1.73053283]
+5:11:53 [RQ Bayes 7/8] Start. Branch 3
+5:11:53[QML:Bayes 7; QMD 74] Name: xTiPPyTiPPzTiPPzTz
+5:11:53[QML:Bayes 7; QMD 74] Time to reconstruct updater: 0.0014224052429199219
+5:11:53[QML:Bayes 7; QMD 74] Prior mean: [ 1.12124527  5.95004546  1.60141533  0.92358827]
+5:11:53 [RQ Bayes 6/7] Start. Branch 3
+5:11:53[QML:Bayes 8; QMD 74] Name: xTiPPxTxPPyTiPPzTi
+5:11:53[QML:Bayes 8; QMD 74] Time to reconstruct updater: 0.0013315677642822266
+5:11:53[QML:Bayes 8; QMD 74] Prior mean: [ 1.81974663 -0.0760558   5.82168098  1.73247682]
+5:11:53 [RQ Bayes 6/8] Start. Branch 3
+6:5:12 [RQ Bayes 6/7] BF computed: A:6; B:7; BF:0.0 	Reset remormalisation record: False
+6:5:12 [RQ Bayes 6/7] Finished. rq time:  3199.584876060486
+6:5:21 [RQ Bayes 6/8] BF computed: A:6; B:8; BF:0.0 	Reset remormalisation record: False
+6:5:21 [RQ Bayes 6/8] Finished. rq time:  3208.8382110595703
+6:5:22 [RQ Bayes 7/8] BF computed: A:7; B:8; BF:5.940710008146426e+35 	Reset remormalisation record: False
+6:5:22 [RQ Bayes 7/8] Finished. rq time:  3210.157116174698
+6:5:22 [QMD 74] compareModelsWithinBranch 3 active_models_in_branch_old: [6.0, 7.0, 8.0] active_models_in_branch_new: [6, 7, 8]
+6:5:22 [QMD 74] [compareModelsWithinBranch 3] Point to 7 (comparison 6/7)
+6:5:22 [QMD 74] [compareModelsWithinBranch 3] Point to 8 (comparison 6/8)
+6:5:22 [QMD 74] [compareModelsWithinBranch 3] Point to 7 (comparison 7/8)
+6:5:22 [QMD 74] Model points for branch 3 {6: 0, 7: 2, 8: 1}
+6:5:22 [QMD 74] Champion of branch  3  is  xTiPPyTiPPzTiPPzTz (7)
+6:5:22 [QMD 74] Spawning. Growth rule: NV_alternative_model. Depth: 4
+6:5:22 [QMD 74] After model generation for growth rule NV_alternative_model SPAWN STAGE: [None] 
+new models: ['xTiPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPzTiPPzTz']
+6:5:22 [QMD 74] Branch 4 growth rule NV_alternative_model has 2 new models ['xTiPPxTxPPyTiPPzTiPPzTz', 'xTiPPyTiPPyTyPPzTiPPzTz']
+6:5:22 [DB] Model  xTiPPxTxPPyTiPPzTiPPzTz  not previously considered -- adding. ID: 9
+6:5:23 [QMD 74] Model  xTiPPxTxPPyTiPPzTiPPzTz 
+	computed already:  False 
+	ID: 9
+6:5:23 [DB] Model  xTiPPyTiPPyTyPPzTiPPzTz  not previously considered -- adding. ID: 10
+6:5:23 [QMD 74] Model  xTiPPyTiPPyTyPPzTiPPzTz 
+	computed already:  False 
+	ID: 10
+6:5:23 [QMD 74] Num models already computed on branch  4 = 0
+6:5:23 [QMD 74] Models to add to new branch ( 4 ):  ['xTiPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPzTiPPzTz']
+6:5:23 [QMD 74] learnModelFromBranchID branch 4 : ['xTiPPxTxPPyTiPPzTiPPzTz', 'xTiPPyTiPPyTyPPzTiPPzTz']
+6:5:23 [QMD 74] learnModelFromBranchID. Setting active branches on redis for branch 4 to 0
+6:5:23 [QMD 74] branch 4 precomputed: []
+6:5:23 [QMD 74] Branch  4 has unlearned models: ['xTiPPxTxPPyTiPPzTiPPzTz', 'xTiPPyTiPPyTyPPzTiPPzTz']
+6:5:23 [QMD 74] Model  xTiPPxTxPPyTiPPzTiPPzTz being passed to learnModel function
+6:5:23 [QMD 74] Model xTiPPxTxPPyTiPPzTiPPzTz added to queue.
+6:5:23 [QMD 74] Model  xTiPPyTiPPyTyPPzTiPPzTz being passed to learnModel function
+6:5:23 [QMD 74] Model xTiPPyTiPPyTyPPzTiPPzTz added to queue.
+6:5:23 [QMD 74] learnModelFromBranchID finished, branch 4
+6:5:29 [QML 9] QML for  xTiPPxTxPPyTiPPzTiPPzTz
+6:5:29 [QML 10] QML for  xTiPPyTiPPyTyPPzTiPPzTz
+6:5:29 [QML 9] Getting prior for model: xTiPPxTxPPyTiPPzTiPPzTz Specific terms: {}
+6:5:29 [QML 10] Getting prior for model: xTiPPyTiPPyTyPPzTiPPzTz Specific terms: {}
+6:5:30 [QML 10] Initialization Ready
+6:5:30 [RQ Learn 10.0] Time to unpickle and initialise QML class: 1.0706455707550049
+6:5:30 [RQ Learn 10.0] Updating model.
+6:5:30 [QML 10] Experiment 0
+6:5:30 [QML 10] Initial time selected >  0.0960220180157
+6:5:30 [QML 9] Initialization Ready
+6:5:30 [RQ Learn 9.0] Time to unpickle and initialise QML class: 1.083120584487915
+6:5:30 [RQ Learn 9.0] Updating model.
+6:5:30 [QML 9] Experiment 0
+6:5:30 [QML 9] Initial time selected >  0.0517158226582
+6:7:55 [QML 10] Experiment 75
+6:7:56 [QML 9] Experiment 75
+6:10:26 [QML 10] Experiment 150
+6:10:35 [QML 9] Experiment 150
+6:13:8 [QML 10] Experiment 225
+6:13:10 [QML 9] Experiment 225
+6:15:51 [QML 10] Experiment 300
+6:15:53 [QML 9] Experiment 300
+6:18:32 [QML 10] Experiment 375
+6:18:35 [QML 9] Experiment 375
+6:21:16 [QML 10] Experiment 450
+6:21:19 [QML 9] Experiment 450
+6:24:1 [QML 10] Experiment 525
+6:24:4 [QML 9] Experiment 525
+6:26:46 [QML 10] Experiment 600
+6:26:49 [QML 9] Experiment 600
+6:29:21 [QML 10] Experiment 675
+6:29:24 [QML 9] Experiment 675
+6:32:5 [QML 10] Results for QHL on  xTiPPyTiPPyTyPPzTiPPzTz
+6:32:5 [QML 10] Final time selected > 2.45
+6:32:5 [QML 10] Cumulative time.	 Datum: 0.8824930191040039 	 Update: 1591.3185110092163
+6:32:5 [QML 10] Final Parameters mean and stdev (term  xTi ): [ 1.24673894  0.21146441]
+6:32:5 [QML 10] Final Parameters mean and stdev (term  yTi ): [ 5.93305645  0.05551586]
+6:32:5 [QML 10] Final Parameters mean and stdev (term  yTy ): [ 0.00234861  0.04279978]
+6:32:5 [QML 10] Final Parameters mean and stdev (term  zTi ): [ 1.56585301  0.18370686]
+6:32:5 [QML 10] Final Parameters mean and stdev (term  zTz ): [ 0.87116085  0.13558011]
+6:32:5 [RQ Learn 10.0] Time for update alone: 1594.9066548347473
+6:32:5 [RQ Learn 10.0] Redis learned_models_info added to db for model: 10.0
+6:32:5 [RQ Learn 10.0] Redis SET learned_models_ids: 10.0 ; set True
+6:32:5 [RQ Learn 10.0] Learned. rq time: 1596.2703258991241
+6:32:7 [QML 9] Results for QHL on  xTiPPxTxPPyTiPPzTiPPzTz
+6:32:7 [QML 9] Final time selected > 2.45
+6:32:7 [QML 9] Cumulative time.	 Datum: 0.886648416519165 	 Update: 1593.5178091526031
+6:32:7 [QML 9] Final Parameters mean and stdev (term  xTi ): [ 2.43031557  0.09865264]
+6:32:7 [QML 9] Final Parameters mean and stdev (term  xTx ): [ 0.2463199   0.09949717]
+6:32:7 [QML 9] Final Parameters mean and stdev (term  yTi ): [ 5.58403176  0.05595439]
+6:32:7 [QML 9] Final Parameters mean and stdev (term  zTi ): [ 1.93844559  0.0753021 ]
+6:32:7 [QML 9] Final Parameters mean and stdev (term  zTz ): [ 0.59200646  0.09407131]
+6:32:7 [RQ Learn 9.0] Time for update alone: 1597.1112875938416
+6:32:7 [RQ Learn 9.0] Redis learned_models_info added to db for model: 9.0
+6:32:7 [RQ Learn 9.0] Redis SET learned_models_ids: 9.0 ; set True
+6:32:7 [QMD 74] All models on branch 4 have finished learning.
+6:32:7 [RQ Learn 9.0] Learned. rq time: 1598.4782712459564
+6:32:7[QML:Reduced 9; QMD 74] Updating learned info for model 9
+6:32:7[QML:Reduced 9; QMD 74] Updated learned info for model 9
+6:32:7[QML:Reduced 10; QMD 74] Updating learned info for model 10
+6:32:7[QML:Reduced 10; QMD 74] Updated learned info for model 10
+6:32:7 [QMD 74] remoteBayesFromBranchID 4 model id list: [9, 10]
+6:32:7 [QMD 74] Computing BF for pair 9,10
+6:32:7 [QMD 74] Bayes factor calculation queued. Model IDs 9 10
+6:32:14[QML:Bayes 9; QMD 74] Name: xTiPPxTxPPyTiPPzTiPPzTz
+6:32:14[QML:Bayes 9; QMD 74] Time to reconstruct updater: 0.0018129348754882812
+6:32:14[QML:Bayes 9; QMD 74] Prior mean: [ 2.42988704  0.2472726   5.58461385  1.93676825  0.59039322]
+6:32:15[QML:Bayes 10; QMD 74] Name: xTiPPyTiPPyTyPPzTiPPzTz
+6:32:15[QML:Bayes 10; QMD 74] Time to reconstruct updater: 0.0014719963073730469
+6:32:15[QML:Bayes 10; QMD 74] Prior mean: [  1.24101533e+00   5.93291779e+00   6.02609119e-04   1.56855331e+00
+   8.71475716e-01]
+6:32:15 [RQ Bayes 9/10] Start. Branch 4
+7:24:59 [RQ Bayes 9/10] BF computed: A:9; B:10; BF:0.0 	Reset remormalisation record: False
+7:24:59 [RQ Bayes 9/10] Finished. rq time:  3164.4985044002533
+7:24:59 [QMD 74] compareModelsWithinBranch 4 active_models_in_branch_old: [9.0, 10.0] active_models_in_branch_new: [9, 10]
+7:24:59 [QMD 74] [compareModelsWithinBranch 4] Point to 10 (comparison 9/10)
+7:24:59 [QMD 74] Model points for branch 4 {9: 0, 10: 1}
+7:24:59 [QMD 74] Champion of branch  4  is  xTiPPyTiPPyTyPPzTiPPzTz (10)
+7:24:59 [QMD 74] Spawning. Growth rule: NV_alternative_model. Depth: 5
+7:24:59 [QMD 74] After model generation for growth rule NV_alternative_model SPAWN STAGE: [None] 
+new models: ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+7:24:59 [QMD 74] Branch 5 growth rule NV_alternative_model has 1 new models ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+7:24:59 [DB] Model  xTiPPxTxPPyTiPPyTyPPzTiPPzTz  not previously considered -- adding. ID: 11
+7:24:59 [QMD 74] Model  xTiPPxTxPPyTiPPyTyPPzTiPPzTz 
+	computed already:  False 
+	ID: 11
+7:24:59 [QMD 74] Num models already computed on branch  5 = 0
+7:24:59 [QMD 74] Models to add to new branch ( 5 ):  ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+7:24:59 [QMD 74] learnModelFromBranchID branch 5 : ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+7:24:59 [QMD 74] learnModelFromBranchID. Setting active branches on redis for branch 5 to 0
+7:24:59 [QMD 74] branch 5 precomputed: []
+7:24:59 [QMD 74] Branch  5 has unlearned models: ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+7:24:59 [QMD 74] Model  xTiPPxTxPPyTiPPyTyPPzTiPPzTz being passed to learnModel function
+7:24:59 [QMD 74] Model xTiPPxTxPPyTiPPyTyPPzTiPPzTz added to queue.
+7:24:59 [QMD 74] learnModelFromBranchID finished, branch 5
+7:25:6 [QML 11] QML for  xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+7:25:6 [QML 11] Getting prior for model: xTiPPxTxPPyTiPPyTyPPzTiPPzTz Specific terms: {}
+7:25:7 [QML 11] Initialization Ready
+7:25:7 [RQ Learn 11.0] Time to unpickle and initialise QML class: 1.1031739711761475
+7:25:7 [RQ Learn 11.0] Updating model.
+7:25:7 [QML 11] Experiment 0
+7:25:7 [QML 11] Initial time selected >  0.111260154304
+7:27:26 [QML 11] Experiment 75
+7:29:53 [QML 11] Experiment 150
+7:32:21 [QML 11] Experiment 225
+7:34:57 [QML 11] Experiment 300
+7:37:34 [QML 11] Experiment 375
+7:40:15 [QML 11] Experiment 450
+7:43:0 [QML 11] Experiment 525
+7:45:45 [QML 11] Experiment 600
+7:48:20 [QML 11] Experiment 675
+7:51:2 [QML 11] Results for QHL on  xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+7:51:2 [QML 11] Final time selected > 2.45
+7:51:2 [QML 11] Cumulative time.	 Datum: 0.9210026264190674 	 Update: 1551.0197842121124
+7:51:2 [QML 11] Final Parameters mean and stdev (term  xTi ): [ 1.77682598  0.17496942]
+7:51:2 [QML 11] Final Parameters mean and stdev (term  xTx ): [ 0.09871058  0.06104714]
+7:51:2 [QML 11] Final Parameters mean and stdev (term  yTi ): [ 5.87488398  0.03717968]
+7:51:2 [QML 11] Final Parameters mean and stdev (term  yTy ): [ 0.01499678  0.03238188]
+7:51:2 [QML 11] Final Parameters mean and stdev (term  zTi ): [ 1.15296983  0.07732661]
+7:51:2 [QML 11] Final Parameters mean and stdev (term  zTz ): [ 1.12127547  0.07880088]
+7:51:2 [RQ Learn 11.0] Time for update alone: 1555.018411397934
+7:51:2 [RQ Learn 11.0] Redis learned_models_info added to db for model: 11.0
+7:51:2 [RQ Learn 11.0] Redis SET learned_models_ids: 11.0 ; set True
+7:51:2 [QMD 74] All models on branch 5 have finished learning.
+7:51:2 [RQ Learn 11.0] Learned. rq time: 1556.4240989685059
+7:51:2[QML:Reduced 11; QMD 74] Updating learned info for model 11
+7:51:2[QML:Reduced 11; QMD 74] Updated learned info for model 11
+7:51:2 [QMD 74] remoteBayesFromBranchID 5 model id list: [11]
+7:51:2 [QMD 74] compareModelsWithinBranch 5 active_models_in_branch_old: [11.0] active_models_in_branch_new: [11]
+7:51:2 [QMD 74] Model points for branch 5 {11: 0}
+7:51:2 [QMD 74] Champion of branch  5  is  xTiPPxTxPPyTiPPyTyPPzTiPPzTz (11)
+7:51:2 [QMD 74] Spawning. Growth rule: NV_alternative_model. Depth: 6
+7:51:2 [QMD 74] After model generation for growth rule NV_alternative_model SPAWN STAGE: [None] 
+new models: ['xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz']
+7:51:2 [QMD 74] Branch 6 growth rule NV_alternative_model has 3 new models ['xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz']
+7:51:2 [DB] Model  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz  not previously considered -- adding. ID: 12
+7:51:2 [QMD 74] Model  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz 
+	computed already:  False 
+	ID: 12
+7:51:2 [DB] Model  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz  not previously considered -- adding. ID: 13
+7:51:2 [QMD 74] Model  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz 
+	computed already:  False 
+	ID: 13
+7:51:2 [DB] Model  xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz  not previously considered -- adding. ID: 14
+7:51:2 [QMD 74] Model  xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz 
+	computed already:  False 
+	ID: 14
+7:51:2 [QMD 74] Num models already computed on branch  6 = 0
+7:51:2 [QMD 74] Models to add to new branch ( 6 ):  ['xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz']
+7:51:2 [QMD 74] learnModelFromBranchID branch 6 : ['xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz']
+7:51:2 [QMD 74] learnModelFromBranchID. Setting active branches on redis for branch 6 to 0
+7:51:2 [QMD 74] branch 6 precomputed: []
+7:51:2 [QMD 74] Branch  6 has unlearned models: ['xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz']
+7:51:2 [QMD 74] Model  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz being passed to learnModel function
+7:51:2 [QMD 74] Model xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz added to queue.
+7:51:2 [QMD 74] Model  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz being passed to learnModel function
+7:51:2 [QMD 74] Model xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz added to queue.
+7:51:2 [QMD 74] Model  xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz being passed to learnModel function
+7:51:2 [QMD 74] Model xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz added to queue.
+7:51:2 [QMD 74] learnModelFromBranchID finished, branch 6
+7:51:9 [QML 14] QML for  xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz
+7:51:9 [QML 13] QML for  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz
+7:51:9 [QML 12] QML for  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz
+7:51:9 [QML 14] Getting prior for model: xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz Specific terms: {}
+7:51:9 [QML 13] Getting prior for model: xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz Specific terms: {}
+7:51:9 [QML 12] Getting prior for model: xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz Specific terms: {}
+7:51:10 [QML 14] Initialization Ready
+7:51:10 [RQ Learn 14.0] Time to unpickle and initialise QML class: 1.3976972103118896
+7:51:10 [RQ Learn 14.0] Updating model.
+7:51:10 [QML 14] Experiment 0
+7:51:10 [QML 14] Initial time selected >  0.0431850402823
+7:51:10 [QML 12] Initialization Ready
+7:51:10 [RQ Learn 12.0] Time to unpickle and initialise QML class: 1.412858486175537
+7:51:10 [RQ Learn 12.0] Updating model.
+7:51:10 [QML 12] Experiment 0
+7:51:10 [QML 12] Initial time selected >  0.081535366833
+7:51:10 [QML 13] Initialization Ready
+7:51:10 [RQ Learn 13.0] Time to unpickle and initialise QML class: 1.4199597835540771
+7:51:10 [RQ Learn 13.0] Updating model.
+7:51:10 [QML 13] Experiment 0
+7:51:10 [QML 13] Initial time selected >  0.033437228037
+7:53:34 [QML 13] Experiment 75
+7:53:37 [QML 14] Experiment 75
+7:53:39 [QML 12] Experiment 75
+7:55:59 [QML 13] Experiment 150
+7:56:9 [QML 12] Experiment 150
+7:56:13 [QML 14] Experiment 150
+7:58:34 [QML 13] Experiment 225
+7:58:40 [QML 12] Experiment 225
+7:58:49 [QML 14] Experiment 225
+8:1:13 [QML 12] Experiment 300
+8:1:16 [QML 13] Experiment 300
+8:1:30 [QML 14] Experiment 300
+8:3:53 [QML 12] Experiment 375
+8:3:58 [QML 13] Experiment 375
+8:4:13 [QML 14] Experiment 375
+8:6:39 [QML 12] Experiment 450
+8:6:42 [QML 13] Experiment 450
+8:6:58 [QML 14] Experiment 450
+8:9:26 [QML 12] Experiment 525
+8:9:26 [QML 13] Experiment 525
+8:9:43 [QML 14] Experiment 525
+8:12:10 [QML 13] Experiment 600
+8:12:11 [QML 12] Experiment 600
+8:12:28 [QML 14] Experiment 600
+8:14:49 [QML 13] Experiment 675
+8:14:52 [QML 12] Experiment 675
+8:15:9 [QML 14] Experiment 675
+8:17:33 [QML 13] Results for QHL on  xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz
+8:17:33 [QML 13] Final time selected > 2.45
+8:17:33 [QML 13] Cumulative time.	 Datum: 0.870288610458374 	 Update: 1578.4210603237152
+8:17:33 [QML 13] Final Parameters mean and stdev (term  xTi ): [ 2.08736677  0.12680732]
+8:17:33 [QML 13] Final Parameters mean and stdev (term  xTx ): [-0.7479022   0.14513247]
+8:17:33 [QML 13] Final Parameters mean and stdev (term  yTi ): [ 6.93916474  0.05802393]
+8:17:33 [QML 13] Final Parameters mean and stdev (term  yTy ): [ 0.19714065  0.14709969]
+8:17:33 [QML 13] Final Parameters mean and stdev (term  yTz ): [ 1.10281557  0.07367772]
+8:17:33 [QML 13] Final Parameters mean and stdev (term  zTi ): [ 1.95310788  0.07367496]
+8:17:33 [QML 13] Final Parameters mean and stdev (term  zTz ): [ 1.89487237  0.11414083]
+8:17:33 [RQ Learn 13.0] Time for update alone: 1582.8486771583557
+8:17:33 [RQ Learn 13.0] Redis learned_models_info added to db for model: 13.0
+8:17:33 [RQ Learn 13.0] Redis SET learned_models_ids: 13.0 ; set True
+8:17:33 [RQ Learn 13.0] Learned. rq time: 1584.5277321338654
+8:17:38 [QML 12] Results for QHL on  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz
+8:17:38 [QML 12] Final time selected > 2.45
+8:17:38 [QML 12] Cumulative time.	 Datum: 0.9233875274658203 	 Update: 1583.1965608596802
+8:17:38 [QML 12] Final Parameters mean and stdev (term  xTi ): [ 3.04659286  0.20432031]
+8:17:38 [QML 12] Final Parameters mean and stdev (term  xTx ): [ 1.55811061  0.2614424 ]
+8:17:38 [QML 12] Final Parameters mean and stdev (term  xTz ): [ 2.22152349  0.19972561]
+8:17:38 [QML 12] Final Parameters mean and stdev (term  yTi ): [ 6.21177156  0.06513545]
+8:17:38 [QML 12] Final Parameters mean and stdev (term  yTy ): [ 0.42970281  0.1411359 ]
+8:17:38 [QML 12] Final Parameters mean and stdev (term  zTi ): [ 1.80695779  0.2854913 ]
+8:17:38 [QML 12] Final Parameters mean and stdev (term  zTz ): [ 0.94744097  0.25100742]
+8:17:38 [RQ Learn 12.0] Time for update alone: 1587.745926141739
+8:17:38 [RQ Learn 12.0] Redis learned_models_info added to db for model: 12.0
+8:17:38 [RQ Learn 12.0] Redis SET learned_models_ids: 12.0 ; set True
+8:17:38 [RQ Learn 12.0] Learned. rq time: 1589.4219362735748
+8:17:53 [QML 14] Results for QHL on  xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz
+8:17:53 [QML 14] Final time selected > 2.45
+8:17:53 [QML 14] Cumulative time.	 Datum: 0.8694322109222412 	 Update: 1598.9200496673584
+8:17:53 [QML 14] Final Parameters mean and stdev (term  xTi ): [ 3.4411051   0.21286216]
+8:17:53 [QML 14] Final Parameters mean and stdev (term  xTx ): [ 3.86975233  0.28803789]
+8:17:53 [QML 14] Final Parameters mean and stdev (term  xTy ): [ 0.05584307  0.21026788]
+8:17:53 [QML 14] Final Parameters mean and stdev (term  yTi ): [ 6.85920364  0.20789742]
+8:17:53 [QML 14] Final Parameters mean and stdev (term  yTy ): [ 1.81693112  0.20335519]
+8:17:53 [QML 14] Final Parameters mean and stdev (term  zTi ): [ 1.2556031   0.16100745]
+8:17:53 [QML 14] Final Parameters mean and stdev (term  zTz ): [ 0.75782024  0.19939942]
+8:17:53 [RQ Learn 14.0] Time for update alone: 1603.3373935222626
+8:17:53 [RQ Learn 14.0] Redis learned_models_info added to db for model: 14.0
+8:17:53 [RQ Learn 14.0] Redis SET learned_models_ids: 14.0 ; set True
+8:17:53 [QMD 74] All models on branch 6 have finished learning.
+8:17:54 [RQ Learn 14.0] Learned. rq time: 1604.9893486499786
+8:17:54[QML:Reduced 12; QMD 74] Updating learned info for model 12
+8:17:54[QML:Reduced 12; QMD 74] Updated learned info for model 12
+8:17:54[QML:Reduced 13; QMD 74] Updating learned info for model 13
+8:17:54[QML:Reduced 13; QMD 74] Updated learned info for model 13
+8:17:54[QML:Reduced 14; QMD 74] Updating learned info for model 14
+8:17:54[QML:Reduced 14; QMD 74] Updated learned info for model 14
+8:17:54 [QMD 74] remoteBayesFromBranchID 6 model id list: [12, 13, 14]
+8:17:54 [QMD 74] Computing BF for pair 12,13
+8:17:54 [QMD 74] Bayes factor calculation queued. Model IDs 12 13
+8:17:54 [QMD 74] Computing BF for pair 12,14
+8:17:54 [QMD 74] Bayes factor calculation queued. Model IDs 12 14
+8:17:54 [QMD 74] Computing BF for pair 13,14
+8:17:54 [QMD 74] Bayes factor calculation queued. Model IDs 13 14
+8:18:0[QML:Bayes 13; QMD 74] Name: xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz
+8:18:0[QML:Bayes 12; QMD 74] Name: xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz
+8:18:0[QML:Bayes 12; QMD 74] Name: xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz
+8:18:0[QML:Bayes 12; QMD 74] Time to reconstruct updater: 0.0023207664489746094
+8:18:0[QML:Bayes 13; QMD 74] Time to reconstruct updater: 0.0023250579833984375
+8:18:0[QML:Bayes 12; QMD 74] Time to reconstruct updater: 0.0021483898162841797
+8:18:0[QML:Bayes 12; QMD 74] Prior mean: [ 3.04741504  1.56274148  2.21888333  6.21174448  0.43211878  1.80698653
+  0.9438675 ]
+8:18:0[QML:Bayes 13; QMD 74] Prior mean: [ 2.08726267 -0.74797342  6.93923185  0.19722158  1.10193853  1.953117
+  1.89559937]
+8:18:0[QML:Bayes 12; QMD 74] Prior mean: [ 3.05063676  1.5580682   2.21927906  6.21369494  0.43527497  1.80114588
+  0.94097405]
+8:18:1[QML:Bayes 14; QMD 74] Name: xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz
+8:18:1[QML:Bayes 14; QMD 74] Name: xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz
+8:18:1[QML:Bayes 13; QMD 74] Name: xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz
+8:18:1[QML:Bayes 14; QMD 74] Time to reconstruct updater: 0.001916646957397461
+8:18:1[QML:Bayes 14; QMD 74] Time to reconstruct updater: 0.001834869384765625
+8:18:1[QML:Bayes 14; QMD 74] Prior mean: [ 3.4373131   3.86633959  0.0612423   6.86174542  1.8180446   1.2566071
+  0.75957321]
+8:18:1[QML:Bayes 14; QMD 74] Prior mean: [ 3.4466622   3.86983428  0.06069845  6.85826482  1.81305622  1.25407342
+  0.7557777 ]
+8:18:1[QML:Bayes 13; QMD 74] Time to reconstruct updater: 0.0019505023956298828
+8:18:1 [RQ Bayes 13/14] Start. Branch 6
+8:18:1[QML:Bayes 13; QMD 74] Prior mean: [ 2.08527221 -0.74507277  6.94180696  0.1926977   1.10698746  1.94930329
+  1.89149787]
+8:18:1 [RQ Bayes 12/14] Start. Branch 6
+8:18:1 [RQ Bayes 12/13] Start. Branch 6
+9:10:42 [RQ Bayes 12/13] BF computed: A:12; B:13; BF:4.1280701061952965e+33 	Reset remormalisation record: False
+9:10:42 [RQ Bayes 12/13] Finished. rq time:  3161.706425666809
+9:11:0 [RQ Bayes 12/14] BF computed: A:12; B:14; BF:6661945099.38 	Reset remormalisation record: False
+9:11:0 [RQ Bayes 12/14] Finished. rq time:  3180.1581361293793
+9:11:3 [RQ Bayes 13/14] BF computed: A:13; B:14; BF:1335340648.1 	Reset remormalisation record: False
+9:11:3 [RQ Bayes 13/14] Finished. rq time:  3183.103397130966
+9:11:3 [QMD 74] compareModelsWithinBranch 6 active_models_in_branch_old: [12.0, 13.0, 14.0] active_models_in_branch_new: [12, 13, 14]
+9:11:3 [QMD 74] [compareModelsWithinBranch 6] Point to 12 (comparison 12/13)
+9:11:3 [QMD 74] [compareModelsWithinBranch 6] Point to 12 (comparison 12/14)
+9:11:3 [QMD 74] [compareModelsWithinBranch 6] Point to 13 (comparison 13/14)
+9:11:3 [QMD 74] Model points for branch 6 {12: 2, 13: 1, 14: 0}
+9:11:3 [QMD 74] Champion of branch  6  is  xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz (12)
+9:11:3 [QMD 74] Spawning. Growth rule: NV_alternative_model. Depth: 7
+9:11:3 [QMD 74] After model generation for growth rule NV_alternative_model SPAWN STAGE: [None] 
+new models: ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+9:11:3 [QMD 74] Branch 7 growth rule NV_alternative_model has 2 new models ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+9:11:3 [DB] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz  not previously considered -- adding. ID: 15
+9:11:3 [QMD 74] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz 
+	computed already:  False 
+	ID: 15
+9:11:3 [DB] Model  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz  not previously considered -- adding. ID: 16
+9:11:3 [QMD 74] Model  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz 
+	computed already:  False 
+	ID: 16
+9:11:3 [QMD 74] Num models already computed on branch  7 = 0
+9:11:3 [QMD 74] Models to add to new branch ( 7 ):  ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+9:11:3 [QMD 74] learnModelFromBranchID branch 7 : ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+9:11:3 [QMD 74] learnModelFromBranchID. Setting active branches on redis for branch 7 to 0
+9:11:3 [QMD 74] branch 7 precomputed: []
+9:11:3 [QMD 74] Branch  7 has unlearned models: ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz', 'xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+9:11:3 [QMD 74] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz being passed to learnModel function
+9:11:3 [QMD 74] Model xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz added to queue.
+9:11:3 [QMD 74] Model  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz being passed to learnModel function
+9:11:3 [QMD 74] Model xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz added to queue.
+9:11:3 [QMD 74] learnModelFromBranchID finished, branch 7
+9:11:9 [QML 16] QML for  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+9:11:9 [QML 15] QML for  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz
+9:11:9 [QML 16] Getting prior for model: xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz Specific terms: {}
+9:11:9 [QML 15] Getting prior for model: xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz Specific terms: {}
+9:11:11 [QML 16] Initialization Ready
+9:11:11 [RQ Learn 16.0] Time to unpickle and initialise QML class: 1.5008025169372559
+9:11:11 [RQ Learn 16.0] Updating model.
+9:11:11 [QML 16] Experiment 0
+9:11:11 [QML 16] Initial time selected >  0.0403143610091
+9:11:11 [QML 15] Initialization Ready
+9:11:11 [RQ Learn 15.0] Time to unpickle and initialise QML class: 1.5085320472717285
+9:11:11 [RQ Learn 15.0] Updating model.
+9:11:11 [QML 15] Experiment 0
+9:11:11 [QML 15] Initial time selected >  0.0508267084914
+9:13:34 [QML 15] Experiment 75
+9:13:36 [QML 16] Experiment 75
+9:16:1 [QML 15] Experiment 150
+9:16:4 [QML 16] Experiment 150
+9:18:33 [QML 15] Experiment 225
+9:18:39 [QML 16] Experiment 225
+9:21:10 [QML 15] Experiment 300
+9:21:13 [QML 16] Experiment 300
+9:23:48 [QML 15] Experiment 375
+9:23:49 [QML 16] Experiment 375
+9:26:31 [QML 15] Experiment 450
+9:26:33 [QML 16] Experiment 450
+9:29:14 [QML 15] Experiment 525
+9:29:17 [QML 16] Experiment 525
+9:32:0 [QML 15] Experiment 600
+9:32:2 [QML 16] Experiment 600
+9:34:42 [QML 15] Experiment 675
+9:34:43 [QML 16] Experiment 675
+9:37:28 [QML 16] Results for QHL on  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+9:37:28 [QML 16] Final time selected > 2.45
+9:37:28 [QML 16] Cumulative time.	 Datum: 0.8924756050109863 	 Update: 1572.0928044319153
+9:37:28 [QML 16] Final Parameters mean and stdev (term  xTi ): [ 3.56676192  0.32317336]
+9:37:28 [QML 16] Final Parameters mean and stdev (term  xTx ): [ 2.29758563  0.18604692]
+9:37:28 [QML 16] Final Parameters mean and stdev (term  xTz ): [ 2.40208747  0.44497318]
+9:37:28 [QML 16] Final Parameters mean and stdev (term  yTi ): [ 8.56719077  0.2084043 ]
+9:37:28 [QML 16] Final Parameters mean and stdev (term  yTy ): [ 0.9968408   0.26634072]
+9:37:28 [QML 16] Final Parameters mean and stdev (term  yTz ): [ 2.66361879  0.22858473]
+9:37:28 [QML 16] Final Parameters mean and stdev (term  zTi ): [ 0.70401113  0.37417254]
+9:37:28 [QML 16] Final Parameters mean and stdev (term  zTz ): [-0.79410079  0.3859413 ]
+9:37:28 [RQ Learn 16.0] Time for update alone: 1577.0140867233276
+9:37:28 [RQ Learn 16.0] Redis learned_models_info added to db for model: 16.0
+9:37:28 [RQ Learn 16.0] Redis SET learned_models_ids: 16.0 ; set True
+9:37:28 [RQ Learn 16.0] Learned. rq time: 1578.7861106395721
+9:37:29 [QML 15] Results for QHL on  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz
+9:37:29 [QML 15] Final time selected > 2.45
+9:37:29 [QML 15] Cumulative time.	 Datum: 0.9307096004486084 	 Update: 1573.291790485382
+9:37:29 [QML 15] Final Parameters mean and stdev (term  xTi ): [ 4.05061166  0.53488401]
+9:37:29 [QML 15] Final Parameters mean and stdev (term  xTx ): [ 2.1208578   1.54487548]
+9:37:29 [QML 15] Final Parameters mean and stdev (term  xTy ): [ 2.95326151  0.63507857]
+9:37:29 [QML 15] Final Parameters mean and stdev (term  xTz ): [ 1.51651857  0.65993589]
+9:37:29 [QML 15] Final Parameters mean and stdev (term  yTi ): [ 8.7518755   1.23928554]
+9:37:29 [QML 15] Final Parameters mean and stdev (term  yTy ): [ 2.92444251  1.55973613]
+9:37:29 [QML 15] Final Parameters mean and stdev (term  zTi ): [ 1.6708727   0.21121555]
+9:37:29 [QML 15] Final Parameters mean and stdev (term  zTz ): [ 1.51228839  0.86742622]
+9:37:29 [RQ Learn 15.0] Time for update alone: 1578.3427274227142
+9:37:29 [RQ Learn 15.0] Redis learned_models_info added to db for model: 15.0
+9:37:29 [RQ Learn 15.0] Redis SET learned_models_ids: 15.0 ; set True
+9:37:29 [QMD 74] All models on branch 7 have finished learning.
+9:37:29 [RQ Learn 15.0] Learned. rq time: 1580.1314647197723
+9:37:29[QML:Reduced 15; QMD 74] Updating learned info for model 15
+9:37:30[QML:Reduced 15; QMD 74] Updated learned info for model 15
+9:37:30[QML:Reduced 16; QMD 74] Updating learned info for model 16
+9:37:30[QML:Reduced 16; QMD 74] Updated learned info for model 16
+9:37:30 [QMD 74] remoteBayesFromBranchID 7 model id list: [15, 16]
+9:37:30 [QMD 74] Computing BF for pair 15,16
+9:37:30 [QMD 74] Bayes factor calculation queued. Model IDs 15 16
+9:37:36[QML:Bayes 15; QMD 74] Name: xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPzTiPPzTz
+9:37:36[QML:Bayes 15; QMD 74] Time to reconstruct updater: 0.0024437904357910156
+9:37:36[QML:Bayes 15; QMD 74] Prior mean: [ 4.04739966  2.10370822  2.96074622  1.50339064  8.73060426  2.89878782
+  1.67331958  1.53338704]
+9:37:36[QML:Bayes 16; QMD 74] Name: xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+9:37:36[QML:Bayes 16; QMD 74] Time to reconstruct updater: 0.0021016597747802734
+9:37:36[QML:Bayes 16; QMD 74] Prior mean: [ 3.56643298  2.30326868  2.40273233  8.5604364   0.99659946  2.65585729
+  0.70776872 -0.78881126]
+9:37:36 [RQ Bayes 15/16] Start. Branch 7
+10:29:11 [RQ Bayes 15/16] BF computed: A:15; B:16; BF:0.0 	Reset remormalisation record: False
+10:29:11 [RQ Bayes 15/16] Finished. rq time:  3095.544864654541
+10:29:11 [QMD 74] compareModelsWithinBranch 7 active_models_in_branch_old: [15.0, 16.0] active_models_in_branch_new: [15, 16]
+10:29:11 [QMD 74] [compareModelsWithinBranch 7] Point to 16 (comparison 15/16)
+10:29:11 [QMD 74] Model points for branch 7 {15: 0, 16: 1}
+10:29:11 [QMD 74] Champion of branch  7  is  xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz (16)
+10:29:11 [QMD 74] Spawning. Growth rule: NV_alternative_model. Depth: 8
+10:29:11 [QMD 74] After model generation for growth rule NV_alternative_model SPAWN STAGE: [None] 
+new models: ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+10:29:11 [QMD 74] Branch 8 growth rule NV_alternative_model has 1 new models ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+10:29:11 [DB] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz  not previously considered -- adding. ID: 17
+10:29:11 [QMD 74] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz 
+	computed already:  False 
+	ID: 17
+10:29:11 [QMD 74] Num models already computed on branch  8 = 0
+10:29:11 [QMD 74] Models to add to new branch ( 8 ):  ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+10:29:11 [QMD 74] learnModelFromBranchID branch 8 : ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+10:29:11 [QMD 74] learnModelFromBranchID. Setting active branches on redis for branch 8 to 0
+10:29:11 [QMD 74] branch 8 precomputed: []
+10:29:11 [QMD 74] Branch  8 has unlearned models: ['xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz']
+10:29:11 [QMD 74] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz being passed to learnModel function
+10:29:11 [QMD 74] Model xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz added to queue.
+10:29:11 [QMD 74] learnModelFromBranchID finished, branch 8
+10:29:11 [QMD 74] All trees have completed. Num complete: 1
+10:29:18 [QML 17] QML for  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+10:29:18 [QML 17] Getting prior for model: xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz Specific terms: {}
+10:29:19 [QML 17] Initialization Ready
+10:29:19 [RQ Learn 17.0] Time to unpickle and initialise QML class: 1.441957950592041
+10:29:19 [RQ Learn 17.0] Updating model.
+10:29:19 [QML 17] Experiment 0
+10:29:19 [QML 17] Initial time selected >  0.0335397434664
+10:31:36 [QML 17] Experiment 75
+10:33:53 [QML 17] Experiment 150
+10:36:12 [QML 17] Experiment 225
+10:38:30 [QML 17] Experiment 300
+10:40:53 [QML 17] Experiment 375
+10:43:28 [QML 17] Experiment 450
+10:46:3 [QML 17] Experiment 525
+10:48:38 [QML 17] Experiment 600
+10:51:9 [QML 17] Experiment 675
+10:53:44 [QML 17] Results for QHL on  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+10:53:44 [QML 17] Final time selected > 2.45
+10:53:44 [QML 17] Cumulative time.	 Datum: 0.8417937755584717 	 Update: 1460.2065272331238
+10:53:44 [QML 17] Final Parameters mean and stdev (term  xTi ): [ 2.78483554  0.16880653]
+10:53:44 [QML 17] Final Parameters mean and stdev (term  xTx ): [ 3.51290376  0.13922536]
+10:53:44 [QML 17] Final Parameters mean and stdev (term  xTy ): [ 3.36336101  0.30783201]
+10:53:44 [QML 17] Final Parameters mean and stdev (term  xTz ): [ 1.76716278  0.1658758 ]
+10:53:44 [QML 17] Final Parameters mean and stdev (term  yTi ): [ 7.357855    0.11234657]
+10:53:44 [QML 17] Final Parameters mean and stdev (term  yTy ): [-0.02168165  0.34160234]
+10:53:44 [QML 17] Final Parameters mean and stdev (term  yTz ): [ 2.14430247  0.14736063]
+10:53:44 [QML 17] Final Parameters mean and stdev (term  zTi ): [ 1.91286673  0.1901791 ]
+10:53:44 [QML 17] Final Parameters mean and stdev (term  zTz ): [ 1.06294659  0.08211736]
+10:53:44 [RQ Learn 17.0] Time for update alone: 1465.328931093216
+10:53:45 [RQ Learn 17.0] Redis learned_models_info added to db for model: 17.0
+10:53:45 [RQ Learn 17.0] Redis SET learned_models_ids: 17.0 ; set True
+10:53:45 [QMD 74] remoteBayesFromBranchID 8 model id list: [17]
+10:53:45 [RQ Learn 17.0] Learned. rq time: 1467.0364305973053
+10:53:45 [QMD 74] compareModelsWithinBranch 8 active_models_in_branch_old: [17.0] active_models_in_branch_new: [17]
+10:53:45 [QMD 74] Model points for branch 8 {17: 0}
+10:53:45 [QMD 74] Champion of branch  8  is  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz (17)
+10:53:45 [QMD 74] Active branch champs at start of final Bayes comp: [1, 4, 5, 7, 10, 11, 12, 16, 17]
+10:53:45 [QMD 74] Model 1 doesn't have a parent to compare with.
+10:53:45 [QMD 74] Bayes factor calculation queued. Model IDs 1 4
+10:53:45 [QMD 74] Comparing child  4 with parent 1
+10:53:45 [QMD 74] Bayes factor calculation queued. Model IDs 4 5
+10:53:45 [QMD 74] Comparing child  5 with parent 4
+10:53:45 [QMD 74] Bayes factor calculation queued. Model IDs 5 7
+10:53:45 [QMD 74] Comparing child  7 with parent 5
+10:53:45 [QMD 74] Bayes factor calculation queued. Model IDs 7 10
+10:53:45 [QMD 74] Comparing child  10 with parent 7
+10:53:45 [QMD 74] Bayes factor calculation queued. Model IDs 10 11
+10:53:45 [QMD 74] Comparing child  11 with parent 10
+10:53:45 [QMD 74] Bayes factor calculation queued. Model IDs 11 12
+10:53:45 [QMD 74] Comparing child  12 with parent 11
+10:53:45 [QMD 74] Bayes factor calculation queued. Model IDs 12 16
+10:53:45 [QMD 74] Comparing child  16 with parent 12
+10:53:45 [QMD 74] Bayes factor calculation queued. Model IDs 16 17
+10:53:45 [QMD 74] Comparing child  17 with parent 16
+10:53:45 [QMD 74] Final Bayes Comparisons. 
+Entering while loop in final bayes fnc. 
+active branch champs:  [1, 4, 5, 7, 10, 11, 12, 16, 17]
+10:53:45 [QMD 74] Waiting on parent/child Bayes factors.
+10:53:45 [QMD 74] Waiting on parent/child Bayes factors.
+10:53:51[QML:Bayes 1; QMD 74] Name: yTi
+10:53:51[QML:Bayes 5; QMD 74] Name: xTiPPyTiPPzTi
+10:53:51[QML:Bayes 1; QMD 74] Time to reconstruct updater: 0.0008957386016845703
+10:53:51[QML:Bayes 1; QMD 74] Prior mean: [ 6.55753249]
+10:53:51[QML:Bayes 7; QMD 74] Name: xTiPPyTiPPzTiPPzTz
+10:53:51[QML:Bayes 5; QMD 74] Time to reconstruct updater: 0.0015625953674316406
+10:53:51[QML:Bayes 5; QMD 74] Prior mean: [ 0.49864037  6.19929419  1.80362925]
+10:53:51[QML:Bayes 10; QMD 74] Name: xTiPPyTiPPyTyPPzTiPPzTz
+10:53:51[QML:Bayes 7; QMD 74] Time to reconstruct updater: 0.0017018318176269531
+10:53:51[QML:Bayes 7; QMD 74] Prior mean: [ 1.12528507  5.94865597  1.60442426  0.92057475]
+10:53:51[QML:Bayes 10; QMD 74] Time to reconstruct updater: 0.001898050308227539
+10:53:51[QML:Bayes 10; QMD 74] Prior mean: [  1.25292299e+00   5.93127817e+00   4.04531988e-03   1.56356571e+00
+   8.72614129e-01]
+10:53:51[QML:Bayes 4; QMD 74] Name: yTiPPzTi
+10:53:51[QML:Bayes 11; QMD 74] Name: xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+10:53:51[QML:Bayes 4; QMD 74] Time to reconstruct updater: 0.0012669563293457031
+10:53:51[QML:Bayes 4; QMD 74] Prior mean: [ 6.2019494   2.00832049]
+10:53:51[QML:Bayes 11; QMD 74] Time to reconstruct updater: 0.0021729469299316406
+10:53:51[QML:Bayes 11; QMD 74] Prior mean: [ 1.77743072  0.09860427  5.87582801  0.01626125  1.15173738  1.11980832]
+10:53:51[QML:Bayes 4; QMD 74] Name: yTiPPzTi
+10:53:51[QML:Bayes 4; QMD 74] Time to reconstruct updater: 0.0010750293731689453
+10:53:51[QML:Bayes 4; QMD 74] Prior mean: [ 6.19891893  2.01743932]
+10:53:51 [RQ Bayes 1/4] Start. Branch None
+10:53:51[QML:Bayes 7; QMD 74] Name: xTiPPyTiPPzTiPPzTz
+10:53:51[QML:Bayes 7; QMD 74] Time to reconstruct updater: 0.0013151168823242188
+10:53:51[QML:Bayes 7; QMD 74] Prior mean: [ 1.13027605  5.94877325  1.60324642  0.92249347]
+10:53:51 [RQ Bayes 5/7] Start. Branch None
+10:53:51[QML:Bayes 10; QMD 74] Name: xTiPPyTiPPyTyPPzTiPPzTz
+10:53:51[QML:Bayes 10; QMD 74] Time to reconstruct updater: 0.0014853477478027344
+10:53:51[QML:Bayes 10; QMD 74] Prior mean: [  1.24206090e+00   5.93323365e+00   3.16042548e-03   1.56975306e+00
+   8.70159316e-01]
+10:53:51 [RQ Bayes 7/10] Start. Branch None
+10:53:51[QML:Bayes 11; QMD 74] Name: xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+10:53:51[QML:Bayes 5; QMD 74] Name: xTiPPyTiPPzTi
+10:53:51[QML:Bayes 11; QMD 74] Time to reconstruct updater: 0.0017507076263427734
+10:53:51[QML:Bayes 11; QMD 74] Prior mean: [ 1.78417809  0.09981979  5.87398397  0.01366129  1.15476203  1.11685909]
+10:53:51[QML:Bayes 5; QMD 74] Time to reconstruct updater: 0.0012912750244140625
+10:53:51[QML:Bayes 5; QMD 74] Prior mean: [ 0.51166365  6.19797876  1.80275348]
+10:53:51 [RQ Bayes 10/11] Start. Branch None
+10:53:51 [RQ Bayes 4/5] Start. Branch None
+10:53:51[QML:Bayes 12; QMD 74] Name: xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz
+10:53:51[QML:Bayes 12; QMD 74] Time to reconstruct updater: 0.0018818378448486328
+10:53:51[QML:Bayes 12; QMD 74] Prior mean: [ 3.04635042  1.55480564  2.22538221  6.21090095  0.42587898  1.80771215
+  0.9503444 ]
+10:53:51 [RQ Bayes 11/12] Start. Branch None
+11:44:4 [RQ Bayes 11/12] BF computed: A:11; B:12; BF:3.9393896653844017e+30 	Reset remormalisation record: False
+11:44:4 [RQ Bayes 11/12] Finished. rq time:  3013.7084028720856
+11:44:11[QML:Bayes 12; QMD 74] Name: xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz
+11:44:11[QML:Bayes 12; QMD 74] Time to reconstruct updater: 0.0021469593048095703
+11:44:11[QML:Bayes 12; QMD 74] Prior mean: [ 3.04477261  1.56758329  2.22421833  6.2122769   0.43322143  1.7986992
+  0.93896713]
+11:44:11[QML:Bayes 16; QMD 74] Name: xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+11:44:11[QML:Bayes 16; QMD 74] Time to reconstruct updater: 0.002028226852416992
+11:44:11[QML:Bayes 16; QMD 74] Prior mean: [ 3.57277359  2.29846715  2.40706036  8.56649385  0.99487999  2.66178453
+  0.7036382  -0.79498422]
+11:44:11 [RQ Bayes 12/16] Start. Branch None
+11:45:9 [RQ Bayes 10/11] BF computed: A:10; B:11; BF:0.0 	Reset remormalisation record: False
+11:45:9 [RQ Bayes 10/11] Finished. rq time:  3078.8058819770813
+11:45:15[QML:Bayes 16; QMD 74] Name: xTiPPxTxPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+11:45:15[QML:Bayes 16; QMD 74] Time to reconstruct updater: 0.0022869110107421875
+11:45:15[QML:Bayes 16; QMD 74] Prior mean: [ 3.57211819  2.29775266  2.41437064  8.56494741  0.99641556  2.65996549
+  0.70731341 -0.78866517]
+11:45:15[QML:Bayes 17; QMD 74] Name: xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+11:45:15[QML:Bayes 17; QMD 74] Time to reconstruct updater: 0.002270936965942383
+11:45:15[QML:Bayes 17; QMD 74] Prior mean: [ 2.7796064   3.51456765  3.37112023  1.76325591  7.35678776 -0.02855221
+  2.14889718  1.9179341   1.06316628]
+11:45:15 [RQ Bayes 16/17] Start. Branch None
+11:45:50 [RQ Bayes 4/5] BF computed: A:4; B:5; BF:0.0 	Reset remormalisation record: False
+11:45:50 [RQ Bayes 4/5] Finished. rq time:  3119.9159846305847
+11:45:53 [RQ Bayes 7/10] BF computed: A:7; B:10; BF:0.0 	Reset remormalisation record: False
+11:45:53 [RQ Bayes 7/10] Finished. rq time:  3122.4690930843353
+11:46:41 [RQ Bayes 5/7] BF computed: A:5; B:7; BF:0.0 	Reset remormalisation record: False
+11:46:41 [RQ Bayes 5/7] Finished. rq time:  3170.8564801216125
+11:47:13 [RQ Bayes 1/4] BF computed: A:1; B:4; BF:0.0 	Reset remormalisation record: False
+11:47:13 [RQ Bayes 1/4] Finished. rq time:  3202.187811613083
+11:47:13 [QMD 74] Waiting on parent/child Bayes factors.
+11:47:13 [QMD 74] Waiting on parent/child Bayes factors.
+11:47:13 [QMD 74] Waiting on parent/child Bayes factors.
+11:47:13 [QMD 74] Waiting on parent/child Bayes factors.
+11:47:13 [QMD 74] Waiting on parent/child Bayes factors.
+11:47:13 [QMD 74] Waiting on parent/child Bayes factors.
+12:33:28 [RQ Bayes 12/16] BF computed: A:12; B:16; BF:9.48701555131539e+17 	Reset remormalisation record: False
+12:33:28 [RQ Bayes 12/16] Finished. rq time:  2957.533967256546
+12:33:28 [QMD 74] Waiting on parent/child Bayes factors.
+12:34:8 [RQ Bayes 16/17] BF computed: A:16; B:17; BF:958.39 	Reset remormalisation record: False
+12:34:8 [RQ Bayes 16/17] Finished. rq time:  2933.055766582489
+12:34:8 [QMD 74] Parent/child Bayes factors jobs all launched.
+12:34:8 [QMD 74] child doesn't have active parent
+12:34:8 [QMD 74] Error: 0
+12:34:8 [QMD 74] parent/child 1/4 has bf 1.2555061801885957e-82
+12:34:8 [QMD 74] Spawned model 4 stronger than parent; deactivating model 1
+12:34:8 [QMD 74] parent/child 4/5 has bf 1.7367706112319436e-16
+12:34:8 [QMD 74] Spawned model 5 stronger than parent; deactivating model 4
+12:34:8 [QMD 74] parent/child 5/7 has bf 5.17770601185229e-22
+12:34:8 [QMD 74] Spawned model 7 stronger than parent; deactivating model 5
+12:34:8 [QMD 74] parent/child 7/10 has bf 0.000889378679639127
+12:34:8 [QMD 74] parent/child 10/11 has bf 2.82018194076513e-09
+12:34:8 [QMD 74] Spawned model 11 stronger than parent; deactivating model 10
+12:34:8 [QMD 74] parent/child 11/12 has bf 3.9393896653844017e+30
+12:34:8 [QMD 74] Parent model, 11 stronger than spawned; deactivating model 12
+12:34:8 [QMD 74] parent/child 12/16 has bf 9.48701555131539e+17
+12:34:8 [QMD 74] Parent model, 12 stronger than spawned; deactivating model 16
+12:34:8 [QMD 74] parent/child 16/17 has bf 958.3946952249125
+12:34:8 [QMD 74] Parent/child comparisons and deactivations complete.
+12:34:8 [QMD 74] Active branch champs after  parental collapse (final Bayes comp): [17, 11, 7]
+12:34:8 [QMD 74] ActiveTreeBranchChamps: {'NV_alternative_model': [17, 11, 7]}
+12:34:8 [QMD 74] Branch 9 growth rule NV_alternative_model has 3 new models ['xTiPPyTiPPzTiPPzTz', 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+12:34:8 [DB] Model xTiPPyTiPPzTiPPzTz  previously considered.
+12:34:8 [QMD 74] Model  xTiPPyTiPPzTiPPzTz 
+	computed already:  True 
+	ID: 7.0
+12:34:8 [DB] Model xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz  previously considered.
+12:34:8 [QMD 74] Model  xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz 
+	computed already:  True 
+	ID: 17.0
+12:34:8 [DB] Model xTiPPxTxPPyTiPPyTyPPzTiPPzTz  previously considered.
+12:34:8 [QMD 74] Model  xTiPPxTxPPyTiPPyTyPPzTiPPzTz 
+	computed already:  True 
+	ID: 11.0
+12:34:8 [QMD 74] Num models already computed on branch  9 = 3
+12:34:8 [QMD 74] learnModelFromBranchID branch 9 : ['xTiPPyTiPPzTiPPzTz', 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+12:34:8 [QMD 74] learnModelFromBranchID. Setting active branches on redis for branch 9 to 3
+12:34:8 [QMD 74] branch 9 precomputed: ['xTiPPyTiPPzTiPPzTz', 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz', 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+12:34:8 [QMD 74] Branch  9 has unlearned models: []
+12:34:8 [QMD 74] learnModelFromBranchID finished, branch 9
+12:34:8 [QMD 74] remoteBayesFromBranchID 9 model id list: [7.0, 17.0, 11.0]
+12:34:8 [QMD 74] Computing BF for pair 7,17
+12:34:8 [QMD 74] Bayes factor calculation queued. Model IDs 7.0 17.0
+12:34:8 [QMD 74] Computing BF for pair 7,11
+12:34:8 [QMD 74] Bayes factor calculation queued. Model IDs 7.0 11.0
+12:34:8 [QMD 74] Computing BF for pair 11,17
+12:34:8 [QMD 74] Bayes factor calculation queued. Model IDs 17.0 11.0
+12:34:14[QML:Bayes 7.0; QMD 74] Name: xTiPPyTiPPzTiPPzTz
+12:34:14[QML:Bayes 7.0; QMD 74] Name: xTiPPyTiPPzTiPPzTz
+12:34:14[QML:Bayes 7.0; QMD 74] Time to reconstruct updater: 0.001592397689819336
+12:34:14[QML:Bayes 7.0; QMD 74] Time to reconstruct updater: 0.0015909671783447266
+12:34:14[QML:Bayes 7.0; QMD 74] Prior mean: [ 1.12842853  5.94868503  1.59900652  0.92592719]
+12:34:14[QML:Bayes 7.0; QMD 74] Prior mean: [ 1.12230555  5.94744406  1.60182224  0.92365871]
+12:34:14[QML:Bayes 17.0; QMD 74] Name: xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+12:34:14[QML:Bayes 17.0; QMD 74] Time to reconstruct updater: 0.0029664039611816406
+12:34:14[QML:Bayes 17.0; QMD 74] Prior mean: [ 2.78444268  3.51755257  3.36319363  1.76569925  7.35550881 -0.02999556
+  2.14558157  1.9119673   1.06453365]
+12:34:14[QML:Bayes 11.0; QMD 74] Name: xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+12:34:14[QML:Bayes 11.0; QMD 74] Time to reconstruct updater: 0.0016558170318603516
+12:34:14[QML:Bayes 11.0; QMD 74] Prior mean: [ 1.77733699  0.09917313  5.87490829  0.01471752  1.15429821  1.12167984]
+12:34:14[QML:Bayes 17.0; QMD 74] Name: xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz
+12:34:14 [RQ Bayes 7.0/11.0] Start. Branch 9
+12:34:14[QML:Bayes 17.0; QMD 74] Time to reconstruct updater: 0.0022439956665039062
+12:34:14[QML:Bayes 17.0; QMD 74] Prior mean: [ 2.78260783  3.50836201  3.36897825  1.76988456  7.3602155  -0.01915528
+  2.14552975  1.91524492  1.06214827]
+12:34:14 [RQ Bayes 7.0/17.0] Start. Branch 9
+12:34:14[QML:Bayes 11.0; QMD 74] Name: xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+12:34:14[QML:Bayes 11.0; QMD 74] Time to reconstruct updater: 0.001707315444946289
+12:34:14[QML:Bayes 11.0; QMD 74] Prior mean: [ 1.78099682  0.10006456  5.87380715  0.01372789  1.15394733  1.11897684]
+12:34:15 [RQ Bayes 17.0/11.0] Start. Branch 9
+13:27:8 [RQ Bayes 7.0/11.0] BF computed: A:7.0; B:11.0; BF:0.0 	Reset remormalisation record: False
+13:27:8 [RQ Bayes 7.0/11.0] Finished. rq time:  3173.872127056122
+13:27:10 [RQ Bayes 7.0/17.0] BF computed: A:7.0; B:17.0; BF:4.5317842767003677e+55 	Reset remormalisation record: False
+13:27:10 [RQ Bayes 7.0/17.0] Finished. rq time:  3175.947824716568
+13:27:34 [RQ Bayes 17.0/11.0] BF computed: A:17.0; B:11.0; BF:0.0 	Reset remormalisation record: False
+13:27:34 [RQ Bayes 17.0/11.0] Finished. rq time:  3199.560406446457
+13:27:34 [QMD 74] compareModelsWithinBranch 9 active_models_in_branch_old: [] active_models_in_branch_new: [7.0, 17.0, 11.0]
+13:27:34 [QMD 74] [compareModelsWithinBranch 9] Point to 7 (comparison 7.0/17.0)
+13:27:34 [QMD 74] [compareModelsWithinBranch 9] Point to 11 (comparison 7.0/11.0)
+13:27:34 [QMD 74] [compareModelsWithinBranch 9] Point to 11 (comparison 17.0/11.0)
+13:27:34 [QMD 74] Model points for branch 9 {7.0: 1, 17.0: 0, 11.0: 2}
+13:27:34 [QMD 74] Champion of branch  9  is  xTiPPxTxPPyTiPPyTyPPzTiPPzTz (11)
+13:27:34 [QMD 74] Ghost Branch 9 deactivating model 17.0
+13:27:34 [QMD 74] Ghost Branch 9 deactivating model 7.0
+13:27:34 [QMD 74] F i n a l   t r e e   c o m p a r i s o n s   c o m p l e t e .
+13:27:34 [QMD 74] After initial interbranch comparisons,                 remaining active branch champions: [11.0]
+13:27:34 [QMD 74] Waiting on result of  Bayes comparisons from given list: [11.0]
+13:27:34 [QMD 74] After final Bayes comparisons (of branch champions) {11.0: 0}
+13:27:34[QML:Reduced 17; QMD 74] Updating learned info for model 17
+13:27:34[QML:Reduced 17; QMD 74] Updated learned info for model 17
+13:27:34 [QMD 74] Checking reducibility of champ model: xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+13:27:34 [QMD 74] Some neglibible parameters found: {'yTy': 0.01} 
+Reduced champion model suggested: xTiPPxTxPPyTiPPzTiPPzTz
+13:27:34 [DB] Model  xTiPPxTxPPyTiPPzTiPPzTz  not previously considered -- adding. ID: 18
+13:27:34[QML:Reduced 18; QMD 74] Updating learned info for model 18
+13:27:34[QML:Reduced 18; QMD 74] Updated learned info for model 18
+13:27:34 [QMD 74] Bayes factor calculation queued. Model IDs 11 18
+13:27:41[QML:Bayes 11; QMD 74] Name: xTiPPxTxPPyTiPPyTyPPzTiPPzTz
+13:27:41[QML:Bayes 11; QMD 74] Time to reconstruct updater: 0.0020630359649658203
+13:27:41[QML:Bayes 11; QMD 74] Prior mean: [ 1.77386144  0.09908813  5.87359484  0.01445863  1.15715553  1.12213598]
+13:27:41[QML:Bayes 18; QMD 74] Name: xTiPPxTxPPyTiPPzTiPPzTz
+13:27:41[QML:Bayes 18; QMD 74] Time to reconstruct updater: 0.0015301704406738281
+13:27:41[QML:Bayes 18; QMD 74] Prior mean: [ 1.7872636   0.0978013   5.87595949  1.15592923  1.12175507]
+13:27:41 [RQ Bayes 11/18] Start. Branch None
