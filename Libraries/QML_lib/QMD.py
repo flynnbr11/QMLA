@@ -125,6 +125,11 @@ class QMD():
         self.QLE = qle # Set to False for IQLE
         # trueOp = self.GlobalVariables.true_operator_class
         self.TrueOpName = self.GlobalVariables.true_op_name
+        self.log_print(
+            [
+                "True model:", self.TrueOpName
+            ]
+        )
         self.TrueOpDim = DataBase.get_num_qubits(self.TrueOpName)
         # TODO  self.InitialOpList isn't needed but is called a few times. Remove.
         # it is replaced by loop over generator list
@@ -150,28 +155,10 @@ class QMD():
         self.ReallocateResources = self.GlobalVariables.reallocate_resources
         # print("[QMD] Base resources: ", self.BaseResources)
 
-        # self.TrueOpList = trueOp.constituents_operators
         self.TrueOpList = self.GlobalVariables.true_op_list
         self.TrueOpNumParams = self.GlobalVariables.true_operator_class.num_constituents
         self.TrueParamsList = self.GlobalVariables.true_params_list
         self.TrueParamDict = self.GlobalVariables.true_params_dict
-        # if true_param_list is not None: 
-        #     self.TrueParamsList = true_param_list
-        # else:
-        #     print("No parameters passed, randomising")
-        #     self.TrueParamsList = [random.random() for i in self.TrueOpList] # TODO: actual true params?
-        # # todo set true parmams properly
-        #self.TrueParamsList = [0.75 for i in self.TrueOpList] # TODO: actual true params?
-        
-        
-        # self.TrueParamDict = {}
-        # true_ops = DataBase.get_constituent_names_from_name(
-        #     self.TrueOpName
-        # )
-        # for i in range(len(true_ops)):
-        #     op_name = true_ops[i]
-        #     param = self.TrueParamsList[i]
-        #     self.TrueParamDict[op_name] = param        
         
 
         self.MaxModNum = max_num_models #TODO: necessary?
@@ -3329,33 +3316,53 @@ class QMD():
     def checkChampReducibility(
         self,
     ):
-
+        champ_mod = self.reducedModelInstanceFromID(self.ChampID)
         self.log_print(
             [
                 "Checking reducibility of champ model:",
-                self.ChampionName                
+                self.ChampionName,
+                "\nParams:\n", champ_mod.LearnedParameters,
+                "\nSigmas:\n", champ_mod.FinalSigmas
             ]
         )
 
-        champ_mod = self.reducedModelInstanceFromID(self.ChampID)
         params = list(champ_mod.LearnedParameters.keys())
         to_remove = []
         removed_params = {}
         idx = 0
         for p in params:
-            if (
-                np.abs(champ_mod.LearnedParameters[p]) 
-                < self.GrowthClass.learned_param_limit_for_negligibility
-            ):
+            if champ_mod.FinalSigmas[p] > champ_mod.LearnedParameters[p]:
                 to_remove.append(p)
                 removed_params[p] = np.round(
-                    champ_mod.LearnedParameters[p],2
+                    champ_mod.LearnedParameters[p],
+                    2
                 )
+
+            # if (
+            #     np.abs(champ_mod.LearnedParameters[p]) 
+            #     < self.GrowthClass.learned_param_limit_for_negligibility
+            # ):
+            #     to_remove.append(p)
+            #     removed_params[p] = np.round(
+            #         champ_mod.LearnedParameters[p],2
+            #     )
             # elif idx == 1:
             #     # for testing
             #     to_remove.append(p)
             # idx += 1
 
+        if len(to_remove) >= len(params):
+            self.log_print(
+                [
+                    "Attempted champion reduction failed due to",
+                    "all params found neglibible.",
+                    "Check method of determining negligibility.",
+                    "(By default, parameter removed if sigma of that",
+                    "parameters final posterior > parameter.",
+                    "i.e. 0 within 1 sigma of distriubtion"
+                ]
+            )
+            return
         if len(to_remove) > 0 :
             new_model_terms = list(
                 set(params) - set(to_remove)
@@ -3371,6 +3378,7 @@ class QMD():
                     "\nReduced champion model suggested:", new_mod
                 ]
             )
+
 
             reduced_mod_info = self.addModel(
                 model = new_mod,
@@ -3493,8 +3501,7 @@ class QMD():
         else:
             self.log_print(
                 [
-                    "Parameters non-negligible; not replacing champion model.",
-                    "Params:\n", champ_mod.LearnedParameters
+                    "Parameters non-negligible; not replacing champion model."
                 ]
             )
 

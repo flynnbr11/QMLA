@@ -218,8 +218,6 @@ class growth_rule_super_class():
             )
         return self.system_probes
 
-
-
     def simulator_probe_generator(
         # system probes
         self,
@@ -238,8 +236,6 @@ class growth_rule_super_class():
                 **kwargs
             )
         return self.simulator_probes
-
-
 
     def plot_probe_generator(
         self, 

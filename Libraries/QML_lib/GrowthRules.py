@@ -6,6 +6,7 @@ sys.path.append((os.path.join(this_dir, "GrowthRuleClasses")))
 
 import SuperClassGrowthRule
 import NVCentreExperimentGrowthRules
+import NVExperimentVaryTrueModel
 import NVCentreFullAccess
 import NVCentreLargeSpinBath
 import NVCentreExperimentWithoutTransverseTerms
@@ -42,6 +43,8 @@ growth_classes = {
         NVCentreAlternativeTrueModel.nv_centre_spin_experimental_method_alternative_true_model,
     'NV_alternative_model_2' : 
         NVCentreAlternativeTrueModel.nv_centre_spin_experimental_method_alternative_true_model_second,
+    'nv_experiment_vary_model' : 
+        NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model,
     'NV_fitness_growth' : 
         NVGrowByFitness.nv_fitness_growth, 
     'NV_centre_revivals' : 

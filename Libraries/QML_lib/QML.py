@@ -1256,12 +1256,6 @@ class reducedModel():
             list( set(times) - set(present_expec_val_times) )
         )
 
-        self.log_print(
-            [
-                "[compute expectation values]", 
-                "times to compute:", required_times
-            ]
-        )
         for t in required_times:
             self.expectation_values[t] = self.GrowthClass.expectation_value(
                 ham = self.LearnedHamiltonian, 
