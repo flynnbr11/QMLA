@@ -68,6 +68,7 @@ class nv_centre_spin_experimental_method(
         # self.probe_generation_function = ProbeGeneration.separable_probe_dict
 
         # params for testing p value calculation
+        self.max_num_probe_qubits = 2
         self.gaussian_prior_means_and_widths = {
         }
 

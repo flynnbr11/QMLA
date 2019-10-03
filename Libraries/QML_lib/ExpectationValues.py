@@ -626,15 +626,6 @@ def n_qubit_hahn_evolution(
         print("\nsecond unitary:\n", second_unitary_time_evolution)
         print("\ninversion_gate:\n", inversion_gate)
     
-    print("\n\n[n qubit Hahn]\n norm ev state:", nm, "\nt=", t, "\nprobe=", repr(state))
-    print("\nev state:\n", repr(ev_state))
-    print("\nham:\n", repr(ham))
-    print("\nHam element[0,2]:\n", ham[0][2])
-    print("\ntotal evolution:\n", repr(total_evolution))
-    print("\nfirst unitary:\n", first_unitary_time_evolution)
-    print("\nsecond unitary:\n", second_unitary_time_evolution)
-    print("\ninversion_gate:\n", inversion_gate)
-
     density_matrix = np.kron( 
         ev_state, 
         (ev_state.T).conj() 
