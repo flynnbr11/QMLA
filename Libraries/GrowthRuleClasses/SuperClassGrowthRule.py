@@ -184,6 +184,11 @@ class growth_rule_super_class():
         self,
         **kwargs
     ):
+        self.log_print(
+            [
+                "System Generate Probes called"
+            ]
+        )
         self.system_probes = self.probe_generation_function(
             max_num_qubits = self.max_num_probe_qubits,
             num_probes = self.num_probes, 
@@ -224,6 +229,11 @@ class growth_rule_super_class():
         shared_probes = None,
         **kwargs
     ):
+        self.log_print(
+            [
+                "Simulator Generate Probes called"
+            ]
+        )
         if shared_probes == None:
             shared_probes = self.shared_probes
 

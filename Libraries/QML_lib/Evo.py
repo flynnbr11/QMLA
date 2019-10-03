@@ -163,6 +163,9 @@ def get_pr0_array_qle(
             #     output[evoId][tId] = outputs_this_ham[t]
             #     print("saved calc")
             # else:
+            if t>1e6: ## Try limiting times to use to 1 million
+                import random
+                t = random.randint(1e6, 3e6) # random large number but still computable without error
             try:
                 likel = growth_class.expectation_value(
                     ham = ham,
@@ -202,13 +205,15 @@ def get_pr0_array_qle(
 #                raise
                 
             if output[evoId][tId] < 0:
+                print("NEGATIVE PROB")
                 log_print(
                     [
                         "[QLE] Negative probability : \
                         \t \t probability = ", 
                         output[evoId][tId]
                     ], 
-                    log_file, log_identifier
+                    log_file, 
+                    log_identifier
 
                 )
             elif output[evoId][tId] > 1.001: 

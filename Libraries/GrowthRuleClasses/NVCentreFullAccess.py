@@ -48,6 +48,7 @@ class nv_centre_spin_full_access(
 
         self.min_param = 0
         self.max_param = 10
+        self.max_num_probe_qubits = 2
 
         self.max_num_models_by_shape = {
             1 : 0,

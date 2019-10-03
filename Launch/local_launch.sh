@@ -10,15 +10,15 @@ num_tests=1
 qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
-exp_data=1
-simulate_experiment=0
+exp_data=0
+simulate_experiment=1
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=20
-exp=5
+prt=5
+exp=1
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -95,9 +95,9 @@ sim_growth_rule='heisenberg_xyz_predetermined'
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # exp_growth_rule='NV_alternative_model'
-exp_growth_rule='NV_alternative_model_2'
+# exp_growth_rule='NV_alternative_model_2'
 # exp_growth_rule='nv_experiment_vary_model'
 # exp_growth_rule='NV_centre_revivals'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'

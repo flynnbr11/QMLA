@@ -333,7 +333,7 @@ def log_likelihood(
         updater._renormalization_record = []
         updater.log_total_likelihood = 0 
         # updater.log_likelihood = 0 
-        # print("BINNING")
+        print("BINNING")
     # else:
     #     print("NOT BINNING")    
 

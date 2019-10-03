@@ -181,6 +181,11 @@ class QInferModelQML(qi.FiniteOutcomeModel):
        
         self.NumProbes = num_probes
         if probe_dict is None: 
+            self.log_print(
+                [
+                    "Generating random probes"
+                ]
+            )
             self.probe_dict = ProbeGeneration.seperable_probe_dict(
                 max_num_qubits=12, 
                 num_probes = self.NumProbes

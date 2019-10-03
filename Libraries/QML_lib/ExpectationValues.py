@@ -366,7 +366,7 @@ def hahn_evolution(
 
     nm = np.linalg.norm(ev_state)
     if np.abs(1-nm) > 1e-5:
-        print("[hahn] norm ev state:", nm)
+        print("[hahn] norm ev state:", nm, "\t t=", t)
         raise NameError("Non-unit norm")
 
     density_matrix = np.kron( ev_state, (ev_state.T).conj() )
@@ -608,15 +608,33 @@ def n_qubit_hahn_evolution(
 
     total_evolution = np.dot(
         second_unitary_time_evolution,
-        np.dot(inversion_gate,
-              first_unitary_time_evolution)
+        np.dot(
+            inversion_gate,
+            first_unitary_time_evolution
+        )
     )
 
     ev_state = np.dot(total_evolution, state)
     nm = np.linalg.norm(ev_state)
     if np.abs(1-nm) > 1e-5:
-        print("[Hahn] norm ev state:", nm)
+        print("\n\n[n qubit Hahn]\n norm ev state:", nm, "\nt=", t, "\nprobe=", repr(state))
+        print("\nev state:\n", repr(ev_state))
+        print("\nham:\n", repr(ham))
+        print("\nHam element[0,2]:\n", ham[0][2])
+        print("\ntotal evolution:\n", repr(total_evolution))
+        print("\nfirst unitary:\n", first_unitary_time_evolution)
+        print("\nsecond unitary:\n", second_unitary_time_evolution)
+        print("\ninversion_gate:\n", inversion_gate)
     
+    print("\n\n[n qubit Hahn]\n norm ev state:", nm, "\nt=", t, "\nprobe=", repr(state))
+    print("\nev state:\n", repr(ev_state))
+    print("\nham:\n", repr(ham))
+    print("\nHam element[0,2]:\n", ham[0][2])
+    print("\ntotal evolution:\n", repr(total_evolution))
+    print("\nfirst unitary:\n", first_unitary_time_evolution)
+    print("\nsecond unitary:\n", second_unitary_time_evolution)
+    print("\ninversion_gate:\n", inversion_gate)
+
     density_matrix = np.kron( 
         ev_state, 
         (ev_state.T).conj() 
