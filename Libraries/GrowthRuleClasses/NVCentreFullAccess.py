@@ -39,7 +39,7 @@ class nv_centre_spin_full_access(
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
-        self.max_num_qubits = 3
+        # self.max_num_qubits = 3
         self.tree_completed_initially = False
         self.experimental_dataset = 'NVB_rescale_dataset.p'
         self.measurement_type = 'full_access'

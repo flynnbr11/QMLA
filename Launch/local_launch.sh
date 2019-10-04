@@ -95,10 +95,10 @@ sim_growth_rule='heisenberg_xyz_predetermined'
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # exp_growth_rule='NV_alternative_model'
 # exp_growth_rule='NV_alternative_model_2'
-# exp_growth_rule='nv_experiment_vary_model'
+exp_growth_rule='nv_experiment_vary_model_3_params'
 # exp_growth_rule='NV_centre_revivals'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine'
 # exp_growth_rule='NV_centre_spin_large_bath'

@@ -3331,25 +3331,21 @@ class QMD():
         removed_params = {}
         idx = 0
         for p in params:
-            if champ_mod.FinalSigmas[p] > champ_mod.LearnedParameters[p]:
-                to_remove.append(p)
-                removed_params[p] = np.round(
-                    champ_mod.LearnedParameters[p],
-                    2
-                )
-
-            # if (
-            #     np.abs(champ_mod.LearnedParameters[p]) 
-            #     < self.GrowthClass.learned_param_limit_for_negligibility
-            # ):
+            # if champ_mod.FinalSigmas[p] > champ_mod.LearnedParameters[p]:
             #     to_remove.append(p)
             #     removed_params[p] = np.round(
-            #         champ_mod.LearnedParameters[p],2
+            #         champ_mod.LearnedParameters[p],
+            #         2
             #     )
-            # elif idx == 1:
-            #     # for testing
-            #     to_remove.append(p)
-            # idx += 1
+
+            if (
+                np.abs(champ_mod.LearnedParameters[p]) 
+                < self.GrowthClass.learned_param_limit_for_negligibility
+            ):
+                to_remove.append(p)
+                removed_params[p] = np.round(
+                    champ_mod.LearnedParameters[p],2
+                )
 
         if len(to_remove) >= len(params):
             self.log_print(

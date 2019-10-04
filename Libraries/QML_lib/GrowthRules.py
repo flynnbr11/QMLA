@@ -47,6 +47,14 @@ growth_classes = {
         NVCentreAlternativeTrueModel.nv_centre_spin_experimental_method_alternative_true_model_second,
     'nv_experiment_vary_model' : 
         NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model,
+    'nv_experiment_vary_model_3_params' : 
+        NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model_3_params,
+    'nv_experiment_vary_model_5_params' : 
+        NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model_5_params,
+    'nv_experiment_vary_model_6_params' : 
+        NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model_6_params,
+    'nv_experiment_vary_model_7_params' : 
+        NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model_7_params,
     'NV_fitness_growth' : 
         NVGrowByFitness.nv_fitness_growth, 
     'NV_centre_revivals' : 
