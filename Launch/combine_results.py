@@ -8,10 +8,11 @@ import os
 # results_directory = '/panfs/panasas01/phys/bf16951/QMD/Launch/Results/'
 # results_directory = '/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Results/'
 results_directory = str(
-	os.getcwd() + 'Results'
+	os.getcwd() + '/Results/'
 )
-
 all_directories = {
+	'sim_1' : 'Oct_07/17_09',
+	'sim_2' : 'Oct_07/17_11',
 	'vary_model_3_params' : 'Oct_04/18_15',
 	'vary_model_4_params' : 'Oct_04/18_17',
 	'vary_model_5_params' : 'Oct_04/18_18',
@@ -20,6 +21,7 @@ all_directories = {
 }
 
 directories_to_use = [
+	# 'sim_1', 'sim_2' # for testing
 	'vary_model_3_params',
 	'vary_model_4_params',
 	'vary_model_5_params',
@@ -27,12 +29,13 @@ directories_to_use = [
 	'vary_model_7_params',
 ]
 
-
 directories = [all_directories[d] for d in directories_to_use]
+directories = [ str(results_directory + d + '/') for d in directories]
 
 all_results_paths = [glob.glob(d+'results*') for d in directories]
-all_results_paths = list(np.array(all_results_paths).flatten('c'))
 
+flatten = lambda l: [item for sublist in l for item in sublist]
+all_results_paths = flatten(all_results_paths)
 
 results_df = pd.DataFrame()
 for results_file in all_results_paths:
