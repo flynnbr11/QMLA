@@ -34,16 +34,16 @@ if use_all_directories == True:
 	directories_to_use = list(all_directories.keys())
 else:
 	directories_to_use = [
-		'sim_1', 'sim_2' # for testing
-		# 'experimental_data_plusphase',
-		# 'experimental_data_plusrandom',
-		# 'simulation_plusphase',
-		# 'simulation_extended_true_model_plusphase',
-		# 'vary_model_3_params',
-		# 'vary_model_4_params',
-		# 'vary_model_5_params',
-		# 'vary_model_6_params',
-		# 'vary_model_7_params',
+		# 'sim_1', 'sim_2' # for testing
+		'experimental_data_plusphase',
+		'experimental_data_plusrandom',
+		'simulation_plusphase',
+		'simulation_extended_true_model_plusphase',
+		'vary_model_3_params',
+		'vary_model_4_params',
+		'vary_model_5_params',
+		'vary_model_6_params',
+		'vary_model_7_params',
 	]
 
 directories = [all_directories[d] for d in directories_to_use]
