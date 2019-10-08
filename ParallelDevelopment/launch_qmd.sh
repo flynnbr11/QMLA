@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="NV-exp-method-sim__random--probe__QMLA"
+test_description="EXP-PAPER__simulate-experiment"
 #test_description="THEO__qmd__mult-growth__heis-true"
 #test_description="test__removing-negligible-params"
 
@@ -10,7 +10,7 @@ test_description="NV-exp-method-sim__random--probe__QMLA"
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=102
+num_tests=2
 num_processes_to_request=6
 qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
@@ -21,8 +21,8 @@ experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=1
 
 # QHL parameters.
-e=750 # experiments
-p=2500 # particles
+e=10 # experiments
+p=30 # particles
 ra=0.98 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -59,9 +59,9 @@ sim_growth_rule='heisenberg_xyz_predetermined'
 
 
 # Experimental growth rules
-#experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
+experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 #experimental_growth_rule='two_qubit_ising_rotation_hyperfine'
-experimental_growth_rule='NV_alternative_model'
+#experimental_growth_rule='NV_alternative_model'
 #experimental_growth_rule='NV_alternative_model_2'
 #experimental_growth_rule='NV_centre_revivals'
 #experimental_growth_rule='NV_spin_full_access'
