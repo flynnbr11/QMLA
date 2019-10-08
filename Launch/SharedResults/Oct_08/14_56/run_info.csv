@@ -1,0 +1,3 @@
+,GrowthGenerator,ResultsDirectory,Run,TrueModel,TrueModelLatex,TrueParams
+0,reduced_nv_experiment,/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_07/17_09/,sim_1,xTiPPxTxPPyTiPPyTyPPzTiPPzTz,"$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$","{'zTi': 0.9647779048920114, 'xTx': 6.723223528628468, 'zTz': 1.6034234519563935, 'xTi': -0.9828895868309395, 'yTi': 6.484220205498312, 'yTy': 2.7377867056770397}"
+1,reduced_nv_experiment,/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Results/Oct_07/17_11/,sim_2,xTiPPxTxPPyTiPPyTyPPzTiPPzTz,"$\hat{S}_{x,y,z}\hat{A}_{x,y,z}$","{'zTi': 0.9647779048920114, 'zTz': 1.6034234519563935, 'xTx': 6.723223528628468, 'yTy': 2.7377867056770397, 'xTi': -0.9828895868309395, 'yTi': 6.484220205498312}"
