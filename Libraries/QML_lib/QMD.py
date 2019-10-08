@@ -3208,7 +3208,9 @@ class QMD():
 
         if DataBase.alph(self.ChampionName) == DataBase.alph(self.TrueOpName):
             correct_model = 1
-        elif ( num_params_champ_model ==  self.TrueOpNumParams and
+        elif ( 
+            num_params_champ_model ==  self.TrueOpNumParams 
+            and
             DataBase.alph(self.ChampionName) != DataBase.alph(self.TrueOpName)
         ):
             misfit = 1
@@ -3217,6 +3219,8 @@ class QMD():
         elif num_params_champ_model < self.TrueOpNumParams: 
             underfit=1
         
+        num_params_difference = self.TrueOpNumParams - num_params_champ_model
+
         num_qubits_champ_model = DataBase.get_num_qubits(self.ChampionName)
         self.LearnedParamsChamp = (
             self.reducedModelInstanceFromID(self.ChampID).LearnedParameters
@@ -3310,6 +3314,8 @@ class QMD():
             'GrowthGenerator' : champ_model.GrowthGenerator, 
             'Heuristic' : champ_model.HeuristicType, 
             'ChampLatex' : champ_model.LatexTerm,
+            'TrueModel' : DataBase.alph(self.TrueOpName),
+            'NumParamDifference' : num_params_difference,
         }
 
 

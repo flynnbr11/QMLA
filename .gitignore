@@ -35,9 +35,17 @@ Launch/Results/*
 !Launch/Results/Selected_Runs/*/*/*
 !Launch/Results/Selected_Runs/*/*/*/*
 
+!Launch/SharedResults/
+Launch/SharedResults/*
+!Launch/SharedResults/*/
+!Launch/SharedResults/*/*
+!Launch/SharedResults/*/*/*
+
+
 !Launch/local_launch.sh
 !Launch/parallel_launch.sh
 !Launch/run_qmd_instance.sh
+
 
 !ParallelDevelopment/Results/
 ParallelDevelopment/Results/*
