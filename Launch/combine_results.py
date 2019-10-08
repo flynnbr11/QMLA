@@ -14,7 +14,7 @@ all_directories = {
 	'experimental_data_plusphase' : 'Oct_02/18_01',
 	'experimental_data_plusrandom' : 'Oct_02/18_16',
 	'simulation_plusphase' : 'Oct_03/17_43',
-	'simulation_extended_true_model_plusphase' : 'Oct_02/18_18'
+	'simulation_extended_true_model_plusphase' : 'Oct_02/18_18',
 	'vary_model_3_params' : 'Oct_04/18_15',
 	'vary_model_4_params' : 'Oct_04/18_17',
 	'vary_model_5_params' : 'Oct_04/18_18',
