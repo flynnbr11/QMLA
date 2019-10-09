@@ -14,7 +14,7 @@ results_directory = str(
 	os.getcwd() + '/Results/'
 )
 
-
+test_run = False
 use_all_directories = False
 all_directories = {
 	'sim_1' : 'Oct_07/17_09',
@@ -29,9 +29,12 @@ all_directories = {
 	'vary_model_6_params' : 'Oct_07/15_24',
 	'vary_model_7_params' : 'Oct_07/15_27'
 }
-
 if use_all_directories == True:
 	directories_to_use = list(all_directories.keys())
+elif test_run == True:
+	directories_to_use = [
+		'sim_1', 'sim_2' # for testing
+	]
 else:
 	directories_to_use = [
 		# 'sim_1', 'sim_2' # for testing
@@ -72,7 +75,7 @@ for d in directories:
 	)
 	exp_val_times = sorted(true_expec_vals.keys())
 	raw_expec_vals = np.array(
-		[exp_val_times] for t in exp_val_times
+		[true_expec_vals[t] for t in exp_val_times]
 	)
 
 	growth_gen = true_params['growth_generator']
