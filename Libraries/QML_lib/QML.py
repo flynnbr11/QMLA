@@ -1262,6 +1262,12 @@ class reducedModel():
                 t = t,
                 state = probe
             )
+        # self.raw_expectation_values = np.array([
+        #     self.expectation_values[t] for t in required_times
+        # ])
+        # self.times = np.array(
+        #     sorted(list(self.expectation_times.keys()))
+        # )
 
     def r_squared(
         self, 

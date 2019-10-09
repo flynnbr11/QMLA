@@ -64,6 +64,17 @@ for d in directories:
 	true_params_path = str(d + 'true_params.p')
 	true_params = pickle.load(open(true_params_path, 'rb'))
 
+	true_expec_vals = pickle.load(
+		open(
+			str( d + 'true_expec_vals.p'),
+			'rb'
+		) 		
+	)
+	exp_val_times = sorted(true_expec_vals.keys())
+	raw_expec_vals = np.array(
+		[exp_val_times] for t in exp_val_times
+	)
+
 	growth_gen = true_params['growth_generator']
 	growth_class = GrowthRules.get_growth_generator_class(
 		growth_generation_rule = growth_gen
@@ -78,7 +89,9 @@ for d in directories:
 		'GrowthGenerator' : growth_gen,
 		'TrueModelLatex' : growth_class.latex_name(
 			true_params['true_op']
-		)
+		), 
+		'TrueExpectationValues' : raw_expec_vals, 
+		'ExpValTimes' : exp_val_times
 	}
 
 	d += '/'
@@ -95,6 +108,12 @@ for d in directories:
 	    data = pd.Series(res)
 	    data['ResultsDirectory'] = d
 	    data['RunIdx'] = idx
+	    expectation_values = np.array([
+	    	res['ExpectationValues'][t] for t in exp_val_times
+	    ])
+	    data['RawExpectationValues'] = expectation_values
+	    epochs = np.array(sorted(res['TrackParameterEstimates'].keys()))
+	    data['Epochs'] = epochs
 	    results_df = results_df.append(
 	        data, 
 	        ignore_index=True
