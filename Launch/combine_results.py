@@ -62,8 +62,8 @@ directory_df = pd.DataFrame()
 
 
 for d in directories:
+	print("Analysing directory ", d)
 	idx = directories.index(d)
-	
 	true_params_path = str(d + 'true_params.p')
 	true_params = pickle.load(open(true_params_path, 'rb'))
 
@@ -73,10 +73,10 @@ for d in directories:
 			'rb'
 		) 		
 	)
-	exp_val_times = sorted(true_expec_vals.keys())
-	raw_expec_vals = np.array(
-		[true_expec_vals[t] for t in exp_val_times]
-	)
+	exp_val_times = (true_expec_vals.keys())
+	raw_expec_vals = [
+		true_expec_vals[t] for t in exp_val_times
+	]
 
 	growth_gen = true_params['growth_generator']
 	growth_class = GrowthRules.get_growth_generator_class(
@@ -111,9 +111,9 @@ for d in directories:
 	    data = pd.Series(res)
 	    data['ResultsDirectory'] = d
 	    data['RunIdx'] = idx
-	    expectation_values = np.array([
+	    expectation_values = [
 	    	res['ExpectationValues'][t] for t in exp_val_times
-	    ])
+	    ]
 	    data['RawExpectationValues'] = expectation_values
 	    epochs = np.array(sorted(res['TrackParameterEstimates'].keys()))
 	    data['Epochs'] = epochs
