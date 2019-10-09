@@ -73,7 +73,7 @@ for d in directories:
 			'rb'
 		) 		
 	)
-	exp_val_times = list(true_expec_vals.keys())
+	exp_val_times = list(sorted(true_expec_vals.keys()))
 	raw_expec_vals = [
 		true_expec_vals[t] for t in exp_val_times
 	]
