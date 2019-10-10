@@ -14,7 +14,7 @@ results_directory = str(
     os.getcwd() + '/Results/'
 )
 
-test_run = True
+test_run = False
 use_all_directories = False
 all_directories = {
     'sim_1' : 'Oct_07/17_09',
