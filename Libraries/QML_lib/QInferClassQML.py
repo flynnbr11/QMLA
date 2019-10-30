@@ -283,7 +283,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
     ):
         super(QInferModelQML, self).likelihood(
             outcomes, modelparams, expparams
-        ) # TODO BF: @AAG why is super.likelihood called?
+        ) # just adds to self._call_count (Qinfer abstact model class)
         """
         log_print(
             [
@@ -509,7 +509,11 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                 self.log_identifier
             )
 
-
+        # if not times:
+        #     times = [time]        
+        # print("time:", times)            
+        # print("pr0:", pr0)
+        # print("likelihood array:", likelihood_array)
         return likelihood_array
 
 

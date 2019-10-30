@@ -186,4 +186,11 @@ class hopping_predetermined(
                 'h_1h2_d4PPPPh_1h3_d4PPPPh_1h4_d4PPPPh_2h3_d4PPPPh_2h4_d4PPPPh_3h4_d4'
             ]
 
+            if self.true_operator not in self.initial_models:
+                self.initial_models.append(
+                    self.true_operator
+                )
+
+
+
         

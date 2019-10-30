@@ -171,7 +171,7 @@ for t in list(experimental_measurements_dict.keys()):
 """
 
 plot_lower_time = 0
-plot_upper_time = expec_val_plot_max_time
+plot_upper_time = growth_class.max_time_to_consider
 plot_number_times = num_datapoints_to_plot
 raw_times = list(np.linspace(
     plot_lower_time, 
@@ -547,7 +547,8 @@ elif (
         # models to QHL can be declared in 
         # UserFunctions.qhl_models_by_generator dict
         qhl_models = growth_class.qhl_models      
-        output_prefix = 'multi_qhl_'
+        # output_prefix = 'multi_qhl_'
+        output_prefix = '' # TODO make so that this can have an output prefix
 
     else:
         qhl_models = further_qhl_models 
@@ -810,8 +811,9 @@ else:
 
         qmd.saveBayesCSV(
             save_to_file=str(
-            global_variables.results_directory+ 
-            'bayes_factors_'+ str(global_variables.long_id)+'.csv'),
+                global_variables.results_directory+ 
+                'bayes_factors_'+ str(global_variables.long_id)+'.csv'
+            ),
             names_ids='latex'
         )
 

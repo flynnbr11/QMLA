@@ -560,11 +560,12 @@ class ModelLearningClass():
         # print("[QML] STARTING QHL UPDATES")
         # true_params = np.array([[self.TrueParams[0]]])
         for istep in range(self.NumExperiments):
+            # print("Epoch", istep)
             if (istep%print_frequency == 0):
                 # print so we can see how far along algorithm is. 
                 self.log_print(
                     [
-                    "Experiment", istep
+                    "Epoch", istep
                     ]
                 )
 
@@ -606,7 +607,7 @@ class ModelLearningClass():
             #    'Getting Datum'
             #    ]
             # )
-
+            # print("Getting datum")
             self.Datum = self.GenSimModel.simulate_experiment(
                 self.SimParams,
                 self.Experiment,
@@ -621,6 +622,7 @@ class ModelLearningClass():
             ## Call updater to update distribution based on datum
             try:
                 # print("[QML] calling updater")
+                # print("Updating with datum {}".format(self.Datum))
                 self.Updater.update(
                     self.Datum, 
                     self.Experiment
@@ -666,7 +668,7 @@ class ModelLearningClass():
                     np.diag(self.Updater.est_covariance_mtx())
                 )
             )
-            # self.TrackCovMatrices.append(self.Updater.est_covariance_mtx()) # TODO this doesn't seem necessary to store
+            self.TrackCovMatrices.append(self.Updater.est_covariance_mtx()) # TODO this doesn't seem necessary to store
             prior_sample = self.Updater.sample(int(5))
 
             these_means = []
@@ -892,7 +894,7 @@ class ModelLearningClass():
         learned_info['initial_params'] = self.SimParams
         learned_info['volume_list'] = self.VolumeList
         learned_info['track_eval'] = self.TrackEval
-        # learned_info['track_cov_matrices'] = self.
+        learned_info['track_cov_matrices'] = self.TrackCovMatrices
         learned_info['track_param_sigmas'] = self.TrackParamSigmas
         learned_info['track_posterior'] = self.TrackPosterior
         learned_info['track_prior_means'] = self.TrackPriorMeans # repeat of track param sigmas?
@@ -1145,7 +1147,7 @@ class reducedModel():
                 self.VolumeList[i] = self.RawVolumeList[i]
 
             self.TrackEval = np.array(learned_info['track_eval'])
-            # self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
+            self.TrackCovMatrices = np.array(learned_info['track_cov_matrices'])
             self.TrackParamSigmas = np.array(learned_info['track_param_sigmas'])
             self.TrackPriorMeans = np.array(learned_info['track_prior_means'])
             self.TrackPosterior = np.array(learned_info['track_posterior'])
@@ -1260,7 +1262,9 @@ class reducedModel():
             self.expectation_values[t] = self.GrowthClass.expectation_value(
                 ham = self.LearnedHamiltonian, 
                 t = t,
-                state = probe
+                state = probe,
+                log_file = self.log_file, 
+                log_identifier = '[QML - compute expectation values]'
             )
         # self.raw_expectation_values = np.array([
         #     self.expectation_values[t] for t in required_times

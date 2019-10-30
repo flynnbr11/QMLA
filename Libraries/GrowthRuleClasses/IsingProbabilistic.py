@@ -57,7 +57,7 @@ class ising_chain_probabilistic(
         self.min_param = 0
         self.max_param = 1
 
-        self.setup_growth_class()
+        self.setup_growth_class() # from connected_lattice
         self.gaussian_prior_means_and_widths = {
             # 'pauliSet_zJz_1J2_d3' : (2, 0.01), 
             # 'pauliSet_zJz_2J3_d3' : (8, 0.1)             

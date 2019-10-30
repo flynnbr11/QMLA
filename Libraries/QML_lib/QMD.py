@@ -268,7 +268,9 @@ class QMD():
                     self.GrowthClass.expectation_value(
                         ham = self.TrueHamiltonian, 
                         t = t, 
-                        state = self.PlotProbes[self.TrueOpDim]  
+                        state = self.PlotProbes[self.TrueOpDim],
+                        log_file = self.log_file,
+                        log_identifier = '[QMD Init]'
                     )
 
                 )
@@ -2697,7 +2699,7 @@ class QMD():
             #     times = expec_val_plot_times
             # ),
             'FinalRSquared' : mod.final_r_squared,
-            'F-score' : self.FScore,
+            'Fscore' : self.FScore,
             'Precision' : self.Precision, 
             'Sensitivity' : self.Sensitivity,
             'p-value' : mod.p_value, 
@@ -2845,7 +2847,7 @@ class QMD():
                 'TrackParameterEstimates' : mod.TrackParameterEstimates,
                 'TrackVolume' : mod.VolumeList,
                 'TrackTimesLearned' : mod.Times, 
-                'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
+                # 'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
                 'ExpectationValues' : mod.expectation_values,
                 # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
                 #     times = expec_val_plot_times,
@@ -2857,7 +2859,7 @@ class QMD():
                     times = expec_val_plot_times
                 ),
                 'p-value' : mod.p_value, 
-                'F-score' : self.FScore,
+                'Fscore' : self.FScore,
                 'Precision' : self.Precision, 
                 'Sensitivity' : self.Sensitivity,
                 'LearnedHamiltonian' : mod.LearnedHamiltonian,

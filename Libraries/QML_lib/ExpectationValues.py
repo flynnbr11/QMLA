@@ -38,10 +38,44 @@ def log_print(to_print_list, log_file, log_identifier):
     with open(log_file, 'a') as write_log_file:
         print(log_identifier, str(to_print), file=write_log_file, flush=True)
 
-     
-## Partial trace functionality
- 
+
+
+### Default expectation value calculations    
+
 def expectation_value(
+    ham, 
+    t, 
+    state,
+    log_file='QMDLog.log',
+    log_identifier='Expecation Value'
+):
+    from scipy import linalg
+
+    unitary = linalg.expm(-1j*ham*t)
+    probe_bra = state.conj().T
+    u_psi = np.dot(unitary, state)
+    psi_u_psi = np.dot(probe_bra, u_psi)
+    expec_val = np.abs(psi_u_psi)**2
+
+    # check that expectation value is reasonable (0 <= EV <= 1)
+    ex_val_tol = 1e-9
+    if (
+        expec_val > (1 + ex_val_tol)
+        or 
+        expec_val < (0 - ex_val_tol)
+    ):
+        log_print(
+            [
+                "Expectation value greater than 1 or less than 0: \t",
+                expec_val
+            ],
+            log_file = log_file,
+            log_identifier = log_identifier
+        )
+    return expec_val
+
+ 
+def expectation_value_verbose(
     ham, t, state=None, 
     choose_random_probe=False,
     use_exp_custom=True, 
@@ -53,7 +87,7 @@ def expectation_value(
     log_identifier=None, 
     debug_plot_print=False
 ):
-
+    ### Deprecated; replaced by expectation_value function above
     if choose_random_probe is True: 
         from ProbeGeneration import random_probe
         num_qubits = int(np.log2(np.shape(ham)[0]))
@@ -192,11 +226,15 @@ def expectation_value(
 
  
 def evolved_state(
-    ham, t, state, 
+    ham, 
+    t, 
+    state, 
     use_exp_custom=True, 
     precision=1e-10, # precision to which we require custom exp_ham to match linalg.expm
     enable_sparse=True, 
-    print_exp_details=False, exp_fnc_cutoff=10, log_file=None,
+    print_exp_details=False, 
+    exp_fnc_cutoff=10, 
+    log_file=None,
     log_identifier=None
 ):
     #import hamiltonian_exponentiation as h
@@ -241,7 +279,7 @@ def evolved_state(
                 type(iht[0][0]), "\nMtx type:", type(iht)], 
                 log_file, log_identifier
             )
-        print("Getting expm from linalg")
+        print("[evolved state] Getting expm from linalg")
         unitary = linalg.expm(-1j*ham*t)
         
         if log_file is not None:
@@ -250,12 +288,22 @@ def evolved_state(
     ev_state = np.dot(unitary, state)
 
     if log_file is not None:
-        log_print(["evolved state fnc. Method details printed in worker log. \nt=",
-            t, "\nHam=\n", ham, "\nprobe=", state, "\nU=\n", unitary, "\nev_state=",
-            ev_state], log_file, log_identifier
+        log_print(
+            [
+                "evolved state fnc. Method details printed in worker log. \nt=",
+                t, 
+                "\nHam=\n", ham, 
+                "\nprobe=", state, 
+                "\nU=\n", unitary, 
+                "\nev_state=", ev_state
+            ], 
+            log_file, 
+            log_identifier
         )
     del unitary # to save space
     return ev_state
+
+## Partial trace functionality
 
 
 def traced_expectation_value_project_one_qubit_plus(

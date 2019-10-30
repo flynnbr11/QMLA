@@ -6,19 +6,19 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=10
-qhl_test=0 # don't perform QMLA; perform QHL on known correct model
+num_tests=1
+qhl_test=1 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
-simulate_experiment=1
+simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=50
-exp=10
+prt=10
+exp=5
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -86,15 +86,16 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='hopping_probabilistic'
 # sim_growth_rule='hopping_predetermined'
 # sim_growth_rule='ising_probabilistic'
-# sim_growth_rule='ising_predetermined'
+sim_growth_rule='ising_predetermined'
 # sim_growth_rule='heisenberg_xyz_probabilistic'
-sim_growth_rule='heisenberg_xyz_predetermined'
+# sim_growth_rule='heisenberg_xyz_predetermined'
 # sim_growth_rule='example'
 
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
+exp_growth_rule='presentation'
 # exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # exp_growth_rule='NV_alternative_model'
 # exp_growth_rule='NV_alternative_model_2'
@@ -104,7 +105,7 @@ sim_growth_rule='heisenberg_xyz_predetermined'
 # exp_growth_rule='NV_centre_spin_large_bath'
 # exp_growth_rule='NV_spin_full_access'
 # exp_growth_rule='NV_centre_experiment_debug'
-exp_growth_rule='reduced_nv_experiment'
+# exp_growth_rule='reduced_nv_experiment'
 # exp_growth_rule='NV_fitness_growth'
 
 

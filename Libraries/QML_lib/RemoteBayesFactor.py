@@ -253,6 +253,7 @@ def BayesFactorRemote(
                     model_b, 
                     bayes_factor = bayes_factor, 
                     bf_times = update_times_model_a,
+                    log_file = log_file, 
                     save_to_file = plot_path
                 )
             except:
@@ -463,6 +464,7 @@ def plot_expec_vals_of_models(
     model_b, 
     bayes_factor,
     bf_times, 
+    log_file,
     save_to_file=None
 ):
     import UserFunctions
@@ -513,7 +515,9 @@ def plot_expec_vals_of_models(
                 exp_val = mod.GrowthClass.expectation_value(
                     ham = final_ham, 
                     t = t, 
-                    state = plot_probe
+                    state = plot_probe,
+                    log_file = log_file, 
+                    log_identifier = '[remoteBayesFactor plots]'
                 )
             except: 
                 exp_val = UserFunctions.expectation_value_wrapper(

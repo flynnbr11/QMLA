@@ -1294,7 +1294,7 @@ def get_model_scores(
         else:
             scores[alph] = 1
             coeff_of_determination[alph] = [ result['FinalRSquared'] ]
-            f_scores[alph] = result['F-score']
+            f_scores[alph] = result['Fscore']
             sensitivities[alph] = result['Sensitivity']
             precisions[alph] = result['Precision']
             volumes[alph] = [vol_list]

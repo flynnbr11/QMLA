@@ -1478,17 +1478,17 @@ def summariseResultsCSV(
         some_results = pickle.load(open(filenames[0], "rb"))
 
     except:
-        # print("Couldn't find results files beginning with ", 
-        #     results_file_name_start
-        # )
+        print("Couldn't find results files beginning with ", 
+            results_file_name_start
+        )
 
-        # print(
-        #     "directory:", directory_name, 
-        #     "\nresults_file_name_start:", results_file_name_start,
-        #     "\nFilenames found:", filenames,
-        #     "\npickled files:", pickled_files,
-        #     "\nlistdir:", os.listdir(directory_name)
-        # )
+        print(
+            "directory:", directory_name, 
+            "\nresults_file_name_start:", results_file_name_start,
+            "\nFilenames found:", filenames,
+            "\npickled files:", pickled_files,
+            "\nlistdir:", os.listdir(directory_name)
+        )
         raise
     result_fields = list(some_results.keys())
     

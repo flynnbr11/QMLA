@@ -17,6 +17,7 @@ import NVCentreAlternativeTrueModel
 import NVGrowByFitness
 import NVProbabilistic
 import ReducedNVExperiment
+import PresentationPlotGeneration
 import SpinProbabilistic
 import IsingChain
 import Hubbard
@@ -73,6 +74,8 @@ growth_classes = {
         IsingMultiAxis.ising_chain_multi_axis, 
     'ising_2d' : 
         Ising2D.ising_2D,
+    'ising_probabilistic' : 
+        IsingProbabilistic.ising_chain_probabilistic,
     'ising_predetermined' : 
         IsingProbabilistic.ising_chain_predetermined,
     'hubbard_square_lattice_generalised' : 
@@ -89,8 +92,6 @@ growth_classes = {
         HoppingProbabilistic.hopping_probabilistic,
     'hopping_predetermined' : 
         HoppingProbabilistic.hopping_predetermined,
-    'ising_probabilistic' : 
-        IsingProbabilistic.ising_chain_probabilistic,
     'heisenberg_xyz_probabilistic' :
         HeisenbergXYZProbabilistic.heisenberg_xyz_probabilistic,
     'heisenberg_xyz_predetermined' : 
@@ -98,7 +99,9 @@ growth_classes = {
     'basic_lindbladian' :
         BasicLindbladian.basic_lindbladian,
     'example' : 
-        ExampleGrowthRule.example_growth
+        ExampleGrowthRule.example_growth,
+    'presentation' : 
+        PresentationPlotGeneration.presentation_plot_generation
 }
 
 

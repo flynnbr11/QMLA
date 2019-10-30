@@ -523,62 +523,6 @@ def ising_terms_full_list(return_branch_dict=None):
     else:
         return latex_terms
 
-
-
-
-#######################################
-
-
-# """
-# Assign each generation rule a latex name mapping
-# """
-# latex_naming_functions = {
-# 	None : default_latex_wrapping,
-# 	'two_qubit_ising_rotation_hyperfine' : 
-# 		latex_name_ising, 
-# 	'two_qubit_ising_rotation_hyperfine_transverse' : 
-# 		latex_name_ising, 
-# }
-
-# all_models_functions = {
-# 	None : ising_terms_rotation_hyperfine,
-# 	'two_qubit_ising_rotation_hyperfine' : 
-# 		ising_terms_rotation_hyperfine, 
-# 	'two_qubit_ising_rotation_hyperfine_transverse' : 
-# 		ising_terms_full_list, 
-# }
-
-
-# ######
-# ### ----- Wrapper functions. ----- ###
-# ######
-
-# def get_latex_name(
-#     name, 
-#     growth_generator=None,
-#     **kwargs
-# ):
-# 	try:
-# 		# if mapping doesn't work, default to just wrap in $__$. 
-# 		latex_mapping = latex_naming_functions[growth_generator]
-# 		latex_representation = latex_mapping(name, **kwargs)
-# 	except:
-# 		latex_mapping = latex_naming_functions[None]
-# 		latex_representation = latex_mapping(name, **kwargs)
-# 	# print("Latex Mapping used", latex_mapping)
-
-# 	return latex_representation
-
-
-# def get_all_model_names(
-# 	growth_generator = None,
-# 	**kwargs
-# ):
-# 	all_models = all_models_functions[growth_generator]
-# 	# print("all model function:", all_models)
-# 	return all_models(**kwargs)
-
-
 def test_return_champs_ALL_MODELS(**kwargs):
 	models = ['x', 'y', 'z', 'xPy', 'xPz', 'yPz', 'xPyPz']
 
