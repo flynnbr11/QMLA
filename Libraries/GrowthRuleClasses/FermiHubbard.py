@@ -74,10 +74,13 @@ class fermi_hubbard(
                     sites = [str(s) for s in c.split('h')]        
 
 
-            term_latex = '\hat{{H}}_{{{}}}^{{{}}}'.format(
-                ",".join(sites),  # subscript site indices
-                basis_latex[spin_type] # superscript which spin type
-            )
+            if spin_type == 'double':
+                term_latex = "N_{{{}}}".format(sites[0])
+            else:
+                term_latex = '\hat{{H}}_{{{}}}^{{{}}}'.format(
+                    ",".join(sites),  # subscript site indices
+                    basis_latex[spin_type] # superscript which spin type
+                )
             latex_str += term_latex
         latex_str = "${}$".format(latex_str)
         return latex_str
