@@ -86,9 +86,10 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='hopping_probabilistic'
 # sim_growth_rule='hopping_predetermined'
 # sim_growth_rule='ising_probabilistic'
-sim_growth_rule='ising_predetermined'
+# sim_growth_rule='ising_predetermined'
 # sim_growth_rule='heisenberg_xyz_probabilistic'
 # sim_growth_rule='heisenberg_xyz_predetermined'
+sim_growth_rule='fermi_hubbard'
 # sim_growth_rule='example'
 
 
@@ -208,6 +209,7 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
     -sp=$special_probe_plot \
     $growth_rules_command 
 
+echo "Generated configuration. Calling Exp.py"
 
 for prt in  "${particle_counts[@]}";
 do

@@ -31,6 +31,7 @@ import HoppingProbabilistic
 import IsingProbabilistic
 import HeisenbergXYZProbabilistic
 import BasicLindbladian
+import FermiHubbard
 import ExampleGrowthRule
 
 growth_classes = {
@@ -92,6 +93,8 @@ growth_classes = {
         HoppingProbabilistic.hopping_probabilistic,
     'hopping_predetermined' : 
         HoppingProbabilistic.hopping_predetermined,
+    'fermi_hubbard' : 
+        FermiHubbard.fermi_hubbard,
     'heisenberg_xyz_probabilistic' :
         HeisenbergXYZProbabilistic.heisenberg_xyz_probabilistic,
     'heisenberg_xyz_predetermined' : 

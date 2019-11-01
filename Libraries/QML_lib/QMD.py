@@ -253,6 +253,9 @@ class QMD():
         if self.UseExperimentalData==False:
             self.ExperimentalMeasurements = {}
             self.TrueHamiltonian = self.GlobalVariables.true_hamiltonian
+            self.TrueHamiltonianDimension = np.log2(
+                self.TrueHamiltonian.shape[0]
+            )
             self.log_print(
                 [
                 "Getting expectation values for simulated model", 
@@ -268,7 +271,7 @@ class QMD():
                     self.GrowthClass.expectation_value(
                         ham = self.TrueHamiltonian, 
                         t = t, 
-                        state = self.PlotProbes[self.TrueOpDim],
+                        state = self.PlotProbes[self.TrueHamiltonianDimension],
                         log_file = self.log_file,
                         log_identifier = '[QMD Init]'
                     )

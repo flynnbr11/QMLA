@@ -1597,6 +1597,60 @@ def hubbard_square_lattice_generalised(**kwargs):
 #     # for use in computing base level terms in a model, used in DataBase.
 #     return hopping_matrix(term)
 
+def compute_hubbard_basis_vector(
+    spin_type, 
+    site, 
+    num_sites,
+    basis_vectors
+):
+    basis_vec = 1
+    spin_vec = basis_vectors[spin_type] 
+    vac = basis_vectors['vac']
+    
+    for i in range(1, num_sites+1):
+        if i == site:
+            basis_vec = np.kron(basis_vec, spin_vec)
+        else:
+            basis_vec = np.kron(basis_vec, vac)
+    return basis_vec
+
+def process_hopping_term(term):
+    basis_vectors = {
+        'vac' : np.array([1,0,0,0]),
+        'down' : np.array([0,1,0,0]),
+        'up' : np.array([0,0,1,0]),
+        'double' : np.array([0,0,0,1])
+    }
+    constituents = term.split('_')
+
+    for c in constituents:
+        if c == 'hop':
+            continue # do nothing - just registers what type of matrix to construct
+        elif c in list(basis_vectors.keys()):
+            spin_type = c
+        elif c[0] == 'd':
+            num_sites = int(c[1:])
+        else:
+            sites = [int(s) for s in c.split('h')]        
+    
+    ## size of Hamiltonian # 2^2n for n sites (2n for v,up,down,double at each site)
+    dim = 2**(2*num_sites) 
+    vectors = [
+        compute_hubbard_basis_vector(
+            spin_type = spin_type, 
+            site = s,
+            num_sites = num_sites,
+            basis_vectors = basis_vectors
+        ) 
+        for s in sites
+    ]
+
+    if len(vectors) == 1:
+        hopping_mtx = np.outer(vectors[0], vectors[0])
+    else:
+        hopping_mtx = np.outer(vectors[0], vectors[1]) + np.outer(vectors[1], vectors[0])
+
+    return hopping_mtx
 
 
 def hopping_matrix(term):

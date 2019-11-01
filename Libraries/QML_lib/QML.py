@@ -1066,6 +1066,9 @@ class reducedModel():
         ]
         self.BayesFactors = {}
         self.NumQubits = DataBase.get_num_qubits(self.Name)
+        self.ProbeDimension = np.log2(
+            self.SimOpList[0].shape[0]
+        )
         self.HostName = host_name
         self.PortNumber = port_number
         self.Q_id = qid
@@ -1237,7 +1240,7 @@ class reducedModel():
         #     )
         #     probe = plot_probe_dict[self.NumQubits]
 
-        probe = self.PlotProbes[self.NumQubits]
+        probe = self.PlotProbes[self.ProbeDimension]
         
         # self.log_print(
         #     [
@@ -1306,7 +1309,7 @@ class reducedModel():
         # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
         # probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
         # probe = plot_probes[self.NumQubits]
-        probe = self.PlotProbes[self.NumQubits]
+        probe = self.PlotProbes[self.ProbeDimension]
 
         datamean = np.mean(exp_data[0:max_data_idx])
         # datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
@@ -1405,7 +1408,7 @@ class reducedModel():
         # exp_data = exp_data[0::10]
         # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
         # probe  = plot_probes[self.NumQubits]
-        probe = self.PlotProbes[self.NumQubits]
+        probe = self.PlotProbes[self.ProbeDimension]
 
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum( 

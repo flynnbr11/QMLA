@@ -93,7 +93,12 @@ growth_class.generate_probes(
 
 system_probes = growth_class.system_probes
 simulator_probe_dict = growth_class.simulator_probes
-print("Generated probe dict from growth class")
+log_print(
+    [
+        "Generated probe dict from growth class"
+    ],
+    log_file = log_file
+)
 
 probes_dir = str(
     global_variables.results_directory
@@ -141,9 +146,13 @@ pickle.dump(
 
 dataset = global_variables.dataset
 
-print("[EXP] For  growth rule {}; use dataset {}".format(
-    global_variables.growth_generation_rule, dataset       
-    )
+log_print(
+    [
+        "[EXP] For  growth rule {}; use dataset {}".format(
+            global_variables.growth_generation_rule, dataset       
+        )
+    ],
+    log_file = log_file
 )
 experimental_measurements_dict = pickle.load(
     open(str('Data/'+dataset), 'rb')
@@ -185,9 +194,13 @@ if global_variables.use_experimental_data==True:
         list(experimental_measurements_dict.keys())
     )    
 
-
 initial_op_list = growth_class.initial_models
-print("[Exp] Retrieved initial op list from growth class")
+log_print(
+    [
+        "[Exp] Retrieved initial op list from growth class"
+    ],
+    log_file = log_file
+)
 
 true_op = global_variables.true_operator
 # true_params = global_variables.true_params
@@ -196,13 +209,16 @@ true_op_list = DataBase.get_constituent_names_from_name(true_op)
 true_op_matrices = [DataBase.compute(t) for t in true_op_list]
 num_params = len(true_op_list)
 true_expectation_value_path = global_variables.true_expec_path
+true_ham = global_variables.true_hamiltonian
+# don't get dimension directly in case N particles encoded in >N hilbert space
+true_probe_dimension = np.log2(true_ham.shape[0]) 
 if os.path.isfile(true_expectation_value_path) == False:
-    true_ham = global_variables.true_hamiltonian
+    
     true_expec_values = {}
     plot_probe_dict = pickle.load(
         open(global_variables.plot_probe_file, 'rb')
     )
-    probe = plot_probe_dict[true_num_qubits]
+    probe = plot_probe_dict[true_probe_dimension]
     log_print(
         [
             "for generating true data.",

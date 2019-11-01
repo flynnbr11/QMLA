@@ -280,7 +280,7 @@ def get_num_qubits(name):
     individual_terms = get_constituent_names_from_name(name)
     for term in individual_terms:
         if (
-            term[0] == 'h'
+            term[0:1] == 'h_'
             or
             '1Dising' in term
             or 
@@ -289,6 +289,8 @@ def get_num_qubits(name):
             'nv' in term
             or 
             'pauliSet' in term
+            or
+            'hop' in term
         ):
             terms = term.split('_')
             dim_term = terms[-1]
@@ -305,7 +307,29 @@ def get_num_qubits(name):
 
     return num_qubits
 
+# def get_constituent_names_from_name(name):
+# ### Deprecated -- now verbose_naming_mechanism_separate_terms
+#     t_str, p_str, max_t, max_p = get_t_p_strings(name)
+#     if(max_t >= max_p):
+#         # if more T's than P's in name, 
+#         # it has only one constituent. 
+#         return [name]
+#     else: 
+#         # More P's indicates a sum at the highest dimension. 
+#         return name.split(p_str)
+    
+
 def get_constituent_names_from_name(name):
+    verbose_naming_mechanism_terms = ['T', 'P', 'M']
+    
+    if np.any(
+        [t in name for t in verbose_naming_mechanism_terms]
+    ):
+        return verbose_naming_mechanism_separate_terms(name)
+    else:
+        return name.split('+')
+    
+def verbose_naming_mechanism_separate_terms(name):
     t_str, p_str, max_t, max_p = get_t_p_strings(name)
     if(max_t >= max_p):
         # if more T's than P's in name, 
@@ -612,7 +636,7 @@ def compute(inp):
     max_t, t_str = find_max_letter(inp, "T")
     max_m, m_str = find_max_letter(inp, "M")
 
-    if(max_m == 0 and max_t==0 and max_p == 0):
+    if (max_m == 0 and max_t==0 and max_p == 0):
         basic_operator = inp
         # return core_operator_dict[basic_operator] 
         return process_basic_operator(basic_operator)
@@ -624,10 +648,9 @@ def compute(inp):
         return compute_p(inp)    
 
 def process_basic_operator(basic_operator):
-    # print("Processing basic opeator", basic_operator)
     import ModelGeneration
 
-    if basic_operator[0] == 'h':
+    if basic_operator[0:1] == 'h_':
         # import ModelGeneration
         mtx = ModelGeneration.process_hubbard_operator(
             basic_operator
@@ -656,8 +679,14 @@ def process_basic_operator(basic_operator):
         mtx = ModelGeneration.process_transverse_term(
             term = basic_operator
         )
+    elif 'hop' in basic_operator:
+        # print("[DB] Processing hopping operator:", term)
+        mtx = ModelGeneration.process_hopping_term(
+            term = basic_operator
+        )
     else:
         mtx = core_operator_dict[basic_operator]
+
 
     return mtx
 

@@ -193,4 +193,36 @@ class hopping_predetermined(
 
 
 
-        
+class hubbard_kinetic_and_onsite(
+    ConnectedLattice.connected_lattice
+    # hopping_probabilistic
+):
+
+    def __init__(
+        self, 
+        growth_generation_rule, 
+        **kwargs
+    ):
+        # print("[Growth Rules] init nv_spin_experiment_full_tree")
+        super().__init__(
+            growth_generation_rule = growth_generation_rule,
+            **kwargs
+        )
+        # self.true_operator = 'hop_1h2_down_d2PPhop_1h2_up_d2PPhop_1_double_d2PPhop_2_double_d2' # nn-connected square
+        self.true_operator = 'hop_1h2_down_d2' 
+        # self.true_operator = 'h_1h2_d2'
+        self.tree_completed_initially = True
+        self.min_param = 0
+        self.max_param = 1
+        self.initial_models = [
+            self.true_operator
+        ]
+
+
+    def latex_name(
+        self,
+        name, 
+        **kwargs
+    ):  
+        # name: string to be formatted for latex
+        return str('${}$'.format(name))
