@@ -82,7 +82,8 @@ class connected_lattice(
         self.initial_models = self.generate_terms_from_new_site(
             connected_sites = self.initially_connected_sites, 
             base_terms = self.base_terms, 
-            num_sites = self.topology.num_sites() 
+            num_sites = self.topology.num_sites(),
+            new_sites = range(1, self.topology.num_sites() + 1), 
         )
         self.true_operator = DataBase.alph(self.true_operator)
         self.model_fitness = {}
@@ -95,11 +96,7 @@ class connected_lattice(
 
         self.spawn_stage = [None]
         self.available_mods_by_generation = {}
-        self.available_mods_by_generation[self.generation_DAG] = self.generate_terms_from_new_site(
-            connected_sites = self.initially_connected_sites, 
-            base_terms = self.base_terms, 
-            num_sites = self.topology.num_sites() 
-        )
+        self.available_mods_by_generation[self.generation_DAG] = self.initial_models
         self.site_connections_considered = self.initially_connected_sites
         self.max_num_sub_generations_per_generation = {
             self.generation_DAG : len(self.available_mods_by_generation[self.generation_DAG])
@@ -111,7 +108,7 @@ class connected_lattice(
             self.generation_DAG : {}
         }
         self.sub_generation_idx = 0 
-        self.counter =0
+        self.counter = 0
 
 
 
@@ -382,7 +379,8 @@ class connected_lattice(
         self, 
         base_terms, 
         connected_sites,
-        num_sites 
+        num_sites,
+        **kwargs 
     ):
 
         return pauli_like_like_terms_connected_sites(
@@ -476,15 +474,11 @@ class connected_lattice(
             **kwargs
         )
 
-
-
-
-
-
 def pauli_like_like_terms_connected_sites(
     connected_sites, 
     base_terms, 
-    num_sites
+    num_sites,
+    **kwargs
 ):
 
     new_terms = []

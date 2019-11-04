@@ -59,10 +59,13 @@ class topology_grid():
             new_site_idx = self.add_site_2d_grid()
         
         this_site_new_connections = []
-        new_coordinate = self.coordinates[new_site_idx ]
+        new_coordinate = self.coordinates[new_site_idx]
         self.nearest_neighbours[new_site_idx] = []            
         self.site_connections[new_site_idx] = []
-        other_sites = list(set(self.site_indices) - set([new_site_idx]))
+        other_sites = list(
+            set(self.site_indices) 
+            - set([new_site_idx])
+        )
         for i in other_sites:
             other_coords = self.coordinates[i] 
             nearest_neighbour = self.check_nearest_neighbour_sites(

@@ -95,6 +95,10 @@ growth_classes = {
         HoppingProbabilistic.hopping_predetermined,
     'fermi_hubbard' : 
         FermiHubbard.fermi_hubbard,
+    'fermi_hubbard_predetermined' : 
+        FermiHubbard.fermi_hubbard_predetermined,
+    'fermi_hubbard_probabilistic' : 
+        FermiHubbard.fermi_hubbard_probabilistic,
     'heisenberg_xyz_probabilistic' :
         HeisenbergXYZProbabilistic.heisenberg_xyz_probabilistic,
     'heisenberg_xyz_predetermined' : 
