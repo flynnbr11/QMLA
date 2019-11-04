@@ -131,7 +131,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self._true_oplist = true_oplist
         self._trueparams = trueparams
         self._truename = truename
-        print("[QML Qinfer class] True op list:", self._true_oplist)
+        # print("[QML Qinfer class] True op list:", self._true_oplist)
         self._true_dim = DataBase.get_num_qubits(self._truename)
         self.use_time_dep_true_model = use_time_dep_true_model
         self.time_dep_true_params = time_dep_true_params

@@ -38,6 +38,7 @@ class fermi_hubbard(
         self.initial_models = [
             self.true_operator
         ]
+        self.max_time_to_consider = 20
 
 
     def latex_name(
@@ -75,7 +76,7 @@ class fermi_hubbard(
 
 
             if spin_type == 'double':
-                term_latex = "N_{{{}}}".format(sites[0])
+                term_latex = "\hat{{N}}_{{{}}}".format(sites[0])
             else:
                 term_latex = '\hat{{H}}_{{{}}}^{{{}}}'.format(
                     ",".join(sites),  # subscript site indices
