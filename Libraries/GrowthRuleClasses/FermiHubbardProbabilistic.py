@@ -33,7 +33,7 @@ class fermi_hubbard_probabilistic(
         self.max_num_probe_qubits = self.max_num_sites
         self.max_num_qubits = self.max_num_sites
         self.num_probes = 2**self.max_num_sites
-        self.lattice_dimension = 2
+        self.lattice_dimension = 1
         self.tree_completed_initially = False
         self.num_top_models_to_build_on = 2
         self.model_generation_strictness = 0
