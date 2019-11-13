@@ -22,8 +22,8 @@ global debug_log_print
 debug_log_print = False
 global likelihood_dev
 likelihood_dev = False
-debug_print_file_line=False
 global debug_print_file_line
+debug_print_file_line=False
 
 def time_seconds():
     import datetime
