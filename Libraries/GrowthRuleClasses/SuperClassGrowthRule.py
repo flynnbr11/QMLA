@@ -75,8 +75,8 @@ class growth_rule_super_class():
         self.gaussian_prior_means_and_widths = {
             # term : (mean, sigma)
         }
-        # self.num_probes = 40
-        self._num_probes = 40
+        self.num_probes = 40
+        # self._num_probes = 40
         self.min_param = 0
         self.max_param = 1
         self.prior_random_mean = False

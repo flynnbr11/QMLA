@@ -38,8 +38,8 @@ class ising_chain_probabilistic(
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
-            # 'x', 
-            # 'y', 
+            'x', 
+            'y', 
             'z'
         ]
         # fitness calculation parameters. fitness calculation inherited.

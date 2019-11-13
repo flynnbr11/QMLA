@@ -1584,8 +1584,8 @@ def process_fermi_hubbard_term(term):
 
 def jordan_wigner_mtx(fermion_operator):
     """
-    Calls fermilib functinoality to compute complete matrix given a FermionOperator class
-     fermion 
+    Calls fermilib functinoality to compute complete matrix given a 
+    FermionOperator class fermion. 
     """
     return fermilib.transforms.get_sparse_operator(fermion_operator).todense()
 
@@ -1635,6 +1635,7 @@ def process_fermi_hubbard_onsite(constituents):
     
     i = 2*site_number - 2 # index with respect to basis (site_number, spin_type)
     num_term = FermionOperator( ( (i,1), (i,0), (i+1, 1), (i+1, 0)) )
+    # operator of form {c^{\dagger}_i c_i c^{\dagger}_{i+1} c_{i+1}}
     num_term += dimensional_fermion_op
     
     mtx = jordan_wigner_mtx(num_term) - jordan_wigner_mtx(dimensional_fermion_op)
@@ -1649,8 +1650,8 @@ def process_fermi_hubbard_hopping(constituents):
         else:
             sites = [int(s) for s in c.split('h')]        
 
-    i_idx = 2*(sites[0]-1) - 2
-    j_idx = 2*(sites[1]-1) - 2    
+    i_idx = 2*(sites[0]-1) - 2 # 2i -2
+    j_idx = 2*(sites[1]-1) - 2 # 2j -2   
     if spin_type == 'down':
         i_idx = 2*(sites[0] - 1)
         j_idx = 2*(sites[1] - 1)

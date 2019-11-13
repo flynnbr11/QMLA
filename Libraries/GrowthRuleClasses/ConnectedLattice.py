@@ -109,34 +109,22 @@ class connected_lattice(
         self.sub_generation_idx = 0 
         self.counter = 0
 
-
-
-
     @property
     def num_sites(self):
-        return self.topology.num_sites
+        return self.topology.num_sites()
     
+
     def generate_models(
         self, 
         model_list, 
         **kwargs
     ):
-        """
-        new models are generated for different cases:
-            * within dimension: add term from available term list until exhausted (greedy)
-            * finalise dimension: return champions of branches within this dimension to determine
-                which model(s) to build on for next generation
-            * new dimension: add site to topology; get available term list; return model list 
-                of previous champ(s) plus each of newest terms
-            * finalise QMD: return generation champs 
-                (here generation directly corresponds to number of sites)
-        cases are indicated by self.spawn_stage
-        """
 
-        # fitness = kwargs['fitness_parameters']
         model_points = kwargs['branch_model_points']
+        self.model_group_fitness_calculation(
+            model_points = model_points
+        )
         branch_models = list(model_points.keys())
-        # keep track of generation_DAG
         ranked_model_list = sorted(
             model_points, 
             key=model_points.get, 
@@ -146,10 +134,9 @@ class connected_lattice(
             models_to_build_on = ranked_model_list
         else:
             models_to_build_on = ranked_model_list[:self.num_top_models_to_build_on]
+
         self.sub_generation_idx += 1 
-        self.models_to_build_on[self.generation_DAG][self.sub_generation_idx] =  (
-            models_to_build_on
-        )
+
         # self.generation_champs[self.generation_DAG][self.sub_generation_idx] = models_to_build_on
         self.generation_champs[self.generation_DAG][self.sub_generation_idx] = [
             kwargs['model_names_ids'][models_to_build_on[0]]
@@ -158,173 +145,142 @@ class connected_lattice(
         self.counter+=1
         new_models = []
 
-        if self.spawn_stage[-1] == None:
-            # within dimension; just add each term in available terms to 
-            # old models (probabilistically). 
+        if self.spawn_stage[-1] == 'make_new_generation':
+            # increase generation idx; add site; get newly available terms; add greedily as above
+            self.new_generation()
 
-            if (
-                self.sub_generation_idx 
-                == self.max_num_sub_generations_per_generation[self.generation_DAG]
-            ):
-                # give back champs from this generation and indicate to make new generation
-                self.log_print(
-                    [
-                        "exhausted this generation.",
-                        "\ngeneration champs:", 
-                        self.generation_champs[self.generation_DAG]
-                    ]
-                )
+        if self.spawn_stage[-1] == None:
+            # new models given by models_to_build_on plus terms in available_terms (greedy)
+            new_models = self.add_terms_greedy(
+                models_to_build_on = models_to_build_on, 
+                available_terms = self.available_mods_by_generation[self.generation_DAG],
+                model_names_ids = kwargs['model_names_ids'],
+                model_points = model_points
+            )
+
+        return new_models
+
+    def new_generation(
+        self
+    ):
+        # Housekeeping: generational elements
+        self.generation_DAG += 1
+        self.sub_generation_idx = 0 
+
+        self.models_to_build_on[self.generation_DAG] =  {}
+        self.generation_champs[self.generation_DAG] = {}
+        self.models_rejected[self.generation_DAG] = []
+        self.models_accepted[self.generation_DAG] = []
+
+        # Increase topology and retrieve effects e.g. new sites
+        self.topology.add_site()
+
+        new_connections = self.topology.new_connections[-1]
+        new_sites = self.topology.new_site_indices[-1]
+        num_sites = self.topology.num_sites()
+        newly_available_terms = self.generate_terms_from_new_site(
+            base_terms = self.base_terms,
+            connected_sites = new_connections, 
+            num_sites = num_sites, 
+            new_sites = new_sites,
+            print_terms = True,
+        )
+        self.log_print(
+            [
+            "Making new generation ({})".format(self.generation_DAG),  
+            "\tNew terms:", newly_available_terms
+            ]
+        )
+
+        self.available_mods_by_generation[self.generation_DAG] = newly_available_terms
+        self.spawn_stage.append(None)
+
+    def add_terms_greedy(
+        self, 
+        models_to_build_on, 
+        available_terms, 
+        model_names_ids,
+        model_points,
+        **kwargs
+    ):
+        # models_to_build_on = [
+        #     kwargs['model_names_ids'][mod_id] for mod_id in models_to_build_on
+        # ]
+        new_models = []
+        for mod_id in models_to_build_on:
+            mod_name = model_names_ids[mod_id]
+            mod_name = self.match_dimension(mod_name, self.topology.num_sites())
+            present_terms = DataBase.get_constituent_names_from_name(mod_name)
+            print("[fermi hubbard] model {} has present terms {}".format(mod_name, present_terms))
+            terms_to_add = list(
+                set(available_terms)
+                - set(present_terms)
+            )
+
+            if len(terms_to_add) == 0:
+                # this dimension exhausted
+                # return branch champs for this generation so far
+                # such that final branch computes this generation champion
                 self.spawn_stage.append('make_new_generation')
                 new_models = [
                     self.generation_champs[self.generation_DAG][k] for k in 
                     list(self.generation_champs[self.generation_DAG].keys())
                 ]
                 new_models = flatten(new_models)
+                # new_models = [new_models[0]] # hack to force non-crash for single generation
                 self.log_print(
                     [
-                        "new mods:", new_models
+                        "No remaining available terms. Completing generation",
+                        self.generation_DAG, 
+                        "\nModels:", new_models
                     ]
                 )
-
                 if self.generation_DAG == self.max_num_generations:
                     # this was the final generation to learn.
-                    # instead of building new generation, skip straight to Complete stage
+                    # instead of building new generation, skip straight to Complete stage                            
+                    self.log_print(
+                        [
+                            "Completing growth rule"
+                        ]
+                    )
                     self.spawn_stage.append('Complete')
-
             else:
-                for mod_id in \
-                        self.models_to_build_on[self.generation_DAG][self.sub_generation_idx]:
-
-                    mod_name = kwargs['model_names_ids'][mod_id]
-
-                    present_terms = DataBase.get_constituent_names_from_name(mod_name)
-                    possible_new_terms = list(
-                        set(
-                            self.available_mods_by_generation[self.generation_DAG]
-                        )
-                        - set(present_terms)
+                # self.model_fitness_calculation(
+                #     model_id = mod_id,
+                #     model_points = model_points
+                # )
+                for term in terms_to_add:
+                    new_mod = "{}+{}".format(
+                        mod_name, 
+                        term    
                     )
-
-                    self.model_fitness_calculation(
-                        model_id = mod_id,
-                        # fitness_parameters = fitness[mod_id],
-                        model_points = model_points
+                    new_mod = self.combine_terms(
+                        terms = [mod_name, term]
                     )
-                    
-                    num_sites_this_mod = DataBase.get_num_qubits(mod_name)
-                    target_num_sites = num_sites_this_mod
-                    p_str = 'P'*target_num_sites
-                    # new_num_qubits = num_qubits + 1
-                    # mod_name_increased_dim = increase_dimension_pauli_set(mod_name) 
-                    for new_term in possible_new_terms: 
-                        new_mod = str(
-                            mod_name + 
-                            p_str +
-                            new_term
-                        )
-                        new_mod = DataBase.alph(new_mod)
-                        if self.determine_whether_to_include_model(mod_id) == True:
-                            new_models.append(new_mod)
-                            self.models_accepted[self.generation_DAG].append(new_mod)
-                        else:
-                            self.models_rejected[self.generation_DAG].append(new_mod)
-        elif self.spawn_stage[-1] == 'make_new_generation':
-            self.generation_DAG += 1
-            self.sub_generation_idx = 0 
-
-            self.models_to_build_on = {
-                self.generation_DAG : {}
-            }
-            self.generation_champs = {
-                self.generation_DAG : {}
-            }
-            self.models_rejected = {
-                self.generation_DAG : []
-            }
-            self.models_accepted = {
-                self.generation_DAG : []
-            }
-            self.topology.add_site()
-            # nearest_neighbours = self.topology.get_nearest_neighbour_list()
-            # new_connections = list(
-            #     set(nearest_neighbours) - set(self.site_connections_considered)
-            # )
-            new_connections = self.topology.new_connections[-1]
-            self.site_connections_considered.extend(new_connections)
-            possible_new_terms = self.generate_terms_from_new_site(
-                connected_sites = new_connections, 
-                base_terms = self.base_terms,
-                num_sites = self.topology.num_sites()
-            )
-            self.log_print(
-                [
-                    "Making generation",  self.generation_DAG,
-                    "\nNew connections:", new_connections, 
-                    "\nPossible new terms:", possible_new_terms
-                ]
-            )
-            self.available_mods_by_generation[self.generation_DAG] = possible_new_terms
-            self.max_num_sub_generations_per_generation[self.generation_DAG] = len(possible_new_terms)
-
-            for mod_id in models_to_build_on:
-                new_num_sites = self.topology.num_sites()
-                mod_name = kwargs['model_names_ids'][mod_id]
-                mod_name = SpinProbabilistic.increase_dimension_pauli_set(
-                    mod_name,
-                    new_dimension = new_num_sites
-                )
-
-                # TODO replace single model fitness calculation with batch calculation (as in Fermi Hubbard)
-                self.model_fitness_calculation(
-                    model_id = mod_id,
-                    # fitness_parameters = fitness[mod_id],
-                    model_points = model_points
-                )
-
-                p_str = 'P'*new_num_sites
-                for new_term in possible_new_terms: 
-                    new_mod = str(
-                        mod_name + 
-                        p_str +
-                        new_term
-                    )
+                    # new_mod = DataBase.alph(new_mod) # TODO fix DataBase.alph to take + like terms
                     if self.determine_whether_to_include_model(mod_id) == True:
                         new_models.append(new_mod)
                         self.models_accepted[self.generation_DAG].append(new_mod)
                     else:
                         self.models_rejected[self.generation_DAG].append(new_mod)
-
-            self.spawn_stage.append(None)
-            # if self.max_num_sub_generations_per_generation[self.generation_DAG] == 1:
-            #     self.spawn_stage.append('make_new_generation')
-
-
-
-        elif self.spawn_stage[-1] == 'Complete':
-            # return list of generation champs to determine final winner
-            champs_all_generations = []
-            for gen_idx in list(self.generation_champs.keys()): 
-                sub_indices = list(self.generation_champs[gen_idx].keys())
-                max_sub_idx = max(sub_indices)
-                champ_this_generation =  self.generation_champs[gen_idx][max_sub_idx]
-                champs_all_generations.append(champ_this_generation)
-                new_models = champ_this_generation
-            self.log_print(
-                [
-                    "Model generation complete.", 
-                    "returning list of champions to determine global champion:",
-                    new_models
-                ]
-            )
-
-
-        elif self.spawn_stage[-1] == 'Complete':
-            return model_list
-        new_models = list(set(new_models))
-        self.log_print(
-            ["New models:", new_models]
-        )
         return new_models
+
+    def combine_terms(
+        self, 
+        terms
+    ):
+        addition_string = 'P'*self.topology.num_sites()
+        terms = sorted(terms)
+        new_mod = addition_string.join(terms)
+        return new_mod
+
+    def match_dimension(
+        self, 
+        mod_name, 
+        num_sites, 
+        **kwargs 
+    ):
+        return increase_dimension_pauli_set(mod_name, num_sites)
 
     def latex_name(
         self, 
@@ -379,14 +335,19 @@ class connected_lattice(
         base_terms, 
         connected_sites,
         num_sites,
+        print_terms=False,
         **kwargs 
     ):
-
-        return pauli_like_like_terms_connected_sites(
+        new_terms = pauli_like_like_terms_connected_sites(
             connected_sites = connected_sites, 
             base_terms = base_terms, 
             num_sites = num_sites
-        )
+        )    
+        if print_terms==True:
+            self.log_print(
+                ["Generating new terms:", new_terms]
+            )
+        return new_terms
 
     def model_group_fitness_calculation(
         self, 
