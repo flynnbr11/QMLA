@@ -61,7 +61,6 @@ class connected_lattice(
             'other' : 10
         }
 
-
         self.setup_growth_class()
 
     def setup_growth_class(self):
@@ -117,7 +116,6 @@ class connected_lattice(
     def num_sites(self):
         return self.topology.num_sites
     
-
     def generate_models(
         self, 
         model_list, 
@@ -276,6 +274,7 @@ class connected_lattice(
                     new_dimension = new_num_sites
                 )
 
+                # TODO replace single model fitness calculation with batch calculation (as in Fermi Hubbard)
                 self.model_fitness_calculation(
                     model_id = mod_id,
                     # fitness_parameters = fitness[mod_id],
@@ -389,6 +388,50 @@ class connected_lattice(
             num_sites = num_sites
         )
 
+    def model_group_fitness_calculation(
+        self, 
+        model_points,
+        **kwargs
+    ):
+        ranked_model_list = sorted(
+            model_points, 
+            key=model_points.get, 
+            reverse=True
+        )
+        new_fitnesses = {}
+        for model_id in ranked_model_list:
+            try:
+                max_wins_model_points = max(model_points.values())
+                win_ratio = model_points[model_id] / max_wins_model_points
+            except:
+                win_ratio = 1
+
+
+            if self.model_generation_strictness == 0:
+                # keep all models and work out relative fitness
+                fitness = (
+                    win_ratio
+                    # win_ratio * fitness_parameters['r_squared']
+                )**self.fitness_win_ratio_exponent
+                # fitness = 1
+            elif self.model_generation_strictness == -1:
+                fitness = 1
+            else:
+                # only consider the best model
+                # turn off all others
+                if model_id == ranked_model_list[0]:
+                    fitness = 1
+                else:
+                    fitness = 0
+            if model_id not in sorted(self.model_fitness.keys()):
+                self.model_fitness[model_id] = []
+            new_fitnesses[model_id] = model_id
+            self.model_fitness[model_id].append(fitness)            
+        self.log_print(
+            [
+                "New fitnesses:\n", new_fitnesses
+            ]
+        )
 
     def model_fitness_calculation(
         self, 
@@ -429,14 +472,14 @@ class connected_lattice(
                 fitness = 1
             else:
                 fitness = 0
-
-
-
-
+        # if model_id not in sorted(self.model_fitness.keys()):
+        #     self.model_fitness[model_id] = {}
+        # # print("Setting fitness for {} to {}".format(model_id, fitness))
+        # self.model_fitness[model_id][self.generation_DAG] = fitness            
         if model_id not in sorted(self.model_fitness.keys()):
-            self.model_fitness[model_id] = {}
+            self.model_fitness[model_id] = []
         # print("Setting fitness for {} to {}".format(model_id, fitness))
-        self.model_fitness[model_id][self.generation_DAG] = fitness            
+        self.model_fitness[model_id].append(fitness)
 
 
     def determine_whether_to_include_model(
@@ -444,7 +487,8 @@ class connected_lattice(
         model_id    
     ):
         # biased coin flip
-        fitness = self.model_fitness[model_id][self.generation_DAG]
+        # fitness = self.model_fitness[model_id][self.generation_DAG]
+        fitness = self.model_fitness[model_id][-1]
         rand = np.random.rand()
         to_generate = ( rand < fitness ) 
         return to_generate

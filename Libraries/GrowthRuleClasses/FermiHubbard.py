@@ -32,14 +32,20 @@ class fermi_hubbard(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        self.true_operator = 'hop_1h2_down_d2+hop_1h2_up_d2+hop_1_double_d2+hop_2_double_d2' 
-        # self.true_operator = 'h_1h2_d2'
+        # self.true_operator = 'hop_1h2_down_d2+hop_1h2_up_d2+hop_1_double_d2+hop_2_double_d2' 
+        self.true_operator = 'FHhop_1h2_up_d2'
         self.tree_completed_initially = True
         self.min_param = 0
         self.max_param = 1
         self.initial_models = [
             self.true_operator
         ]
+        self.probe_generation_function = ProbeGeneration.fermi_hubbard_half_filled_pure_states
+        self.simulator_probe_generation_function = self.probe_generation_function # unless specifically different set of probes required
+        self.shared_probes = True # i.e. system and simulator get same probes for learning
+        self.plot_probe_generation_function = ProbeGeneration.fermi_hubbard_half_filled_superposition
+
+
         self.max_time_to_consider = 20
         self.num_processes_to_parallelise_over = 6
         self.max_num_models_by_shape = {
@@ -74,7 +80,8 @@ class fermi_hubbard(
         for term in terms:
             constituents = term.split('_')
             for c in constituents:
-                if c == 'hop':
+                if c[0:2] == 'FH':
+                    term_type = c[2:]
                     continue # do nothing - just registers what type of matrix to construct
                 elif c in list(basis_vectors.keys()):
                     spin_type = c
@@ -84,9 +91,9 @@ class fermi_hubbard(
                     sites = [str(s) for s in c.split('h')]        
 
 
-            if spin_type == 'double':
+            if term_type == 'onsite':
                 term_latex = "\hat{{N}}_{{{}}}".format(sites[0])
-            else:
+            elif term_type == 'hop':
                 term_latex = '\hat{{H}}_{{{}}}^{{{}}}'.format(
                     ",".join(sites),  # subscript site indices
                     basis_latex[spin_type] # superscript which spin type
@@ -94,7 +101,6 @@ class fermi_hubbard(
             latex_str += term_latex
         latex_str = "${}$".format(latex_str)
         return latex_str
-
 
 
 class fermi_hubbard_predetermined(
@@ -109,10 +115,10 @@ class fermi_hubbard_predetermined(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        self.true_operator = 'hop_1h2_down_d2+hop_1h2_up_d2+hop_1_double_d2+hop_2_double_d2' 
+        self.true_operator = 'FHhop_1h2_up_d2' 
         self.tree_completed_initially = True
         self.initial_models = [
-            'hop_1h2_down_d2+hop_1_double_d2',
+            'FHhop_1h2_up_d2',
         ]
         self.max_num_sites = 2
         if self.true_operator not in self.initial_models:
@@ -120,139 +126,3 @@ class fermi_hubbard_predetermined(
 
 
 
-class fermi_hubbard_probabilistic(
-    fermi_hubbard_predetermined
-):
-    def __init__(
-        self, 
-        growth_generation_rule, 
-        **kwargs
-    ):
-        super().__init__(
-            growth_generation_rule = growth_generation_rule,
-            **kwargs
-        )
-        self.true_operator = 'hop_1h2_down_d2+hop_1h2_up_d2+hop_1_double_d2+hop_2_double_d2' 
-        self.tree_completed_initially = False
-        self.num_top_models_to_build_on = 1 # 'all'
-        self.setup_growth_class()
-
-
-
-
-    def generate_models(
-        self, 
-        model_list, 
-        **kwargs
-    ):
-
-        model_points = kwargs['branch_model_points']
-        branch_models = list(model_points.keys())
-        ranked_model_list = sorted(
-            model_points, 
-            key=model_points.get, 
-            reverse=True
-        )
-        if self.num_top_models_to_build_on == 'all':
-            models_to_build_on = ranked_model_list
-        else:
-            models_to_build_on = ranked_model_list[:self.num_top_models_to_build_on]
-
-        self.sub_generation_idx += 1 
-
-        # self.generation_champs[self.generation_DAG][self.sub_generation_idx] = models_to_build_on
-        self.generation_champs[self.generation_DAG][self.sub_generation_idx] = [
-            kwargs['model_names_ids'][models_to_build_on[0]]
-        ]
-
-        self.counter+=1
-        new_models = []
-
-        if self.spawn_stage[-1] == None:
-            # new models given by models_to_build_on plus terms in available_terms (greedy)
-            
-            for mod_id in models_to_build_on:
-                mod_name = kwargs['model_names_ids'][mod_id]
-                present_terms = DataBase.get_constituent_names_from_name(mod_name)
-                print("[fermi hubbard] model {} has present terms {}".format(mod_name, present_terms))
-                available_terms = list(
-                    set(self.available_mods_by_generation[self.generation_DAG])
-                    - set(present_terms)
-                )
-
-                if len(available_terms) == 0:
-                    # this dimension exhausted; return dimension branch champs
-                    self.spawn_stage.append('make_new_generation')
-                    new_models = [
-                        self.generation_champs[self.generation_DAG][k] for k in 
-                        list(self.generation_champs[self.generation_DAG].keys())
-                    ]
-                    new_models = flatten(new_models)
-                    new_models = [new_models[0]] # hack to force non-crash for single generation
-                    self.log_print(
-                        [
-                            "No remaining available terms. Completing generation",
-                            "generation:", self.generation_DAG, 
-                            "Models:", new_models
-                        ]
-                    )
-                    if self.generation_DAG == self.max_num_generations:
-                        # this was the final generation to learn.
-                        # instead of building new generation, skip straight to Complete stage
-                            
-                        self.log_print(
-                            [
-                                "Completing growth rule"
-                            ]
-                        )
-
-                        self.spawn_stage.append('Complete')
-
-                    return new_models
-
-                # if some terms are still availble (i.e. len(avail_terms)!=0)
-                for term in available_terms:
-                    new_mod = "{}+{}".format(
-                        mod_name, 
-                        term    
-                    )
-                    # new_mod = DataBase.alph(new_mod) # TODO fix DataBase.alph to take + like terms
-                    new_models.append(new_mod)
-
-        return new_models
-
-
-
-
-    def generate_terms_from_new_site(
-        self, 
-        **kwargs 
-    ):
-        
-        return generate_new_terms_hubbard(**kwargs)
-
-def generate_new_terms_hubbard( 
-    connected_sites,
-    num_sites,
-    new_sites, 
-    **kwargs     
-):
-    new_terms = []
-    for pair in connected_sites:
-        i = pair[0]
-        j = pair[1]
-        for spin in ['up', 'down']:
-            hopping_term = "hop_{}h{}_{}_d{}".format(
-                i, j, spin, num_sites 
-            )
-            new_terms.append(hopping_term)
-
-    for site in new_sites:
-        onsite_term = "hop_{}_double_d{}".format(
-            site, num_sites
-        )
-        
-        new_terms.append(onsite_term)
-        
-    return new_terms
-            

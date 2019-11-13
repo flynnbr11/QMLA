@@ -739,7 +739,11 @@ def analyse_and_plot_dynamics_multiple_models(
         sum_of_squares = np.sum(
             true_mean_minus_val
         )
-        final_r_squared = 1 - sum_residuals/sum_of_squares
+        if sum_of_squares != 0 :
+            final_r_squared = 1 - sum_residuals/sum_of_squares
+        else:
+            print("[multiQMD plots] sum of squares 0")
+            final_r_squared = -100
 
         # R^2 for interquartile range
         lower_iqr_sum_residuals = np.sum(
@@ -761,20 +765,29 @@ def analyse_and_plot_dynamics_multiple_models(
 
 
         name = growth_classes[term].latex_name(term)
-        description = str(
-                name + 
-                ' (' + str(num_sets_of_this_name)  + ')'
-                + ' [$R^2=$' +
-                str(
-                    # np.round(final_r_squared, 2)
-                    # np.format_float_scientific(
-                    #     final_r_squared, 
-                    #     precision=2
-                    # )
-                    format_exponent(final_r_squared)
-                ) 
-                + ']'
-            )
+        try:
+            description = str(
+                    name + 
+                    ' (' + str(num_sets_of_this_name)  + ')'
+                    + ' [$R^2=$' +
+                    str(
+                        # np.round(final_r_squared, 2)
+                        # np.format_float_scientific(
+                        #     final_r_squared, 
+                        #     precision=2
+                        # )
+                        format_exponent(final_r_squared)
+                    ) 
+                    + ']'
+                )
+        except:
+            print("Failed to format exponent; final r squared:", final_r_squared)
+            description = str(
+                    name + 
+                    ' (' + str(num_sets_of_this_name)  + ')'
+                    + ' [$R^2=0$]'
+                )
+
         if term == true_model:
             description += ' (True)'
 
@@ -1306,6 +1319,11 @@ def get_model_scores(
         avg_coeff_determination[alph] = np.median(
             coeff_of_determination[alph]
         )
+        if np.isnan(avg_coeff_determination[alph]):
+            # don't allow non-numerical R^2 
+            # happens when sum of squares =0 in calculation, 
+            # because true_exp_val=1 for all times, so no variance
+            avg_coeff_determination[alph] = 0
 
     unique_growth_rules = list(
         set(list(growth_rules.values()))
@@ -1469,6 +1487,7 @@ def plot_scores(
         coefficient_determination_latex_name[latex_mod]
         for latex_mod in latex_model_names
     ]
+
     f_scores_list = [
         f_scores[latex_mod]
         for latex_mod in latex_model_names

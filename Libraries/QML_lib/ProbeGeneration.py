@@ -343,6 +343,406 @@ def random_phase_plus(
     return rand_phase_plus
 
 
+# Hubbard encoding probes
+
+
+def vector_from_fermion_state_description(state):
+
+    occupied = np.array([0,1])
+    vacant = np.array([1,0])
+
+    vector = 1
+
+    for i in range(1, 1+state['num_sites']):
+        try:
+            occupation = state['occupations'][i]
+        except:
+            occupation = ['vacant']
+
+        # in order: (i, down), (i, up)
+        # i.e.  2 qubit encoding per site
+        if 'down' in occupation:
+            vector = np.kron(vector, occupied)
+        else:
+            vector = np.kron(vector, vacant)
+
+        if 'up' in occupation:
+            vector = np.kron(vector, occupied)
+        else:
+            vector = np.kron(vector, vacant)
+
+    return vector
+
+def fermi_hubbard_single_varied_spin_n_sites(
+    max_num_qubits, 
+    spin_type = 'down',
+    num_probes=10,
+    **kwargs
+):
+    probe_dict = {}
+
+    down = vector_from_fermion_state_description(
+        {
+            'num_sites' : 1, 
+            'occupations' : {
+                1 : ['down']
+            }
+        }
+    )
+    up = vector_from_fermion_state_description(
+        {
+            'num_sites' : 1, 
+            'occupations' : {
+                1 : ['up']
+            }
+        }
+    )
+    vacuum = vector_from_fermion_state_description(
+        {
+            'num_sites' : 1, 
+            'occupations' : {
+            }
+        }
+    )
+
+
+    spins = [down, up]
+    for i in range(num_probes):
+        probe_dict[i,0] = spins[i%len(spins)]
+        
+        for j in range(1, 1+max_num_qubits):
+            # here max_num_qubits = num sites; need 2 qubits to encode each site
+            probe_id = (i,j)
+            if j == 1:
+                probe = probe_dict[(i,0)]
+            else:
+                probe = np.kron(
+                    probe_dict[(i, j-1)],
+                    vacuum
+                )
+            probe_dict[(i,j)] = probe
+            # site_dim = int(np.log2(np.shape(probe)[0])) # TODO fix probe dimensionality/dependence
+            # probe_dict[(i,site_dim)] = probe
+    
+    return probe_dict
+    
+
+
+def fermi_hubbard_single_spin_n_sites(
+    max_num_qubits, 
+    spin_type = 'up',
+    num_probes=10,
+    **kwargs
+):
+    probe_dict = {}
+
+    initial_probe = vector_from_fermion_state_description(
+        {
+            'num_sites' : 1, 
+            'occupations' : {
+                1 : [spin_type]
+            }
+        }
+    )
+    vacuum = vector_from_fermion_state_description(
+        {
+            'num_sites' : 1, 
+            'occupations' : {
+            }
+        }
+    )
+    for i in range(num_probes):
+        probe_dict[i,0] = initial_probe
+        
+        for j in range(1, 1+max_num_qubits):
+            # here max_num_qubits = num sites; need 2 qubits to encode each site
+            probe_id = (i,j)
+            if j == 1:
+                probe = probe_dict[(i,0)]
+            else:
+                probe = np.kron(
+                    probe_dict[(i, j-1)],
+                    vacuum
+                )
+            probe_dict[(i,j)] = probe
+            # site_dim = int(np.log2(np.shape(probe)[0])) # TODO fix probe dimensionality/dependence
+            # probe_dict[(i,site_dim)] = probe
+    
+    return probe_dict
+
+
+def get_binary_string(num, length=8):
+    return format(num, '0{}b'.format(length ))
+    
+def fermi_hubbard_half_filled_from_binary(binary_string):
+    """ 
+    e.g. 101 -> up down up -> in occupation basis: |01 10 01> 
+    """
+    vacant = np.array([1,0]) # |0>
+    occupied = np.array([0,1]) # |1>
+    
+    up = np.kron(vacant, occupied)
+    down = np.kron(occupied, vacant)
+    
+    state = 1
+    for b in binary_string:
+        if int(b, 2) == 1:
+            state = np.kron(state, up)
+        else:
+            state = np.kron(state, down)
+    
+    return state
+
+def fermi_hubbard_half_filled_superposition(
+    max_num_qubits, 
+    **kwargs
+):
+    print("[fermi_hubbard_half_filled_superposition] num q:", max_num_qubits)
+    num_sites = max_num_qubits
+    probe_dict = {}
+    for N in range(1, 1+num_sites):
+
+        state = None
+        for i in range(1, N+1):
+            for spin_type in ['up', 'down']:
+
+                new_state = vector_from_fermion_state_description(
+                    {
+                        'num_sites' : N, 
+                        'occupations' : {
+                            i : [spin_type]
+                        }
+                    }
+                )
+
+                if state is None:
+                    state = new_state
+                else:
+                    state += new_state
+
+        state = state/np.linalg.norm(state)
+
+        probe_dict[(1, N)] = state
+    print("[fermi_hubbard_half_filled_superposition] keys:", probe_dict.keys())
+    return probe_dict
+
+def fermi_hubbard_half_filled_pure_states(
+    max_num_qubits, 
+    **kwargs  
+):
+    num_sites = max_num_qubits
+    probe_dict = {}
+    for i in range(2**num_sites):
+        for j in range(1, num_sites+1):
+            binary_rep = get_binary_string(i, length = num_sites)[-j:]
+            probe_dict[(i,j)] = fermi_hubbard_half_filled_from_binary(binary_rep)
+    return probe_dict
+   
+
+def fermi_hubbard_even_superposition(
+    max_num_qubits, 
+    spin_type = 'down',
+    num_probes=10,
+    **kwargs
+):
+    probe_dict = {}
+
+    superposition = np.array([0, 1, 1, 0])/np.sqrt(2) 
+    
+    for i in range(num_probes):
+        probe_dict[i,0] = superposition
+        
+        for j in range(1, 1+max_num_qubits):
+            # here max_num_qubits = num sites; need 2 qubits to encode each site
+            probe = np.kron(
+                probe_dict[(i, j-1)],
+                superposition
+            )
+            probe_dict[(i,j)] = probe
+            # site_dim = int(np.log2(np.shape(probe)[0])) # TODO fix probe dimensionality/dependence
+            # probe_dict[(i,site_dim)] = probe
+    
+    return probe_dict
+    
+
+
+## TODO fermi hubbard below this using incorrect basis encoding (not consisten with Jordan Wigner)
+# TODO remove when safe
+
+def fermi_hubbard_encoding_fixed_spin(
+    max_num_qubits,
+    spin_type='up', 
+    num_probes=10, 
+    **kwargs
+):
+    # basis: (Vacuum, spin-up, spin-down, double-occupancy)
+    # represent Fermions in a site
+    # returns |spin_type> \otimes \Vac>^{n}, n+1 sites
+    basis_vectors = {
+        'vac' : np.array([1,0,0,0]),
+        'down' : np.array([0,1,0,0]),
+        'up' : np.array([0,0,1,0]),
+        'double' : np.array([0,0,0,1])
+    }
+
+    probe_dict = {}
+    
+    for i in range(num_probes):
+        probe_dict[i,0] = basis_vectors[spin_type] 
+        for j in range(1, max_num_qubits):
+            # here max_num_qubits = num sites; need 2 qubits to encode each site
+            probe_id = (i,j)
+            if j == 1:
+                probe = probe_dict[(i,0)]
+            else:
+                probe = np.kron(
+                    probe_dict[(i, j-1)],
+                    basis_vectors['vac']
+                )
+            probe_dict[(i,j)] = probe
+            # site_dim = int(np.log2(np.shape(probe)[0])) # TODO fix probe dimensionality/dependence
+            # probe_dict[(i,site_dim)] = probe
+    
+    return probe_dict
+
+
+def fermi_hubbard_encoding_pure_up_down_cycle(
+    max_num_qubits,
+    bases=['up', 'down'],
+    num_probes=10, 
+    **kwargs
+):
+    # basis: (Vacuum, spin-up, spin-down, double-occupancy)
+    # represent Fermions in a site
+    # returns |spin_type>^N, N sites
+    basis_vectors = {
+        'vac' : np.array([1,0,0,0]),
+        'down' : np.array([0,1,0,0]),
+        'up' : np.array([0,0,1,0]),
+        'double' : np.array([0,0,0,1])
+    }
+    superposition = np.array([0,1,1,0])*(1/np.sqrt(2))
+    probe_dict = {}
+    
+    for i in range(num_probes):
+        if i%2 == 0:
+            pure_basis = basis_vectors['up']
+        else:
+            pure_basis = basis_vectors['down']
+        probe_dict[i,0] = pure_basis
+        print("i={} \n pure basis = {}".format(i, pure_basis))
+        for j in range(1, max_num_qubits):
+            # here max_num_qubits = num sites; need 2 qubits to encode each site
+            probe_id = (i,j)
+            if j == 1:
+                probe = probe_dict[(i,0)]
+            else:
+                probe = np.kron(
+                    probe_dict[(i, j-1)],
+                    basis_vectors['vac']
+                )
+            probe_dict[(i,j)] = probe
+            # site_dim = int(np.log2(np.shape(probe)[0])) # TODO fix probe dimensionality/dependence
+            # probe_dict[(i,site_dim)] = probe
+    
+    return probe_dict
+
+
+
+def fermi_hubbard_encoding_even_superposition_up_down(
+    max_num_qubits,
+    num_probes=10, 
+    **kwargs
+):
+    # basis: (Vacuum, spin-up, spin-down, double-occupancy)
+    # represent Fermions in a site
+    # returns |spin_type>^N, N sites
+    basis_vectors = {
+        'vac' : np.array([1,0,0,0]),
+        'down' : np.array([0,1,0,0]),
+        'up' : np.array([0,0,1,0]),
+        'double' : np.array([0,0,0,1])
+    }
+    superposition = np.array([0,1,1,0])*(1/np.sqrt(2))
+    probe_dict = {}
+    
+    for i in range(num_probes):
+        probe_dict[i,0] = superposition
+        for j in range(1, max_num_qubits):
+            # here max_num_qubits = num sites; need 2 qubits to encode each site
+            probe_id = (i,j)
+            if j == 1:
+                probe = probe_dict[(i,0)]
+            else:
+                probe = np.kron(
+                    probe_dict[(i, j-1)],
+                    superposition
+                )
+            probe_dict[(i,j)] = probe
+            # site_dim = int(np.log2(np.shape(probe)[0])) # TODO fix probe dimensionality/dependence
+            # probe_dict[(i,site_dim)] = probe
+    
+    return probe_dict
+
+
+def fermi_hubbard_encoding_half_filled_random_probes(
+    max_num_qubits, 
+    num_probes=10, 
+    **kwargs
+):
+    # basis: (Vacuum, spin-up, spin-down, double-occupancy)
+    # represent Fermions in a site
+    basis_vectors = {
+        'vac' : np.array([1,0,0,0]),
+        'down' : np.array([0,1,0,0]),
+        'up' : np.array([0,0,1,0]),
+        'double' : np.array([0,0,0,1])
+    }
+
+    probe_dict = {}
+    
+    for i in range(num_probes):
+        probe_dict[i,0] = random_half_filled_fermi_site(
+            basis_vectors = basis_vectors
+        )
+        for j in range(1, max_num_qubits):
+            # here max_num_qubits = num sites; need 2 qubits to encode each site
+            probe_id = (i,j)
+            if j == 1:
+                probe = probe_dict[(i,0)]
+            else:
+                probe = np.kron(
+                    probe_dict[(i, j-1)],
+                    random_half_filled_fermi_site(basis_vectors = basis_vectors)
+                )
+            probe_dict[(i,j)] = probe
+            # site_dim = int(np.log2(np.shape(probe)[0])) # TODO fix probe dimensionality/dependence
+            # probe_dict[(i,site_dim)] = probe
+    
+    return probe_dict
+
+
+def random_half_filled_fermi_site(
+    basis_vectors = {
+        'vac' : np.array([1,0,0,0]),
+        'down' : np.array([0,1,0,0]),
+        'up' : np.array([0,0,1,0]),
+        'double' : np.array([0,0,0,1])
+    }    
+):    
+    """
+    half-filled i.e. single spin in superposition of down + up
+    encoded in basis ( vacuum, down, up, up-down)
+    (vacuum and up-down bases not used in half filling)
+    """
+    vec = (
+        np.random.rand() * basis_vectors['down']
+        + np.random.rand() * basis_vectors['up']
+    )
+    norm= np.linalg.norm(vec)
+    vec = vec/norm    
+    return vec
+
 
 
 # General purpose probe dictionaries

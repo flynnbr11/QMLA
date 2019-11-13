@@ -211,14 +211,14 @@ num_params = len(true_op_list)
 true_expectation_value_path = global_variables.true_expec_path
 true_ham = global_variables.true_hamiltonian
 # don't get dimension directly in case N particles encoded in >N hilbert space
-true_probe_dimension = np.log2(true_ham.shape[0]) 
+true_probe_dimension = np.log2(np.shape(true_ham)[0]) 
 if os.path.isfile(true_expectation_value_path) == False:
     
     true_expec_values = {}
     plot_probe_dict = pickle.load(
         open(global_variables.plot_probe_file, 'rb')
     )
-    probe = plot_probe_dict[true_probe_dimension]
+    probe = plot_probe_dict[true_num_qubits]
     log_print(
         [
             "for generating true data.",

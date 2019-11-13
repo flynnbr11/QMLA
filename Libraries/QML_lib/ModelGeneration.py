@@ -1551,15 +1551,127 @@ def generate_models_heisenberg_xyz(
         spawn_stage.append('Complete')
     return new_models
     
-        
+
+##################### ##################### #####################
+##################### Hubbard rules #####################
+##################### ##################### #####################
+
+### Fermi Hubbard 
+import fermilib
+from fermilib.transforms import get_sparse_operator
+from fermilib.ops import FermionOperator
+# Note to extend e.g. to bosonic:
+# https://github.com/quantumlib/OpenFermion/blob/master/src/openfermion/hamiltonians/_hubbard.py
+
+def process_fermi_hubbard_term(term):
+#     term ~ FHhop_ihj_s_dN, FHonsite_i_dN, FHchemical_i_dN: 
+#     (i,j) sites to hop between; s spin type to hop ('up' or 'down')
+#     i site to count; N number sites total
+    
+    constituents = term.split('_')
+    for c in constituents:
+        if c == 'FHhop':
+            constituents.remove(c)
+            mtx = process_fermi_hubbard_hopping(constituents) 
+        elif c == 'FHonsite':
+            constituents.remove(c)
+            mtx = process_fermi_hubbard_onsite(constituents) 
+        elif c == 'FHchemical':
+            constituents.remove(c)
+            mtx = process_fermi_hubbard_chemical(constituents)
+    return mtx
+
+
+def jordan_wigner_mtx(fermion_operator):
+    """
+    Calls fermilib functinoality to compute complete matrix given a FermionOperator class
+     fermion 
+    """
+    return fermilib.transforms.get_sparse_operator(fermion_operator).todense()
+
+def fermionic_hopping_term(i, j, num_sites):
+    dimensional_description = "{}".format(2*num_sites-1)
+    dimensional_fermion_op = FermionOperator(dimensional_description)
+
+    hopping_term = FermionOperator(((i, 1), (j, 0)))
+    hopping_term += FermionOperator(((j, 1), (i, 0)))
+    hopping_term += dimensional_fermion_op
+
+    mtx = jordan_wigner_mtx(hopping_term) - jordan_wigner_mtx(dimensional_fermion_op)
+    return np.array(mtx)
+
+def process_fermi_hubbard_chemical(constituents):
+#     constituents ~ ['dN', 'i'], N = num sites, i = site index for onsite term
+    for c in constituents:
+        if c[0] == 'd':
+            num_sites = int(c[1:])
+        else:
+            site_number = int(c)
+    
+    
+    dimensional_description = "{}".format(2*num_sites-1)
+    dimensional_fermion_op = FermionOperator(dimensional_description)
+    
+    i = 2*site_number - 2 # index with respect to basis (site_number, spin_type)
+    down_term = FermionOperator( ( (i,0), ) )
+    up_term = FermionOperator( ( (i,1), ) )
+    down_term += dimensional_fermion_op
+    up_term += dimensional_fermion_op
+    
+    mtx = jordan_wigner_mtx(up_term) + jordan_wigner_mtx(down_term) - 2*jordan_wigner_mtx(dimensional_fermion_op)
+    return np.array(mtx)
     
 
 
+def process_fermi_hubbard_onsite(constituents):
+#     constituents ~ ['dN', 'i'], N = num sites, i = site index for onsite term
+    for c in constituents:
+        if c[0] == 'd':
+            num_sites = int(c[1:])
+        else:
+            site_number = int(c)
+    dimensional_description = "{}".format(2*num_sites-1)
+    dimensional_fermion_op = FermionOperator(dimensional_description)
+    
+    i = 2*site_number - 2 # index with respect to basis (site_number, spin_type)
+    num_term = FermionOperator( ( (i,1), (i,0), (i+1, 1), (i+1, 0)) )
+    num_term += dimensional_fermion_op
+    
+    mtx = jordan_wigner_mtx(num_term) - jordan_wigner_mtx(dimensional_fermion_op)
+    return np.array(mtx)
+
+def process_fermi_hubbard_hopping(constituents):
+    for c in constituents:
+        if c in ['down', 'up']:
+            spin_type = c
+        elif c[0] == 'd':
+            num_sites = int(c[1:])
+        else:
+            sites = [int(s) for s in c.split('h')]        
+
+    i_idx = 2*(sites[0]-1) - 2
+    j_idx = 2*(sites[1]-1) - 2    
+    if spin_type == 'down':
+        i_idx = 2*(sites[0] - 1)
+        j_idx = 2*(sites[1] - 1)
+    elif spin_type == 'up':
+        i_idx = 2*(sites[0]) - 1
+        j_idx = 2*(sites[1]) - 1
+    
+
+    dimensional_description = "{}".format(2*num_sites-1)
+    dimensional_fermion_op = FermionOperator(dimensional_description)
+
+    hopping_term = FermionOperator(((i_idx, 1), (j_idx, 0)))
+    hopping_term += FermionOperator(((j_idx, 1), (i_idx, 0)))
+    hopping_term += dimensional_fermion_op
+
+    mtx = jordan_wigner_mtx(hopping_term) - jordan_wigner_mtx(dimensional_fermion_op)
+    return np.array(mtx)
 
 
-## Hubbard rules
 
-
+### Old "Hubbard" rules (not physically correct; just hopping in most cases)
 def hubbard_square_lattice_generalised(**kwargs):
     from UserFunctions import initial_models, max_num_qubits_info, fixed_axes_by_generator
     growth_generator = kwargs['generator']
@@ -2044,6 +2156,21 @@ def hubbard_chain(**kwargs):
                 new_models.append(new_mod)
             spawn_stage.append('Complete')
     return new_models
+
+
+
+
+
+
+
+
+
+
+
+### Below is probably no longer needed -- replaced by system topology class
+# TODO check and remove 
+
+
 
 def check_nearest_neighbour_sites(site_1, site_2):
     # simply checks whether sites are adjacent (or comptues distance)

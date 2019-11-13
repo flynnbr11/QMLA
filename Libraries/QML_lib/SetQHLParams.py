@@ -374,12 +374,10 @@ plot_probe_dict = growth_class.plot_probe_generator(
     # num_probes = 1, 
     noise_level = probe_noise_level, 
 )
-print("Generated probe dict for plotting")
 
 for k in list(plot_probe_dict.keys()):
     # replace tuple like key returned, with just dimension. 
     plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
-
 if plot_probe_file is not None:
     import pickle
     pickle.dump(

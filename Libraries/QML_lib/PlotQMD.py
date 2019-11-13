@@ -452,7 +452,7 @@ def plotDynamicsLearnedModels(
         if include_expec_vals is True:
             ham = reduced.LearnedHamiltonian
             dim = np.log2(np.shape(ham)[0])
-            probe = plot_probes[dim]
+            probe = plot_probes[reduced.ProbeDimension]
             # print(
             #     "[plotDynamicsLearnedModels]",
             #     "\n\tModel ", reduced.LatexTerm, 

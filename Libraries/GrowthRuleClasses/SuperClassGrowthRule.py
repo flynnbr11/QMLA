@@ -53,7 +53,7 @@ class growth_rule_super_class():
         # max_spawn_depth is the maximum number of spawns/branches in a run
         self.max_spawn_depth = 10
         self.max_num_qubits = 5
-        self.max_num_probe_qubits = 11
+        self.max_num_probe_qubits = 5 # TODO remove dependency on this -- it is not needed
         self.max_time_to_consider = 15 # arbitrary time units
         # If you want to do just Bayes facotr calculation on a deterministic initial set you set tree_completed_initially to True
         self.tree_completed_initially = False
@@ -75,7 +75,8 @@ class growth_rule_super_class():
         self.gaussian_prior_means_and_widths = {
             # term : (mean, sigma)
         }
-        self.num_probes = 40
+        # self.num_probes = 40
+        self._num_probes = 40
         self.min_param = 0
         self.max_param = 1
         self.prior_random_mean = False

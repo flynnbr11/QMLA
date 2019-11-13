@@ -604,16 +604,18 @@ class ModelLearningClass():
 
             # self.log_print(
             #    [
-            #    'Getting Datum'
+            #    'Getting Datum',
+            #    '\nSimParams:', self.SimParams, 
+            #    '\nExperiment:', self.Experiment
             #    ]
             # )
-            # print("Getting datum")
+
             self.Datum = self.GenSimModel.simulate_experiment(
                 self.SimParams,
                 self.Experiment,
                 repeat=1
             ) # TODO reconsider repeat number
-
+            # self.Datum = 1
             after_datum = time.time()
             self.datum_gather_cumulative_time+=after_datum-before_datum
             
@@ -622,7 +624,6 @@ class ModelLearningClass():
             ## Call updater to update distribution based on datum
             try:
                 # print("[QML] calling updater")
-                # print("Updating with datum {}".format(self.Datum))
                 self.Updater.update(
                     self.Datum, 
                     self.Experiment
@@ -1066,9 +1067,7 @@ class reducedModel():
         ]
         self.BayesFactors = {}
         self.NumQubits = DataBase.get_num_qubits(self.Name)
-        self.ProbeDimension = np.log2(
-            self.SimOpList[0].shape[0]
-        )
+        self.ProbeDimension = self.NumQubits
         self.HostName = host_name
         self.PortNumber = port_number
         self.Q_id = qid
@@ -1103,7 +1102,6 @@ class reducedModel():
         
         """
         if self.values_updated == False:
-            print("[QML] Updating learned values for model ", self.ModelID)
             self.values_updated = True
             rds_dbs = rds.databases_from_qmd_id(
                 self.HostName, 
@@ -1348,6 +1346,12 @@ class reducedModel():
             self.r_squared_of_t[t] = 1 - (sum_of_residuals/total_sum_of_squares)
             chi_squared += diff_squared/true
         
+
+        if total_sum_of_squares == 0:
+            print("[QML - r_squared] Total sum of squares is 0", total_sum_of_squares)
+            print("data mean:", datamean )
+            print("d:", d)
+            print("exp_data:", exp_data)
         self.final_r_squared = 1 - (sum_of_residuals/total_sum_of_squares)
         self.sum_of_residuals = sum_of_residuals
         self.chi_squared = chi_squared

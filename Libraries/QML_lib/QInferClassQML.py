@@ -10,7 +10,7 @@ import Evo
 import ExperimentalDataFunctions as expdt
 import GrowthRules
 # from ProbeStates import *
-from MemoryTest import print_loc
+from MemoryTest import print_loc, print_file_line
 import ProbeGeneration
 from psutil import virtual_memory
 import DataBase
@@ -22,6 +22,9 @@ global debug_log_print
 debug_log_print = False
 global likelihood_dev
 likelihood_dev = False
+debug_print_file_line=False
+global debug_print_file_line
+
 def time_seconds():
     import datetime
     now =  datetime.date.today()
@@ -51,7 +54,6 @@ def log_print(
     to_print = " ".join(print_strings)
     with open(log_file, 'a') as write_log_file:
         print(identifier, str(to_print), file=write_log_file)
-
 
 
 class QInferModelQML(qi.FiniteOutcomeModel):
@@ -156,6 +158,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.exp_comparison_tol = exp_comparison_tol  
         self._min_freq = min_freq
         self.ModelName = model_name
+        self.model_dimension = DataBase.get_num_qubits(self.ModelName)
         self.inBayesUpdates = False
         self.ideal_probe = None
         # self.IdealProbe = DataBase.ideal_probe(self.ModelName)
@@ -282,19 +285,24 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         modelparams, 
         expparams
     ):
+        # log_print(
+        #     ["likelihood function"],
+        #     self.log_file, 
+        #     self.log_identifier
+        # )
         super(QInferModelQML, self).likelihood(
             outcomes, modelparams, expparams
         ) # just adds to self._call_count (Qinfer abstact model class)
-        """
-        log_print(
-            [
-            'Likelihood function. \t len(modelparams):',
-            len(modelparams)
-            ],
-            self.log_file, 
-            self.log_identifier
-        )
-        """
+        print_file_line(debug_print_file_line)
+        # log_print(
+        #     [
+        #     'Likelihood function. \t len(modelparams):',
+        #     len(modelparams)
+        #     ],
+        #     self.log_file, 
+        #     self.log_identifier
+        # )
+        
         import copy
         print_loc(global_print_loc)
         cutoff=min(len(modelparams), 5)
@@ -303,10 +311,11 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         if self._a % 2 == 1:
             self._b += 1
         num_parameters = modelparams.shape[1]
-        true_dim = np.log2(self._true_oplist[0].shape[0])
-        sim_dim = np.log2(self._oplist[0].shape[0])
+        # true_dim = np.log2(self._true_oplist[0].shape[0])
+        # sim_dim = np.log2(self._oplist[0].shape[0])
         
         if  num_particles == 1:
+            print_file_line(debug_print_file_line)
             # print("[likelihood] true_evo. outcomes", outcomes)
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
             true_evo = True
@@ -322,14 +331,16 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                 for i in range(a,b):
                     # Because params is a list of 1 element, an array, need [0] index.
                     params[0][i] *=  time
-            
+            ham_num_qubits = self._true_dim
         else:
+            print_file_line(debug_print_file_line)
             # print("[likelihood] sim_evo. outcomes", outcomes)
             sample = np.array([expparams.item(0)[1:]])
             true_evo = False
             operators = self._oplist
             params = modelparams
-        ham_num_qubits = np.log2(operators[0].shape[0])
+            ham_num_qubits = self.model_dimension
+        # ham_num_qubits = np.log2(operators[0].shape[0])
 
         # Now get pr0 and pass to likelihood function
         # log_print(
@@ -386,6 +397,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             pr0 = np.array([[experimental_expec_value]])
 
         else:  
+            print_file_line(debug_print_file_line)
             # print(
             #     "[likelihood fnc] Simulator being called.",
             #     # "\nProbe", probe
@@ -408,16 +420,23 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             #     ]
 
             if true_evo == True:
+                print_file_line(debug_print_file_line)
+                # print("[likelihood] trying to get probe id ", 
+                #     (self._b % int(self.NumProbes)), 
+                #     ham_num_qubits
+                # )
                 probe = self.probe_dict[
                     (self._b % int(self.NumProbes)), 
                     ham_num_qubits
                 ]
+                print_file_line(debug_print_file_line)
             else:
+                print_file_line(debug_print_file_line)
                 probe = self.sim_probe_dict[
                     (self._b % int(self.NumProbes)), 
                     ham_num_qubits
                 ]
-
+            print_file_line(debug_print_file_line)
             # print(
             #     "\n\n[likelihood fnc]",
             #     "\n True evo:", true_evo, 
@@ -430,6 +449,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                 axes=1
             )[0]
             print_loc(global_print_loc)
+            print_file_line(debug_print_file_line)
 
             if len(modelparams.shape) == 1:
                 modelparams = modelparams[..., np.newaxis]
@@ -451,20 +471,32 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                     )
 
             if self.QLE is True:
-                pr0 = Evo.get_pr0_array_qle(
-                    t_list=times, 
-                    modelparams=params,
-                    oplist=operators, 
-                    probe=probe, 
-                    measurement_type=self.measurement_type,
-                    growth_class = self.growth_class,  
-                    use_experimental_data = self.use_experimental_data,
-                    use_exp_custom=self.use_exp_custom,
-                    exp_comparison_tol=self.exp_comparison_tol, 
-                    enable_sparse = self.enable_sparse, 
-                    log_file=self.log_file, 
-                    log_identifier=self.log_identifier
-                )
+                print_file_line(debug_print_file_line)
+                try:
+                    pr0 = Evo.get_pr0_array_qle(
+                        t_list=times, 
+                        modelparams=params,
+                        oplist=operators, 
+                        probe=probe, 
+                        measurement_type=self.measurement_type,
+                        growth_class = self.growth_class,  
+                        use_experimental_data = self.use_experimental_data,
+                        use_exp_custom=self.use_exp_custom,
+                        exp_comparison_tol=self.exp_comparison_tol, 
+                        enable_sparse = self.enable_sparse, 
+                        log_file=self.log_file, 
+                        log_identifier=self.log_identifier
+                    )
+                    print_file_line(debug_print_file_line)
+                except:
+                    log_print(
+                        [
+                            "[likelihood] failure to compute pr0",
+                            "probe:", probe, 
+                            "\n oplist:", oplist
+                        ]
+                    )
+                    print_file_line(debug_print_file_line)
 
             else: 
                 # Built for IQLE but not in use/tested so unlikely to work. 
@@ -501,14 +533,14 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             )
         )
 
-        if debug_log_print:
-            log_print(
-                [
-                '\n likelihood values:\n:', likelihood_array
-                ],
-                self.log_file, 
-                self.log_identifier
-            )
+        # if debug_log_print:
+        #     log_print(
+        #         [
+        #         '\n likelihood values:\n:', likelihood_array
+        #         ],
+        #         self.log_file, 
+        #         self.log_identifier
+        #     )
 
         # if not times:
         #     times = [time]        

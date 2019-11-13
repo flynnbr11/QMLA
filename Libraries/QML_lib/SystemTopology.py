@@ -47,6 +47,7 @@ class topology_grid():
         }
         
         self.new_connections = []
+        self.new_site_indices = []
             
             
         for i in range(1, num_sites):
@@ -57,7 +58,8 @@ class topology_grid():
             new_site_idx = self.add_site_1d_grid()
         elif self.dimension == 2:
             new_site_idx = self.add_site_2d_grid()
-        
+
+        self.new_site_indices.append([new_site_idx])        
         this_site_new_connections = []
         new_coordinate = self.coordinates[new_site_idx]
         self.nearest_neighbours[new_site_idx] = []            
@@ -310,14 +312,16 @@ class topology_grid():
         # Add sites in such a way that all sites have at least two nearest neighbours
         ## Assumption to minimise energy -- not always necessary
         all_sites_greater_than_2_nearest_neighbours = False
+        added_sites = []
         while all_sites_greater_than_2_nearest_neighbours == False:
             new_site_idx = self.add_new_coordinate_2d_lattice()
             nn_lists = list(self.nearest_neighbours.values())
             num_nearest_neighbours = np.array([len(a) for a in nn_lists])
             all_sites_greater_than_2_nearest_neighbours = np.all(
                 num_nearest_neighbours >= 2
-            )            
-            
+            )          
+            added_sites.append(new_site_idx)  
+        self.new_site_indices.append(added_sites)        
             
             
     def draw_topology(self):

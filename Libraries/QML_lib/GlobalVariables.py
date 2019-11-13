@@ -235,7 +235,9 @@ class GlobalVariablesClass():
         self.param_sigma = arguments.param_sigma
         self.bayes_time_binning = bool(arguments.bayes_time_binning)
         self.bayes_factors_use_all_exp_times = bool(arguments.bayes_factors_use_all_exp_times)
-        self.num_probes = arguments.num_probes
+        # self.num_probes = arguments.num_probes
+        self.num_probes = self.growth_class.num_probes
+
         self.probe_noise_level = arguments.probe_noise_level
         self.updater_from_prior = bool(arguments.updater_from_prior)
 

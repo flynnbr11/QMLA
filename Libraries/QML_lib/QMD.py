@@ -271,7 +271,8 @@ class QMD():
                     self.GrowthClass.expectation_value(
                         ham = self.TrueHamiltonian, 
                         t = t, 
-                        state = self.PlotProbes[self.TrueHamiltonianDimension],
+                        state = self.PlotProbes[self.TrueOpDim],
+                        # state = self.PlotProbes[self.TrueHamiltonianDimension],
                         log_file = self.log_file,
                         log_identifier = '[QMD Init]'
                     )

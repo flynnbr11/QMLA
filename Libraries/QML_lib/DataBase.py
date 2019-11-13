@@ -209,9 +209,12 @@ class operator():
         """
         Full matrix of operator. 
         """
-        mtx = empty_array_of_same_dim(self.name)
+        mtx = None
         for i in self.constituents_operators:
-            mtx += i
+            if mtx is None:
+                mtx = i
+            else:
+                mtx += i
         return mtx
 
     @property
@@ -290,7 +293,7 @@ def get_num_qubits(name):
             or 
             'pauliSet' in term
             or
-            'hop' in term
+            'FH' in term
         ):
             terms = term.split('_')
             dim_term = terms[-1]
@@ -679,9 +682,9 @@ def process_basic_operator(basic_operator):
         mtx = ModelGeneration.process_transverse_term(
             term = basic_operator
         )
-    elif 'hop' in basic_operator:
+    elif 'FH' in basic_operator:
         # print("[DB] Processing hopping operator:", term)
-        mtx = ModelGeneration.process_hopping_term(
+        mtx = ModelGeneration.process_fermi_hubbard_term(
             term = basic_operator
         )
     else:
