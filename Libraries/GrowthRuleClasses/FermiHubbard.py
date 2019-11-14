@@ -44,6 +44,7 @@ class fermi_hubbard(
         self.simulator_probe_generation_function = self.probe_generation_function # unless specifically different set of probes required
         self.shared_probes = True # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = ProbeGeneration.fermi_hubbard_half_filled_superposition
+        # self.plot_probe_generation_function = ProbeGeneration.fermi_hubbard_single_spin_n_sites
 
 
         self.max_time_to_consider = 20
@@ -75,7 +76,8 @@ class fermi_hubbard(
             'double' : r'\updownarrow'
         }
 
-        latex_str = ""
+        number_counting_terms = []
+        hopping_terms = []
         terms = name.split('+')
         for term in terms:
             constituents = term.split('_')
@@ -93,11 +95,16 @@ class fermi_hubbard(
 
             if term_type == 'onsite':
                 term_latex = "\hat{{N}}_{{{}}}".format(sites[0])
+                number_counting_terms.append(term_latex)
             elif term_type == 'hop':
                 term_latex = '\hat{{H}}_{{{}}}^{{{}}}'.format(
                     ",".join(sites),  # subscript site indices
                     basis_latex[spin_type] # superscript which spin type
                 )
+                hopping_terms.append(term_latex)
+        
+        latex_str = ""
+        for term_latex in (sorted(hopping_terms) + sorted(number_counting_terms)):
             latex_str += term_latex
         latex_str = "${}$".format(latex_str)
         return latex_str

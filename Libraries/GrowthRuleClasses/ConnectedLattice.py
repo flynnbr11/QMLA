@@ -78,12 +78,6 @@ class connected_lattice(
         )
         self.initially_connected_sites = self.topology.get_connected_site_list()
 
-        self.initial_models = self.generate_terms_from_new_site(
-            connected_sites = self.initially_connected_sites, 
-            base_terms = self.base_terms, 
-            num_sites = self.topology.num_sites(),
-            new_sites = range(1, self.topology.num_sites() + 1), 
-        )
         self.true_operator = DataBase.alph(self.true_operator)
         self.model_fitness = {}
         self.models_rejected = {
@@ -93,9 +87,18 @@ class connected_lattice(
             self.generation_DAG : []
         }
 
-        self.spawn_stage = [None]
         self.available_mods_by_generation = {}
-        self.available_mods_by_generation[self.generation_DAG] = self.initial_models
+        self.available_mods_by_generation[self.generation_DAG] = self.generate_terms_from_new_site(
+            connected_sites = self.initially_connected_sites, 
+            base_terms = self.base_terms, 
+            num_sites = self.topology.num_sites(),
+            new_sites = range(1, self.topology.num_sites() + 1), 
+        )
+        self.spawn_stage = ['Start']
+        self.initial_models = self.generate_models(
+            model_list = ['']
+        )
+
         self.site_connections_considered = self.initially_connected_sites
         self.max_num_sub_generations_per_generation = {
             self.generation_DAG : len(self.available_mods_by_generation[self.generation_DAG])
@@ -119,44 +122,67 @@ class connected_lattice(
         model_list, 
         **kwargs
     ):
+        if self.spawn_stage[-1] == 'Start':
+            
+            new_models = self.available_mods_by_generation[self.generation_DAG]
+            self.log_print(["Spawning initial models:", new_models])
+            self.spawn_stage.append(None)
 
-        model_points = kwargs['branch_model_points']
-        self.model_group_fitness_calculation(
-            model_points = model_points
-        )
-        branch_models = list(model_points.keys())
-        ranked_model_list = sorted(
-            model_points, 
-            key=model_points.get, 
-            reverse=True
-        )
-        if self.num_top_models_to_build_on == 'all':
-            models_to_build_on = ranked_model_list
         else:
-            models_to_build_on = ranked_model_list[:self.num_top_models_to_build_on]
-
-        self.sub_generation_idx += 1 
-
-        # self.generation_champs[self.generation_DAG][self.sub_generation_idx] = models_to_build_on
-        self.generation_champs[self.generation_DAG][self.sub_generation_idx] = [
-            kwargs['model_names_ids'][models_to_build_on[0]]
-        ]
-
-        self.counter+=1
-        new_models = []
-
-        if self.spawn_stage[-1] == 'make_new_generation':
-            # increase generation idx; add site; get newly available terms; add greedily as above
-            self.new_generation()
-
-        if self.spawn_stage[-1] == None:
-            # new models given by models_to_build_on plus terms in available_terms (greedy)
-            new_models = self.add_terms_greedy(
-                models_to_build_on = models_to_build_on, 
-                available_terms = self.available_mods_by_generation[self.generation_DAG],
-                model_names_ids = kwargs['model_names_ids'],
+            model_points = kwargs['branch_model_points']
+            self.model_group_fitness_calculation(
                 model_points = model_points
             )
+            branch_models = list(model_points.keys())
+            ranked_model_list = sorted(
+                model_points, 
+                key=model_points.get, 
+                reverse=True
+            )
+            if self.num_top_models_to_build_on == 'all':
+                models_to_build_on = ranked_model_list
+            else:
+                models_to_build_on = ranked_model_list[:self.num_top_models_to_build_on]
+
+            self.sub_generation_idx += 1 
+
+            # self.generation_champs[self.generation_DAG][self.sub_generation_idx] = models_to_build_on
+            self.generation_champs[self.generation_DAG][self.sub_generation_idx] = [
+                kwargs['model_names_ids'][models_to_build_on[0]]
+            ]
+
+            self.counter+=1
+            new_models = []
+
+            if self.spawn_stage[-1] == 'make_new_generation':
+            # increase generation idx; add site; get newly available terms; add greedily as above
+                self.new_generation()
+
+            if self.spawn_stage[-1] == None:
+                # new models given by models_to_build_on plus terms in available_terms (greedy)
+                new_models = self.add_terms_greedy(
+                    models_to_build_on = models_to_build_on, 
+                    available_terms = self.available_mods_by_generation[self.generation_DAG],
+                    model_names_ids = kwargs['model_names_ids'],
+                    model_points = model_points
+                )
+
+        new_models = [
+            DataBase.alph(mod) 
+            for mod in new_models 
+            if self.check_model_validity(mod) 
+        ]
+        # store branch idx for new models
+
+        registered_models = list(self.model_branches.keys())
+        for model in new_models:
+            if model not in registered_models:
+                latex_model_name = self.latex_name(model)
+                branch_id = (
+                    self.generation_DAG 
+                    + len(DataBase.get_constituent_names_from_name(model))
+                )
+                self.model_branches[latex_model_name] = branch_id
 
         return new_models
 
@@ -264,6 +290,14 @@ class connected_lattice(
                     else:
                         self.models_rejected[self.generation_DAG].append(new_mod)
         return new_models
+
+    def check_model_validity(
+        self, 
+        model, 
+        **kwargs
+    ):
+        # possibility that some models not valid; not needed by default but checked for general case
+        return True
 
     def combine_terms(
         self, 

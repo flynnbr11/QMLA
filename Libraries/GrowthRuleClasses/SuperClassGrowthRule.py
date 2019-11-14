@@ -65,6 +65,7 @@ class growth_rule_super_class():
         self.num_processes_to_parallelise_over = 6
         self.learned_param_limit_for_negligibility = 0.05
         self.reduce_champ_bayes_factor_threshold = 1e2
+        self.model_branches = {}
 
         self.max_num_models_by_shape = {
             1 : 0,
@@ -133,7 +134,8 @@ class growth_rule_super_class():
         **kwargs
     ):
         import ModelNames
-        return ModelNames.branch_is_num_params(
+        # branch_is_num_params
+        return ModelNames.branch_computed_from_qubit_and_param_count(
             latex_mapping_file = latex_mapping_file,
             **kwargs
         )

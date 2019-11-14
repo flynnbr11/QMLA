@@ -673,7 +673,47 @@ def branch_is_num_params_and_qubits(
     return model_branches
 
 
+def branch_computed_from_qubit_and_param_count(
+    latex_mapping_file,
+    **kwargs
+):
+    with open(latex_mapping_file) as f:
+        content = f.readlines()
+    # remove whitespace characters like `\n` at the end of each line
+    content = [x.strip() for x in content] 
 
+    latex_name_map = {}
+    for c in content:
+        this_tuple = eval(c)
+        model_string = this_tuple[0]
+        latex_name = this_tuple[1]
+        latex_name_map[model_string] = latex_name    # this mapping assigns models to branches with the number of parameters they have
+
+    model_names = list(set(list(latex_name_map.keys())))
+
+    models_by_num_qubits = {}
+    for mod in model_names:
+        num_qubits = DataBase.get_num_qubits(mod)
+        if num_qubits not in models_by_num_qubits.keys():
+            models_by_num_qubits[num_qubits] = []
+        models_by_num_qubits[num_qubits].append(mod)
+
+
+
+    numbers_of_qubits = sorted(models_by_num_qubits.keys())
+    model_branches = {}
+    highest_branch = 0
+
+    for num_qubits in numbers_of_qubits:
+        base_branch = highest_branch
+        models = models_by_num_qubits[num_qubits]
+        for model in models:
+            num_params = len(DataBase.get_constituent_names_from_name(model))
+            branch_idx = base_branch + num_params
+            if branch_idx > highest_branch:
+                highest_branch = branch_idx
+            model_branches[model] = branch_idx
+    return model_branches
 
 def interacting_ising_nearest_neighbours_all_names(
     # growth_generator,
