@@ -40,7 +40,7 @@ class fermi_hubbard(
         self.initial_models = [
             self.true_operator
         ]
-        self.probe_generation_function = ProbeGeneration.fermi_hubbard_half_filled_pure_states
+        self.probe_generation_function = ProbeGeneration.fermi_hubbard_separable_probes_half_filled
         self.simulator_probe_generation_function = self.probe_generation_function # unless specifically different set of probes required
         self.shared_probes = True # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = ProbeGeneration.fermi_hubbard_half_filled_superposition

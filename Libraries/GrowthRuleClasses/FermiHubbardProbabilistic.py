@@ -28,11 +28,11 @@ class fermi_hubbard_probabilistic(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        self.true_operator = 'FHhop_1h2_up_d2'#'FHonsite_1_d1' #'FHhop_1h2_down_d2+FHhop_1h2_up_d2' # for testing  
+        self.true_operator = 'FHhop_1h2_down_d2+FHhop_1h2_up_d2+FHonsite_1_d2+FHonsite_2_d2' # for testing  
         self.max_num_sites = 3
         self.max_num_probe_qubits = self.max_num_sites
         self.max_num_qubits = self.max_num_sites
-        self.num_probes = 2**self.max_num_sites
+        self.num_probes = 20
         self.lattice_dimension = 1
         self.tree_completed_initially = False
         self.num_top_models_to_build_on = 1
@@ -44,7 +44,7 @@ class fermi_hubbard_probabilistic(
 
         self.true_params = {
             # term : true_param
-            'FHhop_1h2_up_d2' : 1,
+            # 'FHhop_1h2_up_d2' : 1,
         }
         self.max_num_models_by_shape = {
             'other' : 4

@@ -426,6 +426,64 @@ def fermi_hubbard_single_varied_spin_n_sites(
     
     return probe_dict
     
+def random_superposition_half_filled_occupation_basis():
+    # vacant = np.array([1,0])
+    # occupied = np.array([0,1])
+    # down = np.kron(occupied, vacant) #|10>
+    # up = np.kron(vacant, occupied) #|01>
+    
+    down = np.array([0, 0, 1, 0])
+    up = np.array([0, 1, 0, 0])
+
+    alpha = np.random.randn() + 1j*np.random.randn()
+    beta = np.random.randn() + 1j*np.random.randn()
+    
+    state = ( alpha * down ) + ( beta * up )
+    state = state/np.linalg.norm(state)
+    return state
+
+def fermi_hubbard_separable_probes_half_filled(
+    max_num_qubits, 
+    num_probes,
+    **kwargs
+):
+    separable_probes = {}
+    for i in range(num_probes):
+        separable_probes[i,0] = random_superposition_half_filled_occupation_basis()
+        for j in range(1, 1+max_num_qubits):
+            if j==1:
+                separable_probes[i,j] = separable_probes[i,0]
+            else: 
+                separable_probes[i,j] = (
+                    np.tensordot(
+                        separable_probes[i,j-1],
+                        random_superposition_half_filled_occupation_basis(), 
+                        axes=0
+                    ).flatten(order='c')
+                )
+            norm = np.linalg.norm(separable_probes[i,j])
+            while (
+                np.abs( norm -1) >
+                1e-13
+
+            ):
+                print(
+                    "non-unit norm: ", 
+                    norm
+                )
+                # keep replacing until a unit-norm 
+                separable_probes[i,j] = (
+                    np.tensordot(
+                        separable_probes[i,j-1], 
+                        random_superposition_half_filled_occupation_basis(),
+                        axes=0
+                    ).flatten(order='c')
+                )
+                norm = np.linalg.norm(separable_probes[i,j])
+            # print("unit norm:", np.abs(1-norm) )
+
+    return separable_probes
+
 
 
 def fermi_hubbard_single_spin_n_sites(
