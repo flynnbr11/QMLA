@@ -488,7 +488,7 @@ def fermi_hubbard_separable_probes_half_filled(
 
 def fermi_hubbard_single_spin_n_sites(
     max_num_qubits, 
-    spin_type = 'up',
+    spin_type = 'down',
     num_probes=10,
     **kwargs
 ):

@@ -110,8 +110,8 @@ if not os.path.exists(probes_dir):
         os.makedirs(probes_dir)
         system_probes_path = str( 
             probes_dir
-            + 'system_probes_'
-            + str(global_variables.long_id)
+            + 'system_probes'
+            # + str(global_variables.long_id)
             +'.p'
         )
         pickle.dump(
@@ -120,8 +120,8 @@ if not os.path.exists(probes_dir):
         )
         simulator_probes_path = str(
             probes_dir
-            + 'simulator_probes_'
-            + str(global_variables.long_id)
+            + 'simulator_probes'
+            # + str(global_variables.long_id)
             +'.p'
         )
         pickle.dump(
