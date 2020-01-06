@@ -2,7 +2,7 @@ import numpy as np
 #import qutip
 # import ExpectationValues
 import DataBase
-
+import itertools
 
 ## Simluated Probes: random
 def separable_probe_dict(
@@ -380,10 +380,57 @@ def fermi_hubbard_random_half_filled_superpositions(
     probe_dict = {}
     
     for i in range(num_probes):
-        random_superposition = sum([np.random.rand()*b for b in basis])
+        random_superposition = sum(
+            [
+                (np.random.rand() + 1.0j*np.random.rand()) * b 
+                for b in basis
+            ]
+        )
         random_superposition /= np.linalg.norm(random_superposition)
     
         probe_dict[(i, num_sites)] = random_superposition
+    
+    return probe_dict
+def fermi_hubbard_random_half_filled_bases(
+    max_num_qubits = 2, 
+    num_sites = 2, 
+    num_probes = 10, 
+    **kwargs
+):
+    import itertools
+    half_filled_list = [0,1]*num_sites
+
+    perms = list(itertools.permutations( half_filled_list ))
+    perms = [''.join([str(j) for j in this_el]) for this_el in perms]
+    perms = list(set(perms))
+
+    basis = [state_from_string(s) for s in perms]
+    probe_dict = {}
+    
+    for i in range(num_probes):    
+        probe_dict[(i, num_sites)] = basis[i%len(basis)]
+    
+    return probe_dict
+
+def singular_fill_bases(
+    max_num_qubits = 2, 
+    num_sites = 2, 
+    num_probes = 10, 
+    **kwargs
+):
+
+    fill_list = [0]*2*num_sites
+    fill_list[0] = 1
+    
+    perms = list(itertools.permutations( fill_list ))
+    perms = [''.join([str(j) for j in this_el]) for this_el in perms]
+    perms = list(set(perms))
+
+    basis = [state_from_string(s) for s in perms]
+    probe_dict = {}
+    
+    for i in range(num_probes):   
+        probe_dict[(i, num_sites)] = basis[i%len(basis)]
     
     return probe_dict
 
@@ -528,7 +575,7 @@ def fermi_hubbard_separable_probes_half_filled(
 
 def fermi_hubbard_single_spin_n_sites(
     max_num_qubits, 
-    spin_type = 'up',
+    spin_type = 'down',
     num_probes=10,
     **kwargs
 ):
