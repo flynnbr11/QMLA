@@ -32,6 +32,7 @@ class fermi_hubbard_probabilistic(
         # self.true_operator = 'FHhop_1h2_up_d2+FHonsite_1_d2+FHonsite_2_d2' # for testing  
         self.true_operator = 'FHhop_1h2_down_d2+FHhop_1h2_up_d2' # for testing  
         # self.probe_generation_function = ProbeGeneration.fermi_hubbard_single_spin_n_sites
+        self.probe_generation_function = ProbeGeneration.fermi_hubbard_random_half_filled_superpositions
         self.max_num_sites = 3
         self.max_num_probe_qubits = self.max_num_sites
         self.max_num_qubits = self.max_num_sites

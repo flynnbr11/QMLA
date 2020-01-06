@@ -344,7 +344,48 @@ def random_phase_plus(
 
 
 # Hubbard encoding probes
+def state_from_string(
+    s,
+    basis_states = {
+        '0' : np.array([1,0]),
+        '1' : np.array([0,1])
+    }    
+):
+    # input s, form 1001, returns corresponding basis vector
+    state = None
+    for i in s:
+        if state is None:
+            state = basis_states[i]
+        else:
+            state = np.kron(
+                state, 
+                basis_states[i]
+            )
+    state = np.array(state)
+    return state
+def fermi_hubbard_random_half_filled_superpositions(
+    max_num_qubits = 2, 
+    num_sites = 2, 
+    num_probes = 10, 
+    **kwargs
+):
+    import itertools
+    half_filled_list = [0,1]*num_sites
 
+    perms = list(itertools.permutations( half_filled_list ))
+    perms = [''.join([str(j) for j in this_el]) for this_el in perms]
+    perms = list(set(perms))
+
+    basis = [state_from_string(s) for s in perms]
+    probe_dict = {}
+    
+    for i in range(num_probes):
+        random_superposition = sum([np.random.rand()*b for b in basis])
+        random_superposition /= np.linalg.norm(random_superposition)
+    
+        probe_dict[(i, num_sites)] = random_superposition
+    
+    return probe_dict
 
 def vector_from_fermion_state_description(state):
 
@@ -405,7 +446,6 @@ def fermi_hubbard_single_varied_spin_n_sites(
         }
     )
 
-
     spins = [down, up]
     for i in range(num_probes):
         probe_dict[i,0] = spins[i%len(spins)]
@@ -463,7 +503,7 @@ def fermi_hubbard_separable_probes_half_filled(
                 )
             norm = np.linalg.norm(separable_probes[i,j])
             while (
-                np.abs( norm -1) >
+                np.abs( norm - 1) >
                 1e-13
 
             ):
@@ -488,7 +528,7 @@ def fermi_hubbard_separable_probes_half_filled(
 
 def fermi_hubbard_single_spin_n_sites(
     max_num_qubits, 
-    spin_type = 'down',
+    spin_type = 'up',
     num_probes=10,
     **kwargs
 ):
