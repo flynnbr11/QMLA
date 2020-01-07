@@ -11,9 +11,6 @@ import Heuristics
 
 
 import SuperClassGrowthRule
-import NVCentreLargeSpinBath
-import NVGrowByFitness
-import SpinProbabilistic
 import ConnectedLattice
 
 
@@ -41,7 +38,11 @@ class heisenberg_xyz_probabilistic(
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
 
-        self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_2J3_d4PPPPpauliSet_yJy_3J4_d4'
+        self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4PPPPpauliSet_yJy_1J4_d4'
+        # self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4+pauliSet_yJy_1J2_d4+pauliSet_xJx_2J3_d4+pauliSet_yJy_3J4_d4+pauliSet_zJz_3J4_d4+pauliSet_yJy_1J4_d4'
+        self.true_operator_fully_connected_square = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_1J3_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_xJx_2J4_d4PPPPpauliSet_yJy_2J4_d4PPPPpauliSet_zJz_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4'
+        
+        self.true_operator = self.true_operator_fully_connected_square
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
@@ -77,12 +78,9 @@ class heisenberg_xyz_predetermined(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        # self.true_operator = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_yJy_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_yJy_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_yJy_d4PPPPpauliSet_3J4_zJz_d4'
-        # self.true_operator = 'pauliSet_1J2_xJx_d4PPPPpauliSet_2J3_yJy_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_xJx_d4'
-        self.true_operator = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_yJy_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_yJy_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_yJy_d4PPPPpauliSet_3J4_zJz_d4'
         self.tree_completed_initially = True
-        self.setup_growth_class()
         self.max_num_sites = 6
+        self.setup_growth_class()
         self.max_num_models_by_shape = {
             'other' : 3
         }
@@ -95,7 +93,7 @@ class heisenberg_xyz_predetermined(
             list_connections = [
                 [(1,2)], # pair of sites
                 [(1,2), (2,3)],  # chain length 3
-                [(1,2), (1,3), (2,3), (2,4)], # square, 
+                [(1,2), (1,3), (3, 4), (2,4)], # square, 
                 [(1,2), (2,3), (3,4)], # chain,
                 [(1,2), (2,3), (3,4), (4,5)], # chain,
                 [(1,2), (2,3), (3,4), (4,5), (5,6)], # chain,
@@ -116,4 +114,5 @@ class heisenberg_xyz_predetermined(
             self.initial_models = models
 
             if self.true_operator not in self.initial_models:
+                self.log_print("Adding true operator to initial model list")
                 self.initial_models.append(self.true_operator)

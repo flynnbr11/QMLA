@@ -7,7 +7,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1 # don't perform QMLA; perform QHL on known correct model
+qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=500
-exp=100
+prt=50
+exp=10
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -74,26 +74,12 @@ git_commit=$(git rev-parse HEAD)
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
-# sim_growth_rule='ising_1d_chain'
-# sim_growth_rule='ising_multi_axis'
-# sim_growth_rule='ising_2d'
-# sim_growth_rule='heisenberg_xyz'
-# sim_growth_rule='hubbard_square_lattice_generalised'
-# sim_growth_rule='hopping_topology'
-# sim_growth_rule='probabilistic_spin'
-# sim_growth_rule='pairwise_pauli_probabilistic_nearest_neighbour'
-# sim_growth_rule='nearest_neighbour_pauli_2D'
-# sim_growth_rule='hopping_probabilistic'
-# sim_growth_rule='hopping_predetermined'
 # sim_growth_rule='ising_probabilistic'
 # sim_growth_rule='ising_predetermined'
-# sim_growth_rule='heisenberg_xyz_probabilistic'
 # sim_growth_rule='heisenberg_xyz_predetermined'
-# sim_growth_rule='fermi_hubbard'
-# sim_growth_rule='fermi_hubbard_predetermined'
-sim_growth_rule='fermi_hubbard_probabilistic'
-# sim_growth_rule='example'
-
+# sim_growth_rule='heisenberg_xyz_probabilistic'
+sim_growth_rule='fermi_hubbard_predetermined'
+# sim_growth_rule='fermi_hubbard_probabilistic'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1

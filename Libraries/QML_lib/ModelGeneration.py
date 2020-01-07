@@ -63,6 +63,7 @@ Functions for NV centre spin.
 """
 
 def process_transverse_term(term):
+    # terms of form transverse_x_d3
     # transverse matrix is a single matrix of form,.e.g
     # XII + IXI + IIX
     # where num qubits=3, transverse axis=X

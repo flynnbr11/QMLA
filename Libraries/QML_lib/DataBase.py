@@ -293,6 +293,8 @@ def get_num_qubits(name):
             or 
             'pauliSet' in term
             or
+            'transverse' in term
+            or
             'FH' in term
         ):
             terms = term.split('_')

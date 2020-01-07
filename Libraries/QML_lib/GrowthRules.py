@@ -18,28 +18,15 @@ import NVGrowByFitness
 import NVProbabilistic
 import ReducedNVExperiment
 import PresentationPlotGeneration
-import SpinProbabilistic
-import IsingChain
-import Hubbard
-import Heisenberg
-import Hopping
-import IsingMultiAxis
-import Ising2D 
-import PauliPairwiseProbabilisticNearestNeighbour
 import ConnectedLattice
-import HoppingProbabilistic
-import IsingProbabilistic
-import HeisenbergXYZProbabilistic
-import BasicLindbladian
+import Ising
+import HeisenbergXYZ
 import FermiHubbard
-import FermiHubbardProbabilistic
+import BasicLindbladian
 import ExampleGrowthRule
 
 growth_classes = {
-    # 'test_growth_class' : 
-    #     SuperClassGrowthRule.default_growth, 
-    # 'two_qubit_ising_rotation_hyperfine_transverse' : 
-    #     SuperClassGrowthRule.default_growth, 
+    # Experimental paper growth rules
     'two_qubit_ising_rotation_hyperfine_transverse' : 
         NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method,
     'two_qubit_ising_rotation_hyperfine' : 
@@ -50,14 +37,6 @@ growth_classes = {
         NVCentreAlternativeTrueModel.nv_centre_spin_experimental_method_alternative_true_model_second,
     'nv_experiment_vary_model' : 
         NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model,
-    'nv_experiment_vary_model_3_params' : 
-        NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model_3_params,
-    'nv_experiment_vary_model_5_params' : 
-        NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model_5_params,
-    'nv_experiment_vary_model_6_params' : 
-        NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model_6_params,
-    'nv_experiment_vary_model_7_params' : 
-        NVExperimentVaryTrueModel.nv_centre_spin_experimental_method_varying_true_model_7_params,
     'NV_fitness_growth' : 
         NVGrowByFitness.nv_fitness_growth, 
     'NV_centre_revivals' : 
@@ -68,42 +47,20 @@ growth_classes = {
         NVCentreLargeSpinBath.nv_centre_large_spin_bath,
     'reduced_nv_experiment' : 
         ReducedNVExperiment.reduced_nv_experiment,
-    'probabilistic_spin' :
-        SpinProbabilistic.spin_probabilistic,
-    'ising_1d_chain' : 
-        IsingChain.ising_chain,
-    'ising_multi_axis' : 
-        IsingMultiAxis.ising_chain_multi_axis, 
-    'ising_2d' : 
-        Ising2D.ising_2D,
-    'ising_probabilistic' : 
-        IsingProbabilistic.ising_chain_probabilistic,
+    # Theoretical paper growth rules
     'ising_predetermined' : 
-        IsingProbabilistic.ising_chain_predetermined,
-    'hubbard_square_lattice_generalised' : 
-        Hubbard.hubbard_square,
-    'heisenberg_xyz' : 
-        Heisenberg.heisenberg_XYZ, 
-    'pairwise_pauli_probabilistic_nearest_neighbour' : 
-        PauliPairwiseProbabilisticNearestNeighbour.pauli_pairwise_nearest_neighbour_probabilistic,
-    'nearest_neighbour_pauli_2D' : 
-        ConnectedLattice.connected_lattice,
-    'hopping_topology' : 
-        Hopping.hopping,
-    'hopping_probabilistic' : 
-        HoppingProbabilistic.hopping_probabilistic,
-    'hopping_predetermined' : 
-        HoppingProbabilistic.hopping_predetermined,
-    'fermi_hubbard' : 
-        FermiHubbard.fermi_hubbard,
+        Ising.ising_chain_predetermined,
+    'ising_probabilistic' : 
+        Ising.ising_chain_probabilistic,
+    'heisenberg_xyz_predetermined' : 
+        HeisenbergXYZ.heisenberg_xyz_predetermined,
+    'heisenberg_xyz_probabilistic' :
+        HeisenbergXYZ.heisenberg_xyz_probabilistic,
     'fermi_hubbard_predetermined' : 
         FermiHubbard.fermi_hubbard_predetermined,
     'fermi_hubbard_probabilistic' : 
-        FermiHubbardProbabilistic.fermi_hubbard_probabilistic,
-    'heisenberg_xyz_probabilistic' :
-        HeisenbergXYZProbabilistic.heisenberg_xyz_probabilistic,
-    'heisenberg_xyz_predetermined' : 
-        HeisenbergXYZProbabilistic.heisenberg_xyz_predetermined,
+        FermiHubbard.fermi_hubbard_probabilistic,
+    # Others
     'basic_lindbladian' :
         BasicLindbladian.basic_lindbladian,
     'example' : 

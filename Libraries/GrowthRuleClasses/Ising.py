@@ -34,7 +34,9 @@ class ising_chain_probabilistic(
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
 
-        self.true_operator = 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3'
+        # self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4PPPPpauliSet_z_1_d4PPPPpauliSet_z_2_d4PPPPpauliSet_z_3_d4PPPPpauliSet_z_4_d4'
+        self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4PPPPtransverse_x_d4'
+        # self.true_operator = 'transverse_x_d4'
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
@@ -94,7 +96,7 @@ class ising_chain_predetermined(
         self.max_num_sites = 7
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
-        self.true_operator = 'pauliSet_zJz_1J2_d2'
+        # self.true_operator = 'pauliSet_zJz_1J2_d2'
         # self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]

@@ -9,14 +9,12 @@ import ModelGeneration
 import SystemTopology
 import Heuristics
 
-import SpinProbabilistic
 import SuperClassGrowthRule
 
 flatten = lambda l: [item for sublist in l for item in sublist]  # flatten list of lists
 
 
 class connected_lattice(
-    # SpinProbabilistic.spin_probabilistic
     SuperClassGrowthRule.growth_rule_super_class    
 ):
 
@@ -69,6 +67,7 @@ class connected_lattice(
             self.initial_num_sites + 
             self.generation_DAG
         )
+        self.max_num_probe_qubits = self.max_num_sites
         self.topology = SystemTopology.topology_grid(
             dimension = self.lattice_dimension,
             num_sites = self.initial_num_sites,
@@ -237,7 +236,7 @@ class connected_lattice(
             mod_name = model_names_ids[mod_id]
             mod_name = self.match_dimension(mod_name, self.topology.num_sites())
             present_terms = DataBase.get_constituent_names_from_name(mod_name)
-            print("[fermi hubbard] model {} has present terms {}".format(mod_name, present_terms))
+            print("Model {} has present terms {}".format(mod_name, present_terms))
             terms_to_add = list(
                 set(available_terms)
                 - set(present_terms)
@@ -332,6 +331,7 @@ class connected_lattice(
             site_connections[c] = []
 
         term_type_markers = ['pauliSet', 'transverse']
+        transverse_axis = None
         for term in separate_terms:
             components = term.split('_')
             if 'pauliSet' in components:
@@ -347,6 +347,14 @@ class connected_lattice(
                 sites = tuple([int(a) for a in sites])
                 op = operators[0] # assumes like-like pauli terms like xx, yy, zz
                 site_connections[sites].append(op)
+            elif 'transverse' in components:
+                components.remove('transverse')
+                for l in components:
+                    if l[0] == 'd':
+                        transverse_dim = int(l.replace('d', ''))
+                    elif l in core_operators:
+                        transverse_axis = l
+
 
         ordered_connections = list(sorted(site_connections.keys()))
         latex_term = ""
@@ -361,6 +369,8 @@ class connected_lattice(
                     this_term += "{}".format(t)
                 this_term += "}"
                 latex_term += this_term
+        if transverse_axis is not None:
+            latex_term += 'T^{}_{}'.format(transverse_axis, transverse_dim)
         latex_term = "${}$".format(latex_term)
         return latex_term
 
