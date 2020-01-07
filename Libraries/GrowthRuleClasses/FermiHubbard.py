@@ -40,7 +40,7 @@ class fermi_hubbard(
         self.initial_models = [
             self.true_operator
         ]
-        self.probe_generation_function = ProbeGeneration.fermi_hubbard_separable_probes_half_filled
+        self.probe_generation_function = ProbeGeneration.separable_fermi_hubbard_half_filled
         self.simulator_probe_generation_function = self.probe_generation_function # unless specifically different set of probes required
         self.shared_probes = True # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = ProbeGeneration.fermi_hubbard_half_filled_superposition
@@ -78,6 +78,7 @@ class fermi_hubbard(
 
         number_counting_terms = []
         hopping_terms = []
+        chemical_terms = []
         terms = name.split('+')
         for term in terms:
             constituents = term.split('_')
@@ -102,9 +103,15 @@ class fermi_hubbard(
                     basis_latex[spin_type] # superscript which spin type
                 )
                 hopping_terms.append(term_latex)
+            elif term_type == 'chemical':
+                term_latex = "\hat{{C}}_{{{}}}".format(sites[0])
+                chemical_terms.append(term_latex)
+
         
         latex_str = ""
-        for term_latex in (sorted(hopping_terms) + sorted(number_counting_terms)):
+        for term_latex in (
+            sorted(hopping_terms) + sorted(number_counting_terms) + sorted(chemical_terms)
+        ):
             latex_str += term_latex
         latex_str = "${}$".format(latex_str)
         return latex_str
