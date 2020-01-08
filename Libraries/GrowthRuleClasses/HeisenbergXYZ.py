@@ -78,7 +78,16 @@ class heisenberg_xyz_predetermined(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
-        self.tree_completed_initially = True
+        self.num_processes_to_parallelise_over = 10
+        self.max_num_models_by_shape = {
+            # Note dN here requires 2N qubits so d3 counts as shape 6
+            1 : 0,
+            2 : 1,
+            4 : 3, 
+            5 : 2,
+            6 : 2,
+            'other' : 0
+        }
         self.max_num_sites = 6
         self.setup_growth_class()
         self.max_num_models_by_shape = {

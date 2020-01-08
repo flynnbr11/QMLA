@@ -45,7 +45,7 @@ class fermi_hubbard(
 
 
         self.max_time_to_consider = 20
-        self.num_processes_to_parallelise_over = 6
+        self.num_processes_to_parallelise_over = 9
         self.max_num_models_by_shape = {
             1 : 0,
             2 : 0,
@@ -247,6 +247,17 @@ class fermi_hubbard_predetermined(
         )
         # self.true_operator = 'FHhop_1h2_up_d2' 
         self.tree_completed_initially = True
+        self.num_processes_to_parallelise_over = 9
+        self.max_num_models_by_shape = {
+            # Note dN here requires 2N qubits so d3 counts as shape 6
+            1 : 0,
+            2 : 0,
+            4 : 2, 
+            6 : 2,
+            8 : 1,
+            'other' : 0
+        }
+
         self.initial_models = [
             'FHhop_1h2_down_d2',
             'FHhop_1h2_down_d2+FHhop_1h2_up_d2',
@@ -256,7 +267,17 @@ class fermi_hubbard_predetermined(
         ]
         self.max_num_sites = 4
         if self.true_operator not in self.initial_models:
+            self.log_print(
+                [
+                "True model not present in initial models for predetermined set; adding it."
+                ]
+            )
             self.initial_models.append(self.true_operator)
+        self.log_print(
+            [
+            "Predetermined models:", self.initial_models
+            ]
+        )
 
     
 

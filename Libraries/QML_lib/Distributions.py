@@ -123,7 +123,7 @@ def plot_prior(
     cm_subsection = np.linspace(0,0.8,num_params)
     #        colours = [ cm.magma(x) for x in cm_subsection ]
     colours = [ cm.viridis(x) for x in cm_subsection ]
-
+    include_legend = False
     for i in range(num_params):
 
         ax = axes[row, col]
@@ -174,10 +174,12 @@ def plot_prior(
                     label='True'
                     # linestyle = ls
                 )
+                include_legend=True
             except:
                 pass # i.e. this parameter not in true params
         ax.set_title(param_label)
-        ax.legend()
+        if include_legend==True:
+            ax.legend()
 
     # plt.legend()
     fig.suptitle('Initial prior for {}'.format(model_name))
