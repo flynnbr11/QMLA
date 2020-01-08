@@ -45,6 +45,7 @@ class fermi_hubbard(
 
 
         self.max_time_to_consider = 20
+        self.max_num_qubits = 6
         self.num_processes_to_parallelise_over = 9
         self.max_num_models_by_shape = {
             1 : 0,
@@ -258,7 +259,7 @@ class fermi_hubbard_predetermined(
             8 : 1,
             'other' : 0
         }
-
+        self.max_num_qubits = 8
         self.initial_models = [
             'FHhop_1h2_down_d2',
             'FHhop_1h2_down_d2+FHhop_1h2_up_d2',

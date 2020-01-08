@@ -15,9 +15,9 @@ additional_growth="-agr=ising_1d_chain -agr=hubbard_square_lattice_generalised"
 # -ggr='hubbard_square_lattice_generalised' \
 
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-growth_rule='NV_fitness_growth'
-num_experiments=10
-num_particles=10
+growth_rule='fermi_hubbard_predetermined'
+num_experiments=250
+num_particles=1000
 
 
 python3 CalculateTimeRequired.py \
@@ -35,3 +35,6 @@ python3 CalculateTimeRequired.py \
 	-qhltenv="QHL_TIME" \
 	-fqhltenv="FQHL_TIME" \
 	-num_proc_env="NUM_PROC"
+
+
+echo "TIME requested " $QMD_TIME

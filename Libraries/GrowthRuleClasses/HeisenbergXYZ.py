@@ -90,11 +90,9 @@ class heisenberg_xyz_predetermined(
             6 : 2,
             'other' : 0
         }
+        self.max_num_qubits = 6
         self.max_num_sites = 6
         self.setup_growth_class()
-        self.max_num_models_by_shape = {
-            'other' : 3
-        }
         self.min_param = 0
         self.max_param = 1
 

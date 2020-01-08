@@ -377,6 +377,8 @@ def time_required(
         growth_generation_rule = gen
       )
       generator_max_num_models_by_shape = growth_class.max_num_models_by_shape
+      print("Got time required from growth generator {}".format(gen))
+      print("Num models by num qubits:", generator_max_num_models_by_shape)
     except:
       generator_max_num_models_by_shape = max_num_models_by_shape[gen]
 
