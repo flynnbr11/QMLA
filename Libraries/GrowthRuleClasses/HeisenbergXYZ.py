@@ -106,7 +106,7 @@ class heisenberg_xyz_predetermined(
                 [(1,2), (1,3), (3, 4), (2,4)], # square, 
                 [(1,2), (2,3), (3,4)], # chain,
                 [(1,2), (2,3), (3,4), (4,5)], # chain,
-                [(1,2), (2,3), (3,4), (4,5), (5,6)], # chain,
+                # [(1,2), (2,3), (3,4), (4,5), (5,6)], # chain,
                 [(1,2), (1,4), (2,3), (2,5), (3,6), (4,5), (5,6)] #3x2 grid     
             ]
             for connected_sites in list_connections:
