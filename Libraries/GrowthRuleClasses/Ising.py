@@ -94,6 +94,7 @@ class ising_chain_predetermined(
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
         self.max_num_sites = 7
+        self.max_time_to_consider = 5
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
         # self.true_operator = 'pauliSet_zJz_1J2_d2'

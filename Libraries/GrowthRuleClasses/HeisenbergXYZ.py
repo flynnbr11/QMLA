@@ -78,6 +78,7 @@ class heisenberg_xyz_predetermined(
             growth_generation_rule = growth_generation_rule,
             **kwargs
         )
+        self.max_time_to_consider = 5
         self.tree_completed_initially = True
         self.num_processes_to_parallelise_over = 8
         self.max_num_models_by_shape = {

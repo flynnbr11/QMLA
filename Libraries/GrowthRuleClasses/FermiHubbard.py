@@ -247,6 +247,7 @@ class fermi_hubbard_predetermined(
         )
         # self.true_operator = 'FHhop_1h2_up_d2' 
         self.tree_completed_initially = True
+        self.max_time_to_consider = 5
         self.num_processes_to_parallelise_over = 9
         self.max_num_models_by_shape = {
             # Note dN here requires 2N qubits so d3 counts as shape 6
