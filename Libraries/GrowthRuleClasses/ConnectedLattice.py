@@ -33,7 +33,7 @@ class connected_lattice(
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
-        self.lattice_full_connectivity = True
+        self.lattice_full_connectivity = False
 
         self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.true_operator = DataBase.alph(self.true_operator)
@@ -122,7 +122,7 @@ class connected_lattice(
     ):
         if self.spawn_stage[-1] == 'Start':
             new_models = self.available_mods_by_generation[self.generation_DAG]
-            self.log_print(["Spawning initial models:", new_models])
+            # self.log_print(["Spawning initial models:", new_models])
             self.spawn_stage.append(None)
 
         else:
