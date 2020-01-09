@@ -1777,11 +1777,20 @@ def count_model_occurences(
     max_count = max(model_counts)
     integer_ticks = list(range(max_count+1))
     colours = ['blue' for m in unique_models]
-    
+    unique_models = [u[:-1] for u in unique_models if u[-1]==')' ]
+    true_operator_latex = true_operator_latex.replace(' ', '')
     if true_operator_latex in unique_models:
         true_idx = unique_models.index(true_operator_latex)
         colours[true_idx] = 'green'
     
+    print(
+        "[multiQMD - count model occurences]",
+        "Colours:", colours, 
+        "\ntrue op:", true_operator_latex, 
+        "\nunique models:", unique_models,
+        "test:", (str(true_operator_latex) in unique_models)
+    )
+
     fig, ax = plt.subplots(
         figsize=(
             max(max_count*2, 5),

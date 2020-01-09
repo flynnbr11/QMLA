@@ -162,10 +162,11 @@ class topology_grid():
 
         if len(site_1) != len(site_2):
             print(
-                "Site distance calculation: both sites must have same number of dimensions.",
+                "Site distance calculation: both sites must ", 
+                "have same number of dimensions.",
                 "Given:", site_1, site_2
             )
-            raise NameError('Unequal site dimensions.')
+            raise NameError('[Topology] Unequal site dimensions.')
 
         dim = len(site_1)
         dist = 0
@@ -177,10 +178,15 @@ class topology_grid():
         dist = np.sqrt(dist)
         return dist, shared_axis
         
-    def check_sites_connection(self, site_1_idx, site_2_idx):
-#         site_1 = self.coordinates[site_1_idx]
-#         site_2 = self.coordinates[site_2_idx]
-        dist, shared_axis = self.get_distance_between_sites(site_1_idx, site_2_idx)
+    def check_sites_connection(
+        self, 
+        site_1_idx, 
+        site_2_idx
+    ):
+        dist, shared_axis = self.get_distance_between_sites(
+            site_1_idx, 
+            site_2_idx
+        )
         
         if dist <= self.maximum_connection_distance:
             connected = True

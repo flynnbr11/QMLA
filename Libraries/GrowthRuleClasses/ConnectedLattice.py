@@ -33,7 +33,7 @@ class connected_lattice(
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
-        self.lattice_full_connectivity = False
+        self.lattice_full_connectivity = True
 
         self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.true_operator = DataBase.alph(self.true_operator)
@@ -45,7 +45,7 @@ class connected_lattice(
         ]
 
         # fitness calculation parameters. fitness calculation inherited.
-        self.num_top_models_to_build_on = 1 # 'all' # at each generation Badassness parameter
+        self.num_top_models_to_build_on = 2 # 'all' # at each generation Badassness parameter
         self.model_generation_strictness = 0 #1 #-1 
         self.fitness_win_ratio_exponent = 3
 
@@ -113,8 +113,7 @@ class connected_lattice(
 
     @property
     def num_sites(self):
-        return self.topology.num_sites()
-    
+        return self.topology.num_sites()  
 
     def generate_models(
         self, 
@@ -122,7 +121,6 @@ class connected_lattice(
         **kwargs
     ):
         if self.spawn_stage[-1] == 'Start':
-            
             new_models = self.available_mods_by_generation[self.generation_DAG]
             self.log_print(["Spawning initial models:", new_models])
             self.spawn_stage.append(None)
@@ -144,12 +142,9 @@ class connected_lattice(
                 models_to_build_on = ranked_model_list[:self.num_top_models_to_build_on]
 
             self.sub_generation_idx += 1 
-
-            # self.generation_champs[self.generation_DAG][self.sub_generation_idx] = models_to_build_on
             self.generation_champs[self.generation_DAG][self.sub_generation_idx] = [
                 kwargs['model_names_ids'][models_to_build_on[0]]
             ]
-
             self.counter+=1
             new_models = []
 
@@ -169,7 +164,7 @@ class connected_lattice(
         new_models = [
             DataBase.alph(mod) 
             for mod in new_models 
-            if self.check_model_validity(mod) 
+            if self.check_model_validity(mod) # Final check whether this model is allowed
         ]
         # store branch idx for new models
 
@@ -275,14 +270,9 @@ class connected_lattice(
                 #     model_points = model_points
                 # )
                 for term in terms_to_add:
-                    new_mod = "{}+{}".format(
-                        mod_name, 
-                        term    
-                    )
                     new_mod = self.combine_terms(
                         terms = [mod_name, term]
                     )
-                    # new_mod = DataBase.alph(new_mod) # TODO fix DataBase.alph to take + like terms
                     if self.determine_whether_to_include_model(mod_id) == True:
                         new_models.append(new_mod)
                         self.models_accepted[self.generation_DAG].append(new_mod)
@@ -430,7 +420,7 @@ class connected_lattice(
                     fitness = 0
             if model_id not in sorted(self.model_fitness.keys()):
                 self.model_fitness[model_id] = []
-            new_fitnesses[model_id] = model_id
+            new_fitnesses[model_id] = fitness
             self.model_fitness[model_id].append(fitness)            
         self.log_print(
             [
@@ -491,9 +481,8 @@ class connected_lattice(
         self, 
         model_id    
     ):
-        # biased coin flip
-        # fitness = self.model_fitness[model_id][self.generation_DAG]
-        fitness = self.model_fitness[model_id][-1]
+        # return bool: whether this model should parent a new model, randomly decided according to biased coin flip
+        fitness = self.model_fitness[model_id][-1] # most recent fitness value calculated for this model
         rand = np.random.rand()
         to_generate = ( rand < fitness ) 
         return to_generate
