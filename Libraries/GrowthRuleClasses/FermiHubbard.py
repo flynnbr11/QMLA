@@ -254,18 +254,21 @@ class fermi_hubbard_predetermined(
             # Note dN here requires 2N qubits so d3 counts as shape 6
             1 : 0,
             2 : 0,
-            4 : 2, 
-            6 : 2,
+            4 : 3, 
+            6 : 4,
             8 : 1,
             'other' : 0
         }
         self.max_num_qubits = 8
         self.initial_models = [
             'FHhop_1h2_down_d2',
+            'FHhop_1h2_up_d2',
             'FHhop_1h2_down_d2+FHhop_1h2_up_d2',
             'FHhop_1h2_down_d3+FHhop_1h2_up_d3+FHhop_1h3_down_d3+FHonsite_1_d3+FHonsite_2_d3+FHonsite_3_d3',
+            'FHhop_1h2_down_d3+FHhop_1h2_up_d3+FHhop_1h3_down_d3+FHhop_1h3_up_d3+FHhop_2h3_down_d3+FHhop_2h3_up_d3',
+            'FHhop_1h2_down_d3+FHhop_1h2_up_d3+FHhop_1h3_down_d3+FHhop_1h3_up_d3+FHhop_2h3_down_d3+FHhop_2h3_up_d3+FHonsite_1_d3+FHonsite_2_d3+FHonsite_3_d3',
             'FHhop_1h2_down_d3+FHhop_1h2_up_d3+FHhop_1h3_down_d3+FHhop_2h3_up_d3+FHonsite_1_d3+FHonsite_2_d3+FHonsite_3_d3',
-            'FHhop_1h2_down_d4+FHhop_1h2_up_d4+FHhop_1h3_down_d4+FHhop_2h4_down_d4+FHonsite_1_d4+FHonsite_2_d4+FHonsite_3_d4+FHonsite_4_d4',
+            # 'FHhop_1h2_down_d4+FHhop_1h2_up_d4+FHhop_1h3_down_d4+FHhop_2h4_down_d4+FHonsite_1_d4+FHonsite_2_d4+FHonsite_3_d4+FHonsite_4_d4',
         ]
         self.max_num_sites = 4
         if self.true_operator not in self.initial_models:

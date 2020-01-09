@@ -28,20 +28,19 @@ class ising_chain_probabilistic(
             **kwargs
         )
 
-        self.lattice_dimension = 1
+        self.lattice_dimension = 2
         self.initial_num_sites = 2
-        self.lattice_connectivity_max_distance = 1
+        self.lattice_connectivity_max_distance = 2
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
 
-        # self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4PPPPpauliSet_z_1_d4PPPPpauliSet_z_2_d4PPPPpauliSet_z_3_d4PPPPpauliSet_z_4_d4'
-        self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4PPPPtransverse_x_d4'
-        # self.true_operator = 'transverse_x_d4'
+        # self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4PPPPtransverse_x_d4'
+        self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_zJz_2J4_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
-            'x', 
-            'y', 
+            # 'x', 
+            # 'y', 
             'z'
         ]
         # fitness calculation parameters. fitness calculation inherited.
@@ -50,7 +49,7 @@ class ising_chain_probabilistic(
         self.fitness_win_ratio_exponent = 3
 
         self.generation_DAG = 1
-        self.max_num_sites = 4
+        self.max_num_sites = 6
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10
         self.max_num_models_by_shape = {
