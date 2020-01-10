@@ -44,7 +44,8 @@ class heisenberg_xyz_probabilistic(
         self.true_operator_partially_connected = 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_zJz_d3'
         self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_yJy_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_zJz_3J4_d4'
-        self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_yJy_1J3_d4PPPPpauliSet_xJx_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_yJy_3J4_d4'
+        # self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_ZJZy_1J3_d4PPPPpauliSet_xJx_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_yJy_3J4_d4'
+        self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_yJy_2J4_d4'
         self.max_num_sites = 4
         self.true_operator = self.true_operator_partially_connected
         self.true_operator = DataBase.alph(self.true_operator)
@@ -52,7 +53,7 @@ class heisenberg_xyz_probabilistic(
         self.base_terms = [
             'x', 
             'y', 
-            # 'z'
+            'z'
         ]
         # fitness calculation parameters. fitness calculation inherited.
         self.num_top_models_to_build_on = 'all' # 'all' # at each generation Badassness parameter
