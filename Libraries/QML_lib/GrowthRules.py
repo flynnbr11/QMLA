@@ -24,6 +24,7 @@ import HeisenbergXYZ
 import FermiHubbard
 import BasicLindbladian
 import ExampleGrowthRule
+import Genetic
 
 growth_classes = {
     # Experimental paper growth rules
@@ -66,7 +67,9 @@ growth_classes = {
     'example' : 
         ExampleGrowthRule.example_growth,
     'presentation' : 
-        PresentationPlotGeneration.presentation_plot_generation
+        PresentationPlotGeneration.presentation_plot_generation,
+    'genetic' : 
+        Genetic.genetic_algorithm
 }
 
 

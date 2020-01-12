@@ -45,7 +45,7 @@ class heisenberg_xyz_probabilistic(
         self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_yJy_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_zJz_3J4_d4'
         # self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_ZJZy_1J3_d4PPPPpauliSet_xJx_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_yJy_3J4_d4'
-        self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_yJy_2J4_d4'
+        self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_2J4_d4'
         self.max_num_sites = 4
         self.true_operator = self.true_operator_partially_connected
         self.true_operator = DataBase.alph(self.true_operator)

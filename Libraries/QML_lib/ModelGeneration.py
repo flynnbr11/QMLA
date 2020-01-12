@@ -109,7 +109,7 @@ def process_multipauli_term(term):
     }
 
     full_mod_str = ModelNames.full_model_string(term_dict)
-    print("Getting full matrix corresponding to:", full_mod_str)
+    # print("Getting full matrix corresponding to:", full_mod_str)
     return DataBase.compute(full_mod_str)
 
 def process_n_qubit_NV_centre_spin(term): 
