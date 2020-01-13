@@ -999,8 +999,10 @@ class QMD():
 
         self.log_print(
             [
-            "branch", branchID,
-            "precomputed:", self.BranchPrecomputedModels[branchID]
+                "branch {} precomputed:".format(
+                    branchID, 
+                    self.BranchPrecomputedModels[branchID]
+                ) 
             ]
         )
         if len(unlearned_models_this_branch) == 0:
