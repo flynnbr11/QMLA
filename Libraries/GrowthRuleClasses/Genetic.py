@@ -46,16 +46,17 @@ class genetic_algorithm(
         self.true_operator = 'pauliSet_xJx_1J2_d4+pauliSet_yJy_1J2_d4+pauliSet_yJy_2J3_d4+pauliSet_zJz_1J3_d4+pauliSet_yJy_1J4_d4'
         # self.true_operator = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        self.initial_num_models = 10
+        self.initial_num_models = 7
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models = self.initial_num_models
         )
-        self.max_spawn_depth = 4
+        self.max_spawn_depth = 8
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
             4 : self.initial_num_models * self.max_spawn_depth, 
             'other' : 0
         }
+        self.num_processes_to_parallelise_over = 10
 
 
     def generate_models(
