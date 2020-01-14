@@ -53,7 +53,7 @@ class heisenberg_xyz_probabilistic(
         self.qhl_models = [self.true_operator]
         self.base_terms = [
             'x', 
-            # 'y', 
+            'y', 
             'z'
         ]
         self.max_time_to_consider = 5
