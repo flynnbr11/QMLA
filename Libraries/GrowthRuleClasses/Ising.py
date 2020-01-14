@@ -47,6 +47,7 @@ class ising_chain_probabilistic(
         self.num_top_models_to_build_on = 1 # 'all' # at each generation Badassness parameter
         self.model_generation_strictness = 0 #1 #-1 
         self.fitness_win_ratio_exponent = 1
+        self.max_time_to_consider = 5
 
         self.generation_DAG = 1
         self.max_num_sites = 6

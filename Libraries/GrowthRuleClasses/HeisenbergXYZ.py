@@ -46,16 +46,17 @@ class heisenberg_xyz_probabilistic(
         self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_yJy_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_zJz_3J4_d4'
         # self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_ZJZy_1J3_d4PPPPpauliSet_xJx_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_yJy_3J4_d4'
         self.true_operator_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_2J4_d4'
-        self.three_site_chain_xxz = 'pauliSet_xJx_1J2_d3PPPpauliSet_zJz_1J2_d3PPPpauliSet_xJx_2J3_d3'
+        self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3'
         self.max_num_sites = 3
         self.true_operator = self.three_site_chain_xxz
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
             'x', 
-            # 'y', 
+            'y', 
             'z'
         ]
+        self.max_time_to_consider = 5
         # fitness calculation parameters. fitness calculation inherited.
         self.num_top_models_to_build_on = 2 #'all' # 'all' # at each generation Badassness parameter
         self.model_generation_strictness = 0 #1 #-1 

@@ -43,7 +43,8 @@ class genetic_algorithm(
             mutation_probability = self.mutation_probability
         )
 
-        self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4'
+        # self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4'
+        self.true_operator = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
         self.true_operator = DataBase.alph(self.true_operator)
         self.true_chromosome = self.genetic_algorithm.map_model_to_chromosome(
             self.true_operator
@@ -72,7 +73,7 @@ class genetic_algorithm(
         }
         self.fitness_at_step = {}
 
-        self.max_spawn_depth = 10
+        self.max_spawn_depth = 25
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
             4 : self.initial_num_models * self.max_spawn_depth, 

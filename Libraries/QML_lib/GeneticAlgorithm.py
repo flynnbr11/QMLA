@@ -49,6 +49,7 @@ class GeneticAlgorithmQMLA():
         self.chromosome_description_array = np.array(self.chromosome_description)
         self.basic_chromosome = np.array(basic_chromosome)
         self.num_terms = len(self.basic_chromosome)
+        # print("Chromosome definition:", self.chromosome_description_array)
 #         binary_combinations = list(itertools.product([0,1], repeat=self.num_terms))
 #         binary_combinations = [list(b) for b in binary_combinations]        
 #         self.possible_chromosomes = np.array(binary_combinations)
@@ -103,7 +104,16 @@ class GeneticAlgorithmQMLA():
         chromosome_locations = []
         for term in terms:
             components = term.split('_')
-            components.remove('pauliSet')
+            try:
+                components.remove('pauliSet')
+            except:
+                print(
+                    "[GA - map model to chromosome] \
+                    Cannot remove pauliSet from components:", 
+                    components,
+                    "\n Model:", model
+                )
+                raise
             core_operators = list(sorted(DataBase.core_operator_dict.keys()))
             for l in components:
                 if l[0] == 'd':
@@ -137,7 +147,7 @@ class GeneticAlgorithmQMLA():
         new_models = []
         
         while len(new_models) < num_models:
-            r = random.randint(0, 2**self.num_terms)
+            r = random.randint(1, 2**self.num_terms)
             r = format(r, '0{}b'.format(self.num_terms))
             
             if self.chromosome_string(r) not in self.previously_considered_chromosomes:

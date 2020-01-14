@@ -3166,6 +3166,15 @@ class QMD():
             ]
         )
 
+        if self.ChampionName == DataBase.alph(self.TrueOpName):
+            self.log_print(
+                [
+                    "True model found: {}".format(
+                        DataBase.alph(self.TrueOpName)
+                    )
+                ]
+            )
+
         self.finaliseQMD()
 
 
