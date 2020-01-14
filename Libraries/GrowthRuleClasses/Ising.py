@@ -28,14 +28,14 @@ class ising_chain_probabilistic(
             **kwargs
         )
 
-        self.lattice_dimension = 2
+        self.lattice_dimension = 1
         self.initial_num_sites = 2
-        self.lattice_connectivity_max_distance = 2
+        self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
 
-        # self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4PPPPtransverse_x_d4'
-        self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_zJz_2J4_d4PPPPpauliSet_zJz_3J4_d4'
+        # self.true_operator = 'pauliSet_zJz_1J2_d3PPPpauliSet_xJx_1J3_d3PPPpauliSet_zJz_2J3_d3PPPpauliSet_yJy_1J2_d3'
+        self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
@@ -44,7 +44,7 @@ class ising_chain_probabilistic(
             'z'
         ]
         # fitness calculation parameters. fitness calculation inherited.
-        self.num_top_models_to_build_on = 2 # 'all' # at each generation Badassness parameter
+        self.num_top_models_to_build_on = 1 # 'all' # at each generation Badassness parameter
         self.model_generation_strictness = 0 #1 #-1 
         self.fitness_win_ratio_exponent = 1
 

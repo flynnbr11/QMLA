@@ -31,7 +31,7 @@ class genetic_algorithm(
             **kwargs
         )
 
-        self.num_sites = 4
+        self.num_sites = 3
         self.base_terms = [
             'x', 'y', 'z'
         ]
@@ -43,19 +43,45 @@ class genetic_algorithm(
             mutation_probability = self.mutation_probability
         )
 
-        self.true_operator = 'pauliSet_xJx_1J2_d4+pauliSet_yJy_1J2_d4+pauliSet_yJy_2J3_d4+pauliSet_zJz_1J3_d4+pauliSet_yJy_1J4_d4'
+        self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4'
+        self.true_operator = DataBase.alph(self.true_operator)
+        self.true_chromosome = self.genetic_algorithm.map_model_to_chromosome(
+            self.true_operator
+        )
+        self.true_chromosome_string = self.genetic_algorithm.chromosome_string(
+            self.true_chromosome
+        )
         # self.true_operator = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        self.initial_num_models = 7
+        self.initial_num_models = 6
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models = self.initial_num_models
         )
-        self.max_spawn_depth = 8
+        self.hamming_distance_by_generation_step = {
+            0 : [
+                hamming_distance(
+                    self.true_chromosome_string, 
+                    self.genetic_algorithm.chromosome_string(
+                        self.genetic_algorithm.map_model_to_chromosome(
+                            mod
+                        )
+                    )
+                )
+                for mod in self.initial_models                
+            ]        
+        }
+        self.fitness_at_step = {}
+
+        self.max_spawn_depth = 10
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
             4 : self.initial_num_models * self.max_spawn_depth, 
             'other' : 0
         }
+        
+        self.max_time_to_consider = 5
+        self.min_param = 0.499
+        self.max_param = 0.501
         self.num_processes_to_parallelise_over = 10
 
 
@@ -68,6 +94,7 @@ class genetic_algorithm(
         model_points = kwargs['branch_model_points']
         # print("Model points:", model_points)
         # print("kwargs: ", kwargs)
+        self.fitness_at_step[kwargs['spawn_step']] = model_points
         model_fitnesses = {}
         for m in list(model_points.keys()):
             mod = kwargs['model_names_ids'][m]
@@ -78,6 +105,19 @@ class genetic_algorithm(
             model_fitnesses = model_fitnesses,
             num_pairs_to_sample = self.initial_num_models
         )
+
+        hamming_distances = [
+            hamming_distance(
+                self.true_chromosome_string, 
+                self.genetic_algorithm.chromosome_string(
+                    self.genetic_algorithm.map_model_to_chromosome(
+                        mod
+                    )
+                )
+            )
+            for mod in new_models
+        ]
+        self.hamming_distance_by_generation_step[kwargs['spawn_step']] = hamming_distances
 
         return new_models
 
@@ -144,3 +184,5 @@ class genetic_algorithm(
 
 
 
+def hamming_distance(str1, str2):
+    return sum(c1 != c2 for c1, c2 in zip(str1, str2))

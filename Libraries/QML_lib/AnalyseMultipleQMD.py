@@ -334,7 +334,8 @@ median_coeff_determination = model_score_results['avg_coeff_determination']
 f_scores = model_score_results['f_scores']
 latex_coeff_det = model_score_results['latex_coeff_det']
 
-arguments.top_number_models = len(model_scores.keys())
+# arguments.top_number_models = len(model_scores.keys())
+arguments.top_number_models = 4
 print("Changed top # models to:", arguments.top_number_models)
 # print("Avg coeff if determination", avg_coeff_determination)
 print("Average param estimates")

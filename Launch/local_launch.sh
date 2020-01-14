@@ -18,7 +18,7 @@ q_id=0 # can start from other ID if desired
 # QHL parameters
 ### --------------------------------------------------###
 prt=10
-exp=3
+exp=10
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -77,10 +77,10 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='ising_probabilistic'
 # sim_growth_rule='ising_predetermined'
 # sim_growth_rule='heisenberg_xyz_predetermined'
-# sim_growth_rule='heisenberg_xyz_probabilistic'
+sim_growth_rule='heisenberg_xyz_probabilistic'
 # sim_growth_rule='fermi_hubbard_predetermined'
 # sim_growth_rule='fermi_hubbard_probabilistic'
-sim_growth_rule='genetic'
+# sim_growth_rule='genetic'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1

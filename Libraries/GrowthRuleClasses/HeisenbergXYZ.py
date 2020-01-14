@@ -32,7 +32,7 @@ class heisenberg_xyz_probabilistic(
         self.min_param = 0
         self.max_param = 10
         
-        self.lattice_dimension = 2
+        self.lattice_dimension = 1
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
@@ -45,18 +45,19 @@ class heisenberg_xyz_probabilistic(
         self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_yJy_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_zJz_3J4_d4'
         # self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_ZJZy_1J3_d4PPPPpauliSet_xJx_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_yJy_3J4_d4'
-        self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_2J4_d4'
-        self.max_num_sites = 4
-        self.true_operator = self.true_operator_partially_connected
+        self.true_operator_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_2J4_d4'
+        self.three_site_chain_xxz = 'pauliSet_xJx_1J2_d3PPPpauliSet_zJz_1J2_d3PPPpauliSet_xJx_2J3_d3'
+        self.max_num_sites = 3
+        self.true_operator = self.three_site_chain_xxz
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
             'x', 
-            'y', 
+            # 'y', 
             'z'
         ]
         # fitness calculation parameters. fitness calculation inherited.
-        self.num_top_models_to_build_on = 'all' # 'all' # at each generation Badassness parameter
+        self.num_top_models_to_build_on = 2 #'all' # 'all' # at each generation Badassness parameter
         self.model_generation_strictness = 0 #1 #-1 
         self.fitness_win_ratio_exponent = 1
 

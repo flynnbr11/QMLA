@@ -493,7 +493,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                         [
                             "[likelihood] failure to compute pr0",
                             "probe:", probe, 
-                            "\n oplist:", oplist
+                            "\n oplist:", operators
                         ]
                     )
                     print_file_line(debug_print_file_line)

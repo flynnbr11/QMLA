@@ -243,7 +243,7 @@ class GeneticAlgorithmQMLA():
         for c in copy_chromosomes:
             if np.random.rand() < self.mutation_probability:
                 idx = np.random.choice(range(len(c)))
-                print("Flipping idx {}".format(idx))
+                # print("Flipping idx {}".format(idx))
                 if c[idx] == 0 :
                     c[idx] = 1
                 elif c[idx] == 1:
