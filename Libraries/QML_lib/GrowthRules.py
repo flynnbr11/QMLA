@@ -1,3 +1,10 @@
+import sys
+import os
+
+this_dir = str(os.path.dirname(os.path.realpath(__file__)))
+# sys.path.append((os.path.join(this_dir, "GrowthRuleClasses")))
+sys.path.append(os.path.join(".."))
+sys.path.append(os.path.join(this_dir, "..", "GrowthRuleClasses"))
 import Genetic
 import ExampleGrowthRule
 import BasicLindbladian
@@ -17,13 +24,7 @@ import NVCentreFullAccess
 import NVExperimentVaryTrueModel
 import NVCentreExperimentGrowthRules
 import SuperClassGrowthRule
-import sys
-import os
 
-this_dir = str(os.path.dirname(os.path.realpath(__file__)))
-# sys.path.append((os.path.join(this_dir, "GrowthRuleClasses")))
-sys.path.append(os.path.join(".."))
-sys.path.append(os.path.join(this_dir, "..", "GrowthRuleClasses"))
 
 
 growth_classes = {

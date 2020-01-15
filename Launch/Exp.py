@@ -1,24 +1,9 @@
 from __future__ import print_function  # so print doesn't show brackets
-import ModelGeneration
-import DataBase
-import matplotlib.pyplot as plt
-import UserFunctions
-import ExpectationValues
-import Evo
-import QML
-from QMD import QMD  # QMD class in Library
-import ExperimentalDataFunctions as expdt
-import Evo as evo
-import RedisSettings as rds
-import GlobalVariables
 import os as os
-
 import warnings
-# warnings.filterwarnings("ignore")
-
 import numpy as np
 import itertools as itr
-
+import matplotlib.pyplot as plt
 import sys as sys
 import pandas as pd
 import warnings
@@ -26,13 +11,20 @@ import time as time
 import random
 import pickle
 pickle.HIGHEST_PROTOCOL = 2
+
+# import ModelGeneration
 sys.path.append(os.path.join("..", "Libraries", "QML_lib"))
+import DataBase
+# import ExpectationValues
+# import QML
+from QuantumModelLearningAgent import QuantumModelLearningAgent  # QMD class in Library
+import RedisSettings as rds
+import GlobalVariables
+
 
 # Parse input variables to use in QMD; store in class global_variables.
 global_variables = GlobalVariables.parse_cmd_line_args(sys.argv[1:])
 growth_class = global_variables.growth_class
-
-#from pympler import asizeof
 
 ###  START QMD ###
 start = time.time()
@@ -82,13 +74,8 @@ qle = global_variables.do_qle  # True for QLE, False for IQLE
 
 growth_class.generate_probes(
     experimental_data=global_variables.use_experimental_data,
-    # growth_generator = global_variables.growth_generation_rule,
-    # special_probe = global_variables.special_probe,
     noise_level=global_variables.probe_noise_level,
     minimum_tolerable_noise=0.0,
-    # noise_level = 0.0,
-    # minimum_tolerable_noise = 1e-7, # to match dec_14/09_55 run # TODO remove!!!
-    # num_probes = global_variables.num_probes
 )
 
 system_probes = growth_class.system_probes
@@ -273,32 +260,6 @@ else:
     true_expec_values = pickle.load(
         open(true_expectation_value_path, 'rb')
     )
-# log_print(
-#     ["True params:", true_params],
-#     log_file
-# )
-
-# if global_variables.custom_prior:
-#     prior_data = pickle.load(
-#         open(
-#             global_variables.prior_pickle_file,
-#             'rb'
-#         )
-#     )
-#     prior_specific_terms = prior_data['specific_terms']
-
-# else:
-#     prior_specific_terms = {}
-
-
-# log_print(
-#     [
-#         "Prior specific terms:",
-#         prior_specific_terms
-#     ],
-#     log_file
-# )
-
 
 model_priors = None
 
@@ -371,7 +332,7 @@ log_print(
 
 )
 
-qmd = QMD(
+qmd = QuantumModelLearningAgent(
     global_variables=global_variables,
     initial_op_list=initial_op_list,
     generator_list=generators,

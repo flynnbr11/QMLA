@@ -1,3 +1,8 @@
+import numpy as np
+import itertools
+import sys
+import os
+sys.path.append(os.path.abspath('..'))
 import SuperClassGrowthRule
 import Heuristics
 import SystemTopology
@@ -5,11 +10,6 @@ import ModelGeneration
 import ModelNames
 import ProbeGeneration
 import DataBase
-import numpy as np
-import itertools
-import sys
-import os
-sys.path.append(os.path.abspath('..'))
 
 
 # flatten list of lists
@@ -61,7 +61,6 @@ class connected_lattice(
         self.max_num_models_by_shape = {
             'other': 10
         }
-
         self.setup_growth_class()
 
     def setup_growth_class(self):
@@ -144,7 +143,9 @@ class connected_lattice(
                 models_to_build_on = ranked_model_list
             else:
                 models_to_build_on = ranked_model_list[:
-                                                       self.num_top_models_to_build_on]
+                    self.num_top_models_to_build_on
+                ]
+
 
             self.sub_generation_idx += 1
             self.generation_champs[self.generation_DAG][self.sub_generation_idx] = [
@@ -234,6 +235,13 @@ class connected_lattice(
         # models_to_build_on = [
         #     kwargs['model_names_ids'][mod_id] for mod_id in models_to_build_on
         # ]
+        self.log_print(
+            [
+                "[Greedy add terms] models to build on {}".format(
+                    models_to_build_on
+                )
+            ]
+        )
         new_models = []
         for mod_id in models_to_build_on:
             mod_name = model_names_ids[mod_id]

@@ -1,12 +1,11 @@
+import sys
+import os
+sys.path.append(os.path.abspath('..'))
 import Distributions
 import Heuristics
 import ProbeGeneration
 import ExpectationValues
 import DataBase
-import sys
-import os
-sys.path.append(os.path.abspath('..'))
-# import Heuristics
 
 
 class growth_rule_super_class():

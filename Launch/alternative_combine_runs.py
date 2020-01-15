@@ -1,4 +1,3 @@
-import GrowthRules
 import glob
 import numpy as np
 import pandas as pd
@@ -9,6 +8,7 @@ import sys
 sys.path.append(
     os.path.join("..", "Libraries", "QML_lib")
 )
+import GrowthRules
 
 results_directory = str(
     os.getcwd() + '/Results/'

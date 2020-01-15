@@ -220,7 +220,6 @@ class GlobalVariablesClass():
         self.port_number = arguments.port_number
 #        self.results_directory = 'Results/'+results_directory
         self.results_directory = arguments.results_directory
-
         self.rq_timeout = arguments.rq_timeout
 
         # self.save_plots = bool(arguments.save_plots)
@@ -241,6 +240,9 @@ class GlobalVariablesClass():
             arguments.bayes_factors_use_all_exp_times)
         # self.num_probes = arguments.num_probes
         self.num_probes = self.growth_class.num_probes
+        self.num_top_models_to_generate_from = (
+            self.growth_class.num_top_models_to_build_on    
+        )
 
         self.probe_noise_level = arguments.probe_noise_level
         self.updater_from_prior = bool(arguments.updater_from_prior)

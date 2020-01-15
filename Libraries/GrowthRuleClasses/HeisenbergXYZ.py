@@ -1,3 +1,8 @@
+import numpy as np
+import itertools
+import sys
+import os
+sys.path.append(os.path.abspath('..'))
 import ConnectedLattice
 import SuperClassGrowthRule
 import Heuristics
@@ -6,11 +11,6 @@ import ModelGeneration
 import ModelNames
 import ProbeGeneration
 import DataBase
-import numpy as np
-import itertools
-import sys
-import os
-sys.path.append(os.path.abspath('..'))
 
 
 class heisenberg_xyz_probabilistic(
@@ -58,7 +58,7 @@ class heisenberg_xyz_probabilistic(
         self.max_time_to_consider = 5
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # 'all' # at each generation Badassness parameter
-        self.num_top_models_to_build_on = 2
+        self.num_top_models_to_build_on = 3
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
 

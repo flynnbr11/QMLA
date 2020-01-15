@@ -2,7 +2,6 @@ from matplotlib.gridspec import GridSpec
 import Evo
 from matplotlib import cm
 import GrowthRules
-import UserFunctions
 import ModelNames
 import ExperimentalDataFunctions as expdt
 import ExpectationValues
