@@ -1,65 +1,64 @@
-import sys, os
+import GrowthRules
+import ModelNames
+import PlotQMD as ptq
+import DataBase
+import numpy as np
+import argparse
+from matplotlib.lines import Line2D
+import sys
+import os
 import pickle
 import matplotlib.pyplot as plt
 import pandas
 plt.switch_backend('agg')
-from matplotlib.lines import Line2D
 
-import argparse
-import numpy as np
 
-import DataBase
-import PlotQMD as ptq
-import ModelNames
-# import UserFunctions 
-import GrowthRules
+# import UserFunctions
 
 global test_growth_class_implementation
 test_growth_class_implementation = True
 
 
-
-
 parser = argparse.ArgumentParser(description='Pass variables for (I)QLE.')
 
 # Add parser arguments, ie command line arguments for QMD
-## QMD parameters -- fundamentals such as number of particles etc
+# QMD parameters -- fundamentals such as number of particles etc
 parser.add_argument(
-    '-dir', '--results_directory', 
+    '-dir', '--results_directory',
     help="Directory where results of multiple QMD are held.",
     type=str,
     default=os.getcwd()
 )
 
 parser.add_argument(
-    '-bcsv', '--bayes_csv', 
+    '-bcsv', '--bayes_csv',
     help="CSV given to QMD to store all Bayes factors computed.",
     type=str,
     default=os.getcwd()
 )
 
 parser.add_argument(
-    '-top', '--top_number_models', 
+    '-top', '--top_number_models',
     help="N, for top N models by number of QMD wins.",
     type=int,
     default=3
 )
 
 parser.add_argument(
-    '-qhl', '--qhl_mode', 
+    '-qhl', '--qhl_mode',
     help="Whether QMD is being used in QHL mode.",
     type=int,
     default=0
 )
 
 parser.add_argument(
-    '-fqhl', '--further_qhl_mode', 
+    '-fqhl', '--further_qhl_mode',
     help="Whether in further QHL stage.",
     type=int,
     default=0
 )
 # parser.add_argument(
-#     '-data', '--dataset', 
+#     '-data', '--dataset',
 #     help="Which dataset QMD was run using..",
 #     type=str,
 #     default='NVB_dataset'
@@ -110,19 +109,17 @@ parser.add_argument(
     default=None
 )
 parser.add_argument(
-  '-plot_probes', '--plot_probe_file', 
-  help="File to pickle probes against which to plot expectation values.",
-  type=str,
-  default=None
+    '-plot_probes', '--plot_probe_file',
+    help="File to pickle probes against which to plot expectation values.",
+    type=str,
+    default=None
 )
 parser.add_argument(
-  '-plus', '--force_plus_probe', 
-  help="Whether to enforce plots to use |+>^n as probe.",
-  type=int,
-  default=0
+    '-plus', '--force_plus_probe',
+    help="Whether to enforce plots to use |+>^n as probe.",
+    type=int,
+    default=0
 )
-
-
 
 
 arguments = parser.parse_args()
@@ -142,43 +139,43 @@ plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
 
 results_csv_name = '/summary_results.csv'
-results_csv = directory_to_analyse+results_csv_name
+results_csv = directory_to_analyse + results_csv_name
 
 
 def plot_tree_multi_QMD(
-        results_csv, 
-        all_bayes_csv, 
-        latex_mapping_file,
-        avg_type='medians',
-        growth_generator=None,
-        entropy=None, 
-        inf_gain=None, 
-        save_to_file=None
-    ):
+    results_csv,
+    all_bayes_csv,
+    latex_mapping_file,
+    avg_type='medians',
+    growth_generator=None,
+    entropy=None,
+    inf_gain=None,
+    save_to_file=None
+):
     qmd_res = pandas.DataFrame.from_csv(
-        results_csv, 
+        results_csv,
         index_col='LatexName'
     )
     mods = list(qmd_res.index)
     winning_count = {}
     for mod in mods:
-        winning_count[mod]=mods.count(mod)
+        winning_count[mod] = mods.count(mod)
 
     ptq.cumulativeQMDTreePlot(
-        cumulative_csv=all_bayes_csv, 
+        cumulative_csv=all_bayes_csv,
         wins_per_mod=winning_count,
-        latex_mapping_file=latex_mapping_file, 
+        latex_mapping_file=latex_mapping_file,
         growth_generator=growth_generator,
-        only_adjacent_branches=True, 
+        only_adjacent_branches=True,
         avg=avg_type, entropy=entropy, inf_gain=inf_gain,
         save_to_file=save_to_file
-    )        
+    )
 
 
 # plot_tree_multi_QMD(
-#     results_csv = results_csv, 
-#     latex_mapping_file=latex_mapping_file, 
-#     all_bayes_csv = all_bayes_csv, 
+#     results_csv = results_csv,
+#     latex_mapping_file=latex_mapping_file,
+#     all_bayes_csv = all_bayes_csv,
 #     growth_generator=growth_generator,
 #     avg_type='means',
 #     entropy = None,
@@ -193,12 +190,12 @@ sys.stdout = open(
 )
 
 plot_tree_multi_QMD(
-    results_csv = results_csv, 
-    latex_mapping_file=latex_mapping_file, 
-    avg_type='medians', 
-    all_bayes_csv = all_bayes_csv, 
+    results_csv=results_csv,
+    latex_mapping_file=latex_mapping_file,
+    avg_type='medians',
+    all_bayes_csv=all_bayes_csv,
     growth_generator=growth_generator,
-    entropy = None,
-    inf_gain = None,
+    entropy=None,
+    inf_gain=None,
     save_to_file='multiQMD_tree_median_bayes_factors.png'
 )

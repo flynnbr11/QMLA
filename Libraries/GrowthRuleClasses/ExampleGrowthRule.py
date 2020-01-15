@@ -1,13 +1,14 @@
-import sys, os
-sys.path.append(os.path.abspath('..'))
-import DataBase
-import ExpectationValues
-import ProbeGeneration
-
 import SuperClassGrowthRule
+import ProbeGeneration
+import ExpectationValues
+import DataBase
+import sys
+import os
+sys.path.append(os.path.abspath('..'))
+
 
 class example_growth(
-    SuperClassGrowthRule.growth_rule_super_class # inherit from this
+    SuperClassGrowthRule.growth_rule_super_class  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
@@ -21,7 +22,7 @@ class example_growth(
         import Heuristics
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         self.initial_models = ['pauliSet_xJx_1J2_d2']
@@ -34,14 +35,14 @@ class example_growth(
         }
         self.spawn_stage = [None]
 
-
     def generate_models(
         self,
         model_list,
         **kwargs
     ):
-        # default is to just return given model list and set spawn stage to complete
-        if self.spawn_stage[-1] == None:
+        # default is to just return given model list and set spawn stage to
+        # complete
+        if self.spawn_stage[-1] is None:
             new_models = [
                 'pauliSet_yJy_1J2_d2'
             ]
@@ -52,8 +53,6 @@ class example_growth(
             ]
             self.spawn_stage.append('Complete')
         return new_models
-
-
 
     def check_tree_completed(
         self,

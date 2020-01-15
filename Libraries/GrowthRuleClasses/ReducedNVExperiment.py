@@ -1,18 +1,19 @@
-import sys, os
+import NVCentreFullAccess
+import sys
+import os
 sys.path.append(os.path.abspath('..'))
 
-import NVCentreFullAccess
 
 class reduced_nv_experiment(
     NVCentreFullAccess.nv_centre_spin_full_access
 ):
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         self.max_num_parameter_estimate = 9
@@ -20,34 +21,29 @@ class reduced_nv_experiment(
         self.max_num_qubits = 2
 
         self.initial_models = [
-            'xTiPPxTxPPyTiPPyTyPPzTi', 
+            'xTiPPxTxPPyTiPPyTyPPzTi',
             'xTiPPxTxPPyTiPPzTiPPzTz',
-            'xTiPPyTiPPyTyPPzTiPPzTz' 
+            'xTiPPyTiPPyTyPPzTiPPzTz'
         ]
 
         self.max_num_models_by_shape = {
-            2 : 7, 
-            'other' : 0
+            2: 7,
+            'other': 0
         }
 
-
-
         self.overwrite_growth_class_methods(
-            **kwargs    
+            **kwargs
         )
 
-
     def generate_models(
-        self, 
-        model_list, 
+        self,
+        model_list,
         **kwargs
     ):
         import ModelGeneration
 
         new_mods = ModelGeneration.reduced_nv_experimental_method(
-            model_list, 
+            model_list,
             **kwargs
         )
         return new_mods
-
-

@@ -1,27 +1,27 @@
-import sys, os
-sys.path.append(os.path.abspath('..'))
-import random
-
-import DataBase
-import ExpectationValues
-import ProbeGeneration
-
 import NVCentreExperimentGrowthRules
+import ProbeGeneration
+import ExpectationValues
+import DataBase
+import random
+import sys
+import os
+sys.path.append(os.path.abspath('..'))
+
 
 class nv_centre_spin_experimental_method_varying_true_model(
-    NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method # inherit from this
+    NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
     # but uses an expectation value which traces out
 
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         self.max_time_to_consider
@@ -36,61 +36,61 @@ class nv_centre_spin_experimental_method_varying_true_model(
         self.max_param = 10
 
 
-
 class nv_centre_spin_experimental_method_varying_true_model_3_params(
-    nv_centre_spin_experimental_method_varying_true_model # inherit from this
+    nv_centre_spin_experimental_method_varying_true_model  # inherit from this
 ):
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         self.true_operator = 'xTiPPyTiPPzTi'
 
+
 class nv_centre_spin_experimental_method_varying_true_model_5_params(
-    nv_centre_spin_experimental_method_varying_true_model # inherit from this
+    nv_centre_spin_experimental_method_varying_true_model  # inherit from this
 ):
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTi'
 
+
 class nv_centre_spin_experimental_method_varying_true_model_6_params(
-    nv_centre_spin_experimental_method_varying_true_model # inherit from this
+    nv_centre_spin_experimental_method_varying_true_model  # inherit from this
 ):
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
 
+
 class nv_centre_spin_experimental_method_varying_true_model_7_params(
-    nv_centre_spin_experimental_method_varying_true_model # inherit from this
+    nv_centre_spin_experimental_method_varying_true_model  # inherit from this
 ):
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         self.true_operator = 'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz'
-
-

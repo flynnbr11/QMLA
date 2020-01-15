@@ -1,46 +1,48 @@
+import SuperClassGrowthRule
+import GeneticAlgorithm
+import Heuristics
+import SystemTopology
+import ModelGeneration
+import ModelNames
+import ProbeGeneration
+import DataBase
 import numpy as np
 import itertools
-import sys, os
+import sys
+import os
 import random
 sys.path.append(os.path.abspath('..'))
-import DataBase
-import ProbeGeneration
-import ModelNames
-import ModelGeneration
-import SystemTopology
-import Heuristics
-import GeneticAlgorithm
 
-import SuperClassGrowthRule
 
-flatten = lambda l: [item for sublist in l for item in sublist]  # flatten list of lists
+# flatten list of lists
+def flatten(l): return [item for sublist in l for item in sublist]
 
 
 class genetic_algorithm(
-    SuperClassGrowthRule.growth_rule_super_class    
+    SuperClassGrowthRule.growth_rule_super_class
 ):
 
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
 
         self.num_sites = 4
         self.base_terms = [
-             'x', 'y', #'z'
+            'x', 'y',  # 'z'
         ]
         self.mutation_probability = 0.1
 
         self.genetic_algorithm = GeneticAlgorithm.GeneticAlgorithmQMLA(
-            num_sites = self.num_sites, 
-            base_terms = self.base_terms, 
-            mutation_probability = self.mutation_probability
+            num_sites=self.num_sites,
+            base_terms=self.base_terms,
+            mutation_probability=self.mutation_probability
         )
 
         # self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
@@ -57,39 +59,38 @@ class genetic_algorithm(
         self.max_num_probe_qubits = self.num_sites
         self.initial_num_models = 10
         self.initial_models = self.genetic_algorithm.random_initial_models(
-            num_models = self.initial_num_models
+            num_models=self.initial_num_models
         )
         self.hamming_distance_by_generation_step = {
-            0 : [
+            0: [
                 hamming_distance(
-                    self.true_chromosome_string, 
+                    self.true_chromosome_string,
                     self.genetic_algorithm.chromosome_string(
                         self.genetic_algorithm.map_model_to_chromosome(
                             mod
                         )
                     )
                 )
-                for mod in self.initial_models                
-            ]        
+                for mod in self.initial_models
+            ]
         }
         self.fitness_at_step = {}
 
         self.max_spawn_depth = 100
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
-            4 : self.initial_num_models * self.max_spawn_depth, 
-            'other' : 0
+            4: self.initial_num_models * self.max_spawn_depth,
+            'other': 0
         }
-        
+
         self.max_time_to_consider = 5
         self.min_param = 0.499
         self.max_param = 0.501
         self.num_processes_to_parallelise_over = 10
 
-
     def generate_models(
-        self, 
-        model_list, 
+        self,
+        model_list,
         **kwargs
     ):
         # print("[Genetic] Calling generate_models")
@@ -109,13 +110,13 @@ class genetic_algorithm(
 
         # print("Model fitnesses:", model_fitnesses)
         new_models = self.genetic_algorithm.genetic_algorithm_step(
-            model_fitnesses = model_fitnesses,
-            num_pairs_to_sample = self.initial_num_models/2
+            model_fitnesses=model_fitnesses,
+            num_pairs_to_sample=self.initial_num_models / 2
         )
 
         hamming_distances = [
             hamming_distance(
-                self.true_chromosome_string, 
+                self.true_chromosome_string,
                 self.genetic_algorithm.chromosome_string(
                     self.genetic_algorithm.map_model_to_chromosome(
                         mod
@@ -124,24 +125,25 @@ class genetic_algorithm(
             )
             for mod in new_models
         ]
-        self.hamming_distance_by_generation_step[kwargs['spawn_step']] = hamming_distances
+        self.hamming_distance_by_generation_step[kwargs['spawn_step']
+                                                 ] = hamming_distances
 
         return new_models
 
     def latex_name(
-        self, 
-        name, 
+        self,
+        name,
         **kwargs
     ):
         # print("[latex name fnc] name:", name)
         core_operators = list(sorted(DataBase.core_operator_dict.keys()))
         num_sites = DataBase.get_num_qubits(name)
-        p_str = 'P'*num_sites
+        p_str = 'P' * num_sites
         p_str = '+'
         separate_terms = name.split(p_str)
 
         site_connections = {}
-        for c in list(itertools.combinations(list(range(num_sites+1)), 2)):
+        for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):
             site_connections[c] = []
 
         term_type_markers = ['pauliSet', 'transverse']
@@ -159,7 +161,8 @@ class genetic_algorithm(
                     else:
                         sites = l.split('J')
                 sites = tuple([int(a) for a in sites])
-                op = operators[0] # assumes like-like pauli terms like xx, yy, zz
+                # assumes like-like pauli terms like xx, yy, zz
+                op = operators[0]
                 site_connections[sites].append(op)
             elif 'transverse' in components:
                 components.remove('transverse')
@@ -169,13 +172,12 @@ class genetic_algorithm(
                     elif l in core_operators:
                         transverse_axis = l
 
-
         ordered_connections = list(sorted(site_connections.keys()))
         latex_term = ""
 
         for c in ordered_connections:
             if len(site_connections[c]) > 0:
-                this_term = "\sigma_{"
+                this_term = r"\sigma_{"
                 this_term += str(c)
                 this_term += "}"
                 this_term += "^{"
@@ -187,8 +189,6 @@ class genetic_algorithm(
             latex_term += 'T^{}_{}'.format(transverse_axis, transverse_dim)
         latex_term = "${}$".format(latex_term)
         return latex_term
-
-
 
 
 def hamming_distance(str1, str2):

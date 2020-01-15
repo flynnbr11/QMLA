@@ -1,3 +1,12 @@
+from matplotlib.gridspec import GridSpec
+import Evo
+from matplotlib import cm
+import GrowthRules
+import UserFunctions
+import ModelNames
+import ExperimentalDataFunctions as expdt
+import ExpectationValues
+import DataBase
 import os
 import numpy as np
 import pandas as pd
@@ -32,13 +41,6 @@ frameinfo = getframeinfo(currentframe())
 #from QMD import  *
 #from QML import *
 
-import DataBase
-import Evo 
-import ExpectationValues
-import ExperimentalDataFunctions as expdt
-import ModelNames
-import UserFunctions
-import GrowthRules
 
 global test_growth_class_implementation
 test_growth_class_implementation = True
@@ -47,23 +49,23 @@ test_growth_class_implementation = True
 #### Hinton Diagram ####
 
 def ExpectationValuesTrueSim(
-    qmd, 
-    model_ids=None, champ=True, 
+    qmd,
+    model_ids=None, champ=True,
     times=None,
-    max_time=3, t_interval=0.01, 
+    max_time=3, t_interval=0.01,
     linspace_times=False,
     upper_x_lim=None,
     plus_probe=True,
-    true_plot_type='scatter', 
+    true_plot_type='scatter',
     save_to_file=None
 ):
     use_experimental_data = qmd.UseExperimentalData
     experimental_measurements_dict = qmd.ExperimentalMeasurements
-    
+
     try:
         qmd.ChampID
-    except:
-        qmd.ChampID = qmd.HighestModelID+1
+    except BaseException:
+        qmd.ChampID = qmd.HighestModelID + 1
 
     if model_ids is None and champ == True:
         model_ids = [qmd.ChampID]
@@ -73,27 +75,28 @@ def ExpectationValuesTrueSim(
         if qmd.ChampID not in model_ids:
             model_ids.append(qmd.ChampID)
 
-    if qmd.ChampID in model_ids and champ==False:
+    if qmd.ChampID in model_ids and champ == False:
         model_ids.remove(qmd.ChampID)
 
-    # plus_plus = np.array([0.5-0.j,  0.5-0.j, 0.5-0.j, 0.5-0.j]) # TODO generalise probe
+    # plus_plus = np.array([0.5-0.j,  0.5-0.j, 0.5-0.j, 0.5-0.j]) # TODO
+    # generalise probe
     plot_probe_dict = pickle.load(
         open(qmd.PlotProbeFile, 'rb')
     )
     probe_id = random.choice(range(qmd.NumProbes))
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
-    true_colour =  colors.cnames['lightsalmon'] #'b'
-    true_colour =  'r' #'b'
+    true_colour = colors.cnames['lightsalmon']  # 'b'
+    true_colour = 'r'  # 'b'
 
-    champion_colour =  colors.cnames['cornflowerblue'] #'r'
+    champion_colour = colors.cnames['cornflowerblue']  # 'r'
     sim_colours = ['g', 'c', 'm', 'y', 'k']
     global_min_time = 0
     plt.clf()
     if (
-        (experimental_measurements_dict is not None) 
-        and 
-        (use_experimental_data==True)
+        (experimental_measurements_dict is not None)
+        and
+        (use_experimental_data == True)
     ):
         times = sorted(list(experimental_measurements_dict.keys()))
         true_expec_values = [
@@ -138,37 +141,36 @@ def ExpectationValuesTrueSim(
 
             try:
                 expec = qmd.GrowthClass.expectation_value(
-                    ham = true_ham, 
-                    t=t, 
-                    state = true_probe
+                    ham=true_ham,
+                    t=t,
+                    state=true_probe
                 )
 
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
-                    "\nParams:", params, 
-                    "\nTimes:", times, 
-                    "\ntrue_ham:", true_ham,
-                    "\nt=", t,
-                    "\nstate=", true_probe
-                )
+                      "\nParams:", params,
+                      "\nTimes:", times,
+                      "\ntrue_ham:", true_ham,
+                      "\nt=", t,
+                      "\nstate=", true_probe
+                      )
 
-            true_expec_values.append(expec) 
-
+            true_expec_values.append(expec)
 
     ax1 = plt.subplot(311)
-    if true_plot_type=='plot': 
-    #        plt.subplot(211)
-        plt.plot(times, 
-            true_expec_values, 
-            label='True Expectation Value',
-            color = true_colour
-        )
+    if true_plot_type == 'plot':
+        #        plt.subplot(211)
+        plt.plot(times,
+                 true_expec_values,
+                 label='True Expectation Value',
+                 color=true_colour
+                 )
     else:
-        plt.scatter(times, 
-            true_expec_values, 
-            label='True Expectation Value',
-            marker='o', s=2, color = true_colour
-        )
+        plt.scatter(times,
+                    true_expec_values,
+                    label='True Expectation Value',
+                    marker='o', s=2, color=true_colour
+                    )
 
         # If we want a linspace plot of expec value
         if linspace_times:
@@ -180,9 +182,9 @@ def ExpectationValuesTrueSim(
             )
 
         ChampionsByBranch = {
-            v:k for k,v in qmd.BranchChampions.items()
+            v: k for k, v in qmd.BranchChampions.items()
         }
-        max_time_learned = 0 
+        max_time_learned = 0
         for i in range(len(model_ids)):
             mod_id = model_ids[i]
             sim = qmd.ModelNameIDs[mod_id]
@@ -195,7 +197,7 @@ def ExpectationValuesTrueSim(
             # else:
             #     sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
             sim_probe = plot_probe_dict[sim_dim]
-            colour_id = int(i%len(sim_colours))
+            colour_id = int(i % len(sim_colours))
             sim_col = sim_colours[colour_id]
 
             sim_expec_values = []
@@ -208,15 +210,14 @@ def ExpectationValuesTrueSim(
                     sim_expec_values.append(
                         mod.expectation_values[t]
                     )
-                except:
+                except BaseException:
                     expec = qmd.GrowthClass.expectation_value(
-                        ham=sim_ham, 
+                        ham=sim_ham,
                         t=t,
                         state=sim_probe
                     )
 
                     sim_expec_values.append(expec)
-
 
             if mod_id == qmd.ChampID:
                 models_branch = ChampionsByBranch[mod_id]
@@ -234,9 +235,9 @@ def ExpectationValuesTrueSim(
 
             plt.subplot(311)
             plt.plot(
-                times, 
-                sim_expec_values, 
-                label=sim_label, 
+                times,
+                sim_expec_values,
+                label=sim_label,
                 color=sim_col
             )
 
@@ -253,41 +254,40 @@ def ExpectationValuesTrueSim(
             r_squared = mod.r_squared()
             r_squared_of_t = mod.r_squared_of_t
 
-
             exp_times = sorted(list(mod.r_squared_of_t.keys()))
             r_sq_of_t = [mod.r_squared_of_t[t] for t in exp_times]
             bar_hist = 'hist'
 
             ax2 = plt.subplot(
-                312, 
+                312,
                 # sharex=ax1
             )
             if bar_hist == 'bar':
                 plt.bar(
-                    unique_times_learned, 
-                    unique_times_count, 
-                    color=sim_col, 
-                    label=str(mod.LatexTerm),                
+                    unique_times_learned,
+                    unique_times_count,
+                    color=sim_col,
+                    label=str(mod.LatexTerm),
                     width=0.001
                 )
             elif bar_hist == 'hist':
                 plt.hist(
-                    times_learned, 
+                    times_learned,
                     bins=num_bins,
-                    label=str('Occurences (max time:'+
-                        str(np.round(max_time_learned, 2))+
-                        ')'
-                    ),                
+                    label=str('Occurences (max time:' +
+                              str(np.round(max_time_learned, 2)) +
+                              ')'
+                              ),
                     color=sim_col,
                     histtype='step',
                     fill=False
                 )
-            ax3=ax2.twinx()
+            ax3 = ax2.twinx()
             ax3.set_ylabel('$R^2$')
             plt.plot(
                 exp_times, r_sq_of_t,
                 label='$R^2(t)$',
-                color=sim_col, 
+                color=sim_col,
                 linestyle='dashed'
             )
 
@@ -305,20 +305,20 @@ def ExpectationValuesTrueSim(
             which='both',      # both major and minor ticks are affected
             bottom=True,      # ticks along the bottom edge are off
             top=False,         # ticks along the top edge are off
-            labelbottom=True # labels along the bottom edge are off
+            labelbottom=True  # labels along the bottom edge are off
         )
 
         ax1.set_xlim(global_min_time, max(times))
-        if max_time_learned  > max(times):
+        if max_time_learned > max(times):
             ax2.semilogx()
             ax2.axvline(
-                max(times), 
-                color='red', 
+                max(times),
+                color='red',
                 label='Max exp. val. time shown'
             )
 
         max_time_plot = max(max(times), max_time_learned)
-        ax2.set_xlim(global_min_time, max_time_plot+0.1)
+        ax2.set_xlim(global_min_time, max_time_plot + 0.1)
 
         ax1.set_ylabel('Exp Value')
         ax2.set_ylabel('Occurences')
@@ -334,7 +334,7 @@ def ExpectationValuesTrueSim(
         )
         ax1.axvline(0, color='black')
         plot_title = str(
-            str(qmd.NumParticles) + ' particles.\n'  
+            str(qmd.NumParticles) + ' particles.\n'
             + str(qmd.NumExperiments) + ' experiments.'
         )
         plt.title(plot_title)
@@ -342,18 +342,15 @@ def ExpectationValuesTrueSim(
 
         plt.tight_layout()
         if save_to_file is not None:
-            plt.savefig(save_to_file, bbox_inches='tight')    
-
-from matplotlib.gridspec import GridSpec
-from matplotlib import cm
+            plt.savefig(save_to_file, bbox_inches='tight')
 
 
 def plotDynamicsLearnedModels(
-    qmd, 
-    model_ids = None,
+    qmd,
+    model_ids=None,
     include_expec_vals=True,
-    include_bayes_factors=True, 
-    include_times_learned=True, 
+    include_bayes_factors=True,
+    include_times_learned=True,
     include_param_estimates=False,
     save_to_file=None
 ):
@@ -366,12 +363,14 @@ def plotDynamicsLearnedModels(
     elif model_ids is None:
         model_ids = list(qmd.BranchChampions.values())
 
-    model_ids = list(sorted(set(model_ids))) # only uniques values
-    true_expec_vals = pickle.load(open(qmd.GlobalVariables.true_expec_path, 'rb'))
-    times_to_plot = list(sorted(true_expec_vals.keys())) 
+    model_ids = list(sorted(set(model_ids)))  # only uniques values
+    true_expec_vals = pickle.load(
+        open(qmd.GlobalVariables.true_expec_path, 'rb'))
+    times_to_plot = list(sorted(true_expec_vals.keys()))
     # times_to_plot = list(sorted(qmd.plot_times))
 
-    # TODO this is overwritten within for loop below so that large Hamiltonians don't have to work out each time step
+    # TODO this is overwritten within for loop below so that large
+    # Hamiltonians don't have to work out each time step
     true_exp = [true_expec_vals[t] for t in times_to_plot]
     plot_probes = pickle.load(
         open(qmd.GlobalVariables.plot_probe_file, 'rb')
@@ -380,27 +379,28 @@ def plotDynamicsLearnedModels(
     all_bayes_factors = qmd.AllBayesFactors
     max_time = max(times_to_plot)
     individual_terms_already_in_legend = []
-    
+
 #     ncols = int(np.ceil(np.sqrt(num_models_to_plot)))
-#     nrows = 3*int(np.ceil(num_models_to_plot/ncols)) + 1 # 1 extra row for "master"
-    
+# nrows = 3*int(np.ceil(num_models_to_plot/ncols)) + 1 # 1 extra row for
+# "master"
+
     ncols = (
         include_expec_vals +
-        include_bayes_factors + 
-        include_times_learned + 
+        include_bayes_factors +
+        include_times_learned +
         include_param_estimates
     )
 #     ncols = 4
-    nrows = num_models_to_plot 
-    
+    nrows = num_models_to_plot
+
     fig = plt.figure(
-        figsize = (18, 10), 
+        figsize=(18, 10),
         # constrained_layout=True,
         tight_layout=True
     )
     gs = GridSpec(
-        nrows, 
-        ncols, 
+        nrows,
+        ncols,
         # figure=fig # not available on matplotlib 2.1.1 (on BC)
     )
 
@@ -410,12 +410,12 @@ def plotDynamicsLearnedModels(
     for mod_id in model_ids:
         reduced = qmd.reducedModelInstanceFromID(mod_id)
         reduced.compute_expectation_values(
-            times = qmd.PlotTimes
+            times=qmd.PlotTimes
         )
 #         growth_generator = reduced.GrowthGenerator
         desc = str(
-            "ID:{}\n".format(mod_id) + 
-            reduced.LatexTerm 
+            "ID:{}\n".format(mod_id) +
+            reduced.LatexTerm
         )
         times_to_plot = list(sorted(true_expec_vals.keys()))
         plot_colour = 'blue'
@@ -423,11 +423,11 @@ def plotDynamicsLearnedModels(
         dynamics_label = str(mod_id)
         try:
             true_model_id = qmd.TrueOpModelID
-        except:
+        except BaseException:
             true_model_id = -1
         if (
-            mod_id == qmd.ChampID 
-            and 
+            mod_id == qmd.ChampID
+            and
             mod_id == true_model_id
         ):
             plot_colour = 'green'
@@ -444,7 +444,6 @@ def plotDynamicsLearnedModels(
             name_colour = 'green'
             dynamics_label += ' [true]'
             desc += str('\n[True]')
-        
 
         ############ --------------- ############
         ############ Plot dynamics in left most column ############
@@ -455,8 +454,8 @@ def plotDynamicsLearnedModels(
             probe = plot_probes[reduced.ProbeDimension]
             # print(
             #     "[plotDynamicsLearnedModels]",
-            #     "\n\tModel ", reduced.LatexTerm, 
-            #     "\n\tnum qubits:", dim, 
+            #     "\n\tModel ", reduced.LatexTerm,
+            #     "\n\tnum qubits:", dim,
             #     "\n\tprobe:", probe
 
             # )
@@ -464,44 +463,42 @@ def plotDynamicsLearnedModels(
             if dim > 4:
                 times_to_plot = times_to_plot[0::5]
                 print(
-                    "reducing number of times for plot:", 
+                    "reducing number of times for plot:",
                     times_to_plot
                 )
             else:
                 print("Not reducing number of times for plots")
 
-
             times_to_plot = sorted(list(true_expec_vals.keys()))
             true_exp = [true_expec_vals[t] for t in times_to_plot]
 
-
-            ## choose an axis to plot on
+            # choose an axis to plot on
             ax = fig.add_subplot(gs[row, col])
-            ## first plot true dynamics
+            # first plot true dynamics
             ax.plot(
-                times_to_plot, 
-                true_exp, 
-                c = 'r'
+                times_to_plot,
+                true_exp,
+                c='r'
             )
 
-            ## now plot learned dynamics
+            # now plot learned dynamics
             expec_vals = reduced.expectation_values
             sim_times = sorted(list(expec_vals.keys()))
             sim_exp = [expec_vals[t] for t in sim_times]
 
             # print(
             #     "[plotDynamics]",
-            #     "\nsim exp:", sim_exp, 
+            #     "\nsim exp:", sim_exp,
             #     "\nsim_times:", sim_times
             # )
             ax.plot(
-                sim_times, 
-                sim_exp, 
-                marker = 'o', 
-                markevery = 10, 
-                c = plot_colour,
+                sim_times,
+                sim_exp,
+                marker='o',
+                markevery=10,
+                c=plot_colour,
                 # label = dynamics_label
-                label = desc
+                label=desc
             )
     #         ax.legend()
 
@@ -512,13 +509,13 @@ def plotDynamicsLearnedModels(
 
             col += 1
             if col == ncols:
-                col=0
-                row+=1
+                col = 0
+                row += 1
         ############ --------------- ############
         ############ Plot Bayes factors ############
         ############ --------------- ############
         if include_bayes_factors == True:
-            bayes_factors_this_mod =[] 
+            bayes_factors_this_mod = []
             bf_opponents = []
             for b in model_ids:
                 if b != mod_id:
@@ -526,13 +523,14 @@ def plotDynamicsLearnedModels(
                         # bf_opponents.append(
                         #     qmd.reducedModelInstanceFromID(b).LatexTerm
                         # )
-                        bayes_factors_this_mod.append(np.log10(all_bayes_factors[mod_id][b][-1]))
+                        bayes_factors_this_mod.append(
+                            np.log10(all_bayes_factors[mod_id][b][-1]))
                         bf_opponents.append(str(b))
             ax = fig.add_subplot(gs[row, col])
             ax.bar(
-                bf_opponents, 
+                bf_opponents,
                 bayes_factors_this_mod,
-                color = plot_colour
+                color=plot_colour
             )
             ax.axhline(0, color='black')
             if row == 0:
@@ -540,8 +538,8 @@ def plotDynamicsLearnedModels(
 
             col += 1
             if col == ncols:
-                col=0
-                row+=1
+                col = 0
+                row += 1
         ############ --------------- ############
         ############ Plot times learned over ############
         ############ --------------- ############
@@ -550,8 +548,8 @@ def plotDynamicsLearnedModels(
             if row == 0:
                 ax.set_title('Times learned')
     #         ax.set_ylabel(
-    #             desc, 
-    #             color=name_colour, 
+    #             desc,
+    #             color=name_colour,
     #             rotation=0,
     #         )
             ax.yaxis.set_label_position("right")
@@ -560,7 +558,7 @@ def plotDynamicsLearnedModels(
             n, bins, patches = ax.hist(
                 times_learned_over,
                 # histtype='step',
-                color = plot_colour, 
+                color=plot_colour,
                 # fill=False,
                 label=desc
             )
@@ -568,27 +566,26 @@ def plotDynamicsLearnedModels(
             # ax.semilogy()
             for bin_value in bins:
                 ax.axvline(
-                    bin_value, 
-                    linestyle='--', 
+                    bin_value,
+                    linestyle='--',
                     alpha=0.3
                 )
             plot_time_max = max(times_to_plot)
             max_time = max(times_learned_over)
             if max_time > plot_time_max:
                 ax.axvline(
-                    plot_time_max, 
-                    color='red', 
-                    linestyle='--', 
+                    plot_time_max,
+                    color='red',
+                    linestyle='--',
                     label='Dynamics plot cutoff'
                 )
                 ax.legend()
             ax.set_xlim(0, max_time)
 
-
             col += 1
             if col == ncols:
-                col=0
-                row+=1
+                col = 0
+                row += 1
         ############ --------------- ############
         ############ Plot parameters estimates ############
         ############ --------------- ############
@@ -596,51 +593,56 @@ def plotDynamicsLearnedModels(
             ax = fig.add_subplot(gs[row, col])
             name = reduced.Name
             terms = DataBase.get_constituent_names_from_name(name)
-            num_terms = len(terms) 
+            num_terms = len(terms)
 
-            term_positions={}
+            term_positions = {}
             param_estimate_by_term = {}
             std_devs = {}
 
             for t in range(num_terms):
-                term_positions[terms[t]] = t 
+                term_positions[terms[t]] = t
                 term = terms[t]
                 param_position = term_positions[term]
-                param_estimates = reduced.TrackEval[:,param_position]
+                param_estimates = reduced.TrackEval[:, param_position]
                 #std_dev = mod.cov_matrix[param_position,param_position]
                 # std_dev = reduced.TrackCovMatrices[
                 #     :,param_position,param_position
                 # ]
                 std_dev = reduced.TrackParamSigmas[:, param_position]
-                param_estimate_by_term[term] = param_estimates   
+                param_estimate_by_term[term] = param_estimates
                 std_devs[term] = std_dev
 
-            cm_subsection = np.linspace(0,0.8,num_terms)
-            colours = [ cm.magma(x) for x in cm_subsection ]
+            cm_subsection = np.linspace(0, 0.8, num_terms)
+            colours = [cm.magma(x) for x in cm_subsection]
             # TODO use color map as list
             num_epochs = reduced.NumExperiments
 
-            i=0
+            i = 0
         #    for term in list(param_estimate_by_term.keys()):
             for term in terms:
-                colour = colours[i%len(colours)]
-                i+=1
+                colour = colours[i % len(colours)]
+                i += 1
                 try:
-                    if use_experimental_data==False:
+                    if use_experimental_data == False:
                         y_true = qmd.TrueParamDict[term]
                         # true_term_latex = DataBase.latex_name_ising(term)
                         true_term_latex = qmd.GrowthClass.latex_name(
-                            name = term
+                            name=term
                         )
 
-                        ax.axhline(y_true, label=str(true_term_latex+ ' True'), color=colour)
-                except:
+                        ax.axhline(
+                            y_true,
+                            label=str(
+                                true_term_latex +
+                                ' True'),
+                            color=colour)
+                except BaseException:
                     pass
                 y = np.array(param_estimate_by_term[term])
                 s = np.array(std_devs[term])
-                x = range(1,1+len(param_estimate_by_term[term]))
+                x = range(1, 1 + len(param_estimate_by_term[term]))
                 latex_term = qmd.GrowthClass.latex_name(
-                    name = term
+                    name=term
                 )
                 if latex_term not in individual_terms_already_in_legend:
                     individual_terms_already_in_legend.append(latex_term)
@@ -650,17 +652,17 @@ def plotDynamicsLearnedModels(
                 # print("[pQMD] latex_term:", latex_term)
                 ax.plot(
                     x,
-                    y, 
-    #                 s=max(1,50/num_epochs), 
-                    label=plot_label, 
+                    y,
+                    #                 s=max(1,50/num_epochs),
+                    label=plot_label,
                     color=colour
                 )
         #        ax.set_yscale('symlog')
                 # print("[pQMD] scatter done" )
     #             ax.fill_between(
-    #                 x, 
-    #                 y+s, 
-    #                 y-s, 
+    #                 x,
+    #                 y+s,
+    #                 y-s,
     #                 alpha=0.2,
     #                 facecolor=colour
     #             )
@@ -671,18 +673,17 @@ def plotDynamicsLearnedModels(
 
             col += 1
             if col == ncols:
-                col=0
-                row+=1
+                col = 0
+                row += 1
     if save_to_file is not None:
         plt.savefig(
-            save_to_file, 
+            save_to_file,
             bbox_inches='tight'
         )
 
 
-    
 def ExpectationValuesQHL_TrueModel(
-    qmd, 
+    qmd,
     max_time=3, t_interval=0.01,
     upper_x_lim=None,
     true_plot_type='scatter',
@@ -697,18 +698,18 @@ def ExpectationValuesQHL_TrueModel(
     use_experimental_data = qmd.UseExperimentalData
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
-    true_colour =  colors.cnames['lightsalmon'] #'b'
-    true_colour =  'r' #'b'
-    
-    champion_colour =  colors.cnames['cornflowerblue'] #'r'
+    true_colour = colors.cnames['lightsalmon']  # 'b'
+    true_colour = 'r'  # 'b'
+
+    champion_colour = colors.cnames['cornflowerblue']  # 'r'
     sim_colours = ['g', 'c', 'm', 'y', 'k']
 
     plt.clf()
     plt.xlabel('Time (microseconds)')
     plt.ylabel('Expectation Value')
 
-    
-    if (experimental_measurements_dict is not None) and (use_experimental_data==True):
+    if (experimental_measurements_dict is not None) and (
+            use_experimental_data == True):
         times = sorted(list(experimental_measurements_dict.keys()))
         true_expec_values = [
             experimental_measurements_dict[t] for t in times
@@ -717,16 +718,15 @@ def ExpectationValuesQHL_TrueModel(
         times = np.arange(0, max_time, t_interval)
         true = qmd.TrueOpName
         true_op = DataBase.operator(true)
-        
+
         true_params = qmd.TrueParamsList
 #        true_ops = true_op.constituents_operators
         true_ops = qmd.TrueOpList
         true_dim = true_op.num_qubits
-        true_probe = qmd.ProbeDict[(probe_id,true_dim)]
+        true_probe = qmd.ProbeDict[(probe_id, true_dim)]
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
         true_expec_values = []
-                
-        
+
         for t in times:
             if qmd.UseTimeDepTrueModel:
                 # Multiply time dependent parameters by time value
@@ -739,49 +739,49 @@ def ExpectationValuesQHL_TrueModel(
                 true_ham = np.tensordot(params, true_ops, axes=1)
             else:
                 true_ham = time_ind_true_ham
-        
+
             try:
                 expec = qmd.GrowthClass.expectation_value(
-                    ham = true_ham, 
-                    t=t, 
-                    state = true_probe
+                    ham=true_ham,
+                    t=t,
+                    state=true_probe
                 )
-                
+
             except UnboundLocalError:
                 print("[PlotQMD]\n Unbound local error for:",
-                    "\nParams:", params, 
-                    "\nTimes:", times, 
-                    "\ntrue_ham:", true_ham,
-                    "\nt=", t,
-                    "\nstate=", true_probe
-                )
+                      "\nParams:", params,
+                      "\nTimes:", times,
+                      "\ntrue_ham:", true_ham,
+                      "\nt=", t,
+                      "\nstate=", true_probe
+                      )
 
-            true_expec_values.append(expec) 
-        
-    if true_plot_type=='plot':
+            true_expec_values.append(expec)
+
+    if true_plot_type == 'plot':
         plt.plot(times, true_expec_values, label='True Expectation Value',
-                 color = true_colour
-        )
+                 color=true_colour
+                 )
     else:
         plt.scatter(times, true_expec_values, label='True Expectation Value',
-            marker='o', s=8, color = true_colour
-        )
+                    marker='o', s=8, color=true_colour
+                    )
 
-    ChampionsByBranch = {v:k for k,v in qmd.BranchChampions.items()}
+    ChampionsByBranch = {v: k for k, v in qmd.BranchChampions.items()}
     for i in range(len(model_ids)):
         mod_id = model_ids[i]
         sim = qmd.ModelNameIDs[mod_id]
-        sim_op  = DataBase.operator(sim)
+        sim_op = DataBase.operator(sim)
         mod = qmd.reducedModelInstanceFromID(mod_id)
-        sim_params = list(mod.FinalParams[:,0])
+        sim_params = list(mod.FinalParams[:, 0])
         sim_ops = sim_op.constituents_operators
         sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
-        if debug_print: 
+        if debug_print:
             print("Times:\n", times)
             print("SIM HAM:\n", sim_ham)
         sim_dim = sim_op.num_qubits
-        sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
-        colour_id = int(i%len(sim_colours))
+        sim_probe = qmd.ProbeDict[(probe_id, sim_dim)]
+        colour_id = int(i % len(sim_colours))
         sim_col = sim_colours[colour_id]
 #        sim_expec_values = [ExpectationValues.expectation_value(ham=sim_ham, t=t,
 #            state=sim_probe) for t in times
@@ -797,23 +797,22 @@ def ExpectationValuesQHL_TrueModel(
         for t in times:
             # ex_val = ExpectationValues.hahn_evolution(
             ex_val = qmd.GrowthClass.expectation_value(
-                ham=sim_ham, 
+                ham=sim_ham,
                 t=t,
                 state=sim_probe
             )
             sim_expec_values.append(ex_val)
 
-        
         if mod_id == qmd.TrueOpModelID:
             sim_label = 'Simulated Model'
             sim_col = champion_colour
         else:
-            sim_label = 'Model '+str(mod_id)
+            sim_label = 'Model ' + str(mod_id)
 
         plt.plot(
-            times, 
-            sim_expec_values, 
-            label=sim_label, 
+            times,
+            sim_expec_values,
+            label=sim_label,
             color=sim_col
         )
 
@@ -823,19 +822,22 @@ def ExpectationValuesQHL_TrueModel(
     box = ax.get_position()
     qty = 0.1
     ax.set_position([box.x0, box.y0 + box.height * qty,
-                     box.width, box.height * (1.0-qty)])
+                     box.width, box.height * (1.0 - qty)])
 
     handles, labels = ax.get_legend_handles_labels()
     label_list = list(labels)
     handle_list = list(handles)
 
-    new_labels=[]
-    new_handles=[]
+    new_labels = []
+    new_handles = []
 
-    special_labels=[]
-    special_handles=[]
+    special_labels = []
+    special_handles = []
 
-    special_terms = ['True Expectation Value', 'Champion Model', 'Simulated Model']
+    special_terms = [
+        'True Expectation Value',
+        'Champion Model',
+        'Simulated Model']
 
     for i in range(len(label_list)):
         if label_list[i] in special_terms:
@@ -845,93 +847,91 @@ def ExpectationValuesQHL_TrueModel(
             new_labels.append(label_list[i])
             new_handles.append(handle_list[i])
 
-
     special_handles = tuple(special_handles)
     special_labels = tuple(special_labels)
 
     extra_lgd = True
     if len(new_handles) == 0:
-#        print("No models other than champ/true")
-        extra_lgd=False
-        
+        #        print("No models other than champ/true")
+        extra_lgd = False
+
     new_handles = tuple(new_handles)
     new_labels = tuple(new_labels)
-    
+
     all_expec_values = sim_expec_values + true_expec_values
-    lower_y_lim = max(0,min(all_expec_values))
+    lower_y_lim = max(0, min(all_expec_values))
     upper_y_lim = max(all_expec_values)
     plt.ylim(lower_y_lim, upper_y_lim)
-    
+
     if upper_x_lim is not None:
-        plt.xlim(0,upper_x_lim)
+        plt.xlim(0, upper_x_lim)
     else:
         plt.xlim(0, max(times))
     plt.xlim(0, max_time)
-    
+
     if extra_lgd:
-        lgd_spec=ax.legend(special_handles, special_labels, 
-            loc='upper center', bbox_to_anchor=(1, 1),fancybox=True,
-            shadow=True, ncol=1
-        )
-        lgd_new=ax.legend(new_handles, new_labels, 
-            loc='upper center', bbox_to_anchor=(1.15, 0.75),
-            fancybox=True, shadow=True, ncol=1
-        )
+        lgd_spec = ax.legend(special_handles, special_labels,
+                             loc='upper center', bbox_to_anchor=(1, 1), fancybox=True,
+                             shadow=True, ncol=1
+                             )
+        lgd_new = ax.legend(new_handles, new_labels,
+                            loc='upper center', bbox_to_anchor=(1.15, 0.75),
+                            fancybox=True, shadow=True, ncol=1
+                            )
         plt.gca().add_artist(lgd_spec)
     else:
-        lgd_spec=ax.legend(special_handles, special_labels,
-            loc='upper center', bbox_to_anchor=(1, 1),fancybox=True, 
-            shadow=True, ncol=1
-        )
-        
+        lgd_spec = ax.legend(special_handles, special_labels,
+                             loc='upper center', bbox_to_anchor=(1, 1), fancybox=True,
+                             shadow=True, ncol=1
+                             )
 
-    latex_name_for_title = qmd.GrowthClass.latex_name(name = qmd.TrueOpName)
+    latex_name_for_title = qmd.GrowthClass.latex_name(name=qmd.TrueOpName)
     plt.title(
         str(
-            "QHL test for " + 
+            "QHL test for " +
             latex_name_for_title
-            +". [" + str(qmd.NumParticles) + " prt; "
-            + str(qmd.NumExperiments) +"exp]"
+            + ". [" + str(qmd.NumParticles) + " prt; "
+            + str(qmd.NumExperiments) + "exp]"
         )
-    )        
+    )
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
 def plotDistributionProgression(
-    qmd, 
-    model_id=None, true_model=False, 
+    qmd,
+    model_id=None, true_model=False,
     num_steps_to_show=2, show_means=True,
     renormalise=True,
     save_to_file=None
 ):
     # Plots initial and final prior distribution over parameter space
-    # with num_steps_to_show intermediate distributions 
-    # Note only safe/tested for QHL, ie on true model (single parameter). 
+    # with num_steps_to_show intermediate distributions
+    # Note only safe/tested for QHL, ie on true model (single parameter).
     from scipy import stats
     plt.clf()
     if true_model:
         try:
             mod = qmd.reducedModelInstanceFromID(qmd.TrueOpModelID)
-        except:
+        except BaseException:
             print("True model not present in this instance of QMD.")
     elif model_id is not None:
         mod = qmd.reducedModelInstanceFromID(model_id)
     else:
         print("Either provide a model id or set true_model=True to generate \
               plot of distribution development."
-         )
+              )
     true_parameters = mod.TrueParams
     num_experiments = np.shape(mod.Particles)[2]
     max_exp_num = num_experiments - 1
     num_intervals_to_show = num_steps_to_show
-    increment = int(num_experiments/num_intervals_to_show)
+    increment = int(num_experiments / num_intervals_to_show)
 
-    nearest_five = round(increment/5)*5
+    nearest_five = round(increment / 5) * 5
     if nearest_five == 0:
         nearest_five = 1
 
-    steps_to_show = list(range(0,num_experiments,nearest_five))
+    steps_to_show = list(range(0, num_experiments, nearest_five))
 
     if max_exp_num not in steps_to_show:
         steps_to_show.append(max_exp_num)
@@ -944,66 +944,75 @@ def plotDistributionProgression(
     steps_to_show = sorted(steps_to_show)
 
     ax = plt.subplot(111)
-    
+
     if show_means:
         for t in true_parameters:
-            ax.axvline(t, label='True param', c=true_colour, linestyle='dashed')
+            ax.axvline(
+                t,
+                label='True param',
+                c=true_colour,
+                linestyle='dashed')
 
     for i in steps_to_show:
-        j = steps_to_show.index(i) - 1 # previous step which is shown on plot already
-        if not np.all(mod.Particles[:,:,i] == mod.Particles[:,:,j]):
+        # previous step which is shown on plot already
+        j = steps_to_show.index(i) - 1
+        if not np.all(mod.Particles[:, :, i] == mod.Particles[:, :, j]):
             # don't display identical distributions between steps
-            particles = mod.Particles[:,:,i]
+            particles = mod.Particles[:, :, i]
             particles = sorted(particles)
-            colour = colours[i%len(colours)]
+            colour = colours[i % len(colours)]
 
-            # TODO if renormalise False, DON'T use a stat.pdf to model distribution
+            # TODO if renormalise False, DON'T use a stat.pdf to model
+            # distribution
             if renormalise:
-                fit = stats.norm.pdf(particles, np.mean(particles), np.std(particles))
+                fit = stats.norm.pdf(
+                    particles, np.mean(particles), np.std(particles))
                 max_fit = max(fit)
-                fit = fit/max_fit
+                fit = fit / max_fit
             else:
-                fit = mod.Weights[:,i]
-                
-            if i==max_exp_num:
+                fit = mod.Weights[:, i]
+
+            if i == max_exp_num:
                 colour = final_colour
                 label = 'Final distribution'
-                if show_means: 
-                    ax.axvline(np.mean(particles), 
-                        label='Final Mean', color=colour, linestyle='dashed'
-                    )
-            elif i==min(steps_to_show):
+                if show_means:
+                    ax.axvline(np.mean(particles),
+                               label='Final Mean', color=colour, linestyle='dashed'
+                               )
+            elif i == min(steps_to_show):
                 colour = initial_colour
                 if show_means:
                     ax.axvline(np.mean(particles), label='Initial Mean',
-                        color=colour, linestyle='dashed'
-                    )
-                label='Initial distribution'
+                               color=colour, linestyle='dashed'
+                               )
+                label = 'Initial distribution'
             else:
-                label=str('Step '+str(i))
+                label = str('Step ' + str(i))
 
             ax.plot(particles, fit, label=label, color=colour)
 
     plt.legend(bbox_to_anchor=(1.02, 1.02), ncol=1)
     plt.xlabel('Parameter estimate')
     plt.ylabel('Probability Density (relative)')
-    title=str('Probability density function of parameter for '+mod.LatexTerm)
+    title = str(
+        'Probability density function of parameter for ' +
+        mod.LatexTerm)
     plt.title(title)
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
 def plotDistributionProgressionQML(
-    mod, 
-    num_steps_to_show=2, 
+    mod,
+    num_steps_to_show=2,
     show_means=True,
     renormalise=True,
     save_to_file=None
 ):
     # Plots initial and final prior distribution over parameter space
-    # with num_steps_to_show intermediate distributions 
-    # Note only safe/tested for QHL, ie on true model (single parameter). 
-    
+    # with num_steps_to_show intermediate distributions
+    # Note only safe/tested for QHL, ie on true model (single parameter).
+
     from scipy import stats
     plt.clf()
 
@@ -1011,17 +1020,16 @@ def plotDistributionProgressionQML(
     num_experiments = np.shape(mod.Particles)[2]
     max_exp_num = num_experiments - 1
     num_intervals_to_show = num_steps_to_show
-    increment = int(num_experiments/num_intervals_to_show)
+    increment = int(num_experiments / num_intervals_to_show)
 
-
-    nearest_five = round(increment/5)*5
+    nearest_five = round(increment / 5) * 5
     if nearest_five == 0:
         nearest_five = 1
 
     # steps_to_show = list(range(0,num_experiments,nearest_five))
 
     resampled_epochs = mod.ResampleEpochs
-    steps_to_show = list(range(0,resampled_epochs,num_steps_to_show))    
+    steps_to_show = list(range(0, resampled_epochs, num_steps_to_show))
     steps_to_show = [int(s) for s in steps_to_show]
 
     if max_exp_num not in steps_to_show:
@@ -1034,85 +1042,84 @@ def plotDistributionProgressionQML(
     final_colour = 'r'
     steps_to_show = sorted(steps_to_show)
     print(
-        "[plotDistributionProgression]", 
-        "num exp:", num_experiments, 
-        "increment:", increment, 
+        "[plotDistributionProgression]",
+        "num exp:", num_experiments,
+        "increment:", increment,
         "steps to show", steps_to_show,
         "resampled epochs:", mod.ResampleEpochs,
     )
 
     ax = plt.subplot(111)
-    
+
     if show_means:
         for t in true_parameters:
             ax.axvline(
-                t, 
-                label='True param', 
-                c=true_colour, 
+                t,
+                label='True param',
+                c=true_colour,
                 linestyle='dashed'
             )
 
     for i in steps_to_show:
         print(
-            "[plotDistributionProgression]", 
+            "[plotDistributionProgression]",
             "i,", i
         )
-        
-        particles = mod.Particles[:,:,i]
+
+        particles = mod.Particles[:, :, i]
         particles = sorted(particles)
-        colour = colours[i%len(colours)]
+        colour = colours[i % len(colours)]
 
         # TODO if renormalise False, DON'T use a stat.pdf to model distribution
         if renormalise:
             fit = stats.norm.pdf(
-                particles, 
-                np.mean(particles), 
+                particles,
+                np.mean(particles),
                 np.std(particles)
             )
             max_fit = max(fit)
-            fit = fit/max_fit
+            fit = fit / max_fit
         else:
-            fit = mod.Weights[:,i]
-            
-        if i==max_exp_num:
+            fit = mod.Weights[:, i]
+
+        if i == max_exp_num:
             colour = final_colour
             label = 'Final distribution'
-            if show_means: 
+            if show_means:
                 ax.axvline(
-                    np.mean(particles), 
-                    label='Final Mean', 
-                    color=colour, 
+                    np.mean(particles),
+                    label='Final Mean',
+                    color=colour,
                     linestyle='dashed'
                 )
-        elif i==min(steps_to_show):
+        elif i == min(steps_to_show):
             colour = initial_colour
             if show_means:
                 ax.axvline(
-                    np.mean(particles), 
+                    np.mean(particles),
                     label='Initial Mean',
-                    color=colour, 
+                    color=colour,
                     linestyle='dashed'
                 )
-            label='Initial distribution'
+            label = 'Initial distribution'
         else:
-            label=str('Step '+str(i))
+            label = str('Step ' + str(i))
 
         ax.plot(particles, fit, label=label, color=colour)
-
 
     # for i in steps_to_show:
     #     j = steps_to_show.index(i) - 1 # previous step which is shown on plot already
     #     if (
-    #         steps_to_show.index(i)==0 
-    #         or 
+    #         steps_to_show.index(i)==0
+    #         or
     #         not np.all(mod.Particles[:,:,i] == mod.Particles[:,:,j])
     #     ):
     #         # don't display identical distributions between steps
     #         print(
-    #             "[plotDistributionProgression]", 
-    #             "i,j:", i,j  
+    #             "[plotDistributionProgression]",
+    #             "i,j:", i,j
     #         )
-            
+
     #         particles = mod.Particles[:,:,i]
     #         particles = sorted(particles)
     #         colour = colours[i%len(colours)]
@@ -1120,32 +1127,32 @@ def plotDistributionProgressionQML(
     #         # TODO if renormalise False, DON'T use a stat.pdf to model distribution
     #         if renormalise:
     #             fit = stats.norm.pdf(
-    #                 particles, 
-    #                 np.mean(particles), 
+    #                 particles,
+    #                 np.mean(particles),
     #                 np.std(particles)
     #             )
     #             max_fit = max(fit)
     #             fit = fit/max_fit
     #         else:
     #             fit = mod.Weights[:,i]
-                
+
     #         if i==max_exp_num:
     #             colour = final_colour
     #             label = 'Final distribution'
-    #             if show_means: 
+    #             if show_means:
     #                 ax.axvline(
-    #                     np.mean(particles), 
-    #                     label='Final Mean', 
-    #                     color=colour, 
+    #                     np.mean(particles),
+    #                     label='Final Mean',
+    #                     color=colour,
     #                     linestyle='dashed'
     #                 )
     #         elif i==min(steps_to_show):
     #             colour = initial_colour
     #             if show_means:
     #                 ax.axvline(
-    #                     np.mean(particles), 
+    #                     np.mean(particles),
     #                     label='Initial Mean',
-    #                     color=colour, 
+    #                     color=colour,
     #                     linestyle='dashed'
     #                 )
     #             label='Initial distribution'
@@ -1157,29 +1164,31 @@ def plotDistributionProgressionQML(
     plt.legend(bbox_to_anchor=(1.02, 1.02), ncol=1)
     plt.xlabel('Parameter estimate')
     plt.ylabel('Probability Density (relative)')
-    title=str(
-        'Probability density function of parameter for '+
+    title = str(
+        'Probability density function of parameter for ' +
         mod.LatexTerm
     )
     plt.title(title)
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
+
 def r_squared_plot(
     results_csv_path=None,
     save_to_file=None
 ):
     # For use in QHL parameter sweep
-    qhl_results = pd.DataFrame.from_csv(results_csv_path, index_col='ConfigLatex')
+    qhl_results = pd.DataFrame.from_csv(
+        results_csv_path, index_col='ConfigLatex')
 
-    piv = pd.pivot_table(qhl_results, 
-        values=[ 'Time', 'RSquaredTrueModel'], 
-        index=['ConfigLatex'], 
-        aggfunc={
-            'Time':[np.mean, np.median, min, max], 
-            'RSquaredTrueModel' : [np.median, np.mean] 
-        }
-    )
+    piv = pd.pivot_table(qhl_results,
+                         values=['Time', 'RSquaredTrueModel'],
+                         index=['ConfigLatex'],
+                         aggfunc={
+                             'Time': [np.mean, np.median, min, max],
+                             'RSquaredTrueModel': [np.median, np.mean]
+                         }
+                         )
 
     time_means = list(piv['Time']['mean'])
     time_mins = list(piv['Time']['min'])
@@ -1191,22 +1200,21 @@ def r_squared_plot(
     num_models = len(time_medians)
     configs = piv.index.tolist()
 
-
     plt.clf()
     fig, ax = plt.subplots()
-    if num_models <= 5 :
+    if num_models <= 5:
         plot_height = num_models
     else:
-        plot_height = num_models/2
+        plot_height = num_models / 2
 
     fig.set_figheight(plot_height)
-    #fig.set_figwidth(num_models/4)
+    # fig.set_figwidth(num_models/4)
 
     ax2 = ax.twiny()
-    width = 0.5 # the width of the bars 
+    width = 0.5  # the width of the bars
     ind = np.arange(len(r_squared_medians))  # the x locations for the groups
-    use_log_times=False
-    time_colour='b'
+    use_log_times = False
+    time_colour = 'b'
     if use_log_times:
         times_to_use = [np.log10(t) for t in time_medians]
         ax2.set_xlabel('Time ($log_{10}$ seconds)')
@@ -1214,9 +1222,9 @@ def r_squared_plot(
         times_to_use = time_medians
         ax2.set_xlabel('Median Time (seconds)')
 
-    ax2.barh(ind, times_to_use, width/4, color=time_colour, label='Time')
+    ax2.barh(ind, times_to_use, width / 4, color=time_colour, label='Time')
 
-    times_to_mark = [60,600, 3600, 14400, 36000]
+    times_to_mark = [60, 600, 3600, 14400, 36000]
     if use_log_times:
         times_to_mark = [np.log10(t) for t in times_to_mark]
 
@@ -1225,31 +1233,32 @@ def r_squared_plot(
         if t < max_time:
             ax2.axvline(x=t, color=time_colour)
 
-    ax.barh(ind, r_squared_medians, width, color='grey', align='center', 
-        label='$R^2$'
-    )
-    #    ax.axvline(x=max_x/2, color='g', label='50% Models correct')   
+    ax.barh(ind, r_squared_medians, width, color='grey', align='center',
+            label='$R^2$'
+            )
+    #    ax.axvline(x=max_x/2, color='g', label='50% Models correct')
     ax.set_yticks(ind)
     ax.set_yticklabels(configs, minor=False)
     ax.set_ylabel('Configurations')
-    ax.set_xlim(min(r_squared_medians)-0.2, 1)
+    ax.set_xlim(min(r_squared_medians) - 0.2, 1)
     ax.axvline(0, label='$R^2=0$')
 
     lines, labels = ax.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax2.legend(lines + lines2, labels + labels2, loc='upper center',
-        bbox_to_anchor=(0.5, -0.2), ncol=2
-    )
-    
+               bbox_to_anchor=(0.5, -0.2), ncol=2
+               )
+
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
+
 def average_quadratic_losses(
     results_path,
-    growth_classes, 
+    growth_classes,
     growth_generator,
-    top_number_models = 2,
-    fill_alpha = 0.3, # to shade area of 1 std deviation
+    top_number_models=2,
+    fill_alpha=0.3,  # to shade area of 1 std deviation
     save_to_file=None
 ):
     from matplotlib import cm
@@ -1257,32 +1266,32 @@ def average_quadratic_losses(
         results_path,
         index_col='QID'
     )
-    sigmas = { # standard sigma values 
-        1 : 34.13,
-        2 : 13.59,
-        3 : 2.15, 
-        4 : 0.1,
+    sigmas = {  # standard sigma values
+        1: 34.13,
+        2: 13.59,
+        3: 2.15,
+        4: 0.1,
     }
 
     all_winning_models = list(results.loc[:, 'NameAlphabetical'])
-    rank_models = lambda n:sorted(set(n), key=n.count)[::-1] 
-    # from https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
+    def rank_models(n): return sorted(set(n), key=n.count)[::-1]
+    # from
+    # https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
 
     if len(all_winning_models) > top_number_models:
         winning_models = rank_models(all_winning_models)[0:top_number_models]
     else:
-        winning_models = list(set(all_winning_models))    
+        winning_models = list(set(all_winning_models))
 
     cm_subsection = np.linspace(
-        0,0.8,top_number_models
+        0, 0.8, top_number_models
     )
-    colour_list = [ cm.Accent(x) for x in cm_subsection ]
+    colour_list = [cm.Accent(x) for x in cm_subsection]
 
     plot_colours = {}
     for mod in winning_models:
         plot_colours[mod] = colour_list[winning_models.index(mod)]
         winning_models_quadratic_losses = {}
-
 
     fig = plt.figure()
     plt.clf()
@@ -1291,7 +1300,7 @@ def average_quadratic_losses(
     for mod in winning_models:
         winning_models_quadratic_losses[mod] = (
             results.loc[results['NameAlphabetical']
-            ==mod]['QuadraticLosses'].values
+                        == mod]['QuadraticLosses'].values
         )
 
         list_this_models_q_losses = []
@@ -1302,7 +1311,7 @@ def average_quadratic_losses(
 
         list_this_models_q_losses = np.array(
             list_this_models_q_losses
-        )    
+        )
 
         num_experiments = np.shape(list_this_models_q_losses)[1]
         avg_q_losses = np.empty(num_experiments)
@@ -1310,31 +1319,30 @@ def average_quadratic_losses(
         for i in range(num_experiments):
             avg_q_losses[i] = np.average(list_this_models_q_losses[:, i])
 
-
-        latex_name = growth_classes[growth_generator].latex_name(name = mod)
-        epochs = range(1, num_experiments+1)
+        latex_name = growth_classes[growth_generator].latex_name(name=mod)
+        epochs = range(1, num_experiments + 1)
 
         ax.semilogy(
-            epochs, 
-            avg_q_losses, 
-            label = latex_name,
+            epochs,
+            avg_q_losses,
+            label=latex_name,
             color=plot_colours[mod]
         )
 
         upper_one_sigma = [
-            np.percentile(np.array(list_this_models_q_losses[:,t]), 50 + sigmas[1]) for t in range(num_experiments)
-        ] 
+            np.percentile(np.array(list_this_models_q_losses[:, t]), 50 + sigmas[1]) for t in range(num_experiments)
+        ]
         lower_one_sigma = [
-            np.percentile(np.array(list_this_models_q_losses[:,t]), 50 - sigmas[1]) for t in range(num_experiments)
-        ] 
+            np.percentile(np.array(list_this_models_q_losses[:, t]), 50 - sigmas[1]) for t in range(num_experiments)
+        ]
 
         ax.fill_between(
-            epochs, 
-            lower_one_sigma, 
-            upper_one_sigma, 
+            epochs,
+            lower_one_sigma,
+            upper_one_sigma,
             alpha=fill_alpha,
             facecolor=plot_colours[mod],
-    #         label='$1 \sigma$ '
+            #         label='$1 \sigma$ '
         )
 
     ax.set_xlim(1, num_experiments)
@@ -1345,7 +1353,7 @@ def average_quadratic_losses(
 
 
 def r_squared_from_epoch_list(
-    qmd, 
+    qmd,
     model_ids=[],
     epochs=[],
     min_time=0,
@@ -1368,19 +1376,18 @@ def r_squared_from_epoch_list(
     # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe
     # picking probe based on model instead
     datamean = np.mean(exp_data[0:max_data_idx])
-    datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
-    
+    datavar = np.sum((exp_data[0:max_data_idx] - datamean)**2)
 
     fig = plt.figure()
     ax = plt.subplot(111)
     model_ids = list(set(model_ids))
     for model_id in model_ids:
-        mod = qmd.reducedModelInstanceFromID( model_id )
+        mod = qmd.reducedModelInstanceFromID(model_id)
         r_squared_by_epoch = {}
-        
+
         mod_num_qubits = DataBase.get_num_qubits(mod.Name)
         probe = ExpectationValues.n_qubit_plus_state(mod_num_qubits)
-        epochs.extend([0, qmd.NumExperiments-1])
+        epochs.extend([0, qmd.NumExperiments - 1])
         if len(mod.ResampleEpochs) > 0:
             epochs.extend(mod.ResampleEpochs)
 
@@ -1388,36 +1395,37 @@ def r_squared_from_epoch_list(
         for epoch in epochs:
             # Construct new Hamiltonian to get R^2 from
             # Hamiltonian corresponds to parameters at that epoch
-            ham = np.tensordot(mod.TrackEval[ epoch ], mod.SimOpList , axes=1)
+            ham = np.tensordot(mod.TrackEval[epoch], mod.SimOpList, axes=1)
             sum_of_residuals = 0
             for t in exp_times:
                 # sim = ExpectationValues.hahn_evolution(
-                sim = qmd.GrowthClass.expectation-value(
-                    ham=ham, 
-                    t=t, 
+                sim = qmd.GrowthClass.expectation - value(
+                    ham=ham,
+                    t=t,
                     state=probe
                 )
                 true = qmd.ExperimentalMeasurements[t]
                 diff_squared = (sim - true)**2
                 sum_of_residuals += diff_squared
 
-            Rsq = 1 - sum_of_residuals/datavar
+            Rsq = 1 - sum_of_residuals / datavar
             r_squared_by_epoch[epoch] = Rsq
 
-        r_squareds = [ r_squared_by_epoch[e] for e in  epochs ]
-        
-        plot_label=str( mod.LatexTerm )
+        r_squareds = [r_squared_by_epoch[e] for e in epochs]
+
+        plot_label = str(mod.LatexTerm)
         ax.plot(epochs, r_squareds, label=plot_label, marker='o')
-    ax.legend( bbox_to_anchor=(1, 0.5),)
+    ax.legend(bbox_to_anchor=(1, 0.5),)
     ax.set_ylabel('$R^2$')
     ax.set_xlabel('Epoch')
     ax.set_title('$R^2$ Vs Epoch (with resampling epochs)')
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
+
 def plot_quadratic_loss(
     qmd,
-    champs_or_all = 'champs',
+    champs_or_all='champs',
     save_to_file=None
 ):
 
@@ -1427,23 +1435,23 @@ def plot_quadratic_loss(
 
     if qmd.QHLmode is True:
         to_plot_quad_loss = [qmd.TrueOpModelID]
-        plot_title=str('Quadratic Loss for True operator (from QHL)')
+        plot_title = str('Quadratic Loss for True operator (from QHL)')
     elif champs_or_all == 'champs':
         to_plot_quad_loss = qmd.BranchChampions.values()
-        plot_title=str('Quadratic Loss for Branch champions')
+        plot_title = str('Quadratic Loss for Branch champions')
     else:
         to_plot_quad_loss = qmd.ModelNameIDs.keys()
-        plot_title=str('Quadratic Loss for all models')
-    
+        plot_title = str('Quadratic Loss for all models')
+
     for i in sorted(list(to_plot_quad_loss)):
         mod = qmd.reducedModelInstanceFromID(i)
         if len(mod.QuadraticLosses) > 0:
             epochs = range(1, len(mod.QuadraticLosses) + 1)
             model_name = mod.GrowthClass.latex_name(
-                name = qmd.ModelNameIDs[i] 
+                name=qmd.ModelNameIDs[i]
             )
             ax.plot(epochs, mod.QuadraticLosses, label=str(model_name))
-    ax.legend(bbox_to_anchor=(1,1))
+    ax.legend(bbox_to_anchor=(1, 1))
 
     ax.set_title(plot_title)
 
@@ -1451,39 +1459,39 @@ def plot_quadratic_loss(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-
 def summariseResultsCSV(
-    directory_name, 
+    directory_name,
     results_file_name_start="results",
     csv_name='all_results.csv'
 ):
-    import os, csv
+    import os
+    import csv
     if not directory_name.endswith('/'):
         directory_name += '/'
 
         # results_file_name_start
     if not csv_name.endswith('.csv'):
         csv_name += '.csv'
-        
+
     pickled_files = []
     for file in os.listdir(directory_name):
         if (
-            file.endswith(".p") 
-            and 
+            file.endswith(".p")
+            and
             file.startswith(results_file_name_start)
         ):
             pickled_files.append(file)
-    filenames = [directory_name+str(f) for f in pickled_files ]
+    filenames = [directory_name + str(f) for f in pickled_files]
     try:
         some_results = pickle.load(open(filenames[0], "rb"))
 
-    except:
-        print("Couldn't find results files beginning with ", 
-            results_file_name_start
-        )
+    except BaseException:
+        print("Couldn't find results files beginning with ",
+              results_file_name_start
+              )
 
         print(
-            "directory:", directory_name, 
+            "directory:", directory_name,
             "\nresults_file_name_start:", results_file_name_start,
             "\nFilenames found:", filenames,
             "\npickled files:", pickled_files,
@@ -1491,13 +1499,11 @@ def summariseResultsCSV(
         )
         raise
     result_fields = list(some_results.keys())
-    
-    
-    
+
+
 #    results_csv = str(directory_name+str(csv_name))
     results_csv = str(csv_name)
 
-    
     with open(results_csv, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=result_fields)
         writer.writeheader()
@@ -1507,26 +1513,25 @@ def summariseResultsCSV(
             writer.writerow(results)
 
 
-
 def plotVolumeQHL(
-    qmd, 
-    model_id=None, 
-    true_model=True, 
-    show_resamplings=True,  
+    qmd,
+    model_id=None,
+    true_model=True,
+    show_resamplings=True,
     save_to_file=None
 ):
     if true_model:
         try:
             mod = qmd.reducedModelInstanceFromID(
                 qmd.TrueOpModelID
-            ) 
-        except:
+            )
+        except BaseException:
             print("True model not present in QMD models.")
     elif model_id is not None:
         mod = qmd.reducedModelInstanceFromID(model_id)
     else:
         print("Must either provide model_id or set true_model=True for volume plot.")
-        
+
     try:
         y = mod.VolumeList
     except AttributeError:
@@ -1534,45 +1539,53 @@ def plotVolumeQHL(
         raise
 
     x = range(qmd.NumExperiments)
-        
+
     plt.clf()
     plt.xlabel('Epoch')
     plt.ylabel('Volume')
-    plt.semilogy(x,y, label='Volume')
+    plt.semilogy(x, y, label='Volume')
 
     resamplings = mod.ResampleEpochs
-    
-    if show_resamplings and len(resamplings)>0:
-        plt.axvline(resamplings[0], linestyle='dashed', 
-            c='grey', label='Resample point'
-        )
+
+    if show_resamplings and len(resamplings) > 0:
+        plt.axvline(resamplings[0], linestyle='dashed',
+                    c='grey', label='Resample point'
+                    )
         for r in resamplings[1:]:
             plt.axvline(r, linestyle='dashed', c='grey')
-    
+
     plt.legend()
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
-def BayF_IndexDictToMatrix(ModelNames, AllBayesFactors, StartBayesFactors=None):
-    
+
+def BayF_IndexDictToMatrix(ModelNames, AllBayesFactors,
+                           StartBayesFactors=None):
+
     size = len(ModelNames)
-    Bayf_matrix = np.zeros([size,size])
-    
+    Bayf_matrix = np.zeros([size, size])
+
     for i in range(size):
         for j in range(size):
-            try: 
-                Bayf_matrix[i,j] = AllBayesFactors[i][j][-1]
-            except:
-                Bayf_matrix[i,j] = 1
-    
+            try:
+                Bayf_matrix[i, j] = AllBayesFactors[i][j][-1]
+            except BaseException:
+                Bayf_matrix[i, j] = 1
+
     return Bayf_matrix
-    
+
 
 class SquareCollection(collections.RegularPolyCollection):
     """Return a collection of squares."""
 
     def __init__(self, **kwargs):
-        super(SquareCollection, self).__init__(4, rotation=np.pi/4., **kwargs)
+        super(
+            SquareCollection,
+            self).__init__(
+            4,
+            rotation=np.pi /
+            4.,
+            **kwargs)
 
     def get_transform(self):
         """Return transform scaling circle areas to data space."""
@@ -1581,9 +1594,8 @@ class SquareCollection(collections.RegularPolyCollection):
         scale_x = pts2pixels * ax.bbox.width / ax.viewLim.width
         scale_y = pts2pixels * ax.bbox.height / ax.viewLim.height
         return transforms.Affine2D().scale(scale_x, scale_y)
-        
-        
-        
+
+
 class IndexLocator(ticker.Locator):
 
     def __init__(self, max_ticks=21):
@@ -1599,11 +1611,10 @@ class IndexLocator(ticker.Locator):
         return self.raise_if_exceeds(np.arange(0, dmax, step))
 
 
-        
-def hinton(inarray, max_value=None, use_default_ticks=True, 
-    skip_diagonal = True, skip_which = None, grid = True, white_half = 0.,
-    where_labels = 'bottomleft'
-):
+def hinton(inarray, max_value=None, use_default_ticks=True,
+           skip_diagonal=True, skip_which=None, grid=True, white_half=0.,
+           where_labels='bottomleft'
+           ):
     """Plot Hinton diagram for visualizing the values of a 2D array.
 
     Plot representation of an array with positive and negative values
@@ -1624,7 +1635,7 @@ def hinton(inarray, max_value=None, use_default_ticks=True,
     skip_diagonal: boolean
         remove plotting of values on the diagonal
     skip_which: None, upper, lower
-        whether to plot both upper and lower triangular 
+        whether to plot both upper and lower triangular
         matrix or just one of them
     grid: Boolean
         to remove the grid from the plot
@@ -1641,88 +1652,87 @@ def hinton(inarray, max_value=None, use_default_ticks=True,
     inarray = np.asarray(inarray)
     height, width = inarray.shape
     if max_value is None:
-        finite_inarray = inarray[np.where(inarray>-np.inf)]
-        max_value = 2**np.ceil(np.log(np.max(np.abs(finite_inarray)))/np.log(2))
-    values = np.clip(inarray/max_value, -1, 1)
+        finite_inarray = inarray[np.where(inarray > -np.inf)]
+        max_value = 2**np.ceil(np.log(np.max(np.abs(finite_inarray))) / np.log(2))
+    values = np.clip(inarray / max_value, -1, 1)
     rows, cols = np.mgrid[:height, :width]
 
-    pos = np.where( np.logical_and(values > 0 , np.abs(values) < np.inf)  )
-    neg = np.where( np.logical_and(values < 0 , np.abs(values) < np.inf) )
+    pos = np.where(np.logical_and(values > 0, np.abs(values) < np.inf))
+    neg = np.where(np.logical_and(values < 0, np.abs(values) < np.inf))
 
     # if skip_diagonal:
-        # for mylist in [pos,neg]:
-            # diags = np.array([ elem[0] == elem[1] for elem in mylist ])
-            # diags = np.where(diags == True)
-            # print(diags)
-            # for elem in diags:
-                # del(mylist[elem])
-                # del(mylist[elem])    
-    
+    # for mylist in [pos,neg]:
+    # diags = np.array([ elem[0] == elem[1] for elem in mylist ])
+    # diags = np.where(diags == True)
+    # print(diags)
+    # for elem in diags:
+    # del(mylist[elem])
+    # del(mylist[elem])
+
     for idx, color in zip([pos, neg], ['white', 'black']):
         if len(idx[0]) > 0:
             xy = list(zip(cols[idx], rows[idx]))
 
             circle_areas = np.pi / 2 * np.abs(values[idx])
             if skip_diagonal:
-                diags = np.array([ elem[0] == elem[1] for elem in xy ])
+                diags = np.array([elem[0] == elem[1] for elem in xy])
                 diags = np.where(diags == True)
-                
+
                 for delme in diags[0][::-1]:
                     circle_areas[delme] = 0
-            
+
             if skip_which is not None:
                 if skip_which is 'upper':
-                    lows = np.array([ elem[0] > elem[1] for elem in xy ])
+                    lows = np.array([elem[0] > elem[1] for elem in xy])
                 if skip_which is 'lower':
-                    lows = np.array([ elem[0] < elem[1] for elem in xy ])
+                    lows = np.array([elem[0] < elem[1] for elem in xy])
                 lows = np.where(lows == True)
-                
+
                 for delme in lows[0][::-1]:
-                    circle_areas[delme] = 0 
-            
+                    circle_areas[delme] = 0
+
             squares = SquareCollection(sizes=circle_areas,
                                        offsets=xy, transOffset=ax.transData,
                                        facecolor=color, edgecolor=color)
             ax.add_collection(squares, autolim=True)
-            
+
     if white_half > 0:
         for i in range(width):
             for j in range(i):
-                
-                xy = [(i,j)] if skip_which is 'upper' else [(j,i)]
+
+                xy = [(i, j)] if skip_which is 'upper' else [(j, i)]
 
                 squares = SquareCollection(sizes=[white_half],
-                                       offsets=xy, transOffset=ax.transData,
-                                       facecolor='white', edgecolor='white')
+                                           offsets=xy, transOffset=ax.transData,
+                                           facecolor='white', edgecolor='white')
                 ax.add_collection(squares, autolim=True)
-                
 
     ax.axis('scaled')
     # set data limits instead of using xlim, ylim.
-    ax.set_xlim(-0.5, width-0.5)
-    ax.set_ylim(height-0.5, -0.5)
-    
-    if grid: ax.grid(color='gray', linestyle='--', linewidth=0.5)
+    ax.set_xlim(-0.5, width - 0.5)
+    ax.set_ylim(height - 0.5, -0.5)
+
+    if grid:
+        ax.grid(color='gray', linestyle='--', linewidth=0.5)
     ax.set_axisbelow(True)
 
     if use_default_ticks:
         ax.xaxis.set_major_locator(IndexLocator())
         ax.yaxis.set_major_locator(IndexLocator())
-        
+
     if where_labels is 'topright':
         ax.xaxis.tick_top()
         ax.yaxis.tick_right()
-        
-        
-        
+
+
 def format_fn(tick_val, tick_pos, labels):
-    
+
     if int(tick_val) in range(len(labels)):
         return labels[int(tick_val)]
     else:
         return ''
-        
-        
+
+
 class QMDFuncFormatter(Formatter):
     """
     Use a user-defined function for formatting.
@@ -1731,6 +1741,7 @@ class QMDFuncFormatter(Formatter):
     position ``pos``), and return a string containing the corresponding
     tick label.
     """
+
     def __init__(self, func, args):
         self.func = func
         self.args = args
@@ -1741,25 +1752,31 @@ class QMDFuncFormatter(Formatter):
 
         `x` and `pos` are passed through as-is.
         """
-        return self.func(x, pos, self.args)   
-        
+        return self.func(x, pos, self.args)
+
+
 def plotHinton(
-    model_names, 
-    bayes_factors, 
-    growth_generator=None, 
+    model_names,
+    bayes_factors,
+    growth_generator=None,
     save_to_file=None
 ):
-    hinton_mtx=BayF_IndexDictToMatrix(model_names, bayes_factors)
+    hinton_mtx = BayF_IndexDictToMatrix(model_names, bayes_factors)
     log_hinton_mtx = np.log10(hinton_mtx)
     # labels = [DataBase.latex_name_ising(name) for name in model_names.values()]
     labels = [
-        UserFunctions.get_latex_name(name, growth_generator) 
-            for name in model_names.values()
+        UserFunctions.get_latex_name(name, growth_generator)
+        for name in model_names.values()
     ]
 
-    fig, ax = plt.subplots(figsize=(7,7))
+    fig, ax = plt.subplots(figsize=(7, 7))
 
-    hinton(log_hinton_mtx, use_default_ticks=True, skip_diagonal=True, where_labels='topright', skip_which='upper')
+    hinton(
+        log_hinton_mtx,
+        use_default_ticks=True,
+        skip_diagonal=True,
+        where_labels='topright',
+        skip_which='upper')
     ax.xaxis.set_major_formatter(QMDFuncFormatter(format_fn, labels))
     ax.yaxis.set_major_formatter(QMDFuncFormatter(format_fn, labels))
     plt.xticks(rotation=90)
@@ -1769,10 +1786,8 @@ def plotHinton(
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
     plt.show()
-    
-    
-    
-    
+
+
 ###### Tree diagram #####
 
 def adjacent_branch_test(qmd, mod1, mod2):
@@ -1780,7 +1795,7 @@ def adjacent_branch_test(qmd, mod1, mod2):
     mod_b = qmd.reducedModelInstanceFromID(mod2).Name
     br_a = qmd.pullField(name=mod_a, field='branchID')
     br_b = qmd.pullField(name=mod_b, field='branchID')
-       
+
     diff = br_a - br_b
     if diff in [-1, 0, 1]:
         return True
@@ -1788,16 +1803,15 @@ def adjacent_branch_test(qmd, mod1, mod2):
         return False
 
 
-
-def available_position_list(max_this_branch, max_any_branch):   
-    # Used to get a list of positions to place nodes centrally 
-    N = 2*max_any_branch - 1
+def available_position_list(max_this_branch, max_any_branch):
+    # Used to get a list of positions to place nodes centrally
+    N = 2 * max_any_branch - 1
     all_nums = list(range(N))
-    evens = [a for a in all_nums if a%2==0]
-    odds = [a for a in all_nums if a%2!=0]    
-    
-    diff = max_any_branch-max_this_branch 
-    if diff%2==0:
+    evens = [a for a in all_nums if a % 2 == 0]
+    odds = [a for a in all_nums if a % 2 != 0]
+
+    diff = max_any_branch - max_this_branch
+    if diff % 2 == 0:
         all_positions = evens
         even_odd = 'even'
     else:
@@ -1805,87 +1819,86 @@ def available_position_list(max_this_branch, max_any_branch):
         even_odd = 'odd'
 
     if diff > 1:
-        if even_odd=='even':
-            to_cut = int(diff/2)
+        if even_odd == 'even':
+            to_cut = int(diff / 2)
             available_positions = all_positions[to_cut:-to_cut]
         else:
-            to_cut = int((diff)/2)
+            to_cut = int((diff) / 2)
             available_positions = all_positions[to_cut:-to_cut]
     else:
         available_positions = all_positions
-        
+
     return available_positions
 
-    
+
 # static coloring property definitions
 losing_node_colour = 'r'
 branch_champ_node_colour = 'b'
-overall_champ_node_colour = 'g'    
+overall_champ_node_colour = 'g'
 
-    
+
 def qmdclassTOnxobj(
-    qmd, 
-    modlist=None, 
+    qmd,
+    modlist=None,
     directed=True,
     only_adjacent_branches=True
 ):
-    
+
     if directed:
-        G=nx.DiGraph()
+        G = nx.DiGraph()
     else:
-        G=nx.Graph()
-        
+        G = nx.Graph()
+
     positions = {}
     branch_x_filled = {}
     branch_mod_count = {}
 
-    
     max_branch_id = qmd.HighestBranchID
     max_mod_id = qmd.HighestModelID
     if modlist is None:
         modlist = range(max_mod_id)
-    for i in range(max_branch_id+1):
+    for i in range(max_branch_id + 1):
         branch_x_filled[i] = 0
-        branch_mod_count[i] =  0 
+        branch_mod_count[i] = 0
 
     for i in modlist:
         mod = qmd.reducedModelInstanceFromID(i)
         name = mod.Name
-        branch=qmd.pullField(name=name, field='branchID')
+        branch = qmd.pullField(name=name, field='branchID')
         branch_mod_count[branch] += 1
         latex_term = mod.LatexTerm
-        
+
         G.add_node(i)
         G.node[i]['label'] = latex_term
         G.node[i]['status'] = 0.2
         G.node[i]['info'] = 'Non-winner'
 
-    # Set x-coordinate for each node based on how many nodes 
+    # Set x-coordinate for each node based on how many nodes
     # are on that branch (y-coordinate)
     most_models_per_branch = max(branch_mod_count.values())
     for i in modlist:
         mod = qmd.reducedModelInstanceFromID(i)
         name = mod.Name
-        branch=qmd.pullField(name=name, field='branchID')
+        branch = qmd.pullField(name=name, field='branchID')
         num_models_this_branch = branch_mod_count[branch]
         pos_list = available_position_list(
             num_models_this_branch,
             most_models_per_branch
         )
         branch_filled_so_far = branch_x_filled[branch]
-        branch_x_filled[branch]+=1
-        
+        branch_x_filled[branch] += 1
+
         x_pos = pos_list[branch_filled_so_far]
         y_pos = branch
         positions[i] = (x_pos, y_pos)
         G.node[i]['pos'] = (x_pos, y_pos)
 
-    # set node colour based on whether that model won a branch 
+    # set node colour based on whether that model won a branch
     for b in list(qmd.BranchChampions.values()):
         if b in modlist:
             G.node[b]['status'] = 0.45
             G.node[b]['info'] = 'Branch Champion'
-            
+
     G.node[qmd.ChampID]['status'] = 0.9
     G.node[qmd.ChampID]['info'] = 'Overall Champion'
 
@@ -1894,213 +1907,207 @@ def qmdclassTOnxobj(
         for b in modlist:
             is_adj = adjacent_branch_test(qmd, a, b)
             if is_adj or not only_adjacent_branches:
-                if a!=b:
-                    unique_pair = DataBase.unique_model_pair_identifier(a,b)
+                if a != b:
+                    unique_pair = DataBase.unique_model_pair_identifier(a, b)
                     if ((unique_pair not in edges)
                         and (unique_pair in qmd.BayesFactorsComputed)
-                    ):
+                        ):
                         edges.append(unique_pair)
-                        vs = [int(stringa) for stringa 
-                            in unique_pair.split(',')
-                        ]
-                        
+                        vs = [int(stringa) for stringa
+                              in unique_pair.split(',')
+                              ]
+
                         thisweight = np.log10(
                             qmd.AllBayesFactors[float(vs[0])][float(vs[1])][-1]
                         )
-                        
+
                         if thisweight < 0:
-                            # flip negative valued edges and move 
+                            # flip negative valued edges and move
                             # them to positive
-                            thisweight = - thisweight 
+                            thisweight = - thisweight
                             flipped = True
-                            G.add_edge(vs[1], vs[0], 
-                                weight=thisweight, flipped=flipped, 
-                                winner=b,
-                                loser=a,
-                                adj=is_adj
-                            )
+                            G.add_edge(vs[1], vs[0],
+                                       weight=thisweight, flipped=flipped,
+                                       winner=b,
+                                       loser=a,
+                                       adj=is_adj
+                                       )
                         else:
                             flipped = False
-                            G.add_edge(vs[0], vs[1], 
-                                weight=thisweight, flipped=flipped, 
-                                winner=a,
-                                loser=b,
-                                adj=is_adj
-                            )
+                            G.add_edge(vs[0], vs[1],
+                                       weight=thisweight, flipped=flipped,
+                                       winner=a,
+                                       loser=b,
+                                       adj=is_adj
+                                       )
     return G
-    
-    
+
+
 def plotQMDTree(
-    qmd, 
-    save_to_file=None, 
-    only_adjacent_branches=True, 
+    qmd,
+    save_to_file=None,
+    only_adjacent_branches=True,
     id_labels=True,
     modlist=None
 ):
 
     G = qmdclassTOnxobj(
-        qmd, 
-        only_adjacent_branches=only_adjacent_branches, 
+        qmd,
+        only_adjacent_branches=only_adjacent_branches,
         modlist=modlist)
-    
 
     arr = np.linspace(0, 50, 100).reshape((10, 10))
     cmap = plt.get_cmap('viridis')
     new_cmap = truncate_colormap(cmap, 0.35, 1.0)
 
     plotTreeDiagram(
-        G, 
-        n_cmap = plt.cm.pink_r, 
-        e_cmap = new_cmap, 
-        arrow_size = 0.02,
+        G,
+        n_cmap=plt.cm.pink_r,
+        e_cmap=new_cmap,
+        arrow_size=0.02,
         # arrow_size = 8.0,
-        nonadj_alpha = 0.1, e_alphas = [], 
-        label_padding = 0.4, pathstyle="curve",
+        nonadj_alpha=0.1, e_alphas=[],
+        label_padding=0.4, pathstyle="curve",
         id_labels=id_labels, save_to_file=save_to_file)
-    
-   
+
 
 def plotTreeDiagram(
-    G, 
-    n_cmap, 
-    e_cmap, 
-    e_alphas = [], nonadj_alpha=0.1, 
-    label_padding = 0.4, 
-    arrow_size = 0.02, widthscale=1.0,
+    G,
+    n_cmap,
+    e_cmap,
+    e_alphas=[], nonadj_alpha=0.1,
+    label_padding=0.4,
+    arrow_size=0.02, widthscale=1.0,
     entropy=None, inf_gain=None,
-    pathstyle = "straight", 
-    id_labels = True,
+    pathstyle="straight",
+    id_labels=True,
     save_to_file=None
 ):
     plt.clf()
-    plt.figure(figsize=(6,11))   
-    
-    directed  = nx.is_directed(G)
+    plt.figure(figsize=(6, 11))
 
-    if int(nx.__version__[0])>=2: 
+    directed = nx.is_directed(G)
+
+    if int(nx.__version__[0]) >= 2:
         list_of_edges = list(G.edges(data=True))
-    
-    
-    edge_tuples = tuple( G.edges() )
-    
-    positions = dict( zip( G.nodes(), tuple(  [prop['pos'] for
-        (n,prop) in G.nodes(data=True)]  ) )
+
+    edge_tuples = tuple(G.edges())
+
+    positions = dict(zip(G.nodes(), tuple([prop['pos'] for
+                                           (n, prop) in G.nodes(data=True)]))
+                     )
+    n_colours = tuple(
+        [
+            n_cmap(prop['status']) for (n, prop) in G.nodes(data=True)
+        ]
     )
-    n_colours = tuple( 
-        [ 
-            n_cmap(prop['status']) for (n,prop) in G.nodes(data=True)
-        ]   
-    )
-    
-    label_positions = []   
+
+    label_positions = []
     if id_labels is True:
-        labels = dict( 
-            zip( 
-                G.nodes(), 
-                tuple(  [prop['mod_id'] for (n,prop) in G.nodes(data=True)]  ) 
-                # tuple(  [n for (n,prop) in G.nodes(data=True)]  ) 
+        labels = dict(
+            zip(
+                G.nodes(),
+                tuple([prop['mod_id'] for (n, prop) in G.nodes(data=True)])
+                # tuple(  [n for (n,prop) in G.nodes(data=True)]  )
             )
         )
         for key in positions.keys():
             label_positions.append(
-                tuple( np.array(positions[key]) - np.array([0., 0.]) 
-            ) 
-        )
+                tuple(np.array(positions[key]) - np.array([0., 0.])
+                      )
+            )
     else:
-        labels = dict( 
-            zip( 
-                G.nodes(), 
-                tuple(  [prop['label'] for (n,prop) in G.nodes(data=True)]  ) 
+        labels = dict(
+            zip(
+                G.nodes(),
+                tuple([prop['label'] for (n, prop) in G.nodes(data=True)])
             )
-        )  
-        for key in positions.keys():
-            label_positions.append( tuple( np.array(positions[key]) - np.array([0., label_padding]) ) 
         )
-    
+        for key in positions.keys():
+            label_positions.append(tuple(np.array(positions[key]) - np.array([0., label_padding]))
+                                   )
+
     label_positions = dict(
-        zip( positions.keys(), tuple(label_positions) )
+        zip(positions.keys(), tuple(label_positions))
     )
-     
-    
-    if len(e_alphas) == 0: 
+
+    if len(e_alphas) == 0:
         for idx in range(len(edge_tuples)):
-            e_alphas.append(  
-                0.8 if list_of_edges[idx][2]["adj"] 
-                else nonadj_alpha 
+            e_alphas.append(
+                0.8 if list_of_edges[idx][2]["adj"]
+                else nonadj_alpha
             )
-    weights = tuple( 
-        [prop['weight'] for (u,v,prop) in list_of_edges] 
+    weights = tuple(
+        [prop['weight'] for (u, v, prop) in list_of_edges]
     )
-
-
 
     nx.draw_networkx_labels(
-        G, 
-        label_positions, 
+        G,
+        label_positions,
         labels,
         font_color='black',
         font_weight='bold'
     )
-    
+
     plt.tight_layout()
-    plt.gca().invert_yaxis() # so branch 0 on top
+    plt.gca().invert_yaxis()  # so branch 0 on top
     plt.gca().get_xaxis().set_visible(False)
     plt.ylabel('Branch')
-    
-    xmin = min( np.array(list(label_positions.values()))[:,0] )
-    xmax = max( np.array(list(label_positions.values()))[:,0] )
-    plt.xlim(xmin -0.8, xmax +0.8)
-    
 
+    xmin = min(np.array(list(label_positions.values()))[:, 0])
+    xmax = max(np.array(list(label_positions.values()))[:, 0])
+    plt.xlim(xmin - 0.8, xmax + 0.8)
 
-    nodes=list(G.nodes)
-    distinct_status=[]
+    nodes = list(G.nodes)
+    distinct_status = []
 
     model_ids_names = {}
 
-    labels=[]
-    handles=[]
+    labels = []
+    handles = []
     for n in nodes:
         model_ids_names[G.nodes[n]['mod_id']] = G.nodes[n]['label']
-        stat = G.nodes[n]['status'] # only for status not yet represented in legend
+        # only for status not yet represented in legend
+        stat = G.nodes[n]['status']
         if stat not in distinct_status:
             distinct_status.append(stat)
             # node colour encodes either number wins or branch champion
-            info=str(G.nodes[n]['wins']) 
-            col = tuple( n_cmap(G.nodes[n]['status']) )
+            info = str(G.nodes[n]['wins'])
+            col = tuple(n_cmap(G.nodes[n]['status']))
             handles.append(mpatches.Patch(color=col))
             labels.append(info)
-    labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: int(t[0]) ))
-    lgd_handles=[]
-    
+    labels, handles = zip(
+        *sorted(zip(labels, handles), key=lambda t: int(t[0])))
+    lgd_handles = []
+
     # if 'Branch Champion' in labels:
     #     legend_title='Champion Type'
     # else:
     #     legend_title='# QMD wins'
     # plt.legend(handles, labels, title=legend_title)
     if 'Branch Champion' in labels:
-        legend_title='Champion Type'
+        legend_title = 'Champion Type'
     else:
-        legend_title='# QMD wins'
+        legend_title = '# QMD wins'
 
     legend_num_wins = plt.legend(
-        handles, 
-        labels, 
-        title=legend_title, 
-        # mode="expand", 
-        ncol=min(6, len(handles)), 
+        handles,
+        labels,
+        title=legend_title,
+        # mode="expand",
+        ncol=min(6, len(handles)),
         loc='lower center'
     )
 
     mod_id_handles = list(sorted(list(model_ids_names.keys())))
     mod_id_labels = [model_ids_names[k] for k in mod_id_handles]
-    
+
     mod_id_labels, mod_id_handles = zip(
         *sorted(
             zip(
-                mod_id_labels, 
+                mod_id_labels,
                 mod_id_handles
-            ), 
+            ),
             key=lambda t: t[0]
         )
     )
@@ -2116,23 +2123,22 @@ def plotTreeDiagram(
     # model_handles.append(mod_handle)
     # handler_map[mod_handle] = textObjectHandler()
 
-
     for mid in mod_id_handles:
         mod_str = model_ids_names[mid]
         num_wins = G.nodes[mod_str]['wins']
         relation_to_true_model = G.nodes[mod_str]['relation_to_true_model']
 
         mod_lab = "({}) \t {}".format(
-            num_wins, 
+            num_wins,
             str(mod_str)
-        ) 
+        )
 
         model_labels.append(mod_lab)
         mod_colour = "black"  # if true/champ can change colour
         # mod_colour =n_cmap(G.nodes[mod_str]['status'])
         mod_handle = textHandleModelID(
             mid,
-            relation_to_true_model, 
+            relation_to_true_model,
             num_wins,
             mod_colour
         )
@@ -2142,9 +2148,9 @@ def plotTreeDiagram(
     model_labels, model_handles = zip(
         *sorted(
             zip(
-                model_labels, 
+                model_labels,
                 model_handles
-            ), 
+            ),
             key=lambda t: int(t[1].model_id)
         )
     )
@@ -2159,70 +2165,67 @@ def plotTreeDiagram(
     #     else:
     #         node_boundary_colours.append('black')
 
-
     nx.draw_networkx_nodes(
-        G, 
-        with_labels = True, # labels=labels, 
-        pos=positions, 
-        k=1.5, #node spacing
-        width=None, 
-        alpha = 0.5, 
-        node_size=700, #node_shape='8',
-        node_color = n_colours,
-        edgecolors = node_boundary_colours, 
-    )  
-    
+        G,
+        with_labels=True,  # labels=labels,
+        pos=positions,
+        k=1.5,  # node spacing
+        width=None,
+        alpha=0.5,
+        node_size=700,  # node_shape='8',
+        node_color=n_colours,
+        edgecolors=node_boundary_colours,
+    )
+
     edges_for_cmap = draw_networkx_arrows(
-        G, 
+        G,
         edgelist=edge_tuples,
-        pos=positions, 
-        arrows=True, 
+        pos=positions,
+        arrows=True,
         arrowstyle='->',
-        width = arrow_size, 
+        width=arrow_size,
         widthscale=widthscale,
-        pathstyle=pathstyle, 
-        alphas = e_alphas, 
-        edge_color= weights,
-        edge_cmap=e_cmap, 
-        edge_vmin=None, #0.8, 
-        edge_vmax=None, #0.85
+        pathstyle=pathstyle,
+        alphas=e_alphas,
+        edge_color=weights,
+        edge_cmap=e_cmap,
+        edge_vmin=None,  # 0.8,
+        edge_vmax=None,  # 0.85
     )
 
     plt.legend(
-        model_handles, 
+        model_handles,
         model_labels,
-        bbox_to_anchor=(0.5, 1.0, 1, 0 ),
+        bbox_to_anchor=(0.5, 1.0, 1, 0),
         # bbox_to_anchor=(1.1, 1.05),
-        handler_map=handler_map, 
+        handler_map=handler_map,
         loc=1,
-        title = model_legend_title
-    )._legend_box.align='left'
+        title=model_legend_title
+    )._legend_box.align = 'left'
 
     plt.gca().add_artist(legend_num_wins)
     plt.colorbar(
-        edges_for_cmap, 
-        orientation="horizontal", 
-        pad= 0, 
+        edges_for_cmap,
+        orientation="horizontal",
+        pad=0,
         label=r'$\log_{10}$ Bayes factor'
-    ) 
-   
+    )
+
     plot_title = str(
         "Quantum Model Development Tree"
     )
     plt.title(plot_title)
 
-
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-
 class textHandleModelID(object):
     def __init__(
-        self, 
-        model_id, 
-        relation_to_true_model, 
-        num_wins, 
+        self,
+        model_id,
+        relation_to_true_model,
+        num_wins,
         color
     ):
 
@@ -2231,7 +2234,7 @@ class textHandleModelID(object):
         self.relation_to_true_model = relation_to_true_model
         if num_wins < 0:
             self.my_text = str(
-                "{} ({}) ".format(model_id,num_wins)
+                "{} ({}) ".format(model_id, num_wins)
             )
         else:
             self.my_text = str("{}".format(model_id))
@@ -2243,63 +2246,60 @@ class textHandleModelID(object):
             self.my_color = color
             self.text_weight = 'normal'
 
+
 class textObjectHandler(object):
     def legend_artist(
-        self, 
-        legend, 
-        orig_handle, 
-        fontsize, 
+        self,
+        legend,
+        orig_handle,
+        fontsize,
         handlebox
     ):
         x0, y0 = handlebox.xdescent, handlebox.ydescent
         width, height = handlebox.width, handlebox.height
         patch = mpl_text.Text(
-            x=0, y=0, 
-            text=orig_handle.my_text, 
-            color=orig_handle.my_color, 
-            fontweight = orig_handle.text_weight, 
-            verticalalignment=u'baseline', 
-            horizontalalignment=u'left', 
-            multialignment=None, 
-            fontproperties=None, 
-#             rotation=45, 
-            linespacing=None, 
+            x=0, y=0,
+            text=orig_handle.my_text,
+            color=orig_handle.my_color,
+            fontweight=orig_handle.text_weight,
+            verticalalignment=u'baseline',
+            horizontalalignment=u'left',
+            multialignment=None,
+            fontproperties=None,
+            #             rotation=45,
+            linespacing=None,
             rotation_mode=None
         )
         handlebox.add_artist(patch)
         return patch
 
 
-
-
 def colour_dicts_from_win_count(
-    winning_count, 
+    winning_count,
     latex_mapping_file,
     growth_generator=None,
     min_colour_value=0.1
 ):
     growth_class = GrowthRules.get_growth_generator_class(
-        growth_generation_rule = growth_generator
+        growth_generation_rule=growth_generator
     )
 
-    max_wins=max(list(winning_count.values()))
-    min_wins=min(list(winning_count.values()))
+    max_wins = max(list(winning_count.values()))
+    min_wins = min(list(winning_count.values()))
     min_col = min_colour_value
     max_col = 0.9
 
     win_count_vals = list(winning_count.values())
     win_count_vals.append(0)
-    distinct_win_vals=sorted(list(set(win_count_vals)))
+    distinct_win_vals = sorted(list(set(win_count_vals)))
     num_colours = len(distinct_win_vals)
     col_space = np.linspace(min_col, max_col, num_colours)
     colour_by_win_count = {}
     colour_by_node_name = {}
-    
+
     all_models = growth_class.name_branch_map(
-        latex_mapping_file = latex_mapping_file,
+        latex_mapping_file=latex_mapping_file,
     ).keys()
-
-
 
     # print("colour dict function. all_models:\n", all_models)
 
@@ -2309,71 +2309,68 @@ def colour_dicts_from_win_count(
     for k in all_models:
         try:
             num_wins = winning_count[k]
-        except:
+        except BaseException:
             num_wins = 0
         idx = distinct_win_vals.index(num_wins)
         colour_by_node_name[k] = colour_by_win_count[idx]
     return colour_by_node_name, colour_by_win_count
 
 
-
-
 def cumulativeQMDTreePlot(
-        cumulative_csv, 
-        wins_per_mod, 
-        latex_mapping_file,
-        avg='means',
-        only_adjacent_branches=True,
-        growth_generator=None,
-        directed=True,
-        entropy=None, 
-        inf_gain=None,
-        save_to_file=None
-    ):
+    cumulative_csv,
+    wins_per_mod,
+    latex_mapping_file,
+    avg='means',
+    only_adjacent_branches=True,
+    growth_generator=None,
+    directed=True,
+    entropy=None,
+    inf_gain=None,
+    save_to_file=None
+):
     import networkx as nx
     import copy
     import csv
     means, medians, counts = multiQMDBayes(
-        cumulative_csv, 
+        cumulative_csv,
         growth_generator=growth_generator
     )
-    if avg=='means':
+    if avg == 'means':
         # print("[cumulativeQMDTreePlot] USING MEANS")
         # print(means)
-        bayes_factors = means #medians
-    elif avg=='medians':
+        bayes_factors = means  # medians
+    elif avg == 'medians':
         # print("[cumulativeQMDTreePlot] USING MEDIANS")
         # print(medians)
         bayes_factors = medians
 
     print("[cumulativeQMDTreePlot] COUNTS", counts)
 
-
-    max_bayes_factor = max([max(bayes_factors[k].values()) for k in bayes_factors.keys()])
+    max_bayes_factor = max([max(bayes_factors[k].values())
+                            for k in bayes_factors.keys()])
     growth_class = GrowthRules.get_growth_generator_class(
-        growth_generation_rule = growth_generator
+        growth_generation_rule=growth_generator
     )
     true_model = growth_class.true_operator_latex()
 
     term_branches = growth_class.name_branch_map(
-        latex_mapping_file = latex_mapping_file,
+        latex_mapping_file=latex_mapping_file,
     )
 
     modlist = csv.DictReader(open(cumulative_csv)).fieldnames
     if 'ModelName' in modlist:
         modlist.remove('ModelName')
 
-    pair_freqs={}
+    pair_freqs = {}
     for c in list(counts.keys()):
         for k in list(counts[c].keys()):
-            this_edge=(c,k)
-            pair_freqs[this_edge]=counts[c][k]
-
+            this_edge = (c, k)
+            pair_freqs[this_edge] = counts[c][k]
 
     if directed:
-        G=nx.DiGraph()
+        G = nx.DiGraph()
     else:
-        G=nx.Graph()
+        G = nx.Graph()
 
     positions = {}
     branch_x_filled = {}
@@ -2381,27 +2378,27 @@ def cumulativeQMDTreePlot(
 
 #    max_branch_id = qmd.HighestBranchID # TODO: get this number without access to QMD class instance
     # max_branch_id = 9 # TODO: this is hardcoded - is there an alternative?
-    max_branch_id = max( list(term_branches.values()) ) + 1
+    max_branch_id = max(list(term_branches.values())) + 1
     max_mod_id = len(modlist)
-    for i in range(max_branch_id+1):
+    for i in range(max_branch_id + 1):
         branch_x_filled[i] = 0
-        branch_mod_count[i] =  0 
+        branch_mod_count[i] = 0
 
     colour_by_node_name, colour_by_count = (
         colour_dicts_from_win_count(
-            wins_per_mod, 
+            wins_per_mod,
             latex_mapping_file=latex_mapping_file,
-            growth_generator=growth_generator, 
+            growth_generator=growth_generator,
             min_colour_value=0.4
         )
     )
     min_colour = min(list(colour_by_node_name.values()))
-    
+
     for m in modlist:
         branch = term_branches[m]
-        branch_mod_count[branch]+=1
+        branch_mod_count[branch] += 1
         G.add_node(m)
-        G.nodes[m]['label']=str(m)
+        G.nodes[m]['label'] = str(m)
 
         if m == true_model:
             G.nodes[m]['relation_to_true_model'] = 'true'
@@ -2409,22 +2406,21 @@ def cumulativeQMDTreePlot(
             G.nodes[m]['relation_to_true_model'] = 'none'
 
         try:
-            G.nodes[m]['status']=colour_by_node_name[m]
-            G.nodes[m]['wins']=wins_per_mod[m]
-            G.nodes[m]['info']=wins_per_mod[m]
-            
-        except:
+            G.nodes[m]['status'] = colour_by_node_name[m]
+            G.nodes[m]['wins'] = wins_per_mod[m]
+            G.nodes[m]['info'] = wins_per_mod[m]
+
+        except BaseException:
             G.nodes[m]['wins'] = 0
-            G.nodes[m]['status']=min_colour
-            G.nodes[m]['info']=0
-            
+            G.nodes[m]['status'] = min_colour
+            G.nodes[m]['info'] = 0
+
     print("[cumulativeQMDTreePlot] nodes added.")
-    max_num_mods_any_branch=max(list(branch_mod_count.values()))
+    max_num_mods_any_branch = max(list(branch_mod_count.values()))
     # get the cordinates to display this model's node at
-    
-    
+
     for m in modlist:
-        
+
         branch = term_branches[m]
         num_mods_this_branch = branch_mod_count[branch]
         pos_list = available_position_list(
@@ -2432,14 +2428,12 @@ def cumulativeQMDTreePlot(
             max_num_mods_any_branch
         )
         branch_filled_so_far = branch_x_filled[branch]
-        branch_x_filled[branch]+=1
+        branch_x_filled[branch] += 1
 
         x_pos = pos_list[branch_filled_so_far]
         y_pos = branch
         positions[m] = (x_pos, y_pos)
         G.node[m]['pos'] = (x_pos, y_pos)
-        
-
 
     print("[cumulativeQMDTreePlot] node positions added.")
     sorted_positions = sorted(positions.values(), key=lambda x: (x[1], x[0]))
@@ -2454,18 +2448,17 @@ def cumulativeQMDTreePlot(
         model_ids_names[mod_id] = G.node[m]['label']
 
     edges = []
-    edge_frequencies=[]
+    edge_frequencies = []
     max_frequency = max(list(pair_freqs.values()))
 
     try:
-        low = int(np.percentile(range(0,max_frequency), q=20  ))
-        mid = int(np.percentile(range(0,max_frequency), q=60  ))
+        low = int(np.percentile(range(0, max_frequency), q=20))
+        mid = int(np.percentile(range(0, max_frequency), q=60))
         high = max_frequency
-    except:
+    except BaseException:
         low = max_frequency
         mid = max_frequency
         high = max_frequency
-
 
     # frequency_markers = list(np.linspace(0, max_frequency, 4, dtype=int))
     print("[cumulativeQMDTreePlot] setting edges.")
@@ -2475,51 +2468,50 @@ def cumulativeQMDTreePlot(
     even_arrow_width = True
     # setting the thickness if the arrows
     for a in modlist:
-        remaining_modlist = modlist[modlist.index(a)+1:]
+        remaining_modlist = modlist[modlist.index(a) + 1:]
         for b in remaining_modlist:
             is_adj = global_adjacent_branch_test(
-                a, 
-                b, 
+                a,
+                b,
                 term_branches
             )
             if is_adj or not only_adjacent_branches:
-                if a!=b :
-                    pairing = (a,b)
+                if a != b:
+                    pairing = (a, b)
                     try:
                         # frequency = pair_freqs[pairing]/max_frequency
                         frequency = pair_freqs[pairing]
                         if frequency < low:
-                            frequency = 1 # thin 
+                            frequency = 1  # thin
                         elif low <= frequency < mid:
-                            frequency = 10 # medium 
-                        else: 
-                            frequency = 50 # thick
-                    except:
+                            frequency = 10  # medium
+                        else:
+                            frequency = 50  # thick
+                    except BaseException:
                         print("couldn't assign frequency")
                         frequency = 1
-                    
+
                     edges.append(pairing)
                     print("pair {} freq {}".format(pairing, frequency))
                     edge_frequencies.append(frequency)
 
-                    vs = [a,b]
+                    vs = [a, b]
 
                     try:
                         bf = bayes_factors[a][b]
-                    except:
-                        bf = 0 
+                    except BaseException:
+                        bf = 0
 
                     if bf != 0:
-                        if bf < 1: # ie model b has won
-                            bf = float(1/bf)
+                        if bf < 1:  # ie model b has won
+                            bf = float(1 / bf)
                             weight = np.log10(bf)
-                            winner = b 
+                            winner = b
                             loser = a
-                        else: 
+                        else:
                             weight = np.log10(bf)
                             winner = a
                             loser = b
-
 
                         # thisweight = np.log10(bayes_factors[a][b])
                         try:
@@ -2531,49 +2523,49 @@ def cumulativeQMDTreePlot(
                                 \n\t bf:{} \
                                 \n\t freq:{} \
                                 \n\t pair freq {}".format(
-                                pairing, 
-                                str(bayes_factors[a][b]),
-                                str(bayes_factors[b][a]),
-                                str(weight), 
-                                str(bf),
-                                frequency,
-                                pair_freqs[pairing]
+                                    pairing,
+                                    str(bayes_factors[a][b]),
+                                    str(bayes_factors[b][a]),
+                                    str(weight),
+                                    str(bf),
+                                    frequency,
+                                    pair_freqs[pairing]
                                 )
                             )
                             G.add_edge(
-                                loser, 
-                                winner, 
-                                weight=weight, 
+                                loser,
+                                winner,
+                                weight=weight,
                                 winner=winner,
                                 loser=loser,
                                 # flipped=flipped,
-                                adj = is_adj, 
+                                adj=is_adj,
                                 freq=frequency
                             )
-                        except:
+                        except BaseException:
                             print(
                                 "[plotQMD - cumulativeQMDTreePlot] failed to add edge", pairing
                             )
                             raise
 
                     elif bf == 0:
-                        weight = 0 
+                        weight = 0
             else:
-                print("not adding edge {}/{}".format(a,b))
+                print("not adding edge {}/{}".format(a, b))
 
     print("[cumulativeQMDTreePlot] edges added.")
     print("edge freqs:", edge_frequencies)
     max_freq = max(edge_frequencies)
     # print("freq markers:", frequency_markers)
     print("[plotQMD]max freq:", max_freq)
-    
+
     # try:
     #     freq_scale = 10/max_freq
     # except:
-    #     freq_scale = 0 
+    #     freq_scale = 0
 
     freq_scale = 1
-    edge_f = [i*freq_scale for i in edge_frequencies]
+    edge_f = [i * freq_scale for i in edge_frequencies]
 
     arr = np.linspace(0, 50, 100).reshape((10, 10))
     cmap = plt.get_cmap('viridis')
@@ -2584,26 +2576,25 @@ def cumulativeQMDTreePlot(
 
     plotTreeDiagram(
         G,
-        n_cmap = plt.cm.pink_r, 
-        e_cmap = new_cmap,
-       # e_cmap = plt.cm.Blues, 
-        # e_cmap = plt.cm.Paired,     
-        # e_cmap = plt.cm.rainbow,     
-        nonadj_alpha = 0.0, 
-        e_alphas = [] , 
-        # widthscale=10.5, 
-        widthscale=3, 
-        label_padding = 0.4, 
+        n_cmap=plt.cm.pink_r,
+        e_cmap=new_cmap,
+        # e_cmap = plt.cm.Blues,
+        # e_cmap = plt.cm.Paired,
+        # e_cmap = plt.cm.rainbow,
+        nonadj_alpha=0.0,
+        e_alphas=[],
+        # widthscale=10.5,
+        widthscale=3,
+        label_padding=0.4,
         pathstyle="curve",
         arrow_size=None,
-        entropy=None, 
+        entropy=None,
         inf_gain=None
-    )   
+    )
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
-    return G, edges, edge_f   
-    
+    return G, edges, edge_f
 
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
@@ -2614,12 +2605,12 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
 
 
 def draw_networkx_arrows(
-    G, 
+    G,
     pos,
     edgelist=None,
-    nodedim = 0.,
-    width=0.02,    #                        width=0.02, 1.0
-    widthscale = 1.0,
+    nodedim=0.,
+    width=0.02,  # width=0.02, 1.0
+    widthscale=1.0,
     edge_color='k',
     style='solid',
     alphas=1.,
@@ -2636,45 +2627,47 @@ def draw_networkx_arrows(
 
     if edgelist is None:
         edgelist = G.edges()
-        
+
     if width is None:
         try:
             widthlist = np.array(
                 list(
-                    [(widthscale*prop['freq']) for (u,v,prop) in G.edges(data=True)]  
+                    [(widthscale * prop['freq'])
+                     for (u, v, prop) in G.edges(data=True)]
                 )
             )
-            widthlist = widthscale*widthlist/np.max(widthlist)
-            # widthlist = [(a+widthscale*0.1) for a in widthlist] ## this was giving colour to non-existent edges
-        except:
-#            widthlist = widthscale*0.02
+            widthlist = widthscale * widthlist / np.max(widthlist)
+            # widthlist = [(a+widthscale*0.1) for a in widthlist] ## this was
+            # giving colour to non-existent edges
+        except BaseException:
+            #            widthlist = widthscale*0.02
             widthlist = widthscale
-            
+
     else:
         widthlist = width
 
     if not edgelist or len(edgelist) == 0:  # no edges!
         return None
-        
-    if len(alphas)<len(edgelist):
+
+    if len(alphas) < len(edgelist):
         alphas = np.repeat(alphas, len(edgelist))
 
     # set edge positions
     edge_pos = np.asarray([(pos[e[0]], pos[e[1]]) for e in edgelist])
-    
+
     if not cb.iterable(widthlist):
         lw = (widthlist,)
     else:
         lw = widthlist
 
     if (
-        # not cb.is_string_like(edge_color) 
-        type(edge_color) != str 
-        and cb.iterable(edge_color) 
+        # not cb.is_string_like(edge_color)
+        type(edge_color) != str
+        and cb.iterable(edge_color)
         and len(edge_color) == len(edge_pos)
     ):
         if np.alltrue(
-            [type(c)==str for c in edge_color]
+            [type(c) == str for c in edge_color]
         ):
             # (should check ALL elements)
             # list of color letters such as ['k','r','k',...]
@@ -2682,7 +2675,7 @@ def draw_networkx_arrows(
                                  for c in edge_color])
         elif np.alltrue(
             # [not cb.is_string_like(c) for c in edge_color]
-            [type(c)!=str for c in edge_color]
+            [type(c) != str for c in edge_color]
         ):
             # If color specs are given as (rgb) or (rgba) tuples, we're OK
             if np.alltrue(
@@ -2695,10 +2688,10 @@ def draw_networkx_arrows(
         else:
             raise ValueError('edge_color must consist of \
                 either color names or numbers'
-            )
+                             )
     else:
         if (
-            # cb.is_string_like(edge_color) 
+            # cb.is_string_like(edge_color)
             type(edge_color) == str
             or len(edge_color) == 1
         ):
@@ -2706,11 +2699,11 @@ def draw_networkx_arrows(
         else:
             raise ValueError('edge_color must be a single color or \
             list of exactly m colors where m is the number or edges'
-        )
+                             )
 
     edge_collection = collections.LineCollection(
         edge_pos,
-        colors=edge_colors, 
+        colors=edge_colors,
         linewidths=lw
     )
     edge_collection.set_zorder(1)  # edges go behind nodes
@@ -2733,15 +2726,16 @@ def draw_networkx_arrows(
     #     print(edgelist[i], ":", edge_color[i])
 
     for n in G:
-        c=Circle(pos[n],radius=0.02,alpha=0.5)
+        c = Circle(pos[n], radius=0.02, alpha=0.5)
         ax.add_patch(c)
-        G.node[n]['patch']=c
-        x,y=pos[n]
-    seen={}
+        G.node[n]['patch'] = c
+        x, y = pos[n]
+    seen = {}
 
-    # Rescale all weights between 0,1 so cmap can find the appropriate RGB value.
+    # Rescale all weights between 0,1 so cmap can find the appropriate RGB
+    # value.
     offset = 0.7
-    norm_edge_color = edge_color/max_bayes_value
+    norm_edge_color = edge_color / max_bayes_value
 
     # print("all color cmap values", norm_edge_color)
 
@@ -2752,52 +2746,56 @@ def draw_networkx_arrows(
                 lw = widthlist
             else:
                 lw = widthlist[idx]
-            
-            arrow_colour =  edge_cmap(norm_edge_color[idx])
+
+            arrow_colour = edge_cmap(norm_edge_color[idx])
 
             if pathstyle is "straight":
                 (src, dst) = edge_pos[idx]
                 x1, y1 = src
                 x2, y2 = dst
                 delta = 0.2
-                theta = np.arctan((y2-y1)/(x2-x1))
+                theta = np.arctan((y2 - y1) / (x2 - x1))
                 # print(theta)
-                if x1==x2:
-                    dx = x2-x1
-                    dy = y2-y1 - np.sign(y2-y1)*delta
-                elif y1==y2:
-                    dx = x2-x1 - np.sign(x2-x1)*delta
-                    dy = y2-y1 
+                if x1 == x2:
+                    dx = x2 - x1
+                    dy = y2 - y1 - np.sign(y2 - y1) * delta
+                elif y1 == y2:
+                    dx = x2 - x1 - np.sign(x2 - x1) * delta
+                    dy = y2 - y1
                 else:
-                    dx = x2-x1 - np.sign(x2-x1)*np.abs(np.cos(theta)*delta)   # x offset
-                    dy = y2-y1 - np.sign(y2-y1)*np.abs(np.sin(theta)*delta)   # y offset 
-                
-                thislabel = None if len(label)<len(edgelist) else label[idx]
+                    dx = x2 - x1 - \
+                        np.sign(x2 - x1) * np.abs(np.cos(theta)
+                                                  * delta)   # x offset
+                    dy = y2 - y1 - \
+                        np.sign(y2 - y1) * np.abs(np.sin(theta)
+                                                  * delta)   # y offset
+
+                thislabel = None if len(label) < len(edgelist) else label[idx]
 
                 ax.arrow(
-                    x1,y1, dx,dy,
-                    facecolor=arrow_colour, 
-                    alpha = alphas[idx],
-                    linewidth = 0, 
-                    antialiased = True,
-                    width = lw, 
-                    head_width = 5*lw,
-                    overhang = -5*0.02/lw,
-                    length_includes_head=True, 
+                    x1, y1, dx, dy,
+                    facecolor=arrow_colour,
+                    alpha=alphas[idx],
+                    linewidth=0,
+                    antialiased=True,
+                    width=lw,
+                    head_width=5 * lw,
+                    overhang=-5 * 0.02 / lw,
+                    length_includes_head=True,
                     label=thislabel, zorder=1
                 )
-                    
+
             elif pathstyle is "curve":
-                
-                (u,v) = edgelist[idx]
+
+                (u, v) = edgelist[idx]
                 # (u,v,prop) = prop['weight'] for  in list_of_edges
                 # flipped = G.edge[(u,v)]
-                
-                winner = G.edges[(u,v)]['winner']
-                loser = G.edges[(u,v)]['loser']
 
-                n1=G.node[winner]['patch']
-                n2=G.node[loser]['patch']
+                winner = G.edges[(u, v)]['winner']
+                loser = G.edges[(u, v)]['loser']
+
+                n1 = G.node[winner]['patch']
+                n2 = G.node[loser]['patch']
 
                 # n1=G.node[loser]['patch']
                 # n2=G.node[winner]['patch']
@@ -2805,26 +2803,26 @@ def draw_networkx_arrows(
                 # n1=G.node[u]['patch']
                 # n2=G.node[v]['patch']
 
-                rad=0.1
+                rad = 0.1
 
-                if (u,v) in seen:
-                    rad=seen.get((u,v))
-                    rad=(rad+np.sign(rad)*0.1)*-1
-                alpha=0.5
-                
+                if (u, v) in seen:
+                    rad = seen.get((u, v))
+                    rad = (rad + np.sign(rad) * 0.1) * -1
+                alpha = 0.5
+
                 kwargs = {
-                    # 'head_width': 5*lw, 
-                    'facecolor': arrow_colour[0:3]+(alphas[idx],),
-                    'edgecolor': (0,0,0,0.)
-                      #'overhang':-5*0.02/lw,  
-                      #'length_includes_head': True,
-                      # capstyle='projecting',
+                    # 'head_width': 5*lw,
+                    'facecolor': arrow_colour[0:3] + (alphas[idx],),
+                    'edgecolor': (0, 0, 0, 0.)
+                    # 'overhang':-5*0.02/lw,
+                    # 'length_includes_head': True,
+                    # capstyle='projecting',
                 }
-                          
+
                 # Can be accepted by fancy arrow patch to alter arrows
                 arrow_style = ArrowStyle.Wedge(
-                    tail_width = lw,
-                    shrink_factor = 0.4
+                    tail_width=lw,
+                    shrink_factor=0.4
                 )
 
                 # arrow_style = mpatches.ArrowStyle.Curve(
@@ -2838,179 +2836,230 @@ def draw_networkx_arrows(
                     arrowstyle=arrow_style,
                     # arrowstyle='simple',
                     # arrowstyle='curveb',
-                    connectionstyle='arc3,rad=%s'%rad,
+                    connectionstyle='arc3,rad=%s' % rad,
                     mutation_scale=5.0,
                     # alpha=0.5,
-                    lw=lw,   #AROUND 10 TO BE FEASIBLE
-                   **kwargs
+                    lw=lw,  # AROUND 10 TO BE FEASIBLE
+                    **kwargs
                 )
-                seen[(u,v)]=rad
+                seen[(u, v)] = rad
                 ax.add_patch(e)
-           
+
     # print("rad", rad)
     # print("Node coordinates", n1, n2)
     # print("arrowcolor", arrow_colour)
-    
+
     # update view
     minx = np.amin(np.ravel(edge_pos[:, :, 0]))
     maxx = np.amax(np.ravel(edge_pos[:, :, 0]))
     miny = np.amin(np.ravel(edge_pos[:, :, 1]))
     maxy = np.amax(np.ravel(edge_pos[:, :, 1]))
 
-    w = maxx-minx
-    h = maxy-miny
-    padx,  pady = 0.05*w, 0.05*h
-    corners = (minx-padx, miny-pady), (maxx+padx, maxy+pady)
+    w = maxx - minx
+    h = maxy - miny
+    padx, pady = 0.05 * w, 0.05 * h
+    corners = (minx - padx, miny - pady), (maxx + padx, maxy + pady)
     ax.update_datalim(corners)
     ax.autoscale_view()
 
-    return edge_collection    
+    return edge_collection
 
 
 ### Parameter Estimate Plot ###
 def fill_between_sigmas(
-    ax, 
-    distribution, 
-    times, 
+    ax,
+    distribution,
+    times,
     legend=False,
-    only_one_sigma = True, 
+    only_one_sigma=True,
 ):
     # to draw distributions on a given axis, ax.
     # where distribution must be a dict
-    # distribution[t] = [...], a list of values for the distribution at that time
-    
-    sigmas = { # standard sigma values 
-        1 : 34.13,
-        2 : 13.59,
-        3 : 2.15, 
-        4 : 0.1,
+    # distribution[t] = [...], a list of values for the distribution at that
+    # time
+
+    sigmas = {  # standard sigma values
+        1: 34.13,
+        2: 13.59,
+        3: 2.15,
+        4: 0.1,
     }
 
-    upper_one_sigma = [np.percentile(np.array(distribution[t]), 50 + sigmas[1]) for t in times] 
-    lower_one_sigma = [np.percentile(np.array(distribution[t]), 50 - sigmas[1]) for t in times] 
-    upper_two_sigma = [np.percentile(np.array(distribution[t]), 50 + sigmas[1] + sigmas[2]) for t in times] 
-    lower_two_sigma = [np.percentile(np.array(distribution[t]), 50 - sigmas[1] - sigmas[2]) for t in times] 
-    upper_three_sigma = [np.percentile(np.array(distribution[t]), 50 + sigmas[1] + sigmas[2] + sigmas[3]) for t in times] 
-    lower_three_sigma = [np.percentile(np.array(distribution[t]), 50 - sigmas[1] - sigmas[2] - sigmas[3]) for t in times] 
-    upper_four_sigma = [np.percentile(np.array(distribution[t]),  50 + sigmas[1] + sigmas[2] + sigmas[3] + sigmas[4]) for t in times] 
-    lower_four_sigma = [np.percentile(np.array(distribution[t]),  50 - sigmas[1] - sigmas[2] - sigmas[3] - sigmas[4]) for t in times] 
+    upper_one_sigma = [
+        np.percentile(
+            np.array(
+                distribution[t]),
+            50 +
+            sigmas[1]) for t in times]
+    lower_one_sigma = [
+        np.percentile(
+            np.array(
+                distribution[t]),
+            50 -
+            sigmas[1]) for t in times]
+    upper_two_sigma = [
+        np.percentile(
+            np.array(
+                distribution[t]),
+            50 +
+            sigmas[1] +
+            sigmas[2]) for t in times]
+    lower_two_sigma = [
+        np.percentile(
+            np.array(
+                distribution[t]),
+            50 -
+            sigmas[1] -
+            sigmas[2]) for t in times]
+    upper_three_sigma = [
+        np.percentile(
+            np.array(
+                distribution[t]),
+            50 +
+            sigmas[1] +
+            sigmas[2] +
+            sigmas[3]) for t in times]
+    lower_three_sigma = [
+        np.percentile(
+            np.array(
+                distribution[t]),
+            50 -
+            sigmas[1] -
+            sigmas[2] -
+            sigmas[3]) for t in times]
+    upper_four_sigma = [
+        np.percentile(
+            np.array(
+                distribution[t]),
+            50 +
+            sigmas[1] +
+            sigmas[2] +
+            sigmas[3] +
+            sigmas[4]) for t in times]
+    lower_four_sigma = [
+        np.percentile(
+            np.array(
+                distribution[t]),
+            50 -
+            sigmas[1] -
+            sigmas[2] -
+            sigmas[3] -
+            sigmas[4]) for t in times]
 
     fill_alpha = 0.2
-    one_sigma_colour='green'
-    two_sigma_colour='red'
-    three_sigma_colour='blue'
-    four_sigma_colour='orange'
+    one_sigma_colour = 'green'
+    two_sigma_colour = 'red'
+    three_sigma_colour = 'blue'
+    four_sigma_colour = 'orange'
     ax.fill_between(
-        # times, 
-        [t+1 for t in times],
-        upper_one_sigma, 
-        lower_one_sigma, 
+        # times,
+        [t + 1 for t in times],
+        upper_one_sigma,
+        lower_one_sigma,
         alpha=fill_alpha,
         facecolor=one_sigma_colour,
-        label='$1 \sigma$ '
+        label=r'$1 \sigma$ '
     )
-
 
     if only_one_sigma == False:
         ax.fill_between(
-            # times, 
-            [t+1 for t in times],
+            # times,
+            [t + 1 for t in times],
             upper_two_sigma,
-            upper_one_sigma, 
+            upper_one_sigma,
             alpha=fill_alpha,
             facecolor=two_sigma_colour,
-            label='$2 \sigma$ '
+            label=r'$2 \sigma$ '
         )
         ax.fill_between(
-            # times, 
-            [t+1 for t in times],
-            lower_one_sigma, 
+            # times,
+            [t + 1 for t in times],
+            lower_one_sigma,
             lower_two_sigma,
             alpha=fill_alpha,
             facecolor=two_sigma_colour,
         )
 
         ax.fill_between(
-            # times, 
-            [t+1 for t in times],
+            # times,
+            [t + 1 for t in times],
             upper_three_sigma,
-            upper_two_sigma, 
+            upper_two_sigma,
             alpha=fill_alpha,
             facecolor=three_sigma_colour,
-            label='$3 \sigma$ '
+            label=r'$3 \sigma$ '
         )
         ax.fill_between(
-            # times, 
-            [t+1 for t in times],
-            lower_two_sigma, 
+            # times,
+            [t + 1 for t in times],
+            lower_two_sigma,
             lower_three_sigma,
             alpha=fill_alpha,
             facecolor=three_sigma_colour,
         )
 
         ax.fill_between(
-            # times, 
-            [t+1 for t in times],
+            # times,
+            [t + 1 for t in times],
             upper_four_sigma,
-            upper_three_sigma, 
+            upper_three_sigma,
             alpha=fill_alpha,
             facecolor=four_sigma_colour,
-            label='$4 \sigma$ '
+            label=r'$4 \sigma$ '
         )
         ax.fill_between(
-            # times, 
-            [t+1 for t in times],
-            lower_three_sigma, 
+            # times,
+            [t + 1 for t in times],
+            lower_three_sigma,
             lower_four_sigma,
             alpha=fill_alpha,
             facecolor=four_sigma_colour,
         )
 
-    if legend==True:
+    if legend == True:
         ax.legend(
-            loc='center right', 
-            bbox_to_anchor=(1.5, 0.5), 
-#             title=''
+            loc='center right',
+            bbox_to_anchor=(1.5, 0.5),
+            #             title=''
         )
 
 
-
 def parameterEstimates(
-    qmd, 
-    modelID, 
+    qmd,
+    modelID,
     use_experimental_data=False,
     save_to_file=None
 ):
     from matplotlib import cm
     mod = qmd.reducedModelInstanceFromID(modelID)
     name = mod.Name
-        
+
     if name not in list(qmd.ModelNameIDs.values()):
         print(
-            "True model ", name, 
-            "not in studied models", 
+            "True model ", name,
+            "not in studied models",
             list(qmd.ModelNameIDs.values())
         )
         return False
     terms = DataBase.get_constituent_names_from_name(name)
-    num_terms = len(terms) 
+    num_terms = len(terms)
 
-    term_positions={}
+    term_positions = {}
     param_estimate_by_term = {}
     std_devs = {}
 
     for t in range(num_terms):
-        term_positions[terms[t]] = t 
+        term_positions[terms[t]] = t
         term = terms[t]
         param_position = term_positions[term]
-        param_estimates = mod.TrackEval[:,param_position]
+        param_estimates = mod.TrackEval[:, param_position]
         #std_dev = mod.cov_matrix[param_position,param_position]
-        std_dev = mod.TrackCovMatrices[:,param_position,param_position]
-        param_estimate_by_term[term] = param_estimates    
+        std_dev = mod.TrackCovMatrices[:, param_position, param_position]
+        param_estimate_by_term[term] = param_estimates
         std_devs[term] = std_dev
 
-    cm_subsection = np.linspace(0,0.8,num_terms)
-    colours = [ cm.magma(x) for x in cm_subsection ]
+    cm_subsection = np.linspace(0, 0.8, num_terms)
+    colours = [cm.magma(x) for x in cm_subsection]
 #    colours = [ cm.Set1(x) for x in cm_subsection ]
 
 #    colours = ['b','r','g','orange', 'pink', 'grey']
@@ -3024,61 +3073,61 @@ def parameterEstimates(
     # ncols=3
     # nrows=3 # TODO  -- make safe
     ncols = int(np.ceil(np.sqrt(num_terms)))
-    nrows = int(np.ceil(num_terms/ncols))
+    nrows = int(np.ceil(num_terms / ncols))
 
 #    nrows=int(np.ceil( num_terms/ncols ))
 
     fig, axes = plt.subplots(
-        figsize = (10, 7), 
-        nrows=nrows, 
+        figsize=(10, 7),
+        nrows=nrows,
         ncols=ncols,
         squeeze=False
     )
     row = 0
     col = 0
     axes_so_far = 0
-    i=0
+    i = 0
 #    for term in list(param_estimate_by_term.keys()):
     for term in terms:
-        ax = axes[row,col]
-        colour = colours[i%len(colours)]
-        i+=1
+        ax = axes[row, col]
+        colour = colours[i % len(colours)]
+        i += 1
         try:
-            if use_experimental_data==False:
+            if use_experimental_data == False:
                 y_true = qmd.TrueParamDict[term]
                 # true_term_latex = DataBase.latex_name_ising(term)
                 true_term_latex = qmd.GrowthClass.latex_name(
-                    name = term
+                    name=term
                 )
                 true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
 
                 ax.axhline(
-                    y_true, 
-                    label=str(true_term_latex), 
+                    y_true,
+                    label=str(true_term_latex),
                     color='red',
                     linestyle='--'
                 )
-        except:
+        except BaseException:
             pass
         y = np.array(param_estimate_by_term[term])
         s = np.array(std_devs[term])
-        x = range(1,1+len(param_estimate_by_term[term]))
+        x = range(1, 1 + len(param_estimate_by_term[term]))
         latex_term = mod.GrowthClass.latex_name(term)
-        latex_term = latex_term[:-1] + '^{\prime}' + '$'
+        latex_term = latex_term[:-1] + r'^{\prime}' + '$'
         # print("[pQMD] latex_term:", latex_term)
         ax.scatter(
             x,
-            y, 
-            s=max(1,50/num_epochs), 
-            label=str(latex_term), 
+            y,
+            s=max(1, 50 / num_epochs),
+            label=str(latex_term),
             color=colour
         )
 #        ax.set_yscale('symlog')
         # print("[pQMD] scatter done" )
         ax.fill_between(
-            x, 
-            y+s, 
-            y-s, 
+            x,
+            y + s,
+            y - s,
             alpha=0.2,
             facecolor='green',
             # label='$\sigma$'
@@ -3089,8 +3138,8 @@ def parameterEstimates(
         axes_so_far += 1
         col += 1
         if col == ncols:
-            col=0
-            row+=1
+            col = 0
+            row += 1
         # ax.set_title(str(latex_term))
         # print("[pQMD] title set")
 
@@ -3099,7 +3148,7 @@ def parameterEstimates(
     plt.ylabel('Parameter Estimate', fontsize=15)
     # plt.legend(bbox_to_anchor=(1.1, 1.05))
     # # TODO put title at top; Epoch centred bottom; Estimate centre y-axis
-    # plt.title(str("Parameter estimation for model " +  
+    # plt.title(str("Parameter estimation for model " +
     #     DataBase.latex_name_ising(name)+" ["+str(qmd.NumParticles)
     #     +" prt;" + str(qmd.NumExperiments) + "exp]"
     #     )
@@ -3107,12 +3156,12 @@ def parameterEstimates(
 
     if save_to_file is not None:
         print(
-            "[parameterEstimates] saving to file", 
+            "[parameterEstimates] saving to file",
             save_to_file,
             "type:", type(save_to_file)
         )
         plt.savefig(
-            save_to_file, 
+            save_to_file,
             bbox_inches='tight'
         )
     # print("[pQMD] complete")
@@ -3122,22 +3171,26 @@ def parameterEstimates(
 
 def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
     from matplotlib import cm as colmap
-#    from viz_library_undev import radar_factory # TODO IS THIS THE RIGHT FUNCTION?
-    
+# from viz_library_undev import radar_factory # TODO IS THIS THE RIGHT
+# FUNCTION?
+
     labels = [
         UserFunctions.get_latex_name(
-            name=qmd.ModelNameIDs[l], 
+            name=qmd.ModelNameIDs[l],
             growth_generator=qmd.GrowthGenerator
-        ) for l in modlist    
+        ) for l in modlist
     ]
     size = len(modlist)
-    theta = custom_radar_factory(size, frame='polygon') 
-    
-    fig, ax = plt.subplots(figsize=(12,6), subplot_kw=dict(projection='radar'))
-    
+    theta = custom_radar_factory(size, frame='polygon')
+
+    fig, ax = plt.subplots(
+        figsize=(
+            12, 6), subplot_kw=dict(
+            projection='radar'))
+
 #    cmap = colmap.get_cmap('viridis')
     cmap = colmap.get_cmap('RdYlBu')
-    colors = [cmap(col) for col in np.linspace(0.1,1,size)]
+    colors = [cmap(col) for col in np.linspace(0.1, 1, size)]
 
     required_bayes = {}
     scale = []
@@ -3149,21 +3202,20 @@ def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
                 try:
                     val = qmd.AllBayesFactors[i][j][-1]
                     scale.append(np.log10(val))
-                except:
+                except BaseException:
                     val = 1.0
                 required_bayes[i][j] = val
-
 
     [scale_min, scale_max] = [min(scale), max(scale)]
     many_circles = 4
     low_ini = scale_min
     shift_ini = 1
     shift = 6
-    ax.set_rgrids(list(shift_ini + 
-        np.linspace(low_ini+0.05,0.05,many_circles)), 
-        labels = list(np.round(np.linspace(low_ini+0.05,0.05,many_circles), 
-        2)), angle=180
-    )
+    ax.set_rgrids(list(shift_ini +
+                       np.linspace(low_ini + 0.05, 0.05, many_circles)),
+                  labels=list(np.round(np.linspace(low_ini + 0.05, 0.05, many_circles),
+                                       2)), angle=180
+                  )
 
     for i in modlist:
         dplot = []
@@ -3171,32 +3223,32 @@ def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
             if i is not j:
                 try:
                     bayes_factor = qmd.AllBayesFactors[i][j][-1]
-                except: 
+                except BaseException:
                     bayes_factor = 1.0
 
                 log_bayes_factor = np.log10(bayes_factor)
-                dplot.append(shift+log_bayes_factor)
+                dplot.append(shift + log_bayes_factor)
             else:
-                dplot.append(shift+0.0)
-        ax.plot(theta, np.array(dplot), color=colors[int(i%len(colors))],
-            linestyle = '--', alpha = 1.
-        )
-        ax.fill(theta, np.array(dplot), 
-            facecolor=colors[int(i%len(colors))], alpha=0.25
-        )
+                dplot.append(shift + 0.0)
+        ax.plot(theta, np.array(dplot), color=colors[int(i % len(colors))],
+                linestyle='--', alpha=1.
+                )
+        ax.fill(theta, np.array(dplot),
+                facecolor=colors[int(i % len(colors))], alpha=0.25
+                )
 
-    ax.plot(theta, np.repeat(shift, len(labels)), color='black', 
-        linestyle = '-', label='BayesFactor=1'
-    )
-    
+    ax.plot(theta, np.repeat(shift, len(labels)), color='black',
+            linestyle='-', label='BayesFactor=1'
+            )
+
     ax.set_varlabels(labels, fontsize=15)
     try:
         ax.tick_params(pad=50)
-    except:
+    except BaseException:
         pass
-        
+
     legend = ax.legend(labels, loc=(1.5, .35),
-        labelspacing=0.1, fontsize=14)
+                       labelspacing=0.1, fontsize=14)
 
     if plot_title is not None:
         plt.title(str(plot_title))
@@ -3205,8 +3257,6 @@ def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-
-    
 class IndexLocator(ticker.Locator):
 
     def __init__(self, max_ticks=10):
@@ -3220,11 +3270,8 @@ class IndexLocator(ticker.Locator):
         else:
             step = np.ceil(dmax / self.max_ticks)
         return self.raise_if_exceeds(np.arange(0, dmax, step))
-        
-        
-        
-        
-        
+
+
 def custom_radar_factory(num_vars, frame='circle'):
     """Create a radar chart with `num_vars` axes.
 
@@ -3239,7 +3286,7 @@ def custom_radar_factory(num_vars, frame='circle'):
 
     """
     # calculate evenly-spaced axis angles
-    theta = np.linspace(0, 2*np.pi, num_vars, endpoint=False)
+    theta = np.linspace(0, 2 * np.pi, num_vars, endpoint=False)
 
     def draw_poly_patch(self):
         # rotate theta such that the first axis is at the top
@@ -3286,10 +3333,10 @@ def custom_radar_factory(num_vars, frame='circle'):
                 y = np.concatenate((y, [y[0]]))
                 line.set_data(x, y)
 
-        def set_varlabels(self, labels, fontsize = None, frac=1.0):
-            self.set_thetagrids(np.degrees(theta), labels, 
-                fontsize = fontsize, frac=frac
-            )
+        def set_varlabels(self, labels, fontsize=None, frac=1.0):
+            self.set_thetagrids(np.degrees(theta), labels,
+                                fontsize=fontsize, frac=frac
+                                )
 
         def _gen_axes_patch(self):
             return self.draw_patch()
@@ -3321,57 +3368,56 @@ def unit_poly_verts(theta):
     This polygon is circumscribed by a unit circle centered at (0.5, 0.5)
     """
     x0, y0, r = [0.5] * 3
-    verts = [(r*np.cos(t) + x0, r*np.sin(t) + y0) for t in theta]
+    verts = [(r * np.cos(t) + x0, r * np.sin(t) + y0) for t in theta]
     return verts
-    
 
 
 #### Cumulative Bayes CSV and InterQMD Tree plotting ####
 
 def multiQMDBayes(
-    all_bayes_csv, 
+    all_bayes_csv,
     growth_generator=None
 ):
-    import csv, pandas
+    import csv
+    import pandas
     cumulative_bayes = pandas.DataFrame.from_csv(all_bayes_csv)
-    names=list(cumulative_bayes.keys())
+    names = list(cumulative_bayes.keys())
 
-    count_bayes={}
+    count_bayes = {}
     mod_names = list(cumulative_bayes.keys())
 
     for mod in mod_names:
         count_bayes[mod] = {}
-        model_results=cumulative_bayes[mod]
+        model_results = cumulative_bayes[mod]
         for comp_mod in mod_names:
             try:
-                num_bayes=model_results[comp_mod].count()
-            except:
-                num_bayes=0
+                num_bayes = model_results[comp_mod].count()
+            except BaseException:
+                num_bayes = 0
             count_bayes[mod][comp_mod] = num_bayes
 
-
-
     piv = pandas.pivot_table(
-        cumulative_bayes, 
-        index='ModelName', 
-        values=names, 
+        cumulative_bayes,
+        index='ModelName',
+        values=names,
         aggfunc=[np.mean, np.median]
     )
 
-    means=piv['mean']
-    medians=piv['median']
+    means = piv['mean']
+    medians = piv['median']
 
-    b=means.apply(lambda x: x.dropna().to_dict(), axis=1)
+    b = means.apply(lambda x: x.dropna().to_dict(), axis=1)
     means_dict = b.to_dict()
 
-    c=medians.apply(lambda x: x.dropna().to_dict(), axis=1)
-    medians_dict = c.to_dict()        
-    
+    c = medians.apply(lambda x: x.dropna().to_dict(), axis=1)
+    medians_dict = c.to_dict()
+
     return means_dict, medians_dict, count_bayes
 
 
 def updateAllBayesCSV(qmd, all_bayes_csv):
-    import os,csv
+    import os
+    import csv
     data = get_bayes_latex_dict(qmd)
     names = list(data.keys())
     fields = ['ModelName']
@@ -3385,7 +3431,7 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
         # print("creating CSV")
         with open(all_bayes_csv, 'a+') as bayes_csv:
             writer = csv.DictWriter(
-                bayes_csv, 
+                bayes_csv,
                 fieldnames=fields
             )
             writer.writeheader()
@@ -3401,12 +3447,12 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
 
             import pandas
             csv_input = pandas.read_csv(
-                all_bayes_csv, 
+                all_bayes_csv,
                 index_col='ModelName'
             )
-            a=list(csv_input.keys())
+            a = list(csv_input.keys())
             # print("pandas says existing models are:\n", a)
-            empty_list = [np.NaN]*len(list(csv_input[a[0]].values))
+            empty_list = [np.NaN] * len(list(csv_input[a[0]].values))
 
             for new_col in new_models:
                 csv_input[new_col] = empty_list
@@ -3415,18 +3461,18 @@ def updateAllBayesCSV(qmd, all_bayes_csv):
 
     with open(all_bayes_csv) as bayes_csv:
         reader = csv.DictReader(
-            bayes_csv, 
+            bayes_csv,
         )
         fields = reader.fieldnames
 
     with open(all_bayes_csv, 'a') as bayes_csv:
         writer = csv.DictWriter(
-            bayes_csv, 
+            bayes_csv,
             fieldnames=fields,
         )
         for f in names:
             single_model_dict = data[f]
-            single_model_dict['ModelName']=f
+            single_model_dict['ModelName'] = f
             writer.writerow(single_model_dict)
 
 
@@ -3434,9 +3480,9 @@ def get_bayes_latex_dict(qmd):
     latex_dict = {}
     # print("get bayes latex dict")
 
-    latex_write_file  = open(
-        # str(qmd.ResultsDirectory + 'LatexMapping.txt'), 
-        qmd.LatexMappingFile, 
+    latex_write_file = open(
+        # str(qmd.ResultsDirectory + 'LatexMapping.txt'),
+        qmd.LatexMappingFile,
         'a+'
     )
     for i in list(qmd.AllBayesFactors.keys()):
@@ -3450,11 +3496,11 @@ def get_bayes_latex_dict(qmd):
         latex_dict[mod_a] = {}
         for j in list(qmd.AllBayesFactors[i].keys()):
             mod_b = qmd.reducedModelInstanceFromID(j).LatexTerm
-            latex_dict[mod_a][mod_b]= qmd.AllBayesFactors[i][j][-1]
+            latex_dict[mod_a][mod_b] = qmd.AllBayesFactors[i][j][-1]
     return latex_dict
 
 
-def global_adjacent_branch_test(a,b, term_branches):
+def global_adjacent_branch_test(a, b, term_branches):
     branch_a = int(term_branches[a])
     branch_b = int(term_branches[b])
 
@@ -3463,27 +3509,27 @@ def global_adjacent_branch_test(a,b, term_branches):
     branch_b_idx = available_branches.index(branch_b)
 
     # closeness conditions
-    c1 = (branch_a_idx==branch_b_idx)
-    c2 =  (branch_a_idx==branch_b_idx+1)
-    c3 = (branch_a_idx==branch_b_idx-1)
+    c1 = (branch_a_idx == branch_b_idx)
+    c2 = (branch_a_idx == branch_b_idx + 1)
+    c3 = (branch_a_idx == branch_b_idx - 1)
 
     if (
         c1 == True
-        or  c2 == True
+        or c2 == True
         or c3 == True
     ):
         return True
     else:
         return False
 
-    
-#### Manipulate QMD output
+
+# Manipulate QMD output
 def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
 
     import csv
     fields = ['ID', 'Name']
-    if names_ids=='latex':
-        # names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in 
+    if names_ids == 'latex':
+        # names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in
 
         names = []
         for mod_name in list(qmd.ModelNameIDs.values()):
@@ -3495,14 +3541,14 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
                 ].latex_name(name=mod_name)
             )
 
-    elif names_ids=='nonlatex':
+    elif names_ids == 'nonlatex':
         names = [
-            qmd.ModelNameIDs[i] 
-            for i in 
+            qmd.ModelNameIDs[i]
+            for i in
             range(qmd.HighestModelID)
         ]
-    elif names_ids=='ids':
-        names=range(qmd.HighestModelID)
+    elif names_ids == 'ids':
+        names = range(qmd.HighestModelID)
     else:
         print("BayesFactorsCSV names_ids must be latex, nonlatex, or ids.")
 
@@ -3512,7 +3558,7 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
 
         fieldnames = fields
         writer = csv.DictWriter(
-            csvfile, 
+            csvfile,
             fieldnames=fieldnames
         )
 
@@ -3520,14 +3566,14 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
         for i in range(qmd.HighestModelID):
             model_bf = {}
             for j in qmd.AllBayesFactors[i].keys():
-                if names_ids=='latex':
+                if names_ids == 'latex':
                     other_model_name = qmd.BranchGrowthClasses[
                         qmd.ModelsBranches[j]
-                    ].latex_name(name = qmd.ModelNameIDs[j])
+                    ].latex_name(name=qmd.ModelNameIDs[j])
 
-                elif names_ids=='nonlatex':
+                elif names_ids == 'nonlatex':
                     other_model_name = qmd.ModelNameIDs[j]
-                elif names_ids=='ids':
+                elif names_ids == 'ids':
                     other_model_name = j
                 model_bf[other_model_name] = qmd.AllBayesFactors[i][j][-1]
 
@@ -3537,32 +3583,32 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
                 model_bf['Name'] = qmd.BranchGrowthClasses[
                     qmd.ModelsBranches[i]
                 ].latex_name(name=qmd.ModelNameIDs[i])
-            except:
+            except BaseException:
                 model_bf['Name'] = qmd.ModelNameIDs[i]
             model_bf['ID'] = i
             writer.writerow(model_bf)
-     
-        
-## Overall multiple QMD analyses
+
+
+# Overall multiple QMD analyses
 
 
 def plotTrueModelBayesFactors_IsingRotationTerms(
-    results_csv_path, 
-    correct_mod="xTiPPyTiPPzTiPPxTxPPyTyPPzTz", 
-    growth_generator=None, 
+    results_csv_path,
+    correct_mod="xTiPPyTiPPzTiPPxTxPPyTyPPzTz",
+    growth_generator=None,
     save_to_file=None
 ):
     from matplotlib import cm
     # TODO saved fig is cut off on edges and don't have axes titles.
 
     # correct_mod = DataBase.latex_name_ising(correct_mod)
-    
+
     growth_class = GrowthRules.get_growth_generator_class(
-        growth_generation_rule = growth_generator
+        growth_generation_rule=growth_generator
     )
 
     correct_mod = growth_class.latex_name(
-        name = correct_mod
+        name=correct_mod
     )
     results_csv = os.path.abspath(results_csv_path)
     qmd_res = pd.DataFrame.from_csv(results_csv)
@@ -3575,14 +3621,14 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
     if correct_mod not in mods:
         print(
             "[TrueModelBayesHistogram]",
-            "Correct model", correct_mod, 
+            "Correct model", correct_mod,
             "not present in", mods
         )
         return False
 
     mods.pop(mods.index(correct_mod))
     othermods = mods
-    correct_subDB = qmd_res.ix[correct_mod]    
+    correct_subDB = qmd_res.ix[correct_mod]
     all_BFs = []
 
     for competitor in othermods:
@@ -3595,25 +3641,26 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
     # nrows=5
     # ncols=3
     ncols = int(np.ceil(np.sqrt(num_models)))
-    nrows = int(np.ceil(num_models/ncols))
+    nrows = int(np.ceil(num_models / ncols))
 
-    fig, axes = plt.subplots(figsize = (20, 10), nrows=nrows, ncols=ncols)
-    cm_subsection = np.linspace(0.1, 0.9, len(all_BFs)) 
-    colors = [ cm.viridis(x) for x in cm_subsection ]
+    fig, axes = plt.subplots(figsize=(20, 10), nrows=nrows, ncols=ncols)
+    cm_subsection = np.linspace(0.1, 0.9, len(all_BFs))
+    colors = [cm.viridis(x) for x in cm_subsection]
 
     for row in range(nrows):
         for col in range(ncols):
             # Make a multiple-histogram of data-sets with different length.
-            idx = row*ncols+col
+            idx = row * ncols + col
             if idx < len(all_BFs):
-                hist, bins, _ = axes[row,col].hist(np.log10(all_BFs[idx]), n_bins, color=colors[idx], label=othermods[idx])
-                
-                try: 
-                    maxBF = 1.1*np.max(np.abs(np.log10(all_BFs[idx])))
-                except:
+                hist, bins, _ = axes[row, col].hist(
+                    np.log10(all_BFs[idx]), n_bins, color=colors[idx], label=othermods[idx])
+
+                try:
+                    maxBF = 1.1 * np.max(np.abs(np.log10(all_BFs[idx])))
+                except BaseException:
                     maxBF = 10
-                axes[row,col].legend()
-                axes[row,col].set_xlim(-maxBF, maxBF)
+                axes[row, col].legend()
+                axes[row, col].set_xlim(-maxBF, maxBF)
 
 
 #    fig.text(0.07, 0.5, 'Occurences', va='center', rotation='vertical')
@@ -3624,47 +3671,49 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
         fig.savefig(save_to_file, bbox_inches='tight')
 
 
-
-#### 
-## Standalone function to redraw expectation values
-## of QHL given the params_dict it learned, and 
-## the path to the dict of true expectation values
-## it was emulating
+####
+# Standalone function to redraw expectation values
+# of QHL given the params_dict it learned, and
+# the path to the dict of true expectation values
+# it was emulating
 
 def replot_expectation_values(
-    params_dictionary_list, # list of params_dicts 
+    params_dictionary_list,  # list of params_dicts
     true_expec_vals_path,
-    plot_probe_path, 
+    plot_probe_path,
     growth_generator,
-    measurement_method = 'full_access',
+    measurement_method='full_access',
     upper_x_limit=None,
-    model_descriptions=None, 
+    model_descriptions=None,
     save_to_file=None
 ):
 
     # print("[replot] ",
     #     "\ntrue_expec_vals_path", true_expec_vals_path,
-    #     "\nplot_probe_path", plot_probe_path,  
+    #     "\nplot_probe_path", plot_probe_path,
     #     "\ngrowth_generator", growth_generator,
     #     "\nmeasurement_method", measurement_method
     # )
     growth_class = GrowthRules.get_growth_generator_class(
-        growth_generation_rule = growth_generator
+        growth_generation_rule=growth_generator
     )
-    sim_colours = ['b', 'g', 'c', 'y', 'm',  'k']
+    sim_colours = ['b', 'g', 'c', 'y', 'm', 'k']
     plot_probes = pickle.load(open(plot_probe_path, 'rb'))
     # true_expec_vals_path = str(
     #     directory_name + 'true_expec_vals.p'
     # )
     # print(
-    #     "Reconstructed QHL with expectation value method:", 
+    #     "Reconstructed QHL with expectation value method:",
     #     measurement_method
     # )
 
-    print (getframeinfo(currentframe()).filename, getframeinfo(currentframe()).lineno)
+    print(
+        getframeinfo(
+            currentframe()).filename, getframeinfo(
+            currentframe()).lineno)
     true_exp_vals = pickle.load(open(true_expec_vals_path, 'rb'))
     exp_times = sorted(list(true_exp_vals.keys()))
-    
+
     sim_times = copy.copy(exp_times)[0::5]
 
     num_times = len(exp_times)
@@ -3674,34 +3723,33 @@ def replot_expectation_values(
     # )
 
     if (
-        upper_x_limit is not None 
+        upper_x_limit is not None
         and
-        upper_x_limit  > max(exp_times)
+        upper_x_limit > max(exp_times)
     ):
-        additional_sim_times = np.linspace(max(exp_times), upper_x_limit, 30 )
+        additional_sim_times = np.linspace(max(exp_times), upper_x_limit, 30)
         sim_times.extend(additional_sim_times)
         sim_times = sorted(sim_times)
-    
+
     if type(params_dictionary_list) == dict:
         params_dictionary_list = [params_dictionary_list]
-    
 
     num_plots = len(params_dictionary_list)
     ncols = int(np.ceil(np.sqrt(num_plots)))
-    nrows = int(np.ceil(num_plots/ncols))
+    nrows = int(np.ceil(num_plots / ncols))
 
     fig, axes = plt.subplots(
-        figsize = (10, 7), 
-        nrows=nrows, 
+        figsize=(10, 7),
+        nrows=nrows,
         ncols=ncols,
         squeeze=False
     )
     row = 0
     col = 0
 
-    true_exp = [true_exp_vals[t] for t in exp_times]    
+    true_exp = [true_exp_vals[t] for t in exp_times]
     for params_dict in params_dictionary_list:
-        ax = axes[row,col]
+        ax = axes[row, col]
         sim_ops_names = list(params_dict.keys())
         sim_params = [
             params_dict[k] for k in sim_ops_names
@@ -3715,54 +3763,53 @@ def replot_expectation_values(
         # p_str=''
         # for i in range(2):
         #     p_str+='P'
-        p_str = 'P'*sim_num_qubits
+        p_str = 'P' * sim_num_qubits
         probe = plot_probes[sim_num_qubits]
 
         sim_exp_vals = {}
         for t in sim_times:
             sim_exp_vals[t] = growth_class.expectation_value(
-                ham=sim_ham, 
-                state = probe, 
-                t = t
+                ham=sim_ham,
+                state=probe,
+                t=t
             )
 
         sim_exp = [sim_exp_vals[t] for t in sim_times]
         list_id = params_dictionary_list.index(params_dict)
         sim_colour = sim_colours[list_id % len(sim_colours)]
-     
+
         if model_descriptions is not None:
             model_label = model_descriptions[list_id]
         else:
             sim_op_string = p_str.join(sim_ops_names)
-            latex_name = growth_class.latex_name(name = sim_op_string)
+            latex_name = growth_class.latex_name(name=sim_op_string)
             model_label = latex_name
-        
+
         ax.plot(
-            sim_times, 
-            sim_exp, 
-            marker = 'o', 
+            sim_times,
+            sim_exp,
+            marker='o',
             markersize=3,
             markevery=5,
-            label=str(model_label), 
+            label=str(model_label),
             color=sim_colour
         )
         ax.set_title(model_label)
         ax.scatter(
-            exp_times, 
-            true_exp, 
-            label='True', 
-            color='red', 
+            exp_times,
+            true_exp,
+            label='True',
+            color='red',
             s=3
         )
-        ax.set_xlim(0,upper_x_limit)
+        ax.set_xlim(0, upper_x_limit)
 
         col += 1
         # if col == ncols and row == 0:
         ax.legend(loc=1)
         if col == ncols:
-            col=0
-            row+=1
-
+            col = 0
+            row += 1
 
     # plt.legend(loc=1)
     fig.suptitle("Expectation Value of clustered parameters.")
@@ -3772,18 +3819,17 @@ def replot_expectation_values(
         plt.show()
 
 
-
 def cluster_results_and_plot(
-    path_to_results, # results_summary_csv to be clustered
-    true_expec_path,  
+    path_to_results,  # results_summary_csv to be clustered
+    true_expec_path,
     plot_probe_path,
     true_params_path,
     growth_generator,
     measurement_type,
-    upper_x_limit=None, 
-    save_param_clusters_to_file=None, 
-    save_param_values_to_file=None, 
-    save_redrawn_expectation_values=None, 
+    upper_x_limit=None,
+    save_param_clusters_to_file=None,
+    save_param_values_to_file=None,
+    save_redrawn_expectation_values=None,
 ):
     from matplotlib import cm
     growth_class = GrowthRules.get_growth_generator_class(growth_generator)
@@ -3797,18 +3843,18 @@ def cluster_results_and_plot(
     )
     try:
         growth_generator = true_info_dict['growth_generator']
-    except:
+    except BaseException:
         pass
-        
+
     true_params_dict = true_info_dict['params_dict']
     if true_params_dict is not None:
         for k in list(true_params_dict.keys()):
             latex_key = growth_class.latex_name(
-                name = k
+                name=k
             )
             true_params_dict[latex_key] = true_params_dict[k]
             true_params_dict.pop(k)
-    
+
     all_learned_params = {}
     champions_params = {}
 
@@ -3816,9 +3862,10 @@ def cluster_results_and_plot(
         champ = unique_champions[i]
         all_learned_params[champ] = (
             results_csv.loc[results_csv['NameAlphabetical']
-            ==champ]['LearnedParameters'].values
+                            == champ]['LearnedParameters'].values
         )
-        this_champs_params = sorted(list(eval(all_learned_params[champ][0]).keys()))
+        this_champs_params = sorted(
+            list(eval(all_learned_params[champ][0]).keys()))
         champions_params[champ] = this_champs_params
 
     all_possible_params = []
@@ -3836,12 +3883,13 @@ def cluster_results_and_plot(
         params_this_champ = sorted(
             list(eval(all_learned_params[this_champ][0]).keys())
         )
-        params = np.empty([num_results_for_this_champ, len(champions_params[this_champ])])
+        params = np.empty([num_results_for_this_champ,
+                           len(champions_params[this_champ])])
         for i in range(num_results_for_this_champ):
             learned_param_dict = eval(all_learned_params[this_champ][i])
             test_list = [i for i in champions_params[this_champ]]
-            params[i] = [ 
-                learned_param_dict[this_param] for this_param in champions_params[this_champ] 
+            params[i] = [
+                learned_param_dict[this_param] for this_param in champions_params[this_champ]
             ]
 
         params_for_clustering[this_champ] = params
@@ -3860,11 +3908,12 @@ def cluster_results_and_plot(
             n_clusters_ = len(labels_unique)
 
             clusters[this_champ] = cluster_centers
-        except:
-            # NOTE: in case where clusters can't be formed, 
+        except BaseException:
+            # NOTE: in case where clusters can't be formed,
             # that model is represented only by the first set of results..
             # should they be averaged somehow?
-            clusters[this_champ] = np.array([params_for_clustering[this_champ][0]])
+            clusters[this_champ] = np.array(
+                [params_for_clustering[this_champ][0]])
 
     available_clustered_models = list(clusters.keys())
     clustered_parameters_this_model = {}
@@ -3873,28 +3922,29 @@ def cluster_results_and_plot(
     all_clusters_params = []
     all_clusters_descriptions = []
     all_centroids_of_each_param = {}
-    
+
     for mod in available_clustered_models:
         clusters_by_model[mod] = {}
         cluster_descriptions_by_model[mod] = []
         terms = champions_params[mod]
         this_model_clusters = clusters[mod]
 
-        for j in range(len(this_model_clusters)): 
+        for j in range(len(this_model_clusters)):
             single_cluster = {}
             for i in range(len(terms)):
                 single_cluster[terms[i]] = this_model_clusters[j][i]
-                try: 
-                    all_centroids_of_each_param[terms[i]].append(this_model_clusters[j][i])
-                except:
-                    all_centroids_of_each_param[terms[i]] = [this_model_clusters[j][i]]
-                
-                
+                try:
+                    all_centroids_of_each_param[terms[i]].append(
+                        this_model_clusters[j][i])
+                except BaseException:
+                    all_centroids_of_each_param[terms[i]] = [
+                        this_model_clusters[j][i]]
+
             latex_mod_name = growth_class.latex_name(
-                name = mod
+                name=mod
             )
             cluster_description = str(
-                latex_mod_name + ' (' +  str(j) +')'
+                latex_mod_name + ' (' + str(j) + ')'
             )
             all_clusters_params.append(single_cluster)
             all_clusters_descriptions.append(
@@ -3903,33 +3953,32 @@ def cluster_results_and_plot(
             clusters_by_model[mod][cluster_description] = single_cluster
             cluster_descriptions_by_model[mod].append(
                 cluster_description
-            )    
+            )
 
     for k in list(all_centroids_of_each_param.keys()):
-        latex_term = growth_class.latex_name(name = k)
+        latex_term = growth_class.latex_name(name=k)
         all_centroids_of_each_param[latex_term] = all_centroids_of_each_param[k]
         all_centroids_of_each_param.pop(k)
-    
-    
+
     cm_subsection = np.linspace(
-        0,0.8,len(all_possible_params)
+        0, 0.8, len(all_possible_params)
     )
-    plot_colours = [ cm.Paired(x) for x in cm_subsection ]
+    plot_colours = [cm.Paired(x) for x in cm_subsection]
 
     term_colours = {}
     latex_terms = {}
     for term in all_possible_params:
         latex_rep = growth_class.latex_name(name=term)
-    
+
         latex_terms[term] = latex_rep
-    
+
     for i in range(len(all_possible_params)):
         name = latex_terms[all_possible_params[i]]
         term_colours[name] = plot_colours[i]
-    total_num_clusters=0
+    total_num_clusters = 0
     for c in clusters:
         total_num_clusters += len(clusters[c])
-    
+
     #######
     # Plot centroids by parameter
     #######
@@ -3938,11 +3987,11 @@ def cluster_results_and_plot(
     )
     total_num_params = len(unique_latex_params)
     ncols = int(np.ceil(np.sqrt(total_num_params)))
-    nrows = int(np.ceil(total_num_params/ncols))
+    nrows = int(np.ceil(total_num_params / ncols))
 
     fig, axes = plt.subplots(
-        figsize = (10, 7), 
-        nrows=nrows, 
+        figsize=(10, 7),
+        nrows=nrows,
         ncols=ncols,
         squeeze=False
     )
@@ -3950,56 +3999,53 @@ def cluster_results_and_plot(
     col = 0
 
     # from here below has to be put on an array layout
-    
+
     for param in sorted(unique_latex_params):
-        ax = axes[row,col]
+        ax = axes[row, col]
         ax.get_shared_y_axes().join(ax, axes[row, 0])
         this_param_values = all_centroids_of_each_param[param]
         try:
             true_param = true_params_dict[param]
             ax.axhline(
-                true_param, 
-                linestyle='--', 
+                true_param,
+                linestyle='--',
                 label='True',
                 color=term_colours[param]
             )
-        except:
+        except BaseException:
             pass
-        
+
         for v in this_param_values:
-            if this_param_values.index(v)==0:
+            if this_param_values.index(v) == 0:
                 ax.axhline(
-                    v, 
+                    v,
                     color=term_colours[param],
                     label=param
                 )
             else:
                 ax.axhline(
-                    v, 
+                    v,
                     color=term_colours[param],
                 )
         ax.legend(loc=1)
         col += 1
         if col == ncols:
-            col=0
-            row+=1
+            col = 0
+            row += 1
 
-                
     if save_param_values_to_file is not None:
         plt.savefig(
-            save_param_values_to_file, 
+            save_param_values_to_file,
             bbox_to_inches='tight'
         )
 
-        
-        
-    # Plot centroids by cluster 
+    # Plot centroids by cluster
     ncols = int(np.ceil(np.sqrt(total_num_clusters)))
-    nrows = int(np.ceil(total_num_clusters/ncols))
+    nrows = int(np.ceil(total_num_clusters / ncols))
 
     fig, axes = plt.subplots(
-        figsize = (10, 7), 
-        nrows=nrows, 
+        figsize=(10, 7),
+        nrows=nrows,
         ncols=ncols,
         squeeze=False
     )
@@ -4012,42 +4058,41 @@ def cluster_results_and_plot(
             list(clusters_by_model[mod].keys())
         ):
             cluster = clusters_by_model[mod][cluster_description]
-            ax = axes[row,col]
+            ax = axes[row, col]
             for term in sorted(cluster.keys()):
                 label = growth_class.latex_name(
-                    name = term
+                    name=term
                 )
                 ax.axhline(
-                    cluster[term], 
-                    label=label, 
+                    cluster[term],
+                    label=label,
                     color=term_colours[label]
                 )
                 ax.set_title(cluster_description)
 
             col += 1
-            # TODO add legend for all individual params/colours... 
+            # TODO add legend for all individual params/colours...
             # single legend accross subplots??
             # if col == ncols and row == 0:
             ax.legend(loc=1)
             if col == ncols:
-                col=0
-                row+=1
-                
-                
+                col = 0
+                row += 1
+
     if save_param_clusters_to_file is not None:
         plt.title('Parameter clusters')
         plt.savefig(
-            save_param_clusters_to_file, 
+            save_param_clusters_to_file,
             bbox_to_inches='tight'
         )
 
     replot_expectation_values(
-        params_dictionary_list = all_clusters_params, # list of params_dicts 
-        model_descriptions = all_clusters_descriptions,
-        true_expec_vals_path = true_expec_path,
-        plot_probe_path =plot_probe_path, 
-        growth_generator = growth_generator,
-        measurement_method = measurement_type,
-        upper_x_limit = upper_x_limit, # can play with this
-        save_to_file = save_redrawn_expectation_values
-    )                        
+        params_dictionary_list=all_clusters_params,  # list of params_dicts
+        model_descriptions=all_clusters_descriptions,
+        true_expec_vals_path=true_expec_path,
+        plot_probe_path=plot_probe_path,
+        growth_generator=growth_generator,
+        measurement_method=measurement_type,
+        upper_x_limit=upper_x_limit,  # can play with this
+        save_to_file=save_redrawn_expectation_values
+    )

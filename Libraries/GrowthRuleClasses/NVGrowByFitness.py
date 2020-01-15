@@ -1,24 +1,25 @@
+import NVCentreLargeSpinBath
+import ProbeGeneration
+import DataBase
 import numpy as np
 import itertools
-import sys, os
+import sys
+import os
 sys.path.append(os.path.abspath('..'))
-import DataBase
-import ProbeGeneration
 
-import NVCentreLargeSpinBath
 
 class nv_fitness_growth(
     NVCentreLargeSpinBath.nv_centre_large_spin_bath
 ):
 
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
 
@@ -28,13 +29,14 @@ class nv_fitness_growth(
             'nv_spin_z_d1',
         ]
 
-        self.initial_models = all_unique_addition_combinations(self.base_models)
+        self.initial_models = all_unique_addition_combinations(
+            self.base_models)
         self.available_axes = ['x', 'y', 'z']
         self.true_operator = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
         self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
         self.max_num_qubits = 4
-        self.num_top_models_to_build_on = 2 # at each generation
-        self.generation_DAG = 0 
+        self.num_top_models_to_build_on = 2  # at each generation
+        self.generation_DAG = 0
         self.model_fitness = {}
         # self._fitness_parameters = {}
         self.generational_fitness_parameters = {}
@@ -44,14 +46,14 @@ class nv_fitness_growth(
         self.num_processes_to_parallelise_over = 10
 
         self.max_num_models_by_shape = {
-            1 : 7,
-            2 : 20,
-            'other' : 0
+            1: 7,
+            2: 20,
+            'other': 0
         }
 
     def generate_models(
-        self, 
-        model_list, 
+        self,
+        model_list,
         **kwargs
     ):
         # fitness = kwargs['fitness_parameters']
@@ -60,27 +62,28 @@ class nv_fitness_growth(
 
         # keep track of generation_DAG
         ranked_model_list = sorted(
-            model_points, 
-            key=model_points.get, 
+            model_points,
+            key=model_points.get,
             reverse=True
         )
-        models_to_build_on = ranked_model_list[:self.num_top_models_to_build_on]
+        models_to_build_on = ranked_model_list[:
+                                               self.num_top_models_to_build_on]
         self.models_to_build_on[self.generation_DAG] = models_to_build_on
         new_models = []
 
-        if self.spawn_stage[-1] == None:
+        if self.spawn_stage[-1] is None:
             for mod_id in self.models_to_build_on[self.generation_DAG]:
                 self.model_fitness_calculation(
-                    model_id = mod_id,
+                    model_id=mod_id,
                     # fitness_parameters = fitness[mod_id],
-                    model_points = model_points
+                    model_points=model_points
                 )
                 mod_name = kwargs['model_names_ids'][mod_id]
                 num_qubits = DataBase.get_num_qubits(mod_name)
                 new_num_qubits = num_qubits + 1
                 mod_name_increased_dim = increase_dimension_keep_terms_nv_model(
-                    model_name = mod_name,
-                    new_dimension = new_num_qubits
+                    model_name=mod_name,
+                    new_dimension=new_num_qubits
                 )
 
                 new_terms = [
@@ -88,14 +91,15 @@ class nv_fitness_growth(
                     for axis in self.available_axes
                 ]
 
-                self.available_mods_by_generation[self.generation_DAG] = all_unique_addition_combinations(new_terms)
+                self.available_mods_by_generation[self.generation_DAG] = all_unique_addition_combinations(
+                    new_terms)
                 for new_term in self.available_mods_by_generation[self.generation_DAG]:
                     if self.determine_whether_to_include_model(mod_id) == True:
                         # new_term = "nv_interaction_{}_d{}".format(axis, new_num_qubits)
                         p_str = 'P' * new_num_qubits
                         new_mod = str(
-                            mod_name_increased_dim 
-                            + p_str 
+                            mod_name_increased_dim
+                            + p_str
                             + new_term
                         )
                         new_mod = DataBase.alph(new_mod)
@@ -109,16 +113,15 @@ class nv_fitness_growth(
         #     **kwargs
         # )
 
-
     def model_fitness_calculation(
-        self, 
-        model_id, 
+        self,
+        model_id,
         # fitness_parameters, # of this model_id
-        model_points, 
+        model_points,
         **kwargs
     ):
-        # TODO make fitness parameters within QMD 
-        # pass 
+        # TODO make fitness parameters within QMD
+        # pass
         # print("model fitness function. fitness params:", fitness_parameters)
         max_wins_model_points = max(model_points.values())
 
@@ -139,36 +142,31 @@ class nv_fitness_growth(
             else:
                 fitness = 0
 
-
-
-
         if model_id not in sorted(self.model_fitness.keys()):
             self.model_fitness[model_id] = {}
         print("Setting fitness for {} to {}".format(model_id, fitness))
-        self.model_fitness[model_id][self.generation_DAG] = fitness            
-
+        self.model_fitness[model_id][self.generation_DAG] = fitness
 
     def determine_whether_to_include_model(
-        self, 
-        model_id    
+        self,
+        model_id
     ):
         # biased coin flip
         fitness = self.model_fitness[model_id][self.generation_DAG]
         rand = np.random.rand()
-        to_generate = ( rand < fitness ) 
+        to_generate = (rand < fitness)
         return to_generate
 
     def check_tree_completed(
         self,
-        spawn_step, 
+        spawn_step,
         **kwargs
     ):
         if self.spawn_stage[-1] == 'Complete':
-            return True 
+            return True
         else:
             return False
         return True
-
 
 
 def increase_dimension_keep_terms_nv_model(
@@ -176,7 +174,7 @@ def increase_dimension_keep_terms_nv_model(
     new_dimension,
 ):
     current_dimension = DataBase.get_num_qubits(model_name)
-    p_str = 'P'*new_dimension
+    p_str = 'P' * new_dimension
     individual_terms = DataBase.get_constituent_names_from_name(model_name)
 
     spin_terms = []
@@ -188,16 +186,15 @@ def increase_dimension_keep_terms_nv_model(
                 dim = int(l.replace('d', ''))
             elif l == 'spin':
                 term_type = 'spin'
-            elif l == 'interaction' : 
+            elif l == 'interaction':
                 term_type = 'interaction'
             elif l in ['x', 'y', 'z']:
                 pauli = l
-        
+
         if term_type == 'spin':
             spin_terms.append(pauli)
         elif term_type == 'interaction':
             interaction_terms.append(pauli)
-
 
     all_terms = []
     for term in spin_terms:
@@ -222,15 +219,10 @@ def all_unique_addition_combinations(model_list):
         new_combinations = list(itertools.combinations(model_list, i))
         all_combinations.extend(new_combinations)
     num_qubits = DataBase.get_num_qubits(model_list[0])
-    p_str = 'P'*num_qubits
-    
+    p_str = 'P' * num_qubits
+
     for combination in all_combinations:
         model = p_str.join(combination)
         all_models.append(model)
-        
+
     return all_models
-    
-    
-    
-
-

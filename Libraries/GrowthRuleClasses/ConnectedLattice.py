@@ -1,31 +1,33 @@
+import SuperClassGrowthRule
+import Heuristics
+import SystemTopology
+import ModelGeneration
+import ModelNames
+import ProbeGeneration
+import DataBase
 import numpy as np
 import itertools
-import sys, os
+import sys
+import os
 sys.path.append(os.path.abspath('..'))
-import DataBase
-import ProbeGeneration
-import ModelNames
-import ModelGeneration
-import SystemTopology
-import Heuristics
 
-import SuperClassGrowthRule
 
-flatten = lambda l: [item for sublist in l for item in sublist]  # flatten list of lists
+# flatten list of lists
+def flatten(l): return [item for sublist in l for item in sublist]
 
 
 class connected_lattice(
-    SuperClassGrowthRule.growth_rule_super_class    
+    SuperClassGrowthRule.growth_rule_super_class
 ):
 
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         self.heuristic_function = Heuristics.one_over_sigma_then_linspace
@@ -39,14 +41,15 @@ class connected_lattice(
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
-            'x', 
-            'y', 
+            'x',
+            'y',
             'z'
         ]
 
         # fitness calculation parameters. fitness calculation inherited.
-        self.num_top_models_to_build_on = 2 # 'all' # at each generation Badassness parameter
-        self.model_generation_strictness = 0 #1 #-1 
+        # 'all' # at each generation Badassness parameter
+        self.num_top_models_to_build_on = 2
+        self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 3
 
         self.generation_DAG = 1
@@ -56,68 +59,69 @@ class connected_lattice(
         self.max_num_parameter_estimate = 9
         self.max_num_qubits = 4
         self.max_num_models_by_shape = {
-            'other' : 10
+            'other': 10
         }
 
         self.setup_growth_class()
 
     def setup_growth_class(self):
         self.max_num_generations = (
-            self.max_num_sites - 
-            self.initial_num_sites + 
+            self.max_num_sites -
+            self.initial_num_sites +
             self.generation_DAG
         )
         self.max_num_probe_qubits = self.max_num_sites
         self.topology = SystemTopology.topology_grid(
-            dimension = self.lattice_dimension,
-            num_sites = self.initial_num_sites,
-            maximum_connection_distance = self.lattice_connectivity_max_distance, # nearest neighbours only, 
-            linear_connections_only = self.lattice_connectivity_linear_only, 
-            all_sites_connected = self.lattice_full_connectivity, 
+            dimension=self.lattice_dimension,
+            num_sites=self.initial_num_sites,
+            # nearest neighbours only,
+            maximum_connection_distance=self.lattice_connectivity_max_distance,
+            linear_connections_only=self.lattice_connectivity_linear_only,
+            all_sites_connected=self.lattice_full_connectivity,
         )
         self.initially_connected_sites = self.topology.get_connected_site_list()
 
         self.true_operator = DataBase.alph(self.true_operator)
         self.model_fitness = {}
         self.models_rejected = {
-            self.generation_DAG : []
+            self.generation_DAG: []
         }
         self.models_accepted = {
-            self.generation_DAG : []
+            self.generation_DAG: []
         }
 
         self.available_mods_by_generation = {}
         self.available_mods_by_generation[self.generation_DAG] = self.generate_terms_from_new_site(
-            connected_sites = self.initially_connected_sites, 
-            base_terms = self.base_terms, 
-            num_sites = self.topology.num_sites(),
-            new_sites = range(1, self.topology.num_sites() + 1), 
+            connected_sites=self.initially_connected_sites,
+            base_terms=self.base_terms,
+            num_sites=self.topology.num_sites(),
+            new_sites=range(1, self.topology.num_sites() + 1),
         )
         self.spawn_stage = ['Start']
         self.initial_models = self.generate_models(
-            model_list = ['']
+            model_list=['']
         )
 
         self.site_connections_considered = self.initially_connected_sites
         self.max_num_sub_generations_per_generation = {
-            self.generation_DAG : len(self.available_mods_by_generation[self.generation_DAG])
+            self.generation_DAG: len(self.available_mods_by_generation[self.generation_DAG])
         }
         self.models_to_build_on = {
-            self.generation_DAG : {}
+            self.generation_DAG: {}
         }
         self.generation_champs = {
-            self.generation_DAG : {}
+            self.generation_DAG: {}
         }
-        self.sub_generation_idx = 0 
+        self.sub_generation_idx = 0
         self.counter = 0
 
     @property
     def num_sites(self):
-        return self.topology.num_sites()  
+        return self.topology.num_sites()
 
     def generate_models(
-        self, 
-        model_list, 
+        self,
+        model_list,
         **kwargs
     ):
         if self.spawn_stage[-1] == 'Start':
@@ -128,43 +132,47 @@ class connected_lattice(
         else:
             model_points = kwargs['branch_model_points']
             self.model_group_fitness_calculation(
-                model_points = model_points
+                model_points=model_points
             )
             branch_models = list(model_points.keys())
             ranked_model_list = sorted(
-                model_points, 
-                key=model_points.get, 
+                model_points,
+                key=model_points.get,
                 reverse=True
             )
             if self.num_top_models_to_build_on == 'all':
                 models_to_build_on = ranked_model_list
             else:
-                models_to_build_on = ranked_model_list[:self.num_top_models_to_build_on]
+                models_to_build_on = ranked_model_list[:
+                                                       self.num_top_models_to_build_on]
 
-            self.sub_generation_idx += 1 
+            self.sub_generation_idx += 1
             self.generation_champs[self.generation_DAG][self.sub_generation_idx] = [
                 kwargs['model_names_ids'][models_to_build_on[0]]
             ]
-            self.counter+=1
+            self.counter += 1
             new_models = []
 
             if self.spawn_stage[-1] == 'make_new_generation':
-            # increase generation idx; add site; get newly available terms; add greedily as above
+                # increase generation idx; add site; get newly available terms;
+                # add greedily as above
                 self.new_generation()
 
-            if self.spawn_stage[-1] == None:
-                # new models given by models_to_build_on plus terms in available_terms (greedy)
+            if self.spawn_stage[-1] is None:
+                # new models given by models_to_build_on plus terms in
+                # available_terms (greedy)
                 new_models = self.add_terms_greedy(
-                    models_to_build_on = models_to_build_on, 
-                    available_terms = self.available_mods_by_generation[self.generation_DAG],
-                    model_names_ids = kwargs['model_names_ids'],
-                    model_points = model_points
+                    models_to_build_on=models_to_build_on,
+                    available_terms=self.available_mods_by_generation[self.generation_DAG],
+                    model_names_ids=kwargs['model_names_ids'],
+                    model_points=model_points
                 )
 
         new_models = [
-            DataBase.alph(mod) 
-            for mod in new_models 
-            if self.check_model_validity(mod) # Final check whether this model is allowed
+            DataBase.alph(mod)
+            for mod in new_models
+            # Final check whether this model is allowed
+            if self.check_model_validity(mod)
         ]
         # store branch idx for new models
 
@@ -173,7 +181,7 @@ class connected_lattice(
             if model not in registered_models:
                 latex_model_name = self.latex_name(model)
                 branch_id = (
-                    self.generation_DAG 
+                    self.generation_DAG
                     + len(DataBase.get_constituent_names_from_name(model))
                 )
                 self.model_branches[latex_model_name] = branch_id
@@ -185,9 +193,9 @@ class connected_lattice(
     ):
         # Housekeeping: generational elements
         self.generation_DAG += 1
-        self.sub_generation_idx = 0 
+        self.sub_generation_idx = 0
 
-        self.models_to_build_on[self.generation_DAG] =  {}
+        self.models_to_build_on[self.generation_DAG] = {}
         self.generation_champs[self.generation_DAG] = {}
         self.models_rejected[self.generation_DAG] = []
         self.models_accepted[self.generation_DAG] = []
@@ -199,16 +207,16 @@ class connected_lattice(
         new_sites = self.topology.new_site_indices[-1]
         num_sites = self.topology.num_sites()
         newly_available_terms = self.generate_terms_from_new_site(
-            base_terms = self.base_terms,
-            connected_sites = new_connections, 
-            num_sites = num_sites, 
-            new_sites = new_sites,
-            print_terms = True,
+            base_terms=self.base_terms,
+            connected_sites=new_connections,
+            num_sites=num_sites,
+            new_sites=new_sites,
+            print_terms=True,
         )
         self.log_print(
             [
-            "Making new generation ({})".format(self.generation_DAG),  
-            "\tNew terms:", newly_available_terms
+                "Making new generation ({})".format(self.generation_DAG),
+                "\tNew terms:", newly_available_terms
             ]
         )
 
@@ -216,9 +224,9 @@ class connected_lattice(
         self.spawn_stage.append(None)
 
     def add_terms_greedy(
-        self, 
-        models_to_build_on, 
-        available_terms, 
+        self,
+        models_to_build_on,
+        available_terms,
         model_names_ids,
         model_points,
         **kwargs
@@ -229,9 +237,12 @@ class connected_lattice(
         new_models = []
         for mod_id in models_to_build_on:
             mod_name = model_names_ids[mod_id]
-            mod_name = self.match_dimension(mod_name, self.topology.num_sites())
+            mod_name = self.match_dimension(
+                mod_name, self.topology.num_sites())
             present_terms = DataBase.get_constituent_names_from_name(mod_name)
-            print("Model {} has present terms {}".format(mod_name, present_terms))
+            print(
+                "Model {} has present terms {}".format(
+                    mod_name, present_terms))
             terms_to_add = list(
                 set(available_terms)
                 - set(present_terms)
@@ -243,21 +254,23 @@ class connected_lattice(
                 # such that final branch computes this generation champion
                 self.spawn_stage.append('make_new_generation')
                 new_models = [
-                    self.generation_champs[self.generation_DAG][k] for k in 
+                    self.generation_champs[self.generation_DAG][k] for k in
                     list(self.generation_champs[self.generation_DAG].keys())
                 ]
                 new_models = flatten(new_models)
-                # new_models = [new_models[0]] # hack to force non-crash for single generation
+                # new_models = [new_models[0]] # hack to force non-crash for
+                # single generation
                 self.log_print(
                     [
                         "No remaining available terms. Completing generation",
-                        self.generation_DAG, 
+                        self.generation_DAG,
                         "\nModels:", new_models
                     ]
                 )
                 if self.generation_DAG == self.max_num_generations:
                     # this was the final generation to learn.
-                    # instead of building new generation, skip straight to Complete stage                            
+                    # instead of building new generation, skip straight to
+                    # Complete stage
                     self.log_print(
                         [
                             "Completing growth rule"
@@ -271,53 +284,56 @@ class connected_lattice(
                 # )
                 for term in terms_to_add:
                     new_mod = self.combine_terms(
-                        terms = [mod_name, term]
+                        terms=[mod_name, term]
                     )
                     if self.determine_whether_to_include_model(mod_id) == True:
                         new_models.append(new_mod)
-                        self.models_accepted[self.generation_DAG].append(new_mod)
+                        self.models_accepted[self.generation_DAG].append(
+                            new_mod)
                     else:
-                        self.models_rejected[self.generation_DAG].append(new_mod)
+                        self.models_rejected[self.generation_DAG].append(
+                            new_mod)
         return new_models
 
     def check_model_validity(
-        self, 
-        model, 
+        self,
+        model,
         **kwargs
     ):
-        # possibility that some models not valid; not needed by default but checked for general case
+        # possibility that some models not valid; not needed by default but
+        # checked for general case
         return True
 
     def combine_terms(
-        self, 
+        self,
         terms
     ):
-        addition_string = 'P'*self.topology.num_sites()
+        addition_string = 'P' * self.topology.num_sites()
         terms = sorted(terms)
         new_mod = addition_string.join(terms)
         return new_mod
 
     def match_dimension(
-        self, 
-        mod_name, 
-        num_sites, 
-        **kwargs 
+        self,
+        mod_name,
+        num_sites,
+        **kwargs
     ):
         return increase_dimension_pauli_set(mod_name, num_sites)
 
     def latex_name(
-        self, 
-        name, 
+        self,
+        name,
         **kwargs
     ):
         # print("[latex name fnc] name:", name)
         core_operators = list(sorted(DataBase.core_operator_dict.keys()))
         num_sites = DataBase.get_num_qubits(name)
-        p_str = 'P'*num_sites
+        p_str = 'P' * num_sites
         separate_terms = name.split(p_str)
 
         site_connections = {}
-        for c in list(itertools.combinations(list(range(num_sites+1)), 2)):
+        for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):
             site_connections[c] = []
 
         term_type_markers = ['pauliSet', 'transverse']
@@ -335,7 +351,8 @@ class connected_lattice(
                     else:
                         sites = l.split('J')
                 sites = tuple([int(a) for a in sites])
-                op = operators[0] # assumes like-like pauli terms like xx, yy, zz
+                # assumes like-like pauli terms like xx, yy, zz
+                op = operators[0]
                 site_connections[sites].append(op)
             elif 'transverse' in components:
                 components.remove('transverse')
@@ -345,13 +362,12 @@ class connected_lattice(
                     elif l in core_operators:
                         transverse_axis = l
 
-
         ordered_connections = list(sorted(site_connections.keys()))
         latex_term = ""
 
         for c in ordered_connections:
             if len(site_connections[c]) > 0:
-                this_term = "\sigma_{"
+                this_term = r"\sigma_{"
                 this_term += str(c)
                 this_term += "}"
                 this_term += "^{"
@@ -365,32 +381,32 @@ class connected_lattice(
         return latex_term
 
     def generate_terms_from_new_site(
-        self, 
-        base_terms, 
+        self,
+        base_terms,
         connected_sites,
         num_sites,
         print_terms=False,
-        **kwargs 
+        **kwargs
     ):
         new_terms = pauli_like_like_terms_connected_sites(
-            connected_sites = connected_sites, 
-            base_terms = base_terms, 
-            num_sites = num_sites
-        )    
-        if print_terms==True:
+            connected_sites=connected_sites,
+            base_terms=base_terms,
+            num_sites=num_sites
+        )
+        if print_terms == True:
             self.log_print(
                 ["Generating new terms:", new_terms]
             )
         return new_terms
 
     def model_group_fitness_calculation(
-        self, 
+        self,
         model_points,
         **kwargs
     ):
         ranked_model_list = sorted(
-            model_points, 
-            key=model_points.get, 
+            model_points,
+            key=model_points.get,
             reverse=True
         )
         new_fitnesses = {}
@@ -398,9 +414,8 @@ class connected_lattice(
             try:
                 max_wins_model_points = max(model_points.values())
                 win_ratio = model_points[model_id] / max_wins_model_points
-            except:
+            except BaseException:
                 win_ratio = 1
-
 
             if self.model_generation_strictness == 0:
                 # keep all models and work out relative fitness
@@ -421,7 +436,7 @@ class connected_lattice(
             if model_id not in sorted(self.model_fitness.keys()):
                 self.model_fitness[model_id] = []
             new_fitnesses[model_id] = fitness
-            self.model_fitness[model_id].append(fitness)            
+            self.model_fitness[model_id].append(fitness)
         self.log_print(
             [
                 "New fitnesses:\n", new_fitnesses
@@ -429,26 +444,26 @@ class connected_lattice(
         )
 
     def model_fitness_calculation(
-        self, 
-        model_id, 
+        self,
+        model_id,
         # fitness_parameters, # of this model_id
-        model_points, 
+        model_points,
         **kwargs
     ):
-        # TODO make fitness parameters within QMD 
-        # pass 
+        # TODO make fitness parameters within QMD
+        # pass
         # print("model fitness function. fitness params:", fitness_parameters)
         # print("[prob spin] model fitness. model points:", model_points)
         ranked_model_list = sorted(
-            model_points, 
-            key=model_points.get, 
+            model_points,
+            key=model_points.get,
             reverse=True
         )
 
         try:
             max_wins_model_points = max(model_points.values())
             win_ratio = model_points[model_id] / max_wins_model_points
-        except:
+        except BaseException:
             win_ratio = 1
 
         if self.model_generation_strictness == 0:
@@ -470,37 +485,38 @@ class connected_lattice(
         # if model_id not in sorted(self.model_fitness.keys()):
         #     self.model_fitness[model_id] = {}
         # # print("Setting fitness for {} to {}".format(model_id, fitness))
-        # self.model_fitness[model_id][self.generation_DAG] = fitness            
+        # self.model_fitness[model_id][self.generation_DAG] = fitness
         if model_id not in sorted(self.model_fitness.keys()):
             self.model_fitness[model_id] = []
         # print("Setting fitness for {} to {}".format(model_id, fitness))
         self.model_fitness[model_id].append(fitness)
 
-
     def determine_whether_to_include_model(
-        self, 
-        model_id    
+        self,
+        model_id
     ):
-        # return bool: whether this model should parent a new model, randomly decided according to biased coin flip
-        fitness = self.model_fitness[model_id][-1] # most recent fitness value calculated for this model
+        # return bool: whether this model should parent a new model, randomly
+        # decided according to biased coin flip
+        # most recent fitness value calculated for this model
+        fitness = self.model_fitness[model_id][-1]
         rand = np.random.rand()
-        to_generate = ( rand < fitness ) 
+        to_generate = (rand < fitness)
         return to_generate
 
     def check_tree_completed(
         self,
-        spawn_step, 
+        spawn_step,
         **kwargs
     ):
         if self.spawn_stage[-1] == 'Complete':
-            return True 
+            return True
         else:
             return False
         return True
 
     def name_branch_map(
         self,
-        latex_mapping_file, 
+        latex_mapping_file,
         **kwargs
     ):
 
@@ -508,13 +524,14 @@ class connected_lattice(
         # TODO get generation idx + sub generation idx
 
         return ModelNames.branch_is_num_params_and_qubits(
-            latex_mapping_file = latex_mapping_file,
+            latex_mapping_file=latex_mapping_file,
             **kwargs
         )
 
+
 def pauli_like_like_terms_connected_sites(
-    connected_sites, 
-    base_terms, 
+    connected_sites,
+    base_terms,
     num_sites,
     **kwargs
 ):
@@ -528,7 +545,7 @@ def pauli_like_like_terms_connected_sites(
         for t in base_terms:
             pauli_terms = "{}J{}".format(t, t)
             mod = "pauliSet_{}_{}_d{}".format(acted_on, pauli_terms, num_sites)
-            new_terms.append(mod)    
+            new_terms.append(mod)
     return new_terms
 
 
@@ -536,26 +553,27 @@ def possible_pauli_combinations(base_terms, num_sites):
     # possible_terms_tuples = list(itertools.combinations_with_replacement(base_terms, num_sites))
     # possible_terms_tuples = list(itertools.combinations(base_terms, num_sites))
     possible_terms_tuples = [
-        (a,)*num_sites for a in base_terms
-    ] # only hyerfine type terms; no transverse
-
+        (a,) * num_sites for a in base_terms
+    ]  # only hyerfine type terms; no transverse
 
     possible_terms = []
 
     for term in possible_terms_tuples:
         pauli_terms = 'J'.join(list(term))
-        acted_on_sites = [str(i) for i in range(1,num_sites+1) ]
+        acted_on_sites = [str(i) for i in range(1, num_sites + 1)]
         acted_on = 'J'.join(acted_on_sites)
         mod = "pauliSet_{}_{}_d{}".format(pauli_terms, acted_on, num_sites)
 
         possible_terms.append(mod)
     return possible_terms
 
+
 def increase_dimension_pauli_set(initial_model, new_dimension=None):
-    print("[spin prob incr dim] initial model:", initial_model, "new dim:", new_dimension)
+    print("[spin prob incr dim] initial model:",
+          initial_model, "new dim:", new_dimension)
     individual_terms = DataBase.get_constituent_names_from_name(initial_model)
     separate_terms = []
-    
+
     for model in individual_terms:
         components = model.split('_')
 
@@ -564,17 +582,14 @@ def increase_dimension_pauli_set(initial_model, new_dimension=None):
                 current_dim = int(c.replace('d', ''))
                 components.remove(c)
 
-        if new_dimension == None:
+        if new_dimension is None:
             new_dimension = current_dim + 1
         new_component = "d{}".format(new_dimension)
         components.append(new_component)
         new_mod = '_'.join(components)
         separate_terms.append(new_mod)
 
-    p_str = 'P'*(new_dimension)
+    p_str = 'P' * (new_dimension)
     full_model = p_str.join(separate_terms)
-    
+
     return full_model
-    
-    
-    

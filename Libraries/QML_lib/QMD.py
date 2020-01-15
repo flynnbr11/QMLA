@@ -1,114 +1,117 @@
-from __future__ import print_function # so print doesn't show brackets
+from __future__ import print_function  # so print doesn't show brackets
 # Libraries
+from RemoteBayesFactor import *
+import PlotQMD
+import DataBase
+import qinfer
+import GrowthRules
+import ExpectationValues
+from RemoteModelLearning import *
+import ModelNames
+import ModelGeneration
+import QML
+import RedisSettings as rds
+import redis
+import math
+import matplotlib.pyplot as plt
+import matplotlib
+import json
 import numpy as np
 import itertools as itr
 import os as os
-import sys as sys 
+import sys as sys
 import pandas as pd
 import warnings
 import time as time
 from time import sleep
 import random
 from psutil import virtual_memory
- # only want to do this once at the start!
-import pickle 
-pickle.HIGHEST_PROTOCOL=2 # TODO if >python3, can use higher protocol
-import json
-import matplotlib
-import matplotlib.pyplot as plt
+# only want to do this once at the start!
+import pickle
+pickle.HIGHEST_PROTOCOL = 2  # TODO if >python3, can use higher protocol
 plt.switch_backend('agg')
-import math
 
-import qinfer 
-import redis
-import RedisSettings as rds
 
 # Local files
-import DataBase 
-import QML
-import ModelGeneration
-import ModelNames
-import PlotQMD 
-from RemoteModelLearning import *
-from RemoteBayesFactor import * 
-import ExpectationValues
 # import UserFunctions
-import GrowthRules
 
 global test_growth_class_implementation
 test_growth_class_implementation = True
 
 
-
 def time_seconds():
     import datetime
-    now =  datetime.date.today()
+    now = datetime.date.today()
     hour = datetime.datetime.now().hour
     minute = datetime.datetime.now().minute
     second = datetime.datetime.now().second
-    time = str(str(hour)+':'+str(minute)+':'+str(second))
+    time = str(str(hour) + ':' + str(minute) + ':' + str(second))
     return time
 
+
 def high_BF():
-	return 1
+    return 1
+
 
 def low_BF():
-	return 100
+    return 100
+
 
 class QMD():
     """
-    - This class manages quantum model development. 
-    - This is done by controlling a pandas database, 
+    - This class manages quantum model development.
+    - This is done by controlling a pandas database,
         sending model specifications
-        to remote actors (via RQ) to compute QHL, 
-        and also Bayes factors, generating 
-        a next set of models iteratively. 
+        to remote actors (via RQ) to compute QHL,
+        and also Bayes factors, generating
+        a next set of models iteratively.
     - This is done in a tree like growth mechanism where
-        new branches consist of 
-        models generated considering previously determined "good" models. 
-    - Model generation rules are given in ModelGeneration. 
-    - Database control is given in DataBase. 
+        new branches consist of
+        models generated considering previously determined "good" models.
+    - Model generation rules are given in ModelGeneration.
+    - Database control is given in DataBase.
     - Remote functions for computing QHL/Bayes factors are in
-    - RemoteModelLearning and RemoteBayesFactor respectively. 
-    - Redis databases are used to ensure QMD parameters are accessible to 
-        remote models (since shared memory is not available). 
-        Relevant QMD parameters and info are pickled to redis.  
+    - RemoteModelLearning and RemoteBayesFactor respectively.
+    - Redis databases are used to ensure QMD parameters are accessible to
+        remote models (since shared memory is not available).
+        Relevant QMD parameters and info are pickled to redis.
 
     """
+
     def __init__(self,
-        global_variables,
-        # generator_initial_models, 
-        initial_op_list=['x'],
-        generator_list=[], 
-        true_operator='x',
-        # true_param_list = None,
-        use_time_dep_true_model=False,
-        true_params_time_dep=None,
-        max_num_models=30, 
-        max_num_qubits=7, #TODO change -- this may cause crashes somewhere
-        model_priors=None,
-        store_particles_weights=False,
-        # bayes_time_binning = False,
-        qhl_plots=False, 
-        experimental_measurements=None,
-        results_directory='', 
-        long_id='001', 
-        # num_probes = 20,
-        probe_dict=None,  
-        sim_probe_dict=None,
-        max_num_layers=10,
-        max_num_branches=20, 
-        use_exp_custom=True,
-        enable_sparse=True,
-        compare_linalg_exp_tol=None,
-        parallel=False,
-        plot_times=[0,1],
-        sigma_threshold=1e-13, 
-        debug_directory=None,
-        # prior_specific_terms=None, 
-        qle=None,   
-        **kwargs
-    ):
+                 global_variables,
+                 # generator_initial_models,
+                 initial_op_list=['x'],
+                 generator_list=[],
+                 true_operator='x',
+                 # true_param_list = None,
+                 use_time_dep_true_model=False,
+                 true_params_time_dep=None,
+                 max_num_models=30,
+                 max_num_qubits=7,  # TODO change -- this may cause crashes somewhere
+                 model_priors=None,
+                 store_particles_weights=False,
+                 # bayes_time_binning = False,
+                 qhl_plots=False,
+                 experimental_measurements=None,
+                 results_directory='',
+                 long_id='001',
+                 # num_probes = 20,
+                 probe_dict=None,
+                 sim_probe_dict=None,
+                 max_num_layers=10,
+                 max_num_branches=20,
+                 use_exp_custom=True,
+                 enable_sparse=True,
+                 compare_linalg_exp_tol=None,
+                 parallel=False,
+                 plot_times=[0, 1],
+                 sigma_threshold=1e-13,
+                 debug_directory=None,
+                 # prior_specific_terms=None,
+                 qle=None,
+                 **kwargs
+                 ):
         self.GlobalVariables = global_variables
         self.GrowthClass = self.GlobalVariables.growth_class
         qhl_test = self.GlobalVariables.qhl_test
@@ -120,9 +123,9 @@ class QMD():
         if self.GlobalVariables.log_file is not None:
             self.log_file = self.GlobalVariables.log_file
         else:
-            self.log_file = str('QMD_'+str(q_id)+'.log')
-        
-        self.QLE = qle # Set to False for IQLE
+            self.log_file = str('QMD_' + str(q_id) + '.log')
+
+        self.QLE = qle  # Set to False for IQLE
         # trueOp = self.GlobalVariables.true_operator_class
         self.TrueOpName = self.GlobalVariables.true_op_name
         self.log_print(
@@ -147,10 +150,10 @@ class QMD():
                 num_terms < base_num_terms
             ):
                 base_num_terms = num_terms
-        
+
         self.BaseResources = {
-            'num_qubits' : base_num_qubits, 
-            'num_terms' : base_num_terms,
+            'num_qubits': base_num_qubits,
+            'num_terms': base_num_terms,
         }
         self.ReallocateResources = self.GlobalVariables.reallocate_resources
         # print("[QMD] Base resources: ", self.BaseResources)
@@ -159,9 +162,8 @@ class QMD():
         self.TrueOpNumParams = self.GlobalVariables.true_operator_class.num_constituents
         self.TrueParamsList = self.GlobalVariables.true_params_list
         self.TrueParamDict = self.GlobalVariables.true_params_dict
-        
 
-        self.MaxModNum = max_num_models #TODO: necessary?
+        self.MaxModNum = max_num_models  # TODO: necessary?
         self.gaussian = self.GlobalVariables.gaussian
         self.NumParticles = self.GlobalVariables.num_particles
         self.NumExperiments = self.GlobalVariables.num_experiments
@@ -175,14 +177,14 @@ class QMD():
         self.PGHExponent = self.GlobalVariables.pgh_exponent
         self.QHLmode = self.GlobalVariables.qhl_test
         self.multiQHLMode = False
-        # self.BayesTimeBinning = self.GlobalVariables.bayes_time_binning 
+        # self.BayesTimeBinning = self.GlobalVariables.bayes_time_binning
         self.StoreParticlesWeights = self.GlobalVariables.store_particles_weights
         self.QHL_plots = qhl_plots
         self.ResultsDirectory = results_directory
         if not self.ResultsDirectory.endswith('/'):
             self.ResultsDirectory += '/'
         self.LatexMappingFile = self.GlobalVariables.latex_mapping_file
-        
+
         self.BayesFactorsFolder = str(
             self.ResultsDirectory
             + 'BayesFactorsTimeRecords/'
@@ -190,34 +192,34 @@ class QMD():
         if not os.path.exists(self.BayesFactorsFolder):
             try:
                 os.makedirs(self.BayesFactorsFolder)
-            except:
-                # reached at exact same time as another process; don't cause crash
+            except BaseException:
+                # reached at exact same time as another process; don't cause
+                # crash
                 pass
-
 
         self.BayesFactorsTimeFile = str(
             self.BayesFactorsFolder
             + 'BayesFactorsPairsTimes_'
             + str(self.GlobalVariables.long_id)
-            +'.txt'
+            + '.txt'
         )
 
         self.NumProbes = global_variables.num_probes
         if probe_dict is None:
             self.log_print(
                 [
-                "Generating probe dict."
+                    "Generating probe dict."
                 ]
             )
             self.ProbeDict = separable_probe_dict(
-                max_num_qubits=self.MaxQubitNumber, 
+                max_num_qubits=self.MaxQubitNumber,
                 num_probes=self.NumProbes
             )
             self.SimProbeDict = self.ProbeDict
         else:
             self.log_print(
                 [
-                "Probe dict provided to QMD."
+                    "Probe dict provided to QMD."
                 ]
             )
             self.ProbeDict = probe_dict
@@ -226,10 +228,10 @@ class QMD():
         self.MaxBranchID = max_num_branches
         self.MaxLayerNumber = max_num_layers
         self.LayerChampions = {}
-        self.BayesPointsByBranch ={}
+        self.BayesPointsByBranch = {}
         self.BranchRankings = {}
         self.InterBranchChampions = {}
-        self.GlobalEpoch = 0 
+        self.GlobalEpoch = 0
         self.GhostBranchList = []
         self.MeasurementType = self.GlobalVariables.measurement_type
         self.UseExperimentalData = self.GlobalVariables.use_experimental_data
@@ -238,10 +240,10 @@ class QMD():
             self.ExperimentalMeasurementTimes = (
                 sorted(list(self.ExperimentalMeasurements.keys()))
             )
-        else: 
-            self.ExperimentalMeasurementTimes=None
+        else:
+            self.ExperimentalMeasurementTimes = None
         self.PlotProbeFile = self.GlobalVariables.plot_probe_file
-        
+
         self.PlotTimes = plot_times
         self.ReducedPlotTimes = self.PlotTimes[0::10]
 
@@ -249,8 +251,7 @@ class QMD():
             open(self.PlotProbeFile, 'rb')
         )
 
-
-        if self.UseExperimentalData==False:
+        if self.UseExperimentalData == False:
             self.ExperimentalMeasurements = {}
             self.TrueHamiltonian = self.GlobalVariables.true_hamiltonian
             self.TrueHamiltonianDimension = np.log2(
@@ -258,29 +259,29 @@ class QMD():
             )
             self.log_print(
                 [
-                "Getting expectation values for simulated model", 
-                "(len {})".format(len(self.PlotTimes)),
-                "\n Times computed:\n", self.PlotTimes
+                    "Getting expectation values for simulated model",
+                    "(len {})".format(len(self.PlotTimes)),
+                    "\n Times computed:\n", self.PlotTimes
                 ]
             )
 
             for t in self.PlotTimes:
                 # TODO is this the right expectation value func???
-                
+
                 self.ExperimentalMeasurements[t] = (
                     self.GrowthClass.expectation_value(
-                        ham = self.TrueHamiltonian, 
-                        t = t, 
-                        state = self.PlotProbes[self.TrueOpDim],
+                        ham=self.TrueHamiltonian,
+                        t=t,
+                        state=self.PlotProbes[self.TrueOpDim],
                         # state = self.PlotProbes[self.TrueHamiltonianDimension],
-                        log_file = self.log_file,
-                        log_identifier = '[QMD Init]'
+                        log_file=self.log_file,
+                        log_identifier='[QMD Init]'
                     )
 
                 )
             self.log_print(
                 [
-                "Expectation values computed", 
+                    "Expectation values computed",
                 ]
             )
 
@@ -294,7 +295,6 @@ class QMD():
         self.AllBayesFactors = {}
         self.BayesFactorsComputed = []
         self.ModelNameIDs = {}
-
 
         # Growth rule setup
         self.BranchParents = {}
@@ -320,10 +320,10 @@ class QMD():
             self.GeneratorList[matching_gen_idx] = zeroth_gen
 
         print("Gen list:", self.GeneratorList)
-        
+
         self.log_print(
             [
-                "generator list after ensuring true generator is first:", 
+                "generator list after ensuring true generator is first:",
                 self.GeneratorList
             ]
         )
@@ -332,7 +332,7 @@ class QMD():
         self.BranchChampions = {}
         self.ActiveBranchChampList = []
         self.HighestBranchID = 0
-        self.HighestModelID = 0 # so first created model gets modelID=0
+        self.HighestModelID = 0  # so first created model gets modelID=0
         self.NumModelsPerBranch = {}
         self.NumModelPairsPerBranch = {}
         self.BranchAllModelsLearned = {}
@@ -345,14 +345,14 @@ class QMD():
         self.BranchModelIds = {}
         self.BranchGrowthRules = {}
         self.UniqueGrowthClasses = {
-            self.GrowthGenerator : self.GrowthClass
-        } # to save making many instances
+            self.GrowthGenerator: self.GrowthClass
+        }  # to save making many instances
         self.BranchGrowthClasses = {}
         self.SpawnDepthByGrowthRule = {}
         self.TreesCompleted = {}
         self.InitialOpsAllBranches = []
         self.InitialModelBranches = {}
-        self.InitialModelIDs =  {}
+        self.InitialModelIDs = {}
         self.BranchChampsByNumQubits = {}
         self.GhostBranches = {}
         self.SpawnStage = {}
@@ -361,12 +361,13 @@ class QMD():
         initial_id_counter = 0
         models_already_added_to_a_branch = []
         for i in range(len(self.GeneratorList)):
-            # to match this newly created branch with corresponding dicts filled here
+            # to match this newly created branch with corresponding dicts
+            # filled here
             gen = self.GeneratorList[i]
             growth_class_gen = GrowthRules.get_growth_generator_class(
-                growth_generation_rule = gen, 
-                use_experimental_data = self.UseExperimentalData,
-                log_file = self.log_file
+                growth_generation_rule=gen,
+                use_experimental_data=self.UseExperimentalData,
+                log_file=self.log_file
             )
             # self.TreesCompleted[gen] = False
             self.TreesCompleted[gen] = growth_class_gen.tree_completed_initially
@@ -377,45 +378,46 @@ class QMD():
             self.log_print(
                 [
                     "initialising generator {} with models: {}".format(
-                        gen, 
-                        initial_models_this_gen) 
+                        gen,
+                        initial_models_this_gen)
 
                 ]
             )
             self.InitialOpsAllBranches.extend(initial_models_this_gen)
             num_new_models = len(initial_models_this_gen)
             # self.BranchModelIds[i] = list(range(
-            #     self.HighestModelID, 
+            #     self.HighestModelID,
             #     self.HighestModelID+num_new_models
             # ))
             self.BranchModelIds[i] = []
             self.BranchModels[i] = []
             self.BranchPrecomputedModels[i] = []
-            self.BranchNumModelsPreComputed[i]  = 0
+            self.BranchNumModelsPreComputed[i] = 0
 
             for mod in initial_models_this_gen:
                 mod = DataBase.alph(mod)
                 self.BranchModels[i].append(mod)
-                self.ModelsBranches[initial_id_counter] = i  # latest branch to claim it
+                # latest branch to claim it
+                self.ModelsBranches[initial_id_counter] = i
                 self.HighestBranchID = i
                 # self.BranchModelIds[i].append(initial_id_counter)
                 if mod in models_already_added_to_a_branch:
                     orig_mod_id = self.InitialModelIDs[mod]
                     self.log_print(
                         [
-                            mod, 
-                            "already added as", 
+                            mod,
+                            "already added as",
                             orig_mod_id
                         ]
                     )
                     self.BranchModelIds[i].append(orig_mod_id)
                     self.BranchPrecomputedModels[i].append(mod)
-                    self.BranchNumModelsPreComputed[i]+=1
+                    self.BranchNumModelsPreComputed[i] += 1
                 else:
                     self.log_print(
                         [
-                            mod, 
-                            "not added yet. List:", 
+                            mod,
+                            "not added yet. List:",
                             models_already_added_to_a_branch
                         ]
                     )
@@ -451,21 +453,24 @@ class QMD():
         self.log_print(
             [
                 "After initial branches. InitialModelIDs:",
-                self.InitialModelIDs 
+                self.InitialModelIDs
             ]
         )
-        self.HighestModelID = max(self.InitialModelIDs.values())+1 # to ensure everywhere we use range(qmd.HighestModelID) goes to the right number
+        # to ensure everywhere we use range(qmd.HighestModelID) goes to the
+        # right number
+        self.HighestModelID = max(self.InitialModelIDs.values()) + 1
         self.NumModels = len(self.InitialModelIDs.keys())
         self.log_print(
             [
-                "After setting up initial branches, highest branch id:", 
+                "After setting up initial branches, highest branch id:",
                 self.HighestBranchID,
                 "highest model id:", self.HighestModelID,
                 "initial models:", self.ModelNameIDs
             ]
-        )   
+        )
 
-        self.NumTrees = len(self.GeneratorList) # i.e. Trees only stem from unique generators
+        # i.e. Trees only stem from unique generators
+        self.NumTrees = len(self.GeneratorList)
         # print("[QMD] num trees:", self.NumTrees)
         self.NumTreesCompleted = np.sum(
             list(self.TreesCompleted.values())
@@ -475,44 +480,47 @@ class QMD():
         self.rq_timeout = self.GlobalVariables.rq_timeout
         self.rq_log_file = self.log_file
         self.write_log_file = open(self.log_file, 'a')
-            
+
         try:
             from rq import Connection, Queue, Worker
-            self.redis_conn = redis.Redis(host=self.HostName, port=self.PortNumber)
-            test_workers=self.use_rq
+            self.redis_conn = redis.Redis(
+                host=self.HostName, port=self.PortNumber)
+            test_workers = self.use_rq
             self.rq_queue = Queue(
                 self.Q_id,
                 connection=self.redis_conn,
-                async=test_workers, 
+                async=test_workers,
                 default_timeout=self.rq_timeout
-            ) # TODO is this timeout sufficient for ALL QMD jobs?
+            )  # TODO is this timeout sufficient for ALL QMD jobs?
 
             parallel_enabled = True
-        except:
+        except BaseException:
             print("importing rq failed")
-            parallel_enabled = False    
+            parallel_enabled = False
 
         self.RunParallel = parallel and parallel_enabled
 
         self.log_print(["Retrieving databases from redis"])
         self.RedisDataBases = rds.databases_from_qmd_id(
-            self.HostName, 
-            self.PortNumber, 
+            self.HostName,
+            self.PortNumber,
             self.Q_id,
-            tree_identifiers = self.TreeIdentifiers
+            tree_identifiers=self.TreeIdentifiers
         )
         self.RedisDataBases['any_job_failed'].set('Status', 0)
         self.log_print(
             [
-                "any job failed db:", self.RedisDataBases['any_job_failed'].keys(),
+                "any job failed db:", self.RedisDataBases['any_job_failed'].keys(
+                ),
                 "Status:", self.RedisDataBases['any_job_failed']['Status']
 
             ]
         )
-        
-#        rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh redis databases for this instance of QMD.
- 
-        self.UseTimeDepTrueModel = use_time_dep_true_model 
+
+# rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh
+# redis databases for this instance of QMD.
+
+        self.UseTimeDepTrueModel = use_time_dep_true_model
         if self.UseTimeDepTrueModel:
             # Build time dependent parameters into true op/param list
             self.TimeDepParams = true_params_time_dep
@@ -523,13 +531,13 @@ class QMD():
             terms = list(self.TimeDepParams.keys())
 
             for t in terms:
-                if terms.index(t)>0:
+                if terms.index(t) > 0:
                     time_dep_term += str('PP')
                 time_dep_term += str(t)
                 time_dep_params.append(self.TimeDepParams[t])
-                
+
             time_dep_op = DataBase.operator(time_dep_term)
-            time_dep_ops = time_dep_op.constituents_operators    
+            time_dep_ops = time_dep_op.constituents_operators
 
             self.TrueOpList.extend(time_dep_ops)
             self.TrueParamsList.extend(time_dep_params)
@@ -539,85 +547,87 @@ class QMD():
             self.TimeDepParams = None
         if self.QLE:
             self.QLE_Type = 'QLE'
-        else: 
+        else:
             self.QLE_Type = 'IQLE'
-    
+
         num_exp_ham = (
-            self.NumParticles * 
+            self.NumParticles *
             (self.NumExperiments + self.NumTimesForBayesUpdates)
         )
-        latex_config = str( 
-            '$P_{'+str(self.NumParticles) +
+        latex_config = str(
+            '$P_{' + str(self.NumParticles) +
             '}E_{' + str(self.NumExperiments) +
-            '}B_{' + str( self.NumTimesForBayesUpdates)  +
+            '}B_{' + str(self.NumTimesForBayesUpdates) +
             '}RT_{' + str(self.ResampleThreshold) +
             '}RA_{' + str(self.ResamplerA) +
             '}RP_{' + str(self.PGHPrefactor) +
-            '}H_{' + str(num_exp_ham) + 
-            '}|\psi>_{' + str(self.NumProbes) +             
-            '}PN_{' + str(self.GlobalVariables.probe_noise_level) + 
-            '}BF^{bin }_{' + str(self.GlobalVariables.bayes_time_binning) +             
-            '}BF^{all }_{' + str(self.GlobalVariables.bayes_factors_use_all_exp_times) +             
+            '}H_{' + str(num_exp_ham) +
+            r'}|\psi>_{' + str(self.NumProbes) +
+            '}PN_{' + str(self.GlobalVariables.probe_noise_level) +
+            '}BF^{bin }_{' + str(self.GlobalVariables.bayes_time_binning) +
+            '}BF^{all }_{' + str(self.GlobalVariables.bayes_factors_use_all_exp_times) +
             '}$'
         )
         self.LatexConfig = latex_config
         print("[QMD] latex config:", self.LatexConfig)
-        
+
         self.QMDInfo = {
-            # may need to take copies of these in case pointers accross nodes break
-            'num_probes' : self.NumProbes,
+            # may need to take copies of these in case pointers accross nodes
+            # break
+            'num_probes': self.NumProbes,
             #          'probe_dict' : self.ProbeDict, # possibly include here?
-            'plot_probe_file' : self.PlotProbeFile,
-            'plot_times' : self.PlotTimes, 
-            'true_oplist' : self.TrueOpList,
-            'true_params' : self.TrueParamsList,  
-            'num_particles' : self.NumParticles,
-            'num_experiments' : self.NumExperiments, 
-            'resampler_thresh' : self.ResampleThreshold,
-            'resampler_a' : self.ResamplerA,
-            'pgh_prefactor' : self.PGHPrefactor,
-            'pgh_exponent' : self.PGHExponent, 
-            'increase_pgh_time' : self.GlobalVariables.increase_pgh_time, 
-            'store_particles_weights' : self.StoreParticlesWeights,
-            'growth_generator' : self.GrowthGenerator, 
-            'qhl_plots' : self.QHL_plots, 
-            'results_directory' : self.ResultsDirectory, 
-            'plots_directory' : self.GlobalVariables.plots_directory,
-            'long_id' : long_id, 
-            'debug_directory' : self.DebugDirectory,
-            'qle' : self.QLE,
-            'sigma_threshold' : self.SigmaThreshold,
-            'true_name' : self.TrueOpName,
-            'use_exp_custom' : self.UseExpCustom,
-            'measurement_type' : self.MeasurementType,
-            'use_experimental_data' : self.UseExperimentalData,
-            'experimental_measurements' : self.ExperimentalMeasurements,
-            'experimental_measurement_times' : self.ExperimentalMeasurementTimes, 
-            'compare_linalg_exp_tol' : self.ExpComparisonTol,
-            'gaussian' : self.gaussian,
+            'plot_probe_file': self.PlotProbeFile,
+            'plot_times': self.PlotTimes,
+            'true_oplist': self.TrueOpList,
+            'true_params': self.TrueParamsList,
+            'num_particles': self.NumParticles,
+            'num_experiments': self.NumExperiments,
+            'resampler_thresh': self.ResampleThreshold,
+            'resampler_a': self.ResamplerA,
+            'pgh_prefactor': self.PGHPrefactor,
+            'pgh_exponent': self.PGHExponent,
+            'increase_pgh_time': self.GlobalVariables.increase_pgh_time,
+            'store_particles_weights': self.StoreParticlesWeights,
+            'growth_generator': self.GrowthGenerator,
+            'qhl_plots': self.QHL_plots,
+            'results_directory': self.ResultsDirectory,
+            'plots_directory': self.GlobalVariables.plots_directory,
+            'long_id': long_id,
+            'debug_directory': self.DebugDirectory,
+            'qle': self.QLE,
+            'sigma_threshold': self.SigmaThreshold,
+            'true_name': self.TrueOpName,
+            'use_exp_custom': self.UseExpCustom,
+            'measurement_type': self.MeasurementType,
+            'use_experimental_data': self.UseExperimentalData,
+            'experimental_measurements': self.ExperimentalMeasurements,
+            'experimental_measurement_times': self.ExperimentalMeasurementTimes,
+            'compare_linalg_exp_tol': self.ExpComparisonTol,
+            'gaussian': self.gaussian,
             # 'bayes_factors_time_binning' : self.BayesTimeBinning,
-            'bayes_factors_time_binning' : self.GlobalVariables.bayes_time_binning,
-            'q_id' : self.Q_id,
-            'use_time_dep_true_params' : use_time_dep_true_model,
-            'time_dep_true_params' : self.TimeDepParams,
-            'num_time_dependent_true_params' : self.NumTimeDepTrueParams, 
-            'prior_pickle_file' : self.GlobalVariables.prior_pickle_file, 
-            'prior_specific_terms' : self.GrowthClass.gaussian_prior_means_and_widths,
-            'model_priors' : model_priors,
-            'base_resources' : self.BaseResources,
-            'reallocate_resources' : self.ReallocateResources,
-            'param_min' : self.GlobalVariables.param_min, 
-            'param_max' : self.GlobalVariables.param_max, 
-            'param_mean' : self.GlobalVariables.param_mean, 
-            'param_sigma' : self.GlobalVariables.param_sigma,
-            'tree_identifiers' : self.TreeIdentifiers,     
-            'bayes_factors_time_all_exp_times' : global_variables.bayes_factors_use_all_exp_times,      
+            'bayes_factors_time_binning': self.GlobalVariables.bayes_time_binning,
+            'q_id': self.Q_id,
+            'use_time_dep_true_params': use_time_dep_true_model,
+            'time_dep_true_params': self.TimeDepParams,
+            'num_time_dependent_true_params': self.NumTimeDepTrueParams,
+            'prior_pickle_file': self.GlobalVariables.prior_pickle_file,
+            'prior_specific_terms': self.GrowthClass.gaussian_prior_means_and_widths,
+            'model_priors': model_priors,
+            'base_resources': self.BaseResources,
+            'reallocate_resources': self.ReallocateResources,
+            'param_min': self.GlobalVariables.param_min,
+            'param_max': self.GlobalVariables.param_max,
+            'param_mean': self.GlobalVariables.param_mean,
+            'param_sigma': self.GlobalVariables.param_sigma,
+            'tree_identifiers': self.TreeIdentifiers,
+            'bayes_factors_time_all_exp_times': global_variables.bayes_factors_use_all_exp_times,
         }
         self.log_print(
             ["Initial op list:", self.InitialOpList]
         )
 
-        self.log_print(['Specific terms for prior', self.GrowthClass.gaussian_prior_means_and_widths])
+        self.log_print(['Specific terms for prior',
+                        self.GrowthClass.gaussian_prior_means_and_widths])
         self.log_print(["RunParallel=", self.RunParallel])
         compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
         compressed_probe_dict = pickle.dumps(self.ProbeDict, protocol=2)
@@ -630,58 +640,53 @@ class QMD():
 
         # Initialise database and lists.
         self.log_print(["Running ", self.QLE_Type, " for true operator ",
-            true_operator, " with parameters : ", self.TrueParamsList]
-        )
+                        true_operator, " with parameters : ", self.TrueParamsList]
+                       )
         self.initiateDB()
 
-        
-
     def log_print(self, to_print_list):
-        identifier = str(str(time_seconds()) +" [QMD "+ str(self.Q_id) +"]")
-        if type(to_print_list)!=list:
+        identifier = str(str(time_seconds()) + " [QMD " + str(self.Q_id) + "]")
+        if not isinstance(to_print_list, list):
             to_print_list = list(to_print_list)
 
         print_strings = [str(s) for s in to_print_list]
         to_print = " ".join(print_strings)
         with open(self.log_file, 'a') as write_log_file:
             print(identifier, str(to_print), file=write_log_file, flush=True)
-        
 
     def initiateDB(self):
         self.db, self.legacy_db, self.model_lists = \
             DataBase.launch_db(
-                true_op_name = self.TrueOpName,
+                true_op_name=self.TrueOpName,
                 # gen_list = self.InitialOpList,
-                new_model_branches = self.InitialModelBranches, 
-                new_model_ids = self.InitialModelIDs, 
-                log_file = self.log_file, 
-                gen_list = self.InitialOpsAllBranches, 
-                qle = self.QLE,
-                true_ops = self.TrueOpList,
-                true_params = self.TrueParamsList,
-                num_particles = self.NumParticles,
-                redimensionalise = False,
-                resample_threshold = self.ResampleThreshold,
-                resampler_a = self.ResamplerA,
-                pgh_prefactor = self.PGHPrefactor,
-                num_probes = self.NumProbes,
-                probe_dict = self.ProbeDict,
-                use_exp_custom = self.UseExpCustom,
-                enable_sparse = self.EnableSparse,
-                debug_directory = self.DebugDirectory,
-                qid=self.Q_id, 
+                new_model_branches=self.InitialModelBranches,
+                new_model_ids=self.InitialModelIDs,
+                log_file=self.log_file,
+                gen_list=self.InitialOpsAllBranches,
+                qle=self.QLE,
+                true_ops=self.TrueOpList,
+                true_params=self.TrueParamsList,
+                num_particles=self.NumParticles,
+                redimensionalise=False,
+                resample_threshold=self.ResampleThreshold,
+                resampler_a=self.ResamplerA,
+                pgh_prefactor=self.PGHPrefactor,
+                num_probes=self.NumProbes,
+                probe_dict=self.ProbeDict,
+                use_exp_custom=self.UseExpCustom,
+                enable_sparse=self.EnableSparse,
+                debug_directory=self.DebugDirectory,
+                qid=self.Q_id,
                 host_name=self.HostName,
                 port_number=self.PortNumber
             )
-            
+
         for mod in list(self.InitialModelIDs.keys()):
             mod_id = self.InitialModelIDs[mod]
             if DataBase.alph(mod) == self.TrueOpName:
                 self.TrueOpModelID = mod_id
             print("mod id:", mod_id)
             self.ModelNameIDs[int(mod_id)] = mod
-
-
 
         self.log_print(
             [
@@ -694,75 +699,77 @@ class QMD():
         #     if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
         #         self.TrueOpModelID = i
         #     self.ModelNameIDs[i] = model
-            
+
     def addModel(
-        self, 
-        model, 
+        self,
+        model,
         branchID=0,
         force_create_model=False
     ):
         #self.NumModels += 1
         model = DataBase.alph(model)
         tryAddModel = DataBase.add_model(
-            model_name = model,
-            running_database = self.db,
-            num_particles = self.NumParticles, 
-            true_op_name = self.TrueOpName,
-            model_lists = self.model_lists,
-            true_ops = self.TrueOpList,
-            true_params = self.TrueParamsList,
-            branchID = branchID,
-            resample_threshold = self.ResampleThreshold,
-            resampler_a = self.ResamplerA,
-            pgh_prefactor = self.PGHPrefactor,
-            num_probes = self.NumProbes,
-            probe_dict = self.ProbeDict,
-            use_exp_custom = self.UseExpCustom,
-            enable_sparse = self.EnableSparse,
-            debug_directory = self.DebugDirectory,
-            modelID = self.NumModels,
-            redimensionalise = False,
-            qle = self.QLE,
-            host_name = self.HostName, 
-            port_number = self.PortNumber, 
-            qid = self.Q_id,
-            log_file = self.log_file,
-            force_create_model=force_create_model, 
+            model_name=model,
+            running_database=self.db,
+            num_particles=self.NumParticles,
+            true_op_name=self.TrueOpName,
+            model_lists=self.model_lists,
+            true_ops=self.TrueOpList,
+            true_params=self.TrueParamsList,
+            branchID=branchID,
+            resample_threshold=self.ResampleThreshold,
+            resampler_a=self.ResamplerA,
+            pgh_prefactor=self.PGHPrefactor,
+            num_probes=self.NumProbes,
+            probe_dict=self.ProbeDict,
+            use_exp_custom=self.UseExpCustom,
+            enable_sparse=self.EnableSparse,
+            debug_directory=self.DebugDirectory,
+            modelID=self.NumModels,
+            redimensionalise=False,
+            qle=self.QLE,
+            host_name=self.HostName,
+            port_number=self.PortNumber,
+            qid=self.Q_id,
+            log_file=self.log_file,
+            force_create_model=force_create_model,
         )
-        if tryAddModel == True: ## keep track of how many models/branches in play
+        if tryAddModel == True:  # keep track of how many models/branches in play
             if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
                 self.TrueOpModelID = self.NumModels
-            self.HighestModelID += 1 
+            self.HighestModelID += 1
             # print("Setting model ", model, "to ID:", self.NumModels)
             model_id = self.NumModels
             self.ModelNameIDs[model_id] = model
             self.NumModels += 1
             if DataBase.get_num_qubits(model) > self.HighestQubitNumber:
                 self.HighestQubitNumber = DataBase.get_num_qubits(model)
-                self.BranchGrowthClasses[branchID].highest_num_qubits = DataBase.get_num_qubits(model)
+                self.BranchGrowthClasses[branchID].highest_num_qubits = DataBase.get_num_qubits(
+                    model)
                 # self.GrowthClass.highest_num_qubits = DataBase.get_num_qubits(model)
-                print("self.GrowthClass.highest_num_qubits", self.BranchGrowthClasses[branchID].highest_num_qubits)
+                print("self.GrowthClass.highest_num_qubits",
+                      self.BranchGrowthClasses[branchID].highest_num_qubits)
 
         # retrieve model_id from database? or somewhere
         else:
             try:
                 model_id = DataBase.model_id_from_name(
-                    db = self.db, 
-                    name = model    
+                    db=self.db,
+                    name=model
                 )
-            except:
+            except BaseException:
                 self.log_print(
                     [
                         "Couldn't find model id for model:", model,
-                        "model_names_ids:", 
+                        "model_names_ids:",
                         self.ModelNameIDs
                     ]
                 )
                 raise
 
         add_model_output = {
-            'is_new_model' : tryAddModel, 
-            'model_id' : model_id,
+            'is_new_model': tryAddModel,
+            'model_id': model_id,
         }
 
         return add_model_output
@@ -774,11 +781,11 @@ class QMD():
         del self.write_log_file
 
     def newBranch(
-        self, 
-        growth_rule, 
+        self,
+        growth_rule,
         model_list
     ):
-        model_list = list(set(model_list)) # remove possible duplicates
+        model_list = list(set(model_list))  # remove possible duplicates
         self.HighestBranchID += 1
         branchID = int(self.HighestBranchID)
         print(
@@ -798,9 +805,9 @@ class QMD():
         self.log_print(
             [
                 'Branch {} growth rule {} has {} new models {}'.format(
-                    branchID, 
-                    growth_rule, 
-                    num_models, 
+                    branchID,
+                    growth_rule,
+                    num_models,
                     model_list
                 )
             ]
@@ -813,7 +820,7 @@ class QMD():
             # addModel returns whether adding model was successful
             # if false, that's because it's already been computed
             add_model_info = self.addModel(
-                model, 
+                model,
                 branchID=branchID
             )
             already_computed = not(
@@ -821,20 +828,20 @@ class QMD():
             )
             model_id = add_model_info['model_id']
             model_id_list.append(model_id)
-            if already_computed == False: # first instance of this model
+            if already_computed == False:  # first instance of this model
                 self.ModelsBranches[model_id] = branchID
 
             self.log_print(
                 [
-                'Model ', model, 
-                '\n\tcomputed already: ', already_computed, 
-                '\n\tID:', model_id
+                    'Model ', model,
+                    '\n\tcomputed already: ', already_computed,
+                    '\n\tID:', model_id
                 ]
             )
             num_models_already_computed_this_branch += bool(
                 already_computed
             )
-            if bool(already_computed)==True: 
+            if bool(already_computed) == True:
                 pre_computed_models.append(model)
 
         # for model in model_list:
@@ -847,7 +854,7 @@ class QMD():
         #     except:
         #         self.log_print(
         #             [
-        #                 "can't get model id from database:\n", 
+        #                 "can't get model id from database:\n",
         #                 self.db
         #             ]
         #         )
@@ -860,47 +867,47 @@ class QMD():
         self.BranchModelIds[branchID] = model_id_list
         self.log_print(
             [
-            'Num models already computed on branch ', 
-            branchID, 
-            '=', num_models_already_computed_this_branch,
-            # 'Branch model ids:', model_id_list
+                'Num models already computed on branch ',
+                branchID,
+                '=', num_models_already_computed_this_branch,
+                # 'Branch model ids:', model_id_list
             ]
         )
         return branchID
-    
+
     def printState(self):
         self.log_print(["Branch champions:", self.BranchChampions])
         self.log_print(["InterBranch champions:", self.InterBranchChampions])
         self.log_print(["Branch Rankings: \n", self.BranchRankings])
-        
+
     def getModelInstance(self, name):
-        try: 
+        try:
             instance = DataBase.get_qml_instance(self.db, name)
             return instance
-        except: 
+        except BaseException:
             if name in list(self.legacy_db['<Name>']):
                 self.log_print(["Operator in legacy databse - retired. "])
-            else: 
+            else:
                 self.log_print(["Model not found."])
+
     def getOperatorInstance(self, name):
-        try: 
+        try:
             return DataBase.get_operator_instance(self.db, name)
-        except:
+        except BaseException:
             if name in list(self.legacy_db['<Name>']):
                 self.log_print(["Operator in legacy databse - retired. "])
-            else: 
-               self.log_print(["Operator not found."])
+            else:
+                self.log_print(["Operator not found."])
 
     def getModelDBIndex(self, name):
         return DataBase.get_location(self.db, name)
 
     def getModelInstanceFromID(self, model_id):
-        return DataBase.model_instance_from_id(self.db, model_id)    
+        return DataBase.model_instance_from_id(self.db, model_id)
 
     def reducedModelInstanceFromID(self, model_id):
-        return DataBase.reduced_model_instance_from_id(self.db, model_id)    
+        return DataBase.reduced_model_instance_from_id(self.db, model_id)
 
-    
     def killModel(self, name):
         if name not in list(self.db['<Name>']):
             print("Cannot remove ", name, "; not in ", list(self.db["<Name>"]))
@@ -914,58 +921,57 @@ class QMD():
             self.db = DataBase.remove_model(self.db, name)
             del model_instance
             del operator_instance
-    
+
     def runIQLE(self, model, num_exp=50):
-        model_exists=False
+        model_exists = False
         if model in list(self.db['<Name>']):
             model_exists = True
         elif model in list(self.legacy_db['<Name>']):
             print(
-                "Model ", 
-                model, 
+                "Model ",
+                model,
                 "previously considered and retired."
             )
-        
+
         has_model_finished = self.pullField(name=model, field='Completed')
-        
-        if model_exists==True and has_model_finished==False : 
+
+        if model_exists == True and has_model_finished == False:
             model_instance = self.getModelInstance(model)
             print("Running ", self.QLE_Type, " for model: ", model)
-            model_instance.UpdateModel(num_exp, 
-                sigma_threshold = self.SigmaThreshold
-            )
-            self.updateModelRecord(name=model, field='Completed', new_value=True)
-        else: 
-            print("Model ", model ,"does not exist")
+            model_instance.UpdateModel(num_exp,
+                                       sigma_threshold=self.SigmaThreshold
+                                       )
+            self.updateModelRecord(
+                name=model, field='Completed', new_value=True)
+        else:
+            print("Model ", model, "does not exist")
 
-    
     def learnUnfinishedModels(self, use_rq=True, blocking=False):
         unfinished_model_names = DataBase.all_unfinished_model_names(self.db)
         for model_name in unfinished_model_names:
             print("Model ", model_name, "being learned")
             self.learnModel(
-                model_name=model_name, 
-                use_rq=self.use_rq, 
+                model_name=model_name,
+                use_rq=self.use_rq,
                 blocking=blocking
             )
-            self.updateModelRecord(field='Completed', 
-                name=model_name,  new_value=True
-            )
-        
+            self.updateModelRecord(field='Completed',
+                                   name=model_name, new_value=True
+                                   )
 
     def learnModelFromBranchID(
-        self, 
-        branchID, 
-        use_rq=True, 
+        self,
+        branchID,
+        use_rq=True,
         blocking=False
     ):
         # model_list = DataBase.model_names_on_branch(self.db, branchID)
         model_list = self.BranchModels[branchID]
         self.log_print(
             [
-                "learnModelFromBranchID branch", 
+                "learnModelFromBranchID branch",
                 branchID,
-                ":", 
+                ":",
                 model_list
             ]
         )
@@ -983,144 +989,146 @@ class QMD():
                 branchID,
                 "to",
                 num_models_already_set_this_branch
-                
+
             ]
         )
 
         active_branches_learning_models.set(
-            int(branchID), 
+            int(branchID),
             num_models_already_set_this_branch
         )
 
         unlearned_models_this_branch = list(
-            set(model_list) - 
+            set(model_list) -
             set(self.BranchPrecomputedModels[branchID])
         )
 
         self.log_print(
             [
                 "branch {} precomputed:".format(
-                    branchID, 
+                    branchID,
                     self.BranchPrecomputedModels[branchID]
-                ) 
+                )
             ]
         )
         if len(unlearned_models_this_branch) == 0:
-            self.GhostBranchList.append(branchID) 
+            self.GhostBranchList.append(branchID)
 
         self.log_print(
             [
-            "Branch ", branchID, 
-            "has unlearned models:", 
-            unlearned_models_this_branch
-           ]
+                "Branch ", branchID,
+                "has unlearned models:",
+                unlearned_models_this_branch
+            ]
         )
 
         # for model_name in model_list:
         for model_name in unlearned_models_this_branch:
             self.log_print(
                 [
-                "Model ", model_name,
-                "being passed to learnModel function"
+                    "Model ", model_name,
+                    "being passed to learnModel function"
                 ]
             )
             self.learnModel(
-                model_name=model_name, 
-                use_rq=self.use_rq, 
+                model_name=model_name,
+                use_rq=self.use_rq,
                 blocking=blocking
             )
             if blocking is True:
                 self.log_print(
                     [
-                        "Blocking on; model finished:", 
+                        "Blocking on; model finished:",
                         model_name
                     ]
                 )
             self.updateModelRecord(
-                field='Completed', 
-                name=model_name, 
+                field='Completed',
+                name=model_name,
                 new_value=True
             )
         self.log_print(
             [
-            'learnModelFromBranchID finished, branch', branchID
+                'learnModelFromBranchID finished, branch', branchID
             ]
         )
-    
+
     def learnModelNameList(self, model_name_list, use_rq=True, blocking=False):
         for model_name in model_name_list:
-            self.learnModel(model_name=model_name, use_rq=self.use_rq, blocking=blocking)
+            self.learnModel(
+                model_name=model_name,
+                use_rq=self.use_rq,
+                blocking=blocking)
             self.updateModelRecord(field='Completed', name=model_name,
-                new_value=True
-            )
-            
-    
+                                   new_value=True
+                                   )
+
     def learnModel(
-        self, 
-        model_name, 
-        use_rq=True, 
+        self,
+        model_name,
+        use_rq=True,
         blocking=False
-    ): 
+    ):
         exists = DataBase.check_model_exists(
-            model_name = model_name,
-            model_lists = self.model_lists, 
-            db = self.db
+            model_name=model_name,
+            model_lists=self.model_lists,
+            db=self.db
         )
         if exists:
             modelID = DataBase.model_id_from_name(
-                self.db, 
-                name = model_name
+                self.db,
+                name=model_name
             )
 
             branchID = self.ModelsBranches[modelID]
 
             if self.RunParallel and use_rq:
-                # i.e. use a job queue rather than sequentially doing it. 
+                # i.e. use a job queue rather than sequentially doing it.
                 from rq import Connection, Queue, Worker
                 queue = Queue(
-                    self.Q_id, 
+                    self.Q_id,
                     connection=self.redis_conn,
-                    async=self.use_rq, 
+                    async=self.use_rq,
                     default_timeout=self.rq_timeout
-                ) # TODO is this timeout sufficient for ALL QMD jobs?
+                )  # TODO is this timeout sufficient for ALL QMD jobs?
 
                 # add function call to RQ queue
                 print("[QMD 1085] RQ used")
                 queued_model = queue.enqueue(
-                    learnModelRemote, 
+                    learnModelRemote,
                     model_name,
-                    modelID, 
-                    growth_generator = self.BranchGrowthRules[branchID],
-                    branchID=branchID, 
-                    remote=True, 
-                    host_name=self.HostName, 
+                    modelID,
+                    growth_generator=self.BranchGrowthRules[branchID],
+                    branchID=branchID,
+                    remote=True,
+                    host_name=self.HostName,
                     port_number=self.PortNumber,
-                    qid=self.Q_id, 
-                    log_file=self.rq_log_file, 
+                    qid=self.Q_id,
+                    log_file=self.rq_log_file,
                     result_ttl=-1,
                     timeout=self.rq_timeout
-                ) 
-                
+                )
+
                 self.log_print(
                     [
-                        "Model", 
-                        model_name, 
+                        "Model",
+                        model_name,
                         "added to queue."
                     ]
                 )
-                if blocking ==  True: # i.e. wait for result when called. 
+                if blocking == True:  # i.e. wait for result when called.
                     self.log_print(
                         [
                             "Blocking, ie waiting for",
-                            model_name, 
-                            "to finish on redis queue." 
+                            model_name,
+                            "to finish on redis queue."
                         ]
                     )
                     while not queued_model.is_finished:
                         if queued_model.is_failed:
                             self.log_print(
                                 [
-                                    "Model", model_name, 
+                                    "Model", model_name,
                                     "has failed on remote worker."
                                 ]
                             )
@@ -1141,115 +1149,113 @@ class QMD():
                 self.QMDInfo['probe_dict'] = self.ProbeDict
                 updated_model_info = learnModelRemote(
                     model_name,
-                    modelID, 
-                    growth_generator = self.BranchGrowthRules[branchID],
-                    branchID=branchID, 
-                    qmd_info=self.QMDInfo, 
-                    remote=True, 
-                    host_name=self.HostName, 
+                    modelID,
+                    growth_generator=self.BranchGrowthRules[branchID],
+                    branchID=branchID,
+                    qmd_info=self.QMDInfo,
+                    remote=True,
+                    host_name=self.HostName,
                     port_number=self.PortNumber,
-                    qid=self.Q_id,log_file=self.rq_log_file
+                    qid=self.Q_id, log_file=self.rq_log_file
                 )
 
                 del updated_model_info
         else:
             self.log_print(
                 [
-                    "Model", 
-                    model_name, 
+                    "Model",
+                    model_name,
                     "does not yet exist."
                 ]
             )
 
     def remoteBayes(
-        self, 
-        model_a_id, 
-        model_b_id, 
-        return_job=False, 
-        branchID=None, 
-        interbranch=False, 
-        remote=True, 
+        self,
+        model_a_id,
+        model_b_id,
+        return_job=False,
+        branchID=None,
+        interbranch=False,
+        remote=True,
         bayes_threshold=None,
         wait_on_result=False
     ):
-        # only do this when both models have learned. TODO add check for this. 
-        
-        if bayes_threshold is None: 
+        # only do this when both models have learned. TODO add check for this.
+
+        if bayes_threshold is None:
             bayes_threshold = self.BayesUpper
 
         if branchID is None:
-            interbranch=True            
+            interbranch = True
         # print("[QMD remoteBayes] self.NumTimesForBayesUpdates: ", self.NumTimesForBayesUpdates)
-        
+
         unique_id = DataBase.unique_model_pair_identifier(
             model_a_id,
             model_b_id
         )
         if (
-            unique_id not in self.BayesFactorsComputed 
-        ): #ie not yet considered
+            unique_id not in self.BayesFactorsComputed
+        ):  # ie not yet considered
             self.BayesFactorsComputed.append(
                 unique_id
             )
 
-
-
         if self.use_rq:
             from rq import Connection, Queue, Worker
-            queue = Queue(self.Q_id, connection=self.redis_conn, 
-                async=self.use_rq, default_timeout=self.rq_timeout
-            ) 
+            queue = Queue(self.Q_id, connection=self.redis_conn,
+                          async=self.use_rq, default_timeout=self.rq_timeout
+                          )
             job = queue.enqueue(
-                BayesFactorRemote, 
+                BayesFactorRemote,
                 model_a_id=model_a_id,
-                model_b_id=model_b_id, 
-                branchID=branchID, 
-                interbranch=interbranch, 
+                model_b_id=model_b_id,
+                branchID=branchID,
+                interbranch=interbranch,
                 times_record=self.BayesFactorsTimeFile,
                 bf_data_folder=self.BayesFactorsFolder,
-                num_times_to_use = self.NumTimesForBayesUpdates, 
-                trueModel=self.TrueOpName, 
+                num_times_to_use=self.NumTimesForBayesUpdates,
+                trueModel=self.TrueOpName,
                 bayes_threshold=bayes_threshold,
-                host_name=self.HostName, 
-                port_number=self.PortNumber, 
-                qid=self.Q_id, 
-                log_file=self.rq_log_file, 
+                host_name=self.HostName,
+                port_number=self.PortNumber,
+                qid=self.Q_id,
+                log_file=self.rq_log_file,
                 result_ttl=-1,
                 timeout=self.rq_timeout
-            ) 
+            )
             self.log_print(
                 [
                     "Bayes factor calculation queued. Model IDs",
-                    model_a_id, 
+                    model_a_id,
                     model_b_id
                 ]
             )
             if wait_on_result == True:
                 while job.is_finished == False:
-                    if job.is_failed== True:
+                    if job.is_failed == True:
                         raise("Remote BF failure")
-                    sleep(0.1)                        
+                    sleep(0.1)
             elif return_job == True:
                 return job
         else:
             BayesFactorRemote(
-                model_a_id=model_a_id, 
+                model_a_id=model_a_id,
                 model_b_id=model_b_id,
-                trueModel=self.TrueOpName, 
+                trueModel=self.TrueOpName,
                 bf_data_folder=self.BayesFactorsFolder,
                 times_record=self.BayesFactorsTimeFile,
-                num_times_to_use = self.NumTimesForBayesUpdates,
+                num_times_to_use=self.NumTimesForBayesUpdates,
                 branchID=branchID,
-                interbranch=interbranch, 
+                interbranch=interbranch,
                 bayes_threshold=bayes_threshold,
-                host_name=self.HostName, 
-                port_number=self.PortNumber, 
-                qid=self.Q_id, 
+                host_name=self.HostName,
+                port_number=self.PortNumber,
+                qid=self.Q_id,
                 log_file=self.rq_log_file
             )
         if wait_on_result == True:
             pair_id = DataBase.unique_model_pair_identifier(
-                model_a_id, 
+                model_a_id,
                 model_b_id
             )
             bf_from_db = self.RedisDataBases['bayes_factors_db'].get(pair_id)
@@ -1257,51 +1263,47 @@ class QMD():
 
             return bayes_factor
 
-
-
-
-
     def remoteBayesFromIDList(
-        self, 
-        model_id_list, 
+        self,
+        model_id_list,
         remote=True,
-        wait_on_result=False, 
-        recompute=False, 
+        wait_on_result=False,
+        recompute=False,
         bayes_threshold=None
-    ): 
+    ):
         if bayes_threshold is None:
-            bayes_threshold=self.BayesLower
+            bayes_threshold = self.BayesLower
 
-        remote_jobs=[]
+        remote_jobs = []
         num_models = len(model_id_list)
         for i in range(num_models):
             a = model_id_list[i]
-            for j in range(i,num_models):
-                b=model_id_list[j]
-                if a!=b:
-                    unique_id = DataBase.unique_model_pair_identifier(a,b)
+            for j in range(i, num_models):
+                b = model_id_list[j]
+                if a != b:
+                    unique_id = DataBase.unique_model_pair_identifier(a, b)
                     if (
-                        unique_id not in self.BayesFactorsComputed 
-                        or recompute==True
-                    ): #ie not yet considered
+                        unique_id not in self.BayesFactorsComputed
+                        or recompute == True
+                    ):  # ie not yet considered
                         # self.BayesFactorsComputed.append(
                         #     unique_id
                         # )
                         remote_jobs.append(
                             self.remoteBayes(
                                 a,
-                                b, 
+                                b,
                                 remote=remote,
                                 return_job=wait_on_result,
                                 bayes_threshold=bayes_threshold
                             )
                         )
 
-        if wait_on_result and self.use_rq: # test_workers from RedisSettings
+        if wait_on_result and self.use_rq:  # test_workers from RedisSettings
             self.log_print(
                 [
                     "Waiting on result of ",
-                    "Bayes comparisons from given list:", 
+                    "Bayes comparisons from given list:",
                     model_id_list
                 ]
 
@@ -1318,131 +1320,129 @@ class QMD():
                     "since not using RQ workers."
                 ]
             )
-    
+
     def remoteBayesFromBranchID(
-        self, 
-        branchID, 
-        remote=True, 
-        bayes_threshold=None, #actually was 50,
+        self,
+        branchID,
+        remote=True,
+        bayes_threshold=None,  # actually was 50,
         recompute=False
     ):
-        if bayes_threshold is None: 
-            bayes_threshold=self.BayesUpper
+        if bayes_threshold is None:
+            bayes_threshold = self.BayesUpper
 
         active_branches_bayes = self.RedisDataBases['active_branches_bayes']
         # model_id_list = DataBase.active_model_ids_by_branch_id(self.db, branchID)
         model_id_list = self.BranchModelIds[branchID]
         self.log_print(
             [
-            'remoteBayesFromBranchID',
-            branchID,
-            'model id list:',
-             model_id_list
+                'remoteBayesFromBranchID',
+                branchID,
+                'model id list:',
+                model_id_list
             ]
         )
-        
-        active_branches_bayes.set(int(branchID), 0) # set up branch 0
+
+        active_branches_bayes.set(int(branchID), 0)  # set up branch 0
         num_models = len(model_id_list)
         for i in range(num_models):
             a = model_id_list[i]
-            for j in range(i,num_models):
-                b=model_id_list[j]
-                if a!=b:
-                    unique_id = DataBase.unique_model_pair_identifier(a,b)
+            for j in range(i, num_models):
+                b = model_id_list[j]
+                if a != b:
+                    unique_id = DataBase.unique_model_pair_identifier(a, b)
                     if (
                         unique_id not in self.BayesFactorsComputed
-                        or 
-                        recompute==True
-                    ): #ie not yet considered
+                        or
+                        recompute == True
+                    ):  # ie not yet considered
                         # self.BayesFactorsComputed.append(unique_id)
                         self.log_print(
                             [
-                                "Computing BF for pair", 
+                                "Computing BF for pair",
                                 unique_id
                             ]
                         )
 
                         self.remoteBayes(
                             a,
-                            b, 
-                            remote=remote, 
-                            branchID=branchID, 
+                            b,
+                            remote=remote,
+                            branchID=branchID,
                             bayes_threshold=bayes_threshold
                         )
-                    elif unique_id in self.BayesFactorsComputed: 
-                        # if this already computed, so we need to tell this branch not to wait on it. 
+                    elif unique_id in self.BayesFactorsComputed:
+                        # if this already computed, so we need to tell this
+                        # branch not to wait on it.
                         active_branches_bayes.incr(
-                            int(branchID), 
+                            int(branchID),
                             1
                         )
                         self.log_print(
                             [
-                                "BF already computed for pair ", 
+                                "BF already computed for pair ",
                                 unique_id,
-                                "now active branches bayes, br", 
+                                "now active branches bayes, br",
                                 branchID,
-                                ":", 
+                                ":",
                                 active_branches_bayes[branchID]
                             ]
                         )
 
-
     def blockingQMD(self):
-        self.learnModelNameList(model_name_list=self.InitialOpList, 
-            blocking=False, use_rq=True
-        )
-        ids=DataBase.active_model_ids_by_branch_id(self.db, 0)
+        self.learnModelNameList(model_name_list=self.InitialOpList,
+                                blocking=False, use_rq=True
+                                )
+        ids = DataBase.active_model_ids_by_branch_id(self.db, 0)
         self.remoteBayesFromIDList(ids, remote=True)
         self.remoteBranchBayesComparison(branchID=0)
-    
+
     def remoteBranchBayesComparison(self, branchID):
         active_models_in_branch = \
             DataBase.active_model_ids_by_branch_id(self.db,
-            branchID
-        )
-        
+                                                   branchID
+                                                   )
+
         num_models = len(active_models_in_branch)
         models_points = {}
         for i in range(num_models):
             a = active_models_in_branch[i]
-            for j in range(i+1, num_models):
+            for j in range(i + 1, num_models):
                 b = active_models_in_branch[j]
-                if a!=b:
-                    self.processRemoteBayesPair(a=a, b=b)            
-    
+                if a != b:
+                    self.processRemoteBayesPair(a=a, b=b)
 
     def processAllRemoteBayesFactors(self):
         bayes_factors_db = self.RedisDataBases['bayes_factors_db']
         computed_pairs = bayes_factors_db.keys()
-        #TODO check whether pair computed before using bayes dict of QMD, or something more efficient
+        # TODO check whether pair computed before using bayes dict of QMD, or something more efficient
         # TODO take list, or branch argument and only process those.
         for pair in computed_pairs:
             self.processRemoteBayesPair(pair=pair)
 
-
     def processRemoteBayesPair(
-        self, 
-        a=None, 
-        b=None, 
-        pair=None, 
+        self,
+        a=None,
+        b=None,
+        pair=None,
         bayes_threshold=None
     ):
 
-        if bayes_threshold is None: 
-            bayes_threshold=self.BayesLower
+        if bayes_threshold is None:
+            bayes_threshold = self.BayesLower
         bayes_factors_db = self.RedisDataBases['bayes_factors_db']
-        if pair is not None:        
+        if pair is not None:
             model_ids = pair.split(',')
-            a=(float(model_ids[0]))
-            b=(float(model_ids[1]))
+            a = (float(model_ids[0]))
+            b = (float(model_ids[1]))
         elif a is not None and b is not None:
-            a=float(a)
-            b=float(b)
-            pair = DataBase.unique_model_pair_identifier(a,b)
+            a = float(a)
+            b = float(b)
+            pair = DataBase.unique_model_pair_identifier(a, b)
         else:
             self.log_print(
                 [
-                "Must pass either two model ids, or a \
+                    "Must pass either two model ids, or a \
                 pair name string, to process Bayes factors."]
             )
         try:
@@ -1452,17 +1452,17 @@ class QMD():
         except TypeError:
             self.log_print(
                 [
-                    "On bayes_factors_db for pair id", 
-                    pair, 
-                    "value=", 
+                    "On bayes_factors_db for pair id",
+                    pair,
+                    "value=",
                     bayes_factors_db.get(pair)
                 ]
             )
-        
+
         # bayes_factor refers to calculation BF(pair), where pair
         # is defined (lower, higher) for continuity
-        lower_id = min(a,b)
-        higher_id = max(a,b)
+        lower_id = min(a, b)
+        higher_id = max(a, b)
 
         mod_low = self.reducedModelInstanceFromID(lower_id)
         mod_high = self.reducedModelInstanceFromID(higher_id)
@@ -1470,91 +1470,89 @@ class QMD():
             mod_low.BayesFactors[higher_id].append(bayes_factor)
         else:
             mod_low.BayesFactors[higher_id] = [bayes_factor]
-        
-        if lower_id in mod_high.BayesFactors:
-            mod_high.BayesFactors[lower_id].append((1.0/bayes_factor))
-        else:
-            mod_high.BayesFactors[lower_id] = [(1.0/bayes_factor)]
 
-                    
-        if bayes_factor > bayes_threshold: 
-            champ =  mod_low.ModelID
-        elif bayes_factor <  (1.0/bayes_threshold):
+        if lower_id in mod_high.BayesFactors:
+            mod_high.BayesFactors[lower_id].append((1.0 / bayes_factor))
+        else:
+            mod_high.BayesFactors[lower_id] = [(1.0 / bayes_factor)]
+
+        if bayes_factor > bayes_threshold:
+            champ = mod_low.ModelID
+        elif bayes_factor < (1.0 / bayes_threshold):
             champ = mod_high.ModelID
 
         # self.log_print(
         #     [
         #         "Champ of pair {}: {}".format(
-        #             pair, 
+        #             pair,
         #             champ
         #         )
         #     ]
         # )
 
         return champ
-                        
 
     def runAllActiveModelsIQLE(self, num_exp):
-        active_models = self.db.loc[self.db['Status']=='Active']['<Name>']
+        active_models = self.db.loc[self.db['Status'] == 'Active']['<Name>']
         for model in active_models:
             self.runIQLE(model=model, num_exp=num_exp)
         self.GlobalEpoch += num_exp
-            
-        
+
     def updateModelRecord(
-        self, 
-        field, 
-        name=None, 
-        model_id=None, 
-        new_value=None, 
+        self,
+        field,
+        name=None,
+        model_id=None,
+        new_value=None,
         increment=None
     ):
         DataBase.update_field(
-            db=self.db, 
+            db=self.db,
             name=name,
             model_id=model_id,
             field=field,
             new_value=new_value,
             increment=increment
         )
+
     def pullField(self, name, field):
         return DataBase.pull_field(self.db, name, field)
 
     def statusChangeBranch(self, branchID, new_status='Saturated'):
-        self.db.loc[ self.db['branchID']==branchID , 'Status'] = new_status
+        self.db.loc[self.db['branchID'] == branchID, 'Status'] = new_status
 
     def statusChangeModel(self, model_name, new_status='Saturated'):
-        self.db.loc[ self.db['<Name>']==model_name , 'Status'] = new_status
-        
+        self.db.loc[self.db['<Name>'] == model_name, 'Status'] = new_status
+
     def getListTrueOpByDimension(self):
         self.TrueOpListByDim = {}
         self.TrueParamByDim = {}
-        for dim in range(1, 1+self.MaxDimension):
+        for dim in range(1, 1 + self.MaxDimension):
             new_op = ModelGeneration.identity_interact(
                 subsystem=self.TrueOpName, num_qubits=dim, return_operator=True
             )
             self.TrueOpListByDim[dim] = new_op.constituents_operators
-        for i in range(1, self.TrueOpDim+1):
+        for i in range(1, self.TrueOpDim + 1):
             self.TrueParamByDim[i] = self.TrueParamsList
-        for i in range(self.TrueOpDim+1, self.MaxDimension):
+        for i in range(self.TrueOpDim + 1, self.MaxDimension):
             self.TrueParamByDim[i] = [self.TrueParamsList[0]]
 
     def compareModels(self, log_comparison_high=50.0, num_times_to_use='all',
-        model_a_id = None, model_b_id =None, model_a = None, model_b = None,
-        name_a=None, name_b=None, print_result = True
-    ):
+                      model_a_id=None, model_b_id=None, model_a=None, model_b=None,
+                      name_a=None, name_b=None, print_result=True
+                      ):
         # Either pass in name_a and name_b OR model_a and model_b
         if model_a is None and model_b is None:
-            if model_a_id is not None and model_b_id is not None: 
+            if model_a_id is not None and model_b_id is not None:
                 model_a = self.getModelInstanceFromID(model_a_id)
                 model_b = self.getModelInstanceFromID(model_b_id)
-            else: # if only names were passed 
+            else:  # if only names were passed
                 model_a = self.getModelInstance(name_a)
                 model_b = self.getModelInstance(name_b)
-        if model_a ==  model_b:
+        if model_a == model_b:
             return "Same Models"
-        else: 
-            log_comparison_low = 1.0/log_comparison_high
+        else:
+            log_comparison_low = 1.0 / log_comparison_high
             if model_a_id is None and model_b is None:
                 model_a_id = model_a.ModelID
                 model_b_id = model_b.ModelID
@@ -1563,42 +1561,45 @@ class QMD():
                 times_a = model_a.TrackTime
             elif len(model_a.TrackTime) < num_times_to_use:
                 times_a = model_a.TrackTime
-            else: 
+            else:
                 times_a = model_a.TrackTime[num_times_to_use:]
 
-            if num_times_to_use=='all':
+            if num_times_to_use == 'all':
                 times_b = model_b.TrackTime
             elif len(model_b.TrackTime) < num_times_to_use:
                 times_b = model_b.TrackTime
-            else: 
+            else:
                 times_b = model_b.TrackTime[num_times_to_use:]
-            
+
             times = []
             times.extend(times_a)
             times.extend(times_b)
 
-            bayes_factor = compute_bayes_factor(model_a, model_b, times_a, times_b)
+            bayes_factor = compute_bayes_factor(
+                model_a, model_b, times_a, times_b)
 
             model_a.addBayesFactor(compared_with=model_b_id,
-                bayes_factor=bayes_factor
-            )
-            model_b.addBayesFactor(compared_with=model_a_id, 
-                bayes_factor=1.0/bayes_factor
-            )
+                                   bayes_factor=bayes_factor
+                                   )
+            model_b.addBayesFactor(compared_with=model_a_id,
+                                   bayes_factor=1.0 / bayes_factor
+                                   )
             if print_result:
-                self.log_print(["Bayes factor b/w ", model_a.Name, "&", 
-                    model_b.Name," = ", bayes_factor]
-                )
-            if bayes_factor >= log_comparison_high: 
-                if print_result: print("Point to ", model_a.Name)
+                self.log_print(["Bayes factor b/w ", model_a.Name, "&",
+                                model_b.Name, " = ", bayes_factor]
+                               )
+            if bayes_factor >= log_comparison_high:
+                if print_result:
+                    print("Point to ", model_a.Name)
                 return "a"
-            elif bayes_factor < log_comparison_low: 
-                if print_result: print("Point to ", model_b.Name)
+            elif bayes_factor < log_comparison_low:
+                if print_result:
+                    print("Point to ", model_b.Name)
                 return "b"
 
     def compareModelsWithinBranch(
-        self, 
-        branchID, 
+        self,
+        branchID,
         bayes_threshold=None
     ):
 
@@ -1609,31 +1610,31 @@ class QMD():
         active_models_in_branch = self.BranchModelIds[branchID]
         self.log_print(
             [
-            'compareModelsWithinBranch', branchID,
-            'active_models_in_branch_old:', active_models_in_branch_old,
-            'active_models_in_branch_new:', active_models_in_branch,
+                'compareModelsWithinBranch', branchID,
+                'active_models_in_branch_old:', active_models_in_branch_old,
+                'active_models_in_branch_new:', active_models_in_branch,
             ]
         )
 
         if bayes_threshold is None:
-            bayes_threshold=self.BayesLower
-        
+            bayes_threshold = self.BayesLower
+
         models_points = {}
         for model_id in active_models_in_branch:
             models_points[model_id] = 0
-        
+
         for i in range(len(active_models_in_branch)):
             mod1 = active_models_in_branch[i]
-            for j in range(i, len(active_models_in_branch)): 
+            for j in range(i, len(active_models_in_branch)):
                 mod2 = active_models_in_branch[j]
-                if mod1!=mod2:
+                if mod1 != mod2:
                     res = self.processRemoteBayesPair(a=mod1, b=mod2)
                     models_points[res] += 1
                     self.log_print(
                         [
                             "[compareModelsWithinBranch {}]".format(branchID),
-                            "Point to", res, 
-                            "(comparison {}/{})".format(mod1, mod2), 
+                            "Point to", res,
+                            "(comparison {}/{})".format(mod1, mod2),
                         ]
                     )
                     # if res == "a":
@@ -1642,62 +1643,61 @@ class QMD():
                     # elif res == "b":
                     #     models_points[mod2] += 1
                     #     losing_model_id = mod1
-                        # todo if more than one model has max points
-
-
+                    # todo if more than one model has max points
 
         max_points = max(models_points.values())
         max_points_branches = [
-            key for key, val in models_points.items() 
-            if val==max_points
+            key for key, val in models_points.items()
+            if val == max_points
         ]
-        
-        if len(max_points_branches) > 1: 
-            # todo: recompare. Fnc: compareListOfModels (rather than branch based)
+
+        if len(max_points_branches) > 1:
+            # todo: recompare. Fnc: compareListOfModels (rather than branch
+            # based)
             self.log_print(
                 [
                     "Multiple models have same number of points within \
-                    branch.\n", 
+                    branch.\n",
                     models_points
                 ]
             )
             self.remoteBayesFromIDList(
-                model_id_list=max_points_branches, 
-                remote=True, 
-                recompute=True, 
+                model_id_list=max_points_branches,
+                remote=True,
+                recompute=True,
                 bayes_threshold=bayes_threshold,
                 wait_on_result=True
             )
 
             champ_id = self.compareModelList(
                 max_points_branches,
-                bayes_threshold=bayes_threshold, 
+                bayes_threshold=bayes_threshold,
                 models_points_dict=models_points
             )
-        else: 
+        else:
             champ_id = max(models_points, key=models_points.get)
         champ_id = int(champ_id)
         # champ_name = DataBase.model_name_from_id(
-        #     self.db, 
+        #     self.db,
         #     champ_id
         # )
         champ_name = self.ModelNameIDs[champ_id]
-        
+
         champ_num_qubits = DataBase.get_num_qubits(champ_name)
         self.BranchChampions[int(branchID)] = champ_id
         if champ_id not in self.ActiveBranchChampList:
             self.ActiveBranchChampList.append(champ_id)
         growth_rule = self.BranchGrowthRules[int(branchID)]
         try:
-            self.BranchChampsByNumQubits[growth_rule][champ_num_qubits].append(champ_name)
-        except:
-            self.BranchChampsByNumQubits[growth_rule][champ_num_qubits] = [champ_name]
-
-
+            self.BranchChampsByNumQubits[growth_rule][champ_num_qubits].append(
+                champ_name)
+        except BaseException:
+            self.BranchChampsByNumQubits[growth_rule][champ_num_qubits] = [
+                champ_name]
 
         for model_id in active_models_in_branch:
             self.updateModelRecord(
-                model_id=model_id, 
+                model_id=model_id,
                 field='Status',
                 new_value='Deactivated'
             )
@@ -1705,33 +1705,34 @@ class QMD():
         self.updateModelRecord(
             # name=DataBase.model_name_from_id(self.db, champ_id),
             name=self.ModelNameIDs[champ_id],
-            field='Status', 
+            field='Status',
             new_value='Active'
         )
         ranked_model_list = sorted(
-            models_points, 
-            key=models_points.get, 
+            models_points,
+            key=models_points.get,
             reverse=True
         )
 
-        if self.BranchBayesComputed[int(float(branchID))] == False: 
-        # only update self.BranchRankings the first time branch is considered
+        if self.BranchBayesComputed[int(float(branchID))] == False:
+            # only update self.BranchRankings the first time branch is
+            # considered
             self.BranchRankings[int(float(branchID))] = ranked_model_list
             self.BranchBayesComputed[int(float(branchID))] = True
-            
+
         self.log_print(
             [
                 "Model points for branch",
-                branchID, 
+                branchID,
                 models_points
             ]
         )
         self.log_print(
             [
-                "Champion of branch ", 
-                branchID, 
-                " is ", 
-                champ_name, 
+                "Champion of branch ",
+                branchID,
+                " is ",
+                champ_name,
                 "({})".format(champ_id)
             ]
         )
@@ -1741,26 +1742,26 @@ class QMD():
         if branchID in self.GhostBranchList:
             models_to_deactivate = list(
                 set(active_models_in_branch)
-                 - set([champ_id])
+                - set([champ_id])
             )
-            # Ghost branches are to compare 
+            # Ghost branches are to compare
             # already computed models from
-            # different branches.  
+            # different branches.
             # So deactivate losers since they shouldn't
-            # progress if they lose in a ghost branch. 
+            # progress if they lose in a ghost branch.
             for losing_model_id in models_to_deactivate:
                 try:
                     self.updateModelRecord(
-                        model_id=losing_model_id, 
+                        model_id=losing_model_id,
                         field='Status',
                         new_value='Deactivated'
                     )
-                except:
+                except BaseException:
                     self.log_print(
                         [
                             "not deactivating",
                             losing_model_id,
-                            "ActiveBranchChampList:", 
+                            "ActiveBranchChampList:",
                             self.ActiveBranchChampList
                         ]
                     )
@@ -1770,22 +1771,21 @@ class QMD():
                     )
                     self.log_print(
                         [
-                            "Ghost Branch", 
+                            "Ghost Branch",
                             branchID,
-                            "deactivating model", 
+                            "deactivating model",
                             losing_model_id
                         ]
                     )
-                except:
+                except BaseException:
                     pass
         return models_points, champ_id
 
-    
     def compareModelList(
-        self, 
-        model_list, 
+        self,
+        model_list,
         bayes_threshold=None,
-        models_points_dict=None, 
+        models_points_dict=None,
         num_times_to_use='all'
     ):
         if bayes_threshold is None:
@@ -1794,7 +1794,7 @@ class QMD():
         models_points = {}
         for mod in model_list:
             models_points[mod] = 0
-        
+
         for i in range(len(model_list)):
             mod1 = model_list[i]
             for j in range(i, len(model_list)):
@@ -1810,31 +1810,32 @@ class QMD():
                     self.log_print(
                         [
                             "[compareModelList]",
-                            "Point to", res ,
+                            "Point to", res,
                             "(comparison {}/{})".format(mod1, mod2)
                         ]
                     )
                     # if res == "a":
                     #     models_points[mod1] += 1
-                    #     if models_points_dict is not None: 
+                    #     if models_points_dict is not None:
                     #         models_points_dict[mod1]+=1
                     # elif res == "b":
                     #     models_points[mod2]+=1
-                    #     if models_points_dict is not None: 
+                    #     if models_points_dict is not None:
                     #         models_points_dict[mod2]+=1
 
                     # self.log_print(
                     #     [
-                    #     "comparison bw", mod1, mod2, 
+                    #     "comparison bw", mod1, mod2,
                     #     "point to", res
                     #     ]
                     # )
 
         max_points = max(models_points.values())
-        max_points_branches = [key for key, val in models_points.items() 
-            if val==max_points]
-        if len(max_points_branches) > 1: 
-            # todo: recompare. Fnc: compareListOfModels (rather than branch based)
+        max_points_branches = [key for key, val in models_points.items()
+                               if val == max_points]
+        if len(max_points_branches) > 1:
+            # todo: recompare. Fnc: compareListOfModels (rather than branch
+            # based)
             self.log_print(
                 [
                     "Multiple models \
@@ -1852,60 +1853,63 @@ class QMD():
             self.log_print(["Points:\n", models_points])
             self.remoteBayesFromIDList(
                 model_id_list=max_points_branches,
-                remote=True, 
-                recompute=True, 
-                bayes_threshold=self.BayesLower, 
+                remote=True,
+                recompute=True,
+                bayes_threshold=self.BayesLower,
                 wait_on_result=True
             )
             champ_id = self.compareModelList(
-                max_points_branches, 
+                max_points_branches,
                 bayes_threshold=self.BayesLower
             )
-        else: 
+        else:
             self.log_print(["After comparing list:", models_points])
             champ_id = max(models_points, key=models_points.get)
         # champ_name = DataBase.model_name_from_id(self.db, champ_id)
         champ_name = self.ModelNameIDs[champ_id]
-        
+
         return champ_id
-    
-    
-    
+
     def finalBayesComparisons(
-        self, 
+        self,
         bayes_threshold=None
     ):
-        if bayes_threshold is None: 
-            bayes_threshold=self.BayesUpper
+        if bayes_threshold is None:
+            bayes_threshold = self.BayesUpper
 
         bayes_factors_db = self.RedisDataBases['bayes_factors_db']
         # branch_champions = list(self.BranchChampions.values())
         branch_champions = self.ActiveBranchChampList
         job_list = []
         job_finished_count = 0
-        interbranch_collapse_threshold = 1e5 ## if a spawned model is this much better than its parent, parent is deactivated
-        # interbranch_collapse_threshold = 3 ## if a spawned model is this much better than its parent, parent is deactivated
+        # if a spawned model is this much better than its parent, parent is
+        # deactivated
+        interbranch_collapse_threshold = 1e5
+        # interbranch_collapse_threshold = 3 ## if a spawned model is this much
+        # better than its parent, parent is deactivated
         num_champs = len(branch_champions)
-        
+
         self.log_print(
             [
-                "Active branch champs at start of final Bayes comp:", 
+                "Active branch champs at start of final Bayes comp:",
                 self.ActiveBranchChampList
             ]
         )
         children_branches = list(self.BranchParents.keys())
         # for k in range( num_champs - 1 ):
-            # mod1 = branch_champions[k]
-            # mod2 = branch_champions[k+1]
-            # are_both_models_active ? 
+        # mod1 = branch_champions[k]
+        # mod2 = branch_champions[k+1]
+        # are_both_models_active ?
 
         for child_id in branch_champions:
             # child_id = branch_champions[k]
-            child_branch = self.ModelsBranches[child_id] # branch this child sits on
+            # branch this child sits on
+            child_branch = self.ModelsBranches[child_id]
 
             try:
-                # TODO make parent relationships more explicit by model rather than alway parent branch champ
-                parent_branch = self.BranchParents[child_branch] 
+                # TODO make parent relationships more explicit by model rather
+                # than alway parent branch champ
+                parent_branch = self.BranchParents[child_branch]
                 parent_id = self.BranchChampions[parent_branch]
 
                 if (
@@ -1918,7 +1922,7 @@ class QMD():
                         self.remoteBayes(
                             model_a_id=parent_id,
                             model_b_id=child_id,
-                            return_job=True, 
+                            return_job=True,
                             remote=self.use_rq
                         )
                     )
@@ -1926,37 +1930,37 @@ class QMD():
                     self.log_print(
                         [
                             "Comparing child ",
-                            child_id, 
-                            "with parent", 
+                            child_id,
+                            "with parent",
                             parent_id
                         ]
                     )
                 else:
                     self.log_print(
                         [
-                        "Either parent or child not in ActiveBranchChampList",
-                        "Child:", child_id, 
-                        "Parent:", parent_id
+                            "Either parent or child not in ActiveBranchChampList",
+                            "Child:", child_id,
+                            "Parent:", parent_id
                         ]
                     )
-            except:
+            except BaseException:
                 self.log_print(
                     [
-                    "Model", 
-                    child_id, 
-                    "doesn't have a parent to compare with."
+                        "Model",
+                        child_id,
+                        "doesn't have a parent to compare with."
                     ]
                 )
-            
+
         self.log_print(
             [
-                "Final Bayes Comparisons.", 
+                "Final Bayes Comparisons.",
                 "\nEntering while loop in final bayes fnc.",
                 "\nactive branch champs: ", branch_champions
 
             ]
         )
-        
+
         if self.use_rq:
             self.log_print(
                 [
@@ -1989,16 +1993,17 @@ class QMD():
         models_to_remove = []
         for child_id in branch_champions:
             # child_id = branch_champions[k]
-            child_branch = self.ModelsBranches[child_id] # branch this child sits on
+            # branch this child sits on
+            child_branch = self.ModelsBranches[child_id]
             try:
-                parent_branch = self.BranchParents[child_branch] 
+                parent_branch = self.BranchParents[child_branch]
                 parent_id = self.BranchChampions[parent_branch]
 
                 mod1 = min(parent_id, child_id)
                 mod2 = max(parent_id, child_id)
 
                 pair_id = DataBase.unique_model_pair_identifier(
-                    mod1, 
+                    mod1,
                     mod2
                 )
                 bf_from_db = bayes_factors_db.get(pair_id)
@@ -2006,8 +2011,8 @@ class QMD():
                 self.log_print(
                     [
                         "parent/child {}/{} has bf {}".format(
-                            parent_id, 
-                            child_id, 
+                            parent_id,
+                            child_id,
                             bayes_factor
                         )
                     ]
@@ -2017,29 +2022,29 @@ class QMD():
                     # bayes_factor heavily favours mod1, so deactive mod2
                     self.log_print(
                         [
-                        "Parent model,", 
-                        mod1, 
-                        "stronger than spawned; deactivating model", 
-                        mod2
+                            "Parent model,",
+                            mod1,
+                            "stronger than spawned; deactivating model",
+                            mod2
                         ]
                     )
                     self.updateModelRecord(
-                        model_id=mod2, 
+                        model_id=mod2,
                         field='Status',
                         new_value='Deactivated'
                     )
                     try:
                         models_to_remove.append(mod2)
                         # self.ActiveBranchChampList.remove(mod2)
-                    except:
+                    except BaseException:
                         pass
-                elif bayes_factor < (1.0/interbranch_collapse_threshold):
+                elif bayes_factor < (1.0 / interbranch_collapse_threshold):
                     self.log_print(
                         [
-                        "Spawned model", 
-                        mod2, 
-                        "stronger than parent; deactivating model", 
-                        mod1
+                            "Spawned model",
+                            mod2,
+                            "stronger than parent; deactivating model",
+                            mod1
                         ]
                     )
                     self.updateModelRecord(
@@ -2050,39 +2055,39 @@ class QMD():
                     try:
                         models_to_remove.append(mod1)
                         # self.ActiveBranchChampList.remove(mod1)
-                    except:
+                    except BaseException:
                         pass
 
-                # Add bayes factors to BayesFactor dict for each model        
+                # Add bayes factors to BayesFactor dict for each model
                 mod_a = self.reducedModelInstanceFromID(mod1)
                 mod_b = self.reducedModelInstanceFromID(mod2)
                 if mod2 in mod_a.BayesFactors:
                     mod_a.BayesFactors[mod2].append(bayes_factor)
                 else:
                     mod_a.BayesFactors[mod2] = [bayes_factor]
-                
+
                 if mod1 in mod_b.BayesFactors:
-                    mod_b.BayesFactors[mod1].append((1.0/bayes_factor))
+                    mod_b.BayesFactors[mod1].append((1.0 / bayes_factor))
                 else:
-                    mod_b.BayesFactors[mod1] = [(1.0/bayes_factor)]
+                    mod_b.BayesFactors[mod1] = [(1.0 / bayes_factor)]
             except Exception as exc:
                 self.log_print(
                     [
-                    "child doesn't have active parent",
-                    # "\t child id ", child_id, 
-                    # "\t parent id ", parent_id,
-                    # "\n\tchild branch:", child_branch,
-                    # "\tparent branch:", parent_branch
+                        "child doesn't have active parent",
+                        # "\t child id ", child_id,
+                        # "\t parent id ", parent_id,
+                        # "\n\tchild branch:", child_branch,
+                        # "\tparent branch:", parent_branch
                     ]
                 )
                 self.log_print(
                     [
-                    "Error:", exc
+                        "Error:", exc
                     ]
-                )    
-                # raise                    
+                )
+                # raise
         self.ActiveBranchChampList = list(
-            set(self.ActiveBranchChampList) - 
+            set(self.ActiveBranchChampList) -
             set(models_to_remove)
         )
         self.log_print(
@@ -2096,7 +2101,7 @@ class QMD():
         self.log_print(
             [
                 "Active branch champs after ",
-                "parental collapse (final Bayes comp):", 
+                "parental collapse (final Bayes comp):",
                 self.ActiveBranchChampList
             ]
         )
@@ -2107,7 +2112,7 @@ class QMD():
             self.ActiveTreeBranchChamps[gen] = []
 
         for active_champ in self.ActiveBranchChampList:
-            branch_id_of_champ = self.ModelsBranches[active_champ] 
+            branch_id_of_champ = self.ModelsBranches[active_champ]
             gen = self.BranchGrowthRules[branch_id_of_champ]
             self.ActiveTreeBranchChamps[gen].append(active_champ)
 
@@ -2125,8 +2130,8 @@ class QMD():
                 for m in models_for_tree_ghost_branch
             ]
             new_branch_id = self.newBranch(
-                model_list = mod_names,
-                growth_rule = gen
+                model_list=mod_names,
+                growth_rule=gen
             )
 
             self.FinalTrees.append(
@@ -2154,47 +2159,45 @@ class QMD():
             )
             for branchID_bytes in branch_ids_on_db:
                 branchID = int(branchID_bytes)
-                if ( 
-                    (int(active_branches_learning_models.get(branchID)) == 
-                    self.NumModelsPerBranch[branchID]) 
-                    and 
-                    (self.BranchAllModelsLearned[branchID]==False)
+                if (
+                    (int(active_branches_learning_models.get(branchID)) ==
+                     self.NumModelsPerBranch[branchID])
+                    and
+                    (self.BranchAllModelsLearned[branchID] == False)
                 ):
                     self.BranchAllModelsLearned[branchID] = True
                     self.remoteBayesFromBranchID(branchID)
-            
-                
+
                 if branchID_bytes in active_branches_bayes.keys():
                     branchID = int(branchID_bytes)
                     num_bayes_done_on_branch = (
                         active_branches_bayes.get(branchID_bytes)
                     )
 
-                    if ( int(num_bayes_done_on_branch) ==
-                            self.NumModelPairsPerBranch[branchID] 
-                        and
-                        self.BranchComparisonsComplete[branchID]==False
-                    ):
+                    if (int(num_bayes_done_on_branch) ==
+                        self.NumModelPairsPerBranch[branchID]
+                            and
+                            self.BranchComparisonsComplete[branchID] == False
+                        ):
                         self.BranchComparisonsComplete[branchID] = True
                         self.compareModelsWithinBranch(branchID)
-            
+
             if (
                 np.all(
                     np.array(list(self.BranchAllModelsLearned.values()))
-                    ==True
+                    == True
                 )
                 and
                 np.all(np.array(list(
-                    self.BranchComparisonsComplete.values()))==True
+                    self.BranchComparisonsComplete.values())) == True
                 )
-            ):    
-                still_learning = False # i.e. break out of this while loop
+            ):
+                still_learning = False  # i.e. break out of this while loop
 
         self.log_print("Final tree comparisons complete.")
 
-        
-        # Finally, compare all remaining active models, 
-        # which should just mean the tree champions at this point. 
+        # Finally, compare all remaining active models,
+        # which should just mean the tree champions at this point.
         active_models = DataBase.all_active_model_ids(self.db)
         self.SurvivingChampions = DataBase.all_active_model_ids(
             self.db
@@ -2202,38 +2205,38 @@ class QMD():
         self.log_print(
             [
                 "After initial interbranch comparisons, \
-                remaining active branch champions:", 
+                remaining active branch champions:",
                 active_models
             ]
         )
         num_active_models = len(active_models)
-        
+
         self.remoteBayesFromIDList(
-            model_id_list=active_models, 
+            model_id_list=active_models,
             remote=True,
-            recompute=True, 
-            wait_on_result=True, 
+            recompute=True,
+            wait_on_result=True,
             bayes_threshold=bayes_threshold
         )
 
         branch_champions_points = {}
-        for c in active_models: 
+        for c in active_models:
             branch_champions_points[c] = 0
 
         for i in range(num_active_models):
             mod1 = active_models[i]
             for j in range(i, num_active_models):
                 mod2 = active_models[j]
-                if mod1!=mod2:
+                if mod1 != mod2:
                     res = self.processRemoteBayesPair(
-                        a=mod1, 
+                        a=mod1,
                         b=mod2
                     )
                     self.log_print(
                         [
                             "[finalBayesComparisons]",
-                            "Point to", res, 
-                            "(comparison {}/{})".format(mod1, mod2) 
+                            "Point to", res,
+                            "(comparison {}/{})".format(mod1, mod2)
                         ]
                     )
 
@@ -2243,23 +2246,24 @@ class QMD():
                     # elif res == "b":
                     #     branch_champions_points[mod2] += 1
         self.ranked_champions = sorted(
-            branch_champions_points, 
+            branch_champions_points,
             reverse=True
         )
         self.log_print(
             [
-            "After final Bayes comparisons (of branch champions)",
-            branch_champions_points
+                "After final Bayes comparisons (of branch champions)",
+                branch_champions_points
             ]
         )
-        
+
         max_points = max(branch_champions_points.values())
         max_points_branches = [
-            key for key, val in branch_champions_points.items() 
-            if val==max_points
+            key for key, val in branch_champions_points.items()
+            if val == max_points
         ]
-        if len(max_points_branches) > 1: 
-            # todo: recompare. Fnc: compareListOfModels (rather than branch based)
+        if len(max_points_branches) > 1:
+            # todo: recompare. Fnc: compareListOfModels (rather than branch
+            # based)
             self.log_print(
                 [
                     "No distinct champion, recomputing bayes "
@@ -2268,49 +2272,48 @@ class QMD():
                 ]
             )
             champ_id = self.compareModelList(
-                max_points_branches, 
-                bayes_threshold=self.BayesLower, 
+                max_points_branches,
+                bayes_threshold=self.BayesLower,
                 models_points_dict=branch_champions_points
             )
-        else: 
+        else:
             champ_id = max(
-                branch_champions_points, 
+                branch_champions_points,
                 key=branch_champions_points.get
             )
         # champ_name = DataBase.model_name_from_id(self.db, champ_id)
         champ_name = self.ModelNameIDs[champ_id]
 
         branch_champ_names = [
-            # DataBase.model_name_from_id(self.db, mod_id) 
-            self.ModelNameIDs[mod_id]            
+            # DataBase.model_name_from_id(self.db, mod_id)
+            self.ModelNameIDs[mod_id]
             for mod_id in active_models
         ]
         self.statusChangeModel(
-            champ_name, 
-            new_status = 'Active'
+            champ_name,
+            new_status='Active'
         )
         return champ_name, branch_champ_names
-    
+
     def interBranchChampion(
-        self, 
-        branch_list=[], 
+        self,
+        branch_list=[],
         just_active_models=False,
-        global_champion=False, 
+        global_champion=False,
         bayes_threshold=None
     ):
         if bayes_threshold is None:
-            bayes_threshold=self.BayesLower
+            bayes_threshold = self.BayesLower
         all_branches = self.db['branchID'].unique()
-        if global_champion == True: 
+        if global_champion == True:
             branches = all_branches
         elif just_active_models:
             # some models turned off intermediately
             branches = DataBase.all_active_model_ids(self.db)
-        else: 
+        else:
             branches = branch_list
         self.log_print(["Branches : ", branches])
-        
-        
+
         num_branches = len(branches)
         points_by_branches = [None] * num_branches
         champions_of_branches = [None] * num_branches
@@ -2327,29 +2330,29 @@ class QMD():
 
         self.remoteBayesFromIDList(
             model_id_list=champions_of_branches,
-            remote=True, 
-            recompute=True, 
+            remote=True,
+            recompute=True,
             wait_on_result=True,
             bayes_threshold=bayes_threshold
         )
 
         self.log_print(
             [
-            "All jobs have finished while computing", 
-            "interbranch champion"
+                "All jobs have finished while computing",
+                "interbranch champion"
             ]
         )
         branch_champions_points = {}
-        for c in champions_of_branches: 
+        for c in champions_of_branches:
             branch_champions_points[c] = 0
 
         for i in range(num_branches):
             mod1 = champions_of_branches[i]
             for j in range(i, num_branches):
                 mod2 = champions_of_branches[j]
-                if mod1!=mod2:
+                if mod1 != mod2:
                     res = self.processRemoteBayesPair(
-                        a=mod1, 
+                        a=mod1,
                         b=mod2
                     )
                     branch_champions_points[res] += 1
@@ -2357,66 +2360,66 @@ class QMD():
                         [
                             "[interBranchChampion]",
                             "Point to", res,
-                            "(comparison {}/{})".format(mod1, mod2) 
+                            "(comparison {}/{})".format(mod1, mod2)
                         ]
                     )
 
-                    
                     # if res == "a":
                     #     branch_champions_points[mod1] += 1
                     # elif res == "b":
                     #     branch_champions_points[mod2] += 1
         self.ranked_champions = sorted(
-            branch_champions_points, 
+            branch_champions_points,
             reverse=True
         )
-        
+
         max_points = max(branch_champions_points.values())
         max_points_branches = [
-            key for key, val in branch_champions_points.items() 
-            if val==max_points
+            key for key, val in branch_champions_points.items()
+            if val == max_points
         ]
-        if len(max_points_branches) > 1: 
-            # todo: recompare. Fnc: compareListOfModels (rather than branch based)
+        if len(max_points_branches) > 1:
+            # todo: recompare. Fnc: compareListOfModels (rather than branch
+            # based)
             self.log_print(
                 [
-                    "No distinct champion;" 
-                    "recomputing bayes factors between: ", 
+                    "No distinct champion;"
+                    "recomputing bayes factors between: ",
                     max_points_branches
                 ]
             )
             champ_id = self.compareModelList(
-                max_points_branches, 
-                bayes_threshold=self.BayesLower, 
+                max_points_branches,
+                bayes_threshold=self.BayesLower,
                 models_points_dict=branch_champions_points
             )
-        else: 
+        else:
             champ_id = max(
-                branch_champions_points, 
+                branch_champions_points,
                 key=branch_champions_points.get
             )
         # champ_name = DataBase.model_name_from_id(self.db, champ_id)
         champ_name = self.ModelNameIDs[champ_id]
 
         branch_champ_names = [
-            # DataBase.model_name_from_id(self.db, mod_id)  
+            # DataBase.model_name_from_id(self.db, mod_id)
             self.ModelNameIDs[mod_id]
             for mod_id in champions_of_branches
         ]
         self.statusChangeModel(
-            champ_name, 
+            champ_name,
             new_status='Active'
         )
-        
+
         interBranchChampListID = len(self.InterBranchChampions)
         self.InterBranchChampions[interBranchChampListID] = [
             branches, champ_id
         ]
         return champ_name, branch_champ_names
-    
+
     def globalChampionCalculation(self):
         branches = self.db['branchID'].unique()
-        
+
         num_branches = len(branches)
         self.points_by_branches = [None] * num_branches
         self.champions_of_branches = [None] * num_branches
@@ -2428,22 +2431,22 @@ class QMD():
             )
 
         self.champions_points = {}
-        for c in self.champions_of_branches: 
+        for c in self.champions_of_branches:
             self.champions_points[c] = 0
 
         for i in range(num_branches):
             mod1 = self.champions_of_branches[i]
             for j in range(i, num_branches):
                 mod2 = self.champions_of_branches[j]
-                if mod1!=mod2:
+                if mod1 != mod2:
                     res = self.processRemoteBayesPair(a=mod1, b=mod2)
 
-                    self.champions_points[res] += 1  
+                    self.champions_points[res] += 1
                     self.log_print(
                         [
                             "[globalChampionCalculation]",
                             "Point to", res,
-                            "(comparison {}/{})".format(mod1, mod2) 
+                            "(comparison {}/{})".format(mod1, mod2)
                         ]
                     )
 
@@ -2455,31 +2458,29 @@ class QMD():
         champ_id = max(self.champions_points, key=self.champions_points.get)
         # champ_name = DataBase.model_name_from_id(self.db, champ_id)
         champ_name = self.ModelNameIDs[champ_id]
-        self.log_print(["Champion of Champions is",  champ_name])
-        
+        self.log_print(["Champion of Champions is", champ_name])
+
     def checkBranchGrowthRuleCompleted(
-        self, 
-        branchID, 
+        self,
+        branchID,
         growth_rule,
     ):
 
         tree_completed = self.BranchGrowthClasses[branchID].check_tree_completed(
-            spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
-            current_num_qubits = new_model_dimension
+            spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
+            current_num_qubits=new_model_dimension
         )
-        return tree_completed    
-
-
+        return tree_completed
 
     def spawnFromBranch(
-        self, 
-        branchID, 
+        self,
+        branchID,
         growth_rule,
         num_models=1
     ):
 
-        self.SpawnDepthByGrowthRule[growth_rule] += 1  
-        self.SpawnDepth+=1
+        self.SpawnDepthByGrowthRule[growth_rule] += 1
+        self.SpawnDepth += 1
         # self.log_print(["Spawning, spawn depth:", self.SpawnDepth])
         self.log_print(
             [
@@ -2494,7 +2495,7 @@ class QMD():
         best_model_names = [
             # DataBase.model_name_from_id(self.db, mod_id) for
             self.ModelNameIDs[mod_id]
-            for mod_id in best_models 
+            for mod_id in best_models
         ]
         # new_models = ModelGeneration.new_model_list(
         current_champs = [
@@ -2502,93 +2503,93 @@ class QMD():
             list(self.BranchChampions.values())
         ]
         # print("[QMD] fitness parameters:", self.FitnessParameters)
-        
+
         new_models = self.BranchGrowthClasses[branchID].generate_models(
-            # generator = growth_rule, 
+            # generator = growth_rule,
             model_list=best_model_names,
             spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
-            ghost_branches = self.GhostBranches, 
-            branch_champs_by_qubit_num = self.BranchChampsByNumQubits[growth_rule],
+            ghost_branches=self.GhostBranches,
+            branch_champs_by_qubit_num=self.BranchChampsByNumQubits[growth_rule],
             model_dict=self.model_lists,
-            log_file=self.log_file, 
-            current_champs = current_champs,
-            spawn_stage = self.SpawnStage[growth_rule],
-            # fitness_parameters = self.FitnessParameters, 
-            branch_model_points = self.BayesPointsByBranch[branchID],
-            model_names_ids = self.ModelNameIDs, 
-            miscellaneous = self.MiscellaneousGrowthInfo[growth_rule]
+            log_file=self.log_file,
+            current_champs=current_champs,
+            spawn_stage=self.SpawnStage[growth_rule],
+            # fitness_parameters = self.FitnessParameters,
+            branch_model_points=self.BayesPointsByBranch[branchID],
+            model_names_ids=self.ModelNameIDs,
+            miscellaneous=self.MiscellaneousGrowthInfo[growth_rule]
         )
         new_models = list(set(new_models))
         new_models = [DataBase.alph(mod) for mod in new_models]
 
         self.log_print(
             [
-                "After model generation for growth rule", 
-                growth_rule, 
-                "SPAWN STAGE:", 
+                "After model generation for growth rule",
+                growth_rule,
+                "SPAWN STAGE:",
                 self.SpawnStage[growth_rule],
-                "\nnew models:", 
+                "\nnew models:",
                 new_models
             ]
         )
 
         new_branch_id = self.newBranch(
-            model_list = new_models,
-            growth_rule = growth_rule
+            model_list=new_models,
+            growth_rule=growth_rule
         )
 
         self.BranchParents[new_branch_id] = branchID
 
         self.log_print(
             [
-            "Models to add to new branch (", 
-            new_branch_id, 
-            "): ",
-            new_models
+                "Models to add to new branch (",
+                new_branch_id,
+                "): ",
+                new_models
             ]
         )
-        
+
         try:
             new_model_dimension = DataBase.get_num_qubits(
                 new_models[0]
             )
-        except:
-            # TODO this is only during development -- only for cases where spawn step determines termination
+        except BaseException:
+            # TODO this is only during development -- only for cases where
+            # spawn step determines termination
             new_model_dimension = DataBase.get_num_qubits(
                 best_model_names[0]
             )
 
         self.learnModelFromBranchID(
-            new_branch_id, 
-            blocking=False, 
+            new_branch_id,
+            blocking=False,
             use_rq=True
         )
         tree_completed = self.BranchGrowthClasses[branchID].check_tree_completed(
-            spawn_step = self.SpawnDepthByGrowthRule[growth_rule],
-            current_num_qubits = new_model_dimension
+            spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
+            current_num_qubits=new_model_dimension
         )
 
-        if self.SpawnStage[growth_rule][-1]=='Complete':
+        if self.SpawnStage[growth_rule][-1] == 'Complete':
             tree_completed = True
         # print(
-        #     "[spawnFromBranch] growth:", 
-        #     growth_rule, 
-        #     ";tree_completed:", 
+        #     "[spawnFromBranch] growth:",
+        #     growth_rule,
+        #     ";tree_completed:",
         #     tree_completed
         # )
-        return tree_completed            
-        
+        return tree_completed
 
     def runQHLTest(self):
-    
+
         if (
-            self.QHLmode == True 
-            and 
+            self.QHLmode == True
+            and
             self.TrueOpName not in list(self.ModelsBranches.keys())
-        ): 
+        ):
             self.newBranch(
-                growth_rule = self.GrowthGenerator, 
-                model_list = [self.TrueOpName]
+                growth_rule=self.GrowthGenerator,
+                model_list=[self.TrueOpName]
             )
 
         mod_to_learn = self.TrueOpName
@@ -2599,22 +2600,22 @@ class QMD():
         )
 
         self.learnModel(
-            model_name = mod_to_learn,
-            use_rq = self.use_rq, 
-            blocking = True
+            model_name=mod_to_learn,
+            use_rq=self.use_rq,
+            blocking=True
         )
-                
+
         mod_id = DataBase.model_id_from_name(
-            db=self.db, 
+            db=self.db,
             name=mod_to_learn
         )
         self.TrueOpModelID = mod_id
         self.ChampID = mod_id
         self.log_print(
             [
-                "Learned:", 
-                mod_to_learn, 
-                ". ID=", 
+                "Learned:",
+                mod_to_learn,
+                ". ID=",
                 mod_id
             ]
         )
@@ -2623,7 +2624,7 @@ class QMD():
         mod.updateLearnedValues(
             # fitness_parameters = self.FitnessParameters
         )
-        
+
         n_qubits = DataBase.get_num_qubits(mod.Name)
         if n_qubits > 3:
             # only compute subset of points for plot
@@ -2645,13 +2646,13 @@ class QMD():
 
         self.log_print(
             [
-                "times to plot for expetation values:", 
+                "times to plot for expetation values:",
                 expec_val_plot_times
             ]
         )
 
         mod.compute_expectation_values(
-            times = expec_val_plot_times,
+            times=expec_val_plot_times,
             # plot_probe_path = self.PlotProbeFile
         )
         self.log_print(
@@ -2662,39 +2663,37 @@ class QMD():
         )
 
         self.compute_f_score(
-            model_id = mod_id
+            model_id=mod_id
         )
 
-
-        #TODO write single QHL test
+        # TODO write single QHL test
         time_now = time.time()
         time_taken = time_now - self.StartingTime
 #        true_model_r_squared = self.reducedModelInstanceFromID(self.TrueOpModelID).r_squared()
-    
-    
+
         self.ResultsDict = {
-            'NumParticles' : self.NumParticles,
-            'NumExperiments' : mod.NumExperiments,
-            'NumBayesTimes' : self.NumTimesForBayesUpdates,
-            'ResampleThreshold' : self.ResampleThreshold,
-            'ResamplerA' : self.ResamplerA,
-            'PHGPrefactor' : self.PGHPrefactor,
-            'ConfigLatex' : self.LatexConfig,       
+            'NumParticles': self.NumParticles,
+            'NumExperiments': mod.NumExperiments,
+            'NumBayesTimes': self.NumTimesForBayesUpdates,
+            'ResampleThreshold': self.ResampleThreshold,
+            'ResamplerA': self.ResamplerA,
+            'PHGPrefactor': self.PGHPrefactor,
+            'ConfigLatex': self.LatexConfig,
             'Time': time_taken,
-            'QID' : self.Q_id,
-            'RSquaredTrueModel' : mod.r_squared(
-                times = expec_val_plot_times,
-                plot_probes = self.PlotProbes
+            'QID': self.Q_id,
+            'RSquaredTrueModel': mod.r_squared(
+                times=expec_val_plot_times,
+                plot_probes=self.PlotProbes
             ),
-            'QuadraticLosses' : mod.QuadraticLosses,
-            'NameAlphabetical' : DataBase.alph(mod.Name),
-            'LearnedParameters' : mod.LearnedParameters,
-            'FinalSigmas' : mod.FinalSigmas,
-            'TrackParameterEstimates' : mod.TrackParameterEstimates,
-            'TrackVolume' : mod.VolumeList,
-            'TrackTimesLearned' : mod.Times, 
-            # 'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
-            'ExpectationValues' : mod.expectation_values,
+            'QuadraticLosses': mod.QuadraticLosses,
+            'NameAlphabetical': DataBase.alph(mod.Name),
+            'LearnedParameters': mod.LearnedParameters,
+            'FinalSigmas': mod.FinalSigmas,
+            'TrackParameterEstimates': mod.TrackParameterEstimates,
+            'TrackVolume': mod.VolumeList,
+            'TrackTimesLearned': mod.Times,
+            # 'TrackCovarianceMatrices' : mod.TrackCovMatrices,
+            'ExpectationValues': mod.expectation_values,
             # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
             #     times = expec_val_plot_times,
             #     plot_probes = self.PlotProbes
@@ -2704,15 +2703,15 @@ class QMD():
             #     plot_probes = self.PlotProbes,
             #     times = expec_val_plot_times
             # ),
-            'FinalRSquared' : mod.final_r_squared,
-            'Fscore' : self.FScore,
-            'Precision' : self.Precision, 
-            'Sensitivity' : self.Sensitivity,
-            'p-value' : mod.p_value, 
-            'LearnedHamiltonian' : mod.LearnedHamiltonian,
-            'GrowthGenerator' : mod.GrowthGenerator, 
-            'Heuristic' : mod.HeuristicType, 
-            'ChampLatex' : mod.LatexTerm,
+            'FinalRSquared': mod.final_r_squared,
+            'Fscore': self.FScore,
+            'Precision': self.Precision,
+            'Sensitivity': self.Sensitivity,
+            'p-value': mod.p_value,
+            'LearnedHamiltonian': mod.LearnedHamiltonian,
+            'GrowthGenerator': mod.GrowthGenerator,
+            'Heuristic': mod.HeuristicType,
+            'ChampLatex': mod.LatexTerm,
         }
 
         self.log_print(
@@ -2724,14 +2723,14 @@ class QMD():
     def runMultipleModelQHL(self, model_names=None):
         if model_names is None:
             model_names = self.InitialOpList
-        
+
         current_models = list(
             self.ModelsBranches.keys()
         )
         self.log_print(
             [
-            "Model Names for multiple QHL:", model_names,
-            "current models:", current_models
+                "Model Names for multiple QHL:", model_names,
+                "current models:", current_models
             ]
         )
         models_to_add = []
@@ -2740,22 +2739,22 @@ class QMD():
                 models_to_add.append(mod)
         if len(models_to_add) > 0:
             self.newBranch(
-                growth_rule = self.GrowthGenerator, 
-                model_list = models_to_add
+                growth_rule=self.GrowthGenerator,
+                model_list=models_to_add
             )
         self.multiQHLMode = True
-        self.ChampID = -1, # TODO just so not to crash during dynamics plot
+        self.ChampID = -1,  # TODO just so not to crash during dynamics plot
         self.multiQHL_model_ids = [
             DataBase.model_id_from_name(
-                db=self.db, 
+                db=self.db,
                 name=mod_name
             ) for mod_name in model_names
         ]
 
         self.log_print(
             [
-            'run multiple QHL. names:', model_names,
-            "model ids:", self.multiQHL_model_ids
+                'run multiple QHL. names:', model_names,
+                "model ids:", self.multiQHL_model_ids
             ]
         )
 
@@ -2764,22 +2763,22 @@ class QMD():
         for mod_name in model_names:
             print("Trying to get mod id for", mod_name)
             mod_id = DataBase.model_id_from_name(
-                db=self.db, 
+                db=self.db,
                 name=mod_name
             )
             learned_models_ids.set(
                 str(mod_id), 0
             )
-            self.learnModel(    
-                model_name = mod_name,
-                use_rq = self.use_rq, 
-                blocking = False
+            self.learnModel(
+                model_name=mod_name,
+                use_rq=self.use_rq,
+                blocking=False
             )
 
         running_models = learned_models_ids.keys()
         self.log_print(
             [
-            'Running Models:', running_models,
+                'Running Models:', running_models,
             ]
         )
         for k in running_models:
@@ -2789,7 +2788,7 @@ class QMD():
 
         self.log_print(
             [
-            'Finished waiting on queue, for all:', running_models,
+                'Finished waiting on queue, for all:', running_models,
             ]
         )
         time_now = time.time()
@@ -2800,10 +2799,10 @@ class QMD():
             )
             mod = self.reducedModelInstanceFromID(mod_id)
             mod.updateLearnedValues(
-                fitness_parameters = self.FitnessParameters
+                fitness_parameters=self.FitnessParameters
             )
             self.compute_f_score(
-                model_id = mod_id
+                model_id=mod_id
             )
 
             n_qubits = DataBase.get_num_qubits(mod.Name)
@@ -2825,65 +2824,62 @@ class QMD():
                 )
                 expec_val_plot_times = self.PlotTimes
 
-
             mod.compute_expectation_values(
                 times=expec_val_plot_times,
                 # plot_probe_path = self.PlotProbeFile
             )
             # equivalent to self.ResultsDict
             mod.results_dict = {
-                'NumParticles' : mod.NumParticles,
-                'NumExperiments' : mod.NumExperiments,
-                'NumBayesTimes' : self.NumTimesForBayesUpdates,
-                'ResampleThreshold' : self.ResampleThreshold,
-                'ResamplerA' : self.ResamplerA,
-                'PHGPrefactor' : self.PGHPrefactor,
-                'ConfigLatex' : self.LatexConfig,       
+                'NumParticles': mod.NumParticles,
+                'NumExperiments': mod.NumExperiments,
+                'NumBayesTimes': self.NumTimesForBayesUpdates,
+                'ResampleThreshold': self.ResampleThreshold,
+                'ResamplerA': self.ResamplerA,
+                'PHGPrefactor': self.PGHPrefactor,
+                'ConfigLatex': self.LatexConfig,
                 'Time': time_taken,
-                'QID' : self.Q_id,
-                'ChampID' : self.ChampID, 
-                'QuadraticLosses' : mod.QuadraticLosses,
-                'RSquaredTrueModel' : mod.r_squared(
-                    plot_probes = self.PlotProbes, 
-                    times = expec_val_plot_times
+                'QID': self.Q_id,
+                'ChampID': self.ChampID,
+                'QuadraticLosses': mod.QuadraticLosses,
+                'RSquaredTrueModel': mod.r_squared(
+                    plot_probes=self.PlotProbes,
+                    times=expec_val_plot_times
                 ),
-                'NameAlphabetical' : DataBase.alph(mod.Name),
-                'LearnedParameters' : mod.LearnedParameters,
-                'FinalSigmas' : mod.FinalSigmas, 
-                'TrackParameterEstimates' : mod.TrackParameterEstimates,
-                'TrackVolume' : mod.VolumeList,
-                'TrackTimesLearned' : mod.Times, 
-                # 'TrackCovarianceMatrices' : mod.TrackCovMatrices, 
-                'ExpectationValues' : mod.expectation_values,
+                'NameAlphabetical': DataBase.alph(mod.Name),
+                'LearnedParameters': mod.LearnedParameters,
+                'FinalSigmas': mod.FinalSigmas,
+                'TrackParameterEstimates': mod.TrackParameterEstimates,
+                'TrackVolume': mod.VolumeList,
+                'TrackTimesLearned': mod.Times,
+                # 'TrackCovarianceMatrices' : mod.TrackCovMatrices,
+                'ExpectationValues': mod.expectation_values,
                 # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
                 #     times = expec_val_plot_times,
                 #     plot_probes = self.PlotProbes
                 # ),
                 # 'FinalRSquared' : mod.final_r_squared,
-                'FinalRSquared' : mod.r_squared(
-                    plot_probes = self.PlotProbes,
-                    times = expec_val_plot_times
+                'FinalRSquared': mod.r_squared(
+                    plot_probes=self.PlotProbes,
+                    times=expec_val_plot_times
                 ),
-                'p-value' : mod.p_value, 
-                'Fscore' : self.FScore,
-                'Precision' : self.Precision, 
-                'Sensitivity' : self.Sensitivity,
-                'LearnedHamiltonian' : mod.LearnedHamiltonian,
-                'GrowthGenerator' : mod.GrowthGenerator,
-                'Heuristic' : mod.HeuristicType, 
-                'ChampLatex' : mod.LatexTerm
+                'p-value': mod.p_value,
+                'Fscore': self.FScore,
+                'Precision': self.Precision,
+                'Sensitivity': self.Sensitivity,
+                'LearnedHamiltonian': mod.LearnedHamiltonian,
+                'GrowthGenerator': mod.GrowthGenerator,
+                'Heuristic': mod.HeuristicType,
+                'ChampLatex': mod.LatexTerm
             }
             self.ModelIDNames = {}
             for k in self.ModelNameIDs:
                 v = self.ModelNameIDs[k]
                 self.ModelIDNames[v] = k
 
-
-
     def inspect_remote_job_crashes(self):
         if self.RedisDataBases['any_job_failed']['Status'] == b'1':
-            # TODO better way to detect errors? For some reason the   
-            # log print isn't being hit, but raising error seems to be.               
+            # TODO better way to detect errors? For some reason the
+            # log print isn't being hit, but raising error seems to be.
             self.log_print(
                 [
                     "Failure on remote node. Terminating QMD."
@@ -2891,15 +2887,13 @@ class QMD():
             )
             raise NameError('Remote QML Failure')
 
-
-
     def runRemoteQMD_MULTIPLE_GEN(
-        self, 
-        num_exp=40, 
-        num_spawns=1, 
-        max_branches= None, 
-        max_num_qubits = None,
-        max_num_models=None, 
+        self,
+        num_exp=40,
+        num_spawns=1,
+        max_branches=None,
+        max_num_qubits=None,
+        max_num_models=None,
         spawn=True,
         just_given_models=False
     ):
@@ -2917,16 +2911,18 @@ class QMD():
                 # print("[QMD runMult] launching branch ", i)
                 # ie initial branches
                 self.learnModelFromBranchID(
-                    i, 
-                    blocking=False, 
+                    i,
+                    blocking=False,
                     use_rq=True
                 )
                 while(
                     int(active_branches_learning_models.get(i))
-                        < self.NumModelsPerBranch[i] 
+                        < self.NumModelsPerBranch[i]
                 ):
-                    sleep(0.1) # don't do comparisons till all models on this branch are done
-                    # print("num models learned on br", i, 
+                    # don't do comparisons till all models on this branch are
+                    # done
+                    sleep(0.1)
+                    # print("num models learned on br", i,
                     #     ":", int(active_branches_learning_models[i])
                     # )
                 self.BranchAllModelsLearned[i] = True
@@ -2934,18 +2930,18 @@ class QMD():
                 while (
                     int(active_branches_bayes.get(i))
                         < self.NumModelPairsPerBranch[i]
-                ):#bayes comparisons not done
+                ):  # bayes comparisons not done
                     # print(
-                    #     "num comparisons complete br", i, 
+                    #     "num comparisons complete br", i,
                     #     ":", int(active_branches_bayes[i]),
-                    #     "should be", 
+                    #     "should be",
                     #     self.NumModelPairsPerBranch[i]
                     # )
                     sleep(0.1)
                 # self.BranchComparisonsComplete[i] = True
                 self.log_print(
                     [
-                        "Models computed and compared for branch", 
+                        "Models computed and compared for branch",
                         i
                     ]
                 )
@@ -2954,15 +2950,13 @@ class QMD():
                 # print("[QMD runMult] launching branch ", i)
                 # ie initial branches
                 self.learnModelFromBranchID(
-                    i, 
-                    blocking=False, 
+                    i,
+                    blocking=False,
                     use_rq=True
                 )
 
-
-
-        max_spawn_depth_reached=False
-        all_comparisons_complete=False
+        max_spawn_depth_reached = False
+        all_comparisons_complete = False
 
         branch_ids_on_db = list(
             active_branches_learning_models.keys()
@@ -2981,13 +2975,12 @@ class QMD():
             # print("[QMD] branches:", branch_ids_on_db)
             self.inspect_remote_job_crashes()
 
-
             for branchID_bytes in branch_ids_on_db:
                 branchID = int(branchID_bytes)
                 # print(
                 #     "\n\tactive learning:",
                 #     active_branches_learning_models.get(branchID),
-                #     "\n\tnum mods on branch", 
+                #     "\n\tnum mods on branch",
                 #     self.NumModelsPerBranch[branchID],
                 #     "\n\tall learned:",
                 #     self.BranchAllModelsLearned[branchID]
@@ -2998,13 +2991,13 @@ class QMD():
                     int(
                         active_branches_learning_models.get(
                             branchID)
-                        ) == self.NumModelsPerBranch[branchID] 
-                    and 
-                    self.BranchAllModelsLearned[branchID]==False
+                    ) == self.NumModelsPerBranch[branchID]
+                    and
+                    self.BranchAllModelsLearned[branchID] == False
                 ):
                     self.log_print([
-                        "All models on branch", 
-                        branchID, 
+                        "All models on branch",
+                        branchID,
                         "have finished learning."]
                     )
                     self.BranchAllModelsLearned[branchID] = True
@@ -3017,55 +3010,52 @@ class QMD():
 
                     self.remoteBayesFromBranchID(branchID)
 
-
-
-
-
             for branchID_bytes in active_branches_bayes.keys():
-                
+
                 branchID = int(branchID_bytes)
                 bayes_calculated = active_branches_bayes.get(
                     branchID_bytes
                 )
 
-                if (int(bayes_calculated) ==  
-                        self.NumModelPairsPerBranch[branchID] 
-                    and
-                        self.BranchComparisonsComplete[branchID]==False
-                ):
+                if (int(bayes_calculated) ==
+                        self.NumModelPairsPerBranch[branchID]
+                            and
+                        self.BranchComparisonsComplete[branchID] == False
+                        ):
                     self.BranchComparisonsComplete[branchID] = True
                     self.compareModelsWithinBranch(branchID)
                     # print("[QMD] getting growth rule for branchID", branchID)
                     # print("[QMD] dict:", self.BranchGrowthRules)
                     this_branch_growth_rule = self.BranchGrowthRules[branchID]
-                    if self.TreesCompleted[this_branch_growth_rule]==False:
+                    if self.TreesCompleted[this_branch_growth_rule] == False:
                         print(
-                            "not finished tree for growth:", 
+                            "not finished tree for growth:",
                             this_branch_growth_rule
                         )
 
                         growth_rule_tree_complete = self.spawnFromBranch(
-                            # will return True if this brings it to self.MaxSpawnDepth
+                            # will return True if this brings it to
+                            # self.MaxSpawnDepth
                             branchID=branchID,
-                            growth_rule = this_branch_growth_rule, 
+                            growth_rule=this_branch_growth_rule,
                             num_models=1
                         )
 
                         if (
-                            growth_rule_tree_complete==True
+                            growth_rule_tree_complete == True
                         ):
                             self.TreesCompleted[this_branch_growth_rule] = True
                             self.NumTreesCompleted += 1
                             print(
-                                "[QMD] Num trees now completed:", 
-                                self.NumTreesCompleted, 
+                                "[QMD] Num trees now completed:",
+                                self.NumTreesCompleted,
                                 "Tree completed dict:",
                                 self.TreesCompleted
                             )
                             max_spawn_depth_reached = True
                     else:
                         print(
-                            "\n\n\nFinished tree for growth:", 
+                            "\n\n\nFinished tree for growth:",
                             this_branch_growth_rule
                         )
                 # elif self.BranchComparisonsComplete[branchID]==False:
@@ -3075,19 +3065,19 @@ class QMD():
                 #         int(bayes_calculated),
                 #         "NumModelPairsPerBranch:",
                 #         self.NumModelPairsPerBranch[branchID],
-                #         "BranchComparisonsComplete", 
+                #         "BranchComparisonsComplete",
                 #         self.BranchComparisonsComplete[branchID]
                 #     )
 
-
         self.log_print(
             [
-                "All trees have completed.", 
-                "Num complete:", 
+                "All trees have completed.",
+                "Num complete:",
                 self.NumTreesCompleted
             ]
         )
-        # let any branches which have just started finish before moving to analysis
+        # let any branches which have just started finish before moving to
+        # analysis
         still_learning = True
 
         while still_learning:
@@ -3095,51 +3085,52 @@ class QMD():
             # branch_ids_on_db.remove(b'LOCKED')
             for branchID_bytes in branch_ids_on_db:
                 branchID = int(branchID_bytes)
-                if ( 
-                    (int(active_branches_learning_models.get(branchID)) == 
-                    self.NumModelsPerBranch[branchID]) 
-                    and 
-                    (self.BranchAllModelsLearned[branchID]==False)
+                if (
+                    (int(active_branches_learning_models.get(branchID)) ==
+                     self.NumModelsPerBranch[branchID])
+                    and
+                    (self.BranchAllModelsLearned[branchID] == False)
                 ):
                     self.BranchAllModelsLearned[branchID] = True
                     self.remoteBayesFromBranchID(branchID)
-                    
+
                 if branchID_bytes in active_branches_bayes:
                     num_bayes_done_on_branch = (
                         active_branches_bayes.get(branchID_bytes)
                     )
                     # print(
-                    #     "branch", branchID, 
+                    #     "branch", branchID,
                     #     "num complete:", num_bayes_done_on_branch
                     # )
-                    if ( int(num_bayes_done_on_branch) == 
-                        self.NumModelPairsPerBranch[branchID] and
-                        self.BranchComparisonsComplete[branchID]==False
-                    ):
+                    if (int(num_bayes_done_on_branch) ==
+                            self.NumModelPairsPerBranch[branchID] and
+                            self.BranchComparisonsComplete[branchID] == False
+                        ):
                         self.BranchComparisonsComplete[branchID] = True
                         self.compareModelsWithinBranch(branchID)
-            
+
             if (
                 np.all(
                     np.array(list(self.BranchAllModelsLearned.values()))
-                    ==True
+                    == True
                 )
                 and
                 np.all(np.array(list(
-                    self.BranchComparisonsComplete.values()))==True
+                    self.BranchComparisonsComplete.values())) == True
                 )
-            ):    
-                still_learning = False # i.e. break out of this while loop
+            ):
+                still_learning = False  # i.e. break out of this while loop
 
         print("[QMD runRemoteMult] Finalising QMD.")
         final_winner, final_branch_winners = self.finalBayesComparisons()
         self.ChampionName = final_winner
         self.ChampID = self.pullField(
-            name=final_winner, 
+            name=final_winner,
             field='ModelID'
         )
 
-        # Check if final winner has parameters close to 0; potentially change champ
+        # Check if final winner has parameters close to 0; potentially change
+        # champ
         self.updateDataBaseModelValues()
 
         if (
@@ -3148,7 +3139,7 @@ class QMD():
             self.GrowthClass.tree_completed_initially == False
         ):
             self.checkChampReducibility()
-        
+
         self.log_print(
             [
                 "Final winner = ", self.ChampionName
@@ -3166,15 +3157,13 @@ class QMD():
 
         self.finaliseQMD()
 
-
-
     def finaliseQMD(self):
-        ### Final functions at end of QMD
-        ### Fill in champions result dict for further analysis.
+        # Final functions at end of QMD
+        # Fill in champions result dict for further analysis.
 
         champ_model = self.reducedModelInstanceFromID(self.ChampID)
         for i in range(self.HighestModelID):
-            # Dict of all Bayes factors for each model considered. 
+            # Dict of all Bayes factors for each model considered.
             self.AllBayesFactors[i] = (
                 self.reducedModelInstanceFromID(i).BayesFactors
             )
@@ -3187,23 +3176,21 @@ class QMD():
         self.log_print(["computed expect vals"])
 
         self.compute_f_score(
-            model_id = self.ChampID
+            model_id=self.ChampID
         )
 
         self.ChampionFinalParams = (
             champ_model.FinalParams
         )
 
-        champ_op = DataBase.operator(self.ChampionName)        
+        champ_op = DataBase.operator(self.ChampionName)
         num_params_champ_model = champ_op.num_constituents
-
-
 
         correct_model = misfit = underfit = overfit = 0
         self.log_print(
             [
-            "Num params - champ:", num_params_champ_model,
-            "; \t true:", self.TrueOpNumParams]
+                "Num params - champ:", num_params_champ_model,
+                "; \t true:", self.TrueOpNumParams]
         )
 
         self.ModelIDNames = {}
@@ -3211,20 +3198,19 @@ class QMD():
             v = self.ModelNameIDs[k]
             self.ModelIDNames[v] = k
 
-
         if DataBase.alph(self.ChampionName) == DataBase.alph(self.TrueOpName):
             correct_model = 1
-        elif ( 
-            num_params_champ_model ==  self.TrueOpNumParams 
+        elif (
+            num_params_champ_model == self.TrueOpNumParams
             and
             DataBase.alph(self.ChampionName) != DataBase.alph(self.TrueOpName)
         ):
             misfit = 1
-        elif num_params_champ_model > self.TrueOpNumParams: 
+        elif num_params_champ_model > self.TrueOpNumParams:
             overfit = 1
-        elif num_params_champ_model < self.TrueOpNumParams: 
-            underfit=1
-        
+        elif num_params_champ_model < self.TrueOpNumParams:
+            underfit = 1
+
         num_params_difference = self.TrueOpNumParams - num_params_champ_model
 
         num_qubits_champ_model = DataBase.get_num_qubits(self.ChampionName)
@@ -3235,18 +3221,18 @@ class QMD():
             self.reducedModelInstanceFromID(self.ChampID).FinalSigmas
         )
         num_exp_ham = (
-            self.NumParticles * 
+            self.NumParticles *
             (self.NumExperiments + self.NumTimesForBayesUpdates)
         )
 
-        config = str( 'config' + 
-            '_p'+str(self.NumParticles) +
-            '_e' + str(self.NumExperiments) +
-            '_b' + str( self.NumTimesForBayesUpdates)  +
-            '_ra' + str(self.ResamplerA) +
-            '_rt' + str(self.ResampleThreshold) +
-            '_rp' + str(self.PGHPrefactor)
-            )
+        config = str('config' +
+                     '_p' + str(self.NumParticles) +
+                     '_e' + str(self.NumExperiments) +
+                     '_b' + str(self.NumTimesForBayesUpdates) +
+                     '_ra' + str(self.ResamplerA) +
+                     '_rt' + str(self.ResampleThreshold) +
+                     '_rp' + str(self.PGHPrefactor)
+                     )
 
         time_now = time.time()
         time_taken = time_now - self.StartingTime
@@ -3274,58 +3260,57 @@ class QMD():
         # equivalent to sleepf.ResultsDict
 
         self.ChampionResultsDict = {
-            'NameAlphabetical' : DataBase.alph(self.ChampionName),
-            'NameNonAlph' : self.ChampionName,
-            'FinalParams' : self.ChampionFinalParams,
-            'LatexName' : champ_model.LatexTerm,
+            'NameAlphabetical': DataBase.alph(self.ChampionName),
+            'NameNonAlph': self.ChampionName,
+            'FinalParams': self.ChampionFinalParams,
+            'LatexName': champ_model.LatexTerm,
             # 'LatexName' : DataBase.latex_name_ising(self.ChampionName),
-            'NumParticles' : self.NumParticles,
-            'NumExperiments' : champ_model.NumExperiments,
-            'NumBayesTimes' : self.NumTimesForBayesUpdates,
-            'ResampleThreshold' : self.ResampleThreshold,
-            'ResamplerA' : self.ResamplerA,
-            'PHGPrefactor' : self.PGHPrefactor,
-            'LogFile' : self.log_file,
-            'ParamConfiguration' : config,
-            'ConfigLatex' : self.LatexConfig,       
+            'NumParticles': self.NumParticles,
+            'NumExperiments': champ_model.NumExperiments,
+            'NumBayesTimes': self.NumTimesForBayesUpdates,
+            'ResampleThreshold': self.ResampleThreshold,
+            'ResamplerA': self.ResamplerA,
+            'PHGPrefactor': self.PGHPrefactor,
+            'LogFile': self.log_file,
+            'ParamConfiguration': config,
+            'ConfigLatex': self.LatexConfig,
             'Time': time_taken,
-            'QID' : self.Q_id,
-            'CorrectModel' : correct_model,
-            'Underfit' : underfit,
-            'Overfit' : overfit, 
-            'Misfit' : misfit,
-            'NumQubits' : num_qubits_champ_model,
-            'NumParams' : num_params_champ_model,
-            'LearnedParameters' : self.LearnedParamsChamp,
-            'FinalSigmas' : self.FinalSigmasChamp,
-            'QuadraticLosses' : champ_model.QuadraticLosses,
-            'ExpectationValues' : champ_model.expectation_values,
-            # 'RawExpectationValues' : champ_model.raw_expectation_values, 
+            'QID': self.Q_id,
+            'CorrectModel': correct_model,
+            'Underfit': underfit,
+            'Overfit': overfit,
+            'Misfit': misfit,
+            'NumQubits': num_qubits_champ_model,
+            'NumParams': num_params_champ_model,
+            'LearnedParameters': self.LearnedParamsChamp,
+            'FinalSigmas': self.FinalSigmasChamp,
+            'QuadraticLosses': champ_model.QuadraticLosses,
+            'ExpectationValues': champ_model.expectation_values,
+            # 'RawExpectationValues' : champ_model.raw_expectation_values,
             # 'ExpValTimes' : champ_model.times,
-            'TrackParameterEstimates' : champ_model.TrackParameterEstimates,
-            'TrackVolume' : champ_model.VolumeList,
-            'TrackTimesLearned' : champ_model.Times, 
-            # 'TrackCovarianceMatrices' : champ_model.TrackCovMatrices, 
+            'TrackParameterEstimates': champ_model.TrackParameterEstimates,
+            'TrackVolume': champ_model.VolumeList,
+            'TrackTimesLearned': champ_model.Times,
+            # 'TrackCovarianceMatrices' : champ_model.TrackCovMatrices,
             # 'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
             #     plot_probes = self.PlotProbes,
             #     times = expec_val_plot_times
             # ),
-            'FinalRSquared' : champ_model.r_squared(
-                plot_probes = self.PlotProbes,
-                times = expec_val_plot_times
+            'FinalRSquared': champ_model.r_squared(
+                plot_probes=self.PlotProbes,
+                times=expec_val_plot_times
             ),
-            'Fscore' : self.FScore,
-            'Precision' : self.Precision, 
-            'Sensitivity' : self.Sensitivity,
-            'PValue' : champ_model.p_value, 
-            'LearnedHamiltonian' : champ_model.LearnedHamiltonian,
-            'GrowthGenerator' : champ_model.GrowthGenerator, 
-            'Heuristic' : champ_model.HeuristicType, 
-            'ChampLatex' : champ_model.LatexTerm,
-            'TrueModel' : DataBase.alph(self.TrueOpName),
-            'NumParamDifference' : num_params_difference,
+            'Fscore': self.FScore,
+            'Precision': self.Precision,
+            'Sensitivity': self.Sensitivity,
+            'PValue': champ_model.p_value,
+            'LearnedHamiltonian': champ_model.LearnedHamiltonian,
+            'GrowthGenerator': champ_model.GrowthGenerator,
+            'Heuristic': champ_model.HeuristicType,
+            'ChampLatex': champ_model.LatexTerm,
+            'TrueModel': DataBase.alph(self.TrueOpName),
+            'NumParamDifference': num_params_difference,
         }
-
 
     def checkChampReducibility(
         self,
@@ -3353,12 +3338,12 @@ class QMD():
             #     )
 
             if (
-                np.abs(champ_mod.LearnedParameters[p]) 
+                np.abs(champ_mod.LearnedParameters[p])
                 < self.GrowthClass.learned_param_limit_for_negligibility
             ):
                 to_remove.append(p)
                 removed_params[p] = np.round(
-                    champ_mod.LearnedParameters[p],2
+                    champ_mod.LearnedParameters[p], 2
                 )
 
         if len(to_remove) >= len(params):
@@ -3373,26 +3358,25 @@ class QMD():
                 ]
             )
             return
-        if len(to_remove) > 0 :
+        if len(to_remove) > 0:
             new_model_terms = list(
                 set(params) - set(to_remove)
             )
             dim = DataBase.get_num_qubits(new_model_terms[0])
-            p_str = 'P'*dim            
+            p_str = 'P' * dim
             new_mod = p_str.join(new_model_terms)
-            new_mod = DataBase.alph(new_mod)            
+            new_mod = DataBase.alph(new_mod)
 
             self.log_print(
                 [
-                    "Some neglibible parameters found:", removed_params, 
+                    "Some neglibible parameters found:", removed_params,
                     "\nReduced champion model suggested:", new_mod
                 ]
             )
 
-
             reduced_mod_info = self.addModel(
-                model = new_mod,
-                force_create_model = True
+                model=new_mod,
+                force_create_model=True
             )
             reduced_mod_id = reduced_mod_info['model_id']
             reduced_mod_instance = self.reducedModelInstanceFromID(
@@ -3416,7 +3400,8 @@ class QMD():
 
             # get champion leared info
             reduced_champion_info = pickle.loads(
-                self.RedisDataBases['learned_models_info'].get(str(self.ChampID))
+                self.RedisDataBases['learned_models_info'].get(
+                    str(self.ChampID))
             )
 
             reduced_params = {}
@@ -3433,7 +3418,7 @@ class QMD():
                 sigmas**2
             )
             new_prior = qinfer.MultivariateNormalDistribution(
-                learned_params, 
+                learned_params,
                 new_cov_mat
             )
 
@@ -3450,26 +3435,27 @@ class QMD():
             reduced_champion_info['initial_params'] = reduced_sigmas
 
             compressed_reduced_champ_info = pickle.dumps(
-                reduced_champion_info, 
+                reduced_champion_info,
                 protocol=2
             )
 
             # TODO fill in values for reducedModel
             self.RedisDataBases['learned_models_info'].set(
-                str(float(reduced_mod_id)), 
+                str(float(reduced_mod_id)),
                 compressed_reduced_champ_info
             )
 
-            self.reducedModelInstanceFromID(reduced_mod_id).updateLearnedValues()
+            self.reducedModelInstanceFromID(
+                reduced_mod_id).updateLearnedValues()
 
             bayes_factor = self.remoteBayes(
-                model_a_id = int(self.ChampID),
-                model_b_id = int(reduced_mod_id),
-                wait_on_result = True
+                model_a_id=int(self.ChampID),
+                model_b_id=int(reduced_mod_id),
+                wait_on_result=True
             )
             self.log_print(
                 [
-                    "[QMD] BF b/w champ and reduced champ models:", 
+                    "[QMD] BF b/w champ and reduced champ models:",
                     bayes_factor
                 ]
             )
@@ -3478,7 +3464,7 @@ class QMD():
                 (
                     bayes_factor
                     < (1.0 / self.GrowthClass.reduce_champ_bayes_factor_threshold)
-                ) 
+                )
                 # or True
             ):
                 # overwrite champ id etc
@@ -3486,10 +3472,10 @@ class QMD():
                 self.log_print(
                     [
                         "Replacing champion model ({}) with reduced champion model ({} - {})".format(
-                            self.ChampID, 
+                            self.ChampID,
                             reduced_mod_id,
                             new_mod
-                        ), 
+                        ),
                         "\n i.e. removing negligible parameter terms:\n{}".format(
                             removed_params
                         )
@@ -3501,12 +3487,12 @@ class QMD():
                 self.ChampionName = new_mod
 
                 self.reducedModelInstanceFromID(self.ChampID).BayesFactors = (
-                    self.reducedModelInstanceFromID(original_champ_id).BayesFactors
+                    self.reducedModelInstanceFromID(
+                        original_champ_id).BayesFactors
                 )
 
-            # TODO check if BF > threshold; if so, reassign self.ChampID and self.ChampionName
-
-
+            # TODO check if BF > threshold; if so, reassign self.ChampID and
+            # self.ChampionName
 
         else:
             self.log_print(
@@ -3515,22 +3501,22 @@ class QMD():
                 ]
             )
 
-
     def updateDataBaseModelValues(self):
         for mod_id in range(self.HighestModelID):
             try:
-                # TODO remove this try/except when reduced-champ-model instance is update-able
+                # TODO remove this try/except when reduced-champ-model instance
+                # is update-able
                 mod = self.reducedModelInstanceFromID(mod_id)
                 mod.updateLearnedValues(
-                    fitness_parameters = self.FitnessParameters
+                    fitness_parameters=self.FitnessParameters
                 )
-            except:
+            except BaseException:
                 pass
 
     def compute_f_score(
         self,
         model_id,
-        beta = 1 # beta=1 for F1-score. Beta is relative importance of sensitivity to precision    
+        beta=1  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
     ):
 
         true_set = self.GrowthClass.true_operator_terms
@@ -3540,7 +3526,7 @@ class QMD():
             growth_class.latex_name(
                 term
             )
-            for term in 
+            for term in
             DataBase.get_constituent_names_from_name(
                 self.ModelNameIDs[model_id]
             )
@@ -3550,28 +3536,29 @@ class QMD():
         self.TruePositives = len(true_set.intersection(learned_set))
         self.FalsePositives = len(learned_set - true_set)
         self.false_negatives = len(true_set - learned_set)
-        self.Precision = self.TruePositives / (self.TruePositives + self.FalsePositives)
-        self.Sensitivity = self.TruePositives/self.TotalPositives
+        self.Precision = self.TruePositives / \
+            (self.TruePositives + self.FalsePositives)
+        self.Sensitivity = self.TruePositives / self.TotalPositives
         try:
             self.FScore = (
                 (1 + beta**2) * (
                     (self.Precision * self.Sensitivity)
-                    / (beta**2 * self.Precision + self.Sensitivity) 
+                    / (beta**2 * self.Precision + self.Sensitivity)
                 )
-            ) 
-        except:
+            )
+        except BaseException:
             # both precision and sensitivity=0 as true_positives=0
-            self.FScore = 0 
+            self.FScore = 0
 
         return self.FScore
-            
+
     def runQMD(
-        self, 
-        num_exp=20, 
-        max_branches=None, 
+        self,
+        num_exp=20,
+        max_branches=None,
         max_num_qubits=None,
-        max_num_models=None, 
-        spawn=True, 
+        max_num_models=None,
+        spawn=True,
         just_given_models=False
     ):
         if just_given_models:
@@ -3590,18 +3577,18 @@ class QMD():
 
             if max_num_qubits is None:
                 max_num_qubits = self.MaxQubitNumber
-                
-            if max_num_models is None: 
+
+            if max_num_models is None:
                 max_num_models = self.MaxModNum
-                
-            while self.HighestQubitNumber < max_num_qubits: 
+
+            while self.HighestQubitNumber < max_num_qubits:
                 self.runAllActiveModelsIQLE(num_exp=num_exp)
                 self.spawn()
-                if ( self.HighestBranchID > max_branches or \
-                    self.NumModels > max_num_models
-                ):
+                if (self.HighestBranchID > max_branches or
+                        self.NumModels > max_num_models
+                    ):
                     break
-            
+
             self.runAllActiveModelsIQLE(num_exp=num_exp)
             self.log_print(["\n\n\n\nBayes Updates\n\n\n\n"])
             final_winner, final_branch_winners = (
@@ -3610,67 +3597,64 @@ class QMD():
             self.ChampionName = final_winner
             self.log_print(["Final winner = ", final_winner])
 
-    def majorityVoteQMD(self, num_runs=1, num_exp=20, max_branches= None,
-        max_num_qubits = None, max_num_models=None, spawn=True,
-        just_given_models=False
-    ):
+    def majorityVoteQMD(self, num_runs=1, num_exp=20, max_branches=None,
+                        max_num_qubits=None, max_num_models=None, spawn=True,
+                        just_given_models=False
+                        ):
 
-        model_id_list = DataBase.active_model_ids_by_branch_id(self.db, branchID=0) 
+        model_id_list = DataBase.active_model_ids_by_branch_id(
+            self.db, branchID=0)
         for i in range(num_runs):
             for j in model_id_list:
                 mod = self.getModelInstanceFromID(j)
                 mod.resetPrior()
                 mod.UpdateModel(n_experiments=num_exp)
             self.compareModelList(model_list=model_id_list, bayes_threshold=self.BayesLower,
-                num_times_to_use=num_exp
-            )
+                                  num_times_to_use=num_exp
+                                  )
         self.MajorityVotingScores = self.majorityVotingTally()
 
-
     def plotQuadraticLoss(
-        self, 
-        save_to_file = None, 
+        self,
+        save_to_file=None,
     ):
         PlotQMD.plot_quadratic_loss(
-            qmd=self, 
-            champs_or_all = 'champs', 
-            save_to_file = save_to_file
+            qmd=self,
+            champs_or_all='champs',
+            save_to_file=save_to_file
         )
 
-
-
-    def plotVolumes(self, model_id_list=None, branch_champions=False, 
-        branch_id=None, save_to_file=None
-    ):
+    def plotVolumes(self, model_id_list=None, branch_champions=False,
+                    branch_id=None, save_to_file=None
+                    ):
 
         plt.clf()
-        plot_descriptor = '\n('+str(self.NumParticles)+'particles; '+ \
-            str(self.NumExperiments)+'experiments).'
+        plot_descriptor = '\n(' + str(self.NumParticles) + 'particles; ' + \
+            str(self.NumExperiments) + 'experiments).'
 
         if branch_champions:
             # only plot for branch champions
             model_id_list = list(self.BranchChampions.values())
-            plot_descriptor+='[Branch champions]'
+            plot_descriptor += '[Branch champions]'
 
-        
         elif branch_id is not None:
-            model_id_list = DataBase.list_model_id_in_branch(self.db, branch_id)
-            plot_descriptor+='[Branch'+str(branch_id)+']'
-        
+            model_id_list = DataBase.list_model_id_in_branch(
+                self.db, branch_id)
+            plot_descriptor += '[Branch' + str(branch_id) + ']'
+
         elif model_id_list is None:
             self.log_print(["Plotting volumes for all models by default."])
-            
-            model_id_list = range(self.HighestModelID)
-            plot_descriptor+='[All models]'
 
-        plt.title('Volume evolution through QMD '+plot_descriptor)
+            model_id_list = range(self.HighestModelID)
+            plot_descriptor += '[All models]'
+
+        plt.title('Volume evolution through QMD ' + plot_descriptor)
         plt.xlabel('Epoch')
         plt.ylabel('Volume')
 
-
         for i in model_id_list:
             vols = self.reducedModelInstanceFromID(i).VolumeList
-            plt.semilogy(vols, label=str('ID:'+str(i)))
+            plt.semilogy(vols, label=str('ID:' + str(i)))
 #            plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1.0))
 
         ax = plt.subplot(111)
@@ -3681,15 +3665,15 @@ class QMD():
                          box.width, box.height * 0.9])
 
         # Put a legend below current axis
-        lgd=ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15),
-                  fancybox=True, shadow=True, ncol=4)
-
+        lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15),
+                        fancybox=True, shadow=True, ncol=4)
 
         if save_to_file is None:
             plt.show()
         else:
-            plt.savefig(save_to_file, bbox_extra_artists=(lgd,), bbox_inches='tight')
-    
+            plt.savefig(
+                save_to_file, bbox_extra_artists=(
+                    lgd,), bbox_inches='tight')
 
     def saveBayesCSV(self, save_to_file, names_ids='latex'):
         PlotQMD.BayesFactorsCSV(self, save_to_file, names_ids=names_ids)
@@ -3701,11 +3685,10 @@ class QMD():
     def plotHintonAllModels(self, save_to_file=None):
         PlotQMD.plotHinton(
             model_names=self.ModelNameIDs,
-            bayes_factors=self.AllBayesFactors, 
+            bayes_factors=self.AllBayesFactors,
             growth_generator=self.GrowthGenerator,
             save_to_file=save_to_file
         )
-
 
     def plotHintonListModels(self, model_list, save_to_file=None):
         bayes_factors = {}
@@ -3713,56 +3696,55 @@ class QMD():
             bayes_factors[a] = {}
             key_empty = True
             for b in model_list:
-                if a!=b:
+                if a != b:
                     try:
                         bayes_factors[a][b] = self.AllBayesFactors[a][b]
                         key_empty = False
-                    except:
+                    except BaseException:
                         pass
             if key_empty:
                 bayes_factors.pop(a)
-            
+
         model_name_dict = {}
         for m in model_list:
             model_name_dict[m] = DataBase.model_name_from_id(self.db, m)
-        
-        
+
         PlotQMD.plotHinton(
-            model_names=model_name_dict, 
-            bayes_factors=bayes_factors, 
-            growth_generator = self.GrowthGenerator,
+            model_names=model_name_dict,
+            bayes_factors=bayes_factors,
+            growth_generator=self.GrowthGenerator,
             save_to_file=save_to_file
         )
-        
+
     def plotParameterEstimates(
-        self, 
-        model_id=0, 
-        true_model=False, 
+        self,
+        model_id=0,
+        true_model=False,
         save_to_file=None
     ):
-    
-        if true_model: 
-            model_id = DataBase.model_id_from_name(db=self.db, name=self.TrueOpName)
 
-        PlotQMD.parameterEstimates(qmd=self, 
-            modelID = model_id, 
-            use_experimental_data = self.UseExperimentalData,
-            save_to_file = save_to_file
-        )
-    
+        if true_model:
+            model_id = DataBase.model_id_from_name(
+                db=self.db, name=self.TrueOpName)
+
+        PlotQMD.parameterEstimates(qmd=self,
+                                   modelID=model_id,
+                                   use_experimental_data=self.UseExperimentalData,
+                                   save_to_file=save_to_file
+                                   )
 
     def plotDynamics(
-        self, 
-        all_models=False, 
-        model_ids=None, 
-        include_bayes_factors_in_dynamics_plots=True, 
+        self,
+        all_models=False,
+        model_ids=None,
+        include_bayes_factors_in_dynamics_plots=True,
         include_param_estimates_in_dynamics_plots=False,
-        include_times_learned_in_dynamics_plots=True, 
-        save_to_file=None, 
+        include_times_learned_in_dynamics_plots=True,
+        save_to_file=None,
     ):
-        if all_models==True:
+        if all_models == True:
             model_ids = list(sorted(self.ModelNameIDs.keys()))
-        elif model_ids is None: 
+        elif model_ids is None:
             model_ids = list(
                 sorted(self.BranchChampions.values())
             )
@@ -3771,66 +3753,66 @@ class QMD():
         #     include_bayes_factors_in_dynamics_plots = False
         #     include_param_estimates_in_dynamics_plots = False
         # else:
-        #     include_bayes_factors_in_dynamics_plots = True 
+        #     include_bayes_factors_in_dynamics_plots = True
         #     include_param_estimates_in_dynamics_plots = True
 
         PlotQMD.plotDynamicsLearnedModels(
-            qmd = self, 
-            include_bayes_factors = include_bayes_factors_in_dynamics_plots,
-            include_times_learned = include_times_learned_in_dynamics_plots, 
-            include_param_estimates = include_param_estimates_in_dynamics_plots,
-            model_ids = model_ids, 
-            save_to_file = save_to_file,
+            qmd=self,
+            include_bayes_factors=include_bayes_factors_in_dynamics_plots,
+            include_times_learned=include_times_learned_in_dynamics_plots,
+            include_param_estimates=include_param_estimates_in_dynamics_plots,
+            model_ids=model_ids,
+            save_to_file=save_to_file,
         )
-        
+
     def plotExpecValues(
-        self, 
-        model_ids=None, 
+        self,
+        model_ids=None,
         times=None,
-        champ=True, 
+        champ=True,
         max_time=1.8,
-        plus_probe=False, 
+        plus_probe=False,
         t_interval=0.3, save_to_file=None
     ):
-    
+
         if (
-            plus_probe == False 
-            and 
+            plus_probe == False
+            and
             self.UseExperimentalData == True
         ):
-            plus_probe=True
+            plus_probe = True
 
         PlotQMD.ExpectationValuesTrueSim(
-            qmd=self, 
-            model_ids=model_ids, 
-            champ=champ, 
-            times=times, 
+            qmd=self,
+            model_ids=model_ids,
+            champ=champ,
+            times=times,
             plus_probe=plus_probe,
             max_time=max_time, t_interval=t_interval,
-            upper_x_lim = max_time,
+            upper_x_lim=max_time,
             save_to_file=save_to_file
         )
 
-    def plotExpecValuesQHLTrueModel(self, 
-        max_time = 1.8,
-        t_interval= 0.1,
-        save_to_file=None,
-        debug_print=False,
-        plus_probe=False 
-    ):
+    def plotExpecValuesQHLTrueModel(self,
+                                    max_time=1.8,
+                                    t_interval=0.1,
+                                    save_to_file=None,
+                                    debug_print=False,
+                                    plus_probe=False
+                                    ):
         # TODO use this updated function instead of old one
-        
+
         true_mod_id = self.TrueOpModelID
         PlotQMD.ExpectationValuesTrueSim(
-            qmd=self, 
+            qmd=self,
             champ=False,
-            model_ids=[true_mod_id], 
+            model_ids=[true_mod_id],
             max_time=max_time, t_interval=t_interval,
-            upper_x_lim = max_time,
+            upper_x_lim=max_time,
             save_to_file=save_to_file
         )
         """
-        PlotQMD.ExpectationValuesQHL_TrueModel(qmd=self, 
+        PlotQMD.ExpectationValuesQHL_TrueModel(qmd=self,
             max_time = max_time,
             t_interval = t_interval,
             save_to_file = save_to_file,
@@ -3838,87 +3820,82 @@ class QMD():
         )
         """
 
-
-
-
-    def plotDistributionProgression(self, 
-        show_means = True,
-        model_id = None,
-        num_steps_to_show = 2,
-        renormalise = True,
-        true_model = True,
-        save_to_file = None
-    ):
+    def plotDistributionProgression(self,
+                                    show_means=True,
+                                    model_id=None,
+                                    num_steps_to_show=2,
+                                    renormalise=True,
+                                    true_model=True,
+                                    save_to_file=None
+                                    ):
         PlotQMD.plotDistributionProgression(
-            qmd=self, 
-            model_id = model_id,
-            show_means = show_means,
-            renormalise = renormalise,
-            num_steps_to_show = num_steps_to_show,
-            true_model = true_model,
-            save_to_file = save_to_file
-        )               
-            
-    def plotVolumeQHL(self, 
-        model_id = None, 
-        true_model = True, 
-        show_resamplings = True, 
-        save_to_file = None
-    ):
+            qmd=self,
+            model_id=model_id,
+            show_means=show_means,
+            renormalise=renormalise,
+            num_steps_to_show=num_steps_to_show,
+            true_model=true_model,
+            save_to_file=save_to_file
+        )
+
+    def plotVolumeQHL(self,
+                      model_id=None,
+                      true_model=True,
+                      show_resamplings=True,
+                      save_to_file=None
+                      ):
         PlotQMD.plotVolumeQHL(
             qmd=self,
-            model_id = model_id, 
-            true_model = true_model, 
-            show_resamplings = show_resamplings, 
-            save_to_file = save_to_file
+            model_id=model_id,
+            true_model=true_model,
+            show_resamplings=show_resamplings,
+            save_to_file=save_to_file
         )
 
     def plotTreeDiagram(
-        self, 
-        modlist=None, 
+        self,
+        modlist=None,
         only_adjacent_branches=True,
         save_to_file=None
     ):
         PlotQMD.plotQMDTree(
-            self, 
-            modlist=modlist, 
+            self,
+            modlist=modlist,
             only_adjacent_branches=only_adjacent_branches,
             save_to_file=save_to_file
         )
 
     def plotRadarDiagram(self, modlist=None, save_to_file=None):
-        plot_title=str("Radar Plot QMD "+ str(self.Q_id))
+        plot_title = str("Radar Plot QMD " + str(self.Q_id))
         if modlist is None:
             modlist = list(self.BranchChampions.values())
         PlotQMD.plotRadar(
-            self, 
-            modlist, 
+            self,
+            modlist,
             save_to_file=save_to_file,
             plot_title=plot_title
         )
 
-
     def plotRSquaredVsEpoch(
-        self, 
-        modlist=None, 
+        self,
+        modlist=None,
         save_to_file=None
     ):
         if modlist is None:
             modlist = []
             try:
                 modlist.append(self.ChampID)
-            except:
+            except BaseException:
                 pass
             try:
                 modlist.append(self.TrueOpModelID)
-            except:
+            except BaseException:
                 pass
 
-
         PlotQMD.r_squared_from_epoch_list(
-            qmd = self, 
-            model_ids = modlist, 
-            save_to_file = save_to_file
+            qmd=self,
+            model_ids=modlist,
+            save_to_file=save_to_file
         )
 
     def majorityVotingTally(self):
@@ -3934,29 +3911,27 @@ class QMD():
                     comparison = np.array(scores[j]) > 1
                     points = np.sum(comparison)
                     tally[mod.Name] += points
-        return tally    
-
+        return tally
 
     def inspectModel(self, name):
         print("\nmodel name: ", name)
         mod = self.getModelInstance(name)
-        
+
         print("experiments done ", mod.NumExperimentsToDate)
-        print("times: ",  mod.TrackTime)
+        print("times: ", mod.TrackTime)
         print("final params : ", mod.FinalParams)
         print("bayes factors: ", mod.BayesFactors)
-        
 
     def one_qubit_probes_bloch_sphere(self):
         print("In jupyter, include the following to view sphere: %matplotlib inline")
         # import qutip as qt
         bloch = qt.Bloch()
         for i in range(self.NumProbes):
-            state = self.ProbeDict[i,1]
+            state = self.ProbeDict[i, 1]
             a = state[0]
             b = state[1]
-            A=a*qt.basis(2,0)
-            B=b*qt.basis(2,1)
+            A = a * qt.basis(2, 0)
+            B = b * qt.basis(2, 1)
             vec = (A + B)
             print(vec)
             bloch.add_states(vec)
@@ -3968,15 +3943,15 @@ def num_pairs_in_list(num_models):
         return 0
 
     n = num_models
-    k = 2 # ie. nCk where k=2 since we want pairs
-    
-    try:    
-        a= math.factorial(n) / math.factorial(k)
-        b= math.factorial(n-k)
-    except:
-        print("Numbers too large to compute number pairs. n=",n,"\t k=",k)
-    
-    return a/b
+    k = 2  # ie. nCk where k=2 since we want pairs
+
+    try:
+        a = math.factorial(n) / math.factorial(k)
+        b = math.factorial(n - k)
+    except BaseException:
+        print("Numbers too large to compute number pairs. n=", n, "\t k=", k)
+
+    return a / b
 
 # def separable_probe_dict(max_num_qubits, num_probes):
 #     seperable_probes = {}
@@ -3985,15 +3960,15 @@ def num_pairs_in_list(num_models):
 #         for j in range(1, 1+max_num_qubits):
 #             if j==1:
 #                 seperable_probes[i,j] = seperable_probes[i,0]
-#             else: 
+#             else:
 #                 seperable_probes[i,j] = (np.tensordot(seperable_probes[i,j-1],
 #                     random_probe(1), axes=0).flatten(order='c')
 #                 )
-#             while (np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]), 
+#             while (np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]),
 #                 atol=1e-14) is  False
 #             ):
 #                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
-#                 # keep replacing until a unit-norm 
+#                 # keep replacing until a unit-norm
 #                 seperable_probes[i,j] = (
 #                     np.tensordot(seperable_probes[i,j-1], random_probe(1),
 #                     axes=0).flatten(order='c')

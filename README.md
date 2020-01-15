@@ -30,6 +30,12 @@ TODO: add package installations used
 ### Other
 * redis
 
+### Programming convention
+Note that Python files in this package follow Pep8. 
+Before commiting new files, ensure to run autopep8 on the file first. 
+```
+autopep8 --in-place --aggressive <filename>
+```
 
 ## Overview 
 QMLA is a Python package for learning the model describing data obtained by probing a quantum system. 

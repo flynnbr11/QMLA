@@ -1,18 +1,20 @@
+import ConnectedLattice
+import SuperClassGrowthRule
+import Heuristics
+import SystemTopology
+import ModelGeneration
+import ModelNames
+import ProbeGeneration
+import DataBase
 import numpy as np
 import itertools
-import sys, os
+import sys
+import os
 sys.path.append(os.path.abspath('..'))
-import DataBase
-import ProbeGeneration
-import ModelNames
-import ModelGeneration
-import SystemTopology
-import Heuristics
 
-import SuperClassGrowthRule
-import ConnectedLattice
 
-flatten = lambda l: [item for sublist in l for item in sublist]  # flatten list of lists
+# flatten list of lists
+def flatten(l): return [item for sublist in l for item in sublist]
 
 
 class fermi_hubbard(
@@ -20,17 +22,17 @@ class fermi_hubbard(
     # hopping_probabilistic
 ):
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         # self.true_operator = 'FHhop_1h2_up_d2'
-        self.true_operator = 'FHhop_1h2_down_d3+FHhop_1h2_up_d3+FHhop_1h3_down_d3+FHhop_2h3_up_d3+FHonsite_1_d3+FHonsite_2_d3+FHonsite_3_d3' # for testing  
+        self.true_operator = 'FHhop_1h2_down_d3+FHhop_1h2_up_d3+FHhop_1h3_down_d3+FHhop_2h3_up_d3+FHonsite_1_d3+FHonsite_2_d3+FHonsite_3_d3'  # for testing
         self.tree_completed_initially = True
         self.min_param = 0
         self.max_param = 1
@@ -38,40 +40,41 @@ class fermi_hubbard(
             self.true_operator
         ]
         self.probe_generation_function = ProbeGeneration.separable_fermi_hubbard_half_filled
-        self.simulator_probe_generation_function = self.probe_generation_function # unless specifically different set of probes required
-        self.shared_probes = True # i.e. system and simulator get same probes for learning
+        # unless specifically different set of probes required
+        self.simulator_probe_generation_function = self.probe_generation_function
+        self.shared_probes = True  # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = ProbeGeneration.fermi_hubbard_half_filled_superposition
         # self.plot_probe_generation_function = ProbeGeneration.fermi_hubbard_single_spin_n_sites
-
 
         self.max_time_to_consider = 20
         self.max_num_qubits = 6
         self.num_processes_to_parallelise_over = 9
         self.max_num_models_by_shape = {
-            1 : 0,
-            2 : 0,
-            4 : 10, 
-            'other' : 0
+            1: 0,
+            2: 0,
+            4: 10,
+            'other': 0
         }
 
     def latex_name(
         self,
-        name, 
+        name,
         **kwargs
-    ):  
-        # TODO gather terms in list, sort alphabetically and combine for latex str
+    ):
+        # TODO gather terms in list, sort alphabetically and combine for latex
+        # str
         basis_vectors = {
-            'vac' : np.array([1,0,0,0]),
-            'down' : np.array([0,1,0,0]),
-            'up' : np.array([0,0,1,0]),
-            'double' : np.array([0,0,0,1])
+            'vac': np.array([1, 0, 0, 0]),
+            'down': np.array([0, 1, 0, 0]),
+            'up': np.array([0, 0, 1, 0]),
+            'double': np.array([0, 0, 0, 1])
         }
 
         basis_latex = {
-            'vac' : 'V',
-            'up' : r'\uparrow',
-            'down' : r'\downarrow',
-            'double' : r'\updownarrow'
+            'vac': 'V',
+            'up': r'\uparrow',
+            'down': r'\downarrow',
+            'double': r'\updownarrow'
         }
 
         number_counting_terms = []
@@ -83,49 +86,47 @@ class fermi_hubbard(
             for c in constituents:
                 if c[0:2] == 'FH':
                     term_type = c[2:]
-                    continue # do nothing - just registers what type of matrix to construct
+                    continue  # do nothing - just registers what type of matrix to construct
                 elif c in list(basis_vectors.keys()):
                     spin_type = c
                 elif c[0] == 'd':
                     num_sites = int(c[1:])
                 else:
-                    sites = [str(s) for s in c.split('h')]        
-
+                    sites = [str(s) for s in c.split('h')]
 
             if term_type == 'onsite':
-                term_latex = "\hat{{N}}_{{{}}}".format(sites[0])
+                term_latex = r"\hat{{N}}_{{{}}}".format(sites[0])
                 number_counting_terms.append(term_latex)
             elif term_type == 'hop':
                 term_latex = '\hat{{H}}_{{{}}}^{{{}}}'.format(
                     ",".join(sites),  # subscript site indices
-                    basis_latex[spin_type] # superscript which spin type
+                    basis_latex[spin_type]  # superscript which spin type
                 )
                 hopping_terms.append(term_latex)
             elif term_type == 'chemical':
-                term_latex = "\hat{{C}}_{{{}}}".format(sites[0])
+                term_latex = r"\hat{{C}}_{{{}}}".format(sites[0])
                 chemical_terms.append(term_latex)
 
-        
         latex_str = ""
         for term_latex in (
-            sorted(hopping_terms) + sorted(number_counting_terms) + sorted(chemical_terms)
+            sorted(hopping_terms) + sorted(number_counting_terms) +
+            sorted(chemical_terms)
         ):
             latex_str += term_latex
         latex_str = "${}$".format(latex_str)
         return latex_str
 
 
-
 class fermi_hubbard_probabilistic(
     fermi_hubbard
 ):
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         self.max_num_sites = 4
@@ -146,21 +147,22 @@ class fermi_hubbard_probabilistic(
             # 'FHhop_1h2_up_d2' : 1,
         }
         self.max_num_models_by_shape = {
-            'other' : 4
+            'other': 4
         }
 
         self.setup_growth_class()
 
     def check_model_validity(
-        self, 
-        model, 
+        self,
+        model,
         **kwargs
     ):
-        # possibility that some models not valid; not needed by default but checked for general case
+        # possibility that some models not valid; not needed by default but
+        # checked for general case
         terms = DataBase.get_constituent_names_from_name(model)
 
         if np.all(['FHhop' in a for a in terms]):
-            return  True
+            return True
         elif np.all(['FHonsite' in a for a in terms]):
             # onsite present in all terms: discard
             # self.log_print(
@@ -200,7 +202,7 @@ class fermi_hubbard_probabilistic(
                 # so number term will be constant
                 self.log_print(
                     [
-                        "Rejecting model", model, 
+                        "Rejecting model", model,
                         "bc number terms present"
                         "which aren't present in kinetic term"
                     ]
@@ -210,54 +212,55 @@ class fermi_hubbard_probabilistic(
     def match_dimension(
         self,
         mod_name,
-        num_sites, 
+        num_sites,
         **kwargs
     ):
         dimension_matched_name = match_dimension_hubbard(
-            mod_name, 
+            mod_name,
             num_sites,
-        )    
+        )
         return dimension_matched_name
 
     def generate_terms_from_new_site(
-        self, 
-        **kwargs 
+        self,
+        **kwargs
     ):
-        
+
         return generate_new_terms_hubbard(**kwargs)
 
     def combine_terms(
-        self, 
-        terms, 
+        self,
+        terms,
     ):
         addition_string = '+'
         terms = sorted(terms)
         return addition_string.join(terms)
 
+
 class fermi_hubbard_predetermined(
     fermi_hubbard_probabilistic
 ):
     def __init__(
-        self, 
-        growth_generation_rule, 
+        self,
+        growth_generation_rule,
         **kwargs
     ):
         super().__init__(
-            growth_generation_rule = growth_generation_rule,
+            growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        # self.true_operator = 'FHhop_1h2_up_d2' 
+        # self.true_operator = 'FHhop_1h2_up_d2'
         self.tree_completed_initially = True
         self.max_time_to_consider = 5
         self.num_processes_to_parallelise_over = 9
         self.max_num_models_by_shape = {
             # Note dN here requires 2N qubits so d3 counts as shape 6
-            1 : 0,
-            2 : 0,
-            4 : 3, 
-            6 : 4,
-            8 : 1,
-            'other' : 0
+            1: 0,
+            2: 0,
+            4: 3,
+            6: 4,
+            8: 1,
+            'other': 0
         }
         self.max_num_qubits = 8
         self.initial_models = [
@@ -274,24 +277,22 @@ class fermi_hubbard_predetermined(
         if self.true_operator not in self.initial_models:
             self.log_print(
                 [
-                "True model not present in initial models for predetermined set; adding it."
+                    "True model not present in initial models for predetermined set; adding it."
                 ]
             )
             self.initial_models.append(self.true_operator)
         self.log_print(
             [
-            "Predetermined models:", self.initial_models
+                "Predetermined models:", self.initial_models
             ]
         )
 
-    
 
-
-def generate_new_terms_hubbard( 
+def generate_new_terms_hubbard(
     connected_sites,
     num_sites,
-    new_sites, 
-    **kwargs     
+    new_sites,
+    **kwargs
 ):
     new_terms = []
     for pair in connected_sites:
@@ -299,7 +300,7 @@ def generate_new_terms_hubbard(
         j = pair[1]
         for spin in ['up', 'down']:
             hopping_term = "FHhop_{}h{}_{}_d{}".format(
-                i, j, spin, num_sites 
+                i, j, spin, num_sites
             )
             new_terms.append(hopping_term)
 
@@ -307,13 +308,14 @@ def generate_new_terms_hubbard(
         onsite_term = "FHonsite_{}_d{}".format(
             site, num_sites
         )
-        
+
         new_terms.append(onsite_term)
-        
+
     return new_terms
 
+
 def match_dimension_hubbard(
-    model_name, 
+    model_name,
     num_sites,
     **kwargs
 ):
@@ -330,5 +332,3 @@ def match_dimension_hubbard(
         redimensionalised_terms.append(new_term)
     new_model_name = "+".join(redimensionalised_terms)
     return new_model_name
-    
-
