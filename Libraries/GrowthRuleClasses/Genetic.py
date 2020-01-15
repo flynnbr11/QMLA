@@ -31,9 +31,9 @@ class genetic_algorithm(
             **kwargs
         )
 
-        self.num_sites = 3
+        self.num_sites = 4
         self.base_terms = [
-            'x', 'y', 'z'
+             'x', 'y', #'z'
         ]
         self.mutation_probability = 0.1
 
@@ -43,8 +43,9 @@ class genetic_algorithm(
             mutation_probability = self.mutation_probability
         )
 
-        # self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4'
-        self.true_operator = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
+        # self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
+        # self.true_operator = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
+        self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J4_xJx_d4+pauliSet_2J4_xJx_d4'
         self.true_operator = DataBase.alph(self.true_operator)
         self.true_chromosome = self.genetic_algorithm.map_model_to_chromosome(
             self.true_operator
@@ -54,7 +55,7 @@ class genetic_algorithm(
         )
         # self.true_operator = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        self.initial_num_models = 6
+        self.initial_num_models = 10
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models = self.initial_num_models
         )
@@ -73,7 +74,7 @@ class genetic_algorithm(
         }
         self.fitness_at_step = {}
 
-        self.max_spawn_depth = 25
+        self.max_spawn_depth = 100
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
             4 : self.initial_num_models * self.max_spawn_depth, 
@@ -92,6 +93,11 @@ class genetic_algorithm(
         **kwargs
     ):
         # print("[Genetic] Calling generate_models")
+        self.log_print(
+            [
+                "Spawn step:", kwargs['spawn_step']
+            ]
+        )
         model_points = kwargs['branch_model_points']
         # print("Model points:", model_points)
         # print("kwargs: ", kwargs)
@@ -104,7 +110,7 @@ class genetic_algorithm(
         # print("Model fitnesses:", model_fitnesses)
         new_models = self.genetic_algorithm.genetic_algorithm_step(
             model_fitnesses = model_fitnesses,
-            num_pairs_to_sample = self.initial_num_models
+            num_pairs_to_sample = self.initial_num_models/2
         )
 
         hamming_distances = [

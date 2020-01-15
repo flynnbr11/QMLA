@@ -109,9 +109,9 @@ class GeneticAlgorithmQMLA():
             except:
                 print(
                     "[GA - map model to chromosome] \
-                    Cannot remove pauliSet from components:", 
+                    \nCannot remove pauliSet from components:", 
                     components,
-                    "\n Model:", model
+                    "\nModel:", model
                 )
                 raise
             core_operators = list(sorted(DataBase.core_operator_dict.keys()))
@@ -187,13 +187,14 @@ class GeneticAlgorithmQMLA():
         chromosome_fitness = {}
         chromosomes = {}
         weights = []
+        print("[GA - selection] Getting weights of input models.")
         for model in models:
             print("[GeneticAlgorithm - selection] mapping {} to chromosome".format(model))
             chrom = self.map_model_to_chromosome(model)
             chromosomes[model] = chrom
             weights.append(model_fitnesses[model])
         weights /= np.sum(weights) # normalise so weights are probabilities
-        
+        print("Models: {} \nWeights: {}".format(models, weights))
         new_chromosome_pairs = []
         combinations = []
 
@@ -223,7 +224,7 @@ class GeneticAlgorithmQMLA():
                         num_pairs_to_sample
                     )
                 )
-
+        print("[GA - selection] returning {}".format(new_chromosome_pairs))
         return new_chromosome_pairs
     
     def crossover(
@@ -251,7 +252,15 @@ class GeneticAlgorithmQMLA():
     ):
         copy_chromosomes = copy.copy(chromosomes)
         for c in copy_chromosomes:
-            if np.random.rand() < self.mutation_probability:
+            if np.all(c == 0):
+                print(
+                    "Input chomosome {} has no interactions -- forcing mutation".format(c)
+                )
+                mutation_probability = 1.0
+            else:
+                mutation_probability = self.mutation_probability
+
+            if np.random.rand() < mutation_probability:
                 idx = np.random.choice(range(len(c)))
                 # print("Flipping idx {}".format(idx))
                 if c[idx] == 0 :

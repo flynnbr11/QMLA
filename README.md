@@ -34,13 +34,15 @@ TODO: add package installations used
 ## Overview 
 QMLA is a Python package for learning the model describing data obtained by probing a quantum system. 
 
-QMLA is designed to run locally or else on a cluster operating SunGridEngine. In both cases, shared memory is achieved using a redis-server. 
-Before running a QMLA instance, start the redis-server from the top directory of this package:
+QMLA is designed to run locally or else on a cluster operating PBS. 
+In both cases, shared memory is achieved using a redis-server. 
+To run locally, initialise the redis-server in a terminal:
 ```
 redis-server
 ```
 
-In a separate terminal, go to QMD/ExperimentalSimulations, the file launch_qmd.sh contains the top-level controls of interest. 
+In a separate terminal window, go to QMD/Launch, which contains scripts local_launch.sh and parallel_launch.sh. 
+These implement QMLa locally or on a cluster respectively; they contain the top-level controls of interest:
 
 * Binary settings - top level
 ** num_tests: how many independent QMLA instances to run
@@ -58,13 +60,17 @@ In a separate terminal, go to QMD/ExperimentalSimulations, the file launch_qmd.s
 ** rt: resampler t parameter
 
 
-The user need not change controls listed under QMD Settings as these do not materially impact how QMLA proceeds (they are used for consistency).
+The user need not change controls listed under QMD Settings as these do not materially impact how QMLA proceeds (they are used for consistency e.g. for creating paths to store results).
 
 
 ## Growth rules
 The main control the user must change for their purposes is which growth rule is used. 
+Growth rules are the mechanism by which the user can control how QMLA progresses: they specify the logic used to combine previously considered models, to produce unseen models to test against the system. 
+
+Within the launch script, the user can specify `exp_growth_rule` and `sim_growth_rule`. 
+
 If 
 * exp_data==1 => exp_growth_rule is assigned
 * exp_data==0 => sim_growth_rule is assigned (pure simulation) 
-* simulate_experimetn => exp_growth_rule is used, generating data according to the set true model
-s
+* simulate_experiment => exp_growth_rule is used, generating data according to the true model set within the growth rule. 
+

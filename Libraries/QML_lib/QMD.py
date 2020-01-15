@@ -2967,8 +2967,6 @@ class QMD():
         branch_ids_on_db = list(
             active_branches_learning_models.keys()
         )
-        # print("[QMD]before while loop, branches:", branch_ids_on_db)
-        # print("[QMD] self.NumModelsPerBranch:", self.NumModelsPerBranch)
         self.log_print(
             [
                 "Entering while loop of spawning/comparing."
@@ -3029,15 +3027,6 @@ class QMD():
                 bayes_calculated = active_branches_bayes.get(
                     branchID_bytes
                 )
-                # print(
-                #     "branch", branchID,
-                #     "\n\tbayes_calculated", bayes_calculated, 
-                #     "\n\tNumModelPairsPerBranch:",
-                #     self.NumModelPairsPerBranch[branchID],
-                #     "\n\tBranchComparisonsComplete", 
-                #     self.BranchComparisonsComplete[branchID],
-                # )
-
 
                 if (int(bayes_calculated) ==  
                         self.NumModelPairsPerBranch[branchID] 
