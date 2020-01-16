@@ -57,6 +57,7 @@ class growth_rule_super_class():
         self.max_num_qubits = 5
         self.max_num_probe_qubits = 5  # TODO remove dependency on this -- it is not needed
         self.max_time_to_consider = 15  # arbitrary time units
+        self.num_top_models_to_build_on = 1
         # If you want to do just Bayes facotr calculation on a deterministic
         # initial set you set tree_completed_initially to True
         self.tree_completed_initially = False

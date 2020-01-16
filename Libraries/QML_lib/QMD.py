@@ -57,7 +57,7 @@ def low_BF():
     return 100
 
 
-class QuantumModelLearningAgent():
+class QMD():
     """
     - This class manages quantum model development.
     - This is done by controlling a pandas database,

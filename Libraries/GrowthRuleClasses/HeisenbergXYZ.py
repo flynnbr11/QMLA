@@ -28,9 +28,6 @@ class heisenberg_xyz_probabilistic(
             **kwargs
         )
 
-        self.min_param = 0
-        self.max_param = 10
-
         self.lattice_dimension = 1
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
@@ -55,12 +52,14 @@ class heisenberg_xyz_probabilistic(
             'y',
             'z'
         ]
-        self.max_time_to_consider = 5
+        self.max_time_to_consider = 20
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # 'all' # at each generation Badassness parameter
         self.num_top_models_to_build_on = 3
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
+        self.min_param = 0
+        self.max_param = 1
 
         self.generation_DAG = 1
 
@@ -74,6 +73,8 @@ class heisenberg_xyz_probabilistic(
             4: 15,
             'other': 0
         }
+
+
         self.setup_growth_class()
 
 
@@ -103,11 +104,21 @@ class heisenberg_xyz_predetermined(
             6: 2,
             'other': 0
         }
-        self.max_num_qubits = 6
-        self.max_num_sites = 6
+        self.max_num_qubits = 3
+        self.max_num_sites = 3
         self.setup_growth_class()
         self.min_param = 0
         self.max_param = 1
+
+        self.true_params = {
+            'pauliSet_1J2_xJx_d3': 4.0969217897733703, 
+            'pauliSet_1J2_zJz_d3': 9.7007310340158401, 
+            'pauliSet_2J3_xJx_d3':  6.7344876799395417, 
+            'pauliSet_2J3_yJy_d3': 1.9672493478694473
+        }
+        self.initial_models = [
+
+        ]
 
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
