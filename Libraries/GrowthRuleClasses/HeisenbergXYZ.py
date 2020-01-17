@@ -110,15 +110,12 @@ class heisenberg_xyz_predetermined(
         self.min_param = 0
         self.max_param = 1
 
-        self.true_params = {
-            'pauliSet_1J2_xJx_d3': 4.0969217897733703, 
-            'pauliSet_1J2_zJz_d3': 9.7007310340158401, 
-            'pauliSet_2J3_xJx_d3':  6.7344876799395417, 
-            'pauliSet_2J3_yJy_d3': 1.9672493478694473
-        }
-        self.initial_models = [
-
-        ]
+        # self.true_params = {
+        #     'pauliSet_1J2_xJx_d3': 4.0969217897733703, 
+        #     'pauliSet_1J2_zJz_d3': 9.7007310340158401, 
+        #     'pauliSet_2J3_xJx_d3':  6.7344876799395417, 
+        #     'pauliSet_2J3_yJy_d3': 1.9672493478694473
+        # }
 
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
@@ -150,3 +147,14 @@ class heisenberg_xyz_predetermined(
             if self.true_operator not in self.initial_models:
                 self.log_print("Adding true operator to initial model list")
                 self.initial_models.append(self.true_operator)
+        
+        # Test set of models for 3-site chain -- overwrite above
+        self.initial_models = [
+            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_zJz_d3',
+            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_xJx_d3',
+            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3',
+            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_yJy_d3',
+            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_yJy_d3PPPpauliSet_2J3_zJz_d3',
+            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_yJy_d3',
+            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3',
+        ]
