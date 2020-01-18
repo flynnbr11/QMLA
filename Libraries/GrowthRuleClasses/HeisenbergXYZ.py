@@ -150,6 +150,7 @@ class heisenberg_xyz_predetermined(
         
         # Test set of models for 3-site chain -- overwrite above
         self.initial_models = [
+            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_yJy_d3',
             'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_zJz_d3',
             'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_xJx_d3',
             'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3',
