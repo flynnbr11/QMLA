@@ -60,7 +60,7 @@ class heisenberg_xyz_probabilistic(
         self.fitness_win_ratio_exponent = 1
         self.min_param = 0
         self.max_param = 1
-
+        self.check_champion_reducibility = False
         self.generation_DAG = 1
 
         self.tree_completed_initially = False
