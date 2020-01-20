@@ -43,7 +43,7 @@ class heisenberg_xyz_probabilistic(
         # self.true_operator_partially_connected ='pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_ZJZy_1J3_d4PPPPpauliSet_xJx_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_yJy_3J4_d4'
         self.true_operator_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_2J4_d4'
         self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_yJy_d3'
-        self.max_num_sites = 3
+        self.max_num_sites = 4
         self.true_operator = self.three_site_chain_xxz
         self.true_operator = DataBase.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
@@ -55,12 +55,12 @@ class heisenberg_xyz_probabilistic(
         self.max_time_to_consider = 20
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # 'all' # at each generation Badassness parameter
-        self.num_top_models_to_build_on = 3
-        self.model_generation_strictness = 0  # 1 #-1
+        self.num_top_models_to_build_on =  2
+        self.model_generation_strictness = -1 # 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
         self.min_param = 0
         self.max_param = 1
-        self.check_champion_reducibility = False
+        self.check_champion_reducibility = True
         self.generation_DAG = 1
 
         self.tree_completed_initially = False

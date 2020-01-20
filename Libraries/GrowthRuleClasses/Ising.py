@@ -45,8 +45,8 @@ class ising_chain_probabilistic(
         ]
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # at each generation Badassness parameter
-        self.num_top_models_to_build_on = 1
-        self.model_generation_strictness = 0  # 1 #-1
+        self.num_top_models_to_build_on = 'all'
+        self.model_generation_strictness = -1 #0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
         self.max_time_to_consider = 5
 
