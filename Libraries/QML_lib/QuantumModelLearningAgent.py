@@ -2194,7 +2194,7 @@ class QuantumModelLearningAgent():
             ):
                 still_learning = False  # i.e. break out of this while loop
 
-        self.log_print("Final tree comparisons complete.")
+        self.log_print(["Final tree comparisons complete."])
 
         # Finally, compare all remaining active models,
         # which should just mean the tree champions at this point.

@@ -145,7 +145,7 @@ true_growth_class = GrowthRules.get_growth_generator_class(
     log_file=log_file
 )
 dataset = true_growth_class.experimental_dataset
-measurement_type = true_growth_class.measurement_type
+# measurement_type = true_growth_class.measurement_type
 latex_mapping_file = arguments.latex_mapping_file
 plot_probe_file = arguments.plot_probe_file
 force_plus_probe = bool(arguments.force_plus_probe)
@@ -546,7 +546,7 @@ if further_qhl_mode == False:
                 plot_probe_path=plot_probe_file,
                 true_params_path=true_params_path,
                 growth_generator=growth_generator,
-                measurement_type=measurement_type,
+                # measurement_type=measurement_type,
                 save_param_values_to_file=str(
                     plot_desc + 'clusters_by_param.png'),
                 save_param_clusters_to_file=str(

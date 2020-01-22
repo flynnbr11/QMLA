@@ -43,6 +43,7 @@ class growth_rule_super_class():
         self.prior_distribution_generator = Distributions.gaussian_prior
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
+        self.model_branches = {} 
 
         # Parameters specific to the growth rule
         self.true_operator = 'xTi'
@@ -55,23 +56,24 @@ class growth_rule_super_class():
         # max_spawn_depth is the maximum number of spawns/branches in a run
         self.max_spawn_depth = 10
         self.max_num_qubits = 5
-        self.max_num_probe_qubits = 5  # TODO remove dependency on this -- it is not needed
+        # self.max_num_probe_qubits = 5  # TODO remove dependency on this -- it is not needed
         self.max_time_to_consider = 15  # arbitrary time units
         self.num_top_models_to_build_on = 1
         # If you want to do just Bayes facotr calculation on a deterministic
         # initial set you set tree_completed_initially to True
         self.tree_completed_initially = False
         self.check_champion_reducibility = False
-        self.experimental_dataset = 'NVB_rescale_dataset.p'
-        self.measurement_type = 'full_access'  # deprecated
-        # if you have a transverse axis and you want to generate on that axis
-        # than set it to True
-        self.fixed_axis_generator = False
-        self.fixed_axis = 'z'  # e.g. transverse axis
-        self.num_processes_to_parallelise_over = 6
         self.learned_param_limit_for_negligibility = 0.05
         self.reduce_champ_bayes_factor_threshold = 1e2
-        self.model_branches = {}
+
+        self.experimental_dataset = 'NVB_rescale_dataset.p'
+        # self.measurement_type = 'full_access'  # deprecated
+        # if you have a transverse axis and you want to generate on that axis
+        # than set it to True
+        # self.fixed_axis_generator = False
+        # self.fixed_axis = 'z'  # e.g. transverse axis
+        self.num_processes_to_parallelise_over = 6
+        
 
         self.max_num_models_by_shape = {
             1: 0,
@@ -210,49 +212,50 @@ class growth_rule_super_class():
                 **kwargs
             )
 
-    def probe_generator(
-        # system probes
-        self,
-        **kwargs
-    ):
-        self.system_probes = self.probe_generation_function(
-            max_num_qubits=self.max_num_probe_qubits,
-            num_probes=self.num_probes,
-            **kwargs
-        )
-        if self.shared_probes == True:
-            self.simulator_probes = self.system_probes
-        else:
-            self.simulator_probes = self.simulator_probe_generation_function(
-                max_num_qubits=self.max_num_probe_qubits,
-                num_probes=self.num_probes,
-                **kwargs
-            )
-        return self.system_probes
+    # Deprecated??
+    # def probe_generator(
+    #     # system probes
+    #     self,
+    #     **kwargs
+    # ):
+    #     self.system_probes = self.probe_generation_function(
+    #         max_num_qubits=self.max_num_probe_qubits,
+    #         num_probes=self.num_probes,
+    #         **kwargs
+    #     )
+    #     if self.shared_probes == True:
+    #         self.simulator_probes = self.system_probes
+    #     else:
+    #         self.simulator_probes = self.simulator_probe_generation_function(
+    #             max_num_qubits=self.max_num_probe_qubits,
+    #             num_probes=self.num_probes,
+    #             **kwargs
+    #         )
+    #     return self.system_probes
 
-    def simulator_probe_generator(
-        # system probes
-        self,
-        shared_probes=None,
-        **kwargs
-    ):
-        self.log_print(
-            [
-                "Simulator Generate Probes called"
-            ]
-        )
-        if shared_probes is None:
-            shared_probes = self.shared_probes
+    # def simulator_probe_generator(
+    #     # system probes
+    #     self,
+    #     shared_probes=None,
+    #     **kwargs
+    # ):
+    #     self.log_print(
+    #         [
+    #             "Simulator Generate Probes called"
+    #         ]
+    #     )
+    #     if shared_probes is None:
+    #         shared_probes = self.shared_probes
 
-        if shared_probes == True:
-            self.simulator_probes = self.system_probes
-        else:
-            self.simulator_probes = self.simulator_probe_generation_function(
-                max_num_qubits=self.max_num_probe_qubits,
-                num_probes=self.num_probes,
-                **kwargs
-            )
-        return self.simulator_probes
+    #     if shared_probes == True:
+    #         self.simulator_probes = self.system_probes
+    #     else:
+    #         self.simulator_probes = self.simulator_probe_generation_function(
+    #             max_num_qubits=self.max_num_probe_qubits,
+    #             num_probes=self.num_probes,
+    #             **kwargs
+    #         )
+    #     return self.simulator_probes
 
     def plot_probe_generator(
         self,

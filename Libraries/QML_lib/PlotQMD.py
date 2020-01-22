@@ -3681,7 +3681,7 @@ def replot_expectation_values(
     true_expec_vals_path,
     plot_probe_path,
     growth_generator,
-    measurement_method='full_access',
+    # measurement_method='full_access',
     upper_x_limit=None,
     model_descriptions=None,
     save_to_file=None
@@ -3824,7 +3824,7 @@ def cluster_results_and_plot(
     plot_probe_path,
     true_params_path,
     growth_generator,
-    measurement_type,
+    # measurement_type,
     upper_x_limit=None,
     save_param_clusters_to_file=None,
     save_param_values_to_file=None,
@@ -4091,7 +4091,7 @@ def cluster_results_and_plot(
         true_expec_vals_path=true_expec_path,
         plot_probe_path=plot_probe_path,
         growth_generator=growth_generator,
-        measurement_method=measurement_type,
+        # measurement_method=measurement_type,
         upper_x_limit=upper_x_limit,  # can play with this
         save_to_file=save_redrawn_expectation_values
     )

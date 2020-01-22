@@ -272,7 +272,7 @@ class connected_lattice(
                     [
                         "No remaining available terms. Completing generation",
                         self.generation_DAG,
-                        "\nModels:", new_models
+                        "\nSub generation champion models:", new_models
                     ]
                 )
                 if self.generation_DAG == self.max_num_generations:
@@ -451,53 +451,53 @@ class connected_lattice(
             ]
         )
 
-    def model_fitness_calculation(
-        self,
-        model_id,
-        # fitness_parameters, # of this model_id
-        model_points,
-        **kwargs
-    ):
-        # TODO make fitness parameters within QMD
-        # pass
-        # print("model fitness function. fitness params:", fitness_parameters)
-        # print("[prob spin] model fitness. model points:", model_points)
-        ranked_model_list = sorted(
-            model_points,
-            key=model_points.get,
-            reverse=True
-        )
+    # def model_fitness_calculation(
+    #     self,
+    #     model_id,
+    #     # fitness_parameters, # of this model_id
+    #     model_points,
+    #     **kwargs
+    # ):
+    #     # TODO make fitness parameters within QMD
+    #     # pass
+    #     # print("model fitness function. fitness params:", fitness_parameters)
+    #     # print("[prob spin] model fitness. model points:", model_points)
+    #     ranked_model_list = sorted(
+    #         model_points,
+    #         key=model_points.get,
+    #         reverse=True
+    #     )
 
-        try:
-            max_wins_model_points = max(model_points.values())
-            win_ratio = model_points[model_id] / max_wins_model_points
-        except BaseException:
-            win_ratio = 1
+    #     try:
+    #         max_wins_model_points = max(model_points.values())
+    #         win_ratio = model_points[model_id] / max_wins_model_points
+    #     except BaseException:
+    #         win_ratio = 1
 
-        if self.model_generation_strictness == 0:
-            # keep all models and work out relative fitness
-            fitness = (
-                win_ratio
-                # win_ratio * fitness_parameters['r_squared']
-            )**self.fitness_win_ratio_exponent
-            # fitness = 1
-        elif self.model_generation_strictness == -1:
-            fitness = 1
-        else:
-            # only consider the best model
-            # turn off all others
-            if model_id == ranked_model_list[0]:
-                fitness = 1
-            else:
-                fitness = 0
-        # if model_id not in sorted(self.model_fitness.keys()):
-        #     self.model_fitness[model_id] = {}
-        # # print("Setting fitness for {} to {}".format(model_id, fitness))
-        # self.model_fitness[model_id][self.generation_DAG] = fitness
-        if model_id not in sorted(self.model_fitness.keys()):
-            self.model_fitness[model_id] = []
-        # print("Setting fitness for {} to {}".format(model_id, fitness))
-        self.model_fitness[model_id].append(fitness)
+    #     if self.model_generation_strictness == 0:
+    #         # keep all models and work out relative fitness
+    #         fitness = (
+    #             win_ratio
+    #             # win_ratio * fitness_parameters['r_squared']
+    #         )**self.fitness_win_ratio_exponent
+    #         # fitness = 1
+    #     elif self.model_generation_strictness == -1:
+    #         fitness = 1
+    #     else:
+    #         # only consider the best model
+    #         # turn off all others
+    #         if model_id == ranked_model_list[0]:
+    #             fitness = 1
+    #         else:
+    #             fitness = 0
+    #     # if model_id not in sorted(self.model_fitness.keys()):
+    #     #     self.model_fitness[model_id] = {}
+    #     # # print("Setting fitness for {} to {}".format(model_id, fitness))
+    #     # self.model_fitness[model_id][self.generation_DAG] = fitness
+    #     if model_id not in sorted(self.model_fitness.keys()):
+    #         self.model_fitness[model_id] = []
+    #     # print("Setting fitness for {} to {}".format(model_id, fitness))
+    #     self.model_fitness[model_id].append(fitness)
 
     def determine_whether_to_include_model(
         self,

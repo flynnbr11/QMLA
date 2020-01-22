@@ -18,7 +18,8 @@ class GeneticAlgorithmQMLA():
         self,
         num_sites,
         base_terms=['x', 'y', 'z'],
-        mutation_probability=0.1
+        mutation_probability=0.1,
+        log_file=None, 
     ):
         self.num_sites = num_sites
         self.base_terms = base_terms
@@ -27,6 +28,10 @@ class GeneticAlgorithmQMLA():
         self.addition_str = '+'
         self.mutation_probability = mutation_probability
         self.previously_considered_chromosomes = []
+        self.log_file = log_file
+        self.chromosomes_at_generation = {}
+        self.genetic_generation = 0
+
 
     def get_base_chromosome(self):
         """
@@ -149,6 +154,7 @@ class GeneticAlgorithmQMLA():
         num_models=5
     ):
         new_models = []
+        self.chromosomes_at_generation[0] = []
 
         while len(new_models) < num_models:
             r = random.randint(1, 2**self.num_terms)
@@ -161,6 +167,9 @@ class GeneticAlgorithmQMLA():
                 mod = self.map_chromosome_to_model(r)
 
                 self.previously_considered_chromosomes.append(
+                    self.chromosome_string(r)
+                )
+                self.chromosomes_at_generation[0].append(
                     self.chromosome_string(r)
                 )
 
@@ -183,11 +192,17 @@ class GeneticAlgorithmQMLA():
             list(model_fitnesses.values()))
         num_models = len(models)
 
-        print(
-            "Getting max possible combinations: {} choose {}".format(
-                num_nonzero_fitness_models, 2))
         max_possible_num_combinations = scipy.misc.comb(
             num_nonzero_fitness_models, 2)
+
+        self.log_print(
+            [
+                "[Selection] Getting max possible combinations: {} choose {} = {}".format(
+                num_nonzero_fitness_models, 2, max_possible_num_combinations
+                )
+            ]        
+        )
+
         num_pairs_to_sample = min(
             num_pairs_to_sample,
             max_possible_num_combinations
@@ -196,15 +211,26 @@ class GeneticAlgorithmQMLA():
         chromosome_fitness = {}
         chromosomes = {}
         weights = []
-        print("[GA - selection] Getting weights of input models.")
+        self.log_print(
+            [
+            "Getting weights of input models."
+            ]
+        )
         for model in models:
-            print(
-                "[GeneticAlgorithm - selection] mapping {} to chromosome".format(model))
+            self.log_print(
+                [
+                    "Mapping {} to chromosome".format(model) 
+                ]
+            )
             chrom = self.map_model_to_chromosome(model)
             chromosomes[model] = chrom
             weights.append(model_fitnesses[model])
         weights /= np.sum(weights)  # normalise so weights are probabilities
-        print("Models: {} \nWeights: {}".format(models, weights))
+        self.log_print(
+            [
+            "Models: {} \nWeights: {}".format(models, weights)
+            ]
+        )
         new_chromosome_pairs = []
         combinations = []
 
@@ -228,13 +254,24 @@ class GeneticAlgorithmQMLA():
             if combination not in combinations:
                 combinations.append(combination)
                 new_chromosome_pairs.append(selected_chromosomes)
-                print("Including selected models:", selected_models)
-                print("Now {} combinations of {}".format(
-                    len(new_chromosome_pairs),
-                    num_pairs_to_sample
+                self.log_print(
+                    [
+                    "Including selected models:", selected_models
+                    ]
                 )
+                self.log_print(
+                    [
+                    "Now {} combinations of {}".format(
+                        len(new_chromosome_pairs),
+                        num_pairs_to_sample
+                    )
+                    ]
                 )
-        print("[GA - selection] returning {}".format(new_chromosome_pairs))
+        self.log_print(
+            [
+            "[Selection] Returning {}".format(new_chromosome_pairs)
+            ]
+        )
         return new_chromosome_pairs
 
     def crossover(
@@ -290,10 +327,11 @@ class GeneticAlgorithmQMLA():
             model_fitnesses=model_fitnesses,
             num_pairs_to_sample=num_pairs_to_sample
         )
-
+        new_chromosomes_this_generation = []
         for chromosomes in chromosomes_selected:
             new_chromosomes = self.crossover(chromosomes)
             new_chromosomes = self.mutation(new_chromosomes)
+            new_chromosomes_this_generation.extend(new_chromosomes)
 
             new_models.extend(
                 [
@@ -301,11 +339,31 @@ class GeneticAlgorithmQMLA():
                     for c in new_chromosomes
                 ]
             )
-            self.previously_considered_chromosomes.extend(
-                [
-                    self.chromosome_string(c)
-                    for c in new_chromosomes
-                ]
-            )
 
+        self.previously_considered_chromosomes.extend([
+            self.chromosome_string(r) for r in new_chromosomes_this_generation
+            ]
+        )
+        self.genetic_generation += 1
+        self.chromosomes_at_generation[self.genetic_generation] = [
+            self.chromosome_string(r) for r in new_chromosomes_this_generation
+        ]
         return new_models
+
+    def log_print(
+        self,
+        to_print_list
+    ):
+        identifier = "[Genetic algorithm]"
+        if type(to_print_list) != list:
+            to_print_list = list(to_print_list)
+
+        print_strings = [str(s) for s in to_print_list]
+        to_print = " ".join(print_strings)
+        with open(self.log_file, 'a') as write_log_file:
+            print(
+                identifier,
+                str(to_print),
+                file=write_log_file,
+                flush=True
+            )

@@ -32,32 +32,37 @@ class genetic_algorithm(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-
-        self.num_sites = 4
+        # self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
+        # self.true_operator = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
+        # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
+        self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
+        self.true_operator = self.ising_full_connectivity
+        self.true_operator = DataBase.alph(self.true_operator)
+        self.num_sites = DataBase.get_num_qubits(self.true_operator)
+        
         self.base_terms = [
-            'x', 'y',  # 'z'
+            'z',
+            # 'x', 'y',  'z'
         ]
         self.mutation_probability = 0.1
 
         self.genetic_algorithm = GeneticAlgorithm.GeneticAlgorithmQMLA(
             num_sites=self.num_sites,
             base_terms=self.base_terms,
-            mutation_probability=self.mutation_probability
+            mutation_probability=self.mutation_probability,
+            log_file=self.log_file
         )
 
-        # self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
-        # self.true_operator = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
-        self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J4_xJx_d4+pauliSet_2J4_xJx_d4'
-        self.true_operator = DataBase.alph(self.true_operator)
         self.true_chromosome = self.genetic_algorithm.map_model_to_chromosome(
             self.true_operator
         )
         self.true_chromosome_string = self.genetic_algorithm.chromosome_string(
             self.true_chromosome
         )
+
         # self.true_operator = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        self.initial_num_models = 10
+        self.initial_num_models = 4
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -76,7 +81,7 @@ class genetic_algorithm(
         }
         self.fitness_at_step = {}
 
-        self.max_spawn_depth = 100
+        self.max_spawn_depth = 4
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
             4: self.initial_num_models * self.max_spawn_depth,
