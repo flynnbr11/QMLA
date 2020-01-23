@@ -6,7 +6,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=3
+num_tests=1
 qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
@@ -178,7 +178,7 @@ let bt="$exp"
 # Launch $num_tests instances of QMD 
 
 # First set up parameters/data to be used by all instances of QMD for this run. 
-python3 ../Libraries/QML_lib/SetQHLParams.py \
+python3 ../qmla/SetQHLParams.py \
     -true=$true_params_pickle_file \
     -prior=$prior_pickle_file \
     -probe=$plot_probe_file \
@@ -258,7 +258,7 @@ echo "
 # write to a script so we can recall analysis later.
 echo "
 cd $full_path_to_results
-python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
+python3 ../../../../qmla/AnalyseMultipleQMD.py \
     -dir=$full_path_to_results --bayes_csv=$bayes_csv \
     -log=$this_log \
     -top=$number_best_models_further_qhl \
@@ -270,7 +270,7 @@ python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
     -latex=$latex_mapping_file
 
 
-python3 ../../../../Libraries/QML_lib/CombineAnalysisPlots.py \
+python3 ../../../../qmla/CombineAnalysisPlots.py \
     -dir=$full_path_to_results \
     -p=$prt -e=$exp -bt=$bt -t=$num_tests \
     -log=$this_log \
@@ -357,7 +357,7 @@ then
     done
     echo "
     cd $full_path_to_results
-    python3 ../../../../Libraries/QML_lib/AnalyseMultipleQMD.py \
+    python3 ../../../../qmla/AnalyseMultipleQMD.py \
         -dir=$full_path_to_results \
         --bayes_csv=$bayes_csv \
         -log=$this_log \

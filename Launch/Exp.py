@@ -13,7 +13,7 @@ import pickle
 pickle.HIGHEST_PROTOCOL = 2
 
 # import ModelGeneration
-sys.path.append(os.path.join("..", "Libraries", "QML_lib"))
+sys.path.append(os.path.join("..", "qmla"))
 import DataBase
 # import ExpectationValues
 # import QML

@@ -57,8 +57,8 @@ ParallelDevelopment/Results/*
 
 
 # But want redis configuration:
-!Libraries/QML_lib/RedisConfig.conf
-!Libraries/QML_lib/RedisDatabaseConfig.conf
+!qmla/RedisConfig.conf
+!qmla/RedisDatabaseConfig.conf
 
 
 

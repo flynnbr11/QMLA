@@ -529,7 +529,7 @@
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/GlobalVariables.py",
+			"file": "qmla/GlobalVariables.py",
 			"settings":
 			{
 				"buffer_size": 20455,
@@ -537,7 +537,7 @@
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/Heuristics.py",
+			"file": "qmla/Heuristics.py",
 			"settings":
 			{
 				"buffer_size": 15774,
@@ -546,7 +546,7 @@
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/ExpectationValues.py",
+			"file": "qmla/ExpectationValues.py",
 			"settings":
 			{
 				"buffer_size": 29589,
@@ -564,7 +564,7 @@
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/QMD.py",
+			"file": "qmla/QMD.py",
 			"settings":
 			{
 				"buffer_size": 132858,
@@ -573,7 +573,7 @@
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/DataBase.py",
+			"file": "qmla/DataBase.py",
 			"settings":
 			{
 				"buffer_size": 35587,
@@ -581,7 +581,7 @@
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/CombineAnalysisPlots.py",
+			"file": "qmla/CombineAnalysisPlots.py",
 			"settings":
 			{
 				"buffer_size": 6317,
@@ -591,7 +591,7 @@
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/SetQHLParams.py",
+			"file": "qmla/SetQHLParams.py",
 			"settings":
 			{
 				"buffer_size": 14454,
@@ -599,7 +599,7 @@
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/QML.py",
+			"file": "qmla/QML.py",
 			"settings":
 			{
 				"buffer_size": 58489,
@@ -608,7 +608,7 @@
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
+			"file": "qmla/AnalyseMultipleQMD.py",
 			"settings":
 			{
 				"buffer_size": 58323,
@@ -617,7 +617,7 @@
 			}
 		},
 		{
-			"file": "Libraries/QML_lib/PlotQMD.py",
+			"file": "qmla/PlotQMD.py",
 			"settings":
 			{
 				"buffer_size": 122884,
@@ -672,39 +672,39 @@
 	],
 	"file_history":
 	[
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/SetQHLParams.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/UserFunctions.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QMD.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GlobalVariables.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Heuristics.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelGeneration.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/GenSimQMD_IQLE.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Distrib.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/AnalyseMultipleQMD.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/SetQHLParams.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/UserFunctions.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/QMD.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/GlobalVariables.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/Heuristics.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/ModelGeneration.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/GenSimQMD_IQLE.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/Distrib.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/AnalyseMultipleQMD.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/ExponentiationTimes/test_exponentiation_methods.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/PlotQMD.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/CalculateTimeRequired.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExpectationValues.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteBayesFactor.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/multiPGH.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/PlotQMD.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/CalculateTimeRequired.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/ExpectationValues.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/RemoteBayesFactor.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/multiPGH.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/Exp.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/qmd_pipeline.sh",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RemoteModelLearning.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/CallTimeCalculator.sh",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ModelNames.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/QML.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/DataBase.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ProbeGeneration.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Evo.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExperimentalDataFunctions.py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RedisSettings.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/RemoteModelLearning.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/CallTimeCalculator.sh",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/ModelNames.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/QML.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/DataBase.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/ProbeGeneration.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/Evo.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/ExperimentalDataFunctions.py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/RedisSettings.py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/another.sh",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/id_cycling.sh",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/test_ids.txt",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/DevelopmentNotebooks/test_ids_complete.txt",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/Evo (Sebastian Knauer's conflicted copy 2018-09-07).py",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/RedisDatabaseConfig.conf",
-		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/Libraries/QML_lib/ExperimentalDataFunctions (Brian Flynn's conflicted copy 2018-08-28).py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/Evo (Sebastian Knauer's conflicted copy 2018-09-07).py",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/RedisDatabaseConfig.conf",
+		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/qmla/ExperimentalDataFunctions (Brian Flynn's conflicted copy 2018-08-28).py",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/NV05_HahnPeaks_expdataset/04.csv",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/ExperimentalSimulations/NV05_HahnPeaks_expdataset/01.csv",
 		"/home/bf16951/Dropbox/QML_share_stateofart/QMD/README.md",
@@ -942,7 +942,7 @@
 				},
 				{
 					"buffer": 1,
-					"file": "Libraries/QML_lib/GlobalVariables.py",
+					"file": "qmla/GlobalVariables.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -972,7 +972,7 @@
 				},
 				{
 					"buffer": 2,
-					"file": "Libraries/QML_lib/Heuristics.py",
+					"file": "qmla/Heuristics.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -1002,7 +1002,7 @@
 				},
 				{
 					"buffer": 3,
-					"file": "Libraries/QML_lib/ExpectationValues.py",
+					"file": "qmla/ExpectationValues.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -1062,7 +1062,7 @@
 				},
 				{
 					"buffer": 5,
-					"file": "Libraries/QML_lib/QMD.py",
+					"file": "qmla/QMD.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -1092,7 +1092,7 @@
 				},
 				{
 					"buffer": 6,
-					"file": "Libraries/QML_lib/DataBase.py",
+					"file": "qmla/DataBase.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -1128,7 +1128,7 @@
 			[
 				{
 					"buffer": 7,
-					"file": "Libraries/QML_lib/CombineAnalysisPlots.py",
+					"file": "qmla/CombineAnalysisPlots.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -1159,7 +1159,7 @@
 				},
 				{
 					"buffer": 8,
-					"file": "Libraries/QML_lib/SetQHLParams.py",
+					"file": "qmla/SetQHLParams.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -1188,7 +1188,7 @@
 				},
 				{
 					"buffer": 9,
-					"file": "Libraries/QML_lib/QML.py",
+					"file": "qmla/QML.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -1218,7 +1218,7 @@
 				},
 				{
 					"buffer": 10,
-					"file": "Libraries/QML_lib/AnalyseMultipleQMD.py",
+					"file": "qmla/AnalyseMultipleQMD.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -1248,7 +1248,7 @@
 				},
 				{
 					"buffer": 11,
-					"file": "Libraries/QML_lib/PlotQMD.py",
+					"file": "qmla/PlotQMD.py",
 					"semi_transient": false,
 					"settings":
 					{

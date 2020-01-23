@@ -122,8 +122,8 @@ param_min=0
 param_max=10
 param_mean=0.5
 param_sigma=2
-random_true_params=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
-random_prior=0 # if not random, then as set in Libraries/QML_Lib/SetQHLParams.py
+random_true_params=0 # if not random, then as set in qmla/SetQHLParams.py
+random_prior=0 # if not random, then as set in qmla/SetQHLParams.py
 resource_reallocation=0 # whether to weight num particles given to model based on number parameters it has
 updater_from_prior=0 # 1->incorrect method of getting initial prior; 0->correct method copying entire updater
 store_particles_weights=0
@@ -256,7 +256,7 @@ then
 fi
 
 ### First set up parameters/data to be used by all instances of QMD for this run. 
-python3 ../Libraries/QML_lib/SetQHLParams.py \
+python3 ../qmla/SetQHLParams.py \
 	-true=$true_params_pickle_file \
 	-prior=$prior_pickle_file \
 	-probe=$plot_probe_file \
@@ -279,7 +279,7 @@ python3 ../Libraries/QML_lib/SetQHLParams.py \
 
 ### Call script to determine how much time is needed based on above params. Store in QMD_TIME, QHL_TIME, etc. 
 let temp_bayes_times="2*$e" # TODO fix time calculator
-python3 ../Libraries/QML_lib/CalculateTimeRequired.py \
+python3 ../qmla/CalculateTimeRequired.py \
 	-ggr=$growth_rule \
 	-use_agr=$multiple_growth_rules \
 	$growth_rules_command \
