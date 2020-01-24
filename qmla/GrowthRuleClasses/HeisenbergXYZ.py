@@ -4,6 +4,7 @@ import sys
 import os
 sys.path.append(os.path.abspath('..'))
 import ConnectedLattice
+import ConnectedLatticeRevivals
 import SuperClassGrowthRule
 import Heuristics
 import SystemTopology
@@ -14,7 +15,8 @@ import DataBase
 
 
 class heisenberg_xyz_probabilistic(
-    ConnectedLattice.connected_lattice
+    # ConnectedLattice.connected_lattice
+    ConnectedLatticeRevivals.connected_lattice_revivals
 ):
 
     def __init__(
@@ -55,7 +57,7 @@ class heisenberg_xyz_probabilistic(
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # 'all' # at each generation Badassness parameter
         self.num_top_models_to_build_on =  'all'
-        self.model_generation_strictness = -1 # 0  # 1 #-1
+        self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
         self.min_param = 0
         self.max_param = 1

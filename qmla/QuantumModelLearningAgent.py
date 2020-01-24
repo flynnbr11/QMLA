@@ -1766,15 +1766,16 @@ class QuantumModelLearningAgent():
                         ]
                     )
                 try:
-                    self.ActiveBranchChampList.remove(
-                        losing_model_id
-                    )
+                    # self.ActiveBranchChampList.remove(
+                    #     losing_model_id
+                    # )
                     self.log_print(
                         [
-                            "Ghost Branch",
+                            "[Currently switched off] \
+                                Ghost Branch {} deactivating model {}".format(
                             branchID,
-                            "deactivating model",
                             losing_model_id
+                            )
                         ]
                     )
                 except BaseException:
