@@ -27,7 +27,7 @@ class connected_lattice_revivals(
             **kwargs
         )
         self.weighted_fitnesses = {}
-        self.fitness_minimum = 0.1 # TODO this is overwritten by default set in parent class -- add to setup?
+        # self.fitness_minimum = 0.1 # TODO this is overwritten by default set in parent class -- add to setup?
         self.fitness_maximum = 1
 
     def generate_models(
@@ -138,7 +138,7 @@ class connected_lattice_revivals(
                 weighted_f = self.rescale_fitness(
                     weighted_f,
                     original_min = self.fitness_minimum, 
-                    rescaled_min = self.finess_minimum
+                    rescaled_min = self.fitness_minimum
                 )
                 if mod not in list(weighted_fitnesses.keys()):
                     weighted_fitnesses[mod] = weighted_f

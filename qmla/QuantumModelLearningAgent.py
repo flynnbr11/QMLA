@@ -1215,7 +1215,7 @@ class QuantumModelLearningAgent():
                 bf_data_folder=self.BayesFactorsFolder,
                 num_times_to_use=self.NumTimesForBayesUpdates,
                 trueModel=self.TrueOpName,
-                bayes_threshold=bayes_threshold,
+                bayes_threshold=self.BayesLower,
                 host_name=self.HostName,
                 port_number=self.PortNumber,
                 qid=self.Q_id,
@@ -3610,9 +3610,10 @@ class QuantumModelLearningAgent():
                 mod = self.getModelInstanceFromID(j)
                 mod.resetPrior()
                 mod.UpdateModel(n_experiments=num_exp)
-            self.compareModelList(model_list=model_id_list, bayes_threshold=self.BayesLower,
-                                  num_times_to_use=num_exp
-                                  )
+            self.compareModelList(model_list=model_id_list, 
+                bayes_threshold=self.BayesLower,
+                num_times_to_use=num_exp
+            )
         self.MajorityVotingScores = self.majorityVotingTally()
 
     def plotQuadraticLoss(

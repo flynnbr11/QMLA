@@ -51,7 +51,7 @@ class connected_lattice(
         self.num_top_models_to_build_on = 2
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 3
-        self.finess_minimum = 0.1
+        self.fitness_minimum = 0.25
         self.generation_DAG = 1
         self.max_num_sites = 4
         self.tree_completed_initially = False
@@ -441,7 +441,7 @@ class connected_lattice(
                 )**self.fitness_win_ratio_exponent
                 fitness = self.rescale_fitness(
                     fitness,
-                    rescaled_min = self.finess_minimum
+                    rescaled_min = self.fitness_minimum
                 )
                 # fitness = 1
             elif self.model_generation_strictness == -1:
