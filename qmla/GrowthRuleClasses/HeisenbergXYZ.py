@@ -69,9 +69,9 @@ class heisenberg_xyz_probabilistic(
         self.max_num_models_by_shape = {
             # Note dN here requires 2N qubits so d3 counts as shape 6
             1: 0,
-            2: 15,
-            3: 15,
-            4: 15,
+            2: 30,
+            3: 30,
+            4: 30,
             'other': 0
         }
 
