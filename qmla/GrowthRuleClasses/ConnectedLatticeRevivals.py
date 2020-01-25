@@ -27,7 +27,7 @@ class connected_lattice_revivals(
             **kwargs
         )
         self.weighted_fitnesses = {}
-        self.fitness_minimum = 0.99 # TODO this is overwritten by default set in parent class -- add to setup?
+        self.fitness_minimum = 0.1 # TODO this is overwritten by default set in parent class -- add to setup?
         self.fitness_maximum = 1
 
     def generate_models(
