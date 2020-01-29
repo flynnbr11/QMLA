@@ -7,7 +7,7 @@ import warnings
 from psutil import virtual_memory
 
 import qmla.Evo as Evo
-import ExperimentalDataFunctions as expdt
+import qmla.ExperimentalDataFunctions as expdt
 import qmla.GrowthRules as GrowthRules
 from qmla.MemoryTest import print_loc, print_file_line
 import qmla.ProbeGeneration as ProbeGeneration

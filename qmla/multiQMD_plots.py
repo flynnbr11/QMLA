@@ -1,8 +1,3 @@
-
-import GrowthRules
-import ModelNames
-import PlotQMD as ptq
-import DataBase
 import numpy as np
 import argparse
 from matplotlib.lines import Line2D
@@ -11,11 +6,12 @@ import os
 import pickle
 import matplotlib.pyplot as plt
 import pandas
+
+import qmla.GrowthRules as GrowthRules
+import qmla.ModelNames as ModelNames
+import qmla.PlotQMD as ptq
+import qmla.DataBase as DataBase
 plt.switch_backend('agg')
-
-
-# import UserFunctions
-
 
 def parameter_sweep_analysis(
     directory_name,

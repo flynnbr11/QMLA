@@ -665,7 +665,7 @@ def compute(inp):
 
 
 def process_basic_operator(basic_operator):
-    import ModelGeneration
+    from qmla import ModelGeneration
 
     if basic_operator[0:1] == 'h_':
         # import ModelGeneration

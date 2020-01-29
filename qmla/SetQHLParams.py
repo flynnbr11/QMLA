@@ -8,20 +8,13 @@ import matplotlib.pyplot as plt
 import qmla.DataBase as DataBase
 import qmla.Distributions as Distributions
 import qmla.GrowthRules as GrowthRules
-import qmla.ProbeGeneration as ProbeGeneration
+# import .ProbeGeneration as ProbeGeneration
 
 pickle.HIGHEST_PROTOCOL = 2
-global test_growth_class_implementation
-test_growth_class_implementation = True
 
-
-def MIN_PARAM():
-    return -100
-
-
-def MAX_PARAM():
-    return -50
-
+__all__ = [
+    'create_qhl_params'
+]
 
 def create_qhl_params(
     true_op,
@@ -31,18 +24,13 @@ def create_qhl_params(
     growth_generator=None,
     unique_growth_classes=None,
     all_growth_classes=None,
-    rand_min=None,
-    rand_max=None,
+    rand_min=-100,
+    rand_max=-50,
     exp_data=0,
     growth_class=None,
     plus_probe_for_plot=False,
     true_prior_plot_file=None,
 ):
-    if rand_min is None:
-        rand_min = MIN_PARAM()
-    if rand_max is None:
-        rand_max = MAX_PARAM()
-
     terms = DataBase.get_constituent_names_from_name(
         true_op
     )
@@ -346,17 +334,6 @@ if arguments.true_params_file is not None:
     )
 
 
-"""
-if (
-    force_plus_probe == True
-    or
-    exp_data == True
-):
-    force_plus = True
-else:
-    force_plus = False
-
-"""
 ###
 # Now generate a probe dict to be used by all instances
 # of QMD within this run, when plotting results.

@@ -8,7 +8,7 @@ import sys as sys
 import os as os
 
 from qmla.MemoryTest import print_loc
-import qmla.ExpectationValues as ExpectationValues
+# import qmla.ExpectationValues as ExpectationValues
 # sys.path.append((os.path.join("..")))
 
 global_print_loc = False

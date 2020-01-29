@@ -13,17 +13,17 @@ import pickle
 pickle.HIGHEST_PROTOCOL = 2
 
 # import ModelGeneration
-sys.path.append(os.path.join("..", "qmla"))
-import DataBase
+# sys.path.append(os.path.join("..", "qmla"))
 # import ExpectationValues
 # import QML
-from quantum_model_learning_agent import QuantumModelLearningAgent  # QMD class in Library
-import RedisSettings as rds
-import GlobalVariables
-
+sys.path.append("..")
+import qmla
+from qmla import DataBase
+from qmla.quantum_model_learning_agent import QuantumModelLearningAgent  # QMD class in Library
+from qmla import RedisSettings as rds
 
 # Parse input variables to use in QMD; store in class global_variables.
-global_variables = GlobalVariables.parse_cmd_line_args(sys.argv[1:])
+global_variables = qmla.parse_cmd_line_args(sys.argv[1:])
 growth_class = global_variables.growth_class
 
 ###  START QMD ###

@@ -592,20 +592,20 @@ def parse_cmd_line_args(args):
         '-true_params_path', '--true_params_pickle_file',
         help='Path to save true params to.',
         type=str,
-        default=default_true_params_pickle_file
+        default='true_'
     )
 
     parser.add_argument(
         '-true_expec_path', '--true_expec_path',
         help='Path to save true params to.',
         type=str,
-        default=default_true_params_pickle_file
+        default="{}/true_params.p".format(os.getcwd())
     )
     parser.add_argument(
         '-plot_probes', '--plot_probe_file',
         help='Path where plot probe dict is pickled to.',
         type=str,
-        default=default_plot_probe_file
+        default="{}/plot_probes.p".format(os.getcwd())
     )
 
     parser.add_argument(

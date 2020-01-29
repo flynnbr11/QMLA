@@ -11,9 +11,9 @@ import hashlib
 
 import redis
 from qinfer import NormalDistribution
-from qmla.QML import ModelLearningClass, reducedModel
 
-from DataBase import * 
+from qmla.QML import ModelLearningClass, reducedModel
+from qmla.DataBase import * 
 
 def launch_db(
     true_op_name,

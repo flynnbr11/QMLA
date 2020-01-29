@@ -35,7 +35,7 @@ def full_model_string(operations):
 
     # Note TODO: this doesn't give an error when tuples are
     # given which aren't used. it should
-    from DataBase import alph
+    from qmla.DataBase import alph
     terms = operations['terms']
     num_qubits = operations['dim']
     num_terms = len(terms)
