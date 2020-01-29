@@ -1,11 +1,5 @@
 from matplotlib.gridspec import GridSpec
-import Evo
 from matplotlib import cm
-import GrowthRules
-import ModelNames
-import ExperimentalDataFunctions as expdt
-import ExpectationValues
-import DataBase
 import os
 import numpy as np
 import pandas as pd
@@ -33,8 +27,15 @@ from matplotlib.path import Path
 from matplotlib.spines import Spine
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.projections import register_projection
-
 from inspect import currentframe, getframeinfo
+
+import qmla.Evo as Evo
+import qmla.GrowthRules as GrowthRules
+import qmla.ModelNames as ModelNames
+import qmla.ExperimentalDataFunctions as expdt
+import qmla.ExpectationValues as ExpectationValues
+import qmla.DataBase as DataBase
+
 frameinfo = getframeinfo(currentframe())
 
 #from QMD import  *

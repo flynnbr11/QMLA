@@ -2,7 +2,7 @@ import qinfer as qi
 import numpy as np
 import scipy as sp
 
-from Evo import *
+# from qmla.Evo import *
 from inspect import currentframe, getframeinfo
 
 frameinfo = getframeinfo(currentframe())
@@ -77,12 +77,10 @@ class multiPGH(qi.Heuristic):
                 {} iterations.".format(self._maxiters)
             )
 
-        # print('Selected particles: #1 ' + repr(x) + ' #2 ' + repr(xp))
         eps = np.empty(
             (1,),
             dtype=self._updater.model.expparams_dtype
         )
-        # print (frameinfo.filename, frameinfo.lineno)
 
         idx_iter = 0  # modified in order to cycle through particle parameters with different names
         for field_i in self._x_:
@@ -93,62 +91,7 @@ class multiPGH(qi.Heuristic):
         new_time = self._t_func(
             1 / sigma**self._pgh_exponent
         )
-        # print(
-        #     "[multipgh]",
-        #     "\nnew_time:", new_time
-        # )
         eps[self._t] = new_time
-
-        # if self._oplist is None:   #Standard QInfer geom distance
-        #     # print("[multipgh] oplist is None")
-
-        #     sigma = self._updater.model.distance(x, xp)
-        #     # print("sigma = ", sigma)
-        #     if self._increase_time == True:
-        #         # Increase time
-        #         # ie get 1/sigma and add another time factor on top
-        #         # to reach higher times
-        #         orig_time = self._t_func(
-        #             (1 / sigma**self._pgh_exponent)
-        #         )
-
-        #         new_time = self._t_func(
-        #             (1 / sigma**self._pgh_exponent)
-        #             + ((1/sigma) * epoch_id * num_params)/10
-        #         )
-        #         # print(
-        #         #     "[multipgh]",
-        #         #     "\norig time:", orig_time,
-        #         #     "\nnew_time:", new_time
-        #         # )
-        #         eps[self._t] = new_time
-        #     else:
-        #         new_time = self._t_func(
-        #             1 / sigma**self._pgh_exponent
-        #         )
-        #         # print(
-        #         #     "[multipgh]",
-        #         #     "\nnew_time:", new_time
-        #         # )
-        #         eps[self._t] = new_time
-
-        # else:
-        #     deltaH = getH(x, self._oplist)-getH(xp, self._oplist)
-        #     if self._norm=='Frobenius':
-        #         print("[multipgh] Froebenius")
-        #         print (frameinfo.filename, frameinfo.lineno)
-        #         eps[self._t] = 1/np.linalg.norm(deltaH)   #Frobenius norm
-        #     elif self._norm=='MinSingVal':
-        #         print("[multipgh] MinSingVal")
-        #         print (frameinfo.filename, frameinfo.lineno)
-        #         eps[self._t] = 1/minsingvalnorm(deltaH)   #Min SingVal norm
-        #     elif self._norm=='SingVal':
-        #         print (frameinfo.filename, frameinfo.lineno)
-        #         eps[self._t] = 1/singvalnorm(deltaH)   #Max SingVal
-        #     else:
-        #         print (frameinfo.filename, frameinfo.lineno)
-        #         eps[self._t] = 1/np.linalg.norm(deltaH)
-        #         raise RuntimeError("Unknown Norm: using Frobenius norm instead")
         for field, value in self._other_fields.items():
             eps[field] = value**self._pgh_exponent
 
@@ -221,12 +164,6 @@ class time_from_list(qi.Heuristic):
         # self._time_list = kwargs['time_list']
         self._time_list = time_list
         self._len_time_list = len(self._time_list)
-
-        # print(
-        #     "[Heuristics - time_from_list]",
-        #     # "num experiments:", self._num_experiments,
-        #     "\n kwargs:", kwargs
-        # )
 
         try:
             self._num_experiments = kwargs.get('num_experiments')

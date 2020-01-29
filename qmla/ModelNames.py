@@ -7,15 +7,15 @@ from __future__ import print_function  # so print doesn't show brackets
 
 import numpy as np
 import itertools as itr
-
 import os as os
 import sys as sys
 import pandas as pd
 import warnings
 import time as time
-import Evo as evo
-import DataBase
 import warnings
+
+import qmla.Evo as evo
+import qmla.DataBase as DataBase
 
 """
 Useful functions

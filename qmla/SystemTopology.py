@@ -7,10 +7,10 @@ import pandas as pd
 import warnings
 import copy
 import time as time
-#import Evo as evo
-import DataBase
 import warnings
-import ModelNames
+
+import qmla.DataBase as DataBase
+import qmla.ModelNames as ModelNames
 
 
 class topology_grid():

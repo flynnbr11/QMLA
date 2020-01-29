@@ -1,16 +1,20 @@
+from __future__ import absolute_import
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
-import Distributions
-import Heuristics
-import ProbeGeneration
-import ExpectationValues
-import DataBase
+# sys.path.append(os.path.abspath('..'))
 
+import qmla.Distributions as Distributions
+import qmla.Heuristics as Heuristics
+import qmla.ProbeGeneration as ProbeGeneration
+import qmla.ExpectationValues as ExpectationValues
+import qmla.DataBase as DataBase
+
+__all__ = [
+    'growth_rule_super_class'
+]
 
 class growth_rule_super_class():
     # superclass for growth generation rules
-
     def __init__(
         self,
         growth_generation_rule,

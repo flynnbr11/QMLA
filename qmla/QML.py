@@ -5,24 +5,22 @@ import os
 import time
 import copy
 import qinfer as qi
-# import Evo
-import ExpectationValues
-import GrowthRules
-# import UserFunctions
-import Distributions
-import QInferClassQML as qml_qi
-import ExperimentalDataFunctions as expdt
-# import multiPGH as mpgh
-import DataBase
-import ModelNames
-from MemoryTest import print_loc
 from psutil import virtual_memory
-import RedisSettings as rds
-import PlotQMD
 import redis
 import pickle
 import matplotlib.pyplot as plt
 pickle.HIGHEST_PROTOCOL = 2
+
+import qmla.DataBase as DataBase
+import qmla.Distributions as Distributions
+import qmla.ExperimentalDataFunctions as expdt
+import qmla.ExpectationValues as ExpectationValues
+import qmla.GrowthRules as GrowthRules
+import qmla.ModelNames as ModelNames
+from qmla.MemoryTest import print_loc
+import qmla.PlotQMD as PlotQMD
+import qmla.QInferClassQML as qml_qi
+import qmla.RedisSettings as rds
 
 global debug_print
 global print_mem_status

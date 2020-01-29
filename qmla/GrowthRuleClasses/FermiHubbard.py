@@ -1,17 +1,15 @@
-import ConnectedLattice
-import SuperClassGrowthRule
-import Heuristics
-import SystemTopology
-import ModelGeneration
-import ModelNames
-import ProbeGeneration
-import DataBase
 import numpy as np
 import itertools
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
 
+from qmla.GrowthRuleClasses import ConnectedLattice
+from qmla import Heuristics
+from qmla import SystemTopology
+from qmla import ModelGeneration
+from qmla import ModelNames
+from qmla import ProbeGeneration
+from qmla import DataBase
 
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]
@@ -81,6 +79,7 @@ class fermi_hubbard(
         hopping_terms = []
         chemical_terms = []
         terms = name.split('+')
+        term_type = None
         for term in terms:
             constituents = term.split('_')
             for c in constituents:

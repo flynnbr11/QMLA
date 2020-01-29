@@ -1,14 +1,19 @@
-import SuperClassGrowthRule
-import Heuristics
-import ExpectationValues
-import DataBase
+from __future__ import absolute_import
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
 
+from qmla.GrowthRuleClasses.SuperClassGrowthRule import growth_rule_super_class
+from qmla import Heuristics
+from qmla import ExpectationValues
+from qmla import DataBase
+
+__all__ = [
+    'nv_centre_spin_full_access'
+]
 
 class nv_centre_spin_full_access(
-    SuperClassGrowthRule.growth_rule_super_class
+    # SuperClassGrowthRule.growth_rule_super_class
+    growth_rule_super_class
 ):
     def __init__(
         self,

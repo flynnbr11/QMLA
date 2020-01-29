@@ -3,9 +3,10 @@ import os
 import sys
 import pickle
 
-import GrowthRules
-import UserFunctions
-import DataBase
+import qmla.GrowthRules as GrowthRules
+# import UserFunctions
+import qmla.DataBase as DataBase
+
 
 """
 This file is callable with *kwargs from a separate QMD program.

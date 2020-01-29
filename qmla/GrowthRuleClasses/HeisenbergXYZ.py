@@ -2,15 +2,14 @@ import numpy as np
 import itertools
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
-import ConnectedLattice
-import SuperClassGrowthRule
-import Heuristics
-import SystemTopology
-import ModelGeneration
-import ModelNames
-import ProbeGeneration
-import DataBase
+
+from qmla.GrowthRuleClasses import ConnectedLattice
+from qmla import Heuristics
+from qmla import SystemTopology
+from qmla import ModelGeneration
+from qmla import ModelNames
+from qmla import ProbeGeneration
+from qmla import DataBase
 
 
 class heisenberg_xyz_probabilistic(

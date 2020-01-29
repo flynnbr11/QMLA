@@ -1,8 +1,7 @@
 from __future__ import print_function  # so print doesn't show brackets
 # Libraries
-import DataBase
+
 from qinfer import NormalDistribution
-import QML
 import matplotlib.pyplot as plt
 import matplotlib
 import copy
@@ -26,6 +25,9 @@ try:
     enforce_serial = False
 except BaseException:
     enforce_serial = True  # shouldn't be needed
+
+import qmla.DataBase as DataBase
+import qmla.QML as QML
 
 plt.switch_backend('agg')
 

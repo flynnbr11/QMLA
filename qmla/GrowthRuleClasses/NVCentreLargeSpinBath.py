@@ -1,11 +1,11 @@
-import NVCentreFullAccess
-import Heuristics
-import ProbeGeneration
-import ExpectationValues
-import DataBase
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
+
+from qmla.GrowthRuleClasses import NVCentreFullAccess
+from qmla import Heuristics
+from qmla import ProbeGeneration
+from qmla import ExpectationValues
+from qmla import DataBase
 
 
 class nv_centre_large_spin_bath(

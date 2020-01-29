@@ -1,15 +1,12 @@
 from __future__ import print_function  # so print doesn't show brackets
 # Libraries
-import DataBase
 import json  # possibly worth a different serialization if pickle is very slow
 from qinfer import NormalDistribution
-import QML
 import matplotlib.pyplot as plt
 import matplotlib
 import copy
 import pickle
 from psutil import virtual_memory
-import ExperimentalDataFunctions
 import random
 import time as time
 import numpy as np
@@ -27,6 +24,10 @@ try:
     enforce_serial = False
 except BaseException:
     enforce_serial = True  # shouldn't be needed
+
+import qmla.DataBase as DataBase
+import qmla.QML as QML
+
 
 plt.switch_backend('agg')
 

@@ -1,16 +1,15 @@
-import SuperClassGrowthRule
-import Heuristics
-import SystemTopology
-import ModelGeneration
-import ModelNames
-import ProbeGeneration
-import DataBase
 import numpy as np
 import itertools
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
 
+from qmla.GrowthRuleClasses import SuperClassGrowthRule
+from qmla import Heuristics
+from qmla import SystemTopology
+from qmla import ModelGeneration
+from qmla import ModelNames
+from qmla import ProbeGeneration
+from qmla import DataBase
 
 class basic_lindbladian(
     SuperClassGrowthRule.growth_rule_super_class

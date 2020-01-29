@@ -1,11 +1,11 @@
-import NVCentreLargeSpinBath
-import ProbeGeneration
-import ExpectationValues
-import DataBase
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
 
+from qmla.GrowthRuleClasses import NVCentreLargeSpinBath
+from qmla import ProbeGeneration
+from qmla import ExpectationValues
+from qmla import DataBase
+from qmla import Heuristics
 
 class nv_centre_revival_data(
     NVCentreLargeSpinBath.nv_centre_large_spin_bath  # inherit from this
@@ -19,7 +19,7 @@ class nv_centre_revival_data(
         growth_generation_rule,
         **kwargs
     ):
-        import Heuristics
+        # import Heuristics
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule=growth_generation_rule,
@@ -29,14 +29,9 @@ class nv_centre_revival_data(
         self.true_operator = 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6'
 
         self.qhl_models = [
-            NV_centre_large_spin_bath.gali_model_nv_centre_spin(2),
-            NV_centre_large_spin_bath.gali_model_nv_centre_spin(6),
-            NV_centre_large_spin_bath.gali_model_nv_centre_spin(7),
-            # NV_centre_large_spin_bath.gali_model_nv_centre_spin(8),
-            # 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3',
-            # 'nv_spin_x_d4PPPPnv_spin_y_d4PPPPnv_spin_z_d4PPPPnv_interaction_x_d4PPPPnv_interaction_y_d4PPPPnv_interaction_z_d4',
-            # 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6',
-            # 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6',
+            NVCentreLargeSpinBath.gali_model_nv_centre_spin(2),
+            NVCentreLargeSpinBath.gali_model_nv_centre_spin(6),
+            NVCentreLargeSpinBath.gali_model_nv_centre_spin(7),
         ]
 
         self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict

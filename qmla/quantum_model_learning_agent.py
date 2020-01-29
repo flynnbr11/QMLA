@@ -26,6 +26,7 @@ import qinfer
 from qmla.RemoteBayesFactor import *
 import qmla.PlotQMD as PlotQMD
 import qmla.DataBase as DataBase
+import qmla.DataBase as DataBaseLaunch
 import qmla.GrowthRules as GrowthRules
 import qmla.ExpectationValues as ExpectationValues 
 from qmla.RemoteModelLearning import *
@@ -713,7 +714,7 @@ class QuantumModelLearningAgent():
     ):
         #self.NumModels += 1
         model = DataBase.alph(model)
-        tryAddModel = DataBase.add_model(
+        tryAddModel = DataBaseLaunch.add_model(
             model_name=model,
             running_database=self.db,
             num_particles=self.NumParticles,

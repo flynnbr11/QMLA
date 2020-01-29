@@ -9,6 +9,7 @@ from fermilib.transforms import get_sparse_operator
 import fermilib
 import numpy as np
 import itertools as itr
+import warnings
 
 import os as os
 import sys as sys
@@ -17,9 +18,8 @@ import warnings
 import copy
 import time as time
 #import Evo as evo
-import DataBase
-import warnings
-import ModelNames
+import qmla.DataBase as DataBase
+import qmla.ModelNames as ModelNames
 
 # global paulis_list
 # paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}

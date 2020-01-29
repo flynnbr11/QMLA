@@ -1,10 +1,10 @@
-import NVCentreExperimentGrowthRules
-import ProbeGeneration
-import ExpectationValues
-import DataBase
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
+
+from qmla.GrowthRuleClasses import NVCentreExperimentGrowthRules
+from qmla import ProbeGeneration
+from qmla import ExpectationValues
+from qmla import DataBase
 
 
 class nv_centre_spin_experimental_method_alternative_true_model(

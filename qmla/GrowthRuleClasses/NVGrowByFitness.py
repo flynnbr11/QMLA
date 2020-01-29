@@ -1,11 +1,11 @@
-import NVCentreLargeSpinBath
-import ProbeGeneration
-import DataBase
 import numpy as np
 import itertools
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
+
+from qmla.GrowthRuleClasses import NVCentreLargeSpinBath
+from qmla import ProbeGeneration
+from qmla import DataBase
 
 
 class nv_fitness_growth(

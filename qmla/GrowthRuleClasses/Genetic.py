@@ -1,18 +1,17 @@
-import SuperClassGrowthRule
-import GeneticAlgorithm
-import Heuristics
-import SystemTopology
-import ModelGeneration
-import ModelNames
-import ProbeGeneration
-import DataBase
 import numpy as np
 import itertools
 import sys
 import os
 import random
-sys.path.append(os.path.abspath('..'))
 
+from qmla.GrowthRuleClasses import SuperClassGrowthRule
+from qmla import GeneticAlgorithm
+from qmla import Heuristics
+from qmla import SystemTopology
+from qmla import ModelGeneration
+from qmla import ModelNames
+from qmla import ProbeGeneration
+from qmla import DataBase
 
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]

@@ -6,8 +6,9 @@ import inspect
 import time
 import sys as sys
 import os as os
-import ProbeGeneration
-from MemoryTest import print_loc
+
+import qmla.ProbeGeneration as ProbeGeneration
+from qmla.MemoryTest import print_loc
 
 # sys.path.append((os.path.join("..")))
 

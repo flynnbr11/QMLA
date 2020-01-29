@@ -4,16 +4,14 @@ import qinfer as qi
 import numpy as np
 import scipy as sp
 import warnings
-
-# from Evo import * # TODO remove ALL import * calls across QMD
-import Evo
-import ExperimentalDataFunctions as expdt
-import GrowthRules
-# from ProbeStates import *
-from MemoryTest import print_loc, print_file_line
-import ProbeGeneration
 from psutil import virtual_memory
-import DataBase
+
+import qmla.Evo as Evo
+import ExperimentalDataFunctions as expdt
+import qmla.GrowthRules as GrowthRules
+from qmla.MemoryTest import print_loc, print_file_line
+import qmla.ProbeGeneration as ProbeGeneration
+import qmla.DataBase as DataBase
 
 global_print_loc = False
 global debug_print

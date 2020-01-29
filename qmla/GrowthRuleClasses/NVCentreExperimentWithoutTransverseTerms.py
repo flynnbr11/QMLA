@@ -1,5 +1,4 @@
-import NVCentreExperimentGrowthRules
-
+from qmla.GrowthRuleClasses import NVCentreExperimentGrowthRules
 
 class nv_centre_spin_experimental_method_without_transvere_terms(
         NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method

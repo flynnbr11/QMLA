@@ -1,10 +1,10 @@
-import SuperClassGrowthRule
-import ProbeGeneration
-import ExpectationValues
-import DataBase
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
+
+from qmla.GrowthRuleClasses import SuperClassGrowthRule
+from qmla import ProbeGeneration
+from qmla import ExpectationValues
+from qmla import DataBase
 
 
 class example_growth(
@@ -19,7 +19,7 @@ class example_growth(
         growth_generation_rule,
         **kwargs
     ):
-        import Heuristics
+        from qmla import Heuristics
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule=growth_generation_rule,

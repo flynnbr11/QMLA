@@ -1,11 +1,11 @@
-import NVCentreExperimentGrowthRules
-import ProbeGeneration
-import ExpectationValues
-import DataBase
 import random
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
+
+from qmla.GrowthRuleClasses import NVCentreExperimentGrowthRules
+from qmla import ProbeGeneration
+from qmla import ExpectationValues
+from qmla import DataBase
 
 
 class presentation_plot_generation(

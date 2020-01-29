@@ -1,15 +1,15 @@
-import ProbeGeneration
 import numpy as np
 import random
 import pickle
 import argparse
-# import UserFunctions
-import DataBase
-import Distributions
-import GrowthRules
-
 import os
 import matplotlib.pyplot as plt
+
+import qmla.DataBase as DataBase
+import qmla.Distributions as Distributions
+import qmla.GrowthRules as GrowthRules
+import qmla.ProbeGeneration as ProbeGeneration
+
 pickle.HIGHEST_PROTOCOL = 2
 global test_growth_class_implementation
 test_growth_class_implementation = True

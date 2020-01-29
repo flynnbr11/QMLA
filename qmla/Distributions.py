@@ -1,13 +1,11 @@
 import qinfer
 import random
 import numpy as np
-import DataBase
 import matplotlib.pyplot as plt
-
-
 from scipy.stats import norm
 from scipy.optimize import curve_fit
 
+import qmla.DataBase as DataBase
 
 def time_seconds():
     # return time in h:m:s format for logging.

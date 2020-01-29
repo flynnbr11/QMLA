@@ -17,7 +17,7 @@ sys.path.append(os.path.join("..", "qmla"))
 import DataBase
 # import ExpectationValues
 # import QML
-from QuantumModelLearningAgent import QuantumModelLearningAgent  # QMD class in Library
+from quantum_model_learning_agent import QuantumModelLearningAgent  # QMD class in Library
 import RedisSettings as rds
 import GlobalVariables
 

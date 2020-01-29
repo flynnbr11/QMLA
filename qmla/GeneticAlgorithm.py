@@ -4,13 +4,12 @@ import sys
 import os
 import random
 import copy
-
-import DataBase
-import ModelNames
-import ModelGeneration
-
 import scipy
 import time
+
+import qmla.DataBase as DataBase
+import qmla.ModelNames as ModelNames
+import qmla.ModelGeneration as ModelGeneration
 
 
 class GeneticAlgorithmQMLA():

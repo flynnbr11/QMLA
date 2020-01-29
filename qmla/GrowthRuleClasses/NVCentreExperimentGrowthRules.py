@@ -1,15 +1,20 @@
-import NVCentreFullAccess
-import ProbeGeneration
-import ExpectationValues
-import DataBase
 import random
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
 
+from qmla.GrowthRuleClasses import NVCentreFullAccess
+from  qmla import ProbeGeneration
+from qmla import ExpectationValues
+from qmla import DataBase
+
+
+__all__ = [
+    'nv_centre_spin_experimental_method'
+]
 
 class nv_centre_spin_experimental_method(
     NVCentreFullAccess.nv_centre_spin_full_access  # inherit from this
+    # growth_rule_super_class # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
@@ -20,7 +25,7 @@ class nv_centre_spin_experimental_method(
         growth_generation_rule,
         **kwargs
     ):
-        import Heuristics
+        from qmla import Heuristics
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule=growth_generation_rule,

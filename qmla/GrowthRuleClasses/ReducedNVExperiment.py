@@ -1,7 +1,7 @@
-import NVCentreFullAccess
 import sys
 import os
-sys.path.append(os.path.abspath('..'))
+
+from qmla.GrowthRuleClasses import NVCentreFullAccess
 
 
 class reduced_nv_experiment(
