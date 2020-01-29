@@ -19,7 +19,6 @@ import qmla.ExpectationValues as ExpectationValues
 import qmla.GrowthRules as GrowthRules
 import qmla.ModelNames as ModelNames
 from qmla.MemoryTest import print_loc
-# import qmla.PlotQMD as PlotQMD
 import qmla.QInferClassQML as qml_qi
 import qmla.RedisSettings as rds
 

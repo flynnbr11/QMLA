@@ -14,8 +14,6 @@ from qmla.GlobalVariables import *
 
 from qmla.ModelGeneration import * # TODO fix __all__
 from qmla.ModelNames import * # TODO fix __all__
-from qmla.multiQMD_plots import * # TODO fix __all__
-from qmla.PlotQMD import * # TODO fix __all__
 from qmla.QInferClassQML import * 
 from qmla.QML import * 
 from qmla.quantum_model_learning_agent import *

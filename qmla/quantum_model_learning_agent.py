@@ -24,7 +24,6 @@ import qinfer
 
 # Libraries
 from qmla.RemoteBayesFactor import *
-import qmla.PlotQMD as PlotQMD
 import qmla.analysis
 import qmla.DataBase as DataBase
 import qmla.DatabaseLaunch as DataBaseLaunch

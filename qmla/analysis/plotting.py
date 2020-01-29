@@ -7,9 +7,11 @@ import pickle
 import matplotlib.pyplot as plt
 import pandas
 
+from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas, cumulativeQMDTreePlot
+
 import qmla.GrowthRules as GrowthRules
 import qmla.ModelNames as ModelNames
-import qmla.PlotQMD as ptq
+# import qmla.PlotQMD as ptq
 import qmla.DataBase as DataBase
 plt.switch_backend('agg')
 
@@ -411,7 +413,7 @@ def average_parameter_estimates(
                 color='black',
                 label='0'
             )
-            ptq.fill_between_sigmas(
+            fill_between_sigmas(
                 ax,
                 parameters[term],
                 # [e +1 for e in epochs],
@@ -1407,7 +1409,6 @@ def get_entropy(
     # What is initial_entropy meant to be?
     num_qmd_instances = sum(list(models_points.values()))
     num_possible_qmd_instances = len(
-        # ptq.ising_terms_rotation_hyperfine()
         UserFunctions.get_all_model_names(
             growth_generator=growth_generator,
             return_branch_dict='latex_terms'
@@ -1729,7 +1730,7 @@ def plot_tree_multi_QMD(
     for mod in mods:
         winning_count[mod] = mods.count(mod)
 
-    ptq.cumulativeQMDTreePlot(
+    cumulativeQMDTreePlot(
         cumulative_csv=all_bayes_csv,
         wins_per_mod=winning_count,
         latex_mapping_file=latex_mapping_file,
