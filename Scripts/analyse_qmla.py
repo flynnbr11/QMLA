@@ -18,7 +18,7 @@ import qmla
 # import ..qmla
 # 
 parser = argparse.ArgumentParser(
-    description='Pass variables for (I)QLE.'
+    description='Pass variables for QMLA.'
 )
 
 # Add parser arguments, ie command line arguments for QMD

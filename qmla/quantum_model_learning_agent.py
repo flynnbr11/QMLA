@@ -25,6 +25,7 @@ import qinfer
 # Libraries
 from qmla.RemoteBayesFactor import *
 import qmla.PlotQMD as PlotQMD
+import qmla.analysis
 import qmla.DataBase as DataBase
 import qmla.DatabaseLaunch as DataBaseLaunch
 import qmla.GrowthRules as GrowthRules
@@ -3624,7 +3625,7 @@ class QuantumModelLearningAgent():
         self,
         save_to_file=None,
     ):
-        PlotQMD.plot_quadratic_loss(
+        qmla.analysis.plot_quadratic_loss(
             qmd=self,
             champs_or_all='champs',
             save_to_file=save_to_file
@@ -3682,14 +3683,14 @@ class QuantumModelLearningAgent():
                     lgd,), bbox_inches='tight')
 
     def saveBayesCSV(self, save_to_file, names_ids='latex'):
-        PlotQMD.BayesFactorsCSV(self, save_to_file, names_ids=names_ids)
+        qmla.analysis.BayesFactorsCSV(self, save_to_file, names_ids=names_ids)
 
     def writeInterQMDBayesCSV(self, bayes_csv):
         print("[QMD] writing Bayes CSV")
-        PlotQMD.updateAllBayesCSV(self, bayes_csv)
+        qmla.analysis.updateAllBayesCSV(self, bayes_csv)
 
     def plotHintonAllModels(self, save_to_file=None):
-        PlotQMD.plotHinton(
+        qmla.analysis.plotHinton(
             model_names=self.ModelNameIDs,
             bayes_factors=self.AllBayesFactors,
             growth_generator=self.GrowthGenerator,
@@ -3715,7 +3716,7 @@ class QuantumModelLearningAgent():
         for m in model_list:
             model_name_dict[m] = DataBase.model_name_from_id(self.db, m)
 
-        PlotQMD.plotHinton(
+        qmla.analysis.plotHinton(
             model_names=model_name_dict,
             bayes_factors=bayes_factors,
             growth_generator=self.GrowthGenerator,
@@ -3733,7 +3734,7 @@ class QuantumModelLearningAgent():
             model_id = DataBase.model_id_from_name(
                 db=self.db, name=self.TrueOpName)
 
-        PlotQMD.parameterEstimates(qmd=self,
+        qmla.analysis.parameterEstimates(qmd=self,
                                    modelID=model_id,
                                    use_experimental_data=self.UseExperimentalData,
                                    save_to_file=save_to_file
@@ -3762,7 +3763,7 @@ class QuantumModelLearningAgent():
         #     include_bayes_factors_in_dynamics_plots = True
         #     include_param_estimates_in_dynamics_plots = True
 
-        PlotQMD.plotDynamicsLearnedModels(
+        qmla.analysis.plotDynamicsLearnedModels(
             qmd=self,
             include_bayes_factors=include_bayes_factors_in_dynamics_plots,
             include_times_learned=include_times_learned_in_dynamics_plots,
@@ -3788,7 +3789,7 @@ class QuantumModelLearningAgent():
         ):
             plus_probe = True
 
-        PlotQMD.ExpectationValuesTrueSim(
+        qmla.analysis.ExpectationValuesTrueSim(
             qmd=self,
             model_ids=model_ids,
             champ=champ,
@@ -3809,7 +3810,7 @@ class QuantumModelLearningAgent():
         # TODO use this updated function instead of old one
 
         true_mod_id = self.TrueOpModelID
-        PlotQMD.ExpectationValuesTrueSim(
+        qmla.analysis.ExpectationValuesTrueSim(
             qmd=self,
             champ=False,
             model_ids=[true_mod_id],
@@ -3818,7 +3819,7 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
         """
-        PlotQMD.ExpectationValuesQHL_TrueModel(qmd=self,
+        qmla.analysis.ExpectationValuesQHL_TrueModel(qmd=self,
             max_time = max_time,
             t_interval = t_interval,
             save_to_file = save_to_file,
@@ -3834,7 +3835,7 @@ class QuantumModelLearningAgent():
                                     true_model=True,
                                     save_to_file=None
                                     ):
-        PlotQMD.plotDistributionProgression(
+        qmla.analysis.plotDistributionProgression(
             qmd=self,
             model_id=model_id,
             show_means=show_means,
@@ -3850,7 +3851,7 @@ class QuantumModelLearningAgent():
                       show_resamplings=True,
                       save_to_file=None
                       ):
-        PlotQMD.plotVolumeQHL(
+        qmla.analysis.plotVolumeQHL(
             qmd=self,
             model_id=model_id,
             true_model=true_model,
@@ -3864,7 +3865,7 @@ class QuantumModelLearningAgent():
         only_adjacent_branches=True,
         save_to_file=None
     ):
-        PlotQMD.plotQMDTree(
+        qmla.analysis.plotQMDTree(
             self,
             modlist=modlist,
             only_adjacent_branches=only_adjacent_branches,
@@ -3875,7 +3876,7 @@ class QuantumModelLearningAgent():
         plot_title = str("Radar Plot QMD " + str(self.Q_id))
         if modlist is None:
             modlist = list(self.BranchChampions.values())
-        PlotQMD.plotRadar(
+        qmla.analysis.plotRadar(
             self,
             modlist,
             save_to_file=save_to_file,
@@ -3898,7 +3899,7 @@ class QuantumModelLearningAgent():
             except BaseException:
                 pass
 
-        PlotQMD.r_squared_from_epoch_list(
+        qmla.analysis.r_squared_from_epoch_list(
             qmd=self,
             model_ids=modlist,
             save_to_file=save_to_file

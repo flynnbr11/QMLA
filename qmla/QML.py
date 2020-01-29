@@ -11,6 +11,7 @@ import pickle
 import matplotlib.pyplot as plt
 pickle.HIGHEST_PROTOCOL = 2
 
+import qmla.analysis
 import qmla.DataBase as DataBase
 import qmla.Distributions as Distributions
 import qmla.ExperimentalDataFunctions as expdt
@@ -18,7 +19,7 @@ import qmla.ExpectationValues as ExpectationValues
 import qmla.GrowthRules as GrowthRules
 import qmla.ModelNames as ModelNames
 from qmla.MemoryTest import print_loc
-import qmla.PlotQMD as PlotQMD
+# import qmla.PlotQMD as PlotQMD
 import qmla.QInferClassQML as qml_qi
 import qmla.RedisSettings as rds
 
@@ -974,7 +975,7 @@ class ModelLearningClass():
                                     renormalise=False,
                                     save_to_file=None
                                     ):
-        PlotQMD.plotDistributionProgressionQML(
+        qmla.analysis.plotDistributionProgressionQML(
             mod=self,
             num_steps_to_show=2,
             show_means=True,
