@@ -1,8 +1,3 @@
-from multiQMD_plots import *  # TODO remove wildcard imports
-import GrowthRules
-import ModelNames
-import PlotQMD as ptq
-import DataBase
 import numpy as np
 import argparse
 from matplotlib.lines import Line2D
@@ -11,9 +6,20 @@ import os
 import pickle
 import matplotlib.pyplot as plt
 import pandas
-plt.switch_backend('agg')
 
-parser = argparse.ArgumentParser(description='Pass variables for (I)QLE.')
+plt.switch_backend('agg')
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname( __file__ ), '..')
+    )
+)
+
+import qmla
+# import ..qmla
+# 
+parser = argparse.ArgumentParser(
+    description='Pass variables for (I)QLE.'
+)
 
 # Add parser arguments, ie command line arguments for QMD
 # QMD parameters -- fundamentals such as number of particles etc
@@ -132,7 +138,7 @@ true_params_path = arguments.true_params
 exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
-true_growth_class = GrowthRules.get_growth_generator_class(
+true_growth_class = qmla.get_growth_generator_class(
     growth_generation_rule=growth_generator,
     use_experimental_data=exp_data,
     log_file=log_file
@@ -187,7 +193,7 @@ if not directory_to_analyse.endswith('/'):
 print("Counting model occurences.")
 
 try:
-    count_model_occurences(
+    qmla.analysis.count_model_occurences(
         latex_map=latex_mapping_file,
         true_operator_latex=true_growth_class.latex_name(
             true_operator
@@ -205,14 +211,13 @@ except BaseException:
     print("Failed to plot # occurences of each model.")
     # raise
 
-
 if further_qhl_mode == True:
     print("further_qhl_model = True.")
 
     results_csv_name = 'summary_further_qhl_results.csv'
     results_csv = directory_to_analyse + results_csv_name
     results_file_name_start = 'further_qhl_results'
-    ptq.summariseResultsCSV(
+    qmla.analysis.summariseResultsCSV(
         directory_name=directory_to_analyse,
         results_file_name_start=results_file_name_start,
         csv_name=results_csv
@@ -223,7 +228,7 @@ else:
     results_csv_name = 'summary_results.csv'
     results_csv = directory_to_analyse + results_csv_name
     results_file_name_start = 'results'
-    ptq.summariseResultsCSV(
+    qmla.analysis.summariseResultsCSV(
         directory_name=directory_to_analyse,
         results_file_name_start=results_file_name_start,
         csv_name=results_csv
@@ -231,7 +236,7 @@ else:
     plot_desc = ''
 
 try:
-    average_priors = average_parameters(
+    average_priors = qmla.analysis.average_parameters(
         results_path=results_csv,
         top_number_models=arguments.top_number_models
     )
@@ -247,7 +252,6 @@ except BaseException:
     raise
     # for compatability with old versions
     pass
-
 
 os.chdir(directory_to_analyse)
 pickled_files = []
@@ -295,7 +299,7 @@ unique_growth_classes = {}
 unique_growth_rules = true_params_info['all_growth_classes']
 for g in unique_growth_rules:
     try:
-        unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
+        unique_growth_classes[g] = qmla.get_growth_generator_class(
             growth_generation_rule=g
         )
     except BaseException:
@@ -306,7 +310,7 @@ print("[AnalyseMultipleQMD] unique growth classes:", unique_growth_classes)
 
 
 # first get model scores
-model_score_results = get_model_scores(
+model_score_results = qmla.analysis.get_model_scores(
     directory_name=directory_to_analyse,
     unique_growth_classes=unique_growth_classes,
     collective_analysis_pickle_file=results_collection_file,
@@ -326,7 +330,7 @@ print("Changed top # models to:", arguments.top_number_models)
 print("Average param estimates")
 
 
-average_parameter_estimates(
+qmla.analysis.average_parameter_estimates(
     directory_name=directory_to_analyse,
     results_path=results_csv,
     top_number_models=arguments.top_number_models,
@@ -344,7 +348,7 @@ average_parameter_estimates(
 print("Analysis/dynamics starting")
 
 try:
-    analyse_and_plot_dynamics_multiple_models(  # average expected values
+    qmla.analysis.analyse_and_plot_dynamics_multiple_models(  # average expected values
         directory_name=directory_to_analyse,
         dataset=dataset,
         results_path=results_csv,
@@ -384,7 +388,7 @@ except BaseException:
         "R^2 at each epoch not stored in QMD (method in QML)."
     )
 
-ptq.average_quadratic_losses(
+qmla.analysis.average_quadratic_losses(
     results_path=results_csv,
     growth_classes=unique_growth_classes,
     growth_generator=growth_generator,
@@ -397,7 +401,7 @@ ptq.average_quadratic_losses(
 )
 
 
-volume_average(
+qmla.analysis.volume_average(
     results_path=results_csv,
     growth_class=true_growth_class,
     top_number_models=arguments.top_number_models,
@@ -408,7 +412,7 @@ volume_average(
     )
 )
 
-all_times_learned_histogram(
+qmla.analysis.all_times_learned_histogram(
     results_path=results_csv,
     top_number_models=arguments.top_number_models,
     save_to_file=str(
@@ -426,7 +430,7 @@ if qhl_mode==True:
         directory_to_analyse +
         'r_squared_QHL.png'
     )
-    ptq.r_squared_plot(
+    qmla.analysis.r_squared_plot(
         results_csv_path = results_csv,
         save_to_file = r_squared_plot
     )
@@ -438,7 +442,7 @@ if further_qhl_mode == False:
 
     entropy = inf_gain = 0.0
     print("[AnalyseMultipleQMD] f scores before plot scores:", f_scores)
-    plot_scores(
+    qmla.analysis.plot_scores(
         scores=model_scores,
         growth_classes=growth_classes,
         unique_growth_classes=unique_growth_classes,
@@ -485,7 +489,7 @@ if further_qhl_mode == False:
 
     to_plot = [wins, f_score, precision, sensitivity]
 
-    plot_statistics(
+    qmla.analysis.plot_statistics(
         to_plot,
         models,
         true_operator=true_operator_latex,
@@ -496,7 +500,7 @@ if further_qhl_mode == False:
     )
 
     try:
-        ptq.plotTrueModelBayesFactors_IsingRotationTerms(
+        qmla.analysis.plotTrueModelBayesFactors_IsingRotationTerms(
             results_csv_path=all_bayes_csv,
             # correct_mod='xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
             correct_mod=true_operator,
@@ -515,11 +519,11 @@ if further_qhl_mode == False:
         'sweep_param_percentage.png')
 
     try:
-        parameter_sweep_analysis(
+        qmla.analysis.parameter_sweep_analysis(
             directory_name=directory_to_analyse,
             results_csv=results_csv,
             save_to_file=param_plot)
-        parameter_sweep_analysis(
+        qmla.analysis.parameter_sweep_analysis(
             directory_name=directory_to_analyse,
             results_csv=results_csv,
             use_log_times=True,
@@ -533,7 +537,7 @@ if further_qhl_mode == False:
     do_clustering = True
     if do_clustering:
         try:
-            ptq.cluster_results_and_plot(
+            qmla.analysis.cluster_results_and_plot(
                 path_to_results=results_csv,
                 true_expec_path=true_expec_path,
                 plot_probe_path=plot_probe_file,
@@ -617,3 +621,4 @@ if further_qhl_mode == False:
     except BaseException:
         # print("[AnalyseMultipleQMD] Could not plot Multi QMD tree.")
         raise
+

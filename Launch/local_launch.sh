@@ -75,9 +75,9 @@ git_commit=$(git rev-parse HEAD)
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='ising_probabilistic'
-# sim_growth_rule='ising_predetermined'
+sim_growth_rule='ising_predetermined'
 # sim_growth_rule='heisenberg_xyz_predetermined'
-sim_growth_rule='heisenberg_xyz_probabilistic'
+# sim_growth_rule='heisenberg_xyz_probabilistic'
 # sim_growth_rule='fermi_hubbard_predetermined'
 # sim_growth_rule='fermi_hubbard_probabilistic'
 # sim_growth_rule='genetic'
@@ -178,7 +178,8 @@ let bt="$exp"
 # Launch $num_tests instances of QMD 
 
 # First set up parameters/data to be used by all instances of QMD for this run. 
-python3 ../qmla/SetQHLParams.py \
+# python3 ../qmla/SetQHLParams.py \
+python3 ../Scripts/set_qmla_params.py \
     -true=$true_params_pickle_file \
     -prior=$prior_pickle_file \
     -probe=$plot_probe_file \
@@ -198,7 +199,7 @@ python3 ../qmla/SetQHLParams.py \
     -sp=$special_probe_plot \
     $growth_rules_command 
 
-echo "Generated configuration. Calling Exp.py"
+echo "Generated configuration."
 
 for prt in  "${particle_counts[@]}";
 do
@@ -209,7 +210,7 @@ do
         # python3 -m cProfile \
             # -o "Profile_linalg_long_run.txt" \
         python3 \
-            Exp.py \
+            ../Scripts/implement_qmla.py \
             -mqhl=$multiple_qhl \
             -p=$prt -e=$exp -bt=$bt \
             -rq=$use_rq \
@@ -258,7 +259,7 @@ echo "
 # write to a script so we can recall analysis later.
 echo "
 cd $full_path_to_results
-python3 ../../../../qmla/AnalyseMultipleQMD.py \
+python3 ../../../../Scripts/analyse_qmla.py \
     -dir=$full_path_to_results --bayes_csv=$bayes_csv \
     -log=$this_log \
     -top=$number_best_models_further_qhl \
@@ -269,8 +270,7 @@ python3 ../../../../qmla/AnalyseMultipleQMD.py \
     -params=$true_params_pickle_file \
     -latex=$latex_mapping_file
 
-
-python3 ../../../../qmla/CombineAnalysisPlots.py \
+python3 ../../../../Scripts/generate_results_pdf.py \
     -dir=$full_path_to_results \
     -p=$prt -e=$exp -bt=$bt -t=$num_tests \
     -log=$this_log \
@@ -287,9 +287,8 @@ python3 ../../../../qmla/CombineAnalysisPlots.py \
     -mqhl=$multiple_qhl \
     -cb=$bayes_csv \
     -exp=$exp_data
+
 " > $analyse_script
-
-
 
 
 chmod a+x $analyse_script
@@ -317,7 +316,7 @@ then
         # q_id=\$((q_id+1))
         let q_id="$q_id + 1"
         echo "QID: $q_id"
-        python3 Exp.py \
+        python3 /Scripts/implement_qmla.py \
             -fq=1 \
             -p=$particles \
             -e=$experiments \
@@ -357,7 +356,7 @@ then
     done
     echo "
     cd $full_path_to_results
-    python3 ../../../../qmla/AnalyseMultipleQMD.py \
+    python3 ../../../../Scripts/AnalyseMultipleQMD.py \
         -dir=$full_path_to_results \
         --bayes_csv=$bayes_csv \
         -log=$this_log \

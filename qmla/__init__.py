@@ -3,6 +3,7 @@ from __future__ import absolute_import
 print("QMLA __init__")
 
 import qmla.GrowthRuleClasses
+import qmla.analysis
 
 from qmla.GrowthRules import * 
 
