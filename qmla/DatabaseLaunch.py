@@ -12,7 +12,7 @@ import hashlib
 import redis
 from qinfer import NormalDistribution
 
-from qmla.QML import ModelLearningClass, reducedModel
+from qmla.QML import ModelInstanceForLearning, ModelInstanceForStorage
 from qmla.DataBase import * 
 
 def launch_db(
@@ -226,7 +226,7 @@ def add_model(
         )
         op = operator(name=sim_name, undimensionalised_name=model_name)
         num_rows = len(running_database)
-        qml_instance = ModelLearningClass(
+        qml_instance = ModelInstanceForLearning(
             name=op.name,
             num_probes=num_probes,
             # probe_dict = probe_dict,
@@ -249,7 +249,7 @@ def add_model(
         # Note: do NOT use pd.df.append() as this copies total DB,
         # appends and returns copy.
 
-        reduced_qml_instance = reducedModel(
+        reduced_qml_instance = ModelInstanceForStorage(
             model_name=model_name,
             sim_oplist=op.constituents_operators,
             true_oplist=true_ops,

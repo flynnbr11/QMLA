@@ -905,7 +905,7 @@ class QuantumModelLearningAgent():
     def getModelInstanceFromID(self, model_id):
         return DataBase.model_instance_from_id(self.db, model_id)
 
-    def reducedModelInstanceFromID(self, model_id):
+    def ModelInstanceForStorageInstanceFromID(self, model_id):
         return DataBase.reduced_model_instance_from_id(self.db, model_id)
 
     def killModel(self, name):
@@ -1464,8 +1464,8 @@ class QuantumModelLearningAgent():
         lower_id = min(a, b)
         higher_id = max(a, b)
 
-        mod_low = self.reducedModelInstanceFromID(lower_id)
-        mod_high = self.reducedModelInstanceFromID(higher_id)
+        mod_low = self.ModelInstanceForStorageInstanceFromID(lower_id)
+        mod_high = self.ModelInstanceForStorageInstanceFromID(higher_id)
         if higher_id in mod_low.BayesFactors:
             mod_low.BayesFactors[higher_id].append(bayes_factor)
         else:
@@ -2059,8 +2059,8 @@ class QuantumModelLearningAgent():
                         pass
 
                 # Add bayes factors to BayesFactor dict for each model
-                mod_a = self.reducedModelInstanceFromID(mod1)
-                mod_b = self.reducedModelInstanceFromID(mod2)
+                mod_a = self.ModelInstanceForStorageInstanceFromID(mod1)
+                mod_b = self.ModelInstanceForStorageInstanceFromID(mod2)
                 if mod2 in mod_a.BayesFactors:
                     mod_a.BayesFactors[mod2].append(bayes_factor)
                 else:
@@ -2619,7 +2619,7 @@ class QuantumModelLearningAgent():
                 mod_id
             ]
         )
-        mod = self.reducedModelInstanceFromID(mod_id)
+        mod = self.ModelInstanceForStorageInstanceFromID(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
         mod.updateLearnedValues(
             # fitness_parameters = self.FitnessParameters
@@ -2669,7 +2669,7 @@ class QuantumModelLearningAgent():
         # TODO write single QHL test
         time_now = time.time()
         time_taken = time_now - self.StartingTime
-#        true_model_r_squared = self.reducedModelInstanceFromID(self.TrueOpModelID).r_squared()
+#        true_model_r_squared = self.ModelInstanceForStorageInstanceFromID(self.TrueOpModelID).r_squared()
 
         self.ResultsDict = {
             'NumParticles': self.NumParticles,
@@ -2797,7 +2797,7 @@ class QuantumModelLearningAgent():
             mod_id = DataBase.model_id_from_name(
                 db=self.db, name=mod_name
             )
-            mod = self.reducedModelInstanceFromID(mod_id)
+            mod = self.ModelInstanceForStorageInstanceFromID(mod_id)
             mod.updateLearnedValues(
                 fitness_parameters=self.FitnessParameters
             )
@@ -3003,7 +3003,7 @@ class QuantumModelLearningAgent():
                     self.BranchAllModelsLearned[branchID] = True
                     models_this_branch = self.BranchModelIds[branchID]
                     for mod_id in models_this_branch:
-                        mod = self.reducedModelInstanceFromID(mod_id)
+                        mod = self.ModelInstanceForStorageInstanceFromID(mod_id)
                         mod.updateLearnedValues(
                             # fitness_parameters = self.FitnessParameters
                         )
@@ -3161,11 +3161,11 @@ class QuantumModelLearningAgent():
         # Final functions at end of QMD
         # Fill in champions result dict for further analysis.
 
-        champ_model = self.reducedModelInstanceFromID(self.ChampID)
+        champ_model = self.ModelInstanceForStorageInstanceFromID(self.ChampID)
         for i in range(self.HighestModelID):
             # Dict of all Bayes factors for each model considered.
             self.AllBayesFactors[i] = (
-                self.reducedModelInstanceFromID(i).BayesFactors
+                self.ModelInstanceForStorageInstanceFromID(i).BayesFactors
             )
 
         self.log_print(["computing expect vals for mod ", champ_model.ModelID])
@@ -3215,10 +3215,10 @@ class QuantumModelLearningAgent():
 
         num_qubits_champ_model = DataBase.get_num_qubits(self.ChampionName)
         self.LearnedParamsChamp = (
-            self.reducedModelInstanceFromID(self.ChampID).LearnedParameters
+            self.ModelInstanceForStorageInstanceFromID(self.ChampID).LearnedParameters
         )
         self.FinalSigmasChamp = (
-            self.reducedModelInstanceFromID(self.ChampID).FinalSigmas
+            self.ModelInstanceForStorageInstanceFromID(self.ChampID).FinalSigmas
         )
         num_exp_ham = (
             self.NumParticles *
@@ -3315,7 +3315,7 @@ class QuantumModelLearningAgent():
     def checkChampReducibility(
         self,
     ):
-        champ_mod = self.reducedModelInstanceFromID(self.ChampID)
+        champ_mod = self.ModelInstanceForStorageInstanceFromID(self.ChampID)
         self.log_print(
             [
                 "Checking reducibility of champ model:",
@@ -3379,7 +3379,7 @@ class QuantumModelLearningAgent():
                 force_create_model=True
             )
             reduced_mod_id = reduced_mod_info['model_id']
-            reduced_mod_instance = self.reducedModelInstanceFromID(
+            reduced_mod_instance = self.ModelInstanceForStorageInstanceFromID(
                 reduced_mod_id
             )
 
@@ -3439,13 +3439,13 @@ class QuantumModelLearningAgent():
                 protocol=2
             )
 
-            # TODO fill in values for reducedModel
+            # TODO fill in values for ModelInstanceForStorage
             self.RedisDataBases['learned_models_info'].set(
                 str(float(reduced_mod_id)),
                 compressed_reduced_champ_info
             )
 
-            self.reducedModelInstanceFromID(
+            self.ModelInstanceForStorageInstanceFromID(
                 reduced_mod_id).updateLearnedValues()
 
             bayes_factor = self.remoteBayes(
@@ -3486,8 +3486,8 @@ class QuantumModelLearningAgent():
                 self.ChampID = reduced_mod_id
                 self.ChampionName = new_mod
 
-                self.reducedModelInstanceFromID(self.ChampID).BayesFactors = (
-                    self.reducedModelInstanceFromID(
+                self.ModelInstanceForStorageInstanceFromID(self.ChampID).BayesFactors = (
+                    self.ModelInstanceForStorageInstanceFromID(
                         original_champ_id).BayesFactors
                 )
 
@@ -3506,7 +3506,7 @@ class QuantumModelLearningAgent():
             try:
                 # TODO remove this try/except when reduced-champ-model instance
                 # is update-able
-                mod = self.reducedModelInstanceFromID(mod_id)
+                mod = self.ModelInstanceForStorageInstanceFromID(mod_id)
                 mod.updateLearnedValues(
                     fitness_parameters=self.FitnessParameters
                 )
@@ -3521,7 +3521,7 @@ class QuantumModelLearningAgent():
 
         true_set = self.GrowthClass.true_operator_terms
 
-        growth_class = self.reducedModelInstanceFromID(model_id).GrowthClass
+        growth_class = self.ModelInstanceForStorageInstanceFromID(model_id).GrowthClass
         terms = [
             growth_class.latex_name(
                 term
@@ -3653,7 +3653,7 @@ class QuantumModelLearningAgent():
         plt.ylabel('Volume')
 
         for i in model_id_list:
-            vols = self.reducedModelInstanceFromID(i).VolumeList
+            vols = self.ModelInstanceForStorageInstanceFromID(i).VolumeList
             plt.semilogy(vols, label=str('ID:' + str(i)))
 #            plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1.0))
 

@@ -37,9 +37,9 @@ test_growth_class_implementation = True
 
 """
 In this file are class definitions:
-    - ModelLearningClass
-    - reducedModel
-    - modelClassForRemoteBayesFactor
+    - ModelInstanceForLearning
+    - ModelInstanceForStorage
+    - ModelInstanceForComparison
 
 """
 
@@ -107,7 +107,7 @@ def time_seconds():
     return time
 
 
-class ModelLearningClass():
+class ModelInstanceForLearning():
     """
     Class to learn individual model. Model name is given when initialised.
     A host_name and port_number are given to InitialiseNewModel.
@@ -968,7 +968,7 @@ class ModelLearningClass():
 
 
 ### Reduced class with only essential information saved ###
-class reducedModel():
+class ModelInstanceForStorage():
     """
     Class holds what is required for updates only.
     i.e.
@@ -1282,9 +1282,6 @@ class reducedModel():
         exp_data = [
             self.ExperimentalMeasurements[t] for t in exp_times
         ]
-        # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
-        # probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
-        # probe = plot_probes[self.NumQubits]
         probe = self.PlotProbes[self.ProbeDimension]
 
         datamean = np.mean(exp_data[0:max_data_idx])
@@ -1297,10 +1294,7 @@ class reducedModel():
         self.total_sum_of_squares = total_sum_of_squares
 
         ham = self.LearnedHamiltonian
-
-        # print(exp_times)
         sum_of_residuals = 0
-
         available_expectation_values = sorted(
             list(self.expectation_values.keys()))
 
@@ -1448,12 +1442,12 @@ class reducedModel():
 #        self.Updater.NormalizationRecord = self.NormalizationRecord
 
 
-class modelClassForRemoteBayesFactor():
+class ModelInstanceForComparison():
     """
     When Bayes factors are calculated remotely (ie on RQ workers),
     they require SMCUpdaters etc to do calculations.
     This class captures the minimum required to enable these calculations.
-    These are pickled by the ModelLearningClass to a redis database:
+    These are pickled by the ModelInstanceForLearning to a redis database:
     this class unpickles the useful information and generates new instances
     of GenSimModel etc. to use in those calculations.
 

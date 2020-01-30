@@ -132,14 +132,14 @@ def BayesFactorRemote(
                 return (1.0 / bayes_factor)
     else:
 
-        model_a = QML.modelClassForRemoteBayesFactor(
+        model_a = QML.ModelInstanceForComparison(
             modelID=model_a_id,
             host_name=host_name,
             port_number=port_number,
             qid=qid,
             log_file=log_file
         )
-        model_b = QML.modelClassForRemoteBayesFactor(
+        model_b = QML.ModelInstanceForComparison(
             modelID=model_b_id,
             host_name=host_name,
             port_number=port_number,

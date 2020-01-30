@@ -401,7 +401,7 @@ if global_variables.qhl_test:
             )
         )
 
-        true_mod_instance = qmd.reducedModelInstanceFromID(
+        true_mod_instance = qmd.ModelInstanceForStorageInstanceFromID(
             qmd.TrueOpModelID
         )
 
@@ -429,7 +429,7 @@ if global_variables.qhl_test:
         log_file
     )
 
-    true_mod = qmd.reducedModelInstanceFromID(
+    true_mod = qmd.ModelInstanceForStorageInstanceFromID(
         qmd.TrueOpModelID
     )
     extend_dynamics_plot_times = [
@@ -539,7 +539,7 @@ elif (
     # results_file = global_variables.results_file
 
     for mid in model_ids:
-        mod = qmd.reducedModelInstanceFromID(mid)
+        mod = qmd.ModelInstanceForStorageInstanceFromID(mid)
         name = mod.Name
 
         results_file = str(
@@ -607,7 +607,7 @@ else:
         )
     )
 
-    champ_mod = qmd.reducedModelInstanceFromID(
+    champ_mod = qmd.ModelInstanceForStorageInstanceFromID(
         qmd.ChampID
     )
     extend_dynamics_plot_times = [

@@ -43,22 +43,8 @@ def databases_from_qmd_id(
         qmd_id=qmd_id)
 
     if print_status:
-        # print("Database requested for host/port/id", host_name,
-        #     port_number, qmd_id, "has seed", seed
-        # )
         qid_seeds = redis.StrictRedis(host=host_name, port=port_number, db=0)
-        # print("QID seed dict has keys:", qid_seeds.keys())
 
-    # num_trees = len(tree_identifiers)
-    # for j in range(num_trees):
-    #     tree_id = tree_identifiers[j]
-    #     for i in range(len(databases_required)):
-    #         new_db = databases_required[i]
-    #         database_dict[tree_id][new_db] = redis.StrictRedis(
-    #             host=host_name,
-    #             port=port_number,
-    #             db=seed+(j*num_trees)+i
-    #         )
     for i in range(len(databases_required)):
         new_db = databases_required[i]
         database_dict[new_db] = redis.StrictRedis(

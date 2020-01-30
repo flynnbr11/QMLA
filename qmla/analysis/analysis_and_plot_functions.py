@@ -187,7 +187,7 @@ def ExpectationValuesTrueSim(
         for i in range(len(model_ids)):
             mod_id = model_ids[i]
             sim = qmd.ModelNameIDs[mod_id]
-            mod = qmd.reducedModelInstanceFromID(mod_id)
+            mod = qmd.ModelInstanceForStorageInstanceFromID(mod_id)
             sim_ham = mod.LearnedHamiltonian
             times_learned = mod.Times
             sim_dim = DataBase.get_num_qubits(mod.Name)
@@ -407,7 +407,7 @@ def plotDynamicsLearnedModels(
     col = 0
 
     for mod_id in model_ids:
-        reduced = qmd.reducedModelInstanceFromID(mod_id)
+        reduced = qmd.ModelInstanceForStorageInstanceFromID(mod_id)
         reduced.compute_expectation_values(
             times=qmd.PlotTimes
         )
@@ -520,7 +520,7 @@ def plotDynamicsLearnedModels(
                 if b != mod_id:
                     if b in list(all_bayes_factors[mod_id].keys()):
                         # bf_opponents.append(
-                        #     qmd.reducedModelInstanceFromID(b).LatexTerm
+                        #     qmd.ModelInstanceForStorageInstanceFromID(b).LatexTerm
                         # )
                         bayes_factors_this_mod.append(
                             np.log10(all_bayes_factors[mod_id][b][-1]))
@@ -771,7 +771,7 @@ def ExpectationValuesQHL_TrueModel(
         mod_id = model_ids[i]
         sim = qmd.ModelNameIDs[mod_id]
         sim_op = DataBase.operator(sim)
-        mod = qmd.reducedModelInstanceFromID(mod_id)
+        mod = qmd.ModelInstanceForStorageInstanceFromID(mod_id)
         sim_params = list(mod.FinalParams[:, 0])
         sim_ops = sim_op.constituents_operators
         sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
@@ -910,11 +910,11 @@ def plotDistributionProgression(
     plt.clf()
     if true_model:
         try:
-            mod = qmd.reducedModelInstanceFromID(qmd.TrueOpModelID)
+            mod = qmd.ModelInstanceForStorageInstanceFromID(qmd.TrueOpModelID)
         except BaseException:
             print("True model not present in this instance of QMD.")
     elif model_id is not None:
-        mod = qmd.reducedModelInstanceFromID(model_id)
+        mod = qmd.ModelInstanceForStorageInstanceFromID(model_id)
     else:
         print("Either provide a model id or set true_model=True to generate \
               plot of distribution development."
@@ -1380,7 +1380,7 @@ def r_squared_from_epoch_list(
     ax = plt.subplot(111)
     model_ids = list(set(model_ids))
     for model_id in model_ids:
-        mod = qmd.reducedModelInstanceFromID(model_id)
+        mod = qmd.ModelInstanceForStorageInstanceFromID(model_id)
         r_squared_by_epoch = {}
 
         mod_num_qubits = DataBase.get_num_qubits(mod.Name)
@@ -1441,7 +1441,7 @@ def plot_quadratic_loss(
         plot_title = str('Quadratic Loss for all models')
 
     for i in sorted(list(to_plot_quad_loss)):
-        mod = qmd.reducedModelInstanceFromID(i)
+        mod = qmd.ModelInstanceForStorageInstanceFromID(i)
         if len(mod.QuadraticLosses) > 0:
             epochs = range(1, len(mod.QuadraticLosses) + 1)
             model_name = mod.GrowthClass.latex_name(
@@ -1519,13 +1519,13 @@ def plotVolumeQHL(
 ):
     if true_model:
         try:
-            mod = qmd.reducedModelInstanceFromID(
+            mod = qmd.ModelInstanceForStorageInstanceFromID(
                 qmd.TrueOpModelID
             )
         except BaseException:
             print("True model not present in QMD models.")
     elif model_id is not None:
-        mod = qmd.reducedModelInstanceFromID(model_id)
+        mod = qmd.ModelInstanceForStorageInstanceFromID(model_id)
     else:
         print("Must either provide model_id or set true_model=True for volume plot.")
 
@@ -1794,8 +1794,8 @@ def plotHinton(
 ###### Tree diagram #####
 
 def adjacent_branch_test(qmd, mod1, mod2):
-    mod_a = qmd.reducedModelInstanceFromID(mod1).Name
-    mod_b = qmd.reducedModelInstanceFromID(mod2).Name
+    mod_a = qmd.ModelInstanceForStorageInstanceFromID(mod1).Name
+    mod_b = qmd.ModelInstanceForStorageInstanceFromID(mod2).Name
     br_a = qmd.pullField(name=mod_a, field='branchID')
     br_b = qmd.pullField(name=mod_b, field='branchID')
 
@@ -1865,7 +1865,7 @@ def qmdclassTOnxobj(
         branch_mod_count[i] = 0
 
     for i in modlist:
-        mod = qmd.reducedModelInstanceFromID(i)
+        mod = qmd.ModelInstanceForStorageInstanceFromID(i)
         name = mod.Name
         branch = qmd.pullField(name=name, field='branchID')
         branch_mod_count[branch] += 1
@@ -1880,7 +1880,7 @@ def qmdclassTOnxobj(
     # are on that branch (y-coordinate)
     most_models_per_branch = max(branch_mod_count.values())
     for i in modlist:
-        mod = qmd.reducedModelInstanceFromID(i)
+        mod = qmd.ModelInstanceForStorageInstanceFromID(i)
         name = mod.Name
         branch = qmd.pullField(name=name, field='branchID')
         num_models_this_branch = branch_mod_count[branch]
@@ -3034,7 +3034,7 @@ def parameterEstimates(
     save_to_file=None
 ):
     from matplotlib import cm
-    mod = qmd.reducedModelInstanceFromID(modelID)
+    mod = qmd.ModelInstanceForStorageInstanceFromID(modelID)
     name = mod.Name
 
     if name not in list(qmd.ModelNameIDs.values()):
@@ -3493,15 +3493,15 @@ def get_bayes_latex_dict(qmd):
     )
     for i in list(qmd.AllBayesFactors.keys()):
         mod = qmd.ModelNameIDs[i]
-        latex_name = qmd.reducedModelInstanceFromID(i).LatexTerm
+        latex_name = qmd.ModelInstanceForStorageInstanceFromID(i).LatexTerm
         mapping = (mod, latex_name)
         print(mapping, file=latex_write_file)
 
     for i in list(qmd.AllBayesFactors.keys()):
-        mod_a = qmd.reducedModelInstanceFromID(i).LatexTerm
+        mod_a = qmd.ModelInstanceForStorageInstanceFromID(i).LatexTerm
         latex_dict[mod_a] = {}
         for j in list(qmd.AllBayesFactors[i].keys()):
-            mod_b = qmd.reducedModelInstanceFromID(j).LatexTerm
+            mod_b = qmd.ModelInstanceForStorageInstanceFromID(j).LatexTerm
             latex_dict[mod_a][mod_b] = qmd.AllBayesFactors[i][j][-1]
     return latex_dict
 

@@ -62,7 +62,7 @@ def learnModelRemote(
     models  without knowledge of full QMD program.
     QMD info is unpickled from a redis databse, containing
     true operator, params etc.
-    Given model names are used to generate ModelLearningClass instances,
+    Given model names are used to generate ModelInstanceForLearning instances,
     upon which we update the posterior parameter distribution iteratively.
     Once parameters are learned, we pickle the results to dictionaries
     held on a redis database which can be accessed by other actors.
@@ -131,7 +131,7 @@ def learnModelRemote(
 
     # Generate model and learn
     op = DataBase.operator(name=name)
-    qml_instance = QML.ModelLearningClass(
+    qml_instance = QML.ModelInstanceForLearning(
         name=name,
         num_probes=num_probes,
         probe_dict=probe_dict,

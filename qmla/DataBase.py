@@ -63,7 +63,7 @@ import hashlib
 import redis
 from qinfer import NormalDistribution
 
-# from qmla.QML import ModelLearningClass, reducedModel
+# from qmla.QML import ModelInstanceForLearning, ModelInstanceForStorage
 
 def identity():
     return np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, 1 + 0.j]])
