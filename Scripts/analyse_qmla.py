@@ -582,7 +582,7 @@ if further_qhl_mode == False:
         #     save_to_file='multiQMD_tree_mean_bayes_factors.png'
         # )
 
-        plot_tree_multi_QMD(
+        qmla.analysis.plot_tree_multi_QMD(
             results_csv=results_csv,
             latex_mapping_file=latex_mapping_file,
             avg_type='medians',

@@ -29,7 +29,6 @@ from matplotlib.projections.polar import PolarAxes
 from matplotlib.projections import register_projection
 from inspect import currentframe, getframeinfo
 
-import qmla.Evo as Evo
 import qmla.GrowthRules as GrowthRules
 import qmla.ModelNames as ModelNames
 import qmla.ExperimentalDataFunctions as expdt
@@ -794,8 +793,7 @@ def ExpectationValuesQHL_TrueModel(
 #        print("Times =\n", times)
 
         sim_expec_values = []
-        for t in times:
-            # ex_val = ExpectationValues.hahn_evolution(
+        for t in times:            
             ex_val = qmd.GrowthClass.expectation_value(
                 ham=sim_ham,
                 t=t,
@@ -1398,7 +1396,6 @@ def r_squared_from_epoch_list(
             ham = np.tensordot(mod.TrackEval[epoch], mod.SimOpList, axes=1)
             sum_of_residuals = 0
             for t in exp_times:
-                # sim = ExpectationValues.hahn_evolution(
                 sim = qmd.GrowthClass.expectation - value(
                     ham=ham,
                     t=t,
@@ -1761,11 +1758,17 @@ def plotHinton(
     growth_generator=None,
     save_to_file=None
 ):
+    """
+    Deprecated -- using old functionality e.g. get_latex_name 
+    should come from growth class; 
+    but retained in case plotting logic wanted later
+    """
+
     hinton_mtx = BayF_IndexDictToMatrix(model_names, bayes_factors)
     log_hinton_mtx = np.log10(hinton_mtx)
     # labels = [DataBase.latex_name_ising(name) for name in model_names.values()]
     labels = [
-        UserFunctions.get_latex_name(name, growth_generator)
+        get_latex_name(name, growth_generator)
         for name in model_names.values()
     ]
 
@@ -3170,12 +3173,15 @@ def parameterEstimates(
 ### Radar Plot ###
 
 def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
+    """
+    Deprecated -- using old functionality e.g. UserFunctions; 
+    but retained in case plotting logic wanted later
+    """
+  
     from matplotlib import cm as colmap
-# from viz_library_undev import radar_factory # TODO IS THIS THE RIGHT
-# FUNCTION?
 
     labels = [
-        UserFunctions.get_latex_name(
+        get_latex_name(
             name=qmd.ModelNameIDs[l],
             growth_generator=qmd.GrowthGenerator
         ) for l in modlist

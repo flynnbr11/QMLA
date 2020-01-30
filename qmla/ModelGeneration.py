@@ -17,22 +17,13 @@ import pandas as pd
 import warnings
 import copy
 import time as time
-#import Evo as evo
+
 import qmla.DataBase as DataBase
 import qmla.ModelNames as ModelNames
 
-# global paulis_list
-# paulis_list = {'i' : np.eye(2), 'x' : evo.sigmax(), 'y' : evo.sigmay(), 'z' : evo.sigmaz()}
-
-# Dict of max spawn depths, corresponding to different generation functions.
-
-##########################################################################
-##########################################################################
 """
 Essential functions. Functions below are specific, for generating terms according to given rules. new_model_list is the wrapper function which calls the selected generator rule.
 """
-##########################################################################
-##########################################################################
 
 
 def time_seconds():

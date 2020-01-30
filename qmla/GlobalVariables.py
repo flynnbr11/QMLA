@@ -4,7 +4,6 @@ import sys
 import pickle
 
 import qmla.GrowthRules as GrowthRules
-# import UserFunctions
 import qmla.DataBase as DataBase
 
 
@@ -142,13 +141,6 @@ class GlobalVariablesClass():
             # self.measurement_type = self.growth_class.measurement_type
         self.measurement_type = self.growth_class.expectation_value_function.__name__
         self.dataset = self.growth_class.experimental_dataset
-        # except:
-        #   self.measurement_type = UserFunctions.get_measurement_type(
-        #     growth_generator = self.growth_generation_rule
-        #   )
-        #   self.dataset = UserFunctions.get_experimental_dataset(
-        #     growth_generator = self.growth_generation_rule
-        #   )
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
         self.multiQHL = bool(arguments.multiQHL)
@@ -188,10 +180,6 @@ class GlobalVariablesClass():
                     true_ham = param * mtx
 
         self.true_hamiltonian = true_ham
-        # self.true_operator = UserFunctions.default_true_operators_by_generator[
-        #     self.growth_generation_rule
-        # ]
-
         self.qhl_test = bool(arguments.qhl_test)
         self.further_qhl = bool(arguments.further_qhl)
         self.do_iqle = bool(arguments.do_iqle)
@@ -509,19 +497,6 @@ def parse_cmd_line_args(args):
         type=int,
         default=default_experimental_data
     )
-    # parser.add_argument(
-    #   '-meas', '--measurement_type',
-    #   help='Which measurement type to use. Must be written in Evo.py.',
-    #   type=str,
-    #   default=default_measurement_type
-    # )
-
-    # parser.add_argument(
-    #   '-ds', '--dataset',
-    #   help='Dataset to use',
-    #   type=str,
-    #   default=default_dataset
-    # )
 
     parser.add_argument(
         '-dst', '--data_max_time',

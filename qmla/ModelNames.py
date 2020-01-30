@@ -14,7 +14,6 @@ import warnings
 import time as time
 import warnings
 
-import qmla.Evo as evo
 import qmla.DataBase as DataBase
 
 """

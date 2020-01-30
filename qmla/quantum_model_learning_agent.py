@@ -38,12 +38,6 @@ import qmla.RedisSettings as rds
 __all__ = [
     'QuantumModelLearningAgent'
 ]
-# Local files
-# import UserFunctions
-
-global test_growth_class_implementation
-test_growth_class_implementation = True
-
 
 def time_seconds():
     import datetime

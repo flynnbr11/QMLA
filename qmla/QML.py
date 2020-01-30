@@ -830,22 +830,6 @@ class ModelLearningClass():
                                 self.TrackLogTotLikelihood[-1]]
                                )
 
-    # def resetPrior(self):
-    #     print("[QML]\n\n\n\n\IN RESET PRIOR\n\n\n")
-    #     self.Updater.prior = self.Prior
-    #     self.Updater = qi.SMCUpdater(self.GenSimModel,
-    #         self.NumParticles, self.Prior,
-    #         resample_thresh=self.ResamplerThresh,
-    #         resampler = qi.LiuWestResampler(a=self.ResamplerA),
-    #         debug_resampling=False
-    #     )
-    # # TODO  use UserFunctions.get_heuristic() instead
-    #     self.Heuristic = mpgh.multiPGH(
-    #         self.Updater,
-    #         self.SimOpList,
-    #         inv_field=self.Inv_Field
-    #     )
-    #     return 1
 
     def learned_info_dict(self):
         """

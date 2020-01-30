@@ -5,7 +5,7 @@ import os
 import random
 
 from qmla.GrowthRuleClasses import SuperClassGrowthRule
-from qmla import GeneticAlgorithm
+from qmla.GrowthRuleClasses import GeneticAlgorithm
 from qmla import Heuristics
 from qmla import SystemTopology
 from qmla import ModelGeneration

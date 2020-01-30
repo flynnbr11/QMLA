@@ -12,10 +12,6 @@ import random
 import pickle
 pickle.HIGHEST_PROTOCOL = 2
 
-# import ModelGeneration
-# sys.path.append(os.path.join("..", "qmla"))
-# import ExpectationValues
-# import QML
 sys.path.append("..")
 import qmla
 from qmla import DataBase
@@ -64,13 +60,6 @@ store_particles_weights = False
 
 log_file = global_variables.log_file
 qle = global_variables.do_qle  # True for QLE, False for IQLE
-# if global_variables.special_probe == 'plus':
-#     num_probes=1
-# else:
-#     num_probes = 20
-
-# using 40 probes for training - randomly generated
-# num_probes = 40
 
 growth_class.generate_probes(
     experimental_data=global_variables.use_experimental_data,
@@ -155,17 +144,6 @@ if global_variables.use_experimental_data is True:
 else:
     expec_val_plot_max_time = global_variables.data_max_time
 
-"""
-for t in list(experimental_measurements_dict.keys()):
-    # Shift t-values by offset so t=0 corresponds to Pr(0)=1
-    # Convert t from ns to ms; remove old records
-
-    new_time = (t - global_variables.data_time_offset)/1000
-    msmt = experimental_measurements_dict[t]
-    experimental_measurements_dict.pop(t)
-    experimental_measurements_dict[new_time] = msmt
-"""
-
 plot_lower_time = 0
 plot_upper_time = growth_class.max_time_to_consider
 plot_number_times = num_datapoints_to_plot
@@ -190,17 +168,14 @@ log_print(
 )
 
 true_op = global_variables.true_operator
-# true_params = global_variables.true_params
 true_num_qubits = DataBase.get_num_qubits(true_op)
 true_op_list = DataBase.get_constituent_names_from_name(true_op)
 true_op_matrices = [DataBase.compute(t) for t in true_op_list]
 num_params = len(true_op_list)
 true_expectation_value_path = global_variables.true_expec_path
 true_ham = global_variables.true_hamiltonian
-# don't get dimension directly in case N particles encoded in >N hilbert space
-# true_probe_dimension = np.log2(np.shape(true_ham)[0])
-if os.path.isfile(true_expectation_value_path) == False:
 
+if os.path.isfile(true_expectation_value_path) == False:
     true_expec_values = {}
     plot_probe_dict = pickle.load(
         open(global_variables.plot_probe_file, 'rb')
@@ -285,8 +260,6 @@ if global_variables.further_qhl == True:
 
 
 num_ops = len(initial_op_list)
-# do_qhl_plots = global_variables.qhl_test and False # TODO when to turn
-# this on?
 do_qhl_plots = False  # testing posterior transition # TODO turn off usually
 
 results_directory = global_variables.results_directory
@@ -377,9 +350,6 @@ if global_variables.qhl_test:
             pickle.dump(qmd, pkl_file, protocol=2)
 
     if global_variables.save_plots:
-
-        print("[Exp.py] Plotting things")
-
         try:
             log_print(
                 [
@@ -434,11 +404,6 @@ if global_variables.qhl_test:
         true_mod_instance = qmd.reducedModelInstanceFromID(
             qmd.TrueOpModelID
         )
-        # r_squared = (
-        #     true_mod_instance.r_squared()
-        # )
-
-    print("plotting expectation values")
 
     log_print(
         [
@@ -491,21 +456,6 @@ if global_variables.qhl_test:
         )
     )
 
-
-#     qmd.plotExpecValues(
-#         model_ids = [qmd.TrueOpModelID], # hardcode to see full model for development
-#         max_time = expec_val_plot_max_time, #in microsec
-#         t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
-# #        t_interval=0.02,
-#         champ = False,
-#         save_to_file=str(
-#             global_variables.plots_directory +
-#             'expec_values_' +
-#             str(global_variables.long_id)+
-#             '.png'
-#         )
-#     )
-
     results_file = global_variables.results_file
     pickle.dump(
         qmd.ResultsDict,
@@ -513,16 +463,12 @@ if global_variables.qhl_test:
         protocol=2
     )
 
-
 elif (
     global_variables.further_qhl == True
     or global_variables.multiQHL == True
 ):
 
     if global_variables.multiQHL == True:
-        # note models are only for true growth generation rule
-        # models to QHL can be declared in
-        # UserFunctions.qhl_models_by_generator dict
         qhl_models = growth_class.qhl_models
         # output_prefix = 'multi_qhl_'
         output_prefix = ''  # TODO make so that this can have an output prefix

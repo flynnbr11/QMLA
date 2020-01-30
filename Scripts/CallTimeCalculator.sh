@@ -1,9 +1,8 @@
 #!/bin/bash
 
-RESULTS_DIR='../../DevelopmentNotebooks'
+RESULTS_DIR='../DevelopmentNotebooks'
 script_name="call_time_script.sh"
 script_path="$RESULTS_DIR/$script_name"
-# rm $script_path
 
 additional_growth="-agr=ising_1d_chain -agr=hubbard_square_lattice_generalised"
 # additional_growth=""

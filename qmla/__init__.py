@@ -2,16 +2,13 @@ from __future__ import absolute_import
 
 print("QMLA __init__")
 
-import qmla.GrowthRuleClasses
+# import qmla.GrowthRuleClasses
 import qmla.analysis
 
 from qmla.GrowthRules import * 
-
 from qmla.DataBase import * # TODO fix __all__
 from qmla.Distributions import *
-from qmla.GeneticAlgorithm import *
 from qmla.GlobalVariables import *
-
 from qmla.ModelGeneration import * # TODO fix __all__
 from qmla.ModelNames import * # TODO fix __all__
 from qmla.QInferClassQML import * 

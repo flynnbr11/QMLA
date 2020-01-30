@@ -1405,11 +1405,16 @@ def get_entropy(
     growth_generator=None,
     inf_gain=False
 ):
+    """
+    Deprecated -- using old functionality e.g. get_all_model_names 
+    should come from growth class; 
+    but retained in case plotting logic wanted later
+    """
     # TODO this calculation of entropy may not be correct
     # What is initial_entropy meant to be?
     num_qmd_instances = sum(list(models_points.values()))
     num_possible_qmd_instances = len(
-        UserFunctions.get_all_model_names(
+        get_all_model_names(
             growth_generator=growth_generator,
             return_branch_dict='latex_terms'
         )

@@ -27,12 +27,13 @@ except BaseException:
 
 import qmla.DataBase as DataBase
 import qmla.QML as QML
+import qmla.analysis 
 
 
 plt.switch_backend('agg')
 
 # Local files
-# import Evo as evo
+
 # import ModelGeneration
 #import BayesF
 # from Distrib import MultiVariateNormalDistributionNocov
@@ -471,8 +472,6 @@ def plot_expec_vals_of_models(
     log_file,
     save_to_file=None
 ):
-    import UserFunctions
-
     exp_msmts = model_a.ExperimentalMeasurements
     times = list(sorted(exp_msmts.keys()))
     experimental_exp_vals = [
@@ -525,12 +524,7 @@ def plot_expec_vals_of_models(
                     log_identifier='[remoteBayesFactor plots]'
                 )
             except BaseException:
-                exp_val = UserFunctions.expectation_value_wrapper(
-                    method=mod.MeasurementType,
-                    ham=final_ham,
-                    t=t,
-                    state=plot_probe
-                )
+                raise
             mod_exp_vals.append(exp_val)
             # mod_exp_vals.append(t)
             # print("exp val found for t={}:{}".format(t, exp_val))

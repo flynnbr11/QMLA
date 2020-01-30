@@ -32,12 +32,6 @@ import qmla.QML as QML
 plt.switch_backend('agg')
 
 # Local files
-# import Evo as evo
-# from QML import *
-# import ModelGeneration
-#import BayesF
-# from Distrib import MultiVariateNormalDistributionNocov
-
 
 def time_seconds():
     import datetime

@@ -5,11 +5,16 @@ import matplotlib.pyplot as plt
 import argparse
 import numpy as np
 
-# import UserFunctions
-import DataBase
-import GrowthRules
-# Information needed
+sys.path.append("..")
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname( __file__ ), '..')
+    )
+)
+import qmla
 
+# import DataBase
+# import GrowthRules
 
 parser = argparse.ArgumentParser(
     description='Pass variables for (I)QLE.'
@@ -368,7 +373,7 @@ def time_required(
     total_time_required = 0
     for gen in growth_rules:
         try:
-            growth_class = GrowthRules.get_growth_generator_class(
+            growth_class = qmla.get_growth_generator_class(
                 growth_generation_rule=gen
             )
             generator_max_num_models_by_shape = growth_class.max_num_models_by_shape
@@ -411,14 +416,11 @@ def time_required(
     try:
         true_operator = growth_class.true_operator
     except BaseException:
-        true_operator = UserFunctions.default_true_operators_by_generator[
-            growth_generator
-        ]
-
+        raise
     highest_parallelisability = max(parallelisability.values())
     times_reqd['num_processes'] = highest_parallelisability
 
-    true_dimension = DataBase.get_num_qubits(true_operator)
+    true_dimension = qmla.get_num_qubits(true_operator)
     qhl_time = 2 * (
         insurance_factor *
         hamiltonian_exponentiation_times[true_dimension]
