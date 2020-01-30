@@ -145,8 +145,6 @@ parser.add_argument(
     default=0
 )
 
-# import UserFunctions
-
 arguments = parser.parse_args()
 results_directory = arguments.results_directory
 output_file_name = arguments.output_file_name

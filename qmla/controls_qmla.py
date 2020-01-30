@@ -9,7 +9,7 @@ import qmla.DataBase as DataBase
 
 """
 This file is callable with *kwargs from a separate QMD program.
-It returns an instance of the class GlobalVariablesClass, which has attributes
+It returns an instance of the class ControlsQMLA, which has attributes
 for all the user defined parameters, and defaults if not specified by the user.
 
 """
@@ -115,7 +115,7 @@ default_reallocate_resources = 0
 default_bayes_time_binning = 0
 
 
-class GlobalVariablesClass():
+class ControlsQMLA():
     def __init__(
         self,
         arguments,
@@ -657,7 +657,7 @@ def parse_cmd_line_args(args):
     arguments = parser.parse_args(args)
 
     # Use arguments to initialise global variables class.
-    global_variables = GlobalVariablesClass(
+    global_variables = ControlsQMLA(
         arguments,
     )
 
