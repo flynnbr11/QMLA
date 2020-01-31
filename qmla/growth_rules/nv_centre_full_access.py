@@ -8,10 +8,10 @@ from qmla import expectation_values
 from qmla import database_framework
 
 __all__ = [
-    'nv_centre_spin_full_access'
+    'ExperimentFullAccessNV'
 ]
 
-class nv_centre_spin_full_access(
+class ExperimentFullAccessNV(
     # SuperClassGrowthRule.growth_rule_super_class
     growth_rule_super_class
 ):
@@ -45,6 +45,7 @@ class nv_centre_spin_full_access(
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         # self.max_num_qubits = 3
+        self.max_num_probe_qubits = 8
         self.tree_completed_initially = False
         self.experimental_dataset = 'NVB_rescale_dataset.p'
         self.measurement_type = 'full_access'

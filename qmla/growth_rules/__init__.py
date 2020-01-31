@@ -2,16 +2,14 @@ from __future__ import absolute_import
 
 
 from qmla.growth_rules.SuperClassGrowthRule import * 
-from qmla.growth_rules.NVCentreFullAccess import * 
-from qmla.growth_rules.NVCentreExperimentGrowthRules import * 
-from qmla.growth_rules.NVCentreAlternativeTrueModel import *
-from qmla.growth_rules.NVCentreExperimentWithoutTransverseTerms import * 
-from qmla.growth_rules.NVCentreLargeSpinBath import *
-from qmla.growth_rules.NVCentreRevivals import * 
+from qmla.growth_rules.nv_centre_full_access import * 
+from qmla.growth_rules.nv_centre_experiment import * 
+from qmla.growth_rules.nv_centre_alternate_true_model import *
+from qmla.growth_rules.nv_centre_no_transverse_terms import * 
+from qmla.growth_rules.nv_centre_large_spin_bath import *
+from qmla.growth_rules.nv_centre_revivals import * 
 from qmla.growth_rules.NVExperimentVaryTrueModel import * 
-from qmla.growth_rules.NVCentreRevivals import * 
-from qmla.growth_rules.NVGrowByFitness import * 
-from qmla.growth_rules.NVProbabilistic import * 
+from qmla.growth_rules.nv_centre_revivals import * 
 from qmla.growth_rules.ReducedNVExperiment import * 
 
 from qmla.growth_rules.lindbladian import * 

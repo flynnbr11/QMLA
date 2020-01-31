@@ -231,22 +231,3 @@ def experimental_NVcentre_ising_probes_plusplus(
                 )
     return seperable_probes
 
-
-# def random_probe(num_qubits):
-#     dim = 2**num_qubits
-#     real = []
-#     imaginary = []
-#     complex_vectors = []
-#     for i in range(dim):
-#         real.append(np.random.uniform(low=-1, high=1))
-#         imaginary.append(np.random.uniform(low=-1, high=1))
-#         complex_vectors.append(real[i] + 1j*imaginary[i])
-
-#     a=np.array(complex_vectors)
-#     norm_factor = np.linalg.norm(a)
-#     probe = complex_vectors/norm_factor
-#     if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
-#         print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
-#         return probe_set_generation.random_probe(num_qubits)
-
-#     return probe

@@ -531,7 +531,7 @@ class ConnectedLattice(
         **kwargs
     ):
 
-        import model_naming
+        import qmla.model_naming
         # TODO get generation idx + sub generation idx
 
         return model_naming.branch_is_num_params_and_qubits(

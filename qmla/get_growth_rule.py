@@ -7,24 +7,22 @@ import qmla.growth_rules as GR
 
 growth_classes = {
     # # Experimental paper growth rules
-    'two_qubit_ising_rotation_hyperfine_transverse':
-        GR.nv_centre_spin_experimental_method,
-    'two_qubit_ising_rotation_hyperfine':
-        GR.nv_centre_spin_experimental_method_without_transvere_terms,
-    'NV_alternative_model':
-        GR.nv_centre_spin_experimental_method_alternative_true_model,
+    'ExperimentNVCentre':
+        GR.ExperimentNVCentre,
+    'ExperimentNVCentreNoTransvereTerms':
+        GR.ExperimentNVCentreNoTransvereTerms,
+    'ExpAlternativeNV':
+        GR.ExpAlternativeNV,
     'NV_alternative_model_2':
-        GR.nv_centre_spin_experimental_method_alternative_true_model_second,
+        GR.ExpAlternativeNV_second,
     'nv_experiment_vary_model':
-        GR.nv_centre_spin_experimental_method_varying_true_model,
-    'NV_fitness_growth':
-        GR.nv_fitness_growth,
-    'NV_centre_revivals':
-        GR.nv_centre_revival_data,
-    'NV_spin_full_access':
-        GR.nv_centre_spin_full_access,
-    'NV_centre_spin_large_bath':
-        GR.nv_centre_large_spin_bath,
+        GR.ExperimentNVCentre_varying_true_model,
+    'ExpNVRevivals':
+        GR.ExpNVRevivals,
+    'ExperimentFullAccessNV':
+        GR.ExperimentFullAccessNV,
+    'NVLargeSpinBath':
+        GR.NVLargeSpinBath,
     'reduced_nv_experiment':
         GR.reduced_nv_experiment,
     # Theoretical paper growth rules

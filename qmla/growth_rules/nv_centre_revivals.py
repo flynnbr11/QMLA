@@ -1,14 +1,14 @@
 import sys
 import os
 
-from qmla.growth_rules import NVCentreLargeSpinBath
+from qmla.growth_rules import nv_centre_large_spin_bath
 from qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import database_framework
 from qmla import experiment_design_heuristics
 
-class nv_centre_revival_data(
-    NVCentreLargeSpinBath.nv_centre_large_spin_bath  # inherit from this
+class ExpNVRevivals(
+    nv_centre_large_spin_bath.NVLargeSpinBath  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
@@ -29,9 +29,9 @@ class nv_centre_revival_data(
         self.true_operator = 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6'
 
         self.qhl_models = [
-            NVCentreLargeSpinBath.gali_model_nv_centre_spin(2),
-            NVCentreLargeSpinBath.gali_model_nv_centre_spin(6),
-            NVCentreLargeSpinBath.gali_model_nv_centre_spin(7),
+            nv_centre_large_spin_bath.gali_model_nv_centre_spin(2),
+            nv_centre_large_spin_bath.gali_model_nv_centre_spin(6),
+            nv_centre_large_spin_bath.gali_model_nv_centre_spin(7),
         ]
 
         self.plot_probe_generation_function = probe_set_generation.plus_probes_dict

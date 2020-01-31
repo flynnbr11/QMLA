@@ -2,18 +2,18 @@ import random
 import sys
 import os
 
-from qmla.growth_rules import NVCentreFullAccess
+from qmla.growth_rules import nv_centre_full_access
 from  qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import database_framework
 
 
 __all__ = [
-    'nv_centre_spin_experimental_method'
+    'ExperimentNVCentre'
 ]
 
-class nv_centre_spin_experimental_method(
-    NVCentreFullAccess.nv_centre_spin_full_access  # inherit from this
+class ExperimentNVCentre(
+    nv_centre_full_access.ExperimentFullAccessNV  # inherit from this
     # growth_rule_super_class # inherit from this
 ):
     # Uses all the same functionality, growth etc as

@@ -1,11 +1,11 @@
 import sys
 import os
 
-from qmla.growth_rules import NVCentreFullAccess
+from qmla.growth_rules import nv_centre_full_access
 
 
 class reduced_nv_experiment(
-    NVCentreFullAccess.nv_centre_spin_full_access
+    nv_centre_full_access.ExperimentFullAccessNV
 ):
     def __init__(
         self,

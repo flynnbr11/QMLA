@@ -2,14 +2,14 @@ import random
 import sys
 import os
 
-from qmla.growth_rules import NVCentreExperimentGrowthRules
+from qmla.growth_rules import nv_centre_experiment
 from qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import database_framework
 
 
 class PresentationPlotGeneration(
-    NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method  # inherit from this
+    nv_centre_experiment.ExperimentNVCentre  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
