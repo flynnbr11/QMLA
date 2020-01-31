@@ -21,7 +21,7 @@ pickle.HIGHEST_PROTOCOL = 2
 
 try:
     import redis
-    import qmla.RedisSettings as rds
+    import qmla.redis_settings as rds
     enforce_serial = False
 except BaseException:
     enforce_serial = True  # shouldn't be needed

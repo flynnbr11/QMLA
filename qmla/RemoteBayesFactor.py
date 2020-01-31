@@ -19,7 +19,7 @@ warnings.filterwarnings("ignore")
 pickle.HIGHEST_PROTOCOL = 2
 
 try:
-    import qmla.RedisSettings as rds
+    import qmla.redis_settings as rds
     import redis
     enforce_serial = False
 except BaseException:

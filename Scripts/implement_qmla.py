@@ -16,7 +16,7 @@ sys.path.append("..")
 import qmla
 from qmla import DataBase
 from qmla.quantum_model_learning_agent import QuantumModelLearningAgent  # QMD class in Library
-from qmla import RedisSettings as rds
+from qmla import redis_settings as rds
 
 # Parse input variables to use in QMD; store in class global_variables.
 global_variables = qmla.parse_cmd_line_args(sys.argv[1:])

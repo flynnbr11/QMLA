@@ -20,7 +20,7 @@ import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming
 from qmla.memory_tests import print_loc
 import qmla.qinfer_model_interface as qml_qi
-import qmla.RedisSettings as rds
+import qmla.redis_settings as rds
 
 global debug_print
 global print_mem_status

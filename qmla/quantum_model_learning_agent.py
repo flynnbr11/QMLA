@@ -33,7 +33,7 @@ from qmla.RemoteModelLearning import *
 import qmla.model_naming as model_naming
 import qmla.model_generation as model_generation
 import qmla.model_instances as QML
-import qmla.RedisSettings as rds
+import qmla.redis_settings as rds
 
 __all__ = [
     'QuantumModelLearningAgent'
@@ -1299,7 +1299,7 @@ class QuantumModelLearningAgent():
                             )
                         )
 
-        if wait_on_result and self.use_rq:  # test_workers from RedisSettings
+        if wait_on_result and self.use_rq:  # test_workers from redis_settings
             self.log_print(
                 [
                     "Waiting on result of ",
