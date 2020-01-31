@@ -12,7 +12,7 @@ from qmla import probe_set_generation
 from qmla import database_framework
 
 
-class heisenberg_xyz_probabilistic(
+class HeisenbergXYZProbabilistic(
     connected_lattice.ConnectedLattice
 ):
 
@@ -76,8 +76,8 @@ class heisenberg_xyz_probabilistic(
         self.setup_growth_class()
 
 
-class heisenberg_xyz_predetermined(
-    heisenberg_xyz_probabilistic
+class HeisenbergXYZPredetermined(
+    HeisenbergXYZProbabilistic
 ):
 
     def __init__(

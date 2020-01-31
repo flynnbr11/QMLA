@@ -52,8 +52,8 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 #sim_growth_rule='hopping_predetermined'
 #sim_growth_rule='ising_probabilistic'
 #sim_growth_rule='ising_predetermined'
-#sim_growth_rule='heisenberg_xyz_probabilistic'
-sim_growth_rule='heisenberg_xyz_predetermined'
+#sim_growth_rule='HeisenbergXYZProbabilistic'
+sim_growth_rule='HeisenbergXYZPredetermined'
 
 
 
@@ -90,7 +90,7 @@ alt_growth_rules=(
 #	'hopping_probabilistic'
 #	'ising_probabilistic'
 	'ising_predetermined' 
-	'heisenberg_xyz_predetermined'
+	'HeisenbergXYZPredetermined'
 	'hopping_predetermined'
 )
 growth_rules_command=""

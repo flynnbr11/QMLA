@@ -28,17 +28,17 @@ growth_classes = {
     'reduced_nv_experiment':
         GR.reduced_nv_experiment,
     # Theoretical paper growth rules
-    'ising_predetermined':
+    'IsingPredetermined':
         GR.IsingPredetermined,
-    'ising_probabilistic':
+    'IsingProbabilistic':
         GR.IsingProbabilistic,
-    'heisenberg_xyz_predetermined':
-        GR.heisenberg_xyz_predetermined,
-    'heisenberg_xyz_probabilistic':
-        GR.heisenberg_xyz_probabilistic,
-    'fermi_hubbard_predetermined':
+    'HeisenbergXYZPredetermined':
+        GR.HeisenbergXYZPredetermined,
+    'HeisenbergXYZProbabilistic':
+        GR.HeisenbergXYZProbabilistic,
+    'FermiHubbardPredetermined':
         GR.FermiHubbardPredetermined,
-    'fermi_hubbard_probabilistic':
+    'FermiHubbardProbabilistic':
         GR.FermiHubbardProbabilistic,
     # Others
     'basic_lindbladian':
@@ -47,7 +47,7 @@ growth_classes = {
         GR.GrowthRuleTemplate,
     'presentation':
         GR.presentation_plot_generation,
-    'genetic':
+    'Genetic':
         GR.genetic_algorithm
 }
 

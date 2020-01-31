@@ -74,13 +74,13 @@ git_commit=$(git rev-parse HEAD)
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
-# sim_growth_rule='ising_probabilistic'
-sim_growth_rule='ising_predetermined'
-# sim_growth_rule='heisenberg_xyz_predetermined'
-# sim_growth_rule='heisenberg_xyz_probabilistic'
-# sim_growth_rule='fermi_hubbard_predetermined'
-# sim_growth_rule='fermi_hubbard_probabilistic'
-# sim_growth_rule='genetic'
+# sim_growth_rule='IsingProbabilistic'
+# sim_growth_rule='IsingPredetermined'
+# sim_growth_rule='HeisenbergXYZPredetermined'
+# sim_growth_rule='HeisenbergXYZProbabilistic'
+# sim_growth_rule='FermiHubbardPredetermined'
+# sim_growth_rule='FermiHubbardProbabilistic'
+sim_growth_rule='Genetic'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
@@ -111,8 +111,8 @@ alt_growth_rules=(
     # 'hubbard_square_lattice_generalised'
     # 'ising_probabilistic' 
     # 'hopping_probabilistic'
-    # 'heisenberg_xyz_probabilistic'
-    # 'heisenberg_xyz_predetermined'
+    # 'HeisenbergXYZProbabilistic'
+    # 'HeisenbergXYZPredetermined'
     # 'hopping_predetermined'
 )
 
