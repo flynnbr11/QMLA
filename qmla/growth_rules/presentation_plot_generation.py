@@ -8,7 +8,7 @@ from qmla import expectation_values
 from qmla import database_framework
 
 
-class presentation_plot_generation(
+class PresentationPlotGeneration(
     NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method  # inherit from this
 ):
     # Uses all the same functionality, growth etc as

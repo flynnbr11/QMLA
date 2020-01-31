@@ -45,8 +45,8 @@ growth_classes = {
         GR.basic_lindbladian,
     'example':
         GR.GrowthRuleTemplate,
-    'presentation':
-        GR.presentation_plot_generation,
+    'Presentation':
+        GR.PresentationPlotGeneration,
     'Genetic':
         GR.genetic_algorithm
 }

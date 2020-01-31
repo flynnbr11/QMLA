@@ -382,7 +382,7 @@ def n_qubit_hahn_evolution(
     # print("n qubit hahn")
     # import qutip
     import numpy as np
-    import DataBase
+    import qmla.database_framework
     from scipy import linalg
     # print("n qubit hahn")
     num_qubits = int(np.log2(np.shape(ham)[0]))
@@ -483,7 +483,7 @@ def OLD_n_qubit_hahn_evolution(
 ):
     # import qutip
     import numpy as np
-    import DataBase
+    import qmla.database_framework
     #hahn_angle = np.pi/2
     #hahn = np.kron(hahn_angle*sigmaz(), np.eye(2))
     #inversion_gate = linalg.expm(-1j*hahn)

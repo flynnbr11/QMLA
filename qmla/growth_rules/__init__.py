@@ -22,6 +22,6 @@ from qmla.growth_rules.heisenberg_xyz import *
 from qmla.growth_rules.ising import * 
 
 from qmla.growth_rules.template import * 
-from qmla.growth_rules.PresentationPlotGeneration import *
+from qmla.growth_rules.presentation_plot_generation import *
 
 
