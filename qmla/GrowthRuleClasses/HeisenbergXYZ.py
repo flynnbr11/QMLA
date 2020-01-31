@@ -8,7 +8,7 @@ from qmla import experiment_design_heuristics
 from qmla import topology
 from qmla import model_generation
 from qmla import model_naming
-from qmla import ProbeGeneration
+from qmla import probe_set_generation
 from qmla import DataBase
 
 

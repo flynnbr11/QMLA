@@ -26,9 +26,9 @@ class nv_centre_spin_full_access(
             **kwargs
         )
         # if self.use_experimental_data == True:
-        #     import ProbeGeneration
-        #     # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
-        #     self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
+        #     import probe_set_generation
+        #     # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
+        #     self.probe_generation_function = probe_set_generation.restore_dec_13_probe_generation
 
         # self.true_operator = 'xTz'
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'

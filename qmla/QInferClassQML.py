@@ -9,7 +9,7 @@ from psutil import virtual_memory
 import qmla.experimental_data_processing as expdt
 import qmla.get_growth_rule as get_growth_rule
 from qmla.memory_tests import print_loc, print_file_line
-import qmla.ProbeGeneration as ProbeGeneration
+import qmla.probe_set_generation as probe_set_generation
 import qmla.DataBase as DataBase
 
 global_print_loc = False
@@ -190,7 +190,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                     "Generating random probes"
                 ]
             )
-            self.probe_dict = ProbeGeneration.seperable_probe_dict(
+            self.probe_dict = probe_set_generation.seperable_probe_dict(
                 max_num_qubits=12,
                 num_probes=self.NumProbes
             )  # TODO -- make same as number of qubits in model.

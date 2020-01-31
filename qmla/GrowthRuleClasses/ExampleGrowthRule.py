@@ -2,7 +2,7 @@ import sys
 import os
 
 from qmla.GrowthRuleClasses import SuperClassGrowthRule
-from qmla import ProbeGeneration
+from qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import DataBase
 

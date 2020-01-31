@@ -4,7 +4,7 @@ import sys
 import os
 
 from qmla.GrowthRuleClasses import NVGrowByFitness
-from qmla import ProbeGeneration
+from qmla import probe_set_generation
 from qmla import DataBase
 
 

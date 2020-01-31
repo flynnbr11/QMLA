@@ -3,7 +3,7 @@ import sys
 import os
 
 from qmla.GrowthRuleClasses import NVCentreExperimentGrowthRules
-from qmla import ProbeGeneration
+from qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import DataBase
 
@@ -25,7 +25,7 @@ class presentation_plot_generation(
             **kwargs
         )
 
-        self.probe_generation_function = ProbeGeneration.separable_probe_dict
+        self.probe_generation_function = probe_set_generation.separable_probe_dict
         # unless specifically different set of probes required
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning

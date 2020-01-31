@@ -8,7 +8,7 @@ from qmla import experiment_design_heuristics
 from qmla import topology
 from qmla import model_generation
 from qmla import model_naming
-from qmla import ProbeGeneration
+from qmla import probe_set_generation
 from qmla import DataBase
 
 # flatten list of lists
@@ -37,12 +37,12 @@ class fermi_hubbard(
         self.initial_models = [
             self.true_operator
         ]
-        self.probe_generation_function = ProbeGeneration.separable_fermi_hubbard_half_filled
+        self.probe_generation_function = probe_set_generation.separable_fermi_hubbard_half_filled
         # unless specifically different set of probes required
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
-        self.plot_probe_generation_function = ProbeGeneration.fermi_hubbard_half_filled_superposition
-        # self.plot_probe_generation_function = ProbeGeneration.fermi_hubbard_single_spin_n_sites
+        self.plot_probe_generation_function = probe_set_generation.fermi_hubbard_half_filled_superposition
+        # self.plot_probe_generation_function = probe_set_generation.fermi_hubbard_single_spin_n_sites
 
         self.max_time_to_consider = 20
         self.max_num_qubits = 6

@@ -151,7 +151,7 @@ results_directory = arguments.results_directory
 growth_class_attributes = {
     'use_experimental_data': exp_data,
     'log_file': log_file
-    # 'probe_generator' : ProbeGeneration.restore_dec_13_probe_generation,
+    # 'probe_generator' : probe_set_generation.restore_dec_13_probe_generation,
     # 'test_growth_class_att' : True
 }
 

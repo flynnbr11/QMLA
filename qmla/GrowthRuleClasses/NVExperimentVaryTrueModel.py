@@ -3,7 +3,7 @@ import sys
 import os
 
 from qmla.GrowthRuleClasses import NVCentreExperimentGrowthRules
-from qmla import ProbeGeneration
+from qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import DataBase
 
@@ -26,8 +26,8 @@ class nv_centre_spin_experimental_method_varying_true_model(
         )
         self.max_time_to_consider
         self.true_operator = 'xTiPPyTiPPzTiPPzTz'
-        # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
-        self.probe_generation_function = ProbeGeneration.separable_probe_dict
+        # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
+        self.probe_generation_function = probe_set_generation.separable_probe_dict
         self.shared_probes = True
         self.true_params = {}
 

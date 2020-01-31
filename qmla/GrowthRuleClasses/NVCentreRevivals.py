@@ -2,7 +2,7 @@ import sys
 import os
 
 from qmla.GrowthRuleClasses import NVCentreLargeSpinBath
-from qmla import ProbeGeneration
+from qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import DataBase
 from qmla import experiment_design_heuristics
@@ -34,6 +34,6 @@ class nv_centre_revival_data(
             NVCentreLargeSpinBath.gali_model_nv_centre_spin(7),
         ]
 
-        self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
+        self.plot_probe_generation_function = probe_set_generation.plus_probes_dict
         if self.use_experimental_data == True:
-            self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
+            self.probe_generation_function = probe_set_generation.restore_dec_13_probe_generation

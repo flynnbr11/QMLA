@@ -2,7 +2,7 @@ import sys
 import os
 
 from qmla.GrowthRuleClasses import NVCentreExperimentGrowthRules
-from qmla import ProbeGeneration
+from qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import DataBase
 
@@ -25,8 +25,8 @@ class nv_centre_spin_experimental_method_alternative_true_model(
         )
 
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
-        # self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
-        # self.probe_generation_function = ProbeGeneration.separable_probe_dict
+        # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
+        # self.probe_generation_function = probe_set_generation.separable_probe_dict
         # self.shared_probes = True
 
         if self.true_operator == 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz':
@@ -61,7 +61,7 @@ class nv_centre_spin_experimental_method_alternative_true_model_second(
         )
 
         self.true_operator = 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz'
-        self.probe_generation_function = ProbeGeneration.NV_centre_ising_probes_plus
+        self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
         # unless specifically different set of probes required
         self.simulator_probe_generation_function = self.probe_generation_function
-        # self.probe_generation_function = ProbeGeneration.separable_probe_dict
+        # self.probe_generation_function = probe_set_generation.separable_probe_dict

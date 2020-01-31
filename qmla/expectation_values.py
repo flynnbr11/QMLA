@@ -7,7 +7,7 @@ import time
 import sys as sys
 import os as os
 
-import qmla.ProbeGeneration as ProbeGeneration
+import qmla.probe_set_generation as probe_set_generation
 from qmla.memory_tests import print_loc
 
 # sys.path.append((os.path.join("..")))
@@ -90,9 +90,9 @@ def expectation_value_verbose(
 ):
     # Deprecated; replaced by expectation_value function above
     if choose_random_probe is True:
-        from ProbeGeneration import random_probe
+        from probe_set_generation import random_probe
         num_qubits = int(np.log2(np.shape(ham)[0]))
-        # state = ProbeGeneration.random_probe(num_qubits)
+        # state = probe_set_generation.random_probe(num_qubits)
         state = random_probe(num_qubits)
     elif choose_random_probe is False and state is None:
         log_print(
@@ -432,9 +432,9 @@ def hahn_evolution(
     plus_state = np.array([1, 1]) / np.sqrt(2)
     # from 1000 counts - Poissonian noise = 1/sqrt(1000) # should be ~0.03
     noise_level = 0.00
-    from ProbeGeneration import random_probe
+    from probe_set_generation import random_probe
     random_noise = noise_level * random_probe(1)
-    # random_noise = noise_level * ProbeGeneration.random_probe(1)
+    # random_noise = noise_level * probe_set_generation.random_probe(1)
     noisy_plus = plus_state + random_noise
     norm_factor = np.linalg.norm(noisy_plus)
     noisy_plus = noisy_plus / norm_factor
@@ -803,7 +803,7 @@ def OLD_n_qubit_hahn_evolution(
     plus_state = np.array([1, 1]) / np.sqrt(2)
     # from 1000 counts - Poissonian noise = 1/sqrt(1000) # should be ~0.03
     noise_level = 0.00
-    from ProbeGeneration import random_probe
+    from probe_set_generation import random_probe
     random_noise = noise_level * random_probe(1)
     noisy_plus = plus_state + random_noise
     norm_factor = np.linalg.norm(noisy_plus)
@@ -941,14 +941,14 @@ def partial_trace_out_second_qubit(
 #     probe = complex_vectors/norm_factor
 #     # if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
 #     #     print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
-#     #     return ProbeGeneration.random_probe(num_qubits)
+#     #     return probe_set_generation.random_probe(num_qubits)
 #     while (
 #         np.abs( np.linalg.norm(probe) ) - 1
 #         >
 #         1e-14
 #     ):
 #         print("generating new random probe..")
-#         probe = ProbeGeneration.random_probe(num_qubits)
+#         probe = probe_set_generation.random_probe(num_qubits)
 
 #     print("random probe generated with norm:", np.linalg.norm(probe))
 #     return probe

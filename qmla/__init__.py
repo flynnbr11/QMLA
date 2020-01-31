@@ -18,6 +18,6 @@ from qmla.RemoteBayesFactor import *
 from qmla.RemoteModelLearning import *
 from qmla.expectation_values import *
 from qmla.experiment_design_heuristics import * # TODO fix __all__
-from qmla.ProbeGeneration import * # TODO fix __all__
+from qmla.probe_set_generation import * # TODO fix __all__
 from qmla.topology import * 
 from qmla.ParameterDefinition import *
