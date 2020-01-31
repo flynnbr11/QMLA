@@ -3,7 +3,7 @@ import itertools
 import sys
 import os
 
-from qmla.growth_rules import ConnectedLattice
+from qmla.growth_rules import connected_lattice
 from qmla import experiment_design_heuristics
 from qmla import topology
 from qmla import model_generation
@@ -15,8 +15,8 @@ from qmla import database_framework
 def flatten(l): return [item for sublist in l for item in sublist]
 
 
-class fermi_hubbard(
-    ConnectedLattice.connected_lattice
+class FermiHubbardBase(
+    connected_lattice.ConnectedLattice
     # hopping_probabilistic
 ):
     def __init__(
@@ -42,7 +42,7 @@ class fermi_hubbard(
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = probe_set_generation.fermi_hubbard_half_filled_superposition
-        # self.plot_probe_generation_function = probe_set_generation.fermi_hubbard_single_spin_n_sites
+        # self.plot_probe_generation_function = probe_set_generation.FermiHubbard_single_spin_n_sites
 
         self.max_time_to_consider = 20
         self.max_num_qubits = 6
@@ -116,8 +116,8 @@ class fermi_hubbard(
         return latex_str
 
 
-class fermi_hubbard_probabilistic(
-    fermi_hubbard
+class FermiHubbardProbabilistic(
+    FermiHubbardBase
 ):
     def __init__(
         self,
@@ -236,8 +236,8 @@ class fermi_hubbard_probabilistic(
         return addition_string.join(terms)
 
 
-class fermi_hubbard_predetermined(
-    fermi_hubbard_probabilistic
+class FermiHubbardPredetermined(
+    FermiHubbardProbabilistic
 ):
     def __init__(
         self,

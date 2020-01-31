@@ -7,7 +7,7 @@ from qmla import expectation_values
 from qmla import database_framework
 
 
-class example_growth(
+class GrowthRuleTemplate(
     SuperClassGrowthRule.growth_rule_super_class  # inherit from this
 ):
     # Uses all the same functionality, growth etc as

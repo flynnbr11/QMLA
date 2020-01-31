@@ -19,7 +19,7 @@ num_experiments=250
 num_particles=1000
 
 
-python3 CalculateTimeRequired.py \
+python3 time_required_calculation.py \
 	-ggr=$growth_rule \
 	$additional_growth \
 	-use_agr=0 \

@@ -12,14 +12,14 @@ from qmla import probe_set_generation
 from qmla import database_framework
 
 __all__ = [
-    'connected_lattice'
+    'ConnectedLattice'
 ]
 
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]
 
 
-class connected_lattice(
+class ConnectedLattice(
     SuperClassGrowthRule.growth_rule_super_class
 ):
 

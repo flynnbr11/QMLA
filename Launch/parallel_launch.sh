@@ -279,7 +279,7 @@ python3 ../qmla/SetQHLParams.py \
 
 ### Call script to determine how much time is needed based on above params. Store in QMD_TIME, QHL_TIME, etc. 
 let temp_bayes_times="2*$e" # TODO fix time calculator
-python3 ../qmla/CalculateTimeRequired.py \
+python3 ../qmla/time_required_calculation.py \
 	-ggr=$growth_rule \
 	-use_agr=$multiple_growth_rules \
 	$growth_rules_command \

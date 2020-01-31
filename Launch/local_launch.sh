@@ -125,7 +125,6 @@ done
 num_probes=10
 force_plot_plus=0
 gaussian=1
-#probe_noise=0.0000001
 probe_noise=0.0000001
 param_min=0
 param_max=10
@@ -207,8 +206,6 @@ do
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        # python3 -m cProfile \
-            # -o "Profile_linalg_long_run.txt" \
         python3 \
             ../Scripts/implement_qmla.py \
             -mqhl=$multiple_qhl \

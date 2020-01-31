@@ -3,7 +3,7 @@ import itertools
 import sys
 import os
 
-from qmla.growth_rules import ConnectedLattice
+from qmla.growth_rules import connected_lattice
 from qmla import experiment_design_heuristics
 from qmla import topology
 from qmla import model_generation
@@ -13,7 +13,7 @@ from qmla import database_framework
 
 
 class heisenberg_xyz_probabilistic(
-    ConnectedLattice.connected_lattice
+    connected_lattice.ConnectedLattice
 ):
 
     def __init__(
@@ -131,7 +131,7 @@ class heisenberg_xyz_predetermined(
             for connected_sites in list_connections:
 
                 system_size = max(max(connected_sites))
-                terms = ConnectedLattice.pauli_like_like_terms_connected_sites(
+                terms = connected_lattice.pauli_like_like_terms_connected_sites(
                     connected_sites=connected_sites,
                     base_terms=['x', 'y', 'z'],
                     num_sites=system_size

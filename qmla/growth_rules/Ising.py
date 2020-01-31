@@ -2,7 +2,7 @@ import numpy as np
 import itertools
 import sys
 import os
-from qmla.growth_rules import ConnectedLattice
+from qmla.growth_rules import connected_lattice
 from qmla import experiment_design_heuristics
 from qmla import topology
 from qmla import model_generation
@@ -12,8 +12,8 @@ from qmla import database_framework
 
 
 
-class ising_chain_probabilistic(
-    ConnectedLattice.connected_lattice
+class IsingProbabilistic(
+    connected_lattice.ConnectedLattice
 ):
 
     def __init__(
@@ -59,7 +59,7 @@ class ising_chain_probabilistic(
         self.min_param = 0
         self.max_param = 1
 
-        self.setup_growth_class()  # from connected_lattice
+        self.setup_growth_class()  # from ConnectedLattice
         self.gaussian_prior_means_and_widths = {
             # 'pauliSet_zJz_1J2_d3' : (2, 0.01),
             # 'pauliSet_zJz_2J3_d3' : (8, 0.1)
@@ -75,8 +75,8 @@ class ising_chain_probabilistic(
             ]
 
 
-class ising_chain_predetermined(
-    ising_chain_probabilistic
+class IsingPredetermined(
+    IsingProbabilistic
 ):
     def __init__(
         self,

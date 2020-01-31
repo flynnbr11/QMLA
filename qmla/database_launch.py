@@ -15,6 +15,11 @@ from qinfer import NormalDistribution
 from qmla.model_instances import ModelInstanceForLearning, ModelInstanceForStorage
 from qmla.database_framework import * 
 
+__all__ = [
+    'launch_db', 
+    'add_model'
+]
+
 def launch_db(
     true_op_name,
     new_model_branches,
