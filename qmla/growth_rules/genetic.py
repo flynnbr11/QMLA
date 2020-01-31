@@ -7,7 +7,7 @@ import copy
 import scipy
 import time
 
-from qmla.growth_rules import SuperClassGrowthRule
+from qmla.growth_rules import growth_rule_super
 # from qmla.growth_rules import GeneticAlgorithm
 from qmla import experiment_design_heuristics
 from qmla import topology
@@ -21,7 +21,7 @@ def flatten(l): return [item for sublist in l for item in sublist]
 
 
 class genetic_algorithm(
-    SuperClassGrowthRule.growth_rule_super_class
+    growth_rule_super.GrowthRuleSuper
 ):
 
     def __init__(

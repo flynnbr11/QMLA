@@ -804,7 +804,7 @@ def NV_centre_experiment_debug(
     return model_list
 
 
-def reduced_nv_experimental_method(
+def ExperimentReducedNVal_method(
     model_list,
     spawn_step,
     model_dict,

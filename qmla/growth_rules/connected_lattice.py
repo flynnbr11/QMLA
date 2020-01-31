@@ -3,7 +3,7 @@ import itertools
 import sys
 import os
 
-from qmla.growth_rules import SuperClassGrowthRule
+from qmla.growth_rules import growth_rule_super
 from qmla import experiment_design_heuristics
 from qmla import topology
 from qmla import model_generation
@@ -20,7 +20,7 @@ def flatten(l): return [item for sublist in l for item in sublist]
 
 
 class ConnectedLattice(
-    SuperClassGrowthRule.growth_rule_super_class
+    growth_rule_super.GrowthRuleSuper
 ):
 
     def __init__(

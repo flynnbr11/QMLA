@@ -15,16 +15,16 @@ growth_classes = {
         GR.ExpAlternativeNV,
     'NV_alternative_model_2':
         GR.ExpAlternativeNV_second,
-    'nv_experiment_vary_model':
-        GR.ExperimentNVCentre_varying_true_model,
+    'ExperimentNVCentreVaryTrueModel':
+        GR.ExperimentNVCentreVaryTrueModel,
     'ExpNVRevivals':
         GR.ExpNVRevivals,
     'ExperimentFullAccessNV':
         GR.ExperimentFullAccessNV,
     'NVLargeSpinBath':
         GR.NVLargeSpinBath,
-    'reduced_nv_experiment':
-        GR.reduced_nv_experiment,
+    'ExperimentReducedNV':
+        GR.ExperimentReducedNV,
     # Theoretical paper growth rules
     'IsingPredetermined':
         GR.IsingPredetermined,

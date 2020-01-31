@@ -14,7 +14,7 @@ __all__ = [
 
 class ExperimentNVCentre(
     nv_centre_full_access.ExperimentFullAccessNV  # inherit from this
-    # growth_rule_super_class # inherit from this
+    # GrowthRuleSuper # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations

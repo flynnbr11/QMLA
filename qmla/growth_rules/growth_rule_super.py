@@ -10,10 +10,10 @@ import qmla.expectation_values as expectation_values
 import qmla.database_framework as database_framework
 
 __all__ = [
-    'growth_rule_super_class'
+    'GrowthRuleSuper'
 ]
 
-class growth_rule_super_class():
+class GrowthRuleSuper():
     # superclass for growth generation rules
     def __init__(
         self,

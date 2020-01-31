@@ -8,7 +8,7 @@ from qmla import expectation_values
 from qmla import database_framework
 
 
-class ExperimentNVCentre_varying_true_model(
+class ExperimentNVCentreVaryTrueModel(
     nv_centre_experiment.ExperimentNVCentre  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
@@ -36,8 +36,8 @@ class ExperimentNVCentre_varying_true_model(
         self.max_param = 10
 
 
-class ExperimentNVCentre_varying_true_model_3_params(
-    ExperimentNVCentre_varying_true_model  # inherit from this
+class ExperimentNVCentreVaryTrueModel_3_params(
+    ExperimentNVCentreVaryTrueModel  # inherit from this
 ):
     def __init__(
         self,
@@ -51,8 +51,8 @@ class ExperimentNVCentre_varying_true_model_3_params(
         self.true_operator = 'xTiPPyTiPPzTi'
 
 
-class ExperimentNVCentre_varying_true_model_5_params(
-    ExperimentNVCentre_varying_true_model  # inherit from this
+class ExperimentNVCentreVaryTrueModel_5_params(
+    ExperimentNVCentreVaryTrueModel  # inherit from this
 ):
     def __init__(
         self,
@@ -66,8 +66,8 @@ class ExperimentNVCentre_varying_true_model_5_params(
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTi'
 
 
-class ExperimentNVCentre_varying_true_model_6_params(
-    ExperimentNVCentre_varying_true_model  # inherit from this
+class ExperimentNVCentreVaryTrueModel_6_params(
+    ExperimentNVCentreVaryTrueModel  # inherit from this
 ):
     def __init__(
         self,
@@ -81,8 +81,8 @@ class ExperimentNVCentre_varying_true_model_6_params(
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
 
 
-class ExperimentNVCentre_varying_true_model_7_params(
-    ExperimentNVCentre_varying_true_model  # inherit from this
+class ExperimentNVCentreVaryTrueModel_7_params(
+    ExperimentNVCentreVaryTrueModel  # inherit from this
 ):
     def __init__(
         self,

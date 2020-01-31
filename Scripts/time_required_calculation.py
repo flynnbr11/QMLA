@@ -176,7 +176,7 @@ max_num_models_by_shape['NV_centre_experiment_debug'] = {
 }
 
 
-max_num_models_by_shape['reduced_nv_experiment'] = {
+max_num_models_by_shape['ExperimentReducedNV'] = {
     1: 0,
     #    (2, 1) : 2,
     #    (2, 2) : 2,
