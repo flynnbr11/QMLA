@@ -1,15 +1,15 @@
 import sys
 import os
 
-from qmla.growth_rules import NVCentreFullAccess
+from qmla.growth_rules import nv_centre_full_access
 from qmla import experiment_design_heuristics
 from qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import database_framework
 
 
-class nv_centre_large_spin_bath(
-    NVCentreFullAccess.nv_centre_spin_full_access  # inherit from this
+class NVLargeSpinBath(
+    nv_centre_full_access.ExperimentFullAccessNV  # inherit from this
 ):
     # Uses some of the same functionality as
     # default NV centre spin experiments/simulations
@@ -178,7 +178,7 @@ class nv_centre_large_spin_bath(
         name,
         **kwargs
     ):
-        import model_naming
+        from qmla import model_naming
         latex_name = model_naming.large_spin_bath_nv_system_name(
             term=name
         )
@@ -189,7 +189,7 @@ class nv_centre_large_spin_bath(
         latex_mapping_file,
         **kwargs
     ):
-        import model_naming
+        from qmla import model_naming
         name_map = model_naming.branch_is_num_dims(
             latex_mapping_file=latex_mapping_file,
             **kwargs

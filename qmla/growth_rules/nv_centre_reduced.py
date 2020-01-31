@@ -1,11 +1,11 @@
 import sys
 import os
 
-from qmla.growth_rules import NVCentreFullAccess
+from qmla.growth_rules import nv_centre_full_access
 
 
-class reduced_nv_experiment(
-    NVCentreFullAccess.nv_centre_spin_full_access
+class ExperimentReducedNV(
+    nv_centre_full_access.ExperimentFullAccessNV
 ):
     def __init__(
         self,
@@ -40,9 +40,9 @@ class reduced_nv_experiment(
         model_list,
         **kwargs
     ):
-        import model_generation
+        from qmla import model_generation
 
-        new_mods = model_generation.reduced_nv_experimental_method(
+        new_mods = model_generation.ExperimentReducedNVal_method(
             model_list,
             **kwargs
         )

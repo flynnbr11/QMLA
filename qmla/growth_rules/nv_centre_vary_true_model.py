@@ -2,14 +2,14 @@ import random
 import sys
 import os
 
-from qmla.growth_rules import NVCentreExperimentGrowthRules
+from qmla.growth_rules import nv_centre_experiment
 from qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import database_framework
 
 
-class nv_centre_spin_experimental_method_varying_true_model(
-    NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method  # inherit from this
+class ExperimentNVCentreVaryTrueModel(
+    nv_centre_experiment.ExperimentNVCentre  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
@@ -36,8 +36,8 @@ class nv_centre_spin_experimental_method_varying_true_model(
         self.max_param = 10
 
 
-class nv_centre_spin_experimental_method_varying_true_model_3_params(
-    nv_centre_spin_experimental_method_varying_true_model  # inherit from this
+class ExperimentNVCentreVaryTrueModel_3_params(
+    ExperimentNVCentreVaryTrueModel  # inherit from this
 ):
     def __init__(
         self,
@@ -51,8 +51,8 @@ class nv_centre_spin_experimental_method_varying_true_model_3_params(
         self.true_operator = 'xTiPPyTiPPzTi'
 
 
-class nv_centre_spin_experimental_method_varying_true_model_5_params(
-    nv_centre_spin_experimental_method_varying_true_model  # inherit from this
+class ExperimentNVCentreVaryTrueModel_5_params(
+    ExperimentNVCentreVaryTrueModel  # inherit from this
 ):
     def __init__(
         self,
@@ -66,8 +66,8 @@ class nv_centre_spin_experimental_method_varying_true_model_5_params(
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTi'
 
 
-class nv_centre_spin_experimental_method_varying_true_model_6_params(
-    nv_centre_spin_experimental_method_varying_true_model  # inherit from this
+class ExperimentNVCentreVaryTrueModel_6_params(
+    ExperimentNVCentreVaryTrueModel  # inherit from this
 ):
     def __init__(
         self,
@@ -81,8 +81,8 @@ class nv_centre_spin_experimental_method_varying_true_model_6_params(
         self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
 
 
-class nv_centre_spin_experimental_method_varying_true_model_7_params(
-    nv_centre_spin_experimental_method_varying_true_model  # inherit from this
+class ExperimentNVCentreVaryTrueModel_7_params(
+    ExperimentNVCentreVaryTrueModel  # inherit from this
 ):
     def __init__(
         self,

@@ -103,7 +103,7 @@ class HeisenbergXYZPredetermined(
             'other': 0
         }
         self.max_num_qubits = 3
-        self.max_num_sites = 3
+        self.max_num_sites = 4
         self.setup_growth_class()
         self.min_param = 0
         self.max_param = 1

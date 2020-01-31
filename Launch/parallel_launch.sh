@@ -69,7 +69,7 @@ experimental_growth_rule='nv_experiment_vary_model_7_params'
 #experimental_growth_rule='NV_spin_full_access'
 #experimental_growth_rule='NV_centre_spin_large_bath'
 #experimental_growth_rule='NV_centre_experiment_debug'
-#experimental_growth_rule='reduced_nv_experiment'
+#experimental_growth_rule='ExperimentReducedNV'
 #experimental_growth_rule='NV_fitness_growth'
 
 

@@ -4,10 +4,10 @@ import DataBase
 import ExpectationValues
 import ProbeGeneration
 
-import SuperClassGrowthRule
+import growth_rule_super
 
 class example_growth(
-    SuperClassGrowthRule.growth_rule_super_class # inherit from this
+    growth_rule_super.GrowthRuleSuper # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations

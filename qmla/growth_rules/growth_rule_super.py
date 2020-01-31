@@ -10,10 +10,10 @@ import qmla.expectation_values as expectation_values
 import qmla.database_framework as database_framework
 
 __all__ = [
-    'growth_rule_super_class'
+    'GrowthRuleSuper'
 ]
 
-class growth_rule_super_class():
+class GrowthRuleSuper():
     # superclass for growth generation rules
     def __init__(
         self,
@@ -144,7 +144,7 @@ class growth_rule_super_class():
         latex_mapping_file,
         **kwargs
     ):
-        import model_naming
+        import qmla.model_naming
         # branch_is_num_params
         return model_naming.branch_computed_from_qubit_and_param_count(
             latex_mapping_file=latex_mapping_file,

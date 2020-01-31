@@ -242,8 +242,6 @@ plot_probe_dict = growth_class.plot_probe_generator(
     true_operator=true_operator,
     growth_generator=growth_generation_rule,
     experimental_data=exp_data,
-    # special_probe = special_probe,
-    # num_probes = 1,
     noise_level=probe_noise_level,
 )
 

@@ -209,7 +209,7 @@ def n_qubit_hahn_evolution(
     # print("n qubit hahn")
     # import qutip
     import numpy as np
-    import DataBase
+    import qmla.database_framework
     from scipy import linalg
     # print("n qubit hahn")
     num_qubits = int(np.log2(np.shape(ham)[0]))
@@ -300,8 +300,6 @@ def n_qubit_hahn_evolution(
 
     return 1 - expect_value
     # return expect_value
-
-
 
 
 

@@ -1,7 +1,7 @@
-from qmla.growth_rules import NVCentreExperimentGrowthRules
+from qmla.growth_rules import nv_centre_experiment
 
-class nv_centre_spin_experimental_method_without_transvere_terms(
-        NVCentreExperimentGrowthRules.nv_centre_spin_experimental_method
+class ExperimentNVCentreNoTransvereTerms(
+        nv_centre_experiment.ExperimentNVCentre
 ):
     def __init__(
         self,
