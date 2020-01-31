@@ -774,15 +774,7 @@ def ExpectationValuesQHL_TrueModel(
         sim_probe = qmd.ProbeDict[(probe_id, sim_dim)]
         colour_id = int(i % len(sim_colours))
         sim_col = sim_colours[colour_id]
-#        sim_expec_values = [expectation_values.expectation_value(ham=sim_ham, t=t,
-#            state=sim_probe) for t in times
-#        ]
 
-
-#        print("Calling expectation value function for expec val plot. Experimental data=", use_experimental_data)
-#        print("Sim ham:", sim_ham)
-#        print("[Expectation value function, QHL]\nSim probe:", sim_probe)
-#        print("Times =\n", times)
 
         sim_expec_values = []
         for t in times:            
