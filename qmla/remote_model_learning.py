@@ -26,7 +26,7 @@ try:
 except BaseException:
     enforce_serial = True  # shouldn't be needed
 
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 import qmla.model_instances as QML
 
 plt.switch_backend('agg')
@@ -130,7 +130,7 @@ def learnModelRemote(
 #    log_print(["true params:", true_params])
 
     # Generate model and learn
-    op = DataBase.Operator(name=name)
+    op = database_framework.Operator(name=name)
     qml_instance = QML.ModelInstanceForLearning(
         name=name,
         num_probes=num_probes,
@@ -155,14 +155,14 @@ def learnModelRemote(
     if (
         model_priors is not None
         and
-        DataBase.alph(name) in list(model_priors.keys())
+        database_framework.alph(name) in list(model_priors.keys())
     ):
         prior_specific_terms = model_priors[name]
     else:
         prior_specific_terms = qmd_info['prior_specific_terms']
 
     sim_pars = []
-    constituent_terms = DataBase.get_constituent_names_from_name(name)
+    constituent_terms = database_framework.get_constituent_names_from_name(name)
     for term in op.constituents_names:
         try:
             initial_prior_centre = prior_specific_terms[term][0]
@@ -223,7 +223,7 @@ def learnModelRemote(
     except NameError:
         log_print(
             [
-                "QHL failed for model id {}. Setting job failure database.".format(
+                "QHL failed for model id {}. Setting job failure database_framework.".format(
                     modelID)
             ]
         )
@@ -231,7 +231,7 @@ def learnModelRemote(
     except BaseException:
         log_print(
             [
-                "QHL failed for model id {}. Setting job failure database.".format(
+                "QHL failed for model id {}. Setting job failure database_framework.".format(
                     modelID)
             ]
         )

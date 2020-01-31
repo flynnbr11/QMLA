@@ -7,7 +7,7 @@ import qmla.prior_distributions as Distributions
 import qmla.experiment_design_heuristics as experiment_design_heuristics
 import qmla.probe_set_generation as probe_set_generation
 import qmla.expectation_values as expectation_values
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 
 __all__ = [
     'growth_rule_super_class'
@@ -273,7 +273,7 @@ class growth_rule_super_class():
 
     @property
     def true_operator_terms(self):
-        true_terms = DataBase.get_constituent_names_from_name(
+        true_terms = database_framework.get_constituent_names_from_name(
             self.true_operator
         )
 

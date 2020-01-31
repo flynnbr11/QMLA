@@ -5,7 +5,7 @@ import os
 
 from qmla.GrowthRuleClasses import NVCentreLargeSpinBath
 from qmla import probe_set_generation
-from qmla import DataBase
+from qmla import database_framework
 
 
 class nv_fitness_growth(
@@ -79,7 +79,7 @@ class nv_fitness_growth(
                     model_points=model_points
                 )
                 mod_name = kwargs['model_names_ids'][mod_id]
-                num_qubits = DataBase.get_num_qubits(mod_name)
+                num_qubits = database_framework.get_num_qubits(mod_name)
                 new_num_qubits = num_qubits + 1
                 mod_name_increased_dim = increase_dimension_keep_terms_nv_model(
                     model_name=mod_name,
@@ -102,7 +102,7 @@ class nv_fitness_growth(
                             + p_str
                             + new_term
                         )
-                        new_mod = DataBase.alph(new_mod)
+                        new_mod = database_framework.alph(new_mod)
                         new_models.append(new_mod)
             self.spawn_stage.append('Complete')
 
@@ -173,9 +173,9 @@ def increase_dimension_keep_terms_nv_model(
     model_name,
     new_dimension,
 ):
-    current_dimension = DataBase.get_num_qubits(model_name)
+    current_dimension = database_framework.get_num_qubits(model_name)
     p_str = 'P' * new_dimension
-    individual_terms = DataBase.get_constituent_names_from_name(model_name)
+    individual_terms = database_framework.get_constituent_names_from_name(model_name)
 
     spin_terms = []
     interaction_terms = []
@@ -206,7 +206,7 @@ def increase_dimension_keep_terms_nv_model(
         all_terms.append(new_term)
 
     model_string = p_str.join(all_terms)
-    model_string = DataBase.alph(model_string)
+    model_string = database_framework.alph(model_string)
     return model_string
 
 
@@ -218,7 +218,7 @@ def all_unique_addition_combinations(model_list):
     for i in range(1, num_mods):
         new_combinations = list(itertools.combinations(model_list, i))
         all_combinations.extend(new_combinations)
-    num_qubits = DataBase.get_num_qubits(model_list[0])
+    num_qubits = database_framework.get_num_qubits(model_list[0])
     p_str = 'P' * num_qubits
 
     for combination in all_combinations:

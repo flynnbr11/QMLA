@@ -33,7 +33,7 @@ import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming
 import qmla.experimental_data_processing as expdt
 import qmla.expectation_values as expectation_values
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 
 frameinfo = getframeinfo(currentframe())
 
@@ -97,7 +97,7 @@ def ExpectationValuesTrueSim(
         else:
             times = times
         true = qmd.TrueOpName
-        true_op = DataBase.Operator(true)
+        true_op = database_framework.Operator(true)
 
         true_params = qmd.TrueParamsList
         true_ops = qmd.TrueOpList
@@ -180,7 +180,7 @@ def ExpectationValuesTrueSim(
             mod = qmd.ModelInstanceForStorageInstanceFromID(mod_id)
             sim_ham = mod.LearnedHamiltonian
             times_learned = mod.Times
-            sim_dim = DataBase.get_num_qubits(mod.Name)
+            sim_dim = database_framework.get_num_qubits(mod.Name)
             # if plus_probe:
             #     sim_probe = expectation_values.n_qubit_plus_state(sim_dim)
             # else:
@@ -581,7 +581,7 @@ def plotDynamicsLearnedModels(
         if include_param_estimates == True:
             ax = fig.add_subplot(gs[row, col])
             name = reduced.Name
-            terms = DataBase.get_constituent_names_from_name(name)
+            terms = database_framework.get_constituent_names_from_name(name)
             num_terms = len(terms)
 
             term_positions = {}
@@ -614,7 +614,7 @@ def plotDynamicsLearnedModels(
                 try:
                     if use_experimental_data == False:
                         y_true = qmd.TrueParamDict[term]
-                        # true_term_latex = DataBase.latex_name_ising(term)
+                        # true_term_latex = database_framework.latex_name_ising(term)
                         true_term_latex = qmd.GrowthClass.latex_name(
                             name=term
                         )
@@ -706,7 +706,7 @@ def ExpectationValuesQHL_TrueModel(
     else:
         times = np.arange(0, max_time, t_interval)
         true = qmd.TrueOpName
-        true_op = DataBase.Operator(true)
+        true_op = database_framework.Operator(true)
 
         true_params = qmd.TrueParamsList
 #        true_ops = true_op.constituents_operators
@@ -760,7 +760,7 @@ def ExpectationValuesQHL_TrueModel(
     for i in range(len(model_ids)):
         mod_id = model_ids[i]
         sim = qmd.ModelNameIDs[mod_id]
-        sim_op = DataBase.Operator(sim)
+        sim_op = database_framework.Operator(sim)
         mod = qmd.ModelInstanceForStorageInstanceFromID(mod_id)
         sim_params = list(mod.FinalParams[:, 0])
         sim_ops = sim_op.constituents_operators
@@ -1373,7 +1373,7 @@ def r_squared_from_epoch_list(
         mod = qmd.ModelInstanceForStorageInstanceFromID(model_id)
         r_squared_by_epoch = {}
 
-        mod_num_qubits = DataBase.get_num_qubits(mod.Name)
+        mod_num_qubits = database_framework.get_num_qubits(mod.Name)
         probe = expectation_values.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.NumExperiments - 1])
         if len(mod.ResampleEpochs) > 0:
@@ -1756,7 +1756,7 @@ def plotHinton(
 
     hinton_mtx = BayF_IndexDictToMatrix(model_names, bayes_factors)
     log_hinton_mtx = np.log10(hinton_mtx)
-    # labels = [DataBase.latex_name_ising(name) for name in model_names.values()]
+    # labels = [database_framework.latex_name_ising(name) for name in model_names.values()]
     labels = [
         get_latex_name(name, growth_generator)
         for name in model_names.values()
@@ -1901,7 +1901,7 @@ def qmdclassTOnxobj(
             is_adj = adjacent_branch_test(qmd, a, b)
             if is_adj or not only_adjacent_branches:
                 if a != b:
-                    unique_pair = DataBase.unique_model_pair_identifier(a, b)
+                    unique_pair = database_framework.unique_model_pair_identifier(a, b)
                     if ((unique_pair not in edges)
                         and (unique_pair in qmd.BayesFactorsComputed)
                         ):
@@ -3034,7 +3034,7 @@ def parameterEstimates(
             list(qmd.ModelNameIDs.values())
         )
         return False
-    terms = DataBase.get_constituent_names_from_name(name)
+    terms = database_framework.get_constituent_names_from_name(name)
     num_terms = len(terms)
 
     term_positions = {}
@@ -3088,7 +3088,7 @@ def parameterEstimates(
         try:
             if use_experimental_data == False:
                 y_true = qmd.TrueParamDict[term]
-                # true_term_latex = DataBase.latex_name_ising(term)
+                # true_term_latex = database_framework.latex_name_ising(term)
                 true_term_latex = qmd.GrowthClass.latex_name(
                     name=term
                 )
@@ -3142,7 +3142,7 @@ def parameterEstimates(
     # plt.legend(bbox_to_anchor=(1.1, 1.05))
     # # TODO put title at top; Epoch centred bottom; Estimate centre y-axis
     # plt.title(str("Parameter estimation for model " +
-    #     DataBase.latex_name_ising(name)+" ["+str(qmd.NumParticles)
+    #     database_framework.latex_name_ising(name)+" ["+str(qmd.NumParticles)
     #     +" prt;" + str(qmd.NumExperiments) + "exp]"
     #     )
     # )
@@ -3525,7 +3525,7 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
     import csv
     fields = ['ID', 'Name']
     if names_ids == 'latex':
-        # names = [DataBase.latex_name_ising(qmd.ModelNameIDs[i]) for i in
+        # names = [database_framework.latex_name_ising(qmd.ModelNameIDs[i]) for i in
 
         names = []
         for mod_name in list(qmd.ModelNameIDs.values()):
@@ -3574,7 +3574,7 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
                 model_bf[other_model_name] = qmd.AllBayesFactors[i][j][-1]
 
             # if names_ids=='latex':
-                # model_bf['Name'] = DataBase.latex_name_ising(qmd.ModelNameIDs[i])
+                # model_bf['Name'] = database_framework.latex_name_ising(qmd.ModelNameIDs[i])
             try:
                 model_bf['Name'] = qmd.BranchGrowthClasses[
                     qmd.ModelsBranches[i]
@@ -3597,7 +3597,7 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
     from matplotlib import cm
     # TODO saved fig is cut off on edges and don't have axes titles.
 
-    # correct_mod = DataBase.latex_name_ising(correct_mod)
+    # correct_mod = database_framework.latex_name_ising(correct_mod)
 
     growth_class = get_growth_rule.get_growth_generator_class(
         growth_generation_rule=growth_generator
@@ -3751,11 +3751,11 @@ def replot_expectation_values(
             params_dict[k] for k in sim_ops_names
         ]
         sim_ops = [
-            DataBase.compute(k) for k in sim_ops_names
+            database_framework.compute(k) for k in sim_ops_names
         ]
         sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
 
-        sim_num_qubits = DataBase.get_num_qubits(sim_ops_names[0])
+        sim_num_qubits = database_framework.get_num_qubits(sim_ops_names[0])
         # p_str=''
         # for i in range(2):
         #     p_str+='P'

@@ -4,7 +4,7 @@ import os
 from qmla.GrowthRuleClasses import SuperClassGrowthRule
 from qmla import probe_set_generation
 from qmla import expectation_values
-from qmla import DataBase
+from qmla import database_framework
 
 
 class example_growth(

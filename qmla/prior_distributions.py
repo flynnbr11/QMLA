@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 from scipy.optimize import curve_fit
 
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 
 def time_seconds():
     # return time in h:m:s format for logging.
@@ -57,7 +57,7 @@ def gaussian_prior(
         log_file,
         log_identifier
     )
-    individual_terms = DataBase.get_constituent_names_from_name(
+    individual_terms = database_framework.get_constituent_names_from_name(
         model_name
     )
     num_terms = len(individual_terms)

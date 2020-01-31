@@ -5,7 +5,7 @@ import os
 
 from qmla.GrowthRuleClasses import NVGrowByFitness
 from qmla import probe_set_generation
-from qmla import DataBase
+from qmla import database_framework
 
 
 class nv_probabilistic(
@@ -65,7 +65,7 @@ class nv_probabilistic(
                     model_points=model_points
                 )
                 mod_name = kwargs['model_names_ids'][mod_id]
-                num_sites_this_mod = DataBase.get_num_qubits(mod_name)
+                num_sites_this_mod = database_framework.get_num_qubits(mod_name)
 
                 target_num_sites = num_sites_this_mod
                 p_str = 'P' * target_num_sites

@@ -25,8 +25,8 @@ import qinfer
 # Libraries
 from qmla.remote_bayes_factor import *
 import qmla.analysis
-import qmla.DataBase as DataBase
-import qmla.DatabaseLaunch as DataBaseLaunch
+import qmla.database_framework as database_framework
+import qmla.database_launch as database_launch
 import qmla.get_growth_rule as get_growth_rule
 import qmla.expectation_values as expectation_values 
 from qmla.remote_model_learning import *
@@ -69,7 +69,7 @@ class QuantumModelLearningAgent():
         new branches consist of
         models generated considering previously determined "good" models.
     - Model generation rules are given in model_generation.
-    - Database control is given in DataBase.
+    - Database control is given in database_framework.
     - Remote functions for computing QHL/Bayes factors are in
     - remote_model_learning and remote_bayes_factor respectively.
     - Redis databases are used to ensure QMD parameters are accessible to
@@ -133,7 +133,7 @@ class QuantumModelLearningAgent():
                 "True model:", self.TrueOpName
             ]
         )
-        self.TrueOpDim = DataBase.get_num_qubits(self.TrueOpName)
+        self.TrueOpDim = database_framework.get_num_qubits(self.TrueOpName)
         # TODO  self.InitialOpList isn't needed but is called a few times. Remove.
         # it is replaced by loop over generator list
 
@@ -143,9 +143,9 @@ class QuantumModelLearningAgent():
         base_num_qubits = 3
         base_num_terms = 3
         for op in self.InitialOpList:
-            if DataBase.get_num_qubits(op) < base_num_qubits:
-                base_num_qubits = DataBase.get_num_qubits(op)
-            num_terms = len(DataBase.get_constituent_names_from_name(op))
+            if database_framework.get_num_qubits(op) < base_num_qubits:
+                base_num_qubits = database_framework.get_num_qubits(op)
+            num_terms = len(database_framework.get_constituent_names_from_name(op))
             if (
                 num_terms < base_num_terms
             ):
@@ -395,7 +395,7 @@ class QuantumModelLearningAgent():
             self.BranchNumModelsPreComputed[i] = 0
 
             for mod in initial_models_this_gen:
-                mod = DataBase.alph(mod)
+                mod = database_framework.alph(mod)
                 self.BranchModels[i].append(mod)
                 # latest branch to claim it
                 self.ModelsBranches[initial_id_counter] = i
@@ -536,7 +536,7 @@ class QuantumModelLearningAgent():
                 time_dep_term += str(t)
                 time_dep_params.append(self.TimeDepParams[t])
 
-            time_dep_op = DataBase.Operator(time_dep_term)
+            time_dep_op = database_framework.Operator(time_dep_term)
             time_dep_ops = time_dep_op.constituents_operators
 
             self.TrueOpList.extend(time_dep_ops)
@@ -656,7 +656,7 @@ class QuantumModelLearningAgent():
 
     def initiateDB(self):
         self.db, self.legacy_db, self.model_lists = \
-            DataBaseLaunch.launch_db(
+            database_launch.launch_db(
                 true_op_name=self.TrueOpName,
                 # gen_list = self.InitialOpList,
                 new_model_branches=self.InitialModelBranches,
@@ -683,7 +683,7 @@ class QuantumModelLearningAgent():
 
         for mod in list(self.InitialModelIDs.keys()):
             mod_id = self.InitialModelIDs[mod]
-            if DataBase.alph(mod) == self.TrueOpName:
+            if database_framework.alph(mod) == self.TrueOpName:
                 self.TrueOpModelID = mod_id
             print("mod id:", mod_id)
             self.ModelNameIDs[int(mod_id)] = mod
@@ -696,7 +696,7 @@ class QuantumModelLearningAgent():
         # for i in range(len(self.InitialOpList)):
         #     model = self.InitialOpList[i]
 
-        #     if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
+        #     if database_framework.alph(model) == database_framework.alph(self.TrueOpName):
         #         self.TrueOpModelID = i
         #     self.ModelNameIDs[i] = model
 
@@ -707,8 +707,8 @@ class QuantumModelLearningAgent():
         force_create_model=False
     ):
         #self.NumModels += 1
-        model = DataBase.alph(model)
-        tryAddModel = DataBaseLaunch.add_model(
+        model = database_framework.alph(model)
+        tryAddModel = database_launch.add_model(
             model_name=model,
             running_database=self.db,
             num_particles=self.NumParticles,
@@ -735,25 +735,25 @@ class QuantumModelLearningAgent():
             force_create_model=force_create_model,
         )
         if tryAddModel == True:  # keep track of how many models/branches in play
-            if DataBase.alph(model) == DataBase.alph(self.TrueOpName):
+            if database_framework.alph(model) == database_framework.alph(self.TrueOpName):
                 self.TrueOpModelID = self.NumModels
             self.HighestModelID += 1
             # print("Setting model ", model, "to ID:", self.NumModels)
             model_id = self.NumModels
             self.ModelNameIDs[model_id] = model
             self.NumModels += 1
-            if DataBase.get_num_qubits(model) > self.HighestQubitNumber:
-                self.HighestQubitNumber = DataBase.get_num_qubits(model)
-                self.BranchGrowthClasses[branchID].highest_num_qubits = DataBase.get_num_qubits(
+            if database_framework.get_num_qubits(model) > self.HighestQubitNumber:
+                self.HighestQubitNumber = database_framework.get_num_qubits(model)
+                self.BranchGrowthClasses[branchID].highest_num_qubits = database_framework.get_num_qubits(
                     model)
-                # self.GrowthClass.highest_num_qubits = DataBase.get_num_qubits(model)
+                # self.GrowthClass.highest_num_qubits = database_framework.get_num_qubits(model)
                 print("self.GrowthClass.highest_num_qubits",
                       self.BranchGrowthClasses[branchID].highest_num_qubits)
 
         # retrieve model_id from database? or somewhere
         else:
             try:
-                model_id = DataBase.model_id_from_name(
+                model_id = database_framework.model_id_from_name(
                     db=self.db,
                     name=model
                 )
@@ -846,7 +846,7 @@ class QuantumModelLearningAgent():
 
         # for model in model_list:
         #     try:
-        #         m_id = DataBase.model_id_from_name(self.db, model)
+        #         m_id = database_framework.model_id_from_name(self.db, model)
         #         self.log_print(["m_id:", m_id])
         #         model_id_list.append(m_id)
         #         self.log_print(["model id list:", model_id_list])
@@ -882,7 +882,7 @@ class QuantumModelLearningAgent():
 
     def getModelInstance(self, name):
         try:
-            instance = DataBase.get_qml_instance(self.db, name)
+            instance = database_framework.get_qml_instance(self.db, name)
             return instance
         except BaseException:
             if name in list(self.legacy_db['<Name>']):
@@ -892,7 +892,7 @@ class QuantumModelLearningAgent():
 
     def getOperatorInstance(self, name):
         try:
-            return DataBase.get_operator_instance(self.db, name)
+            return database_framework.get_operator_instance(self.db, name)
         except BaseException:
             if name in list(self.legacy_db['<Name>']):
                 self.log_print(["Operator in legacy databse - retired. "])
@@ -900,13 +900,13 @@ class QuantumModelLearningAgent():
                 self.log_print(["Operator not found."])
 
     def getModelDBIndex(self, name):
-        return DataBase.get_location(self.db, name)
+        return database_framework.get_location(self.db, name)
 
     def getModelInstanceFromID(self, model_id):
-        return DataBase.model_instance_from_id(self.db, model_id)
+        return database_framework.model_instance_from_id(self.db, model_id)
 
     def ModelInstanceForStorageInstanceFromID(self, model_id):
-        return DataBase.reduced_model_instance_from_id(self.db, model_id)
+        return database_framework.reduced_model_instance_from_id(self.db, model_id)
 
     def killModel(self, name):
         if name not in list(self.db['<Name>']):
@@ -914,11 +914,11 @@ class QuantumModelLearningAgent():
         else:
             print("Killing model", name)
             # Add to legacy_db
-            DataBase.move_to_legacy(self.db, self.legacy_db, name)
+            database_framework.move_to_legacy(self.db, self.legacy_db, name)
             model_instance = self.getModelInstance(name)
             operator_instance = self.getOperatorInstance(name)
             # Remove from self.db
-            self.db = DataBase.remove_model(self.db, name)
+            self.db = database_framework.remove_model(self.db, name)
             del model_instance
             del operator_instance
 
@@ -947,7 +947,7 @@ class QuantumModelLearningAgent():
             print("Model ", model, "does not exist")
 
     def learnUnfinishedModels(self, use_rq=True, blocking=False):
-        unfinished_model_names = DataBase.all_unfinished_model_names(self.db)
+        unfinished_model_names = database_framework.all_unfinished_model_names(self.db)
         for model_name in unfinished_model_names:
             print("Model ", model_name, "being learned")
             self.learnModel(
@@ -965,7 +965,7 @@ class QuantumModelLearningAgent():
         use_rq=True,
         blocking=False
     ):
-        # model_list = DataBase.model_names_on_branch(self.db, branchID)
+        # model_list = database_framework.model_names_on_branch(self.db, branchID)
         model_list = self.BranchModels[branchID]
         self.log_print(
             [
@@ -1069,13 +1069,13 @@ class QuantumModelLearningAgent():
         use_rq=True,
         blocking=False
     ):
-        exists = DataBase.check_model_exists(
+        exists = database_framework.check_model_exists(
             model_name=model_name,
             model_lists=self.model_lists,
             db=self.db
         )
         if exists:
-            modelID = DataBase.model_id_from_name(
+            modelID = database_framework.model_id_from_name(
                 self.db,
                 name=model_name
             )
@@ -1189,7 +1189,7 @@ class QuantumModelLearningAgent():
             interbranch = True
         # print("[QMD remoteBayes] self.NumTimesForBayesUpdates: ", self.NumTimesForBayesUpdates)
 
-        unique_id = DataBase.unique_model_pair_identifier(
+        unique_id = database_framework.unique_model_pair_identifier(
             model_a_id,
             model_b_id
         )
@@ -1254,7 +1254,7 @@ class QuantumModelLearningAgent():
                 log_file=self.rq_log_file
             )
         if wait_on_result == True:
-            pair_id = DataBase.unique_model_pair_identifier(
+            pair_id = database_framework.unique_model_pair_identifier(
                 model_a_id,
                 model_b_id
             )
@@ -1281,7 +1281,7 @@ class QuantumModelLearningAgent():
             for j in range(i, num_models):
                 b = model_id_list[j]
                 if a != b:
-                    unique_id = DataBase.unique_model_pair_identifier(a, b)
+                    unique_id = database_framework.unique_model_pair_identifier(a, b)
                     if (
                         unique_id not in self.BayesFactorsComputed
                         or recompute == True
@@ -1332,7 +1332,7 @@ class QuantumModelLearningAgent():
             bayes_threshold = self.BayesUpper
 
         active_branches_bayes = self.RedisDataBases['active_branches_bayes']
-        # model_id_list = DataBase.active_model_ids_by_branch_id(self.db, branchID)
+        # model_id_list = database_framework.active_model_ids_by_branch_id(self.db, branchID)
         model_id_list = self.BranchModelIds[branchID]
         self.log_print(
             [
@@ -1350,7 +1350,7 @@ class QuantumModelLearningAgent():
             for j in range(i, num_models):
                 b = model_id_list[j]
                 if a != b:
-                    unique_id = DataBase.unique_model_pair_identifier(a, b)
+                    unique_id = database_framework.unique_model_pair_identifier(a, b)
                     if (
                         unique_id not in self.BayesFactorsComputed
                         or
@@ -1393,13 +1393,13 @@ class QuantumModelLearningAgent():
         self.learnModelNameList(model_name_list=self.InitialOpList,
                                 blocking=False, use_rq=True
                                 )
-        ids = DataBase.active_model_ids_by_branch_id(self.db, 0)
+        ids = database_framework.active_model_ids_by_branch_id(self.db, 0)
         self.remoteBayesFromIDList(ids, remote=True)
         self.remoteBranchBayesComparison(branchID=0)
 
     def remoteBranchBayesComparison(self, branchID):
         active_models_in_branch = \
-            DataBase.active_model_ids_by_branch_id(self.db,
+            database_framework.active_model_ids_by_branch_id(self.db,
                                                    branchID
                                                    )
 
@@ -1438,7 +1438,7 @@ class QuantumModelLearningAgent():
         elif a is not None and b is not None:
             a = float(a)
             b = float(b)
-            pair = DataBase.unique_model_pair_identifier(a, b)
+            pair = database_framework.unique_model_pair_identifier(a, b)
         else:
             self.log_print(
                 [
@@ -1506,7 +1506,7 @@ class QuantumModelLearningAgent():
         new_value=None,
         increment=None
     ):
-        DataBase.update_field(
+        database_framework.update_field(
             db=self.db,
             name=name,
             model_id=model_id,
@@ -1516,7 +1516,7 @@ class QuantumModelLearningAgent():
         )
 
     def pullField(self, name, field):
-        return DataBase.pull_field(self.db, name, field)
+        return database_framework.pull_field(self.db, name, field)
 
     def statusChangeBranch(self, branchID, new_status='Saturated'):
         self.db.loc[self.db['branchID'] == branchID, 'Status'] = new_status
@@ -1603,7 +1603,7 @@ class QuantumModelLearningAgent():
         bayes_threshold=None
     ):
 
-        active_models_in_branch_old = DataBase.active_model_ids_by_branch_id(
+        active_models_in_branch_old = database_framework.active_model_ids_by_branch_id(
             self.db,
             branchID
         )
@@ -1677,13 +1677,13 @@ class QuantumModelLearningAgent():
         else:
             champ_id = max(models_points, key=models_points.get)
         champ_id = int(champ_id)
-        # champ_name = DataBase.model_name_from_id(
+        # champ_name = database_framework.model_name_from_id(
         #     self.db,
         #     champ_id
         # )
         champ_name = self.ModelNameIDs[champ_id]
 
-        champ_num_qubits = DataBase.get_num_qubits(champ_name)
+        champ_num_qubits = database_framework.get_num_qubits(champ_name)
         self.BranchChampions[int(branchID)] = champ_id
         if champ_id not in self.ActiveBranchChampList:
             self.ActiveBranchChampList.append(champ_id)
@@ -1703,7 +1703,7 @@ class QuantumModelLearningAgent():
             )
 
         self.updateModelRecord(
-            # name=DataBase.model_name_from_id(self.db, champ_id),
+            # name=database_framework.model_name_from_id(self.db, champ_id),
             name=self.ModelNameIDs[champ_id],
             field='Status',
             new_value='Active'
@@ -1847,7 +1847,7 @@ class QuantumModelLearningAgent():
             for i in max_points_branches:
                 self.log_print(
                     [
-                        DataBase.model_name_from_id(self.db, i)
+                        database_framework.model_name_from_id(self.db, i)
                     ]
                 )
             self.log_print(["Points:\n", models_points])
@@ -1865,7 +1865,7 @@ class QuantumModelLearningAgent():
         else:
             self.log_print(["After comparing list:", models_points])
             champ_id = max(models_points, key=models_points.get)
-        # champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        # champ_name = database_framework.model_name_from_id(self.db, champ_id)
         champ_name = self.ModelNameIDs[champ_id]
 
         return champ_id
@@ -2002,7 +2002,7 @@ class QuantumModelLearningAgent():
                 mod1 = min(parent_id, child_id)
                 mod2 = max(parent_id, child_id)
 
-                pair_id = DataBase.unique_model_pair_identifier(
+                pair_id = database_framework.unique_model_pair_identifier(
                     mod1,
                     mod2
                 )
@@ -2198,8 +2198,8 @@ class QuantumModelLearningAgent():
 
         # Finally, compare all remaining active models,
         # which should just mean the tree champions at this point.
-        active_models = DataBase.all_active_model_ids(self.db)
-        self.SurvivingChampions = DataBase.all_active_model_ids(
+        active_models = database_framework.all_active_model_ids(self.db)
+        self.SurvivingChampions = database_framework.all_active_model_ids(
             self.db
         )
         self.log_print(
@@ -2281,11 +2281,11 @@ class QuantumModelLearningAgent():
                 branch_champions_points,
                 key=branch_champions_points.get
             )
-        # champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        # champ_name = database_framework.model_name_from_id(self.db, champ_id)
         champ_name = self.ModelNameIDs[champ_id]
 
         branch_champ_names = [
-            # DataBase.model_name_from_id(self.db, mod_id)
+            # database_framework.model_name_from_id(self.db, mod_id)
             self.ModelNameIDs[mod_id]
             for mod_id in active_models
         ]
@@ -2309,7 +2309,7 @@ class QuantumModelLearningAgent():
             branches = all_branches
         elif just_active_models:
             # some models turned off intermediately
-            branches = DataBase.all_active_model_ids(self.db)
+            branches = database_framework.all_active_model_ids(self.db)
         else:
             branches = branch_list
         self.log_print(["Branches : ", branches])
@@ -2322,7 +2322,7 @@ class QuantumModelLearningAgent():
             branchID = branches[i]
             if branchID not in all_branches:
                 self.log_print(["branch ID : ", branchID])
-                warnings.warn("branch not in database.")
+                warnings.warn("branch not in database_framework.")
                 return False
             points_by_branches[i], champions_of_branches[i] = (
                 self.compareModelsWithinBranch(branchID)
@@ -2398,11 +2398,11 @@ class QuantumModelLearningAgent():
                 branch_champions_points,
                 key=branch_champions_points.get
             )
-        # champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        # champ_name = database_framework.model_name_from_id(self.db, champ_id)
         champ_name = self.ModelNameIDs[champ_id]
 
         branch_champ_names = [
-            # DataBase.model_name_from_id(self.db, mod_id)
+            # database_framework.model_name_from_id(self.db, mod_id)
             self.ModelNameIDs[mod_id]
             for mod_id in champions_of_branches
         ]
@@ -2456,7 +2456,7 @@ class QuantumModelLearningAgent():
                     #     self.champions_points[mod2]+=1
         self.ranked_champions = sorted(self.champions_points, reverse=True)
         champ_id = max(self.champions_points, key=self.champions_points.get)
-        # champ_name = DataBase.model_name_from_id(self.db, champ_id)
+        # champ_name = database_framework.model_name_from_id(self.db, champ_id)
         champ_name = self.ModelNameIDs[champ_id]
         self.log_print(["Champion of Champions is", champ_name])
 
@@ -2493,7 +2493,7 @@ class QuantumModelLearningAgent():
         all_models_this_branch = self.BranchRankings[branchID]
         best_models = self.BranchRankings[branchID][:num_models]
         best_model_names = [
-            # DataBase.model_name_from_id(self.db, mod_id) for
+            # database_framework.model_name_from_id(self.db, mod_id) for
             self.ModelNameIDs[mod_id]
             for mod_id in best_models
         ]
@@ -2520,7 +2520,7 @@ class QuantumModelLearningAgent():
             miscellaneous=self.MiscellaneousGrowthInfo[growth_rule]
         )
         new_models = list(set(new_models))
-        new_models = [DataBase.alph(mod) for mod in new_models]
+        new_models = [database_framework.alph(mod) for mod in new_models]
 
         self.log_print(
             [
@@ -2550,13 +2550,13 @@ class QuantumModelLearningAgent():
         )
 
         try:
-            new_model_dimension = DataBase.get_num_qubits(
+            new_model_dimension = database_framework.get_num_qubits(
                 new_models[0]
             )
         except BaseException:
             # TODO this is only during development -- only for cases where
             # spawn step determines termination
-            new_model_dimension = DataBase.get_num_qubits(
+            new_model_dimension = database_framework.get_num_qubits(
                 best_model_names[0]
             )
 
@@ -2605,7 +2605,7 @@ class QuantumModelLearningAgent():
             blocking=True
         )
 
-        mod_id = DataBase.model_id_from_name(
+        mod_id = database_framework.model_id_from_name(
             db=self.db,
             name=mod_to_learn
         )
@@ -2625,7 +2625,7 @@ class QuantumModelLearningAgent():
             # fitness_parameters = self.FitnessParameters
         )
 
-        n_qubits = DataBase.get_num_qubits(mod.Name)
+        n_qubits = database_framework.get_num_qubits(mod.Name)
         if n_qubits > 3:
             # only compute subset of points for plot
             # otherwise takes too long
@@ -2686,7 +2686,7 @@ class QuantumModelLearningAgent():
                 plot_probes=self.PlotProbes
             ),
             'QuadraticLosses': mod.QuadraticLosses,
-            'NameAlphabetical': DataBase.alph(mod.Name),
+            'NameAlphabetical': database_framework.alph(mod.Name),
             'LearnedParameters': mod.LearnedParameters,
             'FinalSigmas': mod.FinalSigmas,
             'TrackParameterEstimates': mod.TrackParameterEstimates,
@@ -2745,7 +2745,7 @@ class QuantumModelLearningAgent():
         self.multiQHLMode = True
         self.ChampID = -1,  # TODO just so not to crash during dynamics plot
         self.multiQHL_model_ids = [
-            DataBase.model_id_from_name(
+            database_framework.model_id_from_name(
                 db=self.db,
                 name=mod_name
             ) for mod_name in model_names
@@ -2762,7 +2762,7 @@ class QuantumModelLearningAgent():
 
         for mod_name in model_names:
             print("Trying to get mod id for", mod_name)
-            mod_id = DataBase.model_id_from_name(
+            mod_id = database_framework.model_id_from_name(
                 db=self.db,
                 name=mod_name
             )
@@ -2794,7 +2794,7 @@ class QuantumModelLearningAgent():
         time_now = time.time()
         time_taken = time_now - self.StartingTime
         for mod_name in model_names:
-            mod_id = DataBase.model_id_from_name(
+            mod_id = database_framework.model_id_from_name(
                 db=self.db, name=mod_name
             )
             mod = self.ModelInstanceForStorageInstanceFromID(mod_id)
@@ -2805,7 +2805,7 @@ class QuantumModelLearningAgent():
                 model_id=mod_id
             )
 
-            n_qubits = DataBase.get_num_qubits(mod.Name)
+            n_qubits = database_framework.get_num_qubits(mod.Name)
             if n_qubits > 5:
                 # only compute subset of points for plot
                 # otherwise takes too long
@@ -2845,7 +2845,7 @@ class QuantumModelLearningAgent():
                     plot_probes=self.PlotProbes,
                     times=expec_val_plot_times
                 ),
-                'NameAlphabetical': DataBase.alph(mod.Name),
+                'NameAlphabetical': database_framework.alph(mod.Name),
                 'LearnedParameters': mod.LearnedParameters,
                 'FinalSigmas': mod.FinalSigmas,
                 'TrackParameterEstimates': mod.TrackParameterEstimates,
@@ -3146,11 +3146,11 @@ class QuantumModelLearningAgent():
             ]
         )
 
-        if self.ChampionName == DataBase.alph(self.TrueOpName):
+        if self.ChampionName == database_framework.alph(self.TrueOpName):
             self.log_print(
                 [
                     "True model found: {}".format(
-                        DataBase.alph(self.TrueOpName)
+                        database_framework.alph(self.TrueOpName)
                     )
                 ]
             )
@@ -3183,7 +3183,7 @@ class QuantumModelLearningAgent():
             champ_model.FinalParams
         )
 
-        champ_op = DataBase.Operator(self.ChampionName)
+        champ_op = database_framework.Operator(self.ChampionName)
         num_params_champ_model = champ_op.num_constituents
 
         correct_model = misfit = underfit = overfit = 0
@@ -3198,12 +3198,12 @@ class QuantumModelLearningAgent():
             v = self.ModelNameIDs[k]
             self.ModelIDNames[v] = k
 
-        if DataBase.alph(self.ChampionName) == DataBase.alph(self.TrueOpName):
+        if database_framework.alph(self.ChampionName) == database_framework.alph(self.TrueOpName):
             correct_model = 1
         elif (
             num_params_champ_model == self.TrueOpNumParams
             and
-            DataBase.alph(self.ChampionName) != DataBase.alph(self.TrueOpName)
+            database_framework.alph(self.ChampionName) != database_framework.alph(self.TrueOpName)
         ):
             misfit = 1
         elif num_params_champ_model > self.TrueOpNumParams:
@@ -3213,7 +3213,7 @@ class QuantumModelLearningAgent():
 
         num_params_difference = self.TrueOpNumParams - num_params_champ_model
 
-        num_qubits_champ_model = DataBase.get_num_qubits(self.ChampionName)
+        num_qubits_champ_model = database_framework.get_num_qubits(self.ChampionName)
         self.LearnedParamsChamp = (
             self.ModelInstanceForStorageInstanceFromID(self.ChampID).LearnedParameters
         )
@@ -3237,7 +3237,7 @@ class QuantumModelLearningAgent():
         time_now = time.time()
         time_taken = time_now - self.StartingTime
 
-        n_qubits = DataBase.get_num_qubits(champ_model.Name)
+        n_qubits = database_framework.get_num_qubits(champ_model.Name)
         if n_qubits > 3:
             # only compute subset of points for plot
             # otherwise takes too long
@@ -3260,11 +3260,11 @@ class QuantumModelLearningAgent():
         # equivalent to sleepf.ResultsDict
 
         self.ChampionResultsDict = {
-            'NameAlphabetical': DataBase.alph(self.ChampionName),
+            'NameAlphabetical': database_framework.alph(self.ChampionName),
             'NameNonAlph': self.ChampionName,
             'FinalParams': self.ChampionFinalParams,
             'LatexName': champ_model.LatexTerm,
-            # 'LatexName' : DataBase.latex_name_ising(self.ChampionName),
+            # 'LatexName' : database_framework.latex_name_ising(self.ChampionName),
             'NumParticles': self.NumParticles,
             'NumExperiments': champ_model.NumExperiments,
             'NumBayesTimes': self.NumTimesForBayesUpdates,
@@ -3308,7 +3308,7 @@ class QuantumModelLearningAgent():
             'GrowthGenerator': champ_model.GrowthGenerator,
             'Heuristic': champ_model.HeuristicType,
             'ChampLatex': champ_model.LatexTerm,
-            'TrueModel': DataBase.alph(self.TrueOpName),
+            'TrueModel': database_framework.alph(self.TrueOpName),
             'NumParamDifference': num_params_difference,
         }
 
@@ -3362,10 +3362,10 @@ class QuantumModelLearningAgent():
             new_model_terms = list(
                 set(params) - set(to_remove)
             )
-            dim = DataBase.get_num_qubits(new_model_terms[0])
+            dim = database_framework.get_num_qubits(new_model_terms[0])
             p_str = 'P' * dim
             new_mod = p_str.join(new_model_terms)
-            new_mod = DataBase.alph(new_mod)
+            new_mod = database_framework.alph(new_mod)
 
             self.log_print(
                 [
@@ -3384,7 +3384,7 @@ class QuantumModelLearningAgent():
             )
 
             reduced_mod_terms = sorted(
-                DataBase.get_constituent_names_from_name(
+                database_framework.get_constituent_names_from_name(
                     new_mod
                 )
             )
@@ -3527,7 +3527,7 @@ class QuantumModelLearningAgent():
                 term
             )
             for term in
-            DataBase.get_constituent_names_from_name(
+            database_framework.get_constituent_names_from_name(
                 self.ModelNameIDs[model_id]
             )
         ]
@@ -3602,7 +3602,7 @@ class QuantumModelLearningAgent():
                         just_given_models=False
                         ):
 
-        model_id_list = DataBase.active_model_ids_by_branch_id(
+        model_id_list = database_framework.active_model_ids_by_branch_id(
             self.db, branchID=0)
         for i in range(num_runs):
             for j in model_id_list:
@@ -3638,7 +3638,7 @@ class QuantumModelLearningAgent():
             plot_descriptor += '[Branch champions]'
 
         elif branch_id is not None:
-            model_id_list = DataBase.list_model_id_in_branch(
+            model_id_list = database_framework.list_model_id_in_branch(
                 self.db, branch_id)
             plot_descriptor += '[Branch' + str(branch_id) + ']'
 
@@ -3707,7 +3707,7 @@ class QuantumModelLearningAgent():
 
         model_name_dict = {}
         for m in model_list:
-            model_name_dict[m] = DataBase.model_name_from_id(self.db, m)
+            model_name_dict[m] = database_framework.model_name_from_id(self.db, m)
 
         qmla.analysis.plotHinton(
             model_names=model_name_dict,
@@ -3724,7 +3724,7 @@ class QuantumModelLearningAgent():
     ):
 
         if true_model:
-            model_id = DataBase.model_id_from_name(
+            model_id = database_framework.model_id_from_name(
                 db=self.db, name=self.TrueOpName)
 
         qmla.analysis.parameterEstimates(qmd=self,
@@ -3899,7 +3899,7 @@ class QuantumModelLearningAgent():
         )
 
     def majorityVotingTally(self):
-        mod_ids = DataBase.list_model_id_in_branch(self.db, 0)
+        mod_ids = database_framework.list_model_id_in_branch(self.db, 0)
         tally = {}
 
         for i in mod_ids:

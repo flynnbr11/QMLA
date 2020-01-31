@@ -8,7 +8,7 @@ from qmla import topology
 from qmla import model_generation
 from qmla import model_naming
 from qmla import probe_set_generation
-from qmla import DataBase
+from qmla import database_framework
 
 
 
@@ -35,7 +35,7 @@ class ising_chain_probabilistic(
 
         # self.true_operator = 'pauliSet_zJz_1J2_d3PPPpauliSet_xJx_1J3_d3PPPpauliSet_zJz_2J3_d3PPPpauliSet_yJy_1J2_d3'
         self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
-        self.true_operator = DataBase.alph(self.true_operator)
+        self.true_operator = database_framework.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
             # 'x',
@@ -98,7 +98,7 @@ class ising_chain_predetermined(
         self.lattice_full_connectivity = False
         # self.true_operator = 'pauliSet_zJz_1J2_d2'
         # self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
-        self.true_operator = DataBase.alph(self.true_operator)
+        self.true_operator = database_framework.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
             'z'

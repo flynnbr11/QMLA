@@ -5,7 +5,7 @@ import os
 from qmla.GrowthRuleClasses import NVCentreExperimentGrowthRules
 from qmla import probe_set_generation
 from qmla import expectation_values
-from qmla import DataBase
+from qmla import database_framework
 
 
 class presentation_plot_generation(

@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
 
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 # Simluated Probes: random
 
 
@@ -1076,8 +1076,8 @@ def ideal_probe_dict(
     **kwargs
 ):
     probe_dict = {}
-    true_dim = DataBase.get_num_qubits(true_operator)
-    ideal_probe = DataBase.ideal_probe(true_operator)
+    true_dim = database_framework.get_num_qubits(true_operator)
+    ideal_probe = database_framework.ideal_probe(true_operator)
     qt_probe = qutip.Qobj(ideal_probe)
     density_mtx = qutip.ket2dm(qt_probe)
 

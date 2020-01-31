@@ -13,7 +13,7 @@ import redis
 from qinfer import NormalDistribution
 
 from qmla.model_instances import ModelInstanceForLearning, ModelInstanceForStorage
-from qmla.DataBase import * 
+from qmla.database_framework import * 
 
 def launch_db(
     true_op_name,
@@ -57,7 +57,7 @@ def launch_db(
 
     Usage:
         $ gen_list = ['xTy, yPz, iTxTTy] # Sample list of model names
-        $ running_db, legacy_db, model_lists = DataBase.launch_db(gen_list=gen_list)
+        $ running_db, legacy_db, model_lists = database_framework.launch_db(gen_list=gen_list)
 
     """
 

@@ -4,7 +4,7 @@ import os
 from qmla.GrowthRuleClasses import NVCentreLargeSpinBath
 from qmla import probe_set_generation
 from qmla import expectation_values
-from qmla import DataBase
+from qmla import database_framework
 from qmla import experiment_design_heuristics
 
 class nv_centre_revival_data(

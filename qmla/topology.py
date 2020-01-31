@@ -9,7 +9,7 @@ import copy
 import time as time
 import warnings
 
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 import qmla.model_naming as model_naming
 
 

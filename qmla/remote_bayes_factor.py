@@ -25,7 +25,7 @@ try:
 except BaseException:
     enforce_serial = True  # shouldn't be needed
 
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 import qmla.model_instances as QML
 import qmla.analysis 
 
@@ -203,7 +203,7 @@ def BayesFactorRemote(
         if (
             save_plots_of_posteriors == True
             and
-            DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name)
+            database_framework.alph(model_a.Name) == database_framework.alph(true_mod_name)
         ):
 
             # updater_b_copy = copy.deepcopy(model_b.updater)
@@ -237,9 +237,9 @@ def BayesFactorRemote(
         # bayes_factor = np.exp(log_l_a - log_l_b)
         if (
             (
-                DataBase.alph(model_a.Name) == DataBase.alph(true_mod_name)
+                database_framework.alph(model_a.Name) == database_framework.alph(true_mod_name)
                 or
-                DataBase.alph(model_b.Name) == DataBase.alph(true_mod_name)
+                database_framework.alph(model_b.Name) == database_framework.alph(true_mod_name)
             )
             and
             plot_true_mod_post_bayes_factor_dynamics == True
@@ -281,7 +281,7 @@ def BayesFactorRemote(
         elif bayes_factor > 1e160:
             bayes_factor = 1e160
 
-        pair_id = DataBase.unique_model_pair_identifier(
+        pair_id = database_framework.unique_model_pair_identifier(
             model_a_id, model_b_id
         )
         print("Bayes Factor:", pair_id)

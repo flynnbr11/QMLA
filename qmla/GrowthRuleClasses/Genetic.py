@@ -11,7 +11,7 @@ from qmla import topology
 from qmla import model_generation
 from qmla import model_naming
 from qmla import probe_set_generation
-from qmla import DataBase
+from qmla import database_framework
 
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]
@@ -36,8 +36,8 @@ class genetic_algorithm(
         # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
         self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
         self.true_operator = self.ising_full_connectivity
-        self.true_operator = DataBase.alph(self.true_operator)
-        self.num_sites = DataBase.get_num_qubits(self.true_operator)
+        self.true_operator = database_framework.alph(self.true_operator)
+        self.num_sites = database_framework.get_num_qubits(self.true_operator)
         
         self.base_terms = [
             'z',
@@ -140,8 +140,8 @@ class genetic_algorithm(
         **kwargs
     ):
         # print("[latex name fnc] name:", name)
-        core_operators = list(sorted(DataBase.core_operator_dict.keys()))
-        num_sites = DataBase.get_num_qubits(name)
+        core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+        num_sites = database_framework.get_num_qubits(name)
         p_str = 'P' * num_sites
         p_str = '+'
         separate_terms = name.split(p_str)

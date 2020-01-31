@@ -4,7 +4,7 @@ import sys
 import pickle
 
 import qmla.get_growth_rule as get_growth_rule
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 
 
 """
@@ -152,8 +152,8 @@ class ControlsQMLA():
             open(self.true_params_pickle_file, 'rb')
         )
         self.true_operator = true_params_info['true_op']
-        self.true_op_name = DataBase.alph(self.true_operator)
-        self.true_operator_class = DataBase.Operator(
+        self.true_op_name = database_framework.alph(self.true_operator)
+        self.true_operator_class = database_framework.Operator(
             self.true_op_name
         )
         self.true_op_list = self.true_operator_class.constituents_operators
@@ -173,7 +173,7 @@ class ControlsQMLA():
             true_ham = None
             for k in list(self.true_params_dict.keys()):
                 param = self.true_params_dict[k]
-                mtx = DataBase.compute(k)
+                mtx = database_framework.compute(k)
                 if true_ham is not None:
                     true_ham += param * mtx
                 else:

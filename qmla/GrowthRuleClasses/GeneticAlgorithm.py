@@ -7,7 +7,7 @@ import copy
 import scipy
 import time
 
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 import qmla.model_naming as model_naming
 import qmla.model_generation as model_generation
 
@@ -106,7 +106,7 @@ class GeneticAlgorithmQMLA():
         self,
         model
     ):
-        terms = DataBase.get_constituent_names_from_name(model)
+        terms = database_framework.get_constituent_names_from_name(model)
         chromosome_locations = []
         for term in terms:
             components = term.split('_')
@@ -120,7 +120,7 @@ class GeneticAlgorithmQMLA():
                     "\nModel:", model
                 )
                 raise
-            core_operators = list(sorted(DataBase.core_operator_dict.keys()))
+            core_operators = list(sorted(database_framework.core_operator_dict.keys()))
             for l in components:
                 if l[0] == 'd':
                     dim = int(l.replace('d', ''))

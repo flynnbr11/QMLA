@@ -14,7 +14,7 @@ pickle.HIGHEST_PROTOCOL = 2
 
 sys.path.append("..")
 import qmla
-from qmla import DataBase
+from qmla import database_framework
 from qmla.quantum_model_learning_agent import QuantumModelLearningAgent  # QMD class in Library
 from qmla import redis_settings as rds
 
@@ -168,9 +168,9 @@ log_print(
 )
 
 true_op = global_variables.true_operator
-true_num_qubits = DataBase.get_num_qubits(true_op)
-true_op_list = DataBase.get_constituent_names_from_name(true_op)
-true_op_matrices = [DataBase.compute(t) for t in true_op_list]
+true_num_qubits = database_framework.get_num_qubits(true_op)
+true_op_list = database_framework.get_constituent_names_from_name(true_op)
+true_op_matrices = [database_framework.compute(t) for t in true_op_list]
 num_params = len(true_op_list)
 true_expectation_value_path = global_variables.true_expec_path
 true_ham = global_variables.true_hamiltonian
@@ -484,7 +484,7 @@ elif (
     )
     # model_ids = list(range(qmd.HighestModelID))
     model_ids = [
-        DataBase.model_id_from_name(
+        database_framework.model_id_from_name(
             db=qmd.db,
             name=mod
             # ) for mod in further_qhl_models

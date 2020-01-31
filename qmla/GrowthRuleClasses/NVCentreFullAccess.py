@@ -5,7 +5,7 @@ import os
 from qmla.GrowthRuleClasses.SuperClassGrowthRule import growth_rule_super_class
 from qmla import experiment_design_heuristics
 from qmla import expectation_values
-from qmla import DataBase
+from qmla import database_framework
 
 __all__ = [
     'nv_centre_spin_full_access'
@@ -117,7 +117,7 @@ class nv_centre_spin_full_access(
                 if term not in present_terms:
                     new_model = model + 'PP' + term
                     if (
-                        DataBase.check_model_in_dict(
+                        database_framework.check_model_in_dict(
                             new_model, model_dict) == False
                         and new_model not in new_models
                     ):
@@ -132,7 +132,7 @@ class nv_centre_spin_full_access(
                 if term not in present_terms:
                     new_model = model + 'PP' + term
                     if (
-                        DataBase.check_model_in_dict(
+                        database_framework.check_model_in_dict(
                             new_model, model_dict) == False
                         and new_model not in new_models
                     ):
@@ -148,7 +148,7 @@ class nv_centre_spin_full_access(
                 if term not in present_terms:
                     new_model = model + 'PP' + term
                     if (
-                        DataBase.check_model_in_dict(
+                        database_framework.check_model_in_dict(
                             new_model, model_dict) == False
                         and new_model not in new_models
                     ):
@@ -164,7 +164,7 @@ class nv_centre_spin_full_access(
         if name == 'x' or name == 'y' or name == 'z':
             return '$' + name + '$'
 
-        num_qubits = DataBase.get_num_qubits(name)
+        num_qubits = database_framework.get_num_qubits(name)
         terms = name.split('PP')
         rotations = ['xTi', 'yTi', 'zTi']
         hartree_fock = ['xTx', 'yTy', 'zTz']

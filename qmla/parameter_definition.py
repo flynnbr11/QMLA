@@ -5,7 +5,7 @@ import argparse
 import os
 import matplotlib.pyplot as plt
 
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 import qmla.prior_distributions as Distributions
 import qmla.get_growth_rule as get_growth_rule
 
@@ -31,7 +31,7 @@ def create_qhl_params(
     plus_probe_for_plot=False,
     true_prior_plot_file=None,
 ):
-    terms = DataBase.get_constituent_names_from_name(
+    terms = database_framework.get_constituent_names_from_name(
         true_op
     )
 

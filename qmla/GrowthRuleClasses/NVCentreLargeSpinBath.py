@@ -5,7 +5,7 @@ from qmla.GrowthRuleClasses import NVCentreFullAccess
 from qmla import experiment_design_heuristics
 from qmla import probe_set_generation
 from qmla import expectation_values
-from qmla import DataBase
+from qmla import database_framework
 
 
 class nv_centre_large_spin_bath(
@@ -168,7 +168,7 @@ class nv_centre_large_spin_bath(
         )
 
         max_num_qubits = max(
-            [DataBase.get_num_qubits(mod) for mod in model_list]
+            [database_framework.get_num_qubits(mod) for mod in model_list]
         )
         new_gali_model = gali_model_nv_centre_spin(max_num_qubits + 1)
         return [new_gali_model]

@@ -172,12 +172,12 @@ true_operator_latex = true_growth_class.latex_name(
 
 if exp_data is False:
     name = true_params_info['true_op']
-    terms = DataBase.get_constituent_names_from_name(name)
+    terms = database_framework.get_constituent_names_from_name(name)
     params = []
     ops = []
     for t in terms:
         params.append(true_params_dict[t])
-        ops.append(DataBase.compute(t))
+        ops.append(database_framework.compute(t))
 
     true_ham = np.tensordot(params, ops, axes=1)
 

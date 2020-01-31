@@ -12,7 +12,7 @@ from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas, cumul
 import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming
 # import qmla.PlotQMD as ptq
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 plt.switch_backend('agg')
 
 def parameter_sweep_analysis(
@@ -170,7 +170,7 @@ def average_parameters(
     for mod in winning_models:
         params_dict[mod] = {}
         sigmas_dict[mod] = {}
-        params = DataBase.get_constituent_names_from_name(mod)
+        params = database_framework.get_constituent_names_from_name(mod)
         for p in params:
             params_dict[mod][p] = []
             sigmas_dict[mod][p] = []
@@ -202,7 +202,7 @@ def average_parameters(
         avg_sigmas_dict[mod] = {}
         std_deviations[mod] = {}
         learned_priors[mod] = {}
-        params = DataBase.get_constituent_names_from_name(mod)
+        params = database_framework.get_constituent_names_from_name(mod)
         for p in params:
             # if average_type == 'median':
             #     average_params_dict[mod][p] = np.median(
@@ -326,7 +326,7 @@ def average_parameter_estimates(
 
         parameters_for_this_name = parameter_estimates_from_qmd[name]
         num_wins_for_name = len(parameters_for_this_name)
-        terms = sorted(DataBase.get_constituent_names_from_name(name))
+        terms = sorted(database_framework.get_constituent_names_from_name(name))
         num_terms = len(terms)
 
         ncols = int(np.ceil(np.sqrt(num_terms)))
@@ -382,7 +382,7 @@ def average_parameter_estimates(
             if col == ncols:
                 col = 0
                 row += 1
-            # latex_terms[term] = DataBase.latex_name_ising(term)
+            # latex_terms[term] = database_framework.latex_name_ising(term)
             latex_terms[term] = growth_classes[name].latex_name(term)
             averages = np.array(
                 [avg_parameters[term][e] for e in epochs]
@@ -393,7 +393,7 @@ def average_parameter_estimates(
 
             try:
                 true_val = true_params_dict[term]
-                # true_term_latex = DataBase.latex_name_ising(term)
+                # true_term_latex = database_framework.latex_name_ising(term)
                 true_term_latex = growth_classes[name].latex_name(term)
                 ax.axhline(
                     true_val,
@@ -431,7 +431,7 @@ def average_parameter_estimates(
                 color='black'
             )
 
-            # latex_term = DataBase.latex_name_ising(term)
+            # latex_term = database_framework.latex_name_ising(term)
             latex_term = growth_classes[name].latex_name(term)
             # latex_term = latex_terms[term]
             ax.set_title(str(latex_term))
@@ -439,7 +439,7 @@ def average_parameter_estimates(
         """
         plot_title= str(
             'Average Parameter Estimates '+
-            # str(DataBase.latex_name_ising(name)) +
+            # str(database_framework.latex_name_ising(name)) +
             ' [' +
             str(num_wins_for_name) + # TODO - num times this model won
             ' instances].'
@@ -732,7 +732,7 @@ def analyse_and_plot_dynamics_multiple_models(
             [lower_iqr_expectation_values[t] for t in times])
         higher_iqr_exp = np.array(
             [higher_iqr_expectation_values[t] for t in times])
-        # name=DataBase.latex_name_ising(term)
+        # name=database_framework.latex_name_ising(term)
         residuals = (mean_exp - true_exp)**2
         sum_residuals = np.sum(residuals)
         mean_true_val = np.mean(true_exp)
@@ -1067,7 +1067,7 @@ def r_sqaured_average(
             [np.std(r_squared_lists[t]) for t in times]
         )
 
-        # term = DataBase.latex_name_ising(name)
+        # term = database_framework.latex_name_ising(name)
         gr_class = growth_classes_by_name[name]
         # TODO need growth rule of given name to get proper latex term
         term = gr_class.latex_name(name)
@@ -1159,7 +1159,7 @@ def volume_average(
             [np.std(volume_lists[t]) for t in times]
         )
 
-        # term = DataBase.latex_name_ising(name)
+        # term = database_framework.latex_name_ising(name)
         term = growth_class.latex_name(name)
         plot_label = str(term + ' (' + str(num_wins) + ')')
         colour = colours[i]
@@ -1507,13 +1507,13 @@ def plot_scores(
     batch_correct_models = []
     if batch_nearest_num_params_as_winners == True:
         num_true_params = len(
-            DataBase.get_constituent_names_from_name(
+            database_framework.get_constituent_names_from_name(
                 true_operator
             )
         )
         for mod in models:
             num_params = len(
-                DataBase.get_constituent_names_from_name(mod)
+                database_framework.get_constituent_names_from_name(mod)
             )
 
             if (

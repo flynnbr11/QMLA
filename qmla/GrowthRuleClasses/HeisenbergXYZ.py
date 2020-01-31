@@ -9,7 +9,7 @@ from qmla import topology
 from qmla import model_generation
 from qmla import model_naming
 from qmla import probe_set_generation
-from qmla import DataBase
+from qmla import database_framework
 
 
 class heisenberg_xyz_probabilistic(
@@ -43,7 +43,7 @@ class heisenberg_xyz_probabilistic(
         self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_yJy_d3'
         self.max_num_sites = 4
         self.true_operator = self.four_site_x
-        self.true_operator = DataBase.alph(self.true_operator)
+        self.true_operator = database_framework.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
             'x',

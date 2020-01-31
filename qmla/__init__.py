@@ -6,7 +6,7 @@ print("QMLA __init__")
 import qmla.analysis
 
 from qmla.get_growth_rule import * 
-from qmla.DataBase import * # TODO fix __all__
+from qmla.database_framework import * # TODO fix __all__
 from qmla.prior_distributions import *
 from qmla.controls_qmla import *
 from qmla.model_generation import * # TODO fix __all__

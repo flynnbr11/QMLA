@@ -9,7 +9,7 @@ from qmla import topology
 from qmla import model_generation
 from qmla import model_naming
 from qmla import probe_set_generation
-from qmla import DataBase
+from qmla import database_framework
 
 __all__ = [
     'connected_lattice'
@@ -41,7 +41,7 @@ class connected_lattice(
         self.lattice_full_connectivity = False
 
         self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
-        self.true_operator = DataBase.alph(self.true_operator)
+        self.true_operator = database_framework.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [
             'x',
@@ -83,7 +83,7 @@ class connected_lattice(
         )
         self.initially_connected_sites = self.topology.get_connected_site_list()
 
-        self.true_operator = DataBase.alph(self.true_operator)
+        self.true_operator = database_framework.alph(self.true_operator)
         self.model_fitness = {}
         self.models_rejected = {
             self.generation_DAG: []
@@ -173,7 +173,7 @@ class connected_lattice(
                 )
 
         new_models = [
-            DataBase.alph(mod)
+            database_framework.alph(mod)
             for mod in new_models
             # Final check whether this model is allowed
             if self.check_model_validity(mod)
@@ -186,7 +186,7 @@ class connected_lattice(
                 latex_model_name = self.latex_name(model)
                 branch_id = (
                     self.generation_DAG
-                    + len(DataBase.get_constituent_names_from_name(model))
+                    + len(database_framework.get_constituent_names_from_name(model))
                 )
                 self.model_branches[latex_model_name] = branch_id
 
@@ -250,7 +250,7 @@ class connected_lattice(
             mod_name = model_names_ids[mod_id]
             mod_name = self.match_dimension(
                 mod_name, self.topology.num_sites())
-            present_terms = DataBase.get_constituent_names_from_name(mod_name)
+            present_terms = database_framework.get_constituent_names_from_name(mod_name)
             print(
                 "Model {} has present terms {}".format(
                     mod_name, present_terms))
@@ -338,8 +338,8 @@ class connected_lattice(
         **kwargs
     ):
         # print("[latex name fnc] name:", name)
-        core_operators = list(sorted(DataBase.core_operator_dict.keys()))
-        num_sites = DataBase.get_num_qubits(name)
+        core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+        num_sites = database_framework.get_num_qubits(name)
         p_str = 'P' * num_sites
         separate_terms = name.split(p_str)
 
@@ -582,7 +582,7 @@ def possible_pauli_combinations(base_terms, num_sites):
 def increase_dimension_pauli_set(initial_model, new_dimension=None):
     print("[spin prob incr dim] initial model:",
           initial_model, "new dim:", new_dimension)
-    individual_terms = DataBase.get_constituent_names_from_name(initial_model)
+    individual_terms = database_framework.get_constituent_names_from_name(initial_model)
     separate_terms = []
 
     for model in individual_terms:

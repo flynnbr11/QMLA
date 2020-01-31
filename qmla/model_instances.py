@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 pickle.HIGHEST_PROTOCOL = 2
 
 import qmla.analysis
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 import qmla.prior_distributions as Distributions
 import qmla.experimental_data_processing as expdt
 import qmla.expectation_values as expectation_values
@@ -130,8 +130,8 @@ class ModelInstanceForLearning():
     ):
         self.VolumeList = np.array([])
         self.Name = name
-        # self.LatexTerm = DataBase.latex_name_ising(self.Name)
-        self.Dimension = DataBase.get_num_qubits(name)
+        # self.LatexTerm = database_framework.latex_name_ising(self.Name)
+        self.Dimension = database_framework.get_num_qubits(name)
         self.NumExperimentsToDate = 0
         self.BayesFactors = {}
         self.log_file = log_file
@@ -206,9 +206,9 @@ class ModelInstanceForLearning():
         base_resources = qmd_info['base_resources']
         base_num_qubits = base_resources['num_qubits']
         base_num_terms = base_resources['num_terms']
-        this_model_num_qubits = DataBase.get_num_qubits(self.Name)
+        this_model_num_qubits = database_framework.get_num_qubits(self.Name)
         this_model_num_terms = len(
-            DataBase.get_constituent_names_from_name(self.Name)
+            database_framework.get_constituent_names_from_name(self.Name)
         )
 
         max_num_params = self.GrowthClass.max_num_parameter_estimate
@@ -266,13 +266,13 @@ class ModelInstanceForLearning():
         self.SimOpList = np.asarray(simoplist)
         self.SimParams = np.asarray([simparams[0]])
 
-        individual_terms_in_name = DataBase.get_constituent_names_from_name(
+        individual_terms_in_name = database_framework.get_constituent_names_from_name(
             self.Name
         )
 
         for i in range(len(individual_terms_in_name)):
             term = individual_terms_in_name[i]
-            term_mtx = DataBase.compute(term)
+            term_mtx = database_framework.compute(term)
             if np.all(term_mtx == self.SimOpList[i]) is False:
                 print("[QML] UNEQUAL SIM OP LIST / TERM MATRICES.")
                 print("==> INSPECT PRIORS ORDERING.")
@@ -335,10 +335,10 @@ class ModelInstanceForLearning():
 #             if (
 #                 qmd_info['model_priors'] is not None
 #                 and
-#                 DataBase.alph(self.Name) in list(qmd_info['model_priors'].keys())
+#                 database_framework.alph(self.Name) in list(qmd_info['model_priors'].keys())
 #             ):
 #                 self.PriorSpecificTerms = (
-#                     qmd_info['model_priors'][DataBase.alph(self.Name)]
+#                     qmd_info['model_priors'][database_framework.alph(self.Name)]
 #                 )
 
 #             self.Prior = Distributions.normal_distribution_ising(
@@ -525,7 +525,7 @@ class ModelInstanceForLearning():
 
         self.TrueParamsDict = {}
 
-        true_params_names = DataBase.get_constituent_names_from_name(
+        true_params_names = database_framework.get_constituent_names_from_name(
             self.TrueOpName
         )
         if self.UseExperimentalData == False:
@@ -1035,7 +1035,7 @@ class ModelInstanceForStorage():
             'store_particles_weights'
         ]
         self.BayesFactors = {}
-        self.NumQubits = DataBase.get_num_qubits(self.Name)
+        self.NumQubits = database_framework.get_num_qubits(self.Name)
         self.ProbeDimension = self.NumQubits
         self.HostName = host_name
         self.PortNumber = port_number
@@ -1509,7 +1509,7 @@ class ModelInstanceForComparison():
                 "Name:", self.Name
             ]
         )
-        op = DataBase.Operator(self.Name)
+        op = database_framework.Operator(self.Name)
         # todo, put this in a lighter function
         self.SimOpList = op.constituents_operators
         self.Times = learned_model_info['times']
@@ -1568,7 +1568,7 @@ class ModelInstanceForComparison():
         # recreate prior using final params instead of pickling
 
         # Plot posterior distribution after learning.
-        # model_terms = DataBase.get_constituent_names_from_name(
+        # model_terms = database_framework.get_constituent_names_from_name(
         #     self.Name
         # )
         # model_name_individual_terms = [

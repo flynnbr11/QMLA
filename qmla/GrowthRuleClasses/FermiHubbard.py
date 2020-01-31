@@ -9,7 +9,7 @@ from qmla import topology
 from qmla import model_generation
 from qmla import model_naming
 from qmla import probe_set_generation
-from qmla import DataBase
+from qmla import database_framework
 
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]
@@ -158,7 +158,7 @@ class fermi_hubbard_probabilistic(
     ):
         # possibility that some models not valid; not needed by default but
         # checked for general case
-        terms = DataBase.get_constituent_names_from_name(model)
+        terms = database_framework.get_constituent_names_from_name(model)
 
         if np.all(['FHhop' in a for a in terms]):
             return True
@@ -172,7 +172,7 @@ class fermi_hubbard_probabilistic(
             hopping_sites = []
             number_term_sites = []
             chemical_sites = []
-            num_sites = DataBase.get_num_qubits(model)
+            num_sites = database_framework.get_num_qubits(model)
             for term in terms:
                 constituents = term.split('_')
                 constituents.remove('d{}'.format(num_sites))

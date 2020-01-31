@@ -14,7 +14,7 @@ import warnings
 import time as time
 import warnings
 
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 
 """
 Useful functions
@@ -34,7 +34,7 @@ def full_model_string(operations):
 
     # Note TODO: this doesn't give an error when tuples are
     # given which aren't used. it should
-    from qmla.DataBase import alph
+    from qmla.database_framework import alph
     terms = operations['terms']
     num_qubits = operations['dim']
     num_terms = len(terms)
@@ -64,14 +64,14 @@ def full_model_string(operations):
         p_str += 'P'
 
     full_model = p_str.join(all_terms)
-    # full_model = DataBase.alph(full_model)
+    # full_model = database_framework.alph(full_model)
     full_model = alph(full_model)
     return full_model
 
 
 def operations_dict_from_name(mod_name):
-    constituents = DataBase.get_constituent_names_from_name(mod_name)
-    num_qubits = DataBase.get_num_qubits(mod_name)
+    constituents = database_framework.get_constituent_names_from_name(mod_name)
+    num_qubits = database_framework.get_num_qubits(mod_name)
     initial_t_str = ''
     all_terms = []
     for j in range(num_qubits - 1):
@@ -105,7 +105,7 @@ def operations_dict_from_name(mod_name):
 
 
 def make_term_transverse(term, transverse_axis):
-    dimension = DataBase.get_num_qubits(term)
+    dimension = database_framework.get_num_qubits(term)
 
     transverse_terms = []
     op_dict = operations_dict_from_name(term)
@@ -136,7 +136,7 @@ def latex_name_ising(name):
     if name == 'x' or name == 'y' or name == 'z':
         return '$' + name + '$'
 
-    num_qubits = DataBase.get_num_qubits(name)
+    num_qubits = database_framework.get_num_qubits(name)
     terms = name.split('PP')
     rotations = ['xTi', 'yTi', 'zTi']
     hartree_fock = ['xTx', 'yTy', 'zTz']
@@ -191,7 +191,7 @@ def latex_name_ising(name):
 
 def latex_name_1d_ising_chain(name):
 
-    individual_terms = DataBase.get_constituent_names_from_name(name)
+    individual_terms = database_framework.get_constituent_names_from_name(name)
     chain_axis = transverse_axis = None
 
     for term in individual_terms:
@@ -237,7 +237,7 @@ def latex_name_1d_ising_chain(name):
 
 def latex_name_heisenberg_xyz(name):
 
-    individual_terms = DataBase.get_constituent_names_from_name(name)
+    individual_terms = database_framework.get_constituent_names_from_name(name)
     chain_axis = transverse_axis = None
     chain_axes = []
 
@@ -357,7 +357,7 @@ def ising_terms_rotation_hyperfine(return_branch_dict=None):
                     ising_terms.append(triple_hf)
                     branch_by_term_dict[triple_hf] = 5
 
-    # latex_terms = [DataBase.latex_name_ising(i) for i in ising_terms]
+    # latex_terms = [database_framework.latex_name_ising(i) for i in ising_terms]
     latex_terms = [
         # get_latex_name(
         #     #  in this case this list is only generating ising type so hard code growth generator
@@ -374,7 +374,7 @@ def ising_terms_rotation_hyperfine(return_branch_dict=None):
         return latex_terms
     elif return_branch_dict == 'term_branch_dict':
         for k in list(branch_by_term_dict.keys()):
-            # branch_by_term_dict[DataBase.latex_name_ising(k)]=(
+            # branch_by_term_dict[database_framework.latex_name_ising(k)]=(
             branch_by_term_dict[
                 # get_latex_name(
                 #     #  in this case this list is only generating ising type so hard code growth generator
@@ -475,7 +475,7 @@ def ising_terms_full_list(return_branch_dict=None):
                     ising_terms.append(triple_hf_term)
 
     latex_terms = [
-        # DataBase.latex_name_ising(i) for i in ising_terms
+        # database_framework.latex_name_ising(i) for i in ising_terms
         # get_latex_name(
         #     name=i,
         #     #  in this case this list is only generating ising type so hard code growth generator
@@ -492,7 +492,7 @@ def ising_terms_full_list(return_branch_dict=None):
         return latex_terms
     elif return_branch_dict == 'term_branch_dict':
         for k in list(branch_by_term_dict.keys()):
-            # branch_by_term_dict[DataBase.latex_name_ising(k)]=(
+            # branch_by_term_dict[database_framework.latex_name_ising(k)]=(
             branch_by_term_dict[
                 # get_latex_name(
                 #     name=k,
@@ -594,7 +594,7 @@ def branch_is_num_params(latex_mapping_file, **kwargs):
     model_branches = {}
 
     for mod in model_names:
-        num_params = len(DataBase.get_constituent_names_from_name(mod))
+        num_params = len(database_framework.get_constituent_names_from_name(mod))
         num_params_by_mod[mod] = num_params
         latex_name = latex_name_map[mod]
         model_branches[latex_name] = num_params
@@ -621,8 +621,8 @@ def branch_is_num_dims(latex_mapping_file, **kwargs):
     model_branches = {}
 
     for mod in model_names:
-        # num_params = len(DataBase.get_constituent_names_from_name(mod))
-        num_qubits = DataBase.get_num_qubits(mod)
+        # num_params = len(database_framework.get_constituent_names_from_name(mod))
+        num_qubits = database_framework.get_num_qubits(mod)
         latex_name = latex_name_map[mod]
         model_branches[latex_name] = num_qubits
 
@@ -651,11 +651,11 @@ def branch_is_num_params_and_qubits(
     model_branches = {}
 
     for mod in model_names:
-        # num_params = len(DataBase.get_constituent_names_from_name(mod))
-        num_qubits = DataBase.get_num_qubits(mod)
+        # num_params = len(database_framework.get_constituent_names_from_name(mod))
+        num_qubits = database_framework.get_num_qubits(mod)
         max_num_params_this_num_sites = 1
         num_params = len(
-            DataBase.get_constituent_names_from_name(mod)
+            database_framework.get_constituent_names_from_name(mod)
         )
         latex_name = latex_name_map[mod]
         branch_num = (max_num_params_this_num_sites * num_qubits) + num_params
@@ -686,7 +686,7 @@ def branch_computed_from_qubit_and_param_count(
 
     models_by_num_qubits = {}
     for mod in model_names:
-        num_qubits = DataBase.get_num_qubits(mod)
+        num_qubits = database_framework.get_num_qubits(mod)
         if num_qubits not in models_by_num_qubits.keys():
             models_by_num_qubits[num_qubits] = []
         models_by_num_qubits[num_qubits].append(mod)
@@ -699,7 +699,7 @@ def branch_computed_from_qubit_and_param_count(
         base_branch = highest_branch
         models = models_by_num_qubits[num_qubits]
         for model in models:
-            num_params = len(DataBase.get_constituent_names_from_name(model))
+            num_params = len(database_framework.get_constituent_names_from_name(model))
             branch_idx = base_branch + num_params
             if branch_idx > highest_branch:
                 highest_branch = branch_idx
@@ -736,7 +736,7 @@ def nearest_neighbour_ising_latex_name(
     name,
     **kwargs
 ):
-    num_qubits = DataBase.get_num_qubits(name)
+    num_qubits = database_framework.get_num_qubits(name)
 
     paulis = ['x', 'y', 'z']
 
@@ -755,7 +755,7 @@ def nearest_neighbour_ising_latex_name(
     return latex_rep
 
 # def hubbard_latex(name):
-#     individual_terms = DataBase.get_constituent_names_from_name(name)
+#     individual_terms = database_framework.get_constituent_names_from_name(name)
 #     latex_term = ''
 #     for term in individual_terms:
 #         if term[0] == 'h':
@@ -786,7 +786,7 @@ def nearest_neighbour_ising_latex_name(
 
 
 def hubbard_latex(name):
-    individual_terms = DataBase.get_constituent_names_from_name(name)
+    individual_terms = database_framework.get_constituent_names_from_name(name)
     latex_term = ''
 
     hopping_terms = []
@@ -834,7 +834,7 @@ def interaction_latex_name(
     interacting_term=r'\sigma',
     **kwargs
 ):
-    name = DataBase.alph(name)
+    name = database_framework.alph(name)
     op_dict = operations_dict_from_name(name)
     terms = op_dict['terms']
     num_terms = len(terms)
@@ -877,7 +877,7 @@ def interaction_latex_name(
 
 
 def large_spin_bath_nv_system_name(term):
-    num_qubits = DataBase.get_num_qubits(term)
+    num_qubits = database_framework.get_num_qubits(term)
     t_str = 'T' * (num_qubits - 1)
     p_str = 'P' * num_qubits
     separate_terms = term.split(p_str)
@@ -925,8 +925,8 @@ def pauliSet_latex_name(
     name,
     **kwargs
 ):
-    core_operators = list(sorted(DataBase.core_operator_dict.keys()))
-    num_sites = DataBase.get_num_qubits(name)
+    core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+    num_sites = database_framework.get_num_qubits(name)
     p_str = 'P' * num_sites
     separate_terms = name.split(p_str)
 

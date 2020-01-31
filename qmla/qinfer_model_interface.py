@@ -10,7 +10,7 @@ import qmla.experimental_data_processing as expdt
 import qmla.get_growth_rule as get_growth_rule
 from qmla.memory_tests import print_loc, print_file_line
 import qmla.probe_set_generation as probe_set_generation
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 
 global_print_loc = False
 global debug_print
@@ -135,7 +135,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self._trueparams = trueparams
         self._truename = truename
         # print("[QML Qinfer class] True op list:", self._true_oplist)
-        self._true_dim = DataBase.get_num_qubits(self._truename)
+        self._true_dim = database_framework.get_num_qubits(self._truename)
         self.use_time_dep_true_model = use_time_dep_true_model
         self.time_dep_true_params = time_dep_true_params
         self.num_time_dep_true_params = num_time_dep_true_params
@@ -159,10 +159,10 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.exp_comparison_tol = exp_comparison_tol
         self._min_freq = min_freq
         self.ModelName = model_name
-        self.model_dimension = DataBase.get_num_qubits(self.ModelName)
+        self.model_dimension = database_framework.get_num_qubits(self.ModelName)
         self.inBayesUpdates = False
         self.ideal_probe = None
-        # self.IdealProbe = DataBase.ideal_probe(self.ModelName)
+        # self.IdealProbe = database_framework.ideal_probe(self.ModelName)
         self.ideal_probelist = None
         self.log_identifier = log_identifier
         if true_oplist is not None and trueparams is None:

@@ -18,7 +18,7 @@ import warnings
 import copy
 import time as time
 
-import qmla.DataBase as DataBase
+import qmla.database_framework as database_framework
 import qmla.model_naming as model_naming
 
 """
@@ -66,7 +66,7 @@ def process_transverse_term(term):
 
     components = term.split('_')
     components.remove('transverse')
-    core_operators = list(sorted(DataBase.core_operator_dict.keys()))
+    core_operators = list(sorted(database_framework.core_operator_dict.keys()))
 
     for l in components:
         if l[0] == 'd':
@@ -89,7 +89,7 @@ def process_multipauli_term(term):
 
     components = term.split('_')
     components.remove('pauliSet')
-    core_operators = list(sorted(DataBase.core_operator_dict.keys()))
+    core_operators = list(sorted(database_framework.core_operator_dict.keys()))
     for l in components:
         if l[0] == 'd':
             dim = int(l.replace('d', ''))
@@ -109,7 +109,7 @@ def process_multipauli_term(term):
 
     full_mod_str = model_naming.full_model_string(term_dict)
     # print("Getting full matrix corresponding to:", full_mod_str)
-    return DataBase.compute(full_mod_str)
+    return database_framework.compute(full_mod_str)
 
 
 def process_n_qubit_NV_centre_spin(term):
@@ -149,7 +149,7 @@ def process_n_qubit_NV_centre_spin(term):
                 op_name += p_str
 
     # print("Type {} ; name {}".format(term_type, op_name))
-    return DataBase.compute(op_name)
+    return database_framework.compute(op_name)
 
 
 """
@@ -205,9 +205,9 @@ def transverse_axis_matrix(
                 t_str += 'T'
 
         individual_transverse_terms.append(single_term)
-    running_mtx = DataBase.compute(individual_transverse_terms[0])
+    running_mtx = database_framework.compute(individual_transverse_terms[0])
     for term in individual_transverse_terms[1:]:
-        running_mtx += DataBase.compute(term)
+        running_mtx += database_framework.compute(term)
     return running_mtx
 
 
@@ -238,10 +238,10 @@ def ising_interaction_component(num_qubits, interaction_axis):
 
         individual_interaction_terms.append(single_term)
 
-    running_mtx = DataBase.compute(individual_interaction_terms[0])
+    running_mtx = database_framework.compute(individual_interaction_terms[0])
 
     for term in individual_interaction_terms[1:]:
-        running_mtx += DataBase.compute(term)
+        running_mtx += database_framework.compute(term)
 
     return running_mtx
 
@@ -287,7 +287,7 @@ def generate_models_ising_1d_chain(
     transverse_axis = transverse_axis_by_generator[growth_generator]
 
     largest_mod_num_qubits = max([
-        DataBase.get_num_qubits(mod) for mod in model_list
+        database_framework.get_num_qubits(mod) for mod in model_list
     ]
     )
 
@@ -323,7 +323,7 @@ def random_model_name(num_dimensions=1, num_terms=1):
     Return a valid (simple) model name of given number of dimensions and terms.
     """
     import random
-    paulis = DataBase.pauli_cores_with_identity
+    paulis = database_framework.pauli_cores_with_identity
     p_str = ''
     t_str = ''
 
@@ -360,7 +360,7 @@ def random_ising_chain(
     Return a valid (simple) model name of given number of dimensions and terms.
     """
     import random
-    paulis_full = DataBase.pauli_cores_no_identity
+    paulis_full = database_framework.pauli_cores_no_identity
     if include_identity:
         paulis_full.append('i')
 
@@ -399,7 +399,7 @@ def generate_term(
     """
     For use only in random_model_name() function.
     """
-    paulis = DataBase.pauli_cores_with_identity
+    paulis = database_framework.pauli_cores_with_identity
     import random
     t_str = ''
     running_str = ''
@@ -425,7 +425,7 @@ def single_pauli_multiple_dim(
     For use only in random_model_name() function.
     """
     import random
-    paulis = DataBase.pauli_cores_with_identity
+    paulis = database_framework.pauli_cores_with_identity
     t_str = ''
     running_str = ''
 
@@ -448,7 +448,7 @@ def single_pauli_multiple_dim(
 """
 Specific Hamiltonian generators.
 Return strings corresponding to model names following naming convention.
-Use these strings with DataBase.Operator class.
+Use these strings with database_framework.Operator class.
 """
 
 
@@ -499,7 +499,7 @@ def ising_fully_interacting(num_qubits):
 
 def identity_interact(subsystem, num_qubits, return_operator=False):
     new_string = ''
-    sub_dim = DataBase.get_num_qubits(subsystem)
+    sub_dim = database_framework.get_num_qubits(subsystem)
     if sub_dim >= num_qubits:
         if return_operator:
             return op
@@ -513,13 +513,13 @@ def identity_interact(subsystem, num_qubits, return_operator=False):
         new_string += t_str + 'i'
     output_string = subsystem + new_string
     if return_operator:
-        return DataBase.Operator(output_string)
+        return database_framework.Operator(output_string)
     else:
         return output_string
 
 
 def dimensionalise_name_by_name(name, true_dim, return_operator=False):
-    op = DataBase.Operator(name)
+    op = database_framework.Operator(name)
     constituents = op.constituents_names
     new_list = []
 
@@ -533,7 +533,7 @@ def dimensionalise_name_by_name(name, true_dim, return_operator=False):
     new_name = p_str.join(new_list)
 
     if return_operator:
-        return DataBase.Operator(new_name)
+        return database_framework.Operator(new_name)
     else:
         return new_name
 
@@ -552,7 +552,7 @@ def dimensionalise_name_by_operator(op, true_dim, return_operator=False):
     new_name = p_str.join(new_list)
 
     if return_operator:
-        return DataBase.Operator(new_name)
+        return database_framework.Operator(new_name)
     else:
         return new_name
 
@@ -570,7 +570,7 @@ def dimensionalise_name_by_name_list(
 
     new_name = p_str.join(new_list)
     if return_operator:
-        return DataBase.Operator(new_name)
+        return database_framework.Operator(new_name)
     else:
         return new_name
 
@@ -580,9 +580,9 @@ def simple_ising(
     **kwargs
 ):
     new_options = []
-    options = DataBase.pauli_cores_no_identity,
+    options = database_framework.pauli_cores_no_identity,
     for gen in generator_list:
-        num_qubits = DataBase.get_num_qubits(gen)
+        num_qubits = database_framework.get_num_qubits(gen)
         t_str = ''
         for a in range(num_qubits):
             t_str += 'T'
@@ -600,7 +600,7 @@ def single_pauli_multiple_dim(
     pauli=None
 ):
     import random
-    paulis = DataBase.pauli_cores_with_identity
+    paulis = database_framework.pauli_cores_with_identity
     t_str = ''
     running_str = ''
 
@@ -754,7 +754,7 @@ def hyperfine_like(
             if term not in present_terms:
                 new_model = model + 'PP' + term
                 if (
-                    DataBase.check_model_in_dict(
+                    database_framework.check_model_in_dict(
                         new_model, model_dict) == False
                     and new_model not in new_models
                 ):
@@ -769,7 +769,7 @@ def hyperfine_like(
             if term not in present_terms:
                 new_model = model + 'PP' + term
                 if (
-                    DataBase.check_model_in_dict(
+                    database_framework.check_model_in_dict(
                         new_model, model_dict) == False
                     and new_model not in new_models
                 ):
@@ -785,7 +785,7 @@ def hyperfine_like(
             if term not in present_terms:
                 new_model = model + 'PP' + term
                 if (
-                    DataBase.check_model_in_dict(
+                    database_framework.check_model_in_dict(
                         new_model, model_dict) == False
                     and new_model not in new_models
                 ):
@@ -837,8 +837,8 @@ def test_multidimensional(
     new_models = []
 
     for m in model_list:
-        dim = DataBase.get_num_qubits(m)
-        num_terms = len(DataBase.get_constituent_names_from_name(m))
+        dim = database_framework.get_num_qubits(m)
+        num_terms = len(database_framework.get_constituent_names_from_name(m))
         for i in range(2):
             new_mod = random_model_name(dim, num_terms + 1)
             new_models.append(new_mod)
@@ -866,7 +866,7 @@ def test_multidimensional(
 
 
 def p_t_actions(name):
-    num_qubits = DataBase.get_num_qubits(name)
+    num_qubits = database_framework.get_num_qubits(name)
 
     p_str = 'P'
     t_str = ''
@@ -895,7 +895,7 @@ def existing_branch_champs_test(
     for name in model_list:
         actions = p_t_actions(model_list)
         p_str = actions['p']
-        one_qubit_terms = DataBase.pauli_cores_no_identity
+        one_qubit_terms = database_framework.pauli_cores_no_identity
         individual_terms = name.split(p_str)
 
         remaining_terms = list(set(one_qubit_terms) - set(individual_terms))
@@ -913,7 +913,7 @@ def existing_branch_champs_test(
 
 def non_interacting_ising(model_list, **kwargs):
     new_models = []
-    paulis = DataBase.pauli_cores_no_identity
+    paulis = database_framework.pauli_cores_no_identity
     # paulis=['y']
     for mod in model_list:
         t_str = p_t_actions(mod)['t']
@@ -926,7 +926,7 @@ def non_interacting_ising(model_list, **kwargs):
 
 def non_interacting_ising_single_axis(model_list, **kwargs):
     new_models = []
-    paulis = DataBase.pauli_cores_no_identity
+    paulis = database_framework.pauli_cores_no_identity
     for mod in model_list:
         t_str = p_t_actions(mod)['t']
         new_t_str = str(t_str + 'T')
@@ -950,11 +950,11 @@ def deterministic_noninteracting_ising_single_axis(
     for mod in model_list:
         new = non_interacting_ising_single_axis([mod])
         new_models.extend(new)
-        dimension = DataBase.get_num_qubits(new)
+        dimension = database_framework.get_num_qubits(new)
         while dimension < num_qubits:
             new = non_interacting_ising_single_axis(new)
             new_models.extend(new)
-            dimension = DataBase.get_num_qubits(new[0])
+            dimension = database_framework.get_num_qubits(new[0])
     return list(set(new_models))
 
 
@@ -963,7 +963,7 @@ def interacting_nearest_neighbour_ising(
     **kwargs
 ):
     new_models = []
-    paulis = DataBase.pauli_cores_no_identity
+    paulis = database_framework.pauli_cores_no_identity
     for mod in model_list:
         potential_core_paulis = []
         for p in paulis:
@@ -1024,11 +1024,11 @@ def deterministic_interacting_nn_ising_single_axis(
     for mod in model_list:
         new = interacting_nearest_neighbour_ising([mod])
         new_models.extend(new)
-        dimension = DataBase.get_num_qubits(new)
+        dimension = database_framework.get_num_qubits(new)
         while dimension < num_qubits:
             new = interacting_nearest_neighbour_ising(new)
             new_models.extend(new)
-            dimension = DataBase.get_num_qubits(new[0])
+            dimension = database_framework.get_num_qubits(new[0])
     return list(set(new_models))
 
 
@@ -1081,7 +1081,7 @@ def tensor_all_with_identity_at_start(name):
 
 
 def add_fixed_axis_nn_interaction(name, fixed_axis):
-    dimension = DataBase.get_num_qubits(name)
+    dimension = database_framework.get_num_qubits(name)
     op_dict = model_naming.operations_dict_from_name(name)
     new_terms = []
     for i in range(1, dimension):
@@ -1111,9 +1111,9 @@ def deterministic_transverse_ising_nn_fixed_axis(
         'deterministic_transverse_ising_nn_fixed_axis'
     ]
     one_qubit_larger_name = name
-    starting_dimension = DataBase.get_num_qubits(name)
+    starting_dimension = database_framework.get_num_qubits(name)
     for i in range(starting_dimension, max_num_qubits):
-        name = DataBase.alph(one_qubit_larger_name)
+        name = database_framework.alph(one_qubit_larger_name)
         op_dict = model_naming.operations_dict_from_name(name)
         terms = op_dict['terms']
         num_terms = len(terms)
@@ -1168,11 +1168,11 @@ def test_changes_to_qmd(
     new_models = []
 
     base_terms = initial_models[growth_generator]
-    this_dimension = DataBase.get_num_qubits(model_list[0])
-    base_dimension = DataBase.get_num_qubits(base_terms[0])
+    this_dimension = database_framework.get_num_qubits(model_list[0])
+    base_dimension = database_framework.get_num_qubits(base_terms[0])
 
     for mod in model_list:
-        present_terms = DataBase.get_constituent_names_from_name(mod)
+        present_terms = database_framework.get_constituent_names_from_name(mod)
         base_models_this_dim = []
         if this_dimension == base_dimension:
             base_models_this_dim = base_terms
@@ -1187,7 +1187,7 @@ def test_changes_to_qmd(
         base_terms_not_present = list(
             set(base_models_this_dim) - set(present_terms)
         )
-        num_qubits = DataBase.get_num_qubits(mod)
+        num_qubits = database_framework.get_num_qubits(mod)
 
         p_str = ''
         for i in range(num_qubits):
@@ -1217,7 +1217,7 @@ def NV_centre_spin_large_bath(
     )
 
     max_num_qubits = max(
-        [DataBase.get_num_qubits(mod) for mod in model_list]
+        [database_framework.get_num_qubits(mod) for mod in model_list]
     )
     new_gali_model = gali_model_nv_centre_spin(max_num_qubits + 1)
     return [new_gali_model]
@@ -1259,8 +1259,8 @@ def heisenberg_nontransverse(
     new_models = []
     base_terms = initial_models[growth_generator]
 
-    this_dimension = DataBase.get_num_qubits(model_list[0])
-    base_dimension = DataBase.get_num_qubits(base_terms[0])
+    this_dimension = database_framework.get_num_qubits(model_list[0])
+    base_dimension = database_framework.get_num_qubits(base_terms[0])
 
     base_models_this_dim = []
     if this_dimension == base_dimension:
@@ -1274,11 +1274,11 @@ def heisenberg_nontransverse(
             base_models_this_dim.append(new_mod)
 
     for mod in model_list:
-        present_terms = DataBase.get_constituent_names_from_name(mod)
+        present_terms = database_framework.get_constituent_names_from_name(mod)
         base_terms_not_present = list(
             set(base_models_this_dim) - set(present_terms)
         )
-        num_qubits = DataBase.get_num_qubits(mod)
+        num_qubits = database_framework.get_num_qubits(mod)
         p_str = ''
         for i in range(num_qubits):
             p_str += 'P'
@@ -1322,8 +1322,8 @@ def heisenberg_transverse(
     new_models = []
     base_terms = initial_models[growth_generator]
 
-    this_dimension = DataBase.get_num_qubits(model_list[0])
-    base_dimension = DataBase.get_num_qubits(base_terms[0])
+    this_dimension = database_framework.get_num_qubits(model_list[0])
+    base_dimension = database_framework.get_num_qubits(base_terms[0])
 
     base_models_this_dim = []
     if this_dimension == base_dimension:
@@ -1337,11 +1337,11 @@ def heisenberg_transverse(
             base_models_this_dim.append(new_mod)
 
     for mod in model_list:
-        present_terms = DataBase.get_constituent_names_from_name(mod)
+        present_terms = database_framework.get_constituent_names_from_name(mod)
         base_terms_not_present = list(
             set(base_models_this_dim) - set(present_terms)
         )
-        num_qubits = DataBase.get_num_qubits(mod)
+        num_qubits = database_framework.get_num_qubits(mod)
         p_str = ''
         for i in range(num_qubits):
             p_str += 'P'
@@ -1459,10 +1459,10 @@ def single_axis_nearest_neighbour_interaction_chain(
 
         individual_interaction_terms.append(single_term)
 
-    running_mtx = DataBase.compute(individual_interaction_terms[0])
+    running_mtx = database_framework.compute(individual_interaction_terms[0])
 
     for term in individual_interaction_terms[1:]:
-        running_mtx += DataBase.compute(term)
+        running_mtx += database_framework.compute(term)
 
     return running_mtx
 
@@ -1489,10 +1489,10 @@ def single_axis_transverse_component(
 
         individual_transverse_terms.append(single_term)
 
-    running_mtx = DataBase.compute(individual_transverse_terms[0])
+    running_mtx = database_framework.compute(individual_transverse_terms[0])
 
     for term in individual_transverse_terms[1:]:
-        running_mtx += DataBase.compute(term)
+        running_mtx += database_framework.compute(term)
 
     return running_mtx
 
@@ -1720,7 +1720,7 @@ def hubbard_square_lattice_generalised(**kwargs):
         new_models.append(new_mod)
 
     if np.any(
-        np.array([DataBase.get_num_qubits(mod) for mod in new_models]) >=
+        np.array([database_framework.get_num_qubits(mod) for mod in new_models]) >=
         max_num_qubits
     ):
         print("Max num qubits {} reached".format(max_num_qubits))
@@ -1731,7 +1731,7 @@ def hubbard_square_lattice_generalised(**kwargs):
 # def process_hubbard_operator(
 #     term
 # ):
-#     # for use in computing base level terms in a model, used in DataBase.
+#     # for use in computing base level terms in a model, used in database_framework.
 #     return hopping_matrix(term)
 
 
@@ -1848,9 +1848,9 @@ def hopping_matrix(term):
             'terms': terms
         }
         full_name = full_model_string(op_dict)
-    # mtx = DataBase.Operatorfull_name).matrix
+    # mtx = database_framework.Operatorfull_name).matrix
 
-    mtx = DataBase.compute(full_name)
+    mtx = database_framework.compute(full_name)
 
     return mtx
 
@@ -1863,7 +1863,7 @@ def hubbard_chain_increase_dimension_full_chain(mod):
     orig_sites = orig_mod['sites']
     this_num_qubits = orig_mod['dim']
 
-    individual_terms = DataBase.get_constituent_names_from_name(mod)
+    individual_terms = database_framework.get_constituent_names_from_name(mod)
     new_num_qubits = this_num_qubits + 1
 
     new_site_list = []
@@ -1958,8 +1958,8 @@ def interaction_energy_pauli_term(dim):
 
 # def deconstruct_hopping_term(hopping_string):
 
-#     dim = DataBase.get_num_qubits(hopping_string)
-#     individual_terms = DataBase.get_constituent_names_from_name(hopping_string)
+#     dim = database_framework.get_num_qubits(hopping_string)
+#     individual_terms = database_framework.get_constituent_names_from_name(hopping_string)
 
 #     deconstructed = {
 #         'sites' : [],
@@ -1980,8 +1980,8 @@ def interaction_energy_pauli_term(dim):
 
 # def deconstruct_hopping_term(hopping_string):
 
-#     dim = DataBase.get_num_qubits(hopping_string)
-#     individual_terms = DataBase.get_constituent_names_from_name(hopping_string)
+#     dim = database_framework.get_num_qubits(hopping_string)
+#     individual_terms = database_framework.get_constituent_names_from_name(hopping_string)
 
 #     deconstructed = {
 #         'sites' : [],
@@ -2006,7 +2006,7 @@ def interaction_energy_pauli_term(dim):
 def process_hubbard_operator(
     term
 ):
-    # for use in computing base level terms in a model, used in DataBase.
+    # for use in computing base level terms in a model, used in database_framework.
     return base_hubbard_grouped_term(term)
 
 
@@ -2044,7 +2044,7 @@ def base_hubbard_grouped_term(term):
     if energy_term is True:
         # self energy
         full_name = interaction_energy_pauli_term(dim)
-        mtx = DataBase.compute(full_name)
+        mtx = database_framework.compute(full_name)
 
     elif hopping_term is True:
         matrices = []
@@ -2065,9 +2065,9 @@ def base_hubbard_grouped_term(term):
             }
             full_name = full_model_string(op_dict)
             # print("[base hopping process] op dict:", op_dict)
-            # this_mtx = DataBase.Operatorfull_name).matrix
+            # this_mtx = database_framework.Operatorfull_name).matrix
 
-            this_mtx = DataBase.compute(full_name)
+            this_mtx = database_framework.compute(full_name)
             if mtx is None:
                 mtx = this_mtx
             else:
@@ -2125,8 +2125,8 @@ def generate_hopping_term(
 
 
 def deconstruct_hopping_term(hopping_string):
-    dim = DataBase.get_num_qubits(hopping_string)
-    individual_terms = DataBase.get_constituent_names_from_name(hopping_string)
+    dim = database_framework.get_num_qubits(hopping_string)
+    individual_terms = database_framework.get_constituent_names_from_name(hopping_string)
     deconstructed = {
         'sites': [],
         'dim': dim,
@@ -2394,7 +2394,7 @@ def possible_hopping_terms_new_site(site_id):
 
 
 def append_model_with_new_terms(mod, new_terms):
-    dimension = DataBase.get_num_qubits(mod)
+    dimension = database_framework.get_num_qubits(mod)
     p_str = 'P' * dimension
 
     new_mods = []
@@ -2455,7 +2455,7 @@ def generate_models_hopping_topology(
         spawn_stage.append((2, 'c'))
         # return [h_1h2_d3PPPh_1h3_d3, h_1h2_d3PPPh_2h3_d3]
         # spawn stage -> (3,1)
-        # dim = DataBase.get_num_qubits(mod)
+        # dim = database_framework.get_num_qubits(mod)
         # new_dim = dim + 1
         # increased_dim_model = increase_dimension_maintain_distinct_interactions(mod)
         # new_terms = possible_hopping_terms_new_site(new_dim)
@@ -2488,7 +2488,7 @@ def generate_models_hopping_topology(
             # add one parameter to given mod,
             # return a list
             # spawn_stage -> (N, num_branches+1)
-            present_terms = DataBase.get_constituent_names_from_name(mod)
+            present_terms = database_framework.get_constituent_names_from_name(mod)
             possible_new_terms_this_dimension = possible_hopping_terms_new_site(
                 dim)
             nonpresent_possible_terms = list(

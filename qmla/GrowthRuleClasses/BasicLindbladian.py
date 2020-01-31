@@ -9,7 +9,7 @@ from qmla import topology
 from qmla import model_generation
 from qmla import model_naming
 from qmla import probe_set_generation
-from qmla import DataBase
+from qmla import database_framework
 
 class basic_lindbladian(
     SuperClassGrowthRule.growth_rule_super_class
