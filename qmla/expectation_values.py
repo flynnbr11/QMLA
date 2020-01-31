@@ -43,7 +43,7 @@ def log_print(to_print_list, log_file, log_identifier):
 
 # Default expectation value calculations
 
-def expectation_value(
+def default_expectation_value(
     ham,
     t,
     state,
@@ -88,7 +88,7 @@ def expectation_value_verbose(
     log_identifier=None,
     debug_plot_print=False
 ):
-    # Deprecated; replaced by expectation_value function above
+    # Deprecated; replaced by default_expectation_value function above
     if choose_random_probe is True:
         from probe_set_generation import random_probe
         num_qubits = int(np.log2(np.shape(ham)[0]))

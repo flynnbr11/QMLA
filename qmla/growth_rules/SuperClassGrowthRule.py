@@ -42,7 +42,7 @@ class growth_rule_super_class():
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = probe_set_generation.plus_probes_dict
-        self.expectation_value_function = expectation_values.expectation_value
+        self.expectation_value_function = expectation_values.default_expectation_value
         self.heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
         self.prior_distribution_generator = Distributions.gaussian_prior
         self.highest_num_qubits = 1
