@@ -23,13 +23,13 @@ plt.switch_backend('agg')
 import qinfer
 
 # Libraries
-from qmla.RemoteBayesFactor import *
+from qmla.remote_bayes_factor import *
 import qmla.analysis
 import qmla.DataBase as DataBase
 import qmla.DatabaseLaunch as DataBaseLaunch
 import qmla.get_growth_rule as get_growth_rule
 import qmla.expectation_values as expectation_values 
-from qmla.RemoteModelLearning import *
+from qmla.remote_model_learning import *
 import qmla.model_naming as model_naming
 import qmla.model_generation as model_generation
 import qmla.model_instances as QML
@@ -71,7 +71,7 @@ class QuantumModelLearningAgent():
     - Model generation rules are given in model_generation.
     - Database control is given in DataBase.
     - Remote functions for computing QHL/Bayes factors are in
-    - RemoteModelLearning and RemoteBayesFactor respectively.
+    - remote_model_learning and remote_bayes_factor respectively.
     - Redis databases are used to ensure QMD parameters are accessible to
         remote models (since shared memory is not available).
         Relevant QMD parameters and info are pickled to redis.
@@ -1412,7 +1412,7 @@ class QuantumModelLearningAgent():
                 if a != b:
                     self.processRemoteBayesPair(a=a, b=b)
 
-    def processAllRemoteBayesFactors(self):
+    def processAllremote_bayes_factors(self):
         bayes_factors_db = self.RedisDataBases['bayes_factors_db']
         computed_pairs = bayes_factors_db.keys()
         # TODO check whether pair computed before using bayes dict of QMD, or something more efficient

@@ -521,7 +521,7 @@ def plot_expec_vals_of_models(
                     t=t,
                     state=plot_probe,
                     log_file=log_file,
-                    log_identifier='[remoteBayesFactor plots]'
+                    log_identifier='[remote_bayes_factor plots]'
                 )
             except BaseException:
                 raise

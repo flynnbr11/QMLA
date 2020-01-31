@@ -14,8 +14,8 @@ from qmla.model_naming import * # TODO fix __all__
 from qmla.qinfer_model_interface import * 
 from qmla.model_instances import * 
 from qmla.quantum_model_learning_agent import *
-from qmla.RemoteBayesFactor import *
-from qmla.RemoteModelLearning import *
+from qmla.remote_bayes_factor import *
+from qmla.remote_model_learning import *
 from qmla.expectation_values import *
 from qmla.experiment_design_heuristics import * # TODO fix __all__
 from qmla.probe_set_generation import * # TODO fix __all__
