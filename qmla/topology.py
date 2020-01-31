@@ -13,7 +13,7 @@ import qmla.DataBase as DataBase
 import qmla.ModelNames as ModelNames
 
 
-class topology_grid():
+class GridTopology():
     def __init__(
         self,
         dimension=2,

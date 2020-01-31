@@ -6,8 +6,8 @@ import scipy as sp
 import warnings
 from psutil import virtual_memory
 
-import qmla.ExperimentalDataFunctions as expdt
-import qmla.GrowthRules as GrowthRules
+import qmla.experimental_data_processing as expdt
+import qmla.get_growth_rule as get_growth_rule
 from qmla.MemoryTest import print_loc, print_file_line
 import qmla.ProbeGeneration as ProbeGeneration
 import qmla.DataBase as DataBase
@@ -144,7 +144,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.log_file = log_file
         self.growth_generation_rule = growth_generation_rule
         try:
-            self.growth_class = GrowthRules.get_growth_generator_class(
+            self.growth_class = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
                 use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file

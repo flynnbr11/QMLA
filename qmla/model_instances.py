@@ -13,10 +13,10 @@ pickle.HIGHEST_PROTOCOL = 2
 
 import qmla.analysis
 import qmla.DataBase as DataBase
-import qmla.Distributions as Distributions
-import qmla.ExperimentalDataFunctions as expdt
-import qmla.ExpectationValues as ExpectationValues
-import qmla.GrowthRules as GrowthRules
+import qmla.prior_distributions as Distributions
+import qmla.experimental_data_processing as expdt
+import qmla.expectation_values as expectation_values
+import qmla.get_growth_rule as get_growth_rule
 import qmla.ModelNames as ModelNames
 from qmla.MemoryTest import print_loc
 import qmla.QInferClassQML as qml_qi
@@ -29,11 +29,6 @@ debug_log_print = True
 debug_print = False
 print_mem_status = True
 global_print_loc = False
-
-
-global test_growth_class_implementation
-test_growth_class_implementation = True
-
 
 """
 In this file are class definitions:
@@ -199,7 +194,7 @@ class ModelInstanceForLearning():
         self.GrowthGenerator = growth_generator
 
         try:
-            self.GrowthClass = GrowthRules.get_growth_generator_class(
+            self.GrowthClass = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.GrowthGenerator,
                 use_experimental_data=self.UseExperimentalData,
                 log_file=self.log_file
@@ -457,7 +452,7 @@ class ModelInstanceForLearning():
             for item
             in self.GenSimModel.expparams_dtype[1:]
         ]
-        # self.Heuristic = mpgh.multiPGH(
+        # self.Heuristic = mpgh.MultiParticleGuessHeuristic(
         #     growth_generator = self.GrowthGenerator,
         #     self.Updater,
         #     inv_field=self.Inv_Field,
@@ -1143,7 +1138,7 @@ class ModelInstanceForStorage():
             self.cov_matrix = learned_info['cov_matrix']
             self.GrowthGenerator = learned_info['growth_generator']
             try:
-                self.GrowthClass = GrowthRules.get_growth_generator_class(
+                self.GrowthClass = get_growth_rule.get_growth_generator_class(
                     growth_generation_rule=self.GrowthGenerator,
                     use_experimental_data=self.UseExperimentalData,
                     log_file=self.log_file
@@ -1208,7 +1203,7 @@ class ModelInstanceForStorage():
     ):
         # TODO expectation_values dict only for |++> probe as is.
         # if probe is None and plot_probe_path is None:
-        #     probe  = ExpectationValues.n_qubit_plus_state(self.NumQubits)
+        #     probe  = expectation_values.n_qubit_plus_state(self.NumQubits)
         # else:
 
         #     plot_probe_dict = pickle.load(
@@ -1514,7 +1509,7 @@ class ModelInstanceForComparison():
                 "Name:", self.Name
             ]
         )
-        op = DataBase.operator(self.Name)
+        op = DataBase.Operator(self.Name)
         # todo, put this in a lighter function
         self.SimOpList = op.constituents_operators
         self.Times = learned_model_info['times']
@@ -1532,7 +1527,7 @@ class ModelInstanceForComparison():
         # )
         self.InitialParams = learned_model_info['initial_params']
         self.GrowthGenerator = learned_model_info['growth_generator']
-        self.GrowthClass = GrowthRules.get_growth_generator_class(
+        self.GrowthClass = get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.GrowthGenerator,
             use_experimental_data=self.UseExperimentalData,
             log_file=self.log_file

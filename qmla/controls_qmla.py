@@ -3,7 +3,7 @@ import os
 import sys
 import pickle
 
-import qmla.GrowthRules as GrowthRules
+import qmla.get_growth_rule as get_growth_rule
 import qmla.DataBase as DataBase
 
 
@@ -127,7 +127,7 @@ class ControlsQMLA():
         self.growth_generation_rule = arguments.growth_generation_rule
         self.log_file = arguments.log_file
         try:
-            self.growth_class = GrowthRules.get_growth_generator_class(
+            self.growth_class = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
                 use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
@@ -153,7 +153,7 @@ class ControlsQMLA():
         )
         self.true_operator = true_params_info['true_op']
         self.true_op_name = DataBase.alph(self.true_operator)
-        self.true_operator_class = DataBase.operator(
+        self.true_operator_class = DataBase.Operator(
             self.true_op_name
         )
         self.true_op_list = self.true_operator_class.constituents_operators

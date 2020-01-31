@@ -42,7 +42,7 @@ of the given model are, and fills these values into the model_db.
 
 e.g. usage of operator:
   $ name='xPyTz'
-  $ test_op = operator(name)
+  $ test_op = Operator(name)
   $ print(test_op.name)
   $ print(test_op.matrix)
   $ print(test_op.constituents_operators
@@ -63,7 +63,7 @@ import hashlib
 import redis
 from qinfer import NormalDistribution
 
-# from qmla.QML import ModelInstanceForLearning, ModelInstanceForStorage
+# from qmla.model_instances import ModelInstanceForLearning, ModelInstanceForStorage
 
 def identity():
     return np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, 1 + 0.j]])
@@ -140,7 +140,7 @@ def log_print(to_print_list, log_file):
         )
 
 
-class operator():
+class Operator():
     """
     Operator class:
     Takes one argument: name (string) according to naming convention.
@@ -272,12 +272,12 @@ def reduced_operators(name, max_dim):
 
     split_by_t = name.split(t_str)
     reduced_dim_op = split_by_t[0]
-    op = operator(reduced_dim_op)
+    op = Operator(reduced_dim_op)
     return op.constituents_operators
 
 
 def print_matrix(name):
-    op = operator(name)
+    op = Operator(name)
     print(op.matrix)
 
 
@@ -712,7 +712,7 @@ def ideal_probe(name):
     Returns a probe state which is the normalised sum of the given operators
     eigenvectors, ideal for probing that operator.
     """
-    mtx = operator(name).matrix
+    mtx = Operator(name).matrix
     eigvalues = np.linalg.eig(mtx)[1]
     summed_eigvals = np.sum(eigvalues, axis=0)
     normalised_probe = summed_eigvals / np.linalg.norm(summed_eigvals)
@@ -720,7 +720,7 @@ def ideal_probe(name):
 
 
 def get_eigenvectors(name):
-    mtx = operator(name).matrix
+    mtx = Operator(name).matrix
     eigvectors = np.linalg.eig(mtx)[0]
     return eigvectors
 
@@ -744,8 +744,8 @@ Initial distribution to sample from, normal_dist
 # #true_operator_list = [sigmax(), sigmay()]
 # true_operator_list = np.array([sigmax(), sigmay()])
 
-# #xtx = operator('xTx')
-# ytz = operator('yTz')
+# #xtx = Operator('xTx')
+# ytz = Operator('yTz')
 # true_operator_list = np.array([ ytz.matrix] )
 
 

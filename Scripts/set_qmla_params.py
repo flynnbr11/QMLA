@@ -155,7 +155,7 @@ growth_class_attributes = {
     # 'test_growth_class_att' : True
 }
 
-# growth_class = GrowthRules.get_growth_generator_class(
+# growth_class = get_growth_rule.get_growth_generator_class(
 growth_class = qmla.get_growth_generator_class(
     growth_generation_rule=growth_generation_rule,
     **growth_class_attributes
@@ -170,7 +170,7 @@ all_growth_classes = list(set(all_growth_classes))
 unique_growth_classes = {}
 for g in all_growth_classes:
     try:
-        # unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
+        # unique_growth_classes[g] = get_growth_rule.get_growth_generator_class(
         unique_growth_classes[g] = qmla.get_growth_generator_class(
             growth_generation_rule=g,
             **growth_class_attributes

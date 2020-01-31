@@ -283,7 +283,7 @@ for f in pickled_files:
 # unique_growth_classes = {}
 # for g in unique_growth_rules:
 #     try:
-#         unique_growth_classes[g] = GrowthRules.get_growth_generator_class(
+#         unique_growth_classes[g] = get_growth_rule.get_growth_generator_class(
 #             growth_generation_rule = g
 #         )
 #     except:

@@ -4,8 +4,8 @@ import sys
 import os
 
 from qmla.GrowthRuleClasses import SuperClassGrowthRule
-from qmla import Heuristics
-from qmla import SystemTopology
+from qmla import experiment_design_heuristics
+from qmla import topology
 from qmla import ModelGeneration
 from qmla import ModelNames
 from qmla import ProbeGeneration
@@ -33,7 +33,7 @@ class connected_lattice(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.heuristic_function = Heuristics.one_over_sigma_then_linspace
+        self.heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.lattice_dimension = 2
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
@@ -73,7 +73,7 @@ class connected_lattice(
             self.generation_DAG
         )
         self.max_num_probe_qubits = self.max_num_sites
-        self.topology = SystemTopology.topology_grid(
+        self.topology = topology.GridTopology(
             dimension=self.lattice_dimension,
             num_sites=self.initial_num_sites,
             # nearest neighbours only,

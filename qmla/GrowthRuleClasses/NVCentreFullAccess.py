@@ -3,8 +3,8 @@ import sys
 import os
 
 from qmla.GrowthRuleClasses.SuperClassGrowthRule import growth_rule_super_class
-from qmla import Heuristics
-from qmla import ExpectationValues
+from qmla import experiment_design_heuristics
+from qmla import expectation_values
 from qmla import DataBase
 
 __all__ = [
@@ -41,7 +41,7 @@ class nv_centre_spin_full_access(
 
             # 'zTi'
         ]
-        self.heuristic_function = Heuristics.one_over_sigma_then_linspace
+        self.heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         # self.max_num_qubits = 3

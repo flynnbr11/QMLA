@@ -29,23 +29,13 @@ from matplotlib.projections.polar import PolarAxes
 from matplotlib.projections import register_projection
 from inspect import currentframe, getframeinfo
 
-import qmla.GrowthRules as GrowthRules
+import qmla.get_growth_rule as get_growth_rule
 import qmla.ModelNames as ModelNames
-import qmla.ExperimentalDataFunctions as expdt
-import qmla.ExpectationValues as ExpectationValues
+import qmla.experimental_data_processing as expdt
+import qmla.expectation_values as expectation_values
 import qmla.DataBase as DataBase
 
 frameinfo = getframeinfo(currentframe())
-
-#from QMD import  *
-#from QML import *
-
-
-global test_growth_class_implementation
-test_growth_class_implementation = True
-
-
-#### Hinton Diagram ####
 
 def ExpectationValuesTrueSim(
     qmd,
@@ -107,7 +97,7 @@ def ExpectationValuesTrueSim(
         else:
             times = times
         true = qmd.TrueOpName
-        true_op = DataBase.operator(true)
+        true_op = DataBase.Operator(true)
 
         true_params = qmd.TrueParamsList
         true_ops = qmd.TrueOpList
@@ -115,7 +105,7 @@ def ExpectationValuesTrueSim(
 
         # if plus_probe:
         #     # true_probe = plus_plus
-        #     true_probe = ExpectationValues.n_qubit_plus_state(true_dim)
+        #     true_probe = expectation_values.n_qubit_plus_state(true_dim)
         # else:
         #     true_probe = qmd.ProbeDict[(probe_id,true_dim)]
 
@@ -192,7 +182,7 @@ def ExpectationValuesTrueSim(
             times_learned = mod.Times
             sim_dim = DataBase.get_num_qubits(mod.Name)
             # if plus_probe:
-            #     sim_probe = ExpectationValues.n_qubit_plus_state(sim_dim)
+            #     sim_probe = expectation_values.n_qubit_plus_state(sim_dim)
             # else:
             #     sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
             sim_probe = plot_probe_dict[sim_dim]
@@ -716,7 +706,7 @@ def ExpectationValuesQHL_TrueModel(
     else:
         times = np.arange(0, max_time, t_interval)
         true = qmd.TrueOpName
-        true_op = DataBase.operator(true)
+        true_op = DataBase.Operator(true)
 
         true_params = qmd.TrueParamsList
 #        true_ops = true_op.constituents_operators
@@ -770,7 +760,7 @@ def ExpectationValuesQHL_TrueModel(
     for i in range(len(model_ids)):
         mod_id = model_ids[i]
         sim = qmd.ModelNameIDs[mod_id]
-        sim_op = DataBase.operator(sim)
+        sim_op = DataBase.Operator(sim)
         mod = qmd.ModelInstanceForStorageInstanceFromID(mod_id)
         sim_params = list(mod.FinalParams[:, 0])
         sim_ops = sim_op.constituents_operators
@@ -782,7 +772,7 @@ def ExpectationValuesQHL_TrueModel(
         sim_probe = qmd.ProbeDict[(probe_id, sim_dim)]
         colour_id = int(i % len(sim_colours))
         sim_col = sim_colours[colour_id]
-#        sim_expec_values = [ExpectationValues.expectation_value(ham=sim_ham, t=t,
+#        sim_expec_values = [expectation_values.expectation_value(ham=sim_ham, t=t,
 #            state=sim_probe) for t in times
 #        ]
 
@@ -1384,7 +1374,7 @@ def r_squared_from_epoch_list(
         r_squared_by_epoch = {}
 
         mod_num_qubits = DataBase.get_num_qubits(mod.Name)
-        probe = ExpectationValues.n_qubit_plus_state(mod_num_qubits)
+        probe = expectation_values.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.NumExperiments - 1])
         if len(mod.ResampleEpochs) > 0:
             epochs.extend(mod.ResampleEpochs)
@@ -2283,7 +2273,7 @@ def colour_dicts_from_win_count(
     growth_generator=None,
     min_colour_value=0.1
 ):
-    growth_class = GrowthRules.get_growth_generator_class(
+    growth_class = get_growth_rule.get_growth_generator_class(
         growth_generation_rule=growth_generator
     )
 
@@ -2351,7 +2341,7 @@ def cumulativeQMDTreePlot(
 
     max_bayes_factor = max([max(bayes_factors[k].values())
                             for k in bayes_factors.keys()])
-    growth_class = GrowthRules.get_growth_generator_class(
+    growth_class = get_growth_rule.get_growth_generator_class(
         growth_generation_rule=growth_generator
     )
     true_model = growth_class.true_operator_latex()
@@ -3609,7 +3599,7 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
 
     # correct_mod = DataBase.latex_name_ising(correct_mod)
 
-    growth_class = GrowthRules.get_growth_generator_class(
+    growth_class = get_growth_rule.get_growth_generator_class(
         growth_generation_rule=growth_generator
     )
 
@@ -3700,7 +3690,7 @@ def replot_expectation_values(
     #     "\ngrowth_generator", growth_generator,
     #     "\nmeasurement_method", measurement_method
     # )
-    growth_class = GrowthRules.get_growth_generator_class(
+    growth_class = get_growth_rule.get_growth_generator_class(
         growth_generation_rule=growth_generator
     )
     sim_colours = ['b', 'g', 'c', 'y', 'm', 'k']
@@ -3838,7 +3828,7 @@ def cluster_results_and_plot(
     save_redrawn_expectation_values=None,
 ):
     from matplotlib import cm
-    growth_class = GrowthRules.get_growth_generator_class(growth_generator)
+    growth_class = get_growth_rule.get_growth_generator_class(growth_generator)
     results_csv = pd.read_csv(path_to_results)
     unique_champions = list(
         set(list(results_csv['NameAlphabetical']))

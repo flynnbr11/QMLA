@@ -3,8 +3,8 @@ import itertools
 import sys
 import os
 from qmla.GrowthRuleClasses import ConnectedLattice
-from qmla import Heuristics
-from qmla import SystemTopology
+from qmla import experiment_design_heuristics
+from qmla import topology
 from qmla import ModelGeneration
 from qmla import ModelNames
 from qmla import ProbeGeneration

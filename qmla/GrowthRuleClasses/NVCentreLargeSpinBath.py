@@ -2,9 +2,9 @@ import sys
 import os
 
 from qmla.GrowthRuleClasses import NVCentreFullAccess
-from qmla import Heuristics
+from qmla import experiment_design_heuristics
 from qmla import ProbeGeneration
-from qmla import ExpectationValues
+from qmla import expectation_values
 from qmla import DataBase
 
 
@@ -34,7 +34,7 @@ class nv_centre_large_spin_bath(
             # self.probe_generation_function = ProbeGeneration.restore_dec_13_probe_generation
             self.probe_generation_function = ProbeGeneration.plus_probes_dict
 
-        self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
+        self.expectation_value_function = expectation_values.n_qubit_hahn_evolution
 
         self.true_operator = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
         # self.true_operator = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'

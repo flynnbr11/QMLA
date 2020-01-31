@@ -27,12 +27,12 @@ from qmla.RemoteBayesFactor import *
 import qmla.analysis
 import qmla.DataBase as DataBase
 import qmla.DatabaseLaunch as DataBaseLaunch
-import qmla.GrowthRules as GrowthRules
-import qmla.ExpectationValues as ExpectationValues 
+import qmla.get_growth_rule as get_growth_rule
+import qmla.expectation_values as expectation_values 
 from qmla.RemoteModelLearning import *
 import qmla.ModelNames as ModelNames
 import qmla.ModelGeneration as ModelGeneration
-import qmla.QML as QML
+import qmla.model_instances as QML
 import qmla.RedisSettings as rds
 
 __all__ = [
@@ -343,7 +343,7 @@ class QuantumModelLearningAgent():
         self.ModelsBranches = {}
         self.BranchPrecomputedModels = {}
         self.BranchModelIds = {}
-        self.BranchGrowthRules = {}
+        self.Branchget_growth_rule = {}
         self.UniqueGrowthClasses = {
             self.GrowthGenerator: self.GrowthClass
         }  # to save making many instances
@@ -364,7 +364,7 @@ class QuantumModelLearningAgent():
             # to match this newly created branch with corresponding dicts
             # filled here
             gen = self.GeneratorList[i]
-            growth_class_gen = GrowthRules.get_growth_generator_class(
+            growth_class_gen = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=gen,
                 use_experimental_data=self.UseExperimentalData,
                 log_file=self.log_file
@@ -443,7 +443,7 @@ class QuantumModelLearningAgent():
             self.SpawnDepthByGrowthRule[gen] = 0
             self.SpawnStage[gen] = [None]
             self.MiscellaneousGrowthInfo[gen] = {}
-            self.BranchGrowthRules[i] = gen
+            self.Branchget_growth_rule[i] = gen
             # self.BranchGrowthClasses[i] = growth_class_gen
             if gen not in list(self.UniqueGrowthClasses.keys()):
                 self.UniqueGrowthClasses[gen] = growth_class_gen
@@ -536,7 +536,7 @@ class QuantumModelLearningAgent():
                 time_dep_term += str(t)
                 time_dep_params.append(self.TimeDepParams[t])
 
-            time_dep_op = DataBase.operator(time_dep_term)
+            time_dep_op = DataBase.Operator(time_dep_term)
             time_dep_ops = time_dep_op.constituents_operators
 
             self.TrueOpList.extend(time_dep_ops)
@@ -799,7 +799,7 @@ class QuantumModelLearningAgent():
         )
         self.BranchAllModelsLearned[branchID] = False
         self.BranchComparisonsComplete[branchID] = False
-        self.BranchGrowthRules[branchID] = growth_rule
+        self.Branchget_growth_rule[branchID] = growth_rule
         self.BranchGrowthClasses[branchID] = self.UniqueGrowthClasses[growth_rule]
 
         self.log_print(
@@ -1098,7 +1098,7 @@ class QuantumModelLearningAgent():
                     learnModelRemote,
                     model_name,
                     modelID,
-                    growth_generator=self.BranchGrowthRules[branchID],
+                    growth_generator=self.Branchget_growth_rule[branchID],
                     branchID=branchID,
                     remote=True,
                     host_name=self.HostName,
@@ -1150,7 +1150,7 @@ class QuantumModelLearningAgent():
                 updated_model_info = learnModelRemote(
                     model_name,
                     modelID,
-                    growth_generator=self.BranchGrowthRules[branchID],
+                    growth_generator=self.Branchget_growth_rule[branchID],
                     branchID=branchID,
                     qmd_info=self.QMDInfo,
                     remote=True,
@@ -1687,7 +1687,7 @@ class QuantumModelLearningAgent():
         self.BranchChampions[int(branchID)] = champ_id
         if champ_id not in self.ActiveBranchChampList:
             self.ActiveBranchChampList.append(champ_id)
-        growth_rule = self.BranchGrowthRules[int(branchID)]
+        growth_rule = self.Branchget_growth_rule[int(branchID)]
         try:
             self.BranchChampsByNumQubits[growth_rule][champ_num_qubits].append(
                 champ_name)
@@ -1737,7 +1737,7 @@ class QuantumModelLearningAgent():
             ]
         )
         self.BayesPointsByBranch[branchID] = models_points
-        # self.BranchGrowthRules[branchID]
+        # self.Branchget_growth_rule[branchID]
 
         if branchID in self.GhostBranchList:
             models_to_deactivate = list(
@@ -2113,7 +2113,7 @@ class QuantumModelLearningAgent():
 
         for active_champ in self.ActiveBranchChampList:
             branch_id_of_champ = self.ModelsBranches[active_champ]
-            gen = self.BranchGrowthRules[branch_id_of_champ]
+            gen = self.Branchget_growth_rule[branch_id_of_champ]
             self.ActiveTreeBranchChamps[gen].append(active_champ)
 
         self.log_print(
@@ -3025,8 +3025,8 @@ class QuantumModelLearningAgent():
                     self.BranchComparisonsComplete[branchID] = True
                     self.compareModelsWithinBranch(branchID)
                     # print("[QMD] getting growth rule for branchID", branchID)
-                    # print("[QMD] dict:", self.BranchGrowthRules)
-                    this_branch_growth_rule = self.BranchGrowthRules[branchID]
+                    # print("[QMD] dict:", self.Branchget_growth_rule)
+                    this_branch_growth_rule = self.Branchget_growth_rule[branchID]
                     if self.TreesCompleted[this_branch_growth_rule] == False:
                         print(
                             "not finished tree for growth:",
@@ -3183,7 +3183,7 @@ class QuantumModelLearningAgent():
             champ_model.FinalParams
         )
 
-        champ_op = DataBase.operator(self.ChampionName)
+        champ_op = DataBase.Operator(self.ChampionName)
         num_params_champ_model = champ_op.num_constituents
 
         correct_model = misfit = underfit = overfit = 0

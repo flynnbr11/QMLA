@@ -26,7 +26,7 @@ except BaseException:
     enforce_serial = True  # shouldn't be needed
 
 import qmla.DataBase as DataBase
-import qmla.QML as QML
+import qmla.model_instances as QML
 import qmla.analysis 
 
 

@@ -3,9 +3,9 @@ import os
 
 from qmla.GrowthRuleClasses import NVCentreLargeSpinBath
 from qmla import ProbeGeneration
-from qmla import ExpectationValues
+from qmla import expectation_values
 from qmla import DataBase
-from qmla import Heuristics
+from qmla import experiment_design_heuristics
 
 class nv_centre_revival_data(
     NVCentreLargeSpinBath.nv_centre_large_spin_bath  # inherit from this

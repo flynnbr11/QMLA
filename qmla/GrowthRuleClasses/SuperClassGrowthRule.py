@@ -3,10 +3,10 @@ import sys
 import os
 # sys.path.append(os.path.abspath('..'))
 
-import qmla.Distributions as Distributions
-import qmla.Heuristics as Heuristics
+import qmla.prior_distributions as Distributions
+import qmla.experiment_design_heuristics as experiment_design_heuristics
 import qmla.ProbeGeneration as ProbeGeneration
-import qmla.ExpectationValues as ExpectationValues
+import qmla.expectation_values as expectation_values
 import qmla.DataBase as DataBase
 
 __all__ = [
@@ -20,7 +20,7 @@ class growth_rule_super_class():
         growth_generation_rule,
         **kwargs
     ):
-        # print("[GrowthRuleSuper] init. kwargs", kwargs)
+        # print("[GrowthRulesuper] init. kwargs", kwargs)
 
         self.growth_generation_rule = growth_generation_rule
         if 'use_experimental_data' in kwargs:
@@ -42,8 +42,8 @@ class growth_rule_super_class():
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = ProbeGeneration.plus_probes_dict
-        self.expectation_value_function = ExpectationValues.expectation_value
-        self.heuristic_function = Heuristics.multiPGH
+        self.expectation_value_function = expectation_values.expectation_value
+        self.heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
         self.prior_distribution_generator = Distributions.gaussian_prior
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
@@ -101,7 +101,7 @@ class growth_rule_super_class():
         self,
         **kwargs
     ):
-        # print("[GrowthRuleSuper] overwrite_growth_class_methods. kwargs", kwargs)
+        # print("[GrowthRulesuper] overwrite_growth_class_methods. kwargs", kwargs)
         kw = list(kwargs.keys())
 
         attributes = [

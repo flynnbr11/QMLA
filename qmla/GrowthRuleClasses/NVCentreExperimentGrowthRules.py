@@ -4,7 +4,7 @@ import os
 
 from qmla.GrowthRuleClasses import NVCentreFullAccess
 from  qmla import ProbeGeneration
-from qmla import ExpectationValues
+from qmla import expectation_values
 from qmla import DataBase
 
 
@@ -25,19 +25,19 @@ class nv_centre_spin_experimental_method(
         growth_generation_rule,
         **kwargs
     ):
-        from qmla import Heuristics
+        from qmla import experiment_design_heuristics
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
         if self.use_experimental_data == True:
-            self.expectation_value_function = ExpectationValues.hahn_evolution
+            self.expectation_value_function = expectation_values.hahn_evolution
         else:
-            self.expectation_value_function = ExpectationValues.n_qubit_hahn_evolution
+            self.expectation_value_function = expectation_values.n_qubit_hahn_evolution
 
         # self.true_operator = 'xTiPPyTy'
-        self.heuristic_function = Heuristics.one_over_sigma_then_linspace
+        self.heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.measurement_type = 'hahn'
 
         self.true_operator = 'xTiPPyTiPPzTiPPzTz'

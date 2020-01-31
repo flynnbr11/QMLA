@@ -3,7 +3,7 @@ import os
 
 from qmla.GrowthRuleClasses import SuperClassGrowthRule
 from qmla import ProbeGeneration
-from qmla import ExpectationValues
+from qmla import expectation_values
 from qmla import DataBase
 
 
@@ -19,7 +19,7 @@ class example_growth(
         growth_generation_rule,
         **kwargs
     ):
-        from qmla import Heuristics
+        from qmla import experiment_design_heuristics
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule=growth_generation_rule,

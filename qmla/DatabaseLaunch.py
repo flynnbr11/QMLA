@@ -12,7 +12,7 @@ import hashlib
 import redis
 from qinfer import NormalDistribution
 
-from qmla.QML import ModelInstanceForLearning, ModelInstanceForStorage
+from qmla.model_instances import ModelInstanceForLearning, ModelInstanceForStorage
 from qmla.DataBase import * 
 
 def launch_db(
@@ -224,7 +224,7 @@ def add_model(
             ],
             log_file
         )
-        op = operator(name=sim_name, undimensionalised_name=model_name)
+        op = Operator(name=sim_name, undimensionalised_name=model_name)
         num_rows = len(running_database)
         qml_instance = ModelInstanceForLearning(
             name=op.name,

@@ -9,7 +9,7 @@ import pandas
 
 from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas, cumulativeQMDTreePlot
 
-import qmla.GrowthRules as GrowthRules
+import qmla.get_growth_rule as get_growth_rule
 import qmla.ModelNames as ModelNames
 # import qmla.PlotQMD as ptq
 import qmla.DataBase as DataBase

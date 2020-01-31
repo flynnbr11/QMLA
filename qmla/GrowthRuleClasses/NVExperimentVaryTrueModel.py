@@ -4,7 +4,7 @@ import os
 
 from qmla.GrowthRuleClasses import NVCentreExperimentGrowthRules
 from qmla import ProbeGeneration
-from qmla import ExpectationValues
+from qmla import expectation_values
 from qmla import DataBase
 
 

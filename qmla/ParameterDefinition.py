@@ -6,8 +6,8 @@ import os
 import matplotlib.pyplot as plt
 
 import qmla.DataBase as DataBase
-import qmla.Distributions as Distributions
-import qmla.GrowthRules as GrowthRules
+import qmla.prior_distributions as Distributions
+import qmla.get_growth_rule as get_growth_rule
 
 pickle.HIGHEST_PROTOCOL = 2
 

@@ -27,7 +27,7 @@ except BaseException:
     enforce_serial = True  # shouldn't be needed
 
 import qmla.DataBase as DataBase
-import qmla.QML as QML
+import qmla.model_instances as QML
 
 plt.switch_backend('agg')
 
@@ -130,7 +130,7 @@ def learnModelRemote(
 #    log_print(["true params:", true_params])
 
     # Generate model and learn
-    op = DataBase.operator(name=name)
+    op = DataBase.Operator(name=name)
     qml_instance = QML.ModelInstanceForLearning(
         name=name,
         num_probes=num_probes,

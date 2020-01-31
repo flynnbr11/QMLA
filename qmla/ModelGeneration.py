@@ -448,7 +448,7 @@ def single_pauli_multiple_dim(
 """
 Specific Hamiltonian generators.
 Return strings corresponding to model names following naming convention.
-Use these strings with DataBase.operator class.
+Use these strings with DataBase.Operator class.
 """
 
 
@@ -513,13 +513,13 @@ def identity_interact(subsystem, num_qubits, return_operator=False):
         new_string += t_str + 'i'
     output_string = subsystem + new_string
     if return_operator:
-        return DataBase.operator(output_string)
+        return DataBase.Operator(output_string)
     else:
         return output_string
 
 
 def dimensionalise_name_by_name(name, true_dim, return_operator=False):
-    op = DataBase.operator(name)
+    op = DataBase.Operator(name)
     constituents = op.constituents_names
     new_list = []
 
@@ -533,7 +533,7 @@ def dimensionalise_name_by_name(name, true_dim, return_operator=False):
     new_name = p_str.join(new_list)
 
     if return_operator:
-        return DataBase.operator(new_name)
+        return DataBase.Operator(new_name)
     else:
         return new_name
 
@@ -552,7 +552,7 @@ def dimensionalise_name_by_operator(op, true_dim, return_operator=False):
     new_name = p_str.join(new_list)
 
     if return_operator:
-        return DataBase.operator(new_name)
+        return DataBase.Operator(new_name)
     else:
         return new_name
 
@@ -570,7 +570,7 @@ def dimensionalise_name_by_name_list(
 
     new_name = p_str.join(new_list)
     if return_operator:
-        return DataBase.operator(new_name)
+        return DataBase.Operator(new_name)
     else:
         return new_name
 
@@ -1848,7 +1848,7 @@ def hopping_matrix(term):
             'terms': terms
         }
         full_name = full_model_string(op_dict)
-    # mtx = DataBase.operator(full_name).matrix
+    # mtx = DataBase.Operatorfull_name).matrix
 
     mtx = DataBase.compute(full_name)
 
@@ -2065,7 +2065,7 @@ def base_hubbard_grouped_term(term):
             }
             full_name = full_model_string(op_dict)
             # print("[base hopping process] op dict:", op_dict)
-            # this_mtx = DataBase.operator(full_name).matrix
+            # this_mtx = DataBase.Operatorfull_name).matrix
 
             this_mtx = DataBase.compute(full_name)
             if mtx is None:

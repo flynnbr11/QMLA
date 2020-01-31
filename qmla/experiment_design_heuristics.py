@@ -21,8 +21,7 @@ def minsingvalnorm(matrix):
 def identity(arg): return arg
 
 
-class multiPGH(qi.Heuristic):
-
+class MultiParticleGuessHeuristic(qi.Heuristic):
     def __init__(
         self,
         updater,
@@ -38,7 +37,7 @@ class multiPGH(qi.Heuristic):
         other_fields=None,
         **kwargs
     ):
-        super(multiPGH, self).__init__(updater)
+        super(MultiParticleGuessHeuristic, self).__init__(updater)
         self._oplist = oplist
         self._norm = norm
         self._x_ = inv_field
@@ -50,7 +49,7 @@ class multiPGH(qi.Heuristic):
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
         # print(
-        #     "[Hueirstic] - multipgh\n",
+        #     "[Hueirstic] - MultiParticleGuessHeuristic\n",
         #     "kwargs:", kwargs
         # )
 
@@ -98,7 +97,7 @@ class multiPGH(qi.Heuristic):
         return eps
 
 
-class tHeurist(qi.Heuristic):
+class TimeHeurstic(qi.Heuristic):
 
     def identity(arg): return arg
 
@@ -106,7 +105,7 @@ class tHeurist(qi.Heuristic):
                  t_func=identity,
                  maxiters=10
                  ):
-        super(tHeurist, self).__init__(updater)
+        super(TimeHeurstic, self).__init__(updater)
         self._t = t_field
         self._t_func = t_func
         self._maxiters = maxiters
@@ -132,7 +131,7 @@ class tHeurist(qi.Heuristic):
         return eps
 
 
-class time_from_list(qi.Heuristic):
+class TimeFromListHeuristic(qi.Heuristic):
 
     def __init__(
         self,
@@ -150,7 +149,7 @@ class time_from_list(qi.Heuristic):
         time_list=None,
         **kwargs
     ):
-        super(time_from_list, self).__init__(updater)
+        super(TimeFromListHeuristic, self).__init__(updater)
         self._oplist = oplist
         self._norm = norm
         self._x_ = inv_field
@@ -210,7 +209,7 @@ class time_from_list(qi.Heuristic):
         new_time = self._time_list[time_id]
         eps[self._t] = new_time
 
-        # print("[Hueristic - time list] time idx {}  chosen {}:".format(
+        # print("[Heuristic - time list] time idx {}  chosen {}:".format(
         #         time_id,
         #         eps[self._t]
         #     )
@@ -218,7 +217,7 @@ class time_from_list(qi.Heuristic):
         return eps
 
 
-class one_over_sigma_then_linspace(qi.Heuristic):
+class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
 
     def __init__(
         self,
@@ -237,7 +236,7 @@ class one_over_sigma_then_linspace(qi.Heuristic):
         # num_experiments=200,
         **kwargs
     ):
-        super(one_over_sigma_then_linspace, self).__init__(updater)
+        super(MixedMultiParticleLinspaceHeuristic, self).__init__(updater)
         self._oplist = oplist
         self._norm = norm
         self._x_ = inv_field
@@ -310,14 +309,14 @@ class one_over_sigma_then_linspace(qi.Heuristic):
             time_id = epoch_id % self._len_time_list
             new_time = self._time_list[time_id]
         # print(
-        #     "[Hueristic] 1/sigma then linspace",
+        #     "[Heuristic] 1/sigma then linspace",
         #     "\t time:", new_time
         # )
         eps[self._t] = new_time
         return eps
 
 
-class inverse_min_eigvalue(qi.Heuristic):
+class InverseEigenvalueHeuristic(qi.Heuristic):
 
     def __init__(
         self,
@@ -336,7 +335,7 @@ class inverse_min_eigvalue(qi.Heuristic):
         # num_experiments=200,
         **kwargs
     ):
-        super(inverse_min_eigvalue, self).__init__(updater)
+        super(InverseEigenvalueHeuristic, self).__init__(updater)
         self._oplist = oplist
         self._norm = norm
         self._x_ = inv_field
@@ -362,7 +361,7 @@ class inverse_min_eigvalue(qi.Heuristic):
         **kwargs
     ):
         print(
-            "[Heuristic - inverse_min_eigvalue]",
+            "[Heuristic - InverseEigenvalueHeuristic]",
             "kwargs:", kwargs
         )
         current_params = kwargs['current_params']
@@ -406,7 +405,7 @@ class inverse_min_eigvalue(qi.Heuristic):
         #     time_id = epoch_id % self._len_time_list
         #     new_time = self._time_list[time_id]
         # print(
-        #     "[Hueristic] 1/sigma then linspace",
+        #     "[Heuristic] 1/sigma then linspace",
         #     "\t time:", new_time
         # )
 
