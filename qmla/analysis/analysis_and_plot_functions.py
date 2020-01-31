@@ -30,7 +30,7 @@ from matplotlib.projections import register_projection
 from inspect import currentframe, getframeinfo
 
 import qmla.get_growth_rule as get_growth_rule
-import qmla.ModelNames as ModelNames
+import qmla.model_naming as model_naming
 import qmla.experimental_data_processing as expdt
 import qmla.expectation_values as expectation_values
 import qmla.DataBase as DataBase
@@ -1546,10 +1546,10 @@ def plotVolumeQHL(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-def BayF_IndexDictToMatrix(ModelNames, AllBayesFactors,
+def BayF_IndexDictToMatrix(model_naming, AllBayesFactors,
                            StartBayesFactors=None):
 
-    size = len(ModelNames)
+    size = len(model_naming)
     Bayf_matrix = np.zeros([size, size])
 
     for i in range(size):

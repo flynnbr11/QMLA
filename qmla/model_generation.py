@@ -19,7 +19,7 @@ import copy
 import time as time
 
 import qmla.DataBase as DataBase
-import qmla.ModelNames as ModelNames
+import qmla.model_naming as model_naming
 
 """
 Essential functions. Functions below are specific, for generating terms according to given rules. new_model_list is the wrapper function which calls the selected generator rule.
@@ -107,7 +107,7 @@ def process_multipauli_term(term):
         'terms': [all_terms]
     }
 
-    full_mod_str = ModelNames.full_model_string(term_dict)
+    full_mod_str = model_naming.full_model_string(term_dict)
     # print("Getting full matrix corresponding to:", full_mod_str)
     return DataBase.compute(full_mod_str)
 
@@ -980,7 +980,7 @@ def interacting_nearest_neighbour_ising(
                 Proceeding with core",
                   core_pauli
                   )
-        operations_of_mod = ModelNames.operations_dict_from_name(mod)
+        operations_of_mod = model_naming.operations_dict_from_name(mod)
         previous_dim = operations_of_mod['dim']
         new_dim = previous_dim + 1
         present_terms = operations_of_mod['terms']
@@ -1007,7 +1007,7 @@ def interacting_nearest_neighbour_ising(
             'terms': all_new_separate_terms
         }
 
-        new_mod_string = ModelNames.full_model_string(new_mod_dict)
+        new_mod_string = model_naming.full_model_string(new_mod_dict)
 
         new_models.append(new_mod_string)
 
@@ -1034,7 +1034,7 @@ def deterministic_interacting_nn_ising_single_axis(
 
 def tensor_all_with_identity_at_end(name):
     import copy
-    op_dict = ModelNames.operations_dict_from_name(name)
+    op_dict = model_naming.operations_dict_from_name(name)
     num_qubits = op_dict['dim']
     terms = op_dict['terms']
     new_terms = []
@@ -1051,13 +1051,13 @@ def tensor_all_with_identity_at_end(name):
         'dim': new_dimension,
         'terms': new_terms
     }
-    new_mod_name = ModelNames.full_model_string(new_op_dict)
+    new_mod_name = model_naming.full_model_string(new_op_dict)
     return new_mod_name
 
 
 def tensor_all_with_identity_at_start(name):
     import copy
-    op_dict = ModelNames.operations_dict_from_name(name)
+    op_dict = model_naming.operations_dict_from_name(name)
     num_qubits = op_dict['dim']
     terms = op_dict['terms']
     new_terms = []
@@ -1075,14 +1075,14 @@ def tensor_all_with_identity_at_start(name):
         'dim': new_dimension,
         'terms': new_terms
     }
-    new_mod_name = ModelNames.full_model_string(new_op_dict)
+    new_mod_name = model_naming.full_model_string(new_op_dict)
 
     return new_mod_name
 
 
 def add_fixed_axis_nn_interaction(name, fixed_axis):
     dimension = DataBase.get_num_qubits(name)
-    op_dict = ModelNames.operations_dict_from_name(name)
+    op_dict = model_naming.operations_dict_from_name(name)
     new_terms = []
     for i in range(1, dimension):
         term_one = (i, fixed_axis)
@@ -1091,7 +1091,7 @@ def add_fixed_axis_nn_interaction(name, fixed_axis):
         new_terms.append(total_term)
 
     op_dict['terms'].extend(new_terms)
-    new_name = ModelNames.full_model_string(op_dict)
+    new_name = model_naming.full_model_string(op_dict)
     return new_name
 
 
@@ -1114,7 +1114,7 @@ def deterministic_transverse_ising_nn_fixed_axis(
     starting_dimension = DataBase.get_num_qubits(name)
     for i in range(starting_dimension, max_num_qubits):
         name = DataBase.alph(one_qubit_larger_name)
-        op_dict = ModelNames.operations_dict_from_name(name)
+        op_dict = model_naming.operations_dict_from_name(name)
         terms = op_dict['terms']
         num_terms = len(terms)
         # full_model_string = ''
@@ -1145,7 +1145,7 @@ def deterministic_transverse_ising_nn_fixed_axis(
             'terms': new_terms
         }
 
-        one_qubit_larger_name = ModelNames.full_model_string(
+        one_qubit_larger_name = model_naming.full_model_string(
             new_op_dict
         )
         add_interaction = add_fixed_axis_nn_interaction(
@@ -1397,7 +1397,7 @@ def heisenberg_transverse(
         )
         for champ in all_champs:
             new_models.append(
-                ModelNames.make_term_transverse(
+                model_naming.make_term_transverse(
                     term=champ,
                     transverse_axis=transverse_axis
                 )
@@ -1797,7 +1797,7 @@ def process_hopping_term(term):
 def hopping_matrix(term):
     # to get a matrix given a term consisting of Hopping type terms
     # e.g. h_1_2_d3PPPh_1_3_d3
-    from ModelNames import full_model_string
+    from model_naming import full_model_string
     print("hopping_matrix func. term:", term)
     split_term = term.split('_')
     sites = []
@@ -1946,7 +1946,7 @@ def interaction_energy_pauli_term(dim):
             'terms': [[(i, 'z')]],
             'dim': dim
         }
-        new_term = ModelNames.full_model_string(op_dict)
+        new_term = model_naming.full_model_string(op_dict)
 
         if first_term == False:
             interaction_energy += p_str
@@ -2012,7 +2012,7 @@ def process_hubbard_operator(
 
 def base_hubbard_grouped_term(term):
     # from model_generation import interaction_energy_pauli_term
-    from ModelNames import full_model_string
+    from model_naming import full_model_string
 
     split_term = term.split('_')
     sites = []

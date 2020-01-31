@@ -7,7 +7,7 @@ from qmla.GrowthRuleClasses import SuperClassGrowthRule
 from qmla import experiment_design_heuristics
 from qmla import topology
 from qmla import model_generation
-from qmla import ModelNames
+from qmla import model_naming
 from qmla import ProbeGeneration
 from qmla import DataBase
 
@@ -531,10 +531,10 @@ class connected_lattice(
         **kwargs
     ):
 
-        import ModelNames
+        import model_naming
         # TODO get generation idx + sub generation idx
 
-        return ModelNames.branch_is_num_params_and_qubits(
+        return model_naming.branch_is_num_params_and_qubits(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )

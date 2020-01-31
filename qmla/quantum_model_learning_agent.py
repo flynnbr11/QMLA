@@ -30,7 +30,7 @@ import qmla.DatabaseLaunch as DataBaseLaunch
 import qmla.get_growth_rule as get_growth_rule
 import qmla.expectation_values as expectation_values 
 from qmla.RemoteModelLearning import *
-import qmla.ModelNames as ModelNames
+import qmla.model_naming as model_naming
 import qmla.model_generation as model_generation
 import qmla.model_instances as QML
 import qmla.RedisSettings as rds

@@ -28,8 +28,8 @@ Dictionaries to fill in:
     * `model_list`: champions of layer N, used to create list of models for layer N+1
     * `spawn_step`: doesn't have to be used, but can be useful to generate models specically based on here in the tree development the algorithm has reached. 
 * `tree_finished_functions`: function to check whether the QMD tree should terminate at that step. Default is to terminate after a given number of steps. 
-* `get_name_branch_map`: function which returns a dictionary mapping all generated models' names to a branch number. Default is to put models on a branch with ID equal to the number of parameters that model has. An alternative (prebuilt) is to assign branch ID of the number of qubits. These functions are stored in QML_lib/ModelNames
-* `latex_naming_functions`: function to take a model name (string according to model naming convention), to a LaTex representation of that name. These can be specific to growth rules, and are stored in ModelNames.
+* `get_name_branch_map`: function which returns a dictionary mapping all generated models' names to a branch number. Default is to put models on a branch with ID equal to the number of parameters that model has. An alternative (prebuilt) is to assign branch ID of the number of qubits. These functions are stored in QML_lib/model_naming
+* `latex_naming_functions`: function to take a model name (string according to model naming convention), to a LaTex representation of that name. These can be specific to growth rules, and are stored in model_naming.
 * `initial_models`: default set of models to form the first layer, which are the seeds for growing the tree. 
 #### Probe dict generators
 QMD cycles through a set of probes at each epoch to learn parameters during the QHL phase for each model. 

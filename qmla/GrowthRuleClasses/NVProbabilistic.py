@@ -89,7 +89,7 @@ class nv_probabilistic(
         name,
         **kwargs
     ):
-        return ModelNames.pauliSet_latex_name(
+        return model_naming.pauliSet_latex_name(
             name,
             **kwargs
         )

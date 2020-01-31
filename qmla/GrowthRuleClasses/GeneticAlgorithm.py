@@ -8,7 +8,7 @@ import scipy
 import time
 
 import qmla.DataBase as DataBase
-import qmla.ModelNames as ModelNames
+import qmla.model_naming as model_naming
 import qmla.model_generation as model_generation
 
 

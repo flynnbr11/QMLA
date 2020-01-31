@@ -10,7 +10,7 @@ import pandas
 from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas, cumulativeQMDTreePlot
 
 import qmla.get_growth_rule as get_growth_rule
-import qmla.ModelNames as ModelNames
+import qmla.model_naming as model_naming
 # import qmla.PlotQMD as ptq
 import qmla.DataBase as DataBase
 plt.switch_backend('agg')

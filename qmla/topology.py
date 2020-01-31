@@ -10,7 +10,7 @@ import time as time
 import warnings
 
 import qmla.DataBase as DataBase
-import qmla.ModelNames as ModelNames
+import qmla.model_naming as model_naming
 
 
 class GridTopology():

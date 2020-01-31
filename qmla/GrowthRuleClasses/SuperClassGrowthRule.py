@@ -144,9 +144,9 @@ class growth_rule_super_class():
         latex_mapping_file,
         **kwargs
     ):
-        import ModelNames
+        import model_naming
         # branch_is_num_params
-        return ModelNames.branch_computed_from_qubit_and_param_count(
+        return model_naming.branch_computed_from_qubit_and_param_count(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )

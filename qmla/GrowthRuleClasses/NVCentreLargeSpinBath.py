@@ -178,8 +178,8 @@ class nv_centre_large_spin_bath(
         name,
         **kwargs
     ):
-        import ModelNames
-        latex_name = ModelNames.large_spin_bath_nv_system_name(
+        import model_naming
+        latex_name = model_naming.large_spin_bath_nv_system_name(
             term=name
         )
         return latex_name
@@ -189,8 +189,8 @@ class nv_centre_large_spin_bath(
         latex_mapping_file,
         **kwargs
     ):
-        import ModelNames
-        name_map = ModelNames.branch_is_num_dims(
+        import model_naming
+        name_map = model_naming.branch_is_num_dims(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )
