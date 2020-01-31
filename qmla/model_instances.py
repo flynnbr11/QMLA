@@ -18,7 +18,7 @@ import qmla.experimental_data_processing as expdt
 import qmla.expectation_values as expectation_values
 import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming
-from qmla.MemoryTest import print_loc
+from qmla.memory_tests import print_loc
 import qmla.QInferClassQML as qml_qi
 import qmla.RedisSettings as rds
 

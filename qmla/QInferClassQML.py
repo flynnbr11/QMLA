@@ -8,7 +8,7 @@ from psutil import virtual_memory
 
 import qmla.experimental_data_processing as expdt
 import qmla.get_growth_rule as get_growth_rule
-from qmla.MemoryTest import print_loc, print_file_line
+from qmla.memory_tests import print_loc, print_file_line
 import qmla.ProbeGeneration as ProbeGeneration
 import qmla.DataBase as DataBase
 

@@ -8,7 +8,7 @@ import sys as sys
 import os as os
 
 import qmla.ProbeGeneration as ProbeGeneration
-from qmla.MemoryTest import print_loc
+from qmla.memory_tests import print_loc
 
 # sys.path.append((os.path.join("..")))
 
