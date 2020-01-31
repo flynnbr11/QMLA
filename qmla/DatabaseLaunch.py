@@ -188,7 +188,7 @@ def add_model(
         model_lists[model_num_qubits].append(alph_model_name)
 
         if redimensionalise:
-            import ModelGeneration
+            import model_generation
             print("Redimensionalising")
             true_dim = int(np.log2(np.shape(true_ops[0])[0]))
             sim_dim = get_num_qubits(model_name)
@@ -196,7 +196,7 @@ def add_model(
             if sim_dim > true_dim:
                 true_params = [true_params[0]]
                 redimensionalised_true_op = (
-                    ModelGeneration.identity_interact(subsystem=true_op_name,
+                    model_generation.identity_interact(subsystem=true_op_name,
                                                       num_qubits=sim_dim, return_operator=True)
                 )
                 true_ops = redimensionalised_true_op.constituents_operators
@@ -207,7 +207,7 @@ def add_model(
                       model_name, "true_dim = ", true_dim
                       )
                 sim_name = (
-                    ModelGeneration.dimensionalise_name_by_name(name=model_name,
+                    model_generation.dimensionalise_name_by_name(name=model_name,
                                                                 true_dim=true_dim)
                 )
             else:

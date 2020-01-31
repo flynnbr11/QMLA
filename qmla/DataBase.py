@@ -665,40 +665,40 @@ def compute(inp):
 
 
 def process_basic_operator(basic_operator):
-    from qmla import ModelGeneration
+    from qmla import model_generation
 
     if basic_operator[0:1] == 'h_':
-        # import ModelGeneration
-        mtx = ModelGeneration.process_hubbard_operator(
+        # import model_generation
+        mtx = model_generation.process_hubbard_operator(
             basic_operator
         )
         # hopping_matrix(basic_operator)
     elif '1Dising' in basic_operator:
-        # import ModelGeneration
-        mtx = ModelGeneration.process_1d_ising(
+        # import model_generation
+        mtx = model_generation.process_1d_ising(
             basic_operator
         )
     elif 'Heis' in basic_operator:
-        # import ModelGeneration
-        mtx = ModelGeneration.process_heisenberg_xyz(
+        # import model_generation
+        mtx = model_generation.process_heisenberg_xyz(
             basic_operator
         )
     elif 'nv' in basic_operator:
-        # import ModelGeneration
-        mtx = ModelGeneration.process_n_qubit_NV_centre_spin(
+        # import model_generation
+        mtx = model_generation.process_n_qubit_NV_centre_spin(
             basic_operator
         )
     elif 'pauliSet' in basic_operator:
-        mtx = ModelGeneration.process_multipauli_term(
+        mtx = model_generation.process_multipauli_term(
             term=basic_operator
         )
     elif 'transverse' in basic_operator:
-        mtx = ModelGeneration.process_transverse_term(
+        mtx = model_generation.process_transverse_term(
             term=basic_operator
         )
     elif 'FH' in basic_operator:
         # print("[DB] Processing hopping operator:", term)
-        mtx = ModelGeneration.process_fermi_hubbard_term(
+        mtx = model_generation.process_fermi_hubbard_term(
             term=basic_operator
         )
     else:

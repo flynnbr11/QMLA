@@ -529,7 +529,7 @@ def parse_cmd_line_args(args):
     parser.add_argument(
         '-ggr', '--growth_generation_rule',
         help='Rule applied for generation of new models during QMD. \
-        Corresponding functions must be built into ModelGeneration',
+        Corresponding functions must be built into model_generation',
         type=str,
         default=default_growth_generation_rule
     )

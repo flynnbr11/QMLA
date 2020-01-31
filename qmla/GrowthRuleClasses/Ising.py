@@ -5,7 +5,7 @@ import os
 from qmla.GrowthRuleClasses import ConnectedLattice
 from qmla import experiment_design_heuristics
 from qmla import topology
-from qmla import ModelGeneration
+from qmla import model_generation
 from qmla import ModelNames
 from qmla import ProbeGeneration
 from qmla import DataBase

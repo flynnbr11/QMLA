@@ -9,7 +9,7 @@ from qmla.get_growth_rule import *
 from qmla.DataBase import * # TODO fix __all__
 from qmla.prior_distributions import *
 from qmla.controls_qmla import *
-from qmla.ModelGeneration import * # TODO fix __all__
+from qmla.model_generation import * # TODO fix __all__
 from qmla.ModelNames import * # TODO fix __all__
 from qmla.QInferClassQML import * 
 from qmla.model_instances import * 

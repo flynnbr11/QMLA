@@ -163,7 +163,7 @@ class nv_centre_large_spin_bath(
         spawn_stage = kwargs['spawn_stage']
 
         print(
-            "[ModelGeneration.NV_centre_spin_large_bath]",
+            "[model_generation.NV_centre_spin_large_bath]",
             "Spawn stage:", spawn_stage
         )
 

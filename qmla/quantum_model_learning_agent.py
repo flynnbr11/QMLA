@@ -31,7 +31,7 @@ import qmla.get_growth_rule as get_growth_rule
 import qmla.expectation_values as expectation_values 
 from qmla.RemoteModelLearning import *
 import qmla.ModelNames as ModelNames
-import qmla.ModelGeneration as ModelGeneration
+import qmla.model_generation as model_generation
 import qmla.model_instances as QML
 import qmla.RedisSettings as rds
 
@@ -68,7 +68,7 @@ class QuantumModelLearningAgent():
     - This is done in a tree like growth mechanism where
         new branches consist of
         models generated considering previously determined "good" models.
-    - Model generation rules are given in ModelGeneration.
+    - Model generation rules are given in model_generation.
     - Database control is given in DataBase.
     - Remote functions for computing QHL/Bayes factors are in
     - RemoteModelLearning and RemoteBayesFactor respectively.
@@ -1528,7 +1528,7 @@ class QuantumModelLearningAgent():
         self.TrueOpListByDim = {}
         self.TrueParamByDim = {}
         for dim in range(1, 1 + self.MaxDimension):
-            new_op = ModelGeneration.identity_interact(
+            new_op = model_generation.identity_interact(
                 subsystem=self.TrueOpName, num_qubits=dim, return_operator=True
             )
             self.TrueOpListByDim[dim] = new_op.constituents_operators
@@ -2497,7 +2497,7 @@ class QuantumModelLearningAgent():
             self.ModelNameIDs[mod_id]
             for mod_id in best_models
         ]
-        # new_models = ModelGeneration.new_model_list(
+        # new_models = model_generation.new_model_list(
         current_champs = [
             self.ModelNameIDs[i] for i in
             list(self.BranchChampions.values())

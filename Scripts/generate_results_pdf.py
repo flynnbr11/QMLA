@@ -72,7 +72,7 @@ parser.add_argument(
 parser.add_argument(
     '-ggr', '--growth_generation_rule',
     help='Rule applied for generation of new models during QMD. \
-    Corresponding functions must be built into ModelGeneration',
+    Corresponding functions must be built into model_generation',
     type=str,
     default='Unknown'
 )

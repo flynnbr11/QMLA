@@ -34,7 +34,7 @@ plt.switch_backend('agg')
 
 # Local files
 
-# import ModelGeneration
+# import model_generation
 #import BayesF
 # from Distrib import MultiVariateNormalDistributionNocov
 

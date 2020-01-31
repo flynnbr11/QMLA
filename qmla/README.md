@@ -24,7 +24,7 @@ Dictionaries to fill in:
 * `fixed_axes_by_generator`: which axis to fix. 
 * `max_spawn_depth_info`: for growth rules which terminate after a fixed number of steps, here define the number of steps allowed. 
 * `max_num_qubits_info`: maximum number of qubits permitted according to this growth generator. In some cases, growth is terminated when models reach this size. 
-* `model_generation_functions`: which function creates a list of model names to form the next layer. These functions are stored in QML_lib/ModelGeneration. This is called by `new_model_generator` and must take arguments
+* `model_generation_functions`: which function creates a list of model names to form the next layer. These functions are stored in QML_lib/model_generation. This is called by `new_model_generator` and must take arguments
     * `model_list`: champions of layer N, used to create list of models for layer N+1
     * `spawn_step`: doesn't have to be used, but can be useful to generate models specically based on here in the tree development the algorithm has reached. 
 * `tree_finished_functions`: function to check whether the QMD tree should terminate at that step. Default is to terminate after a given number of steps. 

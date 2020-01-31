@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     '-ggr', '--growth_generation_rule',
     help='Rule applied for generation of new models during QMD. \
-    Corresponding functions must be built into ModelGeneration',
+    Corresponding functions must be built into model_generation',
     type=str,
     default='two_qubit_ising_rotation_hyperfine'
 )

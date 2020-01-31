@@ -9,7 +9,7 @@ import time
 
 import qmla.DataBase as DataBase
 import qmla.ModelNames as ModelNames
-import qmla.ModelGeneration as ModelGeneration
+import qmla.model_generation as model_generation
 
 
 class GeneticAlgorithmQMLA():

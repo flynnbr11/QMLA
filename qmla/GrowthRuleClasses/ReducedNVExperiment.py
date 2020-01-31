@@ -40,9 +40,9 @@ class reduced_nv_experiment(
         model_list,
         **kwargs
     ):
-        import ModelGeneration
+        import model_generation
 
-        new_mods = ModelGeneration.reduced_nv_experimental_method(
+        new_mods = model_generation.reduced_nv_experimental_method(
             model_list,
             **kwargs
         )

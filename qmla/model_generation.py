@@ -1212,7 +1212,7 @@ def NV_centre_spin_large_bath(
     spawn_stage = kwargs['spawn_stage']
 
     print(
-        "[ModelGeneration.NV_centre_spin_large_bath]",
+        "[model_generation.NV_centre_spin_large_bath]",
         "Spawn stage:", spawn_stage
     )
 
@@ -2011,7 +2011,7 @@ def process_hubbard_operator(
 
 
 def base_hubbard_grouped_term(term):
-    # from ModelGeneration import interaction_energy_pauli_term
+    # from model_generation import interaction_energy_pauli_term
     from ModelNames import full_model_string
 
     split_term = term.split('_')

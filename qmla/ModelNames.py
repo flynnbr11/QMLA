@@ -711,7 +711,7 @@ def interacting_ising_nearest_neighbours_all_names(
     # growth_generator,
     **kwargs
 ):
-    import ModelGeneration
+    import model_generation
     all_models = []
 
     initial_models = ['xTx', 'yTy', 'zTz']
@@ -723,7 +723,7 @@ def interacting_ising_nearest_neighbours_all_names(
 
     model_list = initial_models
     for i in range(2, num_qubits + 1):
-        new_models = ModelGeneration.interacting_nearest_neighbour_ising(
+        new_models = model_generation.interacting_nearest_neighbour_ising(
             model_list)
         all_models.extend(new_models)
         model_list = new_models
