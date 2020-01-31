@@ -1,7 +1,7 @@
 import sys
 import os
 
-from qmla.GrowthRuleClasses import NVCentreLargeSpinBath
+from qmla.growth_rules import NVCentreLargeSpinBath
 from qmla import probe_set_generation
 from qmla import expectation_values
 from qmla import database_framework

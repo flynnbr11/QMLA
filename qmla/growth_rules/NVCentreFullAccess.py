@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import sys
 import os
 
-from qmla.GrowthRuleClasses.SuperClassGrowthRule import growth_rule_super_class
+from qmla.growth_rules.SuperClassGrowthRule import growth_rule_super_class
 from qmla import experiment_design_heuristics
 from qmla import expectation_values
 from qmla import database_framework

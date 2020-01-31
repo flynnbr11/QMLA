@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import sys
 import os
 
-import qmla.GrowthRuleClasses as GR
+import qmla.growth_rules as GR
 
 growth_classes = {
     # # Experimental paper growth rules

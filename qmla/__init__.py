@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 print("QMLA __init__")
 
-# import qmla.GrowthRuleClasses
+# import qmla.growth_rules
 import qmla.analysis
 
 from qmla.get_growth_rule import * 

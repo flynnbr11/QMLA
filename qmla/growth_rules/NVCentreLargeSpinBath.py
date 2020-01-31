@@ -1,7 +1,7 @@
 import sys
 import os
 
-from qmla.GrowthRuleClasses import NVCentreFullAccess
+from qmla.growth_rules import NVCentreFullAccess
 from qmla import experiment_design_heuristics
 from qmla import probe_set_generation
 from qmla import expectation_values

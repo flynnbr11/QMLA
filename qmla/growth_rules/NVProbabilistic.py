@@ -3,7 +3,7 @@ import itertools
 import sys
 import os
 
-from qmla.GrowthRuleClasses import NVGrowByFitness
+from qmla.growth_rules import NVGrowByFitness
 from qmla import probe_set_generation
 from qmla import database_framework
 

@@ -1,7 +1,7 @@
 import sys
 import os
 
-from qmla.GrowthRuleClasses import NVCentreFullAccess
+from qmla.growth_rules import NVCentreFullAccess
 
 
 class reduced_nv_experiment(

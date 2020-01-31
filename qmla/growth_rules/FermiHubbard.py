@@ -3,7 +3,7 @@ import itertools
 import sys
 import os
 
-from qmla.GrowthRuleClasses import ConnectedLattice
+from qmla.growth_rules import ConnectedLattice
 from qmla import experiment_design_heuristics
 from qmla import topology
 from qmla import model_generation

@@ -4,8 +4,8 @@ import sys
 import os
 import random
 
-from qmla.GrowthRuleClasses import SuperClassGrowthRule
-from qmla.GrowthRuleClasses import GeneticAlgorithm
+from qmla.growth_rules import SuperClassGrowthRule
+from qmla.growth_rules import GeneticAlgorithm
 from qmla import experiment_design_heuristics
 from qmla import topology
 from qmla import model_generation
