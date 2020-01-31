@@ -19,7 +19,7 @@ import qmla.expectation_values as expectation_values
 import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming
 from qmla.memory_tests import print_loc
-import qmla.QInferClassQML as qml_qi
+import qmla.qinfer_model_interface as qml_qi
 import qmla.RedisSettings as rds
 
 global debug_print
@@ -1427,7 +1427,7 @@ class ModelInstanceForStorage():
         return r_squared_by_epoch
 
 
-#        self.GenSimModel = qml_qi.QInferClassQML(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,
+#        self.GenSimModel = qml_qi.qinfer_model_interface(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,
 #            experimental_measurements = self.ExperimentalMeasurements,
 #            experimental_measurement_times=(
 #                self.ExperimentalMeasurementTimes
