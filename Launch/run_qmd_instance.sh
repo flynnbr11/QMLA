@@ -19,6 +19,7 @@ host=$(hostname)
 running_dir=$RUNNING_DIR
 lib_dir=$LIBRARY_DIR
 script_dir=$SCRIPT_DIR
+root_dir=$ROOT_DIR
 echo "QMD ID = $QMD_ID; REDIS_PORT=$REDIS_PORT"
 echo "Global server: $GLOBAL_SERVER"
 echo "Running directory: $running_dir"
@@ -32,10 +33,11 @@ module load languages/intel-compiler-16-u2
 
 SERVER_HOST=$(head -1 "$PBS_NODEFILE")
 cd $lib_dir
+#cd $script_dir
 redis-server RedisDatabaseConfig.conf --protected-mode no --port $REDIS_PORT & 
 redis-cli -p $REDIS_PORT flushall
 
-cd $lib_dir
+#cd $lib_dir
 echo "Going in to launch redis script"
 echo "If this fails -- ensure permission enabled on RedisLaunch script in library"
 
@@ -55,7 +57,7 @@ mkdir -p $PBS_O_WORKDIR/logs
 
 # The redis server is started on the first node.
 REDIS_URL=redis://$SERVER_HOST:$REDIS_PORT
-
+echo "REDIS_URL : $REDIS_URL"
 QMD_LOG_DIR="$RESULTS_DIR/logs"
 OUTPUT_ERROR_DIR="$RESULTS_DIR/output_and_error_logs"
 mkdir -p $QMD_LOG_DIR
@@ -76,7 +78,8 @@ done
 # -------------------------------------
 
 
-cd $lib_dir
+#cd $lib_dir
+cd $root_dir
 if [[ "$host" == "node"* ]]
 then
 	echo "Launching RQ worker on remote nodes using mpirun"
