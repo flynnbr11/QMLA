@@ -20,7 +20,7 @@ from qmla import database_framework
 def flatten(l): return [item for sublist in l for item in sublist]
 
 
-class genetic_algorithm(
+class Genetic(
     growth_rule_super.GrowthRuleSuper
 ):
 

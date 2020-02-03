@@ -11,7 +11,7 @@ from qmla import model_naming
 from qmla import probe_set_generation
 from qmla import database_framework
 
-class basic_lindbladian(
+class Lindbladian(
     growth_rule_super.GrowthRuleSuper
 ):
 

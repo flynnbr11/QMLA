@@ -40,13 +40,13 @@ growth_classes = {
         GR.FermiHubbardProbabilistic,
     # Others
     'basic_lindbladian':
-        GR.basic_lindbladian,
+        GR.Lindbladian,
     'example':
         GR.GrowthRuleTemplate,
     'Presentation':
         GR.PresentationPlotGeneration,
     'Genetic':
-        GR.genetic_algorithm
+        GR.Genetic
 }
 
 
