@@ -15,14 +15,10 @@ import warnings
 import time as time
 from time import sleep
 import random
-from psutil import virtual_memory
-# only want to do this once at the start!
 import pickle
-pickle.HIGHEST_PROTOCOL = 2  # TODO if >python3, can use higher protocol
-plt.switch_backend('agg')
 import qinfer
 
-# Libraries
+# QMLA functionality
 from qmla.remote_bayes_factor import *
 import qmla.analysis
 import qmla.database_framework as database_framework
@@ -34,6 +30,9 @@ import qmla.model_naming as model_naming
 import qmla.model_generation as model_generation
 import qmla.model_instances as QML
 import qmla.redis_settings as rds
+
+pickle.HIGHEST_PROTOCOL = 2  # TODO if >python3, can use higher protocol
+plt.switch_backend('agg')
 
 __all__ = [
     'QuantumModelLearningAgent'
@@ -635,6 +634,10 @@ class QuantumModelLearningAgent():
                        )
         self.initiate_database()
 
+    ##########
+    # Section: Setup, configuration and branch/database management functions
+    ##########
+
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) + " [QMD " + str(self.Q_id) + "]")
         if not isinstance(to_print_list, list):
@@ -828,22 +831,6 @@ class QuantumModelLearningAgent():
             if bool(already_computed) == True:
                 pre_computed_models.append(model)
 
-        # for model in model_list:
-        #     try:
-        #         m_id = database_framework.model_id_from_name(self.db, model)
-        #         self.log_print(["m_id:", m_id])
-        #         model_id_list.append(m_id)
-        #         self.log_print(["model id list:", model_id_list])
-        #         self.ModelsBranches[m_id] = branchID
-        #     except:
-        #         self.log_print(
-        #             [
-        #                 "can't get model id from database:\n",
-        #                 self.db
-        #             ]
-        #         )
-        #         raise
-
         self.BranchNumModelsPreComputed[branchID] = num_models_already_computed_this_branch
         self.BranchModels[branchID] = model_list
         self.BranchPrecomputedModels[branchID] = pre_computed_models
@@ -862,6 +849,44 @@ class QuantumModelLearningAgent():
     def get_model_storage_instance_by_id(self, model_id):
         return database_framework.reduced_model_instance_from_id(self.db, model_id)
 
+    def update_database_model_info(self):
+        for mod_id in range(self.HighestModelID):
+            try:
+                # TODO remove this try/except when reduced-champ-model instance
+                # is update-able
+                mod = self.get_model_storage_instance_by_id(mod_id)
+                mod.updateLearnedValues(
+                    fitness_parameters=self.FitnessParameters
+                )
+            except BaseException:
+                pass
+
+    def update_model_record(
+        self,
+        field,
+        name=None,
+        model_id=None,
+        new_value=None,
+        increment=None
+    ):
+        database_framework.update_field(
+            db=self.db,
+            name=name,
+            model_id=model_id,
+            field=field,
+            new_value=new_value,
+            increment=increment
+        )
+
+    def get_model_data_by_field(self, name, field):
+        return database_framework.pull_field(self.db, name, field)
+
+    def change_model_status(self, model_name, new_status='Saturated'):
+        self.db.loc[self.db['<Name>'] == model_name, 'Status'] = new_status
+
+    ##########
+    # Section: Calculation of models parameters and Bayes factors
+    ##########
 
     def learn_models_on_given_branch(
         self,
@@ -1340,28 +1365,6 @@ class QuantumModelLearningAgent():
 
         return champ
 
-    def update_model_record(
-        self,
-        field,
-        name=None,
-        model_id=None,
-        new_value=None,
-        increment=None
-    ):
-        database_framework.update_field(
-            db=self.db,
-            name=name,
-            model_id=model_id,
-            field=field,
-            new_value=new_value,
-            increment=increment
-        )
-
-    def get_model_data_by_field(self, name, field):
-        return database_framework.pull_field(self.db, name, field)
-
-    def change_model_status(self, model_name, new_status='Saturated'):
-        self.db.loc[self.db['<Name>'] == model_name, 'Status'] = new_status
 
     def compare_all_models_in_branch(
         self,
@@ -2039,6 +2042,9 @@ class QuantumModelLearningAgent():
         )
         return champ_name, branch_champ_names
 
+    ##########
+    # Section: QMLA algorithm subroutines
+    ##########
 
     def spawn_from_branch(
         self,
@@ -2142,302 +2148,6 @@ class QuantumModelLearningAgent():
             tree_completed = True
         return tree_completed
 
-    def runQHLTest(self):
-
-        if (
-            self.QHLmode == True
-            and
-            self.TrueOpName not in list(self.ModelsBranches.keys())
-        ):
-            self.new_branch(
-                growth_rule=self.GrowthGenerator,
-                model_list=[self.TrueOpName]
-            )
-
-        mod_to_learn = self.TrueOpName
-        self.log_print(
-            [
-                "QHL test on:", mod_to_learn
-            ]
-        )
-
-        self.learn_model(
-            model_name=mod_to_learn,
-            use_rq=self.use_rq,
-            blocking=True
-        )
-
-        mod_id = database_framework.model_id_from_name(
-            db=self.db,
-            name=mod_to_learn
-        )
-        self.TrueOpModelID = mod_id
-        self.ChampID = mod_id
-        self.log_print(
-            [
-                "Learned:",
-                mod_to_learn,
-                ". ID=",
-                mod_id
-            ]
-        )
-        mod = self.get_model_storage_instance_by_id(mod_id)
-        self.log_print(["Mod (reduced) name:", mod.Name])
-        mod.updateLearnedValues(
-            # fitness_parameters = self.FitnessParameters
-        )
-
-        n_qubits = database_framework.get_num_qubits(mod.Name)
-        if n_qubits > 3:
-            # only compute subset of points for plot
-            # otherwise takes too long
-            self.log_print(
-                [
-                    "getting new set of times to plot expectation values for"
-                ]
-            )
-            expec_val_plot_times = self.ReducedPlotTimes
-        else:
-            self.log_print(
-                [
-                    "Using default times to plot expectation values for",
-                    "num qubits:", n_qubits
-                ]
-            )
-            expec_val_plot_times = self.PlotTimes
-
-        self.log_print(
-            [
-                "times to plot for expetation values:",
-                expec_val_plot_times
-            ]
-        )
-
-        mod.compute_expectation_values(
-            times=expec_val_plot_times,
-            # plot_probe_path = self.PlotProbeFile
-        )
-        self.log_print(
-            [
-                "Finished computing expectation values for", mod.Name,
-                mod.expectation_values
-            ]
-        )
-
-        self.compute_f_score(
-            model_id=mod_id
-        )
-
-        # TODO write single QHL test
-        time_now = time.time()
-        time_taken = time_now - self.StartingTime
-#        true_model_r_squared = self.get_model_storage_instance_by_id(self.TrueOpModelID).r_squared()
-
-        self.ResultsDict = {
-            'NumParticles': self.NumParticles,
-            'NumExperiments': mod.NumExperiments,
-            'NumBayesTimes': self.NumTimesForBayesUpdates,
-            'ResampleThreshold': self.ResampleThreshold,
-            'ResamplerA': self.ResamplerA,
-            'PHGPrefactor': self.PGHPrefactor,
-            'ConfigLatex': self.LatexConfig,
-            'Time': time_taken,
-            'QID': self.Q_id,
-            'RSquaredTrueModel': mod.r_squared(
-                times=expec_val_plot_times,
-                plot_probes=self.PlotProbes
-            ),
-            'QuadraticLosses': mod.QuadraticLosses,
-            'NameAlphabetical': database_framework.alph(mod.Name),
-            'LearnedParameters': mod.LearnedParameters,
-            'FinalSigmas': mod.FinalSigmas,
-            'TrackParameterEstimates': mod.TrackParameterEstimates,
-            'TrackVolume': mod.VolumeList,
-            'TrackTimesLearned': mod.Times,
-            # 'TrackCovarianceMatrices' : mod.TrackCovMatrices,
-            'ExpectationValues': mod.expectation_values,
-            # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
-            #     times = expec_val_plot_times,
-            #     plot_probes = self.PlotProbes
-            # ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
-            # 'FinalRSquared' : mod.final_r_squared,
-            # 'FinalRSquared' : mod.r_squared(
-            #     plot_probes = self.PlotProbes,
-            #     times = expec_val_plot_times
-            # ),
-            'FinalRSquared': mod.final_r_squared,
-            'Fscore': self.FScore,
-            'Precision': self.Precision,
-            'Sensitivity': self.Sensitivity,
-            'p-value': mod.p_value,
-            'LearnedHamiltonian': mod.LearnedHamiltonian,
-            'GrowthGenerator': mod.GrowthGenerator,
-            'Heuristic': mod.HeuristicType,
-            'ChampLatex': mod.LatexTerm,
-        }
-
-        self.log_print(
-            [
-                "Stored results dict. Finished testQHL function"
-            ]
-        )
-
-    def run_quantum_hamiltonian_learning_multiple_models(self, model_names=None):
-        if model_names is None:
-            model_names = self.InitialOpList
-
-        current_models = list(
-            self.ModelsBranches.keys()
-        )
-        self.log_print(
-            [
-                "Model Names for multiple QHL:", model_names,
-                "current models:", current_models
-            ]
-        )
-        models_to_add = []
-        for mod in model_names:
-            if mod not in current_models:
-                models_to_add.append(mod)
-        if len(models_to_add) > 0:
-            self.new_branch(
-                growth_rule=self.GrowthGenerator,
-                model_list=models_to_add
-            )
-        self.multiQHLMode = True
-        self.ChampID = -1,  # TODO just so not to crash during dynamics plot
-        self.multiQHL_model_ids = [
-            database_framework.model_id_from_name(
-                db=self.db,
-                name=mod_name
-            ) for mod_name in model_names
-        ]
-
-        self.log_print(
-            [
-                'run multiple QHL. names:', model_names,
-                "model ids:", self.multiQHL_model_ids
-            ]
-        )
-
-        learned_models_ids = self.RedisDataBases['learned_models_ids']
-
-        for mod_name in model_names:
-            print("Trying to get mod id for", mod_name)
-            mod_id = database_framework.model_id_from_name(
-                db=self.db,
-                name=mod_name
-            )
-            learned_models_ids.set(
-                str(mod_id), 0
-            )
-            self.learn_model(
-                model_name=mod_name,
-                use_rq=self.use_rq,
-                blocking=False
-            )
-
-        running_models = learned_models_ids.keys()
-        self.log_print(
-            [
-                'Running Models:', running_models,
-            ]
-        )
-        for k in running_models:
-            while int(learned_models_ids.get(k)) != 1:
-                sleep(0.01)
-                self.inspect_remote_job_crashes()
-
-        self.log_print(
-            [
-                'Finished waiting on queue, for all:', running_models,
-            ]
-        )
-        time_now = time.time()
-        time_taken = time_now - self.StartingTime
-        for mod_name in model_names:
-            mod_id = database_framework.model_id_from_name(
-                db=self.db, name=mod_name
-            )
-            mod = self.get_model_storage_instance_by_id(mod_id)
-            mod.updateLearnedValues(
-                fitness_parameters=self.FitnessParameters
-            )
-            self.compute_f_score(
-                model_id=mod_id
-            )
-
-            n_qubits = database_framework.get_num_qubits(mod.Name)
-            if n_qubits > 5:
-                # only compute subset of points for plot
-                # otherwise takes too long
-                self.log_print(
-                    [
-                        "getting new set of times to plot expectation values for"
-                    ]
-                )
-                expec_val_plot_times = self.ReducedPlotTimes
-            else:
-                self.log_print(
-                    [
-                        "Using default times to plot expectation values for",
-                        "num qubits:", n_qubits
-                    ]
-                )
-                expec_val_plot_times = self.PlotTimes
-
-            mod.compute_expectation_values(
-                times=expec_val_plot_times,
-                # plot_probe_path = self.PlotProbeFile
-            )
-            # equivalent to self.ResultsDict
-            mod.results_dict = {
-                'NumParticles': mod.NumParticles,
-                'NumExperiments': mod.NumExperiments,
-                'NumBayesTimes': self.NumTimesForBayesUpdates,
-                'ResampleThreshold': self.ResampleThreshold,
-                'ResamplerA': self.ResamplerA,
-                'PHGPrefactor': self.PGHPrefactor,
-                'ConfigLatex': self.LatexConfig,
-                'Time': time_taken,
-                'QID': self.Q_id,
-                'ChampID': self.ChampID,
-                'QuadraticLosses': mod.QuadraticLosses,
-                'RSquaredTrueModel': mod.r_squared(
-                    plot_probes=self.PlotProbes,
-                    times=expec_val_plot_times
-                ),
-                'NameAlphabetical': database_framework.alph(mod.Name),
-                'LearnedParameters': mod.LearnedParameters,
-                'FinalSigmas': mod.FinalSigmas,
-                'TrackParameterEstimates': mod.TrackParameterEstimates,
-                'TrackVolume': mod.VolumeList,
-                'TrackTimesLearned': mod.Times,
-                # 'TrackCovarianceMatrices' : mod.TrackCovMatrices,
-                'ExpectationValues': mod.expectation_values,
-                # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
-                #     times = expec_val_plot_times,
-                #     plot_probes = self.PlotProbes
-                # ),
-                # 'FinalRSquared' : mod.final_r_squared,
-                'FinalRSquared': mod.r_squared(
-                    plot_probes=self.PlotProbes,
-                    times=expec_val_plot_times
-                ),
-                'p-value': mod.p_value,
-                'Fscore': self.FScore,
-                'Precision': self.Precision,
-                'Sensitivity': self.Sensitivity,
-                'LearnedHamiltonian': mod.LearnedHamiltonian,
-                'GrowthGenerator': mod.GrowthGenerator,
-                'Heuristic': mod.HeuristicType,
-                'ChampLatex': mod.LatexTerm
-            }
-            self.ModelIDNames = {}
-            for k in self.ModelNameIDs:
-                v = self.ModelNameIDs[k]
-                self.ModelIDNames[v] = k
-
     def inspect_remote_job_crashes(self):
         if self.RedisDataBases['any_job_failed']['Status'] == b'1':
             # TODO better way to detect errors? For some reason the
@@ -2449,275 +2159,6 @@ class QuantumModelLearningAgent():
             )
             raise NameError('Remote QML Failure')
 
-    def run_complete_qmla(
-        self,
-        num_exp=40,
-        num_spawns=1,
-        max_branches=None,
-        max_num_qubits=None,
-        max_num_models=None,
-        spawn=True,
-        just_given_models=False
-    ):
-
-        # print("[QMD runMult] start")
-        active_branches_learning_models = (
-            self.RedisDataBases['active_branches_learning_models']
-        )
-        active_branches_bayes = self.RedisDataBases['active_branches_bayes']
-
-        print("[QMD] Going to learn initial models from branches.")
-
-        if self.NumTrees > 1:
-            for i in list(self.BranchModels.keys()):
-                # print("[QMD runMult] launching branch ", i)
-                # ie initial branches
-                self.learn_models_on_given_branch(
-                    i,
-                    blocking=False,
-                    use_rq=True
-                )
-                while(
-                    int(active_branches_learning_models.get(i))
-                        < self.NumModelsPerBranch[i]
-                ):
-                    # don't do comparisons till all models on this branch are
-                    # done
-                    sleep(0.1)
-                    # print("num models learned on br", i,
-                    #     ":", int(active_branches_learning_models[i])
-                    # )
-                self.BranchAllModelsLearned[i] = True
-                self.get_bayes_factors_by_branch_id(i)
-                while (
-                    int(active_branches_bayes.get(i))
-                        < self.NumModelPairsPerBranch[i]
-                ):  # bayes comparisons not done
-                    # print(
-                    #     "num comparisons complete br", i,
-                    #     ":", int(active_branches_bayes[i]),
-                    #     "should be",
-                    #     self.NumModelPairsPerBranch[i]
-                    # )
-                    sleep(0.1)
-                # self.BranchComparisonsComplete[i] = True
-                self.log_print(
-                    [
-                        "Models computed and compared for branch",
-                        i
-                    ]
-                )
-        else:
-            for i in list(self.BranchModels.keys()):
-                # print("[QMD runMult] launching branch ", i)
-                # ie initial branches
-                self.learn_models_on_given_branch(
-                    i,
-                    blocking=False,
-                    use_rq=True
-                )
-
-        max_spawn_depth_reached = False
-        all_comparisons_complete = False
-
-        branch_ids_on_db = list(
-            active_branches_learning_models.keys()
-        )
-        self.log_print(
-            [
-                "Entering while loop of spawning/comparing."
-            ]
-        )
-        # while max_spawn_depth_reached==False:
-        while self.NumTreesCompleted < self.NumTrees:
-            branch_ids_on_db = list(
-                active_branches_learning_models.keys()
-            )
-
-            # print("[QMD] branches:", branch_ids_on_db)
-            self.inspect_remote_job_crashes()
-
-            for branchID_bytes in branch_ids_on_db:
-                branchID = int(branchID_bytes)
-                # print(
-                #     "\n\tactive learning:",
-                #     active_branches_learning_models.get(branchID),
-                #     "\n\tnum mods on branch",
-                #     self.NumModelsPerBranch[branchID],
-                #     "\n\tall learned:",
-                #     self.BranchAllModelsLearned[branchID]
-                # )
-
-                # print("[QMD] considering branch:", branchID)
-                if (
-                    int(
-                        active_branches_learning_models.get(
-                            branchID)
-                    ) == self.NumModelsPerBranch[branchID]
-                    and
-                    self.BranchAllModelsLearned[branchID] == False
-                ):
-                    self.log_print([
-                        "All models on branch",
-                        branchID,
-                        "have finished learning."]
-                    )
-                    self.BranchAllModelsLearned[branchID] = True
-                    models_this_branch = self.BranchModelIds[branchID]
-                    for mod_id in models_this_branch:
-                        mod = self.get_model_storage_instance_by_id(mod_id)
-                        mod.updateLearnedValues(
-                            # fitness_parameters = self.FitnessParameters
-                        )
-
-                    self.get_bayes_factors_by_branch_id(branchID)
-
-            for branchID_bytes in active_branches_bayes.keys():
-
-                branchID = int(branchID_bytes)
-                bayes_calculated = active_branches_bayes.get(
-                    branchID_bytes
-                )
-
-                if (int(bayes_calculated) ==
-                        self.NumModelPairsPerBranch[branchID]
-                            and
-                        self.BranchComparisonsComplete[branchID] == False
-                        ):
-                    self.BranchComparisonsComplete[branchID] = True
-                    self.compare_all_models_in_branch(branchID)
-                    # print("[QMD] getting growth rule for branchID", branchID)
-                    # print("[QMD] dict:", self.Branchget_growth_rule)
-                    this_branch_growth_rule = self.Branchget_growth_rule[branchID]
-                    if self.TreesCompleted[this_branch_growth_rule] == False:
-                        print(
-                            "not finished tree for growth:",
-                            this_branch_growth_rule
-                        )
-
-                        growth_rule_tree_complete = self.spawn_from_branch(
-                            # will return True if this brings it to
-                            # self.MaxSpawnDepth
-                            branchID=branchID,
-                            growth_rule=this_branch_growth_rule,
-                            num_models=1
-                        )
-
-                        if (
-                            growth_rule_tree_complete == True
-                        ):
-                            self.TreesCompleted[this_branch_growth_rule] = True
-                            self.NumTreesCompleted += 1
-                            print(
-                                "[QMD] Num trees now completed:",
-                                self.NumTreesCompleted,
-                                "Tree completed dict:",
-                                self.TreesCompleted
-                            )
-                            max_spawn_depth_reached = True
-                    else:
-                        print(
-                            "\n\n\nFinished tree for growth:",
-                            this_branch_growth_rule
-                        )
-                # elif self.BranchComparisonsComplete[branchID]==False:
-                #     print(
-                #         "branchID:", branchID,
-                #         "num finished:",
-                #         int(bayes_calculated),
-                #         "NumModelPairsPerBranch:",
-                #         self.NumModelPairsPerBranch[branchID],
-                #         "BranchComparisonsComplete",
-                #         self.BranchComparisonsComplete[branchID]
-                #     )
-
-        self.log_print(
-            [
-                "All trees have completed.",
-                "Num complete:",
-                self.NumTreesCompleted
-            ]
-        )
-        # let any branches which have just started finish before moving to
-        # analysis
-        still_learning = True
-
-        while still_learning:
-            branch_ids_on_db = list(active_branches_learning_models.keys())
-            # branch_ids_on_db.remove(b'LOCKED')
-            for branchID_bytes in branch_ids_on_db:
-                branchID = int(branchID_bytes)
-                if (
-                    (int(active_branches_learning_models.get(branchID)) ==
-                     self.NumModelsPerBranch[branchID])
-                    and
-                    (self.BranchAllModelsLearned[branchID] == False)
-                ):
-                    self.BranchAllModelsLearned[branchID] = True
-                    self.get_bayes_factors_by_branch_id(branchID)
-
-                if branchID_bytes in active_branches_bayes:
-                    num_bayes_done_on_branch = (
-                        active_branches_bayes.get(branchID_bytes)
-                    )
-                    # print(
-                    #     "branch", branchID,
-                    #     "num complete:", num_bayes_done_on_branch
-                    # )
-                    if (int(num_bayes_done_on_branch) ==
-                            self.NumModelPairsPerBranch[branchID] and
-                            self.BranchComparisonsComplete[branchID] == False
-                        ):
-                        self.BranchComparisonsComplete[branchID] = True
-                        self.compare_all_models_in_branch(branchID)
-
-            if (
-                np.all(
-                    np.array(list(self.BranchAllModelsLearned.values()))
-                    == True
-                )
-                and
-                np.all(np.array(list(
-                    self.BranchComparisonsComplete.values())) == True
-                )
-            ):
-                still_learning = False  # i.e. break out of this while loop
-
-        print("[QMD runRemoteMult] Finalising QMD.")
-        final_winner, final_branch_winners = self.perform_final_bayes_comparisons()
-        self.ChampionName = final_winner
-        self.ChampID = self.get_model_data_by_field(
-            name=final_winner,
-            field='ModelID'
-        )
-
-        # Check if final winner has parameters close to 0; potentially change
-        # champ
-        self.update_database_model_info()
-
-        if (
-            self.GrowthClass.check_champion_reducibility == True
-            and
-            self.GrowthClass.tree_completed_initially == False
-        ):
-            self.check_champion_reducibility()
-
-        self.log_print(
-            [
-                "Final winner = ", self.ChampionName
-            ]
-        )
-
-        if self.ChampionName == database_framework.alph(self.TrueOpName):
-            self.log_print(
-                [
-                    "True model found: {}".format(
-                        database_framework.alph(self.TrueOpName)
-                    )
-                ]
-            )
-
-        self.finalise_qmla()
 
     def finalise_qmla(self):
         # Final functions at end of QMD
@@ -3063,17 +2504,571 @@ class QuantumModelLearningAgent():
                 ]
             )
 
-    def update_database_model_info(self):
-        for mod_id in range(self.HighestModelID):
-            try:
-                # TODO remove this try/except when reduced-champ-model instance
-                # is update-able
-                mod = self.get_model_storage_instance_by_id(mod_id)
-                mod.updateLearnedValues(
-                    fitness_parameters=self.FitnessParameters
+    ##########
+    # Section: Run available algorithms
+    ##########
+
+    def run_quantum_hamiltonian_learning(self):
+
+        if (
+            self.QHLmode == True
+            and
+            self.TrueOpName not in list(self.ModelsBranches.keys())
+        ):
+            self.new_branch(
+                growth_rule=self.GrowthGenerator,
+                model_list=[self.TrueOpName]
+            )
+
+        mod_to_learn = self.TrueOpName
+        self.log_print(
+            [
+                "QHL test on:", mod_to_learn
+            ]
+        )
+
+        self.learn_model(
+            model_name=mod_to_learn,
+            use_rq=self.use_rq,
+            blocking=True
+        )
+
+        mod_id = database_framework.model_id_from_name(
+            db=self.db,
+            name=mod_to_learn
+        )
+        self.TrueOpModelID = mod_id
+        self.ChampID = mod_id
+        self.log_print(
+            [
+                "Learned:",
+                mod_to_learn,
+                ". ID=",
+                mod_id
+            ]
+        )
+        mod = self.get_model_storage_instance_by_id(mod_id)
+        self.log_print(["Mod (reduced) name:", mod.Name])
+        mod.updateLearnedValues(
+            # fitness_parameters = self.FitnessParameters
+        )
+
+        n_qubits = database_framework.get_num_qubits(mod.Name)
+        if n_qubits > 3:
+            # only compute subset of points for plot
+            # otherwise takes too long
+            self.log_print(
+                [
+                    "getting new set of times to plot expectation values for"
+                ]
+            )
+            expec_val_plot_times = self.ReducedPlotTimes
+        else:
+            self.log_print(
+                [
+                    "Using default times to plot expectation values for",
+                    "num qubits:", n_qubits
+                ]
+            )
+            expec_val_plot_times = self.PlotTimes
+
+        self.log_print(
+            [
+                "times to plot for expetation values:",
+                expec_val_plot_times
+            ]
+        )
+
+        mod.compute_expectation_values(
+            times=expec_val_plot_times,
+            # plot_probe_path = self.PlotProbeFile
+        )
+        self.log_print(
+            [
+                "Finished computing expectation values for", mod.Name,
+                mod.expectation_values
+            ]
+        )
+
+        self.compute_f_score(
+            model_id=mod_id
+        )
+
+        # TODO write single QHL test
+        time_now = time.time()
+        time_taken = time_now - self.StartingTime
+#        true_model_r_squared = self.get_model_storage_instance_by_id(self.TrueOpModelID).r_squared()
+
+        self.ResultsDict = {
+            'NumParticles': self.NumParticles,
+            'NumExperiments': mod.NumExperiments,
+            'NumBayesTimes': self.NumTimesForBayesUpdates,
+            'ResampleThreshold': self.ResampleThreshold,
+            'ResamplerA': self.ResamplerA,
+            'PHGPrefactor': self.PGHPrefactor,
+            'ConfigLatex': self.LatexConfig,
+            'Time': time_taken,
+            'QID': self.Q_id,
+            'RSquaredTrueModel': mod.r_squared(
+                times=expec_val_plot_times,
+                plot_probes=self.PlotProbes
+            ),
+            'QuadraticLosses': mod.QuadraticLosses,
+            'NameAlphabetical': database_framework.alph(mod.Name),
+            'LearnedParameters': mod.LearnedParameters,
+            'FinalSigmas': mod.FinalSigmas,
+            'TrackParameterEstimates': mod.TrackParameterEstimates,
+            'TrackVolume': mod.VolumeList,
+            'TrackTimesLearned': mod.Times,
+            # 'TrackCovarianceMatrices' : mod.TrackCovMatrices,
+            'ExpectationValues': mod.expectation_values,
+            # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
+            #     times = expec_val_plot_times,
+            #     plot_probes = self.PlotProbes
+            # ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
+            # 'FinalRSquared' : mod.final_r_squared,
+            # 'FinalRSquared' : mod.r_squared(
+            #     plot_probes = self.PlotProbes,
+            #     times = expec_val_plot_times
+            # ),
+            'FinalRSquared': mod.final_r_squared,
+            'Fscore': self.FScore,
+            'Precision': self.Precision,
+            'Sensitivity': self.Sensitivity,
+            'p-value': mod.p_value,
+            'LearnedHamiltonian': mod.LearnedHamiltonian,
+            'GrowthGenerator': mod.GrowthGenerator,
+            'Heuristic': mod.HeuristicType,
+            'ChampLatex': mod.LatexTerm,
+        }
+
+        self.log_print(
+            [
+                "Stored results dict. Finished testQHL function"
+            ]
+        )
+
+    def run_quantum_hamiltonian_learning_multiple_models(self, model_names=None):
+        if model_names is None:
+            model_names = self.InitialOpList
+
+        current_models = list(
+            self.ModelsBranches.keys()
+        )
+        self.log_print(
+            [
+                "Model Names for multiple QHL:", model_names,
+                "current models:", current_models
+            ]
+        )
+        models_to_add = []
+        for mod in model_names:
+            if mod not in current_models:
+                models_to_add.append(mod)
+        if len(models_to_add) > 0:
+            self.new_branch(
+                growth_rule=self.GrowthGenerator,
+                model_list=models_to_add
+            )
+        self.multiQHLMode = True
+        self.ChampID = -1,  # TODO just so not to crash during dynamics plot
+        self.multiQHL_model_ids = [
+            database_framework.model_id_from_name(
+                db=self.db,
+                name=mod_name
+            ) for mod_name in model_names
+        ]
+
+        self.log_print(
+            [
+                'run multiple QHL. names:', model_names,
+                "model ids:", self.multiQHL_model_ids
+            ]
+        )
+
+        learned_models_ids = self.RedisDataBases['learned_models_ids']
+
+        for mod_name in model_names:
+            print("Trying to get mod id for", mod_name)
+            mod_id = database_framework.model_id_from_name(
+                db=self.db,
+                name=mod_name
+            )
+            learned_models_ids.set(
+                str(mod_id), 0
+            )
+            self.learn_model(
+                model_name=mod_name,
+                use_rq=self.use_rq,
+                blocking=False
+            )
+
+        running_models = learned_models_ids.keys()
+        self.log_print(
+            [
+                'Running Models:', running_models,
+            ]
+        )
+        for k in running_models:
+            while int(learned_models_ids.get(k)) != 1:
+                sleep(0.01)
+                self.inspect_remote_job_crashes()
+
+        self.log_print(
+            [
+                'Finished waiting on queue, for all:', running_models,
+            ]
+        )
+        time_now = time.time()
+        time_taken = time_now - self.StartingTime
+        for mod_name in model_names:
+            mod_id = database_framework.model_id_from_name(
+                db=self.db, name=mod_name
+            )
+            mod = self.get_model_storage_instance_by_id(mod_id)
+            mod.updateLearnedValues(
+                fitness_parameters=self.FitnessParameters
+            )
+            self.compute_f_score(
+                model_id=mod_id
+            )
+
+            n_qubits = database_framework.get_num_qubits(mod.Name)
+            if n_qubits > 5:
+                # only compute subset of points for plot
+                # otherwise takes too long
+                self.log_print(
+                    [
+                        "getting new set of times to plot expectation values for"
+                    ]
                 )
-            except BaseException:
-                pass
+                expec_val_plot_times = self.ReducedPlotTimes
+            else:
+                self.log_print(
+                    [
+                        "Using default times to plot expectation values for",
+                        "num qubits:", n_qubits
+                    ]
+                )
+                expec_val_plot_times = self.PlotTimes
+
+            mod.compute_expectation_values(
+                times=expec_val_plot_times,
+                # plot_probe_path = self.PlotProbeFile
+            )
+            # equivalent to self.ResultsDict
+            mod.results_dict = {
+                'NumParticles': mod.NumParticles,
+                'NumExperiments': mod.NumExperiments,
+                'NumBayesTimes': self.NumTimesForBayesUpdates,
+                'ResampleThreshold': self.ResampleThreshold,
+                'ResamplerA': self.ResamplerA,
+                'PHGPrefactor': self.PGHPrefactor,
+                'ConfigLatex': self.LatexConfig,
+                'Time': time_taken,
+                'QID': self.Q_id,
+                'ChampID': self.ChampID,
+                'QuadraticLosses': mod.QuadraticLosses,
+                'RSquaredTrueModel': mod.r_squared(
+                    plot_probes=self.PlotProbes,
+                    times=expec_val_plot_times
+                ),
+                'NameAlphabetical': database_framework.alph(mod.Name),
+                'LearnedParameters': mod.LearnedParameters,
+                'FinalSigmas': mod.FinalSigmas,
+                'TrackParameterEstimates': mod.TrackParameterEstimates,
+                'TrackVolume': mod.VolumeList,
+                'TrackTimesLearned': mod.Times,
+                # 'TrackCovarianceMatrices' : mod.TrackCovMatrices,
+                'ExpectationValues': mod.expectation_values,
+                # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
+                #     times = expec_val_plot_times,
+                #     plot_probes = self.PlotProbes
+                # ),
+                # 'FinalRSquared' : mod.final_r_squared,
+                'FinalRSquared': mod.r_squared(
+                    plot_probes=self.PlotProbes,
+                    times=expec_val_plot_times
+                ),
+                'p-value': mod.p_value,
+                'Fscore': self.FScore,
+                'Precision': self.Precision,
+                'Sensitivity': self.Sensitivity,
+                'LearnedHamiltonian': mod.LearnedHamiltonian,
+                'GrowthGenerator': mod.GrowthGenerator,
+                'Heuristic': mod.HeuristicType,
+                'ChampLatex': mod.LatexTerm
+            }
+            self.ModelIDNames = {}
+            for k in self.ModelNameIDs:
+                v = self.ModelNameIDs[k]
+                self.ModelIDNames[v] = k
+
+
+    def run_complete_qmla(
+        self,
+        num_exp=40,
+        num_spawns=1,
+        max_branches=None,
+        max_num_qubits=None,
+        max_num_models=None,
+        spawn=True,
+        just_given_models=False
+    ):
+
+        # print("[QMD runMult] start")
+        active_branches_learning_models = (
+            self.RedisDataBases['active_branches_learning_models']
+        )
+        active_branches_bayes = self.RedisDataBases['active_branches_bayes']
+
+        print("[QMD] Going to learn initial models from branches.")
+
+        if self.NumTrees > 1:
+            for i in list(self.BranchModels.keys()):
+                # print("[QMD runMult] launching branch ", i)
+                # ie initial branches
+                self.learn_models_on_given_branch(
+                    i,
+                    blocking=False,
+                    use_rq=True
+                )
+                while(
+                    int(active_branches_learning_models.get(i))
+                        < self.NumModelsPerBranch[i]
+                ):
+                    # don't do comparisons till all models on this branch are
+                    # done
+                    sleep(0.1)
+                    # print("num models learned on br", i,
+                    #     ":", int(active_branches_learning_models[i])
+                    # )
+                self.BranchAllModelsLearned[i] = True
+                self.get_bayes_factors_by_branch_id(i)
+                while (
+                    int(active_branches_bayes.get(i))
+                        < self.NumModelPairsPerBranch[i]
+                ):  # bayes comparisons not done
+                    # print(
+                    #     "num comparisons complete br", i,
+                    #     ":", int(active_branches_bayes[i]),
+                    #     "should be",
+                    #     self.NumModelPairsPerBranch[i]
+                    # )
+                    sleep(0.1)
+                # self.BranchComparisonsComplete[i] = True
+                self.log_print(
+                    [
+                        "Models computed and compared for branch",
+                        i
+                    ]
+                )
+        else:
+            for i in list(self.BranchModels.keys()):
+                # print("[QMD runMult] launching branch ", i)
+                # ie initial branches
+                self.learn_models_on_given_branch(
+                    i,
+                    blocking=False,
+                    use_rq=True
+                )
+
+        max_spawn_depth_reached = False
+        all_comparisons_complete = False
+
+        branch_ids_on_db = list(
+            active_branches_learning_models.keys()
+        )
+        self.log_print(
+            [
+                "Entering while loop of spawning/comparing."
+            ]
+        )
+        # while max_spawn_depth_reached==False:
+        while self.NumTreesCompleted < self.NumTrees:
+            branch_ids_on_db = list(
+                active_branches_learning_models.keys()
+            )
+
+            # print("[QMD] branches:", branch_ids_on_db)
+            self.inspect_remote_job_crashes()
+
+            for branchID_bytes in branch_ids_on_db:
+                branchID = int(branchID_bytes)
+                # print(
+                #     "\n\tactive learning:",
+                #     active_branches_learning_models.get(branchID),
+                #     "\n\tnum mods on branch",
+                #     self.NumModelsPerBranch[branchID],
+                #     "\n\tall learned:",
+                #     self.BranchAllModelsLearned[branchID]
+                # )
+
+                # print("[QMD] considering branch:", branchID)
+                if (
+                    int(
+                        active_branches_learning_models.get(
+                            branchID)
+                    ) == self.NumModelsPerBranch[branchID]
+                    and
+                    self.BranchAllModelsLearned[branchID] == False
+                ):
+                    self.log_print([
+                        "All models on branch",
+                        branchID,
+                        "have finished learning."]
+                    )
+                    self.BranchAllModelsLearned[branchID] = True
+                    models_this_branch = self.BranchModelIds[branchID]
+                    for mod_id in models_this_branch:
+                        mod = self.get_model_storage_instance_by_id(mod_id)
+                        mod.updateLearnedValues(
+                            # fitness_parameters = self.FitnessParameters
+                        )
+
+                    self.get_bayes_factors_by_branch_id(branchID)
+
+            for branchID_bytes in active_branches_bayes.keys():
+
+                branchID = int(branchID_bytes)
+                bayes_calculated = active_branches_bayes.get(
+                    branchID_bytes
+                )
+
+                if (int(bayes_calculated) ==
+                        self.NumModelPairsPerBranch[branchID]
+                            and
+                        self.BranchComparisonsComplete[branchID] == False
+                        ):
+                    self.BranchComparisonsComplete[branchID] = True
+                    self.compare_all_models_in_branch(branchID)
+                    # print("[QMD] getting growth rule for branchID", branchID)
+                    # print("[QMD] dict:", self.Branchget_growth_rule)
+                    this_branch_growth_rule = self.Branchget_growth_rule[branchID]
+                    if self.TreesCompleted[this_branch_growth_rule] == False:
+                        print(
+                            "not finished tree for growth:",
+                            this_branch_growth_rule
+                        )
+
+                        growth_rule_tree_complete = self.spawn_from_branch(
+                            # will return True if this brings it to
+                            # self.MaxSpawnDepth
+                            branchID=branchID,
+                            growth_rule=this_branch_growth_rule,
+                            num_models=1
+                        )
+
+                        if (
+                            growth_rule_tree_complete == True
+                        ):
+                            self.TreesCompleted[this_branch_growth_rule] = True
+                            self.NumTreesCompleted += 1
+                            print(
+                                "[QMD] Num trees now completed:",
+                                self.NumTreesCompleted,
+                                "Tree completed dict:",
+                                self.TreesCompleted
+                            )
+                            max_spawn_depth_reached = True
+                    else:
+                        print(
+                            "\n\n\nFinished tree for growth:",
+                            this_branch_growth_rule
+                        )
+
+        self.log_print(
+            [
+                "All trees have completed.",
+                "Num complete:",
+                self.NumTreesCompleted
+            ]
+        )
+        # let any branches which have just started finish before moving to
+        # analysis
+        still_learning = True
+
+        while still_learning:
+            branch_ids_on_db = list(active_branches_learning_models.keys())
+            # branch_ids_on_db.remove(b'LOCKED')
+            for branchID_bytes in branch_ids_on_db:
+                branchID = int(branchID_bytes)
+                if (
+                    (int(active_branches_learning_models.get(branchID)) ==
+                     self.NumModelsPerBranch[branchID])
+                    and
+                    (self.BranchAllModelsLearned[branchID] == False)
+                ):
+                    self.BranchAllModelsLearned[branchID] = True
+                    self.get_bayes_factors_by_branch_id(branchID)
+
+                if branchID_bytes in active_branches_bayes:
+                    num_bayes_done_on_branch = (
+                        active_branches_bayes.get(branchID_bytes)
+                    )
+                    # print(
+                    #     "branch", branchID,
+                    #     "num complete:", num_bayes_done_on_branch
+                    # )
+                    if (int(num_bayes_done_on_branch) ==
+                            self.NumModelPairsPerBranch[branchID] and
+                            self.BranchComparisonsComplete[branchID] == False
+                        ):
+                        self.BranchComparisonsComplete[branchID] = True
+                        self.compare_all_models_in_branch(branchID)
+
+            if (
+                np.all(
+                    np.array(list(self.BranchAllModelsLearned.values()))
+                    == True
+                )
+                and
+                np.all(np.array(list(
+                    self.BranchComparisonsComplete.values())) == True
+                )
+            ):
+                still_learning = False  # i.e. break out of this while loop
+
+        print("[QMD runRemoteMult] Finalising QMD.")
+        final_winner, final_branch_winners = self.perform_final_bayes_comparisons()
+        self.ChampionName = final_winner
+        self.ChampID = self.get_model_data_by_field(
+            name=final_winner,
+            field='ModelID'
+        )
+
+        # Check if final winner has parameters close to 0; potentially change
+        # champ
+        self.update_database_model_info()
+
+        if (
+            self.GrowthClass.check_champion_reducibility == True
+            and
+            self.GrowthClass.tree_completed_initially == False
+        ):
+            self.check_champion_reducibility()
+
+        self.log_print(
+            [
+                "Final winner = ", self.ChampionName
+            ]
+        )
+
+        if self.ChampionName == database_framework.alph(self.TrueOpName):
+            self.log_print(
+                [
+                    "True model found: {}".format(
+                        database_framework.alph(self.TrueOpName)
+                    )
+                ]
+            )
+
+        self.finalise_qmla()
+
+
+    ##########
+    # Section: Analysis/plotting functions
+    ##########
 
     def compute_f_score(
         self,
@@ -3224,24 +3219,6 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file,
         )
 
-    # def plotDistributionProgression(self,
-    #                                 show_means=True,
-    #                                 model_id=None,
-    #                                 num_steps_to_show=2,
-    #                                 renormalise=True,
-    #                                 true_model=True,
-    #                                 save_to_file=None
-    #                                 ):
-    #     qmla.analysis.plotDistributionProgression(
-    #         qmd=self,
-    #         model_id=model_id,
-    #         show_means=show_means,
-    #         renormalise=renormalise,
-    #         num_steps_to_show=num_steps_to_show,
-    #         true_model=true_model,
-    #         save_to_file=save_to_file
-    #     )
-
     def plot_volume_after_qhl(self,
                       model_id=None,
                       true_model=True,
@@ -3316,6 +3293,11 @@ class QuantumModelLearningAgent():
             print(vec)
             bloch.add_states(vec)
         bloch.show()
+
+
+##########
+# Section: Miscellaneous functions called within QMLA
+##########
 
 
 def num_pairs_in_list(num_models):

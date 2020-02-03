@@ -36,44 +36,26 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 ### ---------------------------------------------------###
 
 # Simulation growth rule
-#sim_growth_rule='two_qubit_ising_rotation_hyperfine'
-#sim_growth_rule='NV_centre_spin_large_bath'
-#sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-#sim_growth_rule='NV_centre_spin_large_bath'
-#sim_growth_rule='ising_1d_chain'
-#sim_growth_rule='ising_multi_axis'
-#sim_growth_rule='heisenberg_xyz'
-#sim_growth_rule='hubbard_square_lattice_generalised'
-#sim_growth_rule='hopping_topology'
-#sim_growth_rule='NV_centre_spin_large_bath'
-#sim_growth_rule='probabilistic_spin'
-#sim_growth_rule='pairwise_pauli_probabilistic_nearest_neighbour'
-#sim_growth_rule='hopping_probabilistic'
-#sim_growth_rule='hopping_predetermined'
-#sim_growth_rule='ising_probabilistic'
-#sim_growth_rule='ising_predetermined'
-#sim_growth_rule='HeisenbergXYZProbabilistic'
-sim_growth_rule='HeisenbergXYZPredetermined'
+sim_growth_rule='IsingProbabilistic'
+# sim_growth_rule='IsingPredetermined'
+# sim_growth_rule='HeisenbergXYZPredetermined'
+# sim_growth_rule='HeisenbergXYZProbabilistic'
+# sim_growth_rule='FermiHubbardPredetermined'
+# sim_growth_rule='FermiHubbardProbabilistic'
+# sim_growth_rule='Genetic'
+# sim_growth_rule='Presentation'
 
+### Experimental growth rules 
+### which will overwrite growth_rule if exp_data==1
 
-
-
-# Experimental growth rules
-#experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-#experimental_growth_rule='nv_experiment_vary_model'
-experimental_growth_rule='nv_experiment_vary_model_7_params'
-#experimental_growth_rule='two_qubit_ising_rotation_hyperfine'
-#experimental_growth_rule='NV_alternative_model'
-#experimental_growth_rule='NV_alternative_model_2'
-#experimental_growth_rule='NV_centre_revivals'
-#experimental_growth_rule='NV_spin_full_access'
-#experimental_growth_rule='NV_centre_spin_large_bath'
-#experimental_growth_rule='NV_centre_experiment_debug'
-#experimental_growth_rule='ExperimentReducedNV'
-#experimental_growth_rule='NV_fitness_growth'
-
-
-#experimental_growth_rule='PT_Effective_Hamiltonian'
+exp_growth_rule='ExperimentNVCentre'
+# exp_growth_rule='ExperimentNVCentreNoTransvereTerms'
+# exp_growth_rule='ExpAlternativeNV'
+# exp_growth_rule='ExperimentFullAccessNV'
+# exp_growth_rule='NVLargeSpinBath'
+# exp_growth_rule='ExperimentNVCentreVaryTrueModel'
+# exp_growth_rule='ExpNVRevivals'
+# exp_growth_rule='ExperimentReducedNV'
 
 # Choose a growth rule
 if (( "$experimental_data" == 1)) || (( "$simulate_experiment" == 1))
@@ -85,13 +67,9 @@ fi
 
 # Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_growth_rules set to 1 above
 alt_growth_rules=(  
-#	'ising_1d_chain'
-#	'hubbard_square_lattice_generalised'
-#	'hopping_probabilistic'
-#	'ising_probabilistic'
-	'ising_predetermined' 
+	'IsingPredetermined' 
 	'HeisenbergXYZPredetermined'
-	'hopping_predetermined'
+	'FermiHubbardPredetermined'
 )
 growth_rules_command=""
 for item in ${alt_growth_rules[*]}
@@ -144,7 +122,7 @@ running_dir="$(pwd)"
 #qmd_dir="${running_dir%/ParallelDevelopment}" # chop off ParallelDevelopment to get qmd folder path
 qmd_dir="${running_dir%/Launch}" # chop off ParallelDevelopment to get qmd folder path
 lib_dir="$qmd_dir/Libraries/QML_lib"
-script_dir="$qmd_dir/ExperimentalSimulations"
+script_dir="$qmd_dir/Scripts"
 results_dir=$day_time
 full_path_to_results=$(pwd)/Results/$results_dir
 all_qmd_bayes_csv="$full_path_to_results/cumulative.csv"
@@ -256,7 +234,8 @@ then
 fi
 
 ### First set up parameters/data to be used by all instances of QMD for this run. 
-python3 ../qmla/SetQHLParams.py \
+# python3 ../qmla/SetQHLParams.py \
+python3 ../Scripts/set_qmla_params.py \
 	-true=$true_params_pickle_file \
 	-prior=$prior_pickle_file \
 	-probe=$plot_probe_file \
@@ -279,7 +258,7 @@ python3 ../qmla/SetQHLParams.py \
 
 ### Call script to determine how much time is needed based on above params. Store in QMD_TIME, QHL_TIME, etc. 
 let temp_bayes_times="2*$e" # TODO fix time calculator
-python3 ../qmla/time_required_calculation.py \
+python3 ../Scripts/time_required_calculation.py \
 	-ggr=$growth_rule \
 	-use_agr=$multiple_growth_rules \
 	$growth_rules_command \
@@ -375,8 +354,8 @@ finalise_further_qhl_stage_script=$full_path_to_results/FURTHER_finalise.sh
 ### Generate script to analyse results of QMD runs. 
 echo "
 #!/bin/bash 
-cd $lib_dir
-python3 AnalyseMultipleQMD.py \
+cd $script_dir
+python3 analyse_qmla.py \
 	-dir="$full_path_to_results" \
 	-log=$multi_qmd_log \
 	--bayes_csv=$all_qmd_bayes_csv \
@@ -390,7 +369,7 @@ python3 AnalyseMultipleQMD.py \
 	-latex=$latex_mapping_file \
 	-ggr=$growth_rule
 
-python3 CombineAnalysisPlots.py \
+python3 generate_results_pdf.py \
     -dir=$full_path_to_results \
     -p=$p -e=$e -bt=$bt -t=$num_tests \
     -nprobes=$num_probes \
@@ -436,8 +415,8 @@ fi
 
 echo "
 	#!/bin/bash 
-	cd $lib_dir
-	python3 AnalyseMultipleQMD.py \
+	cd $script_dir
+	python3 analyse_qmla.py \
 		-dir="$full_path_to_results" \
 		-log=$multi_qmd_log \
 		--bayes_csv=$all_qmd_bayes_csv \
@@ -451,7 +430,7 @@ echo "
 		-ggr=$growth_rule \
 		-plot_probes=$plot_probe_file
 
-	python3 CombineAnalysisPlots.py \
+	python3 generate_results_pdf.py \
 		-dir=$full_path_to_results \
 		-p=$p -e=$e -bt=$bt -t=$num_tests \
 		-nprobes=$num_probes \

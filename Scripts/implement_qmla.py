@@ -332,7 +332,7 @@ qmd = QuantumModelLearningAgent(
 )
 
 if global_variables.qhl_test:
-    qmd.runQHLTest()
+    qmd.run_quantum_hamiltonian_learning()
     log_print(
         [
             "QHL complete",

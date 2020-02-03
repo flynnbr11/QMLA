@@ -94,9 +94,9 @@ then
 	ALT_GROWTH=""
 fi
 sleep 5
-cd $running_dir
-# cd $script_dir
-python3 Exp.py -mqhl=$MULTIPLE_QHL -rq=1 -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -pgh_exp=$PGH_EXPONENT -pgh_incr=$PGH_INCREASE -qid=$QMD_ID -rqt=200000 -g=$GAUSSIAN -exp=$EXP_DATA -qhl=$QHL -fq=$FURTHER_QHL -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -cb=$BAYES_CSV -cpr=$CUSTOM_PRIOR -prtwt=$STORE_PARTICLES_WEIGHTS -dst=$DATA_MAX_TIME -ggr=$GROWTH $ALT_GROWTH -bintimes=$BIN_TIMES_BAYES -bftimesall=$BF_ALL_TIMES -latex=$LATEX_MAP_FILE -nprobes=$NUM_PROBES -prior_path=$PRIOR_FILE -true_params_path=$TRUE_PARAMS_FILE -plot_probes=$PLOT_PROBES -special_probe=$SPECIAL_PROBE -pnoise=$PROBE_NOISE -true_expec_path=$TRUE_EXPEC_PATH -pmin=$PARAM_MIN -pmax=$PARAM_MAX -pmean=$PARAM_MEAN -psigma=$PARAM_SIGMA -resource=$RESOURCE_REALLOCATION --updater_from_prior=$UPDATER_FROM_PRIOR  
+# cd $running_dir
+cd $script_dir
+python3 implement_qmla.py -mqhl=$MULTIPLE_QHL -rq=1 -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -pgh_exp=$PGH_EXPONENT -pgh_incr=$PGH_INCREASE -qid=$QMD_ID -rqt=200000 -g=$GAUSSIAN -exp=$EXP_DATA -qhl=$QHL -fq=$FURTHER_QHL -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -cb=$BAYES_CSV -cpr=$CUSTOM_PRIOR -prtwt=$STORE_PARTICLES_WEIGHTS -dst=$DATA_MAX_TIME -ggr=$GROWTH $ALT_GROWTH -bintimes=$BIN_TIMES_BAYES -bftimesall=$BF_ALL_TIMES -latex=$LATEX_MAP_FILE -nprobes=$NUM_PROBES -prior_path=$PRIOR_FILE -true_params_path=$TRUE_PARAMS_FILE -plot_probes=$PLOT_PROBES -special_probe=$SPECIAL_PROBE -pnoise=$PROBE_NOISE -true_expec_path=$TRUE_EXPEC_PATH -pmin=$PARAM_MIN -pmax=$PARAM_MAX -pmean=$PARAM_MEAN -psigma=$PARAM_SIGMA -resource=$RESOURCE_REALLOCATION --updater_from_prior=$UPDATER_FROM_PRIOR  
 
 
 
