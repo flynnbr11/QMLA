@@ -31,6 +31,10 @@ if (use_linalg):
 
 
 def log_print(to_print_list, log_file, log_identifier):
+    """
+    log_print writes in the log file the string passed as first argument.
+    log_print(to_print_list, log_file, log_identifier)
+    """
     # identifier = str(str(time_seconds()) +" [Expectation Values]")
     if not isinstance(to_print_list, list):
         to_print_list = list(to_print_list)
