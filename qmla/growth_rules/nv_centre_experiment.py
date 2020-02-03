@@ -51,7 +51,7 @@ class ExperimentNVCentre(
         self.tree_completed_initially = False
         self.qhl_models = [
             # 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
-            # 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+            'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
             'xTiPPyTiPPzTiPPzTz',
             'xTiPPyTiPPyTyPPzTiPPzTz',
             # 'yTi'

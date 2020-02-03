@@ -944,7 +944,7 @@ class QuantumModelLearningAgent():
                         model_name
                     ]
                 )
-            self.updateModelRecord(
+            self.update_model_record(
                 field='Completed',
                 name=model_name,
                 new_value=True
@@ -1340,7 +1340,7 @@ class QuantumModelLearningAgent():
 
         return champ
 
-    def updateModelRecord(
+    def update_model_record(
         self,
         field,
         name=None,
@@ -1357,13 +1357,13 @@ class QuantumModelLearningAgent():
             increment=increment
         )
 
-    def pullField(self, name, field):
+    def get_model_data_by_field(self, name, field):
         return database_framework.pull_field(self.db, name, field)
 
-    def statusChangeModel(self, model_name, new_status='Saturated'):
+    def change_model_status(self, model_name, new_status='Saturated'):
         self.db.loc[self.db['<Name>'] == model_name, 'Status'] = new_status
 
-    def compareModelsWithinBranch(
+    def compare_all_models_in_branch(
         self,
         branchID,
         bayes_threshold=None
@@ -1376,7 +1376,7 @@ class QuantumModelLearningAgent():
         active_models_in_branch = self.BranchModelIds[branchID]
         self.log_print(
             [
-                'compareModelsWithinBranch', branchID,
+                'compare_all_models_in_branch', branchID,
                 'active_models_in_branch_old:', active_models_in_branch_old,
                 'active_models_in_branch_new:', active_models_in_branch,
             ]
@@ -1398,7 +1398,7 @@ class QuantumModelLearningAgent():
                     models_points[res] += 1
                     self.log_print(
                         [
-                            "[compareModelsWithinBranch {}]".format(branchID),
+                            "[compare_all_models_in_branch {}]".format(branchID),
                             "Point to", res,
                             "(comparison {}/{})".format(mod1, mod2),
                         ]
@@ -1435,7 +1435,7 @@ class QuantumModelLearningAgent():
                 wait_on_result=True
             )
 
-            champ_id = self.compareModelList(
+            champ_id = self.compare_models_from_list(
                 max_points_branches,
                 bayes_threshold=bayes_threshold,
                 models_points_dict=models_points
@@ -1462,13 +1462,13 @@ class QuantumModelLearningAgent():
                 champ_name]
 
         for model_id in active_models_in_branch:
-            self.updateModelRecord(
+            self.update_model_record(
                 model_id=model_id,
                 field='Status',
                 new_value='Deactivated'
             )
 
-        self.updateModelRecord(
+        self.update_model_record(
             # name=database_framework.model_name_from_id(self.db, champ_id),
             name=self.ModelNameIDs[champ_id],
             field='Status',
@@ -1517,7 +1517,7 @@ class QuantumModelLearningAgent():
             # progress if they lose in a ghost branch.
             for losing_model_id in models_to_deactivate:
                 try:
-                    self.updateModelRecord(
+                    self.update_model_record(
                         model_id=losing_model_id,
                         field='Status',
                         new_value='Deactivated'
@@ -1547,7 +1547,7 @@ class QuantumModelLearningAgent():
                     pass
         return models_points, champ_id
 
-    def compareModelList(
+    def compare_models_from_list(
         self,
         model_list,
         bayes_threshold=None,
@@ -1575,37 +1575,20 @@ class QuantumModelLearningAgent():
                     models_points[res] += 1
                     self.log_print(
                         [
-                            "[compareModelList]",
+                            "[compare_models_from_list]",
                             "Point to", res,
                             "(comparison {}/{})".format(mod1, mod2)
                         ]
                     )
-                    # if res == "a":
-                    #     models_points[mod1] += 1
-                    #     if models_points_dict is not None:
-                    #         models_points_dict[mod1]+=1
-                    # elif res == "b":
-                    #     models_points[mod2]+=1
-                    #     if models_points_dict is not None:
-                    #         models_points_dict[mod2]+=1
-
-                    # self.log_print(
-                    #     [
-                    #     "comparison bw", mod1, mod2,
-                    #     "point to", res
-                    #     ]
-                    # )
 
         max_points = max(models_points.values())
         max_points_branches = [key for key, val in models_points.items()
                                if val == max_points]
         if len(max_points_branches) > 1:
-            # todo: recompare. Fnc: compareListOfModels (rather than branch
-            # based)
             self.log_print(
                 [
                     "Multiple models \
-                    have same number of points in compareModelList:",
+                    have same number of points in compare_models_from_list:",
                     max_points_branches
                 ]
             )
@@ -1624,7 +1607,7 @@ class QuantumModelLearningAgent():
                 bayes_threshold=self.BayesLower,
                 wait_on_result=True
             )
-            champ_id = self.compareModelList(
+            champ_id = self.compare_models_from_list(
                 max_points_branches,
                 bayes_threshold=self.BayesLower
             )
@@ -1636,7 +1619,7 @@ class QuantumModelLearningAgent():
 
         return champ_id
 
-    def finalBayesComparisons(
+    def perform_final_bayes_comparisons(
         self,
         bayes_threshold=None
     ):
@@ -1662,11 +1645,6 @@ class QuantumModelLearningAgent():
             ]
         )
         children_branches = list(self.BranchParents.keys())
-        # for k in range( num_champs - 1 ):
-        # mod1 = branch_champions[k]
-        # mod2 = branch_champions[k+1]
-        # are_both_models_active ?
-
         for child_id in branch_champions:
             # child_id = branch_champions[k]
             # branch this child sits on
@@ -1794,7 +1772,7 @@ class QuantumModelLearningAgent():
                             mod2
                         ]
                     )
-                    self.updateModelRecord(
+                    self.update_model_record(
                         model_id=mod2,
                         field='Status',
                         new_value='Deactivated'
@@ -1813,7 +1791,7 @@ class QuantumModelLearningAgent():
                             mod1
                         ]
                     )
-                    self.updateModelRecord(
+                    self.update_model_record(
                         model_id=mod1,
                         field='Status',
                         new_value='Deactivated'
@@ -1946,7 +1924,7 @@ class QuantumModelLearningAgent():
                             self.BranchComparisonsComplete[branchID] == False
                         ):
                         self.BranchComparisonsComplete[branchID] = True
-                        self.compareModelsWithinBranch(branchID)
+                        self.compare_all_models_in_branch(branchID)
 
             if (
                 np.all(
@@ -2000,7 +1978,7 @@ class QuantumModelLearningAgent():
                     )
                     self.log_print(
                         [
-                            "[finalBayesComparisons]",
+                            "[perform_final_bayes_comparisons]",
                             "Point to", res,
                             "(comparison {}/{})".format(mod1, mod2)
                         ]
@@ -2037,7 +2015,7 @@ class QuantumModelLearningAgent():
                     max_points_branches
                 ]
             )
-            champ_id = self.compareModelList(
+            champ_id = self.compare_models_from_list(
                 max_points_branches,
                 bayes_threshold=self.BayesLower,
                 models_points_dict=branch_champions_points
@@ -2055,135 +2033,14 @@ class QuantumModelLearningAgent():
             self.ModelNameIDs[mod_id]
             for mod_id in active_models
         ]
-        self.statusChangeModel(
+        self.change_model_status(
             champ_name,
             new_status='Active'
         )
         return champ_name, branch_champ_names
 
-    def interBranchChampion(
-        self,
-        branch_list=[],
-        just_active_models=False,
-        global_champion=False,
-        bayes_threshold=None
-    ):
-        if bayes_threshold is None:
-            bayes_threshold = self.BayesLower
-        all_branches = self.db['branchID'].unique()
-        if global_champion == True:
-            branches = all_branches
-        elif just_active_models:
-            # some models turned off intermediately
-            branches = database_framework.all_active_model_ids(self.db)
-        else:
-            branches = branch_list
-        self.log_print(["Branches : ", branches])
 
-        num_branches = len(branches)
-        points_by_branches = [None] * num_branches
-        champions_of_branches = [None] * num_branches
-
-        for i in range(num_branches):
-            branchID = branches[i]
-            if branchID not in all_branches:
-                self.log_print(["branch ID : ", branchID])
-                warnings.warn("branch not in database_framework.")
-                return False
-            points_by_branches[i], champions_of_branches[i] = (
-                self.compareModelsWithinBranch(branchID)
-            )
-
-        self.get_bayes_factors_from_list(
-            model_id_list=champions_of_branches,
-            remote=True,
-            recompute=True,
-            wait_on_result=True,
-            bayes_threshold=bayes_threshold
-        )
-
-        self.log_print(
-            [
-                "All jobs have finished while computing",
-                "interbranch champion"
-            ]
-        )
-        branch_champions_points = {}
-        for c in champions_of_branches:
-            branch_champions_points[c] = 0
-
-        for i in range(num_branches):
-            mod1 = champions_of_branches[i]
-            for j in range(i, num_branches):
-                mod2 = champions_of_branches[j]
-                if mod1 != mod2:
-                    res = self.processRemoteBayesPair(
-                        a=mod1,
-                        b=mod2
-                    )
-                    branch_champions_points[res] += 1
-                    self.log_print(
-                        [
-                            "[interBranchChampion]",
-                            "Point to", res,
-                            "(comparison {}/{})".format(mod1, mod2)
-                        ]
-                    )
-
-                    # if res == "a":
-                    #     branch_champions_points[mod1] += 1
-                    # elif res == "b":
-                    #     branch_champions_points[mod2] += 1
-        self.ranked_champions = sorted(
-            branch_champions_points,
-            reverse=True
-        )
-
-        max_points = max(branch_champions_points.values())
-        max_points_branches = [
-            key for key, val in branch_champions_points.items()
-            if val == max_points
-        ]
-        if len(max_points_branches) > 1:
-            # todo: recompare. Fnc: compareListOfModels (rather than branch
-            # based)
-            self.log_print(
-                [
-                    "No distinct champion;"
-                    "recomputing bayes factors between: ",
-                    max_points_branches
-                ]
-            )
-            champ_id = self.compareModelList(
-                max_points_branches,
-                bayes_threshold=self.BayesLower,
-                models_points_dict=branch_champions_points
-            )
-        else:
-            champ_id = max(
-                branch_champions_points,
-                key=branch_champions_points.get
-            )
-        # champ_name = database_framework.model_name_from_id(self.db, champ_id)
-        champ_name = self.ModelNameIDs[champ_id]
-
-        branch_champ_names = [
-            # database_framework.model_name_from_id(self.db, mod_id)
-            self.ModelNameIDs[mod_id]
-            for mod_id in champions_of_branches
-        ]
-        self.statusChangeModel(
-            champ_name,
-            new_status='Active'
-        )
-
-        interBranchChampListID = len(self.InterBranchChampions)
-        self.InterBranchChampions[interBranchChampListID] = [
-            branches, champ_id
-        ]
-        return champ_name, branch_champ_names
-
-    def spawnFromBranch(
+    def spawn_from_branch(
         self,
         branchID,
         growth_rule,
@@ -2283,12 +2140,6 @@ class QuantumModelLearningAgent():
 
         if self.SpawnStage[growth_rule][-1] == 'Complete':
             tree_completed = True
-        # print(
-        #     "[spawnFromBranch] growth:",
-        #     growth_rule,
-        #     ";tree_completed:",
-        #     tree_completed
-        # )
         return tree_completed
 
     def runQHLTest(self):
@@ -2431,7 +2282,7 @@ class QuantumModelLearningAgent():
             ]
         )
 
-    def runMultipleModelQHL(self, model_names=None):
+    def run_quantum_hamiltonian_learning_multiple_models(self, model_names=None):
         if model_names is None:
             model_names = self.InitialOpList
 
@@ -2598,7 +2449,7 @@ class QuantumModelLearningAgent():
             )
             raise NameError('Remote QML Failure')
 
-    def runRemoteQMD_MULTIPLE_GEN(
+    def run_complete_qmla(
         self,
         num_exp=40,
         num_spawns=1,
@@ -2734,7 +2585,7 @@ class QuantumModelLearningAgent():
                         self.BranchComparisonsComplete[branchID] == False
                         ):
                     self.BranchComparisonsComplete[branchID] = True
-                    self.compareModelsWithinBranch(branchID)
+                    self.compare_all_models_in_branch(branchID)
                     # print("[QMD] getting growth rule for branchID", branchID)
                     # print("[QMD] dict:", self.Branchget_growth_rule)
                     this_branch_growth_rule = self.Branchget_growth_rule[branchID]
@@ -2744,7 +2595,7 @@ class QuantumModelLearningAgent():
                             this_branch_growth_rule
                         )
 
-                        growth_rule_tree_complete = self.spawnFromBranch(
+                        growth_rule_tree_complete = self.spawn_from_branch(
                             # will return True if this brings it to
                             # self.MaxSpawnDepth
                             branchID=branchID,
@@ -2818,7 +2669,7 @@ class QuantumModelLearningAgent():
                             self.BranchComparisonsComplete[branchID] == False
                         ):
                         self.BranchComparisonsComplete[branchID] = True
-                        self.compareModelsWithinBranch(branchID)
+                        self.compare_all_models_in_branch(branchID)
 
             if (
                 np.all(
@@ -2833,23 +2684,23 @@ class QuantumModelLearningAgent():
                 still_learning = False  # i.e. break out of this while loop
 
         print("[QMD runRemoteMult] Finalising QMD.")
-        final_winner, final_branch_winners = self.finalBayesComparisons()
+        final_winner, final_branch_winners = self.perform_final_bayes_comparisons()
         self.ChampionName = final_winner
-        self.ChampID = self.pullField(
+        self.ChampID = self.get_model_data_by_field(
             name=final_winner,
             field='ModelID'
         )
 
         # Check if final winner has parameters close to 0; potentially change
         # champ
-        self.updateDataBaseModelValues()
+        self.update_database_model_info()
 
         if (
             self.GrowthClass.check_champion_reducibility == True
             and
             self.GrowthClass.tree_completed_initially == False
         ):
-            self.checkChampReducibility()
+            self.check_champion_reducibility()
 
         self.log_print(
             [
@@ -2866,9 +2717,9 @@ class QuantumModelLearningAgent():
                 ]
             )
 
-        self.finaliseQMD()
+        self.finalise_qmla()
 
-    def finaliseQMD(self):
+    def finalise_qmla(self):
         # Final functions at end of QMD
         # Fill in champions result dict for further analysis.
 
@@ -3023,7 +2874,7 @@ class QuantumModelLearningAgent():
             'NumParamDifference': num_params_difference,
         }
 
-    def checkChampReducibility(
+    def check_champion_reducibility(
         self,
     ):
         champ_mod = self.get_model_storage_instance_by_id(self.ChampID)
@@ -3212,7 +3063,7 @@ class QuantumModelLearningAgent():
                 ]
             )
 
-    def updateDataBaseModelValues(self):
+    def update_database_model_info(self):
         for mod_id in range(self.HighestModelID):
             try:
                 # TODO remove this try/except when reduced-champ-model instance
@@ -3263,7 +3114,7 @@ class QuantumModelLearningAgent():
 
         return self.FScore
 
-    def plotQuadraticLoss(
+    def plot_branch_champs_quadratic_losses(
         self,
         save_to_file=None,
     ):
@@ -3273,7 +3124,7 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plotVolumes(self, model_id_list=None, branch_champions=False,
+    def plot_branch_champs_volumes(self, model_id_list=None, branch_champions=False,
                     branch_id=None, save_to_file=None
                     ):
 
@@ -3324,14 +3175,14 @@ class QuantumModelLearningAgent():
                 save_to_file, bbox_extra_artists=(
                     lgd,), bbox_inches='tight')
 
-    def saveBayesCSV(self, save_to_file, names_ids='latex'):
+    def store_bayes_factors_to_csv(self, save_to_file, names_ids='latex'):
         qmla.analysis.BayesFactorsCSV(self, save_to_file, names_ids=names_ids)
 
-    def writeInterQMDBayesCSV(self, bayes_csv):
+    def store_bayes_factors_to_shared_csv(self, bayes_csv):
         print("[QMD] writing Bayes CSV")
         qmla.analysis.updateAllBayesCSV(self, bayes_csv)
 
-    def plotParameterEstimates(
+    def plot_parameter_learning_single_model(
         self,
         model_id=0,
         true_model=False,
@@ -3348,7 +3199,7 @@ class QuantumModelLearningAgent():
                                    save_to_file=save_to_file
                                    )
 
-    def plotDynamics(
+    def plot_branch_champions_dynamics(
         self,
         all_models=False,
         model_ids=None,
@@ -3373,25 +3224,25 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file,
         )
 
-    def plotDistributionProgression(self,
-                                    show_means=True,
-                                    model_id=None,
-                                    num_steps_to_show=2,
-                                    renormalise=True,
-                                    true_model=True,
-                                    save_to_file=None
-                                    ):
-        qmla.analysis.plotDistributionProgression(
-            qmd=self,
-            model_id=model_id,
-            show_means=show_means,
-            renormalise=renormalise,
-            num_steps_to_show=num_steps_to_show,
-            true_model=true_model,
-            save_to_file=save_to_file
-        )
+    # def plotDistributionProgression(self,
+    #                                 show_means=True,
+    #                                 model_id=None,
+    #                                 num_steps_to_show=2,
+    #                                 renormalise=True,
+    #                                 true_model=True,
+    #                                 save_to_file=None
+    #                                 ):
+    #     qmla.analysis.plotDistributionProgression(
+    #         qmd=self,
+    #         model_id=model_id,
+    #         show_means=show_means,
+    #         renormalise=renormalise,
+    #         num_steps_to_show=num_steps_to_show,
+    #         true_model=true_model,
+    #         save_to_file=save_to_file
+    #     )
 
-    def plotVolumeQHL(self,
+    def plot_volume_after_qhl(self,
                       model_id=None,
                       true_model=True,
                       show_resamplings=True,
@@ -3405,7 +3256,7 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plotTreeDiagram(
+    def plot_qmla_tree(
         self,
         modlist=None,
         only_adjacent_branches=True,
@@ -3418,7 +3269,7 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plotRadarDiagram(self, modlist=None, save_to_file=None):
+    def plot_qmla_radar_scores(self, modlist=None, save_to_file=None):
         plot_title = str("Radar Plot QMD " + str(self.Q_id))
         if modlist is None:
             modlist = list(self.BranchChampions.values())
@@ -3429,7 +3280,7 @@ class QuantumModelLearningAgent():
             plot_title=plot_title
         )
 
-    def plotRSquaredVsEpoch(
+    def plot_r_squared_by_epoch_for_model_list(
         self,
         modlist=None,
         save_to_file=None

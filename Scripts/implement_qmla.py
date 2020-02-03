@@ -358,7 +358,7 @@ if global_variables.qhl_test:
                 ],
                 log_file
             )
-            qmd.plotParameterEstimates(
+            qmd.plot_parameter_learning_single_model(
                 true_model=True,
                 save_to_file=str(
                     global_variables.plots_directory +
@@ -377,7 +377,7 @@ if global_variables.qhl_test:
                 ],
                 log_file
             )
-            qmd.plotVolumeQHL(
+            qmd.plot_volume_after_qhl(
                 save_to_file=str(
                     global_variables.plots_directory +
                     'qhl_volume_' +
@@ -394,7 +394,7 @@ if global_variables.qhl_test:
             log_file
         )
 
-        qmd.plotQuadraticLoss(
+        qmd.plot_branch_champs_quadratic_losses(
             save_to_file=str(
                 global_variables.plots_directory +
                 'qhl_quadratic_loss_'
@@ -412,7 +412,7 @@ if global_variables.qhl_test:
         ],
         log_file
     )
-    qmd.plotDynamics(
+    qmd.plot_branch_champions_dynamics(
         include_bayes_factors_in_dynamics_plots=False,
         include_param_estimates_in_dynamics_plots=True,
         include_times_learned_in_dynamics_plots=True,
@@ -444,7 +444,7 @@ if global_variables.qhl_test:
         times=extend_dynamics_plot_times
     )
 
-    qmd.plotDynamics(
+    qmd.plot_branch_champions_dynamics(
         model_ids=[qmd.TrueOpModelID],
         include_bayes_factors_in_dynamics_plots=False,
         include_param_estimates_in_dynamics_plots=False,
@@ -480,7 +480,7 @@ elif (
 
     print("QHL Models:", qhl_models)
 
-    qmd.runMultipleModelQHL(
+    qmd.run_quantum_hamiltonian_learning_multiple_models(
         model_names=qhl_models
     )
     # model_ids = list(range(qmd.HighestModelID))
@@ -492,7 +492,7 @@ elif (
         ) for mod in qhl_models
     ]
 
-    qmd.plotDynamics(
+    qmd.plot_branch_champions_dynamics(
         save_to_file=str(
             global_variables.plots_directory +
             'dynamics_' +
@@ -518,7 +518,7 @@ elif (
 
     # for mod_id in range(qmd.HighestModelID):
     #     mod_name = qmd.ModelNameIDs[mod_id]
-    #     qmd.plotParameterEstimates(
+    #     qmd.plot_parameter_learning_single_model(
     #         model_id = mod_id,
     #         save_to_file= str(global_variables.plots_directory+
     #         'further_qhl_parameter_estimates_'+ str(mod_name) +
@@ -562,7 +562,7 @@ elif (
 
 else:
     # qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
-    qmd.runRemoteQMD_MULTIPLE_GEN(num_spawns=3)  # Actually run QMD
+    qmd.run_complete_qmla(num_spawns=3)  # Actually run QMD
     print(" \n\n------QMD learned ------\n\n")
 
     """
@@ -598,7 +598,7 @@ else:
         plot_dynamics_all_models = True
     else:
         plot_dynamics_all_models = False
-    qmd.plotDynamics(
+    qmd.plot_branch_champions_dynamics(
         all_models=plot_dynamics_all_models,
         save_to_file=str(
             global_variables.plots_directory +
@@ -622,7 +622,7 @@ else:
         times=extend_dynamics_plot_times
     )
 
-    qmd.plotDynamics(
+    qmd.plot_branch_champions_dynamics(
         model_ids=[qmd.ChampID],
         include_bayes_factors_in_dynamics_plots=False,
         include_param_estimates_in_dynamics_plots=False,
@@ -637,21 +637,21 @@ else:
 
     if global_variables.save_plots:
         try:
-            print("plotVolumes")
-            qmd.plotVolumes(
+            print("plot_branch_champs_volumes")
+            qmd.plot_branch_champs_volumes(
                 save_to_file=str(
                     global_variables.plots_directory +
                     'volumes_all_models_' + str(global_variables.long_id) + '.png')
             )
             print("plotExpecValues2")
-            qmd.plotVolumes(
+            qmd.plot_branch_champs_volumes(
                 branch_champions=True,
                 save_to_file=str(global_variables.plots_directory +
                                  'volumes_branch_champs_' + str(global_variables.long_id) +
                                  '.png')
             )
             print("plotQuadLoss")
-            qmd.plotQuadraticLoss(
+            qmd.plot_branch_champs_quadratic_losses(
                 save_to_file=str(
                     global_variables.plots_directory +
                     'quadratic_loss_' + str(global_variables.long_id) +
@@ -671,8 +671,8 @@ else:
         if true_op_known == True:
             # if QMD has knowledge of the "true" model, then plot params
             try:
-                print("plotParameterEstimates")
-                qmd.plotParameterEstimates(
+                print("plot_parameter_learning_single_model")
+                qmd.plot_parameter_learning_single_model(
                     model_id=qmd.TrueOpModelID,
                     save_to_file=str(
                         global_variables.plots_directory +
@@ -689,8 +689,8 @@ else:
 
             if qmd.ChampID != qmd.TrueOpModelID:
                 try:
-                    print("plotParameterEstimates champ id != true id")
-                    qmd.plotParameterEstimates(
+                    print("plot_parameter_learning_single_model champ id != true id")
+                    qmd.plot_parameter_learning_single_model(
                         model_id=qmd.ChampID,
                         save_to_file=str(global_variables.plots_directory +
                                          'champ_model_parameter_estimates_' + str(global_variables.long_id) +
@@ -705,8 +705,8 @@ else:
 
         else:
             try:
-                print("else plotParameterEstimates")
-                qmd.plotParameterEstimates(
+                print("else plot_parameter_learning_single_model")
+                qmd.plot_parameter_learning_single_model(
                     model_id=qmd.ChampID,
                     save_to_file=str(global_variables.plots_directory +
                                      'champ_model_parameter_estimates_' + str(global_variables.long_id) +
@@ -721,15 +721,15 @@ else:
         """
         # TODO radar plot not working - when used with RQ ???
         # not finding TrueModelID when using ising_hyperfine generation rule
-        qmd.plotRadarDiagram(
+        qmd.plot_qmla_radar_scores(
             save_to_file=str(
             global_variables.plots_directory+
             'radar_'+ str(global_variables.long_id)+ '.png')
         )
         """
-        print("saveBayesCSV")
+        print("store_bayes_factors_to_csv")
 
-        qmd.saveBayesCSV(
+        qmd.store_bayes_factors_to_csv(
             save_to_file=str(
                 global_variables.results_directory +
                 'bayes_factors_' + str(global_variables.long_id) + '.csv'
@@ -740,8 +740,8 @@ else:
         # TODO generalise so tree diagram can be used in all cases
         # currently only useful for Ising growth 2 qubits.
         try:
-            print("plotTreeDiagram")
-            qmd.plotTreeDiagram(
+            print("plot_qmla_tree")
+            qmd.plot_qmla_tree(
                 only_adjacent_branches=False,
                 save_to_file=str
                 (global_variables.plots_directory +
@@ -754,8 +754,8 @@ else:
             raise
 
         try:
-            print("plotRSquaredVsEpoch")
-            qmd.plotRSquaredVsEpoch(
+            print("plot_r_squared_by_epoch_for_model_list")
+            qmd.plot_r_squared_by_epoch_for_model_list(
                 save_to_file=str(
                     global_variables.plots_directory +
                     'r_squared_by_epoch_' + str(global_variables.long_id) +
@@ -787,7 +787,7 @@ else:
 
     # TODO generalise so tree diagram can be used in all cases
     # currently only useful for Ising growth 2 qubits.
-    qmd.writeInterQMDBayesCSV(
+    qmd.store_bayes_factors_to_shared_csv(
         bayes_csv=str(global_variables.cumulative_csv)
     )
 

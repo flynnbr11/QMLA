@@ -1780,8 +1780,8 @@ def plotHinton(
 def adjacent_branch_test(qmd, mod1, mod2):
     mod_a = qmd.get_model_storage_instance_by_id(mod1).Name
     mod_b = qmd.get_model_storage_instance_by_id(mod2).Name
-    br_a = qmd.pullField(name=mod_a, field='branchID')
-    br_b = qmd.pullField(name=mod_b, field='branchID')
+    br_a = qmd.get_model_data_by_field(name=mod_a, field='branchID')
+    br_b = qmd.get_model_data_by_field(name=mod_b, field='branchID')
 
     diff = br_a - br_b
     if diff in [-1, 0, 1]:
@@ -1851,7 +1851,7 @@ def qmdclassTOnxobj(
     for i in modlist:
         mod = qmd.get_model_storage_instance_by_id(i)
         name = mod.Name
-        branch = qmd.pullField(name=name, field='branchID')
+        branch = qmd.get_model_data_by_field(name=name, field='branchID')
         branch_mod_count[branch] += 1
         latex_term = mod.LatexTerm
 
@@ -1866,7 +1866,7 @@ def qmdclassTOnxobj(
     for i in modlist:
         mod = qmd.get_model_storage_instance_by_id(i)
         name = mod.Name
-        branch = qmd.pullField(name=name, field='branchID')
+        branch = qmd.get_model_data_by_field(name=name, field='branchID')
         num_models_this_branch = branch_mod_count[branch]
         pos_list = available_position_list(
             num_models_this_branch,
