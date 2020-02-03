@@ -31,6 +31,22 @@ if (use_linalg):
 
 
 def log_print(to_print_list, log_file, log_identifier):
+    """
+    log_print writes in the log file the string passed as first argument.
+    log_print(to_print_list, log_file, log_identifier)
+
+    longhish description: adds the content of the first argument to the log file passed as second argument
+    and using the identifier for the log entry specified in the third parameter
+    if the first argument is not passed as string will be converted to string.
+
+    :param to_print_list: string you want to print 
+    :type to_print_list: str() 
+    :param log_file: path of the log file you want to update
+    :type log_file: str() 
+    :param log_identifier: identifier for the log
+    :type log_identifier: str()
+
+    """
     # identifier = str(str(time_seconds()) +" [Expectation Values]")
     if not isinstance(to_print_list, list):
         to_print_list = list(to_print_list)
@@ -50,6 +66,27 @@ def default_expectation_value(
     log_file='QMDLog.log',
     log_identifier='Expecation Value'
 ):
+    """
+    This is the default evolution and expectation value function for QMLA.
+
+    longish description:
+    Returns the expectation value computed by evolving the input state with
+    the provided Hamiltonian operator. NB: In this case, the assumption is that the 
+    value measured is 1 and the expectation value corresponds to the probability of
+    obtaining 1.
+
+    :param ham: Hamiltonian needed for the time-evolution
+    :type ham: np.array()
+    :param t: Evolution time
+    :type t: float()
+    :param log_file: path of the log file for logging errors
+    :type log_file: str() 
+    :param log_identifier: identifier for the log
+    :type log_identifier: str()    
+
+    :output: expectation value of the evolved state
+    """
+
     from scipy import linalg
 
     unitary = linalg.expm(-1j * ham * t)
@@ -88,6 +125,10 @@ def hahn_evolution(
     log_file=None,
     log_identifier=None
 ):
+    """
+
+    """
+    
     # NOTE this is always projecting onto |+>
     # okay for experimental data with spins in NV centre
     import numpy as np
