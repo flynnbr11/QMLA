@@ -88,7 +88,6 @@ if not os.path.exists(probes_dir):
         system_probes_path = str(
             probes_dir
             + 'system_probes'
-            # + str(global_variables.long_id)
             + '.p'
         )
         pickle.dump(
@@ -98,7 +97,6 @@ if not os.path.exists(probes_dir):
         simulator_probes_path = str(
             probes_dir
             + 'simulator_probes'
-            # + str(global_variables.long_id)
             + '.p'
         )
         pickle.dump(
@@ -110,40 +108,37 @@ if not os.path.exists(probes_dir):
         pass
 
 
-global_variables_path = str(
-    global_variables.results_directory
-    + "/configuration.p"
-)
-pickle.dump(
-    global_variables,
-    open(global_variables_path, 'wb')
-)
+# global_variables_path = str(
+#     global_variables.results_directory
+#     + "/configuration.p"
+# )
+# pickle.dump(
+#     global_variables,
+#     open(global_variables_path, 'wb')
+# )
 
-
-dataset = global_variables.dataset
-
-log_print(
-    [
-        "[EXP] For  growth rule {}; use dataset {}".format(
-            global_variables.growth_generation_rule, dataset
-        )
-    ],
-    log_file=log_file
-)
-experimental_measurements_dict = pickle.load(
-    open(str('../Launch/Data/' + dataset), 'rb')
-)
-# print("Experimental dataset keys:", sorted(experimental_measurements_dict.keys()))
-num_datapoints_to_plot = 300  # to visualise in expec_val plot for simulated data
-
-if global_variables.use_experimental_data is True:
+if global_variables.use_experimental_data: 
+    dataset = global_variables.dataset
+    log_print(
+        [
+            "[EXP] For  growth rule {}; use dataset {}".format(
+                global_variables.growth_generation_rule, dataset
+            )
+        ],
+        log_file=log_file
+    )
+    experimental_measurements_dict = pickle.load(
+        open(str('../Launch/Data/' + dataset), 'rb')
+    )
     expec_val_plot_max_time = max(
         list(experimental_measurements_dict.keys())
     )
     # expec_val_plot_max_time = global_variables.data_max_time
 else:
     expec_val_plot_max_time = global_variables.data_max_time
+    experimental_measurements_dict = None
 
+num_datapoints_to_plot = 300
 plot_lower_time = 0
 plot_upper_time = growth_class.max_time_to_consider
 plot_number_times = num_datapoints_to_plot
@@ -160,7 +155,7 @@ if global_variables.use_experimental_data == True:
     )
 
 # do not get initial model list directly from growth rule in case using further qhl mode
-firsrt_layer_models = growth_class.initial_models 
+first_layer_models = growth_class.initial_models 
 log_print(
     [
         "[Exp] Retrieved initial op list from growth class"
@@ -256,11 +251,11 @@ if global_variables.further_qhl == True:
         ["Futher QHL. Model_priors:\n", model_priors],
         log_file
     )
-    firsrt_layer_models = list(model_priors.keys())
+    first_layer_models = list(model_priors.keys())
     further_qhl_models = list(model_priors.keys())
 
 
-num_ops = len(firsrt_layer_models)
+num_ops = len(first_layer_models)
 do_qhl_plots = False  # testing posterior transition # TODO turn off usually
 
 results_directory = global_variables.results_directory
@@ -308,27 +303,13 @@ log_print(
 
 qmd = QuantumModelLearningAgent(
     global_variables=global_variables,
-    firsrt_layer_models=firsrt_layer_models,
     generator_list=generators,
-    true_operator=true_op,
-    use_time_dep_true_model=False,
-    true_params_time_dep={'xTi': 0.01},
-    qle=qle,
-    store_particles_weights=store_particles_weights,
-    qhl_plots=do_qhl_plots,
-    results_directory=results_directory,
-    long_id=long_id,
+    first_layer_models=first_layer_models,
     probe_dict=system_probes,
     sim_probe_dict=simulator_probe_dict,
     model_priors=model_priors,
     experimental_measurements=experimental_measurements_dict,
     plot_times=plot_times,
-    max_num_branches=0,
-    max_num_qubits=10,
-    parallel=True,
-    use_exp_custom=True,
-    compare_linalg_exp_tol=None,
-    # prior_specific_terms = prior_specific_terms,
 )
 
 if global_variables.qhl_test:
@@ -501,30 +482,6 @@ elif (
         )
     )
 
-    # qmd.plotExpecValues(
-    #     model_ids = model_ids, # hardcode to see full model for development
-    #     times=plot_times,
-    #     max_time = expec_val_plot_max_time, #in microsec
-    #     t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
-    #     champ = False,
-    #     save_to_file=str(
-    #         global_variables.plots_directory+
-    #         output_prefix +
-    #         'expec_values_'+
-    #         str(global_variables.long_id) +
-    #         '.png'
-    #     )
-    # )
-
-    # for mod_id in range(qmd.HighestModelID):
-    #     mod_name = qmd.ModelNameIDs[mod_id]
-    #     qmd.plot_parameter_learning_single_model(
-    #         model_id = mod_id,
-    #         save_to_file= str(global_variables.plots_directory+
-    #         'further_qhl_parameter_estimates_'+ str(mod_name) +
-    #         '.png')
-    #     )
-
     if global_variables.pickle_qmd_class:
         log_print(
             [
@@ -568,15 +525,6 @@ else:
     """
     Tidy up and analysis.
     """
-
-    # Need to do this so QML reduced class has expectation value
-    # dict... should be made unnecessary
-    # plot_times = np.linspace(
-    #     0,
-    #     expec_val_plot_max_time,
-    #     num_datapoints_to_plot
-    # )
-
     expec_value_mods_to_plot = []
     try:
         expec_value_mods_to_plot = [qmd.TrueOpModelID]
