@@ -159,7 +159,8 @@ if global_variables.use_experimental_data == True:
         list(experimental_measurements_dict.keys())
     )
 
-initial_op_list = growth_class.initial_models
+# do not get initial model list directly from growth rule in case using further qhl mode
+firsrt_layer_models = growth_class.initial_models 
 log_print(
     [
         "[Exp] Retrieved initial op list from growth class"
@@ -255,11 +256,11 @@ if global_variables.further_qhl == True:
         ["Futher QHL. Model_priors:\n", model_priors],
         log_file
     )
-    initial_op_list = list(model_priors.keys())
+    firsrt_layer_models = list(model_priors.keys())
     further_qhl_models = list(model_priors.keys())
 
 
-num_ops = len(initial_op_list)
+num_ops = len(firsrt_layer_models)
 do_qhl_plots = False  # testing posterior transition # TODO turn off usually
 
 results_directory = global_variables.results_directory
@@ -307,7 +308,7 @@ log_print(
 
 qmd = QuantumModelLearningAgent(
     global_variables=global_variables,
-    initial_op_list=initial_op_list,
+    firsrt_layer_models=firsrt_layer_models,
     generator_list=generators,
     true_operator=true_op,
     use_time_dep_true_model=False,
@@ -736,20 +737,6 @@ else:
             names_ids='latex'
         )
 
-#        log_print(["Before expec value plot"], log_file)
-# This causes BC to break and nothing after this happens for some reason,
-# so commented out for now (Brian, Aug 16)
-
-    #        qmd.plotHintonAllModels(save_to_file=str(
-    #            global_variables.results_directory,'hinton_',
-    #            str(global_variables.long_id), '.png')
-    #        )
-
-    #        qmd.plotHintonListModels(model_list=qmd.SurvivingChampions,
-    #            save_to_file=str(global_variables.results_directory,
-    #            'hinton_champions_', str(global_variables.long_id),
-    #            '.png')
-    #        )
         # TODO generalise so tree diagram can be used in all cases
         # currently only useful for Ising growth 2 qubits.
         try:

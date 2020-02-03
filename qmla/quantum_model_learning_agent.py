@@ -49,14 +49,6 @@ def time_seconds():
     return time
 
 
-def high_BF():
-    return 1
-
-
-def low_BF():
-    return 100
-
-
 class QuantumModelLearningAgent():
     """
     - This class manages quantum model development.
@@ -81,7 +73,7 @@ class QuantumModelLearningAgent():
     def __init__(self,
                  global_variables,
                  # generator_initial_models,
-                 initial_op_list=['x'],
+                 firsrt_layer_models=['x'],
                  generator_list=[],
                  true_operator='x',
                  # true_param_list = None,
@@ -137,8 +129,7 @@ class QuantumModelLearningAgent():
         # TODO  self.InitialOpList isn't needed but is called a few times. Remove.
         # it is replaced by loop over generator list
 
-        self.InitialOpList = initial_op_list
-        print("[QMD] self.InitialOpList:", self.InitialOpList)
+        self.InitialOpList = firsrt_layer_models
 
         base_num_qubits = 3
         base_num_terms = 3
@@ -658,7 +649,6 @@ class QuantumModelLearningAgent():
         self.db, self.legacy_db, self.model_lists = \
             database_launch.launch_db(
                 true_op_name=self.TrueOpName,
-                # gen_list = self.InitialOpList,
                 new_model_branches=self.InitialModelBranches,
                 new_model_ids=self.InitialModelIDs,
                 log_file=self.log_file,
@@ -693,12 +683,6 @@ class QuantumModelLearningAgent():
                 "After initiating DB, models:", self.ModelNameIDs
             ]
         )
-        # for i in range(len(self.InitialOpList)):
-        #     model = self.InitialOpList[i]
-
-        #     if database_framework.alph(model) == database_framework.alph(self.TrueOpName):
-        #         self.TrueOpModelID = i
-        #     self.ModelNameIDs[i] = model
 
     def addModel(
         self,
@@ -875,12 +859,8 @@ class QuantumModelLearningAgent():
         )
         return branchID
 
-    def printState(self):
-        self.log_print(["Branch champions:", self.BranchChampions])
-        self.log_print(["InterBranch champions:", self.InterBranchChampions])
-        self.log_print(["Branch Rankings: \n", self.BranchRankings])
-
     def getModelInstance(self, name):
+        # TODO still used but maybe online in functions never called; possibly remove later
         try:
             instance = database_framework.get_qml_instance(self.db, name)
             return instance
@@ -899,65 +879,12 @@ class QuantumModelLearningAgent():
             else:
                 self.log_print(["Operator not found."])
 
-    def getModelDBIndex(self, name):
-        return database_framework.get_location(self.db, name)
-
     def getModelInstanceFromID(self, model_id):
         return database_framework.model_instance_from_id(self.db, model_id)
 
     def ModelInstanceForStorageInstanceFromID(self, model_id):
         return database_framework.reduced_model_instance_from_id(self.db, model_id)
 
-    def killModel(self, name):
-        if name not in list(self.db['<Name>']):
-            print("Cannot remove ", name, "; not in ", list(self.db["<Name>"]))
-        else:
-            print("Killing model", name)
-            # Add to legacy_db
-            database_framework.move_to_legacy(self.db, self.legacy_db, name)
-            model_instance = self.getModelInstance(name)
-            operator_instance = self.getOperatorInstance(name)
-            # Remove from self.db
-            self.db = database_framework.remove_model(self.db, name)
-            del model_instance
-            del operator_instance
-
-    def runIQLE(self, model, num_exp=50):
-        model_exists = False
-        if model in list(self.db['<Name>']):
-            model_exists = True
-        elif model in list(self.legacy_db['<Name>']):
-            print(
-                "Model ",
-                model,
-                "previously considered and retired."
-            )
-
-        has_model_finished = self.pullField(name=model, field='Completed')
-
-        if model_exists == True and has_model_finished == False:
-            model_instance = self.getModelInstance(model)
-            print("Running ", self.QLE_Type, " for model: ", model)
-            model_instance.UpdateModel(num_exp,
-                                       sigma_threshold=self.SigmaThreshold
-                                       )
-            self.updateModelRecord(
-                name=model, field='Completed', new_value=True)
-        else:
-            print("Model ", model, "does not exist")
-
-    def learnUnfinishedModels(self, use_rq=True, blocking=False):
-        unfinished_model_names = database_framework.all_unfinished_model_names(self.db)
-        for model_name in unfinished_model_names:
-            print("Model ", model_name, "being learned")
-            self.learnModel(
-                model_name=model_name,
-                use_rq=self.use_rq,
-                blocking=blocking
-            )
-            self.updateModelRecord(field='Completed',
-                                   name=model_name, new_value=True
-                                   )
 
     def learnModelFromBranchID(
         self,
@@ -1052,16 +979,6 @@ class QuantumModelLearningAgent():
                 'learnModelFromBranchID finished, branch', branchID
             ]
         )
-
-    def learnModelNameList(self, model_name_list, use_rq=True, blocking=False):
-        for model_name in model_name_list:
-            self.learnModel(
-                model_name=model_name,
-                use_rq=self.use_rq,
-                blocking=blocking)
-            self.updateModelRecord(field='Completed', name=model_name,
-                                   new_value=True
-                                   )
 
     def learnModel(
         self,
@@ -1389,37 +1306,6 @@ class QuantumModelLearningAgent():
                             ]
                         )
 
-    def blockingQMD(self):
-        self.learnModelNameList(model_name_list=self.InitialOpList,
-                                blocking=False, use_rq=True
-                                )
-        ids = database_framework.active_model_ids_by_branch_id(self.db, 0)
-        self.remoteBayesFromIDList(ids, remote=True)
-        self.remoteBranchBayesComparison(branchID=0)
-
-    def remoteBranchBayesComparison(self, branchID):
-        active_models_in_branch = \
-            database_framework.active_model_ids_by_branch_id(self.db,
-                                                   branchID
-                                                   )
-
-        num_models = len(active_models_in_branch)
-        models_points = {}
-        for i in range(num_models):
-            a = active_models_in_branch[i]
-            for j in range(i + 1, num_models):
-                b = active_models_in_branch[j]
-                if a != b:
-                    self.processRemoteBayesPair(a=a, b=b)
-
-    def processAllremote_bayes_factors(self):
-        bayes_factors_db = self.RedisDataBases['bayes_factors_db']
-        computed_pairs = bayes_factors_db.keys()
-        # TODO check whether pair computed before using bayes dict of QMD, or something more efficient
-        # TODO take list, or branch argument and only process those.
-        for pair in computed_pairs:
-            self.processRemoteBayesPair(pair=pair)
-
     def processRemoteBayesPair(
         self,
         a=None,
@@ -1492,12 +1378,6 @@ class QuantumModelLearningAgent():
 
         return champ
 
-    def runAllActiveModelsIQLE(self, num_exp):
-        active_models = self.db.loc[self.db['Status'] == 'Active']['<Name>']
-        for model in active_models:
-            self.runIQLE(model=model, num_exp=num_exp)
-        self.GlobalEpoch += num_exp
-
     def updateModelRecord(
         self,
         field,
@@ -1518,84 +1398,8 @@ class QuantumModelLearningAgent():
     def pullField(self, name, field):
         return database_framework.pull_field(self.db, name, field)
 
-    def statusChangeBranch(self, branchID, new_status='Saturated'):
-        self.db.loc[self.db['branchID'] == branchID, 'Status'] = new_status
-
     def statusChangeModel(self, model_name, new_status='Saturated'):
         self.db.loc[self.db['<Name>'] == model_name, 'Status'] = new_status
-
-    def getListTrueOpByDimension(self):
-        self.TrueOpListByDim = {}
-        self.TrueParamByDim = {}
-        for dim in range(1, 1 + self.MaxDimension):
-            new_op = model_generation.identity_interact(
-                subsystem=self.TrueOpName, num_qubits=dim, return_operator=True
-            )
-            self.TrueOpListByDim[dim] = new_op.constituents_operators
-        for i in range(1, self.TrueOpDim + 1):
-            self.TrueParamByDim[i] = self.TrueParamsList
-        for i in range(self.TrueOpDim + 1, self.MaxDimension):
-            self.TrueParamByDim[i] = [self.TrueParamsList[0]]
-
-    def compareModels(self, log_comparison_high=50.0, num_times_to_use='all',
-                      model_a_id=None, model_b_id=None, model_a=None, model_b=None,
-                      name_a=None, name_b=None, print_result=True
-                      ):
-        # Either pass in name_a and name_b OR model_a and model_b
-        if model_a is None and model_b is None:
-            if model_a_id is not None and model_b_id is not None:
-                model_a = self.getModelInstanceFromID(model_a_id)
-                model_b = self.getModelInstanceFromID(model_b_id)
-            else:  # if only names were passed
-                model_a = self.getModelInstance(name_a)
-                model_b = self.getModelInstance(name_b)
-        if model_a == model_b:
-            return "Same Models"
-        else:
-            log_comparison_low = 1.0 / log_comparison_high
-            if model_a_id is None and model_b is None:
-                model_a_id = model_a.ModelID
-                model_b_id = model_b.ModelID
-
-            if num_times_to_use == 'all':
-                times_a = model_a.TrackTime
-            elif len(model_a.TrackTime) < num_times_to_use:
-                times_a = model_a.TrackTime
-            else:
-                times_a = model_a.TrackTime[num_times_to_use:]
-
-            if num_times_to_use == 'all':
-                times_b = model_b.TrackTime
-            elif len(model_b.TrackTime) < num_times_to_use:
-                times_b = model_b.TrackTime
-            else:
-                times_b = model_b.TrackTime[num_times_to_use:]
-
-            times = []
-            times.extend(times_a)
-            times.extend(times_b)
-
-            bayes_factor = compute_bayes_factor(
-                model_a, model_b, times_a, times_b)
-
-            model_a.addBayesFactor(compared_with=model_b_id,
-                                   bayes_factor=bayes_factor
-                                   )
-            model_b.addBayesFactor(compared_with=model_a_id,
-                                   bayes_factor=1.0 / bayes_factor
-                                   )
-            if print_result:
-                self.log_print(["Bayes factor b/w ", model_a.Name, "&",
-                                model_b.Name, " = ", bayes_factor]
-                               )
-            if bayes_factor >= log_comparison_high:
-                if print_result:
-                    print("Point to ", model_a.Name)
-                return "a"
-            elif bayes_factor < log_comparison_low:
-                if print_result:
-                    print("Point to ", model_b.Name)
-                return "b"
 
     def compareModelsWithinBranch(
         self,
@@ -2416,61 +2220,6 @@ class QuantumModelLearningAgent():
             branches, champ_id
         ]
         return champ_name, branch_champ_names
-
-    def globalChampionCalculation(self):
-        branches = self.db['branchID'].unique()
-
-        num_branches = len(branches)
-        self.points_by_branches = [None] * num_branches
-        self.champions_of_branches = [None] * num_branches
-
-        for i in range(num_branches):
-            branchID = branches[i]
-            self.points_by_branches[i], self.champions_of_branches[i] = (
-                self.compareModelsWithinBranch(branchID)
-            )
-
-        self.champions_points = {}
-        for c in self.champions_of_branches:
-            self.champions_points[c] = 0
-
-        for i in range(num_branches):
-            mod1 = self.champions_of_branches[i]
-            for j in range(i, num_branches):
-                mod2 = self.champions_of_branches[j]
-                if mod1 != mod2:
-                    res = self.processRemoteBayesPair(a=mod1, b=mod2)
-
-                    self.champions_points[res] += 1
-                    self.log_print(
-                        [
-                            "[globalChampionCalculation]",
-                            "Point to", res,
-                            "(comparison {}/{})".format(mod1, mod2)
-                        ]
-                    )
-
-                    # if res == "a":
-                    #     self.champions_points[mod1] += 1
-                    # elif res == "b":
-                    #     self.champions_points[mod2]+=1
-        self.ranked_champions = sorted(self.champions_points, reverse=True)
-        champ_id = max(self.champions_points, key=self.champions_points.get)
-        # champ_name = database_framework.model_name_from_id(self.db, champ_id)
-        champ_name = self.ModelNameIDs[champ_id]
-        self.log_print(["Champion of Champions is", champ_name])
-
-    def checkBranchGrowthRuleCompleted(
-        self,
-        branchID,
-        growth_rule,
-    ):
-
-        tree_completed = self.BranchGrowthClasses[branchID].check_tree_completed(
-            spawn_step=self.SpawnDepthByGrowthRule[growth_rule],
-            current_num_qubits=new_model_dimension
-        )
-        return tree_completed
 
     def spawnFromBranch(
         self,
@@ -3552,68 +3301,6 @@ class QuantumModelLearningAgent():
 
         return self.FScore
 
-    def runQMD(
-        self,
-        num_exp=20,
-        max_branches=None,
-        max_num_qubits=None,
-        max_num_models=None,
-        spawn=True,
-        just_given_models=False
-    ):
-        if just_given_models:
-            self.runAllActiveModelsIQLE(num_exp=num_exp)
-            final_winner, final_branch_winners = (
-                self.interBranchChampion(global_champion=True)
-            )
-            self.ChampionName = final_winner
-
-            print("Final winner = ", final_winner)
-            self.log_print([])
-
-        else:
-            if max_branches is None:
-                max_branches = self.MaxBranchID
-
-            if max_num_qubits is None:
-                max_num_qubits = self.MaxQubitNumber
-
-            if max_num_models is None:
-                max_num_models = self.MaxModNum
-
-            while self.HighestQubitNumber < max_num_qubits:
-                self.runAllActiveModelsIQLE(num_exp=num_exp)
-                self.spawn()
-                if (self.HighestBranchID > max_branches or
-                        self.NumModels > max_num_models
-                    ):
-                    break
-
-            self.runAllActiveModelsIQLE(num_exp=num_exp)
-            self.log_print(["\n\n\n\nBayes Updates\n\n\n\n"])
-            final_winner, final_branch_winners = (
-                self.interBranchChampion(global_champion=True)
-            )
-            self.ChampionName = final_winner
-            self.log_print(["Final winner = ", final_winner])
-
-    def majorityVoteQMD(self, num_runs=1, num_exp=20, max_branches=None,
-                        max_num_qubits=None, max_num_models=None, spawn=True,
-                        just_given_models=False
-                        ):
-
-        model_id_list = database_framework.active_model_ids_by_branch_id(
-            self.db, branchID=0)
-        for i in range(num_runs):
-            for j in model_id_list:
-                mod = self.getModelInstanceFromID(j)
-                mod.resetPrior()
-                mod.UpdateModel(n_experiments=num_exp)
-            self.compareModelList(model_list=model_id_list, bayes_threshold=self.BayesLower,
-                                  num_times_to_use=num_exp
-                                  )
-        self.MajorityVotingScores = self.majorityVotingTally()
-
     def plotQuadraticLoss(
         self,
         save_to_file=None,
@@ -3682,40 +3369,6 @@ class QuantumModelLearningAgent():
         print("[QMD] writing Bayes CSV")
         qmla.analysis.updateAllBayesCSV(self, bayes_csv)
 
-    def plotHintonAllModels(self, save_to_file=None):
-        qmla.analysis.plotHinton(
-            model_names=self.ModelNameIDs,
-            bayes_factors=self.AllBayesFactors,
-            growth_generator=self.GrowthGenerator,
-            save_to_file=save_to_file
-        )
-
-    def plotHintonListModels(self, model_list, save_to_file=None):
-        bayes_factors = {}
-        for a in model_list:
-            bayes_factors[a] = {}
-            key_empty = True
-            for b in model_list:
-                if a != b:
-                    try:
-                        bayes_factors[a][b] = self.AllBayesFactors[a][b]
-                        key_empty = False
-                    except BaseException:
-                        pass
-            if key_empty:
-                bayes_factors.pop(a)
-
-        model_name_dict = {}
-        for m in model_list:
-            model_name_dict[m] = database_framework.model_name_from_id(self.db, m)
-
-        qmla.analysis.plotHinton(
-            model_names=model_name_dict,
-            bayes_factors=bayes_factors,
-            growth_generator=self.GrowthGenerator,
-            save_to_file=save_to_file
-        )
-
     def plotParameterEstimates(
         self,
         model_id=0,
@@ -3749,13 +3402,6 @@ class QuantumModelLearningAgent():
                 sorted(self.BranchChampions.values())
             )
 
-        # if self.QHLmode == False and self.multiQHLMode ==False:
-        #     include_bayes_factors_in_dynamics_plots = False
-        #     include_param_estimates_in_dynamics_plots = False
-        # else:
-        #     include_bayes_factors_in_dynamics_plots = True
-        #     include_param_estimates_in_dynamics_plots = True
-
         qmla.analysis.plotDynamicsLearnedModels(
             qmd=self,
             include_bayes_factors=include_bayes_factors_in_dynamics_plots,
@@ -3764,61 +3410,6 @@ class QuantumModelLearningAgent():
             model_ids=model_ids,
             save_to_file=save_to_file,
         )
-
-    def plotExpecValues(
-        self,
-        model_ids=None,
-        times=None,
-        champ=True,
-        max_time=1.8,
-        plus_probe=False,
-        t_interval=0.3, save_to_file=None
-    ):
-
-        if (
-            plus_probe == False
-            and
-            self.UseExperimentalData == True
-        ):
-            plus_probe = True
-
-        qmla.analysis.ExpectationValuesTrueSim(
-            qmd=self,
-            model_ids=model_ids,
-            champ=champ,
-            times=times,
-            plus_probe=plus_probe,
-            max_time=max_time, t_interval=t_interval,
-            upper_x_lim=max_time,
-            save_to_file=save_to_file
-        )
-
-    def plotExpecValuesQHLTrueModel(self,
-                                    max_time=1.8,
-                                    t_interval=0.1,
-                                    save_to_file=None,
-                                    debug_print=False,
-                                    plus_probe=False
-                                    ):
-        # TODO use this updated function instead of old one
-
-        true_mod_id = self.TrueOpModelID
-        qmla.analysis.ExpectationValuesTrueSim(
-            qmd=self,
-            champ=False,
-            model_ids=[true_mod_id],
-            max_time=max_time, t_interval=t_interval,
-            upper_x_lim=max_time,
-            save_to_file=save_to_file
-        )
-        """
-        qmla.analysis.ExpectationValuesQHL_TrueModel(qmd=self,
-            max_time = max_time,
-            t_interval = t_interval,
-            save_to_file = save_to_file,
-            debug_print = debug_print
-        )
-        """
 
     def plotDistributionProgression(self,
                                     show_means=True,
@@ -3898,21 +3489,6 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def majorityVotingTally(self):
-        mod_ids = database_framework.list_model_id_in_branch(self.db, 0)
-        tally = {}
-
-        for i in mod_ids:
-            mod = self.getModelInstanceFromID(i)
-            tally[mod.Name] = 0
-            scores = mod.BayesFactors
-            for j in mod_ids:
-                if i != j:
-                    comparison = np.array(scores[j]) > 1
-                    points = np.sum(comparison)
-                    tally[mod.Name] += points
-        return tally
-
     def inspectModel(self, name):
         print("\nmodel name: ", name)
         mod = self.getModelInstance(name)
@@ -3952,44 +3528,3 @@ def num_pairs_in_list(num_models):
         print("Numbers too large to compute number pairs. n=", n, "\t k=", k)
 
     return a / b
-
-# def separable_probe_dict(max_num_qubits, num_probes):
-#     seperable_probes = {}
-#     for i in range(num_probes):
-#         seperable_probes[i,0] = random_probe(1)
-#         for j in range(1, 1+max_num_qubits):
-#             if j==1:
-#                 seperable_probes[i,j] = seperable_probes[i,0]
-#             else:
-#                 seperable_probes[i,j] = (np.tensordot(seperable_probes[i,j-1],
-#                     random_probe(1), axes=0).flatten(order='c')
-#                 )
-#             while (np.isclose(1.0, np.linalg.norm(seperable_probes[i,j]),
-#                 atol=1e-14) is  False
-#             ):
-#                 print("non-unit norm: ", np.linalg.norm(seperable_probes[i,j]))
-#                 # keep replacing until a unit-norm
-#                 seperable_probes[i,j] = (
-#                     np.tensordot(seperable_probes[i,j-1], random_probe(1),
-#                     axes=0).flatten(order='c')
-#                 )
-#     return seperable_probes
-
-# def random_probe(num_qubits):
-#     dim = 2**num_qubits
-#     real = []
-#     imaginary = []
-#     complex_vectors = []
-#     for i in range(dim):
-#         real.append(np.random.uniform(low=-1, high=1))
-#         imaginary.append(np.random.uniform(low=-1, high=1))
-#         complex_vectors.append(real[i] + 1j*imaginary[i])
-
-#     a=np.array(complex_vectors)
-#     norm_factor = np.linalg.norm(a)
-#     probe = complex_vectors/norm_factor
-#     if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
-#         print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
-#         return random_probe(num_qubits)
-
-#     return probe
