@@ -296,12 +296,6 @@ class QuantumModelLearningAgent():
         self.SpawnDepth = 0
         self.TreeIdentifiers = [self.GrowthGenerator]
 
-        # TODO  replace this later:::
-        # self.GeneratorList[0] = self.GrowthGenerator # to ensure old procedure followed during development
-        # self.GeneratorList = list(set(self.GeneratorList))
-        # if self.GrowthGenerator not in self.GeneratorList:
-        #     self.GrowthGenerator = self.GeneratorList
-
         # TODO SORT OUT PASSING IN GEN LIST
         zeroth_gen = self.GeneratorList[0]
         matching_gen_idx = self.GeneratorList.index(self.GrowthGenerator)
@@ -506,9 +500,6 @@ class QuantumModelLearningAgent():
 
             ]
         )
-
-# rds.flush_dbs_from_id(self.HostName, self.PortNumber, self.Q_id) # fresh
-# redis databases for this instance of QMD.
 
         self.UseTimeDepTrueModel = use_time_dep_true_model
         if self.UseTimeDepTrueModel:

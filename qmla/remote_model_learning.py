@@ -18,16 +18,11 @@ from psutil import virtual_memory
 import json  # possibly worth a different serialization if pickle is very slow
 import pickle
 pickle.HIGHEST_PROTOCOL = 2
-
-try:
-    import redis
-    import qmla.redis_settings as rds
-    enforce_serial = False
-except BaseException:
-    enforce_serial = True  # shouldn't be needed
+import redis
 
 import qmla.database_framework as database_framework
 import qmla.model_instances as QML
+import qmla.redis_settings as rds
 
 plt.switch_backend('agg')
 
@@ -68,17 +63,6 @@ def learnModelRemote(
     held on a redis database which can be accessed by other actors.
 
     """
-
-    print("QHL", modelID, ":", name)
-    time_start = time.time()
-    # Get params from qmd_info
-    rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
-    qmd_info_db = rds_dbs['qmd_info_db']
-    learned_models_info = rds_dbs['learned_models_info']
-    learned_models_ids = rds_dbs['learned_models_ids']
-    active_branches_learning_models = rds_dbs['active_branches_learning_models']
-    any_job_failed_db = rds_dbs['any_job_failed']
-
     def log_print(to_print_list):
         identifier = str(
             str(time_seconds()) +
@@ -93,7 +77,19 @@ def learnModelRemote(
         with open(log_file, 'a') as write_log_file:
             print(identifier, str(to_print), file=write_log_file,
                   flush=True
-                  )
+                  )    
+
+    log_print(['Starting for model:', name])
+    print("QHL", modelID, ":", name)
+
+    time_start = time.time()
+    # Get params from qmd_info
+    rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
+    qmd_info_db = rds_dbs['qmd_info_db']
+    learned_models_info = rds_dbs['learned_models_info']
+    learned_models_ids = rds_dbs['learned_models_ids']
+    active_branches_learning_models = rds_dbs['active_branches_learning_models']
+    any_job_failed_db = rds_dbs['any_job_failed']
 
     if qmd_info is None:
         qmd_info = pickle.loads(qmd_info_db['QMDInfo'])
@@ -122,12 +118,7 @@ def learnModelRemote(
     results_directory = qmd_info['results_directory']
     plots_directory = qmd_info['plots_directory']
     long_id = qmd_info['long_id']
-#    use_time_dep_true_params = qmd_info['use_time_dep_true_params']
-#    time_dep_true_params = qmd_info['time_dep_true_params']
 
-#    log_print(['Name:', name])
-#    log_print(['true ops:\n', true_ops])
-#    log_print(["true params:", true_params])
 
     # Generate model and learn
     op = database_framework.Operator(name=name)
@@ -139,18 +130,6 @@ def learnModelRemote(
         log_file=log_file,
         modelID=modelID
     )
-
-    # random_sim_pars=False
-    # if random_sim_pars==True:
-    #     sim_pars = []
-    #     num_pars = op.num_constituents
-    #     if num_pars ==1 : #TODO Remove this fixing the prior
-    #         normal_dist=NormalDistribution(mean=true_params[0], var=0.1)
-    #     else:
-    #         normal_dist = MultiVariateNormalDistributionNocov(num_pars)
-
-    # else:
-
     model_priors = qmd_info['model_priors']
     if (
         model_priors is not None
