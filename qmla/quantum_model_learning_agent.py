@@ -633,7 +633,7 @@ class QuantumModelLearningAgent():
         self.log_print(["Running ", self.QLE_Type, " for true operator ",
                         true_operator, " with parameters : ", self.TrueParamsList]
                        )
-        self.initiateDB()
+        self.initiate_database()
 
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) + " [QMD " + str(self.Q_id) + "]")
@@ -645,7 +645,7 @@ class QuantumModelLearningAgent():
         with open(self.log_file, 'a') as write_log_file:
             print(identifier, str(to_print), file=write_log_file, flush=True)
 
-    def initiateDB(self):
+    def initiate_database(self):
         self.db, self.legacy_db, self.model_lists = \
             database_launch.launch_db(
                 true_op_name=self.TrueOpName,
@@ -684,7 +684,7 @@ class QuantumModelLearningAgent():
             ]
         )
 
-    def addModel(
+    def add_model_to_database(
         self,
         model,
         branchID=0,
@@ -764,7 +764,7 @@ class QuantumModelLearningAgent():
         del self.RedisDataBases
         del self.write_log_file
 
-    def newBranch(
+    def new_branch(
         self,
         growth_rule,
         model_list
@@ -803,7 +803,7 @@ class QuantumModelLearningAgent():
         for model in model_list:
             # addModel returns whether adding model was successful
             # if false, that's because it's already been computed
-            add_model_info = self.addModel(
+            add_model_info = self.add_model_to_database(
                 model,
                 branchID=branchID
             )
@@ -859,40 +859,16 @@ class QuantumModelLearningAgent():
         )
         return branchID
 
-    def getModelInstance(self, name):
-        # TODO still used but maybe online in functions never called; possibly remove later
-        try:
-            instance = database_framework.get_qml_instance(self.db, name)
-            return instance
-        except BaseException:
-            if name in list(self.legacy_db['<Name>']):
-                self.log_print(["Operator in legacy databse - retired. "])
-            else:
-                self.log_print(["Model not found."])
-
-    def getOperatorInstance(self, name):
-        try:
-            return database_framework.get_operator_instance(self.db, name)
-        except BaseException:
-            if name in list(self.legacy_db['<Name>']):
-                self.log_print(["Operator in legacy databse - retired. "])
-            else:
-                self.log_print(["Operator not found."])
-
-    def getModelInstanceFromID(self, model_id):
-        return database_framework.model_instance_from_id(self.db, model_id)
-
-    def ModelInstanceForStorageInstanceFromID(self, model_id):
+    def get_model_storage_instance_by_id(self, model_id):
         return database_framework.reduced_model_instance_from_id(self.db, model_id)
 
 
-    def learnModelFromBranchID(
+    def learn_models_on_given_branch(
         self,
         branchID,
         use_rq=True,
         blocking=False
     ):
-        # model_list = database_framework.model_names_on_branch(self.db, branchID)
         model_list = self.BranchModels[branchID]
         self.log_print(
             [
@@ -949,7 +925,6 @@ class QuantumModelLearningAgent():
             ]
         )
 
-        # for model_name in model_list:
         for model_name in unlearned_models_this_branch:
             self.log_print(
                 [
@@ -957,7 +932,7 @@ class QuantumModelLearningAgent():
                     "being passed to learnModel function"
                 ]
             )
-            self.learnModel(
+            self.learn_model(
                 model_name=model_name,
                 use_rq=self.use_rq,
                 blocking=blocking
@@ -980,7 +955,7 @@ class QuantumModelLearningAgent():
             ]
         )
 
-    def learnModel(
+    def learn_model(
         self,
         model_name,
         use_rq=True,
@@ -1086,7 +1061,7 @@ class QuantumModelLearningAgent():
                 ]
             )
 
-    def remoteBayes(
+    def get_pairwise_bayes_factor(
         self,
         model_a_id,
         model_b_id,
@@ -1097,15 +1072,11 @@ class QuantumModelLearningAgent():
         bayes_threshold=None,
         wait_on_result=False
     ):
-        # only do this when both models have learned. TODO add check for this.
-
         if bayes_threshold is None:
             bayes_threshold = self.BayesUpper
 
         if branchID is None:
             interbranch = True
-        # print("[QMD remoteBayes] self.NumTimesForBayesUpdates: ", self.NumTimesForBayesUpdates)
-
         unique_id = database_framework.unique_model_pair_identifier(
             model_a_id,
             model_b_id
@@ -1180,7 +1151,7 @@ class QuantumModelLearningAgent():
 
             return bayes_factor
 
-    def remoteBayesFromIDList(
+    def get_bayes_factors_from_list(
         self,
         model_id_list,
         remote=True,
@@ -1207,7 +1178,7 @@ class QuantumModelLearningAgent():
                         #     unique_id
                         # )
                         remote_jobs.append(
-                            self.remoteBayes(
+                            self.get_pairwise_bayes_factor(
                                 a,
                                 b,
                                 remote=remote,
@@ -1238,7 +1209,7 @@ class QuantumModelLearningAgent():
                 ]
             )
 
-    def remoteBayesFromBranchID(
+    def get_bayes_factors_by_branch_id(
         self,
         branchID,
         remote=True,
@@ -1253,7 +1224,7 @@ class QuantumModelLearningAgent():
         model_id_list = self.BranchModelIds[branchID]
         self.log_print(
             [
-                'remoteBayesFromBranchID',
+                'get_bayes_factors_by_branch_id',
                 branchID,
                 'model id list:',
                 model_id_list
@@ -1281,7 +1252,7 @@ class QuantumModelLearningAgent():
                             ]
                         )
 
-                        self.remoteBayes(
+                        self.get_pairwise_bayes_factor(
                             a,
                             b,
                             remote=remote,
@@ -1350,8 +1321,8 @@ class QuantumModelLearningAgent():
         lower_id = min(a, b)
         higher_id = max(a, b)
 
-        mod_low = self.ModelInstanceForStorageInstanceFromID(lower_id)
-        mod_high = self.ModelInstanceForStorageInstanceFromID(higher_id)
+        mod_low = self.get_model_storage_instance_by_id(lower_id)
+        mod_high = self.get_model_storage_instance_by_id(higher_id)
         if higher_id in mod_low.BayesFactors:
             mod_low.BayesFactors[higher_id].append(bayes_factor)
         else:
@@ -1366,15 +1337,6 @@ class QuantumModelLearningAgent():
             champ = mod_low.ModelID
         elif bayes_factor < (1.0 / bayes_threshold):
             champ = mod_high.ModelID
-
-        # self.log_print(
-        #     [
-        #         "Champ of pair {}: {}".format(
-        #             pair,
-        #             champ
-        #         )
-        #     ]
-        # )
 
         return champ
 
@@ -1465,7 +1427,7 @@ class QuantumModelLearningAgent():
                     models_points
                 ]
             )
-            self.remoteBayesFromIDList(
+            self.get_bayes_factors_from_list(
                 model_id_list=max_points_branches,
                 remote=True,
                 recompute=True,
@@ -1655,7 +1617,7 @@ class QuantumModelLearningAgent():
                     ]
                 )
             self.log_print(["Points:\n", models_points])
-            self.remoteBayesFromIDList(
+            self.get_bayes_factors_from_list(
                 model_id_list=max_points_branches,
                 remote=True,
                 recompute=True,
@@ -1723,7 +1685,7 @@ class QuantumModelLearningAgent():
                 ):
 
                     job_list.append(
-                        self.remoteBayes(
+                        self.get_pairwise_bayes_factor(
                             model_a_id=parent_id,
                             model_b_id=child_id,
                             return_job=True,
@@ -1863,8 +1825,8 @@ class QuantumModelLearningAgent():
                         pass
 
                 # Add bayes factors to BayesFactor dict for each model
-                mod_a = self.ModelInstanceForStorageInstanceFromID(mod1)
-                mod_b = self.ModelInstanceForStorageInstanceFromID(mod2)
+                mod_a = self.get_model_storage_instance_by_id(mod1)
+                mod_b = self.get_model_storage_instance_by_id(mod2)
                 if mod2 in mod_a.BayesFactors:
                     mod_a.BayesFactors[mod2].append(bayes_factor)
                 else:
@@ -1933,7 +1895,7 @@ class QuantumModelLearningAgent():
                 self.ModelNameIDs[m]
                 for m in models_for_tree_ghost_branch
             ]
-            new_branch_id = self.newBranch(
+            new_branch_id = self.new_branch(
                 model_list=mod_names,
                 growth_rule=gen
             )
@@ -1942,9 +1904,9 @@ class QuantumModelLearningAgent():
                 new_branch_id
             )
             self.BranchAllModelsLearned[new_branch_id] = True
-            self.learnModelFromBranchID(new_branch_id)
-            self.remoteBayesFromBranchID(new_branch_id)
-            # self.remoteBayesFromBranchID(new_branch_id)
+            self.learn_models_on_given_branch(new_branch_id)
+            self.get_bayes_factors_by_branch_id(new_branch_id)
+            # self.get_bayes_factors_by_branch_id(new_branch_id)
 
         active_branches_learning_models = (
             self.RedisDataBases[
@@ -1970,7 +1932,7 @@ class QuantumModelLearningAgent():
                     (self.BranchAllModelsLearned[branchID] == False)
                 ):
                     self.BranchAllModelsLearned[branchID] = True
-                    self.remoteBayesFromBranchID(branchID)
+                    self.get_bayes_factors_by_branch_id(branchID)
 
                 if branchID_bytes in active_branches_bayes.keys():
                     branchID = int(branchID_bytes)
@@ -2015,7 +1977,7 @@ class QuantumModelLearningAgent():
         )
         num_active_models = len(active_models)
 
-        self.remoteBayesFromIDList(
+        self.get_bayes_factors_from_list(
             model_id_list=active_models,
             remote=True,
             recompute=True,
@@ -2132,7 +2094,7 @@ class QuantumModelLearningAgent():
                 self.compareModelsWithinBranch(branchID)
             )
 
-        self.remoteBayesFromIDList(
+        self.get_bayes_factors_from_list(
             model_id_list=champions_of_branches,
             remote=True,
             recompute=True,
@@ -2282,7 +2244,7 @@ class QuantumModelLearningAgent():
             ]
         )
 
-        new_branch_id = self.newBranch(
+        new_branch_id = self.new_branch(
             model_list=new_models,
             growth_rule=growth_rule
         )
@@ -2309,7 +2271,7 @@ class QuantumModelLearningAgent():
                 best_model_names[0]
             )
 
-        self.learnModelFromBranchID(
+        self.learn_models_on_given_branch(
             new_branch_id,
             blocking=False,
             use_rq=True
@@ -2336,7 +2298,7 @@ class QuantumModelLearningAgent():
             and
             self.TrueOpName not in list(self.ModelsBranches.keys())
         ):
-            self.newBranch(
+            self.new_branch(
                 growth_rule=self.GrowthGenerator,
                 model_list=[self.TrueOpName]
             )
@@ -2348,7 +2310,7 @@ class QuantumModelLearningAgent():
             ]
         )
 
-        self.learnModel(
+        self.learn_model(
             model_name=mod_to_learn,
             use_rq=self.use_rq,
             blocking=True
@@ -2368,7 +2330,7 @@ class QuantumModelLearningAgent():
                 mod_id
             ]
         )
-        mod = self.ModelInstanceForStorageInstanceFromID(mod_id)
+        mod = self.get_model_storage_instance_by_id(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
         mod.updateLearnedValues(
             # fitness_parameters = self.FitnessParameters
@@ -2418,7 +2380,7 @@ class QuantumModelLearningAgent():
         # TODO write single QHL test
         time_now = time.time()
         time_taken = time_now - self.StartingTime
-#        true_model_r_squared = self.ModelInstanceForStorageInstanceFromID(self.TrueOpModelID).r_squared()
+#        true_model_r_squared = self.get_model_storage_instance_by_id(self.TrueOpModelID).r_squared()
 
         self.ResultsDict = {
             'NumParticles': self.NumParticles,
@@ -2487,7 +2449,7 @@ class QuantumModelLearningAgent():
             if mod not in current_models:
                 models_to_add.append(mod)
         if len(models_to_add) > 0:
-            self.newBranch(
+            self.new_branch(
                 growth_rule=self.GrowthGenerator,
                 model_list=models_to_add
             )
@@ -2518,7 +2480,7 @@ class QuantumModelLearningAgent():
             learned_models_ids.set(
                 str(mod_id), 0
             )
-            self.learnModel(
+            self.learn_model(
                 model_name=mod_name,
                 use_rq=self.use_rq,
                 blocking=False
@@ -2546,7 +2508,7 @@ class QuantumModelLearningAgent():
             mod_id = database_framework.model_id_from_name(
                 db=self.db, name=mod_name
             )
-            mod = self.ModelInstanceForStorageInstanceFromID(mod_id)
+            mod = self.get_model_storage_instance_by_id(mod_id)
             mod.updateLearnedValues(
                 fitness_parameters=self.FitnessParameters
             )
@@ -2659,7 +2621,7 @@ class QuantumModelLearningAgent():
             for i in list(self.BranchModels.keys()):
                 # print("[QMD runMult] launching branch ", i)
                 # ie initial branches
-                self.learnModelFromBranchID(
+                self.learn_models_on_given_branch(
                     i,
                     blocking=False,
                     use_rq=True
@@ -2675,7 +2637,7 @@ class QuantumModelLearningAgent():
                     #     ":", int(active_branches_learning_models[i])
                     # )
                 self.BranchAllModelsLearned[i] = True
-                self.remoteBayesFromBranchID(i)
+                self.get_bayes_factors_by_branch_id(i)
                 while (
                     int(active_branches_bayes.get(i))
                         < self.NumModelPairsPerBranch[i]
@@ -2698,7 +2660,7 @@ class QuantumModelLearningAgent():
             for i in list(self.BranchModels.keys()):
                 # print("[QMD runMult] launching branch ", i)
                 # ie initial branches
-                self.learnModelFromBranchID(
+                self.learn_models_on_given_branch(
                     i,
                     blocking=False,
                     use_rq=True
@@ -2752,12 +2714,12 @@ class QuantumModelLearningAgent():
                     self.BranchAllModelsLearned[branchID] = True
                     models_this_branch = self.BranchModelIds[branchID]
                     for mod_id in models_this_branch:
-                        mod = self.ModelInstanceForStorageInstanceFromID(mod_id)
+                        mod = self.get_model_storage_instance_by_id(mod_id)
                         mod.updateLearnedValues(
                             # fitness_parameters = self.FitnessParameters
                         )
 
-                    self.remoteBayesFromBranchID(branchID)
+                    self.get_bayes_factors_by_branch_id(branchID)
 
             for branchID_bytes in active_branches_bayes.keys():
 
@@ -2841,7 +2803,7 @@ class QuantumModelLearningAgent():
                     (self.BranchAllModelsLearned[branchID] == False)
                 ):
                     self.BranchAllModelsLearned[branchID] = True
-                    self.remoteBayesFromBranchID(branchID)
+                    self.get_bayes_factors_by_branch_id(branchID)
 
                 if branchID_bytes in active_branches_bayes:
                     num_bayes_done_on_branch = (
@@ -2910,11 +2872,11 @@ class QuantumModelLearningAgent():
         # Final functions at end of QMD
         # Fill in champions result dict for further analysis.
 
-        champ_model = self.ModelInstanceForStorageInstanceFromID(self.ChampID)
+        champ_model = self.get_model_storage_instance_by_id(self.ChampID)
         for i in range(self.HighestModelID):
             # Dict of all Bayes factors for each model considered.
             self.AllBayesFactors[i] = (
-                self.ModelInstanceForStorageInstanceFromID(i).BayesFactors
+                self.get_model_storage_instance_by_id(i).BayesFactors
             )
 
         self.log_print(["computing expect vals for mod ", champ_model.ModelID])
@@ -2964,10 +2926,10 @@ class QuantumModelLearningAgent():
 
         num_qubits_champ_model = database_framework.get_num_qubits(self.ChampionName)
         self.LearnedParamsChamp = (
-            self.ModelInstanceForStorageInstanceFromID(self.ChampID).LearnedParameters
+            self.get_model_storage_instance_by_id(self.ChampID).LearnedParameters
         )
         self.FinalSigmasChamp = (
-            self.ModelInstanceForStorageInstanceFromID(self.ChampID).FinalSigmas
+            self.get_model_storage_instance_by_id(self.ChampID).FinalSigmas
         )
         num_exp_ham = (
             self.NumParticles *
@@ -3064,7 +3026,7 @@ class QuantumModelLearningAgent():
     def checkChampReducibility(
         self,
     ):
-        champ_mod = self.ModelInstanceForStorageInstanceFromID(self.ChampID)
+        champ_mod = self.get_model_storage_instance_by_id(self.ChampID)
         self.log_print(
             [
                 "Checking reducibility of champ model:",
@@ -3123,12 +3085,12 @@ class QuantumModelLearningAgent():
                 ]
             )
 
-            reduced_mod_info = self.addModel(
+            reduced_mod_info = self.add_model_to_database(
                 model=new_mod,
                 force_create_model=True
             )
             reduced_mod_id = reduced_mod_info['model_id']
-            reduced_mod_instance = self.ModelInstanceForStorageInstanceFromID(
+            reduced_mod_instance = self.get_model_storage_instance_by_id(
                 reduced_mod_id
             )
 
@@ -3194,10 +3156,10 @@ class QuantumModelLearningAgent():
                 compressed_reduced_champ_info
             )
 
-            self.ModelInstanceForStorageInstanceFromID(
+            self.get_model_storage_instance_by_id(
                 reduced_mod_id).updateLearnedValues()
 
-            bayes_factor = self.remoteBayes(
+            bayes_factor = self.get_pairwise_bayes_factor(
                 model_a_id=int(self.ChampID),
                 model_b_id=int(reduced_mod_id),
                 wait_on_result=True
@@ -3235,8 +3197,8 @@ class QuantumModelLearningAgent():
                 self.ChampID = reduced_mod_id
                 self.ChampionName = new_mod
 
-                self.ModelInstanceForStorageInstanceFromID(self.ChampID).BayesFactors = (
-                    self.ModelInstanceForStorageInstanceFromID(
+                self.get_model_storage_instance_by_id(self.ChampID).BayesFactors = (
+                    self.get_model_storage_instance_by_id(
                         original_champ_id).BayesFactors
                 )
 
@@ -3255,7 +3217,7 @@ class QuantumModelLearningAgent():
             try:
                 # TODO remove this try/except when reduced-champ-model instance
                 # is update-able
-                mod = self.ModelInstanceForStorageInstanceFromID(mod_id)
+                mod = self.get_model_storage_instance_by_id(mod_id)
                 mod.updateLearnedValues(
                     fitness_parameters=self.FitnessParameters
                 )
@@ -3270,7 +3232,7 @@ class QuantumModelLearningAgent():
 
         true_set = self.GrowthClass.true_operator_terms
 
-        growth_class = self.ModelInstanceForStorageInstanceFromID(model_id).GrowthClass
+        growth_class = self.get_model_storage_instance_by_id(model_id).GrowthClass
         terms = [
             growth_class.latex_name(
                 term
@@ -3340,7 +3302,7 @@ class QuantumModelLearningAgent():
         plt.ylabel('Volume')
 
         for i in model_id_list:
-            vols = self.ModelInstanceForStorageInstanceFromID(i).VolumeList
+            vols = self.get_model_storage_instance_by_id(i).VolumeList
             plt.semilogy(vols, label=str('ID:' + str(i)))
 #            plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1.0))
 
@@ -3488,15 +3450,6 @@ class QuantumModelLearningAgent():
             model_ids=modlist,
             save_to_file=save_to_file
         )
-
-    def inspectModel(self, name):
-        print("\nmodel name: ", name)
-        mod = self.getModelInstance(name)
-
-        print("experiments done ", mod.NumExperimentsToDate)
-        print("times: ", mod.TrackTime)
-        print("final params : ", mod.FinalParams)
-        print("bayes factors: ", mod.BayesFactors)
 
     def one_qubit_probes_bloch_sphere(self):
         print("In jupyter, include the following to view sphere: %matplotlib inline")

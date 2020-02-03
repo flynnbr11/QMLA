@@ -74,8 +74,8 @@ git_commit=$(git rev-parse HEAD)
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
-# sim_growth_rule='IsingProbabilistic'
-sim_growth_rule='IsingPredetermined'
+sim_growth_rule='IsingProbabilistic'
+# sim_growth_rule='IsingPredetermined'
 # sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
 # sim_growth_rule='FermiHubbardPredetermined'
