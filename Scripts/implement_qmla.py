@@ -374,7 +374,7 @@ if global_variables.qhl_test:
         )
 
         true_mod_instance = qmd.get_model_storage_instance_by_id(
-            qmd.TrueOpModelID
+            qmd.true_model_id
         )
 
     log_print(
@@ -402,7 +402,7 @@ if global_variables.qhl_test:
     )
 
     true_mod = qmd.get_model_storage_instance_by_id(
-        qmd.TrueOpModelID
+        qmd.true_model_id
     )
     extend_dynamics_plot_times = [
         t * 2 for t in qmd.times_to_plot
@@ -416,7 +416,7 @@ if global_variables.qhl_test:
     )
 
     qmd.plot_branch_champions_dynamics(
-        model_ids=[qmd.TrueOpModelID],
+        model_ids=[qmd.true_model_id],
         include_bayes_factors_in_dynamics_plots=False,
         include_param_estimates_in_dynamics_plots=False,
         include_times_learned_in_dynamics_plots=False,
@@ -430,7 +430,7 @@ if global_variables.qhl_test:
 
     results_file = global_variables.results_file
     pickle.dump(
-        qmd.ResultsDict,
+        qmdchampion_results,
         open(results_file, "wb"),
         protocol=2
     )
@@ -521,7 +521,7 @@ else:
     """
     expec_value_mods_to_plot = []
     try:
-        expec_value_mods_to_plot = [qmd.TrueOpModelID]
+        expec_value_mods_to_plot = [qmd.true_model_id]
     except BaseException:
         pass
     expec_value_mods_to_plot.append(qmd.champion_model_id)
@@ -605,7 +605,7 @@ else:
 
         true_op_known = False
         try:
-            if qmd.TrueOpModelID:
+            if qmd.true_model_id:
                 true_op_known = True
         except BaseException:
             true_op_known = False
@@ -615,7 +615,7 @@ else:
             try:
                 print("plot_parameter_learning_single_model")
                 qmd.plot_parameter_learning_single_model(
-                    model_id=qmd.TrueOpModelID,
+                    model_id=qmd.true_model_id,
                     save_to_file=str(
                         global_variables.plots_directory +
                         'true_model_parameter_estimates_' +
@@ -629,7 +629,7 @@ else:
                     qmd.true_model_name
                 )
 
-            if qmd.champion_model_id != qmd.TrueOpModelID:
+            if qmd.champion_model_id != qmd.true_model_id:
                 try:
                     print("plot_parameter_learning_single_model champ id != true id")
                     qmd.plot_parameter_learning_single_model(

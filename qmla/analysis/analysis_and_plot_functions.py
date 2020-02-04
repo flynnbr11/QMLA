@@ -346,7 +346,7 @@ def plotDynamicsLearnedModels(
     save_to_file=None
 ):
     if qmd.qhl_mode == True:
-        model_ids = [qmd.TrueOpModelID]
+        model_ids = [qmd.true_model_id]
         include_bayes_factors = False
     elif qmd.qhl_mode_multiple_models == True:
         model_ids = list(qmd.multiQHL_model_ids)
@@ -413,7 +413,7 @@ def plotDynamicsLearnedModels(
         name_colour = 'black'
         dynamics_label = str(mod_id)
         try:
-            true_model_id = qmd.TrueOpModelID
+            true_model_id = qmd.true_model_id
         except BaseException:
             true_model_id = -1
         if (
@@ -681,7 +681,7 @@ def ExpectationValuesQHL_TrueModel(
     save_to_file=None,
     debug_print=False
 ):
-    model_ids = [qmd.TrueOpModelID]
+    model_ids = [qmd.true_model_id]
 #    probe_id = random.choice(range(qmd.probe_number))
     probe_id = 10
 
@@ -785,7 +785,7 @@ def ExpectationValuesQHL_TrueModel(
             )
             sim_expec_values.append(ex_val)
 
-        if mod_id == qmd.TrueOpModelID:
+        if mod_id == qmd.true_model_id:
             sim_label = 'Simulated Model'
             sim_col = champion_colour
         else:
@@ -894,7 +894,7 @@ def plotDistributionProgression(
     plt.clf()
     if true_model:
         try:
-            mod = qmd.get_model_storage_instance_by_id(qmd.TrueOpModelID)
+            mod = qmd.get_model_storage_instance_by_id(qmd.true_model_id)
         except BaseException:
             print("True model not present in this instance of QMD.")
     elif model_id is not None:
@@ -1415,7 +1415,7 @@ def plot_quadratic_loss(
     ax = plt.subplot(111)
 
     if qmd.qhl_mode is True:
-        to_plot_quad_loss = [qmd.TrueOpModelID]
+        to_plot_quad_loss = [qmd.true_model_id]
         plot_title = str('Quadratic Loss for True operator (from QHL)')
     elif champs_or_all == 'champs':
         to_plot_quad_loss = qmd.branch_champions.values()
@@ -1504,7 +1504,7 @@ def plotVolumeQHL(
     if true_model:
         try:
             mod = qmd.get_model_storage_instance_by_id(
-                qmd.TrueOpModelID
+                qmd.true_model_id
             )
         except BaseException:
             print("True model not present in QMD models.")

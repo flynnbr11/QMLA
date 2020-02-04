@@ -636,7 +636,7 @@ class QuantumModelLearningAgent():
         for mod in list(self.model_initial_ids.keys()):
             mod_id = self.model_initial_ids[mod]
             if database_framework.alph(mod) == self.true_model_name:
-                self.TrueOpModelID = mod_id
+                self.true_model_id = mod_id
             print("mod id:", mod_id)
             self.model_name_id_map[int(mod_id)] = mod
 
@@ -686,7 +686,7 @@ class QuantumModelLearningAgent():
         )
         if add_model_to_database_result == True:  # keep track of how many models/branches in play
             if database_framework.alph(model) == database_framework.alph(self.true_model_name):
-                self.TrueOpModelID = self.model_count
+                self.true_model_id = self.model_count
             self.highest_model_id += 1
             # print("Setting model ", model, "to ID:", self.model_count)
             model_id = self.model_count
@@ -810,7 +810,7 @@ class QuantumModelLearningAgent():
                 # TODO remove this try/except when reduced-champ-model instance
                 # is update-able
                 mod = self.get_model_storage_instance_by_id(mod_id)
-                mod.updateLearnedValues(
+                mod.model_update_learned_values(
                     fitness_parameters=self.model_fitness_scores
                 )
             except BaseException:
@@ -1772,24 +1772,24 @@ class QuantumModelLearningAgent():
         )
         # make ghost branches of all individidual trees
         # individual trees correspond to separate growth rules.
-        self.ActiveTreeBranchChamps = {}
+        self.active_growth_rule_branch_champs = {}
         for gen in self.growth_rules_list:
-            self.ActiveTreeBranchChamps[gen] = []
+            self.active_growth_rule_branch_champs[gen] = []
 
         for active_champ in self.branch_champs_active_list:
             branch_id_of_champ = self.models_branches[active_champ]
             gen = self.branch_growth_rules[branch_id_of_champ]
-            self.ActiveTreeBranchChamps[gen].append(active_champ)
+            self.active_growth_rule_branch_champs[gen].append(active_champ)
 
         self.log_print(
             [
                 "ActiveTreeBranchChamps:",
-                self.ActiveTreeBranchChamps
+                self.active_growth_rule_branch_champs
             ]
         )
         # self.final_trees = []
-        for gen in list(self.ActiveTreeBranchChamps.keys()):
-            models_for_tree_ghost_branch = self.ActiveTreeBranchChamps[gen]
+        for gen in list(self.active_growth_rule_branch_champs.keys()):
+            models_for_tree_ghost_branch = self.active_growth_rule_branch_champs[gen]
             mod_names = [
                 self.model_name_id_map[m]
                 for m in models_for_tree_ghost_branch
@@ -2176,7 +2176,7 @@ class QuantumModelLearningAgent():
             expec_val_plot_times = self.times_to_plot
 
         self.champion_name_latex = champ_model.model_name_latex
-        # equivalent to sleepf.ResultsDict
+        # equivalent to sleepfchampion_results
 
         self.champion_results = {
             'NameAlphabetical': database_framework.alph(self.ChampionName),
@@ -2365,7 +2365,7 @@ class QuantumModelLearningAgent():
             )
 
             self.get_model_storage_instance_by_id(
-                reduced_mod_id).updateLearnedValues()
+                reduced_mod_id).model_update_learned_values()
 
             bayes_factor = self.get_pairwise_bayes_factor(
                 model_a_id=int(self.champion_model_id),
@@ -2453,7 +2453,7 @@ class QuantumModelLearningAgent():
             db=self.db,
             name=mod_to_learn
         )
-        self.TrueOpModelID = mod_id
+        self.true_model_id = mod_id
         self.champion_model_id = mod_id
         self.log_print(
             [
@@ -2465,7 +2465,7 @@ class QuantumModelLearningAgent():
         )
         mod = self.get_model_storage_instance_by_id(mod_id)
         self.log_print(["Mod (reduced) name:", mod.Name])
-        mod.updateLearnedValues()
+        mod.model_update_learned_values()
 
         n_qubits = database_framework.get_num_qubits(mod.Name)
         if n_qubits > 3:
@@ -2486,21 +2486,12 @@ class QuantumModelLearningAgent():
             )
             expec_val_plot_times = self.times_to_plot
 
-        self.log_print(
-            [
-                "times to plot for expetation values:",
-                expec_val_plot_times
-            ]
-        )
-
         mod.compute_expectation_values(
             times=expec_val_plot_times,
-            # plot_probe_path = self.probes_plot_file
         )
         self.log_print(
             [
                 "Finished computing expectation values for", mod.Name,
-                mod.expectation_values
             ]
         )
 
@@ -2508,12 +2499,10 @@ class QuantumModelLearningAgent():
             model_id=mod_id
         )
 
-        # TODO write single QHL test
         time_now = time.time()
         time_taken = time_now - self._start_time
-#        true_model_r_squared = self.get_model_storage_instance_by_id(self.TrueOpModelID).r_squared()
 
-        self.ResultsDict = {
+        self.champion_results = {
             'NumParticles': self.num_particles,
             'NumExperiments': mod.num_experiments,
             'NumBayesTimes': self.num_experiments_for_bayes_updates,
@@ -2646,7 +2635,7 @@ class QuantumModelLearningAgent():
                 db=self.db, name=mod_name
             )
             mod = self.get_model_storage_instance_by_id(mod_id)
-            mod.updateLearnedValues(
+            mod.model_update_learned_values(
                 fitness_parameters=self.model_fitness_scores
             )
             self.compute_f_score(
@@ -2676,7 +2665,7 @@ class QuantumModelLearningAgent():
                 times=expec_val_plot_times,
                 # plot_probe_path = self.probes_plot_file
             )
-            # equivalent to self.ResultsDict
+            # equivalent to self.champion_results
             mod.results_dict = {
                 'NumParticles': mod.num_particles,
                 'NumExperiments': mod.num_experiments,
@@ -2842,7 +2831,7 @@ class QuantumModelLearningAgent():
                     models_this_branch = self.branch_resident_model_ids[branchID]
                     for mod_id in models_this_branch:
                         mod = self.get_model_storage_instance_by_id(mod_id)
-                        mod.updateLearnedValues()
+                        mod.model_update_learned_values()
 
                     self.get_bayes_factors_by_branch_id(branchID)
 
@@ -3187,7 +3176,7 @@ class QuantumModelLearningAgent():
             except BaseException:
                 pass
             try:
-                modlist.append(self.TrueOpModelID)
+                modlist.append(self.true_model_id)
             except BaseException:
                 pass
 

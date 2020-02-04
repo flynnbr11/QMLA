@@ -1057,7 +1057,7 @@ class ModelInstanceForStorage():
         with open(self.log_file, 'a') as write_log_file:
             print(identifier, str(to_print), file=write_log_file)
 
-    def updateLearnedValues(
+    def model_update_learned_values(
         self,
         # fitness_parameters,
         learned_info=None,
