@@ -52,7 +52,7 @@ def time_seconds():
 # Single function call to compute Bayes Factor between models given their IDs
 
 
-def BayesFactorRemote(
+def remote_bayes_factor_calculation(
     model_a_id,
     model_b_id,
     branchID=None,
@@ -108,7 +108,7 @@ def BayesFactorRemote(
     active_branches_bayes = rds_dbs['active_branches_bayes']
     active_interbranch_bayes = rds_dbs['active_interbranch_bayes']
 
-    info_dict = pickle.loads(rds_dbs['qmd_info_db']['QMDInfo'])
+    info_dict = pickle.loads(rds_dbs['qmd_info_db']['qmla_core_data'])
     use_experimental_data = info_dict['use_experimental_data']
     experimental_data_times = info_dict['experimental_measurement_times']
     binning = info_dict['bayes_factors_time_binning']

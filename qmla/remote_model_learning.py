@@ -38,9 +38,9 @@ def time_seconds():
     return time
 
 
-# Single function call, given QMDInfo and a name, to learn model entirely.
+# Single function call, given qmla_core_data and a name, to learn model entirely.
 
-def learnModelRemote(
+def remote_learn_model_parameters(
     name,
     modelID,
     branchID,
@@ -92,7 +92,7 @@ def learnModelRemote(
     any_job_failed_db = rds_dbs['any_job_failed']
 
     if qmd_info is None:
-        qmd_info = pickle.loads(qmd_info_db['QMDInfo'])
+        qmd_info = pickle.loads(qmd_info_db['qmla_core_data'])
         probe_dict = pickle.loads(qmd_info_db['ProbeDict'])
     else:  # if in serial, qmd_info given, with probe_dict included in it.
         probe_dict = qmd_info['probe_dict']

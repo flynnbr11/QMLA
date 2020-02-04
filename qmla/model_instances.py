@@ -185,7 +185,7 @@ class ModelInstanceForLearning():
         rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
         qmd_info_db = rds_dbs['qmd_info_db']
         init_model_print_loc = False
-        qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
+        qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
         self.use_experimental_data = qmd_info['use_experimental_data']
         self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
         self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
@@ -1010,7 +1010,7 @@ class ModelInstanceForStorage():
         self.ModelID = modelID
         self.SimOpList = sim_oplist
         self.ModelID = modelID
-        qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
+        qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
         self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
         self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
         self.measurement_class = qmd_info['measurement_type']
@@ -1468,7 +1468,7 @@ class ModelInstanceForComparison():
 
         qmd_info_db = rds_dbs['qmd_info_db']
 
-        qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
+        qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
         self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
         self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
 

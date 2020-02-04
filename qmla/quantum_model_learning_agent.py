@@ -20,17 +20,17 @@ import qinfer
 import redis
 
 # QMLA functionality
-from qmla.remote_bayes_factor import *
 import qmla.analysis
 import qmla.database_framework as database_framework
 import qmla.database_launch as database_launch
 import qmla.get_growth_rule as get_growth_rule
 import qmla.expectation_values as expectation_values 
-from qmla.remote_model_learning import *
 import qmla.model_naming as model_naming
 import qmla.model_generation as model_generation
 import qmla.model_instances as QML
 import qmla.redis_settings as rds
+from qmla.remote_bayes_factor import remote_bayes_factor_calculation
+from qmla.remote_model_learning import remote_learn_model_parameters
 
 pickle.HIGHEST_PROTOCOL = 2  # TODO if >python3, can use higher protocol
 plt.switch_backend('agg')
@@ -133,6 +133,16 @@ class QuantumModelLearningAgent():
     ##########
     # Section: Initialisation
     ##########
+
+    def log_print(self, to_print_list):
+        identifier = str(str(time_seconds()) + " [QMD " + str(self.qmla_id) + "]")
+        if not isinstance(to_print_list, list):
+            to_print_list = list(to_print_list)
+
+        print_strings = [str(s) for s in to_print_list]
+        to_print = " ".join(print_strings)
+        with open(self.log_file, 'a') as write_log_file:
+            print(identifier, str(to_print), file=write_log_file, flush=True)
 
     def _fundamental_settings(self):
         self.qmla_id = self.qmla_controls.qmd_id
@@ -480,66 +490,67 @@ class QuantumModelLearningAgent():
             test_workers = self.use_rq
             self.rq_queue = Queue(
                 self.qmla_id,
-                connection=self.redis_conn,
-                async=test_workers,
-                default_timeout=self.rq_timeout
-            )  # TODO is this timeout sufficient for ALL QMD jobs?
-
+                connection = self.redis_conn,
+                async = test_workers,
+                default_timeout = self.rq_timeout
+            )
             parallel_enabled = True
         except BaseException:
-            print("importing rq failed")
+            self.log_print("Importing rq failed")
             parallel_enabled = False
 
-        self.RunParallel = parallel_enabled
+        self.run_in_parallel = parallel_enabled
 
     def _compute_base_resources(self):
         # TODO remove base_num_qubits stuff?
-        base_num_qubits = 3
-        base_num_terms = 3
-        for op in self.models_first_layer:
-            if database_framework.get_num_qubits(op) < base_num_qubits:
-                base_num_qubits = database_framework.get_num_qubits(op)
-            num_terms = len(database_framework.get_constituent_names_from_name(op))
-            if (
-                num_terms < base_num_terms
-            ):
-                base_num_terms = num_terms
+        if self.reallocate_resources:
+            base_num_qubits = 3
+            base_num_terms = 3
+            for op in self.models_first_layer:
+                if database_framework.get_num_qubits(op) < base_num_qubits:
+                    base_num_qubits = database_framework.get_num_qubits(op)
+                num_terms = len(database_framework.get_constituent_names_from_name(op))
+                if (
+                    num_terms < base_num_terms
+                ):
+                    base_num_terms = num_terms
 
-        self.BaseResources = {
-            'num_qubits': base_num_qubits,
-            'num_terms': base_num_terms,
-        }
-
+            self.base_resources = {
+                'num_qubits': base_num_qubits,
+                'num_terms': base_num_terms,
+            }
+        else:
+            self.base_resources = {
+                'num_qubits': 1,
+                'num_terms': 1,
+            }
 
     def _compile_and_store_qmla_info_summary(
         self
     ):
-        num_exp_ham = (
+        number_hamiltonians_to_exponentiate = (
             self.num_particles *
             (self.num_experiments + self.num_experiments_for_bayes_updates)
         )
-        latex_config = str(
+        self.latex_config = str(
             '$P_{' + str(self.num_particles) +
             '}E_{' + str(self.num_experiments) +
             '}B_{' + str(self.num_experiments_for_bayes_updates) +
             '}RT_{' + str(self.qinfer_resample_threshold) +
             '}RA_{' + str(self.qinfer_resampler_a) +
             '}RP_{' + str(self.qinfer_PGH_heuristic_factor) +
-            '}H_{' + str(num_exp_ham) +
+            '}H_{' + str(number_hamiltonians_to_exponentiate) +
             r'}|\psi>_{' + str(self.probe_number) +
             '}PN_{' + str(self.qmla_controls.probe_noise_level) +
             '}BF^{bin }_{' + str(self.qmla_controls.bayes_time_binning) +
             '}BF^{all }_{' + str(self.qmla_controls.bayes_factors_use_all_exp_times) +
             '}$'
         )
-        self.LatexConfig = latex_config
-        print("[QMD] latex config:", self.LatexConfig)
 
-        self.QMDInfo = {
+        self.qmla_core_data = {
             # may need to take copies of these in case pointers accross nodes
             # break
             'num_probes': self.probe_number,
-            #          'probe_dict' : self.probes_system, # possibly include here?
             'probes_plot_file': self.probes_plot_file,
             'plot_times': self.times_to_plot,
             'true_oplist': self.true_model_constituent_operators,
@@ -577,7 +588,7 @@ class QuantumModelLearningAgent():
             'prior_pickle_file': self.qmla_controls.prior_pickle_file,
             'prior_specific_terms': self.growth_class.gaussian_prior_means_and_widths,
             'model_priors': self.model_priors,
-            'base_resources': self.BaseResources,
+            'base_resources': self.base_resources,
             'reallocate_resources': self.reallocate_resources,
             'param_min': self.qmla_controls.param_min,
             'param_max': self.qmla_controls.param_max,
@@ -586,24 +597,15 @@ class QuantumModelLearningAgent():
             'tree_identifiers': self.tree_identifiers,
             'bayes_factors_time_all_exp_times': self.qmla_controls.bayes_factors_use_all_exp_times,
         }
-        compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
+        compressed_qmd_info = pickle.dumps(self.qmla_core_data, protocol=2)
         compressed_probe_dict = pickle.dumps(self.probes_system, protocol=2)
         compressed_sim_probe_dict = pickle.dumps(self.probes_simulator, protocol=2)
         qmd_info_db = self.redis_databases['qmd_info_db']
         self.log_print(["Saving qmd info db to ", qmd_info_db])
-        qmd_info_db.set('QMDInfo', compressed_qmd_info)
+        qmd_info_db.set('qmla_core_data', compressed_qmd_info)
         qmd_info_db.set('ProbeDict', compressed_probe_dict)
         qmd_info_db.set('SimProbeDict', compressed_sim_probe_dict)
 
-    def log_print(self, to_print_list):
-        identifier = str(str(time_seconds()) + " [QMD " + str(self.qmla_id) + "]")
-        if not isinstance(to_print_list, list):
-            to_print_list = list(to_print_list)
-
-        print_strings = [str(s) for s in to_print_list]
-        to_print = " ".join(print_strings)
-        with open(self.log_file, 'a') as write_log_file:
-            print(identifier, str(to_print), file=write_log_file, flush=True)
 
     def _initiate_database(self):
         self.db, self.legacy_db, self.model_lists = \
@@ -656,7 +658,7 @@ class QuantumModelLearningAgent():
     ):
         #self.model_count += 1
         model = database_framework.alph(model)
-        tryAddModel = database_launch.add_model(
+        add_model_to_database_result = database_launch.add_model(
             model_name=model,
             running_database=self.db,
             num_particles=self.num_particles,
@@ -682,7 +684,7 @@ class QuantumModelLearningAgent():
             log_file=self.log_file,
             force_create_model=force_create_model,
         )
-        if tryAddModel == True:  # keep track of how many models/branches in play
+        if add_model_to_database_result == True:  # keep track of how many models/branches in play
             if database_framework.alph(model) == database_framework.alph(self.true_model_name):
                 self.TrueOpModelID = self.model_count
             self.highest_model_id += 1
@@ -690,15 +692,6 @@ class QuantumModelLearningAgent():
             model_id = self.model_count
             self.model_name_id_map[model_id] = model
             self.model_count += 1
-            # if database_framework.get_num_qubits(model) > self.HighestQubitNumber:
-            #     self.HighestQubitNumber = database_framework.get_num_qubits(model)
-            #     self.branch_growth_rule_instances[branchID].highest_num_qubits = database_framework.get_num_qubits(
-            #         model)
-            #     # self.growth_class.highest_num_qubits = database_framework.get_num_qubits(model)
-            #     print("self.growth_class.highest_num_qubits",
-            #           self.branch_growth_rule_instances[branchID].highest_num_qubits)
-
-        # retrieve model_id from database? or somewhere
         else:
             try:
                 model_id = database_framework.model_id_from_name(
@@ -716,7 +709,7 @@ class QuantumModelLearningAgent():
                 raise
 
         add_model_output = {
-            'is_new_model': tryAddModel,
+            'is_new_model': add_model_to_database_result,
             'model_id': model_id,
         }
 
@@ -736,8 +729,10 @@ class QuantumModelLearningAgent():
         model_list = list(set(model_list))  # remove possible duplicates
         self.branch_highest_id += 1
         branchID = int(self.branch_highest_id)
-        print(
-            "NEW BRANCH {}. growth rule= {}".format(branchID, growth_rule)
+        self.log_print(
+            [
+                "NEW BRANCH {}. growth rule= {}".format(branchID, growth_rule)
+            ]
         )
         self.branch_comparisons_completed[branchID] = False
         num_models = len(model_list)
@@ -802,7 +797,6 @@ class QuantumModelLearningAgent():
                 'Num models already computed on branch ',
                 branchID,
                 '=', num_models_already_computed_this_branch,
-                # 'Branch model ids:', model_id_list
             ]
         )
         return branchID
@@ -858,9 +852,9 @@ class QuantumModelLearningAgent():
         model_list = self.branch_resident_model_names[branchID]
         self.log_print(
             [
-                "learnModelFromBranchID branch",
+                "learn_models_on_given_branch. branch",
                 branchID,
-                ":",
+                " has models:",
                 model_list
             ]
         )
@@ -870,23 +864,10 @@ class QuantumModelLearningAgent():
         num_models_already_set_this_branch = (
             self.branch_num_precomputed_models[branchID]
         )
-
-        self.log_print(
-            [
-                "learnModelFromBranchID.",
-                "Setting active branches on redis for branch",
-                branchID,
-                "to",
-                num_models_already_set_this_branch
-
-            ]
-        )
-
         active_branches_learning_models.set(
             int(branchID),
             num_models_already_set_this_branch
         )
-
         unlearned_models_this_branch = list(
             set(model_list) -
             set(self.branch_models_precomputed[branchID])
@@ -894,22 +875,15 @@ class QuantumModelLearningAgent():
 
         self.log_print(
             [
-                "branch {} precomputed:".format(
+                "branch {} has {} precomputed models and unlearned models {}".format(
                     branchID,
-                    self.branch_models_precomputed[branchID]
+                    self.branch_models_precomputed[branchID],
+                    unlearned_models_this_branch
                 )
             ]
         )
         if len(unlearned_models_this_branch) == 0:
             self.ghost_branch_list.append(branchID)
-
-        self.log_print(
-            [
-                "Branch ", branchID,
-                "has unlearned models:",
-                unlearned_models_this_branch
-            ]
-        )
 
         for model_name in unlearned_models_this_branch:
             self.log_print(
@@ -937,7 +911,7 @@ class QuantumModelLearningAgent():
             )
         self.log_print(
             [
-                'learnModelFromBranchID finished, branch', branchID
+                'Learning models from branch {} finished.'.format( branchID )
             ]
         )
 
@@ -947,20 +921,18 @@ class QuantumModelLearningAgent():
         use_rq=True,
         blocking=False
     ):
-        exists = database_framework.check_model_exists(
+        model_already_exists = database_framework.check_model_exists(
             model_name=model_name,
             model_lists=self.model_lists,
             db=self.db
         )
-        if exists:
+        if model_already_exists:
             modelID = database_framework.model_id_from_name(
                 self.db,
                 name=model_name
             )
-
             branchID = self.models_branches[modelID]
-
-            if self.RunParallel and use_rq:
+            if self.run_in_parallel and use_rq:
                 # i.e. use a job queue rather than sequentially doing it.
                 from rq import Connection, Queue, Worker
                 queue = Queue(
@@ -968,12 +940,9 @@ class QuantumModelLearningAgent():
                     connection=self.redis_conn,
                     async=self.use_rq,
                     default_timeout=self.rq_timeout
-                )  # TODO is this timeout sufficient for ALL QMD jobs?
-
-                # add function call to RQ queue
-                print("[QMD 1085] RQ used")
+                )
                 queued_model = queue.enqueue(
-                    learnModelRemote,
+                    remote_learn_model_parameters,
                     model_name,
                     modelID,
                     growth_generator=self.branch_growth_rules[branchID],
@@ -1024,13 +993,13 @@ class QuantumModelLearningAgent():
                         "model:", model_name
                     ]
                 )
-                self.QMDInfo['probe_dict'] = self.probes_system
-                updated_model_info = learnModelRemote(
+                self.qmla_core_data['probe_dict'] = self.probes_system # why is this happening here??
+                updated_model_info = remote_learn_model_parameters(
                     model_name,
                     modelID,
                     growth_generator=self.branch_growth_rules[branchID],
                     branchID=branchID,
-                    qmd_info=self.QMDInfo,
+                    qmd_info=self.qmla_core_data,
                     remote=True,
                     host_name=self.redis_host_name,
                     port_number=self.redis_port_number,
@@ -1055,11 +1024,11 @@ class QuantumModelLearningAgent():
         branchID=None,
         interbranch=False,
         remote=True,
-        bayes_threshold=None,
+        # bayes_threshold=None,
         wait_on_result=False
     ):
-        if bayes_threshold is None:
-            bayes_threshold = self.bayes_threshold_upper
+        # if bayes_threshold is None:
+        #     bayes_threshold = self.bayes_threshold_upper
 
         if branchID is None:
             interbranch = True
@@ -1069,7 +1038,8 @@ class QuantumModelLearningAgent():
         )
         if (
             unique_id not in self.bayes_factor_pair_computed
-        ):  # ie not yet considered
+        ):  
+            # ie not yet considered
             self.bayes_factor_pair_computed.append(
                 unique_id
             )
@@ -1080,22 +1050,22 @@ class QuantumModelLearningAgent():
                           async=self.use_rq, default_timeout=self.rq_timeout
                           )
             job = queue.enqueue(
-                BayesFactorRemote,
-                model_a_id=model_a_id,
-                model_b_id=model_b_id,
-                branchID=branchID,
-                interbranch=interbranch,
-                times_record=self.bayes_factors_store_times_file,
-                bf_data_folder=self.bayes_factors_store_directory,
-                num_times_to_use=self.num_experiments_for_bayes_updates,
-                trueModel=self.true_model_name,
-                bayes_threshold=bayes_threshold,
-                host_name=self.redis_host_name,
-                port_number=self.redis_port_number,
-                qid=self.qmla_id,
-                log_file=self.rq_log_file,
-                result_ttl=-1,
-                timeout=self.rq_timeout
+                remote_bayes_factor_calculation, # the function is the first argument to RQ workers
+                model_a_id = model_a_id,
+                model_b_id = model_b_id,
+                branchID = branchID,
+                interbranch = interbranch,
+                times_record = self.bayes_factors_store_times_file,
+                bf_data_folder = self.bayes_factors_store_directory,
+                num_times_to_use = self.num_experiments_for_bayes_updates,
+                trueModel = self.true_model_name,
+                bayes_threshold = self.bayes_threshold_lower,
+                host_name = self.redis_host_name,
+                port_number = self.redis_port_number,
+                qid = self.qmla_id,
+                log_file = self.rq_log_file,
+                result_ttl = -1,
+                timeout = self.rq_timeout
             )
             self.log_print(
                 [
@@ -1112,7 +1082,7 @@ class QuantumModelLearningAgent():
             elif return_job == True:
                 return job
         else:
-            BayesFactorRemote(
+            remote_bayes_factor_calculation(
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
                 trueModel=self.true_model_name,
@@ -1121,7 +1091,7 @@ class QuantumModelLearningAgent():
                 num_times_to_use=self.num_experiments_for_bayes_updates,
                 branchID=branchID,
                 interbranch=interbranch,
-                bayes_threshold=bayes_threshold,
+                bayes_threshold=self.bayes_threshold_lower,
                 host_name=self.redis_host_name,
                 port_number=self.redis_port_number,
                 qid=self.qmla_id,
@@ -1143,10 +1113,10 @@ class QuantumModelLearningAgent():
         remote=True,
         wait_on_result=False,
         recompute=False,
-        bayes_threshold=None
+        # bayes_threshold=None
     ):
-        if bayes_threshold is None:
-            bayes_threshold = self.bayes_threshold_lower
+        # if bayes_threshold is None:
+        #     bayes_threshold = self.bayes_threshold_lower
 
         remote_jobs = []
         num_models = len(model_id_list)
@@ -1159,28 +1129,25 @@ class QuantumModelLearningAgent():
                     if (
                         unique_id not in self.bayes_factor_pair_computed
                         or recompute == True
-                    ):  # ie not yet considered
-                        # self.bayes_factor_pair_computed.append(
-                        #     unique_id
-                        # )
+                    ):  
+                        # ie not yet considered
                         remote_jobs.append(
                             self.get_pairwise_bayes_factor(
                                 a,
                                 b,
                                 remote=remote,
                                 return_job=wait_on_result,
-                                bayes_threshold=bayes_threshold
+                                # bayes_threshold=bayes_threshold
                             )
                         )
 
-        if wait_on_result and self.use_rq:  # test_workers from redis_settings
+        if wait_on_result and self.use_rq: 
             self.log_print(
                 [
                     "Waiting on result of ",
                     "Bayes comparisons from given list:",
                     model_id_list
                 ]
-
             )
             for job in remote_jobs:
                 while job.is_finished == False:
@@ -1190,8 +1157,8 @@ class QuantumModelLearningAgent():
         else:
             self.log_print(
                 [
-                    "Not waiting on results",
-                    "since not using RQ workers."
+                    "Not waiting on results of BF calculations",
+                    "since we're not using RQ workers here."
                 ]
             )
 
@@ -1199,14 +1166,13 @@ class QuantumModelLearningAgent():
         self,
         branchID,
         remote=True,
-        bayes_threshold=None,  # actually was 50,
+        # bayes_threshold=None,
         recompute=False
     ):
-        if bayes_threshold is None:
-            bayes_threshold = self.bayes_threshold_upper
+        # if bayes_threshold is None:
+        #     bayes_threshold = self.bayes_threshold_upper
 
         active_branches_bayes = self.redis_databases['active_branches_bayes']
-        # model_id_list = database_framework.active_model_ids_by_branch_id(self.db, branchID)
         model_id_list = self.branch_resident_model_ids[branchID]
         self.log_print(
             [
@@ -1229,8 +1195,8 @@ class QuantumModelLearningAgent():
                         unique_id not in self.bayes_factor_pair_computed
                         or
                         recompute == True
-                    ):  # ie not yet considered
-                        # self.bayes_factor_pair_computed.append(unique_id)
+                    ):  
+                        # ie not yet considered or recomputing
                         self.log_print(
                             [
                                 "Computing BF for pair",
@@ -1243,36 +1209,27 @@ class QuantumModelLearningAgent():
                             b,
                             remote=remote,
                             branchID=branchID,
-                            bayes_threshold=bayes_threshold
+                            # bayes_threshold=bayes_threshold
                         )
                     elif unique_id in self.bayes_factor_pair_computed:
-                        # if this already computed, so we need to tell this
-                        # branch not to wait on it.
+                        # if this is already computed,
+                        # tell this branch not to wait on it.
                         active_branches_bayes.incr(
                             int(branchID),
                             1
                         )
-                        self.log_print(
-                            [
-                                "BF already computed for pair ",
-                                unique_id,
-                                "now active branches bayes, br",
-                                branchID,
-                                ":",
-                                active_branches_bayes[branchID]
-                            ]
-                        )
 
-    def processRemoteBayesPair(
+    def process_remote_bayes_factor(
         self,
         a=None,
         b=None,
         pair=None,
-        bayes_threshold=None
+        # bayes_threshold=None
     ):
 
-        if bayes_threshold is None:
-            bayes_threshold = self.bayes_threshold_lower
+        # if bayes_threshold is None:
+        #     bayes_threshold = self.bayes_threshold_lower
+        # bayes_threshold = self.bayes_threshold_lower
         bayes_factors_db = self.redis_databases['bayes_factors_db']
         if pair is not None:
             model_ids = pair.split(',')
@@ -1319,9 +1276,9 @@ class QuantumModelLearningAgent():
         else:
             mod_high.BayesFactors[lower_id] = [(1.0 / bayes_factor)]
 
-        if bayes_factor > bayes_threshold:
+        if bayes_factor > self.bayes_threshold_lower:
             champ = mod_low.ModelID
-        elif bayes_factor < (1.0 / bayes_threshold):
+        elif bayes_factor < (1.0 / self.bayes_threshold_lower):
             champ = mod_high.ModelID
 
         return champ
@@ -1330,7 +1287,7 @@ class QuantumModelLearningAgent():
     def compare_all_models_in_branch(
         self,
         branchID,
-        bayes_threshold=None
+        # bayes_threshold=None
     ):
 
         active_models_in_branch_old = database_framework.active_model_ids_by_branch_id(
@@ -1346,8 +1303,8 @@ class QuantumModelLearningAgent():
             ]
         )
 
-        if bayes_threshold is None:
-            bayes_threshold = self.bayes_threshold_lower
+        # if bayes_threshold is None:
+        #     bayes_threshold = self.bayes_threshold_lower
 
         models_points = {}
         for model_id in active_models_in_branch:
@@ -1358,7 +1315,7 @@ class QuantumModelLearningAgent():
             for j in range(i, len(active_models_in_branch)):
                 mod2 = active_models_in_branch[j]
                 if mod1 != mod2:
-                    res = self.processRemoteBayesPair(a=mod1, b=mod2)
+                    res = self.process_remote_bayes_factor(a=mod1, b=mod2)
                     models_points[res] += 1
                     self.log_print(
                         [
@@ -1395,13 +1352,13 @@ class QuantumModelLearningAgent():
                 model_id_list=max_points_branches,
                 remote=True,
                 recompute=True,
-                bayes_threshold=bayes_threshold,
+                # bayes_threshold=self.bayes_threshold_lower,
                 wait_on_result=True
             )
 
             champ_id = self.compare_models_from_list(
                 max_points_branches,
-                bayes_threshold=bayes_threshold,
+                # bayes_threshold=bayes_threshold,
                 models_points_dict=models_points
             )
         else:
@@ -1514,12 +1471,12 @@ class QuantumModelLearningAgent():
     def compare_models_from_list(
         self,
         model_list,
-        bayes_threshold=None,
+        # bayes_threshold=None,
         models_points_dict=None,
         num_times_to_use='all'
     ):
-        if bayes_threshold is None:
-            bayes_threshold = self.bayes_threshold_lower
+        # if bayes_threshold is None:
+        #     bayes_threshold = self.bayes_threshold_lower
 
         models_points = {}
         for mod in model_list:
@@ -1531,7 +1488,7 @@ class QuantumModelLearningAgent():
                 mod2 = model_list[j]
                 if mod1 != mod2:
 
-                    res = self.processRemoteBayesPair(a=mod1, b=mod2)
+                    res = self.process_remote_bayes_factor(a=mod1, b=mod2)
                     if res == mod1:
                         loser = mod2
                     elif res == mod2:
@@ -1568,12 +1525,12 @@ class QuantumModelLearningAgent():
                 model_id_list=max_points_branches,
                 remote=True,
                 recompute=True,
-                bayes_threshold=self.bayes_threshold_lower,
+                # bayes_threshold=self.bayes_threshold_lower,
                 wait_on_result=True
             )
             champ_id = self.compare_models_from_list(
                 max_points_branches,
-                bayes_threshold=self.bayes_threshold_lower
+                # bayes_threshold=self.bayes_threshold_lower
             )
         else:
             self.log_print(["After comparing list:", models_points])
@@ -1585,10 +1542,10 @@ class QuantumModelLearningAgent():
 
     def perform_final_bayes_comparisons(
         self,
-        bayes_threshold=None
+        # bayes_threshold=None
     ):
-        if bayes_threshold is None:
-            bayes_threshold = self.bayes_threshold_upper
+        # if bayes_threshold is None:
+        #     bayes_threshold = self.bayes_threshold_upper
 
         bayes_factors_db = self.redis_databases['bayes_factors_db']
         # branch_champions = list(self.branch_champions.values())
@@ -1924,7 +1881,7 @@ class QuantumModelLearningAgent():
             remote=True,
             recompute=True,
             wait_on_result=True,
-            bayes_threshold=bayes_threshold
+            # bayes_threshold=bayes_threshold
         )
 
         branch_champions_points = {}
@@ -1936,7 +1893,7 @@ class QuantumModelLearningAgent():
             for j in range(i, num_active_models):
                 mod2 = active_models[j]
                 if mod1 != mod2:
-                    res = self.processRemoteBayesPair(
+                    res = self.process_remote_bayes_factor(
                         a=mod1,
                         b=mod2
                     )
@@ -1981,7 +1938,7 @@ class QuantumModelLearningAgent():
             )
             champ_id = self.compare_models_from_list(
                 max_points_branches,
-                bayes_threshold=self.bayes_threshold_lower,
+                # bayes_threshold=self.bayes_threshold_lower,
                 models_points_dict=branch_champions_points
             )
         else:
@@ -2183,7 +2140,7 @@ class QuantumModelLearningAgent():
         self.FinalSigmasChamp = (
             self.get_model_storage_instance_by_id(self.ChampID).FinalSigmas
         )
-        num_exp_ham = (
+        number_hamiltonians_to_exponentiate = (
             self.num_particles *
             (self.num_experiments + self.num_experiments_for_bayes_updates)
         )
@@ -2236,7 +2193,7 @@ class QuantumModelLearningAgent():
             'PHGPrefactor': self.qinfer_PGH_heuristic_factor,
             'LogFile': self.log_file,
             'ParamConfiguration': config,
-            'ConfigLatex': self.LatexConfig,
+            'ConfigLatex': self.latex_config,
             'Time': time_taken,
             'QID': self.qmla_id,
             'CorrectModel': correct_model,
@@ -2564,7 +2521,7 @@ class QuantumModelLearningAgent():
             'ResampleThreshold': self.qinfer_resample_threshold,
             'ResamplerA': self.qinfer_resampler_a,
             'PHGPrefactor': self.qinfer_PGH_heuristic_factor,
-            'ConfigLatex': self.LatexConfig,
+            'ConfigLatex': self.latex_config,
             'Time': time_taken,
             'QID': self.qmla_id,
             'RSquaredTrueModel': mod.r_squared(
@@ -2728,7 +2685,7 @@ class QuantumModelLearningAgent():
                 'ResampleThreshold': self.qinfer_resample_threshold,
                 'ResamplerA': self.qinfer_resampler_a,
                 'PHGPrefactor': self.qinfer_PGH_heuristic_factor,
-                'ConfigLatex': self.LatexConfig,
+                'ConfigLatex': self.latex_config,
                 'Time': time_taken,
                 'QID': self.qmla_id,
                 'ChampID': self.ChampID,
