@@ -430,7 +430,7 @@ if global_variables.qhl_test:
 
     results_file = global_variables.results_file
     pickle.dump(
-        qmdchampion_results,
+        qmd.champion_results,
         open(results_file, "wb"),
         protocol=2
     )
