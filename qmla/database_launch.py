@@ -13,12 +13,20 @@ import redis
 from qinfer import NormalDistribution
 
 from qmla.model_instances import ModelInstanceForLearning, ModelInstanceForStorage
-from qmla.database_framework import * 
+from qmla.database_framework import *
+import qmla.logging
 
 __all__ = [
-    'launch_db', 
+    'launch_db',
     'add_model'
 ]
+
+def log_print(to_print_list, log_file):
+    qmla.logging.print_to_log(
+        to_print_list = to_print_list,
+        log_file = log_file, 
+        log_identifier = 'Database launch'
+    )
 
 def launch_db(
     true_op_name,
@@ -48,9 +56,6 @@ def launch_db(
     """
     Inputs:
     TODO
-    RootN_Qbit: TODO
-    N_Qubits: TODO
-    gen_list: list of strings corresponding to model names.
 
     Outputs:
       - db: "running database", info on active models. Can access QML and
@@ -202,7 +207,7 @@ def add_model(
                 true_params = [true_params[0]]
                 redimensionalised_true_op = (
                     model_generation.identity_interact(subsystem=true_op_name,
-                                                      num_qubits=sim_dim, return_operator=True)
+                                                       num_qubits=sim_dim, return_operator=True)
                 )
                 true_ops = redimensionalised_true_op.constituents_operators
                 sim_name = model_name
@@ -213,7 +218,7 @@ def add_model(
                       )
                 sim_name = (
                     model_generation.dimensionalise_name_by_name(name=model_name,
-                                                                true_dim=true_dim)
+                                                                 true_dim=true_dim)
                 )
             else:
                 sim_name = model_name
@@ -234,55 +239,28 @@ def add_model(
         qml_instance = ModelInstanceForLearning(
             name=op.name,
             num_probes=num_probes,
-            # probe_dict = probe_dict,
-            # sim_probe_dict = sim_probe_dict,
         )
         sim_pars = []
         num_pars = op.num_constituents
-        # if num_pars ==1 : #TODO Remove this fixing the prior
-        #   normal_dist = NormalDistribution(
-        #     mean=true_params[0],
-        #     var=0.1
-        # )
-        # else:
-        #   normal_dist = MultiVariateNormalDistributionNocov(num_pars)
-
-        # for j in range(op.num_constituents):
-        #   sim_pars.append(normal_dist.sample()[0,0])
-
-        # add model_db_new_row to model_db and running_database
-        # Note: do NOT use pd.df.append() as this copies total DB,
-        # appends and returns copy.
-
         reduced_qml_instance = ModelInstanceForStorage(
             model_name=model_name,
             sim_oplist=op.constituents_operators,
             true_oplist=true_ops,
             true_params=true_params,
             modelID=int(modelID),
-            # numparticles = num_particles,
-            # resample_thresh = resample_threshold,
-            # resample_a = resampler_a,
-            # qle = qle,
             qid=qid,
             host_name=host_name,
             port_number=port_number,
             log_file=log_file
         )
-
-        # Add to running_database, same columns as initial gen_list
-
         running_db_new_row = pd.Series({
             '<Name>': model_name,
             'Status': 'Active',  # TODO
             'Completed': False,
             'branchID': int(branchID),  # TODO make argument of add_model fnc,
-            # 'Param_Estimates' : sim_pars,
-            # 'Estimates_Dist_Width' : normal_dist_width,
             'Reduced_Model_Class_Instance': reduced_qml_instance,
             'Operator_Instance': op,
             'Epoch_Start': 0,  # TODO fill in
-            # needs to be unique for each model
             'ModelID': int(float(modelID)),
         })
 

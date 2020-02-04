@@ -7,6 +7,10 @@ from scipy.optimize import curve_fit
 
 import qmla.database_framework as database_framework
 
+__all__ = [
+    'gaussian_prior'
+]
+
 def time_seconds():
     # return time in h:m:s format for logging.
     import datetime

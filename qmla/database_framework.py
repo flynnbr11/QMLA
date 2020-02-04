@@ -61,9 +61,25 @@ import warnings
 import hashlib
 
 import redis
-from qinfer import NormalDistribution
+# from qinfer import NormalDistribution
 
-# from qmla.model_instances import ModelInstanceForLearning, ModelInstanceForStorage
+__all__ = [
+    'core_operator_dict', 
+    'Operator',
+    'get_num_qubits', 
+    'get_constituent_names_from_name', 
+    'alph', 
+    'process_basic_operator', 
+    'consider_new_model', 
+    'reduced_model_instance_from_id',
+    'update_field', 
+    'pull_field', 
+    'check_model_exists',
+    'unique_model_pair_identifier',
+    'all_active_model_ids',
+    'model_id_from_name',
+    'list_model_id_in_branch'
+]
 
 def identity():
     return np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, 1 + 0.j]])

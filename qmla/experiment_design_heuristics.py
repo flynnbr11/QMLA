@@ -7,6 +7,14 @@ from inspect import currentframe, getframeinfo
 
 frameinfo = getframeinfo(currentframe())
 
+__all__ = [
+    'MultiParticleGuessHeuristic',
+    'TimeHeurstic',
+    'TimeFromListHeuristic',
+    'MixedMultiParticleLinspaceHeuristic',
+    'InverseEigenvalueHeuristic'
+]
+
 
 def singvalnorm(matrix):
     return np.real(max(np.sqrt(np.linalg.eig(np.dot(
@@ -48,10 +56,6 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
-        # print(
-        #     "[Hueirstic] - MultiParticleGuessHeuristic\n",
-        #     "kwargs:", kwargs
-        # )
 
     def __call__(
         self,
@@ -192,14 +196,10 @@ class TimeFromListHeuristic(qi.Heuristic):
                 "PGH did not find distinct particles in \
                 {} iterations.".format(self._maxiters)
             )
-
-        # print('Selected particles: #1 ' + repr(x) + ' #2 ' + repr(xp))
         eps = np.empty(
             (1,),
             dtype=self._updater.model.expparams_dtype
         )
-        # print (frameinfo.filename, frameinfo.lineno)
-
         idx_iter = 0  # modified in order to cycle through particle parameters with different names
         for field_i in self._x_:
             eps[field_i] = self._inv_func(x)[0][idx_iter]
@@ -209,11 +209,6 @@ class TimeFromListHeuristic(qi.Heuristic):
         new_time = self._time_list[time_id]
         eps[self._t] = new_time
 
-        # print("[Heuristic - time list] time idx {}  chosen {}:".format(
-        #         time_id,
-        #         eps[self._t]
-        #     )
-        # )
         return eps
 
 
@@ -233,7 +228,6 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         maxiters=10,
         other_fields=None,
         time_list=None,
-        # num_experiments=200,
         **kwargs
     ):
         super(MixedMultiParticleLinspaceHeuristic, self).__init__(updater)
@@ -248,22 +242,9 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
         self._num_experiments = kwargs.get('num_experiments', 200)
-
-        # self._time_list = kwargs['time_list']
         self._time_list = time_list
         self._len_time_list = len(self._time_list)
         self.num_epochs_for_first_phase = self._num_experiments / 2
-
-        # print(
-        #     "[Heuristics - 1/sigma then linspace]",
-        #     "num epochs for first phase:", self.num_epochs_for_first_phase,
-        #     "\n kwargs:", kwargs
-        # )
-        # try:
-        #     self._num_experiments = kwargs.get('num_experiments')
-        #     print("self.num_experiments:", self._num_experiments)
-        # except:
-        #     print("Can't find num_experiments in kwargs")
 
     def __call__(
         self,
@@ -288,13 +269,10 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
                 {} iterations.".format(self._maxiters)
             )
 
-        # print('Selected particles: #1 ' + repr(x) + ' #2 ' + repr(xp))
         eps = np.empty(
             (1,),
             dtype=self._updater.model.expparams_dtype
         )
-        # print (frameinfo.filename, frameinfo.lineno)
-
         idx_iter = 0  # modified in order to cycle through particle parameters with different names
         for field_i in self._x_:
             eps[field_i] = self._inv_func(x)[0][idx_iter]
@@ -308,10 +286,6 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         else:
             time_id = epoch_id % self._len_time_list
             new_time = self._time_list[time_id]
-        # print(
-        #     "[Heuristic] 1/sigma then linspace",
-        #     "\t time:", new_time
-        # )
         eps[self._t] = new_time
         return eps
 
@@ -332,7 +306,6 @@ class InverseEigenvalueHeuristic(qi.Heuristic):
         maxiters=10,
         other_fields=None,
         time_list=None,
-        # num_experiments=200,
         **kwargs
     ):
         super(InverseEigenvalueHeuristic, self).__init__(updater)
@@ -347,8 +320,6 @@ class InverseEigenvalueHeuristic(qi.Heuristic):
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
         self._num_experiments = kwargs.get('num_experiments', 200)
-
-        # self._time_list = kwargs['time_list']
         self._time_list = time_list
         self._len_time_list = len(self._time_list)
         self.num_epochs_for_first_phase = self._num_experiments / 2
@@ -379,14 +350,10 @@ class InverseEigenvalueHeuristic(qi.Heuristic):
                 "PGH did not find distinct particles in \
                 {} iterations.".format(self._maxiters)
             )
-
-        # print('Selected particles: #1 ' + repr(x) + ' #2 ' + repr(xp))
         eps = np.empty(
             (1,),
             dtype=self._updater.model.expparams_dtype
         )
-        # print (frameinfo.filename, frameinfo.lineno)
-
         idx_iter = 0  # modified in order to cycle through particle parameters with different names
         for field_i in self._x_:
             eps[field_i] = self._inv_func(x)[0][idx_iter]
@@ -402,12 +369,6 @@ class InverseEigenvalueHeuristic(qi.Heuristic):
                 params=current_params,
                 raw_ops=self._oplist
             )
-        #     time_id = epoch_id % self._len_time_list
-        #     new_time = self._time_list[time_id]
-        # print(
-        #     "[Heuristic] 1/sigma then linspace",
-        #     "\t time:", new_time
-        # )
 
         eps[self._t] = new_time
         return eps
@@ -418,11 +379,6 @@ def new_time_based_on_eigvals(
     raw_ops,
     time_scale=1
 ):
-
-    # print(
-    #     "[Heuristic - time from eigvals]",
-    #     "params : {} \n raw ops: {}".format(params, raw_ops)
-    # )
     param_ops = [
         (params[i] * raw_ops[i]) for i in range(len(params))
     ]
@@ -434,5 +390,4 @@ def new_time_based_on_eigvals(
         max_eigvals.append(max_eigval_this_op)
     min_eigval = min(max_eigvals)
     new_time = time_scale * 1 / min_eigval
-    # print("[Heuristic - new time:", new_time)
     return new_time

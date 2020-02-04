@@ -15,6 +15,7 @@ sys.path.append(
 )
 
 import qmla
+import qmla.analysis
 # import ..qmla
 # 
 parser = argparse.ArgumentParser(

@@ -5,6 +5,10 @@ import os
 
 import qmla.growth_rules as GR
 
+__all__ = [
+    'get_growth_generator_class'
+]
+
 growth_classes = {
     # # Experimental paper growth rules
     'ExperimentNVCentre':
