@@ -51,7 +51,7 @@ def ExpectationValuesTrueSim(
     save_to_file=None
 ):
     use_experimental_data = qmd.use_experimental_data
-    experimental_measurements_dict = qmd.ExperimentalMeasurements
+    experimental_measurements_dict = qmd.experimental_measurements
 
     try:
         qmd.ChampID
@@ -72,7 +72,7 @@ def ExpectationValuesTrueSim(
     # plus_plus = np.array([0.5-0.j,  0.5-0.j, 0.5-0.j, 0.5-0.j]) # TODO
     # generalise probe
     plot_probe_dict = pickle.load(
-        open(qmd.PlotProbeFile, 'rb')
+        open(qmd.probes_plot_file, 'rb')
     )
     probe_id = random.choice(range(qmd.probe_number))
     # names colours from
@@ -109,7 +109,7 @@ def ExpectationValuesTrueSim(
         #     # true_probe = plus_plus
         #     true_probe = expectation_values.n_qubit_plus_state(true_dim)
         # else:
-        #     true_probe = qmd.system_probes[(probe_id,true_dim)]
+        #     true_probe = qmd.probes_system[(probe_id,true_dim)]
 
         true_probe = plot_probe_dict[true_dim]
 
@@ -186,7 +186,7 @@ def ExpectationValuesTrueSim(
             # if plus_probe:
             #     sim_probe = expectation_values.n_qubit_plus_state(sim_dim)
             # else:
-            #     sim_probe = qmd.system_probes[(probe_id,sim_dim)]
+            #     sim_probe = qmd.probes_system[(probe_id,sim_dim)]
             sim_probe = plot_probe_dict[sim_dim]
             colour_id = int(i % len(sim_colours))
             sim_col = sim_colours[colour_id]
@@ -364,7 +364,7 @@ def plotDynamicsLearnedModels(
     # Hamiltonians don't have to work out each time step
     true_exp = [true_expec_vals[t] for t in times_to_plot]
     plot_probes = pickle.load(
-        open(qmd.qmla_controls.plot_probe_file, 'rb')
+        open(qmd.qmla_controls.probes_plot_file, 'rb')
     )
     num_models_to_plot = len(model_ids)
     all_bayes_factors = qmd.all_bayes_factors
@@ -401,7 +401,7 @@ def plotDynamicsLearnedModels(
     for mod_id in model_ids:
         reduced = qmd.get_model_storage_instance_by_id(mod_id)
         reduced.compute_expectation_values(
-            times=qmd.PlotTimes
+            times=qmd.times_to_plot
         )
 #         growth_generator = reduced.growth_rule_of_true_model
         desc = str(
@@ -685,7 +685,7 @@ def ExpectationValuesQHL_TrueModel(
 #    probe_id = random.choice(range(qmd.probe_number))
     probe_id = 10
 
-    experimental_measurements_dict = qmd.ExperimentalMeasurements
+    experimental_measurements_dict = qmd.experimental_measurements
     use_experimental_data = qmd.use_experimental_data
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
@@ -714,7 +714,7 @@ def ExpectationValuesQHL_TrueModel(
 #        true_ops = true_op.constituents_operators
         true_ops = qmd.true_model_constituent_operators
         true_dim = true_op.num_qubits
-        true_probe = qmd.system_probes[(probe_id, true_dim)]
+        true_probe = qmd.probes_system[(probe_id, true_dim)]
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
         true_expec_values = []
 
@@ -771,7 +771,7 @@ def ExpectationValuesQHL_TrueModel(
             print("Times:\n", times)
             print("SIM HAM:\n", sim_ham)
         sim_dim = sim_op.num_qubits
-        sim_probe = qmd.system_probes[(probe_id, sim_dim)]
+        sim_probe = qmd.probes_system[(probe_id, sim_dim)]
         colour_id = int(i % len(sim_colours))
         sim_col = sim_colours[colour_id]
 
@@ -1342,7 +1342,7 @@ def r_squared_from_epoch_list(
     max_time=None,
     save_to_file=None,
 ):
-    exp_times = sorted(list(qmd.ExperimentalMeasurements.keys()))
+    exp_times = sorted(list(qmd.experimental_measurements.keys()))
     if max_time is None:
         max_time = max(exp_times)
 
@@ -1352,7 +1352,7 @@ def r_squared_from_epoch_list(
     max_data_idx = exp_times.index(max_time)
     exp_times = exp_times[min_data_idx:max_data_idx]
     exp_data = [
-        qmd.ExperimentalMeasurements[t] for t in exp_times
+        qmd.experimental_measurements[t] for t in exp_times
     ]
     # plus = 1/np.sqrt(2) * np.array([1,1])
     # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe
@@ -1385,7 +1385,7 @@ def r_squared_from_epoch_list(
                     t=t,
                     state=probe
                 )
-                true = qmd.ExperimentalMeasurements[t]
+                true = qmd.experimental_measurements[t]
                 diff_squared = (sim - true)**2
                 sum_of_residuals += diff_squared
 

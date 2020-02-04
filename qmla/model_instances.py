@@ -187,8 +187,8 @@ class ModelInstanceForLearning():
         init_model_print_loc = False
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
         self.use_experimental_data = qmd_info['use_experimental_data']
-        self.system_probes = pickle.loads(qmd_info_db['ProbeDict'])
-        self.simulator_probes = pickle.loads(qmd_info_db['SimProbeDict'])
+        self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
+        self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
         self.num_particles = qmd_info['num_particles']
         self.num_experiments = qmd_info['num_experiments']
         self.growth_rule_of_true_model = growth_generator
@@ -249,12 +249,12 @@ class ModelInstanceForLearning():
         self.TimeDepTrueParams = qmd_info['time_dep_true_params']
         self.NumTimeDepTrueParams = qmd_info['num_time_dependent_true_params']
         self.QLE = qmd_info['qle']
-        self.PlotTimes = qmd_info['plot_times']
+        self.times_to_plot = qmd_info['plot_times']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.ExpComparisonTol = qmd_info['compare_linalg_exp_tol']
         self.MeasurementType = qmd_info['measurement_type']
-        self.ExperimentalMeasurements = qmd_info['experimental_measurements']
-        self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
+        self.experimental_measurements = qmd_info['experimental_measurements']
+        self.experimental_measurement_times = qmd_info['experimental_measurement_times']
         self.SimOpsNames = simopnames
 
         self.LatexTerm = self.growth_class.latex_name(
@@ -416,10 +416,10 @@ class ModelInstanceForLearning():
             measurement_type=self.MeasurementType,
             growth_generation_rule=self.growth_rule_of_true_model,
             use_experimental_data=self.use_experimental_data,
-            experimental_measurements=self.ExperimentalMeasurements,
-            experimental_measurement_times=self.ExperimentalMeasurementTimes,
-            probe_dict=self.system_probes,
-            sim_probe_dict=self.simulator_probes,
+            experimental_measurements=self.experimental_measurements,
+            experimental_measurement_times=self.experimental_measurement_times,
+            probe_dict=self.probes_system,
+            sim_probe_dict=self.probes_simulator,
             probecounter=0,
             solver='scipy',
             trotter=True,
@@ -465,7 +465,7 @@ class ModelInstanceForLearning():
             inv_field=self.Inv_Field,
             increase_time=self.IncreasePGHTime,
             pgh_exponent=self.qinfer_PGH_heuristic_exponent,
-            time_list=self.PlotTimes,
+            time_list=self.times_to_plot,
             num_experiments=self.num_experiments,
         )
         self.HeuristicType = self.Heuristic.__class__.__name__
@@ -574,7 +574,7 @@ class ModelInstanceForLearning():
             if self.use_experimental_data:
                 t = self.Experiment[0][0]
                 nearest = expdt.nearestAvailableExpTime(
-                    times=self.ExperimentalMeasurementTimes,
+                    times=self.experimental_measurement_times,
                     t=t
                 )
                 self.Experiment[0][0] = nearest
@@ -1011,10 +1011,10 @@ class ModelInstanceForStorage():
         self.SimOpList = sim_oplist
         self.ModelID = modelID
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
-        self.system_probes = pickle.loads(qmd_info_db['ProbeDict'])
-        self.simulator_probes = pickle.loads(qmd_info_db['SimProbeDict'])
+        self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
+        self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
         self.MeasurementType = qmd_info['measurement_type']
-        self.ExperimentalMeasurements = qmd_info['experimental_measurements']
+        self.experimental_measurements = qmd_info['experimental_measurements']
         self.use_experimental_data = qmd_info['use_experimental_data']
         # self.num_particles = qmd_info['num_particles']
         # self.num_experiments = qmd_info['num_experiments']
@@ -1025,10 +1025,10 @@ class ModelInstanceForStorage():
         self.true_model_constituent_operators = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
         self.true_model_name = qmd_info['true_name']
-        self.PlotProbes = pickle.load(
-            open(qmd_info['plot_probe_file'], 'rb')
+        self.probes_for_plots = pickle.load(
+            open(qmd_info['probes_plot_file'], 'rb')
         )
-        self.PlotTimes = qmd_info['plot_times']
+        self.times_to_plot = qmd_info['plot_times']
         self.QLE = qmd_info['qle']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.StoreParticlesWeights = qmd_info[
@@ -1211,7 +1211,7 @@ class ModelInstanceForStorage():
         #     )
         #     probe = plot_probe_dict[self.NumQubits]
 
-        probe = self.PlotProbes[self.ProbeDimension]
+        probe = self.probes_for_plots[self.ProbeDimension]
 
         # self.log_print(
         #     [
@@ -1262,7 +1262,7 @@ class ModelInstanceForStorage():
         )
         if times is None:
             exp_times = sorted(
-                list(self.ExperimentalMeasurements.keys())
+                list(self.experimental_measurements.keys())
             )
         else:
             exp_times = times
@@ -1275,9 +1275,9 @@ class ModelInstanceForStorage():
         max_data_idx = exp_times.index(max_time)
         exp_times = exp_times[min_data_idx:max_data_idx]
         exp_data = [
-            self.ExperimentalMeasurements[t] for t in exp_times
+            self.experimental_measurements[t] for t in exp_times
         ]
-        probe = self.PlotProbes[self.ProbeDimension]
+        probe = self.probes_for_plots[self.ProbeDimension]
 
         datamean = np.mean(exp_data[0:max_data_idx])
         # datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
@@ -1308,7 +1308,7 @@ class ModelInstanceForStorage():
                 )
                 self.expectation_values[t] = sim
 
-            true = self.ExperimentalMeasurements[t]
+            true = self.experimental_measurements[t]
             diff_squared = (true - sim)**2
             sum_of_residuals += diff_squared
             self.r_squared_of_t[t] = 1 - \
@@ -1353,7 +1353,7 @@ class ModelInstanceForStorage():
         )
 
         if times is None:
-            exp_times = sorted(list(self.ExperimentalMeasurements.keys()))
+            exp_times = sorted(list(self.experimental_measurements.keys()))
         else:
             exp_times = times
 
@@ -1373,14 +1373,14 @@ class ModelInstanceForStorage():
         exp_times = exp_times[min_data_idx:max_data_idx]
 
         exp_data = [
-            self.ExperimentalMeasurements[t]
+            self.experimental_measurements[t]
             for t in exp_times
         ]
 
         # exp_data = exp_data[0::10]
         # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
         # probe  = plot_probes[self.NumQubits]
-        probe = self.PlotProbes[self.ProbeDimension]
+        probe = self.probes_for_plots[self.ProbeDimension]
 
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum(
@@ -1415,7 +1415,7 @@ class ModelInstanceForStorage():
                     t=t,
                     state=probe
                 )
-                true = self.ExperimentalMeasurements[t]
+                true = self.experimental_measurements[t]
                 diff_squared = (sim - true)**2
                 sum_of_residuals += diff_squared
 
@@ -1428,11 +1428,11 @@ class ModelInstanceForStorage():
 
 
 #        self.GenSimModel = qml_qi.qinfer_model_interface(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.true_model_constituent_operators, trueparams = self.TrueParams, truename=self.true_model_name,             use_experimental_data = self.use_experimental_data,
-#            experimental_measurements = self.ExperimentalMeasurements,
+#            experimental_measurements = self.experimental_measurements,
 #            experimental_measurement_times=(
-#                self.ExperimentalMeasurementTimes
+#                self.experimental_measurement_times
 #            ),
-# model_name=self.Name, probe_dict = self.system_probes)    # probelist=self.true_model_constituent_operators,
+# model_name=self.Name, probe_dict = self.probes_system)    # probelist=self.true_model_constituent_operators,
 #        self.Updater = qi.SMCUpdater(self.GenSimModel, self.num_particles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.qinfer_resampler_a), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
 #        self.Updater.NormalizationRecord = self.NormalizationRecord
 
@@ -1469,13 +1469,13 @@ class ModelInstanceForComparison():
         qmd_info_db = rds_dbs['qmd_info_db']
 
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
-        self.system_probes = pickle.loads(qmd_info_db['ProbeDict'])
-        self.simulator_probes = pickle.loads(qmd_info_db['SimProbeDict'])
+        self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
+        self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
 
         self.ModelID = modelID
         self.num_particles = qmd_info['num_particles']
         self.probe_number = qmd_info['num_probes']
-        self.PlotProbePath = qmd_info['plot_probe_file']
+        self.PlotProbePath = qmd_info['probes_plot_file']
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.qinfer_resampler_a = qmd_info['resampler_a']
         self.qinfer_PGH_heuristic_factor = qmd_info['pgh_prefactor']
@@ -1485,8 +1485,8 @@ class ModelInstanceForComparison():
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.MeasurementType = qmd_info['measurement_type']
         self.use_experimental_data = qmd_info['use_experimental_data']
-        self.ExperimentalMeasurements = qmd_info['experimental_measurements']
-        self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
+        self.experimental_measurements = qmd_info['experimental_measurements']
+        self.experimental_measurement_times = qmd_info['experimental_measurement_times']
         self.results_directory = qmd_info['results_directory']
 
         # Get model specific data
@@ -1553,14 +1553,14 @@ class ModelInstanceForComparison():
             measurement_type=self.MeasurementType,
             growth_generation_rule=self.growth_rule_of_true_model,
             use_experimental_data=self.use_experimental_data,
-            experimental_measurements=self.ExperimentalMeasurements,
+            experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=(
-                self.ExperimentalMeasurementTimes
+                self.experimental_measurement_times
             ),
             model_name=self.Name,
             num_probes=self.probe_number,
-            probe_dict=self.system_probes,
-            sim_probe_dict=self.simulator_probes,
+            probe_dict=self.probes_system,
+            sim_probe_dict=self.probes_simulator,
             log_file=self.log_file,
             log_identifier=log_identifier
         )

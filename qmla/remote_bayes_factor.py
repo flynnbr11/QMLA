@@ -472,7 +472,7 @@ def plot_expec_vals_of_models(
     log_file,
     save_to_file=None
 ):
-    exp_msmts = model_a.ExperimentalMeasurements
+    exp_msmts = model_aexperimental_measurements
     times = list(sorted(exp_msmts.keys()))
     experimental_exp_vals = [
         exp_msmts[t] for t in times

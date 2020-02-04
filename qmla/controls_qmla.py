@@ -110,7 +110,7 @@ default_latex_mapping_file = str(
     default_results_directory +
     '/LatexMapping.txt'
 )
-default_plot_probe_file = None
+default_probes_plot_file = None
 default_reallocate_resources = 0
 default_bayes_time_binning = 0
 
@@ -216,7 +216,7 @@ class ControlsQMLA():
         self.data_time_offset = arguments.data_time_offset
         self.data_max_time = self.growth_class.max_time_to_consider  # arguments.data_max_time
         self.true_expec_path = arguments.true_expec_path
-        self.plot_probe_file = arguments.plot_probe_file
+        self.probes_plot_file = arguments.probes_plot_file
         self.special_probe = arguments.special_probe_for_learning
         self.latex_mapping_file = arguments.latex_mapping_file
         self.reallocate_resources = bool(arguments.reallocate_resources)
@@ -577,7 +577,7 @@ def parse_cmd_line_args(args):
         default="{}/true_params.p".format(os.getcwd())
     )
     parser.add_argument(
-        '-plot_probes', '--plot_probe_file',
+        '-plot_probes', '--probes_plot_file',
         help='Path where plot probe dict is pickled to.',
         type=str,
         default="{}/plot_probes.p".format(os.getcwd())

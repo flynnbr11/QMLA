@@ -497,7 +497,7 @@ def analyse_and_plot_dynamics_multiple_models(
     true_expectation_value_path=None,
     growth_generator=None,
     unique_growth_classes=None,
-    plot_probe_file=None,
+    probes_plot_file=None,
     top_number_models=2,
     save_true_expec_vals_alone_plot=True,
     collective_analysis_pickle_file=None,

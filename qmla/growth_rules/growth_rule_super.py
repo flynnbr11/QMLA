@@ -202,15 +202,15 @@ class GrowthRuleSuper():
                 "System Generate Probes called"
             ]
         )
-        self.system_probes = self.probe_generation_function(
+        self.probes_system = self.probe_generation_function(
             max_num_qubits=self.max_num_probe_qubits,
             num_probes=self.num_probes,
             **kwargs
         )
         if self.shared_probes == True:
-            self.simulator_probes = self.system_probes
+            self.probes_simulator = self.probes_system
         else:
-            self.simulator_probes = self.simulator_probe_generation_function(
+            self.probes_simulator = self.simulator_probe_generation_function(
                 max_num_qubits=self.max_num_probe_qubits,
                 num_probes=self.num_probes,
                 **kwargs
@@ -222,20 +222,20 @@ class GrowthRuleSuper():
     #     self,
     #     **kwargs
     # ):
-    #     self.system_probes = self.probe_generation_function(
+    #     self.probes_system = self.probe_generation_function(
     #         max_num_qubits=self.max_num_probe_qubits,
     #         num_probes=self.num_probes,
     #         **kwargs
     #     )
     #     if self.shared_probes == True:
-    #         self.simulator_probes = self.system_probes
+    #         self.probes_simulator = self.probes_system
     #     else:
-    #         self.simulator_probes = self.simulator_probe_generation_function(
+    #         self.probes_simulator = self.simulator_probe_generation_function(
     #             max_num_qubits=self.max_num_probe_qubits,
     #             num_probes=self.num_probes,
     #             **kwargs
     #         )
-    #     return self.system_probes
+    #     return self.probes_system
 
     # def simulator_probe_generator(
     #     # system probes
@@ -252,14 +252,14 @@ class GrowthRuleSuper():
     #         shared_probes = self.shared_probes
 
     #     if shared_probes == True:
-    #         self.simulator_probes = self.system_probes
+    #         self.probes_simulator = self.probes_system
     #     else:
-    #         self.simulator_probes = self.simulator_probe_generation_function(
+    #         self.probes_simulator = self.simulator_probe_generation_function(
     #             max_num_qubits=self.max_num_probe_qubits,
     #             num_probes=self.num_probes,
     #             **kwargs
     #         )
-    #     return self.simulator_probes
+    #     return self.probes_simulator
 
     def plot_probe_generator(
         self,

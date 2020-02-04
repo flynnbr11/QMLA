@@ -67,8 +67,8 @@ growth_class.generate_probes(
     minimum_tolerable_noise=0.0,
 )
 
-system_probes = growth_class.system_probes
-simulator_probe_dict = growth_class.simulator_probes
+system_probes = growth_class.probes_system
+simulator_probe_dict = growth_class.probes_simulator
 log_print(
     [
         "Generated probe dict from growth class"
@@ -164,7 +164,7 @@ true_ham = global_variables.true_hamiltonian
 if os.path.isfile(true_expectation_value_path) == False:
     true_expec_values = {}
     plot_probe_dict = pickle.load(
-        open(global_variables.plot_probe_file, 'rb')
+        open(global_variables.probes_plot_file, 'rb')
     )
     probe = plot_probe_dict[true_num_qubits]
     log_print(
@@ -405,7 +405,7 @@ if global_variables.qhl_test:
         qmd.TrueOpModelID
     )
     extend_dynamics_plot_times = [
-        t * 2 for t in qmd.PlotTimes
+        t * 2 for t in qmd.times_to_plot
     ]
     print(
         "[Exp.py - QHL]",
@@ -554,7 +554,7 @@ else:
         qmd.ChampID
     )
     extend_dynamics_plot_times = [
-        t * 2 for t in qmd.PlotTimes
+        t * 2 for t in qmd.times_to_plot
     ]
     print(
         "[Exp.py - QHL]",

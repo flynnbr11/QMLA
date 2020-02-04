@@ -115,7 +115,7 @@ parser.add_argument(
     default=None
 )
 parser.add_argument(
-    '-plot_probes', '--plot_probe_file',
+    '-plot_probes', '--probes_plot_file',
     help="File to pickle probes against which to plot expectation values.",
     type=str,
     default=None
@@ -146,7 +146,7 @@ true_growth_class = qmla.get_growth_generator_class(
 dataset = true_growth_class.experimental_dataset
 # measurement_type = true_growth_class.measurement_type
 latex_mapping_file = arguments.latex_mapping_file
-plot_probe_file = arguments.plot_probe_file
+probes_plot_file = arguments.probes_plot_file
 force_plus_probe = bool(arguments.force_plus_probe)
 results_collection_file = "{}/collect_analyses.p".format(
     directory_to_analyse
@@ -358,7 +358,7 @@ try:
         growth_generator=growth_generator,
         unique_growth_classes=unique_growth_classes,
         top_number_models=arguments.top_number_models,
-        plot_probe_file=plot_probe_file,
+        probes_plot_file=probes_plot_file,
         collective_analysis_pickle_file=results_collection_file,
         save_to_file=str(
             directory_to_analyse +
@@ -540,7 +540,7 @@ if further_qhl_mode == False:
             qmla.analysis.cluster_results_and_plot(
                 path_to_results=results_csv,
                 true_expec_path=true_expec_path,
-                plot_probe_path=plot_probe_file,
+                plot_probe_path=probes_plot_file,
                 true_params_path=true_params_path,
                 growth_generator=growth_generator,
                 # measurement_type=measurement_type,

@@ -375,8 +375,8 @@ class QuantumModelLearningAgent():
                 noise_level = self.qmla_controls.probe_noise_level,
                 minimum_tolerable_noise = 0.0,
             )
-            self.system_probes = self.growth_class.system_probes
-            self.simulator_probes = self.system_probes
+            self.probes_system = self.growth_class.probes_system
+            self.probes_simulator = self.probes_system
         else:
             self.probe_number = self.qmla_controls.num_probes
             self.log_print(
@@ -384,58 +384,49 @@ class QuantumModelLearningAgent():
                     "Probe dict provided to QMLA."
                 ]
             )
-            self.system_probes = system_probe_dict
-            self.simulator_probes = simulation_probe_dict
+            self.probes_system = system_probe_dict
+            self.probes_simulator = simulation_probe_dict
         
-        self.ExperimentalMeasurements = experimental_measurements
-        if self.ExperimentalMeasurements is not None:
-            self.ExperimentalMeasurementTimes = (
-                sorted(list(self.ExperimentalMeasurements.keys()))
+        self.experimental_measurements = experimental_measurements
+        if self.experimental_measurements is not None:
+            self.experimental_measurement_times = (
+                sorted(list(self.experimental_measurements.keys()))
             )
         else:
-            self.ExperimentalMeasurementTimes = None
-        self.PlotProbeFile = self.qmla_controls.plot_probe_file
+            self.experimental_measurement_times = None
+        self.probes_plot_file = self.qmla_controls.probes_plot_file
 
-        self.PlotTimes = plot_times
-        self.ReducedPlotTimes = self.PlotTimes[0::10]
-        self.PlotProbes = pickle.load(
-            open(self.PlotProbeFile, 'rb')
+        self.times_to_plot = plot_times
+        self.times_to_plot_reduced_set = self.times_to_plot[0::10]
+        self.probes_for_plots = pickle.load(
+            open(self.probes_plot_file, 'rb')
         )
         if self.use_experimental_data == False:
             # TODO is this doing anything useful?
             # at least put in separate method
-            self.ExperimentalMeasurements = {}
-            self.TrueHamiltonian = self.qmla_controls.true_hamiltonian
-            self.TrueHamiltonianDimension = np.log2(
-                self.TrueHamiltonian.shape[0]
-            )
+            self.experimental_measurements = {}
+            self.true_model_hamiltonian = self.qmla_controls.true_hamiltonian
             self.log_print(
                 [
                     "Getting expectation values for simulated model",
-                    "(len {})".format(len(self.PlotTimes)),
-                    "\n Times computed:\n", self.PlotTimes
+                    "(len {})".format(len(self.times_to_plot)),
+                    "\n Times computed:\n", self.times_to_plot
                 ]
             )
 
-            for t in self.PlotTimes:
+            for t in self.times_to_plot:
                 # TODO is this the right expectation value func???
 
-                self.ExperimentalMeasurements[t] = (
+                self.experimental_measurements[t] = (
                     self.growth_class.expectation_value(
-                        ham=self.TrueHamiltonian,
-                        t=t,
-                        state=self.PlotProbes[self.true_model_dimension],
-                        log_file=self.log_file,
-                        log_identifier='[QMD Init]'
+                        ham = self.qmla_controls.true_hamiltonian,
+                        t = t,
+                        state = self.probes_for_plots[self.true_model_dimension],
+                        log_file = self.log_file,
+                        log_identifier = '[QMLA Init]'
                     )
 
                 )
-            self.log_print(
-                [
-                    "Expectation values computed",
-                ]
-            )
-
 
     def _potentially_redundant_setup(
         self,
@@ -474,6 +465,7 @@ class QuantumModelLearningAgent():
             + str(self.qmla_controls.long_id)
             + '.txt'
         )
+        
     def _setup_parallel_requirements(self):
         self.use_rq = self.qmla_controls.use_rq
         self.rq_timeout = self.qmla_controls.rq_timeout
@@ -546,9 +538,9 @@ class QuantumModelLearningAgent():
             # may need to take copies of these in case pointers accross nodes
             # break
             'num_probes': self.probe_number,
-            #          'probe_dict' : self.system_probes, # possibly include here?
-            'plot_probe_file': self.PlotProbeFile,
-            'plot_times': self.PlotTimes,
+            #          'probe_dict' : self.probes_system, # possibly include here?
+            'probes_plot_file': self.probes_plot_file,
+            'plot_times': self.times_to_plot,
             'true_oplist': self.true_model_constituent_operators,
             'true_params': self.true_param_list,
             'num_particles': self.num_particles,
@@ -571,8 +563,8 @@ class QuantumModelLearningAgent():
             'use_exp_custom': self.UseExpCustom,
             'measurement_type': self.MeasurementType,
             'use_experimental_data': self.use_experimental_data,
-            'experimental_measurements': self.ExperimentalMeasurements,
-            'experimental_measurement_times': self.ExperimentalMeasurementTimes,
+            'experimental_measurements': self.experimental_measurements,
+            'experimental_measurement_times': self.experimental_measurement_times,
             'compare_linalg_exp_tol': self.ExpComparisonTol,
             'gaussian': self.gaussian,
             # 'bayes_factors_time_binning' : self.BayesTimeBinning,
@@ -594,8 +586,8 @@ class QuantumModelLearningAgent():
             'bayes_factors_time_all_exp_times': self.qmla_controls.bayes_factors_use_all_exp_times,
         }
         compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
-        compressed_probe_dict = pickle.dumps(self.system_probes, protocol=2)
-        compressed_sim_probe_dict = pickle.dumps(self.simulator_probes, protocol=2)
+        compressed_probe_dict = pickle.dumps(self.probes_system, protocol=2)
+        compressed_sim_probe_dict = pickle.dumps(self.probes_simulator, protocol=2)
         qmd_info_db = self.redis_databases['qmd_info_db']
         self.log_print(["Saving qmd info db to ", qmd_info_db])
         qmd_info_db.set('QMDInfo', compressed_qmd_info)
@@ -629,7 +621,7 @@ class QuantumModelLearningAgent():
                 resampler_a=self.qinfer_resampler_a,
                 pgh_prefactor=self.qinfer_PGH_heuristic_factor,
                 num_probes=self.probe_number,
-                probe_dict=self.system_probes,
+                probe_dict=self.probes_system,
                 use_exp_custom=self.UseExpCustom,
                 enable_sparse=self.EnableSparse,
                 debug_directory=self.DebugDirectory,
@@ -676,7 +668,7 @@ class QuantumModelLearningAgent():
             resampler_a=self.qinfer_resampler_a,
             pgh_prefactor=self.qinfer_PGH_heuristic_factor,
             num_probes=self.probe_number,
-            probe_dict=self.system_probes,
+            probe_dict=self.probes_system,
             use_exp_custom=self.UseExpCustom,
             enable_sparse=self.EnableSparse,
             debug_directory=self.DebugDirectory,
@@ -1031,7 +1023,7 @@ class QuantumModelLearningAgent():
                         "model:", model_name
                     ]
                 )
-                self.QMDInfo['probe_dict'] = self.system_probes
+                self.QMDInfo['probe_dict'] = self.probes_system
                 updated_model_info = learnModelRemote(
                     model_name,
                     modelID,
@@ -2140,8 +2132,8 @@ class QuantumModelLearningAgent():
 
         self.log_print(["computing expect vals for mod ", champ_model.ModelID])
         champ_model.compute_expectation_values(
-            times=self.PlotTimes,
-            # plot_probe_path = self.PlotProbeFile
+            times=self.times_to_plot,
+            # plot_probe_path = self.probes_plot_file
         )
         self.log_print(["computed expect vals"])
 
@@ -2216,7 +2208,7 @@ class QuantumModelLearningAgent():
                     "getting new set of times to plot expectation values for"
                 ]
             )
-            expec_val_plot_times = self.ReducedPlotTimes
+            expec_val_plot_times = self.times_to_plot_reduced_set
         else:
             self.log_print(
                 [
@@ -2224,7 +2216,7 @@ class QuantumModelLearningAgent():
                     "num qubits:", n_qubits
                 ]
             )
-            expec_val_plot_times = self.PlotTimes
+            expec_val_plot_times = self.times_to_plot
 
         self.ChampLatex = champ_model.LatexTerm
         # equivalent to sleepf.ResultsDict
@@ -2263,11 +2255,11 @@ class QuantumModelLearningAgent():
             'TrackTimesLearned': champ_model.Times,
             # 'TrackCovarianceMatrices' : champ_model.TrackCovMatrices,
             # 'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
-            #     plot_probes = self.PlotProbes,
+            #     plot_probes = self.probes_for_plots,
             #     times = expec_val_plot_times
             # ),
             'FinalRSquared': champ_model.r_squared(
-                plot_probes=self.PlotProbes,
+                plot_probes=self.probes_for_plots,
                 times=expec_val_plot_times
             ),
             'Fscore': self.FScore,
@@ -2527,7 +2519,7 @@ class QuantumModelLearningAgent():
                     "getting new set of times to plot expectation values for"
                 ]
             )
-            expec_val_plot_times = self.ReducedPlotTimes
+            expec_val_plot_times = self.times_to_plot_reduced_set
         else:
             self.log_print(
                 [
@@ -2535,7 +2527,7 @@ class QuantumModelLearningAgent():
                     "num qubits:", n_qubits
                 ]
             )
-            expec_val_plot_times = self.PlotTimes
+            expec_val_plot_times = self.times_to_plot
 
         self.log_print(
             [
@@ -2546,7 +2538,7 @@ class QuantumModelLearningAgent():
 
         mod.compute_expectation_values(
             times=expec_val_plot_times,
-            # plot_probe_path = self.PlotProbeFile
+            # plot_probe_path = self.probes_plot_file
         )
         self.log_print(
             [
@@ -2576,7 +2568,7 @@ class QuantumModelLearningAgent():
             'QID': self.qmla_id,
             'RSquaredTrueModel': mod.r_squared(
                 times=expec_val_plot_times,
-                plot_probes=self.PlotProbes
+                plot_probes=self.probes_for_plots
             ),
             'QuadraticLosses': mod.QuadraticLosses,
             'NameAlphabetical': database_framework.alph(mod.Name),
@@ -2589,11 +2581,11 @@ class QuantumModelLearningAgent():
             'ExpectationValues': mod.expectation_values,
             # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
             #     times = expec_val_plot_times,
-            #     plot_probes = self.PlotProbes
+            #     plot_probes = self.probes_for_plots
             # ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
             # 'FinalRSquared' : mod.final_r_squared,
             # 'FinalRSquared' : mod.r_squared(
-            #     plot_probes = self.PlotProbes,
+            #     plot_probes = self.probes_for_plots,
             #     times = expec_val_plot_times
             # ),
             'FinalRSquared': mod.final_r_squared,
@@ -2713,7 +2705,7 @@ class QuantumModelLearningAgent():
                         "getting new set of times to plot expectation values for"
                     ]
                 )
-                expec_val_plot_times = self.ReducedPlotTimes
+                expec_val_plot_times = self.times_to_plot_reduced_set
             else:
                 self.log_print(
                     [
@@ -2721,11 +2713,11 @@ class QuantumModelLearningAgent():
                         "num qubits:", n_qubits
                     ]
                 )
-                expec_val_plot_times = self.PlotTimes
+                expec_val_plot_times = self.times_to_plot
 
             mod.compute_expectation_values(
                 times=expec_val_plot_times,
-                # plot_probe_path = self.PlotProbeFile
+                # plot_probe_path = self.probes_plot_file
             )
             # equivalent to self.ResultsDict
             mod.results_dict = {
@@ -2741,7 +2733,7 @@ class QuantumModelLearningAgent():
                 'ChampID': self.ChampID,
                 'QuadraticLosses': mod.QuadraticLosses,
                 'RSquaredTrueModel': mod.r_squared(
-                    plot_probes=self.PlotProbes,
+                    plot_probes=self.probes_for_plots,
                     times=expec_val_plot_times
                 ),
                 'NameAlphabetical': database_framework.alph(mod.Name),
@@ -2754,11 +2746,11 @@ class QuantumModelLearningAgent():
                 'ExpectationValues': mod.expectation_values,
                 # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
                 #     times = expec_val_plot_times,
-                #     plot_probes = self.PlotProbes
+                #     plot_probes = self.probes_for_plots
                 # ),
                 # 'FinalRSquared' : mod.final_r_squared,
                 'FinalRSquared': mod.r_squared(
-                    plot_probes=self.PlotProbes,
+                    plot_probes=self.probes_for_plots,
                     times=expec_val_plot_times
                 ),
                 'p-value': mod.p_value,
@@ -3253,7 +3245,7 @@ class QuantumModelLearningAgent():
         # import qutip as qt
         bloch = qt.Bloch()
         for i in range(self.probe_number):
-            state = self.system_probes[i, 1]
+            state = self.probes_system[i, 1]
             a = state[0]
             b = state[1]
             A = a * qt.basis(2, 0)

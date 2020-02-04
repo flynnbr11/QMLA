@@ -79,7 +79,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-probe', '--plot_probe_file',
+    '-probe', '--probes_plot_file',
     help="File to pickle probes against which to plot expectation values.",
     type=str,
     default=None
@@ -179,7 +179,7 @@ for g in all_growth_classes:
         unique_growth_classes[g] = None
 
 true_operator = growth_class.true_operator
-plot_probe_file = arguments.plot_probe_file
+probes_plot_file = arguments.probes_plot_file
 force_plus_probe = bool(arguments.force_plus_probe)
 special_probe = arguments.special_probe
 gaussian = bool(arguments.gaussian)
@@ -248,9 +248,9 @@ plot_probe_dict = growth_class.plot_probe_generator(
 for k in list(plot_probe_dict.keys()):
     # replace tuple like key returned, with just dimension.
     plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
-if plot_probe_file is not None:
+if probes_plot_file is not None:
     import pickle
     pickle.dump(
         plot_probe_dict,
-        open(plot_probe_file, 'wb')
+        open(probes_plot_file, 'wb')
     )
