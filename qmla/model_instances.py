@@ -135,7 +135,7 @@ class ModelInstanceForLearning():
         self.NumExperimentsToDate = 0
         self.BayesFactors = {}
         self.log_file = log_file
-        self.Q_id = qid
+        self.qmla_id = qid
         self.ModelID = int(modelID)
 
     def log_print(
@@ -186,7 +186,7 @@ class ModelInstanceForLearning():
         qmd_info_db = rds_dbs['qmd_info_db']
         init_model_print_loc = False
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
-        self.UseExperimentalData = qmd_info['use_experimental_data']
+        self.use_experimental_data = qmd_info['use_experimental_data']
         self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
         self.SimProbeDict = pickle.loads(qmd_info_db['SimProbeDict'])
         self.NumParticles = qmd_info['num_particles']
@@ -196,7 +196,7 @@ class ModelInstanceForLearning():
         try:
             self.growth_class = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.GrowthGenerator,
-                use_experimental_data=self.UseExperimentalData,
+                use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
             )
         except BaseException:
@@ -241,7 +241,7 @@ class ModelInstanceForLearning():
         self.IncreasePGHTime = qmd_info['increase_pgh_time']
         self.StoreParticlesWeights = qmd_info['store_particles_weights']
         self.QHL_plots = qmd_info['qhl_plots']
-        self.ResultsDirectory = qmd_info['results_directory']
+        self.results_directory = qmd_info['results_directory']
         self.TrueOpList = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
         self.TrueOpName = qmd_info['true_name']
@@ -361,8 +361,8 @@ class ModelInstanceForLearning():
         )
 
         prior_dir = str(
-            self.ResultsDirectory +
-            'priors/QMD_{}/'.format(self.Q_id)
+            self.results_directory +
+            'priors/QMD_{}/'.format(self.qmla_id)
         )
 
         if not os.path.exists(prior_dir):
@@ -415,7 +415,7 @@ class ModelInstanceForLearning():
             num_probes=self.NumProbes,
             measurement_type=self.MeasurementType,
             growth_generation_rule=self.GrowthGenerator,
-            use_experimental_data=self.UseExperimentalData,
+            use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.ExperimentalMeasurements,
             experimental_measurement_times=self.ExperimentalMeasurementTimes,
             probe_dict=self.ProbeDict,
@@ -528,7 +528,7 @@ class ModelInstanceForLearning():
         true_params_names = database_framework.get_constituent_names_from_name(
             self.TrueOpName
         )
-        if self.UseExperimentalData == False:
+        if self.use_experimental_data == False:
             for i in range(len(true_params_names)):
                 term = true_params_names[i]
                 true_param_val = self.TrueParams[i]
@@ -571,7 +571,7 @@ class ModelInstanceForLearning():
             print_loc(global_print_loc)
             # TODO prefactor, if used, should be inside specific heuristic
             self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
-            if self.UseExperimentalData:
+            if self.use_experimental_data:
                 t = self.Experiment[0][0]
                 nearest = expdt.nearestAvailableExpTime(
                     times=self.ExperimentalMeasurementTimes,
@@ -687,7 +687,7 @@ class ModelInstanceForLearning():
             if (
                 checkloss == True
                 and
-                self.UseExperimentalData == False
+                self.use_experimental_data == False
                 # and istep%10 == 0
             ):
                 quadratic_loss = 0
@@ -1015,7 +1015,7 @@ class ModelInstanceForStorage():
         self.SimProbeDict = pickle.loads(qmd_info_db['SimProbeDict'])
         self.MeasurementType = qmd_info['measurement_type']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
-        self.UseExperimentalData = qmd_info['use_experimental_data']
+        self.use_experimental_data = qmd_info['use_experimental_data']
         # self.NumParticles = qmd_info['num_particles']
         # self.NumExperiments = qmd_info['num_experiments']
         self.NumProbes = qmd_info['num_probes']
@@ -1037,9 +1037,9 @@ class ModelInstanceForStorage():
         self.BayesFactors = {}
         self.NumQubits = database_framework.get_num_qubits(self.Name)
         self.ProbeDimension = self.NumQubits
-        self.HostName = host_name
-        self.PortNumber = port_number
-        self.Q_id = qid
+        self.redis_host_name = host_name
+        self.redis_port_number = port_number
+        self.qmla_id = qid
         self.log_file = log_file
         self.expectation_values = {}
         self.values_updated = False
@@ -1047,7 +1047,7 @@ class ModelInstanceForStorage():
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) +
                          "[QML:Reduced " +
-                         str(self.ModelID) + "; QMD " + str(self.Q_id) + "]"
+                         str(self.ModelID) + "; QMD " + str(self.qmla_id) + "]"
                          )
         if not isinstance(to_print_list, list):
             to_print_list = list(to_print_list)
@@ -1071,9 +1071,9 @@ class ModelInstanceForStorage():
         if self.values_updated == False:
             self.values_updated = True
             rds_dbs = rds.databases_from_qmd_id(
-                self.HostName,
-                self.PortNumber,
-                self.Q_id
+                self.redis_host_name,
+                self.redis_port_number,
+                self.qmla_id
             )
             learned_models_info = rds_dbs['learned_models_info']
             self.log_print(
@@ -1140,7 +1140,7 @@ class ModelInstanceForStorage():
             try:
                 self.growth_class = get_growth_rule.get_growth_generator_class(
                     growth_generation_rule=self.GrowthGenerator,
-                    use_experimental_data=self.UseExperimentalData,
+                    use_experimental_data=self.use_experimental_data,
                     log_file=self.log_file
                 )
             except BaseException:
@@ -1427,7 +1427,7 @@ class ModelInstanceForStorage():
         return r_squared_by_epoch
 
 
-#        self.GenSimModel = qml_qi.qinfer_model_interface(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.UseExperimentalData,
+#        self.GenSimModel = qml_qi.qinfer_model_interface(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.use_experimental_data,
 #            experimental_measurements = self.ExperimentalMeasurements,
 #            experimental_measurement_times=(
 #                self.ExperimentalMeasurementTimes
@@ -1464,7 +1464,7 @@ class ModelInstanceForComparison():
             qid
         )
         self.log_file = log_file
-        self.Q_id = qid
+        self.qmla_id = qid
 
         qmd_info_db = rds_dbs['qmd_info_db']
 
@@ -1484,10 +1484,10 @@ class ModelInstanceForComparison():
         self.TrueOpName = qmd_info['true_name']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.MeasurementType = qmd_info['measurement_type']
-        self.UseExperimentalData = qmd_info['use_experimental_data']
+        self.use_experimental_data = qmd_info['use_experimental_data']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
-        self.ResultsDirectory = qmd_info['results_directory']
+        self.results_directory = qmd_info['results_directory']
 
         # Get model specific data
         learned_models_info = rds_dbs['learned_models_info']
@@ -1529,7 +1529,7 @@ class ModelInstanceForComparison():
         self.GrowthGenerator = learned_model_info['growth_generator']
         self.growth_class = get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.GrowthGenerator,
-            use_experimental_data=self.UseExperimentalData,
+            use_experimental_data=self.use_experimental_data,
             log_file=self.log_file
         )
         # TODO this can be recreated from finalparams, but how for multiple
@@ -1552,7 +1552,7 @@ class ModelInstanceForComparison():
             truename=self.TrueOpName,
             measurement_type=self.MeasurementType,
             growth_generation_rule=self.GrowthGenerator,
-            use_experimental_data=self.UseExperimentalData,
+            use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.ExperimentalMeasurements,
             experimental_measurement_times=(
                 self.ExperimentalMeasurementTimes
@@ -1581,9 +1581,9 @@ class ModelInstanceForComparison():
         #     model_name_individual_terms = model_name_individual_terms,
         #     prior = posterior_distribution,
         #     plot_file = str(
-        #         self.ResultsDirectory
+        #         self.results_directory
         #         + '/priors/posterior_{}_{}.png'.format(
-        #             self.Q_id,
+        #             self.qmla_id,
         #             int(self.ModelID)
         #         )
         #     )
@@ -1643,7 +1643,7 @@ class ModelInstanceForComparison():
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) +
                          "[QML:Bayes " + str(self.ModelID) +
-                         "; QMD " + str(self.Q_id) + "]"
+                         "; QMD " + str(self.qmla_id) + "]"
                          )
         if not isinstance(to_print_list, list):
             to_print_list = list(to_print_list)

@@ -36,7 +36,7 @@ class IsingProbabilistic(
         # self.true_operator = 'pauliSet_zJz_1J2_d3PPPpauliSet_xJx_1J3_d3PPPpauliSet_zJz_2J3_d3PPPpauliSet_yJy_1J2_d3'
         self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_operator = database_framework.alph(self.true_operator)
-        self.qhl_models = [self.true_operator]
+        self.qhl_models = [self.true_operator, 'pauliSet_zJz_1J2_d4']
         self.base_terms = [
             # 'x',
             # 'y',
@@ -99,7 +99,10 @@ class IsingPredetermined(
         # self.true_operator = 'pauliSet_zJz_1J2_d2'
         # self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_operator = database_framework.alph(self.true_operator)
-        self.qhl_models = [self.true_operator]
+        self.qhl_models = [
+            self.true_operator,
+            'pauliSet_zJz_1J2_d2'
+        ]
         self.base_terms = [
             'z'
         ]

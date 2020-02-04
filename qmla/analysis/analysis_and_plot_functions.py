@@ -50,7 +50,7 @@ def ExpectationValuesTrueSim(
     true_plot_type='scatter',
     save_to_file=None
 ):
-    use_experimental_data = qmd.UseExperimentalData
+    use_experimental_data = qmd.use_experimental_data
     experimental_measurements_dict = qmd.ExperimentalMeasurements
 
     try:
@@ -345,10 +345,10 @@ def plotDynamicsLearnedModels(
     include_param_estimates=False,
     save_to_file=None
 ):
-    if qmd.QHLmode == True:
+    if qmd.qhl_mode == True:
         model_ids = [qmd.TrueOpModelID]
         include_bayes_factors = False
-    elif qmd.multiQHLMode == True:
+    elif qmd.qhl_mode_multiple_models == True:
         model_ids = list(qmd.multiQHL_model_ids)
         include_bayes_factors = False
     elif model_ids is None:
@@ -686,7 +686,7 @@ def ExpectationValuesQHL_TrueModel(
     probe_id = 10
 
     experimental_measurements_dict = qmd.ExperimentalMeasurements
-    use_experimental_data = qmd.UseExperimentalData
+    use_experimental_data = qmd.use_experimental_data
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour = colors.cnames['lightsalmon']  # 'b'
@@ -1414,7 +1414,7 @@ def plot_quadratic_loss(
     plt.clf()
     ax = plt.subplot(111)
 
-    if qmd.QHLmode is True:
+    if qmd.qhl_mode is True:
         to_plot_quad_loss = [qmd.TrueOpModelID]
         plot_title = str('Quadratic Loss for True operator (from QHL)')
     elif champs_or_all == 'champs':
@@ -3471,8 +3471,8 @@ def get_bayes_latex_dict(qmd):
     # print("get bayes latex dict")
 
     latex_write_file = open(
-        # str(qmd.ResultsDirectory + 'LatexMapping.txt'),
-        qmd.LatexMappingFile,
+        # str(qmd.results_directory + 'LatexMapping.txt'),
+        qmd.latex_name_map_file_path,
         'a+'
     )
     for i in list(qmd.AllBayesFactors.keys()):

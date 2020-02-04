@@ -135,26 +135,25 @@ class QuantumModelLearningAgent():
     ##########
 
     def _fundamental_settings(self):
-        self.Q_id = self.qmla_controls.qmd_id
-        self.UseExperimentalData = self.qmla_controls.use_experimental_data
-        self.HostName = self.qmla_controls.host_name
-        self.PortNumber = self.qmla_controls.port_number
+        self.qmla_id = self.qmla_controls.qmd_id
+        self.use_experimental_data = self.qmla_controls.use_experimental_data
+        self.redis_host_name = self.qmla_controls.host_name
+        self.redis_port_number = self.qmla_controls.port_number
         self.log_file = self.qmla_controls.log_file        
-        self.QLE = False  # Set to False for IQLE # TODO remove - redundant
-        self.QHLmode = self.qmla_controls.qhl_test
-        self.multiQHLMode = False
-        self.ResultsDirectory = self.qmla_controls.results_directory
-        if not self.ResultsDirectory.endswith('/'):
-            self.ResultsDirectory += '/'
-        self.LatexMappingFile = self.qmla_controls.latex_mapping_file
+        self.qhl_mode = self.qmla_controls.qhl_test
+        self.qhl_mode_multiple_models = self.qmla_controls.multiQHL
+        self.results_directory = self.qmla_controls.results_directory
+        if not self.results_directory.endswith('/'):
+            self.results_directory += '/'
+        self.latex_name_map_file_path = self.qmla_controls.latex_mapping_file
         self.log_print(["Retrieving databases from redis"])
-        self.RedisDataBases = rds.databases_from_qmd_id(
-            self.HostName,
-            self.PortNumber,
-            self.Q_id,
+        self.redis_databases = rds.databases_from_qmd_id(
+            self.redis_host_name,
+            self.redis_port_number,
+            self.qmla_id,
             # tree_identifiers=self.TreeIdentifiers
         )
-        self.RedisDataBases['any_job_failed'].set('Status', 0)
+        self.redis_databases['any_job_failed'].set('Status', 0)
 
     def _true_model_definition(self):
         self.TrueOpName = self.qmla_controls.true_op_name
@@ -242,7 +241,7 @@ class QuantumModelLearningAgent():
             gen = self.GeneratorList[i]
             growth_class_gen = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=gen,
-                use_experimental_data=self.UseExperimentalData,
+                use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
             )
             # self.TreesCompleted[gen] = False
@@ -406,7 +405,7 @@ class QuantumModelLearningAgent():
         self.PlotProbes = pickle.load(
             open(self.PlotProbeFile, 'rb')
         )
-        if self.UseExperimentalData == False:
+        if self.use_experimental_data == False:
             # TODO is this doing anything useful?
             # at least put in separate method
             self.ExperimentalMeasurements = {}
@@ -449,6 +448,7 @@ class QuantumModelLearningAgent():
     ):
         # testing whether these are used anywhere
         # Either remove, or find appropriate initialisation
+        self.QLE = False  # Set to False for IQLE # TODO remove - redundant
         self.MeasurementType = self.qmla_controls.measurement_type 
         self.UseExpCustom = use_exp_custom
         self.EnableSparse = True # should only matter when using custom exponentiation package
@@ -459,7 +459,7 @@ class QuantumModelLearningAgent():
         self.TimeDepParams = None
         self.UseTimeDepTrueModel = False
         self.BayesFactorsFolder = str(
-            self.ResultsDirectory
+            self.results_directory
             + 'BayesFactorsTimeRecords/'
         )
         if not os.path.exists(self.BayesFactorsFolder):
@@ -483,10 +483,10 @@ class QuantumModelLearningAgent():
         try:
             from rq import Connection, Queue, Worker
             self.redis_conn = redis.Redis(
-                host=self.HostName, port=self.PortNumber)
+                host=self.redis_host_name, port=self.redis_port_number)
             test_workers = self.use_rq
             self.rq_queue = Queue(
-                self.Q_id,
+                self.qmla_id,
                 connection=self.redis_conn,
                 async=test_workers,
                 default_timeout=self.rq_timeout
@@ -561,7 +561,7 @@ class QuantumModelLearningAgent():
             'store_particles_weights': False,
             'growth_generator': self.GrowthGenerator,
             'qhl_plots': False, # can be used during dev
-            'results_directory': self.ResultsDirectory,
+            'results_directory': self.results_directory,
             'plots_directory': self.qmla_controls.plots_directory,
             'long_id': self.qmla_controls.long_id,
             'debug_directory': self.DebugDirectory,
@@ -570,14 +570,14 @@ class QuantumModelLearningAgent():
             'true_name': self.TrueOpName,
             'use_exp_custom': self.UseExpCustom,
             'measurement_type': self.MeasurementType,
-            'use_experimental_data': self.UseExperimentalData,
+            'use_experimental_data': self.use_experimental_data,
             'experimental_measurements': self.ExperimentalMeasurements,
             'experimental_measurement_times': self.ExperimentalMeasurementTimes,
             'compare_linalg_exp_tol': self.ExpComparisonTol,
             'gaussian': self.gaussian,
             # 'bayes_factors_time_binning' : self.BayesTimeBinning,
             'bayes_factors_time_binning': self.qmla_controls.bayes_time_binning,
-            'q_id': self.Q_id,
+            'q_id': self.qmla_id,
             'use_time_dep_true_params': False,
             'time_dep_true_params': self.TimeDepParams,
             'num_time_dependent_true_params': self.NumTimeDepTrueParams,
@@ -596,14 +596,14 @@ class QuantumModelLearningAgent():
         compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
         compressed_probe_dict = pickle.dumps(self.ProbeDict, protocol=2)
         compressed_sim_probe_dict = pickle.dumps(self.SimProbeDict, protocol=2)
-        qmd_info_db = self.RedisDataBases['qmd_info_db']
+        qmd_info_db = self.redis_databases['qmd_info_db']
         self.log_print(["Saving qmd info db to ", qmd_info_db])
         qmd_info_db.set('QMDInfo', compressed_qmd_info)
         qmd_info_db.set('ProbeDict', compressed_probe_dict)
         qmd_info_db.set('SimProbeDict', compressed_sim_probe_dict)
 
     def log_print(self, to_print_list):
-        identifier = str(str(time_seconds()) + " [QMD " + str(self.Q_id) + "]")
+        identifier = str(str(time_seconds()) + " [QMD " + str(self.qmla_id) + "]")
         if not isinstance(to_print_list, list):
             to_print_list = list(to_print_list)
 
@@ -633,9 +633,9 @@ class QuantumModelLearningAgent():
                 use_exp_custom=self.UseExpCustom,
                 enable_sparse=self.EnableSparse,
                 debug_directory=self.DebugDirectory,
-                qid=self.Q_id,
-                host_name=self.HostName,
-                port_number=self.PortNumber
+                qid=self.qmla_id,
+                host_name=self.redis_host_name,
+                port_number=self.redis_port_number
             )
 
         for mod in list(self.InitialModelIDs.keys()):
@@ -683,9 +683,9 @@ class QuantumModelLearningAgent():
             modelID=self.NumModels,
             redimensionalise=False,
             qle=self.QLE,
-            host_name=self.HostName,
-            port_number=self.PortNumber,
-            qid=self.Q_id,
+            host_name=self.redis_host_name,
+            port_number=self.redis_port_number,
+            qid=self.qmla_id,
             log_file=self.log_file,
             force_create_model=force_create_model,
         )
@@ -732,7 +732,7 @@ class QuantumModelLearningAgent():
     def delete_unpicklable_attributes(self):
         del self.redis_conn
         del self.rq_queue
-        del self.RedisDataBases
+        del self.redis_databases
         del self.write_log_file
 
     def new_branch(
@@ -872,7 +872,7 @@ class QuantumModelLearningAgent():
             ]
         )
         active_branches_learning_models = (
-            self.RedisDataBases['active_branches_learning_models']
+            self.redis_databases['active_branches_learning_models']
         )
         num_models_already_set_this_branch = (
             self.BranchNumModelsPreComputed[branchID]
@@ -971,7 +971,7 @@ class QuantumModelLearningAgent():
                 # i.e. use a job queue rather than sequentially doing it.
                 from rq import Connection, Queue, Worker
                 queue = Queue(
-                    self.Q_id,
+                    self.qmla_id,
                     connection=self.redis_conn,
                     async=self.use_rq,
                     default_timeout=self.rq_timeout
@@ -986,9 +986,9 @@ class QuantumModelLearningAgent():
                     growth_generator=self.Branchget_growth_rule[branchID],
                     branchID=branchID,
                     remote=True,
-                    host_name=self.HostName,
-                    port_number=self.PortNumber,
-                    qid=self.Q_id,
+                    host_name=self.redis_host_name,
+                    port_number=self.redis_port_number,
+                    qid=self.qmla_id,
                     log_file=self.rq_log_file,
                     result_ttl=-1,
                     timeout=self.rq_timeout
@@ -1039,9 +1039,9 @@ class QuantumModelLearningAgent():
                     branchID=branchID,
                     qmd_info=self.QMDInfo,
                     remote=True,
-                    host_name=self.HostName,
-                    port_number=self.PortNumber,
-                    qid=self.Q_id, log_file=self.rq_log_file
+                    host_name=self.redis_host_name,
+                    port_number=self.redis_port_number,
+                    qid=self.qmla_id, log_file=self.rq_log_file
                 )
 
                 del updated_model_info
@@ -1083,7 +1083,7 @@ class QuantumModelLearningAgent():
 
         if self.use_rq:
             from rq import Connection, Queue, Worker
-            queue = Queue(self.Q_id, connection=self.redis_conn,
+            queue = Queue(self.qmla_id, connection=self.redis_conn,
                           async=self.use_rq, default_timeout=self.rq_timeout
                           )
             job = queue.enqueue(
@@ -1097,9 +1097,9 @@ class QuantumModelLearningAgent():
                 num_times_to_use=self.NumTimesForBayesUpdates,
                 trueModel=self.TrueOpName,
                 bayes_threshold=bayes_threshold,
-                host_name=self.HostName,
-                port_number=self.PortNumber,
-                qid=self.Q_id,
+                host_name=self.redis_host_name,
+                port_number=self.redis_port_number,
+                qid=self.qmla_id,
                 log_file=self.rq_log_file,
                 result_ttl=-1,
                 timeout=self.rq_timeout
@@ -1129,9 +1129,9 @@ class QuantumModelLearningAgent():
                 branchID=branchID,
                 interbranch=interbranch,
                 bayes_threshold=bayes_threshold,
-                host_name=self.HostName,
-                port_number=self.PortNumber,
-                qid=self.Q_id,
+                host_name=self.redis_host_name,
+                port_number=self.redis_port_number,
+                qid=self.qmla_id,
                 log_file=self.rq_log_file
             )
         if wait_on_result == True:
@@ -1139,7 +1139,7 @@ class QuantumModelLearningAgent():
                 model_a_id,
                 model_b_id
             )
-            bf_from_db = self.RedisDataBases['bayes_factors_db'].get(pair_id)
+            bf_from_db = self.redis_databases['bayes_factors_db'].get(pair_id)
             bayes_factor = float(bf_from_db)
 
             return bayes_factor
@@ -1212,7 +1212,7 @@ class QuantumModelLearningAgent():
         if bayes_threshold is None:
             bayes_threshold = self.BayesUpper
 
-        active_branches_bayes = self.RedisDataBases['active_branches_bayes']
+        active_branches_bayes = self.redis_databases['active_branches_bayes']
         # model_id_list = database_framework.active_model_ids_by_branch_id(self.db, branchID)
         model_id_list = self.BranchModelIds[branchID]
         self.log_print(
@@ -1280,7 +1280,7 @@ class QuantumModelLearningAgent():
 
         if bayes_threshold is None:
             bayes_threshold = self.BayesLower
-        bayes_factors_db = self.RedisDataBases['bayes_factors_db']
+        bayes_factors_db = self.redis_databases['bayes_factors_db']
         if pair is not None:
             model_ids = pair.split(',')
             a = (float(model_ids[0]))
@@ -1597,7 +1597,7 @@ class QuantumModelLearningAgent():
         if bayes_threshold is None:
             bayes_threshold = self.BayesUpper
 
-        bayes_factors_db = self.RedisDataBases['bayes_factors_db']
+        bayes_factors_db = self.redis_databases['bayes_factors_db']
         # branch_champions = list(self.BranchChampions.values())
         branch_champions = self.ActiveBranchChampList
         job_list = []
@@ -1858,11 +1858,11 @@ class QuantumModelLearningAgent():
             # self.get_bayes_factors_by_branch_id(new_branch_id)
 
         active_branches_learning_models = (
-            self.RedisDataBases[
+            self.redis_databases[
                 'active_branches_learning_models'
             ]
         )
-        active_branches_bayes = self.RedisDataBases[
+        active_branches_bayes = self.redis_databases[
             'active_branches_bayes'
         ]
         still_learning = True
@@ -2117,7 +2117,7 @@ class QuantumModelLearningAgent():
         return tree_completed
 
     def inspect_remote_job_crashes(self):
-        if self.RedisDataBases['any_job_failed']['Status'] == b'1':
+        if self.redis_databases['any_job_failed']['Status'] == b'1':
             # TODO better way to detect errors? For some reason the
             # log print isn't being hit, but raising error seems to be.
             self.log_print(
@@ -2246,7 +2246,7 @@ class QuantumModelLearningAgent():
             'ParamConfiguration': config,
             'ConfigLatex': self.LatexConfig,
             'Time': time_taken,
-            'QID': self.Q_id,
+            'QID': self.qmla_id,
             'CorrectModel': correct_model,
             'Underfit': underfit,
             'Overfit': overfit,
@@ -2371,7 +2371,7 @@ class QuantumModelLearningAgent():
 
             # get champion leared info
             reduced_champion_info = pickle.loads(
-                self.RedisDataBases['learned_models_info'].get(
+                self.redis_databases['learned_models_info'].get(
                     str(self.ChampID))
             )
 
@@ -2411,7 +2411,7 @@ class QuantumModelLearningAgent():
             )
 
             # TODO fill in values for ModelInstanceForStorage
-            self.RedisDataBases['learned_models_info'].set(
+            self.redis_databases['learned_models_info'].set(
                 str(float(reduced_mod_id)),
                 compressed_reduced_champ_info
             )
@@ -2479,7 +2479,7 @@ class QuantumModelLearningAgent():
     def run_quantum_hamiltonian_learning(self):
 
         if (
-            self.QHLmode == True
+            self.qhl_mode == True
             and
             self.TrueOpName not in list(self.ModelsBranches.keys())
         ):
@@ -2576,7 +2576,7 @@ class QuantumModelLearningAgent():
             'PHGPrefactor': self.PGHPrefactor,
             'ConfigLatex': self.LatexConfig,
             'Time': time_taken,
-            'QID': self.Q_id,
+            'QID': self.qmla_id,
             'RSquaredTrueModel': mod.r_squared(
                 times=expec_val_plot_times,
                 plot_probes=self.PlotProbes
@@ -2619,6 +2619,11 @@ class QuantumModelLearningAgent():
     def run_quantum_hamiltonian_learning_multiple_models(self, model_names=None):
         if model_names is None:
             # TODO get from growth rule
+            self.log_print(
+                [
+                    "Multiple model QHL; model_names is None; getting initial models"
+                ]
+            )
             model_names = self.InitialOpList
 
         current_models = list(
@@ -2639,7 +2644,7 @@ class QuantumModelLearningAgent():
                 growth_rule=self.GrowthGenerator,
                 model_list=models_to_add
             )
-        self.multiQHLMode = True
+        self.qhl_mode_multiple_models = True
         self.ChampID = -1,  # TODO just so not to crash during dynamics plot
         self.multiQHL_model_ids = [
             database_framework.model_id_from_name(
@@ -2655,7 +2660,7 @@ class QuantumModelLearningAgent():
             ]
         )
 
-        learned_models_ids = self.RedisDataBases['learned_models_ids']
+        learned_models_ids = self.redis_databases['learned_models_ids']
 
         for mod_name in model_names:
             print("Trying to get mod id for", mod_name)
@@ -2735,7 +2740,7 @@ class QuantumModelLearningAgent():
                 'PHGPrefactor': self.PGHPrefactor,
                 'ConfigLatex': self.LatexConfig,
                 'Time': time_taken,
-                'QID': self.Q_id,
+                'QID': self.qmla_id,
                 'ChampID': self.ChampID,
                 'QuadraticLosses': mod.QuadraticLosses,
                 'RSquaredTrueModel': mod.r_squared(
@@ -2787,9 +2792,9 @@ class QuantumModelLearningAgent():
 
         # print("[QMD runMult] start")
         active_branches_learning_models = (
-            self.RedisDataBases['active_branches_learning_models']
+            self.redis_databases['active_branches_learning_models']
         )
-        active_branches_bayes = self.RedisDataBases['active_branches_bayes']
+        active_branches_bayes = self.redis_databases['active_branches_bayes']
 
         print("[QMD] Going to learn initial models from branches.")
 
@@ -3159,7 +3164,7 @@ class QuantumModelLearningAgent():
 
         qmla.analysis.parameterEstimates(qmd=self,
                                    modelID=model_id,
-                                   use_experimental_data=self.UseExperimentalData,
+                                   use_experimental_data=self.use_experimental_data,
                                    save_to_file=save_to_file
                                    )
 
@@ -3216,7 +3221,7 @@ class QuantumModelLearningAgent():
         )
 
     def plot_qmla_radar_scores(self, modlist=None, save_to_file=None):
-        plot_title = str("Radar Plot QMD " + str(self.Q_id))
+        plot_title = str("Radar Plot QMD " + str(self.qmla_id))
         if modlist is None:
             modlist = list(self.BranchChampions.values())
         qmla.analysis.plotRadar(

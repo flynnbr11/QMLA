@@ -449,8 +449,12 @@ elif (
         qhl_models = further_qhl_models
         output_prefix = 'further_qhl_'
 
-    print("QHL Models:", qhl_models)
-
+    log_print(
+        [
+            "Launching QHL with multiple models: {}".format(qhl_models)
+        ],
+        log_file
+    )
     qmd.run_quantum_hamiltonian_learning_multiple_models(
         model_names=qhl_models
     )
