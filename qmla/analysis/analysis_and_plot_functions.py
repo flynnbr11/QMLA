@@ -118,11 +118,11 @@ def ExpectationValuesTrueSim(
 
         # print("true ham:", time_ind_true_ham)
         for t in times:
-            if qmd.UseTimeDepTrueModel:
+            if qmd.use_time_dependent_true_model:
                 # Multiply time dependent parameters by time value
                 params = copy.copy(qmd.true_param_list)
                 for i in range(
-                    len(params) - qmd.NumTimeDepTrueParams,
+                    len(params) - qmd.num_time_dependent_true_params,
                     len(params)
                 ):
                     params[i] = params[i] * t
@@ -719,11 +719,11 @@ def ExpectationValuesQHL_TrueModel(
         true_expec_values = []
 
         for t in times:
-            if qmd.UseTimeDepTrueModel:
+            if qmd.use_time_dependent_true_model:
                 # Multiply time dependent parameters by time value
                 params = copy.copy(qmd.true_param_list)
                 for i in range(
-                    len(params) - qmd.NumTimeDepTrueParams,
+                    len(params) - qmd.num_time_dependent_true_params,
                     len(params)
                 ):
                     params[i] = params[i] * t

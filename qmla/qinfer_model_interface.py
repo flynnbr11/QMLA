@@ -122,7 +122,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self._probecounter = probecounter
         self._a = 0
         self._b = 0
-        self.QLE = qle
+        self.use_qle = qle
         self._trotter = trotter
         self._modelparams = modelparams
         # print("[QInferModelQML] \n Oplist: {} \n params: {}".format(

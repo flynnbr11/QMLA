@@ -435,37 +435,38 @@ class QuantumModelLearningAgent():
         sigma_threshold, 
     ):
         # testing whether these are used anywhere
-        # Either remove, or find appropriate initialisation
-        self.InitialOpList = first_layer_models
-        self.QLE = False  # Set to False for IQLE # TODO remove - redundant
-        self.MeasurementType = self.qmla_controls.measurement_type 
-        self.UseExpCustom = use_exp_custom
-        self.EnableSparse = True # should only matter when using custom exponentiation package
-        self.ExpComparisonTol = None
-        self.SigmaThreshold = sigma_threshold
-        self.FitnessParameters = {}
-        self.DebugDirectory = None
-        self.NumTimeDepTrueParams = 0
+        # Either remove, or find appropriate place for initialisation and use
+        # many are included in qmd_info dict sent to workers; check if they are used thereafter
+        self.models_first_layer = first_layer_models
+        self.use_qle = False  # Set to False for IQLE # TODO remove - redundant
+        self.measurement_class = self.qmla_controls.measurement_type 
+        self.use_custom_exponentiation = use_exp_custom
+        self.enable_sparse_exponentiation = True # should only matter when using custom exponentiation package
+        self.exponentiation_tolerance = None
+        self.sigma_threshold = sigma_threshold
+        self.model_fitness_scores = {}
+        self.debug_directory = None
+        self.use_time_dependent_true_model = False
+        self.num_time_dependent_true_params = 0
+        self.time_dependent_params = None
         self.gaussian = self.qmla_controls.gaussian # TODO remove?        
-        self.TimeDepParams = None
-        self.UseTimeDepTrueModel = False
-        self.BayesFactorsFolder = str(
+        self.bayes_factors_store_directory = str(
             self.results_directory
             + 'BayesFactorsTimeRecords/'
         )
-        if not os.path.exists(self.BayesFactorsFolder):
+        if not os.path.exists(self.bayes_factors_store_directory):
             try:
-                os.makedirs(self.BayesFactorsFolder)
+                os.makedirs(self.bayes_factors_store_directory)
             except BaseException:
                 # reached at exact same time as another process; don't crash
                 pass
-        self.BayesFactorsTimeFile = str(
-            self.BayesFactorsFolder
+        self.bayes_factors_store_times_file = str(
+            self.bayes_factors_store_directory
             + 'BayesFactorsPairsTimes_'
             + str(self.qmla_controls.long_id)
             + '.txt'
         )
-        
+
     def _setup_parallel_requirements(self):
         self.use_rq = self.qmla_controls.use_rq
         self.rq_timeout = self.qmla_controls.rq_timeout
@@ -495,7 +496,7 @@ class QuantumModelLearningAgent():
         # TODO remove base_num_qubits stuff?
         base_num_qubits = 3
         base_num_terms = 3
-        for op in self.InitialOpList:
+        for op in self.models_first_layer:
             if database_framework.get_num_qubits(op) < base_num_qubits:
                 base_num_qubits = database_framework.get_num_qubits(op)
             num_terms = len(database_framework.get_constituent_names_from_name(op))
@@ -556,23 +557,23 @@ class QuantumModelLearningAgent():
             'results_directory': self.results_directory,
             'plots_directory': self.qmla_controls.plots_directory,
             'long_id': self.qmla_controls.long_id,
-            'debug_directory': self.DebugDirectory,
-            'qle': self.QLE,
-            'sigma_threshold': self.SigmaThreshold,
+            'debug_directory': self.debug_directory,
+            'qle': self.use_qle,
+            'sigma_threshold': self.sigma_threshold,
             'true_name': self.true_model_name,
-            'use_exp_custom': self.UseExpCustom,
-            'measurement_type': self.MeasurementType,
+            'use_exp_custom': self.use_custom_exponentiation,
+            'measurement_type': self.measurement_class,
             'use_experimental_data': self.use_experimental_data,
             'experimental_measurements': self.experimental_measurements,
             'experimental_measurement_times': self.experimental_measurement_times,
-            'compare_linalg_exp_tol': self.ExpComparisonTol,
+            'compare_linalg_exp_tol': self.exponentiation_tolerance,
             'gaussian': self.gaussian,
             # 'bayes_factors_time_binning' : self.BayesTimeBinning,
             'bayes_factors_time_binning': self.qmla_controls.bayes_time_binning,
             'q_id': self.qmla_id,
             'use_time_dep_true_params': False,
-            'time_dep_true_params': self.TimeDepParams,
-            'num_time_dependent_true_params': self.NumTimeDepTrueParams,
+            'time_dep_true_params': self.time_dependent_params,
+            'num_time_dependent_true_params': self.num_time_dependent_true_params,
             'prior_pickle_file': self.qmla_controls.prior_pickle_file,
             'prior_specific_terms': self.growth_class.gaussian_prior_means_and_widths,
             'model_priors': self.model_priors,
@@ -612,7 +613,7 @@ class QuantumModelLearningAgent():
                 new_model_ids=self.model_initial_ids,
                 log_file=self.log_file,
                 gen_list=self.branch_initial_models,
-                qle=self.QLE,
+                qle=self.use_qle,
                 true_ops=self.true_model_constituent_operators,
                 true_params=self.true_param_list,
                 num_particles=self.num_particles,
@@ -622,9 +623,9 @@ class QuantumModelLearningAgent():
                 pgh_prefactor=self.qinfer_PGH_heuristic_factor,
                 num_probes=self.probe_number,
                 probe_dict=self.probes_system,
-                use_exp_custom=self.UseExpCustom,
-                enable_sparse=self.EnableSparse,
-                debug_directory=self.DebugDirectory,
+                use_exp_custom=self.use_custom_exponentiation,
+                enable_sparse=self.enable_sparse_exponentiation,
+                debug_directory=self.debug_directory,
                 qid=self.qmla_id,
                 host_name=self.redis_host_name,
                 port_number=self.redis_port_number
@@ -669,12 +670,12 @@ class QuantumModelLearningAgent():
             pgh_prefactor=self.qinfer_PGH_heuristic_factor,
             num_probes=self.probe_number,
             probe_dict=self.probes_system,
-            use_exp_custom=self.UseExpCustom,
-            enable_sparse=self.EnableSparse,
-            debug_directory=self.DebugDirectory,
+            use_exp_custom=self.use_custom_exponentiation,
+            enable_sparse=self.enable_sparse_exponentiation,
+            debug_directory=self.debug_directory,
             modelID=self.model_count,
             redimensionalise=False,
-            qle=self.QLE,
+            qle=self.use_qle,
             host_name=self.redis_host_name,
             port_number=self.redis_port_number,
             qid=self.qmla_id,
@@ -816,7 +817,7 @@ class QuantumModelLearningAgent():
                 # is update-able
                 mod = self.get_model_storage_instance_by_id(mod_id)
                 mod.updateLearnedValues(
-                    fitness_parameters=self.FitnessParameters
+                    fitness_parameters=self.model_fitness_scores
                 )
             except BaseException:
                 pass
@@ -1084,8 +1085,8 @@ class QuantumModelLearningAgent():
                 model_b_id=model_b_id,
                 branchID=branchID,
                 interbranch=interbranch,
-                times_record=self.BayesFactorsTimeFile,
-                bf_data_folder=self.BayesFactorsFolder,
+                times_record=self.bayes_factors_store_times_file,
+                bf_data_folder=self.bayes_factors_store_directory,
                 num_times_to_use=self.num_experiments_for_bayes_updates,
                 trueModel=self.true_model_name,
                 bayes_threshold=bayes_threshold,
@@ -1115,8 +1116,8 @@ class QuantumModelLearningAgent():
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
                 trueModel=self.true_model_name,
-                bf_data_folder=self.BayesFactorsFolder,
-                times_record=self.BayesFactorsTimeFile,
+                bf_data_folder=self.bayes_factors_store_directory,
+                times_record=self.bayes_factors_store_times_file,
                 num_times_to_use=self.num_experiments_for_bayes_updates,
                 branchID=branchID,
                 interbranch=interbranch,
@@ -2036,7 +2037,7 @@ class QuantumModelLearningAgent():
             self.model_name_id_map[i] for i in
             list(self.branch_champions.values())
         ]
-        # print("[QMD] fitness parameters:", self.FitnessParameters)
+        # print("[QMD] fitness parameters:", self.model_fitness_scores)
 
         new_models = self.branch_growth_rule_instances[branchID].generate_models(
             # generator = growth_rule,
@@ -2690,7 +2691,7 @@ class QuantumModelLearningAgent():
             )
             mod = self.get_model_storage_instance_by_id(mod_id)
             mod.updateLearnedValues(
-                fitness_parameters=self.FitnessParameters
+                fitness_parameters=self.model_fitness_scores
             )
             self.compute_f_score(
                 model_id=mod_id

@@ -245,14 +245,14 @@ class ModelInstanceForLearning():
         self.true_model_constituent_operators = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
         self.true_model_name = qmd_info['true_name']
-        self.UseTimeDepTrueModel = qmd_info['use_time_dep_true_params']
+        self.use_time_dependent_true_model = qmd_info['use_time_dep_true_params']
         self.TimeDepTrueParams = qmd_info['time_dep_true_params']
-        self.NumTimeDepTrueParams = qmd_info['num_time_dependent_true_params']
-        self.QLE = qmd_info['qle']
+        self.num_time_dependent_true_params = qmd_info['num_time_dependent_true_params']
+        self.use_qle = qmd_info['qle']
         self.times_to_plot = qmd_info['plot_times']
-        self.UseExpCustom = qmd_info['use_exp_custom']
-        self.ExpComparisonTol = qmd_info['compare_linalg_exp_tol']
-        self.MeasurementType = qmd_info['measurement_type']
+        self.use_custom_exponentiation = qmd_info['use_exp_custom']
+        self.exponentiation_tolerance = qmd_info['compare_linalg_exp_tol']
+        self.measurement_class = qmd_info['measurement_type']
         self.experimental_measurements = qmd_info['experimental_measurements']
         self.experimental_measurement_times = qmd_info['experimental_measurement_times']
         self.SimOpsNames = simopnames
@@ -301,7 +301,7 @@ class ModelInstanceForLearning():
         # self.log_print(["True oplist:", self.true_model_constituent_operators ])
         # self.log_print(["Sim oplist:", self.SimOpList])
         # self.log_print(["learning true params:", self.TrueParams])
-        self.EnableSparse = enable_sparse
+        self.enable_sparse_exponentiation = enable_sparse
         self.checkQLoss = True
         print_loc(print_location=init_model_print_loc)
         """
@@ -315,7 +315,7 @@ class ModelInstanceForLearning():
         """
         if debug_directory is not None:
             self.debugSave = True
-            self.debugDirectory = debug_directory
+            self.debug_directory = debug_directory
         else:
             self.debugSave = False
         num_params = len(self.SimOpList)
@@ -409,11 +409,11 @@ class ModelInstanceForLearning():
             true_oplist=self.true_model_constituent_operators,
             trueparams=self.TrueParams,
             truename=self.true_model_name,
-            use_time_dep_true_model=self.UseTimeDepTrueModel,
+            use_time_dep_true_model=self.use_time_dependent_true_model,
             time_dep_true_params=self.TimeDepTrueParams,
-            num_time_dep_true_params=self.NumTimeDepTrueParams,
+            num_time_dep_true_params=self.num_time_dependent_true_params,
             num_probes=self.probe_number,
-            measurement_type=self.MeasurementType,
+            measurement_type=self.measurement_class,
             growth_generation_rule=self.growth_rule_of_true_model,
             use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
@@ -423,10 +423,10 @@ class ModelInstanceForLearning():
             probecounter=0,
             solver='scipy',
             trotter=True,
-            qle=self.QLE,
-            use_exp_custom=self.UseExpCustom,
-            exp_comparison_tol=self.ExpComparisonTol,
-            enable_sparse=self.EnableSparse,
+            qle=self.use_qle,
+            use_exp_custom=self.use_custom_exponentiation,
+            exp_comparison_tol=self.exponentiation_tolerance,
+            enable_sparse=self.enable_sparse_exponentiation,
             model_name=self.Name,
             log_file=self.log_file,
             log_identifier=log_identifier
@@ -912,8 +912,8 @@ class ModelInstanceForLearning():
     def store_particles(self, debug_dir=None):
         if debug_dir is not None:
             save_dir = debug_dir
-        elif self.debugDirectory is not None:
-            save_dir = self.debugDirectory
+        elif self.debug_directory is not None:
+            save_dir = self.debug_directory
         else:
             self.log_print([
                 "Need to pass debug_dir to QML.debug_save function"]
@@ -931,8 +931,8 @@ class ModelInstanceForLearning():
     def store_covariances(self, debug_dir=None):
         if debug_dir is not None:
             save_dir = debug_dir
-        elif self.debugDirectory is not None:
-            save_dir = self.debugDirectory
+        elif self.debug_directory is not None:
+            save_dir = self.debug_directory
         else:
             self.log_print(
                 ["Need to pass debug_dir to QML.debug_save function"])
@@ -1013,7 +1013,7 @@ class ModelInstanceForStorage():
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
         self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
         self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
-        self.MeasurementType = qmd_info['measurement_type']
+        self.measurement_class = qmd_info['measurement_type']
         self.experimental_measurements = qmd_info['experimental_measurements']
         self.use_experimental_data = qmd_info['use_experimental_data']
         # self.num_particles = qmd_info['num_particles']
@@ -1029,8 +1029,8 @@ class ModelInstanceForStorage():
             open(qmd_info['probes_plot_file'], 'rb')
         )
         self.times_to_plot = qmd_info['plot_times']
-        self.QLE = qmd_info['qle']
-        self.UseExpCustom = qmd_info['use_exp_custom']
+        self.use_qle = qmd_info['qle']
+        self.use_custom_exponentiation = qmd_info['use_exp_custom']
         self.StoreParticlesWeights = qmd_info[
             'store_particles_weights'
         ]
@@ -1216,7 +1216,7 @@ class ModelInstanceForStorage():
         # self.log_print(
         #     [
         #     "Computing expectation values.",
-        #     "\nMeasurement Type:", self.MeasurementType,
+        #     "\nMeasurement Type:", self.measurement_class,
         #     "\nLearnedHamiltonian", self.LearnedHamiltonian,
         #     # "\nPlotProbePath:", plot_probe_path,
         #     "\nProbe:", probe,
@@ -1482,8 +1482,8 @@ class ModelInstanceForComparison():
         self.true_model_constituent_operators = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
         self.true_model_name = qmd_info['true_name']
-        self.UseExpCustom = qmd_info['use_exp_custom']
-        self.MeasurementType = qmd_info['measurement_type']
+        self.use_custom_exponentiation = qmd_info['use_exp_custom']
+        self.measurement_class = qmd_info['measurement_type']
         self.use_experimental_data = qmd_info['use_experimental_data']
         self.experimental_measurements = qmd_info['experimental_measurements']
         self.experimental_measurement_times = qmd_info['experimental_measurement_times']
@@ -1550,7 +1550,7 @@ class ModelInstanceForComparison():
             true_oplist=self.true_model_constituent_operators,
             trueparams=self.TrueParams,
             truename=self.true_model_name,
-            measurement_type=self.MeasurementType,
+            measurement_type=self.measurement_class,
             growth_generation_rule=self.growth_rule_of_true_model,
             use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
