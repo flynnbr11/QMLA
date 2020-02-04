@@ -107,16 +107,6 @@ if not os.path.exists(probes_dir):
         # if already exists (ie created by another QMD since if test ran...)
         pass
 
-
-# global_variables_path = str(
-#     global_variables.results_directory
-#     + "/configuration.p"
-# )
-# pickle.dump(
-#     global_variables,
-#     open(global_variables_path, 'wb')
-# )
-
 if global_variables.use_experimental_data: 
     dataset = global_variables.dataset
     log_print(

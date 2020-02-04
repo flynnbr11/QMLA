@@ -131,7 +131,7 @@ def ExpectationValuesTrueSim(
                 true_ham = time_ind_true_ham
 
             try:
-                expec = qmd.GrowthClass.expectation_value(
+                expec = qmd.growth_class.expectation_value(
                     ham=true_ham,
                     t=t,
                     state=true_probe
@@ -202,7 +202,7 @@ def ExpectationValuesTrueSim(
                         mod.expectation_values[t]
                     )
                 except BaseException:
-                    expec = qmd.GrowthClass.expectation_value(
+                    expec = qmd.growth_class.expectation_value(
                         ham=sim_ham,
                         t=t,
                         state=sim_probe
@@ -356,7 +356,7 @@ def plotDynamicsLearnedModels(
 
     model_ids = list(sorted(set(model_ids)))  # only uniques values
     true_expec_vals = pickle.load(
-        open(qmd.GlobalVariables.true_expec_path, 'rb'))
+        open(qmd.qmla_controls.true_expec_path, 'rb'))
     times_to_plot = list(sorted(true_expec_vals.keys()))
     # times_to_plot = list(sorted(qmd.plot_times))
 
@@ -364,7 +364,7 @@ def plotDynamicsLearnedModels(
     # Hamiltonians don't have to work out each time step
     true_exp = [true_expec_vals[t] for t in times_to_plot]
     plot_probes = pickle.load(
-        open(qmd.GlobalVariables.plot_probe_file, 'rb')
+        open(qmd.qmla_controls.plot_probe_file, 'rb')
     )
     num_models_to_plot = len(model_ids)
     all_bayes_factors = qmd.AllBayesFactors
@@ -617,7 +617,7 @@ def plotDynamicsLearnedModels(
                     if use_experimental_data == False:
                         y_true = qmd.TrueParamDict[term]
                         # true_term_latex = database_framework.latex_name_ising(term)
-                        true_term_latex = qmd.GrowthClass.latex_name(
+                        true_term_latex = qmd.growth_class.latex_name(
                             name=term
                         )
 
@@ -632,7 +632,7 @@ def plotDynamicsLearnedModels(
                 y = np.array(param_estimate_by_term[term])
                 s = np.array(std_devs[term])
                 x = range(1, 1 + len(param_estimate_by_term[term]))
-                latex_term = qmd.GrowthClass.latex_name(
+                latex_term = qmd.growth_class.latex_name(
                     name=term
                 )
                 if latex_term not in individual_terms_already_in_legend:
@@ -732,7 +732,7 @@ def ExpectationValuesQHL_TrueModel(
                 true_ham = time_ind_true_ham
 
             try:
-                expec = qmd.GrowthClass.expectation_value(
+                expec = qmd.growth_class.expectation_value(
                     ham=true_ham,
                     t=t,
                     state=true_probe
@@ -778,7 +778,7 @@ def ExpectationValuesQHL_TrueModel(
 
         sim_expec_values = []
         for t in times:            
-            ex_val = qmd.GrowthClass.expectation_value(
+            ex_val = qmd.growth_class.expectation_value(
                 ham=sim_ham,
                 t=t,
                 state=sim_probe
@@ -867,7 +867,7 @@ def ExpectationValuesQHL_TrueModel(
                              shadow=True, ncol=1
                              )
 
-    latex_name_for_title = qmd.GrowthClass.latex_name(name=qmd.TrueOpName)
+    latex_name_for_title = qmd.growth_class.latex_name(name=qmd.TrueOpName)
     plt.title(
         str(
             "QHL test for " +
@@ -1380,7 +1380,7 @@ def r_squared_from_epoch_list(
             ham = np.tensordot(mod.TrackEval[epoch], mod.SimOpList, axes=1)
             sum_of_residuals = 0
             for t in exp_times:
-                sim = qmd.GrowthClass.expectation - value(
+                sim = qmd.growth_class.expectation - value(
                     ham=ham,
                     t=t,
                     state=probe
@@ -1428,7 +1428,7 @@ def plot_quadratic_loss(
         mod = qmd.get_model_storage_instance_by_id(i)
         if len(mod.QuadraticLosses) > 0:
             epochs = range(1, len(mod.QuadraticLosses) + 1)
-            model_name = mod.GrowthClass.latex_name(
+            model_name = mod.growth_class.latex_name(
                 name=qmd.ModelNameIDs[i]
             )
             ax.plot(epochs, mod.QuadraticLosses, label=str(model_name))
@@ -3083,7 +3083,7 @@ def parameterEstimates(
             if use_experimental_data == False:
                 y_true = qmd.TrueParamDict[term]
                 # true_term_latex = database_framework.latex_name_ising(term)
-                true_term_latex = qmd.GrowthClass.latex_name(
+                true_term_latex = qmd.growth_class.latex_name(
                     name=term
                 )
                 true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
@@ -3099,7 +3099,7 @@ def parameterEstimates(
         y = np.array(param_estimate_by_term[term])
         s = np.array(std_devs[term])
         x = range(1, 1 + len(param_estimate_by_term[term]))
-        latex_term = mod.GrowthClass.latex_name(term)
+        latex_term = mod.growth_class.latex_name(term)
         latex_term = latex_term[:-1] + r'^{\prime}' + '$'
         # print("[pQMD] latex_term:", latex_term)
         ax.scatter(

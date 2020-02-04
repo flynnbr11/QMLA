@@ -194,14 +194,14 @@ class ModelInstanceForLearning():
         self.GrowthGenerator = growth_generator
 
         try:
-            self.GrowthClass = get_growth_rule.get_growth_generator_class(
+            self.growth_class = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.GrowthGenerator,
                 use_experimental_data=self.UseExperimentalData,
                 log_file=self.log_file
             )
         except BaseException:
             # raise
-            self.GrowthClass = None
+            self.growth_class = None
 
         base_resources = qmd_info['base_resources']
         base_num_qubits = base_resources['num_qubits']
@@ -211,7 +211,7 @@ class ModelInstanceForLearning():
             database_framework.get_constituent_names_from_name(self.Name)
         )
 
-        max_num_params = self.GrowthClass.max_num_parameter_estimate
+        max_num_params = self.growth_class.max_num_parameter_estimate
 
         if qmd_info['reallocate_resources'] == True:
             new_resources = resource_allocation(
@@ -257,7 +257,7 @@ class ModelInstanceForLearning():
         self.ExperimentalMeasurementTimes = qmd_info['experimental_measurement_times']
         self.SimOpsNames = simopnames
 
-        self.LatexTerm = self.GrowthClass.latex_name(
+        self.LatexTerm = self.growth_class.latex_name(
             name=self.Name
         )
 
@@ -354,7 +354,7 @@ class ModelInstanceForLearning():
         log_identifier = str("QML " + str(self.ModelID))
 
         # self.Prior = Distributions.get_prior(
-        self.Prior = self.GrowthClass.get_prior(
+        self.Prior = self.growth_class.get_prior(
             model_name=self.Name,
             log_file=self.log_file,
             log_identifier=log_identifier
@@ -381,7 +381,7 @@ class ModelInstanceForLearning():
 
         latex_terms = []
         for term in individual_terms_in_name:
-            lt = self.GrowthClass.latex_name(
+            lt = self.growth_class.latex_name(
                 name=term
             )
             latex_terms.append(lt)
@@ -459,7 +459,7 @@ class ModelInstanceForLearning():
         #     increase_time = self.IncreasePGHTime,
         #     pgh_exponent = self.PGHExponent
         # )
-        self.Heuristic = self.GrowthClass.heuristic(
+        self.Heuristic = self.growth_class.heuristic(
             updater=self.Updater,
             oplist=self.SimOpList,
             inv_field=self.Inv_Field,
@@ -1138,17 +1138,17 @@ class ModelInstanceForStorage():
             self.cov_matrix = learned_info['cov_matrix']
             self.GrowthGenerator = learned_info['growth_generator']
             try:
-                self.GrowthClass = get_growth_rule.get_growth_generator_class(
+                self.growth_class = get_growth_rule.get_growth_generator_class(
                     growth_generation_rule=self.GrowthGenerator,
                     use_experimental_data=self.UseExperimentalData,
                     log_file=self.log_file
                 )
             except BaseException:
                 # raise
-                self.GrowthClass = None
+                self.growth_class = None
             self.HeuristicType = learned_info['heuristic']
 
-            self.LatexTerm = self.GrowthClass.latex_name(
+            self.LatexTerm = self.growth_class.latex_name(
                 name=self.Name
             )
 
@@ -1233,7 +1233,7 @@ class ModelInstanceForStorage():
         )
 
         for t in required_times:
-            self.expectation_values[t] = self.GrowthClass.expectation_value(
+            self.expectation_values[t] = self.growth_class.expectation_value(
                 ham=self.LearnedHamiltonian,
                 t=t,
                 state=probe,
@@ -1301,7 +1301,7 @@ class ModelInstanceForStorage():
             if t in available_expectation_values:
                 sim = self.expectation_values[t]
             else:
-                sim = self.GrowthClass.expectation_value(
+                sim = self.growth_class.expectation_value(
                     ham=ham,
                     t=t,
                     state=probe
@@ -1410,7 +1410,7 @@ class ModelInstanceForStorage():
                 list(self.expectation_values.keys())
             )
             for t in exp_times:
-                sim = self.GrowthClass.expectation_value(
+                sim = self.growth_class.expectation_value(
                     ham=ham,
                     t=t,
                     state=probe
@@ -1527,7 +1527,7 @@ class ModelInstanceForComparison():
         # )
         self.InitialParams = learned_model_info['initial_params']
         self.GrowthGenerator = learned_model_info['growth_generator']
-        self.GrowthClass = get_growth_rule.get_growth_generator_class(
+        self.growth_class = get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.GrowthGenerator,
             use_experimental_data=self.UseExperimentalData,
             log_file=self.log_file
@@ -1572,7 +1572,7 @@ class ModelInstanceForComparison():
         #     self.Name
         # )
         # model_name_individual_terms = [
-        #     self.GrowthClass.latex_name(t)
+        #     self.growth_class.latex_name(t)
         #     for t in model_terms
         # ]
 

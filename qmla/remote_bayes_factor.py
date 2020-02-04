@@ -516,7 +516,7 @@ def plot_expec_vals_of_models(
             try:
                 # todo get this from GenSimModel of mod instead of
                 # instantiating class every time
-                exp_val = mod.GrowthClass.expectation_value(
+                exp_val = mod.growth_class.expectation_value(
                     ham=final_ham,
                     t=t,
                     state=plot_probe,

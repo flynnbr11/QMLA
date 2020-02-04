@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 from __future__ import print_function  # so print doesn't show brackets
 
-import redis
 import math
 import matplotlib.pyplot as plt
 import matplotlib
@@ -15,8 +14,10 @@ import warnings
 import time as time
 from time import sleep
 import random
+
 import pickle
 import qinfer
+import redis
 
 # QMLA functionality
 from qmla.remote_bayes_factor import *
@@ -83,20 +84,20 @@ class QuantumModelLearningAgent():
                  sigma_threshold=1e-13,
                  **kwargs
                  ):
-        self.StartingTime = time.time() # to measure run-time
+        self._start_time = time.time() # to measure run-time
 
         # Configure this QMLA instance
-        self.GlobalVariables = global_variables
-        self.GrowthClass = self.GlobalVariables.growth_class
+        self.qmla_controls = global_variables
+        self.growth_class = self.qmla_controls.growth_class
 
         # Basic settings, path definitions etc
-        self.fundamental_settings()
+        self._fundamental_settings()
 
         # Info on true model
-        self.true_model_definition()
+        self._true_model_definition()
 
         # Parameters related to learning/comparing models
-        self.learning_and_comparison_parameters(
+        self._set_learning_and_comparison_parameters(
             model_priors = model_priors, 
             system_probe_dict = probe_dict,
             simulation_probe_dict = sim_probe_dict,
@@ -104,14 +105,76 @@ class QuantumModelLearningAgent():
             plot_times = plot_times
         )
 
-
         # Redundant terms -- TODO remove calls to them and then attributes
-        self.potentially_redundant_setup(
+        self._potentially_redundant_setup(
             use_exp_custom, 
             sigma_threshold, 
         )
 
+        # set up all attributes related to growth rules and tree management
+        self._setup_tree_and_growth_rules(
+            first_layer_models = first_layer_models, 
+            generator_list = generator_list, 
+        )
 
+        # check if QMLA should run in parallel and set up accordingly
+        self._setup_parallel_requirements()
+
+        # resources potentiall reallocated based on number of parameters/dimension
+        self._compute_base_resources()
+        
+        # QMLA core info stored on redis server
+        self._compile_and_store_qmla_info_summary()
+        
+        # Database used to keep track of models tested
+        self._initiate_database()
+
+
+    ##########
+    # Section: Initialisation
+    ##########
+
+    def _fundamental_settings(self):
+        self.Q_id = self.qmla_controls.qmd_id
+        self.UseExperimentalData = self.qmla_controls.use_experimental_data
+        self.HostName = self.qmla_controls.host_name
+        self.PortNumber = self.qmla_controls.port_number
+        self.log_file = self.qmla_controls.log_file        
+        self.QLE = False  # Set to False for IQLE # TODO remove - redundant
+        self.QHLmode = self.qmla_controls.qhl_test
+        self.multiQHLMode = False
+        self.ResultsDirectory = self.qmla_controls.results_directory
+        if not self.ResultsDirectory.endswith('/'):
+            self.ResultsDirectory += '/'
+        self.LatexMappingFile = self.qmla_controls.latex_mapping_file
+        self.log_print(["Retrieving databases from redis"])
+        self.RedisDataBases = rds.databases_from_qmd_id(
+            self.HostName,
+            self.PortNumber,
+            self.Q_id,
+            # tree_identifiers=self.TreeIdentifiers
+        )
+        self.RedisDataBases['any_job_failed'].set('Status', 0)
+
+    def _true_model_definition(self):
+        self.TrueOpName = self.qmla_controls.true_op_name
+        self.TrueOpDim = database_framework.get_num_qubits(self.TrueOpName)
+        self.TrueOpList = self.qmla_controls.true_op_list
+        self.TrueOpNumParams = self.qmla_controls.true_operator_class.num_constituents
+        self.TrueParamsList = self.qmla_controls.true_params_list
+        self.TrueParamDict = self.qmla_controls.true_params_dict
+        self.log_print(
+            [
+                "True model:", self.TrueOpName
+            ]
+        )
+
+    def _setup_tree_and_growth_rules(
+        self,
+        first_layer_models, 
+        generator_list, 
+
+    ):
         # Populate the tree
         self.InitialOpList = first_layer_models
         self.HighestQubitNumber = int(0)
@@ -130,7 +193,7 @@ class QuantumModelLearningAgent():
         self.BranchParents = {}
         self.GeneratorInitialModels = {}
         self.GeneratorList = generator_list
-        self.GrowthGenerator = self.GlobalVariables.growth_generation_rule
+        self.GrowthGenerator = self.qmla_controls.growth_generation_rule
         self.SpawnDepth = 0
         self.TreeIdentifiers = [self.GrowthGenerator]
 
@@ -157,7 +220,7 @@ class QuantumModelLearningAgent():
         self.BranchModelIds = {}
         self.Branchget_growth_rule = {}
         self.UniqueGrowthClasses = {
-            self.GrowthGenerator: self.GrowthClass
+            self.GrowthGenerator: self.growth_class
         }  # to save making many instances
         self.BranchGrowthClasses = {}
         self.SpawnDepthByGrowthRule = {}
@@ -193,7 +256,6 @@ class QuantumModelLearningAgent():
                     "initialising generator {} with models: {}".format(
                         gen,
                         initial_models_this_gen)
-
                 ]
             )
             self.InitialOpsAllBranches.extend(initial_models_this_gen)
@@ -285,53 +347,8 @@ class QuantumModelLearningAgent():
             list(self.TreesCompleted.values())
         )
 
-        self.setup_parallel_requirements()
 
-
-        self.compute_base_resources()
-        self.compile_and_store_qmla_info_summary()
-        self.initiate_database()
-
-    ##########
-    # Section: Initialise everything
-    ##########
-
-    def fundamental_settings(self):
-        self.Q_id = self.GlobalVariables.qmd_id
-        self.UseExperimentalData = self.GlobalVariables.use_experimental_data
-        self.HostName = self.GlobalVariables.host_name
-        self.PortNumber = self.GlobalVariables.port_number
-        self.log_file = self.GlobalVariables.log_file        
-        self.QLE = False  # Set to False for IQLE # TODO remove - redundant
-        self.QHLmode = self.GlobalVariables.qhl_test
-        self.multiQHLMode = False
-        self.ResultsDirectory = self.GlobalVariables.results_directory
-        if not self.ResultsDirectory.endswith('/'):
-            self.ResultsDirectory += '/'
-        self.LatexMappingFile = self.GlobalVariables.latex_mapping_file
-        self.log_print(["Retrieving databases from redis"])
-        self.RedisDataBases = rds.databases_from_qmd_id(
-            self.HostName,
-            self.PortNumber,
-            self.Q_id,
-            # tree_identifiers=self.TreeIdentifiers
-        )
-        self.RedisDataBases['any_job_failed'].set('Status', 0)
-
-    def true_model_definition(self):
-        self.TrueOpName = self.GlobalVariables.true_op_name
-        self.TrueOpDim = database_framework.get_num_qubits(self.TrueOpName)
-        self.TrueOpList = self.GlobalVariables.true_op_list
-        self.TrueOpNumParams = self.GlobalVariables.true_operator_class.num_constituents
-        self.TrueParamsList = self.GlobalVariables.true_params_list
-        self.TrueParamDict = self.GlobalVariables.true_params_dict
-        self.log_print(
-            [
-                "True model:", self.TrueOpName
-            ]
-        )
-
-    def learning_and_comparison_parameters(
+    def _set_learning_and_comparison_parameters(
         self,
         model_priors, 
         system_probe_dict,
@@ -340,17 +357,17 @@ class QuantumModelLearningAgent():
         plot_times
     ):
         self.ModelPriors = model_priors
-        self.NumParticles = self.GlobalVariables.num_particles
-        self.NumExperiments = self.GlobalVariables.num_experiments
-        self.NumTimesForBayesUpdates = self.GlobalVariables.num_times_bayes
-        self.BayesLower = self.GlobalVariables.bayes_lower
-        self.BayesUpper = self.GlobalVariables.bayes_upper
-        self.ResampleThreshold = self.GlobalVariables.resample_threshold
-        self.ResamplerA = self.GlobalVariables.resample_a
-        self.PGHPrefactor = self.GlobalVariables.pgh_factor
-        self.PGHExponent = self.GlobalVariables.pgh_exponent
-        self.ReallocateResources = self.GlobalVariables.reallocate_resources
-        self.gaussian = self.GlobalVariables.gaussian # TODO remove?
+        self.NumParticles = self.qmla_controls.num_particles
+        self.NumExperiments = self.qmla_controls.num_experiments
+        self.NumTimesForBayesUpdates = self.qmla_controls.num_times_bayes
+        self.BayesLower = self.qmla_controls.bayes_lower
+        self.BayesUpper = self.qmla_controls.bayes_upper
+        self.ResampleThreshold = self.qmla_controls.resample_threshold
+        self.ResamplerA = self.qmla_controls.resample_a
+        self.PGHPrefactor = self.qmla_controls.pgh_factor
+        self.PGHExponent = self.qmla_controls.pgh_exponent
+        self.ReallocateResources = self.qmla_controls.reallocate_resources
+        self.gaussian = self.qmla_controls.gaussian # TODO remove?
         if system_probe_dict is None:
             # ensure there is a probe set
             self.log_print(
@@ -358,15 +375,15 @@ class QuantumModelLearningAgent():
                     "Generating probes within QMLA"
                 ]
             )
-            self.GrowthClass.generate_probes(
-                experimental_data=self.GlobalVariables.use_experimental_data,
-                noise_level=self.GlobalVariables.probe_noise_level,
+            self.growth_class.generate_probes(
+                experimental_data=self.qmla_controls.use_experimental_data,
+                noise_level=self.qmla_controls.probe_noise_level,
                 minimum_tolerable_noise=0.0,
             )
-            self.ProbeDict = self.GrowthClass.system_probes
+            self.ProbeDict = self.growth_class.system_probes
             self.SimProbeDict = self.ProbeDict
         else:
-            self.NumProbes = self.GlobalVariables.num_probes
+            self.NumProbes = self.qmla_controls.num_probes
             self.log_print(
                 [
                     "Probe dict provided to QMLA."
@@ -382,7 +399,7 @@ class QuantumModelLearningAgent():
             )
         else:
             self.ExperimentalMeasurementTimes = None
-        self.PlotProbeFile = self.GlobalVariables.plot_probe_file
+        self.PlotProbeFile = self.qmla_controls.plot_probe_file
 
         self.PlotTimes = plot_times
         self.ReducedPlotTimes = self.PlotTimes[0::10]
@@ -393,7 +410,7 @@ class QuantumModelLearningAgent():
             # TODO is this doing anything useful?
             # at least put in separate method
             self.ExperimentalMeasurements = {}
-            self.TrueHamiltonian = self.GlobalVariables.true_hamiltonian
+            self.TrueHamiltonian = self.qmla_controls.true_hamiltonian
             self.TrueHamiltonianDimension = np.log2(
                 self.TrueHamiltonian.shape[0]
             )
@@ -409,7 +426,7 @@ class QuantumModelLearningAgent():
                 # TODO is this the right expectation value func???
 
                 self.ExperimentalMeasurements[t] = (
-                    self.GrowthClass.expectation_value(
+                    self.growth_class.expectation_value(
                         ham=self.TrueHamiltonian,
                         t=t,
                         state=self.PlotProbes[self.TrueOpDim],
@@ -425,14 +442,14 @@ class QuantumModelLearningAgent():
             )
 
 
-    def potentially_redundant_setup(
+    def _potentially_redundant_setup(
         self,
         use_exp_custom, 
         sigma_threshold, 
     ):
         # testing whether these are used anywhere
         # Either remove, or find appropriate initialisation
-        self.MeasurementType = self.GlobalVariables.measurement_type 
+        self.MeasurementType = self.qmla_controls.measurement_type 
         self.UseExpCustom = use_exp_custom
         self.EnableSparse = True # should only matter when using custom exponentiation package
         self.ExpComparisonTol = None
@@ -454,12 +471,12 @@ class QuantumModelLearningAgent():
         self.BayesFactorsTimeFile = str(
             self.BayesFactorsFolder
             + 'BayesFactorsPairsTimes_'
-            + str(self.GlobalVariables.long_id)
+            + str(self.qmla_controls.long_id)
             + '.txt'
         )
-    def setup_parallel_requirements(self):
-        self.use_rq = self.GlobalVariables.use_rq
-        self.rq_timeout = self.GlobalVariables.rq_timeout
+    def _setup_parallel_requirements(self):
+        self.use_rq = self.qmla_controls.use_rq
+        self.rq_timeout = self.qmla_controls.rq_timeout
         self.rq_log_file = self.log_file
         self.write_log_file = open(self.log_file, 'a')
 
@@ -482,7 +499,7 @@ class QuantumModelLearningAgent():
 
         self.RunParallel = parallel_enabled
 
-    def compute_base_resources(self):
+    def _compute_base_resources(self):
         # TODO remove base_num_qubits stuff?
         base_num_qubits = 3
         base_num_terms = 3
@@ -501,7 +518,7 @@ class QuantumModelLearningAgent():
         }
 
 
-    def compile_and_store_qmla_info_summary(
+    def _compile_and_store_qmla_info_summary(
         self
     ):
         num_exp_ham = (
@@ -517,9 +534,9 @@ class QuantumModelLearningAgent():
             '}RP_{' + str(self.PGHPrefactor) +
             '}H_{' + str(num_exp_ham) +
             r'}|\psi>_{' + str(self.NumProbes) +
-            '}PN_{' + str(self.GlobalVariables.probe_noise_level) +
-            '}BF^{bin }_{' + str(self.GlobalVariables.bayes_time_binning) +
-            '}BF^{all }_{' + str(self.GlobalVariables.bayes_factors_use_all_exp_times) +
+            '}PN_{' + str(self.qmla_controls.probe_noise_level) +
+            '}BF^{bin }_{' + str(self.qmla_controls.bayes_time_binning) +
+            '}BF^{all }_{' + str(self.qmla_controls.bayes_factors_use_all_exp_times) +
             '}$'
         )
         self.LatexConfig = latex_config
@@ -540,13 +557,13 @@ class QuantumModelLearningAgent():
             'resampler_a': self.ResamplerA,
             'pgh_prefactor': self.PGHPrefactor,
             'pgh_exponent': self.PGHExponent,
-            'increase_pgh_time': self.GlobalVariables.increase_pgh_time,
+            'increase_pgh_time': self.qmla_controls.increase_pgh_time,
             'store_particles_weights': False,
             'growth_generator': self.GrowthGenerator,
             'qhl_plots': False, # can be used during dev
             'results_directory': self.ResultsDirectory,
-            'plots_directory': self.GlobalVariables.plots_directory,
-            'long_id': self.GlobalVariables.long_id,
+            'plots_directory': self.qmla_controls.plots_directory,
+            'long_id': self.qmla_controls.long_id,
             'debug_directory': self.DebugDirectory,
             'qle': self.QLE,
             'sigma_threshold': self.SigmaThreshold,
@@ -559,22 +576,22 @@ class QuantumModelLearningAgent():
             'compare_linalg_exp_tol': self.ExpComparisonTol,
             'gaussian': self.gaussian,
             # 'bayes_factors_time_binning' : self.BayesTimeBinning,
-            'bayes_factors_time_binning': self.GlobalVariables.bayes_time_binning,
+            'bayes_factors_time_binning': self.qmla_controls.bayes_time_binning,
             'q_id': self.Q_id,
             'use_time_dep_true_params': False,
             'time_dep_true_params': self.TimeDepParams,
             'num_time_dependent_true_params': self.NumTimeDepTrueParams,
-            'prior_pickle_file': self.GlobalVariables.prior_pickle_file,
-            'prior_specific_terms': self.GrowthClass.gaussian_prior_means_and_widths,
+            'prior_pickle_file': self.qmla_controls.prior_pickle_file,
+            'prior_specific_terms': self.growth_class.gaussian_prior_means_and_widths,
             'model_priors': self.ModelPriors,
             'base_resources': self.BaseResources,
             'reallocate_resources': self.ReallocateResources,
-            'param_min': self.GlobalVariables.param_min,
-            'param_max': self.GlobalVariables.param_max,
-            'param_mean': self.GlobalVariables.param_mean,
-            'param_sigma': self.GlobalVariables.param_sigma,
+            'param_min': self.qmla_controls.param_min,
+            'param_max': self.qmla_controls.param_max,
+            'param_mean': self.qmla_controls.param_mean,
+            'param_sigma': self.qmla_controls.param_sigma,
             'tree_identifiers': self.TreeIdentifiers,
-            'bayes_factors_time_all_exp_times': self.GlobalVariables.bayes_factors_use_all_exp_times,
+            'bayes_factors_time_all_exp_times': self.qmla_controls.bayes_factors_use_all_exp_times,
         }
         compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
         compressed_probe_dict = pickle.dumps(self.ProbeDict, protocol=2)
@@ -584,10 +601,6 @@ class QuantumModelLearningAgent():
         qmd_info_db.set('QMDInfo', compressed_qmd_info)
         qmd_info_db.set('ProbeDict', compressed_probe_dict)
         qmd_info_db.set('SimProbeDict', compressed_sim_probe_dict)
-
-    ##########
-    # Section: Setup, configuration and branch/database management functions
-    ##########
 
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) + " [QMD " + str(self.Q_id) + "]")
@@ -599,7 +612,7 @@ class QuantumModelLearningAgent():
         with open(self.log_file, 'a') as write_log_file:
             print(identifier, str(to_print), file=write_log_file, flush=True)
 
-    def initiate_database(self):
+    def _initiate_database(self):
         self.db, self.legacy_db, self.model_lists = \
             database_launch.launch_db(
                 true_op_name=self.TrueOpName,
@@ -637,6 +650,10 @@ class QuantumModelLearningAgent():
                 "After initiating DB, models:", self.ModelNameIDs
             ]
         )
+
+    ##########
+    # Section: Setup, configuration and branch/database management functions
+    ##########
 
     def add_model_to_database(
         self,
@@ -684,8 +701,8 @@ class QuantumModelLearningAgent():
                 self.HighestQubitNumber = database_framework.get_num_qubits(model)
                 self.BranchGrowthClasses[branchID].highest_num_qubits = database_framework.get_num_qubits(
                     model)
-                # self.GrowthClass.highest_num_qubits = database_framework.get_num_qubits(model)
-                print("self.GrowthClass.highest_num_qubits",
+                # self.growth_class.highest_num_qubits = database_framework.get_num_qubits(model)
+                print("self.growth_class.highest_num_qubits",
                       self.BranchGrowthClasses[branchID].highest_num_qubits)
 
         # retrieve model_id from database? or somewhere
@@ -2189,7 +2206,7 @@ class QuantumModelLearningAgent():
                      )
 
         time_now = time.time()
-        time_taken = time_now - self.StartingTime
+        time_taken = time_now - self._start_time
 
         n_qubits = database_framework.get_num_qubits(champ_model.Name)
         if n_qubits > 3:
@@ -2293,7 +2310,7 @@ class QuantumModelLearningAgent():
 
             if (
                 np.abs(champ_mod.LearnedParameters[p])
-                < self.GrowthClass.learned_param_limit_for_negligibility
+                < self.growth_class.learned_param_limit_for_negligibility
             ):
                 to_remove.append(p)
                 removed_params[p] = np.round(
@@ -2417,7 +2434,7 @@ class QuantumModelLearningAgent():
             if (
                 (
                     bayes_factor
-                    < (1.0 / self.GrowthClass.reduce_champ_bayes_factor_threshold)
+                    < (1.0 / self.growth_class.reduce_champ_bayes_factor_threshold)
                 )
                 # or True
             ):
@@ -2547,7 +2564,7 @@ class QuantumModelLearningAgent():
 
         # TODO write single QHL test
         time_now = time.time()
-        time_taken = time_now - self.StartingTime
+        time_taken = time_now - self._start_time
 #        true_model_r_squared = self.get_model_storage_instance_by_id(self.TrueOpModelID).r_squared()
 
         self.ResultsDict = {
@@ -2672,7 +2689,7 @@ class QuantumModelLearningAgent():
             ]
         )
         time_now = time.time()
-        time_taken = time_now - self.StartingTime
+        time_taken = time_now - self._start_time
         for mod_name in model_names:
             mod_id = database_framework.model_id_from_name(
                 db=self.db, name=mod_name
@@ -2994,9 +3011,9 @@ class QuantumModelLearningAgent():
         self.update_database_model_info()
 
         if (
-            self.GrowthClass.check_champion_reducibility == True
+            self.growth_class.check_champion_reducibility == True
             and
-            self.GrowthClass.tree_completed_initially == False
+            self.growth_class.tree_completed_initially == False
         ):
             self.check_champion_reducibility()
 
@@ -3028,9 +3045,9 @@ class QuantumModelLearningAgent():
         beta=1  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
     ):
 
-        true_set = self.GrowthClass.true_operator_terms
+        true_set = self.growth_class.true_operator_terms
 
-        growth_class = self.get_model_storage_instance_by_id(model_id).GrowthClass
+        growth_class = self.get_model_storage_instance_by_id(model_id).growth_class
         terms = [
             growth_class.latex_name(
                 term
