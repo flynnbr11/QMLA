@@ -54,20 +54,20 @@ def ExpectationValuesTrueSim(
     experimental_measurements_dict = qmd.experimental_measurements
 
     try:
-        qmd.ChampID
+        qmd.champion_model_id
     except BaseException:
-        qmd.ChampID = qmd.highest_model_id + 1
+        qmd.champion_model_id = qmd.highest_model_id + 1
 
     if model_ids is None and champ == True:
-        model_ids = [qmd.ChampID]
+        model_ids = [qmd.champion_model_id]
     elif model_ids is not None and champ == True:
         if type(model_ids) is not list:
             model_ids = [model_ids]
-        if qmd.ChampID not in model_ids:
-            model_ids.append(qmd.ChampID)
+        if qmd.champion_model_id not in model_ids:
+            model_ids.append(qmd.champion_model_id)
 
-    if qmd.ChampID in model_ids and champ == False:
-        model_ids.remove(qmd.ChampID)
+    if qmd.champion_model_id in model_ids and champ == False:
+        model_ids.remove(qmd.champion_model_id)
 
     # plus_plus = np.array([0.5-0.j,  0.5-0.j, 0.5-0.j, 0.5-0.j]) # TODO
     # generalise probe
@@ -210,19 +210,19 @@ def ExpectationValuesTrueSim(
 
                     sim_expec_values.append(expec)
 
-            if mod_id == qmd.ChampID:
+            if mod_id == qmd.champion_model_id:
                 models_branch = ChampionsByBranch[mod_id]
-                champ_sim_label = str(mod.LatexTerm + ' (Champion)')
+                champ_sim_label = str(mod.model_name_latex + ' (Champion)')
                 sim_label = champ_sim_label
                 sim_col = champion_colour
                 time_hist_label = 'Times learned by Champion Model'
             elif mod_id in list(qmd.branch_champions.values()):
                 models_branch = ChampionsByBranch[mod_id]
                 # sim_label = 'Branch '+str(models_branch)+' Champion'
-                sim_label = mod.LatexTerm
+                sim_label = mod.model_name_latex
             else:
                 # sim_label = 'Model '+str(mod_id)
-                sim_label = mod.LatexTerm
+                sim_label = mod.model_name_latex
 
             plt.subplot(311)
             plt.plot(
@@ -258,7 +258,7 @@ def ExpectationValuesTrueSim(
                     unique_times_learned,
                     unique_times_count,
                     color=sim_col,
-                    label=str(mod.LatexTerm),
+                    label=str(mod.model_name_latex),
                     width=0.001
                 )
             elif bar_hist == 'hist':
@@ -406,7 +406,7 @@ def plotDynamicsLearnedModels(
 #         growth_generator = reduced.growth_rule_of_true_model
         desc = str(
             "ID:{}\n".format(mod_id) +
-            reduced.LatexTerm
+            reduced.model_name_latex
         )
         times_to_plot = list(sorted(true_expec_vals.keys()))
         plot_colour = 'blue'
@@ -417,7 +417,7 @@ def plotDynamicsLearnedModels(
         except BaseException:
             true_model_id = -1
         if (
-            mod_id == qmd.ChampID
+            mod_id == qmd.champion_model_id
             and
             mod_id == true_model_id
         ):
@@ -425,7 +425,7 @@ def plotDynamicsLearnedModels(
             name_colour = 'green'
             dynamics_label += ' [true + champ]'
             desc += str('\n[True + Champ]')
-        elif mod_id == qmd.ChampID:
+        elif mod_id == qmd.champion_model_id:
             plot_colour = 'orange'
             name_colour = 'orange'
             dynamics_label += ' [champ]'
@@ -445,7 +445,7 @@ def plotDynamicsLearnedModels(
             probe = plot_probes[reduced.ProbeDimension]
             # print(
             #     "[plotDynamicsLearnedModels]",
-            #     "\n\tModel ", reduced.LatexTerm,
+            #     "\n\tModel ", reduced.model_name_latex,
             #     "\n\tnum qubits:", dim,
             #     "\n\tprobe:", probe
 
@@ -512,7 +512,7 @@ def plotDynamicsLearnedModels(
                 if b != mod_id:
                     if b in list(all_bayes_factors[mod_id].keys()):
                         # bf_opponents.append(
-                        #     qmd.get_model_storage_instance_by_id(b).LatexTerm
+                        #     qmd.get_model_storage_instance_by_id(b).model_name_latex
                         # )
                         bayes_factors_this_mod.append(
                             np.log10(all_bayes_factors[mod_id][b][-1]))
@@ -978,7 +978,7 @@ def plotDistributionProgression(
     plt.ylabel('Probability Density (relative)')
     title = str(
         'Probability density function of parameter for ' +
-        mod.LatexTerm)
+        mod.model_name_latex)
     plt.title(title)
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
@@ -1148,7 +1148,7 @@ def plotDistributionProgressionQML(
     plt.ylabel('Probability Density (relative)')
     title = str(
         'Probability density function of parameter for ' +
-        mod.LatexTerm
+        mod.model_name_latex
     )
     plt.title(title)
     if save_to_file is not None:
@@ -1394,7 +1394,7 @@ def r_squared_from_epoch_list(
 
         r_squareds = [r_squared_by_epoch[e] for e in epochs]
 
-        plot_label = str(mod.LatexTerm)
+        plot_label = str(mod.model_name_latex)
         ax.plot(epochs, r_squareds, label=plot_label, marker='o')
     ax.legend(bbox_to_anchor=(1, 0.5),)
     ax.set_ylabel('$R^2$')
@@ -1853,7 +1853,7 @@ def qmdclassTOnxobj(
         name = mod.Name
         branch = qmd.get_model_data_by_field(name=name, field='branchID')
         branch_mod_count[branch] += 1
-        latex_term = mod.LatexTerm
+        latex_term = mod.model_name_latex
 
         G.add_node(i)
         G.node[i]['label'] = latex_term
@@ -1886,8 +1886,8 @@ def qmdclassTOnxobj(
             G.node[b]['status'] = 0.45
             G.node[b]['info'] = 'Branch Champion'
 
-    G.node[qmd.ChampID]['status'] = 0.9
-    G.node[qmd.ChampID]['info'] = 'Overall Champion'
+    G.node[qmd.champion_model_id]['status'] = 0.9
+    G.node[qmd.champion_model_id]['info'] = 'Overall Champion'
 
     edges = []
     for a in modlist:
@@ -3477,15 +3477,15 @@ def get_bayes_latex_dict(qmd):
     )
     for i in list(qmd.all_bayes_factors.keys()):
         mod = qmd.model_name_id_map[i]
-        latex_name = qmd.get_model_storage_instance_by_id(i).LatexTerm
+        latex_name = qmd.get_model_storage_instance_by_id(i).model_name_latex
         mapping = (mod, latex_name)
         print(mapping, file=latex_write_file)
 
     for i in list(qmd.all_bayes_factors.keys()):
-        mod_a = qmd.get_model_storage_instance_by_id(i).LatexTerm
+        mod_a = qmd.get_model_storage_instance_by_id(i).model_name_latex
         latex_dict[mod_a] = {}
         for j in list(qmd.all_bayes_factors[i].keys()):
-            mod_b = qmd.get_model_storage_instance_by_id(j).LatexTerm
+            mod_b = qmd.get_model_storage_instance_by_id(j).model_name_latex
             latex_dict[mod_a][mod_b] = qmd.all_bayes_factors[i][j][-1]
     return latex_dict
 
@@ -3526,7 +3526,7 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
             names.append(
                 qmd.branch_growth_rule_instances[
                     qmd.models_branches[
-                        qmd.ModelIDNames[mod_name]
+                        qmd.model_id_to_name_map[mod_name]
                     ]
                 ].latex_name(name=mod_name)
             )

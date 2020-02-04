@@ -524,7 +524,7 @@ else:
         expec_value_mods_to_plot = [qmd.TrueOpModelID]
     except BaseException:
         pass
-    expec_value_mods_to_plot.append(qmd.ChampID)
+    expec_value_mods_to_plot.append(qmd.champion_model_id)
 
     print("plotExpecValues")
     # qmd.plotExpecValues(
@@ -551,7 +551,7 @@ else:
     )
 
     champ_mod = qmd.get_model_storage_instance_by_id(
-        qmd.ChampID
+        qmd.champion_model_id
     )
     extend_dynamics_plot_times = [
         t * 2 for t in qmd.times_to_plot
@@ -565,7 +565,7 @@ else:
     )
 
     qmd.plot_branch_champions_dynamics(
-        model_ids=[qmd.ChampID],
+        model_ids=[qmd.champion_model_id],
         include_bayes_factors_in_dynamics_plots=False,
         include_param_estimates_in_dynamics_plots=False,
         include_times_learned_in_dynamics_plots=False,
@@ -629,11 +629,11 @@ else:
                     qmd.true_model_name
                 )
 
-            if qmd.ChampID != qmd.TrueOpModelID:
+            if qmd.champion_model_id != qmd.TrueOpModelID:
                 try:
                     print("plot_parameter_learning_single_model champ id != true id")
                     qmd.plot_parameter_learning_single_model(
-                        model_id=qmd.ChampID,
+                        model_id=qmd.champion_model_id,
                         save_to_file=str(global_variables.plots_directory +
                                          'champ_model_parameter_estimates_' + str(global_variables.long_id) +
                                          '.png')
@@ -642,14 +642,14 @@ else:
                     print(
                         "Failed to plot parameter estimates for ",
                         "champ model:",
-                        qmd.ChampID
+                        qmd.champion_model_id
                     )
 
         else:
             try:
                 print("else plot_parameter_learning_single_model")
                 qmd.plot_parameter_learning_single_model(
-                    model_id=qmd.ChampID,
+                    model_id=qmd.champion_model_id,
                     save_to_file=str(global_variables.plots_directory +
                                      'champ_model_parameter_estimates_' + str(global_variables.long_id) +
                                      '.png')
@@ -657,7 +657,7 @@ else:
             except BaseException:
                 print(
                     "Failed to plot parameter estimates for champ model:",
-                    qmd.ChampID
+                    qmd.champion_model_id
                 )
 
         """
@@ -717,7 +717,7 @@ else:
     if (
         global_variables.pickle_qmd_class
         # or
-        # global_variables.true_operator == qmd.ChampLatex
+        # global_variables.true_operator == qmd.champion_name_latex
     ):
         log_print(["QMD complete. Pickling result to",
                    global_variables.class_pickle_file], log_file
@@ -735,7 +735,7 @@ else:
 
     results_file = global_variables.results_file
     pickle.dump(
-        qmd.ChampionResultsDict,
+        qmd.champion_results,
         open(results_file, "wb"),
         protocol=2
     )

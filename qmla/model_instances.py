@@ -130,10 +130,10 @@ class ModelInstanceForLearning():
     ):
         self.VolumeList = np.array([])
         self.Name = name
-        # self.LatexTerm = database_framework.latex_name_ising(self.Name)
+        # self.model_name_latex = database_framework.latex_name_ising(self.Name)
         self.Dimension = database_framework.get_num_qubits(name)
         self.NumExperimentsToDate = 0
-        self.BayesFactors = {}
+        self.model_bayes_factors = {}
         self.log_file = log_file
         self.qmla_id = qid
         self.ModelID = int(modelID)
@@ -257,7 +257,7 @@ class ModelInstanceForLearning():
         self.experimental_measurement_times = qmd_info['experimental_measurement_times']
         self.SimOpsNames = simopnames
 
-        self.LatexTerm = self.growth_class.latex_name(
+        self.model_name_latex = self.growth_class.latex_name(
             name=self.Name
         )
 
@@ -389,7 +389,7 @@ class ModelInstanceForLearning():
         plot_all_priors = True
         if plot_all_priors == True:
             Distributions.plot_prior(
-                model_name=self.LatexTerm,
+                model_name=self.model_name_latex,
                 model_name_individual_terms=latex_terms,
                 prior=self.Prior,
                 plot_file=prior_file,
@@ -904,10 +904,10 @@ class ModelInstanceForLearning():
         )
 
     def addBayesFactor(self, compared_with, bayes_factor):
-        if compared_with in self.BayesFactors:
-            self.BayesFactors[compared_with].append(bayes_factor)
+        if compared_with in self.model_bayes_factors:
+            self.model_bayes_factors[compared_with].append(bayes_factor)
         else:
-            self.BayesFactors[compared_with] = [bayes_factor]
+            self.model_bayes_factors[compared_with] = [bayes_factor]
 
     def store_particles(self, debug_dir=None):
         if debug_dir is not None:
@@ -1034,7 +1034,7 @@ class ModelInstanceForStorage():
         self.StoreParticlesWeights = qmd_info[
             'store_particles_weights'
         ]
-        self.BayesFactors = {}
+        self.model_bayes_factors = {}
         self.NumQubits = database_framework.get_num_qubits(self.Name)
         self.ProbeDimension = self.NumQubits
         self.redis_host_name = host_name
@@ -1148,7 +1148,7 @@ class ModelInstanceForStorage():
                 self.growth_class = None
             self.HeuristicType = learned_info['heuristic']
 
-            self.LatexTerm = self.growth_class.latex_name(
+            self.model_name_latex = self.growth_class.latex_name(
                 name=self.Name
             )
 

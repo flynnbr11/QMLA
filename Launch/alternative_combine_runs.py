@@ -193,7 +193,7 @@ true_expectation_values.to_csv(
 #             pd.Series(
 #             {
 #                 'RunIdx' : row.RunIdx,
-#                 'ChampLatex' : row.ChampLatex,
+#                 'ChampLatex' : row.champion_name_latex,
 #                 'time' : t,
 #                 'ExpVal' : e
 #             }
@@ -218,7 +218,7 @@ true_expectation_values.to_csv(
 #             pd.Series(
 #             {
 #                 'RunIdx' : row.RunIdx,
-#                 'ChampLatex' : row.ChampLatex,
+#                 'ChampLatex' : row.champion_name_latex,
 #                 'Epoch' : e,
 #                 'Volume' : v
 #             }

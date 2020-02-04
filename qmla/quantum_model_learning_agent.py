@@ -1266,15 +1266,15 @@ class QuantumModelLearningAgent():
 
         mod_low = self.get_model_storage_instance_by_id(lower_id)
         mod_high = self.get_model_storage_instance_by_id(higher_id)
-        if higher_id in mod_low.BayesFactors:
-            mod_low.BayesFactors[higher_id].append(bayes_factor)
+        if higher_id in mod_low.model_bayes_factors:
+            mod_low.model_bayes_factors[higher_id].append(bayes_factor)
         else:
-            mod_low.BayesFactors[higher_id] = [bayes_factor]
+            mod_low.model_bayes_factors[higher_id] = [bayes_factor]
 
-        if lower_id in mod_high.BayesFactors:
-            mod_high.BayesFactors[lower_id].append((1.0 / bayes_factor))
+        if lower_id in mod_high.model_bayes_factors:
+            mod_high.model_bayes_factors[lower_id].append((1.0 / bayes_factor))
         else:
-            mod_high.BayesFactors[lower_id] = [(1.0 / bayes_factor)]
+            mod_high.model_bayes_factors[lower_id] = [(1.0 / bayes_factor)]
 
         if bayes_factor > self.bayes_threshold_lower:
             champ = mod_low.ModelID
@@ -1554,7 +1554,7 @@ class QuantumModelLearningAgent():
         job_finished_count = 0
         # if a spawned model is this much better than its parent, parent is
         # deactivated
-        interbranch_collapse_threshold = 1e5
+        interbranch_collapse_threshold = 1e5 # to justify deactivating a parent/child
         # interbranch_collapse_threshold = 3 ## if a spawned model is this much
         # better than its parent, parent is deactivated
         num_champs = len(branch_champions)
@@ -1603,7 +1603,7 @@ class QuantumModelLearningAgent():
                 else:
                     self.log_print(
                         [
-                            "Either parent or child not in ActiveBranchChampList",
+                            "Either parent or child not in active branch champs list",
                             "Child:", child_id,
                             "Parent:", parent_id
                         ]
@@ -1726,15 +1726,15 @@ class QuantumModelLearningAgent():
                 # Add bayes factors to BayesFactor dict for each model
                 mod_a = self.get_model_storage_instance_by_id(mod1)
                 mod_b = self.get_model_storage_instance_by_id(mod2)
-                if mod2 in mod_a.BayesFactors:
-                    mod_a.BayesFactors[mod2].append(bayes_factor)
+                if mod2 in mod_a.model_bayes_factors:
+                    mod_a.model_bayes_factors[mod2].append(bayes_factor)
                 else:
-                    mod_a.BayesFactors[mod2] = [bayes_factor]
+                    mod_a.model_bayes_factors[mod2] = [bayes_factor]
 
-                if mod1 in mod_b.BayesFactors:
-                    mod_b.BayesFactors[mod1].append((1.0 / bayes_factor))
+                if mod1 in mod_b.model_bayes_factors:
+                    mod_b.model_bayes_factors[mod1].append((1.0 / bayes_factor))
                 else:
-                    mod_b.BayesFactors[mod1] = [(1.0 / bayes_factor)]
+                    mod_b.model_bayes_factors[mod1] = [(1.0 / bayes_factor)]
             except Exception as exc:
                 self.log_print(
                     [
@@ -1787,7 +1787,7 @@ class QuantumModelLearningAgent():
                 self.ActiveTreeBranchChamps
             ]
         )
-        self.FinalTrees = []
+        # self.final_trees = []
         for gen in list(self.ActiveTreeBranchChamps.keys()):
             models_for_tree_ghost_branch = self.ActiveTreeBranchChamps[gen]
             mod_names = [
@@ -1799,9 +1799,9 @@ class QuantumModelLearningAgent():
                 growth_rule=gen
             )
 
-            self.FinalTrees.append(
-                new_branch_id
-            )
+            # self.final_trees.append(
+            #     new_branch_id
+            # )
             self.branch_model_learning_complete[new_branch_id] = True
             self.learn_models_on_given_branch(new_branch_id)
             self.get_bayes_factors_by_branch_id(new_branch_id)
@@ -1864,9 +1864,9 @@ class QuantumModelLearningAgent():
         # Finally, compare all remaining active models,
         # which should just mean the tree champions at this point.
         active_models = database_framework.all_active_model_ids(self.db)
-        self.SurvivingChampions = database_framework.all_active_model_ids(
-            self.db
-        )
+        # self.surviving_champions = database_framework.all_active_model_ids(
+        #     self.db
+        # )
         self.log_print(
             [
                 "After initial interbranch comparisons, \
@@ -2081,11 +2081,11 @@ class QuantumModelLearningAgent():
         # Final functions at end of QMD
         # Fill in champions result dict for further analysis.
 
-        champ_model = self.get_model_storage_instance_by_id(self.ChampID)
+        champ_model = self.get_model_storage_instance_by_id(self.champion_model_id)
         for i in range(self.highest_model_id):
             # Dict of all Bayes factors for each model considered.
             self.all_bayes_factors[i] = (
-                self.get_model_storage_instance_by_id(i).BayesFactors
+                self.get_model_storage_instance_by_id(i).model_bayes_factors
             )
 
         self.log_print(["computing expect vals for mod ", champ_model.ModelID])
@@ -2096,7 +2096,7 @@ class QuantumModelLearningAgent():
         self.log_print(["computed expect vals"])
 
         self.compute_f_score(
-            model_id=self.ChampID
+            model_id=self.champion_model_id
         )
 
         self.ChampionFinalParams = (
@@ -2113,10 +2113,10 @@ class QuantumModelLearningAgent():
                 "; \t true:", self.true_model_num_params]
         )
 
-        self.ModelIDNames = {}
+        self.model_id_to_name_map = {}
         for k in self.model_name_id_map:
             v = self.model_name_id_map[k]
-            self.ModelIDNames[v] = k
+            self.model_id_to_name_map[v] = k
 
         if database_framework.alph(self.ChampionName) == database_framework.alph(self.true_model_name):
             correct_model = 1
@@ -2132,13 +2132,12 @@ class QuantumModelLearningAgent():
             underfit = 1
 
         num_params_difference = self.true_model_num_params - num_params_champ_model
-
         num_qubits_champ_model = database_framework.get_num_qubits(self.ChampionName)
         self.LearnedParamsChamp = (
-            self.get_model_storage_instance_by_id(self.ChampID).LearnedParameters
+            self.get_model_storage_instance_by_id(self.champion_model_id).LearnedParameters
         )
-        self.FinalSigmasChamp = (
-            self.get_model_storage_instance_by_id(self.ChampID).FinalSigmas
+        self.champ_final_sigmas = (
+            self.get_model_storage_instance_by_id(self.champion_model_id).FinalSigmas
         )
         number_hamiltonians_to_exponentiate = (
             self.num_particles *
@@ -2176,14 +2175,14 @@ class QuantumModelLearningAgent():
             )
             expec_val_plot_times = self.times_to_plot
 
-        self.ChampLatex = champ_model.LatexTerm
+        self.champion_name_latex = champ_model.model_name_latex
         # equivalent to sleepf.ResultsDict
 
-        self.ChampionResultsDict = {
+        self.champion_results = {
             'NameAlphabetical': database_framework.alph(self.ChampionName),
             'NameNonAlph': self.ChampionName,
             'FinalParams': self.ChampionFinalParams,
-            'LatexName': champ_model.LatexTerm,
+            'LatexName': champ_model.model_name_latex,
             # 'LatexName' : database_framework.latex_name_ising(self.ChampionName),
             'NumParticles': self.num_particles,
             'NumExperiments': champ_model.num_experiments,
@@ -2203,7 +2202,7 @@ class QuantumModelLearningAgent():
             'NumQubits': num_qubits_champ_model,
             'NumParams': num_params_champ_model,
             'LearnedParameters': self.LearnedParamsChamp,
-            'FinalSigmas': self.FinalSigmasChamp,
+            'FinalSigmas': self.champ_final_sigmas,
             'QuadraticLosses': champ_model.QuadraticLosses,
             'ExpectationValues': champ_model.expectation_values,
             # 'RawExpectationValues' : champ_model.raw_expectation_values,
@@ -2227,7 +2226,7 @@ class QuantumModelLearningAgent():
             'LearnedHamiltonian': champ_model.LearnedHamiltonian,
             'GrowthGenerator': champ_model.growth_rule_of_true_model,
             'Heuristic': champ_model.HeuristicType,
-            'ChampLatex': champ_model.LatexTerm,
+            'ChampLatex': champ_model.model_name_latex,
             'TrueModel': database_framework.alph(self.true_model_name),
             'NumParamDifference': num_params_difference,
         }
@@ -2235,7 +2234,7 @@ class QuantumModelLearningAgent():
     def check_champion_reducibility(
         self,
     ):
-        champ_mod = self.get_model_storage_instance_by_id(self.ChampID)
+        champ_mod = self.get_model_storage_instance_by_id(self.champion_model_id)
         self.log_print(
             [
                 "Checking reducibility of champ model:",
@@ -2321,7 +2320,7 @@ class QuantumModelLearningAgent():
             # get champion leared info
             reduced_champion_info = pickle.loads(
                 self.redis_databases['learned_models_info'].get(
-                    str(self.ChampID))
+                    str(self.champion_model_id))
             )
 
             reduced_params = {}
@@ -2369,7 +2368,7 @@ class QuantumModelLearningAgent():
                 reduced_mod_id).updateLearnedValues()
 
             bayes_factor = self.get_pairwise_bayes_factor(
-                model_a_id=int(self.ChampID),
+                model_a_id=int(self.champion_model_id),
                 model_b_id=int(reduced_mod_id),
                 wait_on_result=True
             )
@@ -2392,7 +2391,7 @@ class QuantumModelLearningAgent():
                 self.log_print(
                     [
                         "Replacing champion model ({}) with reduced champion model ({} - {})".format(
-                            self.ChampID,
+                            self.champion_model_id,
                             reduced_mod_id,
                             new_mod
                         ),
@@ -2402,16 +2401,16 @@ class QuantumModelLearningAgent():
 
                     ]
                 )
-                original_champ_id = self.ChampID
-                self.ChampID = reduced_mod_id
+                original_champ_id = self.champion_model_id
+                self.champion_model_id = reduced_mod_id
                 self.ChampionName = new_mod
 
-                self.get_model_storage_instance_by_id(self.ChampID).BayesFactors = (
+                self.get_model_storage_instance_by_id(self.champion_model_id).model_bayes_factors = (
                     self.get_model_storage_instance_by_id(
-                        original_champ_id).BayesFactors
+                        original_champ_id).model_bayes_factors
                 )
 
-            # TODO check if BF > threshold; if so, reassign self.ChampID and
+            # TODO check if BF > threshold; if so, reassign self.champion_model_id and
             # self.ChampionName
 
         else:
@@ -2455,7 +2454,7 @@ class QuantumModelLearningAgent():
             name=mod_to_learn
         )
         self.TrueOpModelID = mod_id
-        self.ChampID = mod_id
+        self.champion_model_id = mod_id
         self.log_print(
             [
                 "Learned:",
@@ -2554,7 +2553,7 @@ class QuantumModelLearningAgent():
             'LearnedHamiltonian': mod.LearnedHamiltonian,
             'GrowthGenerator': mod.growth_rule_of_true_model,
             'Heuristic': mod.HeuristicType,
-            'ChampLatex': mod.LatexTerm,
+            'ChampLatex': mod.model_name_latex,
         }
 
         self.log_print(
@@ -2592,7 +2591,7 @@ class QuantumModelLearningAgent():
                 model_list=models_to_add
             )
         self.qhl_mode_multiple_models = True
-        self.ChampID = -1,  # TODO just so not to crash during dynamics plot
+        self.champion_model_id = -1,  # TODO just so not to crash during dynamics plot
         self.multiQHL_model_ids = [
             database_framework.model_id_from_name(
                 db=self.db,
@@ -2688,7 +2687,7 @@ class QuantumModelLearningAgent():
                 'ConfigLatex': self.latex_config,
                 'Time': time_taken,
                 'QID': self.qmla_id,
-                'ChampID': self.ChampID,
+                'ChampID': self.champion_model_id,
                 'QuadraticLosses': mod.QuadraticLosses,
                 'RSquaredTrueModel': mod.r_squared(
                     plot_probes=self.probes_for_plots,
@@ -2718,12 +2717,12 @@ class QuantumModelLearningAgent():
                 'LearnedHamiltonian': mod.LearnedHamiltonian,
                 'GrowthGenerator': mod.growth_rule_of_true_model,
                 'Heuristic': mod.HeuristicType,
-                'ChampLatex': mod.LatexTerm
+                'ChampLatex': mod.model_name_latex
             }
-            self.ModelIDNames = {}
+            self.model_id_to_name_map = {}
             for k in self.model_name_id_map:
                 v = self.model_name_id_map[k]
-                self.ModelIDNames[v] = k
+                self.model_id_to_name_map[v] = k
 
 
     def run_complete_qmla(
@@ -2951,7 +2950,7 @@ class QuantumModelLearningAgent():
         print("[QMD runRemoteMult] Finalising QMD.")
         final_winner, final_branch_winners = self.perform_final_bayes_comparisons()
         self.ChampionName = final_winner
-        self.ChampID = self.get_model_data_by_field(
+        self.champion_model_id = self.get_model_data_by_field(
             name=final_winner,
             field='ModelID'
         )
@@ -3090,7 +3089,7 @@ class QuantumModelLearningAgent():
                     lgd,), bbox_inches='tight')
 
     def store_bayes_factors_to_csv(self, save_to_file, names_ids='latex'):
-        qmla.analysis.BayesFactorsCSV(self, save_to_file, names_ids=names_ids)
+        qmla.analysis.model_bayes_factorsCSV(self, save_to_file, names_ids=names_ids)
 
     def store_bayes_factors_to_shared_csv(self, bayes_csv):
         print("[QMD] writing Bayes CSV")
@@ -3184,7 +3183,7 @@ class QuantumModelLearningAgent():
         if modlist is None:
             modlist = []
             try:
-                modlist.append(self.ChampID)
+                modlist.append(self.champion_model_id)
             except BaseException:
                 pass
             try:
