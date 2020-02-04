@@ -288,7 +288,7 @@ def average_parameter_estimates(
         fname = directory_name + '/' + str(f)
         result = pickle.load(open(fname, 'rb'))
         alph = result['NameAlphabetical']
-        track_parameter_estimates = result['TrackParameterEstimates']
+        track_parameter_estimates = result['Trackplot_parameter_estimates']
 
         # num_experiments = result['NumExperiments']
         if alph in parameter_estimates_from_qmd.keys():

@@ -336,7 +336,7 @@ def ExpectationValuesTrueSim(
             plt.savefig(save_to_file, bbox_inches='tight')
 
 
-def plotDynamicsLearnedModels(
+def plot_learned_models_dynamics(
     qmd,
     model_ids=None,
     include_expec_vals=True,
@@ -444,7 +444,7 @@ def plotDynamicsLearnedModels(
             dim = np.log2(np.shape(ham)[0])
             probe = plot_probes[reduced.ProbeDimension]
             # print(
-            #     "[plotDynamicsLearnedModels]",
+            #     "[plot_learned_models_dynamics]",
             #     "\n\tModel ", reduced.model_name_latex,
             #     "\n\tnum qubits:", dim,
             #     "\n\tprobe:", probe
@@ -1494,7 +1494,7 @@ def summariseResultsCSV(
             writer.writerow(results)
 
 
-def plotVolumeQHL(
+def plot_volume_after_qhl(
     qmd,
     model_id=None,
     true_model=True,
@@ -1930,7 +1930,7 @@ def qmdclassTOnxobj(
     return G
 
 
-def plotQMDTree(
+def plot_qmla_single_instance_tree(
     qmd,
     save_to_file=None,
     only_adjacent_branches=True,
@@ -3011,7 +3011,7 @@ def fill_between_sigmas(
         )
 
 
-def parameterEstimates(
+def plot_parameter_estimates(
     qmd,
     modelID,
     use_experimental_data=False,
@@ -3143,7 +3143,7 @@ def parameterEstimates(
 
     if save_to_file is not None:
         print(
-            "[parameterEstimates] saving to file",
+            "[plot_parameter_estimates] saving to file",
             save_to_file,
             "type:", type(save_to_file)
         )

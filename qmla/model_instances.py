@@ -1152,13 +1152,13 @@ class ModelInstanceForStorage():
                 name=self.Name
             )
 
-            self.TrackParameterEstimates = {}
+            self.Trackplot_parameter_estimates = {}
             num_params = np.shape(self.TrackEval)[1]
             max_exp = np.shape(self.TrackEval)[0] - 1
             for i in range(num_params):
                 for term in self.LearnedParameters.keys():
                     if self.LearnedParameters[term] == self.TrackEval[max_exp][i]:
-                        self.TrackParameterEstimates[term] = self.TrackEval[:, i]
+                        self.Trackplot_parameter_estimates[term] = self.TrackEval[:, i]
 
             try:
                 self.Particles = np.array(learned_info['particles'])
