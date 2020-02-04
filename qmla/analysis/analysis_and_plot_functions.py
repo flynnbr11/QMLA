@@ -56,7 +56,7 @@ def ExpectationValuesTrueSim(
     try:
         qmd.ChampID
     except BaseException:
-        qmd.ChampID = qmd.HighestModelID + 1
+        qmd.ChampID = qmd.highest_model_id + 1
 
     if model_ids is None and champ == True:
         model_ids = [qmd.ChampID]
@@ -173,7 +173,7 @@ def ExpectationValuesTrueSim(
             )
 
         ChampionsByBranch = {
-            v: k for k, v in qmd.BranchChampions.items()
+            v: k for k, v in qmd.branch_champions.items()
         }
         max_time_learned = 0
         for i in range(len(model_ids)):
@@ -216,7 +216,7 @@ def ExpectationValuesTrueSim(
                 sim_label = champ_sim_label
                 sim_col = champion_colour
                 time_hist_label = 'Times learned by Champion Model'
-            elif mod_id in list(qmd.BranchChampions.values()):
+            elif mod_id in list(qmd.branch_champions.values()):
                 models_branch = ChampionsByBranch[mod_id]
                 # sim_label = 'Branch '+str(models_branch)+' Champion'
                 sim_label = mod.LatexTerm
@@ -352,7 +352,7 @@ def plotDynamicsLearnedModels(
         model_ids = list(qmd.multiQHL_model_ids)
         include_bayes_factors = False
     elif model_ids is None:
-        model_ids = list(qmd.BranchChampions.values())
+        model_ids = list(qmd.branch_champions.values())
 
     model_ids = list(sorted(set(model_ids)))  # only uniques values
     true_expec_vals = pickle.load(
@@ -758,7 +758,7 @@ def ExpectationValuesQHL_TrueModel(
                     marker='o', s=8, color=true_colour
                     )
 
-    ChampionsByBranch = {v: k for k, v in qmd.BranchChampions.items()}
+    ChampionsByBranch = {v: k for k, v in qmd.branch_champions.items()}
     for i in range(len(model_ids)):
         mod_id = model_ids[i]
         sim = qmd.model_name_id_map[mod_id]
@@ -1418,7 +1418,7 @@ def plot_quadratic_loss(
         to_plot_quad_loss = [qmd.TrueOpModelID]
         plot_title = str('Quadratic Loss for True operator (from QHL)')
     elif champs_or_all == 'champs':
-        to_plot_quad_loss = qmd.BranchChampions.values()
+        to_plot_quad_loss = qmd.branch_champions.values()
         plot_title = str('Quadratic Loss for Branch champions')
     else:
         to_plot_quad_loss = qmd.model_name_id_map.keys()
@@ -1840,8 +1840,8 @@ def qmdclassTOnxobj(
     branch_x_filled = {}
     branch_mod_count = {}
 
-    max_branch_id = qmd.HighestBranchID
-    max_mod_id = qmd.HighestModelID
+    max_branch_id = qmd.branch_highest_id
+    max_mod_id = qmd.highest_model_id
     if modlist is None:
         modlist = range(max_mod_id)
     for i in range(max_branch_id + 1):
@@ -1881,7 +1881,7 @@ def qmdclassTOnxobj(
         G.node[i]['pos'] = (x_pos, y_pos)
 
     # set node colour based on whether that model won a branch
-    for b in list(qmd.BranchChampions.values()):
+    for b in list(qmd.branch_champions.values()):
         if b in modlist:
             G.node[b]['status'] = 0.45
             G.node[b]['info'] = 'Branch Champion'
@@ -2363,7 +2363,7 @@ def cumulativeQMDTreePlot(
     branch_x_filled = {}
     branch_mod_count = {}
 
-#    max_branch_id = qmd.HighestBranchID # TODO: get this number without access to QMD class instance
+#    max_branch_id = qmd.branch_highest_id # TODO: get this number without access to QMD class instance
     # max_branch_id = 9 # TODO: this is hardcoded - is there an alternative?
     max_branch_id = max(list(term_branches.values())) + 1
     max_mod_id = len(modlist)
@@ -3524,8 +3524,8 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
         names = []
         for mod_name in list(qmd.model_name_id_map.values()):
             names.append(
-                qmd.BranchGrowthClasses[
-                    qmd.ModelsBranches[
+                qmd.branch_growth_rule_instances[
+                    qmd.models_branches[
                         qmd.ModelIDNames[mod_name]
                     ]
                 ].latex_name(name=mod_name)
@@ -3535,10 +3535,10 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
         names = [
             qmd.model_name_id_map[i]
             for i in
-            range(qmd.HighestModelID)
+            range(qmd.highest_model_id)
         ]
     elif names_ids == 'ids':
-        names = range(qmd.HighestModelID)
+        names = range(qmd.highest_model_id)
     else:
         print("BayesFactorsCSV names_ids must be latex, nonlatex, or ids.")
 
@@ -3553,12 +3553,12 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
         )
 
         writer.writeheader()
-        for i in range(qmd.HighestModelID):
+        for i in range(qmd.highest_model_id):
             model_bf = {}
             for j in qmd.all_bayes_factors[i].keys():
                 if names_ids == 'latex':
-                    other_model_name = qmd.BranchGrowthClasses[
-                        qmd.ModelsBranches[j]
+                    other_model_name = qmd.branch_growth_rule_instances[
+                        qmd.models_branches[j]
                     ].latex_name(name=qmd.model_name_id_map[j])
 
                 elif names_ids == 'nonlatex':
@@ -3570,8 +3570,8 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
             # if names_ids=='latex':
                 # model_bf['Name'] = database_framework.latex_name_ising(qmd.model_name_id_map[i])
             try:
-                model_bf['Name'] = qmd.BranchGrowthClasses[
-                    qmd.ModelsBranches[i]
+                model_bf['Name'] = qmd.branch_growth_rule_instances[
+                    qmd.models_branches[i]
                 ].latex_name(name=qmd.model_name_id_map[i])
             except BaseException:
                 model_bf['Name'] = qmd.model_name_id_map[i]

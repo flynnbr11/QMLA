@@ -458,7 +458,7 @@ elif (
     qmd.run_quantum_hamiltonian_learning_multiple_models(
         model_names=qhl_models
     )
-    # model_ids = list(range(qmd.HighestModelID))
+    # model_ids = list(range(qmd.highest_model_id))
     model_ids = [
         database_framework.model_id_from_name(
             db=qmd.db,
