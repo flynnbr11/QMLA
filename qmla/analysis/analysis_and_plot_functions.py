@@ -98,11 +98,11 @@ def ExpectationValuesTrueSim(
             times = np.arange(0, max_time, t_interval)
         else:
             times = times
-        true = qmd.TrueOpName
+        true = qmd.true_model_name
         true_op = database_framework.Operator(true)
 
-        true_params = qmd.TrueParamsList
-        true_ops = qmd.TrueOpList
+        true_params = qmd.true_param_list
+        true_ops = qmd.true_model_constituent_operators
         true_dim = true_op.num_qubits
 
         # if plus_probe:
@@ -120,7 +120,7 @@ def ExpectationValuesTrueSim(
         for t in times:
             if qmd.UseTimeDepTrueModel:
                 # Multiply time dependent parameters by time value
-                params = copy.copy(qmd.TrueParamsList)
+                params = copy.copy(qmd.true_param_list)
                 for i in range(
                     len(params) - qmd.NumTimeDepTrueParams,
                     len(params)
@@ -615,7 +615,7 @@ def plotDynamicsLearnedModels(
                 i += 1
                 try:
                     if use_experimental_data == False:
-                        y_true = qmd.TrueParamDict[term]
+                        y_true = qmd.true_param_dict[term]
                         # true_term_latex = database_framework.latex_name_ising(term)
                         true_term_latex = qmd.growth_class.latex_name(
                             name=term
@@ -707,12 +707,12 @@ def ExpectationValuesQHL_TrueModel(
         ]
     else:
         times = np.arange(0, max_time, t_interval)
-        true = qmd.TrueOpName
+        true = qmd.true_model_name
         true_op = database_framework.Operator(true)
 
-        true_params = qmd.TrueParamsList
+        true_params = qmd.true_param_list
 #        true_ops = true_op.constituents_operators
-        true_ops = qmd.TrueOpList
+        true_ops = qmd.true_model_constituent_operators
         true_dim = true_op.num_qubits
         true_probe = qmd.ProbeDict[(probe_id, true_dim)]
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
@@ -721,7 +721,7 @@ def ExpectationValuesQHL_TrueModel(
         for t in times:
             if qmd.UseTimeDepTrueModel:
                 # Multiply time dependent parameters by time value
-                params = copy.copy(qmd.TrueParamsList)
+                params = copy.copy(qmd.true_param_list)
                 for i in range(
                     len(params) - qmd.NumTimeDepTrueParams,
                     len(params)
@@ -867,7 +867,7 @@ def ExpectationValuesQHL_TrueModel(
                              shadow=True, ncol=1
                              )
 
-    latex_name_for_title = qmd.growth_class.latex_name(name=qmd.TrueOpName)
+    latex_name_for_title = qmd.growth_class.latex_name(name=qmd.true_model_name)
     plt.title(
         str(
             "QHL test for " +
@@ -3081,7 +3081,7 @@ def parameterEstimates(
         i += 1
         try:
             if use_experimental_data == False:
-                y_true = qmd.TrueParamDict[term]
+                y_true = qmd.true_param_dict[term]
                 # true_term_latex = database_framework.latex_name_ising(term)
                 true_term_latex = qmd.growth_class.latex_name(
                     name=term

@@ -626,7 +626,7 @@ else:
             except BaseException:
                 print(
                     "Failed to plot parameter estimates for true model:",
-                    qmd.TrueOpName
+                    qmd.true_model_name
                 )
 
             if qmd.ChampID != qmd.TrueOpModelID:

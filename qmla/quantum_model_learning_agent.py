@@ -156,15 +156,15 @@ class QuantumModelLearningAgent():
         self.redis_databases['any_job_failed'].set('Status', 0)
 
     def _true_model_definition(self):
-        self.TrueOpName = self.qmla_controls.true_op_name
-        self.TrueOpDim = database_framework.get_num_qubits(self.TrueOpName)
-        self.TrueOpList = self.qmla_controls.true_op_list
-        self.TrueOpNumParams = self.qmla_controls.true_operator_class.num_constituents
-        self.TrueParamsList = self.qmla_controls.true_params_list
-        self.TrueParamDict = self.qmla_controls.true_params_dict
+        self.true_model_name = self.qmla_controls.true_op_name
+        self.true_model_dimension = database_framework.get_num_qubits(self.true_model_name)
+        self.true_model_constituent_operators = self.qmla_controls.true_op_list
+        self.true_model_num_params = self.qmla_controls.true_operator_class.num_constituents
+        self.true_param_list = self.qmla_controls.true_params_list
+        self.true_param_dict = self.qmla_controls.true_params_dict
         self.log_print(
             [
-                "True model:", self.TrueOpName
+                "True model:", self.true_model_name
             ]
         )
 
@@ -428,7 +428,7 @@ class QuantumModelLearningAgent():
                     self.growth_class.expectation_value(
                         ham=self.TrueHamiltonian,
                         t=t,
-                        state=self.PlotProbes[self.TrueOpDim],
+                        state=self.PlotProbes[self.true_model_dimension],
                         log_file=self.log_file,
                         log_identifier='[QMD Init]'
                     )
@@ -549,8 +549,8 @@ class QuantumModelLearningAgent():
             #          'probe_dict' : self.ProbeDict, # possibly include here?
             'plot_probe_file': self.PlotProbeFile,
             'plot_times': self.PlotTimes,
-            'true_oplist': self.TrueOpList,
-            'true_params': self.TrueParamsList,
+            'true_oplist': self.true_model_constituent_operators,
+            'true_params': self.true_param_list,
             'num_particles': self.NumParticles,
             'num_experiments': self.NumExperiments,
             'resampler_thresh': self.ResampleThreshold,
@@ -567,7 +567,7 @@ class QuantumModelLearningAgent():
             'debug_directory': self.DebugDirectory,
             'qle': self.QLE,
             'sigma_threshold': self.SigmaThreshold,
-            'true_name': self.TrueOpName,
+            'true_name': self.true_model_name,
             'use_exp_custom': self.UseExpCustom,
             'measurement_type': self.MeasurementType,
             'use_experimental_data': self.use_experimental_data,
@@ -615,14 +615,14 @@ class QuantumModelLearningAgent():
     def _initiate_database(self):
         self.db, self.legacy_db, self.model_lists = \
             database_launch.launch_db(
-                true_op_name=self.TrueOpName,
+                true_op_name=self.true_model_name,
                 new_model_branches=self.InitialModelBranches,
                 new_model_ids=self.InitialModelIDs,
                 log_file=self.log_file,
                 gen_list=self.InitialOpsAllBranches,
                 qle=self.QLE,
-                true_ops=self.TrueOpList,
-                true_params=self.TrueParamsList,
+                true_ops=self.true_model_constituent_operators,
+                true_params=self.true_param_list,
                 num_particles=self.NumParticles,
                 redimensionalise=False,
                 resample_threshold=self.ResampleThreshold,
@@ -640,7 +640,7 @@ class QuantumModelLearningAgent():
 
         for mod in list(self.InitialModelIDs.keys()):
             mod_id = self.InitialModelIDs[mod]
-            if database_framework.alph(mod) == self.TrueOpName:
+            if database_framework.alph(mod) == self.true_model_name:
                 self.TrueOpModelID = mod_id
             print("mod id:", mod_id)
             self.ModelNameIDs[int(mod_id)] = mod
@@ -667,10 +667,10 @@ class QuantumModelLearningAgent():
             model_name=model,
             running_database=self.db,
             num_particles=self.NumParticles,
-            true_op_name=self.TrueOpName,
+            true_op_name=self.true_model_name,
             model_lists=self.model_lists,
-            true_ops=self.TrueOpList,
-            true_params=self.TrueParamsList,
+            true_ops=self.true_model_constituent_operators,
+            true_params=self.true_param_list,
             branchID=branchID,
             resample_threshold=self.ResampleThreshold,
             resampler_a=self.ResamplerA,
@@ -690,7 +690,7 @@ class QuantumModelLearningAgent():
             force_create_model=force_create_model,
         )
         if tryAddModel == True:  # keep track of how many models/branches in play
-            if database_framework.alph(model) == database_framework.alph(self.TrueOpName):
+            if database_framework.alph(model) == database_framework.alph(self.true_model_name):
                 self.TrueOpModelID = self.NumModels
             self.HighestModelID += 1
             # print("Setting model ", model, "to ID:", self.NumModels)
@@ -1095,7 +1095,7 @@ class QuantumModelLearningAgent():
                 times_record=self.BayesFactorsTimeFile,
                 bf_data_folder=self.BayesFactorsFolder,
                 num_times_to_use=self.NumTimesForBayesUpdates,
-                trueModel=self.TrueOpName,
+                trueModel=self.true_model_name,
                 bayes_threshold=bayes_threshold,
                 host_name=self.redis_host_name,
                 port_number=self.redis_port_number,
@@ -1122,7 +1122,7 @@ class QuantumModelLearningAgent():
             BayesFactorRemote(
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
-                trueModel=self.TrueOpName,
+                trueModel=self.true_model_name,
                 bf_data_folder=self.BayesFactorsFolder,
                 times_record=self.BayesFactorsTimeFile,
                 num_times_to_use=self.NumTimesForBayesUpdates,
@@ -2161,7 +2161,7 @@ class QuantumModelLearningAgent():
         self.log_print(
             [
                 "Num params - champ:", num_params_champ_model,
-                "; \t true:", self.TrueOpNumParams]
+                "; \t true:", self.true_model_num_params]
         )
 
         self.ModelIDNames = {}
@@ -2169,20 +2169,20 @@ class QuantumModelLearningAgent():
             v = self.ModelNameIDs[k]
             self.ModelIDNames[v] = k
 
-        if database_framework.alph(self.ChampionName) == database_framework.alph(self.TrueOpName):
+        if database_framework.alph(self.ChampionName) == database_framework.alph(self.true_model_name):
             correct_model = 1
         elif (
-            num_params_champ_model == self.TrueOpNumParams
+            num_params_champ_model == self.true_model_num_params
             and
-            database_framework.alph(self.ChampionName) != database_framework.alph(self.TrueOpName)
+            database_framework.alph(self.ChampionName) != database_framework.alph(self.true_model_name)
         ):
             misfit = 1
-        elif num_params_champ_model > self.TrueOpNumParams:
+        elif num_params_champ_model > self.true_model_num_params:
             overfit = 1
-        elif num_params_champ_model < self.TrueOpNumParams:
+        elif num_params_champ_model < self.true_model_num_params:
             underfit = 1
 
-        num_params_difference = self.TrueOpNumParams - num_params_champ_model
+        num_params_difference = self.true_model_num_params - num_params_champ_model
 
         num_qubits_champ_model = database_framework.get_num_qubits(self.ChampionName)
         self.LearnedParamsChamp = (
@@ -2279,7 +2279,7 @@ class QuantumModelLearningAgent():
             'GrowthGenerator': champ_model.GrowthGenerator,
             'Heuristic': champ_model.HeuristicType,
             'ChampLatex': champ_model.LatexTerm,
-            'TrueModel': database_framework.alph(self.TrueOpName),
+            'TrueModel': database_framework.alph(self.true_model_name),
             'NumParamDifference': num_params_difference,
         }
 
@@ -2481,14 +2481,14 @@ class QuantumModelLearningAgent():
         if (
             self.qhl_mode == True
             and
-            self.TrueOpName not in list(self.ModelsBranches.keys())
+            self.true_model_name not in list(self.ModelsBranches.keys())
         ):
             self.new_branch(
                 growth_rule=self.GrowthGenerator,
-                model_list=[self.TrueOpName]
+                model_list=[self.true_model_name]
             )
 
-        mod_to_learn = self.TrueOpName
+        mod_to_learn = self.true_model_name
         self.log_print(
             [
                 "QHL test on:", mod_to_learn
@@ -3028,11 +3028,11 @@ class QuantumModelLearningAgent():
             ]
         )
 
-        if self.ChampionName == database_framework.alph(self.TrueOpName):
+        if self.ChampionName == database_framework.alph(self.true_model_name):
             self.log_print(
                 [
                     "True model found: {}".format(
-                        database_framework.alph(self.TrueOpName)
+                        database_framework.alph(self.true_model_name)
                     )
                 ]
             )
@@ -3160,7 +3160,7 @@ class QuantumModelLearningAgent():
 
         if true_model:
             model_id = database_framework.model_id_from_name(
-                db=self.db, name=self.TrueOpName)
+                db=self.db, name=self.true_model_name)
 
         qmla.analysis.parameterEstimates(qmd=self,
                                    modelID=model_id,

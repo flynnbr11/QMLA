@@ -242,9 +242,9 @@ class ModelInstanceForLearning():
         self.StoreParticlesWeights = qmd_info['store_particles_weights']
         self.QHL_plots = qmd_info['qhl_plots']
         self.results_directory = qmd_info['results_directory']
-        self.TrueOpList = qmd_info['true_oplist']
+        self.true_model_constituent_operators = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
-        self.TrueOpName = qmd_info['true_name']
+        self.true_model_name = qmd_info['true_name']
         self.UseTimeDepTrueModel = qmd_info['use_time_dep_true_params']
         self.TimeDepTrueParams = qmd_info['time_dep_true_params']
         self.NumTimeDepTrueParams = qmd_info['num_time_dependent_true_params']
@@ -298,7 +298,7 @@ class ModelInstanceForLearning():
             #     print("calculated mtx:", term_mtx )
             #     print("sim op list:", self.SimOpList[i] )
 
-        # self.log_print(["True oplist:", self.TrueOpList ])
+        # self.log_print(["True oplist:", self.true_model_constituent_operators ])
         # self.log_print(["Sim oplist:", self.SimOpList])
         # self.log_print(["learning true params:", self.TrueParams])
         self.EnableSparse = enable_sparse
@@ -306,7 +306,7 @@ class ModelInstanceForLearning():
         print_loc(print_location=init_model_print_loc)
         """
         self.log_print(['True params', self.TrueParams, '\n true op list:',
-            self.TrueOpList, 'true op name:', self.TrueOpName]
+            self.true_model_constituent_operators, 'true op name:', self.true_model_name]
         )
         self.log_print(['SimOpsNames:', self.SimOpsNames,
             '\n\tSimOpList:\n', self.SimOpList,
@@ -406,9 +406,9 @@ class ModelInstanceForLearning():
         self.GenSimModel = qml_qi.QInferModelQML(
             oplist=self.SimOpList,
             modelparams=self.SimParams,
-            true_oplist=self.TrueOpList,
+            true_oplist=self.true_model_constituent_operators,
             trueparams=self.TrueParams,
-            truename=self.TrueOpName,
+            truename=self.true_model_name,
             use_time_dep_true_model=self.UseTimeDepTrueModel,
             time_dep_true_params=self.TimeDepTrueParams,
             num_time_dep_true_params=self.NumTimeDepTrueParams,
@@ -526,7 +526,7 @@ class ModelInstanceForLearning():
         self.TrueParamsDict = {}
 
         true_params_names = database_framework.get_constituent_names_from_name(
-            self.TrueOpName
+            self.true_model_name
         )
         if self.use_experimental_data == False:
             for i in range(len(true_params_names)):
@@ -1022,9 +1022,9 @@ class ModelInstanceForStorage():
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.ResamplerA = qmd_info['resampler_a']
         self.PGHPrefactor = qmd_info['pgh_prefactor']
-        self.TrueOpList = qmd_info['true_oplist']
+        self.true_model_constituent_operators = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
-        self.TrueOpName = qmd_info['true_name']
+        self.true_model_name = qmd_info['true_name']
         self.PlotProbes = pickle.load(
             open(qmd_info['plot_probe_file'], 'rb')
         )
@@ -1427,12 +1427,12 @@ class ModelInstanceForStorage():
         return r_squared_by_epoch
 
 
-#        self.GenSimModel = qml_qi.qinfer_model_interface(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.TrueOpList, trueparams = self.TrueParams, truename=self.TrueOpName,             use_experimental_data = self.use_experimental_data,
+#        self.GenSimModel = qml_qi.qinfer_model_interface(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.true_model_constituent_operators, trueparams = self.TrueParams, truename=self.true_model_name,             use_experimental_data = self.use_experimental_data,
 #            experimental_measurements = self.ExperimentalMeasurements,
 #            experimental_measurement_times=(
 #                self.ExperimentalMeasurementTimes
 #            ),
-# model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.TrueOpList,
+# model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.true_model_constituent_operators,
 #        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
 #        self.Updater.NormalizationRecord = self.NormalizationRecord
 
@@ -1479,9 +1479,9 @@ class ModelInstanceForComparison():
         self.ResamplerThresh = qmd_info['resampler_thresh']
         self.ResamplerA = qmd_info['resampler_a']
         self.PGHPrefactor = qmd_info['pgh_prefactor']
-        self.TrueOpList = qmd_info['true_oplist']
+        self.true_model_constituent_operators = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
-        self.TrueOpName = qmd_info['true_name']
+        self.true_model_name = qmd_info['true_name']
         self.UseExpCustom = qmd_info['use_exp_custom']
         self.MeasurementType = qmd_info['measurement_type']
         self.use_experimental_data = qmd_info['use_experimental_data']
@@ -1547,9 +1547,9 @@ class ModelInstanceForComparison():
         self.GenSimModel = qml_qi.QInferModelQML(
             oplist=self.SimOpList,
             modelparams=self.SimParams_Final,
-            true_oplist=self.TrueOpList,
+            true_oplist=self.true_model_constituent_operators,
             trueparams=self.TrueParams,
-            truename=self.TrueOpName,
+            truename=self.true_model_name,
             measurement_type=self.MeasurementType,
             growth_generation_rule=self.GrowthGenerator,
             use_experimental_data=self.use_experimental_data,
