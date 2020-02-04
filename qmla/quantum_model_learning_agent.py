@@ -241,7 +241,6 @@ class QuantumModelLearningAgent():
                 use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
             )
-            # self.tree_completed[gen] = False
             self.tree_completed[gen] = growth_class_gen.tree_completed_initially
             self.growth_rules_initial_models[gen] = growth_class_gen.initial_models
 
@@ -326,7 +325,7 @@ class QuantumModelLearningAgent():
         # to ensure everywhere we use range(qmd.highest_model_id) goes to the
         # right number
         self.highest_model_id = max(self.model_initial_ids.values()) + 1
-        self.NumModels = len(self.model_initial_ids.keys())
+        self.model_count = len(self.model_initial_ids.keys())
         self.log_print(
             [
                 "After setting up initial branches, highest branch id:",
@@ -337,9 +336,9 @@ class QuantumModelLearningAgent():
         )
 
         # i.e. Trees only stem from unique generators
-        self.NumTrees = len(self.growth_rules_list)
-        # print("[QMD] num trees:", self.NumTrees)
-        self.NumTreesCompleted = np.sum(
+        self.tree_count = len(self.growth_rules_list)
+        # print("[QMD] num trees:", self.tree_count)
+        self.tree_count_completed = np.sum(
             list(self.tree_completed.values())
         )
 
@@ -352,18 +351,18 @@ class QuantumModelLearningAgent():
         experimental_measurements,
         plot_times
     ):
-        self.ModelPriors = model_priors
-        self.NumParticles = self.qmla_controls.num_particles
-        self.NumExperiments = self.qmla_controls.num_experiments
-        self.NumTimesForBayesUpdates = self.qmla_controls.num_times_bayes
-        self.BayesLower = self.qmla_controls.bayes_lower
-        self.BayesUpper = self.qmla_controls.bayes_upper
-        self.ResampleThreshold = self.qmla_controls.resample_threshold
-        self.ResamplerA = self.qmla_controls.resample_a
-        self.PGHPrefactor = self.qmla_controls.pgh_factor
-        self.PGHExponent = self.qmla_controls.pgh_exponent
-        self.ReallocateResources = self.qmla_controls.reallocate_resources
-        self.gaussian = self.qmla_controls.gaussian # TODO remove?
+        self.model_priors = model_priors
+        self.num_particles = self.qmla_controls.num_particles
+        self.num_experiments = self.qmla_controls.num_experiments
+        self.num_experiments_for_bayes_updates = self.qmla_controls.num_times_bayes
+        self.bayes_threshold_lower = self.qmla_controls.bayes_lower
+        self.bayes_threshold_upper = self.qmla_controls.bayes_upper
+        self.qinfer_resample_threshold = self.qmla_controls.resample_threshold
+        self.qinfer_resampler_a = self.qmla_controls.resample_a
+        self.qinfer_PGH_heuristic_factor = self.qmla_controls.pgh_factor
+        self.qinfer_PGH_heuristic_exponent = self.qmla_controls.pgh_exponent
+        self.reallocate_resources = self.qmla_controls.reallocate_resources
+
         if system_probe_dict is None:
             # ensure there is a probe set
             self.log_print(
@@ -372,21 +371,21 @@ class QuantumModelLearningAgent():
                 ]
             )
             self.growth_class.generate_probes(
-                experimental_data=self.qmla_controls.use_experimental_data,
-                noise_level=self.qmla_controls.probe_noise_level,
-                minimum_tolerable_noise=0.0,
+                experimental_data = self.qmla_controls.use_experimental_data,
+                noise_level = self.qmla_controls.probe_noise_level,
+                minimum_tolerable_noise = 0.0,
             )
-            self.ProbeDict = self.growth_class.system_probes
-            self.SimProbeDict = self.ProbeDict
+            self.system_probes = self.growth_class.system_probes
+            self.simulator_probes = self.system_probes
         else:
-            self.NumProbes = self.qmla_controls.num_probes
+            self.probe_number = self.qmla_controls.num_probes
             self.log_print(
                 [
                     "Probe dict provided to QMLA."
                 ]
             )
-            self.ProbeDict = system_probe_dict
-            self.SimProbeDict = simulation_probe_dict
+            self.system_probes = system_probe_dict
+            self.simulator_probes = simulation_probe_dict
         
         self.ExperimentalMeasurements = experimental_measurements
         if self.ExperimentalMeasurements is not None:
@@ -456,6 +455,7 @@ class QuantumModelLearningAgent():
         self.FitnessParameters = {}
         self.DebugDirectory = None
         self.NumTimeDepTrueParams = 0
+        self.gaussian = self.qmla_controls.gaussian # TODO remove?        
         self.TimeDepParams = None
         self.UseTimeDepTrueModel = False
         self.BayesFactorsFolder = str(
@@ -522,18 +522,18 @@ class QuantumModelLearningAgent():
         self
     ):
         num_exp_ham = (
-            self.NumParticles *
-            (self.NumExperiments + self.NumTimesForBayesUpdates)
+            self.num_particles *
+            (self.num_experiments + self.num_experiments_for_bayes_updates)
         )
         latex_config = str(
-            '$P_{' + str(self.NumParticles) +
-            '}E_{' + str(self.NumExperiments) +
-            '}B_{' + str(self.NumTimesForBayesUpdates) +
-            '}RT_{' + str(self.ResampleThreshold) +
-            '}RA_{' + str(self.ResamplerA) +
-            '}RP_{' + str(self.PGHPrefactor) +
+            '$P_{' + str(self.num_particles) +
+            '}E_{' + str(self.num_experiments) +
+            '}B_{' + str(self.num_experiments_for_bayes_updates) +
+            '}RT_{' + str(self.qinfer_resample_threshold) +
+            '}RA_{' + str(self.qinfer_resampler_a) +
+            '}RP_{' + str(self.qinfer_PGH_heuristic_factor) +
             '}H_{' + str(num_exp_ham) +
-            r'}|\psi>_{' + str(self.NumProbes) +
+            r'}|\psi>_{' + str(self.probe_number) +
             '}PN_{' + str(self.qmla_controls.probe_noise_level) +
             '}BF^{bin }_{' + str(self.qmla_controls.bayes_time_binning) +
             '}BF^{all }_{' + str(self.qmla_controls.bayes_factors_use_all_exp_times) +
@@ -545,18 +545,18 @@ class QuantumModelLearningAgent():
         self.QMDInfo = {
             # may need to take copies of these in case pointers accross nodes
             # break
-            'num_probes': self.NumProbes,
-            #          'probe_dict' : self.ProbeDict, # possibly include here?
+            'num_probes': self.probe_number,
+            #          'probe_dict' : self.system_probes, # possibly include here?
             'plot_probe_file': self.PlotProbeFile,
             'plot_times': self.PlotTimes,
             'true_oplist': self.true_model_constituent_operators,
             'true_params': self.true_param_list,
-            'num_particles': self.NumParticles,
-            'num_experiments': self.NumExperiments,
-            'resampler_thresh': self.ResampleThreshold,
-            'resampler_a': self.ResamplerA,
-            'pgh_prefactor': self.PGHPrefactor,
-            'pgh_exponent': self.PGHExponent,
+            'num_particles': self.num_particles,
+            'num_experiments': self.num_experiments,
+            'resampler_thresh': self.qinfer_resample_threshold,
+            'resampler_a': self.qinfer_resampler_a,
+            'pgh_prefactor': self.qinfer_PGH_heuristic_factor,
+            'pgh_exponent': self.qinfer_PGH_heuristic_exponent,
             'increase_pgh_time': self.qmla_controls.increase_pgh_time,
             'store_particles_weights': False,
             'growth_generator': self.growth_rule_of_true_model,
@@ -583,9 +583,9 @@ class QuantumModelLearningAgent():
             'num_time_dependent_true_params': self.NumTimeDepTrueParams,
             'prior_pickle_file': self.qmla_controls.prior_pickle_file,
             'prior_specific_terms': self.growth_class.gaussian_prior_means_and_widths,
-            'model_priors': self.ModelPriors,
+            'model_priors': self.model_priors,
             'base_resources': self.BaseResources,
-            'reallocate_resources': self.ReallocateResources,
+            'reallocate_resources': self.reallocate_resources,
             'param_min': self.qmla_controls.param_min,
             'param_max': self.qmla_controls.param_max,
             'param_mean': self.qmla_controls.param_mean,
@@ -594,8 +594,8 @@ class QuantumModelLearningAgent():
             'bayes_factors_time_all_exp_times': self.qmla_controls.bayes_factors_use_all_exp_times,
         }
         compressed_qmd_info = pickle.dumps(self.QMDInfo, protocol=2)
-        compressed_probe_dict = pickle.dumps(self.ProbeDict, protocol=2)
-        compressed_sim_probe_dict = pickle.dumps(self.SimProbeDict, protocol=2)
+        compressed_probe_dict = pickle.dumps(self.system_probes, protocol=2)
+        compressed_sim_probe_dict = pickle.dumps(self.simulator_probes, protocol=2)
         qmd_info_db = self.redis_databases['qmd_info_db']
         self.log_print(["Saving qmd info db to ", qmd_info_db])
         qmd_info_db.set('QMDInfo', compressed_qmd_info)
@@ -623,13 +623,13 @@ class QuantumModelLearningAgent():
                 qle=self.QLE,
                 true_ops=self.true_model_constituent_operators,
                 true_params=self.true_param_list,
-                num_particles=self.NumParticles,
+                num_particles=self.num_particles,
                 redimensionalise=False,
-                resample_threshold=self.ResampleThreshold,
-                resampler_a=self.ResamplerA,
-                pgh_prefactor=self.PGHPrefactor,
-                num_probes=self.NumProbes,
-                probe_dict=self.ProbeDict,
+                resample_threshold=self.qinfer_resample_threshold,
+                resampler_a=self.qinfer_resampler_a,
+                pgh_prefactor=self.qinfer_PGH_heuristic_factor,
+                num_probes=self.probe_number,
+                probe_dict=self.system_probes,
                 use_exp_custom=self.UseExpCustom,
                 enable_sparse=self.EnableSparse,
                 debug_directory=self.DebugDirectory,
@@ -661,26 +661,26 @@ class QuantumModelLearningAgent():
         branchID=0,
         force_create_model=False
     ):
-        #self.NumModels += 1
+        #self.model_count += 1
         model = database_framework.alph(model)
         tryAddModel = database_launch.add_model(
             model_name=model,
             running_database=self.db,
-            num_particles=self.NumParticles,
+            num_particles=self.num_particles,
             true_op_name=self.true_model_name,
             model_lists=self.model_lists,
             true_ops=self.true_model_constituent_operators,
             true_params=self.true_param_list,
             branchID=branchID,
-            resample_threshold=self.ResampleThreshold,
-            resampler_a=self.ResamplerA,
-            pgh_prefactor=self.PGHPrefactor,
-            num_probes=self.NumProbes,
-            probe_dict=self.ProbeDict,
+            resample_threshold=self.qinfer_resample_threshold,
+            resampler_a=self.qinfer_resampler_a,
+            pgh_prefactor=self.qinfer_PGH_heuristic_factor,
+            num_probes=self.probe_number,
+            probe_dict=self.system_probes,
             use_exp_custom=self.UseExpCustom,
             enable_sparse=self.EnableSparse,
             debug_directory=self.DebugDirectory,
-            modelID=self.NumModels,
+            modelID=self.model_count,
             redimensionalise=False,
             qle=self.QLE,
             host_name=self.redis_host_name,
@@ -691,12 +691,12 @@ class QuantumModelLearningAgent():
         )
         if tryAddModel == True:  # keep track of how many models/branches in play
             if database_framework.alph(model) == database_framework.alph(self.true_model_name):
-                self.TrueOpModelID = self.NumModels
+                self.TrueOpModelID = self.model_count
             self.highest_model_id += 1
-            # print("Setting model ", model, "to ID:", self.NumModels)
-            model_id = self.NumModels
+            # print("Setting model ", model, "to ID:", self.model_count)
+            model_id = self.model_count
             self.model_name_id_map[model_id] = model
-            self.NumModels += 1
+            self.model_count += 1
             # if database_framework.get_num_qubits(model) > self.HighestQubitNumber:
             #     self.HighestQubitNumber = database_framework.get_num_qubits(model)
             #     self.branch_growth_rule_instances[branchID].highest_num_qubits = database_framework.get_num_qubits(
@@ -1031,7 +1031,7 @@ class QuantumModelLearningAgent():
                         "model:", model_name
                     ]
                 )
-                self.QMDInfo['probe_dict'] = self.ProbeDict
+                self.QMDInfo['probe_dict'] = self.system_probes
                 updated_model_info = learnModelRemote(
                     model_name,
                     modelID,
@@ -1066,7 +1066,7 @@ class QuantumModelLearningAgent():
         wait_on_result=False
     ):
         if bayes_threshold is None:
-            bayes_threshold = self.BayesUpper
+            bayes_threshold = self.bayes_threshold_upper
 
         if branchID is None:
             interbranch = True
@@ -1094,7 +1094,7 @@ class QuantumModelLearningAgent():
                 interbranch=interbranch,
                 times_record=self.BayesFactorsTimeFile,
                 bf_data_folder=self.BayesFactorsFolder,
-                num_times_to_use=self.NumTimesForBayesUpdates,
+                num_times_to_use=self.num_experiments_for_bayes_updates,
                 trueModel=self.true_model_name,
                 bayes_threshold=bayes_threshold,
                 host_name=self.redis_host_name,
@@ -1125,7 +1125,7 @@ class QuantumModelLearningAgent():
                 trueModel=self.true_model_name,
                 bf_data_folder=self.BayesFactorsFolder,
                 times_record=self.BayesFactorsTimeFile,
-                num_times_to_use=self.NumTimesForBayesUpdates,
+                num_times_to_use=self.num_experiments_for_bayes_updates,
                 branchID=branchID,
                 interbranch=interbranch,
                 bayes_threshold=bayes_threshold,
@@ -1153,7 +1153,7 @@ class QuantumModelLearningAgent():
         bayes_threshold=None
     ):
         if bayes_threshold is None:
-            bayes_threshold = self.BayesLower
+            bayes_threshold = self.bayes_threshold_lower
 
         remote_jobs = []
         num_models = len(model_id_list)
@@ -1210,7 +1210,7 @@ class QuantumModelLearningAgent():
         recompute=False
     ):
         if bayes_threshold is None:
-            bayes_threshold = self.BayesUpper
+            bayes_threshold = self.bayes_threshold_upper
 
         active_branches_bayes = self.redis_databases['active_branches_bayes']
         # model_id_list = database_framework.active_model_ids_by_branch_id(self.db, branchID)
@@ -1279,7 +1279,7 @@ class QuantumModelLearningAgent():
     ):
 
         if bayes_threshold is None:
-            bayes_threshold = self.BayesLower
+            bayes_threshold = self.bayes_threshold_lower
         bayes_factors_db = self.redis_databases['bayes_factors_db']
         if pair is not None:
             model_ids = pair.split(',')
@@ -1354,7 +1354,7 @@ class QuantumModelLearningAgent():
         )
 
         if bayes_threshold is None:
-            bayes_threshold = self.BayesLower
+            bayes_threshold = self.bayes_threshold_lower
 
         models_points = {}
         for model_id in active_models_in_branch:
@@ -1526,7 +1526,7 @@ class QuantumModelLearningAgent():
         num_times_to_use='all'
     ):
         if bayes_threshold is None:
-            bayes_threshold = self.BayesLower
+            bayes_threshold = self.bayes_threshold_lower
 
         models_points = {}
         for mod in model_list:
@@ -1575,12 +1575,12 @@ class QuantumModelLearningAgent():
                 model_id_list=max_points_branches,
                 remote=True,
                 recompute=True,
-                bayes_threshold=self.BayesLower,
+                bayes_threshold=self.bayes_threshold_lower,
                 wait_on_result=True
             )
             champ_id = self.compare_models_from_list(
                 max_points_branches,
-                bayes_threshold=self.BayesLower
+                bayes_threshold=self.bayes_threshold_lower
             )
         else:
             self.log_print(["After comparing list:", models_points])
@@ -1595,7 +1595,7 @@ class QuantumModelLearningAgent():
         bayes_threshold=None
     ):
         if bayes_threshold is None:
-            bayes_threshold = self.BayesUpper
+            bayes_threshold = self.bayes_threshold_upper
 
         bayes_factors_db = self.redis_databases['bayes_factors_db']
         # branch_champions = list(self.branch_champions.values())
@@ -1988,7 +1988,7 @@ class QuantumModelLearningAgent():
             )
             champ_id = self.compare_models_from_list(
                 max_points_branches,
-                bayes_threshold=self.BayesLower,
+                bayes_threshold=self.bayes_threshold_lower,
                 models_points_dict=branch_champions_points
             )
         else:
@@ -2191,17 +2191,17 @@ class QuantumModelLearningAgent():
             self.get_model_storage_instance_by_id(self.ChampID).FinalSigmas
         )
         num_exp_ham = (
-            self.NumParticles *
-            (self.NumExperiments + self.NumTimesForBayesUpdates)
+            self.num_particles *
+            (self.num_experiments + self.num_experiments_for_bayes_updates)
         )
 
         config = str('config' +
-                     '_p' + str(self.NumParticles) +
-                     '_e' + str(self.NumExperiments) +
-                     '_b' + str(self.NumTimesForBayesUpdates) +
-                     '_ra' + str(self.ResamplerA) +
-                     '_rt' + str(self.ResampleThreshold) +
-                     '_rp' + str(self.PGHPrefactor)
+                     '_p' + str(self.num_particles) +
+                     '_e' + str(self.num_experiments) +
+                     '_b' + str(self.num_experiments_for_bayes_updates) +
+                     '_ra' + str(self.qinfer_resampler_a) +
+                     '_rt' + str(self.qinfer_resample_threshold) +
+                     '_rp' + str(self.qinfer_PGH_heuristic_factor)
                      )
 
         time_now = time.time()
@@ -2235,12 +2235,12 @@ class QuantumModelLearningAgent():
             'FinalParams': self.ChampionFinalParams,
             'LatexName': champ_model.LatexTerm,
             # 'LatexName' : database_framework.latex_name_ising(self.ChampionName),
-            'NumParticles': self.NumParticles,
-            'NumExperiments': champ_model.NumExperiments,
-            'NumBayesTimes': self.NumTimesForBayesUpdates,
-            'ResampleThreshold': self.ResampleThreshold,
-            'ResamplerA': self.ResamplerA,
-            'PHGPrefactor': self.PGHPrefactor,
+            'NumParticles': self.num_particles,
+            'NumExperiments': champ_model.num_experiments,
+            'NumBayesTimes': self.num_experiments_for_bayes_updates,
+            'ResampleThreshold': self.qinfer_resample_threshold,
+            'ResamplerA': self.qinfer_resampler_a,
+            'PHGPrefactor': self.qinfer_PGH_heuristic_factor,
             'LogFile': self.log_file,
             'ParamConfiguration': config,
             'ConfigLatex': self.LatexConfig,
@@ -2565,12 +2565,12 @@ class QuantumModelLearningAgent():
 #        true_model_r_squared = self.get_model_storage_instance_by_id(self.TrueOpModelID).r_squared()
 
         self.ResultsDict = {
-            'NumParticles': self.NumParticles,
-            'NumExperiments': mod.NumExperiments,
-            'NumBayesTimes': self.NumTimesForBayesUpdates,
-            'ResampleThreshold': self.ResampleThreshold,
-            'ResamplerA': self.ResamplerA,
-            'PHGPrefactor': self.PGHPrefactor,
+            'NumParticles': self.num_particles,
+            'NumExperiments': mod.num_experiments,
+            'NumBayesTimes': self.num_experiments_for_bayes_updates,
+            'ResampleThreshold': self.qinfer_resample_threshold,
+            'ResamplerA': self.qinfer_resampler_a,
+            'PHGPrefactor': self.qinfer_PGH_heuristic_factor,
             'ConfigLatex': self.LatexConfig,
             'Time': time_taken,
             'QID': self.qmla_id,
@@ -2729,12 +2729,12 @@ class QuantumModelLearningAgent():
             )
             # equivalent to self.ResultsDict
             mod.results_dict = {
-                'NumParticles': mod.NumParticles,
-                'NumExperiments': mod.NumExperiments,
-                'NumBayesTimes': self.NumTimesForBayesUpdates,
-                'ResampleThreshold': self.ResampleThreshold,
-                'ResamplerA': self.ResamplerA,
-                'PHGPrefactor': self.PGHPrefactor,
+                'NumParticles': mod.num_particles,
+                'NumExperiments': mod.num_experiments,
+                'NumBayesTimes': self.num_experiments_for_bayes_updates,
+                'ResampleThreshold': self.qinfer_resample_threshold,
+                'ResamplerA': self.qinfer_resampler_a,
+                'PHGPrefactor': self.qinfer_PGH_heuristic_factor,
                 'ConfigLatex': self.LatexConfig,
                 'Time': time_taken,
                 'QID': self.qmla_id,
@@ -2795,7 +2795,7 @@ class QuantumModelLearningAgent():
 
         print("[QMD] Going to learn initial models from branches.")
 
-        if self.NumTrees > 1:
+        if self.tree_count > 1:
             for i in list(self.branch_resident_model_names.keys()):
                 # print("[QMD runMult] launching branch ", i)
                 # ie initial branches
@@ -2856,7 +2856,7 @@ class QuantumModelLearningAgent():
             ]
         )
         # while max_spawn_depth_reached==False:
-        while self.NumTreesCompleted < self.NumTrees:
+        while self.tree_count_completed < self.tree_count:
             branch_ids_on_db = list(
                 active_branches_learning_models.keys()
             )
@@ -2932,10 +2932,10 @@ class QuantumModelLearningAgent():
                             growth_rule_tree_complete == True
                         ):
                             self.tree_completed[this_branch_growth_rule] = True
-                            self.NumTreesCompleted += 1
+                            self.tree_count_completed += 1
                             print(
                                 "[QMD] Num trees now completed:",
-                                self.NumTreesCompleted,
+                                self.tree_count_completed,
                                 "Tree completed dict:",
                                 self.tree_completed
                             )
@@ -2950,7 +2950,7 @@ class QuantumModelLearningAgent():
             [
                 "All trees have completed.",
                 "Num complete:",
-                self.NumTreesCompleted
+                self.tree_count_completed
             ]
         )
         # let any branches which have just started finish before moving to
@@ -3093,8 +3093,8 @@ class QuantumModelLearningAgent():
                     ):
 
         plt.clf()
-        plot_descriptor = '\n(' + str(self.NumParticles) + 'particles; ' + \
-            str(self.NumExperiments) + 'experiments).'
+        plot_descriptor = '\n(' + str(self.num_particles) + 'particles; ' + \
+            str(self.num_experiments) + 'experiments).'
 
         if branch_champions:
             # only plot for branch champions
@@ -3252,8 +3252,8 @@ class QuantumModelLearningAgent():
         print("In jupyter, include the following to view sphere: %matplotlib inline")
         # import qutip as qt
         bloch = qt.Bloch()
-        for i in range(self.NumProbes):
-            state = self.ProbeDict[i, 1]
+        for i in range(self.probe_number):
+            state = self.system_probes[i, 1]
             a = state[0]
             b = state[1]
             A = a * qt.basis(2, 0)

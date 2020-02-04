@@ -183,7 +183,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
 
         super(QInferModelQML, self).__init__(self._oplist)
 
-        self.NumProbes = num_probes
+        self.probe_number = num_probes
         if probe_dict is None:
             self.log_print(
                 [
@@ -192,7 +192,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             )
             self.probe_dict = probe_set_generation.seperable_probe_dict(
                 max_num_qubits=12,
-                num_probes=self.NumProbes
+                num_probes=self.probe_number
             )  # TODO -- make same as number of qubits in model.
             self.sim_probe_dict = self.probe_dict
         else:
@@ -372,18 +372,18 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             if true_evo == True:
                 print_file_line(debug_print_file_line)
                 # print("[likelihood] trying to get probe id ",
-                #     (self._b % int(self.NumProbes)),
+                #     (self._b % int(self.probe_number)),
                 #     ham_num_qubits
                 # )
                 probe = self.probe_dict[
-                    (self._b % int(self.NumProbes)),
+                    (self._b % int(self.probe_number)),
                     ham_num_qubits
                 ]
                 print_file_line(debug_print_file_line)
             else:
                 print_file_line(debug_print_file_line)
                 probe = self.sim_probe_dict[
-                    (self._b % int(self.NumProbes)),
+                    (self._b % int(self.probe_number)),
                     ham_num_qubits
                 ]
             print_file_line(debug_print_file_line)

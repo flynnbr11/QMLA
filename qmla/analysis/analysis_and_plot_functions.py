@@ -74,7 +74,7 @@ def ExpectationValuesTrueSim(
     plot_probe_dict = pickle.load(
         open(qmd.PlotProbeFile, 'rb')
     )
-    probe_id = random.choice(range(qmd.NumProbes))
+    probe_id = random.choice(range(qmd.probe_number))
     # names colours from
     # https://matplotlib.org/2.0.0/examples/color/named_colors.html
     true_colour = colors.cnames['lightsalmon']  # 'b'
@@ -109,7 +109,7 @@ def ExpectationValuesTrueSim(
         #     # true_probe = plus_plus
         #     true_probe = expectation_values.n_qubit_plus_state(true_dim)
         # else:
-        #     true_probe = qmd.ProbeDict[(probe_id,true_dim)]
+        #     true_probe = qmd.system_probes[(probe_id,true_dim)]
 
         true_probe = plot_probe_dict[true_dim]
 
@@ -186,7 +186,7 @@ def ExpectationValuesTrueSim(
             # if plus_probe:
             #     sim_probe = expectation_values.n_qubit_plus_state(sim_dim)
             # else:
-            #     sim_probe = qmd.ProbeDict[(probe_id,sim_dim)]
+            #     sim_probe = qmd.system_probes[(probe_id,sim_dim)]
             sim_probe = plot_probe_dict[sim_dim]
             colour_id = int(i % len(sim_colours))
             sim_col = sim_colours[colour_id]
@@ -325,8 +325,8 @@ def ExpectationValuesTrueSim(
         )
         ax1.axvline(0, color='black')
         plot_title = str(
-            str(qmd.NumParticles) + ' particles.\n'
-            + str(qmd.NumExperiments) + ' experiments.'
+            str(qmd.num_particles) + ' particles.\n'
+            + str(qmd.num_experiments) + ' experiments.'
         )
         plt.title(plot_title)
 #        plt.figlegend()
@@ -606,7 +606,7 @@ def plotDynamicsLearnedModels(
             cm_subsection = np.linspace(0, 0.8, num_terms)
             colours = [cm.magma(x) for x in cm_subsection]
             # TODO use color map as list
-            num_epochs = reduced.NumExperiments
+            num_epochs = reduced.num_experiments
 
             i = 0
         #    for term in list(param_estimate_by_term.keys()):
@@ -682,7 +682,7 @@ def ExpectationValuesQHL_TrueModel(
     debug_print=False
 ):
     model_ids = [qmd.TrueOpModelID]
-#    probe_id = random.choice(range(qmd.NumProbes))
+#    probe_id = random.choice(range(qmd.probe_number))
     probe_id = 10
 
     experimental_measurements_dict = qmd.ExperimentalMeasurements
@@ -714,7 +714,7 @@ def ExpectationValuesQHL_TrueModel(
 #        true_ops = true_op.constituents_operators
         true_ops = qmd.true_model_constituent_operators
         true_dim = true_op.num_qubits
-        true_probe = qmd.ProbeDict[(probe_id, true_dim)]
+        true_probe = qmd.system_probes[(probe_id, true_dim)]
         time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
         true_expec_values = []
 
@@ -771,7 +771,7 @@ def ExpectationValuesQHL_TrueModel(
             print("Times:\n", times)
             print("SIM HAM:\n", sim_ham)
         sim_dim = sim_op.num_qubits
-        sim_probe = qmd.ProbeDict[(probe_id, sim_dim)]
+        sim_probe = qmd.system_probes[(probe_id, sim_dim)]
         colour_id = int(i % len(sim_colours))
         sim_col = sim_colours[colour_id]
 
@@ -872,8 +872,8 @@ def ExpectationValuesQHL_TrueModel(
         str(
             "QHL test for " +
             latex_name_for_title
-            + ". [" + str(qmd.NumParticles) + " prt; "
-            + str(qmd.NumExperiments) + "exp]"
+            + ". [" + str(qmd.num_particles) + " prt; "
+            + str(qmd.num_experiments) + "exp]"
         )
     )
     if save_to_file is not None:
@@ -1369,7 +1369,7 @@ def r_squared_from_epoch_list(
 
         mod_num_qubits = database_framework.get_num_qubits(mod.Name)
         probe = expectation_values.n_qubit_plus_state(mod_num_qubits)
-        epochs.extend([0, qmd.NumExperiments - 1])
+        epochs.extend([0, qmd.num_experiments - 1])
         if len(mod.ResampleEpochs) > 0:
             epochs.extend(mod.ResampleEpochs)
 
@@ -1519,7 +1519,7 @@ def plotVolumeQHL(
         print("Model not considered.")
         raise
 
-    x = range(qmd.NumExperiments)
+    x = range(qmd.num_experiments)
 
     plt.clf()
     plt.xlabel('Epoch')
@@ -3052,8 +3052,8 @@ def parameterEstimates(
 #    colours = ['b','r','g','orange', 'pink', 'grey']
 
     # TODO use color map as list
-    # num_epochs = qmd.NumExperiments
-    num_epochs = mod.NumExperiments
+    # num_epochs = qmd.num_experiments
+    num_epochs = mod.num_experiments
 #    fig = plt.figure()
 #    ax = plt.subplot(111)
 
@@ -3136,8 +3136,8 @@ def parameterEstimates(
     # plt.legend(bbox_to_anchor=(1.1, 1.05))
     # # TODO put title at top; Epoch centred bottom; Estimate centre y-axis
     # plt.title(str("Parameter estimation for model " +
-    #     database_framework.latex_name_ising(name)+" ["+str(qmd.NumParticles)
-    #     +" prt;" + str(qmd.NumExperiments) + "exp]"
+    #     database_framework.latex_name_ising(name)+" ["+str(qmd.num_particles)
+    #     +" prt;" + str(qmd.num_experiments) + "exp]"
     #     )
     # )
 

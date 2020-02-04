@@ -187,10 +187,10 @@ class ModelInstanceForLearning():
         init_model_print_loc = False
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
         self.use_experimental_data = qmd_info['use_experimental_data']
-        self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
-        self.SimProbeDict = pickle.loads(qmd_info_db['SimProbeDict'])
-        self.NumParticles = qmd_info['num_particles']
-        self.NumExperiments = qmd_info['num_experiments']
+        self.system_probes = pickle.loads(qmd_info_db['ProbeDict'])
+        self.simulator_probes = pickle.loads(qmd_info_db['SimProbeDict'])
+        self.num_particles = qmd_info['num_particles']
+        self.num_experiments = qmd_info['num_experiments']
         self.growth_rule_of_true_model = growth_generator
 
         try:
@@ -220,24 +220,24 @@ class ModelInstanceForLearning():
                 max_num_params=max_num_params,
                 this_model_qubits=this_model_num_qubits,
                 this_model_terms=this_model_num_terms,
-                num_experiments=self.NumExperiments,
-                num_particles=self.NumParticles
+                num_experiments=self.num_experiments,
+                num_particles=self.num_particles
             )
 
-            self.NumExperiments = new_resources['num_experiments']
-            self.NumParticles = new_resources['num_particles']
+            self.num_experiments = new_resources['num_experiments']
+            self.num_particles = new_resources['num_particles']
             self.log_print(
                 [
                     'After resource reallocation, QML on', self.Name,
-                    '\n\tParticles:', self.NumParticles,
-                    '\n\tExperiments:', self.NumExperiments,
+                    '\n\tParticles:', self.num_particles,
+                    '\n\tExperiments:', self.num_experiments,
                 ]
             )
-        self.NumProbes = qmd_info['num_probes']
+        self.probe_number = qmd_info['num_probes']
         self.ResamplerThresh = qmd_info['resampler_thresh']
-        self.ResamplerA = qmd_info['resampler_a']
-        self.PGHPrefactor = qmd_info['pgh_prefactor']
-        self.PGHExponent = qmd_info['pgh_exponent']
+        self.qinfer_resampler_a = qmd_info['resampler_a']
+        self.qinfer_PGH_heuristic_factor = qmd_info['pgh_prefactor']
+        self.qinfer_PGH_heuristic_exponent = qmd_info['pgh_exponent']
         self.IncreasePGHTime = qmd_info['increase_pgh_time']
         self.StoreParticlesWeights = qmd_info['store_particles_weights']
         self.QHL_plots = qmd_info['qhl_plots']
@@ -412,14 +412,14 @@ class ModelInstanceForLearning():
             use_time_dep_true_model=self.UseTimeDepTrueModel,
             time_dep_true_params=self.TimeDepTrueParams,
             num_time_dep_true_params=self.NumTimeDepTrueParams,
-            num_probes=self.NumProbes,
+            num_probes=self.probe_number,
             measurement_type=self.MeasurementType,
             growth_generation_rule=self.growth_rule_of_true_model,
             use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.ExperimentalMeasurements,
             experimental_measurement_times=self.ExperimentalMeasurementTimes,
-            probe_dict=self.ProbeDict,
-            sim_probe_dict=self.SimProbeDict,
+            probe_dict=self.system_probes,
+            sim_probe_dict=self.simulator_probes,
             probecounter=0,
             solver='scipy',
             trotter=True,
@@ -434,10 +434,10 @@ class ModelInstanceForLearning():
 
         self.Updater = qi.SMCUpdater(
             self.GenSimModel,
-            self.NumParticles,
+            self.num_particles,
             self.Prior,
             resample_thresh=self.ResamplerThresh,
-            resampler=qi.LiuWestResampler(a=self.ResamplerA),
+            resampler=qi.LiuWestResampler(a=self.qinfer_resampler_a),
             debug_resampling=False
         )
 
@@ -457,16 +457,16 @@ class ModelInstanceForLearning():
         #     self.Updater,
         #     inv_field=self.Inv_Field,
         #     increase_time = self.IncreasePGHTime,
-        #     pgh_exponent = self.PGHExponent
+        #     pgh_exponent = self.qinfer_PGH_heuristic_exponent
         # )
         self.Heuristic = self.growth_class.heuristic(
             updater=self.Updater,
             oplist=self.SimOpList,
             inv_field=self.Inv_Field,
             increase_time=self.IncreasePGHTime,
-            pgh_exponent=self.PGHExponent,
+            pgh_exponent=self.qinfer_PGH_heuristic_exponent,
             time_list=self.PlotTimes,
-            num_experiments=self.NumExperiments,
+            num_experiments=self.num_experiments,
         )
         self.HeuristicType = self.Heuristic.__class__.__name__
 
@@ -492,26 +492,26 @@ class ModelInstanceForLearning():
         sigma_threshold=10**-13,
         checkloss=True
     ):
-        # self.NumExperiments = n_experiments
+        # self.num_experiments = n_experiments
 
         # if self.checkQLoss == True:
-        #     self.QLosses = np.empty(self.NumExperiments)
-        self.Covars = np.empty(self.NumExperiments)
+        #     self.QLosses = np.empty(self.num_experiments)
+        self.Covars = np.empty(self.num_experiments)
         self.TrackEval = [self.Updater.est_mean()]
         self.TrackCovMatrices = []
         self.TrackParamSigmas = []
         self.TrackPosterior = []
         self.TrackPriorMeans = []
         self.TrackPriorStdDev = []
-        # self.TrackPosteriorMarginal = np.empty(self.NumExperiments, self.NumParameters)
-        self.TrackTime = np.empty(self.NumExperiments)  # only for debugging
+        # self.TrackPosteriorMarginal = np.empty(self.num_experiments, self.NumParameters)
+        self.TrackTime = np.empty(self.num_experiments)  # only for debugging
 
-        self.Particles = np.empty([self.NumParticles,
-                                   len(self.SimParams[0]), self.NumExperiments]
+        self.Particles = np.empty([self.num_particles,
+                                   len(self.SimParams[0]), self.num_experiments]
                                   )
-        self.Weights = np.empty([self.NumParticles, self.NumExperiments])
-        self.DistributionMeans = np.empty([self.NumExperiments])
-        self.DistributionStdDevs = np.empty([self.NumExperiments])
+        self.Weights = np.empty([self.num_particles, self.num_experiments])
+        self.DistributionMeans = np.empty([self.num_experiments])
+        self.DistributionStdDevs = np.empty([self.num_experiments])
 
         # self.Experiment = self.Heuristic()
         # This is the value of the Norm of the COvariance matrix which stops
@@ -542,12 +542,12 @@ class ModelInstanceForLearning():
             param_indices[op_name] = self.SimOpsNames.index(op_name)
 
         print_frequency = max(
-            int(self.NumExperiments / 10),
+            int(self.num_experiments / 10),
             5
         )
         # print("[QML] STARTING QHL UPDATES")
         # true_params = np.array([[self.TrueParams[0]]])
-        for istep in range(self.NumExperiments):
+        for istep in range(self.num_experiments):
             # print("Epoch", istep)
             if (istep % print_frequency == 0):
                 # print so we can see how far along algorithm is.
@@ -570,7 +570,7 @@ class ModelInstanceForLearning():
             )
             print_loc(global_print_loc)
             # TODO prefactor, if used, should be inside specific heuristic
-            self.Experiment[0][0] = self.Experiment[0][0] * self.PGHPrefactor
+            self.Experiment[0][0] = self.Experiment[0][0] * self.qinfer_PGH_heuristic_factor
             if self.use_experimental_data:
                 t = self.Experiment[0][0]
                 nearest = expdt.nearestAvailableExpTime(
@@ -770,7 +770,7 @@ class ModelInstanceForLearning():
 
                 break
 
-            if istep == self.NumExperiments - 1:
+            if istep == self.num_experiments - 1:
                 self.log_print(["Results for QHL on ", self.Name])
                 self.log_print(
                     [
@@ -877,8 +877,8 @@ class ModelInstanceForLearning():
         learned_info['learned_parameters'] = self.LearnedParameters
         learned_info['final_sigmas'] = self.FinalSigmas
         learned_info['cov_matrix'] = self.Updater.est_covariance_mtx()
-        learned_info['num_particles'] = self.NumParticles
-        learned_info['num_experiments'] = self.NumExperiments
+        learned_info['num_particles'] = self.num_particles
+        learned_info['num_experiments'] = self.num_experiments
         learned_info['growth_generator'] = self.growth_rule_of_true_model
         learned_info['heuristic'] = self.HeuristicType
         if self.StoreParticlesWeights:
@@ -1011,17 +1011,17 @@ class ModelInstanceForStorage():
         self.SimOpList = sim_oplist
         self.ModelID = modelID
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
-        self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
-        self.SimProbeDict = pickle.loads(qmd_info_db['SimProbeDict'])
+        self.system_probes = pickle.loads(qmd_info_db['ProbeDict'])
+        self.simulator_probes = pickle.loads(qmd_info_db['SimProbeDict'])
         self.MeasurementType = qmd_info['measurement_type']
         self.ExperimentalMeasurements = qmd_info['experimental_measurements']
         self.use_experimental_data = qmd_info['use_experimental_data']
-        # self.NumParticles = qmd_info['num_particles']
-        # self.NumExperiments = qmd_info['num_experiments']
-        self.NumProbes = qmd_info['num_probes']
+        # self.num_particles = qmd_info['num_particles']
+        # self.num_experiments = qmd_info['num_experiments']
+        self.probe_number = qmd_info['num_probes']
         self.ResamplerThresh = qmd_info['resampler_thresh']
-        self.ResamplerA = qmd_info['resampler_a']
-        self.PGHPrefactor = qmd_info['pgh_prefactor']
+        self.qinfer_resampler_a = qmd_info['resampler_a']
+        self.qinfer_PGH_heuristic_factor = qmd_info['pgh_prefactor']
         self.true_model_constituent_operators = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
         self.true_model_name = qmd_info['true_name']
@@ -1101,8 +1101,8 @@ class ModelInstanceForStorage():
                                 model_id_str)
                         ]
                     )
-            self.NumParticles = learned_info['num_particles']
-            self.NumExperiments = learned_info['num_experiments']
+            self.num_particles = learned_info['num_particles']
+            self.num_experiments = learned_info['num_experiments']
             self.Times = list(learned_info['times'])
             # should be final params from learning process
             self.FinalParams = learned_info['final_params']
@@ -1394,8 +1394,8 @@ class ModelInstanceForStorage():
         spaced_epochs = np.round(
             np.linspace(
                 0,
-                self.NumExperiments - 1,
-                min(self.NumExperiments, num_points))
+                self.num_experiments - 1,
+                min(self.num_experiments, num_points))
         )
 
         for e in spaced_epochs:
@@ -1432,8 +1432,8 @@ class ModelInstanceForStorage():
 #            experimental_measurement_times=(
 #                self.ExperimentalMeasurementTimes
 #            ),
-# model_name=self.Name, probe_dict = self.ProbeDict)    # probelist=self.true_model_constituent_operators,
-#        self.Updater = qi.SMCUpdater(self.GenSimModel, self.NumParticles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.ResamplerA), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
+# model_name=self.Name, probe_dict = self.system_probes)    # probelist=self.true_model_constituent_operators,
+#        self.Updater = qi.SMCUpdater(self.GenSimModel, self.num_particles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.qinfer_resampler_a), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
 #        self.Updater.NormalizationRecord = self.NormalizationRecord
 
 
@@ -1469,16 +1469,16 @@ class ModelInstanceForComparison():
         qmd_info_db = rds_dbs['qmd_info_db']
 
         qmd_info = pickle.loads(qmd_info_db.get('QMDInfo'))
-        self.ProbeDict = pickle.loads(qmd_info_db['ProbeDict'])
-        self.SimProbeDict = pickle.loads(qmd_info_db['SimProbeDict'])
+        self.system_probes = pickle.loads(qmd_info_db['ProbeDict'])
+        self.simulator_probes = pickle.loads(qmd_info_db['SimProbeDict'])
 
         self.ModelID = modelID
-        self.NumParticles = qmd_info['num_particles']
-        self.NumProbes = qmd_info['num_probes']
+        self.num_particles = qmd_info['num_particles']
+        self.probe_number = qmd_info['num_probes']
         self.PlotProbePath = qmd_info['plot_probe_file']
         self.ResamplerThresh = qmd_info['resampler_thresh']
-        self.ResamplerA = qmd_info['resampler_a']
-        self.PGHPrefactor = qmd_info['pgh_prefactor']
+        self.qinfer_resampler_a = qmd_info['resampler_a']
+        self.qinfer_PGH_heuristic_factor = qmd_info['pgh_prefactor']
         self.true_model_constituent_operators = qmd_info['true_oplist']
         self.TrueParams = qmd_info['true_params']
         self.true_model_name = qmd_info['true_name']
@@ -1558,9 +1558,9 @@ class ModelInstanceForComparison():
                 self.ExperimentalMeasurementTimes
             ),
             model_name=self.Name,
-            num_probes=self.NumProbes,
-            probe_dict=self.ProbeDict,
-            sim_probe_dict=self.SimProbeDict,
+            num_probes=self.probe_number,
+            probe_dict=self.system_probes,
+            sim_probe_dict=self.simulator_probes,
             log_file=self.log_file,
             log_identifier=log_identifier
         )
@@ -1600,12 +1600,12 @@ class ModelInstanceForComparison():
 
             self.Updater = qi.SMCUpdater(
                 model=self.GenSimModel,
-                n_particles=self.NumParticles,
+                n_particles=self.num_particles,
                 prior=posterior_distribution,
                 # prior = self.Prior,
                 resample_thresh=self.ResamplerThresh,
                 resampler=qi.LiuWestResampler(
-                    a=self.ResamplerA
+                    a=self.qinfer_resampler_a
                 ),
                 debug_resampling=False
             )
