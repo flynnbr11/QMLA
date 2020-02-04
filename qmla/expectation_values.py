@@ -31,6 +31,8 @@ if (use_linalg):
 
 
 def log_print(to_print_list, log_file, log_identifier):
+    ## Note removed to logging.py 
+    #  TODO replace internal log_prints in all files with call to central logging functions
     """
     log_print writes in the log file the string passed as first argument.
     log_print(to_print_list, log_file, log_identifier)
