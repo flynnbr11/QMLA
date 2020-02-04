@@ -104,13 +104,8 @@ else
 fi
 
 alt_growth_rules=(
-    # 'ising_1d_chain'
-    # 'hubbard_square_lattice_generalised'
-    # 'ising_probabilistic' 
-    # 'hopping_probabilistic'
     # 'HeisenbergXYZProbabilistic'
-    # 'HeisenbergXYZPredetermined'
-    # 'hopping_predetermined'
+    'HeisenbergXYZPredetermined'
 )
 
 growth_rules_command=""

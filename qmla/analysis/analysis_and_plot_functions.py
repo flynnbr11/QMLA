@@ -178,7 +178,7 @@ def ExpectationValuesTrueSim(
         max_time_learned = 0
         for i in range(len(model_ids)):
             mod_id = model_ids[i]
-            sim = qmd.ModelNameIDs[mod_id]
+            sim = qmd.model_name_id_map[mod_id]
             mod = qmd.get_model_storage_instance_by_id(mod_id)
             sim_ham = mod.LearnedHamiltonian
             times_learned = mod.Times
@@ -367,7 +367,7 @@ def plotDynamicsLearnedModels(
         open(qmd.qmla_controls.plot_probe_file, 'rb')
     )
     num_models_to_plot = len(model_ids)
-    all_bayes_factors = qmd.AllBayesFactors
+    all_bayes_factors = qmd.all_bayes_factors
     max_time = max(times_to_plot)
     individual_terms_already_in_legend = []
 
@@ -403,7 +403,7 @@ def plotDynamicsLearnedModels(
         reduced.compute_expectation_values(
             times=qmd.PlotTimes
         )
-#         growth_generator = reduced.GrowthGenerator
+#         growth_generator = reduced.growth_rule_of_true_model
         desc = str(
             "ID:{}\n".format(mod_id) +
             reduced.LatexTerm
@@ -761,7 +761,7 @@ def ExpectationValuesQHL_TrueModel(
     ChampionsByBranch = {v: k for k, v in qmd.BranchChampions.items()}
     for i in range(len(model_ids)):
         mod_id = model_ids[i]
-        sim = qmd.ModelNameIDs[mod_id]
+        sim = qmd.model_name_id_map[mod_id]
         sim_op = database_framework.Operator(sim)
         mod = qmd.get_model_storage_instance_by_id(mod_id)
         sim_params = list(mod.FinalParams[:, 0])
@@ -1421,7 +1421,7 @@ def plot_quadratic_loss(
         to_plot_quad_loss = qmd.BranchChampions.values()
         plot_title = str('Quadratic Loss for Branch champions')
     else:
-        to_plot_quad_loss = qmd.ModelNameIDs.keys()
+        to_plot_quad_loss = qmd.model_name_id_map.keys()
         plot_title = str('Quadratic Loss for all models')
 
     for i in sorted(list(to_plot_quad_loss)):
@@ -1429,7 +1429,7 @@ def plot_quadratic_loss(
         if len(mod.QuadraticLosses) > 0:
             epochs = range(1, len(mod.QuadraticLosses) + 1)
             model_name = mod.growth_class.latex_name(
-                name=qmd.ModelNameIDs[i]
+                name=qmd.model_name_id_map[i]
             )
             ax.plot(epochs, mod.QuadraticLosses, label=str(model_name))
     ax.legend(bbox_to_anchor=(1, 1))
@@ -1897,7 +1897,7 @@ def qmdclassTOnxobj(
                 if a != b:
                     unique_pair = database_framework.unique_model_pair_identifier(a, b)
                     if ((unique_pair not in edges)
-                        and (unique_pair in qmd.BayesFactorsComputed)
+                        and (unique_pair in qmd.bayes_factor_pair_computed)
                         ):
                         edges.append(unique_pair)
                         vs = [int(stringa) for stringa
@@ -1905,7 +1905,7 @@ def qmdclassTOnxobj(
                               ]
 
                         thisweight = np.log10(
-                            qmd.AllBayesFactors[float(vs[0])][float(vs[1])][-1]
+                            qmd.all_bayes_factors[float(vs[0])][float(vs[1])][-1]
                         )
 
                         if thisweight < 0:
@@ -3021,11 +3021,11 @@ def parameterEstimates(
     mod = qmd.get_model_storage_instance_by_id(modelID)
     name = mod.Name
 
-    if name not in list(qmd.ModelNameIDs.values()):
+    if name not in list(qmd.model_name_id_map.values()):
         print(
             "True model ", name,
             "not in studied models",
-            list(qmd.ModelNameIDs.values())
+            list(qmd.model_name_id_map.values())
         )
         return False
     terms = database_framework.get_constituent_names_from_name(name)
@@ -3166,8 +3166,8 @@ def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
 
     labels = [
         get_latex_name(
-            name=qmd.ModelNameIDs[l],
-            growth_generator=qmd.GrowthGenerator
+            name=qmd.model_name_id_map[l],
+            growth_generator=qmd.growth_rule_of_true_model
         ) for l in modlist
     ]
     size = len(modlist)
@@ -3190,7 +3190,7 @@ def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
         for j in modlist:
             if i is not j:
                 try:
-                    val = qmd.AllBayesFactors[i][j][-1]
+                    val = qmd.all_bayes_factors[i][j][-1]
                     scale.append(np.log10(val))
                 except BaseException:
                     val = 1.0
@@ -3212,7 +3212,7 @@ def plotRadar(qmd, modlist, save_to_file=None, plot_title=None):
         for j in modlist:
             if i is not j:
                 try:
-                    bayes_factor = qmd.AllBayesFactors[i][j][-1]
+                    bayes_factor = qmd.all_bayes_factors[i][j][-1]
                 except BaseException:
                     bayes_factor = 1.0
 
@@ -3475,18 +3475,18 @@ def get_bayes_latex_dict(qmd):
         qmd.latex_name_map_file_path,
         'a+'
     )
-    for i in list(qmd.AllBayesFactors.keys()):
-        mod = qmd.ModelNameIDs[i]
+    for i in list(qmd.all_bayes_factors.keys()):
+        mod = qmd.model_name_id_map[i]
         latex_name = qmd.get_model_storage_instance_by_id(i).LatexTerm
         mapping = (mod, latex_name)
         print(mapping, file=latex_write_file)
 
-    for i in list(qmd.AllBayesFactors.keys()):
+    for i in list(qmd.all_bayes_factors.keys()):
         mod_a = qmd.get_model_storage_instance_by_id(i).LatexTerm
         latex_dict[mod_a] = {}
-        for j in list(qmd.AllBayesFactors[i].keys()):
+        for j in list(qmd.all_bayes_factors[i].keys()):
             mod_b = qmd.get_model_storage_instance_by_id(j).LatexTerm
-            latex_dict[mod_a][mod_b] = qmd.AllBayesFactors[i][j][-1]
+            latex_dict[mod_a][mod_b] = qmd.all_bayes_factors[i][j][-1]
     return latex_dict
 
 
@@ -3519,10 +3519,10 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
     import csv
     fields = ['ID', 'Name']
     if names_ids == 'latex':
-        # names = [database_framework.latex_name_ising(qmd.ModelNameIDs[i]) for i in
+        # names = [database_framework.latex_name_ising(qmd.model_name_id_map[i]) for i in
 
         names = []
-        for mod_name in list(qmd.ModelNameIDs.values()):
+        for mod_name in list(qmd.model_name_id_map.values()):
             names.append(
                 qmd.BranchGrowthClasses[
                     qmd.ModelsBranches[
@@ -3533,7 +3533,7 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
 
     elif names_ids == 'nonlatex':
         names = [
-            qmd.ModelNameIDs[i]
+            qmd.model_name_id_map[i]
             for i in
             range(qmd.HighestModelID)
         ]
@@ -3555,26 +3555,26 @@ def BayesFactorsCSV(qmd, save_to_file, names_ids='latex'):
         writer.writeheader()
         for i in range(qmd.HighestModelID):
             model_bf = {}
-            for j in qmd.AllBayesFactors[i].keys():
+            for j in qmd.all_bayes_factors[i].keys():
                 if names_ids == 'latex':
                     other_model_name = qmd.BranchGrowthClasses[
                         qmd.ModelsBranches[j]
-                    ].latex_name(name=qmd.ModelNameIDs[j])
+                    ].latex_name(name=qmd.model_name_id_map[j])
 
                 elif names_ids == 'nonlatex':
-                    other_model_name = qmd.ModelNameIDs[j]
+                    other_model_name = qmd.model_name_id_map[j]
                 elif names_ids == 'ids':
                     other_model_name = j
-                model_bf[other_model_name] = qmd.AllBayesFactors[i][j][-1]
+                model_bf[other_model_name] = qmd.all_bayes_factors[i][j][-1]
 
             # if names_ids=='latex':
-                # model_bf['Name'] = database_framework.latex_name_ising(qmd.ModelNameIDs[i])
+                # model_bf['Name'] = database_framework.latex_name_ising(qmd.model_name_id_map[i])
             try:
                 model_bf['Name'] = qmd.BranchGrowthClasses[
                     qmd.ModelsBranches[i]
-                ].latex_name(name=qmd.ModelNameIDs[i])
+                ].latex_name(name=qmd.model_name_id_map[i])
             except BaseException:
-                model_bf['Name'] = qmd.ModelNameIDs[i]
+                model_bf['Name'] = qmd.model_name_id_map[i]
             model_bf['ID'] = i
             writer.writerow(model_bf)
 

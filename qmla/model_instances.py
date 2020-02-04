@@ -191,11 +191,11 @@ class ModelInstanceForLearning():
         self.SimProbeDict = pickle.loads(qmd_info_db['SimProbeDict'])
         self.NumParticles = qmd_info['num_particles']
         self.NumExperiments = qmd_info['num_experiments']
-        self.GrowthGenerator = growth_generator
+        self.growth_rule_of_true_model = growth_generator
 
         try:
             self.growth_class = get_growth_rule.get_growth_generator_class(
-                growth_generation_rule=self.GrowthGenerator,
+                growth_generation_rule=self.growth_rule_of_true_model,
                 use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
             )
@@ -414,7 +414,7 @@ class ModelInstanceForLearning():
             num_time_dep_true_params=self.NumTimeDepTrueParams,
             num_probes=self.NumProbes,
             measurement_type=self.MeasurementType,
-            growth_generation_rule=self.GrowthGenerator,
+            growth_generation_rule=self.growth_rule_of_true_model,
             use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.ExperimentalMeasurements,
             experimental_measurement_times=self.ExperimentalMeasurementTimes,
@@ -453,7 +453,7 @@ class ModelInstanceForLearning():
             in self.GenSimModel.expparams_dtype[1:]
         ]
         # self.Heuristic = mpgh.MultiParticleGuessHeuristic(
-        #     growth_generator = self.GrowthGenerator,
+        #     growth_generator = self.growth_rule_of_true_model,
         #     self.Updater,
         #     inv_field=self.Inv_Field,
         #     increase_time = self.IncreasePGHTime,
@@ -879,7 +879,7 @@ class ModelInstanceForLearning():
         learned_info['cov_matrix'] = self.Updater.est_covariance_mtx()
         learned_info['num_particles'] = self.NumParticles
         learned_info['num_experiments'] = self.NumExperiments
-        learned_info['growth_generator'] = self.GrowthGenerator
+        learned_info['growth_generator'] = self.growth_rule_of_true_model
         learned_info['heuristic'] = self.HeuristicType
         if self.StoreParticlesWeights:
             self.log_print(
@@ -1136,10 +1136,10 @@ class ModelInstanceForStorage():
             self.FinalSigmas = learned_info['final_sigmas']
 
             self.cov_matrix = learned_info['cov_matrix']
-            self.GrowthGenerator = learned_info['growth_generator']
+            self.growth_rule_of_true_model = learned_info['growth_generator']
             try:
                 self.growth_class = get_growth_rule.get_growth_generator_class(
-                    growth_generation_rule=self.GrowthGenerator,
+                    growth_generation_rule=self.growth_rule_of_true_model,
                     use_experimental_data=self.use_experimental_data,
                     log_file=self.log_file
                 )
@@ -1526,9 +1526,9 @@ class ModelInstanceForComparison():
         #     )
         # )
         self.InitialParams = learned_model_info['initial_params']
-        self.GrowthGenerator = learned_model_info['growth_generator']
+        self.growth_rule_of_true_model = learned_model_info['growth_generator']
         self.growth_class = get_growth_rule.get_growth_generator_class(
-            growth_generation_rule=self.GrowthGenerator,
+            growth_generation_rule=self.growth_rule_of_true_model,
             use_experimental_data=self.use_experimental_data,
             log_file=self.log_file
         )
@@ -1551,7 +1551,7 @@ class ModelInstanceForComparison():
             trueparams=self.TrueParams,
             truename=self.true_model_name,
             measurement_type=self.MeasurementType,
-            growth_generation_rule=self.GrowthGenerator,
+            growth_generation_rule=self.growth_rule_of_true_model,
             use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.ExperimentalMeasurements,
             experimental_measurement_times=(
