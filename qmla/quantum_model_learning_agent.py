@@ -2217,7 +2217,7 @@ class QuantumModelLearningAgent():
             # 'ExpValTimes' : champ_model.times,
             'Trackplot_parameter_estimates': champ_model.track_parameter_estimates,
             'TrackVolume': champ_model.volume_by_epoch,
-            'TrackTimesLearned': champ_model.Times,
+            'TrackTimesLearned': champ_model.times_learned_over,
             # 'TrackCovarianceMatrices' : champ_model.track_covariance_matrices,
             # 'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
             #     plot_probes = self.probes_for_plots,
@@ -2532,7 +2532,7 @@ class QuantumModelLearningAgent():
             'FinalSigmas': mod.final_sigmas_qhl,
             'Trackplot_parameter_estimates': mod.track_parameter_estimates,
             'TrackVolume': mod.volume_by_epoch,
-            'TrackTimesLearned': mod.Times,
+            'TrackTimesLearned': mod.times_learned_over,
             # 'TrackCovarianceMatrices' : mod.track_covariance_matrices,
             'ExpectationValues': mod.expectation_values,
             # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
@@ -2675,7 +2675,7 @@ class QuantumModelLearningAgent():
                 'FinalSigmas': mod.final_sigmas_qhl,
                 'Trackplot_parameter_estimates': mod.track_parameter_estimates,
                 'TrackVolume': mod.volume_by_epoch,
-                'TrackTimesLearned': mod.Times,
+                'TrackTimesLearned': mod.times_learned_over,
                 # 'TrackCovarianceMatrices' : mod.track_covariance_matrices,
                 'ExpectationValues': mod.expectation_values,
                 # 'RSquaredByEpoch' : mod.r_squared_by_epoch(

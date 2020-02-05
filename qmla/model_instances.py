@@ -973,7 +973,7 @@ class ModelInstanceForStorage():
                     )
             self.num_particles = learned_info['num_particles']
             self.num_experiments = learned_info['num_experiments']
-            self.Times = list(learned_info['times'])
+            self.times_learned_over = list(learned_info['times'])
             self.final_learned_params = learned_info['final_params']
             self.model_terms_parameters_Final = np.array([[self.final_learned_params[0, 0]]])
             # self.SimOpNames = learned_info['sim_op_names']
@@ -1380,7 +1380,7 @@ class ModelInstanceForComparison():
         op = database_framework.Operator(self.model_name)
         # todo, put this in a lighter function
         self.model_terms_matrices = op.constituents_operators
-        self.Times = learned_model_info['times']
+        self.times_learned_over = learned_model_info['times']
         self.final_learned_params = learned_model_info['final_params']
         # TODO this won't work for multiple parameters
         self.model_terms_parameters_Final = np.array(self.final_learned_params)
@@ -1393,7 +1393,7 @@ class ModelInstanceForComparison():
         #     self.model_terms_matrices
         #     )
         # )
-        self.InitialParams = learned_model_info['initial_params']
+        # self.initial_params = learned_model_info['initial_params']
         self.growth_rule_of_this_model = learned_model_info['growth_generator']
         self.growth_class = get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.growth_rule_of_this_model,
@@ -1403,13 +1403,13 @@ class ModelInstanceForComparison():
         # TODO this can be recreated from finalparams, but how for multiple
         # params?
         self.model_prior = learned_model_info['final_prior']
-        self.PosteriorMarginal = learned_model_info['posterior_marginal']
+        self.posterior_marginal = learned_model_info['posterior_marginal']
         self.initial_prior = learned_model_info['initial_prior']
         self.model_normalization_record = learned_model_info['normalization_record']
         self.log_total_likelihood = learned_model_info['log_total_likelihood']
         self.learned_parameters_qhl = learned_model_info['learned_parameters']
         self.final_sigmas_qhl = learned_model_info['final_sigmas']
-        self.FinalCovarianceMatrix = learned_model_info['final_cov_mat']
+        self.covariance_mtx_final = learned_model_info['final_cov_mat']
         log_identifier = str("Bayes " + str(self.model_id))
 
         self.qinfer_model = qml_qi.QInferModelQML(
@@ -1462,7 +1462,7 @@ class ModelInstanceForComparison():
             posterior_distribution = qi.MultivariateNormalDistribution(
                 # final_params,
                 learned_model_info['est_mean'],
-                self.FinalCovarianceMatrix
+                self.covariance_mtx_final
                 # final_cov_mat
             )
 
@@ -1508,15 +1508,26 @@ class ModelInstanceForComparison():
         )
         del qmd_info, learned_model_info
 
-    def log_print(self, to_print_list):
-        identifier = str(str(time_seconds()) +
-                         "[QML:Bayes " + str(self.model_id) +
-                         "; QMD " + str(self.qmla_id) + "]"
-                         )
-        if not isinstance(to_print_list, list):
-            to_print_list = list(to_print_list)
+    def log_print(
+        self,
+        to_print_list
+    ):
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list, 
+            log_file = self.log_file, 
+            log_identifier = 'ModelForComparison {}'.format(self.model_id)
+        )
 
-        print_strings = [str(s) for s in to_print_list]
-        to_print = " ".join(print_strings)
-        with open(self.log_file, 'a') as write_log_file:
-            print(identifier, str(to_print), file=write_log_file)
+
+    # def log_print(self, to_print_list):
+    #     identifier = str(str(time_seconds()) +
+    #                      "[QML:Bayes " + str(self.model_id) +
+    #                      "; QMD " + str(self.qmla_id) + "]"
+    #                      )
+    #     if not isinstance(to_print_list, list):
+    #         to_print_list = list(to_print_list)
+
+    #     print_strings = [str(s) for s in to_print_list]
+    #     to_print = " ".join(print_strings)
+    #     with open(self.log_file, 'a') as write_log_file:
+    #         print(identifier, str(to_print), file=write_log_file)

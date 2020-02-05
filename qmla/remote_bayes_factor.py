@@ -155,10 +155,10 @@ def remote_bayes_factor_calculation(
         if num_times_to_use == 'all':
             first_t_idx = 0
         else:
-            first_t_idx = len(model_a.Times) - num_times_to_use
+            first_t_idx = len(model_a.times_learned_over) - num_times_to_use
 
-        update_times_model_a = model_b.Times[first_t_idx:]
-        update_times_model_b = model_a.Times[first_t_idx:]
+        update_times_model_a = model_b.times_learned_over[first_t_idx:]
+        update_times_model_b = model_a.times_learned_over[first_t_idx:]
         set_renorm_record_to_zero = False
 
         with open(times_record, 'a') as write_log_file:
@@ -567,7 +567,7 @@ def plot_posterior_marginals(
     qid,
     bf_data_folder
 ):
-    old_post_marg = model_a.PosteriorMarginal
+    old_post_marg = model_a.posterior_marginal
     before_bf_updates = []
     new_post_marg = []
 

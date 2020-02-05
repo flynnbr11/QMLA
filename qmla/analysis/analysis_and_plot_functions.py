@@ -181,7 +181,7 @@ def ExpectationValuesTrueSim(
             sim = qmd.model_name_id_map[mod_id]
             mod = qmd.get_model_storage_instance_by_id(mod_id)
             sim_ham = mod.learned_hamiltonian
-            times_learned = mod.Times
+            times_learned = mod.times_learned_over
             sim_dim = database_framework.get_num_qubits(mod.model_name)
             # if plus_probe:
             #     sim_probe = expectation_values.n_qubit_plus_state(sim_dim)
@@ -545,7 +545,7 @@ def plot_learned_models_dynamics(
     #         )
             ax.yaxis.set_label_position("right")
 
-            times_learned_over = reduced.Times
+            times_learned_over = reduced.times_learned_over
             n, bins, patches = ax.hist(
                 times_learned_over,
                 # histtype='step',
