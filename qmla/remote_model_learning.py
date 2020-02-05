@@ -79,26 +79,9 @@ def remote_learn_model_parameters(
         probe_dict = qmla_core_info_dict['probe_dict']
 
     true_model_terms_matrices = qmla_core_info_dict['true_oplist']
-    true_model_terms_params = qmla_core_info_dict['true_model_terms_params']
-    num_particles = qmla_core_info_dict['num_particles']
-    num_experiments = qmla_core_info_dict['num_experiments']
-    base_resources = qmla_core_info_dict['base_resources']
-    base_num_qubits = base_resources['num_qubits']
-    base_num_terms = base_resources['num_terms']
-    resampler_threshold = qmla_core_info_dict['resampler_thresh']
-    resampler_a = qmla_core_info_dict['resampler_a']
-    pgh_prefactor = qmla_core_info_dict['pgh_prefactor']
-    debug_directory = qmla_core_info_dict['debug_directory']
-    qle = qmla_core_info_dict['qle']
-    num_probes = qmla_core_info_dict['num_probes']
-    sigma_threshold = qmla_core_info_dict['sigma_threshold']
-    gaussian = qmla_core_info_dict['gaussian']
-    store_particles_weights = qmla_core_info_dict['store_particles_weights']
     qhl_plots = qmla_core_info_dict['qhl_plots']
-    results_directory = qmla_core_info_dict['results_directory']
     plots_directory = qmla_core_info_dict['plots_directory']
     long_id = qmla_core_info_dict['long_id']
-
 
     # Generate model and learn
     op = database_framework.Operator(name=name)
@@ -129,7 +112,7 @@ def remote_learn_model_parameters(
 
     qml_instance = QML.ModelInstanceForLearning(
         name=name,
-        num_probes=num_probes,
+        # num_probes=num_probes,
         probe_dict=probe_dict,
         qid=qid,
         log_file=log_file,
@@ -138,29 +121,12 @@ def remote_learn_model_parameters(
         model_terms_matrices=op.constituents_operators,
         model_terms_parameters=[sim_pars],
         model_terms_names=op.constituents_names,
-        debug_directory=debug_directory,
+        # debug_directory=debug_directory,
         host_name=host_name,
         port_number=port_number,
     )
 
-
-    # qml_instance.initialise_model_for_learning(
-    #     growth_generator=growth_generator,
-    #     model_terms_matrices=op.constituents_operators,
-    #     model_terms_parameters=[sim_pars],
-    #     model_terms_names=op.constituents_names,
-    #     debug_directory=debug_directory,
-    #     host_name=host_name,
-    #     port_number=port_number,
-    # )
-    log_print(
-        [
-            "Time to unpickle and initialise QML class: {}".format(
-                time.time() - time_start
-            )
-        ]
-    )
-    log_print(["Updating model."])
+    log_print(["Starting model QHL update."])
     try:
         update_timer_start = time.time()
         qml_instance.update_model()
@@ -187,26 +153,9 @@ def remote_learn_model_parameters(
             ]
         )
         any_job_failed_db.set('Status', 1)
-        # raise
-        # sys.exit()
 
     if qhl_plots:
         log_print(["Drawing plots for QHL"])
-
-        # with (
-        #     open(
-        #         str(
-        #             "{}/plots/qmd_{}_qml_{}.p".format(
-        #                 results_directory,
-        #                 qid,
-        #                 model_id
-        #             )
-        #         ),
-        #         "wb"
-        #     )
-        # ) as pkl_file:
-        #     pickle.dump(qml_instance, pkl_file , protocol=4)
-
         try:
             if len(true_model_terms_matrices) == 1:  # TODO buggy
                 qml_instance.plot_distribution_progression(
@@ -223,10 +172,11 @@ def remote_learn_model_parameters(
                 )
         except BaseException:
             pass
+
+    # only need to store results; throw away class 
     updated_model_info = copy.deepcopy(
         qml_instance.learned_info_dict()
     )
-
     del qml_instance
 
     compressed_info = pickle.dumps(
