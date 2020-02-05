@@ -182,7 +182,7 @@ def ExpectationValuesTrueSim(
             mod = qmd.get_model_storage_instance_by_id(mod_id)
             sim_ham = mod.LearnedHamiltonian
             times_learned = mod.Times
-            sim_dim = database_framework.get_num_qubits(mod.Name)
+            sim_dim = database_framework.get_num_qubits(mod.model_name)
             # if plus_probe:
             #     sim_probe = expectation_values.n_qubit_plus_state(sim_dim)
             # else:
@@ -1367,7 +1367,7 @@ def r_squared_from_epoch_list(
         mod = qmd.get_model_storage_instance_by_id(model_id)
         r_squared_by_epoch = {}
 
-        mod_num_qubits = database_framework.get_num_qubits(mod.Name)
+        mod_num_qubits = database_framework.get_num_qubits(mod.model_name)
         probe = expectation_values.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.num_experiments - 1])
         if len(mod.ResampleEpochs) > 0:
@@ -1514,7 +1514,7 @@ def plot_volume_after_qhl(
         print("Must either provide model_id or set true_model=True for volume plot.")
 
     try:
-        y = mod.VolumeList
+        y = mod.volume_by_epoch
     except AttributeError:
         print("Model not considered.")
         raise
@@ -1850,7 +1850,7 @@ def qmdclassTOnxobj(
 
     for i in modlist:
         mod = qmd.get_model_storage_instance_by_id(i)
-        name = mod.Name
+        name = mod.model_name
         branch = qmd.get_model_data_by_field(name=name, field='branchID')
         branch_mod_count[branch] += 1
         latex_term = mod.model_name_latex
@@ -1865,7 +1865,7 @@ def qmdclassTOnxobj(
     most_models_per_branch = max(branch_mod_count.values())
     for i in modlist:
         mod = qmd.get_model_storage_instance_by_id(i)
-        name = mod.Name
+        name = mod.model_name
         branch = qmd.get_model_data_by_field(name=name, field='branchID')
         num_models_this_branch = branch_mod_count[branch]
         pos_list = available_position_list(
@@ -3019,7 +3019,7 @@ def plot_parameter_estimates(
 ):
     from matplotlib import cm
     mod = qmd.get_model_storage_instance_by_id(modelID)
-    name = mod.Name
+    name = mod.model_name
 
     if name not in list(qmd.model_name_id_map.values()):
         print(

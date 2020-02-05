@@ -17,6 +17,7 @@ import qmla.prior_distributions as Distributions
 import qmla.experimental_data_processing as expdt
 import qmla.expectation_values as expectation_values
 import qmla.get_growth_rule as get_growth_rule
+import qmla.logging
 import qmla.model_naming as model_naming
 from qmla.memory_tests import print_loc
 import qmla.qinfer_model_interface as qml_qi
@@ -37,6 +38,12 @@ In this file are class definitions:
     - ModelInstanceForComparison
 
 """
+
+__all__ = [
+    'ModelInstanceForLearning',
+    'ModelInstanceForStorage',
+    'ModelInstanceForComparison'
+]
 
 
 def resource_allocation(
@@ -105,7 +112,7 @@ def time_seconds():
 class ModelInstanceForLearning():
     """
     Class to learn individual model. Model name is given when initialised.
-    A host_name and port_number are given to InitialiseNewModel.
+    A host_name and port_number are given to initialise_model_for_learning.
     The qmd_info dict from Redis is pulled and pickled to find
     the true model and other QMD parameters needed.
     A GenSimModel is set which details the SMCUpdater
@@ -119,70 +126,58 @@ class ModelInstanceForLearning():
 
     def __init__(
         self,
+        modelID,
         name,
-        num_probes=20,
-        probe_dict=None,
-        sim_probe_dict=None,
-        qid=0,
-        log_file='QMD_log.log',
-        modelID=0,
+        qid,
+        log_file,
+        growth_generator,
+        model_terms_matrices,
+        model_terms_parameters,
+        model_terms_names,
+        host_name='localhost',
+        port_number=6379,
         **kwargs
     ):
-        self.VolumeList = np.array([])
-        self.Name = name
-        # self.model_name_latex = database_framework.latex_name_ising(self.Name)
-        self.Dimension = database_framework.get_num_qubits(name)
-        self.NumExperimentsToDate = 0
-        self.model_bayes_factors = {}
-        self.log_file = log_file
         self.qmla_id = qid
-        self.ModelID = int(modelID)
+        self.model_id = int(modelID)
+        self.model_name = name
+        self.log_file = log_file
+        self.volume_by_epoch = np.array([])
+        self.redis_host = host_name
+        self.redis_port_number = port_number
+
+        self.initialise_model_for_learning(
+            growth_generator = growth_generator,
+            model_terms_matrices = model_terms_matrices,
+            model_terms_parameters = model_terms_parameters,
+            model_terms_names = model_terms_names,
+        )
 
     def log_print(
         self,
         to_print_list
     ):
-        identifier = str(str(time_seconds()) +
-                         " [QML " + str(self.ModelID) + "]")
-        if not isinstance(to_print_list, list):
-            to_print_list = list(to_print_list)
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list, 
+            log_file = self.log_file, 
+            log_identifier = 'ModelForLearning {}'.format(self.model_id)
+        )
 
-        print_strings = [str(s) for s in to_print_list]
-        to_print = " ".join(print_strings)
-        with open(self.log_file, 'a') as write_log_file:
-            print(identifier, str(to_print), file=write_log_file)
-
-    def InitialiseNewModel(
+    def initialise_model_for_learning(
         self,
-        trueoplist,
-        modeltrueparams,
-        simoplist,
-        simparams,
-        simopnames,
-        numparticles,
-        modelID,
         growth_generator,
-        use_time_dep_true_params=False,
-        time_dep_true_params=None,
-        resample_thresh=0.5,
-        resampler_a=0.95,
-        pgh_prefactor=1.0,
-        store_partices_weights=False,
+        model_terms_matrices,
+        model_terms_parameters,
+        model_terms_names,
         checkloss=True,
-        gaussian=True,
-        use_exp_custom=True,
-        enable_sparse=True,
         debug_directory=None,
-        qle=True,
-        host_name='localhost',
-        port_number=6379,
-        qid=0,
-        log_file='QMD_log.log'
+        **kwargs
     ):
-
-        # self.log_print(["QID=", qid])
-        self.log_print(["QML for ", self.Name])
-        rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
+        rds_dbs = rds.databases_from_qmd_id(
+            self.redis_host, 
+            self.redis_port_number, 
+            self.qmla_id
+        )
         qmd_info_db = rds_dbs['qmd_info_db']
         init_model_print_loc = False
         qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
@@ -191,11 +186,11 @@ class ModelInstanceForLearning():
         self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
         self.num_particles = qmd_info['num_particles']
         self.num_experiments = qmd_info['num_experiments']
-        self.growth_rule_of_true_model = growth_generator
+        self.growth_rule_of_this_model = growth_generator
 
         try:
             self.growth_class = get_growth_rule.get_growth_generator_class(
-                growth_generation_rule=self.growth_rule_of_true_model,
+                growth_generation_rule=self.growth_rule_of_this_model,
                 use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
             )
@@ -206,9 +201,9 @@ class ModelInstanceForLearning():
         base_resources = qmd_info['base_resources']
         base_num_qubits = base_resources['num_qubits']
         base_num_terms = base_resources['num_terms']
-        this_model_num_qubits = database_framework.get_num_qubits(self.Name)
+        this_model_num_qubits = database_framework.get_num_qubits(self.model_name)
         this_model_num_terms = len(
-            database_framework.get_constituent_names_from_name(self.Name)
+            database_framework.get_constituent_names_from_name(self.model_name)
         )
 
         max_num_params = self.growth_class.max_num_parameter_estimate
@@ -228,7 +223,7 @@ class ModelInstanceForLearning():
             self.num_particles = new_resources['num_particles']
             self.log_print(
                 [
-                    'After resource reallocation, QML on', self.Name,
+                    'After resource reallocation, QML on', self.model_name,
                     '\n\tParticles:', self.num_particles,
                     '\n\tExperiments:', self.num_experiments,
                 ]
@@ -255,19 +250,19 @@ class ModelInstanceForLearning():
         self.measurement_class = qmd_info['measurement_type']
         self.experimental_measurements = qmd_info['experimental_measurements']
         self.experimental_measurement_times = qmd_info['experimental_measurement_times']
-        self.SimOpsNames = simopnames
+        self.SimOpsNames = model_terms_names
 
         self.model_name_latex = self.growth_class.latex_name(
-            name=self.Name
+            name=self.model_name
         )
 
         print_loc(print_location=init_model_print_loc)
 
-        self.SimOpList = np.asarray(simoplist)
-        self.SimParams = np.asarray([simparams[0]])
+        self.SimOpList = np.asarray(model_terms_matrices)
+        self.SimParams = np.asarray([model_terms_parameters[0]])
 
         individual_terms_in_name = database_framework.get_constituent_names_from_name(
-            self.Name
+            self.model_name
         )
 
         for i in range(len(individual_terms_in_name)):
@@ -284,7 +279,7 @@ class ModelInstanceForLearning():
                     ]
                 )
             elif term != self.SimOpsNames[i]:
-                print("!!! Check log -- QML", self.Name)
+                print("!!! Check log -- QML", self.model_name)
 
                 self.log_print(
                     [
@@ -293,26 +288,10 @@ class ModelInstanceForLearning():
                         )
                     ]
                 )
-            # else:
-            #     print("term:", term)
-            #     print("calculated mtx:", term_mtx )
-            #     print("sim op list:", self.SimOpList[i] )
 
-        # self.log_print(["True oplist:", self.true_model_constituent_operators ])
-        # self.log_print(["Sim oplist:", self.SimOpList])
-        # self.log_print(["learning true params:", self.TrueParams])
-        self.enable_sparse_exponentiation = enable_sparse
         self.checkQLoss = True
         print_loc(print_location=init_model_print_loc)
-        """
-        self.log_print(['True params', self.TrueParams, '\n true op list:',
-            self.true_model_constituent_operators, 'true op name:', self.true_model_name]
-        )
-        self.log_print(['SimOpsNames:', self.SimOpsNames,
-            '\n\tSimOpList:\n', self.SimOpList,
-            '\n\t SimParams:', self.SimParams]
-        )
-        """
+
         if debug_directory is not None:
             self.debugSave = True
             self.debug_directory = debug_directory
@@ -321,41 +300,11 @@ class ModelInstanceForLearning():
         num_params = len(self.SimOpList)
 
         self.PriorSpecificTerms = qmd_info['prior_specific_terms']
-#         if gaussian:
-#             # Use a normal distribution
-#             self.log_print(["Normal distribution generated"])
-#             means = self.TrueParams[0:num_params]
-#             if num_params > len(self.TrueParams):
-#                 for i in range(len(self.TrueParams), num_params):
-#                     means.append(self.TrueParams[i%len(self.TrueParams)])
-# #            self.Prior = Distributions.MultiVariateNormalDistributionNocov(num_params)
-
-#             self.PriorSpecificTerms = qmd_info['prior_specific_terms']
-
-#             if (
-#                 qmd_info['model_priors'] is not None
-#                 and
-#                 database_framework.alph(self.Name) in list(qmd_info['model_priors'].keys())
-#             ):
-#                 self.PriorSpecificTerms = (
-#                     qmd_info['model_priors'][database_framework.alph(self.Name)]
-#                 )
-
-#             self.Prior = Distributions.normal_distribution_ising(
-#                 term = self.Name,
-#                 specific_terms = self.PriorSpecificTerms
-#             )
-#         else:
-#             self.log_print(["Uniform distribution generated"])
-
-#             self.Prior = Distributions.uniform_distribution_ising(
-#                 term = self.Name
-#             )
-        log_identifier = str("QML " + str(self.ModelID))
+        log_identifier = str("QML " + str(self.model_id))
 
         # self.Prior = Distributions.get_prior(
         self.Prior = self.growth_class.get_prior(
-            model_name=self.Name,
+            model_name=self.model_name,
             log_file=self.log_file,
             log_identifier=log_identifier
         )
@@ -375,7 +324,7 @@ class ModelInstanceForLearning():
         prior_file = str(
             prior_dir +
             'prior_' +
-            str(self.ModelID) +
+            str(self.model_id) +
             '.png'
         )
 
@@ -395,14 +344,6 @@ class ModelInstanceForLearning():
                 plot_file=prior_file,
             )
 
-        # # pickle.dump(
-        # #     self.Prior,
-        # #     open(
-        # #         prior_file,
-        # #         'wb'
-        # #     )
-        # # )
-
         self.GenSimModel = qml_qi.QInferModelQML(
             oplist=self.SimOpList,
             modelparams=self.SimParams,
@@ -414,7 +355,7 @@ class ModelInstanceForLearning():
             num_time_dep_true_params=self.num_time_dependent_true_params,
             num_probes=self.probe_number,
             measurement_type=self.measurement_class,
-            growth_generation_rule=self.growth_rule_of_true_model,
+            growth_generation_rule=self.growth_rule_of_this_model,
             use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
@@ -426,8 +367,8 @@ class ModelInstanceForLearning():
             qle=self.use_qle,
             use_exp_custom=self.use_custom_exponentiation,
             exp_comparison_tol=self.exponentiation_tolerance,
-            enable_sparse=self.enable_sparse_exponentiation,
-            model_name=self.Name,
+            enable_sparse=True,
+            model_name=self.model_name,
             log_file=self.log_file,
             log_identifier=log_identifier
         )
@@ -452,13 +393,7 @@ class ModelInstanceForLearning():
             for item
             in self.GenSimModel.expparams_dtype[1:]
         ]
-        # self.Heuristic = mpgh.MultiParticleGuessHeuristic(
-        #     growth_generator = self.growth_rule_of_true_model,
-        #     self.Updater,
-        #     inv_field=self.Inv_Field,
-        #     increase_time = self.IncreasePGHTime,
-        #     pgh_exponent = self.qinfer_PGH_heuristic_exponent
-        # )
+
         self.Heuristic = self.growth_class.heuristic(
             updater=self.Updater,
             oplist=self.SimOpList,
@@ -579,7 +514,7 @@ class ModelInstanceForLearning():
                 )
                 self.Experiment[0][0] = nearest
 
-            self.NumExperimentsToDate += 1
+            # self.NumExperimentsToDate += 1
             print_loc(global_print_loc)
             if istep == 0:
                 print_loc(global_print_loc)
@@ -622,9 +557,9 @@ class ModelInstanceForLearning():
                 self.log_print(
                     [
                         "RuntimeError from updater on model ID ",
-                        self.ModelID,
+                        self.model_id,
                         ":",
-                        self.Name,
+                        self.model_name,
                         "\nError:\n",
                         str(e)
                     ]
@@ -641,8 +576,8 @@ class ModelInstanceForLearning():
 
             print_loc(global_print_loc)
             # self.covmat = self.Updater.est_covariance_mtx()
-            self.VolumeList = np.append(
-                self.VolumeList,
+            self.volume_by_epoch = np.append(
+                self.volume_by_epoch,
                 np.linalg.det(
                     sp.linalg.sqrtm(
                         # self.covmat
@@ -771,7 +706,7 @@ class ModelInstanceForLearning():
                 break
 
             if istep == self.num_experiments - 1:
-                self.log_print(["Results for QHL on ", self.Name])
+                self.log_print(["Results for QHL on ", self.model_name])
                 self.log_print(
                     [
                         'Final time selected >',
@@ -844,8 +779,8 @@ class ModelInstanceForLearning():
         learned_info['normalization_record'] = self.Updater.normalization_record
         learned_info['log_total_likelihood'] = self.Updater.log_total_likelihood
         learned_info['data_record'] = self.Updater.data_record
-        learned_info['name'] = self.Name
-        learned_info['model_id'] = self.ModelID
+        learned_info['name'] = self.model_name
+        learned_info['model_id'] = self.model_id
         # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['updater'] = pickle.dumps(self.Updater, protocol=2)
         # TODO regenerate this from mean and std_dev instead of saving it
@@ -863,7 +798,7 @@ class ModelInstanceForLearning():
 
         learned_info['posterior_marginal'] = all_post_margs
         learned_info['initial_params'] = self.SimParams
-        learned_info['volume_list'] = self.VolumeList
+        learned_info['volume_list'] = self.volume_by_epoch
         learned_info['track_eval'] = self.TrackEval
         learned_info['track_cov_matrices'] = self.TrackCovMatrices
         learned_info['track_param_sigmas'] = self.TrackParamSigmas
@@ -879,13 +814,13 @@ class ModelInstanceForLearning():
         learned_info['cov_matrix'] = self.Updater.est_covariance_mtx()
         learned_info['num_particles'] = self.num_particles
         learned_info['num_experiments'] = self.num_experiments
-        learned_info['growth_generator'] = self.growth_rule_of_true_model
+        learned_info['growth_generator'] = self.growth_rule_of_this_model
         learned_info['heuristic'] = self.HeuristicType
         if self.StoreParticlesWeights:
             self.log_print(
                 [
                     "Storing particles and weights for model",
-                    self.ModelID
+                    self.model_id
                 ]
             )
             learned_info['particles'] = self.Particles
@@ -893,21 +828,21 @@ class ModelInstanceForLearning():
 
         return learned_info
 
-    def UpdateKLogTotLikelihood(self, epoch, tpool, stepnum):
-        # Calcalate total log likelihood when the model finishes, compared with
-        # all previously completed but still active models.
+    # def UpdateKLogTotLikelihood(self, epoch, tpool, stepnum):
+    #     # Calcalate total log likelihood when the model finishes, compared with
+    #     # all previously completed but still active models.
 
-        mytpool = np.setdiff1d(tpool, self.TrackTime[-stepnum - 1:-1])
+    #     mytpool = np.setdiff1d(tpool, self.TrackTime[-stepnum - 1:-1])
 
-        self.TrackLogTotLikelihood = np.append(
-            self.TrackLogTotLikelihood, LogL_UpdateCalc(self, tpool)
-        )
+    #     self.TrackLogTotLikelihood = np.append(
+    #         self.TrackLogTotLikelihood, LogL_UpdateCalc(self, tpool)
+    #     )
 
-    def addBayesFactor(self, compared_with, bayes_factor):
-        if compared_with in self.model_bayes_factors:
-            self.model_bayes_factors[compared_with].append(bayes_factor)
-        else:
-            self.model_bayes_factors[compared_with] = [bayes_factor]
+    # def addBayesFactor(self, compared_with, bayes_factor):
+    #     if compared_with in self.model_bayes_factors:
+    #         self.model_bayes_factors[compared_with].append(bayes_factor)
+    #     else:
+    #         self.model_bayes_factors[compared_with] = [bayes_factor]
 
     def store_particles(self, debug_dir=None):
         if debug_dir is not None:
@@ -922,7 +857,7 @@ class ModelInstanceForLearning():
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
 
-        save_file = save_dir + '/particles_mod_' + str(self.ModelID) + '.dat'
+        save_file = save_dir + '/particles_mod_' + str(self.model_id) + '.dat'
 
         particle_file = open(save_file, 'w')
         particle_file.write("\n".join(str(elem) for elem in self.Particles.T))
@@ -940,7 +875,7 @@ class ModelInstanceForLearning():
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
 
-        save_file = save_dir + '/covariances_mod_' + str(self.ModelID) + '.dat'
+        save_file = save_dir + '/covariances_mod_' + str(self.model_id) + '.dat'
         particle_file = open(save_file, 'w')
         particle_file.write("\n".join(str(elem) for elem in self.Covars))
         particle_file.close()
@@ -1006,10 +941,10 @@ class ModelInstanceForStorage():
         #print("In reduced model. rds_dbs:", rds_dbs)
       #  print("QMD INFO DB has type", type(qmd_info_db), "\n", qmd_info_db)
 
-        self.Name = model_name
-        self.ModelID = modelID
+        self.model_name = model_name
+        self.model_id = modelID
         self.SimOpList = sim_oplist
-        self.ModelID = modelID
+        self.model_id = modelID
         qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
         self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
         self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
@@ -1035,7 +970,7 @@ class ModelInstanceForStorage():
             'store_particles_weights'
         ]
         self.model_bayes_factors = {}
-        self.NumQubits = database_framework.get_num_qubits(self.Name)
+        self.NumQubits = database_framework.get_num_qubits(self.model_name)
         self.ProbeDimension = self.NumQubits
         self.redis_host_name = host_name
         self.redis_port_number = port_number
@@ -1047,7 +982,7 @@ class ModelInstanceForStorage():
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) +
                          "[QML:Reduced " +
-                         str(self.ModelID) + "; QMD " + str(self.qmla_id) + "]"
+                         str(self.model_id) + "; QMD " + str(self.qmla_id) + "]"
                          )
         if not isinstance(to_print_list, list):
             to_print_list = list(to_print_list)
@@ -1078,12 +1013,12 @@ class ModelInstanceForStorage():
             learned_models_info = rds_dbs['learned_models_info']
             self.log_print(
                 [
-                    "Updating learned info for model {}".format(self.ModelID),
+                    "Updating learned info for model {}".format(self.model_id),
                 ]
             )
 
             if learned_info is None:
-                model_id_float = float(self.ModelID)
+                model_id_float = float(self.model_id)
                 model_id_str = str(model_id_float)
                 try:
                     learned_info = pickle.loads(
@@ -1095,7 +1030,7 @@ class ModelInstanceForStorage():
                         [
                             "Unable to load learned info",
                             "model_id_str: ", model_id_str,
-                            "model id: ", self.ModelID,
+                            "model id: ", self.model_id,
                             "learned info keys:, ", learned_models_info.keys(),
                             "learned info:, ", learned_models_info.get(
                                 model_id_str)
@@ -1115,9 +1050,9 @@ class ModelInstanceForStorage():
             self.NormalizationRecord = learned_info['normalization_record']
             self.log_total_likelihod = learned_info['log_total_likelihood']
             self.RawVolumeList = learned_info['volume_list']
-            self.VolumeList = {}
+            self.volume_by_epoch = {}
             for i in range(len(self.RawVolumeList)):
-                self.VolumeList[i] = self.RawVolumeList[i]
+                self.volume_by_epoch[i] = self.RawVolumeList[i]
 
             self.TrackEval = np.array(learned_info['track_eval'])
             self.TrackCovMatrices = np.array(
@@ -1136,10 +1071,10 @@ class ModelInstanceForStorage():
             self.FinalSigmas = learned_info['final_sigmas']
 
             self.cov_matrix = learned_info['cov_matrix']
-            self.growth_rule_of_true_model = learned_info['growth_generator']
+            self.growth_rule_of_this_model = learned_info['growth_generator']
             try:
                 self.growth_class = get_growth_rule.get_growth_generator_class(
-                    growth_generation_rule=self.growth_rule_of_true_model,
+                    growth_generation_rule=self.growth_rule_of_this_model,
                     use_experimental_data=self.use_experimental_data,
                     log_file=self.log_file
                 )
@@ -1149,7 +1084,7 @@ class ModelInstanceForStorage():
             self.HeuristicType = learned_info['heuristic']
 
             self.model_name_latex = self.growth_class.latex_name(
-                name=self.Name
+                name=self.model_name
             )
 
             self.Trackplot_parameter_estimates = {}
@@ -1177,8 +1112,8 @@ class ModelInstanceForStorage():
             except BaseException:
                 print(
                     "[QML] (failed) trying to build learned hamiltonian for ",
-                    self.ModelID, " : ",
-                    self.Name,
+                    self.model_id, " : ",
+                    self.model_name,
                     "\nsim_params:", sim_params,
                     "\nsim op list", self.SimOpList
                 )
@@ -1186,14 +1121,14 @@ class ModelInstanceForStorage():
 
             self.log_print(
                 [
-                    "Updated learned info for model {}".format(self.ModelID),
+                    "Updated learned info for model {}".format(self.model_id),
 
                 ]
             )
 
-            # if self.ModelID not in sorted(fitness_parameters.keys()):
-            #     fitness_parameters[self.ModelID] = {}
-            # fitness_parameters[self.ModelID]['r_squared'] =  0.75
+            # if self.model_id not in sorted(fitness_parameters.keys()):
+            #     fitness_parameters[self.model_id] = {}
+            # fitness_parameters[self.model_id]['r_squared'] =  0.75
 
     def compute_expectation_values(
         self,
@@ -1257,7 +1192,7 @@ class ModelInstanceForStorage():
         # TODO recheck R squared functions eg which probe used
         self.log_print(
             [
-                "R squared function for", self.Name
+                "R squared function for", self.model_name
             ]
         )
         if times is None:
@@ -1346,7 +1281,7 @@ class ModelInstanceForStorage():
         self.log_print(
             [
                 "R squared by epoch function for",
-                self.Name,
+                self.model_name,
                 "Times passed:",
                 times
             ]
@@ -1432,7 +1367,7 @@ class ModelInstanceForStorage():
 #            experimental_measurement_times=(
 #                self.experimental_measurement_times
 #            ),
-# model_name=self.Name, probe_dict = self.probes_system)    # probelist=self.true_model_constituent_operators,
+# model_name=self.model_name, probe_dict = self.probes_system)    # probelist=self.true_model_constituent_operators,
 #        self.Updater = qi.SMCUpdater(self.GenSimModel, self.num_particles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.qinfer_resampler_a), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
 #        self.Updater.NormalizationRecord = self.NormalizationRecord
 
@@ -1472,7 +1407,7 @@ class ModelInstanceForComparison():
         self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
         self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
 
-        self.ModelID = modelID
+        self.model_id = modelID
         self.num_particles = qmd_info['num_particles']
         self.probe_number = qmd_info['num_probes']
         self.PlotProbePath = qmd_info['probes_plot_file']
@@ -1503,13 +1438,13 @@ class ModelInstanceForComparison():
                 learned_models_info.get(model_id_str)
             )
 
-        self.Name = learned_model_info['name']
+        self.model_name = learned_model_info['name']
         self.log_print(
             [
-                "Name:", self.Name
+                "Name:", self.model_name
             ]
         )
-        op = database_framework.Operator(self.Name)
+        op = database_framework.Operator(self.model_name)
         # todo, put this in a lighter function
         self.SimOpList = op.constituents_operators
         self.Times = learned_model_info['times']
@@ -1520,15 +1455,15 @@ class ModelInstanceForComparison():
         # this won't work for multiple parameters
 
         # print("[QML {}] \nSimParams_Final: {} \nSimOpList: {}".format(
-        #     self.Name,
+        #     self.model_name,
         #     self.SimParams_Final,
         #     self.SimOpList
         #     )
         # )
         self.InitialParams = learned_model_info['initial_params']
-        self.growth_rule_of_true_model = learned_model_info['growth_generator']
+        self.growth_rule_of_this_model = learned_model_info['growth_generator']
         self.growth_class = get_growth_rule.get_growth_generator_class(
-            growth_generation_rule=self.growth_rule_of_true_model,
+            growth_generation_rule=self.growth_rule_of_this_model,
             use_experimental_data=self.use_experimental_data,
             log_file=self.log_file
         )
@@ -1542,7 +1477,7 @@ class ModelInstanceForComparison():
         self.LearnedParameters = learned_model_info['learned_parameters']
         self.FinalSigmas = learned_model_info['final_sigmas']
         self.FinalCovarianceMatrix = learned_model_info['final_cov_mat']
-        log_identifier = str("Bayes " + str(self.ModelID))
+        log_identifier = str("Bayes " + str(self.model_id))
 
         self.GenSimModel = qml_qi.QInferModelQML(
             oplist=self.SimOpList,
@@ -1551,13 +1486,13 @@ class ModelInstanceForComparison():
             trueparams=self.TrueParams,
             truename=self.true_model_name,
             measurement_type=self.measurement_class,
-            growth_generation_rule=self.growth_rule_of_true_model,
+            growth_generation_rule=self.growth_rule_of_this_model,
             use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=(
                 self.experimental_measurement_times
             ),
-            model_name=self.Name,
+            model_name=self.model_name,
             num_probes=self.probe_number,
             probe_dict=self.probes_system,
             sim_probe_dict=self.probes_simulator,
@@ -1569,7 +1504,7 @@ class ModelInstanceForComparison():
 
         # Plot posterior distribution after learning.
         # model_terms = database_framework.get_constituent_names_from_name(
-        #     self.Name
+        #     self.model_name
         # )
         # model_name_individual_terms = [
         #     self.growth_class.latex_name(t)
@@ -1577,14 +1512,14 @@ class ModelInstanceForComparison():
         # ]
 
         # Distributions.plot_prior(
-        #     model_name = self.Name,
+        #     model_name = self.model_name,
         #     model_name_individual_terms = model_name_individual_terms,
         #     prior = posterior_distribution,
         #     plot_file = str(
         #         self.results_directory
         #         + '/priors/posterior_{}_{}.png'.format(
         #             self.qmla_id,
-        #             int(self.ModelID)
+        #             int(self.model_id)
         #         )
         #     )
         # )
@@ -1642,7 +1577,7 @@ class ModelInstanceForComparison():
 
     def log_print(self, to_print_list):
         identifier = str(str(time_seconds()) +
-                         "[QML:Bayes " + str(self.ModelID) +
+                         "[QML:Bayes " + str(self.model_id) +
                          "; QMD " + str(self.qmla_id) + "]"
                          )
         if not isinstance(to_print_list, list):

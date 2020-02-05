@@ -2,9 +2,10 @@ import time
 
 start = time.time()
 # import qmla
+import qmla.growth_rules
 
 # import qmla.analysis
-from qmla.database_framework import * 
+# from qmla.database_framework import * 
 # import qmla.database_framework as database_framework
 # import qmla.database_launch as database_launch
 # import qmla.get_growth_rule as get_growth_rule

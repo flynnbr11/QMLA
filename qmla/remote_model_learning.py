@@ -122,14 +122,6 @@ def remote_learn_model_parameters(
 
     # Generate model and learn
     op = database_framework.Operator(name=name)
-    qml_instance = QML.ModelInstanceForLearning(
-        name=name,
-        num_probes=num_probes,
-        probe_dict=probe_dict,
-        qid=qid,
-        log_file=log_file,
-        modelID=modelID
-    )
     model_priors = qmd_info['model_priors']
     if (
         model_priors is not None
@@ -154,30 +146,33 @@ def remote_learn_model_parameters(
     # add model_db_new_row to model_db and running_database
     # Note: do NOT use pd.df.append() as this copies total DB,
     # appends and returns copy.
-    qml_instance.InitialiseNewModel(
-        trueoplist=true_ops,
-        modeltrueparams=true_params,
-        simoplist=op.constituents_operators,
-        simparams=[sim_pars],
-        simopnames=op.constituents_names,
-        numparticles=num_particles,
-        growth_generator=growth_generator,
-        use_exp_custom=True,
-        enable_sparse=True,
-        modelID=modelID,
-        resample_thresh=resampler_threshold,
-        resampler_a=resampler_a,
-        pgh_prefactor=pgh_prefactor,
-        gaussian=gaussian,
-        debug_directory=debug_directory,
-        qle=qle,
-        host_name=host_name,
-        port_number=port_number,
+
+    qml_instance = QML.ModelInstanceForLearning(
+        name=name,
+        num_probes=num_probes,
+        probe_dict=probe_dict,
         qid=qid,
         log_file=log_file,
-        #      use_time_dep_true_params = use_time_dep_true_params,
-        #      time_dep_true_params = time_dep_true_params
+        modelID=modelID,
+        growth_generator=growth_generator,
+        model_terms_matrices=op.constituents_operators,
+        model_terms_parameters=[sim_pars],
+        model_terms_names=op.constituents_names,
+        debug_directory=debug_directory,
+        host_name=host_name,
+        port_number=port_number,
     )
+
+
+    # qml_instance.initialise_model_for_learning(
+    #     growth_generator=growth_generator,
+    #     model_terms_matrices=op.constituents_operators,
+    #     model_terms_parameters=[sim_pars],
+    #     model_terms_names=op.constituents_names,
+    #     debug_directory=debug_directory,
+    #     host_name=host_name,
+    #     port_number=port_number,
+    # )
     log_print(
         [
             "Time to unpickle and initialise QML class: {}".format(

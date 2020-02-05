@@ -4,6 +4,11 @@ import os
 import inspect
 from psutil import virtual_memory
 
+__all__ = [
+    'print_loc',
+    'print_file_line'
+]
+
 
 def print_loc(print_location=False, sig_figures=2):
     if print_location:
@@ -13,16 +18,15 @@ def print_loc(print_location=False, sig_figures=2):
         mem = virtual_memory()
         mem_percent = (mem.used / mem.total) * 100
         print(
-            "Line ",
-            info.lineno,
-            " of ",
-            info.filename,
-            " function ",
-            info.function,
-            "Mem % used : ",
-            round(
-                mem_percent,
-                sig_figures))
+            "Line {} of {}; function {}. Memory \% used: {}".format(
+                info.lineno,
+                info.filename,
+                info.function,
+                round(
+                    mem_percent,
+                    sig_figures)
+            )
+        )
 
 
 def print_file_line(print_location=False, sig_figures=2):

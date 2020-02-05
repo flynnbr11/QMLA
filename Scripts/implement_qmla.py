@@ -492,7 +492,7 @@ elif (
 
     for mid in model_ids:
         mod = qmd.get_model_storage_instance_by_id(mid)
-        name = mod.Name
+        name = mod.model_name
 
         results_file = str(
             global_variables.results_directory +

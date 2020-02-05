@@ -71,7 +71,5 @@ def get_growth_generator_class(
         )
     except BaseException:
         raise
-        # print("{} growth class not found.".format(growth_generation_rule))
-        gr = None
 
     return gr

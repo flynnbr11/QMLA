@@ -998,7 +998,8 @@ class QuantumModelLearningAgent():
                     remote=True,
                     host_name=self.redis_host_name,
                     port_number=self.redis_port_number,
-                    qid=self.qmla_id, log_file=self.rq_log_file
+                    qid=self.qmla_id, 
+                    log_file=self.rq_log_file
                 )
 
                 del updated_model_info
@@ -1275,9 +1276,9 @@ class QuantumModelLearningAgent():
             mod_high.model_bayes_factors[lower_id] = [(1.0 / bayes_factor)]
 
         if bayes_factor > self.bayes_threshold_lower:
-            champ = mod_low.ModelID
+            champ = mod_low.model_id
         elif bayes_factor < (1.0 / self.bayes_threshold_lower):
-            champ = mod_high.ModelID
+            champ = mod_high.model_id
 
         return champ
 
@@ -2089,7 +2090,7 @@ class QuantumModelLearningAgent():
                 self.get_model_storage_instance_by_id(i).model_bayes_factors
             )
 
-        self.log_print(["computing expect vals for mod ", champ_model.ModelID])
+        self.log_print(["computing expect vals for mod ", champ_model.model_id])
         champ_model.compute_expectation_values(
             times=self.times_to_plot,
             # plot_probe_path = self.probes_plot_file
@@ -2163,7 +2164,7 @@ class QuantumModelLearningAgent():
         time_now = time.time()
         time_taken = time_now - self._start_time
 
-        n_qubits = database_framework.get_num_qubits(champ_model.Name)
+        n_qubits = database_framework.get_num_qubits(champ_model.model_name)
         if n_qubits > 3:
             # only compute subset of points for plot
             # otherwise takes too long
@@ -2215,7 +2216,7 @@ class QuantumModelLearningAgent():
             # 'RawExpectationValues' : champ_model.raw_expectation_values,
             # 'ExpValTimes' : champ_model.times,
             'Trackplot_parameter_estimates': champ_model.Trackplot_parameter_estimates,
-            'TrackVolume': champ_model.VolumeList,
+            'TrackVolume': champ_model.volume_by_epoch,
             'TrackTimesLearned': champ_model.Times,
             # 'TrackCovarianceMatrices' : champ_model.TrackCovMatrices,
             # 'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
@@ -2231,7 +2232,7 @@ class QuantumModelLearningAgent():
             'Sensitivity': self.sensitivity,
             'PValue': champ_model.p_value,
             'LearnedHamiltonian': champ_model.LearnedHamiltonian,
-            'GrowthGenerator': champ_model.growth_rule_of_true_model,
+            'GrowthGenerator': champ_model.growth_rule_of_this_model,
             'Heuristic': champ_model.HeuristicType,
             'ChampLatex': champ_model.model_name_latex,
             'TrueModel': database_framework.alph(self.true_model_name),
@@ -2473,10 +2474,10 @@ class QuantumModelLearningAgent():
             ]
         )
         mod = self.get_model_storage_instance_by_id(mod_id)
-        self.log_print(["Mod (reduced) name:", mod.Name])
+        self.log_print(["Mod (reduced) name:", mod.model_name])
         mod.model_update_learned_values()
 
-        n_qubits = database_framework.get_num_qubits(mod.Name)
+        n_qubits = database_framework.get_num_qubits(mod.model_name)
         if n_qubits > 3:
             # only compute subset of points for plot
             # otherwise takes too long
@@ -2500,7 +2501,7 @@ class QuantumModelLearningAgent():
         )
         self.log_print(
             [
-                "Finished computing expectation values for", mod.Name,
+                "Finished computing expectation values for", mod.model_name,
             ]
         )
 
@@ -2526,11 +2527,11 @@ class QuantumModelLearningAgent():
                 plot_probes=self.probes_for_plots
             ),
             'QuadraticLosses': mod.QuadraticLosses,
-            'NameAlphabetical': database_framework.alph(mod.Name),
+            'NameAlphabetical': database_framework.alph(mod.model_name),
             'LearnedParameters': mod.LearnedParameters,
             'FinalSigmas': mod.FinalSigmas,
             'Trackplot_parameter_estimates': mod.Trackplot_parameter_estimates,
-            'TrackVolume': mod.VolumeList,
+            'TrackVolume': mod.volume_by_epoch,
             'TrackTimesLearned': mod.Times,
             # 'TrackCovarianceMatrices' : mod.TrackCovMatrices,
             'ExpectationValues': mod.expectation_values,
@@ -2549,7 +2550,7 @@ class QuantumModelLearningAgent():
             'Sensitivity': self.sensitivity,
             'p-value': mod.p_value,
             'LearnedHamiltonian': mod.LearnedHamiltonian,
-            'GrowthGenerator': mod.growth_rule_of_true_model,
+            'GrowthGenerator': mod.growth_rule_of_this_model,
             'Heuristic': mod.HeuristicType,
             'ChampLatex': mod.model_name_latex,
         }
@@ -2641,7 +2642,7 @@ class QuantumModelLearningAgent():
                 model_id=mod_id
             )
 
-            n_qubits = database_framework.get_num_qubits(mod.Name)
+            n_qubits = database_framework.get_num_qubits(mod.model_name)
             if n_qubits > 5:
                 # only compute subset of points for plot
                 # otherwise takes too long
@@ -2669,11 +2670,11 @@ class QuantumModelLearningAgent():
                     plot_probes=self.probes_for_plots,
                     times=expec_val_plot_times
                 ),
-                'NameAlphabetical': database_framework.alph(mod.Name),
+                'NameAlphabetical': database_framework.alph(mod.model_name),
                 'LearnedParameters': mod.LearnedParameters,
                 'FinalSigmas': mod.FinalSigmas,
                 'Trackplot_parameter_estimates': mod.Trackplot_parameter_estimates,
-                'TrackVolume': mod.VolumeList,
+                'TrackVolume': mod.volume_by_epoch,
                 'TrackTimesLearned': mod.Times,
                 # 'TrackCovarianceMatrices' : mod.TrackCovMatrices,
                 'ExpectationValues': mod.expectation_values,
@@ -2691,7 +2692,7 @@ class QuantumModelLearningAgent():
                 'Precision': self.precision,
                 'Sensitivity': self.sensitivity,
                 'LearnedHamiltonian': mod.LearnedHamiltonian,
-                'GrowthGenerator': mod.growth_rule_of_true_model,
+                'GrowthGenerator': mod.growth_rule_of_this_model,
                 'Heuristic': mod.HeuristicType,
                 'ChampLatex': mod.model_name_latex
             }
@@ -3023,7 +3024,7 @@ class QuantumModelLearningAgent():
         plt.ylabel('Volume')
 
         for i in model_id_list:
-            vols = self.get_model_storage_instance_by_id(i).VolumeList
+            vols = self.get_model_storage_instance_by_id(i).volume_by_epoch
             plt.semilogy(vols, label=str('ID:' + str(i)))
 #            plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1.0))
 

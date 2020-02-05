@@ -236,10 +236,10 @@ def add_model(
         )
         op = Operator(name=sim_name, undimensionalised_name=model_name)
         num_rows = len(running_database)
-        qml_instance = ModelInstanceForLearning(
-            name=op.name,
-            num_probes=num_probes,
-        )
+        # qml_instance = ModelInstanceForLearning(
+        #     name=op.name,
+        #     num_probes=num_probes,
+        # )
         sim_pars = []
         num_pars = op.num_constituents
         reduced_qml_instance = ModelInstanceForStorage(

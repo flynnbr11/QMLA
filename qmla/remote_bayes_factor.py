@@ -167,16 +167,16 @@ def remote_bayes_factor_calculation(
             )
             print(
                 "\n\nModels {}/{}".format(
-                    model_a.ModelID,
-                    model_b.ModelID
+                    model_a.model_id,
+                    model_b.model_id
                 ),
                 "\n\tID_A {} [len {}]: {}".format(
-                    model_a.ModelID,
+                    model_a.model_id,
                     len(update_times_model_a),
                     [np.round(val, 2) for val in update_times_model_a]
                 ),
                 "\n\tID_B {} [len {}]: {}".format(
-                    model_b.ModelID,
+                    model_b.model_id,
                     len(update_times_model_b),
                     [np.round(val, 2) for val in update_times_model_b]
                 ),
@@ -203,13 +203,13 @@ def remote_bayes_factor_calculation(
         if (
             save_plots_of_posteriors == True
             and
-            database_framework.alph(model_a.Name) == database_framework.alph(true_mod_name)
+            database_framework.alph(model_a.model_name) == database_framework.alph(true_mod_name)
         ):
 
             # updater_b_copy = copy.deepcopy(model_b.updater)
 
             try:
-                print("\n\nBF UPDATE Model {}".format(model_a.Name))
+                print("\n\nBF UPDATE Model {}".format(model_a.model_name))
                 plot_posterior_marginals(
                     model_a=model_a,
                     qid=qid,
@@ -237,9 +237,9 @@ def remote_bayes_factor_calculation(
         # bayes_factor = np.exp(log_l_a - log_l_b)
         if (
             (
-                database_framework.alph(model_a.Name) == database_framework.alph(true_mod_name)
+                database_framework.alph(model_a.model_name) == database_framework.alph(true_mod_name)
                 or
-                database_framework.alph(model_b.Name) == database_framework.alph(true_mod_name)
+                database_framework.alph(model_b.model_name) == database_framework.alph(true_mod_name)
             )
             and
             plot_true_mod_post_bayes_factor_dynamics == True
@@ -249,8 +249,8 @@ def remote_bayes_factor_calculation(
                     bf_data_folder +
                     '/BF_{}__{}_{}.png'.format(
                         str(qid),
-                        str(model_a.ModelID),
-                        str(model_b.ModelID)
+                        str(model_a.model_id),
+                        str(model_b.model_id)
                     )
                 )
                 plot_expec_vals_of_models(
@@ -325,10 +325,10 @@ def log_likelihood(
 ):
     updater = model.Updater
     # print(
-    #     "\n[log likel] Log likelihood for model", model.Name
+    #     "\n[log likel] Log likelihood for model", model.model_name
     # )
     # sum_data = 0
-    #print("log likelihood function. Model", model.ModelID, "\n Times:", times)
+    #print("log likelihood function. Model", model.model_id, "\n Times:", times)
 
     if binning:
         updater._renormalization_record = []
@@ -345,7 +345,7 @@ def log_likelihood(
         params_array = np.array([[model.TrueParams[:]]])
 
         # print(
-        #     "log likelihood", model.Name,
+        #     "log likelihood", model.model_name,
         #     "\n\ttime:", times[i],
         #     "\n\tModel.TrueParams:", model.TrueParams,
         #     "\n\tparams array:", params_array,
@@ -531,7 +531,7 @@ def plot_expec_vals_of_models(
         ax1.plot(
             times,
             mod_exp_vals,
-            label=str(mod.ModelID)
+            label=str(mod.model_id)
         )
     ax2 = ax1.twinx()
 
@@ -575,7 +575,7 @@ def plot_posterior_marginals(
         bf_data_folder +
         '/posterior_marginal_pickle_{}_{}.p'.format(
             str(qid),
-            str(model_a.ModelID),
+            str(model_a.model_id),
         )
     )
 
@@ -607,7 +607,7 @@ def plot_posterior_marginals(
             bf_data_folder +
             '/posterior_marginal_{}_mod{}_param{}.png'.format(
                 str(qid),
-                str(model_a.ModelID),
+                str(model_a.model_id),
                 str(param_of_interest)
             )
         )
