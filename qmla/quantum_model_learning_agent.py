@@ -2102,7 +2102,7 @@ class QuantumModelLearningAgent():
         )
 
         self.ChampionFinalParams = (
-            champ_model.FinalParams
+            champ_model.final_learned_params
         )
 
         champ_op = database_framework.Operator(self.ChampionName)

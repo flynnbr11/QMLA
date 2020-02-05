@@ -405,16 +405,15 @@ class ModelInstanceForLearning():
         self.quadratic_losses = []
         self.track_total_log_likelihood = np.array([])
         self.track_experimental_times = np.array([])  # only for debugging
-        self.Particles = np.array([])
-        self.Weights = np.array([])
-        self.ResampleEpochs = []
-        # self.Experiment = self.model_heuristic()
-        self.ExperimentsHistory = np.array([])
+        self.particles = np.array([])
+        self.weights = np.array([])
+        self.epochs_after_resampling = []
+        # self.ExperimentsHistory = np.array([])
         # average and standard deviation at the final step of the parameters
         # inferred distributions
-        self.FinalParams = np.empty([len(self.model_terms_matrices), 2])
-        print_loc(print_location=init_model_print_loc)
-        self.log_print(['Initialization Ready'])
+        self.final_learned_params = np.empty([len(self.model_terms_matrices), 2])
+        # print_loc(print_location=init_model_print_loc)
+        # self.log_print(['Initialization Ready'])
 
     def UpdateModel(
         self,
@@ -436,10 +435,10 @@ class ModelInstanceForLearning():
         # self.TrackPosteriorMarginal = np.empty(self.num_experiments, self.NumParameters)
         self.track_experimental_times = np.empty(self.num_experiments)  # only for debugging
 
-        self.Particles = np.empty([self.num_particles,
+        self.particles = np.empty([self.num_particles,
                                    len(self.model_terms_parameters[0]), self.num_experiments]
                                   )
-        self.Weights = np.empty([self.num_particles, self.num_experiments])
+        self.weights = np.empty([self.num_particles, self.num_experiments])
         self.DistributionMeans = np.empty([self.num_experiments])
         self.DistributionStdDevs = np.empty([self.num_experiments])
 
@@ -567,7 +566,7 @@ class ModelInstanceForLearning():
             self.update_cumulative_time += after_upd - before_upd
 
             if self.qinfer_updater.just_resampled is True:
-                self.ResampleEpochs.append(istep)
+                self.epochs_after_resampling.append(istep)
 
             print_loc(global_print_loc)
             # self.covmat = self.qinfer_updater.est_covariance_mtx()
@@ -608,8 +607,8 @@ class ModelInstanceForLearning():
                 self.qinfer_updater.est_covariance_mtx()
             )
             print_loc(global_print_loc)
-            self.Particles[:, :, istep] = self.qinfer_updater.particle_locations
-            #self.Weights[:, istep] = self.qinfer_updater.particle_weights
+            self.particles[:, :, istep] = self.qinfer_updater.particle_locations
+            #self.weights[:, istep] = self.qinfer_updater.particle_weights
 
             self.NewEval = self.qinfer_updater.est_mean()
             print_loc(global_print_loc)
@@ -645,25 +644,25 @@ class ModelInstanceForLearning():
                          -  Iteration Number ' + str(istep)
                           )
 
-                    for iterator in range(len(self.FinalParams)):
-                        self.FinalParams[iterator] = [
+                    for iterator in range(len(self.final_learned_params)):
+                        self.final_learned_params[iterator] = [
                             # final params and sigmas
-                            # np.mean(self.Particles[:,iterator,istep]),
+                            # np.mean(self.particles[:,iterator,istep]),
                             # TODO should this be gotten from updater.est_covariance_mtx()?
-                            # np.std(self.Particles[:,iterator,istep])
+                            # np.std(self.particles[:,iterator,istep])
                             self.qinfer_updater.est_mean(),
                             np.sqrt(np.diag(updater.est_covariance_mtx()))
                         ]
                         print('Final Parameters mean and stdev:' +
-                              str(self.FinalParams[iterator])
+                              str(self.final_learned_params[iterator])
                               )
                     self.LogTotLikelihood = (
                         self.qinfer_updater.log_total_likelihood
                     )
                     # self.quadratic_losses=(np.resize(self.quadratic_losses, (1,istep)))[0]
                     self.Covars = (np.resize(self.Covars, (1, istep)))[0]
-                    self.Particles = self.Particles[:, :, 0:istep]
-                    self.Weights = self.Weights[:, 0:istep]
+                    self.particles = self.particles[:, :, 0:istep]
+                    self.weights = self.weights[:, 0:istep]
                     self.track_experimental_times = self.track_experimental_times[0:istep]
                     break
 
@@ -678,14 +677,14 @@ class ModelInstanceForLearning():
                     Norm. Thrshold of ', str(self.Covars[istep])]
                                )
                 self.log_print([' at Iteration Number ', str(istep)])
-                for iterator in range(len(self.FinalParams)):
-                    self.FinalParams[iterator] = [
-                        #                        np.mean(self.Particles[:,iterator,istep]),
+                for iterator in range(len(self.final_learned_params)):
+                    self.final_learned_params[iterator] = [
+                        #                        np.mean(self.particles[:,iterator,istep]),
                         self.qinfer_updater.est_mean(),
-                        np.std(self.Particles[:, iterator, istep])
+                        np.std(self.particles[:, iterator, istep])
                     ]
                     self.log_print(['Final Parameters mean and stdev:',
-                                    str(self.FinalParams[iterator])]
+                                    str(self.final_learned_params[iterator])]
                                    )
                 self.LogTotLikelihood = self.qinfer_updater.log_total_likelihood
                 # if checkloss == True:
@@ -694,8 +693,8 @@ class ModelInstanceForLearning():
                 #     )
 
                 self.Covars = (np.resize(self.Covars, (1, istep)))[0]
-                self.Particles = self.Particles[:, :, 0:istep]
-                self.Weights = self.Weights[:, 0:istep]
+                self.particles = self.particles[:, :, 0:istep]
+                self.weights = self.weights[:, 0:istep]
                 self.track_experimental_times = self.track_experimental_times[0:istep]
 
                 break
@@ -725,25 +724,25 @@ class ModelInstanceForLearning():
                 self.LearnedParameters = {}
                 self.FinalSigmas = {}
                 cov_mat = self.qinfer_updater.est_covariance_mtx()
-                for iterator in range(len(self.FinalParams)):
-                    self.FinalParams[iterator] = [
-                        #                        np.mean(self.Particles[:,iterator,istep-1]),
+                for iterator in range(len(self.final_learned_params)):
+                    self.final_learned_params[iterator] = [
+                        #                        np.mean(self.particles[:,iterator,istep-1]),
                         self.qinfer_updater.est_mean()[iterator],
                         np.sqrt(cov_mat[iterator][iterator])
-                        # np.std(self.Particles[:,iterator,istep-1])
+                        # np.std(self.particles[:,iterator,istep-1])
                         # self.qinfer_updater.est_mean(),
                         # np.sqrt(np.diag(updater.est_covariance_mtx()))
                     ]
                     self.log_print([
                         'Final Parameters mean and stdev (term ',
                         self.model_terms_names[iterator], '):',
-                        str(self.FinalParams[iterator])]
+                        str(self.final_learned_params[iterator])]
                     )
                     self.LearnedParameters[self.model_terms_names[iterator]] = (
-                        self.FinalParams[iterator][0]
+                        self.final_learned_params[iterator][0]
                     )
                     self.FinalSigmas[self.model_terms_names[iterator]] = (
-                        self.FinalParams[iterator][1]
+                        self.final_learned_params[iterator][1]
                     )
 
 #                plt.savefig(posterior_plot,'posterior.png')
@@ -763,14 +762,14 @@ class ModelInstanceForLearning():
         """
 
         all_post_margs = []
-        for i in range(len(self.FinalParams)):
+        for i in range(len(self.final_learned_params)):
             all_post_margs.append(
                 self.qinfer_updater.posterior_marginal(idx_param=i)
             )
 
         learned_info = {}
         learned_info['times'] = self.track_experimental_times
-        learned_info['final_params'] = self.FinalParams
+        learned_info['final_params'] = self.final_learned_params
         learned_info['normalization_record'] = self.qinfer_updater.normalization_record
         learned_info['log_total_likelihood'] = self.qinfer_updater.log_total_likelihood
         learned_info['data_record'] = self.qinfer_updater.data_record
@@ -802,7 +801,7 @@ class ModelInstanceForLearning():
         learned_info['track_prior_means'] = self.TrackPriorMeans
         learned_info['track_prior_std_devs'] = self.TrackPriorStdDev
         # learned_info['track_posterior_marginal'] = self.TrackPosteriorMarginal
-        learned_info['resample_epochs'] = self.ResampleEpochs
+        learned_info['resample_epochs'] = self.epochs_after_resampling
         learned_info['quadratic_losses'] = self.quadratic_losses
         learned_info['learned_parameters'] = self.LearnedParameters
         learned_info['final_sigmas'] = self.FinalSigmas
@@ -818,8 +817,8 @@ class ModelInstanceForLearning():
                     self.model_id
                 ]
             )
-            learned_info['particles'] = self.Particles
-            learned_info['weights'] = self.Weights
+            learned_info['particles'] = self.particles
+            learned_info['weights'] = self.weights
 
         return learned_info
 
@@ -855,7 +854,7 @@ class ModelInstanceForLearning():
         save_file = save_dir + '/particles_mod_' + str(self.model_id) + '.dat'
 
         particle_file = open(save_file, 'w')
-        particle_file.write("\n".join(str(elem) for elem in self.Particles.T))
+        particle_file.write("\n".join(str(elem) for elem in self.particles.T))
         particle_file.close()
 
     def store_covariances(self, debug_dir=None):
@@ -1035,9 +1034,9 @@ class ModelInstanceForStorage():
             self.num_experiments = learned_info['num_experiments']
             self.Times = list(learned_info['times'])
             # should be final params from learning process
-            self.FinalParams = learned_info['final_params']
+            self.final_learned_params = learned_info['final_params']
             # TODO this won't work for multiple parameters
-            self.model_terms_parameters_Final = np.array([[self.FinalParams[0, 0]]])
+            self.model_terms_parameters_Final = np.array([[self.final_learned_params[0, 0]]])
             self.SimOpNames = learned_info['sim_op_names']
             # TODO this can be recreated from finalparams, but how for multiple
             # params?
@@ -1060,7 +1059,7 @@ class ModelInstanceForStorage():
                 learned_info['track_prior_std_devs'])
             # self.TrackPosteriorMarginal = np.array(learned_info['track_posterior_marginal'])
 
-            self.ResampleEpochs = learned_info['resample_epochs']
+            self.epochs_after_resampling = learned_info['resample_epochs']
             self.QuadraticLosses = learned_info['quadratic_losses']
             self.LearnedParameters = learned_info['learned_parameters']
             self.FinalSigmas = learned_info['final_sigmas']
@@ -1091,13 +1090,13 @@ class ModelInstanceForStorage():
                         self.Trackplot_parameter_estimates[term] = self.TrackEval[:, i]
 
             try:
-                self.Particles = np.array(learned_info['particles'])
-                self.Weights = np.array(learned_info['weights'])
+                self.particles = np.array(learned_info['particles'])
+                self.weights = np.array(learned_info['weights'])
             except BaseException:
-                self.Particles = 'Particles not stored.'
-                self.Weights = 'Weights not stored.'
+                self.particles = 'Particles not stored.'
+                self.weights = 'Weights not stored.'
 
-            sim_params = list(self.FinalParams[:, 0])
+            sim_params = list(self.final_learned_params[:, 0])
             try:
                 self.LearnedHamiltonian = np.tensordot(
                     sim_params,
@@ -1443,10 +1442,10 @@ class ModelInstanceForComparison():
         # todo, put this in a lighter function
         self.model_terms_matrices = op.constituents_operators
         self.Times = learned_model_info['times']
-        self.FinalParams = learned_model_info['final_params']
+        self.final_learned_params = learned_model_info['final_params']
         # TODO this won't work for multiple parameters
-        self.model_terms_parameters_Final = np.array(self.FinalParams)
-        # self.model_terms_parameters_Final = np.array([[self.FinalParams[0,0]]]) # TODO
+        self.model_terms_parameters_Final = np.array(self.final_learned_params)
+        # self.model_terms_parameters_Final = np.array([[self.final_learned_params[0,0]]]) # TODO
         # this won't work for multiple parameters
 
         # print("[QML {}] \nSimParams_Final: {} \nSimOpList: {}".format(

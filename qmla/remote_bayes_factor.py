@@ -387,9 +387,9 @@ def get_exp(model, time):
     try:
         for i in range(1, len(gen.expparams_dtype)):
             col_name = 'w_' + str(i)
-            exp[col_name] = model.FinalParams[i - 1, 0]
+            exp[col_name] = model.final_learned_params[i - 1, 0]
     except BaseException:
-        print("failed to get exp. \nFinal params:", model.FinalParams)
+        print("failed to get exp. \nFinal params:", model.final_learned_params)
 
     return exp
 

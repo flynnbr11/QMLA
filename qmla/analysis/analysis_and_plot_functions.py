@@ -764,7 +764,7 @@ def ExpectationValuesQHL_TrueModel(
         sim = qmd.model_name_id_map[mod_id]
         sim_op = database_framework.Operator(sim)
         mod = qmd.get_model_storage_instance_by_id(mod_id)
-        sim_params = list(mod.FinalParams[:, 0])
+        sim_params = list(mod.final_learned_params[:, 0])
         sim_ops = sim_op.constituents_operators
         sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
         if debug_print:
@@ -904,7 +904,7 @@ def plotDistributionProgression(
               plot of distribution development."
               )
     true_parameters = mod.true_model_params
-    num_experiments = np.shape(mod.Particles)[2]
+    num_experiments = np.shape(mod.particles)[2]
     max_exp_num = num_experiments - 1
     num_intervals_to_show = num_steps_to_show
     increment = int(num_experiments / num_intervals_to_show)
@@ -938,9 +938,9 @@ def plotDistributionProgression(
     for i in steps_to_show:
         # previous step which is shown on plot already
         j = steps_to_show.index(i) - 1
-        if not np.all(mod.Particles[:, :, i] == mod.Particles[:, :, j]):
+        if not np.all(mod.particles[:, :, i] == mod.particles[:, :, j]):
             # don't display identical distributions between steps
-            particles = mod.Particles[:, :, i]
+            particles = mod.particles[:, :, i]
             particles = sorted(particles)
             colour = colours[i % len(colours)]
 
@@ -952,7 +952,7 @@ def plotDistributionProgression(
                 max_fit = max(fit)
                 fit = fit / max_fit
             else:
-                fit = mod.Weights[:, i]
+                fit = mod.weights[:, i]
 
             if i == max_exp_num:
                 colour = final_colour
@@ -999,7 +999,7 @@ def plotDistributionProgressionQML(
     plt.clf()
 
     true_parameters = mod.true_model_params
-    num_experiments = np.shape(mod.Particles)[2]
+    num_experiments = np.shape(mod.particles)[2]
     max_exp_num = num_experiments - 1
     num_intervals_to_show = num_steps_to_show
     increment = int(num_experiments / num_intervals_to_show)
@@ -1010,7 +1010,7 @@ def plotDistributionProgressionQML(
 
     # steps_to_show = list(range(0,num_experiments,nearest_five))
 
-    resampled_epochs = mod.ResampleEpochs
+    resampled_epochs = mod.epochs_after_resampling
     steps_to_show = list(range(0, resampled_epochs, num_steps_to_show))
     steps_to_show = [int(s) for s in steps_to_show]
 
@@ -1028,7 +1028,7 @@ def plotDistributionProgressionQML(
         "num exp:", num_experiments,
         "increment:", increment,
         "steps to show", steps_to_show,
-        "resampled epochs:", mod.ResampleEpochs,
+        "resampled epochs:", mod.epochs_after_resampling,
     )
 
     ax = plt.subplot(111)
@@ -1048,7 +1048,7 @@ def plotDistributionProgressionQML(
             "i,", i
         )
 
-        particles = mod.Particles[:, :, i]
+        particles = mod.particles[:, :, i]
         particles = sorted(particles)
         colour = colours[i % len(colours)]
 
@@ -1062,7 +1062,7 @@ def plotDistributionProgressionQML(
             max_fit = max(fit)
             fit = fit / max_fit
         else:
-            fit = mod.Weights[:, i]
+            fit = mod.weights[:, i]
 
         if i == max_exp_num:
             colour = final_colour
@@ -1094,7 +1094,7 @@ def plotDistributionProgressionQML(
     #     if (
     #         steps_to_show.index(i)==0
     #         or
-    #         not np.all(mod.Particles[:,:,i] == mod.Particles[:,:,j])
+    #         not np.all(mod.particles[:,:,i] == mod.particles[:,:,j])
     #     ):
     #         # don't display identical distributions between steps
     #         print(
@@ -1102,7 +1102,7 @@ def plotDistributionProgressionQML(
     #             "i,j:", i,j
     #         )
 
-    #         particles = mod.Particles[:,:,i]
+    #         particles = mod.particles[:,:,i]
     #         particles = sorted(particles)
     #         colour = colours[i%len(colours)]
 
@@ -1116,7 +1116,7 @@ def plotDistributionProgressionQML(
     #             max_fit = max(fit)
     #             fit = fit/max_fit
     #         else:
-    #             fit = mod.Weights[:,i]
+    #             fit = mod.weights[:,i]
 
     #         if i==max_exp_num:
     #             colour = final_colour
@@ -1370,8 +1370,8 @@ def r_squared_from_epoch_list(
         mod_num_qubits = database_framework.get_num_qubits(mod.model_name)
         probe = expectation_values.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.num_experiments - 1])
-        if len(mod.ResampleEpochs) > 0:
-            epochs.extend(mod.ResampleEpochs)
+        if len(mod.epochs_after_resampling) > 0:
+            epochs.extend(mod.epochs_after_resampling)
 
         epochs = sorted(set(epochs))
         for epoch in epochs:
@@ -1526,7 +1526,7 @@ def plot_volume_after_qhl(
     plt.ylabel('Volume')
     plt.semilogy(x, y, label='Volume')
 
-    resamplings = mod.ResampleEpochs
+    resamplings = mod.epochs_after_resampling
 
     if show_resamplings and len(resamplings) > 0:
         plt.axvline(resamplings[0], linestyle='dashed',

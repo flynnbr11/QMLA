@@ -896,7 +896,7 @@ def move_to_legacy(db, legacy_db, name):
     print("Model instance ", name, " moved to legacy db")
     new_row = pd.Series({
         '<Name>': name,
-        'Param_Est_Final': model_instance.FinalParams,
+        'Param_Est_Final': model_instance.final_learned_params,
         'Epoch_Start': 0,  # TODO
         'Epoch_Finish': 10,  # TODO
         'ModelID': model_instance.model_id
