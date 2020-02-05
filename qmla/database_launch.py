@@ -205,11 +205,11 @@ def add_model(
 
             if sim_dim > true_dim:
                 true_params = [true_params[0]]
-                redimensionalised_true_op = (
-                    model_generation.identity_interact(subsystem=true_op_name,
-                                                       num_qubits=sim_dim, return_operator=True)
-                )
-                true_ops = redimensionalised_true_op.constituents_operators
+                # redimensionalised_true_op = (
+                #     model_generation.identity_interact(subsystem=true_op_name,
+                #                                        num_qubits=sim_dim, return_operator=True)
+                # )
+                # true_ops = redimensionalised_true_op.constituents_operators
                 sim_name = model_name
 
             elif true_dim > sim_dim:

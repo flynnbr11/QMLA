@@ -70,6 +70,7 @@ def get_growth_generator_class(
             **kwargs
         )
     except BaseException:
+        print("Cannot find growth rule in available rules:", growth_generation_rule)
         raise
 
     return gr

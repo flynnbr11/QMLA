@@ -17,7 +17,7 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=10
+prt=20
 exp=2
 pgh=1.0
 pgh_exponent=1.0
@@ -74,10 +74,10 @@ git_commit=$(git rev-parse HEAD)
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
-sim_growth_rule='IsingProbabilistic'
+# sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'
 # sim_growth_rule='HeisenbergXYZPredetermined'
-# sim_growth_rule='HeisenbergXYZProbabilistic'
+sim_growth_rule='HeisenbergXYZProbabilistic'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
 # sim_growth_rule='Genetic'
@@ -104,8 +104,13 @@ else
 fi
 
 alt_growth_rules=(
+    # 'IsingPredetermined'
+    # 'IsingProbabilistic'
     # 'HeisenbergXYZProbabilistic'
-    'HeisenbergXYZPredetermined'
+    # 'HeisenbergXYZPredetermined'
+    # 'FermiHubbardPredetermined' 
+    # 'FermiHubbardProbabilistic' 
+    # 'ExperimentReducedNV'
 )
 
 growth_rules_command=""

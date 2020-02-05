@@ -40,10 +40,32 @@ class ExperimentReducedNV(
         model_list,
         **kwargs
     ):
-        from qmla import model_generation
+        # from qmla import model_generation
 
-        new_mods = model_generation.ExperimentReducedNVal_method(
+        new_mods = ExperimentReducedNVal_method(
             model_list,
             **kwargs
         )
         return new_mods
+
+
+def ExperimentReducedNVal_method(
+    model_list,
+    spawn_step,
+    model_dict,
+    log_file,
+    **kwargs
+):
+    """
+    For use only during development to minimise time taken for testing.
+    """
+    if spawn_step == 1:
+        return ['xTiPPxTxPPyTiPPyTyPPzTiPPzTz']
+    elif spawn_step == 2:
+        kwargs['spawn_stage'].append('Complete')
+        return [
+            'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz',
+            'xTiPPxTxPPyTiPPyTyPPyTzPPzTiPPzTz',
+            'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz'
+        ]
+

@@ -6,7 +6,7 @@ import os
 from qmla.growth_rules import connected_lattice
 from qmla import experiment_design_heuristics
 from qmla import topology
-from qmla import model_generation
+# from qmla import model_generation
 from qmla import model_naming
 from qmla import probe_set_generation
 from qmla import database_framework
@@ -42,7 +42,7 @@ class HeisenbergXYZProbabilistic(
         self.four_site_x = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_yJy_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_yJy_d4'
         self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_yJy_d3'
         self.max_num_sites = 4
-        self.true_operator = self.four_site_x
+        self.true_operator = self.true_operator_partially_connected
         self.true_operator = database_framework.alph(self.true_operator)
         self.qhl_models = [self.true_operator]
         self.base_terms = [

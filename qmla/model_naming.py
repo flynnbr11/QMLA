@@ -707,31 +707,6 @@ def branch_computed_from_qubit_and_param_count(
     return model_branches
 
 
-def interacting_ising_nearest_neighbours_all_names(
-    # growth_generator,
-    **kwargs
-):
-    import model_generation
-    all_models = []
-
-    initial_models = ['xTx', 'yTy', 'zTz']
-    num_qubits = 5
-
-    models_on_branches = {
-        2: initial_models
-    }
-
-    model_list = initial_models
-    for i in range(2, num_qubits + 1):
-        new_models = model_generation.interacting_nearest_neighbour_ising(
-            model_list)
-        all_models.extend(new_models)
-        model_list = new_models
-        models_on_branches[i] = new_models
-
-    return all_models
-
-
 def nearest_neighbour_ising_latex_name(
     name,
     **kwargs

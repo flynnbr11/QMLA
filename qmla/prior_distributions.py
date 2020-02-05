@@ -6,39 +6,22 @@ from scipy.stats import norm
 from scipy.optimize import curve_fit
 
 import qmla.database_framework as database_framework
+import qmla.logging
 
 __all__ = [
     'gaussian_prior'
 ]
 
-def time_seconds():
-    # return time in h:m:s format for logging.
-    import datetime
-    now = datetime.date.today()
-    hour = datetime.datetime.now().hour
-    minute = datetime.datetime.now().minute
-    second = datetime.datetime.now().second
-    time = str(str(hour) + ':' + str(minute) + ':' + str(second))
-    return time
-
-
 def log_print(
     to_print_list,
-    log_file,
-    log_identifier=None
+    log_file, 
+    log_identifier='Distributions'
 ):
-    if log_identifier is None:
-        log_identifier = '[Distrib]'
-    if type(to_print_list) != list:
-        to_print_list = list(to_print_list)
-    identifier = str(str(time_seconds()) +
-                     " [" + log_identifier + "]"
-                     )
-
-    print_strings = [str(s) for s in to_print_list]
-    to_print = " ".join(print_strings)
-    with open(log_file, 'a') as write_log_file:
-        print(identifier, str(to_print), file=write_log_file)
+    qmla.logging.print_to_log(
+        to_print_list = to_print_list, 
+        log_file = log_file, 
+        log_identifier = log_identifier
+    )
 
 
 def gaussian_prior(
@@ -127,7 +110,6 @@ def plot_prior(
     axes_so_far = 0
 
     cm_subsection = np.linspace(0, 0.8, num_params)
-    #        colours = [ cm.magma(x) for x in cm_subsection ]
     colours = [cm.viridis(x) for x in cm_subsection]
     include_legend = False
     for i in range(num_params):
@@ -154,12 +136,6 @@ def plot_prior(
         spacing = np.linspace(min(this_param_samples), max(this_param_samples))
         distribution = norm.pdf(spacing, this_param_mean, this_param_dev)
         ls = next(linecycler)
-        # plt.plot(
-        #     spacing,
-        #     distribution,
-        #     label=param_label,
-        #     linestyle=ls
-        # )
         ax.hist(
             this_param_samples,
             histtype='step',
@@ -196,40 +172,3 @@ def plot_prior(
     )
     fig.savefig(plot_file)
     plt.clf()
-
-
-def Gaussian(x, mean=0., sigma=1.):
-    """
-    returns a 1D Gaussian distribution from the input vector of positions x
-    """
-    return norm.pdf(x, loc=mean, scale=sigma)
-
-
-def get_posterior_fromMarginals(
-    all_post_marginals
-):
-    """
-    from an input list of posterior marginals from qinfer.update.posterior_marginal
-    returns a qinfer posterior MVNormal distribution (as such it already deals with multiple parameters)
-    """
-
-    posterior_fits = []
-
-    for idx_param in range(len(all_post_marginals)):
-
-        post_marginal = all_post_marginals[idx_param]
-        p0 = [np.mean(post_marginal[0]), np.std(post_marginal[0])]
-        posterior_fits.append(
-            curve_fit(
-                Gaussian,
-                post_marginal[0],
-                post_marginal[1],
-                p0=p0)[0])
-
-    posterior = qinfer.MultivariateNormalDistribution(
-        np.array(posterior_fits)[
-            :, 0], np.diag(
-            np.array(posterior_fits)[
-                :, 1])**2)
-
-    return posterior

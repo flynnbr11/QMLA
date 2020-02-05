@@ -1,5 +1,6 @@
 import datetime
 
+
 def time_seconds():
     # return time in h:m:s format for logging.
     now = datetime.date.today()
@@ -23,10 +24,10 @@ def print_to_log(
     and using the identifier for the log entry specified in the third parameter
     if the first argument is not passed as string will be converted to string.
 
-    :param to_print_list: string you want to print 
-    :type to_print_list: str() 
+    :param to_print_list: string you want to print
+    :type to_print_list: str()
     :param log_file: path of the log file you want to update
-    :type log_file: str() 
+    :type log_file: str()
     :param log_identifier: identifier for the log
     :type log_identifier: str()
 

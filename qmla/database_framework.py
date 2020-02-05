@@ -63,13 +63,16 @@ import hashlib
 import redis
 # from qinfer import NormalDistribution
 
+
+
+
 __all__ = [
     'core_operator_dict', 
     'Operator',
     'get_num_qubits', 
     'get_constituent_names_from_name', 
     'alph', 
-    'process_basic_operator', 
+    # 'process_basic_operator', 
     'consider_new_model', 
     'reduced_model_instance_from_id',
     'update_field', 
@@ -663,7 +666,7 @@ def compute(inp):
     Tensor product, multiply or sum resulting lists.
     Return operator which is specified by inp.
     """
-
+    from qmla.process_string_to_matrix import process_basic_operator
     max_p, p_str = find_max_letter(inp, "P")
     max_t, t_str = find_max_letter(inp, "T")
     max_m, m_str = find_max_letter(inp, "M")
@@ -680,47 +683,6 @@ def compute(inp):
         return compute_p(inp)
 
 
-def process_basic_operator(basic_operator):
-    from qmla import model_generation
-
-    if basic_operator[0:1] == 'h_':
-        # import model_generation
-        mtx = model_generation.process_hubbard_operator(
-            basic_operator
-        )
-        # hopping_matrix(basic_operator)
-    elif '1Dising' in basic_operator:
-        # import model_generation
-        mtx = model_generation.process_1d_ising(
-            basic_operator
-        )
-    elif 'Heis' in basic_operator:
-        # import model_generation
-        mtx = model_generation.process_heisenberg_xyz(
-            basic_operator
-        )
-    elif 'nv' in basic_operator:
-        # import model_generation
-        mtx = model_generation.process_n_qubit_NV_centre_spin(
-            basic_operator
-        )
-    elif 'pauliSet' in basic_operator:
-        mtx = model_generation.process_multipauli_term(
-            term=basic_operator
-        )
-    elif 'transverse' in basic_operator:
-        mtx = model_generation.process_transverse_term(
-            term=basic_operator
-        )
-    elif 'FH' in basic_operator:
-        # print("[DB] Processing hopping operator:", term)
-        mtx = model_generation.process_fermi_hubbard_term(
-            term=basic_operator
-        )
-    else:
-        mtx = core_operator_dict[basic_operator]
-
-    return mtx
 
 
 def ideal_probe(name):
