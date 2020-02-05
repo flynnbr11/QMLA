@@ -1,19 +1,19 @@
 from __future__ import print_function  # so print doesn't show brackets
 
 import numpy as np
-import itertools as itr
-import copy
-import os as os
-import sys as sys
+# import itertools as itr
+# import copy
+# import os as os
+# import sys as sys
 import pandas as pd
-import warnings
-import hashlib
+# import warnings
+# import hashlib
 
 import redis
-from qinfer import NormalDistribution
+# from qinfer import NormalDistribution
 
 from qmla.model_instances import ModelInstanceForLearning, ModelInstanceForStorage
-from qmla.database_framework import *
+from qmla.database_framework import * # TODO remove import *
 import qmla.logging
 
 __all__ = [
@@ -29,7 +29,7 @@ def log_print(to_print_list, log_file):
     )
 
 def launch_db(
-    true_op_name,
+    # true_op_name,
     new_model_branches,
     new_model_ids,
     log_file,
@@ -109,7 +109,7 @@ def launch_db(
             model_id=int(new_model_ids[model_name]),
             running_database=db,
             model_lists=model_lists,
-            true_op_name=true_op_name,
+            # true_op_name=true_op_name,
             true_model_terms_matrices=true_model_terms_matrices,
             true_model_terms_params=true_model_terms_params,
             log_file=log_file,
@@ -140,7 +140,7 @@ def add_model(
     model_name,
     running_database,
     model_lists,
-    true_op_name,
+    # true_op_name,
     model_id,
     log_file,
     redimensionalise=True,

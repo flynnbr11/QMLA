@@ -2,16 +2,9 @@ from __future__ import print_function  # so print doesn't show brackets
 
 import copy
 import numpy as np
-import itertools as itr
-import os as os
-import sys as sys
-import pandas as pd
-import warnings
 import time as time
-import random
 import matplotlib.pyplot as plt
 
-from psutil import virtual_memory
 import pickle
 pickle.HIGHEST_PROTOCOL = 4
 import redis

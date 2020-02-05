@@ -1,6 +1,6 @@
 from __future__ import print_function  # so print doesn't show brackets
 # Libraries
-import json  # possibly worth a different serialization if pickle is very slow
+  # possibly worth a different serialization if pickle is very slow
 from qinfer import NormalDistribution
 import matplotlib.pyplot as plt
 import matplotlib

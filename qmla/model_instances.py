@@ -1,13 +1,13 @@
-from __future__ import print_function  # so print doesn't show brackets
+# from __future__ import print_function  # so print doesn't show brackets
 import qmla.redis_settings as rds
 import qmla.qinfer_model_interface as qml_qi
 from qmla.memory_tests import print_loc
-import qmla.model_naming as model_naming
+# import qmla.model_naming as model_naming
 import qmla.logging
 import qmla.get_growth_rule as get_growth_rule
-import qmla.expectation_values as expectation_values
+# import qmla.expectation_values as expectation_values
 import qmla.experimental_data_processing as expdt
-import qmla.prior_distributions as Distributions
+import qmla.prior_distributions as distributions
 import qmla.database_framework as database_framework
 import qmla.analysis
 import numpy as np
@@ -16,7 +16,7 @@ import os
 import time
 import copy
 import qinfer as qi
-from psutil import virtual_memory
+# from psutil import virtual_memory
 import redis
 import pickle
 import matplotlib.pyplot as plt
@@ -310,7 +310,7 @@ class ModelInstanceForLearning():
 
         plot_all_priors = True
         if plot_all_priors == True:
-            Distributions.plot_prior(
+            distributions.plot_prior(
                 model_name=self.model_name_latex,
                 model_name_individual_terms=latex_terms,
                 prior=self.model_prior,
@@ -404,8 +404,8 @@ class ModelInstanceForLearning():
                                    len(self.model_terms_parameters[0]), self.num_experiments]
                                   )
         self.weights = np.empty([self.num_particles, self.num_experiments])
-        self.DistributionMeans = np.empty([self.num_experiments])
-        self.DistributionStdDevs = np.empty([self.num_experiments])
+        # self.DistributionMeans = np.empty([self.num_experiments])
+        # self.distributionstdDevs = np.empty([self.num_experiments])
         self.true_model_params_dict = {}
 
         true_params_names = database_framework.get_constituent_names_from_name(

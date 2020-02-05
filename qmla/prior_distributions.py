@@ -3,7 +3,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-from scipy.optimize import curve_fit
+# from scipy.optimize import curve_fit
 
 import qmla.database_framework as database_framework
 import qmla.logging

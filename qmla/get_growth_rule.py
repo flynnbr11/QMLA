@@ -1,8 +1,5 @@
 from __future__ import absolute_import
 
-import sys
-import os
-
 import qmla.growth_rules as GR
 
 __all__ = [

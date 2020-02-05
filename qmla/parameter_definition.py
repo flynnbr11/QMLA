@@ -1,13 +1,13 @@
 import numpy as np
-import random
+# import random
 import pickle
-import argparse
-import os
-import matplotlib.pyplot as plt
+# import argparse
+# import os
+# import matplotlib.pyplot as plt
 
 import qmla.database_framework as database_framework
-import qmla.prior_distributions as Distributions
-import qmla.get_growth_rule as get_growth_rule
+import qmla.prior_distributions as distributions
+# import qmla.get_growth_rule as get_growth_rule
 
 pickle.HIGHEST_PROTOCOL = 4
 
@@ -77,7 +77,7 @@ def create_qhl_params(
 
     true_prior.__setattr__('cov', old_cov_mtx)
     try:
-        Distributions.plot_prior(
+        distributions.plot_prior(
             model_name=true_op_latex,
             model_name_individual_terms=latex_terms,
             prior=true_prior,

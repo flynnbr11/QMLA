@@ -3,14 +3,10 @@ from __future__ import print_function  # so print doesn't show brackets
 
 import math
 import matplotlib.pyplot as plt
-import matplotlib
-import json
 import numpy as np
-import itertools as itr
 import os as os
 import sys as sys
 import pandas as pd
-import warnings
 import time as time
 from time import sleep
 import random
@@ -23,10 +19,6 @@ import qmla.analysis
 import qmla.database_framework as database_framework
 import qmla.database_launch as database_launch
 import qmla.get_growth_rule as get_growth_rule
-import qmla.expectation_values as expectation_values
-import qmla.model_naming as model_naming
-import qmla.model_generation as model_generation
-import qmla.model_instances as QML
 import qmla.redis_settings as rds
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation
 from qmla.remote_model_learning import remote_learn_model_parameters
