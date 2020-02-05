@@ -859,25 +859,24 @@ class ModelInstanceForStorage():
     def __init__(
         self,
         model_name,
-        sim_oplist,
-        true_oplist,
-        true_params,
         modelID,
-        # numparticles,
-        # resample_thresh=0.5,
-        # resample_a=0.9,
-        # qle=True,
-        # probe_dict= None,
+        model_terms_matrices,
         qid=0,
+        # true_oplist,
+        # true_params,
         host_name='localhost',
         port_number=6379,
-        log_file='QMD_log.log'
+        log_file='QMD_log.log',
+        **kwargs
     ):
+        self.redis_host_name = host_name
+        self.redis_port_number = port_number
+        self.qmla_id = qid
 
         rds_dbs = rds.databases_from_qmd_id(
-            host_name,
-            port_number,
-            qid
+            self.redis_host_name,
+            self.redis_port_number,
+            self.qmla_id
         )
         qmd_info_db = rds_dbs['qmd_info_db']
         #print("In reduced model. rds_dbs:", rds_dbs)
@@ -885,7 +884,7 @@ class ModelInstanceForStorage():
 
         self.model_name = model_name
         self.model_id = modelID
-        self.model_terms_matrices = sim_oplist
+        self.model_terms_matrices = model_terms_matrices
         self.model_id = modelID
         qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
         self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
@@ -912,27 +911,21 @@ class ModelInstanceForStorage():
             'store_particles_weights'
         ]
         self.model_bayes_factors = {}
-        self.NumQubits = database_framework.get_num_qubits(self.model_name)
-        self.ProbeDimension = self.NumQubits
-        self.redis_host_name = host_name
-        self.redis_port_number = port_number
-        self.qmla_id = qid
+        self.model_num_qubits = database_framework.get_num_qubits(self.model_name)
+        self.probe_num_qubits = self.model_num_qubits
         self.log_file = log_file
         self.expectation_values = {}
         self.values_updated = False
 
-    def log_print(self, to_print_list):
-        identifier = str(str(time_seconds()) +
-                         "[QML:Reduced " +
-                         str(self.model_id) + "; QMD " + str(self.qmla_id) + "]"
-                         )
-        if not isinstance(to_print_list, list):
-            to_print_list = list(to_print_list)
-
-        print_strings = [str(s) for s in to_print_list]
-        to_print = " ".join(print_strings)
-        with open(self.log_file, 'a') as write_log_file:
-            print(identifier, str(to_print), file=write_log_file)
+    def log_print(
+        self,
+        to_print_list
+    ):
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list, 
+            log_file = self.log_file, 
+            log_identifier = 'ModelForStorage {}'.format(self.model_id)
+        )
 
     def model_update_learned_values(
         self,
@@ -981,20 +974,18 @@ class ModelInstanceForStorage():
             self.num_particles = learned_info['num_particles']
             self.num_experiments = learned_info['num_experiments']
             self.Times = list(learned_info['times'])
-            # should be final params from learning process
             self.final_learned_params = learned_info['final_params']
-            # TODO this won't work for multiple parameters
             self.model_terms_parameters_Final = np.array([[self.final_learned_params[0, 0]]])
-            self.SimOpNames = learned_info['sim_op_names']
+            # self.SimOpNames = learned_info['sim_op_names']
             # TODO this can be recreated from finalparams, but how for multiple
             # params?
             self.model_prior = learned_info['final_prior']
-            self.NormalizationRecord = learned_info['normalization_record']
+            self.model_normalization_record = learned_info['normalization_record']
             self.log_total_likelihod = learned_info['log_total_likelihood']
-            self.RawVolumeList = learned_info['volume_list']
+            self.raw_volume_list = learned_info['volume_list']
             self.volume_by_epoch = {}
-            for i in range(len(self.RawVolumeList)):
-                self.volume_by_epoch[i] = self.RawVolumeList[i]
+            for i in range(len(self.raw_volume_list)):
+                self.volume_by_epoch[i] = self.raw_volume_list[i]
 
             self.track_mean_params = np.array(learned_info['track_eval'])
             self.track_covariance_matrices = np.array(
@@ -1008,7 +999,7 @@ class ModelInstanceForStorage():
             # self.track_posterior_distMarginal = np.array(learned_info['track_posterior_marginal'])
 
             self.epochs_after_resampling = learned_info['resample_epochs']
-            self.QuadraticLosses = learned_info['quadratic_losses']
+            self.quadratic_losses_record = learned_info['quadratic_losses']
             self.learned_parameters_qhl = learned_info['learned_parameters']
             self.final_sigmas_qhl = learned_info['final_sigmas']
 
@@ -1029,13 +1020,13 @@ class ModelInstanceForStorage():
                 name=self.model_name
             )
 
-            self.Trackplot_parameter_estimates = {}
+            self.track_parameter_estimates = {}
             num_params = np.shape(self.track_mean_params)[1]
             max_exp = np.shape(self.track_mean_params)[0] - 1
             for i in range(num_params):
                 for term in self.learned_parameters_qhl.keys():
                     if self.learned_parameters_qhl[term] == self.track_mean_params[max_exp][i]:
-                        self.Trackplot_parameter_estimates[term] = self.track_mean_params[:, i]
+                        self.track_parameter_estimates[term] = self.track_mean_params[:, i]
 
             try:
                 self.particles = np.array(learned_info['particles'])
@@ -1046,7 +1037,7 @@ class ModelInstanceForStorage():
 
             sim_params = list(self.final_learned_params[:, 0])
             try:
-                self.LearnedHamiltonian = np.tensordot(
+                self.learned_hamiltonian = np.tensordot(
                     sim_params,
                     self.model_terms_matrices,
                     axes=1
@@ -1080,21 +1071,21 @@ class ModelInstanceForStorage():
     ):
         # TODO expectation_values dict only for |++> probe as is.
         # if probe is None and plot_probe_path is None:
-        #     probe  = expectation_values.n_qubit_plus_state(self.NumQubits)
+        #     probe  = expectation_values.n_qubit_plus_state(self.model_num_qubits)
         # else:
 
         #     plot_probe_dict = pickle.load(
         #         open(plot_probe_path, 'rb')
         #     )
-        #     probe = plot_probe_dict[self.NumQubits]
+        #     probe = plot_probe_dict[self.model_num_qubits]
 
-        probe = self.probes_for_plots[self.ProbeDimension]
+        probe = self.probes_for_plots[self.probe_num_qubits]
 
         # self.log_print(
         #     [
         #     "Computing expectation values.",
         #     "\nMeasurement Type:", self.measurement_class,
-        #     "\nLearnedHamiltonian", self.LearnedHamiltonian,
+        #     "\nLearnedHamiltonian", self.learned_hamiltonian,
         #     # "\nPlotProbePath:", plot_probe_path,
         #     "\nProbe:", probe,
         #     "\nTimes:", times
@@ -1111,7 +1102,7 @@ class ModelInstanceForStorage():
 
         for t in required_times:
             self.expectation_values[t] = self.growth_class.expectation_value(
-                ham=self.LearnedHamiltonian,
+                ham=self.learned_hamiltonian,
                 t=t,
                 state=probe,
                 log_file=self.log_file,
@@ -1154,7 +1145,7 @@ class ModelInstanceForStorage():
         exp_data = [
             self.experimental_measurements[t] for t in exp_times
         ]
-        probe = self.probes_for_plots[self.ProbeDimension]
+        probe = self.probes_for_plots[self.probe_num_qubits]
 
         datamean = np.mean(exp_data[0:max_data_idx])
         # datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
@@ -1165,7 +1156,7 @@ class ModelInstanceForStorage():
         self.true_exp_val_mean = datamean
         self.total_sum_of_squares = total_sum_of_squares
 
-        ham = self.LearnedHamiltonian
+        ham = self.learned_hamiltonian
         sum_of_residuals = 0
         available_expectation_values = sorted(
             list(self.expectation_values.keys()))
@@ -1256,8 +1247,8 @@ class ModelInstanceForStorage():
 
         # exp_data = exp_data[0::10]
         # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
-        # probe  = plot_probes[self.NumQubits]
-        probe = self.probes_for_plots[self.ProbeDimension]
+        # probe  = plot_probes[self.model_num_qubits]
+        probe = self.probes_for_plots[self.probe_num_qubits]
 
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum(
@@ -1311,7 +1302,7 @@ class ModelInstanceForStorage():
 #            ),
 # model_name=self.model_name, probe_dict = self.probes_system)    # probelist=self.true_model_constituent_operators,
 #        self.qinfer_updater = qi.SMCUpdater(self.qinfer_model, self.num_particles, self.model_prior, resample_thresh=self.qinfer_resampler_threshold , resampler = qi.LiuWestResampler(a=self.qinfer_resampler_a), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
-#        self.qinfer_updater.NormalizationRecord = self.NormalizationRecord
+#        self.qinfer_updater.model_normalization_record = self.model_normalization_record
 
 
 class ModelInstanceForComparison():
@@ -1414,7 +1405,7 @@ class ModelInstanceForComparison():
         self.model_prior = learned_model_info['final_prior']
         self.PosteriorMarginal = learned_model_info['posterior_marginal']
         self.initial_prior = learned_model_info['initial_prior']
-        self.NormalizationRecord = learned_model_info['normalization_record']
+        self.model_normalization_record = learned_model_info['normalization_record']
         self.log_total_likelihood = learned_model_info['log_total_likelihood']
         self.learned_parameters_qhl = learned_model_info['learned_parameters']
         self.final_sigmas_qhl = learned_model_info['final_sigmas']
@@ -1486,7 +1477,7 @@ class ModelInstanceForComparison():
                 ),
                 debug_resampling=False
             )
-            self.qinfer_updater._normalization_record = self.NormalizationRecord
+            self.qinfer_updater._normalization_record = self.model_normalization_record
             self.qinfer_updater._log_total_likelihood = self.log_total_likelihood
             time_taken = time.time() - time_s
             self.log_print(

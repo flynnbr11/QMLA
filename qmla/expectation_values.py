@@ -286,26 +286,26 @@ def n_qubit_hahn_evolution(
     log_file=None,
     log_identifier=None
 ):
-"""
-n qubits time evolution for hahn-echo measurement returning expectation value
+    """
+    n qubits time evolution for hahn-echo measurement returning expectation value
 
-:param ham: Hamiltonian needed for the time-evolution
-:type ham: np.array()
-:param t: Evolution time
-:type t: float()
-:param state: Initial state to evolve and measure on
-:type state: float()
-:param precision: (optional) chosen precision for expectation value, default 1e-10
-:type precision: float()
-:param log_file: (optional) path of the log file for logging errors
-:type log_file: str() 
-:param log_identifier: (optional) identifier for the log
-:type log_identifier: str()    
+    :param ham: Hamiltonian needed for the time-evolution
+    :type ham: np.array()
+    :param t: Evolution time
+    :type t: float()
+    :param state: Initial state to evolve and measure on
+    :type state: float()
+    :param precision: (optional) chosen precision for expectation value, default 1e-10
+    :type precision: float()
+    :param log_file: (optional) path of the log file for logging errors
+    :type log_file: str() 
+    :param log_identifier: (optional) identifier for the log
+    :type log_identifier: str()    
 
-:output: expectation value of the evolved state
+    :output: expectation value of the evolved state
 
 
-"""
+    """
 
     # print("n qubit hahn")
     # import qutip

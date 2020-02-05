@@ -180,7 +180,7 @@ def ExpectationValuesTrueSim(
             mod_id = model_ids[i]
             sim = qmd.model_name_id_map[mod_id]
             mod = qmd.get_model_storage_instance_by_id(mod_id)
-            sim_ham = mod.LearnedHamiltonian
+            sim_ham = mod.learned_hamiltonian
             times_learned = mod.Times
             sim_dim = database_framework.get_num_qubits(mod.model_name)
             # if plus_probe:
@@ -440,9 +440,9 @@ def plot_learned_models_dynamics(
         ############ Plot dynamics in left most column ############
         ############ --------------- ############
         if include_expec_vals is True:
-            ham = reduced.LearnedHamiltonian
+            ham = reduced.learned_hamiltonian
             dim = np.log2(np.shape(ham)[0])
-            probe = plot_probes[reduced.ProbeDimension]
+            probe = plot_probes[reduced.probe_num_qubits]
             # print(
             #     "[plot_learned_models_dynamics]",
             #     "\n\tModel ", reduced.model_name_latex,
@@ -1426,12 +1426,12 @@ def plot_quadratic_loss(
 
     for i in sorted(list(to_plot_quad_loss)):
         mod = qmd.get_model_storage_instance_by_id(i)
-        if len(mod.QuadraticLosses) > 0:
-            epochs = range(1, len(mod.QuadraticLosses) + 1)
+        if len(mod.quadratic_losses_record) > 0:
+            epochs = range(1, len(mod.quadratic_losses_record) + 1)
             model_name = mod.growth_class.latex_name(
                 name=qmd.model_name_id_map[i]
             )
-            ax.plot(epochs, mod.QuadraticLosses, label=str(model_name))
+            ax.plot(epochs, mod.quadratic_losses_record, label=str(model_name))
     ax.legend(bbox_to_anchor=(1, 1))
 
     ax.set_title(plot_title)

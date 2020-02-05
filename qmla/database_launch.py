@@ -244,7 +244,7 @@ def add_model(
         num_pars = op.num_constituents
         reduced_qml_instance = ModelInstanceForStorage(
             model_name=model_name,
-            sim_oplist=op.constituents_operators,
+            model_terms_matrices=op.constituents_operators,
             true_oplist=true_ops,
             true_params=true_params,
             modelID=int(modelID),
