@@ -98,7 +98,7 @@ def launch_db(
         'ModelID': [],
     })
 
-    modelID = int(0)
+    model_id = int(0)
 
     gen_list = list(new_model_branches.keys())
 
@@ -106,7 +106,7 @@ def launch_db(
         try_add_model = add_model(
             model_name=model_name,
             branchID=new_model_branches[model_name],
-            modelID=int(new_model_ids[model_name]),
+            model_id=int(new_model_ids[model_name]),
             running_database=db,
             model_lists=model_lists,
             true_op_name=true_op_name,
@@ -131,7 +131,7 @@ def launch_db(
             port_number=port_number
         )
         if try_add_model is True:
-            modelID += int(1)
+            model_id += int(1)
 
     return db, legacy_db, model_lists
 
@@ -141,7 +141,7 @@ def add_model(
     running_database,
     model_lists,
     true_op_name,
-    modelID,
+    model_id,
     log_file,
     redimensionalise=True,
     num_particles=2000,
@@ -186,7 +186,7 @@ def add_model(
 
     # Fix dimensions if model and true model are of different starting
     # dimension.
-    modelID = int(modelID)
+    model_id = int(model_id)
     alph_model_name = alph(model_name)
     model_num_qubits = get_num_qubits(model_name)
 
@@ -230,7 +230,7 @@ def add_model(
             [
                 "Model ", model_name,
                 " not previously considered -- adding.",
-                "ID:", modelID
+                "ID:", model_id
             ],
             log_file
         )
@@ -247,7 +247,7 @@ def add_model(
             model_terms_matrices=op.constituents_operators,
             true_oplist=true_ops,
             true_params=true_params,
-            modelID=int(modelID),
+            model_id=int(model_id),
             qid=qid,
             host_name=host_name,
             port_number=port_number,
@@ -261,7 +261,7 @@ def add_model(
             'Reduced_Model_Class_Instance': reduced_qml_instance,
             'Operator_Instance': op,
             'Epoch_Start': 0,  # TODO fill in
-            'ModelID': int(float(modelID)),
+            'ModelID': int(float(model_id)),
         })
 
         running_database.loc[num_rows] = running_db_new_row

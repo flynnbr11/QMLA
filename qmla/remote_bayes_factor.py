@@ -16,7 +16,7 @@ import sys as sys
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
-pickle.HIGHEST_PROTOCOL = 2
+pickle.HIGHEST_PROTOCOL = 3
 
 try:
     import qmla.redis_settings as rds
@@ -133,14 +133,14 @@ def remote_bayes_factor_calculation(
     else:
 
         model_a = QML.ModelInstanceForComparison(
-            modelID=model_a_id,
+            model_id=model_a_id,
             host_name=host_name,
             port_number=port_number,
             qid=qid,
             log_file=log_file
         )
         model_b = QML.ModelInstanceForComparison(
-            modelID=model_b_id,
+            model_id=model_b_id,
             host_name=host_name,
             port_number=port_number,
             qid=qid,

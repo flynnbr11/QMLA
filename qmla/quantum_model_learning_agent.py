@@ -31,7 +31,7 @@ import qmla.redis_settings as rds
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation
 from qmla.remote_model_learning import remote_learn_model_parameters
 
-pickle.HIGHEST_PROTOCOL = 2  # TODO if >python3, can use higher protocol
+pickle.HIGHEST_PROTOCOL = 3  # TODO if >python3, can use higher protocol
 plt.switch_backend('agg')
 
 __all__ = [
@@ -175,7 +175,7 @@ class QuantumModelLearningAgent():
         self.all_bayes_factors = {}
         self.bayes_factor_pair_computed = []
         self.model_name_id_map = {}
-        self.highest_model_id = 0  # so first created model gets modelID=0
+        self.highest_model_id = 0  # so first created model gets model_id=0
         self.models_branches = {}
         self.model_initial_branch = {}
         self.model_initial_ids = {}
@@ -667,7 +667,7 @@ class QuantumModelLearningAgent():
             use_exp_custom=self.use_custom_exponentiation,
             enable_sparse=self.enable_sparse_exponentiation,
             debug_directory=self.debug_directory,
-            modelID=self.model_count,
+            model_id=self.model_count,
             redimensionalise=False,
             qle=self.use_qle,
             host_name=self.redis_host_name,
@@ -921,11 +921,11 @@ class QuantumModelLearningAgent():
             db=self.db
         )
         if model_already_exists:
-            modelID = database_framework.model_id_from_name(
+            model_id = database_framework.model_id_from_name(
                 self.db,
                 name=model_name
             )
-            branchID = self.models_branches[modelID]
+            branchID = self.models_branches[model_id]
             if self.run_in_parallel and use_rq:
                 # i.e. use a job queue rather than sequentially doing it.
                 from rq import Connection, Queue, Worker
@@ -938,7 +938,7 @@ class QuantumModelLearningAgent():
                 queued_model = queue.enqueue(
                     remote_learn_model_parameters,
                     model_name,
-                    modelID,
+                    model_id,
                     growth_generator=self.branch_growth_rules[branchID],
                     branchID=branchID,
                     remote=True,
@@ -991,7 +991,7 @@ class QuantumModelLearningAgent():
                 self.qmla_core_data['probe_dict'] = self.probes_system
                 updated_model_info = remote_learn_model_parameters(
                     model_name,
-                    modelID,
+                    model_id,
                     growth_generator=self.branch_growth_rules[branchID],
                     branchID=branchID,
                     qmd_info=self.qmla_core_data,
@@ -2353,7 +2353,7 @@ class QuantumModelLearningAgent():
 
             # reduce learned info where appropriate
             reduced_champion_info['name'] = new_mod
-            reduced_champion_info['sim_op_names'] = reduced_mod_terms
+            reduced_champion_info['model_terms_names'] = reduced_mod_terms
             reduced_champion_info['final_cov_mat'] = new_cov_mat
             reduced_champion_info['final_params'] = final_params
             reduced_champion_info['learned_parameters'] = reduced_params
@@ -3065,7 +3065,7 @@ class QuantumModelLearningAgent():
                 db=self.db, name=self.true_model_name)
 
         qmla.analysis.plot_parameter_estimates(qmd=self,
-                                               modelID=model_id,
+                                               model_id=model_id,
                                                use_experimental_data=self.use_experimental_data,
                                                save_to_file=save_to_file
                                                )

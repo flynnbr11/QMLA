@@ -3013,12 +3013,12 @@ def fill_between_sigmas(
 
 def plot_parameter_estimates(
     qmd,
-    modelID,
+    model_id,
     use_experimental_data=False,
     save_to_file=None
 ):
     from matplotlib import cm
-    mod = qmd.get_model_storage_instance_by_id(modelID)
+    mod = qmd.get_model_storage_instance_by_id(model_id)
     name = mod.model_name
 
     if name not in list(qmd.model_name_id_map.values()):

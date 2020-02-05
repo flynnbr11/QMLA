@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append("..")
 import qmla
-pickle.HIGHEST_PROTOCOL = 2
+pickle.HIGHEST_PROTOCOL = 3
 
 # Parse arguments from bash
 parser = argparse.ArgumentParser(

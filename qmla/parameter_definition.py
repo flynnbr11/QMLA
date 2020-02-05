@@ -9,7 +9,7 @@ import qmla.database_framework as database_framework
 import qmla.prior_distributions as Distributions
 import qmla.get_growth_rule as get_growth_rule
 
-pickle.HIGHEST_PROTOCOL = 2
+pickle.HIGHEST_PROTOCOL = 3
 
 __all__ = [
     'create_qhl_params'

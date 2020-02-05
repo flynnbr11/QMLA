@@ -1,4 +1,15 @@
 from __future__ import print_function  # so print doesn't show brackets
+import qmla.redis_settings as rds
+import qmla.qinfer_model_interface as qml_qi
+from qmla.memory_tests import print_loc
+import qmla.model_naming as model_naming
+import qmla.logging
+import qmla.get_growth_rule as get_growth_rule
+import qmla.expectation_values as expectation_values
+import qmla.experimental_data_processing as expdt
+import qmla.prior_distributions as Distributions
+import qmla.database_framework as database_framework
+import qmla.analysis
 import numpy as np
 import scipy as sp
 import os
@@ -9,19 +20,8 @@ from psutil import virtual_memory
 import redis
 import pickle
 import matplotlib.pyplot as plt
-pickle.HIGHEST_PROTOCOL = 2
+pickle.HIGHEST_PROTOCOL = 3
 
-import qmla.analysis
-import qmla.database_framework as database_framework
-import qmla.prior_distributions as Distributions
-import qmla.experimental_data_processing as expdt
-import qmla.expectation_values as expectation_values
-import qmla.get_growth_rule as get_growth_rule
-import qmla.logging
-import qmla.model_naming as model_naming
-from qmla.memory_tests import print_loc
-import qmla.qinfer_model_interface as qml_qi
-import qmla.redis_settings as rds
 
 global print_mem_status
 global debug_log_print
@@ -96,17 +96,6 @@ def resource_allocation(
     return new_resources
 
 
-def time_seconds():
-    # return time in h:m:s format for logging.
-    import datetime
-    now = datetime.date.today()
-    hour = datetime.datetime.now().hour
-    minute = datetime.datetime.now().minute
-    second = datetime.datetime.now().second
-    time = str(str(hour) + ':' + str(minute) + ':' + str(second))
-    return time
-
-
 class ModelInstanceForLearning():
     """
     Class to learn individual model. Model name is given when initialised.
@@ -124,7 +113,7 @@ class ModelInstanceForLearning():
 
     def __init__(
         self,
-        modelID,
+        model_id,
         name,
         qid,
         log_file,
@@ -137,7 +126,7 @@ class ModelInstanceForLearning():
         **kwargs
     ):
         self.qmla_id = qid
-        self.model_id = int(modelID)
+        self.model_id = int(model_id)
         self.model_name = name
         self.log_file = log_file
         self.volume_by_epoch = np.array([])
@@ -145,10 +134,10 @@ class ModelInstanceForLearning():
         self.redis_port_number = port_number
 
         self.initialise_model_for_learning(
-            growth_generator = growth_generator,
-            model_terms_matrices = model_terms_matrices,
-            model_terms_parameters = model_terms_parameters,
-            model_terms_names = model_terms_names,
+            growth_generator=growth_generator,
+            model_terms_matrices=model_terms_matrices,
+            model_terms_parameters=model_terms_parameters,
+            model_terms_names=model_terms_names,
         )
 
     def log_print(
@@ -156,9 +145,9 @@ class ModelInstanceForLearning():
         to_print_list
     ):
         qmla.logging.print_to_log(
-            to_print_list = to_print_list, 
-            log_file = self.log_file, 
-            log_identifier = 'ModelForLearning {}'.format(self.model_id)
+            to_print_list=to_print_list,
+            log_file=self.log_file,
+            log_identifier='ModelForLearning {}'.format(self.model_id)
         )
 
     def initialise_model_for_learning(
@@ -172,8 +161,8 @@ class ModelInstanceForLearning():
         **kwargs
     ):
         rds_dbs = rds.databases_from_qmd_id(
-            self.redis_host, 
-            self.redis_port_number, 
+            self.redis_host,
+            self.redis_port_number,
             self.qmla_id
         )
         qmd_info_db = rds_dbs['qmd_info_db']
@@ -188,23 +177,23 @@ class ModelInstanceForLearning():
 
         try:
             self.growth_class = get_growth_rule.get_growth_generator_class(
-                growth_generation_rule = self.growth_rule_of_this_model,
-                use_experimental_data = self.use_experimental_data,
-                log_file = self.log_file
+                growth_generation_rule=self.growth_rule_of_this_model,
+                use_experimental_data=self.use_experimental_data,
+                log_file=self.log_file
             )
         except BaseException:
             raise
-            # self.growth_class = None
-
 
         if qmd_info['reallocate_resources'] == True:
 
             base_resources = qmd_info['base_resources']
             base_num_qubits = base_resources['num_qubits']
             base_num_terms = base_resources['num_terms']
-            this_model_num_qubits = database_framework.get_num_qubits(self.model_name)
+            this_model_num_qubits = database_framework.get_num_qubits(
+                self.model_name)
             this_model_num_terms = len(
-                database_framework.get_constituent_names_from_name(self.model_name)
+                database_framework.get_constituent_names_from_name(
+                    self.model_name)
             )
             max_num_params = self.growth_class.max_num_parameter_estimate
 
@@ -235,7 +224,6 @@ class ModelInstanceForLearning():
         self.qinfer_PGH_heuristic_exponent = qmd_info['pgh_exponent']
         self.qinfer_PGH_heuristic_increase_time = qmd_info['increase_pgh_time']
         self.store_particle_locations_and_weights = qmd_info['store_particles_weights']
-        # self.do_qhl_plots = qmd_info['qhl_plots']
         self.results_directory = qmd_info['results_directory']
         self.true_model_constituent_operators = qmd_info['true_oplist']
         self.true_model_params = qmd_info['true_params']
@@ -266,8 +254,9 @@ class ModelInstanceForLearning():
             term = individual_terms_in_name[i]
             term_mtx = database_framework.compute(term)
             if np.all(term_mtx == self.model_terms_matrices[i]) is False:
-                print("[QML] UNEQUAL SIM OP LIST / TERM MATRICES.")
-                print("==> INSPECT PRIORS ORDERING.")
+                # TODO make this raise an exception instead
+                print("[ModelInstanceForLearning] UNEQUAL LIST / TERM MATRICES.")
+                print("==> INSPECT ORDER OF PRIORS.")
                 self.log_print(
                     [
                         "Term", term,
@@ -276,8 +265,6 @@ class ModelInstanceForLearning():
                     ]
                 )
             elif term != self.model_terms_names[i]:
-                print("!!! Check log -- QML", self.model_name)
-
                 self.log_print(
                     [
                         "term {} != SimOpsNames[i] {}".format(
@@ -290,14 +277,12 @@ class ModelInstanceForLearning():
         print_loc(print_location=init_model_print_loc)
 
         num_params = len(self.model_terms_matrices)
-        log_identifier=str("QML " + str(self.model_id))
-        # self.model_priorSpecificTerms = qmd_info['prior_specific_terms']
+        log_identifier = str("QML " + str(self.model_id))
         self.model_prior = self.growth_class.get_prior(
             model_name=self.model_name,
             log_file=self.log_file,
-            log_identifier = log_identifier, 
+            log_identifier=log_identifier,
         )
-
         prior_dir = str(
             self.results_directory +
             'priors/QMD_{}/'.format(self.qmla_id)
@@ -307,8 +292,7 @@ class ModelInstanceForLearning():
             try:
                 os.makedirs(prior_dir)
             except BaseException:
-                # if already exists (ie created by another QMD since if test
-                # ran...)
+                # if already exists (ie created by another QMLA instance)
                 pass
         prior_file = str(
             prior_dir +
@@ -393,32 +377,19 @@ class ModelInstanceForLearning():
             num_experiments=self.num_experiments,
         )
         self.model_heuristic_class = self.model_heuristic.__class__.__name__
-
-        # if checkloss == True or self.check_quadratic_loss==True:
-        #     self.quadratic_losses = np.array([])
         self.quadratic_losses = []
         self.track_total_log_likelihood = np.array([])
         self.track_experimental_times = np.array([])  # only for debugging
         self.particles = np.array([])
         self.weights = np.array([])
         self.epochs_after_resampling = []
-        # self.ExperimentsHistory = np.array([])
-        # average and standard deviation at the final step of the parameters
-        # inferred distributions
-        self.final_learned_params = np.empty([len(self.model_terms_matrices), 2])
-        # print_loc(print_location=init_model_print_loc)
-        # self.log_print(['Initialization Ready'])
+        self.final_learned_params = np.empty(
+            [len(self.model_terms_matrices), 2])
 
     def update_model(
         self,
-        # n_experiments=None,
-        # sigma_threshold=10**-13,
-        checkloss=False #TODO is this needed?
+        checkloss=False  # TODO is this needed?
     ):
-        # self.num_experiments = n_experiments
-
-        # if self.check_quadratic_loss == True:
-        #     self.quadratic_losses = np.empty(self.num_experiments)
         self.covariances = np.empty(self.num_experiments)
         self.track_mean_params = [self.qinfer_updater.est_mean()]
         self.track_covariance_matrices = []
@@ -426,8 +397,8 @@ class ModelInstanceForLearning():
         self.track_posterior_dist = []
         self.track_prior_means = []
         self.track_prior_std_dev = []
-        # self.track_posterior_distMarginal = np.empty(self.num_experiments, self.NumParameters)
-        self.track_experimental_times = np.empty(self.num_experiments)  # only for debugging
+        self.track_experimental_times = np.empty(
+            self.num_experiments)  # only for debugging
 
         self.particles = np.empty([self.num_particles,
                                    len(self.model_terms_parameters[0]), self.num_experiments]
@@ -435,16 +406,6 @@ class ModelInstanceForLearning():
         self.weights = np.empty([self.num_particles, self.num_experiments])
         self.DistributionMeans = np.empty([self.num_experiments])
         self.DistributionStdDevs = np.empty([self.num_experiments])
-
-        # self.new_experiment = self.model_heuristic()
-        # This is the value of the Norm of the COvariance matrix which stops
-        # the IQLE
-        # self.sigma_threshold = sigma_threshold
-        # self.model_log_total_likelihood = []  # log_total_likelihood
-
-        # self.datum_gather_cumulative_time = 0
-        # self.update_cumulative_time = 0
-        # self.learned_est_means = {}
         self.true_model_params_dict = {}
 
         true_params_names = database_framework.get_constituent_names_from_name(
@@ -467,10 +428,7 @@ class ModelInstanceForLearning():
             int(self.num_experiments / 10),
             5
         )
-        # print("[QML] STARTING QHL UPDATES")
-        # true_params = np.array([[self.true_model_params[0]]])
         for istep in range(self.num_experiments):
-            # print("Epoch", istep)
             if (istep % print_frequency == 0):
                 # print so we can see how far along algorithm is.
                 self.log_print(
@@ -478,21 +436,20 @@ class ModelInstanceForLearning():
                         "Epoch", istep
                     ]
                 )
-
-            # print("[QML] Calling heuristic")
             if istep == 0:
                 param_estimates = self.qinfer_updater.est_mean()
             else:
                 param_estimates = self.track_mean_params[-1]
             self.new_experiment = self.model_heuristic(
-                test_param="from QML",
+                test_param="from Model class",
                 num_params=len(self.model_terms_names),
                 epoch_id=istep,
                 current_params=param_estimates
             )
             print_loc(global_print_loc)
             # TODO prefactor, if used, should be inside specific heuristic
-            self.new_experiment[0][0] = self.new_experiment[0][0] * self.qinfer_PGH_heuristic_factor
+            self.new_experiment[0][0] = self.new_experiment[0][0] * \
+                self.qinfer_PGH_heuristic_factor
             if self.use_experimental_data:
                 t = self.new_experiment[0][0]
                 nearest = expdt.nearestAvailableExpTime(
@@ -500,41 +457,22 @@ class ModelInstanceForLearning():
                     t=t
                 )
                 self.new_experiment[0][0] = nearest
-
-            # self.NumExperimentsToDate += 1
             print_loc(global_print_loc)
             if istep == 0:
                 print_loc(global_print_loc)
                 self.log_print(['Initial time selected > ',
                                 str(self.new_experiment[0][0])]
                                )
-
             self.track_experimental_times[istep] = self.new_experiment[0][0]
-
-            before_datum = time.time()
-
-            # self.log_print(
-            #    [
-            #    'Getting Datum',
-            #    '\nSimParams:', self.model_terms_parameters,
-            #    '\nExperiment:', self.new_experiment
-            #    ]
-            # )
 
             self.datum_from_experiment = self.qinfer_model.simulate_experiment(
                 self.model_terms_parameters,
                 self.new_experiment,
                 repeat=1
-            )  # TODO reconsider repeat number
-            # self.datum_from_experiment = 1
-            after_datum = time.time()
-            # self.datum_gather_cumulative_time += after_datum - before_datum
+            )  # TODO reconsider repeat number?
 
-            # exp_t = self.new_experiment[0][0]
-            before_upd = time.time()
             # Call updater to update distribution based on datum
             try:
-                # print("[QML] calling updater")
                 self.qinfer_updater.update(
                     self.datum_from_experiment,
                     self.new_experiment
@@ -551,28 +489,21 @@ class ModelInstanceForLearning():
                         str(e)
                     ]
                 )
-                print("\n\nEXITING; Inspect log\n\n")
+                print("\n\n[Model class] EXITING; Inspect log\n\n")
                 raise NameError("Qinfer update failure")
                 sys.exit()
-
-            after_upd = time.time()
-            # self.update_cumulative_time += after_upd - before_upd
 
             if self.qinfer_updater.just_resampled is True:
                 self.epochs_after_resampling.append(istep)
 
-            print_loc(global_print_loc)
-            # self.covmat = self.qinfer_updater.est_covariance_mtx()
             self.volume_by_epoch = np.append(
                 self.volume_by_epoch,
                 np.linalg.det(
                     sp.linalg.sqrtm(
-                        # self.covmat
                         self.qinfer_updater.est_covariance_mtx()
                     )  # TODO seems unnecessary to do this every epoch - every 10th would be enough for plot
                 )
             )
-
             self.track_mean_params.append(self.qinfer_updater.est_mean())
             self.track_param_dist_widths.append(
                 np.sqrt(
@@ -580,7 +511,8 @@ class ModelInstanceForLearning():
                 )
             )
             # TODO this doesn't seem necessary to store
-            self.track_covariance_matrices.append(self.qinfer_updater.est_covariance_mtx())
+            self.track_covariance_matrices.append(
+                self.qinfer_updater.est_covariance_mtx())
             prior_sample = self.qinfer_updater.sample(int(5))
 
             these_means = []
@@ -591,31 +523,23 @@ class ModelInstanceForLearning():
 
             self.track_posterior_dist.append(prior_sample)
             self.track_prior_means.append(these_means)
-            # TODO get this from self.qinfer_updater.est_mean()
             self.track_prior_std_dev.append(these_std)
-            # self.track_posterior_distMarginal.append(self.qinfer_updater.posterior_marginal())
-
-            print_loc(global_print_loc)
             self.covariances[istep] = np.linalg.norm(
                 self.qinfer_updater.est_covariance_mtx()
             )
-            print_loc(global_print_loc)
-            self.particles[:, :, istep] = self.qinfer_updater.particle_locations
-            #self.weights[:, istep] = self.qinfer_updater.particle_weights
-
-            self.NewEval = self.qinfer_updater.est_mean()
-            print_loc(global_print_loc)
+            # self.particles[:, :,
+                        #    istep] = self.qinfer_updater.particle_locations
+            # self.weights[:, istep] = self.qinfer_updater.particle_weights
 
             if (
                 checkloss == True
                 and
                 self.use_experimental_data == False
-                # and istep%10 == 0
             ):
                 quadratic_loss = 0
                 for param in all_params_for_q_loss:
                     if param in self.model_terms_names:
-                        learned_param = self.NewEval[param_indices[param]]
+                        learned_param = self.qinfer_updater.est_mean()[param_indices[param]]
                     else:
                         learned_param = 0
 
@@ -623,7 +547,6 @@ class ModelInstanceForLearning():
                         true_param = self.true_model_params_dict[param]
                     else:
                         true_param = 0
-                    # print("[QML] param:", param, "learned param:", learned_param, "\t true param:", true_param)
                     quadratic_loss += (learned_param - true_param)**2
                 self.quadratic_losses.append(quadratic_loss)
 
@@ -637,10 +560,6 @@ class ModelInstanceForLearning():
 
                     for iterator in range(len(self.final_learned_params)):
                         self.final_learned_params[iterator] = [
-                            # final params and sigmas
-                            # np.mean(self.particles[:,iterator,istep]),
-                            # TODO should this be gotten from updater.est_covariance_mtx()?
-                            # np.std(self.particles[:,iterator,istep])
                             self.qinfer_updater.est_mean(),
                             np.sqrt(np.diag(updater.est_covariance_mtx()))
                         ]
@@ -650,8 +569,9 @@ class ModelInstanceForLearning():
                     self.model_log_total_likelihood = (
                         self.qinfer_updater.log_total_likelihood
                     )
-                    # self.quadratic_losses=(np.resize(self.quadratic_losses, (1,istep)))[0]
-                    self.covariances = (np.resize(self.covariances, (1, istep)))[0]
+                    self.covariances = (
+                        np.resize(
+                            self.covariances, (1, istep)))[0]
                     self.particles = self.particles[:, :, 0:istep]
                     self.weights = self.weights[:, 0:istep]
                     self.track_experimental_times = self.track_experimental_times[0:istep]
@@ -676,11 +596,6 @@ class ModelInstanceForLearning():
                                     str(self.final_learned_params[iterator])]
                                    )
                 self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
-                # if checkloss == True:
-                #     self.quadratic_losses=(
-                #         (np.resize(self.quadratic_losses, (1,istep)))[0]
-                #     )
-
                 self.covariances = (np.resize(self.covariances, (1, istep)))[0]
                 self.particles = self.particles[:, :, 0:istep]
                 self.weights = self.weights[:, 0:istep]
@@ -698,18 +613,13 @@ class ModelInstanceForLearning():
                 )
                 self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
 
-                #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.qinfer_updater), '\t GenSim:', asizeof.asizeof(self.qinfer_model) ])
                 self.learned_parameters_qhl = {}
                 self.final_sigmas_qhl = {}
                 cov_mat = self.qinfer_updater.est_covariance_mtx()
                 for iterator in range(len(self.final_learned_params)):
                     self.final_learned_params[iterator] = [
-                        #                        np.mean(self.particles[:,iterator,istep-1]),
                         self.qinfer_updater.est_mean()[iterator],
                         np.sqrt(cov_mat[iterator][iterator])
-                        # np.std(self.particles[:,iterator,istep-1])
-                        # self.qinfer_updater.est_mean(),
-                        # np.sqrt(np.diag(updater.est_covariance_mtx()))
                     ]
                     self.log_print([
                         'Final Parameters mean and stdev (term ',
@@ -743,33 +653,23 @@ class ModelInstanceForLearning():
         learned_info['data_record'] = self.qinfer_updater.data_record
         learned_info['name'] = self.model_name
         learned_info['model_id'] = self.model_id
-        # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['updater'] = pickle.dumps(self.qinfer_updater, protocol=2)
-        # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['final_prior'] = self.qinfer_updater.prior
         learned_info['initial_prior'] = self.initial_prior
-        learned_info['sim_op_names'] = self.model_terms_names
+        learned_info['model_terms_names'] = self.model_terms_names
         learned_info['final_cov_mat'] = self.qinfer_updater.est_covariance_mtx()
         learned_info['est_mean'] = self.qinfer_updater.est_mean()
-        """
-        1st is still the initial prior!
-        that object does not get updated by the learning!
-        modify e.g. using the functions defined in /QML_lib/Distrib.py
-        2nd is fine
-        """
-
         learned_info['posterior_marginal'] = all_post_margs
         learned_info['initial_params'] = self.model_terms_parameters
         learned_info['volume_list'] = self.volume_by_epoch
-        learned_info['track_eval'] = self.track_mean_params
+        learned_info['track_mean_params'] = self.track_mean_params
         learned_info['track_cov_matrices'] = self.track_covariance_matrices
         learned_info['track_param_sigmas'] = self.track_param_dist_widths
         learned_info['track_posterior'] = self.track_posterior_dist
         # repeat of track param sigmas?
         learned_info['track_prior_means'] = self.track_prior_means
         learned_info['track_prior_std_devs'] = self.track_prior_std_dev
-        # learned_info['track_posterior_marginal'] = self.track_posterior_distMarginal
-        learned_info['resample_epochs'] = self.epochs_after_resampling
+        learned_info['epochs_after_resampling'] = self.epochs_after_resampling
         learned_info['quadratic_losses'] = self.quadratic_losses
         learned_info['learned_parameters'] = self.learned_parameters_qhl
         learned_info['final_sigmas'] = self.final_sigmas_qhl
@@ -787,49 +687,12 @@ class ModelInstanceForLearning():
             )
             learned_info['particles'] = self.particles
             learned_info['weights'] = self.weights
-
         return learned_info
 
-    # def store_particles(self, debug_dir=None):
-    #     if debug_dir is not None:
-    #         save_dir = debug_dir
-    #     elif self.debug_directory is not None:
-    #         save_dir = self.debug_directory
-    #     else:
-    #         self.log_print([
-    #             "Need to pass debug_dir to QML.debug_save function"]
-    #         )
-    #         return False
-    #     if not os.path.exists(save_dir):
-    #         os.makedirs(save_dir)
-
-    #     save_file = save_dir + '/particles_mod_' + str(self.model_id) + '.dat'
-
-    #     particle_file = open(save_file, 'w')
-    #     particle_file.write("\n".join(str(elem) for elem in self.particles.T))
-    #     particle_file.close()
-
-    # def store_covariances(self, debug_dir=None):
-    #     if debug_dir is not None:
-    #         save_dir = debug_dir
-    #     elif self.debug_directory is not None:
-    #         save_dir = self.debug_directory
-    #     else:
-    #         self.log_print(
-    #             ["Need to pass debug_dir to QML.debug_save function"])
-    #         return False
-    #     if not os.path.exists(save_dir):
-    #         os.makedirs(save_dir)
-
-    #     save_file = save_dir + '/covariances_mod_' + str(self.model_id) + '.dat'
-    #     particle_file = open(save_file, 'w')
-    #     particle_file.write("\n".join(str(elem) for elem in self.covariances))
-    #     particle_file.close()
-
     def plot_distribution_progression(self,
-                                    renormalise=False,
-                                    save_to_file=None
-                                    ):
+                                      renormalise=False,
+                                      save_to_file=None
+                                      ):
         qmla.analysis.plot_distribution_progression_of_model(
             mod=self,
             num_steps_to_show=2,
@@ -859,11 +722,9 @@ class ModelInstanceForStorage():
     def __init__(
         self,
         model_name,
-        modelID,
+        model_id,
         model_terms_matrices,
-        qid=0,
-        # true_oplist,
-        # true_params,
+        qid,
         host_name='localhost',
         port_number=6379,
         log_file='QMD_log.log',
@@ -879,21 +740,16 @@ class ModelInstanceForStorage():
             self.qmla_id
         )
         qmd_info_db = rds_dbs['qmd_info_db']
-        #print("In reduced model. rds_dbs:", rds_dbs)
-      #  print("QMD INFO DB has type", type(qmd_info_db), "\n", qmd_info_db)
-
         self.model_name = model_name
-        self.model_id = modelID
+        self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
-        self.model_id = modelID
+        self.model_id = model_id
         qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
         self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
         self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
         self.measurement_class = qmd_info['measurement_type']
         self.experimental_measurements = qmd_info['experimental_measurements']
         self.use_experimental_data = qmd_info['use_experimental_data']
-        # self.num_particles = qmd_info['num_particles']
-        # self.num_experiments = qmd_info['num_experiments']
         self.probe_number = qmd_info['num_probes']
         self.qinfer_resampler_threshold = qmd_info['resampler_thresh']
         self.qinfer_resampler_a = qmd_info['resampler_a']
@@ -911,7 +767,8 @@ class ModelInstanceForStorage():
             'store_particles_weights'
         ]
         self.model_bayes_factors = {}
-        self.model_num_qubits = database_framework.get_num_qubits(self.model_name)
+        self.model_num_qubits = database_framework.get_num_qubits(
+            self.model_name)
         self.probe_num_qubits = self.model_num_qubits
         self.log_file = log_file
         self.expectation_values = {}
@@ -922,9 +779,9 @@ class ModelInstanceForStorage():
         to_print_list
     ):
         qmla.logging.print_to_log(
-            to_print_list = to_print_list, 
-            log_file = self.log_file, 
-            log_identifier = 'ModelForStorage {}'.format(self.model_id)
+            to_print_list=to_print_list,
+            log_file=self.log_file,
+            log_identifier='ModelForStorage {}'.format(self.model_id)
         )
 
     def model_update_learned_values(
@@ -959,7 +816,7 @@ class ModelInstanceForStorage():
                     learned_info = pickle.loads(
                         learned_models_info.get(model_id_str),
                         encoding='latin1'
-                    )  # TODO telling pickle which encoding was used, though I'm not sure why/where that encoding was given...
+                    )
                 except BaseException:
                     self.log_print(
                         [
@@ -975,10 +832,8 @@ class ModelInstanceForStorage():
             self.num_experiments = learned_info['num_experiments']
             self.times_learned_over = list(learned_info['times'])
             self.final_learned_params = learned_info['final_params']
-            self.model_terms_parameters_Final = np.array([[self.final_learned_params[0, 0]]])
-            # self.SimOpNames = learned_info['sim_op_names']
-            # TODO this can be recreated from finalparams, but how for multiple
-            # params?
+            self.model_terms_parameters_final = np.array(
+                [[self.final_learned_params[0, 0]]])
             self.model_prior = learned_info['final_prior']
             self.model_normalization_record = learned_info['normalization_record']
             self.log_total_likelihod = learned_info['log_total_likelihood']
@@ -987,18 +842,18 @@ class ModelInstanceForStorage():
             for i in range(len(self.raw_volume_list)):
                 self.volume_by_epoch[i] = self.raw_volume_list[i]
 
-            self.track_mean_params = np.array(learned_info['track_eval'])
+            self.track_mean_params = np.array(learned_info['track_mean_params'])
             self.track_covariance_matrices = np.array(
                 learned_info['track_cov_matrices'])
             self.track_param_dist_widths = np.array(
                 learned_info['track_param_sigmas'])
-            self.track_prior_means = np.array(learned_info['track_prior_means'])
-            self.track_posterior_dist = np.array(learned_info['track_posterior'])
+            self.track_prior_means = np.array(
+                learned_info['track_prior_means'])
+            self.track_posterior_dist = np.array(
+                learned_info['track_posterior'])
             self.track_prior_std_dev = np.array(
                 learned_info['track_prior_std_devs'])
-            # self.track_posterior_distMarginal = np.array(learned_info['track_posterior_marginal'])
-
-            self.epochs_after_resampling = learned_info['resample_epochs']
+            self.epochs_after_resampling = learned_info['epochs_after_resampling']
             self.quadratic_losses_record = learned_info['quadratic_losses']
             self.learned_parameters_qhl = learned_info['learned_parameters']
             self.final_sigmas_qhl = learned_info['final_sigmas']
@@ -1012,8 +867,7 @@ class ModelInstanceForStorage():
                     log_file=self.log_file
                 )
             except BaseException:
-                # raise
-                self.growth_class = None
+                raise
             self.model_heuristic_class = learned_info['heuristic']
 
             self.model_name_latex = self.growth_class.latex_name(
@@ -1059,43 +913,14 @@ class ModelInstanceForStorage():
                 ]
             )
 
-            # if self.model_id not in sorted(fitness_parameters.keys()):
-            #     fitness_parameters[self.model_id] = {}
-            # fitness_parameters[self.model_id]['r_squared'] =  0.75
-
     def compute_expectation_values(
         self,
         times=[],
-        # plot_probe_path = None,
-        # probe = None #  TODO generalise probe
     ):
-        # TODO expectation_values dict only for |++> probe as is.
-        # if probe is None and plot_probe_path is None:
-        #     probe  = expectation_values.n_qubit_plus_state(self.model_num_qubits)
-        # else:
-
-        #     plot_probe_dict = pickle.load(
-        #         open(plot_probe_path, 'rb')
-        #     )
-        #     probe = plot_probe_dict[self.model_num_qubits]
-
         probe = self.probes_for_plots[self.probe_num_qubits]
-
-        # self.log_print(
-        #     [
-        #     "Computing expectation values.",
-        #     "\nMeasurement Type:", self.measurement_class,
-        #     "\nLearnedHamiltonian", self.learned_hamiltonian,
-        #     # "\nPlotProbePath:", plot_probe_path,
-        #     "\nProbe:", probe,
-        #     "\nTimes:", times
-        #     ]
-        # )
-
         present_expec_val_times = sorted(
             list(self.expectation_values.keys())
         )
-
         required_times = sorted(
             list(set(times) - set(present_expec_val_times))
         )
@@ -1108,12 +933,6 @@ class ModelInstanceForStorage():
                 log_file=self.log_file,
                 log_identifier='[QML - compute expectation values]'
             )
-        # self.raw_expectation_values = np.array([
-        #     self.expectation_values[t] for t in required_times
-        # ])
-        # self.times = np.array(
-        #     sorted(list(self.expectation_times.keys()))
-        # )
 
     def r_squared(
         self,
@@ -1122,7 +941,6 @@ class ModelInstanceForStorage():
         min_time=0,
         max_time=None
     ):
-        # TODO recheck R squared functions eg which probe used
         self.log_print(
             [
                 "R squared function for", self.model_name
@@ -1146,10 +964,7 @@ class ModelInstanceForStorage():
             self.experimental_measurements[t] for t in exp_times
         ]
         probe = self.probes_for_plots[self.probe_num_qubits]
-
         datamean = np.mean(exp_data[0:max_data_idx])
-        # datavar = np.sum( (exp_data[0:max_data_idx] - datamean)**2  )
-
         total_sum_of_squares = 0
         for d in exp_data:
             total_sum_of_squares += (d - datamean)**2
@@ -1164,8 +979,6 @@ class ModelInstanceForStorage():
         chi_squared = 0
         self.r_squared_of_t = {}
         for t in exp_times:
-            # TODO if use_experimental_data is False, call full expectatino
-            # value function isntead
             if t in available_expectation_values:
                 sim = self.expectation_values[t]
             else:
@@ -1185,7 +998,7 @@ class ModelInstanceForStorage():
 
         if total_sum_of_squares == 0:
             print(
-                "[QML - r_squared] Total sum of squares is 0",
+                "[ModelForStorage - r_squared] Total sum of squares is 0",
                 total_sum_of_squares)
             print("data mean:", datamean)
             print("d:", d)
@@ -1208,9 +1021,8 @@ class ModelInstanceForStorage():
         times=None,
         min_time=0,
         max_time=None,
-        num_points=10  # maximum number of epochs to take R^2 at
+        num_points=10 
     ):
-        # TODO recheck R squared functions eg which probe used
         self.log_print(
             [
                 "R squared by epoch function for",
@@ -1244,17 +1056,11 @@ class ModelInstanceForStorage():
             self.experimental_measurements[t]
             for t in exp_times
         ]
-
-        # exp_data = exp_data[0::10]
-        # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise
-        # probe  = plot_probes[self.model_num_qubits]
         probe = self.probes_for_plots[self.probe_num_qubits]
-
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum(
             (exp_data[0:max_data_idx] - datamean)**2
         )
-
         r_squared_by_epoch = {}
 
         # only use subset of epochs in case there are a large
@@ -1295,16 +1101,6 @@ class ModelInstanceForStorage():
         return r_squared_by_epoch
 
 
-#        self.qinfer_model = qml_qi.qinfer_model_interface(oplist=self.model_terms_matrices, modelparams=self.model_terms_parameters_Final, true_oplist = self.true_model_constituent_operators, trueparams = self.true_model_params, truename=self.true_model_name,             use_experimental_data = self.use_experimental_data,
-#            experimental_measurements = self.experimental_measurements,
-#            experimental_measurement_times=(
-#                self.experimental_measurement_times
-#            ),
-# model_name=self.model_name, probe_dict = self.probes_system)    # probelist=self.true_model_constituent_operators,
-#        self.qinfer_updater = qi.SMCUpdater(self.qinfer_model, self.num_particles, self.model_prior, resample_thresh=self.qinfer_resampler_threshold , resampler = qi.LiuWestResampler(a=self.qinfer_resampler_a), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
-#        self.qinfer_updater.model_normalization_record = self.model_normalization_record
-
-
 class ModelInstanceForComparison():
     """
     When Bayes factors are calculated remotely (ie on RQ workers),
@@ -1318,7 +1114,7 @@ class ModelInstanceForComparison():
 
     def __init__(
         self,
-        modelID,
+        model_id,
         host_name='localhost',
         port_number=6379,
         qid=0,
@@ -1340,7 +1136,7 @@ class ModelInstanceForComparison():
         self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
         self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
 
-        self.model_id = modelID
+        self.model_id = model_id
         self.num_particles = qmd_info['num_particles']
         self.probe_number = qmd_info['num_probes']
         self.PlotProbePath = qmd_info['probes_plot_file']
@@ -1359,7 +1155,7 @@ class ModelInstanceForComparison():
 
         # Get model specific data
         learned_models_info = rds_dbs['learned_models_info']
-        model_id_float = float(modelID)
+        model_id_float = float(model_id)
         model_id_str = str(model_id_float)
         try:
             learned_model_info = pickle.loads(
@@ -1378,30 +1174,16 @@ class ModelInstanceForComparison():
             ]
         )
         op = database_framework.Operator(self.model_name)
-        # todo, put this in a lighter function
         self.model_terms_matrices = op.constituents_operators
         self.times_learned_over = learned_model_info['times']
         self.final_learned_params = learned_model_info['final_params']
-        # TODO this won't work for multiple parameters
-        self.model_terms_parameters_Final = np.array(self.final_learned_params)
-        # self.model_terms_parameters_Final = np.array([[self.final_learned_params[0,0]]]) # TODO
-        # this won't work for multiple parameters
-
-        # print("[QML {}] \nSimParams_Final: {} \nSimOpList: {}".format(
-        #     self.model_name,
-        #     self.model_terms_parameters_Final,
-        #     self.model_terms_matrices
-        #     )
-        # )
-        # self.initial_params = learned_model_info['initial_params']
+        self.model_terms_parameters_final = np.array(self.final_learned_params)
         self.growth_rule_of_this_model = learned_model_info['growth_generator']
         self.growth_class = get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.growth_rule_of_this_model,
             use_experimental_data=self.use_experimental_data,
             log_file=self.log_file
         )
-        # TODO this can be recreated from finalparams, but how for multiple
-        # params?
         self.model_prior = learned_model_info['final_prior']
         self.posterior_marginal = learned_model_info['posterior_marginal']
         self.initial_prior = learned_model_info['initial_prior']
@@ -1414,7 +1196,7 @@ class ModelInstanceForComparison():
 
         self.qinfer_model = qml_qi.QInferModelQML(
             oplist=self.model_terms_matrices,
-            modelparams=self.model_terms_parameters_Final,
+            modelparams=self.model_terms_parameters_final,
             true_oplist=self.true_model_constituent_operators,
             trueparams=self.true_model_params,
             truename=self.true_model_name,
@@ -1433,44 +1215,18 @@ class ModelInstanceForComparison():
             log_identifier=log_identifier
         )
 
-        # recreate prior using final params instead of pickling
-
-        # Plot posterior distribution after learning.
-        # model_terms = database_framework.get_constituent_names_from_name(
-        #     self.model_name
-        # )
-        # model_name_individual_terms = [
-        #     self.growth_class.latex_name(t)
-        #     for t in model_terms
-        # ]
-
-        # Distributions.plot_prior(
-        #     model_name = self.model_name,
-        #     model_name_individual_terms = model_name_individual_terms,
-        #     prior = posterior_distribution,
-        #     plot_file = str(
-        #         self.results_directory
-        #         + '/priors/posterior_{}_{}.png'.format(
-        #             self.qmla_id,
-        #             int(self.model_id)
-        #         )
-        #     )
-        # )
         self.reconstruct_updater = True
         time_s = time.time()
         if self.reconstruct_updater == True:
             posterior_distribution = qi.MultivariateNormalDistribution(
-                # final_params,
                 learned_model_info['est_mean'],
                 self.covariance_mtx_final
-                # final_cov_mat
             )
 
             self.qinfer_updater = qi.SMCUpdater(
                 model=self.qinfer_model,
                 n_particles=self.num_particles,
                 prior=posterior_distribution,
-                # prior = self.model_prior,
                 resample_thresh=self.qinfer_resampler_threshold,
                 resampler=qi.LiuWestResampler(
                     a=self.qinfer_resampler_a
@@ -1513,21 +1269,7 @@ class ModelInstanceForComparison():
         to_print_list
     ):
         qmla.logging.print_to_log(
-            to_print_list = to_print_list, 
-            log_file = self.log_file, 
-            log_identifier = 'ModelForComparison {}'.format(self.model_id)
+            to_print_list=to_print_list,
+            log_file=self.log_file,
+            log_identifier='ModelForComparison {}'.format(self.model_id)
         )
-
-
-    # def log_print(self, to_print_list):
-    #     identifier = str(str(time_seconds()) +
-    #                      "[QML:Bayes " + str(self.model_id) +
-    #                      "; QMD " + str(self.qmla_id) + "]"
-    #                      )
-    #     if not isinstance(to_print_list, list):
-    #         to_print_list = list(to_print_list)
-
-    #     print_strings = [str(s) for s in to_print_list]
-    #     to_print = " ".join(print_strings)
-    #     with open(self.log_file, 'a') as write_log_file:
-    #         print(identifier, str(to_print), file=write_log_file)

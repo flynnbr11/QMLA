@@ -17,7 +17,7 @@ import random
 from psutil import virtual_memory
 import json  # possibly worth a different serialization if pickle is very slow
 import pickle
-pickle.HIGHEST_PROTOCOL = 2
+pickle.HIGHEST_PROTOCOL = 3
 import redis
 
 import qmla.database_framework as database_framework
@@ -42,7 +42,7 @@ def time_seconds():
 
 def remote_learn_model_parameters(
     name,
-    modelID,
+    model_id,
     branchID,
     growth_generator,
     qmd_info=None,
@@ -66,7 +66,7 @@ def remote_learn_model_parameters(
     def log_print(to_print_list):
         identifier = str(
             str(time_seconds()) +
-            " [RQ Learn " + str(modelID) + "]"
+            " [RQ Learn " + str(model_id) + "]"
         )
         if not isinstance(to_print_list, list):
             to_print_list = list(to_print_list)
@@ -80,7 +80,7 @@ def remote_learn_model_parameters(
                   )    
 
     log_print(['Starting for model:', name])
-    print("QHL", modelID, ":", name)
+    print("QHL", model_id, ":", name)
 
     time_start = time.time()
     # Get params from qmd_info
@@ -153,7 +153,7 @@ def remote_learn_model_parameters(
         probe_dict=probe_dict,
         qid=qid,
         log_file=log_file,
-        modelID=modelID,
+        model_id=model_id,
         growth_generator=growth_generator,
         model_terms_matrices=op.constituents_operators,
         model_terms_parameters=[sim_pars],
@@ -198,7 +198,7 @@ def remote_learn_model_parameters(
         log_print(
             [
                 "QHL failed for model id {}. Setting job failure database_framework.".format(
-                    modelID)
+                    model_id)
             ]
         )
         any_job_failed_db.set('Status', 1)
@@ -206,7 +206,7 @@ def remote_learn_model_parameters(
         log_print(
             [
                 "QHL failed for model id {}. Setting job failure database_framework.".format(
-                    modelID)
+                    model_id)
             ]
         )
         any_job_failed_db.set('Status', 1)
@@ -222,7 +222,7 @@ def remote_learn_model_parameters(
         #             "{}/plots/qmd_{}_qml_{}.p".format(
         #                 results_directory,
         #                 qid,
-        #                 modelID
+        #                 model_id
         #             )
         #         ),
         #         "wb"
@@ -261,26 +261,26 @@ def remote_learn_model_parameters(
     # not entirely clear why this encoding is used
     try:
         learned_models_info.set(
-            str(modelID),
+            str(model_id),
             compressed_info
         )
         log_print(
             [
                 "Redis learned_models_info added to db for model:",
-                str(modelID)
+                str(model_id)
             ]
         )
     except BaseException:
         log_print(
             [
                 "Failed to add learned_models_info for model:",
-                modelID
+                model_id
             ]
         )
     active_branches_learning_models.incr(int(branchID), 1)
     time_end = time.time()
-    log_print(["Redis SET learned_models_ids:", modelID, "; set True"])
-    learned_models_ids.set(str(modelID), 1)
+    log_print(["Redis SET learned_models_ids:", model_id, "; set True"])
+    learned_models_ids.set(str(model_id), 1)
 
     if remote:
         del updated_model_info
