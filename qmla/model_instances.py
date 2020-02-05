@@ -339,7 +339,7 @@ class ModelInstanceForLearning():
                 plot_file=prior_file,
             )
 
-        self.GenSimModel = qml_qi.QInferModelQML(
+        self.qinfer_model = qml_qi.QInferModelQML(
             oplist=self.model_terms_matrices,
             modelparams=self.model_terms_parameters,
             true_oplist=self.true_model_constituent_operators,
@@ -369,7 +369,7 @@ class ModelInstanceForLearning():
         )
 
         self.qinfer_updater = qi.SMCUpdater(
-            self.GenSimModel,
+            self.qinfer_model,
             self.num_particles,
             self.model_prior,
             resample_thresh=self.qinfer_resampler_threshold,
@@ -377,38 +377,38 @@ class ModelInstanceForLearning():
             debug_resampling=False
         )
 
-        self.InitialPrior = []
+        self.initial_prior = []
         for i in range(len(self.model_terms_parameters[0])):
-            self.InitialPrior.append(
+            self.initial_prior.append(
                 self.qinfer_updater.posterior_marginal(idx_param=i)
             )
 
-        self.Inv_Field = [
+        self.inversion_field = [
             item[0]
             for item
-            in self.GenSimModel.expparams_dtype[1:]
+            in self.qinfer_model.expparams_dtype[1:]
         ]
 
-        self.Heuristic = self.growth_class.heuristic(
+        self.model_heuristic = self.growth_class.model_heuristic_function(
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
-            inv_field=self.Inv_Field,
+            inv_field=self.inversion_field,
             increase_time=self.qinfer_PGH_heuristic_increase_time,
             pgh_exponent=self.qinfer_PGH_heuristic_exponent,
             time_list=self.times_to_plot,
             num_experiments=self.num_experiments,
         )
-        self.HeuristicType = self.Heuristic.__class__.__name__
+        self.model_heuristic_class = self.model_heuristic.__class__.__name__
 
         # if checkloss == True or self.check_quadratic_loss==True:
-        #     self.QLosses = np.array([])
-        self.QLosses = []
-        self.TrackLogTotLikelihood = np.array([])
-        self.TrackTime = np.array([])  # only for debugging
+        #     self.quadratic_losses = np.array([])
+        self.quadratic_losses = []
+        self.track_total_log_likelihood = np.array([])
+        self.track_experimental_times = np.array([])  # only for debugging
         self.Particles = np.array([])
         self.Weights = np.array([])
         self.ResampleEpochs = []
-        # self.Experiment = self.Heuristic()
+        # self.Experiment = self.model_heuristic()
         self.ExperimentsHistory = np.array([])
         # average and standard deviation at the final step of the parameters
         # inferred distributions
@@ -425,7 +425,7 @@ class ModelInstanceForLearning():
         # self.num_experiments = n_experiments
 
         # if self.check_quadratic_loss == True:
-        #     self.QLosses = np.empty(self.num_experiments)
+        #     self.quadratic_losses = np.empty(self.num_experiments)
         self.Covars = np.empty(self.num_experiments)
         self.TrackEval = [self.qinfer_updater.est_mean()]
         self.TrackCovMatrices = []
@@ -434,7 +434,7 @@ class ModelInstanceForLearning():
         self.TrackPriorMeans = []
         self.TrackPriorStdDev = []
         # self.TrackPosteriorMarginal = np.empty(self.num_experiments, self.NumParameters)
-        self.TrackTime = np.empty(self.num_experiments)  # only for debugging
+        self.track_experimental_times = np.empty(self.num_experiments)  # only for debugging
 
         self.Particles = np.empty([self.num_particles,
                                    len(self.model_terms_parameters[0]), self.num_experiments]
@@ -443,7 +443,7 @@ class ModelInstanceForLearning():
         self.DistributionMeans = np.empty([self.num_experiments])
         self.DistributionStdDevs = np.empty([self.num_experiments])
 
-        # self.Experiment = self.Heuristic()
+        # self.Experiment = self.model_heuristic()
         # This is the value of the Norm of the COvariance matrix which stops
         # the IQLE
         self.SigmaThresh = sigma_threshold
@@ -492,7 +492,7 @@ class ModelInstanceForLearning():
                 param_estimates = self.qinfer_updater.est_mean()
             else:
                 param_estimates = self.TrackEval[-1]
-            self.Experiment = self.Heuristic(
+            self.Experiment = self.model_heuristic(
                 test_param="from QML",
                 num_params=len(self.model_terms_names),
                 epoch_id=istep,
@@ -517,7 +517,7 @@ class ModelInstanceForLearning():
                                 str(self.Experiment[0][0])]
                                )
 
-            self.TrackTime[istep] = self.Experiment[0][0]
+            self.track_experimental_times[istep] = self.Experiment[0][0]
 
             before_datum = time.time()
 
@@ -529,7 +529,7 @@ class ModelInstanceForLearning():
             #    ]
             # )
 
-            self.Datum = self.GenSimModel.simulate_experiment(
+            self.Datum = self.qinfer_model.simulate_experiment(
                 self.model_terms_parameters,
                 self.Experiment,
                 repeat=1
@@ -633,7 +633,7 @@ class ModelInstanceForLearning():
                         true_param = 0
                     # print("[QML] param:", param, "learned param:", learned_param, "\t true param:", true_param)
                     quadratic_loss += (learned_param - true_param)**2
-                self.QLosses.append(quadratic_loss)
+                self.quadratic_losses.append(quadratic_loss)
 
                 if False:  # can be reinstated to stop learning when volume converges
                     if self.debugSave:
@@ -660,11 +660,11 @@ class ModelInstanceForLearning():
                     self.LogTotLikelihood = (
                         self.qinfer_updater.log_total_likelihood
                     )
-                    # self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
+                    # self.quadratic_losses=(np.resize(self.quadratic_losses, (1,istep)))[0]
                     self.Covars = (np.resize(self.Covars, (1, istep)))[0]
                     self.Particles = self.Particles[:, :, 0:istep]
                     self.Weights = self.Weights[:, 0:istep]
-                    self.TrackTime = self.TrackTime[0:istep]
+                    self.track_experimental_times = self.track_experimental_times[0:istep]
                     break
 
             if self.Covars[istep] < self.SigmaThresh and False:
@@ -689,14 +689,14 @@ class ModelInstanceForLearning():
                                    )
                 self.LogTotLikelihood = self.qinfer_updater.log_total_likelihood
                 # if checkloss == True:
-                #     self.QLosses=(
-                #         (np.resize(self.QLosses, (1,istep)))[0]
+                #     self.quadratic_losses=(
+                #         (np.resize(self.quadratic_losses, (1,istep)))[0]
                 #     )
 
                 self.Covars = (np.resize(self.Covars, (1, istep)))[0]
                 self.Particles = self.Particles[:, :, 0:istep]
                 self.Weights = self.Weights[:, 0:istep]
-                self.TrackTime = self.TrackTime[0:istep]
+                self.track_experimental_times = self.track_experimental_times[0:istep]
 
                 break
 
@@ -718,7 +718,7 @@ class ModelInstanceForLearning():
                     ]
                 )
 
-                #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.qinfer_updater), '\t GenSim:', asizeof.asizeof(self.GenSimModel) ])
+                #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.qinfer_updater), '\t GenSim:', asizeof.asizeof(self.qinfer_model) ])
                 if self.debugSave:
                     self.debug_store()
 
@@ -752,7 +752,7 @@ class ModelInstanceForLearning():
                 self.log_print(["step ", istep])
                 self.log_print(["has params: ", self.NewEval])
                 self.log_print(["log total likelihood:",
-                                self.TrackLogTotLikelihood[-1]]
+                                self.track_total_log_likelihood[-1]]
                                )
 
 
@@ -769,7 +769,7 @@ class ModelInstanceForLearning():
             )
 
         learned_info = {}
-        learned_info['times'] = self.TrackTime
+        learned_info['times'] = self.track_experimental_times
         learned_info['final_params'] = self.FinalParams
         learned_info['normalization_record'] = self.qinfer_updater.normalization_record
         learned_info['log_total_likelihood'] = self.qinfer_updater.log_total_likelihood
@@ -780,7 +780,7 @@ class ModelInstanceForLearning():
         learned_info['updater'] = pickle.dumps(self.qinfer_updater, protocol=2)
         # TODO regenerate this from mean and std_dev instead of saving it
         learned_info['final_prior'] = self.qinfer_updater.prior
-        learned_info['initial_prior'] = self.InitialPrior
+        learned_info['initial_prior'] = self.initial_prior
         learned_info['sim_op_names'] = self.model_terms_names
         learned_info['final_cov_mat'] = self.qinfer_updater.est_covariance_mtx()
         learned_info['est_mean'] = self.qinfer_updater.est_mean()
@@ -803,14 +803,14 @@ class ModelInstanceForLearning():
         learned_info['track_prior_std_devs'] = self.TrackPriorStdDev
         # learned_info['track_posterior_marginal'] = self.TrackPosteriorMarginal
         learned_info['resample_epochs'] = self.ResampleEpochs
-        learned_info['quadratic_losses'] = self.QLosses
+        learned_info['quadratic_losses'] = self.quadratic_losses
         learned_info['learned_parameters'] = self.LearnedParameters
         learned_info['final_sigmas'] = self.FinalSigmas
         learned_info['cov_matrix'] = self.qinfer_updater.est_covariance_mtx()
         learned_info['num_particles'] = self.num_particles
         learned_info['num_experiments'] = self.num_experiments
         learned_info['growth_generator'] = self.growth_rule_of_this_model
-        learned_info['heuristic'] = self.HeuristicType
+        learned_info['heuristic'] = self.model_heuristic_class
         if self.store_particle_locations_and_weights:
             self.log_print(
                 [
@@ -827,10 +827,10 @@ class ModelInstanceForLearning():
     #     # Calcalate total log likelihood when the model finishes, compared with
     #     # all previously completed but still active models.
 
-    #     mytpool = np.setdiff1d(tpool, self.TrackTime[-stepnum - 1:-1])
+    #     mytpool = np.setdiff1d(tpool, self.track_experimental_times[-stepnum - 1:-1])
 
-    #     self.TrackLogTotLikelihood = np.append(
-    #         self.TrackLogTotLikelihood, LogL_UpdateCalc(self, tpool)
+    #     self.track_total_log_likelihood = np.append(
+    #         self.track_total_log_likelihood, LogL_UpdateCalc(self, tpool)
     #     )
 
     # def addBayesFactor(self, compared_with, bayes_factor):
@@ -1076,7 +1076,7 @@ class ModelInstanceForStorage():
             except BaseException:
                 # raise
                 self.growth_class = None
-            self.HeuristicType = learned_info['heuristic']
+            self.model_heuristic_class = learned_info['heuristic']
 
             self.model_name_latex = self.growth_class.latex_name(
                 name=self.model_name
@@ -1357,13 +1357,13 @@ class ModelInstanceForStorage():
         return r_squared_by_epoch
 
 
-#        self.GenSimModel = qml_qi.qinfer_model_interface(oplist=self.model_terms_matrices, modelparams=self.model_terms_parameters_Final, true_oplist = self.true_model_constituent_operators, trueparams = self.true_model_params, truename=self.true_model_name,             use_experimental_data = self.use_experimental_data,
+#        self.qinfer_model = qml_qi.qinfer_model_interface(oplist=self.model_terms_matrices, modelparams=self.model_terms_parameters_Final, true_oplist = self.true_model_constituent_operators, trueparams = self.true_model_params, truename=self.true_model_name,             use_experimental_data = self.use_experimental_data,
 #            experimental_measurements = self.experimental_measurements,
 #            experimental_measurement_times=(
 #                self.experimental_measurement_times
 #            ),
 # model_name=self.model_name, probe_dict = self.probes_system)    # probelist=self.true_model_constituent_operators,
-#        self.qinfer_updater = qi.SMCUpdater(self.GenSimModel, self.num_particles, self.model_prior, resample_thresh=self.qinfer_resampler_threshold , resampler = qi.LiuWestResampler(a=self.qinfer_resampler_a), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
+#        self.qinfer_updater = qi.SMCUpdater(self.qinfer_model, self.num_particles, self.model_prior, resample_thresh=self.qinfer_resampler_threshold , resampler = qi.LiuWestResampler(a=self.qinfer_resampler_a), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
 #        self.qinfer_updater.NormalizationRecord = self.NormalizationRecord
 
 
@@ -1466,7 +1466,7 @@ class ModelInstanceForComparison():
         # params?
         self.model_prior = learned_model_info['final_prior']
         self.PosteriorMarginal = learned_model_info['posterior_marginal']
-        self.InitialPrior = learned_model_info['initial_prior']
+        self.initial_prior = learned_model_info['initial_prior']
         self.NormalizationRecord = learned_model_info['normalization_record']
         self.log_total_likelihood = learned_model_info['log_total_likelihood']
         self.LearnedParameters = learned_model_info['learned_parameters']
@@ -1474,7 +1474,7 @@ class ModelInstanceForComparison():
         self.FinalCovarianceMatrix = learned_model_info['final_cov_mat']
         log_identifier = str("Bayes " + str(self.model_id))
 
-        self.GenSimModel = qml_qi.QInferModelQML(
+        self.qinfer_model = qml_qi.QInferModelQML(
             oplist=self.model_terms_matrices,
             modelparams=self.model_terms_parameters_Final,
             true_oplist=self.true_model_constituent_operators,
@@ -1529,7 +1529,7 @@ class ModelInstanceForComparison():
             )
 
             self.qinfer_updater = qi.SMCUpdater(
-                model=self.GenSimModel,
+                model=self.qinfer_model,
                 n_particles=self.num_particles,
                 prior=posterior_distribution,
                 # prior = self.model_prior,

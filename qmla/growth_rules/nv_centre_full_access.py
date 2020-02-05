@@ -41,7 +41,7 @@ class ExperimentFullAccessNV(
 
             # 'zTi'
         ]
-        self.heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         # self.max_num_qubits = 3

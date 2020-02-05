@@ -161,7 +161,7 @@ variables = vars(arguments)
 
 # variables['measurement_type'] = growth_class.measurement_type
 variables['expectation_value_func'] = growth_class.expectation_value_function.__name__
-variables['heuristic'] = growth_class.heuristic_function.__name__
+variables['heuristic'] = growth_class.model_heuristic_function.__name__
 variables['probe_generation_function'] = growth_class.probe_generation_function.__name__
 variables['plot_probe_generation_function'] = growth_class.plot_probe_generation_function.__name__
 

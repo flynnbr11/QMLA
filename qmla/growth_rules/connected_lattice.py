@@ -33,7 +33,7 @@ class ConnectedLattice(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.lattice_dimension = 2
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1

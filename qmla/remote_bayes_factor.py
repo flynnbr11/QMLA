@@ -357,7 +357,7 @@ def log_likelihood(
             exp,
             repeat=1
         )
-        # datum = model.GenSimModel.simulate_experiment(
+        # datum = model.qinfer_model.simulate_experiment(
         #     params_array,
         #     exp,
         #     repeat=1
@@ -365,7 +365,7 @@ def log_likelihood(
         """
         why updater.model ???
          this is non standard, compare e.g. with QML_lib/QML.py
-         >>>> self.Datum = self.GenSimModel.simulate_experiment
+         >>>> self.Datum = self.qinfer_model.simulate_experiment
         """
         # sum_data += datum
         # print("Upater")
@@ -376,8 +376,8 @@ def log_likelihood(
 
 
 def get_exp(model, time):
-    # gen = model.qinfer_updater.model # or gen=model.GenSimModel
-    gen = model.GenSimModel
+    # gen = model.qinfer_updater.model # or gen=model.qinfer_model
+    gen = model.qinfer_model
     exp = np.empty(
         len(time),
         dtype=gen.expparams_dtype
@@ -631,7 +631,7 @@ def plot_posterior_marginals(
         #     label='End BF',
         #     # alpha=0.5,
         # )
-        init_post_marg = model_a.InitialPrior[param_of_interest]
+        init_post_marg = model_a.initial_prior[param_of_interest]
         # plt.plot(
         #     init_post_marg[0],
         #     init_post_marg[1],

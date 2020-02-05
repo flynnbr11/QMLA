@@ -37,7 +37,7 @@ class ExperimentNVCentre(
             self.expectation_value_function = expectation_values.n_qubit_hahn_evolution
 
         # self.true_operator = 'xTiPPyTy'
-        self.heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.measurement_type = 'hahn'
 
         self.true_operator = 'xTiPPyTiPPzTiPPzTz'

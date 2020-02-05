@@ -2233,7 +2233,7 @@ class QuantumModelLearningAgent():
             'PValue': champ_model.p_value,
             'LearnedHamiltonian': champ_model.LearnedHamiltonian,
             'GrowthGenerator': champ_model.growth_rule_of_this_model,
-            'Heuristic': champ_model.HeuristicType,
+            'Heuristic': champ_model.model_heuristic_class,
             'ChampLatex': champ_model.model_name_latex,
             'TrueModel': database_framework.alph(self.true_model_name),
             'NumParamDifference': num_params_difference,
@@ -2551,7 +2551,7 @@ class QuantumModelLearningAgent():
             'p-value': mod.p_value,
             'LearnedHamiltonian': mod.LearnedHamiltonian,
             'GrowthGenerator': mod.growth_rule_of_this_model,
-            'Heuristic': mod.HeuristicType,
+            'Heuristic': mod.model_heuristic_class,
             'ChampLatex': mod.model_name_latex,
         }
 
@@ -2693,7 +2693,7 @@ class QuantumModelLearningAgent():
                 'Sensitivity': self.sensitivity,
                 'LearnedHamiltonian': mod.LearnedHamiltonian,
                 'GrowthGenerator': mod.growth_rule_of_this_model,
-                'Heuristic': mod.HeuristicType,
+                'Heuristic': mod.model_heuristic_class,
                 'ChampLatex': mod.model_name_latex
             }
             self.model_id_to_name_map = {}
