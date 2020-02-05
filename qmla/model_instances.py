@@ -23,11 +23,9 @@ from qmla.memory_tests import print_loc
 import qmla.qinfer_model_interface as qml_qi
 import qmla.redis_settings as rds
 
-global debug_print
 global print_mem_status
 global debug_log_print
 debug_log_print = True
-debug_print = False
 print_mem_status = True
 global_print_loc = False
 
@@ -291,11 +289,6 @@ class ModelInstanceForLearning():
         self.check_quadratic_loss = True
         print_loc(print_location=init_model_print_loc)
 
-        if debug_directory is not None:
-            self.debugSave = True
-            self.debug_directory = debug_directory
-        else:
-            self.debugSave = False
         num_params = len(self.model_terms_matrices)
         log_identifier=str("QML " + str(self.model_id))
         # self.model_priorSpecificTerms = qmd_info['prior_specific_terms']
@@ -635,8 +628,6 @@ class ModelInstanceForLearning():
                 self.quadratic_losses.append(quadratic_loss)
 
                 if False:  # can be reinstated to stop learning when volume converges
-                    if self.debugSave:
-                        self.debug_store()
                     self.log_print(['Final time selected > ',
                                     str(self.new_experiment[0][0])]
                                    )
@@ -668,8 +659,6 @@ class ModelInstanceForLearning():
 
             if self.covariances[istep] < self.sigma_threshold and False:
                 # can be reinstated to stop learning when volume converges
-                if self.debugSave:
-                    self.debug_store()
                 self.log_print(['Final time selected > ',
                                 str(self.new_experiment[0][0])]
                                )
@@ -710,9 +699,6 @@ class ModelInstanceForLearning():
                 self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
 
                 #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.qinfer_updater), '\t GenSim:', asizeof.asizeof(self.qinfer_model) ])
-                if self.debugSave:
-                    self.debug_store()
-
                 self.learned_parameters_qhl = {}
                 self.final_sigmas_qhl = {}
                 cov_mat = self.qinfer_updater.est_covariance_mtx()
@@ -736,16 +722,6 @@ class ModelInstanceForLearning():
                     self.final_sigmas_qhl[self.model_terms_names[iterator]] = (
                         self.final_learned_params[iterator][1]
                     )
-
-#                plt.savefig(posterior_plot,'posterior.png')
-
-            if debug_print:
-                self.log_print(["step ", istep])
-                self.log_print(["has params: ", self.NewEval])
-                self.log_print(["log total likelihood:",
-                                self.track_total_log_likelihood[-1]]
-                               )
-
 
     def learned_info_dict(self):
         """
@@ -814,67 +790,47 @@ class ModelInstanceForLearning():
 
         return learned_info
 
-    # def UpdateKLogTotLikelihood(self, epoch, tpool, stepnum):
-    #     # Calcalate total log likelihood when the model finishes, compared with
-    #     # all previously completed but still active models.
-
-    #     mytpool = np.setdiff1d(tpool, self.track_experimental_times[-stepnum - 1:-1])
-
-    #     self.track_total_log_likelihood = np.append(
-    #         self.track_total_log_likelihood, LogL_UpdateCalc(self, tpool)
-    #     )
-
-    # def addBayesFactor(self, compared_with, bayes_factor):
-    #     if compared_with in self.model_bayes_factors:
-    #         self.model_bayes_factors[compared_with].append(bayes_factor)
+    # def store_particles(self, debug_dir=None):
+    #     if debug_dir is not None:
+    #         save_dir = debug_dir
+    #     elif self.debug_directory is not None:
+    #         save_dir = self.debug_directory
     #     else:
-    #         self.model_bayes_factors[compared_with] = [bayes_factor]
+    #         self.log_print([
+    #             "Need to pass debug_dir to QML.debug_save function"]
+    #         )
+    #         return False
+    #     if not os.path.exists(save_dir):
+    #         os.makedirs(save_dir)
 
-    def store_particles(self, debug_dir=None):
-        if debug_dir is not None:
-            save_dir = debug_dir
-        elif self.debug_directory is not None:
-            save_dir = self.debug_directory
-        else:
-            self.log_print([
-                "Need to pass debug_dir to QML.debug_save function"]
-            )
-            return False
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
+    #     save_file = save_dir + '/particles_mod_' + str(self.model_id) + '.dat'
 
-        save_file = save_dir + '/particles_mod_' + str(self.model_id) + '.dat'
+    #     particle_file = open(save_file, 'w')
+    #     particle_file.write("\n".join(str(elem) for elem in self.particles.T))
+    #     particle_file.close()
 
-        particle_file = open(save_file, 'w')
-        particle_file.write("\n".join(str(elem) for elem in self.particles.T))
-        particle_file.close()
+    # def store_covariances(self, debug_dir=None):
+    #     if debug_dir is not None:
+    #         save_dir = debug_dir
+    #     elif self.debug_directory is not None:
+    #         save_dir = self.debug_directory
+    #     else:
+    #         self.log_print(
+    #             ["Need to pass debug_dir to QML.debug_save function"])
+    #         return False
+    #     if not os.path.exists(save_dir):
+    #         os.makedirs(save_dir)
 
-    def store_covariances(self, debug_dir=None):
-        if debug_dir is not None:
-            save_dir = debug_dir
-        elif self.debug_directory is not None:
-            save_dir = self.debug_directory
-        else:
-            self.log_print(
-                ["Need to pass debug_dir to QML.debug_save function"])
-            return False
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
+    #     save_file = save_dir + '/covariances_mod_' + str(self.model_id) + '.dat'
+    #     particle_file = open(save_file, 'w')
+    #     particle_file.write("\n".join(str(elem) for elem in self.covariances))
+    #     particle_file.close()
 
-        save_file = save_dir + '/covariances_mod_' + str(self.model_id) + '.dat'
-        particle_file = open(save_file, 'w')
-        particle_file.write("\n".join(str(elem) for elem in self.covariances))
-        particle_file.close()
-
-    def debug_store(self, debug_dir=None):  # Adjust what gets stored here
-        self.store_particles(debug_dir=debug_dir)
-        self.store_covariances(debug_dir=debug_dir)
-
-    def plotDistributionProgression(self,
+    def plot_distribution_progression(self,
                                     renormalise=False,
                                     save_to_file=None
                                     ):
-        qmla.analysis.plotDistributionProgressionQML(
+        qmla.analysis.plot_distribution_progression_of_model(
             mod=self,
             num_steps_to_show=2,
             show_means=True,

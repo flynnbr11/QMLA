@@ -880,7 +880,7 @@ def ExpectationValuesQHL_TrueModel(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-def plotDistributionProgression(
+def plot_distribution_progression(
     qmd,
     model_id=None, true_model=False,
     num_steps_to_show=2, show_means=True,
@@ -984,7 +984,7 @@ def plotDistributionProgression(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-def plotDistributionProgressionQML(
+def plot_distribution_progression_of_model(
     mod,
     num_steps_to_show=2,
     show_means=True,
@@ -1024,7 +1024,7 @@ def plotDistributionProgressionQML(
     final_colour = 'r'
     steps_to_show = sorted(steps_to_show)
     print(
-        "[plotDistributionProgression]",
+        "[plot_distribution_progression]",
         "num exp:", num_experiments,
         "increment:", increment,
         "steps to show", steps_to_show,
@@ -1044,7 +1044,7 @@ def plotDistributionProgressionQML(
 
     for i in steps_to_show:
         print(
-            "[plotDistributionProgression]",
+            "[plot_distribution_progression]",
             "i,", i
         )
 
@@ -1098,7 +1098,7 @@ def plotDistributionProgressionQML(
     #     ):
     #         # don't display identical distributions between steps
     #         print(
-    #             "[plotDistributionProgression]",
+    #             "[plot_distribution_progression]",
     #             "i,j:", i,j
     #         )
 

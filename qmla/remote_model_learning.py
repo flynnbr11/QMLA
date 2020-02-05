@@ -232,13 +232,13 @@ def remote_learn_model_parameters(
 
         try:
             if len(true_ops) == 1:  # TODO buggy
-                qml_instance.plotDistributionProgression(
+                qml_instance.plot_distribution_progression(
                     save_to_file=str(
                         plots_directory
                         + 'qhl_distribution_progression_' + str(long_id) + '.png')
                 )
 
-                qml_instance.plotDistributionProgression(
+                qml_instance.plot_distribution_progression(
                     renormalise=False,
                     save_to_file=str(
                         plots_directory
