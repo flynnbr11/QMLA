@@ -81,9 +81,11 @@ def default_expectation_value(
     :type ham: np.array()
     :param t: Evolution time
     :type t: float()
-    :param log_file: path of the log file for logging errors
+    :param state: Initial state to evolve and measure on
+    :type state: float()
+    :param log_file: (optional) path of the log file for logging errors
     :type log_file: str() 
-    :param log_identifier: identifier for the log
+    :param log_identifier: (optional) identifier for the log
     :type log_identifier: str()    
 
     :output: expectation value of the evolved state
@@ -128,6 +130,28 @@ def hahn_evolution(
     log_identifier=None
 ):
     """
+    This is the hahn echo evolution and expectation value function for QMLA.
+
+    longish description:
+    Returns the expectation value computed by evolving the input state with
+    the Hamiltonian corresponding to the Hahn eco evolution. NB: In this case, the assumption is that the 
+    value measured is 1 and the expectation value corresponds to the probability of
+    obtaining 1.
+
+    :param ham: Hamiltonian needed for the time-evolution
+    :type ham: np.array()
+    :param t: Evolution time
+    :type t: float()
+    :param state: Initial state to evolve and measure on
+    :type state: float()
+    :param precision: (optional) chosen precision for expectation value, default 1e-10
+    :type precision: float()
+    :param log_file: (optional) path of the log file for logging errors
+    :type log_file: str() 
+    :param log_identifier: (optional) identifier for the log
+    :type log_identifier: str()    
+
+    :output: expectation value of the evolved state
 
     """
     
@@ -227,10 +251,23 @@ def hahn_evolution(
 
 
 def sigmaz():
+    """
+    function that returns a Pauli z as numpy array
+
+    :output : PauliZ
+    """
+
     return np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]])
 
 
 def make_inversion_gate(num_qubits):
+    """
+    returns the inversion gate for the Hahn eco evolution as numpy array
+
+    :parameter num_qubits: size of the inversion gate required
+
+    :output : inversion gate
+    """
     from scipy import linalg
     hahn_angle = np.pi / 2
     hahn_gate = np.kron(
@@ -249,6 +286,27 @@ def n_qubit_hahn_evolution(
     log_file=None,
     log_identifier=None
 ):
+"""
+n qubits time evolution for hahn-echo measurement returning expectation value
+
+:param ham: Hamiltonian needed for the time-evolution
+:type ham: np.array()
+:param t: Evolution time
+:type t: float()
+:param state: Initial state to evolve and measure on
+:type state: float()
+:param precision: (optional) chosen precision for expectation value, default 1e-10
+:type precision: float()
+:param log_file: (optional) path of the log file for logging errors
+:type log_file: str() 
+:param log_identifier: (optional) identifier for the log
+:type log_identifier: str()    
+
+:output: expectation value of the evolved state
+
+
+"""
+
     # print("n qubit hahn")
     # import qutip
     import numpy as np
@@ -353,21 +411,26 @@ def partial_trace(
     reverse=True
 ):
     """
-    taken from https://github.com/Qiskit/qiskit-terra/blob/master/qiskit/tools/qi/qi.py#L177
-    Partial trace over subsystems of multi-partite matrix.
+    Returns the partial trace of mat over subsystems of multi-partite matrix.
+    
+
+    loghish description:
+    This function has been taken from https://github.com/Qiskit/qiskit-terra/blob/master/qiskit/tools/qi/qi.py#L177
     Note that subsystems are ordered as rho012 = rho0(x)rho1(x)rho2.
-    Args:
-        mat (matrix_like): a matrix NxN.
-        trace_systems (list(int)): a list of subsystems (starting from 0) to
-                                  trace over.
-        dimensions (list(int)): a list of the dimensions of the subsystems.
-                                If this is not set it will assume all
-                                subsystems are qubits.
-        reverse (bool): ordering of systems in operator.
-            If True system-0 is the right most system in tensor product.
-            If False system-0 is the left most system in tensor product.
-    Returns:
-        ndarray: A density matrix with the appropriate subsystems traced over.
+    
+    :param mat: a matrix NxN.
+    :type mat: np.array()
+    :param trace_systems: a list of subsystems (starting from 0) to trace over.
+    :type trace_system: list(int())
+    :param dimensions : (optional) a list of the dimensions of the subsystems. Default=None.
+    If this is not set it will assume all subsystems are qubits.
+    :type dimensions: list(int())
+    :param reverse: (optional) If True reverses the ordering of systems in operator. Default=True.
+    If True system-0 is the right most system in tensor product.
+    If False system-0 is the left most system in tensor product.
+    :type reverse: bool 
+
+    :output:  A density matrix with the appropriate subsystems traced over as ndarray.
     """
     if dimensions is None:  # compute dims if not specified
         length = np.shape(mat)[0]
@@ -411,12 +474,19 @@ def partial_trace_out_second_qubit(
     qubits_to_trace=[1]
 ):
 
-    # INPUTS
     """
-     - global_rho: numpy array of the original full density matrix
-     - qubits_to_trace: list of the qubit indexes to trace out from the full system
+    2 qubit version of the partial trace function.
+
+    :parameter global_rho: original full density matrix
+    :type global_rho: np.array()
+
+    :parameter qubits_to_trace: list containing the qubit index that we want to trace out from the full system
+    this can be [0] or [1]. Default=[1]
+    :type global_rho: list(int())
+
+    :output: matrix containing the traced out state as np.array()
     """
-    #print("trace fnc. global rho", global_rho)
+
     len_input_state = len(global_rho)
     input_num_qubits = int(np.log2(len_input_state))
 
@@ -445,6 +515,15 @@ def partial_trace_out_second_qubit(
 
 # for easy access to plus states to plot against
 def n_qubit_plus_state(num_qubits):
+    """
+    Returns the num_qubits pure quantum states where each of the qubits is in plus state as a np.array()
+
+    :parameter num_qubits: number of qubits 
+    :type num_qubits: int()
+
+    :output: pure quantum state of num_qubits in plus state.
+    """
+
     one_qubit_plus = (1 / np.sqrt(2) + 0j) * np.array([1, 1])
     plus_n = one_qubit_plus
     for i in range(num_qubits - 1):
