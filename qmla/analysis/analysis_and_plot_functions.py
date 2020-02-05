@@ -594,12 +594,12 @@ def plot_learned_models_dynamics(
                 term_positions[terms[t]] = t
                 term = terms[t]
                 param_position = term_positions[term]
-                param_estimates = reduced.TrackEval[:, param_position]
+                param_estimates = reduced.track_mean_params[:, param_position]
                 #std_dev = mod.cov_matrix[param_position,param_position]
-                # std_dev = reduced.TrackCovMatrices[
+                # std_dev = reduced.track_covariance_matrices[
                 #     :,param_position,param_position
                 # ]
-                std_dev = reduced.TrackParamSigmas[:, param_position]
+                std_dev = reduced.track_param_dist_widths[:, param_position]
                 param_estimate_by_term[term] = param_estimates
                 std_devs[term] = std_dev
 
@@ -1377,7 +1377,7 @@ def r_squared_from_epoch_list(
         for epoch in epochs:
             # Construct new Hamiltonian to get R^2 from
             # Hamiltonian corresponds to parameters at that epoch
-            ham = np.tensordot(mod.TrackEval[epoch], mod.model_terms_matrices, axes=1)
+            ham = np.tensordot(mod.track_mean_params[epoch], mod.model_terms_matrices, axes=1)
             sum_of_residuals = 0
             for t in exp_times:
                 sim = qmd.growth_class.expectation - value(
@@ -3039,9 +3039,9 @@ def plot_parameter_estimates(
         term_positions[terms[t]] = t
         term = terms[t]
         param_position = term_positions[term]
-        param_estimates = mod.TrackEval[:, param_position]
+        param_estimates = mod.track_mean_params[:, param_position]
         #std_dev = mod.cov_matrix[param_position,param_position]
-        std_dev = mod.TrackCovMatrices[:, param_position, param_position]
+        std_dev = mod.track_covariance_matrices[:, param_position, param_position]
         param_estimate_by_term[term] = param_estimates
         std_devs[term] = std_dev
 

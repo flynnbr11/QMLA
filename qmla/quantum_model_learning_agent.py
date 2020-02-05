@@ -2141,11 +2141,11 @@ class QuantumModelLearningAgent():
             self.ChampionName)
         self.LearnedParamsChamp = (
             self.get_model_storage_instance_by_id(
-                self.champion_model_id).LearnedParameters
+                self.champion_model_id).learned_parameters_qhl
         )
         self.champ_final_sigmas = (
             self.get_model_storage_instance_by_id(
-                self.champion_model_id).FinalSigmas
+                self.champion_model_id).final_sigmas_qhl
         )
         number_hamiltonians_to_exponentiate = (
             self.num_particles *
@@ -2218,7 +2218,7 @@ class QuantumModelLearningAgent():
             'Trackplot_parameter_estimates': champ_model.Trackplot_parameter_estimates,
             'TrackVolume': champ_model.volume_by_epoch,
             'TrackTimesLearned': champ_model.Times,
-            # 'TrackCovarianceMatrices' : champ_model.TrackCovMatrices,
+            # 'TrackCovarianceMatrices' : champ_model.track_covariance_matrices,
             # 'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
             #     plot_probes = self.probes_for_plots,
             #     times = expec_val_plot_times
@@ -2248,30 +2248,30 @@ class QuantumModelLearningAgent():
             [
                 "Checking reducibility of champ model:",
                 self.ChampionName,
-                "\nParams:\n", champ_mod.LearnedParameters,
-                "\nSigmas:\n", champ_mod.FinalSigmas
+                "\nParams:\n", champ_mod.learned_parameters_qhl,
+                "\nSigmas:\n", champ_mod.final_sigmas_qhl
             ]
         )
 
-        params = list(champ_mod.LearnedParameters.keys())
+        params = list(champ_mod.learned_parameters_qhl.keys())
         to_remove = []
         removed_params = {}
         idx = 0
         for p in params:
-            # if champ_mod.FinalSigmas[p] > champ_mod.LearnedParameters[p]:
+            # if champ_mod.final_sigmas_qhl[p] > champ_mod.learned_parameters_qhl[p]:
             #     to_remove.append(p)
             #     removed_params[p] = np.round(
-            #         champ_mod.LearnedParameters[p],
+            #         champ_mod.learned_parameters_qhl[p],
             #         2
             #     )
 
             if (
-                np.abs(champ_mod.LearnedParameters[p])
+                np.abs(champ_mod.learned_parameters_qhl[p])
                 < self.growth_class.learned_param_limit_for_negligibility
             ):
                 to_remove.append(p)
                 removed_params[p] = np.round(
-                    champ_mod.LearnedParameters[p], 2
+                    champ_mod.learned_parameters_qhl[p], 2
                 )
 
         if len(to_remove) >= len(params):
@@ -2335,8 +2335,8 @@ class QuantumModelLearningAgent():
             reduced_params = {}
             reduced_sigmas = {}
             for term in reduced_mod_terms:
-                reduced_params[term] = champ_mod.LearnedParameters[term]
-                reduced_sigmas[term] = champ_mod.FinalSigmas[term]
+                reduced_params[term] = champ_mod.learned_parameters_qhl[term]
+                reduced_sigmas[term] = champ_mod.final_sigmas_qhl[term]
 
             learned_params = [reduced_params[t] for t in reduced_mod_terms]
             sigmas = np.array([reduced_sigmas[t] for t in reduced_mod_terms])
@@ -2528,12 +2528,12 @@ class QuantumModelLearningAgent():
             ),
             'QuadraticLosses': mod.QuadraticLosses,
             'NameAlphabetical': database_framework.alph(mod.model_name),
-            'LearnedParameters': mod.LearnedParameters,
-            'FinalSigmas': mod.FinalSigmas,
+            'LearnedParameters': mod.learned_parameters_qhl,
+            'FinalSigmas': mod.final_sigmas_qhl,
             'Trackplot_parameter_estimates': mod.Trackplot_parameter_estimates,
             'TrackVolume': mod.volume_by_epoch,
             'TrackTimesLearned': mod.Times,
-            # 'TrackCovarianceMatrices' : mod.TrackCovMatrices,
+            # 'TrackCovarianceMatrices' : mod.track_covariance_matrices,
             'ExpectationValues': mod.expectation_values,
             # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
             #     times = expec_val_plot_times,
@@ -2671,12 +2671,12 @@ class QuantumModelLearningAgent():
                     times=expec_val_plot_times
                 ),
                 'NameAlphabetical': database_framework.alph(mod.model_name),
-                'LearnedParameters': mod.LearnedParameters,
-                'FinalSigmas': mod.FinalSigmas,
+                'LearnedParameters': mod.learned_parameters_qhl,
+                'FinalSigmas': mod.final_sigmas_qhl,
                 'Trackplot_parameter_estimates': mod.Trackplot_parameter_estimates,
                 'TrackVolume': mod.volume_by_epoch,
                 'TrackTimesLearned': mod.Times,
-                # 'TrackCovarianceMatrices' : mod.TrackCovMatrices,
+                # 'TrackCovarianceMatrices' : mod.track_covariance_matrices,
                 'ExpectationValues': mod.expectation_values,
                 # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
                 #     times = expec_val_plot_times,

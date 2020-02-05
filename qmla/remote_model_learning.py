@@ -183,9 +183,9 @@ def remote_learn_model_parameters(
     log_print(["Updating model."])
     try:
         update_timer_start = time.time()
-        qml_instance.UpdateModel(
-            n_experiments=num_experiments,
-            sigma_threshold=sigma_threshold
+        qml_instance.update_model(
+            # n_experiments=num_experiments,
+            # sigma_threshold=sigma_threshold
         )
         log_print(
             [

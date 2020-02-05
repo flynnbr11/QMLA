@@ -365,7 +365,7 @@ def log_likelihood(
         """
         why updater.model ???
          this is non standard, compare e.g. with QML_lib/QML.py
-         >>>> self.Datum = self.qinfer_model.simulate_experiment
+         >>>> self.datum_from_experiment = self.qinfer_model.simulate_experiment
         """
         # sum_data += datum
         # print("Upater")

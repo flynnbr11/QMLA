@@ -117,7 +117,7 @@ class ModelInstanceForLearning():
     the true model and other QMD parameters needed.
     A GenSimModel is set which details the SMCUpdater
     used to update the posterior distribution.
-    UpdateModel calls the updater in a loop of n_experiments.
+    update_model calls the updater in a loop of n_experiments.
     The final parameter estimates are set as the mean of the
     posterior distribution after n_experiments wherein n_particles
     are sampled per experiment (set in qmd_info).
@@ -246,6 +246,7 @@ class ModelInstanceForLearning():
         self.time_dependent_true_params = qmd_info['time_dep_true_params']
         self.num_time_dependent_true_params = qmd_info['num_time_dependent_true_params']
         self.use_qle = qmd_info['qle']
+        self.sigma_threshold = qmd_info['sigma_threshold']
         self.times_to_plot = qmd_info['plot_times']
         self.use_custom_exponentiation = qmd_info['use_exp_custom']
         self.exponentiation_tolerance = qmd_info['compare_linalg_exp_tol']
@@ -415,24 +416,24 @@ class ModelInstanceForLearning():
         # print_loc(print_location=init_model_print_loc)
         # self.log_print(['Initialization Ready'])
 
-    def UpdateModel(
+    def update_model(
         self,
-        n_experiments=None,
-        sigma_threshold=10**-13,
-        checkloss=True
+        # n_experiments=None,
+        # sigma_threshold=10**-13,
+        checkloss=False #TODO is this needed?
     ):
         # self.num_experiments = n_experiments
 
         # if self.check_quadratic_loss == True:
         #     self.quadratic_losses = np.empty(self.num_experiments)
-        self.Covars = np.empty(self.num_experiments)
-        self.TrackEval = [self.qinfer_updater.est_mean()]
-        self.TrackCovMatrices = []
-        self.TrackParamSigmas = []
-        self.TrackPosterior = []
-        self.TrackPriorMeans = []
-        self.TrackPriorStdDev = []
-        # self.TrackPosteriorMarginal = np.empty(self.num_experiments, self.NumParameters)
+        self.covariances = np.empty(self.num_experiments)
+        self.track_mean_params = [self.qinfer_updater.est_mean()]
+        self.track_covariance_matrices = []
+        self.track_param_dist_widths = []
+        self.track_posterior_dist = []
+        self.track_prior_means = []
+        self.track_prior_std_dev = []
+        # self.track_posterior_distMarginal = np.empty(self.num_experiments, self.NumParameters)
         self.track_experimental_times = np.empty(self.num_experiments)  # only for debugging
 
         self.particles = np.empty([self.num_particles,
@@ -442,17 +443,16 @@ class ModelInstanceForLearning():
         self.DistributionMeans = np.empty([self.num_experiments])
         self.DistributionStdDevs = np.empty([self.num_experiments])
 
-        # self.Experiment = self.model_heuristic()
+        # self.new_experiment = self.model_heuristic()
         # This is the value of the Norm of the COvariance matrix which stops
         # the IQLE
-        self.SigmaThresh = sigma_threshold
-        self.LogTotLikelihood = []  # log_total_likelihood
+        # self.sigma_threshold = sigma_threshold
+        # self.model_log_total_likelihood = []  # log_total_likelihood
 
-        self.datum_gather_cumulative_time = 0
-        self.update_cumulative_time = 0
-        self.learned_est_means = {}
-
-        self.true_model_paramsDict = {}
+        # self.datum_gather_cumulative_time = 0
+        # self.update_cumulative_time = 0
+        # self.learned_est_means = {}
+        self.true_model_params_dict = {}
 
         true_params_names = database_framework.get_constituent_names_from_name(
             self.true_model_name
@@ -461,7 +461,7 @@ class ModelInstanceForLearning():
             for i in range(len(true_params_names)):
                 term = true_params_names[i]
                 true_param_val = self.true_model_params[i]
-                self.true_model_paramsDict[term] = true_param_val
+                self.true_model_params_dict[term] = true_param_val
 
         all_params_for_q_loss = list(
             set(true_params_names).union(self.model_terms_names)
@@ -490,8 +490,8 @@ class ModelInstanceForLearning():
             if istep == 0:
                 param_estimates = self.qinfer_updater.est_mean()
             else:
-                param_estimates = self.TrackEval[-1]
-            self.Experiment = self.model_heuristic(
+                param_estimates = self.track_mean_params[-1]
+            self.new_experiment = self.model_heuristic(
                 test_param="from QML",
                 num_params=len(self.model_terms_names),
                 epoch_id=istep,
@@ -499,24 +499,24 @@ class ModelInstanceForLearning():
             )
             print_loc(global_print_loc)
             # TODO prefactor, if used, should be inside specific heuristic
-            self.Experiment[0][0] = self.Experiment[0][0] * self.qinfer_PGH_heuristic_factor
+            self.new_experiment[0][0] = self.new_experiment[0][0] * self.qinfer_PGH_heuristic_factor
             if self.use_experimental_data:
-                t = self.Experiment[0][0]
+                t = self.new_experiment[0][0]
                 nearest = expdt.nearestAvailableExpTime(
                     times=self.experimental_measurement_times,
                     t=t
                 )
-                self.Experiment[0][0] = nearest
+                self.new_experiment[0][0] = nearest
 
             # self.NumExperimentsToDate += 1
             print_loc(global_print_loc)
             if istep == 0:
                 print_loc(global_print_loc)
                 self.log_print(['Initial time selected > ',
-                                str(self.Experiment[0][0])]
+                                str(self.new_experiment[0][0])]
                                )
 
-            self.track_experimental_times[istep] = self.Experiment[0][0]
+            self.track_experimental_times[istep] = self.new_experiment[0][0]
 
             before_datum = time.time()
 
@@ -524,27 +524,27 @@ class ModelInstanceForLearning():
             #    [
             #    'Getting Datum',
             #    '\nSimParams:', self.model_terms_parameters,
-            #    '\nExperiment:', self.Experiment
+            #    '\nExperiment:', self.new_experiment
             #    ]
             # )
 
-            self.Datum = self.qinfer_model.simulate_experiment(
+            self.datum_from_experiment = self.qinfer_model.simulate_experiment(
                 self.model_terms_parameters,
-                self.Experiment,
+                self.new_experiment,
                 repeat=1
             )  # TODO reconsider repeat number
-            # self.Datum = 1
+            # self.datum_from_experiment = 1
             after_datum = time.time()
-            self.datum_gather_cumulative_time += after_datum - before_datum
+            # self.datum_gather_cumulative_time += after_datum - before_datum
 
-            # exp_t = self.Experiment[0][0]
+            # exp_t = self.new_experiment[0][0]
             before_upd = time.time()
             # Call updater to update distribution based on datum
             try:
                 # print("[QML] calling updater")
                 self.qinfer_updater.update(
-                    self.Datum,
-                    self.Experiment
+                    self.datum_from_experiment,
+                    self.new_experiment
                 )
             except RuntimeError as e:
                 import sys
@@ -563,7 +563,7 @@ class ModelInstanceForLearning():
                 sys.exit()
 
             after_upd = time.time()
-            self.update_cumulative_time += after_upd - before_upd
+            # self.update_cumulative_time += after_upd - before_upd
 
             if self.qinfer_updater.just_resampled is True:
                 self.epochs_after_resampling.append(istep)
@@ -580,14 +580,14 @@ class ModelInstanceForLearning():
                 )
             )
 
-            self.TrackEval.append(self.qinfer_updater.est_mean())
-            self.TrackParamSigmas.append(
+            self.track_mean_params.append(self.qinfer_updater.est_mean())
+            self.track_param_dist_widths.append(
                 np.sqrt(
                     np.diag(self.qinfer_updater.est_covariance_mtx())
                 )
             )
             # TODO this doesn't seem necessary to store
-            self.TrackCovMatrices.append(self.qinfer_updater.est_covariance_mtx())
+            self.track_covariance_matrices.append(self.qinfer_updater.est_covariance_mtx())
             prior_sample = self.qinfer_updater.sample(int(5))
 
             these_means = []
@@ -596,14 +596,14 @@ class ModelInstanceForLearning():
                 these_means.append(np.mean(prior_sample[:, i]))
                 these_std.append(np.std(prior_sample[:, i]))
 
-            self.TrackPosterior.append(prior_sample)
-            self.TrackPriorMeans.append(these_means)
+            self.track_posterior_dist.append(prior_sample)
+            self.track_prior_means.append(these_means)
             # TODO get this from self.qinfer_updater.est_mean()
-            self.TrackPriorStdDev.append(these_std)
-            # self.TrackPosteriorMarginal.append(self.qinfer_updater.posterior_marginal())
+            self.track_prior_std_dev.append(these_std)
+            # self.track_posterior_distMarginal.append(self.qinfer_updater.posterior_marginal())
 
             print_loc(global_print_loc)
-            self.Covars[istep] = np.linalg.norm(
+            self.covariances[istep] = np.linalg.norm(
                 self.qinfer_updater.est_covariance_mtx()
             )
             print_loc(global_print_loc)
@@ -627,7 +627,7 @@ class ModelInstanceForLearning():
                         learned_param = 0
 
                     if param in true_params_names:
-                        true_param = self.true_model_paramsDict[param]
+                        true_param = self.true_model_params_dict[param]
                     else:
                         true_param = 0
                     # print("[QML] param:", param, "learned param:", learned_param, "\t true param:", true_param)
@@ -638,7 +638,7 @@ class ModelInstanceForLearning():
                     if self.debugSave:
                         self.debug_store()
                     self.log_print(['Final time selected > ',
-                                    str(self.Experiment[0][0])]
+                                    str(self.new_experiment[0][0])]
                                    )
                     print('Exiting learning for Reaching Num. Prec. \
                          -  Iteration Number ' + str(istep)
@@ -656,25 +656,25 @@ class ModelInstanceForLearning():
                         print('Final Parameters mean and stdev:' +
                               str(self.final_learned_params[iterator])
                               )
-                    self.LogTotLikelihood = (
+                    self.model_log_total_likelihood = (
                         self.qinfer_updater.log_total_likelihood
                     )
                     # self.quadratic_losses=(np.resize(self.quadratic_losses, (1,istep)))[0]
-                    self.Covars = (np.resize(self.Covars, (1, istep)))[0]
+                    self.covariances = (np.resize(self.covariances, (1, istep)))[0]
                     self.particles = self.particles[:, :, 0:istep]
                     self.weights = self.weights[:, 0:istep]
                     self.track_experimental_times = self.track_experimental_times[0:istep]
                     break
 
-            if self.Covars[istep] < self.SigmaThresh and False:
+            if self.covariances[istep] < self.sigma_threshold and False:
                 # can be reinstated to stop learning when volume converges
                 if self.debugSave:
                     self.debug_store()
                 self.log_print(['Final time selected > ',
-                                str(self.Experiment[0][0])]
+                                str(self.new_experiment[0][0])]
                                )
                 self.log_print(['Exiting learning for Reaching Cov. \
-                    Norm. Thrshold of ', str(self.Covars[istep])]
+                    Norm. Thrshold of ', str(self.covariances[istep])]
                                )
                 self.log_print([' at Iteration Number ', str(istep)])
                 for iterator in range(len(self.final_learned_params)):
@@ -686,13 +686,13 @@ class ModelInstanceForLearning():
                     self.log_print(['Final Parameters mean and stdev:',
                                     str(self.final_learned_params[iterator])]
                                    )
-                self.LogTotLikelihood = self.qinfer_updater.log_total_likelihood
+                self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
                 # if checkloss == True:
                 #     self.quadratic_losses=(
                 #         (np.resize(self.quadratic_losses, (1,istep)))[0]
                 #     )
 
-                self.Covars = (np.resize(self.Covars, (1, istep)))[0]
+                self.covariances = (np.resize(self.covariances, (1, istep)))[0]
                 self.particles = self.particles[:, :, 0:istep]
                 self.weights = self.weights[:, 0:istep]
                 self.track_experimental_times = self.track_experimental_times[0:istep]
@@ -704,25 +704,17 @@ class ModelInstanceForLearning():
                 self.log_print(
                     [
                         'Final time selected >',
-                        str(self.Experiment[0][0])
+                        str(self.new_experiment[0][0])
                     ]
                 )
-                self.LogTotLikelihood = self.qinfer_updater.log_total_likelihood
-                #from pympler import asizeof
-                self.log_print(
-                    [
-                        'Cumulative time.\t Datum:',
-                        self.datum_gather_cumulative_time, '\t Update:',
-                        self.update_cumulative_time
-                    ]
-                )
+                self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
 
                 #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.qinfer_updater), '\t GenSim:', asizeof.asizeof(self.qinfer_model) ])
                 if self.debugSave:
                     self.debug_store()
 
-                self.LearnedParameters = {}
-                self.FinalSigmas = {}
+                self.learned_parameters_qhl = {}
+                self.final_sigmas_qhl = {}
                 cov_mat = self.qinfer_updater.est_covariance_mtx()
                 for iterator in range(len(self.final_learned_params)):
                     self.final_learned_params[iterator] = [
@@ -738,10 +730,10 @@ class ModelInstanceForLearning():
                         self.model_terms_names[iterator], '):',
                         str(self.final_learned_params[iterator])]
                     )
-                    self.LearnedParameters[self.model_terms_names[iterator]] = (
+                    self.learned_parameters_qhl[self.model_terms_names[iterator]] = (
                         self.final_learned_params[iterator][0]
                     )
-                    self.FinalSigmas[self.model_terms_names[iterator]] = (
+                    self.final_sigmas_qhl[self.model_terms_names[iterator]] = (
                         self.final_learned_params[iterator][1]
                     )
 
@@ -793,18 +785,18 @@ class ModelInstanceForLearning():
         learned_info['posterior_marginal'] = all_post_margs
         learned_info['initial_params'] = self.model_terms_parameters
         learned_info['volume_list'] = self.volume_by_epoch
-        learned_info['track_eval'] = self.TrackEval
-        learned_info['track_cov_matrices'] = self.TrackCovMatrices
-        learned_info['track_param_sigmas'] = self.TrackParamSigmas
-        learned_info['track_posterior'] = self.TrackPosterior
+        learned_info['track_eval'] = self.track_mean_params
+        learned_info['track_cov_matrices'] = self.track_covariance_matrices
+        learned_info['track_param_sigmas'] = self.track_param_dist_widths
+        learned_info['track_posterior'] = self.track_posterior_dist
         # repeat of track param sigmas?
-        learned_info['track_prior_means'] = self.TrackPriorMeans
-        learned_info['track_prior_std_devs'] = self.TrackPriorStdDev
-        # learned_info['track_posterior_marginal'] = self.TrackPosteriorMarginal
+        learned_info['track_prior_means'] = self.track_prior_means
+        learned_info['track_prior_std_devs'] = self.track_prior_std_dev
+        # learned_info['track_posterior_marginal'] = self.track_posterior_distMarginal
         learned_info['resample_epochs'] = self.epochs_after_resampling
         learned_info['quadratic_losses'] = self.quadratic_losses
-        learned_info['learned_parameters'] = self.LearnedParameters
-        learned_info['final_sigmas'] = self.FinalSigmas
+        learned_info['learned_parameters'] = self.learned_parameters_qhl
+        learned_info['final_sigmas'] = self.final_sigmas_qhl
         learned_info['cov_matrix'] = self.qinfer_updater.est_covariance_mtx()
         learned_info['num_particles'] = self.num_particles
         learned_info['num_experiments'] = self.num_experiments
@@ -871,7 +863,7 @@ class ModelInstanceForLearning():
 
         save_file = save_dir + '/covariances_mod_' + str(self.model_id) + '.dat'
         particle_file = open(save_file, 'w')
-        particle_file.write("\n".join(str(elem) for elem in self.Covars))
+        particle_file.write("\n".join(str(elem) for elem in self.covariances))
         particle_file.close()
 
     def debug_store(self, debug_dir=None):  # Adjust what gets stored here
@@ -1048,21 +1040,21 @@ class ModelInstanceForStorage():
             for i in range(len(self.RawVolumeList)):
                 self.volume_by_epoch[i] = self.RawVolumeList[i]
 
-            self.TrackEval = np.array(learned_info['track_eval'])
-            self.TrackCovMatrices = np.array(
+            self.track_mean_params = np.array(learned_info['track_eval'])
+            self.track_covariance_matrices = np.array(
                 learned_info['track_cov_matrices'])
-            self.TrackParamSigmas = np.array(
+            self.track_param_dist_widths = np.array(
                 learned_info['track_param_sigmas'])
-            self.TrackPriorMeans = np.array(learned_info['track_prior_means'])
-            self.TrackPosterior = np.array(learned_info['track_posterior'])
-            self.TrackPriorStdDev = np.array(
+            self.track_prior_means = np.array(learned_info['track_prior_means'])
+            self.track_posterior_dist = np.array(learned_info['track_posterior'])
+            self.track_prior_std_dev = np.array(
                 learned_info['track_prior_std_devs'])
-            # self.TrackPosteriorMarginal = np.array(learned_info['track_posterior_marginal'])
+            # self.track_posterior_distMarginal = np.array(learned_info['track_posterior_marginal'])
 
             self.epochs_after_resampling = learned_info['resample_epochs']
             self.QuadraticLosses = learned_info['quadratic_losses']
-            self.LearnedParameters = learned_info['learned_parameters']
-            self.FinalSigmas = learned_info['final_sigmas']
+            self.learned_parameters_qhl = learned_info['learned_parameters']
+            self.final_sigmas_qhl = learned_info['final_sigmas']
 
             self.cov_matrix = learned_info['cov_matrix']
             self.growth_rule_of_this_model = learned_info['growth_generator']
@@ -1082,12 +1074,12 @@ class ModelInstanceForStorage():
             )
 
             self.Trackplot_parameter_estimates = {}
-            num_params = np.shape(self.TrackEval)[1]
-            max_exp = np.shape(self.TrackEval)[0] - 1
+            num_params = np.shape(self.track_mean_params)[1]
+            max_exp = np.shape(self.track_mean_params)[0] - 1
             for i in range(num_params):
-                for term in self.LearnedParameters.keys():
-                    if self.LearnedParameters[term] == self.TrackEval[max_exp][i]:
-                        self.Trackplot_parameter_estimates[term] = self.TrackEval[:, i]
+                for term in self.learned_parameters_qhl.keys():
+                    if self.learned_parameters_qhl[term] == self.track_mean_params[max_exp][i]:
+                        self.Trackplot_parameter_estimates[term] = self.track_mean_params[:, i]
 
             try:
                 self.particles = np.array(learned_info['particles'])
@@ -1330,7 +1322,7 @@ class ModelInstanceForStorage():
         for e in spaced_epochs:
 
             ham = np.tensordot(
-                self.TrackEval[int(e)],
+                self.track_mean_params[int(e)],
                 self.model_terms_matrices,
                 axes=1
             )  # the Hamiltonian this model held at epoch e
@@ -1468,8 +1460,8 @@ class ModelInstanceForComparison():
         self.initial_prior = learned_model_info['initial_prior']
         self.NormalizationRecord = learned_model_info['normalization_record']
         self.log_total_likelihood = learned_model_info['log_total_likelihood']
-        self.LearnedParameters = learned_model_info['learned_parameters']
-        self.FinalSigmas = learned_model_info['final_sigmas']
+        self.learned_parameters_qhl = learned_model_info['learned_parameters']
+        self.final_sigmas_qhl = learned_model_info['final_sigmas']
         self.FinalCovarianceMatrix = learned_model_info['final_cov_mat']
         log_identifier = str("Bayes " + str(self.model_id))
 
