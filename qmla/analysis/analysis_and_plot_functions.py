@@ -903,7 +903,7 @@ def plotDistributionProgression(
         print("Either provide a model id or set true_model=True to generate \
               plot of distribution development."
               )
-    true_parameters = mod.TrueParams
+    true_parameters = mod.true_model_params
     num_experiments = np.shape(mod.Particles)[2]
     max_exp_num = num_experiments - 1
     num_intervals_to_show = num_steps_to_show
@@ -998,7 +998,7 @@ def plotDistributionProgressionQML(
     from scipy import stats
     plt.clf()
 
-    true_parameters = mod.TrueParams
+    true_parameters = mod.true_model_params
     num_experiments = np.shape(mod.Particles)[2]
     max_exp_num = num_experiments - 1
     num_intervals_to_show = num_steps_to_show
@@ -1377,7 +1377,7 @@ def r_squared_from_epoch_list(
         for epoch in epochs:
             # Construct new Hamiltonian to get R^2 from
             # Hamiltonian corresponds to parameters at that epoch
-            ham = np.tensordot(mod.TrackEval[epoch], mod.SimOpList, axes=1)
+            ham = np.tensordot(mod.TrackEval[epoch], mod.model_terms_matrices, axes=1)
             sum_of_residuals = 0
             for t in exp_times:
                 sim = qmd.growth_class.expectation - value(

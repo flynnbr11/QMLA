@@ -190,25 +190,26 @@ class ModelInstanceForLearning():
 
         try:
             self.growth_class = get_growth_rule.get_growth_generator_class(
-                growth_generation_rule=self.growth_rule_of_this_model,
-                use_experimental_data=self.use_experimental_data,
-                log_file=self.log_file
+                growth_generation_rule = self.growth_rule_of_this_model,
+                use_experimental_data = self.use_experimental_data,
+                log_file = self.log_file
             )
         except BaseException:
-            # raise
-            self.growth_class = None
+            raise
+            # self.growth_class = None
 
-        base_resources = qmd_info['base_resources']
-        base_num_qubits = base_resources['num_qubits']
-        base_num_terms = base_resources['num_terms']
-        this_model_num_qubits = database_framework.get_num_qubits(self.model_name)
-        this_model_num_terms = len(
-            database_framework.get_constituent_names_from_name(self.model_name)
-        )
-
-        max_num_params = self.growth_class.max_num_parameter_estimate
 
         if qmd_info['reallocate_resources'] == True:
+
+            base_resources = qmd_info['base_resources']
+            base_num_qubits = base_resources['num_qubits']
+            base_num_terms = base_resources['num_terms']
+            this_model_num_qubits = database_framework.get_num_qubits(self.model_name)
+            this_model_num_terms = len(
+                database_framework.get_constituent_names_from_name(self.model_name)
+            )
+            max_num_params = self.growth_class.max_num_parameter_estimate
+
             new_resources = resource_allocation(
                 base_qubits=base_num_qubits,
                 base_terms=base_num_terms,
@@ -228,20 +229,21 @@ class ModelInstanceForLearning():
                     '\n\tExperiments:', self.num_experiments,
                 ]
             )
+
         self.probe_number = qmd_info['num_probes']
-        self.ResamplerThresh = qmd_info['resampler_thresh']
+        self.qinfer_resampler_threshold = qmd_info['resampler_thresh']
         self.qinfer_resampler_a = qmd_info['resampler_a']
         self.qinfer_PGH_heuristic_factor = qmd_info['pgh_prefactor']
         self.qinfer_PGH_heuristic_exponent = qmd_info['pgh_exponent']
-        self.IncreasePGHTime = qmd_info['increase_pgh_time']
-        self.StoreParticlesWeights = qmd_info['store_particles_weights']
-        self.QHL_plots = qmd_info['qhl_plots']
+        self.qinfer_PGH_heuristic_increase_time = qmd_info['increase_pgh_time']
+        self.store_particle_locations_and_weights = qmd_info['store_particles_weights']
+        # self.do_qhl_plots = qmd_info['qhl_plots']
         self.results_directory = qmd_info['results_directory']
         self.true_model_constituent_operators = qmd_info['true_oplist']
-        self.TrueParams = qmd_info['true_params']
+        self.true_model_params = qmd_info['true_params']
         self.true_model_name = qmd_info['true_name']
         self.use_time_dependent_true_model = qmd_info['use_time_dep_true_params']
-        self.TimeDepTrueParams = qmd_info['time_dep_true_params']
+        self.time_dependent_true_params = qmd_info['time_dep_true_params']
         self.num_time_dependent_true_params = qmd_info['num_time_dependent_true_params']
         self.use_qle = qmd_info['qle']
         self.times_to_plot = qmd_info['plot_times']
@@ -250,16 +252,12 @@ class ModelInstanceForLearning():
         self.measurement_class = qmd_info['measurement_type']
         self.experimental_measurements = qmd_info['experimental_measurements']
         self.experimental_measurement_times = qmd_info['experimental_measurement_times']
-        self.SimOpsNames = model_terms_names
-
+        self.model_terms_names = model_terms_names
         self.model_name_latex = self.growth_class.latex_name(
             name=self.model_name
         )
-
-        print_loc(print_location=init_model_print_loc)
-
-        self.SimOpList = np.asarray(model_terms_matrices)
-        self.SimParams = np.asarray([model_terms_parameters[0]])
+        self.model_terms_matrices = np.asarray(model_terms_matrices)
+        self.model_terms_parameters = np.asarray([model_terms_parameters[0]])
 
         individual_terms_in_name = database_framework.get_constituent_names_from_name(
             self.model_name
@@ -268,28 +266,28 @@ class ModelInstanceForLearning():
         for i in range(len(individual_terms_in_name)):
             term = individual_terms_in_name[i]
             term_mtx = database_framework.compute(term)
-            if np.all(term_mtx == self.SimOpList[i]) is False:
+            if np.all(term_mtx == self.model_terms_matrices[i]) is False:
                 print("[QML] UNEQUAL SIM OP LIST / TERM MATRICES.")
                 print("==> INSPECT PRIORS ORDERING.")
                 self.log_print(
                     [
                         "Term", term,
                         "\ncalculated mtx:", term_mtx,
-                        "\nSimOpList:", self.SimOpList[i]
+                        "\nSimOpList:", self.model_terms_matrices[i]
                     ]
                 )
-            elif term != self.SimOpsNames[i]:
+            elif term != self.model_terms_names[i]:
                 print("!!! Check log -- QML", self.model_name)
 
                 self.log_print(
                     [
                         "term {} != SimOpsNames[i] {}".format(
-                            term, self.SimOpsNames[i]
+                            term, self.model_terms_names[i]
                         )
                     ]
                 )
 
-        self.checkQLoss = True
+        self.check_quadratic_loss = True
         print_loc(print_location=init_model_print_loc)
 
         if debug_directory is not None:
@@ -297,16 +295,13 @@ class ModelInstanceForLearning():
             self.debug_directory = debug_directory
         else:
             self.debugSave = False
-        num_params = len(self.SimOpList)
-
-        self.PriorSpecificTerms = qmd_info['prior_specific_terms']
-        log_identifier = str("QML " + str(self.model_id))
-
-        # self.Prior = Distributions.get_prior(
-        self.Prior = self.growth_class.get_prior(
+        num_params = len(self.model_terms_matrices)
+        log_identifier=str("QML " + str(self.model_id))
+        # self.model_priorSpecificTerms = qmd_info['prior_specific_terms']
+        self.model_prior = self.growth_class.get_prior(
             model_name=self.model_name,
             log_file=self.log_file,
-            log_identifier=log_identifier
+            log_identifier = log_identifier, 
         )
 
         prior_dir = str(
@@ -340,18 +335,18 @@ class ModelInstanceForLearning():
             Distributions.plot_prior(
                 model_name=self.model_name_latex,
                 model_name_individual_terms=latex_terms,
-                prior=self.Prior,
+                prior=self.model_prior,
                 plot_file=prior_file,
             )
 
         self.GenSimModel = qml_qi.QInferModelQML(
-            oplist=self.SimOpList,
-            modelparams=self.SimParams,
+            oplist=self.model_terms_matrices,
+            modelparams=self.model_terms_parameters,
             true_oplist=self.true_model_constituent_operators,
-            trueparams=self.TrueParams,
+            trueparams=self.true_model_params,
             truename=self.true_model_name,
             use_time_dep_true_model=self.use_time_dependent_true_model,
-            time_dep_true_params=self.TimeDepTrueParams,
+            time_dep_true_params=self.time_dependent_true_params,
             num_time_dep_true_params=self.num_time_dependent_true_params,
             num_probes=self.probe_number,
             measurement_type=self.measurement_class,
@@ -373,19 +368,19 @@ class ModelInstanceForLearning():
             log_identifier=log_identifier
         )
 
-        self.Updater = qi.SMCUpdater(
+        self.qinfer_updater = qi.SMCUpdater(
             self.GenSimModel,
             self.num_particles,
-            self.Prior,
-            resample_thresh=self.ResamplerThresh,
+            self.model_prior,
+            resample_thresh=self.qinfer_resampler_threshold,
             resampler=qi.LiuWestResampler(a=self.qinfer_resampler_a),
             debug_resampling=False
         )
 
         self.InitialPrior = []
-        for i in range(len(self.SimParams[0])):
+        for i in range(len(self.model_terms_parameters[0])):
             self.InitialPrior.append(
-                self.Updater.posterior_marginal(idx_param=i)
+                self.qinfer_updater.posterior_marginal(idx_param=i)
             )
 
         self.Inv_Field = [
@@ -395,17 +390,17 @@ class ModelInstanceForLearning():
         ]
 
         self.Heuristic = self.growth_class.heuristic(
-            updater=self.Updater,
-            oplist=self.SimOpList,
+            updater=self.qinfer_updater,
+            oplist=self.model_terms_matrices,
             inv_field=self.Inv_Field,
-            increase_time=self.IncreasePGHTime,
+            increase_time=self.qinfer_PGH_heuristic_increase_time,
             pgh_exponent=self.qinfer_PGH_heuristic_exponent,
             time_list=self.times_to_plot,
             num_experiments=self.num_experiments,
         )
         self.HeuristicType = self.Heuristic.__class__.__name__
 
-        # if checkloss == True or self.checkQLoss==True:
+        # if checkloss == True or self.check_quadratic_loss==True:
         #     self.QLosses = np.array([])
         self.QLosses = []
         self.TrackLogTotLikelihood = np.array([])
@@ -417,7 +412,7 @@ class ModelInstanceForLearning():
         self.ExperimentsHistory = np.array([])
         # average and standard deviation at the final step of the parameters
         # inferred distributions
-        self.FinalParams = np.empty([len(self.SimOpList), 2])
+        self.FinalParams = np.empty([len(self.model_terms_matrices), 2])
         print_loc(print_location=init_model_print_loc)
         self.log_print(['Initialization Ready'])
 
@@ -429,10 +424,10 @@ class ModelInstanceForLearning():
     ):
         # self.num_experiments = n_experiments
 
-        # if self.checkQLoss == True:
+        # if self.check_quadratic_loss == True:
         #     self.QLosses = np.empty(self.num_experiments)
         self.Covars = np.empty(self.num_experiments)
-        self.TrackEval = [self.Updater.est_mean()]
+        self.TrackEval = [self.qinfer_updater.est_mean()]
         self.TrackCovMatrices = []
         self.TrackParamSigmas = []
         self.TrackPosterior = []
@@ -442,7 +437,7 @@ class ModelInstanceForLearning():
         self.TrackTime = np.empty(self.num_experiments)  # only for debugging
 
         self.Particles = np.empty([self.num_particles,
-                                   len(self.SimParams[0]), self.num_experiments]
+                                   len(self.model_terms_parameters[0]), self.num_experiments]
                                   )
         self.Weights = np.empty([self.num_particles, self.num_experiments])
         self.DistributionMeans = np.empty([self.num_experiments])
@@ -458,7 +453,7 @@ class ModelInstanceForLearning():
         self.update_cumulative_time = 0
         self.learned_est_means = {}
 
-        self.TrueParamsDict = {}
+        self.true_model_paramsDict = {}
 
         true_params_names = database_framework.get_constituent_names_from_name(
             self.true_model_name
@@ -466,22 +461,22 @@ class ModelInstanceForLearning():
         if self.use_experimental_data == False:
             for i in range(len(true_params_names)):
                 term = true_params_names[i]
-                true_param_val = self.TrueParams[i]
-                self.TrueParamsDict[term] = true_param_val
+                true_param_val = self.true_model_params[i]
+                self.true_model_paramsDict[term] = true_param_val
 
         all_params_for_q_loss = list(
-            set(true_params_names).union(self.SimOpsNames)
+            set(true_params_names).union(self.model_terms_names)
         )
         param_indices = {}
-        for op_name in self.SimOpsNames:
-            param_indices[op_name] = self.SimOpsNames.index(op_name)
+        for op_name in self.model_terms_names:
+            param_indices[op_name] = self.model_terms_names.index(op_name)
 
         print_frequency = max(
             int(self.num_experiments / 10),
             5
         )
         # print("[QML] STARTING QHL UPDATES")
-        # true_params = np.array([[self.TrueParams[0]]])
+        # true_params = np.array([[self.true_model_params[0]]])
         for istep in range(self.num_experiments):
             # print("Epoch", istep)
             if (istep % print_frequency == 0):
@@ -494,12 +489,12 @@ class ModelInstanceForLearning():
 
             # print("[QML] Calling heuristic")
             if istep == 0:
-                param_estimates = self.Updater.est_mean()
+                param_estimates = self.qinfer_updater.est_mean()
             else:
                 param_estimates = self.TrackEval[-1]
             self.Experiment = self.Heuristic(
                 test_param="from QML",
-                num_params=len(self.SimOpsNames),
+                num_params=len(self.model_terms_names),
                 epoch_id=istep,
                 current_params=param_estimates
             )
@@ -529,13 +524,13 @@ class ModelInstanceForLearning():
             # self.log_print(
             #    [
             #    'Getting Datum',
-            #    '\nSimParams:', self.SimParams,
+            #    '\nSimParams:', self.model_terms_parameters,
             #    '\nExperiment:', self.Experiment
             #    ]
             # )
 
             self.Datum = self.GenSimModel.simulate_experiment(
-                self.SimParams,
+                self.model_terms_parameters,
                 self.Experiment,
                 repeat=1
             )  # TODO reconsider repeat number
@@ -548,7 +543,7 @@ class ModelInstanceForLearning():
             # Call updater to update distribution based on datum
             try:
                 # print("[QML] calling updater")
-                self.Updater.update(
+                self.qinfer_updater.update(
                     self.Datum,
                     self.Experiment
                 )
@@ -571,52 +566,52 @@ class ModelInstanceForLearning():
             after_upd = time.time()
             self.update_cumulative_time += after_upd - before_upd
 
-            if self.Updater.just_resampled is True:
+            if self.qinfer_updater.just_resampled is True:
                 self.ResampleEpochs.append(istep)
 
             print_loc(global_print_loc)
-            # self.covmat = self.Updater.est_covariance_mtx()
+            # self.covmat = self.qinfer_updater.est_covariance_mtx()
             self.volume_by_epoch = np.append(
                 self.volume_by_epoch,
                 np.linalg.det(
                     sp.linalg.sqrtm(
                         # self.covmat
-                        self.Updater.est_covariance_mtx()
+                        self.qinfer_updater.est_covariance_mtx()
                     )  # TODO seems unnecessary to do this every epoch - every 10th would be enough for plot
                 )
             )
 
-            self.TrackEval.append(self.Updater.est_mean())
+            self.TrackEval.append(self.qinfer_updater.est_mean())
             self.TrackParamSigmas.append(
                 np.sqrt(
-                    np.diag(self.Updater.est_covariance_mtx())
+                    np.diag(self.qinfer_updater.est_covariance_mtx())
                 )
             )
             # TODO this doesn't seem necessary to store
-            self.TrackCovMatrices.append(self.Updater.est_covariance_mtx())
-            prior_sample = self.Updater.sample(int(5))
+            self.TrackCovMatrices.append(self.qinfer_updater.est_covariance_mtx())
+            prior_sample = self.qinfer_updater.sample(int(5))
 
             these_means = []
             these_std = []
-            for i in range(len(self.SimOpList)):
+            for i in range(len(self.model_terms_matrices)):
                 these_means.append(np.mean(prior_sample[:, i]))
                 these_std.append(np.std(prior_sample[:, i]))
 
             self.TrackPosterior.append(prior_sample)
             self.TrackPriorMeans.append(these_means)
-            # TODO get this from self.Updater.est_mean()
+            # TODO get this from self.qinfer_updater.est_mean()
             self.TrackPriorStdDev.append(these_std)
-            # self.TrackPosteriorMarginal.append(self.Updater.posterior_marginal())
+            # self.TrackPosteriorMarginal.append(self.qinfer_updater.posterior_marginal())
 
             print_loc(global_print_loc)
             self.Covars[istep] = np.linalg.norm(
-                self.Updater.est_covariance_mtx()
+                self.qinfer_updater.est_covariance_mtx()
             )
             print_loc(global_print_loc)
-            self.Particles[:, :, istep] = self.Updater.particle_locations
-            #self.Weights[:, istep] = self.Updater.particle_weights
+            self.Particles[:, :, istep] = self.qinfer_updater.particle_locations
+            #self.Weights[:, istep] = self.qinfer_updater.particle_weights
 
-            self.NewEval = self.Updater.est_mean()
+            self.NewEval = self.qinfer_updater.est_mean()
             print_loc(global_print_loc)
 
             if (
@@ -627,13 +622,13 @@ class ModelInstanceForLearning():
             ):
                 quadratic_loss = 0
                 for param in all_params_for_q_loss:
-                    if param in self.SimOpsNames:
+                    if param in self.model_terms_names:
                         learned_param = self.NewEval[param_indices[param]]
                     else:
                         learned_param = 0
 
                     if param in true_params_names:
-                        true_param = self.TrueParamsDict[param]
+                        true_param = self.true_model_paramsDict[param]
                     else:
                         true_param = 0
                     # print("[QML] param:", param, "learned param:", learned_param, "\t true param:", true_param)
@@ -656,14 +651,14 @@ class ModelInstanceForLearning():
                             # np.mean(self.Particles[:,iterator,istep]),
                             # TODO should this be gotten from updater.est_covariance_mtx()?
                             # np.std(self.Particles[:,iterator,istep])
-                            self.Updater.est_mean(),
+                            self.qinfer_updater.est_mean(),
                             np.sqrt(np.diag(updater.est_covariance_mtx()))
                         ]
                         print('Final Parameters mean and stdev:' +
                               str(self.FinalParams[iterator])
                               )
                     self.LogTotLikelihood = (
-                        self.Updater.log_total_likelihood
+                        self.qinfer_updater.log_total_likelihood
                     )
                     # self.QLosses=(np.resize(self.QLosses, (1,istep)))[0]
                     self.Covars = (np.resize(self.Covars, (1, istep)))[0]
@@ -686,13 +681,13 @@ class ModelInstanceForLearning():
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator] = [
                         #                        np.mean(self.Particles[:,iterator,istep]),
-                        self.Updater.est_mean(),
+                        self.qinfer_updater.est_mean(),
                         np.std(self.Particles[:, iterator, istep])
                     ]
                     self.log_print(['Final Parameters mean and stdev:',
                                     str(self.FinalParams[iterator])]
                                    )
-                self.LogTotLikelihood = self.Updater.log_total_likelihood
+                self.LogTotLikelihood = self.qinfer_updater.log_total_likelihood
                 # if checkloss == True:
                 #     self.QLosses=(
                 #         (np.resize(self.QLosses, (1,istep)))[0]
@@ -713,7 +708,7 @@ class ModelInstanceForLearning():
                         str(self.Experiment[0][0])
                     ]
                 )
-                self.LogTotLikelihood = self.Updater.log_total_likelihood
+                self.LogTotLikelihood = self.qinfer_updater.log_total_likelihood
                 #from pympler import asizeof
                 self.log_print(
                     [
@@ -723,31 +718,31 @@ class ModelInstanceForLearning():
                     ]
                 )
 
-                #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.Updater), '\t GenSim:', asizeof.asizeof(self.GenSimModel) ])
+                #self.log_print(['Sizes:\t updater:', asizeof.asizeof(self.qinfer_updater), '\t GenSim:', asizeof.asizeof(self.GenSimModel) ])
                 if self.debugSave:
                     self.debug_store()
 
                 self.LearnedParameters = {}
                 self.FinalSigmas = {}
-                cov_mat = self.Updater.est_covariance_mtx()
+                cov_mat = self.qinfer_updater.est_covariance_mtx()
                 for iterator in range(len(self.FinalParams)):
                     self.FinalParams[iterator] = [
                         #                        np.mean(self.Particles[:,iterator,istep-1]),
-                        self.Updater.est_mean()[iterator],
+                        self.qinfer_updater.est_mean()[iterator],
                         np.sqrt(cov_mat[iterator][iterator])
                         # np.std(self.Particles[:,iterator,istep-1])
-                        # self.Updater.est_mean(),
+                        # self.qinfer_updater.est_mean(),
                         # np.sqrt(np.diag(updater.est_covariance_mtx()))
                     ]
                     self.log_print([
                         'Final Parameters mean and stdev (term ',
-                        self.SimOpsNames[iterator], '):',
+                        self.model_terms_names[iterator], '):',
                         str(self.FinalParams[iterator])]
                     )
-                    self.LearnedParameters[self.SimOpsNames[iterator]] = (
+                    self.LearnedParameters[self.model_terms_names[iterator]] = (
                         self.FinalParams[iterator][0]
                     )
-                    self.FinalSigmas[self.SimOpsNames[iterator]] = (
+                    self.FinalSigmas[self.model_terms_names[iterator]] = (
                         self.FinalParams[iterator][1]
                     )
 
@@ -770,25 +765,25 @@ class ModelInstanceForLearning():
         all_post_margs = []
         for i in range(len(self.FinalParams)):
             all_post_margs.append(
-                self.Updater.posterior_marginal(idx_param=i)
+                self.qinfer_updater.posterior_marginal(idx_param=i)
             )
 
         learned_info = {}
         learned_info['times'] = self.TrackTime
         learned_info['final_params'] = self.FinalParams
-        learned_info['normalization_record'] = self.Updater.normalization_record
-        learned_info['log_total_likelihood'] = self.Updater.log_total_likelihood
-        learned_info['data_record'] = self.Updater.data_record
+        learned_info['normalization_record'] = self.qinfer_updater.normalization_record
+        learned_info['log_total_likelihood'] = self.qinfer_updater.log_total_likelihood
+        learned_info['data_record'] = self.qinfer_updater.data_record
         learned_info['name'] = self.model_name
         learned_info['model_id'] = self.model_id
         # TODO regenerate this from mean and std_dev instead of saving it
-        learned_info['updater'] = pickle.dumps(self.Updater, protocol=2)
+        learned_info['updater'] = pickle.dumps(self.qinfer_updater, protocol=2)
         # TODO regenerate this from mean and std_dev instead of saving it
-        learned_info['final_prior'] = self.Updater.prior
+        learned_info['final_prior'] = self.qinfer_updater.prior
         learned_info['initial_prior'] = self.InitialPrior
-        learned_info['sim_op_names'] = self.SimOpsNames
-        learned_info['final_cov_mat'] = self.Updater.est_covariance_mtx()
-        learned_info['est_mean'] = self.Updater.est_mean()
+        learned_info['sim_op_names'] = self.model_terms_names
+        learned_info['final_cov_mat'] = self.qinfer_updater.est_covariance_mtx()
+        learned_info['est_mean'] = self.qinfer_updater.est_mean()
         """
         1st is still the initial prior!
         that object does not get updated by the learning!
@@ -797,7 +792,7 @@ class ModelInstanceForLearning():
         """
 
         learned_info['posterior_marginal'] = all_post_margs
-        learned_info['initial_params'] = self.SimParams
+        learned_info['initial_params'] = self.model_terms_parameters
         learned_info['volume_list'] = self.volume_by_epoch
         learned_info['track_eval'] = self.TrackEval
         learned_info['track_cov_matrices'] = self.TrackCovMatrices
@@ -811,12 +806,12 @@ class ModelInstanceForLearning():
         learned_info['quadratic_losses'] = self.QLosses
         learned_info['learned_parameters'] = self.LearnedParameters
         learned_info['final_sigmas'] = self.FinalSigmas
-        learned_info['cov_matrix'] = self.Updater.est_covariance_mtx()
+        learned_info['cov_matrix'] = self.qinfer_updater.est_covariance_mtx()
         learned_info['num_particles'] = self.num_particles
         learned_info['num_experiments'] = self.num_experiments
         learned_info['growth_generator'] = self.growth_rule_of_this_model
         learned_info['heuristic'] = self.HeuristicType
-        if self.StoreParticlesWeights:
+        if self.store_particle_locations_and_weights:
             self.log_print(
                 [
                     "Storing particles and weights for model",
@@ -943,7 +938,7 @@ class ModelInstanceForStorage():
 
         self.model_name = model_name
         self.model_id = modelID
-        self.SimOpList = sim_oplist
+        self.model_terms_matrices = sim_oplist
         self.model_id = modelID
         qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
         self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
@@ -954,11 +949,11 @@ class ModelInstanceForStorage():
         # self.num_particles = qmd_info['num_particles']
         # self.num_experiments = qmd_info['num_experiments']
         self.probe_number = qmd_info['num_probes']
-        self.ResamplerThresh = qmd_info['resampler_thresh']
+        self.qinfer_resampler_threshold = qmd_info['resampler_thresh']
         self.qinfer_resampler_a = qmd_info['resampler_a']
         self.qinfer_PGH_heuristic_factor = qmd_info['pgh_prefactor']
         self.true_model_constituent_operators = qmd_info['true_oplist']
-        self.TrueParams = qmd_info['true_params']
+        self.true_model_params = qmd_info['true_params']
         self.true_model_name = qmd_info['true_name']
         self.probes_for_plots = pickle.load(
             open(qmd_info['probes_plot_file'], 'rb')
@@ -966,7 +961,7 @@ class ModelInstanceForStorage():
         self.times_to_plot = qmd_info['plot_times']
         self.use_qle = qmd_info['qle']
         self.use_custom_exponentiation = qmd_info['use_exp_custom']
-        self.StoreParticlesWeights = qmd_info[
+        self.store_particle_locations_and_weights = qmd_info[
             'store_particles_weights'
         ]
         self.model_bayes_factors = {}
@@ -1042,11 +1037,11 @@ class ModelInstanceForStorage():
             # should be final params from learning process
             self.FinalParams = learned_info['final_params']
             # TODO this won't work for multiple parameters
-            self.SimParams_Final = np.array([[self.FinalParams[0, 0]]])
+            self.model_terms_parameters_Final = np.array([[self.FinalParams[0, 0]]])
             self.SimOpNames = learned_info['sim_op_names']
             # TODO this can be recreated from finalparams, but how for multiple
             # params?
-            self.Prior = learned_info['final_prior']
+            self.model_prior = learned_info['final_prior']
             self.NormalizationRecord = learned_info['normalization_record']
             self.log_total_likelihod = learned_info['log_total_likelihood']
             self.RawVolumeList = learned_info['volume_list']
@@ -1106,7 +1101,7 @@ class ModelInstanceForStorage():
             try:
                 self.LearnedHamiltonian = np.tensordot(
                     sim_params,
-                    self.SimOpList,
+                    self.model_terms_matrices,
                     axes=1
                 )
             except BaseException:
@@ -1115,7 +1110,7 @@ class ModelInstanceForStorage():
                     self.model_id, " : ",
                     self.model_name,
                     "\nsim_params:", sim_params,
-                    "\nsim op list", self.SimOpList
+                    "\nsim op list", self.model_terms_matrices
                 )
                 raise
 
@@ -1337,7 +1332,7 @@ class ModelInstanceForStorage():
 
             ham = np.tensordot(
                 self.TrackEval[int(e)],
-                self.SimOpList,
+                self.model_terms_matrices,
                 axes=1
             )  # the Hamiltonian this model held at epoch e
             sum_of_residuals = 0
@@ -1362,14 +1357,14 @@ class ModelInstanceForStorage():
         return r_squared_by_epoch
 
 
-#        self.GenSimModel = qml_qi.qinfer_model_interface(oplist=self.SimOpList, modelparams=self.SimParams_Final, true_oplist = self.true_model_constituent_operators, trueparams = self.TrueParams, truename=self.true_model_name,             use_experimental_data = self.use_experimental_data,
+#        self.GenSimModel = qml_qi.qinfer_model_interface(oplist=self.model_terms_matrices, modelparams=self.model_terms_parameters_Final, true_oplist = self.true_model_constituent_operators, trueparams = self.true_model_params, truename=self.true_model_name,             use_experimental_data = self.use_experimental_data,
 #            experimental_measurements = self.experimental_measurements,
 #            experimental_measurement_times=(
 #                self.experimental_measurement_times
 #            ),
 # model_name=self.model_name, probe_dict = self.probes_system)    # probelist=self.true_model_constituent_operators,
-#        self.Updater = qi.SMCUpdater(self.GenSimModel, self.num_particles, self.Prior, resample_thresh=self.ResamplerThresh , resampler = qi.LiuWestResampler(a=self.qinfer_resampler_a), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
-#        self.Updater.NormalizationRecord = self.NormalizationRecord
+#        self.qinfer_updater = qi.SMCUpdater(self.GenSimModel, self.num_particles, self.model_prior, resample_thresh=self.qinfer_resampler_threshold , resampler = qi.LiuWestResampler(a=self.qinfer_resampler_a), debug_resampling=False) ## TODO does the reduced model instance need an updater or GenSimModel?
+#        self.qinfer_updater.NormalizationRecord = self.NormalizationRecord
 
 
 class ModelInstanceForComparison():
@@ -1411,11 +1406,11 @@ class ModelInstanceForComparison():
         self.num_particles = qmd_info['num_particles']
         self.probe_number = qmd_info['num_probes']
         self.PlotProbePath = qmd_info['probes_plot_file']
-        self.ResamplerThresh = qmd_info['resampler_thresh']
+        self.qinfer_resampler_threshold = qmd_info['resampler_thresh']
         self.qinfer_resampler_a = qmd_info['resampler_a']
         self.qinfer_PGH_heuristic_factor = qmd_info['pgh_prefactor']
         self.true_model_constituent_operators = qmd_info['true_oplist']
-        self.TrueParams = qmd_info['true_params']
+        self.true_model_params = qmd_info['true_params']
         self.true_model_name = qmd_info['true_name']
         self.use_custom_exponentiation = qmd_info['use_exp_custom']
         self.measurement_class = qmd_info['measurement_type']
@@ -1446,18 +1441,18 @@ class ModelInstanceForComparison():
         )
         op = database_framework.Operator(self.model_name)
         # todo, put this in a lighter function
-        self.SimOpList = op.constituents_operators
+        self.model_terms_matrices = op.constituents_operators
         self.Times = learned_model_info['times']
         self.FinalParams = learned_model_info['final_params']
         # TODO this won't work for multiple parameters
-        self.SimParams_Final = np.array(self.FinalParams)
-        # self.SimParams_Final = np.array([[self.FinalParams[0,0]]]) # TODO
+        self.model_terms_parameters_Final = np.array(self.FinalParams)
+        # self.model_terms_parameters_Final = np.array([[self.FinalParams[0,0]]]) # TODO
         # this won't work for multiple parameters
 
         # print("[QML {}] \nSimParams_Final: {} \nSimOpList: {}".format(
         #     self.model_name,
-        #     self.SimParams_Final,
-        #     self.SimOpList
+        #     self.model_terms_parameters_Final,
+        #     self.model_terms_matrices
         #     )
         # )
         self.InitialParams = learned_model_info['initial_params']
@@ -1469,7 +1464,7 @@ class ModelInstanceForComparison():
         )
         # TODO this can be recreated from finalparams, but how for multiple
         # params?
-        self.Prior = learned_model_info['final_prior']
+        self.model_prior = learned_model_info['final_prior']
         self.PosteriorMarginal = learned_model_info['posterior_marginal']
         self.InitialPrior = learned_model_info['initial_prior']
         self.NormalizationRecord = learned_model_info['normalization_record']
@@ -1480,10 +1475,10 @@ class ModelInstanceForComparison():
         log_identifier = str("Bayes " + str(self.model_id))
 
         self.GenSimModel = qml_qi.QInferModelQML(
-            oplist=self.SimOpList,
-            modelparams=self.SimParams_Final,
+            oplist=self.model_terms_matrices,
+            modelparams=self.model_terms_parameters_Final,
             true_oplist=self.true_model_constituent_operators,
-            trueparams=self.TrueParams,
+            trueparams=self.true_model_params,
             truename=self.true_model_name,
             measurement_type=self.measurement_class,
             growth_generation_rule=self.growth_rule_of_this_model,
@@ -1533,19 +1528,19 @@ class ModelInstanceForComparison():
                 # final_cov_mat
             )
 
-            self.Updater = qi.SMCUpdater(
+            self.qinfer_updater = qi.SMCUpdater(
                 model=self.GenSimModel,
                 n_particles=self.num_particles,
                 prior=posterior_distribution,
-                # prior = self.Prior,
-                resample_thresh=self.ResamplerThresh,
+                # prior = self.model_prior,
+                resample_thresh=self.qinfer_resampler_threshold,
                 resampler=qi.LiuWestResampler(
                     a=self.qinfer_resampler_a
                 ),
                 debug_resampling=False
             )
-            self.Updater._normalization_record = self.NormalizationRecord
-            self.Updater._log_total_likelihood = self.log_total_likelihood
+            self.qinfer_updater._normalization_record = self.NormalizationRecord
+            self.qinfer_updater._log_total_likelihood = self.log_total_likelihood
             time_taken = time.time() - time_s
             self.log_print(
                 [
@@ -1557,7 +1552,7 @@ class ModelInstanceForComparison():
 
         else:
             time_s = time.time()
-            self.Updater = pickle.loads(
+            self.qinfer_updater = pickle.loads(
                 learned_model_info['updater']
             )
             time_taken = time.time() - time_s
@@ -1570,7 +1565,7 @@ class ModelInstanceForComparison():
             )
         self.log_print(
             [
-                "Prior mean:", self.Updater.est_mean()
+                "Prior mean:", self.qinfer_updater.est_mean()
             ]
         )
         del qmd_info, learned_model_info

@@ -183,7 +183,7 @@ def remote_bayes_factor_calculation(
                 file=write_log_file
             )
 
-        updater_a_copy = copy.deepcopy(model_a.Updater)
+        updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
         log_l_a = log_likelihood(
             model_a,
             update_times_model_a,
@@ -323,7 +323,7 @@ def log_likelihood(
     times,
     binning=False
 ):
-    updater = model.Updater
+    updater = model.qinfer_updater
     # print(
     #     "\n[log likel] Log likelihood for model", model.model_name
     # )
@@ -342,12 +342,12 @@ def log_likelihood(
         exp = get_exp(model, [times[i]])
     #    print("exp:", exp)
         # TODO this will cause an error for multiple parameters
-        params_array = np.array([[model.TrueParams[:]]])
+        params_array = np.array([[model.true_model_params[:]]])
 
         # print(
         #     "log likelihood", model.model_name,
         #     "\n\ttime:", times[i],
-        #     "\n\tModel.TrueParams:", model.TrueParams,
+        #     "\n\tModel.true_model_params:", model.true_model_params,
         #     "\n\tparams array:", params_array,
         #     "\n\texp:", exp
         # )
@@ -376,7 +376,7 @@ def log_likelihood(
 
 
 def get_exp(model, time):
-    # gen = model.Updater.model # or gen=model.GenSimModel
+    # gen = model.qinfer_updater.model # or gen=model.GenSimModel
     gen = model.GenSimModel
     exp = np.empty(
         len(time),
@@ -497,14 +497,14 @@ def plot_expec_vals_of_models(
 
     for mod in [model_a, model_b]:
         # TODO get final learned params,
-        # generate hamiltonian from mod.SimOpList
+        # generate hamiltonian from mod.model_terms_matrices
         # get exp vals against times list
         # plot using different colour
 
-        final_params = mod.Updater.est_mean()
+        final_params = mod.qinfer_updater.est_mean()
         final_ham = np.tensordot(
             final_params,
-            mod.SimOpList,
+            mod.model_terms_matrices,
             axes=1
         )
         dim = int(np.log2(np.shape(final_ham)[0]))
@@ -580,7 +580,7 @@ def plot_posterior_marginals(
     )
 
     pickle.dump(
-        # model_a.Updater,
+        # model_a.qinfer_updater,
         updater_a_copy,
         open(
             posterior_plot_path,
@@ -594,9 +594,9 @@ def plot_posterior_marginals(
         )
 
         new_post_marg.append(
-            model_a.Updater.posterior_marginal(idx_param=i)
+            model_a.qinfer_updater.posterior_marginal(idx_param=i)
         )
-        # new_post_marg = model_a.Updater.posterior_marginal(1)
+        # new_post_marg = model_a.qinfer_updater.posterior_marginal(1)
 
     # print("OLD:", old_post_marg)
     # print("NEW:", new_post_marg)
