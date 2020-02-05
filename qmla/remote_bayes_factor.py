@@ -16,7 +16,7 @@ import sys as sys
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
-pickle.HIGHEST_PROTOCOL = 3
+pickle.HIGHEST_PROTOCOL = 4
 
 try:
     import qmla.redis_settings as rds

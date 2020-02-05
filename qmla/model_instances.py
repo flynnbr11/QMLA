@@ -20,7 +20,7 @@ from psutil import virtual_memory
 import redis
 import pickle
 import matplotlib.pyplot as plt
-pickle.HIGHEST_PROTOCOL = 3
+pickle.HIGHEST_PROTOCOL = 4
 
 
 global print_mem_status

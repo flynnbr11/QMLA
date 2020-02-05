@@ -10,7 +10,7 @@ import warnings
 import time as time
 import random
 import pickle
-pickle.HIGHEST_PROTOCOL = 3
+pickle.HIGHEST_PROTOCOL = 4
 
 sys.path.append("..")
 import qmla

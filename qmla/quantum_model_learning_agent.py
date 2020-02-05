@@ -31,7 +31,7 @@ import qmla.redis_settings as rds
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation
 from qmla.remote_model_learning import remote_learn_model_parameters
 
-pickle.HIGHEST_PROTOCOL = 3  # TODO if >python3, can use higher protocol
+pickle.HIGHEST_PROTOCOL = 4  # TODO if >python3, can use higher protocol
 plt.switch_backend('agg')
 
 __all__ = [

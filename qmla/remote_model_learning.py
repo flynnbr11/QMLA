@@ -17,7 +17,7 @@ import random
 from psutil import virtual_memory
 import json  # possibly worth a different serialization if pickle is very slow
 import pickle
-pickle.HIGHEST_PROTOCOL = 3
+pickle.HIGHEST_PROTOCOL = 4
 import redis
 
 import qmla.database_framework as database_framework
