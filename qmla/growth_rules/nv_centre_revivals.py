@@ -35,5 +35,6 @@ class ExpNVRevivals(
         ]
 
         self.plot_probe_generation_function = probe_set_generation.plus_probes_dict
-        if self.use_experimental_data == True:
-            self.probe_generation_function = probe_set_generation.restore_dec_13_probe_generation
+        # if self.use_experimental_data == True:
+            # TODO previously using dec_13_probes; what should it be doing??
+            # self.probe_generation_function = probe_set_generation.restore_dec_13_probe_generation
