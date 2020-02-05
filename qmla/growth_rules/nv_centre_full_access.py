@@ -61,7 +61,7 @@ class ExperimentFullAccessNV(
             'other': 1
         }
 
-        self.true_params = {
+        self.true_model_terms_params = {
             # Decohering param set
             # From 3000exp/20000prt, BC SelectedRuns/Nov_28/15_14/results_049
             'xTi': -0.98288958683093952,  # -0.098288958683093952

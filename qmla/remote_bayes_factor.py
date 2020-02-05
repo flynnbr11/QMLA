@@ -55,7 +55,7 @@ def time_seconds():
 def remote_bayes_factor_calculation(
     model_a_id,
     model_b_id,
-    branchID=None,
+    branch_id=None,
     interbranch=False,
     num_times_to_use='all',
     bf_data_folder=None,
@@ -98,17 +98,17 @@ def remote_bayes_factor_calculation(
             print(identifier, str(to_print), file=write_log_file, flush=True)
 
     time_start = time.time()
-    rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
-    qmd_info_db = rds_dbs['qmd_info_db']
-    learned_models_info = rds_dbs['learned_models_info']
-    learned_models_ids = rds_dbs['learned_models_ids']
-    bayes_factors_db = rds_dbs['bayes_factors_db']
-    bayes_factors_winners_db = rds_dbs['bayes_factors_winners_db']
-    active_branches_learning_models = rds_dbs['active_branches_learning_models']
-    active_branches_bayes = rds_dbs['active_branches_bayes']
-    active_interbranch_bayes = rds_dbs['active_interbranch_bayes']
+    redis_databases = rds.databases_from_qmd_id(host_name, port_number, qid)
+    qmla_core_info_database = redis_databases['qmla_core_info_database']
+    learned_models_info = redis_databases['learned_models_info']
+    learned_models_ids = redis_databases['learned_models_ids']
+    bayes_factors_db = redis_databases['bayes_factors_db']
+    bayes_factors_winners_db = redis_databases['bayes_factors_winners_db']
+    active_branches_learning_models = redis_databases['active_branches_learning_models']
+    active_branches_bayes = redis_databases['active_branches_bayes']
+    active_interbranch_bayes = redis_databases['active_interbranch_bayes']
 
-    info_dict = pickle.loads(rds_dbs['qmd_info_db']['qmla_core_data'])
+    info_dict = pickle.loads(redis_databases['qmla_core_info_database']['qmla_core_data'])
     use_experimental_data = info_dict['use_experimental_data']
     experimental_data_times = info_dict['experimental_measurement_times']
     binning = info_dict['bayes_factors_time_binning']
@@ -151,7 +151,7 @@ def remote_bayes_factor_calculation(
         # up to t_idx given.
         # And inherit renormalization record from QML updater
         # In special cases, eg experimental data, change these defaults below.
-        log_print(["Start. Branch", branchID])
+        log_print(["Start. Branch", branch_id])
         if num_times_to_use == 'all':
             first_t_idx = 0
         else:
@@ -298,10 +298,10 @@ def remote_bayes_factor_calculation(
         else:
             log_print(["Neither model much better."])
 
-        if branchID is not None:
+        if branch_id is not None:
             # only want to fill these lists when comparing models within branch
-            # log_print(["Redis INCR active_branches_bayes branch:", branchID])
-            active_branches_bayes.incr(int(branchID), 1)
+            # log_print(["Redis INCR active_branches_bayes branch:", branch_id])
+            active_branches_bayes.incr(int(branch_id), 1)
         else:
             active_interbranch_bayes.set(pair_id, True)
             # log_print(["Redis SET active_interbranch_bayes pair:", pair_id,

@@ -319,7 +319,7 @@ if global_variables.qhl_test:
         )
         qmd.delete_unpicklable_attributes()
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
-            pickle.dump(qmd, pkl_file, protocol=2)
+            pickle.dump(qmd, pkl_file, protocol=4)
 
     if global_variables.save_plots:
         try:
@@ -432,7 +432,7 @@ if global_variables.qhl_test:
     pickle.dump(
         qmd.champion_results,
         open(results_file, "wb"),
-        protocol=2
+        protocol=4
     )
 
 elif (
@@ -486,7 +486,7 @@ elif (
         )
         qmd.delete_unpicklable_attributes()
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
-            pickle.dump(qmd, pkl_file, protocol=2)
+            pickle.dump(qmd, pkl_file, protocol=4)
 
     # results_file = global_variables.results_file
 
@@ -507,7 +507,7 @@ elif (
         pickle.dump(
             mod.results_dict,
             open(results_file, "wb"),
-            protocol=2
+            protocol=4
         )
 
 
@@ -725,7 +725,7 @@ else:
         # pickle in cases where true model found
         qmd.delete_unpicklable_attributes()
         with open(global_variables.class_pickle_file, "wb") as pkl_file:
-            pickle.dump(qmd, pkl_file, protocol=2)
+            pickle.dump(qmd, pkl_file, protocol=4)
 
     # TODO generalise so tree diagram can be used in all cases
     # currently only useful for Ising growth 2 qubits.
@@ -737,7 +737,7 @@ else:
     pickle.dump(
         qmd.champion_results,
         open(results_file, "wb"),
-        protocol=2
+        protocol=4
     )
 
 end = time.time()

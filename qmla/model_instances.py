@@ -100,14 +100,14 @@ class ModelInstanceForLearning():
     """
     Class to learn individual model. Model name is given when initialised.
     A host_name and port_number are given to initialise_model_for_learning.
-    The qmd_info dict from Redis is pulled and pickled to find
+    The qmla_core_info_dict dict from Redis is pulled and pickled to find
     the true model and other QMD parameters needed.
     A GenSimModel is set which details the SMCUpdater
     used to update the posterior distribution.
     update_model calls the updater in a loop of n_experiments.
     The final parameter estimates are set as the mean of the
     posterior distribution after n_experiments wherein n_particles
-    are sampled per experiment (set in qmd_info).
+    are sampled per experiment (set in qmla_core_info_dict).
 
     """
 
@@ -160,19 +160,19 @@ class ModelInstanceForLearning():
         debug_directory=None,
         **kwargs
     ):
-        rds_dbs = rds.databases_from_qmd_id(
+        redis_databases = rds.databases_from_qmd_id(
             self.redis_host,
             self.redis_port_number,
             self.qmla_id
         )
-        qmd_info_db = rds_dbs['qmd_info_db']
+        qmla_core_info_database = redis_databases['qmla_core_info_database']
         init_model_print_loc = False
-        qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
-        self.use_experimental_data = qmd_info['use_experimental_data']
-        self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
-        self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
-        self.num_particles = qmd_info['num_particles']
-        self.num_experiments = qmd_info['num_experiments']
+        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_core_data'))
+        self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
+        self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
+        self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
+        self.num_particles = qmla_core_info_dict['num_particles']
+        self.num_experiments = qmla_core_info_dict['num_experiments']
         self.growth_rule_of_this_model = growth_generator
 
         try:
@@ -184,9 +184,9 @@ class ModelInstanceForLearning():
         except BaseException:
             raise
 
-        if qmd_info['reallocate_resources'] == True:
+        if qmla_core_info_dict['reallocate_resources'] == True:
 
-            base_resources = qmd_info['base_resources']
+            base_resources = qmla_core_info_dict['base_resources']
             base_num_qubits = base_resources['num_qubits']
             base_num_terms = base_resources['num_terms']
             this_model_num_qubits = database_framework.get_num_qubits(
@@ -217,28 +217,28 @@ class ModelInstanceForLearning():
                 ]
             )
 
-        self.probe_number = qmd_info['num_probes']
-        self.qinfer_resampler_threshold = qmd_info['resampler_thresh']
-        self.qinfer_resampler_a = qmd_info['resampler_a']
-        self.qinfer_PGH_heuristic_factor = qmd_info['pgh_prefactor']
-        self.qinfer_PGH_heuristic_exponent = qmd_info['pgh_exponent']
-        self.qinfer_PGH_heuristic_increase_time = qmd_info['increase_pgh_time']
-        self.store_particle_locations_and_weights = qmd_info['store_particles_weights']
-        self.results_directory = qmd_info['results_directory']
-        self.true_model_constituent_operators = qmd_info['true_oplist']
-        self.true_model_params = qmd_info['true_params']
-        self.true_model_name = qmd_info['true_name']
-        self.use_time_dependent_true_model = qmd_info['use_time_dep_true_params']
-        self.time_dependent_true_params = qmd_info['time_dep_true_params']
-        self.num_time_dependent_true_params = qmd_info['num_time_dependent_true_params']
-        self.use_qle = qmd_info['qle']
-        self.sigma_threshold = qmd_info['sigma_threshold']
-        self.times_to_plot = qmd_info['plot_times']
-        self.use_custom_exponentiation = qmd_info['use_exp_custom']
-        self.exponentiation_tolerance = qmd_info['compare_linalg_exp_tol']
-        self.measurement_class = qmd_info['measurement_type']
-        self.experimental_measurements = qmd_info['experimental_measurements']
-        self.experimental_measurement_times = qmd_info['experimental_measurement_times']
+        self.probe_number = qmla_core_info_dict['num_probes']
+        self.qinfer_resampler_threshold = qmla_core_info_dict['resampler_thresh']
+        self.qinfer_resampler_a = qmla_core_info_dict['resampler_a']
+        self.qinfer_PGH_heuristic_factor = qmla_core_info_dict['pgh_prefactor']
+        self.qinfer_PGH_heuristic_exponent = qmla_core_info_dict['pgh_exponent']
+        self.qinfer_PGH_heuristic_increase_time = qmla_core_info_dict['increase_pgh_time']
+        self.store_particle_locations_and_weights = qmla_core_info_dict['store_particles_weights']
+        self.results_directory = qmla_core_info_dict['results_directory']
+        self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
+        self.true_model_params = qmla_core_info_dict['true_model_terms_params']
+        self.true_model_name = qmla_core_info_dict['true_name']
+        self.use_time_dependent_true_model = qmla_core_info_dict['use_time_dep_true_params']
+        self.time_dependent_true_params = qmla_core_info_dict['time_dep_true_params']
+        self.num_time_dependent_true_params = qmla_core_info_dict['num_time_dependent_true_params']
+        self.use_qle = qmla_core_info_dict['qle']
+        self.sigma_threshold = qmla_core_info_dict['sigma_threshold']
+        self.times_to_plot = qmla_core_info_dict['plot_times']
+        self.use_custom_exponentiation = qmla_core_info_dict['use_exp_custom']
+        self.exponentiation_tolerance = qmla_core_info_dict['compare_linalg_exp_tol']
+        self.measurement_class = qmla_core_info_dict['measurement_type']
+        self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
+        self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         self.model_terms_names = model_terms_names
         self.model_name_latex = self.growth_class.latex_name(
             name=self.model_name
@@ -653,7 +653,7 @@ class ModelInstanceForLearning():
         learned_info['data_record'] = self.qinfer_updater.data_record
         learned_info['name'] = self.model_name
         learned_info['model_id'] = self.model_id
-        learned_info['updater'] = pickle.dumps(self.qinfer_updater, protocol=2)
+        learned_info['updater'] = pickle.dumps(self.qinfer_updater, protocol=4)
         learned_info['final_prior'] = self.qinfer_updater.prior
         learned_info['initial_prior'] = self.initial_prior
         learned_info['model_terms_names'] = self.model_terms_names
@@ -711,7 +711,7 @@ class ModelInstanceForStorage():
         - final parameters
         - oplist
         - true_oplist (?) needed to regenerate GenSimModel identically (necessary?)
-        - true_params (?)
+        - true_model_terms_params (?)
         - resample_thresh
         - resample_a [are resampling params needed only for updates?]
         - Prior (specified by mean and std_dev?)
@@ -734,36 +734,36 @@ class ModelInstanceForStorage():
         self.redis_port_number = port_number
         self.qmla_id = qid
 
-        rds_dbs = rds.databases_from_qmd_id(
+        redis_databases = rds.databases_from_qmd_id(
             self.redis_host_name,
             self.redis_port_number,
             self.qmla_id
         )
-        qmd_info_db = rds_dbs['qmd_info_db']
+        qmla_core_info_database = redis_databases['qmla_core_info_database']
         self.model_name = model_name
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
         self.model_id = model_id
-        qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
-        self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
-        self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
-        self.measurement_class = qmd_info['measurement_type']
-        self.experimental_measurements = qmd_info['experimental_measurements']
-        self.use_experimental_data = qmd_info['use_experimental_data']
-        self.probe_number = qmd_info['num_probes']
-        self.qinfer_resampler_threshold = qmd_info['resampler_thresh']
-        self.qinfer_resampler_a = qmd_info['resampler_a']
-        self.qinfer_PGH_heuristic_factor = qmd_info['pgh_prefactor']
-        self.true_model_constituent_operators = qmd_info['true_oplist']
-        self.true_model_params = qmd_info['true_params']
-        self.true_model_name = qmd_info['true_name']
+        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_core_data'))
+        self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
+        self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
+        self.measurement_class = qmla_core_info_dict['measurement_type']
+        self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
+        self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
+        self.probe_number = qmla_core_info_dict['num_probes']
+        self.qinfer_resampler_threshold = qmla_core_info_dict['resampler_thresh']
+        self.qinfer_resampler_a = qmla_core_info_dict['resampler_a']
+        self.qinfer_PGH_heuristic_factor = qmla_core_info_dict['pgh_prefactor']
+        self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
+        self.true_model_params = qmla_core_info_dict['true_model_terms_params']
+        self.true_model_name = qmla_core_info_dict['true_name']
         self.probes_for_plots = pickle.load(
-            open(qmd_info['probes_plot_file'], 'rb')
+            open(qmla_core_info_dict['probes_plot_file'], 'rb')
         )
-        self.times_to_plot = qmd_info['plot_times']
-        self.use_qle = qmd_info['qle']
-        self.use_custom_exponentiation = qmd_info['use_exp_custom']
-        self.store_particle_locations_and_weights = qmd_info[
+        self.times_to_plot = qmla_core_info_dict['plot_times']
+        self.use_qle = qmla_core_info_dict['qle']
+        self.use_custom_exponentiation = qmla_core_info_dict['use_exp_custom']
+        self.store_particle_locations_and_weights = qmla_core_info_dict[
             'store_particles_weights'
         ]
         self.model_bayes_factors = {}
@@ -797,12 +797,12 @@ class ModelInstanceForStorage():
         """
         if self.values_updated == False:
             self.values_updated = True
-            rds_dbs = rds.databases_from_qmd_id(
+            redis_databases = rds.databases_from_qmd_id(
                 self.redis_host_name,
                 self.redis_port_number,
                 self.qmla_id
             )
-            learned_models_info = rds_dbs['learned_models_info']
+            learned_models_info = redis_databases['learned_models_info']
             self.log_print(
                 [
                     "Updating learned info for model {}".format(self.model_id),
@@ -1122,7 +1122,7 @@ class ModelInstanceForComparison():
         learned_model_info=None,
     ):
 
-        rds_dbs = rds.databases_from_qmd_id(
+        redis_databases = rds.databases_from_qmd_id(
             host_name,
             port_number,
             qid
@@ -1130,31 +1130,31 @@ class ModelInstanceForComparison():
         self.log_file = log_file
         self.qmla_id = qid
 
-        qmd_info_db = rds_dbs['qmd_info_db']
+        qmla_core_info_database = redis_databases['qmla_core_info_database']
 
-        qmd_info = pickle.loads(qmd_info_db.get('qmla_core_data'))
-        self.probes_system = pickle.loads(qmd_info_db['ProbeDict'])
-        self.probes_simulator = pickle.loads(qmd_info_db['SimProbeDict'])
+        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_core_data'))
+        self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
+        self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
 
         self.model_id = model_id
-        self.num_particles = qmd_info['num_particles']
-        self.probe_number = qmd_info['num_probes']
-        self.PlotProbePath = qmd_info['probes_plot_file']
-        self.qinfer_resampler_threshold = qmd_info['resampler_thresh']
-        self.qinfer_resampler_a = qmd_info['resampler_a']
-        self.qinfer_PGH_heuristic_factor = qmd_info['pgh_prefactor']
-        self.true_model_constituent_operators = qmd_info['true_oplist']
-        self.true_model_params = qmd_info['true_params']
-        self.true_model_name = qmd_info['true_name']
-        self.use_custom_exponentiation = qmd_info['use_exp_custom']
-        self.measurement_class = qmd_info['measurement_type']
-        self.use_experimental_data = qmd_info['use_experimental_data']
-        self.experimental_measurements = qmd_info['experimental_measurements']
-        self.experimental_measurement_times = qmd_info['experimental_measurement_times']
-        self.results_directory = qmd_info['results_directory']
+        self.num_particles = qmla_core_info_dict['num_particles']
+        self.probe_number = qmla_core_info_dict['num_probes']
+        self.PlotProbePath = qmla_core_info_dict['probes_plot_file']
+        self.qinfer_resampler_threshold = qmla_core_info_dict['resampler_thresh']
+        self.qinfer_resampler_a = qmla_core_info_dict['resampler_a']
+        self.qinfer_PGH_heuristic_factor = qmla_core_info_dict['pgh_prefactor']
+        self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
+        self.true_model_params = qmla_core_info_dict['true_model_terms_params']
+        self.true_model_name = qmla_core_info_dict['true_name']
+        self.use_custom_exponentiation = qmla_core_info_dict['use_exp_custom']
+        self.measurement_class = qmla_core_info_dict['measurement_type']
+        self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
+        self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
+        self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
+        self.results_directory = qmla_core_info_dict['results_directory']
 
         # Get model specific data
-        learned_models_info = rds_dbs['learned_models_info']
+        learned_models_info = redis_databases['learned_models_info']
         model_id_float = float(model_id)
         model_id_str = str(model_id_float)
         try:
@@ -1262,7 +1262,7 @@ class ModelInstanceForComparison():
                 "Prior mean:", self.qinfer_updater.est_mean()
             ]
         )
-        del qmd_info, learned_model_info
+        del qmla_core_info_dict, learned_model_info
 
     def log_print(
         self,

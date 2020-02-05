@@ -28,7 +28,7 @@ class GrowthRuleTemplate(
         self.initial_models = ['pauliSet_xJx_1J2_d2']
         self.tree_completed_initially = False
         self.true_operator = 'pauliSet_1J2_zJz_d2PPpauliSet_1J2_xJx_d2PPpauliSet_1J2_yJy_d2'
-        self.true_params = {
+        self.true_model_terms_params = {
             'pauliSet_1J2_zJz_d2': 0.3,
             'pauliSet_1J2_xJx_d2': 0.1,
             'pauliSet_1J2_yJy_d2': 0.9

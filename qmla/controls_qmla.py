@@ -157,7 +157,7 @@ class ControlsQMLA():
             self.true_op_name
         )
         self.true_op_list = self.true_operator_class.constituents_operators
-        self.true_params = true_params_info['params_list']
+        self.true_model_terms_params = true_params_info['params_list']
         if self.use_experimental_data == True:
             # so it
             true_ham = None
@@ -574,7 +574,7 @@ def parse_cmd_line_args(args):
         '-true_expec_path', '--true_expec_path',
         help='Path to save true params to.',
         type=str,
-        default="{}/true_params.p".format(os.getcwd())
+        default="{}/true_model_terms_params.p".format(os.getcwd())
     )
     parser.add_argument(
         '-plot_probes', '--probes_plot_file',

@@ -17,7 +17,7 @@ pickled to redis. Pickling and unpickling is quite slow, so should be minimised.
 """
 
 databases_required = [
-    'qmd_info_db',
+    'qmla_core_info_database',
     'learned_models_info',
     'learned_models_ids',
     'bayes_factors_db',
@@ -114,7 +114,7 @@ def redis_start(host_name, port_number, qmd_id):
               )
         running_dict = {}
         running_dict[qmd_id] = True
-        pickled_running_dict = pickle.dumps(running_dict, protocol=2)
+        pickled_running_dict = pickle.dumps(running_dict, protocol=4)
         redis_conn.set('Running', pickled_running_dict)
 
     else:
@@ -123,7 +123,7 @@ def redis_start(host_name, port_number, qmd_id):
               )
         current = pickle.loads(redis_conn['Running'])
         current[qmd_id] = True
-        pickled_running_dict = pickle.dumps(current, protocol=2)
+        pickled_running_dict = pickle.dumps(current, protocol=4)
         redis_conn.set('Running', pickled_running_dict)
 
 
@@ -131,7 +131,7 @@ def redis_end(host_name, port_number, qmd_id):
     redis_conn = redis.Redis(host=host_name, port=port_number)
     current = pickle.loads(redis_conn['Running'])
     current[qmd_id] = False
-    pickled_running_dict = pickle.dumps(current, protocol=2)
+    pickled_running_dict = pickle.dumps(current, protocol=4)
     redis_conn.set('Running', pickled_running_dict)
 
 

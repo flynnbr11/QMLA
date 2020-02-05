@@ -71,7 +71,7 @@ class NVLargeSpinBath(
             'other': 1
         }
 
-        self.true_params = {
+        self.true_model_terms_params = {
             # test tracing out
             # 'nv_spin_x_d2' : -2.98288958683093952,
             # 'nv_spin_y_d2' : 3.4842202054983122,

@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
 
-# import qmla.database_framework as database_framework
+# Default probe set
 
 def separable_probe_dict(
     max_num_qubits,
@@ -59,9 +59,6 @@ def random_probe(num_qubits):
     a = np.array(complex_vectors)
     norm_factor = np.linalg.norm(a)
     probe = complex_vectors / norm_factor
-    # if np.isclose(1.0, np.linalg.norm(probe), atol=1e-14) is False:
-    #     print("Probe not normalised. Norm factor=", np.linalg.norm(probe)-1)
-    #     return random_probe(num_qubits)
     while (
         np.abs(np.linalg.norm(probe)) - 1
         >
@@ -70,7 +67,6 @@ def random_probe(num_qubits):
         print("generating new random probe..")
         probe = random_probe(num_qubits)
 
-    # print("random probe generated with norm:", np.linalg.norm(probe))
     return probe
 
 
@@ -225,8 +221,9 @@ def random_phase_plus(
     return rand_phase_plus
 
 
+# General purpose probe dictionaries for specific cases
+## e.g. experimental method, generalised to multiple dimensions
 
-# General purpose probe dictionaries
 def n_qubit_plus_state(num_qubits):
     one_qubit_plus = (1 / np.sqrt(2) + 0j) * np.array([1, 1])
     plus_n = one_qubit_plus
@@ -285,33 +282,7 @@ def zero_state_probes(max_num_qubits=9, **kwargs):
     return probes
 
 
-## Parity Time functions
-
-def PT_Effective_Hamiltonian_probe_dict(
-    **kwargs
-):
-    # for development
-    # TODO make this more robust
-    import pickle
-    try:
-        probes = pickle.load(
-            open(
-                "/home/bf16951/Dropbox/QML_share_stateofart/QMD/Launch/Data/test_PT_probedict.p",
-                'rb'
-            )
-        )
-    except BaseException:
-        probes = pickle.load(
-            open(
-                "/panfs/panasas01/phys/bf16951/QMD/Launch/Data/test_PT_probedict.p",
-                'rb'
-            )
-        )
-
-    return probes
-
-
-# Fermi Hubbard model -- requires encoding via Jordan-Wigner transformation. 
+# Fermi Hubbard model -- requires encoding via Jordan-Wigner transformation.
 def separable_fermi_hubbard_half_filled(
     max_num_qubits,
     num_probes,
@@ -372,6 +343,7 @@ def separable_fermi_hubbard_half_filled(
 
     return separable_probes
 
+
 def get_half_filled_basis_vectors(
     num_sites
 ):
@@ -407,8 +379,6 @@ def random_superposition_occupation_basis():
     return state
 
 
-
-
 def state_from_string(
     s,
     basis_states={
@@ -428,6 +398,7 @@ def state_from_string(
             )
     state = np.array(state)
     return state
+
 
 def fermi_hubbard_half_filled_superposition(
     max_num_qubits,
@@ -462,13 +433,13 @@ def fermi_hubbard_half_filled_superposition(
     print("[fermi_hubbard_half_filled_superposition] keys:", probe_dict.keys())
     return probe_dict
 
+
 def vector_from_fermion_state_description(state):
 
     occupied = np.array([0, 1])
     vacant = np.array([1, 0])
 
-    vector = 1
-
+    vector = 1 # so we can perform tensor product on it
     for i in range(1, 1 + state['num_sites']):
         try:
             occupation = state['occupations'][i]

@@ -435,7 +435,7 @@ class QuantumModelLearningAgent():
     ):
         # testing whether these are used anywhere
         # Either remove, or find appropriate place for initialisation and use
-        # many are included in qmd_info dict sent to workers; check if they are
+        # many are included in qmla_core_info_dict dict sent to workers; check if they are
         # used thereafter
         self.models_first_layer = first_layer_models
         self.use_qle = False  # Set to False for IQLE # TODO remove - redundant
@@ -546,7 +546,7 @@ class QuantumModelLearningAgent():
             'probes_plot_file': self.probes_plot_file,
             'plot_times': self.times_to_plot,
             'true_oplist': self.true_model_constituent_operators,
-            'true_params': self.true_param_list,
+            'true_model_terms_params': self.true_param_list,
             'num_particles': self.num_particles,
             'num_experiments': self.num_experiments,
             'resampler_thresh': self.qinfer_resample_threshold,
@@ -589,15 +589,15 @@ class QuantumModelLearningAgent():
             'tree_identifiers': self.tree_identifiers,
             'bayes_factors_time_all_exp_times': self.qmla_controls.bayes_factors_use_all_exp_times,
         }
-        compressed_qmd_info = pickle.dumps(self.qmla_core_data, protocol=2)
-        compressed_probe_dict = pickle.dumps(self.probes_system, protocol=2)
+        compressed_qmd_info = pickle.dumps(self.qmla_core_data, protocol=4)
+        compressed_probe_dict = pickle.dumps(self.probes_system, protocol=4)
         compressed_sim_probe_dict = pickle.dumps(
-            self.probes_simulator, protocol=2)
-        qmd_info_db = self.redis_databases['qmd_info_db']
-        self.log_print(["Saving qmd info db to ", qmd_info_db])
-        qmd_info_db.set('qmla_core_data', compressed_qmd_info)
-        qmd_info_db.set('ProbeDict', compressed_probe_dict)
-        qmd_info_db.set('SimProbeDict', compressed_sim_probe_dict)
+            self.probes_simulator, protocol=4)
+        qmla_core_info_database = self.redis_databases['qmla_core_info_database']
+        self.log_print(["Saving qmd info db to ", qmla_core_info_database])
+        qmla_core_info_database.set('qmla_core_data', compressed_qmd_info)
+        qmla_core_info_database.set('ProbeDict', compressed_probe_dict)
+        qmla_core_info_database.set('SimProbeDict', compressed_sim_probe_dict)
 
     def _initiate_database(self):
         self.db, self.legacy_db, self.model_lists = \
@@ -608,8 +608,8 @@ class QuantumModelLearningAgent():
                 log_file=self.log_file,
                 gen_list=self.branch_initial_models,
                 qle=self.use_qle,
-                true_ops=self.true_model_constituent_operators,
-                true_params=self.true_param_list,
+                true_model_terms_matrices=self.true_model_constituent_operators,
+                true_model_terms_params=self.true_param_list,
                 num_particles=self.num_particles,
                 redimensionalise=False,
                 resample_threshold=self.qinfer_resample_threshold,
@@ -645,7 +645,7 @@ class QuantumModelLearningAgent():
     def add_model_to_database(
         self,
         model,
-        branchID=0,
+        branch_id=0,
         force_create_model=False
     ):
         #self.model_count += 1
@@ -656,9 +656,9 @@ class QuantumModelLearningAgent():
             num_particles=self.num_particles,
             true_op_name=self.true_model_name,
             model_lists=self.model_lists,
-            true_ops=self.true_model_constituent_operators,
-            true_params=self.true_param_list,
-            branchID=branchID,
+            true_model_terms_matrices=self.true_model_constituent_operators,
+            true_model_terms_params=self.true_param_list,
+            branch_id=branch_id,
             resample_threshold=self.qinfer_resample_threshold,
             resampler_a=self.qinfer_resampler_a,
             pgh_prefactor=self.qinfer_PGH_heuristic_factor,
@@ -721,27 +721,27 @@ class QuantumModelLearningAgent():
     ):
         model_list = list(set(model_list))  # remove possible duplicates
         self.branch_highest_id += 1
-        branchID = int(self.branch_highest_id)
+        branch_id = int(self.branch_highest_id)
         self.log_print(
             [
-                "NEW BRANCH {}. growth rule= {}".format(branchID, growth_rule)
+                "NEW BRANCH {}. growth rule= {}".format(branch_id, growth_rule)
             ]
         )
-        self.branch_comparisons_completed[branchID] = False
+        self.branch_comparisons_completed[branch_id] = False
         num_models = len(model_list)
-        self.branch_num_models[branchID] = num_models
-        self.branch_num_model_pairs[branchID] = num_pairs_in_list(
+        self.branch_num_models[branch_id] = num_models
+        self.branch_num_model_pairs[branch_id] = num_pairs_in_list(
             num_models
         )
-        self.branch_model_learning_complete[branchID] = False
-        self.branch_comparisons_complete[branchID] = False
-        self.branch_growth_rules[branchID] = growth_rule
-        self.branch_growth_rule_instances[branchID] = self.unique_growth_rule_instances[growth_rule]
+        self.branch_model_learning_complete[branch_id] = False
+        self.branch_comparisons_complete[branch_id] = False
+        self.branch_growth_rules[branch_id] = growth_rule
+        self.branch_growth_rule_instances[branch_id] = self.unique_growth_rule_instances[growth_rule]
 
         self.log_print(
             [
                 'Branch {} growth rule {} has {} new models {}'.format(
-                    branchID,
+                    branch_id,
                     growth_rule,
                     num_models,
                     model_list
@@ -757,7 +757,7 @@ class QuantumModelLearningAgent():
             # if false, that's because it's already been computed
             add_model_info = self.add_model_to_database(
                 model,
-                branchID=branchID
+                branch_id=branch_id
             )
             already_computed = not(
                 add_model_info['is_new_model']
@@ -765,7 +765,7 @@ class QuantumModelLearningAgent():
             model_id = add_model_info['model_id']
             model_id_list.append(model_id)
             if already_computed == False:  # first instance of this model
-                self.models_branches[model_id] = branchID
+                self.models_branches[model_id] = branch_id
 
             self.log_print(
                 [
@@ -780,19 +780,19 @@ class QuantumModelLearningAgent():
             if bool(already_computed) == True:
                 pre_computed_models.append(model)
 
-        self.branch_num_precomputed_models[branchID] = num_models_already_computed_this_branch
-        self.branch_resident_model_names[branchID] = model_list
-        self.branch_models_precomputed[branchID] = pre_computed_models
+        self.branch_num_precomputed_models[branch_id] = num_models_already_computed_this_branch
+        self.branch_resident_model_names[branch_id] = model_list
+        self.branch_models_precomputed[branch_id] = pre_computed_models
 
-        self.branch_resident_model_ids[branchID] = model_id_list
+        self.branch_resident_model_ids[branch_id] = model_id_list
         self.log_print(
             [
                 'Num models already computed on branch ',
-                branchID,
+                branch_id,
                 '=', num_models_already_computed_this_branch,
             ]
         )
-        return branchID
+        return branch_id
 
     def get_model_storage_instance_by_id(self, model_id):
         return database_framework.reduced_model_instance_from_id(
@@ -839,15 +839,15 @@ class QuantumModelLearningAgent():
 
     def learn_models_on_given_branch(
         self,
-        branchID,
+        branch_id,
         use_rq=True,
         blocking=False
     ):
-        model_list = self.branch_resident_model_names[branchID]
+        model_list = self.branch_resident_model_names[branch_id]
         self.log_print(
             [
                 "learn_models_on_given_branch. branch",
-                branchID,
+                branch_id,
                 " has models:",
                 model_list
             ]
@@ -856,28 +856,28 @@ class QuantumModelLearningAgent():
             self.redis_databases['active_branches_learning_models']
         )
         num_models_already_set_this_branch = (
-            self.branch_num_precomputed_models[branchID]
+            self.branch_num_precomputed_models[branch_id]
         )
         active_branches_learning_models.set(
-            int(branchID),
+            int(branch_id),
             num_models_already_set_this_branch
         )
         unlearned_models_this_branch = list(
             set(model_list) -
-            set(self.branch_models_precomputed[branchID])
+            set(self.branch_models_precomputed[branch_id])
         )
 
         self.log_print(
             [
                 "branch {} has {} precomputed models and unlearned models {}".format(
-                    branchID,
-                    self.branch_models_precomputed[branchID],
+                    branch_id,
+                    self.branch_models_precomputed[branch_id],
                     unlearned_models_this_branch
                 )
             ]
         )
         if len(unlearned_models_this_branch) == 0:
-            self.ghost_branch_list.append(branchID)
+            self.ghost_branch_list.append(branch_id)
 
         for model_name in unlearned_models_this_branch:
             self.log_print(
@@ -905,7 +905,7 @@ class QuantumModelLearningAgent():
             )
         self.log_print(
             [
-                'Learning models from branch {} finished.'.format(branchID)
+                'Learning models from branch {} finished.'.format(branch_id)
             ]
         )
 
@@ -925,7 +925,7 @@ class QuantumModelLearningAgent():
                 self.db,
                 name=model_name
             )
-            branchID = self.models_branches[model_id]
+            branch_id = self.models_branches[model_id]
             if self.run_in_parallel and use_rq:
                 # i.e. use a job queue rather than sequentially doing it.
                 from rq import Connection, Queue, Worker
@@ -939,8 +939,8 @@ class QuantumModelLearningAgent():
                     remote_learn_model_parameters,
                     model_name,
                     model_id,
-                    growth_generator=self.branch_growth_rules[branchID],
-                    branchID=branchID,
+                    growth_generator=self.branch_growth_rules[branch_id],
+                    branch_id=branch_id,
                     remote=True,
                     host_name=self.redis_host_name,
                     port_number=self.redis_port_number,
@@ -992,9 +992,9 @@ class QuantumModelLearningAgent():
                 updated_model_info = remote_learn_model_parameters(
                     model_name,
                     model_id,
-                    growth_generator=self.branch_growth_rules[branchID],
-                    branchID=branchID,
-                    qmd_info=self.qmla_core_data,
+                    growth_generator=self.branch_growth_rules[branch_id],
+                    branch_id=branch_id,
+                    qmla_core_info_dict=self.qmla_core_data,
                     remote=True,
                     host_name=self.redis_host_name,
                     port_number=self.redis_port_number,
@@ -1017,7 +1017,7 @@ class QuantumModelLearningAgent():
         model_a_id,
         model_b_id,
         return_job=False,
-        branchID=None,
+        branch_id=None,
         interbranch=False,
         remote=True,
         # bayes_threshold=None,
@@ -1026,7 +1026,7 @@ class QuantumModelLearningAgent():
         # if bayes_threshold is None:
         #     bayes_threshold = self.bayes_threshold_upper
 
-        if branchID is None:
+        if branch_id is None:
             interbranch = True
         unique_id = database_framework.unique_model_pair_identifier(
             model_a_id,
@@ -1050,7 +1050,7 @@ class QuantumModelLearningAgent():
                 # the function is the first argument to RQ workers
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
-                branchID=branchID,
+                branch_id=branch_id,
                 interbranch=interbranch,
                 times_record=self.bayes_factors_store_times_file,
                 bf_data_folder=self.bayes_factors_store_directory,
@@ -1086,7 +1086,7 @@ class QuantumModelLearningAgent():
                 bf_data_folder=self.bayes_factors_store_directory,
                 times_record=self.bayes_factors_store_times_file,
                 num_times_to_use=self.num_experiments_for_bayes_updates,
-                branchID=branchID,
+                branch_id=branch_id,
                 interbranch=interbranch,
                 bayes_threshold=self.bayes_threshold_lower,
                 host_name=self.redis_host_name,
@@ -1162,7 +1162,7 @@ class QuantumModelLearningAgent():
 
     def get_bayes_factors_by_branch_id(
         self,
-        branchID,
+        branch_id,
         remote=True,
         # bayes_threshold=None,
         recompute=False
@@ -1171,17 +1171,17 @@ class QuantumModelLearningAgent():
         #     bayes_threshold = self.bayes_threshold_upper
 
         active_branches_bayes = self.redis_databases['active_branches_bayes']
-        model_id_list = self.branch_resident_model_ids[branchID]
+        model_id_list = self.branch_resident_model_ids[branch_id]
         self.log_print(
             [
                 'get_bayes_factors_by_branch_id',
-                branchID,
+                branch_id,
                 'model id list:',
                 model_id_list
             ]
         )
 
-        active_branches_bayes.set(int(branchID), 0)  # set up branch 0
+        active_branches_bayes.set(int(branch_id), 0)  # set up branch 0
         num_models = len(model_id_list)
         for i in range(num_models):
             a = model_id_list[i]
@@ -1207,14 +1207,14 @@ class QuantumModelLearningAgent():
                             a,
                             b,
                             remote=remote,
-                            branchID=branchID,
+                            branch_id=branch_id,
                             # bayes_threshold=bayes_threshold
                         )
                     elif unique_id in self.bayes_factor_pair_computed:
                         # if this is already computed,
                         # tell this branch not to wait on it.
                         active_branches_bayes.incr(
-                            int(branchID),
+                            int(branch_id),
                             1
                         )
 
@@ -1284,18 +1284,18 @@ class QuantumModelLearningAgent():
 
     def compare_all_models_in_branch(
         self,
-        branchID,
+        branch_id,
         # bayes_threshold=None
     ):
 
         active_models_in_branch_old = database_framework.active_model_ids_by_branch_id(
             self.db,
-            branchID
+            branch_id
         )
-        active_models_in_branch = self.branch_resident_model_ids[branchID]
+        active_models_in_branch = self.branch_resident_model_ids[branch_id]
         self.log_print(
             [
-                'compare_all_models_in_branch', branchID,
+                'compare_all_models_in_branch', branch_id,
                 'active_models_in_branch_old:', active_models_in_branch_old,
                 'active_models_in_branch_new:', active_models_in_branch,
             ]
@@ -1318,7 +1318,7 @@ class QuantumModelLearningAgent():
                     self.log_print(
                         [
                             "[compare_all_models_in_branch {}]".format(
-                                branchID),
+                                branch_id),
                             "Point to", res,
                             "(comparison {}/{})".format(mod1, mod2),
                         ]
@@ -1370,10 +1370,10 @@ class QuantumModelLearningAgent():
         champ_name = self.model_name_id_map[champ_id]
 
         champ_num_qubits = database_framework.get_num_qubits(champ_name)
-        self.branch_champions[int(branchID)] = champ_id
+        self.branch_champions[int(branch_id)] = champ_id
         if champ_id not in self.branch_champs_active_list:
             self.branch_champs_active_list.append(champ_id)
-        growth_rule = self.branch_growth_rules[int(branchID)]
+        growth_rule = self.branch_growth_rules[int(branch_id)]
         try:
             self.branch_champs_by_dimension[growth_rule][champ_num_qubits].append(
                 champ_name)
@@ -1400,32 +1400,32 @@ class QuantumModelLearningAgent():
             reverse=True
         )
 
-        if self.branch_comparisons_completed[int(float(branchID))] == False:
+        if self.branch_comparisons_completed[int(float(branch_id))] == False:
             # only update self.branch_rankings the first time branch is
             # considered
-            self.branch_rankings[int(float(branchID))] = ranked_model_list
-            self.branch_comparisons_completed[int(float(branchID))] = True
+            self.branch_rankings[int(float(branch_id))] = ranked_model_list
+            self.branch_comparisons_completed[int(float(branch_id))] = True
 
         self.log_print(
             [
                 "Model points for branch",
-                branchID,
+                branch_id,
                 models_points
             ]
         )
         self.log_print(
             [
                 "Champion of branch ",
-                branchID,
+                branch_id,
                 " is ",
                 champ_name,
                 "({})".format(champ_id)
             ]
         )
-        self.branch_bayes_points[branchID] = models_points
-        # self.branch_growth_rules[branchID]
+        self.branch_bayes_points[branch_id] = models_points
+        # self.branch_growth_rules[branch_id]
 
-        if branchID in self.ghost_branch_list:
+        if branch_id in self.ghost_branch_list:
             models_to_deactivate = list(
                 set(active_models_in_branch)
                 - set([champ_id])
@@ -1458,7 +1458,7 @@ class QuantumModelLearningAgent():
                     self.log_print(
                         [
                             "Ghost Branch",
-                            branchID,
+                            branch_id,
                             "deactivating model",
                             losing_model_id
                         ]
@@ -1823,29 +1823,29 @@ class QuantumModelLearningAgent():
                 active_branches_learning_models.keys()
             )
             for branchID_bytes in branch_ids_on_db:
-                branchID = int(branchID_bytes)
+                branch_id = int(branchID_bytes)
                 if (
-                    (int(active_branches_learning_models.get(branchID)) ==
-                     self.branch_num_models[branchID])
+                    (int(active_branches_learning_models.get(branch_id)) ==
+                     self.branch_num_models[branch_id])
                     and
-                    (self.branch_model_learning_complete[branchID] == False)
+                    (self.branch_model_learning_complete[branch_id] == False)
                 ):
-                    self.branch_model_learning_complete[branchID] = True
-                    self.get_bayes_factors_by_branch_id(branchID)
+                    self.branch_model_learning_complete[branch_id] = True
+                    self.get_bayes_factors_by_branch_id(branch_id)
 
                 if branchID_bytes in active_branches_bayes.keys():
-                    branchID = int(branchID_bytes)
+                    branch_id = int(branchID_bytes)
                     num_bayes_done_on_branch = (
                         active_branches_bayes.get(branchID_bytes)
                     )
 
                     if (int(num_bayes_done_on_branch) ==
-                                self.branch_num_model_pairs[branchID]
+                                self.branch_num_model_pairs[branch_id]
                             and
-                            self.branch_comparisons_complete[branchID] == False
+                            self.branch_comparisons_complete[branch_id] == False
                             ):
-                        self.branch_comparisons_complete[branchID] = True
-                        self.compare_all_models_in_branch(branchID)
+                        self.branch_comparisons_complete[branch_id] = True
+                        self.compare_all_models_in_branch(branch_id)
 
             if (
                 np.all(
@@ -1968,7 +1968,7 @@ class QuantumModelLearningAgent():
 
     def spawn_from_branch(
         self,
-        branchID,
+        branch_id,
         growth_rule,
         num_models=1
     ):
@@ -1984,8 +1984,8 @@ class QuantumModelLearningAgent():
                 )
             ]
         )
-        all_models_this_branch = self.branch_rankings[branchID]
-        best_models = self.branch_rankings[branchID][:num_models]
+        all_models_this_branch = self.branch_rankings[branch_id]
+        best_models = self.branch_rankings[branch_id][:num_models]
         best_model_names = [
             # database_framework.model_name_from_id(self.db, mod_id) for
             self.model_name_id_map[mod_id]
@@ -1998,7 +1998,7 @@ class QuantumModelLearningAgent():
         ]
         # print("[QMD] fitness parameters:", self.model_fitness_scores)
 
-        new_models = self.branch_growth_rule_instances[branchID].generate_models(
+        new_models = self.branch_growth_rule_instances[branch_id].generate_models(
             # generator = growth_rule,
             model_list=best_model_names,
             spawn_step=self.spawn_depth_by_growth_rule[growth_rule],
@@ -2008,7 +2008,7 @@ class QuantumModelLearningAgent():
             log_file=self.log_file,
             current_champs=current_champs,
             spawn_stage=self.spawn_stage[growth_rule],
-            branch_model_points=self.branch_bayes_points[branchID],
+            branch_model_points=self.branch_bayes_points[branch_id],
             model_names_ids=self.model_name_id_map,
             miscellaneous=self.misc_growth_info[growth_rule]
         )
@@ -2031,7 +2031,7 @@ class QuantumModelLearningAgent():
             growth_rule=growth_rule
         )
 
-        self.branch_parents[new_branch_id] = branchID
+        self.branch_parents[new_branch_id] = branch_id
 
         self.log_print(
             [
@@ -2058,7 +2058,7 @@ class QuantumModelLearningAgent():
             blocking=False,
             use_rq=True
         )
-        tree_completed = self.branch_growth_rule_instances[branchID].check_tree_completed(
+        tree_completed = self.branch_growth_rule_instances[branch_id].check_tree_completed(
             spawn_step=self.spawn_depth_by_growth_rule[growth_rule],
             current_num_qubits=new_model_dimension
         )
@@ -2319,7 +2319,7 @@ class QuantumModelLearningAgent():
 
             # champ_attributes = list(champ_mod.__dict__.keys())
             # Here we need to fill in learned_info dict on redis with required attributes
-            # fill in rds_dbs['learned_models_info'][reduced_mod_id]
+            # fill in redis_databases['learned_models_info'][reduced_mod_id]
             # for att in champ_attributes:
             #     reduced_mod_instance.__setattr__(
             #         att,
@@ -2365,7 +2365,7 @@ class QuantumModelLearningAgent():
 
             compressed_reduced_champ_info = pickle.dumps(
                 reduced_champion_info,
-                protocol=2
+                protocol=4
             )
 
             # TODO fill in values for ModelInstanceForStorage
@@ -2778,45 +2778,45 @@ class QuantumModelLearningAgent():
             self.inspect_remote_job_crashes()
 
             for branchID_bytes in branch_ids_on_db:
-                branchID = int(branchID_bytes)
+                branch_id = int(branchID_bytes)
                 if (
                     int(
                         active_branches_learning_models.get(
-                            branchID)
-                    ) == self.branch_num_models[branchID]
+                            branch_id)
+                    ) == self.branch_num_models[branch_id]
                     and
-                    self.branch_model_learning_complete[branchID] == False
+                    self.branch_model_learning_complete[branch_id] == False
                 ):
                     self.log_print([
                         "All models on branch",
-                        branchID,
+                        branch_id,
                         "have finished learning."]
                     )
-                    self.branch_model_learning_complete[branchID] = True
-                    models_this_branch = self.branch_resident_model_ids[branchID]
+                    self.branch_model_learning_complete[branch_id] = True
+                    models_this_branch = self.branch_resident_model_ids[branch_id]
                     for mod_id in models_this_branch:
                         mod = self.get_model_storage_instance_by_id(mod_id)
                         mod.model_update_learned_values()
 
-                    self.get_bayes_factors_by_branch_id(branchID)
+                    self.get_bayes_factors_by_branch_id(branch_id)
 
             for branchID_bytes in active_branches_bayes.keys():
 
-                branchID = int(branchID_bytes)
+                branch_id = int(branchID_bytes)
                 bayes_calculated = active_branches_bayes.get(
                     branchID_bytes
                 )
 
                 if (int(bayes_calculated) ==
-                    self.branch_num_model_pairs[branchID]
+                    self.branch_num_model_pairs[branch_id]
                         and
-                    self.branch_comparisons_complete[branchID] == False
+                    self.branch_comparisons_complete[branch_id] == False
                     ):
-                    self.branch_comparisons_complete[branchID] = True
-                    self.compare_all_models_in_branch(branchID)
-                    # print("[QMD] getting growth rule for branchID", branchID)
+                    self.branch_comparisons_complete[branch_id] = True
+                    self.compare_all_models_in_branch(branch_id)
+                    # print("[QMD] getting growth rule for branch_id", branch_id)
                     # print("[QMD] dict:", self.branch_growth_rules)
-                    this_branch_growth_rule = self.branch_growth_rules[branchID]
+                    this_branch_growth_rule = self.branch_growth_rules[branch_id]
                     if self.tree_completed[this_branch_growth_rule] == False:
                         print(
                             "not finished tree for growth:",
@@ -2826,7 +2826,7 @@ class QuantumModelLearningAgent():
                         growth_rule_tree_complete = self.spawn_from_branch(
                             # will return True if this brings it to
                             # self.MaxSpawnDepth
-                            branchID=branchID,
+                            branch_id=branch_id,
                             growth_rule=this_branch_growth_rule,
                             num_models=1
                         )
@@ -2864,30 +2864,30 @@ class QuantumModelLearningAgent():
             branch_ids_on_db = list(active_branches_learning_models.keys())
             # branch_ids_on_db.remove(b'LOCKED')
             for branchID_bytes in branch_ids_on_db:
-                branchID = int(branchID_bytes)
+                branch_id = int(branchID_bytes)
                 if (
-                    (int(active_branches_learning_models.get(branchID)) ==
-                     self.branch_num_models[branchID])
+                    (int(active_branches_learning_models.get(branch_id)) ==
+                     self.branch_num_models[branch_id])
                     and
-                    (self.branch_model_learning_complete[branchID] == False)
+                    (self.branch_model_learning_complete[branch_id] == False)
                 ):
-                    self.branch_model_learning_complete[branchID] = True
-                    self.get_bayes_factors_by_branch_id(branchID)
+                    self.branch_model_learning_complete[branch_id] = True
+                    self.get_bayes_factors_by_branch_id(branch_id)
 
                 if branchID_bytes in active_branches_bayes:
                     num_bayes_done_on_branch = (
                         active_branches_bayes.get(branchID_bytes)
                     )
                     # print(
-                    #     "branch", branchID,
+                    #     "branch", branch_id,
                     #     "num complete:", num_bayes_done_on_branch
                     # )
                     if (int(num_bayes_done_on_branch) ==
-                            self.branch_num_model_pairs[branchID] and
-                            self.branch_comparisons_complete[branchID] == False
+                            self.branch_num_model_pairs[branch_id] and
+                            self.branch_comparisons_complete[branch_id] == False
                             ):
-                        self.branch_comparisons_complete[branchID] = True
-                        self.compare_all_models_in_branch(branchID)
+                        self.branch_comparisons_complete[branch_id] = True
+                        self.compare_all_models_in_branch(branch_id)
 
             if (
                 np.all(

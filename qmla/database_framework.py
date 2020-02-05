@@ -868,7 +868,7 @@ def move_to_legacy(db, legacy_db, name):
 
 
 def model_branch_from_model_id(db, model_id):
-    return db.loc[db['ModelID'] == model_id]['branchID'].item()
+    return db.loc[db['ModelID'] == model_id]['branch_id'].item()
 
 
 def model_id_from_name(db, name):
@@ -900,8 +900,8 @@ def reduced_model_instance_from_id(db, model_id):
     return db.loc[idx]["Reduced_Model_Class_Instance"]
 
 
-def list_model_id_in_branch(db, branchID):
-    return list(db[db['branchID'] == branchID]['ModelID'])
+def list_model_id_in_branch(db, branch_id):
+    return list(db[db['branch_id'] == branch_id]['ModelID'])
 
 
 def update_field(db, field, name=None, model_id=None,
@@ -920,16 +920,16 @@ def pull_field(db, name, field):
         print("Cannot update field -- model does not exist in database_framework.")
 
 
-def model_names_on_branch(db, branchID):
-    return list(db[(db['branchID'] == branchID)]['<Name>'])
+def model_names_on_branch(db, branch_id):
+    return list(db[(db['branch_id'] == branch_id)]['<Name>'])
 
 
 def all_active_model_ids(db):
     return list(db[(db['Status'] == 'Active')]['ModelID'])
 
 
-def active_model_ids_by_branch_id(db, branchID):
-    return list(db[(db['branchID'] == branchID) & (
+def active_model_ids_by_branch_id(db, branch_id):
+    return list(db[(db['branch_id'] == branch_id) & (
         db['Status'] == 'Active')]['ModelID'])
 
 
@@ -941,7 +941,7 @@ def all_unfinished_model_names(db):
     return list(db[(db['Completed'] == False)]['<Name>'])
 
 
-def unfinished_model_ids_by_branch_id(db, branchID):
-    return list(db[(db['branchID'] == branchID) &
+def unfinished_model_ids_by_branch_id(db, branch_id):
+    return list(db[(db['branch_id'] == branch_id) &
                    (db['Completed'] == False)]['ModelID']
                 )

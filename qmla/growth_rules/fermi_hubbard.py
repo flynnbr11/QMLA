@@ -141,7 +141,7 @@ class FermiHubbardProbabilistic(
             'FHhop_1h2_down_d3+FHonsite_3_d3'
         ]
 
-        self.true_params = {
+        self.true_model_terms_params = {
             # term : true_param
             # 'FHhop_1h2_up_d2' : 1,
         }

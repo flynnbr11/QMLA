@@ -72,7 +72,7 @@ parser.add_argument(
 # )
 
 parser.add_argument(
-    '-params', '--true_params',
+    '-params', '--true_model_terms_params',
     help="Path to pickled true params info.",
     type=str,
     default=None
@@ -135,7 +135,7 @@ log_file = arguments.log_file
 all_bayes_csv = arguments.bayes_csv
 qhl_mode = bool(arguments.qhl_mode)
 further_qhl_mode = bool(arguments.further_qhl_mode)
-true_params_path = arguments.true_params
+true_params_path = arguments.true_model_terms_params
 exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
@@ -213,8 +213,6 @@ except BaseException:
     # raise
 
 if further_qhl_mode == True:
-    print("further_qhl_model = True.")
-
     results_csv_name = 'summary_further_qhl_results.csv'
     results_csv = directory_to_analyse + results_csv_name
     results_file_name_start = 'further_qhl_results'
@@ -247,7 +245,7 @@ try:
     pickle.dump(
         average_priors,
         open(avg_priors, 'wb'),
-        protocol=2
+        protocol=4
     )
 except BaseException:
     raise

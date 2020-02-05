@@ -36,7 +36,7 @@ class PresentationPlotGeneration(
         # self.max_num_probe_qubits = 3
         # self.true_operator = 'yTxTTz'
 
-        self.true_params = {
+        self.true_model_terms_params = {
             # Decohering param set
             # From 3000exp/20000prt, BC SelectedRuns/Nov_28/15_14/results_049
             'xTi': -0.98288958683093952,  # -0.098288958683093952
@@ -62,7 +62,7 @@ class PresentationPlotGeneration(
             'zTi': (1.65, 0.1),  # 0.096477790489201143,
             'zTz': (0.76, 0.1)  # 0.16034234519563935,
         }
-        # self.true_params = { # from Jul_05/16_40
+        # self.true_model_terms_params = { # from Jul_05/16_40
         #     'xTi': 0.92450565,
         #     'yTi': 6.00664336,
         #     'zTi': 1.65998543,
@@ -72,7 +72,7 @@ class PresentationPlotGeneration(
         if self.single_parameter == True:
             self.max_time_to_consider = 2
             self.true_operator = 'zTi'
-            self.true_params = {
+            self.true_model_terms_params = {
                 'zTi': 6.5
             }
             self.gaussian_prior_means_and_widths = {

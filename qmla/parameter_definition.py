@@ -46,7 +46,7 @@ def create_qhl_params(
     )
 
     num_terms = len(terms)
-    true_params = []
+    true_model_terms_params = []
     true_params_dict = {}
     true_params_dict_latex_names = {}
 
@@ -57,7 +57,7 @@ def create_qhl_params(
     true_prior.__setattr__('cov', new_cov_mtx)
     sampled_list = true_prior.sample()
     try:
-        fixed_true_params = growth_class.true_params
+        fixed_true_params = growth_class.true_model_terms_params
     except BaseException:
         fixed_true_params = set_true_params
 
@@ -71,7 +71,7 @@ def create_qhl_params(
                 true_param = fixed_true_params[term]
             except BaseException:
                 true_param = sampled_list[0][i]
-        true_params.append(true_param)
+        true_model_terms_params.append(true_param)
         true_params_dict[terms[i]] = true_param
         true_params_dict_latex_names[latex_terms[i]] = true_param
 
@@ -82,14 +82,14 @@ def create_qhl_params(
             model_name_individual_terms=latex_terms,
             prior=true_prior,
             plot_file=true_prior_plot_file,
-            true_params=true_params_dict_latex_names
+            true_model_terms_params=true_params_dict_latex_names
         )
     except BaseException:
         print("[SetQHLParams] plotting prior failed \n\n\n")
         pass
 
     true_params_info = {
-        'params_list': true_params,
+        'params_list': true_model_terms_params,
         'params_dict': true_params_dict,
         'all_growth_classes': all_growth_classes,
     }

@@ -93,7 +93,7 @@ class GrowthRuleSuper():
         self.min_param = 0
         self.max_param = 1
         self.prior_random_mean = False
-        self.true_params = {
+        self.true_model_terms_params = {
             # term : true_param
         }
 

@@ -87,7 +87,7 @@ def plot_prior(
     model_name_individual_terms,
     prior,
     plot_file,
-    true_params=None,
+    true_model_terms_params=None,
 ):
     from itertools import cycle
     from matplotlib import cm
@@ -145,9 +145,9 @@ def plot_prior(
             color=this_param_colour
         )
 
-        if true_params is not None:
+        if true_model_terms_params is not None:
             try:
-                true_param = true_params[latex_term]
+                true_param = true_model_terms_params[latex_term]
                 ax.axvline(
                     true_param,
                     color=this_param_colour,

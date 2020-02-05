@@ -108,7 +108,7 @@ class HeisenbergXYZPredetermined(
         self.min_param = 0
         self.max_param = 1
 
-        # self.true_params = {
+        # self.true_model_terms_params = {
         #     'pauliSet_1J2_xJx_d3': 4.0969217897733703, 
         #     'pauliSet_1J2_zJz_d3': 9.7007310340158401, 
         #     'pauliSet_2J3_xJx_d3':  6.7344876799395417, 

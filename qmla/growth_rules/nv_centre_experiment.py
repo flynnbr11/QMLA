@@ -77,13 +77,13 @@ class ExperimentNVCentre(
         self.gaussian_prior_means_and_widths = {
         }
 
-        # self.true_params = {
+        # self.true_model_terms_params = {
         #     'xTi' : 0.602,
         #     'yTy' : 0.799
 
         # }
         if self.true_operator == 'xTiPPyTiPPzTiPPzTz':
-            self.true_params = {  # from Jul_05/16_40
+            self.true_model_terms_params = {  # from Jul_05/16_40
                 'xTi': 0.92450565,
                 'yTi': 6.00664336,
                 'zTi': 1.65998543,

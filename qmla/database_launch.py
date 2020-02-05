@@ -36,8 +36,8 @@ def launch_db(
     RootN_Qbit=[0],
     N_Qubits=1,
     gen_list=[],
-    true_ops=[],
-    true_params=[],
+    true_model_terms_matrices=[],
+    true_model_terms_params=[],
     num_particles=1000,
     qle=True,
     redimensionalise=True,
@@ -88,7 +88,7 @@ def launch_db(
         '<Name>': [],
         'Status': [],  # TODO can get rid?
         'Completed': [],  # TODO what's this for?
-        'branchID': [],  # TODO proper branch id's,
+        'branch_id': [],  # TODO proper branch id's,
         # 'Param_Estimates' : sim_ops,
         # 'Estimates_Dist_Width' : [normal_dist_width for gen in generators],
         # 'Model_Class_Instance' : [],
@@ -105,13 +105,13 @@ def launch_db(
     for model_name in gen_list:
         try_add_model = add_model(
             model_name=model_name,
-            branchID=new_model_branches[model_name],
+            branch_id=new_model_branches[model_name],
             model_id=int(new_model_ids[model_name]),
             running_database=db,
             model_lists=model_lists,
             true_op_name=true_op_name,
-            true_ops=true_ops,
-            true_params=true_params,
+            true_model_terms_matrices=true_model_terms_matrices,
+            true_model_terms_params=true_model_terms_params,
             log_file=log_file,
             epoch=0,
             probe_dict=probe_dict,
@@ -124,7 +124,7 @@ def launch_db(
             use_exp_custom=use_exp_custom,
             enable_sparse=enable_sparse,
             debug_directory=debug_directory,
-            # branchID=0,
+            # branch_id=0,
             qle=qle,
             qid=qid,
             host_name=host_name,
@@ -145,10 +145,10 @@ def add_model(
     log_file,
     redimensionalise=True,
     num_particles=2000,
-    branchID=0,
+    branch_id=0,
     epoch=0,
-    true_ops=[],
-    true_params=[],
+    true_model_terms_matrices=[],
+    true_model_terms_params=[],
     use_exp_custom=True,
     enable_sparse=True,
     probe_dict=None,
@@ -200,16 +200,16 @@ def add_model(
         if redimensionalise:
             import model_generation
             print("Redimensionalising")
-            true_dim = int(np.log2(np.shape(true_ops[0])[0]))
+            true_dim = int(np.log2(np.shape(true_model_terms_matrices[0])[0]))
             sim_dim = get_num_qubits(model_name)
 
             if sim_dim > true_dim:
-                true_params = [true_params[0]]
+                true_model_terms_params = [true_model_terms_params[0]]
                 # redimensionalised_true_op = (
                 #     model_generation.identity_interact(subsystem=true_op_name,
                 #                                        num_qubits=sim_dim, return_operator=True)
                 # )
-                # true_ops = redimensionalised_true_op.constituents_operators
+                # true_model_terms_matrices = redimensionalised_true_op.constituents_operators
                 sim_name = model_name
 
             elif true_dim > sim_dim:
@@ -245,8 +245,8 @@ def add_model(
         reduced_qml_instance = ModelInstanceForStorage(
             model_name=model_name,
             model_terms_matrices=op.constituents_operators,
-            true_oplist=true_ops,
-            true_params=true_params,
+            true_oplist=true_model_terms_matrices,
+            true_model_terms_params=true_model_terms_params,
             model_id=int(model_id),
             qid=qid,
             host_name=host_name,
@@ -257,7 +257,7 @@ def add_model(
             '<Name>': model_name,
             'Status': 'Active',  # TODO
             'Completed': False,
-            'branchID': int(branchID),  # TODO make argument of add_model fnc,
+            'branch_id': int(branch_id),  # TODO make argument of add_model fnc,
             'Reduced_Model_Class_Instance': reduced_qml_instance,
             'Operator_Instance': op,
             'Epoch_Start': 0,  # TODO fill in

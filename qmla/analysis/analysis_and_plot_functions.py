@@ -101,8 +101,8 @@ def ExpectationValuesTrueSim(
         true = qmd.true_model_name
         true_op = database_framework.Operator(true)
 
-        true_params = qmd.true_param_list
-        true_ops = qmd.true_model_constituent_operators
+        true_model_terms_params = qmd.true_param_list
+        true_model_terms_matrices = qmd.true_model_constituent_operators
         true_dim = true_op.num_qubits
 
         # if plus_probe:
@@ -113,7 +113,7 @@ def ExpectationValuesTrueSim(
 
         true_probe = plot_probe_dict[true_dim]
 
-        time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
+        time_ind_true_ham = np.tensordot(true_model_terms_params, true_model_terms_matrices, axes=1)
         true_expec_values = []
 
         # print("true ham:", time_ind_true_ham)
@@ -126,7 +126,7 @@ def ExpectationValuesTrueSim(
                     len(params)
                 ):
                     params[i] = params[i] * t
-                true_ham = np.tensordot(params, true_ops, axes=1)
+                true_ham = np.tensordot(params, true_model_terms_matrices, axes=1)
             else:
                 true_ham = time_ind_true_ham
 
@@ -710,12 +710,12 @@ def ExpectationValuesQHL_TrueModel(
         true = qmd.true_model_name
         true_op = database_framework.Operator(true)
 
-        true_params = qmd.true_param_list
-#        true_ops = true_op.constituents_operators
-        true_ops = qmd.true_model_constituent_operators
+        true_model_terms_params = qmd.true_param_list
+#        true_model_terms_matrices = true_op.constituents_operators
+        true_model_terms_matrices = qmd.true_model_constituent_operators
         true_dim = true_op.num_qubits
         true_probe = qmd.probes_system[(probe_id, true_dim)]
-        time_ind_true_ham = np.tensordot(true_params, true_ops, axes=1)
+        time_ind_true_ham = np.tensordot(true_model_terms_params, true_model_terms_matrices, axes=1)
         true_expec_values = []
 
         for t in times:
@@ -727,7 +727,7 @@ def ExpectationValuesQHL_TrueModel(
                     len(params)
                 ):
                     params[i] = params[i] * t
-                true_ham = np.tensordot(params, true_ops, axes=1)
+                true_ham = np.tensordot(params, true_model_terms_matrices, axes=1)
             else:
                 true_ham = time_ind_true_ham
 
@@ -1780,8 +1780,8 @@ def plotHinton(
 def adjacent_branch_test(qmd, mod1, mod2):
     mod_a = qmd.get_model_storage_instance_by_id(mod1).Name
     mod_b = qmd.get_model_storage_instance_by_id(mod2).Name
-    br_a = qmd.get_model_data_by_field(name=mod_a, field='branchID')
-    br_b = qmd.get_model_data_by_field(name=mod_b, field='branchID')
+    br_a = qmd.get_model_data_by_field(name=mod_a, field='branch_id')
+    br_b = qmd.get_model_data_by_field(name=mod_b, field='branch_id')
 
     diff = br_a - br_b
     if diff in [-1, 0, 1]:
@@ -1851,7 +1851,7 @@ def qmdclassTOnxobj(
     for i in modlist:
         mod = qmd.get_model_storage_instance_by_id(i)
         name = mod.model_name
-        branch = qmd.get_model_data_by_field(name=name, field='branchID')
+        branch = qmd.get_model_data_by_field(name=name, field='branch_id')
         branch_mod_count[branch] += 1
         latex_term = mod.model_name_latex
 
@@ -1866,7 +1866,7 @@ def qmdclassTOnxobj(
     for i in modlist:
         mod = qmd.get_model_storage_instance_by_id(i)
         name = mod.model_name
-        branch = qmd.get_model_data_by_field(name=name, field='branchID')
+        branch = qmd.get_model_data_by_field(name=name, field='branch_id')
         num_models_this_branch = branch_mod_count[branch]
         pos_list = available_position_list(
             num_models_this_branch,

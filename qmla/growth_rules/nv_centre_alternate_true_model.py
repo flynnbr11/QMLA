@@ -30,7 +30,7 @@ class ExpAlternativeNV(
         # self.shared_probes = True
 
         if self.true_operator == 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz':
-            self.true_params = {
+            self.true_model_terms_params = {
                 # Decohering param set
                 # From 3000exp/20000prt, BC
                 # SelectedRuns/Nov_28/15_14/results_049

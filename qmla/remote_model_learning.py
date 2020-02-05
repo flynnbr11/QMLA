@@ -1,9 +1,5 @@
 from __future__ import print_function  # so print doesn't show brackets
-# Libraries
 
-from qinfer import NormalDistribution
-import matplotlib.pyplot as plt
-import matplotlib
 import copy
 import numpy as np
 import itertools as itr
@@ -11,41 +7,33 @@ import os as os
 import sys as sys
 import pandas as pd
 import warnings
-# warnings.filterwarnings("ignore")
 import time as time
 import random
+import matplotlib.pyplot as plt
+
 from psutil import virtual_memory
-import json  # possibly worth a different serialization if pickle is very slow
 import pickle
 pickle.HIGHEST_PROTOCOL = 4
 import redis
 
+
 import qmla.database_framework as database_framework
 import qmla.model_instances as QML
 import qmla.redis_settings as rds
+import qmla.logging
 
 plt.switch_backend('agg')
 
 # Local files
-
-def time_seconds():
-    import datetime
-    now = datetime.date.today()
-    hour = datetime.datetime.now().hour
-    minute = datetime.datetime.now().minute
-    second = datetime.datetime.now().second
-    time = str(str(hour) + ':' + str(minute) + ':' + str(second))
-    return time
-
 
 # Single function call, given qmla_core_data and a name, to learn model entirely.
 
 def remote_learn_model_parameters(
     name,
     model_id,
-    branchID,
+    branch_id,
     growth_generator,
-    qmd_info=None,
+    qmla_core_info_dict=None,
     remote=False,
     host_name='localhost',
     port_number=6379,
@@ -63,66 +51,58 @@ def remote_learn_model_parameters(
     held on a redis database which can be accessed by other actors.
 
     """
+
     def log_print(to_print_list):
-        identifier = str(
-            str(time_seconds()) +
-            " [RQ Learn " + str(model_id) + "]"
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list, 
+            log_file = log_file, 
+            log_identifier = 'RemoteLearnModel {}'.format(model_id)
         )
-        if not isinstance(to_print_list, list):
-            to_print_list = list(to_print_list)
-
-        print_strings = [str(s) for s in to_print_list]
-        to_print = " ".join(print_strings)
-
-        with open(log_file, 'a') as write_log_file:
-            print(identifier, str(to_print), file=write_log_file,
-                  flush=True
-                  )    
 
     log_print(['Starting for model:', name])
-    print("QHL", model_id, ":", name)
+    print("Learning model {}: {}".format( model_id,  name))
 
     time_start = time.time()
-    # Get params from qmd_info
-    rds_dbs = rds.databases_from_qmd_id(host_name, port_number, qid)
-    qmd_info_db = rds_dbs['qmd_info_db']
-    learned_models_info = rds_dbs['learned_models_info']
-    learned_models_ids = rds_dbs['learned_models_ids']
-    active_branches_learning_models = rds_dbs['active_branches_learning_models']
-    any_job_failed_db = rds_dbs['any_job_failed']
 
-    if qmd_info is None:
-        qmd_info = pickle.loads(qmd_info_db['qmla_core_data'])
-        probe_dict = pickle.loads(qmd_info_db['ProbeDict'])
-    else:  # if in serial, qmd_info given, with probe_dict included in it.
-        probe_dict = qmd_info['probe_dict']
+    # Get params from qmla_core_info_dict
+    redis_databases = rds.databases_from_qmd_id(host_name, port_number, qid)
+    qmla_core_info_database = redis_databases['qmla_core_info_database']
+    learned_models_info = redis_databases['learned_models_info']
+    learned_models_ids = redis_databases['learned_models_ids']
+    active_branches_learning_models = redis_databases['active_branches_learning_models']
+    any_job_failed_db = redis_databases['any_job_failed']
 
-    true_ops = qmd_info['true_oplist']
-    true_params = qmd_info['true_params']
-    num_particles = qmd_info['num_particles']
-    num_experiments = qmd_info['num_experiments']
-    base_resources = qmd_info['base_resources']
+    if qmla_core_info_dict is None:
+        qmla_core_info_dict = pickle.loads(qmla_core_info_database['qmla_core_data'])
+        probe_dict = pickle.loads(qmla_core_info_database['ProbeDict'])
+    else:  # if in serial, qmla_core_info_dict given, with probe_dict included in it.
+        probe_dict = qmla_core_info_dict['probe_dict']
+
+    true_model_terms_matrices = qmla_core_info_dict['true_oplist']
+    true_model_terms_params = qmla_core_info_dict['true_model_terms_params']
+    num_particles = qmla_core_info_dict['num_particles']
+    num_experiments = qmla_core_info_dict['num_experiments']
+    base_resources = qmla_core_info_dict['base_resources']
     base_num_qubits = base_resources['num_qubits']
     base_num_terms = base_resources['num_terms']
-
-    resampler_threshold = qmd_info['resampler_thresh']
-    resampler_a = qmd_info['resampler_a']
-    pgh_prefactor = qmd_info['pgh_prefactor']
-    debug_directory = qmd_info['debug_directory']
-    qle = qmd_info['qle']
-    num_probes = qmd_info['num_probes']
-    sigma_threshold = qmd_info['sigma_threshold']
-    gaussian = qmd_info['gaussian']
-    store_particles_weights = qmd_info['store_particles_weights']
-    qhl_plots = qmd_info['qhl_plots']
-    results_directory = qmd_info['results_directory']
-    plots_directory = qmd_info['plots_directory']
-    long_id = qmd_info['long_id']
+    resampler_threshold = qmla_core_info_dict['resampler_thresh']
+    resampler_a = qmla_core_info_dict['resampler_a']
+    pgh_prefactor = qmla_core_info_dict['pgh_prefactor']
+    debug_directory = qmla_core_info_dict['debug_directory']
+    qle = qmla_core_info_dict['qle']
+    num_probes = qmla_core_info_dict['num_probes']
+    sigma_threshold = qmla_core_info_dict['sigma_threshold']
+    gaussian = qmla_core_info_dict['gaussian']
+    store_particles_weights = qmla_core_info_dict['store_particles_weights']
+    qhl_plots = qmla_core_info_dict['qhl_plots']
+    results_directory = qmla_core_info_dict['results_directory']
+    plots_directory = qmla_core_info_dict['plots_directory']
+    long_id = qmla_core_info_dict['long_id']
 
 
     # Generate model and learn
     op = database_framework.Operator(name=name)
-    model_priors = qmd_info['model_priors']
+    model_priors = qmla_core_info_dict['model_priors']
     if (
         model_priors is not None
         and
@@ -130,7 +110,7 @@ def remote_learn_model_parameters(
     ):
         prior_specific_terms = model_priors[name]
     else:
-        prior_specific_terms = qmd_info['prior_specific_terms']
+        prior_specific_terms = qmla_core_info_dict['prior_specific_terms']
 
     sim_pars = []
     constituent_terms = database_framework.get_constituent_names_from_name(name)
@@ -225,10 +205,10 @@ def remote_learn_model_parameters(
         #         "wb"
         #     )
         # ) as pkl_file:
-        #     pickle.dump(qml_instance, pkl_file , protocol=2)
+        #     pickle.dump(qml_instance, pkl_file , protocol=4)
 
         try:
-            if len(true_ops) == 1:  # TODO buggy
+            if len(true_model_terms_matrices) == 1:  # TODO buggy
                 qml_instance.plot_distribution_progression(
                     save_to_file=str(
                         plots_directory
@@ -251,7 +231,7 @@ def remote_learn_model_parameters(
 
     compressed_info = pickle.dumps(
         updated_model_info,
-        protocol=2
+        protocol=4
     )
     # TODO is there a way to use higher protocol when using python3 for faster
     # pickling? this seems to need to be decoded using encoding='latin1'....
@@ -274,7 +254,7 @@ def remote_learn_model_parameters(
                 model_id
             ]
         )
-    active_branches_learning_models.incr(int(branchID), 1)
+    active_branches_learning_models.incr(int(branch_id), 1)
     time_end = time.time()
     log_print(["Redis SET learned_models_ids:", model_id, "; set True"])
     learned_models_ids.set(str(model_id), 1)

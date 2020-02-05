@@ -29,7 +29,7 @@ class ExperimentNVCentreVaryTrueModel(
         # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
         self.probe_generation_function = probe_set_generation.separable_probe_dict
         self.shared_probes = True
-        self.true_params = {}
+        self.true_model_terms_params = {}
 
         self.max_time_to_consider = 20
         self.min_param = 0
