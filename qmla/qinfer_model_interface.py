@@ -17,8 +17,6 @@ global debug_print
 debug_print = False
 global debug_log_print
 debug_log_print = False
-global likelihood_dev
-likelihood_dev = False
 global debug_print_file_line
 debug_print_file_line = False
 
@@ -54,53 +52,34 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self,
         oplist,
         modelparams,
-        probecounter=None,
-        use_time_dep_true_model=False,
-        time_dep_true_params=None,
-        num_time_dep_true_params=0,
         true_oplist=None,
         truename=None,
         num_probes=40,
         probe_dict=None,
         sim_probe_dict=None,
         trueparams=None,
-        probelist=None,
-        min_freq=0,
-        solver='scipy',
-        measurement_type='full_access',
         growth_generation_rule=None,
         use_experimental_data=False,
         experimental_measurements=None,
         experimental_measurement_times=None,
-        trotter=False,
-        qle=True,
-        use_exp_custom=True,
-        exp_comparison_tol=None,
-        enable_sparse=True,
         model_name=None,
         log_file='QMDLog.log',
-        log_identifier=None,
+        solver='scipy',
         **kwargs
     ):
         self._solver = solver
         # This is the solver used for time evolution scipy is faster
         # QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
-        self._probecounter = probecounter
+        # self._probecounter = probecounter
         self._a = 0
         self._b = 0
-        self.use_qle = qle
-        self._trotter = trotter
         self._modelparams = modelparams
         self.signs_of_inital_params = np.sign(modelparams)
         self._true_oplist = true_oplist
         self._trueparams = trueparams
         self._truename = truename
         self._true_dim = qmla.database_framework.get_num_qubits(self._truename)
-        self.use_time_dep_true_model = use_time_dep_true_model
-        self.time_dep_true_params = time_dep_true_params
-        self.num_time_dep_true_params = num_time_dep_true_params
-        self.measurement_type = measurement_type
         self.use_experimental_data = use_experimental_data
         self.log_file = log_file
         self.growth_generation_rule = growth_generation_rule
@@ -115,14 +94,10 @@ class QInferModelQML(qi.FiniteOutcomeModel):
 
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
-        self.use_exp_custom = use_exp_custom
-        self.enable_sparse = enable_sparse
-        self.exp_comparison_tol = exp_comparison_tol
-        self._min_freq = min_freq
+        self._min_freq = 0 # what does this do?
         self.ModelName = model_name
         self.model_dimension = qmla.database_framework.get_num_qubits(self.ModelName)
         self.inBayesUpdates = False
-        self.log_identifier = log_identifier
         if true_oplist is not None and trueparams is None:
             raise(
                 ValueError(
@@ -141,21 +116,14 @@ class QInferModelQML(qi.FiniteOutcomeModel):
 
         super(QInferModelQML, self).__init__(self._oplist)
 
-        self.probe_number = num_probes
-        if probe_dict is None:
-            self.log_print(
-                [
-                    "Generating random probes"
-                ]
-            )
-            self.probe_dict = qmla.probe_set_generation.seperable_probe_dict(
-                max_num_qubits=12,
-                num_probes=self.probe_number
-            )  # TODO -- make same as number of qubits in model.
-            self.sim_probe_dict = self.probe_dict
-        else:
+        try:
             self.probe_dict = probe_dict
             self.sim_probe_dict = sim_probe_dict
+            self.probe_number = num_probes
+        except:
+            raise ValueError(
+                "Probe dictionaries not passed to Qinfer model"
+            )
 
     def log_print(
         self, 
@@ -252,22 +220,12 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         num_parameters = modelparams.shape[1]
 
         if num_particles == 1:
+            # call the system, use the true paramaters to get true model
             qmla.memory_tests.print_file_line(debug_print_file_line)
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
             true_evo = True
             operators = self._true_oplist
             params = [copy.deepcopy(self._trueparams)]
-
-            if self.use_time_dep_true_model:
-                # Multiply time dependent parameters by time of this evolution.
-                time = expparams['t']
-                a = len(params[0]) - self.num_time_dep_true_params
-                b = len(params[0])
-                before = (params)
-                for i in range(a, b):
-                    # Because params is a list of 1 element, an array, need [0]
-                    # index.
-                    params[0][i] *= time
             ham_num_qubits = self._true_dim
         else:
             qmla.memory_tests.print_file_line(debug_print_file_line)
@@ -283,26 +241,17 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             self.use_experimental_data == True
         ):
             time = expparams['t']
-            # print(
-            #     "[likelihood fnc] Experimental data being called.",
-            #     # "\nProbe", probe
-            # )
             if debug_log_print:
                 self.log_print(
                     [
                         'Getting system outcome',
                         'time:\n', time
                     ],
-                    # self.log_file,
-                    # self.log_identifier
                 )
-            #print("Time:", time[0])
             try:
                 # If time already exists in experimental data
                 experimental_expec_value = self.experimental_measurements[time]
             except BaseException:
-                #print("t=",time,"not found in data")
-                #print("t type:", type(time))
                 experimental_expec_value = qmla.experimental_data_processing.nearestAvailableExpVal(
                     times=self.experimental_measurement_times,
                     experimental_data=self.experimental_measurements,
@@ -314,8 +263,6 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                         "Using experimental time", time,
                         "\texp val:", experimental_expec_value
                     ],
-                    # self.log_file,
-                    # self.log_identifier
                 )
             pr0 = np.array([[experimental_expec_value]])
 
@@ -324,10 +271,6 @@ class QInferModelQML(qi.FiniteOutcomeModel):
 
             if true_evo == True:
                 qmla.memory_tests.print_file_line(debug_print_file_line)
-                # print("[likelihood] trying to get probe id ",
-                #     (self._b % int(self.probe_number)),
-                #     ham_num_qubits
-                # )
                 probe = self.probe_dict[
                     (self._b % int(self.probe_number)),
                     ham_num_qubits
@@ -371,22 +314,14 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         
             qmla.memory_tests.print_file_line(debug_print_file_line)
             try:
-                # pr0 = Evo.get_pr0_array_qle(
                 pr0 = get_pr0_array_qle(
                     t_list=times,
                     modelparams=params,
                     oplist=operators,
                     probe=probe,
-                    measurement_type=self.measurement_type,
                     growth_class=self.growth_class,
-                    use_experimental_data=self.use_experimental_data,
-                    use_exp_custom=self.use_exp_custom,
-                    exp_comparison_tol=self.exp_comparison_tol,
-                    enable_sparse=self.enable_sparse,
                     log_file=self.log_file,
-                    log_identifier=self.log_identifier
                 )
-                # qmla.memory_tests.print_file_line(debug_print_file_line)
             except BaseException:
                 self.log_print(
                     [
@@ -406,34 +341,15 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                         '\nOutcomes:', outcomes,
                         #'\n pr0:\n', pr0,
                     ],
-                    # self.log_file,
-                    # self.log_identifier
                 )
 
-#        outcomes[[0]] = 1-outcomes[[0]]
         likelihood_array = (
             qi.FiniteOutcomeModel.pr0_to_likelihood_array(
                 outcomes, pr0
             )
         )
 
-        # if debug_log_print:
-        #     log_print(
-        #         [
-        #         '\n likelihood values:\n:', likelihood_array
-        #         ],
-        #         self.log_file,
-        #         self.log_identifier
-        #     )
-
-        # if not times:
-        #     times = [time]
-        # print("time:", times)
-        # print("pr0:", pr0)
-        # print("likelihood array:", likelihood_array)
         return likelihood_array
-
-
 
 
 def get_pr0_array_qle(
@@ -441,15 +357,9 @@ def get_pr0_array_qle(
     modelparams,
     oplist,
     probe,
-    measurement_type='full_access',
-    growth_class=None,
-    use_experimental_data=False,
-    use_exp_custom=True,
-    exp_comparison_tol=None,
-    enable_sparse=True,
-    ham_list=None,
+    growth_class,
     log_file='QMDLog.log',
-    log_identifier=None
+    **kwargs
 ):
     from rq import timeouts
     def log_print(
@@ -494,7 +404,7 @@ def get_pr0_array_qle(
                     t=t,
                     state=probe,
                     log_file=log_file,
-                    log_identifier=log_identifier
+                    log_identifier='get pr0 call exp val'
                 )
                 output[evoId][tId] = likel
 
@@ -504,7 +414,7 @@ def get_pr0_array_qle(
                         "Error raised; unphysical expecation value.",
                         "\nHam:\n", ham,
                         "\nt=", t,
-                        "\nState=", probe
+                        "\nState=", probe,
                     ],
                 )
                 sys.exit()
@@ -537,4 +447,5 @@ def get_pr0_array_qle(
                     ],
                 )
     return output
+
 
