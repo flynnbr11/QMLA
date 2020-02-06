@@ -536,19 +536,16 @@ class QuantumModelLearningAgent():
         )
 
         self.qmla_settings = {
-            'q_id': self.qmla_id,
             'probes_plot_file': self.probes_plot_file,
             'plot_times': self.times_to_plot,
             'true_name': self.true_model_name,
             'true_oplist': self.true_model_constituent_operators,
             'true_model_terms_params': self.true_param_list,
-            'growth_generator': self.growth_rule_of_true_model,
             'num_particles': self.num_particles,
             'num_experiments': self.num_experiments,
             'results_directory': self.results_directory,
             'plots_directory': self.qmla_controls.plots_directory,
             'long_id': self.qmla_controls.long_id,
-            'prior_pickle_file': self.qmla_controls.prior_pickle_file,
             'prior_specific_terms': self.growth_class.gaussian_prior_means_and_widths,
             'model_priors': self.model_priors,
             'use_experimental_data': self.use_experimental_data, 
@@ -562,27 +559,11 @@ class QuantumModelLearningAgent():
             'increase_pgh_time': self.qmla_controls.increase_pgh_time, # TODO put this inside growth rule
             'store_particles_weights': False,  # from growth rule or unneeded
             'qhl_plots': False,  # from growth rule or unneeded
-            'debug_directory': self.debug_directory, # from growth rule or unneeded
-            'qle': self.use_qle, # from growth rule or unneeded
             'sigma_threshold': self.sigma_threshold, # from growth rule or unneeded
-            'use_exp_custom': self.use_custom_exponentiation, # from growth rule or unneeded
-            'measurement_type': self.measurement_class, # from growth rule or unneeded
             'experimental_measurement_times': self.experimental_measurement_times, 
-            'compare_linalg_exp_tol': self.exponentiation_tolerance, # from growth rule or unneeded
-            'gaussian': self.gaussian, # from growth rule or unneeded
-            'bayes_factors_time_binning': self.qmla_controls.bayes_time_binning, # from growth rule or unneeded
-            'use_time_dep_true_params': False, # from growth rule or unneeded
-            'time_dep_true_params': self.time_dependent_params, # from growth rule or unneeded
-            'num_time_dependent_true_params': self.num_time_dependent_true_params, # from growth rule or unneeded
-            'param_min': self.qmla_controls.param_min, # from growth rule or unneeded
-            'param_max': self.qmla_controls.param_max, # from growth rule or unneeded
-            'param_mean': self.qmla_controls.param_mean, # from growth rule or unneeded
-            'param_sigma': self.qmla_controls.param_sigma, # from growth rule or unneeded
-            'tree_identifiers': self.tree_identifiers, # what does it do?
-            'bayes_factors_time_all_exp_times': self.qmla_controls.bayes_factors_use_all_exp_times, # what does it do?
             'num_probes': self.probe_number, # from growth rule or unneeded
-
         }
+
         # Store qmla_settings and probe dictionaries on the redis database, accessible by all workers
         # These are retrieved by workers to inform them 
         # of parameters to use when learning/comparing models.

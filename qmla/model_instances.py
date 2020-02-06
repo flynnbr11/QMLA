@@ -1095,9 +1095,9 @@ class ModelInstanceForComparison():
     def __init__(
         self,
         model_id,
+        qid,
         host_name='localhost',
         port_number=6379,
-        qid=0,
         log_file='QMD_log.log',
         learned_model_info=None,
     ):
@@ -1109,6 +1109,7 @@ class ModelInstanceForComparison():
         )
         self.log_file = log_file
         self.qmla_id = qid
+        self.model_id = model_id
 
         qmla_core_info_database = redis_databases['qmla_core_info_database']
 
@@ -1116,18 +1117,14 @@ class ModelInstanceForComparison():
         self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
         self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
 
-        self.model_id = model_id
         self.num_particles = qmla_core_info_dict['num_particles']
         self.probe_number = qmla_core_info_dict['num_probes']
-        self.PlotProbePath = qmla_core_info_dict['probes_plot_file']
         self.qinfer_resampler_threshold = qmla_core_info_dict['resampler_thresh']
         self.qinfer_resampler_a = qmla_core_info_dict['resampler_a']
         self.qinfer_PGH_heuristic_factor = qmla_core_info_dict['pgh_prefactor']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
-        self.use_custom_exponentiation = qmla_core_info_dict['use_exp_custom']
-        self.measurement_class = qmla_core_info_dict['measurement_type']
         self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
@@ -1253,7 +1250,3 @@ class ModelInstanceForComparison():
             log_file=self.log_file,
             log_identifier='ModelForComparison {}'.format(self.model_id)
         )
-
-
-def _test_import_private_stuff(a, b):
-    return a*b

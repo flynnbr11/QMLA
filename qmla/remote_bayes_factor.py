@@ -108,17 +108,18 @@ def remote_bayes_factor_calculation(
     active_branches_bayes = redis_databases['active_branches_bayes']
     active_interbranch_bayes = redis_databases['active_interbranch_bayes']
 
-    info_dict = pickle.loads(redis_databases['qmla_core_info_database']['qmla_settings'])
-    use_experimental_data = info_dict['use_experimental_data']
-    experimental_data_times = info_dict['experimental_measurement_times']
-    binning = info_dict['bayes_factors_time_binning']
+    qmla_core_info_dict = pickle.loads(redis_databases['qmla_core_info_database']['qmla_settings'])
+    use_experimental_data = qmla_core_info_dict['use_experimental_data']
+    experimental_data_times = qmla_core_info_dict['experimental_measurement_times']
+    # binning = qmla_core_info_dict['bayes_factors_time_binning']
     # use_all_exmodel_id_strp_times_for_bayes_factors = False # TODO make this
     # a QMD input
     # TODO make this a QMD input
-    use_all_exp_times_for_bayes_factors = info_dict['bayes_factors_time_all_exp_times']
+    # use_all_exp_times_for_bayes_factors = qmla_core_info_dict['bayes_factors_time_all_exp_times']
+
     linspace_times_for_bayes_factor_comparison = False
     use_opponent_learned_times = True
-    true_mod_name = info_dict['true_name']
+    true_mod_name = qmla_core_info_dict['true_name']
     save_plots_of_posteriors = True
     plot_true_mod_post_bayes_factor_dynamics = False
 
@@ -134,17 +135,17 @@ def remote_bayes_factor_calculation(
 
         model_a = QML.ModelInstanceForComparison(
             model_id=model_a_id,
+            qid=qid,
+            log_file=log_file,
             host_name=host_name,
             port_number=port_number,
-            qid=qid,
-            log_file=log_file
         )
         model_b = QML.ModelInstanceForComparison(
             model_id=model_b_id,
+            qid=qid,
+            log_file=log_file,
             host_name=host_name,
             port_number=port_number,
-            qid=qid,
-            log_file=log_file
         )
 
         # By default, use times the other model trained on,

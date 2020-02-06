@@ -104,17 +104,14 @@ def remote_learn_model_parameters(
     # appends and returns copy.
 
     qml_instance = QML.ModelInstanceForLearning(
+        model_id=model_id,
         name=name,
-        # num_probes=num_probes,
-        probe_dict=probe_dict,
         qid=qid,
         log_file=log_file,
-        model_id=model_id,
         growth_generator=growth_generator,
         model_terms_matrices=op.constituents_operators,
         model_terms_parameters=[sim_pars],
         model_terms_names=op.constituents_names,
-        # debug_directory=debug_directory,
         host_name=host_name,
         port_number=port_number,
     )
