@@ -1,22 +1,16 @@
-from __future__ import print_function  # so print doesn't show brackets
-# Libraries
-  # possibly worth a different serialization if pickle is very slow
-from qinfer import NormalDistribution
-import matplotlib.pyplot as plt
-import matplotlib
 import copy
 import pickle
-from psutil import virtual_memory
 import random
 import time as time
 import numpy as np
-import itertools as itr
 import os as os
-import sys as sys
 import pandas as pd
-import warnings
-warnings.filterwarnings("ignore")
-pickle.HIGHEST_PROTOCOL = 4
+
+import matplotlib.pyplot as plt
+
+import qmla.database_framework as database_framework
+import qmla.model_instances as QML
+import qmla.logging
 
 try:
     import qmla.redis_settings as rds
@@ -25,33 +19,15 @@ try:
 except BaseException:
     enforce_serial = True  # shouldn't be needed
 
-import qmla.database_framework as database_framework
-import qmla.model_instances as QML
-import qmla.analysis 
-
-
+pickle.HIGHEST_PROTOCOL = 4
 plt.switch_backend('agg')
 
-# Local files
 
-# import model_generation
-#import BayesF
-# from Distrib import MultiVariateNormalDistributionNocov
-
-
-def time_seconds():
-    import datetime
-    now = datetime.date.today()
-    hour = datetime.datetime.now().hour
-    minute = datetime.datetime.now().minute
-    second = datetime.datetime.now().second
-    time = str(str(hour) + ':' + str(minute) + ':' + str(second))
-
-    return time
+__all__ = [
+    'remote_bayes_factor_calculation'
+]
 
 # Single function call to compute Bayes Factor between models given their IDs
-
-
 def remote_bayes_factor_calculation(
     model_a_id,
     model_b_id,
@@ -78,25 +54,13 @@ def remote_bayes_factor_calculation(
     From these we extract log likelihoods to compute Bayes factors.
 
     """
-
-    write_log_file = open(log_file, 'a')
-
     def log_print(to_print_list):
-        identifier = str(
-            str(time_seconds())
-            + " [RQ Bayes "
-            + str(model_a_id)
-            + "/"
-            + str(model_b_id)
-            + "]"
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list, 
+            log_file = log_file, 
+            log_identifier = 'Bayes Factor remote'
         )
-        if not isinstance(to_print_list, list):
-            to_print_list = list(to_print_list)
-        print_strings = [str(s) for s in to_print_list]
-        to_print = " ".join(print_strings)
-        with open(log_file, 'a') as write_log_file:
-            print(identifier, str(to_print), file=write_log_file, flush=True)
-
+    
     time_start = time.time()
     redis_databases = rds.databases_from_qmd_id(host_name, port_number, qid)
     qmla_core_info_database = redis_databases['qmla_core_info_database']
@@ -111,11 +75,6 @@ def remote_bayes_factor_calculation(
     qmla_core_info_dict = pickle.loads(redis_databases['qmla_core_info_database']['qmla_settings'])
     use_experimental_data = qmla_core_info_dict['use_experimental_data']
     experimental_data_times = qmla_core_info_dict['experimental_measurement_times']
-    # binning = qmla_core_info_dict['bayes_factors_time_binning']
-    # use_all_exmodel_id_strp_times_for_bayes_factors = False # TODO make this
-    # a QMD input
-    # TODO make this a QMD input
-    # use_all_exp_times_for_bayes_factors = qmla_core_info_dict['bayes_factors_time_all_exp_times']
 
     linspace_times_for_bayes_factor_comparison = False
     use_opponent_learned_times = True
@@ -195,7 +154,6 @@ def remote_bayes_factor_calculation(
             update_times_model_b,
             binning=set_renorm_record_to_zero
         )
-        # log_print(["Log likelihoods computed."])
 
         # after learning, want to see what dynamics are like after further
         # updaters
@@ -206,9 +164,6 @@ def remote_bayes_factor_calculation(
             and
             database_framework.alph(model_a.model_name) == database_framework.alph(true_mod_name)
         ):
-
-            # updater_b_copy = copy.deepcopy(model_b.updater)
-
             try:
                 print("\n\nBF UPDATE Model {}".format(model_a.model_name))
                 plot_posterior_marginals(
@@ -325,51 +280,20 @@ def log_likelihood(
     binning=False
 ):
     updater = model.qinfer_updater
-    # print(
-    #     "\n[log likel] Log likelihood for model", model.model_name
-    # )
-    # sum_data = 0
-    #print("log likelihood function. Model", model.model_id, "\n Times:", times)
-
+    
     if binning:
         updater._renormalization_record = []
         updater.log_total_likelihood = 0
-        # updater.log_likelihood = 0
         print("BINNING")
-    # else:
-    #     print("NOT BINNING")
 
     for i in range(len(times)):
         exp = get_exp(model, [times[i]])
-    #    print("exp:", exp)
-        # TODO this will cause an error for multiple parameters
         params_array = np.array([[model.true_model_params[:]]])
-
-        # print(
-        #     "log likelihood", model.model_name,
-        #     "\n\ttime:", times[i],
-        #     "\n\tModel.true_model_params:", model.true_model_params,
-        #     "\n\tparams array:", params_array,
-        #     "\n\texp:", exp
-        # )
-        # print("Getting Datum")
         datum = updater.model.simulate_experiment(
             params_array,
             exp,
             repeat=1
         )
-        # datum = model.qinfer_model.simulate_experiment(
-        #     params_array,
-        #     exp,
-        #     repeat=1
-        # )
-        """
-        why updater.model ???
-         this is non standard, compare e.g. with QML_lib/QML.py
-         >>>> self.datum_from_experiment = self.qinfer_model.simulate_experiment
-        """
-        # sum_data += datum
-        # print("Upater")
         updater.update(datum, exp)
 
     log_likelihood = updater.log_total_likelihood
@@ -377,7 +301,6 @@ def log_likelihood(
 
 
 def get_exp(model, time):
-    # gen = model.qinfer_updater.model # or gen=model.qinfer_model
     gen = model.qinfer_model
     exp = np.empty(
         len(time),
@@ -398,72 +321,6 @@ def get_exp(model, time):
 #########
 # Functions for rescaling times to be used during Bayes factor calculation
 #########
-
-def balance_times_by_binning(
-    data,
-    num_bins,
-    all_times_used=False,
-    fraction_times_to_use=0.5,
-    log_base=2
-):
-
-    bins = np.linspace(min(data), max(data), num_bins)
-    if all_times_used == True:
-        # all exp data points become a bin
-        bins = np.array(sorted(np.unique(data)))
-    # bins -= 0.00000001
-    # print("Bins:", bins, "\nTimes:", sorted(data))
-    digitized = np.digitize(data, bins)
-    bincount = np.bincount(digitized)
-
-    # scaling by log to remove exponential preference observed for some times
-    # remove error cases where log will cause errors (ie log(1) and log(0))
-    # ratio goes -> 1, bins overrepresented but not critically
-    bincount[np.where(bincount == 1)] = log_base
-    # so ratio goes -> 0 and bins don't count
-    bincount[np.where(bincount == 0)] = 1
-
-    log_bincount = np.log(bincount) / np.log(log_base)
-    log_bincount[np.where(log_bincount == -np.inf)] = 0
-    log_bincount[np.where(log_bincount == -np.nan)] = 0
-    ratio = [int(np.ceil(i)) for i in log_bincount]
-
-    sum_ratio = np.sum(ratio)
-    median_bincount = np.median(bincount[np.where(bincount != 0)])
-    mean_bincount = np.mean(bincount[np.where(bincount != 0)])
-    # nonzero_bincounts = bincount[ np.where(bincount != 0 ) ]
-    # base_num_elements_per_bin = int(mean_bincount)
-    # base_num_elements_per_bin = int(
-    #     np.average(bincount, weights=ratio)
-    # )
-    base_num_elements_per_bin = int(len(data) / sum_ratio)
-    # print("sum ratio: ", sum_ratio)
-    # print("base num elements before", base_num_elements_per_bin )
-    # print("frac to use:", fraction_times_to_use)
-
-    base_num_elements_per_bin = max(
-        1,
-        int(fraction_times_to_use * base_num_elements_per_bin)
-    )
-    # print("base num elements after", base_num_elements_per_bin )
-    newdata = []
-
-    for binid in range(1, len(bincount)):
-        # for binid in range(len(bincount)):
-        num_elements_in_this_bin = bincount[binid]
-        num_element_to_return_this_bin = base_num_elements_per_bin * \
-            ratio[binid]
-        if num_elements_in_this_bin > 0:
-            # indices of data array which fit in this bin
-            multiples = np.where(digitized == binid)
-            for i in range(num_element_to_return_this_bin):
-                # a single random data array index in this bin
-                single = np.random.choice(multiples[0])
-                newdata.append(data[single])
-    newdata = np.array(newdata)
-
-    return newdata
-
 
 def plot_expec_vals_of_models(
     model_a,
