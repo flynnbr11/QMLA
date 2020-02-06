@@ -1,8 +1,8 @@
-from __future__ import print_function  # so print doesn't show brackets
-import redis
 import os
 import sys
 import pickle
+
+import redis
 
 """
 This file provides functionality to create multiple databases on a redis server.
@@ -15,6 +15,11 @@ This method is quite slow - useful information is stored in dictionaries and
 pickled to redis. Pickling and unpickling is quite slow, so should be minimised.
 
 """
+
+__all__ = [
+    'databases_from_qmd_id'
+]
+
 
 databases_required = [
     'qmla_core_info_database',
