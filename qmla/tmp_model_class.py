@@ -1,3 +1,4 @@
+
 class ModelInstanceForLearning():
     """
     Class to learn individual model. Model name is given when initialised.
@@ -68,6 +69,7 @@ class ModelInstanceForLearning():
             self.qmla_id
         )
         qmla_core_info_database = redis_databases['qmla_core_info_database']
+        init_model_print_loc = False
         qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
         self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
@@ -175,6 +177,7 @@ class ModelInstanceForLearning():
                 )
 
         self.check_quadratic_loss = True
+        qmla.memory_tests.print_loc(print_location=init_model_print_loc)
 
         num_params = len(self.model_terms_matrices)
         log_identifier = str("QML " + str(self.model_id))
@@ -218,32 +221,20 @@ class ModelInstanceForLearning():
             )
 
         self.qinfer_model = qml_qi.QInferModelQML(
-            oplist=self.model_terms_matrices,
+            model_name=self.model_name,
             modelparams=self.model_terms_parameters,
+            oplist=self.model_terms_matrices,
             true_oplist=self.true_model_constituent_operators,
-            trueparams=self.true_model_params,
             truename=self.true_model_name,
-            use_time_dep_true_model=self.use_time_dependent_true_model,
-            time_dep_true_params=self.time_dependent_true_params,
-            num_time_dep_true_params=self.num_time_dependent_true_params,
+            trueparams=self.true_model_params,
             num_probes=self.probe_number,
-            measurement_type=self.measurement_class,
+            probe_dict=self.probes_system,
+            sim_probe_dict=self.probes_simulator,
             growth_generation_rule=self.growth_rule_of_this_model,
             use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
-            probe_dict=self.probes_system,
-            sim_probe_dict=self.probes_simulator,
-            probecounter=0,
-            solver='scipy',
-            trotter=True,
-            qle=self.use_qle,
-            use_exp_custom=self.use_custom_exponentiation,
-            exp_comparison_tol=self.exponentiation_tolerance,
-            enable_sparse=True,
-            model_name=self.model_name,
             log_file=self.log_file,
-            log_identifier=log_identifier
         )
 
         self.qinfer_updater = qi.SMCUpdater(
@@ -304,8 +295,6 @@ class ModelInstanceForLearning():
                                    len(self.model_terms_parameters[0]), self.num_experiments]
                                   )
         self.weights = np.empty([self.num_particles, self.num_experiments])
-        # self.DistributionMeans = np.empty([self.num_experiments])
-        # self.distributionstdDevs = np.empty([self.num_experiments])
         self.true_model_params_dict = {}
 
         true_params_names = qmla.database_framework.get_constituent_names_from_name(
@@ -600,3 +589,4 @@ class ModelInstanceForLearning():
             renormalise=renormalise,
             save_to_file=save_to_file
         )
+
