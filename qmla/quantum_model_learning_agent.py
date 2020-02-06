@@ -581,18 +581,18 @@ class QuantumModelLearningAgent():
             'tree_identifiers': self.tree_identifiers,
             'bayes_factors_time_all_exp_times': self.qmla_controls.bayes_factors_use_all_exp_times,
         }
-        compressed_qmd_info = pickle.dumps(self.qmla_core_data, protocol=4)
+        compressed_qmla_core_info = pickle.dumps(self.qmla_core_data, protocol=4)
         compressed_probe_dict = pickle.dumps(self.probes_system, protocol=4)
         compressed_sim_probe_dict = pickle.dumps(
             self.probes_simulator, protocol=4)
         qmla_core_info_database = self.redis_databases['qmla_core_info_database']
-        self.log_print(["Saving qmd info db to ", qmla_core_info_database])
-        qmla_core_info_database.set('qmla_core_data', compressed_qmd_info)
+        self.log_print(["Saving QMLA instance info to ", qmla_core_info_database])
+        qmla_core_info_database.set('qmla_core_data', compressed_qmla_core_info)
         qmla_core_info_database.set('ProbeDict', compressed_probe_dict)
         qmla_core_info_database.set('SimProbeDict', compressed_sim_probe_dict)
 
     def _initiate_database(self):
-        self.db, self.model_lists = \
+        self.model_database, self.model_lists = \
             database_launch.launch_db(
                 true_op_name=self.true_model_name,
                 new_model_branches=self.model_initial_branch,
@@ -644,7 +644,7 @@ class QuantumModelLearningAgent():
         model = database_framework.alph(model)
         add_model_to_database_result = database_launch.add_model(
             model_name=model,
-            running_database=self.db,
+            running_database=self.model_database,
             num_particles=self.num_particles,
             true_op_name=self.true_model_name,
             model_lists=self.model_lists,
@@ -680,7 +680,7 @@ class QuantumModelLearningAgent():
         else:
             try:
                 model_id = database_framework.model_id_from_name(
-                    db=self.db,
+                    db=self.model_database,
                     name=model
                 )
             except BaseException:
@@ -788,7 +788,7 @@ class QuantumModelLearningAgent():
 
     def get_model_storage_instance_by_id(self, model_id):
         return database_framework.reduced_model_instance_from_id(
-            self.db, model_id)
+            self.model_database, model_id)
 
     def update_database_model_info(self):
         for mod_id in range(self.highest_model_id):
@@ -811,7 +811,7 @@ class QuantumModelLearningAgent():
         increment=None
     ):
         database_framework.update_field(
-            db=self.db,
+            db=self.model_database,
             name=name,
             model_id=model_id,
             field=field,
@@ -820,10 +820,10 @@ class QuantumModelLearningAgent():
         )
 
     def get_model_data_by_field(self, name, field):
-        return database_framework.pull_field(self.db, name, field)
+        return database_framework.pull_field(self.model_database, name, field)
 
     def change_model_status(self, model_name, new_status='Saturated'):
-        self.db.loc[self.db['<Name>'] == model_name, 'Status'] = new_status
+        self.model_database.loc[self.model_database['<Name>'] == model_name, 'Status'] = new_status
 
     ##########
     # Section: Calculation of models parameters and Bayes factors
@@ -910,11 +910,11 @@ class QuantumModelLearningAgent():
         model_already_exists = database_framework.check_model_exists(
             model_name=model_name,
             model_lists=self.model_lists,
-            db=self.db
+            db=self.model_database
         )
         if model_already_exists:
             model_id = database_framework.model_id_from_name(
-                self.db,
+                self.model_database,
                 name=model_name
             )
             branch_id = self.models_branches[model_id]
@@ -1281,7 +1281,7 @@ class QuantumModelLearningAgent():
     ):
 
         active_models_in_branch_old = database_framework.active_model_ids_by_branch_id(
-            self.db,
+            self.model_database,
             branch_id
         )
         active_models_in_branch = self.branch_resident_model_ids[branch_id]
@@ -1356,7 +1356,7 @@ class QuantumModelLearningAgent():
             champ_id = max(models_points, key=models_points.get)
         champ_id = int(champ_id)
         # champ_name = database_framework.model_name_from_id(
-        #     self.db,
+        #     self.model_database,
         #     champ_id
         # )
         champ_name = self.model_name_id_map[champ_id]
@@ -1381,7 +1381,7 @@ class QuantumModelLearningAgent():
             )
 
         self.update_model_record(
-            # name=database_framework.model_name_from_id(self.db, champ_id),
+            # name=database_framework.model_name_from_id(self.model_database, champ_id),
             name=self.model_name_id_map[champ_id],
             field='Status',
             new_value='Active'
@@ -1508,7 +1508,7 @@ class QuantumModelLearningAgent():
             for i in max_points_branches:
                 self.log_print(
                     [
-                        database_framework.model_name_from_id(self.db, i)
+                        database_framework.model_name_from_id(self.model_database, i)
                     ]
                 )
             self.log_print(["Points:\n", models_points])
@@ -1526,7 +1526,7 @@ class QuantumModelLearningAgent():
         else:
             self.log_print(["After comparing list:", models_points])
             champ_id = max(models_points, key=models_points.get)
-        # champ_name = database_framework.model_name_from_id(self.db, champ_id)
+        # champ_name = database_framework.model_name_from_id(self.model_database, champ_id)
         champ_name = self.model_name_id_map[champ_id]
 
         return champ_id
@@ -1857,9 +1857,9 @@ class QuantumModelLearningAgent():
 
         # Finally, compare all remaining active models,
         # which should just mean the tree champions at this point.
-        active_models = database_framework.all_active_model_ids(self.db)
+        active_models = database_framework.all_active_model_ids(self.model_database)
         # self.surviving_champions = database_framework.all_active_model_ids(
-        #     self.db
+        #     self.model_database
         # )
         self.log_print(
             [
@@ -1940,11 +1940,11 @@ class QuantumModelLearningAgent():
                 branch_champions_points,
                 key=branch_champions_points.get
             )
-        # champ_name = database_framework.model_name_from_id(self.db, champ_id)
+        # champ_name = database_framework.model_name_from_id(self.model_database, champ_id)
         champ_name = self.model_name_id_map[champ_id]
 
         branch_champ_names = [
-            # database_framework.model_name_from_id(self.db, mod_id)
+            # database_framework.model_name_from_id(self.model_database, mod_id)
             self.model_name_id_map[mod_id]
             for mod_id in active_models
         ]
@@ -1979,7 +1979,7 @@ class QuantumModelLearningAgent():
         all_models_this_branch = self.branch_rankings[branch_id]
         best_models = self.branch_rankings[branch_id][:num_models]
         best_model_names = [
-            # database_framework.model_name_from_id(self.db, mod_id) for
+            # database_framework.model_name_from_id(self.model_database, mod_id) for
             self.model_name_id_map[mod_id]
             for mod_id in best_models
         ]
@@ -2452,7 +2452,7 @@ class QuantumModelLearningAgent():
         )
 
         mod_id = database_framework.model_id_from_name(
-            db=self.db,
+            db=self.model_database,
             name=mod_to_learn
         )
         self.true_model_id = mod_id
@@ -2576,7 +2576,7 @@ class QuantumModelLearningAgent():
         self.champion_model_id = -1,  # TODO just so not to crash during dynamics plot
         self.multiQHL_model_ids = [
             database_framework.model_id_from_name(
-                db=self.db,
+                db=self.model_database,
                 name=mod_name
             ) for mod_name in model_names
         ]
@@ -2590,7 +2590,7 @@ class QuantumModelLearningAgent():
         for mod_name in model_names:
             print("Trying to get mod id for", mod_name)
             mod_id = database_framework.model_id_from_name(
-                db=self.db,
+                db=self.model_database,
                 name=mod_name
             )
             learned_models_ids.set(
@@ -2622,7 +2622,7 @@ class QuantumModelLearningAgent():
         time_taken = time_now - self._start_time
         for mod_name in model_names:
             mod_id = database_framework.model_id_from_name(
-                db=self.db, name=mod_name
+                db=self.model_database, name=mod_name
             )
             mod = self.get_model_storage_instance_by_id(mod_id)
             mod.model_update_learned_values(
@@ -3002,7 +3002,7 @@ class QuantumModelLearningAgent():
 
         elif branch_id is not None:
             model_id_list = database_framework.list_model_id_in_branch(
-                self.db, branch_id)
+                self.model_database, branch_id)
             plot_descriptor += '[Branch' + str(branch_id) + ']'
 
         elif model_id_list is None:
@@ -3054,7 +3054,7 @@ class QuantumModelLearningAgent():
     ):
         if true_model:
             model_id = database_framework.model_id_from_name(
-                db=self.db, name=self.true_model_name)
+                db=self.model_database, name=self.true_model_name)
 
         qmla.analysis.plot_parameter_estimates(qmd=self,
                                                model_id=model_id,

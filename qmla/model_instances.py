@@ -1,25 +1,24 @@
-# from __future__ import print_function  # so print doesn't show brackets
-import qmla.redis_settings as rds
-import qmla.qinfer_model_interface as qml_qi
-from qmla.memory_tests import print_loc
-# import qmla.model_naming as model_naming
-import qmla.logging
-import qmla.get_growth_rule as get_growth_rule
-# import qmla.expectation_values as expectation_values
-import qmla.experimental_data_processing as expdt
-import qmla.prior_distributions as distributions
-import qmla.database_framework as database_framework
-import qmla.analysis
 import numpy as np
 import scipy as sp
 import os
 import time
 import copy
 import qinfer as qi
-# from psutil import virtual_memory
+
 import redis
 import pickle
-import matplotlib.pyplot as plt
+
+import qmla.redis_settings as rds
+import qmla.qinfer_model_interface as qml_qi
+import qmla.memory_tests
+import qmla.logging
+import qmla.get_growth_rule as get_growth_rule
+# import qmla.experimental_data_processing as expdt
+import qmla.experimental_data_processing
+import qmla.prior_distributions
+import qmla.database_framework
+import qmla.analysis
+
 pickle.HIGHEST_PROTOCOL = 4
 
 
@@ -189,10 +188,10 @@ class ModelInstanceForLearning():
             base_resources = qmla_core_info_dict['base_resources']
             base_num_qubits = base_resources['num_qubits']
             base_num_terms = base_resources['num_terms']
-            this_model_num_qubits = database_framework.get_num_qubits(
+            this_model_num_qubits = qmla.database_framework.get_num_qubits(
                 self.model_name)
             this_model_num_terms = len(
-                database_framework.get_constituent_names_from_name(
+                qmla.database_framework.get_constituent_names_from_name(
                     self.model_name)
             )
             max_num_params = self.growth_class.max_num_parameter_estimate
@@ -246,13 +245,13 @@ class ModelInstanceForLearning():
         self.model_terms_matrices = np.asarray(model_terms_matrices)
         self.model_terms_parameters = np.asarray([model_terms_parameters[0]])
 
-        individual_terms_in_name = database_framework.get_constituent_names_from_name(
+        individual_terms_in_name = qmla.database_framework.get_constituent_names_from_name(
             self.model_name
         )
 
         for i in range(len(individual_terms_in_name)):
             term = individual_terms_in_name[i]
-            term_mtx = database_framework.compute(term)
+            term_mtx = qmla.database_framework.compute(term)
             if np.all(term_mtx == self.model_terms_matrices[i]) is False:
                 # TODO make this raise an exception instead
                 print("[ModelInstanceForLearning] UNEQUAL LIST / TERM MATRICES.")
@@ -274,7 +273,7 @@ class ModelInstanceForLearning():
                 )
 
         self.check_quadratic_loss = True
-        print_loc(print_location=init_model_print_loc)
+        qmla.memory_tests.print_loc(print_location=init_model_print_loc)
 
         num_params = len(self.model_terms_matrices)
         log_identifier = str("QML " + str(self.model_id))
@@ -310,7 +309,7 @@ class ModelInstanceForLearning():
 
         plot_all_priors = True
         if plot_all_priors == True:
-            distributions.plot_prior(
+            qmla.prior_distributions.plot_prior(
                 model_name=self.model_name_latex,
                 model_name_individual_terms=latex_terms,
                 prior=self.model_prior,
@@ -408,7 +407,7 @@ class ModelInstanceForLearning():
         # self.distributionstdDevs = np.empty([self.num_experiments])
         self.true_model_params_dict = {}
 
-        true_params_names = database_framework.get_constituent_names_from_name(
+        true_params_names = qmla.database_framework.get_constituent_names_from_name(
             self.true_model_name
         )
         if self.use_experimental_data == False:
@@ -446,20 +445,20 @@ class ModelInstanceForLearning():
                 epoch_id=istep,
                 current_params=param_estimates
             )
-            print_loc(global_print_loc)
+            qmla.memory_tests.print_loc(global_print_loc)
             # TODO prefactor, if used, should be inside specific heuristic
             self.new_experiment[0][0] = self.new_experiment[0][0] * \
                 self.qinfer_PGH_heuristic_factor
             if self.use_experimental_data:
                 t = self.new_experiment[0][0]
-                nearest = expdt.nearestAvailableExpTime(
+                nearest = qmla.experimental_data_processing.nearestAvailableExpTime(
                     times=self.experimental_measurement_times,
                     t=t
                 )
                 self.new_experiment[0][0] = nearest
-            print_loc(global_print_loc)
+            qmla.memory_tests.print_loc(global_print_loc)
             if istep == 0:
-                print_loc(global_print_loc)
+                qmla.memory_tests.print_loc(global_print_loc)
                 self.log_print(['Initial time selected > ',
                                 str(self.new_experiment[0][0])]
                                )
@@ -767,7 +766,7 @@ class ModelInstanceForStorage():
             'store_particles_weights'
         ]
         self.model_bayes_factors = {}
-        self.model_num_qubits = database_framework.get_num_qubits(
+        self.model_num_qubits = qmla.database_framework.get_num_qubits(
             self.model_name)
         self.probe_num_qubits = self.model_num_qubits
         self.log_file = log_file
@@ -955,8 +954,8 @@ class ModelInstanceForStorage():
         if max_time is None:
             max_time = max(exp_times)
 
-        min_time = expdt.nearestAvailableExpTime(exp_times, min_time)
-        max_time = expdt.nearestAvailableExpTime(exp_times, max_time)
+        min_time = qmla.experimental_data_processing.nearestAvailableExpTime(exp_times, min_time)
+        max_time = qmla.experimental_data_processing.nearestAvailableExpTime(exp_times, max_time)
         min_data_idx = exp_times.index(min_time)
         max_data_idx = exp_times.index(max_time)
         exp_times = exp_times[min_data_idx:max_data_idx]
@@ -1040,11 +1039,11 @@ class ModelInstanceForStorage():
         if max_time is None:
             max_time = max(exp_times)
 
-        min_time = expdt.nearestAvailableExpTime(
+        min_time = qmla.experimental_data_processing.nearestAvailableExpTime(
             exp_times,
             min_time
         )
-        max_time = expdt.nearestAvailableExpTime(
+        max_time = qmla.experimental_data_processing.nearestAvailableExpTime(
             exp_times,
             max_time
         )
@@ -1173,7 +1172,7 @@ class ModelInstanceForComparison():
                 "Name:", self.model_name
             ]
         )
-        op = database_framework.Operator(self.model_name)
+        op = qmla.database_framework.Operator(self.model_name)
         self.model_terms_matrices = op.constituents_operators
         self.times_learned_over = learned_model_info['times']
         self.final_learned_params = learned_model_info['final_params']

@@ -461,7 +461,7 @@ elif (
     # model_ids = list(range(qmd.highest_model_id))
     model_ids = [
         database_framework.model_id_from_name(
-            db=qmd.db,
+            db=qmd.model_database,
             name=mod
             # ) for mod in further_qhl_models
         ) for mod in qhl_models
