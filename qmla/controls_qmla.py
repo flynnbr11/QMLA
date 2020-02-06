@@ -5,7 +5,7 @@ import pickle
 
 import qmla.get_growth_rule as get_growth_rule
 import qmla.database_framework as database_framework
-
+import qmla.logging
 
 """
 This file is callable with *kwargs from a separate QMD program.
@@ -13,6 +13,15 @@ It returns an instance of the class ControlsQMLA, which has attributes
 for all the user defined parameters, and defaults if not specified by the user.
 
 """
+def log_print(
+    to_print_list, 
+    log_file
+):
+    qmla.logging.print_to_log(
+        to_print_list = to_print_list, 
+        log_file = log_file, 
+        log_identifier = 'Setting QMLA controls'
+    )
 
 
 def get_directory_name_by_time(just_date=False):
@@ -35,84 +44,13 @@ def get_directory_name_by_time(just_date=False):
         return str(date + '/')
 
 
-def time_seconds():
-    import datetime
-    now = datetime.date.today()
-    hour = datetime.datetime.now().hour
-    minute = datetime.datetime.now().minute
-    second = datetime.datetime.now().second
-    time = str(str(hour) + ':' + str(minute) + ':' + str(second))
-    return time
-
-
-def log_print(to_print_list, log_file):
-    identifier = str(str(time_seconds()) + " [GLOBAL VARIABLES]")
-    if type(to_print_list) != list:
-        to_print_list = list(to_print_list)
-
-    print_strings = [str(s) for s in to_print_list]
-    to_print = " ".join(print_strings)
-    with open(log_file, 'a') as write_log_file:
-        print(identifier,
-              str(to_print),
-              file=write_log_file,
-              flush=True
-              )
-
-
-default_host_name = 'localhost'
-default_port_number = 6379
-default_use_rq = 1
-default_do_iqle = 0
-default_do_qle = 1
-default_use_rq = 1
-default_num_runs = 1
-default_num_tests = 1
-default_num_qubits = 2
-default_num_parameters = 2
-default_num_experiments = 10
-default_num_particles = 20
-default_bayes_times = 5
-default_bayes_threshold_lower = 1
-default_bayes_threshold_upper = 100
-default_gaussian = True
-default_custom_prior = False
-default_do_plots = 0
-default_resample_threshold = 0.5
-default_resample_a = 0.95
-default_pgh_factor = 1.0
-default_qmd_id = 1
 default_results_directory = get_directory_name_by_time(
     just_date=False
 )
-default_pickle_qmd_class = 0
-default_port_number = 6379
-default_host = 'localhost'
-default_rq_timeout = 3600
-default_log_file = 'default_log_file.log'
-default_save_plots = False
-default_cumulative_csv = 'cumulative_csv.csv'
-default_measurement_type = 'full_access'
-default_experimental_data = False
-# NOTE true operator is set in dict in UserFunctions:
-# default_true_operators_by_generator
-default_true_operator = 'xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-default_qhl_test = 0
-default_further_qhl = 0
-default_dataset = 'NV_HahnPeaks_expdataset'
-default_data_max_useful_time = 2000  # nanoseconds
-default_data_time_offset = 180  # nanoseconds
-default_growth_generation_rule = 'two_qubit_ising_rotation_hyperfine'
-default_prior_pickle_file = None
-default_true_params_pickle_file = None
-default_true_expec_path = None
 default_latex_mapping_file = str(
     default_results_directory +
     '/LatexMapping.txt'
 )
-default_probes_plot_file = None
-default_reallocate_resources = 0
-default_bayes_time_binning = 0
 
 
 class ControlsQMLA():
@@ -275,21 +213,21 @@ def parse_cmd_line_args(args):
     #   '-op', '--true_operator',
     #   help="True operator to be simulated and learned against.",
     #   type=str,
-    #   default=default_true_operator
+    #   default='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
     # )
 
     parser.add_argument(
         '-qhl', '--qhl_test',
         help="Bool to test QHL on given true operator only.",
         type=int,
-        default=default_qhl_test
+        default=0
     )
 
     parser.add_argument(
         '-fq', '--further_qhl',
         help="Bool to perform further QHL on best models from previous run.",
         type=int,
-        default=default_further_qhl
+        default=0
     )
 
     # QMD parameters -- fundamentals such as number of particles etc
@@ -297,53 +235,53 @@ def parse_cmd_line_args(args):
         '-r', '--num_runs',
         help="Number of runs to perform majority voting.",
         type=int,
-        default=default_num_runs
+        default=1
     )
 
     parser.add_argument(
         '-t', '--num_tests',
         help="Number of complete tests to average over.",
         type=int,
-        default=default_num_tests
+        default=1
     )
 
     parser.add_argument(
         '-e', '--num_experiments',
         help='Number of experiments to use for the learning process',
         type=int,
-        default=default_num_experiments
+        default=10
     )
     parser.add_argument(
         '-p', '--num_particles',
         help='Number of particles to use for the learning process',
         type=int,
-        default=default_num_particles
+        default=20
     )
     parser.add_argument(
         '-bt', '--num_times_bayes',
         help='Number of times to consider in Bayes function.',
         type=int,
-        default=default_bayes_times
+        default=5
     )
     parser.add_argument(
         '-rq', '--use_rq',
         help='Bool whether to use RQ for parallel or not.',
         type=int,
-        default=default_use_rq
+        default=1
     )
 
     parser.add_argument(
         '-bu', '--bayes_upper',
         help='Higher Bayes threshold.',
         type=int,
-        default=default_bayes_threshold_upper
+        default=100
     )
 
     parser.add_argument(
         '-bl', '--bayes_lower',
         help='Lower Bayes threshold.',
         type=int,
-        default=default_bayes_threshold_lower
+        default=1
     )
 
     # Parameters about the model to use as true model (currently deprecated)
@@ -351,13 +289,13 @@ def parse_cmd_line_args(args):
         '-q', '--num_qubits',
         help='Number of qubits to run tests for.',
         type=int,
-        default=default_num_qubits
+        default=2
     )
     parser.add_argument(
         '-pm', '--num_parameters',
         help='Number of parameters to run tests for.',
         type=int,
-        default=default_num_parameters
+        default=2
     )
 
     # Whether to use QLE, IQLE or both (currently deprecated)
@@ -365,27 +303,27 @@ def parse_cmd_line_args(args):
         '-qle', '--do_qle',
         help='True to perform QLE, False otherwise.',
         type=int,
-        default=default_do_qle
+        default=1
     )
     parser.add_argument(
         '-iqle', '--do_iqle',
         help='True to perform IQLE, False otherwise.',
         type=int,
-        default=default_do_iqle
+        default=0
     )
 
     parser.add_argument(
         '-g', '--gaussian',
         help='True: normal distribution; False: uniform.',
         type=int,
-        default=default_gaussian
+        default=True
     )
 
     parser.add_argument(
         '-cpr', '--custom_prior',
         help='True: use custom prior given to QMD instance; False: use defulat.',
         type=int,
-        default=default_custom_prior
+        default=False
     )
 
     # Include optional plots
@@ -393,7 +331,7 @@ def parse_cmd_line_args(args):
         '-pt', '--save_plots',
         help='True: save all plots for this QMD; False: do not.',
         type=int,
-        default=default_save_plots
+        default=False
     )
 
     parser.add_argument(
@@ -409,19 +347,19 @@ def parse_cmd_line_args(args):
         '-rt', '--resample_threshold',
         help='Resampling threshold for QInfer.',
         type=float,
-        default=default_resample_threshold
+        default=0.5
     )
     parser.add_argument(
         '-ra', '--resample_a',
         help='Resampling a for QInfer.',
         type=float,
-        default=default_resample_a
+        default=0.95
     )
     parser.add_argument(
         '-pgh', '--pgh_factor',
         help='Resampling threshold for QInfer.',
         type=float,
-        default=default_pgh_factor
+        default=1.0
     )
     parser.add_argument(
         '-pgh_exp', '--pgh_exponent',
@@ -442,20 +380,20 @@ def parse_cmd_line_args(args):
         '-host', '--host_name',
         help='Name of Redis host.',
         type=str,
-        default=default_host
+        default='localhost'
     )
     parser.add_argument(
         '-port', '--port_number',
         help='Redis port number.',
         type=int,
-        default=default_port_number
+        default=6379
     )
 
     parser.add_argument(
         '-qid', '--qmd_id',
         help='ID tag for QMD.',
         type=int,
-        default=default_qmd_id
+        default=1
     )
     parser.add_argument(
         '-dir', '--results_directory',
@@ -467,56 +405,56 @@ def parse_cmd_line_args(args):
         '-pkl', '--pickle_qmd_class',
         help='Store QMD class in pickled file at end. Large memory requirement, recommend not to.',
         type=int,
-        default=default_pickle_qmd_class
+        default=0
     )
 
     parser.add_argument(
         '-rqt', '--rq_timeout',
         help='Time allowed before RQ job crashes.',
         type=int,
-        default=default_rq_timeout
+        default=3600
     )
 
     parser.add_argument(
         '-log', '--log_file',
         help='File to log RQ workers.',
         type=str,
-        default=default_log_file
+        default='default_log_file.log'
     )
 
     parser.add_argument(
         '-cb', '--cumulative_csv',
         help='CSV to store Bayes factors of all QMDs.',
         type=str,
-        default=default_cumulative_csv
+        default='cumulative.csv'
     )
 
     parser.add_argument(
         '-exp', '--experimental_data',
         help='Use experimental data if provided',
         type=int,
-        default=default_experimental_data
+        default=False
     )
 
     parser.add_argument(
         '-dst', '--data_max_time',
         help='Maximum useful time in given data.',
         type=int,
-        default=default_data_max_useful_time
+        default=2000
     )
 
     parser.add_argument(
         '-dto', '--data_time_offset',
         help='Offset to ensure at t=0, Pr=1.',
         type=int,
-        default=default_data_time_offset
+        default=180
     )
 
     parser.add_argument(
         '-bintimes', '--bayes_time_binning',
         help='Store QMD class in pickled file at end. Large memory requirement, recommend not to.',
         type=int,
-        default=default_bayes_time_binning
+        default=0
     )
 
     parser.add_argument(
@@ -531,7 +469,7 @@ def parse_cmd_line_args(args):
         help='Rule applied for generation of new models during QMD. \
         Corresponding functions must be built into model_generation',
         type=str,
-        default=default_growth_generation_rule
+        default='two_qubit_ising_rotation_hyperfine'
     )
 
     parser.add_argument(
@@ -561,7 +499,7 @@ def parse_cmd_line_args(args):
         '-prior_path', '--prior_pickle_file',
         help='Path to save prior to.',
         type=str,
-        default=default_prior_pickle_file
+        default=None
     )
     parser.add_argument(
         '-true_params_path', '--true_params_pickle_file',
@@ -602,7 +540,7 @@ def parse_cmd_line_args(args):
         help='Bool: whether to reallocate resources scaling  \
         with num qubits/terms to be learned during QHL.',
         type=int,
-        default=default_reallocate_resources
+        default=0
     )
 
     parser.add_argument(
