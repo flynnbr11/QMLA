@@ -50,28 +50,23 @@ class QInferModelQML(qi.FiniteOutcomeModel):
 
     def __init__(
         self,
-        oplist,
+        model_name,
         modelparams,
-        true_oplist=None,
-        truename=None,
-        num_probes=40,
-        probe_dict=None,
-        sim_probe_dict=None,
-        trueparams=None,
-        growth_generation_rule=None,
-        use_experimental_data=False,
-        experimental_measurements=None,
-        experimental_measurement_times=None,
-        model_name=None,
-        log_file='QMDLog.log',
-        solver='scipy',
+        oplist,
+        true_oplist,
+        truename,
+        trueparams,
+        num_probes,
+        probe_dict,
+        sim_probe_dict,
+        growth_generation_rule,
+        use_experimental_data,
+        experimental_measurements,
+        experimental_measurement_times,
+        log_file,
         **kwargs
     ):
-        self._solver = solver
-        # This is the solver used for time evolution scipy is faster
-        # QuTip can handle implicit time dependent likelihoods
         self._oplist = oplist
-        # self._probecounter = probecounter
         self._a = 0
         self._b = 0
         self._modelparams = modelparams
@@ -95,6 +90,10 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
         self._min_freq = 0 # what does this do?
+        self._solver = 'scipy'
+        # This is the solver used for time evolution scipy is faster
+        # QuTip can handle implicit time dependent likelihoods
+
         self.ModelName = model_name
         self.model_dimension = qmla.database_framework.get_num_qubits(self.ModelName)
         self.inBayesUpdates = False
