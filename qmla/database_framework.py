@@ -52,19 +52,17 @@ e.g. usage of operator:
 from __future__ import print_function  # so print doesn't show brackets
 
 import numpy as np
-import itertools as itr
+# import itertools as itr
 import copy
-import os as os
-import sys as sys
+# import os as os
+# import sys as sys
 import pandas as pd
-import warnings
-import hashlib
+# import warnings
+# import hashlib
 
-import redis
-# from qinfer import NormalDistribution
+# import redis
 
-
-
+import qmla.logging
 
 __all__ = [
     'core_operator_dict', 
@@ -84,80 +82,65 @@ __all__ = [
     'list_model_id_in_branch'
 ]
 
-def identity():
-    return np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, 1 + 0.j]])
-
-
-def sigmaz():
-    return np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]])
-
-
-def sigmax():
-    return np.array([[0 + 0.j, 1 + 0.j], [1 + 0.j, 0 + 0.j]])
-
-
-def sigmay():
-    return np.array([[0 + 0.j, 0 - 1.j], [0 + 1.j, 0 + 0.j]])
-
-
-def addition():
-    return np.array([[0 + 0.j, 1 + 0.j], [0 + 0.j, 0 + 0.j]])
-
-
-def subtraction():
-    return np.array([[0 + 0.j, 0 + 0.j], [1 + 0.j, 0 + 0.j]])
-
-
-# global core_operator_dict
 core_operator_dict = {
-    'i': identity(),
-    'x': sigmax(),
-    'y': sigmay(),
-    'z': sigmaz(),
-    'a': addition(),
-    's': subtraction()
+    'i': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, 1 + 0.j]]),
+    'x': np.array([[0 + 0.j, 1 + 0.j], [1 + 0.j, 0 + 0.j]]),
+    'y': np.array([[0 + 0.j, 0 - 1.j], [0 + 1.j, 0 + 0.j]]),
+    'z': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]]),
+    'a': np.array([[0 + 0.j, 1 + 0.j], [0 + 0.j, 0 + 0.j]]),
+    's': np.array([[0 + 0.j, 0 + 0.j], [1 + 0.j, 0 + 0.j]])
 }
 
-global paulis_names
-paulis_names = list(core_operator_dict.keys())
-core_terms_with_identity = list(core_operator_dict.keys())
-core_terms_no_identity = copy.copy(
-    list(core_operator_dict.keys())).remove('i')
-pauli_cores_with_identity = ['x', 'y', 'z', 'i']
-pauli_cores_no_identity = ['x', 'y', 'z']
-plus_basis_with_identity = ['a', 's', 'i']
-plus_basis_no_identity = ['a', 's']
+# global paulis_names
+# paulis_names = list(core_operator_dict.keys())
+# core_terms_with_identity = list(core_operator_dict.keys())
+# core_terms_no_identity = copy.copy(
+#     list(core_operator_dict.keys())).remove('i')
+# pauli_cores_with_identity = ['x', 'y', 'z', 'i']
+# pauli_cores_no_identity = ['x', 'y', 'z']
+# plus_basis_with_identity = ['a', 's', 'i']
+# plus_basis_no_identity = ['a', 's']
 
 """
 ------ ------ Operator Class ------ ------
 """
 
 
-def time_seconds():
-    import datetime
-    now = datetime.date.today()
-    hour = datetime.datetime.now().hour
-    minute = datetime.datetime.now().minute
-    second = datetime.datetime.now().second
-    time = str(str(hour) + ':' + str(minute) + ':' + str(second))
-    return time
+# def time_seconds():
+#     import datetime
+#     now = datetime.date.today()
+#     hour = datetime.datetime.now().hour
+#     minute = datetime.datetime.now().minute
+#     second = datetime.datetime.now().second
+#     time = str(str(hour) + ':' + str(minute) + ':' + str(second))
+#     return time
 
 
-def log_print(to_print_list, log_file):
-    identifier = str(str(time_seconds()) + " [DB]")
-    if not isinstance(to_print_list, list):
-        to_print_list = list(to_print_list)
+# def log_print(to_print_list, log_file):
+#     identifier = str(str(time_seconds()) + " [DB]")
+#     if not isinstance(to_print_list, list):
+#         to_print_list = list(to_print_list)
 
-    print_strings = [str(s) for s in to_print_list]
-    to_print = " ".join(print_strings)
-    with open(log_file, 'a') as write_log_file:
-        print(
-            identifier,
-            str(to_print),
-            file=write_log_file,
-            flush=True
-        )
+#     print_strings = [str(s) for s in to_print_list]
+#     to_print = " ".join(print_strings)
+#     with open(log_file, 'a') as write_log_file:
+#         print(
+#             identifier,
+#             str(to_print),
+#             file=write_log_file,
+#             flush=True
+#         )
 
+
+def log_print(
+    to_print_list,
+    log_file
+):
+    qmla.logging.print_to_file(
+        to_print_list = to_print_list, 
+        log_file = log_file, 
+        log_identifier = 'Database/Operator methods'
+    )
 
 class Operator():
     """
@@ -240,24 +223,24 @@ class Operator():
                 mtx += i
         return mtx
 
-    @property
-    def qubits_acted_on(self):
-        """
-        List of qubits which are acted on non-trivially by this operator.
-        TODO: qubit count starts from 1 -- should it start from 0?
-        """
-        return list_used_qubits(self.name)
+    # @property
+    # def qubits_acted_on(self):
+    #     """
+    #     List of qubits which are acted on non-trivially by this operator.
+    #     TODO: qubit count starts from 1 -- should it start from 0?
+    #     """
+    #     return list_used_qubits(self.name)
 
-    @property
-    def two_to_power_used_qubits_sum(self):
-        """
-        Binary sum of operators acted on.
-        For use in comparing new operators. [Not currently used]
-        """
-        running_sum = 0
-        for element in list_used_qubits(self.name):
-            running_sum += 2**element
-        return running_sum
+    # @property
+    # def two_to_power_used_qubits_sum(self):
+    #     """
+    #     Binary sum of operators acted on.
+    #     For use in comparing new operators. [Not currently used]
+    #     """
+    #     running_sum = 0
+    #     for element in list_used_qubits(self.name):
+    #         running_sum += 2**element
+    #     return running_sum
 
     @property
     def alph_name(self):
@@ -268,9 +251,9 @@ class Operator():
         """
         return alph(self.name)
 
-    @property
-    def ideal_probe(self):
-        return ideal_probe(self.name)
+    # @property
+    # def ideal_probe(self):
+    #     return ideal_probe(self.name)
 
     @property
     def eigenvectors(self):
@@ -282,22 +265,22 @@ Functions for use by operator class to parse string (name) and prodcue relevent 
 """
 
 
-def reduced_operators(name, max_dim):
-    t_str = ''
-    p_str = 'P'
-    for i in range(max_dim):
-        t_str += 'T'
-        p_str += 'P'
+# def reduced_operators(name, max_dim):
+#     t_str = ''
+#     p_str = 'P'
+#     for i in range(max_dim):
+#         t_str += 'T'
+#         p_str += 'P'
 
-    split_by_t = name.split(t_str)
-    reduced_dim_op = split_by_t[0]
-    op = Operator(reduced_dim_op)
-    return op.constituents_operators
+#     split_by_t = name.split(t_str)
+#     reduced_dim_op = split_by_t[0]
+#     op = Operator(reduced_dim_op)
+#     return op.constituents_operators
 
 
-def print_matrix(name):
-    op = Operator(name)
-    print(op.matrix)
+# def print_matrix(name):
+#     op = Operator(name)
+#     print(op.matrix)
 
 
 def get_num_qubits(name):
@@ -373,84 +356,84 @@ def verbose_naming_mechanism_separate_terms(name):
         return name.split(p_str)
 
 
-def list_used_qubits(name):
-    """
-    Parse string and determine which qubits are acted on non-trivially.
-    """
-    max_t, t_str = find_max_letter(name, "T")
-    max_p, p_str = find_max_letter(name, "P")
-    running_list = []
+# def list_used_qubits(name):
+#     """
+#     Parse string and determine which qubits are acted on non-trivially.
+#     """
+#     max_t, t_str = find_max_letter(name, "T")
+#     max_p, p_str = find_max_letter(name, "P")
+#     running_list = []
 
-    if max_p >= max_t:
-        list_by_p_sep = []
-        if p_str == '':
-            # In case of empty separator, split by anything into one string
-            p_str = 'RRR'
+#     if max_p >= max_t:
+#         list_by_p_sep = []
+#         if p_str == '':
+#             # In case of empty separator, split by anything into one string
+#             p_str = 'RRR'
 
-        sep_by_p = name.split(p_str)
-        for element in sep_by_p:
-            list_by_p_sep.append(get_acted_on_qubits(element))
+#         sep_by_p = name.split(p_str)
+#         for element in sep_by_p:
+#             list_by_p_sep.append(get_acted_on_qubits(element))
 
-        for i in range(len(list_by_p_sep)):
-            to_add = list(set(list_by_p_sep[i]) - set(running_list))
-            running_list = running_list + to_add
+#         for i in range(len(list_by_p_sep)):
+#             to_add = list(set(list_by_p_sep[i]) - set(running_list))
+#             running_list = running_list + to_add
 
-    else:
-        running_list = get_acted_on_qubits(name)
-    return running_list
-
-
-def get_acted_on_qubits(name):
-    """
-    Parse string and determine which qubits are acted on non-trivially.
-    """
-    max_t, t_str = find_max_letter(name, "T")
-    max_p, p_str = find_max_letter(name, "P")
-    if max_p > max_t:
-        list_by_p_sep = []
-        if p_str == '':
-            # In case of empty separator, split by anything into one string
-            p_str = 'RRR'
-
-        sep_by_p = name.split(p_str)
-        for element in sep_by_p:
-            list_by_sep.append(fill_qubits_acted_on_list, element)
-
-    qubits_acted_on = []
-    fill_qubits_acted_on_list(qubits_acted_on, name)
-    return sorted(qubits_acted_on)
+#     else:
+#         running_list = get_acted_on_qubits(name)
+#     return running_list
 
 
-def fill_qubits_acted_on_list(qubits_acted_on, name):
-    """
-    Parse string and determine which qubits are acted on non-trivially.
-    Return list of those qubits.
-    """
-    max_t, t_str = find_max_letter(name, "T")
-    max_p, p_str = find_max_letter(name, "P")
-    if(max_p > max_t):
-        string_to_analyse = name.split(p_str)[0]
-    else:
-        string_to_analyse = name
+# def get_acted_on_qubits(name):
+#     """
+#     Parse string and determine which qubits are acted on non-trivially.
+#     """
+#     max_t, t_str = find_max_letter(name, "T")
+#     max_p, p_str = find_max_letter(name, "P")
+#     if max_p > max_t:
+#         list_by_p_sep = []
+#         if p_str == '':
+#             # In case of empty separator, split by anything into one string
+#             p_str = 'RRR'
 
-    if max_t == 0:
-        if string_to_analyse != 'i':
-            qubits_acted_on.append(1)
+#         sep_by_p = name.split(p_str)
+#         for element in sep_by_p:
+#             list_by_sep.append(fill_qubits_acted_on_list, element)
 
-    else:
-        i = max_t
-        this_t_str = t_str
-        broken_down = string_to_analyse.split(this_t_str)
-        lhs = broken_down[0]
-        rhs = broken_down[1]
-        if rhs != 'i':
-            qubits_acted_on.append(i + 1)
+#     qubits_acted_on = []
+#     fill_qubits_acted_on_list(qubits_acted_on, name)
+#     return sorted(qubits_acted_on)
 
-        if max_t == 1:
-            if lhs != 'i':
-                qubits_acted_on.append(1)
-        else:
-            fill_qubits_acted_on_list(qubits_acted_on, lhs)
+
+# def fill_qubits_acted_on_list(qubits_acted_on, name):
+#     """
+#     Parse string and determine which qubits are acted on non-trivially.
+#     Return list of those qubits.
+#     """
+#     max_t, t_str = find_max_letter(name, "T")
+#     max_p, p_str = find_max_letter(name, "P")
+#     if(max_p > max_t):
+#         string_to_analyse = name.split(p_str)[0]
+#     else:
+#         string_to_analyse = name
+
+#     if max_t == 0:
+#         if string_to_analyse != 'i':
+#             qubits_acted_on.append(1)
+
+#     else:
+#         i = max_t
+#         this_t_str = t_str
+#         broken_down = string_to_analyse.split(this_t_str)
+#         lhs = broken_down[0]
+#         rhs = broken_down[1]
+#         if rhs != 'i':
+#             qubits_acted_on.append(i + 1)
+
+#         if max_t == 1:
+#             if lhs != 'i':
+#                 qubits_acted_on.append(1)
+#         else:
+#             fill_qubits_acted_on_list(qubits_acted_on, lhs)
 
 
 def get_t_p_strings(name):
@@ -687,7 +670,7 @@ def compute(inp):
 
 def ideal_probe(name):
     """
-    Returns a probe state which is the normalised sum of the given operators
+    Returns a probe state which is the normalised sum of the given operator's
     eigenvectors, ideal for probing that operator.
     """
     mtx = Operator(name).matrix
@@ -710,24 +693,6 @@ def get_eigenvectors(name):
 """
 Initial distribution to sample from, normal_dist
 """
-# TODO: change mean and var?
-# normal_dist_width = 0.25
-
-# """
-# QML parameters
-# #TODO: maybe these need to be changed
-# """
-# n_particles = 2000
-# n_experiments = 300
-# #true_operator_list = [sigmax(), sigmay()]
-# true_operator_list = np.array([sigmax(), sigmay()])
-
-# #xtx = Operator('xTx')
-# ytz = Operator('yTz')
-# true_operator_list = np.array([ ytz.matrix] )
-
-
-
 
 def get_location(db, name):
     """
@@ -739,17 +704,17 @@ def get_location(db, name):
             return i
 
 
-def get_location_by_alph_name(db, name):
-    """
-    Return which row in db corresponds to the string name.
-    Pass in alphabetised version of name.
-    """
-    location = None
-#    for i in range(len(db['Alph_Name'])):
-    for i in list(db.index.values):
-        if db['Alph_Name'][i] == name:
-            location = i
-    return location
+# def get_location_by_alph_name(db, name):
+#     """
+#     Return which row in db corresponds to the string name.
+#     Pass in alphabetised version of name.
+#     """
+#     location = None
+# #    for i in range(len(db['Alph_Name'])):
+#     for i in list(db.index.values):
+#         if db['Alph_Name'][i] == name:
+#             location = i
+#     return location
 
 
 def consider_new_model(model_lists, name, db):
@@ -772,20 +737,15 @@ def consider_new_model(model_lists, name, db):
         return 'New'
 
 
-def num_parameters_from_name(name):
-    t_str, p_str, max_t, max_p = DB.get_t_p_strings(name)
-    # core_operator_dict = {
-    #     'i' : np.eye(2),
-    #     'x' : sigmax(),
-    #     'y' : sigmay(),
-    #     'z' : sigmaz()
-    # }
-    if(max_t >= max_p):
-        # if more T's than P's in name, it has only one constituent.
-        return 1
-    else:
-        # More P's indicates a sum at the highest dimension.
-        return len(name.split(p_str))
+# def num_parameters_from_name(name):
+#     t_str, p_str, max_t, max_p = DB.get_t_p_strings(name)
+
+#     if(max_t >= max_p):
+#         # if more T's than P's in name, it has only one constituent.
+#         return 1
+#     else:
+#         # More P's indicates a sum at the highest dimension.
+#         return len(name.split(p_str))
 
 
 def check_model_in_dict(name, model_dict):
@@ -846,29 +806,29 @@ def get_operator_instance(db, name):
     return db.loc[location]["Operator_Instance"]
 
 
-def remove_model(db, name):
-    tmp_db = db[db['<Name>'] != name]
-    return tmp_db
+# def remove_model(db, name):
+#     tmp_db = db[db['<Name>'] != name]
+#     return tmp_db
 
 
-def move_to_legacy(db, legacy_db, name):
-    legacy_db = legacy_db
-    num_rows = len(legacy_db)
-    model_instance = get_qml_instance(db, name)
-    print("Model instance ", name, " moved to legacy db")
-    new_row = pd.Series({
-        '<Name>': name,
-        'Param_Est_Final': model_instance.final_learned_params,
-        'Epoch_Start': 0,  # TODO
-        'Epoch_Finish': 10,  # TODO
-        'ModelID': model_instance.model_id
-    })
+# def move_to_legacy(db, legacy_db, name):
+#     legacy_db = legacy_db
+#     num_rows = len(legacy_db)
+#     model_instance = get_qml_instance(db, name)
+#     print("Model instance ", name, " moved to legacy db")
+#     new_row = pd.Series({
+#         '<Name>': name,
+#         'Param_Est_Final': model_instance.final_learned_params,
+#         'Epoch_Start': 0,  # TODO
+#         'Epoch_Finish': 10,  # TODO
+#         'ModelID': model_instance.model_id
+#     })
 
-    legacy_db.loc[num_rows] = new_row
+#     legacy_db.loc[num_rows] = new_row
 
 
-def model_branch_from_model_id(db, model_id):
-    return db.loc[db['ModelID'] == model_id]['branch_id'].item()
+# def model_branch_from_model_id(db, model_id):
+#     return db.loc[db['ModelID'] == model_id]['branch_id'].item()
 
 
 def model_id_from_name(db, name):
@@ -881,18 +841,18 @@ def model_name_from_id(db, model_id):
     return db.loc[db['ModelID'] == model_id]['<Name>'].item()
 
 
-def index_from_name(db, name):
-    name = alph(name)
-    return db.loc[db['<Name>'] == name].index[0]
+# def index_from_name(db, name):
+#     name = alph(name)
+#     return db.loc[db['<Name>'] == name].index[0]
 
 
 def index_from_model_id(db, model_id):
     return db.loc[db['ModelID'] == model_id].index[0]
 
 
-def model_instance_from_id(db, model_id):
-    idx = index_from_model_id(db, model_id)
-    return db.loc[idx]["Model_Class_Instance"]
+# def model_instance_from_id(db, model_id):
+#     idx = index_from_model_id(db, model_id)
+#     return db.loc[idx]["Model_Class_Instance"]
 
 
 def reduced_model_instance_from_id(db, model_id):
@@ -920,8 +880,8 @@ def pull_field(db, name, field):
         print("Cannot update field -- model does not exist in database_framework.")
 
 
-def model_names_on_branch(db, branch_id):
-    return list(db[(db['branch_id'] == branch_id)]['<Name>'])
+# def model_names_on_branch(db, branch_id):
+#     return list(db[(db['branch_id'] == branch_id)]['<Name>'])
 
 
 def all_active_model_ids(db):
@@ -933,15 +893,15 @@ def active_model_ids_by_branch_id(db, branch_id):
         db['Status'] == 'Active')]['ModelID'])
 
 
-def all_unfinished_model_ids(db):
-    return list(db[(db['Completed'] == False)]['ModelID'])
+# def all_unfinished_model_ids(db):
+#     return list(db[(db['Completed'] == False)]['ModelID'])
 
 
-def all_unfinished_model_names(db):
-    return list(db[(db['Completed'] == False)]['<Name>'])
+# def all_unfinished_model_names(db):
+#     return list(db[(db['Completed'] == False)]['<Name>'])
 
 
-def unfinished_model_ids_by_branch_id(db, branch_id):
-    return list(db[(db['branch_id'] == branch_id) &
-                   (db['Completed'] == False)]['ModelID']
-                )
+# def unfinished_model_ids_by_branch_id(db, branch_id):
+#     return list(db[(db['branch_id'] == branch_id) &
+#                    (db['Completed'] == False)]['ModelID']
+#                 )

@@ -592,7 +592,7 @@ class QuantumModelLearningAgent():
         qmla_core_info_database.set('SimProbeDict', compressed_sim_probe_dict)
 
     def _initiate_database(self):
-        self.db, self.legacy_db, self.model_lists = \
+        self.db, self.model_lists = \
             database_launch.launch_db(
                 true_op_name=self.true_model_name,
                 new_model_branches=self.model_initial_branch,

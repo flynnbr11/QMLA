@@ -1273,3 +1273,7 @@ class ModelInstanceForComparison():
             log_file=self.log_file,
             log_identifier='ModelForComparison {}'.format(self.model_id)
         )
+
+
+def _test_import_private_stuff(a, b):
+    return a*b

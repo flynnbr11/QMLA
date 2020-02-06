@@ -1,19 +1,8 @@
-from __future__ import print_function  # so print doesn't show brackets
-
 import numpy as np
-# import itertools as itr
-# import copy
-# import os as os
-# import sys as sys
 import pandas as pd
-# import warnings
-# import hashlib
 
-import redis
-# from qinfer import NormalDistribution
-
-from qmla.model_instances import ModelInstanceForLearning, ModelInstanceForStorage
-from qmla.database_framework import * # TODO remove import *
+import qmla.model_instances
+import qmla.database_framework
 import qmla.logging
 
 __all__ = [
@@ -28,30 +17,18 @@ def log_print(to_print_list, log_file):
         log_identifier = 'Database launch'
     )
 
+
+
 def launch_db(
-    # true_op_name,
     new_model_branches,
     new_model_ids,
     log_file,
-    RootN_Qbit=[0],
-    N_Qubits=1,
-    gen_list=[],
     true_model_terms_matrices=[],
     true_model_terms_params=[],
-    num_particles=1000,
-    qle=True,
-    redimensionalise=True,
-    resample_threshold=0.5,
-    resampler_a=0.95,
-    pgh_prefactor=1.0,
-    num_probes=None,
-    probe_dict=None,
-    use_exp_custom=True,
-    enable_sparse=True,
-    debug_directory=None,
     qid=0,
     host_name='localhost',
-    port_number=6379
+    port_number=6379,
+    **kwargs
 ):
     """
     Inputs:
@@ -71,27 +48,18 @@ def launch_db(
 
     """
 
-    Max_N_Qubits = 13
-    model_lists = {}
-    for j in range(1, Max_N_Qubits):
-        model_lists[j] = []
-
-    legacy_db = pd.DataFrame({
-        '<Name>': [],
-        'Param_Est_Final': [],
-        'Epoch_Start': [],
-        'Epoch_Finish': [],
-        'ModelID': [],
-    })
-
+    model_lists = { 
+        # assumes maxmium 13 qubit-models considered
+        # to be checked when checking model_lists
+        # TODO generalise or add dimension if not present
+        j : []
+        for j in range(1,13)
+    }
     db = pd.DataFrame({
         '<Name>': [],
-        'Status': [],  # TODO can get rid?
-        'Completed': [],  # TODO what's this for?
-        'branch_id': [],  # TODO proper branch id's,
-        # 'Param_Estimates' : sim_ops,
-        # 'Estimates_Dist_Width' : [normal_dist_width for gen in generators],
-        # 'Model_Class_Instance' : [],
+        'Status': [],  
+        'Completed': [], 
+        'branch_id': [],  
         'Reduced_Model_Class_Instance': [],
         'Operator_Instance': [],
         'Epoch_Start': [],
@@ -99,33 +67,16 @@ def launch_db(
     })
 
     model_id = int(0)
-
-    gen_list = list(new_model_branches.keys())
-
-    for model_name in gen_list:
+    for model_name in list(new_model_branches.keys()):
         try_add_model = add_model(
             model_name=model_name,
-            branch_id=new_model_branches[model_name],
             model_id=int(new_model_ids[model_name]),
+            branch_id=new_model_branches[model_name],
             running_database=db,
             model_lists=model_lists,
-            # true_op_name=true_op_name,
             true_model_terms_matrices=true_model_terms_matrices,
             true_model_terms_params=true_model_terms_params,
             log_file=log_file,
-            epoch=0,
-            probe_dict=probe_dict,
-            resample_threshold=resample_threshold,
-            resampler_a=resampler_a,
-            pgh_prefactor=pgh_prefactor,
-            num_probes=num_probes,
-            num_particles=num_particles,
-            redimensionalise=redimensionalise,
-            use_exp_custom=use_exp_custom,
-            enable_sparse=enable_sparse,
-            debug_directory=debug_directory,
-            # branch_id=0,
-            qle=qle,
             qid=qid,
             host_name=host_name,
             port_number=port_number
@@ -133,35 +84,24 @@ def launch_db(
         if try_add_model is True:
             model_id += int(1)
 
-    return db, legacy_db, model_lists
+    return db, model_lists
+
 
 
 def add_model(
     model_name,
+    model_id,
+    branch_id,
     running_database,
     model_lists,
-    # true_op_name,
-    model_id,
+    true_model_terms_matrices,
+    true_model_terms_params,
     log_file,
-    redimensionalise=True,
-    num_particles=2000,
-    branch_id=0,
-    epoch=0,
-    true_model_terms_matrices=[],
-    true_model_terms_params=[],
-    use_exp_custom=True,
-    enable_sparse=True,
-    probe_dict=None,
-    resample_threshold=0.5,
-    resampler_a=0.95,
-    pgh_prefactor=1.0,
-    num_probes=None,
-    debug_directory=None,
-    qle=True,
-    qid=0,
+    qid,
     host_name='localhost',
     port_number=6379,
     force_create_model=False,
+    **kwargs
 ):
     """
     Function to add a model to the existing databases.
@@ -184,65 +124,31 @@ def add_model(
           Adds a row to running_database containing all columns of those.
     """
 
-    # Fix dimensions if model and true model are of different starting
-    # dimension.
     model_id = int(model_id)
-    alph_model_name = alph(model_name)
-    model_num_qubits = get_num_qubits(model_name)
+    model_name = qmla.database_framework.alph(model_name)
+    model_num_qubits = qmla.database_framework.get_num_qubits(model_name)
 
     if (
-        consider_new_model(model_lists, model_name, running_database) == 'New'
+        qmla.database_framework.consider_new_model(
+            model_lists, model_name, running_database) == 'New'
         or
         force_create_model == True
     ):
-        model_lists[model_num_qubits].append(alph_model_name)
-
-        if redimensionalise:
-            import model_generation
-            print("Redimensionalising")
-            true_dim = int(np.log2(np.shape(true_model_terms_matrices[0])[0]))
-            sim_dim = get_num_qubits(model_name)
-
-            if sim_dim > true_dim:
-                true_model_terms_params = [true_model_terms_params[0]]
-                # redimensionalised_true_op = (
-                #     model_generation.identity_interact(subsystem=true_op_name,
-                #                                        num_qubits=sim_dim, return_operator=True)
-                # )
-                # true_model_terms_matrices = redimensionalised_true_op.constituents_operators
-                sim_name = model_name
-
-            elif true_dim > sim_dim:
-                print("Before dimensionalising name. Name = ",
-                      model_name, "true_dim = ", true_dim
-                      )
-                sim_name = (
-                    model_generation.dimensionalise_name_by_name(name=model_name,
-                                                                 true_dim=true_dim)
-                )
-            else:
-                sim_name = model_name
-
-        else:
-            sim_name = model_name
-
+        model_lists[model_num_qubits].append(model_name)
         log_print(
             [
                 "Model ", model_name,
-                " not previously considered -- adding.",
+                "not previously considered -- adding.",
                 "ID:", model_id
             ],
             log_file
         )
-        op = Operator(name=sim_name, undimensionalised_name=model_name)
+        op = qmla.database_framework.Operator(
+            name=model_name, undimensionalised_name=model_name
+        )
         num_rows = len(running_database)
-        # qml_instance = ModelInstanceForLearning(
-        #     name=op.name,
-        #     num_probes=num_probes,
-        # )
-        sim_pars = []
-        num_pars = op.num_constituents
-        reduced_qml_instance = ModelInstanceForStorage(
+
+        reduced_qml_instance = qmla.model_instances.ModelInstanceForStorage(
             model_name=model_name,
             model_terms_matrices=op.constituents_operators,
             true_oplist=true_model_terms_matrices,
@@ -255,23 +161,22 @@ def add_model(
         )
         running_db_new_row = pd.Series({
             '<Name>': model_name,
-            'Status': 'Active',  # TODO
+            'Status': 'Active',
             'Completed': False,
-            'branch_id': int(branch_id),  # TODO make argument of add_model fnc,
+            'branch_id': int(branch_id),
             'Reduced_Model_Class_Instance': reduced_qml_instance,
             'Operator_Instance': op,
-            'Epoch_Start': 0,  # TODO fill in
+            'Epoch_Start': 0, 
             'ModelID': int(float(model_id)),
         })
-
         running_database.loc[num_rows] = running_db_new_row
         return True
     else:
         log_print(
             [
-                "Model",
-                alph_model_name,
-                " previously considered."
+                "Model {} previously considered.".format(
+                    model_name
+                )
             ],
             log_file
         )

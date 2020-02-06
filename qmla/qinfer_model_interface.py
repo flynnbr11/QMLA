@@ -161,9 +161,9 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.ModelName = model_name
         self.model_dimension = database_framework.get_num_qubits(self.ModelName)
         self.inBayesUpdates = False
-        self.ideal_probe = None
+        # self.ideal_probe = None
         # self.IdealProbe = database_framework.ideal_probe(self.ModelName)
-        self.ideal_probelist = None
+        # self.ideal_probelist = None
         self.log_identifier = log_identifier
         if true_oplist is not None and trueparams is None:
             raise(
