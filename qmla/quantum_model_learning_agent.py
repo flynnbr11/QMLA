@@ -469,10 +469,12 @@ class QuantumModelLearningAgent():
         try:
             from rq import Connection, Queue, Worker
             self.redis_conn = redis.Redis(
-                host=self.redis_host_name, port=self.redis_port_number)
+                host=self.redis_host_name, 
+                port=self.redis_port_number
+            )
             test_workers = self.use_rq
             self.rq_queue = Queue(
-                self.qmla_id,
+                self.qmla_id, # queue number redis will assign tasks via
                 connection=self.redis_conn,
                 async=test_workers,
                 default_timeout=self.rq_timeout
@@ -486,6 +488,8 @@ class QuantumModelLearningAgent():
 
     def _compute_base_resources(self):
         # TODO remove base_num_qubits stuff?
+        # TODO put option inside growth rule
+        # and functionality as method of ModelForLearning
         if self.reallocate_resources:
             base_num_qubits = 3
             base_num_terms = 3

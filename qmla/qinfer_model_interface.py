@@ -4,13 +4,13 @@ import qinfer as qi
 import numpy as np
 import scipy as sp
 import warnings
-from psutil import virtual_memory
 
-import qmla.experimental_data_processing as expdt
-import qmla.get_growth_rule as get_growth_rule
-from qmla.memory_tests import print_loc, print_file_line
-import qmla.probe_set_generation as probe_set_generation
-import qmla.database_framework as database_framework
+import qmla.experimental_data_processing
+import qmla.get_growth_rule
+import qmla.memory_tests
+import qmla.probe_set_generation
+import qmla.database_framework
+import qmla.logging 
 
 global_print_loc = False
 global debug_print
@@ -21,38 +21,6 @@ global likelihood_dev
 likelihood_dev = False
 global debug_print_file_line
 debug_print_file_line = False
-
-
-def time_seconds():
-    import datetime
-    now = datetime.date.today()
-    hour = datetime.datetime.now().hour
-    minute = datetime.datetime.now().minute
-    second = datetime.datetime.now().second
-    time = str(str(hour) + ':' + str(minute) + ':' + str(second))
-    return time
-
-
-def log_print(
-    to_print_list,
-    log_file,
-    log_identifier=None
-):
-    if log_identifier is None:
-        log_identifier = '[GenSim]'
-    identifier = str(
-        str(time_seconds())
-        + " [QML-Qinfer] ("
-        + str(log_identifier)
-        + ")]"
-    )
-    if not isinstance(to_print_list, list):
-        to_print_list = list(to_print_list)
-
-    print_strings = [str(s) for s in to_print_list]
-    to_print = " ".join(print_strings)
-    with open(log_file, 'a') as write_log_file:
-        print(identifier, str(to_print), file=write_log_file)
 
 
 class QInferModelQML(qi.FiniteOutcomeModel):
@@ -86,8 +54,6 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self,
         oplist,
         modelparams,
-        # modelparams not needed (used) for this class # TODO remove unneeded
-        # inputs
         probecounter=None,
         use_time_dep_true_model=False,
         time_dep_true_params=None,
@@ -113,7 +79,8 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         enable_sparse=True,
         model_name=None,
         log_file='QMDLog.log',
-        log_identifier=None
+        log_identifier=None,
+        **kwargs
     ):
         self._solver = solver
         # This is the solver used for time evolution scipy is faster
@@ -125,17 +92,11 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.use_qle = qle
         self._trotter = trotter
         self._modelparams = modelparams
-        # print("[QInferModelQML] \n Oplist: {} \n params: {}".format(
-        #     self._oplist,
-        #     self._modelparams
-        #     )
-        # )
         self.signs_of_inital_params = np.sign(modelparams)
         self._true_oplist = true_oplist
         self._trueparams = trueparams
         self._truename = truename
-        # print("[QML Qinfer class] True op list:", self._true_oplist)
-        self._true_dim = database_framework.get_num_qubits(self._truename)
+        self._true_dim = qmla.database_framework.get_num_qubits(self._truename)
         self.use_time_dep_true_model = use_time_dep_true_model
         self.time_dep_true_params = time_dep_true_params
         self.num_time_dep_true_params = num_time_dep_true_params
@@ -144,7 +105,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.log_file = log_file
         self.growth_generation_rule = growth_generation_rule
         try:
-            self.growth_class = get_growth_rule.get_growth_generator_class(
+            self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
                 use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
@@ -159,11 +120,8 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         self.exp_comparison_tol = exp_comparison_tol
         self._min_freq = min_freq
         self.ModelName = model_name
-        self.model_dimension = database_framework.get_num_qubits(self.ModelName)
+        self.model_dimension = qmla.database_framework.get_num_qubits(self.ModelName)
         self.inBayesUpdates = False
-        # self.ideal_probe = None
-        # self.IdealProbe = database_framework.ideal_probe(self.ModelName)
-        # self.ideal_probelist = None
         self.log_identifier = log_identifier
         if true_oplist is not None and trueparams is None:
             raise(
@@ -190,7 +148,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                     "Generating random probes"
                 ]
             )
-            self.probe_dict = probe_set_generation.seperable_probe_dict(
+            self.probe_dict = qmla.probe_set_generation.seperable_probe_dict(
                 max_num_qubits=12,
                 num_probes=self.probe_number
             )  # TODO -- make same as number of qubits in model.
@@ -199,27 +157,22 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             self.probe_dict = probe_dict
             self.sim_probe_dict = sim_probe_dict
 
-        # log_print(
-        #     [
-        #         "Mod name:", self.ModelName,
-        #         "n_modelparams:", self.n_modelparams,
-        #         "probe[(0,1)]:",
-        #         self.probe_dict[(0,1)],
-        #         "\nsim probe[(0,1)]:",
-        #         self.sim_probe_dict[(0,1)],
-        #     ],
-        #     self.log_file,
-        #     self.log_identifier
-        # )
+    def log_print(
+        self, 
+        to_print_list, 
+        # log_file = None
+    ):
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list, 
+            log_file = self.log_file, 
+            log_identifier = 'QMLA-QInfer model'
+        )
 
     ## PROPERTIES ##
     @property
     def n_modelparams(self):
         return len(self._oplist)
 
-    # Modelparams is the list of parameters in the System Hamiltonian
-    # -- the ones we want to know
-    # Possibly add a second axis to modelparams.
     @property
     def modelparam_names(self):
         modnames = ['w0']
@@ -289,8 +242,8 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         super(QInferModelQML, self).likelihood(
             outcomes, modelparams, expparams
         )  # just adds to self._call_count (Qinfer abstact model class)
-        print_file_line(debug_print_file_line)
-        print_loc(global_print_loc)
+        qmla.memory_tests.print_file_line(debug_print_file_line)
+        qmla.memory_tests.print_loc(global_print_loc)
         cutoff = min(len(modelparams), 5)
         num_particles = modelparams.shape[0]
         self._a += 1
@@ -299,7 +252,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         num_parameters = modelparams.shape[1]
 
         if num_particles == 1:
-            print_file_line(debug_print_file_line)
+            qmla.memory_tests.print_file_line(debug_print_file_line)
             sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
             true_evo = True
             operators = self._true_oplist
@@ -317,7 +270,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                     params[0][i] *= time
             ham_num_qubits = self._true_dim
         else:
-            print_file_line(debug_print_file_line)
+            qmla.memory_tests.print_file_line(debug_print_file_line)
             sample = np.array([expparams.item(0)[1:]])
             true_evo = False
             operators = self._oplist
@@ -335,13 +288,13 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             #     # "\nProbe", probe
             # )
             if debug_log_print:
-                log_print(
+                self.log_print(
                     [
                         'Getting system outcome',
                         'time:\n', time
                     ],
-                    self.log_file,
-                    self.log_identifier
+                    # self.log_file,
+                    # self.log_identifier
                 )
             #print("Time:", time[0])
             try:
@@ -350,27 +303,27 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             except BaseException:
                 #print("t=",time,"not found in data")
                 #print("t type:", type(time))
-                experimental_expec_value = expdt.nearestAvailableExpVal(
+                experimental_expec_value = qmla.experimental_data_processing.nearestAvailableExpVal(
                     times=self.experimental_measurement_times,
                     experimental_data=self.experimental_measurements,
                     t=time
                 )
             if debug_log_print:
-                log_print(
+                self.log_print(
                     [
                         "Using experimental time", time,
                         "\texp val:", experimental_expec_value
                     ],
-                    self.log_file,
-                    self.log_identifier
+                    # self.log_file,
+                    # self.log_identifier
                 )
             pr0 = np.array([[experimental_expec_value]])
 
         else:
-            print_file_line(debug_print_file_line)
+            qmla.memory_tests.print_file_line(debug_print_file_line)
 
             if true_evo == True:
-                print_file_line(debug_print_file_line)
+                qmla.memory_tests.print_file_line(debug_print_file_line)
                 # print("[likelihood] trying to get probe id ",
                 #     (self._b % int(self.probe_number)),
                 #     ham_num_qubits
@@ -379,22 +332,22 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                     (self._b % int(self.probe_number)),
                     ham_num_qubits
                 ]
-                print_file_line(debug_print_file_line)
+                qmla.memory_tests.print_file_line(debug_print_file_line)
             else:
-                print_file_line(debug_print_file_line)
+                qmla.memory_tests.print_file_line(debug_print_file_line)
                 probe = self.sim_probe_dict[
                     (self._b % int(self.probe_number)),
                     ham_num_qubits
                 ]
-            print_file_line(debug_print_file_line)
+            qmla.memory_tests.print_file_line(debug_print_file_line)
 
             ham_minus = np.tensordot(
                 sample,
                 self._oplist,
                 axes=1
             )[0]
-            print_loc(global_print_loc)
-            print_file_line(debug_print_file_line)
+            qmla.memory_tests.print_loc(global_print_loc)
+            qmla.memory_tests.print_file_line(debug_print_file_line)
 
             if len(modelparams.shape) == 1:
                 modelparams = modelparams[..., np.newaxis]
@@ -416,7 +369,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                         "All times NOT available experimentally originally"
                     )
         
-            print_file_line(debug_print_file_line)
+            qmla.memory_tests.print_file_line(debug_print_file_line)
             try:
                 # pr0 = Evo.get_pr0_array_qle(
                 pr0 = get_pr0_array_qle(
@@ -433,19 +386,19 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                     log_file=self.log_file,
                     log_identifier=self.log_identifier
                 )
-                print_file_line(debug_print_file_line)
+                # qmla.memory_tests.print_file_line(debug_print_file_line)
             except BaseException:
-                log_print(
+                self.log_print(
                     [
-                        "[likelihood] failure to compute pr0",
+                        "failure to compute pr0",
                         "probe:", probe,
                         "\n oplist:", operators
                     ]
                 )
-                print_file_line(debug_print_file_line)
+                qmla.memory_tests.print_file_line(debug_print_file_line)
 
             if debug_log_print:
-                log_print(
+                self.log_print(
                     [
                         'Simulating experiment.',
                         'times:', times,
@@ -453,8 +406,8 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                         '\nOutcomes:', outcomes,
                         #'\n pr0:\n', pr0,
                     ],
-                    self.log_file,
-                    self.log_identifier
+                    # self.log_file,
+                    # self.log_identifier
                 )
 
 #        outcomes[[0]] = 1-outcomes[[0]]
@@ -481,6 +434,8 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         return likelihood_array
 
 
+
+
 def get_pr0_array_qle(
     t_list,
     modelparams,
@@ -497,43 +452,37 @@ def get_pr0_array_qle(
     log_identifier=None
 ):
     from rq import timeouts
-    print_loc(global_print_loc)
+    def log_print(
+        self, 
+        to_print_list, 
+    ):
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list, 
+            log_file = log_file, 
+            log_identifier = 'get_pr0'
+        )
+    
+    qmla.memory_tests.print_loc(global_print_loc)
     num_particles = len(modelparams)
     num_times = len(t_list)
     output = np.empty([num_particles, num_times])
 
-    for evoId in range(
-            num_particles):  # todo not sure about length/arrays here
-
+    for evoId in range(num_particles):  
         try:
             ham = np.tensordot(
                 modelparams[evoId], oplist, axes=1
             )
         except BaseException:
-            log_print(
+            self.log_print(
                 [
                     "Failed to build Hamiltonian.",
                     "\nmodelparams:", modelparams[evoId],
                     "\noplist:", oplist
                 ],
-                log_file, log_identifier
             )
             raise
-        outputs_this_ham = {}
-        unique_times_considered_this_ham = []
 
         for tId in range(len(t_list)):
-            """
-            # Log print to prove True Hamiltonian is time dependent.
-            if num_particles == 1:
-                log_print(
-                    [
-                    "Time dependent, true Hamiltonian:\n", ham
-                    ],
-                    log_file, log_identifier
-                )
-            """
-
             t = t_list[tId]
             if t > 1e6:  # Try limiting times to use to 1 million
                 import random
@@ -548,55 +497,44 @@ def get_pr0_array_qle(
                     log_identifier=log_identifier
                 )
                 output[evoId][tId] = likel
-                # unique_times_considered_this_ham.append(t)
-                # outputs_this_ham[t] = likel
 
             except NameError:
-                log_print(
+                self.log_print(
                     [
                         "Error raised; unphysical expecation value.",
                         "\nHam:\n", ham,
                         "\nt=", t,
                         "\nState=", probe
                     ],
-                    log_file,
-                    log_identifier
                 )
                 sys.exit()
             except timeouts.JobTimeoutException:
-                log_print(
+                self.log_print(
                     [
                         "RQ Time exception. \nprobe=",
                         probe,
                         "\nt=", t, "\nHam=",
                         ham
                     ],
-                    log_file,
-                    log_identifier
                 )
                 sys.exit()
 
             if output[evoId][tId] < 0:
                 print("NEGATIVE PROB")
-                log_print(
+                self.log_print(
                     [
                         "[QLE] Negative probability : \
                         \t \t probability = ",
                         output[evoId][tId]
                     ],
-                    log_file,
-                    log_identifier
-
                 )
             elif output[evoId][tId] > 1.001:
-                log_print(
+                self.log_print(
                     [
                         "[QLE] Probability > 1: \
                         \t \t probability = ",
                         output[evoId][tId]
                     ],
-                    log_file,
-                    log_identifier
                 )
     return output
 

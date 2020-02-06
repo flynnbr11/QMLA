@@ -743,9 +743,11 @@ class ModelInstanceForStorage():
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
         self.model_id = model_id
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
+        # Get data from redis database which is needed to learn from
         self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
         self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
+        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
+
         self.measurement_class = qmla_core_info_dict['measurement_type']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
