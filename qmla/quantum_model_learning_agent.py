@@ -531,65 +531,66 @@ class QuantumModelLearningAgent():
             '}$'
         )
 
-        self.qmla_core_data = {
-            # may need to take copies of these in case pointers accross nodes
-            # break
-            'num_probes': self.probe_number,
+        self.qmla_settings = {
+            'q_id': self.qmla_id,
             'probes_plot_file': self.probes_plot_file,
             'plot_times': self.times_to_plot,
+            'true_name': self.true_model_name,
             'true_oplist': self.true_model_constituent_operators,
             'true_model_terms_params': self.true_param_list,
+            'growth_generator': self.growth_rule_of_true_model,
             'num_particles': self.num_particles,
             'num_experiments': self.num_experiments,
-            'resampler_thresh': self.qinfer_resample_threshold,
-            'resampler_a': self.qinfer_resampler_a,
-            'pgh_prefactor': self.qinfer_PGH_heuristic_factor,
-            'pgh_exponent': self.qinfer_PGH_heuristic_exponent,
-            'increase_pgh_time': self.qmla_controls.increase_pgh_time,
-            'store_particles_weights': False,
-            'growth_generator': self.growth_rule_of_true_model,
-            'qhl_plots': False,  # can be used during dev
             'results_directory': self.results_directory,
             'plots_directory': self.qmla_controls.plots_directory,
             'long_id': self.qmla_controls.long_id,
-            'debug_directory': self.debug_directory,
-            'qle': self.use_qle,
-            'sigma_threshold': self.sigma_threshold,
-            'true_name': self.true_model_name,
-            'use_exp_custom': self.use_custom_exponentiation,
-            'measurement_type': self.measurement_class,
-            'use_experimental_data': self.use_experimental_data,
-            'experimental_measurements': self.experimental_measurements,
-            'experimental_measurement_times': self.experimental_measurement_times,
-            'compare_linalg_exp_tol': self.exponentiation_tolerance,
-            'gaussian': self.gaussian,
-            # 'bayes_factors_time_binning' : self.BayesTimeBinning,
-            'bayes_factors_time_binning': self.qmla_controls.bayes_time_binning,
-            'q_id': self.qmla_id,
-            'use_time_dep_true_params': False,
-            'time_dep_true_params': self.time_dependent_params,
-            'num_time_dependent_true_params': self.num_time_dependent_true_params,
             'prior_pickle_file': self.qmla_controls.prior_pickle_file,
             'prior_specific_terms': self.growth_class.gaussian_prior_means_and_widths,
             'model_priors': self.model_priors,
-            'base_resources': self.base_resources,
-            'reallocate_resources': self.reallocate_resources,
-            'param_min': self.qmla_controls.param_min,
-            'param_max': self.qmla_controls.param_max,
-            'param_mean': self.qmla_controls.param_mean,
-            'param_sigma': self.qmla_controls.param_sigma,
-            'tree_identifiers': self.tree_identifiers,
-            'bayes_factors_time_all_exp_times': self.qmla_controls.bayes_factors_use_all_exp_times,
+            'use_experimental_data': self.use_experimental_data, 
+            'experimental_measurements': self.experimental_measurements, # could be path to unpickle within model?
+            'base_resources': self.base_resources, # put inside growth rule
+            'reallocate_resources': self.reallocate_resources, # put inside growth rule
+            'resampler_thresh': self.qinfer_resample_threshold, # TODO put this inside growth rule, does it need to be top level control? 
+            'resampler_a': self.qinfer_resampler_a,  # TODO put this inside growth rule, does it need to be top level control? 
+            'pgh_prefactor': self.qinfer_PGH_heuristic_factor,  # TODO put this inside growth rule
+            'pgh_exponent': self.qinfer_PGH_heuristic_exponent, # TODO put this inside growth rule
+            'increase_pgh_time': self.qmla_controls.increase_pgh_time, # TODO put this inside growth rule
+            'store_particles_weights': False,  # from growth rule or unneeded
+            'qhl_plots': False,  # from growth rule or unneeded
+            'debug_directory': self.debug_directory, # from growth rule or unneeded
+            'qle': self.use_qle, # from growth rule or unneeded
+            'sigma_threshold': self.sigma_threshold, # from growth rule or unneeded
+            'use_exp_custom': self.use_custom_exponentiation, # from growth rule or unneeded
+            'measurement_type': self.measurement_class, # from growth rule or unneeded
+            'experimental_measurement_times': self.experimental_measurement_times, 
+            'compare_linalg_exp_tol': self.exponentiation_tolerance, # from growth rule or unneeded
+            'gaussian': self.gaussian, # from growth rule or unneeded
+            'bayes_factors_time_binning': self.qmla_controls.bayes_time_binning, # from growth rule or unneeded
+            'use_time_dep_true_params': False, # from growth rule or unneeded
+            'time_dep_true_params': self.time_dependent_params, # from growth rule or unneeded
+            'num_time_dependent_true_params': self.num_time_dependent_true_params, # from growth rule or unneeded
+            'param_min': self.qmla_controls.param_min, # from growth rule or unneeded
+            'param_max': self.qmla_controls.param_max, # from growth rule or unneeded
+            'param_mean': self.qmla_controls.param_mean, # from growth rule or unneeded
+            'param_sigma': self.qmla_controls.param_sigma, # from growth rule or unneeded
+            'tree_identifiers': self.tree_identifiers, # what does it do?
+            'bayes_factors_time_all_exp_times': self.qmla_controls.bayes_factors_use_all_exp_times, # what does it do?
+            'num_probes': self.probe_number, # from growth rule or unneeded
+
         }
-        compressed_qmla_core_info = pickle.dumps(self.qmla_core_data, protocol=4)
+        # Store qmla_settings and probe dictionaries on the redis database, accessible by all workers
+        # These are retrieved by workers to inform them 
+        # of parameters to use when learning/comparing models.
+        compressed_qmla_core_info = pickle.dumps(self.qmla_settings, protocol=4)
         compressed_probe_dict = pickle.dumps(self.probes_system, protocol=4)
         compressed_sim_probe_dict = pickle.dumps(
             self.probes_simulator, protocol=4)
         qmla_core_info_database = self.redis_databases['qmla_core_info_database']
-        self.log_print(["Saving QMLA instance info to ", qmla_core_info_database])
-        qmla_core_info_database.set('qmla_core_data', compressed_qmla_core_info)
+        qmla_core_info_database.set('qmla_settings', compressed_qmla_core_info)
         qmla_core_info_database.set('ProbeDict', compressed_probe_dict)
         qmla_core_info_database.set('SimProbeDict', compressed_sim_probe_dict)
+        self.log_print(["Saved QMLA instance info to ", qmla_core_info_database])
 
     def _initiate_database(self):
         self.model_database, self.model_lists = \
@@ -980,13 +981,13 @@ class QuantumModelLearningAgent():
                     ]
                 )
                 # why is this happening here??
-                self.qmla_core_data['probe_dict'] = self.probes_system
+                self.qmla_settings['probe_dict'] = self.probes_system
                 updated_model_info = remote_learn_model_parameters(
                     model_name,
                     model_id,
                     growth_generator=self.branch_growth_rules[branch_id],
                     branch_id=branch_id,
-                    qmla_core_info_dict=self.qmla_core_data,
+                    qmla_core_info_dict=self.qmla_settings,
                     remote=True,
                     host_name=self.redis_host_name,
                     port_number=self.redis_port_number,

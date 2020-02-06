@@ -66,7 +66,7 @@ def remote_learn_model_parameters(
     any_job_failed_db = redis_databases['any_job_failed']
 
     if qmla_core_info_dict is None:
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database['qmla_core_data'])
+        qmla_core_info_dict = pickle.loads(qmla_core_info_database['qmla_settings'])
         probe_dict = pickle.loads(qmla_core_info_database['ProbeDict'])
     else:  # if in serial, qmla_core_info_dict given, with probe_dict included in it.
         probe_dict = qmla_core_info_dict['probe_dict']

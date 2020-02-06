@@ -166,7 +166,7 @@ class ModelInstanceForLearning():
         )
         qmla_core_info_database = redis_databases['qmla_core_info_database']
         init_model_print_loc = False
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_core_data'))
+        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
         self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
         self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
@@ -743,7 +743,7 @@ class ModelInstanceForStorage():
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
         self.model_id = model_id
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_core_data'))
+        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
         self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
         self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
         self.measurement_class = qmla_core_info_dict['measurement_type']
@@ -1131,7 +1131,7 @@ class ModelInstanceForComparison():
 
         qmla_core_info_database = redis_databases['qmla_core_info_database']
 
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_core_data'))
+        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
         self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
         self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
 

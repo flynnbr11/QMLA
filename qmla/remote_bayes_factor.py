@@ -108,7 +108,7 @@ def remote_bayes_factor_calculation(
     active_branches_bayes = redis_databases['active_branches_bayes']
     active_interbranch_bayes = redis_databases['active_interbranch_bayes']
 
-    info_dict = pickle.loads(redis_databases['qmla_core_info_database']['qmla_core_data'])
+    info_dict = pickle.loads(redis_databases['qmla_core_info_database']['qmla_settings'])
     use_experimental_data = info_dict['use_experimental_data']
     experimental_data_times = info_dict['experimental_measurement_times']
     binning = info_dict['bayes_factors_time_binning']
