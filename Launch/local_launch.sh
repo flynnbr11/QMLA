@@ -208,7 +208,6 @@ do
             -mqhl=$multiple_qhl \
             -p=$prt -e=$exp -bt=$bt \
             -rq=$use_rq \
-            -g=$gaussian \
             -qhl=$qhl_test \
             -ra=$ra -rt=$rt -pgh=$pgh \
             -pgh_exp=$pgh_exponent \
@@ -217,25 +216,28 @@ do
             -qid=$q_id \
             -pt=$plots \
             -pkl=1 \
-            -log=$this_log -cb=$bayes_csv \
-            -exp=$exp_data -cpr=$custom_prior \
+            -log=$this_log \
+            -cb=$bayes_csv \
+            -exp=$exp_data \
             -prtwt=$store_prt_wt \
             -pnoise=$probe_noise \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
-            -bintimes=$bintimes \
-            -bftimesall=$bf_all_times \
             -latex=$latex_mapping_file \
             -resource=$reallocate_resources \
-            --updater_from_prior=$updater_from_prior \
             -ggr=$growth_rule \
-            -nprobes=$num_probes \
-            -pmin=$param_min -pmax=$param_max \
-            -pmean=$param_mean -psigma=$param_sigma \
-            -special_probe=$special_probe \
             $growth_rules_command 
+            # -g=$gaussian \
+            # -cpr=$custom_prior \
+            # -bintimes=$bintimes \
+            # -bftimesall=$bf_all_times \
+            # --updater_from_prior=$updater_from_prior \
+            # -nprobes=$num_probes \
+            # -pmin=$param_min -pmax=$param_max \
+            # -pmean=$param_mean -psigma=$param_sigma \
+            # -special_probe=$special_probe \
     done
 done
 
@@ -316,7 +318,6 @@ then
             -e=$experiments \
             -bt=$bt \
             -rq=$use_rq \
-            -g=$gaussian \
             -qhl=0 \
             -ra=$ra \
             -rt=$rt \
@@ -330,23 +331,17 @@ then
             -log=$this_log \
             -cb=$bayes_csv \
             -exp=$exp_data \
-            -cpr=$custom_prior \
             -prtwt=$store_prt_wt \
             -pnoise=$probe_noise \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
-            -bintimes=$bintimes \
-            -bftimesall=$bf_all_times \
             -latex=$latex_mapping_file \
             -ggr=$growth_rule \
-            --updater_from_prior=$updater_from_prior \
             -resource=$reallocate_resources \
             -ggr=$growth_rule \
-            -nprobes=$num_probes \
             $growth_rules_command 
-
     done
     echo "
     cd $full_path_to_results

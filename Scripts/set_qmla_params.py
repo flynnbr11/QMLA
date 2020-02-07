@@ -139,7 +139,6 @@ parser.add_argument(
     default=0.03
 )
 
-
 arguments = parser.parse_args()
 random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)

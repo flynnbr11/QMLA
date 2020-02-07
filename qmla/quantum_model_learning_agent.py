@@ -530,8 +530,6 @@ class QuantumModelLearningAgent():
             '}H_{' + str(number_hamiltonians_to_exponentiate) +
             r'}|\psi>_{' + str(self.probe_number) +
             '}PN_{' + str(self.qmla_controls.probe_noise_level) +
-            # '}BF^{bin }_{' + str(self.qmla_controls.bayes_time_binning) +
-            # '}BF^{all }_{' + str(self.qmla_controls.bayes_factors_use_all_exp_times) +
             '}$'
         )
 

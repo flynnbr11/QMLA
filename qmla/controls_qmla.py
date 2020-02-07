@@ -7,6 +7,11 @@ import qmla.get_growth_rule as get_growth_rule
 import qmla.database_framework as database_framework
 import qmla.logging
 
+__all__ = [
+    'ControlsQMLA'
+]
+
+
 """
 This file is callable with *kwargs from a separate QMD program.
 It returns an instance of the class ControlsQMLA, which has attributes
@@ -22,35 +27,6 @@ def log_print(
         log_file = log_file, 
         log_identifier = 'Setting QMLA controls'
     )
-
-
-def get_directory_name_by_time(just_date=False):
-    import datetime
-    # Directory name based on date and time it was generated from
-    # https://www.saltycrane.com/blog/2008/06/how-to-get-current-date-and-time-in/
-    now = datetime.date.today()
-    year = now.strftime("%y")
-    month = now.strftime("%b")
-    day = now.strftime("%d")
-    hour = datetime.datetime.now().hour
-    minute = datetime.datetime.now().minute
-    date = str(str(day) + '_' + str(month) + '_' + str(year))
-    time = str(str(hour) + '_' + str(minute))
-    name = str(date + '/' + time + '/')
-    if just_date is False:
-        return name
-    else:
-        return str(date + '/')
-
-
-default_results_directory = get_directory_name_by_time(
-    just_date=False
-)
-default_latex_mapping_file = str(
-    default_results_directory +
-    '/LatexMapping.txt'
-)
-
 
 class ControlsQMLA():
     def __init__(
@@ -72,7 +48,6 @@ class ControlsQMLA():
             self.growth_class = None
 
         # get useful stuff out of growth_rule class
-        # self.measurement_type = self.growth_class.expectation_value_function.__name__
         self.dataset = self.growth_class.experimental_dataset
         self.data_max_time = self.growth_class.max_time_to_consider  # arguments.data_max_time
         self.num_probes = self.growth_class.num_probes
@@ -80,12 +55,11 @@ class ControlsQMLA():
             self.growth_class.num_top_models_to_build_on    
         )
 
-        # get other useful stuff out of arguments passed to implement_qmla script
+        # get core arguments passed to implement_qmla script
+        # and generate required parameters from those
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
         self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
-        # self.models_for_qhl = arguments.models_for_qhl
-        self.prior_pickle_file = arguments.prior_pickle_file
         self.true_params_pickle_file = arguments.true_params_pickle_file
 
         true_params_info = pickle.load(
@@ -121,15 +95,12 @@ class ControlsQMLA():
                     true_ham = param * mtx
 
         self.true_hamiltonian = true_ham
+        
+        # get parameters from arguments passed to implement_qmla.py
+        self.prior_pickle_file = arguments.prior_pickle_file
         self.qhl_test = bool(arguments.qhl_test)
         self.further_qhl = bool(arguments.further_qhl)
-        # self.do_iqle = bool(arguments.do_iqle)
-        # self.do_qle = bool(arguments.do_qle)
         self.use_rq = bool(arguments.use_rq)
-        # self.num_runs = arguments.num_runs
-        # self.num_tests = arguments.num_tests
-        # self.num_qubits = arguments.num_qubits
-        # self.num_parameters = arguments.num_parameters
         self.num_experiments = arguments.num_experiments
         self.num_particles = arguments.num_particles
         self.num_times_bayes = arguments.num_times_bayes
@@ -137,8 +108,6 @@ class ControlsQMLA():
         self.bayes_upper = arguments.bayes_upper
         self.save_plots = bool(arguments.save_plots)
         self.store_particles_weights = bool(arguments.store_particles_weights)
-        # self.gaussian = bool(arguments.gaussian)
-        # self.custom_prior = bool(arguments.custom_prior)
         self.resample_threshold = arguments.resample_threshold  # TODO put inside growth rule
         self.resample_a = arguments.resample_a
         self.pgh_factor = arguments.pgh_factor
@@ -151,23 +120,13 @@ class ControlsQMLA():
         self.results_directory = arguments.results_directory
         self.rq_timeout = arguments.rq_timeout
         self.cumulative_csv = arguments.cumulative_csv
-        # self.data_time_offset = arguments.data_time_offset
         self.true_expec_path = arguments.true_expec_path
         self.probes_plot_file = arguments.probes_plot_file
-        # self.special_probe = arguments.special_probe_for_learning
         self.latex_mapping_file = arguments.latex_mapping_file
         self.reallocate_resources = bool(arguments.reallocate_resources)
-        # self.param_min = arguments.param_min
-        # self.param_max = arguments.param_max
-        # self.param_mean = arguments.param_mean
-        # self.param_sigma = arguments.param_sigma
-        # self.bayes_time_binning = bool(arguments.bayes_time_binning)
-        # self.bayes_factors_use_all_exp_times = bool(
-        #     arguments.bayes_factors_use_all_exp_times)
+        self.probe_noise_level = arguments.probe_noise_level # TODO put in growth rule
 
-        self.probe_noise_level = arguments.probe_noise_level
-        self.updater_from_prior = bool(arguments.updater_from_prior)
-
+        # create some new parameters
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
         self.plots_directory = self.results_directory + 'plots/'
@@ -201,14 +160,11 @@ def parse_cmd_line_args(args):
 
     parser = argparse.ArgumentParser(description='Pass variables for (I)QLE.')
 
-    # Add parser arguments, ie command line arguments for QMD
-
-    # parser.add_argument(
-    #   '-op', '--true_model',
-    #   help="True operator to be simulated and learned against.",
-    #   type=str,
-    #   default='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
-    # )
+    # Interpret command line arguments
+    # These are passed through the launch script
+    # and into this function as args, 
+    # parsed here and then available to QMLA instances
+    # which have access to the controls class returned from  this function. 
 
     parser.add_argument(
         '-qhl', '--qhl_test',
@@ -225,19 +181,6 @@ def parse_cmd_line_args(args):
     )
 
     # QMD parameters -- fundamentals such as number of particles etc
-    parser.add_argument(
-        '-r', '--num_runs',
-        help="Number of runs to perform majority voting.",
-        type=int,
-        default=1
-    )
-
-    parser.add_argument(
-        '-t', '--num_tests',
-        help="Number of complete tests to average over.",
-        type=int,
-        default=1
-    )
 
     parser.add_argument(
         '-e', '--num_experiments',
@@ -276,48 +219,6 @@ def parse_cmd_line_args(args):
         help='Lower Bayes threshold.',
         type=int,
         default=1
-    )
-
-    # Parameters about the model to use as true model (currently deprecated)
-    parser.add_argument(
-        '-q', '--num_qubits',
-        help='Number of qubits to run tests for.',
-        type=int,
-        default=2
-    )
-    parser.add_argument(
-        '-pm', '--num_parameters',
-        help='Number of parameters to run tests for.',
-        type=int,
-        default=2
-    )
-
-    # Whether to use QLE, IQLE or both (currently deprecated)
-    parser.add_argument(
-        '-qle', '--do_qle',
-        help='True to perform QLE, False otherwise.',
-        type=int,
-        default=1
-    )
-    parser.add_argument(
-        '-iqle', '--do_iqle',
-        help='True to perform IQLE, False otherwise.',
-        type=int,
-        default=0
-    )
-
-    parser.add_argument(
-        '-g', '--gaussian',
-        help='True: normal distribution; False: uniform.',
-        type=int,
-        default=True
-    )
-
-    parser.add_argument(
-        '-cpr', '--custom_prior',
-        help='True: use custom prior given to QMD instance; False: use defulat.',
-        type=int,
-        default=False
     )
 
     # Include optional plots
@@ -393,7 +294,7 @@ def parse_cmd_line_args(args):
         '-dir', '--results_directory',
         help='Relative directory to store results in.',
         type=str,
-        default=default_results_directory
+        default='QMLA_default_results/'
     )
     parser.add_argument(
         '-pkl', '--pickle_qmd_class',
@@ -435,27 +336,6 @@ def parse_cmd_line_args(args):
         help='Maximum useful time in given data.',
         type=int,
         default=2000
-    )
-
-    parser.add_argument(
-        '-dto', '--data_time_offset',
-        help='Offset to ensure at t=0, Pr=1.',
-        type=int,
-        default=180
-    )
-
-    parser.add_argument(
-        '-bintimes', '--bayes_time_binning',
-        help='Store QMD class in pickled file at end. Large memory requirement, recommend not to.',
-        type=int,
-        default=0
-    )
-
-    parser.add_argument(
-        '-bftimesall', '--bayes_factors_use_all_exp_times',
-        help='Store QMD class in pickled file at end. Large memory requirement, recommend not to.',
-        type=int,
-        default=0
     )
 
     parser.add_argument(
@@ -516,17 +396,10 @@ def parse_cmd_line_args(args):
     )
 
     parser.add_argument(
-        '-special_probe', '--special_probe_for_learning',
-        help='Specify type of probe to use during learning.',
-        type=str,
-        default=None
-    )
-
-    parser.add_argument(
         '-latex', '--latex_mapping_file',
         help='Path to save list of terms latex/name maps to.',
         type=str,
-        default=default_latex_mapping_file
+        default='QMLA_default_results/latex_map.txt'
     )
 
     parser.add_argument(
@@ -538,63 +411,22 @@ def parse_cmd_line_args(args):
     )
 
     parser.add_argument(
-        '-pmin', '--param_min',
-        help='Minimum valid paramater value.',
-        type=float,
-        default=0
-    )
-    parser.add_argument(
-        '-pmax', '--param_max',
-        help='Maximum valid paramater value.',
-        type=float,
-        default=1
-    )
-
-    parser.add_argument(
-        '-pmean', '--param_mean',
-        help='Default mean parameter value for normal distribution.',
-        type=float,
-        default=0.5
-    )
-
-    parser.add_argument(
-        '-psigma', '--param_sigma',
-        help='Default std dev on distribution',
-        type=float,
-        default=0.5
-    )
-
-    parser.add_argument(
-        '-nprobes', '--num_probes',
-        help='How many probe states in rota for learning parameters.',
-        type=int,
-        default=20
-    )
-
-    parser.add_argument(
         '-pnoise', '--probe_noise_level',
         help='Noise level to add to probe for learning',
         type=float,
         default=0.03
     )
 
-    parser.add_argument(
-        '-updprior', '--updater_from_prior',
-        help='Whether or not to use the prior to generate new updater for Bayes Factor calculation',
-        type=int,
-        default=0
-    )
-
     # Process arguments from command line
     arguments = parser.parse_args(args)
 
     # Use arguments to initialise global variables class.
-    global_variables = ControlsQMLA(
+    qmla_controls = ControlsQMLA(
         arguments,
     )
 
     # args_dict = vars(arguments)
-    args_dict = vars(global_variables)
+    args_dict = vars(qmla_controls)
 
     for a in list(args_dict.keys()):
         log_print(
@@ -603,7 +435,7 @@ def parse_cmd_line_args(args):
                 ':',
                 args_dict[a]
             ],
-            log_file=global_variables.log_file
+            log_file=qmla_controls.log_file
         )
 
-    return global_variables
+    return qmla_controls
