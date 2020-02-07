@@ -582,7 +582,7 @@ def plot_learned_models_dynamics(
         ############ --------------- ############
         if include_param_estimates == True:
             ax = fig.add_subplot(gs[row, col])
-            name = reduced.Name
+            name = reduced.model_name
             terms = database_framework.get_constituent_names_from_name(name)
             num_terms = len(terms)
 
@@ -1346,8 +1346,8 @@ def r_squared_from_epoch_list(
     if max_time is None:
         max_time = max(exp_times)
 
-    min_time = expdt.nearestAvailableExpTime(exp_times, 0)
-    max_time = expdt.nearestAvailableExpTime(exp_times, max_time)
+    min_time = expdt.nearest_experimental_time_available(exp_times, 0)
+    max_time = expdt.nearest_experimental_time_available(exp_times, max_time)
     min_data_idx = exp_times.index(min_time)
     max_data_idx = exp_times.index(max_time)
     exp_times = exp_times[min_data_idx:max_data_idx]

@@ -1,18 +1,8 @@
-from __future__ import print_function  # so print doesn't show brackets
-import qinfer as qi
 import numpy as np
-import scipy as sp
-import inspect
-import time
-import sys as sys
-import os as os
 
 import qmla.probe_set_generation as probe_set_generation
-from qmla.memory_tests import print_loc
+import qmla.logging
 
-# sys.path.append((os.path.join("..")))
-
-global_print_loc = False
 use_linalg = False
 use_sparse = False
 
@@ -30,33 +20,16 @@ if (use_linalg):
     ham_exp_installed = False
 
 
-def log_print(to_print_list, log_file, log_identifier):
-    ## Note removed to logging.py 
-    #  TODO replace internal log_prints in all files with call to central logging functions
-    """
-    log_print writes in the log file the string passed as first argument.
-    log_print(to_print_list, log_file, log_identifier)
-
-    longhish description: adds the content of the first argument to the log file passed as second argument
-    and using the identifier for the log entry specified in the third parameter
-    if the first argument is not passed as string will be converted to string.
-
-    :param to_print_list: string you want to print 
-    :type to_print_list: str() 
-    :param log_file: path of the log file you want to update
-    :type log_file: str() 
-    :param log_identifier: identifier for the log
-    :type log_identifier: str()
-
-    """
-    # identifier = str(str(time_seconds()) +" [Expectation Values]")
-    if not isinstance(to_print_list, list):
-        to_print_list = list(to_print_list)
-
-    print_strings = [str(s) for s in to_print_list]
-    to_print = " ".join(print_strings)
-    with open(log_file, 'a') as write_log_file:
-        print(log_identifier, str(to_print), file=write_log_file, flush=True)
+def log_print(
+    to_print_list, 
+    log_file, 
+    log_identifier='ExpectationValue'
+):
+    qmla.logging.print_to_log(
+        to_print_list = to_print_list, 
+        log_file = log_file, 
+        log_identifier = log_identifier
+    )
 
 
 # Default expectation value calculations
@@ -159,6 +132,7 @@ def hahn_evolution(
     # okay for experimental data with spins in NV centre
     import numpy as np
     from scipy import linalg
+    from qmla.probe_set_generation import random_probe
     inversion_gate = np.array([
         [0. - 1.j, 0. + 0.j, 0. + 0.j, 0. + 0.j],
         [0. + 0.j, 0. - 1.j, 0. + 0.j, 0. + 0.j],
@@ -233,7 +207,7 @@ def hahn_evolution(
     plus_state = np.array([1, 1]) / np.sqrt(2)
     # from 1000 counts - Poissonian noise = 1/sqrt(1000) # should be ~0.03
     noise_level = 0.00
-    from probe_set_generation import random_probe
+    
     random_noise = noise_level * random_probe(1)
     # random_noise = noise_level * probe_set_generation.random_probe(1)
     noisy_plus = plus_state + random_noise
@@ -250,15 +224,6 @@ def hahn_evolution(
 #    return expect_value
 
 
-def sigmaz():
-    """
-    function that returns a Pauli z as numpy array
-
-    :output : PauliZ
-    """
-
-    return np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]])
-
 
 def make_inversion_gate(num_qubits):
     """
@@ -269,9 +234,10 @@ def make_inversion_gate(num_qubits):
     :output : inversion gate
     """
     from scipy import linalg
+    sigma_z = np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]])
     hahn_angle = np.pi / 2
     hahn_gate = np.kron(
-        hahn_angle * sigmaz(),
+        hahn_angle * sigma_z,
         np.eye(2**(num_qubits - 1))
     )
     # inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()

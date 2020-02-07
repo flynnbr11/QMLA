@@ -10,7 +10,7 @@ num_tests=1
 qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
-exp_data=0
+exp_data=1
 simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
@@ -74,7 +74,7 @@ git_commit=$(git rev-parse HEAD)
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
-# sim_growth_rule='IsingProbabilistic'
+sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'
 # sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
@@ -82,7 +82,7 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='FermiHubbardProbabilistic'
 # sim_growth_rule='Genetic'
 # sim_growth_rule='Presentation'
-sim_growth_rule='ExperimentReducedNV'
+# sim_growth_rule='ExperimentReducedNV'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1

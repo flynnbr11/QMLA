@@ -251,7 +251,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                 # If time already exists in experimental data
                 experimental_expec_value = self.experimental_measurements[time]
             except BaseException:
-                experimental_expec_value = qmla.experimental_data_processing.nearestAvailableExpVal(
+                experimental_expec_value = qmla.experimental_data_processing.nearest_experimental_expect_val_available(
                     times=self.experimental_measurement_times,
                     experimental_data=self.experimental_measurements,
                     t=time

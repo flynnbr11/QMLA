@@ -436,7 +436,7 @@ class ModelInstanceForLearning():
                 self.qinfer_PGH_heuristic_factor
             if self.use_experimental_data:
                 t = self.new_experiment[0][0]
-                nearest = qmla.experimental_data_processing.nearestAvailableExpTime(
+                nearest = qmla.experimental_data_processing.nearest_experimental_time_available(
                     times=self.experimental_measurement_times,
                     t=t
                 )
@@ -944,8 +944,8 @@ class ModelInstanceForStorage():
         if max_time is None:
             max_time = max(exp_times)
 
-        min_time = qmla.experimental_data_processing.nearestAvailableExpTime(exp_times, min_time)
-        max_time = qmla.experimental_data_processing.nearestAvailableExpTime(exp_times, max_time)
+        min_time = qmla.experimental_data_processing.nearest_experimental_time_available(exp_times, min_time)
+        max_time = qmla.experimental_data_processing.nearest_experimental_time_available(exp_times, max_time)
         min_data_idx = exp_times.index(min_time)
         max_data_idx = exp_times.index(max_time)
         exp_times = exp_times[min_data_idx:max_data_idx]
@@ -1029,11 +1029,11 @@ class ModelInstanceForStorage():
         if max_time is None:
             max_time = max(exp_times)
 
-        min_time = qmla.experimental_data_processing.nearestAvailableExpTime(
+        min_time = qmla.experimental_data_processing.nearest_experimental_time_available(
             exp_times,
             min_time
         )
-        max_time = qmla.experimental_data_processing.nearestAvailableExpTime(
+        max_time = qmla.experimental_data_processing.nearest_experimental_time_available(
             exp_times,
             max_time
         )
