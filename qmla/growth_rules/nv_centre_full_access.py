@@ -30,8 +30,8 @@ class ExperimentFullAccessNV(
         #     # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
         #     self.probe_generation_function = probe_set_generation.restore_dec_13_probe_generation
 
-        # self.true_operator = 'xTz'
-        self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
+        # self.true_model = 'xTz'
+        self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
         self.initial_models = ['xTi', 'yTi', 'zTi']
         self.qhl_models = [
             'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz',
@@ -48,7 +48,7 @@ class ExperimentFullAccessNV(
         self.max_num_probe_qubits = 8
         self.tree_completed_initially = False
         self.experimental_dataset = 'NVB_rescale_dataset.p'
-        self.measurement_type = 'full_access'
+        # self.measurement_type = 'full_access'
         self.fixed_axis_generator = False
         self.fixed_axis = 'z'  # e.g. transverse axis
 

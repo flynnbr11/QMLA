@@ -59,7 +59,7 @@ def log_print(to_print_list, log_file):
 store_particles_weights = False
 
 log_file = global_variables.log_file
-qle = global_variables.do_qle  # True for QLE, False for IQLE
+# qle = global_variables.do_qle  # True for QLE, False for IQLE
 
 growth_class.generate_probes(
     experimental_data=global_variables.use_experimental_data,
@@ -153,7 +153,7 @@ log_print(
     log_file=log_file
 )
 
-true_op = global_variables.true_operator
+true_op = global_variables.true_model
 true_num_qubits = database_framework.get_num_qubits(true_op)
 true_op_list = database_framework.get_constituent_names_from_name(true_op)
 true_op_matrices = [database_framework.compute(t) for t in true_op_list]
@@ -262,7 +262,7 @@ log_print(
         "\n", global_variables.num_particles,
         " particles for", global_variables.num_experiments,
         "experiments and ", global_variables.num_times_bayes,
-        "bayes updates\n Gaussian=", global_variables.gaussian,
+        # "bayes updates\n Gaussian=", global_variables.gaussian,
         "\n RQ=", global_variables.use_rq, "RQ log:",
         global_variables.log_file, "\n Bayes CSV:",
         global_variables.cumulative_csv
@@ -437,10 +437,10 @@ if global_variables.qhl_test:
 
 elif (
     global_variables.further_qhl == True
-    or global_variables.multiQHL == True
+    or global_variables.qhl_mode_multiple_models == True
 ):
 
-    if global_variables.multiQHL == True:
+    if global_variables.qhl_mode_multiple_models == True:
         qhl_models = growth_class.qhl_models
         # output_prefix = 'multi_qhl_'
         output_prefix = ''  # TODO make so that this can have an output prefix
@@ -717,7 +717,7 @@ else:
     if (
         global_variables.pickle_qmd_class
         # or
-        # global_variables.true_operator == qmd.champion_name_latex
+        # global_variables.true_model == qmd.champion_name_latex
     ):
         log_print(["QMD complete. Pickling result to",
                    global_variables.class_pickle_file], log_file

@@ -178,15 +178,15 @@ for g in all_growth_classes:
     except BaseException:
         unique_growth_classes[g] = None
 
-true_operator = growth_class.true_operator
+true_model = growth_class.true_model
 probes_plot_file = arguments.probes_plot_file
 force_plus_probe = bool(arguments.force_plus_probe)
-special_probe = arguments.special_probe
-gaussian = bool(arguments.gaussian)
-param_min = arguments.param_min
-param_max = arguments.param_max
-param_mean = arguments.param_mean
-param_sigma = arguments.param_sigma
+# special_probe = arguments.special_probe
+# gaussian = bool(arguments.gaussian)
+# param_min = arguments.param_min
+# param_max = arguments.param_max
+# param_mean = arguments.param_mean
+# param_sigma = arguments.param_sigma
 probe_noise_level = arguments.probe_noise_level
 
 true_prior_plot_file = str(
@@ -195,7 +195,7 @@ true_prior_plot_file = str(
 )
 
 true_prior = growth_class.get_prior(
-    model_name=true_operator,
+    model_name=true_model,
     log_file=log_file,
     log_identifier='[SetQHLParams]'
 )
@@ -214,15 +214,15 @@ if pickle_file is not None:
 if arguments.true_params_file is not None:
     qmla.create_qhl_params(
         # true_op = arguments.true_op,
-        true_op=true_operator,
+        true_op=true_model,
         true_prior=true_prior,
         pickle_file=arguments.true_params_file,
         growth_generator=growth_generation_rule,
         unique_growth_classes=unique_growth_classes,
         all_growth_classes=all_growth_classes,
         random_vals=random_true_params,
-        rand_min=param_min,
-        rand_max=param_max,
+        # rand_min=param_min,
+        # rand_max=param_max,
         exp_data=exp_data,
         growth_class=growth_class,
         true_prior_plot_file=true_prior_plot_file
@@ -239,7 +239,7 @@ print("Generating probe dict for plotting")
 
 # TODO
 plot_probe_dict = growth_class.plot_probe_generator(
-    true_operator=true_operator,
+    true_model=true_model,
     growth_generator=growth_generation_rule,
     experimental_data=exp_data,
     noise_level=probe_noise_level,

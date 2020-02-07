@@ -34,13 +34,13 @@ class Genetic(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        # self.true_operator = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
-        # self.true_operator = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
+        # self.true_model = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
+        # self.true_model = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
         # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
         self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
-        self.true_operator = self.ising_full_connectivity
-        self.true_operator = database_framework.alph(self.true_operator)
-        self.num_sites = database_framework.get_num_qubits(self.true_operator)
+        self.true_model = self.ising_full_connectivity
+        self.true_model = database_framework.alph(self.true_model)
+        self.num_sites = database_framework.get_num_qubits(self.true_model)
         
         self.base_terms = [
             'z',
@@ -56,13 +56,13 @@ class Genetic(
         )
 
         self.true_chromosome = self.genetic_algorithm.map_model_to_chromosome(
-            self.true_operator
+            self.true_model
         )
         self.true_chromosome_string = self.genetic_algorithm.chromosome_string(
             self.true_chromosome
         )
 
-        # self.true_operator = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
+        # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         self.initial_num_models = 4
         self.initial_models = self.genetic_algorithm.random_initial_models(

@@ -29,13 +29,13 @@ class FermiHubbardBase(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        # self.true_operator = 'FHhop_1h2_up_d2'
-        self.true_operator = 'FHhop_1h2_down_d3+FHhop_1h2_up_d3+FHhop_1h3_down_d3+FHhop_2h3_up_d3+FHonsite_1_d3+FHonsite_2_d3+FHonsite_3_d3'  # for testing
+        # self.true_model = 'FHhop_1h2_up_d2'
+        self.true_model = 'FHhop_1h2_down_d3+FHhop_1h2_up_d3+FHhop_1h3_down_d3+FHhop_2h3_up_d3+FHonsite_1_d3+FHonsite_2_d3+FHonsite_3_d3'  # for testing
         self.tree_completed_initially = True
         self.min_param = 0
         self.max_param = 1
         self.initial_models = [
-            self.true_operator
+            self.true_model
         ]
         self.probe_generation_function = probe_set_generation.separable_fermi_hubbard_half_filled
         # unless specifically different set of probes required
@@ -248,7 +248,7 @@ class FermiHubbardPredetermined(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        # self.true_operator = 'FHhop_1h2_up_d2'
+        # self.true_model = 'FHhop_1h2_up_d2'
         self.tree_completed_initially = True
         self.max_time_to_consider = 5
         self.num_processes_to_parallelise_over = 9
@@ -273,13 +273,13 @@ class FermiHubbardPredetermined(
             # 'FHhop_1h2_down_d4+FHhop_1h2_up_d4+FHhop_1h3_down_d4+FHhop_2h4_down_d4+FHonsite_1_d4+FHonsite_2_d4+FHonsite_3_d4+FHonsite_4_d4',
         ]
         self.max_num_sites = 4
-        if self.true_operator not in self.initial_models:
+        if self.true_model not in self.initial_models:
             self.log_print(
                 [
                     "True model not present in initial models for predetermined set; adding it."
                 ]
             )
-            self.initial_models.append(self.true_operator)
+            self.initial_models.append(self.true_model)
         self.log_print(
             [
                 "Predetermined models:", self.initial_models

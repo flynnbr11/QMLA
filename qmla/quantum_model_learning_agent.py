@@ -130,7 +130,7 @@ class QuantumModelLearningAgent():
         self.redis_port_number = self.qmla_controls.port_number
         self.log_file = self.qmla_controls.log_file
         self.qhl_mode = self.qmla_controls.qhl_test
-        self.qhl_mode_multiple_models = self.qmla_controls.multiQHL
+        self.qhl_mode_multiple_models = self.qmla_controls.qhl_mode_multiple_models
         self.results_directory = self.qmla_controls.results_directory
         if not self.results_directory.endswith('/'):
             self.results_directory += '/'
@@ -149,8 +149,8 @@ class QuantumModelLearningAgent():
             self.qmla_controls.true_op_name)
         self.true_model_dimension = database_framework.get_num_qubits(
             self.true_model_name)
-        self.true_model_constituent_operators = self.qmla_controls.true_op_list
-        self.true_model_num_params = self.qmla_controls.true_operator_class.num_constituents
+        self.true_model_constituent_operators = self.qmla_controls.true_model_terms_matrices
+        self.true_model_num_params = self.qmla_controls.true_model_class.num_constituents
         self.true_param_list = self.qmla_controls.true_params_list
         self.true_param_dict = self.qmla_controls.true_params_dict
         self.log_print(
@@ -431,7 +431,7 @@ class QuantumModelLearningAgent():
         # used thereafter
         self.models_first_layer = first_layer_models
         self.use_qle = False  # Set to False for IQLE # TODO remove - redundant
-        self.measurement_class = self.qmla_controls.measurement_type
+        # self.measurement_class = self.qmla_controls.measurement_type
         self.use_custom_exponentiation = use_exp_custom
         # should only matter when using custom exponentiation package
         self.enable_sparse_exponentiation = True
@@ -442,7 +442,7 @@ class QuantumModelLearningAgent():
         self.use_time_dependent_true_model = False
         self.num_time_dependent_true_params = 0
         self.time_dependent_params = None
-        self.gaussian = self.qmla_controls.gaussian  # TODO remove?
+        # self.gaussian = self.qmla_controls.gaussian  # TODO remove?
         self.bayes_factors_store_directory = str(
             self.results_directory
             + 'BayesFactorsTimeRecords/'
@@ -530,8 +530,8 @@ class QuantumModelLearningAgent():
             '}H_{' + str(number_hamiltonians_to_exponentiate) +
             r'}|\psi>_{' + str(self.probe_number) +
             '}PN_{' + str(self.qmla_controls.probe_noise_level) +
-            '}BF^{bin }_{' + str(self.qmla_controls.bayes_time_binning) +
-            '}BF^{all }_{' + str(self.qmla_controls.bayes_factors_use_all_exp_times) +
+            # '}BF^{bin }_{' + str(self.qmla_controls.bayes_time_binning) +
+            # '}BF^{all }_{' + str(self.qmla_controls.bayes_factors_use_all_exp_times) +
             '}$'
         )
 
@@ -2560,7 +2560,7 @@ class QuantumModelLearningAgent():
             )
         self.qhl_mode_multiple_models = True
         self.champion_model_id = -1,  # TODO just so not to crash during dynamics plot
-        self.multiQHL_model_ids = [
+        self.qhl_mode_multiple_models_model_ids = [
             database_framework.model_id_from_name(
                 db=self.model_database,
                 name=mod_name
@@ -2926,7 +2926,7 @@ class QuantumModelLearningAgent():
     ):
         # TODO set precision, f-score etc as model instance attributes and
         # return those in champion_results
-        true_set = self.growth_class.true_operator_terms
+        true_set = self.growth_class.true_model_terms
         growth_class = self.get_model_storage_instance_by_id(
             model_id).growth_class
         terms = [

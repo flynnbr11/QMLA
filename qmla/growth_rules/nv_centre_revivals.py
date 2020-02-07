@@ -26,7 +26,7 @@ class ExpNVRevivals(
             **kwargs
         )
         self.experimental_dataset = 'NV_revivals.p'
-        self.true_operator = 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6'
+        self.true_model = 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6'
 
         self.qhl_models = [
             nv_centre_large_spin_bath.gali_model_nv_centre_spin(2),

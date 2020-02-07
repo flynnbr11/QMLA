@@ -33,10 +33,10 @@ class IsingProbabilistic(
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
 
-        # self.true_operator = 'pauliSet_zJz_1J2_d3PPPpauliSet_xJx_1J3_d3PPPpauliSet_zJz_2J3_d3PPPpauliSet_yJy_1J2_d3'
-        self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
-        self.true_operator = database_framework.alph(self.true_operator)
-        self.qhl_models = [self.true_operator, 'pauliSet_zJz_1J2_d4']
+        # self.true_model = 'pauliSet_zJz_1J2_d3PPPpauliSet_xJx_1J3_d3PPPpauliSet_zJz_2J3_d3PPPpauliSet_yJy_1J2_d3'
+        self.true_model = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
+        self.true_model = database_framework.alph(self.true_model)
+        self.qhl_models = [self.true_model, 'pauliSet_zJz_1J2_d4']
         self.base_terms = [
             # 'x',
             # 'y',
@@ -69,7 +69,7 @@ class IsingProbabilistic(
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
             self.initial_models = [
-                self.true_operator,
+                self.true_model,
                 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
 
             ]
@@ -96,11 +96,11 @@ class IsingPredetermined(
         self.max_time_to_consider = 5
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
-        # self.true_operator = 'pauliSet_zJz_1J2_d2'
-        # self.true_operator = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
-        self.true_operator = database_framework.alph(self.true_operator)
+        # self.true_model = 'pauliSet_zJz_1J2_d2'
+        # self.true_model = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
+        self.true_model = database_framework.alph(self.true_model)
         self.qhl_models = [
-            self.true_operator,
+            self.true_model,
             'pauliSet_zJz_1J2_d2'
         ]
         self.base_terms = [
@@ -122,5 +122,5 @@ class IsingPredetermined(
                 # 'pauliSet_zJz_1J2_d7PPPPPPPpauliSet_zJz_2J3_d7PPPPPPPpauliSet_zJz_3J4_d7PPPPPPPpauliSet_zJz_4J5_d7PPPPPPPpauliSet_zJz_5J6_d7PPPPPPPpauliSet_zJz_6J7_d7',
             ]
 
-            if self.true_operator not in self.initial_models:
-                self.initial_models.append(self.true_operator)
+            if self.true_model not in self.initial_models:
+                self.initial_models.append(self.true_model)

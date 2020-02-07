@@ -126,7 +126,7 @@ parser.add_argument(
     default=0
 )
 parser.add_argument(
-    '-mqhl', '--multiQHL',
+    '-mqhl', '--qhl_mode_multiple_models',
     help='Run QHL test on multiple (provided) models.',
     type=int,
     default=0

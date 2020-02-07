@@ -32,9 +32,9 @@ class PresentationPlotGeneration(
 
         self.single_parameter = False
 
-        self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
+        self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
         # self.max_num_probe_qubits = 3
-        # self.true_operator = 'yTxTTz'
+        # self.true_model = 'yTxTTz'
 
         self.true_model_terms_params = {
             # Decohering param set
@@ -50,7 +50,7 @@ class PresentationPlotGeneration(
         self.qhl_models = [
             'zTi',
             'xTiPPyTiPPzTiPPzTz',
-            # self.true_operator
+            # self.true_model
         ]
         self.max_time_to_consider = 6
 
@@ -71,7 +71,7 @@ class PresentationPlotGeneration(
 
         if self.single_parameter == True:
             self.max_time_to_consider = 2
-            self.true_operator = 'zTi'
+            self.true_model = 'zTi'
             self.true_model_terms_params = {
                 'zTi': 6.5
             }

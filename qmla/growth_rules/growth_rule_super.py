@@ -50,7 +50,7 @@ class GrowthRuleSuper():
         self.model_branches = {} 
 
         # Parameters specific to the growth rule
-        self.true_operator = 'xTi'
+        self.true_model = 'xTi'
         # qhl_models is the list of models used in a fixed QHL case, where we
         # are not running any QML
         self.qhl_models = ['xTi', 'yTi', 'zTi']
@@ -114,8 +114,8 @@ class GrowthRuleSuper():
                 print("Resetting {} to {}".format(att, kwargs[att]))
                 self.__setattr__(att, kwargs[att])
 
-    def true_operator_latex(self):
-        return self.latex_name(self.true_operator)
+    def true_model_latex(self):
+        return self.latex_name(self.true_model)
 
     def generate_models(
         self,
@@ -272,9 +272,9 @@ class GrowthRuleSuper():
         )
 
     @property
-    def true_operator_terms(self):
+    def true_model_terms(self):
         true_terms = database_framework.get_constituent_names_from_name(
-            self.true_operator
+            self.true_model
         )
 
         latex_true_terms = [

@@ -25,7 +25,7 @@ class ExperimentNVCentreVaryTrueModel(
             **kwargs
         )
         self.max_time_to_consider
-        self.true_operator = 'xTiPPyTiPPzTiPPzTz'
+        self.true_model = 'xTiPPyTiPPzTiPPzTz'
         # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
         self.probe_generation_function = probe_set_generation.separable_probe_dict
         self.shared_probes = True
@@ -48,7 +48,7 @@ class ExperimentNVCentreVaryTrueModel_3_params(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.true_operator = 'xTiPPyTiPPzTi'
+        self.true_model = 'xTiPPyTiPPzTi'
 
 
 class ExperimentNVCentreVaryTrueModel_5_params(
@@ -63,7 +63,7 @@ class ExperimentNVCentreVaryTrueModel_5_params(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTi'
+        self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTi'
 
 
 class ExperimentNVCentreVaryTrueModel_6_params(
@@ -78,7 +78,7 @@ class ExperimentNVCentreVaryTrueModel_6_params(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
+        self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
 
 
 class ExperimentNVCentreVaryTrueModel_7_params(
@@ -93,4 +93,4 @@ class ExperimentNVCentreVaryTrueModel_7_params(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.true_operator = 'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz'
+        self.true_model = 'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz'

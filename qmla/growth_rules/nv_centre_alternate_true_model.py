@@ -24,12 +24,12 @@ class ExpAlternativeNV(
             **kwargs
         )
 
-        self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
+        self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
         # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
         # self.probe_generation_function = probe_set_generation.separable_probe_dict
         # self.shared_probes = True
 
-        if self.true_operator == 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz':
+        if self.true_model == 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz':
             self.true_model_terms_params = {
                 # Decohering param set
                 # From 3000exp/20000prt, BC
@@ -60,7 +60,7 @@ class ExpAlternativeNV_second(
             **kwargs
         )
 
-        self.true_operator = 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz'
+        self.true_model = 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz'
         self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
         # unless specifically different set of probes required
         self.simulator_probe_generation_function = self.probe_generation_function

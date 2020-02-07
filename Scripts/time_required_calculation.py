@@ -414,13 +414,13 @@ def time_required(
 
     # Get time for QHL
     try:
-        true_operator = growth_class.true_operator
+        true_model = growth_class.true_model
     except BaseException:
         raise
     highest_parallelisability = max(parallelisability.values())
     times_reqd['num_processes'] = highest_parallelisability
 
-    true_dimension = qmla.get_num_qubits(true_operator)
+    true_dimension = qmla.get_num_qubits(true_model)
     qhl_time = 2 * (
         insurance_factor *
         hamiltonian_exponentiation_times[true_dimension]

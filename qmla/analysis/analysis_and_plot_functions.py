@@ -349,7 +349,7 @@ def plot_learned_models_dynamics(
         model_ids = [qmd.true_model_id]
         include_bayes_factors = False
     elif qmd.qhl_mode_multiple_models == True:
-        model_ids = list(qmd.multiQHL_model_ids)
+        model_ids = list(qmd.qhl_mode_multiple_models_model_ids)
         include_bayes_factors = False
     elif model_ids is None:
         model_ids = list(qmd.branch_champions.values())
@@ -2338,7 +2338,7 @@ def cumulativeQMDTreePlot(
     growth_class = get_growth_rule.get_growth_generator_class(
         growth_generation_rule=growth_generator
     )
-    true_model = growth_class.true_operator_latex()
+    true_model = growth_class.true_model_latex()
 
     term_branches = growth_class.name_branch_map(
         latex_mapping_file=latex_mapping_file,

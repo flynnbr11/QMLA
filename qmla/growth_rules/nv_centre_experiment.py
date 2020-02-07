@@ -36,12 +36,12 @@ class ExperimentNVCentre(
         else:
             self.expectation_value_function = expectation_values.n_qubit_hahn_evolution
 
-        # self.true_operator = 'xTiPPyTy'
+        # self.true_model = 'xTiPPyTy'
         self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
-        self.measurement_type = 'hahn'
+        # self.measurement_type = 'hahn'
 
-        self.true_operator = 'xTiPPyTiPPzTiPPzTz'
-        # self.true_operator = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
+        self.true_model = 'xTiPPyTiPPzTiPPzTz'
+        # self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
 
         self.initial_models = ['xTi', 'yTi', 'zTi']
         # self.initial_models = [
@@ -82,7 +82,7 @@ class ExperimentNVCentre(
         #     'yTy' : 0.799
 
         # }
-        if self.true_operator == 'xTiPPyTiPPzTiPPzTz':
+        if self.true_model == 'xTiPPyTiPPzTiPPzTz':
             self.true_model_terms_params = {  # from Jul_05/16_40
                 'xTi': 0.92450565,
                 'yTi': 6.00664336,

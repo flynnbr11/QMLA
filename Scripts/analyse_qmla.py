@@ -162,12 +162,12 @@ if true_params_path is not None:
         )
     )
     true_params_dict = true_params_info['params_dict']
-    true_operator = true_params_info['true_op']
+    true_model = true_params_info['true_op']
 else:
     true_params_dict = None
-    true_operator = true_growth_class.true_operator
-true_operator_latex = true_growth_class.latex_name(
-    true_operator
+    true_model = true_growth_class.true_model
+true_model_latex = true_growth_class.latex_name(
+    true_model
 )
 
 
@@ -196,8 +196,8 @@ print("Counting model occurences.")
 try:
     qmla.analysis.count_model_occurences(
         latex_map=latex_mapping_file,
-        true_operator_latex=true_growth_class.latex_name(
-            true_operator
+        true_model_latex=true_growth_class.latex_name(
+            true_model
         ),
         save_counts_dict=str(
             directory_to_analyse +
@@ -449,7 +449,7 @@ if further_qhl_mode == False:
         coefficients_of_determination=median_coeff_determination,
         coefficient_determination_latex_name=latex_coeff_det,
         f_scores=f_scores,
-        true_operator=true_operator,
+        true_model=true_model,
         growth_generator=growth_generator,
         # collective_analysis_pickle_file = results_collection_file,
         save_file=plot_file
@@ -491,7 +491,7 @@ if further_qhl_mode == False:
     qmla.analysis.plot_statistics(
         to_plot,
         models,
-        true_operator=true_operator_latex,
+        true_model=true_model_latex,
         save_to_file=str(
             directory_to_analyse +
             'model_stats.png'
@@ -502,7 +502,7 @@ if further_qhl_mode == False:
         qmla.analysis.plotTrueModelBayesFactors_IsingRotationTerms(
             results_csv_path=all_bayes_csv,
             # correct_mod='xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
-            correct_mod=true_operator,
+            correct_mod=true_model,
             growth_generator=growth_generator,
             save_to_file=str(
                 directory_to_analyse +

@@ -584,7 +584,7 @@ def analyse_and_plot_dynamics_multiple_models(
             growth_classes[g] = None
 
     try:
-        true_model = unique_growth_classes[growth_generator].true_operator
+        true_model = unique_growth_classes[growth_generator].true_model
     except BaseException:
         print("Couldn't find growth rule of {} in \n {}".format(
             growth_generator,
@@ -1454,7 +1454,7 @@ def plot_scores(
     plot_f_scores=False,
     entropy=None,
     inf_gain=None,
-    true_operator=None,
+    true_model=None,
     growth_generator=None,
     batch_nearest_num_params_as_winners=True,
     collective_analysis_pickle_file=None,
@@ -1466,7 +1466,7 @@ def plot_scores(
     # print("[AnalyseMultiple - plot_scores] growth classes:",growth_classes )
     # print("[AnalyseMultiple - plot_scores] unique_growth_classes:",unique_growth_classes )
     latex_true_op = unique_growth_classes[growth_generator].latex_name(
-        name=true_operator
+        name=true_model
     )
 
     latex_model_names = [
@@ -1508,7 +1508,7 @@ def plot_scores(
     if batch_nearest_num_params_as_winners == True:
         num_true_params = len(
             database_framework.get_constituent_names_from_name(
-                true_operator
+                true_model
             )
         )
         for mod in models:
@@ -1538,9 +1538,9 @@ def plot_scores(
         mod_idx = latex_model_names.index(mod_latex)
         colours[mod_idx] = 'orange'
         batch_success_rate += mod_scores[mod]
-    if true_operator in models:
-        batch_success_rate += mod_scores[true_operator]
-        correct_success_rate = mod_scores[true_operator]
+    if true_model in models:
+        batch_success_rate += mod_scores[true_model]
+        correct_success_rate = mod_scores[true_model]
 
     batch_success_rate /= num_runs
     correct_success_rate /= num_runs
@@ -1750,7 +1750,7 @@ def plot_tree_multi_QMD(
 
 def count_model_occurences(
     latex_map,
-    true_operator_latex,
+    true_model_latex,
     save_counts_dict=None,
     save_to_file=None
 ):
@@ -1780,17 +1780,17 @@ def count_model_occurences(
     integer_ticks = list(range(max_count + 1))
     colours = ['blue' for m in unique_models]
     unique_models = [u[:-1] for u in unique_models if u[-1] == ')']
-    true_operator_latex = true_operator_latex.replace(' ', '')
-    if true_operator_latex in unique_models:
-        true_idx = unique_models.index(true_operator_latex)
+    true_model_latex = true_model_latex.replace(' ', '')
+    if true_model_latex in unique_models:
+        true_idx = unique_models.index(true_model_latex)
         colours[true_idx] = 'green'
 
     print(
         "[multiQMD - count model occurences]",
         "Colours:", colours,
-        "\ntrue op:", true_operator_latex,
+        "\ntrue op:", true_model_latex,
         "\nunique models:", unique_models,
-        "test:", (str(true_operator_latex) in unique_models)
+        "test:", (str(true_model_latex) in unique_models)
     )
 
     fig, ax = plt.subplots(
@@ -1839,7 +1839,7 @@ def count_model_occurences(
 def plot_statistics(
     to_plot,  # list of dictionaries of statistics to plot
     models,  # list of models to plot results for,
-    true_operator,
+    true_model,
     colourmap=plt.cm.tab20c,
     save_to_file=None
 ):
@@ -1964,7 +1964,7 @@ def plot_statistics(
     model_label_colours = ['black' for m in models]
 
     try:
-        true_idx = models.index(str(true_operator))
+        true_idx = models.index(str(true_model))
         top_ax.get_yticklabels()[true_idx].set_color('green')
     except BaseException:
         pass

@@ -26,8 +26,7 @@ def log_print(
 
 def get_directory_name_by_time(just_date=False):
     import datetime
-    # Directory name based on date and time it was generated
-    # from
+    # Directory name based on date and time it was generated from
     # https://www.saltycrane.com/blog/2008/06/how-to-get-current-date-and-time-in/
     now = datetime.date.today()
     year = now.strftime("%y")
@@ -59,9 +58,7 @@ class ControlsQMLA():
         arguments,
         **kwargs
     ):
-        # self.true_operator = true_operator
         self.use_experimental_data = bool(arguments.experimental_data)
-        # self.measurement_type = arguments.measurement_type
         self.growth_generation_rule = arguments.growth_generation_rule
         self.log_file = arguments.log_file
         try:
@@ -74,30 +71,36 @@ class ControlsQMLA():
             raise
             self.growth_class = None
 
-        # Switching to using class for growth generators rather than UserFunctions
-        # try:
-            # self.measurement_type = self.growth_class.measurement_type
-        self.measurement_type = self.growth_class.expectation_value_function.__name__
+        # get useful stuff out of growth_rule class
+        # self.measurement_type = self.growth_class.expectation_value_function.__name__
         self.dataset = self.growth_class.experimental_dataset
+        self.data_max_time = self.growth_class.max_time_to_consider  # arguments.data_max_time
+        self.num_probes = self.growth_class.num_probes
+        self.num_top_models_to_generate_from = (
+            self.growth_class.num_top_models_to_build_on    
+        )
+
+        # get other useful stuff out of arguments passed to implement_qmla script
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
-        self.multiQHL = bool(arguments.multiQHL)
-        self.models_for_qhl = arguments.models_for_qhl
+        self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
+        # self.models_for_qhl = arguments.models_for_qhl
         self.prior_pickle_file = arguments.prior_pickle_file
         self.true_params_pickle_file = arguments.true_params_pickle_file
 
         true_params_info = pickle.load(
             open(self.true_params_pickle_file, 'rb')
         )
-        self.true_operator = true_params_info['true_op']
-        self.true_op_name = database_framework.alph(self.true_operator)
-        self.true_operator_class = database_framework.Operator(
+        self.true_model = true_params_info['true_op']
+        self.true_op_name = database_framework.alph(self.true_model)
+        self.true_model_class = database_framework.Operator(
             self.true_op_name
         )
-        self.true_op_list = self.true_operator_class.constituents_operators
+        self.true_model_terms_matrices = self.true_model_class.constituents_operators
         self.true_model_terms_params = true_params_info['params_list']
+        
+        # derive required info from data from growth rule and arguments
         if self.use_experimental_data == True:
-            # so it
             true_ham = None
             self.true_params_dict = None
             self.true_params_list = []
@@ -105,7 +108,7 @@ class ControlsQMLA():
             self.true_params_dict = true_params_info['params_dict']
             self.true_params_list = [
                 self.true_params_dict[p]
-                for p in self.true_operator_class.constituents_names
+                for p in self.true_model_class.constituents_names
             ]
             # generate true hamiltonian for simulated case
             true_ham = None
@@ -120,23 +123,23 @@ class ControlsQMLA():
         self.true_hamiltonian = true_ham
         self.qhl_test = bool(arguments.qhl_test)
         self.further_qhl = bool(arguments.further_qhl)
-        self.do_iqle = bool(arguments.do_iqle)
-        self.do_qle = bool(arguments.do_qle)
+        # self.do_iqle = bool(arguments.do_iqle)
+        # self.do_qle = bool(arguments.do_qle)
         self.use_rq = bool(arguments.use_rq)
-        self.num_runs = arguments.num_runs
-        self.num_tests = arguments.num_tests
-        self.num_qubits = arguments.num_qubits
-        self.num_parameters = arguments.num_parameters
+        # self.num_runs = arguments.num_runs
+        # self.num_tests = arguments.num_tests
+        # self.num_qubits = arguments.num_qubits
+        # self.num_parameters = arguments.num_parameters
         self.num_experiments = arguments.num_experiments
         self.num_particles = arguments.num_particles
         self.num_times_bayes = arguments.num_times_bayes
-        self.bayes_lower = arguments.bayes_lower
+        self.bayes_lower = arguments.bayes_lower # TODO put inside growth rule
         self.bayes_upper = arguments.bayes_upper
         self.save_plots = bool(arguments.save_plots)
         self.store_particles_weights = bool(arguments.store_particles_weights)
-        self.gaussian = bool(arguments.gaussian)
-        self.custom_prior = bool(arguments.custom_prior)
-        self.resample_threshold = arguments.resample_threshold
+        # self.gaussian = bool(arguments.gaussian)
+        # self.custom_prior = bool(arguments.custom_prior)
+        self.resample_threshold = arguments.resample_threshold  # TODO put inside growth rule
         self.resample_a = arguments.resample_a
         self.pgh_factor = arguments.pgh_factor
         self.pgh_exponent = arguments.pgh_exponent
@@ -145,31 +148,22 @@ class ControlsQMLA():
         self.qmd_id = arguments.qmd_id
         self.host_name = arguments.host_name
         self.port_number = arguments.port_number
-#        self.results_directory = 'Results/'+results_directory
         self.results_directory = arguments.results_directory
         self.rq_timeout = arguments.rq_timeout
-
-        # self.save_plots = bool(arguments.save_plots)
         self.cumulative_csv = arguments.cumulative_csv
-        self.data_time_offset = arguments.data_time_offset
-        self.data_max_time = self.growth_class.max_time_to_consider  # arguments.data_max_time
+        # self.data_time_offset = arguments.data_time_offset
         self.true_expec_path = arguments.true_expec_path
         self.probes_plot_file = arguments.probes_plot_file
-        self.special_probe = arguments.special_probe_for_learning
+        # self.special_probe = arguments.special_probe_for_learning
         self.latex_mapping_file = arguments.latex_mapping_file
         self.reallocate_resources = bool(arguments.reallocate_resources)
-        self.param_min = arguments.param_min
-        self.param_max = arguments.param_max
-        self.param_mean = arguments.param_mean
-        self.param_sigma = arguments.param_sigma
-        self.bayes_time_binning = bool(arguments.bayes_time_binning)
-        self.bayes_factors_use_all_exp_times = bool(
-            arguments.bayes_factors_use_all_exp_times)
-        # self.num_probes = arguments.num_probes
-        self.num_probes = self.growth_class.num_probes
-        self.num_top_models_to_generate_from = (
-            self.growth_class.num_top_models_to_build_on    
-        )
+        # self.param_min = arguments.param_min
+        # self.param_max = arguments.param_max
+        # self.param_mean = arguments.param_mean
+        # self.param_sigma = arguments.param_sigma
+        # self.bayes_time_binning = bool(arguments.bayes_time_binning)
+        # self.bayes_factors_use_all_exp_times = bool(
+        #     arguments.bayes_factors_use_all_exp_times)
 
         self.probe_noise_level = arguments.probe_noise_level
         self.updater_from_prior = bool(arguments.updater_from_prior)
@@ -210,7 +204,7 @@ def parse_cmd_line_args(args):
     # Add parser arguments, ie command line arguments for QMD
 
     # parser.add_argument(
-    #   '-op', '--true_operator',
+    #   '-op', '--true_model',
     #   help="True operator to be simulated and learned against.",
     #   type=str,
     #   default='xTiPPyTiPPzTiPPxTxPPyTyPPzTz'
@@ -489,7 +483,7 @@ def parse_cmd_line_args(args):
     )
 
     parser.add_argument(
-        '-mqhl', '--multiQHL',
+        '-mqhl', '--qhl_mode_multiple_models',
         help='Run QHL test on multiple (provided) models.',
         type=int,
         default=0

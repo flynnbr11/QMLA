@@ -476,6 +476,15 @@ class ModelInstanceForLearning():
                 print("\n\n[Model class] EXITING; Inspect log\n\n")
                 raise NameError("Qinfer update failure")
                 sys.exit()
+            except: 
+                self.log_print(
+                    [
+                        "Failed to update model {} at update step {}".format(
+                            self.model_id, 
+                            istep
+                        )
+                    ]
+                )
 
             if self.qinfer_updater.just_resampled is True:
                 self.epochs_after_resampling.append(istep)

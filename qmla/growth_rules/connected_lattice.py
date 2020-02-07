@@ -40,9 +40,9 @@ class ConnectedLattice(
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
 
-        self.true_operator = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
-        self.true_operator = database_framework.alph(self.true_operator)
-        self.qhl_models = [self.true_operator]
+        self.true_model = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
+        self.true_model = database_framework.alph(self.true_model)
+        self.qhl_models = [self.true_model]
         self.base_terms = [
             'x',
             'y',
@@ -83,7 +83,7 @@ class ConnectedLattice(
         )
         self.initially_connected_sites = self.topology.get_connected_site_list()
 
-        self.true_operator = database_framework.alph(self.true_operator)
+        self.true_model = database_framework.alph(self.true_model)
         self.model_fitness = {}
         self.models_rejected = {
             self.generation_DAG: []
