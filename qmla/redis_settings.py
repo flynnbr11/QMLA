@@ -94,78 +94,78 @@ def get_seed(host_name, port_number, qmd_id, print_status=False):
     return int(seed)
 
 
-def flush_dbs_from_id(host_name, port_number, qmd_id):
-    dbs = databases_from_qmd_id(host_name, port_number, qmd_id=qmd_id)
-    for v in list(dbs.values()):
-        try:
-            v.flushdb()
-        except BaseException:
-            pass
+# def flush_dbs_from_id(host_name, port_number, qmd_id):
+#     dbs = databases_from_qmd_id(host_name, port_number, qmd_id=qmd_id)
+#     for v in list(dbs.values()):
+#         try:
+#             v.flushdb()
+#         except BaseException:
+#             pass
 
 
-def remove_from_dict(host_name, port_number, qmd_id):
-    seeds_dict = redis.StrictRedis(host=host_name, port=port_number, db=0)
-    seed = get_seed(host_name, port_number, qmd_id)
-    flush_dbs_from_id(host_name, port_number, qmd_id)
-    del seeds_dict[seed]
+# def remove_from_dict(host_name, port_number, qmd_id):
+#     seeds_dict = redis.StrictRedis(host=host_name, port=port_number, db=0)
+#     seed = get_seed(host_name, port_number, qmd_id)
+#     flush_dbs_from_id(host_name, port_number, qmd_id)
+#     del seeds_dict[seed]
 
 
-def redis_start(host_name, port_number, qmd_id):
-    redis_conn = redis.Redis(host=host_name, port=port_number)
+# def redis_start(host_name, port_number, qmd_id):
+#     redis_conn = redis.Redis(host=host_name, port=port_number)
 
-    if 'Running' not in redis_conn:
-        print("On host/port", host_name, "/", port_number,
-              ": first QMD", qmd_id
-              )
-        running_dict = {}
-        running_dict[qmd_id] = True
-        pickled_running_dict = pickle.dumps(running_dict, protocol=4)
-        redis_conn.set('Running', pickled_running_dict)
+#     if 'Running' not in redis_conn:
+#         print("On host/port", host_name, "/", port_number,
+#               ": first QMD", qmd_id
+#               )
+#         running_dict = {}
+#         running_dict[qmd_id] = True
+#         pickled_running_dict = pickle.dumps(running_dict, protocol=4)
+#         redis_conn.set('Running', pickled_running_dict)
 
-    else:
-        print("On host/port", host_name, "/", port_number,
-              ": setting ON QMD", qmd_id
-              )
-        current = pickle.loads(redis_conn['Running'])
-        current[qmd_id] = True
-        pickled_running_dict = pickle.dumps(current, protocol=4)
-        redis_conn.set('Running', pickled_running_dict)
-
-
-def redis_end(host_name, port_number, qmd_id):
-    redis_conn = redis.Redis(host=host_name, port=port_number)
-    current = pickle.loads(redis_conn['Running'])
-    current[qmd_id] = False
-    pickled_running_dict = pickle.dumps(current, protocol=4)
-    redis_conn.set('Running', pickled_running_dict)
+#     else:
+#         print("On host/port", host_name, "/", port_number,
+#               ": setting ON QMD", qmd_id
+#               )
+#         current = pickle.loads(redis_conn['Running'])
+#         current[qmd_id] = True
+#         pickled_running_dict = pickle.dumps(current, protocol=4)
+#         redis_conn.set('Running', pickled_running_dict)
 
 
-def check_running(host_name, port_number, print_status=True):
-    # Check if all QMD ids on this redis host have finished,
-    # ie turned Running to False.
-    redis_conn = redis.Redis(host=host_name, port=port_number)
-
-    if 'Running' in redis_conn:
-        current = pickle.loads(redis_conn['Running'])
-        if all(a == False for a in list(current.values())):
-            if print_status:
-                print("On redis host/port", host_name, "/",
-                      port_number, ":QMD ids have all finished:",
-                      list(current.keys())
-                      )
-            return 'Finished'
-        else:
-            return 'Running'
-
-    else:
-        return 'Finished'
+# def redis_end(host_name, port_number, qmd_id):
+#     redis_conn = redis.Redis(host=host_name, port=port_number)
+#     current = pickle.loads(redis_conn['Running'])
+#     current[qmd_id] = False
+#     pickled_running_dict = pickle.dumps(current, protocol=4)
+#     redis_conn.set('Running', pickled_running_dict)
 
 
-def cleanup_redis(host_name, port_number):
-    if check_running(host_name, port_number) == 'Finished':
-        redis_conn = redis.Redis(host=host_name, port=port_number)
-        redis_conn.flushall()
-        redis_conn.shutdown()
-        print("Redis flushed and shut down on", host_name, "/", port_number)
-    else:
-        print("Some QMD still active on", host_name, "/", port_number)
+# def check_running(host_name, port_number, print_status=True):
+#     # Check if all QMD ids on this redis host have finished,
+#     # ie turned Running to False.
+#     redis_conn = redis.Redis(host=host_name, port=port_number)
+
+#     if 'Running' in redis_conn:
+#         current = pickle.loads(redis_conn['Running'])
+#         if all(a == False for a in list(current.values())):
+#             if print_status:
+#                 print("On redis host/port", host_name, "/",
+#                       port_number, ":QMD ids have all finished:",
+#                       list(current.keys())
+#                       )
+#             return 'Finished'
+#         else:
+#             return 'Running'
+
+#     else:
+#         return 'Finished'
+
+
+# def cleanup_redis(host_name, port_number):
+#     if check_running(host_name, port_number) == 'Finished':
+#         redis_conn = redis.Redis(host=host_name, port=port_number)
+#         redis_conn.flushall()
+#         redis_conn.shutdown()
+#         print("Redis flushed and shut down on", host_name, "/", port_number)
+#     else:
+#         print("Some QMD still active on", host_name, "/", port_number)
