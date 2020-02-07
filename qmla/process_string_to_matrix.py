@@ -9,7 +9,8 @@ import numpy as np
 
 # import fermilib
 from fermilib.ops import FermionOperator
-from fermilib.transforms import get_sparse_operator
+import fermilib.transforms
+# from fermilib.transforms import get_sparse_operator
 
 from qmla import database_framework
 import qmla.model_naming as model_naming

@@ -8,7 +8,8 @@ import qmla.database_framework as database_framework
 import qmla.logging
 
 __all__ = [
-    'ControlsQMLA'
+    'ControlsQMLA',
+    'parse_cmd_line_args'
 ]
 
 

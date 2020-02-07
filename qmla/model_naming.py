@@ -1,18 +1,4 @@
-"""
-Functions for naming, and retrieving latex representation
-of models according to QMD naming convention.
-"""
-
-from __future__ import print_function  # so print doesn't show brackets
-
 import numpy as np
-import itertools as itr
-import os as os
-import sys as sys
-import pandas as pd
-import warnings
-import time as time
-import warnings
 
 import qmla.database_framework as database_framework
 
@@ -103,20 +89,6 @@ def operations_dict_from_name(mod_name):
 
     return operations
 
-
-def make_term_transverse(term, transverse_axis):
-    dimension = database_framework.get_num_qubits(term)
-
-    transverse_terms = []
-    op_dict = operations_dict_from_name(term)
-
-    for i in range(1, 1 + dimension):
-        transverse_term = [(i, transverse_axis)]
-        op_dict['terms'].append(transverse_term)
-    term_with_transverse_components = full_model_string(op_dict)
-    return term_with_transverse_components
-
-
 """
 First define all the functions which are callable
 by the wrappers for converting name strings to
@@ -189,390 +161,117 @@ def latex_name_ising(name):
         return final_term
 
 
-def latex_name_1d_ising_chain(name):
+############# Latex naming functions used by growth rules ##########
+ 
+def large_spin_bath_nv_system_name(term):
+    num_qubits = database_framework.get_num_qubits(term)
+    t_str = 'T' * (num_qubits - 1)
+    p_str = 'P' * num_qubits
+    separate_terms = term.split(p_str)
 
-    individual_terms = database_framework.get_constituent_names_from_name(name)
-    chain_axis = transverse_axis = None
+    spin_terms = []
+    interaction_terms = []
 
-    for term in individual_terms:
-        components = term.split('_')
-        components.remove('1Dising')
-        for c in components:
-            if c[0] == 'd':
-                dim = int(c.replace('d', ''))
-            elif c[0] == 'i':
-                chain_axis = str(c.replace('i', ''))
-                include_chain_component = True
-            elif c[0] == 't':
-                include_transverse_component = True
-                transverse_axis = str(c.replace('t', ''))
+    for t in separate_terms:
+        components = t.split('_')
+        components.remove('nv')
+        components.remove(str('d' + str(num_qubits)))
+        if 'spin' in components:
+            components.remove('spin')
+            spin_terms.append(components[0])
+        elif 'interaction' in components:
+            components.remove('interaction')
+            interaction_terms.append(components[0])
 
-    latex_term = '$('
-    if chain_axis is not None:
-        chain_term = str(
-            r'\sigma_{'
-            + chain_axis
-            + ','
-            + chain_axis
-            + '}'
-        )
-        latex_term += chain_term
+    latex_name = '('
+    if len(spin_terms) > 0:
+        latex_name += 'S_{'
+        for s in spin_terms:
+            latex_name += str(s)
+        latex_name += '}'
+    if len(interaction_terms) > 0:
+        latex_name += 'I_{'
+        for s in interaction_terms:
+            latex_name += str(s)
+        latex_name += '}'
 
-    if transverse_axis is not None:
-        transverse_term = str(
-            r'\sigma_{'
-            + transverse_axis
-            + '}'
-        )
-        latex_term += transverse_term
-
-    latex_term += str(
+    latex_name += str(
         r')^{\otimes'
-        + str(dim)
-        + '}$'
+        + str(num_qubits)
+        + '}'
     )
 
-    return latex_term
+    return '$' + latex_name + '$'
 
 
-def latex_name_heisenberg_xyz(name):
-
-    individual_terms = database_framework.get_constituent_names_from_name(name)
-    chain_axis = transverse_axis = None
-    chain_axes = []
-
-    for term in individual_terms:
-        components = term.split('_')
-        try:
-            components.remove('Heis')
-        except BaseException:
-            print(
-                "Can not remove 'Heis'. Components:",
-                components
-            )
-        for c in components:
-            if c[0] == 'd':
-                dim = int(c.replace('d', ''))
-            elif c[0] == 'i':
-                chain_axis = str(c.replace('i', ''))
-                chain_axes.append(chain_axis)
-                include_chain_component = True
-            elif c[0] == 't':
-                include_transverse_component = True
-                transverse_axis = str(c.replace('t', ''))
-    chain_axes = list(sorted(set(chain_axes)))
-    # print("[latex term, XYZ] Chain axes:", chain_axes)
-    latex_term = '$('
-    # if chain_axis is not None:
-    chain_term = ''
-    for chain_axis in chain_axes:
-        chain_term += str(
-            r'\sigma_{'
-            + chain_axis
-            + ','
-            + chain_axis
-            + '}'
-        )
-    latex_term += chain_term
-
-    if transverse_axis is not None:
-        transverse_term = str(
-            r'\sigma_{'
-            + transverse_axis
-            + '}'
-        )
-        latex_term += transverse_term
-
-    latex_term += str(
-        r')^{\otimes'
-        + str(dim)
-        + '}$'
-    )
-
-    return latex_term
-
-
-##### All possible model list functions ######
-def ising_terms_rotation_hyperfine(return_branch_dict=None):
-    pauli_terms = ['x', 'y', 'z']
-
-    branches = {}
-    branch_by_term_dict = {}
-    for i in range(9):
-        branches[i] = []
-
-    rotation_terms = []
-    hf_terms = []
-    transverse_terms = []
-
-    for t in pauli_terms:
-        rotation_terms.append(t + 'Ti')
-        hf_terms.append(t + 'T' + t)
-        for k in pauli_terms:
-            if k > t:
-                transverse_terms.append(t + 'T' + k)
-
-    ising_terms = []
-    add = 'PP'
-
-    for r in rotation_terms:
-        ising_terms.append(r)
-        branches[0].append(r)
-        branch_by_term_dict[r] = 0
-
-    for r in rotation_terms:
-        new_terms = []
-        for i in rotation_terms:
-            if r < i:
-                branches[1].append(r + add + i)
-                branch_by_term_dict[r + add + i] = 1
-                new_terms.append(r + add + i)
-        ising_terms.extend(new_terms)
-
-    full_rotation = add.join(rotation_terms)
-    ising_terms.append(full_rotation)
-    branches[2].append(full_rotation)
-    branch_by_term_dict[full_rotation] = 2
-
-    for t in hf_terms:
-        new_term = full_rotation + add + t
-        branches[3].append(new_term)
-        branch_by_term_dict[new_term] = 3
-        ising_terms.append(new_term)
-
-    for t in hf_terms:
-        for k in hf_terms:
-            if t < k:
-                dual_hf_term = full_rotation + add + t + add + k
-                branches[4].append(dual_hf_term)
-                branch_by_term_dict[dual_hf_term] = 4
-                ising_terms.append(dual_hf_term)
-
-    for t in hf_terms:
-        for l in hf_terms:
-            for k in hf_terms:
-                if t < k < l:
-                    triple_hf = full_rotation + add + t + add + k + add + l
-                    branches[5].append(triple_hf)
-                    ising_terms.append(triple_hf)
-                    branch_by_term_dict[triple_hf] = 5
-
-    # latex_terms = [database_framework.latex_name_ising(i) for i in ising_terms]
-    latex_terms = [
-        # get_latex_name(
-        #     #  in this case this list is only generating ising type so hard code growth generator
-        #     name=i, growth_generator='two_qubit_ising_rotation_hyperfine_transverse'
-        # ) for i in ising_terms
-        latex_name_ising(name=i) for i in ising_terms
-    ]
-
-    if return_branch_dict == 'branches':
-        return branches
-    elif return_branch_dict == 'terms':
-        return branch_by_term_dict
-    elif return_branch_dict == 'latex_terms':
-        return latex_terms
-    elif return_branch_dict == 'term_branch_dict':
-        for k in list(branch_by_term_dict.keys()):
-            # branch_by_term_dict[database_framework.latex_name_ising(k)]=(
-            branch_by_term_dict[
-                # get_latex_name(
-                #     #  in this case this list is only generating ising type so hard code growth generator
-                #     name = k, growth_generator='two_qubit_ising_rotation_hyperfine_transverse')
-                # ] = (branch_by_term_dict.pop(k)
-                latex_name_ising(name=k)] = (branch_by_term_dict.pop(k)
-                                             )
-        return branch_by_term_dict
-    else:
-        return latex_terms
-
-
-def ising_terms_full_list(return_branch_dict=None):
-    pauli_terms = ['x', 'y', 'z']
-
-    branches = {}
-    branch_by_term_dict = {}
-    for i in range(9):
-        branches[i] = []
-
-    rotation_terms = []
-    hf_terms = []
-    transverse_terms = []
-
-    for t in pauli_terms:
-        rotation_terms.append(t + 'Ti')
-        hf_terms.append(t + 'T' + t)
-        for k in pauli_terms:
-            if k > t:
-                transverse_terms.append(t + 'T' + k)
-
-    ising_terms = []
-    add = 'PP'
-
-    for r in rotation_terms:
-        ising_terms.append(r)
-        branches[0].append(r)
-        branch_by_term_dict[r] = 0
-
-    for r in rotation_terms:
-        new_terms = []
-        for i in rotation_terms:
-            if r < i:
-                branches[1].append(r + add + i)
-                branch_by_term_dict[r + add + i] = 1
-                new_terms.append(r + add + i)
-        ising_terms.extend(new_terms)
-
-    full_rotation = add.join(rotation_terms)
-    ising_terms.append(full_rotation)
-    branches[2].append(full_rotation)
-    branch_by_term_dict[full_rotation] = 2
-
-    for t in hf_terms:
-        new_term = full_rotation + add + t
-        branches[3].append(new_term)
-        branch_by_term_dict[new_term] = 3
-        ising_terms.append(new_term)
-
-    for t in hf_terms:
-        for k in hf_terms:
-            if t < k:
-                dual_hf_term = full_rotation + add + t + add + k
-                branches[4].append(dual_hf_term)
-                branch_by_term_dict[dual_hf_term] = 4
-                ising_terms.append(dual_hf_term)
-
-    for t in hf_terms:
-        for l in hf_terms:
-            for k in hf_terms:
-                if t < k < l:
-                    triple_hf = full_rotation + add + t + add + k + add + l
-                    branches[5].append(triple_hf)
-                    ising_terms.append(triple_hf)
-                    branch_by_term_dict[triple_hf] = 5
-
-    for t in transverse_terms:
-        transverse_term = triple_hf + add + t
-        branches[6].append(transverse_term)
-        branch_by_term_dict[transverse_term] = 6
-        ising_terms.append(transverse_term)
-
-    for t in transverse_terms:
-        for k in transverse_terms:
-            if t < k:
-                dual_transverse_term = triple_hf + add + t + add + k
-                branches[7].append(dual_transverse_term)
-                branch_by_term_dict[dual_transverse_term] = 7
-                ising_terms.append(dual_transverse_term)
-
-    for t in transverse_terms:
-        for l in transverse_terms:
-            for k in transverse_terms:
-                if t < k < l:
-                    triple_hf_term = triple_hf + add + t + add + k + add + l
-                    branch_by_term_dict[triple_hf_term] = 8
-                    branches[8].append(triple_hf_term)
-                    ising_terms.append(triple_hf_term)
-
-    latex_terms = [
-        # database_framework.latex_name_ising(i) for i in ising_terms
-        # get_latex_name(
-        #     name=i,
-        #     #  in this case this list is only generating ising type so hard code growth generator
-        #     growth_generator='two_qubit_ising_rotation_hyperfine_transverse'
-        # ) for i in ising_terms
-        latex_name_ising(name=i) for i in ising_terms
-    ]
-
-    if return_branch_dict == 'branches':
-        return branches
-    elif return_branch_dict == 'terms':
-        return branch_by_term_dict
-    elif return_branch_dict == 'latex_terms':
-        return latex_terms
-    elif return_branch_dict == 'term_branch_dict':
-        for k in list(branch_by_term_dict.keys()):
-            # branch_by_term_dict[database_framework.latex_name_ising(k)]=(
-            branch_by_term_dict[
-                # get_latex_name(
-                #     name=k,
-                #     growth_generator='two_qubit_ising_rotation_hyperfine_transverse'
-                # )
-                latex_name_ising(name=k)
-            ] = (
-                branch_by_term_dict.pop(k)
-            )
-        return branch_by_term_dict
-
-    else:
-        return latex_terms
-
-
-def test_return_champs_ALL_MODELS(**kwargs):
-    models = ['x', 'y', 'z', 'xPy', 'xPz', 'yPz', 'xPyPz']
-
-    return models
-
-
-def non_interacting_model(core_pauli, num_qubits):
-
-    t_str = ''
-    model = core_pauli
-    for i in range(num_qubits):
-        t_str += 'T'
-        model += str(t_str + core_pauli)
-
-    return model
-
-
-def non_interacting_ising_all_names(
-    num_qubits=2,
-    return_branch_dict='latex_terms',
+def pauliSet_latex_name(
+    name,
     **kwargs
 ):
-    from UserFunctions import max_spawn_depth_info
-    num_qubits = max_spawn_depth_info['non_interacting_ising'] + 1
-    num_qubits = 1  # deliberately cause crash to inspect error.
-    paulis = ['x', 'y', 'z']
-    all_models = []
-    models_on_branches = {0: ['']}
-    t_str = ''
-    for i in range(num_qubits):
-        models_on_branches[i + 1] = []
-        for m in models_on_branches[i]:
-            for p in paulis:
-                new_mod = str(m + t_str + p)
-                models_on_branches[i + 1].append(new_mod)
-                all_models.append(new_mod)
-        t_str += 'T'
+    core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+    num_sites = database_framework.get_num_qubits(name)
+    p_str = 'P' * num_sites
+    separate_terms = name.split(p_str)
 
-    models_on_branches.pop(0)
-    terms_by_branch = {}
-    for b in models_on_branches:
-        for v in list(models_on_branches[b]):
-            latex_term = default_latex_wrapping(v)
-            terms_by_branch[latex_term] = b
+    latex_terms = []
+    term_type_markers = ['pauliSet', 'transverse']
+    for term in separate_terms:
+        components = term.split('_')
+        if 'pauliSet' in components:
+            components.remove('pauliSet')
 
-    latex_terms = [
-        default_latex_wrapping(i)
-        for i in all_models
-    ]
+            for l in components:
+                if l[0] == 'd':
+                    dim = int(l.replace('d', ''))
+                elif l[0] in core_operators:
+                    operators = l.split('J')
+                else:
+                    sites = l.split('J')
 
-    try:
-        if return_branch_dict == 'branches':
-            return models_on_branches
-        elif return_branch_dict == 'terms':
-            return all_models_latex
-        elif return_branch_dict == 'latex_terms':
-            return latex_terms
-        elif return_branch_dict == 'term_branch_dict':
-            return terms_by_branch
-    except BaseException:
-        return latex_terms
+            latex_str = r'\sigma'
+
+            latex_str += '^{'
+            for s in sites:
+                latex_str += str('{},'.format(s))
+
+            latex_str = latex_str[0:-1]
+            latex_str += '}'
+
+            latex_str += '_{'
+            for o in operators:
+                latex_str += str('{},'.format(o))
+            latex_str = latex_str[0:-1]  # remove final comma
+            latex_str += '}'
+
+        elif 'transverse' in components:
+            components.remove('transverse')
+            for l in components:
+                if l[0] == 'd':
+                    dim = int(l.replace('d', ''))
+                else:
+                    transverse_axis = str(l)
+
+            latex_str = r'\sigma'
+
+            latex_str += r'^{\otimes '
+            latex_str += str(dim)
+            latex_str += '}'
+
+            latex_str += '_{'
+            latex_str += str(transverse_axis)
+            latex_str += '}'
+
+        latex_terms.append(latex_str)
+
+    latex_terms = sorted(latex_terms)
+    full_latex_term = ''.join(latex_terms)
+    full_latex_term = str('$' + full_latex_term + '$')
+    full_latex_term = str("'{}'".format(full_latex_term))
+    # print("LATEX NAME:", full_latex_term)
+    return full_latex_term
 
 
 ############# Model to Branch convention functions ##########
-
 
 def branch_is_num_params(latex_mapping_file, **kwargs):
     with open(latex_mapping_file) as f:
@@ -706,258 +405,3 @@ def branch_computed_from_qubit_and_param_count(
             model_branches[model] = branch_idx
     return model_branches
 
-
-def nearest_neighbour_ising_latex_name(
-    name,
-    **kwargs
-):
-    num_qubits = database_framework.get_num_qubits(name)
-
-    paulis = ['x', 'y', 'z']
-
-    for p in paulis:
-        if p in name:
-            core_pauli = p
-
-    latex_rep = str(
-        '$' +
-        core_pauli +
-        '^{' +
-        '\\otimes' +
-        str(num_qubits) +
-        '}$'
-    )
-    return latex_rep
-
-# def hubbard_latex(name):
-#     individual_terms = database_framework.get_constituent_names_from_name(name)
-#     latex_term = ''
-#     for term in individual_terms:
-#         if term[0] == 'h':
-#             split_term = term.split('_')
-#             sites = []
-#             for st in split_term:
-#                 if st[0] not in ['h', 'd']:
-#                     sites.append(st)
-#             latex_this_term = str(
-#                 'H_{' +
-#                 sites[0] +
-#                 ',' + sites[1] +
-#                 '}'
-#             )
-#             latex_term += latex_this_term
-#         else:
-#             latex_this_term = interaction_latex_name(term)
-#             list_letters = list(latex_this_term)
-#             while '$' in list_letters:
-#                 list_letters.remove('$')
-#             new_latex_term = ''
-#             for l in list_letters:
-#                 new_latex_term += l
-#             latex_term += new_latex_term
-
-#     latex_term = str('$' + latex_term + '$')
-#     return latex_term
-
-
-def hubbard_latex(name):
-    individual_terms = database_framework.get_constituent_names_from_name(name)
-    latex_term = ''
-
-    hopping_terms = []
-    interaction_energy = False
-    for constituent in individual_terms:
-        components = constituent.split('_')
-        for term in components:
-            if term != 'h':  # ie entire term not just 'h'
-                if 'h' in term:  # ie a hopping term eg 1_1h2_d3, hopping sites 1-2, total num sites 3
-                    split_term = term.split('h')
-                    hopping_terms.append(split_term)
-
-                elif 'e' in term:
-                    interaction_energy = True
-                elif 'd' in term:
-                    dim = int(term.replace('d', ''))
-
-    hopping_latex = 'H_{'
-    for site_pair in hopping_terms:
-        hopping_latex += str(
-            '({},{})'.format(
-                str(site_pair[0]),
-                str(site_pair[1])
-            )
-        )
-
-    hopping_latex += '}'
-
-    if hopping_latex != 'H_{}':
-        latex_term += hopping_latex
-
-    if interaction_energy is True:
-        latex_term += str(
-            r'\sigma_{z}^{\otimes'
-            + str(dim)
-            + '}'
-        )
-
-    latex_term = str('$' + latex_term + '$')
-    return latex_term
-
-
-def interaction_latex_name(
-    name,
-    interacting_term=r'\sigma',
-    **kwargs
-):
-    name = database_framework.alph(name)
-    op_dict = operations_dict_from_name(name)
-    terms = op_dict['terms']
-    num_terms = len(terms)
-    full_model_string = ''
-    all_term_strings = []
-
-    for term in terms:
-        this_term_string = ''
-        paulis = []
-        qubits = []
-
-        for j in range(len(term)):
-            action = term[j]
-            if action[1] != 'i':
-                qubits.append(action[0])
-                paulis.append(action[1])
-
-        if len(paulis) != len(qubits):
-            print("unmatching number of qubits to pauli operators in naming function.")
-
-        else:
-            this_term_string += interacting_term
-            this_term_string += '^{'
-
-            for p in paulis:
-                this_term_string += str(p)
-            this_term_string += '}'
-
-            this_term_string += '_{'
-            for q in qubits:
-                this_term_string += str(q)
-            this_term_string += '}'
-
-            all_term_strings.append(this_term_string)
-
-    all_term_strings = sorted(all_term_strings)
-    final_string = ''.join(all_term_strings)
-    final_string = str('$' + final_string + '$')
-    return final_string
-
-
-def large_spin_bath_nv_system_name(term):
-    num_qubits = database_framework.get_num_qubits(term)
-    t_str = 'T' * (num_qubits - 1)
-    p_str = 'P' * num_qubits
-    separate_terms = term.split(p_str)
-
-    spin_terms = []
-    interaction_terms = []
-
-    for t in separate_terms:
-        components = t.split('_')
-        components.remove('nv')
-        components.remove(str('d' + str(num_qubits)))
-        if 'spin' in components:
-            components.remove('spin')
-            spin_terms.append(components[0])
-        elif 'interaction' in components:
-            components.remove('interaction')
-            interaction_terms.append(components[0])
-        # elif 'pauliSet' in components
-        #     components.remove('pauliSet')
-        #     for c in components:
-        #         if len(set(paulis) & set(list(c)))
-
-    latex_name = '('
-    if len(spin_terms) > 0:
-        latex_name += 'S_{'
-        for s in spin_terms:
-            latex_name += str(s)
-        latex_name += '}'
-    if len(interaction_terms) > 0:
-        latex_name += 'I_{'
-        for s in interaction_terms:
-            latex_name += str(s)
-        latex_name += '}'
-
-    latex_name += str(
-        r')^{\otimes'
-        + str(num_qubits)
-        + '}'
-    )
-
-    return '$' + latex_name + '$'
-
-
-def pauliSet_latex_name(
-    name,
-    **kwargs
-):
-    core_operators = list(sorted(database_framework.core_operator_dict.keys()))
-    num_sites = database_framework.get_num_qubits(name)
-    p_str = 'P' * num_sites
-    separate_terms = name.split(p_str)
-
-    latex_terms = []
-    term_type_markers = ['pauliSet', 'transverse']
-    for term in separate_terms:
-        components = term.split('_')
-        if 'pauliSet' in components:
-            components.remove('pauliSet')
-
-            for l in components:
-                if l[0] == 'd':
-                    dim = int(l.replace('d', ''))
-                elif l[0] in core_operators:
-                    operators = l.split('J')
-                else:
-                    sites = l.split('J')
-
-            latex_str = r'\sigma'
-
-            latex_str += '^{'
-            for s in sites:
-                latex_str += str('{},'.format(s))
-
-            latex_str = latex_str[0:-1]
-            latex_str += '}'
-
-            latex_str += '_{'
-            for o in operators:
-                latex_str += str('{},'.format(o))
-            latex_str = latex_str[0:-1]  # remove final comma
-            latex_str += '}'
-
-        elif 'transverse' in components:
-            components.remove('transverse')
-            for l in components:
-                if l[0] == 'd':
-                    dim = int(l.replace('d', ''))
-                else:
-                    transverse_axis = str(l)
-
-            latex_str = r'\sigma'
-
-            latex_str += r'^{\otimes '
-            latex_str += str(dim)
-            latex_str += '}'
-
-            latex_str += '_{'
-            latex_str += str(transverse_axis)
-            latex_str += '}'
-
-        latex_terms.append(latex_str)
-
-    latex_terms = sorted(latex_terms)
-    full_latex_term = ''.join(latex_terms)
-    full_latex_term = str('$' + full_latex_term + '$')
-    full_latex_term = str("'{}'".format(full_latex_term))
-    # print("LATEX NAME:", full_latex_term)
-    return full_latex_term
