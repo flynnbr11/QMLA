@@ -1,20 +1,23 @@
 import numpy as np
-import itertools
+# import itertools
 import sys
 import os
 
-import ConnectedLattice
+# import ConnectedLattice
 
-sys.path.append(os.path.abspath('..'))
-import Heuristics
-import SystemTopology
-import ModelGeneration
-import ModelNames
-import ProbeGeneration
-import DataBase
+# sys.path.append(os.path.abspath('..'))
+# import Heuristics
+# import SystemTopology
+# import ModelGeneration
+# import ModelNames
+# import ProbeGeneration
+# import DataBase
 
-class connected_lattice_revivals(
-    ConnectedLattice.connected_lattice
+from qmla.growth_rules import connected_lattice
+import qmla.database_framework
+
+class ConnectedLatticeProbabilistic(
+    connected_lattice.ConnectedLattice
 ):
     def __init__(
         self,
@@ -88,7 +91,7 @@ class connected_lattice_revivals(
             #     self.spawn_stage.append('start_of_new_generation')
 
         new_models = [
-            DataBase.alph(mod)
+            qmla.database_framework.alph(mod)
             for mod in new_models
             # Final check whether this model is allowed
             if self.check_model_validity(mod)
@@ -101,7 +104,7 @@ class connected_lattice_revivals(
                 latex_model_name = self.latex_name(model)
                 branch_id = (
                     self.generation_DAG
-                    + len(DataBase.get_constituent_names_from_name(model))
+                    + len(qmla.database_framework.get_constituent_names_from_name(model))
                 )
                 self.model_branches[latex_model_name] = branch_id
 

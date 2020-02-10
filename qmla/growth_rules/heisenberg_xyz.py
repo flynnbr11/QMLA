@@ -3,7 +3,7 @@ import itertools
 import sys
 import os
 
-from qmla.growth_rules import connected_lattice
+from qmla.growth_rules import connected_lattice, connected_lattice_probabilistic
 from qmla import experiment_design_heuristics
 from qmla import topology
 # from qmla import model_generation
@@ -13,8 +13,8 @@ from qmla import database_framework
 
 
 class HeisenbergXYZProbabilistic(
-    connected_lattice.ConnectedLattice
-    # ConnectedLatticeRevivals.connected_lattice_revivals
+    # connected_lattice.ConnectedLattice
+    connected_lattice_probabilistic.ConnectedLatticeProbabilistic
 ):
 
     def __init__(
