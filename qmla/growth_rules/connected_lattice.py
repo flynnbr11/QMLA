@@ -54,7 +54,7 @@ class ConnectedLattice(
         self.num_top_models_to_build_on = 2
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 3
-
+        self.fitness_minimum = 0.25
         self.generation_DAG = 1
         self.max_num_sites = 4
         self.tree_completed_initially = False
@@ -114,6 +114,9 @@ class ConnectedLattice(
         self.generation_champs = {
             self.generation_DAG: {}
         }
+        self.generation_fitnesses = {
+            self.generation_DAG: {}
+        }
         self.sub_generation_idx = 0
         self.counter = 0
 
@@ -132,16 +135,13 @@ class ConnectedLattice(
             self.spawn_stage.append(None)
 
         else:
-            model_points = kwargs['branch_model_points']
-            self.model_group_fitness_calculation(
-                model_points=model_points
+            # model_points = kwargs['branch_model_points']
+            ranked_model_list = self.model_group_fitness_calculation(
+                model_points=kwargs['branch_model_points'],
+                generation = self.generation_DAG, 
+                subgeneration = self.sub_generation_idx
             )
-            branch_models = list(model_points.keys())
-            ranked_model_list = sorted(
-                model_points,
-                key=model_points.get,
-                reverse=True
-            )
+
             if self.num_top_models_to_build_on == 'all':
                 models_to_build_on = ranked_model_list
             else:
@@ -157,7 +157,7 @@ class ConnectedLattice(
             self.counter += 1
             new_models = []
 
-            if self.spawn_stage[-1] == 'make_new_generation':
+            if self.spawn_stage[-1] == 'finish_generation':
                 # increase generation idx; add site; get newly available terms;
                 # add greedily as above
                 self.new_generation()
@@ -169,7 +169,7 @@ class ConnectedLattice(
                     models_to_build_on=models_to_build_on,
                     available_terms=self.available_mods_by_generation[self.generation_DAG],
                     model_names_ids=kwargs['model_names_ids'],
-                    model_points=model_points
+                    # model_points=model_points
                 )
 
         new_models = [
@@ -203,7 +203,7 @@ class ConnectedLattice(
         self.generation_champs[self.generation_DAG] = {}
         self.models_rejected[self.generation_DAG] = []
         self.models_accepted[self.generation_DAG] = []
-
+        self.generation_fitnesses[self.generation_DAG] = {}
         # Increase topology and retrieve effects e.g. new sites
         self.topology.add_site()
 
@@ -232,7 +232,7 @@ class ConnectedLattice(
         models_to_build_on,
         available_terms,
         model_names_ids,
-        model_points,
+        # model_points,
         **kwargs
     ):
         # models_to_build_on = [
@@ -263,7 +263,7 @@ class ConnectedLattice(
                 # this dimension exhausted
                 # return branch champs for this generation so far
                 # such that final branch computes this generation champion
-                self.spawn_stage.append('make_new_generation')
+                self.spawn_stage.append('finish_generation')
                 new_models = [
                     self.generation_champs[self.generation_DAG][k] for k in
                     list(self.generation_champs[self.generation_DAG].keys())
@@ -347,7 +347,7 @@ class ConnectedLattice(
         for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):
             site_connections[c] = []
 
-        term_type_markers = ['pauliSet', 'transverse']
+        # term_type_markers = ['pauliSet', 'transverse']
         transverse_axis = None
         for term in separate_terms:
             components = term.split('_')
@@ -413,12 +413,20 @@ class ConnectedLattice(
     def model_group_fitness_calculation(
         self,
         model_points,
+        generation=None, 
+        subgeneration=None, 
         **kwargs
     ):
         ranked_model_list = sorted(
             model_points,
             key=model_points.get,
             reverse=True
+        )
+        self.log_print(
+            [
+                "Model group fitness calculation for input models:", 
+                model_points
+            ]
         )
         new_fitnesses = {}
         for model_id in ranked_model_list:
@@ -434,6 +442,10 @@ class ConnectedLattice(
                     win_ratio
                     # win_ratio * fitness_parameters['r_squared']
                 )**self.fitness_win_ratio_exponent
+                fitness = self.rescale_fitness(
+                    fitness,
+                    rescaled_min = self.fitness_minimum
+                )
                 # fitness = 1
             elif self.model_generation_strictness == -1:
                 fitness = 1
@@ -453,6 +465,9 @@ class ConnectedLattice(
                 "New fitnesses:\n", new_fitnesses
             ]
         )
+        if generation and subgeneration is not None:
+            self.generation_fitnesses[generation][subgeneration] = new_fitnesses
+        return ranked_model_list
 
     # def model_fitness_calculation(
     #     self,
@@ -538,6 +553,20 @@ class ConnectedLattice(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )
+
+    def rescale_fitness(
+        self, 
+        fitness, 
+        original_max = 1,
+        original_min = 0, 
+        rescaled_max = 1, 
+        rescaled_min = 0.1, 
+    ):
+        # self.log_print(["rescale fitness min:", rescaled_min])
+        old_range = original_max - original_min
+        new_range = rescaled_max - rescaled_min
+        new_fitness = (( (fitness - original_min) * new_range )/old_range) + rescaled_min
+        return new_fitness
 
 
 def pauli_like_like_terms_connected_sites(

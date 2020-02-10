@@ -14,6 +14,7 @@ from qmla import database_framework
 
 class HeisenbergXYZProbabilistic(
     connected_lattice.ConnectedLattice
+    # ConnectedLatticeRevivals.connected_lattice_revivals
 ):
 
     def __init__(
@@ -54,7 +55,7 @@ class HeisenbergXYZProbabilistic(
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # 'all' # at each generation Badassness parameter
         self.num_top_models_to_build_on =  'all'
-        self.model_generation_strictness = -1 # 0  # 1 #-1
+        self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
         self.min_param = 0
         self.max_param = 1
@@ -66,9 +67,9 @@ class HeisenbergXYZProbabilistic(
         self.max_num_models_by_shape = {
             # Note dN here requires 2N qubits so d3 counts as shape 6
             1: 0,
-            2: 15,
-            3: 15,
-            4: 15,
+            2: 30,
+            3: 30,
+            4: 30,
             'other': 0
         }
 
