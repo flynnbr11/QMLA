@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="test-changes-to-file-structure"
+test_description="test-changes-codebase__exp-data-QHL"
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -8,19 +8,19 @@ test_description="test-changes-to-file-structure"
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=3
+num_tests=1
 num_processes_to_request=6
 qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 multiple_qhl=0
 multiple_growth_rules=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
-experimental_data=0 # use experimental data -> 1; use fake data ->0
+experimental_data=1 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters.
-e=10 # experiments
-p=30 # particles
+e=7 # experiments
+p=25 # particles
 ra=0.98 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -58,7 +58,7 @@ exp_growth_rule='ExperimentNVCentre'
 # Choose a growth rule
 if (( "$experimental_data" == 1)) || (( "$simulate_experiment" == 1))
 then
-	growth_rule=$experimental_growth_rule
+	growth_rule=$exp_growth_rule
 else
 	growth_rule=$sim_growth_rule
 fi
@@ -207,7 +207,7 @@ printf "$day_time: \t $test_description \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; r
 force_plot_plus=0
 special_probe='random' #'ideal'
 special_probe_plot='random'
-time_request_insurance_factor=1
+time_request_insurance_factor=3
 if (( "$bin_times_bayes_factors" == 1))
 then
 	let time_request_insurance_factor="2*$time_request_insurance_factor"
