@@ -10,14 +10,14 @@ num_tests=1
 qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
-exp_data=0
+exp_data=1
 simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=10
+prt=20
 exp=2
 pgh=1.0
 pgh_exponent=1.0
@@ -74,29 +74,27 @@ git_commit=$(git rev-parse HEAD)
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
-# sim_growth_rule='ising_probabilistic'
-# sim_growth_rule='ising_predetermined'
-# sim_growth_rule='heisenberg_xyz_predetermined'
-sim_growth_rule='heisenberg_xyz_probabilistic'
-# sim_growth_rule='fermi_hubbard_predetermined'
-# sim_growth_rule='fermi_hubbard_probabilistic'
-# sim_growth_rule='genetic'
+sim_growth_rule='IsingProbabilistic'
+# sim_growth_rule='IsingPredetermined'
+# sim_growth_rule='HeisenbergXYZPredetermined'
+# sim_growth_rule='HeisenbergXYZProbabilistic'
+# sim_growth_rule='FermiHubbardPredetermined'
+# sim_growth_rule='FermiHubbardProbabilistic'
+# sim_growth_rule='Genetic'
+# sim_growth_rule='Presentation'
+# sim_growth_rule='ExperimentReducedNV'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-exp_growth_rule='presentation'
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-# exp_growth_rule='NV_alternative_model'
-# exp_growth_rule='NV_alternative_model_2'
-# exp_growth_rule='nv_experiment_vary_model_5_params'
-# exp_growth_rule='NV_centre_revivals'
-# exp_growth_rule='two_qubit_ising_rotation_hyperfine'
-# exp_growth_rule='NV_centre_spin_large_bath'
-# exp_growth_rule='NV_spin_full_access'
-# exp_growth_rule='NV_centre_experiment_debug'
-# exp_growth_rule='reduced_nv_experiment'
-# exp_growth_rule='NV_fitness_growth'
+exp_growth_rule='ExperimentNVCentre'
+# exp_growth_rule='ExperimentNVCentreNoTransvereTerms'
+# exp_growth_rule='ExpAlternativeNV'
+# exp_growth_rule='ExperimentFullAccessNV'
+# exp_growth_rule='NVLargeSpinBath'
+# exp_growth_rule='ExperimentNVCentreVaryTrueModel'
+# exp_growth_rule='ExpNVRevivals'
+# exp_growth_rule='ExperimentReducedNV'
 
 
 if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
@@ -107,13 +105,14 @@ else
 fi
 
 alt_growth_rules=(
-    # 'ising_1d_chain'
-    # 'hubbard_square_lattice_generalised'
-    # 'ising_probabilistic' 
-    # 'hopping_probabilistic'
-    # 'heisenberg_xyz_probabilistic'
-    # 'heisenberg_xyz_predetermined'
-    # 'hopping_predetermined'
+    # 'IsingPredetermined'
+    # 'IsingProbabilistic'
+    # 'HeisenbergXYZProbabilistic'
+    # 'HeisenbergXYZPredetermined'
+    # 'FermiHubbardPredetermined' 
+    # 'FermiHubbardProbabilistic' 
+    # 'ExperimentReducedNV'
+    # 'ExperimentNVCentre'
 )
 
 growth_rules_command=""
@@ -125,7 +124,6 @@ done
 num_probes=10
 force_plot_plus=0
 gaussian=1
-#probe_noise=0.0000001
 probe_noise=0.0000001
 param_min=0
 param_max=10
@@ -178,7 +176,8 @@ let bt="$exp"
 # Launch $num_tests instances of QMD 
 
 # First set up parameters/data to be used by all instances of QMD for this run. 
-python3 ../qmla/SetQHLParams.py \
+# python3 ../qmla/SetQHLParams.py \
+python3 ../Scripts/set_qmla_params.py \
     -true=$true_params_pickle_file \
     -prior=$prior_pickle_file \
     -probe=$plot_probe_file \
@@ -198,7 +197,7 @@ python3 ../qmla/SetQHLParams.py \
     -sp=$special_probe_plot \
     $growth_rules_command 
 
-echo "Generated configuration. Calling Exp.py"
+echo "Generated configuration."
 
 for prt in  "${particle_counts[@]}";
 do
@@ -206,41 +205,45 @@ do
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        # python3 -m cProfile \
-            # -o "Profile_linalg_long_run.txt" \
         python3 \
-            Exp.py \
-            -mqhl=$multiple_qhl \
-            -p=$prt -e=$exp -bt=$bt \
-            -rq=$use_rq \
-            -g=$gaussian \
+            ../Scripts/implement_qmla.py \
             -qhl=$qhl_test \
-            -ra=$ra -rt=$rt -pgh=$pgh \
+            -mqhl=$multiple_qhl \
+            -rq=$use_rq \
+            -p=$prt \
+            -e=$exp \
+            -bt=$bt \
+            -ra=$ra \
+            -rt=$rt \
+            -qid=$q_id \
+            -log=$this_log \
+            -dir=$full_path_to_results \
+            -pgh=$pgh \
             -pgh_exp=$pgh_exponent \
             -pgh_incr=$pgh_increase \
-            -dir=$full_path_to_results \
-            -qid=$q_id \
             -pt=$plots \
             -pkl=1 \
-            -log=$this_log -cb=$bayes_csv \
-            -exp=$exp_data -cpr=$custom_prior \
+            -cb=$bayes_csv \
+            -exp=$exp_data \
             -prtwt=$store_prt_wt \
-            -pnoise=$probe_noise \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
-            -bintimes=$bintimes \
-            -bftimesall=$bf_all_times \
             -latex=$latex_mapping_file \
             -resource=$reallocate_resources \
-            --updater_from_prior=$updater_from_prior \
             -ggr=$growth_rule \
-            -nprobes=$num_probes \
-            -pmin=$param_min -pmax=$param_max \
-            -pmean=$param_mean -psigma=$param_sigma \
-            -special_probe=$special_probe \
             $growth_rules_command 
+            # -pnoise=$probe_noise \
+            # -g=$gaussian \
+            # -cpr=$custom_prior \
+            # -bintimes=$bintimes \
+            # -bftimesall=$bf_all_times \
+            # --updater_from_prior=$updater_from_prior \
+            # -nprobes=$num_probes \
+            # -pmin=$param_min -pmax=$param_max \
+            # -pmean=$param_mean -psigma=$param_sigma \
+            # -special_probe=$special_probe \
     done
 done
 
@@ -258,7 +261,7 @@ echo "
 # write to a script so we can recall analysis later.
 echo "
 cd $full_path_to_results
-python3 ../../../../qmla/AnalyseMultipleQMD.py \
+python3 ../../../../Scripts/analyse_qmla.py \
     -dir=$full_path_to_results --bayes_csv=$bayes_csv \
     -log=$this_log \
     -top=$number_best_models_further_qhl \
@@ -269,8 +272,7 @@ python3 ../../../../qmla/AnalyseMultipleQMD.py \
     -params=$true_params_pickle_file \
     -latex=$latex_mapping_file
 
-
-python3 ../../../../qmla/CombineAnalysisPlots.py \
+python3 ../../../../Scripts/generate_results_pdf.py \
     -dir=$full_path_to_results \
     -p=$prt -e=$exp -bt=$bt -t=$num_tests \
     -log=$this_log \
@@ -287,9 +289,8 @@ python3 ../../../../qmla/CombineAnalysisPlots.py \
     -mqhl=$multiple_qhl \
     -cb=$bayes_csv \
     -exp=$exp_data
+
 " > $analyse_script
-
-
 
 
 chmod a+x $analyse_script
@@ -317,13 +318,12 @@ then
         # q_id=\$((q_id+1))
         let q_id="$q_id + 1"
         echo "QID: $q_id"
-        python3 Exp.py \
+        python3 /Scripts/implement_qmla.py \
             -fq=1 \
             -p=$particles \
             -e=$experiments \
             -bt=$bt \
             -rq=$use_rq \
-            -g=$gaussian \
             -qhl=0 \
             -ra=$ra \
             -rt=$rt \
@@ -337,27 +337,21 @@ then
             -log=$this_log \
             -cb=$bayes_csv \
             -exp=$exp_data \
-            -cpr=$custom_prior \
-            -prtwt=$store_prt_wt \
             -pnoise=$probe_noise \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
-            -bintimes=$bintimes \
-            -bftimesall=$bf_all_times \
             -latex=$latex_mapping_file \
             -ggr=$growth_rule \
-            --updater_from_prior=$updater_from_prior \
             -resource=$reallocate_resources \
             -ggr=$growth_rule \
-            -nprobes=$num_probes \
             $growth_rules_command 
-
+            # -prtwt=$store_prt_wt \
     done
     echo "
     cd $full_path_to_results
-    python3 ../../../../qmla/AnalyseMultipleQMD.py \
+    python3 ../../../../Scripts/AnalyseMultipleQMD.py \
         -dir=$full_path_to_results \
         --bayes_csv=$bayes_csv \
         -log=$this_log \

@@ -1,8 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="EXP-PAPER__simulation-veried-model__7-params"
-#test_description="THEO__qmd__mult-growth__heis-true"
-#test_description="test__removing-negligible-params"
+test_description="test-changes-codebase__exp-data-QHL"
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -10,19 +8,19 @@ test_description="EXP-PAPER__simulation-veried-model__7-params"
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=115
+num_tests=1
 num_processes_to_request=6
-qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
+qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 multiple_qhl=0
-multiple_growth_rules=1
+multiple_growth_rules=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
-experimental_data=0 # use experimental data -> 1; use fake data ->0
-simulate_experiment=1
+experimental_data=1 # use experimental data -> 1; use fake data ->0
+simulate_experiment=0
 
 # QHL parameters.
-e=1000 # experiments
-p=3000 # particles
+e=7 # experiments
+p=25 # particles
 ra=0.98 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -36,62 +34,40 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 ### ---------------------------------------------------###
 
 # Simulation growth rule
-#sim_growth_rule='two_qubit_ising_rotation_hyperfine'
-#sim_growth_rule='NV_centre_spin_large_bath'
-#sim_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-#sim_growth_rule='NV_centre_spin_large_bath'
-#sim_growth_rule='ising_1d_chain'
-#sim_growth_rule='ising_multi_axis'
-#sim_growth_rule='heisenberg_xyz'
-#sim_growth_rule='hubbard_square_lattice_generalised'
-#sim_growth_rule='hopping_topology'
-#sim_growth_rule='NV_centre_spin_large_bath'
-#sim_growth_rule='probabilistic_spin'
-#sim_growth_rule='pairwise_pauli_probabilistic_nearest_neighbour'
-#sim_growth_rule='hopping_probabilistic'
-#sim_growth_rule='hopping_predetermined'
-#sim_growth_rule='ising_probabilistic'
-#sim_growth_rule='ising_predetermined'
-#sim_growth_rule='heisenberg_xyz_probabilistic'
-sim_growth_rule='heisenberg_xyz_predetermined'
+sim_growth_rule='IsingProbabilistic'
+# sim_growth_rule='IsingPredetermined'
+# sim_growth_rule='HeisenbergXYZPredetermined'
+# sim_growth_rule='HeisenbergXYZProbabilistic'
+# sim_growth_rule='FermiHubbardPredetermined'
+# sim_growth_rule='FermiHubbardProbabilistic'
+# sim_growth_rule='Genetic'
+# sim_growth_rule='Presentation'
 
+### Experimental growth rules 
+### which will overwrite growth_rule if exp_data==1
 
-
-
-# Experimental growth rules
-#experimental_growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-#experimental_growth_rule='nv_experiment_vary_model'
-experimental_growth_rule='nv_experiment_vary_model_7_params'
-#experimental_growth_rule='two_qubit_ising_rotation_hyperfine'
-#experimental_growth_rule='NV_alternative_model'
-#experimental_growth_rule='NV_alternative_model_2'
-#experimental_growth_rule='NV_centre_revivals'
-#experimental_growth_rule='NV_spin_full_access'
-#experimental_growth_rule='NV_centre_spin_large_bath'
-#experimental_growth_rule='NV_centre_experiment_debug'
-#experimental_growth_rule='reduced_nv_experiment'
-#experimental_growth_rule='NV_fitness_growth'
-
-
-#experimental_growth_rule='PT_Effective_Hamiltonian'
+exp_growth_rule='ExperimentNVCentre'
+# exp_growth_rule='ExperimentNVCentreNoTransvereTerms'
+# exp_growth_rule='ExpAlternativeNV'
+# exp_growth_rule='ExperimentFullAccessNV'
+# exp_growth_rule='NVLargeSpinBath'
+# exp_growth_rule='ExperimentNVCentreVaryTrueModel'
+# exp_growth_rule='ExpNVRevivals'
+# exp_growth_rule='ExperimentReducedNV'
 
 # Choose a growth rule
 if (( "$experimental_data" == 1)) || (( "$simulate_experiment" == 1))
 then
-	growth_rule=$experimental_growth_rule
+	growth_rule=$exp_growth_rule
 else
 	growth_rule=$sim_growth_rule
 fi
 
 # Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_growth_rules set to 1 above
 alt_growth_rules=(  
-#	'ising_1d_chain'
-#	'hubbard_square_lattice_generalised'
-#	'hopping_probabilistic'
-#	'ising_probabilistic'
-	'ising_predetermined' 
-	'heisenberg_xyz_predetermined'
-	'hopping_predetermined'
+	'IsingPredetermined' 
+	'HeisenbergXYZPredetermined'
+	'FermiHubbardPredetermined'
 )
 growth_rules_command=""
 for item in ${alt_growth_rules[*]}
@@ -143,8 +119,9 @@ day_time=$(date +%b_%d/%H_%M)
 running_dir="$(pwd)"
 #qmd_dir="${running_dir%/ParallelDevelopment}" # chop off ParallelDevelopment to get qmd folder path
 qmd_dir="${running_dir%/Launch}" # chop off ParallelDevelopment to get qmd folder path
-lib_dir="$qmd_dir/Libraries/QML_lib"
-script_dir="$qmd_dir/ExperimentalSimulations"
+#lib_dir="$qmd_dir/Libraries/QML_lib"
+lib_dir="$qmd_dir/qmla"
+script_dir="$qmd_dir/Scripts"
 results_dir=$day_time
 full_path_to_results=$(pwd)/Results/$results_dir
 all_qmd_bayes_csv="$full_path_to_results/cumulative.csv"
@@ -230,7 +207,7 @@ printf "$day_time: \t $test_description \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; r
 force_plot_plus=0
 special_probe='random' #'ideal'
 special_probe_plot='random'
-time_request_insurance_factor=1
+time_request_insurance_factor=3
 if (( "$bin_times_bayes_factors" == 1))
 then
 	let time_request_insurance_factor="2*$time_request_insurance_factor"
@@ -256,7 +233,8 @@ then
 fi
 
 ### First set up parameters/data to be used by all instances of QMD for this run. 
-python3 ../qmla/SetQHLParams.py \
+# python3 ../qmla/SetQHLParams.py \
+python3 ../Scripts/set_qmla_params.py \
 	-true=$true_params_pickle_file \
 	-prior=$prior_pickle_file \
 	-probe=$plot_probe_file \
@@ -279,7 +257,7 @@ python3 ../qmla/SetQHLParams.py \
 
 ### Call script to determine how much time is needed based on above params. Store in QMD_TIME, QHL_TIME, etc. 
 let temp_bayes_times="2*$e" # TODO fix time calculator
-python3 ../qmla/CalculateTimeRequired.py \
+python3 ../Scripts/time_required_calculation.py \
 	-ggr=$growth_rule \
 	-use_agr=$multiple_growth_rules \
 	$growth_rules_command \
@@ -356,7 +334,7 @@ do
 									this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
 									printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd; noise=$probe_noise_level; bintimesBF=$bin_times_bayes_factors \n" >> QMD_all_tasks.log
 
-									qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,QMD_ID=$qmd_id,QHL=$qhl,MULTIPLE_QHL=$multiple_qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PGH_EXPONENT=$pgh_exp,PGH_INCREASE=$pgh_increase,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,STORE_PARTICLES_WEIGHTS=$store_particles_weights,DATA_MAX_TIME=$data_max_time,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,NUM_PROBES=$num_probes,SPECIAL_PROBE=$special_probe,PROBE_NOISE=$probe_noise_level,RESOURCE_REALLOCATION=$resource_reallocation,UPDATER_FROM_PRIOR=$updater_from_prior,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma,BIN_TIMES_BAYES=$bin_times_bayes_factors,BF_ALL_TIMES=$use_all_times_bf -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+									qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,ROOT_DIR=$qmd_dir,QMD_ID=$qmd_id,QHL=$qhl,MULTIPLE_QHL=$multiple_qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PGH_EXPONENT=$pgh_exp,PGH_INCREASE=$pgh_increase,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,STORE_PARTICLES_WEIGHTS=$store_particles_weights,DATA_MAX_TIME=$data_max_time,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,NUM_PROBES=$num_probes,SPECIAL_PROBE=$special_probe,PROBE_NOISE=$probe_noise_level,RESOURCE_REALLOCATION=$resource_reallocation,UPDATER_FROM_PRIOR=$updater_from_prior,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma,BIN_TIMES_BAYES=$bin_times_bayes_factors,BF_ALL_TIMES=$use_all_times_bf -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
 
 								done
 							done
@@ -375,8 +353,8 @@ finalise_further_qhl_stage_script=$full_path_to_results/FURTHER_finalise.sh
 ### Generate script to analyse results of QMD runs. 
 echo "
 #!/bin/bash 
-cd $lib_dir
-python3 AnalyseMultipleQMD.py \
+cd $script_dir
+python3 analyse_qmla.py \
 	-dir="$full_path_to_results" \
 	-log=$multi_qmd_log \
 	--bayes_csv=$all_qmd_bayes_csv \
@@ -390,7 +368,7 @@ python3 AnalyseMultipleQMD.py \
 	-latex=$latex_mapping_file \
 	-ggr=$growth_rule
 
-python3 CombineAnalysisPlots.py \
+python3 generate_results_pdf.py \
     -dir=$full_path_to_results \
     -p=$p -e=$e -bt=$bt -t=$num_tests \
     -nprobes=$num_probes \
@@ -436,8 +414,8 @@ fi
 
 echo "
 	#!/bin/bash 
-	cd $lib_dir
-	python3 AnalyseMultipleQMD.py \
+	cd $script_dir
+	python3 analyse_qmla.py \
 		-dir="$full_path_to_results" \
 		-log=$multi_qmd_log \
 		--bayes_csv=$all_qmd_bayes_csv \
@@ -451,7 +429,7 @@ echo "
 		-ggr=$growth_rule \
 		-plot_probes=$plot_probe_file
 
-	python3 CombineAnalysisPlots.py \
+	python3 generate_results_pdf.py \
 		-dir=$full_path_to_results \
 		-p=$p -e=$e -bt=$bt -t=$num_tests \
 		-nprobes=$num_probes \

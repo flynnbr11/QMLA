@@ -19,6 +19,7 @@ host=$(hostname)
 running_dir=$RUNNING_DIR
 lib_dir=$LIBRARY_DIR
 script_dir=$SCRIPT_DIR
+root_dir=$ROOT_DIR
 echo "QMD ID = $QMD_ID; REDIS_PORT=$REDIS_PORT"
 echo "Global server: $GLOBAL_SERVER"
 echo "Running directory: $running_dir"
@@ -32,10 +33,11 @@ module load languages/intel-compiler-16-u2
 
 SERVER_HOST=$(head -1 "$PBS_NODEFILE")
 cd $lib_dir
+#cd $script_dir
 redis-server RedisDatabaseConfig.conf --protected-mode no --port $REDIS_PORT & 
 redis-cli -p $REDIS_PORT flushall
 
-cd $lib_dir
+#cd $lib_dir
 echo "Going in to launch redis script"
 echo "If this fails -- ensure permission enabled on RedisLaunch script in library"
 
@@ -55,7 +57,7 @@ mkdir -p $PBS_O_WORKDIR/logs
 
 # The redis server is started on the first node.
 REDIS_URL=redis://$SERVER_HOST:$REDIS_PORT
-
+echo "REDIS_URL : $REDIS_URL"
 QMD_LOG_DIR="$RESULTS_DIR/logs"
 OUTPUT_ERROR_DIR="$RESULTS_DIR/output_and_error_logs"
 mkdir -p $QMD_LOG_DIR
@@ -76,7 +78,8 @@ done
 # -------------------------------------
 
 
-cd $lib_dir
+# Launch RQ workers from QMLA root directory so that import statements calling qmla are understood
+cd $root_dir
 if [[ "$host" == "node"* ]]
 then
 	echo "Launching RQ worker on remote nodes using mpirun"
@@ -94,14 +97,40 @@ then
 	ALT_GROWTH=""
 fi
 sleep 5
-cd $running_dir
-# cd $script_dir
-python3 Exp.py -mqhl=$MULTIPLE_QHL -rq=1 -p=$NUM_PARTICLES -e=$NUM_EXP -bt=$NUM_BAYES -rt=$RESAMPLE_T -ra=$RESAMPLE_A -pgh=$RESAMPLE_PGH -pgh_exp=$PGH_EXPONENT -pgh_incr=$PGH_INCREASE -qid=$QMD_ID -rqt=200000 -g=$GAUSSIAN -exp=$EXP_DATA -qhl=$QHL -fq=$FURTHER_QHL -pt=$PLOTS -pkl=$PICKLE_QMD -host=$SERVER_HOST -port=$REDIS_PORT -dir=$RESULTS_DIR -log=$QMD_LOG -cb=$BAYES_CSV -cpr=$CUSTOM_PRIOR -prtwt=$STORE_PARTICLES_WEIGHTS -dst=$DATA_MAX_TIME -ggr=$GROWTH $ALT_GROWTH -bintimes=$BIN_TIMES_BAYES -bftimesall=$BF_ALL_TIMES -latex=$LATEX_MAP_FILE -nprobes=$NUM_PROBES -prior_path=$PRIOR_FILE -true_params_path=$TRUE_PARAMS_FILE -plot_probes=$PLOT_PROBES -special_probe=$SPECIAL_PROBE -pnoise=$PROBE_NOISE -true_expec_path=$TRUE_EXPEC_PATH -pmin=$PARAM_MIN -pmax=$PARAM_MAX -pmean=$PARAM_MEAN -psigma=$PARAM_SIGMA -resource=$RESOURCE_REALLOCATION --updater_from_prior=$UPDATER_FROM_PRIOR  
-
-
-
+# cd $running_dir
+cd $script_dir
+python3 implement_qmla.py \
+	-qhl=$QHL \
+	-fq=$FURTHER_QHL \
+	-mqhl=$MULTIPLE_QHL \
+	-rq=1 \
+	-p=$NUM_PARTICLES \
+	-e=$NUM_EXP \
+	-bt=$NUM_BAYES \
+	-rt=$RESAMPLE_T \
+	-ra=$RESAMPLE_A \
+	-qid=$QMD_ID \
+	-host=$SERVER_HOST \
+	-port=$REDIS_PORT \
+	-log=$QMD_LOG \
+	-dir=$RESULTS_DIR \
+	-pgh=$RESAMPLE_PGH \
+	-pgh_exp=$PGH_EXPONENT \
+	-pgh_incr=$PGH_INCREASE \
+	-pt=$PLOTS \
+	-pkl=$PICKLE_QMD \
+	-cb=$BAYES_CSV \
+	-exp=$EXP_DATA \
+	-prior_path=$PRIOR_FILE \
+	-true_params_path=$TRUE_PARAMS_FILE \
+	-true_expec_path=$TRUE_EXPEC_PATH \
+	-plot_probes=$PLOT_PROBES \
+	-latex=$LATEX_MAP_FILE \
+	-resource=$RESOURCE_REALLOCATION \
+	-ggr=$GROWTH \
+	$ALT_GROWTH 
 echo "Finished Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
-sleep 1
+sleep 3
 
 redis-cli -p $REDIS_PORT flushall
 redis-cli -p $REDIS_PORT shutdown

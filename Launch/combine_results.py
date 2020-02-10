@@ -68,8 +68,8 @@ volume_df = pd.DataFrame()
 for d in directories:
     print("Analysing directory ", d)
     idx = directories.index(d)
-    true_params_path = str(d + 'true_params.p')
-    true_params = pickle.load(open(true_params_path, 'rb'))
+    true_params_path = str(d + 'true_model_terms_params.p')
+    true_model_terms_params = pickle.load(open(true_params_path, 'rb'))
 
     true_expec_vals = pickle.load(
         open(
@@ -82,7 +82,7 @@ for d in directories:
         true_expec_vals[t] for t in exp_val_times
     ]
 
-    growth_gen = true_params['growth_generator']
+    growth_gen = true_model_terms_params['growth_generator']
     growth_class = GrowthRules.get_growth_generator_class(
         growth_generation_rule=growth_gen
     )
@@ -91,11 +91,11 @@ for d in directories:
         'Run': directories_to_use[idx],
         'RunIdx': idx,
         'ResultsDirectory': d,
-        'TrueModel': true_params['true_op'],
-        'TrueParams': true_params['params_dict'],
+        'TrueModel': true_model_terms_params['true_op'],
+        'TrueParams': true_model_terms_params['params_dict'],
         'GrowthGenerator': growth_gen,
         'TrueModelLatex': growth_class.latex_name(
-            true_params['true_op']
+            true_model_terms_params['true_op']
         ),
         'TrueExpectationValues': raw_expec_vals,
         'ExpValTimes': exp_val_times

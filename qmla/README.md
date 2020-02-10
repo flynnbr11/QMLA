@@ -24,12 +24,12 @@ Dictionaries to fill in:
 * `fixed_axes_by_generator`: which axis to fix. 
 * `max_spawn_depth_info`: for growth rules which terminate after a fixed number of steps, here define the number of steps allowed. 
 * `max_num_qubits_info`: maximum number of qubits permitted according to this growth generator. In some cases, growth is terminated when models reach this size. 
-* `model_generation_functions`: which function creates a list of model names to form the next layer. These functions are stored in QML_lib/ModelGeneration. This is called by `new_model_generator` and must take arguments
+* `model_generation_functions`: which function creates a list of model names to form the next layer. These functions are stored in QML_lib/model_generation. This is called by `new_model_generator` and must take arguments
     * `model_list`: champions of layer N, used to create list of models for layer N+1
     * `spawn_step`: doesn't have to be used, but can be useful to generate models specically based on here in the tree development the algorithm has reached. 
 * `tree_finished_functions`: function to check whether the QMD tree should terminate at that step. Default is to terminate after a given number of steps. 
-* `get_name_branch_map`: function which returns a dictionary mapping all generated models' names to a branch number. Default is to put models on a branch with ID equal to the number of parameters that model has. An alternative (prebuilt) is to assign branch ID of the number of qubits. These functions are stored in QML_lib/ModelNames
-* `latex_naming_functions`: function to take a model name (string according to model naming convention), to a LaTex representation of that name. These can be specific to growth rules, and are stored in ModelNames.
+* `get_name_branch_map`: function which returns a dictionary mapping all generated models' names to a branch number. Default is to put models on a branch with ID equal to the number of parameters that model has. An alternative (prebuilt) is to assign branch ID of the number of qubits. These functions are stored in QML_lib/model_naming
+* `latex_naming_functions`: function to take a model name (string according to model naming convention), to a LaTex representation of that name. These can be specific to growth rules, and are stored in model_naming.
 * `initial_models`: default set of models to form the first layer, which are the seeds for growing the tree. 
 #### Probe dict generators
 QMD cycles through a set of probes at each epoch to learn parameters during the QHL phase for each model. 
@@ -37,7 +37,7 @@ These are generated once and stored in a dict.
 * `experimental_probe_dict_generator`: In the case experimental data is being used, the probes must correspond to the probes used during the experiment.
 * `simulated_probe_dict_generator` and `special_probe_functions`: In simulated data, there may be special cases where probes are specific, e.g. |+>^n. In general, random probes are used for simulated data. 
 #### Timing requirements
-* In `CalculateTimeRequired.py`, the dict `max_num_models_by_shape` tracks the maximum number of models of a given dimension this growth rule supports. This is used to work out roughly how much time is required by a parallel compute cluster to complete QMD for the growth rule, as clusters demand a specific time is requested for allocation purposes. 
+* In `time_required_calculation.py`, the dict `max_num_models_by_shape` tracks the maximum number of models of a given dimension this growth rule supports. This is used to work out roughly how much time is required by a parallel compute cluster to complete QMD for the growth rule, as clusters demand a specific time is requested for allocation purposes. 
 ​
 ​
 
