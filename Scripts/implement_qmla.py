@@ -63,7 +63,7 @@ log_file = global_variables.log_file
 
 growth_class.generate_probes(
     experimental_data=global_variables.use_experimental_data,
-    noise_level=global_variables.probe_noise_level,
+    noise_level=growth_class.probe_noise_level,
     minimum_tolerable_noise=0.0,
 )
 

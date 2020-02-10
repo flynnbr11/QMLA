@@ -207,22 +207,25 @@ do
         let q_id="$q_id+1"
         python3 \
             ../Scripts/implement_qmla.py \
-            -mqhl=$multiple_qhl \
-            -p=$prt -e=$exp -bt=$bt \
-            -rq=$use_rq \
             -qhl=$qhl_test \
-            -ra=$ra -rt=$rt -pgh=$pgh \
+            -mqhl=$multiple_qhl \
+            -rq=$use_rq \
+            -p=$prt \
+            -e=$exp \
+            -bt=$bt \
+            -ra=$ra \
+            -rt=$rt \
+            -qid=$q_id \
+            -log=$this_log \
+            -dir=$full_path_to_results \
+            -pgh=$pgh \
             -pgh_exp=$pgh_exponent \
             -pgh_incr=$pgh_increase \
-            -dir=$full_path_to_results \
-            -qid=$q_id \
             -pt=$plots \
             -pkl=1 \
-            -log=$this_log \
             -cb=$bayes_csv \
             -exp=$exp_data \
             -prtwt=$store_prt_wt \
-            -pnoise=$probe_noise \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
             -true_expec_path=$true_expec_path \
@@ -231,6 +234,7 @@ do
             -resource=$reallocate_resources \
             -ggr=$growth_rule \
             $growth_rules_command 
+            # -pnoise=$probe_noise \
             # -g=$gaussian \
             # -cpr=$custom_prior \
             # -bintimes=$bintimes \
