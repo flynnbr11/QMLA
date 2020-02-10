@@ -337,7 +337,6 @@ then
             -log=$this_log \
             -cb=$bayes_csv \
             -exp=$exp_data \
-            -prtwt=$store_prt_wt \
             -pnoise=$probe_noise \
             -prior_path=$prior_pickle_file \
             -true_params_path=$true_params_pickle_file \
@@ -348,6 +347,7 @@ then
             -resource=$reallocate_resources \
             -ggr=$growth_rule \
             $growth_rules_command 
+            # -prtwt=$store_prt_wt \
     done
     echo "
     cd $full_path_to_results
