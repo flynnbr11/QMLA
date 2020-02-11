@@ -182,9 +182,14 @@ class QuantumModelLearningAgent():
         if self.growth_rules_list[0] != self.growth_rule_of_true_model:
             self.growth_rules_list[0] = self.growth_rule_of_true_model
             self.growth_rules_list[matching_gen_idx] = zeroth_gen
-        self.unique_growth_rule_instances = {
-            self.growth_rule_of_true_model: self.growth_class
-        }
+        self.unique_growth_rule_instances = self.qmla_controls.unique_growth_rule_instances
+        self.log_print(
+            ["Growth rule instances: {}".format(self.unique_growth_rule_instances)]
+        )
+        # self.unique_growth_rule_instances = {
+        #     self.growth_rule_of_true_model: self.growth_class
+        # }
+
         self.spawn_depth_by_growth_rule = {}
 
         # Tree/growth management
@@ -302,9 +307,9 @@ class QuantumModelLearningAgent():
             self.spawn_stage[gen] = [None]
             self.misc_growth_info[gen] = {}
             self.branch_growth_rules[i] = gen
-            # self.branch_growth_rule_instances[i] = growth_class_gen
-            if gen not in list(self.unique_growth_rule_instances.keys()):
-                self.unique_growth_rule_instances[gen] = growth_class_gen
+
+            # if gen not in list(self.unique_growth_rule_instances.keys()):
+            #     self.unique_growth_rule_instances[gen] = growth_class_gen
             self.branch_growth_rule_instances[i] = self.unique_growth_rule_instances[gen]
 
         # self.branch_highest_id = max(self.model_initial_branch.values())

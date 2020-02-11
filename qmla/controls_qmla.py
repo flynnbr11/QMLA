@@ -56,10 +56,21 @@ class ControlsQMLA():
             self.growth_class.num_top_models_to_build_on    
         )
 
+
         # get core arguments passed to implement_qmla script
         # and generate required parameters from those
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
+        self.unique_growth_rule_instances = {
+            gen : get_growth_rule.get_growth_generator_class(
+                    growth_generation_rule = gen, 
+                    use_experimental_data = self.use_experimental_data, 
+                    log_file = self.log_file
+                )
+            for gen in self.alternative_growth_rules
+        }
+        self.unique_growth_rule_instances[self.growth_generation_rule] = self.growth_class
+
         self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
         self.true_params_pickle_file = arguments.true_params_pickle_file
 
