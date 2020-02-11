@@ -10,7 +10,7 @@ num_tests=1
 qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
-exp_data=1
+exp_data=0
 simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
@@ -105,7 +105,7 @@ else
 fi
 
 alt_growth_rules=(
-    # 'IsingPredetermined'
+    'IsingPredetermined'
     # 'IsingProbabilistic'
     # 'HeisenbergXYZProbabilistic'
     # 'HeisenbergXYZPredetermined'
@@ -234,16 +234,6 @@ do
             -resource=$reallocate_resources \
             -ggr=$growth_rule \
             $growth_rules_command 
-            # -pnoise=$probe_noise \
-            # -g=$gaussian \
-            # -cpr=$custom_prior \
-            # -bintimes=$bintimes \
-            # -bftimesall=$bf_all_times \
-            # --updater_from_prior=$updater_from_prior \
-            # -nprobes=$num_probes \
-            # -pmin=$param_min -pmax=$param_max \
-            # -pmean=$param_mean -psigma=$param_sigma \
-            # -special_probe=$special_probe \
     done
 done
 

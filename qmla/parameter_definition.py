@@ -12,11 +12,11 @@ import qmla.prior_distributions as distributions
 pickle.HIGHEST_PROTOCOL = 4
 
 __all__ = [
-    'create_qhl_params'
+    'set_shared_parameters'
 ]
 
 
-def create_qhl_params(
+def set_shared_parameters(
     true_op,
     true_prior,
     pickle_file=None,

@@ -211,7 +211,7 @@ if pickle_file is not None:
     )
 
 if arguments.true_params_file is not None:
-    qmla.create_qhl_params(
+    qmla.set_shared_parameters(
         # true_op = arguments.true_op,
         true_op=true_model,
         true_prior=true_prior,

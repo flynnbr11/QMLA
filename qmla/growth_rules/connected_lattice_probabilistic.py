@@ -1,20 +1,23 @@
 import numpy as np
-import itertools
+# import itertools
 import sys
 import os
 
-import ConnectedLattice
+# import ConnectedLattice
 
-sys.path.append(os.path.abspath('..'))
-import Heuristics
-import SystemTopology
-import ModelGeneration
-import ModelNames
-import ProbeGeneration
-import DataBase
+# sys.path.append(os.path.abspath('..'))
+# import Heuristics
+# import SystemTopology
+# import ModelGeneration
+# import ModelNames
+# import ProbeGeneration
+# import DataBase
 
-class connected_lattice_revivals(
-    ConnectedLattice.connected_lattice
+from qmla.growth_rules import connected_lattice
+import qmla.database_framework
+
+class ConnectedLatticeProbabilistic(
+    connected_lattice.ConnectedLattice
 ):
     def __init__(
         self,
@@ -27,7 +30,7 @@ class connected_lattice_revivals(
             **kwargs
         )
         self.weighted_fitnesses = {}
-        # self.fitness_minimum = 0.1 # TODO this is overwritten by default set in parent class -- add to setup?
+        self.fitness_minimum = 0 # TODO this is overwritten by default set in parent class -- add to setup?
         self.fitness_maximum = 1
 
     def generate_models(
@@ -37,7 +40,6 @@ class connected_lattice_revivals(
     ):
         if self.spawn_stage[-1] == 'Start':
             new_models = self.available_mods_by_generation[self.generation_DAG]
-            # self.log_print(["Spawning initial models:", new_models])
             self.spawn_stage.append(None)
 
         else:
@@ -85,15 +87,14 @@ class connected_lattice_revivals(
                 )
 
             # if starting_new_generation == True and self.spawn_stage[-1]!='Complete':
-            #     self.spawn_stage.append('start_of_new_generation')
+            #     self.spawn_stage.append('start_of_new_generation')          
 
         new_models = [
-            DataBase.alph(mod)
+            qmla.database_framework.alph(mod)
             for mod in new_models
             # Final check whether this model is allowed
             if self.check_model_validity(mod)
         ]
-        # store branch idx for new models
 
         registered_models = list(self.model_branches.keys())
         for model in new_models:
@@ -101,11 +102,73 @@ class connected_lattice_revivals(
                 latex_model_name = self.latex_name(model)
                 branch_id = (
                     self.generation_DAG
-                    + len(DataBase.get_constituent_names_from_name(model))
+                    + len(qmla.database_framework.get_constituent_names_from_name(model))
                 )
                 self.model_branches[latex_model_name] = branch_id
 
         return new_models
+
+    def model_group_fitness_calculation(
+        self,
+        model_points,
+        generation=None, 
+        subgeneration=None, 
+        **kwargs
+    ):
+        ranked_model_list = sorted(
+            model_points,
+            key=model_points.get,
+            reverse=True
+        )
+        new_fitnesses = {}
+        self.log_print(
+            ["Prob conn lattice group fitness calculation"]
+        )
+        for model_id in ranked_model_list:
+            try:
+                max_wins_model_points = max(model_points.values())
+                win_ratio = model_points[model_id] / max_wins_model_points
+            except BaseException:
+                win_ratio = 1
+
+            # fitness can be calculated by some other callable function here
+            fitness = win_ratio 
+            fitness = self.rescale_fitness(
+                fitness,
+                rescaled_min = self.fitness_minimum,
+                rescaled_max = self.fitness_maximum
+            )
+
+            if model_id not in sorted(self.model_fitness.keys()):
+                self.model_fitness[model_id] = []
+            self.model_fitness[model_id].append(fitness)
+            new_fitnesses[model_id] = fitness
+
+        self.log_print(
+            [
+                "New fitnesses:\n", new_fitnesses
+            ]
+        )
+        if generation and subgeneration is not None:
+            self.generation_fitnesses[generation][subgeneration] = new_fitnesses
+        return ranked_model_list
+
+    def rescale_fitness(
+        self, 
+        fitness, 
+        original_max = 1,
+        original_min = 0, 
+        rescaled_max = 1, 
+        rescaled_min = 0.1, 
+    ):
+        # self.log_print(["rescale fitness min:", rescaled_min])
+        if rescaled_max == rescaled_min:
+            new_fitness = rescaled_max
+        else:
+            old_range = original_max - original_min
+            new_range = rescaled_max - rescaled_min
+            new_fitness = (( (fitness - original_min) * new_range )/old_range) + rescaled_min
+        return new_fitness
 
 
     def generation_compound_fitness(

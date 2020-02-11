@@ -6,7 +6,6 @@ import os
 from qmla.growth_rules import growth_rule_super
 from qmla import experiment_design_heuristics
 from qmla import topology
-# from qmla import model_generation
 from qmla import model_naming
 from qmla import probe_set_generation
 from qmla import database_framework
@@ -54,7 +53,7 @@ class ConnectedLattice(
         self.num_top_models_to_build_on = 2
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 3
-        self.fitness_minimum = 0.25
+        self.fitness_minimum = 0.1
         self.generation_DAG = 1
         self.max_num_sites = 4
         self.tree_completed_initially = False
@@ -246,8 +245,10 @@ class ConnectedLattice(
             ]
         )
         new_models = []
+        models_by_parent = {}
         for mod_id in models_to_build_on:
             mod_name = model_names_ids[mod_id]
+            models_by_parent[mod_id] = 0
             mod_name = self.match_dimension(
                 mod_name, self.topology.num_sites())
             present_terms = database_framework.get_constituent_names_from_name(mod_name)
@@ -289,10 +290,6 @@ class ConnectedLattice(
                     )
                     self.spawn_stage.append('Complete')
             else:
-                # self.model_fitness_calculation(
-                #     model_id = mod_id,
-                #     model_points = model_points
-                # )
                 for term in terms_to_add:
                     new_mod = self.combine_terms(
                         terms=[mod_name, term]
@@ -301,9 +298,13 @@ class ConnectedLattice(
                         new_models.append(new_mod)
                         self.models_accepted[self.generation_DAG].append(
                             new_mod)
+                        models_by_parent[mod_id] += 1
                     else:
                         self.models_rejected[self.generation_DAG].append(
                             new_mod)
+        self.log_print(
+            ["# models added by parent: {}".format(models_by_parent)]
+        )
         return new_models
 
     def check_model_validity(
@@ -442,10 +443,10 @@ class ConnectedLattice(
                     win_ratio
                     # win_ratio * fitness_parameters['r_squared']
                 )**self.fitness_win_ratio_exponent
-                fitness = self.rescale_fitness(
-                    fitness,
-                    rescaled_min = self.fitness_minimum
-                )
+                # fitness = self.rescale_fitness(
+                #     fitness,
+                #     rescaled_min = self.fitness_minimum
+                # )
                 # fitness = 1
             elif self.model_generation_strictness == -1:
                 fitness = 1
@@ -469,53 +470,6 @@ class ConnectedLattice(
             self.generation_fitnesses[generation][subgeneration] = new_fitnesses
         return ranked_model_list
 
-    # def model_fitness_calculation(
-    #     self,
-    #     model_id,
-    #     # fitness_parameters, # of this model_id
-    #     model_points,
-    #     **kwargs
-    # ):
-    #     # TODO make fitness parameters within QMD
-    #     # pass
-    #     # print("model fitness function. fitness params:", fitness_parameters)
-    #     # print("[prob spin] model fitness. model points:", model_points)
-    #     ranked_model_list = sorted(
-    #         model_points,
-    #         key=model_points.get,
-    #         reverse=True
-    #     )
-
-    #     try:
-    #         max_wins_model_points = max(model_points.values())
-    #         win_ratio = model_points[model_id] / max_wins_model_points
-    #     except BaseException:
-    #         win_ratio = 1
-
-    #     if self.model_generation_strictness == 0:
-    #         # keep all models and work out relative fitness
-    #         fitness = (
-    #             win_ratio
-    #             # win_ratio * fitness_parameters['r_squared']
-    #         )**self.fitness_win_ratio_exponent
-    #         # fitness = 1
-    #     elif self.model_generation_strictness == -1:
-    #         fitness = 1
-    #     else:
-    #         # only consider the best model
-    #         # turn off all others
-    #         if model_id == ranked_model_list[0]:
-    #             fitness = 1
-    #         else:
-    #             fitness = 0
-    #     # if model_id not in sorted(self.model_fitness.keys()):
-    #     #     self.model_fitness[model_id] = {}
-    #     # # print("Setting fitness for {} to {}".format(model_id, fitness))
-    #     # self.model_fitness[model_id][self.generation_DAG] = fitness
-    #     if model_id not in sorted(self.model_fitness.keys()):
-    #         self.model_fitness[model_id] = []
-    #     # print("Setting fitness for {} to {}".format(model_id, fitness))
-    #     self.model_fitness[model_id].append(fitness)
 
     def determine_whether_to_include_model(
         self,
@@ -554,19 +508,6 @@ class ConnectedLattice(
             **kwargs
         )
 
-    def rescale_fitness(
-        self, 
-        fitness, 
-        original_max = 1,
-        original_min = 0, 
-        rescaled_max = 1, 
-        rescaled_min = 0.1, 
-    ):
-        # self.log_print(["rescale fitness min:", rescaled_min])
-        old_range = original_max - original_min
-        new_range = rescaled_max - rescaled_min
-        new_fitness = (( (fitness - original_min) * new_range )/old_range) + rescaled_min
-        return new_fitness
 
 
 def pauli_like_like_terms_connected_sites(

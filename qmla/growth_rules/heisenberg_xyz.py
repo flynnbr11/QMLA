@@ -3,7 +3,7 @@ import itertools
 import sys
 import os
 
-from qmla.growth_rules import connected_lattice
+from qmla.growth_rules import connected_lattice, connected_lattice_probabilistic
 from qmla import experiment_design_heuristics
 from qmla import topology
 # from qmla import model_generation
@@ -13,8 +13,8 @@ from qmla import database_framework
 
 
 class HeisenbergXYZProbabilistic(
-    connected_lattice.ConnectedLattice
-    # ConnectedLatticeRevivals.connected_lattice_revivals
+    # connected_lattice.ConnectedLattice
+    connected_lattice_probabilistic.ConnectedLatticeProbabilistic
 ):
 
     def __init__(
@@ -28,28 +28,28 @@ class HeisenbergXYZProbabilistic(
             **kwargs
         )
 
-        self.lattice_dimension = 2
+        self.lattice_dimension = 1
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
 
-        self.true_model_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4PPPPpauliSet_yJy_1J4_d4'
+        # self.true_model_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4PPPPpauliSet_yJy_1J4_d4'
         # self.true_model_partially_connected ='pauliSet_xJx_1J2_d4+pauliSet_yJy_1J2_d4+pauliSet_xJx_2J3_d4+pauliSet_yJy_3J4_d4+pauliSet_zJz_3J4_d4+pauliSet_yJy_1J4_d4'
-        self.true_model_fully_connected_square = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_1J3_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_xJx_2J4_d4PPPPpauliSet_yJy_2J4_d4PPPPpauliSet_zJz_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4'
-        self.true_model_partially_connected = 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_zJz_d3'
-        self.true_model_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4'
+        # self.true_model_fully_connected_square = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_1J3_d4PPPPpauliSet_zJz_1J3_d4PPPPpauliSet_xJx_2J4_d4PPPPpauliSet_yJy_2J4_d4PPPPpauliSet_zJz_2J4_d4PPPPpauliSet_xJx_3J4_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4'
+        # self.true_model_partially_connected = 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_zJz_d3'
+        # self.true_model_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_model_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_2J4_d4'
         self.four_site_x = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_yJy_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_yJy_d4'
-        self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_yJy_d3'
-        self.max_num_sites = 4
-        self.true_model = self.true_model_partially_connected
+        self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_yJy_d3PPPpauliSet_2J3_zJz_d3'
+        self.max_num_sites = 3
+        self.true_model = self.three_site_chain_xxz
         self.true_model = database_framework.alph(self.true_model)
         self.qhl_models = [self.true_model]
         self.base_terms = [
             'x',
             'y',
-            # 'z'
+            'z'
         ]
         self.max_time_to_consider = 20
         # fitness calculation parameters. fitness calculation inherited.
@@ -57,6 +57,8 @@ class HeisenbergXYZProbabilistic(
         self.num_top_models_to_build_on =  'all'
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
+        self.fitness_minimum = 0.0
+        self.fitness_maximum = 1.0
         self.min_param = 0
         self.max_param = 1
         self.check_champion_reducibility = True
@@ -65,11 +67,12 @@ class HeisenbergXYZProbabilistic(
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10
         self.max_num_models_by_shape = {
-            # Note dN here requires 2N qubits so d3 counts as shape 6
-            1: 0,
-            2: 30,
-            3: 30,
-            4: 30,
+            1 : 0,
+            2: 10,
+            3: 10,
+            # 2: 30,
+            # 3: 30,
+            # 4: 30,
             'other': 0
         }
 
