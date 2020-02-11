@@ -208,8 +208,8 @@ class GrowthRuleSuper():
         return self.prior
 
     def generate_probes(
-        # system probes
         self,
+        probe_maximum_number_qubits=None, 
         **kwargs
     ):
         self.log_print(
@@ -217,8 +217,10 @@ class GrowthRuleSuper():
                 "System Generate Probes called"
             ]
         )
+        if probe_maximum_number_qubits is None: 
+            probe_maximum_number_qubits = self.max_num_probe_qubits
         self.probes_system = self.probe_generation_function(
-            max_num_qubits=self.max_num_probe_qubits,
+            max_num_qubits=probe_maximum_number_qubits,
             num_probes=self.num_probes,
             **kwargs
         )
@@ -226,62 +228,21 @@ class GrowthRuleSuper():
             self.probes_simulator = self.probes_system
         else:
             self.probes_simulator = self.simulator_probe_generation_function(
-                max_num_qubits=self.max_num_probe_qubits,
+                max_num_qubits=probe_maximum_number_qubits,
                 num_probes=self.num_probes,
                 **kwargs
             )
 
-    # Deprecated??
-    # def probe_generator(
-    #     # system probes
-    #     self,
-    #     **kwargs
-    # ):
-    #     self.probes_system = self.probe_generation_function(
-    #         max_num_qubits=self.max_num_probe_qubits,
-    #         num_probes=self.num_probes,
-    #         **kwargs
-    #     )
-    #     if self.shared_probes == True:
-    #         self.probes_simulator = self.probes_system
-    #     else:
-    #         self.probes_simulator = self.simulator_probe_generation_function(
-    #             max_num_qubits=self.max_num_probe_qubits,
-    #             num_probes=self.num_probes,
-    #             **kwargs
-    #         )
-    #     return self.probes_system
-
-    # def simulator_probe_generator(
-    #     # system probes
-    #     self,
-    #     shared_probes=None,
-    #     **kwargs
-    # ):
-    #     self.log_print(
-    #         [
-    #             "Simulator Generate Probes called"
-    #         ]
-    #     )
-    #     if shared_probes is None:
-    #         shared_probes = self.shared_probes
-
-    #     if shared_probes == True:
-    #         self.probes_simulator = self.probes_system
-    #     else:
-    #         self.probes_simulator = self.simulator_probe_generation_function(
-    #             max_num_qubits=self.max_num_probe_qubits,
-    #             num_probes=self.num_probes,
-    #             **kwargs
-    #         )
-    #     return self.probes_simulator
-
     def plot_probe_generator(
         self,
+        probe_maximum_number_qubits=None, 
         **kwargs
     ):
+        if probe_maximum_number_qubits is None: 
+            probe_maximum_number_qubits = self.max_num_probe_qubits
+
         return self.plot_probe_generation_function(
-            max_num_qubits=self.max_num_probe_qubits,
+            max_num_qubits=probe_maximum_number_qubits,
             num_probes=1,
             **kwargs
         )

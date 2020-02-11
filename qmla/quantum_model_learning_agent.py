@@ -146,7 +146,7 @@ class QuantumModelLearningAgent():
 
     def _true_model_definition(self):
         self.true_model_name = database_framework.alph(
-            self.qmla_controls.true_op_name)
+            self.qmla_controls.true_model_name)
         self.true_model_dimension = database_framework.get_num_qubits(
             self.true_model_name)
         self.true_model_constituent_operators = self.qmla_controls.true_model_terms_matrices
@@ -2784,11 +2784,6 @@ class QuantumModelLearningAgent():
                     # print("[QMD] dict:", self.branch_growth_rules)
                     this_branch_growth_rule = self.branch_growth_rules[branch_id]
                     if self.tree_completed[this_branch_growth_rule] == False:
-                        print(
-                            "not finished tree for growth:",
-                            this_branch_growth_rule
-                        )
-
                         growth_rule_tree_complete = self.spawn_from_branch(
                             # will return True if this brings it to
                             # self.MaxSpawnDepth
@@ -2811,7 +2806,7 @@ class QuantumModelLearningAgent():
                             # max_spawn_depth_reached = True
                     else:
                         print(
-                            "\n\n\nFinished tree for growth:",
+                            "Finished tree for growth rule:",
                             this_branch_growth_rule
                         )
 

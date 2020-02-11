@@ -27,7 +27,6 @@ class ConnectedLattice(
         growth_generation_rule,
         **kwargs
     ):
-        # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             **kwargs
@@ -66,6 +65,17 @@ class ConnectedLattice(
         self.setup_growth_class()
 
     def setup_growth_class(self):
+        # for classes which use connected_lattice as super class
+        # which may change attributes defined above, calculate 
+        # further attributes based on those, e.g. max num generations 
+        # based on max num sites, defined by the class inheriting. 
+        self.log_print(
+            [
+                "In Growth class setup fnc for {}.".format(
+                    self.growth_generation_rule
+                )
+            ]
+        )
         self.max_num_generations = (
             self.max_num_sites -
             self.initial_num_sites +

@@ -59,6 +59,12 @@ class ControlsQMLA():
 
         # get core arguments passed to implement_qmla script
         # and generate required parameters from those
+        log_print(
+            [
+                "Getting growth rule instances for alternative growth rules", 
+            ],
+            log_file = self.log_file
+        )
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
         self.unique_growth_rule_instances = {
@@ -70,6 +76,19 @@ class ControlsQMLA():
             for gen in self.alternative_growth_rules
         }
         self.unique_growth_rule_instances[self.growth_generation_rule] = self.growth_class
+        self.probe_max_num_qubits_all_growth_rules = max( 
+            [
+                gr.max_num_probe_qubits for gr in 
+                list(self.unique_growth_rule_instances.values())
+            ]
+        )
+        log_print(
+            [
+                "probe_max_num_qubits_all_growth_rules:", 
+                self.probe_max_num_qubits_all_growth_rules
+            ],
+            log_file = self.log_file
+        )
 
         self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
         self.true_params_pickle_file = arguments.true_params_pickle_file
@@ -78,9 +97,9 @@ class ControlsQMLA():
             open(self.true_params_pickle_file, 'rb')
         )
         self.true_model = true_params_info['true_op']
-        self.true_op_name = database_framework.alph(self.true_model)
+        self.true_model_name = database_framework.alph(self.true_model)
         self.true_model_class = database_framework.Operator(
-            self.true_op_name
+            self.true_model_name
         )
         self.true_model_terms_matrices = self.true_model_class.constituents_operators
         self.true_model_terms_params = true_params_info['params_list']

@@ -139,6 +139,8 @@ parser.add_argument(
     default=0.03
 )
 
+print("Set QMLA Params script")
+
 arguments = parser.parse_args()
 random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
@@ -150,11 +152,8 @@ results_directory = arguments.results_directory
 growth_class_attributes = {
     'use_experimental_data': exp_data,
     'log_file': log_file
-    # 'probe_generator' : probe_set_generation.restore_dec_13_probe_generation,
-    # 'test_growth_class_att' : True
 }
 
-# growth_class = get_growth_rule.get_growth_generator_class(
 growth_class = qmla.get_growth_generator_class(
     growth_generation_rule=growth_generation_rule,
     **growth_class_attributes
@@ -166,26 +165,21 @@ alternative_growth_rules = arguments.alternative_growth_rules
 all_growth_classes.extend(alternative_growth_rules)
 all_growth_classes = list(set(all_growth_classes))
 
-unique_growth_classes = {}
-for g in all_growth_classes:
-    try:
-        # unique_growth_classes[g] = get_growth_rule.get_growth_generator_class(
-        unique_growth_classes[g] = qmla.get_growth_generator_class(
+# this section just gets the max number of qubits to generate a plot probe for
+max_num_qubits_for_probes = [
+    qmla.get_growth_generator_class(
             growth_generation_rule=g,
             **growth_class_attributes
-        )
-    except BaseException:
-        unique_growth_classes[g] = None
+    ).max_num_probe_qubits
+    for g in all_growth_classes
+]
+probe_max_num_qubits_all_growth_rules = max( 
+    max_num_qubits_for_probes
+)
 
 true_model = growth_class.true_model
 probes_plot_file = arguments.probes_plot_file
 force_plus_probe = bool(arguments.force_plus_probe)
-# special_probe = arguments.special_probe
-# gaussian = bool(arguments.gaussian)
-# param_min = arguments.param_min
-# param_max = arguments.param_max
-# param_mean = arguments.param_mean
-# param_sigma = arguments.param_sigma
 probe_noise_level = arguments.probe_noise_level
 
 true_prior_plot_file = str(
@@ -212,16 +206,12 @@ if pickle_file is not None:
 
 if arguments.true_params_file is not None:
     qmla.set_shared_parameters(
-        # true_op = arguments.true_op,
         true_op=true_model,
         true_prior=true_prior,
         pickle_file=arguments.true_params_file,
         growth_generator=growth_generation_rule,
-        unique_growth_classes=unique_growth_classes,
         all_growth_classes=all_growth_classes,
         random_vals=random_true_params,
-        # rand_min=param_min,
-        # rand_max=param_max,
         exp_data=exp_data,
         growth_class=growth_class,
         true_prior_plot_file=true_prior_plot_file
@@ -240,6 +230,7 @@ print("Generating probe dict for plotting")
 plot_probe_dict = growth_class.plot_probe_generator(
     true_model=true_model,
     growth_generator=growth_generation_rule,
+    probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
     experimental_data=exp_data,
     noise_level=probe_noise_level,
 )

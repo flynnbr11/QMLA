@@ -7,7 +7,6 @@ import pickle
 
 import qmla.database_framework as database_framework
 import qmla.prior_distributions as distributions
-# import qmla.get_growth_rule as get_growth_rule
 
 pickle.HIGHEST_PROTOCOL = 4
 
@@ -22,7 +21,6 @@ def set_shared_parameters(
     pickle_file=None,
     random_vals=False,
     growth_generator=None,
-    unique_growth_classes=None,
     all_growth_classes=None,
     rand_min=0,
     rand_max=1,

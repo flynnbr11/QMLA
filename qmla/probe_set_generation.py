@@ -95,7 +95,6 @@ def NV_centre_ising_probes_plus(
     if minimum_tolerable_noise > noise_level:
         noise_level = minimum_tolerable_noise
         # print("using minimum_tolerable_noise")
-    print("noise level in plus probe:", noise_level)
     plus_state = np.array([1 + 0j, 1]) / np.sqrt(2)
     random_noise = noise_level * random_probe(1)
     noisy_plus = plus_state + random_noise
@@ -238,22 +237,10 @@ def plus_probes_dict(
     minimum_tolerable_noise=0,
     **kwargs
 ):
-    print("[Plus probe dict] Locals:", locals())
     num_probes = kwargs['num_probes']
-
-    print(
-        "[plus_probes_dict] min tol noise:",
-        minimum_tolerable_noise,
-        "noise level:", noise_level,
-        "num probes:", num_probes
-    )
-
     if minimum_tolerable_noise > noise_level:
         noise_level = minimum_tolerable_noise
-        # print("using minimum_tolerable_noise")
-    print("noise level in plus probe:", noise_level)
     probe_dict = {}
-    # noise_level = 0.03
     for j in range(num_probes):
         for i in range(1, 1 + max_num_qubits):
             # dict key is tuple of form (0,i) for consistency with other probe

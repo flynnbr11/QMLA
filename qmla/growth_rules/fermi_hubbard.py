@@ -285,6 +285,7 @@ class FermiHubbardPredetermined(
                 "Predetermined models:", self.initial_models
             ]
         )
+        self.setup_growth_class()
 
 
 def generate_new_terms_hubbard(

@@ -76,7 +76,6 @@ class HeisenbergXYZProbabilistic(
             'other': 0
         }
 
-
         self.setup_growth_class()
 
 

@@ -41,7 +41,7 @@ def time_seconds():
 
 
 def log_print(to_print_list, log_file):
-    identifier = str(str(time_seconds()) + " [EXP]")
+    identifier = str(str(time_seconds()) + " [Implement QMLA script]")
     if not isinstance(to_print_list, list):
         to_print_list = list(to_print_list)
 
@@ -55,13 +55,22 @@ def log_print(to_print_list, log_file):
               )
 
 
+print("Implement QMLA script")
 # Note this should usually be False, True just for testing/some specific plots.
 store_particles_weights = False
 
 log_file = global_variables.log_file
 # qle = global_variables.do_qle  # True for QLE, False for IQLE
 
+log_print(
+    [
+        "probe_max_num_qubits_all_growth_rules:", 
+        global_variables.probe_max_num_qubits_all_growth_rules
+    ],
+    log_file = log_file
+)
 growth_class.generate_probes(
+    probe_maximum_number_qubits = global_variables.probe_max_num_qubits_all_growth_rules, 
     experimental_data=global_variables.use_experimental_data,
     noise_level=growth_class.probe_noise_level,
     minimum_tolerable_noise=0.0,
@@ -87,8 +96,7 @@ if not os.path.exists(probes_dir):
         os.makedirs(probes_dir)
         system_probes_path = str(
             probes_dir
-            + 'system_probes'
-            + '.p'
+            + 'system_probes.p'
         )
         pickle.dump(
             system_probes,
@@ -96,8 +104,7 @@ if not os.path.exists(probes_dir):
         )
         simulator_probes_path = str(
             probes_dir
-            + 'simulator_probes'
-            + '.p'
+            + 'simulator_probes.p'
         )
         pickle.dump(
             simulator_probe_dict,
@@ -257,8 +264,9 @@ log_print(
         " on host ", global_variables.host_name,
         "and port", global_variables.port_number,
         "has seed", rds.get_seed(global_variables.host_name,
-                                 global_variables.port_number, global_variables.qmd_id,
-                                 print_status=True),
+                                 global_variables.port_number, 
+                                 global_variables.qmd_id,
+                                 print_status=False),
         "\n", global_variables.num_particles,
         " particles for", global_variables.num_experiments,
         "experiments and ", global_variables.num_times_bayes,
@@ -290,6 +298,8 @@ log_print(
     log_file
 
 )
+
+print("------ QMLA starting ------")
 
 qmd = QuantumModelLearningAgent(
     global_variables=global_variables,
