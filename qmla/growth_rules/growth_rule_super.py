@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import sys
 import os
-# sys.path.append(os.path.abspath('..'))
+import pickle
 
 import qmla.prior_distributions as Distributions
 import qmla.experiment_design_heuristics as experiment_design_heuristics
@@ -105,10 +105,10 @@ class GrowthRuleSuper():
         dict_for_storage = self.__dict__
         if path_to_pickle_config is not None: 
             pickle.dump(
+                dict_for_storage,
                 open(
-                    dict_for_storage, 'wb'
-                ), 
-                path_to_pickle_config
+                    path_to_pickle_config, 'wb'
+                )                
             )
         return dict_for_storage
 

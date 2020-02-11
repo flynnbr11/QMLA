@@ -18,9 +18,9 @@ from qmla import database_framework
 from qmla.quantum_model_learning_agent import QuantumModelLearningAgent  # QMD class in Library
 from qmla import redis_settings as rds
 
-# Parse input variables to use in QMD; store in class global_variables.
-global_variables = qmla.parse_cmd_line_args(sys.argv[1:])
-growth_class = global_variables.growth_class
+# Parse input variables to use in QMD; store in class qmla_controls.
+qmla_controls = qmla.parse_cmd_line_args(sys.argv[1:])
+growth_class = qmla_controls.growth_class
 
 ###  START QMD ###
 start = time.time()
@@ -59,19 +59,19 @@ print("Implement QMLA script")
 # Note this should usually be False, True just for testing/some specific plots.
 store_particles_weights = False
 
-log_file = global_variables.log_file
-# qle = global_variables.do_qle  # True for QLE, False for IQLE
+log_file = qmla_controls.log_file
+# qle = qmla_controls.do_qle  # True for QLE, False for IQLE
 
 log_print(
     [
         "probe_max_num_qubits_all_growth_rules:", 
-        global_variables.probe_max_num_qubits_all_growth_rules
+        qmla_controls.probe_max_num_qubits_all_growth_rules
     ],
     log_file = log_file
 )
 growth_class.generate_probes(
-    probe_maximum_number_qubits = global_variables.probe_max_num_qubits_all_growth_rules, 
-    experimental_data=global_variables.use_experimental_data,
+    probe_maximum_number_qubits = qmla_controls.probe_max_num_qubits_all_growth_rules, 
+    experimental_data=qmla_controls.use_experimental_data,
     noise_level=growth_class.probe_noise_level,
     minimum_tolerable_noise=0.0,
 )
@@ -86,7 +86,7 @@ log_print(
 )
 
 probes_dir = str(
-    global_variables.results_directory
+    qmla_controls.results_directory
     + 'training_probes/'
 )
 if not os.path.exists(probes_dir):
@@ -114,12 +114,12 @@ if not os.path.exists(probes_dir):
         # if already exists (ie created by another QMD since if test ran...)
         pass
 
-if global_variables.use_experimental_data: 
-    dataset = global_variables.dataset
+if qmla_controls.use_experimental_data: 
+    dataset = qmla_controls.dataset
     log_print(
         [
             "[EXP] For  growth rule {}; use dataset {}".format(
-                global_variables.growth_generation_rule, dataset
+                qmla_controls.growth_generation_rule, dataset
             )
         ],
         log_file=log_file
@@ -130,9 +130,9 @@ if global_variables.use_experimental_data:
     expec_val_plot_max_time = max(
         list(experimental_measurements_dict.keys())
     )
-    # expec_val_plot_max_time = global_variables.data_max_time
+    # expec_val_plot_max_time = qmla_controls.data_max_time
 else:
-    expec_val_plot_max_time = global_variables.data_max_time
+    expec_val_plot_max_time = qmla_controls.data_max_time
     experimental_measurements_dict = None
 
 num_datapoints_to_plot = 300
@@ -146,7 +146,7 @@ raw_times = list(np.linspace(
 )
 plot_times = [np.round(a, 2) for a in raw_times]
 plot_times = sorted(plot_times)
-if global_variables.use_experimental_data == True:
+if qmla_controls.use_experimental_data == True:
     plot_times = sorted(
         list(experimental_measurements_dict.keys())
     )
@@ -160,18 +160,18 @@ log_print(
     log_file=log_file
 )
 
-true_op = global_variables.true_model
+true_op = qmla_controls.true_model
 true_num_qubits = database_framework.get_num_qubits(true_op)
 true_op_list = database_framework.get_constituent_names_from_name(true_op)
 true_op_matrices = [database_framework.compute(t) for t in true_op_list]
 num_params = len(true_op_list)
-true_expectation_value_path = global_variables.true_expec_path
-true_ham = global_variables.true_hamiltonian
+true_expectation_value_path = qmla_controls.true_expec_path
+true_ham = qmla_controls.true_hamiltonian
 
 if os.path.isfile(true_expectation_value_path) == False:
     true_expec_values = {}
     plot_probe_dict = pickle.load(
-        open(global_variables.probes_plot_file, 'rb')
+        open(qmla_controls.probes_plot_file, 'rb')
     )
     probe = plot_probe_dict[true_num_qubits]
     log_print(
@@ -183,7 +183,7 @@ if os.path.isfile(true_expectation_value_path) == False:
         ],
         log_file
     )
-    if global_variables.use_experimental_data == True:
+    if qmla_controls.use_experimental_data == True:
         true_expec_values = experimental_measurements_dict
     else:
         log_print(
@@ -231,10 +231,10 @@ else:
 
 model_priors = None
 
-if global_variables.further_qhl == True:
+if qmla_controls.further_qhl == True:
 
     qmd_results_model_scores_csv = str(
-        global_variables.results_directory
+        qmla_controls.results_directory
         + 'average_priors.p'
     )
     print("QMD results CSV in ", qmd_results_model_scores_csv)
@@ -255,25 +255,25 @@ if global_variables.further_qhl == True:
 num_ops = len(first_layer_models)
 do_qhl_plots = False  # testing posterior transition # TODO turn off usually
 
-results_directory = global_variables.results_directory
-long_id = global_variables.long_id
+results_directory = qmla_controls.results_directory
+long_id = qmla_controls.long_id
 
 log_print(
     [
-        "\n QMD id", global_variables.qmd_id,
-        " on host ", global_variables.host_name,
-        "and port", global_variables.port_number,
-        "has seed", rds.get_seed(global_variables.host_name,
-                                 global_variables.port_number, 
-                                 global_variables.qmd_id,
+        "\n QMD id", qmla_controls.qmd_id,
+        " on host ", qmla_controls.host_name,
+        "and port", qmla_controls.port_number,
+        "has seed", rds.get_seed(qmla_controls.host_name,
+                                 qmla_controls.port_number, 
+                                 qmla_controls.qmd_id,
                                  print_status=False),
-        "\n", global_variables.num_particles,
-        " particles for", global_variables.num_experiments,
-        "experiments and ", global_variables.num_times_bayes,
-        # "bayes updates\n Gaussian=", global_variables.gaussian,
-        "\n RQ=", global_variables.use_rq, "RQ log:",
-        global_variables.log_file, "\n Bayes CSV:",
-        global_variables.cumulative_csv
+        "\n", qmla_controls.num_particles,
+        " particles for", qmla_controls.num_experiments,
+        "experiments and ", qmla_controls.num_times_bayes,
+        # "bayes updates\n Gaussian=", qmla_controls.gaussian,
+        "\n RQ=", qmla_controls.use_rq, "RQ log:",
+        qmla_controls.log_file, "\n Bayes CSV:",
+        qmla_controls.cumulative_csv
     ],
     log_file
 )
@@ -283,11 +283,11 @@ Launch and run QMD
 """
 
 generators = [
-    global_variables.growth_generation_rule,
+    qmla_controls.growth_generation_rule,
 ]
 
 generators.extend(
-    global_variables.alternative_growth_rules
+    qmla_controls.alternative_growth_rules
 )
 generators = list(set(generators))
 
@@ -302,7 +302,7 @@ log_print(
 print("------ QMLA starting ------")
 
 qmd = QuantumModelLearningAgent(
-    global_variables=global_variables,
+    qmla_controls=qmla_controls,
     generator_list=generators,
     first_layer_models=first_layer_models,
     probe_dict=system_probes,
@@ -312,7 +312,7 @@ qmd = QuantumModelLearningAgent(
     plot_times=plot_times,
 )
 
-if global_variables.qhl_test:
+if qmla_controls.qhl_test:
     qmd.run_quantum_hamiltonian_learning()
     log_print(
         [
@@ -320,18 +320,18 @@ if global_variables.qhl_test:
         ],
         log_file
     )
-    if global_variables.pickle_qmd_class:
+    if qmla_controls.pickle_qmd_class:
         log_print(
             [
                 "QMD complete. Pickling result to",
-                global_variables.class_pickle_file
+                qmla_controls.class_pickle_file
             ], log_file
         )
         qmd.delete_unpicklable_attributes()
-        with open(global_variables.class_pickle_file, "wb") as pkl_file:
+        with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file, protocol=4)
 
-    if global_variables.save_plots:
+    if qmla_controls.save_plots:
         try:
             log_print(
                 [
@@ -342,9 +342,9 @@ if global_variables.qhl_test:
             qmd.plot_parameter_learning_single_model(
                 true_model=True,
                 save_to_file=str(
-                    global_variables.plots_directory +
+                    qmla_controls.plots_directory +
                     'qhl_parameter_estimates_' +
-                    str(global_variables.long_id) +
+                    str(qmla_controls.long_id) +
                     '.png'
                 )
             )
@@ -360,9 +360,9 @@ if global_variables.qhl_test:
             )
             qmd.plot_volume_after_qhl(
                 save_to_file=str(
-                    global_variables.plots_directory +
+                    qmla_controls.plots_directory +
                     'qhl_volume_' +
-                    str(global_variables.long_id) +
+                    str(qmla_controls.long_id) +
                     '.png'
                 )
             )
@@ -377,9 +377,9 @@ if global_variables.qhl_test:
 
         qmd.plot_branch_champs_quadratic_losses(
             save_to_file=str(
-                global_variables.plots_directory +
+                qmla_controls.plots_directory +
                 'qhl_quadratic_loss_'
-                + str(global_variables.long_id) + '.png'
+                + str(qmla_controls.long_id) + '.png'
             )
         )
 
@@ -398,9 +398,9 @@ if global_variables.qhl_test:
         include_param_estimates_in_dynamics_plots=True,
         include_times_learned_in_dynamics_plots=True,
         save_to_file=str(
-            global_variables.plots_directory +
+            qmla_controls.plots_directory +
             'dynamics_' +
-            str(global_variables.long_id) +
+            str(qmla_controls.long_id) +
             '.png'
         )
     )
@@ -431,14 +431,14 @@ if global_variables.qhl_test:
         include_param_estimates_in_dynamics_plots=False,
         include_times_learned_in_dynamics_plots=False,
         save_to_file=str(
-            global_variables.plots_directory +
+            qmla_controls.plots_directory +
             'extended_dynamics_' +
-            str(global_variables.long_id) +
+            str(qmla_controls.long_id) +
             '.png'
         )
     )
 
-    results_file = global_variables.results_file
+    results_file = qmla_controls.results_file
     pickle.dump(
         qmd.champion_results,
         open(results_file, "wb"),
@@ -446,11 +446,11 @@ if global_variables.qhl_test:
     )
 
 elif (
-    global_variables.further_qhl == True
-    or global_variables.qhl_mode_multiple_models == True
+    qmla_controls.further_qhl == True
+    or qmla_controls.qhl_mode_multiple_models == True
 ):
 
-    if global_variables.qhl_mode_multiple_models == True:
+    if qmla_controls.qhl_mode_multiple_models == True:
         qhl_models = growth_class.qhl_models
         # output_prefix = 'multi_qhl_'
         output_prefix = ''  # TODO make so that this can have an output prefix
@@ -479,37 +479,37 @@ elif (
 
     qmd.plot_branch_champions_dynamics(
         save_to_file=str(
-            global_variables.plots_directory +
+            qmla_controls.plots_directory +
             'dynamics_' +
-            str(global_variables.long_id) +
+            str(qmla_controls.long_id) +
             '.png'
         )
     )
 
-    if global_variables.pickle_qmd_class:
+    if qmla_controls.pickle_qmd_class:
         log_print(
             [
                 "QMD complete. Pickling result to",
-                global_variables.class_pickle_file
+                qmla_controls.class_pickle_file
             ],
             log_file
         )
         qmd.delete_unpicklable_attributes()
-        with open(global_variables.class_pickle_file, "wb") as pkl_file:
+        with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file, protocol=4)
 
-    # results_file = global_variables.results_file
+    # results_file = qmla_controls.results_file
 
     for mid in model_ids:
         mod = qmd.get_model_storage_instance_by_id(mid)
         name = mod.model_name
 
         results_file = str(
-            global_variables.results_directory +
+            qmla_controls.results_directory +
             output_prefix +
             'results_' +
             str(name) + '_' +
-            str(global_variables.long_id) +
+            str(qmla_controls.long_id) +
             '.p'
         )
         print("[Exp] results file:", results_file)
@@ -543,19 +543,19 @@ else:
     #     max_time = expec_val_plot_max_time, #in microsec
     #     t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
     #     save_to_file=str(
-    #     global_variables.plots_directory+
-    #     'expec_values_'+str(global_variables.long_id)+'.png')
+    #     qmla_controls.plots_directory+
+    #     'expec_values_'+str(qmla_controls.long_id)+'.png')
     # )
-    if global_variables.growth_generation_rule == 'NV_centre_experiment_debug':
+    if qmla_controls.growth_generation_rule == 'NV_centre_experiment_debug':
         plot_dynamics_all_models = True
     else:
         plot_dynamics_all_models = False
     qmd.plot_branch_champions_dynamics(
         all_models=plot_dynamics_all_models,
         save_to_file=str(
-            global_variables.plots_directory +
+            qmla_controls.plots_directory +
             'dynamics_' +
-            str(global_variables.long_id) +
+            str(qmla_controls.long_id) +
             '.png'
         )
     )
@@ -580,33 +580,33 @@ else:
         include_param_estimates_in_dynamics_plots=False,
         include_times_learned_in_dynamics_plots=False,
         save_to_file=str(
-            global_variables.plots_directory +
+            qmla_controls.plots_directory +
             'extended_dynamics_' +
-            str(global_variables.long_id) +
+            str(qmla_controls.long_id) +
             '.png'
         )
     )
 
-    if global_variables.save_plots:
+    if qmla_controls.save_plots:
         try:
             print("plot_branch_champs_volumes")
             qmd.plot_branch_champs_volumes(
                 save_to_file=str(
-                    global_variables.plots_directory +
-                    'volumes_all_models_' + str(global_variables.long_id) + '.png')
+                    qmla_controls.plots_directory +
+                    'volumes_all_models_' + str(qmla_controls.long_id) + '.png')
             )
             print("plotExpecValues2")
             qmd.plot_branch_champs_volumes(
                 branch_champions=True,
-                save_to_file=str(global_variables.plots_directory +
-                                 'volumes_branch_champs_' + str(global_variables.long_id) +
+                save_to_file=str(qmla_controls.plots_directory +
+                                 'volumes_branch_champs_' + str(qmla_controls.long_id) +
                                  '.png')
             )
             print("plotQuadLoss")
             qmd.plot_branch_champs_quadratic_losses(
                 save_to_file=str(
-                    global_variables.plots_directory +
-                    'quadratic_loss_' + str(global_variables.long_id) +
+                    qmla_controls.plots_directory +
+                    'quadratic_loss_' + str(qmla_controls.long_id) +
                     '.png'
                 )
             )
@@ -627,9 +627,9 @@ else:
                 qmd.plot_parameter_learning_single_model(
                     model_id=qmd.true_model_id,
                     save_to_file=str(
-                        global_variables.plots_directory +
+                        qmla_controls.plots_directory +
                         'true_model_parameter_estimates_' +
-                        str(global_variables.long_id) +
+                        str(qmla_controls.long_id) +
                         '.png'
                     )
                 )
@@ -644,8 +644,8 @@ else:
                     print("plot_parameter_learning_single_model champ id != true id")
                     qmd.plot_parameter_learning_single_model(
                         model_id=qmd.champion_model_id,
-                        save_to_file=str(global_variables.plots_directory +
-                                         'champ_model_parameter_estimates_' + str(global_variables.long_id) +
+                        save_to_file=str(qmla_controls.plots_directory +
+                                         'champ_model_parameter_estimates_' + str(qmla_controls.long_id) +
                                          '.png')
                     )
                 except BaseException:
@@ -660,8 +660,8 @@ else:
                 print("else plot_parameter_learning_single_model")
                 qmd.plot_parameter_learning_single_model(
                     model_id=qmd.champion_model_id,
-                    save_to_file=str(global_variables.plots_directory +
-                                     'champ_model_parameter_estimates_' + str(global_variables.long_id) +
+                    save_to_file=str(qmla_controls.plots_directory +
+                                     'champ_model_parameter_estimates_' + str(qmla_controls.long_id) +
                                      '.png')
                 )
             except BaseException:
@@ -675,16 +675,16 @@ else:
         # not finding TrueModelID when using ising_hyperfine generation rule
         qmd.plot_qmla_radar_scores(
             save_to_file=str(
-            global_variables.plots_directory+
-            'radar_'+ str(global_variables.long_id)+ '.png')
+            qmla_controls.plots_directory+
+            'radar_'+ str(qmla_controls.long_id)+ '.png')
         )
         """
         print("store_bayes_factors_to_csv")
 
         qmd.store_bayes_factors_to_csv(
             save_to_file=str(
-                global_variables.results_directory +
-                'bayes_factors_' + str(global_variables.long_id) + '.csv'
+                qmla_controls.results_directory +
+                'bayes_factors_' + str(qmla_controls.long_id) + '.csv'
             ),
             names_ids='latex'
         )
@@ -696,21 +696,21 @@ else:
             qmd.plot_qmla_tree(
                 only_adjacent_branches=False,
                 save_to_file=str
-                (global_variables.plots_directory +
+                (qmla_controls.plots_directory +
                  'tree_diagram_' +
-                 str(global_variables.long_id) +
+                 str(qmla_controls.long_id) +
                  '.png')
             )
         except BaseException:
-            print("Failed to plot tree for ", global_variables.long_id)
+            print("Failed to plot tree for ", qmla_controls.long_id)
             raise
 
         try:
             print("plot_r_squared_by_epoch_for_model_list")
             qmd.plot_r_squared_by_epoch_for_model_list(
                 save_to_file=str(
-                    global_variables.plots_directory +
-                    'r_squared_by_epoch_' + str(global_variables.long_id) +
+                    qmla_controls.plots_directory +
+                    'r_squared_by_epoch_' + str(qmla_controls.long_id) +
                     '.png'
                 )
             )
@@ -725,25 +725,25 @@ else:
             )
 
     if (
-        global_variables.pickle_qmd_class
+        qmla_controls.pickle_qmd_class
         # or
-        # global_variables.true_model == qmd.champion_name_latex
+        # qmla_controls.true_model == qmd.champion_name_latex
     ):
         log_print(["QMD complete. Pickling result to",
-                   global_variables.class_pickle_file], log_file
+                   qmla_controls.class_pickle_file], log_file
                   )
         # pickle in cases where true model found
         qmd.delete_unpicklable_attributes()
-        with open(global_variables.class_pickle_file, "wb") as pkl_file:
+        with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file, protocol=4)
 
     # TODO generalise so tree diagram can be used in all cases
     # currently only useful for Ising growth 2 qubits.
     qmd.store_bayes_factors_to_shared_csv(
-        bayes_csv=str(global_variables.cumulative_csv)
+        bayes_csv=str(qmla_controls.cumulative_csv)
     )
 
-    results_file = global_variables.results_file
+    results_file = qmla_controls.results_file
     pickle.dump(
         qmd.champion_results,
         open(results_file, "wb"),
@@ -752,13 +752,13 @@ else:
 
 end = time.time()
 log_print(["Time taken:", end - start], log_file)
-log_print(["END: QMD id", global_variables.qmd_id, ":",
-           global_variables.num_particles, " particles;",
-           global_variables.num_experiments, "exp; ",
-           global_variables.num_times_bayes,
+log_print(["END: QMD id", qmla_controls.qmd_id, ":",
+           qmla_controls.num_particles, " particles;",
+           qmla_controls.num_experiments, "exp; ",
+           qmla_controls.num_times_bayes,
            "bayes. Time:", end - start
            ],
           log_file
           )
 
-print("QMD finished - results in:", global_variables.results_directory)
+print("QMD finished - results in:", qmla_controls.results_directory)

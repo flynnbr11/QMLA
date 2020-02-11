@@ -175,15 +175,6 @@ class ControlsQMLA():
                 pass
 
         self.long_id = '{0:03d}'.format(self.qmd_id)
-        path_to_store_configurations = self.results_directory + "growth_rule_configs_{}.p".format(self.long_id)
-        self.all_growth_rule_configs = {
-            gr : self.unique_growth_rule_instances[gr].store_growth_rule_configuration()
-            for gr in self.unique_growth_rule_instances
-        }
-        pickle.dump(
-            self.all_growth_rule_configs,
-            open(path_to_store_configurations, 'wb')
-        )
 
 
         if self.further_qhl == True:

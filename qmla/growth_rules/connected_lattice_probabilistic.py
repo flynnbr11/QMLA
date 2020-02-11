@@ -30,7 +30,7 @@ class ConnectedLatticeProbabilistic(
             **kwargs
         )
         self.weighted_fitnesses = {}
-        self.fitness_minimum = 0 # TODO this is overwritten by default set in parent class -- add to setup?
+        self.fitness_minimum = 0
         self.fitness_maximum = 1
 
     def generate_models(
@@ -74,7 +74,6 @@ class ConnectedLatticeProbabilistic(
                 # increase generation idx; add site; get newly available terms;
                 # add greedily as above
                 self.new_generation()
-                # starting_new_generation = True
 
             if self.spawn_stage[-1] is None:
                 # new models given by models_to_build_on plus terms in
@@ -83,11 +82,7 @@ class ConnectedLatticeProbabilistic(
                     models_to_build_on=models_to_build_on,
                     available_terms=self.available_mods_by_generation[self.generation_DAG],
                     model_names_ids=kwargs['model_names_ids'],
-                    # model_points=model_points
                 )
-
-            # if starting_new_generation == True and self.spawn_stage[-1]!='Complete':
-            #     self.spawn_stage.append('start_of_new_generation')          
 
         new_models = [
             qmla.database_framework.alph(mod)
@@ -199,8 +194,10 @@ class ConnectedLatticeProbabilistic(
             for mod in this_subgen_models: 
                 weighted_f = corresponding_weight * this_subgen_fitnesses[mod]
                 weighted_f = self.rescale_fitness(
+                    # TODO double check this is what we want to do 
+                    # meant to rescale (0,1) -> (fitness_min, 1)
                     weighted_f,
-                    original_min = self.fitness_minimum, 
+                    # original_min = self.fitness_minimum, 
                     rescaled_min = self.fitness_minimum
                 )
                 if mod not in list(weighted_fitnesses.keys()):

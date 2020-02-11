@@ -1,9 +1,5 @@
 import numpy as np
-# import random
 import pickle
-# import argparse
-# import os
-# import matplotlib.pyplot as plt
 
 import qmla.database_framework as database_framework
 import qmla.prior_distributions as distributions

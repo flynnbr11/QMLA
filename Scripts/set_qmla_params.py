@@ -154,27 +154,23 @@ growth_class_attributes = {
     'log_file': log_file
 }
 
-growth_class = qmla.get_growth_generator_class(
-    growth_generation_rule=growth_generation_rule,
-    **growth_class_attributes
-    # use_experimental_data = exp_data
-)
-
 all_growth_classes = [growth_generation_rule]
 alternative_growth_rules = arguments.alternative_growth_rules
 all_growth_classes.extend(alternative_growth_rules)
 all_growth_classes = list(set(all_growth_classes))
 
-# this section just gets the max number of qubits to generate a plot probe for
-max_num_qubits_for_probes = [
-    qmla.get_growth_generator_class(
-            growth_generation_rule=g,
+unique_growth_classes = {
+    gr : qmla.get_growth_generator_class(
+            growth_generation_rule=gr,
             **growth_class_attributes
-    ).max_num_probe_qubits
-    for g in all_growth_classes
-]
+    ) for gr in all_growth_classes
+}
+
+growth_class = unique_growth_classes[growth_generation_rule]
 probe_max_num_qubits_all_growth_rules = max( 
-    max_num_qubits_for_probes
+    [
+        gr.max_num_probe_qubits for gr in unique_growth_classes.values()
+    ]
 )
 
 true_model = growth_class.true_model
@@ -190,7 +186,7 @@ true_prior_plot_file = str(
 true_prior = growth_class.get_prior(
     model_name=true_model,
     log_file=log_file,
-    log_identifier='[SetQHLParams]'
+    log_identifier='[Set QMLA params script]'
 )
 prior_data = {
     'true_prior': true_prior
@@ -244,3 +240,17 @@ if probes_plot_file is not None:
         plot_probe_dict,
         open(probes_plot_file, 'wb')
     )
+
+# store growth rule config to share with all instances in this run
+path_to_store_configs = os.path.join(
+    results_directory, 
+    'growth_rule_config.p'
+)
+growth_rule_configurations = {
+    gr : unique_growth_classes[gr].store_growth_rule_configuration()
+    for gr in unique_growth_classes
+}
+pickle.dump(
+    growth_rule_configurations,
+    open(path_to_store_configs, 'wb')
+)

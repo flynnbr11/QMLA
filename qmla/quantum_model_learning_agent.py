@@ -52,7 +52,7 @@ class QuantumModelLearningAgent():
     """
 
     def __init__(self,
-                 global_variables,  # TODO make default global variables class available
+                 qmla_controls,  # TODO make default global variables class available
                  generator_list=[],
                  first_layer_models=['x'],
                  probe_dict=None,
@@ -69,7 +69,7 @@ class QuantumModelLearningAgent():
         self._start_time = time.time()  # to measure run-time
 
         # Configure this QMLA instance
-        self.qmla_controls = global_variables
+        self.qmla_controls = qmla_controls
         self.growth_class = self.qmla_controls.growth_class
 
         # Basic settings, path definitions etc

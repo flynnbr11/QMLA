@@ -75,8 +75,8 @@ git_commit=$(git rev-parse HEAD)
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='IsingProbabilistic'
-sim_growth_rule='IsingPredetermined'
-# sim_growth_rule='HeisenbergXYZPredetermined'
+# sim_growth_rule='IsingPredetermined'
+sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
@@ -106,8 +106,8 @@ fi
 
 alt_growth_rules=(
     # 'IsingPredetermined'
-    'IsingProbabilistic'
-    # 'HeisenbergXYZProbabilistic'
+    # 'IsingProbabilistic'
+    'HeisenbergXYZProbabilistic'
     # 'HeisenbergXYZPredetermined'
     # 'FermiHubbardPredetermined' 
     # 'FermiHubbardProbabilistic' 
@@ -337,7 +337,6 @@ then
             -resource=$reallocate_resources \
             -ggr=$growth_rule \
             $growth_rules_command 
-            # -prtwt=$store_prt_wt \
     done
     echo "
     cd $full_path_to_results
