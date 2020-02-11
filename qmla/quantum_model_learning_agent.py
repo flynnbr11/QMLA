@@ -1517,21 +1517,15 @@ class QuantumModelLearningAgent():
 
     def perform_final_bayes_comparisons(
         self,
-        # bayes_threshold=None
     ):
-        # if bayes_threshold is None:
-        #     bayes_threshold = self.bayes_threshold_upper
 
         bayes_factors_db = self.redis_databases['bayes_factors_db']
-        # branch_champions = list(self.branch_champions.values())
         branch_champions = self.branch_champs_active_list
         job_list = []
         job_finished_count = 0
         # if a spawned model is this much better than its parent, parent is
         # deactivated
         interbranch_collapse_threshold = 1e5  # to justify deactivating a parent/child
-        # interbranch_collapse_threshold = 3 ## if a spawned model is this much
-        # better than its parent, parent is deactivated
         num_champs = len(branch_champions)
 
         self.log_print(
@@ -1542,7 +1536,6 @@ class QuantumModelLearningAgent():
         )
         children_branches = list(self.branch_parents.keys())
         for child_id in branch_champions:
-            # child_id = branch_champions[k]
             # branch this child sits on
             child_branch = self.models_branches[child_id]
 
@@ -1632,7 +1625,6 @@ class QuantumModelLearningAgent():
         # now deactivate parent/children based on those bayes factors
         models_to_remove = []
         for child_id in branch_champions:
-            # child_id = branch_champions[k]
             # branch this child sits on
             child_branch = self.models_branches[child_id]
             try:
@@ -1715,10 +1707,6 @@ class QuantumModelLearningAgent():
                 self.log_print(
                     [
                         "child doesn't have active parent",
-                        # "\t child id ", child_id,
-                        # "\t parent id ", parent_id,
-                        # "\n\tchild branch:", child_branch,
-                        # "\tparent branch:", parent_branch
                     ]
                 )
                 self.log_print(
@@ -1736,9 +1724,6 @@ class QuantumModelLearningAgent():
                 "Parent/child comparisons and deactivations complete."
             ]
         )
-        # for k in range(num_champs - 1):
-        #     mod1 = branch_champions[k]
-        #     mod2 = branch_champions[k+1]
         self.log_print(
             [
                 "Active branch champs after ",

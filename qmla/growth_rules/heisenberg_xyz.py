@@ -57,7 +57,7 @@ class HeisenbergXYZProbabilistic(
         self.num_top_models_to_build_on =  'all'
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
-        self.fitness_minimum = 0.15
+        self.fitness_minimum = 0.0
         self.fitness_maximum = 1.0
         self.min_param = 0
         self.max_param = 1
@@ -67,10 +67,12 @@ class HeisenbergXYZProbabilistic(
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10
         self.max_num_models_by_shape = {
-            1: 0,
-            2: 30,
-            3: 30,
-            4: 30,
+            1 : 0,
+            2: 10,
+            3: 10,
+            # 2: 30,
+            # 3: 30,
+            # 4: 30,
             'other': 0
         }
 
