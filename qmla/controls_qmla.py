@@ -141,8 +141,8 @@ class ControlsQMLA():
         # create some new parameters
         if self.results_directory[-1] != '/':
             self.results_directory += '/'
-        self.plots_directory = self.results_directory + 'plots/'
 
+        self.plots_directory = self.results_directory + 'plots/'
         if not os.path.exists(self.results_directory):
             try:
                 os.makedirs(self.results_directory)
@@ -156,6 +156,17 @@ class ControlsQMLA():
                 pass
 
         self.long_id = '{0:03d}'.format(self.qmd_id)
+        path_to_store_configurations = self.results_directory + "growth_rule_configs_{}.p".format(self.long_id)
+        self.all_growth_rule_configs = {
+            gr : self.unique_growth_rule_instances[gr].store_growth_rule_configuration()
+            for gr in self.unique_growth_rule_instances
+        }
+        pickle.dump(
+            self.all_growth_rule_configs,
+            open(path_to_store_configurations, 'wb')
+        )
+
+
         if self.further_qhl == True:
             self.results_file = self.results_directory + 'further_qhl_results_' + \
                 str(self.long_id) + '.p'  # for pickling results into

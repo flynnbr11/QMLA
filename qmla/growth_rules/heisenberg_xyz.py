@@ -57,7 +57,7 @@ class HeisenbergXYZProbabilistic(
         self.num_top_models_to_build_on =  'all'
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
-        self.fitness_minimum = 0.0
+        self.fitness_minimum = 0.25
         self.fitness_maximum = 1.0
         self.min_param = 0
         self.max_param = 1

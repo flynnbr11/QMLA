@@ -18,10 +18,9 @@ class GrowthRuleSuper():
     def __init__(
         self,
         growth_generation_rule,
+        configuration=None, 
         **kwargs
     ):
-        # print("[GrowthRulesuper] init. kwargs", kwargs)
-
         self.growth_generation_rule = growth_generation_rule
         if 'use_experimental_data' in kwargs:
             self.use_experimental_data = kwargs['use_experimental_data']
@@ -31,7 +30,7 @@ class GrowthRuleSuper():
         if 'log_file' in kwargs:
             self.log_file = kwargs['log_file']
         else:
-            self.log_file = '.default_qmd_log.log'
+            self.log_file = '.default_qmla_log.log'
 
         # by changing the function object these point to,
         # determine how probes are generated and expectation values are computed
@@ -97,6 +96,21 @@ class GrowthRuleSuper():
         self.true_model_terms_params = {
             # term : true_param
         }
+
+    def store_growth_rule_configuration(
+        self, 
+        path_to_pickle_config = None,
+        **kwargs
+    ):
+        dict_for_storage = self.__dict__
+        if path_to_pickle_config is not None: 
+            pickle.dump(
+                open(
+                    dict_for_storage, 'wb'
+                ), 
+                path_to_pickle_config
+            )
+        return dict_for_storage
 
     def overwrite_growth_class_methods(
         self,
