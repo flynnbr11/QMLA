@@ -1,7 +1,7 @@
 import sys
 import os
 
-from qmla.growth_rules import nv_centre_full_access
+from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
 from qmla import experiment_design_heuristics
 from qmla import probe_set_generation
 from qmla import expectation_values

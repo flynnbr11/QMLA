@@ -1,4 +1,4 @@
-from qmla.growth_rules import nv_centre_experiment
+from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_experiment
 
 class ExperimentNVCentreNoTransvereTerms(
         nv_centre_experiment.ExperimentNVCentre
