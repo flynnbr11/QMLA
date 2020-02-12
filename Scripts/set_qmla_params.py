@@ -244,7 +244,7 @@ if probes_plot_file is not None:
 # store growth rule config to share with all instances in this run
 path_to_store_configs = os.path.join(
     results_directory, 
-    'growth_rule_config.p'
+    'growth_rule_configs.p'
 )
 growth_rule_configurations = {
     gr : unique_growth_classes[gr].store_growth_rule_configuration()
