@@ -28,7 +28,7 @@ class HeisenbergXYZProbabilistic(
             **kwargs
         )
 
-        self.lattice_dimension = 1
+        self.lattice_dimension = 2
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
@@ -40,15 +40,15 @@ class HeisenbergXYZProbabilistic(
         # self.true_model_partially_connected = 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_zJz_d3'
         # self.true_model_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_model_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_2J4_d4'
-        self.four_site_x = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_yJy_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_yJy_d4'
-        self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_yJy_d3PPPpauliSet_2J3_zJz_d3'
-        self.max_num_sites = 3
+        self.four_site_xxz = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
+        self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_zJz_d3'
+        self.max_num_sites = 4
         self.true_model = self.three_site_chain_xxz
         self.true_model = database_framework.alph(self.true_model)
         self.qhl_models = [self.true_model]
         self.base_terms = [
             'x',
-            'y',
+            # 'y',
             'z'
         ]
         self.max_time_to_consider = 20
@@ -57,7 +57,7 @@ class HeisenbergXYZProbabilistic(
         self.num_top_models_to_build_on =  'all'
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
-        self.fitness_minimum = 0.5
+        self.fitness_minimum = 0.25
         self.fitness_maximum = 1.0
         self.min_param = 0
         self.max_param = 1
@@ -106,7 +106,7 @@ class HeisenbergXYZPredetermined(
             'other': 0
         }
         self.max_num_qubits = 3
-        self.max_num_sites = 4
+        self.max_num_sites = 5
         self.setup_growth_class()
         self.min_param = 0
         self.max_param = 1

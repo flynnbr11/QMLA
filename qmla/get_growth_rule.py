@@ -59,8 +59,11 @@ def get_growth_generator_class(
     # in some plotting functions this is not known, but it should not matter unless
     # called to get probes etc.
 
-    # print("Trying to find growth class for ", growth_generation_rule)
-    # print("kwargs:", kwargs)
+    try:
+        log_file = kwargs['log_file']
+    except:
+        log_file = '.default_qmd.log'
+
     try:
         gr = growth_classes[growth_generation_rule](
             growth_generation_rule=growth_generation_rule,

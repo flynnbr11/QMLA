@@ -14,7 +14,6 @@ from qmla import database_framework
 class Lindbladian(
     growth_rule_super.GrowthRuleSuper
 ):
-
     def __init__(
         self,
         growth_generation_rule,

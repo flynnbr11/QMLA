@@ -8,17 +8,19 @@ import qmla.experiment_design_heuristics as experiment_design_heuristics
 import qmla.probe_set_generation as probe_set_generation
 import qmla.expectation_values as expectation_values
 import qmla.database_framework as database_framework
+from qmla.growth_rules.growth_rule_decorator import GrowthRuleDecorator
 
 __all__ = [
     'GrowthRuleSuper'
 ]
 
+# @GrowthRuleDecorator
 class GrowthRuleSuper():
     # superclass for growth generation rules
     def __init__(
         self,
         growth_generation_rule,
-        configuration=None, 
+        # configuration=None, 
         **kwargs
     ):
         self.growth_generation_rule = growth_generation_rule
@@ -32,6 +34,9 @@ class GrowthRuleSuper():
         else:
             self.log_file = '.default_qmla_log.log'
 
+        self.assign_parameters()
+
+    def assign_parameters(self):
         # by changing the function object these point to,
         # determine how probes are generated and expectation values are computed
         # these can be directly overwritten within class definition
@@ -60,6 +65,7 @@ class GrowthRuleSuper():
         # max_spawn_depth is the maximum number of spawns/branches in a run
         self.max_spawn_depth = 10
         self.max_num_qubits = 5
+        self.max_num_probe_qubits = 6
         # self.max_num_probe_qubits = 5  # TODO remove dependency on this -- it is not needed
         self.max_time_to_consider = 15  # arbitrary time units
         self.num_top_models_to_build_on = 1
