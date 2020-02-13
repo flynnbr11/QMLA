@@ -40,10 +40,10 @@ class HeisenbergXYZProbabilistic(
         # self.true_model_partially_connected = 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_zJz_d3'
         # self.true_model_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4'
         self.true_model_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_1J3_d4PPPPpauliSet_yJy_2J4_d4'
-        self.four_site_xxz = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
+        self.four_site_xxz = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_xJx_zJz_d4PPPPpauliSet_3J4_zJz_d4'
         self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_zJz_d3'
         self.max_num_sites = 4
-        self.true_model = self.three_site_chain_xxz
+        self.true_model = self.four_site_xxz
         self.true_model = database_framework.alph(self.true_model)
         self.qhl_models = [self.true_model]
         self.base_terms = [
