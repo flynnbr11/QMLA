@@ -51,7 +51,7 @@ class HeisenbergXYZProbabilistic(
             'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4',
             'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_zJz_d4',
             'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_2J4_zJz_d4PPPPpauliSet_3J4_xJx_d4.png'
+            'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_2J4_zJz_d4PPPPpauliSet_3J4_xJx_d4'
         ]
         self.base_terms = [
             'x',
