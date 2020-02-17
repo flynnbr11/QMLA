@@ -4,7 +4,8 @@ import qmla.get_growth_rule as get_growth_rule
 def combine_analysis_plots(
     results_directory,
     output_file_name,
-    variables
+    variables,
+    include_all_pngs=False
 ):
     import re
     from fpdf import FPDF
@@ -81,18 +82,20 @@ def combine_analysis_plots(
         )
     pdf.set_text_color(r=0, g=0, b=0)  # reset to black
 
-    image_list = [
-        str(results_directory + a)
-        for a in os.listdir(results_directory)
-        if '.png' in a
-    ]
+    if include_all_pngs:
+        image_list = [
+            str(results_directory + a)
+            for a in os.listdir(results_directory)
+            if '.png' in a
+        ]
 
-    for new_img in image_list:
-        pdf.add_page()
-        pdf.image(
-            new_img,
-            w=200
-        )
+        for new_img in image_list:
+            pdf.add_page()
+            pdf.image(
+                new_img,
+                w=200
+            )
+
     output_file_name = str(
         output_desc + '_' + output_file_name
     )

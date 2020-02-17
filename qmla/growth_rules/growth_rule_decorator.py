@@ -1,8 +1,11 @@
 
 class GrowthRuleDecorator():
-    def __init__(self, growth_rule):
-        print("growth rule wrapper __init__")
+    def __init__(self, growth_rule, **kwargs):
+        print("growth rule decorator __init__. growth rule: ", growth_rule)
+        print("kwargs: ", kwargs)
         self.growth_rule = growth_rule
+        print("assigned self.growth_rule")
+
 
     def __call__(
         self, 
@@ -11,7 +14,7 @@ class GrowthRuleDecorator():
         # *args, 
         **kwargs
     ):
-        print("growth rule wrapper __call__")
+        print("growth rule decorator __call__. kwargs: ", kwargs )
         
         gr = self.growth_rule(
             growth_generation_rule = growth_generation_rule,

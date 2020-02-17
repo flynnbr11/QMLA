@@ -27,6 +27,7 @@ class ConnectedLattice(
         growth_generation_rule,
         **kwargs
     ):
+        print("Connected lattice __init__. kwargs: ", kwargs)
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             **kwargs
@@ -108,9 +109,10 @@ class ConnectedLattice(
             new_sites=range(1, self.topology.num_sites() + 1),
         )
         self.spawn_stage = ['Start']
-        self.initial_models = self.generate_models(
-            model_list=['']
-        )
+        if not self.tree_completed_initially:
+            self.initial_models = self.generate_models(
+                model_list=['']
+            )
 
         self.site_connections_considered = self.initially_connected_sites
         self.max_num_sub_generations_per_generation = {

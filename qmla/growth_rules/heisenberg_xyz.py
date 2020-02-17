@@ -151,23 +151,20 @@ class HeisenbergXYZPredetermined(
                 p_str = 'P' * system_size
                 models.append(p_str.join(terms))
 
-            self.initial_models = models
+            # self.initial_models = models
+            # testing models which win full search
+            self.initial_models = [
+                self.true_model, 
+                'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_1J3_xJx_d3PPPpauliSet_1J3_zJz_d3',
+                'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_2J4_zJz_d4PPPPpauliSet_3J4_xJx_d4',
+                'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_3J4_xJx_d4',
+                'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_xJx_d4'
+            ]
 
             if self.true_model not in self.initial_models:
                 self.log_print("Adding true operator to initial model list")
                 self.initial_models.append(self.true_model)
         
-        # Test set of models for 3-site chain -- overwrite above
-        self.initial_models = [
-            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_yJy_d3',
-            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_zJz_d3',
-            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_xJx_d3',
-            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3',
-            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_yJy_d3',
-            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_yJy_d3PPPpauliSet_2J3_zJz_d3',
-            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_yJy_d3',
-            'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3',
-        ]
         self.max_num_models_by_shape = {
             # Note dN here requires 2N qubits so d3 counts as shape 6
             3: 10,
