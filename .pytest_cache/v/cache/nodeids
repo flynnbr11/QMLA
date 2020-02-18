@@ -1,0 +1,4 @@
+[
+  "test_intro.py::test_basic",
+  "test_intro.py::test_qmla_growth_rule"
+]
