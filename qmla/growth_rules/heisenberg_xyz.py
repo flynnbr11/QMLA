@@ -72,6 +72,13 @@ class HeisenbergXYZProbabilistic(
         self.max_param = 1
         self.check_champion_reducibility = True
         self.generation_DAG = 1
+        self.true_model_terms_params = {
+            'pauliSet_1J2_xJx_d4': 0.27044671107574969, 
+            'pauliSet_1J3_zJz_d4': 1.1396665426731736, 
+            'pauliSet_2J4_xJx_d4': 0.38705331216054806, 
+            'pauliSet_3J4_xJx_d4': 0.46892509638460805, 
+            'pauliSet_3J4_zJz_d4': 0.45440765993845578
+        }
 
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10
@@ -178,6 +185,6 @@ class HeisenbergXYZPredetermined(
 
 
         self.max_num_models_by_shape = {
-            3: 10,
+            4: 6,
             'other': 0
         }

@@ -2,7 +2,7 @@ import time
 
 start = time.time()
 # import qmla
-import qmla.growth_rules
+# import qmla.growth_rules
 
 # import qmla.analysis
 # from qmla.database_framework import * 
