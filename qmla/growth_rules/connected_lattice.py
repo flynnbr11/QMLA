@@ -27,7 +27,7 @@ class ConnectedLattice(
         growth_generation_rule,
         **kwargs
     ):
-        print("Connected lattice __init__. kwargs: ", kwargs)
+        # print("Connected lattice __init__. kwargs: ", kwargs)
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             **kwargs

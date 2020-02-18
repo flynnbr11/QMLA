@@ -37,7 +37,7 @@ def remote_bayes_factor_calculation(
     bf_data_folder=None,
     times_record='BayesFactorsTimes.txt',
     check_db=False,
-    trueModel=None,
+    # trueModel=None,
     bayes_threshold=1,
     host_name='localhost',
     port_number=6379,

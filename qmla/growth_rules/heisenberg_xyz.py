@@ -33,6 +33,7 @@ class HeisenbergXYZProbabilistic(
         self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
+        self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
         self.max_num_sites = 4
 
         # self.true_model_partially_connected = 'pauliSet_xJx_1J2_d4PPPPpauliSet_yJy_1J2_d4PPPPpauliSet_xJx_2J3_d4PPPPpauliSet_yJy_3J4_d4PPPPpauliSet_zJz_3J4_d4PPPPpauliSet_yJy_1J4_d4'
@@ -75,12 +76,12 @@ class HeisenbergXYZProbabilistic(
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10
         self.max_num_models_by_shape = {
-            1 : 0,
-            2: 10,
-            3: 10,
-            # 2: 30,
-            # 3: 30,
-            # 4: 30,
+            # 1 : 0,
+            # 2: 10,
+            # 3: 10,
+            2: 30,
+            3: 30,
+            4: 30,
             'other': 0
         }
 
@@ -101,7 +102,7 @@ class HeisenbergXYZPredetermined(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.max_time_to_consider = 5
+        self.max_time_to_consider = 20
         self.tree_completed_initially = True
         self.num_processes_to_parallelise_over = 8
         self.max_num_models_by_shape = {
@@ -166,7 +167,6 @@ class HeisenbergXYZPredetermined(
                 self.initial_models.append(self.true_model)
         
         self.max_num_models_by_shape = {
-            # Note dN here requires 2N qubits so d3 counts as shape 6
             3: 10,
             'other': 0
         }

@@ -83,6 +83,7 @@ sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='Genetic'
 # sim_growth_rule='Presentation'
 # sim_growth_rule='ExperimentReducedNV'
+# sim_growth_rule='example'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1

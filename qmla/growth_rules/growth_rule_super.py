@@ -23,7 +23,7 @@ class GrowthRuleSuper():
         # configuration=None, 
         **kwargs
     ):
-        print("GrowthRuleSuper __init__. kwargs", kwargs)
+        # print("GrowthRuleSuper __init__. kwargs", kwargs)
         self.growth_generation_rule = growth_generation_rule
         if 'use_experimental_data' in kwargs:
             self.use_experimental_data = kwargs['use_experimental_data']

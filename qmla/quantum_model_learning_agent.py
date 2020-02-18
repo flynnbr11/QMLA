@@ -1036,7 +1036,7 @@ class QuantumModelLearningAgent():
                 times_record=self.bayes_factors_store_times_file,
                 bf_data_folder=self.bayes_factors_store_directory,
                 num_times_to_use=self.num_experiments_for_bayes_updates,
-                trueModel=self.true_model_name,
+                # trueModel=self.true_model_name,
                 bayes_threshold=self.bayes_threshold_lower,
                 host_name=self.redis_host_name,
                 port_number=self.redis_port_number,
@@ -1063,7 +1063,7 @@ class QuantumModelLearningAgent():
             remote_bayes_factor_calculation(
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
-                trueModel=self.true_model_name,
+                # trueModel=self.true_model_name,
                 bf_data_folder=self.bayes_factors_store_directory,
                 times_record=self.bayes_factors_store_times_file,
                 num_times_to_use=self.num_experiments_for_bayes_updates,

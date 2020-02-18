@@ -43,7 +43,8 @@ growth_classes = {
     'basic_lindbladian':
         GR.Lindbladian,
     'example':
-        GR.GrowthRuleTemplate,
+        GR.GrowthRuleSuper,
+        # GR.GrowthRuleTemplate,
     'Presentation':
         GR.PresentationPlotGeneration,
     'Genetic':
