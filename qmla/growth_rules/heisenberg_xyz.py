@@ -154,6 +154,7 @@ class HeisenbergXYZPredetermined(
 
             # self.initial_models = models
             # testing models which win full search
+            self.true_model = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
             self.initial_models = [
                 self.true_model, 
                 'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3PPPpauliSet_1J3_xJx_d3PPPpauliSet_1J3_zJz_d3',
@@ -162,10 +163,20 @@ class HeisenbergXYZPredetermined(
                 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_xJx_d4'
             ]
 
+            self.true_model_terms_params = {
+                'pauliSet_1J2_xJx_d4': 0.27044671107574969, 
+                'pauliSet_1J3_zJz_d4': 1.1396665426731736, 
+                'pauliSet_2J4_xJx_d4': 0.38705331216054806, 
+                'pauliSet_3J4_xJx_d4': 0.46892509638460805, 
+                'pauliSet_3J4_zJz_d4': 0.45440765993845578
+            }
+
             if self.true_model not in self.initial_models:
                 self.log_print("Adding true operator to initial model list")
                 self.initial_models.append(self.true_model)
         
+
+
         self.max_num_models_by_shape = {
             3: 10,
             'other': 0
