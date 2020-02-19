@@ -263,9 +263,6 @@ class ConnectedLattice(
             mod_name = self.match_dimension(
                 mod_name, self.topology.num_sites())
             present_terms = database_framework.get_constituent_names_from_name(mod_name)
-            print(
-                "Model {} has present terms {}".format(
-                    mod_name, present_terms))
             terms_to_add = list(
                 set(available_terms)
                 - set(present_terms)
@@ -558,8 +555,6 @@ def possible_pauli_combinations(base_terms, num_sites):
 
 
 def increase_dimension_pauli_set(initial_model, new_dimension=None):
-    print("[spin prob incr dim] initial model:",
-          initial_model, "new dim:", new_dimension)
     individual_terms = database_framework.get_constituent_names_from_name(initial_model)
     separate_terms = []
 

@@ -720,6 +720,7 @@ class ModelInstanceForStorage():
         model_id,
         model_terms_matrices,
         qid,
+        plot_probes=None, 
         host_name='localhost',
         port_number=6379,
         log_file='QMD_log.log',
@@ -747,9 +748,14 @@ class ModelInstanceForStorage():
         qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
-        self.probes_for_plots = pickle.load(
-            open(qmla_core_info_dict['probes_plot_file'], 'rb')
-        )
+        
+        if plot_probes is not None: 
+            self.probes_for_plots = plot_probes 
+        else: 
+            self.probes_for_plots = pickle.load(
+                open(qmla_core_info_dict['probes_plot_file'], 'rb')
+            )
+
         self.store_particle_locations_and_weights = qmla_core_info_dict[
             'store_particles_weights'
         ]
@@ -904,9 +910,11 @@ class ModelInstanceForStorage():
 
     def compute_expectation_values(
         self,
+        # plot_probes, 
         times=[],
     ):
         probe = self.probes_for_plots[self.probe_num_qubits]
+        # probe = plot_probes[self.probe_num_qubits]
         present_expec_val_times = sorted(
             list(self.expectation_values.keys())
         )

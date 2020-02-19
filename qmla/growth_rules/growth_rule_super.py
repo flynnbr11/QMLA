@@ -248,11 +248,16 @@ class GrowthRuleSuper():
         if probe_maximum_number_qubits is None: 
             probe_maximum_number_qubits = self.max_num_probe_qubits
 
-        return self.plot_probe_generation_function(
+        plot_probe_dict =  self.plot_probe_generation_function(
             max_num_qubits=probe_maximum_number_qubits,
             num_probes=1,
             **kwargs
         )
+        for k in list(plot_probe_dict.keys()):
+            # replace tuple like key returned, with just dimension.
+            plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
+
+        return plot_probe_dict
 
     @property
     def true_model_terms(self):

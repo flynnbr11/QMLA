@@ -162,7 +162,7 @@ if true_params_path is not None:
         )
     )
     true_params_dict = true_params_info['params_dict']
-    true_model = true_params_info['true_op']
+    true_model = true_params_info['true_model']
 else:
     true_params_dict = None
     true_model = true_growth_class.true_model
@@ -172,7 +172,7 @@ true_model_latex = true_growth_class.latex_name(
 
 
 if exp_data is False:
-    name = true_params_info['true_op']
+    name = true_params_info['true_model']
     terms = database_framework.get_constituent_names_from_name(name)
     params = []
     ops = []
@@ -295,7 +295,7 @@ for f in pickled_files:
 #         growth_classes[g] = None
 
 unique_growth_classes = {}
-unique_growth_rules = true_params_info['all_growth_classes']
+unique_growth_rules = true_params_info['all_growth_rules']
 for g in unique_growth_rules:
     try:
         unique_growth_classes[g] = qmla.get_growth_generator_class(

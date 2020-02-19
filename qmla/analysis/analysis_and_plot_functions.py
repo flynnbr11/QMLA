@@ -453,12 +453,6 @@ def plot_learned_models_dynamics(
             expec_vals = {}
             if dim > 4:
                 times_to_plot = times_to_plot[0::5]
-                print(
-                    "reducing number of times for plot:",
-                    times_to_plot
-                )
-            else:
-                print("Not reducing number of times for plots")
 
             times_to_plot = sorted(list(true_expec_vals.keys()))
             true_exp = [true_expec_vals[t] for t in times_to_plot]

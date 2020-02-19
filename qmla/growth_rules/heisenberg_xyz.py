@@ -34,13 +34,13 @@ class HeisenbergXYZProbabilistic(
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
         self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
-        self.max_num_sites = 3
+        self.max_num_sites = 4
 
-        self.true_model_partially_connected = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
-        # self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_xJx_d3PPPpauliSet_2J3_zJz_d3'
+        self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
+        self.four_site_xxz_chain = 'pauliSet_1J2_xJx_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_zJz_d4'
         self.four_site_xxz = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
         
-        self.true_model = self.true_model_partially_connected
+        self.true_model = self.four_site_xxz_chain
         self.true_model = database_framework.alph(self.true_model)
         self.qhl_models = [
             self.true_model,
@@ -58,7 +58,9 @@ class HeisenbergXYZProbabilistic(
         self.max_time_to_consider = 20
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # 'all' # at each generation Badassness parameter
-        self.num_top_models_to_build_on =  'all'
+
+        self.num_top_models_to_build_on =  1 # to test strict generation to ensure sensible paths occuring
+        # self.num_top_models_to_build_on =  'all'
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
         self.fitness_minimum = 0

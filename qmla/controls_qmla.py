@@ -67,6 +67,9 @@ class ControlsQMLA():
         )
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
+        self.generator_list = [self.growth_generation_rule]
+        self.generator_list.extend(self.alternative_growth_rules)
+        self.generator_list = list(set(self.generator_list))
         self.unique_growth_rule_instances = {
             gen : get_growth_rule.get_growth_generator_class(
                     growth_generation_rule = gen, 
@@ -91,12 +94,22 @@ class ControlsQMLA():
         )
 
         self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
-        self.true_params_pickle_file = arguments.true_params_pickle_file
+        
+        if arguments.true_params_pickle_file is None: 
+            true_params_info = qmla.set_shared_parameters(
+                growth_class = self.growth_class,  
+                # all_growth_rules = # TODO get list of growth rules here
+            )
+        else:
+            # true_params_pickle_file = arguments.true_params_pickle_file
+            true_params_info = pickle.load(
+                open(
+                    arguments.true_params_pickle_file, 
+                    'rb'
+                )
+            )
 
-        true_params_info = pickle.load(
-            open(self.true_params_pickle_file, 'rb')
-        )
-        self.true_model = true_params_info['true_op']
+        self.true_model = true_params_info['true_model']
         self.true_model_name = database_framework.alph(self.true_model)
         self.true_model_class = database_framework.Operator(
             self.true_model_name
@@ -376,7 +389,7 @@ def parse_cmd_line_args(args):
         help='Rule applied for generation of new models during QMD. \
         Corresponding functions must be built into model_generation',
         type=str,
-        default='two_qubit_ising_rotation_hyperfine'
+        default='GrowthRuleSuper'
     )
 
     parser.add_argument(
@@ -412,7 +425,7 @@ def parse_cmd_line_args(args):
         '-true_params_path', '--true_params_pickle_file',
         help='Path to save true params to.',
         type=str,
-        default='true_'
+        default=None
     )
 
     parser.add_argument(
@@ -425,14 +438,14 @@ def parse_cmd_line_args(args):
         '-plot_probes', '--probes_plot_file',
         help='Path where plot probe dict is pickled to.',
         type=str,
-        default="{}/plot_probes.p".format(os.getcwd())
+        default=None
     )
 
     parser.add_argument(
         '-latex', '--latex_mapping_file',
         help='Path to save list of terms latex/name maps to.',
         type=str,
-        default='QMLA_default_results/latex_map.txt'
+        default=None
     )
 
     parser.add_argument(

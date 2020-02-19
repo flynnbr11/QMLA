@@ -303,7 +303,7 @@ print("------ QMLA starting ------")
 
 qmd = QuantumModelLearningAgent(
     qmla_controls=qmla_controls,
-    generator_list=generators,
+    # generator_list=generators,
     first_layer_models=first_layer_models,
     probe_dict=system_probes,
     sim_probe_dict=simulator_probe_dict,
@@ -524,7 +524,8 @@ elif (
 else:
     # qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
     qmd.run_complete_qmla(num_spawns=3)  # Actually run QMD
-    print(" \n\n------QMD learned ------\n\n")
+    print(" \n\n------ QML learning stage complete ------\n\n")
+    print(" ------ Analysis ------")
 
     """
     Tidy up and analysis.
@@ -761,4 +762,4 @@ log_print(["END: QMD id", qmla_controls.qmd_id, ":",
           log_file
           )
 
-print("QMD finished - results in:", qmla_controls.results_directory)
+print("QMLA finished; results in:", qmla_controls.results_directory)

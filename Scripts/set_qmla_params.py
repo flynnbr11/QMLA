@@ -154,16 +154,16 @@ growth_class_attributes = {
     'log_file': log_file
 }
 
-all_growth_classes = [growth_generation_rule]
+all_growth_rules = [growth_generation_rule]
 alternative_growth_rules = arguments.alternative_growth_rules
-all_growth_classes.extend(alternative_growth_rules)
-all_growth_classes = list(set(all_growth_classes))
+all_growth_rules.extend(alternative_growth_rules)
+all_growth_rules = list(set(all_growth_rules))
 
 unique_growth_classes = {
     gr : qmla.get_growth_generator_class(
             growth_generation_rule=gr,
             **growth_class_attributes
-    ) for gr in all_growth_classes
+    ) for gr in all_growth_rules
 }
 
 growth_class = unique_growth_classes[growth_generation_rule]
@@ -202,14 +202,14 @@ if pickle_file is not None:
 
 if arguments.true_params_file is not None:
     qmla.set_shared_parameters(
-        true_op=true_model,
+        growth_class=growth_class,
+        # true_op=true_model,
         true_prior=true_prior,
         pickle_file=arguments.true_params_file,
-        growth_generator=growth_generation_rule,
-        all_growth_classes=all_growth_classes,
-        random_vals=random_true_params,
+        # growth_generator=growth_generation_rule,
+        all_growth_rules=all_growth_rules,
+        # random_vals=random_true_params,
         exp_data=exp_data,
-        growth_class=growth_class,
         true_prior_plot_file=true_prior_plot_file
     )
 
@@ -231,9 +231,9 @@ plot_probe_dict = growth_class.plot_probe_generator(
     noise_level=probe_noise_level,
 )
 
-for k in list(plot_probe_dict.keys()):
-    # replace tuple like key returned, with just dimension.
-    plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
+# for k in list(plot_probe_dict.keys()):
+#     # replace tuple like key returned, with just dimension.
+#     plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
 if probes_plot_file is not None:
     import pickle
     pickle.dump(

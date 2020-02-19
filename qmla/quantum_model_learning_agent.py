@@ -52,8 +52,8 @@ class QuantumModelLearningAgent():
     """
 
     def __init__(self,
-                 qmla_controls,  # TODO make default global variables class available
-                 generator_list=[],
+                 qmla_controls = None, 
+                #  generator_list=[],
                  first_layer_models=['x'],
                  probe_dict=None,
                  sim_probe_dict=None,
@@ -69,7 +69,12 @@ class QuantumModelLearningAgent():
         self._start_time = time.time()  # to measure run-time
 
         # Configure this QMLA instance
-        self.qmla_controls = qmla_controls
+        if qmla_controls is None: 
+            self.qmla_controls = qmla.controls_qmla.parse_cmd_line_args(
+                args = {}
+            )
+        else:
+            self.qmla_controls = qmla_controls
         self.growth_class = self.qmla_controls.growth_class
 
         # Basic settings, path definitions etc
@@ -96,7 +101,7 @@ class QuantumModelLearningAgent():
 
         # set up all attributes related to growth rules and tree management
         self._setup_tree_and_growth_rules(
-            generator_list=generator_list,
+            # generator_list=generator_list,
         )
 
         # check if QMLA should run in parallel and set up accordingly
@@ -134,7 +139,14 @@ class QuantumModelLearningAgent():
         self.results_directory = self.qmla_controls.results_directory
         if not self.results_directory.endswith('/'):
             self.results_directory += '/'
-        self.latex_name_map_file_path = self.qmla_controls.latex_mapping_file
+        
+        if self.qmla_controls.latex_mapping_file is None: 
+            self.latex_name_map_file_path = os.path.join(
+                self.results_directory, 
+                'LatexMapping.txt'
+            )
+        else: 
+            self.latex_name_map_file_path = self.qmla_controls.latex_mapping_file
         self.log_print(["Retrieving databases from redis"])
         self.redis_databases = rds.databases_from_qmd_id(
             self.redis_host_name,
@@ -161,7 +173,7 @@ class QuantumModelLearningAgent():
 
     def _setup_tree_and_growth_rules(
         self,
-        generator_list,
+        # generator_list,
     ):
         # Models and Bayes factors lists
         self.all_bayes_factors = {}
@@ -173,7 +185,15 @@ class QuantumModelLearningAgent():
         self.model_initial_ids = {}
 
         # Growth rule setup
-        self.growth_rules_list = generator_list
+        # self.growth_rules_list = generator_list
+        self.growth_rules_list = self.qmla_controls.generator_list
+        # print(
+        #     "[QMLA 189] Generator list {} \n controls all growth rules: {}".format(
+        #         generator_list, 
+        #         self.qmla_controls
+        #     )
+        
+        # )
         self.growth_rules_initial_models = {}
         self.growth_rule_of_true_model = self.qmla_controls.growth_generation_rule
         zeroth_gen = self.growth_rules_list[0]
@@ -373,6 +393,7 @@ class QuantumModelLearningAgent():
             )
             self.probes_system = self.growth_class.probes_system
             self.probes_simulator = self.probes_system
+            self.probe_number = self.growth_class.num_probes
         else:
             self.probe_number = self.qmla_controls.num_probes
             self.log_print(
@@ -390,13 +411,30 @@ class QuantumModelLearningAgent():
             )
         else:
             self.experimental_measurement_times = None
-        self.probes_plot_file = self.qmla_controls.probes_plot_file
 
         self.times_to_plot = plot_times
         self.times_to_plot_reduced_set = self.times_to_plot[0::10]
-        self.probes_for_plots = pickle.load(
-            open(self.probes_plot_file, 'rb')
-        )
+        self.probes_plot_file = self.qmla_controls.probes_plot_file
+        if self.probes_plot_file is None: 
+
+            print(
+                "Generating plot probes.",
+                "max num probe qubits: ", self.growth_class.max_num_probe_qubits,
+                "true dimension: ", self.true_model_dimension
+            )
+
+            self.probes_for_plots = self.growth_class.plot_probe_generator(
+                true_model=self.true_model_name,
+                growth_generator=self.growth_class.growth_generation_rule,
+                probe_maximum_number_qubits = self.growth_class.max_num_probe_qubits, 
+                experimental_data=self.use_experimental_data,
+                noise_level=0.0000001,
+            )
+        else: 
+            self.probes_for_plots = pickle.load(
+                open(self.probes_plot_file, 'rb')
+            )
+
         if self.use_experimental_data == False:
             # TODO is this doing anything useful?
             # at least put in separate method
@@ -411,8 +449,6 @@ class QuantumModelLearningAgent():
             )
 
             for t in self.times_to_plot:
-                # TODO is this the right expectation value func???
-
                 self.experimental_measurements[t] = (
                     self.growth_class.expectation_value(
                         ham=self.qmla_controls.true_hamiltonian,
@@ -583,24 +619,12 @@ class QuantumModelLearningAgent():
     def _initiate_database(self):
         self.model_database, self.model_lists = \
             database_launch.launch_db(
-                true_op_name=self.true_model_name,
                 new_model_branches=self.model_initial_branch,
                 new_model_ids=self.model_initial_ids,
+                plot_probes=self.probes_for_plots, 
                 log_file=self.log_file,
-                gen_list=self.branch_initial_models,
-                qle=self.use_qle,
                 true_model_terms_matrices=self.true_model_constituent_operators,
                 true_model_terms_params=self.true_param_list,
-                num_particles=self.num_particles,
-                redimensionalise=False,
-                resample_threshold=self.qinfer_resample_threshold,
-                resampler_a=self.qinfer_resampler_a,
-                pgh_prefactor=self.qinfer_PGH_heuristic_factor,
-                num_probes=self.probe_number,
-                probe_dict=self.probes_system,
-                use_exp_custom=self.use_custom_exponentiation,
-                enable_sparse=self.enable_sparse_exponentiation,
-                debug_directory=self.debug_directory,
                 qid=self.qmla_id,
                 host_name=self.redis_host_name,
                 port_number=self.redis_port_number
@@ -629,28 +653,16 @@ class QuantumModelLearningAgent():
         branch_id=0,
         force_create_model=False
     ):
-        #self.model_count += 1
         model = database_framework.alph(model)
         add_model_to_database_result = database_launch.add_model(
             model_name=model,
+            model_id=self.model_count,
+            branch_id=branch_id,
             running_database=self.model_database,
-            num_particles=self.num_particles,
-            true_op_name=self.true_model_name,
             model_lists=self.model_lists,
             true_model_terms_matrices=self.true_model_constituent_operators,
             true_model_terms_params=self.true_param_list,
-            branch_id=branch_id,
-            resample_threshold=self.qinfer_resample_threshold,
-            resampler_a=self.qinfer_resampler_a,
-            pgh_prefactor=self.qinfer_PGH_heuristic_factor,
-            num_probes=self.probe_number,
-            probe_dict=self.probes_system,
-            use_exp_custom=self.use_custom_exponentiation,
-            enable_sparse=self.enable_sparse_exponentiation,
-            debug_directory=self.debug_directory,
-            model_id=self.model_count,
-            redimensionalise=False,
-            qle=self.use_qle,
+            plot_probes=self.probes_for_plots,
             host_name=self.redis_host_name,
             port_number=self.redis_port_number,
             qid=self.qmla_id,
