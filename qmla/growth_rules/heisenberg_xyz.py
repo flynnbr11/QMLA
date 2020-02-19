@@ -81,9 +81,9 @@ class HeisenbergXYZProbabilistic(
             # 1 : 0,
             # 2: 10,
             # 3: 10,
-            2: 10,
-            3: 10,
-            4: 50,
+            2: 4,
+            3: 4,
+            # 4: 50,
             'other': 0
         }
 
