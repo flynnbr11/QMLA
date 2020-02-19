@@ -11,7 +11,7 @@ TODO: add package installations used
 * scipy 1.0.0
 * matplotlib 3.0.3
 * QInfer 1.0 
-* CYthon
+* Cython
 * Qutip 4.2.0
 * pickle 4.0 (standard)
 * random (standard)
