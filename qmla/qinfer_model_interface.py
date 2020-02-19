@@ -150,6 +150,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
     # expparams are the {t, w1, w2, ...} guessed parameters, i.e. each element
     # is a particle with a specific sampled value of the corresponding
     # parameter
+    # 
 
     @property
     def expparams_dtype(self):
@@ -157,6 +158,10 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         for exppar in range(self.n_modelparams):
             expnames.append(('w_' + str(exppar + 1), 'float'))
         return expnames
+
+    # Do we really need the following property? It looks a bit pointless
+
+
 
     @property
     def is_n_outcomes_constant(self):
@@ -205,6 +210,16 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         modelparams,
         expparams
     ):
+    """
+    Function to calculate likelihoods for all the particles
+
+    :param outcomes: outcomes of the experiments
+    :param modelparams: values of the model parameters
+    :param expparams: experimental parameters
+
+    :output : array with the likelihoods 
+
+    """
         import copy
         super(QInferModelQML, self).likelihood(
             outcomes, modelparams, expparams
