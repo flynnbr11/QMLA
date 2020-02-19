@@ -134,7 +134,7 @@ class QuantumModelLearningAgent():
         self.redis_host_name = self.qmla_controls.host_name
         self.redis_port_number = self.qmla_controls.port_number
         self.log_file = self.qmla_controls.log_file
-        self.qhl_mode = self.qmla_controls.qhl_test
+        self.qhl_mode = self.qmla_controls.qhl_mode
         self.qhl_mode_multiple_models = self.qmla_controls.qhl_mode_multiple_models
         self.results_directory = self.qmla_controls.results_directory
         if not self.results_directory.endswith('/'):

@@ -142,7 +142,7 @@ class ControlsQMLA():
         
         # get parameters from arguments passed to implement_qmla.py
         self.prior_pickle_file = arguments.prior_pickle_file
-        self.qhl_test = bool(arguments.qhl_test)
+        self.qhl_mode = bool(arguments.qhl_mode)
         self.further_qhl = bool(arguments.further_qhl)
         self.use_rq = bool(arguments.use_rq)
         self.num_experiments = arguments.num_experiments
@@ -213,7 +213,7 @@ def parse_cmd_line_args(args):
     # which have access to the controls class returned from  this function. 
 
     parser.add_argument(
-        '-qhl', '--qhl_test',
+        '-qhl', '--qhl_mode',
         help="Bool to test QHL on given true operator only.",
         type=int,
         default=0

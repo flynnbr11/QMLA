@@ -63,19 +63,19 @@ class HeisenbergXYZProbabilistic(
         # self.num_top_models_to_build_on =  'all'
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
-        self.fitness_minimum = 0
+        self.fitness_minimum = 1
         self.fitness_maximum = 1.0
         self.min_param = 0
         self.max_param = 1
         self.check_champion_reducibility = True
         self.generation_DAG = 1
-        self.true_model_terms_params = {
-            'pauliSet_1J2_xJx_d4': 0.27044671107574969, 
-            'pauliSet_1J3_zJz_d4': 1.1396665426731736, 
-            'pauliSet_2J4_xJx_d4': 0.38705331216054806, 
-            'pauliSet_3J4_xJx_d4': 0.46892509638460805, 
-            'pauliSet_3J4_zJz_d4': 0.45440765993845578
-        }
+        # self.true_model_terms_params = {
+        #     'pauliSet_1J2_xJx_d4': 0.27044671107574969, 
+        #     'pauliSet_1J3_zJz_d4': 1.1396665426731736, 
+        #     'pauliSet_2J4_xJx_d4': 0.38705331216054806, 
+        #     'pauliSet_3J4_xJx_d4': 0.46892509638460805, 
+        #     'pauliSet_3J4_zJz_d4': 0.45440765993845578
+        # }
 
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10

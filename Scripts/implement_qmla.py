@@ -312,7 +312,7 @@ qmd = QuantumModelLearningAgent(
     plot_times=plot_times,
 )
 
-if qmla_controls.qhl_test:
+if qmla_controls.qhl_mode:
     qmd.run_quantum_hamiltonian_learning()
     log_print(
         [
