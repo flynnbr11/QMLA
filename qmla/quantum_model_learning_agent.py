@@ -614,6 +614,12 @@ class QuantumModelLearningAgent():
         qmla_core_info_database.set('qmla_settings', compressed_qmla_core_info)
         qmla_core_info_database.set('ProbeDict', compressed_probe_dict)
         qmla_core_info_database.set('SimProbeDict', compressed_sim_probe_dict)
+        
+        self.qmla_core_info_database = {
+            'qmla_settings' : self.qmla_settings, 
+            'ProbeDict' : self.probes_system, 
+            'SimProbeDict' : self.probes_simulator
+        }
         self.log_print(["Saved QMLA instance info to ", qmla_core_info_database])
 
     def _initiate_database(self):
@@ -625,6 +631,7 @@ class QuantumModelLearningAgent():
                 log_file=self.log_file,
                 true_model_terms_matrices=self.true_model_constituent_operators,
                 true_model_terms_params=self.true_param_list,
+                qmla_core_info_database=self.qmla_core_info_database,
                 qid=self.qmla_id,
                 host_name=self.redis_host_name,
                 port_number=self.redis_port_number
@@ -663,6 +670,7 @@ class QuantumModelLearningAgent():
             true_model_terms_matrices=self.true_model_constituent_operators,
             true_model_terms_params=self.true_param_list,
             plot_probes=self.probes_for_plots,
+            qmla_core_info_database=self.qmla_core_info_database,
             host_name=self.redis_host_name,
             port_number=self.redis_port_number,
             qid=self.qmla_id,

@@ -721,6 +721,7 @@ class ModelInstanceForStorage():
         model_terms_matrices,
         qid,
         plot_probes=None, 
+        qmla_core_info_database=None, 
         host_name='localhost',
         port_number=6379,
         log_file='QMD_log.log',
@@ -729,32 +730,50 @@ class ModelInstanceForStorage():
         self.redis_host_name = host_name
         self.redis_port_number = port_number
         self.qmla_id = qid
-
-        redis_databases = rds.databases_from_qmd_id(
-            self.redis_host_name,
-            self.redis_port_number,
-            self.qmla_id
-        )
-        qmla_core_info_database = redis_databases['qmla_core_info_database']
+        self.log_file = log_file
         self.model_name = model_name
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
-        self.model_id = model_id
 
-        # Get data from redis database which is needed to learn from
-        self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
-        self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
+        if qmla_core_info_database is None: 
+            self.log_print(
+                [
+                    'QMLA core info DB is None; retrieveing from redis.'
+                ]
+            )
+            redis_databases = rds.databases_from_qmd_id(
+                self.redis_host_name,
+                self.redis_port_number,
+                self.qmla_id
+            )
+            qmla_core_info_database = redis_databases['qmla_core_info_database']
+            # Get data from redis database which is needed to learn from
+            self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
+            self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
+            qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
 
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
+        else: 
+            self.log_print(
+                [
+                    'QMLA core info provided to model storage class w/ keys:',
+                    list(qmla_core_info_database.keys())
+                ]
+            )
+            self.probes_system = qmla_core_info_database['ProbeDict']
+            self.probes_simulator = qmla_core_info_database['SimProbeDict']
+            qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
+
+
+
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         
-        if plot_probes is not None: 
-            self.probes_for_plots = plot_probes 
-        else: 
+        if plot_probes is None: 
             self.probes_for_plots = pickle.load(
                 open(qmla_core_info_dict['probes_plot_file'], 'rb')
             )
+        else: 
+            self.probes_for_plots = plot_probes 
 
         self.store_particle_locations_and_weights = qmla_core_info_dict[
             'store_particles_weights'
@@ -765,7 +784,7 @@ class ModelInstanceForStorage():
         self.model_num_qubits = qmla.database_framework.get_num_qubits(
             self.model_name)
         self.probe_num_qubits = self.model_num_qubits
-        self.log_file = log_file
+        
         self.expectation_values = {}
         self.values_updated = False
 
