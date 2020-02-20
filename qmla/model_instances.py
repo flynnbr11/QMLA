@@ -113,20 +113,18 @@ class ModelInstanceForLearning():
     def __init__(
         self,
         model_id,
-        name,
+        model_name,
         qid,
         log_file,
         growth_generator,
-        model_terms_matrices,
-        model_terms_parameters,
-        model_terms_names,
+        qmla_core_info_database=None, 
         host_name='localhost',
         port_number=6379,
         **kwargs
     ):
         self.qmla_id = qid
         self.model_id = int(model_id)
-        self.model_name = name
+        self.model_name = model_name
         self.log_file = log_file
         self.volume_by_epoch = np.array([])
         self.redis_host = host_name
@@ -134,9 +132,8 @@ class ModelInstanceForLearning():
 
         self.initialise_model_for_learning(
             growth_generator=growth_generator,
-            model_terms_matrices=model_terms_matrices,
-            model_terms_parameters=model_terms_parameters,
-            model_terms_names=model_terms_names,
+            model_name = self.model_name, 
+            qmla_core_info_database=qmla_core_info_database,
         )
 
     def log_print(
@@ -151,10 +148,9 @@ class ModelInstanceForLearning():
 
     def initialise_model_for_learning(
         self,
+        model_name,
         growth_generator,
-        model_terms_matrices,
-        model_terms_parameters,
-        model_terms_names,
+        qmla_core_info_database,
         checkloss=True,
         debug_directory=None,
         **kwargs
@@ -164,12 +160,17 @@ class ModelInstanceForLearning():
             self.redis_port_number,
             self.qmla_id
         )
-        qmla_core_info_database = redis_databases['qmla_core_info_database']
-        init_model_print_loc = False
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
+        if qmla_core_info_database is None:
+            qmla_core_info_database = redis_databases['qmla_core_info_database']
+            qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
+            self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
+            self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
+        else: 
+            qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
+            self.probes_system = qmla_core_info_database['ProbeDict']
+            self.probes_simulator = qmla_core_info_database['SimProbeDict']
+        
         self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
-        self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
-        self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
         self.num_particles = qmla_core_info_dict['num_particles']
         self.num_experiments = qmla_core_info_dict['num_experiments']
         self.growth_rule_of_this_model = growth_generator
@@ -187,8 +188,40 @@ class ModelInstanceForLearning():
             )
             raise
 
-        if qmla_core_info_dict['reallocate_resources'] == True:
 
+        # Get starting configuration for this model to learn from
+        op = qmla.database_framework.Operator(name=model_name)
+        self.model_terms_names = op.constituents_names
+        self.model_name_latex = self.growth_class.latex_name(
+            name=self.model_name
+        )
+        self.model_terms_matrices = np.asarray(op.constituents_operators)
+
+        model_priors = qmla_core_info_dict['model_priors']
+        if (
+            model_priors is not None
+            and
+            qmla.database_framework.alph(model_name) in list(model_priors.keys())
+        ):
+            prior_specific_terms = model_priors[model_name]
+        else:
+            prior_specific_terms = qmla_core_info_dict['prior_specific_terms']
+
+        model_terms_parameters = []
+        for term in self.model_terms_names:
+            try:
+                initial_prior_centre = prior_specific_terms[term][0]
+                model_terms_parameters.append(initial_prior_centre)
+            except BaseException:
+                # if prior not defined, start from 0 for all other params
+                initial_prior_centre = 0
+                model_terms_parameters.append(initial_prior_centre)
+
+        # TODO processing of sim_pars seems pointless?
+        model_terms_parameters = [model_terms_parameters]
+        self.model_terms_parameters = np.asarray([model_terms_parameters[0]])
+
+        if qmla_core_info_dict['reallocate_resources'] == True:
             base_resources = qmla_core_info_dict['base_resources']
             base_num_qubits = base_resources['num_qubits']
             base_num_terms = base_resources['num_terms']
@@ -237,12 +270,6 @@ class ModelInstanceForLearning():
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         
-        self.model_terms_names = model_terms_names
-        self.model_name_latex = self.growth_class.latex_name(
-            name=self.model_name
-        )
-        self.model_terms_matrices = np.asarray(model_terms_matrices)
-        self.model_terms_parameters = np.asarray([model_terms_parameters[0]])
 
         individual_terms_in_name = qmla.database_framework.get_constituent_names_from_name(
             self.model_name
@@ -272,7 +299,6 @@ class ModelInstanceForLearning():
                 )
 
         self.check_quadratic_loss = True
-        qmla.memory_tests.print_loc(print_location=init_model_print_loc)
 
         num_params = len(self.model_terms_matrices)
         log_identifier = str("QML " + str(self.model_id))

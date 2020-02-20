@@ -76,42 +76,13 @@ def remote_learn_model_parameters(
     plots_directory = qmla_core_info_dict['plots_directory']
     long_id = qmla_core_info_dict['long_id']
 
-    # Generate model and learn
-    op = database_framework.Operator(name=name)
-    model_priors = qmla_core_info_dict['model_priors']
-    if (
-        model_priors is not None
-        and
-        database_framework.alph(name) in list(model_priors.keys())
-    ):
-        prior_specific_terms = model_priors[name]
-    else:
-        prior_specific_terms = qmla_core_info_dict['prior_specific_terms']
-
-    sim_pars = []
-    constituent_terms = database_framework.get_constituent_names_from_name(name)
-    for term in op.constituents_names:
-        try:
-            initial_prior_centre = prior_specific_terms[term][0]
-            sim_pars.append(initial_prior_centre)
-        except BaseException:
-            # if prior not defined, start from 0 for all other params
-            initial_prior_centre = 0
-            sim_pars.append(initial_prior_centre)
-
-    # add model_db_new_row to model_db and running_database
-    # Note: do NOT use pd.df.append() as this copies total DB,
-    # appends and returns copy.
-
+    # Generate model instance and learn
     qml_instance = QML.ModelInstanceForLearning(
         model_id=model_id,
-        name=name,
+        model_name=name,
         qid=qid,
         log_file=log_file,
         growth_generator=growth_generator,
-        model_terms_matrices=op.constituents_operators,
-        model_terms_parameters=[sim_pars],
-        model_terms_names=op.constituents_names,
         host_name=host_name,
         port_number=port_number,
     )
@@ -173,9 +144,6 @@ def remote_learn_model_parameters(
         updated_model_info,
         protocol=4
     )
-    # TODO is there a way to use higher protocol when using python3 for faster
-    # pickling? this seems to need to be decoded using encoding='latin1'....
-    # not entirely clear why this encoding is used
     try:
         learned_models_info.set(
             str(model_id),
