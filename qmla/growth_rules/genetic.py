@@ -44,8 +44,8 @@ class Genetic(
         self.num_sites = database_framework.get_num_qubits(self.true_model)
         
         self.base_terms = [
-            'x', 'z',
-            # 'x', 'y',  'z'
+            # 'x', 'z',
+            'x', 'y',  'z'
         ]
         self.mutation_probability = 0.1
 
@@ -65,7 +65,7 @@ class Genetic(
 
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        self.initial_num_models = 4
+        self.initial_num_models = 10
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -84,7 +84,7 @@ class Genetic(
         }
         self.fitness_at_step = {}
 
-        self.max_spawn_depth = 2
+        self.max_spawn_depth = 3
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
             4: self.initial_num_models * self.max_spawn_depth,
@@ -133,8 +133,8 @@ class Genetic(
             )
             for mod in new_models
         ]
-        self.hamming_distance_by_generation_step[kwargs['spawn_step']
-                                                 ] = hamming_distances
+        self.hamming_distance_by_generation_step[
+            kwargs['spawn_step']] = hamming_distances
 
         return new_models
 
