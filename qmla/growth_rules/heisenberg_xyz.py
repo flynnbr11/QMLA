@@ -183,9 +183,9 @@ class HeisenbergXYZPredetermined(
                 'pauliSet_3J4_zJz_d4': 0.45440765993845578
             }
 
-            # if self.true_model not in self.initial_models:
-            #     self.log_print("Adding true operator to initial model list")
-            #     self.initial_models.append(self.true_model)
+            if self.true_model not in self.initial_models:
+                self.log_print("Adding true operator to initial model list")
+                self.initial_models.append(self.true_model)
         
 
 
