@@ -161,19 +161,20 @@ class HeisenbergXYZPredetermined(
             # i.e. 1 qubit model containing correct subsystem wins 1 qubit generation
             self.true_model = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
             self.initial_models = [
-                'pauliSet_1J2_xJx_d2',
-                'pauliSet_1J2_zJz_d2',
-                'pauliSet_1J2_yJy_d2',
-                'pauliSet_1J2_xJx_d2PPpauliSet_1J2_yJy_d2',
-                'pauliSet_1J2_xJx_d2PPpauliSet_1J2_zJz_d2',
-                'pauliSet_1J2_zJz_d2PPpauliSet_1J2_yJy_d2',
-                'pauliSet_1J2_xJx_d2PPpauliSet_1J2_yJy_d2PPpauliSet_1J2_zJz_d2',
+                'pauliSet_1J2_xJx_d3',
+                'pauliSet_1J2_zJz_d3',
+                'pauliSet_1J2_yJy_d3',
+                'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3',
+                'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3',
+                'pauliSet_1J2_zJz_d3PPPpauliSet_1J2_yJy_d3',
+                'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_1J2_zJz_d3',
 
             ]
 
             self.true_model_terms_params = {
                 'pauliSet_1J2_xJx_d3': 0.27044671107574969, 
-                'pauliSet_2J3_zJz_d3': 1.1396665426731736, 
+                'pauliSet_2J3_zJz_d3': 0, 
+                # 'pauliSet_2J3_zJz_d3': 1.1396665426731736, 
                 'pauliSet_1J3_zJz_d3': 1.1396665426731736, 
                 'pauliSet_1J2_xJx_d4': 0.27044671107574969, 
                 'pauliSet_1J3_zJz_d4': 1.1396665426731736, 

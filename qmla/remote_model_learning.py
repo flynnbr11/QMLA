@@ -60,7 +60,7 @@ def remote_learn_model_parameters(
     # Get params from qmla_core_info_dict
     redis_databases = rds.databases_from_qmd_id(host_name, port_number, qid)
     qmla_core_info_database = redis_databases['qmla_core_info_database']
-    learned_models_info = redis_databases['learned_models_info']
+    learned_models_info_db = redis_databases['learned_models_info_db']
     learned_models_ids = redis_databases['learned_models_ids']
     active_branches_learning_models = redis_databases['active_branches_learning_models']
     any_job_failed_db = redis_databases['any_job_failed']
@@ -145,20 +145,20 @@ def remote_learn_model_parameters(
         protocol=4
     )
     try:
-        learned_models_info.set(
+        learned_models_info_db.set(
             str(model_id),
             compressed_info
         )
         log_print(
             [
-                "Redis learned_models_info added to db for model:",
+                "Redis learned_models_info_db added to db for model:",
                 str(model_id)
             ]
         )
     except BaseException:
         log_print(
             [
-                "Failed to add learned_models_info for model:",
+                "Failed to add learned_models_info_db for model:",
                 model_id
             ]
         )

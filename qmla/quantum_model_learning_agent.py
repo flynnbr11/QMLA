@@ -2305,7 +2305,7 @@ class QuantumModelLearningAgent():
 
             # champ_attributes = list(champ_mod.__dict__.keys())
             # Here we need to fill in learned_info dict on redis with required attributes
-            # fill in redis_databases['learned_models_info'][reduced_mod_id]
+            # fill in redis_databases['learned_models_info_db'][reduced_mod_id]
             # for att in champ_attributes:
             #     reduced_mod_instance.__setattr__(
             #         att,
@@ -2314,7 +2314,7 @@ class QuantumModelLearningAgent():
 
             # get champion leared info
             reduced_champion_info = pickle.loads(
-                self.redis_databases['learned_models_info'].get(
+                self.redis_databases['learned_models_info_db'].get(
                     str(self.champion_model_id))
             )
 
@@ -2355,7 +2355,7 @@ class QuantumModelLearningAgent():
             )
 
             # TODO fill in values for ModelInstanceForStorage
-            self.redis_databases['learned_models_info'].set(
+            self.redis_databases['learned_models_info_db'].set(
                 str(float(reduced_mod_id)),
                 compressed_reduced_champ_info
             )
