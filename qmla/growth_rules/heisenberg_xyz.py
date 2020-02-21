@@ -172,6 +172,9 @@ class HeisenbergXYZPredetermined(
             ]
 
             self.true_model_terms_params = {
+                'pauliSet_1J2_xJx_d3': 0.27044671107574969, 
+                'pauliSet_2J3_zJz_d3': 1.1396665426731736, 
+                'pauliSet_1J3_zJz_d3': 1.1396665426731736, 
                 'pauliSet_1J2_xJx_d4': 0.27044671107574969, 
                 'pauliSet_1J3_zJz_d4': 1.1396665426731736, 
                 'pauliSet_2J4_xJx_d4': 0.38705331216054806, 
@@ -186,6 +189,8 @@ class HeisenbergXYZPredetermined(
 
 
         self.max_num_models_by_shape = {
+            2 : 6, 
+            3 : 6, 
             4: 6,
             'other': 0
         }
