@@ -2891,6 +2891,15 @@ class QuantumModelLearningAgent():
             name=final_winner,
             field='ModelID'
         )
+        try:
+            self.true_model_considered=True
+            if self.champion_model_id == self.true_model_id:
+                self.true_model_found = True
+            else:
+                self.true_model_found = False
+        except:
+            self.true_model_considered = False 
+            self.true_model_found = False
         self.update_database_model_info()
 
         # Check if final winner has negligible parameters; potentially change
