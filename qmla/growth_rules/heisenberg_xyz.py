@@ -54,7 +54,7 @@ class HeisenbergXYZProbabilistic(
             # 'y',
             'z'
         ]
-        self.num_probes = 5
+        self.num_probes = 50
         self.max_time_to_consider = 20
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # 'all' # at each generation Badassness parameter
