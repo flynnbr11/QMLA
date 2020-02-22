@@ -92,8 +92,8 @@ class Genetic(
         }
 
         self.max_time_to_consider = 5
-        self.min_param = 0.499
-        self.max_param = 0.501
+#         self.min_param = 0.499
+#         self.max_param = 0.501
         self.num_processes_to_parallelise_over = 10
 
     def generate_models(
