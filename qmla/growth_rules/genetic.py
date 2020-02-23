@@ -38,11 +38,11 @@ class Genetic(
         # self.true_model = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
         # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
         self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
-        self.heisenberg_xxz_small = 'pauliSet_1J2_xJx_d3+pauliSet_2J3_zJz_d3'
+        self.heisenberg_xxz_small = 'pauliSet_1J2_xJx_d3+pauliSet_1J3_yJy_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
         self.true_model = self.heisenberg_xxz_small
         self.true_model = database_framework.alph(self.true_model)
         self.num_sites = database_framework.get_num_qubits(self.true_model)
-        
+        self.num_probes = 5
         self.base_terms = [
             # 'x', 'z',
             'x', 'y',  'z'
