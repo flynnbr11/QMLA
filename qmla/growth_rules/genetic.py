@@ -62,9 +62,11 @@ class Genetic(
         self.true_chromosome_string = self.genetic_algorithm.chromosome_string(
             self.true_chromosome
         )
+        self.num_possible_models = 2**len(self.true_chromosome)
 
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
+        self.max_spawn_depth = 3
         self.initial_num_models = 10
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
@@ -84,7 +86,7 @@ class Genetic(
         }
         self.fitness_at_step = {}
 
-        self.max_spawn_depth = 7
+        
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
             4: self.initial_num_models * self.max_spawn_depth,
@@ -92,8 +94,8 @@ class Genetic(
         }
 
         self.max_time_to_consider = 5
-#         self.min_param = 0.499
-#         self.max_param = 0.501
+        self.min_param = 0.48
+        self.max_param = 0.52
         self.num_processes_to_parallelise_over = 10
 
     def generate_models(

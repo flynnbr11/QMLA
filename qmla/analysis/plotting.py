@@ -4,11 +4,13 @@ from matplotlib.lines import Line2D
 import sys
 import os
 import pickle
-import matplotlib.pyplot as plt
 import pandas
 
-from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas, cumulativeQMDTreePlot
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
+
+from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas, cumulativeQMDTreePlot
 import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming
 # import qmla.PlotQMD as ptq
@@ -611,7 +613,6 @@ def analyse_and_plot_dynamics_multiple_models(
         # constrained_layout=True,
         tight_layout=True
     )
-    from matplotlib.gridspec import GridSpec
     gs = GridSpec(
         nrows,
         ncols,
@@ -1707,6 +1708,45 @@ def plot_scores(
     plt.savefig(save_file, bbox_inches='tight')
 
 
+def stat_metrics_histograms(
+    champ_info, 
+    save_to_file=None
+):
+
+    include_plots = [
+        {'name' : 'f_scores', 'colour' : 'red'}, 
+        {'name' : 'precisions',  'colour': 'blue'}, 
+        {'name' : 'sensitivities', 'colour' : 'green'}, 
+    ]
+
+    fig = plt.figure(
+        figsize=(15, 5),
+        tight_layout=True
+    )
+    gs = GridSpec(
+        nrows=1,
+        ncols=len(include_plots),
+        # figure=fig # not available on matplotlib 2.1.1 (on BC)
+    )
+    plot_col = 0
+
+    for plotting_data in include_plots: 
+        ax = fig.add_subplot(gs[0, plot_col])
+        data = champ_info[plotting_data['name']]
+        ax.hist(
+            list(data.values()), 
+            color = plotting_data['colour'],
+        )
+        ax.set_xlim(0,1)    
+        ax.set_title(
+            "Champions' {}".format(plotting_data['name'])
+        )
+        ax.set_xlabel(plotting_data['name'])
+        ax.set_ylabel('# Champions')
+        plot_col += 1
+    if save_to_file is not None: 
+        plt.savefig(save_to_file)
+
 def plot_tree_multi_QMD(
     results_csv,
     all_bayes_csv,
@@ -1980,4 +2020,34 @@ def plot_statistics(
         plt.savefig(
             save_to_file,
             bbox_inches='tight'
+        )
+
+
+def summarise_qmla_text_file(
+    results_csv_path, 
+    path_to_summary_file
+):
+    all_results = pandas.read_csv(results_csv_path)
+
+    to_write = "\
+        {num_true_found} instance(s) total \n\
+        True model won {true_mod_found} instance(s); considered in {true_mod_considered} instance(s). \n\
+        Average time taken: {avg_time} seconds \n\
+        True growth rules: {growth_rules} \n\
+        Range of number of models per instance: {min_num_mods}-{max_num_mods}. \n\
+        ".format(
+            num_true_found = len(all_results), 
+            true_mod_considered = all_results['TrueModelConsidered'].sum(), 
+            true_mod_found = all_results['TrueModelFound'].sum(),
+            avg_time = np.round(all_results['Time'].median(), 2),
+            growth_rules = list(all_results.GrowthGenerator.unique()),
+            min_num_mods = all_results['NumModels'].min(),
+            max_num_mods = all_results['NumModels'].max()
+        )
+
+    with open(path_to_summary_file, 'w') as summary_file:
+        print(
+            to_write, 
+            file=summary_file, 
+            flush=True
         )

@@ -522,8 +522,7 @@ elif (
 
 
 else:
-    # qmd.runRemoteQMD(num_spawns=3) #  Actually run QMD
-    qmd.run_complete_qmla(num_spawns=3)  # Actually run QMD
+    qmd.run_complete_qmla(num_spawns=3)  
     print(" \n\n------ QML learning stage complete ------\n\n")
     print(" ------ Analysis ------")
 
@@ -537,20 +536,8 @@ else:
         pass
     expec_value_mods_to_plot.append(qmd.champion_model_id)
 
-    print("plotExpecValues")
-    # qmd.plotExpecValues(
-    #     model_ids = expec_value_mods_to_plot, # hardcode to see full model for development
-    #     times=plot_times,
-    #     max_time = expec_val_plot_max_time, #in microsec
-    #     t_interval=float(expec_val_plot_max_time/num_datapoints_to_plot),
-    #     save_to_file=str(
-    #     qmla_controls.plots_directory+
-    #     'expec_values_'+str(qmla_controls.long_id)+'.png')
-    # )
-    if qmla_controls.growth_generation_rule == 'NV_centre_experiment_debug':
-        plot_dynamics_all_models = True
-    else:
-        plot_dynamics_all_models = False
+    print("Plotting expectation values.")
+    plot_dynamics_all_models = False
     qmd.plot_branch_champions_dynamics(
         all_models=plot_dynamics_all_models,
         save_to_file=str(
@@ -560,6 +547,15 @@ else:
             '.png'
         )
     )
+
+    print("Plotting statistical metrics")
+    qmd.get_statistical_metrics(
+        save_to_file=os.path.join(
+            qmla_controls.plots_directory, 
+            "metrics_{}.png".format(qmla_controls.long_id)
+        )
+    )
+
 
     champ_mod = qmd.get_model_storage_instance_by_id(
         qmd.champion_model_id

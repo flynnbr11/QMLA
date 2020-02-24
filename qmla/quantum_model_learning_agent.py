@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import print_function  # so print doesn't show brackets
 
 import math
-import matplotlib.pyplot as plt
 import numpy as np
 import os as os
 import sys as sys
@@ -11,6 +10,8 @@ import time as time
 from time import sleep
 import random
 
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 import pickle
 import redis
 
@@ -165,6 +166,9 @@ class QuantumModelLearningAgent():
         self.true_model_num_params = self.qmla_controls.true_model_class.num_constituents
         self.true_param_list = self.qmla_controls.true_params_list
         self.true_param_dict = self.qmla_controls.true_params_dict
+        self.true_model_branch = -1 # overwrite if considered
+        self.true_model_considered = False
+        self.true_model_found = False
         self.log_print(
             [
                 "True model:", self.true_model_name
@@ -378,6 +382,9 @@ class QuantumModelLearningAgent():
         self.qinfer_PGH_heuristic_factor = self.qmla_controls.pgh_factor
         self.qinfer_PGH_heuristic_exponent = self.qmla_controls.pgh_exponent
         self.reallocate_resources = self.qmla_controls.reallocate_resources
+        self.model_f_scores = {}
+        self.model_precisions = {}
+        self.model_sensitivities = {}
 
         if system_probe_dict is None:
             # ensure there is a probe set
@@ -681,6 +688,7 @@ class QuantumModelLearningAgent():
             if database_framework.alph(
                     model) == database_framework.alph(self.true_model_name):
                 self.true_model_id = self.model_count
+                self.true_model_branch = branch_id
             self.highest_model_id += 1
             # print("Setting model ", model, "to ID:", self.model_count)
             model_id = self.model_count
@@ -829,7 +837,11 @@ class QuantumModelLearningAgent():
         )
 
     def get_model_data_by_field(self, name, field):
-        return database_framework.pull_field(self.model_database, name, field)
+        return database_framework.pull_field(
+            self.model_database, 
+            name, 
+            field
+    )
 
     def change_model_status(self, model_name, new_status='Saturated'):
         self.model_database.loc[self.model_database['<Name>'] == model_name, 'Status'] = new_status
@@ -2070,11 +2082,14 @@ class QuantumModelLearningAgent():
 
         champ_model = self.get_model_storage_instance_by_id(
             self.champion_model_id)
+        
         for i in range(self.highest_model_id):
             # Dict of all Bayes factors for each model considered.
             self.all_bayes_factors[i] = (
                 self.get_model_storage_instance_by_id(i).model_bayes_factors
             )
+            self.compute_model_f_score(i)
+        self.get_statistical_metrics()
 
         self.log_print(["computing expect vals for mod ", champ_model.model_id])
         champ_model.compute_expectation_values(
@@ -2082,10 +2097,6 @@ class QuantumModelLearningAgent():
             # plot_probe_path = self.probes_plot_file
         )
         self.log_print(["computed expect vals"])
-
-        self.compute_model_f_score(
-            model_id=self.champion_model_id
-        )
 
         self.ChampionFinalParams = (
             champ_model.final_learned_params
@@ -2199,23 +2210,16 @@ class QuantumModelLearningAgent():
             'FinalSigmas': self.champ_final_sigmas,
             'QuadraticLosses': champ_model.quadratic_losses_record,
             'ExpectationValues': champ_model.expectation_values,
-            # 'RawExpectationValues' : champ_model.raw_expectation_values,
-            # 'ExpValTimes' : champ_model.times,
             'Trackplot_parameter_estimates': champ_model.track_parameter_estimates,
             'TrackVolume': champ_model.volume_by_epoch,
             'TrackTimesLearned': champ_model.times_learned_over,
-            # 'TrackCovarianceMatrices' : champ_model.track_covariance_matrices,
-            # 'RSquaredByEpoch' : champ_model.r_squared_by_epoch(
-            #     plot_probes = self.probes_for_plots,
-            #     times = expec_val_plot_times
-            # ),
             'FinalRSquared': champ_model.r_squared(
                 plot_probes=self.probes_for_plots,
                 times=expec_val_plot_times
             ),
-            'Fscore': self.f_score,
-            'Precision': self.precision,
-            'Sensitivity': self.sensitivity,
+            'Fscore': self.model_f_scores[self.champion_model_id],
+            'Precision': self.model_precisions[self.champion_model_id],
+            'Sensitivity': self.model_sensitivities[self.champion_model_id],
             'PValue': champ_model.p_value,
             'LearnedHamiltonian': champ_model.learned_hamiltonian,
             'GrowthGenerator': champ_model.growth_rule_of_this_model,
@@ -2223,6 +2227,11 @@ class QuantumModelLearningAgent():
             'ChampLatex': champ_model.model_name_latex,
             'TrueModel': database_framework.alph(self.true_model_name),
             'NumParamDifference': num_params_difference,
+            'TrueModelConsidered' : self.true_model_considered, 
+            'TrueModelFound' : self.true_model_found,
+            'TrueModelBranch' : self.true_model_branch,
+            'NumModels' : self.highest_model_id,
+            'StatisticalMetrics' : self.generational_statistical_metrics,
         }
 
     def check_champion_reducibility(
@@ -2451,6 +2460,8 @@ class QuantumModelLearningAgent():
         )
         self.true_model_id = mod_id
         self.champion_model_id = mod_id
+        self.true_model_found = True
+        self.true_model_considered = True # these don't really matter for QHL
         self.log_print(
             [
                 "Learned:",
@@ -2494,6 +2505,7 @@ class QuantumModelLearningAgent():
         self.compute_model_f_score(
             model_id=mod_id
         )
+        self.get_statistical_metrics()
 
         time_now = time.time()
         time_taken = time_now - self._start_time
@@ -2519,26 +2531,21 @@ class QuantumModelLearningAgent():
             'Trackplot_parameter_estimates': mod.track_parameter_estimates,
             'TrackVolume': mod.volume_by_epoch,
             'TrackTimesLearned': mod.times_learned_over,
-            # 'TrackCovarianceMatrices' : mod.track_covariance_matrices,
             'ExpectationValues': mod.expectation_values,
-            # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
-            #     times = expec_val_plot_times,
-            #     plot_probes = self.probes_for_plots
-            # ), # TODO only used for AnalyseMultipleQMD/r_squared_average() -- not currently in use
-            # 'FinalRSquared' : mod.final_r_squared,
-            # 'FinalRSquared' : mod.r_squared(
-            #     plot_probes = self.probes_for_plots,
-            #     times = expec_val_plot_times
-            # ),
             'FinalRSquared': mod.final_r_squared,
-            'Fscore': self.f_score,
-            'Precision': self.precision,
-            'Sensitivity': self.sensitivity,
+            'Fscore': self.model_f_scores[mod_id],
+            'Precision': self.model_precisions[mod_id],
+            'Sensitivity': self.model_sensitivities[mod_id],
             'p-value': mod.p_value,
             'LearnedHamiltonian': mod.learned_hamiltonian,
             'GrowthGenerator': mod.growth_rule_of_this_model,
             'Heuristic': mod.model_heuristic_class,
             'ChampLatex': mod.model_name_latex,
+            'TrueModelConsidered' : self.true_model_considered, 
+            'TrueModelFound' : self.true_model_found,
+            'TrueModelBranch' : self.true_model_branch,
+            'NumModels' : self.highest_model_id,
+            'StatisticalMetrics' : self.generational_statistical_metrics,
         }
 
         self.log_print(
@@ -2627,6 +2634,7 @@ class QuantumModelLearningAgent():
             self.compute_model_f_score(
                 model_id=mod_id
             )
+            self.get_statistical_metrics()
 
             n_qubits = database_framework.get_num_qubits(mod.model_name)
             if n_qubits > 5:
@@ -2674,13 +2682,18 @@ class QuantumModelLearningAgent():
                     times=expec_val_plot_times
                 ),
                 'p-value': mod.p_value,
-                'Fscore': self.f_score,
-                'Precision': self.precision,
-                'Sensitivity': self.sensitivity,
+                'Fscore': self.model_f_scores[mod_id],
+                'Precision': self.model_precisions[mod_id],
+                'Sensitivity': self.model_sensitivities[mod_id],
                 'LearnedHamiltonian': mod.learned_hamiltonian,
                 'GrowthGenerator': mod.growth_rule_of_this_model,
                 'Heuristic': mod.model_heuristic_class,
-                'ChampLatex': mod.model_name_latex
+                'ChampLatex': mod.model_name_latex,
+                'TrueModelConsidered' : self.true_model_considered, 
+                'TrueModelFound' : self.true_model_found,
+                'TrueModelBranch' : self.true_model_branch,
+                'NumModels' : self.highest_model_id,
+                'StatisticalMetrics' : self.generational_statistical_metrics,
             }
             self.model_id_to_name_map = {}
             for k in self.model_name_id_map:
@@ -2892,7 +2905,7 @@ class QuantumModelLearningAgent():
             field='ModelID'
         )
         try:
-            self.true_model_considered=True
+            self.true_model_considered = True
             if self.champion_model_id == self.true_model_id:
                 self.true_model_found = True
             else:
@@ -2925,6 +2938,15 @@ class QuantumModelLearningAgent():
                     )
                 ]
             )
+        self.log_print(
+            [
+                "True model considered: {}. on branch {}.".format(
+                    self.true_model_considered,
+                    self.true_model_branch
+                )
+            ]
+        )
+
         self.finalise_qmla()
 
     ##########
@@ -2951,19 +2973,21 @@ class QuantumModelLearningAgent():
             )
         ]
         learned_set = set(sorted(terms))
-        self.total_positives = len(true_set)
-        self.true_positives = len(true_set.intersection(learned_set))
-        self.false_positives = len(learned_set - true_set)
-        self.false_negatives = len(true_set - learned_set)
-        self.precision = self.true_positives / \
-            (self.true_positives + self.false_positives)
-        self.sensitivity = self.true_positives / self.total_positives
+
+
+        total_positives = len(true_set)
+        true_positives = len(true_set.intersection(learned_set))
+        false_positives = len(learned_set - true_set)
+        false_negatives = len(true_set - learned_set)
+        precision = true_positives / \
+            (true_positives + false_positives)
+        sensitivity = true_positives / total_positives
         try:
             # self.f_score = (
             f_score = (
                 (1 + beta**2) * (
-                    (self.precision * self.sensitivity)
-                    / (beta**2 * self.precision + self.sensitivity)
+                    (precision * sensitivity)
+                    / (beta**2 * precision + sensitivity)
                 )
             )
         except BaseException:
@@ -2972,8 +2996,93 @@ class QuantumModelLearningAgent():
             f_score = 0
 
         self.f_score = f_score
+        self.model_f_scores[model_id] = f_score
+        self.model_precisions[model_id] = precision
+        self.model_sensitivities[model_id] = sensitivity
+        return f_score 
 
-        return f_score
+    def get_statistical_metrics(
+        self,
+        save_to_file=None
+    ):
+        model_ids = range(self.highest_model_id)
+        model_branches = {
+            i : self.get_model_data_by_field(
+                name = self.model_name_id_map[i], 
+                field = 'branch_id'
+            )
+            for i in model_ids
+        }
+
+        generations = sorted(set(model_branches.values()))
+        generational_sensitivity = {
+            b : []
+            for b in generations
+        }
+        generational_f_score = {
+            b : []
+            for b in generations
+        }
+        generational_precision = {
+            b : []
+            for b in generations
+        }
+        for m in model_ids: 
+            b = model_branches[m]
+            generational_sensitivity[b].append(self.model_sensitivities[m])
+            generational_precision[b].append(self.model_precisions[m]) 
+            generational_f_score[b].append(self.model_f_scores[m])    
+        include_plots = [
+            {'name' : 'F-score', 'data' : generational_f_score, 'colour' : 'red'}, 
+            {'name' : 'Precision', 'data' : generational_precision, 'colour': 'blue'}, 
+            {'name' : 'Sensitivity', 'data' : generational_sensitivity, 'colour' : 'green'}, 
+        ]
+        self.generational_statistical_metrics = {
+            k['name'] : k['data']
+            for k in include_plots
+        }
+
+        fig = plt.figure(
+            figsize=(15, 5),
+            # constrained_layout=True,
+            tight_layout=True
+        )
+        gs = GridSpec(
+            nrows=1,
+            ncols=len(include_plots),
+            # figure=fig # not available on matplotlib 2.1.1 (on BC)
+        )
+        plot_col = 0
+
+        for plotting_data in include_plots: 
+
+            ax = fig.add_subplot(gs[0, plot_col])
+            data = plotting_data['data']
+            ax.plot(
+                generations,
+                [np.median(data[b]) for b in generations], 
+                label = "{} median".format(plotting_data['name']),
+                color = plotting_data['colour'],
+                marker = 'o'
+            )
+            ax.fill_between(
+                generations,
+                [np.min(data[b]) for b in generations], 
+                [np.max(data[b]) for b in generations], 
+                alpha = 0.2, 
+                label = "{} min/max".format(plotting_data['name']),
+                color = plotting_data['colour']
+            )
+            ax.set_ylabel("{}".format(plotting_data['name']))
+            ax.set_xlabel("Generation")
+            ax.legend()
+            ax.set_ylim(0,1)
+            plot_col += 1
+
+        if save_to_file is not None: 
+            plt.savefig(save_to_file)
+
+
 
     def plot_branch_champs_quadratic_losses(
         self,
