@@ -2089,11 +2089,11 @@ def avg_f_score_multi_qmla(
         for g in indices
     ]
     lower_quartile = [
-        np.quantile(flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 0.25)        
+        np.percentile(flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 25)        
         for g in indices
     ]
     upper_quartile = [
-        np.quantile(flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 0.75)        
+        np.percentile(flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 75)        
         for g in indices    
     ]
 
