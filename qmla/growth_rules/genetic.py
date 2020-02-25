@@ -8,14 +8,16 @@ import scipy
 import time
 
 from qmla.growth_rules import growth_rule_super
-# from qmla.growth_rules import GeneticAlgorithm
 from qmla import experiment_design_heuristics
 from qmla import topology
-# from qmla import model_generation
 from qmla import model_naming
 from qmla import probe_set_generation
 from qmla import database_framework
 
+__all__ = [
+    'Genetic', 
+    'GeneticAlgorithmQMLA'
+]
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]
 
@@ -66,8 +68,8 @@ class Genetic(
 
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        self.max_spawn_depth = 20
-        self.initial_num_models = 20
+        self.max_spawn_depth = 50
+        self.initial_num_models = 16
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -88,14 +90,14 @@ class Genetic(
 
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
-            4: self.initial_num_models * self.max_spawn_depth,
+            self.num_sites : (self.initial_num_models * self.max_spawn_depth)/6,
             'other': 0
         }
 
         self.max_time_to_consider = 5
         self.min_param = 0.48
         self.max_param = 0.52
-        self.num_processes_to_parallelise_over = 10
+        self.num_processes_to_parallelise_over = max(self.initial_num_models, 15)
 
     def generate_models(
         self,
@@ -345,6 +347,7 @@ class GeneticAlgorithmQMLA():
         num_models=5
     ):
         new_models = []
+        self.initial_number_models = num_models
         self.chromosomes_at_generation[0] = []
 
         while len(new_models) < num_models:
@@ -375,9 +378,11 @@ class GeneticAlgorithmQMLA():
         self,
         model_fitnesses,
         num_chromosomes_to_select=2,
-        num_pairs_to_sample=5,
+        num_pairs_to_sample=None,
         **kwargs
     ):
+        if num_pairs_to_sample is None: 
+            num_pairs_to_sample = self.initial_number_models/2
         models = list(model_fitnesses.keys())
         num_nonzero_fitness_models = np.count_nonzero(
             list(model_fitnesses.values()))
