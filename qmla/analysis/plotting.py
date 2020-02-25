@@ -2100,6 +2100,7 @@ def avg_f_score_multi_qmla(
     plt.plot(
         indices, 
         avg_f_scores,
+        marker='o',
         label='Median F score'
     )
 
@@ -2113,6 +2114,9 @@ def avg_f_score_multi_qmla(
     plt.title("Median F-score V QMLA generation")
     plt.ylabel('F-score')
     plt.xlabel('Generation')
+    plt.ylim(-0.1, 1.1)
+    plt.yticks([0,0.25, 0.5, 0.75, 1])
+    plt.xticks(indices)
     plt.legend()
     
     if save_to_file is not None: 
