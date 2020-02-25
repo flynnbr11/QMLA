@@ -2038,7 +2038,7 @@ def summarise_qmla_text_file(
         True model won {true_mod_found} instance(s); considered in {true_mod_considered} instance(s). \n\
         Average time taken: {avg_time} seconds \n\
         True growth rules: {growth_rules} \n\
-        Range of number of models per instance: {min_num_mods}-{max_num_mods}. \n\
+        Min/median/max number of models per instance: {min_num_mods}/{median_num_mods}/{max_num_mods}. \n\
         ".format(
             num_true_found = len(all_results), 
             true_mod_considered = all_results['TrueModelConsidered'].sum(), 
@@ -2046,6 +2046,7 @@ def summarise_qmla_text_file(
             avg_time = np.round(all_results['Time'].median(), 2),
             growth_rules = list(all_results.GrowthGenerator.unique()),
             min_num_mods = all_results['NumModels'].min(),
+            median_num_mods = all_results['NumModels'].median(),
             max_num_mods = all_results['NumModels'].max()
         )
 
