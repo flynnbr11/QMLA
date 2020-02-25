@@ -2232,6 +2232,7 @@ class QuantumModelLearningAgent():
             'TrueModelBranch' : self.true_model_branch,
             'NumModels' : self.highest_model_id,
             'StatisticalMetrics' : self.generational_statistical_metrics,
+            'GenerationalFscore'  : self.generational_f_score,
         }
 
     def check_champion_reducibility(
@@ -2546,6 +2547,7 @@ class QuantumModelLearningAgent():
             'TrueModelBranch' : self.true_model_branch,
             'NumModels' : self.highest_model_id,
             'StatisticalMetrics' : self.generational_statistical_metrics,
+            'GenerationalFscore'  : self.generational_f_score,
         }
 
         self.log_print(
@@ -2694,6 +2696,7 @@ class QuantumModelLearningAgent():
                 'TrueModelBranch' : self.true_model_branch,
                 'NumModels' : self.highest_model_id,
                 'StatisticalMetrics' : self.generational_statistical_metrics,
+                'GenerationalFscore'  : self.generational_f_score,
             }
             self.model_id_to_name_map = {}
             for k in self.model_name_id_map:
@@ -3037,9 +3040,18 @@ class QuantumModelLearningAgent():
             {'name' : 'Precision', 'data' : generational_precision, 'colour': 'blue'}, 
             {'name' : 'Sensitivity', 'data' : generational_sensitivity, 'colour' : 'green'}, 
         ]
+        self.generational_f_score = generational_f_score
         self.generational_statistical_metrics = {
             k['name'] : k['data']
             for k in include_plots
+        }
+        self.alt_generational_statistical_metrics = {
+            b : {
+                'Precision' : generational_precision[b],
+                'Sensitivity' : generational_sensitivity[b], 
+                'F-score' : generational_f_score[b]
+            }
+            for b in generations 
         }
 
         fig = plt.figure(

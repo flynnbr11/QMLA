@@ -314,6 +314,14 @@ qmla.analysis.stat_metrics_histograms(
     )
 )
 
+qmla.analysis.avg_f_score_multi_qmla(
+    results_csv_path = results_csv, 
+    save_to_file=os.path.join(
+        directory_to_analyse, 
+        'f_scores.png'
+    )
+)
+
 # Summarise results into txt file for quick checking results. 
 qmla.analysis.summarise_qmla_text_file(
     results_csv_path = results_csv, 
@@ -321,8 +329,8 @@ qmla.analysis.summarise_qmla_text_file(
         directory_to_analyse, 
         'summary.txt'
     )
-
 )
+
 
 
 # arguments.top_number_models = len(model_scores.keys())

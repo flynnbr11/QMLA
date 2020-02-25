@@ -17,6 +17,10 @@ import qmla.model_naming as model_naming
 import qmla.database_framework as database_framework
 plt.switch_backend('agg')
 
+def flatten(l): 
+    # flatten list of lists
+    return [item for sublist in l for item in sublist]
+
 def parameter_sweep_analysis(
     directory_name,
     results_csv,
@@ -2050,4 +2054,68 @@ def summarise_qmla_text_file(
             to_write, 
             file=summary_file, 
             flush=True
+        )
+
+def avg_f_score_multi_qmla(
+    results_csv_path,
+    save_to_file=None
+):
+    plt.clf()
+    all_results = pandas.read_csv(results_csv_path)
+    gen_f_scores = all_results.GenerationalFscore
+
+    all_f_scores = None
+    for g in gen_f_scores.index:
+        data = eval(gen_f_scores[g])
+        indices = list(data.keys())
+        data_array = np.array(
+            [data[i] for i in indices]
+        )
+        p = pandas.DataFrame(
+            data_array, 
+            columns=['Fscore'],
+            index=indices
+        )
+        p['ID'] = g
+        p['Gen'] = indices
+
+        if all_f_scores is None:
+            all_f_scores = p
+        else:
+            all_f_scores = all_f_scores.append(p, ignore_index=True)
+
+    avg_f_scores = [
+        np.median(flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)))        
+        for g in indices
+    ]
+    lower_quartile = [
+        np.quantile(flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 0.25)        
+        for g in indices
+    ]
+    upper_quartile = [
+        np.quantile(flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 0.75)        
+        for g in indices    
+    ]
+
+    plt.plot(
+        indices, 
+        avg_f_scores,
+        label='Median F score'
+    )
+
+    plt.fill_between(
+        indices, 
+        lower_quartile, 
+        upper_quartile,
+        label='Inter-quartile range',
+        alpha=0.2
+    )
+    plt.title("Median F-score V QMLA generation")
+    plt.ylabel('F-score')
+    plt.xlabel('Generation')
+    plt.legend()
+    
+    if save_to_file is not None: 
+        plt.savefig(
+            save_to_file
         )
