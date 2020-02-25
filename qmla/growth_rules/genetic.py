@@ -90,7 +90,7 @@ class Genetic(
 
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
-            self.num_sites : (self.initial_num_models * self.max_spawn_depth)/6,
+            self.num_sites : (self.initial_num_models * self.max_spawn_depth),
             'other': 0
         }
 
