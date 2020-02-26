@@ -297,12 +297,21 @@ class Genetic(
         import matplotlib.pyplot as plt
         import seaborn as sns
         plt.clf()
-        bplot = sns.lineplot(
-            x='f_score', 
-            y='fitness', 
-            # hue='generation',
-            data = self.fitness_by_f_score,
-        )
+        try:
+            bplot = sns.lineplot(
+                x='f_score', 
+                y='fitness', 
+                # hue='generation',
+                data = self.fitness_by_f_score,
+            )
+        except:
+            bplot = sns.tsplot(
+                x='f_score', 
+                y='fitness', 
+                # hue='generation',
+                data = self.fitness_by_f_score,
+            )
+
         plt.legend(loc='lower right')
         bplot.set_xlabel('F score')
         bplot.set_ylabel('Fitness (win ratio)')
