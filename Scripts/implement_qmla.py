@@ -735,7 +735,8 @@ else:
             pickle.dump(qmd, pkl_file, protocol=4)
 
     qmd.growth_class.growth_rule_specific_plots(
-        save_directory = qmla_controls.plots_directory
+        save_directory = qmla_controls.plots_directory,
+        qmla_id = qmla_controls.long_id
     )
 
     qmd.store_bayes_factors_to_shared_csv(
