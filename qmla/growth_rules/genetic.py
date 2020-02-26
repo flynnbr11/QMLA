@@ -297,6 +297,7 @@ class Genetic(
         import matplotlib.pyplot as plt
         import seaborn as sns
         plt.clf()
+
         try:
             bplot = sns.lineplot(
                 x='f_score', 
@@ -305,7 +306,7 @@ class Genetic(
                 data = self.fitness_by_f_score,
             )
         except:
-            bplot = sns.tsplot(
+            bplot = sns.regplot(
                 x='f_score', 
                 y='fitness', 
                 # hue='generation',
