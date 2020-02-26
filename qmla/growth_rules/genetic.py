@@ -102,7 +102,7 @@ class Genetic(
         self.max_time_to_consider = 5
         self.min_param = 0.499
         self.max_param = 0.501
-        self.num_processes_to_parallelise_over = min(self.initial_num_models, 15)
+        self.num_processes_to_parallelise_over = 10
 
     def generate_models(
         self,
@@ -122,8 +122,11 @@ class Genetic(
         model_fitnesses = {}
         model_f_scores = {}
         # fitness_by_f_score = {}
+        fitness_track = {}
 
-        max_fitness = max(list(model_points.values()))
+        sum_fitnesses = sum(list(model_points.values()))
+        self.log_print(["Sum fitnesses:", sum_fitnesses])
+        self.log_print(["Values:", list(model_points.values())])
         for m in list(model_points.keys()):
             mod = kwargs['model_names_ids'][m]
             model_fitnesses[mod] = model_points[m]
@@ -131,30 +134,26 @@ class Genetic(
                 test_model = mod, 
             )
             model_f_scores[mod] = f_score
+            fitness_track[mod] = model_fitnesses[mod]/sum_fitnesses
             self.fitness_by_f_score = (
                 self.fitness_by_f_score.append(
                     pd.Series(
                     {
-                        'fitness' : model_fitnesses[mod]/max_fitness, 
+                        'fitness' : model_fitnesses[mod]/sum_fitnesses, 
                         'generation' : kwargs['spawn_step'],
                         'f_score' : f_score
                     }), 
                     ignore_index=True
                 )
             )
-            # try:
-            #     self.fitness_by_f_score[f_score].append(model_fitnesses[mod]/max_fitness)
-            # except:
-            #     self.fitness_by_f_score[f_score] = [(model_fitnesses[mod]/max_fitness)]
-
         
         self.log_print(
             [
-                'Generation {} \nModel Fitnesses: {} \nF-scores: {}'.format(
+                'Generation {} \nModel Fitnesses: {} \nF-scores: {} \nWeights:{}'.format(
                     kwargs['spawn_step'],
                     model_fitnesses,
                     model_f_scores,
-                    # fitness_by_f_score
+                    fitness_track
                 )                
             ]
         )
@@ -316,6 +315,8 @@ class Genetic(
         plt.legend(loc='lower right')
         bplot.set_xlabel('F score')
         bplot.set_ylabel('Fitness (win ratio)')
+        bplot.set_ylim((0,1))
+        bplot.set_xlim((0,1))
         bplot.figure.savefig(save_to_file)
 
 
