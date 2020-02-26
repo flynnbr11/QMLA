@@ -6,13 +6,15 @@ import random
 import copy
 import scipy
 import time
+import pandas as pd
 
 from qmla.growth_rules import growth_rule_super
 from qmla import experiment_design_heuristics
 from qmla import topology
 from qmla import model_naming
 from qmla import probe_set_generation
-from qmla import database_framework
+# from qmla import qmla.database_framework
+import qmla.database_framework
 
 __all__ = [
     'Genetic', 
@@ -39,12 +41,13 @@ class Genetic(
         # self.true_model = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
         # self.true_model = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
         # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
+        self.fitness_by_f_score = pd.DataFrame()
         self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
         self.heisenberg_xxz_small = 'pauliSet_1J2_xJx_d3+pauliSet_1J3_yJy_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
         self.true_model = self.heisenberg_xxz_small
         self.true_model = 'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
-        self.true_model = database_framework.alph(self.true_model)
-        self.num_sites = database_framework.get_num_qubits(self.true_model)
+        self.true_model = qmla.database_framework.alph(self.true_model)
+        self.num_sites = qmla.database_framework.get_num_qubits(self.true_model)
         self.num_probes = 5
         self.base_terms = [
             # 'x', 'z',
@@ -69,7 +72,7 @@ class Genetic(
 
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        self.max_spawn_depth = 5
+        self.max_spawn_depth = 3
         self.initial_num_models = 8
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
@@ -88,6 +91,7 @@ class Genetic(
             ]
         }
         self.fitness_at_step = {}
+        
 
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
@@ -116,11 +120,44 @@ class Genetic(
         # print("kwargs: ", kwargs)
         self.fitness_at_step[kwargs['spawn_step']] = model_points
         model_fitnesses = {}
+        model_f_scores = {}
+        # fitness_by_f_score = {}
+
+        max_fitness = max(list(model_points.values()))
         for m in list(model_points.keys()):
             mod = kwargs['model_names_ids'][m]
             model_fitnesses[mod] = model_points[m]
+            f_score = self.f_score_model_comparison(
+                test_model = mod, 
+            )
+            model_f_scores[mod] = f_score
+            self.fitness_by_f_score = (
+                self.fitness_by_f_score.append(
+                    pd.Series(
+                    {
+                        'fitness' : model_fitnesses[mod]/max_fitness, 
+                        'generation' : kwargs['spawn_step'],
+                        'f_score' : f_score
+                    }), 
+                    ignore_index=True
+                )
+            )
+            # try:
+            #     self.fitness_by_f_score[f_score].append(model_fitnesses[mod]/max_fitness)
+            # except:
+            #     self.fitness_by_f_score[f_score] = [(model_fitnesses[mod]/max_fitness)]
 
-        # print("Model fitnesses:", model_fitnesses)
+        
+        self.log_print(
+            [
+                'Generation {} \nModel Fitnesses: {} \nF-scores: {}'.format(
+                    kwargs['spawn_step'],
+                    model_fitnesses,
+                    model_f_scores,
+                    # fitness_by_f_score
+                )                
+            ]
+        )
         new_models = self.genetic_algorithm.genetic_algorithm_step(
             model_fitnesses=model_fitnesses,
             num_pairs_to_sample=self.initial_num_models / 2
@@ -142,14 +179,56 @@ class Genetic(
 
         return new_models
 
+    def f_score_model_comparison(
+        self,
+        test_model,
+        # target_model=None, 
+        # growth_class, 
+        beta=1,  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
+    ):
+        target_model = self.true_model
+        true_set = set(
+            self.latex_name(mod) for mod in
+            qmla.database_framework.get_constituent_names_from_name(target_model)
+        )
+        terms = [
+            self.latex_name(
+                term
+            )
+            for term in
+            qmla.database_framework.get_constituent_names_from_name(
+                test_model
+            )
+        ]
+        learned_set = set(sorted(terms))
+
+        total_positives = len(true_set)
+        true_positives = len(true_set.intersection(learned_set))
+        false_positives = len(learned_set - true_set)
+        false_negatives = len(true_set - learned_set)
+        precision = true_positives / \
+            (true_positives + false_positives)
+        sensitivity = true_positives / total_positives
+        try:
+            f_score = (
+                (1 + beta**2) * (
+                    (precision * sensitivity)
+                    / (beta**2 * precision + sensitivity)
+                )
+            )
+        except BaseException:
+            # both precision and sensitivity=0 as true_positives=0
+            f_score = 0
+        return f_score
+
     def latex_name(
         self,
         name,
         **kwargs
     ):
         # print("[latex name fnc] name:", name)
-        core_operators = list(sorted(database_framework.core_operator_dict.keys()))
-        num_sites = database_framework.get_num_qubits(name)
+        core_operators = list(sorted(qmla.database_framework.core_operator_dict.keys()))
+        num_sites = qmla.database_framework.get_num_qubits(name)
         p_str = 'P' * num_sites
         p_str = '+'
         separate_terms = name.split(p_str)
@@ -201,6 +280,33 @@ class Genetic(
             latex_term += 'T^{}_{}'.format(transverse_axis, transverse_dim)
         latex_term = "${}$".format(latex_term)
         return latex_term
+
+    def growth_rule_specific_plots(
+        self,
+        save_directory,
+        qmla_id=0, 
+    ):
+        self.plot_fitness_v_fscore(
+            save_to_file = os.path.join(
+                save_directory, 
+                'fitness_v_fscore_{}.png'.format(qmla_id)
+            )
+        )
+
+    def plot_fitness_v_fscore(self, save_to_file):
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+        plt.clf()
+        bplot = sns.lineplot(
+            x='f_score', 
+            y='fitness', 
+            # hue='generation',
+            data = self.fitness_by_f_score,
+        )
+        plt.legend(loc='lower right')
+        bplot.set_xlabel('F score')
+        bplot.set_ylabel('Fitness (win ratio)')
+        bplot.figure.savefig(save_to_file)
 
 
 def hamming_distance(str1, str2):
@@ -301,7 +407,7 @@ class GeneticAlgorithmQMLA():
         self,
         model
     ):
-        terms = database_framework.get_constituent_names_from_name(model)
+        terms = qmla.database_framework.get_constituent_names_from_name(model)
         chromosome_locations = []
         for term in terms:
             components = term.split('_')
@@ -315,7 +421,7 @@ class GeneticAlgorithmQMLA():
                     "\nModel:", model
                 )
                 raise
-            core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+            core_operators = list(sorted(qmla.database_framework.core_operator_dict.keys()))
             for l in components:
                 if l[0] == 'd':
                     dim = int(l.replace('d', ''))

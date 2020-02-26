@@ -734,8 +734,10 @@ else:
         with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmd, pkl_file, protocol=4)
 
-    # TODO generalise so tree diagram can be used in all cases
-    # currently only useful for Ising growth 2 qubits.
+    qmd.growth_class.growth_rule_specific_plots(
+        save_directory = qmla_controls.plots_directory
+    )
+
     qmd.store_bayes_factors_to_shared_csv(
         bayes_csv=str(qmla_controls.cumulative_csv)
     )

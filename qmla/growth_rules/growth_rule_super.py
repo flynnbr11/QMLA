@@ -273,6 +273,15 @@ class GrowthRuleSuper():
 
         return self.true_op_terms
 
+    def growth_rule_specific_plots(
+        self,
+        save_directory, 
+        **kwargs
+    ):
+        self.log_print(
+            ['No growth rule plots specified.']
+        )
+
     def log_print(
         self,
         to_print_list
