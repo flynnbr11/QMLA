@@ -68,8 +68,8 @@ class Genetic(
 
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        self.max_spawn_depth = 50
-        self.initial_num_models = 16
+        self.max_spawn_depth = 5
+        self.initial_num_models = 8
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -97,7 +97,7 @@ class Genetic(
         self.max_time_to_consider = 5
         self.min_param = 0.48
         self.max_param = 0.52
-        self.num_processes_to_parallelise_over = max(self.initial_num_models, 15)
+        self.num_processes_to_parallelise_over = min(self.initial_num_models, 15)
 
     def generate_models(
         self,
