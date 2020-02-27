@@ -2089,6 +2089,7 @@ class QuantumModelLearningAgent():
                 self.get_model_storage_instance_by_id(i).model_bayes_factors
             )
             self.compute_model_f_score(i)
+        self.f_score = self.model_f_scores[self.champion_model_id]            
         self.get_statistical_metrics()
 
         self.log_print(["computing expect vals for mod ", champ_model.model_id])
@@ -2506,6 +2507,7 @@ class QuantumModelLearningAgent():
         self.compute_model_f_score(
             model_id=mod_id
         )
+        self.f_score = self.model_f_scores[self.champion_model_id]
         self.get_statistical_metrics()
 
         time_now = time.time()
@@ -2636,6 +2638,7 @@ class QuantumModelLearningAgent():
             self.compute_model_f_score(
                 model_id=mod_id
             )
+            self.f_score = self.model_f_scores[self.champion_model_id]
             self.get_statistical_metrics()
 
             n_qubits = database_framework.get_num_qubits(mod.model_name)
@@ -2998,7 +3001,7 @@ class QuantumModelLearningAgent():
             # self.f_score = 0
             f_score = 0
 
-        self.f_score = f_score
+        f_score = f_score
         self.model_f_scores[model_id] = f_score
         self.model_precisions[model_id] = precision
         self.model_sensitivities[model_id] = sensitivity
