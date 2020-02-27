@@ -2089,7 +2089,7 @@ class QuantumModelLearningAgent():
                 self.get_model_storage_instance_by_id(i).model_bayes_factors
             )
             self.compute_model_f_score(i)
-        self.f_score = self.model_f_scores[self.champion_model_id]            
+        # self.f_score = self.model_f_scores[self.champion_model_id]            
         self.get_statistical_metrics()
 
         self.log_print(["computing expect vals for mod ", champ_model.model_id])
@@ -2507,7 +2507,7 @@ class QuantumModelLearningAgent():
         self.compute_model_f_score(
             model_id=mod_id
         )
-        self.f_score = self.model_f_scores[self.champion_model_id]
+        # self.f_score = self.model_f_scores[self.champion_model_id]
         self.get_statistical_metrics()
 
         time_now = time.time()
@@ -2638,7 +2638,7 @@ class QuantumModelLearningAgent():
             self.compute_model_f_score(
                 model_id=mod_id
             )
-            self.f_score = self.model_f_scores[self.champion_model_id]
+            # self.f_score = self.model_f_scores[self.champion_model_id]
             self.get_statistical_metrics()
 
             n_qubits = database_framework.get_num_qubits(mod.model_name)
@@ -2930,12 +2930,6 @@ class QuantumModelLearningAgent():
         ):
             self.check_champion_reducibility()
 
-        self.log_print(
-            [
-                "Final winner:", self.ChampionName
-            ]
-        )
-
         if self.ChampionName == database_framework.alph(self.true_model_name):
             self.log_print(
                 [
@@ -2952,8 +2946,13 @@ class QuantumModelLearningAgent():
                 )
             ]
         )
-
         self.finalise_qmla()
+        self.log_print(
+            [
+                "Final winner:", self.ChampionName, 
+                "has F-score ", self.model_f_scores[self.champion_model_id]
+            ]
+        )
 
     ##########
     # Section: Analysis/plotting functions
