@@ -299,19 +299,23 @@ class Genetic(
         import matplotlib.pyplot as plt
         import seaborn as sns
         plt.clf()
+        sns.set(rc={'figure.figsize':(11.7,8.27)})
 
+        cmap = sns.cubehelix_palette(dark=.3, light=.8, as_cmap=True)
         try:
             bplot = sns.lineplot(
                 x='f_score', 
                 y='fitness', 
-                # hue='generation',
+                hue='generation',
+                palette=cmap,
                 data = self.fitness_by_f_score,
             )
         except:
             bplot = sns.regplot(
                 x='f_score', 
                 y='fitness', 
-                # hue='generation',
+                hue='generation',
+                palette = cmap,
                 data = self.fitness_by_f_score,
             )
 
@@ -562,11 +566,12 @@ class GeneticAlgorithmQMLA():
             selected_chromosomes = [
                 chromosomes[mod] for mod in selected_models
             ]
+            # combination is a unique string - sum of the two chromosomes - to check against combinations already considered in this generation
             combination = ''.join(
                 [
                     str(i) for i in list(selected_chromosomes[0] + selected_chromosomes[1])
                 ]
-            )
+            ) 
             # print("Trying combination {}".format(combination))
             if combination not in combinations:
                 combinations.append(combination)
