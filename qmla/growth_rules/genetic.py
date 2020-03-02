@@ -49,6 +49,12 @@ class Genetic(
         self.true_model = qmla.database_framework.alph(self.true_model)
         self.num_sites = qmla.database_framework.get_num_qubits(self.true_model)
         self.num_probes = 5
+        
+        self.qhl_models = [
+            'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
+            'pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
+            'pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
+        ]
         self.base_terms = [
             # 'x', 'z',
             'x', 'y',  'z'

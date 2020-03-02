@@ -135,6 +135,7 @@ class QuantumModelLearningAgent():
         self.redis_host_name = self.qmla_controls.host_name
         self.redis_port_number = self.qmla_controls.port_number
         self.log_file = self.qmla_controls.log_file
+        self.models_learned = []
         self.qhl_mode = self.qmla_controls.qhl_mode
         self.qhl_mode_multiple_models = self.qmla_controls.qhl_mode_multiple_models
         self.results_directory = self.qmla_controls.results_directory
@@ -938,6 +939,7 @@ class QuantumModelLearningAgent():
                 self.model_database,
                 name=model_name
             )
+            self.models_learned.append(model_id)
             branch_id = self.models_branches[model_id]
             if self.run_in_parallel and use_rq:
                 # i.e. use a job queue rather than sequentially doing it.
@@ -997,7 +999,8 @@ class QuantumModelLearningAgent():
                 self.log_print(
                     [
                         "Locally calling learn model function.",
-                        "model:", model_name
+                        "model:", model_name,
+                        " ID:", model_id
                     ]
                 )
                 # why is this happening here??
@@ -2625,6 +2628,7 @@ class QuantumModelLearningAgent():
         )
         time_now = time.time()
         time_taken = time_now - self._start_time
+
         for mod_name in model_names:
             mod_id = database_framework.model_id_from_name(
                 db=self.model_database, name=mod_name
@@ -2633,14 +2637,9 @@ class QuantumModelLearningAgent():
             mod.model_update_learned_values(
                 fitness_parameters=self.model_fitness_scores
             )
-            # for this stage, consider the considered model as champion
-            self.champion_model_id = mod_id
             self.compute_model_f_score(
                 model_id=mod_id
             )
-            # self.f_score = self.model_f_scores[self.champion_model_id]
-            self.get_statistical_metrics()
-
             n_qubits = database_framework.get_num_qubits(mod.model_name)
             if n_qubits > 5:
                 # only compute subset of points for plot
@@ -2652,6 +2651,18 @@ class QuantumModelLearningAgent():
             mod.compute_expectation_values(
                 times=expec_val_plot_times,
             )
+
+        self.get_statistical_metrics()
+
+        for mod_name in model_names:
+            mod_id = database_framework.model_id_from_name(
+                db=self.model_database, name=mod_name
+            )
+            mod = self.get_model_storage_instance_by_id(mod_id)
+            # for this stage, consider the considered model as champion
+            self.champion_model_id = mod_id
+            # self.f_score = self.model_f_scores[self.champion_model_id]
+
             # equivalent to self.champion_results
             mod.results_dict = {
                 'NumParticles': mod.num_particles,
@@ -3010,7 +3021,10 @@ class QuantumModelLearningAgent():
         self,
         save_to_file=None
     ):
-        model_ids = range(self.highest_model_id)
+        model_ids = self.models_learned
+        self.log_print(
+            ["Getting statistical metrics for {}".format(model_ids)]
+        )
         model_branches = {
             i : self.get_model_data_by_field(
                 name = self.model_name_id_map[i], 
@@ -3018,8 +3032,16 @@ class QuantumModelLearningAgent():
             )
             for i in model_ids
         }
-
         generations = sorted(set(model_branches.values()))
+        self.log_print(
+            [
+                "[get_statistical_metrics",
+                "model branches:", model_branches, 
+                "model ids: ", model_ids, 
+                "generations: ", generations
+            ]
+        )
+
         generational_sensitivity = {
             b : []
             for b in generations
@@ -3093,6 +3115,7 @@ class QuantumModelLearningAgent():
             ax.set_ylim(0,1)
             plot_col += 1
 
+        self.log_print(["getting statistical metrics complete"])
         if save_to_file is not None: 
             plt.savefig(save_to_file)
 

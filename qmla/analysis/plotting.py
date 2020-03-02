@@ -2096,18 +2096,36 @@ def avg_f_score_multi_qmla(
         else:
             all_f_scores = all_f_scores.append(p, ignore_index=True)
 
-    avg_f_scores = [
-        np.median(flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)))        
-        for g in indices
-    ]
-    lower_quartile = [
-        np.percentile(flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 25)        
-        for g in indices
-    ]
-    upper_quartile = [
-        np.percentile(flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 75)        
-        for g in indices    
-    ]
+
+    try:
+        avg_f_scores = [
+            np.median(
+                flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore))
+            )        
+            for g in indices
+        ]
+        lower_quartile = [
+            np.percentile(
+                flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 
+                25
+            )        
+            for g in indices
+        ]
+        upper_quartile = [
+            np.percentile(
+                flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 
+                75
+            )        
+            for g in indices    
+        ]
+    except: 
+        print("Not enough data for multiple plot points.")
+        f = list(all_f_scores[all_f_scores['Gen'] == 1].Fscore)
+
+        print("Indices:", indices)
+        avg_f_scores = [np.median(f)]
+        lower_quartile = [np.percentile(f, 25)]
+        upper_quartile = [np.percentile(f, 75)]
 
     plt.plot(
         indices, 
@@ -2135,3 +2153,4 @@ def avg_f_score_multi_qmla(
         plt.savefig(
             save_to_file
         )
+    print("Plotted average f scores by generation")
