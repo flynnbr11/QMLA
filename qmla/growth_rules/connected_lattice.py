@@ -350,8 +350,12 @@ class ConnectedLattice(
         # print("[latex name fnc] name:", name)
         core_operators = list(sorted(database_framework.core_operator_dict.keys()))
         num_sites = database_framework.get_num_qubits(name)
-        p_str = 'P' * num_sites
-        separate_terms = name.split(p_str)
+        try:
+            p_str = 'P' * num_sites
+            separate_terms = name.split(p_str)
+        except:
+            p_str = '+'
+            separate_terms = name.split(p_str)
 
         site_connections = {}
         for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):

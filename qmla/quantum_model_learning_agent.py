@@ -2234,7 +2234,7 @@ class QuantumModelLearningAgent():
             'TrueModelConsidered' : self.true_model_considered, 
             'TrueModelFound' : self.true_model_found,
             'TrueModelBranch' : self.true_model_branch,
-            'NumModels' : self.highest_model_id,
+            'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
         }
@@ -2556,7 +2556,7 @@ class QuantumModelLearningAgent():
             'TrueModelConsidered' : self.true_model_considered, 
             'TrueModelFound' : self.true_model_found,
             'TrueModelBranch' : self.true_model_branch,
-            'NumModels' : self.highest_model_id,
+            'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
         }
@@ -2714,7 +2714,7 @@ class QuantumModelLearningAgent():
                 'TrueModelConsidered' : self.true_model_considered, 
                 'TrueModelFound' : self.true_model_found,
                 'TrueModelBranch' : self.true_model_branch,
-                'NumModels' : self.highest_model_id,
+                'NumModels' : len(self.models_learned),
                 'StatisticalMetrics' : self.generational_statistical_metrics,
                 'GenerationalFscore'  : self.generational_f_score,
             }

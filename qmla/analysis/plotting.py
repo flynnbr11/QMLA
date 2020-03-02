@@ -2045,13 +2045,16 @@ def summarise_qmla_text_file(
     all_results = pandas.read_csv(results_csv_path)
 
     to_write = "\
-        {num_true_found} instance(s) total \n\
+        {num_instances} instance(s) total. \n\
         True model won {true_mod_found} instance(s); considered in {true_mod_considered} instance(s). \n\
-        Average time taken: {avg_time} seconds \n\
-        True growth rules: {growth_rules} \n\
+        {n_exp} experiments; {n_prt} particles. \n\
+        Average time taken: {avg_time} seconds. \n\
+        True growth rules: {growth_rules}. \n\
         Min/median/max number of models per instance: {min_num_mods}/{median_num_mods}/{max_num_mods}. \n\
         ".format(
-            num_true_found = len(all_results), 
+            num_instances = len(all_results), 
+            n_exp = int(all_results['NumExperiments'].mean()),
+            n_prt = int(all_results['NumParticles'].mean()),
             true_mod_considered = all_results['TrueModelConsidered'].sum(), 
             true_mod_found = all_results['TrueModelFound'].sum(),
             avg_time = np.round(all_results['Time'].median(), 2),
