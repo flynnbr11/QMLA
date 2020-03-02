@@ -1154,7 +1154,7 @@ def r_squared_plot(
     save_to_file=None
 ):
     # For use in QHL parameter sweep
-    qhl_results = pd.DataFrame.from_csv(
+    qhl_results = pd.DataFrame.read_csv(
         results_csv_path, index_col='ConfigLatex')
 
     piv = pd.pivot_table(qhl_results,
@@ -1238,7 +1238,7 @@ def average_quadratic_losses(
     save_to_file=None
 ):
     from matplotlib import cm
-    results = pd.DataFrame.from_csv(
+    results = pd.DataFrame.read_csv(
         results_path,
         index_col='QID'
     )
@@ -3364,7 +3364,7 @@ def multiQMDBayes(
 ):
     import csv
     import pandas
-    cumulative_bayes = pandas.DataFrame.from_csv(all_bayes_csv)
+    cumulative_bayes = pandas.DataFrame.read_csv(all_bayes_csv)
     names = list(cumulative_bayes.keys())
 
     count_bayes = {}
@@ -3595,7 +3595,7 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
         name=correct_mod
     )
     results_csv = os.path.abspath(results_csv_path)
-    qmd_res = pd.DataFrame.from_csv(results_csv)
+    qmd_res = pd.DataFrame.read_csv(results_csv)
 
     mods = list(
         set(list(

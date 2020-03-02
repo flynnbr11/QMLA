@@ -1,9 +1,9 @@
 import numpy as np
 import itertools as itr
-
 import os as os
 import sys as sys
 
+import matplotlib.pyplot as plt
 
 class GridTopology():
     def __init__(

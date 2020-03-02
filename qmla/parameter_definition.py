@@ -82,7 +82,7 @@ def set_shared_parameters(
             true_model_terms_params=true_params_dict_latex_names
         )
     except BaseException:
-        print("[SetQHLParams] plotting prior failed \n\n\n")
+        print("[ParameterDefinition] plotting prior failed \n\n\n")
         pass
 
     if growth_class.growth_generation_rule not in all_growth_rules: 

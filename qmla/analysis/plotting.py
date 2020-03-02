@@ -34,7 +34,7 @@ def parameter_sweep_analysis(
     if not directory_name.endswith('/'):
         directory_name += '/'
 
-    qmd_cumulative_results = pandas.DataFrame.from_csv(results_csv,
+    qmd_cumulative_results = pandas.DataFrame.read_csv(results_csv,
                                                        index_col='ConfigLatex'
                                                        )
     piv = pandas.pivot_table(
@@ -156,7 +156,7 @@ def average_parameters(
     average_type='median'
 ):
 
-    results = pandas.DataFrame.from_csv(
+    results = pandas.DataFrame.read_csv(
         results_path,
         index_col='QID'
     )
@@ -263,7 +263,7 @@ def average_parameter_estimates(
 ):
     from matplotlib import cm
     plt.switch_backend('agg')  # to try fix plt issue on BC
-    results = pandas.DataFrame.from_csv(
+    results = pandas.DataFrame.read_csv(
         results_path,
         index_col='QID'
     )
@@ -516,7 +516,7 @@ def analyse_and_plot_dynamics_multiple_models(
     from matplotlib import cm
     from scipy import stats
 
-    results = pandas.DataFrame.from_csv(
+    results = pandas.DataFrame.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1025,7 +1025,7 @@ def r_sqaured_average(
     fig = plt.figure()
     ax = plt.subplot(111)
 
-    results = pandas.DataFrame.from_csv(
+    results = pandas.DataFrame.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1118,7 +1118,7 @@ def volume_average(
     fig = plt.figure()
     ax = plt.subplot(111)
 
-    results = pandas.DataFrame.from_csv(
+    results = pandas.DataFrame.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1204,7 +1204,7 @@ def all_times_learned_histogram(
     fig = plt.figure()
     ax = plt.subplot(111)
 
-    results = pandas.DataFrame.from_csv(
+    results = pandas.DataFrame.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1764,7 +1764,7 @@ def plot_tree_multi_QMD(
     save_to_file=None
 ):
     try:
-        qmd_res = pandas.DataFrame.from_csv(
+        qmd_res = pandas.DataFrame.read_csv(
             results_csv,
             index_col='LatexName'
         )
