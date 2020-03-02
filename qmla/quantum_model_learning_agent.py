@@ -2434,12 +2434,18 @@ class QuantumModelLearningAgent():
     # Section: Run available algorithms
     ##########
 
-    def run_quantum_hamiltonian_learning(self):
+    def run_quantum_hamiltonian_learning(
+        self,
+        force_qhl=False
+    ):
 
         if (
-            self.qhl_mode == True
-            and
-            self.true_model_name not in list(self.models_branches.keys())
+            (
+                self.qhl_mode 
+                and
+                self.true_model_name not in list(self.models_branches.keys())
+            )
+            or force_qhl
         ):
             self.new_branch(
                 growth_rule=self.growth_rule_of_true_model,

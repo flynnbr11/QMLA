@@ -8,7 +8,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 num_tests=1
 qhl_test=0 # don't perform QMLA; perform QHL on known correct model
-multiple_qhl=1 # perform QHL for defined list of models.
+multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
 simulate_experiment=0
@@ -84,6 +84,7 @@ sim_growth_rule='Genetic'
 # sim_growth_rule='Presentation'
 # sim_growth_rule='ExperimentReducedNV'
 # sim_growth_rule='example'
+# sim_growth_rule='TalkDemonstration'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1

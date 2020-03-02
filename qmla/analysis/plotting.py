@@ -2056,9 +2056,9 @@ def summarise_qmla_text_file(
             true_mod_found = all_results['TrueModelFound'].sum(),
             avg_time = np.round(all_results['Time'].median(), 2),
             growth_rules = list(all_results.GrowthGenerator.unique()),
-            min_num_mods = all_results['NumModels'].min(),
-            median_num_mods = all_results['NumModels'].median(),
-            max_num_mods = all_results['NumModels'].max()
+            min_num_mods = int(all_results['NumModels'].min()),
+            median_num_mods = int(all_results['NumModels'].median()),
+            max_num_mods = int(all_results['NumModels'].max())
         )
 
     with open(path_to_summary_file, 'w') as summary_file:

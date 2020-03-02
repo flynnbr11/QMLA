@@ -48,7 +48,9 @@ growth_classes = {
     'Presentation':
         GR.PresentationPlotGeneration,
     'Genetic':
-        GR.Genetic
+        GR.Genetic,
+    'TalkDemonstration': 
+        GR.TalkDemonstration
 }
 
 

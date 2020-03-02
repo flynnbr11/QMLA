@@ -12,7 +12,6 @@ from qmla import database_framework
 
 
 class HeisenbergXYZProbabilistic(
-    # connected_lattice.ConnectedLattice
     connected_lattice_probabilistic.ConnectedLatticeProbabilistic
 ):
 

@@ -527,7 +527,8 @@ class GeneticAlgorithmQMLA():
             list(model_fitnesses.values()))
         num_models = len(models)
 
-        max_possible_num_combinations = scipy.misc.comb(
+        # max_possible_num_combinations = scipy.misc.comb(
+        max_possible_num_combinations = scipy.special.comb(
             num_nonzero_fitness_models, 2)
 
         self.log_print(
