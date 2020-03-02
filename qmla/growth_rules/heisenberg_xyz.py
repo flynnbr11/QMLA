@@ -33,7 +33,7 @@ class HeisenbergXYZProbabilistic(
         self.lattice_full_connectivity = False
         self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
         self.max_num_sites = 4
-        self.probe_generation_function = probe_set_generation.pauli_eigenvector_based_probes
+        # self.probe_generation_function = probe_set_generation.pauli_eigenvector_based_probes
 
         self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
         self.four_site_xxz_chain = 'pauliSet_1J2_xJx_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_zJz_d4'
@@ -118,7 +118,7 @@ class HeisenbergXYZPredetermined(
             'other': 0
         }
         self.max_num_qubits = 3
-        self.max_num_sites = 5
+        self.max_num_sites = 6
         self.setup_growth_class()
         self.min_param = 0
         self.max_param = 1
@@ -132,6 +132,7 @@ class HeisenbergXYZPredetermined(
 
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
+            self.true_model = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_yJy_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_yJy_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_yJy_d4PPPPpauliSet_3J4_zJz_d4'
             models = []
             list_connections = [
                 [(1, 2)],  # pair of sites
@@ -146,6 +147,8 @@ class HeisenbergXYZPredetermined(
             for connected_sites in list_connections:
 
                 system_size = max(max(connected_sites))
+                if system_size  > self.max_num_sites: 
+                    self.max_num_sites = system_size + 1
                 terms = connected_lattice.pauli_like_like_terms_connected_sites(
                     connected_sites=connected_sites,
                     base_terms=['x', 'y', 'z'],
@@ -155,36 +158,40 @@ class HeisenbergXYZPredetermined(
                 p_str = 'P' * system_size
                 models.append(p_str.join(terms))
 
-            # self.initial_models = models
+            self.initial_models = models
+
+            ###########
             # testing that subsystem is better than random alternative
+            ##########
+
             # i.e. 1 qubit model containing correct subsystem wins 1 qubit generation
-            self.true_model = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
-            self.initial_models = [
-                'pauliSet_1J2_xJx_d3',
-                'pauliSet_1J2_zJz_d3',
-                'pauliSet_1J2_yJy_d3',
-                'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3',
-                'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3',
-                'pauliSet_1J2_zJz_d3PPPpauliSet_1J2_yJy_d3',
-                'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_1J2_zJz_d3',
+            # self.true_model = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
+            # self.initial_models = [
+            #     'pauliSet_1J2_xJx_d3',
+            #     'pauliSet_1J2_zJz_d3',
+            #     'pauliSet_1J2_yJy_d3',
+            #     'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3',
+            #     'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3',
+            #     'pauliSet_1J2_zJz_d3PPPpauliSet_1J2_yJy_d3',
+            #     'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_1J2_zJz_d3',
+            # ]
 
-            ]
 
-            self.true_model_terms_params = {
-                'pauliSet_1J2_xJx_d3': 0.27044671107574969, 
-                # 'pauliSet_2J3_zJz_d3': 0, 
-                'pauliSet_2J3_zJz_d3': 1.1396665426731736, 
-                'pauliSet_1J3_zJz_d3': 1.1396665426731736, 
-                'pauliSet_1J2_xJx_d4': 0.27044671107574969, 
-                'pauliSet_1J3_zJz_d4': 1.1396665426731736, 
-                'pauliSet_2J4_xJx_d4': 0.38705331216054806, 
-                'pauliSet_3J4_xJx_d4': 0.46892509638460805, 
-                'pauliSet_3J4_zJz_d4': 0.45440765993845578
-            }
+            # self.true_model_terms_params = {
+            #     'pauliSet_1J2_xJx_d3': 0.27044671107574969, 
+            #     # 'pauliSet_2J3_zJz_d3': 0, 
+            #     'pauliSet_2J3_zJz_d3': 1.1396665426731736, 
+            #     'pauliSet_1J3_zJz_d3': 1.1396665426731736, 
+            #     'pauliSet_1J2_xJx_d4': 0.27044671107574969, 
+            #     'pauliSet_1J3_zJz_d4': 1.1396665426731736, 
+            #     'pauliSet_2J4_xJx_d4': 0.38705331216054806, 
+            #     'pauliSet_3J4_xJx_d4': 0.46892509638460805, 
+            #     'pauliSet_3J4_zJz_d4': 0.45440765993845578
+            # }
 
-            # if self.true_model not in self.initial_models:
-            #     self.log_print("Adding true operator to initial model list")
-            #     self.initial_models.append(self.true_model)
+            if self.true_model not in self.initial_models:
+                self.log_print("Adding true operator to initial model list")
+                self.initial_models.append(self.true_model)
         
 
 
