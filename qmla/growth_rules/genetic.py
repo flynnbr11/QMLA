@@ -306,7 +306,7 @@ class Genetic(
             x='f_score', 
             y='fitness', 
             # hue='generation',
-            palette = cmap,
+            # palette = cmap,
             data = self.fitness_by_f_score,
         )
 
