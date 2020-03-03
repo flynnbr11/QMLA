@@ -40,6 +40,8 @@ class ConnectedLattice(
         self.lattice_full_connectivity = False
         self.max_time_to_consider = 50
         self.num_probes = 25
+        self.min_param = 0.4 # for the sake of plots
+        self.max_param = 0.6
 
         self.true_model = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.true_model = database_framework.alph(self.true_model)

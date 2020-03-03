@@ -64,8 +64,6 @@ class HeisenbergXYZProbabilistic(
         self.fitness_win_ratio_exponent = 1
         self.fitness_minimum = 1
         self.fitness_maximum = 1.0
-        self.min_param = 0
-        self.max_param = 1
         self.check_champion_reducibility = True
         self.generation_DAG = 1
         # self.true_model_terms_params = {
@@ -120,19 +118,17 @@ class HeisenbergXYZPredetermined(
         self.max_num_qubits = 3
         self.max_num_sites = 6
         self.setup_growth_class()
-        self.min_param = 0
-        self.max_param = 1
 
-        self.true_model_terms_params = {
-            'pauliSet_1J2_zJz_d4': 0.7070533314487537, 
-            'pauliSet_2J4_zJz_d4': 0.46976922504656166, 
-            'pauliSet_1J3_xJx_d4': 0.5445604382949641, 
-            'pauliSet_3J4_zJz_d4': 0.9825508924850654, 
-            'pauliSet_1J2_xJx_d4': 0.268227093044357, 
-            'pauliSet_3J4_xJx_d4': 0.7849629571198494, 
-            'pauliSet_2J4_xJx_d4': 0.48907849424521366, 
-            'pauliSet_1J3_zJz_d4': 0.1972300936609916
-        }
+        # self.true_model_terms_params = {
+        #     'pauliSet_1J2_zJz_d4': 0.7070533314487537, 
+        #     'pauliSet_2J4_zJz_d4': 0.46976922504656166, 
+        #     'pauliSet_1J3_xJx_d4': 0.5445604382949641, 
+        #     'pauliSet_3J4_zJz_d4': 0.9825508924850654, 
+        #     'pauliSet_1J2_xJx_d4': 0.268227093044357, 
+        #     'pauliSet_3J4_xJx_d4': 0.7849629571198494, 
+        #     'pauliSet_2J4_xJx_d4': 0.48907849424521366, 
+        #     'pauliSet_1J3_zJz_d4': 0.1972300936609916
+        # }
 
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered

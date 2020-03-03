@@ -32,8 +32,6 @@ class FermiHubbardBase(
         # self.true_model = 'FHhop_1h2_up_d2'
         self.true_model = 'FHhop_1h2_down_d3+FHhop_1h2_up_d3+FHhop_1h3_down_d3+FHhop_2h3_up_d3+FHonsite_1_d3+FHonsite_2_d3+FHonsite_3_d3'  # for testing
         self.tree_completed_initially = True
-        self.min_param = 0
-        self.max_param = 1
         self.initial_models = [
             self.true_model
         ]
