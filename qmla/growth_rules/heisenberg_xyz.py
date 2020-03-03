@@ -130,6 +130,18 @@ class HeisenbergXYZPredetermined(
         #     'pauliSet_2J3_yJy_d3': 1.9672493478694473
         # }
 
+        self.true_model_terms_params = {
+            'pauliSet_1J2_zJz_d4': 0.7070533314487537, 
+            'pauliSet_2J3_zJz_d4': 0.6253883093034486, 
+            'pauliSet_2J3_xJx_d4': 0.611354486807859, 
+            'pauliSet_3J4_zJz_d4': 0.9825508924850654, 
+            'pauliSet_3J4_yJy_d4': 1.0654314259965183, 
+            'pauliSet_3J4_xJx_d4': 0.7849629571198494, 
+            'pauliSet_2J3_yJy_d4': -0.014525280713959088, 
+            'pauliSet_1J2_xJx_d4': 0.268227093044357, 
+            'pauliSet_1J2_yJy_d4': 0.44095526633847043
+        }
+
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
             self.true_model = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_yJy_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_yJy_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_yJy_d4PPPPpauliSet_3J4_zJz_d4'
