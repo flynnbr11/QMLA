@@ -32,12 +32,13 @@ class ConnectedLattice(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        # self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.lattice_dimension = 2
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
+        self.max_time_to_consider = 50
 
         self.true_model = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.true_model = database_framework.alph(self.true_model)
@@ -579,5 +580,6 @@ def increase_dimension_pauli_set(initial_model, new_dimension=None):
 
     p_str = 'P' * (new_dimension)
     full_model = p_str.join(separate_terms)
+    # full_model = '+'.join(separate_terms)
 
     return full_model

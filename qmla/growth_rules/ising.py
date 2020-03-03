@@ -47,7 +47,7 @@ class IsingProbabilistic(
         self.num_top_models_to_build_on = 'all'
         self.model_generation_strictness = -1 #0  # 1 #-1
         self.fitness_win_ratio_exponent = 1
-        self.max_time_to_consider = 5
+        # self.max_time_to_consider = 20
 
         self.generation_DAG = 1
         self.tree_completed_initially = False
@@ -85,7 +85,7 @@ class IsingPredetermined(
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
         self.max_num_sites = 10
-        self.max_time_to_consider = 5
+        # self.max_time_to_consider = 50
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
         # self.true_model = 'pauliSet_zJz_1J2_d2'
@@ -100,6 +100,14 @@ class IsingPredetermined(
         ]
         self.min_param = 0
         self.max_param = 1
+        self.true_model_terms_params = {
+            # 'pauliSet_zJz_2J3_d4': 0.27994282368625547, 
+            # 'pauliSet_zJz_1J2_d4': 0.7120709293057756, 
+            # 'pauliSet_zJz_3J4_d4': -0.12436606254961697
+            # 'pauliSet_zJz_2J3_d4': 2.7994282368625547, 
+            # 'pauliSet_zJz_1J2_d4': 7.120709293057756, 
+            # 'pauliSet_zJz_3J4_d4': -1.2436606254961697
+        }
 
         self.setup_growth_class()
         self.tree_completed_initially = True

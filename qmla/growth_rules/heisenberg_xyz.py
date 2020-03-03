@@ -54,7 +54,7 @@ class HeisenbergXYZProbabilistic(
             'z'
         ]
         self.num_probes = 50
-        self.max_time_to_consider = 20
+        # self.max_time_to_consider = 50
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # 'all' # at each generation Badassness parameter
 
@@ -105,7 +105,7 @@ class HeisenbergXYZPredetermined(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.max_time_to_consider = 20
+        # self.max_time_to_consider = 100
         self.tree_completed_initially = True
         self.num_processes_to_parallelise_over = 8
         self.max_num_models_by_shape = {

@@ -44,7 +44,7 @@ class FermiHubbardBase(
         self.plot_probe_generation_function = probe_set_generation.fermi_hubbard_half_filled_superposition
         # self.plot_probe_generation_function = probe_set_generation.FermiHubbard_single_spin_n_sites
 
-        self.max_time_to_consider = 20
+        # self.max_time_to_consider = 20
         self.max_num_qubits = 6
         self.num_processes_to_parallelise_over = 9
         self.max_num_models_by_shape = {
@@ -250,7 +250,7 @@ class FermiHubbardPredetermined(
         )
         # self.true_model = 'FHhop_1h2_up_d2'
         self.tree_completed_initially = True
-        self.max_time_to_consider = 5
+        # self.max_time_to_consider = 5
         self.num_processes_to_parallelise_over = 9
         self.max_num_models_by_shape = {
             # Note dN here requires 2N qubits so d3 counts as shape 6
