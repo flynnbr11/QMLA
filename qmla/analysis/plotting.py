@@ -425,7 +425,7 @@ def average_parameter_estimates(
                 # colour = 'blue', 
                 # alpha = 0.3,
                 legend=leg,
-                only_one_sigma=False, 
+                only_one_sigma=True, 
             )
             ax.plot(
                 [e + 1 for e in epochs],
