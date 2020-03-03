@@ -55,8 +55,6 @@ class IsingProbabilistic(
         self.max_num_models_by_shape = {
             'other': 3
         }
-        self.min_param = 0
-        self.max_param = 1
         self.max_num_sites = 5
         
         self.gaussian_prior_means_and_widths = {
@@ -98,8 +96,6 @@ class IsingPredetermined(
         self.base_terms = [
             'z'
         ]
-        self.min_param = 0
-        self.max_param = 1
         # self.true_model_terms_params = {
         #     'pauliSet_zJz_1J2_d4': 0.61427723297770065, 
         #     'pauliSet_zJz_2J3_d4': 0.12996320356092372, 
