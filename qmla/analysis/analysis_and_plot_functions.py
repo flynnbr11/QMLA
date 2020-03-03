@@ -2929,7 +2929,7 @@ def fill_between_sigmas(
             sigmas[3] -
             sigmas[4]) for t in times]
 
-    fill_alpha = 0.2
+    fill_alpha = 0.3
     one_sigma_colour = 'blue'
     two_sigma_colour = 'green'
     three_sigma_colour = 'orange'
@@ -2950,7 +2950,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             upper_two_sigma,
             upper_one_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2, # less strong for smaller proportions
             facecolor=two_sigma_colour,
             label=r'$2 \sigma$ '
         )
@@ -2959,7 +2959,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             lower_one_sigma,
             lower_two_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2,
             facecolor=two_sigma_colour,
         )
 
@@ -2968,7 +2968,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             upper_three_sigma,
             upper_two_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2,
             facecolor=three_sigma_colour,
             label=r'$3 \sigma$ '
         )
@@ -2977,7 +2977,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             lower_two_sigma,
             lower_three_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2,
             facecolor=three_sigma_colour,
         )
 
@@ -2986,7 +2986,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             upper_four_sigma,
             upper_three_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2,
             facecolor=four_sigma_colour,
             label=r'$4 \sigma$ '
         )
@@ -2995,7 +2995,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             lower_three_sigma,
             lower_four_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2,
             facecolor=four_sigma_colour,
         )
 
