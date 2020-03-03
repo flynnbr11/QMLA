@@ -519,6 +519,7 @@ class ModelInstanceForLearning():
                         )
                     ]
                 )
+                sys.exit()
 
             if self.qinfer_updater.just_resampled is True:
                 self.epochs_after_resampling.append(istep)

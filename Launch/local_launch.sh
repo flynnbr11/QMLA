@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=500
-exp=100
+prt=50
+exp=10
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -75,8 +75,8 @@ git_commit=$(git rev-parse HEAD)
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='IsingProbabilistic'
-sim_growth_rule='IsingPredetermined'
-# sim_growth_rule='HeisenbergXYZPredetermined'
+# sim_growth_rule='IsingPredetermined'
+sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
