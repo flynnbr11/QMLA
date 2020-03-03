@@ -1530,7 +1530,7 @@ def plot_scores(
             )
 
             if (
-                num_true_params - num_params == 1
+                np.abs(num_true_params - num_params) == 1
             ):
                 # must be exactly one parameter smaller
                 batch_correct_models.append(
