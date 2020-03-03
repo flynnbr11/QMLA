@@ -430,9 +430,9 @@ def average_parameter_estimates(
             ax.plot(
                 [e + 1 for e in epochs],
                 averages,
-                marker='o',
-                markevery=0.1,
-                markersize=2*param_lw,
+                # marker='o',
+                # markevery=0.1,
+                # markersize=2*param_lw,
                 lw=param_lw,
                 label=latex_terms[term],
                 color='blue'
