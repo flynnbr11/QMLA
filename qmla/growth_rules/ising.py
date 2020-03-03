@@ -103,7 +103,7 @@ class IsingPredetermined(
 #        }
         self.min_param = 0.49
         self.max_param = 0.51
-        # self.num_probes = 100
+        self.num_probes = 25
 
 
         self.setup_growth_class()
