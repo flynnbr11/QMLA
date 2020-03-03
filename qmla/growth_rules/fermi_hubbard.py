@@ -131,7 +131,7 @@ class FermiHubbardProbabilistic(
         self.max_num_sites = 4
         self.max_num_probe_qubits = self.max_num_sites
         self.max_num_qubits = self.max_num_sites
-        self.num_probes = 20
+        # self.num_probes = 20
         self.lattice_dimension = 1
         self.tree_completed_initially = False
         self.num_top_models_to_build_on = 1
@@ -256,9 +256,10 @@ class FermiHubbardPredetermined(
             # Note dN here requires 2N qubits so d3 counts as shape 6
             1: 0,
             2: 0,
-            4: 3,
+            3 : 4,
+            4: 4,
             6: 4,
-            8: 1,
+            8: 4,
             'other': 0
         }
         self.max_num_qubits = 8

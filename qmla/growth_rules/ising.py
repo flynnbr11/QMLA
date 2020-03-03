@@ -84,7 +84,7 @@ class IsingPredetermined(
         self.lattice_dimension = 1
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
-        self.max_num_sites = 10
+        self.max_num_sites = 6
         # self.max_time_to_consider = 50
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
