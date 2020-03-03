@@ -96,11 +96,11 @@ class IsingPredetermined(
         self.base_terms = [
             'z'
         ]
-        # self.true_model_terms_params = {
-        #     'pauliSet_zJz_1J2_d4': 0.61427723297770065, 
-        #     'pauliSet_zJz_2J3_d4': 0.12996320356092372, 
-        #     'pauliSet_zJz_3J4_d4': 0.18011186731750234
-        # }
+        self.true_model_terms_params = {
+            'pauliSet_zJz_1J2_d4': 0.61427723297770065, 
+            'pauliSet_zJz_2J3_d4': 0.12996320356092372, 
+            'pauliSet_zJz_3J4_d4': 0.18011186731750234
+        }
 
 
         self.setup_growth_class()
