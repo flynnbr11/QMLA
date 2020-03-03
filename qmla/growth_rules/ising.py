@@ -96,13 +96,13 @@ class IsingPredetermined(
         self.base_terms = [
             'z'
         ]
-        self.true_model_terms_params = {
-            'pauliSet_zJz_1J2_d4': 0.61427723297770065, 
-            'pauliSet_zJz_2J3_d4': 0.12996320356092372, 
-            'pauliSet_zJz_3J4_d4': 0.18011186731750234
-        }
-        # self.min_param = 0
-        # self.max_param = 1
+#        self.true_model_terms_params = {
+#            'pauliSet_zJz_1J2_d4': 0.61427723297770065, 
+#            'pauliSet_zJz_2J3_d4': 0.12996320356092372, 
+#            'pauliSet_zJz_3J4_d4': 0.18011186731750234
+#        }
+        self.min_param = 0.49
+        self.max_param = 0.51
         # self.num_probes = 100
 
 
