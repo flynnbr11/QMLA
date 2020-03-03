@@ -266,7 +266,6 @@ def average_parameter_estimates(
 ):
     from matplotlib import cm
     plt.switch_backend('agg')  # to try fix plt issue on BC
-    # results = pandas.DataFrame.from_csv(
     results = pandas.read_csv(
         results_path,
         index_col='QID'
@@ -321,9 +320,6 @@ def average_parameter_estimates(
             growth_classes[g] = unique_growth_classes[growth_rules[g]]
         except BaseException:
             growth_classes[g] = None
-    # print("[AnalyseMultiple - param avg] unique_growth_rules:", unique_growth_rules)
-    # print("[AnalyseMultiple - param avg] unique_growth_classes:", unique_growth_classes)
-    # print("[AnalyseMultiple - param avg] growth classes:", growth_classes)
 
     for name in winning_models:
         num_experiments = num_experiments_by_name[name]
@@ -353,7 +349,6 @@ def average_parameter_estimates(
         axes_so_far = 0
 
         cm_subsection = np.linspace(0, 0.8, num_terms)
-#        colours = [ cm.magma(x) for x in cm_subsection ]
         colours = [cm.Paired(x) for x in cm_subsection]
 
         parameters = {}
@@ -401,16 +396,16 @@ def average_parameter_estimates(
                 [std_devs[term][e] for e in epochs]
             )
 
+            param_lw = 3
             try:
                 true_val = true_params_dict[term]
-                # true_term_latex = database_framework.latex_name_ising(term)
                 true_term_latex = growth_classes[name].latex_name(term)
                 ax.axhline(
                     true_val,
-                    # label=str(true_term_latex+ ' True'),
-                    # color=colours[terms.index(term)]
                     label=str('True value'),
-                    color='black'
+                    ls='--',
+                    color='red',
+                    lw=param_lw
 
                 )
             except BaseException:
@@ -426,45 +421,36 @@ def average_parameter_estimates(
             fill_between_sigmas(
                 ax,
                 parameters[term],
-                # [e +1 for e in epochs],
                 epochs,
-                legend=leg
+                # colour = 'blue', 
+                # alpha = 0.3,
+                legend=leg,
+                only_one_sigma=False, 
             )
-
-            ax.scatter(
+            ax.plot(
                 [e + 1 for e in epochs],
-                #                epochs,
                 averages,
-                s=max(1, 50 / num_experiments),
+                marker='o',
+                markevery=0.1,
+                markersize=2*param_lw,
+                lw=param_lw,
                 label=latex_terms[term],
-                # color=colours[terms.index(term)]
-                color='black'
+                color='blue'
             )
 
-            # latex_term = database_framework.latex_name_ising(term)
+            # ax.scatter(
+            #     [e + 1 for e in epochs],
+            #     averages,
+            #     s=max(1, 50 / num_experiments),
+            #     label=latex_terms[term],
+            #     color='black'
+            # )
+
+
             latex_term = growth_classes[name].latex_name(term)
-            # latex_term = latex_terms[term]
             ax.set_title(str(latex_term))
 
-        """
-        plot_title= str(
-            'Average Parameter Estimates '+
-            # str(database_framework.latex_name_ising(name)) +
-            ' [' +
-            str(num_wins_for_name) + # TODO - num times this model won
-            ' instances].'
-        )
-        ax.set_ylabel('Parameter Esimate')
-        ax.set_xlabel('Experiment')
-        plt.title(plot_title)
-        ax.legend(
-            loc='center left',
-            bbox_to_anchor=(1, 0.5),
-            title='Parameter'
-        )
-        """
-
-        latex_name = growth_classes[name].latex_name(term)
+        latex_name = growth_classes[name].latex_name(name)
 
         if save_to_file is not None:
             fig.suptitle(

@@ -2930,10 +2930,10 @@ def fill_between_sigmas(
             sigmas[4]) for t in times]
 
     fill_alpha = 0.2
-    one_sigma_colour = 'green'
-    two_sigma_colour = 'red'
-    three_sigma_colour = 'blue'
-    four_sigma_colour = 'orange'
+    one_sigma_colour = 'blue'
+    two_sigma_colour = 'green'
+    three_sigma_colour = 'orange'
+    four_sigma_colour = 'red'
     ax.fill_between(
         # times,
         [t + 1 for t in times],

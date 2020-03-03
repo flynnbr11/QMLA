@@ -27,7 +27,7 @@ class HeisenbergXYZProbabilistic(
         )
 
         self.lattice_dimension = 2
-        self.initial_num_sites = 2
+        self.initial_num_sites = 4
         self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
@@ -123,28 +123,21 @@ class HeisenbergXYZPredetermined(
         self.min_param = 0
         self.max_param = 1
 
-        # self.true_model_terms_params = {
-        #     'pauliSet_1J2_xJx_d3': 4.0969217897733703, 
-        #     'pauliSet_1J2_zJz_d3': 9.7007310340158401, 
-        #     'pauliSet_2J3_xJx_d3':  6.7344876799395417, 
-        #     'pauliSet_2J3_yJy_d3': 1.9672493478694473
-        # }
-
         self.true_model_terms_params = {
             'pauliSet_1J2_zJz_d4': 0.7070533314487537, 
-            'pauliSet_2J3_zJz_d4': 0.6253883093034486, 
-            'pauliSet_2J3_xJx_d4': 0.611354486807859, 
+            'pauliSet_2J4_zJz_d4': 0.46976922504656166, 
+            'pauliSet_1J3_xJx_d4': 0.5445604382949641, 
             'pauliSet_3J4_zJz_d4': 0.9825508924850654, 
-            'pauliSet_3J4_yJy_d4': 1.0654314259965183, 
-            'pauliSet_3J4_xJx_d4': 0.7849629571198494, 
-            'pauliSet_2J3_yJy_d4': -0.014525280713959088, 
             'pauliSet_1J2_xJx_d4': 0.268227093044357, 
-            'pauliSet_1J2_yJy_d4': 0.44095526633847043
+            'pauliSet_3J4_xJx_d4': 0.7849629571198494, 
+            'pauliSet_2J4_xJx_d4': 0.48907849424521366, 
+            'pauliSet_1J3_zJz_d4': 0.1972300936609916
         }
 
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
-            self.true_model = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_yJy_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_yJy_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_yJy_d4PPPPpauliSet_3J4_zJz_d4'
+            heis_xxz_4site = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_2J4_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
+            self.true_model = heis_xxz_4site
             models = []
             list_connections = [
                 [(1, 2)],  # pair of sites
@@ -163,7 +156,7 @@ class HeisenbergXYZPredetermined(
                     self.max_num_sites = system_size + 1
                 terms = connected_lattice.pauli_like_like_terms_connected_sites(
                     connected_sites=connected_sites,
-                    base_terms=['x', 'y', 'z'],
+                    base_terms=self.base_terms, 
                     num_sites=system_size
                 )
 
