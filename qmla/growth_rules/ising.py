@@ -101,7 +101,6 @@ class IsingPredetermined(
             'pauliSet_zJz_2J3_d4': 0.12996320356092372, 
             'pauliSet_zJz_3J4_d4': 0.18011186731750234
         }
-        self.num_probes = 100
 
 
         self.setup_growth_class()
