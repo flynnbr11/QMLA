@@ -306,34 +306,34 @@ pickle.dump(
 )
 
 # Plot metrics such as F1 score histogram
-qmla.analysis.stat_metrics_histograms(
-    champ_info = model_score_results, 
-    save_to_file=os.path.join(
-        directory_to_analyse, 
-        'metrics.png'
-    )
-)
+# qmla.analysis.stat_metrics_histograms(
+#     champ_info = model_score_results, 
+#     save_to_file=os.path.join(
+#         directory_to_analyse, 
+#         'metrics.png'
+#     )
+# )
 
-try:
-    qmla.analysis.avg_f_score_multi_qmla(
-        results_csv_path = results_csv, 
-        save_to_file=os.path.join(
-            directory_to_analyse, 
-            'f_scores.png'
-        )
-    )
-except:
-    print("Average F-score by generation plot failed.")
-    pass
+# try:
+#     qmla.analysis.avg_f_score_multi_qmla(
+#         results_csv_path = results_csv, 
+#         save_to_file=os.path.join(
+#             directory_to_analyse, 
+#             'f_scores.png'
+#         )
+#     )
+# except:
+#     print("Average F-score by generation plot failed.")
+#     pass
 
-# Summarise results into txt file for quick checking results. 
-qmla.analysis.summarise_qmla_text_file(
-    results_csv_path = results_csv, 
-    path_to_summary_file = os.path.join(
-        directory_to_analyse, 
-        'summary.txt'
-    )
-)
+# # Summarise results into txt file for quick checking results. 
+# qmla.analysis.summarise_qmla_text_file(
+#     results_csv_path = results_csv, 
+#     path_to_summary_file = os.path.join(
+#         directory_to_analyse, 
+#         'summary.txt'
+#     )
+# )
 
 
 
