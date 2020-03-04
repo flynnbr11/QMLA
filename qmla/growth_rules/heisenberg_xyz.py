@@ -132,8 +132,8 @@ class HeisenbergXYZPredetermined(
 
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
-            heis_xxz_4site = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_2J4_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
-            self.true_model = heis_xxz_4site
+            # heis_xxz_4site = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_2J4_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
+            # self.true_model = heis_xxz_4site
             models = []
             list_connections = [
                 [(1, 2)],  # pair of sites
@@ -160,6 +160,7 @@ class HeisenbergXYZPredetermined(
                 models.append(p_str.join(terms))
 
             self.initial_models = models
+            self.true_model = self.initial_models[2]
 
             ###########
             # testing that subsystem is better than random alternative
