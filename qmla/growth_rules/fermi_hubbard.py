@@ -272,6 +272,18 @@ class FermiHubbardPredetermined(
             # 'FHhop_1h2_down_d4+FHhop_1h2_up_d4+FHhop_1h3_down_d4+FHhop_2h4_down_d4+FHonsite_1_d4+FHonsite_2_d4+FHonsite_3_d4+FHonsite_4_d4',
         ]
         self.max_num_sites = 4
+        self.qhl_models = self.initial_models
+
+        self.true_model_terms_params = {
+            'FHhop_1h2_down_d3': 0.56358314008409693, 
+            'FHhop_1h2_up_d3': 0.61068905874925739, 
+            'FHhop_1h3_down_d3': 0.49954927338652116, 
+            'FHhop_2h3_up_d3': 0.52398243911927589, 
+            'FHonsite_1_d3': 0.6260708716247626, 
+            'FHonsite_2_d3': 0.51488767350916587, 
+            'FHonsite_3_d3': 0.6516084737325778
+        }
+
         if self.true_model not in self.initial_models:
             self.log_print(
                 [

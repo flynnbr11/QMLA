@@ -444,6 +444,7 @@ if further_qhl_mode == False:
         growth_classes=growth_classes,
         unique_growth_classes=unique_growth_classes,
         growth_rules=growth_rules,
+        plot_r_squared=False,
         coefficients_of_determination=median_coeff_determination,
         coefficient_determination_latex_name=latex_coeff_det,
         f_scores=f_scores,
