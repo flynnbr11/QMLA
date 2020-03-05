@@ -138,41 +138,51 @@ class QInferModelQML(qi.FiniteOutcomeModel):
     ## PROPERTIES ##
     @property
     def n_modelparams(self):
+        r"""
+        Number of parameters in the specific model 
+        typically, in QMLA, we have one parameter per model.
+        """
+
         return len(self._oplist)
 
     @property
     def modelparam_names(self):
+        r"""
+        Inherited from Qinfer:
+        Returns the names of the various model parameters admitted by this
+        model, formatted as LaTeX strings.
+        """
         modnames = ['w0']
         for modpar in range(self.n_modelparams - 1):
             modnames.append('w' + str(modpar + 1))
         return modnames
 
-    # expparams are the {t, w1, w2, ...} guessed parameters, i.e. each element
-    # is a particle with a specific sampled value of the corresponding
+    # expparams are the {t, w1, w2, ...} guessed parameters, i.e. each 
+    # particle has a specific sampled value of the corresponding
     # parameter
     # 
 
     @property
     def expparams_dtype(self):
+        r"""
+        Modified from Qinfer:
+        Returns the dtype of an experiment parameter array. For a
+        model with single-parameter control, this will likely be a scalar dtype,
+        such as ``"float64"``. More generally, this can be an example of a
+        record type, such as ``[('time', py.'float64'), ('axis', 'uint8')]``.
+        This property is assumed by inference engines to be constant for
+        the lifetime of a Model instance.
+        In the context of QMLA the expparams_dtype are assumed to be a list of tuple where
+        the first element of the tuple identifies the parameters (including type) while the second element is
+        the actual type of of the parameter, typicaly a float.
+
+        """
         expnames = [('t', 'float')]
         for exppar in range(self.n_modelparams):
             expnames.append(('w_' + str(exppar + 1), 'float'))
         return expnames
 
     # Do we really need the following property? It looks a bit pointless
-
-
-
-    @property
-    def is_n_outcomes_constant(self):
-        """
-        Returns ``True`` if and only if the number of outcomes for each
-        experiment is independent of the experiment being performed.
-
-        This property is assumed by inference engines to be constant for
-        the lifetime of a Model instance.
-        """
-        return True
 
     ## METHODS ##
 
@@ -194,7 +204,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             return validity
 
     def n_outcomes(self, expparams):
-        """
+        r"""
         Returns an array of dtype ``uint`` describing the number of outcomes
         for each experiment specified by ``expparams``.
 
@@ -210,16 +220,37 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         modelparams,
         expparams
     ):
-    """
-    Function to calculate likelihoods for all the particles
+    r"""
+        Inherited from Qinfer:
+        Function to calculate likelihoods for all the particles
+        
+        Longish description:
+        Calculates the probability of each given outcome, conditioned on each
+        given model parameter vector and each given experimental control setting.
 
-    :param outcomes: outcomes of the experiments
-    :param modelparams: values of the model parameters
-    :param expparams: experimental parameters
+        :param np.ndarray outcomes: outcomes of the experiments
 
-    :output : array with the likelihoods 
+        :param np.ndarray modelparams: 
+            values of the model parameters particles 
+            A shape ``(n_particles, n_modelparams)``
+            array of model parameter vectors describing the hypotheses for
+            which the likelihood function is to be calculated.
+        
+        :param np.ndarray expparams: 
+            experimental parameters, 
+            A shape ``(n_experiments, )`` array of
+            experimental control settings, with ``dtype`` given by 
+            :attr:`~qinfer.Simulatable.expparams_dtype`, describing the
+            experiments from which the given outcomes were drawn.
+            
+        :rtype: np.ndarray
+        :return: A three-index tensor ``L[i, j, k]``, where ``i`` is the outcome
+            being considered, ``j`` indexes which vector of model parameters was used,
+            and where ``k`` indexes which experimental parameters where used.
+            Each element ``L[i, j, k]`` then corresponds to the likelihood
+            :math:`\Pr(d_i | \vec{x}_j; e_k)`.
+        """
 
-    """
         import copy
         super(QInferModelQML, self).likelihood(
             outcomes, modelparams, expparams
@@ -376,6 +407,26 @@ def get_pr0_array_qle(
     log_file='QMDLog.log',
     **kwargs
 ):
+"""
+    Returns the output probabilities as an array
+
+    :param np.ndarray t_list: 
+    List of times on which to perform experiments
+
+    :param np.ndarray modelparams: 
+    values of the model parameters particles 
+    A shape ``(n_particles, n_modelparams)``
+    array of model parameter vectors describing the hypotheses for
+    which the likelihood function is to be calculated.
+
+    :param list oplist:
+    list of the operators defining the model
+
+    :param probe: quantum state to evolve
+
+    :param growth_class: 
+"""
+
     from rq import timeouts
     def log_print(
         self, 
