@@ -54,6 +54,7 @@ class GrowthRuleSuper():
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
         self.model_branches = {} 
+        self.growth_rule_specific_data_to_store = {}
 
         # Parameters specific to the growth rule
         self.true_model = 'xTi'
@@ -272,6 +273,11 @@ class GrowthRuleSuper():
         self.true_op_terms = set(sorted(latex_true_terms))
 
         return self.true_op_terms
+
+    def growth_rule_finalise(self):
+        # do whatever is needed to wrap up growth rule
+        # e.g. store data required for analysis
+        self.growth_rule_specific_data_to_store = {}
 
     def growth_rule_specific_plots(
         self,

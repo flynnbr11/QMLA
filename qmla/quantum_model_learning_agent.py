@@ -2185,7 +2185,8 @@ class QuantumModelLearningAgent():
             expec_val_plot_times = self.times_to_plot
 
         self.champion_name_latex = champ_model.model_name_latex
-        # equivalent to sleepfchampion_results
+        self.growth_class.growth_rule_finalise()
+        # equivalent to self.champion_results
 
         self.champion_results = {
             'NameAlphabetical': database_framework.alph(self.ChampionName),
@@ -2237,6 +2238,7 @@ class QuantumModelLearningAgent():
             'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
+            'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
         }
 
     def check_champion_reducibility(
@@ -2518,10 +2520,9 @@ class QuantumModelLearningAgent():
         )
         # self.f_score = self.model_f_scores[self.champion_model_id]
         self.get_statistical_metrics()
-
+        self.growth_class.growth_rule_finalise()
         time_now = time.time()
         time_taken = time_now - self._start_time
-
         self.champion_results = {
             'NumParticles': self.num_particles,
             'NumExperiments': mod.num_experiments,
@@ -2559,6 +2560,7 @@ class QuantumModelLearningAgent():
             'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
+            'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
         }
 
         self.log_print(
@@ -2659,6 +2661,7 @@ class QuantumModelLearningAgent():
             )
 
         self.get_statistical_metrics()
+        self.growth_class.growth_rule_finalise()
 
         for mod_name in model_names:
             mod_id = database_framework.model_id_from_name(
@@ -2717,6 +2720,7 @@ class QuantumModelLearningAgent():
                 'NumModels' : len(self.models_learned),
                 'StatisticalMetrics' : self.generational_statistical_metrics,
                 'GenerationalFscore'  : self.generational_f_score,
+                'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
             }
             self.model_id_to_name_map = {}
             for k in self.model_name_id_map:

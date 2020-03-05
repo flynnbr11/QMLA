@@ -20,6 +20,7 @@ import random
 import matplotlib.cbook as cb
 from matplotlib.colors import colorConverter, Colormap
 from matplotlib.patches import FancyArrowPatch, Circle, ArrowStyle
+from matplotlib.lines import Line2D
 import matplotlib.colors as colors
 from matplotlib.colors import ListedColormap
 import matplotlib.patches as mpatches
@@ -38,6 +39,9 @@ import qmla.expectation_values as expectation_values
 import qmla.database_framework as database_framework
 
 frameinfo = getframeinfo(currentframe())
+
+def flatten(l): return [item for sublist in l for item in sublist]
+
 
 def ExpectationValuesTrueSim(
     qmd,
@@ -4084,3 +4088,98 @@ def cluster_results_and_plot(
         upper_x_limit=upper_x_limit,  # can play with this
         save_to_file=save_redrawn_expectation_values
     )
+
+def hamming_distance(str1, str2):
+    return sum(c1 != c2 for c1, c2 in zip(str1, str2))
+
+def colour_by_hamming_dist(h, cmap):
+    if h == 0:
+        cmap_val = cmap(0.)
+        alpha = 1        
+    elif h == 1: 
+        cmap_val = cmap(0.33)
+        alpha = 0.7        
+        return cmap(0.33)
+    elif h <=3:
+        cmap_val = cmap(0.66)
+        alpha = 0.4        
+    else:
+        cmap_val = cmap(0.99)
+        alpha = 0.2        
+
+    return (cmap_val[0], cmap_val[1], cmap_val[2], alpha)
+
+
+def model_generation_probability(
+    results_path, 
+    # combined_results, 
+    save_to_file=None
+):
+    combined_results = pd.read_csv(results_path)
+    data_indices = list(combined_results['GrowthRuleStorageData'].index)
+    true_chromosome = eval(combined_results['GrowthRuleStorageData'][0])['true_model_chromosome']
+    num_terms = len(true_chromosome)
+
+    chromosomes = []
+    chromosomes.extend(
+        c for c in 
+        [eval(combined_results['GrowthRuleStorageData'][c])['chromosomes_tested'] for c in data_indices]
+    )
+    chromosomes = flatten(chromosomes)
+
+    f_scores = []
+    f_scores.extend(
+        c for c in 
+        [eval(combined_results['GrowthRuleStorageData'][c])['f_score_tested_models'] for c in data_indices]
+    )
+    f_scores = flatten(f_scores)
+
+    cmap = plt.cm.Paired
+
+
+    unique_chromosome_numbers = sorted(list(set(chromosomes)))
+    unique_chromosomes = [bin(int(c))[2:].zfill(num_terms) for c in unique_chromosome_numbers]
+    counts = [chromosomes.count(a) for a in unique_chromosome_numbers]
+    ham_d = [hamming_distance(c, true_chromosome) for c in unique_chromosomes]
+    chromosome_colours = [colour_by_hamming_dist(h, cmap=cmap) for h in ham_d]
+    num_runs = len(data_indices)
+    counts = [c/num_runs for c in counts] # so this reflects 'probability' of being generated
+
+    fig, ax = plt.subplots()
+    ax.scatter(
+        unique_chromosome_numbers, 
+        counts,
+        c = chromosome_colours,
+        marker = 'o',
+        facecolors='none'
+
+    )
+    ax.set_xlabel('Model ID (binary representation)')
+    ax.set_ylabel('Prob. of generation')
+
+
+    custom_lines = [
+        Line2D([0], [0], color=cmap(0.), lw=4),
+        Line2D([0], [0], color=cmap(0.33), lw=4),
+        Line2D([0], [0], color=cmap(.66), lw=4),
+        Line2D([0], [0], color=cmap(0.99), lw=4)
+    ]
+    custom_labels = [
+        'Correct', 
+        '1 term wrong', 
+        '2-3 terms wrong', 
+        '>3 terms wrong'
+    ]
+
+
+    ax.legend(
+        custom_lines, 
+        custom_labels
+    )
+    ax.set_title(
+        "True chromosome: {}".format(true_chromosome)
+    )
+    if save_to_file is not None: 
+        plt.savefig(save_to_file)
+
+

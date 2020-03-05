@@ -7,6 +7,7 @@ import copy
 import scipy
 import time
 import pandas as pd
+import sklearn
 
 from qmla.growth_rules import growth_rule_super
 from qmla import experiment_design_heuristics
@@ -49,7 +50,7 @@ class Genetic(
         self.true_model = qmla.database_framework.alph(self.true_model)
         self.num_sites = qmla.database_framework.get_num_qubits(self.true_model)
         self.num_probes = 5
-        
+
         self.qhl_models = [
             'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
             'pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
@@ -78,11 +79,11 @@ class Genetic(
 
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        self.max_spawn_depth = 40
-        self.initial_num_models = 16
+        # self.max_spawn_depth = 40
+        # self.initial_num_models = 16
         # test
-        # self.max_spawn_depth = 2
-        # self.initial_num_models = 8
+        self.max_spawn_depth = 2
+        self.initial_num_models = 10
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -229,6 +230,16 @@ class Genetic(
             f_score = 0
         return f_score
 
+    def f_score_from_chromosome_string(
+        self, 
+        chromosome, 
+    ):
+        mod = np.array([int(a) for a in list(chromosome)])
+        return sklearn.metrics.f1_score(
+            mod, 
+            self.true_chromosome
+        )
+
     def latex_name(
         self,
         name,
@@ -288,6 +299,18 @@ class Genetic(
             latex_term += 'T^{}_{}'.format(transverse_axis, transverse_dim)
         latex_term = "${}$".format(latex_term)
         return latex_term
+
+
+    def growth_rule_finalise(
+        self
+    ):        
+        chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
+        chromosome_numbers = sorted([int(c,2) for c in chromosomes])
+        self.growth_rule_specific_data_to_store['chromosomes_tested'] = chromosome_numbers
+        f_scores = [self.f_score_from_chromosome_string(c) for c in chromosomes]
+        self.growth_rule_specific_data_to_store['f_score_tested_models'] = f_scores
+        self.growth_rule_specific_data_to_store['true_model_chromosome'] = self.true_chromosome_string
+
 
     def growth_rule_specific_plots(
         self,

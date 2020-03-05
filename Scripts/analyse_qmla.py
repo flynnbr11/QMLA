@@ -252,6 +252,20 @@ except BaseException:
     # for compatability with old versions
     pass
 
+try: 
+    qmla.analysis.model_generation_probability(
+        results_path = results_csv_name,
+        save_to_file=os.path.join(
+            directory_to_analyse, 
+            'prob_of_model_generation.png'
+        )
+    )
+except:
+    print("Failed to plot probability of model generation")
+    print("Note this is only built for genetic algorithm so far.")
+    raise
+
+
 os.chdir(directory_to_analyse)
 pickled_files = []
 for file in os.listdir(directory_to_analyse):
