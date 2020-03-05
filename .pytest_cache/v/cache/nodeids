@@ -1,4 +1,7 @@
 [
   "test_intro.py::test_basic",
-  "test_intro.py::test_qmla_growth_rule"
+  "test_intro.py::test_qmla_growth_rule",
+  "test_qmla.py::test_basic",
+  "test_qmla.py::test_qmla_import",
+  "test_qmla.py::test_qmla_attributes"
 ]

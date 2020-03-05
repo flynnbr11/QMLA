@@ -32,12 +32,18 @@ class ConnectedLattice(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        # self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.lattice_dimension = 2
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
+        self.max_time_to_consider = 50
+        self.num_probes = 25
+        # self.min_param = 0.25 # for the sake of plots
+        # self.max_param = 0.75
+        self.min_param = 0.0 # normal
+        self.max_param = 1.0
 
         self.true_model = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
         self.true_model = database_framework.alph(self.true_model)
@@ -263,9 +269,6 @@ class ConnectedLattice(
             mod_name = self.match_dimension(
                 mod_name, self.topology.num_sites())
             present_terms = database_framework.get_constituent_names_from_name(mod_name)
-            print(
-                "Model {} has present terms {}".format(
-                    mod_name, present_terms))
             terms_to_add = list(
                 set(available_terms)
                 - set(present_terms)
@@ -353,8 +356,12 @@ class ConnectedLattice(
         # print("[latex name fnc] name:", name)
         core_operators = list(sorted(database_framework.core_operator_dict.keys()))
         num_sites = database_framework.get_num_qubits(name)
-        p_str = 'P' * num_sites
-        separate_terms = name.split(p_str)
+        try:
+            p_str = 'P' * num_sites
+            separate_terms = name.split(p_str)
+        except:
+            p_str = '+'
+            separate_terms = name.split(p_str)
 
         site_connections = {}
         for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):
@@ -558,8 +565,6 @@ def possible_pauli_combinations(base_terms, num_sites):
 
 
 def increase_dimension_pauli_set(initial_model, new_dimension=None):
-    print("[spin prob incr dim] initial model:",
-          initial_model, "new dim:", new_dimension)
     individual_terms = database_framework.get_constituent_names_from_name(initial_model)
     separate_terms = []
 
@@ -580,5 +585,6 @@ def increase_dimension_pauli_set(initial_model, new_dimension=None):
 
     p_str = 'P' * (new_dimension)
     full_model = p_str.join(separate_terms)
+    # full_model = '+'.join(separate_terms)
 
     return full_model

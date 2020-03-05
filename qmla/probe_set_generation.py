@@ -1,5 +1,8 @@
 import numpy as np
 import itertools
+from scipy import linalg
+import random
+
 
 # Default probe set
 
@@ -68,6 +71,94 @@ def random_probe(num_qubits):
         probe = random_probe(num_qubits)
 
     return probe
+
+
+# probes generated according to Pauli matrices' eigenvectors
+core_operator_dict = {
+#     'a': np.array([[0 + 0.j, 1 + 0.j], [0 + 0.j, 0 + 0.j]]),
+#     's': np.array([[0 + 0.j, 0 + 0.j], [1 + 0.j, 0 + 0.j]])
+    'i': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, 1 + 0.j]]),
+    'x': np.array([[0 + 0.j, 1 + 0.j], [1 + 0.j, 0 + 0.j]]),
+    'y': np.array([[0 + 0.j, 0 - 1.j], [0 + 1.j, 0 + 0.j]]),
+    'z': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]]),
+}
+
+
+eigvals = {
+    k : linalg.eig(core_operator_dict[k])[0]
+    for k in core_operator_dict
+}
+eigvecs = {
+    k : linalg.eig(core_operator_dict[k])[1]
+    for k in core_operator_dict
+}
+all_eigvecs = [eigvecs[k][l] for k in eigvecs for l in range(eigvecs[k].shape[0]) ]
+eigvec_indices = range(len(all_eigvecs))
+eigenvectors = {
+    i : all_eigvecs[i]
+    for i in eigvec_indices
+}
+def random_sum_eigenvectors():
+#     num_to_sum = random.randrange(2, 5)
+    num_to_sum = 1
+    indices_to_include = []
+    while len(indices_to_include) < num_to_sum:
+        a = random.choice(eigvec_indices)
+        if a not in indices_to_include: 
+            indices_to_include.append(a)
+    
+    state = None
+    for i in indices_to_include:
+        if state is None: 
+            state = eigenvectors[i]
+        else: 
+            state += eigenvectors[i]
+        print("Including eig i={}: {}".format(i, eigenvectors[i]))
+    return state/linalg.norm(state)
+
+def pauli_eigenvector_based_probes(
+    max_num_qubits,
+    num_probes,
+    **kwargs
+):
+    separable_probes = {}
+    for i in range(num_probes):
+#         separable_probes[i, 0] = random_probe(1)
+        separable_probes[i, 0] = random_sum_eigenvectors()
+        for j in range(1, 1 + max_num_qubits):
+            if j == 1:
+                separable_probes[i, j] = separable_probes[i, 0]
+            else:
+                separable_probes[i, j] = (
+                    np.tensordot(
+                        separable_probes[i, j - 1],
+                        random_sum_eigenvectors(),
+                        axes=0
+                    ).flatten(order='c')
+                )
+            norm = np.linalg.norm(separable_probes[i, j])
+            while (
+                np.abs(norm - 1) >
+                1e-13
+
+            ):
+                print(
+                    "non-unit norm: ",
+                    norm
+                )
+                # keep replacing until a unit-norm
+                separable_probes[i, j] = (
+                    np.tensordot(
+                        separable_probes[i, j - 1],
+                        random_sum_eigenvectors(),
+#                         random_probe(1),
+                        axes=0
+                    ).flatten(order='c')
+                )
+                norm = np.linalg.norm(separable_probes[i, j])
+            # print("unit norm:", np.abs(1-norm) )
+
+    return separable_probes
 
 
 # Specific experimental probes

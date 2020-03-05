@@ -25,4 +25,4 @@ from qmla.parameter_definition import *
 # from qmla.expectation_values import *
 # from qmla.experiment_design_heuristics import * # TODO fix __all__
 # from qmla.probe_set_generation import * # TODO fix __all__
-# from qmla.topology import * 
+from qmla.topology import * 

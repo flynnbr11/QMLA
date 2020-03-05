@@ -339,12 +339,13 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             except BaseException:
                 self.log_print(
                     [
-                        "failure to compute pr0",
+                        "failure to compute pr0.",
                         "probe:", probe,
                         "\n oplist:", operators
                     ]
                 )
                 qmla.memory_tests.print_file_line(debug_print_file_line)
+                sys.exit()
 
             if debug_log_print:
                 self.log_print(

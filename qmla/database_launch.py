@@ -23,6 +23,8 @@ def launch_db(
     new_model_branches,
     new_model_ids,
     log_file,
+    qmla_core_info_database=None, 
+    plot_probes=None, 
     true_model_terms_matrices=[],
     true_model_terms_params=[],
     qid=0,
@@ -74,8 +76,10 @@ def launch_db(
             branch_id=new_model_branches[model_name],
             running_database=db,
             model_lists=model_lists,
+            qmla_core_info_database=qmla_core_info_database, 
             true_model_terms_matrices=true_model_terms_matrices,
             true_model_terms_params=true_model_terms_params,
+            plot_probes = plot_probes,
             log_file=log_file,
             qid=qid,
             host_name=host_name,
@@ -96,8 +100,10 @@ def add_model(
     model_lists,
     true_model_terms_matrices,
     true_model_terms_params,
-    log_file,
     qid,
+    log_file,
+    qmla_core_info_database=None, 
+    plot_probes=None, 
     host_name='localhost',
     port_number=6379,
     force_create_model=False,
@@ -147,14 +153,15 @@ def add_model(
             name=model_name, undimensionalised_name=model_name
         )
         num_rows = len(running_database)
-
         reduced_qml_instance = qmla.model_instances.ModelInstanceForStorage(
             model_name=model_name,
+            model_id=int(model_id),
             model_terms_matrices=op.constituents_operators,
             true_oplist=true_model_terms_matrices,
             true_model_terms_params=true_model_terms_params,
-            model_id=int(model_id),
             qid=qid,
+            qmla_core_info_database=qmla_core_info_database,
+            plot_probes=plot_probes, 
             host_name=host_name,
             port_number=port_number,
             log_file=log_file

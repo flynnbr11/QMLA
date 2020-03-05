@@ -42,13 +42,15 @@ growth_classes = {
     # Others
     'basic_lindbladian':
         GR.Lindbladian,
-    'example':
+    'GrowthRuleSuper':
         GR.GrowthRuleSuper,
         # GR.GrowthRuleTemplate,
     'Presentation':
         GR.PresentationPlotGeneration,
     'Genetic':
-        GR.Genetic
+        GR.Genetic,
+    'TalkDemonstration': 
+        GR.TalkDemonstration
 }
 
 

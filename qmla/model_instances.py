@@ -113,20 +113,18 @@ class ModelInstanceForLearning():
     def __init__(
         self,
         model_id,
-        name,
+        model_name,
         qid,
         log_file,
         growth_generator,
-        model_terms_matrices,
-        model_terms_parameters,
-        model_terms_names,
+        qmla_core_info_database=None, 
         host_name='localhost',
         port_number=6379,
         **kwargs
     ):
         self.qmla_id = qid
         self.model_id = int(model_id)
-        self.model_name = name
+        self.model_name = model_name
         self.log_file = log_file
         self.volume_by_epoch = np.array([])
         self.redis_host = host_name
@@ -134,9 +132,8 @@ class ModelInstanceForLearning():
 
         self.initialise_model_for_learning(
             growth_generator=growth_generator,
-            model_terms_matrices=model_terms_matrices,
-            model_terms_parameters=model_terms_parameters,
-            model_terms_names=model_terms_names,
+            model_name = self.model_name, 
+            qmla_core_info_database=qmla_core_info_database,
         )
 
     def log_print(
@@ -151,10 +148,9 @@ class ModelInstanceForLearning():
 
     def initialise_model_for_learning(
         self,
+        model_name,
         growth_generator,
-        model_terms_matrices,
-        model_terms_parameters,
-        model_terms_names,
+        qmla_core_info_database,
         checkloss=True,
         debug_directory=None,
         **kwargs
@@ -164,12 +160,17 @@ class ModelInstanceForLearning():
             self.redis_port_number,
             self.qmla_id
         )
-        qmla_core_info_database = redis_databases['qmla_core_info_database']
-        init_model_print_loc = False
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
+        if qmla_core_info_database is None:
+            qmla_core_info_database = redis_databases['qmla_core_info_database']
+            qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
+            self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
+            self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
+        else: 
+            qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
+            self.probes_system = qmla_core_info_database['ProbeDict']
+            self.probes_simulator = qmla_core_info_database['SimProbeDict']
+        
         self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
-        self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
-        self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
         self.num_particles = qmla_core_info_dict['num_particles']
         self.num_experiments = qmla_core_info_dict['num_experiments']
         self.growth_rule_of_this_model = growth_generator
@@ -187,8 +188,40 @@ class ModelInstanceForLearning():
             )
             raise
 
-        if qmla_core_info_dict['reallocate_resources'] == True:
 
+        # Get starting configuration for this model to learn from
+        op = qmla.database_framework.Operator(name=model_name)
+        self.model_terms_names = op.constituents_names
+        self.model_name_latex = self.growth_class.latex_name(
+            name=self.model_name
+        )
+        self.model_terms_matrices = np.asarray(op.constituents_operators)
+
+        model_priors = qmla_core_info_dict['model_priors']
+        if (
+            model_priors is not None
+            and
+            qmla.database_framework.alph(model_name) in list(model_priors.keys())
+        ):
+            prior_specific_terms = model_priors[model_name]
+        else:
+            prior_specific_terms = qmla_core_info_dict['prior_specific_terms']
+
+        model_terms_parameters = []
+        for term in self.model_terms_names:
+            try:
+                initial_prior_centre = prior_specific_terms[term][0]
+                model_terms_parameters.append(initial_prior_centre)
+            except BaseException:
+                # if prior not defined, start from 0 for all other params
+                initial_prior_centre = 0
+                model_terms_parameters.append(initial_prior_centre)
+
+        # TODO processing of sim_pars seems pointless?
+        model_terms_parameters = [model_terms_parameters]
+        self.model_terms_parameters = np.asarray([model_terms_parameters[0]])
+
+        if qmla_core_info_dict['reallocate_resources'] == True:
             base_resources = qmla_core_info_dict['base_resources']
             base_num_qubits = base_resources['num_qubits']
             base_num_terms = base_resources['num_terms']
@@ -237,12 +270,6 @@ class ModelInstanceForLearning():
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         
-        self.model_terms_names = model_terms_names
-        self.model_name_latex = self.growth_class.latex_name(
-            name=self.model_name
-        )
-        self.model_terms_matrices = np.asarray(model_terms_matrices)
-        self.model_terms_parameters = np.asarray([model_terms_parameters[0]])
 
         individual_terms_in_name = qmla.database_framework.get_constituent_names_from_name(
             self.model_name
@@ -272,7 +299,6 @@ class ModelInstanceForLearning():
                 )
 
         self.check_quadratic_loss = True
-        qmla.memory_tests.print_loc(print_location=init_model_print_loc)
 
         num_params = len(self.model_terms_matrices)
         log_identifier = str("QML " + str(self.model_id))
@@ -363,6 +389,12 @@ class ModelInstanceForLearning():
             num_experiments=self.num_experiments,
         )
         self.model_heuristic_class = self.model_heuristic.__class__.__name__
+
+        self._initialise_tracking_infrastructure()
+
+    def _initialise_tracking_infrastructure(
+        self
+    ):
         self.quadratic_losses = []
         self.track_total_log_likelihood = np.array([])
         self.track_experimental_times = np.array([])  # only for debugging
@@ -371,11 +403,6 @@ class ModelInstanceForLearning():
         self.epochs_after_resampling = []
         self.final_learned_params = np.empty(
             [len(self.model_terms_matrices), 2])
-
-    def update_model(
-        self,
-        checkloss=False  # TODO is this needed?
-    ):
         self.covariances = np.empty(self.num_experiments)
         self.track_mean_params = [self.qinfer_updater.est_mean()]
         self.track_covariance_matrices = []
@@ -391,7 +418,14 @@ class ModelInstanceForLearning():
                                   )
         self.weights = np.empty([self.num_particles, self.num_experiments])
         self.true_model_params_dict = {}
+        self.learned_parameters_qhl = {}
+        self.final_sigmas_qhl = {}
 
+
+    def update_model(
+        self,
+        checkloss=False  # TODO is this needed?
+    ):
         true_params_names = qmla.database_framework.get_constituent_names_from_name(
             self.true_model_name
         )
@@ -485,6 +519,7 @@ class ModelInstanceForLearning():
                         )
                     ]
                 )
+                sys.exit()
 
             if self.qinfer_updater.just_resampled is True:
                 self.epochs_after_resampling.append(istep)
@@ -606,8 +641,6 @@ class ModelInstanceForLearning():
                 )
                 self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
 
-                self.learned_parameters_qhl = {}
-                self.final_sigmas_qhl = {}
                 cov_mat = self.qinfer_updater.est_covariance_mtx()
                 for iterator in range(len(self.final_learned_params)):
                     self.final_learned_params[iterator] = [
@@ -720,6 +753,8 @@ class ModelInstanceForStorage():
         model_id,
         model_terms_matrices,
         qid,
+        plot_probes=None, 
+        qmla_core_info_database=None, 
         host_name='localhost',
         port_number=6379,
         log_file='QMD_log.log',
@@ -728,28 +763,51 @@ class ModelInstanceForStorage():
         self.redis_host_name = host_name
         self.redis_port_number = port_number
         self.qmla_id = qid
-
-        redis_databases = rds.databases_from_qmd_id(
-            self.redis_host_name,
-            self.redis_port_number,
-            self.qmla_id
-        )
-        qmla_core_info_database = redis_databases['qmla_core_info_database']
+        self.log_file = log_file
         self.model_name = model_name
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
-        self.model_id = model_id
 
-        # Get data from redis database which is needed to learn from
-        self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
-        self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
+        if qmla_core_info_database is None: 
+            self.log_print(
+                [
+                    'QMLA core info DB is None; retrieveing from redis.'
+                ]
+            )
+            redis_databases = rds.databases_from_qmd_id(
+                self.redis_host_name,
+                self.redis_port_number,
+                self.qmla_id
+            )
+            qmla_core_info_database = redis_databases['qmla_core_info_database']
+            # Get data from redis database which is needed to learn from
+            self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
+            self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
+            qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
 
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
+        else: 
+            self.log_print(
+                [
+                    'QMLA core info provided to model storage class w/ keys:',
+                    list(qmla_core_info_database.keys())
+                ]
+            )
+            self.probes_system = qmla_core_info_database['ProbeDict']
+            self.probes_simulator = qmla_core_info_database['SimProbeDict']
+            qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
+
+
+
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
-        self.probes_for_plots = pickle.load(
-            open(qmla_core_info_dict['probes_plot_file'], 'rb')
-        )
+        
+        if plot_probes is None: 
+            self.probes_for_plots = pickle.load(
+                open(qmla_core_info_dict['probes_plot_file'], 'rb')
+            )
+        else: 
+            self.probes_for_plots = plot_probes 
+
         self.store_particle_locations_and_weights = qmla_core_info_dict[
             'store_particles_weights'
         ]
@@ -759,7 +817,7 @@ class ModelInstanceForStorage():
         self.model_num_qubits = qmla.database_framework.get_num_qubits(
             self.model_name)
         self.probe_num_qubits = self.model_num_qubits
-        self.log_file = log_file
+        
         self.expectation_values = {}
         self.values_updated = False
 
@@ -791,7 +849,7 @@ class ModelInstanceForStorage():
                 self.redis_port_number,
                 self.qmla_id
             )
-            learned_models_info = redis_databases['learned_models_info']
+            learned_models_info_db = redis_databases['learned_models_info_db']
             self.log_print(
                 [
                     "Updating learned info for model {}".format(self.model_id),
@@ -799,11 +857,13 @@ class ModelInstanceForStorage():
             )
 
             if learned_info is None:
+                # TODO put unloading redis inside this if statement
+                # everything can be done locally if learned_info is provided
                 model_id_float = float(self.model_id)
                 model_id_str = str(model_id_float)
                 try:
                     learned_info = pickle.loads(
-                        learned_models_info.get(model_id_str),
+                        learned_models_info_db.get(model_id_str),
                         encoding='latin1'
                     )
                 except BaseException:
@@ -812,8 +872,8 @@ class ModelInstanceForStorage():
                             "Unable to load learned info",
                             "model_id_str: ", model_id_str,
                             "model id: ", self.model_id,
-                            "learned info keys:, ", learned_models_info.keys(),
-                            "learned info:, ", learned_models_info.get(
+                            "learned info keys:, ", learned_models_info_db.keys(),
+                            "learned info:, ", learned_models_info_db.get(
                                 model_id_str)
                         ]
                     )
@@ -904,9 +964,11 @@ class ModelInstanceForStorage():
 
     def compute_expectation_values(
         self,
+        # plot_probes, 
         times=[],
     ):
         probe = self.probes_for_plots[self.probe_num_qubits]
+        # probe = plot_probes[self.probe_num_qubits]
         present_expec_val_times = sorted(
             list(self.expectation_values.keys())
         )
@@ -1105,26 +1167,31 @@ class ModelInstanceForComparison():
         self,
         model_id,
         qid,
+        qmla_core_info_database=None,
         host_name='localhost',
         port_number=6379,
         log_file='QMD_log.log',
         learned_model_info=None,
     ):
-
-        redis_databases = rds.databases_from_qmd_id(
-            host_name,
-            port_number,
-            qid
-        )
         self.log_file = log_file
         self.qmla_id = qid
         self.model_id = model_id
 
-        qmla_core_info_database = redis_databases['qmla_core_info_database']
+        if qmla_core_info_database is None:
+            redis_databases = rds.databases_from_qmd_id(
+                host_name,
+                port_number,
+                qid
+            )
+            qmla_core_info_database = redis_databases['qmla_core_info_database']
+            qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
+            self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
+            self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
+        else: 
+            qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
+            self.probes_system = qmla_core_info_database['ProbeDict']
+            self.probes_simulator = qmla_core_info_database['SimProbeDict']
 
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
-        self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
-        self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
 
         self.num_particles = qmla_core_info_dict['num_particles']
         self.probe_number = qmla_core_info_dict['num_probes']
@@ -1140,18 +1207,32 @@ class ModelInstanceForComparison():
         self.results_directory = qmla_core_info_dict['results_directory']
 
         # Get model specific data
-        learned_models_info = redis_databases['learned_models_info']
-        model_id_float = float(model_id)
-        model_id_str = str(model_id_float)
-        try:
-            learned_model_info = pickle.loads(
-                learned_models_info.get(model_id_str),
-                encoding='latin1'
-            )
-        except BaseException:
-            learned_model_info = pickle.loads(
-                learned_models_info.get(model_id_str)
-            )
+        if learned_model_info is None:
+            # get the learned info dictionary from the redis
+            # database corresponding to this model id
+            try:
+                redis_databases = rds.databases_from_qmd_id(
+                    host_name,
+                    port_number,
+                    qid
+                )
+                learned_models_info_db = redis_databases['learned_models_info_db']
+            except: 
+                print("Unable to retrieve redis database.")
+                raise 
+
+            model_id_str = str(float(model_id))
+            try:
+                learned_model_info = pickle.loads(
+                    learned_models_info_db.get(model_id_str),
+                    encoding='latin1'
+                )
+            except BaseException:
+                learned_model_info = pickle.loads(
+                    learned_models_info_db.get(model_id_str)
+                )
+            except: 
+                print("Learned model's info not provided to ModelInstanceForComparison")
 
         self.model_name = learned_model_info['name']
         self.log_print(

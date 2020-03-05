@@ -30,7 +30,7 @@ def gaussian_prior(
     param_maximum=1,
     default_sigma=None,
     random_mean=False,  # if set to true, chooses a random mean between given uniform min/max
-    prior_specific_terms=None,
+    prior_specific_terms={},
     log_file='qmd.log',
     log_identifier=None,
     **kwargs

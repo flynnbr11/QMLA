@@ -103,11 +103,11 @@ for d in directories:
         'Run': directories_to_use[idx],
         'RunIdx': idx,
         'ResultsDirectory': d,
-        'TrueModel': true_model_terms_params['true_op'],
+        'TrueModel': true_model_terms_params['true_model'],
         'TrueParams': true_model_terms_params['params_dict'],
         'GrowthGenerator': growth_gen,
         'TrueModelLatex': growth_class.latex_name(
-            true_model_terms_params['true_op']
+            true_model_terms_params['true_model']
         ),
         'TrueExpectationValues': raw_expec_vals,
         'ExpValTimes': exp_val_times

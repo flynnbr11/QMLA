@@ -12,21 +12,24 @@ __all__ = [
 
 
 def set_shared_parameters(
-    true_op,
-    true_prior,
+    growth_class,
+    true_prior=None,
     pickle_file=None,
     random_vals=False,
-    growth_generator=None,
-    all_growth_classes=None,
-    rand_min=0,
-    rand_max=1,
+    all_growth_rules=[],
     exp_data=0,
-    growth_class=None,
-    plus_probe_for_plot=False,
     true_prior_plot_file=None,
 ):
+    true_model = growth_class.true_model
+    if true_prior is None: 
+        true_prior = growth_class.get_prior(
+            model_name=true_model,
+            log_file=growth_class.log_file,
+            log_identifier='[Param definition]'
+        )
+
     terms = database_framework.get_constituent_names_from_name(
-        true_op
+        true_model
     )
 
     latex_terms = []
@@ -35,8 +38,8 @@ def set_shared_parameters(
             name=term
         )
         latex_terms.append(lt)
-    true_op_latex = growth_class.latex_name(
-        name=true_op,
+    true_model_latex = growth_class.latex_name(
+        name=true_model,
     )
 
     num_terms = len(terms)
@@ -72,20 +75,23 @@ def set_shared_parameters(
     true_prior.__setattr__('cov', old_cov_mtx)
     try:
         distributions.plot_prior(
-            model_name=true_op_latex,
+            model_name=true_model_latex,
             model_name_individual_terms=latex_terms,
             prior=true_prior,
             plot_file=true_prior_plot_file,
             true_model_terms_params=true_params_dict_latex_names
         )
     except BaseException:
-        print("[SetQHLParams] plotting prior failed \n\n\n")
+        print("[ParameterDefinition] plotting prior failed \n\n\n")
         pass
+
+    if growth_class.growth_generation_rule not in all_growth_rules: 
+        all_growth_rules.append(growth_class.growth_generation_rule)
 
     true_params_info = {
         'params_list': true_model_terms_params,
         'params_dict': true_params_dict,
-        'all_growth_classes': all_growth_classes,
+        'all_growth_rules': all_growth_rules,
     }
     if exp_data:
         print("\n\n\n[SetQHL] EXPDATA -- dont store true vals")
@@ -94,8 +100,8 @@ def set_shared_parameters(
         true_params_info['params_list'] = []
         print("true params info:\n", true_params_info)
 
-    true_params_info['true_op'] = true_op
-    true_params_info['growth_generator'] = growth_generator
+    true_params_info['true_model'] = true_model
+    true_params_info['growth_generator'] = growth_class.growth_generation_rule
     if pickle_file is not None:
         import pickle
         pickle.dump(

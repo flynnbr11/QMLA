@@ -32,8 +32,6 @@ class FermiHubbardBase(
         # self.true_model = 'FHhop_1h2_up_d2'
         self.true_model = 'FHhop_1h2_down_d3+FHhop_1h2_up_d3+FHhop_1h3_down_d3+FHhop_2h3_up_d3+FHonsite_1_d3+FHonsite_2_d3+FHonsite_3_d3'  # for testing
         self.tree_completed_initially = True
-        self.min_param = 0
-        self.max_param = 1
         self.initial_models = [
             self.true_model
         ]
@@ -44,7 +42,7 @@ class FermiHubbardBase(
         self.plot_probe_generation_function = probe_set_generation.fermi_hubbard_half_filled_superposition
         # self.plot_probe_generation_function = probe_set_generation.FermiHubbard_single_spin_n_sites
 
-        self.max_time_to_consider = 20
+        # self.max_time_to_consider = 20
         self.max_num_qubits = 6
         self.num_processes_to_parallelise_over = 9
         self.max_num_models_by_shape = {
@@ -131,7 +129,7 @@ class FermiHubbardProbabilistic(
         self.max_num_sites = 4
         self.max_num_probe_qubits = self.max_num_sites
         self.max_num_qubits = self.max_num_sites
-        self.num_probes = 20
+        # self.num_probes = 20
         self.lattice_dimension = 1
         self.tree_completed_initially = False
         self.num_top_models_to_build_on = 1
@@ -250,15 +248,16 @@ class FermiHubbardPredetermined(
         )
         # self.true_model = 'FHhop_1h2_up_d2'
         self.tree_completed_initially = True
-        self.max_time_to_consider = 5
+        # self.max_time_to_consider = 5
         self.num_processes_to_parallelise_over = 9
         self.max_num_models_by_shape = {
             # Note dN here requires 2N qubits so d3 counts as shape 6
             1: 0,
             2: 0,
-            4: 3,
+            3 : 4,
+            4: 4,
             6: 4,
-            8: 1,
+            8: 4,
             'other': 0
         }
         self.max_num_qubits = 8
@@ -273,6 +272,18 @@ class FermiHubbardPredetermined(
             # 'FHhop_1h2_down_d4+FHhop_1h2_up_d4+FHhop_1h3_down_d4+FHhop_2h4_down_d4+FHonsite_1_d4+FHonsite_2_d4+FHonsite_3_d4+FHonsite_4_d4',
         ]
         self.max_num_sites = 4
+        self.qhl_models = self.initial_models
+
+        self.true_model_terms_params = {
+            'FHhop_1h2_down_d3': 0.56358314008409693, 
+            'FHhop_1h2_up_d3': 0.61068905874925739, 
+            'FHhop_1h3_down_d3': 0.49954927338652116, 
+            'FHhop_2h3_up_d3': 0.52398243911927589, 
+            'FHonsite_1_d3': 0.6260708716247626, 
+            'FHonsite_2_d3': 0.51488767350916587, 
+            'FHonsite_3_d3': 0.6516084737325778
+        }
+
         if self.true_model not in self.initial_models:
             self.log_print(
                 [

@@ -4,16 +4,22 @@ from matplotlib.lines import Line2D
 import sys
 import os
 import pickle
-import matplotlib.pyplot as plt
 import pandas
 
-from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas, cumulativeQMDTreePlot
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
+
+from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas, cumulativeQMDTreePlot
 import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming
 # import qmla.PlotQMD as ptq
 import qmla.database_framework as database_framework
 plt.switch_backend('agg')
+
+def flatten(l): 
+    # flatten list of lists
+    return [item for sublist in l for item in sublist]
 
 def parameter_sweep_analysis(
     directory_name,
@@ -28,7 +34,8 @@ def parameter_sweep_analysis(
     if not directory_name.endswith('/'):
         directory_name += '/'
 
-    qmd_cumulative_results = pandas.DataFrame.from_csv(results_csv,
+    # qmd_cumulative_results = pandas.DataFrame.from_csv(results_csv,
+    qmd_cumulative_results = pandas.read_csv(results_csv,
                                                        index_col='ConfigLatex'
                                                        )
     piv = pandas.pivot_table(
@@ -150,7 +157,8 @@ def average_parameters(
     average_type='median'
 ):
 
-    results = pandas.DataFrame.from_csv(
+    # results = pandas.DataFrame.from_csv(
+    results = pandas.read_csv(
         results_path,
         index_col='QID'
     )
@@ -242,6 +250,7 @@ def average_parameters(
                 avg_sigmas_dict[mod][p]
             ]
 
+    print("Average Parmaeters plot complete")
     return learned_priors
 
 
@@ -257,7 +266,7 @@ def average_parameter_estimates(
 ):
     from matplotlib import cm
     plt.switch_backend('agg')  # to try fix plt issue on BC
-    results = pandas.DataFrame.from_csv(
+    results = pandas.read_csv(
         results_path,
         index_col='QID'
     )
@@ -311,9 +320,6 @@ def average_parameter_estimates(
             growth_classes[g] = unique_growth_classes[growth_rules[g]]
         except BaseException:
             growth_classes[g] = None
-    # print("[AnalyseMultiple - param avg] unique_growth_rules:", unique_growth_rules)
-    # print("[AnalyseMultiple - param avg] unique_growth_classes:", unique_growth_classes)
-    # print("[AnalyseMultiple - param avg] growth classes:", growth_classes)
 
     for name in winning_models:
         num_experiments = num_experiments_by_name[name]
@@ -343,7 +349,6 @@ def average_parameter_estimates(
         axes_so_far = 0
 
         cm_subsection = np.linspace(0, 0.8, num_terms)
-#        colours = [ cm.magma(x) for x in cm_subsection ]
         colours = [cm.Paired(x) for x in cm_subsection]
 
         parameters = {}
@@ -391,16 +396,16 @@ def average_parameter_estimates(
                 [std_devs[term][e] for e in epochs]
             )
 
+            param_lw = 3
             try:
                 true_val = true_params_dict[term]
-                # true_term_latex = database_framework.latex_name_ising(term)
                 true_term_latex = growth_classes[name].latex_name(term)
                 ax.axhline(
                     true_val,
-                    # label=str(true_term_latex+ ' True'),
-                    # color=colours[terms.index(term)]
                     label=str('True value'),
-                    color='black'
+                    ls='--',
+                    color='red',
+                    lw=param_lw
 
                 )
             except BaseException:
@@ -416,45 +421,36 @@ def average_parameter_estimates(
             fill_between_sigmas(
                 ax,
                 parameters[term],
-                # [e +1 for e in epochs],
                 epochs,
-                legend=leg
+                # colour = 'blue', 
+                # alpha = 0.3,
+                legend=leg,
+                only_one_sigma=True, 
             )
-
-            ax.scatter(
+            ax.plot(
                 [e + 1 for e in epochs],
-                #                epochs,
                 averages,
-                s=max(1, 50 / num_experiments),
+                # marker='o',
+                # markevery=0.1,
+                # markersize=2*param_lw,
+                lw=param_lw,
                 label=latex_terms[term],
-                # color=colours[terms.index(term)]
-                color='black'
+                color='blue'
             )
 
-            # latex_term = database_framework.latex_name_ising(term)
+            # ax.scatter(
+            #     [e + 1 for e in epochs],
+            #     averages,
+            #     s=max(1, 50 / num_experiments),
+            #     label=latex_terms[term],
+            #     color='black'
+            # )
+
+
             latex_term = growth_classes[name].latex_name(term)
-            # latex_term = latex_terms[term]
             ax.set_title(str(latex_term))
 
-        """
-        plot_title= str(
-            'Average Parameter Estimates '+
-            # str(database_framework.latex_name_ising(name)) +
-            ' [' +
-            str(num_wins_for_name) + # TODO - num times this model won
-            ' instances].'
-        )
-        ax.set_ylabel('Parameter Esimate')
-        ax.set_xlabel('Experiment')
-        plt.title(plot_title)
-        ax.legend(
-            loc='center left',
-            bbox_to_anchor=(1, 0.5),
-            title='Parameter'
-        )
-        """
-
-        latex_name = growth_classes[name].latex_name(term)
+        latex_name = growth_classes[name].latex_name(name)
 
         if save_to_file is not None:
             fig.suptitle(
@@ -510,7 +506,8 @@ def analyse_and_plot_dynamics_multiple_models(
     from matplotlib import cm
     from scipy import stats
 
-    results = pandas.DataFrame.from_csv(
+    # results = pandas.DataFrame.from_csv(
+    results = pandas.read_csv(
         results_path,
         index_col='QID'
     )
@@ -611,7 +608,6 @@ def analyse_and_plot_dynamics_multiple_models(
         # constrained_layout=True,
         tight_layout=True
     )
-    from matplotlib.gridspec import GridSpec
     gs = GridSpec(
         nrows,
         ncols,
@@ -1020,7 +1016,8 @@ def r_sqaured_average(
     fig = plt.figure()
     ax = plt.subplot(111)
 
-    results = pandas.DataFrame.from_csv(
+    # results = pandas.DataFrame.from_csv(
+    results = pandas.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1113,7 +1110,8 @@ def volume_average(
     fig = plt.figure()
     ax = plt.subplot(111)
 
-    results = pandas.DataFrame.from_csv(
+    # results = pandas.DataFrame.from_csv(
+    results = pandas.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1199,7 +1197,8 @@ def all_times_learned_histogram(
     fig = plt.figure()
     ax = plt.subplot(111)
 
-    results = pandas.DataFrame.from_csv(
+    # results = pandas.DataFrame.from_csv(
+    results = pandas.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1517,7 +1516,7 @@ def plot_scores(
             )
 
             if (
-                num_true_params - num_params == 1
+                np.abs(num_true_params - num_params) == 1
             ):
                 # must be exactly one parameter smaller
                 batch_correct_models.append(
@@ -1707,6 +1706,47 @@ def plot_scores(
     plt.savefig(save_file, bbox_inches='tight')
 
 
+def stat_metrics_histograms(
+    champ_info, 
+    save_to_file=None
+):
+
+    include_plots = [
+        {'name' : 'f_scores', 'colour' : 'red'}, 
+        {'name' : 'precisions',  'colour': 'blue'}, 
+        {'name' : 'sensitivities', 'colour' : 'green'}, 
+    ]
+
+    fig = plt.figure(
+        figsize=(15, 5),
+        tight_layout=True
+    )
+    gs = GridSpec(
+        nrows=1,
+        ncols=len(include_plots),
+        # figure=fig # not available on matplotlib 2.1.1 (on BC)
+    )
+    plot_col = 0
+    hist_bins = np.arange(0,1, 0.1)
+    for plotting_data in include_plots: 
+        ax = fig.add_subplot(gs[0, plot_col])
+        data = champ_info[plotting_data['name']]
+        print("data for {}: {}".format(plotting_data['name'], data))
+        ax.hist(
+            list(data.values()), 
+            color = plotting_data['colour'],
+            bins = hist_bins
+        )
+        ax.set_xlim(0,1)    
+        ax.set_title(
+            "Champions' {}".format(plotting_data['name'])
+        )
+        ax.set_xlabel(plotting_data['name'])
+        ax.set_ylabel('# Champions')
+        plot_col += 1
+    if save_to_file is not None: 
+        plt.savefig(save_to_file)
+
 def plot_tree_multi_QMD(
     results_csv,
     all_bayes_csv,
@@ -1718,7 +1758,8 @@ def plot_tree_multi_QMD(
     save_to_file=None
 ):
     try:
-        qmd_res = pandas.DataFrame.from_csv(
+        # qmd_res = pandas.DataFrame.from_csv(
+        qmd_res = pandas.read_csv(
             results_csv,
             index_col='LatexName'
         )
@@ -1981,3 +2022,124 @@ def plot_statistics(
             save_to_file,
             bbox_inches='tight'
         )
+
+
+def summarise_qmla_text_file(
+    results_csv_path, 
+    path_to_summary_file
+):
+    all_results = pandas.read_csv(results_csv_path)
+
+    to_write = "\
+        {num_instances} instance(s) total. \n\
+        True model won {true_mod_found} instance(s); considered in {true_mod_considered} instance(s). \n\
+        {n_exp} experiments; {n_prt} particles. \n\
+        Average time taken: {avg_time} seconds. \n\
+        True growth rules: {growth_rules}. \n\
+        Min/median/max number of models per instance: {min_num_mods}/{median_num_mods}/{max_num_mods}. \n\
+        ".format(
+            num_instances = len(all_results), 
+            n_exp = int(all_results['NumExperiments'].mean()),
+            n_prt = int(all_results['NumParticles'].mean()),
+            true_mod_considered = all_results['TrueModelConsidered'].sum(), 
+            true_mod_found = all_results['TrueModelFound'].sum(),
+            avg_time = np.round(all_results['Time'].median(), 2),
+            growth_rules = list(all_results.GrowthGenerator.unique()),
+            min_num_mods = int(all_results['NumModels'].min()),
+            median_num_mods = int(all_results['NumModels'].median()),
+            max_num_mods = int(all_results['NumModels'].max())
+        )
+
+    with open(path_to_summary_file, 'w') as summary_file:
+        print(
+            to_write, 
+            file=summary_file, 
+            flush=True
+        )
+
+def avg_f_score_multi_qmla(
+    results_csv_path,
+    save_to_file=None
+):
+    plt.clf()
+    all_results = pandas.read_csv(results_csv_path)
+    gen_f_scores = all_results.GenerationalFscore
+
+    all_f_scores = None
+    for g in gen_f_scores.index:
+        data = eval(gen_f_scores[g])
+        indices = list(data.keys())
+        data_array = np.array(
+            [data[i] for i in indices]
+        )
+        p = pandas.DataFrame(
+            data_array, 
+            columns=['Fscore'],
+            index=indices
+        )
+        p['ID'] = g
+        p['Gen'] = indices
+
+        if all_f_scores is None:
+            all_f_scores = p
+        else:
+            all_f_scores = all_f_scores.append(p, ignore_index=True)
+
+
+    try:
+        avg_f_scores = [
+            np.median(
+                flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore))
+            )        
+            for g in indices
+        ]
+        lower_quartile = [
+            np.percentile(
+                flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 
+                25
+            )        
+            for g in indices
+        ]
+        upper_quartile = [
+            np.percentile(
+                flatten(list(all_f_scores[all_f_scores['Gen'] == g].Fscore)), 
+                75
+            )        
+            for g in indices    
+        ]
+    except: 
+        print("Not enough data for multiple plot points.")
+        f = list(all_f_scores[all_f_scores['Gen'] == 1].Fscore)
+
+        print("Indices:", indices)
+        avg_f_scores = [np.median(f)]
+        lower_quartile = [np.percentile(f, 25)]
+        upper_quartile = [np.percentile(f, 75)]
+
+    plt.plot(
+        indices, 
+        avg_f_scores,
+        marker='o',
+        label='Median F score'
+    )
+
+    plt.fill_between(
+        indices, 
+        lower_quartile, 
+        upper_quartile,
+        label='Inter-quartile range',
+        alpha=0.2
+    )
+    plt.title("Median F-score V QMLA generation")
+    plt.ylabel('F-score')
+    plt.xlabel('Generation')
+    plt.ylim(-0.1, 1.1)
+    plt.yticks([0,0.25, 0.5, 0.75, 1])
+    plt.xticks(indices)
+    plt.legend()
+    
+    if save_to_file is not None: 
+        plt.savefig(
+            save_to_file
+        )
+    print("Plotted average f scores by generation")

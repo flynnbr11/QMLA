@@ -23,7 +23,7 @@ __all__ = [
 
 databases_required = [
     'qmla_core_info_database',
-    'learned_models_info',
+    'learned_models_info_db',
     'learned_models_ids',
     'bayes_factors_db',
     'bayes_factors_winners_db',

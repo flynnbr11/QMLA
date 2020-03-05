@@ -120,7 +120,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-qhl', '--qhl_test',
+    '-qhl', '--qhl_mode',
     help="Bool to test QHL on given true operator only.",
     type=int,
     default=0

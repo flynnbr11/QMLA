@@ -453,12 +453,6 @@ def plot_learned_models_dynamics(
             expec_vals = {}
             if dim > 4:
                 times_to_plot = times_to_plot[0::5]
-                print(
-                    "reducing number of times for plot:",
-                    times_to_plot
-                )
-            else:
-                print("Not reducing number of times for plots")
 
             times_to_plot = sorted(list(true_expec_vals.keys()))
             true_exp = [true_expec_vals[t] for t in times_to_plot]
@@ -1160,7 +1154,8 @@ def r_squared_plot(
     save_to_file=None
 ):
     # For use in QHL parameter sweep
-    qhl_results = pd.DataFrame.from_csv(
+    # qhl_results = pd.DataFrame.from_csv(
+    qhl_results = pd.read_csv(
         results_csv_path, index_col='ConfigLatex')
 
     piv = pd.pivot_table(qhl_results,
@@ -1244,7 +1239,8 @@ def average_quadratic_losses(
     save_to_file=None
 ):
     from matplotlib import cm
-    results = pd.DataFrame.from_csv(
+    # results = pd.DataFrame.from_csv(
+    results = pd.read_csv(
         results_path,
         index_col='QID'
     )
@@ -2933,11 +2929,11 @@ def fill_between_sigmas(
             sigmas[3] -
             sigmas[4]) for t in times]
 
-    fill_alpha = 0.2
-    one_sigma_colour = 'green'
-    two_sigma_colour = 'red'
-    three_sigma_colour = 'blue'
-    four_sigma_colour = 'orange'
+    fill_alpha = 0.3
+    one_sigma_colour = 'blue'
+    two_sigma_colour = 'green'
+    three_sigma_colour = 'orange'
+    four_sigma_colour = 'red'
     ax.fill_between(
         # times,
         [t + 1 for t in times],
@@ -2954,7 +2950,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             upper_two_sigma,
             upper_one_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2, # less strong for smaller proportions
             facecolor=two_sigma_colour,
             label=r'$2 \sigma$ '
         )
@@ -2963,7 +2959,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             lower_one_sigma,
             lower_two_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2,
             facecolor=two_sigma_colour,
         )
 
@@ -2972,7 +2968,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             upper_three_sigma,
             upper_two_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2,
             facecolor=three_sigma_colour,
             label=r'$3 \sigma$ '
         )
@@ -2981,7 +2977,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             lower_two_sigma,
             lower_three_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2,
             facecolor=three_sigma_colour,
         )
 
@@ -2990,7 +2986,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             upper_four_sigma,
             upper_three_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2,
             facecolor=four_sigma_colour,
             label=r'$4 \sigma$ '
         )
@@ -2999,7 +2995,7 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             lower_three_sigma,
             lower_four_sigma,
-            alpha=fill_alpha,
+            alpha=fill_alpha/2,
             facecolor=four_sigma_colour,
         )
 
@@ -3370,7 +3366,8 @@ def multiQMDBayes(
 ):
     import csv
     import pandas
-    cumulative_bayes = pandas.DataFrame.from_csv(all_bayes_csv)
+    # cumulative_bayes = pandas.DataFrame.from_csv(all_bayes_csv)
+    cumulative_bayes = pandas.read_csv(all_bayes_csv)
     names = list(cumulative_bayes.keys())
 
     count_bayes = {}
@@ -3601,7 +3598,8 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
         name=correct_mod
     )
     results_csv = os.path.abspath(results_csv_path)
-    qmd_res = pd.DataFrame.from_csv(results_csv)
+    # qmd_res = pd.DataFrame.from_csv(results_csv)
+    qmd_res = pd.read_csv(results_csv)
 
     mods = list(
         set(list(

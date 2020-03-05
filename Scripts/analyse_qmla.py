@@ -162,7 +162,7 @@ if true_params_path is not None:
         )
     )
     true_params_dict = true_params_info['params_dict']
-    true_model = true_params_info['true_op']
+    true_model = true_params_info['true_model']
 else:
     true_params_dict = None
     true_model = true_growth_class.true_model
@@ -172,7 +172,7 @@ true_model_latex = true_growth_class.latex_name(
 
 
 if exp_data is False:
-    name = true_params_info['true_op']
+    name = true_params_info['true_model']
     terms = database_framework.get_constituent_names_from_name(name)
     params = []
     ops = []
@@ -268,34 +268,11 @@ for f in pickled_files:
     fname = directory_to_analyse + '/' + str(f)
     result = pickle.load(open(fname, 'rb'))
     alph = result['NameAlphabetical']
-    # expec_values = result['ExpectationValues']
-
-    # if alph in expectation_values_by_name.keys():
-    #     expectation_values_by_name[alph].append(expec_values)
-    # else:
-    #     expectation_values_by_name[alph] = [expec_values]
-
     if alph not in list(growth_rules.keys()):
         growth_rules[alph] = result['GrowthGenerator']
 
-# unique_growth_rules = list(set(list(growth_rules.values())))
-# unique_growth_classes = {}
-# for g in unique_growth_rules:
-#     try:
-#         unique_growth_classes[g] = get_growth_rule.get_growth_generator_class(
-#             growth_generation_rule = g
-#         )
-#     except:
-#         unique_growth_classes[g] = None
-# growth_classes = {}
-# for g in list(growth_rules.keys()):
-#     try:
-#         growth_classes[g] = unique_growth_classes[growth_rules[g]]
-#     except:
-#         growth_classes[g] = None
-
 unique_growth_classes = {}
-unique_growth_rules = true_params_info['all_growth_classes']
+unique_growth_rules = true_params_info['all_growth_rules']
 for g in unique_growth_rules:
     try:
         unique_growth_classes[g] = qmla.get_growth_generator_class(
@@ -303,10 +280,6 @@ for g in unique_growth_rules:
         )
     except BaseException:
         unique_growth_classes[g] = None
-
-
-print("[AnalyseMultipleQMD] unique growth classes:", unique_growth_classes)
-
 
 # first get model scores
 model_score_results = qmla.analysis.get_model_scores(
@@ -321,13 +294,52 @@ unique_growth_classes = model_score_results['unique_growth_classes']
 median_coeff_determination = model_score_results['avg_coeff_determination']
 f_scores = model_score_results['f_scores']
 latex_coeff_det = model_score_results['latex_coeff_det']
+pickle.dump(
+    model_score_results, 
+    open(
+        os.path.join(
+            directory_to_analyse, 
+            'champions_info.p'
+        ),
+        'wb'
+    )
+)
+
+# Plot metrics such as F1 score histogram
+qmla.analysis.stat_metrics_histograms(
+    champ_info = model_score_results, 
+    save_to_file=os.path.join(
+        directory_to_analyse, 
+        'metrics.png'
+    )
+)
+
+try:
+    qmla.analysis.avg_f_score_multi_qmla(
+        results_csv_path = results_csv, 
+        save_to_file=os.path.join(
+            directory_to_analyse, 
+            'f_scores.png'
+        )
+    )
+except:
+    print("Average F-score by generation plot failed.")
+    pass
+
+# Summarise results into txt file for quick checking results. 
+qmla.analysis.summarise_qmla_text_file(
+    results_csv_path = results_csv, 
+    path_to_summary_file = os.path.join(
+        directory_to_analyse, 
+        'summary.txt'
+    )
+)
+
+
 
 # arguments.top_number_models = len(model_scores.keys())
 arguments.top_number_models = 4
 print("Changed top # models to:", arguments.top_number_models)
-# print("Avg coeff if determination", avg_coeff_determination)
-print("Average param estimates")
-
 
 qmla.analysis.average_parameter_estimates(
     directory_name=directory_to_analyse,
@@ -421,20 +433,6 @@ qmla.analysis.all_times_learned_histogram(
     )
 )
 
-
-"""
-
-if qhl_mode==True:
-    r_squared_plot = str(
-        directory_to_analyse +
-        'r_squared_QHL.png'
-    )
-    qmla.analysis.r_squared_plot(
-        results_csv_path = results_csv,
-        save_to_file = r_squared_plot
-    )
-"""
-
 if further_qhl_mode == False:
     print("FURTHER QHL=FALSE. PLOTTING STUFF")
     plot_file = directory_to_analyse + 'model_wins.png'
@@ -446,6 +444,7 @@ if further_qhl_mode == False:
         growth_classes=growth_classes,
         unique_growth_classes=unique_growth_classes,
         growth_rules=growth_rules,
+        plot_r_squared=False,
         coefficients_of_determination=median_coeff_determination,
         coefficient_determination_latex_name=latex_coeff_det,
         f_scores=f_scores,
