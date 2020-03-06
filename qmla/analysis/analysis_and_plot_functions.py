@@ -4214,7 +4214,7 @@ def model_generation_probability(
     label_fontsize = 20
     ax.set_xlabel('Model ID (binary representation)', fontsize=label_fontsize)
     ax.set_ylabel('Prob. of generation', fontsize=label_fontsize)
-    ax.set_ylim(-0.1, 1.1)
+    ax.set_ylim(-0.1, 1.2)
     probs_to_label = [0, 0.25, 0.5, 0.75, 1]
     ax.set_yticks(
         probs_to_label,
@@ -4226,24 +4226,26 @@ def model_generation_probability(
 
 
     custom_lines = [
-        Line2D([0], [0], color=cmap(0.), lw=4),
-        Line2D([0], [0], color=cmap(0.33), lw=4),
+        Line2D([0], [0], color=cmap(0.99), lw=4),
         Line2D([0], [0], color=cmap(.66), lw=4),
-        Line2D([0], [0], color=cmap(0.99), lw=4)
+        Line2D([0], [0], color=cmap(0.33), lw=4),
+        Line2D([0], [0], color=cmap(0.), lw=4),
     ]
     custom_labels = [
-        'Correct', 
-        '1 term wrong', 
+        '>3 terms wrong',
         '2-3 terms wrong', 
-        '>3 terms wrong'
+        '1 term wrong', 
+        'Correct', 
     ]
 
 
     ax.legend(
         custom_lines, 
         custom_labels,
-        prop={'size' : label_fontsize}
-    )
+        prop={'size' : 0.75*label_fontsize},
+        loc='upper center',
+        ncol=4
+   )
     ax.set_title(
         "True chromosome: {} ({})".format(true_chromosome, int(true_chromosome,2)),
         fontsize = label_fontsize
@@ -4257,6 +4259,15 @@ def model_generation_probability(
         range(num_runs+1),
         fontdict={'fontsize' : label_fontsize}
     )
+    if num_runs > 9: 
+        ax2.set_yticks(
+            [0, 0.5, 1.0],
+        )
+        ax2.set_yticklabels(
+            ['0', str(int(num_runs/2)), str(num_runs)],
+            fontdict={'fontsize' : label_fontsize}
+        )
+
     ax2.set_ylabel('Number of occurences', fontsize=label_fontsize)
     if save_directory is not None: 
         plt.savefig(os.path.join(save_directory, 'prob_model_generation.png'))
@@ -4278,12 +4289,14 @@ def model_generation_probability(
             f_colours.append(colour)
             
     ax.scatter(f_vals, count_vals, c=f_colours)
-    ax.set_ylim(-0.1,1.1)    
+    ax.set_ylim(-0.1,1.2)    
     ax.set_yticks(probs_to_label)
     ax.legend(
         custom_lines, 
         custom_labels,
-        prop={'size' : label_fontsize}
+        prop={'size' : 0.75*label_fontsize},
+        loc='upper center',
+        ncol=4
     )
     ax.set_xlabel('Model F-score', fontsize=label_fontsize)
     ax.set_ylabel('Prob. of generation', fontsize=label_fontsize)
@@ -4296,6 +4309,14 @@ def model_generation_probability(
         range(num_runs+1),
         fontdict={'fontsize' : label_fontsize}
     )
+    if num_runs > 9: 
+        ax2.set_yticks(
+            [0, 0.5, 1.0],
+        )
+        ax2.set_yticklabels(
+            ['0', str(int(num_runs/2)), str(num_runs)],
+            fontdict={'fontsize' : label_fontsize}
+        )
     ax2.set_ylabel('Number of occurences', fontsize=label_fontsize)
     if save_directory is not None: 
         plt.savefig(os.path.join(save_directory, 'prob_f_score_generation.png'))
