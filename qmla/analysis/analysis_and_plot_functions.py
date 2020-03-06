@@ -13,7 +13,7 @@ from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib.ticker import Formatter
 from matplotlib import colors as mcolors
 import matplotlib.text as mpl_text
-
+import sklearn
 
 import copy
 import random
@@ -4092,6 +4092,20 @@ def cluster_results_and_plot(
 def hamming_distance(str1, str2):
     return sum(c1 != c2 for c1, c2 in zip(str1, str2))
 
+def f_score_from_chromosome_string(
+    chromosome, 
+    target_chromosome
+):
+    mod = np.array([int(a) for a in list(chromosome)])
+    target_chromosome = np.array([int(a) for a in list(target_chromosome)])
+    return sklearn.metrics.f1_score(
+        mod, 
+        target_chromosome
+    )
+
+def round_nearest(x,a):
+    return round(round(x/a)*a ,2)
+
 def colour_by_hamming_dist(h, cmap):
     if h == 0:
         cmap_val = cmap(0.)
@@ -4113,7 +4127,7 @@ def colour_by_hamming_dist(h, cmap):
 def model_generation_probability(
     results_path, 
     # combined_results, 
-    save_to_file=None
+    save_directory=None
 ):
     print("Trying to read csv ", results_path)
     combined_results = pd.read_csv(results_path)
@@ -4154,30 +4168,49 @@ def model_generation_probability(
         idx = unique_chromosome_numbers.index(i)
         array_counts[i] = counts[idx]
 
+    f_score_values = [np.round(i,2) for i in list(np.arange(0,1.001,0.01))]
+    f_occurences = {f : [] for f in f_score_values}
+    f_num_mods = {f : 0  for f in f_score_values}
+    f_mod_present = {f : 0 for f in f_score_values}
+    f_count_ratio = {f : [] for f in f_score_values}
+
+    f_counts = {}
+    f_plot_colours =  {f : [] for f in f_score_values}
+
+    f_v_hamming = []
+    hamming_v_f = []
+
     colours = [cmap(1)]*num_models
     for mod in all_models:
         chromosome = bin(mod)[2:].zfill(num_terms)
         h = hamming_distance(chromosome, true_chromosome)
         c = colour_by_hamming_dist(h, cmap=cmap)
         colours[mod] = c
+        f_score = f_score_from_chromosome_string(chromosome = chromosome, target_chromosome=true_chromosome)
+        f_score = round_nearest(f_score, 0.01)
+        
+        occurences = chromosomes.count(mod)
+        f_occurences[f_score].append(occurences)
+        if occurences > 0:
+            f_mod_present[f_score] += 1
+        f_num_mods[f_score] += 1
+        f_count_ratio[f_score].append( occurences/num_runs )
+        f_plot_colours[f_score].append(c)
+        f_v_hamming.append(f_score)
+        hamming_v_f.append(h)
+        
     colours = np.array(colours)
 
+
     
-    fig, ax = plt.subplots(figsize=(20, 10))
+    fig, ax = plt.subplots(figsize=(15, 7))
     ax.scatter(
         all_models, 
         array_counts, 
         edgecolors = colours,
         facecolor='none'
     )    
-#     ax.scatter(
-#         unique_chromosome_numbers, 
-#         counts,
-#         c = chromosome_colours,
-#         marker = 'o',
-#         facecolors='none'
 
-#     )
     label_fontsize = 20
     ax.set_xlabel('Model ID (binary representation)', fontsize=label_fontsize)
     ax.set_ylabel('Prob. of generation', fontsize=label_fontsize)
@@ -4225,7 +4258,46 @@ def model_generation_probability(
         fontdict={'fontsize' : label_fontsize}
     )
     ax2.set_ylabel('Number of occurences', fontsize=label_fontsize)
-    if save_to_file is not None: 
-        plt.savefig(save_to_file)
+    if save_directory is not None: 
+        plt.savefig(os.path.join(save_directory, 'prob_model_generation.png'))
 
-    plt.show()
+
+    # f score model probability plot
+    plt.clf()
+    fig, ax = plt.subplots(figsize=(15, 7))
+
+    f_vals = []
+    count_vals = []
+    f_colours = []
+    for f in f_score_values:
+        counts = f_count_ratio[f]
+        colours = f_plot_colours[f]
+        for colour, count in zip(colours, counts): 
+            f_vals.append(f)
+            count_vals.append(count)
+            f_colours.append(colour)
+            
+    ax.scatter(f_vals, count_vals, c=f_colours)
+    ax.set_ylim(-0.1,1.1)    
+    ax.set_yticks(probs_to_label)
+    ax.legend(
+        custom_lines, 
+        custom_labels,
+        prop={'size' : label_fontsize}
+    )
+    ax.set_xlabel('Model F-score', fontsize=label_fontsize)
+    ax.set_ylabel('Prob. of generation', fontsize=label_fontsize)
+    ax2 = ax.twinx()
+    ax2.set_ylim(ax.get_ylim())
+    ax2.set_yticks(
+        np.linspace(0,1,num_runs+1),
+    )
+    ax2.set_yticklabels(
+        range(num_runs+1),
+        fontdict={'fontsize' : label_fontsize}
+    )
+    ax2.set_ylabel('Number of occurences', fontsize=label_fontsize)
+    if save_directory is not None: 
+        plt.savefig(os.path.join(save_directory, 'prob_f_score_generation.png'))
+
+    # plt.show()
