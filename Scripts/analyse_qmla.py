@@ -100,6 +100,14 @@ parser.add_argument(
     type=str,
     default=None
 )
+parser.add_argument(
+    '-gs', '--gather_summary_results',
+    help="Unpickle all results files and \
+        compile into single file. \
+        Don't want to do this if already compiled.",
+    type=int,
+    default=1
+)
 
 # parser.add_argument(
 #   '-meas', '--measurement_type',
@@ -139,6 +147,7 @@ true_params_path = arguments.true_model_terms_params
 exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
+gather_summary_results = bool(arguments.gather_summary_results)
 true_growth_class = qmla.get_growth_generator_class(
     growth_generation_rule=growth_generator,
     use_experimental_data=exp_data,
@@ -212,27 +221,26 @@ except BaseException:
     print("Failed to plot # occurences of each model.")
     # raise
 
+
 if further_qhl_mode == True:
     results_csv_name = 'summary_further_qhl_results.csv'
     results_csv = directory_to_analyse + results_csv_name
     results_file_name_start = 'further_qhl_results'
-    qmla.analysis.summariseResultsCSV(
-        directory_name=directory_to_analyse,
-        results_file_name_start=results_file_name_start,
-        csv_name=results_csv
-    )
     plot_desc = 'further_'
-
 else:
     results_csv_name = 'summary_results.csv'
     results_csv = directory_to_analyse + results_csv_name
     results_file_name_start = 'results'
+    plot_desc = ''
+
+if gather_summary_results: 
+    # don't want to waste time doing this if already compiled
     qmla.analysis.summariseResultsCSV(
         directory_name=directory_to_analyse,
         results_file_name_start=results_file_name_start,
         csv_name=results_csv
     )
-    plot_desc = ''
+
 
 try:
     average_priors = qmla.analysis.average_parameters(
