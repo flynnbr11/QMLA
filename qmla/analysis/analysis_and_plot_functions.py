@@ -3611,11 +3611,6 @@ def plotTrueModelBayesFactors_IsingRotationTerms(
         ))
     )
     if correct_mod not in mods:
-        print(
-            "[TrueModelBayesHistogram]",
-            "Correct model", correct_mod,
-            "not present in", mods
-        )
         return False
 
     mods.pop(mods.index(correct_mod))
