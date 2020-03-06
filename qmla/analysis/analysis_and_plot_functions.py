@@ -4102,13 +4102,13 @@ def colour_by_hamming_dist(h, cmap):
         return cmap(0.33)
     elif h <=3:
         cmap_val = cmap(0.66)
-        alpha = 0.4        
+        alpha = 0.5        
     else:
         cmap_val = cmap(0.99)
-        alpha = 0.2        
+        alpha = 0.5   
+    alpha = 1
 
     return (cmap_val[0], cmap_val[1], cmap_val[2], alpha)
-
 
 def model_generation_probability(
     results_path, 
@@ -4120,6 +4120,7 @@ def model_generation_probability(
     data_indices = list(combined_results['GrowthRuleStorageData'].index)
     true_chromosome = eval(combined_results['GrowthRuleStorageData'][0])['true_model_chromosome']
     num_terms = len(true_chromosome)
+    full_chromosome = 2**num_terms
 
     chromosomes = []
     chromosomes.extend(
@@ -4137,26 +4138,58 @@ def model_generation_probability(
 
     cmap = plt.cm.viridis
 
+    num_runs = len(data_indices)
+    num_models = 2**num_terms
+    all_models = range(num_models)
 
     unique_chromosome_numbers = sorted(list(set(chromosomes)))
     unique_chromosomes = [bin(int(c))[2:].zfill(num_terms) for c in unique_chromosome_numbers]
     counts = [chromosomes.count(a) for a in unique_chromosome_numbers]
-    ham_d = [hamming_distance(c, true_chromosome) for c in unique_chromosomes]
-    chromosome_colours = [colour_by_hamming_dist(h, cmap=cmap) for h in ham_d]
-    num_runs = len(data_indices)
+#     ham_d = [hamming_distance(c, true_chromosome) for c in unique_chromosomes]
+#     chromosome_colours = [colour_by_hamming_dist(h, cmap=cmap) for h in ham_d]
     counts = [c/num_runs for c in counts] # so this reflects 'probability' of being generated
 
-    fig, ax = plt.subplots()
-    ax.scatter(
-        unique_chromosome_numbers, 
-        counts,
-        c = chromosome_colours,
-        marker = 'o',
-        facecolors='none'
+    array_counts = np.zeros(num_models)
+    for i in unique_chromosome_numbers:
+        idx = unique_chromosome_numbers.index(i)
+        array_counts[i] = counts[idx]
 
+    colours = [cmap(1)]*num_models
+    for mod in all_models:
+        chromosome = bin(mod)[2:].zfill(num_terms)
+        h = hamming_distance(chromosome, true_chromosome)
+        c = colour_by_hamming_dist(h, cmap=cmap)
+        colours[mod] = c
+    colours = np.array(colours)
+
+    
+    fig, ax = plt.subplots(figsize=(20, 10))
+    ax.scatter(
+        all_models, 
+        array_counts, 
+        edgecolors = colours,
+        facecolor='none'
+    )    
+#     ax.scatter(
+#         unique_chromosome_numbers, 
+#         counts,
+#         c = chromosome_colours,
+#         marker = 'o',
+#         facecolors='none'
+
+#     )
+    label_fontsize = 20
+    ax.set_xlabel('Model ID (binary representation)', fontsize=label_fontsize)
+    ax.set_ylabel('Prob. of generation', fontsize=label_fontsize)
+    ax.set_ylim(-0.1, 1.1)
+    probs_to_label = [0, 0.25, 0.5, 0.75, 1]
+    ax.set_yticks(
+        probs_to_label,
     )
-    ax.set_xlabel('Model ID (binary representation)')
-    ax.set_ylabel('Prob. of generation')
+    ax.set_yticklabels(
+        labels = probs_to_label,
+        fontdict={'fontsize' : label_fontsize}
+    )
 
 
     custom_lines = [
@@ -4175,12 +4208,24 @@ def model_generation_probability(
 
     ax.legend(
         custom_lines, 
-        custom_labels
+        custom_labels,
+        prop={'size' : label_fontsize}
     )
     ax.set_title(
-        "True chromosome: {}".format(true_chromosome)
+        "True chromosome: {} ({})".format(true_chromosome, int(true_chromosome,2)),
+        fontsize = label_fontsize
     )
+    ax2 = ax.twinx()
+    ax2.set_ylim(ax.get_ylim())
+    ax2.set_yticks(
+        np.linspace(0,1,num_runs+1),
+    )
+    ax2.set_yticklabels(
+        range(num_runs+1),
+        fontdict={'fontsize' : label_fontsize}
+    )
+    ax2.set_ylabel('Number of occurences', fontsize=label_fontsize)
     if save_to_file is not None: 
         plt.savefig(save_to_file)
 
-
+    plt.show()
