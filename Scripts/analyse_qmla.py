@@ -254,7 +254,7 @@ except BaseException:
 
 try: 
     qmla.analysis.model_generation_probability(
-        results_path = results_csv_name,
+        results_path = results_csv,
         save_to_file=os.path.join(
             directory_to_analyse, 
             'prob_of_model_generation.png'
