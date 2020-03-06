@@ -202,24 +202,6 @@ if not directory_to_analyse.endswith('/'):
 
 print("Counting model occurences.")
 
-try:
-    qmla.analysis.count_model_occurences(
-        latex_map=latex_mapping_file,
-        true_model_latex=true_growth_class.latex_name(
-            true_model
-        ),
-        save_counts_dict=str(
-            directory_to_analyse +
-            "count_model_occurences.p"
-        ),
-        save_to_file=str(
-            directory_to_analyse +
-            "occurences_of_models.png"
-        )
-    )
-except BaseException:
-    print("Failed to plot # occurences of each model.")
-    # raise
 
 
 if further_qhl_mode == True:
@@ -240,6 +222,25 @@ if gather_summary_results:
         results_file_name_start=results_file_name_start,
         csv_name=results_csv
     )
+    try:
+        # counting model analysis is costly so making it optional
+        qmla.analysis.count_model_occurences(
+            latex_map=latex_mapping_file,
+            true_model_latex=true_growth_class.latex_name(
+                true_model
+            ),
+            save_counts_dict=str(
+                directory_to_analyse +
+                "count_model_occurences.p"
+            ),
+            save_to_file=str(
+                directory_to_analyse +
+                "occurences_of_models.png"
+            )
+        )
+    except BaseException:
+        print("Failed to plot # occurences of each model.")
+        # raise
 
 
 try:

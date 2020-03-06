@@ -1826,14 +1826,6 @@ def count_model_occurences(
         true_idx = unique_models.index(true_model_latex)
         colours[true_idx] = 'green'
 
-    print(
-        "[multiQMD - count model occurences]",
-        "Colours:", colours,
-        "\ntrue op:", true_model_latex,
-        "\nunique models:", unique_models,
-        "test:", (str(true_model_latex) in unique_models)
-    )
-
     fig, ax = plt.subplots(
         figsize=(
             max(max_count * 2, 5),
