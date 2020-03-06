@@ -4135,7 +4135,7 @@ def model_generation_probability(
     )
     f_scores = flatten(f_scores)
 
-    cmap = plt.cm.Paired
+    cmap = plt.cm.viridis
 
 
     unique_chromosome_numbers = sorted(list(set(chromosomes)))
