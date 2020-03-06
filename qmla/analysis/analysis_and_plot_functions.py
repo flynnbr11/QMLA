@@ -4133,6 +4133,8 @@ def model_generation_probability(
     combined_results = pd.read_csv(results_path)
     data_indices = list(combined_results['GrowthRuleStorageData'].index)
     true_chromosome = eval(combined_results['GrowthRuleStorageData'][0])['true_model_chromosome']
+    num_experiments = combined_results['NumExperiments'][0]
+    num_particles = combined_results['NumParticles'][0]
     num_terms = len(true_chromosome)
     full_chromosome = 2**num_terms
 
@@ -4318,6 +4320,14 @@ def model_generation_probability(
             fontdict={'fontsize' : label_fontsize}
         )
     ax2.set_ylabel('Number of occurences', fontsize=label_fontsize)
+    ax2.set_title(
+        "Probability of model generation. {} experiments; {} particles; {} runs".format(
+            num_experiments, 
+            num_particles, 
+            num_runs
+        ),
+        fontsize = label_fontsize
+    )
     if save_directory is not None: 
         plt.savefig(os.path.join(save_directory, 'prob_f_score_generation.png'))
 

@@ -82,7 +82,7 @@ class Genetic(
         # self.max_spawn_depth = 40
         # self.initial_num_models = 16
         # test
-        self.max_spawn_depth = 2
+        self.max_spawn_depth = 4
         self.initial_num_models = 10
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
