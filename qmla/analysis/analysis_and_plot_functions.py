@@ -4249,7 +4249,7 @@ def model_generation_probability(
     )
     ax.axhline(
         random_sampling_prob, 
-        label='Random generation',
+        label='Random generation ({}%)'.format(random_sampling_prob),
         c ='black',
         ls = '--'
     )
