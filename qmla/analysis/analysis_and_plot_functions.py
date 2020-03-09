@@ -4132,6 +4132,34 @@ def model_generation_probability(
     num_particles = combined_results['NumParticles'][0]
     num_terms = len(true_chromosome)
     full_chromosome = 2**num_terms
+    cmap = plt.cm.viridis
+    num_runs = len(data_indices)
+    num_models = 2**num_terms
+    all_models = range(num_models)
+
+    # get prob of generation at random for all available models 
+    avg_num_mods_per_instance = combined_results.NumModels.median()
+    std_dev_num_mods_per_instance = combined_results.NumModels.std()
+    if np.isnan(std_dev_num_mods_per_instance): 
+        std_dev_num_mods_per_instance = 0
+
+    counts = np.zeros(2**num_terms)
+    num_trials = int(1e4)
+    for i in range(num_trials):
+        # randomly choose a number of models to sample
+        num_samples = int(np.random.normal(
+            avg_num_mods_per_instance, 
+            std_dev_num_mods_per_instance)
+        )
+        model_ids = random.sample(range(2**num_terms), num_samples)
+        for m in model_ids: 
+            counts[m] += 1
+    counts /= num_trials
+    random_sampling_prob = np.round(np.median(counts), 3)
+    random_sampling_width = np.round(np.std(counts), 3)
+    random_width_array_upper = [random_sampling_prob + random_sampling_width] * num_models
+    random_width_array_lower = [random_sampling_prob - random_sampling_width] * num_models
+
 
     chromosomes = []
     chromosomes.extend(
@@ -4147,11 +4175,6 @@ def model_generation_probability(
     )
     f_scores = flatten(f_scores)
 
-    cmap = plt.cm.viridis
-
-    num_runs = len(data_indices)
-    num_models = 2**num_terms
-    all_models = range(num_models)
 
     unique_chromosome_numbers = sorted(list(set(chromosomes)))
     unique_chromosomes = [bin(int(c))[2:].zfill(num_terms) for c in unique_chromosome_numbers]
@@ -4200,7 +4223,7 @@ def model_generation_probability(
 
 
     
-    fig, ax = plt.subplots(figsize=(15, 7))
+    fig, ax = plt.subplots(figsize=(17, 7))
     ax.scatter(
         all_models, 
         array_counts, 
@@ -4220,7 +4243,19 @@ def model_generation_probability(
         labels = probs_to_label,
         fontdict={'fontsize' : label_fontsize}
     )
-
+    ax.axvline(
+        int(true_chromosome,2),
+        c = cmap(0.0), ls=':'
+    )
+    ax.axhline(
+        random_sampling_prob, 
+        label='Random generation',
+        c ='black',
+        ls = '--'
+    )
+    print("Median:", random_sampling_prob)
+    print("random array lower width:", random_width_array_lower[:10])
+    handles, labels = ax.get_legend_handles_labels()
 
     custom_lines = [
         Line2D([0], [0], color=cmap(0.99), lw=4),
@@ -4234,14 +4269,17 @@ def model_generation_probability(
         '1 term wrong', 
         'Correct', 
     ]
-
+    handles.extend(custom_lines)
+    labels.extend(custom_labels)
 
     ax.legend(
-        custom_lines, 
-        custom_labels,
-        prop={'size' : 0.75*label_fontsize},
+        # custom_lines, 
+        # custom_labels,
+        handles, 
+        labels,
+        prop={'size' : 0.65*label_fontsize},
         loc='upper center',
-        ncol=4
+        ncol=5
    )
     ax.set_title(
         "True chromosome: {} ({})".format(true_chromosome, int(true_chromosome,2)),
@@ -4269,10 +4307,11 @@ def model_generation_probability(
     if save_directory is not None: 
         plt.savefig(os.path.join(save_directory, 'prob_model_generation.png'))
 
-
+    #############
     # f score model probability plot
+    #############
     plt.clf()
-    fig, ax = plt.subplots(figsize=(15, 7))
+    fig, ax = plt.subplots(figsize=(17, 7))
 
     f_vals = []
     count_vals = []
@@ -4286,15 +4325,24 @@ def model_generation_probability(
             f_colours.append(colour)
             
     ax.scatter(f_vals, count_vals, c=f_colours)
+    ax.axhline(
+        random_sampling_prob, 
+        label='Prob random generation',
+        c ='black',
+        ls = '--'
+    )
     ax.set_ylim(-0.1,1.2)    
     ax.set_yticks(probs_to_label)
     ax.legend(
-        custom_lines, 
-        custom_labels,
-        prop={'size' : 0.75*label_fontsize},
+        handles, 
+        labels, 
+        # custom_lines, 
+        # custom_labels,
+        prop={'size' : 0.65*label_fontsize},
         loc='upper center',
-        ncol=4
+        ncol=5
     )
+    
     ax.set_xlabel('Model F-score', fontsize=label_fontsize)
     ax.set_ylabel('Prob. of generation', fontsize=label_fontsize)
     ax2 = ax.twinx()
