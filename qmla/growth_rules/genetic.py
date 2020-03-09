@@ -46,7 +46,9 @@ class Genetic(
         self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
         self.heisenberg_xxz_small = 'pauliSet_1J2_xJx_d3+pauliSet_1J3_yJy_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
         self.true_model = self.heisenberg_xxz_small
-        self.true_model = 'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
+        self.four_site_true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4'
+        self.three_site_true_model = 'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
+        self.true_model = self.four_site_true_model
         self.true_model = qmla.database_framework.alph(self.true_model)
         self.num_sites = qmla.database_framework.get_num_qubits(self.true_model)
         self.num_probes = 5
@@ -56,10 +58,16 @@ class Genetic(
             'pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
             'pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
         ]
-        self.base_terms = [
-            # 'x', 'z',
-            'x', 'y',  'z'
-        ]
+        if self.num_sites < 4 : 
+            # to keep state spaces reasonable for development.
+            self.base_terms = [
+                'x', 'y',  'z'
+            ]
+        else: 
+            self.base_terms = [
+                'x', 'z',
+            ]
+
         self.mutation_probability = 0.1
 
         self.genetic_algorithm = GeneticAlgorithmQMLA(
@@ -79,8 +87,8 @@ class Genetic(
 
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        self.max_spawn_depth = 2
-        self.initial_num_models = 16
+        self.max_spawn_depth = 1
+        self.initial_num_models = 8
         # self.tree_completed_initially = True
         # test
         # self.max_spawn_depth = 2

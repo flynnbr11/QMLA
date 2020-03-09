@@ -4253,8 +4253,6 @@ def model_generation_probability(
         c ='black',
         ls = '--'
     )
-    print("Median:", random_sampling_prob)
-    print("random array lower width:", random_width_array_lower[:10])
     handles, labels = ax.get_legend_handles_labels()
 
     custom_lines = [
