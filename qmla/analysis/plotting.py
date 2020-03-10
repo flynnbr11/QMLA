@@ -1732,8 +1732,12 @@ def stat_metrics_histograms(
         ax = fig.add_subplot(gs[0, plot_col])
         data = champ_info[plotting_data['name']]
         print("data for {}: {}".format(plotting_data['name'], data))
+        models = list(data.keys())
+        f_scores = [champ_info['f_scores'][mod] for mod in models]
+        model_num_wins = []
         ax.hist(
-            list(data.values()), 
+            # list(data.values()), 
+            f_scores,
             color = plotting_data['colour'],
             bins = hist_bins,
             align='mid'
