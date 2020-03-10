@@ -91,8 +91,8 @@ class Genetic(
         # self.max_spawn_depth = 10
         # self.initial_num_models = 20
         # self.tree_completed_initially = True
-        self.max_spawn_depth = 20
-        self.initial_num_models = 10
+        self.max_spawn_depth = 50
+        self.initial_num_models = 20
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
