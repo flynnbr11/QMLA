@@ -1727,7 +1727,7 @@ def stat_metrics_histograms(
         # figure=fig # not available on matplotlib 2.1.1 (on BC)
     )
     plot_col = 0
-    hist_bins = np.arange(0,1, 0.1)
+    hist_bins = np.arange(0,1.1,0.1)
     for plotting_data in include_plots: 
         ax = fig.add_subplot(gs[0, plot_col])
         data = champ_info[plotting_data['name']]
@@ -1735,9 +1735,10 @@ def stat_metrics_histograms(
         ax.hist(
             list(data.values()), 
             color = plotting_data['colour'],
-            bins = hist_bins
+            bins = hist_bins,
+            align='mid'
         )
-        ax.set_xlim(0,1)    
+        ax.set_xlim(0,1.0)    
         ax.set_title(
             "Champions' {}".format(plotting_data['name'])
         )
