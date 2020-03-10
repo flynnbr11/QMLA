@@ -88,11 +88,11 @@ class Genetic(
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         # test
-        # self.max_spawn_depth = 1
-        # self.initial_num_models = 8
-        # self.tree_completed_initially = True
-        self.max_spawn_depth = 50
+        self.max_spawn_depth = 10
         self.initial_num_models = 20
+        # self.tree_completed_initially = True
+        # self.max_spawn_depth = 50
+        # self.initial_num_models = 20
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -176,8 +176,11 @@ class Genetic(
                 )                
             ]
         )
+
+        # TEST: instead of relative number of wins, use model f score as fitness
         new_models = self.genetic_algorithm.genetic_algorithm_step(
-            model_fitnesses=model_fitnesses,
+            model_fitnesses=model_f_scores,
+            # model_fitnesses=model_fitnesses,
             num_pairs_to_sample=self.initial_num_models / 2
         )
 
