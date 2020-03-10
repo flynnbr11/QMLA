@@ -1283,6 +1283,7 @@ def get_model_scores(
             pickled_files.append(file)
 
     coeff_of_determination = {}
+    latex_model_wins = {}
     avg_coeff_determination = {}
     f_scores = {}
     precisions = {}
@@ -1339,6 +1340,7 @@ def get_model_scores(
     wins = {}
     for mod in list(scores.keys()):
         latex_name = unique_growth_classes[growth_rules[mod]].latex_name(mod)
+        latex_model_wins[latex_name] = scores[mod]
         latex_f_scores[latex_name] = f_scores[mod]
         latex_coeff_det[latex_name] = avg_coeff_determination[mod]
         precisions[latex_name] = precisions[mod]
@@ -1357,6 +1359,7 @@ def get_model_scores(
 
     results = {
         'scores': scores,
+        'latex_model_wins' : latex_model_wins, 
         'growth_rules': growth_rules,
         'growth_classes': growth_classes,
         'unique_growth_classes': unique_growth_classes,
@@ -1728,16 +1731,25 @@ def stat_metrics_histograms(
     )
     plot_col = 0
     hist_bins = np.arange(0,1.1,0.1)
+    model_wins = champ_info['latex_model_wins']
     for plotting_data in include_plots: 
         ax = fig.add_subplot(gs[0, plot_col])
         data = champ_info[plotting_data['name']]
         print("data for {}: {}".format(plotting_data['name'], data))
-        models = list(data.keys())
-        f_scores = [champ_info['f_scores'][mod] for mod in models]
-        model_num_wins = []
+        weights = {}
+        for mod in model_wins: 
+            d = data[mod]
+            wins = model_wins[mod]
+            try:
+                weights[d] += wins
+            except: 
+                weights[d] = wins
+
+        values_to_plot = sorted(weights.keys())
+        wts = [weights[v] for v in values_to_plot]
         ax.hist(
-            # list(data.values()), 
-            f_scores,
+            values_to_plot, 
+            weights = wts, 
             color = plotting_data['colour'],
             bins = hist_bins,
             align='mid'
