@@ -88,7 +88,7 @@ class Genetic(
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         # test
-        self.max_spawn_depth = 15
+        self.max_spawn_depth = 1
         self.initial_num_models = 20
         # self.tree_completed_initially = True
         # self.max_spawn_depth = 50
@@ -376,7 +376,7 @@ class Genetic(
         plt.legend(loc='lower right')
         bplot.set_xlabel('F score')
         bplot.set_ylabel('Fitness (win ratio)')
-        bplot.set_ylim((0,1))
+        # bplot.set_ylim((0,1))
         bplot.set_xlim((0,1))
         bplot.figure.savefig(save_to_file)
 
