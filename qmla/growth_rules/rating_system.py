@@ -127,7 +127,9 @@ class ELORating(RatingSystem):
         elif winner_id == model_b_id: 
             rating_a_new = rating_a + (self.k_const * (0 - prob_a))
             rating_b_new = rating_b + (self.k_const * (1 - prob_b))
-        
+        rating_a_new = int(rating_a_new)
+        rating_b_new = int(rating_b_new)
+
         model_a.update_rating(
             opponent_id = model_b_id, 
             winner_id = winner_id,

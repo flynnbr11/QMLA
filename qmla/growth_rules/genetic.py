@@ -144,13 +144,30 @@ class Genetic(
         fitness_track = {}
 
         sum_fitnesses = sum(list(model_points.values()))
-        self.log_print(["Sum fitnesses:", sum_fitnesses])
-        self.log_print(["Values:", list(model_points.values())])
+        model_ids = list(model_points.keys())
         model_ratings = self.ratings_class.get_ratings(list(model_points.keys()))
-        ratings_by_name = {}
-        for m in list(model_points.keys()):
+        ratings_by_name = {
+            kwargs['model_names_ids'][m] : model_ratings[m]
+            for m in model_ids
+        }
+        min_rating = min(ratings_by_name.values())
+        for m in ratings_by_name: ratings_by_name[m] -= min_rating
+        sum_ratings = np.sum(list(ratings_by_name.values()))
+        self.log_print(
+            [
+                "Sum fitnesses:", sum_fitnesses,
+                "\nSum ratings:", sum_ratings
+            ]
+        )
+
+        ratings_weights = {
+            m : ratings_by_name[m]/sum_ratings
+            for m in ratings_by_name
+        }
+
+        for m in model_ids:
             mod = kwargs['model_names_ids'][m]
-            ratings_by_name[mod] = model_ratings[m]
+            # ratings_by_name[mod] = model_ratings[m]
             model_fitnesses[mod] = model_points[m]
             f_score = self.f_score_model_comparison(
                 test_model = mod, 
@@ -161,8 +178,8 @@ class Genetic(
                 self.fitness_by_f_score.append(
                     pd.Series(
                     {
-                        # 'fitness' : model_fitnesses[mod]/sum_fitnesses, 
-                        'fitness' : ratings_by_name[mod], 
+                        'fitness_by_win_ratio' : model_fitnesses[mod]/sum_fitnesses, 
+                        'fitness_by_rating' : ratings_weights[mod], 
                         'generation' : kwargs['spawn_step'],
                         'f_score' : f_score
                     }), 
@@ -180,6 +197,13 @@ class Genetic(
                     ratings_by_name, 
                 )                
             ]
+        )
+        # subtracting minimum rating so that model has 0 probability of being used for selection
+        min_model_rating = min(ratings_by_name.values())
+        for m in ratings_by_name:
+            ratings_by_name[m] = ratings_by_name[m] - min_model_rating
+        self.log_print(
+            ["Re-rated fitnessses:", ratings_by_name]
         )
         # TEST: instead of relative number of wins, use model f score as fitness
         new_models = self.genetic_algorithm.genetic_algorithm_step(
@@ -324,10 +348,10 @@ class Genetic(
         chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
         chromosome_numbers = sorted([int(c,2) for c in chromosomes])
         self.growth_rule_specific_data_to_store['chromosomes_tested'] = chromosome_numbers
-        f_scores = [self.f_score_from_chromosome_string(c) for c in chromosomes]
+        f_scores = [np.round(self.f_score_from_chromosome_string(c), 3) for c in chromosomes]
         self.growth_rule_specific_data_to_store['f_score_tested_models'] = f_scores
         self.growth_rule_specific_data_to_store['true_model_chromosome'] = self.true_chromosome_string
-        self.growth_rule_specific_data_to_store['fitness_by_f_score'] = self.fitness_by_f_score
+        # self.growth_rule_specific_data_to_store['fitness_by_f_score'] = self.fitness_by_f_score
 
 
     def growth_rule_specific_plots(
@@ -351,7 +375,7 @@ class Genetic(
         cmap = sns.cubehelix_palette(dark=.3, light=.8, as_cmap=True)
         bplot = sns.regplot(
             x='f_score', 
-            y='fitness', 
+            y='fitness_by_rating', 
             # hue='generation',
             # palette = cmap,
             data = self.fitness_by_f_score,
@@ -376,7 +400,7 @@ class Genetic(
 
         plt.legend(loc='lower right')
         bplot.set_xlabel('F score')
-        bplot.set_ylabel('Fitness (win ratio)')
+        bplot.set_ylabel('Fitness (weighted model rating)')
         # bplot.set_ylim((0,1))
         bplot.set_xlim((0,1))
         bplot.figure.savefig(save_to_file)
@@ -603,9 +627,10 @@ class GeneticAlgorithmQMLA():
             chromosomes[model] = chrom
             weights.append(model_fitnesses[model])
         weights /= np.sum(weights)  # normalise so weights are probabilities
+
         self.log_print(
             [
-            "Models: {} \nWeights: {}".format(models, weights)
+            "Models/Weights: {}".format( set(zip(models, weights)) )
             ]
         )
         new_chromosome_pairs = []

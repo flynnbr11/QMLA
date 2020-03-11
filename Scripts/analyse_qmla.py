@@ -271,7 +271,7 @@ try:
 except:
     print("Failed to plot probability of model generation")
     print("Note this is only built for genetic algorithm so far.")
-    # raise
+    raise
 
 
 os.chdir(directory_to_analyse)
