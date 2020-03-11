@@ -89,7 +89,7 @@ class Genetic(
         self.max_num_probe_qubits = self.num_sites
         # test
         self.max_spawn_depth = 1
-        self.initial_num_models = 20
+        self.initial_num_models = 8
         # self.tree_completed_initially = True
         # self.max_spawn_depth = 50
         # self.initial_num_models = 20
@@ -327,6 +327,7 @@ class Genetic(
         f_scores = [self.f_score_from_chromosome_string(c) for c in chromosomes]
         self.growth_rule_specific_data_to_store['f_score_tested_models'] = f_scores
         self.growth_rule_specific_data_to_store['true_model_chromosome'] = self.true_chromosome_string
+        self.growth_rule_specific_data_to_store['fitness_by_f_score'] = self.fitness_by_f_score
 
 
     def growth_rule_specific_plots(
