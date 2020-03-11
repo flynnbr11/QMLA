@@ -88,7 +88,7 @@ class Genetic(
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         # test
-        self.max_spawn_depth = 50
+        self.max_spawn_depth = 15
         self.initial_num_models = 20
         # self.tree_completed_initially = True
         # self.max_spawn_depth = 50
@@ -146,8 +146,11 @@ class Genetic(
         sum_fitnesses = sum(list(model_points.values()))
         self.log_print(["Sum fitnesses:", sum_fitnesses])
         self.log_print(["Values:", list(model_points.values())])
+        model_ratings = self.ratings_class.get_ratings(list(model_points.keys()))
+        ratings_by_name = {}
         for m in list(model_points.keys()):
             mod = kwargs['model_names_ids'][m]
+            ratings_by_name[mod] = model_ratings[m]
             model_fitnesses[mod] = model_points[m]
             f_score = self.f_score_model_comparison(
                 test_model = mod, 
@@ -158,7 +161,8 @@ class Genetic(
                 self.fitness_by_f_score.append(
                     pd.Series(
                     {
-                        'fitness' : model_fitnesses[mod]/sum_fitnesses, 
+                        # 'fitness' : model_fitnesses[mod]/sum_fitnesses, 
+                        'fitness' : ratings_by_name[mod], 
                         'generation' : kwargs['spawn_step'],
                         'f_score' : f_score
                     }), 
@@ -168,19 +172,20 @@ class Genetic(
         
         self.log_print(
             [
-                'Generation {} \nModel Fitnesses: {} \nF-scores: {} \nWeights:{}'.format(
+                'Generation {} \nModel Fitnesses: {} \nF-scores: {} \nWeights:{} \nModel Ratings:{}'.format(
                     kwargs['spawn_step'],
                     model_fitnesses,
                     model_f_scores,
-                    fitness_track
+                    fitness_track,
+                    ratings_by_name, 
                 )                
             ]
         )
-
         # TEST: instead of relative number of wins, use model f score as fitness
         new_models = self.genetic_algorithm.genetic_algorithm_step(
-            model_fitnesses=model_f_scores,
+            # model_fitnesses=model_f_scores,
             # model_fitnesses=model_fitnesses,
+            model_fitnesses=ratings_by_name, 
             num_pairs_to_sample=self.initial_num_models / 2
         )
 

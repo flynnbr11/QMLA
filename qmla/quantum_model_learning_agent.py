@@ -1296,6 +1296,13 @@ class QuantumModelLearningAgent():
         elif bayes_factor < (1.0 / self.bayes_threshold_lower):
             champ = mod_high.model_id
 
+        # Tell growth rule's rating system about this comparison
+        self.growth_class.ratings_class.compute_new_ratings(
+            model_a_id = mod_low.model_id, 
+            model_b_id = mod_high.model_id, 
+            winner_id = champ
+        )
+
         return champ
 
     def compare_all_models_in_branch(

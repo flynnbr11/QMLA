@@ -8,6 +8,7 @@ import qmla.experiment_design_heuristics as experiment_design_heuristics
 import qmla.probe_set_generation as probe_set_generation
 import qmla.expectation_values as expectation_values
 import qmla.database_framework as database_framework
+import qmla.growth_rules.rating_system
 from qmla.growth_rules.growth_rule_decorator import GrowthRuleDecorator
 
 __all__ = [
@@ -49,6 +50,7 @@ class GrowthRuleSuper():
         self.plot_probe_generation_function = probe_set_generation.plus_probes_dict
         self.expectation_value_function = expectation_values.default_expectation_value
         self.probe_noise_level = 1e-5
+        self.ratings_class = qmla.growth_rules.rating_system.ELORating(k_const=100) # for use when ranking/rating models
         self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
         self.prior_distribution_generator = Distributions.gaussian_prior
         self.highest_num_qubits = 1
