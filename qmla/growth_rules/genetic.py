@@ -88,10 +88,10 @@ class Genetic(
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         # test
-        # self.max_spawn_depth = 1
+        # self.max_spawn_depth = 2
         # self.initial_num_models = 8
         # self.tree_completed_initially = True
-        self.max_spawn_depth = 40
+        self.max_spawn_depth = 20
         self.initial_num_models = 16
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
@@ -156,7 +156,8 @@ class Genetic(
         self.log_print(
             [
                 "Sum fitnesses:", sum_fitnesses,
-                "\nSum ratings:", sum_ratings
+                "\nSum ratings:", sum_ratings,
+                "\nMin rating:", min_rating
             ]
         )
 
@@ -351,7 +352,21 @@ class Genetic(
         f_scores = [np.round(self.f_score_from_chromosome_string(c), 3) for c in chromosomes]
         self.growth_rule_specific_data_to_store['f_score_tested_models'] = f_scores
         self.growth_rule_specific_data_to_store['true_model_chromosome'] = self.true_chromosome_string
-        # self.growth_rule_specific_data_to_store['fitness_by_f_score'] = self.fitness_by_f_score
+        # self.growth_rule_specific_data_to_store['rating_fitnesses'] = list(zip(
+        #         self.fitness_by_f_score['f_score'],
+        #         self.fitness_by_f_score['fitness_by_rating']
+        # ))
+        # self.growth_rule_specific_data_to_store['win_ratio_fitnesses'] = list(zip(
+        #     self.fitness_by_f_score['f_score'],
+        #     self.fitness_by_f_score['fitness_by_win_ratio']
+        # ))
+        self.growth_rule_specific_data_to_store['f_score_fitnesses'] = list(zip(
+            self.fitness_by_f_score['f_score'],
+            self.fitness_by_f_score['fitness_by_win_ratio'],
+            self.fitness_by_f_score['fitness_by_rating']
+        ))
+
+
 
 
     def growth_rule_specific_plots(
@@ -370,40 +385,37 @@ class Genetic(
         import matplotlib.pyplot as plt
         import seaborn as sns
         plt.clf()
+        fig, ax = plt.subplots()
         sns.set(rc={'figure.figsize':(11.7,8.27)})
 
         cmap = sns.cubehelix_palette(dark=.3, light=.8, as_cmap=True)
-        bplot = sns.regplot(
+        # bplot = 
+        sns.scatterplot(
             x='f_score', 
             y='fitness_by_rating', 
             # hue='generation',
             # palette = cmap,
+            label='Rating',
             data = self.fitness_by_f_score,
+            ax = ax
         )
 
-        # try:
-        #     bplot = sns.lineplot(
-        #         x='f_score', 
-        #         y='fitness', 
-        #         hue='generation',
-        #         palette=cmap,
-        #         data = self.fitness_by_f_score,
-        #     )
-        # except:
-        #     bplot = sns.regplot(
-        #         x='f_score', 
-        #         y='fitness', 
-        #         hue='generation',
-        #         palette = cmap,
-        #         data = self.fitness_by_f_score,
-        #     )
+        sns.scatterplot(
+            x='f_score', 
+            y='fitness_by_win_ratio', 
+            # hue='generation',
+            # palette = cmap,
+            label='Win ratio',
+            data = self.fitness_by_f_score,
+            ax = ax
+        )
 
-        plt.legend(loc='lower right')
-        bplot.set_xlabel('F score')
-        bplot.set_ylabel('Fitness (weighted model rating)')
+        ax.legend(loc='lower right')
+        ax.set_xlabel('F score')
+        ax.set_ylabel('Fitness (as probability)')
         # bplot.set_ylim((0,1))
-        bplot.set_xlim((0,1))
-        bplot.figure.savefig(save_to_file)
+        ax.set_xlim((0,1))
+        ax.figure.savefig(save_to_file)
 
 
 def hamming_distance(str1, str2):
