@@ -52,7 +52,7 @@ class GrowthRuleSuper():
         self.probe_noise_level = 1e-5
         self.ratings_class = qmla.growth_rules.rating_system.ELORating(
             initial_rating=1500,
-            k_const=200
+            k_const=30
         ) # for use when ranking/rating models
         self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
         self.prior_distribution_generator = Distributions.gaussian_prior

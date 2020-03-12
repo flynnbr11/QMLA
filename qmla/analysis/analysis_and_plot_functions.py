@@ -4170,14 +4170,20 @@ def model_generation_probability(
     chromosomes = []
     chromosomes.extend(
         c for c in 
-        [eval(combined_results['GrowthRuleStorageData'][c])['chromosomes_tested'] for c in data_indices]
+        [
+            eval(combined_results['GrowthRuleStorageData'][c])['chromosomes_tested'] 
+            for c in data_indices
+        ]
     )
     chromosomes = flatten(chromosomes)
 
     f_scores = []
     f_scores.extend(
         c for c in 
-        [eval(combined_results['GrowthRuleStorageData'][c])['f_score_tested_models'] for c in data_indices]
+        [
+            eval(combined_results['GrowthRuleStorageData'][c])['f_score_tested_models'] 
+            for c in data_indices
+        ]
     )
     f_scores = flatten(f_scores)
 
@@ -4227,8 +4233,6 @@ def model_generation_probability(
         
     colours = np.array(colours)
 
-
-    
     fig, ax = plt.subplots(figsize=(17, 7))
     ax.scatter(
         all_models, 
@@ -4397,7 +4401,9 @@ def genetic_algorithm_f_score_fitness_plots(
                     {
                         'f_score' : round_nearest(result[0], 0.05),
                         'fitness_by_win_ratio' : np.round(result[1], 2),
-                        'fitness_by_rating' : np.round(result[2], 2)
+                        'fitness_by_rating' : np.round(result[2], 2),
+                        'original_fitness' : int(result[3]),
+                        'rating_to_wins_ratio' : np.round(result[4])
                     }), 
                     ignore_index=True
                 )
@@ -4413,7 +4419,7 @@ def genetic_algorithm_f_score_fitness_plots(
         3,
         1,
     )
-
+    sns.set_style('darkgrid')
     ax1 = fig.add_subplot(gs[0, 0])
     sns.boxplot(
     # sns.violinplot(
@@ -4449,6 +4455,8 @@ def genetic_algorithm_f_score_fitness_plots(
     ax3.set_xlim(0,1)
     ax3.set_title('Number of models')
 
+
+    
     if save_directory is not None:
         save_to_file = os.path.join(
             save_directory, 
@@ -4456,6 +4464,7 @@ def genetic_algorithm_f_score_fitness_plots(
         )
         plt.savefig(save_to_file)
 
+    ### Separate plot
     plt.clf()
     fig = plt.figure(
         figsize=(18, 10),
@@ -4463,7 +4472,7 @@ def genetic_algorithm_f_score_fitness_plots(
         tight_layout=True
     )
     gs = GridSpec(
-        1,
+        3,
         1,
     )
 
@@ -4488,6 +4497,32 @@ def genetic_algorithm_f_score_fitness_plots(
     )
     ax4.legend()
     ax4.set_title('Fitnes comparison')
+
+    ax5 = fig.add_subplot(gs[1, 0])
+    sns.lineplot(
+        x='f_score',
+        y='original_fitness', 
+        data=results_by_fscore,
+        ax = ax5,
+    )    
+    ax5.set_title('Original ELO rating')
+    ax5.set_xlim(0,1)
+
+    ax6 = fig.add_subplot(gs[2, 0])
+    sns.boxplot(
+        x='f_score',
+        y='rating_to_wins_ratio', 
+        data=results_by_fscore,
+        ax = ax6,
+    )    
+    ax6.set_title('Ratio of rating:wins')
+    ax6.axhline(1)
+    ax6.set_xlabel('F-score')
+    ax6.set_ylabel('Ratio')
+    ax6.set_xlim(0,1)
+
+
+
     if save_directory is not None:
         save_to_file = os.path.join(
             save_directory, 

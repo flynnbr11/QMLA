@@ -42,6 +42,11 @@ class Genetic(
         # self.true_model = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
         # self.true_model = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
         # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
+        self.ratings_class = qmla.growth_rules.rating_system.ELORating(
+            initial_rating=1500,
+            k_const=30
+        ) # for use when ranking/rating models
+        
         self.fitness_by_f_score = pd.DataFrame()
         self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
         self.heisenberg_xxz_small = 'pauliSet_1J2_xJx_d3+pauliSet_1J3_yJy_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
@@ -146,12 +151,15 @@ class Genetic(
         sum_fitnesses = sum(list(model_points.values()))
         model_ids = list(model_points.keys())
         model_ratings = self.ratings_class.get_ratings(list(model_points.keys()))
-        ratings_by_name = {
+        original_ratings_by_name = {
             kwargs['model_names_ids'][m] : model_ratings[m]
             for m in model_ids
         }
-        min_rating = min(ratings_by_name.values())
-        for m in ratings_by_name: ratings_by_name[m] -= min_rating
+        min_rating = min(original_ratings_by_name.values())
+        ratings_by_name = {
+            m : original_ratings_by_name[m] - min_rating
+            for m in original_ratings_by_name
+        }
         sum_ratings = np.sum(list(ratings_by_name.values()))
         self.log_print(
             [
@@ -175,14 +183,19 @@ class Genetic(
             )
             model_f_scores[mod] = f_score
             fitness_track[mod] = model_fitnesses[mod]/sum_fitnesses
+            fitness_ratio = ratings_weights[mod]/fitness_track[mod]
+            if np.isnan(fitness_ratio):
+                fitness_ratio = 0 
             self.fitness_by_f_score = (
                 self.fitness_by_f_score.append(
                     pd.Series(
                     {
-                        'fitness_by_win_ratio' : model_fitnesses[mod]/sum_fitnesses, 
+                        'fitness_by_win_ratio' : fitness_track[mod], 
                         'fitness_by_rating' : ratings_weights[mod], 
+                        'original_rating' : original_ratings_by_name[mod],
                         'generation' : kwargs['spawn_step'],
-                        'f_score' : f_score
+                        'f_score' : f_score,
+                        'fitness_ratio_rating_win_rate' : fitness_ratio
                     }), 
                     ignore_index=True
                 )
@@ -363,7 +376,9 @@ class Genetic(
         self.growth_rule_specific_data_to_store['f_score_fitnesses'] = list(zip(
             self.fitness_by_f_score['f_score'],
             self.fitness_by_f_score['fitness_by_win_ratio'],
-            self.fitness_by_f_score['fitness_by_rating']
+            self.fitness_by_f_score['fitness_by_rating'],
+            self.fitness_by_f_score['original_rating'],
+            self.fitness_by_f_score['fitness_ratio_rating_win_rate']
         ))
 
 
