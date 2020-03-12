@@ -44,7 +44,7 @@ class Genetic(
         # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
         self.ratings_class = qmla.growth_rules.rating_system.ELORating(
             initial_rating=1500,
-            k_const=30
+            k_const=300
         ) # for use when ranking/rating models
         
         self.fitness_by_f_score = pd.DataFrame()
