@@ -4432,22 +4432,60 @@ def genetic_algorithm_f_score_fitness_plots(
     )
     ax2.set_title('Fitness by win ratio')
     ax2.set_ylim(-0.1,1.1)
-    # ax2.set_xticks(
-    #     [0, 0.5, 1.0]
-    # )
-    ax2.legend()
 
     ax3 = fig.add_subplot(gs[2, 0])
     sns.distplot(
         results_by_fscore['f_score'],
-        bins = np.arange(0,1.01, 0.05)
+        bins = np.arange(0,1.01, 0.05),
+        ax = ax3,
+        kde=False, 
     )
+    ax3.set_xlim(0,1)
     ax3.set_title('Number of models')
 
-    
     if save_directory is not None:
         save_to_file = os.path.join(
             save_directory, 
             'genetic_alg_fitnesses_by_f_score.png'
         )
         plt.savefig(save_to_file)
+
+    plt.clf()
+    fig = plt.figure(
+        figsize=(18, 10),
+        # constrained_layout=True,
+        tight_layout=True
+    )
+    gs = GridSpec(
+        1,
+        1,
+    )
+
+    ax4 = fig.add_subplot(gs[0, 0])
+
+    sns.lineplot(
+        x = 'fitness_by_win_ratio',
+        y = 'fitness_by_rating',
+        data= results_by_fscore,
+        ax = ax4,
+    )
+
+    highest_fit = max( 
+        results_by_fscore['fitness_by_win_ratio'].max(), 
+        results_by_fscore['fitness_by_rating'].max()
+    )
+    ax4.plot(
+        np.linspace(0,highest_fit),
+        np.linspace(0,highest_fit),
+        label = 'x=y',
+        ls = '--'
+    )
+    ax4.legend()
+    ax4.set_title('Fitnes comparison')
+    if save_directory is not None:
+        save_to_file = os.path.join(
+            save_directory, 
+            'fitness_comparison.png'
+        )
+        plt.savefig(save_to_file)
+
