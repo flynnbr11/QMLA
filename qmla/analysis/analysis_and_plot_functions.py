@@ -4504,9 +4504,15 @@ def genetic_algorithm_f_score_fitness_plots(
         y='original_fitness', 
         data=results_by_fscore,
         ax = ax5,
-    )    
+    )
+    sns.swarmplot(
+        x='f_score',
+        y='original_fitness', 
+        data=results_by_fscore,
+        ax = ax5,
+    )
     ax5.set_title('Original ELO rating')
-    ax5.set_xlim(0,1)
+    # ax5.set_xlim(0,1)
 
     ax6 = fig.add_subplot(gs[2, 0])
     sns.boxplot(
@@ -4515,8 +4521,8 @@ def genetic_algorithm_f_score_fitness_plots(
         data=results_by_fscore,
         ax = ax6,
     )    
-    ax6.set_title('Ratio of rating:wins')
-    ax6.axhline(1)
+    ax6.set_title('Ratio of fitness by rating:wins')
+    ax6.axhline(1, color='black', ls='dotted')
     ax6.set_xlabel('F-score')
     ax6.set_ylabel('Ratio')
     # ax6.set_xlim(0,1)
