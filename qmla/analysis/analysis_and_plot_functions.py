@@ -4154,7 +4154,7 @@ def model_generation_probability(
         try:
             model_ids = random.sample(range(2**num_terms), num_samples)
         except:
-            print("Failed to draw {} samples from {} dist".format(num_sampes, num_terms))
+            print("Failed to draw {} samples from {} dist".format(num_samples, 2**num_terms))
         for m in model_ids: 
             counts[m] += 1
     counts /= num_trials
