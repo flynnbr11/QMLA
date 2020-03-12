@@ -4147,10 +4147,10 @@ def model_generation_probability(
     num_trials = int(1e4)
     for i in range(num_trials):
         # randomly choose a number of models to sample
-        num_samples = int(np.random.normal(
+        num_samples = abs(int(np.random.normal(
             avg_num_mods_per_instance, 
             std_dev_num_mods_per_instance)
-        )
+        ))
         try:
             model_ids = random.sample(range(2**num_terms), num_samples)
         except:
