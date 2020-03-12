@@ -4499,7 +4499,7 @@ def genetic_algorithm_f_score_fitness_plots(
     ax4.set_title('Fitnes comparison')
 
     ax5 = fig.add_subplot(gs[1, 0])
-    sns.lineplot(
+    sns.boxplot(
         x='f_score',
         y='original_fitness', 
         data=results_by_fscore,
@@ -4519,14 +4519,14 @@ def genetic_algorithm_f_score_fitness_plots(
     ax6.axhline(1)
     ax6.set_xlabel('F-score')
     ax6.set_ylabel('Ratio')
-    ax6.set_xlim(0,1)
+    # ax6.set_xlim(0,1)
 
 
 
     if save_directory is not None:
         save_to_file = os.path.join(
             save_directory, 
-            'fitness_comparison.png'
+            'genetic_alg_fitness_comparison.png'
         )
         plt.savefig(save_to_file)
 
