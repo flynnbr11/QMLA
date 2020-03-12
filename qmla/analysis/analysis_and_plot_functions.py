@@ -4151,7 +4151,10 @@ def model_generation_probability(
             avg_num_mods_per_instance, 
             std_dev_num_mods_per_instance)
         )
-        model_ids = random.sample(range(2**num_terms), num_samples)
+        try:
+            model_ids = random.sample(range(2**num_terms), num_samples)
+        except:
+            print("Failed to draw {} samples from {} dist".format(num_sampes, num_terms))
         for m in model_ids: 
             counts[m] += 1
     counts /= num_trials
