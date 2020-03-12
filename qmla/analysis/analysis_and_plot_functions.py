@@ -14,9 +14,10 @@ from matplotlib.ticker import Formatter
 from matplotlib import colors as mcolors
 import matplotlib.text as mpl_text
 import sklearn
-
+import seaborn as sns
 import copy
 import random
+
 import matplotlib.cbook as cb
 from matplotlib.colors import colorConverter, Colormap
 from matplotlib.patches import FancyArrowPatch, Circle, ArrowStyle
@@ -33,7 +34,6 @@ from inspect import currentframe, getframeinfo
 import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming
 import qmla.experimental_data_processing as expdt
-
 # from qmla import experimental_data_processing check that is called as experimental_data_processing.method.
 import qmla.expectation_values as expectation_values
 import qmla.database_framework as database_framework
@@ -4373,3 +4373,81 @@ def model_generation_probability(
         plt.savefig(os.path.join(save_directory, 'prob_f_score_generation.png'))
 
     # plt.show()
+
+def genetic_algorithm_f_score_fitness_plots(
+    results_path, 
+    save_directory=None
+):
+    combined_results = pd.read_csv(results_path)
+    results_by_fscore = pd.DataFrame()
+
+    for i in combined_results.index:
+        ratings_list = eval(dict(combined_results['GrowthRuleStorageData'])[i])['f_score_fitnesses']
+
+        for result in ratings_list: 
+            results_by_fscore = (
+                results_by_fscore.append(
+                    pd.Series(
+                    {
+                        'f_score' : round_nearest(result[0], 0.05),
+                        'fitness_by_win_ratio' : np.round(result[1], 2),
+                        'fitness_by_rating' : np.round(result[2], 2)
+                    }), 
+                    ignore_index=True
+                )
+            )    
+
+
+    fig = plt.figure(
+        figsize=(18, 10),
+        # constrained_layout=True,
+        tight_layout=True
+    )
+    gs = GridSpec(
+        3,
+        1,
+    )
+
+    ax1 = fig.add_subplot(gs[0, 0])
+    sns.boxplot(
+    # sns.violinplot(
+        x = 'f_score', 
+        y = 'fitness_by_rating',
+        data = results_by_fscore,
+        ax = ax1,
+    #     label = 'Rating'
+    )
+    ax1.legend()
+    ax1.set_ylim(-0.1,1.1)
+    ax1.set_title('Fitness by ELO rating')
+
+    ax2 = fig.add_subplot(gs[1, 0])
+    sns.boxplot(
+    # sns.violinplot(
+        x = 'f_score', 
+        y = 'fitness_by_win_ratio',
+        data = results_by_fscore,
+        ax = ax2,
+    #     label = 'Rating'
+    )
+    ax2.set_title('Fitness by win ratio')
+    ax2.set_ylim(-0.1,1.1)
+    # ax2.set_xticks(
+    #     [0, 0.5, 1.0]
+    # )
+    ax2.legend()
+
+    ax3 = fig.add_subplot(gs[2, 0])
+    sns.distplot(
+        results_by_fscore['f_score'],
+        bins = np.arange(0,1.01, 0.05)
+    )
+    ax3.set_title('Number of models')
+
+    
+    if save_directory is not None:
+        save_to_file = os.path.join(
+            save_directory, 
+            'genetic_alg_fitnesses_by_f_score.png'
+        )
+        plt.savefig(save_to_file)
