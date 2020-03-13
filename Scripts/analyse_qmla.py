@@ -268,10 +268,10 @@ try:
         results_path = results_csv,
         save_directory=directory_to_analyse, 
     )
-    qmla.analysis.genetic_algorithm_f_score_fitness_plots(
-        results_path = results_csv, 
-        save_directory=directory_to_analyse, 
-    )
+    # qmla.analysis.genetic_algorithm_f_score_fitness_plots(
+    #     results_path = results_csv, 
+    #     save_directory=directory_to_analyse, 
+    # )
 
 except:
     print("Failed to plot probability of model generation")
