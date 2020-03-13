@@ -97,8 +97,8 @@ class Genetic(
         # self.initial_num_models = 8
         # self.tree_completed_initially = True
         # default test - 40 generations x 16 starters
-        self.max_spawn_depth = 16
-        self.initial_num_models = 40
+        self.max_spawn_depth = 20
+        self.initial_num_models = 16
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
