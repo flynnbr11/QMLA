@@ -4404,7 +4404,7 @@ def genetic_algorithm_f_score_fitness_plots(
                         'fitness_by_win_ratio' : np.round(result[1], 2),
                         'fitness_by_rating' : np.round(result[2], 2),
                         'original_fitness' : int(result[3]),
-                        'rating_to_wins_ratio' : np.round(result[4])
+                        # 'rating_to_wins_ratio' : np.round(result[4])
                     }), 
                     ignore_index=True
                 )
@@ -4515,18 +4515,18 @@ def genetic_algorithm_f_score_fitness_plots(
     ax5.set_title('Original ELO rating')
     # ax5.set_xlim(0,1)
 
-    ax6 = fig.add_subplot(gs[2, 0])
-    sns.boxplot(
-        x='f_score',
-        y='rating_to_wins_ratio', 
-        data=results_by_fscore,
-        ax = ax6,
-    )    
-    ax6.set_title('Ratio of fitness by rating:wins')
-    ax6.axhline(1, color='black', ls='dotted')
-    ax6.set_xlabel('F-score')
-    ax6.set_ylabel('Ratio')
-    # ax6.set_xlim(0,1)
+    # ax6 = fig.add_subplot(gs[2, 0])
+    # sns.boxplot(
+    #     x='f_score',
+    #     y='rating_to_wins_ratio', 
+    #     data=results_by_fscore,
+    #     ax = ax6,
+    # )    
+    # ax6.set_title('Ratio of fitness by rating:wins')
+    # ax6.axhline(1, color='black', ls='dotted')
+    # ax6.set_xlabel('F-score')
+    # ax6.set_ylabel('Ratio')
+    # # ax6.set_xlim(0,1)
 
 
 

@@ -93,12 +93,12 @@ class Genetic(
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         # test
-        # self.max_spawn_depth = 2
-        # self.initial_num_models = 8
+        self.max_spawn_depth = 2
+        self.initial_num_models = 8
         # self.tree_completed_initially = True
-        # default test - 40 generations x 16 starters
-        self.max_spawn_depth = 32
-        self.initial_num_models = 16
+        # default test - 32 generations x 16 starters
+        # self.max_spawn_depth = 32
+        # self.initial_num_models = 16
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -115,8 +115,7 @@ class Genetic(
                 for mod in self.initial_models
             ]
         }
-        self.fitness_at_step = {}
-        
+        self.fitness_at_step = {}      
 
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
@@ -156,6 +155,20 @@ class Genetic(
             kwargs['model_names_ids'][m] : model_ratings[m]
             for m in model_ids
         }
+        ranked_model_list = sorted(
+            original_ratings_by_name,
+            key=original_ratings_by_name.get,
+            reverse=True
+        )
+        num_mods = len(ranked_model_list)
+        rankings = list(range(1, num_mods + 1))
+        num_points = sum(rankings)
+        fitness_by_ranking = zip(
+            ranked_model_list, 
+            [r/num_points for r in rankings]
+        )
+        self.log_print(["fitness by ranking:", fitness_by_ranking])
+
         min_rating = min(original_ratings_by_name.values())
         ratings_by_name = {
             m : original_ratings_by_name[m] - min_rating
@@ -185,9 +198,7 @@ class Genetic(
             model_f_scores[mod] = f_score
             fitness_track[mod] = model_fitnesses[mod]/sum_fitnesses
             fitness_ratio = ratings_weights[mod]/fitness_track[mod]
-            if fitness_track[mod]==0:
-                fitness_ratio = None 
-            if np.isnan(fitness_ratio):
+            if fitness_track[mod]==0 or ratings_weights[mod] == 0 :
                 fitness_ratio = None 
             
             self.fitness_by_f_score = (
@@ -199,7 +210,7 @@ class Genetic(
                         'original_rating' : original_ratings_by_name[mod],
                         'generation' : kwargs['spawn_step'],
                         'f_score' : f_score,
-                        'fitness_ratio_rating_win_rate' : fitness_ratio
+                        # 'fitness_ratio_rating_win_rate' : fitness_ratio
                     }), 
                     ignore_index=True
                 )
@@ -382,7 +393,7 @@ class Genetic(
             self.fitness_by_f_score['fitness_by_win_ratio'],
             self.fitness_by_f_score['fitness_by_rating'],
             self.fitness_by_f_score['original_rating'],
-            self.fitness_by_f_score['fitness_ratio_rating_win_rate']
+            # self.fitness_by_f_score['fitness_ratio_rating_win_rate']
         ))
 
 

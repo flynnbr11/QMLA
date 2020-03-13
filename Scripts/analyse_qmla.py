@@ -271,7 +271,7 @@ try:
 except:
     print("Failed to plot probability of model generation")
     print("Note this is only built for genetic algorithm so far.")
-    raise
+    # raise
 
 try:
     qmla.analysis.genetic_algorithm_f_score_fitness_plots(
