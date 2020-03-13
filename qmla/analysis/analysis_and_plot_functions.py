@@ -4124,6 +4124,7 @@ def model_generation_probability(
     # combined_results, 
     save_directory=None
 ):
+    from numpy import inf
     print("Trying to read csv ", results_path)
     combined_results = pd.read_csv(results_path)
     data_indices = list(combined_results['GrowthRuleStorageData'].index)

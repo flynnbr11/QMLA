@@ -268,7 +268,6 @@ try:
         results_path = results_csv,
         save_directory=directory_to_analyse, 
     )
-
 except:
     print("Failed to plot probability of model generation")
     print("Note this is only built for genetic algorithm so far.")
