@@ -48,6 +48,7 @@ class Genetic(
         ) # for use when ranking/rating models
         
         self.fitness_by_f_score = pd.DataFrame()
+        self.fitness_df = pd.DataFrame()
         self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
         self.heisenberg_xxz_small = 'pauliSet_1J2_xJx_d3+pauliSet_1J3_yJy_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
         self.true_model = self.heisenberg_xxz_small
@@ -162,12 +163,14 @@ class Genetic(
         )
         num_mods = len(ranked_model_list)
         rankings = list(range(1, num_mods + 1))
+        rankings.reverse()
         num_points = sum(rankings)
-        fitness_by_ranking = zip(
+        fitness_by_ranking = list(zip(
             ranked_model_list, 
             [r/num_points for r in rankings]
-        )
+        ))
         self.log_print(["fitness by ranking:", fitness_by_ranking])
+        fitness_by_ranking = dict(fitness_by_ranking)
 
         min_rating = min(original_ratings_by_name.values())
         ratings_by_name = {
@@ -210,20 +213,60 @@ class Genetic(
                         'original_rating' : original_ratings_by_name[mod],
                         'generation' : kwargs['spawn_step'],
                         'f_score' : f_score,
+                        'fitness_by_ranking' : fitness_by_ranking[mod], 
                         # 'fitness_ratio_rating_win_rate' : fitness_ratio
                     }), 
                     ignore_index=True
                 )
             )
+
+            self.fitness_df = (
+                self.fitness_df.append(
+                    pd.Series(
+                        {
+                            'f_score' : f_score, 
+                            'fitness' : ratings_weights[mod], 
+                            'fitness_type' : 'elo_rating'
+                        }
+                    ),
+                    ignore_index=True
+                )
+            )
+            self.fitness_df = (
+                self.fitness_df.append(
+                    pd.Series(
+                        {
+                            'f_score' : f_score, 
+                            'fitness' : fitness_track[mod], 
+                            'fitness_type' : 'win_ratio'
+                        }
+                    ),
+                    ignore_index=True
+                )
+            )
+            self.fitness_df = (
+                self.fitness_df.append(
+                    pd.Series(
+                        {
+                            'f_score' : f_score, 
+                            'fitness' : fitness_by_ranking[mod], 
+                            'fitness_type' : 'ranking'
+                        }
+                    ),
+                    ignore_index=True
+                )
+            )
         
+
         self.log_print(
             [
-                'Generation {} \nModel Fitnesses: {} \nF-scores: {} \nWeights:{} \nModel Ratings:{}'.format(
+                'Generation {} \nModel Fitnesses: {} \nF-scores: {} \nWeights:{} \nModel Ratings:{} \nRanking: {}'.format(
                     kwargs['spawn_step'],
                     model_fitnesses,
                     model_f_scores,
                     fitness_track,
                     ratings_by_name, 
+                    fitness_by_ranking
                 )                
             ]
         )
@@ -238,7 +281,8 @@ class Genetic(
         new_models = self.genetic_algorithm.genetic_algorithm_step(
             # model_fitnesses=model_f_scores,
             # model_fitnesses=model_fitnesses,
-            model_fitnesses=ratings_by_name, 
+            # model_fitnesses=ratings_by_name, 
+            model_fitnesses=fitness_by_ranking,
             num_pairs_to_sample=self.initial_num_models / 2
         )
 
@@ -393,8 +437,10 @@ class Genetic(
             self.fitness_by_f_score['fitness_by_win_ratio'],
             self.fitness_by_f_score['fitness_by_rating'],
             self.fitness_by_f_score['original_rating'],
+            self.fitness_by_f_score['fitness_by_ranking']
             # self.fitness_by_f_score['fitness_ratio_rating_win_rate']
         ))
+        # self.growth_rule_specific_data_to_store['fitness'] = self.fitness_df
 
 
 

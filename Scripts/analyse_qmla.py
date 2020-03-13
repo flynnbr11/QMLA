@@ -274,12 +274,17 @@ except:
     # raise
 
 try:
-    qmla.analysis.genetic_algorithm_f_score_fitness_plots(
+    qmla.analysis.genetic_alg_fitness_plots(
         results_path = results_csv, 
         save_directory=directory_to_analyse, 
     )
+    # qmla.analysis.genetic_algorithm_f_score_fitness_plots(
+    #     results_path = results_csv, 
+    #     save_directory=directory_to_analyse, 
+    # )
 except:
     print("Did not plot fitness measures.")
+    raise
 
 
 os.chdir(directory_to_analyse)
