@@ -184,11 +184,11 @@ class Genetic(
             )
             model_f_scores[mod] = f_score
             fitness_track[mod] = model_fitnesses[mod]/sum_fitnesses
-            if fitness_track[mod]==0:
-                fitness_ratio = 0 
             fitness_ratio = ratings_weights[mod]/fitness_track[mod]
+            if fitness_track[mod]==0:
+                fitness_ratio = None 
             if np.isnan(fitness_ratio):
-                fitness_ratio = 0 
+                fitness_ratio = None 
             
             self.fitness_by_f_score = (
                 self.fitness_by_f_score.append(
