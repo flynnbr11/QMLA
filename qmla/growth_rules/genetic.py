@@ -44,7 +44,7 @@ class Genetic(
         # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
         self.ratings_class = qmla.growth_rules.rating_system.ELORating(
             initial_rating=1500,
-            k_const=300
+            k_const=30
         ) # for use when ranking/rating models
         
         self.fitness_by_f_score = pd.DataFrame()
@@ -97,7 +97,7 @@ class Genetic(
         # self.initial_num_models = 8
         # self.tree_completed_initially = True
         # default test - 40 generations x 16 starters
-        self.max_spawn_depth = 20
+        self.max_spawn_depth = 32
         self.initial_num_models = 16
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
