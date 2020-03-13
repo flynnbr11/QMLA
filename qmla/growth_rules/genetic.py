@@ -676,7 +676,7 @@ class GeneticAlgorithmQMLA():
         **kwargs
     ):
         models = list(model_fitnesses.keys())
-        if truncate and len(models) > 4:
+        if truncate and len(models) >= self.initial_num_models/2:
             # TODO is there a more robut way to check if enough models to truncate?
             ranked_models = sorted(
                 model_fitnesses,
