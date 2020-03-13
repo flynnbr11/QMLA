@@ -94,11 +94,11 @@ class Genetic(
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         # test
-        # self.max_spawn_depth = 2
-        # self.initial_num_models = 8
-        # default test - 32 generations x 16 starters
-        self.max_spawn_depth = 32
+        self.max_spawn_depth = 2
         self.initial_num_models = 16
+        # default test - 32 generations x 16 starters
+        # self.max_spawn_depth = 32
+        # self.initial_num_models = 16
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -259,7 +259,7 @@ class Genetic(
 
         self.log_print(
             [
-                'Generation {} \nModel Fitnesses: {} \nF-scores: {} \nWeights:{} \nModel Ratings:{} \nRanking: {}'.format(
+                'Generation {} \nModel Fitnesses: {} \nF-scores: {} \Win ratio:{} \nModel Ratings:{} \nRanking: {}'.format(
                     kwargs['spawn_step'],
                     model_fitnesses,
                     model_f_scores,
@@ -280,9 +280,10 @@ class Genetic(
         new_models = self.genetic_algorithm.genetic_algorithm_step(
             # model_fitnesses=model_f_scores,
             # model_fitnesses=model_fitnesses,
-            # model_fitnesses=ratings_by_name, 
-            model_fitnesses=fitness_by_ranking,
-            num_pairs_to_sample=self.initial_num_models / 2
+            model_fitnesses=ratings_by_name, 
+            # model_fitnesses=fitness_by_ranking,
+            # num_pairs_to_sample=self.initial_num_models
+            num_pairs_to_sample=self.initial_num_models / 2 # for every pair, 2 chromosomes proposed
         )
 
         hamming_distances = [
@@ -670,13 +671,29 @@ class GeneticAlgorithmQMLA():
         model_fitnesses,
         num_chromosomes_to_select=2,
         num_pairs_to_sample=None,
+        truncate=True, 
+        truncation_factor=0.5, 
         **kwargs
     ):
+        models = list(model_fitnesses.keys())
+        if truncate and len(models) > 4:
+            # TODO is there a more robut way to check if enough models to truncate?
+            ranked_models = sorted(
+                model_fitnesses,
+                key=model_fitnesses.get,
+                reverse=True
+            )
+            num_models_to_keep = int( truncation_factor * len(models) )
+            models = ranked_models[:num_models_to_keep]
+            num_nonzero_fitness_models = len(models)
+            
+        else: 
+            num_nonzero_fitness_models = np.count_nonzero(
+                list(model_fitnesses.values())
+                )
         if num_pairs_to_sample is None: 
             num_pairs_to_sample = self.initial_number_models/2
-        models = list(model_fitnesses.keys())
-        num_nonzero_fitness_models = np.count_nonzero(
-            list(model_fitnesses.values()))
+        
         num_models = len(models)
 
         # max_possible_num_combinations = scipy.misc.comb(

@@ -939,7 +939,8 @@ class QuantumModelLearningAgent():
                 self.model_database,
                 name=model_name
             )
-            self.models_learned.append(model_id)
+            if model_id not in self.models_learned: 
+                self.models_learned.append(model_id)
             branch_id = self.models_branches[model_id]
             if self.run_in_parallel and use_rq:
                 # i.e. use a job queue rather than sequentially doing it.
