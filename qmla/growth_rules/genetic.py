@@ -280,8 +280,8 @@ class Genetic(
         new_models = self.genetic_algorithm.genetic_algorithm_step(
             # model_fitnesses=model_f_scores,
             # model_fitnesses=model_fitnesses,
-            model_fitnesses=ratings_by_name, 
-            # model_fitnesses=fitness_by_ranking,
+            # model_fitnesses=ratings_by_name, 
+            model_fitnesses=fitness_by_ranking,
             # num_pairs_to_sample=self.initial_num_models
             num_pairs_to_sample=self.initial_num_models / 2 # for every pair, 2 chromosomes proposed
         )
@@ -671,7 +671,7 @@ class GeneticAlgorithmQMLA():
         model_fitnesses,
         num_chromosomes_to_select=2,
         num_pairs_to_sample=None,
-        truncate=True, 
+        truncate=False, 
         truncation_factor=0.5, 
         **kwargs
     ):
