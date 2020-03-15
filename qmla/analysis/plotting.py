@@ -363,7 +363,10 @@ def average_parameter_estimates(
             track_params = parameters_for_this_name[i]
             for t in terms:
                 for e in epochs:
-                    parameters[t][e].append(track_params[t][e])
+                    try:
+                        parameters[t][e].append(track_params[t][e])
+                    except:
+                        parameters[t][e]  [track_params[t][e]]
 
         avg_parameters = {}
         std_devs = {}
