@@ -284,7 +284,7 @@ try:
     # )
 except:
     print("Did not plot fitness measures.")
-    raise
+    # raise
 
 
 os.chdir(directory_to_analyse)

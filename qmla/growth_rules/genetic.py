@@ -424,22 +424,18 @@ class Genetic(
         f_scores = [np.round(self.f_score_from_chromosome_string(c), 3) for c in chromosomes]
         self.growth_rule_specific_data_to_store['f_score_tested_models'] = f_scores
         self.growth_rule_specific_data_to_store['true_model_chromosome'] = self.true_chromosome_string
-        # self.growth_rule_specific_data_to_store['rating_fitnesses'] = list(zip(
-        #         self.fitness_by_f_score['f_score'],
-        #         self.fitness_by_f_score['fitness_by_rating']
-        # ))
-        # self.growth_rule_specific_data_to_store['win_ratio_fitnesses'] = list(zip(
-        #     self.fitness_by_f_score['f_score'],
-        #     self.fitness_by_f_score['fitness_by_win_ratio']
-        # ))
-        self.growth_rule_specific_data_to_store['f_score_fitnesses'] = list(zip(
-            self.fitness_by_f_score['f_score'],
-            self.fitness_by_f_score['fitness_by_win_ratio'],
-            self.fitness_by_f_score['fitness_by_rating'],
-            self.fitness_by_f_score['original_rating'],
-            self.fitness_by_f_score['fitness_by_ranking']
-            # self.fitness_by_f_score['fitness_ratio_rating_win_rate']
-        ))
+        try:
+            self.growth_rule_specific_data_to_store['f_score_fitnesses'] = list(zip(
+                self.fitness_by_f_score['f_score'],
+                self.fitness_by_f_score['fitness_by_win_ratio'],
+                self.fitness_by_f_score['fitness_by_rating'],
+                self.fitness_by_f_score['original_rating'],
+                self.fitness_by_f_score['fitness_by_ranking']
+                # self.fitness_by_f_score['fitness_ratio_rating_win_rate']
+            ))
+        except:
+            # did not enter generate_models
+            pass
         # self.growth_rule_specific_data_to_store['fitness'] = self.fitness_df
 
 
