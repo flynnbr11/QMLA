@@ -129,7 +129,15 @@ class ModelInstanceForLearning():
         self.volume_by_epoch = np.array([])
         self.redis_host = host_name
         self.redis_port_number = port_number
+        self.log_print(
+            [
+                "QHL for model {} (id:{})".format(
+                    model_name,
+                    model_id, 
+                )
+            ]
 
+        )
         self.initialise_model_for_learning(
             growth_generator=growth_generator,
             model_name = self.model_name, 

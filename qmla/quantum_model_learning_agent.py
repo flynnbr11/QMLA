@@ -170,6 +170,8 @@ class QuantumModelLearningAgent():
         self.true_model_branch = -1 # overwrite if considered
         self.true_model_considered = False
         self.true_model_found = False
+        self.true_model_id = -1
+        self.true_model_on_branhces = []
         self.log_print(
             [
                 "True model:", self.true_model_name
@@ -685,11 +687,12 @@ class QuantumModelLearningAgent():
             log_file=self.log_file,
             force_create_model=force_create_model,
         )
-        if add_model_to_database_result == True:  # keep track of how many models/branches in play
+        if add_model_to_database_result:  # keep track of how many models/branches in play
             if database_framework.alph(
                     model) == database_framework.alph(self.true_model_name):
                 self.true_model_id = self.model_count
                 self.true_model_branch = branch_id
+                self.true_model_on_branhces = [branch_id]
             self.highest_model_id += 1
             # print("Setting model ", model, "to ID:", self.model_count)
             model_id = self.model_count
@@ -701,6 +704,8 @@ class QuantumModelLearningAgent():
                     db=self.model_database,
                     name=model
                 )
+                if model_id == self.true_model_id: 
+                    self.true_model_on_branhces.append(model_id)
             except BaseException:
                 self.log_print(
                     [
