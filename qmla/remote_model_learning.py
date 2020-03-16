@@ -86,7 +86,7 @@ def remote_learn_model_parameters(
         host_name=host_name,
         port_number=port_number,
     )
-    evaluation_times = list(np.arange(1,10, 0.2))
+    evaluation_times = list(np.arange(0, 10, 0.05))
     log_print(["Starting model QHL update."])
     try:
         update_timer_start = time.time()
