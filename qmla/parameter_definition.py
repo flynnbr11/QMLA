@@ -20,9 +20,13 @@ def set_shared_parameters(
     exp_data=0,
     true_prior_plot_file=None,
 ):
-"""
+    r"""
+    Set up parameters for this run of QMLA. 
+    Parameters, such as true model parameters
+    and probes to use for plotting purposes, 
+    are shared by all instances of QMLA within a given run. 
 
-"""
+    """
     true_model = growth_class.true_model
     if true_prior is None: 
         true_prior = growth_class.get_prior(

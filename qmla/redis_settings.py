@@ -41,22 +41,22 @@ def databases_from_qmd_id(
     tree_identifiers=None,
     print_status=False
 ):
-r"""
-Function that returns a dictionary containing a set of database addresses unique to the qmd_id, host_name and port_number
-passed as arguments
-!!! StrictRedis !!! redis-py 3.0 drops support for StrictRedis taht will be renamed Redis
+    r"""
+    Function that returns a dictionary containing a set of database addresses unique to the qmd_id, host_name and port_number
+    passed as arguments
+    !!! StrictRedis !!! redis-py 3.0 drops support for StrictRedis taht will be renamed Redis
 
-:params string host_name: 
-    string with the specific name of the host
+    :params string host_name: 
+        string with the specific name of the host
 
-:params int port_number: 
-    port number
+    :params int port_number: 
+        port number
 
-:params qmd_id: 
-    identifier of the qmd isntance
+    :params qmd_id: 
+        identifier of the qmd isntance
 
 
-"""
+    """
 
     database_dict = {}
     seed = get_seed(

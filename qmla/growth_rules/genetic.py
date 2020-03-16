@@ -94,13 +94,13 @@ class Genetic(
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         # test
-        # self.max_spawn_depth = 2
-        # self.initial_num_models = 8
+        self.max_spawn_depth = 2
+        self.initial_num_models = 8
         # default test - 32 generations x 16 starters
 #         self.max_spawn_depth = 32
 #         self.initial_num_models = 16
-        self.max_spawn_depth = 16
-        self.initial_num_models = 12
+        # self.max_spawn_depth = 16
+        # self.initial_num_models = 12
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -142,6 +142,7 @@ class Genetic(
             ]
         )
         model_points = kwargs['branch_model_points']
+        evaluation_log_likelihoods = kwargs['evaluation_log_likelihoods']
         # print("Model points:", model_points)
         # print("kwargs: ", kwargs)
         self.fitness_at_step[kwargs['spawn_step']] = model_points
@@ -215,6 +216,7 @@ class Genetic(
                         'generation' : kwargs['spawn_step'],
                         'f_score' : f_score,
                         'fitness_by_ranking' : fitness_by_ranking[mod], 
+                        'log_likelihood' : evaluation_log_likelihoods[m],
                         # 'fitness_ratio_rating_win_rate' : fitness_ratio
                     }), 
                     ignore_index=True
@@ -432,7 +434,8 @@ class Genetic(
                 self.fitness_by_f_score['fitness_by_win_ratio'],
                 self.fitness_by_f_score['fitness_by_rating'],
                 self.fitness_by_f_score['original_rating'],
-                self.fitness_by_f_score['fitness_by_ranking']
+                self.fitness_by_f_score['fitness_by_ranking'],
+                self.fitness_by_f_score['log_likelihood']
                 # self.fitness_by_f_score['fitness_ratio_rating_win_rate']
             ))
         except:

@@ -86,7 +86,7 @@ def remote_learn_model_parameters(
         host_name=host_name,
         port_number=port_number,
     )
-
+    evaluation_times = list(np.arange(1,10, 0.2))
     log_print(["Starting model QHL update."])
     try:
         update_timer_start = time.time()
@@ -98,6 +98,10 @@ def remote_learn_model_parameters(
                 )
             ]
         )
+        log_print(["Starting model likelihood calculation."])
+        qml_instance.compute_likelihood_after_parameter_learning(
+            times = evaluation_times
+        )
     except NameError:
         log_print(
             [
@@ -106,6 +110,7 @@ def remote_learn_model_parameters(
             ]
         )
         any_job_failed_db.set('Status', 1)
+        raise
     except BaseException:
         log_print(
             [
@@ -114,6 +119,7 @@ def remote_learn_model_parameters(
             ]
         )
         any_job_failed_db.set('Status', 1)
+        raise
 
     if qhl_plots:
         log_print(["Drawing plots for QHL"])

@@ -87,6 +87,20 @@ def get_f_score_dataframe(combined_results):
                 )
             )    
             
+            # log likelihood
+            results_by_fscore = (
+                results_by_fscore.append(
+                    pd.Series(
+                    {
+                        'f_score' : float(round_nearest(result[0], 0.05)),
+                        'fitness' : np.round(result[5], 2),
+                        'fitness_type' : 'log_likelihood',
+                        'run' : run, 
+                        'generation' : generation
+                    }), 
+                    ignore_index=True
+                )
+            )    
         return results_by_fscore
     
 
@@ -96,7 +110,10 @@ def fitness_comparison(results_by_fscore, ax=None, save_directory=None):
     sns.boxplot(
         x ='f_score',
         y='fitness',
-        data=results_by_fscore[ results_by_fscore['fitness_type']!='elo_rating_raw'],
+        data=results_by_fscore[ 
+            (results_by_fscore['fitness_type'] !='log_likelihood') 
+            & (results_by_fscore['fitness_type']!='elo_rating_raw')
+        ],
         hue='fitness_type',
         ax = ax
     )
@@ -122,6 +139,23 @@ def elo_rating_by_fscore(results_by_fscore, ax=None, save_directory=None):
         plt.savefig(
             os.path.join(save_directory, 'genetic_elo_ratings.png')
         )
+
+def log_likelihood_by_fscore(results_by_fscore, ax=None, save_directory=None):
+    if ax is None: 
+        fig, ax = plt.subplots(figsize=(15, 6))
+    sns.boxplot(
+        x ='f_score',
+        y='fitness',
+        data=results_by_fscore[ results_by_fscore['fitness_type']=='log_likelihood'],
+#         hue='fitness_type',
+        ax = ax
+    )
+    ax.set_title("Log likelihood")
+    if save_directory is not None: 
+        plt.savefig(
+            os.path.join(save_directory, 'genetic_log_likelihood.png')
+        )
+
 
     
 def genetic_alg_num_models(results_by_fscore, ax=None, save_directory=None):
@@ -156,12 +190,14 @@ def genetic_alg_fitness_plots(
         tight_layout=True
     )
     gs = GridSpec(
-        3,
+        4,
         1,
     )
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[1, 0])
     ax3 = fig.add_subplot(gs[2, 0])
+    ax4 = fig.add_subplot(gs[3, 0])
+
 
     fitness_comparison(
         results_by_fscore, 
@@ -173,11 +209,17 @@ def genetic_alg_fitness_plots(
         ax = ax2, 
         # save_directory
     )
-    genetic_alg_num_models(
+    log_likelihood_by_fscore(
         results_by_fscore, 
         ax = ax3, 
         # save_directory
     )
+    genetic_alg_num_models(
+        results_by_fscore, 
+        ax = ax4, 
+        # save_directory
+    )
+
 
     if save_directory is not None: 
         plt.savefig(

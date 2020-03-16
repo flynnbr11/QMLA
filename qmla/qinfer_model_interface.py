@@ -220,36 +220,36 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         modelparams,
         expparams
     ):
-    r"""
-        Inherited from Qinfer:
-        Function to calculate likelihoods for all the particles
-        
-        Longish description:
-        Calculates the probability of each given outcome, conditioned on each
-        given model parameter vector and each given experimental control setting.
-
-        :param np.ndarray outcomes: outcomes of the experiments
-
-        :param np.ndarray modelparams: 
-            values of the model parameters particles 
-            A shape ``(n_particles, n_modelparams)``
-            array of model parameter vectors describing the hypotheses for
-            which the likelihood function is to be calculated.
-        
-        :param np.ndarray expparams: 
-            experimental parameters, 
-            A shape ``(n_experiments, )`` array of
-            experimental control settings, with ``dtype`` given by 
-            :attr:`~qinfer.Simulatable.expparams_dtype`, describing the
-            experiments from which the given outcomes were drawn.
+        r"""
+            Inherited from Qinfer:
+            Function to calculate likelihoods for all the particles
             
-        :rtype: np.ndarray
-        :return: A three-index tensor ``L[i, j, k]``, where ``i`` is the outcome
-            being considered, ``j`` indexes which vector of model parameters was used,
-            and where ``k`` indexes which experimental parameters where used.
-            Each element ``L[i, j, k]`` then corresponds to the likelihood
-            :math:`\Pr(d_i | \vec{x}_j; e_k)`.
-        """
+            Longish description:
+            Calculates the probability of each given outcome, conditioned on each
+            given model parameter vector and each given experimental control setting.
+
+            :param np.ndarray outcomes: outcomes of the experiments
+
+            :param np.ndarray modelparams: 
+                values of the model parameters particles 
+                A shape ``(n_particles, n_modelparams)``
+                array of model parameter vectors describing the hypotheses for
+                which the likelihood function is to be calculated.
+            
+            :param np.ndarray expparams: 
+                experimental parameters, 
+                A shape ``(n_experiments, )`` array of
+                experimental control settings, with ``dtype`` given by 
+                :attr:`~qinfer.Simulatable.expparams_dtype`, describing the
+                experiments from which the given outcomes were drawn.
+                
+            :rtype: np.ndarray
+            :return: A three-index tensor ``L[i, j, k]``, where ``i`` is the outcome
+                being considered, ``j`` indexes which vector of model parameters was used,
+                and where ``k`` indexes which experimental parameters where used.
+                Each element ``L[i, j, k]`` then corresponds to the likelihood
+                :math:`\Pr(d_i | \vec{x}_j; e_k)`.
+            """
 
         import copy
         super(QInferModelQML, self).likelihood(
@@ -407,25 +407,25 @@ def get_pr0_array_qle(
     log_file='QMDLog.log',
     **kwargs
 ):
-"""
-    Returns the output probabilities as an array
+    r"""
+        Returns the output probabilities as an array
 
-    :param np.ndarray t_list: 
-    List of times on which to perform experiments
+        :param np.ndarray t_list: 
+        List of times on which to perform experiments
 
-    :param np.ndarray modelparams: 
-    values of the model parameters particles 
-    A shape ``(n_particles, n_modelparams)``
-    array of model parameter vectors describing the hypotheses for
-    which the likelihood function is to be calculated.
+        :param np.ndarray modelparams: 
+        values of the model parameters particles 
+        A shape ``(n_particles, n_modelparams)``
+        array of model parameter vectors describing the hypotheses for
+        which the likelihood function is to be calculated.
 
-    :param list oplist:
-    list of the operators defining the model
+        :param list oplist:
+        list of the operators defining the model
 
-    :param probe: quantum state to evolve
+        :param probe: quantum state to evolve
 
-    :param growth_class: 
-"""
+        :param growth_class: 
+    """
 
     from rq import timeouts
     def log_print(

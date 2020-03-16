@@ -2010,8 +2010,17 @@ class QuantumModelLearningAgent():
             self.model_name_id_map[i] for i in
             list(self.branch_champions.values())
         ]
-        # print("[QMD] fitness parameters:", self.model_fitness_scores)
-
+        evaluation_log_likelihoods = {
+            mod : 
+            self.get_model_storage_instance_by_id(mod).evaluation_log_likelihood
+            for mod in all_models_this_branch
+        }
+        self.log_print(
+            [
+                "Before model generation, evaluation log likelihoods:", 
+                evaluation_log_likelihoods
+            ]            
+        )
         new_models = self.branch_growth_rule_instances[branch_id].generate_models(
             # generator = growth_rule,
             model_list=best_model_names,
@@ -2024,7 +2033,8 @@ class QuantumModelLearningAgent():
             spawn_stage=self.spawn_stage[growth_rule],
             branch_model_points=self.branch_bayes_points[branch_id],
             model_names_ids=self.model_name_id_map,
-            miscellaneous=self.misc_growth_info[growth_rule]
+            miscellaneous=self.misc_growth_info[growth_rule],
+            evaluation_log_likelihoods = evaluation_log_likelihoods, 
         )
         new_models = list(set(new_models))
         new_models = [database_framework.alph(mod) for mod in new_models]
@@ -2251,6 +2261,7 @@ class QuantumModelLearningAgent():
             'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
+            'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
             'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
         }
 
@@ -2573,6 +2584,7 @@ class QuantumModelLearningAgent():
             'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
+            'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
             'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
         }
 
@@ -2733,6 +2745,7 @@ class QuantumModelLearningAgent():
                 'NumModels' : len(self.models_learned),
                 'StatisticalMetrics' : self.generational_statistical_metrics,
                 'GenerationalFscore'  : self.generational_f_score,
+                'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
                 'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
             }
             self.model_id_to_name_map = {}
@@ -3077,11 +3090,21 @@ class QuantumModelLearningAgent():
             b : []
             for b in generations
         }
+        self.generational_log_likelihoods = {
+            b : []
+            for b in generations
+        }
+
         for m in model_ids: 
             b = model_branches[m]
             generational_sensitivity[b].append(self.model_sensitivities[m])
             generational_precision[b].append(self.model_precisions[m]) 
-            generational_f_score[b].append(self.model_f_scores[m])    
+            generational_f_score[b].append(self.model_f_scores[m])   
+            self.generational_log_likelihoods[b].append(
+                self.get_model_storage_instance_by_id(m).evaluation_log_likelihood
+            )
+
+
         include_plots = [
             {'name' : 'F-score', 'data' : generational_f_score, 'colour' : 'red'}, 
             {'name' : 'Precision', 'data' : generational_precision, 'colour': 'blue'}, 
