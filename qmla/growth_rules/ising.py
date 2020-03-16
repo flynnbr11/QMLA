@@ -88,6 +88,7 @@ class IsingPredetermined(
         self.lattice_full_connectivity = False
         # self.true_model = 'pauliSet_zJz_1J2_d2'
         # self.true_model = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
+        # self.true_model = 'pauliSet_zJz_1J2_d6PPPPPPpauliSet_zJz_2J3_d6PPPPPPpauliSet_zJz_3J4_d6PPPPPPpauliSet_zJz_4J5_d6PPPPPPpauliSet_zJz_5J6_d6'
         self.true_model = database_framework.alph(self.true_model)
         self.qhl_models = [
             self.true_model,

@@ -170,6 +170,8 @@ class QuantumModelLearningAgent():
         self.true_model_branch = -1 # overwrite if considered
         self.true_model_considered = False
         self.true_model_found = False
+        self.true_model_id = -1
+        self.true_model_on_branhces = []
         self.log_print(
             [
                 "True model:", self.true_model_name
@@ -685,11 +687,12 @@ class QuantumModelLearningAgent():
             log_file=self.log_file,
             force_create_model=force_create_model,
         )
-        if add_model_to_database_result == True:  # keep track of how many models/branches in play
+        if add_model_to_database_result:  # keep track of how many models/branches in play
             if database_framework.alph(
                     model) == database_framework.alph(self.true_model_name):
                 self.true_model_id = self.model_count
                 self.true_model_branch = branch_id
+                self.true_model_on_branhces = [branch_id]
             self.highest_model_id += 1
             # print("Setting model ", model, "to ID:", self.model_count)
             model_id = self.model_count
@@ -701,6 +704,8 @@ class QuantumModelLearningAgent():
                     db=self.model_database,
                     name=model
                 )
+                if model_id == self.true_model_id: 
+                    self.true_model_on_branhces.append(model_id)
             except BaseException:
                 self.log_print(
                     [
@@ -939,7 +944,8 @@ class QuantumModelLearningAgent():
                 self.model_database,
                 name=model_name
             )
-            self.models_learned.append(model_id)
+            if model_id not in self.models_learned: 
+                self.models_learned.append(model_id)
             branch_id = self.models_branches[model_id]
             if self.run_in_parallel and use_rq:
                 # i.e. use a job queue rather than sequentially doing it.
@@ -1295,6 +1301,13 @@ class QuantumModelLearningAgent():
             champ = mod_low.model_id
         elif bayes_factor < (1.0 / self.bayes_threshold_lower):
             champ = mod_high.model_id
+
+        # Tell growth rule's rating system about this comparison
+        self.growth_class.ratings_class.compute_new_ratings(
+            model_a_id = mod_low.model_id, 
+            model_b_id = mod_high.model_id, 
+            winner_id = champ
+        )
 
         return champ
 
@@ -2185,7 +2198,8 @@ class QuantumModelLearningAgent():
             expec_val_plot_times = self.times_to_plot
 
         self.champion_name_latex = champ_model.model_name_latex
-        # equivalent to sleepfchampion_results
+        self.growth_class.growth_rule_finalise()
+        # equivalent to self.champion_results
 
         self.champion_results = {
             'NameAlphabetical': database_framework.alph(self.ChampionName),
@@ -2237,6 +2251,7 @@ class QuantumModelLearningAgent():
             'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
+            'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
         }
 
     def check_champion_reducibility(
@@ -2518,10 +2533,9 @@ class QuantumModelLearningAgent():
         )
         # self.f_score = self.model_f_scores[self.champion_model_id]
         self.get_statistical_metrics()
-
+        self.growth_class.growth_rule_finalise()
         time_now = time.time()
         time_taken = time_now - self._start_time
-
         self.champion_results = {
             'NumParticles': self.num_particles,
             'NumExperiments': mod.num_experiments,
@@ -2559,6 +2573,7 @@ class QuantumModelLearningAgent():
             'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
+            'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
         }
 
         self.log_print(
@@ -2659,6 +2674,7 @@ class QuantumModelLearningAgent():
             )
 
         self.get_statistical_metrics()
+        self.growth_class.growth_rule_finalise()
 
         for mod_name in model_names:
             mod_id = database_framework.model_id_from_name(
@@ -2717,6 +2733,7 @@ class QuantumModelLearningAgent():
                 'NumModels' : len(self.models_learned),
                 'StatisticalMetrics' : self.generational_statistical_metrics,
                 'GenerationalFscore'  : self.generational_f_score,
+                'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
             }
             self.model_id_to_name_map = {}
             for k in self.model_name_id_map:

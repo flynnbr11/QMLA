@@ -353,7 +353,7 @@ def parse_cmd_line_args(args):
         '-rqt', '--rq_timeout',
         help='Time allowed before RQ job crashes.',
         type=int,
-        default=3600
+        default=-1
     )
 
     parser.add_argument(

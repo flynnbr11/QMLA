@@ -100,6 +100,14 @@ parser.add_argument(
     type=str,
     default=None
 )
+parser.add_argument(
+    '-gs', '--gather_summary_results',
+    help="Unpickle all results files and \
+        compile into single file. \
+        Don't want to do this if already compiled.",
+    type=int,
+    default=1
+)
 
 # parser.add_argument(
 #   '-meas', '--measurement_type',
@@ -139,6 +147,7 @@ true_params_path = arguments.true_model_terms_params
 exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
+gather_summary_results = bool(arguments.gather_summary_results)
 true_growth_class = qmla.get_growth_generator_class(
     growth_generation_rule=growth_generator,
     use_experimental_data=exp_data,
@@ -193,46 +202,48 @@ if not directory_to_analyse.endswith('/'):
 
 print("Counting model occurences.")
 
-try:
-    qmla.analysis.count_model_occurences(
-        latex_map=latex_mapping_file,
-        true_model_latex=true_growth_class.latex_name(
-            true_model
-        ),
-        save_counts_dict=str(
-            directory_to_analyse +
-            "count_model_occurences.p"
-        ),
-        save_to_file=str(
-            directory_to_analyse +
-            "occurences_of_models.png"
-        )
-    )
-except BaseException:
-    print("Failed to plot # occurences of each model.")
-    # raise
+
 
 if further_qhl_mode == True:
     results_csv_name = 'summary_further_qhl_results.csv'
     results_csv = directory_to_analyse + results_csv_name
     results_file_name_start = 'further_qhl_results'
-    qmla.analysis.summariseResultsCSV(
-        directory_name=directory_to_analyse,
-        results_file_name_start=results_file_name_start,
-        csv_name=results_csv
-    )
     plot_desc = 'further_'
-
 else:
     results_csv_name = 'summary_results.csv'
     results_csv = directory_to_analyse + results_csv_name
     results_file_name_start = 'results'
+    plot_desc = ''
+
+plot_num_model_occurences = False # making optional bc quite slow
+if gather_summary_results: 
+    # don't want to waste time doing this if already compiled
     qmla.analysis.summariseResultsCSV(
         directory_name=directory_to_analyse,
         results_file_name_start=results_file_name_start,
         csv_name=results_csv
     )
-    plot_desc = ''
+    if plot_num_model_occurences:
+        try:
+            # counting model analysis is costly so making it optional
+            qmla.analysis.count_model_occurences(
+                latex_map=latex_mapping_file,
+                true_model_latex=true_growth_class.latex_name(
+                    true_model
+                ),
+                save_counts_dict=str(
+                    directory_to_analyse +
+                    "count_model_occurences.p"
+                ),
+                save_to_file=str(
+                    directory_to_analyse +
+                    "occurences_of_models.png"
+                )
+            )
+        except BaseException:
+            print("Failed to plot # occurences of each model.")
+            # raise
+
 
 try:
     average_priors = qmla.analysis.average_parameters(
@@ -251,6 +262,30 @@ except BaseException:
     raise
     # for compatability with old versions
     pass
+
+try: 
+    qmla.analysis.model_generation_probability(
+        results_path = results_csv,
+        save_directory=directory_to_analyse, 
+    )
+except:
+    print("Failed to plot probability of model generation")
+    print("Note this is only built for genetic algorithm so far.")
+    # raise
+
+try:
+    qmla.analysis.genetic_alg_fitness_plots(
+        results_path = results_csv, 
+        save_directory=directory_to_analyse, 
+    )
+    # qmla.analysis.genetic_algorithm_f_score_fitness_plots(
+    #     results_path = results_csv, 
+    #     save_directory=directory_to_analyse, 
+    # )
+except:
+    print("Did not plot fitness measures.")
+    # raise
+
 
 os.chdir(directory_to_analyse)
 pickled_files = []

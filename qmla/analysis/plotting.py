@@ -363,7 +363,10 @@ def average_parameter_estimates(
             track_params = parameters_for_this_name[i]
             for t in terms:
                 for e in epochs:
-                    parameters[t][e].append(track_params[t][e])
+                    try:
+                        parameters[t][e].append(track_params[t][e])
+                    except:
+                        parameters[t][e] = [track_params[t][e]]
 
         avg_parameters = {}
         std_devs = {}
@@ -1283,6 +1286,7 @@ def get_model_scores(
             pickled_files.append(file)
 
     coeff_of_determination = {}
+    latex_model_wins = {}
     avg_coeff_determination = {}
     f_scores = {}
     precisions = {}
@@ -1339,6 +1343,7 @@ def get_model_scores(
     wins = {}
     for mod in list(scores.keys()):
         latex_name = unique_growth_classes[growth_rules[mod]].latex_name(mod)
+        latex_model_wins[latex_name] = scores[mod]
         latex_f_scores[latex_name] = f_scores[mod]
         latex_coeff_det[latex_name] = avg_coeff_determination[mod]
         precisions[latex_name] = precisions[mod]
@@ -1357,6 +1362,7 @@ def get_model_scores(
 
     results = {
         'scores': scores,
+        'latex_model_wins' : latex_model_wins, 
         'growth_rules': growth_rules,
         'growth_classes': growth_classes,
         'unique_growth_classes': unique_growth_classes,
@@ -1727,17 +1733,31 @@ def stat_metrics_histograms(
         # figure=fig # not available on matplotlib 2.1.1 (on BC)
     )
     plot_col = 0
-    hist_bins = np.arange(0,1, 0.1)
+    hist_bins = np.arange(0, 1.01,0.05)
+    model_wins = champ_info['latex_model_wins']
     for plotting_data in include_plots: 
         ax = fig.add_subplot(gs[0, plot_col])
         data = champ_info[plotting_data['name']]
         print("data for {}: {}".format(plotting_data['name'], data))
+        weights = {}
+        for mod in model_wins: 
+            d = data[mod]
+            wins = model_wins[mod]
+            try:
+                weights[d] += wins
+            except: 
+                weights[d] = wins
+
+        values_to_plot = sorted(weights.keys())
+        wts = [weights[v] for v in values_to_plot]
         ax.hist(
-            list(data.values()), 
+            values_to_plot, 
+            weights = wts, 
             color = plotting_data['colour'],
-            bins = hist_bins
+            bins = hist_bins,
+            align='mid'
         )
-        ax.set_xlim(0,1)    
+        ax.set_xlim(0,1.0)    
         ax.set_title(
             "Champions' {}".format(plotting_data['name'])
         )
@@ -1825,14 +1845,6 @@ def count_model_occurences(
     if true_model_latex in unique_models:
         true_idx = unique_models.index(true_model_latex)
         colours[true_idx] = 'green'
-
-    print(
-        "[multiQMD - count model occurences]",
-        "Colours:", colours,
-        "\ntrue op:", true_model_latex,
-        "\nunique models:", unique_models,
-        "test:", (str(true_model_latex) in unique_models)
-    )
 
     fig, ax = plt.subplots(
         figsize=(

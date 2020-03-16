@@ -1,6 +1,7 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="test-changes-codebase__exp-data-QHL"
+test_description="genetic-algorithm__inspect-model-generation-probability"
+# test_description="theory-test__ising-predetermined____QMLA"
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -8,19 +9,19 @@ test_description="test-changes-codebase__exp-data-QHL"
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=1
+num_tests=50
 num_processes_to_request=6
-qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
+qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 multiple_qhl=0
 multiple_growth_rules=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
-experimental_data=1 # use experimental data -> 1; use fake data ->0
+experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters.
-e=7 # experiments
-p=25 # particles
+e=250 # experiments
+p=100 # particles
 ra=0.98 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -34,13 +35,13 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 ### ---------------------------------------------------###
 
 # Simulation growth rule
-sim_growth_rule='IsingProbabilistic'
+# sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'
 # sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
-# sim_growth_rule='Genetic'
+sim_growth_rule='Genetic'
 # sim_growth_rule='Presentation'
 
 ### Experimental growth rules 
@@ -66,8 +67,8 @@ fi
 # Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_growth_rules set to 1 above
 alt_growth_rules=(  
 	'IsingPredetermined' 
-	'HeisenbergXYZPredetermined'
-	'FermiHubbardPredetermined'
+#	'HeisenbergXYZPredetermined'
+#	'FermiHubbardPredetermined'
 )
 growth_rules_command=""
 for item in ${alt_growth_rules[*]}
@@ -207,7 +208,7 @@ printf "$day_time: \t $test_description \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; r
 force_plot_plus=0
 special_probe='random' #'ideal'
 special_probe_plot='random'
-time_request_insurance_factor=3
+time_request_insurance_factor=1
 if (( "$bin_times_bayes_factors" == 1))
 then
 	let time_request_insurance_factor="2*$time_request_insurance_factor"
@@ -366,6 +367,7 @@ python3 analyse_qmla.py \
 	-params=$true_params_pickle_file \
 	-true_expec=$true_expec_path \
 	-latex=$latex_mapping_file \
+	-gs=1 \
 	-ggr=$growth_rule
 
 python3 generate_results_pdf.py \
