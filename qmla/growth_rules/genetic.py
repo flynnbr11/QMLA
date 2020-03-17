@@ -54,7 +54,7 @@ class Genetic(
         self.true_model = self.heisenberg_xxz_small
         self.four_site_true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4'
         self.three_site_true_model = 'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
-        self.true_model = self.four_site_true_model
+        self.true_model = self.three_site_true_model
         self.true_model = qmla.database_framework.alph(self.true_model)
         self.num_sites = qmla.database_framework.get_num_qubits(self.true_model)
         self.num_probes = 5
@@ -94,13 +94,13 @@ class Genetic(
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         # test
-        self.max_spawn_depth = 6
-        self.initial_num_models = 16
+        # self.max_spawn_depth = 2
+        # self.initial_num_models = 8
         # default test - 32 generations x 16 starters
         # self.max_spawn_depth = 32
         # self.initial_num_models = 16
-        # self.max_spawn_depth = 16
-        # self.initial_num_models = 12
+        self.max_spawn_depth = 12
+        self.initial_num_models = 12
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
