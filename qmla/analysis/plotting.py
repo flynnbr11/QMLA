@@ -2190,19 +2190,17 @@ def generational_analysis(combined_results, save_directory=None):
                     ignore_index=True
                 )
 
-
+    num_instances = len(generational_scores.instance.unique())
     fig = plt.figure(
         figsize=(15, 8),
         tight_layout=True
     )
     gs = GridSpec(
-        4,
+        2,
         1,
     )
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[1, 0])
-    ax3 = fig.add_subplot(gs[2, 0])
-    ax4 = fig.add_subplot(gs[3, 0])
     
     sns.boxplot(
         data = generational_scores, 
@@ -2232,11 +2230,32 @@ def generational_analysis(combined_results, save_directory=None):
         y = 'f_score',
 #         showfliers=False, 
         hue='instance',
+        ci=None, 
         ax = ax2, 
     )
     ax2.set_title("F score individual instances")
     ax2.axhline(0.5, ls='--', color='black')
     ax2.set_ylim(0,1)
+    ax2.legend(
+        title='Instance',
+        ncol=min(8, num_instances)
+    )
+
+    if save_directory is not None:
+        plt.savefig(
+            os.path.join(
+                save_directory, 
+                "generational_measures_f_scores.png"
+            )
+        )
+        
+    plt.clf()
+    gs = GridSpec(
+        2,
+        1,
+    )
+    ax3 = fig.add_subplot(gs[0, 0])
+    ax4 = fig.add_subplot(gs[1, 0])
 
     sns.boxplot(
         data = generational_scores, 
@@ -2254,7 +2273,8 @@ def generational_analysis(combined_results, save_directory=None):
         data = generational_scores, 
         x = 'gen',
         y = 'log_likelihood',
-#         showfliers=False, 
+        # showfliers=False, 
+        ci=None, 
         hue='instance',
         ax = ax4, 
     )
@@ -2262,11 +2282,15 @@ def generational_analysis(combined_results, save_directory=None):
     ax4.set_title('Log likelihood individual instances')
     ax4.set_ylabel('Log likelihood')
     ax4.set_xlabel('Generation')
+    ax4.legend(
+        title='Instance',
+        ncol=min(8, num_instances)
+    )
 
     if save_directory is not None:
         plt.savefig(
             os.path.join(
                 save_directory, 
-                "generational_measures.png"
+                "generational_measures_log_likelihoods.png"
             )
         )
