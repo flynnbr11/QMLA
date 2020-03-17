@@ -13,6 +13,15 @@ __all__ = [
     'plot_dynamics_multiple_models'
 ]
 
+def format_exponent(n):
+    a = '%E' % n
+    val = a.split('E')[0].rstrip('0').rstrip('.')
+    val = np.round(float(val), 2)
+    exponent = a.split('E')[1]
+
+    return str(val) + 'E' + exponent
+
+
 def plot_dynamics_multiple_models(
     directory_name,
     dataset,

@@ -259,6 +259,37 @@ pickle.dump(
         'wb'
     )
 )
+# rearrange some results... TODO this could be tidier/removed?
+models = sorted(model_score_results['wins'].keys())
+models.reverse()
+
+f_score = {
+    'title': 'F-score',
+    'res': [model_score_results['f_scores'][m] for m in models],
+    'range': 'cap_1',
+}
+r_squared = {
+    'title': '$R^2$',
+    'res': [model_score_results['latex_coeff_det'][m] for m in models],
+    'range': 'cap_1',
+}
+
+sensitivity = {
+    'title': 'Sensitivity',
+    'res': [model_score_results['sensitivities'][m] for m in models],
+    'range': 'cap_1',
+}
+precision = {
+    'title': 'Precision',
+    'res': [model_score_results['precisions'][m] for m in models],
+    'range': 'cap_1',
+}
+wins = {
+    'title': '# Wins',
+    'res': [model_score_results['wins'][m] for m in models],
+    'range': 'uncapped',
+}
+
 
 #######################################
 # Now analyse the results.
@@ -341,12 +372,66 @@ except:
     print("ANALYSIS FAIURE: average parameter plots.")
     raise
 
+# cluster champion learned parameters.
+try:
+    qmla.analysis.cluster_results_and_plot(
+        path_to_results=results_csv,
+        true_expec_path=true_expec_path,
+        plot_probe_path=probes_plot_file,
+        true_params_path=true_params_path,
+        growth_generator=growth_generator,
+        # measurement_type=measurement_type,
+        save_param_values_to_file=str(
+            plot_desc + 'clusters_by_param.png'),
+        save_param_clusters_to_file=str(
+            plot_desc + 'clusters_by_model.png'),
+        save_redrawn_expectation_values=str(
+            plot_desc + 'clusters_expec_vals.png')
+    )
+except BaseException:
+    print("ANALYSIS FAIURE: clustering plots.")
+    raise
+
 
 #######################################
 # QMLA Performance
 ## model win rates and statistics
 #######################################
+# model win rates
+try:
+    qmla.analysis.plot_scores(
+        scores=model_scores,
+        growth_classes=growth_classes,
+        unique_growth_classes=unique_growth_classes,
+        growth_rules=growth_rules,
+        plot_r_squared=False,
+        coefficients_of_determination=median_coeff_determination,
+        coefficient_determination_latex_name=latex_coeff_det,
+        f_scores=f_scores,
+        true_model=true_model,
+        growth_generator=growth_generator,
+        # collective_analysis_pickle_file = results_collection_file,
+        save_file=os.path.join(directory_to_analyse, 'model_wins.png')
+    )
+except:
+    print("ANALYSIS FAILURE: plotting model win rates.")
+    raise
+# model statistics (f-score, precision, sensitivty)
+try:
+    qmla.analysis.plot_statistics(
+        to_plot = [wins, f_score, precision, sensitivity],
+        models = models,
+        true_model=true_model_latex,
+        save_to_file=str(
+            directory_to_analyse +
+            'model_stats.png'
+        )
+    )
+except:
+    print("ANALYSIS FAILURE: plotting model statistics.")
+    raise
 
+# model statistics histograms (f-score, precision, sensitivty)
 try:
     # Plot metrics such as F1 score histogram
     qmla.analysis.stat_metrics_histograms(
@@ -373,10 +458,37 @@ except:
     print("ANALYSIS FAILURE: summarising txt")
     raise
 
+# Plots used for comparing parameter sweeps; show wins by over/mis/under-fit
+try:
+    qmla.analysis.parameter_sweep_analysis(
+        directory_name=directory_to_analyse,
+        results_csv=results_csv,
+        save_to_file=os.path.join(
+            directory_to_analyse, 
+            'sweep_param_total.png'
+        )
+    )
+    qmla.analysis.parameter_sweep_analysis(
+        directory_name=directory_to_analyse,
+        results_csv=results_csv,
+        use_log_times=True,
+        use_percentage_models=True,
+        save_to_file=os.path.join(
+            directory_to_analyse, 
+            'sweep_param_percentage.png'
+        )
+    )
+except BaseException:
+    print("ANALYSIS FAILURE: parameter sweeps.")
+    raise
+
+
 #######################################
 # QMLA Internals
 ## How QMLA proceeds 
 ## metrics at each layer
+## Quadratic losses, R^2, volume at each experiment
+## 
 #######################################
 try:
     qmla.analysis.generational_analysis(
@@ -385,6 +497,70 @@ try:
     )
 except:
     print("ANALYSIS FAIURE: generational analysis.")
+    raise
+
+try:
+    qmla.analysis.r_sqaured_average(
+        results_path=results_csv,
+        growth_class=true_growth_class,
+        top_number_models=arguments.top_number_models,
+        growth_classes_by_name=growth_classes,
+        save_to_file=str(
+            directory_to_analyse +
+            plot_desc +
+            'r_squared_averages.png'
+        )
+    )
+except BaseException:
+    print(
+        "ANALYSIS FAIURE: R^2 against epochs.",
+        "R^2 at each epoch not stored in QMLA output (method available in QML)."
+    )
+    pass
+
+try:
+    qmla.analysis.average_quadratic_losses(
+        results_path=results_csv,
+        growth_classes=unique_growth_classes,
+        growth_generator=growth_generator,
+        top_number_models=arguments.top_number_models,
+        save_to_file=str(
+            directory_to_analyse +
+            plot_desc +
+            'quadratic_losses_avg.png'
+        )
+    )
+except:
+    print("ANAYSIS FAILURE: quadratic losses.")
+    raise
+
+try:
+    qmla.analysis.volume_average(
+        results_path=results_csv,
+        growth_class=true_growth_class,
+        top_number_models=arguments.top_number_models,
+        save_to_file=str(
+            directory_to_analyse +
+            plot_desc +
+            'volume_averages.png'
+        )
+    )
+except: 
+    print("ANALYSIS FAILURE: volumes.")
+    raise
+
+try:
+    qmla.analysis.all_times_learned_histogram(
+        results_path=results_csv,
+        top_number_models=arguments.top_number_models,
+        save_to_file=str(
+            directory_to_analyse +
+            plot_desc +
+            'times_histogram.png'
+        )
+    )
+except:
+    print("ANALYSIS FAILURE: times learned upon.")
     raise
 
 #######################################
@@ -436,7 +612,7 @@ try:
             'expec_vals.png'
         )
     )
-except :
+except:
     print("ANALYSIS FAIURE: dynamics.")
     raise
 
@@ -445,131 +621,11 @@ except :
 #######################################
 
 
-
-
-
-
-
-
-
-print("Analysis/dynamics starting")
-
-
-try:
-    r_sqaured_average(
-        results_path=results_csv,
-        growth_class=true_growth_class,
-        top_number_models=arguments.top_number_models,
-        growth_classes_by_name=growth_classes,
-        save_to_file=str(
-            directory_to_analyse +
-            plot_desc +
-            'r_squared_averages.png'
-        )
-    )
-except BaseException:
-    print(
-        "Unable to plot average R^2 over epochs.",
-        "R^2 at each epoch not stored in QMD (method in QML)."
-    )
-
-qmla.analysis.average_quadratic_losses(
-    results_path=results_csv,
-    growth_classes=unique_growth_classes,
-    growth_generator=growth_generator,
-    top_number_models=arguments.top_number_models,
-    save_to_file=str(
-        directory_to_analyse +
-        plot_desc +
-        'quadratic_losses_avg.png'
-    )
-)
-
-
-qmla.analysis.volume_average(
-    results_path=results_csv,
-    growth_class=true_growth_class,
-    top_number_models=arguments.top_number_models,
-    save_to_file=str(
-        directory_to_analyse +
-        plot_desc +
-        'volume_averages.png'
-    )
-)
-
-qmla.analysis.all_times_learned_histogram(
-    results_path=results_csv,
-    top_number_models=arguments.top_number_models,
-    save_to_file=str(
-        directory_to_analyse +
-        plot_desc +
-        'times_histogram.png'
-    )
-)
-
 if further_qhl_mode == False:
     print("FURTHER QHL=FALSE. PLOTTING STUFF")
-    plot_file = directory_to_analyse + 'model_wins.png'
-
+    
     entropy = inf_gain = 0.0
     print("[AnalyseMultipleQMD] f scores before plot scores:", f_scores)
-    qmla.analysis.plot_scores(
-        scores=model_scores,
-        growth_classes=growth_classes,
-        unique_growth_classes=unique_growth_classes,
-        growth_rules=growth_rules,
-        plot_r_squared=False,
-        coefficients_of_determination=median_coeff_determination,
-        coefficient_determination_latex_name=latex_coeff_det,
-        f_scores=f_scores,
-        true_model=true_model,
-        growth_generator=growth_generator,
-        # collective_analysis_pickle_file = results_collection_file,
-        save_file=plot_file
-    )
-
-    # results from get_model_scores above
-    models = sorted(model_score_results['wins'].keys())
-    models.reverse()
-
-    f_score = {
-        'title': 'F-score',
-        'res': [model_score_results['f_scores'][m] for m in models],
-        'range': 'cap_1',
-    }
-    r_squared = {
-        'title': '$R^2$',
-        'res': [model_score_results['latex_coeff_det'][m] for m in models],
-        'range': 'cap_1',
-    }
-
-    sensitivity = {
-        'title': 'Sensitivity',
-        'res': [model_score_results['sensitivities'][m] for m in models],
-        'range': 'cap_1',
-    }
-    precision = {
-        'title': 'Precision',
-        'res': [model_score_results['precisions'][m] for m in models],
-        'range': 'cap_1',
-    }
-    wins = {
-        'title': '# Wins',
-        'res': [model_score_results['wins'][m] for m in models],
-        'range': 'uncapped',
-    }
-
-    to_plot = [wins, f_score, precision, sensitivity]
-
-    qmla.analysis.plot_statistics(
-        to_plot,
-        models,
-        true_model=true_model_latex,
-        save_to_file=str(
-            directory_to_analyse +
-            'model_stats.png'
-        )
-    )
 
     try:
         qmla.analysis.plotTrueModelBayesFactors_IsingRotationTerms(
@@ -585,48 +641,7 @@ if further_qhl_mode == False:
     except BaseException:
         print("Could not plot histogram of Bayes factors for True model.")
         # raise
-    param_plot = str(directory_to_analyse + 'sweep_param_total.png')
-    param_percent_plot = str(
-        directory_to_analyse +
-        'sweep_param_percentage.png')
 
-    try:
-        qmla.analysis.parameter_sweep_analysis(
-            directory_name=directory_to_analyse,
-            results_csv=results_csv,
-            save_to_file=param_plot)
-        qmla.analysis.parameter_sweep_analysis(
-            directory_name=directory_to_analyse,
-            results_csv=results_csv,
-            use_log_times=True,
-            use_percentage_models=True,
-            save_to_file=param_percent_plot
-        )
-    except BaseException:
-        print("Parameter sweep analysis failed.")
-        pass
-
-    do_clustering = True
-    if do_clustering:
-        try:
-            qmla.analysis.cluster_results_and_plot(
-                path_to_results=results_csv,
-                true_expec_path=true_expec_path,
-                plot_probe_path=probes_plot_file,
-                true_params_path=true_params_path,
-                growth_generator=growth_generator,
-                # measurement_type=measurement_type,
-                save_param_values_to_file=str(
-                    plot_desc + 'clusters_by_param.png'),
-                save_param_clusters_to_file=str(
-                    plot_desc + 'clusters_by_model.png'),
-                save_redrawn_expectation_values=str(
-                    plot_desc + 'clusters_expec_vals.png')
-            )
-        except BaseException:
-            print("Failed to cluster and replot results.")
-            pass
-        # raise
 
     valid_growth_rules_for_multiQMD_tree_plot = [
         'two_qubit_ising_rotation',
