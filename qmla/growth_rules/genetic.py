@@ -95,7 +95,7 @@ class Genetic(
         self.max_num_probe_qubits = self.num_sites
         # test
         self.max_spawn_depth = 2
-        self.initial_num_models = 8
+        self.initial_num_models = 4
         # default test - 32 generations x 16 starters
         # self.max_spawn_depth = 32
         # self.initial_num_models = 16

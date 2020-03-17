@@ -5,6 +5,9 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 import pickle
+import copy
+import random
+
 import matplotlib.pyplot as plt
 from matplotlib import collections
 from matplotlib import ticker
@@ -13,11 +16,6 @@ from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib.ticker import Formatter
 from matplotlib import colors as mcolors
 import matplotlib.text as mpl_text
-import sklearn
-import seaborn as sns
-import copy
-import random
-
 import matplotlib.cbook as cb
 from matplotlib.colors import colorConverter, Colormap
 from matplotlib.patches import FancyArrowPatch, Circle, ArrowStyle
@@ -30,6 +28,8 @@ from matplotlib.spines import Spine
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.projections import register_projection
 from inspect import currentframe, getframeinfo
+import sklearn
+import seaborn as sns
 
 import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming

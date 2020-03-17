@@ -207,6 +207,59 @@ else:
     results_file_name_start = 'results'
     plot_desc = ''
 
+# do preliminary analysis - 
+os.chdir(directory_to_analyse)
+pickled_files = []
+for file in os.listdir(directory_to_analyse):
+    if (
+        file.endswith(".p")
+        and
+        file.startswith(results_file_name_start)
+    ):
+        pickled_files.append(file)
+
+growth_rules = {}
+for f in pickled_files:
+    fname = directory_to_analyse + '/' + str(f)
+    result = pickle.load(open(fname, 'rb'))
+    alph = result['NameAlphabetical']
+    if alph not in list(growth_rules.keys()):
+        growth_rules[alph] = result['GrowthGenerator']
+
+unique_growth_classes = {}
+unique_growth_rules = true_params_info['all_growth_rules']
+for g in unique_growth_rules:
+    try:
+        unique_growth_classes[g] = qmla.get_growth_generator_class(
+            growth_generation_rule=g
+        )
+    except BaseException:
+        unique_growth_classes[g] = None
+
+# first get model scores
+model_score_results = qmla.analysis.get_model_scores(
+    directory_name=directory_to_analyse,
+    unique_growth_classes=unique_growth_classes,
+    collective_analysis_pickle_file=results_collection_file,
+)
+model_scores = model_score_results['scores']
+growth_rules = model_score_results['growth_rules']
+growth_classes = model_score_results['growth_classes']
+unique_growth_classes = model_score_results['unique_growth_classes']
+median_coeff_determination = model_score_results['avg_coeff_determination']
+f_scores = model_score_results['f_scores']
+latex_coeff_det = model_score_results['latex_coeff_det']
+pickle.dump(
+    model_score_results, 
+    open(
+        os.path.join(
+            directory_to_analyse, 
+            'champions_info.p'
+        ),
+        'wb'
+    )
+)
+
 #######################################
 # Now analyse the results.
 #######################################
@@ -269,21 +322,70 @@ except BaseException:
     print("ANALYSIS FAIURE: finding average parameters across instances.")
     raise
 
+try:
+    qmla.analysis.average_parameter_estimates(
+        directory_name=directory_to_analyse,
+        results_path=results_csv,
+        top_number_models=arguments.top_number_models,
+        results_file_name_start=results_file_name_start,
+        growth_generator=growth_generator,
+        unique_growth_classes=unique_growth_classes,
+        true_params_dict=true_params_dict,
+        save_to_file=str(
+            directory_to_analyse +
+            plot_desc +
+            'param_avg.png'
+        )
+    )
+except:
+    print("ANALYSIS FAIURE: average parameter plots.")
+    raise
 
 
 #######################################
 # QMLA Performance
 ## model win rates and statistics
-## model generation rates
 #######################################
 
+try:
+    # Plot metrics such as F1 score histogram
+    qmla.analysis.stat_metrics_histograms(
+        champ_info = model_score_results, 
+        save_to_file=os.path.join(
+            directory_to_analyse, 
+            'metrics.png'
+        )
+    )
+except: 
+    print("ANALYSIS FAILURE: statistical metrics")
+    raise
 
+# Summarise results into txt file for quick checking results. 
+try:
+    qmla.analysis.summarise_qmla_text_file(
+        results_csv_path = results_csv, 
+        path_to_summary_file = os.path.join(
+            directory_to_analyse, 
+            'summary.txt'
+        )
+    )
+except:
+    print("ANALYSIS FAILURE: summarising txt")
+    raise
 
 #######################################
 # QMLA Internals
 ## How QMLA proceeds 
 ## metrics at each layer
 #######################################
+try:
+    qmla.analysis.generational_analysis(
+        combined_results = combined_results, 
+        save_directory=directory_to_analyse,
+    )
+except:
+    print("ANALYSIS FAIURE: generational analysis.")
+    raise
 
 #######################################
 # Growth rule specific 
@@ -307,125 +409,16 @@ try:
         save_directory = directory_to_analyse, 
     )
 except:
-    print("Did not plot fitness measures.")
-    # raise
-
-
-#######################################
-# Results
-## Dynamics
-#######################################
-
-
-
-
-
-
-os.chdir(directory_to_analyse)
-pickled_files = []
-for file in os.listdir(directory_to_analyse):
-    if (
-        file.endswith(".p")
-        and
-        file.startswith(results_file_name_start)
-    ):
-        pickled_files.append(file)
-
-growth_rules = {}
-for f in pickled_files:
-    fname = directory_to_analyse + '/' + str(f)
-    result = pickle.load(open(fname, 'rb'))
-    alph = result['NameAlphabetical']
-    if alph not in list(growth_rules.keys()):
-        growth_rules[alph] = result['GrowthGenerator']
-
-unique_growth_classes = {}
-unique_growth_rules = true_params_info['all_growth_rules']
-for g in unique_growth_rules:
-    try:
-        unique_growth_classes[g] = qmla.get_growth_generator_class(
-            growth_generation_rule=g
-        )
-    except BaseException:
-        unique_growth_classes[g] = None
-
-# first get model scores
-model_score_results = qmla.analysis.get_model_scores(
-    directory_name=directory_to_analyse,
-    unique_growth_classes=unique_growth_classes,
-    collective_analysis_pickle_file=results_collection_file,
-)
-model_scores = model_score_results['scores']
-growth_rules = model_score_results['growth_rules']
-growth_classes = model_score_results['growth_classes']
-unique_growth_classes = model_score_results['unique_growth_classes']
-median_coeff_determination = model_score_results['avg_coeff_determination']
-f_scores = model_score_results['f_scores']
-latex_coeff_det = model_score_results['latex_coeff_det']
-pickle.dump(
-    model_score_results, 
-    open(
-        os.path.join(
-            directory_to_analyse, 
-            'champions_info.p'
-        ),
-        'wb'
-    )
-)
-
-# Plot metrics such as F1 score histogram
-qmla.analysis.stat_metrics_histograms(
-    champ_info = model_score_results, 
-    save_to_file=os.path.join(
-        directory_to_analyse, 
-        'metrics.png'
-    )
-)
-
-combined_results = pandas.read_csv(results_csv)
-try:
-    qmla.analysis.generational_analysis(
-        combined_results = combined_results, 
-        save_directory=directory_to_analyse,
-    )
-except:
-    print("\n\n\n\nGenerational analysis plot failed.")
+    print("ANALYSIS FAIURE: genetic algorithm fitness measures.")
     raise
 
-# Summarise results into txt file for quick checking results. 
-qmla.analysis.summarise_qmla_text_file(
-    results_csv_path = results_csv, 
-    path_to_summary_file = os.path.join(
-        directory_to_analyse, 
-        'summary.txt'
-    )
-)
 
-
-
-# arguments.top_number_models = len(model_scores.keys())
-arguments.top_number_models = 4
-print("Changed top # models to:", arguments.top_number_models)
-
-qmla.analysis.average_parameter_estimates(
-    directory_name=directory_to_analyse,
-    results_path=results_csv,
-    top_number_models=arguments.top_number_models,
-    results_file_name_start=results_file_name_start,
-    growth_generator=growth_generator,
-    unique_growth_classes=unique_growth_classes,
-    true_params_dict=true_params_dict,
-    save_to_file=str(
-        directory_to_analyse +
-        plot_desc +
-        'param_avg.png'
-    )
-)
-
-print("Analysis/dynamics starting")
-
+#######################################
+# Results/Outputs
+## Dynamics
+#######################################
 try:
-    qmla.analysis.analyse_and_plot_dynamics_multiple_models(  # average expected values
+    qmla.analysis.plot_dynamics_multiple_models(  # average expected values
         directory_name=directory_to_analyse,
         dataset=dataset,
         results_path=results_csv,
@@ -443,9 +436,24 @@ try:
             'expec_vals.png'
         )
     )
-except BaseException:
+except :
+    print("ANALYSIS FAIURE: dynamics.")
     raise
-print("Analysis/dynamics plot finished")
+
+#######################################
+# Below here  - to be sorted
+#######################################
+
+
+
+
+
+
+
+
+
+print("Analysis/dynamics starting")
+
 
 try:
     r_sqaured_average(
