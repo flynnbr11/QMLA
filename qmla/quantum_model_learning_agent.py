@@ -3095,15 +3095,22 @@ class QuantumModelLearningAgent():
             for b in generations
         }
 
-        for m in model_ids: 
-            b = model_branches[m]
-            generational_sensitivity[b].append(self.model_sensitivities[m])
-            generational_precision[b].append(self.model_precisions[m]) 
-            generational_f_score[b].append(self.model_f_scores[m])   
-            self.generational_log_likelihoods[b].append(
-                self.get_model_storage_instance_by_id(m).evaluation_log_likelihood
-            )
-
+        # for m in model_ids: 
+        #     b = model_branches[m]
+        #     generational_sensitivity[b].append(self.model_sensitivities[m])
+        #     generational_precision[b].append(self.model_precisions[m]) 
+        #     generational_f_score[b].append(self.model_f_scores[m])   
+        #     self.generational_log_likelihoods[b].append(
+        #         self.get_model_storage_instance_by_id(m).evaluation_log_likelihood
+        #     )
+        for b in generations: 
+            for m in self.branch_resident_model_ids[b]: 
+                generational_sensitivity[b].append(self.model_sensitivities[m])
+                generational_precision[b].append(self.model_precisions[m]) 
+                generational_f_score[b].append(self.model_f_scores[m])   
+                self.generational_log_likelihoods[b].append(
+                    self.get_model_storage_instance_by_id(m).evaluation_log_likelihood
+                )
 
         include_plots = [
             {'name' : 'F-score', 'data' : generational_f_score, 'colour' : 'red'}, 
