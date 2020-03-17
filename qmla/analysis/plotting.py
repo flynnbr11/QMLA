@@ -4,7 +4,8 @@ from matplotlib.lines import Line2D
 import sys
 import os
 import pickle
-import pandas
+import pandas as pd
+import seaborn as sns
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -34,11 +35,11 @@ def parameter_sweep_analysis(
     if not directory_name.endswith('/'):
         directory_name += '/'
 
-    # qmd_cumulative_results = pandas.DataFrame.from_csv(results_csv,
-    qmd_cumulative_results = pandas.read_csv(results_csv,
+    # qmd_cumulative_results = pd.DataFrame.from_csv(results_csv,
+    qmd_cumulative_results = pd.read_csv(results_csv,
                                                        index_col='ConfigLatex'
                                                        )
-    piv = pandas.pivot_table(
+    piv = pd.pivot_table(
         qmd_cumulative_results,
         values=['CorrectModel', 'Time', 'Overfit', 'Underfit', 'Misfit'],
         index=['ConfigLatex'],
@@ -157,8 +158,8 @@ def average_parameters(
     average_type='median'
 ):
 
-    # results = pandas.DataFrame.from_csv(
-    results = pandas.read_csv(
+    # results = pd.DataFrame.from_csv(
+    results = pd.read_csv(
         results_path,
         index_col='QID'
     )
@@ -266,7 +267,7 @@ def average_parameter_estimates(
 ):
     from matplotlib import cm
     plt.switch_backend('agg')  # to try fix plt issue on BC
-    results = pandas.read_csv(
+    results = pd.read_csv(
         results_path,
         index_col='QID'
     )
@@ -509,8 +510,8 @@ def analyse_and_plot_dynamics_multiple_models(
     from matplotlib import cm
     from scipy import stats
 
-    # results = pandas.DataFrame.from_csv(
-    results = pandas.read_csv(
+    # results = pd.DataFrame.from_csv(
+    results = pd.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1019,8 +1020,8 @@ def r_sqaured_average(
     fig = plt.figure()
     ax = plt.subplot(111)
 
-    # results = pandas.DataFrame.from_csv(
-    results = pandas.read_csv(
+    # results = pd.DataFrame.from_csv(
+    results = pd.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1113,8 +1114,8 @@ def volume_average(
     fig = plt.figure()
     ax = plt.subplot(111)
 
-    # results = pandas.DataFrame.from_csv(
-    results = pandas.read_csv(
+    # results = pd.DataFrame.from_csv(
+    results = pd.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1200,8 +1201,8 @@ def all_times_learned_histogram(
     fig = plt.figure()
     ax = plt.subplot(111)
 
-    # results = pandas.DataFrame.from_csv(
-    results = pandas.read_csv(
+    # results = pd.DataFrame.from_csv(
+    results = pd.read_csv(
         results_path,
         index_col='QID'
     )
@@ -1778,8 +1779,8 @@ def plot_tree_multi_QMD(
     save_to_file=None
 ):
     try:
-        # qmd_res = pandas.DataFrame.from_csv(
-        qmd_res = pandas.read_csv(
+        # qmd_res = pd.DataFrame.from_csv(
+        qmd_res = pd.read_csv(
             results_csv,
             index_col='LatexName'
         )
@@ -2040,7 +2041,7 @@ def summarise_qmla_text_file(
     results_csv_path, 
     path_to_summary_file
 ):
-    all_results = pandas.read_csv(results_csv_path)
+    all_results = pd.read_csv(results_csv_path)
 
     to_write = "\
         {num_instances} instance(s) total. \n\
@@ -2074,17 +2075,21 @@ def avg_f_score_multi_qmla(
     save_to_file=None
 ):
     plt.clf()
-    all_results = pandas.read_csv(results_csv_path)
+    all_results = pd.read_csv(results_csv_path)
     gen_f_scores = all_results.GenerationalFscore
+    gen_log_likelihoods = all_results.GenerationalLogLikelihoods
 
     all_f_scores = None
+    all_log_likelihoods = None
     for g in gen_f_scores.index:
         data = eval(gen_f_scores[g])
+        log_lk = eval(gen_log_likelihoods[g])
+
         indices = list(data.keys())
         data_array = np.array(
             [data[i] for i in indices]
         )
-        p = pandas.DataFrame(
+        p = pd.DataFrame(
             data_array, 
             columns=['Fscore'],
             index=indices
@@ -2155,3 +2160,89 @@ def avg_f_score_multi_qmla(
             save_to_file
         )
     print("Plotted average f scores by generation")
+
+def generational_analysis(
+    combined_results, 
+    save_directory=None
+):
+    plt.clf()
+    generational_scores = None
+
+    for k in combined_results.index:
+        single_instance_gen_ll = eval(combined_results['GenerationalLogLikelihoods'][k])
+        single_instance_gen_f_score= eval(combined_results['GenerationalFscore'][k])
+
+        for gen in list(single_instance_gen_ll.keys()):
+            this_gen_ll = single_instance_gen_ll[gen]
+            this_gen_log_abs_ll = [np.log(np.abs(ll)) for ll in this_gen_ll]
+            this_gen_f_score = single_instance_gen_f_score[gen]
+            this_gen_data = list(zip(this_gen_ll, this_gen_log_abs_ll, this_gen_f_score))
+
+            df = pd.DataFrame(
+                data = this_gen_data,
+                columns = ['log_likelihood', 'log_abs_ll', 'f_score']
+            )
+
+            df['gen'] = gen
+            df['instance'] = k
+            if generational_scores is None:
+                generational_scores = df
+            else: 
+                generational_scores = generational_scores.append(
+                    df, 
+                    ignore_index=True
+                )
+
+
+    fig = plt.figure(
+        figsize=(15, 8),
+        tight_layout=True
+    )
+    gs = GridSpec(
+        2,
+        1,
+    )
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax2 = fig.add_subplot(gs[1, 0])
+    
+    sns.boxplot(
+        data = generational_scores, 
+        x = 'gen',
+        y = 'f_score',
+        showfliers=False, 
+        ax = ax1, 
+    )
+    sns.swarmplot(
+        data = generational_scores, 
+        x = 'gen',
+        y = 'f_score',
+        # showfliers=False, 
+        color='black',
+        ax = ax1, 
+    )
+
+    ax1.set_ylabel('F score')
+    ax1.set_xlabel('Generation')
+    ax1.set_title('F score V Generation')
+    ax1.set_ylim(0,1)
+    ax1.axhline(0.5, ls='--',color='black')
+
+    sns.boxplot(
+        data = generational_scores, 
+        x = 'gen',
+        y = 'log_likelihood',
+        showfliers=False, 
+        ax = ax2, 
+    )
+
+    ax2.set_title('Log likelihood V generation')
+    ax2.set_ylabel('Log likelihood')
+    ax2.set_xlabel('Generation')
+
+    if save_directory is not None:
+        plt.savefig(
+            os.path.join(
+                save_directory, 
+                "generational_measures.png"
+            )
+        )

@@ -278,10 +278,6 @@ try:
         results_path = results_csv, 
         save_directory=directory_to_analyse, 
     )
-    # qmla.analysis.genetic_algorithm_f_score_fitness_plots(
-    #     results_path = results_csv, 
-    #     save_directory=directory_to_analyse, 
-    # )
 except:
     print("Did not plot fitness measures.")
     # raise
@@ -349,17 +345,15 @@ qmla.analysis.stat_metrics_histograms(
     )
 )
 
+combined_results = pandas.read_csv(results_csv)
 try:
-    qmla.analysis.avg_f_score_multi_qmla(
-        results_csv_path = results_csv, 
-        save_to_file=os.path.join(
-            directory_to_analyse, 
-            'f_scores.png'
-        )
+    qmla.analysis.generational_analysis(
+        combined_results = combined_results, 
+        save_directory=directory_to_analyse,
     )
 except:
-    print("Average F-score by generation plot failed.")
-    pass
+    print("\n\n\n\nGenerational analysis plot failed.")
+    raise
 
 # Summarise results into txt file for quick checking results. 
 qmla.analysis.summarise_qmla_text_file(
