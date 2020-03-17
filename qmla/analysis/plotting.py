@@ -2161,11 +2161,8 @@ def avg_f_score_multi_qmla(
         )
     print("Plotted average f scores by generation")
 
-def generational_analysis(
-    combined_results, 
-    save_directory=None
-):
-    plt.clf()
+def generational_analysis(combined_results, save_directory=None):
+
     generational_scores = None
 
     for k in combined_results.index:
@@ -2199,11 +2196,12 @@ def generational_analysis(
         tight_layout=True
     )
     gs = GridSpec(
-        2,
+        3,
         1,
     )
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[1, 0])
+    ax3 = fig.add_subplot(gs[2, 0])
     
     sns.boxplot(
         data = generational_scores, 
@@ -2217,7 +2215,7 @@ def generational_analysis(
         x = 'gen',
         y = 'f_score',
         # showfliers=False, 
-        color='black',
+        color='grey',
         ax = ax1, 
     )
 
@@ -2238,6 +2236,19 @@ def generational_analysis(
     ax2.set_title('Log likelihood V generation')
     ax2.set_ylabel('Log likelihood')
     ax2.set_xlabel('Generation')
+
+    sns.pointplot(
+        data = generational_scores, 
+        x = 'gen',
+        y = 'log_likelihood',
+#         showfliers=False, 
+        hue='instance',
+        ax = ax3, 
+    )
+
+    ax3.set_title('Log likelihood V generation')
+    ax3.set_ylabel('Log likelihood')
+    ax3.set_xlabel('Generation')
 
     if save_directory is not None:
         plt.savefig(
