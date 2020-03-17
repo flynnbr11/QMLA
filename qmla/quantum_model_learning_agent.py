@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from __future__ import print_function  # so print doesn't show brackets
+from __future__ import print_function 
 
 import math
 import numpy as np
@@ -3057,23 +3057,24 @@ class QuantumModelLearningAgent():
         self,
         save_to_file=None
     ):
-        model_ids = self.models_learned
-        self.log_print(
-            ["Getting statistical metrics for {}".format(model_ids)]
-        )
-        model_branches = {
-            i : self.get_model_data_by_field(
-                name = self.model_name_id_map[i], 
-                field = 'branch_id'
-            )
-            for i in model_ids
-        }
-        generations = sorted(set(model_branches.values()))
+        # model_ids = self.models_learned
+        # self.log_print(
+        #     ["Getting statistical metrics for {}".format(model_ids)]
+        # )
+        # model_branches = {
+        #     i : self.get_model_data_by_field(
+        #         name = self.model_name_id_map[i], 
+        #         field = 'branch_id'
+        #     )
+        #     for i in model_ids
+        # }
+        # generations = sorted(set(model_branches.values()))
+        generations = sorted(set(self.branch_resident_model_ids.keys()))
         self.log_print(
             [
                 "[get_statistical_metrics",
-                "model branches:", model_branches, 
-                "model ids: ", model_ids, 
+                # "model branches:", model_branches, 
+                # "model ids: ", model_ids, 
                 "generations: ", generations
             ]
         )
@@ -3104,7 +3105,8 @@ class QuantumModelLearningAgent():
         #         self.get_model_storage_instance_by_id(m).evaluation_log_likelihood
         #     )
         for b in generations: 
-            models_this_branch = self.branch_resident_model_ids[b]
+            models_this_branch = sorted(self.branch_resident_model_ids[b])
+            # models_this_branch = self.branch_resident_model_ids[b]
             self.log_print(
                 [
                     "Adding models to generational measures for Generation {}:{}".format(

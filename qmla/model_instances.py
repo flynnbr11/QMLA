@@ -794,7 +794,8 @@ class ModelInstanceForLearning():
         self.log_print(
             [
                 "After learning, evaluation normalisation record:", 
-                evaluation_updater.normalization_record
+                evaluation_updater.normalization_record,
+                "\nGiving log likelihood:", round_nearest(evaluation_updater.log_total_likelihood, 0.05)
             ]
         )
         self.evaluation_normalization_record = evaluation_updater.normalization_record
