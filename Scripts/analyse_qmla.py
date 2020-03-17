@@ -162,7 +162,6 @@ results_collection_file = "{}/collect_analyses.p".format(
     directory_to_analyse
 )
 
-
 if true_params_path is not None:
     true_params_info = pickle.load(
         open(
@@ -214,21 +213,27 @@ else:
 
 print("\nAnalysing and storing results in", directory_to_analyse)
 
-plot_num_model_occurences = False # making optional bc quite slow
+#######################################
+# Gather results
+#######################################
+
 
 if gather_summary_results: 
     # Collect results together into single file. 
     # don't want to waste time doing this if already compiled
     # so gather_summary_results can be set to 0 in analysis script.
-    qmla.analysis.collect_results_store_csv(
+    combined_results = qmla.analysis.collect_results_store_csv(
         directory_name = directory_to_analyse,
         results_file_name_start = results_file_name_start,
         results_csv_name = results_csv_name, 
         # csv_name=results_csv
     )
+
+    # Find number of occurences of each model
+    # quite costly so it is optional
+    plot_num_model_occurences = False 
     if plot_num_model_occurences:
         try:
-            # counting model analysis is costly so making it optional
             qmla.analysis.count_model_occurences(
                 latex_map=latex_mapping_file,
                 true_model_latex=true_growth_class.latex_name(
@@ -244,10 +249,12 @@ if gather_summary_results:
                 )
             )
         except BaseException:
-            print("Failed to plot # occurences of each model.")
-            # raise
+            print("ANALYSIS FAIURE: number of occurences for each model.")
+            raise
 
-
+#######################################
+# Parameter analysis
+#######################################
 try:
     # Get average parameters of champion models across instances
     average_priors = qmla.analysis.average_parameters_across_instances(
@@ -260,32 +267,63 @@ try:
     )
 except BaseException:
     print("ANALYSIS FAIURE: finding average parameters across instances.")
-    pass
+    raise
+
+
+
+#######################################
+# QMLA Performance
+## model win rates and statistics
+## model generation rates
+#######################################
+
+
+
+#######################################
+# QMLA Internals
+## How QMLA proceeds 
+## metrics at each layer
+#######################################
+
+#######################################
+# Growth rule specific 
+## genetic algorithm ananlytics
+#######################################
 
 try: 
     qmla.analysis.model_generation_probability(
-        results_path = results_csv,
+        # results_path = results_csv,
+        combined_results = combined_results,
         save_directory=directory_to_analyse, 
     )
 except:
-    print("Failed to plot probability of model generation")
-    print("Note this is only built for genetic algorithm so far.")
-    # raise
+    print("ANALYSIS FAIURE: Model generation rate.")
+    raise
+
 
 try:
     qmla.analysis.genetic_alg_fitness_plots(
         results_path = results_csv, 
-        save_directory=directory_to_analyse, 
+        save_directory = directory_to_analyse, 
     )
 except:
     print("Did not plot fitness measures.")
     # raise
 
 
+#######################################
+# Results
+## Dynamics
+#######################################
+
+
+
+
+
+
 os.chdir(directory_to_analyse)
 pickled_files = []
 for file in os.listdir(directory_to_analyse):
-    # if file.endswith(".p") and file.startswith("results"):
     if (
         file.endswith(".p")
         and

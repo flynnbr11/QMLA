@@ -1,9 +1,13 @@
 import os
 import csv
 import pickle
+import pandas as pd
 pickle.HIGHEST_PROTOCOL = 4
 
-__all__ = ['collect_results_store_csv']
+__all__ = [
+    'collect_results_store_csv',
+    'count_model_occurences'
+]
 
 def collect_results_store_csv(
     directory_name,
@@ -24,7 +28,7 @@ def collect_results_store_csv(
         than standard QMLA. 
     :param results_csv_name: the name to store the resultant CSV by. 
 
-    :returns None: 
+    :returns collected_results: pandas DataFrame with results from all instances.  
     """
     results_csv = os.path.join(directory_name, results_csv_name)
 
@@ -41,7 +45,7 @@ def collect_results_store_csv(
         some_results = pickle.load(open(filenames[0], "rb"))
 
     except BaseException:
-        print("Couldn't find results files beginning with ",
+        print("collect_results: Couldn't find results files beginning with ",
               results_file_name_start
               )
 
@@ -55,7 +59,6 @@ def collect_results_store_csv(
         raise
 
     result_fields = list(some_results.keys())
-
     with open(results_csv, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=result_fields)
         writer.writeheader()
@@ -63,6 +66,9 @@ def collect_results_store_csv(
         for f in filenames:
             results = pickle.load(open(f, "rb"))
             writer.writerow(results)
+
+    collected_results = pd.read_csv(results_csv)
+    return collected_results
 
 
 def count_model_occurences(
@@ -72,8 +78,8 @@ def count_model_occurences(
     save_to_file=None
 ):
     r"""
-    Plots each champion model within this run against the number 
-    of instances won by that model. 
+    Plots each model considered within this run against the number 
+    of times that model was considered. 
     Quite inefficient and usually not very informative/useful, 
     so turned off by default. 
 
@@ -151,7 +157,7 @@ def count_model_occurences(
             )
     except BaseException:
         print(
-            "[AnalyseMultiple - count model occurences] couldn't save plot to file",
+            "[collect_results - count model occurences] couldn't save plot to file",
             save_to_file
 
         )

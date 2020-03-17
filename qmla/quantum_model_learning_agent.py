@@ -3104,7 +3104,16 @@ class QuantumModelLearningAgent():
         #         self.get_model_storage_instance_by_id(m).evaluation_log_likelihood
         #     )
         for b in generations: 
-            for m in self.branch_resident_model_ids[b]: 
+            models_this_branch = self.branch_resident_model_ids[b]
+            self.log_print(
+                [
+                    "Adding models to generational measures for Generation {}:{}".format(
+                        b, 
+                        models_this_branch
+                    )
+                ]
+            )
+            for m in models_this_branch: 
                 generational_sensitivity[b].append(self.model_sensitivities[m])
                 generational_precision[b].append(self.model_precisions[m]) 
                 generational_f_score[b].append(self.model_f_scores[m])   
