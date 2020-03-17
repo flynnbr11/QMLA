@@ -94,8 +94,8 @@ class Genetic(
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         # test
-        self.max_spawn_depth = 2
-        self.initial_num_models = 4
+        self.max_spawn_depth = 16
+        self.initial_num_models = 16
         # default test - 32 generations x 16 starters
         # self.max_spawn_depth = 32
         # self.initial_num_models = 16
