@@ -1440,58 +1440,6 @@ def plot_quadratic_loss(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-def summariseResultsCSV(
-    directory_name,
-    results_file_name_start="results",
-    csv_name='all_results.csv'
-):
-    import os
-    import csv
-    if not directory_name.endswith('/'):
-        directory_name += '/'
-
-        # results_file_name_start
-    if not csv_name.endswith('.csv'):
-        csv_name += '.csv'
-
-    pickled_files = []
-    for file in os.listdir(directory_name):
-        if (
-            file.endswith(".p")
-            and
-            file.startswith(results_file_name_start)
-        ):
-            pickled_files.append(file)
-    filenames = [directory_name + str(f) for f in pickled_files]
-    try:
-        some_results = pickle.load(open(filenames[0], "rb"))
-
-    except BaseException:
-        print("Couldn't find results files beginning with ",
-              results_file_name_start
-              )
-
-        print(
-            "directory:", directory_name,
-            "\nresults_file_name_start:", results_file_name_start,
-            "\nFilenames found:", filenames,
-            "\npickled files:", pickled_files,
-            "\nlistdir:", os.listdir(directory_name)
-        )
-        raise
-    result_fields = list(some_results.keys())
-
-
-#    results_csv = str(directory_name+str(csv_name))
-    results_csv = str(csv_name)
-
-    with open(results_csv, 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=result_fields)
-        writer.writeheader()
-
-        for f in filenames:
-            results = pickle.load(open(f, "rb"))
-            writer.writerow(results)
 
 
 def plot_volume_after_qhl(

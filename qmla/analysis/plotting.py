@@ -10,11 +10,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
-
 from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas, cumulativeQMDTreePlot
 import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming
-# import qmla.PlotQMD as ptq
 import qmla.database_framework as database_framework
 plt.switch_backend('agg')
 
@@ -151,108 +149,6 @@ def parameter_sweep_analysis(
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
 
-
-def average_parameters(
-    results_path,
-    top_number_models=3,
-    average_type='median'
-):
-
-    # results = pd.DataFrame.from_csv(
-    results = pd.read_csv(
-        results_path,
-        index_col='QID'
-    )
-
-    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
-    def rank_models(n): return sorted(set(n), key=n.count)[::-1]
-    # from
-    # https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
-
-    if len(all_winning_models) > top_number_models:
-        winning_models = rank_models(all_winning_models)[0:top_number_models]
-    else:
-        winning_models = list(set(all_winning_models))
-
-    params_dict = {}
-    sigmas_dict = {}
-    for mod in winning_models:
-        params_dict[mod] = {}
-        sigmas_dict[mod] = {}
-        params = database_framework.get_constituent_names_from_name(mod)
-        for p in params:
-            params_dict[mod][p] = []
-            sigmas_dict[mod][p] = []
-
-    for i in range(len(winning_models)):
-        mod = winning_models[i]
-        learned_parameters = list(
-            results[results['NameAlphabetical'] == mod]
-            ['LearnedParameters']
-        )
-        final_sigmas = list(
-            results[results['NameAlphabetical'] == mod]
-            ['FinalSigmas']
-        )
-        num_wins_for_mod = len(learned_parameters)
-        for i in range(num_wins_for_mod):
-            params = eval(learned_parameters[i])
-            sigmas = eval(final_sigmas[i])
-            for k in list(params.keys()):
-                params_dict[mod][k].append(params[k])
-                sigmas_dict[mod][k].append(sigmas[k])
-
-    average_params_dict = {}
-    avg_sigmas_dict = {}
-    std_deviations = {}
-    learned_priors = {}
-    for mod in winning_models:
-        average_params_dict[mod] = {}
-        avg_sigmas_dict[mod] = {}
-        std_deviations[mod] = {}
-        learned_priors[mod] = {}
-        params = database_framework.get_constituent_names_from_name(mod)
-        for p in params:
-            # if average_type == 'median':
-            #     average_params_dict[mod][p] = np.median(
-            #         params_dict[mod][p]
-            #     )
-            # else:
-            #     average_params_dict[mod][p] = np.mean(
-            #         params_dict[mod][p]
-            #     )
-            # if np.std(params_dict[mod][p]) > 0:
-            #     std_deviations[mod][p] = np.std(params_dict[mod][p])
-            # else:
-            #     # if only one winner, give relatively broad prior.
-            #     std_deviations[mod][p] = 0.5
-
-            # learned_priors[mod][p] = [
-            #     average_params_dict[mod][p],
-            #     std_deviations[mod][p]
-            # ]
-
-            avg_sigmas_dict[mod][p] = np.median(sigmas_dict[mod][p])
-            averaging_weight = [1 / sig for sig in sigmas_dict[mod][p]]
-            # print("[mod][p]:", mod, p)
-            # print("Attempting to avg this list:", params_dict[mod][p])
-            # print("with these weights:", averaging_weight)
-
-            average_params_dict[mod][p] = np.average(
-                params_dict[mod][p],
-                weights=sigmas_dict[mod][p]
-            )
-            # print("avg sigmas dict type:", type(avg_sigmas_dict[mod][p]))
-            # print("type average_params_dict:", type(average_params_dict[mod][p]))
-            # print("avg sigmas dict[mod][p]:", avg_sigmas_dict[mod][p])
-            # print("average_params_dict[mod][p]:", average_params_dict[mod][p])
-            learned_priors[mod][p] = [
-                average_params_dict[mod][p],
-                avg_sigmas_dict[mod][p]
-            ]
-
-    print("Average Parmaeters plot complete")
-    return learned_priors
 
 
 def average_parameter_estimates(

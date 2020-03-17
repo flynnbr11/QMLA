@@ -129,12 +129,12 @@ parser.add_argument(
     type=str,
     default=None
 )
-parser.add_argument(
-    '-plus', '--force_plus_probe',
-    help="Whether to enforce plots to use |+>^n as probe.",
-    type=int,
-    default=0
-)
+# parser.add_argument(
+#     '-plus', '--force_plus_probe',
+#     help="Whether to enforce plots to use |+>^n as probe.",
+#     type=int,
+#     default=0
+# )
 
 
 arguments = parser.parse_args()
@@ -157,7 +157,7 @@ dataset = true_growth_class.experimental_dataset
 # measurement_type = true_growth_class.measurement_type
 latex_mapping_file = arguments.latex_mapping_file
 probes_plot_file = arguments.probes_plot_file
-force_plus_probe = bool(arguments.force_plus_probe)
+# force_plus_probe = bool(arguments.force_plus_probe)
 results_collection_file = "{}/collect_analyses.p".format(
     directory_to_analyse
 )
@@ -192,18 +192,11 @@ if exp_data is False:
     true_ham = np.tensordot(params, ops, axes=1)
 
 
-#######################################
-# Now analyse the results.
-#######################################
-print("\nAnalysing and storing results in", directory_to_analyse)
-
 if not directory_to_analyse.endswith('/'):
     directory_to_analyse += '/'
 
-print("Counting model occurences.")
-
-
-
+# Generate results' file names etc depending 
+# on what type of QMLA was run
 if further_qhl_mode == True:
     results_csv_name = 'summary_further_qhl_results.csv'
     results_csv = directory_to_analyse + results_csv_name
@@ -215,13 +208,23 @@ else:
     results_file_name_start = 'results'
     plot_desc = ''
 
+#######################################
+# Now analyse the results.
+#######################################
+
+print("\nAnalysing and storing results in", directory_to_analyse)
+
 plot_num_model_occurences = False # making optional bc quite slow
+
 if gather_summary_results: 
+    # Collect results together into single file. 
     # don't want to waste time doing this if already compiled
-    qmla.analysis.summariseResultsCSV(
-        directory_name=directory_to_analyse,
-        results_file_name_start=results_file_name_start,
-        csv_name=results_csv
+    # so gather_summary_results can be set to 0 in analysis script.
+    qmla.analysis.collect_results_store_csv(
+        directory_name = directory_to_analyse,
+        results_file_name_start = results_file_name_start,
+        results_csv_name = results_csv_name, 
+        # csv_name=results_csv
     )
     if plot_num_model_occurences:
         try:
@@ -246,21 +249,17 @@ if gather_summary_results:
 
 
 try:
-    average_priors = qmla.analysis.average_parameters(
+    # Get average parameters of champion models across instances
+    average_priors = qmla.analysis.average_parameters_across_instances(
         results_path=results_csv,
-        top_number_models=arguments.top_number_models
-    )
-
-    avg_priors = str(directory_to_analyse + 'average_priors.p')
-
-    pickle.dump(
-        average_priors,
-        open(avg_priors, 'wb'),
-        protocol=4
+        top_number_models=arguments.top_number_models,
+        file_to_store = os.path.join(
+            directory_to_analyse, 
+            'average_priors.p'
+        )
     )
 except BaseException:
-    raise
-    # for compatability with old versions
+    print("ANALYSIS FAIURE: finding average parameters across instances.")
     pass
 
 try: 
