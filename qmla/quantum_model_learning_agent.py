@@ -3250,7 +3250,7 @@ class QuantumModelLearningAgent():
 
     def store_bayes_factors_to_shared_csv(self, bayes_csv):
         print("[QMD] writing Bayes CSV")
-        qmla.analysis.updateAllBayesCSV(self, bayes_csv)
+        qmla.analysis.update_shared_bayes_factor_csv(self, bayes_csv)
 
     def plot_parameter_learning_single_model(
         self,

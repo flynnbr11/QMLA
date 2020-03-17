@@ -172,9 +172,14 @@ class GrowthRuleSuper():
         latex_mapping_file,
         **kwargs
     ):
+        
+        r"""
+        branch_is_num_params
+        
+        """
         import qmla.model_naming
-        # branch_is_num_params
-        return model_naming.branch_computed_from_qubit_and_param_count(
+        
+        return qmla.model_naming.branch_computed_from_qubit_and_param_count(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )

@@ -13,10 +13,96 @@ from matplotlib.gridspec import GridSpec
 import qmla.database_framework
 
 __all__ = [
+    'update_shared_bayes_factor_csv', 
     'plot_scores',
     'stat_metrics_histograms',
     'parameter_sweep_analysis'
 ]
+
+def update_shared_bayes_factor_csv(qmd, all_bayes_csv):
+    import os
+    import csv
+    data = get_bayes_latex_dict(qmd)
+    names = list(data.keys())
+    fields = ['ModelName']
+    fields += names
+
+    all_models = []
+    if os.path.isfile(all_bayes_csv) is False:
+        # all_models += ['ModelName']
+        # all_models += names
+        # print("file exists:", os.path.isfile(all_bayes_csv))
+        # print("creating CSV")
+        with open(all_bayes_csv, 'a+') as bayes_csv:
+            writer = csv.DictWriter(
+                bayes_csv,
+                fieldnames=fields
+            )
+            writer.writeheader()
+    else:
+        # print("file exists:", os.path.isfile(all_bayes_csv))
+        current_csv = csv.DictReader(open(all_bayes_csv))
+        current_fieldnames = current_csv.fieldnames
+        new_models = list(
+            set(fields) - set(current_fieldnames)
+        )
+
+        if len(new_models) > 0:
+
+            import pandas
+            csv_input = pandas.read_csv(
+                all_bayes_csv,
+                index_col='ModelName'
+            )
+            a = list(csv_input.keys())
+            # print("pandas says existing models are:\n", a)
+            empty_list = [np.NaN] * len(list(csv_input[a[0]].values))
+
+            for new_col in new_models:
+                csv_input[new_col] = empty_list
+            # print("writing new pandas CSV: ", csv_input)
+            csv_input.to_csv(all_bayes_csv)
+
+    with open(all_bayes_csv) as bayes_csv:
+        reader = csv.DictReader(
+            bayes_csv,
+        )
+        fields = reader.fieldnames
+
+    with open(all_bayes_csv, 'a') as bayes_csv:
+        writer = csv.DictWriter(
+            bayes_csv,
+            fieldnames=fields,
+        )
+        for f in names:
+            single_model_dict = data[f]
+            single_model_dict['ModelName'] = f
+            writer.writerow(single_model_dict)
+
+
+def get_bayes_latex_dict(qmd):
+    latex_dict = {}
+    # print("get bayes latex dict")
+
+    latex_write_file = open(
+        # str(qmd.results_directory + 'LatexMapping.txt'),
+        qmd.latex_name_map_file_path,
+        'a+'
+    )
+    for i in list(qmd.all_bayes_factors.keys()):
+        mod = qmd.model_name_id_map[i]
+        latex_name = qmd.get_model_storage_instance_by_id(i).model_name_latex
+        mapping = (mod, latex_name)
+        print(mapping, file=latex_write_file)
+
+    for i in list(qmd.all_bayes_factors.keys()):
+        mod_a = qmd.get_model_storage_instance_by_id(i).model_name_latex
+        latex_dict[mod_a] = {}
+        for j in list(qmd.all_bayes_factors[i].keys()):
+            mod_b = qmd.get_model_storage_instance_by_id(j).model_name_latex
+            latex_dict[mod_a][mod_b] = qmd.all_bayes_factors[i][j][-1]
+    return latex_dict
+
 
 def plot_scores(
     scores,
@@ -38,9 +124,6 @@ def plot_scores(
 ):
     plt.clf()
     models = list(scores.keys())
-
-    # print("[AnalyseMultiple - plot_scores] growth classes:",growth_classes )
-    # print("[AnalyseMultiple - plot_scores] unique_growth_classes:",unique_growth_classes )
     latex_true_op = unique_growth_classes[growth_generator].latex_name(
         name=true_model
     )
@@ -49,22 +132,6 @@ def plot_scores(
         growth_classes[model].latex_name(model)
         for model in models
     ]
-    print(
-        "[multiQMD plots]coefficients_of_determination:",
-        coefficients_of_determination)
-    print("[multiQMD plots]f scores:", f_scores)
-
-    # coefficient_determination_latex_name = {}
-    # f_score_latex_name = {}
-    # for mod in list(coefficients_of_determination.keys()):
-    #     coefficient_determination_latex_name[
-    #         growth_classes[mod].latex_name(mod)
-    #     ] = coefficients_of_determination[mod]
-
-    #     f_score_latex_name[
-    #         growth_classes[mod].latex_name(mod)
-    #     ] = f_scores[mod]
-
     coeff_of_determination = [
         coefficient_determination_latex_name[latex_mod]
         for latex_mod in latex_model_names
@@ -128,17 +195,6 @@ def plot_scores(
         'true_model': latex_true_op,
         'scores': latex_scores_dict
     }
-    print("[Analyse] results_collection", results_collection)
-
-    # if save_results_collection is not None:
-    #     print("[Analyse] save results collection:", save_results_collection)
-    #     pickle.dump(
-    #         results_collection,
-    #         open(
-    #             save_results_collection,
-    #             'wb'
-    #         )
-    #     )
     if collective_analysis_pickle_file is not None:
         # no longer used/accessed by this function
         if os.path.isfile(collective_analysis_pickle_file) is False:

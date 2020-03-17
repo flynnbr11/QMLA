@@ -15,7 +15,8 @@ plt.switch_backend('agg')
 __all__ = [
     'average_parameters_across_instances',
     'average_parameter_estimates',
-    'cluster_results_and_plot'
+    'cluster_results_and_plot',
+    'plot_parameter_estimates'
 ]
 
 def rank_models(n): 
@@ -787,3 +788,146 @@ def replot_expectation_values(
         plt.savefig(save_to_file, bbox_inches='tight')
     else:
         plt.show()
+
+
+def plot_parameter_estimates(
+    qmd,
+    model_id,
+    use_experimental_data=False,
+    save_to_file=None
+):
+    from matplotlib import cm
+    mod = qmd.get_model_storage_instance_by_id(model_id)
+    name = mod.model_name
+
+    if name not in list(qmd.model_name_id_map.values()):
+        print(
+            "True model ", name,
+            "not in studied models",
+            list(qmd.model_name_id_map.values())
+        )
+        return False
+    terms = database_framework.get_constituent_names_from_name(name)
+    num_terms = len(terms)
+
+    term_positions = {}
+    param_estimate_by_term = {}
+    std_devs = {}
+
+    for t in range(num_terms):
+        term_positions[terms[t]] = t
+        term = terms[t]
+        param_position = term_positions[term]
+        param_estimates = mod.track_mean_params[:, param_position]
+        #std_dev = mod.cov_matrix[param_position,param_position]
+        std_dev = mod.track_covariance_matrices[:, param_position, param_position]
+        param_estimate_by_term[term] = param_estimates
+        std_devs[term] = std_dev
+
+    cm_subsection = np.linspace(0, 0.8, num_terms)
+    colours = [cm.magma(x) for x in cm_subsection]
+#    colours = [ cm.Set1(x) for x in cm_subsection ]
+
+#    colours = ['b','r','g','orange', 'pink', 'grey']
+
+    # TODO use color map as list
+    # num_epochs = qmd.num_experiments
+    num_epochs = mod.num_experiments
+#    fig = plt.figure()
+#    ax = plt.subplot(111)
+
+    # ncols=3
+    # nrows=3 # TODO  -- make safe
+    ncols = int(np.ceil(np.sqrt(num_terms)))
+    nrows = int(np.ceil(num_terms / ncols))
+
+#    nrows=int(np.ceil( num_terms/ncols ))
+
+    fig, axes = plt.subplots(
+        figsize=(10, 7),
+        nrows=nrows,
+        ncols=ncols,
+        squeeze=False
+    )
+    row = 0
+    col = 0
+    axes_so_far = 0
+    i = 0
+#    for term in list(param_estimate_by_term.keys()):
+    for term in terms:
+        ax = axes[row, col]
+        colour = colours[i % len(colours)]
+        i += 1
+        try:
+            if use_experimental_data == False:
+                y_true = qmd.true_param_dict[term]
+                # true_term_latex = database_framework.latex_name_ising(term)
+                true_term_latex = qmd.growth_class.latex_name(
+                    name=term
+                )
+                true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
+
+                ax.axhline(
+                    y_true,
+                    label=str(true_term_latex),
+                    color='red',
+                    linestyle='--'
+                )
+        except BaseException:
+            pass
+        y = np.array(param_estimate_by_term[term])
+        s = np.array(std_devs[term])
+        x = range(1, 1 + len(param_estimate_by_term[term]))
+        latex_term = mod.growth_class.latex_name(term)
+        latex_term = latex_term[:-1] + r'^{\prime}' + '$'
+        # print("[pQMD] latex_term:", latex_term)
+        ax.scatter(
+            x,
+            y,
+            s=max(1, 50 / num_epochs),
+            label=str(latex_term),
+            color=colour
+        )
+#        ax.set_yscale('symlog')
+        # print("[pQMD] scatter done" )
+        ax.fill_between(
+            x,
+            y + s,
+            y - s,
+            alpha=0.2,
+            facecolor='green',
+            # label='$\sigma$'
+
+        )
+        # print("[pQMD] fill between done")
+        ax.legend(loc=1, fontsize=20)
+        axes_so_far += 1
+        col += 1
+        if col == ncols:
+            col = 0
+            row += 1
+        # ax.set_title(str(latex_term))
+        # print("[pQMD] title set")
+
+#    ax = plt.subplot(111)
+    plt.xlabel('Epoch', fontsize=20)
+    plt.ylabel('Parameter Estimate', fontsize=15)
+    # plt.legend(bbox_to_anchor=(1.1, 1.05))
+    # # TODO put title at top; Epoch centred bottom; Estimate centre y-axis
+    # plt.title(str("Parameter estimation for model " +
+    #     database_framework.latex_name_ising(name)+" ["+str(qmd.num_particles)
+    #     +" prt;" + str(qmd.num_experiments) + "exp]"
+    #     )
+    # )
+
+    if save_to_file is not None:
+        print(
+            "[plot_parameter_estimates] saving to file",
+            save_to_file,
+            "type:", type(save_to_file)
+        )
+        plt.savefig(
+            save_to_file,
+            bbox_inches='tight'
+        )
+    # print("[pQMD] complete")

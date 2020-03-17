@@ -16,6 +16,12 @@ import networkx as nx
 
 import qmla.get_growth_rule
 
+__all__ = [
+    'plot_tree_multiple_instances', 
+    'plot_qmla_single_instance_tree'
+]
+
+
 def plot_tree_multiple_instances(
     results_csv,
     all_bayes_csv,
@@ -45,7 +51,7 @@ def plot_tree_multiple_instances(
     for mod in mods:
         winning_count[mod] = mods.count(mod)
 
-    cumulativeQMDTreePlot(
+    cumulative_qmla_tree_plot(
         cumulative_csv=all_bayes_csv,
         wins_per_mod=winning_count,
         latex_mapping_file=latex_mapping_file,
@@ -58,13 +64,12 @@ def plot_tree_multiple_instances(
     )
 
 
-def multiQMDBayes(
+def get_averages_from_combined_results(
     all_bayes_csv,
     growth_generator=None
 ):
     import csv
     import pandas
-    # cumulative_bayes = pandas.DataFrame.from_csv(all_bayes_csv)
     cumulative_bayes = pandas.read_csv(all_bayes_csv)
     names = list(cumulative_bayes.keys())
 
@@ -100,7 +105,7 @@ def multiQMDBayes(
     return means_dict, medians_dict, count_bayes
 
 
-def cumulativeQMDTreePlot(
+def cumulative_qmla_tree_plot(
     cumulative_csv,
     wins_per_mod,
     latex_mapping_file,
@@ -115,20 +120,20 @@ def cumulativeQMDTreePlot(
     import networkx as nx
     import copy
     import csv
-    means, medians, counts = multiQMDBayes(
+    means, medians, counts = get_averages_from_combined_results(
         cumulative_csv,
         growth_generator=growth_generator
     )
     if avg == 'means':
-        # print("[cumulativeQMDTreePlot] USING MEANS")
+        # print("[cumulative_qmla_tree_plot] USING MEANS")
         # print(means)
         bayes_factors = means  # medians
     elif avg == 'medians':
-        # print("[cumulativeQMDTreePlot] USING MEDIANS")
+        # print("[cumulative_qmla_tree_plot] USING MEDIANS")
         # print(medians)
         bayes_factors = medians
 
-    print("[cumulativeQMDTreePlot] COUNTS", counts)
+    print("[cumulative_qmla_tree_plot] COUNTS", counts)
 
     max_bayes_factor = max([max(bayes_factors[k].values())
                             for k in bayes_factors.keys()])
@@ -199,7 +204,7 @@ def cumulativeQMDTreePlot(
             G.nodes[m]['status'] = min_colour
             G.nodes[m]['info'] = 0
 
-    print("[cumulativeQMDTreePlot] nodes added.")
+    print("[cumulative_qmla_tree_plot] nodes added.")
     max_num_mods_any_branch = max(list(branch_mod_count.values()))
     # get the cordinates to display this model's node at
 
@@ -219,7 +224,7 @@ def cumulativeQMDTreePlot(
         positions[m] = (x_pos, y_pos)
         G.node[m]['pos'] = (x_pos, y_pos)
 
-    print("[cumulativeQMDTreePlot] node positions added.")
+    print("[cumulative_qmla_tree_plot] node positions added.")
     sorted_positions = sorted(positions.values(), key=lambda x: (x[1], x[0]))
     mod_id = 0
     model_ids_names = {}
@@ -245,8 +250,8 @@ def cumulativeQMDTreePlot(
         high = max_frequency
 
     # frequency_markers = list(np.linspace(0, max_frequency, 4, dtype=int))
-    print("[cumulativeQMDTreePlot] setting edges.")
-    print("[cumulativeQMDTreePlot] modelist:", modlist)
+    print("[cumulative_qmla_tree_plot] setting edges.")
+    print("[cumulative_qmla_tree_plot] modelist:", modlist)
     # only_adjacent_branches = False
 
     even_arrow_width = True
@@ -328,7 +333,7 @@ def cumulativeQMDTreePlot(
                             )
                         except BaseException:
                             print(
-                                "[plotQMD - cumulativeQMDTreePlot] failed to add edge", pairing
+                                "[plotQMD - cumulative_qmla_tree_plot] failed to add edge", pairing
                             )
                             raise
 
@@ -337,7 +342,7 @@ def cumulativeQMDTreePlot(
             else:
                 print("not adding edge {}/{}".format(a, b))
 
-    print("[cumulativeQMDTreePlot] edges added.")
+    print("[cumulative_qmla_tree_plot] edges added.")
     print("edge freqs:", edge_frequencies)
     max_freq = max(edge_frequencies)
     # print("freq markers:", frequency_markers)
@@ -358,7 +363,7 @@ def cumulativeQMDTreePlot(
     new_cmap = truncate_colormap(cmap, 0.35, 1.0)
     # new_cmap = cmap
 
-    plotTreeDiagram(
+    plot_qmla_tree(
         G,
         n_cmap=plt.cm.pink_r,
         e_cmap=new_cmap,
@@ -380,7 +385,7 @@ def cumulativeQMDTreePlot(
         plt.savefig(save_to_file, bbox_inches='tight')
     return G, edges, edge_f
 
-def plotTreeDiagram(
+def plot_qmla_tree(
     G,
     n_cmap,
     e_cmap,
@@ -1057,3 +1062,140 @@ def available_position_list(max_this_branch, max_any_branch):
 
     return available_positions
 
+#######################
+# single QMLA instance tree
+#######################
+
+
+def qmdclassTOnxobj(
+    qmd,
+    modlist=None,
+    directed=True,
+    only_adjacent_branches=True
+):
+
+    if directed:
+        G = nx.DiGraph()
+    else:
+        G = nx.Graph()
+
+    positions = {}
+    branch_x_filled = {}
+    branch_mod_count = {}
+
+    max_branch_id = qmd.branch_highest_id
+    max_mod_id = qmd.highest_model_id
+    if modlist is None:
+        modlist = range(max_mod_id)
+    for i in range(max_branch_id + 1):
+        branch_x_filled[i] = 0
+        branch_mod_count[i] = 0
+
+    for i in modlist:
+        mod = qmd.get_model_storage_instance_by_id(i)
+        name = mod.model_name
+        branch = qmd.get_model_data_by_field(name=name, field='branch_id')
+        branch_mod_count[branch] += 1
+        latex_term = mod.model_name_latex
+
+        G.add_node(i)
+        G.node[i]['label'] = latex_term
+        G.node[i]['status'] = 0.2
+        G.node[i]['info'] = 'Non-winner'
+
+    # Set x-coordinate for each node based on how many nodes
+    # are on that branch (y-coordinate)
+    most_models_per_branch = max(branch_mod_count.values())
+    for i in modlist:
+        mod = qmd.get_model_storage_instance_by_id(i)
+        name = mod.model_name
+        branch = qmd.get_model_data_by_field(name=name, field='branch_id')
+        num_models_this_branch = branch_mod_count[branch]
+        pos_list = available_position_list(
+            num_models_this_branch,
+            most_models_per_branch
+        )
+        branch_filled_so_far = branch_x_filled[branch]
+        branch_x_filled[branch] += 1
+
+        x_pos = pos_list[branch_filled_so_far]
+        y_pos = branch
+        positions[i] = (x_pos, y_pos)
+        G.node[i]['pos'] = (x_pos, y_pos)
+
+    # set node colour based on whether that model won a branch
+    for b in list(qmd.branch_champions.values()):
+        if b in modlist:
+            G.node[b]['status'] = 0.45
+            G.node[b]['info'] = 'Branch Champion'
+
+    G.node[qmd.champion_model_id]['status'] = 0.9
+    G.node[qmd.champion_model_id]['info'] = 'Overall Champion'
+
+    edges = []
+    for a in modlist:
+        for b in modlist:
+            is_adj = adjacent_branch_test(qmd, a, b)
+            if is_adj or not only_adjacent_branches:
+                if a != b:
+                    unique_pair = database_framework.unique_model_pair_identifier(a, b)
+                    if ((unique_pair not in edges)
+                        and (unique_pair in qmd.bayes_factor_pair_computed)
+                        ):
+                        edges.append(unique_pair)
+                        vs = [int(stringa) for stringa
+                              in unique_pair.split(',')
+                              ]
+
+                        thisweight = np.log10(
+                            qmd.all_bayes_factors[float(vs[0])][float(vs[1])][-1]
+                        )
+
+                        if thisweight < 0:
+                            # flip negative valued edges and move
+                            # them to positive
+                            thisweight = - thisweight
+                            flipped = True
+                            G.add_edge(vs[1], vs[0],
+                                       weight=thisweight, flipped=flipped,
+                                       winner=b,
+                                       loser=a,
+                                       adj=is_adj
+                                       )
+                        else:
+                            flipped = False
+                            G.add_edge(vs[0], vs[1],
+                                       weight=thisweight, flipped=flipped,
+                                       winner=a,
+                                       loser=b,
+                                       adj=is_adj
+                                       )
+    return G
+
+
+def plot_qmla_single_instance_tree(
+    qmd,
+    save_to_file=None,
+    only_adjacent_branches=True,
+    id_labels=True,
+    modlist=None
+):
+
+    G = qmdclassTOnxobj(
+        qmd,
+        only_adjacent_branches=only_adjacent_branches,
+        modlist=modlist)
+
+    arr = np.linspace(0, 50, 100).reshape((10, 10))
+    cmap = plt.get_cmap('viridis')
+    new_cmap = truncate_colormap(cmap, 0.35, 1.0)
+
+    plotTreeDiagram(
+        G,
+        n_cmap=plt.cm.pink_r,
+        e_cmap=new_cmap,
+        arrow_size=0.02,
+        # arrow_size = 8.0,
+        nonadj_alpha=0.1, e_alphas=[],
+        label_padding=0.4, pathstyle="curve",
+        id_labels=id_labels, save_to_file=save_to_file)

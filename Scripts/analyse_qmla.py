@@ -13,17 +13,15 @@ sys.path.append(
         os.path.join(os.path.dirname( __file__ ), '..')
     )
 )
-
 import qmla
 import qmla.analysis
-# import ..qmla
-# 
+
 parser = argparse.ArgumentParser(
     description='Pass variables for QMLA.'
 )
 
 # Add parser arguments, ie command line arguments for QMD
-# QMD parameters -- fundamentals such as number of particles etc
+# QMLA parameters -- fundamentals such as number of particles etc
 parser.add_argument(
     '-dir', '--results_directory',
     help="Directory where results of multiple QMD are held.",
@@ -64,12 +62,6 @@ parser.add_argument(
     type=int,
     default=0
 )
-# parser.add_argument(
-#     '-data', '--dataset',
-#     help="Which dataset QMD was run using..",
-#     type=str,
-#     default='NVB_dataset'
-# )
 
 parser.add_argument(
     '-params', '--true_model_terms_params',
@@ -109,13 +101,6 @@ parser.add_argument(
     default=1
 )
 
-# parser.add_argument(
-#   '-meas', '--measurement_type',
-#   help='Which measurement type to use. Must be written in Evo.py.',
-#   type=str,
-#   default='full_access'
-# )
-
 parser.add_argument(
     '-latex', '--latex_mapping_file',
     help='File path to save tuples which give model \
@@ -129,15 +114,9 @@ parser.add_argument(
     type=str,
     default=None
 )
-# parser.add_argument(
-#     '-plus', '--force_plus_probe',
-#     help="Whether to enforce plots to use |+>^n as probe.",
-#     type=int,
-#     default=0
-# )
-
 
 arguments = parser.parse_args()
+
 directory_to_analyse = arguments.results_directory
 log_file = arguments.log_file
 all_bayes_csv = arguments.bayes_csv
@@ -207,7 +186,7 @@ else:
     results_file_name_start = 'results'
     plot_desc = ''
 
-# do preliminary analysis - 
+# do preliminary analysis 
 os.chdir(directory_to_analyse)
 pickled_files = []
 for file in os.listdir(directory_to_analyse):
@@ -335,7 +314,7 @@ if gather_summary_results:
         except BaseException:
             print("ANALYSIS FAIURE: number of occurences for each model.")
             raise
-        
+
 #######################################
 # Results/Outputs
 ## Dynamics
@@ -661,11 +640,9 @@ try:
 
 except ValueError:
     pass
-    raise
 except Exception as exc:
     print("Error plotting multi QMLA tree.")
     print(exc)
-    raise
     pass
 
 except NameError:
@@ -674,7 +651,7 @@ except NameError:
         one instance of QMD was performed. All other plots generated \
         without error."
     )
-    raise
+    pass
 
 except ZeroDivisionError:
     print(
@@ -682,6 +659,6 @@ except ZeroDivisionError:
         one instance of QMD was performed. All other plots generated \
         without error."
     )
-    raise
+    pass
 except BaseException:
-    raise
+    pass
