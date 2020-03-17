@@ -2196,12 +2196,13 @@ def generational_analysis(combined_results, save_directory=None):
         tight_layout=True
     )
     gs = GridSpec(
-        3,
+        4,
         1,
     )
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[1, 0])
     ax3 = fig.add_subplot(gs[2, 0])
+    ax4 = fig.add_subplot(gs[3, 0])
     
     sns.boxplot(
         data = generational_scores, 
@@ -2225,17 +2226,29 @@ def generational_analysis(combined_results, save_directory=None):
     ax1.set_ylim(0,1)
     ax1.axhline(0.5, ls='--',color='black')
 
+    sns.pointplot(
+        data = generational_scores, 
+        x = 'gen',
+        y = 'f_score',
+#         showfliers=False, 
+        hue='instance',
+        ax = ax2, 
+    )
+    ax2.set_title("F score individual instances")
+    ax2.axhline(0.5, ls='--', color='black')
+    ax2.set_ylim(0,1)
+
     sns.boxplot(
         data = generational_scores, 
         x = 'gen',
         y = 'log_likelihood',
         showfliers=False, 
-        ax = ax2, 
+        ax = ax3, 
     )
 
-    ax2.set_title('Log likelihood V generation')
-    ax2.set_ylabel('Log likelihood')
-    ax2.set_xlabel('Generation')
+    ax3.set_title('Log likelihood V generation')
+    ax3.set_ylabel('Log likelihood')
+    ax3.set_xlabel('Generation')
 
     sns.pointplot(
         data = generational_scores, 
@@ -2243,12 +2256,12 @@ def generational_analysis(combined_results, save_directory=None):
         y = 'log_likelihood',
 #         showfliers=False, 
         hue='instance',
-        ax = ax3, 
+        ax = ax4, 
     )
 
-    ax3.set_title('Log likelihood V generation')
-    ax3.set_ylabel('Log likelihood')
-    ax3.set_xlabel('Generation')
+    ax4.set_title('Log likelihood individual instances')
+    ax4.set_ylabel('Log likelihood')
+    ax4.set_xlabel('Generation')
 
     if save_directory is not None:
         plt.savefig(
