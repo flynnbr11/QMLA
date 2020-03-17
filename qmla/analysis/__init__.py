@@ -7,3 +7,4 @@ from qmla.analysis.collect_results import *
 from qmla.analysis.outputs import *
 from qmla.analysis.internals import *
 from qmla.analysis.performance import *
+from qmla.analysis.tree_plot import *

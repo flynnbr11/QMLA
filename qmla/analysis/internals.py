@@ -8,12 +8,15 @@ from matplotlib.gridspec import GridSpec
 from matplotlib import cm
 import seaborn as sns
 
+import qmla.get_growth_rule
+
 __all__ = [
     'generational_analysis',
     'r_sqaured_average',
     'average_quadratic_losses',
     'all_times_learned_histogram',
-    'volume_average'
+    'volume_average',
+    'plot_bayes_factors_v_true_model'
 ]
 
 
@@ -512,3 +515,82 @@ def volume_average(
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
+
+
+def plot_bayes_factors_v_true_model(
+    results_csv_path,
+    correct_mod="xTiPPyTiPPzTiPPxTxPPyTyPPzTz",
+    growth_generator=None,
+    save_to_file=None
+):
+
+    from matplotlib import cm
+    # TODO saved fig is cut off on edges and don't have axes titles.
+
+    # correct_mod = database_framework.latex_name_ising(correct_mod)
+
+    growth_class = qmla.get_growth_rule.get_growth_generator_class(
+        growth_generation_rule=growth_generator
+    )
+
+    correct_mod = growth_class.latex_name(
+        name=correct_mod
+    )
+    results_csv = os.path.abspath(results_csv_path)
+    # qmd_res = pd.DataFrame.from_csv(results_csv)
+    qmd_res = pd.read_csv(results_csv)
+
+    mods = list(
+        set(list(
+            qmd_res.index
+        ))
+    )
+    if correct_mod not in mods:
+        return False
+
+    mods.pop(mods.index(correct_mod))
+    othermods = mods
+    correct_subDB = qmd_res.ix[correct_mod]
+    all_BFs = []
+
+    for competitor in othermods:
+        BF_values = np.array((correct_subDB[competitor]))
+        BF_values = BF_values[~np.isnan(BF_values)]
+
+        all_BFs.append(BF_values)
+    num_models = len(othermods)
+    n_bins = 30
+    # nrows=5
+    # ncols=3
+    ncols = int(np.ceil(np.sqrt(num_models)))
+    nrows = int(np.ceil(num_models / ncols))
+
+    fig, axes = plt.subplots(figsize=(20, 10), nrows=nrows, ncols=ncols)
+    cm_subsection = np.linspace(0.1, 0.9, len(all_BFs))
+    colors = [cm.viridis(x) for x in cm_subsection]
+
+    for row in range(nrows):
+        for col in range(ncols):
+            # Make a multiple-histogram of data-sets with different length.
+            idx = row * ncols + col
+            if idx < len(all_BFs):
+                hist, bins, _ = axes[row, col].hist(
+                    np.log10(all_BFs[idx]), n_bins, color=colors[idx], label=othermods[idx])
+
+                try:
+                    maxBF = 1.1 * np.max(np.abs(np.log10(all_BFs[idx])))
+                except BaseException:
+                    maxBF = 10
+                axes[row, col].legend()
+                axes[row, col].set_xlim(-maxBF, maxBF)
+
+
+#    fig.text(0.07, 0.5, 'Occurences', va='center', rotation='vertical')
+#    fig.text(0.5, 0.07, '$log_{10}$ Bayes Factor', ha='center')
+
+    plt.title("Bayes factors of true model.")
+    if save_to_file is not None:
+        print("Saving BF V true model to {}".format(save_to_file))
+        fig.savefig(save_to_file, bbox_inches='tight')
+    else: 
+        print("BF V true model -- save to file is None")

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.gridspec import GridSpec
 
-from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas, cumulativeQMDTreePlot
+from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas
 import qmla.get_growth_rule as get_growth_rule
 import qmla.model_naming as model_naming
 import qmla.database_framework as database_framework
@@ -19,21 +19,6 @@ plt.switch_backend('agg')
 def flatten(l): 
     # flatten list of lists
     return [item for sublist in l for item in sublist]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 def get_model_scores(
     directory_name,
@@ -216,46 +201,6 @@ def get_entropy(
 
 
 
-def plot_tree_multi_QMD(
-    results_csv,
-    all_bayes_csv,
-    latex_mapping_file,
-    avg_type='medians',
-    growth_generator=None,
-    entropy=None,
-    inf_gain=None,
-    save_to_file=None
-):
-    try:
-        # qmd_res = pd.DataFrame.from_csv(
-        qmd_res = pd.read_csv(
-            results_csv,
-            index_col='LatexName'
-        )
-    except ValueError:
-        print(
-            "Latex Name not in results CSV keys.",
-            "There aren't enough data for a tree of multiple QMD."
-            "This may be because this run was for QHL rather than QMD."
-        )
-        raise
-
-    mods = list(qmd_res.index)
-    winning_count = {}
-    for mod in mods:
-        winning_count[mod] = mods.count(mod)
-
-    cumulativeQMDTreePlot(
-        cumulative_csv=all_bayes_csv,
-        wins_per_mod=winning_count,
-        latex_mapping_file=latex_mapping_file,
-        growth_generator=growth_generator,
-        only_adjacent_branches=True,
-        avg=avg_type,
-        entropy=entropy,
-        inf_gain=inf_gain,
-        save_to_file=save_to_file
-    )
 
 
 

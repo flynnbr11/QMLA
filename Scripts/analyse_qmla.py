@@ -335,6 +335,35 @@ if gather_summary_results:
         except BaseException:
             print("ANALYSIS FAIURE: number of occurences for each model.")
             raise
+        
+#######################################
+# Results/Outputs
+## Dynamics
+#######################################
+try:
+    qmla.analysis.plot_dynamics_multiple_models(  # average expected values
+        directory_name=directory_to_analyse,
+        dataset=dataset,
+        results_path=results_csv,
+        use_experimental_data=exp_data,
+        results_file_name_start=results_file_name_start,
+        true_expectation_value_path=true_expec_path,
+        growth_generator=growth_generator,
+        unique_growth_classes=unique_growth_classes,
+        top_number_models=arguments.top_number_models,
+        probes_plot_file=probes_plot_file,
+        collective_analysis_pickle_file=results_collection_file,
+        save_to_file=str(
+            directory_to_analyse +
+            plot_desc +
+            'expec_vals.png'
+        )
+    )
+except:
+    print("ANALYSIS FAIURE: dynamics.")
+    raise
+
+#####
 
 #######################################
 # Parameter analysis
@@ -563,6 +592,22 @@ except:
     print("ANALYSIS FAILURE: times learned upon.")
     raise
 
+# Bayes factors Vs true model
+try:
+    qmla.analysis.plot_bayes_factors_v_true_model(
+        results_csv_path=all_bayes_csv,
+        correct_mod=true_model,
+        growth_generator=growth_generator,
+        save_to_file=os.path.join(
+            directory_to_analyse,
+            'bayes_comparisons_true_model.png'
+        )
+    )
+except:
+    print("ANALYSIS FAILURE: Bayes factors v true models.")
+    raise
+
+
 #######################################
 # Growth rule specific 
 ## genetic algorithm ananlytics
@@ -576,7 +621,8 @@ try:
     )
 except:
     print("ANALYSIS FAIURE: Model generation rate.")
-    raise
+    pass
+    # raise
 
 
 try:
@@ -586,126 +632,56 @@ try:
     )
 except:
     print("ANALYSIS FAIURE: genetic algorithm fitness measures.")
-    raise
+    # raise
+    pass
 
 
-#######################################
-# Results/Outputs
-## Dynamics
+##################################
+# Tree representing all QMLA instances
 #######################################
 try:
-    qmla.analysis.plot_dynamics_multiple_models(  # average expected values
-        directory_name=directory_to_analyse,
-        dataset=dataset,
-        results_path=results_csv,
-        use_experimental_data=exp_data,
-        results_file_name_start=results_file_name_start,
-        true_expectation_value_path=true_expec_path,
-        growth_generator=growth_generator,
-        unique_growth_classes=unique_growth_classes,
-        top_number_models=arguments.top_number_models,
-        probes_plot_file=probes_plot_file,
-        collective_analysis_pickle_file=results_collection_file,
-        save_to_file=str(
-            directory_to_analyse +
-            plot_desc +
-            'expec_vals.png'
-        )
+    tree_plot_log = str(directory_to_analyse + 'tree_plot_log.txt')
+    sys.stdout = open(
+        tree_plot_log, 'w'
     )
-except:
-    print("ANALYSIS FAIURE: dynamics.")
+
+    qmla.analysis.plot_tree_multiple_instances(
+        results_csv=results_csv,
+        latex_mapping_file=latex_mapping_file,
+        avg_type='medians',
+        all_bayes_csv=all_bayes_csv,
+        growth_generator=growth_generator,
+        entropy=0,
+        inf_gain=0,
+        save_to_file='DAG_multi_qmla.png'
+    )
+
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
+
+except ValueError:
+    pass
+    raise
+except Exception as exc:
+    print("Error plotting multi QMLA tree.")
+    print(exc)
+    raise
+    pass
+
+except NameError:
+    print(
+        "Can not plot multiQMD tree -- this might be because only \
+        one instance of QMD was performed. All other plots generated \
+        without error."
+    )
     raise
 
-#######################################
-# Below here  - to be sorted
-#######################################
-
-
-if further_qhl_mode == False:
-    print("FURTHER QHL=FALSE. PLOTTING STUFF")
-    
-    entropy = inf_gain = 0.0
-    print("[AnalyseMultipleQMD] f scores before plot scores:", f_scores)
-
-    try:
-        qmla.analysis.plotTrueModelBayesFactors_IsingRotationTerms(
-            results_csv_path=all_bayes_csv,
-            # correct_mod='xTiPPyTiPPzTiPPxTxPPyTyPPzTz',
-            correct_mod=true_model,
-            growth_generator=growth_generator,
-            save_to_file=str(
-                directory_to_analyse +
-                'bayes_comparisons_true_model.png'
-            )
-        )
-    except BaseException:
-        print("Could not plot histogram of Bayes factors for True model.")
-        # raise
-
-
-    valid_growth_rules_for_multiQMD_tree_plot = [
-        'two_qubit_ising_rotation',
-        'two_qubit_ising_rotation_hyperfine',
-        'two_qubit_ising_rotation_hyperfine_transverse',
-        'hyperfine_like'
-    ]
-
-    try:
-        # if growth_generator in valid_growth_rules_for_multiQMD_tree_plot:
-
-        tree_plot_log = str(directory_to_analyse + 'tree_plot_log.txt')
-        sys.stdout = open(
-            tree_plot_log, 'w'
-        )
-
-        # plot_tree_multi_QMD(
-        #     results_csv = results_csv,
-        #     latex_mapping_file=latex_mapping_file,
-        #     avg_type='means',
-        #     all_bayes_csv = all_bayes_csv,
-        #     growth_generator=growth_generator,
-        #     entropy = entropy,
-        #     inf_gain = inf_gain,
-        #     save_to_file='multiQMD_tree_mean_bayes_factors.png'
-        # )
-
-        qmla.analysis.plot_tree_multi_QMD(
-            results_csv=results_csv,
-            latex_mapping_file=latex_mapping_file,
-            avg_type='medians',
-            all_bayes_csv=all_bayes_csv,
-            growth_generator=growth_generator,
-            entropy=entropy,
-            inf_gain=inf_gain,
-            save_to_file='multiQMD_tree_median_bayes_factors.png'
-        )
-
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
-
-    # except ValueError:
-        pass
-    except Exception as exc:
-        print("Error plotting multi QMD tree.")
-        print(exc)
-        pass
-
-    except NameError:
-        print(
-            "Can not plot multiQMD tree -- this might be because only \
-            one instance of QMD was performed. All other plots generated \
-            without error."
-        )
-        raise
-
-    except ZeroDivisionError:
-        print(
-            "Can not plot multiQMD tree -- this might be because only \
-            one instance of QMD was performed. All other plots generated \
-            without error."
-        )
-        raise
-    except BaseException:
-        # print("[AnalyseMultipleQMD] Could not plot Multi QMD tree.")
-        raise
-
+except ZeroDivisionError:
+    print(
+        "Can not plot multiQMD tree -- this might be because only \
+        one instance of QMD was performed. All other plots generated \
+        without error."
+    )
+    raise
+except BaseException:
+    raise
