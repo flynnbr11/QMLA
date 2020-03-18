@@ -52,7 +52,7 @@ class IsingProbabilistic(
         self.generation_DAG = 1
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10
-        self.num_probes = 100
+        
         self.max_num_models_by_shape = {
             'other': 3
         }
@@ -80,6 +80,7 @@ class IsingPredetermined(
             **kwargs
         )
         # keep these fixed to enforce 1d Ising chain up to 7 sites
+        self.num_probes = 25
         self.lattice_dimension = 1
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
