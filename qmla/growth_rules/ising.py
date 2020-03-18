@@ -80,7 +80,7 @@ class IsingPredetermined(
             **kwargs
         )
         # keep these fixed to enforce 1d Ising chain up to 7 sites
-        self.num_probes = 25
+        self.num_probes = 5
         self.lattice_dimension = 1
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
