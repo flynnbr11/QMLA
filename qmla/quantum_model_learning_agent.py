@@ -269,11 +269,17 @@ class QuantumModelLearningAgent():
 
             self.branch_champs_by_dimension[gen] = {}
             initial_models_this_gen = self.growth_rules_initial_models[gen]
+            if self.qhl_mode:
+                initial_models_this_gen = [growth_class_gen.true_model]
+            elif self.qhl_mode_multiple_models:
+                initial_models_this_gen = growth_class_gen.qhl_models
+
             self.log_print(
                 [
-                    "initialising generator {} with models: {}".format(
+                    "Initialising growth rule {} with models: {}".format(
                         gen,
-                        initial_models_this_gen)
+                        initial_models_this_gen
+                    )
                 ]
             )
             self.branch_initial_models.extend(initial_models_this_gen)
@@ -646,7 +652,6 @@ class QuantumModelLearningAgent():
                 host_name=self.redis_host_name,
                 port_number=self.redis_port_number
             )
-
         for mod in list(self.model_initial_ids.keys()):
             mod_id = self.model_initial_ids[mod]
             if database_framework.alph(mod) == self.true_model_name:

@@ -780,14 +780,6 @@ class ModelInstanceForLearning():
                 exp,
                 repeat=1
             )
-            self.log_print(
-                [
-                    "Updating evaluation updater for time {} with datum {}".format(
-                    times[i], 
-                    datum
-                    )
-                ]
-            )
             evaluation_updater.update(datum, exp)
 
         log_likelihood = evaluation_updater.log_total_likelihood

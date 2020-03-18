@@ -312,7 +312,7 @@ if gather_summary_results:
                 )
             )
         except BaseException:
-            print("ANALYSIS FAIURE: number of occurences for each model.")
+            print("ANALYSIS FAILURE: number of occurences for each model.")
             raise
 
 #######################################
@@ -339,7 +339,7 @@ try:
         )
     )
 except:
-    print("ANALYSIS FAIURE: dynamics.")
+    print("ANALYSIS FAILURE: dynamics.")
     raise
 
 #####
@@ -358,7 +358,7 @@ try:
         )
     )
 except BaseException:
-    print("ANALYSIS FAIURE: finding average parameters across instances.")
+    print("ANALYSIS FAILURE: finding average parameters across instances.")
     raise
 
 try:
@@ -377,7 +377,7 @@ try:
         )
     )
 except:
-    print("ANALYSIS FAIURE: average parameter plots.")
+    print("ANALYSIS FAILURE: average parameter plots.")
     raise
 
 # cluster champion learned parameters.
@@ -397,7 +397,7 @@ try:
             plot_desc + 'clusters_expec_vals.png')
     )
 except BaseException:
-    print("ANALYSIS FAIURE: clustering plots.")
+    print("ANALYSIS FAILURE: clustering plots.")
     raise
 
 
@@ -488,7 +488,7 @@ try:
     )
 except BaseException:
     print("ANALYSIS FAILURE: parameter sweeps.")
-    raise
+    pass
 
 
 #######################################
@@ -504,7 +504,7 @@ try:
         save_directory=directory_to_analyse,
     )
 except:
-    print("ANALYSIS FAIURE: generational analysis.")
+    print("ANALYSIS FAILURE: generational analysis.")
     raise
 
 try:
@@ -521,7 +521,7 @@ try:
     )
 except BaseException:
     print(
-        "ANALYSIS FAIURE: R^2 against epochs.",
+        "ANALYSIS FAILURE: R^2 against epochs.",
         "R^2 at each epoch not stored in QMLA output (method available in QML)."
     )
     pass
@@ -584,7 +584,7 @@ try:
     )
 except:
     print("ANALYSIS FAILURE: Bayes factors v true models.")
-    raise
+    pass
 
 
 #######################################
@@ -599,7 +599,7 @@ try:
         save_directory=directory_to_analyse, 
     )
 except:
-    print("ANALYSIS FAIURE: Model generation rate.")
+    print("ANALYSIS FAILURE: [gentic algorithm] Model generation rate.")
     pass
     # raise
 
@@ -610,7 +610,7 @@ try:
         save_directory = directory_to_analyse, 
     )
 except:
-    print("ANALYSIS FAIURE: genetic algorithm fitness measures.")
+    print("ANALYSIS FAILURE: [genetic algorithm] Fitness measures.")
     # raise
     pass
 
