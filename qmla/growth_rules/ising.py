@@ -52,6 +52,7 @@ class IsingProbabilistic(
         self.generation_DAG = 1
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10
+        self.num_probes = 100
         self.max_num_models_by_shape = {
             'other': 3
         }
