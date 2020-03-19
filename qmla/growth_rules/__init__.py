@@ -4,7 +4,7 @@ from qmla.growth_rules.lindbladian import *
 from qmla.growth_rules.connected_lattice import *
 from qmla.growth_rules.connected_lattice_probabilistic import *
 from qmla.growth_rules.fermi_hubbard import *
-from qmla.growth_rules.genetic import * 
+from qmla.growth_rules.genetic_growth_rule import * 
 from qmla.growth_rules.ising import * 
 from qmla.growth_rules.heisenberg_xyz import * 
 

@@ -17,9 +17,12 @@ from qmla import probe_set_generation
 # from qmla import qmla.database_framework
 import qmla.database_framework
 
+import qmla.growth_rules.genetic_algorithm
+
 __all__ = [
     'Genetic', 
-    'GeneticAlgorithmQMLA'
+    'GeneticTest'
+    # 'GeneticAlgorithmQMLA'
 ]
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]
@@ -76,31 +79,24 @@ class Genetic(
 
         self.mutation_probability = 0.1
 
-        self.genetic_algorithm = GeneticAlgorithmQMLA(
+        self.genetic_algorithm = qmla.growth_rules.genetic_algorithm.GeneticAlgorithmQMLA(
             num_sites=self.num_sites,
+            true_model = self.true_model,
             base_terms=self.base_terms,
             mutation_probability=self.mutation_probability,
             log_file=self.log_file
         )
 
-        self.true_chromosome = self.genetic_algorithm.map_model_to_chromosome(
-            self.true_model
-        )
-        self.true_chromosome_string = self.genetic_algorithm.chromosome_string(
-            self.true_chromosome
-        )
+        self.true_chromosome = self.genetic_algorithm.true_chromosome
+        self.true_chromosome_string = self.genetic_algorithm.true_chromosome_string
+
         self.num_possible_models = 2**len(self.true_chromosome)
 
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
-        # test
-        self.max_spawn_depth = 16
-        self.initial_num_models = 16
         # default test - 32 generations x 16 starters
-        # self.max_spawn_depth = 32
-        # self.initial_num_models = 16
-        # self.max_spawn_depth = 8
-        # self.initial_num_models = 12
+        self.max_spawn_depth = 32
+        self.initial_num_models = 16
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -124,11 +120,11 @@ class Genetic(
             self.num_sites : (self.initial_num_models * self.max_spawn_depth)/10,
             'other': 0
         }
+        self.num_processes_to_parallelise_over = 16
 
         self.max_time_to_consider = 5
         self.min_param = 0.25
         self.max_param = 0.75
-        self.num_processes_to_parallelise_over = 16
 
     def generate_models(
         self,
@@ -146,7 +142,7 @@ class Genetic(
         # print("Model points:", model_points)
         # print("kwargs: ", kwargs)
         self.fitness_at_step[kwargs['spawn_step']] = model_points
-        model_fitnesses = {}
+        model_number_wins = {}
         model_f_scores = {}
         # fitness_by_f_score = {}
         fitness_track = {}
@@ -196,12 +192,12 @@ class Genetic(
         for m in model_ids:
             mod = kwargs['model_names_ids'][m]
             # ratings_by_name[mod] = model_ratings[m]
-            model_fitnesses[mod] = model_points[m]
+            model_number_wins[mod] = model_points[m]
             f_score = self.f_score_model_comparison(
                 test_model = mod, 
             )
             model_f_scores[mod] = f_score
-            fitness_track[mod] = model_fitnesses[mod]/sum_fitnesses
+            fitness_track[mod] = model_number_wins[mod]/sum_fitnesses
             fitness_ratio = ratings_weights[mod]/fitness_track[mod]
             if fitness_track[mod]==0 or ratings_weights[mod] == 0 :
                 fitness_ratio = None 
@@ -263,9 +259,9 @@ class Genetic(
 
         self.log_print(
             [
-                'Generation {} \nModel Fitnesses: {} \nF-scores: {} \Win ratio:{} \nModel Ratings:{} \nRanking: {}'.format(
+                'Generation {} \nModel Win numbers: \n{} \nF-scores: \n{} \nWin ratio:\n{} \nModel Ratings:\n{} \nRanking: \n{}'.format(
                     kwargs['spawn_step'],
-                    model_fitnesses,
+                    model_number_wins,
                     model_f_scores,
                     fitness_track,
                     ratings_by_name, 
@@ -283,7 +279,7 @@ class Genetic(
         # TEST: instead of relative number of wins, use model f score as fitness
         new_models = self.genetic_algorithm.genetic_algorithm_step(
             # model_fitnesses=model_f_scores,
-            # model_fitnesses=model_fitnesses,
+            # model_fitnesses=model_number_wins,
             # model_fitnesses=ratings_by_name, 
             model_fitnesses=fitness_by_ranking,
             # num_pairs_to_sample=self.initial_num_models
@@ -309,11 +305,13 @@ class Genetic(
     def f_score_model_comparison(
         self,
         test_model,
-        # target_model=None, 
+        target_model=None, 
         # growth_class, 
         beta=1,  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
     ):
-        target_model = self.true_model
+        if target_model is None:
+            target_model = self.true_model
+
         true_set = set(
             self.latex_name(mod) for mod in
             qmla.database_framework.get_constituent_names_from_name(target_model)
@@ -425,9 +423,14 @@ class Genetic(
         chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
         chromosome_numbers = sorted([int(c,2) for c in chromosomes])
         self.growth_rule_specific_data_to_store['chromosomes_tested'] = chromosome_numbers
-        f_scores = [np.round(self.f_score_from_chromosome_string(c), 3) for c in chromosomes]
-        self.growth_rule_specific_data_to_store['f_score_tested_models'] = f_scores
+        try:
+            f_scores = [np.round(self.f_score_from_chromosome_string(c), 3) for c in chromosomes]
+            self.growth_rule_specific_data_to_store['f_score_tested_models'] = f_scores
+        except:
+            print("Could not compute f score for chromosome list: {}".format(chromosomes))
+            pass
         self.growth_rule_specific_data_to_store['true_model_chromosome'] = self.true_chromosome_string
+        # self.growth_rule_specific_data_to_store['delta_f_scores'] = self.genetic_algorithm.delta_f_by_generation
         try:
             self.growth_rule_specific_data_to_store['f_score_fitnesses'] = list(zip(
                 self.fitness_by_f_score['f_score'],
@@ -499,380 +502,60 @@ def hamming_distance(str1, str2):
     return sum(c1 != c2 for c1, c2 in zip(str1, str2))
 
 
-class GeneticAlgorithmQMLA():
+class GeneticTest(
+    Genetic
+):
+    r"""
+    Exactly as the genetic growth rule, but small depth to test quickly.
+
+    """
+
     def __init__(
         self,
-        num_sites,
-        base_terms=['x', 'y', 'z'],
-        mutation_probability=0.1,
-        log_file=None, 
-    ):
-        self.num_sites = num_sites
-        self.base_terms = base_terms
-        self.get_base_chromosome()
-#         self.addition_str = 'P'*self.num_sites
-        self.addition_str = '+'
-        self.mutation_probability = mutation_probability
-        self.previously_considered_chromosomes = []
-        self.log_file = log_file
-        self.chromosomes_at_generation = {}
-        self.genetic_generation = 0
-
-
-    def get_base_chromosome(self):
-        """
-        get empty chromosome with binary
-        position for each possible term
-        within this model type
-
-        Basic: all pairs can be connected operator o on sites i,j:
-        e.g. i=4,j=7,N=9: IIIoIIoII
-        """
-
-        basic_chromosome = []
-        chromosome_description = []
-        for i in range(1, 1 + self.num_sites):
-            for j in range(i + 1, 1 + self.num_sites):
-                for t in self.base_terms:
-                    pair = (int(i), int(j), t)
-                    pair = tuple(pair)
-                    basic_chromosome.append(0)
-                    chromosome_description.append(pair)
-
-        self.chromosome_description = chromosome_description
-        self.chromosome_description_array = np.array(
-            self.chromosome_description)
-        self.basic_chromosome = np.array(basic_chromosome)
-        self.num_terms = len(self.basic_chromosome)
-        # print("Chromosome definition:", self.chromosome_description_array)
-#         binary_combinations = list(itertools.product([0,1], repeat=self.num_terms))
-#         binary_combinations = [list(b) for b in binary_combinations]
-#         self.possible_chromosomes = np.array(binary_combinations)
-
-    def map_chromosome_to_model(
-        self,
-        chromosome,
-    ):
-        if isinstance(chromosome, str):
-            chromosome = list(chromosome)
-            chromosome = np.array([int(i) for i in chromosome])
-
-        nonzero_postions = chromosome.nonzero()
-        present_terms = list(
-            self.chromosome_description_array[nonzero_postions]
-        )
-        term_list = []
-        for t in present_terms:
-            i = t[0]
-            j = t[1]
-            o = t[2]
-
-            term = 'pauliSet_{i}J{j}_{o}J{o}_d{N}'.format(
-                i=i,
-                j=j,
-                o=o,
-                N=self.num_sites
-            )
-            term_list.append(term)
-
-        model_string = self.addition_str.join(term_list)
-        # print(
-        #     "[GeneticAlgorithm mapping chromosome to model] \
-        #     \n chromosome: {} \
-        #     \n model string: {}\
-        #     \n nonzero_postions: {}".format(
-        #     chromosome,
-        #     model_string,
-        #     nonzero_postions
-        #     )
-        # )
-
-        return model_string
-
-    def map_model_to_chromosome(
-        self,
-        model
-    ):
-        terms = qmla.database_framework.get_constituent_names_from_name(model)
-        chromosome_locations = []
-        for term in terms:
-            components = term.split('_')
-            try:
-                components.remove('pauliSet')
-            except BaseException:
-                print(
-                    "[GA - map model to chromosome] \
-                    \nCannot remove pauliSet from components:",
-                    components,
-                    "\nModel:", model
-                )
-                raise
-            core_operators = list(sorted(qmla.database_framework.core_operator_dict.keys()))
-            for l in components:
-                if l[0] == 'd':
-                    dim = int(l.replace('d', ''))
-                elif l[0] in core_operators:
-                    operators = l.split('J')
-                else:
-                    sites = l.split('J')
-            # get strings when splitting the list elements
-            sites = [int(s) for s in sites]
-            sites = sorted(sites)
-
-            term_desc = [sites[0], sites[1], operators[0]]
-            term_desc = tuple(term_desc)
-            term_chromosome_location = self.chromosome_description.index(
-                term_desc)
-            chromosome_locations.append(term_chromosome_location)
-        new_chromosome = copy.copy(self.basic_chromosome)
-        new_chromosome[chromosome_locations] = 1
-        return new_chromosome
-
-    def chromosome_string(
-        self,
-        c
-    ):
-        b = [str(i) for i in c]
-        return ''.join(b)
-
-    def random_initial_models(
-        self,
-        num_models=5
-    ):
-        new_models = []
-        self.initial_number_models = num_models
-        self.chromosomes_at_generation[0] = []
-
-        while len(new_models) < num_models:
-            r = random.randint(1, 2**self.num_terms)
-            r = format(r, '0{}b'.format(self.num_terms))
-
-            if self.chromosome_string(
-                    r) not in self.previously_considered_chromosomes:
-                r = list(r)
-                r = np.array([int(i) for i in r])
-                mod = self.map_chromosome_to_model(r)
-
-                self.previously_considered_chromosomes.append(
-                    self.chromosome_string(r)
-                )
-                self.chromosomes_at_generation[0].append(
-                    self.chromosome_string(r)
-                )
-
-                new_models.append(mod)
-
-        # new_models = list(set(new_models))
-        # print("Random initial models:", self.previously_considered_chromosomes)
-        # print("Random initial models:", new_models)
-        return new_models
-
-    def selection(
-        self,
-        model_fitnesses,
-        num_chromosomes_to_select=2,
-        num_pairs_to_sample=None,
-        truncate=False, 
-        truncation_factor=0.5, 
+        growth_generation_rule,
         **kwargs
     ):
-        models = list(model_fitnesses.keys())
-        if truncate and len(models) >= num_pairs_to_sample/2:
-            # TODO is there a more robut way to check if enough models to truncate?
-            ranked_models = sorted(
-                model_fitnesses,
-                key=model_fitnesses.get,
-                reverse=True
-            )
-            num_models_to_keep = int( truncation_factor * len(models) )
-            models = ranked_models[:num_models_to_keep]
-            num_nonzero_fitness_models = len(models)
-            
-        else: 
-            num_nonzero_fitness_models = np.count_nonzero(
-                list(model_fitnesses.values())
-                )
-        if num_pairs_to_sample is None: 
-            num_pairs_to_sample = self.initial_number_models/2
-        
-        num_models = len(models)
-
-        # max_possible_num_combinations = scipy.misc.comb(
-        max_possible_num_combinations = scipy.special.comb(
-            num_nonzero_fitness_models, 2)
-
-        self.log_print(
-            [
-                "[Selection] Getting max possible combinations: {} choose {} = {}".format(
-                num_nonzero_fitness_models, 2, max_possible_num_combinations
-                )
-            ]        
+        # print("[Growth Rules] init nv_spin_experiment_full_tree")
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            **kwargs
         )
-
-        num_pairs_to_sample = min(
-            num_pairs_to_sample,
-            max_possible_num_combinations
+        self.max_spawn_depth = 6
+        self.initial_num_models = 6
+        self.initial_models = self.genetic_algorithm.random_initial_models(
+            num_models=self.initial_num_models
         )
-
-        chromosome_fitness = {}
-        chromosomes = {}
-        weights = []
-        self.log_print(
-            [
-            "Getting weights of input models."
-            ]
-        )
-        for model in models:
-            self.log_print(
-                [
-                    "Mapping {} to chromosome".format(model) 
-                ]
-            )
-            chrom = self.map_model_to_chromosome(model)
-            chromosomes[model] = chrom
-            weights.append(model_fitnesses[model])
-        weights /= np.sum(weights)  # normalise so weights are probabilities
-
-        self.log_print(
-            [
-            "Models/Weights: {}".format( set(zip(models, weights)) )
-            ]
-        )
-        new_chromosome_pairs = []
-        combinations = []
-
-        while len(new_chromosome_pairs) < num_pairs_to_sample:
-            # TODO: better way to sample multiple pairs
-            selected_models = np.random.choice(
-                models,
-                size=num_chromosomes_to_select,
-                p=weights,
-                replace=False
-            )
-            selected_chromosomes = [
-                chromosomes[mod] for mod in selected_models
-            ]
-            # combination is a unique string - sum of the two chromosomes - to check against combinations already considered in this generation
-            combination = ''.join(
-                [
-                    str(i) for i in list(selected_chromosomes[0] + selected_chromosomes[1])
-                ]
-            ) 
-            # print("Trying combination {}".format(combination))
-            if combination not in combinations:
-                combinations.append(combination)
-                new_chromosome_pairs.append(selected_chromosomes)
-                self.log_print(
-                    [
-                    "Including selected models:", selected_models
-                    ]
-                )
-                self.log_print(
-                    [
-                    "Now {} combinations of {}".format(
-                        len(new_chromosome_pairs),
-                        num_pairs_to_sample
+        self.hamming_distance_by_generation_step = {
+            0: [
+                hamming_distance(
+                    self.true_chromosome_string,
+                    self.genetic_algorithm.chromosome_string(
+                        self.genetic_algorithm.map_model_to_chromosome(
+                            mod
+                        )
                     )
-                    ]
                 )
-        self.log_print(
-            [
-            "[Selection] Returning {}".format(new_chromosome_pairs)
+                for mod in self.initial_models
             ]
-        )
-        return new_chromosome_pairs
+        }
+        self.tree_completed_initially = False
+        self.max_num_models_by_shape = {
+            self.num_sites : (self.initial_num_models * self.max_spawn_depth)/10,
+            'other': 0
+        }
+        self.num_processes_to_parallelise_over = self.initial_num_models
+ 
 
-    def crossover(
+    def check_tree_completed(
         self,
-        chromosomes,
+        spawn_step,
+        **kwargs
     ):
-        """
-        This fnc assumes only 2 chromosomes to crossover
-        and does so in the most basic method of splitting
-        down the middle and swapping
-        """
-
-        c1 = copy.copy(chromosomes[0])
-        c2 = copy.copy(chromosomes[1])
-
-        x = int(len(c1) / 2)
-        tmp = c2[:x].copy()
-        c2[:x], c1[:x] = c1[:x], tmp
-
-        return c1, c2
-
-    def mutation(
-        self,
-        chromosomes,
-    ):
-        copy_chromosomes = copy.copy(chromosomes)
-        for c in copy_chromosomes:
-            if np.all(c == 0):
-                print(
-                    "Input chomosome {} has no interactions -- forcing mutation".format(
-                        c)
-                )
-                mutation_probability = 1.0
-            else:
-                mutation_probability = self.mutation_probability
-
-            if np.random.rand() < mutation_probability:
-                idx = np.random.choice(range(len(c)))
-                # print("Flipping idx {}".format(idx))
-                if c[idx] == 0:
-                    c[idx] = 1
-                elif c[idx] == 1:
-                    c[idx] = 0
-        return chromosomes
-
-    def genetic_algorithm_step(
-        self,
-        model_fitnesses,
-        num_pairs_to_sample=5
-    ):
-        new_models = []
-        chromosomes_selected = self.selection(
-            model_fitnesses=model_fitnesses,
-            num_pairs_to_sample=num_pairs_to_sample
-        )
-        new_chromosomes_this_generation = []
-        for chromosomes in chromosomes_selected:
-            new_chromosomes = self.crossover(chromosomes)
-            new_chromosomes = self.mutation(new_chromosomes)
-            new_chromosomes_this_generation.extend(new_chromosomes)
-
-            new_models.extend(
-                [
-                    self.map_chromosome_to_model(c)
-                    for c in new_chromosomes
-                ]
-            )
-
-        self.previously_considered_chromosomes.extend([
-            self.chromosome_string(r) for r in new_chromosomes_this_generation
-            ]
-        )
-        self.genetic_generation += 1
-        self.chromosomes_at_generation[self.genetic_generation] = [
-            self.chromosome_string(r) for r in new_chromosomes_this_generation
-        ]
-        return new_models
-
-    def log_print(
-        self,
-        to_print_list
-    ):
-        identifier = "[Genetic algorithm]"
-        if type(to_print_list) != list:
-            to_print_list = list(to_print_list)
-
-        print_strings = [str(s) for s in to_print_list]
-        to_print = " ".join(print_strings)
-        with open(self.log_file, 'a') as write_log_file:
-            print(
-                identifier,
-                str(to_print),
-                file=write_log_file,
-                flush=True
-            )
-
+        if spawn_step == self.max_spawn_depth:
+            return True
+        elif self.genetic_algorithm.best_model_unchanged:
+            # check if elite model hasn't changed in last N generations
+            return True
+        else:
+            return False
+        return True

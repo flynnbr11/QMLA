@@ -6,6 +6,12 @@ import sys as sys
 import matplotlib.pyplot as plt
 
 class GridTopology():
+    r"""
+    Control the layout/connectivity of the lattice the models are based on.
+
+    
+    """
+    
     def __init__(
         self,
         dimension=2,

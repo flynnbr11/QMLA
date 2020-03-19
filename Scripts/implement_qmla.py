@@ -414,29 +414,29 @@ if qmla_controls.qhl_mode:
     true_mod = qmd.get_model_storage_instance_by_id(
         qmd.true_model_id
     )
-    extend_dynamics_plot_times = [
-        t * 2 for t in qmd.times_to_plot
-    ]
-    print(
-        "[Exp.py - QHL]",
-        "Computing more expectation values"
-    )
-    true_mod.compute_expectation_values(
-        times=extend_dynamics_plot_times
-    )
+    # extend_dynamics_plot_times = [
+    #     t * 2 for t in qmd.times_to_plot
+    # ]
+    # print(
+    #     "[Exp.py - QHL]",
+    #     "Computing more expectation values"
+    # )
+    # true_mod.compute_expectation_values(
+    #     times=extend_dynamics_plot_times
+    # )
 
-    qmd.plot_branch_champions_dynamics(
-        model_ids=[qmd.true_model_id],
-        include_bayes_factors_in_dynamics_plots=False,
-        include_param_estimates_in_dynamics_plots=False,
-        include_times_learned_in_dynamics_plots=False,
-        save_to_file=str(
-            qmla_controls.plots_directory +
-            'extended_dynamics_' +
-            str(qmla_controls.long_id) +
-            '.png'
-        )
-    )
+    # qmd.plot_branch_champions_dynamics(
+    #     model_ids=[qmd.true_model_id],
+    #     include_bayes_factors_in_dynamics_plots=False,
+    #     include_param_estimates_in_dynamics_plots=False,
+    #     include_times_learned_in_dynamics_plots=False,
+    #     save_to_file=str(
+    #         qmla_controls.plots_directory +
+    #         'extended_dynamics_' +
+    #         str(qmla_controls.long_id) +
+    #         '.png'
+    #     )
+    # )
 
     results_file = qmla_controls.results_file
     pickle.dump(
@@ -560,29 +560,29 @@ else:
     champ_mod = qmd.get_model_storage_instance_by_id(
         qmd.champion_model_id
     )
-    extend_dynamics_plot_times = [
-        t * 2 for t in qmd.times_to_plot
-    ]
-    print(
-        "[Exp.py - QHL]",
-        "Computing more expectation values"
-    )
-    champ_mod.compute_expectation_values(
-        times=extend_dynamics_plot_times
-    )
+    # extend_dynamics_plot_times = [
+    #     t * 2 for t in qmd.times_to_plot
+    # ]
+    # print(
+    #     "[Exp.py - QHL]",
+    #     "Computing more expectation values"
+    # )
+    # champ_mod.compute_expectation_values(
+    #     times=extend_dynamics_plot_times
+    # )
 
-    qmd.plot_branch_champions_dynamics(
-        model_ids=[qmd.champion_model_id],
-        include_bayes_factors_in_dynamics_plots=False,
-        include_param_estimates_in_dynamics_plots=False,
-        include_times_learned_in_dynamics_plots=False,
-        save_to_file=str(
-            qmla_controls.plots_directory +
-            'extended_dynamics_' +
-            str(qmla_controls.long_id) +
-            '.png'
-        )
-    )
+    # qmd.plot_branch_champions_dynamics(
+    #     model_ids=[qmd.champion_model_id],
+    #     include_bayes_factors_in_dynamics_plots=False,
+    #     include_param_estimates_in_dynamics_plots=False,
+    #     include_times_learned_in_dynamics_plots=False,
+    #     save_to_file=str(
+    #         qmla_controls.plots_directory +
+    #         'extended_dynamics_' +
+    #         str(qmla_controls.long_id) +
+    #         '.png'
+    #     )
+    # )
 
     if qmla_controls.save_plots:
         try:

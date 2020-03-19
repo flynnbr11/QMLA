@@ -656,6 +656,7 @@ class QuantumModelLearningAgent():
             mod_id = self.model_initial_ids[mod]
             if database_framework.alph(mod) == self.true_model_name:
                 self.true_model_id = mod_id
+                self.true_model_considered = True
             print("mod id:", mod_id)
             self.model_name_id_map[int(mod_id)] = mod
 
@@ -696,6 +697,7 @@ class QuantumModelLearningAgent():
             if database_framework.alph(
                     model) == database_framework.alph(self.true_model_name):
                 self.true_model_id = self.model_count
+                self.true_model_considered = True
                 self.true_model_branch = branch_id
                 self.true_model_on_branhces = [branch_id]
             self.highest_model_id += 1
@@ -2962,14 +2964,14 @@ class QuantumModelLearningAgent():
             name=final_winner,
             field='ModelID'
         )
-        try:
-            self.true_model_considered = True
+
+        try:            
             if self.champion_model_id == self.true_model_id:
                 self.true_model_found = True
             else:
                 self.true_model_found = False
         except:
-            self.true_model_considered = False 
+            # self.true_model_considered = False 
             self.true_model_found = False
         self.update_database_model_info()
 

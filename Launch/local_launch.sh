@@ -8,7 +8,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 num_tests=1
 qhl_test=0 # don't perform QMLA; perform QHL on known correct model
-multiple_qhl=1 # perform QHL for defined list of models.
+multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
 simulate_experiment=0
@@ -17,7 +17,7 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=12
+prt=20
 exp=3
 pgh=1.0
 pgh_exponent=1.0
@@ -75,12 +75,13 @@ git_commit=$(git rev-parse HEAD)
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='IsingProbabilistic'
-sim_growth_rule='IsingPredetermined'
+# sim_growth_rule='IsingPredetermined'
 # sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
 # sim_growth_rule='Genetic'
+sim_growth_rule='GeneticTest'
 # sim_growth_rule='Presentation'
 # sim_growth_rule='ExperimentReducedNV'
 # sim_growth_rule='example'
