@@ -108,7 +108,7 @@ class ControlsQMLA():
                     'rb'
                 )
             )
-
+        self.true_params_pickle_file = arguments.true_params_pickle_file
         self.true_model = true_params_info['true_model']
         self.true_model_name = database_framework.alph(self.true_model)
         self.true_model_class = database_framework.Operator(
@@ -139,6 +139,7 @@ class ControlsQMLA():
                     true_ham = param * mtx
 
         self.true_hamiltonian = true_ham
+        
         
         # get parameters from arguments passed to implement_qmla.py
         self.prior_pickle_file = arguments.prior_pickle_file

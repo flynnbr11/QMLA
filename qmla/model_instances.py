@@ -4,6 +4,7 @@ import os
 import time
 import copy
 import qinfer as qi
+import random 
 
 import redis
 import pickle
@@ -206,6 +207,7 @@ class ModelInstanceForLearning():
             name=self.model_name
         )
         self.model_terms_matrices = np.asarray(op.constituents_operators)
+        self.model_dimension = qmla.database_framework.get_num_qubits(self.model_name)
 
         model_priors = qmla_core_info_dict['model_priors']
         if (
@@ -279,6 +281,7 @@ class ModelInstanceForLearning():
         self.times_to_plot = qmla_core_info_dict['plot_times']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
+        self.true_params_path = qmla_core_info_dict['true_params_pickle_file']
         
 
         individual_terms_in_name = qmla.database_framework.get_constituent_names_from_name(
@@ -753,6 +756,35 @@ class ModelInstanceForLearning():
             self.qinfer_updater.est_mean(),
             self.qinfer_updater.est_covariance_mtx(),
         )
+
+        learned_params = list(self.final_learned_params[:, 0])
+        self.learned_hamiltonian = np.tensordot(
+            learned_params,
+            self.model_terms_matrices,
+            axes=1
+        )
+
+        true_params_dict = pickle.load(
+            open(
+                self.true_params_path, 
+                'rb'
+            )
+        )
+        
+        evaluation_experiments = true_params_dict['evaluation_experiments']
+        evaluation_probe_dict = true_params_dict['evaluation_probes']
+
+        evaluation_times = [e[0] for e in evaluation_experiments]
+        evaluation_probes = [
+            evaluation_probe_dict[(e[1], self.model_dimension)] for e in evaluation_experiments
+        ]
+
+        evaluation_experiments = list(zip(
+            evaluation_times, 
+            evaluation_probes
+
+        ))
+
         evaluation_updater = qi.SMCUpdater(
             model=self.qinfer_model,
             n_particles=self.num_particles,
@@ -768,28 +800,45 @@ class ModelInstanceForLearning():
         evaluation_updater._log_total_likelihood = 0.0
         evaluation_updater._normalization_record = []
 
-        for i in range(len(times)):
+        for t, probe in evaluation_experiments:
+        # for i in range(len(times)):
             exp = format_experiment(
                 self.qinfer_model, 
                 final_learned_params = self.final_learned_params, 
-                time = [times[i]]
+                time = [t],
+                # time = [times[i]]
             )
-            params_array = np.array([[self.true_model_params[:]]])
-            datum = evaluation_updater.model.simulate_experiment(
-                params_array,
-                exp,
-                repeat=1
+            # params_array = np.array([[self.true_model_params[:]]])
+            # datum = evaluation_updater.model.simulate_experiment(
+            #     params_array,
+            #     exp,
+            #     repeat=1
+            # )
+            # get datum manually through growth_class.expectation_value
+            expectation_value = self.growth_class.expectation_value(
+                ham = self.learned_hamiltonian, 
+                t = t, 
+                state = probe
             )
+            datum = int( random.random() <= expectation_value ) # single shot measurement
+            
+            self.log_print(
+                [
+                    "Evaluation: t={}; p={}".format(t, repr(probe)),
+                    "Expec val={}; datum={}".format(expectation_value, datum)
+                ]
+            )
+
             evaluation_updater.update(datum, exp)
 
         log_likelihood = evaluation_updater.log_total_likelihood
-        self.log_print(
-            [
-                "After learning, evaluation normalisation record:", 
-                evaluation_updater.normalization_record,
-                "\nGiving log likelihood:", round_nearest(evaluation_updater.log_total_likelihood, 0.05)
-            ]
-        )
+        # self.log_print(
+        #     [
+        #         "After learning, evaluation normalisation record:", 
+        #         evaluation_updater.normalization_record,
+        #         "\nGiving log likelihood:", round_nearest(evaluation_updater.log_total_likelihood, 0.05)
+        #     ]
+        # )
         self.evaluation_normalization_record = evaluation_updater.normalization_record
         self.evaluation_log_likelihood = round_nearest(evaluation_updater.log_total_likelihood, 0.05)
 

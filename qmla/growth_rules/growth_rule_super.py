@@ -228,6 +228,7 @@ class GrowthRuleSuper():
     def generate_probes(
         self,
         probe_maximum_number_qubits=None, 
+        store_probes=True,
         **kwargs
     ):
         self.log_print(
@@ -237,19 +238,24 @@ class GrowthRuleSuper():
         )
         if probe_maximum_number_qubits is None: 
             probe_maximum_number_qubits = self.max_num_probe_qubits
-        self.probes_system = self.probe_generation_function(
+        
+        new_probes = self.probe_generation_function(
             max_num_qubits=probe_maximum_number_qubits,
             num_probes=self.num_probes,
             **kwargs
         )
-        if self.shared_probes == True:
-            self.probes_simulator = self.probes_system
+        if store_probes:
+            self.probes_system = new_probes
+            if self.shared_probes == True:
+                self.probes_simulator = self.probes_system
+            else:
+                self.probes_simulator = self.simulator_probe_generation_function(
+                    max_num_qubits=probe_maximum_number_qubits,
+                    num_probes=self.num_probes,
+                    **kwargs
+                )
         else:
-            self.probes_simulator = self.simulator_probe_generation_function(
-                max_num_qubits=probe_maximum_number_qubits,
-                num_probes=self.num_probes,
-                **kwargs
-            )
+            return new_probes
 
     def plot_probe_generator(
         self,

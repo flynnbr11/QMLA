@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import math
 
 import qmla.database_framework as database_framework
 import qmla.prior_distributions as distributions
@@ -17,7 +18,9 @@ def set_shared_parameters(
     pickle_file=None,
     random_vals=False,
     all_growth_rules=[],
-    exp_data=0,
+    exp_data=False,
+    probe_max_num_qubits_all_growth_rules = 12, 
+    generate_evaluation_experiments=True, 
     true_prior_plot_file=None,
 ):
     r"""
@@ -95,10 +98,33 @@ def set_shared_parameters(
     if growth_class.growth_generation_rule not in all_growth_rules: 
         all_growth_rules.append(growth_class.growth_generation_rule)
 
+    if generate_evaluation_experiments:
+        evaluation_probes = growth_class.generate_probes(
+            store_probes=False, 
+            probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
+            experimental_data = exp_data,
+            noise_level = growth_class.probe_noise_level,
+            minimum_tolerable_noise = 0.0,
+        )
+        evaluation_times = list(np.arange(0, 10, 0.05)) # TODO better choice of times for evaluation
+        available_probe_ids = list(range(growth_class.num_probes))
+        list_len_fator = math.ceil(len(evaluation_times) / len(available_probe_ids))
+        iterable_probe_ids = iter(available_probe_ids * list_len_fator)
+
+        evaluation_experiments = list(zip(
+            np.round(evaluation_times, 2), 
+            [next(iterable_probe_ids) for i in evaluation_times]
+        ))        
+
+    else: 
+        evaluation_probes = None
+
     true_params_info = {
         'params_list': true_model_terms_params,
         'params_dict': true_params_dict,
         'all_growth_rules': all_growth_rules,
+        'evaluation_probes' : evaluation_probes,
+        'evaluation_experiments' : evaluation_experiments
     }
     if exp_data:
         print("\n\n\n[SetQHL] EXPDATA -- dont store true vals")

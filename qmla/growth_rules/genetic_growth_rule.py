@@ -522,8 +522,8 @@ class GeneticTest(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.max_spawn_depth = 10
-        self.initial_num_models = 10
+        self.max_spawn_depth = 4
+        self.initial_num_models = 4
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
@@ -547,7 +547,6 @@ class GeneticTest(
         }
         self.num_processes_to_parallelise_over = self.initial_num_models
  
-
     def check_tree_completed(
         self,
         spawn_step,
@@ -556,8 +555,14 @@ class GeneticTest(
         if spawn_step == self.max_spawn_depth:
             return True
         elif self.genetic_algorithm.best_model_unchanged:
+            self.log_print(
+                [
+                    "Terminating search early b/c elite model unchanged in {} iterations.".format(
+                        self.genetic_algorithm.unchanged_elite_num_generations_cutoff
+                    )
+                ]
+            )
             # check if elite model hasn't changed in last N generations
             return True
         else:
             return False
-        return True

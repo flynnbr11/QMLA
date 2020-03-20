@@ -29,6 +29,7 @@ class GeneticAlgorithmQMLA():
         self.true_chromosome_string = self.chromosome_string(
             self.true_chromosome
         )
+        self.all_zero_chromosome_string = '0'*num_sites
         self.addition_str = '+'
         self.mutation_probability = mutation_probability
         self.previously_considered_chromosomes = []
@@ -160,29 +161,11 @@ class GeneticAlgorithmQMLA():
             self.true_chromosome
         )
 
-    # def log_print(
-    #     self,
-    #     to_print_list
-    # ):
-    #     identifier = "[Genetic algorithm]"
-    #     if type(to_print_list) != list:
-    #         to_print_list = list(to_print_list)
-
-    #     print_strings = [str(s) for s in to_print_list]
-    #     to_print = " ".join(print_strings)
-    #     with open(self.log_file, 'a') as write_log_file:
-    #         print(
-    #             identifier,
-    #             str(to_print),
-    #             file=write_log_file,
-    #             flush=True
-    #         )
-
     def log_print(self, to_print_list):
         qmla.logging.print_to_log(
             to_print_list = to_print_list,
             log_file = self.log_file,
-            log_identifier = 'Genetic algorithm'
+            log_identifier = 'GA gen {}'.format(self.genetic_generation)
         )
 
 
@@ -341,9 +324,11 @@ class GeneticAlgorithmQMLA():
         mutated_chromosomes = []
         for c in copy_chromosomes:
             if np.all(c == 0):
-                print(
-                    "Input chomosome {} has no interactions -- forcing mutation".format(
-                        c)
+                self.log_print(
+                    [
+                        "Input chomosome {} has no interactions -- forcing mutation".format(
+                       c)
+                    ]
                 )
                 mutation_probability = 1.0
             else:
@@ -545,23 +530,16 @@ class GeneticAlgorithmQMLA():
             c0_str = self.chromosome_string( suggested_chromosomes[0] )
             c1_str = self.chromosome_string( suggested_chromosomes[1] )
 
-            if c0_str not in proposed_chromosomes:
+            if (
+                c0_str not in proposed_chromosomes
+                and 
+                c1_str not in proposed_chromosomes
+                and
+                c0_str != self.all_zero_chromosome_string 
+                and
+                c1_str != self.all_zero_chromosome_string
+            ):
                 proposed_chromosomes.append(c0_str)
-                self.log_print(
-                    [
-                        "num proposed chromosome now: {} of {}".format(
-                            len(proposed_chromosomes),
-                            num_models_for_next_generation
-                        )
-                    ]
-                )
-            else: 
-                self.log_print(
-                    [
-                        "{} already present in {}".format(c0_str, proposed_chromosomes)
-                    ]
-                )
-            if c1_str not in proposed_chromosomes:
                 proposed_chromosomes.append(c1_str)
                 self.log_print(
                     [
@@ -571,14 +549,15 @@ class GeneticAlgorithmQMLA():
                         )
                     ]
                 )
-
             else: 
                 self.log_print(
                     [
-                        "{} already present in {}".format(c1_str, proposed_chromosomes)
+                        "{} or {} already present in {}".format(c0_str, c1_str, proposed_chromosomes)
                     ]
                 )
 
+        # chop extra chromosomes if generated
+        proposed_chromosomes = proposed_chromosomes[:num_models_for_next_generation]
         self.log_print(
             [
                 "Proposed chromosome list now has {} elements.".format(

@@ -203,13 +203,12 @@ if pickle_file is not None:
 if arguments.true_params_file is not None:
     qmla.set_shared_parameters(
         growth_class=growth_class,
-        # true_op=true_model,
         true_prior=true_prior,
         pickle_file=arguments.true_params_file,
-        # growth_generator=growth_generation_rule,
         all_growth_rules=all_growth_rules,
-        # random_vals=random_true_params,
         exp_data=exp_data,
+        generate_evaluation_experiments=True, 
+        probe_max_num_qubits_all_growth_rules = probe_max_num_qubits_all_growth_rules, 
         true_prior_plot_file=true_prior_plot_file
     )
 

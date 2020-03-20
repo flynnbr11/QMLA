@@ -616,7 +616,8 @@ class QuantumModelLearningAgent():
             'qhl_plots': False,  # from growth rule or unneeded
             'sigma_threshold': self.sigma_threshold, # from growth rule or unneeded
             'experimental_measurement_times': self.experimental_measurement_times, 
-            'num_probes': self.probe_number, # from growth rule or unneeded
+            'num_probes': self.probe_number, # from growth rule or unneeded,
+            'true_params_pickle_file' : self.qmla_controls.true_params_pickle_file,
         }
 
         # Store qmla_settings and probe dictionaries on the redis database, accessible by all workers
@@ -657,6 +658,15 @@ class QuantumModelLearningAgent():
             if database_framework.alph(mod) == self.true_model_name:
                 self.true_model_id = mod_id
                 self.true_model_considered = True
+                self.true_model_branch = branch_id  = 0 
+                self.log_print(
+                    [
+                        "Model added at first branch {} matches true model {}".format(
+                            mod, 
+                            self.true_model_name
+                        )
+                    ]
+                )
             print("mod id:", mod_id)
             self.model_name_id_map[int(mod_id)] = mod
 
