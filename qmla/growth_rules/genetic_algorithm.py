@@ -246,23 +246,36 @@ class GeneticAlgorithmQMLA():
     ):
         chromosomes = list(chromosome_selection_probabilities.keys())
         probabilities = [chromosome_selection_probabilities[c] for c in chromosomes]
-        new_pair = False
-        while new_pair is False: 
-            selected_chromosomes = np.random.choice(
-                chromosomes,
-                size=2,
-                p=probabilities,
-                replace=False
-            )
-            unique_combination = ''.join(
-                    [
-                        str(i) for i in list(selected_chromosomes[0] + selected_chromosomes[1])
-                    ]
-                ) 
-            if unique_combination not in self.unique_pair_combinations_considered:
-                new_pair = True
+        # new_pair = False
+        # self.log_print(
+        #     [
+        #         "Basic pair selection; finding new combination.",
+        #         "Combinations present already:", 
+        #     ]
+        # )
+        # while new_pair is False: 
+        #     selected_chromosomes = np.random.choice(
+        #         chromosomes,
+        #         size=2,
+        #         p=probabilities,
+        #         replace=False
+        #     )
+        #     unique_combination = ''.join(
+        #             [
+        #                 str(i) for i in list(selected_chromosomes[0] + selected_chromosomes[1])
+        #             ]
+        #         ) 
+        #     if unique_combination not in self.unique_pair_combinations_considered:
+        #         new_pair = True
             
-        self.unique_pair_combinations_considered.append(unique_combination)
+        # self.unique_pair_combinations_considered.append(unique_combination)
+        selected_chromosomes = np.random.choice(
+            chromosomes,
+            size=2,
+            p=probabilities,
+            replace=False
+        )
+
         return selected_chromosomes
 
     ######################
@@ -536,8 +549,9 @@ class GeneticAlgorithmQMLA():
                 proposed_chromosomes.append(c0_str)
                 self.log_print(
                     [
-                        "num proposed chromosome now: {}".format(
-                            len(proposed_chromosomes)
+                        "num proposed chromosome now: {} of {}".format(
+                            len(proposed_chromosomes),
+                            num_models_for_next_generation
                         )
                     ]
                 )
@@ -551,8 +565,9 @@ class GeneticAlgorithmQMLA():
                 proposed_chromosomes.append(c1_str)
                 self.log_print(
                     [
-                        "num proposed chromosome now: {}".format(
-                            len(proposed_chromosomes)
+                        "num proposed chromosome now: {} of {}".format(
+                            len(proposed_chromosomes),
+                            num_models_for_next_generation
                         )
                     ]
                 )
