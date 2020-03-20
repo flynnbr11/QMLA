@@ -148,6 +148,44 @@ class GeneticAlgorithmQMLA():
         b = [str(i) for i in c]
         return ''.join(b)
 
+    def chromosome_f_score(
+        self, 
+        chromosome, 
+    ):
+        if not isinstance(chromosome, np.ndarray):            
+            chromosome = np.array([int(a) for a in list(chromosome)])
+        
+        return sklearn.metrics.f1_score(
+            chromosome, 
+            self.true_chromosome
+        )
+
+    # def log_print(
+    #     self,
+    #     to_print_list
+    # ):
+    #     identifier = "[Genetic algorithm]"
+    #     if type(to_print_list) != list:
+    #         to_print_list = list(to_print_list)
+
+    #     print_strings = [str(s) for s in to_print_list]
+    #     to_print = " ".join(print_strings)
+    #     with open(self.log_file, 'a') as write_log_file:
+    #         print(
+    #             identifier,
+    #             str(to_print),
+    #             file=write_log_file,
+    #             flush=True
+    #         )
+
+    def log_print(self, to_print_list):
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list,
+            log_file = self.log_file,
+            log_identifier = 'Genetic algorithm'
+        )
+
+
     def random_initial_models(
         self,
         num_models=5
@@ -227,222 +265,6 @@ class GeneticAlgorithmQMLA():
         self.unique_pair_combinations_considered.append(unique_combination)
         return selected_chromosomes
 
-
-    def truncated_tournament_with_elitism(
-        self, 
-        model_fitnesses,
-        num_pairs_to_sample=None,
-        num_elites = 2, 
-        **kwargs
-    ):
-        ranked_models = sorted(
-            model_fitnesses,
-            key=model_fitnesses.get,
-            reverse=True
-        )
-        num_models = len(ranked_models)
-        if num_pairs_to_sample is None: 
-            num_pairs_to_sample = num_models / 2
-
-        elite_models = ranked_models[:num_elites]
-        self.most_elite_models_by_generation[self.genetic_generation] = elite_models[0]
-        num_elites_for_termination = 4
-        if self.genetic_generation > num_elites_for_termination + 2:
-            gen = self.genetic_generation
-            recent_elites = list(
-                range(
-                    max(0, gen - num_elites_for_termination), 
-                    gen+1
-                )
-            )
-            recent_elite_models = [self.most_elite_models_by_generation[g] for g in recent_elites]
-            unchanged = np.all( 
-                np.array(recent_elite_models) == self.most_elite_models_by_generation[gen]
-            )
-            if unchanged:
-                self.log_print(
-                    [
-                        "Elite model hasn't changed in {} generations; terminating search. Elite model: {} has f-score {}".format(
-                            num_elites_for_termination, 
-                            self.most_elite_models_by_generation[gen],
-                            self.chromosome_f_score(
-                                self.map_model_to_chromosome(
-                                    self.most_elite_models_by_generation[gen]
-                                )
-                            )
-                        )
-                    ]
-                )
-                self.best_model_unchanged = True
-            else: 
-                self.log_print(
-                    [
-                        "Elite model has changed in last {} generations. \nCurrently: {} has f-score {}".format(
-                            num_elites_for_termination, 
-                            self.most_elite_models_by_generation[gen],
-                            self.chromosome_f_score(
-                                self.map_model_to_chromosome(
-                                    self.most_elite_models_by_generation[gen]
-                                )
-                            )
-                        )
-                    ]
-                )
-
-        prescribed_chromosomes = [
-            self.map_model_to_chromosome(mod) for mod in elite_models
-        ]
-
-        # truncate and keep half the number of models in the list
-        truncated_model_list = ranked_models[:int(num_models/2)] 
-        num_chromosome_pairs_required = num_pairs_to_sample - int(num_elites/2)
-        self.log_print(
-            [
-                "\nElite models: \n", elite_models, 
-                "\nRanked models:\n", ranked_models, 
-                "\ntruncated_model_list:\n", truncated_model_list,
-                "\nnum_new_chromosomes_required:", num_chromosome_pairs_required
-            ]
-
-        )
-        
-        if num_chromosome_pairs_required > 0:
-            truncated_model_fitnesses = {
-                mod : model_fitnesses[mod] 
-                for mod in truncated_model_list
-            }
-            self.log_print(
-                [
-                    "Truncated model fitnesses to enter tournament:", 
-                    truncated_model_fitnesses
-                ]
-            )
-
-            chromosomes_for_selection = self.tournament_selection(
-                model_fitnesses = truncated_model_fitnesses, 
-                num_pairs_to_sample = num_chromosome_pairs_required # every pair sampled gives two new chromosomes
-            )
-        else:
-            chromosomes_for_selection = []
-        self.log_print(
-            [
-                "Returning prescribed_chromosomes:\n", prescribed_chromosomes,
-                "\n and pairs for crossover:", chromosomes_for_selection
-            ]
-        )
-        return prescribed_chromosomes, chromosomes_for_selection
-
-    def tournament_selection(
-        self, 
-        model_fitnesses, 
-        num_chromosomes_to_select=2,
-        num_pairs_to_sample=None,
-        **kwargs
-    ):
-        self.log_print(
-            [
-                "In tournament selection with model fitnesses:\n", 
-                model_fitnesses,
-                "\nnum pairs to sample:", num_pairs_to_sample,
-                "\nnum chromosomes to select:", num_chromosomes_to_select
-            ]
-        )
-        models = list(model_fitnesses.keys())
-        num_nonzero_fitness_models = np.count_nonzero(
-            list(model_fitnesses.values())
-            )
-        if num_pairs_to_sample is None: 
-            num_pairs_to_sample = self.initial_number_models/2
-        
-        num_models = len(models)
-
-        # max_possible_num_combinations = scipy.misc.comb(
-        max_possible_num_combinations = scipy.special.comb(
-            num_nonzero_fitness_models, 2)
-
-        self.log_print(
-            [
-                "[Selection] Getting max possible combinations: {} choose {} = {}".format(
-                num_nonzero_fitness_models, 2, max_possible_num_combinations
-                )
-            ]        
-        )
-
-        num_pairs_to_sample = min(
-            num_pairs_to_sample,
-            max_possible_num_combinations
-        )
-
-        chromosome_fitness = {}
-        chromosomes = {}
-        weights = []
-        self.log_print(
-            [
-            "Getting weights of input models."
-            ]
-        )
-        for model in models:
-            self.log_print(
-                [
-                    "Mapping {} to chromosome".format(model) 
-                ]
-            )
-            chrom = self.map_model_to_chromosome(model)
-            chromosomes[model] = chrom
-            weights.append(model_fitnesses[model])
-        weights /= np.sum(weights)  # normalise so weights are probabilities
-
-        self.log_print(
-            [
-            "Models/Weights: \n{}".format( set(zip(models, weights)) )
-            ]
-        )
-        new_chromosome_pairs = []
-        combinations = []
-
-        while len(new_chromosome_pairs) < num_pairs_to_sample:
-            # TODO: better way to sample multiple pairs
-            selected_models = np.random.choice(
-                models,
-                size=num_chromosomes_to_select,
-                p=weights,
-                replace=False
-            )
-            selected_chromosomes = [
-                chromosomes[mod] for mod in selected_models
-            ]
-            # combination is a unique string - sum of the two chromosomes - to check against combinations already considered in this generation
-            combination = ''.join(
-                [
-                    str(i) for i in list(selected_chromosomes[0] + selected_chromosomes[1])
-                ]
-            ) 
-            # print("Trying combination {}".format(combination))
-            if combination not in combinations:
-                combinations.append(combination)
-                new_chromosome_pairs.append(selected_chromosomes)
-                self.log_print(
-                    [
-                    "[Selection] Including selected models:", selected_models
-                    ]
-                )
-                self.log_print(
-                    [
-                    "Now {} combinations of {}".format(
-                        len(new_chromosome_pairs),
-                        num_pairs_to_sample
-                    )
-                    ]
-                )
-        self.log_print(
-            [
-            "[Selection] Returning {}".format(new_chromosome_pairs)
-            ]
-        )
-        return new_chromosome_pairs
-
-
-
     ######################
     # Crossover functions
     ######################
@@ -479,7 +301,7 @@ class GeneticAlgorithmQMLA():
         # c2 = copy.copy(chromosomes[1])
         self.log_print(
             [
-                "[Crossover] {} / {}".format(repr(c1), repr(c2))
+                "[Crossover Input]\n {} / {}".format(repr(c1), repr(c2))
             ]
         )
         # x = int(len(c1) / 2) # select the halfway point for the crossover
@@ -488,11 +310,15 @@ class GeneticAlgorithmQMLA():
         c2[:x], c1[:x] = c1[:x], tmp
         self.log_print(
             [
-                "[Crossover] (x={}) \nResult: {} / {}".format(x,repr(c1), repr(c2))
+                "[Crossover Result] (x={})\n {} / {}".format(x,repr(c1), repr(c2))
             ]
         )
 
         return c1, c2
+
+    ######################
+    # Mutation functions
+    ######################
 
     def mutation(
         self,
@@ -520,10 +346,12 @@ class GeneticAlgorithmQMLA():
             mutated_chromosomes.append(c)
         return mutated_chromosomes
 
+    ######################
+    # Elitism functions
+    ######################
+
     def get_elite_models(
         self, 
-        model_fitnesses,
-        num_elites = 2,
         **kwargs
     ):
         r"""
@@ -531,6 +359,17 @@ class GeneticAlgorithmQMLA():
 
         
         """
+
+        return self.elite_ranking_top_two(
+            **kwargs
+        )
+
+    def elite_ranking_top_two(
+        self, 
+        model_fitnesses,
+        num_elites = 2,
+        **kwargs
+    ):
         ranked_models = sorted(
             model_fitnesses,
             key=model_fitnesses.get,
@@ -561,7 +400,7 @@ class GeneticAlgorithmQMLA():
                 self.best_model_unchanged = True
             self.log_print(
                 [
-                    "Elite model changed in last {} generations: {}. \nCurrently: {} with f-score {}".format(
+                    "Elite model unchanged in last {} generations: {}. \nCurrently: {} with f-score {}".format(
                         self.unchanged_elite_num_generations_cutoff, 
                         self.best_model_unchanged,
                         self.most_elite_models_by_generation[gen],
@@ -575,16 +414,28 @@ class GeneticAlgorithmQMLA():
             )
         return elite_models
 
+    ######################
+    # Processing given fitness to 
+    # selection probabilities
+    ######################
+
     def get_selection_probabilities(
         self, 
-        model_fitnesses
+        **kwargs
     ):
         r""" 
         Wrapper for user-defined probability processing function.
 
         Current iteration truncates and includes only top half of models
         """
+        return self.truncate_to_top_half(**kwargs)
 
+
+    def truncate_to_top_half(
+        self, 
+        model_fitnesses, 
+        **kwargs
+    ):
         ranked_models = sorted(
             model_fitnesses,
             key=model_fitnesses.get,
@@ -592,9 +443,16 @@ class GeneticAlgorithmQMLA():
         )
         num_models = len(ranked_models)
         truncation_cutoff = int(num_models/2)
-        if num_models >= 4:
+        if num_models <= 4:
             truncated_model_list = ranked_models 
         else:
+            self.log_print(
+                [
+                    "Truncating model to include only {} models".format(
+                        truncation_cutoff
+                    )
+                ]
+            )
             truncated_model_list = ranked_models[:truncation_cutoff]
 
         truncated_model_fitnesses = {
@@ -621,6 +479,11 @@ class GeneticAlgorithmQMLA():
         )
         return model_probabilities
 
+
+    ######################
+    # Implement entire genetic algorithm iteration
+    ######################
+
     def genetic_algorithm_step(
         self,
         model_fitnesses,
@@ -628,6 +491,11 @@ class GeneticAlgorithmQMLA():
     ):
         input_models = list(model_fitnesses.keys())
         num_models_for_next_generation = len(input_models)
+        self.log_print(
+            [
+                "Num models reqd for generation:", num_models_for_next_generation
+            ]
+        )
 
         elite_models = self.get_elite_models(
             model_fitnesses = model_fitnesses,
@@ -643,7 +511,7 @@ class GeneticAlgorithmQMLA():
         ] # list of chromosome strings to return
 
         chromosome_selection_probabilities = self.get_selection_probabilities(
-            model_fitnesses
+            model_fitnesses = model_fitnesses
         )
         self.unique_pair_combinations_considered = []
         while len(proposed_chromosomes) < num_models_for_next_generation:
@@ -664,15 +532,45 @@ class GeneticAlgorithmQMLA():
             c0_str = self.chromosome_string( suggested_chromosomes[0] )
             c1_str = self.chromosome_string( suggested_chromosomes[1] )
 
-            if (
-                c0_str not in proposed_chromosomes
-                and 
-                c1_str not in proposed_chromosomes
-            ):
+            if c0_str not in proposed_chromosomes:
                 proposed_chromosomes.append(c0_str)
+                self.log_print(
+                    [
+                        "num proposed chromosome now: {}".format(
+                            len(proposed_chromosomes)
+                        )
+                    ]
+                )
+            else: 
+                self.log_print(
+                    [
+                        "{} already present in {}".format(c0_str, proposed_chromosomes)
+                    ]
+                )
+            if c1_str not in proposed_chromosomes:
                 proposed_chromosomes.append(c1_str)
-            
-        
+                self.log_print(
+                    [
+                        "num proposed chromosome now: {}".format(
+                            len(proposed_chromosomes)
+                        )
+                    ]
+                )
+
+            else: 
+                self.log_print(
+                    [
+                        "{} already present in {}".format(c1_str, proposed_chromosomes)
+                    ]
+                )
+
+        self.log_print(
+            [
+                "Proposed chromosome list now has {} elements.".format(
+                    len(proposed_chromosomes)
+                )
+            ]
+        )
         self.previously_considered_chromosomes.extend([
             self.chromosome_string(r) for r in proposed_chromosomes
             ]
@@ -695,114 +593,4 @@ class GeneticAlgorithmQMLA():
         return new_models
 
 
-    def genetic_algorithm_step_legacy(
-        self,
-        model_fitnesses,
-        num_pairs_to_sample=5
-    ):
-        prescribed_chromosomes, pair_chromosomes_for_crossover = self.selection(
-            model_fitnesses=model_fitnesses,
-            num_pairs_to_sample=num_pairs_to_sample
-        )
-
-        new_chromosomes_this_generation = prescribed_chromosomes
-        new_models = [self.map_chromosome_to_model(c) for c in new_chromosomes_this_generation]
-        delta_f_score = []
-        for pair_to_crossover in pair_chromosomes_for_crossover:
-            new_chromosomes = self.crossover(
-                pair_to_crossover = pair_to_crossover, 
-                this_generation_chromosomes = new_chromosomes_this_generation
-            )
-            # if (
-            #     new_chromosomes[0] in new_chromosomes_this_generation
-            #     or new_chromosomes[1] in new_chromosomes_this_generation
-            # ):
-            #     self.log_print(
-            #         [
-            #             "{} or {} alreday in this generation:\n{}".format(
-            #                 new_chromosomes[0], 
-            #                 new_chromosomes[1], 
-            #                 new_chromosomes_this_generation
-            #             )
-            #         ]
-            #     )
-            # in mutation, check if chromosomes already suggested; force mutation if so until unique
-
-            new_chromosomes = self.mutation(
-                new_chromosomes
-            )
-
-            self.log_print(
-                [
-                    "already in this generation:\n{}".format(
-                        new_chromosomes_this_generation
-                    ),
-                    "\nnew chromosomes suggested:", new_chromosomes
-                ]
-            )
-            new_chromosomes_this_generation.extend(new_chromosomes)
-            new_models.extend(
-                [
-                    self.map_chromosome_to_model(c)
-                    for c in new_chromosomes
-                ]
-            )
-
-            parent_f_scores = [ self.chromosome_f_score(c) for c in pair_to_crossover ]
-            child_f_scores = [ self.chromosome_f_score(c) for c in new_chromosomes ]
-            delta_f_score.extend(
-                [ 
-                    child - parent
-                    for child in child_f_scores 
-                    for parent in parent_f_scores
-                ]
-            )
-
-
-        self.previously_considered_chromosomes.extend([
-            self.chromosome_string(r) for r in new_chromosomes_this_generation
-            ]
-        )
-        self.genetic_generation += 1
-        self.delta_f_by_generation[self.genetic_generation] = delta_f_score
-        self.chromosomes_at_generation[self.genetic_generation] = [
-            self.chromosome_string(r) for r in new_chromosomes_this_generation
-        ]
-        self.log_print(
-            [
-                "Genetic alg num new models:{}".format(len(new_models)),
-                "({} unique)".format(len(set(list(new_models))))
-            ]
-        )
-        return new_models
-
-    def chromosome_f_score(
-        self, 
-        chromosome, 
-    ):
-        if not isinstance(chromosome, np.ndarray):            
-            chromosome = np.array([int(a) for a in list(chromosome)])
-        
-        return sklearn.metrics.f1_score(
-            chromosome, 
-            self.true_chromosome
-        )
-
-    def log_print(
-        self,
-        to_print_list
-    ):
-        identifier = "[Genetic algorithm]"
-        if type(to_print_list) != list:
-            to_print_list = list(to_print_list)
-
-        print_strings = [str(s) for s in to_print_list]
-        to_print = " ".join(print_strings)
-        with open(self.log_file, 'a') as write_log_file:
-            print(
-                identifier,
-                str(to_print),
-                file=write_log_file,
-                flush=True
-            )
 

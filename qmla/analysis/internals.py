@@ -27,6 +27,7 @@ def generational_analysis(combined_results, save_directory=None):
     for k in combined_results.index:
         single_instance_gen_ll = eval(combined_results['GenerationalLogLikelihoods'][k])
         single_instance_gen_f_score= eval(combined_results['GenerationalFscore'][k])
+        instance_id = combined_results['QID'][k]
 
         for gen in list(single_instance_gen_ll.keys()):
             this_gen_ll = single_instance_gen_ll[gen]
@@ -40,7 +41,8 @@ def generational_analysis(combined_results, save_directory=None):
             )
 
             df['gen'] = gen
-            df['instance'] = k
+            # df['instance'] = k
+            df['instance'] = instance_id
             if generational_scores is None:
                 generational_scores = df
             else: 

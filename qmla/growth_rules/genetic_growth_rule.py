@@ -198,10 +198,12 @@ class Genetic(
             )
             model_f_scores[mod] = f_score
             fitness_track[mod] = model_number_wins[mod]/sum_fitnesses
-            fitness_ratio = ratings_weights[mod]/fitness_track[mod]
-            if fitness_track[mod]==0 or ratings_weights[mod] == 0 :
+            if fitness_track[mod]==0 or ratings_weights[mod] == 0:
                 fitness_ratio = None 
-            
+            else: 
+                fitness_ratio = ratings_weights[mod]/fitness_track[mod]
+
+
             self.fitness_by_f_score = (
                 self.fitness_by_f_score.append(
                     pd.Series(
@@ -520,8 +522,8 @@ class GeneticTest(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.max_spawn_depth = 6
-        self.initial_num_models = 6
+        self.max_spawn_depth = 10
+        self.initial_num_models = 10
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
