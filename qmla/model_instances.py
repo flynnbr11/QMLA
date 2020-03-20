@@ -822,12 +822,12 @@ class ModelInstanceForLearning():
             )
             datum = int( random.random() <= expectation_value ) # single shot measurement
             
-            self.log_print(
-                [
-                    "Evaluation: t={}; p={}".format(t, repr(probe)),
-                    "Expec val={}; datum={}".format(expectation_value, datum)
-                ]
-            )
+            # self.log_print(
+            #     [
+            #         "Evaluation: t={}; p={}".format(t, repr(probe)),
+            #         "Expec val={}; datum={}".format(expectation_value, datum)
+            #     ]
+            # )
 
             evaluation_updater.update(datum, exp)
 
