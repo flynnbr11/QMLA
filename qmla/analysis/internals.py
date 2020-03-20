@@ -31,13 +31,14 @@ def generational_analysis(combined_results, save_directory=None):
 
         for gen in list(single_instance_gen_ll.keys()):
             this_gen_ll = single_instance_gen_ll[gen]
-            this_gen_log_abs_ll = [np.log(np.abs(ll)) for ll in this_gen_ll]
+            # this_gen_log_abs_ll = [np.log(np.abs(ll)) for ll in this_gen_ll]
             this_gen_f_score = single_instance_gen_f_score[gen]
-            this_gen_data = list(zip(this_gen_ll, this_gen_log_abs_ll, this_gen_f_score))
+            # this_gen_data = list(zip(this_gen_ll, this_gen_log_abs_ll, this_gen_f_score))
+            this_gen_data = list(zip(this_gen_ll, this_gen_f_score))
 
             df = pd.DataFrame(
                 data = this_gen_data,
-                columns = ['log_likelihood', 'log_abs_ll', 'f_score']
+                columns = ['log_likelihood', 'f_score']
             )
 
             df['gen'] = gen
