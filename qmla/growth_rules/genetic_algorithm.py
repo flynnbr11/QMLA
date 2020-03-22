@@ -514,6 +514,8 @@ class GeneticAlgorithmQMLA():
             model_fitnesses = model_fitnesses
         )
         self.unique_pair_combinations_considered = []
+        num_loops_to_find_new_chromosome = 0
+        force_mutation = False
         while len(proposed_chromosomes) < num_models_for_next_generation:
             selected_pair_chromosomes = self.selection(
                 chromosome_selection_probabilities = chromosome_selection_probabilities
@@ -527,7 +529,8 @@ class GeneticAlgorithmQMLA():
                 selected_pair_chromosomes
             )
             suggested_chromosomes = self.mutation(
-                suggested_chromosomes
+                suggested_chromosomes,
+                force_mutation=force_mutation
             )
             c0_str = self.chromosome_string( suggested_chromosomes[0] )
             c1_str = self.chromosome_string( suggested_chromosomes[1] )
@@ -548,10 +551,23 @@ class GeneticAlgorithmQMLA():
                         "num proposed chromosome now: {} of {}".format(
                             len(proposed_chromosomes),
                             num_models_for_next_generation
-                        )
+                        ),
+                        "\nnum loops to find new chromosome:", num_loops_to_find_new_chromosome
                     ]
                 )
-            # else: 
+                num_loops_to_find_new_chromosome = 0 
+                force_mutation = False
+
+            else: 
+                num_loops_to_find_new_chromosome += 1
+                if num_loops_to_find_new_chromosome > 15:
+                    force_mutation = True
+                    self.log_print(
+                        [
+                            "Forcing mutation bc num loops to find new chromosome above limit"
+                        ]
+                    )
+                
             #     self.log_print(
             #         [
             #             "{} or {} already present in {}".format(c0_str, c1_str, proposed_chromosomes)
