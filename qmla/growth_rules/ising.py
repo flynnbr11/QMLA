@@ -111,6 +111,7 @@ class IsingPredetermined(
         self.tree_completed_initially = True
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
+            self.num_processes_to_parallelise_over = 5
             self.initial_models = [
                 # 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3',
                 # 'pauliSet_zJz_1J2_d3' # testing
