@@ -164,6 +164,7 @@ class ModelInstanceForComparison():
                 model=self.qinfer_model,
                 n_particles=self.num_particles,
                 prior=posterior_distribution,
+                zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
                 resample_thresh=self.qinfer_resampler_threshold,
                 resampler=qi.LiuWestResampler(
                     a=self.qinfer_resampler_a

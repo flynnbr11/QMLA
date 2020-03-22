@@ -596,6 +596,7 @@ class QuantumModelLearningAgent():
             'true_name': self.true_model_name,
             'true_oplist': self.true_model_constituent_operators,
             'true_model_terms_params': self.true_param_list,
+            # 'true_hamiltonian' : self.true_model_hamiltonian,
             'num_particles': self.num_particles,
             'num_experiments': self.num_experiments,
             'results_directory': self.results_directory,

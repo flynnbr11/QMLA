@@ -275,6 +275,7 @@ class ModelInstanceForLearning():
         self.store_particle_locations_and_weights = qmla_core_info_dict['store_particles_weights']
         self.results_directory = qmla_core_info_dict['results_directory']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
+        # self.true_hamiltonian = qmla_core_info_dict['true_hamiltonian']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
         self.sigma_threshold = qmla_core_info_dict['sigma_threshold']
@@ -375,6 +376,7 @@ class ModelInstanceForLearning():
             self.qinfer_model,
             self.num_particles,
             self.model_prior,
+            zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
             resample_thresh=self.qinfer_resampler_threshold,
             resampler=qi.LiuWestResampler(a=self.qinfer_resampler_a),
             debug_resampling=False
@@ -763,6 +765,12 @@ class ModelInstanceForLearning():
             self.model_terms_matrices,
             axes=1
         )
+        self.log_print(
+            [
+                "Learned parameters:", learned_params, 
+                "\nlearned Hamiltonian:\n", self.learned_hamiltonian
+            ]
+        )
 
         true_params_dict = pickle.load(
             open(
@@ -782,14 +790,29 @@ class ModelInstanceForLearning():
         evaluation_experiments = list(zip(
             evaluation_times, 
             evaluation_probes
-
         ))
+        evaluation_qinfer_model = qml_qi.QInferModelQML(
+            model_name=self.model_name,
+            modelparams=self.model_terms_parameters,
+            oplist=self.model_terms_matrices,
+            true_oplist=self.true_model_constituent_operators,
+            truename=self.true_model_name,
+            trueparams=self.true_model_params,
+            num_probes=self.probe_number,
+            probe_dict=evaluation_probe_dict,
+            sim_probe_dict=evaluation_probe_dict,
+            growth_generation_rule=self.growth_rule_of_this_model,
+            use_experimental_data=self.use_experimental_data,
+            experimental_measurements=self.experimental_measurements,
+            experimental_measurement_times=self.experimental_measurement_times,
+            log_file=self.log_file,
+        )
 
         evaluation_updater = qi.SMCUpdater(
             model=self.qinfer_model,
-            n_particles=self.num_particles,
+            n_particles=2,
+            # n_particles=self.num_particles,
             prior=posterior_distribution,
-            # prior=self.qinfer_updater.posterior_marginal,
             resample_thresh=self.qinfer_resampler_threshold,
             resampler=qi.LiuWestResampler(
                 a=self.qinfer_resampler_a
@@ -800,7 +823,7 @@ class ModelInstanceForLearning():
         evaluation_updater._log_total_likelihood = 0.0
         evaluation_updater._normalization_record = []
 
-        for t, probe in evaluation_experiments:
+        for t in evaluation_times:
         # for i in range(len(times)):
             exp = format_experiment(
                 self.qinfer_model, 
@@ -808,24 +831,35 @@ class ModelInstanceForLearning():
                 time = [t],
                 # time = [times[i]]
             )
-            # params_array = np.array([[self.true_model_params[:]]])
-            # datum = evaluation_updater.model.simulate_experiment(
-            #     params_array,
-            #     exp,
-            #     repeat=1
+            params_array = np.array([[self.true_model_params[:]]])
+            # self.log_print(
+            #     [
+            #         "[evaluation] Getting datum"
+            #     ]
             # )
-            # get datum manually through growth_class.expectation_value
-            expectation_value = self.growth_class.expectation_value(
-                ham = self.learned_hamiltonian, 
-                t = t, 
-                state = probe
+            datum = evaluation_updater.model.simulate_experiment(
+                params_array,
+                exp,
+                repeat=1
             )
-            datum = int( random.random() <= expectation_value ) # single shot measurement
+            # get datum manually through growth_class.expectation_value
+            # expectation_value = self.growth_class.expectation_value(
+            #     # ham = self.learned_hamiltonian, 
+            #     ham = self.true_hamiltonian,
+            #     t = t, 
+            #     state = probe
+            # )
+            # datum = int( random.random() <= expectation_value ) # single shot measurement
             
             # self.log_print(
             #     [
             #         "Evaluation: t={}; p={}".format(t, repr(probe)),
             #         "Expec val={}; datum={}".format(expectation_value, datum)
+            #     ]
+            # )
+            # self.log_print(
+            #     [
+            #         "[evaluation] Updating"
             #     ]
             # )
 

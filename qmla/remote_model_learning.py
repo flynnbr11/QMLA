@@ -99,6 +99,7 @@ def remote_learn_model_parameters(
             ]
         )
         log_print(["Starting model likelihood calculation."])
+        print("Computing log likelihood for mod {}".format(model_id))
         qml_instance.compute_likelihood_after_parameter_learning(
             times = evaluation_times
         )

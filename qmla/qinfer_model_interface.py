@@ -313,29 +313,20 @@ class QInferModelQML(qi.FiniteOutcomeModel):
 
         else:
             qmla.memory_tests.print_file_line(debug_print_file_line)
-
+            probe_counter = (self._b % int(self.probe_number))
             if true_evo == True:
                 qmla.memory_tests.print_file_line(debug_print_file_line)
                 probe = self.probe_dict[
-                    (self._b % int(self.probe_number)),
+                    probe_counter,
                     ham_num_qubits
                 ]
                 qmla.memory_tests.print_file_line(debug_print_file_line)
             else:
                 qmla.memory_tests.print_file_line(debug_print_file_line)
                 probe = self.sim_probe_dict[
-                    (self._b % int(self.probe_number)),
+                    probe_counter,
                     ham_num_qubits
                 ]
-            qmla.memory_tests.print_file_line(debug_print_file_line)
-
-            ham_minus = np.tensordot(
-                sample,
-                self._oplist,
-                axes=1
-            )[0]
-            qmla.memory_tests.print_loc(global_print_loc)
-            qmla.memory_tests.print_file_line(debug_print_file_line)
 
             if len(modelparams.shape) == 1:
                 modelparams = modelparams[..., np.newaxis]
@@ -383,9 +374,14 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                     [
                         'Simulating experiment.',
                         'times:', times,
+                        'true_evo:', true_evo,
                         'len(outcomes):', len(outcomes),
+                        '_a = {}, _b={}'.format(self._a, self._b),
+                        'probe counter:', probe_counter,
+                        '\nexp:', expparams,
                         '\nOutcomes:', outcomes,
-                        #'\n pr0:\n', pr0,
+                        '\nmodelparams:', params,
+                        '\nprobe[0]:', probe[0],
                     ],
                 )
 

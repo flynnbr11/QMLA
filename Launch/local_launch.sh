@@ -17,7 +17,7 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=10
+prt=15
 exp=3
 pgh=1.0
 pgh_exponent=1.0
@@ -80,8 +80,8 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='HeisenbergXYZProbabilistic'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
-# sim_growth_rule='Genetic'
-sim_growth_rule='GeneticTest'
+sim_growth_rule='Genetic'
+# sim_growth_rule='GeneticTest'
 # sim_growth_rule='Presentation'
 # sim_growth_rule='ExperimentReducedNV'
 # sim_growth_rule='example'

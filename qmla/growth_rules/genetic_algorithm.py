@@ -295,20 +295,20 @@ class GeneticAlgorithmQMLA():
         c2 = np.array(list(chromosomes[1]))
         # c1 = copy.copy(chromosomes[0])
         # c2 = copy.copy(chromosomes[1])
-        self.log_print(
-            [
-                "[Crossover Input]\n {} / {}".format(repr(c1), repr(c2))
-            ]
-        )
+        # self.log_print(
+        #     [
+        #         "[Crossover Input]\n {} / {}".format(repr(c1), repr(c2))
+        #     ]
+        # )
         # x = int(len(c1) / 2) # select the halfway point for the crossover
         x = random.randint(1, len(c1) - 2 ) # randomly select the position to perform the crossover at, excluding end points
         tmp = c2[:x].copy()
         c2[:x], c1[:x] = c1[:x], tmp
-        self.log_print(
-            [
-                "[Crossover Result] (x={})\n {} / {}".format(x,repr(c1), repr(c2))
-            ]
-        )
+        # self.log_print(
+        #     [
+        #         "[Crossover Result] (x={})\n {} / {}".format(x,repr(c1), repr(c2))
+        #     ]
+        # )
 
         return c1, c2
 
@@ -440,18 +440,14 @@ class GeneticAlgorithmQMLA():
             reverse=True
         )
         num_models = len(ranked_models)
-        truncation_cutoff = int(num_models/2)
-        if num_models <= 4:
-            truncated_model_list = ranked_models 
-        else:
-            self.log_print(
-                [
-                    "Truncating model to include only {} models".format(
-                        truncation_cutoff
-                    )
-                ]
-            )
-            truncated_model_list = ranked_models[:truncation_cutoff]
+        self.log_print(
+            [
+                "Considering truncation for {} models".format(num_models),
+                "ranked models:", ranked_models
+            ]
+        )
+        truncation_cutoff = max(int(num_models/2), 4)#  either consider top half, or top 4 if too small
+        truncated_model_list = ranked_models[:truncation_cutoff]
 
         truncated_model_fitnesses = {
             mod : model_fitnesses[mod] 
@@ -516,11 +512,11 @@ class GeneticAlgorithmQMLA():
             selected_pair_chromosomes = self.selection(
                 chromosome_selection_probabilities = chromosome_selection_probabilities
             )
-            self.log_print(
-                [
-                    "Selected pair of chromosomes:", selected_pair_chromosomes
-                ]
-            )
+            # self.log_print(
+            #     [
+            #         "Selected pair of chromosomes:", selected_pair_chromosomes
+            #     ]
+            # )
             suggested_chromosomes = self.crossover(
                 selected_pair_chromosomes
             )
@@ -549,12 +545,12 @@ class GeneticAlgorithmQMLA():
                         )
                     ]
                 )
-            else: 
-                self.log_print(
-                    [
-                        "{} or {} already present in {}".format(c0_str, c1_str, proposed_chromosomes)
-                    ]
-                )
+            # else: 
+            #     self.log_print(
+            #         [
+            #             "{} or {} already present in {}".format(c0_str, c1_str, proposed_chromosomes)
+            #         ]
+            #     )
 
         # chop extra chromosomes if generated
         proposed_chromosomes = proposed_chromosomes[:num_models_for_next_generation]

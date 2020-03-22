@@ -505,7 +505,8 @@ try:
     )
 except:
     print("ANALYSIS FAILURE: generational analysis.")
-    raise
+    pass
+    # raise
 
 try:
     qmla.analysis.r_sqaured_average(

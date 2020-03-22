@@ -147,12 +147,14 @@ def remote_bayes_factor_calculation(
         log_l_a = log_likelihood(
             model_a,
             update_times_model_a,
-            binning=set_renorm_record_to_zero
+            binning=set_renorm_record_to_zero,
+            log_file = log_file, 
         )
         log_l_b = log_likelihood(
             model_b,
             update_times_model_b,
-            binning=set_renorm_record_to_zero
+            binning=set_renorm_record_to_zero,
+            log_file = log_file, 
         )
 
         # after learning, want to see what dynamics are like after further
@@ -273,11 +275,23 @@ def remote_bayes_factor_calculation(
 
         return bayes_factor
 
+def log_print(
+    to_print_list,
+    log_file, 
+    log_identifier
+):
+    qmla.logging.print_to_log(
+        to_print_list = to_print_list, 
+        log_file = log_file, 
+        log_identifier = log_identifier
+    )
+
 
 def log_likelihood(
     model,
     times,
-    binning=False
+    binning=False,
+    log_file=None,
 ):
     updater = model.qinfer_updater
     
@@ -289,10 +303,24 @@ def log_likelihood(
     for i in range(len(times)):
         exp = get_exp(model, [times[i]])
         params_array = np.array([[model.true_model_params[:]]])
+        log_print(
+            to_print_list = [
+                "Getting datum"
+            ], 
+            log_file = log_file, 
+            log_identifier = 'log_likelihood'
+        )
         datum = updater.model.simulate_experiment(
             params_array,
             exp,
             repeat=1
+        )
+        log_print(
+            to_print_list = [
+                "Performing update"
+            ], 
+            log_file = log_file, 
+            log_identifier = 'log_likelihood'
         )
         updater.update(datum, exp)
 
