@@ -304,11 +304,11 @@ class GeneticAlgorithmQMLA():
         x = random.randint(1, len(c1) - 2 ) # randomly select the position to perform the crossover at, excluding end points
         tmp = c2[:x].copy()
         c2[:x], c1[:x] = c1[:x], tmp
-        self.log_print(
-            [
-                "[Crossover Result] (x={})\n {} / {}".format(x,repr(c1), repr(c2))
-            ]
-        )
+        # self.log_print(
+        #     [
+        #         "[Crossover Result] (x={})\n {} / {}".format(x,repr(c1), repr(c2))
+        #     ]
+        # )
 
         return c1, c2
 
@@ -319,6 +319,7 @@ class GeneticAlgorithmQMLA():
     def mutation(
         self,
         chromosomes,
+        force_mutation = False, 
     ):
         copy_chromosomes = copy.copy(chromosomes)
         mutated_chromosomes = []
@@ -334,7 +335,11 @@ class GeneticAlgorithmQMLA():
             else:
                 mutation_probability = self.mutation_probability
 
-            if np.random.rand() < mutation_probability:
+            if (
+                np.random.rand() < mutation_probability
+                or 
+                force_mutation
+            ):
                 idx = np.random.choice(range(len(c)))
                 # print("Flipping idx {}".format(idx))
                 if c[idx] == 0:
@@ -446,7 +451,7 @@ class GeneticAlgorithmQMLA():
                 "ranked models:", ranked_models
             ]
         )
-        truncation_cutoff = max( int(num_models/2), 4)#  either consider top half, or top 4 if too small
+        truncation_cutoff = max( int(num_models*0.75), 4)#  either consider top half, or top 4 if too small
         truncation_cutoff = min( truncation_cutoff, num_models )
         truncated_model_list = ranked_models[:truncation_cutoff]
 
