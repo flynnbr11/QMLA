@@ -877,7 +877,10 @@ class ModelInstanceForLearning():
         if np.isnan(evaluation_updater.log_total_likelihood):
             self.evaluation_log_likelihood = None 
         else:
-            self.evaluation_log_likelihood = round_nearest(evaluation_updater.log_total_likelihood, 0.05)
+            self.evaluation_log_likelihood = round_nearest(
+                evaluation_updater.log_total_likelihood / len(self.evaluation_normalization_record), 
+                0.05
+            )
         
 
 def round_nearest(x,a):

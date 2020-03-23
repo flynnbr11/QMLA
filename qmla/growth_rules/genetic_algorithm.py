@@ -579,27 +579,34 @@ class GeneticAlgorithmQMLA():
 
             if (
                 c0_str not in proposed_chromosomes
-                and 
-                c1_str not in proposed_chromosomes
                 and
                 c0_str != self.all_zero_chromosome_string 
+            ):
+                proposed_chromosomes.append(c0_str)
+                self.log_print(
+                    [
+                        "num proposed chromosome now: {} of {}".format(
+                            len(proposed_chromosomes),
+                            num_models_for_next_generation
+                        )
+                    ]
+                )
+
+            if (
+                c1_str not in proposed_chromosomes
                 and
                 c1_str != self.all_zero_chromosome_string
             ):
-                proposed_chromosomes.append(c0_str)
                 proposed_chromosomes.append(c1_str)
                 self.log_print(
                     [
                         "num proposed chromosome now: {} of {}".format(
                             len(proposed_chromosomes),
                             num_models_for_next_generation
-                        ),
-                        "\nnum loops to find new chromosome:", num_loops_to_find_new_chromosome
+                        )
                     ]
                 )
-                num_loops_to_find_new_chromosome = 0 
-                force_mutation = False
-            elif len(self.chrom_pair_df) == 0 :
+            if len(self.chrom_pair_df) == 0 :
                 # already tried every available pair 
                 self.log_print(
                     [
