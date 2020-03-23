@@ -2227,6 +2227,10 @@ class QuantumModelLearningAgent():
 
         self.champion_name_latex = champ_model.model_name_latex
         self.growth_class.growth_rule_finalise()
+        model_evaluation_log_likelihoods = {
+            mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_log_likelihood
+            for mod_id in self.models_learned
+        }
         # equivalent to self.champion_results
 
         self.champion_results = {
@@ -2280,6 +2284,7 @@ class QuantumModelLearningAgent():
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
             'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
+            'ModelEvaluationLogLikelihoods' : model_evaluation_log_likelihoods,
             'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
         }
 
