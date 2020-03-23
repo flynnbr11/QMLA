@@ -607,6 +607,7 @@ class GeneticAlgorithmQMLA():
                     ]
                 )
                 self.prepare_chromosome_pair_dataframe(
+                    chromosome_probabilities=chromosome_selection_probabilities,
                     force_mutation=True
                 )
             # else: 
