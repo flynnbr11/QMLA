@@ -124,7 +124,7 @@ def set_shared_parameters(
         'params_dict': true_params_dict,
         'all_growth_rules': all_growth_rules,
         'evaluation_probes' : evaluation_probes,
-        'evaluation_experiments' : evaluation_experiments
+        'evaluation_times' : evaluation_times
     }
     if exp_data:
         print("\n\n\n[SetQHL] EXPDATA -- dont store true vals")

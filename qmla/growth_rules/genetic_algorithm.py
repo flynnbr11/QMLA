@@ -29,7 +29,7 @@ class GeneticAlgorithmQMLA():
         self.true_chromosome_string = self.chromosome_string(
             self.true_chromosome
         )
-        self.all_zero_chromosome_string = '0'*num_sites
+        self.all_zero_chromosome_string = '0'*self.num_terms
         self.addition_str = '+'
         self.mutation_probability = mutation_probability
         self.previously_considered_chromosomes = []
@@ -293,22 +293,18 @@ class GeneticAlgorithmQMLA():
         c1 = np.array(list(selection['chromosome_1']))
         c2 = np.array(list(selection['chromosome_2']))
         x = selection['other_data']['cut']
-        # c1 = copy.copy(chromosomes[0])
-        # c2 = copy.copy(chromosomes[1])
-        self.log_print(
-            [
-                "[Crossover Input] x={}\n {} / {}".format(x, repr(c1), repr(c2))
-            ]
-        )
-        # x = int(len(c1) / 2) # select the halfway point for the crossover
-        # x = random.randint(1, len(c1) - 2 ) # randomly select the position to perform the crossover at, excluding end points
+        # self.log_print(
+        #     [
+        #         "[Crossover Input] x={}\n {} / {}".format(x, repr(c1), repr(c2))
+        #     ]
+        # )
         tmp = c2[:x].copy()
         c2[:x], c1[:x] = c1[:x], tmp
-        self.log_print(
-            [
-                "[Crossover Result] (x={})\n {} / {}".format(x,repr(c1), repr(c2))
-            ]
-        )
+        # self.log_print(
+        #     [
+        #         "[Crossover Result] (x={})\n {} / {}".format(x,repr(c1), repr(c2))
+        #     ]
+        # )
 
         return c1, c2
 
@@ -584,8 +580,9 @@ class GeneticAlgorithmQMLA():
             ):
                 proposed_chromosomes.append(c0_str)
                 self.log_print(
-                    [
-                        "num proposed chromosome now: {} of {}".format(
+                    [   
+                        "Adding {}; num proposed chromosome now: {} of {}".format(
+                            c0_str,
                             len(proposed_chromosomes),
                             num_models_for_next_generation
                         )

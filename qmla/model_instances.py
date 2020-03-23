@@ -779,18 +779,9 @@ class ModelInstanceForLearning():
             )
         )
         
-        evaluation_experiments = true_params_dict['evaluation_experiments']
+        evaluation_times = true_params_dict['evaluation_times']
         evaluation_probe_dict = true_params_dict['evaluation_probes']
 
-        evaluation_times = [e[0] for e in evaluation_experiments]
-        evaluation_probes = [
-            evaluation_probe_dict[(e[1], self.model_dimension)] for e in evaluation_experiments
-        ]
-
-        evaluation_experiments = list(zip(
-            evaluation_times, 
-            evaluation_probes
-        ))
         evaluation_qinfer_model = qml_qi.QInferModelQML(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
