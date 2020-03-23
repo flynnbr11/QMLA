@@ -58,7 +58,7 @@ def remote_bayes_factor_calculation(
         qmla.logging.print_to_log(
             to_print_list = to_print_list, 
             log_file = log_file, 
-            log_identifier = 'Bayes Factor remote'
+            log_identifier = 'BF ({}/{})'.format(model_a_id, model_b_id)
         )
     
     time_start = time.time()

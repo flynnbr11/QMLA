@@ -522,8 +522,8 @@ class GeneticTest(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.max_spawn_depth = 4
-        self.initial_num_models = 4
+        self.max_spawn_depth = 1
+        self.initial_num_models = 10
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )

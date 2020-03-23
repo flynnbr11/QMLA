@@ -195,10 +195,6 @@ class GeneticAlgorithmQMLA():
                 )
 
                 new_models.append(mod)
-
-        # new_models = list(set(new_models))
-        # print("Random initial models:", self.previously_considered_chromosomes)
-        # print("Random initial models:", new_models)
         return new_models
 
     ######################
@@ -207,7 +203,7 @@ class GeneticAlgorithmQMLA():
 
     def selection(
         self,
-        chromosome_selection_probabilities,
+        # chromosome_selection_probabilities,
         **kwargs
     ):
         r"""
@@ -217,10 +213,43 @@ class GeneticAlgorithmQMLA():
             * prescribed_chromosomes
             * chromosomes_for_crossover - pairs
         """
-        return self.basic_pair_selection(
-            chromosome_selection_probabilities,
-            **kwargs
+        # return self.basic_pair_selection(
+        #     chromosome_selection_probabilities,
+        #     **kwargs
+        # )
+        return self.select_from_pair_df_remove_selected()
+
+    def select_from_pair_df_remove_selected(
+        self,
+        **kwargs
+    ):
+
+        self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
+        self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
+        pair_ids = list(self.chrom_pair_df.index)
+        pair_probs = [ self.chrom_pair_df.loc[i].probability for i in pair_ids]
+        
+        selected_id = np.random.choice(
+            a = pair_ids, 
+            p = pair_probs
         )
+        selected_entry = self.chrom_pair_df.loc[selected_id]
+        self.chrom_pair_df = self.chrom_pair_df.drop(selected_id)
+        selection = {
+            'chromosome_1' : selected_entry['c1'], 
+            'chromosome_2' : selected_entry['c2'], 
+            'other_data' : { 
+                'cut' : int(selected_entry['cut1']),
+                'force_mutation' : bool(selected_entry['force_mutation'])
+            }
+        }
+        self.log_print(
+            [
+                "Selection id {}: {}".format(selected_id, selection)
+            ]
+        )
+        return selection
+
 
     def basic_pair_selection(
         self,
@@ -229,29 +258,6 @@ class GeneticAlgorithmQMLA():
     ):
         chromosomes = list(chromosome_selection_probabilities.keys())
         probabilities = [chromosome_selection_probabilities[c] for c in chromosomes]
-        # new_pair = False
-        # self.log_print(
-        #     [
-        #         "Basic pair selection; finding new combination.",
-        #         "Combinations present already:", 
-        #     ]
-        # )
-        # while new_pair is False: 
-        #     selected_chromosomes = np.random.choice(
-        #         chromosomes,
-        #         size=2,
-        #         p=probabilities,
-        #         replace=False
-        #     )
-        #     unique_combination = ''.join(
-        #             [
-        #                 str(i) for i in list(selected_chromosomes[0] + selected_chromosomes[1])
-        #             ]
-        #         ) 
-        #     if unique_combination not in self.unique_pair_combinations_considered:
-        #         new_pair = True
-            
-        # self.unique_pair_combinations_considered.append(unique_combination)
         selected_chromosomes = np.random.choice(
             chromosomes,
             size=2,
@@ -267,48 +273,42 @@ class GeneticAlgorithmQMLA():
 
     def crossover(
         self,
-        pair_to_crossover,
-        this_generation_chromosomes=None, 
+        selection, 
+        **kwargs
     ):
         """
         This fnc assumes only 2 chromosomes to crossover
         and does so in the most basic method of splitting
         down the middle and swapping
         """
-        suggested_chromosomes =  self.one_point_crossover(pair_to_crossover)
-        if this_generation_chromosomes is not None:
-            self.log_print(
-                [
-                    "This generation chromosomes:\n", this_generation_chromosomes, 
-                    "\nSuggested chromosomes:\n", suggested_chromosomes
-                ]
-            )
-
+        suggested_chromosomes =  self.one_point_crossover(selection)
         return suggested_chromosomes
 
 
     def one_point_crossover(
         self, 
-        chromosomes
+        selection,
+        **kwargs
     ):
-        c1 = np.array(list(chromosomes[0]))
-        c2 = np.array(list(chromosomes[1]))
+        c1 = np.array(list(selection['chromosome_1']))
+        c2 = np.array(list(selection['chromosome_2']))
+        x = selection['other_data']['cut']
         # c1 = copy.copy(chromosomes[0])
         # c2 = copy.copy(chromosomes[1])
-        # self.log_print(
-        #     [
-        #         "[Crossover Input]\n {} / {}".format(repr(c1), repr(c2))
-        #     ]
-        # )
+        self.log_print(
+            [
+                "[Crossover Input] x={}\n {} / {}".format(x, repr(c1), repr(c2))
+            ]
+        )
         # x = int(len(c1) / 2) # select the halfway point for the crossover
-        x = random.randint(1, len(c1) - 2 ) # randomly select the position to perform the crossover at, excluding end points
+        # x = random.randint(1, len(c1) - 2 ) # randomly select the position to perform the crossover at, excluding end points
         tmp = c2[:x].copy()
         c2[:x], c1[:x] = c1[:x], tmp
-        # self.log_print(
-        #     [
-        #         "[Crossover Result] (x={})\n {} / {}".format(x,repr(c1), repr(c2))
-        #     ]
-        # )
+        self.log_print(
+            [
+                "[Crossover Result] (x={})\n {} / {}".format(x,repr(c1), repr(c2))
+            ]
+        )
 
         return c1, c2
 
@@ -480,6 +480,49 @@ class GeneticAlgorithmQMLA():
         return model_probabilities
 
 
+    def prepare_chromosome_pair_dataframe(
+        self, 
+        chromosome_probabilities,
+        force_mutation=False,
+    ):
+        self.log_print(
+            [
+                "Setting up chromosome pair dataframe with initial probabilities", 
+                chromosome_probabilities
+            ]
+        )
+        self.chrom_pair_df = pd.DataFrame(
+            columns = ['c1', 'c2', 'probability', 'cut1', 'c1_prob', 'c2_prob', 'force_mutation'] 
+        )
+        chromosome_combinations = list(
+            itertools.combinations(list(chromosome_probabilities.keys()), 2)
+        )
+        for c1,c2 in chromosome_combinations:
+            pair_prob = chromosome_probabilities[c1] * chromosome_probabilities[c2] # TODO better way to get pair prob?
+            for cut1 in range(1, len(c1)-2):
+                this_pair_df = pd.DataFrame(
+                    np.array([
+                        [
+                            c1, c2, 
+                            np.round(pair_prob, 2), 
+                            cut1, 
+                            chromosome_probabilities[c1], chromosome_probabilities[c2],
+                            force_mutation
+                        ]
+                    ]),
+                    columns=[
+                        'c1', 'c2', 
+                        'probability', 
+                        'cut1', 'c1_prob', 
+                        'c2_prob',
+                        'force_mutation'
+                    ]
+                )
+                self.chrom_pair_df = self.chrom_pair_df.append(
+                    this_pair_df, 
+                    ignore_index=True
+                )
+
     ######################
     # Implement entire genetic algorithm iteration
     ######################
@@ -489,6 +532,7 @@ class GeneticAlgorithmQMLA():
         model_fitnesses,
         **kwargs
     ):
+
         input_models = list(model_fitnesses.keys())
         num_models_for_next_generation = len(input_models)
         self.log_print(
@@ -513,24 +557,22 @@ class GeneticAlgorithmQMLA():
         chromosome_selection_probabilities = self.get_selection_probabilities(
             model_fitnesses = model_fitnesses
         )
+
+        self.prepare_chromosome_pair_dataframe(
+            chromosome_probabilities=chromosome_selection_probabilities
+        )
+
         self.unique_pair_combinations_considered = []
         num_loops_to_find_new_chromosome = 0
         force_mutation = False
         while len(proposed_chromosomes) < num_models_for_next_generation:
-            selected_pair_chromosomes = self.selection(
-                chromosome_selection_probabilities = chromosome_selection_probabilities
-            )
-            # self.log_print(
-            #     [
-            #         "Selected pair of chromosomes:", selected_pair_chromosomes
-            #     ]
-            # )
+            selection = self.selection()
             suggested_chromosomes = self.crossover(
-                selected_pair_chromosomes
+                selection = selection
             )
             suggested_chromosomes = self.mutation(
                 suggested_chromosomes,
-                force_mutation=force_mutation
+                force_mutation=selection['other_data']['force_mutation']
             )
             c0_str = self.chromosome_string( suggested_chromosomes[0] )
             c1_str = self.chromosome_string( suggested_chromosomes[1] )
@@ -557,17 +599,25 @@ class GeneticAlgorithmQMLA():
                 )
                 num_loops_to_find_new_chromosome = 0 
                 force_mutation = False
-
-            else: 
-                num_loops_to_find_new_chromosome += 1
-                if num_loops_to_find_new_chromosome > 15:
-                    force_mutation = True
-                    self.log_print(
-                        [
-                            "Forcing mutation bc num loops to find new chromosome above limit"
-                        ]
-                    )
-                
+            elif len(self.chrom_pair_df) == 0 :
+                # already tried every available pair 
+                self.log_print(
+                    [
+                        "Redrawing chromosome pair selection dataframe, enforcing mutation"
+                    ]
+                )
+                self.prepare_chromosome_pair_dataframe(
+                    force_mutation=True
+                )
+            # else: 
+            #     num_loops_to_find_new_chromosome += 1
+            #     if num_loops_to_find_new_chromosome > 15:
+            #         force_mutation = True
+            #         self.log_print(
+            #             [
+            #                 "Forcing mutation bc num loops to find new chromosome above limit"
+            #             ]
+            #         )
             #     self.log_print(
             #         [
             #             "{} or {} already present in {}".format(c0_str, c1_str, proposed_chromosomes)
