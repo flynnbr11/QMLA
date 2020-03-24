@@ -438,9 +438,10 @@ class Genetic(
         if '1000000000' in chromosomes: 
             self.log_print(
                 [
-                    "{} in previous chromosomes:\n{}",
-                    '1000000000', 
-                     self.genetic_algorithm.previously_considered_chromosomes
+                    "{} in previous chromosomes:\n{}".format(
+                        '1000000000', 
+                        self.genetic_algorithm.previously_considered_chromosomes
+                    )
                 ]
             )
         chromosome_numbers = sorted([int(c,2) for c in chromosomes])

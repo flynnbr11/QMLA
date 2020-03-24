@@ -147,7 +147,14 @@ class GeneticAlgorithmQMLA():
         c
     ):
         b = [str(i) for i in c]
-        return ''.join(b)
+        s = ''.join(b)
+        if s == '1000000000':
+            self.log_print(
+                [
+                    "Unallowed chromosome string {} for {}".format(b, c)
+                ]
+            )
+        return s
 
     def chromosome_f_score(
         self, 
