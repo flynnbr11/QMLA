@@ -869,7 +869,8 @@ class ModelInstanceForLearning():
             self.evaluation_log_likelihood = None 
         else:
             self.evaluation_log_likelihood = round_nearest(
-                evaluation_updater.log_total_likelihood / len(self.evaluation_normalization_record), 
+                # evaluation_updater.log_total_likelihood / len(self.evaluation_normalization_record), 
+                evaluation_updater.log_total_likelihood, 
                 0.05
             )
         

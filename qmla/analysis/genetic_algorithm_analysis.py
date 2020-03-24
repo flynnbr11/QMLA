@@ -338,7 +338,6 @@ def model_generation_probability(
     )
     f_scores = flatten(f_scores)
 
-
     unique_chromosome_numbers = sorted(list(set(chromosomes)))
     unique_chromosomes = [bin(int(c))[2:].zfill(num_terms) for c in unique_chromosome_numbers]
     counts = [chromosomes.count(a) for a in unique_chromosome_numbers]
