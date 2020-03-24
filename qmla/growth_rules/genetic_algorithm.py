@@ -185,7 +185,7 @@ class GeneticAlgorithmQMLA():
         self.chromosomes_at_generation[0] = []
 
         while len(new_models) < num_models:
-            r = random.randint(1, 2**self.num_terms)
+            r = random.randint(1, 2**self.num_terms-1)
             r = format(r, '0{}b'.format(self.num_terms))
 
             if self.chromosome_string(
