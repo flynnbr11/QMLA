@@ -957,12 +957,11 @@ def plot_evaluation_log_likelihoods(
     ax.set_ylabel('Log likelihood')
     ax.set_xlabel('Instance')
     ax.set_xticks(
-        list(range(evaluation_plot_df.instance.min(), 1+evaluation_plot_df.instance.max()))
+        []
+        # list(range(evaluation_plot_df.instance.min(), 1+evaluation_plot_df.instance.max()))
     )
 
-    ax.legend()
-
-    
+    ax.legend()    
     if save_directory is not None: 
         plt.savefig(
             os.path.join(
