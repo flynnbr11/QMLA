@@ -962,6 +962,7 @@ def plot_evaluation_log_likelihoods(
     )
 
     ax.legend()    
+    ax.set_title('Evaluation by individual instances')
     if save_directory is not None: 
         plt.savefig(
             os.path.join(
