@@ -901,7 +901,7 @@ def plot_evaluation_log_likelihoods(
             )
     evaluation_plot_df.instance = evaluation_plot_df.instance.astype(int)
     
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(17, 7))
     sns.boxplot(
         y = 'log_likelihood', 
         x = 'instance', 

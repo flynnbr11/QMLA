@@ -1,6 +1,7 @@
 import numpy as np
 import pickle
 import math
+import scipy
 
 import qmla.database_framework as database_framework
 import qmla.prior_distributions as distributions
@@ -106,7 +107,17 @@ def set_shared_parameters(
             noise_level = growth_class.probe_noise_level,
             minimum_tolerable_noise = 0.0,
         )
-        evaluation_times = list(np.arange(0, 10, 0.05)) # TODO better choice of times for evaluation
+        evaluation_times = scipy.stats.reciprocal.rvs(
+            1e-3, 
+            growth_class.max_time_to_consider, 
+            size=int(1e2)
+        ) # evaluation times generated log-uniformly
+        # evaluation_times = list(np.linspace(
+        #     0, 
+        #     10, 
+        #     100
+        #     )
+        # ) # TODO better choice of times for evaluation
         available_probe_ids = list(range(growth_class.num_probes))
         list_len_fator = math.ceil(len(evaluation_times) / len(available_probe_ids))
         iterable_probe_ids = iter(available_probe_ids * list_len_fator)
