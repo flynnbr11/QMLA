@@ -908,7 +908,7 @@ def plot_evaluation_log_likelihoods(
         data = evaluation_plot_df,
         ax = ax,
         color='lightblue',
-        showfliers=True
+        showfliers=False
     )
     ax.set_ylabel('Log likelihood')
     ax.set_xlabel('Instance')
