@@ -2250,6 +2250,7 @@ class QuantumModelLearningAgent():
             'ConfigLatex': self.latex_config,
             'Time': time_taken,
             'QID': self.qmla_id,
+            'ChampID': self.champion_model_id,
             'CorrectModel': correct_model,
             'Underfit': underfit,
             'Overfit': overfit,
@@ -2280,12 +2281,14 @@ class QuantumModelLearningAgent():
             'TrueModelConsidered' : self.true_model_considered, 
             'TrueModelFound' : self.true_model_found,
             'TrueModelBranch' : self.true_model_branch,
+            'TrueModelID' : self.true_model_id, 
             'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
             'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
             'ModelEvaluationLogLikelihoods' : model_evaluation_log_likelihoods,
             'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
+            'AllModelFScores' : self.model_f_scores, 
         }
 
     def check_champion_reducibility(
@@ -2591,6 +2594,7 @@ class QuantumModelLearningAgent():
             'Trackplot_parameter_estimates': mod.track_parameter_estimates,
             'TrackVolume': mod.volume_by_epoch,
             'TrackTimesLearned': mod.times_learned_over,
+            'ChampID': self.champion_model_id,
             'ExpectationValues': mod.expectation_values,
             'FinalRSquared': mod.final_r_squared,
             'Fscore': self.model_f_scores[mod_id],
@@ -2604,11 +2608,13 @@ class QuantumModelLearningAgent():
             'TrueModelConsidered' : self.true_model_considered, 
             'TrueModelFound' : self.true_model_found,
             'TrueModelBranch' : self.true_model_branch,
+            'TrueModelID' : self.true_model_id, 
             'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
             'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
             'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
+            'AllModelFScores' : self.model_f_scores, 
         }
 
         self.log_print(
@@ -2765,11 +2771,13 @@ class QuantumModelLearningAgent():
                 'TrueModelConsidered' : self.true_model_considered, 
                 'TrueModelFound' : self.true_model_found,
                 'TrueModelBranch' : self.true_model_branch,
+                'TrueModelID' : self.true_model_id, 
                 'NumModels' : len(self.models_learned),
                 'StatisticalMetrics' : self.generational_statistical_metrics,
                 'GenerationalFscore'  : self.generational_f_score,
                 'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
                 'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
+                'AllModelFScores' : self.model_f_scores, 
             }
             self.model_id_to_name_map = {}
             for k in self.model_name_id_map:

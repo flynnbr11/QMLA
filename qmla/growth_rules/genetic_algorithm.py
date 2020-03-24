@@ -223,7 +223,7 @@ class GeneticAlgorithmQMLA():
         self,
         **kwargs
     ):
-
+        # normalise so pairs' probabilities sum to 1
         self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
         self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
         pair_ids = list(self.chrom_pair_df.index)

@@ -19,7 +19,8 @@ __all__ = [
     'summarise_qmla_text_file',
     'plot_scores',
     'stat_metrics_histograms',
-    'parameter_sweep_analysis'
+    'parameter_sweep_analysis',
+    'plot_evaluation_log_likelihoods'
 ]
 
 def update_shared_bayes_factor_csv(qmd, all_bayes_csv):
@@ -840,3 +841,132 @@ def parameter_sweep_analysis(
 
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
+
+
+def plot_evaluation_log_likelihoods(
+    combined_results, 
+    save_directory=None,
+):
+    evaluation_cols = ['instance', 'model_id', 'log_likelihood', 'f_score', 'true', 'champ', 'Classification']
+    evaluation_plot_df = pd.DataFrame(
+        columns = evaluation_cols
+    )
+
+    highlight_columns = ['instance', 'model_id', 'log_likelihood', 'marker', 'colour']
+    highlighted_models_df = pd.DataFrame(
+        columns = highlight_columns
+    )
+
+    for i in list(combined_results.index):
+        res = combined_results.iloc[i]
+
+        log_lls = eval(res.ModelEvaluationLogLikelihoods)
+        f_scores = eval(res.AllModelFScores)
+
+        instance = res.QID
+        instance_true_id = res.TrueModelID
+        instance_champion_id = res.ChampID
+
+        model_ids = list(log_lls.keys())
+        for mod in model_ids: 
+            if (
+                mod == instance_true_id
+                and
+                mod == instance_champion_id
+            ):
+                model_classification = 'True + Champion'
+            elif mod == instance_true_id: 
+                model_classification = 'True'
+            elif mod == instance_champion_id: 
+                model_classification = 'Champion'
+            else:
+                model_classification = 'Standard'
+
+            this_mod_df = pd.DataFrame(
+                [[
+                    i, # for some reason instance causes a shift between the two plot types?
+                    # instance, 
+                    mod, 
+                    log_lls[mod],
+                    f_scores[mod],
+                    mod==instance_true_id,
+                    mod==instance_champion_id,
+                    model_classification, 
+                ]],
+                columns = evaluation_cols
+            )
+            evaluation_plot_df = evaluation_plot_df.append(
+                this_mod_df, 
+                ignore_index=True
+            )
+    evaluation_plot_df.instance = evaluation_plot_df.instance.astype(int)
+    
+    fig, ax = plt.subplots()
+    sns.boxplot(
+        y = 'log_likelihood', 
+        x = 'instance', 
+        data = evaluation_plot_df,
+        ax = ax,
+        color='lightblue',
+        showfliers=False
+    )
+    ax.set_ylabel('Log likelihood')
+    ax.set_xlabel('Instance')
+
+
+    sub_df = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard']
+    all_markers = {
+        'True + Champion' : 'D',
+        'True' : 'X',
+        'Champion' : 'D'
+    }
+    msize = 75
+    marker_sizes = {
+        'True + Champion' : msize,
+        'True' : msize,
+        'Champion' : msize
+    }
+    all_colours = {
+        'True + Champion' : 'darkgreen',
+        'True' : 'darkgreen',
+        'Champion' : 'darkorange'
+    }
+
+    unique_classifications = sub_df.Classification.unique()
+    sns.scatterplot(
+        y = 'log_likelihood', 
+        x = 'instance', 
+        data = sub_df, 
+        ax = ax,
+        style='Classification',
+        markers={
+            c : all_markers[c]
+            for c in unique_classifications
+        },
+    #     sizes = {
+    #         c : marker_sizes[c]
+    #         for c in unique_classifications
+    #     },
+        s = msize,
+        hue = 'Classification',
+        palette = {
+            c : all_colours[c] 
+            for c in unique_classifications
+        }
+    )
+    ax.set_ylabel('Log likelihood')
+    ax.set_xlabel('Instance')
+    ax.set_xticks(
+        list(range(evaluation_plot_df.instance.min(), 1+evaluation_plot_df.instance.max()))
+    )
+
+    ax.legend()
+
+    
+    if save_directory is not None: 
+        plt.savefig(
+            os.path.join(
+                save_directory, 
+                'evaluation_log_likelihoods.png'
+            )
+        )

@@ -353,10 +353,22 @@ class Genetic(
         chromosome, 
     ):
         mod = np.array([int(a) for a in list(chromosome)])
-        return sklearn.metrics.f1_score(
-            mod, 
-            self.true_chromosome
-        )
+        
+        try:
+            f =  sklearn.metrics.f1_score(
+                mod, 
+                self.true_chromosome
+            )
+            return f
+        except:
+            self.log_print(
+                [
+                    "F score from chromosome {} with mod {} not working against true chrom {}".format(
+                        mod, chromosome, self.true_chromosome
+                    )
+                ]
+            )
+            raise
 
     def latex_name(
         self,
@@ -423,13 +435,34 @@ class Genetic(
         self
     ):        
         chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
+        if '1000000000' in chromosomes: 
+            self.log_print(
+                [
+                    "{} in previous chromosomes:\n{}",
+                    '1000000000', 
+                     self.genetic_algorithm.previously_considered_chromosomes
+                ]
+            )
         chromosome_numbers = sorted([int(c,2) for c in chromosomes])
         self.growth_rule_specific_data_to_store['chromosomes_tested'] = chromosome_numbers
         try:
-            f_scores = [np.round(self.f_score_from_chromosome_string(c), 3) for c in chromosomes]
-            self.growth_rule_specific_data_to_store['f_score_tested_models'] = f_scores
+            f_scores = []
+            for c in chromosomes:
+                try:
+                    f_scores.append(np.round(self.f_score_from_chromosome_string(c), 3) )
+                except:
+                    self.log_print(
+                        [
+                            "Could not compute f score for chromosome: {}".format(c)
+                        ]
+                    )
+            self.growth_rule_specific_data_to_store['f_score_tested_models' ] = f_scores
         except:
-            print("Could not compute f score for chromosome list: {}".format(chromosomes))
+            self.log_print(
+                [
+                    "Could not compute f score for chromosome list: {}".format(chromosomes)
+                ]
+            )
             pass
         self.growth_rule_specific_data_to_store['true_model_chromosome'] = self.true_chromosome_string
         # self.growth_rule_specific_data_to_store['delta_f_scores'] = self.genetic_algorithm.delta_f_by_generation
@@ -522,8 +555,8 @@ class GeneticTest(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.max_spawn_depth = 1
-        self.initial_num_models = 10
+        self.max_spawn_depth = 2
+        self.initial_num_models = 6
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )

@@ -289,7 +289,6 @@ if gather_summary_results:
         directory_name = directory_to_analyse,
         results_file_name_start = results_file_name_start,
         results_csv_name = results_csv_name, 
-        # csv_name=results_csv
     )
 
     # Find number of occurences of each model
@@ -314,6 +313,10 @@ if gather_summary_results:
         except BaseException:
             print("ANALYSIS FAILURE: number of occurences for each model.")
             raise
+else:
+    combined_results = pd.read_csv(
+        os.path.join(directory_to_analyse, results_csv_name)
+    )
 
 #######################################
 # Results/Outputs
@@ -424,6 +427,7 @@ try:
 except:
     print("ANALYSIS FAILURE: plotting model win rates.")
     raise
+
 # model statistics (f-score, precision, sensitivty)
 try:
     qmla.analysis.plot_statistics(
@@ -438,6 +442,17 @@ try:
 except:
     print("ANALYSIS FAILURE: plotting model statistics.")
     raise
+
+# Evaluation: log likelihoods of considered models, compared with champion/true
+try:
+    qmla.analysis.plot_evaluation_log_likelihoods(
+        combined_results = combined_results, 
+        save_directory=directory_to_analyse
+    )
+except: 
+    print("ANALYSIS FAILURE: Evaluation log likleihoods.")
+    raise
+
 
 # model statistics histograms (f-score, precision, sensitivty)
 try:
@@ -601,8 +616,8 @@ try:
     )
 except:
     print("ANALYSIS FAILURE: [gentic algorithm] Model generation rate.")
-    pass
-    # raise
+    # pass
+    raise
 
 
 try:
