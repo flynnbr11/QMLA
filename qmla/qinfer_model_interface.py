@@ -16,7 +16,7 @@ global_print_loc = False
 global debug_print
 debug_print = False
 global debug_log_print
-debug_log_print = True
+debug_log_print = False
 global debug_print_file_line
 debug_print_file_line = False
 
