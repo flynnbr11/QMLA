@@ -172,10 +172,7 @@ class ModelInstanceForComparison():
             self.qinfer_updater = qi.SMCUpdater(
                 model=self.qinfer_model,
                 # n_particles=self.num_particles,
-                n_particles=min(
-                    10,
-                    self.num_particles
-                ),
+                n_particles=num_particles_for_bf,
                 prior=posterior_distribution,
                 zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
                 resample_thresh=self.qinfer_resampler_threshold,
