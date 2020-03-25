@@ -136,6 +136,7 @@ class TestReducedParticlesBayesFactors(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
+        self.max_num_qubits = 5
         self.max_num_sites = 6
         self.fraction_particles_for_bf = 1e-4 # to ensure only ~5 particles used
         self.num_processes_to_parallelise_over = 2
