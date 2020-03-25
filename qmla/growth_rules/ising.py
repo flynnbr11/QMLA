@@ -147,6 +147,10 @@ class TestReducedParticlesBayesFactors(
         self.true_model = database_framework.alph(
             self.initial_models[0]
         )
+        self.max_num_models_by_shape = {
+            3 : 2,
+            'other': 0
+        }
 
 class TestAllParticlesBayesFactors(
     TestReducedParticlesBayesFactors
