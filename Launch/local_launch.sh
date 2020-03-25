@@ -76,7 +76,8 @@ git_commit=$(git rev-parse HEAD)
 
 # sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'
-sim_growth_rule='TestReducedParticlesBayesFactors'
+# sim_growth_rule='TestReducedParticlesBayesFactors'
+sim_growth_rule='TestAllParticlesBayesFactors'
 # sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
 # sim_growth_rule='FermiHubbardPredetermined'

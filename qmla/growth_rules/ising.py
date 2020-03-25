@@ -127,7 +127,7 @@ class IsingPredetermined(
                 self.initial_models.append(self.true_model)
 
 class TestReducedParticlesBayesFactors(
-    IsingProbabilistic
+    IsingPredetermined
 ):
     def __init__(
         self,
@@ -139,9 +139,17 @@ class TestReducedParticlesBayesFactors(
             **kwargs
         )
         self.fraction_particles_for_bf = 0.1
+        self.num_processes_to_parallelise_over = 2
+        self.initial_models = [
+            'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3',
+            'pauliSet_zJz_1J2_d3',
+        ]
+        self.true_model = database_framework.alph(
+            self.initial_models[0]
+        )
 
 class TestAllParticlesBayesFactors(
-    IsingProbabilistic
+    TestReducedParticlesBayesFactors
 ):
     def __init__(
         self,
@@ -153,3 +161,4 @@ class TestAllParticlesBayesFactors(
             **kwargs
         )
         self.fraction_particles_for_bf = 1.0
+        self.num_processes_to_parallelise_over = 2
