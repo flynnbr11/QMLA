@@ -25,10 +25,6 @@ class ExpAlternativeNV(
         )
 
         self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
-        # self.shared_probes = True
-
         if self.true_model == 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz':
             self.true_model_terms_params = {
                 # Decohering param set

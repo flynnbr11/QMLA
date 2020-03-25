@@ -28,7 +28,6 @@ class ExperimentFullAccessNV(
         # if self.use_experimental_data == True:
         #     import probe_set_generation
         #     # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
-        #     self.probe_generation_function = qmla.shared_functionality.probe_set_generation.restore_dec_13_probe_generation
 
         # self.true_model = 'xTz'
         self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'

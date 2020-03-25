@@ -1,16 +1,100 @@
+"""
+Functions to generate sets of probe states to be used for training models.
+
+These functions are set to growth rule attributes, which are then called in wrapper functions. 
+- probe_generation_function: 
+    used for training, assumed to be the probes used on the system
+    i.e. probes implemented during experiments. 
+- simulator_probe_generation_function: 
+    used for training, for the simulator. 
+    Should be the same as used for system, 
+    but in practice this is not always the case. 
+    Note growth_rule.shared_probes controls whether
+    to default to the same probe set. 
+- plot_probe_generation_function: 
+    State to use for plotting purposes only (not training). 
+    Plots all use the same set of probes for consistency
+
+"""
+
 import numpy as np
 import itertools
 from scipy import linalg
 import random
 
+###################################
+# General useful functions
+###################################
 
+def random_probe(num_qubits):
+    r"""
+    Random probe of dimension num_qubits.
+    """
+
+    dim = 2**num_qubits
+    real = []
+    imaginary = []
+    complex_vectors = []
+    for i in range(dim):
+        real.append(np.random.uniform(low=-1, high=1))
+        imaginary.append(np.random.uniform(low=-1, high=1))
+        complex_vectors.append(real[i] + 1j * imaginary[i])
+
+    a = np.array(complex_vectors)
+    norm_factor = np.linalg.norm(a)
+    probe = complex_vectors / norm_factor
+    while (
+        np.abs(np.linalg.norm(probe)) - 1
+        >
+        1e-14
+    ):
+        print("generating new random probe..")
+        probe = random_probe(num_qubits)
+
+    return probe
+
+def n_qubit_plus_state(num_qubits):
+    r"""
+    Probe of dimension num_qubits, where for each qubit |+> is appended.
+    """
+
+    one_qubit_plus = (1 / np.sqrt(2) + 0j) * np.array([1, 1])
+    plus_n = one_qubit_plus
+    for i in range(num_qubits - 1):
+        plus_n = np.kron(plus_n, one_qubit_plus)
+    return plus_n
+
+
+
+###################################
 # Default probe set
+###################################
 
 def separable_probe_dict(
     max_num_qubits,
     num_probes,
     **kwargs
 ):
+    r"""
+    Random separable probes. 
+
+    Produces num_probes random states up to max_num_qubits. 
+    Probes are indexed by dimension and an identifier, 
+        e.g. (2, 10) is the 2-qubit version of probe 10.
+    For each probe, 1-qubit states are generated at random,
+        and tensor-producted with the probe id of smaller dimension, 
+        such that, for N qubits,  probe i is:
+        (N+1, i) = (N, i) \otimes r, 
+        where r is a random 1-qubit probe.
+    
+    :param max_num_qubits: Largest number of qubits to generate probes up to.
+    :type max_num_qubits: int
+    :param num_probes: How many probes to produce. 
+    :type num_probes: int
+    :return separable_probes: probe library indexed by (num-qubit, probe-id)
+    :rtype: dict
+
+    """
     separable_probes = {}
     for i in range(num_probes):
         separable_probes[i, 0] = random_probe(1)
@@ -49,135 +133,37 @@ def separable_probe_dict(
     return separable_probes
 
 
-def random_probe(num_qubits):
-    dim = 2**num_qubits
-    real = []
-    imaginary = []
-    complex_vectors = []
-    for i in range(dim):
-        real.append(np.random.uniform(low=-1, high=1))
-        imaginary.append(np.random.uniform(low=-1, high=1))
-        complex_vectors.append(real[i] + 1j * imaginary[i])
 
-    a = np.array(complex_vectors)
-    norm_factor = np.linalg.norm(a)
-    probe = complex_vectors / norm_factor
-    while (
-        np.abs(np.linalg.norm(probe)) - 1
-        >
-        1e-14
-    ):
-        print("generating new random probe..")
-        probe = random_probe(num_qubits)
-
-    return probe
-
-
-# probes generated according to Pauli matrices' eigenvectors
-core_operator_dict = {
-#     'a': np.array([[0 + 0.j, 1 + 0.j], [0 + 0.j, 0 + 0.j]]),
-#     's': np.array([[0 + 0.j, 0 + 0.j], [1 + 0.j, 0 + 0.j]])
-    'i': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, 1 + 0.j]]),
-    'x': np.array([[0 + 0.j, 1 + 0.j], [1 + 0.j, 0 + 0.j]]),
-    'y': np.array([[0 + 0.j, 0 - 1.j], [0 + 1.j, 0 + 0.j]]),
-    'z': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]]),
-}
-
-
-eigvals = {
-    k : linalg.eig(core_operator_dict[k])[0]
-    for k in core_operator_dict
-}
-eigvecs = {
-    k : linalg.eig(core_operator_dict[k])[1]
-    for k in core_operator_dict
-}
-all_eigvecs = [eigvecs[k][l] for k in eigvecs for l in range(eigvecs[k].shape[0]) ]
-eigvec_indices = range(len(all_eigvecs))
-eigenvectors = {
-    i : all_eigvecs[i]
-    for i in eigvec_indices
-}
-def random_sum_eigenvectors():
-#     num_to_sum = random.randrange(2, 5)
-    num_to_sum = 1
-    indices_to_include = []
-    while len(indices_to_include) < num_to_sum:
-        a = random.choice(eigvec_indices)
-        if a not in indices_to_include: 
-            indices_to_include.append(a)
-    
-    state = None
-    for i in indices_to_include:
-        if state is None: 
-            state = eigenvectors[i]
-        else: 
-            state += eigenvectors[i]
-        print("Including eig i={}: {}".format(i, eigenvectors[i]))
-    return state/linalg.norm(state)
-
-def pauli_eigenvector_based_probes(
-    max_num_qubits,
-    num_probes,
-    **kwargs
-):
-    separable_probes = {}
-    for i in range(num_probes):
-#         separable_probes[i, 0] = random_probe(1)
-        separable_probes[i, 0] = random_sum_eigenvectors()
-        for j in range(1, 1 + max_num_qubits):
-            if j == 1:
-                separable_probes[i, j] = separable_probes[i, 0]
-            else:
-                separable_probes[i, j] = (
-                    np.tensordot(
-                        separable_probes[i, j - 1],
-                        random_sum_eigenvectors(),
-                        axes=0
-                    ).flatten(order='c')
-                )
-            norm = np.linalg.norm(separable_probes[i, j])
-            while (
-                np.abs(norm - 1) >
-                1e-13
-
-            ):
-                print(
-                    "non-unit norm: ",
-                    norm
-                )
-                # keep replacing until a unit-norm
-                separable_probes[i, j] = (
-                    np.tensordot(
-                        separable_probes[i, j - 1],
-                        random_sum_eigenvectors(),
-#                         random_probe(1),
-                        axes=0
-                    ).flatten(order='c')
-                )
-                norm = np.linalg.norm(separable_probes[i, j])
-            # print("unit norm:", np.abs(1-norm) )
-
-    return separable_probes
-
-
-# Specific experimental probes
+###################################
+# Specific probe sets
+## e.g. matching experiment.
+###################################
 
 def NV_centre_ising_probes_plus(
     max_num_qubits=2,
     num_probes=40,
     noise_level=0.03,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
-    minimum_tolerable_noise=1e-6,
-    # minimum_tolerable_noise needed
-    # or else run the risk of having
-    # exact eigenstate and no learning occurs, and crashes.
-    # *args,
     **kwargs
 ):
     """
-    Returns a dict of separable probes where the first qubit always acts on
-    a plus state.
+    Returns a dict of separable probes where the first qubit always acts on |+>.
+
+    Used for QMLA on NV centre, experiment in Bristol 2016.
+    Probe library has each probe like |+>|r>..|r>, where |r> is random 1-qubit state.
+
+    :param max_num_qubits: Largest number of qubits to generate probes up to.
+    :type max_num_qubits: int
+    :param num_probes: How many probes to produce. 
+    :type num_probes: int
+    :param noise_level: factor to multiple generated states by to simulate noise.
+    :type noise_level: float
+    :return separable_probes: probe library. 
+    :rtype dict:
     """
+    minimum_tolerable_noise=1e-6
+    # minimum_tolerable_noise needed
+    # or else run the risk of having
+    # exact eigenstate and no learning occurs, and crashes.
     print(
         "[NV_centre_ising_probes_plus] min tol noise:",
         minimum_tolerable_noise,
@@ -235,19 +221,37 @@ def plus_plus_with_phase_difference(
     max_num_qubits=2,
     num_probes=40,
     noise_level=0.03,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
-    minimum_tolerable_noise=1e-6,
-    # minimum_tolerable_noise needed
-    # or else run the risk of having
-    # exact eigenstate and no learning occurs, and crashes.
     # *args,
     **kwargs
 ):
+    r"""
+    Probes |+> |+'> ... |+'>
+
+    To match NV centre experiment in Bristol, 2016. 
+    First qubit is prepared in |+>; 
+        second (and subsequent) qubits (representing environment)
+        assumed to be in |+'> = |0> + e^{iR}|1> (normalised, R = random phase)
+    i.e. 
+        1 qubit  : |+>
+        2 qubits : |+>|+'> 
+        N qubits : |+> |+'> ... |+'>
+
+    :param max_num_qubits: Largest number of qubits to generate probes up to.
+    :type max_num_qubits: int
+    :param num_probes: How many probes to produce. 
+    :type num_probes: int
+    :param noise_level: factor to multiple generated states by to simulate noise.
+    :type noise_level: float
+    :return separable_probes: probe library. 
+    :rtype dict:
+
     """
-    1 qubit  : |+>
-    2 qubits : |+>|+'>, where |+> = |0> + e^{iR}|1> (normalised, R = random phase)
-    N qubits : |+> |+'> ... |+'>
-    To be used for NV centre experimental data.
-    """
+
+    minimum_tolerable_noise=1e-6
+    # minimum_tolerable_noise needed
+    # or else run the risk of having
+    # exact eigenstate and no learning occurs, and crashes.
+
     if minimum_tolerable_noise > noise_level:
         noise_level = minimum_tolerable_noise
     plus_state = np.array([1 + 0j, 1]) / np.sqrt(2)
@@ -295,7 +299,10 @@ def plus_plus_with_phase_difference(
 def random_phase_plus(
     noise_level=1e-5
 ):
-    import random
+    r"""
+    To produce |+'> = |0> + e^{iR}|1> (normalised, R = random phase)
+    """
+
     random_phase = random.uniform(0, np.pi)
     rand_phase_plus = np.array(
         [
@@ -311,16 +318,10 @@ def random_phase_plus(
     return rand_phase_plus
 
 
+###################################
 # General purpose probe dictionaries for specific cases
 ## e.g. experimental method, generalised to multiple dimensions
-
-def n_qubit_plus_state(num_qubits):
-    one_qubit_plus = (1 / np.sqrt(2) + 0j) * np.array([1, 1])
-    plus_n = one_qubit_plus
-    for i in range(num_qubits - 1):
-        plus_n = np.kron(plus_n, one_qubit_plus)
-    return plus_n
-
+###################################
 
 def plus_probes_dict(
     max_num_qubits,
@@ -328,6 +329,10 @@ def plus_probes_dict(
     minimum_tolerable_noise=0,
     **kwargs
 ):
+    r"""
+    Produces exactly |+>|+>...|+> with no noise. 
+    """
+
     num_probes = kwargs['num_probes']
     if minimum_tolerable_noise > noise_level:
         noise_level = minimum_tolerable_noise
@@ -346,6 +351,10 @@ def plus_probes_dict(
 
 
 def zero_state_probes(max_num_qubits=9, **kwargs):
+    r"""
+    Probe library: |0>|0> ... |0>
+    """
+
     zero = np.array([1 + 0j, 0])
     num_probes = kwargs['num_probes']
     probes = {}
@@ -359,6 +368,9 @@ def zero_state_probes(max_num_qubits=9, **kwargs):
 
     return probes
 
+###################################
+# Growth rule specific probes
+###################################
 
 # Fermi Hubbard model -- requires encoding via Jordan-Wigner transformation.
 def separable_fermi_hubbard_half_filled(
@@ -366,10 +378,22 @@ def separable_fermi_hubbard_half_filled(
     num_probes,
     **kwargs
 ):
-    # generates separable probes in N sites;
-    # then projects so that for each dimension
-    # the probe is projected onto the subspace of n
-    # fermions on the n dimensional space
+    r"""
+    Probes for Fermi-Hubbard Hamiltonians. 
+
+    Generates separable probes in N sites;
+        then projects so that for each dimension
+        the probe is projected onto the subspace of n
+        fermions on the n dimensional space.
+    
+    :param max_num_qubits: Largest number of qubits to generate probes up to.
+    :type max_num_qubits: int
+    :param num_probes: How many probes to produce. 
+    :type num_probes: int
+    :return separable_probes: probe library. 
+    :rtype dict:
+    """
+    
     separable_probes = {}
     for i in range(num_probes):
         separable_probes[i, 0] = random_superposition_occupation_basis()
@@ -436,10 +460,13 @@ def get_half_filled_basis_vectors(
 
 
 def random_superposition_occupation_basis():
-    # vacant = np.array([1,0])
-    # occupied = np.array([0,1])
-    # down = np.kron(occupied, vacant) #|10>
-    # up = np.kron(vacant, occupied) #|01>
+    r"""
+
+    vacant = np.array([1,0])
+    occupied = np.array([0,1])
+    down = np.kron(occupied, vacant) #|10>
+    up = np.kron(vacant, occupied) #|01>
+    """
 
     down = np.array([0, 0, 1, 0])
     up = np.array([0, 1, 0, 0])
@@ -537,3 +564,186 @@ def vector_from_fermion_state_description(state):
             vector = np.kron(vector, vacant)
 
     return vector
+
+
+###################################
+# Testing/development
+###################################
+
+# probes generated according to Pauli matrices' eigenvectors
+core_operator_dict = {
+#     'a': np.array([[0 + 0.j, 1 + 0.j], [0 + 0.j, 0 + 0.j]]),
+#     's': np.array([[0 + 0.j, 0 + 0.j], [1 + 0.j, 0 + 0.j]])
+    'i': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, 1 + 0.j]]),
+    'x': np.array([[0 + 0.j, 1 + 0.j], [1 + 0.j, 0 + 0.j]]),
+    'y': np.array([[0 + 0.j, 0 - 1.j], [0 + 1.j, 0 + 0.j]]),
+    'z': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]]),
+}
+
+
+eigvals = {
+    k : linalg.eig(core_operator_dict[k])[0]
+    for k in core_operator_dict
+}
+eigvecs = {
+    k : linalg.eig(core_operator_dict[k])[1]
+    for k in core_operator_dict
+}
+all_eigvecs = [eigvecs[k][l] for k in eigvecs for l in range(eigvecs[k].shape[0]) ]
+eigvec_indices = range(len(all_eigvecs))
+eigenvectors = {
+    i : all_eigvecs[i]
+    for i in eigvec_indices
+}
+
+def random_sum_eigenvectors():
+#     num_to_sum = random.randrange(2, 5)
+    num_to_sum = 1
+    indices_to_include = []
+    while len(indices_to_include) < num_to_sum:
+        a = random.choice(eigvec_indices)
+        if a not in indices_to_include: 
+            indices_to_include.append(a)
+    
+    state = None
+    for i in indices_to_include:
+        if state is None: 
+            state = eigenvectors[i]
+        else: 
+            state += eigenvectors[i]
+        print("Including eig i={}: {}".format(i, eigenvectors[i]))
+    return state/linalg.norm(state)
+
+def pauli_eigenvector_based_probes(
+    max_num_qubits,
+    num_probes,
+    **kwargs
+):
+    separable_probes = {}
+    for i in range(num_probes):
+#         separable_probes[i, 0] = random_probe(1)
+        separable_probes[i, 0] = random_sum_eigenvectors()
+        for j in range(1, 1 + max_num_qubits):
+            if j == 1:
+                separable_probes[i, j] = separable_probes[i, 0]
+            else:
+                separable_probes[i, j] = (
+                    np.tensordot(
+                        separable_probes[i, j - 1],
+                        random_sum_eigenvectors(),
+                        axes=0
+                    ).flatten(order='c')
+                )
+            norm = np.linalg.norm(separable_probes[i, j])
+            while (
+                np.abs(norm - 1) >
+                1e-13
+
+            ):
+                print(
+                    "non-unit norm: ",
+                    norm
+                )
+                # keep replacing until a unit-norm
+                separable_probes[i, j] = (
+                    np.tensordot(
+                        separable_probes[i, j - 1],
+                        random_sum_eigenvectors(),
+#                         random_probe(1),
+                        axes=0
+                    ).flatten(order='c')
+                )
+                norm = np.linalg.norm(separable_probes[i, j])
+            # print("unit norm:", np.abs(1-norm) )
+
+    return separable_probes
+
+
+# probes generated according to Pauli matrices' eigenvectors
+# testing eigenvalue of Paulis probes - not in use
+core_operator_dict = {
+#     'a': np.array([[0 + 0.j, 1 + 0.j], [0 + 0.j, 0 + 0.j]]),
+#     's': np.array([[0 + 0.j, 0 + 0.j], [1 + 0.j, 0 + 0.j]])
+    'i': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, 1 + 0.j]]),
+    'x': np.array([[0 + 0.j, 1 + 0.j], [1 + 0.j, 0 + 0.j]]),
+    'y': np.array([[0 + 0.j, 0 - 1.j], [0 + 1.j, 0 + 0.j]]),
+    'z': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]]),
+}
+
+
+eigvals = {
+    k : linalg.eig(core_operator_dict[k])[0]
+    for k in core_operator_dict
+}
+eigvecs = {
+    k : linalg.eig(core_operator_dict[k])[1]
+    for k in core_operator_dict
+}
+all_eigvecs = [eigvecs[k][l] for k in eigvecs for l in range(eigvecs[k].shape[0]) ]
+eigvec_indices = range(len(all_eigvecs))
+eigenvectors = {
+    i : all_eigvecs[i]
+    for i in eigvec_indices
+}
+
+def random_sum_eigenvectors():
+#     num_to_sum = random.randrange(2, 5)
+    num_to_sum = 1
+    indices_to_include = []
+    while len(indices_to_include) < num_to_sum:
+        a = random.choice(eigvec_indices)
+        if a not in indices_to_include: 
+            indices_to_include.append(a)
+    
+    state = None
+    for i in indices_to_include:
+        if state is None: 
+            state = eigenvectors[i]
+        else: 
+            state += eigenvectors[i]
+        print("Including eig i={}: {}".format(i, eigenvectors[i]))
+    return state/linalg.norm(state)
+
+def pauli_eigenvector_based_probes(
+    max_num_qubits,
+    num_probes,
+    **kwargs
+):
+    separable_probes = {}
+    for i in range(num_probes):
+#         separable_probes[i, 0] = random_probe(1)
+        separable_probes[i, 0] = random_sum_eigenvectors()
+        for j in range(1, 1 + max_num_qubits):
+            if j == 1:
+                separable_probes[i, j] = separable_probes[i, 0]
+            else:
+                separable_probes[i, j] = (
+                    np.tensordot(
+                        separable_probes[i, j - 1],
+                        random_sum_eigenvectors(),
+                        axes=0
+                    ).flatten(order='c')
+                )
+            norm = np.linalg.norm(separable_probes[i, j])
+            while (
+                np.abs(norm - 1) >
+                1e-13
+
+            ):
+                print(
+                    "non-unit norm: ",
+                    norm
+                )
+                # keep replacing until a unit-norm
+                separable_probes[i, j] = (
+                    np.tensordot(
+                        separable_probes[i, j - 1],
+                        random_sum_eigenvectors(),
+#                         random_probe(1),
+                        axes=0
+                    ).flatten(order='c')
+                )
+                norm = np.linalg.norm(separable_probes[i, j])
+            # print("unit norm:", np.abs(1-norm) )
+
+    return separable_probes

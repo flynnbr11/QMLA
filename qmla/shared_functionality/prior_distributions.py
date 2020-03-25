@@ -63,6 +63,9 @@ def gaussian_prior(
     :type log_file: str
     :param log_identifier: Unique identifying sting for logging.
     :type log_identifier: str
+    :return dist: distribution to be used as prior for parameter learning 
+        of the named model.
+    :rtype: QInfer.Distribution
     """
 
     log_print(
