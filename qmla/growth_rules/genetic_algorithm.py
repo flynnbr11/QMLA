@@ -404,6 +404,11 @@ class GeneticAlgorithmQMLA():
             )
             if unchanged:
                 self.best_model_unchanged = True
+                self.log_print(
+                    [
+                        "Setting best_model_unchanged to {}".format(self.best_model_unchanged)
+                    ]
+                )
             self.log_print(
                 [
                     "Elite model unchanged in last {} generations: {}. \nCurrently: {} with f-score {}".format(
@@ -418,6 +423,12 @@ class GeneticAlgorithmQMLA():
                     )
                 ]
             )
+        self.log_print(
+            [
+                "1st Elite model:", elite_models[0],
+                "\n2nd Elite model", elite_models[1],
+            ]
+        )
         return elite_models
 
     ######################

@@ -50,6 +50,7 @@ class GrowthRuleSuper():
         self.plot_probe_generation_function = probe_set_generation.plus_probes_dict
         self.expectation_value_function = expectation_values.default_expectation_value
         self.probe_noise_level = 1e-5
+        self.fraction_particles_for_bf = 1.0 # testing whether reduced num particles for BF can work 
         self.ratings_class = qmla.growth_rules.rating_system.ELORating(
             initial_rating=1500,
             k_const=30

@@ -51,6 +51,10 @@ growth_classes = {
         GR.Genetic,
     'GeneticTest':
         GR.GeneticTest,    
+    'TestReducedParticlesBayesFactors': 
+        GR.TestReducedParticlesBayesFactors, 
+    'TestAllParticlesBayesFactors' : 
+        GR.TestAllParticlesBayesFactors,
     'TalkDemonstration': 
         GR.TalkDemonstration
 }

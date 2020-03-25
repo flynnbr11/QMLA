@@ -379,7 +379,7 @@ class ModelInstanceForLearning():
             zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
             resample_thresh=self.qinfer_resampler_threshold,
             resampler=qi.LiuWestResampler(a=self.qinfer_resampler_a),
-            debug_resampling=False
+            # debug_resampling=False
         )
 
         self.initial_prior = []
@@ -808,7 +808,7 @@ class ModelInstanceForLearning():
             resampler=qi.LiuWestResampler(
                 a=self.qinfer_resampler_a
             ),
-            debug_resampling=False
+            # debug_resampling=False
         )
 
         evaluation_updater._log_total_likelihood = 0.0

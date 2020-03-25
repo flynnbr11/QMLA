@@ -160,16 +160,30 @@ class ModelInstanceForComparison():
                 self.covariance_mtx_final
             )
 
+            num_particles_for_bf = max(
+                5, 
+                int(self.growth_class.fraction_particles_for_bf * self.num_particles)
+            )
+            self.log_print(
+                [
+                    "For Bayes factor calculation, using {} particles".format(num_particles_for_bf)
+                ]
+            )
+
             self.qinfer_updater = qi.SMCUpdater(
                 model=self.qinfer_model,
-                n_particles=self.num_particles,
+                # n_particles=self.num_particles,
+                n_particles=min(
+                    10,
+                    self.num_particles
+                ),
                 prior=posterior_distribution,
                 zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
                 resample_thresh=self.qinfer_resampler_threshold,
                 resampler=qi.LiuWestResampler(
                     a=self.qinfer_resampler_a
                 ),
-                debug_resampling=False
+                # debug_resampling=False
             )
             self.qinfer_updater._normalization_record = self.model_normalization_record
             self.qinfer_updater._log_total_likelihood = self.log_total_likelihood
