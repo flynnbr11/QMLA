@@ -146,7 +146,7 @@ class TestReducedParticlesBayesFactors(
             self.initial_models[0]
         )
         self.max_num_models_by_shape = {
-            int( database_framework.get_num_qubits(self.true_model) ) : 2,
+            5 : 2,
             'other': 0
         }
 
