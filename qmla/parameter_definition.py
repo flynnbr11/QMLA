@@ -108,9 +108,9 @@ def set_shared_parameters(
             minimum_tolerable_noise = 0.0,
         )
         evaluation_times = scipy.stats.reciprocal.rvs(
-            1e-3, 
+            1e-2, 
             growth_class.max_time_to_consider, 
-            size=int(1e2)
+            size=200
         ) # evaluation times generated log-uniformly
         # evaluation_times = list(np.linspace(
         #     0, 
