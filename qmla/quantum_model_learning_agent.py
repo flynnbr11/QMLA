@@ -2238,7 +2238,6 @@ class QuantumModelLearningAgent():
             'NameNonAlph': self.ChampionName,
             'FinalParams': self.ChampionFinalParams,
             'LatexName': champ_model.model_name_latex,
-            # 'LatexName' : database_framework.latex_name_ising(self.ChampionName),
             'NumParticles': self.num_particles,
             'NumExperiments': champ_model.num_experiments,
             'NumBayesTimes': self.num_experiments_for_bayes_updates,

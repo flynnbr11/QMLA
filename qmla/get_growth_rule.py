@@ -55,8 +55,6 @@ growth_classes = {
         GR.TestReducedParticlesBayesFactors, 
     'TestAllParticlesBayesFactors' : 
         GR.TestAllParticlesBayesFactors,
-    'TalkDemonstration': 
-        GR.TalkDemonstration
 }
 
 

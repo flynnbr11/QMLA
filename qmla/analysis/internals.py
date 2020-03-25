@@ -218,7 +218,6 @@ def r_sqaured_average(
             [np.std(r_squared_lists[t]) for t in times]
         )
 
-        # term = database_framework.latex_name_ising(name)
         gr_class = growth_classes_by_name[name]
         # TODO need growth rule of given name to get proper latex term
         term = gr_class.latex_name(name)
@@ -490,7 +489,6 @@ def volume_average(
             [np.std(volume_lists[t]) for t in times]
         )
 
-        # term = database_framework.latex_name_ising(name)
         term = growth_class.latex_name(name)
         plot_label = str(term + ' (' + str(num_wins) + ')')
         colour = colours[i]
@@ -529,8 +527,6 @@ def plot_bayes_factors_v_true_model(
 
     from matplotlib import cm
     # TODO saved fig is cut off on edges and don't have axes titles.
-
-    # correct_mod = database_framework.latex_name_ising(correct_mod)
 
     growth_class = qmla.get_growth_rule.get_growth_generator_class(
         growth_generation_rule=growth_generator

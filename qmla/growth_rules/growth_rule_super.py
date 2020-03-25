@@ -178,9 +178,9 @@ class GrowthRuleSuper():
         branch_is_num_params
         
         """
-        import qmla.model_naming
+        import qmla.growth_rules.shared_functionality.branch_mapping
         
-        return qmla.model_naming.branch_computed_from_qubit_and_param_count(
+        return qmla.growth_rules.shared_functionality.branch_mapping.branch_computed_from_qubit_and_param_count(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )

@@ -273,7 +273,6 @@ def average_parameter_estimates(
             if col == ncols:
                 col = 0
                 row += 1
-            # latex_terms[term] = qmla.database_frameworklatex_name_ising(term)
             latex_terms[term] = growth_classes[name].latex_name(term)
             averages = np.array(
                 [avg_parameters[term][e] for e in epochs]
@@ -861,7 +860,6 @@ def plot_parameter_estimates(
         try:
             if use_experimental_data == False:
                 y_true = qmd.true_param_dict[term]
-                # true_term_latex = database_framework.latex_name_ising(term)
                 true_term_latex = qmd.growth_class.latex_name(
                     name=term
                 )
@@ -914,11 +912,6 @@ def plot_parameter_estimates(
     plt.ylabel('Parameter Estimate', fontsize=15)
     # plt.legend(bbox_to_anchor=(1.1, 1.05))
     # # TODO put title at top; Epoch centred bottom; Estimate centre y-axis
-    # plt.title(str("Parameter estimation for model " +
-    #     database_framework.latex_name_ising(name)+" ["+str(qmd.num_particles)
-    #     +" prt;" + str(qmd.num_experiments) + "exp]"
-    #     )
-    # )
 
     if save_to_file is not None:
         print(

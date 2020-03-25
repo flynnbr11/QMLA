@@ -10,7 +10,6 @@ start = time.time()
 # import qmla.database_launch as database_launch
 # import qmla.get_growth_rule as get_growth_rule
 # import qmla.expectation_values as expectation_values 
-# import qmla.model_naming as model_naming
 # import qmla.model_generation as model_generation
 # import qmla.model_instances as QML
 # import qmla.redis_settings as rds

@@ -5,8 +5,6 @@ import os
 from qmla.growth_rules import connected_lattice
 from qmla import experiment_design_heuristics
 from qmla import topology
-# from qmla import model_generation
-from qmla import model_naming
 from qmla import probe_set_generation
 from qmla import database_framework
 
@@ -138,7 +136,7 @@ class TestReducedParticlesBayesFactors(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.fraction_particles_for_bf = 0.1
+        self.fraction_particles_for_bf = 1e-4 # to ensure only ~5 particles used
         self.num_processes_to_parallelise_over = 2
         self.initial_models = [
             'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3',

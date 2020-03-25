@@ -6,8 +6,6 @@ import os
 from qmla.growth_rules import connected_lattice
 from qmla import experiment_design_heuristics
 from qmla import topology
-# from qmla import model_generation
-from qmla import model_naming
 from qmla import probe_set_generation
 from qmla import database_framework
 

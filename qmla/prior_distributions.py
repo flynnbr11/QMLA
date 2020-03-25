@@ -17,6 +17,7 @@ def log_print(
     log_file, 
     log_identifier='Distributions'
 ):
+    # Standard logging.
     qmla.logging.print_to_log(
         to_print_list = to_print_list, 
         log_file = log_file, 
@@ -35,6 +36,34 @@ def gaussian_prior(
     log_identifier=None,
     **kwargs
 ):
+    """
+    Genearates a QInfer Gaussian distribution .
+
+    Given a model_name, deteremines the number of terms in the model, N.
+    Generates a multivariate distribution with N dimensions. 
+    This is then used as the initial prior, which QHL uses to learn the 
+    model parameters. 
+    By default, each parameter's mean is the average of param_min and param_max, 
+    with sigma = mean/4. This can be changed by specifying prior_specific_terms: 
+        individual parameter's means/sigmas can be given. 
+
+    :param model_name: Unique string representing a model.
+    :type model_name: string
+    :param param_minimum: Lower bound for distribution.
+    :type param_minimum: float
+    :param param_maximum: Upper bound for distribution.
+    :type param_maximum: float
+    :param default_sigma: Width of distribution desired. If None, 
+        defaults to 0.25 * (param_max - param_min).
+    :type default_sigma: float
+    :param prior_specific_terms: Individual parameter mean and sigma
+        to enforce in the distribution. 
+    :type prior_specific_terms: dict
+    :param log_file: Path of the log file for logging errors.
+    :type log_file: str
+    :param log_identifier: Unique identifying sting for logging.
+    :type log_identifier: str
+    """
 
     log_print(
         [
@@ -89,6 +118,22 @@ def plot_prior(
     plot_file,
     true_model_terms_params=None,
 ):
+    r"""
+    Plots the given distribution to the given file path.
+
+    :param model_name: 
+    :type model_name: str
+    :param model_name_individual_terms: List of latex terms for 
+        all terms in the model.
+    :type model_name_individual_terms: list
+    :param prior: distribution to plot
+    :type prior: Qinfer.Distribution
+    :param plot_file: path to save plot of distribution
+    :type plot_file: str
+    :param true_model_terms_params: true values of the parameters
+        to include in plot
+    :type true_model_terms_params: dict
+    """
     from itertools import cycle
     from matplotlib import cm
     lines = ["-", "--", "-.", ":"]

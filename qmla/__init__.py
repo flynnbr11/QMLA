@@ -17,7 +17,6 @@ from qmla.parameter_definition import *
 
 # from qmla.prior_distributions import *
 # from qmla.model_generation import * # TODO fix __all__
-# from qmla.model_naming import * # TODO fix __all__
 # from qmla.qinfer_model_interface import * 
 # from qmla.model_instances import * 
 # from qmla.remote_bayes_factor import *

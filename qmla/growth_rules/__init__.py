@@ -10,6 +10,5 @@ from qmla.growth_rules.heisenberg_xyz import *
 
 from qmla.growth_rules.template import * 
 from qmla.growth_rules.presentation_plot_generation import *
-from qmla.growth_rules.pizza_talk_demo import *
 
 from qmla.growth_rules.nv_centre_spin_characterisation import * 

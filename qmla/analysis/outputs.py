@@ -295,7 +295,6 @@ def plot_dynamics_multiple_models(
             [lower_iqr_expectation_values[t] for t in times])
         higher_iqr_exp = np.array(
             [higher_iqr_expectation_values[t] for t in times])
-        # name=database_framework.latex_name_ising(term)
         residuals = (mean_exp - true_exp)**2
         sum_residuals = np.sum(residuals)
         mean_true_val = np.mean(true_exp)

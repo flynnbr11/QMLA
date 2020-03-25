@@ -32,7 +32,6 @@ import sklearn
 import seaborn as sns
 
 import qmla.get_growth_rule as get_growth_rule
-import qmla.model_naming as model_naming
 import qmla.experimental_data_processing as expdt
 # from qmla import experimental_data_processing check that is called as experimental_data_processing.method.
 import qmla.expectation_values as expectation_values
@@ -283,7 +282,6 @@ def plot_parameter_estimates(
         try:
             if use_experimental_data == False:
                 y_true = qmd.true_param_dict[term]
-                # true_term_latex = database_framework.latex_name_ising(term)
                 true_term_latex = qmd.growth_class.latex_name(
                     name=term
                 )
@@ -334,13 +332,6 @@ def plot_parameter_estimates(
 #    ax = plt.subplot(111)
     plt.xlabel('Epoch', fontsize=20)
     plt.ylabel('Parameter Estimate', fontsize=15)
-    # plt.legend(bbox_to_anchor=(1.1, 1.05))
-    # # TODO put title at top; Epoch centred bottom; Estimate centre y-axis
-    # plt.title(str("Parameter estimation for model " +
-    #     database_framework.latex_name_ising(name)+" ["+str(qmd.num_particles)
-    #     +" prt;" + str(qmd.num_experiments) + "exp]"
-    #     )
-    # )
 
     if save_to_file is not None:
         print(
@@ -629,7 +620,6 @@ def plot_learned_models_dynamics(
                 try:
                     if use_experimental_data == False:
                         y_true = qmd.true_param_dict[term]
-                        # true_term_latex = database_framework.latex_name_ising(term)
                         true_term_latex = qmd.growth_class.latex_name(
                             name=term
                         )

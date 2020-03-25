@@ -6,7 +6,6 @@ import os
 from qmla.growth_rules import growth_rule_super
 from qmla import experiment_design_heuristics
 from qmla import topology
-from qmla import model_naming
 from qmla import probe_set_generation
 from qmla import database_framework
 
@@ -514,11 +513,9 @@ class ConnectedLattice(
         latex_mapping_file,
         **kwargs
     ):
-
-        import qmla.model_naming
         # TODO get generation idx + sub generation idx
-
-        return model_naming.branch_is_num_params_and_qubits(
+        import qmla.growth_rules.shared_functionality.branch_mapping
+        return qmla.growth_rules.shared_functionality.branch_mapping.branch_is_num_params_and_qubits(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )

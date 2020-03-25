@@ -178,19 +178,54 @@ class NVLargeSpinBath(
         name,
         **kwargs
     ):
-        from qmla import model_naming
-        latex_name = model_naming.large_spin_bath_nv_system_name(
-            term=name
+        term = name
+        num_qubits = database_framework.get_num_qubits(term)
+        t_str = 'T' * (num_qubits - 1)
+        p_str = 'P' * num_qubits
+        separate_terms = term.split(p_str)
+
+        spin_terms = []
+        interaction_terms = []
+
+        for t in separate_terms:
+            components = t.split('_')
+            components.remove('nv')
+            components.remove(str('d' + str(num_qubits)))
+            if 'spin' in components:
+                components.remove('spin')
+                spin_terms.append(components[0])
+            elif 'interaction' in components:
+                components.remove('interaction')
+                interaction_terms.append(components[0])
+
+        latex_name = '('
+        if len(spin_terms) > 0:
+            latex_name += 'S_{'
+            for s in spin_terms:
+                latex_name += str(s)
+            latex_name += '}'
+        if len(interaction_terms) > 0:
+            latex_name += 'I_{'
+            for s in interaction_terms:
+                latex_name += str(s)
+            latex_name += '}'
+
+        latex_name += str(
+            r')^{\otimes'
+            + str(num_qubits)
+            + '}'
         )
-        return latex_name
+
+        return '$' + latex_name + '$'
+
 
     def name_branch_map(
         self,
         latex_mapping_file,
         **kwargs
     ):
-        from qmla import model_naming
-        name_map = model_naming.branch_is_num_dims(
+        import qmla.growth_rules.shared_functionality.branch_mapping
+        name_map = qmla.growth_rules.shared_functionality.branch_mapping.branch_is_num_dims(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )

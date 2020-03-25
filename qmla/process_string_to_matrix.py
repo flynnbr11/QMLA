@@ -13,7 +13,6 @@ import fermilib.transforms
 # from fermilib.transforms import get_sparse_operator
 
 from qmla import database_framework
-import qmla.model_naming as model_naming
 import qmla.logging
 
 __all__ = [
@@ -29,7 +28,6 @@ def log_print(
         log_file = log_file,
         log_identifier = 'Model Generation'
     )
-
 
 def process_basic_operator(basic_operator):
     # # from qmla import model_generation
@@ -74,6 +72,96 @@ def process_basic_operator(basic_operator):
 
     return mtx
 
+######################
+# Useful functions 
+######################
+
+def full_model_string(operations):
+    """
+    operations must be a dict with elements:
+    - 'dim' : number of qubits
+    - 'terms' : list of lists of tuple of the form,
+        e.g. [ (1, 'x'), (2, 'y')]
+        i.e. tuples (qubit_id, pauli_operator)
+        Each nested list gives a term, which are all added together for the full model
+    Reconstructs unique model name for that Hamiltonian.
+    """
+
+    # Note TODO: this doesn't give an error when tuples are
+    # given which aren't used. it should
+    from qmla.database_framework import alph
+    terms = operations['terms']
+    num_qubits = operations['dim']
+    num_terms = len(terms)
+    all_terms = []
+    for i in range(len(terms)):
+        single_term = terms[i]
+        single_term_dict = dict(single_term)
+
+        model_name = ''
+
+        t_str = ''
+        for i in range(1, 1 + num_qubits):
+            if i in single_term_dict:
+                pauli = single_term_dict[i]
+            else:
+                pauli = 'i'
+            t_str += 'T'
+            if i == num_qubits:
+                t_str = ''
+            model_name += str(pauli + t_str)
+
+        all_terms.append(model_name)
+
+    all_terms = list(set(list(all_terms)))
+    p_str = 'P'
+    for i in range(num_qubits - 1):
+        p_str += 'P'
+
+    full_model = p_str.join(all_terms)
+    # full_model = database_framework.alph(full_model)
+    full_model = alph(full_model)
+    return full_model
+
+
+def operations_dict_from_name(mod_name):
+    constituents = database_framework.get_constituent_names_from_name(mod_name)
+    num_qubits = database_framework.get_num_qubits(mod_name)
+    initial_t_str = ''
+    all_terms = []
+    for j in range(num_qubits - 1):
+        initial_t_str += 'T'
+
+    for i in range(len(constituents)):
+        t_str = initial_t_str
+        single_term = constituents[i]
+        all_tuples_this_term = []
+        n_minus_1_qubit_operators = single_term
+        for k in range(num_qubits):
+            if len(t_str) > 0:
+                split_by_nth_qubit = n_minus_1_qubit_operators.split(t_str)
+                this_tuple = (num_qubits - k, split_by_nth_qubit[1])
+                n_minus_1_qubit_operators = split_by_nth_qubit[0]
+                t_str = t_str[:-1]
+            else:
+                this_tuple = (num_qubits - k, n_minus_1_qubit_operators)
+
+            all_tuples_this_term.append(this_tuple)
+
+        all_tuples_this_term = sorted(all_tuples_this_term)
+        all_terms.append(all_tuples_this_term)
+
+    operations = {
+        'dim': num_qubits,
+        'terms': all_terms
+    }
+
+    return operations
+
+
+######################
+# Process single terms
+######################
 
 
 def process_transverse_term(term):
@@ -125,7 +213,7 @@ def process_multipauli_term(term):
         'terms': [all_terms]
     }
 
-    full_mod_str = model_naming.full_model_string(term_dict)
+    full_mod_str = full_model_string(term_dict)
     return database_framework.compute(full_mod_str)
 
 
