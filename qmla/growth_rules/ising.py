@@ -139,14 +139,14 @@ class TestReducedParticlesBayesFactors(
         self.fraction_particles_for_bf = 1e-4 # to ensure only ~5 particles used
         self.num_processes_to_parallelise_over = 2
         self.initial_models = [
-            'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3',
-            'pauliSet_zJz_1J2_d3',
+            'pauliSet_zJz_1J2_d5PPPPPpauliSet_zJz_2J3_d5PPPPPpauliSet_zJz_3J4_d5PPPPPpauliSet_zJz_4J5_d5',
+            'pauliSet_zJz_1J2_d5PPPPPpauliSet_zJz_4J5_d5',
         ]
         self.true_model = database_framework.alph(
             self.initial_models[0]
         )
         self.max_num_models_by_shape = {
-            3 : 2,
+            database_framework.get_num_qubits(self.true_model) : 2,
             'other': 0
         }
 
