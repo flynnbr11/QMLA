@@ -260,12 +260,12 @@ long_id = qmla_controls.long_id
 
 log_print(
     [
-        "\n QMD id", qmla_controls.qmd_id,
+        "\n QMD id", qmla_controls.qmla_id,
         " on host ", qmla_controls.host_name,
         "and port", qmla_controls.port_number,
         "has seed", rds.get_seed(qmla_controls.host_name,
                                  qmla_controls.port_number, 
-                                 qmla_controls.qmd_id,
+                                 qmla_controls.qmla_id,
                                  print_status=False),
         "\n", qmla_controls.num_particles,
         " particles for", qmla_controls.num_experiments,
@@ -752,7 +752,7 @@ else:
 
 end = time.time()
 log_print(["Time taken:", end - start], log_file)
-log_print(["END: QMD id", qmla_controls.qmd_id, ":",
+log_print(["END: QMD id", qmla_controls.qmla_id, ":",
            qmla_controls.num_particles, " particles;",
            qmla_controls.num_experiments, "exp; ",
            qmla_controls.num_times_bayes,

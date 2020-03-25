@@ -166,7 +166,7 @@ class ModelInstanceForLearning():
         debug_directory=None,
         **kwargs
     ):
-        redis_databases = rds.databases_from_qmd_id(
+        redis_databases = rds.get_redis_databases_by_qmla_id(
             self.redis_host,
             self.redis_port_number,
             self.qmla_id

@@ -47,7 +47,7 @@ class ModelInstanceForComparison():
         self.model_id = model_id
 
         if qmla_core_info_database is None:
-            redis_databases = rds.databases_from_qmd_id(
+            redis_databases = rds.get_redis_databases_by_qmla_id(
                 host_name,
                 port_number,
                 qid
@@ -80,7 +80,7 @@ class ModelInstanceForComparison():
             # get the learned info dictionary from the redis
             # database corresponding to this model id
             try:
-                redis_databases = rds.databases_from_qmd_id(
+                redis_databases = rds.get_redis_databases_by_qmla_id(
                     host_name,
                     port_number,
                     qid

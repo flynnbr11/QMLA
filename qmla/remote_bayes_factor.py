@@ -62,7 +62,7 @@ def remote_bayes_factor_calculation(
         )
     
     time_start = time.time()
-    redis_databases = rds.databases_from_qmd_id(host_name, port_number, qid)
+    redis_databases = rds.get_redis_databases_by_qmla_id(host_name, port_number, qid)
     qmla_core_info_database = redis_databases['qmla_core_info_database']
     learned_models_info_db = redis_databases['learned_models_info_db']
     learned_models_ids = redis_databases['learned_models_ids']

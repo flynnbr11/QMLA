@@ -130,7 +130,7 @@ class QuantumModelLearningAgent():
         )
 
     def _fundamental_settings(self):
-        self.qmla_id = self.qmla_controls.qmd_id
+        self.qmla_id = self.qmla_controls.qmla_id
         self.use_experimental_data = self.qmla_controls.use_experimental_data
         self.redis_host_name = self.qmla_controls.host_name
         self.redis_port_number = self.qmla_controls.port_number
@@ -150,7 +150,7 @@ class QuantumModelLearningAgent():
         else: 
             self.latex_name_map_file_path = self.qmla_controls.latex_mapping_file
         self.log_print(["Retrieving databases from redis"])
-        self.redis_databases = rds.databases_from_qmd_id(
+        self.redis_databases = rds.get_redis_databases_by_qmla_id(
             self.redis_host_name,
             self.redis_port_number,
             self.qmla_id,

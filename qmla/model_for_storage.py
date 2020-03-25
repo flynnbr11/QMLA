@@ -66,7 +66,7 @@ class ModelInstanceForStorage():
                     'QMLA core info DB is None; retrieveing from redis.'
                 ]
             )
-            redis_databases = rds.databases_from_qmd_id(
+            redis_databases = rds.get_redis_databases_by_qmla_id(
                 self.redis_host_name,
                 self.redis_port_number,
                 self.qmla_id
@@ -141,7 +141,7 @@ class ModelInstanceForStorage():
         """
         if self.values_updated == False:
             self.values_updated = True
-            redis_databases = rds.databases_from_qmd_id(
+            redis_databases = rds.get_redis_databases_by_qmla_id(
                 self.redis_host_name,
                 self.redis_port_number,
                 self.qmla_id

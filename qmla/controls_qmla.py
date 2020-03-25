@@ -159,7 +159,7 @@ class ControlsQMLA():
         self.pgh_exponent = arguments.pgh_exponent
         self.increase_pgh_time = bool(arguments.increase_pgh_time)
         self.pickle_qmd_class = bool(arguments.pickle_qmd_class)
-        self.qmd_id = arguments.qmd_id
+        self.qmla_id = arguments.qmla_id
         self.host_name = arguments.host_name
         self.port_number = arguments.port_number
         self.results_directory = arguments.results_directory
@@ -188,7 +188,7 @@ class ControlsQMLA():
             except FileExistsError:
                 pass
 
-        self.long_id = '{0:03d}'.format(self.qmd_id)
+        self.long_id = '{0:03d}'.format(self.qmla_id)
 
 
         if self.further_qhl == True:
@@ -332,7 +332,7 @@ def parse_cmd_line_args(args):
     )
 
     parser.add_argument(
-        '-qid', '--qmd_id',
+        '-qid', '--qmla_id',
         help='ID tag for QMD.',
         type=int,
         default=1
