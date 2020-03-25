@@ -2570,6 +2570,11 @@ class QuantumModelLearningAgent():
         # self.f_score = self.model_f_scores[self.champion_model_id]
         self.get_statistical_metrics()
         self.growth_class.growth_rule_finalise()
+        model_evaluation_log_likelihoods = {
+            mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_log_likelihood
+            for mod_id in self.models_learned
+        }
+
         time_now = time.time()
         time_taken = time_now - self._start_time
         self.champion_results = {
@@ -2614,6 +2619,7 @@ class QuantumModelLearningAgent():
             'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
             'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
             'AllModelFScores' : self.model_f_scores, 
+            'ModelEvaluationLogLikelihoods' : model_evaluation_log_likelihoods,
         }
 
         self.log_print(
@@ -2715,6 +2721,10 @@ class QuantumModelLearningAgent():
 
         self.get_statistical_metrics()
         self.growth_class.growth_rule_finalise()
+        model_evaluation_log_likelihoods = {
+            mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_log_likelihood
+            for mod_id in self.models_learned
+        }
 
         for mod_name in model_names:
             mod_id = database_framework.model_id_from_name(
@@ -2777,6 +2787,7 @@ class QuantumModelLearningAgent():
                 'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
                 'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
                 'AllModelFScores' : self.model_f_scores, 
+                'ModelEvaluationLogLikelihoods' : model_evaluation_log_likelihoods,
             }
             self.model_id_to_name_map = {}
             for k in self.model_name_id_map:
