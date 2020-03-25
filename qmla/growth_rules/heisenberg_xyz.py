@@ -6,7 +6,7 @@ import os
 from qmla.growth_rules import connected_lattice, connected_lattice_probabilistic
 from qmla import experiment_design_heuristics
 from qmla import topology
-from qmla import probe_set_generation
+import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
 
 
@@ -32,7 +32,7 @@ class HeisenbergXYZProbabilistic(
         self.lattice_full_connectivity = False
         self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
         self.max_num_sites = 4
-        # self.probe_generation_function = probe_set_generation.pauli_eigenvector_based_probes
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.pauli_eigenvector_based_probes
 
         self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
         self.four_site_xxz_chain = 'pauliSet_1J2_xJx_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_zJz_d4'

@@ -4,7 +4,7 @@ import math
 import scipy
 
 import qmla.database_framework as database_framework
-import qmla.prior_distributions as distributions
+import qmla.shared_functionality.prior_distributions
 
 pickle.HIGHEST_PROTOCOL = 4
 
@@ -85,7 +85,7 @@ def set_shared_parameters(
 
     true_prior.__setattr__('cov', old_cov_mtx)
     try:
-        distributions.plot_prior(
+        qmla.distributions.plot_prior(
             model_name=true_model_latex,
             model_name_individual_terms=latex_terms,
             prior=true_prior,

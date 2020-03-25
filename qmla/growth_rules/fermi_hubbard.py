@@ -6,7 +6,7 @@ import os
 from qmla.growth_rules import connected_lattice
 from qmla import experiment_design_heuristics
 from qmla import topology
-from qmla import probe_set_generation
+import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
 
 # flatten list of lists
@@ -33,12 +33,12 @@ class FermiHubbardBase(
         self.initial_models = [
             self.true_model
         ]
-        self.probe_generation_function = probe_set_generation.separable_fermi_hubbard_half_filled
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
         # unless specifically different set of probes required
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
-        self.plot_probe_generation_function = probe_set_generation.fermi_hubbard_half_filled_superposition
-        # self.plot_probe_generation_function = probe_set_generation.FermiHubbard_single_spin_n_sites
+        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
+        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.FermiHubbard_single_spin_n_sites
 
         # self.max_time_to_consider = 20
         self.max_num_qubits = 6

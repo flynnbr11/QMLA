@@ -1,6 +1,5 @@
 import numpy as np
 
-import qmla.probe_set_generation as probe_set_generation
 import qmla.logging
 
 use_linalg = False
@@ -132,7 +131,7 @@ def hahn_evolution(
     # okay for experimental data with spins in NV centre
     import numpy as np
     from scipy import linalg
-    from qmla.probe_set_generation import random_probe
+    from qmla.shared_functionality.probe_set_generation import random_probe
     inversion_gate = np.array([
         [0. - 1.j, 0. + 0.j, 0. + 0.j, 0. + 0.j],
         [0. + 0.j, 0. - 1.j, 0. + 0.j, 0. + 0.j],
@@ -209,11 +208,9 @@ def hahn_evolution(
     noise_level = 0.00
     
     random_noise = noise_level * random_probe(1)
-    # random_noise = noise_level * probe_set_generation.random_probe(1)
     noisy_plus = plus_state + random_noise
     norm_factor = np.linalg.norm(noisy_plus)
     noisy_plus = noisy_plus / norm_factor
-#    noisy_plus = np.array([1, 1])/np.sqrt(2)
     bra = noisy_plus.conj().T
 
     rho_state = np.dot(reduced_matrix, noisy_plus)

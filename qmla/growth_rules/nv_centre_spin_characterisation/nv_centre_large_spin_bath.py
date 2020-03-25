@@ -3,7 +3,7 @@ import os
 
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
 from qmla import experiment_design_heuristics
-from qmla import probe_set_generation
+import qmla.shared_functionality.probe_set_generation
 from qmla import expectation_values
 from qmla import database_framework
 
@@ -30,9 +30,9 @@ class NVLargeSpinBath(
         else:
             self.use_experimental_data = False
         if self.use_experimental_data == True:
-            # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
-            # self.probe_generation_function = probe_set_generation.restore_dec_13_probe_generation
-            self.probe_generation_function = probe_set_generation.plus_probes_dict
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.restore_dec_13_probe_generation
+            self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
 
         self.expectation_value_function = expectation_values.n_qubit_hahn_evolution
 
@@ -61,7 +61,7 @@ class NVLargeSpinBath(
         self.max_num_parameter_estimate = 6
         self.max_spawn_depth = 9
         self.max_num_qubits = 6
-        # self.plot_probe_generation_function = probe_set_generation.zero_state_probes
+        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.zero_state_probes
         self.min_param = 0
         self.max_param = 10
         # self.dataset = 'NV_revivals.p'
@@ -224,8 +224,8 @@ class NVLargeSpinBath(
         latex_mapping_file,
         **kwargs
     ):
-        import qmla.growth_rules.shared_functionality.branch_mapping
-        name_map = qmla.growth_rules.shared_functionality.branch_mapping.branch_is_num_dims(
+        import qmla.shared_functionality.branch_mapping
+        name_map = qmla.shared_functionality.branch_mapping.branch_is_num_dims(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )

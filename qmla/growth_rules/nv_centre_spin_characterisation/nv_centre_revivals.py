@@ -2,7 +2,7 @@ import sys
 import os
 
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_large_spin_bath
-from qmla import probe_set_generation
+import qmla.shared_functionality.probe_set_generation
 from qmla import expectation_values
 from qmla import database_framework
 from qmla import experiment_design_heuristics
@@ -34,7 +34,7 @@ class ExpNVRevivals(
             nv_centre_large_spin_bath.gali_model_nv_centre_spin(7),
         ]
 
-        self.plot_probe_generation_function = probe_set_generation.plus_probes_dict
+        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
         # if self.use_experimental_data == True:
             # TODO previously using dec_13_probes; what should it be doing??
-            # self.probe_generation_function = probe_set_generation.restore_dec_13_probe_generation
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.restore_dec_13_probe_generation

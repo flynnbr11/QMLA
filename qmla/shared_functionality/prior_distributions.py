@@ -134,6 +134,7 @@ def plot_prior(
         to include in plot
     :type true_model_terms_params: dict
     """
+    
     from itertools import cycle
     from matplotlib import cm
     lines = ["-", "--", "-.", ":"]

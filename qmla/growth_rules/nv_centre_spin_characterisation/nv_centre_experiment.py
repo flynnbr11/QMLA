@@ -3,7 +3,8 @@ import sys
 import os
 
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
-from  qmla import probe_set_generation
+# from  qmla import qmla.shared_functionality.probe_set_generation.
+import qmla.shared_functionality.probe_set_generation
 from qmla import expectation_values
 from qmla import database_framework
 
@@ -63,14 +64,14 @@ class ExperimentNVCentre(
         self.fixed_axis_generator = False
         self.fixed_axis = 'z'  # e.g. transverse axis
 
-        # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
-        # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
-        self.probe_generation_function = probe_set_generation.plus_plus_with_phase_difference
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = False
         self.max_time_to_consider = 5
 
-        # self.probe_generation_function = probe_set_generation.separable_probe_dict
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
         # params for testing p value calculation
         self.max_num_probe_qubits = 2
@@ -95,10 +96,10 @@ class ExperimentNVCentre(
             #     "[{}] Experimental data = true".format(
             #     os.path.basename(__file__))
             # )
-            # self.probe_generation_function = probe_set_generation.restore_dec_13_probe_generation
-            # self.probe_generation_function = probe_set_generation.NV_centre_ising_probes_plus
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.restore_dec_13_probe_generation
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
 
-            # self.probe_generation_function = probe_set_generation.plus_probes_dict
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
             self.gaussian_prior_means_and_widths = {
                 'xTi': [4.0, 1.5],
                 'yTi': [4.0, 1.5],

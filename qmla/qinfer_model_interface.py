@@ -8,7 +8,7 @@ import warnings
 import qmla.experimental_data_processing
 import qmla.get_growth_rule
 import qmla.memory_tests
-import qmla.probe_set_generation
+import qmla.shared_functionality.probe_set_generation
 import qmla.database_framework
 import qmla.logging 
 

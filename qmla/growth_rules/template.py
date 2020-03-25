@@ -2,7 +2,7 @@ import sys
 import os
 
 from qmla.growth_rules import growth_rule_super
-from qmla import probe_set_generation
+import qmla.shared_functionality.probe_set_generation
 from qmla import expectation_values
 from qmla import database_framework
 

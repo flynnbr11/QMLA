@@ -3,9 +3,9 @@ import sys
 import os
 import pickle
 
-import qmla.prior_distributions as Distributions
+import qmla.shared_functionality.prior_distributions
 import qmla.experiment_design_heuristics as experiment_design_heuristics
-import qmla.probe_set_generation as probe_set_generation
+import qmla.shared_functionality.probe_set_generation as probe_set_generation
 import qmla.expectation_values as expectation_values
 import qmla.database_framework as database_framework
 import qmla.growth_rules.rating_system
@@ -43,11 +43,11 @@ class GrowthRuleSuper():
         # determine how probes are generated and expectation values are computed
         # these can be directly overwritten within class definition
         # by writing self.probe_generator and self.expectation_value methods
-        self.probe_generation_function = probe_set_generation.separable_probe_dict
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         # unless specifically different set of probes required
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
-        self.plot_probe_generation_function = probe_set_generation.plus_probes_dict
+        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
         self.expectation_value_function = expectation_values.default_expectation_value
         self.probe_noise_level = 1e-5
         self.fraction_particles_for_bf = 1.0 # testing whether reduced num particles for BF can work 
@@ -56,7 +56,7 @@ class GrowthRuleSuper():
             k_const=30
         ) # for use when ranking/rating models
         self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
-        self.prior_distribution_generator = Distributions.gaussian_prior
+        self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.gaussian_prior
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
         self.model_branches = {} 
@@ -178,9 +178,9 @@ class GrowthRuleSuper():
         branch_is_num_params
         
         """
-        import qmla.growth_rules.shared_functionality.branch_mapping
+        import qmla.shared_functionality.branch_mapping
         
-        return qmla.growth_rules.shared_functionality.branch_mapping.branch_computed_from_qubit_and_param_count(
+        return qmla.shared_functionality.branch_mapping.branch_computed_from_qubit_and_param_count(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )

@@ -16,7 +16,7 @@ import qmla.logging
 import qmla.get_growth_rule as get_growth_rule
 # import qmla.experimental_data_processing as expdt
 import qmla.experimental_data_processing
-import qmla.prior_distributions
+import qmla.shared_functionality.prior_distributions
 import qmla.database_framework
 import qmla.analysis
 
@@ -348,7 +348,7 @@ class ModelInstanceForLearning():
 
         plot_all_priors = True
         if plot_all_priors == True:
-            qmla.prior_distributions.plot_prior(
+            qmla.shared_functionality.prior_distributions.plot_prior(
                 model_name=self.model_name_latex,
                 model_name_individual_terms=latex_terms,
                 prior=self.model_prior,
