@@ -210,6 +210,7 @@ class ModelInstanceForStorage():
             self.estimated_mean_params = learned_info['est_mean']
             self.evaluation_log_likelihood = learned_info['evaluation_log_likelihood']
             self.evaluation_normalization_record = learned_info['evaluation_normalization_record']
+            self.evaluation_median_likelihood = learned_info['evaluation_median_likelihood']
             # self.cov_matrix = learned_info['cov_matrix']
             self.growth_rule_of_this_model = learned_info['growth_generator']
             try:

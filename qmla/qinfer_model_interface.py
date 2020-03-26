@@ -390,6 +390,13 @@ class QInferModelQML(qi.FiniteOutcomeModel):
                 outcomes, pr0
             )
         )
+        self.log_print(
+            [
+                "Outcomes: ", outcomes, 
+                "\nPr0: ", pr0, 
+                "\nLikelihood: ", likelihood_array
+            ]
+        )
 
         return likelihood_array
 

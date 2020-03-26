@@ -1,7 +1,10 @@
 import numpy as np
+import os
 import pickle
 import math
+
 import scipy
+import matplotlib.pyplot as plt
 
 import qmla.database_framework as database_framework
 import qmla.shared_functionality.prior_distributions
@@ -20,6 +23,8 @@ def set_shared_parameters(
     random_vals=False,
     all_growth_rules=[],
     exp_data=False,
+    results_directory='',
+    num_particles=100,
     probe_max_num_qubits_all_growth_rules = 12, 
     generate_evaluation_experiments=True, 
     true_prior_plot_file=None,
@@ -85,7 +90,7 @@ def set_shared_parameters(
 
     true_prior.__setattr__('cov', old_cov_mtx)
     try:
-        qmla.distributions.plot_prior(
+        qmla.shared_functionality.prior_distributions.plot_prior(
             model_name=true_model_latex,
             model_name_individual_terms=latex_terms,
             prior=true_prior,
@@ -107,17 +112,12 @@ def set_shared_parameters(
             noise_level = growth_class.probe_noise_level,
             minimum_tolerable_noise = 0.0,
         )
+        num_evaluation_times = int(max(num_particles, 50)) # use at least 50 times to evaluate
         evaluation_times = scipy.stats.reciprocal.rvs(
-            1e-2, 
+            1e-1, 
             growth_class.max_time_to_consider, 
-            size=200
+            size=num_evaluation_times
         ) # evaluation times generated log-uniformly
-        # evaluation_times = list(np.linspace(
-        #     0, 
-        #     10, 
-        #     100
-        #     )
-        # ) # TODO better choice of times for evaluation
         available_probe_ids = list(range(growth_class.num_probes))
         list_len_fator = math.ceil(len(evaluation_times) / len(available_probe_ids))
         iterable_probe_ids = iter(available_probe_ids * list_len_fator)
@@ -125,8 +125,22 @@ def set_shared_parameters(
         evaluation_experiments = list(zip(
             np.round(evaluation_times, 2), 
             [next(iterable_probe_ids) for i in evaluation_times]
-        ))        
-
+        ))       
+         
+        plt.hist(
+            evaluation_times,
+            bins = list(np.linspace(0,growth_class.max_time_to_consider, 10))
+            # bins = list(range(0, growth_class.max_time_to_consider))
+        )
+        plt.title('Times used for evaluation')
+        plt.ylabel('Frequency')
+        plt.xlabel('Time')
+        plt.savefig(
+            os.path.join(
+                results_directory, 
+                'times_for_evaluation.png'
+            )
+        )
     else: 
         evaluation_probes = None
 

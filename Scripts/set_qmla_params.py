@@ -139,12 +139,20 @@ parser.add_argument(
     default=0.03
 )
 
+parser.add_argument(
+    '-prt', '--particle_number',
+    help='Number of particles used during training',
+    type=float,
+    default=100
+)
+
 print("Set QMLA Params script")
 
 arguments = parser.parse_args()
 random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
 exp_data = bool(arguments.use_experimental_data)
+num_particles = arguments.particle_number
 growth_generation_rule = arguments.growth_generation_rule
 log_file = arguments.log_file
 results_directory = arguments.results_directory
@@ -207,6 +215,8 @@ if arguments.true_params_file is not None:
         pickle_file=arguments.true_params_file,
         all_growth_rules=all_growth_rules,
         exp_data=exp_data,
+        results_directory=results_directory,
+        num_particles = num_particles,
         generate_evaluation_experiments=True, 
         probe_max_num_qubits_all_growth_rules = probe_max_num_qubits_all_growth_rules, 
         true_prior_plot_file=true_prior_plot_file

@@ -847,20 +847,19 @@ def plot_evaluation_log_likelihoods(
     combined_results, 
     save_directory=None,
 ):
-    evaluation_cols = ['instance', 'model_id', 'log_likelihood', 'f_score', 'true', 'champ', 'Classification']
+    evaluation_cols = [
+        'instance', 'model_id', 
+        'log_likelihood', 'median_likelihood',
+        'f_score', 'true', 'champ', 'Classification'
+    ]
     evaluation_plot_df = pd.DataFrame(
         columns = evaluation_cols
     )
-
-    highlight_columns = ['instance', 'model_id', 'log_likelihood', 'marker', 'colour']
-    highlighted_models_df = pd.DataFrame(
-        columns = highlight_columns
-    )
-
     for i in list(combined_results.index):
         res = combined_results.iloc[i]
 
         log_lls = eval(res.ModelEvaluationLogLikelihoods)
+        median_lls = eval(res.ModelEvaluationMedianLikelihoods)
         f_scores = eval(res.AllModelFScores)
 
         instance = res.QID
@@ -888,6 +887,7 @@ def plot_evaluation_log_likelihoods(
                     # instance, 
                     mod, 
                     log_lls[mod],
+                    median_lls[mod],
                     f_scores[mod],
                     mod==instance_true_id,
                     mod==instance_champion_id,
@@ -901,17 +901,28 @@ def plot_evaluation_log_likelihoods(
             )
     evaluation_plot_df.instance = evaluation_plot_df.instance.astype(int)
     
-    fig, ax = plt.subplots(figsize=(17, 7))
+    fig = plt.figure(
+        figsize=(17, 9),
+        # constrained_layout=True,
+        tight_layout=True
+    )
+    gs = GridSpec(
+        2,
+        1,
+    )
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax2 = fig.add_subplot(gs[1, 0])
+
     sns.boxplot(
         y = 'log_likelihood', 
         x = 'instance', 
         data = evaluation_plot_df,
-        ax = ax,
+        ax = ax1,
         color='lightblue',
         showfliers=False
     )
-    ax.set_ylabel('Log likelihood')
-    ax.set_xlabel('Instance')
+    ax1.set_ylabel('Log likelihood')
+    ax1.set_xlabel('Instance')
 
 
     sub_df = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard']
@@ -937,16 +948,12 @@ def plot_evaluation_log_likelihoods(
         y = 'log_likelihood', 
         x = 'instance', 
         data = sub_df, 
-        ax = ax,
+        ax = ax1,
         style='Classification',
         markers={
             c : all_markers[c]
             for c in unique_classifications
         },
-    #     sizes = {
-    #         c : marker_sizes[c]
-    #         for c in unique_classifications
-    #     },
         s = msize,
         hue = 'Classification',
         palette = {
@@ -954,19 +961,53 @@ def plot_evaluation_log_likelihoods(
             for c in unique_classifications
         }
     )
-    ax.set_ylabel('Log likelihood')
-    ax.set_xlabel('Instance')
-    ax.set_xticks(
+    ax1.set_ylabel('Log likelihood')
+    ax1.set_xlabel('Instance')
+    ax1.set_xticks(
         []
         # list(range(evaluation_plot_df.instance.min(), 1+evaluation_plot_df.instance.max()))
     )
+    ax1.legend()    
+    ax1.set_title('Model log likelihoods')
 
-    ax.legend()    
-    ax.set_title('Evaluation by individual instances')
+    # median likelihoods
+    sns.boxplot(
+        y = 'median_likelihood', 
+        x = 'instance', 
+        data = evaluation_plot_df,
+        ax = ax2,
+        color='lightblue',
+        showfliers=False
+    )
+    sns.scatterplot(
+        y = 'median_likelihood', 
+        x = 'instance', 
+        data = sub_df, 
+        ax = ax2,
+        style='Classification',
+        markers={
+            c : all_markers[c]
+            for c in unique_classifications
+        },
+        s = msize,
+        hue = 'Classification',
+        palette = {
+            c : all_colours[c] 
+            for c in unique_classifications
+        }
+    )
+    ax2.set_ylim(0,1)
+    ax2.set_xticks([])
+    ax2.set_ylabel('Median likelihood')
+    ax2.set_xlabel('Instance')
+    ax2.set_title('Model likelihoods (median)')
+
+    # plt.suptitle('Evaluation by individual instances')
     if save_directory is not None: 
         plt.savefig(
             os.path.join(
                 save_directory, 
-                'evaluation_log_likelihoods.png'
+                'evaluation_by_likelihoods.png'
             )
         )
+

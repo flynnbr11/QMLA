@@ -2231,8 +2231,11 @@ class QuantumModelLearningAgent():
             mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_log_likelihood
             for mod_id in self.models_learned
         }
+        model_evaluation_median_likelihoods = {
+            mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_median_likelihood
+            for mod_id in self.models_learned
+        }
         # equivalent to self.champion_results
-
         self.champion_results = {
             'NameAlphabetical': database_framework.alph(self.ChampionName),
             'NameNonAlph': self.ChampionName,
@@ -2286,6 +2289,7 @@ class QuantumModelLearningAgent():
             'GenerationalFscore'  : self.generational_f_score,
             'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
             'ModelEvaluationLogLikelihoods' : model_evaluation_log_likelihoods,
+            'ModelEvaluationMedianLikelihoods' : model_evaluation_median_likelihoods,
             'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
             'AllModelFScores' : self.model_f_scores, 
         }
@@ -2574,6 +2578,10 @@ class QuantumModelLearningAgent():
             mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_log_likelihood
             for mod_id in self.models_learned
         }
+        model_evaluation_median_likelihoods = {
+            mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_median_likelihood
+            for mod_id in self.models_learned
+        }
 
         time_now = time.time()
         time_taken = time_now - self._start_time
@@ -2620,6 +2628,7 @@ class QuantumModelLearningAgent():
             'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
             'AllModelFScores' : self.model_f_scores, 
             'ModelEvaluationLogLikelihoods' : model_evaluation_log_likelihoods,
+            'ModelEvaluationMedianLikelihoods' : model_evaluation_median_likelihoods
         }
 
         self.log_print(
@@ -2725,6 +2734,10 @@ class QuantumModelLearningAgent():
             mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_log_likelihood
             for mod_id in self.models_learned
         }
+        model_evaluation_median_likelihoods = {
+            mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_median_likelihood
+            for mod_id in self.models_learned
+        }
 
         for mod_name in model_names:
             mod_id = database_framework.model_id_from_name(
@@ -2788,6 +2801,7 @@ class QuantumModelLearningAgent():
                 'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
                 'AllModelFScores' : self.model_f_scores, 
                 'ModelEvaluationLogLikelihoods' : model_evaluation_log_likelihoods,
+                'ModelEvaluationMedianLikelihoods' : model_evaluation_median_likelihoods
             }
             self.model_id_to_name_map = {}
             for k in self.model_name_id_map:

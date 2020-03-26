@@ -722,9 +722,11 @@ class ModelInstanceForLearning():
         try:
             learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
             learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
+            learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
         except:
             learned_info['evaluation_log_likelihood'] = None
             learned_info['evaluation_normalization_record'] = None
+            learned_info['evaluation_median_likelihood'] = None
 
         if self.store_particle_locations_and_weights:
             self.log_print(
@@ -867,11 +869,16 @@ class ModelInstanceForLearning():
         self.evaluation_normalization_record = evaluation_updater.normalization_record
         if np.isnan(evaluation_updater.log_total_likelihood):
             self.evaluation_log_likelihood = None 
+            self.evaluation_median_likelihood = None
         else:
             self.evaluation_log_likelihood = round_nearest(
                 # evaluation_updater.log_total_likelihood / len(self.evaluation_normalization_record), 
                 evaluation_updater.log_total_likelihood, 
                 0.05
+            )
+            self.evaluation_median_likelihood = np.round(
+                np.median(evaluation_updater.normalization_record),
+                2
             )
         
 
