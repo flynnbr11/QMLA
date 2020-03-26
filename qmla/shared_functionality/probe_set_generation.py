@@ -1,4 +1,4 @@
-"""
+r"""
 Functions to generate sets of probe states to be used for training models.
 
 These functions are set to growth rule attributes, which are then called in wrapper functions. 
@@ -87,13 +87,9 @@ def separable_probe_dict(
         (N+1, i) = (N, i) \otimes r, 
         where r is a random 1-qubit probe.
     
-    :param max_num_qubits: Largest number of qubits to generate probes up to.
-    :type max_num_qubits: int
-    :param num_probes: How many probes to produce. 
-    :type num_probes: int
-    :return separable_probes: probe library indexed by (num-qubit, probe-id)
-    :rtype: dict
-
+    :param int max_num_qubits: Largest number of qubits to generate probes up to.
+    :param int num_probes: How many probes to produce. 
+    :return dict separable_probes: probe library indexed by (num-qubit, probe-id)
     """
     separable_probes = {}
     for i in range(num_probes):
@@ -145,20 +141,16 @@ def NV_centre_ising_probes_plus(
     noise_level=0.03,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
     **kwargs
 ):
-    """
+    r"""
     Returns a dict of separable probes where the first qubit always acts on |+>.
 
     Used for QMLA on NV centre, experiment in Bristol 2016.
     Probe library has each probe like |+>|r>..|r>, where |r> is random 1-qubit state.
 
-    :param max_num_qubits: Largest number of qubits to generate probes up to.
-    :type max_num_qubits: int
-    :param num_probes: How many probes to produce. 
-    :type num_probes: int
-    :param noise_level: factor to multiple generated states by to simulate noise.
-    :type noise_level: float
-    :return separable_probes: probe library. 
-    :rtype dict:
+    :param int max_num_qubits: Largest number of qubits to generate probes up to.
+    :param int num_probes: How many probes to produce. 
+    :param float noise_level: factor to multiple generated states by to simulate noise.
+    :return dict separable_probes: probe library. 
     """
     minimum_tolerable_noise=1e-6
     # minimum_tolerable_noise needed
@@ -236,14 +228,10 @@ def plus_plus_with_phase_difference(
         2 qubits : |+>|+'> 
         N qubits : |+> |+'> ... |+'>
 
-    :param max_num_qubits: Largest number of qubits to generate probes up to.
-    :type max_num_qubits: int
-    :param num_probes: How many probes to produce. 
-    :type num_probes: int
-    :param noise_level: factor to multiple generated states by to simulate noise.
-    :type noise_level: float
-    :return separable_probes: probe library. 
-    :rtype dict:
+    :param int max_num_qubits: Largest number of qubits to generate probes up to.
+    :param int num_probes: How many probes to produce. 
+    :param float noise_level: factor to multiple generated states by to simulate noise.
+    :return dict separable_probes: probe library. 
 
     """
 
@@ -386,12 +374,9 @@ def separable_fermi_hubbard_half_filled(
         the probe is projected onto the subspace of n
         fermions on the n dimensional space.
     
-    :param max_num_qubits: Largest number of qubits to generate probes up to.
-    :type max_num_qubits: int
-    :param num_probes: How many probes to produce. 
-    :type num_probes: int
-    :return separable_probes: probe library. 
-    :rtype dict:
+    :param int max_num_qubits: Largest number of qubits to generate probes up to.
+    :param int  num_probes: How many probes to produce. 
+    :return dict separable_probes: probe library. 
     """
     
     separable_probes = {}

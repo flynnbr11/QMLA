@@ -13,7 +13,6 @@ import qmla.qinfer_model_interface as qml_qi
 import qmla.memory_tests
 import qmla.logging
 import qmla.get_growth_rule as get_growth_rule
-# import qmla.experimental_data_processing as expdt
 import qmla.experimental_data_processing
 import qmla.database_framework
 import qmla.analysis

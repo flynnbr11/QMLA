@@ -3,7 +3,6 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-# from scipy.optimize import curve_fit
 
 import qmla.database_framework as database_framework
 import qmla.logging
@@ -47,25 +46,17 @@ def gaussian_prior(
     with sigma = mean/4. This can be changed by specifying prior_specific_terms: 
         individual parameter's means/sigmas can be given. 
 
-    :param model_name: Unique string representing a model.
-    :type model_name: string
-    :param param_minimum: Lower bound for distribution.
-    :type param_minimum: float
-    :param param_maximum: Upper bound for distribution.
-    :type param_maximum: float
-    :param default_sigma: Width of distribution desired. If None, 
+    :param str model_name: Unique string representing a model.
+    :param float param_minimum: Lower bound for distribution.
+    :param float param_maximum: Upper bound for distribution.
+    :param float default_sigma: Width of distribution desired. If None, 
         defaults to 0.25 * (param_max - param_min).
-    :type default_sigma: float
-    :param prior_specific_terms: Individual parameter mean and sigma
+    :param dict prior_specific_terms: Individual parameter mean and sigma
         to enforce in the distribution. 
-    :type prior_specific_terms: dict
-    :param log_file: Path of the log file for logging errors.
-    :type log_file: str
-    :param log_identifier: Unique identifying sting for logging.
-    :type log_identifier: str
-    :return dist: distribution to be used as prior for parameter learning 
+    :param str log_file: Path of the log file for logging errors.
+    :param str log_identifier: Unique identifying sting for logging.
+    :return QInfer.Distribution dist: distribution to be used as prior for parameter learning 
         of the named model.
-    :rtype: QInfer.Distribution
     """
 
     log_print(

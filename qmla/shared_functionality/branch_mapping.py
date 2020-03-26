@@ -1,8 +1,25 @@
+"""
+Functions which find which branch to display models on. 
+
+Called by growth rules name_branch_map wrapper function. 
+Branch IDs returned are displayed vertically downwards:
+    models on branch 0 appear at the top of the DAG; 
+    models on branch 1,...,N appear beneath. 
+"""
+
 import numpy as np
 
 import qmla.database_framework
 
 def branch_is_num_params(latex_mapping_file, **kwargs):
+    r"""
+    Number of parameters in the models correspond to branch. 
+
+    :param str latex_mapping_file: path to file containing
+        tuples of model strings and their corresponding 
+        latex representations, for all models considered in the run. 
+    """
+
     with open(latex_mapping_file) as f:
         content = f.readlines()
     # remove whitespace characters like `\n` at the end of each line
