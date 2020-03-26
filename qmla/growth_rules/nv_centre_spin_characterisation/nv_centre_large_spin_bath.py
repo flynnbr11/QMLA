@@ -4,7 +4,7 @@ import os
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
 from qmla import experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation
-from qmla import expectation_values
+import qmla.shared_functionality.expectation_values
 from qmla import database_framework
 
 
@@ -34,7 +34,7 @@ class NVLargeSpinBath(
             # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.restore_dec_13_probe_generation
             self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
 
-        self.expectation_value_function = expectation_values.n_qubit_hahn_evolution
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
 
         self.true_model = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
         # self.true_model = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'

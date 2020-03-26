@@ -49,18 +49,13 @@ def default_expectation_value(
     value measured is 1 and the expectation value corresponds to the probability of
     obtaining 1.
 
-    :param ham: Hamiltonian needed for the time-evolution
-    :type ham: np.array()
-    :param t: Evolution time
-    :type t: float()
-    :param state: Initial state to evolve and measure on
-    :type state: float()
-    :param log_file: (optional) path of the log file for logging errors
-    :type log_file: str() 
-    :param log_identifier: (optional) identifier for the log
-    :type log_identifier: str()    
+    :param np.array ham: Hamiltonian needed for the time-evolution
+    :param float t: Evolution time
+    :param np.array state: Initial state to evolve and measure on
+    :param str log_file: (optional) path of the log file
+    :param str log_identifier: (optional) identifier for the log
 
-    :output: expectation value of the evolved state
+    :return: expectation value of the evolved state
     """
 
     from scipy import linalg
@@ -102,28 +97,22 @@ def hahn_evolution(
     log_identifier=None
 ):
     """
-    This is the hahn echo evolution and expectation value function for QMLA.
+    Hahn echo evolution and expectation value.
 
-    longish description:
     Returns the expectation value computed by evolving the input state with
     the Hamiltonian corresponding to the Hahn eco evolution. NB: In this case, the assumption is that the 
     value measured is 1 and the expectation value corresponds to the probability of
     obtaining 1.
 
-    :param ham: Hamiltonian needed for the time-evolution
-    :type ham: np.array()
-    :param t: Evolution time
-    :type t: float()
-    :param state: Initial state to evolve and measure on
-    :type state: float()
-    :param precision: (optional) chosen precision for expectation value, default 1e-10
-    :type precision: float()
-    :param log_file: (optional) path of the log file for logging errors
-    :type log_file: str() 
-    :param log_identifier: (optional) identifier for the log
-    :type log_identifier: str()    
+    :param np.array ham: Hamiltonian needed for the time-evolution
+    :param float t: Evolution time
+    :param np.array state: Initial state to evolve and measure on
+    :param float precision: precision required of the expectation value
+        when using custom exponentiation function. TODO deprecated; remove
+    :param str log_file: (optional) path of the log file
+    :param str log_identifier: (optional) identifier for the log
 
-    :output: expectation value of the evolved state
+    :return: expectation value of the evolved state
 
     """
     
@@ -279,8 +268,8 @@ def n_qubit_hahn_evolution(
     num_qubits = int(np.log2(np.shape(ham)[0]))
 
     try:
-        import hahn_inversion_gates
-        inversion_gate = hahn_inversion_gates.hahn_inversion_gates[num_qubits]
+        from qmla.shared_functionality.hahn_inversion_gates import precomputed_hahn_inversion_gates
+        inversion_gate = precomputed_hahn_inversion_gates[num_qubits]
     except BaseException:
         inversion_gate = make_inversion_gate(num_qubits)
 

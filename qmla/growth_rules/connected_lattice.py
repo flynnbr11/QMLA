@@ -5,7 +5,6 @@ import os
 
 from qmla.growth_rules import growth_rule_super
 from qmla import experiment_design_heuristics
-# from qmla.shared_functionality import topology
 import qmla.shared_functionality.topology
 import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework

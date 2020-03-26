@@ -52,14 +52,12 @@ def get_redis_databases_by_qmla_id(
         - will be renamed Redis
         - TODO
 
-    :params string host_name: 
-        string with the specific name of the host
-    :params int port_number: 
-        port number
-    :params qmla_id: 
-        identifier of the qmd isntance
-    :return database_dict: set of database addresses unique to the qmla_id, host_name and port_number
-    :rtype: dict
+    :param str host_name: name of host server on which redis database exists.
+    :param int port_number: this QMLA instance's unique port number,
+        on which redis database exists. 
+    :param int qmla_id: QMLA id, unique to a single instance within a run. 
+        Used to cosntruct a unique redis database corresponding to this instance.
+    :return dict database_dict: set of database addresses unique to the qmla_id, host_name and port_number
     """
 
     database_dict = {}

@@ -10,7 +10,7 @@ num_tests=1
 qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
-exp_data=0
+exp_data=1
 simulate_experiment=0
 q_id=0 # can start from other ID if desired
 

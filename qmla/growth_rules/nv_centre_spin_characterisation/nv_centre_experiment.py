@@ -5,7 +5,7 @@ import os
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
 # from  qmla import qmla.shared_functionality.probe_set_generation.
 import qmla.shared_functionality.probe_set_generation
-from qmla import expectation_values
+import qmla.shared_functionality.expectation_values
 from qmla import database_framework
 
 
@@ -33,9 +33,9 @@ class ExperimentNVCentre(
             **kwargs
         )
         if self.use_experimental_data == True:
-            self.expectation_value_function = expectation_values.hahn_evolution
+            self.expectation_value_function = qmla.shared_functionality.expectation_values.hahn_evolution
         else:
-            self.expectation_value_function = expectation_values.n_qubit_hahn_evolution
+            self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
 
         # self.true_model = 'xTiPPyTy'
         self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic

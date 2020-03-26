@@ -4,7 +4,6 @@ import os
 
 from qmla.growth_rules.growth_rule_super import GrowthRuleSuper
 from qmla import experiment_design_heuristics
-from qmla import expectation_values
 from qmla import database_framework
 
 __all__ = [

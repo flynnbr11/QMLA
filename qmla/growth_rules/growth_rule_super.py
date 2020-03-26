@@ -6,7 +6,7 @@ import pickle
 import qmla.shared_functionality.prior_distributions
 import qmla.experiment_design_heuristics as experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation as probe_set_generation
-import qmla.expectation_values as expectation_values
+import qmla.shared_functionality.expectation_values
 import qmla.database_framework as database_framework
 import qmla.growth_rules.rating_system
 from qmla.growth_rules.growth_rule_decorator import GrowthRuleDecorator
@@ -48,7 +48,7 @@ class GrowthRuleSuper():
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-        self.expectation_value_function = expectation_values.default_expectation_value
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
         self.probe_noise_level = 1e-5
         self.fraction_particles_for_bf = 1.0 # testing whether reduced num particles for BF can work 
         self.ratings_class = qmla.growth_rules.rating_system.ELORating(

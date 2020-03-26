@@ -4,7 +4,6 @@ import os
 
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_experiment
 import qmla.shared_functionality.probe_set_generation
-from qmla import expectation_values
 from qmla import database_framework
 
 

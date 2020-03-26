@@ -33,8 +33,7 @@ import seaborn as sns
 
 import qmla.get_growth_rule as get_growth_rule
 import qmla.experimental_data_processing as expdt
-# from qmla import experimental_data_processing check that is called as experimental_data_processing.method.
-import qmla.expectation_values as expectation_values
+import qmla.shared_functionality.expectation_values
 import qmla.database_framework as database_framework
 
 frameinfo = getframeinfo(currentframe())
@@ -930,7 +929,7 @@ def r_squared_from_epoch_list(
         r_squared_by_epoch = {}
 
         mod_num_qubits = database_framework.get_num_qubits(mod.model_name)
-        probe = expectation_values.n_qubit_plus_state(mod_num_qubits)
+        probe = qmla.shared_functionality.expectation_values.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.num_experiments - 1])
         if len(mod.epochs_after_resampling) > 0:
             epochs.extend(mod.epochs_after_resampling)

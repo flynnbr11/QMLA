@@ -62,6 +62,16 @@ def get_growth_generator_class(
     growth_generation_rule,
     **kwargs
 ):
+    r"""
+    Get an instance of the class specified by the user to run their Growth Rule.
+
+    :param str growth_generation_rule: string corresponding to a growth rule; 
+        used to pull the class object from the dictionary growth_classes.
+    :params **kwargs: arguments required by the growth rule, passed directly 
+        to the desired growth rule's constructor.
+    :return GrowthRuleSuper gr: growth rule class instance
+
+    """
     # TODO: note that in most places, this is called with use_experimental_data.
     # in some plotting functions this is not known, but it should not matter unless
     # called to get probes etc.
