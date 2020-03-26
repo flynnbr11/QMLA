@@ -12,13 +12,12 @@ __all__ = [
     'parse_cmd_line_args'
 ]
 
-
 """
-This file is callable with *kwargs from a separate QMD program.
+This script is callable with *kwargs.
 It returns an instance of the class ControlsQMLA, which has attributes
 for all the user defined parameters, and defaults if not specified by the user.
-
 """
+
 def log_print(
     to_print_list, 
     log_file
@@ -30,6 +29,19 @@ def log_print(
     )
 
 class ControlsQMLA():
+    r"""
+    Storage for configuration of a QMLA instance. 
+
+    Command line arguments specify details about the QMLA instance,
+        such as number of experiments/particles etc, required to implement
+        the QMLA instance.
+    The command line arguments are held together in this class. 
+    The class is then given to the QuantumModelLearningAgent class, 
+        which incorporates those details into the implementation.
+
+    :param arguments: parsed command line arguments.
+    """
+
     def __init__(
         self,
         arguments,
@@ -204,8 +216,16 @@ class ControlsQMLA():
 
 
 def parse_cmd_line_args(args):
+    r"""
+    Parse command line arguments, store and return in a single class instance. 
+    
+    Defaults and help for all useable command line arguments are specified here.
+    These are parsed, then passed to a ControlsQMLA instance for ease of access. 
 
-    parser = argparse.ArgumentParser(description='Pass variables for (I)QLE.')
+    :param args: command line arguments (e.g. sys.argv[1:]).
+    """
+
+    parser = argparse.ArgumentParser(description='Pass variables for QMLA.')
 
     # Interpret command line arguments
     # These are passed through the launch script
