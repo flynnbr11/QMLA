@@ -9,7 +9,22 @@ class GridTopology():
     r"""
     Control the layout/connectivity of the lattice the models are based on.
 
-    
+    This can be used as a parent class for other topologies. 
+    Here sites are assigned unique indices, 
+        and we use Cartesian coordinates for site positions.
+
+    :param int dimension: dimension of system
+    :param int num_sites: initial number of sites in the system
+    :param int maximum_connection_distance: upper limit of 
+        absolute distance between sites of nearest neighbours 
+        to be considered "connected". 
+    :param bool linear_connections_only: 
+        True: only allow connectivity if sites share an axis
+        False: allow connectivity if absolute distance between sites
+        less than maximum_connection_distance
+    :param bool all_sites_connected: 
+        True: all sites connected
+        False: connectivity based on above criteria
     """
     
     def __init__(
@@ -51,6 +66,12 @@ class GridTopology():
             self.add_site()
 
     def add_site(self):
+        r"""
+        Add site to current state of topology. 
+
+        In multiple dimensions, sites are addedto minimise total area of the lattice.
+        Connectivities are updated. 
+        """
         if self.dimension == 1:
             new_site_idx = self.add_site_1d_grid()
         elif self.dimension == 2:
@@ -119,12 +140,15 @@ class GridTopology():
 
     @property
     def site_indices(self):
+        r"""Unique site indices list. """
         return list(self.coordinates.keys())
 
     def num_sites(self):
+        r"""Number of sites in the topology currently."""
         return len(list(self.coordinates.keys()))
 
     def check_nearest_neighbours_from_indices(self, idx_1, idx_2):
+        r"""Check if two sites are nearest neighbours, given their indices."""
         site_1 = self.coordinates[idx_1]
         site_2 = self.coordinates[idx_2]
         print("Site 1:", site_1)
@@ -132,6 +156,7 @@ class GridTopology():
         return self.check_nearest_neighbour_sites(site_1, site_2)
 
     def check_nearest_neighbour_sites(self, site_1, site_2):
+        r"""Check if two sites are nearest neighbours, given their locations."""
         # simply checks whether sites are adjacent (or comptues distance)
         # assumes Cartesian coordinates
         if len(site_1) != len(site_2):
@@ -152,6 +177,7 @@ class GridTopology():
             return False
 
     def get_distance_between_sites(self, site_1_idx, site_2_idx):
+        r"""Compute distance between two sites, given their indices."""
         site_1 = self.coordinates[site_1_idx]
         site_2 = self.coordinates[site_2_idx]
 
@@ -178,6 +204,7 @@ class GridTopology():
         site_1_idx,
         site_2_idx
     ):
+        r"""Checks whether two site indices are considered connected."""
         dist, shared_axis = self.get_distance_between_sites(
             site_1_idx,
             site_2_idx
@@ -191,7 +218,7 @@ class GridTopology():
         return connected, shared_axis
 
     def get_connected_site_list(self):
-
+        r"""Return list of tuples of connected sites' indices."""
         coordinates = self.coordinates
         site_indices = list(coordinates.keys())
         connected_sites = []
@@ -222,7 +249,7 @@ class GridTopology():
         return connected_sites
 
     def get_nearest_neighbour_list(self):
-
+        r"""Return list of tuples of nearest-neighbours sites' indices."""
         coordinates = self.coordinates
         site_indices = list(coordinates.keys())
         nearest_neighbours = []
@@ -240,6 +267,7 @@ class GridTopology():
         return nearest_neighbours
 
     def add_site_1d_grid(self):
+        r"""Add site to topology if it is a 1D system."""
         max_site_idx = max(list(self.coordinates.keys()))
         new_site_idx = max_site_idx + 1
         self.nearest_neighbours[new_site_idx] = []
@@ -249,6 +277,7 @@ class GridTopology():
         return new_site_idx
 
     def add_site_2d_grid(self):
+        r"""Add site to topology if it is a 2D system."""
         # grows in a manner which minimises area of the topology
         rows = self.occupation['rows']
         cols = self.occupation['cols']
@@ -306,6 +335,10 @@ class GridTopology():
         return new_site_idx
 
     def add_sites_until_closed_topology(self):
+        r""""
+        Continuosly add sites until topology is closed 
+            (here, all sites have at least two nearest neighbours).
+        """
         # Add sites in such a way that all sites have at least two nearest neighbours
         # Assumption to minimise energy -- not always necessary
         all_sites_greater_than_2_nearest_neighbours = False
@@ -321,6 +354,7 @@ class GridTopology():
         self.new_site_indices.append(added_sites)
 
     def draw_topology(self):
+        r"""Plot the current topology. For use in interactive sessions."""
         import networkx as nx
         plt.clf()
         Graph = nx.Graph()

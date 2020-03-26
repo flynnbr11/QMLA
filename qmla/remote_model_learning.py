@@ -34,15 +34,35 @@ def remote_learn_model_parameters(
     log_file='rq_output.log'
 ):
     """
-    This is a standalone function to perform QHL on individual
-    models  without knowledge of full QMD program.
-    QMD info is unpickled from a redis databse, containing
-    true operator, params etc.
-    Given model names are used to generate ModelInstanceForLearning instances,
-    upon which we update the posterior parameter distribution iteratively.
-    Once parameters are learned, we pickle the results to dictionaries
-    held on a redis database which can be accessed by other actors.
+    Standalone function to perform Quantum Hamiltonian Learning on individual models.
 
+    Used in conjunction with redis databases so this calculation can be 
+        performed without any knowledge of the QMLA instance. 
+    Given model ids and names are used to instantiate 
+        the ModelInstanceForLearning class, which is then used
+        for learning the models parameters.
+    QMLA info is unpickled from a redis databse, containing
+        true operator, params etc.
+    Once parameters are learned, we pickle the results to dictionaries
+        held on a redis database which can be accessed by other actors.
+
+    :param str name: model name string
+    :param int model_id: unique model id
+    :param int branch_id: QMLA branch where the model was generated
+    :param str growth_generator: string corresponding to a unique growth rule,
+        used by get_growth_generator_class to generate a 
+        GrowthRuleSuper (or subclass) instance.
+    :param dict qmla_core_info_dict: crucial data for QMLA, such as number 
+        of experiments/particles etc. Default None: core info is stored on the 
+        redis database so can be retrieved there on a server; if running locally, 
+        can be passed to save pickling. 
+    :param bool remote: whether QMLA is running remotely via RQ workers.
+    :param str host_name: name of host server on which redis database exists.
+    :param int port_number: this QMLA instance's unique port number,
+        on which redis database exists. 
+    :param int qid: QMLA id, unique to a single instance within a run. 
+        Used to identify the redis database corresponding to this instance.
+    :param str log_file: Path of the log file.
     """
 
     def log_print(to_print_list):

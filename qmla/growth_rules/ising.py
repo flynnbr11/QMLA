@@ -4,7 +4,6 @@ import sys
 import os
 from qmla.growth_rules import connected_lattice
 from qmla import experiment_design_heuristics
-from qmla import topology
 import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
 

@@ -5,7 +5,8 @@ import os
 
 from qmla.growth_rules import growth_rule_super
 from qmla import experiment_design_heuristics
-from qmla import topology
+# from qmla.shared_functionality import topology
+import qmla.shared_functionality.topology
 import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
 
@@ -87,7 +88,7 @@ class ConnectedLattice(
             self.generation_DAG
         )
         self.max_num_probe_qubits = self.max_num_sites
-        self.topology = topology.GridTopology(
+        self.topology = qmla.shared_functionality.topology.GridTopology(
             dimension=self.lattice_dimension,
             num_sites=self.initial_num_sites,
             # nearest neighbours only,

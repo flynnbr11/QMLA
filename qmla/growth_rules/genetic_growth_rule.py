@@ -11,7 +11,6 @@ import sklearn
 
 from qmla.growth_rules import growth_rule_super
 from qmla import experiment_design_heuristics
-from qmla import topology
 import qmla.shared_functionality.probe_set_generation
 # from qmla import qmla.database_framework
 import qmla.database_framework
