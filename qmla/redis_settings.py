@@ -33,7 +33,7 @@ databases_required = [
     'bayes_factors_winners_db',
     'active_branches_learning_models',
     'active_branches_bayes',
-    'active_interbranch_bayes',
+    'active_interbranch_bayes', # TODO unused?
     'any_job_failed'
 ]
 

@@ -6,8 +6,8 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=3
-qhl_test=1 # don't perform QMLA; perform QHL on known correct model
+num_tests=10
+qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
@@ -17,7 +17,7 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=150
+prt=15
 exp=3
 pgh=1.0
 pgh_exponent=1.0

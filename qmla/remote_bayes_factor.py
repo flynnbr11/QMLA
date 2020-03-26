@@ -32,7 +32,7 @@ def remote_bayes_factor_calculation(
     model_a_id,
     model_b_id,
     branch_id=None,
-    interbranch=False,
+    # interbranch=False,
     num_times_to_use='all',
     bf_data_folder=None,
     times_record='BayesFactorsTimes.txt',
@@ -45,13 +45,50 @@ def remote_bayes_factor_calculation(
     log_file='rq_output.log'
 ):
     """
-    This is a standalone function to compute Bayes factors without knowledge
-    of full QMD program. QMD info is unpickled from a redis databse, containing
-    learned_model information, i.e. final parameters etc.
+    Standalone function to compute Bayes factors.
+    
+    QMLA info is unpickled from a redis databse, containing
+        learned_model information, i.e. final parameters etc.
     Given model ids correspond to model names in the database, which are combined
-    with the final learned parameters to reconstruct model classes of
-    complete learned models.
-    From these we extract log likelihoods to compute Bayes factors.
+        with the final learned parameters to reconstruct model classes of
+        complete learned models.
+    From these we extract log likelihoods to compute the Bayes factor, BF(A,B).
+    Models have a unique pair_id, simply (min(A,B), max(A,B)).
+    For BF(A,B) >> 1, A is deemed the winner; BF(A,B)<<1 deems B the winner. 
+    The result is then stored redis databases:
+        - bayes_factors_db: BF(A,B)
+        - bayes_factors_winners_db: id of winning model
+        - active_branches_bayes: when complete, increase the count of 
+            complete pairs' BF on the given branch.
+        
+
+    :param model_a_id: unique id for model A
+    :type model_a_id: int
+    :param model_b_id: unique id for model B
+    :type model_b_id: int
+    :param branch_id: unique id of branch the pair (A,B) are on
+    :type branch_id: int
+    :param num_times_to_use: how many times, used during the training of 
+        models A,B, to use during the BF calculation. Default 'all'; if 
+        otherwise, Nt, keeps the most recent Nt experiment times of A,B. 
+    :type branch_id: str or int
+    :param bf_data_folder: folder path to store information such as times
+        used during calculation, and plots of posterior marginals.
+    :type bf_data_folder: str
+    :param times_record: filename to store times used during calculation.
+    :type times_record: str
+    :param check_db: look in redis databases to check if this pair's BF
+        has already been computed; return pre-computed BF if so. 
+    :type check_db: str
+    :param bayes_threshold: value to determine whether either model is superior
+        enough to "win" the comparison. If 1 < BF < threshold, neither win. 
+    :type bayes_threshold: float
+    :param host_name: name of host server on which redis database exists.
+    :type host_name: str
+    :param port_number: this QMLA instance's unique port number,
+        on which redis database exists. 
+    :type port_number: str
+    
 
     """
     def log_print(to_print_list):

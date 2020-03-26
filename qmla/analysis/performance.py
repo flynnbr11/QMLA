@@ -845,6 +845,8 @@ def parameter_sweep_analysis(
 
 def plot_evaluation_log_likelihoods(
     combined_results, 
+    include_log_likelihood = True,
+    include_median_likelihood = True,
     save_directory=None,
 ):
     evaluation_cols = [
@@ -901,30 +903,6 @@ def plot_evaluation_log_likelihoods(
             )
     evaluation_plot_df.instance = evaluation_plot_df.instance.astype(int)
     
-    fig = plt.figure(
-        figsize=(17, 9),
-        # constrained_layout=True,
-        tight_layout=True
-    )
-    gs = GridSpec(
-        2,
-        1,
-    )
-    ax1 = fig.add_subplot(gs[0, 0])
-    ax2 = fig.add_subplot(gs[1, 0])
-
-    sns.boxplot(
-        y = 'log_likelihood', 
-        x = 'instance', 
-        data = evaluation_plot_df,
-        ax = ax1,
-        color='lightblue',
-        showfliers=False
-    )
-    ax1.set_ylabel('Log likelihood')
-    ax1.set_xlabel('Instance')
-
-
     sub_df = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard']
     all_markers = {
         'True + Champion' : 'D',
@@ -942,65 +920,88 @@ def plot_evaluation_log_likelihoods(
         'True' : 'darkgreen',
         'Champion' : 'darkorange'
     }
-
     unique_classifications = sub_df.Classification.unique()
-    sns.scatterplot(
-        y = 'log_likelihood', 
-        x = 'instance', 
-        data = sub_df, 
-        ax = ax1,
-        style='Classification',
-        markers={
-            c : all_markers[c]
-            for c in unique_classifications
-        },
-        s = msize,
-        hue = 'Classification',
-        palette = {
-            c : all_colours[c] 
-            for c in unique_classifications
-        }
-    )
-    ax1.set_ylabel('Log likelihood')
-    ax1.set_xlabel('Instance')
-    ax1.set_xticks(
-        []
-        # list(range(evaluation_plot_df.instance.min(), 1+evaluation_plot_df.instance.max()))
-    )
-    ax1.legend()    
-    ax1.set_title('Model log likelihoods')
 
-    # median likelihoods
-    sns.boxplot(
-        y = 'median_likelihood', 
-        x = 'instance', 
-        data = evaluation_plot_df,
-        ax = ax2,
-        color='lightblue',
-        showfliers=False
+    # Plot evaluation(s)
+    num_plots = include_median_likelihood + include_log_likelihood
+    fig = plt.figure(
+        figsize=(17, 9),
+        tight_layout=True
     )
-    sns.scatterplot(
-        y = 'median_likelihood', 
-        x = 'instance', 
-        data = sub_df, 
-        ax = ax2,
-        style='Classification',
-        markers={
-            c : all_markers[c]
-            for c in unique_classifications
-        },
-        s = msize,
-        hue = 'Classification',
-        palette = {
-            c : all_colours[c] 
-            for c in unique_classifications
-        }
+    gs = GridSpec(
+        num_plots,
+        1,
     )
-    ax2.set_ylim(0,1)
-    ax2.set_xticks([])
-    ax2.set_ylabel('Median likelihood')
-    ax2.set_xlabel('Instance')
-    ax2.set_title('Model likelihoods (median)')
+    if include_log_likelihood:
+        ax1 = fig.add_subplot(gs[0, 0])
+        sns.boxplot(
+            y = 'log_likelihood', 
+            x = 'instance', 
+            data = evaluation_plot_df,
+            ax = ax1,
+            color='lightblue',
+            showfliers=False
+        )
+        ax1.set_ylabel('Log likelihood')
+        ax1.set_xlabel('Instance')
+        sns.scatterplot(
+            y = 'log_likelihood', 
+            x = 'instance', 
+            data = sub_df, 
+            ax = ax1,
+            style='Classification',
+            markers={
+                c : all_markers[c]
+                for c in unique_classifications
+            },
+            s = msize,
+            hue = 'Classification',
+            palette = {
+                c : all_colours[c] 
+                for c in unique_classifications
+            },
+        )
+        ax1.set_ylabel('Log likelihood')
+        ax1.set_xlabel('Instance')
+        ax1.set_xticks(
+            []
+            # list(range(evaluation_plot_df.instance.min(), 1+evaluation_plot_df.instance.max()))
+        )
+        ax1.legend()    
+        ax1.set_title('Model log likelihoods')
+    if include_median_likelihood:
+        # median likelihoods
+        ax2 = fig.add_subplot(gs[1, 0])
+        sns.boxplot(
+            y = 'median_likelihood', 
+            x = 'instance', 
+            data = evaluation_plot_df,
+            ax = ax2,
+            color='lightblue',
+            showfliers=False
+        )
+        sns.scatterplot(
+            y = 'median_likelihood', 
+            x = 'instance', 
+            data = sub_df, 
+            ax = ax2,
+            style='Classification',
+            markers={
+                c : all_markers[c]
+                for c in unique_classifications
+            },
+            s = msize,
+            hue = 'Classification',
+            palette = {
+                c : all_colours[c] 
+                for c in unique_classifications
+            }
+        )
+        ax2.set_ylim(0,1)
+        ax2.set_xticks([])
+        ax2.set_ylabel('Median likelihood')
+        ax2.set_xlabel('Instance')
+        ax2.set_title('Model likelihoods (median)')
 
     # plt.suptitle('Evaluation by individual instances')
     if save_directory is not None: 
@@ -1011,3 +1012,10 @@ def plot_evaluation_log_likelihoods(
             )
         )
 
+        # save the df for manual analysis afterwards
+        evaluation_plot_df.to_csv(
+            os.path.join(
+                save_directory, 
+                'evaluation_data.csv'
+            )
+        )
