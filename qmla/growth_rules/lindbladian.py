@@ -3,13 +3,13 @@ import itertools
 import sys
 import os
 
-from qmla.growth_rules import growth_rule_super
+from qmla.growth_rules import growth_rule
 from qmla import experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
 
 class Lindbladian(
-    growth_rule_super.GrowthRuleSuper
+    growth_rule.GrowthRule
 ):
     def __init__(
         self,

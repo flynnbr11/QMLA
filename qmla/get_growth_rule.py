@@ -42,8 +42,8 @@ growth_classes = {
     # Others
     'basic_lindbladian':
         GR.Lindbladian,
-    'GrowthRuleSuper':
-        GR.GrowthRuleSuper,
+    'GrowthRule':
+        GR.GrowthRule,
         # GR.GrowthRuleTemplate,
     'Presentation':
         GR.PresentationPlotGeneration,
@@ -69,7 +69,7 @@ def get_growth_generator_class(
         used to pull the class object from the dictionary growth_classes.
     :params **kwargs: arguments required by the growth rule, passed directly 
         to the desired growth rule's constructor.
-    :return GrowthRuleSuper gr: growth rule class instance
+    :return GrowthRule gr: growth rule class instance
 
     """
     # TODO: note that in most places, this is called with use_experimental_data.

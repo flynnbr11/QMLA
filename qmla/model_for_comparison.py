@@ -9,7 +9,7 @@ import redis
 import pickle
 
 import qmla.redis_settings as rds
-import qmla.qinfer_model_interface as qml_qi
+# import qmla.qinfer_model_interface as qml_qi
 import qmla.memory_tests
 import qmla.logging
 import qmla.get_growth_rule as get_growth_rule
@@ -130,7 +130,7 @@ class ModelInstanceForComparison():
         self.covariance_mtx_final = learned_model_info['final_cov_mat']
         log_identifier = str("Bayes " + str(self.model_id))
 
-        self.qinfer_model = qml_qi.QInferModelQML(
+        self.qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters_final,
             oplist=self.model_terms_matrices,

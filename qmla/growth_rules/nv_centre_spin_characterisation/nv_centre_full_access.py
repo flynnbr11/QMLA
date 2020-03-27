@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import sys
 import os
 
-from qmla.growth_rules.growth_rule_super import GrowthRuleSuper
+from qmla.growth_rules.growth_rule import GrowthRule
 from qmla import experiment_design_heuristics
 from qmla import database_framework
 
@@ -11,8 +11,8 @@ __all__ = [
 ]
 
 class ExperimentFullAccessNV(
-    # growth_rule_super.GrowthRuleSuper
-    GrowthRuleSuper
+    # growth_rule.GrowthRule
+    GrowthRule
 ):
     def __init__(
         self,

@@ -10,7 +10,7 @@ import redis
 import pickle
 
 import qmla.redis_settings as rds
-import qmla.qinfer_model_interface as qml_qi
+# import qmla.qinfer_model_interface as qml_qi
 import qmla.memory_tests
 import qmla.logging
 import qmla.get_growth_rule as get_growth_rule
@@ -354,7 +354,7 @@ class ModelInstanceForLearning():
                 plot_file=prior_file,
             )
 
-        self.qinfer_model = qml_qi.QInferModelQML(
+        self.qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
             oplist=self.model_terms_matrices,
@@ -783,7 +783,7 @@ class ModelInstanceForLearning():
         evaluation_times = true_params_dict['evaluation_times']
         evaluation_probe_dict = true_params_dict['evaluation_probes']
 
-        evaluation_qinfer_model = qml_qi.QInferModelQML(
+        evaluation_qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
             oplist=self.model_terms_matrices,

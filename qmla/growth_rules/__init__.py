@@ -1,4 +1,4 @@
-from qmla.growth_rules.growth_rule_super import * 
+from qmla.growth_rules.growth_rule import * 
 
 from qmla.growth_rules.lindbladian import * 
 from qmla.growth_rules.connected_lattice import *

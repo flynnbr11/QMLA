@@ -9,14 +9,15 @@ import qmla.shared_functionality.probe_set_generation as probe_set_generation
 import qmla.shared_functionality.expectation_values
 import qmla.database_framework as database_framework
 import qmla.growth_rules.rating_system
+import qmla.shared_functionality.qinfer_model_interface
 from qmla.growth_rules.growth_rule_decorator import GrowthRuleDecorator
 
 __all__ = [
-    'GrowthRuleSuper'
+    'GrowthRule'
 ]
 
 # @GrowthRuleDecorator
-class GrowthRuleSuper():
+class GrowthRule():
     # superclass for growth generation rules
     def __init__(
         self,
@@ -24,7 +25,7 @@ class GrowthRuleSuper():
         # configuration=None, 
         **kwargs
     ):
-        # print("GrowthRuleSuper __init__. kwargs", kwargs)
+        # print("GrowthRule __init__. kwargs", kwargs)
         self.growth_generation_rule = growth_generation_rule
         if 'use_experimental_data' in kwargs:
             self.use_experimental_data = kwargs['use_experimental_data']
@@ -56,6 +57,7 @@ class GrowthRuleSuper():
             k_const=30
         ) # for use when ranking/rating models
         self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
+        self.qinfer_model_interface = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
         self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.gaussian_prior
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
@@ -130,7 +132,7 @@ class GrowthRuleSuper():
         self,
         **kwargs
     ):
-        # print("[GrowthRulesuper] overwrite_growth_class_methods. kwargs", kwargs)
+        # print("[GrowthRule] overwrite_growth_class_methods. kwargs", kwargs)
         kw = list(kwargs.keys())
 
         attributes = [
@@ -208,6 +210,14 @@ class GrowthRuleSuper():
         **kwargs
     ):
         return self.model_heuristic_function(
+            **kwargs
+        )
+    
+    def qinfer_model(
+        self, 
+        **kwargs
+    ):
+        return self.qinfer_model_interface(
             **kwargs
         )
 

@@ -1,13 +1,13 @@
 import sys
 import os
 
-from qmla.growth_rules import growth_rule_super
+from qmla.growth_rules import growth_rule
 import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
 
 
 class GrowthRuleTemplate(
-    growth_rule_super.GrowthRuleSuper  # inherit from this
+    growth_rule.GrowthRule  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations

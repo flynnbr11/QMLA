@@ -410,7 +410,7 @@ def parse_cmd_line_args(args):
         help='Rule applied for generation of new models during QMD. \
         Corresponding functions must be built into model_generation',
         type=str,
-        default='GrowthRuleSuper'
+        default='GrowthRule'
     )
 
     parser.add_argument(

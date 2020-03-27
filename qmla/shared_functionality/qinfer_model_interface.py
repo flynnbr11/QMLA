@@ -21,7 +21,7 @@ global debug_print_file_line
 debug_print_file_line = False
 
 
-class QInferModelQML(qi.FiniteOutcomeModel):
+class QInferModelQMLA(qi.FiniteOutcomeModel):
     r"""
     Describes the free evolution of a single qubit prepared in the
     :param np.array : :math:`\left|+\Psi\rangle` state under
@@ -113,7 +113,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
         else:
             self._trueHam = None
 
-        super(QInferModelQML, self).__init__(self._oplist)
+        super(QInferModelQMLA, self).__init__(self._oplist)
 
         try:
             self.probe_dict = probe_dict
@@ -252,7 +252,7 @@ class QInferModelQML(qi.FiniteOutcomeModel):
             """
 
         import copy
-        super(QInferModelQML, self).likelihood(
+        super(QInferModelQMLA, self).likelihood(
             outcomes, modelparams, expparams
         )  # just adds to self._call_count (Qinfer abstact model class)
         qmla.memory_tests.print_file_line(debug_print_file_line)
