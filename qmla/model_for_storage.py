@@ -306,6 +306,7 @@ class ModelInstanceForStorage():
             )
         else:
             exp_times = times
+            
         if max_time is None:
             max_time = max(exp_times)
 

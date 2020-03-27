@@ -120,7 +120,7 @@ class Genetic(
         }
         self.num_processes_to_parallelise_over = 16
 
-        self.max_time_to_consider = 5
+        self.max_time_to_consider = 15
         self.min_param = 0.35
         self.max_param = 0.65
 

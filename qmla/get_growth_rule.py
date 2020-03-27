@@ -8,6 +8,8 @@ __all__ = [
 
 growth_classes = {
     # Experimental paper growth rules
+    'NVExperimentalData' : 
+        GR.NVCentreExperimentalData,
     'ExperimentNVCentre':
         GR.ExperimentNVCentre,
     'ExperimentNVCentreNoTransvereTerms':

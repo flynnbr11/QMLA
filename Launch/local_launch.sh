@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=15
-exp=3
+exp=500
+prt=2000
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -50,7 +50,7 @@ cwd=$(pwd)
 day_time=$(date +%b_%d/%H_%M)
 full_path_to_results="$cwd/Results/$day_time/"
 running_dir="$(pwd)"
-qmd_dir="${running_dir%/ExperimentalSimulations}" # chop off ParallelDevelopment to get qmd folder path
+qmd_dir="${running_dir%/ExperimentalSimulations}"
 lib_dir="$qmd_dir/Libraries/QML_lib"
 bcsv="cumulative.csv"
 bayes_csv="$full_path_to_results$bcsv"
@@ -87,12 +87,14 @@ sim_growth_rule='IsingPredetermined'
 # sim_growth_rule='Presentation'
 # sim_growth_rule='ExperimentReducedNV'
 # sim_growth_rule='example'
-# sim_growth_rule='TalkDemonstration'
+# sim_growth_rule='NVExperimentalData'
+# sim_growth_rule='ExperimentNVCentre'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-exp_growth_rule='ExperimentNVCentre'
+# exp_growth_rule='NVExperimentalData'
+# exp_growth_rule='ExperimentNVCentre'
 # exp_growth_rule='ExperimentNVCentreNoTransvereTerms'
 # exp_growth_rule='ExpAlternativeNV'
 # exp_growth_rule='ExperimentFullAccessNV'

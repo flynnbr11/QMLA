@@ -2,20 +2,24 @@ import random
 import sys
 import os
 
+import pickle 
+
+# import qmla.growth_rules.nv_centre_spin_characterisation.nv_centre_full_access
+# from qmla.growth_rules.nv_centre_spin_characterisation.nv_centre_full_access import ExperimentFullAccessNV
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
-# from  qmla import qmla.shared_functionality.probe_set_generation.
+import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.expectation_values
 from qmla import database_framework
 
 
 __all__ = [
-    'ExperimentNVCentre'
+    'ExperimentNVCentre',
+    'NVCentreExperimentalData'
 ]
 
 class ExperimentNVCentre(
     nv_centre_full_access.ExperimentFullAccessNV  # inherit from this
-    # GrowthRule # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
@@ -117,3 +121,49 @@ class ExperimentNVCentre(
             2: 18,
             'other': 1
         }
+
+
+class NVCentreExperimentalData(
+    ExperimentNVCentre
+):
+    def __init__(
+        self,
+        growth_generation_rule,
+        **kwargs
+    ):
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            **kwargs
+        )
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.hahn_evolution
+        self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.simulator_probe_generation_function = self.probe_generation_function
+        self.shared_probes = False
+
+    def get_measurements_by_time(
+        self
+    ):
+        data_path = os.path.abspath(
+            os.path.join(
+                os.getcwd(), 
+                'Data/NVB_rescale_dataset.p'
+            )
+        ) # TODO use path relative to growth rule's path
+        self.log_print(
+            [
+                "Getting experimental data from {}".format(data_path)
+            ]
+        )
+        self.measurements = pickle.load(
+            open(
+                data_path,
+                'rb'
+            )
+        )
+        self.log_print(
+            [
+                "Setting measurements to experimental msmts:", self.measurements
+            ]
+        )
+        return self.measurements

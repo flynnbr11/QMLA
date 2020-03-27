@@ -259,9 +259,12 @@ class QuantumModelLearningAgent():
             # to match this newly created branch with corresponding dicts
             # filled here
             gen = self.growth_rules_list[i]
+            # TODO get these from qmla_controls.unique_growth_rule_instances
             growth_class_gen = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=gen,
                 use_experimental_data=self.use_experimental_data,
+                true_params_path = self.qmla_controls.true_params_pickle_file,
+                plot_probes_path = self.qmla_controls.probes_plot_file, 
                 log_file=self.log_file
             )
             self.tree_completed[gen] = growth_class_gen.tree_completed_initially
@@ -420,16 +423,32 @@ class QuantumModelLearningAgent():
             self.probes_system = system_probe_dict
             self.probes_simulator = simulation_probe_dict
 
-        self.experimental_measurements = experimental_measurements
-        if self.experimental_measurements is not None:
-            self.experimental_measurement_times = (
-                sorted(list(self.experimental_measurements.keys()))
-            )
-        else:
-            self.experimental_measurement_times = None
+        try:
+            self.experimental_measurements = self.measurements
+        except:
+            self.experimental_measurements = self.growth_class.get_measurements_by_time()
 
-        self.times_to_plot = plot_times
+
+        self.experimental_measurement_times = (
+            sorted(list(self.experimental_measurements.keys()))
+        )
+        # self.experimental_measurements = experimental_measurements
+        # if self.experimental_measurements is not None:
+        #     self.experimental_measurement_times = (
+        #         sorted(list(self.experimental_measurements.keys()))
+        #     )
+        #     self.log_print(
+        #         [
+        #             "Experimental measurement times: ", 
+        #             self.experimental_measurement_times
+        #         ]
+        #     )
+        # else:
+        #     self.experimental_measurement_times = None
+
+        self.times_to_plot = self.experimental_measurement_times
         self.times_to_plot_reduced_set = self.times_to_plot[0::10]
+
         self.probes_plot_file = self.qmla_controls.probes_plot_file
         if self.probes_plot_file is None: 
 
@@ -450,31 +469,32 @@ class QuantumModelLearningAgent():
             self.probes_for_plots = pickle.load(
                 open(self.probes_plot_file, 'rb')
             )
+        self.true_model_hamiltonian = self.qmla_controls.true_hamiltonian
 
-        if self.use_experimental_data == False:
+
+        # if self.use_experimental_data == False:
             # TODO is this doing anything useful?
             # at least put in separate method
-            self.experimental_measurements = {}
-            self.true_model_hamiltonian = self.qmla_controls.true_hamiltonian
-            self.log_print(
-                [
-                    "Getting expectation values for simulated model",
-                    "(len {})".format(len(self.times_to_plot)),
-                    "\n Times computed:\n", self.times_to_plot
-                ]
-            )
+            # self.true_model_hamiltonian = self.qmla_controls.true_hamiltonian
+            # self.experimental_measurements = {}
+            # self.log_print(
+            #     [
+            #         "Getting expectation values for simulated model",
+            #         "(len {})".format(len(self.times_to_plot)),
+            #         "\n Times computed:\n", self.times_to_plot
+            #     ]
+            # )
 
-            for t in self.times_to_plot:
-                self.experimental_measurements[t] = (
-                    self.growth_class.expectation_value(
-                        ham=self.qmla_controls.true_hamiltonian,
-                        t=t,
-                        state=self.probes_for_plots[self.true_model_dimension],
-                        log_file=self.log_file,
-                        log_identifier='[QMLA Init]'
-                    )
-
-                )
+            # for t in self.times_to_plot:
+            #     self.experimental_measurements[t] = (
+            #         self.growth_class.expectation_value(
+            #             ham=self.qmla_controls.true_hamiltonian,
+            #             t=t,
+            #             state=self.probes_for_plots[self.true_model_dimension],
+            #             log_file=self.log_file,
+            #             log_identifier='[QMLA Init]'
+            #         )
+            #     )
 
     def _potentially_redundant_setup(
         self,

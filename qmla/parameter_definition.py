@@ -122,10 +122,10 @@ def set_shared_parameters(
         list_len_fator = math.ceil(len(evaluation_times) / len(available_probe_ids))
         iterable_probe_ids = iter(available_probe_ids * list_len_fator)
 
-        evaluation_experiments = list(zip(
-            np.round(evaluation_times, 2), 
-            [next(iterable_probe_ids) for i in evaluation_times]
-        ))       
+        # evaluation_experiments = list(zip(
+        #     np.round(evaluation_times, 2), 
+        #     [next(iterable_probe_ids) for i in evaluation_times]
+        # ))       
          
         plt.hist(
             evaluation_times,

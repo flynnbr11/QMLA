@@ -54,6 +54,8 @@ class ControlsQMLA():
             self.growth_class = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
                 use_experimental_data=self.use_experimental_data,
+                true_params_path = arguments.true_params_pickle_file,
+                plot_probes_path = arguments.probes_plot_file, 
                 log_file=self.log_file
             )
         except BaseException:

@@ -2,6 +2,7 @@ from __future__ import absolute_import
 import sys
 import os
 import pickle
+import numpy as np
 
 import qmla.shared_functionality.prior_distributions
 import qmla.experiment_design_heuristics as experiment_design_heuristics
@@ -36,6 +37,23 @@ class GrowthRule():
             self.log_file = kwargs['log_file']
         else:
             self.log_file = '.default_qmla_log.log'
+        
+        if 'true_params_path' in kwargs: 
+            self.true_params_path = kwargs['true_params_path']
+        else: 
+            self.true_params_path = None
+        
+        if 'plot_probes_path' in kwargs: 
+            self.plot_probes_path = kwargs['plot_probes_path']
+        else: 
+            self.plot_probes_path = None
+        self.log_print(
+            [
+                "True params path:", self.true_params_path,
+                "\nPlot probes path: ", self.plot_probes_path,
+                "\nLog file:", self.log_file
+            ]
+        )
 
         self.assign_parameters()
 
@@ -57,7 +75,7 @@ class GrowthRule():
             k_const=30
         ) # for use when ranking/rating models
         self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
-        self.qinfer_model_interface = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
+        self.qinfer_model_class = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
         self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.gaussian_prior
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
@@ -87,6 +105,7 @@ class GrowthRule():
         self.reduce_champ_bayes_factor_threshold = 1e2
 
         self.experimental_dataset = 'NVB_rescale_dataset.p'
+        # self.measurements_by_time = self.get_measurements_by_time()
         # self.measurement_type = 'full_access'  # deprecated
         # if you have a transverse axis and you want to generate on that axis
         # than set it to True
@@ -217,7 +236,7 @@ class GrowthRule():
         self, 
         **kwargs
     ):
-        return self.qinfer_model_interface(
+        return self.qinfer_model_class(
             **kwargs
         )
 
@@ -284,7 +303,7 @@ class GrowthRule():
         for k in list(plot_probe_dict.keys()):
             # replace tuple like key returned, with just dimension.
             plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
-
+        self.plot_probe_dict = plot_probe_dict
         return plot_probe_dict
 
     @property
@@ -300,6 +319,67 @@ class GrowthRule():
         self.true_op_terms = set(sorted(latex_true_terms))
 
         return self.true_op_terms
+
+    def get_measurements_by_time(
+        self
+    ):
+        try:
+            true_info = pickle.load(
+                open(
+                    self.true_params_path,
+                    'rb'
+                )
+            )
+        except:
+            print("Failed to load true params from path", self.true_params_path)
+            raise
+        self.true_params_dict = true_info['params_dict']
+        true_ham = None
+        for k in list(self.true_params_dict.keys()):
+            param = self.true_params_dict[k]
+            mtx = database_framework.compute(k)
+            if true_ham is not None:
+                true_ham += param * mtx
+            else:
+                true_ham = param * mtx
+        self.true_hamiltonian = true_ham
+
+        true_ham_dim = database_framework.get_num_qubits(self.true_model)
+        plot_probes = pickle.load(
+            open(
+                self.plot_probes_path, 
+                'rb'
+            )
+        )
+        probe = plot_probes[true_ham_dim]
+
+        num_datapoints_to_plot = 300
+        plot_lower_time = 0
+        plot_upper_time = self.max_time_to_consider
+        raw_times = list(np.linspace(
+            0,
+            self.max_time_to_consider,
+            num_datapoints_to_plot + 1)
+        )
+        plot_times = [np.round(a, 2) for a in raw_times]
+        plot_times = sorted(plot_times)
+        
+        self.measurements = {
+            t : self.expectation_value(
+                ham = self.true_hamiltonian, 
+                t = t, 
+                state = probe
+            )
+            for t in plot_times
+        }
+        self.log_print(
+            [
+                "Storing measurements:\n", self.measurements
+            ]
+        )
+        return self.measurements
+
+        
 
     def growth_rule_finalise(self):
         # do whatever is needed to wrap up growth rule

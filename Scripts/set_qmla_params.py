@@ -155,10 +155,13 @@ exp_data = bool(arguments.use_experimental_data)
 num_particles = arguments.particle_number
 growth_generation_rule = arguments.growth_generation_rule
 log_file = arguments.log_file
+probes_plot_file = arguments.probes_plot_file
 results_directory = arguments.results_directory
 
 growth_class_attributes = {
     'use_experimental_data': exp_data,
+    'true_params_path' : arguments.true_params_file,
+    'plot_probes_path' : probes_plot_file,
     'log_file': log_file
 }
 
@@ -182,7 +185,6 @@ probe_max_num_qubits_all_growth_rules = max(
 )
 
 true_model = growth_class.true_model
-probes_plot_file = arguments.probes_plot_file
 force_plus_probe = bool(arguments.force_plus_probe)
 probe_noise_level = arguments.probe_noise_level
 

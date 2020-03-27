@@ -1,9 +1,12 @@
 from __future__ import print_function  # so print doesn't show brackets
 
-import qinfer as qi
 import numpy as np
-import scipy as sp
+import sys
 import warnings
+import copy
+
+import scipy as sp
+import qinfer as qi
 
 import qmla.experimental_data_processing
 import qmla.get_growth_rule
@@ -16,7 +19,7 @@ global_print_loc = False
 global debug_print
 debug_print = False
 global debug_log_print
-debug_log_print = False
+debug_log_print = True
 global debug_print_file_line
 debug_print_file_line = False
 
@@ -85,8 +88,13 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 log_file=self.log_file
             )
         except BaseException:
-            self.growth_class = None
-
+            self.log_print(
+                [
+                    "Could not instantiate growth rule {}. Terminating".foramt(
+                        self.growth_generation_rule
+                    )
+                ]
+            )
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
         self._min_freq = 0 # what does this do?
@@ -94,8 +102,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # This is the solver used for time evolution scipy is faster
         # QuTip can handle implicit time dependent likelihoods
 
-        self.ModelName = model_name
-        self.model_dimension = qmla.database_framework.get_num_qubits(self.ModelName)
+        self.model_name = model_name
+        self.model_dimension = qmla.database_framework.get_num_qubits(self.model_name)
         self.inBayesUpdates = False
         if true_oplist is not None and trueparams is None:
             raise(
@@ -104,15 +112,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     parameters was requested'
                 )
             )
-        if true_oplist is None:
-            warnings.warn(
-                "\nI am assuming the Model and System \
-                Hamiltonians to be the same", UserWarning
-            )
-            self._trueHam = None
-        else:
-            self._trueHam = None
-
         super(QInferModelQMLA, self).__init__(self._oplist)
 
         try:
@@ -127,13 +126,29 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     def log_print(
         self, 
         to_print_list, 
-        # log_file = None
+        log_identifier=None
     ):
+        if log_identifier is None: 
+            log_identifier = 'QInfer interface'
+
         qmla.logging.print_to_log(
             to_print_list = to_print_list, 
             log_file = self.log_file, 
-            log_identifier = 'QMLA-QInfer model'
+            log_identifier = log_identifier
         )
+
+    def log_print_debug(
+        self, 
+        to_print_list
+    ):
+        r"""
+        Log print if global debug_log_print set to True. 
+        """
+        if debug_log_print:
+            self.log_print(
+                to_print_list = to_print_list,
+                log_identifier = 'QInfer interface debug'
+            )
 
     ## PROPERTIES ##
     @property
@@ -181,8 +196,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         for exppar in range(self.n_modelparams):
             expnames.append(('w_' + str(exppar + 1), 'float'))
         return expnames
-
-    # Do we really need the following property? It looks a bit pointless
 
     ## METHODS ##
 
@@ -251,146 +264,106 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 :math:`\Pr(d_i | \vec{x}_j; e_k)`.
             """
 
-        import copy
+        
         super(QInferModelQMLA, self).likelihood(
             outcomes, modelparams, expparams
         )  # just adds to self._call_count (Qinfer abstact model class)
-        qmla.memory_tests.print_file_line(debug_print_file_line)
-        qmla.memory_tests.print_loc(global_print_loc)
-        cutoff = min(len(modelparams), 5)
+        times = expparams['t'] # times to compute likelihood for. typicall only per experiment. 
         num_particles = modelparams.shape[0]
+        num_parameters = modelparams.shape[1]
+        # assumption is that calls to likelihood are paired: 
+        # one for system, one for simulator
+        # therefore the same probe should be assumed for consecutive calls
+        # probe id is tracked with _a and _b.
+        # i.e. increments each 2nd call, loops back when probe dict exhausted
         self._a += 1
         if self._a % 2 == 1:
             self._b += 1
-        num_parameters = modelparams.shape[1]
+        self.probe_counter = (self._b % int(self.probe_number)) 
+
 
         if num_particles == 1:
-            # call the system, use the true paramaters to get true model
-            qmla.memory_tests.print_file_line(debug_print_file_line)
-            sample = np.array([expparams.item(0)[1:]])[0:num_parameters]
+            # TODO better mechanism to determine if true_evo, 
+            # rather than assuming 1 particle => system
+            # call the system, use the true paramaters as a single particle, 
+            # to get the true evolution
             true_evo = True
-            operators = self._true_oplist
             params = [copy.deepcopy(self._trueparams)]
-            ham_num_qubits = self._true_dim
         else:
-            qmla.memory_tests.print_file_line(debug_print_file_line)
-            sample = np.array([expparams.item(0)[1:]])
             true_evo = False
-            operators = self._oplist
             params = modelparams
-            ham_num_qubits = self.model_dimension
 
-        if (
-            true_evo == True
-            and
-            self.use_experimental_data == True
-        ):
-            time = expparams['t']
-            if debug_log_print:
-                self.log_print(
-                    [
-                        'Getting system outcome',
-                        'time:\n', time
-                    ],
-                )
-            try:
-                # If time already exists in experimental data
-                experimental_expec_value = self.experimental_measurements[time]
-            except BaseException:
-                experimental_expec_value = qmla.experimental_data_processing.nearest_experimental_expect_val_available(
-                    times=self.experimental_measurement_times,
-                    experimental_data=self.experimental_measurements,
-                    t=time
-                )
-            if debug_log_print:
-                self.log_print(
-                    [
-                        "Using experimental time", time,
-                        "\texp val:", experimental_expec_value
-                    ],
-                )
-            pr0 = np.array([[experimental_expec_value]])
+        # if (
+        #     true_evo == True
+        #     and
+        #     self.use_experimental_data == True
+        # ):
+        #     # TODO move true experimental_data case to growth rule specific get_system_pr0 fnc
+        #     time = expparams['t']
+        #     self.log_print_debug(
+        #         [
+        #             'Getting system outcome',
+        #             'time:\n', time
+        #         ],
+        #     )
+        #     try:
+        #         # If time already exists in experimental data
+        #         experimental_expec_value = self.experimental_measurements[time]
+        #     except BaseException:
+        #         experimental_expec_value = qmla.experimental_data_processing.nearest_experimental_expect_val_available(
+        #             times=self.experimental_measurement_times,
+        #             experimental_data=self.experimental_measurements,
+        #             t=time
+        #         )
+        #     self.log_print_debug(
+        #         [
+        #             "Using experimental time", time,
+        #             "\texp val:", experimental_expec_value
+        #         ],
+        #     )
+        #     pr0 = np.array([[experimental_expec_value]])
 
-        else:
-            qmla.memory_tests.print_file_line(debug_print_file_line)
-            probe_counter = (self._b % int(self.probe_number))
-            if true_evo == True:
-                qmla.memory_tests.print_file_line(debug_print_file_line)
-                probe = self.probe_dict[
-                    probe_counter,
-                    ham_num_qubits
-                ]
-                qmla.memory_tests.print_file_line(debug_print_file_line)
+        # else:
+        try:
+            if true_evo:
+                pr0 = self.get_system_pr0_array(
+                    times=times,
+                    particles=params,
+                    # oplist=operators,
+                )
             else:
-                qmla.memory_tests.print_file_line(debug_print_file_line)
-                probe = self.sim_probe_dict[
-                    probe_counter,
-                    ham_num_qubits
+                pr0 = self.get_simulator_pr0_array(
+                    times=times,
+                    particles=params,
+                    # oplist=operators,
+                ) 
+        except:
+            self.log_print(
+                [
+                    "Failed to compute pr0.",
                 ]
-
-            if len(modelparams.shape) == 1:
-                modelparams = modelparams[..., np.newaxis]
-
-            times = expparams['t']
-
-            if self.use_experimental_data == True:
-                # sanity check that all times to be computed are available
-                # experimentally
-                all_avail = np.all(
-                    [
-                        t in self.experimental_measurement_times
-                        for t in times
-                    ]
-                )
-                if all_avail == False:
-                    print(
-                        "[likelihood fnc]",
-                        "All times NOT available experimentally originally"
-                    )
-        
-            qmla.memory_tests.print_file_line(debug_print_file_line)
-            try:
-                pr0 = get_pr0_array_qle(
-                    t_list=times,
-                    modelparams=params,
-                    oplist=operators,
-                    probe=probe,
-                    growth_class=self.growth_class,
-                    log_file=self.log_file,
-                )
-            except BaseException:
-                self.log_print(
-                    [
-                        "failure to compute pr0.",
-                        "probe:", probe,
-                        "\n oplist:", operators
-                    ]
-                )
-                qmla.memory_tests.print_file_line(debug_print_file_line)
-                sys.exit()
-
-            if debug_log_print:
-                self.log_print(
-                    [
-                        'Simulating experiment.',
-                        'times:', times,
-                        'true_evo:', true_evo,
-                        'len(outcomes):', len(outcomes),
-                        '_a = {}, _b={}'.format(self._a, self._b),
-                        'probe counter:', probe_counter,
-                        '\nexp:', expparams,
-                        '\nOutcomes:', outcomes,
-                        '\nmodelparams:', params,
-                        '\nprobe[0]:', probe[0],
-                    ],
-                )
+            )
+            sys.exit()
 
         likelihood_array = (
             qi.FiniteOutcomeModel.pr0_to_likelihood_array(
                 outcomes, pr0
             )
         )
-        self.log_print(
+        self.log_print_debug(
+            [
+                'Simulating experiment.',
+                'times:', times,
+                'true_evo:', true_evo,
+                'len(outcomes):', len(outcomes),
+                '_a = {}, _b={}'.format(self._a, self._b),
+                'probe counter:', self.probe_counter,
+                '\nexp:', expparams,
+                '\nOutcomes:', outcomes,
+                '\nmodelparams:', params,
+            ]
+        )
+        self.log_print_debug(
             [
                 "Outcomes: ", outcomes, 
                 "\nPr0: ", pr0, 
@@ -400,121 +373,244 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
         return likelihood_array
 
-
-def get_pr0_array_qle(
-    t_list,
-    modelparams,
-    oplist,
-    probe,
-    growth_class,
-    log_file='QMDLog.log',
-    **kwargs
-):
-    r"""
-        Returns the output probabilities as an array
-
-        :param np.ndarray t_list: 
-        List of times on which to perform experiments
-
-        :param np.ndarray modelparams: 
-        values of the model parameters particles 
-        A shape ``(n_particles, n_modelparams)``
-        array of model parameter vectors describing the hypotheses for
-        which the likelihood function is to be calculated.
-
-        :param list oplist:
-        list of the operators defining the model
-
-        :param probe: quantum state to evolve
-
-        :param growth_class: 
-    """
-
-    from rq import timeouts
-    def log_print(
+    def get_system_pr0_array(
         self, 
-        to_print_list, 
+        times,
+        particles, 
+        # **kwargs
     ):
-        qmla.logging.print_to_log(
-            to_print_list = to_print_list, 
-            log_file = log_file, 
-            log_identifier = 'get_pr0'
+        operator_list = self._true_oplist
+        ham_num_qubits = self._true_dim
+        # format of probe dict keys: (probe_id, qubit_number)
+        probe = self.probe_dict[
+            self.probe_counter,
+            ham_num_qubits
+        ]
+        # TODO: could just work with true_hamiltonian, worked out on __init__
+        return self.default_pr0_from_modelparams_times(
+            t_list = times,
+            particles = particles, 
+            oplist = operator_list, 
+            probe = probe, 
+            # **kwargs
         )
-    
-    qmla.memory_tests.print_loc(global_print_loc)
-    num_particles = len(modelparams)
-    num_times = len(t_list)
-    output = np.empty([num_particles, num_times])
 
-    for evoId in range(num_particles):  
+    def get_simulator_pr0_array(
+        self, 
+        particles, 
+        times,
+        # **kwargs
+    ):
+        ham_num_qubits = self.model_dimension
+        # format of probe dict keys: (probe_id, qubit_number)
+        probe = self.sim_probe_dict[
+            self.probe_counter,
+            ham_num_qubits 
+        ]
+        operator_list = self._oplist
+        return self.default_pr0_from_modelparams_times(
+            t_list = times, 
+            particles = particles, 
+            oplist = operator_list, 
+            probe = probe, 
+            # **kwargs
+        )
+
+    def default_pr0_from_modelparams_times(
+        self,
+        t_list,
+        particles,
+        oplist,
+        probe,
+        **kwargs
+    ):
+        r"""
+            Compute probabilities of available outputs as an array.
+
+            :param np.ndarray t_list: 
+                List of times on which to perform experiments
+            :param np.ndarray modelparams: 
+                values of the model parameters particles 
+                A shape ``(n_particles, n_modelparams)``
+                array of model parameter vectors describing the hypotheses for
+                which the likelihood function is to be calculated.
+            :param list oplist:
+                list of the operators defining the model
+            :param np.ndarray probe: quantum state to evolve
+            :param GrowthRule growth_class: 
+        """
+
+        from rq import timeouts
+        self.log_print_debug(
+            [
+                "Probe[0] (dimension {}): \n {}".format(
+                    np.shape(probe),
+                    probe[0],
+                ),
+                "Times: ", t_list
+            ]
+        )
+
+        num_particles = len(particles)
+        num_times = len(t_list)
+        output = np.empty([num_particles, num_times])
+
+        for evoId in range(num_particles):  
+            try:
+                ham = np.tensordot(
+                    particles[evoId], oplist, axes=1
+                )
+            except BaseException:
+                self.log_print(
+                    [
+                        "Failed to build Hamiltonian.",
+                        "\nparticles:", particles[evoId],
+                        "\noplist:", oplist
+                    ],
+                )
+                raise
+
+            for tId in range(len(t_list)):
+                t = t_list[tId]
+                if t > 1e6:  # Try limiting times to use to 1 million
+                    import random
+                    # random large number but still computable without error
+                    t = random.randint(1e6, 3e6)
+                try:
+                    likel = self.growth_class.expectation_value(
+                        ham=ham,
+                        t=t,
+                        state=probe,
+                        log_file=self.log_file,
+                        log_identifier='get pr0 call exp val'
+                    )
+                    output[evoId][tId] = likel
+
+                except NameError:
+                    self.log_print(
+                        [
+                            "Error raised; unphysical expecation value.",
+                            "\nHam:\n", ham,
+                            "\nt=", t,
+                            "\nState=", probe,
+                        ],
+                    )
+                    sys.exit()
+                except timeouts.JobTimeoutException:
+                    self.log_print(
+                        [
+                            "RQ Time exception. \nprobe=",
+                            probe,
+                            "\nt=", t, "\nHam=",
+                            ham
+                        ],
+                    )
+                    sys.exit()
+
+                if output[evoId][tId] < 0:
+                    print("NEGATIVE PROB")
+                    self.log_print(
+                        [
+                            "[QLE] Negative probability : \
+                            \t \t probability = ",
+                            output[evoId][tId]
+                        ],
+                    )
+                elif output[evoId][tId] > 1.001:
+                    self.log_print(
+                        [
+                            "[QLE] Probability > 1: \
+                            \t \t probability = ",
+                            output[evoId][tId]
+                        ]
+                    )
+        return output
+
+
+
+class QInferNVCentreExperiment(QInferModelQMLA):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def get_system_pr0_array(
+        self, 
+        times,
+        particles, 
+        **kwargs
+    ):
+        # time = expparams['t']
+        if len(times) > 1:
+            self.log_print("Multiple times given to experimental true evoluation:", times)
+            sys.exit()
+
+        time = times[0]
+        self.log_print(
+            [
+                'Getting system outcome',
+                'time:\n', time
+            ]
+        )
+        
         try:
-            ham = np.tensordot(
-                modelparams[evoId], oplist, axes=1
+            # If time already exists in experimental data
+            experimental_expec_value = self.experimental_measurements[time]
+            self.log_print_debug(
+                [
+                    "Try has worked."
+                ]
             )
         except BaseException:
-            self.log_print(
+            # map to nearest experimental time
+            self.log_print_debug(
                 [
-                    "Failed to build Hamiltonian.",
-                    "\nmodelparams:", modelparams[evoId],
-                    "\noplist:", oplist
-                ],
+                    "In except.",
+                    # "exp times: \n{} \n exp meas: {}".format(
+                    #     self.experimental_measurement_times, 
+                    #     self.experimental_measurements
+                    # )
+                ]
             )
-            raise
-
-        for tId in range(len(t_list)):
-            t = t_list[tId]
-            if t > 1e6:  # Try limiting times to use to 1 million
-                import random
-                # random large number but still computable without error
-                t = random.randint(1e6, 3e6)
             try:
-                likel = growth_class.expectation_value(
-                    ham=ham,
-                    t=t,
-                    state=probe,
-                    log_file=log_file,
-                    log_identifier='get pr0 call exp val'
+                experimental_expec_value = qmla.experimental_data_processing.nearest_experimental_expect_val_available(
+                    times=self.experimental_measurement_times,
+                    experimental_data=self.experimental_measurements,
+                    t=time
                 )
-                output[evoId][tId] = likel
+            except:
+                self.log_print_debug(
+                    [
+                        "Failed to get experimental data point"
+                    ]
+                )
+                raise
+            self.log_print_debug(
+                [
+                    "experimental value for t={}: {}".format(
+                        time, 
+                        experimental_expec_value
+                    )
+                ]
+            )
+        self.log_print_debug(
+            [
+                "Using experimental time", time,
+                "\texp val:", experimental_expec_value
+            ],
+        )
+        pr0 = np.array([[experimental_expec_value]])
+        self.log_print_debug(
+            [
+                "pr0 for system:", pr0
+            ]
+        )
+        return pr0
 
-            except NameError:
-                self.log_print(
-                    [
-                        "Error raised; unphysical expecation value.",
-                        "\nHam:\n", ham,
-                        "\nt=", t,
-                        "\nState=", probe,
-                    ],
-                )
-                sys.exit()
-            except timeouts.JobTimeoutException:
-                self.log_print(
-                    [
-                        "RQ Time exception. \nprobe=",
-                        probe,
-                        "\nt=", t, "\nHam=",
-                        ham
-                    ],
-                )
-                sys.exit()
-
-            if output[evoId][tId] < 0:
-                print("NEGATIVE PROB")
-                self.log_print(
-                    [
-                        "[QLE] Negative probability : \
-                        \t \t probability = ",
-                        output[evoId][tId]
-                    ],
-                )
-            elif output[evoId][tId] > 1.001:
-                self.log_print(
-                    [
-                        "[QLE] Probability > 1: \
-                        \t \t probability = ",
-                        output[evoId][tId]
-                    ],
-                )
-    return output
-
+    # def get_simulator_pr0_array(
+    #     self, 
+    #     particles, 
+    #     times,
+    #     # **kwargs
+    # ):
+    # TODO map times to times available in the experimental dataset
 

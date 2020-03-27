@@ -143,9 +143,7 @@ class ModelInstanceForComparison():
             growth_generation_rule=self.growth_rule_of_this_model,
             use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
-            experimental_measurement_times=(
-                self.experimental_measurement_times
-            ),
+            experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
             # measurement_type=self.measurement_class,
             # log_identifier=log_identifier

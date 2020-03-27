@@ -56,4 +56,13 @@ def nearest_experimental_expect_val_available(times, experimental_data, t):
         else:
             nearest = before
 
-    return experimental_data[nearest]
+    try: 
+        data_point = experimental_data[nearest]
+    except: 
+        print("Could not find {} in data \n{}".format(
+            nearest, 
+            sorted(experimental_data.keys())
+        ))
+        raise
+
+    return data_point

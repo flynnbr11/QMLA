@@ -114,26 +114,53 @@ if not os.path.exists(probes_dir):
         # if already exists (ie created by another QMD since if test ran...)
         pass
 
-if qmla_controls.use_experimental_data: 
-    dataset = qmla_controls.dataset
-    log_print(
-        [
-            "[EXP] For  growth rule {}; use dataset {}".format(
-                qmla_controls.growth_generation_rule, dataset
-            )
-        ],
-        log_file=log_file
-    )
-    experimental_measurements_dict = pickle.load(
-        open(str('../Launch/Data/' + dataset), 'rb')
-    )
+
+# experimental_measurements_dict = pickle.load(
+#     open(
+#         os.path.join('../Launch/Data/' + qmla_controls.dataset), 
+#         'rb'
+#     )
+# )
+experimental_measurements_dict = qmla_controls.growth_class.get_measurements_by_time()
+
+log_print(
+    [
+        "Exp meas dict: \n", experimental_measurements_dict, 
+        "\nImplement QMLA -> exp meas times: \n", 
+        sorted(experimental_measurements_dict.keys())
+    ],
+    log_file=log_file
+)
+
+if qmla_controls.use_experimental_data:
     expec_val_plot_max_time = max(
         list(experimental_measurements_dict.keys())
     )
-    # expec_val_plot_max_time = qmla_controls.data_max_time
 else:
-    expec_val_plot_max_time = qmla_controls.data_max_time
-    experimental_measurements_dict = None
+    expec_val_plot_max_time = max(
+        list(experimental_measurements_dict.keys())
+    )
+
+# if qmla_controls.use_experimental_data: 
+#     dataset = qmla_controls.dataset
+#     log_print(
+#         [
+#             "[EXP] For  growth rule {}; use dataset {}".format(
+#                 qmla_controls.growth_generation_rule, dataset
+#             )
+#         ],
+#         log_file=log_file
+#     )
+#     experimental_measurements_dict = pickle.load(
+#         open(str('../Launch/Data/' + dataset), 'rb')
+#     )
+#     expec_val_plot_max_time = max(
+#         list(experimental_measurements_dict.keys())
+#     )
+#     # expec_val_plot_max_time = qmla_controls.data_max_time
+# else:
+#     expec_val_plot_max_time = qmla_controls.data_max_time
+#     experimental_measurements_dict = None
 
 num_datapoints_to_plot = 300
 plot_lower_time = 0
