@@ -52,13 +52,13 @@ class Genetic(
         self.fitness_df = pd.DataFrame()
         self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
         self.heisenberg_xxz_small = 'pauliSet_1J2_xJx_d3+pauliSet_1J3_yJy_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
-        self.true_model = self.heisenberg_xxz_small
         self.four_site_true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4'
         self.three_site_true_model = 'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
-        self.true_model = self.three_site_true_model
+        self.true_model = self.four_site_true_model
         self.true_model = qmla.database_framework.alph(self.true_model)
         self.num_sites = qmla.database_framework.get_num_qubits(self.true_model)
-        self.num_probes = 5
+        self.num_probes = 50
+        self.max_num_qubits = 7
 
         self.qhl_models = [
             'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
@@ -280,8 +280,8 @@ class Genetic(
         new_models = self.genetic_algorithm.genetic_algorithm_step(
             # model_fitnesses=model_f_scores,
             # model_fitnesses=model_number_wins,
-            # model_fitnesses=ratings_by_name, 
-            model_fitnesses=fitness_by_ranking,
+            model_fitnesses=ratings_by_name, 
+            # model_fitnesses=fitness_by_ranking,
             # num_pairs_to_sample=self.initial_num_models
             num_pairs_to_sample=self.initial_num_models / 2 # for every pair, 2 chromosomes proposed
         )
@@ -573,6 +573,7 @@ class GeneticTest(
             **kwargs
         )
         self.max_spawn_depth = 2
+        self.max_num_probe_qubits = self.num_sites
         self.initial_num_models = 6
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
