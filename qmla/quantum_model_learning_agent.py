@@ -55,15 +55,15 @@ class QuantumModelLearningAgent():
     def __init__(self,
                  qmla_controls = None, 
                 #  generator_list=[],
-                 first_layer_models=['x'],
-                 probe_dict=None,
-                 sim_probe_dict=None,
+                #  first_layer_models=['x'],
+                #  probe_dict=None,
+                #  sim_probe_dict=None,
                  model_priors=None,  # needed for further QHL mode
                  experimental_measurements=None,
                  # TODO get exp measurements from global variables
                  results_directory='',
                  use_exp_custom=True,  # TODO either remove custom exponentiation method or fix
-                 plot_times=[0, 1],
+                #  plot_times=[0, 1],
                  sigma_threshold=1e-13,
                  **kwargs
                  ):
@@ -87,15 +87,11 @@ class QuantumModelLearningAgent():
         # Parameters related to learning/comparing models
         self._set_learning_and_comparison_parameters(
             model_priors=model_priors,
-            system_probe_dict=probe_dict,
-            simulation_probe_dict=sim_probe_dict,
             experimental_measurements=experimental_measurements,
-            plot_times=plot_times
         )
 
         # Redundant terms -- TODO remove calls to them and then attributes
         self._potentially_redundant_setup(
-            first_layer_models=first_layer_models,
             use_exp_custom=use_exp_custom,
             sigma_threshold=sigma_threshold,
         )
@@ -378,10 +374,10 @@ class QuantumModelLearningAgent():
     def _set_learning_and_comparison_parameters(
         self,
         model_priors,
-        system_probe_dict,
-        simulation_probe_dict,
+        # system_probe_dict,
+        # simulation_probe_dict,
         experimental_measurements,
-        plot_times
+        # plot_times
     ):
         self.model_priors = model_priors
         self.num_particles = self.qmla_controls.num_particles
@@ -397,55 +393,20 @@ class QuantumModelLearningAgent():
         self.model_f_scores = {}
         self.model_precisions = {}
         self.model_sensitivities = {}
+        # get probes for learning
+        self.growth_class.generate_probes(
+            experimental_data=self.qmla_controls.use_experimental_data,
+            noise_level=self.qmla_controls.probe_noise_level,
+            minimum_tolerable_noise=0.0,
+        )
+        self.probes_system = self.growth_class.probes_system
+        self.probes_simulator = self.probes_system
+        self.probe_number = self.growth_class.num_probes
 
-        if system_probe_dict is None:
-            # ensure there is a probe set
-            self.log_print(
-                [
-                    "Generating probes within QMLA"
-                ]
-            )
-            self.growth_class.generate_probes(
-                experimental_data=self.qmla_controls.use_experimental_data,
-                noise_level=self.qmla_controls.probe_noise_level,
-                minimum_tolerable_noise=0.0,
-            )
-            self.probes_system = self.growth_class.probes_system
-            self.probes_simulator = self.probes_system
-            self.probe_number = self.growth_class.num_probes
-        else:
-            self.probe_number = self.qmla_controls.num_probes
-            self.log_print(
-                [
-                    "Probe dict provided to QMLA."
-                ]
-            )
-            self.probes_system = system_probe_dict
-            self.probes_simulator = simulation_probe_dict
-
-        try:
-            self.experimental_measurements = self.measurements
-        except:
-            self.experimental_measurements = self.growth_class.get_measurements_by_time()
-
-
+        self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = (
             sorted(list(self.experimental_measurements.keys()))
         )
-        # self.experimental_measurements = experimental_measurements
-        # if self.experimental_measurements is not None:
-        #     self.experimental_measurement_times = (
-        #         sorted(list(self.experimental_measurements.keys()))
-        #     )
-        #     self.log_print(
-        #         [
-        #             "Experimental measurement times: ", 
-        #             self.experimental_measurement_times
-        #         ]
-        #     )
-        # else:
-        #     self.experimental_measurement_times = None
-
         self.times_to_plot = self.experimental_measurement_times
         self.times_to_plot_reduced_set = self.times_to_plot[0::10]
 
@@ -498,7 +459,7 @@ class QuantumModelLearningAgent():
 
     def _potentially_redundant_setup(
         self,
-        first_layer_models,
+        # first_layer_models,
         use_exp_custom,
         sigma_threshold,
     ):
@@ -506,7 +467,7 @@ class QuantumModelLearningAgent():
         # Either remove, or find appropriate place for initialisation and use
         # many are included in qmla_core_info_dict dict sent to workers; check if they are
         # used thereafter
-        self.models_first_layer = first_layer_models
+        # self.models_first_layer = first_layer_models
         self.use_qle = False  # Set to False for IQLE # TODO remove - redundant
         # self.measurement_class = self.qmla_controls.measurement_type
         self.use_custom_exponentiation = use_exp_custom
@@ -570,7 +531,7 @@ class QuantumModelLearningAgent():
         if self.reallocate_resources:
             base_num_qubits = 3
             base_num_terms = 3
-            for op in self.models_first_layer:
+            for op in self.growth_rules.initial_models:
                 if database_framework.get_num_qubits(op) < base_num_qubits:
                     base_num_qubits = database_framework.get_num_qubits(op)
                 num_terms = len(
@@ -2830,13 +2791,6 @@ class QuantumModelLearningAgent():
 
     def run_complete_qmla(
         self,
-        num_exp=40,
-        num_spawns=1,
-        max_branches=None,
-        # max_num_qubits=None,
-        # max_num_models=None,
-        spawn=True,
-        just_given_models=False
     ):
         active_branches_learning_models = (
             self.redis_databases['active_branches_learning_models']

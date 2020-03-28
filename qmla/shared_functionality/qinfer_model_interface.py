@@ -34,7 +34,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     using the interactive QLE model proposed by [WGFC13a]_.
 
     :param np.array oplist: Set of operators whose sum
-    defines the evolution Hamiltonian
+        defines the evolution Hamiltonian
 
     :param float min_freq: Minimum value for :math:`\omega` to accept as valid.
         This is used for testing techniques that mitigate the effects of
@@ -529,7 +529,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
 
 class QInferNVCentreExperiment(QInferModelQMLA):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

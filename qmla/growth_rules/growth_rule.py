@@ -333,6 +333,7 @@ class GrowthRule():
         except:
             print("Failed to load true params from path", self.true_params_path)
             raise
+
         self.true_params_dict = true_info['params_dict']
         true_ham = None
         for k in list(self.true_params_dict.keys()):

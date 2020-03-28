@@ -7,7 +7,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=0 # don't perform QMLA; perform QHL on known correct model
+qhl_test=1 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
@@ -82,12 +82,12 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='HeisenbergXYZProbabilistic'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
-sim_growth_rule='Genetic'
+# sim_growth_rule='Genetic'
 # sim_growth_rule='GeneticTest'
 # sim_growth_rule='Presentation'
 # sim_growth_rule='ExperimentReducedNV'
 # sim_growth_rule='example'
-# sim_growth_rule='NVExperimentalData'
+sim_growth_rule='NVExperimentalData'
 # sim_growth_rule='ExperimentNVCentre'
 
 ### Experimental growth rules 
@@ -201,6 +201,7 @@ python3 ../Scripts/set_qmla_params.py \
     -log=$this_log \
     -min=$param_min \
     -max=$param_max \
+    -true_expec_path=$true_expec_path \
     -plus=$force_plot_plus \
     -sp=$special_probe_plot \
     $growth_rules_command 

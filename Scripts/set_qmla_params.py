@@ -105,7 +105,12 @@ parser.add_argument(
     type=int,
     default=1
 )
-
+parser.add_argument(
+    '-true_expec_path', '--true_expec_path',
+    help='Path to save true params to.',
+    type=str,
+    default="{}/true_model_terms_params.p".format(os.getcwd())
+)
 parser.add_argument(
     '-min', '--param_min',
     help="Minimum valid parameter value",
@@ -210,6 +215,20 @@ if pickle_file is not None:
         open(pickle_file, 'wb')
     )
 
+# get measurements of the true system
+print("[Set QMLA params] Storing true measurements to {}".format(
+    arguments.true_expec_path
+    )
+)
+true_system_measurements = growth_class.get_measurements_by_time()
+pickle.dump(
+    true_system_measurements,
+    open(
+        arguments.true_expec_path,
+        'wb'
+    )
+)
+
 if arguments.true_params_file is not None:
     qmla.set_shared_parameters(
         growth_class=growth_class,
@@ -264,4 +283,36 @@ growth_rule_configurations = {
 pickle.dump(
     growth_rule_configurations,
     open(path_to_store_configs, 'wb')
+)
+
+
+# store an example of the probes used
+growth_class.generate_probes(
+    probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
+    experimental_data=exp_data,
+    noise_level=growth_class.probe_noise_level,
+    minimum_tolerable_noise=0.0,
+)
+
+probes_dir = str(
+    results_directory
+    + 'training_probes/'
+)
+os.makedirs(probes_dir)
+print("QMLA SETTINGS - storing probes sample to ", probes_dir)
+system_probes_path = os.path.join(
+    probes_dir
+    + 'system_probes.p'
+)
+pickle.dump(
+    growth_class.probes_system,
+    open(system_probes_path, 'wb')
+)
+simulator_probes_path = os.path.join(
+    probes_dir
+    + 'simulator_probes.p'
+)
+pickle.dump(
+    growth_class.probes_simulator,
+    open(simulator_probes_path, 'wb')
 )

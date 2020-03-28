@@ -146,10 +146,10 @@ class NVCentreExperimentalData(
     ):
         data_path = os.path.abspath(
             os.path.join(
-                os.getcwd(), 
-                'Data/NVB_rescale_dataset.p'
+                os.path.dirname(os.path.realpath(__file__)),
+                'data/NVB_rescale_dataset.p'
             )
-        ) # TODO use path relative to growth rule's path
+        )
         self.log_print(
             [
                 "Getting experimental data from {}".format(data_path)
