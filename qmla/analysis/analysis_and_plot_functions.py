@@ -246,23 +246,10 @@ def plot_parameter_estimates(
 
     cm_subsection = np.linspace(0, 0.8, num_terms)
     colours = [cm.magma(x) for x in cm_subsection]
-#    colours = [ cm.Set1(x) for x in cm_subsection ]
-
-#    colours = ['b','r','g','orange', 'pink', 'grey']
-
     # TODO use color map as list
-    # num_epochs = qmd.num_experiments
     num_epochs = mod.num_experiments
-#    fig = plt.figure()
-#    ax = plt.subplot(111)
-
-    # ncols=3
-    # nrows=3 # TODO  -- make safe
     ncols = int(np.ceil(np.sqrt(num_terms)))
     nrows = int(np.ceil(num_terms / ncols))
-
-#    nrows=int(np.ceil( num_terms/ncols ))
-
     fig, axes = plt.subplots(
         figsize=(10, 7),
         nrows=nrows,
@@ -279,19 +266,18 @@ def plot_parameter_estimates(
         colour = colours[i % len(colours)]
         i += 1
         try:
-            if use_experimental_data == False:
-                y_true = qmd.true_param_dict[term]
-                true_term_latex = qmd.growth_class.latex_name(
-                    name=term
-                )
-                true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
+            y_true = qmd.true_param_dict[term]
+            true_term_latex = qmd.growth_class.latex_name(
+                name=term
+            )
+            true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
 
-                ax.axhline(
-                    y_true,
-                    label=str(true_term_latex),
-                    color='red',
-                    linestyle='--'
-                )
+            ax.axhline(
+                y_true,
+                label=str(true_term_latex),
+                color='red',
+                linestyle='--'
+            )
         except BaseException:
             pass
         y = np.array(param_estimate_by_term[term])

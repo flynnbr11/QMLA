@@ -22,7 +22,7 @@ def set_shared_parameters(
     pickle_file=None,
     random_vals=False,
     all_growth_rules=[],
-    exp_data=False,
+    # exp_data=False,
     results_directory='',
     num_particles=100,
     probe_max_num_qubits_all_growth_rules = 12, 
@@ -63,43 +63,49 @@ def set_shared_parameters(
     true_params_dict = {}
     true_params_dict_latex_names = {}
 
-    # sample from wider distribution than initiated for QML
-    widen_prior_factor = 2  # should mean true values within 3 sigma of learning distribution
-    old_cov_mtx = true_prior.cov
-    new_cov_mtx = widen_prior_factor * old_cov_mtx
-    true_prior.__setattr__('cov', new_cov_mtx)
-    sampled_list = true_prior.sample()
-    try:
-        fixed_true_params = growth_class.true_model_terms_params
-    except BaseException:
-        fixed_true_params = set_true_params
+    if growth_class.fixed_true_terms:
+        # TODO move this to GR - generate if required; take from pickle if possible
+        true_params_dict = growth_class.true_params_dict
+        true_params_list = growth_class.true_params_list
+    else:
+        print("[param def] NOT using fixed params")
+        # sample from wider distribution than initiated for QML
+        widen_prior_factor = 2  # should mean true values within 3 sigma of learning distribution
+        old_cov_mtx = true_prior.cov
+        new_cov_mtx = widen_prior_factor * old_cov_mtx
+        true_prior.__setattr__('cov', new_cov_mtx)
+        sampled_list = true_prior.sample()
+        try:
+            fixed_true_params = growth_class.true_model_terms_params
+        except BaseException:
+            fixed_true_params = set_true_params
 
-    for i in range(num_terms):
-        if random_vals == True:
-            print("[setQHL] using random vals")
-            true_param = sampled_list[0][i]
-        else:
-            try:
-                term = terms[i]
-                true_param = fixed_true_params[term]
-            except BaseException:
+        for i in range(num_terms):
+            if random_vals == True:
+                print("[setQHL] using random vals")
                 true_param = sampled_list[0][i]
-        true_model_terms_params.append(true_param)
-        true_params_dict[terms[i]] = true_param
-        true_params_dict_latex_names[latex_terms[i]] = true_param
+            else:
+                try:
+                    term = terms[i]
+                    true_param = fixed_true_params[term]
+                except BaseException:
+                    true_param = sampled_list[0][i]
+            true_model_terms_params.append(true_param)
+            true_params_dict[terms[i]] = true_param
+            true_params_dict_latex_names[latex_terms[i]] = true_param
 
-    true_prior.__setattr__('cov', old_cov_mtx)
-    try:
-        qmla.shared_functionality.prior_distributions.plot_prior(
-            model_name=true_model_latex,
-            model_name_individual_terms=latex_terms,
-            prior=true_prior,
-            plot_file=true_prior_plot_file,
-            true_model_terms_params=true_params_dict_latex_names
-        )
-    except BaseException:
-        print("[ParameterDefinition] plotting prior failed \n\n\n")
-        pass
+        true_prior.__setattr__('cov', old_cov_mtx)
+        try:
+            qmla.shared_functionality.prior_distributions.plot_prior(
+                model_name=true_model_latex,
+                model_name_individual_terms=latex_terms,
+                prior=true_prior,
+                plot_file=true_prior_plot_file,
+                true_model_terms_params=true_params_dict_latex_names
+            )
+        except BaseException:
+            print("[ParameterDefinition] plotting prior failed \n\n\n")
+            pass
 
     if growth_class.growth_generation_rule not in all_growth_rules: 
         all_growth_rules.append(growth_class.growth_generation_rule)
@@ -108,7 +114,7 @@ def set_shared_parameters(
         evaluation_probes = growth_class.generate_probes(
             store_probes=False, 
             probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
-            experimental_data = exp_data,
+            # experimental_data = exp_data,
             noise_level = growth_class.probe_noise_level,
             minimum_tolerable_noise = 0.0,
         )
@@ -121,16 +127,10 @@ def set_shared_parameters(
         available_probe_ids = list(range(growth_class.num_probes))
         list_len_fator = math.ceil(len(evaluation_times) / len(available_probe_ids))
         iterable_probe_ids = iter(available_probe_ids * list_len_fator)
-
-        # evaluation_experiments = list(zip(
-        #     np.round(evaluation_times, 2), 
-        #     [next(iterable_probe_ids) for i in evaluation_times]
-        # ))       
          
         plt.hist(
             evaluation_times,
             bins = list(np.linspace(0,growth_class.max_time_to_consider, 10))
-            # bins = list(range(0, growth_class.max_time_to_consider))
         )
         plt.title('Times used for evaluation')
         plt.ylabel('Frequency')
@@ -151,12 +151,6 @@ def set_shared_parameters(
         'evaluation_probes' : evaluation_probes,
         'evaluation_times' : evaluation_times
     }
-    if exp_data:
-        print("\n\n\n[SetQHL] EXPDATA -- dont store true vals")
-        # so as not to plot "true" params for exp data
-        true_params_info['params_dict'] = None
-        true_params_info['params_list'] = []
-        print("true params info:\n", true_params_info)
 
     true_params_info['true_model'] = true_model
     true_params_info['growth_generator'] = growth_class.growth_generation_rule

@@ -19,17 +19,16 @@ from qmla.quantum_model_learning_agent import QuantumModelLearningAgent  # QMD c
 from qmla import redis_settings as rds
 import qmla.logging
 
+#########################
 # Parse input variables to use in QMD; store in class qmla_controls.
+#########################
 qmla_controls = qmla.parse_cmd_line_args(sys.argv[1:])
 growth_class = qmla_controls.growth_class
 
-###  START QMD ###
-start = time.time()
 
-"""
-Set up and functions.
-"""
-
+#########################
+# Set up
+#########################
 def log_print(to_print_list, log_file=None):
     qmla.logging.print_to_log(
         to_print_list=to_print_list,
@@ -38,12 +37,14 @@ def log_print(to_print_list, log_file=None):
     )    
 
 print("Implement QMLA script")
-log_file = qmla_controls.log_file
+start = time.time()
 
 experimental_measurements_dict = pickle.load(
     open(qmla_controls.true_expec_path, 'rb')
 )
 model_priors = None
+results_directory = qmla_controls.results_directory
+long_id = qmla_controls.long_id
 
 if qmla_controls.further_qhl == True:
     # TODO further QHL stage out of date and won't work with 
@@ -67,12 +68,10 @@ if qmla_controls.further_qhl == True:
     first_layer_models = list(model_priors.keys())
     further_qhl_models = list(model_priors.keys())
 
-results_directory = qmla_controls.results_directory
-long_id = qmla_controls.long_id
 
-"""
-Launch QMLA instance and run the desired learning function
-"""
+#########################
+# Run QMLA mode specified in launch scipt
+#########################
 print("------ QMLA starting ------")
 
 qmla_instance = QuantumModelLearningAgent(
@@ -81,9 +80,6 @@ qmla_instance = QuantumModelLearningAgent(
     experimental_measurements=experimental_measurements_dict,
 )
 
-#########################
-# Run QMLA mode specified in launch scipt
-#########################
 
 if qmla_controls.qhl_mode:
     qmla_instance.run_quantum_hamiltonian_learning()
@@ -250,9 +246,6 @@ elif (
         qmla_instance.delete_unpicklable_attributes()
         with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmla_instance, pkl_file, protocol=4)
-
-    # results_file = qmla_controls.results_file
-
     for mid in model_ids:
         mod = qmla_instance.get_model_storage_instance_by_id(mid)
         name = mod.model_name

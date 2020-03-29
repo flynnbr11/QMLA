@@ -28,10 +28,10 @@ class GrowthRule():
     ):
         # print("GrowthRule __init__. kwargs", kwargs)
         self.growth_generation_rule = growth_generation_rule
-        if 'use_experimental_data' in kwargs:
-            self.use_experimental_data = kwargs['use_experimental_data']
-        else:
-            self.use_experimental_data = False
+        # if 'use_experimental_data' in kwargs:
+        #     self.use_experimental_data = kwargs['use_experimental_data']
+        # else:
+        #     self.use_experimental_data = False
 
         if 'log_file' in kwargs:
             self.log_file = kwargs['log_file']
@@ -58,6 +58,7 @@ class GrowthRule():
         self.assign_parameters()
 
     def assign_parameters(self):
+        self.use_experimental_data = False # TODO included for legacy; to be removed everywhere its called
         # by changing the function object these point to,
         # determine how probes are generated and expectation values are computed
         # these can be directly overwritten within class definition
@@ -128,9 +129,46 @@ class GrowthRule():
         self.min_param = 0
         self.max_param = 1
         self.prior_random_mean = False
+        self.fixed_true_terms = False        
+        self.get_true_parameters()
         self.true_model_terms_params = {
             # term : true_param
         }
+
+    def get_true_parameters(
+        self,
+    ):        
+        # get true data from pickled file
+        try:
+            true_config = pickle.load(
+                open(
+                    self.true_params_path, 
+                    'rb'
+                )
+            )
+            self.true_params_list = true_config['params_list']
+            self.true_params_dict = true_config['params_dict']
+        except:
+            self.log_print(
+                [
+                    "Could not unpickle {}".format(self.true_params_path)
+                ]
+            )
+            self.true_params_list = []
+            self.true_params_dict = {}
+
+        true_ham = None
+        for k in list(self.true_params_dict.keys()):
+            param = self.true_params_dict[k]
+            mtx = database_framework.compute(k)
+            if true_ham is not None:
+                true_ham += param * mtx
+            else:
+                true_ham = param * mtx
+        self.true_hamiltonian = true_ham
+
+
+
 
     def store_growth_rule_configuration(
         self, 

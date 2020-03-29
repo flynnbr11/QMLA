@@ -4,8 +4,6 @@ import os
 
 import pickle 
 
-# import qmla.growth_rules.nv_centre_spin_characterisation.nv_centre_full_access
-# from qmla.growth_rules.nv_centre_spin_characterisation.nv_centre_full_access import ExperimentFullAccessNV
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
 import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
@@ -41,18 +39,10 @@ class ExperimentNVCentre(
         else:
             self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
 
-        # self.true_model = 'xTiPPyTy'
         self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
-        # self.measurement_type = 'hahn'
-
         self.true_model = 'xTiPPyTiPPzTiPPzTz'
-        # self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
 
         self.initial_models = ['xTi', 'yTi', 'zTi']
-        # self.initial_models = [
-        #     'xTiPPyTiPPzTiPPzTz',
-        #     'xTiPPyTiPPyTyPPzTiPPzTz',
-        # ]
         self.tree_completed_initially = False
         self.qhl_models = [
             # 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
@@ -135,11 +125,24 @@ class NVCentreExperimentalData(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
+        # TODO this is a hack - there is no true model so this generaates true parameter
+        # for an unused term so it doesn't interfere
+        # this should be looked after by not having a true model in these cases (?)
+        self.true_model = 'xTx' 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.hahn_evolution
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = False
+
+    def get_true_parameters(
+        self,
+    ):        
+        self.fixed_true_terms = True
+        self.true_hamiltonian = None
+        self.true_params_dict = {}
+        self.true_params_list = []
+
 
     def get_measurements_by_time(
         self

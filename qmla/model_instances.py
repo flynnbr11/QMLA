@@ -443,14 +443,16 @@ class ModelInstanceForLearning():
         true_params_names = qmla.database_framework.get_constituent_names_from_name(
             self.true_model_name
         )
-        if self.use_experimental_data == False:
-            for i in range(len(true_params_names)):
-                term = true_params_names[i]
-                true_param_val = self.true_model_params[i]
-                self.true_model_params_dict[term] = true_param_val
+
+        # if self.use_experimental_data == False:
+        # for i in range(len(true_params_names)):
+        #     term = true_params_names[i]
+        #     true_param_val = self.true_model_params[i]
+        #     self.true_model_params_dict[term] = true_param_val
+        self.true_model_params_dict = self.growth_class.true_params_dict
 
         all_params_for_q_loss = list(
-            set(true_params_names).union(self.model_terms_names)
+            set(list(self.true_model_params_dict.keys())).union(self.model_terms_names)
         )
         param_indices = {}
         for op_name in self.model_terms_names:
@@ -585,7 +587,7 @@ class ModelInstanceForLearning():
                     else:
                         learned_param = 0
 
-                    if param in true_params_names:
+                    if param in list(self.true_model_params_dict.keys()):
                         true_param = self.true_model_params_dict[param]
                     else:
                         true_param = 0

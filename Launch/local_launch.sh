@@ -6,7 +6,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
+num_tests=2
 qhl_test=1 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
@@ -159,19 +159,6 @@ then
     special_probe='random'
     special_probe_plot='plus'
 fi
-
-
-
-
-if [[ "$growth_rule" == "PT_Effective_Hamiltonian" ]] 
-then
-    echo "In if statement for PT_Effective_Hamiltonian"
-    special_probe='None'
-    special_probe_plot='None'
-fi
-
-# measurement_type=$exp_measurement_type
-# special_probe='plus' #'plus' #'ideal' # TODO this is just for a test, remove!!
 
 declare -a particle_counts=(
 $prt

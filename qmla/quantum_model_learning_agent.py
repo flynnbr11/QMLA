@@ -54,16 +54,10 @@ class QuantumModelLearningAgent():
 
     def __init__(self,
                  qmla_controls = None, 
-                #  generator_list=[],
-                #  first_layer_models=['x'],
-                #  probe_dict=None,
-                #  sim_probe_dict=None,
                  model_priors=None,  # needed for further QHL mode
                  experimental_measurements=None,
-                 # TODO get exp measurements from global variables
                  results_directory='',
                  use_exp_custom=True,  # TODO either remove custom exponentiation method or fix
-                #  plot_times=[0, 1],
                  sigma_threshold=1e-13,
                  **kwargs
                  ):
@@ -150,7 +144,6 @@ class QuantumModelLearningAgent():
             self.redis_host_name,
             self.redis_port_number,
             self.qmla_id,
-            # tree_identifiers=self.tree_identifiers
         )
         self.redis_databases['any_job_failed'].set('Status', 0)
 
@@ -161,8 +154,8 @@ class QuantumModelLearningAgent():
             self.true_model_name)
         self.true_model_constituent_operators = self.qmla_controls.true_model_terms_matrices
         self.true_model_num_params = self.qmla_controls.true_model_class.num_constituents
-        self.true_param_list = self.qmla_controls.true_params_list
-        self.true_param_dict = self.qmla_controls.true_params_dict
+        self.true_param_list = self.growth_class.true_params_list
+        self.true_param_dict = self.growth_class.true_params_dict
         self.true_model_branch = -1 # overwrite if considered
         self.true_model_considered = False
         self.true_model_found = False
@@ -190,13 +183,6 @@ class QuantumModelLearningAgent():
         # Growth rule setup
         # self.growth_rules_list = generator_list
         self.growth_rules_list = self.qmla_controls.generator_list
-        # print(
-        #     "[QMLA 189] Generator list {} \n controls all growth rules: {}".format(
-        #         generator_list, 
-        #         self.qmla_controls
-        #     )
-        
-        # )
         self.growth_rules_initial_models = {}
         self.growth_rule_of_true_model = self.qmla_controls.growth_generation_rule
         zeroth_gen = self.growth_rules_list[0]
@@ -258,7 +244,7 @@ class QuantumModelLearningAgent():
             # TODO get these from qmla_controls.unique_growth_rule_instances
             growth_class_gen = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=gen,
-                use_experimental_data=self.use_experimental_data,
+                # use_experimental_data=self.use_experimental_data,
                 true_params_path = self.qmla_controls.true_params_pickle_file,
                 plot_probes_path = self.qmla_controls.probes_plot_file, 
                 log_file=self.log_file
@@ -294,7 +280,6 @@ class QuantumModelLearningAgent():
                 # latest branch to claim it
                 self.models_branches[initial_id_counter] = i
                 self.branch_highest_id = i
-                # self.branch_resident_model_ids[i].append(initial_id_counter)
                 if mod in models_already_added_to_a_branch:
                     orig_mod_id = self.model_initial_ids[mod]
                     self.log_print(
@@ -339,12 +324,8 @@ class QuantumModelLearningAgent():
             self.spawn_stage[gen] = [None]
             self.misc_growth_info[gen] = {}
             self.branch_growth_rules[i] = gen
-
-            # if gen not in list(self.unique_growth_rule_instances.keys()):
-            #     self.unique_growth_rule_instances[gen] = growth_class_gen
             self.branch_growth_rule_instances[i] = self.unique_growth_rule_instances[gen]
 
-        # self.branch_highest_id = max(self.model_initial_branch.values())
         self.log_print(
             [
                 "After initial branches. model_initial_ids:",
@@ -366,7 +347,6 @@ class QuantumModelLearningAgent():
 
         # i.e. Trees only stem from unique generators
         self.tree_count = len(self.growth_rules_list)
-        # print("[QMD] num trees:", self.tree_count)
         self.tree_count_completed = np.sum(
             list(self.tree_completed.values())
         )
@@ -374,10 +354,7 @@ class QuantumModelLearningAgent():
     def _set_learning_and_comparison_parameters(
         self,
         model_priors,
-        # system_probe_dict,
-        # simulation_probe_dict,
         experimental_measurements,
-        # plot_times
     ):
         self.model_priors = model_priors
         self.num_particles = self.qmla_controls.num_particles
@@ -393,9 +370,10 @@ class QuantumModelLearningAgent():
         self.model_f_scores = {}
         self.model_precisions = {}
         self.model_sensitivities = {}
+        self.true_model_hamiltonian = self.growth_class.true_hamiltonian
         # get probes for learning
         self.growth_class.generate_probes(
-            experimental_data=self.qmla_controls.use_experimental_data,
+            # experimental_data=self.qmla_controls.use_experimental_data,
             noise_level=self.qmla_controls.probe_noise_level,
             minimum_tolerable_noise=0.0,
         )
@@ -409,53 +387,19 @@ class QuantumModelLearningAgent():
         )
         self.times_to_plot = self.experimental_measurement_times
         self.times_to_plot_reduced_set = self.times_to_plot[0::10]
-
         self.probes_plot_file = self.qmla_controls.probes_plot_file
-        if self.probes_plot_file is None: 
-
-            print(
-                "Generating plot probes.",
-                "max num probe qubits: ", self.growth_class.max_num_probe_qubits,
-                "true dimension: ", self.true_model_dimension
-            )
-
-            self.probes_for_plots = self.growth_class.plot_probe_generator(
-                true_model=self.true_model_name,
-                growth_generator=self.growth_class.growth_generation_rule,
-                probe_maximum_number_qubits = self.growth_class.max_num_probe_qubits, 
-                experimental_data=self.use_experimental_data,
-                noise_level=0.0000001,
-            )
-        else: 
+        try:
             self.probes_for_plots = pickle.load(
                 open(self.probes_plot_file, 'rb')
             )
-        self.true_model_hamiltonian = self.qmla_controls.true_hamiltonian
-
-
-        # if self.use_experimental_data == False:
-            # TODO is this doing anything useful?
-            # at least put in separate method
-            # self.true_model_hamiltonian = self.qmla_controls.true_hamiltonian
-            # self.experimental_measurements = {}
-            # self.log_print(
-            #     [
-            #         "Getting expectation values for simulated model",
-            #         "(len {})".format(len(self.times_to_plot)),
-            #         "\n Times computed:\n", self.times_to_plot
-            #     ]
-            # )
-
-            # for t in self.times_to_plot:
-            #     self.experimental_measurements[t] = (
-            #         self.growth_class.expectation_value(
-            #             ham=self.qmla_controls.true_hamiltonian,
-            #             t=t,
-            #             state=self.probes_for_plots[self.true_model_dimension],
-            #             log_file=self.log_file,
-            #             log_identifier='[QMLA Init]'
-            #         )
-            #     )
+        except: 
+            self.log_print(
+                [
+                    "Could not load plot probes from {}".format(
+                        self.probes_plot_file
+                    )
+                ]
+            )
 
     def _potentially_redundant_setup(
         self,
@@ -3295,7 +3239,7 @@ class QuantumModelLearningAgent():
 
         qmla.analysis.plot_parameter_estimates(qmd=self,
                                                model_id=model_id,
-                                               use_experimental_data=self.use_experimental_data,
+                                            #    use_experimental_data=self.use_experimental_data,
                                                save_to_file=save_to_file
                                                )
 

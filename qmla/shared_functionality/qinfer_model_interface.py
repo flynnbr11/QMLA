@@ -293,49 +293,16 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             true_evo = False
             params = modelparams
 
-        # if (
-        #     true_evo == True
-        #     and
-        #     self.use_experimental_data == True
-        # ):
-        #     # TODO move true experimental_data case to growth rule specific get_system_pr0 fnc
-        #     time = expparams['t']
-        #     self.log_print_debug(
-        #         [
-        #             'Getting system outcome',
-        #             'time:\n', time
-        #         ],
-        #     )
-        #     try:
-        #         # If time already exists in experimental data
-        #         experimental_expec_value = self.experimental_measurements[time]
-        #     except BaseException:
-        #         experimental_expec_value = qmla.experimental_data_processing.nearest_experimental_expect_val_available(
-        #             times=self.experimental_measurement_times,
-        #             experimental_data=self.experimental_measurements,
-        #             t=time
-        #         )
-        #     self.log_print_debug(
-        #         [
-        #             "Using experimental time", time,
-        #             "\texp val:", experimental_expec_value
-        #         ],
-        #     )
-        #     pr0 = np.array([[experimental_expec_value]])
-
-        # else:
         try:
             if true_evo:
                 pr0 = self.get_system_pr0_array(
                     times=times,
                     particles=params,
-                    # oplist=operators,
                 )
             else:
                 pr0 = self.get_simulator_pr0_array(
                     times=times,
                     particles=params,
-                    # oplist=operators,
                 ) 
         except:
             self.log_print(
@@ -379,6 +346,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         particles, 
         # **kwargs
     ):
+        self.log_print(["True pr0"])
         operator_list = self._true_oplist
         ham_num_qubits = self._true_dim
         # format of probe dict keys: (probe_id, qubit_number)
@@ -401,6 +369,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         times,
         # **kwargs
     ):
+        self.log_print(["Simulator pr0"])
         ham_num_qubits = self.model_dimension
         # format of probe dict keys: (probe_id, qubit_number)
         probe = self.sim_probe_dict[
@@ -470,6 +439,11 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 )
                 raise
 
+            self.log_print(
+                [
+                    "Hamiltonian: {}".format(repr(ham))
+                ]
+            )
             for tId in range(len(t_list)):
                 t = t_list[tId]
                 if t > 1e6:  # Try limiting times to use to 1 million
@@ -544,21 +518,16 @@ class QInferNVCentreExperiment(QInferModelQMLA):
             sys.exit()
 
         time = times[0]
-        self.log_print(
-            [
-                'Getting system outcome',
-                'time:\n', time
-            ]
-        )
+        # self.log_print(
+        #     [
+        #         'Getting system outcome',
+        #         'time:\n', time
+        #     ]
+        # )
         
         try:
             # If time already exists in experimental data
             experimental_expec_value = self.experimental_measurements[time]
-            self.log_print_debug(
-                [
-                    "Try has worked."
-                ]
-            )
         except BaseException:
             # map to nearest experimental time
             self.log_print_debug(
@@ -605,11 +574,23 @@ class QInferNVCentreExperiment(QInferModelQMLA):
         )
         return pr0
 
-    # def get_simulator_pr0_array(
-    #     self, 
-    #     particles, 
-    #     times,
-    #     # **kwargs
-    # ):
-    # TODO map times to times available in the experimental dataset
+    def get_simulator_pr0_array(
+        self, 
+        particles, 
+        times,
+        # **kwargs
+    ):
+        # map times to experimentally available times
+        mapped_times = [
+            qmla.experimental_data_processing.nearest_experimental_time_available(
+                times = self.experimental_measurement_times,
+                t = t
+            )
+            for t in times
+        ]
+        return super().get_simulator_pr0_array(
+            particles, 
+            mapped_times
+        )
+
 

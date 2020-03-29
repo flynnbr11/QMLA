@@ -53,7 +53,7 @@ class ControlsQMLA():
         try:
             self.growth_class = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
-                use_experimental_data=self.use_experimental_data,
+                # use_experimental_data=self.use_experimental_data,
                 true_params_path = arguments.true_params_pickle_file,
                 plot_probes_path = arguments.probes_plot_file, 
                 log_file=self.log_file
@@ -87,7 +87,7 @@ class ControlsQMLA():
         self.unique_growth_rule_instances = {
             gen : get_growth_rule.get_growth_generator_class(
                     growth_generation_rule = gen, 
-                    use_experimental_data = self.use_experimental_data, 
+                    # use_experimental_data = self.use_experimental_data, 
                     log_file = self.log_file
                 )
             for gen in self.alternative_growth_rules
@@ -132,28 +132,9 @@ class ControlsQMLA():
         self.true_model_terms_params = true_params_info['params_list']
         
         # derive required info from data from growth rule and arguments
-        if self.use_experimental_data == True:
-            true_ham = None
-            self.true_params_dict = None
-            self.true_params_list = []
-        else:
-            self.true_params_dict = true_params_info['params_dict']
-            self.true_params_list = [
-                self.true_params_dict[p]
-                for p in self.true_model_class.constituents_names
-            ]
-            # generate true hamiltonian for simulated case
-            true_ham = None
-            for k in list(self.true_params_dict.keys()):
-                param = self.true_params_dict[k]
-                mtx = database_framework.compute(k)
-                if true_ham is not None:
-                    true_ham += param * mtx
-                else:
-                    true_ham = param * mtx
-
-        self.true_hamiltonian = true_ham
-        
+        # self.true_hamiltonian = self.growth_class.true_hamiltonian
+        # self.true_params_dict = self.growth_class.true_params_dict
+        # self.true_params_list = self.growth_class.true_params_list            
         
         # get parameters from arguments passed to implement_qmla.py
         self.prior_pickle_file = arguments.prior_pickle_file
