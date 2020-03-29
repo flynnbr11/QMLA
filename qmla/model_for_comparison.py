@@ -70,7 +70,7 @@ class ModelInstanceForComparison():
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
-        self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
+        # self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         self.results_directory = qmla_core_info_dict['results_directory']
@@ -117,7 +117,7 @@ class ModelInstanceForComparison():
         self.growth_rule_of_this_model = learned_model_info['growth_generator']
         self.growth_class = get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.growth_rule_of_this_model,
-            use_experimental_data=self.use_experimental_data,
+            # use_experimental_data=self.use_experimental_data,
             log_file=self.log_file
         )
         self.model_prior = learned_model_info['final_prior']
@@ -141,7 +141,7 @@ class ModelInstanceForComparison():
             probe_dict=self.probes_system,
             sim_probe_dict=self.probes_simulator,
             growth_generation_rule=self.growth_rule_of_this_model,
-            use_experimental_data=self.use_experimental_data,
+            # use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,

@@ -47,7 +47,7 @@ class ControlsQMLA():
         arguments,
         **kwargs
     ):
-        self.use_experimental_data = bool(arguments.experimental_data)
+        # self.use_experimental_data = bool(arguments.experimental_data)
         self.growth_generation_rule = arguments.growth_generation_rule
         self.log_file = arguments.log_file
         try:

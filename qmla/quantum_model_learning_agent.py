@@ -121,7 +121,7 @@ class QuantumModelLearningAgent():
 
     def _fundamental_settings(self):
         self.qmla_id = self.qmla_controls.qmla_id
-        self.use_experimental_data = self.qmla_controls.use_experimental_data
+        # self.use_experimental_data = self.qmla_controls.use_experimental_data
         self.redis_host_name = self.qmla_controls.host_name
         self.redis_port_number = self.qmla_controls.port_number
         self.log_file = self.qmla_controls.log_file
@@ -529,7 +529,7 @@ class QuantumModelLearningAgent():
             'long_id': self.qmla_controls.long_id,
             'prior_specific_terms': self.growth_class.gaussian_prior_means_and_widths,
             'model_priors': self.model_priors,
-            'use_experimental_data': self.use_experimental_data, 
+            # 'use_experimental_data': self.use_experimental_data, 
             'experimental_measurements': self.experimental_measurements, # could be path to unpickle within model?
             'base_resources': self.base_resources, # put inside growth rule
             'reallocate_resources': self.reallocate_resources, # put inside growth rule

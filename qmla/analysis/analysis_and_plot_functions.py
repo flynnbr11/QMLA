@@ -213,7 +213,6 @@ def fill_between_sigmas(
 def plot_parameter_estimates(
     qmd,
     model_id,
-    use_experimental_data=False,
     save_to_file=None
 ):
     from matplotlib import cm
@@ -603,18 +602,17 @@ def plot_learned_models_dynamics(
                 colour = colours[i % len(colours)]
                 i += 1
                 try:
-                    if use_experimental_data == False:
-                        y_true = qmd.true_param_dict[term]
-                        true_term_latex = qmd.growth_class.latex_name(
-                            name=term
-                        )
+                    y_true = qmd.true_param_dict[term]
+                    true_term_latex = qmd.growth_class.latex_name(
+                        name=term
+                    )
 
-                        ax.axhline(
-                            y_true,
-                            label=str(
-                                true_term_latex +
-                                ' True'),
-                            color=colour)
+                    ax.axhline(
+                        y_true,
+                        label=str(
+                            true_term_latex +
+                            ' True'),
+                        color=colour)
                 except BaseException:
                     pass
                 y = np.array(param_estimate_by_term[term])

@@ -63,7 +63,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         probe_dict,
         sim_probe_dict,
         growth_generation_rule,
-        use_experimental_data,
+        # use_experimental_data,
         experimental_measurements,
         experimental_measurement_times,
         log_file,
@@ -78,13 +78,13 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._trueparams = trueparams
         self._truename = truename
         self._true_dim = qmla.database_framework.get_num_qubits(self._truename)
-        self.use_experimental_data = use_experimental_data
+        # self.use_experimental_data = use_experimental_data
         self.log_file = log_file
         self.growth_generation_rule = growth_generation_rule
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
-                use_experimental_data=self.use_experimental_data,
+                # use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
             )
         except BaseException:

@@ -180,7 +180,7 @@ class ModelInstanceForLearning():
             self.probes_system = qmla_core_info_database['ProbeDict']
             self.probes_simulator = qmla_core_info_database['SimProbeDict']
         
-        self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
+        # self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.num_particles = qmla_core_info_dict['num_particles']
         self.num_experiments = qmla_core_info_dict['num_experiments']
         self.growth_rule_of_this_model = growth_generator
@@ -188,7 +188,7 @@ class ModelInstanceForLearning():
         try:
             self.growth_class = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_rule_of_this_model,
-                use_experimental_data=self.use_experimental_data,
+                # use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
             )
         except BaseException:
@@ -365,7 +365,7 @@ class ModelInstanceForLearning():
             probe_dict=self.probes_system,
             sim_probe_dict=self.probes_simulator,
             growth_generation_rule=self.growth_rule_of_this_model,
-            use_experimental_data=self.use_experimental_data,
+            # use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
@@ -444,13 +444,7 @@ class ModelInstanceForLearning():
             self.true_model_name
         )
 
-        # if self.use_experimental_data == False:
-        # for i in range(len(true_params_names)):
-        #     term = true_params_names[i]
-        #     true_param_val = self.true_model_params[i]
-        #     self.true_model_params_dict[term] = true_param_val
         self.true_model_params_dict = self.growth_class.true_params_dict
-
         all_params_for_q_loss = list(
             set(list(self.true_model_params_dict.keys())).union(self.model_terms_names)
         )
@@ -480,21 +474,12 @@ class ModelInstanceForLearning():
                 epoch_id=istep,
                 current_params=param_estimates
             )
-            qmla.memory_tests.print_loc(global_print_loc)
             # TODO prefactor, if used, should be inside specific heuristic
             self.new_experiment[0][0] = self.new_experiment[0][0] * \
                 self.qinfer_PGH_heuristic_factor
-            if self.use_experimental_data:
-                t = self.new_experiment[0][0]
-                nearest = qmla.experimental_data_processing.nearest_experimental_time_available(
-                    times=self.experimental_measurement_times,
-                    t=t
-                )
-                self.new_experiment[0][0] = nearest
-            qmla.memory_tests.print_loc(global_print_loc)
+
             if istep == 0:
-                qmla.memory_tests.print_loc(global_print_loc)
-                self.log_print(['Initial time selected > ',
+                self.log_print(['Initial time selected = ',
                                 str(self.new_experiment[0][0])]
                                )
             self.track_experimental_times[istep] = self.new_experiment[0][0]
@@ -577,8 +562,6 @@ class ModelInstanceForLearning():
 
             if (
                 checkloss == True
-                and
-                self.use_experimental_data == False
             ):
                 quadratic_loss = 0
                 for param in all_params_for_q_loss:
@@ -796,7 +779,7 @@ class ModelInstanceForLearning():
             probe_dict=evaluation_probe_dict,
             sim_probe_dict=evaluation_probe_dict,
             growth_generation_rule=self.growth_rule_of_this_model,
-            use_experimental_data=self.use_experimental_data,
+            # use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,

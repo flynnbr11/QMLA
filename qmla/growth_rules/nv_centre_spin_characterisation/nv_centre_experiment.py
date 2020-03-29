@@ -128,7 +128,8 @@ class NVCentreExperimentalData(
         # TODO this is a hack - there is no true model so this generaates true parameter
         # for an unused term so it doesn't interfere
         # this should be looked after by not having a true model in these cases (?)
-        self.true_model = 'xTx' 
+        self.true_model = 'xTiPPyTiPPzTiPPzTz'
+        self.true_model = qmla.database_framework.alph(self.true_model) 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.hahn_evolution
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference

@@ -129,7 +129,7 @@ growth_generator = arguments.growth_generation_rule
 gather_summary_results = bool(arguments.gather_summary_results)
 true_growth_class = qmla.get_growth_generator_class(
     growth_generation_rule=growth_generator,
-    use_experimental_data=exp_data,
+    # use_experimental_data=exp_data,
     log_file=log_file
 )
 dataset = true_growth_class.experimental_dataset
@@ -327,7 +327,7 @@ try:
         directory_name=directory_to_analyse,
         dataset=dataset,
         results_path=results_csv,
-        use_experimental_data=exp_data,
+        # use_experimental_data=exp_data,
         results_file_name_start=results_file_name_start,
         true_expectation_value_path=true_expec_path,
         growth_generator=growth_generator,

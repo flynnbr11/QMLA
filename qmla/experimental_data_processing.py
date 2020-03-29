@@ -28,7 +28,6 @@ def nearest_experimental_time_available(times, t):
             nearest = after
         else:
             nearest = before
-
     return nearest
 
 

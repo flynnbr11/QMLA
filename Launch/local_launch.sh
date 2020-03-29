@@ -6,7 +6,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=2
+num_tests=5
 qhl_test=1 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-exp=5
-prt=10
+exp=750
+prt=2500
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -93,7 +93,7 @@ sim_growth_rule='NVExperimentalData'
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-# exp_growth_rule='NVExperimentalData'
+exp_growth_rule='NVExperimentalData'
 # exp_growth_rule='ExperimentNVCentre'
 # exp_growth_rule='ExperimentNVCentreNoTransvereTerms'
 # exp_growth_rule='ExpAlternativeNV'
@@ -195,6 +195,49 @@ python3 ../Scripts/set_qmla_params.py \
 
 echo "Generated configuration."
 
+##
+# Write analysis script (before launch in case run stopped before some instances complete.)
+##
+
+
+# write to a script so we can recall analysis later.
+echo "
+cd $full_path_to_results
+python3 ../../../../Scripts/analyse_qmla.py \
+    -dir=$full_path_to_results --bayes_csv=$bayes_csv \
+    -log=$this_log \
+    -top=$number_best_models_further_qhl \
+    -qhl=$qhl_test -fqhl=0 \
+    -exp=$exp_data -true_expec=$true_expec_path \
+    -ggr=$growth_rule \
+    -plot_probes=$plot_probe_file \
+    -params=$true_params_pickle_file \
+    -latex=$latex_mapping_file \
+    -gs=1
+
+python3 ../../../../Scripts/generate_results_pdf.py \
+    -dir=$full_path_to_results \
+    -p=$prt -e=$exp -bt=$bt -t=$num_tests \
+    -log=$this_log \
+    -nprobes=$num_probes \
+    -pnoise=$probe_noise \
+    -special_probe=$special_probe \
+    -ggr=$growth_rule \
+    -run_desc=$test_description \
+    -git_commit=$git_commit \
+    -ra=$ra \
+    -rt=$rt \
+    -pgh=$pgh \
+    -qhl=$qhl_test \
+    -mqhl=$multiple_qhl \
+    -cb=$bayes_csv \
+    -exp=$exp_data
+
+" > $analyse_script
+chmod a+x $analyse_script
+
+
+
 for prt in  "${particle_counts[@]}";
 do
     for i in `seq 1 $max_qmd_id`;
@@ -239,48 +282,6 @@ echo "
 
 "
 
-##
-# Analyse results of QMD. (Only after QMD, not QHL).
-##
-
-
-# write to a script so we can recall analysis later.
-echo "
-cd $full_path_to_results
-python3 ../../../../Scripts/analyse_qmla.py \
-    -dir=$full_path_to_results --bayes_csv=$bayes_csv \
-    -log=$this_log \
-    -top=$number_best_models_further_qhl \
-    -qhl=$qhl_test -fqhl=0 \
-    -exp=$exp_data -true_expec=$true_expec_path \
-    -ggr=$growth_rule \
-    -plot_probes=$plot_probe_file \
-    -params=$true_params_pickle_file \
-    -latex=$latex_mapping_file \
-    -gs=1
-
-python3 ../../../../Scripts/generate_results_pdf.py \
-    -dir=$full_path_to_results \
-    -p=$prt -e=$exp -bt=$bt -t=$num_tests \
-    -log=$this_log \
-    -nprobes=$num_probes \
-    -pnoise=$probe_noise \
-    -special_probe=$special_probe \
-    -ggr=$growth_rule \
-    -run_desc=$test_description \
-    -git_commit=$git_commit \
-    -ra=$ra \
-    -rt=$rt \
-    -pgh=$pgh \
-    -qhl=$qhl_test \
-    -mqhl=$multiple_qhl \
-    -cb=$bayes_csv \
-    -exp=$exp_data
-
-" > $analyse_script
-
-
-chmod a+x $analyse_script
 
 if (( $do_further_qhl == 1 )) 
 then

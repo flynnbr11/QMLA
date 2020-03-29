@@ -88,7 +88,7 @@ class ModelInstanceForStorage():
             qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
 
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
-        self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
+        # self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_name = qmla_core_info_dict['true_name']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
@@ -215,7 +215,7 @@ class ModelInstanceForStorage():
             try:
                 self.growth_class = get_growth_rule.get_growth_generator_class(
                     growth_generation_rule=self.growth_rule_of_this_model,
-                    use_experimental_data=self.use_experimental_data,
+                    # use_experimental_data=self.use_experimental_data,
                     log_file=self.log_file
                 )
             except BaseException:

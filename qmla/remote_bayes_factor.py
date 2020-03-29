@@ -102,7 +102,6 @@ def remote_bayes_factor_calculation(
     active_interbranch_bayes = redis_databases['active_interbranch_bayes']
 
     qmla_core_info_dict = pickle.loads(redis_databases['qmla_core_info_database']['qmla_settings'])
-    use_experimental_data = qmla_core_info_dict['use_experimental_data']
     experimental_data_times = qmla_core_info_dict['experimental_measurement_times']
 
     linspace_times_for_bayes_factor_comparison = False

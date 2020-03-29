@@ -25,10 +25,12 @@ class NVLargeSpinBath(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        if 'use_experimental_data' in kwargs:
-            self.use_experimental_data = kwargs['use_experimental_data']
-        else:
-            self.use_experimental_data = False
+        self.use_experimental_data = False
+        # if 'use_experimental_data' in kwargs:
+        #     self.use_experimental_data = kwargs['use_experimental_data']
+        # else:
+        #     self.use_experimental_data = False
+
         if self.use_experimental_data == True:
             # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
             # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.restore_dec_13_probe_generation

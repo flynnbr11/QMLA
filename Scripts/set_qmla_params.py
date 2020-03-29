@@ -156,7 +156,7 @@ print("Set QMLA Params script")
 arguments = parser.parse_args()
 random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
-exp_data = bool(arguments.use_experimental_data)
+# exp_data = bool(arguments.use_experimental_data)
 num_particles = arguments.particle_number
 growth_generation_rule = arguments.growth_generation_rule
 log_file = arguments.log_file
@@ -164,7 +164,7 @@ probes_plot_file = arguments.probes_plot_file
 results_directory = arguments.results_directory
 
 growth_class_attributes = {
-    'use_experimental_data': exp_data,
+    # 'use_experimental_data': exp_data,
     'true_params_path' : arguments.true_params_file,
     'plot_probes_path' : probes_plot_file,
     'log_file': log_file
