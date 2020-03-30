@@ -16,7 +16,7 @@ def log_print(
     log_file, 
     log_identifier='Distributions'
 ):
-    # Standard logging.
+    r"""Writng to unique QMLA instance log."""
     qmla.logging.print_to_log(
         to_print_list = to_print_list, 
         log_file = log_file, 

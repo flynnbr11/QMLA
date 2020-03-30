@@ -26,27 +26,46 @@ debug_print_file_line = False
 
 class QInferModelQMLA(qi.FiniteOutcomeModel):
     r"""
-    Describes the free evolution of a single qubit prepared in the
-    :param np.array : :math:`\left|+\Psi\rangle` state under
-    a Hamiltonian :math:`H = \omega \sum_i \gamma_i / 2`
-    of a set of (Pauli) operators given by
-    :param np.array oplist:
-    using the interactive QLE model proposed by [WGFC13a]_.
+    Interface between QMLA and QInfer.
 
-    :param np.array oplist: Set of operators whose sum
-        defines the evolution Hamiltonian
-
-    :param float min_freq: Minimum value for :math:`\omega` to accept as valid.
-        This is used for testing techniques that mitigate the effects of
-        degenerate models; there is no "good" reason to ever set this other
-        than zero, other than to test with an explicitly broken model.
-
-    :param str solver: Which solver to use for the Hamiltonian simulation.
-        'scipy' invokes matrix exponentiation (i.e. time-independent evolution)
-        -> fast, accurate when applicable
-        'qutip' invokes ODE solver (i.e. time-dependent evolution can
-        be also managed approx.)
-        -> not invoked by deafult
+    QInfer is a library for performing Bayesian inference
+        on quantum data for parameter estimation.
+        It underlies the Quantum Hamiltonian Learning subroutine
+        employed within QMLA.
+        Bayesian inference relies on comparisons likelihoods
+        of the target and candidate system. 
+    This class, specified by a growth rule, defines how to 
+        compute the likelihood for the user's system. 
+        Most functionality is inherited from QInfer, but methods listed 
+        here are edited for QMLA's needs. 
+    The likelihood function given here should suffice for most QMLA 
+        implementations, though users may want to overwrite 
+        get_system_pr0_array and get_simulator_pr0_array, 
+        for instance to specify which experimental data points to use. 
+    
+    :param str model_name: Unique string representing a model.
+    :param np.ndarray modelparams: list of parameters to multiply by operators, 
+        unused for QMLA reasons but required by QInfer. 
+    :param np.ndarray oplist: Set of operators whose sum
+        defines the evolution Hamiltonian 
+        (where each operator is associated with a distinct parameter).
+    :param np.ndarray true_oplist: list of operators of the target system,
+        used to construct true hamiltonian.
+    :param np.ndarray trueparams: list of parameters of the target system,
+        used to construct true hamiltonian.
+    :param int num_probes: number of probes available in the probe sets, 
+        used to loop through probe set
+    :param dict probe_dict: set of probe states to be used during training
+        for the system, indexed by (probe_id, num_qubits). 
+    :param dict sim_probe_dict: set of probe states to be used during training
+        for the simulator, indexed by (probe_id, num_qubits). Usually the same as 
+        the system probes, but not always. 
+    :param str growth_generator: string corresponding to a unique growth rule,
+        used to generate a GrowthRule_ instance.
+    :param dict experimental_measurements: fixed measurements of the target system, 
+        indexed by time.
+    :param list experimental_measurement_times: times indexed in experimental_measurements.
+    :param str log_file: Path of log file.
     """
 
     ## INITIALIZER ##
@@ -63,7 +82,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         probe_dict,
         sim_probe_dict,
         growth_generation_rule,
-        # use_experimental_data,
         experimental_measurements,
         experimental_measurement_times,
         log_file,
@@ -97,6 +115,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             )
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
+        # Required by QInfer: 
         self._min_freq = 0 # what does this do?
         self._solver = 'scipy'
         # This is the solver used for time evolution scipy is faster
@@ -128,6 +147,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         to_print_list, 
         log_identifier=None
     ):
+        r"""Writng to unique QMLA instance log."""
         if log_identifier is None: 
             log_identifier = 'QInfer interface'
 
@@ -141,9 +161,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self, 
         to_print_list
     ):
-        r"""
-        Log print if global debug_log_print set to True. 
-        """
+        r"""Log print if global debug_log_print set to True."""
+
         if debug_log_print:
             self.log_print(
                 to_print_list = to_print_list,
@@ -163,26 +182,22 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     @property
     def modelparam_names(self):
         r"""
-        Inherited from Qinfer:
         Returns the names of the various model parameters admitted by this
-        model, formatted as LaTeX strings.
+        model, formatted as LaTeX strings. (Inherited from Qinfer)
         """
+
         modnames = ['w0']
         for modpar in range(self.n_modelparams - 1):
             modnames.append('w' + str(modpar + 1))
         return modnames
 
-    # expparams are the {t, w1, w2, ...} guessed parameters, i.e. each 
-    # particle has a specific sampled value of the corresponding
-    # parameter
-    # 
 
     @property
     def expparams_dtype(self):
         r"""
-        Modified from Qinfer:
-        Returns the dtype of an experiment parameter array. For a
-        model with single-parameter control, this will likely be a scalar dtype,
+        Returns the dtype of an experiment parameter array. 
+        
+        For a model with single-parameter control, this will likely be a scalar dtype,
         such as ``"float64"``. More generally, this can be an example of a
         record type, such as ``[('time', py.'float64'), ('axis', 'uint8')]``.
         This property is assumed by inference engines to be constant for
@@ -190,20 +205,33 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         In the context of QMLA the expparams_dtype are assumed to be a list of tuple where
         the first element of the tuple identifies the parameters (including type) while the second element is
         the actual type of of the parameter, typicaly a float.
-
+        (Modified from Qinfer).
         """
+
+        # expparams are the {t, w1, w2, ...} guessed parameters, i.e. each 
+        # particle has a specific sampled value of the corresponding
+        # parameter
+        # 
         expnames = [('t', 'float')]
         for exppar in range(self.n_modelparams):
             expnames.append(('w_' + str(exppar + 1), 'float'))
         return expnames
 
-    ## METHODS ##
+    ################################################################################
+    # Methods
+    ################################################################################
 
     def are_models_valid(self, modelparams):
-        # Before setting new distribution after resampling,
-        # checks that all parameters have same sign as the
-        # initial given parameter for that term.
-        # Otherwise, redraws the distribution.
+        r"""
+        Checks that the proposed models are valid.
+
+        Before setting new distribution after resampling,
+        checks that all parameters have same sign as the
+        initial given parameter for that term.
+        Otherwise, redraws the distribution.
+        Modified from qinfer.
+        """
+
         same_sign_as_initial = False
         if same_sign_as_initial == True:
             new_signs = np.sign(modelparams)
@@ -234,35 +262,69 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         expparams
     ):
         r"""
-            Inherited from Qinfer:
-            Function to calculate likelihoods for all the particles
-            
-            Longish description:
+        Function to calculate likelihoods for all the particles
+        
+        Inherited from Qinfer:
             Calculates the probability of each given outcome, conditioned on each
             given model parameter vector and each given experimental control setting.
 
-            :param np.ndarray outcomes: outcomes of the experiments
+        QMLA modifications: 
+            Given a list of experiments to perform, expparams, 
+            extract the time list. Typically we use a single experiment
+            (therefore single time) per update.
+            QInfer passes particles as modelparams.
+            QMLA updates its knowledge in two steps:
+                * "simulate" an experiment 
+                    (which can include outsourcing from here to perform a real experiment), 
+                * update parameter distribution 
+                    by comparing Np particles to the experimental result
+            It is important that the comparison is fair, meaning:
+                * The evolution time must be the same
+                * The probe state to evolve must be the same.
 
-            :param np.ndarray modelparams: 
-                values of the model parameters particles 
-                A shape ``(n_particles, n_modelparams)``
-                array of model parameter vectors describing the hypotheses for
-                which the likelihood function is to be calculated.
+            To simulate the experiment, we call QInfer's simulate_experiment,
+                which calls likelihood(), passing a single particle. 
+            The update function calls simulate_experiment with Np particles. 
+            Therefore we know, when a single particle is passed to likelihood, 
+                that we want to call the true system (we know the true parameters 
+                and operators by the constructor of this class). 
+            So, when a single particle is detected, we circumvent QInfer by triggering
+                get_system_pr0_array. Users can overwrite this function as desired; 
+                by default it computes true_hamiltonian, 
+                and computes the likelhood for the given time. 
+            When >1 particles are detected, pr0 is computed by constructing Np 
+                candidate Hamiltonians, each corresponding to a single particle, 
+                where particles are chosen by Qinfer and given as modelparams.
+                This is done through get_simulator_pr0_array.
+            We know calls to likelihood are coupled: 
+                one call for the system, and one for the update, 
+                which must use the same probes. Therefore probes are indexed
+                by a probe_id as well as their dimension. 
+                We track calls to likelihood() in _a and increment the probe_id
+                to pull every second call, to ensure the same probe_id is used for 
+                system and simulator.
+
+        :param np.ndarray outcomes: outcomes of the experiments
+        :param np.ndarray modelparams: 
+            values of the model parameters particles 
+            A shape ``(n_particles, n_modelparams)``
+            array of model parameter vectors describing the hypotheses for
+            which the likelihood function is to be calculated.
+        
+        :param np.ndarray expparams: 
+            experimental parameters, 
+            A shape ``(n_experiments, )`` array of
+            experimental control settings, with ``dtype`` given by 
+            :attr:`~qinfer.Simulatable.expparams_dtype`, describing the
+            experiments from which the given outcomes were drawn.
             
-            :param np.ndarray expparams: 
-                experimental parameters, 
-                A shape ``(n_experiments, )`` array of
-                experimental control settings, with ``dtype`` given by 
-                :attr:`~qinfer.Simulatable.expparams_dtype`, describing the
-                experiments from which the given outcomes were drawn.
-                
-            :rtype: np.ndarray
-            :return: A three-index tensor ``L[i, j, k]``, where ``i`` is the outcome
-                being considered, ``j`` indexes which vector of model parameters was used,
-                and where ``k`` indexes which experimental parameters where used.
-                Each element ``L[i, j, k]`` then corresponds to the likelihood
-                :math:`\Pr(d_i | \vec{x}_j; e_k)`.
-            """
+        :rtype: np.ndarray
+        :return: A three-index tensor ``L[i, j, k]``, where ``i`` is the outcome
+            being considered, ``j`` indexes which vector of model parameters was used,
+            and where ``k`` indexes which experimental parameters where used.
+            Each element ``L[i, j, k]`` then corresponds to the likelihood
+            :math:`\Pr(d_i | \vec{x}_j; e_k)`.
+        """
 
         
         super(QInferModelQMLA, self).likelihood(
@@ -346,9 +408,26 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         particles, 
         # **kwargs
     ):
+        r"""
+        Compute pr0 array for the system. 
+
+        For user specific data, or method to compute system data, replace this function 
+            in growth_rule.qinfer_model_class. 
+        Here we pass the true operator list and true parameters to 
+            default_pr0_from_modelparams_times_.
+
+        :param list times: times to compute pr0 for; usually single element.
+        :param np.ndarry particles: list of parameter-lists, used to construct
+            Hamiltonians. In this case, there should be a single particle
+            corresponding to the true parameters. 
+        
+        :returns np.ndarray pr0: probabilities of measuring specified outcome
+        """
+
         operator_list = self._true_oplist
         ham_num_qubits = self._true_dim
         # format of probe dict keys: (probe_id, qubit_number)
+        # probe_counter controlled in likelihood method
         probe = self.probe_dict[
             self.probe_counter,
             ham_num_qubits
@@ -368,8 +447,23 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         times,
         # **kwargs
     ):
+        r"""
+        Compute pr0 array for the simulator. 
+
+        For user specific data, or method to compute simulator data, replace this function 
+            in growth_rule.qinfer_model_class. 
+        Here we pass the candidate model's operators and particles
+            to default_pr0_from_modelparams_times_.
+
+        :param list times: times to compute pr0 for; usually single element.
+        :param np.ndarry particles: list of particles (parameter-lists), used to construct
+            Hamiltonians. 
+        
+        :returns np.ndarray pr0: probabilities of measuring specified outcome
+        """
         ham_num_qubits = self.model_dimension
         # format of probe dict keys: (probe_id, qubit_number)
+        # probe_counter controlled in likelihood method
         probe = self.sim_probe_dict[
             self.probe_counter,
             ham_num_qubits 
@@ -392,19 +486,25 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         **kwargs
     ):
         r"""
-            Compute probabilities of available outputs as an array.
+        Compute probabilities of available outputs as an array.
 
-            :param np.ndarray t_list: 
-                List of times on which to perform experiments
-            :param np.ndarray modelparams: 
-                values of the model parameters particles 
-                A shape ``(n_particles, n_modelparams)``
-                array of model parameter vectors describing the hypotheses for
-                which the likelihood function is to be calculated.
-            :param list oplist:
-                list of the operators defining the model
-            :param np.ndarray probe: quantum state to evolve
-            :param GrowthRule growth_class: 
+        :param np.ndarray t_list: 
+            List of times on which to perform experiments
+        :param np.ndarray particles: 
+            values of the model parameters particles 
+            A shape ``(n_particles, n_modelparams)``
+            array of model parameter vectors describing the hypotheses for
+            which the likelihood function is to be calculated.
+        :param list oplist:
+            list of the operators defining the model
+        :param np.ndarray probe: quantum state to evolve
+
+        :returns np.ndarray pr0: list of probabilities (one for each particle).
+            The calculation, meaning and interpretation of these probabilities 
+            depends on the user defined GrowthRule.expectation_value function. 
+            By default, it is the expecation value:
+                | < probe.transpose | e^{-iHt} | probe > |**2,
+                but can be replaced in the GrowthRule_.  
         """
 
         from rq import timeouts

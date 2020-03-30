@@ -41,9 +41,8 @@ def default_expectation_value(
     log_identifier='Expecation Value'
 ):
     """
-    This is the default evolution and expectation value function for QMLA.
+    Default expectation value calculation: | <state.transpose | e^{-iHt} | state> |**2
 
-    longish description:
     Returns the expectation value computed by evolving the input state with
     the provided Hamiltonian operator. NB: In this case, the assumption is that the 
     value measured is 1 and the expectation value corresponds to the probability of
