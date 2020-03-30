@@ -5,6 +5,8 @@ import random
 import math
 
 from inspect import currentframe, getframeinfo
+import qmla.logging
+
 
 frameinfo = getframeinfo(currentframe())
 
@@ -17,6 +19,16 @@ __all__ = [
 ]
 
 def identity(arg): return arg
+
+def log_print(
+    to_print_list, 
+    log_file, 
+):
+    qmla.logging.print_to_log(
+        to_print_list = to_print_list, 
+        log_file = log_file, 
+        log_identifier = 'Heuristic'
+    )
 
 class MultiParticleGuessHeuristic(qi.Heuristic):
     def __init__(
@@ -215,6 +227,7 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         time_list=None,
         max_time_to_enforce=10,
         num_experiments=100,
+        log_file='qmla_log.log',
         **kwargs
     ):
         super().__init__(updater)
@@ -229,6 +242,7 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
         # self._num_experiments = kwargs.get('num_experiments', 200)
+        self.log_file = log_file
         self._num_experiments = num_experiments
         self._time_list = time_list
         self._len_time_list = len(self._time_list)
@@ -298,8 +312,11 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
             self.count_number_high_times_suggested += 1
         
         if epoch_id == self._num_experiments - 1 : 
-            print(
-                "Number of suggested t > t_max:", self.count_number_high_times_suggested 
+            log_print(
+                [
+                    "Number of suggested t > t_max:", self.count_number_high_times_suggested 
+                ],
+                log_file = self.log_file
             )
         
         eps[self._t] = new_time

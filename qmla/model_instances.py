@@ -401,7 +401,8 @@ class ModelInstanceForLearning():
             pgh_exponent=self.qinfer_PGH_heuristic_exponent,
             time_list=self.times_to_plot,
             num_experiments=self.num_experiments,
-            max_time_to_enforce=self.growth_class.max_time_to_consider
+            max_time_to_enforce=self.growth_class.max_time_to_consider,
+            log_file = self.log_file,
         )
         self.model_heuristic_class = self.model_heuristic.__class__.__name__
 
