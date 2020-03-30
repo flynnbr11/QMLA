@@ -7,6 +7,7 @@ import pickle
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
 import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
+import  qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.expectation_values
 from qmla import database_framework
 
@@ -28,7 +29,7 @@ class ExperimentNVCentre(
         growth_generation_rule,
         **kwargs
     ):
-        from qmla import experiment_design_heuristics
+        
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule=growth_generation_rule,
@@ -39,7 +40,7 @@ class ExperimentNVCentre(
         else:
             self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
 
-        self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.true_model = 'xTiPPyTiPPzTiPPzTz'
 
         self.initial_models = ['xTi', 'yTi', 'zTi']

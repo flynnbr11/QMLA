@@ -5,7 +5,7 @@ import pickle
 import numpy as np
 
 import qmla.shared_functionality.prior_distributions
-import qmla.experiment_design_heuristics as experiment_design_heuristics
+import qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation as probe_set_generation
 import qmla.shared_functionality.expectation_values
 import qmla.database_framework as database_framework
@@ -75,7 +75,7 @@ class GrowthRule():
             initial_rating=1500,
             k_const=30
         ) # for use when ranking/rating models
-        self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         self.qinfer_model_class = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
         self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.gaussian_prior
         self.highest_num_qubits = 1

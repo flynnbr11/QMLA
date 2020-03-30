@@ -32,7 +32,7 @@ import sklearn
 import seaborn as sns
 
 import qmla.get_growth_rule as get_growth_rule
-import qmla.experimental_data_processing as expdt
+import qmla.shared_functionality.experimental_data_processing
 import qmla.shared_functionality.expectation_values
 import qmla.database_framework as database_framework
 
@@ -891,8 +891,8 @@ def r_squared_from_epoch_list(
     if max_time is None:
         max_time = max(exp_times)
 
-    min_time = expdt.nearest_experimental_time_available(exp_times, 0)
-    max_time = expdt.nearest_experimental_time_available(exp_times, max_time)
+    min_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(exp_times, 0)
+    max_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(exp_times, max_time)
     min_data_idx = exp_times.index(min_time)
     max_data_idx = exp_times.index(max_time)
     exp_times = exp_times[min_data_idx:max_data_idx]

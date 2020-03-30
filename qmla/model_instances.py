@@ -14,7 +14,6 @@ import qmla.redis_settings as rds
 import qmla.memory_tests
 import qmla.logging
 import qmla.get_growth_rule as get_growth_rule
-import qmla.experimental_data_processing
 import qmla.shared_functionality.prior_distributions
 import qmla.database_framework
 import qmla.analysis

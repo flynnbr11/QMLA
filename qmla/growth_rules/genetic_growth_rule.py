@@ -10,9 +10,7 @@ import pandas as pd
 import sklearn
 
 from qmla.growth_rules import growth_rule
-from qmla import experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation
-# from qmla import qmla.database_framework
 import qmla.database_framework
 
 import qmla.growth_rules.genetic_algorithm

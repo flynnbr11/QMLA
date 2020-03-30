@@ -6,7 +6,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=5
+num_tests=1
 qhl_test=1 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-exp=750
-prt=2500
+exp=5
+prt=20
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -80,14 +80,14 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='TestAllParticlesBayesFactors'
 # sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
-# sim_growth_rule='FermiHubbardPredetermined'
+sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
 # sim_growth_rule='Genetic'
 # sim_growth_rule='GeneticTest'
 # sim_growth_rule='Presentation'
 # sim_growth_rule='ExperimentReducedNV'
 # sim_growth_rule='example'
-sim_growth_rule='NVExperimentalData'
+# sim_growth_rule='NVExperimentalData'
 # sim_growth_rule='ExperimentNVCentre'
 
 ### Experimental growth rules 

@@ -4,7 +4,6 @@ import sys
 import os
 
 from qmla.growth_rules import growth_rule
-from qmla import experiment_design_heuristics
 import qmla.shared_functionality.topology
 import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
@@ -31,7 +30,6 @@ class ConnectedLattice(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        # self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.lattice_dimension = 2
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1

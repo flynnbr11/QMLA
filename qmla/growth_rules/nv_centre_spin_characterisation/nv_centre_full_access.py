@@ -3,7 +3,7 @@ import sys
 import os
 
 from qmla.growth_rules.growth_rule import GrowthRule
-from qmla import experiment_design_heuristics
+import qmla.shared_functionality.experiment_design_heuristics
 from qmla import database_framework
 
 __all__ = [
@@ -39,7 +39,7 @@ class ExperimentFullAccessNV(
 
             # 'zTi'
         ]
-        self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         # self.max_num_qubits = 3

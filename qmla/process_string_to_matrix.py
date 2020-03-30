@@ -1,16 +1,7 @@
 import numpy as np
-# import itertools as itr
-# import os as os
-# import sys as sys
-# import pandas as pd
-# import warnings
-# import copy
-# import time as time
 
-# import fermilib
 from fermilib.ops import FermionOperator
 import fermilib.transforms
-# from fermilib.transforms import get_sparse_operator
 
 from qmla import database_framework
 import qmla.logging
@@ -30,27 +21,19 @@ def log_print(
     )
 
 def process_basic_operator(basic_operator):
-    # # from qmla import model_generation
-    # from qmla import process_string_to_matrix   
-
     if basic_operator[0:1] == 'h_':
-        # import model_generation
         mtx = process_hubbard_operator(
             basic_operator
         )
-        # hopping_matrix(basic_operator)
     elif '1Dising' in basic_operator:
-        # import model_generation
         mtx = process_1d_ising(
             basic_operator
         )
     elif 'Heis' in basic_operator:
-        # import model_generation
         mtx = process_heisenberg_xyz(
             basic_operator
         )
     elif 'nv' in basic_operator:
-        # import model_generation
         mtx = process_n_qubit_NV_centre_spin(
             basic_operator
         )
@@ -63,7 +46,6 @@ def process_basic_operator(basic_operator):
             term=basic_operator
         )
     elif 'FH' in basic_operator:
-        # print("[DB] Processing hopping operator:", term)
         mtx = process_fermi_hubbard_term(
             term=basic_operator
         )

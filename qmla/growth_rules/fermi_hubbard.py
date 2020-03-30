@@ -4,7 +4,6 @@ import sys
 import os
 
 from qmla.growth_rules import connected_lattice
-from qmla import experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
 
@@ -40,7 +39,9 @@ class FermiHubbardBase(
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.FermiHubbard_single_spin_n_sites
 
         # self.max_time_to_consider = 20
-        self.max_num_qubits = 6
+        self.num_sites_true = database_framework.get_num_qubits(self.true_model)
+        self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
+        self.max_num_qubits = (self.num_sites_true * 2) + 2
         self.num_processes_to_parallelise_over = 9
         self.max_num_models_by_shape = {
             1: 0,

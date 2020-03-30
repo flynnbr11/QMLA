@@ -8,7 +8,7 @@ import copy
 import scipy as sp
 import qinfer as qi
 
-import qmla.experimental_data_processing
+import qmla.shared_functionality.experimental_data_processing
 import qmla.get_growth_rule
 import qmla.memory_tests
 import qmla.shared_functionality.probe_set_generation
@@ -438,12 +438,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     ],
                 )
                 raise
-
-            self.log_print(
-                [
-                    "Hamiltonian: {}".format(repr(ham))
-                ]
-            )
             for tId in range(len(t_list)):
                 t = t_list[tId]
                 if t > 1e6:  # Try limiting times to use to 1 million
@@ -540,7 +534,7 @@ class QInferNVCentreExperiment(QInferModelQMLA):
                 ]
             )
             try:
-                experimental_expec_value = qmla.experimental_data_processing.nearest_experimental_expect_val_available(
+                experimental_expec_value = qmla.shared_functionality.experimental_data_processing.nearest_experimental_expect_val_available(
                     times=self.experimental_measurement_times,
                     experimental_data=self.experimental_measurements,
                     t=time
@@ -582,7 +576,7 @@ class QInferNVCentreExperiment(QInferModelQMLA):
     ):
         # map times to experimentally available times
         mapped_times = [
-            qmla.experimental_data_processing.nearest_experimental_time_available(
+            qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(
                 times = self.experimental_measurement_times,
                 t = t
             )
