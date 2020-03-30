@@ -17,7 +17,7 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-exp=5
+exp=20
 prt=20
 pgh=1.0
 pgh_exponent=1.0
@@ -75,7 +75,7 @@ git_commit=$(git rev-parse HEAD)
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 # sim_growth_rule='IsingProbabilistic'
-sim_growth_rule='IsingPredetermined'
+# sim_growth_rule='IsingPredetermined'
 # sim_growth_rule='TestReducedParticlesBayesFactors'
 # sim_growth_rule='TestAllParticlesBayesFactors'
 # sim_growth_rule='HeisenbergXYZPredetermined'
@@ -87,7 +87,7 @@ sim_growth_rule='IsingPredetermined'
 # sim_growth_rule='Presentation'
 # sim_growth_rule='ExperimentReducedNV'
 # sim_growth_rule='example'
-# sim_growth_rule='NVExperimentalData'
+sim_growth_rule='NVExperimentalData'
 # sim_growth_rule='ExperimentNVCentre'
 
 ### Experimental growth rules 

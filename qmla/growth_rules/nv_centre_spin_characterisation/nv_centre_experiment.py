@@ -136,6 +136,7 @@ class NVCentreExperimentalData(
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = False
+        self.max_time_to_consider = 4.24
 
     def get_true_parameters(
         self,

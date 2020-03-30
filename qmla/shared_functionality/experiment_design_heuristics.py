@@ -1,6 +1,8 @@
 import qinfer as qi
 import numpy as np
 import scipy as sp
+import random 
+import math
 
 from inspect import currentframe, getframeinfo
 
@@ -47,8 +49,6 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
     def __call__(
         self,
         epoch_id=0,
-        num_params=1,
-        test_param=None,
         **kwargs
     ):
 
@@ -164,8 +164,6 @@ class TimeFromListHeuristic(qi.Heuristic):
     def __call__(
         self,
         epoch_id=0,
-        num_params=1,
-        test_param=None,
         **kwargs
     ):
 
@@ -215,6 +213,8 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         maxiters=10,
         other_fields=None,
         time_list=None,
+        max_time_to_enforce=10,
+        num_experiments=100,
         **kwargs
     ):
         super().__init__(updater)
@@ -228,16 +228,35 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
-        self._num_experiments = kwargs.get('num_experiments', 200)
+        # self._num_experiments = kwargs.get('num_experiments', 200)
+        self._num_experiments = num_experiments
         self._time_list = time_list
         self._len_time_list = len(self._time_list)
         self.num_epochs_for_first_phase = self._num_experiments / 2
+        print("Num experiments used: ", self._num_experiments)
+        # generate a list of times of length Ne/2
+        # evenly spaced between 0, max_time (from growth_rule)
+        # then every t in that list is learned upon once. 
+        # Higher Ne means finer granularity 
+        # times are leared in a random order (from random.shuffle below)
+        num_epochs_to_space_time_list = math.ceil(
+            self._num_experiments - self.num_epochs_for_first_phase
+        )
+        t_list = list(np.linspace(
+            0, 
+            max_time_to_enforce,
+            num_epochs_to_space_time_list + 1
+        ))
+        t_list.remove(0)  # dont want to waste an epoch on t=0
+        t_list = [np.round(t, 2) for t in t_list]
+        random.shuffle(t_list)
+        print("Hueristic - time list:", t_list)
+        self._time_list = iter( t_list )
+        
 
     def __call__(
         self,
         epoch_id=0,
-        num_params=1,
-        test_param=None,
         **kwargs
     ):
 
@@ -271,8 +290,9 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
                 1 / sigma**self._pgh_exponent
             )
         else:
-            time_id = epoch_id % self._len_time_list
-            new_time = self._time_list[time_id]
+            # time_id = epoch_id % self._len_time_list
+            # new_time = self._time_list[time_id]
+            new_time = next(self._time_list)
         eps[self._t] = new_time
         return eps
 
@@ -314,8 +334,6 @@ class InverseEigenvalueHeuristic(qi.Heuristic):
     def __call__(
         self,
         epoch_id=0,
-        num_params=1,
-        test_param=None,
         **kwargs
     ):
         print(

@@ -392,7 +392,8 @@ class ModelInstanceForLearning():
             in self.qinfer_model.expparams_dtype[1:]
         ]
 
-        self.model_heuristic = self.growth_class.model_heuristic_function(
+        # self.model_heuristic = self.growth_class.model_heuristic_function(
+        self.model_heuristic = self.growth_class.heuristic(
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
             inv_field=self.inversion_field,
@@ -400,6 +401,7 @@ class ModelInstanceForLearning():
             pgh_exponent=self.qinfer_PGH_heuristic_exponent,
             time_list=self.times_to_plot,
             num_experiments=self.num_experiments,
+            max_time_to_enforce=self.growth_class.max_time_to_consider
         )
         self.model_heuristic_class = self.model_heuristic.__class__.__name__
 
@@ -468,7 +470,6 @@ class ModelInstanceForLearning():
             else:
                 param_estimates = self.track_mean_params[-1]
             self.new_experiment = self.model_heuristic(
-                test_param="from Model class",
                 num_params=len(self.model_terms_names),
                 epoch_id=istep,
                 current_params=param_estimates
