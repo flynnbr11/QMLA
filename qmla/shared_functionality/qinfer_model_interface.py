@@ -346,7 +346,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         particles, 
         # **kwargs
     ):
-        self.log_print(["True pr0"])
         operator_list = self._true_oplist
         ham_num_qubits = self._true_dim
         # format of probe dict keys: (probe_id, qubit_number)
@@ -369,7 +368,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         times,
         # **kwargs
     ):
-        self.log_print(["Simulator pr0"])
         ham_num_qubits = self.model_dimension
         # format of probe dict keys: (probe_id, qubit_number)
         probe = self.sim_probe_dict[
