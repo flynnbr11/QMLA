@@ -38,6 +38,8 @@ class IsingProbabilistic(
             # 'y',
             'z'
         ]
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.max_time_to_consider = 50
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # at each generation Badassness parameter
         self.num_top_models_to_build_on = 'all'
@@ -49,6 +51,11 @@ class IsingProbabilistic(
         self.tree_completed_initially = False
         self.num_processes_to_parallelise_over = 10
         
+        self.true_model_terms_params = {
+            'pauliSet_zJz_1J2_d4': 0.61427723297770065, 
+            'pauliSet_zJz_2J3_d4': 0.12996320356092372, 
+            'pauliSet_zJz_3J4_d4': 0.18011186731750234
+        }
         self.max_num_models_by_shape = {
             'other': 3
         }
@@ -81,9 +88,10 @@ class IsingPredetermined(
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
         self.max_num_sites = 6
-        # self.max_time_to_consider = 50
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
+        # test heuristic -- force all times to be considered
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic 
         # self.true_model = 'pauliSet_zJz_1J2_d2'
         # self.true_model = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
         # self.true_model = 'pauliSet_zJz_1J2_d6PPPPPPpauliSet_zJz_2J3_d6PPPPPPpauliSet_zJz_3J4_d6PPPPPPpauliSet_zJz_4J5_d6PPPPPPpauliSet_zJz_5J6_d6'
@@ -96,11 +104,6 @@ class IsingPredetermined(
         self.base_terms = [
             'z'
         ]
-        self.true_model_terms_params = {
-            'pauliSet_zJz_1J2_d4': 0.61427723297770065, 
-            'pauliSet_zJz_2J3_d4': 0.12996320356092372, 
-            'pauliSet_zJz_3J4_d4': 0.18011186731750234
-        }
 
 
         self.setup_growth_class()

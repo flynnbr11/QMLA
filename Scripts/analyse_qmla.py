@@ -580,7 +580,7 @@ try:
         save_to_file=str(
             directory_to_analyse +
             plot_desc +
-            'times_histogram.png'
+            'times_learned_upon.png'
         )
     )
 except:

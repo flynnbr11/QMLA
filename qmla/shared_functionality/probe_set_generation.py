@@ -372,7 +372,8 @@ def separable_fermi_hubbard_half_filled(
     Generates separable probes in N sites;
         then projects so that for each dimension
         the probe is projected onto the subspace of n
-        fermions on the n dimensional space.
+        fermions on the n dimensional space, 
+        i.e. the half-filled basis. 
     
     :param int max_num_qubits: Largest number of qubits to generate probes up to.
     :param int  num_probes: How many probes to produce. 
@@ -446,6 +447,8 @@ def get_half_filled_basis_vectors(
 
 def random_superposition_occupation_basis():
     r"""
+    Returns a random superposition over the occupation basis of a single site
+        which can be singly or doubly occupied.
 
     vacant = np.array([1,0])
     occupied = np.array([0,1])
@@ -494,7 +497,6 @@ def fermi_hubbard_half_filled_superposition(
     max_num_qubits,
     **kwargs
 ):
-    print("[fermi_hubbard_half_filled_superposition] num q:", max_num_qubits)
     num_sites = max_num_qubits
     probe_dict = {}
     for N in range(1, 1 + num_sites):

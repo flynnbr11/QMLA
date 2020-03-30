@@ -217,7 +217,7 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         time_list=None,
         **kwargs
     ):
-        super(MixedMultiParticleLinspaceHeuristic, self).__init__(updater)
+        super().__init__(updater)
         self._oplist = oplist
         self._norm = norm
         self._x_ = inv_field
