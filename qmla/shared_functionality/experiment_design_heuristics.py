@@ -232,8 +232,9 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         self._num_experiments = num_experiments
         self._time_list = time_list
         self._len_time_list = len(self._time_list)
+        self._max_time_to_enforce = max_time_to_enforce
+        self.count_number_high_times_suggested = 0 
         self.num_epochs_for_first_phase = self._num_experiments / 2
-        print("Num experiments used: ", self._num_experiments)
         # generate a list of times of length Ne/2
         # evenly spaced between 0, max_time (from growth_rule)
         # then every t in that list is learned upon once. 
@@ -250,7 +251,6 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         t_list.remove(0)  # dont want to waste an epoch on t=0
         t_list = [np.round(t, 2) for t in t_list]
         random.shuffle(t_list)
-        print("Hueristic - time list:", t_list)
         self._time_list = iter( t_list )
         
 
@@ -293,6 +293,15 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
             # time_id = epoch_id % self._len_time_list
             # new_time = self._time_list[time_id]
             new_time = next(self._time_list)
+        
+        if new_time > self._max_time_to_enforce:
+            self.count_number_high_times_suggested += 1
+        
+        if epoch_id == self._num_experiments - 1 : 
+            print(
+                "Number of suggested t > t_max:", self.count_number_high_times_suggested 
+            )
+        
         eps[self._t] = new_time
         return eps
 
