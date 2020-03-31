@@ -450,7 +450,7 @@ try:
     )
 except:
     print("ANALYSIS FAILURE: Counting term occurences.")
-    raise
+
 
 # Evaluation: log likelihoods of considered models, compared with champion/true
 try:
@@ -461,8 +461,6 @@ try:
     )
 except: 
     print("ANALYSIS FAILURE: Evaluation log likleihoods.")
-    # pass
-    raise
 
 
 # model statistics histograms (f-score, precision, sensitivty)
