@@ -443,14 +443,25 @@ except:
     print("ANALYSIS FAILURE: plotting model statistics.")
     raise
 
+try:
+    qmla.analysis.count_term_occurences(
+        combined_results = combined_results, 
+        save_directory = directory_to_analyse
+    )
+except:
+    print("ANALYSIS FAILURE: Counting term occurences.")
+    raise
+
 # Evaluation: log likelihoods of considered models, compared with champion/true
 try:
     qmla.analysis.plot_evaluation_log_likelihoods(
         combined_results = combined_results, 
-        save_directory=directory_to_analyse
+        save_directory = directory_to_analyse,
+        include_median_likelihood=False, 
     )
 except: 
     print("ANALYSIS FAILURE: Evaluation log likleihoods.")
+    # pass
     raise
 
 

@@ -455,7 +455,7 @@ class ModelInstanceForLearning():
             param_indices[op_name] = self.model_terms_names.index(op_name)
 
         print_frequency = max(
-            int(self.num_experiments / 10),
+            int(self.num_experiments / 5),
             5
         )
         for istep in range(self.num_experiments):
@@ -755,7 +755,6 @@ class ModelInstanceForLearning():
         self.log_print(
             [
                 "Learned parameters:", learned_params, 
-                "\nlearned Hamiltonian:\n", self.learned_hamiltonian
             ]
         )
 

@@ -153,6 +153,11 @@ class QuantumModelLearningAgent():
         self.true_model_dimension = database_framework.get_num_qubits(
             self.true_model_name)
         self.true_model_constituent_operators = self.qmla_controls.true_model_terms_matrices
+        self.true_model_constituent_terms_latex = [
+            self.growth_class.latex_name(term)
+            for term in 
+            qmla.database_framework.get_constituent_names_from_name(self.true_model_name)
+        ]
         self.true_model_num_params = self.qmla_controls.true_model_class.num_constituents
         self.true_param_list = self.growth_class.true_params_list
         self.true_param_dict = self.growth_class.true_params_dict
@@ -757,7 +762,7 @@ class QuantumModelLearningAgent():
             self.model_database, model_id)
 
     def update_database_model_info(self):
-        for mod_id in range(self.highest_model_id):
+        for mod_id in self.models_learned:
             try:
                 # TODO remove this try/except when reduced-champ-model instance
                 # is update-able
@@ -2046,92 +2051,38 @@ class QuantumModelLearningAgent():
             raise NameError('Remote QML Failure')
 
     def finalise_qmla(self):
-        # Final functions at end of QMD
-        # Fill in champions result dict for further analysis.
+        # Final functions at end of QMLA instance
 
         champ_model = self.get_model_storage_instance_by_id(
             self.champion_model_id)
         
+        # Get metrics for all models tested
         for i in range(self.highest_model_id):
             # Dict of all Bayes factors for each model considered.
             self.all_bayes_factors[i] = (
                 self.get_model_storage_instance_by_id(i).model_bayes_factors
             )
             self.compute_model_f_score(i)
-        # self.f_score = self.model_f_scores[self.champion_model_id]            
         self.get_statistical_metrics()
 
-        self.log_print(["computing expect vals for mod ", champ_model.model_id])
-        champ_model.compute_expectation_values(
-            times=self.times_to_plot,
-            # plot_probe_path = self.probes_plot_file
-        )
-        self.log_print(["computed expect vals"])
-
-        self.ChampionFinalParams = (
-            champ_model.final_learned_params
-        )
-
-        champ_op = database_framework.Operator(self.ChampionName)
-        num_params_champ_model = champ_op.num_constituents
-
-        correct_model = misfit = underfit = overfit = 0
-        self.log_print(
-            [
-                "Num params - champ:", num_params_champ_model,
-                "; \t true:", self.true_model_num_params]
-        )
-
+        # Prepare model/name maps
         self.model_id_to_name_map = {}
         for k in self.model_name_id_map:
             v = self.model_name_id_map[k]
             self.model_id_to_name_map[v] = k
 
-        if database_framework.alph(
-                self.ChampionName) == database_framework.alph(self.true_model_name):
-            correct_model = 1
-        elif (
-            num_params_champ_model == self.true_model_num_params
-            and
-            database_framework.alph(
-                self.ChampionName) != database_framework.alph(
-                self.true_model_name)
-        ):
-            misfit = 1
-        elif num_params_champ_model > self.true_model_num_params:
-            overfit = 1
-        elif num_params_champ_model < self.true_model_num_params:
-            underfit = 1
+    def get_results_dict(
+        self, 
+        model_id=None
+    ):
+        if model_id is None:
+            model_id = self.champion_model_id
 
-        num_params_difference = self.true_model_num_params - num_params_champ_model
-        num_qubits_champ_model = database_framework.get_num_qubits(
-            self.ChampionName)
-        self.LearnedParamsChamp = (
-            self.get_model_storage_instance_by_id(
-                self.champion_model_id).learned_parameters_qhl
-        )
-        self.champ_final_sigmas = (
-            self.get_model_storage_instance_by_id(
-                self.champion_model_id).final_sigmas_qhl
-        )
-        number_hamiltonians_to_exponentiate = (
-            self.num_particles *
-            (self.num_experiments + self.num_experiments_for_bayes_updates)
-        )
+        mod = self.get_model_storage_instance_by_id(model_id)
+        model_name = mod.model_name
 
-        config = str('config' +
-                     '_p' + str(self.num_particles) +
-                     '_e' + str(self.num_experiments) +
-                     '_b' + str(self.num_experiments_for_bayes_updates) +
-                     '_ra' + str(self.qinfer_resampler_a) +
-                     '_rt' + str(self.qinfer_resample_threshold) +
-                     '_rp' + str(self.qinfer_PGH_heuristic_factor)
-                     )
-
-        time_now = time.time()
-        time_taken = time_now - self._start_time
-
-        n_qubits = database_framework.get_num_qubits(champ_model.model_name)
+        # Get expectation values of this model
+        n_qubits = database_framework.get_num_qubits(model_name)
         if n_qubits > 3:
             # only compute subset of points for plot
             # otherwise takes too long
@@ -2150,8 +2101,14 @@ class QuantumModelLearningAgent():
             )
             expec_val_plot_times = self.times_to_plot
 
-        self.champion_name_latex = champ_model.model_name_latex
-        self.growth_class.growth_rule_finalise()
+        mod.compute_expectation_values(
+            times=expec_val_plot_times,
+        )
+
+        # Perform final steps in GrowthRule
+        self.growth_class.growth_rule_finalise() # TODO put in main QMLA/QHL method
+
+        # Evaluate all models in this instance
         model_evaluation_log_likelihoods = {
             mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_log_likelihood
             for mod_id in self.models_learned
@@ -2160,64 +2117,90 @@ class QuantumModelLearningAgent():
             mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_median_likelihood
             for mod_id in self.models_learned
         }
-        # equivalent to self.champion_results
-        self.champion_results = {
-            'NameAlphabetical': database_framework.alph(self.ChampionName),
-            'NameNonAlph': self.ChampionName,
-            'FinalParams': self.ChampionFinalParams,
-            'LatexName': champ_model.model_name_latex,
+
+        # compare this model to the true model
+        # (only meaningful for simulated cases)
+        correct_model = misfit = underfit = overfit = 0
+        model_operator = database_framework.Operator(model_name)
+        num_params_champ_model = model_operator.num_constituents
+
+        if model_name == self.true_model_name:
+            correct_model = 1
+        elif (
+            num_params_champ_model == self.true_model_num_params
+            and
+            model_name != self.true_model_name
+        ):
+            misfit = 1
+        elif num_params_champ_model > self.true_model_num_params:
+            overfit = 1
+        elif num_params_champ_model < self.true_model_num_params:
+            underfit = 1
+        num_params_difference = self.true_model_num_params - num_params_champ_model
+        
+        # Summarise the results of this model and instance in a dictionary
+        time_taken = time.time() - self._start_time
+        results_dict = {
+            # details about QMLA instance:
+            'QID': self.qmla_id,
             'NumParticles': self.num_particles,
-            'NumExperiments': champ_model.num_experiments,
+            'NumExperiments': mod.num_experiments,
             'NumBayesTimes': self.num_experiments_for_bayes_updates,
             'ResampleThreshold': self.qinfer_resample_threshold,
             'ResamplerA': self.qinfer_resampler_a,
             'PHGPrefactor': self.qinfer_PGH_heuristic_factor,
-            'LogFile': self.log_file,
-            'ParamConfiguration': config,
             'ConfigLatex': self.latex_config,
+            'Heuristic': mod.model_heuristic_class,
             'Time': time_taken,
-            'QID': self.qmla_id,
-            'ChampID': self.champion_model_id,
-            'CorrectModel': correct_model,
-            'Underfit': underfit,
-            'Overfit': overfit,
-            'Misfit': misfit,
-            'NumQubits': num_qubits_champ_model,
-            'NumParams': num_params_champ_model,
-            'LearnedParameters': self.LearnedParamsChamp,
-            'FinalSigmas': self.champ_final_sigmas,
-            'QuadraticLosses': champ_model.quadratic_losses_record,
-            'ExpectationValues': champ_model.expectation_values,
-            'Trackplot_parameter_estimates': champ_model.track_parameter_estimates,
-            'TrackVolume': champ_model.volume_by_epoch,
-            'TrackTimesLearned': champ_model.times_learned_over,
-            'FinalRSquared': champ_model.r_squared(
-                plot_probes=self.probes_for_plots,
-                times=expec_val_plot_times
-            ),
-            'Fscore': self.model_f_scores[self.champion_model_id],
-            'Precision': self.model_precisions[self.champion_model_id],
-            'Sensitivity': self.model_sensitivities[self.champion_model_id],
-            'PValue': champ_model.p_value,
-            'LearnedHamiltonian': champ_model.learned_hamiltonian,
-            'GrowthGenerator': champ_model.growth_rule_of_this_model,
-            'Heuristic': champ_model.model_heuristic_class,
-            'ChampLatex': champ_model.model_name_latex,
-            'TrueModel': database_framework.alph(self.true_model_name),
-            'NumParamDifference': num_params_difference,
+            # details about true model:
+            'TrueModel' : self.true_model_name,
             'TrueModelConsidered' : self.true_model_considered, 
             'TrueModelFound' : self.true_model_found,
             'TrueModelBranch' : self.true_model_branch,
             'TrueModelID' : self.true_model_id, 
+            'TrueModelConstituentTerms' : self.true_model_constituent_terms_latex, 
+            # details about this model 
+            # (called champion assuming method called for champion
+            # following QMLA):
+            'ChampID': model_id,
+            'ChampLatex': mod.model_name_latex,
+            'ConstituentTerms' : mod.constituents_terms_latex,
+            'LearnedHamiltonian': mod.learned_hamiltonian,
+            'GrowthGenerator': mod.growth_rule_of_this_model,
+            'NameAlphabetical': database_framework.alph(mod.model_name),
+            'LearnedParameters': mod.learned_parameters_qhl,
+            'FinalSigmas': mod.final_sigmas_qhl,
+            'ExpectationValues': mod.expectation_values,
+            'Trackplot_parameter_estimates': mod.track_parameter_estimates,
+            'TrackVolume': mod.volume_by_epoch,
+            'TrackTimesLearned': mod.times_learned_over,
+            'QuadraticLosses': mod.quadratic_losses_record,
+            'FinalRSquared': mod.r_squared(
+                times=expec_val_plot_times,
+                plot_probes=self.probes_for_plots
+            ),
+            'Fscore': self.model_f_scores[model_id],
+            'Precision': self.model_precisions[model_id],
+            'Sensitivity': self.model_sensitivities[model_id],
+            'PValue': mod.p_value,
+            # comparison to true model (for simulated cases)
+            'NumParamDifference': num_params_difference,
+            'Underfit': underfit,
+            'Overfit': overfit,
+            'Misfit': misfit,
+            'CorrectModel': correct_model,
+            # about QMLA's learning procedure:
             'NumModels' : len(self.models_learned),
             'StatisticalMetrics' : self.generational_statistical_metrics,
             'GenerationalFscore'  : self.generational_f_score,
             'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
             'ModelEvaluationLogLikelihoods' : model_evaluation_log_likelihoods,
             'ModelEvaluationMedianLikelihoods' : model_evaluation_median_likelihoods,
-            'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
             'AllModelFScores' : self.model_f_scores, 
+            # data stored during GrowthRule.growth_rule_finalise():
+            'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
         }
+        return results_dict
 
     def check_champion_reducibility(
         self,
@@ -2462,105 +2445,14 @@ class QuantumModelLearningAgent():
             ]
         )
         mod = self.get_model_storage_instance_by_id(mod_id)
-        self.log_print(["Mod (reduced) name:", mod.model_name])
-        mod.model_update_learned_values()
-
-        n_qubits = database_framework.get_num_qubits(mod.model_name)
-        if n_qubits > 3:
-            # only compute subset of points for plot
-            # otherwise takes too long
-            self.log_print(
-                [
-                    "getting new set of times to plot expectation values for"
-                ]
-            )
-            expec_val_plot_times = self.times_to_plot_reduced_set
-        else:
-            self.log_print(
-                [
-                    "Using default times to plot expectation values for",
-                    "num qubits:", n_qubits
-                ]
-            )
-            expec_val_plot_times = self.times_to_plot
-
-        mod.compute_expectation_values(
-            times=expec_val_plot_times,
-        )
-        self.log_print(
-            [
-                "Finished computing expectation values for", mod.model_name,
-            ]
-        )
+        self.update_database_model_info()
+        # mod.model_update_learned_values()
 
         self.compute_model_f_score(
             model_id=mod_id
         )
-        # self.f_score = self.model_f_scores[self.champion_model_id]
         self.get_statistical_metrics()
-        self.growth_class.growth_rule_finalise()
-        model_evaluation_log_likelihoods = {
-            mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_log_likelihood
-            for mod_id in self.models_learned
-        }
-        model_evaluation_median_likelihoods = {
-            mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_median_likelihood
-            for mod_id in self.models_learned
-        }
 
-        time_now = time.time()
-        time_taken = time_now - self._start_time
-        self.champion_results = {
-            'NumParticles': self.num_particles,
-            'NumExperiments': mod.num_experiments,
-            'NumBayesTimes': self.num_experiments_for_bayes_updates,
-            'ResampleThreshold': self.qinfer_resample_threshold,
-            'ResamplerA': self.qinfer_resampler_a,
-            'PHGPrefactor': self.qinfer_PGH_heuristic_factor,
-            'ConfigLatex': self.latex_config,
-            'Time': time_taken,
-            'QID': self.qmla_id,
-            'RSquaredTrueModel': mod.r_squared(
-                times=expec_val_plot_times,
-                plot_probes=self.probes_for_plots
-            ),
-            'QuadraticLosses': mod.quadratic_losses_record,
-            'NameAlphabetical': database_framework.alph(mod.model_name),
-            'LearnedParameters': mod.learned_parameters_qhl,
-            'FinalSigmas': mod.final_sigmas_qhl,
-            'Trackplot_parameter_estimates': mod.track_parameter_estimates,
-            'TrackVolume': mod.volume_by_epoch,
-            'TrackTimesLearned': mod.times_learned_over,
-            'ChampID': self.champion_model_id,
-            'ExpectationValues': mod.expectation_values,
-            'FinalRSquared': mod.final_r_squared,
-            'Fscore': self.model_f_scores[mod_id],
-            'Precision': self.model_precisions[mod_id],
-            'Sensitivity': self.model_sensitivities[mod_id],
-            'p-value': mod.p_value,
-            'LearnedHamiltonian': mod.learned_hamiltonian,
-            'GrowthGenerator': mod.growth_rule_of_this_model,
-            'Heuristic': mod.model_heuristic_class,
-            'ChampLatex': mod.model_name_latex,
-            'TrueModelConsidered' : self.true_model_considered, 
-            'TrueModelFound' : self.true_model_found,
-            'TrueModelBranch' : self.true_model_branch,
-            'TrueModelID' : self.true_model_id, 
-            'NumModels' : len(self.models_learned),
-            'StatisticalMetrics' : self.generational_statistical_metrics,
-            'GenerationalFscore'  : self.generational_f_score,
-            'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
-            'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
-            'AllModelFScores' : self.model_f_scores, 
-            'ModelEvaluationLogLikelihoods' : model_evaluation_log_likelihoods,
-            'ModelEvaluationMedianLikelihoods' : model_evaluation_median_likelihoods
-        }
-
-        self.log_print(
-            [
-                "Stored results dict. Finished testQHL function"
-            ]
-        )
 
     def run_quantum_hamiltonian_learning_multiple_models(
             self, model_names=None):
@@ -2622,13 +2514,12 @@ class QuantumModelLearningAgent():
                 sleep(0.01)
                 self.inspect_remote_job_crashes()
 
+        # Learning finished
         self.log_print(
             [
-                'Finished waiting on queue, for all:', running_models,
+                'Finished learning, for all:', running_models,
             ]
         )
-        time_now = time.time()
-        time_taken = time_now - self._start_time
 
         for mod_name in model_names:
             mod_id = database_framework.model_id_from_name(
@@ -2641,97 +2532,12 @@ class QuantumModelLearningAgent():
             self.compute_model_f_score(
                 model_id=mod_id
             )
-            n_qubits = database_framework.get_num_qubits(mod.model_name)
-            if n_qubits > 5:
-                # only compute subset of points for plot
-                # otherwise takes too long
-                expec_val_plot_times = self.times_to_plot_reduced_set
-            else:
-                expec_val_plot_times = self.times_to_plot
-
-            mod.compute_expectation_values(
-                times=expec_val_plot_times,
-            )
-
         self.get_statistical_metrics()
         self.growth_class.growth_rule_finalise()
-        model_evaluation_log_likelihoods = {
-            mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_log_likelihood
-            for mod_id in self.models_learned
-        }
-        model_evaluation_median_likelihoods = {
-            mod_id : self.get_model_storage_instance_by_id(mod_id).evaluation_median_likelihood
-            for mod_id in self.models_learned
-        }
-
-        for mod_name in model_names:
-            mod_id = database_framework.model_id_from_name(
-                db=self.model_database, name=mod_name
-            )
-            mod = self.get_model_storage_instance_by_id(mod_id)
-            # for this stage, consider the considered model as champion
-            self.champion_model_id = mod_id
-            # self.f_score = self.model_f_scores[self.champion_model_id]
-
-            # equivalent to self.champion_results
-            mod.results_dict = {
-                'NumParticles': mod.num_particles,
-                'NumExperiments': mod.num_experiments,
-                'NumBayesTimes': self.num_experiments_for_bayes_updates,
-                'ResampleThreshold': self.qinfer_resample_threshold,
-                'ResamplerA': self.qinfer_resampler_a,
-                'PHGPrefactor': self.qinfer_PGH_heuristic_factor,
-                'ConfigLatex': self.latex_config,
-                'Time': time_taken,
-                'QID': self.qmla_id,
-                'ChampID': self.champion_model_id,
-                'QuadraticLosses': mod.quadratic_losses_record,
-                'RSquaredTrueModel': mod.r_squared(
-                    plot_probes=self.probes_for_plots,
-                    times=expec_val_plot_times
-                ),
-                'NameAlphabetical': database_framework.alph(mod.model_name),
-                'LearnedParameters': mod.learned_parameters_qhl,
-                'FinalSigmas': mod.final_sigmas_qhl,
-                'Trackplot_parameter_estimates': mod.track_parameter_estimates,
-                'TrackVolume': mod.volume_by_epoch,
-                'TrackTimesLearned': mod.times_learned_over,
-                # 'TrackCovarianceMatrices' : mod.track_covariance_matrices,
-                'ExpectationValues': mod.expectation_values,
-                # 'RSquaredByEpoch' : mod.r_squared_by_epoch(
-                #     times = expec_val_plot_times,
-                #     plot_probes = self.probes_for_plots
-                # ),
-                # 'FinalRSquared' : mod.final_r_squared,
-                'FinalRSquared': mod.r_squared(
-                    plot_probes=self.probes_for_plots,
-                    times=expec_val_plot_times
-                ),
-                'p-value': mod.p_value,
-                'Fscore': self.model_f_scores[mod_id],
-                'Precision': self.model_precisions[mod_id],
-                'Sensitivity': self.model_sensitivities[mod_id],
-                'LearnedHamiltonian': mod.learned_hamiltonian,
-                'GrowthGenerator': mod.growth_rule_of_this_model,
-                'Heuristic': mod.model_heuristic_class,
-                'ChampLatex': mod.model_name_latex,
-                'TrueModelConsidered' : self.true_model_considered, 
-                'TrueModelFound' : self.true_model_found,
-                'TrueModelBranch' : self.true_model_branch,
-                'TrueModelID' : self.true_model_id, 
-                'NumModels' : len(self.models_learned),
-                'StatisticalMetrics' : self.generational_statistical_metrics,
-                'GenerationalFscore'  : self.generational_f_score,
-                'GenerationalLogLikelihoods' : self.generational_log_likelihoods, 
-                'GrowthRuleStorageData' : self.growth_class.growth_rule_specific_data_to_store,
-                'AllModelFScores' : self.model_f_scores, 
-                'ModelEvaluationLogLikelihoods' : model_evaluation_log_likelihoods,
-                'ModelEvaluationMedianLikelihoods' : model_evaluation_median_likelihoods
-            }
-            self.model_id_to_name_map = {}
-            for k in self.model_name_id_map:
-                v = self.model_name_id_map[k]
-                self.model_id_to_name_map[v] = k
+        self.model_id_to_name_map = {}
+        for k in self.model_name_id_map:
+            v = self.model_name_id_map[k]
+            self.model_id_to_name_map[v] = k
 
     def run_complete_qmla(
         self,

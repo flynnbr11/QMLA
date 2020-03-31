@@ -182,35 +182,36 @@ if qmla_controls.qhl_mode:
             qmla_instance.true_model_id
         )
 
-    log_print(
-        [
-            "Plotting Dynamics",
-        ],
-    )
-    qmla_instance.plot_branch_champions_dynamics(
-        include_bayes_factors_in_dynamics_plots=False,
-        include_param_estimates_in_dynamics_plots=True,
-        include_times_learned_in_dynamics_plots=True,
-        save_to_file=str(
-            qmla_controls.plots_directory +
-            'dynamics_' +
-            str(qmla_controls.long_id) +
-            '.png'
-        )
-    )
-    log_print(
-        [
-            "Finished plotting dynamics",
-        ],
-    )
+    # log_print(
+    #     [
+    #         "Plotting Dynamics",
+    #     ],
+    # )
+    # qmla_instance.plot_branch_champions_dynamics(
+    #     include_bayes_factors_in_dynamics_plots=False,
+    #     include_param_estimates_in_dynamics_plots=True,
+    #     include_times_learned_in_dynamics_plots=True,
+    #     save_to_file=str(
+    #         qmla_controls.plots_directory +
+    #         'dynamics_' +
+    #         str(qmla_controls.long_id) +
+    #         '.png'
+    #     )
+    # )
+    # log_print(
+    #     [
+    #         "Finished plotting dynamics",
+    #     ],
+    # )
 
-    true_mod = qmla_instance.get_model_storage_instance_by_id(
-        qmla_instance.true_model_id
-    )
+    # true_mod = qmla_instance.get_model_storage_instance_by_id(
+    #     qmla_instance.true_model_id
+    # )
 
     results_file = qmla_controls.results_file
     pickle.dump(
-        qmla_instance.champion_results,
+        # qmla_instance.champion_results,
+        qmla_instance.get_results_dict(),
         open(results_file, "wb"),
         protocol=4
     )
@@ -254,14 +255,20 @@ elif (
             qmla_controls.results_directory +
             output_prefix +
             'results_' +
-            str(name) + '_' +
-            str(qmla_controls.long_id) +
-            '.p'
+            str("m{}_q{}.p".format(
+                mid, 
+                qmla_controls.long_id
+                )
+            )
+            # + '_' +
+            # str(qmla_controls.long_id) +
+            # '.p'
         )
         print("[Exp] results file:", results_file)
 
         pickle.dump(
-            mod.results_dict,
+            # mod.results_dict,
+            qmla_instance.get_results_dict(model_id = mid),
             open(results_file, "wb"),
             protocol=4
         )
@@ -450,7 +457,8 @@ else:
 
     results_file = qmla_controls.results_file
     pickle.dump(
-        qmla_instance.champion_results,
+        # qmla_instance.champion_results,
+        qmla_instance.get_results_dict(),
         open(results_file, "wb"),
         protocol=4
     )

@@ -250,16 +250,13 @@ def remote_bayes_factor_calculation(
             except BaseException:
                 raise
                 # pass
-
         log_print(
             [
-                "BF computed: A:{}; B:{}; BF:{}".format(
+                "BF computed: A:{}; B:{}; log10 BF={}".format(
                     model_a_id,
                     model_b_id,
-                    np.round(bayes_factor, 2)
-                ),
-                "\tReset remormalisation record:",
-                set_renorm_record_to_zero
+                    np.round(np.log10(bayes_factor), 2)
+                )
             ]
         )
         if bayes_factor < 1e-160:
@@ -286,13 +283,9 @@ def remote_bayes_factor_calculation(
 
         if branch_id is not None:
             # only want to fill these lists when comparing models within branch
-            # log_print(["Redis INCR active_branches_bayes branch:", branch_id])
             active_branches_bayes.incr(int(branch_id), 1)
         else:
             active_interbranch_bayes.set(pair_id, True)
-            # log_print(["Redis SET active_interbranch_bayes pair:", pair_id,
-            #     "; set:True"]
-            # )
         time_end = time.time()
         log_print(
             [
@@ -300,7 +293,6 @@ def remote_bayes_factor_calculation(
                 str(time_end - time_start)
             ]
         )
-
         return bayes_factor
 
 def log_print(

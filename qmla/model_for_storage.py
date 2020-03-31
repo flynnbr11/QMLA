@@ -55,16 +55,11 @@ class ModelInstanceForStorage():
         self.redis_port_number = port_number
         self.qmla_id = qid
         self.log_file = log_file
-        self.model_name = model_name
+        self.model_name = qmla.database_framework.alph(model_name)
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
 
         if qmla_core_info_database is None: 
-            self.log_print(
-                [
-                    'QMLA core info DB is None; retrieveing from redis.'
-                ]
-            )
             redis_databases = rds.get_redis_databases_by_qmla_id(
                 self.redis_host_name,
                 self.redis_port_number,
@@ -221,10 +216,16 @@ class ModelInstanceForStorage():
             except BaseException:
                 raise
             self.model_heuristic_class = learned_info['heuristic']
-
             self.model_name_latex = self.growth_class.latex_name(
                 name=self.model_name
             )
+            model_constituent_terms = qmla.database_framework.get_constituent_names_from_name(
+                self.model_name
+            )
+            self.constituents_terms_latex = [
+                self.growth_class.latex_name(term)
+                for term in model_constituent_terms
+            ]
 
             self.track_parameter_estimates = {}
             num_params = np.shape(self.track_mean_params)[1]

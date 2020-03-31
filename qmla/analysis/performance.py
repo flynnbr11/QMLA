@@ -3,12 +3,14 @@ import argparse
 import sys
 import os
 import pickle
+import csv
 import pandas as pd
 import seaborn as sns
 
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.gridspec import GridSpec
+import scipy
 
 import qmla.database_framework
 
@@ -20,12 +22,11 @@ __all__ = [
     'plot_scores',
     'stat_metrics_histograms',
     'parameter_sweep_analysis',
-    'plot_evaluation_log_likelihoods'
+    'plot_evaluation_log_likelihoods',
+    'count_term_occurences',
 ]
 
 def update_shared_bayes_factor_csv(qmd, all_bayes_csv):
-    import os
-    import csv
     data = get_bayes_latex_dict(qmd)
     names = list(data.keys())
     fields = ['ModelName']
@@ -847,11 +848,13 @@ def plot_evaluation_log_likelihoods(
     combined_results, 
     include_log_likelihood = True,
     include_median_likelihood = True,
+    include_champion_percentiles = True,
     save_directory=None,
 ):
     evaluation_cols = [
         'instance', 'model_id', 
         'log_likelihood', 'median_likelihood',
+        'likelihood_percentile',
         'f_score', 'true', 'champ', 'Classification'
     ]
     evaluation_plot_df = pd.DataFrame(
@@ -861,6 +864,7 @@ def plot_evaluation_log_likelihoods(
         res = combined_results.iloc[i]
 
         log_lls = eval(res.ModelEvaluationLogLikelihoods)
+        raw_lls = list(log_lls.values())
         median_lls = eval(res.ModelEvaluationMedianLikelihoods)
         f_scores = eval(res.AllModelFScores)
 
@@ -883,6 +887,10 @@ def plot_evaluation_log_likelihoods(
             else:
                 model_classification = 'Standard'
 
+            ll_percentile = scipy.stats.percentileofscore(
+                a = raw_lls, 
+                score = log_lls[mod]
+            )
             this_mod_df = pd.DataFrame(
                 [[
                     i, # for some reason instance causes a shift between the two plot types?
@@ -890,6 +898,7 @@ def plot_evaluation_log_likelihoods(
                     mod, 
                     log_lls[mod],
                     median_lls[mod],
+                    ll_percentile, 
                     f_scores[mod],
                     mod==instance_true_id,
                     mod==instance_champion_id,
@@ -923,7 +932,12 @@ def plot_evaluation_log_likelihoods(
     unique_classifications = sub_df.Classification.unique()
 
     # Plot evaluation(s)
-    num_plots = include_median_likelihood + include_log_likelihood
+    num_plots = (
+        include_median_likelihood 
+        + include_log_likelihood
+        + include_champion_percentiles
+    )
+    n_plots = 0 
     fig = plt.figure(
         figsize=(17, 9),
         tight_layout=True
@@ -934,6 +948,7 @@ def plot_evaluation_log_likelihoods(
     )
     if include_log_likelihood:
         ax1 = fig.add_subplot(gs[0, 0])
+        n_plots += 1
         sns.boxplot(
             y = 'log_likelihood', 
             x = 'instance', 
@@ -971,7 +986,8 @@ def plot_evaluation_log_likelihoods(
         ax1.set_title('Model log likelihoods')
     if include_median_likelihood:
         # median likelihoods
-        ax2 = fig.add_subplot(gs[1, 0])
+        ax2 = fig.add_subplot(gs[n_plots, 0])
+        n_plots += 1
         sns.boxplot(
             y = 'median_likelihood', 
             x = 'instance', 
@@ -1003,7 +1019,26 @@ def plot_evaluation_log_likelihoods(
         ax2.set_xlabel('Instance')
         ax2.set_title('Model likelihoods (median)')
 
-    # plt.suptitle('Evaluation by individual instances')
+
+    if include_champion_percentiles:
+        # plot evaluation percentileof champion models
+        ax = fig.add_subplot(gs[n_plots, 0])
+        n_plots += 1
+        ll_percentiles = evaluation_plot_df[ evaluation_plot_df.true==True].likelihood_percentile
+        ax.hist(
+            ll_percentiles,
+            label="Champions' likelihood percentile"
+        )
+        ax.set_xlim(0,101)
+        ax.set_xlabel('Percentile of champion')
+        ax.set_ylabel('# Champions')
+        ax.set_yticks(
+            list(range( int(ax.get_ylim()[1]) + 1))
+        )
+        ax.axvline(50, label='Median', ls='--')
+        ax.legend()
+        ax.set_title('Evaluation percentile of champion models')
+        
     if save_directory is not None: 
         plt.savefig(
             os.path.join(
@@ -1017,5 +1052,90 @@ def plot_evaluation_log_likelihoods(
             os.path.join(
                 save_directory, 
                 'data_evaluation_plot.csv'
+            )
+        )
+    #     return evaluation_plot_df
+
+def count_term_occurences(
+    combined_results, 
+    save_directory=None
+):
+    all_constituents = []
+    all_true_constituents = []
+    correct_term_counter = []
+
+    term_counter = {}
+    for i in list(combined_results.index):
+        res = combined_results.iloc[i]
+
+        constituents = eval(res['ConstituentTerms'])
+        all_constituents.extend(constituents)
+
+        true_constituents = eval(res['TrueModelConstituentTerms'])
+        all_true_constituents.extend(true_constituents)
+
+        num_correct = len(set(constituents).intersection(set(true_constituents)))
+        correct_term_counter.append(num_correct)
+
+        for term in constituents: 
+            term_in_true_model = term in true_constituents
+            try:
+                term_counter[term]['correct'] += bool(term_in_true_model)
+                term_counter[term]['incorrect'] += bool(not(term_in_true_model))
+                term_counter[term]['occurences'] += 1
+            except:
+                term_counter[term] = {}
+                term_counter[term]['correct'] = bool(term_in_true_model)
+                term_counter[term]['incorrect'] = bool(not(term_in_true_model))
+                term_counter[term]['occurences'] = 1
+
+    all_true_constituents = sorted(list(set(all_true_constituents)))
+    found_untrue_constituents = sorted( set(all_constituents) - set(all_true_constituents) )
+    terms_ordered_by_true_presence = all_true_constituents + found_untrue_constituents
+    terms_ordered_by_true_presence.reverse()
+
+    # correct = [term_counter[term]['correct'] for term in terms_ordered_by_true_presence]
+    # incorrect = [term_counter[term]['incorrect'] for term in terms_ordered_by_true_presence]
+    correct = [
+        term_counter[term]['correct'] 
+        if (term in term_counter) else 0
+        for term in terms_ordered_by_true_presence    
+    ]
+    incorrect = [
+        term_counter[term]['incorrect'] 
+        if (term in term_counter) else 0
+        for term in terms_ordered_by_true_presence
+    ]
+
+
+    fig, ax  = plt.subplots()
+
+    ax.barh(
+        terms_ordered_by_true_presence,
+        correct,
+        color='g',
+        left = None,
+        label='Correctly'
+    )
+
+    ax.barh(
+        terms_ordered_by_true_presence,
+        incorrect,
+        color='b',
+        left = correct,
+        label='Inorrectly'
+    )
+    ax.legend(
+        title='Identified:'
+    )
+    max_x = max([term_counter[t]['occurences'] for t in term_counter])
+    ax.set_xlim(0, max_x+1)
+    ax.set_xticks(range(0, max_x+1))
+    
+    if save_directory is not None:
+        plt.savefig(
+            os.path.join(
+                save_directory, 
+                'term_occurences.png'
             )
         )
