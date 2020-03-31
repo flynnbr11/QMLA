@@ -844,6 +844,9 @@ def parameter_sweep_analysis(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
+def round_nearest(x,a):
+    return round(round(x/a)*a ,2)
+
 def plot_evaluation_log_likelihoods(
     combined_results, 
     include_log_likelihood = True,
@@ -891,6 +894,8 @@ def plot_evaluation_log_likelihoods(
                 a = raw_lls, 
                 score = log_lls[mod]
             )
+            ll_percentile = round_nearest(ll_percentile, 5)
+            
             this_mod_df = pd.DataFrame(
                 [[
                     i, # for some reason instance causes a shift between the two plot types?
@@ -926,7 +931,7 @@ def plot_evaluation_log_likelihoods(
     }
     all_colours = {
         'True + Champion' : 'darkgreen',
-        'True' : 'darkgreen',
+        'True' : 'salmon',
         'Champion' : 'darkorange'
     }
     unique_classifications = sub_df.Classification.unique()
@@ -1024,20 +1029,71 @@ def plot_evaluation_log_likelihoods(
         # plot evaluation percentileof champion models
         ax = fig.add_subplot(gs[n_plots, 0])
         n_plots += 1
-        ll_percentiles = evaluation_plot_df[ evaluation_plot_df.true==True].likelihood_percentile
-        ax.hist(
-            ll_percentiles,
-            label="Champions' likelihood percentile"
+        ax.set_ylabel('Percentile of champion')
+        ax.set_xlabel('# Champions')
+        ax.set_title('(True) Champion models percentile log likelihood')
+
+        
+        true_champ_df = evaluation_plot_df[
+            (evaluation_plot_df.Classification=='True + Champion') 
+        ]
+        true_df = evaluation_plot_df[
+            (evaluation_plot_df.Classification=='True') 
+        ]
+        champ_df = evaluation_plot_df[
+            (evaluation_plot_df.Classification=='Champion') 
+        ]
+        percentiles = np.arange(0,101,5)
+        true_champ_perc = corresponding_percentile_frequencies(
+            subset_to_inspect = true_champ_df,
+            percentiles = percentiles
         )
-        ax.set_xlim(0,101)
-        ax.set_xlabel('Percentile of champion')
-        ax.set_ylabel('# Champions')
-        ax.set_yticks(
-            list(range( int(ax.get_ylim()[1]) + 1))
+        true_perc = corresponding_percentile_frequencies(
+            subset_to_inspect = true_df,
+            percentiles = percentiles
         )
-        ax.axvline(50, label='Median', ls='--')
-        ax.legend()
-        ax.set_title('Evaluation percentile of champion models')
+        champ_perc = corresponding_percentile_frequencies(
+            subset_to_inspect = champ_df,
+            percentiles = percentiles
+        )
+        # horizontal bar plot
+        barheight = 4
+        ax.barh(
+            percentiles, 
+            true_champ_perc,
+            height=barheight,
+            label='True + Champion',
+            color=all_colours['True + Champion']
+        )
+
+        ax.barh(
+            percentiles, 
+            champ_perc, 
+            height=barheight,
+            label='Champion', 
+            color=all_colours['Champion'],
+            left = true_champ_perc
+        )
+
+        ax.barh(
+            percentiles, 
+            true_perc,
+            height=barheight,
+            label='True',
+            color=all_colours['True'],
+            left = [sum(x) for x in zip(champ_perc, true_champ_perc)]
+        )
+        print(
+            "Percentiles:", percentiles, 
+            "\nTrue/Champ:", true_champ_perc,
+            "\nChamp:", champ_perc, 
+            "\nTrue:", true_perc
+        )
+        ax.axhline(
+            50, ls='--', color='black', label='Median',alpha=0.3
+        )
+        ax.legend()        
+
         
     if save_directory is not None: 
         plt.savefig(
@@ -1054,7 +1110,22 @@ def plot_evaluation_log_likelihoods(
                 'data_evaluation_plot.csv'
             )
         )
-    #     return evaluation_plot_df
+    # return evaluation_plot_df
+
+def round_nearest(x,a):
+    return round(round(x/a)*a ,2)
+
+def corresponding_percentile_frequencies(subset_to_inspect, percentiles):
+    counted_percentiles = dict(
+        subset_to_inspect.likelihood_percentile.value_counts()
+    )
+    percentile_freqs = [
+        counted_percentiles[p]
+        if p in counted_percentiles else 0
+        for p in percentiles
+    ]
+    return percentile_freqs
+    
 
 def count_term_occurences(
     combined_results, 
