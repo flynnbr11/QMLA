@@ -83,12 +83,12 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
 # sim_growth_rule='Genetic'
-# sim_growth_rule='GeneticTest'
+sim_growth_rule='GeneticTest'
 # sim_growth_rule='Presentation'
 # sim_growth_rule='ExperimentReducedNV'
 # sim_growth_rule='example'
 # sim_growth_rule='NVExperimentalData'
-sim_growth_rule='ExperimentNVCentre'
+# sim_growth_rule='ExperimentNVCentre'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
