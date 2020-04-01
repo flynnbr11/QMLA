@@ -39,6 +39,7 @@ class qmla_tree():
         self.parent_to_child_relationships = {}
         
         self.completed = self.growth_class.tree_completed_initially
+        self.spawn_step = 0
         self.initial_models = self.growth_class.initial_models
 
         self.branch_champions = {}
@@ -46,6 +47,16 @@ class qmla_tree():
 
         self.ghost_branches = {}
         self.ghost_branch_list = []
+
+    def spawn_models(
+        self, 
+        model_list, 
+        **kwargs
+    ):
+        return self.growth_class.generate_models(
+            model_list = model_list, 
+            **kwargs
+        )
 
     def new_branch(
         self, 
@@ -79,6 +90,19 @@ class qmla_tree():
             log_identifier = 'Tree {}'.format(self.growth_rule)
         )
 
+    def is_tree_complete(
+        self,
+        spawn_step=None
+    ):
+        tree_complete = self.growth_class.check_tree_completed(spawn_step = self.spawn_step)
+        self.log_print(
+            [
+                "Checking if tree complete... ", 
+                tree_complete
+            ]
+        )
+        return tree_complete
+
 
 
 class qmla_branch():
@@ -95,7 +119,10 @@ class qmla_branch():
         self.log_file = self.tree.log_file
         self.growth_class = self.tree.growth_class
         self.growth_rule = self.growth_class.growth_generation_rule
-
+        self.spawn_step = 0 
+        self.log_print([
+            "Branch {} has tree {}".format(self.branch_id, self.tree)
+        ])
         self.models = models
         self.models_by_id = models
         self.resident_models = list(self.models_by_id.values())
@@ -105,6 +132,11 @@ class qmla_branch():
 
         self.precomputed_models = precomputed_models
         self.num_precomputed_models = len(self.precomputed_models)
+        
+        self.unlearned_models = list(
+            set(self.resident_models)
+            - set(self.precomputed_models)
+        )
         if self.num_precomputed_models == 0:
             self.is_ghost_branch = True
         else:
@@ -112,20 +144,23 @@ class qmla_branch():
 
         self.log_print(
             [
-                "New branch; models:", 
-                self.models
+                "New branch {}; models: {}".format(
+                    self.branch_id, 
+                    self.models
+                )
             ]
         )
 
         # To be called/edited continusously by QMLA
         self.model_learning_complete = False
-        self.comparisons_completed = False
+        self.comparisons_complete = False
         self.bayes_points = {}
         self.rankings = [] # ordered from best to worst
 
     def get_champion(self):
         self.champion = self.rankings[0]
         return self.champion
+
 
     def log_print(self, to_print_list):
         qmla.logging.print_to_log(

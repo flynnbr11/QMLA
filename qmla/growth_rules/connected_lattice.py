@@ -72,13 +72,6 @@ class ConnectedLattice(
         # which may change attributes defined above, calculate 
         # further attributes based on those, e.g. max num generations 
         # based on max num sites, defined by the class inheriting. 
-        self.log_print(
-            [
-                "In Growth class setup fnc for {}.".format(
-                    self.growth_generation_rule
-                )
-            ]
-        )
         self.max_num_generations = (
             self.max_num_sites -
             self.initial_num_sites +

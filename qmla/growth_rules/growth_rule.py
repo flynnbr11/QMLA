@@ -47,13 +47,6 @@ class GrowthRule():
             self.plot_probes_path = kwargs['plot_probes_path']
         else: 
             self.plot_probes_path = None
-        self.log_print(
-            [
-                "True params path:", self.true_params_path,
-                "\nPlot probes path: ", self.plot_probes_path,
-                "\nLog file:", self.log_file
-            ]
-        )
 
         self.assign_parameters()
 
@@ -150,11 +143,11 @@ class GrowthRule():
             self.true_params_list = true_config['params_list']
             self.true_params_dict = true_config['params_dict']
         except:
-            self.log_print(
-                [
-                    "Could not unpickle {}".format(self.true_params_path)
-                ]
-            )
+            # self.log_print(
+            #     [
+            #         "Could not unpickle {}".format(self.true_params_path)
+            #     ]
+            # )
             self.true_params_list = []
             self.true_params_dict = {}
 

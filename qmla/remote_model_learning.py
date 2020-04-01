@@ -74,6 +74,12 @@ def remote_learn_model_parameters(
 
     log_print(['Starting for model:', name])
     print("Learning model {}: {}".format( model_id,  name))
+    log_print([
+        "Model {} on branch {}".format(
+            model_id, 
+            branch_id
+        )
+    ])
 
     time_start = time.time()
 
@@ -192,6 +198,12 @@ def remote_learn_model_parameters(
     active_branches_learning_models.incr(int(branch_id), 1)
     time_end = time.time()
     log_print(["Redis SET learned_models_ids:", model_id, "; set True"])
+    log_print(
+        [
+            "Redis SET active_branches_learning_models:", 
+            branch_id, "; now: ",
+            active_branches_learning_models.get(int(branch_id))
+    ])
     learned_models_ids.set(str(model_id), 1)
 
     if remote:

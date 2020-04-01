@@ -212,7 +212,8 @@ class QuantumModelLearningAgent():
         self.tree_identifiers = [self.growth_rule_of_true_model]
         self.trees = {
             gen : qmla.tree.qmla_tree(
-                growth_class = self.unique_growth_rule_instances[gen]
+                growth_class = self.unique_growth_rule_instances[gen],
+                log_file = self.log_file
             )
             for gen in self.unique_growth_rule_instances
         }
@@ -2006,12 +2007,12 @@ class QuantumModelLearningAgent():
         new_models = self.branch_growth_rule_instances[branch_id].generate_models(
             # generator = growth_rule,
             model_list=best_model_names,
-            spawn_step=self.spawn_depth_by_growth_rule[growth_rule],
-            ghost_branches=self.ghost_branches,
-            branch_champs_by_qubit_num=self.branch_champs_by_dimension[growth_rule],
-            model_dict=self.model_lists,
+            # spawn_step=self.spawn_depth_by_growth_rule[growth_rule],
+            # ghost_branches=self.ghost_branches,
+            # branch_champs_by_qubit_num=self.branch_champs_by_dimension[growth_rule],
+            # model_dict=self.model_lists,
+            # current_champs=current_champs,
             log_file=self.log_file,
-            current_champs=current_champs,
             spawn_stage=self.spawn_stage[growth_rule],
             branch_model_points=self.branch_bayes_points[branch_id],
             model_names_ids=self.model_name_id_map,
@@ -2629,7 +2630,12 @@ class QuantumModelLearningAgent():
             branch_ids_on_db = list(
                 active_branches_learning_models.keys()
             )
-
+            self.log_print(
+                [
+                    "Branches actively learning:", 
+                    branch_ids_on_db
+                ]
+            )
             # print("[QMD] branches:", branch_ids_on_db)
             self.inspect_remote_job_crashes()
 
