@@ -19,6 +19,8 @@ def log_print(to_print_list, log_file):
 
 
 
+
+
 def launch_db(
     new_model_branches,
     new_model_ids,
@@ -188,3 +190,43 @@ def add_model(
             log_file
         )
         return False
+
+def launch_db_basic(
+    **kwargs
+):
+    """
+    Inputs:
+    TODO
+
+    Outputs:
+      - db: "running database", info on active models. Can access QML and
+        operator instances for all information about models.
+      - legacy_db: when a model is terminated, we maintain essential information
+        in this db (for plotting, debugging etc.).
+      - model_lists = list of lists containing alphabetised model names.
+        When a new model is considered, it
+
+    Usage:
+        $ gen_list = ['xTy, yPz, iTxTTy] # Sample list of model names
+        $ running_db, legacy_db, model_lists = database_framework.launch_db(gen_list=gen_list)
+
+    """
+
+    model_lists = { 
+        # assumes maxmium 13 qubit-models considered
+        # to be checked when checking model_lists
+        # TODO generalise or add dimension if not present
+        j : []
+        for j in range(1,13)
+    }
+    db = pd.DataFrame({
+        '<Name>': [],
+        'Status': [],  
+        'Completed': [], 
+        'branch_id': [],  
+        'Reduced_Model_Class_Instance': [],
+        'Operator_Instance': [],
+        'Epoch_Start': [],
+        'ModelID': [],
+    })
+    return db, model_lists

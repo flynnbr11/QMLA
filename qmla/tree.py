@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import pickle
 
+import qmla.logging 
+
 pickle.HIGHEST_PROTOCOL = 4  # TODO if >python3, can use higher protocol
 plt.switch_backend('agg')
 
@@ -25,9 +27,13 @@ class qmla_tree():
 
     def __init__(
         self, 
-        growth_class
+        growth_class,
+        log_file
     ):
         self.growth_class = growth_class
+        self.growth_rule = self.growth_class.growth_generation_rule
+        self.log_file = log_file
+        
         self.branches = {}
         self.models = {}
         self.parent_to_child_relationships = {}
@@ -66,6 +72,14 @@ class qmla_tree():
        
         return all_branch_champions
 
+    def log_print(self, to_print_list):
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list,
+            log_file = self.log_file,
+            log_identifier = 'Tree {}'.format(self.growth_rule)
+        )
+
+
 
 class qmla_branch():
     def __init__(
@@ -78,9 +92,11 @@ class qmla_branch():
         # housekeeping
         self.branch_id = branch_id
         self.tree = tree # qmla_tree instance
+        self.log_file = self.tree.log_file
         self.growth_class = self.tree.growth_class
         self.growth_rule = self.growth_class.growth_generation_rule
 
+        self.models = models
         self.models_by_id = models
         self.resident_models = list(self.models_by_id.values())
         self.resident_model_ids = sorted(self.models_by_id.keys())
@@ -94,6 +110,13 @@ class qmla_branch():
         else:
             self.is_ghost_branch = False
 
+        self.log_print(
+            [
+                "New branch; models:", 
+                self.models
+            ]
+        )
+
         # To be called/edited continusously by QMLA
         self.model_learning_complete = False
         self.comparisons_completed = False
@@ -104,6 +127,12 @@ class qmla_branch():
         self.champion = self.rankings[0]
         return self.champion
 
+    def log_print(self, to_print_list):
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list,
+            log_file = self.log_file,
+            log_identifier = 'Branch {}'.format(self.branch_id)
+        )
 
 
 
