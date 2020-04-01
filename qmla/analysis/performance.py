@@ -931,7 +931,7 @@ def plot_evaluation_log_likelihoods(
     }
     all_colours = {
         'True + Champion' : 'darkgreen',
-        'True' : 'darkslategray',
+        'True' : 'navy',
         'Champion' : 'darkorange'
     }
     unique_classifications = sub_df.Classification.unique()

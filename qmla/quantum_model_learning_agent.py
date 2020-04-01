@@ -23,6 +23,7 @@ import qmla.get_growth_rule as get_growth_rule
 import qmla.redis_settings as rds
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation
 from qmla.remote_model_learning import remote_learn_model_parameters
+import qmla.tree
 
 pickle.HIGHEST_PROTOCOL = 4  # TODO if >python3, can use higher protocol
 plt.switch_backend('agg')
@@ -209,11 +210,18 @@ class QuantumModelLearningAgent():
         # Tree/growth management
         self.spawn_depth = 0
         self.tree_identifiers = [self.growth_rule_of_true_model]
+        self.trees = {
+            gen : qmla.tree.qmla_tree(
+                growth_class = self.unique_growth_rule_instances[gen]
+            )
+            for gen in self.unique_growth_rule_instances
+        }
         self.spawn_stage = {}
         self.misc_growth_info = {}
         self.tree_completed = {}
 
         # branch management
+        # TODO migrate to a class
         self.branch_bayes_points = {}
         self.branch_rankings = {}
         self.branch_parents = {}
@@ -247,13 +255,14 @@ class QuantumModelLearningAgent():
             # filled here
             gen = self.growth_rules_list[i]
             # TODO get these from qmla_controls.unique_growth_rule_instances
-            growth_class_gen = get_growth_rule.get_growth_generator_class(
-                growth_generation_rule=gen,
-                # use_experimental_data=self.use_experimental_data,
-                true_params_path = self.qmla_controls.true_params_pickle_file,
-                plot_probes_path = self.qmla_controls.probes_plot_file, 
-                log_file=self.log_file
-            )
+            # growth_class_gen = get_growth_rule.get_growth_generator_class(
+            #     growth_generation_rule=gen,
+            #     # use_experimental_data=self.use_experimental_data,
+            #     true_params_path = self.qmla_controls.true_params_pickle_file,
+            #     plot_probes_path = self.qmla_controls.probes_plot_file, 
+            #     log_file=self.log_file
+            # )
+            growth_class_gen = self.unique_growth_rule_instances[gen]
             self.tree_completed[gen] = growth_class_gen.tree_completed_initially
             self.growth_rules_initial_models[gen] = growth_class_gen.initial_models
 
@@ -714,7 +723,7 @@ class QuantumModelLearningAgent():
         pre_computed_models = []
         num_models_already_computed_this_branch = 0
         model_id_list = []
-
+        this_branch_models = {}
         for model in model_list:
             # addModel returns whether adding model was successful
             # if false, that's because it's already been computed
@@ -726,6 +735,7 @@ class QuantumModelLearningAgent():
                 add_model_info['is_new_model']
             )
             model_id = add_model_info['model_id']
+            this_branch_models[model_id] = model
             model_id_list.append(model_id)
             if already_computed == False:  # first instance of this model
                 self.models_branches[model_id] = branch_id
@@ -742,6 +752,12 @@ class QuantumModelLearningAgent():
             )
             if bool(already_computed) == True:
                 pre_computed_models.append(model)
+
+        # self.branches[branch_id] = qmla.tree.qmla_branch(
+        #     branch_id = branch_id, 
+        #     models = this_branch_models, 
+        #     tree = self.unique_growth_rule_instances[growth_rule]
+        # )
 
         self.branch_num_precomputed_models[branch_id] = num_models_already_computed_this_branch
         self.branch_resident_model_names[branch_id] = model_list
@@ -1193,12 +1209,7 @@ class QuantumModelLearningAgent():
         a=None,
         b=None,
         pair=None,
-        # bayes_threshold=None
     ):
-
-        # if bayes_threshold is None:
-        #     bayes_threshold = self.bayes_threshold_lower
-        # bayes_threshold = self.bayes_threshold_lower
         bayes_factors_db = self.redis_databases['bayes_factors_db']
         if pair is not None:
             model_ids = pair.split(',')
@@ -1262,24 +1273,15 @@ class QuantumModelLearningAgent():
     def compare_all_models_in_branch(
         self,
         branch_id,
-        # bayes_threshold=None
     ):
-
-        active_models_in_branch_old = database_framework.active_model_ids_by_branch_id(
-            self.model_database,
-            branch_id
-        )
+        # this doesn't care if models are 'active' currently
         active_models_in_branch = self.branch_resident_model_ids[branch_id]
         self.log_print(
             [
                 'compare_all_models_in_branch', branch_id,
-                'active_models_in_branch_old:', active_models_in_branch_old,
-                'active_models_in_branch_new:', active_models_in_branch,
+                'active_models_in_branch:', active_models_in_branch,
             ]
         )
-
-        # if bayes_threshold is None:
-        #     bayes_threshold = self.bayes_threshold_lower
 
         models_points = {}
         for model_id in active_models_in_branch:
@@ -1300,13 +1302,6 @@ class QuantumModelLearningAgent():
                             "(comparison {}/{})".format(mod1, mod2),
                         ]
                     )
-                    # if res == "a":
-                    #     models_points[mod1] += 1
-                    #     losing_model_id = mod2
-                    # elif res == "b":
-                    #     models_points[mod2] += 1
-                    #     losing_model_id = mod1
-                    # todo if more than one model has max points
 
         max_points = max(models_points.values())
         max_points_branches = [
@@ -1315,10 +1310,13 @@ class QuantumModelLearningAgent():
         ]
 
         if len(max_points_branches) > 1:
-            # todo: recompare. Fnc: compareListOfModels (rather than branch
-            # based)
+            # TODO ensure multiple models with same # wins
+            # doesn't crash
+            # e.g. take top two, and select the pairwise winner
+            # as champ_id
             self.log_print(
                 [
+                    "This may cause it to crash:",
                     "Multiple models have same number of points within \
                     branch.\n",
                     models_points
@@ -1328,26 +1326,21 @@ class QuantumModelLearningAgent():
                 model_id_list=max_points_branches,
                 remote=True,
                 recompute=True,
-                # bayes_threshold=self.bayes_threshold_lower,
                 wait_on_result=True
             )
 
             champ_id = self.compare_models_from_list(
                 max_points_branches,
-                # bayes_threshold=bayes_threshold,
                 models_points_dict=models_points
             )
         else:
             champ_id = max(models_points, key=models_points.get)
-        champ_id = int(champ_id)
-        # champ_name = database_framework.model_name_from_id(
-        #     self.model_database,
-        #     champ_id
-        # )
-        champ_name = self.model_name_id_map[champ_id]
 
+        champ_id = int(champ_id)
+        champ_name = self.model_name_id_map[champ_id]
         champ_num_qubits = database_framework.get_num_qubits(champ_name)
         self.branch_champions[int(branch_id)] = champ_id
+
         if champ_id not in self.branch_champs_active_list:
             self.branch_champs_active_list.append(champ_id)
         growth_rule = self.branch_growth_rules[int(branch_id)]
@@ -1366,8 +1359,7 @@ class QuantumModelLearningAgent():
             )
 
         self.update_model_record(
-            # name=database_framework.model_name_from_id(self.model_database, champ_id),
-            name=self.model_name_id_map[champ_id],
+            name=champ_name,
             field='Status',
             new_value='Active'
         )
@@ -1400,7 +1392,6 @@ class QuantumModelLearningAgent():
             ]
         )
         self.branch_bayes_points[branch_id] = models_points
-        # self.branch_growth_rules[branch_id]
 
         if branch_id in self.ghost_branch_list:
             models_to_deactivate = list(
@@ -1447,13 +1438,13 @@ class QuantumModelLearningAgent():
     def compare_models_from_list(
         self,
         model_list,
-        # bayes_threshold=None,
         models_points_dict=None,
         num_times_to_use='all'
     ):
-        # if bayes_threshold is None:
-        #     bayes_threshold = self.bayes_threshold_lower
+        r"""
+        Never called in practice; legacy.
 
+        """
         models_points = {}
         for mod in model_list:
             models_points[mod] = 0
@@ -1516,9 +1507,62 @@ class QuantumModelLearningAgent():
 
         return champ_id
 
-    def perform_final_bayes_comparisons(
+    # TODO break choose_champion function into smaller blocks
+    # - (optional) parental collapse within trees
+    # - select tree champions
+    # - select global champion from tree champions
+    def choose_champion_separate_steps(
+        self
+    ):
+
+        tree_champions = self.get_tree_champions()
+        self.choose_global_champion(
+            remaining_models = tree_champions
+        )
+
+    def get_tree_champions(self):
+        return
+        
+
+
+
+    def champion_single_tree(
+        self, 
+        generator
+    ):
+        # do parental collapse if requried
+        self.parental_collapse = False
+        if self.parental_collapse:
+            self.parental_collapse(generator)
+        return
+
+    def parental_collapse(
+        self, 
+        generator
+    ):
+        return
+
+
+    def choose_champion(
         self,
     ):
+        r"""
+        Select the champion model from models tested already. 
+
+        Standard is to perform comparisons between branch champions.
+        If GrowthRule.champion_determined is set to True, 
+            the model is returned from GrowthRule without further 
+            Bayes factor comparisons. 
+        
+        """
+        if self.growth_class.champion_determined:
+            # TODO this should be done on a tree level 
+            # in case multiple trees are run
+            # in which case, find the winner of each tree
+            # separately and compare those
+            champion_model = self.growth_class.champion_model
+            final_branch_winners = None
+            return champion_model, final_branch_winners
 
         bayes_factors_db = self.redis_databases['bayes_factors_db']
         branch_champions = self.branch_champs_active_list
@@ -1596,11 +1640,6 @@ class QuantumModelLearningAgent():
         )
 
         if self.use_rq:
-            self.log_print(
-                [
-                    "Waiting on parent/child Bayes factors."
-                ]
-            )
             for k in range(len(job_list)):
                 self.log_print(
                     [
@@ -1608,19 +1647,19 @@ class QuantumModelLearningAgent():
                     ]
                 )
                 while job_list[k].is_finished == False:
-                    if job_list[k].is_failed == True:
+                    if job_list[k].is_failed:
                         raise NameError("Remote QML failure")
                     sleep(0.01)
             self.log_print(
                 [
-                    "Parent/child Bayes factors jobs all launched."
+                    "Parent/child Bayes factors: jobs all launched."
                 ]
             )
 
         else:
             self.log_print(
                 [
-                    "Jobs all finished because not on RQ"
+                    "Parent/child Bayes factors: finished locally."
                 ]
             )
         # now deactivate parent/children based on those bayes factors
@@ -1734,9 +1773,12 @@ class QuantumModelLearningAgent():
         )
         # make ghost branches of all individidual trees
         # individual trees correspond to separate growth rules.
-        self.active_growth_rule_branch_champs = {}
-        for gen in self.growth_rules_list:
-            self.active_growth_rule_branch_champs[gen] = []
+        self.active_growth_rule_branch_champs = {
+            gen : []
+            for gen in self.growth_rules_list
+        }
+        # for gen in self.growth_rules_list:
+        #     self.active_growth_rule_branch_champs[gen] = []
 
         for active_champ in self.branch_champs_active_list:
             branch_id_of_champ = self.models_branches[active_champ]
@@ -1860,20 +1902,15 @@ class QuantumModelLearningAgent():
                     res = self.process_remote_bayes_factor(
                         a=mod1,
                         b=mod2
-                    )
+                    ) # res is either mod1 or mod2, pulled from redis DB
                     self.log_print(
                         [
-                            "[perform_final_bayes_comparisons]",
+                            "[choose_champion]",
                             "Point to", res,
                             "(comparison {}/{})".format(mod1, mod2)
                         ]
                     )
-
                     branch_champions_points[res] += 1
-                    # if res == "a":
-                    #     branch_champions_points[mod1] += 1
-                    # elif res == "b":
-                    #     branch_champions_points[mod2] += 1
         self.ranked_champions = sorted(
             branch_champions_points,
             reverse=True
@@ -2057,7 +2094,7 @@ class QuantumModelLearningAgent():
             self.champion_model_id)
         
         # Get metrics for all models tested
-        for i in range(self.highest_model_id):
+        for i in self.models_learned:
             # Dict of all Bayes factors for each model considered.
             self.all_bayes_factors[i] = (
                 self.get_model_storage_instance_by_id(i).model_bayes_factors
@@ -2279,15 +2316,6 @@ class QuantumModelLearningAgent():
                     new_mod
                 )
             )
-
-            # champ_attributes = list(champ_mod.__dict__.keys())
-            # Here we need to fill in learned_info dict on redis with required attributes
-            # fill in redis_databases['learned_models_info_db'][reduced_mod_id]
-            # for att in champ_attributes:
-            #     reduced_mod_instance.__setattr__(
-            #         att,
-            #         champ_mod.__getattribute__(att)
-            #     )
 
             # get champion leared info
             reduced_champion_info = pickle.loads(
@@ -2645,8 +2673,6 @@ class QuantumModelLearningAgent():
                     ):
                     self.branch_comparisons_complete[branch_id] = True
                     self.compare_all_models_in_branch(branch_id)
-                    # print("[QMD] getting growth rule for branch_id", branch_id)
-                    # print("[QMD] dict:", self.branch_growth_rules)
                     this_branch_growth_rule = self.branch_growth_rules[branch_id]
                     if self.tree_completed[this_branch_growth_rule] == False:
                         growth_rule_tree_complete = self.spawn_from_branch(
@@ -2663,18 +2689,16 @@ class QuantumModelLearningAgent():
                             self.tree_completed[this_branch_growth_rule] = True
                             self.tree_count_completed += 1
                             print(
-                                "[QMD] Num trees now completed:",
+                                "Number of trees now completed:",
                                 self.tree_count_completed,
                                 "Tree completed dict:",
                                 self.tree_completed
                             )
-                            # max_spawn_depth_reached = True
                     else:
                         print(
                             "Finished tree for growth rule:",
                             this_branch_growth_rule
                         )
-
         self.log_print(
             [
                 "All trees have completed.",
@@ -2682,13 +2706,12 @@ class QuantumModelLearningAgent():
                 self.tree_count_completed
             ]
         )
-        # let any branches which have just started finish before moving to
-        # analysis
-        still_learning = True
 
+        # let any branches which have just started finish 
+        # before moving to analysis
+        still_learning = True
         while still_learning:
             branch_ids_on_db = list(active_branches_learning_models.keys())
-            # branch_ids_on_db.remove(b'LOCKED')
             for branchID_bytes in branch_ids_on_db:
                 branch_id = int(branchID_bytes)
                 if (
@@ -2704,10 +2727,6 @@ class QuantumModelLearningAgent():
                     num_bayes_done_on_branch = (
                         active_branches_bayes.get(branchID_bytes)
                     )
-                    # print(
-                    #     "branch", branch_id,
-                    #     "num complete:", num_bayes_done_on_branch
-                    # )
                     if (int(num_bayes_done_on_branch) ==
                             self.branch_num_model_pairs[branch_id] and
                             self.branch_comparisons_complete[branch_id] == False
@@ -2730,7 +2749,7 @@ class QuantumModelLearningAgent():
                 still_learning = False  # i.e. break out of this while loop
 
         self.log_print(["Finalising QMLA."])
-        final_winner, final_branch_winners = self.perform_final_bayes_comparisons()
+        final_winner, final_branch_winners = self.choose_champion()
         self.ChampionName = final_winner
         self.champion_model_id = self.get_model_data_by_field(
             name=final_winner,
@@ -2836,18 +2855,6 @@ class QuantumModelLearningAgent():
         self,
         save_to_file=None
     ):
-        # model_ids = self.models_learned
-        # self.log_print(
-        #     ["Getting statistical metrics for {}".format(model_ids)]
-        # )
-        # model_branches = {
-        #     i : self.get_model_data_by_field(
-        #         name = self.model_name_id_map[i], 
-        #         field = 'branch_id'
-        #     )
-        #     for i in model_ids
-        # }
-        # generations = sorted(set(model_branches.values()))
         generations = sorted(set(self.branch_resident_model_ids.keys()))
         self.log_print(
             [

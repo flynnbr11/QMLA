@@ -81,6 +81,7 @@ class GrowthRule():
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
         self.model_branches = {} 
+        self.champion_determined = False
         self.growth_rule_specific_data_to_store = {}
 
         # Parameters specific to the growth rule

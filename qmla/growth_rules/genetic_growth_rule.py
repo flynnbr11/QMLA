@@ -487,11 +487,17 @@ class Genetic(
         if spawn_step == self.max_spawn_depth:
             return True
         elif self.genetic_algorithm.best_model_unchanged:
+            self.champion_determined = True
+            self.champion_model = self.genetic_algorithm.most_elite_models_by_generation[
+                self.genetic_algorithm.genetic_generation
+            ]
+
             self.log_print(
                 [
                     "Terminating search early b/c elite model unchanged in {} iterations.".format(
                         self.genetic_algorithm.unchanged_elite_num_generations_cutoff
-                    )
+                    ),
+                    "Declaring champion:", self.champion_model
                 ]
             )
             # check if elite model hasn't changed in last N generations

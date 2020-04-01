@@ -250,11 +250,11 @@ class GeneticAlgorithmQMLA():
                 'force_mutation' : bool(selected_entry['force_mutation'])
             }
         }
-        self.log_print(
-            [
-                "Selection id {}: {}".format(selected_id, selection)
-            ]
-        )
+        # self.log_print(
+        #     [
+        #         "Selection id {}: {}".format(selected_id, selection)
+        #     ]
+        # )
         return selection
 
 
