@@ -35,8 +35,36 @@ class qmla_tree():
         self.completed = self.growth_class.tree_completed_initially
         self.initial_models = self.growth_class.initial_models
 
-    def get_branch_champions(self):
-        return None
+        self.branch_champions = {}
+        self.branch_champions_by_dimension = {}
+
+        self.ghost_branches = {}
+        self.ghost_branch_list = []
+
+    def new_branch(
+        self, 
+        branch_id, 
+        models, 
+        precomputed_models,
+        **kwargs
+    ):
+        branch = qmla_branch(
+            branch_id = branch_id, 
+            models = models, 
+            precomputed_models = precomputed_models,
+            tree = self, # TODO is this safe??
+            **kwargs            
+        )
+        self.branches[branch_id] = branch
+        return branch
+
+    def get_branch_champions(self):      
+        all_branch_champions = [
+            branch.get_champion() 
+            for branch in self.branches
+        ]
+       
+        return all_branch_champions
 
 
 class qmla_branch():
@@ -44,13 +72,14 @@ class qmla_branch():
         self,
         branch_id, 
         models, # dictionary {id : name} 
-        tree
+        tree,
+        precomputed_models
     ):
+        # housekeeping
+        self.branch_id = branch_id
         self.tree = tree # qmla_tree instance
         self.growth_class = self.tree.growth_class
         self.growth_rule = self.growth_class.growth_generation_rule
-        self.bayes_points = {}
-        self.rankings = {}
 
         self.models_by_id = models
         self.resident_models = list(self.models_by_id.values())
@@ -58,30 +87,23 @@ class qmla_branch():
         self.num_models = len(self.resident_models)
         self.num_model_pairs = num_pairs_in_list(self.num_models)
 
+        self.precomputed_models = precomputed_models
+        self.num_precomputed_models = len(self.precomputed_models)
+        if self.num_precomputed_models == 0:
+            self.is_ghost_branch = True
+        else:
+            self.is_ghost_branch = False
+
+        # To be called/edited continusously by QMLA
         self.model_learning_complete = False
         self.comparisons_completed = False
-
-        # To set during QMLA
-        self.precomputed_models = []
-        self.num_precomputed_models = 0
-
-
-
+        self.bayes_points = {}
+        self.rankings = [] # ordered from best to worst
 
     def get_champion(self):
-        return None
+        self.champion = self.rankings[0]
+        return self.champion
 
-
-class qmla_model():
-    def __init__(
-        self, 
-        model_id,
-        model_name,
-    ):
-        self.model_id = model_id
-        self.model_name = model_name
-        self.resident_on_branches = []
-        self.resident_on_trees = []
 
 
 
