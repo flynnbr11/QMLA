@@ -103,6 +103,7 @@ class DevQuantumModelLearningAgent():
 
         # QMLA core info stored on redis server
         self._compile_and_store_qmla_info_summary()
+
         # set up all attributes related to growth rules and tree management
         self._setup_tree_and_growth_rules(
             # generator_list=generator_list,
@@ -184,6 +185,7 @@ class DevQuantumModelLearningAgent():
         self.model_name_id_map = {}
         self.highest_model_id = 0  # so first created model gets model_id=0
         self.models_branches = {}
+
         # self.model_initial_branch = {}
         self.model_initial_ids = {}
 
@@ -223,32 +225,39 @@ class DevQuantumModelLearningAgent():
         self.misc_growth_info = {}
         self.tree_completed = {}
 
-        # branch management
-        # TODO migrate to a class
-        self.branch_bayes_points = {}
-        self.branch_rankings = {}
-        self.branch_parents = {}
-        self.branch_champions = {}
-        self.branch_champs_active_list = []
-        self.branch_highest_id = 0
-        self.branch_num_models = {}
-        self.branch_num_model_pairs = {}
-        # self.branch_model_learning_complete = {}
-        self.branch_comparisons_complete = {}
-        self.branch_num_precomputed_models = {}
-        self.branch_comparisons_completed = {}
-        self.branch_resident_model_names = {}
-        self.branch_models_precomputed = {}
-        self.branch_resident_model_ids = {}
-        self.branch_growth_rules = {}
-        self.branch_growth_rule_instances = {}
-        self.branch_initial_models = []
-        self.branch_champs_by_dimension = {}
+        # # branch management
+        # # TODO migrate to a class
+        # self.branch_bayes_points = {}
+        # self.branch_rankings = {}
+        # self.branch_parents = {}
+        # self.branch_champions = {}
+        # self.branch_champs_active_list = []
+        # self.branch_highest_id = 0
+        # self.branch_num_models = {}
+        # self.branch_num_model_pairs = {}
+        # # self.branch_model_learning_complete = {}
+        # self.branch_comparisons_complete = {}
+        # self.branch_num_precomputed_models = {}
+        # self.branch_comparisons_completed = {}
+        # self.branch_resident_model_names = {}
+        # self.branch_models_precomputed = {}
+        # self.branch_resident_model_ids = {}
+        # self.branch_growth_rules = {}
+        # self.branch_growth_rule_instances = {}
+        # self.branch_initial_models = []
+        # self.branch_champs_by_dimension = {}
+
         self.ghost_branch_list = []
         self.ghost_branches = {}
+        self.model_count = 0 
+        self.branch_highest_id = 0
+        self.tree_count = len(self.trees)
+        self.tree_count_completed = np.sum(
+            [ tree.is_tree_complete() for tree in self.trees.values()]
+        )
 
         self._dev_setup_growth_trees()
-        self._setup_all_growth_rules()
+        # self._setup_all_growth_rules()
 
     def _dev_setup_growth_trees(self):
         self.model_count = 0
@@ -283,7 +292,7 @@ class DevQuantumModelLearningAgent():
             self.tree_completed[gen] = growth_class_gen.tree_completed_initially
             self.growth_rules_initial_models[gen] = growth_class_gen.initial_models
 
-            self.branch_champs_by_dimension[gen] = {}
+            # self.branch_champs_by_dimension[gen] = {}
             initial_models_this_gen = self.growth_rules_initial_models[gen]
             if self.qhl_mode:
                 initial_models_this_gen = [growth_class_gen.true_model]
@@ -752,28 +761,28 @@ class DevQuantumModelLearningAgent():
             precomputed_models = pre_computed_models
         )
         # Stuff to do with class instances instead:
-        self.branch_comparisons_completed[branch_id] = False
-        num_models = len(model_list)
-        self.branch_num_models[branch_id] = num_models
-        self.branch_num_model_pairs[branch_id] = num_pairs_in_list(
-            num_models
-        )
+        # self.branch_comparisons_completed[branch_id] = False
+        # num_models = len(model_list)
+        # self.branch_num_models[branch_id] = num_models
+        # self.branch_num_model_pairs[branch_id] = num_pairs_in_list(
+        #     num_models
+        # )
 
         # still to do 
         # self.branch_model_learning_complete[branch_id] = False
-        self.branch_comparisons_complete[branch_id] = False
-        self.branch_growth_rules[branch_id] = growth_rule
-        self.branch_growth_rule_instances[branch_id] = self.unique_growth_rule_instances[growth_rule]
-        pre_computed_models = []
-        num_models_already_computed_this_branch = 0
-        model_id_list = []
-        this_branch_models = {}
+        # self.branch_comparisons_complete[branch_id] = False
+        # self.branch_growth_rules[branch_id] = growth_rule
+        # self.branch_growth_rule_instances[branch_id] = self.unique_growth_rule_instances[growth_rule]
+        # pre_computed_models = []
+        # num_models_already_computed_this_branch = 0
+        # model_id_list = []
+        # this_branch_models = {}
 
-        self.branch_num_precomputed_models[branch_id] = num_models_already_computed_this_branch
-        self.branch_resident_model_names[branch_id] = model_list
-        self.branch_models_precomputed[branch_id] = pre_computed_models
+        # self.branch_num_precomputed_models[branch_id] = num_models_already_computed_this_branch
+        # self.branch_resident_model_names[branch_id] = model_list
+        # self.branch_models_precomputed[branch_id] = pre_computed_models
 
-        self.branch_resident_model_ids[branch_id] = model_id_list
+        # self.branch_resident_model_ids[branch_id] = model_id_list
 
         return branch_id
 
@@ -782,6 +791,9 @@ class DevQuantumModelLearningAgent():
             self.model_database, model_id)
 
     def update_database_model_info(self):
+        self.log_print([
+            "Updating info for all learned models"
+        ])
         for mod_id in self.models_learned:
             try:
                 # TODO remove this try/except when reduced-champ-model instance
@@ -867,7 +879,8 @@ class DevQuantumModelLearningAgent():
             [
                 "branch {} has models: \nprecomputed: {} \nunlearned: {}".format(
                     branch_id,
-                    self.branch_models_precomputed[branch_id],
+                    self.branches[branch_id].precomputed_models,
+                    # self.branch_models_precomputed[branch_id],
                     unlearned_models_this_branch
                 )
             ]
@@ -994,7 +1007,8 @@ class DevQuantumModelLearningAgent():
                 updated_model_info = remote_learn_model_parameters(
                     model_name,
                     model_id,
-                    growth_generator=self.branch_growth_rules[branch_id],
+                    # growth_generator=self.branch_growth_rules[branch_id],
+                    growth_generator = self.branches[branch_id].growth_rule, 
                     branch_id=branch_id,
                     qmla_core_info_dict=self.qmla_settings,
                     remote=True,
@@ -1359,15 +1373,15 @@ class DevQuantumModelLearningAgent():
         self.branches[branch_id].champion_id = champ_id
         self.branches[branch_id].champion_name = champ_name
 
-        if champ_id not in self.branch_champs_active_list:
-            self.branch_champs_active_list.append(champ_id)
-        growth_rule = self.branch_growth_rules[int(branch_id)]
-        try:
-            self.branch_champs_by_dimension[growth_rule][champ_num_qubits].append(
-                champ_name)
-        except BaseException:
-            self.branch_champs_by_dimension[growth_rule][champ_num_qubits] = [
-                champ_name]
+        # if champ_id not in self.branch_champs_active_list:
+        #     self.branch_champs_active_list.append(champ_id)
+        # growth_rule = self.branch_growth_rules[int(branch_id)]
+        # try:
+        #     self.branch_champs_by_dimension[growth_rule][champ_num_qubits].append(
+        #         champ_name)
+        # except BaseException:
+        #     self.branch_champs_by_dimension[growth_rule][champ_num_qubits] = [
+        #         champ_name]
 
         for model_id in active_models_in_branch:
             self.update_model_record(
@@ -1419,7 +1433,7 @@ class DevQuantumModelLearningAgent():
             ]
         )
         self.branches[branch_id].bayes_points = models_points
-        self.branch_bayes_points[branch_id] = models_points
+        # self.branch_bayes_points[branch_id] = models_points
 
         if branch_id in self.ghost_branch_list:
             models_to_deactivate = list(
@@ -1611,12 +1625,11 @@ class DevQuantumModelLearningAgent():
         self.log_print(
             [
                 "Active branch champs at start of final Bayes comp:",
-                self.branch_champs_active_list,
-                "Branch champions:",
                 branch_champions
             ]
         )
-        children_branches = list(self.branch_parents.keys())
+        # children_branches = list(self.branch_parents.keys())
+        children_branches = list(self.branches.keys())
         for child_id in branch_champions:
             # branch this child sits on
             child_branch = self.models_branches[child_id]
@@ -2036,18 +2049,18 @@ class DevQuantumModelLearningAgent():
         growth_rule,
         num_models=1
     ):
-        self.trees[growth_rule].spawn_step += 1
-        self.spawn_depth_by_growth_rule[growth_rule] += 1
+        # self.trees[growth_rule].spawn_step += 1
+        # self.spawn_depth_by_growth_rule[growth_rule] += 1
         self.spawn_depth += 1
         # self.log_print(["Spawning, spawn depth:", self.spawn_depth])
-        self.log_print(
-            [
-                "Spawning. Growth rule: {}. Depth: {}".format(
-                    growth_rule,
-                    self.spawn_depth_by_growth_rule[growth_rule]
-                )
-            ]
-        )
+        # self.log_print(
+        #     [
+        #         "Spawning. Growth rule: {}. Depth: {}".format(
+        #             growth_rule,
+        #             self.spawn_depth_by_growth_rule[growth_rule]
+        #         )
+        #     ]
+        # )
         # all_models_this_branch = self.branch_rankings[branch_id]
         all_models_this_branch = self.branches[branch_id].rankings
         best_models = all_models_this_branch[:num_models]
@@ -2063,13 +2076,13 @@ class DevQuantumModelLearningAgent():
             for mod_id in best_models
         ]
         # new_models = model_generation.new_model_list(
-        current_champs = [
-            self.branches[b].champion_name
-            for b in self.branches
-            # self.model_name_id_map[i] for i in
-            # [self.branches[b].champion_id]
-            # list(self.branch_champions.values())
-        ]
+        # current_champs = [
+        #     self.branches[b].champion_name
+        #     for b in self.branches
+        #     # self.model_name_id_map[i] for i in
+        #     # [self.branches[b].champion_id]
+        #     # list(self.branch_champions.values())
+        # ]
         evaluation_log_likelihoods = {
             mod : 
             self.get_model_storage_instance_by_id(mod).evaluation_log_likelihood
@@ -2081,15 +2094,17 @@ class DevQuantumModelLearningAgent():
                 evaluation_log_likelihoods
             ]            
         )
-        new_models = self.branch_growth_rule_instances[branch_id].generate_models(
+        # new_models = self.branch_growth_rule_instances[branch_id].generate_models(
+        new_models = self.branches[branch_id].tree.spawn_models(
             # generator = growth_rule,
             model_list=best_model_names,
             log_file=self.log_file,
-            spawn_step=self.spawn_depth_by_growth_rule[growth_rule],
-            spawn_stage=self.spawn_stage[growth_rule],
-            branch_model_points=self.branch_bayes_points[branch_id],
+            # spawn_step=self.spawn_depth_by_growth_rule[growth_rule],
+            # spawn_stage=self.spawn_stage[growth_rule],
+            # branch_model_points=self.branch_bayes_points[branch_id],
+            branch_model_points = self.branches[branch_id].bayes_points,
             model_names_ids=self.model_name_id_map,
-            miscellaneous=self.misc_growth_info[growth_rule],
+            # miscellaneous=self.misc_growth_info[growth_rule],
             evaluation_log_likelihoods = evaluation_log_likelihoods, 
             # ghost_branches=self.ghost_branches,
             # branch_champs_by_qubit_num=self.branch_champs_by_dimension[growth_rule],
@@ -2101,10 +2116,8 @@ class DevQuantumModelLearningAgent():
 
         self.log_print(
             [
-                "After model generation for growth rule",
-                growth_rule,
-                "SPAWN STAGE:",
-                self.spawn_stage[growth_rule],
+                "After model generation for GR",
+                self.branches[branch_id].growth_rule,
                 "\nnew models:",
                 new_models
             ]
@@ -2115,7 +2128,7 @@ class DevQuantumModelLearningAgent():
             growth_rule=growth_rule
         )
 
-        self.branch_parents[new_branch_id] = branch_id
+        # self.branch_parents[new_branch_id] = branch_id
         self.branches[new_branch_id].parent_branch = branch_id
 
         self.log_print(
@@ -2733,8 +2746,8 @@ class DevQuantumModelLearningAgent():
                     )
                     # self.branch_model_learning_complete[branch_id] = True
                     self.branches[branch_id].model_learning_complete = True
-                    models_this_branch = self.branch_resident_model_ids[branch_id]
-                    for mod_id in models_this_branch:
+                    # models_this_branch = self.branch_resident_model_ids[branch_id]
+                    for mod_id in self.branches[branch_id].resident_model_ids:
                         mod = self.get_model_storage_instance_by_id(mod_id)
                         mod.model_update_learned_values()
                     self.log_print(["Starting BF comparisons on branch ", branch_id])
@@ -2754,7 +2767,7 @@ class DevQuantumModelLearningAgent():
                     self.branches[branch_id].comparisons_complete == False
                     # self.branch_comparisons_complete[branch_id] == False
                 ):
-                    self.branch_comparisons_complete[branch_id] = True
+                    # self.branch_comparisons_complete[branch_id] = True
                     self.branches[branch_id].comparisons_complete = True
                     self.compare_all_models_in_branch(branch_id)
                     self.log_print(
@@ -3178,7 +3191,8 @@ class DevQuantumModelLearningAgent():
             model_ids = list(sorted(self.model_name_id_map.keys()))
         elif model_ids is None:
             model_ids = list(
-                sorted(self.branch_champions.values())
+                # sorted(self.branch_champions.values())
+                sorted([self.branches[b].champion_id for b in self.branches])
             )
 
         qmla.analysis.plot_learned_models_dynamics(

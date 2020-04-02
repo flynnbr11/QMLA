@@ -72,6 +72,7 @@ class Genetic(
             self.base_terms = [
                 'x', 'z',
             ]
+        self.spawn_step = 0
 
         self.mutation_probability = 0.1
 
@@ -128,16 +129,17 @@ class Genetic(
         **kwargs
     ):
         # print("[Genetic] Calling generate_models")
+        self.spawn_step += 1
         self.log_print(
             [
-                "Spawn step:", kwargs['spawn_step']
+                "Spawn step:", self.spawn_step
             ]
         )
         model_points = kwargs['branch_model_points']
         evaluation_log_likelihoods = kwargs['evaluation_log_likelihoods']
         # print("Model points:", model_points)
         # print("kwargs: ", kwargs)
-        self.fitness_at_step[kwargs['spawn_step']] = model_points
+        self.fitness_at_step[self.spawn_step] = model_points
         model_number_wins = {}
         model_f_scores = {}
         # fitness_by_f_score = {}
@@ -207,7 +209,7 @@ class Genetic(
                         'fitness_by_win_ratio' : fitness_track[mod], 
                         'fitness_by_rating' : ratings_weights[mod], 
                         'original_rating' : original_ratings_by_name[mod],
-                        'generation' : kwargs['spawn_step'],
+                        'generation' : self.spawn_step,
                         'f_score' : f_score,
                         'fitness_by_ranking' : fitness_by_ranking[mod], 
                         'log_likelihood' : evaluation_log_likelihoods[m],
@@ -258,7 +260,7 @@ class Genetic(
         self.log_print(
             [
                 'Generation {} \nModel Win numbers: \n{} \nF-scores: \n{} \nWin ratio:\n{} \nModel Ratings:\n{} \nRanking: \n{}'.format(
-                    kwargs['spawn_step'],
+                    self.spawn_step,
                     model_number_wins,
                     model_f_scores,
                     fitness_track,
@@ -296,7 +298,7 @@ class Genetic(
             for mod in new_models
         ]
         self.hamming_distance_by_generation_step[
-            kwargs['spawn_step']] = hamming_distances
+            self.spawn_step] = hamming_distances
 
         return new_models
 
@@ -576,7 +578,7 @@ class GeneticTest(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.max_spawn_depth = 2
+        self.max_spawn_depth = 4
         self.max_num_probe_qubits = self.num_sites
         self.initial_num_models = 6
         self.initial_models = self.genetic_algorithm.random_initial_models(

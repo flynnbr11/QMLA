@@ -780,6 +780,9 @@ class QuantumModelLearningAgent():
             self.model_database, model_id)
 
     def update_database_model_info(self):
+        self.log_print([
+            "Updating info for all learned models"
+        ])
         for mod_id in self.models_learned:
             try:
                 # TODO remove this try/except when reduced-champ-model instance

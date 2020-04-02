@@ -159,15 +159,6 @@ class NVLargeSpinBath(
         **kwargs
     ):
 
-            # model_list = kwargs['model_list']
-        spawn_step = kwargs['spawn_step']
-        spawn_stage = kwargs['spawn_stage']
-
-        print(
-            "[model_generation.NV_centre_spin_large_bath]",
-            "Spawn stage:", spawn_stage
-        )
-
         max_num_qubits = max(
             [database_framework.get_num_qubits(mod) for mod in model_list]
         )

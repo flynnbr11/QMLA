@@ -50,11 +50,17 @@ class qmla_tree():
 
     def spawn_models(
         self, 
-        model_list, 
+        # model_list, 
         **kwargs
     ):
+        
+        self.spawn_step += 1
+        self.log_print([
+            "Spawn models called from tree, step=", self.spawn_step
+        ])
         return self.growth_class.generate_models(
-            model_list = model_list, 
+            # model_list = model_list, 
+            spawn_step = self.spawn_step, 
             **kwargs
         )
 
@@ -94,13 +100,24 @@ class qmla_tree():
         self,
         spawn_step=None
     ):
-        tree_complete = self.growth_class.check_tree_completed(spawn_step = self.spawn_step)
+        tree_complete = self.growth_class.check_tree_completed(
+            spawn_step = self.spawn_step
+        )
+        if self.growth_class.tree_completed_initially:
+            self.log_print([
+                "Tree complete initially."
+            ])
+            tree_complete = True
         self.log_print(
             [
                 "Checking if tree complete... ", 
                 tree_complete
             ]
         )
+        if tree_complete:
+            self.log_print([
+                "Complete at spawn step", self.spawn_step
+            ])
         return tree_complete
 
 

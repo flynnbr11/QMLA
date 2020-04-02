@@ -206,8 +206,6 @@ class GrowthRule():
     ):
         # default is to just return given model list and set spawn stage to
         # complete
-        spawn_stage = kwargs['spawn_stage']
-        spawn_stage.append('Complete')
         return model_list
 
     def check_tree_completed(

@@ -129,6 +129,9 @@ def remote_learn_model_parameters(
         qml_instance.compute_likelihood_after_parameter_learning(
             times = evaluation_times
         )
+        log_print([
+            "Model evaluation ll:", qml_instance.evaluation_log_likelihood
+        ])
     except NameError:
         log_print(
             [

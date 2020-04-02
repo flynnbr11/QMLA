@@ -41,7 +41,7 @@ class ExperimentReducedNV(
         **kwargs
     ):
         # from qmla import model_generation
-
+        
         new_mods = ExperimentReducedNVal_method(
             model_list,
             **kwargs
@@ -56,6 +56,8 @@ def ExperimentReducedNVal_method(
     log_file,
     **kwargs
 ):
+    # TODO this will be broken b/c removing spawn stage and spawn step from QMLA 
+    # call to generate_models
     """
     For use only during development to minimise time taken for testing.
     """

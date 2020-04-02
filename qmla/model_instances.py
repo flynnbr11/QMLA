@@ -854,6 +854,9 @@ class ModelInstanceForLearning():
         if np.isnan(evaluation_updater.log_total_likelihood):
             self.evaluation_log_likelihood = None 
             self.evaluation_median_likelihood = None
+            self.log_print([
+                "Evaluation ll is nan"
+            ])
         else:
             self.evaluation_log_likelihood = round_nearest(
                 # evaluation_updater.log_total_likelihood / len(self.evaluation_normalization_record), 
