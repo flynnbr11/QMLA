@@ -75,8 +75,8 @@ if qmla_controls.further_qhl == True:
 print("------ QMLA starting ------")
 
 # working on dev version
-qmla_instance = qmla.DevQuantumModelLearningAgent(
-# qmla_instance = QuantumModelLearningAgent(
+# qmla_instance = qmla.DevQuantumModelLearningAgent(
+qmla_instance = QuantumModelLearningAgent(
     qmla_controls=qmla_controls,
     model_priors=model_priors,
     experimental_measurements=experimental_measurements_dict,

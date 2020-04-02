@@ -1083,12 +1083,6 @@ def plot_evaluation_log_likelihoods(
             color=all_colours['True'],
             left = [sum(x) for x in zip(champ_perc, true_champ_perc)]
         )
-        print(
-            "Percentiles:", percentiles, 
-            "\nTrue/Champ:", true_champ_perc,
-            "\nChamp:", champ_perc, 
-            "\nTrue:", true_perc
-        )
         ax.axhline(
             50, ls='--', color='black', label='Median',alpha=0.3
         )

@@ -17,10 +17,6 @@ def log_print(to_print_list, log_file):
         log_identifier = 'Database launch'
     )
 
-
-
-
-
 def launch_db(
     new_model_branches,
     new_model_ids,

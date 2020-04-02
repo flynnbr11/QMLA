@@ -1387,14 +1387,17 @@ class DevQuantumModelLearningAgent():
             reverse=True
         )
 
-        # if self.branch_comparisons_completed[int(float(branch_id))] == False:
-        if not self.branches[branch_id].comparisons_complete:
-            # only update self.branch_rankings the first time branch is
-            # considered
-            # self.branch_rankings[int(float(branch_id))] = ranked_model_list
-            # self.branch_comparisons_completed[int(float(branch_id))] = True
+        self.branches[branch_id].rankings = ranked_model_list
+        self.branches[branch_id].bayes_points = models_points
 
-            self.branches[branch_id].comparisons_complete = True
+
+        # # if self.branch_comparisons_completed[int(float(branch_id))] == False:
+        if not self.branches[branch_id].comparisons_complete:
+        #     # only update self.branch_rankings the first time branch is
+        #     # considered
+        #     # self.branch_rankings[int(float(branch_id))] = ranked_model_list
+        #     # self.branch_comparisons_completed[int(float(branch_id))] = True
+
             self.branches[branch_id].rankings = ranked_model_list
             self.branches[branch_id].bayes_points = models_points
 
@@ -1571,6 +1574,7 @@ class DevQuantumModelLearningAgent():
     def choose_champion(
         self,
     ):
+        # TODO move steps to trees
         r"""
         Select the champion model from models tested already. 
 
@@ -2047,6 +2051,12 @@ class DevQuantumModelLearningAgent():
         # all_models_this_branch = self.branch_rankings[branch_id]
         all_models_this_branch = self.branches[branch_id].rankings
         best_models = all_models_this_branch[:num_models]
+
+        self.log_print([
+            "Model rankings on branch {}: {}".format(branch_id, all_models_this_branch),
+            "Best models:", best_models
+        ])
+
         best_model_names = [
             # database_framework.model_name_from_id(self.model_database, mod_id) for
             self.model_name_id_map[mod_id]
@@ -2083,7 +2093,7 @@ class DevQuantumModelLearningAgent():
             evaluation_log_likelihoods = evaluation_log_likelihoods, 
             # ghost_branches=self.ghost_branches,
             # branch_champs_by_qubit_num=self.branch_champs_by_dimension[growth_rule],
-            # model_dict=self.model_lists,
+            model_dict=self.model_lists,
             # current_champs=current_champs,
         )
         new_models = list(set(new_models))
