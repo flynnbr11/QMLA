@@ -138,9 +138,6 @@ class NVCentreExperimentalData(
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = False
         self.max_time_to_consider = 4.24
-        self.log_print([
-            "Max spawn depth:", self.max_spawn_depth
-        ])
 
     def get_true_parameters(
         self,

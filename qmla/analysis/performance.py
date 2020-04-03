@@ -888,11 +888,19 @@ def plot_evaluation_log_likelihoods(
             elif mod == instance_champion_id: 
                 model_classification = 'Champion'
             else:
+                print("No special classification; model {} of QMLA {}:".format(
+                    mod,
+                    instance
+                ))
+                print("champ id:", instance_champion_id)
+                print("true id:", instance_true_id)
                 model_classification = 'Standard'
+            print("Class:", model_classification)
 
             ll_percentile = scipy.stats.percentileofscore(
                 a = raw_lls, 
-                score = log_lls[mod]
+                score = log_lls[mod],
+                kind='weak'
             )
             ll_percentile = round_nearest(ll_percentile, 5)
             
@@ -915,7 +923,7 @@ def plot_evaluation_log_likelihoods(
                 this_mod_df, 
                 ignore_index=True
             )
-    evaluation_plot_df.instance = evaluation_plot_df.instance.astype(int)
+    evaluation_plot_df.instance = evaluation_plot_df.instance.astype(str)
     
     sub_df = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard']
     all_markers = {
@@ -960,7 +968,7 @@ def plot_evaluation_log_likelihoods(
             data = evaluation_plot_df,
             ax = ax1,
             color='lightblue',
-            showfliers=False
+            showfliers=True
         )
         ax1.set_ylabel('Log likelihood')
         ax1.set_xlabel('Instance')
@@ -983,10 +991,10 @@ def plot_evaluation_log_likelihoods(
         )
         ax1.set_ylabel('Log likelihood')
         ax1.set_xlabel('Instance')
-        ax1.set_xticks(
-            []
-            # list(range(evaluation_plot_df.instance.min(), 1+evaluation_plot_df.instance.max()))
-        )
+        # ax1.set_xticks(
+        #     []
+        #     # list(range(evaluation_plot_df.instance.min(), 1+evaluation_plot_df.instance.max()))
+        # )
         ax1.legend()    
         ax1.set_title('Model log likelihoods')
     if include_median_likelihood:
@@ -1019,7 +1027,7 @@ def plot_evaluation_log_likelihoods(
             }
         )
         ax2.set_ylim(0,1)
-        ax2.set_xticks([])
+        # ax2.set_xticks([])
         ax2.set_ylabel('Median likelihood')
         ax2.set_xlabel('Instance')
         ax2.set_title('Model likelihoods (median)')

@@ -95,7 +95,7 @@ class GrowthRule():
         # If you want to do just Bayes facotr calculation on a deterministic
         # initial set you set tree_completed_initially to True
         self.tree_completed_initially = False
-        self.check_champion_reducibility = False
+        self.check_champion_reducibility = True
         self.learned_param_limit_for_negligibility = 0.05
         self.reduce_champ_bayes_factor_threshold = 1e2
 

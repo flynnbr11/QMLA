@@ -461,7 +461,7 @@ try:
     )
 except: 
     print("ANALYSIS FAILURE: Evaluation log likleihoods.")
-
+    raise
 
 # model statistics histograms (f-score, precision, sensitivty)
 try:
