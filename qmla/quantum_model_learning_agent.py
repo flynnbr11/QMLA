@@ -2776,8 +2776,8 @@ class QuantumModelLearningAgent():
         # champion
         if (
             self.growth_class.check_champion_reducibility == True
-            and
-            self.growth_class.tree_completed_initially == False
+            # and
+            # self.growth_class.tree_completed_initially == False
         ):
             self.check_champion_reducibility()
 
