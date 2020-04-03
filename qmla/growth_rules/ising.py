@@ -124,6 +124,14 @@ class IsingPredetermined(
             if self.true_model not in self.initial_models:
                 self.initial_models.append(self.true_model)
 
+            self.max_num_models_by_shape = {
+                4 : 1, 
+                5 : 1,
+                'other': 0
+            }
+            self.num_processes_to_parallelise_over = 2
+
+
 class TestReducedParticlesBayesFactors(
     IsingPredetermined
 ):
