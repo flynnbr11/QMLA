@@ -64,6 +64,7 @@ class IsingProbabilistic(
         self.gaussian_prior_means_and_widths = {
             # 'pauliSet_zJz_1J2_d3' : (2, 0.01),
             # 'pauliSet_zJz_2J3_d3' : (8, 0.1)
+            'pauliSet_zJz_4J5_d5' : (0, 0.01)
         }
 
         self.tree_completed_initially = False

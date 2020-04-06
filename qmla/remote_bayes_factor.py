@@ -329,28 +329,26 @@ def log_likelihood(
         updater.log_total_likelihood = 0
         print("BINNING")
 
+    print_freq = max(
+        int( len(times) / 5), 
+        5
+    )
+
     for i in range(len(times)):
+        if i%print_freq == 0:
+            log_print([
+                "Step {}".format(i),
+                ],
+                log_file = log_file,
+                log_identifier = "BF {}. t={}".format(model.model_id, np.round(times[i], 2))
+            )
         exp = get_exp(model, [times[i]])
         params_array = np.array([[model.true_model_params[:]]])
-        # log_print(
-        #     to_print_list = [
-        #         "Getting datum"
-        #     ], 
-        #     log_file = log_file, 
-        #     log_identifier = 'log_likelihood'
-        # )
         datum = updater.model.simulate_experiment(
             params_array,
             exp,
             repeat=1
         )
-        # log_print(
-        #     to_print_list = [
-        #         "Performing update"
-        #     ], 
-        #     log_file = log_file, 
-        #     log_identifier = 'log_likelihood'
-        # )
         updater.update(datum, exp)
 
     log_likelihood = updater.log_total_likelihood
