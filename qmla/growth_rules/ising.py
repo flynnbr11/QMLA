@@ -64,7 +64,7 @@ class IsingProbabilistic(
         self.gaussian_prior_means_and_widths = {
             # 'pauliSet_zJz_1J2_d3' : (2, 0.01),
             # 'pauliSet_zJz_2J3_d3' : (8, 0.1)
-            'pauliSet_zJz_4J5_d5' : (0, 0.01)
+            # 'pauliSet_zJz_4J5_d5' : (0, 0.01)
         }
 
         self.tree_completed_initially = False
@@ -91,6 +91,16 @@ class IsingPredetermined(
         self.max_num_sites = 8 
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
+        self.min_param = 0
+        self.max_param = 0.5
+        # NOTE: turning off fixed parameters to test reducing champ in smaller param space.
+        # TODO turn back on
+        self.true_model_terms_params = {
+
+            # 'pauliSet_zJz_1J2_d4': 0.61427723297770065, 
+            # 'pauliSet_zJz_2J3_d4': 0.12996320356092372, 
+            # 'pauliSet_zJz_3J4_d4': 0.18011186731750234
+        }
         # test heuristic -- force all times to be considered
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic 
         # self.true_model = 'pauliSet_zJz_1J2_d2'
@@ -126,8 +136,8 @@ class IsingPredetermined(
                 self.initial_models.append(self.true_model)
 
             self.max_num_models_by_shape = {
-                4 : 1, 
-                5 : 1,
+                4 : 3, 
+                5 : 3,
                 'other': 0
             }
             self.num_processes_to_parallelise_over = 2
