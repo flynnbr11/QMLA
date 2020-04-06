@@ -189,17 +189,14 @@ if qmla_controls.qhl_mode:
     #         "Plotting Dynamics",
     #     ],
     # )
-    # qmla_instance.plot_branch_champions_dynamics(
-    #     include_bayes_factors_in_dynamics_plots=False,
-    #     include_param_estimates_in_dynamics_plots=True,
-    #     include_times_learned_in_dynamics_plots=True,
-    #     save_to_file=str(
-    #         qmla_controls.plots_directory +
-    #         'dynamics_' +
-    #         str(qmla_controls.long_id) +
-    #         '.png'
-    #     )
-    # )
+    qmla_instance.plot_branch_champions_dynamics(
+        save_to_file=str(
+            qmla_controls.plots_directory +
+            'dynamics_' +
+            str(qmla_controls.long_id) +
+            '.png'
+        )
+    )
     # log_print(
     #     [
     #         "Finished plotting dynamics",

@@ -17,10 +17,6 @@ import qmla.logging
 
 plt.switch_backend('agg')
 
-# Local files
-
-# Single function call, given qmla_core_data and a name, to learn model entirely.
-
 def remote_learn_model_parameters(
     name,
     model_id,

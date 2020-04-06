@@ -2513,6 +2513,7 @@ class QuantumModelLearningAgent():
         self.log_print(
             [
                 'Running QHL for multiple models:', model_names,
+                "qhl_mode_multiple_models_model_ids:", self.qhl_mode_multiple_models_model_ids
             ]
         )
 
@@ -3077,6 +3078,11 @@ class QuantumModelLearningAgent():
             model_ids = list(
                 sorted(self.branch_champions.values())
             )
+
+        self.log_print([
+            "Plotting branch champion dynamics; branch champs:", 
+            model_ids
+        ])
 
         qmla.analysis.plot_learned_models_dynamics(
             qmd=self,

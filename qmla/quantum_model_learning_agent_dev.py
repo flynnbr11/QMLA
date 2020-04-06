@@ -226,12 +226,22 @@ class DevQuantumModelLearningAgent():
             [ tree.is_tree_complete() for tree in self.trees.values()]
         )
 
-        for tree in list(self.trees.values()):
-            starting_models = tree.growth_class.initial_models
-            branch_new_id = self.new_branch(
-                model_list = starting_models, 
-                growth_rule = tree.growth_class.growth_generation_rule
-            )
+        if (
+            not self.qmla_controls.qhl_mode
+            and 
+            not self.qmla_controls.qhl_mode_multiple_models
+        ):
+            for tree in list(self.trees.values()):
+                self.log_print([
+                    "Adding initial branch for {}".format(
+                        tree.growth_rule
+                    )
+                ])
+                starting_models = tree.growth_class.initial_models
+                branch_new_id = self.new_branch(
+                    model_list = starting_models, 
+                    growth_rule = tree.growth_class.growth_generation_rule
+                )
 
     def _set_learning_and_comparison_parameters(
         self,
@@ -2347,30 +2357,50 @@ class DevQuantumModelLearningAgent():
         self,
         force_qhl=False
     ):
+        # if (
+        #     (
+        #         self.qhl_mode 
+        #         and
+        #         self.true_model_name not in list(self.model_name_id_map.values())
+        #     )
+        #     or force_qhl
+        # ):
+        #     self.log_print([
+        #         "True model {} not in list of models already added {}".format(
+        #             self.true_model_name, 
+        #             list(self.model_name_id_map.values())
+        #         )
+        #     ])
+        #     qhl_branch = self.new_branch(
+        #         growth_rule=self.growth_rule_of_true_model,
+        #         model_list=[self.true_model_name]
+        #     )
+        # else:
+        #     qhl_branch = qmla.database_framework.pull_field(
+        #         self.model_database, 
+        #         name = self.true_model_name, 
+        #         field='branch_id'
+        #     )            
+        #     self.log_print([
+        #         "QHL branch id:", qhl_branch
+        #     ])
 
-        if (
-            (
-                self.qhl_mode 
-                and
-                self.true_model_name not in list(self.models_branches.keys())
-            )
-            or force_qhl
-        ):
-            self.new_branch(
-                growth_rule=self.growth_rule_of_true_model,
-                model_list=[self.true_model_name]
-            )
+        qhl_branch = self.new_branch(
+            growth_rule=self.growth_rule_of_true_model,
+            model_list=[self.true_model_name]
+        )
 
         mod_to_learn = self.true_model_name
         self.log_print(
             [
-                "QHL test on:", mod_to_learn
+                "QHL test on:", mod_to_learn,
+                "on branch ", qhl_branch
             ]
         )
 
         self.learn_model(
             model_name=mod_to_learn,
-            branch_id = 0,
+            branch_id = qhl_branch,
             use_rq=self.use_rq,
             blocking=True
         )
@@ -2406,22 +2436,19 @@ class DevQuantumModelLearningAgent():
         # removed while developing for QHL
         # restore from quantum_model_learning_agent.py
         if model_names is None:
-            model_names = self.growth_rule.qhl_models
+            model_names = self.growth_class.qhl_models
 
-        current_models = list(
-            self.models_branches.keys()
-        )
-        models_to_add = []
-        for mod in model_names:
-            if mod not in current_models:
-                models_to_add.append(mod)
+        # models_to_add = []
+        # for mod in model_names:
+        #     if mod not in current_models:
+        #         models_to_add.append(mod)
         # create branch with models not automatically included within the
         # GR.qhl_models
-        if len(models_to_add) > 0:
-            self.new_branch(
-                growth_rule=self.growth_rule_of_true_model,
-                model_list=models_to_add
-            )
+        # if len(models_to_add) > 0:
+        branch_id = self.new_branch(
+            growth_rule=self.growth_rule_of_true_model,
+            model_list= model_names
+        )
         self.qhl_mode_multiple_models = True
         self.champion_model_id = -1,  # TODO just so not to crash during dynamics plot
         self.qhl_mode_multiple_models_model_ids = [
@@ -2448,7 +2475,7 @@ class DevQuantumModelLearningAgent():
             )
             self.learn_model(
                 model_name=mod_name,
-                branch_id = 0,
+                branch_id = branch_id,
                 use_rq=self.use_rq,
                 blocking=False
             )
@@ -2828,8 +2855,6 @@ class DevQuantumModelLearningAgent():
         self.log_print(
             [
                 "[get_statistical_metrics",
-                # "model branches:", model_branches, 
-                # "model ids: ", model_ids, 
                 "generations: ", generations
             ]
         )
@@ -2851,18 +2876,8 @@ class DevQuantumModelLearningAgent():
             for b in generations
         }
 
-        # for m in model_ids: 
-        #     b = model_branches[m]
-        #     generational_sensitivity[b].append(self.model_sensitivities[m])
-        #     generational_precision[b].append(self.model_precisions[m]) 
-        #     generational_f_score[b].append(self.model_f_scores[m])   
-        #     self.generational_log_likelihoods[b].append(
-        #         self.get_model_storage_instance_by_id(m).evaluation_log_likelihood
-        #     )
         for b in generations: 
-            # models_this_branch = sorted(self.branch_resident_model_ids[b])
             models_this_branch = sorted(self.branches[b].resident_model_ids)
-            # models_this_branch = self.branch_resident_model_ids[b]
             self.log_print(
                 [
                     "Adding models to generational measures for Generation {}:{}".format(
@@ -3030,24 +3045,37 @@ class DevQuantumModelLearningAgent():
         self,
         all_models=False,
         model_ids=None,
-        include_bayes_factors_in_dynamics_plots=True,
-        include_param_estimates_in_dynamics_plots=False,
-        include_times_learned_in_dynamics_plots=True,
         save_to_file=None,
     ):
+        include_params = False
+        include_bayes_factors = False
         if all_models == True:
             model_ids = list(sorted(self.model_name_id_map.keys()))
+        elif self.qhl_mode:
+            model_ids = [self.true_model_id]
+            include_params = True
+        elif self.qhl_mode_multiple_models:
+            model_ids = list(self.qhl_mode_multiple_models_model_ids)
+        elif self.growth_class.tree_completed_initially:
+            model_ids = list(self.models_learned)
+            include_bayes_factors=True
+            include_params=True
         elif model_ids is None:
-            model_ids = list(
-                # sorted(self.branch_champions.values())
-                sorted([self.branches[b].champion_id for b in self.branches])
-            )
+            model_ids = [
+                self.branches[b].champion_id
+                for b in self.branches
+            ]
+            include_bayes_factors = True
+        self.log_print([
+            "Plotting branch champion dynamics; branch champs:", 
+            model_ids
+        ])
 
         qmla.analysis.plot_learned_models_dynamics(
             qmd=self,
-            include_bayes_factors=include_bayes_factors_in_dynamics_plots,
-            include_times_learned=include_times_learned_in_dynamics_plots,
-            include_param_estimates=include_param_estimates_in_dynamics_plots,
+            include_bayes_factors=include_bayes_factors,
+            include_times_learned=True,
+            include_param_estimates=include_params,
             model_ids=model_ids,
             save_to_file=save_to_file,
         )

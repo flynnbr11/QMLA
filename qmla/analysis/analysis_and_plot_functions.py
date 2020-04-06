@@ -339,14 +339,19 @@ def plot_learned_models_dynamics(
     include_param_estimates=False,
     save_to_file=None
 ):
-    if qmd.qhl_mode == True:
-        model_ids = [qmd.true_model_id]
-        include_bayes_factors = False
-    elif qmd.qhl_mode_multiple_models == True:
-        model_ids = list(qmd.qhl_mode_multiple_models_model_ids)
-        include_bayes_factors = False
-    elif model_ids is None:
-        model_ids = list(qmd.branch_champions.values())
+    # if qmd.qhl_mode == True:
+    #     model_ids = [qmd.true_model_id]
+    #     include_bayes_factors = False
+    # elif qmd.qhl_mode_multiple_models == True:
+    #     model_ids = list(qmd.qhl_mode_multiple_models_model_ids)
+    #     include_bayes_factors = False
+    # elif model_ids is None:
+    #     model_ids = [
+    #         self.branches[b].champion_id
+    #         for b in self.branches
+    #     ]
+
+        # model_ids = list(qmd.branch_champions.values())
 
     model_ids = list(sorted(set(model_ids)))  # only uniques values
     true_expec_vals = pickle.load(
@@ -609,6 +614,7 @@ def plot_learned_models_dynamics(
 
                     ax.axhline(
                         y_true,
+                        ls='--',
                         label=str(
                             true_term_latex +
                             ' True'),
