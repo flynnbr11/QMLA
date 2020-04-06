@@ -3067,7 +3067,7 @@ class DevQuantumModelLearningAgent():
             ]
             include_bayes_factors = True
         self.log_print([
-            "Plotting branch champion dynamics; branch champs:", 
+            "Plotting dynamics of models:", 
             model_ids
         ])
 
