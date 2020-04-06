@@ -290,13 +290,14 @@ class GrowthRule():
         store_probes=True,
         **kwargs
     ):
-        self.log_print(
-            [
-                "System Generate Probes called"
-            ]
-        )
         if probe_maximum_number_qubits is None: 
             probe_maximum_number_qubits = self.max_num_probe_qubits
+        self.log_print(
+            [
+                "System Generate Probes called",
+                "probe max num qubits:", probe_maximum_number_qubits
+            ]
+        )
         
         new_probes = self.probe_generation_function(
             max_num_qubits=probe_maximum_number_qubits,

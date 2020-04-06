@@ -2219,7 +2219,7 @@ class DevQuantumModelLearningAgent():
                 set(params) - set(to_remove)
             )
             dim = database_framework.get_num_qubits(new_model_terms[0])
-            p_str = 'P' * dim
+            p_str = 'P' * dim # TODO  generalise this to tie together terms via GR instead of assuming P strings work
             new_mod = p_str.join(new_model_terms)
             new_mod = database_framework.alph(new_mod)
 
@@ -2281,6 +2281,9 @@ class DevQuantumModelLearningAgent():
             reduced_champion_info['est_mean'] = np.array(learned_params)
             reduced_champion_info['final_sigmas'] = reduced_sigmas
             reduced_champion_info['initial_params'] = reduced_sigmas
+            # so that champion does not train further on times it already learned
+            reduced_champion_info['normalization_record'] = []
+            reduced_champion_info['times'] = [] 
 
             compressed_reduced_champ_info = pickle.dumps(
                 reduced_champion_info,
@@ -2303,7 +2306,7 @@ class DevQuantumModelLearningAgent():
             )
             self.log_print(
                 [
-                    "[QMD] BF b/w champ and reduced champ models:",
+                    "BF b/w champ and reduced champ models:",
                     bayes_factor
                 ]
             )
@@ -2333,14 +2336,16 @@ class DevQuantumModelLearningAgent():
                 original_champ_id = self.champion_model_id
                 self.champion_model_id = reduced_mod_id
                 self.ChampionName = new_mod
-
-                self.get_model_storage_instance_by_id(self.champion_model_id).model_bayes_factors = (
+                # inherits BF of champion from which it derived (only for plotting really)
+                new_champ = self.get_model_storage_instance_by_id(
+                    self.champion_model_id
+                )
+                new_champ.model_bayes_factors = (
                     self.get_model_storage_instance_by_id(
                         original_champ_id).model_bayes_factors
                 )
-
-            # TODO check if BF > threshold; if so, reassign self.champion_model_id and
-            # self.ChampionName
+                new_champ.times_learned_over = champ_mod.times_learned_over
+                self.models_learned.append(reduced_mod_id)
 
         else:
             self.log_print(
@@ -2761,11 +2766,7 @@ class DevQuantumModelLearningAgent():
 
         # Check if final winner has negligible parameters; potentially change
         # champion
-        if (
-            self.growth_class.check_champion_reducibility == True
-            # and
-            # self.growth_class.tree_completed_initially == False
-        ):
+        if self.growth_class.check_champion_reducibility:
             self.check_champion_reducibility()
 
         if self.ChampionName == database_framework.alph(self.true_model_name):

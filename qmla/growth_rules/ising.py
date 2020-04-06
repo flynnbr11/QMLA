@@ -95,6 +95,10 @@ class IsingPredetermined(
         self.max_param = 0.5
         # NOTE: turning off fixed parameters to test reducing champ in smaller param space.
         # TODO turn back on
+        self.gaussian_prior_means_and_widths = {
+            # 'pauliSet_zJz_4J5_d5' : (0, 0.00001)
+        }
+        self.reduce_champ_bayes_factor_threshold = 10
         self.true_model_terms_params = {
 
             # 'pauliSet_zJz_1J2_d4': 0.61427723297770065, 
