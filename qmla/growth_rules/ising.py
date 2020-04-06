@@ -95,6 +95,7 @@ class IsingPredetermined(
         self.max_param = 0.5
         # NOTE: turning off fixed parameters to test reducing champ in smaller param space.
         # TODO turn back on
+        self.check_champion_reducibility = False
         self.gaussian_prior_means_and_widths = {
             # 'pauliSet_zJz_4J5_d5' : (0, 0.00001)
         }
