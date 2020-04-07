@@ -436,6 +436,7 @@ class ModelInstanceForLearning():
         self.true_model_params_dict = {}
         self.learned_parameters_qhl = {}
         self.final_sigmas_qhl = {}
+        self.resample_epochs = []
 
 
     def update_model(
@@ -493,10 +494,22 @@ class ModelInstanceForLearning():
 
             # Call updater to update distribution based on datum
             try:
+                sum_wts = sum([a**2 for a in self.qinfer_updater.particle_weights])
+                n_ess = 1/sum_wts # corresponds to n_ess in QInfer, for record
+                if n_ess < self.num_particles / 2 or n_ess < 10:                        
+                    self.log_print([
+                        # "Particles:", self.qinfer_updater.particle_locations, 
+                        # "\nWeights:", self.qinfer_updater.particle_weights,
+                        "Small n_ess - expect to resample soon. Sum weights = {}; n_ess = {}".format(sum_wts, (1/sum_wts))                     
+                    ])
                 self.qinfer_updater.update(
                     self.datum_from_experiment,
                     self.new_experiment
                 )
+                if self.qinfer_updater.just_resampled:
+                    self.log_print(["Just resampled"])
+                    self.resample_epochs.append(istep)
+                    
             except RuntimeError as e:
                 import sys
                 self.log_print(
@@ -639,6 +652,9 @@ class ModelInstanceForLearning():
                         str(self.new_experiment[0][0])
                     ]
                 )
+                self.log_print([
+                    "Resample epochs:", self.resample_epochs
+                ])
                 self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
 
                 cov_mat = self.qinfer_updater.est_covariance_mtx()
@@ -652,6 +668,7 @@ class ModelInstanceForLearning():
                         self.model_terms_names[iterator], '):',
                         str(self.final_learned_params[iterator])]
                     )
+                    
                     self.learned_parameters_qhl[self.model_terms_names[iterator]] = (
                         self.final_learned_params[iterator][0]
                     )
@@ -787,10 +804,11 @@ class ModelInstanceForLearning():
 
         evaluation_updater = qi.SMCUpdater(
             model=self.qinfer_model,
-            n_particles=2,
+            n_particles=min(25, self.num_particles),
             # n_particles=self.num_particles,
             prior=posterior_distribution,
-            resample_thresh=self.qinfer_resampler_threshold,
+            # resample more aggressively once learned, since closer to true values
+            resample_thresh=max(self.qinfer_resampler_threshold, 0.6), 
             resampler=qi.LiuWestResampler(
                 a=self.qinfer_resampler_a
             ),
@@ -839,6 +857,16 @@ class ModelInstanceForLearning():
             #         "[evaluation] Updating"
             #     ]
             # )
+
+            
+            # sum_wts = sum([a**2 for a in evaluation_updater.particle_weights])
+            # self.log_print([
+            #     # "Particles:", self.qinfer_updater.particle_locations, 
+            #     "(Evaluation)"
+            #     "\nWeights:", evaluation_updater.particle_weights,
+            #     "\nSum weights = {}; n_ess = {}".format(sum_wts, (1/sum_wts)) 
+                
+            # ])
 
             evaluation_updater.update(datum, exp)
 
