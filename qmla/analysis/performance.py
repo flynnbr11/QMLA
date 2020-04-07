@@ -888,14 +888,7 @@ def plot_evaluation_log_likelihoods(
             elif mod == instance_champion_id: 
                 model_classification = 'Champion'
             else:
-                print("No special classification; model {} of QMLA {}:".format(
-                    mod,
-                    instance
-                ))
-                print("champ id:", instance_champion_id)
-                print("true id:", instance_true_id)
                 model_classification = 'Standard'
-            print("Class:", model_classification)
 
             ll_percentile = scipy.stats.percentileofscore(
                 a = raw_lls, 
@@ -926,13 +919,13 @@ def plot_evaluation_log_likelihoods(
     evaluation_plot_df.instance = evaluation_plot_df.instance.astype(int)
     
     sub_df = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard']
-    sub_df.instance = sub_df.instance.astype(int)
+    # sub_df.instance = sub_df.instance.astype(int)
     all_markers = {
         'True + Champion' : 'D',
         'True' : 'X',
         'Champion' : 'D'
     }
-    msize = 75
+    msize = 15
     marker_sizes = {
         'True + Champion' : msize,
         'True' : msize,
@@ -971,33 +964,43 @@ def plot_evaluation_log_likelihoods(
             color='lightblue',
             showfliers=True
         )
-        ax1.set_ylabel('Log likelihood')
-        ax1.set_xlabel('Instance')
-        another_ax = ax1.twinx().twiny()
-        sns.scatterplot(
+        # using swarm plot since it needs to be categorical to share axis correctly with boxplot
+        sns.swarmplot(
             y = 'log_likelihood', 
             x = 'instance', 
-            # data = sub_df, 
-            data = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard'], 
+            data = sub_df, 
             ax = ax1,
-            # ax = another_ax, 
-            style='Classification',
-            markers={
-                c : all_markers[c]
-                for c in unique_classifications
-            },
-            s = msize,
+            size = msize,
             hue = 'Classification',
             palette = {
                 c : all_colours[c] 
                 for c in unique_classifications
             },
         )
+
+
+        # sns.scatterplot(
+        #     y = 'log_likelihood', 
+        #     x = 'instance', 
+        #     data = sub_df, 
+        #     # data = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard'], 
+        #     ax = ax1,
+        #     style='Classification',
+        #     markers={
+        #         c : all_markers[c]
+        #         for c in unique_classifications
+        #     },
+        #     s = msize,
+        #     hue = 'Classification',
+        #     palette = {
+        #         c : all_colours[c] 
+        #         for c in unique_classifications
+        #     },
+        # )
         ax1.set_ylabel('Log likelihood')
         ax1.set_xlabel('Instance')
         # ax1.set_xticks(
         #     []
-        #     # list(range(evaluation_plot_df.instance.min(), 1+evaluation_plot_df.instance.max()))
         # )
         ax1.legend()    
         ax1.set_title('Model log likelihoods')
@@ -1116,6 +1119,13 @@ def plot_evaluation_log_likelihoods(
                 'data_evaluation_plot.csv'
             )
         )
+        sub_df.to_csv(
+            os.path.join(
+                save_directory, 
+                'data_classified_instances.csv'
+            )
+        )
+        
     # return evaluation_plot_df
 
 def round_nearest(x,a):

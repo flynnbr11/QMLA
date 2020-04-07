@@ -540,7 +540,7 @@ class DevQuantumModelLearningAgent():
             model_added = True
             if database_framework.alph(
                     model) == database_framework.alph(self.true_model_name):
-                self.true_model_id = self.model_count
+                self.true_model_id = model_id
                 self.true_model_considered = True
                 self.true_model_branch = branch_id
                 self.true_model_on_branhces = [branch_id]
