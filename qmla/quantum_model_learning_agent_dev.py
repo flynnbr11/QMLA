@@ -2290,7 +2290,11 @@ class DevQuantumModelLearningAgent():
                 protocol=4
             )
 
-            # TODO fill in values for ModelInstanceForStorage
+            # TODO generate new model for champion
+            # - scratch normalization record; 
+            # - learn according to MPGH for both champion 
+            #   and suggested reduced champion, 
+            #   then take BF based on that
             self.redis_databases['learned_models_info_db'].set(
                 str(float(reduced_mod_id)),
                 compressed_reduced_champ_info

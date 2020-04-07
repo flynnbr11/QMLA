@@ -925,7 +925,7 @@ def plot_evaluation_log_likelihoods(
         'True' : 'X',
         'Champion' : 'D'
     }
-    msize = 15
+    msize = 10
     marker_sizes = {
         'True + Champion' : msize,
         'True' : msize,
@@ -999,9 +999,11 @@ def plot_evaluation_log_likelihoods(
         # )
         ax1.set_ylabel('Log likelihood')
         ax1.set_xlabel('Instance')
-        # ax1.set_xticks(
-        #     []
-        # )
+        if len(sub_df.instance.unique()) > 40:
+            # don't list all instance IDs if too many to view easily
+            ax1.set_xticks(
+                np.arange(0, max(sub_df.instance.unique()) , 5)
+            )
         ax1.legend()    
         ax1.set_title('Model log likelihoods')
     if include_median_likelihood:

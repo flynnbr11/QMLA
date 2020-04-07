@@ -339,7 +339,7 @@ def average_parameter_estimates(
 
         if save_to_file is not None:
             fig.suptitle(
-                'Parameter Esimates for {}'.format(latex_name)
+                'Parameter Estimates for {} from {} wins'.format(latex_name, num_wins_for_name)
             )
             try:
                 save_file = ''
