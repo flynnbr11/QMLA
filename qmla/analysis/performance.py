@@ -906,8 +906,8 @@ def plot_evaluation_log_likelihoods(
             
             this_mod_df = pd.DataFrame(
                 [[
-                    i, # for some reason instance causes a shift between the two plot types?
-                    # instance, 
+                    # i, # for some reason instance causes a shift between the two plot types?
+                    instance, 
                     mod, 
                     log_lls[mod],
                     median_lls[mod],
@@ -923,9 +923,10 @@ def plot_evaluation_log_likelihoods(
                 this_mod_df, 
                 ignore_index=True
             )
-    evaluation_plot_df.instance = evaluation_plot_df.instance.astype(str)
+    evaluation_plot_df.instance = evaluation_plot_df.instance.astype(int)
     
     sub_df = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard']
+    sub_df.instance = sub_df.instance.astype(int)
     all_markers = {
         'True + Champion' : 'D',
         'True' : 'X',
@@ -972,11 +973,14 @@ def plot_evaluation_log_likelihoods(
         )
         ax1.set_ylabel('Log likelihood')
         ax1.set_xlabel('Instance')
+        another_ax = ax1.twinx().twiny()
         sns.scatterplot(
             y = 'log_likelihood', 
             x = 'instance', 
-            data = sub_df, 
+            # data = sub_df, 
+            data = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard'], 
             ax = ax1,
+            # ax = another_ax, 
             style='Classification',
             markers={
                 c : all_markers[c]
