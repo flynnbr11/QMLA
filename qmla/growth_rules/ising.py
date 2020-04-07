@@ -54,7 +54,9 @@ class IsingProbabilistic(
         self.true_model_terms_params = {
             'pauliSet_zJz_1J2_d4': 0.61427723297770065, 
             'pauliSet_zJz_2J3_d4': 0.12996320356092372, 
-            'pauliSet_zJz_3J4_d4': 0.18011186731750234
+            'pauliSet_zJz_3J4_d4': 0.18011186731750234,
+            'pauliSet_zJz_1J2_d3': 0.06342878531289817, 
+            'pauliSet_zJz_2J3_d3': 0.3979280929069925,            
         }
         self.max_num_models_by_shape = {
             'other': 3
@@ -111,7 +113,7 @@ class IsingPredetermined(
         # self.true_model = 'pauliSet_zJz_1J2_d2'
         # self.true_model = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
         # self.true_model = 'pauliSet_zJz_1J2_d6PPPPPPpauliSet_zJz_2J3_d6PPPPPPpauliSet_zJz_3J4_d6PPPPPPpauliSet_zJz_4J5_d6PPPPPPpauliSet_zJz_5J6_d6'
-        # self.true_model = 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3'
+        self.true_model = 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3'
         self.true_model = database_framework.alph(self.true_model)
         self.qhl_models = [
             self.true_model,
@@ -129,9 +131,9 @@ class IsingPredetermined(
             self.num_processes_to_parallelise_over = 5
             self.initial_models = [
                 # 'pauliSet_zJz_1J2_d6PPPPPPpauliSet_zJz_2J3_d6PPPPPPpauliSet_zJz_3J4_d6PPPPPPpauliSet_zJz_4J5_d6PPPPPPpauliSet_zJz_5J6_d6',
-                'pauliSet_zJz_1J2_d5PPPPPpauliSet_zJz_2J3_d5PPPPPpauliSet_zJz_3J4_d5PPPPPpauliSet_zJz_4J5_d5',
+                # 'pauliSet_zJz_1J2_d5PPPPPpauliSet_zJz_2J3_d5PPPPPpauliSet_zJz_3J4_d5PPPPPpauliSet_zJz_4J5_d5',
                 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4',
-                # 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3',
+                'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3',
                 # 'pauliSet_zJz_1J2_d2',
                 # 'pauliSet_zJz_1J2_d7PPPPPPPpauliSet_zJz_2J3_d7PPPPPPPpauliSet_zJz_3J4_d7PPPPPPPpauliSet_zJz_4J5_d7PPPPPPPpauliSet_zJz_5J6_d7PPPPPPPpauliSet_zJz_6J7_d7',
             ]

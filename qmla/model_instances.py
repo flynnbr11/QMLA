@@ -653,7 +653,7 @@ class ModelInstanceForLearning():
                     ]
                 )
                 self.log_print([
-                    "Resample epochs:", self.resample_epochs
+                    "{} Resample epochs: {}".format(len(self.resample_epochs), self.resample_epochs)
                 ])
                 self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
 
