@@ -24,6 +24,7 @@ __all__ = [
     'parameter_sweep_analysis',
     'plot_evaluation_log_likelihoods',
     'count_term_occurences',
+    'inspect_times_on_nodes'
 ]
 
 def update_shared_bayes_factor_csv(qmd, all_bayes_csv):
@@ -1226,5 +1227,27 @@ def count_term_occurences(
             os.path.join(
                 save_directory, 
                 'term_occurences.png'
+            )
+        )
+
+def inspect_times_on_nodes(combined_results, save_directory=None):
+    fig, ax = plt.subplots()
+    
+    sns.boxplot(
+        x = 'Host', 
+        y = 'Time', 
+        data = combined_results,
+        hue='Port',
+        ax = ax, 
+    )
+    
+    ax.set_ylabel('Time (seconds)')
+    ax.set_title('Time of instances on each node')
+    
+    if save_directory is not None:
+        plt.savefig(
+            os.path.join(
+                save_directory, 
+                'times_v_node.png'
             )
         )

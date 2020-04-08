@@ -461,7 +461,18 @@ try:
     )
 except: 
     print("ANALYSIS FAILURE: Evaluation log likleihoods.")
+    pass
+
+# inspect how nodes perform
+try:
+    qmla.analysis.inspect_times_on_nodes(
+        combined_results = combined_results, 
+        save_directory=directory_to_analyse,
+    )
+except: 
+    print("ANALYSIS FAILURE: Time inspection of nodes.")
     raise
+
 
 # model statistics histograms (f-score, precision, sensitivty)
 try:
