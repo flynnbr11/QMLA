@@ -471,7 +471,8 @@ try:
     )
 except: 
     print("ANALYSIS FAILURE: Time inspection of nodes.")
-    raise
+    pass
+    # raise
 
 
 # model statistics histograms (f-score, precision, sensitivty)
