@@ -2117,6 +2117,8 @@ class DevQuantumModelLearningAgent():
             'ConfigLatex': self.latex_config,
             'Heuristic': mod.model_heuristic_class,
             'Time': time_taken,
+            'Host' : self.redis_host_name, 
+            'Port' : self.redis_port_number, 
             # details about true model:
             'TrueModel' : self.true_model_name,
             'TrueModelConsidered' : self.true_model_considered, 
