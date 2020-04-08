@@ -1237,7 +1237,7 @@ def inspect_times_on_nodes(combined_results, save_directory=None):
         x = 'Host', 
         y = 'Time', 
         data = combined_results,
-        hue='Port',
+        # hue='Port',
         ax = ax, 
     )
     
