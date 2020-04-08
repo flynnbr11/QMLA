@@ -6,15 +6,21 @@
 Welcome to QuantumModelLearningAgent's documentation!
 =====================================================
 
+
+.. module:: qmla
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    intro
+    apiref/index
+    :maxdepth: 2
 
 
+.. only:: not latex
 
-Indices and tables
-==================
+    Indices and tables
+    ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    * :ref:`genindex`
+    * :ref:`modindex`
+    * :ref:`search`
+

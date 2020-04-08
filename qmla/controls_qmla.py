@@ -13,9 +13,10 @@ __all__ = [
 ]
 
 """
-This script is callable with *kwargs.
-It returns an instance of the class ControlsQMLA, which has attributes
-for all the user defined parameters, and defaults if not specified by the user.
+This file provides functionality to parse command line arguments 
+passed via the QMLA launch scripts. 
+These are gathered into a single class instance which can be probed by 
+the QMLA instance to implement user specifications. 
 """
 
 def log_print(
@@ -205,7 +206,8 @@ def parse_cmd_line_args(args):
     Defaults and help for all useable command line arguments are specified here.
     These are parsed, then passed to a ControlsQMLA instance for ease of access. 
 
-    :param args: command line arguments (e.g. sys.argv[1:]).
+    :param list args: command line arguments (e.g. sys.argv[1:]).
+    :return ControlsQMLA 
     """
 
     parser = argparse.ArgumentParser(description='Pass variables for QMLA.')

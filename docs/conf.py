@@ -12,9 +12,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
@@ -154,3 +154,13 @@ texinfo_documents = [
      author, 'QuantumModelLearningAgent', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+## EXTLINKS CONFIGURATION ######################################################
+
+# allow e.g. arxiv links
+extlinks = {
+    'arxiv': ('http://arxiv.org/abs/%s', 'arXiv:'),
+    'doi': ('https://dx.doi.org/%s', 'doi:'),
+    'example_nb': ('https://nbviewer.jupyter.org/github/qinfer/qinfer-examples/blob/master/%s.ipynb', ''),
+    'hdl': ('https://hdl.handle.net/%s', 'hdl:')
+}
