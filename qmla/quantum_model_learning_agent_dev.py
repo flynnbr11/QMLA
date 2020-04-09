@@ -18,7 +18,7 @@ import redis
 # QMLA functionality
 import qmla.analysis
 import qmla.database_framework as database_framework
-import qmla.database_launch as database_launch
+# import qmla.database_launch as database_launch
 import qmla.get_growth_rule as get_growth_rule
 import qmla.redis_settings as rds
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation

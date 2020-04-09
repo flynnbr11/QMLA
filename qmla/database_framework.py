@@ -58,8 +58,8 @@ import pandas as pd
 import qmla.logging
 
 __all__ = [
-    'core_operator_dict',
     'Operator',
+    'core_operator_dict',
     'get_num_qubits',
     'get_constituent_names_from_name',
     'alph',

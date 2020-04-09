@@ -5,17 +5,26 @@
     letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View,
     California, 94041, USA.
     
-.. _quantum_model_learning_agent:
-    
+.. _implementation:
 .. currentmodule:: qmla
 
-Quantum Model Learning Agent
-============================
+Implementation 
+==============
 
-:class:`QuantumModelLearningAgent` - Quantum Model Learning Agent manager class
--------------------------------------------------------------------------------
 
-Class Reference 
-~~~~~~~~~~~~~~~
-.. autoclass:: QuantumModelLearningAgent
-    :members:
+Model learning
+------------------
+
+Function References
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: remote_learn_model_parameters
+
+
+Model comparison
+------------------
+
+Function References
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: remote_bayes_factor_calculation

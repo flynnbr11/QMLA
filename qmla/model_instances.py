@@ -29,18 +29,9 @@ debug_log_print = True
 print_mem_status = True
 global_print_loc = False
 
-"""
-In this file are class definitions:
-    - ModelInstanceForLearning
-    - ModelInstanceForStorage
-    - ModelInstanceForComparison
-
-"""
 
 __all__ = [
     'ModelInstanceForLearning',
-    'ModelInstanceForStorage',
-    'ModelInstanceForComparison'
 ]
 
 

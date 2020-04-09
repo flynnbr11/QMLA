@@ -19,7 +19,9 @@ import qmla.analysis
 
 pickle.HIGHEST_PROTOCOL = 4
 
-
+__all__ = [
+    'ModelInstanceForStorage'
+]
 
 ### Reduced class with only essential information saved ###
 class ModelInstanceForStorage():

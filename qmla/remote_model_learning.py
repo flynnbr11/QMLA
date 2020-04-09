@@ -17,6 +17,10 @@ import qmla.logging
 
 plt.switch_backend('agg')
 
+__all__ = [
+    'remote_learn_model_parameters'
+]
+
 def remote_learn_model_parameters(
     name,
     model_id,

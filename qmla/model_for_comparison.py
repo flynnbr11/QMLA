@@ -1,3 +1,8 @@
+r"""
+Model for comparison stuff
+
+"""
+
 import numpy as np
 import scipy as sp
 import os
@@ -18,6 +23,9 @@ import qmla.analysis
 
 pickle.HIGHEST_PROTOCOL = 4
 
+__all__ = [
+    'ModelInstanceForComparison'
+]
 
 class ModelInstanceForComparison():
     """

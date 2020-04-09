@@ -173,6 +173,7 @@ def time_required(
     parallelisability = {}
 
     print("growth rules:", growth_rules)
+#  print("num models by shape:", generator_max_num_models_by_shape)
     total_time_required = 0
     for gen in growth_rules:
         try:

@@ -22,12 +22,13 @@ __pycache__/
 *~
 *.rdb
 *conflicted*
+# Documentation build directories
+docs/_build
 
 ParallelDevelopment/*
 ExperimentalSimulations/*
 DevelopmentNotebooks/*
 Launch/*
-
 
 !Launch/Results/
 Launch/Results/*
