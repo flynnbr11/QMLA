@@ -664,7 +664,7 @@ class ModelInstanceForLearning():
                     "\tUpdates:", np.round(self.time_update,2), 
                     "\t Simulate experiment:", np.round(self.time_simulate_experiment, 2), 
                     "\t Volume:", np.round(self.time_volume, 2),
-                    "\t Heuristic" : np.round(self.time_heuristic, 2),
+                    "\t Heuristic:", np.round(self.time_heuristic, 2),
                 ])
 
                 cov_mat = self.qinfer_updater.est_covariance_mtx()
