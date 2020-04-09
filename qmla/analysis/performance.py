@@ -1262,6 +1262,7 @@ def inspect_times_on_nodes(combined_results, save_directory=None):
         color='grey',
         ax = ax, 
     )
+    # ax.semilogy()
     
     ax.set_ylabel('Time (seconds)')
     ax.set_title('Time of instances on each node')

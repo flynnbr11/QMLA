@@ -905,7 +905,6 @@ class QuantumModelLearningAgent():
             remote_bayes_factor_calculation(
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
-                # trueModel=self.true_model_name,
                 bf_data_folder=self.bayes_factors_store_directory,
                 times_record=self.bayes_factors_store_times_file,
                 num_times_to_use=self.num_experiments_for_bayes_updates,
@@ -2237,33 +2236,6 @@ class QuantumModelLearningAgent():
         self,
         force_qhl=False
     ):
-        # if (
-        #     (
-        #         self.qhl_mode 
-        #         and
-        #         self.true_model_name not in list(self.model_name_id_map.values())
-        #     )
-        #     or force_qhl
-        # ):
-        #     self.log_print([
-        #         "True model {} not in list of models already added {}".format(
-        #             self.true_model_name, 
-        #             list(self.model_name_id_map.values())
-        #         )
-        #     ])
-        #     qhl_branch = self.new_branch(
-        #         growth_rule=self.growth_rule_of_true_model,
-        #         model_list=[self.true_model_name]
-        #     )
-        # else:
-        #     qhl_branch = qmla.database_framework.pull_field(
-        #         self.model_database, 
-        #         name = self.true_model_name, 
-        #         field='branch_id'
-        #     )            
-        #     self.log_print([
-        #         "QHL branch id:", qhl_branch
-        #     ])
 
         qhl_branch = self.new_branch(
             growth_rule=self.growth_rule_of_true_model,
@@ -2303,7 +2275,6 @@ class QuantumModelLearningAgent():
                 )
             ]
         )
-        # mod = self.get_model_storage_instance_by_id(mod_id)
         self.update_database_model_info()
         self.compute_model_f_score(
             model_id=mod_id
@@ -2473,6 +2444,8 @@ class QuantumModelLearningAgent():
                         self.tree_count_completed += 1
                         self.log_print(
                             [
+                                "Tree complete:", 
+                                self.branches[branch_id].growth_rule, 
                                 "Number of trees now completed:",
                                 self.tree_count_completed,
                             ]
@@ -2544,10 +2517,11 @@ class QuantumModelLearningAgent():
                 )
             ):
                 still_learning = False  # i.e. break out of this while loop
-
+        ##########
+        # Wrap up QMLA now that all trees have completed their growth and learning
+        ##########
         self.log_print(["Finalising QMLA."])
         final_winner, final_branch_winners = self.choose_champion()
-        self.log_print(["WINNER:", final_winner])
         self.ChampionName = final_winner
         self.champion_model_id = self.get_model_data_by_field(
             name=final_winner,
@@ -2563,13 +2537,7 @@ class QuantumModelLearningAgent():
             # self.true_model_considered = False 
             self.true_model_found = False
         self.update_database_model_info()
-
-        # Check if final winner has negligible parameters; potentially change
-        # champion
-        if self.growth_class.check_champion_reducibility:
-            self.check_champion_reducibility()
-
-        if self.ChampionName == database_framework.alph(self.true_model_name):
+        if self.true_model_found:
             self.log_print(
                 [
                     "True model found: {}".format(
@@ -2585,6 +2553,12 @@ class QuantumModelLearningAgent():
                 )
             ]
         )
+
+        # Check if final winner has negligible parameters; 
+        # potentially change champion
+        if self.growth_class.check_champion_reducibility:
+            self.check_champion_reducibility()
+
         self.finalise_qmla()
         self.log_print(
             [
