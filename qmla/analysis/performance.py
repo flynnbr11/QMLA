@@ -1254,6 +1254,14 @@ def inspect_times_on_nodes(combined_results, save_directory=None):
         # hue='Process',
         ax = ax, 
     )
+    sns.swarmplot(
+        x = 'Node', 
+        y = 'Time', 
+        data = combined_results,
+        # hue='Process',
+        color='grey',
+        ax = ax, 
+    )
     
     ax.set_ylabel('Time (seconds)')
     ax.set_title('Time of instances on each node')
