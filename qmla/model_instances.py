@@ -370,7 +370,7 @@ class ModelInstanceForLearning():
             self.qinfer_model,
             self.num_particles,
             self.model_prior,
-            zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
+            # zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
             resample_thresh=self.qinfer_resampler_threshold,
             resampler=qi.LiuWestResampler(a=self.qinfer_resampler_a),
         )
@@ -432,7 +432,6 @@ class ModelInstanceForLearning():
         self.time_update = 0
         self.time_volume = 0
         self.time_simulate_experiment = 0
-        self.time_heuristic = 0
 
     def update_model(
         self,

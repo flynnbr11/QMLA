@@ -58,7 +58,6 @@ def default_expectation_value(
     """
 
     from scipy import linalg
-
     unitary = linalg.expm(-1j * ham * t)
     probe_bra = state.conj().T
     u_psi = np.dot(unitary, state)
