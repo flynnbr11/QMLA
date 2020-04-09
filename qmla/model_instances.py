@@ -432,7 +432,7 @@ class ModelInstanceForLearning():
         self.time_update = 0
         self.time_volume = 0
         self.time_simulate_experiment = 0
-
+        self.time_heuristic = 0
 
     def update_model(
         self,
