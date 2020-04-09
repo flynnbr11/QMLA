@@ -1231,13 +1231,27 @@ def count_term_occurences(
         )
 
 def inspect_times_on_nodes(combined_results, save_directory=None):
+    node_ids = []
+    process_ids = []
+    for i in combined_results['Host']: 
+        if i.startswith('node'):
+            node, process = i.replace('node', '').split('-')
+            node_ids.append(node)
+            process_ids.append(process)
+        else:
+            node_ids.append(str(-1))
+            process_ids.append(str(-1))
+
+    combined_results['Node'] = node_ids
+    combined_results['Process'] = process_ids
+
     fig, ax = plt.subplots()
     
     sns.boxplot(
-        x = 'Host', 
+        x = 'Node', 
         y = 'Time', 
         data = combined_results,
-        # hue='Port',
+        hue='Process',
         ax = ax, 
     )
     

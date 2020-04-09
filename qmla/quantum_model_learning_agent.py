@@ -34,20 +34,20 @@ __all__ = [
 
 class QuantumModelLearningAgent():
     """
-    - This class manages quantum model development.
-    - This is done by controlling a pandas database,
+    This class manages the quantum learning agent protocol.
+
+    This is done by controlling a pandas database,
         sending model specifications
         to remote actors (via RQ) to compute QHL,
         and also Bayes factors, generating
         a next set of models iteratively.
-    - This is done in a tree like growth mechanism where
+    This is done in a tree like growth mechanism where
         new branches consist of
         models generated considering previously determined "good" models.
-    - Model generation rules are given in model_generation.
-    - Database control is given in database_framework.
-    - Remote functions for computing QHL/Bayes factors are in
-    - remote_model_learning and remote_bayes_factor respectively.
-    - Redis databases are used to ensure QMD parameters are accessible to
+    Database control is given in database_framework.
+    Remote functions for computing QHL/Bayes factors are in
+    remote_model_learning and remote_bayes_factor respectively.
+    Redis databases are used to ensure QMD parameters are accessible to
         remote models (since shared memory is not available).
         Relevant QMD parameters and info are pickled to redis.
 

@@ -11,6 +11,7 @@ Welcome to QuantumModelLearningAgent's documentation!
 
 .. toctree::
     intro
+    guide/index
     apiref/index
     :maxdepth: 2
 
