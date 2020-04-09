@@ -659,7 +659,7 @@ class ModelInstanceForLearning():
                 ])
                 self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
                 self.log_print([
-                    "Subroutine times:", 
+                    "{} subroutine times:".format(self.redis_host),  
                     "Total:", np.round(time.time() - full_update_time_init, 2),
                     "\tUpdates:", np.round(self.time_update,2), 
                     "\t Simulate experiment:", np.round(self.time_simulate_experiment, 2), 
