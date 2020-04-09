@@ -1251,7 +1251,7 @@ def inspect_times_on_nodes(combined_results, save_directory=None):
         x = 'Node', 
         y = 'Time', 
         data = combined_results,
-        hue='Process',
+        # hue='Process',
         ax = ax, 
     )
     
