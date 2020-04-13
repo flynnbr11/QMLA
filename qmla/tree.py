@@ -9,12 +9,14 @@ import pandas as pd
 import time as time
 from time import sleep
 import random
+import itertools
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import pickle
 
 import qmla.logging 
+import qmla.database_framework
 
 pickle.HIGHEST_PROTOCOL = 4  # TODO if >python3, can use higher protocol
 plt.switch_backend('agg')
@@ -32,14 +34,20 @@ class qmla_tree():
     ):
         self.growth_class = growth_class
         self.growth_rule = self.growth_class.growth_generation_rule
+        self.growth_class.tree = self
         self.log_file = log_file
         
         self.branches = {}
         self.models = {}
-        self.parent_to_child_relationships = {}
+        self.model_instances = {}
+        self.parent_children = {}
+        self.child_parents = {}
         
         self.completed = self.growth_class.tree_completed_initially
+        self.prune_complete = False
+        self.prune_branches = []
         self.spawn_step = 0
+        self.prune_step = 0
         self.initial_models = self.growth_class.initial_models
 
         self.branch_champions = {}
@@ -58,24 +66,70 @@ class qmla_tree():
         self.log_print([
             "Spawn models called from tree, step=", self.spawn_step
         ])
-        return self.growth_class.generate_models(
+        # branch_champions = self.get_branch_champions()
+
+        new_models =  self.growth_class.generate_models(
             # model_list = model_list, 
             spawn_step = self.spawn_step, 
+            
             **kwargs
         )
+        new_models = list(set(new_models))
+        new_models = [qmla.database_framework.alph(mod) for mod in new_models]
+        return new_models
 
-    def new_branch(
+    def prune_tree(
+        self, 
+        previous_prune_branch = 0, 
+        **kwargs
+    ):
+        self.prune_step += 1
+
+        return self.growth_class.tree_pruning(
+            previous_prune_branch = previous_prune_branch,
+            prune_step = self.prune_step
+        )
+
+
+
+    def nominate_champions(
+        self,
+    ):
+        if len(self.prune_branches) > 0:
+            final_branch = self.branches[
+                self.prune_branches[-1]
+            ]
+        else:
+            branches = sorted(list(self.branches.keys()))
+            final_branch = self.branches[
+                max(branches)
+            ]
+
+        self.log_print([
+            "Final branch is {}".format(final_branch.branch_id)
+        ])
+
+        return [final_branch.champion_name]
+
+    def new_branch_on_tree(
         self, 
         branch_id, 
         models, 
+        model_instances,
         precomputed_models,
+        spawning_branch, 
         **kwargs
     ):
+        for m in model_instances:
+            self.model_instances[m] = model_instances[m]
+        
         branch = qmla_branch(
             branch_id = branch_id, 
             models = models, 
+            model_instances = model_instances, 
             precomputed_models = precomputed_models,
             tree = self, # TODO is this safe??
+            spawning_branch = spawning_branch,
             **kwargs            
         )
         self.branches[branch_id] = branch
@@ -83,7 +137,7 @@ class qmla_tree():
 
     def get_branch_champions(self):      
         all_branch_champions = [
-            branch.get_champion() 
+            branch.champion_name
             for branch in self.branches
         ]
        
@@ -98,7 +152,6 @@ class qmla_tree():
 
     def is_tree_complete(
         self,
-        spawn_step=None
     ):
         tree_complete = self.growth_class.check_tree_completed(
             spawn_step = self.spawn_step
@@ -120,6 +173,9 @@ class qmla_tree():
             ])
         return tree_complete
 
+    def is_pruning_complete(self):
+        # TODO do we need calls to this in QMLA? or just check prune_complete?
+        return self.growth_class.prune_complete
 
 
 class qmla_branch():
@@ -127,8 +183,10 @@ class qmla_branch():
         self,
         branch_id, 
         models, # dictionary {id : name} 
+        model_instances, # dictionary {id : ModelInstanceForStorage} 
         tree,
-        precomputed_models
+        precomputed_models,
+        spawning_branch,
     ):
         # housekeeping
         self.branch_id = branch_id
@@ -136,16 +194,45 @@ class qmla_branch():
         self.log_file = self.tree.log_file
         self.growth_class = self.tree.growth_class
         self.growth_rule = self.growth_class.growth_generation_rule
+        self.log_print([
+            "QMLA Branch object for {}. spawning branch:{}".format(
+                branch_id, 
+                spawning_branch
+            )
+        ])
+        try:
+            self.parent_branch = self.tree.branches[spawning_branch]
+            self.log_print([
+                "Setting parent branch of {} -> parent is {}".format(
+                    self.branch_id, 
+                    self.parent_branch.branch_id
+                )
+            ])
+        except:
+            self.parent_branch = None
+            self.log_print(["Failed to set parent branch for ", branch_id])
+        self.prune_branch = False
         self.spawn_step = 0 
         self.log_print([
             "Branch {} has tree {}".format(self.branch_id, self.tree)
         ])
+        self.model_instances = model_instances
         self.models = models
         self.models_by_id = models
-        self.resident_models = list(self.models_by_id.values())
         self.resident_model_ids = sorted(self.models_by_id.keys())
+        self.resident_models = list(self.models_by_id.values())
         self.num_models = len(self.resident_models)
-        self.num_model_pairs = num_pairs_in_list(self.num_models)
+        self.pairs_to_compare = list(
+            itertools.combinations(
+                self.resident_model_ids, 
+                2
+            )
+        )
+        self.num_model_pairs = len(self.pairs_to_compare)
+        self.model_parent_branch = {
+            model_id : spawning_branch 
+            for model_id in self.resident_model_ids
+        }
 
         self.precomputed_models = precomputed_models
         self.num_precomputed_models = len(self.precomputed_models)
@@ -168,7 +255,7 @@ class qmla_branch():
             ]
         )
 
-        # To be called/edited continusously by QMLA
+        # To be called/edited continuously by QMLA
         self.model_learning_complete = False
         self.comparisons_complete = False
         self.bayes_points = {}
@@ -178,6 +265,24 @@ class qmla_branch():
         self.champion = self.rankings[0]
         return self.champion
 
+    def update_comparisons(
+        self, 
+        models_poinits, 
+    ):
+        self.bayes_points = models_points
+
+    def set_as_prune_branch(
+        self, 
+        pairs_to_compare,
+    ):
+        self.pairs_to_compare = pairs_to_compare
+        self.num_model_pairs = len(self.pairs_to_compare)
+        self.log_print([
+            "Setting as prune branch with pairs to compare:", 
+            self.pairs_to_compare
+        ])
+        self.prune_branch=True
+        self.tree.prune_branches.append(self.branch_id)
 
     def log_print(self, to_print_list):
         qmla.logging.print_to_log(
@@ -186,19 +291,19 @@ class qmla_branch():
             log_identifier = 'Branch {}'.format(self.branch_id)
         )
 
+class iterative_improvement_pruning(qmla_tree):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
+    def prune_tree(
+        self, 
+        previous_prune_branch = 0, 
+        **kwargs
+    ):
+        self.prune_complete = True
+        branches = sorted(list(self.branches.keys()))
+        final_branch = self.branches[
+            max(branches)
+        ]
+        return [final_branch.champion_name], []
 
-def num_pairs_in_list(num_models):
-    if num_models <= 1:
-        return 0
-
-    n = num_models
-    k = 2  # ie. nCk where k=2 since we want pairs
-
-    try:
-        a = math.factorial(n) / math.factorial(k)
-        b = math.factorial(n - k)
-    except BaseException:
-        print("Numbers too large to compute number pairs. n=", n, "\t k=", k)
-
-    return a / b

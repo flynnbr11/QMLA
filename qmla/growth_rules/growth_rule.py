@@ -3,6 +3,7 @@ import sys
 import os
 import pickle
 import numpy as np
+import itertools
 
 import qmla.shared_functionality.prior_distributions
 import qmla.shared_functionality.experiment_design_heuristics
@@ -95,6 +96,8 @@ class GrowthRule():
         # If you want to do just Bayes facotr calculation on a deterministic
         # initial set you set tree_completed_initially to True
         self.tree_completed_initially = False
+        self.prune_complete = False
+        self.prune_completed_initially = False
         self.check_champion_reducibility = True
         self.learned_param_limit_for_negligibility = 0.05
         self.reduce_champ_bayes_factor_threshold = 1e1
@@ -410,7 +413,103 @@ class GrowthRule():
         )
         return self.measurements
 
-        
+    def tree_pruning(
+        self,
+        previous_prune_branch,
+        prune_step, 
+    ):
+        pruning_models = []
+        pruning_sets = []
+        self.log_print([
+            "Pruning within {}".format(self.growth_generation_rule),
+            "Branches:", self.tree.branches
+        ])
+        if prune_step == 1:
+            child_parent_pairs = []
+            for branch in self.tree.branches.values():
+                pruning_models.append(branch.champion_name)
+                self.log_print([
+                    "Getting child/parents for branch", branch.branch_id
+                ])
+                try:
+                    champ = branch.champion_id
+                    self.log_print([
+                        "Champ:", branch.champion_id
+                    ])
+                    self.log_print([
+                        "Type parent branch:", type(branch.parent_branch),
+                    ])
+                    parent_champ = branch.parent_branch.champion_id
+
+                    pair = (champ, parent_champ)
+                    self.log_print([
+                        "Adding pair to prune set:", pair
+                    ])
+                    pruning_sets.append(pair)
+                except:
+                    self.log_print([
+                        "Branch has no parent:", branch.branch_id
+                    ])
+                    pass
+    
+        elif prune_step == 2:
+            pruned_branch = self.tree.branches[previous_prune_branch]
+            # check bayes factor compairsons on those from previous prune branch, 
+            # which corresponds to parent/child collapse
+            prune_collapse_threshold = 1e2 # TODO set as GR attribute
+            prev_branch_models = []
+            for l in list(zip(*pruned_branch.pairs_to_compare)):
+                prev_branch_models.extend(list(l))
+            prev_branch_models = list(set(prev_branch_models))
+
+            models_to_prune = []
+            for pair in pruned_branch.pairs_to_compare:
+                id_1 = pair[0]
+                id_2 = pair[1]
+                mod_1 = pruned_branch.model_instances[id_1]
+                try:
+                    bf_1_v_2 = mod_1.model_bayes_factors[ float(id_2) ][-1]
+                except:
+                    self.log_print([
+                        "couldnt find bf {}/{}. mod_{} BF:".format( 
+                            id_1, 
+                            id_2, 
+                            id_1,
+                            mod_1.model_bayes_factors
+                        )
+                    ])
+                if bf_1_v_2 > prune_collapse_threshold:
+                    models_to_prune.append(id_2)
+                elif bf_1_v_2 < float(1 / prune_collapse_threshold):
+                    models_to_prune(id_1)
+
+                models_to_keep = list(
+                    set(prev_branch_models)
+                    - set(models_to_prune)
+                )
+                pruning_models = [
+                    pruned_branch.models_by_id[m]
+                    for m in models_to_keep
+                ]
+                pruning_sets = list(itertools.combinations(
+                    models_to_keep, 
+                    2
+                ))
+            self.prune_complete = True
+
+        self.log_print([
+            "Prune step {}. pruning models: {} \n pruning sets: {}".format(
+                prune_step, 
+                pruning_models, 
+                pruning_sets
+            )
+        ])
+        if len(pruning_models) == 1:
+            self.prune_complete = True
+        self.log_print(["Returning from pruning fnc"])
+        return list(set(pruning_models)), pruning_sets
+
+
 
     def growth_rule_finalise(self):
         # do whatever is needed to wrap up growth rule

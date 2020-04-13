@@ -78,8 +78,12 @@ class ExperimentFullAccessNV(
         log_file,
         **kwargs
     ):
-        print("[Growth Rules] NV MODEL GENERATION")
         import random
+        self.log_print(
+            [
+                "Generating. input model list:", model_list
+            ]
+        )
         single_qubit_terms = ['xTi', 'yTi', 'zTi']
         nontransverse_terms = ['xTx', 'yTy', 'zTz']
         transverse_terms = ['xTy', 'xTz', 'yTz']

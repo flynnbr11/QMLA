@@ -131,6 +131,7 @@ class NVCentreExperimentalData(
         # this should be looked after by not having a true model in these cases (?)
         self.true_model = 'xTiPPyTiPPzTiPPzTz'
         # self.true_model = 'iTi'
+        # self.max_spawn_depth = 3
         self.true_model = qmla.database_framework.alph(self.true_model) 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.hahn_evolution
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment

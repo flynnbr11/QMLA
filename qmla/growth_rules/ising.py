@@ -94,7 +94,7 @@ class IsingPredetermined(
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
         self.min_param = 0
-        self.max_param = 0.5
+        self.max_param = 1
         # NOTE: turning off fixed parameters to test reducing champ in smaller param space.
         # TODO turn back on
         self.check_champion_reducibility = True
@@ -131,11 +131,11 @@ class IsingPredetermined(
             # to manually fix the models to be considered
             self.num_processes_to_parallelise_over = 5
             self.initial_models = [
-                # 'pauliSet_zJz_1J2_d6PPPPPPpauliSet_zJz_2J3_d6PPPPPPpauliSet_zJz_3J4_d6PPPPPPpauliSet_zJz_4J5_d6PPPPPPpauliSet_zJz_5J6_d6',
+                'pauliSet_zJz_1J2_d6PPPPPPpauliSet_zJz_2J3_d6PPPPPPpauliSet_zJz_3J4_d6PPPPPPpauliSet_zJz_4J5_d6PPPPPPpauliSet_zJz_5J6_d6',
                 'pauliSet_zJz_1J2_d5PPPPPpauliSet_zJz_2J3_d5PPPPPpauliSet_zJz_3J4_d5PPPPPpauliSet_zJz_4J5_d5',
                 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4',
-                # 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3',
-                # 'pauliSet_zJz_1J2_d2',
+                'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3',
+                'pauliSet_zJz_1J2_d2',
                 # 'pauliSet_zJz_1J2_d7PPPPPPPpauliSet_zJz_2J3_d7PPPPPPPpauliSet_zJz_3J4_d7PPPPPPPpauliSet_zJz_4J5_d7PPPPPPPpauliSet_zJz_5J6_d7PPPPPPPpauliSet_zJz_6J7_d7',
             ]
             self.qhl_models = self.initial_models
@@ -148,7 +148,6 @@ class IsingPredetermined(
                 5 : 3,
                 'other': 0
             }
-            self.num_processes_to_parallelise_over = 2
 
 
 class TestReducedParticlesBayesFactors(
