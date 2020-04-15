@@ -33,6 +33,8 @@ growth_classes = {
         GR.IsingPredetermined,
     'IsingProbabilistic':
         GR.IsingProbabilistic,
+    'IsingSharedField':
+        GR.IsingSharedField,
     'HeisenbergXYZPredetermined':
         GR.HeisenbergXYZPredetermined,
     'HeisenbergXYZProbabilistic':

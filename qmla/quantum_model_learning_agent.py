@@ -575,6 +575,7 @@ class QuantumModelLearningAgent():
     def new_branch(
         self,
         model_list,
+        pairs_to_compare='all', 
         growth_rule=None,
         spawning_branch = 0,
     ):
@@ -630,6 +631,7 @@ class QuantumModelLearningAgent():
         self.branches[branch_id] = growth_tree.new_branch_on_tree(
             branch_id = branch_id, 
             models = this_branch_models, 
+            pairs_to_compare = pairs_to_compare, 
             model_instances = model_instances, 
             precomputed_models = pre_computed_models,
             spawning_branch = spawning_branch, 
@@ -1045,18 +1047,19 @@ class QuantumModelLearningAgent():
         remote=True,
         recompute=False
     ):
+        # if pair_list is None:
+        #     # pair_list = list(itertools.combinations(
+        #     #     self.branches[branch_id].resident_model_ids, 2)
+        #     # )
+        #     pair_list = self.branches[branch_id].pairs_to_compare
+        #     self.log_print([
+        #         "Pair list not given for branch {}, generated:{}".format(
+        #             branch_id, 
+        #             pair_list
+        #         ),
+        #     ])
         if pair_list is None:
-            # pair_list = list(itertools.combinations(
-            #     self.branches[branch_id].resident_model_ids, 2)
-            # )
             pair_list = self.branches[branch_id].pairs_to_compare
-            self.log_print([
-                "Pair list not given for branch {}, generated:{}".format(
-                    branch_id, 
-                    pair_list
-                ),
-            ])
-
         active_branches_bayes = self.redis_databases['active_branches_bayes']
         self.log_print(
             [
@@ -1933,13 +1936,15 @@ class QuantumModelLearningAgent():
             best_model_names,
             "\nAll:", all_models_this_branch
         ])
-        new_models = self.branches[branch_id].tree.spawn_models(
+        # new_models, pairs_to_compare = self.branches[branch_id].tree.spawn_models(
+        new_models, pairs_to_compare = self.branches[branch_id].tree.next_layer(
             model_list=best_model_names,
             log_file=self.log_file,
             branch_model_points = self.branches[branch_id].bayes_points,
             model_names_ids=self.model_name_id_map,
             evaluation_log_likelihoods = evaluation_log_likelihoods, 
             model_dict=self.model_lists,
+            called_by_branch=branch_id, 
         )
 
         self.log_print(
@@ -1947,13 +1952,15 @@ class QuantumModelLearningAgent():
                 "After model generation for GR",
                 self.branches[branch_id].growth_rule,
                 "\nnew models:",
-                new_models
+                new_models,
+                "pairs to compare:", pairs_to_compare,
             ]
         )
 
         # Generate new QMLA level branch, and launch learning for those models
         new_branch_id = self.new_branch(
             model_list = new_models,
+            pairs_to_compare = pairs_to_compare, 
             growth_rule = growth_rule,
             spawning_branch = branch_id, 
         )
@@ -2465,7 +2472,7 @@ class QuantumModelLearningAgent():
     ):
 
         self.learn_models_until_trees_complete()
-        self.prune_trees_until_complete()
+        # self.prune_trees_until_complete()
         self.compare_nominated_champions()
 
         self.log_print(["Finalising QMLA."])

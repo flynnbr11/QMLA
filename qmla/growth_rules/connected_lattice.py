@@ -359,6 +359,7 @@ class ConnectedLattice(
 
         # term_type_markers = ['pauliSet', 'transverse']
         transverse_axis = None
+        ising_axis = None
         for term in separate_terms:
             components = term.split('_')
             if 'pauliSet' in components:
@@ -375,6 +376,15 @@ class ConnectedLattice(
                 # assumes like-like pauli terms like xx, yy, zz
                 op = operators[0]
                 site_connections[sites].append(op)
+            elif '1Dising' in components:
+                components.remove('1Dising')
+                for l in components:
+                    if l[0] == 'd':
+                        dim = int(l.replace('d', ''))
+                    elif l[0] == 'i':
+                        ising_axis = str(l.replace('i', ''))
+                    elif l[0] == 't':
+                        transverse_axis = str(l.replace('t', ''))
             elif 'transverse' in components:
                 components.remove('transverse')
                 for l in components:
@@ -396,8 +406,16 @@ class ConnectedLattice(
                     this_term += "{}".format(t)
                 this_term += "}"
                 latex_term += this_term
+        if ising_axis is not None:
+            this_term = r"\sigma_{"
+            this_term += str(ising_axis)
+            this_term += "}^{\otimes"
+            this_term += str(dim)
+            this_term += "}"
+            latex_term += this_term
         if transverse_axis is not None:
-            latex_term += 'T^{}_{}'.format(transverse_axis, transverse_dim)
+            latex_term += 'T_{}^{}'.format(transverse_axis, dim)
+
         latex_term = "${}$".format(latex_term)
         return latex_term
 
@@ -510,6 +528,14 @@ class ConnectedLattice(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )
+
+    def tree_pruning(
+        self, 
+        **kwargs
+    ):
+        champion_models = [b.champion_name for b in list(self.tree.branches.values())]
+        self.prune_complete = True
+        return champion_models, 'all'
 
 
 

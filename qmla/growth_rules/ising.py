@@ -86,6 +86,7 @@ class IsingPredetermined(
             **kwargs
         )
         # keep these fixed to enforce 1d Ising chain up to 7 sites
+        
         self.num_probes = 100
         self.lattice_dimension = 1
         self.initial_num_sites = 2
@@ -115,6 +116,8 @@ class IsingPredetermined(
         self.true_model = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
         # self.true_model = 'pauliSet_zJz_1J2_d6PPPPPPpauliSet_zJz_2J3_d6PPPPPPpauliSet_zJz_3J4_d6PPPPPPpauliSet_zJz_4J5_d6PPPPPPpauliSet_zJz_5J6_d6'
         # self.true_model = 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3'
+        # self.true_model = '1Dising_ix_d2'
+        
         self.true_model = database_framework.alph(self.true_model)
         self.qhl_models = [
             self.true_model,
@@ -148,6 +151,30 @@ class IsingPredetermined(
                 5 : 3,
                 'other': 0
             }
+
+class IsingSharedField(
+    IsingPredetermined
+):
+    def __init__(
+        self,
+        growth_generation_rule,
+        **kwargs
+    ):
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            **kwargs
+        )
+        self.true_model = '1Dising_ix_d4PPPP1Dising_tx_d4'
+        self.tree_completed_initially = True
+        self.check_champion_reducibility = False
+        self.initial_models = [
+            '1Dising_iz_d2PP1Dising_tx_d2', 
+            '1Dising_iz_d3PPP1Dising_tx_d3',
+            '1Dising_iz_d4PPPP1Dising_tx_d4',
+            '1Dising_iz_d5PPPPP1Dising_tx_d5',
+            '1Dising_iz_d6PPPPPP1Dising_tx_d6',
+        ]
+        self.num_processes_to_parallelise_over = len(self.initial_models)
 
 
 class TestReducedParticlesBayesFactors(

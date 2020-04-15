@@ -74,6 +74,7 @@ class GrowthRule():
         self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.gaussian_prior
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
+        self.prune_step = 0 
         self.model_branches = {} 
         self.champion_determined = False
         self.growth_rule_specific_data_to_store = {}
@@ -416,8 +417,9 @@ class GrowthRule():
     def tree_pruning(
         self,
         previous_prune_branch,
-        prune_step, 
     ):
+        self.prune_step += 1
+        prune_step = self.prune_step
         pruning_models = []
         pruning_sets = []
         self.log_print([
@@ -433,19 +435,10 @@ class GrowthRule():
                 ])
                 try:
                     champ = branch.champion_id
-                    self.log_print([
-                        "Champ:", branch.champion_id
-                    ])
-                    self.log_print([
-                        "Type parent branch:", type(branch.parent_branch),
-                    ])
                     parent_champ = branch.parent_branch.champion_id
-
                     pair = (champ, parent_champ)
-                    self.log_print([
-                        "Adding pair to prune set:", pair
-                    ])
-                    pruning_sets.append(pair)
+                    if champ != parent_champ:
+                        pruning_sets.append(pair)
                 except:
                     self.log_print([
                         "Branch has no parent:", branch.branch_id

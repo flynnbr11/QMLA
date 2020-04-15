@@ -36,7 +36,10 @@ class qmla_tree():
         self.growth_rule = self.growth_class.growth_generation_rule
         self.growth_class.tree = self
         self.log_file = log_file
-        
+        self.log_print([
+            "Tree started for {}".format(self.growth_rule)
+        ])
+
         self.branches = {}
         self.models = {}
         self.model_instances = {}
@@ -56,41 +59,60 @@ class qmla_tree():
         self.ghost_branches = {}
         self.ghost_branch_list = []
 
-    def spawn_models(
+    def next_layer(
         self, 
-        # model_list, 
         **kwargs
     ):
-        
-        self.spawn_step += 1
-        self.log_print([
-            "Spawn models called from tree, step=", self.spawn_step
-        ])
-        # branch_champions = self.get_branch_champions()
+        if not self.growth_class.check_tree_completed(spawn_step = self.spawn_step):
+            self.log_print([
+                "Next layer - spawn"
+            ])
 
-        new_models =  self.growth_class.generate_models(
-            # model_list = model_list, 
-            spawn_step = self.spawn_step, 
-            
-            **kwargs
-        )
-        new_models = list(set(new_models))
-        new_models = [qmla.database_framework.alph(mod) for mod in new_models]
-        return new_models
+            self.spawn_step += 1
+            model_list =  self.growth_class.generate_models(
+                spawn_step = self.spawn_step,             
+                **kwargs
+            )
+            pairs_to_compare = 'all'
 
-    def prune_tree(
-        self, 
-        previous_prune_branch = 0, 
-        **kwargs
-    ):
-        self.prune_step += 1
+        elif not self.growth_class.prune_complete:
+            self.log_print([
+                "Next layer - prune"
+            ])
+            model_list, pairs_to_compare = self.growth_class.tree_pruning(
+                previous_prune_branch = kwargs['called_by_branch']
+            )
 
-        return self.growth_class.tree_pruning(
-            previous_prune_branch = previous_prune_branch,
-            prune_step = self.prune_step
-        )
+        model_list = list(set(model_list))
+        model_list = [qmla.database_framework.alph(mod) for mod in model_list]
+        return model_list, pairs_to_compare
 
+    # def spawn_models(
+    #     self, 
+    #     **kwargs
+    # ):
+    #     self.spawn_step += 1
+    #     new_models =  self.growth_class.generate_models(
+    #         spawn_step = self.spawn_step,             
+    #         **kwargs
+    #     )
+    #     new_models = list(set(new_models))
+    #     new_models = [qmla.database_framework.alph(mod) for mod in new_models]
+    #     pairs_to_compare = 'all'
 
+    #     return new_models, pairs_to_compare
+
+    # def prune_tree(
+    #     self, 
+    #     previous_prune_branch = 0, 
+    #     **kwargs
+    # ):
+    #     self.prune_step += 1
+
+    #     return self.growth_class.tree_pruning(
+    #         previous_prune_branch = previous_prune_branch,
+    #         prune_step = self.prune_step
+    #     )
 
     def nominate_champions(
         self,
@@ -100,6 +122,9 @@ class qmla_tree():
                 self.prune_branches[-1]
             ]
         else:
+            self.log_print([
+                "Prune branches not listed; assuming final branch to hold tree champion"
+            ])
             branches = sorted(list(self.branches.keys()))
             final_branch = self.branches[
                 max(branches)
@@ -115,6 +140,7 @@ class qmla_tree():
         self, 
         branch_id, 
         models, 
+        pairs_to_compare,
         model_instances,
         precomputed_models,
         spawning_branch, 
@@ -130,6 +156,7 @@ class qmla_tree():
             precomputed_models = precomputed_models,
             tree = self, # TODO is this safe??
             spawning_branch = spawning_branch,
+            pairs_to_compare = pairs_to_compare, 
             **kwargs            
         )
         self.branches[branch_id] = branch
@@ -153,8 +180,10 @@ class qmla_tree():
     def is_tree_complete(
         self,
     ):
-        tree_complete = self.growth_class.check_tree_completed(
-            spawn_step = self.spawn_step
+        tree_complete = (
+            self.growth_class.check_tree_completed(spawn_step = self.spawn_step)
+            and
+            self.growth_class.prune_complete
         )
         if self.growth_class.tree_completed_initially:
             self.log_print([
@@ -187,6 +216,7 @@ class qmla_branch():
         tree,
         precomputed_models,
         spawning_branch,
+        pairs_to_compare, 
     ):
         # housekeeping
         self.branch_id = branch_id
@@ -222,12 +252,18 @@ class qmla_branch():
         self.resident_model_ids = sorted(self.models_by_id.keys())
         self.resident_models = list(self.models_by_id.values())
         self.num_models = len(self.resident_models)
-        self.pairs_to_compare = list(
-            itertools.combinations(
-                self.resident_model_ids, 
-                2
+        if pairs_to_compare == 'all':
+            self.log_print([
+                "All pairs to be compared on branch ", self.branch_id
+            ])
+            self.pairs_to_compare = list(
+                itertools.combinations(
+                    self.resident_model_ids, 
+                    2
+                )
             )
-        )
+        else:
+            self.pairs_to_compare = pairs_to_compare
         self.num_model_pairs = len(self.pairs_to_compare)
         self.model_parent_branch = {
             model_id : spawning_branch 

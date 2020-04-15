@@ -46,6 +46,7 @@ class Genetic(
             k_const=30
         ) # for use when ranking/rating models
         self.prune_completed_initially = True
+        self.prune_complete = True
         self.fitness_by_f_score = pd.DataFrame()
         self.fitness_df = pd.DataFrame()
         self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'

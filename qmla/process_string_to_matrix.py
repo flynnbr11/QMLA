@@ -25,6 +25,10 @@ def process_basic_operator(basic_operator):
         mtx = process_hubbard_operator(
             basic_operator
         )
+    elif 'isingChain' in basic_operator:
+        mtx = process_ising_chain(
+            basic_operator
+        )
     elif '1Dising' in basic_operator:
         mtx = process_1d_ising(
             basic_operator
@@ -237,6 +241,25 @@ def process_n_qubit_NV_centre_spin(term):
 
     # print("Type {} ; name {}".format(term_type, op_name))
     return database_framework.compute(op_name)
+
+def process_ising_chain(term):
+    print("USING ISING CHAIN MTX PROCESS for ", term)
+    components = term.split('_')
+    components.remove('isingChain')
+
+    for element in components:
+        if element[0] == 'd':
+            dim = int(element.replace('d', ''))
+
+    mtx = None        
+    for d in range(1, dim):
+        s = 'pauliSet_{}J{}_zJz_d{}'.format(d, d+1, dim)
+        if mtx is None:
+            mtx = qmla.database_framework.compute(s)
+        else:
+            mtx += qmla.database_framework.compute(s)
+    return mtx
+
 
 def process_1d_ising(term):
     components = term.split('_')
