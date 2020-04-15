@@ -362,6 +362,10 @@ def plot_learned_models_dynamics(
     # TODO this is overwritten within for loop below so that large
     # Hamiltonians don't have to work out each time step
     true_exp = [true_expec_vals[t] for t in times_to_plot]
+    qmd.log_print([
+        "[Dynamics plot] plot probe file:", qmd.qmla_controls.probes_plot_file,
+        "\n true expectation value path:", qmd.qmla_controls.true_expec_path 
+    ])
     plot_probes = pickle.load(
         open(qmd.qmla_controls.probes_plot_file, 'rb')
     )
@@ -398,6 +402,9 @@ def plot_learned_models_dynamics(
     col = 0
 
     for mod_id in model_ids:
+        qmd.log_print([
+            "Plotting dynamics for model {}".format(mod_id)
+        ])
         reduced = qmd.get_model_storage_instance_by_id(mod_id)
         reduced.compute_expectation_values(
             times=qmd.times_to_plot
@@ -449,7 +456,7 @@ def plot_learned_models_dynamics(
             #     "\n\tprobe:", probe
 
             # )
-            expec_vals = {}
+            # expec_vals = {}
             if dim > 4:
                 times_to_plot = times_to_plot[0::5]
 
@@ -484,7 +491,13 @@ def plot_learned_models_dynamics(
                 # label = dynamics_label
                 label=desc
             )
+            # qmd.log_print([
+            #     "[Dynamics plot]",
+            #     "sim_exp:", sim_exp[0:20],
+            #     "true exp:", true_exp[0:20]
+            # ])
     #         ax.legend()
+            ax.set_ylim(-0.05, 1.05)
 
             if row == 0:
                 ax.set_title('Expectation Values')
