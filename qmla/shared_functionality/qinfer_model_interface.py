@@ -7,6 +7,7 @@ import copy
 
 import scipy as sp
 import qinfer as qi
+import time
 
 import qmla.shared_functionality.experimental_data_processing
 import qmla.get_growth_rule
@@ -99,6 +100,34 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # self.use_experimental_data = use_experimental_data
         self.log_file = log_file
         self.growth_generation_rule = growth_generation_rule
+        self.timings = {
+            'system': {}, 
+            'simulator' : {}
+        }
+        for k in self.timings:
+            self.timings[k] = {
+                'expectation_values' : 0, 
+                'get_pr0' : 0,
+                'get_probe' : 0, 
+                'construct_ham' : 0,
+                'storing_output' : 0,
+                'likelihood_array' : 0,
+                'likelihood' : 0, 
+            }
+        self.log_print([
+            "Timings dict at start:", self.timings
+        ])
+        #     'expectation_values' : {'system' : 0, 'simulator' : 0}, 
+        #     'likelihood' : 0, 
+        #     'get_system_pr0': 0,
+        #     'get_simulator_pr0' : 0,
+        #     'likelihood_array'  : 0, 
+        #     'simulator_get_probe' : 0,
+        #     'construct_ham' : {'system' : 0, 'simulator' : 0},
+        #     'sim_internal_get_pr0' : 0,
+        #     'storing_output' : {'system' : 0, 'simulator' : 0},
+        # }
+
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
@@ -326,7 +355,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             :math:`\Pr(d_i | \vec{x}_j; e_k)`.
         """
 
-        
+        t_likelihood_start = time.time()
         super(QInferModelQMLA, self).likelihood(
             outcomes, modelparams, expparams
         )  # just adds to self._call_count (Qinfer abstact model class)
@@ -357,15 +386,21 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
         try:
             if true_evo:
+                t_init = time.time()
                 pr0 = self.get_system_pr0_array(
                     times=times,
                     particles=params,
                 )
+                timing_marker = 'system'
+                self.timings[timing_marker]['get_pr0'] += time.time() - t_init
             else:
+                t_init = time.time()
                 pr0 = self.get_simulator_pr0_array(
                     times=times,
                     particles=params,
                 ) 
+                timing_marker = 'simulator'
+                self.timings[timing_marker]['get_pr0'] += time.time() - t_init
         except:
             self.log_print(
                 [
@@ -373,12 +408,13 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 ]
             )
             sys.exit()
-
+        t_init = time.time()
         likelihood_array = (
             qi.FiniteOutcomeModel.pr0_to_likelihood_array(
                 outcomes, pr0
             )
         )
+        self.timings[timing_marker]['likelihood_array'] += time.time() - t_init
         self.log_print_debug(
             [
                 'Simulating experiment.',
@@ -399,7 +435,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 "\nLikelihood: ", likelihood_array
             ]
         )
-
+        self.timings[timing_marker]['likelihood'] += time.time() - t_likelihood_start
         return likelihood_array
 
     def get_system_pr0_array(
@@ -423,21 +459,25 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         
         :returns np.ndarray pr0: probabilities of measuring specified outcome
         """
+        timing_marker = 'system'
 
         operator_list = self._true_oplist
         ham_num_qubits = self._true_dim
         # format of probe dict keys: (probe_id, qubit_number)
         # probe_counter controlled in likelihood method
+        t_init = time.time()
         probe = self.probe_dict[
             self.probe_counter,
             ham_num_qubits
         ]
+        self.timings[timing_marker]['get_probe'] += time.time() - t_init
         # TODO: could just work with true_hamiltonian, worked out on __init__
         return self.default_pr0_from_modelparams_times(
             t_list = times,
             particles = particles, 
             oplist = operator_list, 
             probe = probe, 
+            timing_marker=timing_marker
             # **kwargs
         )
 
@@ -461,21 +501,27 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         
         :returns np.ndarray pr0: probabilities of measuring specified outcome
         """
+        timing_marker = 'simulator'
         ham_num_qubits = self.model_dimension
         # format of probe dict keys: (probe_id, qubit_number)
         # probe_counter controlled in likelihood method
+        t_init = time.time()
         probe = self.sim_probe_dict[
             self.probe_counter,
             ham_num_qubits 
         ]
+        self.timings[timing_marker]['get_probe'] += time.time() - t_init
         operator_list = self._oplist
-        return self.default_pr0_from_modelparams_times(
+        t_init = time.time()
+        pr0 = self.default_pr0_from_modelparams_times(
             t_list = times, 
             particles = particles, 
             oplist = operator_list, 
             probe = probe, 
+            timing_marker=timing_marker
             # **kwargs
         )
+        return pr0
 
     def default_pr0_from_modelparams_times(
         self,
@@ -483,6 +529,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         particles,
         oplist,
         probe,
+        timing_marker,
         **kwargs
     ):
         r"""
@@ -524,9 +571,11 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
         for evoId in range(num_particles):  
             try:
+                t_init = time.time()
                 ham = np.tensordot(
                     particles[evoId], oplist, axes=1
                 )
+                self.timings[timing_marker]['construct_ham'] += time.time()-t_init
             except BaseException:
                 self.log_print(
                     [
@@ -543,6 +592,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     # random large number but still computable without error
                     t = random.randint(1e6, 3e6)
                 try:
+                    t_init = time.time()
                     likel = self.growth_class.expectation_value(
                         ham=ham,
                         t=t,
@@ -550,7 +600,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                         log_file=self.log_file,
                         log_identifier='get pr0 call exp val'
                     )
+                    self.timings[timing_marker]['expectation_values'] += time.time() - t_init
+                    t_init = time.time()
                     output[evoId][tId] = likel
+                    self.timings[timing_marker]['storing_output'] += time.time() - t_init
 
                 except NameError:
                     self.log_print(

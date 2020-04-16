@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-exp=2
-prt=10
+exp=100
+prt=1000
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -245,7 +245,7 @@ do
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        python3 \
+        python3 -m cProfile -s time \
             ../Scripts/implement_qmla.py \
             -qhl=$qhl_test \
             -mqhl=$multiple_qhl \
@@ -273,7 +273,8 @@ do
             -latex=$latex_mapping_file \
             -resource=$reallocate_resources \
             -ggr=$growth_rule \
-            $growth_rules_command 
+            $growth_rules_command \
+            > $full_path_to_results/profile.txt
     done
 done
 
