@@ -931,8 +931,8 @@ class QuantumModelLearningAgent():
                 ]
             )
             if wait_on_result == True:
-                while job.is_finished == False:
-                    if job.is_failed == True:
+                while not job.is_finished:
+                    if job.is_failed:
                         raise("Remote BF failure")
                     sleep(self.sleep_duration)
             elif return_job == True:
@@ -1041,8 +1041,8 @@ class QuantumModelLearningAgent():
                 ]
             )
             for job in remote_jobs:
-                while job.is_finished == False:
-                    if job.is_failed == True:
+                while not job.is_finished:
+                    if job.is_failed:
                         raise NameError("Remote QML failure")
                     time.sleep(self.sleep_duration)
         else:

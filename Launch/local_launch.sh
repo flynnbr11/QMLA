@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-exp=100
-prt=500
+exp=500
+prt=1500
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -245,7 +245,8 @@ do
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        python3 -m cProfile -s time \
+        # python3 -m cProfile -s time \
+        python3 \
             ../Scripts/implement_qmla.py \
             -qhl=$qhl_test \
             -mqhl=$multiple_qhl \
