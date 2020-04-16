@@ -7,7 +7,7 @@ import os as os
 import sys as sys
 import itertools
 import pandas as pd
-import time as time
+import time
 from time import sleep
 import random
 
@@ -149,6 +149,15 @@ class QuantumModelLearningAgent():
             self.qmla_id,
         )
         self.redis_databases['any_job_failed'].set('Status', 0)
+        self.timings = {
+            'inspect_job_crashes' : 0,
+            'jobs_finished' : 0
+        }
+        self.call_counter = {
+            'job_crashes' : 0,
+            'jobs_finished' : 0, 
+        }
+        self.sleep_duration = 10
 
     def _true_model_definition(self):
         self.true_model_name = database_framework.alph(
@@ -807,7 +816,7 @@ class QuantumModelLearningAgent():
                         "added to queue."
                     ]
                 )
-                if blocking == True:  # i.e. wait for result when called.
+                if blocking:  # i.e. wait for result when called.
                     self.log_print(
                         [
                             "Blocking, ie waiting for",
@@ -816,7 +825,11 @@ class QuantumModelLearningAgent():
                         ]
                     )
                     while not queued_model.is_finished:
-                        if queued_model.is_failed:
+                        t_init = time.time()
+                        some_job_failed = queued_model.is_failed
+                        self.timings['jobs_finished'] += time.time() - t_init
+                        self.call_counter['jobs_finished'] += 1
+                        if some_job_failed:
                             self.log_print(
                                 [
                                     "Model", model_name,
@@ -825,7 +838,7 @@ class QuantumModelLearningAgent():
                             )
                             raise NameError("Remote QML failure")
                             break
-                        time.sleep(0.1)
+                        time.sleep(self.sleep_duration)
                     self.log_print(
                         ['Blocking RQ model learned:', model_name]
                     )
@@ -921,7 +934,7 @@ class QuantumModelLearningAgent():
                 while job.is_finished == False:
                     if job.is_failed == True:
                         raise("Remote BF failure")
-                    sleep(0.1)
+                    sleep(self.sleep_duration)
             elif return_job == True:
                 return job
         else:
@@ -1031,7 +1044,7 @@ class QuantumModelLearningAgent():
                 while job.is_finished == False:
                     if job.is_failed == True:
                         raise NameError("Remote QML failure")
-                    time.sleep(0.01)
+                    time.sleep(self.sleep_duration)
         else:
             self.log_print(
                 [
@@ -1572,7 +1585,7 @@ class QuantumModelLearningAgent():
                 while job_list[k].is_finished == False:
                     if job_list[k].is_failed:
                         raise NameError("Remote QML failure")
-                    sleep(0.01)
+                    sleep(self.sleep_duration)
             self.log_print(
                 [
                     "Parent/child Bayes factors: jobs all launched."
@@ -1982,6 +1995,9 @@ class QuantumModelLearningAgent():
 
 
     def inspect_remote_job_crashes(self):
+        self.calls_to_job_inspections += 1
+        self.call_counter['job_crashes'] += 1
+        t_init = time.time()
         if self.redis_databases['any_job_failed']['Status'] == b'1':
             # TODO better way to detect errors? 
             self.log_print(
@@ -1990,6 +2006,7 @@ class QuantumModelLearningAgent():
                 ]
             )
             raise NameError('Remote QML Failure')
+        self.timings['inspect_job_crashes'] += time.time() - t_init
 
     def finalise_qmla(self):
         # Final functions at end of QMLA instance
@@ -2438,7 +2455,7 @@ class QuantumModelLearningAgent():
             # need to wait on all models to finish anyway, 
             # so can just wait on them in order.
             while int(learned_models_ids.get(k)) != 1:
-                sleep(0.01)
+                sleep(self.sleep_duration)
                 self.inspect_remote_job_crashes()
 
         # Learning finished
@@ -2516,7 +2533,8 @@ class QuantumModelLearningAgent():
         self.finalise_qmla()
         self.log_print(
             [
-                "Final winner:", self.global_champion_name, 
+                "QMLA timings:", self.timings,
+                "\nFinal winner:", self.global_champion_name, 
                 "has F-score ", self.model_f_scores[self.champion_model_id]
             ]
         )

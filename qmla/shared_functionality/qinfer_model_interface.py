@@ -117,17 +117,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.log_print([
             "Timings dict at start:", self.timings
         ])
-        #     'expectation_values' : {'system' : 0, 'simulator' : 0}, 
-        #     'likelihood' : 0, 
-        #     'get_system_pr0': 0,
-        #     'get_simulator_pr0' : 0,
-        #     'likelihood_array'  : 0, 
-        #     'simulator_get_probe' : 0,
-        #     'construct_ham' : {'system' : 0, 'simulator' : 0},
-        #     'sim_internal_get_pr0' : 0,
-        #     'storing_output' : {'system' : 0, 'simulator' : 0},
-        # }
-
+        self.calls_to_likelihood = 0 
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
@@ -355,6 +345,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             :math:`\Pr(d_i | \vec{x}_j; e_k)`.
         """
 
+        self.calls_to_likelihood+=1
         t_likelihood_start = time.time()
         super(QInferModelQMLA, self).likelihood(
             outcomes, modelparams, expparams

@@ -467,6 +467,7 @@ else:
 #########################
 end = time.time()
 log_print(["Time taken:", end - start])
+log_print(["QMLA timings:", qmla_instance.timings, "\nCalls:", qmla_instance.call_counter])
 log_print(
     [
         "END of QMLA id", qmla_controls.qmla_id, ":",

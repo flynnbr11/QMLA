@@ -677,11 +677,6 @@ class ModelInstanceForLearning():
                     self.final_sigmas_qhl[self.model_terms_names[iterator]] = (
                         self.final_learned_params[iterator][1]
                     )
-        # self.qinfer_model.timings = {
-        #     k : np.round(self.qinfer_model.timings[k], 2)
-        #     for k in self.qinfer_model.timings
-        # } # round all timing values to 2 decimal places 
-
 
         for k in self.qinfer_model.timings:
             self.qinfer_model.timings[k] =  {
@@ -689,7 +684,10 @@ class ModelInstanceForLearning():
                 for v in self.qinfer_model.timings[k]
             }
         self.log_print([
-            "After updates, qinfer model timings:", self.qinfer_model.timings
+            "{} calls to likelihood fnc. After updates, qinfer model timings:\n{}".format(
+                self.qinfer_model.calls_to_likelihood,
+                self.qinfer_model.timings
+            )
         ])
 
     def learned_info_dict(self):

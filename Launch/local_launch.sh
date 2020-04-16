@@ -18,7 +18,7 @@ q_id=0 # can start from other ID if desired
 # QHL parameters
 ### --------------------------------------------------###
 exp=100
-prt=1000
+prt=500
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -28,7 +28,7 @@ rt=0.5
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-use_rq=0
+use_rq=1
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
 plots=0
