@@ -199,3 +199,70 @@ class HeisenbergXYZPredetermined(
             4: 6,
             'other': 0
         }
+
+
+class HeisenbergSharedField(
+    HeisenbergXYZPredetermined
+):
+
+    def __init__(
+        self,
+        growth_generation_rule,
+        **kwargs
+    ):
+        # print("[Growth Rules] init nv_spin_experiment_full_tree")
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            **kwargs
+        )
+        self.true_model = 'Heis_ix_d2+Heis_iy_d2+Heis_iz_d2+Heis_tz_d2'
+
+    def latex_name(
+        self,
+        name,
+        **kwargs
+    ):
+        # print("[latex name fnc] name:", name)
+        core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+        num_sites = database_framework.get_num_qubits(name)
+        try:
+            p_str = 'P' * num_sites
+            separate_terms = name.split(p_str)
+        except:
+            p_str = '+'
+            separate_terms = name.split(p_str)
+
+        site_connections = {}
+        for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):
+            site_connections[c] = []
+
+        # term_type_markers = ['pauliSet', 'transverse']
+        transverse_axis = None
+        heis_axis = None
+        for term in separate_terms:
+            components = term.split('_')
+            if 'Heis' in components:
+                components.remove('Heis')
+                for l in components:
+                    if l[0] == 'd':
+                        dim = int(l.replace('d', ''))
+                    elif l[0] == 'i':
+                        heis_axis = str(l.replace('i', ''))
+                    elif l[0] == 't':
+                        transverse_axis = str(l.replace('t', ''))
+
+        latex_term = ""
+        if heis_axis is not None:
+            this_term = r"\sigma_{"
+            this_term += str(ising_axis)
+            this_term += "}^{\otimes"
+            this_term += str(dim)
+            this_term += "}"
+            latex_term += this_term
+        if transverse_axis is not None:
+            latex_term += 'T_{}^{}'.format(transverse_axis, dim)
+
+        if latex_term == "":
+            print("Heisenberg shared field could not generate latex string for ", name)
+        latex_term = "${}$".format(latex_term)
+        return latex_term

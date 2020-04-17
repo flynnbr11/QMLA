@@ -39,6 +39,8 @@ growth_classes = {
         GR.HeisenbergXYZPredetermined,
     'HeisenbergXYZProbabilistic':
         GR.HeisenbergXYZProbabilistic,
+    'HeisenbergSharedField' : 
+        GR.HeisenbergSharedField, 
     'FermiHubbardPredetermined':
         GR.FermiHubbardPredetermined,
     'FermiHubbardProbabilistic':

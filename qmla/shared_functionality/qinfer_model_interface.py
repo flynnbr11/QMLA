@@ -114,9 +114,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 'likelihood_array' : 0,
                 'likelihood' : 0, 
             }
-        self.log_print([
-            "Timings dict at start:", self.timings
-        ])
         self.calls_to_likelihood = 0 
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
