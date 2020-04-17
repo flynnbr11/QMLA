@@ -681,7 +681,7 @@ class ModelInstanceForLearning():
         for k in self.qinfer_model.timings:
             for kk in self.qinfer_model.timings[k]:
                 self.log_print([
-                    "Timing - {}/{}: {}".format(
+                    "QinferModel Timing - {}/{}: {}".format(
                         k, kk, 
                         np.round(self.qinfer_model.timings[k][kk], 2)
                     )
@@ -776,12 +776,12 @@ class ModelInstanceForLearning():
 
     def compute_likelihood_after_parameter_learning(
         self,
-        times = [1, 2]
+        # times = [1, 2]
     ):
-        from qmla.remote_bayes_factor import get_exp
         posterior_distribution = qi.MultivariateNormalDistribution(
             self.qinfer_updater.est_mean(),
-            self.qinfer_updater.est_covariance_mtx(),
+            np.diag(self.qinfer_updater.est_mean()**2), # extremely thin 
+            # self.qinfer_updater.est_covariance_mtx()
         )
 
         learned_params = list(self.final_learned_params[:, 0])
@@ -805,6 +805,9 @@ class ModelInstanceForLearning():
         
         evaluation_times = true_params_dict['evaluation_times']
         evaluation_probe_dict = true_params_dict['evaluation_probes']
+        self.log_print([
+            "Evaluating learned model. number of times:", len(evaluation_times)
+        ])
 
         evaluation_qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
@@ -823,12 +826,15 @@ class ModelInstanceForLearning():
         )
 
         evaluation_updater = qi.SMCUpdater(
-            model=self.qinfer_model,
-            n_particles=min(25, self.num_particles),
+            # model=self.qinfer_model,
+            model = evaluation_qinfer_model, 
+            n_particles=min(5, self.num_particles),
             # n_particles=self.num_particles,
             prior=posterior_distribution,
             # resample more aggressively once learned, since closer to true values
-            resample_thresh=max(self.qinfer_resampler_threshold, 0.6), 
+            # resample_thresh=max(self.qinfer_resampler_threshold, 0.6), 
+            # turn off resampling - want to evaluate the learned model, not improved version
+            resample_thresh=0.0,  
             resampler=qi.LiuWestResampler(
                 a=self.qinfer_resampler_a
             ),
@@ -837,10 +843,9 @@ class ModelInstanceForLearning():
 
         evaluation_updater._log_total_likelihood = 0.0
         evaluation_updater._normalization_record = []
-
         for t in evaluation_times:
             exp = format_experiment(
-                self.qinfer_model, 
+                evaluation_qinfer_model, 
                 final_learned_params = self.final_learned_params, 
                 time = [t],
             )
@@ -851,7 +856,9 @@ class ModelInstanceForLearning():
                 repeat=1
             )
             evaluation_updater.update(datum, exp)
-
+        self.log_print([
+            "Evaluation updates complete. num resamples:", evaluation_updater.resample_count
+        ])
         log_likelihood = evaluation_updater.log_total_likelihood
         self.evaluation_normalization_record = evaluation_updater.normalization_record
         if np.isnan(evaluation_updater.log_total_likelihood):
@@ -869,7 +876,16 @@ class ModelInstanceForLearning():
                 np.median(evaluation_updater.normalization_record),
                 2
             )
-        
+        for k in evaluation_qinfer_model.timings:
+            for kk in evaluation_qinfer_model.timings[k]:
+                self.log_print([
+                    "Evaluation Timing - {}/{}: {}".format(
+                        k, kk, 
+                        np.round(evaluation_qinfer_model.timings[k][kk], 2)
+                    )
+                ])
+
+
 
 def round_nearest(x,a):
     return round(round(x/a)*a ,2)

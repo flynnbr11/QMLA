@@ -2404,6 +2404,10 @@ class QuantumModelLearningAgent():
             model_id=mod_id
         )
         self.get_statistical_metrics()
+        for k in self.timings:
+            self.log_print([
+                "QMLA Timing - {}: {}".format(k, np.round(self.timings[k], 2))
+            ])
 
 
     def run_quantum_hamiltonian_learning_multiple_models(
@@ -2482,6 +2486,10 @@ class QuantumModelLearningAgent():
         for k in self.model_name_id_map:
             v = self.model_name_id_map[k]
             self.model_id_to_name_map[v] = k
+        for k in self.timings:
+            self.log_print([
+                "QMLA Timing - {}: {}".format(k, np.round(self.timings[k], 2))
+            ])
 
 
     def run_complete_qmla_dev(
@@ -2531,9 +2539,12 @@ class QuantumModelLearningAgent():
             self.check_champion_reducibility()
 
         self.finalise_qmla()
+        for k in self.timings:
+            self.log_print([
+                "QMLA Timing - {}: {}".format(k, np.round(self.timings[k], 2))
+            ])
         self.log_print(
             [
-                "QMLA timings:", self.timings,
                 "\nFinal winner:", self.global_champion_name, 
                 "has F-score ", self.model_f_scores[self.champion_model_id]
             ]
@@ -2545,6 +2556,7 @@ class QuantumModelLearningAgent():
     def run_complete_qmla(
         self,
     ):
+        # TODO use this fnc instead of _dev version above
 
         self.learn_models_until_trees_complete()
         # self.prune_trees_until_complete()
@@ -2589,6 +2601,10 @@ class QuantumModelLearningAgent():
             self.check_champion_reducibility()
 
         self.finalise_qmla()
+        for k in self.timings:
+            self.log_print([
+                "QMLA Timing - {}: {}".format(k, np.round(self.timings[k], 2))
+            ])
         self.log_print(
             [
                 "Final winner:", self.global_champion, 

@@ -215,7 +215,8 @@ class HeisenbergSharedField(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.true_model = 'Heis_ix_d2+Heis_iy_d2+Heis_iz_d2+Heis_tz_d2'
+        self.true_model = 'Heis_ix_d2PPHeis_iy_d2PPHeis_iz_d2PPHeis_tz_d2'
+        self.initial_models = [self.true_model]
 
     def latex_name(
         self,
@@ -254,13 +255,18 @@ class HeisenbergSharedField(
         latex_term = ""
         if heis_axis is not None:
             this_term = r"\sigma_{"
-            this_term += str(ising_axis)
+            this_term += str(heis_axis)
             this_term += "}^{\otimes"
             this_term += str(dim)
             this_term += "}"
             latex_term += this_term
         if transverse_axis is not None:
-            latex_term += 'T_{}^{}'.format(transverse_axis, dim)
+            this_term = r"T_{"
+            this_term += str(transverse_axis)
+            this_term += "}^{\otimes"
+            this_term += str(dim)
+            this_term += "}"
+            latex_term += this_term
 
         if latex_term == "":
             print("Heisenberg shared field could not generate latex string for ", name)
