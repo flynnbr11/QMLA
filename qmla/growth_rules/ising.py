@@ -164,17 +164,19 @@ class IsingSharedField(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.zero_state_probes
+        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.zero_state_probes
+        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.
         self.true_model = '1Dising_iz_d4PPPP1Dising_tx_d4'
         self.tree_completed_initially = True
         self.check_champion_reducibility = False
         self.initial_models = [
-            # '1Dising_iz_d6PPPPPP1Dising_tx_d6',
+            '1Dising_iz_d6PPPPPP1Dising_tx_d6',
             '1Dising_iz_d5PPPPP1Dising_tx_d5',
             '1Dising_iz_d4PPPP1Dising_tx_d4',
-            # '1Dising_iz_d3PPP1Dising_tx_d3',
-            # '1Dising_iz_d2PP1Dising_tx_d2', 
+            '1Dising_iz_d3PPP1Dising_tx_d3',
+            '1Dising_iz_d2PP1Dising_tx_d2', 
         ]
+        self.qhl_models = self.initial_models
         self.num_processes_to_parallelise_over = len(self.initial_models)
 
 
