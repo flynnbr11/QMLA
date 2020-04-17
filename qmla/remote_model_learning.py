@@ -99,17 +99,17 @@ def remote_learn_model_parameters(
     learned_models_ids = redis_databases['learned_models_ids']
     active_branches_learning_models = redis_databases['active_branches_learning_models']
     any_job_failed_db = redis_databases['any_job_failed']
-    timings['load_database'] = np.round(time.time() - t_init, 2)
+    timings['load_database'] = time.time() - t_init
 
     if qmla_core_info_dict is None:
         t_init = time.time()
         qmla_core_info_dict = pickle.loads(qmla_core_info_database['qmla_settings'])
         probe_dict = pickle.loads(qmla_core_info_database['ProbeDict'])
-        timings['pickling'] += np.round(time.time() - t_init, 2)
+        timings['pickling'] += time.time() - t_init
     else:  # if in serial, qmla_core_info_dict given, with probe_dict included in it.
         t_init = time.time()
         probe_dict = qmla_core_info_dict['probe_dict']
-        timings['get_probe_dict_local'] += np.round(time.time() - t_init, 2)
+        timings['get_probe_dict_local'] += time.time() - t_init
 
     true_model_terms_matrices = qmla_core_info_dict['true_oplist']
     qhl_plots = qmla_core_info_dict['qhl_plots']
@@ -127,7 +127,7 @@ def remote_learn_model_parameters(
         host_name=host_name,
         port_number=port_number,
     )
-    timings['instantiate_model'] = np.round(time.time() - t_init, 2)
+    timings['instantiate_model'] = time.time() - t_init
     evaluation_times = list(np.arange(0, 10, 0.05))
     log_print(["Starting model QHL update."])
     try:
@@ -140,14 +140,14 @@ def remote_learn_model_parameters(
                 )
             ]
         )
-        timings['update'] += np.round(time.time() - t_init, 2)
+        timings['update'] += time.time() - t_init
         log_print(["Starting model likelihood calculation."])
         print("Computing log likelihood for mod {}".format(model_id))
         t_init = time.time()
         qml_instance.compute_likelihood_after_parameter_learning(
             times = evaluation_times
         )
-        timings['evaluation_likelihood'] = np.round(time.time() - t_init, 2)
+        timings['evaluation_likelihood'] = time.time() - t_init
         log_print([
             "Model evaluation ll:", qml_instance.evaluation_log_likelihood
         ])
@@ -199,7 +199,7 @@ def remote_learn_model_parameters(
         updated_model_info,
         protocol=4
     )
-    timings['storing_result'] = np.round(time.time() - t_init, 2)
+    timings['storing_result'] = time.time() - t_init
 
     try:
         learned_models_info_db.set(
@@ -230,22 +230,21 @@ def remote_learn_model_parameters(
     ])
     learned_models_ids.set(str(model_id), 1)
 
-    timings_tmp = {
-        k : np.round(timings[k], 2)
-        for k in timings
-    }
-    timings = timings_tmp
+    for k in timings:
+        log_print([
+            "Timing - {}: {}".format(k, np.round(timings[k], 2))
+        ])
     if remote:
         t_init = time.time()
         del updated_model_info
         del compressed_info
         timings['deleting_data'] = np.round(time.time() - t_init, 2)
-        timings['total'] = time.time() - time_start
+        timings['total'] = np.round(time.time() - time_start, 2)
         log_print(["Learned. rq time:", str(time_end - time_start)])
-        log_print(["QHL timings:", timings, "\n unaccounted for time:", sum(timings.values()) - timings['total']])
+        log_print(["QHL time unaccounted for:", 2*timings['total'] - sum(timings.values()) ]) # 2*total since already counted in timings
         return None
     else:
-        timings['total'] = time.time() - time_start
-        log_print(["QHL timings:", timings, "\n unaccounted for time:", sum(timings.values()) - timings['total']])
+        timings['total'] = np.round(time.time() - time_start, 2)
+        log_print(["QHL timings:", timings, "\n unaccounted for time:", timings['total'] - sum(timings.values()) ])
         return updated_model_info
     

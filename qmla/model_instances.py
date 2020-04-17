@@ -679,16 +679,23 @@ class ModelInstanceForLearning():
                     )
 
         for k in self.qinfer_model.timings:
-            self.qinfer_model.timings[k] =  {
-                v : np.round(self.qinfer_model.timings[k][v], 2)
-                for v in self.qinfer_model.timings[k]
-            }
-        self.log_print([
-            "{} calls to likelihood fnc. After updates, qinfer model timings:\n{}".format(
-                self.qinfer_model.calls_to_likelihood,
-                self.qinfer_model.timings
-            )
-        ])
+            for kk in self.qinfer_model.timings[k]:
+                self.log_print([
+                    "Timing - {}/{}: {}".format(
+                        k, kk, 
+                        np.round(self.qinfer_model.timings[k][kk], 2)
+                    )
+                ])
+            # self.qinfer_model.timings[k] =  {
+            #     v : np.round(self.qinfer_model.timings[k][v], 2)
+            #     for v in self.qinfer_model.timings[k]
+            # }
+        # self.log_print([
+        #     "{} calls to likelihood fnc. After updates, qinfer model timings:\n{}".format(
+        #         self.qinfer_model.calls_to_likelihood,
+        #         self.qinfer_model.timings
+        #     )
+        # ])
 
     def learned_info_dict(self):
         """

@@ -298,19 +298,19 @@ def remote_bayes_factor_calculation(
         timings['update_databases'] = time.time() - t_init
         time_end = time.time()
         timings['total'] = time.time() - time_start
-        timings_tmp = {
-            k : np.round(timings[k])
-            for k in timings
-        }
-        timings = timings_tmp
+
+        for k in timings:
+            log_print([
+                "Timing - {}: {}".format(k, np.round(timings[k], 2))
+            ])
         log_print(
             [
                 "Finished. rq time: ",
                 str(time_end - time_start),
-                "\nBF timings:", timings,
-                "\n unaccounted for time:", sum(timings.values()) - timings['total']
+                "\nBF time unaccounted for:", 2*timings['total'] - sum(timings.values())
             ]
         )
+
         return bayes_factor
 
 def log_print(
