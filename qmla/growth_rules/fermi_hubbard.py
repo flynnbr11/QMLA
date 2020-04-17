@@ -47,6 +47,7 @@ class FermiHubbardBase(
             1: 0,
             2: 0,
             4: 10,
+            6 : 1, 
             'other': 0
         }
 
@@ -127,6 +128,7 @@ class FermiHubbardProbabilistic(
         self.max_num_sites = 4
         self.max_num_probe_qubits = self.max_num_sites
         self.max_num_qubits = self.max_num_sites
+        self.timing_insurance_factor = 20
         # self.num_probes = 20
         self.lattice_dimension = 1
         self.tree_completed_initially = False

@@ -246,6 +246,8 @@ def time_required(
         minimum_allowed_time,
         int(further_qhl_time)
     )
+    for k in ['qmd', 'qhl', 'fqhl']:
+        times_reqd[k] *= growth_class.timing_insurance_factor
 
     return times_reqd
 
