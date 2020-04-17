@@ -178,6 +178,7 @@ class IsingSharedField(
         ]
         self.qhl_models = self.initial_models
         self.num_processes_to_parallelise_over = len(self.initial_models)
+        self.timing_insurance_factor = 5
 
 
 class TestReducedParticlesBayesFactors(
