@@ -277,28 +277,28 @@ class ModelInstanceForLearning():
             self.model_name
         )
 
-        for i in range(len(individual_terms_in_name)):
-            term = individual_terms_in_name[i]
-            term_mtx = qmla.database_framework.compute(term)
-            if np.all(term_mtx == self.model_terms_matrices[i]) is False:
-                # TODO make this raise an exception instead
-                print("[ModelInstanceForLearning] UNEQUAL LIST / TERM MATRICES.")
-                print("==> INSPECT ORDER OF PRIORS.")
-                self.log_print(
-                    [
-                        "Term", term,
-                        "\ncalculated mtx:", term_mtx,
-                        "\nSimOpList:", self.model_terms_matrices[i]
-                    ]
-                )
-            elif term != self.model_terms_names[i]:
-                self.log_print(
-                    [
-                        "term {} != SimOpsNames[i] {}".format(
-                            term, self.model_terms_names[i]
-                        )
-                    ]
-                )
+        # for i in range(len(individual_terms_in_name)):
+            # term = individual_terms_in_name[i]
+            # term_mtx = qmla.database_framework.compute(term)
+            # if np.all(term_mtx == self.model_terms_matrices[i]) is False:
+            #     # TODO make this raise an exception instead
+            #     print("[ModelInstanceForLearning] UNEQUAL LIST / TERM MATRICES.")
+            #     print("==> INSPECT ORDER OF PRIORS.")
+            #     self.log_print(
+            #         [
+            #             "Term", term,
+            #             "\ncalculated mtx:", term_mtx,
+            #             "\nSimOpList:", self.model_terms_matrices[i]
+            #         ]
+            #     )
+            # elif term != self.model_terms_names[i]:
+            #     self.log_print(
+            #         [
+            #             "term {} != SimOpsNames[i] {}".format(
+            #                 term, self.model_terms_names[i]
+            #             )
+            #         ]
+            #     )
 
         num_params = len(self.model_terms_matrices)
         log_identifier = str("QML " + str(self.model_id))

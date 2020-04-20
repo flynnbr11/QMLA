@@ -213,18 +213,13 @@ def get_num_qubits(name):
     for term in individual_terms:
         if (
             term[0:1] == 'h_'
-            or
-            '1Dising' in term
-            or
-            'Heis' in term
-            or
-            'nv' in term
-            or
-            'pauliSet' in term
-            or
-            'transverse' in term
-            or
-            'FH' in term
+            or '1Dising' in term
+            or 'Heis' in term
+            or 'nv' in term
+            or 'pauliSet' in term
+            or 'transverse' in term
+            or 'FH' in term
+            or 'pauliLikewise' in term
         ):
             terms = term.split('_')
             dim_term = terms[-1]
@@ -317,6 +312,11 @@ def alph(name):
     Return alphabetised version of name.
     Parse string and recursively call alph function to alphabetise substrings.
     """
+    if '+' in name:
+        separate_terms = name.split('+')
+        alphabetised = '+'.join(sorted(separate_terms))
+        return alphabetised
+
     # TODO rewrite for names separated by +
     t_max, t_str = find_max_letter(name, "T")
     p_max, p_str = find_max_letter(name, "P")
@@ -409,28 +409,29 @@ def compute_p(inp):
     max_p, p_str = find_max_letter(inp, "P")
     max_t, t_str = find_max_letter(inp, "T")
 
-    if(max_p == 0 and max_t == 0):
+    if '+' in inp:
+        p_str = '+'
+    elif(max_p == 0 and max_t == 0):
         pauli_symbol = inp
         return core_operator_dict[pauli_symbol]
-
     elif max_p == 0:
         return compute(inp)
-    else:
-        to_add = inp.split(p_str)
-        #print("To add : ", to_add)
-        running_sum = empty_array_of_same_dim(to_add[0])
-        for i in range(len(to_add)):
-            max_p, p_str = find_max_letter(to_add[i], "P")
-            max_t, t_str = find_max_letter(to_add[i], "T")
+    # else:
+    to_add = inp.split(p_str)
+    #print("To add : ", to_add)
+    running_sum = empty_array_of_same_dim(to_add[0])
+    for i in range(len(to_add)):
+        max_p, p_str = find_max_letter(to_add[i], "P")
+        max_t, t_str = find_max_letter(to_add[i], "T")
 
-           # print("To add [i=", i, "]:", to_add[i] )
-            rhs = compute(to_add[i])
-            #print("SUM shape:", np.shape(running_sum))
-            #print("RHS shape:", np.shape(rhs))
-            running_sum += rhs
+        # print("To add [i=", i, "]:", to_add[i] )
+        rhs = compute(to_add[i])
+        #print("SUM shape:", np.shape(running_sum))
+        #print("RHS shape:", np.shape(rhs))
+        running_sum += rhs
 
-        #print("RESULT ", p_str, " : ", inp, ": \n", running_sum)
-        return running_sum
+    #print("RESULT ", p_str, " : ", inp, ": \n", running_sum)
+    return running_sum
 
 
 def compute_m(inp):
@@ -483,9 +484,13 @@ def compute(inp):
     max_t, t_str = find_max_letter(inp, "T")
     max_m, m_str = find_max_letter(inp, "M")
 
+    if '+' in inp:
+        return compute_p(inp)
     if (max_m == 0 and max_t == 0 and max_p == 0):
         basic_operator = inp
-        # return core_operator_dict[basic_operator]
+        # call subroutine which can interpret a "basic operator"
+        # basic operators are defined with the function
+        # they are terms which can not be separated further by P,M,T or +
         return process_basic_operator(basic_operator)
     elif max_m > max_t:
         return compute_m(inp)

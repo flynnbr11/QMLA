@@ -21,22 +21,23 @@ def log_print(
     )
 
 def process_basic_operator(basic_operator):
-    if basic_operator[0:1] == 'h_':
-        mtx = process_hubbard_operator(
-            basic_operator
-        )
-    elif 'isingChain' in basic_operator:
-        mtx = process_ising_chain(
-            basic_operator
-        )
-    elif '1Dising' in basic_operator:
+    print("Process basic operator:", basic_operator)
+    # if basic_operator[0:1] == 'h_':
+    #     mtx = process_hubbard_operator(
+    #         basic_operator
+    #     )
+    # elif 'isingChain' in basic_operator:
+    #     mtx = process_ising_chain(
+    #         basic_operator
+    #     )
+    if '1Dising' in basic_operator:
         mtx = process_1d_ising(
             basic_operator
         )
-    elif 'Heis' in basic_operator:
-        mtx = process_heisenberg_xyz(
-            basic_operator
-        )
+    # elif 'Heis' in basic_operator:
+    #     mtx = process_heisenberg_xyz(
+    #         basic_operator
+    #     )
     elif 'nv' in basic_operator:
         mtx = process_n_qubit_NV_centre_spin(
             basic_operator
@@ -45,10 +46,14 @@ def process_basic_operator(basic_operator):
         mtx = process_multipauli_term(
             term=basic_operator
         )
-    elif 'transverse' in basic_operator:
-        mtx = process_transverse_term(
-            term=basic_operator
+    elif 'pauliLikewise' in basic_operator:
+        mtx = process_likewise_pauli_sum(
+            term = basic_operator
         )
+    # elif 'transverse' in basic_operator:
+    #     mtx = process_transverse_term(
+    #         term=basic_operator
+    #     )
     elif 'FH' in basic_operator:
         mtx = process_fermi_hubbard_term(
             term=basic_operator
@@ -67,7 +72,7 @@ def full_model_string(operations):
     operations must be a dict with elements:
     - 'dim' : number of qubits
     - 'terms' : list of lists of tuple of the form,
-        e.g. [ (1, 'x'), (2, 'y')]
+        e.g. [[ (1, 'x'), (2, 'y')]]
         i.e. tuples (qubit_id, pauli_operator)
         Each nested list gives a term, which are all added together for the full model
     Reconstructs unique model name for that Hamiltonian.
@@ -104,8 +109,8 @@ def full_model_string(operations):
     for i in range(num_qubits - 1):
         p_str += 'P'
 
-    full_model = p_str.join(all_terms)
-    # full_model = database_framework.alph(full_model)
+    # full_model = p_str.join(all_terms)
+    full_model = '+'.join(all_terms)
     full_model = alph(full_model)
     return full_model
 
@@ -202,6 +207,39 @@ def process_multipauli_term(term):
     full_mod_str = full_model_string(term_dict)
     return database_framework.compute(full_mod_str)
 
+def process_likewise_pauli_sum(term):
+    r"""
+    Terms where the same Pauli is applied to different qubits, summed together. 
+
+    Example usage: pauliLikewise_lx_1J2_1J3_2J3_d3
+    = XXI + XIX + IXX
+    returned as a single matrix
+
+    """
+    components = term.split('_')
+    components.remove('pauliLikewise')
+    print("processing likewise pauli sum for:", term)
+
+    connected_sites = []
+    for l in components:
+        if l[0] == 'd':
+            dim = int(l.replace('d', ''))
+        elif l[0] == 'l':
+            operator = str(l.replace('l', ''))
+        else:
+            connected_sites.append(l.split('J'))
+    all_terms = []
+    for s in connected_sites:
+        new_term = 'pauliSet_{o}J{o}_{site1}J{site2}_d{N}'.format(
+            o = operator,
+            site1 = s[0],
+            site2 = s[1], 
+            N = dim
+        )
+        all_terms.append(new_term)
+
+    total_model_string = '+'.join(all_terms)  
+    return qmla.database_framework.compute(total_model_string)    
 
 def process_n_qubit_NV_centre_spin(term):
     components = term.split('_')
@@ -373,11 +411,11 @@ def process_heisenberg_xyz(term):
             num_qubits=dim,
             transverse_axis=transverse_axis
         )
+
 def single_axis_nearest_neighbour_interaction_chain(
     num_qubits,
     interaction_axis='x'
 ):
-
     individual_interaction_terms = []
 
     for i in range(1, num_qubits):

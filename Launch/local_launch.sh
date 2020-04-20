@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-exp=10
-prt=50
+exp=5
+prt=20
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -76,12 +76,12 @@ git_commit=$(git rev-parse HEAD)
 
 # sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'
-sim_growth_rule='IsingSharedField'
+# sim_growth_rule='IsingSharedField'
 # sim_growth_rule='TestReducedParticlesBayesFactors'
 # sim_growth_rule='TestAllParticlesBayesFactors'
 # sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
-# sim_growth_rule='HeisenbergSharedField'
+sim_growth_rule='HeisenbergSharedField'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
 # sim_growth_rule='Genetic'

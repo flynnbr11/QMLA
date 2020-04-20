@@ -31,18 +31,18 @@ class HeisenbergXYZProbabilistic(
         self.max_num_sites = 4
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.pauli_eigenvector_based_probes
 
-        self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
-        self.four_site_xxz_chain = 'pauliSet_1J2_xJx_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_zJz_d4'
-        self.four_site_xxz = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
+        self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3+pauliSet_2J3_zJz_d3'
+        self.four_site_xxz_chain = 'pauliSet_1J2_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4'
+        self.four_site_xxz = 'pauliSet_1J2_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4'
         
         self.true_model = self.four_site_xxz_chain
         self.true_model = database_framework.alph(self.true_model)
         self.qhl_models = [
             self.true_model,
-            'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_2J4_zJz_d4PPPPpauliSet_3J4_xJx_d4'
+            'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4'
         ]
         self.base_terms = [
             'x',
@@ -128,7 +128,7 @@ class HeisenbergXYZPredetermined(
 
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
-            # heis_xxz_4site = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_2J4_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
+            # heis_xxz_4site = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4'
             # self.true_model = heis_xxz_4site
             models = []
             list_connections = [
@@ -163,15 +163,15 @@ class HeisenbergXYZPredetermined(
             ##########
 
             # i.e. 1 qubit model containing correct subsystem wins 1 qubit generation
-            # self.true_model = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
+            # self.true_model = 'pauliSet_1J2_xJx_d3+pauliSet_2J3_zJz_d3'
             # self.initial_models = [
             #     'pauliSet_1J2_xJx_d3',
             #     'pauliSet_1J2_zJz_d3',
             #     'pauliSet_1J2_yJy_d3',
-            #     'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3',
-            #     'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3',
-            #     'pauliSet_1J2_zJz_d3PPPpauliSet_1J2_yJy_d3',
-            #     'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_1J2_zJz_d3',
+            #     'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3',
+            #     'pauliSet_1J2_xJx_d3+pauliSet_1J2_zJz_d3',
+            #     'pauliSet_1J2_zJz_d3+pauliSet_1J2_yJy_d3',
+            #     'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_1J2_zJz_d3',
             # ]
 
 
@@ -215,60 +215,78 @@ class HeisenbergSharedField(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.true_model = 'Heis_ix_d2PPHeis_iy_d2PPHeis_iz_d2PPHeis_tz_d2'
-        self.initial_models = [self.true_model]
+        # self.true_model = 'Heis_ix_d2PPHeis_iy_d2PPHeis_iz_d2PPHeis_tz_d2'
+        # self.true_model = 'likewisePauliSum_lx_1J2_1J3_2J4_3J4_d4+likewisePauliSum_lz_1J2_1J3_2J4_3J4_d4'
+        self.true_model = 'pauliLikewise_lx_1J2_1J3_2J4_3J4_d4+pauliLikewise_ly_1J2_1J3_2J4_3J4_d4+pauliLikewise_lz_1J2_1J3_2J4_3J4_d4'
+        self.initial_models = [
+            'pauliLikewise_lx_1J2_1J3_2J4_3J4_d4+pauliLikewise_ly_1J2_1J3_2J4_3J4_d4+pauliLikewise_lz_1J2_1J3_2J4_3J4_d4',
+            'pauliLikewise_lx_1J2_2J3_3J4_d4+pauliLikewise_ly_1J2_2J3_3J4_d4+pauliLikewise_lz_1J2_2J3_3J4_d4',
+            'pauliLikewise_lx_1J2_1J3_2J3_d3+pauliLikewise_ly_1J2_1J3_2J3_d3+pauliLikewise_lz_1J2_1J3_2J3_d3'
+        ]
+        if self.true_model not in self.initial_models:
+            self.initial_models.append(self.true_model)
+        self.qhl_models = self.initial_models
+        self.tree_completed_initially=True
 
     def latex_name(
         self,
         name,
         **kwargs
     ):
-        # print("[latex name fnc] name:", name)
-        core_operators = list(sorted(database_framework.core_operator_dict.keys()))
-        num_sites = database_framework.get_num_qubits(name)
-        try:
-            p_str = 'P' * num_sites
-            separate_terms = name.split(p_str)
-        except:
-            p_str = '+'
-            separate_terms = name.split(p_str)
+        return "${}$".format(name)
 
-        site_connections = {}
-        for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):
-            site_connections[c] = []
 
-        # term_type_markers = ['pauliSet', 'transverse']
-        transverse_axis = None
-        heis_axis = None
-        for term in separate_terms:
-            components = term.split('_')
-            if 'Heis' in components:
-                components.remove('Heis')
-                for l in components:
-                    if l[0] == 'd':
-                        dim = int(l.replace('d', ''))
-                    elif l[0] == 'i':
-                        heis_axis = str(l.replace('i', ''))
-                    elif l[0] == 't':
-                        transverse_axis = str(l.replace('t', ''))
+    # def latex_name(
+    #     self,
+    #     name,
+    #     **kwargs
+    # ):
+    #     # print("[latex name fnc] name:", name)
+    #     core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+    #     num_sites = database_framework.get_num_qubits(name)
+    #     try:
+    #         p_str = 'P' * num_sites
+    #         separate_terms = name.split(p_str)
+    #     except:
+    #         p_str = '+'
+    #         separate_terms = name.split(p_str)
 
-        latex_term = ""
-        if heis_axis is not None:
-            this_term = r"\sigma_{"
-            this_term += str(heis_axis)
-            this_term += "}^{\otimes"
-            this_term += str(dim)
-            this_term += "}"
-            latex_term += this_term
-        if transverse_axis is not None:
-            this_term = r"T_{"
-            this_term += str(transverse_axis)
-            this_term += "}^{\otimes"
-            this_term += str(dim)
-            this_term += "}"
-            latex_term += this_term
+    #     site_connections = {}
+    #     for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):
+    #         site_connections[c] = []
 
-        if latex_term == "":
-            print("Heisenberg shared field could not generate latex string for ", name)
-        latex_term = "${}$".format(latex_term)
-        return latex_term
+    #     # term_type_markers = ['pauliSet', 'transverse']
+    #     transverse_axis = None
+    #     heis_axis = None
+    #     for term in separate_terms:
+    #         components = term.split('_')
+    #         if 'Heis' in components:
+    #             components.remove('Heis')
+    #             for l in components:
+    #                 if l[0] == 'd':
+    #                     dim = int(l.replace('d', ''))
+    #                 elif l[0] == 'i':
+    #                     heis_axis = str(l.replace('i', ''))
+    #                 elif l[0] == 't':
+    #                     transverse_axis = str(l.replace('t', ''))
+
+    #     latex_term = ""
+    #     if heis_axis is not None:
+    #         this_term = r"\sigma_{"
+    #         this_term += str(heis_axis)
+    #         this_term += "}^{\otimes"
+    #         this_term += str(dim)
+    #         this_term += "}"
+    #         latex_term += this_term
+    #     if transverse_axis is not None:
+    #         this_term = r"T_{"
+    #         this_term += str(transverse_axis)
+    #         this_term += "}^{\otimes"
+    #         this_term += str(dim)
+    #         this_term += "}"
+    #         latex_term += this_term
+
+    #     if latex_term == "":
+    #         print("Heisenberg shared field could not generate latex string for ", name)
+    #     latex_term = "${}$".format(latex_term)
+    #     return latex_term

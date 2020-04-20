@@ -52,6 +52,7 @@ class GrowthRule():
         self.assign_parameters()
 
     def assign_parameters(self):
+        # TODO functional instantiation vs just for extracting functionality
         self.use_experimental_data = False # TODO included for legacy; to be removed everywhere its called
         # by changing the function object these point to,
         # determine how probes are generated and expectation values are computed
@@ -372,6 +373,7 @@ class GrowthRule():
         true_ham = None
         for k in list(self.true_params_dict.keys()):
             param = self.true_params_dict[k]
+            print("get msmt by time, term=", k)
             mtx = database_framework.compute(k)
             if true_ham is not None:
                 true_ham += param * mtx
