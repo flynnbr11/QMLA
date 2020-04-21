@@ -21,7 +21,6 @@ def log_print(
     )
 
 def process_basic_operator(basic_operator):
-    print("Process basic operator:", basic_operator)
     # if basic_operator[0:1] == 'h_':
     #     mtx = process_hubbard_operator(
     #         basic_operator
@@ -218,7 +217,6 @@ def process_likewise_pauli_sum(term):
     """
     components = term.split('_')
     components.remove('pauliLikewise')
-    print("processing likewise pauli sum for:", term)
 
     connected_sites = []
     for l in components:
@@ -230,10 +228,10 @@ def process_likewise_pauli_sum(term):
             connected_sites.append(l.split('J'))
     all_terms = []
     for s in connected_sites:
-        new_term = 'pauliSet_{o}J{o}_{site1}J{site2}_d{N}'.format(
+        conn = 'J'.join(list(s))
+        new_term = 'pauliSet_{o}J{o}_{conn}_d{N}'.format(
             o = operator,
-            site1 = s[0],
-            site2 = s[1], 
+            conn=conn,
             N = dim
         )
         all_terms.append(new_term)

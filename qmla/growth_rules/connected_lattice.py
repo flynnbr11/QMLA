@@ -15,7 +15,6 @@ __all__ = [
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]
 
-
 class ConnectedLattice(
     growth_rule.GrowthRule
 ):
@@ -106,6 +105,9 @@ class ConnectedLattice(
         )
         self.spawn_stage = ['Start']
         if not self.tree_completed_initially:
+            self.log_print([
+                "Getting initial models from generate_models"
+            ])
             self.initial_models = self.generate_models(
                 model_list=['']
             )
@@ -154,8 +156,7 @@ class ConnectedLattice(
                 models_to_build_on = ranked_model_list[:
                     self.num_top_models_to_build_on
                 ]
-
-
+                
             self.sub_generation_idx += 1
             self.generation_champs[self.generation_DAG][self.sub_generation_idx] = [
                 kwargs['model_names_ids'][models_to_build_on[0]]

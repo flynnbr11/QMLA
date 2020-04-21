@@ -45,6 +45,10 @@ growth_classes = {
         GR.FermiHubbardPredetermined,
     'FermiHubbardProbabilistic':
         GR.FermiHubbardProbabilistic,
+    'LatticeSet' : 
+        GR.LatticeSet,
+    'IsingLatticeSet' : 
+        GR.IsingLatticeSet, 
     # Others
     'basic_lindbladian':
         GR.Lindbladian,

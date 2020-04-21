@@ -39,7 +39,6 @@ class qmla_tree():
         self.log_print([
             "Tree started for {}".format(self.growth_rule)
         ])
-
         self.branches = {}
         self.models = {}
         self.model_instances = {}
@@ -58,6 +57,22 @@ class qmla_tree():
 
         self.ghost_branches = {}
         self.ghost_branch_list = []
+
+    def get_initial_models(
+        self, 
+    ):
+        if self.growth_class.initial_models is None:
+            self.log_print([
+                "Initial models not set; retrieving from generate_models"
+            ])
+            self.initial_models = self.growth_class.generate_models(
+                model_list=None
+            )
+        else:
+            self.initial_models = self.growth_class.initial_models
+        return self.initial_models
+
+
 
     def next_layer(
         self, 

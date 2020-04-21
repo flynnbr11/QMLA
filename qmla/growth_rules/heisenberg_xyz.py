@@ -219,74 +219,71 @@ class HeisenbergSharedField(
         # self.true_model = 'likewisePauliSum_lx_1J2_1J3_2J4_3J4_d4+likewisePauliSum_lz_1J2_1J3_2J4_3J4_d4'
         self.true_model = 'pauliLikewise_lx_1J2_1J3_2J4_3J4_d4+pauliLikewise_ly_1J2_1J3_2J4_3J4_d4+pauliLikewise_lz_1J2_1J3_2J4_3J4_d4'
         self.initial_models = [
-            'pauliLikewise_lx_1J2_1J3_2J4_3J4_d4+pauliLikewise_ly_1J2_1J3_2J4_3J4_d4+pauliLikewise_lz_1J2_1J3_2J4_3J4_d4',
+            # triangle
+            'pauliLikewise_lx_1J2_1J3_2J3_d3+pauliLikewise_ly_1J2_1J3_2J3_d3+pauliLikewise_lz_1J2_1J3_2J3_d3',
+            # 3 site chain
+            'pauliLikewise_lx_1J2_2J3_d3+pauliLikewise_ly_1J2_2J3_d3+pauliLikewise_lz_1J2_2J3_d3',
+            # 4 site chain
             'pauliLikewise_lx_1J2_2J3_3J4_d4+pauliLikewise_ly_1J2_2J3_3J4_d4+pauliLikewise_lz_1J2_2J3_3J4_d4',
-            'pauliLikewise_lx_1J2_1J3_2J3_d3+pauliLikewise_ly_1J2_1J3_2J3_d3+pauliLikewise_lz_1J2_1J3_2J3_d3'
+            # square nearest neighbours
+            'pauliLikewise_lx_1J2_1J3_2J4_3J4_d4+pauliLikewise_ly_1J2_1J3_2J4_3J4_d4+pauliLikewise_lz_1J2_1J3_2J4_3J4_d4',
+            # square fully connected
+            'pauliLikewise_lx_1J2_1J3_2J3_2J4_3J4_d4+pauliLikewise_ly_1J2_2J3_1J3_2J4_3J4_d4+pauliLikewise_lz_1J2_2J3_1J3_2J4_3J4_d4',
+            # 3x2 grid
+            'pauliLikewise_lx_1J2_1J4_2J5_2J3_4J5_3J6_5J6_d6+pauliLikewise_ly_1J2_1J4_2J5_2J3_4J5_3J6_5J6_d6+pauliLikewise_lz_1J2_1J4_2J5_2J3_4J5_3J6_5J6_d6',
         ]
         if self.true_model not in self.initial_models:
             self.initial_models.append(self.true_model)
         self.qhl_models = self.initial_models
-        self.tree_completed_initially=True
+        self.tree_completed_initially = True
+        self.num_processes_to_parallelise_over = len(self.initial_models)
+        # self.setup_growth_class()
+
+    def generate_models(self, model_list, **kwargs):
+        return self.initial_models
 
     def latex_name(
         self,
         name,
         **kwargs
     ):
-        return "${}$".format(name)
+        separate_terms = name.split('+')
+        all_connections = []
+        latex_term = ""
+        connections_terms = {}
+        for term in separate_terms:
+            components = term.split('_')
+            try:
+                components.remove('pauliLikewise')
+            except:
+                print("Couldn't remove pauliLikewise from", name)
+            this_term_connections = []
+            for l in components:
+                if l[0] == 'd':
+                    dim = int(l.replace('d', ''))
+                elif l[0] == 'l':
+                    operator = str(l.replace('l', ''))
+                else:
+                    sites = l.split('J')
+                    this_term_connections.append(sites)
+            for s in this_term_connections:
+                con = "({},{})".format(s[0], s[1])
+                try:
+                    connections_terms[con].append(operator)
+                except:
+                    connections_terms[con] = [operator]
+
+            latex_term = ""
+            for c in list(sorted(connections_terms.keys())):
+                connection_string = str(
+                    "\sigma_{"
+                    + str(c)
+                    + "}^{"
+                    + str(",".join(connections_terms[c]))
+                    + "}"
+                )
+                latex_term += connection_string
+
+        return "${}$".format(latex_term)
 
 
-    # def latex_name(
-    #     self,
-    #     name,
-    #     **kwargs
-    # ):
-    #     # print("[latex name fnc] name:", name)
-    #     core_operators = list(sorted(database_framework.core_operator_dict.keys()))
-    #     num_sites = database_framework.get_num_qubits(name)
-    #     try:
-    #         p_str = 'P' * num_sites
-    #         separate_terms = name.split(p_str)
-    #     except:
-    #         p_str = '+'
-    #         separate_terms = name.split(p_str)
-
-    #     site_connections = {}
-    #     for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):
-    #         site_connections[c] = []
-
-    #     # term_type_markers = ['pauliSet', 'transverse']
-    #     transverse_axis = None
-    #     heis_axis = None
-    #     for term in separate_terms:
-    #         components = term.split('_')
-    #         if 'Heis' in components:
-    #             components.remove('Heis')
-    #             for l in components:
-    #                 if l[0] == 'd':
-    #                     dim = int(l.replace('d', ''))
-    #                 elif l[0] == 'i':
-    #                     heis_axis = str(l.replace('i', ''))
-    #                 elif l[0] == 't':
-    #                     transverse_axis = str(l.replace('t', ''))
-
-    #     latex_term = ""
-    #     if heis_axis is not None:
-    #         this_term = r"\sigma_{"
-    #         this_term += str(heis_axis)
-    #         this_term += "}^{\otimes"
-    #         this_term += str(dim)
-    #         this_term += "}"
-    #         latex_term += this_term
-    #     if transverse_axis is not None:
-    #         this_term = r"T_{"
-    #         this_term += str(transverse_axis)
-    #         this_term += "}^{\otimes"
-    #         this_term += str(dim)
-    #         this_term += "}"
-    #         latex_term += this_term
-
-    #     if latex_term == "":
-    #         print("Heisenberg shared field could not generate latex string for ", name)
-    #     latex_term = "${}$".format(latex_term)
-    #     return latex_term

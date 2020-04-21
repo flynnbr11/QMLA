@@ -74,6 +74,9 @@ git_commit=$(git rev-parse HEAD)
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
+
+growth_rule='IsingLatticeSet'
+
 # sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'
 # sim_growth_rule='IsingSharedField'
@@ -81,7 +84,7 @@ git_commit=$(git rev-parse HEAD)
 # sim_growth_rule='TestAllParticlesBayesFactors'
 # sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
-sim_growth_rule='HeisenbergSharedField'
+# sim_growth_rule='HeisenbergSharedField'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
 # sim_growth_rule='Genetic'
@@ -95,7 +98,7 @@ sim_growth_rule='HeisenbergSharedField'
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-exp_growth_rule='NVExperimentalData'
+# exp_growth_rule='NVExperimentalData'
 # exp_growth_rule='ExperimentNVCentre'
 # exp_growth_rule='ExperimentNVCentreNoTransvereTerms'
 # exp_growth_rule='ExpAlternativeNV'
@@ -106,12 +109,12 @@ exp_growth_rule='NVExperimentalData'
 # exp_growth_rule='ExperimentReducedNV'
 
 
-if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
-then
-    growth_rule=$exp_growth_rule
-else
-    growth_rule=$sim_growth_rule
-fi
+# if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
+# then
+#     growth_rule=$exp_growth_rule
+# else
+#     growth_rule=$sim_growth_rule
+# fi
 
 alt_growth_rules=(
     # 'IsingPredetermined'

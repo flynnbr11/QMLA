@@ -190,6 +190,7 @@ class QuantumModelLearningAgent():
         r"""
         Initiates database and other infrastructure.
         """
+        # TODO most of this can probably go inside run_complete_qmla
         self.model_database = pd.DataFrame({
             '<Name>': [],
             'Status': [],  
@@ -246,12 +247,14 @@ class QuantumModelLearningAgent():
             # start a first branch for each tree
 
             for tree in list(self.trees.values()):
+                # starting_models = tree.growth_class.initial_models 
+                starting_models = tree.get_initial_models() 
                 self.log_print([
                     "Adding initial branch for {}".format(
                         tree.growth_rule
-                    )
+                    ),
+                    "Starting models:", starting_models
                 ])
-                starting_models = tree.growth_class.initial_models 
                 self.new_branch(
                     model_list = starting_models, 
                     growth_rule = tree.growth_rule
