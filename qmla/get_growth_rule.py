@@ -49,6 +49,8 @@ growth_classes = {
         GR.LatticeSet,
     'IsingLatticeSet' : 
         GR.IsingLatticeSet, 
+    'HeisenbergLatticeSet' : 
+        GR.HeisenbergLatticeSet,
     # Others
     'basic_lindbladian':
         GR.Lindbladian,

@@ -75,7 +75,8 @@ git_commit=$(git rev-parse HEAD)
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 
-growth_rule='IsingLatticeSet'
+# growth_rule='IsingLatticeSet'
+growth_rule='HeisenbergLatticeSet'
 
 # sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'
@@ -249,8 +250,8 @@ do
     do
         redis-cli flushall
         let q_id="$q_id+1"
-        # python3 /
-        python3 -m cProfile -s time \
+        # python3 -m cProfile -s time \
+        python3 \
             ../Scripts/implement_qmla.py \
             -qhl=$qhl_test \
             -mqhl=$multiple_qhl \
@@ -279,7 +280,7 @@ do
             -resource=$reallocate_resources \
             -ggr=$growth_rule \
             $growth_rules_command \
-            > $full_path_to_results/profile.txt
+            > $full_path_to_results/output.txt
     done
 done
 
