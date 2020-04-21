@@ -132,7 +132,7 @@ class LatticeSet(
                     - nns
                 )
                 if len(sites_not_present) == 0:
-                    lower_limit = "i, j=i+1"
+                    lower_limit = "i=1"
                     operator_string = str("\sigma_{i,i+1}^{" + str(operator) + "}")
 
             upper_limit = str(
