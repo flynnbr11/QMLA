@@ -21,6 +21,7 @@ def log_print(
     )
 
 def process_basic_operator(basic_operator):
+    # print("Process basic operator:", basic_operator)
     # if basic_operator[0:1] == 'h_':
     #     mtx = process_hubbard_operator(
     #         basic_operator
@@ -514,6 +515,50 @@ def process_fermi_hubbard_onsite(constituents):
         jordan_wigner_mtx(dimensional_fermion_op)
     return np.array(mtx)
 
+def process_fermi_hubbard_onsite_sum(constituents):
+    sites = []
+    for c in constituents:
+        if c[0] == 'd':
+            num_sites = int(c[1:])
+        else:
+            sites.append( int(c) )
+
+    mtx = None
+    for s in sites: 
+        onsite_term = "FHonsite_{s}_d{N}".format(
+            s = s, 
+            N = num_sites
+        )
+        if mtx is None:
+            mtx = process_basic_operator(onsite_term)
+        else:
+            mtx += process_basic_operator(onsite_term)
+    return mtx
+
+def process_fermi_hubbard_hopping_sum(constituents):
+    connected_sites = []
+    for c in constituents:
+        if c in ['down', 'up']:
+            spin_type = c
+        elif c[0] == 'd':
+            num_sites = int(c[1:])
+        else:
+            sites = [int(s) for s in c.split('h')]
+            connected_sites.append(sites)
+
+    mtx = None
+    for cs in connected_sites:
+        hopping_term = "FHhop_{s}_{i}h{k}_d{N}".format(
+            s = spin_type, 
+            i = cs[0],
+            k = cs[1],
+            N = num_sites
+        )
+        if mtx is None:
+            mtx = process_basic_operator(hopping_term)
+        else:
+            mtx += process_basic_operator(hopping_term)
+    return mtx
 
 def process_fermi_hubbard_hopping(constituents):
     for c in constituents:
@@ -559,9 +604,15 @@ def process_fermi_hubbard_term(term):
 
     constituents = term.split('_')
     for c in constituents:
-        if c == 'FHhop':
+        if c == 'FH-hopping-sum':
+            constituents.remove(c)
+            mtx = process_fermi_hubbard_hopping_sum(constituents)
+        elif c == 'FHhop':
             constituents.remove(c)
             mtx = process_fermi_hubbard_hopping(constituents)
+        elif c == 'FH-onsite-sum':
+            constituents.remove(c)
+            mtx = process_fermi_hubbard_onsite_sum(constituents)
         elif c == 'FHonsite':
             constituents.remove(c)
             mtx = process_fermi_hubbard_onsite(constituents)

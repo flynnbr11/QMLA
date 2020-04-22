@@ -34,6 +34,7 @@ class LatticeSet(
         self.base_terms = ['x']
         self.initial_models = None # so that QMLA will call generate_models first
         # self.true_model = self.model_from_lattice(self.available_lattices[0])
+        self.max_time_to_consider = 50
         self.transverse_field = None
         self.timing_insurance_factor = 5
 
@@ -178,84 +179,8 @@ class LatticeSet(
         latex_model = "+".join(all_latex_terms)
         return "${}$".format(latex_model)
 
-class IsingLatticeSet(LatticeSet):
-    def __init__(
-        self,
-        growth_generation_rule,
-        **kwargs
-    ):
-        super().__init__(
-            growth_generation_rule=growth_generation_rule,
-            **kwargs
-        )
-
-        self.true_lattice = qmla.shared_functionality.topology.GridTopology(
-                dimension=1, num_sites = 4
-        )
-        self.base_terms = ['z']
-        self.transverse_field = 'x'
-        self.true_model = self.model_from_lattice(self.true_lattice)
-
-        self.available_lattices = [
-            self.true_lattice, 
-            qmla.shared_functionality.topology.GridTopology(
-                dimension=1, num_sites = 3
-            ), # 3 site chain
-            qmla.shared_functionality.topology.GridTopology(
-                dimension=1, num_sites = 5
-            ), # 5 site chain
-            qmla.shared_functionality.topology.GridTopology(
-                dimension=1, num_sites = 6
-            ), # 6 site chain
-        ]
-        self.true_model_terms_params = {
-            'pauliLikewise_lz_1J2_2J3_3J4_d4' : 0.78,
-            'pauliLikewise_lx_1_2_3_4_d4' : 0.12,
-        }
-        self.num_processes_to_parallelise_over = 4
-        self.max_num_models_by_shape = {
-            3 : 2, 
-            4 : 2, 
-            5 : 2, 
-            6 : 2, 
-            'other' : 0
-        }
-        self.max_time_to_consider = 50
-        
 
 
-class HeisenbergLatticeSet(LatticeSet):
-    def __init__(
-        self,
-        growth_generation_rule,
-        **kwargs
-    ):
-        super().__init__(
-            growth_generation_rule=growth_generation_rule,
-            **kwargs
-        )
-        self.transverse_field = None # 'x'
-        self.true_lattice = qmla.shared_functionality.topology.GridTopology(
-                dimension=2, num_sites = 2
-        ) # square
-        self.true_model = self.model_from_lattice(self.true_lattice)
 
-        self.available_lattices = [
-            self.true_lattice, 
-            qmla.shared_functionality.topology.GridTopology(
-                dimension=1, num_sites = 3
-            ), # 3 site chain
-            qmla.shared_functionality.topology.GridTopology(
-                dimension=2, num_sites = 6
-            ), # 6 site grid
-            qmla.shared_functionality.topology.GridTopology(
-                dimension=2, num_sites=5, all_sites_connected=True
-            ), # fully connected 5 site
-            qmla.shared_functionality.topology.GridTopology(
-                dimension=2, num_sites=2, all_sites_connected=True
-            ) # fully connected square
-        ]
-        self.base_terms = ['x', 'z']
-        
 
 
