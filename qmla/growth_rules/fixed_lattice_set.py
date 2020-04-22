@@ -35,6 +35,7 @@ class LatticeSet(
         self.initial_models = None # so that QMLA will call generate_models first
         # self.true_model = self.model_from_lattice(self.available_lattices[0])
         self.transverse_field = None
+        self.timing_insurance_factor = 5
 
     def model_from_lattice(
         self, 
@@ -214,7 +215,7 @@ class IsingLatticeSet(LatticeSet):
         self.num_processes_to_parallelise_over = len(self.available_lattices)
         self.max_num_models_by_shape = {}
         self.max_time_to_consider = 50
-        self.timing_insurance_factor = 5
+        
 
 
 class HeisenbergLatticeSet(LatticeSet):
