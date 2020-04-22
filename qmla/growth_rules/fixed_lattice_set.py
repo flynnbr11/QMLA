@@ -212,8 +212,14 @@ class IsingLatticeSet(LatticeSet):
             'pauliLikewise_lz_1J2_2J3_3J4_d4' : 0.78,
             'pauliLikewise_lx_1_2_3_4_d4' : 0.12,
         }
-        self.num_processes_to_parallelise_over = len(self.available_lattices)
-        self.max_num_models_by_shape = {}
+        self.num_processes_to_parallelise_over = 4
+        self.max_num_models_by_shape = {
+            3 : 2, 
+            4 : 2, 
+            5 : 2, 
+            6 : 2, 
+            'other' : 0
+        }
         self.max_time_to_consider = 50
         
 
