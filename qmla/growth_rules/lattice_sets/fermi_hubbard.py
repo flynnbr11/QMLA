@@ -36,7 +36,7 @@ class FermiHubbardLatticeSet(
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
         self.max_num_qubits = self.num_sites_true
         self.max_num_probe_qubits = self.num_sites_true
-        
+        self.timing_insurance_factor = 15
 
 
     def model_from_lattice(self, lattice):
