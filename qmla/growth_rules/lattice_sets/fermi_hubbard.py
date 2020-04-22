@@ -37,6 +37,8 @@ class FermiHubbardLatticeSet(
         self.max_num_qubits = self.num_sites_true
         self.max_num_probe_qubits = self.num_sites_true
         self.timing_insurance_factor = 15
+        self.min_param = 0.25
+        self.max_param = 0.75
 
 
     def model_from_lattice(self, lattice):
