@@ -203,7 +203,7 @@ def plot_prior(
             ax.legend()
 
     # plt.legend()
-    fig.suptitle('Initial prior for {}'.format(model_name))
+    fig.suptitle('Initial prior for true model')
     fig.subplots_adjust(
         # top = 0.99,
         # bottom=0.01,

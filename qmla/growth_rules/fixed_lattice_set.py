@@ -132,8 +132,19 @@ class LatticeSet(
                     - nns
                 )
                 if len(sites_not_present) == 0:
-                    lower_limit = "i=1"
-                    operator_string = str("\sigma_{i,i+1}^{" + str(operator) + "}")
+                    lower_limit = "i"
+                    operator_string = str(
+                        "\hat{\sigma}_{i}^{" + str(operator) + "}"
+                        + "\hat{\sigma}_{i+1}^{" + str(operator) + "}"
+                    )
+                else: 
+                    this_term_connections = [
+                        "({})".format(c) for c in this_term_connections
+                    ]
+                    lower_limit = str(
+                        "i \in "
+                        +",".join(this_term_connections)
+                    )
 
             upper_limit = str(
                 "N={}".format(dim)
@@ -166,82 +177,6 @@ class LatticeSet(
         latex_model = "+".join(all_latex_terms)
         return "${}$".format(latex_model)
 
-
-
-    def latex_name_old(
-        self,
-        name,
-        **kwargs
-    ):
-        separate_terms = name.split('+')
-        all_connections = []
-        latex_term = ""
-        connections_terms = {}
-        connections_by_operator = {}
-        connections_by_num_sites_involved = {}
-        for term in separate_terms:
-            components = term.split('_')
-            try:
-                components.remove('pauliLikewise')
-            except:
-                print("Couldn't remove pauliLikewise from", name)
-            this_term_connections = []
-            for l in components:
-                if l[0] == 'd':
-                    dim = int(l.replace('d', ''))
-                elif l[0] == 'l':
-                    operator = str(l.replace('l', ''))
-                else:
-                    sites = l.split('J')
-                    this_term_connections.append(sites)
-            
-            print("name: {} \n dim: {} \n operator: {} \n this_term_connections: {}".format(
-                name, dim, operator, this_term_connections
-            ))
-            for s in this_term_connections:
-                # con = "({},{})".format(s[0], s[1])
-                con = ",".join(list(s))
-                try:
-                    connections_by_operator[operator][len(s)].append(con)
-                except:
-                    try:
-                        connections_by_operator[operator][len(s)] = [con]
-                    except:
-                        connections_by_operator[operator] = {}
-                        connections_by_operator[operator][len(s)] = [con]
-
-                try:
-                    connections_by_num_sites_involved[len(s)][operator].append(con)
-                except:
-                    try:
-                        connections_by_num_sites_involved[len(s)][operator] = [con]
-                    except:
-                        connections_by_num_sites_involved[len(s)] = {}
-                        connections_by_num_sites_involved[len(s)][operator] = [con]
-
-                con = "({})".format(con)
-                try:
-                    connections_terms[con].append(operator)
-                except:
-                    connections_terms[con] = [operator]
-                
-
-            latex_term = ""
-            for c in list(sorted(connections_terms.keys())):
-                connection_string = str(
-                    "\sigma_{"
-                    + str(c)
-                    + "}^{"
-                    + str(",".join(connections_terms[c]))
-                    + "}"
-                )
-                latex_term += connection_string
-
-        print("Name {} \t Connections by operator:{}".format(name, connections_by_num_sites_involved))
-
-        return "${}$".format(latex_term)
-
-
 class IsingLatticeSet(LatticeSet):
     def __init__(
         self,
@@ -272,6 +207,11 @@ class IsingLatticeSet(LatticeSet):
                 dimension=1, num_sites = 6
             ), # 6 site chain
         ]
+        self.true_model_terms_params = {
+            'pauliLikewise_lz_1J2_2J3_3J4_d4' : 0.78,
+            'pauliLikewise_lx_1_2_3_4_d4' : 0.12,
+        }
+        self.max_time_to_consider = 50
 
 
 class HeisenbergLatticeSet(LatticeSet):
