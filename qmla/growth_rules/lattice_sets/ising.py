@@ -40,8 +40,8 @@ class IsingLatticeSet(
             'pauliLikewise_lx_1_2_d2' : 0.12,
         }
         self.gaussian_prior_means_and_widths = {
-            'pauliLikewise_lz_1J2_d2' : (0.78, 1e-5),
-            'pauliLikewise_lx_1_2_d2' : (0.12, 1e-5)
+            # 'pauliLikewise_lz_1J2_d2' : (0.78, 1e-5),
+            # 'pauliLikewise_lx_1_2_d2' : (0.12, 1e-5)
         }
         self.num_processes_to_parallelise_over = 4
         self.max_num_models_by_shape = {
