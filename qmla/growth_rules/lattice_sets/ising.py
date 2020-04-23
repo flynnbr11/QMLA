@@ -24,7 +24,7 @@ class IsingLatticeSet(
         self.base_terms = ['z']
         self.transverse_field = 'x'
 
-        self.true_lattice = topology_predefined._2_site_chain
+        self.true_lattice = topology_predefined._4_site_chain
         self.true_model = self.model_from_lattice(self.true_lattice)
 
         self.available_lattices = [
