@@ -67,7 +67,7 @@ class LatticeSet(
                 lattice_dimension
             )
             complete_model += '+{}'.format(transverse_term)
-        return complete_model
+        return database_framework.alph(complete_model)
 
 
     def generate_models(

@@ -76,6 +76,7 @@ class ModelInstanceForComparison():
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
+        self.true_param_dict = qmla_core_info_dict['true_param_dict']
         # self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
@@ -143,6 +144,7 @@ class ModelInstanceForComparison():
             true_oplist=self.true_model_constituent_operators,
             truename=self.true_model_name,
             trueparams=self.true_model_params,
+            true_param_dict = self.true_param_dict, 
             num_probes=self.probe_number,
             probe_dict=self.probes_system,
             sim_probe_dict=self.probes_simulator,
