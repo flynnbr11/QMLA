@@ -266,6 +266,7 @@ class ModelInstanceForLearning():
         # self.true_hamiltonian = qmla_core_info_dict['true_hamiltonian']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
+        self.true_param_dict = qmla_core_info_dict['true_param_dict']
         self.sigma_threshold = qmla_core_info_dict['sigma_threshold']
         self.times_to_plot = qmla_core_info_dict['plot_times']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
@@ -346,6 +347,7 @@ class ModelInstanceForLearning():
             modelparams=self.model_terms_parameters,
             oplist=self.model_terms_matrices,
             true_oplist=self.true_model_constituent_operators,
+            true_param_dict = self.true_param_dict, 
             truename=self.true_model_name,
             trueparams=self.true_model_params,
             num_probes=self.probe_number,
@@ -778,9 +780,18 @@ class ModelInstanceForLearning():
         self,
         # times = [1, 2]
     ):
+        estimated_params = self.qinfer_updater.est_mean()
+        cov_mt_uncertainty = [1e-10] * np.shape(self.qinfer_updater.est_mean())[0]
+        cov_mt = np.diag(cov_mt_uncertainty)
+        # self.log_print([
+        #     "Generating evaluation posterior with estimated params =\n{} \nand cov mt:\n{}".format(
+        #         estimated_params, cov_mt
+        #     )
+        # ])
         posterior_distribution = qi.MultivariateNormalDistribution(
-            self.qinfer_updater.est_mean(),
-            np.diag(self.qinfer_updater.est_mean()**2), # extremely thin 
+            estimated_params,
+            cov_mt
+            # np.diag(self.qinfer_updater.est_mean()**2), # extremely thin 
             # self.qinfer_updater.est_covariance_mtx()
         )
 
@@ -816,6 +827,7 @@ class ModelInstanceForLearning():
             true_oplist=self.true_model_constituent_operators,
             truename=self.true_model_name,
             trueparams=self.true_model_params,
+            true_param_dict = self.true_param_dict, 
             num_probes=self.probe_number,
             probe_dict=evaluation_probe_dict,
             sim_probe_dict=evaluation_probe_dict,

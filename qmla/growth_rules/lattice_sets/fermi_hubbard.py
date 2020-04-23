@@ -68,6 +68,7 @@ class FermiHubbardLatticeSet(
             individual_operators.append(onsite_sum)
 
         complete_model = '+'.join(individual_operators)
+        # complete_model = qmla.database_framework.alph(complete_model)
         return complete_model
 
     def latex_name(self, name):

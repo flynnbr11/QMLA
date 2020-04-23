@@ -166,7 +166,8 @@ class IsingSharedField(
         )
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.zero_state_probes
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.
-        self.true_model = '1Dising_iz_d4PPPP1Dising_tx_d4'
+        # self.true_model = '1Dising_iz_d4PPPP1Dising_tx_d4'
+        self.true_model = '1Dising_iz_d2PP1Dising_tx_d2'
         self.tree_completed_initially = True
         self.check_champion_reducibility = False
         self.initial_models = [
@@ -183,6 +184,8 @@ class IsingSharedField(
         self.true_model_terms_params = {
             '1Dising_iz_d4' : 0.78, 
             '1Dising_tx_d4' : 0.12, 
+            '1Dising_iz_d2' : 0.78, 
+            '1Dising_tx_d2' : 0.12, 
         }
 
 

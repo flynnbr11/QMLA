@@ -78,6 +78,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         oplist,
         true_oplist,
         truename,
+        true_param_dict,
         trueparams,
         num_probes,
         probe_dict,
@@ -88,6 +89,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         log_file,
         **kwargs
     ):
+        self.log_file = log_file
+        self.growth_generation_rule = growth_generation_rule
         self._oplist = oplist
         self._a = 0
         self._b = 0
@@ -97,9 +100,22 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._trueparams = trueparams
         self._truename = truename
         self._true_dim = qmla.database_framework.get_num_qubits(self._truename)
+        self.true_param_dict = true_param_dict 
+        # get true_hamiltonian from true_param dict
+        true_ham = None
+        for k in list(self.true_param_dict.keys()):
+            param = self.true_param_dict[k]
+            mtx = qmla.database_framework.compute(k)
+            if true_ham is not None:
+                true_ham += param * mtx
+            else:
+                true_ham = param * mtx
+        self.true_hamiltonian = true_ham
+        self.log_print([
+            "True hamiltonian:", self.true_hamiltonian
+        ])
+
         # self.use_experimental_data = use_experimental_data
-        self.log_file = log_file
-        self.growth_generation_rule = growth_generation_rule
         self.timings = {
             'system': {}, 
             'simulator' : {}
@@ -464,6 +480,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             t_list = times,
             particles = particles, 
             oplist = operator_list, 
+            hamiltonian=self.true_hamiltonian, 
             probe = probe, 
             timing_marker=timing_marker
             # **kwargs
@@ -518,6 +535,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         oplist,
         probe,
         timing_marker,
+        hamiltonian=None,
         **kwargs
     ):
         r"""
@@ -560,9 +578,12 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         for evoId in range(num_particles):  
             try:
                 t_init = time.time()
-                ham = np.tensordot(
-                    particles[evoId], oplist, axes=1
-                )
+                if hamiltonian is None:
+                    ham = np.tensordot(
+                        particles[evoId], oplist, axes=1
+                    )
+                else:                    
+                    ham = hamiltonian
                 self.timings[timing_marker]['construct_ham'] += time.time()-t_init
             except BaseException:
                 self.log_print(
@@ -573,7 +594,13 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     ],
                 )
                 raise
+            # if evoId == 0:
+            #     self.log_print([
+            #         "{} 1st particle hamiltonian 1st row:\n{}".format(timing_marker, ham[0])
+            #     ])
+
             for tId in range(len(t_list)):
+
                 t = t_list[tId]
                 if t > 1e6:  # Try limiting times to use to 1 million
                     import random
