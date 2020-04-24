@@ -204,7 +204,7 @@ def hahn_evolution(
     expect_value = np.abs(np.dot(bra, rho_state))
 #    print("Hahn. Time=",t, "\t ex = ", expect_value)
     # print("[Hahn evolution] projecting onto:", repr(bra))
-    return 1 - expect_value
+    return 1 - expect_value # because we actually project onto |-> in experiment
 #    return expect_value
 
 
@@ -349,7 +349,7 @@ def n_qubit_hahn_evolution(
     # for this case Pr(0) refers to projection onto |->
     # so return 1 - expect_value
 
-    return 1 - expect_value
+    return expect_value
     # return expect_value
 
 

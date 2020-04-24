@@ -24,22 +24,12 @@ class NVLargeSpinBath(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.use_experimental_data = False
-        # if 'use_experimental_data' in kwargs:
-        #     self.use_experimental_data = kwargs['use_experimental_data']
-        # else:
-        #     self.use_experimental_data = False
-
-        if self.use_experimental_data == True:
-            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
-            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.restore_dec_13_probe_generation
-            self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
 
-        self.true_model = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
+        # self.true_model = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
         # self.true_model = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
-        # self.true_model = 'nv_spin_x_d5PPPPPnv_spin_y_d5PPPPPnv_spin_z_d5PPPPPnv_interaction_x_d5PPPPPnv_interaction_y_d5PPPPPnv_interaction_z_d5'
+        self.true_model = 'nv_spin_x_d5PPPPPnv_spin_y_d5PPPPPnv_spin_z_d5PPPPPnv_interaction_x_d5PPPPPnv_interaction_y_d5PPPPPnv_interaction_z_d5'
         # self.true_model = 'nv_spin_x_d6PPPPPPnv_spin_y_d6PPPPPPnv_spin_z_d6PPPPPPnv_interaction_x_d6PPPPPPnv_interaction_y_d6PPPPPPnv_interaction_z_d6'
 
         # for testing tracing
@@ -51,6 +41,9 @@ class NVLargeSpinBath(
             # self.true_model,
             'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
         ]
+        self.num_qubits_current_model = qmla.database_framework.get_num_qubits(
+            self.initial_models[0]
+        )
         self.qhl_models = [
             'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2',
             'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3',
@@ -162,7 +155,12 @@ class NVLargeSpinBath(
         max_num_qubits = max(
             [database_framework.get_num_qubits(mod) for mod in model_list]
         )
+
+        
         new_gali_model = gali_model_nv_centre_spin(max_num_qubits + 1)
+        self.num_qubits_current_model = qmla.database_framework.get_num_qubits(
+            new_gali_model
+        )
         return [new_gali_model]
 
     def latex_name(
@@ -225,11 +223,11 @@ class NVLargeSpinBath(
 
     def check_tree_completed(
         self,
-        current_num_qubits,
+        # current_num_qubits,
         **kwargs
     ):
         if (
-            current_num_qubits
+            self.num_qubits_current_model
             ==
             self.max_num_qubits
         ):
@@ -243,6 +241,7 @@ class NVLargeSpinBath(
 def gali_model_nv_centre_spin(num_qubits):
     axes = ['x', 'y', 'z']
     p_str = 'P' * num_qubits
+    p_str = '+'
     model_terms = []
     for axis in axes:
         for contribution in ['interaction', 'spin']:

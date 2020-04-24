@@ -31,10 +31,10 @@ class LatticeSet(
                 num_sites=4,
             ) # square
         ]
-        self.base_terms = ['x']
+        self.base_terms = ['x', 'z']
         self.initial_models = None # so that QMLA will call generate_models first
         # self.true_model = self.model_from_lattice(self.available_lattices[0])
-        self.max_time_to_consider = 50
+        self.max_time_to_consider = 45
         self.transverse_field = None
         self.timing_insurance_factor = 5
 

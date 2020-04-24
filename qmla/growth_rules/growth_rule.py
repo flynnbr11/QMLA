@@ -373,7 +373,6 @@ class GrowthRule():
         true_ham = None
         for k in list(self.true_params_dict.keys()):
             param = self.true_params_dict[k]
-            print("get msmt by time, term=", k)
             mtx = database_framework.compute(k)
             if true_ham is not None:
                 true_ham += param * mtx

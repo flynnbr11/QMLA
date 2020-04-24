@@ -53,7 +53,10 @@ class FermiHubbardLatticeSet(
                 connections = conn_string,
                 N = lattice_dimension
             )
-            for s in ['up', 'down']
+            for s in [
+                'up', 
+                # 'down'
+            ]
         ]
 
 
@@ -88,7 +91,7 @@ class FermiHubbardLatticeSet(
                     else:
                         sites = [int(s) for s in c.split('h')]
                         connected_sites += str(
-                            "({},{})".format(sites[0], sites[1])
+                            "({},{})\\\\".format(sites[0], sites[1])
                         )
                 
                 if spin_type == 'up':

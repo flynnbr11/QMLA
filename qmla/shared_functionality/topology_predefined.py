@@ -25,9 +25,9 @@ _6_site_chain = GridTopology(
 
 # 2D 
 # Squares
-_4_site_square = GridTopology(dimension=2, num_sites=2)
+_4_site_square = GridTopology(dimension=2, num_sites=4)
 _4_site_square_fully_connected = GridTopology(
-    dimension=2, num_sites=2, all_sites_connected=True
+    dimension=2, num_sites=4, all_sites_connected=True
 ) 
 
 # Grids
