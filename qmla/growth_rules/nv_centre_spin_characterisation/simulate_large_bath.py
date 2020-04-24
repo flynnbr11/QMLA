@@ -1,5 +1,6 @@
 import sys
 import os
+import itertools
 
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
 import qmla.shared_functionality.probe_set_generation
@@ -28,7 +29,9 @@ class SimulatedNVCentre(
             "GR called. probe fnc:", self.probe_generation_function
         ])
         self.true_model = spin_system_model(
-            num_sites = 2
+            num_sites = 1,
+            core_terms = ['x'], 
+            include_transverse_terms=False
         )
         self.tree_completed_initially = True
         self.initial_models=None
@@ -52,6 +55,14 @@ class SimulatedNVCentre(
             return False
 
 
+    def latex_name(
+        self,
+        name,
+        **kwargs
+    ):
+        self.log_print(["Getting latex for ", name])
+        latex_term = "${}$".format(name)
+        return latex_term
 
 
 def spin_system_model(

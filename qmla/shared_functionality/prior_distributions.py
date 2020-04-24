@@ -97,11 +97,19 @@ def gaussian_prior(
     means = np.array(means)
     sigmas = np.array(sigmas)
     cov_mtx = np.diag(sigmas**2)
-
     dist = qinfer.MultivariateNormalDistribution(
         means,
         cov_mtx
     )
+    log_print(
+        [
+            "means:", means,
+            "cov mt:", cov_mtx,
+            "\ndist:", dist
+        ],
+        log_file, log_identifier
+    )
+
     return dist
 
 
@@ -166,6 +174,7 @@ def plot_prior(
         this_param_dev = np.std(this_param_samples)
         this_param_colour = colours[i % len(colours)]
         latex_term = model_name_individual_terms[i]
+        print("Latex term:", latex_term)
         param_label = str(
             latex_term +
             '\n({} $\pm$ {})'.format(
@@ -176,15 +185,18 @@ def plot_prior(
         spacing = np.linspace(min(this_param_samples), max(this_param_samples))
         distribution = norm.pdf(spacing, this_param_mean, this_param_dev)
         ls = next(linecycler)
-        ax.hist(
-            this_param_samples,
-            histtype='step',
-            fill=False,
-            density=True,
-            # label=param_label,
-            color=this_param_colour
-        )
-
+        print("this param samples:", this_param_samples)
+        try:
+            ax.hist(
+                this_param_samples,
+                histtype='step',
+                fill=False,
+                density=True,
+                # label=param_label,
+                color=this_param_colour
+            )
+        except:
+            raise
         if true_model_terms_params is not None:
             try:
                 true_param = true_model_terms_params[latex_term]

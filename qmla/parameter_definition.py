@@ -96,6 +96,7 @@ def set_shared_parameters(
 
         true_prior.__setattr__('cov', old_cov_mtx)
         try:
+            print("[ParameterDefinition] latex terms:", latex_terms)
             qmla.shared_functionality.prior_distributions.plot_prior(
                 model_name=true_model_latex,
                 model_name_individual_terms=latex_terms,
@@ -106,11 +107,13 @@ def set_shared_parameters(
         except BaseException:
             print("[ParameterDefinition] plotting prior failed \n\n\n")
             pass
-
+    
+    print("[ParameterDefinition] parameters set")
     if growth_class.growth_generation_rule not in all_growth_rules: 
         all_growth_rules.append(growth_class.growth_generation_rule)
 
     if generate_evaluation_experiments:
+        print("[ParameterDefinition] Setting evaluation stuff")
         evaluation_probes = growth_class.generate_probes(
             store_probes=False, 
             probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
@@ -118,6 +121,8 @@ def set_shared_parameters(
             noise_level = growth_class.probe_noise_level,
             minimum_tolerable_noise = 0.0,
         )
+        print("evaluation Probes generated")
+
         num_evaluation_times = int(max(num_particles, 50)) # use at least 50 times to evaluate
         evaluation_times = scipy.stats.reciprocal.rvs(
             1e-1, 
@@ -125,25 +130,35 @@ def set_shared_parameters(
             size=num_evaluation_times
         ) # evaluation times generated log-uniformly
         available_probe_ids = list(range(growth_class.num_probes))
+        print("evaluation times generated")
         list_len_fator = math.ceil(len(evaluation_times) / len(available_probe_ids))
         iterable_probe_ids = iter(available_probe_ids * list_len_fator)
-         
+        plt.clf()
         plt.hist(
             evaluation_times,
             bins = list(np.linspace(0,growth_class.max_time_to_consider, 10))
         )
+        print("max time:", growth_class.max_time_to_consider)
+        print("bins:", list(np.linspace(0,growth_class.max_time_to_consider, 10)))
+        print("eval times:", evaluation_times)
+        print("histogram plotted") 
+        print("Results dir:", results_directory)
         plt.title('Times used for evaluation')
         plt.ylabel('Frequency')
         plt.xlabel('Time')
-        plt.savefig(
-            os.path.join(
-                results_directory, 
-                'times_for_evaluation.png'
-            )
+        print("axes labels set") 
+        fig_path = os.path.join(
+            results_directory, 
+            'times_for_evaluation.png'
         )
+        print("Fig path:", fig_path)
+
+        plt.savefig(fig_path)
+        print("histogram plot saved") 
+        
     else: 
         evaluation_probes = None
-
+    print("[ParameterDefinition] evaluation stuff set ")
     true_params_info = {
         'params_list': true_model_terms_params,
         'params_dict': true_params_dict,
@@ -151,6 +166,7 @@ def set_shared_parameters(
         'evaluation_probes' : evaluation_probes,
         'evaluation_times' : evaluation_times
     }
+    # print("True params info:", true_params_info)
 
     true_params_info['true_model'] = true_model
     true_params_info['growth_generator'] = growth_class.growth_generation_rule

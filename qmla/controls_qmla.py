@@ -48,6 +48,7 @@ class ControlsQMLA():
         arguments,
         **kwargs
     ):
+        import inspect
         # self.use_experimental_data = bool(arguments.experimental_data)
         self.growth_generation_rule = arguments.growth_generation_rule
         self.log_file = arguments.log_file
@@ -110,11 +111,20 @@ class ControlsQMLA():
 
         self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
         
+        log_print([
+            "qhl models retrieved"
+        ], log_file=self.log_file)
         if arguments.true_params_pickle_file is None: 
-            true_params_info = qmla.set_shared_parameters(
-                growth_class = self.growth_class,  
-                # all_growth_rules = # TODO get list of growth rules here
-            )
+            try:
+                true_params_info = qmla.set_shared_parameters(
+                    growth_class = self.growth_class,  
+                    # all_growth_rules = # TODO get list of growth rules here
+                )
+            except:
+                log_print([
+                    "Failed to set shared parameters"
+                ], log_file=self.log_file)
+                raise
         else:
             # true_params_pickle_file = arguments.true_params_pickle_file
             true_params_info = pickle.load(
@@ -123,6 +133,7 @@ class ControlsQMLA():
                     'rb'
                 )
             )
+        log_print([ "shared params set"], log_file=self.log_file)
         self.true_params_pickle_file = arguments.true_params_pickle_file
         self.true_model = true_params_info['true_model']
         self.true_model_name = database_framework.alph(self.true_model)
@@ -131,7 +142,9 @@ class ControlsQMLA():
         )
         self.true_model_terms_matrices = self.true_model_class.constituents_operators
         self.true_model_terms_params = true_params_info['params_list']
-        
+        log_print([
+            "True model set."
+        ], log_file=self.log_file)
         # derive required info from data from growth rule and arguments
         # self.true_hamiltonian = self.growth_class.true_hamiltonian
         # self.true_params_dict = self.growth_class.true_params_dict

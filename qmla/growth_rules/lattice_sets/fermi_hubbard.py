@@ -21,7 +21,7 @@ class FermiHubbardLatticeSet(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )        
-        self.true_lattice = topology_predefined._2_site_chain
+        self.true_lattice = topology_predefined._3_site_chain
         self.onsite_terms_present = False
         self.true_model = self.model_from_lattice(self.true_lattice)
 

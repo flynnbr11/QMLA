@@ -332,15 +332,20 @@ class ModelInstanceForLearning():
                 name=term
             )
             latex_terms.append(lt)
-
+        
         plot_all_priors = True
         if plot_all_priors == True:
-            qmla.shared_functionality.prior_distributions.plot_prior(
-                model_name=self.model_name_latex,
-                model_name_individual_terms=latex_terms,
-                prior=self.model_prior,
-                plot_file=prior_file,
-            )
+            try:
+                qmla.shared_functionality.prior_distributions.plot_prior(
+                    model_name=self.model_name_latex,
+                    model_name_individual_terms=latex_terms,
+                    prior=self.model_prior,
+                    plot_file=prior_file,
+                )
+            except:
+                self.log_print([
+                    "Failed to plot prior"
+                ])
 
         self.qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
@@ -358,6 +363,9 @@ class ModelInstanceForLearning():
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
         )
+        self.log_print([
+            "QInfer model generated."
+        ])
 
         self.qinfer_updater = qi.SMCUpdater(
             self.qinfer_model,
