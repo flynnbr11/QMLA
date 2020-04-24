@@ -419,7 +419,9 @@ def separable_fermi_hubbard_half_filled(
     # by removing amplitude of basis vectors of different form
     # eg 2 sites, keep |0101>; remove |0111>, etc
     combined_base_vectors = {
-        i: sum(get_half_filled_basis_vectors(i)) for i in range(1, max_num_qubits + 1)
+        i: sum(
+            get_half_filled_basis_vectors(i)
+        ) for i in range(1, max_num_qubits + 1)
     }
     for j in range(1, 1 + max_num_qubits):
         bv = combined_base_vectors[j]
@@ -438,8 +440,11 @@ def get_half_filled_basis_vectors(
     half_filled_list = [0, 1] * num_sites
 
     perms = list(itertools.permutations(half_filled_list))
-    perms = [''.join([str(j) for j in this_el]) for this_el in perms]
-    perms = list(set(perms))
+    perms = [
+        ''.join([str(j) for j in this_el])
+        for this_el in perms
+    ] # restore as strings instead of lists
+    perms = list(set(perms)) # unique strings
 
     basis = [state_from_string(s) for s in perms]
     return basis
@@ -552,7 +557,65 @@ def vector_from_fermion_state_description(state):
 
     return vector
 
+def fermi_hubbard_occupation_basis_down_in_first_site(
+    max_num_qubits,
+    num_probes = 1, 
+    **kwargs
+):
+    r"""
+    To test hopping out of first site
+    """
 
+    print("Fermi hubbard down in first site probes. max num qubits:",
+        max_num_qubits
+    )    
+    probe_dict = {}    
+    for j in range(num_probes):
+        for n in range(1, max_num_qubits+1):
+            num_occupation_locations =2*n
+            down_in_first_site = ['0']*num_occupation_locations
+            down_in_first_site[0] = '1'
+            down_in_first_site = ''.join(  down_in_first_site )
+            probe_dict[(j, n)] = state_from_string(down_in_first_site)
+    
+    return probe_dict
+
+def fermi_hubbard_occupation_basis_up_in_first_site(
+    max_num_qubits,
+    num_probes = 1, 
+    **kwargs
+):
+    r"""
+    To test hopping out of first site
+    """
+
+    print("Fermi hubbard down in first site probes. max num qubits:",
+        max_num_qubits
+    )    
+    probe_dict = {}    
+    for j in range(num_probes):
+        for n in range(1, max_num_qubits+1):
+            num_occupation_locations =2*n
+            down_in_first_site = ['0']*num_occupation_locations
+            down_in_first_site[1] = '1'
+            down_in_first_site = ''.join(  down_in_first_site )
+            probe_dict[(j, n)] = state_from_string(down_in_first_site)
+    
+    return probe_dict
+
+def fermi_hubbard_occupation_basis_down_in_all_sites(
+    max_num_qubits,
+    num_probes = 1, 
+    **kwargs
+):
+    probe_dict = {}
+    
+    for j in range(num_probes):
+        for n in range(1, max_num_qubits+1):
+            down_in_all_sites = '10'*n
+            probe_dict[(j, n)] = state_from_string(down_in_all_sites)
+    
+    return probe_dict
 ###################################
 # Testing/development
 ###################################

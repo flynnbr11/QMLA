@@ -22,7 +22,7 @@ class FermiHubbardLatticeSet(
             **kwargs
         )        
         self.true_lattice = topology_predefined._3_site_chain
-        self.onsite_terms_present = True
+        self.onsite_terms_present = False
         self.true_model = self.model_from_lattice(self.true_lattice)
 
         self.available_lattices = [
@@ -36,10 +36,16 @@ class FermiHubbardLatticeSet(
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
         self.max_num_qubits = self.num_sites_true
         self.max_num_probe_qubits = self.num_sites_true
+        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
+        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_up_in_first_site
+        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_all_sites
         self.timing_insurance_factor = 15
         self.min_param = 0.25
         self.max_param = 0.75
-
+        self.true_model_terms_params = {
+            'FH-hopping-sum_down_1h2_2h3_d3' : 0.25,
+            'FH-hopping-sum_up_1h2_2h3_d3' : 0.75
+        }
 
     def model_from_lattice(self, lattice):
         connected_sites = lattice.get_connected_site_list()
@@ -55,7 +61,7 @@ class FermiHubbardLatticeSet(
             )
             for s in [
                 'up', 
-                # 'down'
+                'down'
             ]
         ]
 
@@ -91,7 +97,7 @@ class FermiHubbardLatticeSet(
                     else:
                         sites = [int(s) for s in c.split('h')]
                         connected_sites += str(
-                            "({},{})\\\\".format(sites[0], sites[1])
+                            "({},{})".format(sites[0], sites[1])
                         )
                 
                 if spin_type == 'up':
