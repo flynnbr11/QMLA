@@ -196,6 +196,9 @@ def time_required(
             try:
                 num_models_this_dimension = generator_max_num_models_by_shape[q]
             except BaseException:
+                print("num models {} not in generator_max_num_models_by_shape; taking default".format(
+                    q
+                ))
                 num_models_this_dimension = generator_max_num_models_by_shape['other']
             print("Gen:", gen, "max num models for ", q, "qubits:",
                   num_models_this_dimension

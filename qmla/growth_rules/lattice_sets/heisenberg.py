@@ -31,13 +31,14 @@ class HeisenbergLatticeSet(
             topology_predefined._6_site_grid, 
         ]
         self.max_num_models_by_shape = {
-            '1' : 2, 
-            '2' : 2, 
-            '3' : 2, 
-            '4' : 2, 
-            '5' : 2, 
-            '6' : 2, 
+            1 : 2, 
+            2 : 2, 
+            3 : 2, 
+            4 : 2, 
+            5 : 2, 
+            6 : 2, 
             'other' : 0
         }
         self.base_terms = ['x', 'z']
-        
+        self.num_processes_to_parallelise_over = len(self.available_lattices)
+        self.timing_insurance_factor = 4
