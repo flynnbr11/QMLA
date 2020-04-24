@@ -28,11 +28,11 @@ class IsingLatticeSet(
         self.true_model = self.model_from_lattice(self.true_lattice)
 
         self.available_lattices = [
-            topology_predefined._2_site_chain,
+            # topology_predefined._2_site_chain,
             self.true_lattice, 
             topology_predefined._3_site_chain,
             topology_predefined._5_site_chain,
-            # topology_predefined._6_site_chain,
+            topology_predefined._6_site_chain,
         ]
         self.timing_insurance_factor = 4
         self.true_model_terms_params = {

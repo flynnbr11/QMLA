@@ -111,9 +111,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             else:
                 true_ham = param * mtx
         self.true_hamiltonian = true_ham
-        self.log_print([
-            "True hamiltonian:", self.true_hamiltonian
-        ])
 
         # self.use_experimental_data = use_experimental_data
         self.timings = {
