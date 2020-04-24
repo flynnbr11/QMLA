@@ -147,6 +147,7 @@ def plot_prior(
     ncols = int(np.ceil(np.sqrt(num_params)))
     nrows = int(np.ceil(num_params / ncols))
 
+    plt.clf()
     fig, axes = plt.subplots(
         figsize=(10, 7),
         nrows=nrows,
@@ -177,7 +178,7 @@ def plot_prior(
         print("Latex term:", latex_term)
         param_label = str(
             latex_term +
-            '\n({} $\pm$ {})'.format(
+            '\n( {} $\pm$ {} )'.format(
                 np.round(this_param_mean, 2),
                 np.round(this_param_dev, 2)
             )
@@ -196,7 +197,10 @@ def plot_prior(
                 color=this_param_colour
             )
         except:
+            print("Failed to plot hist")
             raise
+        print("Hist plotted")
+        print("true_model_terms_params:", true_model_terms_params)
         if true_model_terms_params is not None:
             try:
                 true_param = true_model_terms_params[latex_term]
@@ -209,7 +213,9 @@ def plot_prior(
                 )
                 include_legend = True
             except BaseException:
+                print("True param not present")
                 pass  # i.e. this parameter not in true params
+        print("true params added")
         ax.set_title(param_label)
         if include_legend == True:
             ax.legend()
@@ -222,5 +228,10 @@ def plot_prior(
         hspace=0.3,
         wspace=0.4
     )
-    fig.savefig(plot_file)
+    print("Saving file to", plot_file)
+    try:
+        fig.savefig(plot_file)
+    except:
+        print("Couldn't save prior plot for some reason")
+    print("Saved")
     plt.clf()
