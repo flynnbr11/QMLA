@@ -154,9 +154,7 @@ class NVLargeSpinBath(
 
         max_num_qubits = max(
             [database_framework.get_num_qubits(mod) for mod in model_list]
-        )
-
-        
+        )       
         new_gali_model = gali_model_nv_centre_spin(max_num_qubits + 1)
         self.num_qubits_current_model = qmla.database_framework.get_num_qubits(
             new_gali_model

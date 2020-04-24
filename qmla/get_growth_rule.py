@@ -28,6 +28,9 @@ growth_classes = {
         GR.NVLargeSpinBath,
     'ExperimentReducedNV':
         GR.ExperimentReducedNV,
+    'SimulatedNVCentre' : 
+        GR.SimulatedNVCentre,
+
     # Theoretical paper growth rules
     'IsingPredetermined':
         GR.IsingPredetermined,

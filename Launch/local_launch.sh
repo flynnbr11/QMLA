@@ -80,6 +80,7 @@ git_commit=$(git rev-parse HEAD)
 # growth_rule='HeisenbergLatticeSet'
 growth_rule='FermiHubbardLatticeSet'
 # growth_rule='NVLargeSpinBath'
+# growth_rule='SimulatedNVCentre'
 
 # sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'

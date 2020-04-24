@@ -21,7 +21,7 @@ class FermiHubbardLatticeSet(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )        
-        self.true_lattice = topology_predefined._3_site_chain
+        self.true_lattice = topology_predefined._2_site_chain
         self.onsite_terms_present = False
         self.true_model = self.model_from_lattice(self.true_lattice)
 
@@ -44,7 +44,9 @@ class FermiHubbardLatticeSet(
         self.max_param = 0.75
         self.true_model_terms_params = {
             'FH-hopping-sum_down_1h2_2h3_d3' : 0.25,
-            'FH-hopping-sum_up_1h2_2h3_d3' : 0.75
+            'FH-hopping-sum_up_1h2_2h3_d3' : 0.75,
+            'FH-hopping-sum_down_1h2_d2' : 0.25,
+            'FH-hopping-sum_up_1h2_d2' : 0.75
         }
 
     def model_from_lattice(self, lattice):
