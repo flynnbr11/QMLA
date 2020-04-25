@@ -138,27 +138,18 @@ def set_shared_parameters(
             evaluation_times,
             bins = list(np.linspace(0,growth_class.max_time_to_consider, 10))
         )
-        print("max time:", growth_class.max_time_to_consider)
-        print("bins:", list(np.linspace(0,growth_class.max_time_to_consider, 10)))
-        print("eval times:", evaluation_times)
-        print("histogram plotted") 
-        print("Results dir:", results_directory)
         plt.title('Times used for evaluation')
         plt.ylabel('Frequency')
         plt.xlabel('Time')
-        print("axes labels set") 
         fig_path = os.path.join(
             results_directory, 
             'times_for_evaluation.png'
         )
-        print("Fig path:", fig_path)
 
         plt.savefig(fig_path)
-        print("histogram plot saved") 
         
     else: 
         evaluation_probes = None
-    print("[ParameterDefinition] evaluation stuff set ")
     true_params_info = {
         'params_list': true_model_terms_params,
         'params_dict': true_params_dict,

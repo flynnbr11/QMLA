@@ -25,9 +25,6 @@ class SimulatedNVCentre(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.log_print([
-            "GR called. probe fnc:", self.probe_generation_function
-        ])
         self.true_model = spin_system_model(
             num_sites = 4,
             # core_terms = ['x'], 
@@ -39,9 +36,21 @@ class SimulatedNVCentre(
             qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         self.model_heuristic_function = \
             qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic            
-        self.log_print([
-            "GR initialised"
-        ])
+        self.max_time_to_consider = 100
+        self.true_model_terms_params = {
+            'pauliSet_1_x_d4' : 8.2450565,
+            'pauliSet_1_y_d4' : 12.00664336,
+            'pauliSet_1_z_d4' : 5.65998543,
+            'pauliSet_1J2_xJx_d4' : 0.15,
+            'pauliSet_1J2_yJy_d4' : 0.015,
+            'pauliSet_1J2_zJz_d4' : 0.25, #0.7654868,
+            'pauliSet_1J3_xJx_d4' : 0.15,
+            'pauliSet_1J3_yJy_d4' : 0.15, 
+            'pauliSet_1J3_zJz_d4' : 0.15,
+            'pauliSet_1J4_xJx_d4' : 0.15,
+            'pauliSet_1J4_yJy_d4' : 0.15,
+            'pauliSet_1J4_zJz_d4' : 0.15,
+        }
 
     def generate_models(self, model_list, **kwargs):
         if self.spawn_stage[-1]==None:

@@ -22,7 +22,7 @@ class FermiHubbardLatticeSet(
             **kwargs
         )        
         self.true_lattice = topology_predefined._3_site_chain
-        self.onsite_terms_present = False
+        self.onsite_terms_present = True
         self.true_model = self.model_from_lattice(self.true_lattice)
 
         self.available_lattices = [

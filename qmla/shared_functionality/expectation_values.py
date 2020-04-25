@@ -232,6 +232,7 @@ def make_inversion_gate(num_qubits):
 
 def n_qubit_hahn_evolution(
     ham, t, state,
+    second_time_evolution_factor = 1,
     precision=1e-10,
     log_file=None,
     log_identifier=None
@@ -273,10 +274,14 @@ def n_qubit_hahn_evolution(
 
     # print("[expectation values] N qubit Hahn evolution. dimension {}".format(np.shape(ham)))
     # print("state:", state)
+    # want to evolve for t, then han inversion gate, 
+    # then again evolution for (S * t)
+    # where S = 2 in standard Hahn evolution, 
+    # S = 1 for long time dynamics study
     first_unitary_time_evolution = linalg.expm(-1j * ham * t)
     second_unitary_time_evolution = np.linalg.matrix_power(
         first_unitary_time_evolution,
-        2
+        second_time_evolution_factor 
     )
 
     total_evolution = np.dot(
@@ -349,7 +354,7 @@ def n_qubit_hahn_evolution(
     # for this case Pr(0) refers to projection onto |->
     # so return 1 - expect_value
 
-    return expect_value
+    return 1 - expect_value
     # return expect_value
 
 
