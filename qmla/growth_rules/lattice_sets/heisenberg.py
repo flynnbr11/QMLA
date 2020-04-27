@@ -20,7 +20,7 @@ class HeisenbergLatticeSet(
             **kwargs
         )
         self.transverse_field = None # 'x'
-        self.true_lattice = topology_predefined._4_site_square
+        self.true_lattice = topology_predefined._6_site_grid
         self.true_model = self.model_from_lattice(self.true_lattice)
 
         self.available_lattices = [
