@@ -276,13 +276,10 @@ def n_qubit_hahn_evolution(
     # print("[expectation values] N qubit Hahn evolution. dimension {}".format(np.shape(ham)))
     # print("state:", state)
     first_unitary_time_evolution = linalg.expm(-1j * ham * t)
-    second_unitary_time_evolution = np.linalg.matrix_power(
-        first_unitary_time_evolution,
-        2
-    )
+#     second_unitary_time_evolution is not required as far as Hahn signals experiments are performed, because in them t_1 = t_2 in the evolution before and after Hahn inversion
 
     total_evolution = np.dot(
-        second_unitary_time_evolution,
+        first_unitary_time_evolution,
         np.dot(
             inversion_gate,
             first_unitary_time_evolution
