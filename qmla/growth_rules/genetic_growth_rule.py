@@ -93,7 +93,7 @@ class Genetic(
         # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
-        self.max_spawn_depth = 24
+        self.max_spawn_depth = 12
         self.initial_num_models = 16
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
@@ -492,7 +492,7 @@ class Genetic(
         elif self.genetic_algorithm.best_model_unchanged:
             self.champion_determined = True
             self.champion_model = self.genetic_algorithm.most_elite_models_by_generation[
-                self.genetic_algorithm.genetic_generation
+                self.genetic_algorithm.genetic_generation -1
             ]
 
             self.log_print(
@@ -506,6 +506,9 @@ class Genetic(
             # check if elite model hasn't changed in last N generations
             return True
         else:
+            self.log_print([
+                "Elite models changed recently; continuing search."
+            ])
             return False
 
     def growth_rule_specific_plots(

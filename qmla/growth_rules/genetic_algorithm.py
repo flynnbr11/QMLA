@@ -40,7 +40,7 @@ class GeneticAlgorithmQMLA():
         self.f_score_change_by_generation = {}
         self.most_elite_models_by_generation = {}
         self.best_model_unchanged = False
-        self.unchanged_elite_num_generations_cutoff = 5
+        self.unchanged_elite_num_generations_cutoff = 2 #5 #TODO put as 5 - 2 for tests
         
 
 
@@ -383,7 +383,7 @@ class GeneticAlgorithmQMLA():
         )
         elite_models = ranked_models[:num_elites]
         self.most_elite_models_by_generation[self.genetic_generation] = elite_models[0]
-        num_elites_for_termination = 4
+        # num_elites_for_termination = 2
 
         if self.genetic_generation > self.unchanged_elite_num_generations_cutoff + 2:
             gen = self.genetic_generation
@@ -400,7 +400,8 @@ class GeneticAlgorithmQMLA():
                 self.most_elite_models_by_generation[g] for g in recent_generations
             ]
             unchanged = np.all( 
-                np.array(recent_elite_models) == self.most_elite_models_by_generation[gen]
+                np.array(recent_elite_models) 
+                == self.most_elite_models_by_generation[gen]
             )
             if unchanged:
                 self.best_model_unchanged = True
