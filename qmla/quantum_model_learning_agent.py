@@ -1999,7 +1999,7 @@ class QuantumModelLearningAgent():
 
 
     def inspect_remote_job_crashes(self):
-        self.calls_to_job_inspections += 1
+        # self.calls_to_job_inspections += 1
         self.call_counter['job_crashes'] += 1
         t_init = time.time()
         if self.redis_databases['any_job_failed']['Status'] == b'1':

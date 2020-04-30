@@ -155,6 +155,7 @@ class GrowthRule():
             # )
             self.true_params_list = []
             self.true_params_dict = {}
+            # self.true_params_dict = self.true_model_terms_params
 
         true_ham = None
         for k in list(self.true_params_dict.keys()):
