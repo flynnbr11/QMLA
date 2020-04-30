@@ -12,6 +12,10 @@ _2_site_chain = GridTopology(
 _3_site_chain = GridTopology(
     dimension=1, num_sites = 3
 )
+_3_site_chain_fully_connected = GridTopology(
+    dimension=1, num_sites = 3,
+    all_sites_connected=True
+)
 _4_site_chain = GridTopology(
     dimension=1, num_sites = 4
 )

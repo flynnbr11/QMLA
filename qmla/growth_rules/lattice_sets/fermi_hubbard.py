@@ -22,20 +22,23 @@ class FermiHubbardLatticeSet(
             **kwargs
         )        
         self.true_lattice = topology_predefined._3_site_chain
+        # self.true_lattice = topology_predefined._4_site_square
         self.onsite_terms_present = True
         self.true_model = self.model_from_lattice(self.true_lattice)
 
         self.available_lattices = [
             self.true_lattice, 
-            # topology_predefined._3_site_chain,
+            topology_predefined._3_site_chain_fully_connected, 
+            topology_predefined._4_site_chain,
+            topology_predefined._4_site_square,
         ]
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
 
         self.num_sites_true = database_framework.get_num_qubits(self.true_model)
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
-        self.max_num_qubits = self.num_sites_true
-        self.max_num_probe_qubits = self.num_sites_true
+        self.max_num_qubits = 5
+        self.max_num_probe_qubits = self.max_num_qubits
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_up_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_all_sites
