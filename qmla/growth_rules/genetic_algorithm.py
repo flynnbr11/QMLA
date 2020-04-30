@@ -40,7 +40,7 @@ class GeneticAlgorithmQMLA():
         self.f_score_change_by_generation = {}
         self.most_elite_models_by_generation = {}
         self.best_model_unchanged = False
-        self.unchanged_elite_num_generations_cutoff = 2 #5 #TODO put as 5 - 2 for tests
+        self.unchanged_elite_num_generations_cutoff = 5 #TODO put as 5 - 2 for tests
         
 
 

@@ -492,7 +492,7 @@ class Genetic(
         elif self.genetic_algorithm.best_model_unchanged:
             self.champion_determined = True
             self.champion_model = self.genetic_algorithm.most_elite_models_by_generation[
-                self.genetic_algorithm.genetic_generation -1
+                self.genetic_algorithm.genetic_generation - 1
             ]
 
             self.log_print(
