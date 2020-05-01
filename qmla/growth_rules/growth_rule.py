@@ -125,6 +125,7 @@ class GrowthRule():
         }
         self.num_probes = 40
         # self._num_probes = 40
+        self.plot_time_increment=None
         self.min_param = 0
         self.max_param = 1
         self.prior_random_mean = False
@@ -390,17 +391,32 @@ class GrowthRule():
         )
         probe = plot_probes[true_ham_dim]
 
-        num_datapoints_to_plot = 300
         plot_lower_time = 0
         plot_upper_time = self.max_time_to_consider
-        raw_times = list(np.linspace(
-            0,
-            self.max_time_to_consider,
-            num_datapoints_to_plot + 1)
-        )
-        plot_times = [np.round(a, 2) for a in raw_times]
+        if self.plot_time_increment is not None:
+            raw_times = list(np.arange(
+                plot_lower_time, 
+                plot_upper_time, 
+                self.plot_time_increment
+            ))
+            self.log_print([
+                "Getting plot times from plot time increment. Raw times:", raw_times,
+                "lower={}; upper={}; incr={}".format(plot_lower_time, plot_upper_time, self.plot_time_increment)
+            ])
+        else:
+            num_datapoints_to_plot = 300
+            raw_times = list(np.linspace(
+                0,
+                plot_upper_time,
+                num_datapoints_to_plot + 1
+            ))
+
+        plot_times = [np.round(a, 2) if a>0.1 else a for a in raw_times]
         plot_times = sorted(plot_times)
-        
+        self.log_print([
+            "plot times:", plot_times,
+        ])
+
         self.measurements = {
             t : self.expectation_value(
                 ham = self.true_hamiltonian, 

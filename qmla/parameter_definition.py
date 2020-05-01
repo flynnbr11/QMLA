@@ -125,7 +125,7 @@ def set_shared_parameters(
 
         num_evaluation_times = int(max(num_particles, 50)) # use at least 50 times to evaluate
         evaluation_times = scipy.stats.reciprocal.rvs(
-            1e-1, 
+            growth_class.max_time_to_consider/100, 
             growth_class.max_time_to_consider, 
             size=num_evaluation_times
         ) # evaluation times generated log-uniformly

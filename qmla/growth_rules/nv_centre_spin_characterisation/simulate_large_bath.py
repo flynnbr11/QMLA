@@ -25,33 +25,75 @@ class SimulatedNVCentre(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.true_model = spin_system_model(
-            num_sites = 4,
-            # core_terms = ['x'], 
-            include_transverse_terms=False
+
+        # Set up true model
+        B = 11e-3 # Tesla
+        g = 2 # 
+        bohr_magneton = 9.274e-24 # J T^-1
+        hbar = 1.05e-34 # m^2 kg s^-1
+        nuclear_magneton = 5.05e-27 # J T^-1 
+        gamma_n = 0.307e6 / 1e-6 # from Seb's thesis
+        gamma = 10.705e6 # T^-1 s^-1 # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5226623/
+        self.true_model_terms_params = {
+            # spin
+            'pauliSet_1_x_d3' : B*g*bohr_magneton/hbar, # ~1.943 GHz
+            'pauliSet_1_y_d3' : B*g*bohr_magneton/hbar,
+            'pauliSet_1_z_d3' : B*g*bohr_magneton/hbar,
+            # nitrogen nuclei
+            'pauliSet_2_x_d3' : B*gamma_n , # ~3.37GHz
+            'pauliSet_2_y_d3' : B*gamma_n ,
+            'pauliSet_2_z_d3' : B*gamma_n ,
+            # carbon nuclei
+            'pauliSet_3_x_d3' : B * gamma , # ~117KHz
+            'pauliSet_3_y_d3' : B * gamma ,
+            'pauliSet_3_z_d3' : B * gamma ,
+            # interactions: spin with nitrogen nuclei
+            'pauliSet_1J2_xJx_d3' : 2.7e6, # 2.7MHz
+            'pauliSet_1J2_yJy_d3' : 2.7e6,
+            'pauliSet_1J2_zJz_d3' : 2.14e6,
+            # interactions: spin with carbon nuclei
+            'pauliSet_1J3_xJx_d3' : 2.4e6, # 2.4MHz
+            'pauliSet_1J3_yJy_d3' : 2.4e6, 
+            'pauliSet_1J3_zJz_d3' : 2.4e6,
+        }
+
+        self.gaussian_prior_means_and_widths = {
+            # spin
+            'pauliSet_1_x_d3' : (5e9, 2e9), # ~1.943 GHz
+            'pauliSet_1_y_d3' : (5e9, 2e9),
+            'pauliSet_1_z_d3' : (5e9, 2e9),
+            # nitrogen nuclei
+            'pauliSet_2_x_d3' : (5e6, 2e6) , # ~3.37GHz
+            'pauliSet_2_y_d3' : (5e6, 2e6) ,
+            'pauliSet_2_z_d3' : (5e6, 2e6) ,
+            # carbon nuclei
+            'pauliSet_3_x_d3' : (1e6, 2e5) , # ~117KHz
+            'pauliSet_3_y_d3' : (1e6, 2e5) ,
+            'pauliSet_3_z_d3' : (1e6, 2e5) ,
+            # interactions: spin with nitrogen nuclei
+            'pauliSet_1J2_xJx_d3' : (5e6, 2e6), # 2.7MHz
+            'pauliSet_1J2_yJy_d3' : (5e6, 2e6),
+            'pauliSet_1J2_zJz_d3' : (5e6, 2e6),
+            # interactions: spin with carbon nuclei
+            'pauliSet_1J3_xJx_d3' : (5e6, 2e6), # 2.4MHz
+            'pauliSet_1J3_yJy_d3' : (5e6, 2e6), 
+            'pauliSet_1J3_zJz_d3' : (5e6, 2e6),
+
+        }
+
+        self.true_model = '+'.join(
+            (self.true_model_terms_params.keys())
         )
+        self.true_model = qmla.database_framework.alph(self.true_model)
+        
         self.tree_completed_initially = True
         self.initial_models=None
         self.expectation_value_function = \
             qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         self.model_heuristic_function = \
             qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic            
-        self.max_time_to_consider = 100
-        a = 50
-        self.true_model_terms_params = {
-            'pauliSet_1_x_d4' : 2.87,
-            'pauliSet_1_y_d4' : 2.87,
-            'pauliSet_1_z_d4' : 2,
-            'pauliSet_1J2_xJx_d4' : -5,
-            'pauliSet_1J2_yJy_d4' : -5,
-            'pauliSet_1J2_zJz_d4' : 0, #0.7654868,
-            'pauliSet_1J3_xJx_d4' : 0.,
-            'pauliSet_1J3_yJy_d4' : 0., 
-            'pauliSet_1J3_zJz_d4' : 0.,
-            'pauliSet_1J4_xJx_d4' : 0.,
-            'pauliSet_1J4_yJy_d4' : 0.,
-            'pauliSet_1J4_zJz_d4' : 0.,
-        }
+        self.max_time_to_consider = 50 * 1e-6 # 50 microseconds 
+        self.plot_time_increment = 0.5 * 1e-6 # 0.5 microseconds
 
     def generate_models(self, model_list, **kwargs):
         if self.spawn_stage[-1]==None:

@@ -279,6 +279,7 @@ print("[Set QMLA params] Storing true measurements to {}".format(
 )
 
 true_system_measurements = growth_class.get_measurements_by_time()
+print("Measuerements from GR:", true_system_measurements)
 pickle.dump(
     true_system_measurements,
     open(
