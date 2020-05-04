@@ -72,8 +72,6 @@ class qmla_tree():
             self.initial_models = self.growth_class.initial_models
         return self.initial_models
 
-
-
     def next_layer(
         self, 
         **kwargs
@@ -101,33 +99,6 @@ class qmla_tree():
         model_list = list(set(model_list))
         model_list = [qmla.database_framework.alph(mod) for mod in model_list]
         return model_list, pairs_to_compare
-
-    # def spawn_models(
-    #     self, 
-    #     **kwargs
-    # ):
-    #     self.spawn_step += 1
-    #     new_models =  self.growth_class.generate_models(
-    #         spawn_step = self.spawn_step,             
-    #         **kwargs
-    #     )
-    #     new_models = list(set(new_models))
-    #     new_models = [qmla.database_framework.alph(mod) for mod in new_models]
-    #     pairs_to_compare = 'all'
-
-    #     return new_models, pairs_to_compare
-
-    # def prune_tree(
-    #     self, 
-    #     previous_prune_branch = 0, 
-    #     **kwargs
-    # ):
-    #     self.prune_step += 1
-
-    #     return self.growth_class.tree_pruning(
-    #         previous_prune_branch = previous_prune_branch,
-    #         prune_step = self.prune_step
-    #     )
 
     def nominate_champions(
         self,
@@ -342,19 +313,4 @@ class qmla_branch():
             log_identifier = 'Branch {}'.format(self.branch_id)
         )
 
-class iterative_improvement_pruning(qmla_tree):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def prune_tree(
-        self, 
-        previous_prune_branch = 0, 
-        **kwargs
-    ):
-        self.prune_complete = True
-        branches = sorted(list(self.branches.keys()))
-        final_branch = self.branches[
-            max(branches)
-        ]
-        return [final_branch.champion_name], []
 

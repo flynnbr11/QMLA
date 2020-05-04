@@ -152,7 +152,7 @@ class ModelInstanceForLearning():
         growth_generator,
         qmla_core_info_database,
         checkloss=True,
-        debug_directory=None,
+        # debug_directory=None,
         **kwargs
     ):
         redis_databases = rds.get_redis_databases_by_qmla_id(

@@ -35,6 +35,7 @@ class IsingGenetic(
             initial_rating=1500,
             k_const=30
         ) # for use when ranking/rating models
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.zero_state_probes
         self.prune_completed_initially = True
         self.prune_complete = True
         self.fitness_by_f_score = pd.DataFrame()

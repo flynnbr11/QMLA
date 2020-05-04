@@ -19,7 +19,6 @@ import redis
 # QMLA functionality
 import qmla.analysis
 import qmla.database_framework as database_framework
-# import qmla.database_launch as database_launch
 import qmla.get_growth_rule as get_growth_rule
 import qmla.redis_settings as rds
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation
@@ -58,8 +57,6 @@ class QuantumModelLearningAgent():
                  qmla_controls=None, 
                  model_priors=None,  # needed for further QHL mode
                  experimental_measurements=None,
-                #  results_directory='',
-                #  use_exp_custom=True,  # TODO either remove custom exponentiation method or fix
                  sigma_threshold=1e-13,
                  **kwargs
                  ):
@@ -86,34 +83,25 @@ class QuantumModelLearningAgent():
             experimental_measurements=experimental_measurements,
         )
 
-        # resources potentiall reallocated based on number of
-        # parameters/dimension
+        # Resources potentially reallocated 
         self._compute_base_resources()
 
-        # Database used to keep track of models tested
-        # self._initiate_database()
-
-        # Redundant terms -- TODO remove calls to them and then attributes
+        # Redundant attributes, retained for legacy; to be removed
         self._potentially_redundant_setup(
-            # use_exp_custom=use_exp_custom,
             sigma_threshold=sigma_threshold,
         )
 
-        # check if QMLA should run in parallel and set up accordingly
+        # Check if QMLA should run in parallel and set up accordingly
         self._setup_parallel_requirements()
 
         # QMLA core info stored on redis server
         self._compile_and_store_qmla_info_summary()
 
-        # set up all attributes related to growth rules and tree management
-        self._setup_tree_and_growth_rules(
-            # generator_list=generator_list,
-        )
-
-
+        # Set up infrastructure related to growth rules and tree management
+        self._setup_tree_and_growth_rules()
 
     ##########
-    # Section: Initialisation
+    # Section: Initialisation and setup
     ##########
     def log_print(self, to_print_list):
         qmla.logging.print_to_log(
@@ -124,6 +112,9 @@ class QuantumModelLearningAgent():
         )
 
     def _fundamental_settings(self):
+        r"""
+        Basic settings, path definitions etc
+        """
         self.qmla_id = self.qmla_controls.qmla_id
         self.redis_host_name = self.qmla_controls.host_name
         self.redis_port_number = self.qmla_controls.port_number
@@ -160,6 +151,10 @@ class QuantumModelLearningAgent():
         self.sleep_duration = 10
 
     def _true_model_definition(self):
+        r"""
+        Information related to true (target) model.
+        """
+
         self.true_model_name = database_framework.alph(
             self.qmla_controls.true_model_name)
         self.true_model_dimension = database_framework.get_num_qubits(
@@ -188,7 +183,7 @@ class QuantumModelLearningAgent():
         self,
     ):
         r"""
-        Initiates database and other infrastructure.
+        Set up infrastructure.
         """
         # TODO most of this can probably go inside run_complete_qmla
         self.model_database = pd.DataFrame({
@@ -216,6 +211,7 @@ class QuantumModelLearningAgent():
         self.growth_rule_of_true_model = self.qmla_controls.growth_generation_rule
         self.unique_growth_rule_instances = self.qmla_controls.unique_growth_rule_instances
 
+        # Keep track of models/branches
         self.model_count = 0 
         self.highest_model_id = 0  # so first created model gets model_id=0
         self.models_branches = {}       
@@ -224,6 +220,7 @@ class QuantumModelLearningAgent():
         self.ghost_branch_list = []
         self.ghost_branches = {}
 
+        # Tree object for each growth rule
         self.trees = {
             gen : qmla.tree.qmla_tree(
                 growth_class = self.unique_growth_rule_instances[gen],
@@ -232,40 +229,24 @@ class QuantumModelLearningAgent():
             for gen in self.unique_growth_rule_instances
         }
         self.branches = {}
-
         self.tree_count = len(self.trees)
         self.tree_count_completed = np.sum(
             [ tree.is_tree_complete() for tree in self.trees.values()]
         )
-
-        if (
-            not self.qmla_controls.qhl_mode
-            and 
-            not self.qmla_controls.qhl_mode_multiple_models
-        ):
-            # only when full QMLA desired, 
-            # start a first branch for each tree
-
-            for tree in list(self.trees.values()):
-                # starting_models = tree.growth_class.initial_models 
-                starting_models = tree.get_initial_models() 
-                self.log_print([
-                    "Adding initial branch for {}".format(
-                        tree.growth_rule
-                    ),
-                    "Starting models:", starting_models
-                ])
-                self.new_branch(
-                    model_list = starting_models, 
-                    growth_rule = tree.growth_rule
-                )
 
     def _set_learning_and_comparison_parameters(
         self,
         model_priors,
         experimental_measurements,
     ):
+        r"""
+        Parameters related to learning/comparing models. 
+        """
+        self.true_model_hamiltonian = self.growth_class.true_hamiltonian
         self.model_priors = model_priors
+        self.reallocate_resources = self.qmla_controls.reallocate_resources
+
+        # learning parameters, used by QInfer updates
         self.num_particles = self.qmla_controls.num_particles
         self.num_experiments = self.qmla_controls.num_experiments
         self.num_experiments_for_bayes_updates = self.qmla_controls.num_times_bayes
@@ -275,12 +256,13 @@ class QuantumModelLearningAgent():
         self.qinfer_resampler_a = self.qmla_controls.resample_a
         self.qinfer_PGH_heuristic_factor = self.qmla_controls.pgh_factor
         self.qinfer_PGH_heuristic_exponent = self.qmla_controls.pgh_exponent
-        self.reallocate_resources = self.qmla_controls.reallocate_resources
+        
+        # tracking for analysis
         self.model_f_scores = {}
         self.model_precisions = {}
         self.model_sensitivities = {}
-        self.true_model_hamiltonian = self.growth_class.true_hamiltonian
-        # get probes for learning
+
+        # get probes used for learning
         self.growth_class.generate_probes(
             noise_level=self.qmla_controls.probe_noise_level,
             minimum_tolerable_noise=0.0,
@@ -315,17 +297,27 @@ class QuantumModelLearningAgent():
         # use_exp_custom,
         sigma_threshold,
     ):
+        r"""
+        Graveyard for deprecated ifnrastructure. 
+
+        Attributes etc stored here which are not functionally used
+            within QMLA, but which are called somewhere, 
+            and cause errors when omitted. 
+        Should be stored here temporarily during development, 
+            and removed entirely when sure they are not needed. 
+
+        """
         # testing whether these are used anywhere
         # Either remove, or find appropriate place for initialisation and use
         # many are included in qmla_core_info_dict dict sent to workers; check if they are
         # used thereafter
-        self.use_qle = False  # Set to False for IQLE # TODO remove - redundant
+        # self.use_qle = False  # Set to False for IQLE # TODO remove - redundant
         # should only matter when using custom exponentiation package
-        self.enable_sparse_exponentiation = True
-        self.exponentiation_tolerance = None
+        # self.enable_sparse_exponentiation = True
+        # self.exponentiation_tolerance = None
         self.sigma_threshold = sigma_threshold
         self.model_fitness_scores = {}
-        self.debug_directory = None
+        # self.debug_directory = None
         self.use_time_dependent_true_model = False
         self.num_time_dependent_true_params = 0
         self.time_dependent_params = None
@@ -348,6 +340,9 @@ class QuantumModelLearningAgent():
         )
 
     def _setup_parallel_requirements(self):
+        r"""
+        Infrastructure for use when QMLA run in parallel. 
+        """
         self.use_rq = self.qmla_controls.use_rq
         self.rq_timeout = self.qmla_controls.rq_timeout
         self.rq_log_file = self.log_file
@@ -374,6 +369,16 @@ class QuantumModelLearningAgent():
         self.run_in_parallel = parallel_enabled
 
     def _compute_base_resources(self):
+        r"""
+        Compute the set of minimal resources for models to learn on. 
+
+        In the case self.reallocate_resources==True, 
+            models will receive resources (epochs, particles)
+            scaled by how complicated they are. 
+        For instance, models with 4 parameters will receive
+            twice as many particles as a model with 
+            2 parameters. 
+        """
         # TODO remove base_num_qubits stuff?
         # TODO put option inside growth rule
         # and functionality as method of ModelForLearning
@@ -403,6 +408,21 @@ class QuantumModelLearningAgent():
     def _compile_and_store_qmla_info_summary(
         self
     ):
+        r""" 
+        Gather info needed to run QMLA tasks and store remotely. 
+
+        QMLA issues jobs to run remotely, 
+            namely for model (parameter) learning 
+            and model comparisons (Bayes factors). 
+        These jobs don't need access to all QMLA data, 
+            but do need some common info,
+            e.g. number of particles and epochs. 
+        This function gathers all relevant information
+            in a single dict, and stores it on the redis server
+            which all worker nodes have access to. 
+        It also stores the probe sets required for the same tasks. 
+        
+        """
         number_hamiltonians_to_exponentiate = (
             self.num_particles *
             (self.num_experiments + self.num_experiments_for_bayes_updates)
@@ -426,7 +446,6 @@ class QuantumModelLearningAgent():
             'true_name': self.true_model_name,
             'true_oplist': self.true_model_constituent_operators,
             'true_model_terms_params': self.true_param_list,
-            # 'true_hamiltonian' : self.true_model_hamiltonian,
             'true_param_dict' : self.true_param_dict, 
             'num_particles': self.num_particles,
             'num_experiments': self.num_experiments,
@@ -646,8 +665,6 @@ class QuantumModelLearningAgent():
             precomputed_models = pre_computed_models,
             spawning_branch = spawning_branch, 
         )
-            
-
         return branch_id
 
     def get_model_storage_instance_by_id(self, model_id):
@@ -1004,33 +1021,6 @@ class QuantumModelLearningAgent():
                     )
                 )
 
-        # num_models = len(model_id_list)
-        # for i in range(num_models):
-        #     a = model_id_list[i]
-        #     for j in range(i, num_models):
-        #         b = model_id_list[j]
-        #         if a != b:
-        #             unique_id = database_framework.unique_model_pair_identifier(
-        #                 a, b)
-        #             if (
-        #                 unique_id not in self.bayes_factor_pair_computed
-        #                 or recompute == True
-        #             ):
-        #                 # ie not yet considered
-        #                 self.log_print(
-        #                     [
-        #                         "Getting BF from list"
-        #                     ]
-        #                 )
-        #                 remote_jobs.append(
-        #                     self.get_pairwise_bayes_factor(
-        #                         a,
-        #                         b,
-        #                         remote=remote,
-        #                         return_job=wait_on_result,
-        #                     )
-        #                 )
-
         if wait_on_result and self.use_rq:
             self.log_print(
                 [
@@ -1061,17 +1051,6 @@ class QuantumModelLearningAgent():
         remote=True,
         recompute=False
     ):
-        # if pair_list is None:
-        #     # pair_list = list(itertools.combinations(
-        #     #     self.branches[branch_id].resident_model_ids, 2)
-        #     # )
-        #     pair_list = self.branches[branch_id].pairs_to_compare
-        #     self.log_print([
-        #         "Pair list not given for branch {}, generated:{}".format(
-        #             branch_id, 
-        #             pair_list
-        #         ),
-        #     ])
         if pair_list is None:
             pair_list = self.branches[branch_id].pairs_to_compare
         active_branches_bayes = self.redis_databases['active_branches_bayes']
@@ -1085,7 +1064,6 @@ class QuantumModelLearningAgent():
         )
 
         active_branches_bayes.set(int(branch_id), 0)  # set up branch 0
-        # num_models = len(model_id_list)
         for pair in pair_list:
             a = pair[0]
             b = pair[1]
@@ -1118,40 +1096,6 @@ class QuantumModelLearningAgent():
                         int(branch_id),
                         1
                     )
-
-        # for i in range(num_models):
-        #     a = model_id_list[i]
-        #     for j in range(i, num_models):
-        #         b = model_id_list[j]
-        #         if a != b:
-        #             unique_id = database_framework.unique_model_pair_identifier(
-        #                 a, b)
-        #             if (
-        #                 unique_id not in self.bayes_factor_pair_computed
-        #                 or
-        #                 recompute == True
-        #             ):
-        #                 # ie not yet considered or recomputing
-        #                 self.log_print(
-        #                     [
-        #                         "Computing BF for pair",
-        #                         unique_id,
-        #                         " on branch ", branch_id
-        #                     ]
-        #                 )
-        #                 self.get_pairwise_bayes_factor(
-        #                     a,
-        #                     b,
-        #                     remote=remote,
-        #                     branch_id=branch_id,
-        #                 )
-        #             elif unique_id in self.bayes_factor_pair_computed:
-        #                 # if this is already computed,
-        #                 # tell this branch not to wait on it.
-        #                 active_branches_bayes.incr(
-        #                     int(branch_id),
-        #                     1
-        #                 )
 
     def process_remote_bayes_factor(
         self,
@@ -1223,14 +1167,8 @@ class QuantumModelLearningAgent():
         self,
         branch_id,
         pair_list = None
-    ):
-        # this doesn't care if models are 'active' currently
-        # active_models_in_branch = self.branch_resident_model_ids[branch_id]
-        
+    ):      
         if pair_list is None:
-            # pair_list = list(itertools.combinations(
-            #     self.branches[branch_id].resident_model_ids, 2)
-            # )
             pair_list = self.branches[branch_id].pairs_to_compare
             self.log_print([
                 "Pair list not given for branch {}, generated:{}".format(
@@ -1259,25 +1197,6 @@ class QuantumModelLearningAgent():
                         "Point to", res,
                     ]
                 )
-
-        # for model_id in models_involved:
-        #     models_points[model_id] = 0
-
-        # for i in range(len(active_models_in_branch)):
-        #     mod1 = active_models_in_branch[i]
-        #     for j in range(i, len(active_models_in_branch)):
-        #         mod2 = active_models_in_branch[j]
-        #         if mod1 != mod2:
-        #             res = self.process_remote_bayes_factor(a=mod1, b=mod2)
-        #             models_points[res] += 1
-        #             self.log_print(
-        #                 [
-        #                     "[compare_all_models_in_branch {}]".format(
-        #                         branch_id),
-        #                     "Point to", res,
-        #                     "(comparison {}/{})".format(mod1, mod2),
-        #                 ]
-        #             )
 
         max_points = max(models_points.values())
         max_points_branches = [
@@ -1450,458 +1369,6 @@ class QuantumModelLearningAgent():
         champ_name = self.model_name_id_map[champ_id]
         return champ_id
 
-    # TODO break choose_champion function into smaller blocks
-    # - (optional) parental collapse within trees
-    # - select tree champions
-    # - select global champion from tree champions
-    def choose_champion_separate_steps(
-        self
-    ):
-        tree_champions = self.get_tree_champions()
-        self.choose_global_champion(
-            remaining_models = tree_champions
-        )
-
-    def get_tree_champions(self):
-        return
-
-    def champion_single_tree(
-        self, 
-        generator
-    ):
-        # do parental collapse if requried
-        self.parental_collapse = False
-        if self.parental_collapse:
-            self.parental_collapse(generator)
-        return
-
-    def parental_collapse(
-        self, 
-        generator
-    ):
-        return
-
-
-    def choose_champion(
-        self,
-    ):
-        # TODO move steps to trees
-        r"""
-        Select the champion model from models tested already. 
-
-        Standard is to perform comparisons between branch champions.
-        If GrowthRule.champion_determined is set to True, 
-            the model is returned from GrowthRule without further 
-            Bayes factor comparisons. 
-        
-        """
-        if self.growth_class.champion_determined:
-            # TODO this should be done on a tree level 
-            # in case multiple trees are run
-            # in which case, find the winner of each tree
-            # separately and compare those
-            champion_model = self.growth_class.champion_model
-            final_branch_winners = None
-            return champion_model, final_branch_winners
-
-        self.log_print(
-            [
-                "Starting champion selection"
-            ]
-        )
-        bayes_factors_db = self.redis_databases['bayes_factors_db']
-        branch_champions = list(set([self.branches[b].champion_id for b in self.branches]))
-        job_list = []
-        job_finished_count = 0
-        # if a spawned model is this much better than its parent, 
-        # parent is deactivated
-        interbranch_collapse_threshold = 1e5  # to justify deactivating a parent/child
-        num_champs = len(branch_champions)
-
-        self.log_print(
-            [
-                "Active branch champs at start of final Bayes comp:",
-                branch_champions
-            ]
-        )
-        children_branches = list(self.branches.keys())
-        for child_id in branch_champions:
-            # branch this child sits on
-            child_branch = self.models_branches[child_id]
-            try:
-                # TODO make parent relationships more explicit by model rather
-                # than alway parent branch champ
-                # parent_branch = self.branch_parents[child_branch]
-                parent_branch = self.branches[child_branch].parent_branch
-                parent_id = self.branches[parent_branch].champion_id
-                self.log_print(
-                    [
-                        "Getting BF b/w parent/child pair", 
-                        child_id, 
-                        parent_id
-                    ]
-                )
-                job_list.append(
-                    self.get_pairwise_bayes_factor(
-                        model_a_id=parent_id,
-                        model_b_id=child_id,
-                        return_job=True,
-                        remote=self.use_rq
-                    )
-                )
-
-                self.log_print(
-                    [
-                        "Comparing child ",
-                        child_id,
-                        "with parent",
-                        parent_id
-                    ]
-                )
-            except BaseException:
-                self.log_print(
-                    [
-                        "Model",
-                        child_id,
-                        "doesn't have a parent to compare with."
-                    ]
-                )
-
-        self.log_print(
-            [
-                "Final Bayes Comparisons.",
-                "\nEntering while loop in final bayes fnc.",
-                "\nactive branch champs: ", branch_champions
-
-            ]
-        )
-
-        if self.use_rq:
-            for k in range(len(job_list)):
-                self.log_print(
-                    [
-                        "Waiting on parent/child Bayes factors."
-                    ]
-                )
-                while job_list[k].is_finished == False:
-                    if job_list[k].is_failed:
-                        raise NameError("Remote QML failure")
-                    sleep(self.sleep_duration)
-            self.log_print(
-                [
-                    "Parent/child Bayes factors: jobs all launched."
-                ]
-            )
-
-        else:
-            self.log_print(
-                [
-                    "Parent/child Bayes factors: finished locally."
-                ]
-            )
-        # now deactivate parent/children based on those bayes factors
-        models_to_remove = []
-        for child_id in branch_champions:
-            child_branch = self.models_branches[child_id]
-            try:
-                parent_branch = self.branches[child_branch].parent_branch
-                # TODO get direct model parents; not always just the champion of parent branch
-                parent_id = self.branches[parent_branch].champion_id
-
-                mod1 = min(parent_id, child_id)
-                mod2 = max(parent_id, child_id)
-
-                pair_id = database_framework.unique_model_pair_identifier(
-                    mod1,
-                    mod2
-                )
-                bf_from_db = bayes_factors_db.get(pair_id)
-                bayes_factor = float(bf_from_db)
-                self.log_print(
-                    [
-                        "parent/child {}/{} has bf {}".format(
-                            parent_id,
-                            child_id,
-                            bayes_factor
-                        )
-                    ]
-                )
-
-                if bayes_factor > interbranch_collapse_threshold:
-                    # bayes_factor heavily favours mod1, so deactive mod2
-                    self.log_print(
-                        [
-                            "Parent model,",
-                            mod1,
-                            "stronger than spawned; deactivating model",
-                            mod2
-                        ]
-                    )
-                    self.update_model_record(
-                        model_id=mod2,
-                        field='Status',
-                        new_value='Deactivated'
-                    )
-                    try:
-                        models_to_remove.append(mod2)
-                    except BaseException:
-                        pass
-                elif bayes_factor < (1.0 / interbranch_collapse_threshold):
-                    self.log_print(
-                        [
-                            "Spawned model",
-                            mod2,
-                            "stronger than parent; deactivating model",
-                            mod1
-                        ]
-                    )
-                    self.update_model_record(
-                        model_id=mod1,
-                        field='Status',
-                        new_value='Deactivated'
-                    )
-                    try:
-                        models_to_remove.append(mod1)
-                    except BaseException:
-                        pass
-
-                # Add bayes factors to BayesFactor dict for each model
-                mod_a = self.get_model_storage_instance_by_id(mod1)
-                mod_b = self.get_model_storage_instance_by_id(mod2)
-                if mod2 in mod_a.model_bayes_factors:
-                    mod_a.model_bayes_factors[mod2].append(bayes_factor)
-                else:
-                    mod_a.model_bayes_factors[mod2] = [bayes_factor]
-
-                if mod1 in mod_b.model_bayes_factors:
-                    mod_b.model_bayes_factors[mod1].append(
-                        (1.0 / bayes_factor))
-                else:
-                    mod_b.model_bayes_factors[mod1] = [(1.0 / bayes_factor)]
-            except Exception as exc:
-                self.log_print(
-                    [
-                        "child doesn't have active parent",
-                    ]
-                )
-                self.log_print(
-                    [
-                        "Error:", exc
-                    ]
-                )
-                # raise
-        branch_champs_without_deactivated = list(
-            set(branch_champions)
-            - set(models_to_remove)
-        )
-        self.log_print(
-            [
-                "Parent/child comparisons and deactivations complete."
-            ]
-        )
-        # self.log_print(
-        #     [
-        #         "Active branch champs after ",
-        #         "parental collapse (final Bayes comp):",
-        #         branch_champs_without_deactivated
-        #         # self.branch_champs_active_list
-        #     ]
-        # )
-        # # make ghost branches of all individidual trees
-        # # individual trees correspond to separate growth rules.
-        # self.active_growth_rule_branch_champs = {
-        #     gen : []
-        #     for gen in self.growth_rules_list
-        # }
-        # # for gen in self.growth_rules_list:
-        # #     self.active_growth_rule_branch_champs[gen] = []
-
-        # for active_champ in self.branch_champs_active_list:
-        #     branch_id_of_champ = self.models_branches[active_champ]
-        #     gen = self.branch_growth_rules[branch_id_of_champ]
-        #     self.active_growth_rule_branch_champs[gen].append(active_champ)
-
-        # self.log_print(
-        #     [
-        #         "ActiveTreeBranchChamps:",
-        #         self.active_growth_rule_branch_champs
-        #     ]
-        # )
-        # # self.final_trees = []
-        # for gen in list(self.active_growth_rule_branch_champs.keys()):
-        #     models_for_tree_ghost_branch = self.active_growth_rule_branch_champs[gen]
-        #     mod_names = [
-        #         self.model_name_id_map[m]
-        #         for m in models_for_tree_ghost_branch
-        #     ]
-        #     new_branch_id = self.new_branch(
-        #         model_list=mod_names,
-        #         growth_rule=gen
-        #     )
-
-        #     # self.final_trees.append(
-        #     #     new_branch_id
-        #     # )
-        #     # self.branch_model_learning_complete[new_branch_id] = True
-        #     self.branches[new_branch_id].model_learning_complete = True
-        #     self.learn_models_on_given_branch(new_branch_id)
-        #     self.get_bayes_factors_by_branch_id(new_branch_id)
-        #     # self.get_bayes_factors_by_branch_id(new_branch_id)
-
-        # active_branches_learning_models = (
-        #     self.redis_databases[
-        #         'active_branches_learning_models'
-        #     ]
-        # )
-        # active_branches_bayes = self.redis_databases[
-        #     'active_branches_bayes'
-        # ]
-        # still_learning = True
-
-        # # print("[QMD]Entering final while loop")
-        # while still_learning:
-        #     branch_ids_on_db = list(
-        #         active_branches_learning_models.keys()
-        #     )
-        #     for branchID_bytes in branch_ids_on_db:
-        #         branch_id = int(branchID_bytes)
-        #         if (
-        #             (int(active_branches_learning_models.get(branch_id)) ==
-        #              self.branch_num_models[branch_id])
-        #             and
-        #             # (self.branch_model_learning_complete[branch_id] == False)
-        #             self.branches[branch_id].model_learning_complete == False
-        #         ):
-        #             # self.branch_model_learning_complete[branch_id] = True
-        #             self.branches[branch_id].model_learning_complete = True
-        #             self.get_bayes_factors_by_branch_id(branch_id)
-
-        #         if branchID_bytes in active_branches_bayes.keys():
-        #             branch_id = int(branchID_bytes)
-        #             num_bayes_done_on_branch = (
-        #                 active_branches_bayes.get(branchID_bytes)
-        #             )
-
-        #             if (int(num_bayes_done_on_branch) ==
-        #                         self.branch_num_model_pairs[branch_id]
-        #                     and
-        #                     self.branch_comparisons_complete[branch_id] == False
-        #                     ):
-        #                 self.branch_comparisons_complete[branch_id] = True
-        #                 self.compare_all_models_in_branch(branch_id)
-
-        #     if (
-        #         np.all(
-        #             np.array(
-        #                 # list(
-        #                 #     self.branch_model_learning_complete.values()
-
-        #                 # )
-        #                 [ 
-        #                     self.branches[b].model_learning_complete
-        #                     for b in self.branches
-        #                 ]
-        #             ) == True
-        #         )
-        #         and
-        #         np.all(np.array(list(
-        #             self.branch_comparisons_complete.values())) == True
-        #         )
-        #     ):
-        #         still_learning = False  # i.e. break out of this while loop
-
-        # self.log_print(["Final tree comparisons complete."])
-
-        # # Finally, compare all remaining active models,
-        # # which should just mean the tree champions at this point.
-        # active_models = database_framework.all_active_model_ids(self.model_database)
-        # # self.surviving_champions = database_framework.all_active_model_ids(
-        # #     self.model_database
-        # # )
-        active_models = branch_champs_without_deactivated
-        self.log_print(
-            [
-                "After initial interbranch comparisons, \
-                remaining active branch champions:",
-                active_models
-            ]
-        )
-        num_active_models = len(active_models)
-
-        self.get_bayes_factors_from_list(
-            model_id_list=active_models,
-            remote=True,
-            recompute=False,
-            wait_on_result=True,
-        )
-
-        branch_champions_points = {}
-        for c in active_models:
-            branch_champions_points[c] = 0
-
-        for i in range(num_active_models):
-            mod1 = active_models[i]
-            for j in range(i, num_active_models):
-                mod2 = active_models[j]
-                if mod1 != mod2:
-                    res = self.process_remote_bayes_factor(
-                        a=mod1,
-                        b=mod2
-                    ) # res is either mod1 or mod2, pulled from redis DB
-                    self.log_print(
-                        [
-                            "[choose_champion]",
-                            "Point to", res,
-                            "(comparison {}/{})".format(mod1, mod2)
-                        ]
-                    )
-                    branch_champions_points[res] += 1
-        self.ranked_champions = sorted(
-            branch_champions_points,
-            reverse=True
-        )
-        self.log_print(
-            [
-                "After final Bayes comparisons (of branch champions)",
-                branch_champions_points
-            ]
-        )
-
-        max_points = max(branch_champions_points.values())
-        max_points_branches = [
-            key for key, val in branch_champions_points.items()
-            if val == max_points
-        ]
-        if len(max_points_branches) > 1:
-            # todo: recompare. Fnc: compareListOfModels (rather than branch
-            # based)
-            self.log_print(
-                [
-                    "No distinct champion, recomputing bayes "
-                    "factors between : ",
-                    max_points_branches
-                ]
-            )
-            champ_id = self.compare_models_from_list(
-                max_points_branches,
-                # bayes_threshold=self.bayes_threshold_lower,
-                models_points_dict=branch_champions_points
-            )
-        else:
-            champ_id = max(
-                branch_champions_points,
-                key=branch_champions_points.get
-            )
-        champ_name = self.model_name_id_map[champ_id]
-        branch_champ_names = [
-            self.model_name_id_map[mod_id]
-            for mod_id in active_models
-        ]
-        self.change_model_status(
-            champ_name,
-            new_status='Active'
-        )
-        return champ_name, branch_champ_names
 
     ##########
     # Section: QMLA algorithm subroutines
@@ -2077,8 +1544,7 @@ class QuantumModelLearningAgent():
             for mod_id in self.models_learned
         }
 
-        # compare this model to the true model
-        # (only meaningful for simulated cases)
+        # Compare this model to the true model (only meaningful for simulated cases)
         correct_model = misfit = underfit = overfit = 0
         model_operator = database_framework.Operator(model_name)
         num_params_champ_model = model_operator.num_constituents
@@ -2496,20 +1962,34 @@ class QuantumModelLearningAgent():
     def run_complete_qmla(
         self,
     ):
+        # set up one tree per growth rule
+        for tree in list(self.trees.values()):
+            starting_models = tree.get_initial_models() 
+            self.log_print([
+                "First branch for {} has starting models: {}".format(
+                    tree.growth_rule, starting_models
+                ),
+            ])
+            self.new_branch(
+                model_list = starting_models, 
+                growth_rule = tree.growth_rule
+            )
 
+        # Iteratively learn models, compute bayes factors, spawn new models
         self.learn_models_until_trees_complete()
         self.log_print([
-            "Trees completed. Comparing nominated champions."
+            "Growth rule trees completed."
         ])
-        # self.prune_trees_until_complete()
-        self.compare_nominated_champions()
 
-        self.log_print(["Finalising QMLA."])
+        # Choose champion by comparing nominated models (champions) of all trees.
+        self.compare_nominated_champions()
         self.champion_model_id = self.get_model_data_by_field(
             name=self.global_champion_name,
             field='ModelID'
         )
+        self.log_print(["Champion selected."])
 
+        # internal analysiss
         try:            
             if self.global_champion_id == self.true_model_id:
                 self.true_model_found = True
@@ -2535,11 +2015,11 @@ class QuantumModelLearningAgent():
             ]
         )
 
-        # Check if final winner has negligible parameters; 
-        # potentially change champion
+        # Consider reducing champion if negligible parameters found
         if self.growth_class.check_champion_reducibility:
             self.check_champion_reducibility()
 
+        # tidy up and finish QMLA. 
         self.finalise_qmla()
         for k in self.timings:
             self.log_print([
@@ -2551,6 +2031,7 @@ class QuantumModelLearningAgent():
                 "has F-score ", self.model_f_scores[self.champion_model_id]
             ]
         )
+        
 
     def learn_models_until_trees_complete(
         self, 
@@ -2596,17 +2077,13 @@ class QuantumModelLearningAgent():
                     self.branches[branch_id].model_learning_complete == False
                 ):
                     self.log_print([
-                        "All models on branch",
-                        branch_id,
-                        "have finished learning."]
-                    )
+                        "All models on branch {} learned".format(branch_id)
+                    ])
                     self.branches[branch_id].model_learning_complete = True
                     for mod_id in self.branches[branch_id].resident_model_ids:
                         mod = self.get_model_storage_instance_by_id(mod_id)
                         mod.model_update_learned_values()
-                    self.log_print(["Starting BF comparisons on branch ", branch_id])
                     self.get_bayes_factors_by_branch_id(branch_id)
-                    self.log_print(["(Sent) BF comparisons on branch ", branch_id])
 
             for branchID_bytes in active_branches_bayes.keys():
                 branch_id = int(branchID_bytes)
@@ -2645,16 +2122,13 @@ class QuantumModelLearningAgent():
                             num_models=1
                         )
 
-        self.log_print(
-            [
-                "All trees have completed.",
-                "Num complete:",
-                self.tree_count_completed
-            ]
-        )
+        self.log_print([
+                "{} trees have completed. Waiting on final comparisons".format(
+                    self.tree_count_completed
+                )
+        ])
 
-        # let any branches which have just started finish, 
-        # before moving to analysis
+        # allow any branches which have just started to finish 
         still_learning = True
         while still_learning:
             branch_ids_on_db = list(active_branches_learning_models.keys())
@@ -2796,7 +2270,6 @@ class QuantumModelLearningAgent():
         self,
         save_to_file=None
     ):
-        # generations = sorted(set(self.branch_resident_model_ids.keys()))
         generations = sorted(set(self.branches.keys()))
         generations = [ 
             b for b in self.branches 
