@@ -40,7 +40,7 @@ class IsingGenetic(
         self.prune_complete = True
         self.fitness_by_f_score = pd.DataFrame()
         self.fitness_df = pd.DataFrame()
-        self.true_model = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
+        self.true_model = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
         # self.four_sites = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_zJz_d4'
         # self.true_model = qmla.database_framework.alph(self.four_sites)
         self.num_sites = qmla.database_framework.get_num_qubits(self.true_model)
@@ -72,7 +72,7 @@ class IsingGenetic(
 
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
-        self.max_spawn_depth = 2
+        self.max_spawn_depth = 16
         self.initial_num_models = 8
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models

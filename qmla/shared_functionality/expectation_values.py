@@ -94,7 +94,7 @@ def hahn_evolution(
     log_file=None,
     log_identifier=None
 ):
-    """
+    r"""
     Hahn echo evolution and expectation value.
 
     Returns the expectation value computed by evolving the input state with
@@ -210,7 +210,7 @@ def hahn_evolution(
 
 
 def make_inversion_gate(num_qubits):
-    """
+    r"""
     returns the inversion gate for the Hahn eco evolution as numpy array
 
     :parameter num_qubits: size of the inversion gate required
@@ -237,7 +237,7 @@ def n_qubit_hahn_evolution(
     log_file=None,
     log_identifier=None
 ):
-    """
+    r"""
     n qubits time evolution for hahn-echo measurement returning expectation value
 
     :param ham: Hamiltonian needed for the time-evolution

@@ -18,4 +18,5 @@ Quantum Model Learning Agent
 Class Reference 
 ~~~~~~~~~~~~~~~
 .. autoclass:: QuantumModelLearningAgent
-    :members:
+    :members: add_model_to_database
+    

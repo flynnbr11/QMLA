@@ -33,23 +33,16 @@ __all__ = [
 ]
 
 class QuantumModelLearningAgent():
-    """
-    This class manages the quantum learning agent protocol.
+    r"""
+    QMLA manager class.
 
-    This is done by controlling a pandas database,
-        sending model specifications
-        to remote actors (via RQ) to compute QHL,
-        and also Bayes factors, generating
-        a next set of models iteratively.
-    This is done in a tree like growth mechanism where
-        new branches consist of
-        models generated considering previously determined "good" models.
-    Database control is given in database_framework.
-    Remote functions for computing QHL/Bayes factors are in
-    remote_model_learning and remote_bayes_factor respectively.
-    Redis databases are used to ensure QMD parameters are accessible to
-        remote models (since shared memory is not available).
-        Relevant QMD parameters and info are pickled to redis.
+    :param ControlsQMLA qmla_controls: Storage for configuration of a QMLA instance. 
+    :param dict model_priors: values of means/widths to enfore on given models, 
+        specifically for further_qhl mode. 
+    :param dict experimental_measurements: expectation values by time of the 
+        underlying true/target model. 
+    :param float sigma_threshold: volume threshold at which to terminate QHL. 
+        (Not used by default)
 
     """
 
@@ -114,6 +107,7 @@ class QuantumModelLearningAgent():
     def _fundamental_settings(self):
         r"""
         Basic settings, path definitions etc
+
         """
         self.qmla_id = self.qmla_controls.qmla_id
         self.redis_host_name = self.qmla_controls.host_name
@@ -153,6 +147,7 @@ class QuantumModelLearningAgent():
     def _true_model_definition(self):
         r"""
         Information related to true (target) model.
+
         """
 
         self.true_model_name = database_framework.alph(
@@ -184,6 +179,7 @@ class QuantumModelLearningAgent():
     ):
         r"""
         Set up infrastructure.
+
         """
         # TODO most of this can probably go inside run_complete_qmla
         self.model_database = pd.DataFrame({
@@ -293,8 +289,6 @@ class QuantumModelLearningAgent():
 
     def _potentially_redundant_setup(
         self,
-        # first_layer_models,
-        # use_exp_custom,
         sigma_threshold,
     ):
         r"""
@@ -307,21 +301,11 @@ class QuantumModelLearningAgent():
             and removed entirely when sure they are not needed. 
 
         """
-        # testing whether these are used anywhere
-        # Either remove, or find appropriate place for initialisation and use
-        # many are included in qmla_core_info_dict dict sent to workers; check if they are
-        # used thereafter
-        # self.use_qle = False  # Set to False for IQLE # TODO remove - redundant
-        # should only matter when using custom exponentiation package
-        # self.enable_sparse_exponentiation = True
-        # self.exponentiation_tolerance = None
         self.sigma_threshold = sigma_threshold
         self.model_fitness_scores = {}
-        # self.debug_directory = None
         self.use_time_dependent_true_model = False
         self.num_time_dependent_true_params = 0
         self.time_dependent_params = None
-        # self.gaussian = self.qmla_controls.gaussian  # TODO remove?
         self.bayes_factors_store_directory = str(
             self.results_directory
             + 'BayesFactorsTimeRecords/'
@@ -421,7 +405,7 @@ class QuantumModelLearningAgent():
             in a single dict, and stores it on the redis server
             which all worker nodes have access to. 
         It also stores the probe sets required for the same tasks. 
-        
+
         """
         number_hamiltonians_to_exponentiate = (
             self.num_particles *
@@ -500,6 +484,20 @@ class QuantumModelLearningAgent():
         branch_id=-1,
         force_create_model=False
     ):
+        r"""
+        Considers adding a model to QMLA's database of model.
+
+        Checks whether the nominated model is already present; 
+            if not generates a model instance; 
+            stores pertinent details in the running database. 
+
+        :param str model: name of model to consider
+        :param float branch_id: branch id to associate this model with, 
+            if the model is new. 
+        :param bool force_create_model: 
+            True: add model even if the name is found already. 
+        """
+
         model_name = database_framework.alph(model)
         self.log_print([
             "Trying to add model to DB:", model_name
