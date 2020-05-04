@@ -63,9 +63,9 @@ class SimulatedNVCentre(
             'pauliSet_1_y_d3' : (5e9, 2e9),
             'pauliSet_1_z_d3' : (5e9, 2e9),
             # nitrogen nuclei
-            'pauliSet_2_x_d3' : (5e6, 2e6) , # ~3.37GHz
-            'pauliSet_2_y_d3' : (5e6, 2e6) ,
-            'pauliSet_2_z_d3' : (5e6, 2e6) ,
+            'pauliSet_2_x_d3' : (5e9, 2e9) , # ~3.37GHz
+            'pauliSet_2_y_d3' : (5e9, 2e9) ,
+            'pauliSet_2_z_d3' : (5e9, 2e9) ,
             # carbon nuclei
             'pauliSet_3_x_d3' : (1e6, 2e5) , # ~117KHz
             'pauliSet_3_y_d3' : (1e6, 2e5) ,

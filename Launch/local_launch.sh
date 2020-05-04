@@ -81,6 +81,7 @@ git_commit=$(git rev-parse HEAD)
 # growth_rule='NVLargeSpinBath'
 growth_rule='SimulatedNVCentre'
 # growth_rule='GeneticTest'
+# growth_rule='IsingGenetic'
 # growth_rule='Genetic'
 
 # sim_growth_rule='IsingProbabilistic'

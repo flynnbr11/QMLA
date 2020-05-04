@@ -13,7 +13,7 @@ from qmla.growth_rules import growth_rule
 import qmla.shared_functionality.probe_set_generation
 import qmla.database_framework
 
-import qmla.growth_rules.genetic_algorithm
+import qmla.growth_rules.genetic_algorithms.genetic_algorithm
 
 __all__ = [
     'Genetic', 
@@ -77,7 +77,7 @@ class Genetic(
 
         self.mutation_probability = 0.1
 
-        self.genetic_algorithm = qmla.growth_rules.genetic_algorithm.GeneticAlgorithmQMLA(
+        self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
             num_sites=self.num_sites,
             true_model = self.true_model,
             base_terms=self.base_terms,
@@ -608,3 +608,22 @@ class GeneticTest(
         }
         self.num_processes_to_parallelise_over = self.initial_num_models
  
+
+class IsingGeneticAlgorithm(
+    Genetic
+):
+    r"""
+    Exactly as the genetic growth rule, but small depth to test quickly.
+
+    """
+
+    def __init__(
+        self,
+        growth_generation_rule,
+        **kwargs
+    ):
+        # print("[Growth Rules] init nv_spin_experiment_full_tree")
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            **kwargs
+        )

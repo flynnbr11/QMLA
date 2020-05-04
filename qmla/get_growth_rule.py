@@ -68,6 +68,8 @@ growth_classes = {
         GR.Genetic,
     'GeneticTest':
         GR.GeneticTest,    
+    'IsingGenetic' : 
+        GR.IsingGenetic,
     'TestReducedParticlesBayesFactors': 
         GR.TestReducedParticlesBayesFactors, 
     'TestAllParticlesBayesFactors' : 
