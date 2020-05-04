@@ -35,6 +35,8 @@ __all__ = [
 class QuantumModelLearningAgent():
     r"""
     QMLA manager class.
+    
+    Controls the infrastructure which determines which models are learned and compared. 
 
     :param ControlsQMLA qmla_controls: Storage for configuration of a QMLA instance. 
     :param dict model_priors: values of means/widths to enfore on given models, 
@@ -48,7 +50,7 @@ class QuantumModelLearningAgent():
 
     def __init__(self,
                  qmla_controls=None, 
-                 model_priors=None,  # needed for further QHL mode
+                 model_priors=None, 
                  experimental_measurements=None,
                  sigma_threshold=1e-13,
                  **kwargs
@@ -93,22 +95,14 @@ class QuantumModelLearningAgent():
         # Set up infrastructure related to growth rules and tree management
         self._setup_tree_and_growth_rules()
 
+
     ##########
     # Section: Initialisation and setup
     ##########
-    def log_print(self, to_print_list):
-        qmla.logging.print_to_log(
-            to_print_list = to_print_list,
-            log_file = self.log_file,
-            log_identifier = 'QMLA {}'.format(self.qmla_id)
-
-        )
 
     def _fundamental_settings(self):
-        r"""
-        Basic settings, path definitions etc
+        r""" Basic settings, path definitions etc."""
 
-        """
         self.qmla_id = self.qmla_controls.qmla_id
         self.redis_host_name = self.qmla_controls.host_name
         self.redis_port_number = self.qmla_controls.port_number
@@ -145,10 +139,7 @@ class QuantumModelLearningAgent():
         self.sleep_duration = 10
 
     def _true_model_definition(self):
-        r"""
-        Information related to true (target) model.
-
-        """
+        r""" Information related to true (target) model."""
 
         self.true_model_name = database_framework.alph(
             self.qmla_controls.true_model_name)
@@ -177,10 +168,8 @@ class QuantumModelLearningAgent():
     def _setup_tree_and_growth_rules(
         self,
     ):
-        r"""
-        Set up infrastructure.
+        r""" Set up infrastructure."""
 
-        """
         # TODO most of this can probably go inside run_complete_qmla
         self.model_database = pd.DataFrame({
             '<Name>': [],
@@ -235,9 +224,8 @@ class QuantumModelLearningAgent():
         model_priors,
         experimental_measurements,
     ):
-        r"""
-        Parameters related to learning/comparing models. 
-        """
+        r""" Parameters related to learning/comparing models."""
+
         self.true_model_hamiltonian = self.growth_class.true_hamiltonian
         self.model_priors = model_priors
         self.reallocate_resources = self.qmla_controls.reallocate_resources
@@ -301,6 +289,7 @@ class QuantumModelLearningAgent():
             and removed entirely when sure they are not needed. 
 
         """
+
         self.sigma_threshold = sigma_threshold
         self.model_fitness_scores = {}
         self.use_time_dependent_true_model = False
@@ -324,9 +313,8 @@ class QuantumModelLearningAgent():
         )
 
     def _setup_parallel_requirements(self):
-        r"""
-        Infrastructure for use when QMLA run in parallel. 
-        """
+        r""" Infrastructure for use when QMLA run in parallel. """
+
         self.use_rq = self.qmla_controls.use_rq
         self.rq_timeout = self.qmla_controls.rq_timeout
         self.rq_log_file = self.log_file
@@ -473,244 +461,6 @@ class QuantumModelLearningAgent():
         }
         self.log_print(["Saved QMLA instance info to ", qmla_core_info_database])
 
-
-    ##########
-    # Section: Setup, configuration and branch/database management functions
-    ##########
-
-    def add_model_to_database(
-        self,
-        model,
-        branch_id=-1,
-        force_create_model=False
-    ):
-        r"""
-        Considers adding a model to QMLA's database of model.
-
-        Checks whether the nominated model is already present; 
-            if not generates a model instance; 
-            stores pertinent details in the running database. 
-
-        :param str model: name of model to consider
-        :param float branch_id: branch id to associate this model with, 
-            if the model is new. 
-        :param bool force_create_model: 
-            True: add model even if the name is found already. 
-        """
-
-        model_name = database_framework.alph(model)
-        self.log_print([
-            "Trying to add model to DB:", model_name
-        ])
-
-        if (
-            qmla.database_framework.consider_new_model(
-                self.model_lists, model_name, self.model_database) == 'New'
-            or
-            force_create_model == True
-        ):
-            model_num_qubits = qmla.database_framework.get_num_qubits(model_name)
-            model_id = self.highest_model_id + 1
-
-            self.model_lists[model_num_qubits].append(model_name)
-            self.log_print(
-                [
-                    "Model ", model_name,
-                    "not previously considered -- adding.",
-                    "ID:", model_id
-                ]
-            )
-            op = qmla.database_framework.Operator(
-                name=model_name, undimensionalised_name=model_name
-            )
-            reduced_qml_instance = qmla.model_instances.ModelInstanceForStorage(
-                model_name=model_name,
-                model_id=int(model_id),
-                model_terms_matrices=op.constituents_operators,
-                true_oplist=self.true_model_constituent_operators,
-                true_model_terms_params=self.true_param_list,
-                qid=self.qmla_id,
-                qmla_core_info_database=self.qmla_core_info_database,
-                plot_probes=self.probes_for_plots, 
-                host_name=self.redis_host_name,
-                port_number=self.redis_port_number,
-                log_file=self.log_file
-            )
-            running_db_new_row = pd.Series({
-                '<Name>': model_name,
-                'Status': 'Active',
-                'Completed': False,
-                'branch_id': int(branch_id),
-                'Reduced_Model_Class_Instance': reduced_qml_instance,
-                'Operator_Instance': op,
-                'Epoch_Start': 0, 
-                'ModelID': int(model_id),
-            })
-            # add to the database
-            num_rows = len(self.model_database)
-            self.model_database.loc[num_rows] = running_db_new_row
-            model_added = True
-            if database_framework.alph(
-                    model) == database_framework.alph(self.true_model_name):
-                self.true_model_id = model_id
-                self.true_model_considered = True
-                self.true_model_branch = branch_id
-                self.true_model_on_branhces = [branch_id]
-            self.highest_model_id = model_id
-            self.model_name_id_map[model_id] = model_name
-            self.model_count += 1
-
-        else:
-            model_added = False
-            self.log_print([
-                "Model not added: {}".format(
-                    model_name
-                )
-            ])
-            try:
-                model_id = database_framework.model_id_from_name(
-                    db=self.model_database,
-                    name=model_name
-                )
-                self.log_print([
-                    "Previously considered as model ", model_id
-                ])
-                if model_id == self.true_model_id: 
-                    self.true_model_on_branhces.append(model_id)
-            except BaseException:
-                self.log_print(
-                    [
-                        "Couldn't find model id for model:", model_name,
-                        "model_names_ids:",
-                        self.model_name_id_map
-                    ]
-                )
-                raise
-
-        add_model_output = {
-            'is_new_model': model_added,
-            'model_id': model_id,
-        }
-        return add_model_output
-
-    def delete_unpicklable_attributes(self):
-        del self.redis_conn
-        del self.rq_queue
-        del self.redis_databases
-        del self.write_log_file
-
-    def new_branch(
-        self,
-        model_list,
-        pairs_to_compare='all', 
-        growth_rule=None,
-        spawning_branch = 0,
-    ):
-        model_list = list(set(model_list))  # remove possible duplicates
-        self.branch_highest_id += 1
-        branch_id = int(self.branch_highest_id)
-        self.log_print(
-            [
-                "NEW BRANCH {}. growth rule= {}".format(branch_id, growth_rule)
-            ]
-        )
-
-        this_branch_models = {}
-        model_id_list = []
-        pre_computed_models = []
-        for model in model_list:
-            # add_model_to_database returns whether adding model was successful
-            # if false, that's because it's already been computed
-            add_model_info = self.add_model_to_database(
-                model,
-                branch_id=branch_id
-            )
-            already_computed = not(
-                add_model_info['is_new_model']
-            )
-            model_id = add_model_info['model_id']
-            this_branch_models[model_id] = model
-            model_id_list.append(model_id)
-            if already_computed == False:  # first instance of this model
-                self.models_branches[model_id] = branch_id
-
-            self.log_print(
-                [
-                    'Model {} computed already: {} -> ID {}'.format(
-                        model, 
-                        already_computed,
-                        model_id, 
-                        ),
-                ]
-            )
-            if bool(already_computed):
-                pre_computed_models.append(model)
-        
-        model_instances = {
-            m: self.get_model_storage_instance_by_id(m)
-            for m in list(this_branch_models.keys())
-        }
-
-        if growth_rule is None:
-            # placing on true growth rule's tree...
-            growth_rule = self.growth_rule_of_true_model
-        growth_tree = self.trees[growth_rule]
-        self.branches[branch_id] = growth_tree.new_branch_on_tree(
-            branch_id = branch_id, 
-            models = this_branch_models, 
-            pairs_to_compare = pairs_to_compare, 
-            model_instances = model_instances, 
-            precomputed_models = pre_computed_models,
-            spawning_branch = spawning_branch, 
-        )
-        return branch_id
-
-    def get_model_storage_instance_by_id(self, model_id):
-        return database_framework.reduced_model_instance_from_id(
-            self.model_database, model_id)
-
-    def update_database_model_info(self):
-        self.log_print([
-            "Updating info for all learned models"
-        ])
-        for mod_id in self.models_learned:
-            try:
-                # TODO remove this try/except when reduced-champ-model instance
-                # is update-able
-                mod = self.get_model_storage_instance_by_id(mod_id)
-                mod.model_update_learned_values(
-                    fitness_parameters=self.model_fitness_scores
-                )
-            except BaseException:
-                pass
-
-    def update_model_record(
-        self,
-        field,
-        name=None,
-        model_id=None,
-        new_value=None,
-        increment=None
-    ):
-        database_framework.update_field(
-            db=self.model_database,
-            name=name,
-            model_id=model_id,
-            field=field,
-            new_value=new_value,
-            increment=increment
-        )
-
-    def get_model_data_by_field(self, name, field):
-        return database_framework.pull_field(
-            self.model_database, 
-            name, 
-            field
-    )
-
-    def change_model_status(self, model_name, new_status='Saturated'):
-        self.model_database.loc[self.model_database['<Name>'] == model_name, 'Status'] = new_status
-
     ##########
     # Section: Calculation of models parameters and Bayes factors
     ##########
@@ -721,6 +471,28 @@ class QuantumModelLearningAgent():
         use_rq=True,
         blocking=False
     ):
+        r"""
+        Launches jobs to learn all models on the specified branch. 
+        
+        Models which are on the branch but have already been learned are not re-learned. 
+        For each remaining model on the branch, 
+            :meth:`QuantumModelLearningAgent.learn_model` is called. 
+        The branch is added to the redis database `active_branches_learning_models`, 
+            indicating that branch_id has currently got models in the learning phase. 
+            This redis database is monitored by the :meth:`QuantumModelLearningAgent.learn_models_until_trees_complete`.
+            When all models registered on the branch have completed, it is recorded, allowing QMLA 
+            to perform the next stage: either spawning a new branch from this branch, or 
+            continuing to the final stage of QMLA.        
+        This method can block, meaning it waits for a model's learning to complete 
+            before proceeding. If in parallel, do not block as model learning 
+            won't be launched until the previous model has completed. 
+
+        :param int branch_id: unique QMLA branch ID to learn models of.
+        :param bool use_rq: whether to implement learning via RQ workers. 
+            Argument only used when passed to :meth:`QuantumModelLearningAgent.learn_model`.
+        :param bool blocking: whether to wait on all models' learning before proceeding. 
+        """
+
         model_list = self.branches[branch_id].resident_models
         num_models_already_set_this_branch = self.branches[branch_id].num_precomputed_models
         active_branches_learning_models = (
@@ -738,23 +510,22 @@ class QuantumModelLearningAgent():
         )
         unlearned_models_this_branch = self.branches[branch_id].unlearned_models
 
-        self.log_print(
-            [
-                "branch {} has models: \nprecomputed: {} \nunlearned: {}".format(
-                    branch_id,
-                    self.branches[branch_id].precomputed_models,
-                    unlearned_models_this_branch
-                )
-            ]
-        )
+        self.log_print([
+            "branch {} has models: \nprecomputed: {} \nunlearned: {}".format(
+                branch_id,
+                self.branches[branch_id].precomputed_models,
+                unlearned_models_this_branch
+            )
+        ])
         if len(unlearned_models_this_branch) == 0:
             self.ghost_branch_list.append(branch_id)
 
         for model_name in unlearned_models_this_branch:
             self.log_print(
                 [
-                    "Model ", model_name,
-                    "being passed to learnModel function"
+                    "Model {} being passed to learnModel function".format(
+                        model_name
+                    )
                 ]
             )
             self.learn_model(
@@ -763,14 +534,14 @@ class QuantumModelLearningAgent():
                 use_rq=self.use_rq,
                 blocking=blocking
             )
-            if blocking is True:
+            if blocking:
                 self.log_print(
                     [
                         "Blocking on; model finished:",
                         model_name
                     ]
                 )
-            self.update_model_record(
+            self._update_model_record(
                 field='Completed',
                 name=model_name,
                 new_value=True
@@ -788,6 +559,27 @@ class QuantumModelLearningAgent():
         use_rq=True,
         blocking=False
     ):
+        r"""
+        Learn a given model by calling the standalone model learning functionality. 
+
+        The model is learned by launching a job either locally or to the job queue. 
+        Model learning is implemented by 
+            :func:`remote_learn_model_parameters`,
+            which takes a unique model name (string) and distills the terms to learn.             
+            If running locally, QMLA core info is passed. 
+            Else if RQ workers are being used, it retrieves QMLA info from the shared redis
+            database, and the function is launched via rq's `Queue.enqueue` function. 
+            This puts a task on the redis `Queue` - the task is the implementation of 
+            :func:`remote_learn_model_parameters`.            
+        The effect is either to learn the model here, or else to have launched a job
+            where it will be learned remotely, so nothing is returned. 
+
+        :param str model_name: string uniquely representing a model
+        :param int branch_id: unique branch ID within QMLA environment
+        :param bool use_rq: whether to use RQ workers, or implement locally
+        :param bool blocking: whether to wait on model to finish learning before proceeding. 
+
+        """
         model_already_exists = database_framework.check_model_exists(
             model_name=model_name,
             model_lists=self.model_lists,
@@ -1237,13 +1029,13 @@ class QuantumModelLearningAgent():
         # )
 
         for model_id in active_models_in_branch:
-            self.update_model_record(
+            self._update_model_record(
                 model_id=model_id,
                 field='Status',
                 new_value='Deactivated'
             )
 
-        self.update_model_record(
+        self._update_model_record(
             name=champ_name,
             field='Status',
             new_value='Active'
@@ -1284,7 +1076,7 @@ class QuantumModelLearningAgent():
             # progress if they lose in a ghost branch.
             for losing_model_id in models_to_deactivate:
                 try:
-                    self.update_model_record(
+                    self._update_model_record(
                         model_id=losing_model_id,
                         field='Status',
                         new_value='Deactivated'
@@ -1369,16 +1161,158 @@ class QuantumModelLearningAgent():
 
 
     ##########
-    # Section: QMLA algorithm subroutines
+    # Section: routines to implement tree-based QMLA 
     ##########
 
-    def spawn_on_tree(
+    def learn_models_until_trees_complete(
         self, 
-        growth_rule, 
     ):
-        # TODO replace spawn_from_branch with this method
-        tree = self.trees[growth_rule]
+        active_branches_learning_models = (
+            self.redis_databases['active_branches_learning_models']
+        )
+        active_branches_bayes = self.redis_databases['active_branches_bayes']
 
+        self.log_print(
+            [
+                "Starting learning for initial branches:", 
+                list(self.branches.keys())
+            ]
+        )
+        for b in self.branches:
+            self.learn_models_on_given_branch(
+                b,
+                blocking=False,
+                use_rq=True
+            )
+
+        self.log_print(
+            [
+                "Entering while loop; spawning model layers and comparing."
+            ]
+        )
+        while self.tree_count_completed < self.tree_count:
+            branch_ids_on_db = list(
+                active_branches_learning_models.keys()
+            )
+            branch_ids_on_db = [
+                int(b) for b in branch_ids_on_db
+            ]
+            self._inspect_remote_job_crashes()
+            for branch_id in branch_ids_on_db:
+                if (
+                    int(
+                        active_branches_learning_models.get(
+                            branch_id)
+                    ) == self.branches[branch_id].num_models
+                    and
+                    self.branches[branch_id].model_learning_complete == False
+                ):
+                    self.log_print([
+                        "All models on branch {} learned".format(branch_id)
+                    ])
+                    self.branches[branch_id].model_learning_complete = True
+                    for mod_id in self.branches[branch_id].resident_model_ids:
+                        mod = self.get_model_storage_instance_by_id(mod_id)
+                        mod.model_update_learned_values()
+                    self.get_bayes_factors_by_branch_id(branch_id)
+
+            for branchID_bytes in active_branches_bayes.keys():
+                branch_id = int(branchID_bytes)
+                bayes_calculated = active_branches_bayes.get(
+                    branchID_bytes
+                ) # how many completed and stored on redis db
+
+                if (
+                    int(bayes_calculated) == self.branches[branch_id].num_model_pairs
+                    and
+                    self.branches[branch_id].comparisons_complete == False
+                ):
+                    self.branches[branch_id].comparisons_complete = True
+                    self.compare_all_models_in_branch(branch_id)
+                    self.log_print(
+                        [
+                            "Branch {} comparisons complete".format(
+                                branch_id
+                            )
+                        ]
+                    )
+                    if self.branches[branch_id].tree.is_tree_complete():
+                        self.tree_count_completed += 1
+                        self.log_print(
+                            [
+                                "Tree complete:", 
+                                self.branches[branch_id].growth_rule, 
+                                "Number of trees now completed:",
+                                self.tree_count_completed,
+                            ]
+                        )
+                    else: 
+                        self.spawn_from_branch(
+                            branch_id=branch_id,
+                            growth_rule=self.branches[branch_id].tree.growth_rule,
+                            num_models=1
+                        )
+
+        self.log_print([
+                "{} trees have completed. Waiting on final comparisons".format(
+                    self.tree_count_completed
+                )
+        ])
+
+        # allow any branches which have just started to finish 
+        still_learning = True
+        while still_learning:
+            branch_ids_on_db = list(active_branches_learning_models.keys())
+            for branchID_bytes in branch_ids_on_db:
+                branch_id = int(branchID_bytes)
+                if (
+                    (
+                        int(active_branches_learning_models.get(branch_id))
+                        == self.branches[branch_id].num_models
+                    )
+                    and
+                    self.branches[branch_id].model_learning_complete == False
+                ):
+                    self.branches[branch_id].model_learning_complete = True
+                    self.get_bayes_factors_by_branch_id(branch_id)
+
+                if branchID_bytes in active_branches_bayes:
+                    num_bayes_done_on_branch = (
+                        active_branches_bayes.get(branchID_bytes)
+                    )
+                    if (
+                        (
+                            int(num_bayes_done_on_branch)
+                            == self.branches[branch_id].num_model_pairs
+                        )
+                        and
+                        (
+                            self.branches[branch_id].comparisons_complete == False    
+                        )
+                    ):
+                        self.branches[branch_id].comparisons_complete =  True
+                        self.compare_all_models_in_branch(branch_id)
+
+            if (
+                np.all(
+                    np.array(
+                        [
+                            self.branches[b].model_learning_complete
+                            for b in self.branches
+                        ]
+                    ) == True
+                )
+                and
+                np.all(
+                    np.array(
+                        [self.branches[b].comparisons_complete for b in self.branches]
+                    ) == True
+                )
+            ):
+                still_learning = False  # i.e. break out of this while loop
+        self.log_print([
+            "Learning stage complete on all trees."
+        ])
 
     def spawn_from_branch(
         self,
@@ -1415,7 +1349,6 @@ class QuantumModelLearningAgent():
             best_model_names,
             "\nAll:", all_models_this_branch
         ])
-        # new_models, pairs_to_compare = self.branches[branch_id].tree.spawn_models(
         new_models, pairs_to_compare = self.branches[branch_id].tree.next_layer(
             model_list=best_model_names,
             log_file=self.log_file,
@@ -1443,36 +1376,223 @@ class QuantumModelLearningAgent():
             growth_rule = growth_rule,
             spawning_branch = branch_id, 
         )
-        # self.branches[new_branch_id].parent_branch = branch_id
+        self.log_print([
+            "Models to add to new branch {}: ".format(
+                new_branch_id,
+                new_models
+            )
+        ])
 
-        self.log_print(
-            [
-                "Models to add to new branch {}: ".format(
-                    new_branch_id,
-                    new_models
-                )
-            ]
-        )
+        # Learn models on the new branch
         self.learn_models_on_given_branch(
             new_branch_id,
             blocking=False,
             use_rq=True
         )
 
+    def new_branch(
+        self,
+        model_list,
+        pairs_to_compare='all', 
+        growth_rule=None,
+        spawning_branch = 0,
+    ):
+        r"""
+        Add a set of models to a new QMLA branch. 
 
-    def inspect_remote_job_crashes(self):
-        # self.calls_to_job_inspections += 1
-        self.call_counter['job_crashes'] += 1
-        t_init = time.time()
-        if self.redis_databases['any_job_failed']['Status'] == b'1':
-            # TODO better way to detect errors? 
+        Branches have a unique id within QMLA, but belong to a single 
+            tree, where each tree corresponds to a single growth rule. 
+
+        :param list model_list: strings corresponding to models to 
+            place in the branch
+        :param pairs_to_compare: set of model pairs to perform Bayes comparisons on
+            by default all pairs are compared, but for pruning branches a list of 
+            model pairs can be specified instead, by tuples of model ids. 
+        :type pairs_to_compare: str or list
+        :param str growth_rule: growth rule identifer; 
+            used to get the unique tree object corresponding to a growth rule, 
+            which is then used to host the branch. 
+        :param int spawning_branch: branch id which is the parent of the new branch. 
+        :return int branch_id: branch id which uniquely identifies the new branch 
+            within the QMLA environment. 
+
+        """
+
+        model_list = list(set(model_list))  # remove possible duplicates
+        self.branch_highest_id += 1
+        branch_id = int(self.branch_highest_id)
+        self.log_print(
+            [
+                "NEW BRANCH {}. growth rule= {}".format(branch_id, growth_rule)
+            ]
+        )
+
+        this_branch_models = {}
+        model_id_list = []
+        pre_computed_models = []
+        for model in model_list:
+            # add_model_to_database returns whether adding model was successful
+            # if false, that's because it's already been computed
+            add_model_info = self.add_model_to_database(
+                model,
+                branch_id=branch_id
+            )
+            already_computed = not(
+                add_model_info['is_new_model']
+            )
+            model_id = add_model_info['model_id']
+            this_branch_models[model_id] = model
+            model_id_list.append(model_id)
+            if already_computed == False:  # first instance of this model
+                self.models_branches[model_id] = branch_id
+
             self.log_print(
                 [
-                    "Failure on remote node. Terminating QMD."
+                    'Model {} computed already: {} -> ID {}'.format(
+                        model, 
+                        already_computed,
+                        model_id, 
+                        ),
                 ]
             )
-            raise NameError('Remote QML Failure')
-        self.timings['inspect_job_crashes'] += time.time() - t_init
+            if bool(already_computed):
+                pre_computed_models.append(model)
+        
+        model_instances = {
+            m: self.get_model_storage_instance_by_id(m)
+            for m in list(this_branch_models.keys())
+        }
+
+        if growth_rule is None:
+            # placing on true growth rule's tree...
+            growth_rule = self.growth_rule_of_true_model
+        growth_tree = self.trees[growth_rule]
+        self.branches[branch_id] = growth_tree.new_branch_on_tree(
+            branch_id = branch_id, 
+            models = this_branch_models, 
+            pairs_to_compare = pairs_to_compare, 
+            model_instances = model_instances, 
+            precomputed_models = pre_computed_models,
+            spawning_branch = spawning_branch, 
+        )
+        return branch_id
+
+    def add_model_to_database(
+        self,
+        model,
+        branch_id=-1,
+        force_create_model=False
+    ):
+        r"""
+        Considers adding a model to QMLA's database of model.
+
+        Checks whether the nominated model is already present; 
+            if not generates a model instance; 
+            stores pertinent details in the running database. 
+
+        :param str model: name of model to consider
+        :param float branch_id: branch id to associate this model with, 
+            if the model is new. 
+        :param bool force_create_model: 
+            True: add model even if the name is found already. 
+        """
+
+        model_name = database_framework.alph(model)
+        self.log_print([
+            "Trying to add model to DB:", model_name
+        ])
+
+        if (
+            qmla.database_framework.consider_new_model(
+                self.model_lists, model_name, self.model_database) == 'New'
+            or
+            force_create_model == True
+        ):
+            model_num_qubits = qmla.database_framework.get_num_qubits(model_name)
+            model_id = self.highest_model_id + 1
+            self.model_lists[model_num_qubits].append(model_name)
+
+            self.log_print(
+                [
+                    "Model ", model_name,
+                    "not previously considered -- adding.",
+                    "ID:", model_id
+                ]
+            )
+            op = qmla.database_framework.Operator(
+                name=model_name, undimensionalised_name=model_name
+            )
+            reduced_qml_instance = qmla.model_instances.ModelInstanceForStorage(
+                model_name=model_name,
+                model_id=int(model_id),
+                model_terms_matrices=op.constituents_operators,
+                true_oplist=self.true_model_constituent_operators,
+                true_model_terms_params=self.true_param_list,
+                qid=self.qmla_id,
+                qmla_core_info_database=self.qmla_core_info_database,
+                plot_probes=self.probes_for_plots, 
+                host_name=self.redis_host_name,
+                port_number=self.redis_port_number,
+                log_file=self.log_file
+            )
+            running_db_new_row = pd.Series({
+                '<Name>': model_name,
+                'Status': 'Active',
+                'Completed': False,
+                'branch_id': int(branch_id),
+                'Reduced_Model_Class_Instance': reduced_qml_instance,
+                'Operator_Instance': op,
+                'Epoch_Start': 0, 
+                'ModelID': int(model_id),
+            })
+            # add to the database
+            num_rows = len(self.model_database)
+            self.model_database.loc[num_rows] = running_db_new_row
+            model_added = True
+            if database_framework.alph(
+                    model) == database_framework.alph(self.true_model_name):
+                self.true_model_id = model_id
+                self.true_model_considered = True
+                self.true_model_branch = branch_id
+                self.true_model_on_branhces = [branch_id]
+            self.highest_model_id = model_id
+            self.model_name_id_map[model_id] = model_name
+            self.model_count += 1
+
+        else:
+            model_added = False
+            self.log_print([
+                "Model not added: {}".format(
+                    model_name
+                )
+            ])
+            try:
+                model_id = database_framework.model_id_from_name(
+                    db=self.model_database,
+                    name=model_name
+                )
+                self.log_print([
+                    "Previously considered as model ", model_id
+                ])
+                if model_id == self.true_model_id: 
+                    self.true_model_on_branhces.append(model_id)
+            except BaseException:
+                self.log_print(
+                    [
+                        "Couldn't find model id for model:", model_name,
+                        "model_names_ids:",
+                        self.model_name_id_map
+                    ]
+                )
+                raise
+
+        add_model_output = {
+            'is_new_model': model_added,
+            'model_id': model_id,
+        }
+        return add_model_output
+
+
 
     def finalise_qmla(self):
         # Final functions at end of QMLA instance
@@ -1817,8 +1937,39 @@ class QuantumModelLearningAgent():
                 ]
             )
 
+    def compare_nominated_champions(self):
+        
+        tree_champions = []
+        for tree in self.trees.values():
+            tree_champions.extend(tree.nominate_champions())
+
+        global_champ_branch_id = self.new_branch(
+            model_list = tree_champions
+        )
+        global_champ_branch = self.branches[
+            global_champ_branch_id
+        ]
+
+        self.get_bayes_factors_from_list(
+            pair_list = global_champ_branch.pairs_to_compare,
+            wait_on_result = True, 
+        )
+        model_points, champ_id = self.compare_all_models_in_branch(
+            branch_id = global_champ_branch_id
+        )
+        self.global_champion_id = champ_id
+        self.global_champion_model = self.get_model_storage_instance_by_id(
+            self.global_champion_id
+        )
+        self.global_champion_name = self.global_champion_model.model_name
+        self.log_print([
+            "Global champion branch points:", model_points, 
+            "\nGlobal champion ID:", champ_id,
+            "\nGlobal champion:", self.global_champion_name
+        ])
+
     ##########
-    # Section: Run available algorithms
+    # Section: Run available algorithms (QMLA, QHL or QHL with multiple models)
     ##########
 
     def run_quantum_hamiltonian_learning(
@@ -1864,7 +2015,7 @@ class QuantumModelLearningAgent():
                 )
             ]
         )
-        self.update_database_model_info()
+        self._update_database_model_info()
         self.compute_model_f_score(
             model_id=mod_id
         )
@@ -1925,7 +2076,7 @@ class QuantumModelLearningAgent():
             # so can just wait on them in order.
             while int(learned_models_ids.get(k)) != 1:
                 sleep(self.sleep_duration)
-                self.inspect_remote_job_crashes()
+                self._inspect_remote_job_crashes()
 
         # Learning finished
         self.log_print(
@@ -1981,13 +2132,13 @@ class QuantumModelLearningAgent():
 
         # Choose champion by comparing nominated models (champions) of all trees.
         self.compare_nominated_champions()
-        self.champion_model_id = self.get_model_data_by_field(
+        self.champion_model_id = self._get_model_data_by_field(
             name=self.global_champion_name,
             field='ModelID'
         )
         self.log_print(["Champion selected."])
 
-        # internal analysiss
+        # internal analysis
         try:            
             if self.global_champion_id == self.true_model_id:
                 self.true_model_found = True
@@ -1995,7 +2146,7 @@ class QuantumModelLearningAgent():
                 self.true_model_found = False
         except:
             self.true_model_found = False
-        self.update_database_model_info()
+        self._update_database_model_info()
         if self.true_model_found:
             self.log_print(
                 [
@@ -2029,192 +2180,102 @@ class QuantumModelLearningAgent():
                 "has F-score ", self.model_f_scores[self.champion_model_id]
             ]
         )
-        
-
-    def learn_models_until_trees_complete(
-        self, 
-    ):
-        active_branches_learning_models = (
-            self.redis_databases['active_branches_learning_models']
-        )
-        active_branches_bayes = self.redis_databases['active_branches_bayes']
-
-        self.log_print(
-            [
-                "Starting learning for initial branches:", 
-                list(self.branches.keys())
-            ]
-        )
-        for b in self.branches:
-            self.learn_models_on_given_branch(
-                b,
-                blocking=False,
-                use_rq=True
-            )
-
-        self.log_print(
-            [
-                "Entering while loop; spawning model layers and comparing."
-            ]
-        )
-        while self.tree_count_completed < self.tree_count:
-            branch_ids_on_db = list(
-                active_branches_learning_models.keys()
-            )
-            branch_ids_on_db = [
-                int(b) for b in branch_ids_on_db
-            ]
-            self.inspect_remote_job_crashes()
-            for branch_id in branch_ids_on_db:
-                if (
-                    int(
-                        active_branches_learning_models.get(
-                            branch_id)
-                    ) == self.branches[branch_id].num_models
-                    and
-                    self.branches[branch_id].model_learning_complete == False
-                ):
-                    self.log_print([
-                        "All models on branch {} learned".format(branch_id)
-                    ])
-                    self.branches[branch_id].model_learning_complete = True
-                    for mod_id in self.branches[branch_id].resident_model_ids:
-                        mod = self.get_model_storage_instance_by_id(mod_id)
-                        mod.model_update_learned_values()
-                    self.get_bayes_factors_by_branch_id(branch_id)
-
-            for branchID_bytes in active_branches_bayes.keys():
-                branch_id = int(branchID_bytes)
-                bayes_calculated = active_branches_bayes.get(
-                    branchID_bytes
-                ) # how many completed and stored on redis db
-
-                if (
-                    int(bayes_calculated) == self.branches[branch_id].num_model_pairs
-                    and
-                    self.branches[branch_id].comparisons_complete == False
-                ):
-                    self.branches[branch_id].comparisons_complete = True
-                    self.compare_all_models_in_branch(branch_id)
-                    self.log_print(
-                        [
-                            "Branch {} comparisons complete".format(
-                                branch_id
-                            )
-                        ]
-                    )
-                    if self.branches[branch_id].tree.is_tree_complete():
-                        self.tree_count_completed += 1
-                        self.log_print(
-                            [
-                                "Tree complete:", 
-                                self.branches[branch_id].growth_rule, 
-                                "Number of trees now completed:",
-                                self.tree_count_completed,
-                            ]
-                        )
-                    else: 
-                        self.spawn_from_branch(
-                            branch_id=branch_id,
-                            growth_rule=self.branches[branch_id].tree.growth_rule,
-                            num_models=1
-                        )
-
-        self.log_print([
-                "{} trees have completed. Waiting on final comparisons".format(
-                    self.tree_count_completed
-                )
-        ])
-
-        # allow any branches which have just started to finish 
-        still_learning = True
-        while still_learning:
-            branch_ids_on_db = list(active_branches_learning_models.keys())
-            for branchID_bytes in branch_ids_on_db:
-                branch_id = int(branchID_bytes)
-                if (
-                    (
-                        int(active_branches_learning_models.get(branch_id))
-                        == self.branches[branch_id].num_models
-                    )
-                    and
-                    self.branches[branch_id].model_learning_complete == False
-                ):
-                    self.branches[branch_id].model_learning_complete = True
-                    self.get_bayes_factors_by_branch_id(branch_id)
-
-                if branchID_bytes in active_branches_bayes:
-                    num_bayes_done_on_branch = (
-                        active_branches_bayes.get(branchID_bytes)
-                    )
-                    if (
-                        (
-                            int(num_bayes_done_on_branch)
-                            == self.branches[branch_id].num_model_pairs
-                        )
-                        and
-                        (
-                            self.branches[branch_id].comparisons_complete == False    
-                        )
-                    ):
-                        self.branches[branch_id].comparisons_complete =  True
-                        self.compare_all_models_in_branch(branch_id)
-
-            if (
-                np.all(
-                    np.array(
-                        [
-                            self.branches[b].model_learning_complete
-                            for b in self.branches
-                        ]
-                    ) == True
-                )
-                and
-                np.all(
-                    np.array(
-                        [self.branches[b].comparisons_complete for b in self.branches]
-                    ) == True
-                )
-            ):
-                still_learning = False  # i.e. break out of this while loop
-        self.log_print([
-            "Learning stage complete on all trees."
-        ])
-
-    def compare_nominated_champions(self):
-        
-        tree_champions = []
-        for tree in self.trees.values():
-            tree_champions.extend(tree.nominate_champions())
-
-        global_champ_branch_id = self.new_branch(
-            model_list = tree_champions
-        )
-        global_champ_branch = self.branches[
-            global_champ_branch_id
-        ]
-
-        self.get_bayes_factors_from_list(
-            pair_list = global_champ_branch.pairs_to_compare,
-            wait_on_result = True, 
-        )
-        model_points, champ_id = self.compare_all_models_in_branch(
-            branch_id = global_champ_branch_id
-        )
-        self.global_champion_id = champ_id
-        self.global_champion_model = self.get_model_storage_instance_by_id(
-            self.global_champion_id
-        )
-        self.global_champion_name = self.global_champion_model.model_name
-        self.log_print([
-            "Global champion branch points:", model_points, 
-            "\nGlobal champion ID:", champ_id,
-            "\nGlobal champion:", self.global_champion_name
-        ])
-
 
     ##########
-    # Section: Analysis/plotting functions
+    # Section: Utilities
+    ##########
+
+    def log_print(self, to_print_list):
+        qmla.logging.print_to_log(
+            to_print_list = to_print_list,
+            log_file = self.log_file,
+            log_identifier = 'QMLA {}'.format(self.qmla_id)
+
+        )
+
+    def get_model_storage_instance_by_id(self, model_id):
+        r"""
+        Get the unique :class:`qmla.ModelInstanceForLearning` for the given model_id. 
+
+        :param int model_id: unique ID of desired model
+        :return model_instance: storage class of the model 
+        :rtype: :class:`qmla.ModelInstanceForLearning`
+
+        """
+        # return database_framework.reduced_model_instance_from_id(
+        #     self.model_database, model_id)
+        idx = self.model_database.loc[self.model_database['ModelID'] == model_id].index[0]
+        model_instance = self.model_database.loc[idx]["Reduced_Model_Class_Instance"]
+        return model_instance
+
+    def _update_database_model_info(self):
+        r"""
+
+        """
+
+        self.log_print([
+            "Updating info for all learned models"
+        ])
+        for mod_id in self.models_learned:
+            try:
+                # TODO remove this try/except when reduced-champ-model instance
+                # is update-able
+                mod = self.get_model_storage_instance_by_id(mod_id)
+                mod.model_update_learned_values(
+                    fitness_parameters=self.model_fitness_scores
+                )
+            except BaseException:
+                pass
+
+    def _update_model_record(
+        self,
+        field,
+        name=None,
+        model_id=None,
+        new_value=None,
+        increment=None
+    ):
+        database_framework.update_field(
+            db=self.model_database,
+            name=name,
+            model_id=model_id,
+            field=field,
+            new_value=new_value,
+            increment=increment
+        )
+
+    def _inspect_remote_job_crashes(self):
+        self.call_counter['job_crashes'] += 1
+        t_init = time.time()
+        if self.redis_databases['any_job_failed']['Status'] == b'1':
+            # TODO better way to detect errors? 
+            self.log_print(
+                [
+                    "Failure on remote node. Terminating QMD."
+                ]
+            )
+            raise NameError('Remote QML Failure')
+        self.timings['inspect_job_crashes'] += time.time() - t_init
+
+    def _delete_unpicklable_attributes(self):
+        r"""
+        Remove elements of QMLA which cannot be pickled, which cause errors if retained. 
+        """
+        
+        del self.redis_conn
+        del self.rq_queue
+        del self.redis_databases
+        del self.write_log_file
+
+    def _get_model_data_by_field(self, name, field):
+        return database_framework.pull_field(
+            self.model_database, 
+            name, 
+            field
+    )
+
+    ##########
+    # Section: Analysis/plotting methods
     ##########
     def compute_model_f_score(
         self,
@@ -2561,9 +2622,8 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def one_qubit_probes_bloch_sphere(self):
-        print("In jupyter, include the following to view sphere: %matplotlib inline")
-        # import qutip as qt
+    def plot_one_qubit_probes_bloch_sphere(self):
+        import qutip as qt
         bloch = qt.Bloch()
         for i in range(self.probe_number):
             state = self.probes_system[i, 1]
@@ -2575,24 +2635,3 @@ class QuantumModelLearningAgent():
             print(vec)
             bloch.add_states(vec)
         bloch.show()
-
-
-##########
-# Section: Miscellaneous functions called within QMLA
-##########
-
-
-def num_pairs_in_list(num_models):
-    if num_models <= 1:
-        return 0
-
-    n = num_models
-    k = 2  # ie. nCk where k=2 since we want pairs
-
-    try:
-        a = math.factorial(n) / math.factorial(k)
-        b = math.factorial(n - k)
-    except BaseException:
-        print("Numbers too large to compute number pairs. n=", n, "\t k=", k)
-
-    return a / b
