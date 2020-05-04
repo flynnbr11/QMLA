@@ -23,6 +23,9 @@ __all__ = [
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]
 
+def hamming_distance(str1, str2):
+    return sum(c1 != c2 for c1, c2 in zip(str1, str2))
+
 
 class Genetic(
     growth_rule.GrowthRule
@@ -560,10 +563,6 @@ class Genetic(
         ax.figure.savefig(save_to_file)
 
 
-def hamming_distance(str1, str2):
-    return sum(c1 != c2 for c1, c2 in zip(str1, str2))
-
-
 class GeneticTest(
     Genetic
 ):
@@ -608,22 +607,3 @@ class GeneticTest(
         }
         self.num_processes_to_parallelise_over = self.initial_num_models
  
-
-class IsingGeneticAlgorithm(
-    Genetic
-):
-    r"""
-    Exactly as the genetic growth rule, but small depth to test quickly.
-
-    """
-
-    def __init__(
-        self,
-        growth_generation_rule,
-        **kwargs
-    ):
-        # print("[Growth Rules] init nv_spin_experiment_full_tree")
-        super().__init__(
-            growth_generation_rule=growth_generation_rule,
-            **kwargs
-        )

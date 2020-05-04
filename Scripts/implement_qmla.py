@@ -107,7 +107,7 @@ elif (
         model_names=qhl_models
     )
 else:
-    qmla_instance.run_complete_qmla_dev()
+    qmla_instance.run_complete_qmla()
 
 
 #########################

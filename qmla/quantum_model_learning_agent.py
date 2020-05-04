@@ -319,10 +319,7 @@ class QuantumModelLearningAgent():
         # Either remove, or find appropriate place for initialisation and use
         # many are included in qmla_core_info_dict dict sent to workers; check if they are
         # used thereafter
-        # self.models_first_layer = first_layer_models
         self.use_qle = False  # Set to False for IQLE # TODO remove - redundant
-        # self.measurement_class = self.qmla_controls.measurement_type
-        # self.use_custom_exponentiation = use_exp_custom
         # should only matter when using custom exponentiation package
         self.enable_sparse_exponentiation = True
         self.exponentiation_tolerance = None
@@ -2496,17 +2493,18 @@ class QuantumModelLearningAgent():
             ])
 
 
-    def run_complete_qmla_dev(
+    def run_complete_qmla(
         self,
     ):
 
         self.learn_models_until_trees_complete()
+        self.log_print([
+            "Trees completed. Comparing nominated champions."
+        ])
         # self.prune_trees_until_complete()
         self.compare_nominated_champions()
 
         self.log_print(["Finalising QMLA."])
-        # final_winner, final_branch_winners = self.choose_champion()
-        # self.global_champion = final_winner
         self.champion_model_id = self.get_model_data_by_field(
             name=self.global_champion_name,
             field='ModelID'
@@ -2550,68 +2548,6 @@ class QuantumModelLearningAgent():
         self.log_print(
             [
                 "\nFinal winner:", self.global_champion_name, 
-                "has F-score ", self.model_f_scores[self.champion_model_id]
-            ]
-        )
-
-
-
-
-    def run_complete_qmla(
-        self,
-    ):
-        # TODO use this fnc instead of _dev version above
-
-        self.learn_models_until_trees_complete()
-        # self.prune_trees_until_complete()
-        # self.compare_nominated_champions()
-
-        self.log_print(["Finalising QMLA."])
-        final_winner, final_branch_winners = self.choose_champion()
-        self.global_champion = final_winner
-        self.champion_model_id = self.get_model_data_by_field(
-            name=final_winner,
-            field='ModelID'
-        )
-
-        try:            
-            if self.champion_model_id == self.true_model_id:
-                self.true_model_found = True
-            else:
-                self.true_model_found = False
-        except:
-            self.true_model_found = False
-        self.update_database_model_info()
-        if self.true_model_found:
-            self.log_print(
-                [
-                    "True model found: {}".format(
-                        database_framework.alph(self.true_model_name)
-                    )
-                ]
-            )
-        self.log_print(
-            [
-                "True model considered: {}. on branch {}.".format(
-                    self.true_model_considered,
-                    self.true_model_branch
-                )
-            ]
-        )
-
-        # Check if final winner has negligible parameters; 
-        # potentially change champion
-        if self.growth_class.check_champion_reducibility:
-            self.check_champion_reducibility()
-
-        self.finalise_qmla()
-        for k in self.timings:
-            self.log_print([
-                "QMLA Timing - {}: {}".format(k, np.round(self.timings[k], 2))
-            ])
-        self.log_print(
-            [
-                "Final winner:", self.global_champion, 
                 "has F-score ", self.model_f_scores[self.champion_model_id]
             ]
         )
@@ -2771,145 +2707,6 @@ class QuantumModelLearningAgent():
                 still_learning = False  # i.e. break out of this while loop
         self.log_print([
             "Learning stage complete on all trees."
-        ])
-
-
-    def prune_trees_until_complete(
-        self
-    ):
-        self.log_print([
-            "Pruning loop"
-        ])
-        trees = list(self.trees.values())
-        self.num_trees_pruned = sum(
-            [
-                tree.is_pruning_complete() 
-                for tree in trees
-            ]
-        )
-        for tree in trees:
-            self.log_print([
-                "Requesting prune model list for tree:", tree
-            ])
-            model_list_for_pruning, prune_comparison_pairs = tree.prune_tree()
-
-            self.log_print([
-                "model list for pruning:", 
-                model_list_for_pruning
-            ])
-            # model_list_for_pruning = [
-            #     self.get_model_storage_instance_by_id(m).model_name 
-            #     for m in model_list_for_pruning
-            # ]
-            prune_branch = self.new_branch(
-                growth_rule = tree.growth_rule, 
-                model_list = model_list_for_pruning, 
-            )
-            self.branches[prune_branch].set_as_prune_branch(
-                pairs_to_compare = prune_comparison_pairs
-            )
-            self.log_print([
-                "Pruning. pairs to compare:", 
-                self.branches[prune_branch].pairs_to_compare
-            ])
-            self.get_bayes_factors_by_branch_id(
-                branch_id  = prune_branch
-            )
-        # while num trees pruned < num trees
-        # when a branch is finished, call compare_all_models_in_branch
-        # turn off that branch
-        # check if tree pruned fully, 
-        ## if so, incr num_trees_pruned
-        ## else prune again
-        active_branches_bayes = self.redis_databases['active_branches_bayes']
-        
-        while self.num_trees_pruned < self.tree_count:
-            for branchID_bytes in active_branches_bayes.keys():
-                branch_id = int(branchID_bytes)
-                bayes_calculated = active_branches_bayes.get(
-                    branchID_bytes
-                ) # how many completed and stored on redis db
-
-                if (
-                    int(bayes_calculated) == self.branches[branch_id].num_model_pairs
-                    and
-                    self.branches[branch_id].comparisons_complete == False
-                ):
-                    self.branches[branch_id].comparisons_complete = True
-                    self.compare_all_models_in_branch(branch_id)
-                    # now branch has rankings, models_points
-                    self.log_print(
-                        [
-                            "Prune branch {} comparisons complete".format(
-                                branch_id
-                            )
-                        ]
-                    )
-                    if self.branches[branch_id].tree.is_pruning_complete():
-                        self.num_trees_pruned += 1
-                        self.log_print(
-                            [
-                                "Tree pruned:", 
-                                self.branches[branch_id].growth_rule, 
-                                "Number of trees now pruned:",
-                                self.num_trees_pruned,
-                            ]
-                        )
-                    else: 
-                        tree = self.branches[branch_id].tree
-                        model_list_for_pruning, prune_comparison_pairs = tree.prune_tree(
-                            previous_prune_branch = branch_id
-                        )
-                        prune_branch = self.new_branch(
-                            growth_rule = tree.growth_rule, 
-                            model_list = model_list_for_pruning, 
-                        )
-                        self.log_print([
-                            "Pruning again for {}".format(tree)
-                        ])            
-                        self.branches[prune_branch].set_as_prune_branch(
-                            pairs_to_compare = prune_comparison_pairs
-                        )
-                        self.get_bayes_factors_by_branch_id(
-                            branch_id  = prune_branch
-                        )
-
-        self.log_print([
-            "All trees reporting completed pruning. Waiting on final branches."
-        ])
-        still_comparing = True
-        while still_comparing:
-            for branchID_bytes in active_branches_bayes.keys():
-                branch_id = int(branchID_bytes)
-                bayes_calculated = active_branches_bayes.get(
-                    branchID_bytes
-                ) # how many completed and stored on redis db
-
-                if (
-                    int(bayes_calculated) == self.branches[branch_id].num_model_pairs
-                    and
-                    self.branches[branch_id].comparisons_complete == False
-                ):
-                    self.branches[branch_id].comparisons_complete = True
-                    self.compare_all_models_in_branch(branch_id)
-                    # now branch has rankings, models_points
-                    self.log_print(
-                        [
-                            "Prune branch {} comparisons complete".format(
-                                branch_id
-                            )
-                        ]
-                    )
-            if (
-                np.all([
-                    # TODO just check the pruning branches, don't need to look in all instances
-                    b.comparisons_complete for b in list(self.branches.values())
-                ])
-            ):
-                # break out of this loop
-                still_comparing = False
-        self.log_print([
-            "Pruning complete on all trees."
         ])
 
     def compare_nominated_champions(self):

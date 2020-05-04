@@ -43,18 +43,18 @@ class SimulatedNVCentre(
             'pauliSet_2_x_d3' : B*gamma_n , # ~3.37GHz
             'pauliSet_2_y_d3' : B*gamma_n ,
             'pauliSet_2_z_d3' : B*gamma_n ,
-            # carbon nuclei
-            'pauliSet_3_x_d3' : B * gamma , # ~117KHz
-            'pauliSet_3_y_d3' : B * gamma ,
-            'pauliSet_3_z_d3' : B * gamma ,
-            # interactions: spin with nitrogen nuclei
-            'pauliSet_1J2_xJx_d3' : 2.7e6, # 2.7MHz
-            'pauliSet_1J2_yJy_d3' : 2.7e6,
-            'pauliSet_1J2_zJz_d3' : 2.14e6,
-            # interactions: spin with carbon nuclei
-            'pauliSet_1J3_xJx_d3' : 2.4e6, # 2.4MHz
-            'pauliSet_1J3_yJy_d3' : 2.4e6, 
-            'pauliSet_1J3_zJz_d3' : 2.4e6,
+            # # carbon nuclei
+            # 'pauliSet_3_x_d3' : B * gamma , # ~117KHz
+            # 'pauliSet_3_y_d3' : B * gamma ,
+            # 'pauliSet_3_z_d3' : B * gamma ,
+            # # interactions: spin with nitrogen nuclei
+            # 'pauliSet_1J2_xJx_d3' : 2.7e6, # 2.7MHz
+            # 'pauliSet_1J2_yJy_d3' : 2.7e6,
+            # 'pauliSet_1J2_zJz_d3' : 2.14e6,
+            # # interactions: spin with carbon nuclei
+            # 'pauliSet_1J3_xJx_d3' : 2.4e6, # 2.4MHz
+            # 'pauliSet_1J3_yJy_d3' : 2.4e6, 
+            # 'pauliSet_1J3_zJz_d3' : 2.4e6,
         }
 
         self.gaussian_prior_means_and_widths = {
