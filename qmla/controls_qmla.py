@@ -176,12 +176,11 @@ class ControlsQMLA():
         self.cumulative_csv = arguments.cumulative_csv
         self.true_expec_path = arguments.true_expec_path
         self.probes_plot_file = arguments.probes_plot_file
-        self.latex_mapping_file = arguments.latex_mapping_file
         self.reallocate_resources = bool(arguments.reallocate_resources)
         self.probe_noise_level = arguments.probe_noise_level # TODO put in growth rule
 
         # create some new parameters
-        if self.results_directory[-1] != '/':
+        if not self.results_directory.endswith('/'):
             self.results_directory += '/'
 
         self.plots_directory = self.results_directory + 'plots/'
@@ -198,7 +197,12 @@ class ControlsQMLA():
                 pass
 
         self.long_id = '{0:03d}'.format(self.qmla_id)
-
+        self.latex_mapping_file = arguments.latex_mapping_file
+        if self.latex_mapping_file is None: 
+            self.latex_name_map_file_path = os.path.join(
+                self.results_directory, 
+                'LatexMapping.txt'
+            )
 
         if self.further_qhl == True:
             self.results_file = self.results_directory + 'further_qhl_results_' + \

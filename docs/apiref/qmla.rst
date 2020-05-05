@@ -18,8 +18,7 @@ Quantum Model Learning Agent
 Class Reference 
 ~~~~~~~~~~~~~~~
 .. autoclass:: QuantumModelLearningAgent
-    :private-members:
     :members: 
+    :private-members:
 
-Testing -- :class:`QuantumModelLearningAgent` has member :meth:`QuantumModelLearningAgent.learn_model`
     
