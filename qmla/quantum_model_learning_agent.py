@@ -1172,7 +1172,7 @@ class QuantumModelLearningAgent():
 
             champ_id = self.process_model_set_comparisons(
                 max_points_branches,
-                models_points_dict=models_points
+                # models_points_dict=models_points
             )
         else:
             champ_id = max(models_points, key=models_points.get)
