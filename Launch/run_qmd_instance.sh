@@ -99,7 +99,10 @@ fi
 sleep 5
 # cd $running_dir
 cd $script_dir
-python3 implement_qmla.py \
+#python3 -m cProfile -s time \
+python3 \
+	implement_qmla.py \
+	-rq=1 \
 	-qhl=$QHL \
 	-fq=$FURTHER_QHL \
 	-mqhl=$MULTIPLE_QHL \
@@ -128,7 +131,8 @@ python3 implement_qmla.py \
 	-latex=$LATEX_MAP_FILE \
 	-resource=$RESOURCE_REALLOCATION \
 	-ggr=$GROWTH \
-	$ALT_GROWTH 
+	$ALT_GROWTH \
+	> $RESULTS_DIR/output_and_error_logs/profile_$QMD_ID.txt
 echo "Finished Exp.py at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
 sleep 3
 
