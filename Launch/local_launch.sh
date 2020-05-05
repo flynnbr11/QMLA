@@ -10,15 +10,15 @@ num_tests=1
 qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
-exp_data=1
+exp_data=0
 simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-prt=15
-exp=3
+exp=10
+prt=50
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -50,7 +50,7 @@ cwd=$(pwd)
 day_time=$(date +%b_%d/%H_%M)
 full_path_to_results="$cwd/Results/$day_time/"
 running_dir="$(pwd)"
-qmd_dir="${running_dir%/ExperimentalSimulations}" # chop off ParallelDevelopment to get qmd folder path
+qmd_dir="${running_dir%/ExperimentalSimulations}"
 lib_dir="$qmd_dir/Libraries/QML_lib"
 bcsv="cumulative.csv"
 bayes_csv="$full_path_to_results$bcsv"
@@ -74,12 +74,24 @@ git_commit=$(git rev-parse HEAD)
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
-sim_growth_rule='IsingProbabilistic'
+
+# growth_rule='IsingLatticeSet'
+# growth_rule='HeisenbergLatticeSet'
+# growth_rule='FermiHubbardLatticeSet'
+# growth_rule='NVLargeSpinBath'
+# growth_rule='SimulatedNVCentre'
+# growth_rule='GeneticTest'
+growth_rule='IsingGenetic'
+# growth_rule='Genetic'
+# growth_rule='NVExperimentalData'
+
+# sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'
 # sim_growth_rule='TestReducedParticlesBayesFactors'
 # sim_growth_rule='TestAllParticlesBayesFactors'
 # sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
+# sim_growth_rule='HeisenbergSharedField'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
 # sim_growth_rule='Genetic'
@@ -87,12 +99,14 @@ sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='Presentation'
 # sim_growth_rule='ExperimentReducedNV'
 # sim_growth_rule='example'
-# sim_growth_rule='TalkDemonstration'
+# sim_growth_rule='NVExperimentalData'
+# sim_growth_rule='ExperimentNVCentre'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
 
-exp_growth_rule='ExperimentNVCentre'
+# exp_growth_rule='NVExperimentalData'
+# exp_growth_rule='ExperimentNVCentre'
 # exp_growth_rule='ExperimentNVCentreNoTransvereTerms'
 # exp_growth_rule='ExpAlternativeNV'
 # exp_growth_rule='ExperimentFullAccessNV'
@@ -102,14 +116,16 @@ exp_growth_rule='ExperimentNVCentre'
 # exp_growth_rule='ExperimentReducedNV'
 
 
-if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
-then
-    growth_rule=$exp_growth_rule
-else
-    growth_rule=$sim_growth_rule
-fi
+# if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
+# then
+#     growth_rule=$exp_growth_rule
+# else
+#     growth_rule=$sim_growth_rule
+# fi
 
 alt_growth_rules=(
+    # 'GeneticTest'
+    # 'HeisenbergLatticeSet'
     # 'IsingPredetermined'
     # 'IsingProbabilistic'
     # 'HeisenbergXYZProbabilistic'
@@ -158,19 +174,6 @@ then
     special_probe_plot='plus'
 fi
 
-
-
-
-if [[ "$growth_rule" == "PT_Effective_Hamiltonian" ]] 
-then
-    echo "In if statement for PT_Effective_Hamiltonian"
-    special_probe='None'
-    special_probe_plot='None'
-fi
-
-# measurement_type=$exp_measurement_type
-# special_probe='plus' #'plus' #'ideal' # TODO this is just for a test, remove!!
-
 declare -a particle_counts=(
 $prt
 )
@@ -199,58 +202,15 @@ python3 ../Scripts/set_qmla_params.py \
     -log=$this_log \
     -min=$param_min \
     -max=$param_max \
+    -true_expec_path=$true_expec_path \
     -plus=$force_plot_plus \
     -sp=$special_probe_plot \
     $growth_rules_command 
 
 echo "Generated configuration."
 
-for prt in  "${particle_counts[@]}";
-do
-    for i in `seq 1 $max_qmd_id`;
-    do
-        redis-cli flushall
-        let q_id="$q_id+1"
-        python3 \
-            ../Scripts/implement_qmla.py \
-            -qhl=$qhl_test \
-            -mqhl=$multiple_qhl \
-            -rq=$use_rq \
-            -p=$prt \
-            -e=$exp \
-            -bt=$bt \
-            -ra=$ra \
-            -rt=$rt \
-            -qid=$q_id \
-            -log=$this_log \
-            -dir=$full_path_to_results \
-            -pgh=$pgh \
-            -pgh_exp=$pgh_exponent \
-            -pgh_incr=$pgh_increase \
-            -pt=$plots \
-            -pkl=1 \
-            -cb=$bayes_csv \
-            -exp=$exp_data \
-            -prtwt=$store_prt_wt \
-            -prior_path=$prior_pickle_file \
-            -true_params_path=$true_params_pickle_file \
-            -true_expec_path=$true_expec_path \
-            -plot_probes=$plot_probe_file \
-            -latex=$latex_mapping_file \
-            -resource=$reallocate_resources \
-            -ggr=$growth_rule \
-            $growth_rules_command 
-    done
-done
-
-echo "
-
------- QMLA completed ------
-
-"
-
 ##
-# Analyse results of QMD. (Only after QMD, not QHL).
+# Write analysis script (before launch in case run stopped before some instances complete.)
 ##
 
 
@@ -288,9 +248,56 @@ python3 ../../../../Scripts/generate_results_pdf.py \
     -exp=$exp_data
 
 " > $analyse_script
-
-
 chmod a+x $analyse_script
+
+
+
+for prt in  "${particle_counts[@]}";
+do
+    for i in `seq 1 $max_qmd_id`;
+    do
+        redis-cli flushall
+        let q_id="$q_id+1"
+        # python3 -m cProfile -s time \
+        python3 \
+            ../Scripts/implement_qmla.py \
+            -qhl=$qhl_test \
+            -mqhl=$multiple_qhl \
+            -rq=$use_rq \
+            -p=$prt \
+            -e=$exp \
+            -bt=$bt \
+            -ra=$ra \
+            -rt=$rt \
+            -qid=$q_id \
+            -log=$this_log \
+            -dir=$full_path_to_results \
+            -pgh=$pgh \
+            -pgh_exp=$pgh_exponent \
+            -pgh_incr=$pgh_increase \
+            -pt=$plots \
+            -pkl=1 \
+            -cb=$bayes_csv \
+            -exp=$exp_data \
+            -prtwt=$store_prt_wt \
+            -prior_path=$prior_pickle_file \
+            -true_params_path=$true_params_pickle_file \
+            -true_expec_path=$true_expec_path \
+            -plot_probes=$plot_probe_file \
+            -latex=$latex_mapping_file \
+            -resource=$reallocate_resources \
+            -ggr=$growth_rule \
+            $growth_rules_command \
+            > $full_path_to_results/output.txt
+    done
+done
+
+echo "
+
+------ QMLA completed ------
+
+"
+
 
 if (( $do_further_qhl == 1 )) 
 then

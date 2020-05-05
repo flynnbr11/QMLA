@@ -2,8 +2,8 @@ from __future__ import absolute_import
 import sys
 import os
 
-from qmla.growth_rules.growth_rule_super import GrowthRuleSuper
-from qmla import experiment_design_heuristics
+from qmla.growth_rules.growth_rule import GrowthRule
+import qmla.shared_functionality.experiment_design_heuristics
 from qmla import database_framework
 
 __all__ = [
@@ -11,8 +11,8 @@ __all__ = [
 ]
 
 class ExperimentFullAccessNV(
-    # growth_rule_super.GrowthRuleSuper
-    GrowthRuleSuper
+    # growth_rule.GrowthRule
+    GrowthRule
 ):
     def __init__(
         self,
@@ -39,7 +39,7 @@ class ExperimentFullAccessNV(
 
             # 'zTi'
         ]
-        self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         # self.max_num_qubits = 3
@@ -78,8 +78,12 @@ class ExperimentFullAccessNV(
         log_file,
         **kwargs
     ):
-        print("[Growth Rules] NV MODEL GENERATION")
         import random
+        self.log_print(
+            [
+                "Generating. input model list:", model_list
+            ]
+        )
         single_qubit_terms = ['xTi', 'yTi', 'zTi']
         nontransverse_terms = ['xTx', 'yTy', 'zTz']
         transverse_terms = ['xTy', 'xTz', 'yTz']

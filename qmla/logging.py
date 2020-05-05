@@ -1,5 +1,8 @@
 import datetime
 
+__all__ = [
+    'print_to_log'
+]
 
 def time_seconds():
     # return time in h:m:s format for logging.

@@ -10,11 +10,10 @@ import redis
 import pickle
 
 import qmla.redis_settings as rds
-import qmla.qinfer_model_interface as qml_qi
+# import qmla.qinfer_model_interface as qml_qi
 import qmla.memory_tests
 import qmla.logging
 import qmla.get_growth_rule as get_growth_rule
-import qmla.experimental_data_processing
 import qmla.shared_functionality.prior_distributions
 import qmla.database_framework
 import qmla.analysis
@@ -30,18 +29,9 @@ debug_log_print = True
 print_mem_status = True
 global_print_loc = False
 
-"""
-In this file are class definitions:
-    - ModelInstanceForLearning
-    - ModelInstanceForStorage
-    - ModelInstanceForComparison
-
-"""
 
 __all__ = [
     'ModelInstanceForLearning',
-    'ModelInstanceForStorage',
-    'ModelInstanceForComparison'
 ]
 
 
@@ -162,7 +152,7 @@ class ModelInstanceForLearning():
         growth_generator,
         qmla_core_info_database,
         checkloss=True,
-        debug_directory=None,
+        # debug_directory=None,
         **kwargs
     ):
         redis_databases = rds.get_redis_databases_by_qmla_id(
@@ -180,7 +170,7 @@ class ModelInstanceForLearning():
             self.probes_system = qmla_core_info_database['ProbeDict']
             self.probes_simulator = qmla_core_info_database['SimProbeDict']
         
-        self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
+        # self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.num_particles = qmla_core_info_dict['num_particles']
         self.num_experiments = qmla_core_info_dict['num_experiments']
         self.growth_rule_of_this_model = growth_generator
@@ -188,7 +178,7 @@ class ModelInstanceForLearning():
         try:
             self.growth_class = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_rule_of_this_model,
-                use_experimental_data=self.use_experimental_data,
+                # use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
             )
         except BaseException:
@@ -228,7 +218,6 @@ class ModelInstanceForLearning():
                 initial_prior_centre = 0
                 model_terms_parameters.append(initial_prior_centre)
 
-        # TODO processing of sim_pars seems pointless?
         model_terms_parameters = [model_terms_parameters]
         self.model_terms_parameters = np.asarray([model_terms_parameters[0]])
 
@@ -277,6 +266,7 @@ class ModelInstanceForLearning():
         # self.true_hamiltonian = qmla_core_info_dict['true_hamiltonian']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
+        self.true_param_dict = qmla_core_info_dict['true_param_dict']
         self.sigma_threshold = qmla_core_info_dict['sigma_threshold']
         self.times_to_plot = qmla_core_info_dict['plot_times']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
@@ -288,30 +278,28 @@ class ModelInstanceForLearning():
             self.model_name
         )
 
-        for i in range(len(individual_terms_in_name)):
-            term = individual_terms_in_name[i]
-            term_mtx = qmla.database_framework.compute(term)
-            if np.all(term_mtx == self.model_terms_matrices[i]) is False:
-                # TODO make this raise an exception instead
-                print("[ModelInstanceForLearning] UNEQUAL LIST / TERM MATRICES.")
-                print("==> INSPECT ORDER OF PRIORS.")
-                self.log_print(
-                    [
-                        "Term", term,
-                        "\ncalculated mtx:", term_mtx,
-                        "\nSimOpList:", self.model_terms_matrices[i]
-                    ]
-                )
-            elif term != self.model_terms_names[i]:
-                self.log_print(
-                    [
-                        "term {} != SimOpsNames[i] {}".format(
-                            term, self.model_terms_names[i]
-                        )
-                    ]
-                )
-
-        self.check_quadratic_loss = True
+        # for i in range(len(individual_terms_in_name)):
+            # term = individual_terms_in_name[i]
+            # term_mtx = qmla.database_framework.compute(term)
+            # if np.all(term_mtx == self.model_terms_matrices[i]) is False:
+            #     # TODO make this raise an exception instead
+            #     print("[ModelInstanceForLearning] UNEQUAL LIST / TERM MATRICES.")
+            #     print("==> INSPECT ORDER OF PRIORS.")
+            #     self.log_print(
+            #         [
+            #             "Term", term,
+            #             "\ncalculated mtx:", term_mtx,
+            #             "\nSimOpList:", self.model_terms_matrices[i]
+            #         ]
+            #     )
+            # elif term != self.model_terms_names[i]:
+            #     self.log_print(
+            #         [
+            #             "term {} != SimOpsNames[i] {}".format(
+            #                 term, self.model_terms_names[i]
+            #             )
+            #         ]
+            #     )
 
         num_params = len(self.model_terms_matrices)
         log_identifier = str("QML " + str(self.model_id))
@@ -322,7 +310,7 @@ class ModelInstanceForLearning():
         )
         prior_dir = str(
             self.results_directory +
-            'priors/QMD_{}/'.format(self.qmla_id)
+            'priors/QMLA_{}/'.format(self.qmla_id)
         )
 
         if not os.path.exists(prior_dir):
@@ -344,41 +332,48 @@ class ModelInstanceForLearning():
                 name=term
             )
             latex_terms.append(lt)
-
+        
         plot_all_priors = True
         if plot_all_priors == True:
-            qmla.shared_functionality.prior_distributions.plot_prior(
-                model_name=self.model_name_latex,
-                model_name_individual_terms=latex_terms,
-                prior=self.model_prior,
-                plot_file=prior_file,
-            )
+            try:
+                qmla.shared_functionality.prior_distributions.plot_prior(
+                    model_name=self.model_name_latex,
+                    model_name_individual_terms=latex_terms,
+                    prior=self.model_prior,
+                    plot_file=prior_file,
+                )
+            except:
+                self.log_print([
+                    "Failed to plot prior"
+                ])
 
-        self.qinfer_model = qml_qi.QInferModelQML(
+        self.qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
             oplist=self.model_terms_matrices,
             true_oplist=self.true_model_constituent_operators,
+            true_param_dict = self.true_param_dict, 
             truename=self.true_model_name,
             trueparams=self.true_model_params,
             num_probes=self.probe_number,
             probe_dict=self.probes_system,
             sim_probe_dict=self.probes_simulator,
             growth_generation_rule=self.growth_rule_of_this_model,
-            use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
         )
+        self.log_print([
+            "QInfer model generated."
+        ])
 
         self.qinfer_updater = qi.SMCUpdater(
             self.qinfer_model,
             self.num_particles,
             self.model_prior,
-            zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
+            # zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
             resample_thresh=self.qinfer_resampler_threshold,
             resampler=qi.LiuWestResampler(a=self.qinfer_resampler_a),
-            # debug_resampling=False
         )
 
         self.initial_prior = []
@@ -393,7 +388,7 @@ class ModelInstanceForLearning():
             in self.qinfer_model.expparams_dtype[1:]
         ]
 
-        self.model_heuristic = self.growth_class.model_heuristic_function(
+        self.model_heuristic = self.growth_class.heuristic(
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
             inv_field=self.inversion_field,
@@ -401,9 +396,10 @@ class ModelInstanceForLearning():
             pgh_exponent=self.qinfer_PGH_heuristic_exponent,
             time_list=self.times_to_plot,
             num_experiments=self.num_experiments,
+            max_time_to_enforce=self.growth_class.max_time_to_consider,
+            log_file = self.log_file,
         )
         self.model_heuristic_class = self.model_heuristic.__class__.__name__
-
         self._initialise_tracking_infrastructure()
 
     def _initialise_tracking_infrastructure(
@@ -434,30 +430,30 @@ class ModelInstanceForLearning():
         self.true_model_params_dict = {}
         self.learned_parameters_qhl = {}
         self.final_sigmas_qhl = {}
-
+        self.time_update = 0
+        self.time_volume = 0
+        self.time_simulate_experiment = 0
+        self.time_heuristic = 0 
 
     def update_model(
         self,
         checkloss=False  # TODO is this needed?
     ):
+        full_update_time_init = time.time()
         true_params_names = qmla.database_framework.get_constituent_names_from_name(
             self.true_model_name
         )
-        if self.use_experimental_data == False:
-            for i in range(len(true_params_names)):
-                term = true_params_names[i]
-                true_param_val = self.true_model_params[i]
-                self.true_model_params_dict[term] = true_param_val
 
+        self.true_model_params_dict = self.growth_class.true_params_dict
         all_params_for_q_loss = list(
-            set(true_params_names).union(self.model_terms_names)
+            set(list(self.true_model_params_dict.keys())).union(self.model_terms_names)
         )
         param_indices = {}
         for op_name in self.model_terms_names:
             param_indices[op_name] = self.model_terms_names.index(op_name)
 
         print_frequency = max(
-            int(self.num_experiments / 10),
+            int(self.num_experiments / 5),
             5
         )
         for istep in range(self.num_experiments):
@@ -472,43 +468,49 @@ class ModelInstanceForLearning():
                 param_estimates = self.qinfer_updater.est_mean()
             else:
                 param_estimates = self.track_mean_params[-1]
+            _time_init = time.time()
             self.new_experiment = self.model_heuristic(
-                test_param="from Model class",
                 num_params=len(self.model_terms_names),
                 epoch_id=istep,
                 current_params=param_estimates
             )
-            qmla.memory_tests.print_loc(global_print_loc)
-            # TODO prefactor, if used, should be inside specific heuristic
+            self.time_heuristic += time.time() - _time_init
+            # TODO prefactor, if used, should be inside specific GR heuristic
             self.new_experiment[0][0] = self.new_experiment[0][0] * \
                 self.qinfer_PGH_heuristic_factor
-            if self.use_experimental_data:
-                t = self.new_experiment[0][0]
-                nearest = qmla.experimental_data_processing.nearest_experimental_time_available(
-                    times=self.experimental_measurement_times,
-                    t=t
-                )
-                self.new_experiment[0][0] = nearest
-            qmla.memory_tests.print_loc(global_print_loc)
+
             if istep == 0:
-                qmla.memory_tests.print_loc(global_print_loc)
-                self.log_print(['Initial time selected > ',
+                self.log_print(['Initial time selected = ',
                                 str(self.new_experiment[0][0])]
                                )
             self.track_experimental_times[istep] = self.new_experiment[0][0]
 
+            _time_init = time.time()
             self.datum_from_experiment = self.qinfer_model.simulate_experiment(
                 self.model_terms_parameters,
                 self.new_experiment,
                 repeat=1
-            )  # TODO reconsider repeat number?
+            ) 
+            self.time_simulate_experiment += time.time() - _time_init
 
             # Call updater to update distribution based on datum
             try:
+                sum_wts = sum([a**2 for a in self.qinfer_updater.particle_weights])
+                n_ess = 1/sum_wts # corresponds to n_ess in QInfer, for record
+                if n_ess < self.num_particles / 2 or n_ess < 10:                        
+                    self.log_print([
+                        # "Particles:", self.qinfer_updater.particle_locations, 
+                        # "\nWeights:", self.qinfer_updater.particle_weights,
+                        "Small n_ess - expect to resample soon. Sum weights = {}; n_ess = {}".format(sum_wts, (1/sum_wts))                     
+                    ])
+                _time_start = time.time()
+                import cProfile
                 self.qinfer_updater.update(
                     self.datum_from_experiment,
                     self.new_experiment
                 )
+                self.time_update += time.time() - _time_start
+                    
             except RuntimeError as e:
                 import sys
                 self.log_print(
@@ -535,9 +537,11 @@ class ModelInstanceForLearning():
                 )
                 sys.exit()
 
-            if self.qinfer_updater.just_resampled is True:
+            if self.qinfer_updater.just_resampled:
+                self.log_print(["Just resampled"])
                 self.epochs_after_resampling.append(istep)
 
+            _time_init = time.time()
             self.volume_by_epoch = np.append(
                 self.volume_by_epoch,
                 np.linalg.det(
@@ -546,6 +550,8 @@ class ModelInstanceForLearning():
                     )  # TODO seems unnecessary to do this every epoch - every 10th would be enough for plot
                 )
             )
+            self.time_volume += time.time() - _time_init
+
             self.track_mean_params.append(self.qinfer_updater.est_mean())
             self.track_param_dist_widths.append(
                 np.sqrt(
@@ -573,11 +579,8 @@ class ModelInstanceForLearning():
                         #    istep] = self.qinfer_updater.particle_locations
             # self.weights[:, istep] = self.qinfer_updater.particle_weights
 
-            if (
-                checkloss == True
-                and
-                self.use_experimental_data == False
-            ):
+            if checkloss:
+                # TODO not currently recording quadratic loss
                 quadratic_loss = 0
                 for param in all_params_for_q_loss:
                     if param in self.model_terms_names:
@@ -585,7 +588,7 @@ class ModelInstanceForLearning():
                     else:
                         learned_param = 0
 
-                    if param in true_params_names:
+                    if param in list(self.true_model_params_dict.keys()):
                         true_param = self.true_model_params_dict[param]
                     else:
                         true_param = 0
@@ -653,7 +656,18 @@ class ModelInstanceForLearning():
                         str(self.new_experiment[0][0])
                     ]
                 )
+                self.log_print([
+                    "{} Resample epochs: {}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
+                ])
                 self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
+                self.log_print([
+                    "{} subroutine times:".format(self.redis_host),  
+                    "Total:", np.round(time.time() - full_update_time_init, 2),
+                    "\tUpdates:", np.round(self.time_update,2), 
+                    "\t Simulate experiment:", np.round(self.time_simulate_experiment, 2), 
+                    "\t Volume:", np.round(self.time_volume, 2),
+                    "\t Heuristic:", np.round(self.time_heuristic, 2),
+                ])
 
                 cov_mat = self.qinfer_updater.est_covariance_mtx()
                 for iterator in range(len(self.final_learned_params)):
@@ -666,12 +680,32 @@ class ModelInstanceForLearning():
                         self.model_terms_names[iterator], '):',
                         str(self.final_learned_params[iterator])]
                     )
+                    
                     self.learned_parameters_qhl[self.model_terms_names[iterator]] = (
                         self.final_learned_params[iterator][0]
                     )
                     self.final_sigmas_qhl[self.model_terms_names[iterator]] = (
                         self.final_learned_params[iterator][1]
                     )
+
+        for k in self.qinfer_model.timings:
+            for kk in self.qinfer_model.timings[k]:
+                self.log_print([
+                    "QinferModel Timing - {}/{}: {}".format(
+                        k, kk, 
+                        np.round(self.qinfer_model.timings[k][kk], 2)
+                    )
+                ])
+            # self.qinfer_model.timings[k] =  {
+            #     v : np.round(self.qinfer_model.timings[k][v], 2)
+            #     for v in self.qinfer_model.timings[k]
+            # }
+        # self.log_print([
+        #     "{} calls to likelihood fnc. After updates, qinfer model timings:\n{}".format(
+        #         self.qinfer_model.calls_to_likelihood,
+        #         self.qinfer_model.timings
+        #     )
+        # ])
 
     def learned_info_dict(self):
         """
@@ -752,12 +786,21 @@ class ModelInstanceForLearning():
 
     def compute_likelihood_after_parameter_learning(
         self,
-        times = [1, 2]
+        # times = [1, 2]
     ):
-        from qmla.remote_bayes_factor import get_exp
+        estimated_params = self.qinfer_updater.est_mean()
+        cov_mt_uncertainty = [1e-10] * np.shape(self.qinfer_updater.est_mean())[0]
+        cov_mt = np.diag(cov_mt_uncertainty)
+        # self.log_print([
+        #     "Generating evaluation posterior with estimated params =\n{} \nand cov mt:\n{}".format(
+        #         estimated_params, cov_mt
+        #     )
+        # ])
         posterior_distribution = qi.MultivariateNormalDistribution(
-            self.qinfer_updater.est_mean(),
-            self.qinfer_updater.est_covariance_mtx(),
+            estimated_params,
+            cov_mt
+            # np.diag(self.qinfer_updater.est_mean()**2), # extremely thin 
+            # self.qinfer_updater.est_covariance_mtx()
         )
 
         learned_params = list(self.final_learned_params[:, 0])
@@ -769,7 +812,6 @@ class ModelInstanceForLearning():
         self.log_print(
             [
                 "Learned parameters:", learned_params, 
-                "\nlearned Hamiltonian:\n", self.learned_hamiltonian
             ]
         )
 
@@ -782,30 +824,37 @@ class ModelInstanceForLearning():
         
         evaluation_times = true_params_dict['evaluation_times']
         evaluation_probe_dict = true_params_dict['evaluation_probes']
+        self.log_print([
+            "Evaluating learned model. number of times:", len(evaluation_times)
+        ])
 
-        evaluation_qinfer_model = qml_qi.QInferModelQML(
+        evaluation_qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
             oplist=self.model_terms_matrices,
             true_oplist=self.true_model_constituent_operators,
             truename=self.true_model_name,
             trueparams=self.true_model_params,
+            true_param_dict = self.true_param_dict, 
             num_probes=self.probe_number,
             probe_dict=evaluation_probe_dict,
             sim_probe_dict=evaluation_probe_dict,
             growth_generation_rule=self.growth_rule_of_this_model,
-            use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
         )
 
         evaluation_updater = qi.SMCUpdater(
-            model=self.qinfer_model,
-            n_particles=2,
+            # model=self.qinfer_model,
+            model = evaluation_qinfer_model, 
+            n_particles=min(5, self.num_particles),
             # n_particles=self.num_particles,
             prior=posterior_distribution,
-            resample_thresh=self.qinfer_resampler_threshold,
+            # resample more aggressively once learned, since closer to true values
+            # resample_thresh=max(self.qinfer_resampler_threshold, 0.6), 
+            # turn off resampling - want to evaluate the learned model, not improved version
+            resample_thresh=0.0,  
             resampler=qi.LiuWestResampler(
                 a=self.qinfer_resampler_a
             ),
@@ -814,64 +863,32 @@ class ModelInstanceForLearning():
 
         evaluation_updater._log_total_likelihood = 0.0
         evaluation_updater._normalization_record = []
-
         for t in evaluation_times:
-        # for i in range(len(times)):
             exp = format_experiment(
-                self.qinfer_model, 
+                evaluation_qinfer_model, 
                 final_learned_params = self.final_learned_params, 
                 time = [t],
-                # time = [times[i]]
             )
             params_array = np.array([[self.true_model_params[:]]])
-            # self.log_print(
-            #     [
-            #         "[evaluation] Getting datum"
-            #     ]
-            # )
             datum = evaluation_updater.model.simulate_experiment(
                 params_array,
                 exp,
                 repeat=1
             )
-            # get datum manually through growth_class.expectation_value
-            # expectation_value = self.growth_class.expectation_value(
-            #     # ham = self.learned_hamiltonian, 
-            #     ham = self.true_hamiltonian,
-            #     t = t, 
-            #     state = probe
-            # )
-            # datum = int( random.random() <= expectation_value ) # single shot measurement
-            
-            # self.log_print(
-            #     [
-            #         "Evaluation: t={}; p={}".format(t, repr(probe)),
-            #         "Expec val={}; datum={}".format(expectation_value, datum)
-            #     ]
-            # )
-            # self.log_print(
-            #     [
-            #         "[evaluation] Updating"
-            #     ]
-            # )
-
             evaluation_updater.update(datum, exp)
-
+        self.log_print([
+            "Evaluation updates complete. num resamples:", evaluation_updater.resample_count
+        ])
         log_likelihood = evaluation_updater.log_total_likelihood
-        # self.log_print(
-        #     [
-        #         "After learning, evaluation normalisation record:", 
-        #         evaluation_updater.normalization_record,
-        #         "\nGiving log likelihood:", round_nearest(evaluation_updater.log_total_likelihood, 0.05)
-        #     ]
-        # )
         self.evaluation_normalization_record = evaluation_updater.normalization_record
         if np.isnan(evaluation_updater.log_total_likelihood):
             self.evaluation_log_likelihood = None 
             self.evaluation_median_likelihood = None
+            self.log_print([
+                "Evaluation ll is nan"
+            ])
         else:
             self.evaluation_log_likelihood = round_nearest(
-                # evaluation_updater.log_total_likelihood / len(self.evaluation_normalization_record), 
                 evaluation_updater.log_total_likelihood, 
                 0.05
             )
@@ -879,7 +896,16 @@ class ModelInstanceForLearning():
                 np.median(evaluation_updater.normalization_record),
                 2
             )
-        
+        for k in evaluation_qinfer_model.timings:
+            for kk in evaluation_qinfer_model.timings[k]:
+                self.log_print([
+                    "Evaluation Timing - {}/{}: {}".format(
+                        k, kk, 
+                        np.round(evaluation_qinfer_model.timings[k][kk], 2)
+                    )
+                ])
+
+
 
 def round_nearest(x,a):
     return round(round(x/a)*a ,2)

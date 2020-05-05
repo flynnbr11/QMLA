@@ -13,9 +13,10 @@ __all__ = [
 ]
 
 """
-This script is callable with *kwargs.
-It returns an instance of the class ControlsQMLA, which has attributes
-for all the user defined parameters, and defaults if not specified by the user.
+This file provides functionality to parse command line arguments 
+passed via the QMLA launch scripts. 
+These are gathered into a single class instance which can be probed by 
+the QMLA instance to implement user specifications. 
 """
 
 def log_print(
@@ -47,13 +48,16 @@ class ControlsQMLA():
         arguments,
         **kwargs
     ):
-        self.use_experimental_data = bool(arguments.experimental_data)
+        import inspect
+        # self.use_experimental_data = bool(arguments.experimental_data)
         self.growth_generation_rule = arguments.growth_generation_rule
         self.log_file = arguments.log_file
         try:
             self.growth_class = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
-                use_experimental_data=self.use_experimental_data,
+                # use_experimental_data=self.use_experimental_data,
+                true_params_path = arguments.true_params_pickle_file,
+                plot_probes_path = arguments.probes_plot_file, 
                 log_file=self.log_file
             )
         except BaseException:
@@ -85,7 +89,7 @@ class ControlsQMLA():
         self.unique_growth_rule_instances = {
             gen : get_growth_rule.get_growth_generator_class(
                     growth_generation_rule = gen, 
-                    use_experimental_data = self.use_experimental_data, 
+                    # use_experimental_data = self.use_experimental_data, 
                     log_file = self.log_file
                 )
             for gen in self.alternative_growth_rules
@@ -107,11 +111,20 @@ class ControlsQMLA():
 
         self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
         
+        log_print([
+            "qhl models retrieved"
+        ], log_file=self.log_file)
         if arguments.true_params_pickle_file is None: 
-            true_params_info = qmla.set_shared_parameters(
-                growth_class = self.growth_class,  
-                # all_growth_rules = # TODO get list of growth rules here
-            )
+            try:
+                true_params_info = qmla.set_shared_parameters(
+                    growth_class = self.growth_class,  
+                    # all_growth_rules = # TODO get list of growth rules here
+                )
+            except:
+                log_print([
+                    "Failed to set shared parameters"
+                ], log_file=self.log_file)
+                raise
         else:
             # true_params_pickle_file = arguments.true_params_pickle_file
             true_params_info = pickle.load(
@@ -120,6 +133,7 @@ class ControlsQMLA():
                     'rb'
                 )
             )
+        log_print([ "shared params set"], log_file=self.log_file)
         self.true_params_pickle_file = arguments.true_params_pickle_file
         self.true_model = true_params_info['true_model']
         self.true_model_name = database_framework.alph(self.true_model)
@@ -128,30 +142,13 @@ class ControlsQMLA():
         )
         self.true_model_terms_matrices = self.true_model_class.constituents_operators
         self.true_model_terms_params = true_params_info['params_list']
-        
+        log_print([
+            "True model set."
+        ], log_file=self.log_file)
         # derive required info from data from growth rule and arguments
-        if self.use_experimental_data == True:
-            true_ham = None
-            self.true_params_dict = None
-            self.true_params_list = []
-        else:
-            self.true_params_dict = true_params_info['params_dict']
-            self.true_params_list = [
-                self.true_params_dict[p]
-                for p in self.true_model_class.constituents_names
-            ]
-            # generate true hamiltonian for simulated case
-            true_ham = None
-            for k in list(self.true_params_dict.keys()):
-                param = self.true_params_dict[k]
-                mtx = database_framework.compute(k)
-                if true_ham is not None:
-                    true_ham += param * mtx
-                else:
-                    true_ham = param * mtx
-
-        self.true_hamiltonian = true_ham
-        
+        # self.true_hamiltonian = self.growth_class.true_hamiltonian
+        # self.true_params_dict = self.growth_class.true_params_dict
+        # self.true_params_list = self.growth_class.true_params_list            
         
         # get parameters from arguments passed to implement_qmla.py
         self.prior_pickle_file = arguments.prior_pickle_file
@@ -179,12 +176,11 @@ class ControlsQMLA():
         self.cumulative_csv = arguments.cumulative_csv
         self.true_expec_path = arguments.true_expec_path
         self.probes_plot_file = arguments.probes_plot_file
-        self.latex_mapping_file = arguments.latex_mapping_file
         self.reallocate_resources = bool(arguments.reallocate_resources)
         self.probe_noise_level = arguments.probe_noise_level # TODO put in growth rule
 
         # create some new parameters
-        if self.results_directory[-1] != '/':
+        if not self.results_directory.endswith('/'):
             self.results_directory += '/'
 
         self.plots_directory = self.results_directory + 'plots/'
@@ -201,7 +197,12 @@ class ControlsQMLA():
                 pass
 
         self.long_id = '{0:03d}'.format(self.qmla_id)
-
+        self.latex_mapping_file = arguments.latex_mapping_file
+        if self.latex_mapping_file is None: 
+            self.latex_name_map_file_path = os.path.join(
+                self.results_directory, 
+                'LatexMapping.txt'
+            )
 
         if self.further_qhl == True:
             self.results_file = self.results_directory + 'further_qhl_results_' + \
@@ -222,7 +223,8 @@ def parse_cmd_line_args(args):
     Defaults and help for all useable command line arguments are specified here.
     These are parsed, then passed to a ControlsQMLA instance for ease of access. 
 
-    :param args: command line arguments (e.g. sys.argv[1:]).
+    :param list args: command line arguments (e.g. sys.argv[1:]).
+    :return ControlsQMLA 
     """
 
     parser = argparse.ArgumentParser(description='Pass variables for QMLA.')
@@ -410,7 +412,7 @@ def parse_cmd_line_args(args):
         help='Rule applied for generation of new models during QMD. \
         Corresponding functions must be built into model_generation',
         type=str,
-        default='GrowthRuleSuper'
+        default='GrowthRule'
     )
 
     parser.add_argument(

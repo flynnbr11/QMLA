@@ -3,8 +3,7 @@ import itertools
 import sys
 import os
 
-from qmla.growth_rules import growth_rule_super
-from qmla import experiment_design_heuristics
+from qmla.growth_rules import growth_rule
 import qmla.shared_functionality.topology
 import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
@@ -16,9 +15,8 @@ __all__ = [
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]
 
-
 class ConnectedLattice(
-    growth_rule_super.GrowthRuleSuper
+    growth_rule.GrowthRule
 ):
 
     def __init__(
@@ -31,7 +29,6 @@ class ConnectedLattice(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        # self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.lattice_dimension = 2
         self.initial_num_sites = 2
         self.lattice_connectivity_max_distance = 1
@@ -74,13 +71,6 @@ class ConnectedLattice(
         # which may change attributes defined above, calculate 
         # further attributes based on those, e.g. max num generations 
         # based on max num sites, defined by the class inheriting. 
-        self.log_print(
-            [
-                "In Growth class setup fnc for {}.".format(
-                    self.growth_generation_rule
-                )
-            ]
-        )
         self.max_num_generations = (
             self.max_num_sites -
             self.initial_num_sites +
@@ -115,6 +105,9 @@ class ConnectedLattice(
         )
         self.spawn_stage = ['Start']
         if not self.tree_completed_initially:
+            self.log_print([
+                "Getting initial models from generate_models"
+            ])
             self.initial_models = self.generate_models(
                 model_list=['']
             )
@@ -163,8 +156,7 @@ class ConnectedLattice(
                 models_to_build_on = ranked_model_list[:
                     self.num_top_models_to_build_on
                 ]
-
-
+                
             self.sub_generation_idx += 1
             self.generation_champs[self.generation_DAG][self.sub_generation_idx] = [
                 kwargs['model_names_ids'][models_to_build_on[0]]
@@ -368,6 +360,7 @@ class ConnectedLattice(
 
         # term_type_markers = ['pauliSet', 'transverse']
         transverse_axis = None
+        ising_axis = None
         for term in separate_terms:
             components = term.split('_')
             if 'pauliSet' in components:
@@ -384,6 +377,15 @@ class ConnectedLattice(
                 # assumes like-like pauli terms like xx, yy, zz
                 op = operators[0]
                 site_connections[sites].append(op)
+            elif '1Dising' in components:
+                components.remove('1Dising')
+                for l in components:
+                    if l[0] == 'd':
+                        dim = int(l.replace('d', ''))
+                    elif l[0] == 'i':
+                        ising_axis = str(l.replace('i', ''))
+                    elif l[0] == 't':
+                        transverse_axis = str(l.replace('t', ''))
             elif 'transverse' in components:
                 components.remove('transverse')
                 for l in components:
@@ -405,8 +407,16 @@ class ConnectedLattice(
                     this_term += "{}".format(t)
                 this_term += "}"
                 latex_term += this_term
+        if ising_axis is not None:
+            this_term = r"\sigma_{"
+            this_term += str(ising_axis)
+            this_term += "}^{\otimes"
+            this_term += str(dim)
+            this_term += "}"
+            latex_term += this_term
         if transverse_axis is not None:
-            latex_term += 'T^{}_{}'.format(transverse_axis, transverse_dim)
+            latex_term += 'T_{}^{}'.format(transverse_axis, dim)
+
         latex_term = "${}$".format(latex_term)
         return latex_term
 
@@ -519,6 +529,14 @@ class ConnectedLattice(
             latex_mapping_file=latex_mapping_file,
             **kwargs
         )
+
+    def tree_pruning(
+        self, 
+        **kwargs
+    ):
+        champion_models = [b.champion_name for b in list(self.tree.branches.values())]
+        self.prune_complete = True
+        return champion_models, 'all'
 
 
 

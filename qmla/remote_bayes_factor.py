@@ -89,8 +89,9 @@ def remote_bayes_factor_calculation(
             log_file = log_file, 
             log_identifier = 'BF ({}/{})'.format(model_a_id, model_b_id)
         )
-    
+    timings = {}
     time_start = time.time()
+    t_init = time.time()
     redis_databases = rds.get_redis_databases_by_qmla_id(host_name, port_number, qid)
     qmla_core_info_database = redis_databases['qmla_core_info_database']
     learned_models_info_db = redis_databases['learned_models_info_db']
@@ -100,9 +101,11 @@ def remote_bayes_factor_calculation(
     active_branches_learning_models = redis_databases['active_branches_learning_models']
     active_branches_bayes = redis_databases['active_branches_bayes']
     active_interbranch_bayes = redis_databases['active_interbranch_bayes']
+    timings['load_database'] = time.time() - t_init
 
+    t_init = time.time()
     qmla_core_info_dict = pickle.loads(redis_databases['qmla_core_info_database']['qmla_settings'])
-    use_experimental_data = qmla_core_info_dict['use_experimental_data']
+    timings['unpickling_core_info'] = time.time() - t_init
     experimental_data_times = qmla_core_info_dict['experimental_measurement_times']
 
     linspace_times_for_bayes_factor_comparison = False
@@ -120,7 +123,7 @@ def remote_bayes_factor_calculation(
             else:
                 return (1.0 / bayes_factor)
     else:
-
+        t_init = time.time()
         model_a = QML.ModelInstanceForComparison(
             model_id=model_a_id,
             qid=qid,
@@ -135,6 +138,7 @@ def remote_bayes_factor_calculation(
             host_name=host_name,
             port_number=port_number,
         )
+        timings['instantiating_models'] = time.time() - t_init
 
         # By default, use times the other model trained on,
         # up to t_idx given.
@@ -172,6 +176,7 @@ def remote_bayes_factor_calculation(
                 file=write_log_file
             )
 
+        t_init = time.time()
         updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
         log_l_a = log_likelihood(
             model_a,
@@ -179,17 +184,19 @@ def remote_bayes_factor_calculation(
             binning=set_renorm_record_to_zero,
             log_file = log_file, 
         )
+        timings['log_likelihood_a'] = time.time() - t_init
+        t_init = time.time()
         log_l_b = log_likelihood(
             model_b,
             update_times_model_b,
             binning=set_renorm_record_to_zero,
             log_file = log_file, 
         )
+        timings['log_likelihood_b'] = time.time() - t_init
 
         # after learning, want to see what dynamics are like after further
         # updaters
         bayes_factor = np.exp(log_l_a - log_l_b)
-
         if (
             save_plots_of_posteriors == True
             and
@@ -251,16 +258,13 @@ def remote_bayes_factor_calculation(
             except BaseException:
                 raise
                 # pass
-
         log_print(
             [
-                "BF computed: A:{}; B:{}; BF:{}".format(
+                "BF computed: A:{}; B:{}; log10 BF={}".format(
                     model_a_id,
                     model_b_id,
-                    np.round(bayes_factor, 2)
-                ),
-                "\tReset remormalisation record:",
-                set_renorm_record_to_zero
+                    np.round(np.log10(bayes_factor), 2)
+                )
             ]
         )
         if bayes_factor < 1e-160:
@@ -272,6 +276,7 @@ def remote_bayes_factor_calculation(
             model_a_id, model_b_id
         )
         print("Bayes Factor:", pair_id)
+        t_init = time.time()
         if float(model_a_id) < float(model_b_id):
             # so that BF in db always refers to (low/high), not (high/low).
             bayes_factors_db.set(pair_id, bayes_factor)
@@ -287,18 +292,22 @@ def remote_bayes_factor_calculation(
 
         if branch_id is not None:
             # only want to fill these lists when comparing models within branch
-            # log_print(["Redis INCR active_branches_bayes branch:", branch_id])
             active_branches_bayes.incr(int(branch_id), 1)
         else:
             active_interbranch_bayes.set(pair_id, True)
-            # log_print(["Redis SET active_interbranch_bayes pair:", pair_id,
-            #     "; set:True"]
-            # )
+        timings['update_databases'] = time.time() - t_init
         time_end = time.time()
+        timings['total'] = time.time() - time_start
+
+        for k in timings:
+            log_print([
+                "Timing - {}: {}".format(k, np.round(timings[k], 2))
+            ])
         log_print(
             [
                 "Finished. rq time: ",
-                str(time_end - time_start)
+                str(time_end - time_start),
+                "\nBF time unaccounted for:", 2*timings['total'] - sum(timings.values())
             ]
         )
 
@@ -338,28 +347,26 @@ def log_likelihood(
         updater.log_total_likelihood = 0
         print("BINNING")
 
+    print_freq = max(
+        int( len(times) / 5), 
+        5
+    )
+
     for i in range(len(times)):
+        if i%print_freq == 0:
+            log_print([
+                "Step {}".format(i),
+                ],
+                log_file = log_file,
+                log_identifier = "BF {}. t={}".format(model.model_id, np.round(times[i], 2))
+            )
         exp = get_exp(model, [times[i]])
         params_array = np.array([[model.true_model_params[:]]])
-        # log_print(
-        #     to_print_list = [
-        #         "Getting datum"
-        #     ], 
-        #     log_file = log_file, 
-        #     log_identifier = 'log_likelihood'
-        # )
         datum = updater.model.simulate_experiment(
             params_array,
             exp,
             repeat=1
         )
-        # log_print(
-        #     to_print_list = [
-        #         "Performing update"
-        #     ], 
-        #     log_file = log_file, 
-        #     log_identifier = 'log_likelihood'
-        # )
         updater.update(datum, exp)
 
     log_likelihood = updater.log_total_likelihood

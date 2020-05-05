@@ -228,7 +228,9 @@ def plot_dynamics_multiple_models(
         # times = sorted(list(experimental_measurements.keys()))
         true_times = sorted(list(expectation_values.keys()))
         times = sorted(list(expectation_values.keys()))
-        times = [np.round(t, 2) for t in times]
+        times = [
+            np.round(t, 2) if t>0.1 else t for t in times
+        ]
         flag = True
         one_sample = True
         for t in times:

@@ -14,9 +14,10 @@ additional_growth="-agr=ising_1d_chain -agr=hubbard_square_lattice_generalised"
 # -ggr='hubbard_square_lattice_generalised' \
 
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
-growth_rule='fermi_hubbard_predetermined'
+# growth_rule='IsingLatticeSet'
+growth_rule='HeisenbergLatticeSet'
 num_experiments=250
-num_particles=1000
+num_particles=750
 
 
 python3 time_required_calculation.py \
@@ -25,7 +26,7 @@ python3 time_required_calculation.py \
 	-use_agr=0 \
 	-e=$num_experiments \
 	-p=$num_particles \
-	-bt=425 \
+	-bt=$num_experiments \
 	-proc=1 \
 	-res=0 \
 	-time_insurance=1 \
@@ -36,4 +37,4 @@ python3 time_required_calculation.py \
 	-num_proc_env="NUM_PROC"
 
 
-echo "TIME requested " $QMD_TIME
+echo "TIME requested $QMD_TIME" 

@@ -71,14 +71,14 @@ def generational_analysis(combined_results, save_directory=None):
         showfliers=False, 
         ax = ax1, 
     )
-    sns.swarmplot(
-        data = generational_scores, 
-        x = 'gen',
-        y = 'f_score',
-        # showfliers=False, 
-        color='grey',
-        ax = ax1, 
-    )
+    # sns.swarmplot(
+    #     data = generational_scores, 
+    #     x = 'gen',
+    #     y = 'f_score',
+    #     # showfliers=False, 
+    #     color='grey',
+    #     ax = ax1, 
+    # )
 
     ax1.set_ylabel('F score')
     ax1.set_xlabel('Generation')

@@ -32,7 +32,7 @@ import sklearn
 import seaborn as sns
 
 import qmla.get_growth_rule as get_growth_rule
-import qmla.experimental_data_processing as expdt
+import qmla.shared_functionality.experimental_data_processing
 import qmla.shared_functionality.expectation_values
 import qmla.database_framework as database_framework
 
@@ -213,7 +213,6 @@ def fill_between_sigmas(
 def plot_parameter_estimates(
     qmd,
     model_id,
-    use_experimental_data=False,
     save_to_file=None
 ):
     from matplotlib import cm
@@ -246,23 +245,10 @@ def plot_parameter_estimates(
 
     cm_subsection = np.linspace(0, 0.8, num_terms)
     colours = [cm.magma(x) for x in cm_subsection]
-#    colours = [ cm.Set1(x) for x in cm_subsection ]
-
-#    colours = ['b','r','g','orange', 'pink', 'grey']
-
     # TODO use color map as list
-    # num_epochs = qmd.num_experiments
     num_epochs = mod.num_experiments
-#    fig = plt.figure()
-#    ax = plt.subplot(111)
-
-    # ncols=3
-    # nrows=3 # TODO  -- make safe
     ncols = int(np.ceil(np.sqrt(num_terms)))
     nrows = int(np.ceil(num_terms / ncols))
-
-#    nrows=int(np.ceil( num_terms/ncols ))
-
     fig, axes = plt.subplots(
         figsize=(10, 7),
         nrows=nrows,
@@ -279,19 +265,18 @@ def plot_parameter_estimates(
         colour = colours[i % len(colours)]
         i += 1
         try:
-            if use_experimental_data == False:
-                y_true = qmd.true_param_dict[term]
-                true_term_latex = qmd.growth_class.latex_name(
-                    name=term
-                )
-                true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
+            y_true = qmd.true_param_dict[term]
+            true_term_latex = qmd.growth_class.latex_name(
+                name=term
+            )
+            true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
 
-                ax.axhline(
-                    y_true,
-                    label=str(true_term_latex),
-                    color='red',
-                    linestyle='--'
-                )
+            ax.axhline(
+                y_true,
+                label=str(true_term_latex),
+                color='red',
+                linestyle='--'
+            )
         except BaseException:
             pass
         y = np.array(param_estimate_by_term[term])
@@ -354,14 +339,19 @@ def plot_learned_models_dynamics(
     include_param_estimates=False,
     save_to_file=None
 ):
-    if qmd.qhl_mode == True:
-        model_ids = [qmd.true_model_id]
-        include_bayes_factors = False
-    elif qmd.qhl_mode_multiple_models == True:
-        model_ids = list(qmd.qhl_mode_multiple_models_model_ids)
-        include_bayes_factors = False
-    elif model_ids is None:
-        model_ids = list(qmd.branch_champions.values())
+    # if qmd.qhl_mode == True:
+    #     model_ids = [qmd.true_model_id]
+    #     include_bayes_factors = False
+    # elif qmd.qhl_mode_multiple_models == True:
+    #     model_ids = list(qmd.qhl_mode_multiple_models_model_ids)
+    #     include_bayes_factors = False
+    # elif model_ids is None:
+    #     model_ids = [
+    #         self.branches[b].champion_id
+    #         for b in self.branches
+    #     ]
+
+        # model_ids = list(qmd.branch_champions.values())
 
     model_ids = list(sorted(set(model_ids)))  # only uniques values
     true_expec_vals = pickle.load(
@@ -372,6 +362,10 @@ def plot_learned_models_dynamics(
     # TODO this is overwritten within for loop below so that large
     # Hamiltonians don't have to work out each time step
     true_exp = [true_expec_vals[t] for t in times_to_plot]
+    qmd.log_print([
+        "[Dynamics plot] plot probe file:", qmd.qmla_controls.probes_plot_file,
+        "\n true expectation value path:", qmd.qmla_controls.true_expec_path 
+    ])
     plot_probes = pickle.load(
         open(qmd.qmla_controls.probes_plot_file, 'rb')
     )
@@ -408,6 +402,9 @@ def plot_learned_models_dynamics(
     col = 0
 
     for mod_id in model_ids:
+        qmd.log_print([
+            "Plotting dynamics for model {}".format(mod_id)
+        ])
         reduced = qmd.get_model_storage_instance_by_id(mod_id)
         reduced.compute_expectation_values(
             times=qmd.times_to_plot
@@ -459,7 +456,7 @@ def plot_learned_models_dynamics(
             #     "\n\tprobe:", probe
 
             # )
-            expec_vals = {}
+            # expec_vals = {}
             if dim > 4:
                 times_to_plot = times_to_plot[0::5]
 
@@ -494,7 +491,13 @@ def plot_learned_models_dynamics(
                 # label = dynamics_label
                 label=desc
             )
+            # qmd.log_print([
+            #     "[Dynamics plot]",
+            #     "sim_exp:", sim_exp[0:20],
+            #     "true exp:", true_exp[0:20]
+            # ])
     #         ax.legend()
+            ax.set_ylim(-0.05, 1.05)
 
             if row == 0:
                 ax.set_title('Expectation Values')
@@ -617,18 +620,18 @@ def plot_learned_models_dynamics(
                 colour = colours[i % len(colours)]
                 i += 1
                 try:
-                    if use_experimental_data == False:
-                        y_true = qmd.true_param_dict[term]
-                        true_term_latex = qmd.growth_class.latex_name(
-                            name=term
-                        )
+                    y_true = qmd.true_param_dict[term]
+                    true_term_latex = qmd.growth_class.latex_name(
+                        name=term
+                    )
 
-                        ax.axhline(
-                            y_true,
-                            label=str(
-                                true_term_latex +
-                                ' True'),
-                            color=colour)
+                    ax.axhline(
+                        y_true,
+                        ls='--',
+                        label=str(
+                            true_term_latex +
+                            ' True'),
+                        color=colour)
                 except BaseException:
                     pass
                 y = np.array(param_estimate_by_term[term])
@@ -907,8 +910,8 @@ def r_squared_from_epoch_list(
     if max_time is None:
         max_time = max(exp_times)
 
-    min_time = expdt.nearest_experimental_time_available(exp_times, 0)
-    max_time = expdt.nearest_experimental_time_available(exp_times, max_time)
+    min_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(exp_times, 0)
+    max_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(exp_times, max_time)
     min_data_idx = exp_times.index(min_time)
     max_data_idx = exp_times.index(max_time)
     exp_times = exp_times[min_data_idx:max_data_idx]

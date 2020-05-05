@@ -2,20 +2,23 @@ import random
 import sys
 import os
 
+import pickle 
+
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
-# from  qmla import qmla.shared_functionality.probe_set_generation.
+import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
+import  qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.expectation_values
 from qmla import database_framework
 
 
 __all__ = [
-    'ExperimentNVCentre'
+    'ExperimentNVCentre',
+    'NVCentreExperimentalData'
 ]
 
 class ExperimentNVCentre(
     nv_centre_full_access.ExperimentFullAccessNV  # inherit from this
-    # GrowthRuleSuper # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
@@ -26,7 +29,7 @@ class ExperimentNVCentre(
         growth_generation_rule,
         **kwargs
     ):
-        from qmla import experiment_design_heuristics
+        
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule=growth_generation_rule,
@@ -37,18 +40,10 @@ class ExperimentNVCentre(
         else:
             self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
 
-        # self.true_model = 'xTiPPyTy'
-        self.model_heuristic_function = experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
-        # self.measurement_type = 'hahn'
-
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.true_model = 'xTiPPyTiPPzTiPPzTz'
-        # self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
 
         self.initial_models = ['xTi', 'yTi', 'zTi']
-        # self.initial_models = [
-        #     'xTiPPyTiPPzTiPPzTz',
-        #     'xTiPPyTiPPyTyPPzTiPPzTz',
-        # ]
         self.tree_completed_initially = False
         self.qhl_models = [
             # 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
@@ -117,3 +112,61 @@ class ExperimentNVCentre(
             2: 18,
             'other': 1
         }
+
+
+class NVCentreExperimentalData(
+    ExperimentNVCentre
+):
+    def __init__(
+        self,
+        growth_generation_rule,
+        **kwargs
+    ):
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            **kwargs
+        )
+        # TODO this is a hack - there is no true model so this generaates true parameter
+        # for an unused term so it doesn't interfere
+        # this should be looked after by not having a true model in these cases (?)
+        self.true_model = 'xTiPPyTiPPzTiPPzTz'
+        # self.true_model = 'iTi'
+        # self.max_spawn_depth = 3
+        self.true_model = qmla.database_framework.alph(self.true_model) 
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.hahn_evolution
+        self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.simulator_probe_generation_function = self.probe_generation_function
+        self.shared_probes = False
+        self.max_time_to_consider = 4.24
+
+    def get_true_parameters(
+        self,
+    ):        
+        self.fixed_true_terms = True
+        self.true_hamiltonian = None
+        self.true_params_dict = {}
+        self.true_params_list = []
+
+
+    def get_measurements_by_time(
+        self
+    ):
+        data_path = os.path.abspath(
+            os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                'data/NVB_rescale_dataset.p'
+            )
+        )
+        self.log_print(
+            [
+                "Getting experimental data from {}".format(data_path)
+            ]
+        )
+        self.measurements = pickle.load(
+            open(
+                data_path,
+                'rb'
+            )
+        )
+        return self.measurements

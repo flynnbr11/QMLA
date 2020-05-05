@@ -1,13 +1,14 @@
 import sys
 import os
 
-from qmla.growth_rules import growth_rule_super
+from qmla.growth_rules import growth_rule
+import qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
 
 
 class GrowthRuleTemplate(
-    growth_rule_super.GrowthRuleSuper  # inherit from this
+    growth_rule.GrowthRule  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
@@ -18,7 +19,6 @@ class GrowthRuleTemplate(
         growth_generation_rule,
         **kwargs
     ):
-        from qmla import experiment_design_heuristics
         # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule=growth_generation_rule,

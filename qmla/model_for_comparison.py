@@ -1,3 +1,8 @@
+r"""
+Model for comparison stuff
+
+"""
+
 import numpy as np
 import scipy as sp
 import os
@@ -9,17 +14,18 @@ import redis
 import pickle
 
 import qmla.redis_settings as rds
-import qmla.qinfer_model_interface as qml_qi
+# import qmla.qinfer_model_interface as qml_qi
 import qmla.memory_tests
 import qmla.logging
 import qmla.get_growth_rule as get_growth_rule
-# import qmla.experimental_data_processing as expdt
-import qmla.experimental_data_processing
 import qmla.database_framework
 import qmla.analysis
 
 pickle.HIGHEST_PROTOCOL = 4
 
+__all__ = [
+    'ModelInstanceForComparison'
+]
 
 class ModelInstanceForComparison():
     """
@@ -70,7 +76,8 @@ class ModelInstanceForComparison():
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
-        self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
+        self.true_param_dict = qmla_core_info_dict['true_param_dict']
+        # self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         self.results_directory = qmla_core_info_dict['results_directory']
@@ -117,7 +124,7 @@ class ModelInstanceForComparison():
         self.growth_rule_of_this_model = learned_model_info['growth_generator']
         self.growth_class = get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.growth_rule_of_this_model,
-            use_experimental_data=self.use_experimental_data,
+            # use_experimental_data=self.use_experimental_data,
             log_file=self.log_file
         )
         self.model_prior = learned_model_info['final_prior']
@@ -130,22 +137,21 @@ class ModelInstanceForComparison():
         self.covariance_mtx_final = learned_model_info['final_cov_mat']
         log_identifier = str("Bayes " + str(self.model_id))
 
-        self.qinfer_model = qml_qi.QInferModelQML(
+        self.qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters_final,
             oplist=self.model_terms_matrices,
             true_oplist=self.true_model_constituent_operators,
             truename=self.true_model_name,
             trueparams=self.true_model_params,
+            true_param_dict = self.true_param_dict, 
             num_probes=self.probe_number,
             probe_dict=self.probes_system,
             sim_probe_dict=self.probes_simulator,
             growth_generation_rule=self.growth_rule_of_this_model,
-            use_experimental_data=self.use_experimental_data,
+            # use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
-            experimental_measurement_times=(
-                self.experimental_measurement_times
-            ),
+            experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
             # measurement_type=self.measurement_class,
             # log_identifier=log_identifier

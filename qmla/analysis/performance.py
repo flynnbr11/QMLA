@@ -3,12 +3,14 @@ import argparse
 import sys
 import os
 import pickle
+import csv
 import pandas as pd
 import seaborn as sns
 
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.gridspec import GridSpec
+import scipy
 
 import qmla.database_framework
 
@@ -20,12 +22,12 @@ __all__ = [
     'plot_scores',
     'stat_metrics_histograms',
     'parameter_sweep_analysis',
-    'plot_evaluation_log_likelihoods'
+    'plot_evaluation_log_likelihoods',
+    'count_term_occurences',
+    'inspect_times_on_nodes'
 ]
 
 def update_shared_bayes_factor_csv(qmd, all_bayes_csv):
-    import os
-    import csv
     data = get_bayes_latex_dict(qmd)
     names = list(data.keys())
     fields = ['ModelName']
@@ -843,15 +845,20 @@ def parameter_sweep_analysis(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
+def round_nearest(x,a):
+    return round(round(x/a)*a ,2)
+
 def plot_evaluation_log_likelihoods(
     combined_results, 
     include_log_likelihood = True,
     include_median_likelihood = True,
+    include_champion_percentiles = True,
     save_directory=None,
 ):
     evaluation_cols = [
         'instance', 'model_id', 
         'log_likelihood', 'median_likelihood',
+        'likelihood_percentile',
         'f_score', 'true', 'champ', 'Classification'
     ]
     evaluation_plot_df = pd.DataFrame(
@@ -861,6 +868,7 @@ def plot_evaluation_log_likelihoods(
         res = combined_results.iloc[i]
 
         log_lls = eval(res.ModelEvaluationLogLikelihoods)
+        raw_lls = list(log_lls.values())
         median_lls = eval(res.ModelEvaluationMedianLikelihoods)
         f_scores = eval(res.AllModelFScores)
 
@@ -883,13 +891,21 @@ def plot_evaluation_log_likelihoods(
             else:
                 model_classification = 'Standard'
 
+            ll_percentile = scipy.stats.percentileofscore(
+                a = raw_lls, 
+                score = log_lls[mod],
+                kind='weak'
+            )
+            ll_percentile = round_nearest(ll_percentile, 5)
+            
             this_mod_df = pd.DataFrame(
                 [[
-                    i, # for some reason instance causes a shift between the two plot types?
-                    # instance, 
+                    # i, # for some reason instance causes a shift between the two plot types?
+                    instance, 
                     mod, 
                     log_lls[mod],
                     median_lls[mod],
+                    ll_percentile, 
                     f_scores[mod],
                     mod==instance_true_id,
                     mod==instance_champion_id,
@@ -904,12 +920,13 @@ def plot_evaluation_log_likelihoods(
     evaluation_plot_df.instance = evaluation_plot_df.instance.astype(int)
     
     sub_df = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard']
+    # sub_df.instance = sub_df.instance.astype(int)
     all_markers = {
         'True + Champion' : 'D',
         'True' : 'X',
         'Champion' : 'D'
     }
-    msize = 75
+    msize = 10
     marker_sizes = {
         'True + Champion' : msize,
         'True' : msize,
@@ -917,13 +934,18 @@ def plot_evaluation_log_likelihoods(
     }
     all_colours = {
         'True + Champion' : 'darkgreen',
-        'True' : 'darkgreen',
+        'True' : 'navy',
         'Champion' : 'darkorange'
     }
     unique_classifications = sub_df.Classification.unique()
 
     # Plot evaluation(s)
-    num_plots = include_median_likelihood + include_log_likelihood
+    num_plots = (
+        include_median_likelihood 
+        + include_log_likelihood
+        + include_champion_percentiles
+    )
+    n_plots = 0 
     fig = plt.figure(
         figsize=(17, 9),
         tight_layout=True
@@ -934,44 +956,61 @@ def plot_evaluation_log_likelihoods(
     )
     if include_log_likelihood:
         ax1 = fig.add_subplot(gs[0, 0])
+        n_plots += 1
         sns.boxplot(
             y = 'log_likelihood', 
             x = 'instance', 
             data = evaluation_plot_df,
             ax = ax1,
             color='lightblue',
-            showfliers=False
+            showfliers=True
         )
-        ax1.set_ylabel('Log likelihood')
-        ax1.set_xlabel('Instance')
-        sns.scatterplot(
+        # using swarm plot since it needs to be categorical to share axis correctly with boxplot
+        sns.swarmplot(
             y = 'log_likelihood', 
             x = 'instance', 
             data = sub_df, 
             ax = ax1,
-            style='Classification',
-            markers={
-                c : all_markers[c]
-                for c in unique_classifications
-            },
-            s = msize,
+            size = msize,
             hue = 'Classification',
             palette = {
                 c : all_colours[c] 
                 for c in unique_classifications
             },
         )
+
+
+        # sns.scatterplot(
+        #     y = 'log_likelihood', 
+        #     x = 'instance', 
+        #     data = sub_df, 
+        #     # data = evaluation_plot_df[ evaluation_plot_df.Classification != 'Standard'], 
+        #     ax = ax1,
+        #     style='Classification',
+        #     markers={
+        #         c : all_markers[c]
+        #         for c in unique_classifications
+        #     },
+        #     s = msize,
+        #     hue = 'Classification',
+        #     palette = {
+        #         c : all_colours[c] 
+        #         for c in unique_classifications
+        #     },
+        # )
         ax1.set_ylabel('Log likelihood')
         ax1.set_xlabel('Instance')
-        ax1.set_xticks(
-            []
-            # list(range(evaluation_plot_df.instance.min(), 1+evaluation_plot_df.instance.max()))
-        )
+        if len(sub_df.instance.unique()) > 40:
+            # don't list all instance IDs if too many to view easily
+            ax1.set_xticks(
+                np.arange(0, max(sub_df.instance.unique()) , 5)
+            )
         ax1.legend()    
         ax1.set_title('Model log likelihoods')
     if include_median_likelihood:
         # median likelihoods
-        ax2 = fig.add_subplot(gs[1, 0])
+        ax2 = fig.add_subplot(gs[n_plots, 0])
+        n_plots += 1
         sns.boxplot(
             y = 'median_likelihood', 
             x = 'instance', 
@@ -998,12 +1037,76 @@ def plot_evaluation_log_likelihoods(
             }
         )
         ax2.set_ylim(0,1)
-        ax2.set_xticks([])
+        # ax2.set_xticks([])
         ax2.set_ylabel('Median likelihood')
         ax2.set_xlabel('Instance')
         ax2.set_title('Model likelihoods (median)')
 
-    # plt.suptitle('Evaluation by individual instances')
+
+    if include_champion_percentiles:
+        # plot evaluation percentileof champion models
+        ax = fig.add_subplot(gs[n_plots, 0])
+        n_plots += 1
+        ax.set_ylabel('Percentile of champion')
+        ax.set_xlabel('# Champions')
+        ax.set_title('(True) Champion models percentile log likelihood')
+
+        
+        true_champ_df = evaluation_plot_df[
+            (evaluation_plot_df.Classification=='True + Champion') 
+        ]
+        true_df = evaluation_plot_df[
+            (evaluation_plot_df.Classification=='True') 
+        ]
+        champ_df = evaluation_plot_df[
+            (evaluation_plot_df.Classification=='Champion') 
+        ]
+        percentiles = np.arange(0,101,5)
+        true_champ_perc = corresponding_percentile_frequencies(
+            subset_to_inspect = true_champ_df,
+            percentiles = percentiles
+        )
+        true_perc = corresponding_percentile_frequencies(
+            subset_to_inspect = true_df,
+            percentiles = percentiles
+        )
+        champ_perc = corresponding_percentile_frequencies(
+            subset_to_inspect = champ_df,
+            percentiles = percentiles
+        )
+        # horizontal bar plot
+        barheight = 4
+        ax.barh(
+            percentiles, 
+            true_champ_perc,
+            height=barheight,
+            label='True + Champion',
+            color=all_colours['True + Champion']
+        )
+
+        ax.barh(
+            percentiles, 
+            champ_perc, 
+            height=barheight,
+            label='Champion', 
+            color=all_colours['Champion'],
+            left = true_champ_perc
+        )
+
+        ax.barh(
+            percentiles, 
+            true_perc,
+            height=barheight,
+            label='True',
+            color=all_colours['True'],
+            left = [sum(x) for x in zip(champ_perc, true_champ_perc)]
+        )
+        ax.axhline(
+            50, ls='--', color='black', label='Median',alpha=0.3
+        )
+        ax.legend()        
+
+        
     if save_directory is not None: 
         plt.savefig(
             os.path.join(
@@ -1016,6 +1119,158 @@ def plot_evaluation_log_likelihoods(
         evaluation_plot_df.to_csv(
             os.path.join(
                 save_directory, 
-                'evaluation_data.csv'
+                'data_evaluation_plot.csv'
+            )
+        )
+        sub_df.to_csv(
+            os.path.join(
+                save_directory, 
+                'data_classified_instances.csv'
+            )
+        )
+        
+    # return evaluation_plot_df
+
+def round_nearest(x,a):
+    return round(round(x/a)*a ,2)
+
+def corresponding_percentile_frequencies(subset_to_inspect, percentiles):
+    counted_percentiles = dict(
+        subset_to_inspect.likelihood_percentile.value_counts()
+    )
+    percentile_freqs = [
+        counted_percentiles[p]
+        if p in counted_percentiles else 0
+        for p in percentiles
+    ]
+    return percentile_freqs
+    
+
+def count_term_occurences(
+    combined_results, 
+    save_directory=None
+):
+    all_constituents = []
+    all_true_constituents = []
+    correct_term_counter = []
+
+    term_counter = {}
+    for i in list(combined_results.index):
+        res = combined_results.iloc[i]
+
+        constituents = eval(res['ConstituentTerms'])
+        all_constituents.extend(constituents)
+
+        true_constituents = eval(res['TrueModelConstituentTerms'])
+        all_true_constituents.extend(true_constituents)
+
+        num_correct = len(set(constituents).intersection(set(true_constituents)))
+        correct_term_counter.append(num_correct)
+
+        for term in constituents: 
+            term_in_true_model = term in true_constituents
+            try:
+                term_counter[term]['correct'] += bool(term_in_true_model)
+                term_counter[term]['incorrect'] += bool(not(term_in_true_model))
+                term_counter[term]['occurences'] += 1
+            except:
+                term_counter[term] = {}
+                term_counter[term]['correct'] = bool(term_in_true_model)
+                term_counter[term]['incorrect'] = bool(not(term_in_true_model))
+                term_counter[term]['occurences'] = 1
+
+    all_true_constituents = sorted(list(set(all_true_constituents)))
+    found_untrue_constituents = sorted( set(all_constituents) - set(all_true_constituents) )
+    terms_ordered_by_true_presence = all_true_constituents + found_untrue_constituents
+    terms_ordered_by_true_presence.reverse()
+
+    # correct = [term_counter[term]['correct'] for term in terms_ordered_by_true_presence]
+    # incorrect = [term_counter[term]['incorrect'] for term in terms_ordered_by_true_presence]
+    correct = [
+        term_counter[term]['correct'] 
+        if (term in term_counter) else 0
+        for term in terms_ordered_by_true_presence    
+    ]
+    incorrect = [
+        term_counter[term]['incorrect'] 
+        if (term in term_counter) else 0
+        for term in terms_ordered_by_true_presence
+    ]
+
+
+    fig, ax  = plt.subplots()
+
+    ax.barh(
+        terms_ordered_by_true_presence,
+        correct,
+        color='g',
+        left = None,
+        label='Correctly'
+    )
+
+    ax.barh(
+        terms_ordered_by_true_presence,
+        incorrect,
+        color='b',
+        left = correct,
+        label='Inorrectly'
+    )
+    ax.legend(
+        title='Identified:'
+    )
+    max_x = max([term_counter[t]['occurences'] for t in term_counter])
+    ax.set_xlim(0, max_x+1)
+    ax.set_xticks(range(0, max_x+1))
+    
+    if save_directory is not None:
+        plt.savefig(
+            os.path.join(
+                save_directory, 
+                'term_occurences.png'
+            )
+        )
+
+def inspect_times_on_nodes(combined_results, save_directory=None):
+    node_ids = []
+    process_ids = []
+    for i in combined_results['Host']: 
+        if i.startswith('node'):
+            node, process = i.replace('node', '').split('-')
+            node_ids.append(node)
+            process_ids.append(process)
+        else:
+            node_ids.append(str(-1))
+            process_ids.append(str(-1))
+
+    combined_results['Node'] = node_ids
+    combined_results['Process'] = process_ids
+
+    fig, ax = plt.subplots()
+    
+    sns.boxplot(
+        x = 'Node', 
+        y = 'Time', 
+        data = combined_results,
+        # hue='Process',
+        ax = ax, 
+    )
+    sns.swarmplot(
+        x = 'Node', 
+        y = 'Time', 
+        data = combined_results,
+        # hue='Process',
+        color='grey',
+        ax = ax, 
+    )
+    # ax.semilogy()
+    
+    ax.set_ylabel('Time (seconds)')
+    ax.set_title('Time of instances on each node')
+    
+    if save_directory is not None:
+        plt.savefig(
+            os.path.join(
+                save_directory, 
+                'times_v_node.png'
             )
         )

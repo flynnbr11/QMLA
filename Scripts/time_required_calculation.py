@@ -130,202 +130,6 @@ parser.add_argument(
 
 max_num_models_by_shape = {}
 
-
-# 2 qubits Ising growth rules. as in experimental case.
-
-max_num_models_by_shape['two_qubit_ising_rotation_hyperfine'] = {
-    1: 0,
-    (2, 1): 2,
-    (2, 2): 2,
-    2: 12,
-    'other': 0
-}
-
-max_num_models_by_shape['two_qubit_ising_rotation'] = {
-    1: 0,
-    (2, 1): 2,
-    (2, 2): 2,
-    2: 12,
-    'other': 0
-}
-
-
-max_num_models_by_shape['two_qubit_ising_rotation_hyperfine_transverse'] = {
-    1: 0,
-    #    (2, 1) : 2,
-    #    (2, 2) : 2,
-    2: 36,  # TODO generalise insurance factors, this should be 18, with a higher insurance factor since two exp per particle in hahn expec val
-    'other': 1
-}
-
-max_num_models_by_shape['NV_spin_full_access'] = {
-    1: 0,
-    #    (2, 1) : 2,
-    #    (2, 2) : 2,
-    2: 36,  # TODO generalise insurance factors, this should be 18, with a higher insurance factor since two exp per particle in hahn expec val
-    'other': 1
-}
-
-
-max_num_models_by_shape['NV_centre_experiment_debug'] = {
-    1: 0,
-    #    (2, 1) : 2,
-    #    (2, 2) : 2,
-    2: 4,  # TODO generalise insurance factors, this should be 18, with a higher insurance factor since two exp per particle in hahn expec val
-    'other': 1
-}
-
-
-max_num_models_by_shape['ExperimentReducedNV'] = {
-    1: 0,
-    #    (2, 1) : 2,
-    #    (2, 2) : 2,
-    2: 7,  # TODO generalise insurance factors, this should be 18, with a higher insurance factor since two exp per particle in hahn expec val
-    'other': 1
-}
-
-max_num_models_by_shape['NV_centre_spin_large_bath'] = {
-    8: 1,
-    9: 1,
-    'other': 0
-}
-
-
-##########
-# More general Ising models
-##########
-
-###
-# Noninteracting
-max_num_models_by_shape['non_interacting_ising'] = {
-    # (number_qubits, number_terms) : max number of models with those dimensions
-    # number_qubits : max number models of any number terms not specifically
-    # given here
-    'other': 3
-}
-
-max_num_models_by_shape['non_interacting_ising_single_axis'] = {
-    # (number_qubits, number_terms) : max number of models with those dimensions
-    # number_qubits : max number models of any number terms not specifically
-    # given here
-    'other': 1
-}
-
-max_num_models_by_shape['deterministic_noninteracting_ising_single_axis'] = {
-    # (number_qubits, number_terms) : max number of models with those dimensions
-    # number_qubits : max number models of any number terms not specifically
-    # given here
-    'other': 1
-}
-
-###
-# Interacting Ising. interaction restricted to nearest neighbours
-max_num_models_by_shape['interacting_nearest_neighbour_ising'] = {
-    # (number_qubits, number_terms) : max number of models with those dimensions
-    # number_qubits : max number models of any number terms not specifically
-    # given here
-    1: 0,
-    2: 3,
-    'other': 1
-}
-
-
-max_num_models_by_shape['interacing_nn_ising_fixed_axis'] = {
-    'other': 1
-}
-
-max_num_models_by_shape['deterministic_interacting_nn_ising_single_axis'] = {
-    1: 0,
-    'other': 1
-}
-
-
-# Transverse Ising
-max_num_models_by_shape['deterministic_transverse_ising_nn_fixed_axis'] = {
-    1: 3,
-    'other': 2
-}
-
-max_num_models_by_shape['ising_1d_chain'] = {
-    1: 0,
-    'other': 2,
-}
-
-
-##########
-# Heisenberg Models
-##########
-
-max_num_models_by_shape['heisenberg_nontransverse'] = {
-    1: 0,
-    2: 6,
-    3: 6,
-    'other': 6
-}
-
-
-max_num_models_by_shape['heisenberg_transverse'] = {
-
-    1: 0,
-    'other': 7
-}
-
-max_num_models_by_shape['heisenberg_xyz'] = {
-    1: 0,
-    'other': 2,
-}
-
-
-##########
-# Hubbard Models
-##########
-max_num_models_by_shape['hubbard'] = {
-    2: 3,
-    'other': 3
-}
-
-max_num_models_by_shape['hubbard_chain_just_hopping'] = {
-    2: 1,
-    'other': 1
-}
-
-max_num_models_by_shape['hubbard_chain'] = {
-    'other': 2
-}
-
-max_num_models_by_shape['hubbard_square_lattice_generalised'] = {
-    4: 2,
-    6: 2,
-    8: 2,
-    9: 2,
-    'other': 0
-}
-
-##########
-# Topology learning/Hopping
-##########
-max_num_models_by_shape['hopping_topology'] = {
-    2: 1,
-    3: 3,
-    4: 6,
-    5: 10,
-    6: 15,
-    7: 21,
-    8: 29,
-    9: 38,
-    'other': 0
-}
-
-
-##########
-# Other/Miscellaneous
-##########
-max_num_models_by_shape['PT_Effective_Hamiltonian'] = {
-    2: 1,
-    'other': 0
-}
-
-
 # Hamiltonian exponentiation times from testing qutips
 # expm function 100 times for each qubit size.
 hamiltonian_exponentiation_times = {
@@ -392,6 +196,9 @@ def time_required(
             try:
                 num_models_this_dimension = generator_max_num_models_by_shape[q]
             except BaseException:
+                print("num models {} not in generator_max_num_models_by_shape; taking default".format(
+                    q
+                ))
                 num_models_this_dimension = generator_max_num_models_by_shape['other']
             print("Gen:", gen, "max num models for ", q, "qubits:",
                   num_models_this_dimension
@@ -442,6 +249,8 @@ def time_required(
         minimum_allowed_time,
         int(further_qhl_time)
     )
+    for k in ['qmd', 'qhl', 'fqhl']:
+        times_reqd[k] *= growth_class.timing_insurance_factor
 
     return times_reqd
 

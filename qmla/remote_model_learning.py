@@ -17,9 +17,9 @@ import qmla.logging
 
 plt.switch_backend('agg')
 
-# Local files
-
-# Single function call, given qmla_core_data and a name, to learn model entirely.
+__all__ = [
+    'remote_learn_model_parameters'
+]
 
 def remote_learn_model_parameters(
     name,
@@ -51,7 +51,7 @@ def remote_learn_model_parameters(
     :param int branch_id: QMLA branch where the model was generated
     :param str growth_generator: string corresponding to a unique growth rule,
         used by get_growth_generator_class to generate a 
-        GrowthRuleSuper (or subclass) instance.
+        GrowthRule (or subclass) instance.
     :param dict qmla_core_info_dict: crucial data for QMLA, such as number 
         of experiments/particles etc. Default None: core info is stored on the 
         redis database so can be retrieved there on a server; if running locally, 
@@ -74,22 +74,34 @@ def remote_learn_model_parameters(
 
     log_print(['Starting for model:', name])
     print("Learning model {}: {}".format( model_id,  name))
-
+    log_print([
+        "Model {} on branch {}".format(
+            model_id, 
+            branch_id
+        )
+    ])
+    timings = {}
     time_start = time.time()
 
     # Get params from qmla_core_info_dict
+    t_init = time.time()
     redis_databases = rds.get_redis_databases_by_qmla_id(host_name, port_number, qid)
     qmla_core_info_database = redis_databases['qmla_core_info_database']
     learned_models_info_db = redis_databases['learned_models_info_db']
     learned_models_ids = redis_databases['learned_models_ids']
     active_branches_learning_models = redis_databases['active_branches_learning_models']
     any_job_failed_db = redis_databases['any_job_failed']
+    timings['load_database'] = time.time() - t_init
 
     if qmla_core_info_dict is None:
+        t_init = time.time()
         qmla_core_info_dict = pickle.loads(qmla_core_info_database['qmla_settings'])
         probe_dict = pickle.loads(qmla_core_info_database['ProbeDict'])
+        timings['pickling'] = time.time() - t_init
     else:  # if in serial, qmla_core_info_dict given, with probe_dict included in it.
+        t_init = time.time()
         probe_dict = qmla_core_info_dict['probe_dict']
+        timings['get_probe_dict_local'] = time.time() - t_init
 
     true_model_terms_matrices = qmla_core_info_dict['true_oplist']
     qhl_plots = qmla_core_info_dict['qhl_plots']
@@ -97,6 +109,7 @@ def remote_learn_model_parameters(
     long_id = qmla_core_info_dict['long_id']
 
     # Generate model instance and learn
+    t_init = time.time()
     qml_instance = QML.ModelInstanceForLearning(
         model_id=model_id,
         model_name=name,
@@ -106,10 +119,12 @@ def remote_learn_model_parameters(
         host_name=host_name,
         port_number=port_number,
     )
-    evaluation_times = list(np.arange(0, 10, 0.05))
+    timings['instantiate_model'] = time.time() - t_init
+    # evaluation_times = list(np.arange(0, 10, 0.05))
     log_print(["Starting model QHL update."])
     try:
         update_timer_start = time.time()
+        t_init = time.time()
         qml_instance.update_model()
         log_print(
             [
@@ -118,11 +133,17 @@ def remote_learn_model_parameters(
                 )
             ]
         )
+        timings['update'] = time.time() - t_init
         log_print(["Starting model likelihood calculation."])
         print("Computing log likelihood for mod {}".format(model_id))
+        t_init = time.time()
         qml_instance.compute_likelihood_after_parameter_learning(
-            times = evaluation_times
+            # times = evaluation_times
         )
+        timings['evaluation_likelihood'] = time.time() - t_init
+        log_print([
+            "Model evaluation ll:", qml_instance.evaluation_log_likelihood
+        ])
     except NameError:
         log_print(
             [
@@ -162,15 +183,18 @@ def remote_learn_model_parameters(
             pass
 
     # only need to store results; throw away class 
+    t_init = time.time()
     updated_model_info = copy.deepcopy(
         qml_instance.learned_info_dict()
     )
     del qml_instance
-
     compressed_info = pickle.dumps(
         updated_model_info,
         protocol=4
     )
+    timings['storing_result'] = time.time() - t_init
+
+    t_init = time.time()
     try:
         learned_models_info_db.set(
             str(model_id),
@@ -189,15 +213,33 @@ def remote_learn_model_parameters(
                 model_id
             ]
         )
-    active_branches_learning_models.incr(int(branch_id), 1)
-    time_end = time.time()
+    active_branches_learning_models.incr(int(branch_id), 1)    
     log_print(["Redis SET learned_models_ids:", model_id, "; set True"])
+    log_print(
+        [
+            "Redis SET active_branches_learning_models:", 
+            branch_id, "; now: ",
+            active_branches_learning_models.get(int(branch_id))
+    ])
     learned_models_ids.set(str(model_id), 1)
+    timings['updating_db'] = time.time() - t_init
 
+    time_end = time.time()
+    for k in timings:
+        log_print([
+            "QHL Timing - {}: {}".format(k, np.round(timings[k], 2))
+        ])
     if remote:
+        t_init = time.time()
         del updated_model_info
         del compressed_info
-        log_print(["Learned. rq time:", str(time_end - time_start)])
+        timings['deleting_data'] = np.round(time.time() - t_init, 2)
+        timings['total'] = np.round(time.time() - time_start, 2)
+        log_print(["Learned. rq time:", str(time.time() - time_start)])
+        log_print(["QHL time unaccounted for:", 2*timings['total'] - sum(timings.values()) ]) # 2*total since already counted in timings
         return None
     else:
+        timings['total'] = np.round(time.time() - time_start, 2)
+        log_print(["QHL time unaccounted for:", 2*timings['total'] - sum(timings.values()) ]) # 2*total since already counted in timings
         return updated_model_info
+    

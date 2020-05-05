@@ -9,17 +9,19 @@ import redis
 import pickle
 
 import qmla.redis_settings as rds
-import qmla.qinfer_model_interface as qml_qi
+# import qmla.qinfer_model_interface as qml_qi
 import qmla.memory_tests
 import qmla.logging
 import qmla.get_growth_rule as get_growth_rule
-import qmla.experimental_data_processing
+import qmla.shared_functionality.experimental_data_processing
 import qmla.database_framework
 import qmla.analysis
 
 pickle.HIGHEST_PROTOCOL = 4
 
-
+__all__ = [
+    'ModelInstanceForStorage'
+]
 
 ### Reduced class with only essential information saved ###
 class ModelInstanceForStorage():
@@ -55,16 +57,11 @@ class ModelInstanceForStorage():
         self.redis_port_number = port_number
         self.qmla_id = qid
         self.log_file = log_file
-        self.model_name = model_name
+        self.model_name = qmla.database_framework.alph(model_name)
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
 
         if qmla_core_info_database is None: 
-            self.log_print(
-                [
-                    'QMLA core info DB is None; retrieveing from redis.'
-                ]
-            )
             redis_databases = rds.get_redis_databases_by_qmla_id(
                 self.redis_host_name,
                 self.redis_port_number,
@@ -88,7 +85,7 @@ class ModelInstanceForStorage():
             qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
 
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
-        self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
+        # self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_name = qmla_core_info_dict['true_name']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
@@ -215,16 +212,22 @@ class ModelInstanceForStorage():
             try:
                 self.growth_class = get_growth_rule.get_growth_generator_class(
                     growth_generation_rule=self.growth_rule_of_this_model,
-                    use_experimental_data=self.use_experimental_data,
+                    # use_experimental_data=self.use_experimental_data,
                     log_file=self.log_file
                 )
             except BaseException:
                 raise
             self.model_heuristic_class = learned_info['heuristic']
-
             self.model_name_latex = self.growth_class.latex_name(
                 name=self.model_name
             )
+            model_constituent_terms = qmla.database_framework.get_constituent_names_from_name(
+                self.model_name
+            )
+            self.constituents_terms_latex = [
+                self.growth_class.latex_name(term)
+                for term in model_constituent_terms
+            ]
 
             self.track_parameter_estimates = {}
             num_params = np.shape(self.track_mean_params)[1]
@@ -306,11 +309,12 @@ class ModelInstanceForStorage():
             )
         else:
             exp_times = times
+            
         if max_time is None:
             max_time = max(exp_times)
 
-        min_time = qmla.experimental_data_processing.nearest_experimental_time_available(exp_times, min_time)
-        max_time = qmla.experimental_data_processing.nearest_experimental_time_available(exp_times, max_time)
+        min_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(exp_times, min_time)
+        max_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(exp_times, max_time)
         min_data_idx = exp_times.index(min_time)
         max_data_idx = exp_times.index(max_time)
         exp_times = exp_times[min_data_idx:max_data_idx]
@@ -394,11 +398,11 @@ class ModelInstanceForStorage():
         if max_time is None:
             max_time = max(exp_times)
 
-        min_time = qmla.experimental_data_processing.nearest_experimental_time_available(
+        min_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(
             exp_times,
             min_time
         )
-        max_time = qmla.experimental_data_processing.nearest_experimental_time_available(
+        max_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(
             exp_times,
             max_time
         )

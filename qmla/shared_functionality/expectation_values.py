@@ -1,22 +1,23 @@
 import numpy as np
 
+from scipy import linalg
 import qmla.logging
 
-use_linalg = False
-use_sparse = False
+# use_linalg = False
+# use_sparse = False
 
-try:
-    import hamiltonian_exponentiation as h
-    # TODO set to true after testing
-    ham_exp_installed = True
+# try:
+#     import hamiltonian_exponentiation as h
+#     # TODO set to true after testing
+#     ham_exp_installed = True
 
-except BaseException:
-    ham_exp_installed = False
+# except BaseException:
+#     ham_exp_installed = False
 
-if (use_linalg):
-    # override and use linalg.expm even if hamiltonian_exponentiation is
-    # installed
-    ham_exp_installed = False
+# if (use_linalg):
+#     # override and use linalg.expm even if hamiltonian_exponentiation is
+#     # installed
+#     ham_exp_installed = False
 
 
 def log_print(
@@ -41,9 +42,8 @@ def default_expectation_value(
     log_identifier='Expecation Value'
 ):
     """
-    This is the default evolution and expectation value function for QMLA.
+    Default expectation value calculation: | <state.transpose | e^{-iHt} | state> |**2
 
-    longish description:
     Returns the expectation value computed by evolving the input state with
     the provided Hamiltonian operator. NB: In this case, the assumption is that the 
     value measured is 1 and the expectation value corresponds to the probability of
@@ -57,8 +57,6 @@ def default_expectation_value(
 
     :return: expectation value of the evolved state
     """
-
-    from scipy import linalg
 
     unitary = linalg.expm(-1j * ham * t)
     probe_bra = state.conj().T
@@ -96,7 +94,7 @@ def hahn_evolution(
     log_file=None,
     log_identifier=None
 ):
-    """
+    r"""
     Hahn echo evolution and expectation value.
 
     Returns the expectation value computed by evolving the input state with
@@ -206,13 +204,13 @@ def hahn_evolution(
     expect_value = np.abs(np.dot(bra, rho_state))
 #    print("Hahn. Time=",t, "\t ex = ", expect_value)
     # print("[Hahn evolution] projecting onto:", repr(bra))
-    return 1 - expect_value
+    return 1 - expect_value # because we actually project onto |-> in experiment
 #    return expect_value
 
 
 
 def make_inversion_gate(num_qubits):
-    """
+    r"""
     returns the inversion gate for the Hahn eco evolution as numpy array
 
     :parameter num_qubits: size of the inversion gate required
@@ -234,11 +232,12 @@ def make_inversion_gate(num_qubits):
 
 def n_qubit_hahn_evolution(
     ham, t, state,
+    second_time_evolution_factor = 1,
     precision=1e-10,
     log_file=None,
     log_identifier=None
 ):
-    """
+    r"""
     n qubits time evolution for hahn-echo measurement returning expectation value
 
     :param ham: Hamiltonian needed for the time-evolution
@@ -275,11 +274,18 @@ def n_qubit_hahn_evolution(
 
     # print("[expectation values] N qubit Hahn evolution. dimension {}".format(np.shape(ham)))
     # print("state:", state)
+    # want to evolve for t, then han inversion gate, 
+    # then again evolution for (S * t)
+    # where S = 2 in standard Hahn evolution, 
+    # S = 1 for long time dynamics study
     first_unitary_time_evolution = linalg.expm(-1j * ham * t)
-#     second_unitary_time_evolution is not required as far as Hahn signals experiments are performed, because in them t_1 = t_2 in the evolution before and after Hahn inversion
+    second_unitary_time_evolution = np.linalg.matrix_power(
+        first_unitary_time_evolution,
+        second_time_evolution_factor 
+    )
 
     total_evolution = np.dot(
-        first_unitary_time_evolution,
+        second_unitary_time_evolution,
         np.dot(
             inversion_gate,
             first_unitary_time_evolution

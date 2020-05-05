@@ -1002,8 +1002,8 @@ def draw_networkx_arrows(
 def adjacent_branch_test(qmd, mod1, mod2):
     mod_a = qmd.get_model_storage_instance_by_id(mod1).Name
     mod_b = qmd.get_model_storage_instance_by_id(mod2).Name
-    br_a = qmd.get_model_data_by_field(name=mod_a, field='branch_id')
-    br_b = qmd.get_model_data_by_field(name=mod_b, field='branch_id')
+    br_a = qmd._get_model_data_by_field(name=mod_a, field='branch_id')
+    br_b = qmd._get_model_data_by_field(name=mod_b, field='branch_id')
 
     diff = br_a - br_b
     if diff in [-1, 0, 1]:
@@ -1094,7 +1094,7 @@ def qmdclassTOnxobj(
     for i in modlist:
         mod = qmd.get_model_storage_instance_by_id(i)
         name = mod.model_name
-        branch = qmd.get_model_data_by_field(name=name, field='branch_id')
+        branch = qmd._get_model_data_by_field(name=name, field='branch_id')
         branch_mod_count[branch] += 1
         latex_term = mod.model_name_latex
 
@@ -1109,7 +1109,7 @@ def qmdclassTOnxobj(
     for i in modlist:
         mod = qmd.get_model_storage_instance_by_id(i)
         name = mod.model_name
-        branch = qmd.get_model_data_by_field(name=name, field='branch_id')
+        branch = qmd._get_model_data_by_field(name=name, field='branch_id')
         num_models_this_branch = branch_mod_count[branch]
         pos_list = available_position_list(
             num_models_this_branch,

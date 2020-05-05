@@ -4,7 +4,6 @@ import sys
 import os
 
 from qmla.growth_rules import connected_lattice, connected_lattice_probabilistic
-from qmla import experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation
 from qmla import database_framework
 
@@ -29,22 +28,21 @@ class HeisenbergXYZProbabilistic(
         self.lattice_connectivity_max_distance = 1
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
-        self.model_heuristic_function = experiment_design_heuristics.MultiParticleGuessHeuristic
         self.max_num_sites = 4
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.pauli_eigenvector_based_probes
 
-        self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
-        self.four_site_xxz_chain = 'pauliSet_1J2_xJx_d4PPPPpauliSet_2J3_xJx_d4PPPPpauliSet_2J3_zJz_d4PPPPpauliSet_3J4_zJz_d4'
-        self.four_site_xxz = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
+        self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3+pauliSet_2J3_zJz_d3'
+        self.four_site_xxz_chain = 'pauliSet_1J2_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4'
+        self.four_site_xxz = 'pauliSet_1J2_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4'
         
         self.true_model = self.four_site_xxz_chain
         self.true_model = database_framework.alph(self.true_model)
         self.qhl_models = [
             self.true_model,
-            'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_2J4_zJz_d4PPPPpauliSet_3J4_xJx_d4'
+            'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4'
         ]
         self.base_terms = [
             'x',
@@ -130,7 +128,7 @@ class HeisenbergXYZPredetermined(
 
         if self.tree_completed_initially == True:
             # to manually fix the models to be considered
-            # heis_xxz_4site = 'pauliSet_1J2_xJx_d4PPPPpauliSet_1J2_zJz_d4PPPPpauliSet_1J3_xJx_d4PPPPpauliSet_1J3_zJz_d4PPPPpauliSet_2J4_xJx_d4PPPPpauliSet_2J4_zJz_d4PPPPpauliSet_3J4_xJx_d4PPPPpauliSet_3J4_zJz_d4'
+            # heis_xxz_4site = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4'
             # self.true_model = heis_xxz_4site
             models = []
             list_connections = [
@@ -165,15 +163,15 @@ class HeisenbergXYZPredetermined(
             ##########
 
             # i.e. 1 qubit model containing correct subsystem wins 1 qubit generation
-            # self.true_model = 'pauliSet_1J2_xJx_d3PPPpauliSet_2J3_zJz_d3'
+            # self.true_model = 'pauliSet_1J2_xJx_d3+pauliSet_2J3_zJz_d3'
             # self.initial_models = [
             #     'pauliSet_1J2_xJx_d3',
             #     'pauliSet_1J2_zJz_d3',
             #     'pauliSet_1J2_yJy_d3',
-            #     'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3',
-            #     'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_zJz_d3',
-            #     'pauliSet_1J2_zJz_d3PPPpauliSet_1J2_yJy_d3',
-            #     'pauliSet_1J2_xJx_d3PPPpauliSet_1J2_yJy_d3PPPpauliSet_1J2_zJz_d3',
+            #     'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3',
+            #     'pauliSet_1J2_xJx_d3+pauliSet_1J2_zJz_d3',
+            #     'pauliSet_1J2_zJz_d3+pauliSet_1J2_yJy_d3',
+            #     'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_1J2_zJz_d3',
             # ]
 
 
@@ -201,3 +199,91 @@ class HeisenbergXYZPredetermined(
             4: 6,
             'other': 0
         }
+
+
+class HeisenbergSharedField(
+    HeisenbergXYZPredetermined
+):
+
+    def __init__(
+        self,
+        growth_generation_rule,
+        **kwargs
+    ):
+        # print("[Growth Rules] init nv_spin_experiment_full_tree")
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            **kwargs
+        )
+        # self.true_model = 'Heis_ix_d2PPHeis_iy_d2PPHeis_iz_d2PPHeis_tz_d2'
+        # self.true_model = 'likewisePauliSum_lx_1J2_1J3_2J4_3J4_d4+likewisePauliSum_lz_1J2_1J3_2J4_3J4_d4'
+        self.true_model = 'pauliLikewise_lx_1J2_1J3_2J4_3J4_d4+pauliLikewise_ly_1J2_1J3_2J4_3J4_d4+pauliLikewise_lz_1J2_1J3_2J4_3J4_d4'
+        self.initial_models = [
+            # triangle
+            'pauliLikewise_lx_1J2_1J3_2J3_d3+pauliLikewise_ly_1J2_1J3_2J3_d3+pauliLikewise_lz_1J2_1J3_2J3_d3',
+            # 3 site chain
+            'pauliLikewise_lx_1J2_2J3_d3+pauliLikewise_ly_1J2_2J3_d3+pauliLikewise_lz_1J2_2J3_d3',
+            # 4 site chain
+            'pauliLikewise_lx_1J2_2J3_3J4_d4+pauliLikewise_ly_1J2_2J3_3J4_d4+pauliLikewise_lz_1J2_2J3_3J4_d4',
+            # square nearest neighbours
+            'pauliLikewise_lx_1J2_1J3_2J4_3J4_d4+pauliLikewise_ly_1J2_1J3_2J4_3J4_d4+pauliLikewise_lz_1J2_1J3_2J4_3J4_d4',
+            # square fully connected
+            'pauliLikewise_lx_1J2_1J3_2J3_2J4_3J4_d4+pauliLikewise_ly_1J2_2J3_1J3_2J4_3J4_d4+pauliLikewise_lz_1J2_2J3_1J3_2J4_3J4_d4',
+            # 3x2 grid
+            'pauliLikewise_lx_1J2_1J4_2J5_2J3_4J5_3J6_5J6_d6+pauliLikewise_ly_1J2_1J4_2J5_2J3_4J5_3J6_5J6_d6+pauliLikewise_lz_1J2_1J4_2J5_2J3_4J5_3J6_5J6_d6',
+        ]
+        if self.true_model not in self.initial_models:
+            self.initial_models.append(self.true_model)
+        self.qhl_models = self.initial_models
+        self.tree_completed_initially = True
+        self.num_processes_to_parallelise_over = len(self.initial_models)
+        # self.setup_growth_class()
+
+    def generate_models(self, model_list, **kwargs):
+        return self.initial_models
+
+    def latex_name(
+        self,
+        name,
+        **kwargs
+    ):
+        separate_terms = name.split('+')
+        all_connections = []
+        latex_term = ""
+        connections_terms = {}
+        for term in separate_terms:
+            components = term.split('_')
+            try:
+                components.remove('pauliLikewise')
+            except:
+                print("Couldn't remove pauliLikewise from", name)
+            this_term_connections = []
+            for l in components:
+                if l[0] == 'd':
+                    dim = int(l.replace('d', ''))
+                elif l[0] == 'l':
+                    operator = str(l.replace('l', ''))
+                else:
+                    sites = l.split('J')
+                    this_term_connections.append(sites)
+            for s in this_term_connections:
+                con = "({},{})".format(s[0], s[1])
+                try:
+                    connections_terms[con].append(operator)
+                except:
+                    connections_terms[con] = [operator]
+
+            latex_term = ""
+            for c in list(sorted(connections_terms.keys())):
+                connection_string = str(
+                    "\sigma_{"
+                    + str(c)
+                    + "}^{"
+                    + str(",".join(connections_terms[c]))
+                    + "}"
+                )
+                latex_term += connection_string
+
+        return "${}$".format(latex_term)
+
+

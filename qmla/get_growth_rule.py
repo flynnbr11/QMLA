@@ -8,6 +8,8 @@ __all__ = [
 
 growth_classes = {
     # Experimental paper growth rules
+    'NVExperimentalData' : 
+        GR.NVCentreExperimentalData,
     'ExperimentNVCentre':
         GR.ExperimentNVCentre,
     'ExperimentNVCentreNoTransvereTerms':
@@ -26,24 +28,39 @@ growth_classes = {
         GR.NVLargeSpinBath,
     'ExperimentReducedNV':
         GR.ExperimentReducedNV,
+    'SimulatedNVCentre' : 
+        GR.SimulatedNVCentre,
+
     # Theoretical paper growth rules
     'IsingPredetermined':
         GR.IsingPredetermined,
     'IsingProbabilistic':
         GR.IsingProbabilistic,
+    'IsingSharedField':
+        GR.IsingSharedField,
     'HeisenbergXYZPredetermined':
         GR.HeisenbergXYZPredetermined,
     'HeisenbergXYZProbabilistic':
         GR.HeisenbergXYZProbabilistic,
+    'HeisenbergSharedField' : 
+        GR.HeisenbergSharedField, 
     'FermiHubbardPredetermined':
         GR.FermiHubbardPredetermined,
     'FermiHubbardProbabilistic':
         GR.FermiHubbardProbabilistic,
+    'LatticeSet' : 
+        GR.LatticeSet,
+    'IsingLatticeSet' : 
+        GR.IsingLatticeSet, 
+    'HeisenbergLatticeSet' : 
+        GR.HeisenbergLatticeSet,
+    'FermiHubbardLatticeSet': 
+        GR.FermiHubbardLatticeSet, 
     # Others
     'basic_lindbladian':
         GR.Lindbladian,
-    'GrowthRuleSuper':
-        GR.GrowthRuleSuper,
+    'GrowthRule':
+        GR.GrowthRule,
         # GR.GrowthRuleTemplate,
     'Presentation':
         GR.PresentationPlotGeneration,
@@ -51,6 +68,8 @@ growth_classes = {
         GR.Genetic,
     'GeneticTest':
         GR.GeneticTest,    
+    'IsingGenetic' : 
+        GR.IsingGenetic,
     'TestReducedParticlesBayesFactors': 
         GR.TestReducedParticlesBayesFactors, 
     'TestAllParticlesBayesFactors' : 
@@ -69,7 +88,7 @@ def get_growth_generator_class(
         used to pull the class object from the dictionary growth_classes.
     :params **kwargs: arguments required by the growth rule, passed directly 
         to the desired growth rule's constructor.
-    :return GrowthRuleSuper gr: growth rule class instance
+    :return GrowthRule gr: growth rule class instance
 
     """
     # TODO: note that in most places, this is called with use_experimental_data.

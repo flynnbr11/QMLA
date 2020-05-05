@@ -129,7 +129,7 @@ growth_generator = arguments.growth_generation_rule
 gather_summary_results = bool(arguments.gather_summary_results)
 true_growth_class = qmla.get_growth_generator_class(
     growth_generation_rule=growth_generator,
-    use_experimental_data=exp_data,
+    # use_experimental_data=exp_data,
     log_file=log_file
 )
 dataset = true_growth_class.experimental_dataset
@@ -327,7 +327,7 @@ try:
         directory_name=directory_to_analyse,
         dataset=dataset,
         results_path=results_csv,
-        use_experimental_data=exp_data,
+        # use_experimental_data=exp_data,
         results_file_name_start=results_file_name_start,
         true_expectation_value_path=true_expec_path,
         growth_generator=growth_generator,
@@ -443,15 +443,36 @@ except:
     print("ANALYSIS FAILURE: plotting model statistics.")
     raise
 
+try:
+    qmla.analysis.count_term_occurences(
+        combined_results = combined_results, 
+        save_directory = directory_to_analyse
+    )
+except:
+    print("ANALYSIS FAILURE: Counting term occurences.")
+
+
 # Evaluation: log likelihoods of considered models, compared with champion/true
 try:
     qmla.analysis.plot_evaluation_log_likelihoods(
         combined_results = combined_results, 
-        save_directory=directory_to_analyse
+        save_directory = directory_to_analyse,
+        include_median_likelihood=False, 
     )
 except: 
     print("ANALYSIS FAILURE: Evaluation log likleihoods.")
-    raise
+    pass
+
+# inspect how nodes perform
+try:
+    qmla.analysis.inspect_times_on_nodes(
+        combined_results = combined_results, 
+        save_directory=directory_to_analyse,
+    )
+except: 
+    print("ANALYSIS FAILURE: Time inspection of nodes.")
+    pass
+    # raise
 
 
 # model statistics histograms (f-score, precision, sensitivty)
@@ -580,7 +601,7 @@ try:
         save_to_file=str(
             directory_to_analyse +
             plot_desc +
-            'times_histogram.png'
+            'times_learned_upon.png'
         )
     )
 except:
