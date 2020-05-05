@@ -383,9 +383,7 @@ class ModelInstanceForLearning():
             )
 
         self.inversion_field = [
-            item[0]
-            for item
-            in self.qinfer_model.expparams_dtype[1:]
+            item[0] for item in self.qinfer_model.expparams_dtype[1:]
         ]
 
         self.model_heuristic = self.growth_class.heuristic(
@@ -504,7 +502,7 @@ class ModelInstanceForLearning():
                         "Small n_ess - expect to resample soon. Sum weights = {}; n_ess = {}".format(sum_wts, (1/sum_wts))                     
                     ])
                 _time_start = time.time()
-                import cProfile
+                # import cProfile
                 self.qinfer_updater.update(
                     self.datum_from_experiment,
                     self.new_experiment

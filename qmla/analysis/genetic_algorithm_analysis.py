@@ -468,6 +468,12 @@ def model_generation_probability(
     #############
     # f score model probability plot
     #############
+
+    # TODO plot probability of f-score averaged
+    # i.e.  in 10 runs, if 2 models have f-score 0.8, 
+    # one which occurs 5 times and the other 3 times, 
+    # the total probability of that f-score is 8/20 = 40%
+    # so just average
     plt.clf()
     fig, ax = plt.subplots(figsize=(17, 7))
 
