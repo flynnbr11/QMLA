@@ -92,8 +92,9 @@ class SimulatedNVCentre(
             qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         self.model_heuristic_function = \
             qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic            
-        self.max_time_to_consider = 50 * 1e-6 # 50 microseconds 
-        self.plot_time_increment = 0.5 * 1e-6 # 0.5 microseconds
+        time_basis = 1e-9 # nanoseconds
+        self.max_time_to_consider = 50 * time_basis # 50 microseconds 
+        self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
 
     def generate_models(self, model_list, **kwargs):
         if self.spawn_stage[-1]==None:
