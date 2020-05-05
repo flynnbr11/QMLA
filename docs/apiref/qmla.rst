@@ -18,6 +18,7 @@ Quantum Model Learning Agent
 Class Reference 
 ~~~~~~~~~~~~~~~
 .. autoclass:: QuantumModelLearningAgent
-    :private-members:
     :members: 
+    :private-members:
+
     

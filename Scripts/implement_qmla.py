@@ -127,7 +127,7 @@ if qmla_controls.qhl_mode:
                 qmla_controls.class_pickle_file
             ], 
         )
-        qmla_instance.delete_unpicklable_attributes()
+        qmla_instance._delete_unpicklable_attributes() # TODO call from within QMLA
         with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmla_instance, pkl_file, protocol=4)
 
@@ -243,7 +243,7 @@ elif (
                 qmla_controls.class_pickle_file
             ],
         )
-        qmla_instance.delete_unpicklable_attributes()
+        qmla_instance._delete_unpicklable_attributes() # TODO call from within QMLA
         with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmla_instance, pkl_file, protocol=4)
     for mid in model_ids:
@@ -441,7 +441,7 @@ else:
                    qmla_controls.class_pickle_file], 
                   )
         # pickle in cases where true model found
-        qmla_instance.delete_unpicklable_attributes()
+        qmla_instance._delete_unpicklable_attributes() # TODO call from within QMLA
         with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmla_instance, pkl_file, protocol=4)
 
