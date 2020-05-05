@@ -1,7 +1,19 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description="genetic-algorithm__inspect-model-generation-probability"
-# test_description="theory-test__ising-predetermined____QMLA"
+# test_description="genetic-algorithm__longer-run"
+# test_description='inspect-node-times__qhl__reset-zero-wt-policy'
+# test_description="theory-test__ising-predetermined__2-models__4-site-true__champ-reduction__mixed-heuristic__medium-run"
+# test_description='heis-predetermined__w-champ-reduction'
+# test_description='fh-qhl'
+# test_description='not_using_rq'
+# test_description="testing-bf-reqmt-reduced-particles"
+# test_description='ising_chain_shared_field'
+# test_description='pauli-likewise-pairs-test__heis-xyz'
+# test_description='fixed-lattice__test__heis-6-sites-qhl__2-proc'
+# test_description='fixed-lattice__fermi-hubbard-qmla'
+# test_description='qhl-TIME-TEST'
+test_description='nv_simulation_3-sites-6-terms__QHL'
+# test_description="genetic-algorithm__ising-model"
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -9,9 +21,9 @@ test_description="genetic-algorithm__inspect-model-generation-probability"
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=50
+num_tests=20
 num_processes_to_request=6
-qhl=0 # do a test on QHL only -> 1; for full QMD -> 0
+qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
 multiple_qhl=0
 multiple_growth_rules=0
@@ -20,8 +32,8 @@ experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters.
-e=250 # experiments
-p=100 # particles
+e=500 # experiments
+p=3000 # particles
 ra=0.98 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -34,15 +46,28 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 # and value of experimental_data.
 ### ---------------------------------------------------###
 
+growth_rule='SimulatedNVCentre'
+# growth_rule='FermiHubbardLatticeSet'
+# growth_rule='IsingLatticeSet'
+# growth_rule='HeisenbergLatticeSet'
+# growth_rule='IsingSharedField'
+# growth_rule='Genetic'
+# growth_rule='IsingGenetic'
+
 # Simulation growth rule
 # sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'
+# sim_growth_rule='IsingSharedField'
+# sim_growth_rule='HeisenbergSharedField'
 # sim_growth_rule='HeisenbergXYZPredetermined'
 # sim_growth_rule='HeisenbergXYZProbabilistic'
 # sim_growth_rule='FermiHubbardPredetermined'
 # sim_growth_rule='FermiHubbardProbabilistic'
-sim_growth_rule='Genetic'
-# sim_growth_rule='Presentation'
+# sim_growth_rule='Genetic'
+# sim_growth_rule='GeneticTest'
+# sim_growth_rule='TestReducedParticlesBayesFactors'
+# sim_growth_rule='TestAllParticlesBayesFactors'
+# sim_growth_rule='NVExperimentalData'
 
 ### Experimental growth rules 
 ### which will overwrite growth_rule if exp_data==1
@@ -57,18 +82,18 @@ exp_growth_rule='ExperimentNVCentre'
 # exp_growth_rule='ExperimentReducedNV'
 
 # Choose a growth rule
-if (( "$experimental_data" == 1)) || (( "$simulate_experiment" == 1))
-then
-	growth_rule=$exp_growth_rule
-else
-	growth_rule=$sim_growth_rule
-fi
+#if (( "$experimental_data" == 1)) || (( "$simulate_experiment" == 1))
+#then
+#	growth_rule=$exp_growth_rule
+#else
+#	growth_rule=$sim_growth_rule
+#fi
 
 # Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_growth_rules set to 1 above
 alt_growth_rules=(  
-	'IsingPredetermined' 
+#	'IsingPredetermined' 
 #	'HeisenbergXYZPredetermined'
-#	'FermiHubbardPredetermined'
+	'FermiHubbardPredetermined'
 )
 growth_rules_command=""
 for item in ${alt_growth_rules[*]}
@@ -241,6 +266,7 @@ python3 ../Scripts/set_qmla_params.py \
 	-probe=$plot_probe_file \
 	-plus=$force_plot_plus \
 	-pnoise=$probe_noise_level_default \
+	-true_expec_path=$true_expec_path \
 	-sp=$special_probe_plot \
 	-dir=$results_path \
 	-log=$multi_qmd_log \
@@ -278,11 +304,12 @@ source $time_required_script
 qmd_time=$QMD_TIME
 qhl_time=$QHL_TIME
 fqhl_time=$FQHL_TIME
-num_processes=$NUM_PROCESSES
+num_processes=$NUM_PROCESSES # TODO RESTORE!!!!!!! testing without RQ
+#num_processes=1
 # Change requested time. e.g. if running QHL , don't need as many nodes. 
 if (( "$qhl" == 1 )) || [[ "$experimental_growth_rule" == 'PT_Effective_Hamiltonian' ]]
 then	
-	num_proc=1
+	num_proc=2
 elif (( "multiple_qhl"  == 1 ))
 then 
 	num_proc=4
