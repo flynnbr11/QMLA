@@ -1,4 +1,3 @@
-from __future__ import print_function  # so print doesn't show brackets
 import os as os
 import warnings
 import numpy as np
@@ -12,7 +11,16 @@ import random
 import pickle
 pickle.HIGHEST_PROTOCOL = 4
 
-sys.path.append("..")
+# qmla_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
+# sys.path.append(qmla_root)
+# print("Added {} to sys path".format(qmla_root))
+
+p = os.path.abspath(os.path.realpath(__file__))
+elements = p.split('/')[:-2]
+qmla_root = os.path.abspath('/'.join(elements))
+sys.path.append(qmla_root)
+
+# sys.path.append("..")
 import qmla
 from qmla import database_framework
 from qmla.quantum_model_learning_agent import QuantumModelLearningAgent  # QMD class in Library

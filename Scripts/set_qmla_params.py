@@ -6,7 +6,12 @@ import sys
 import os
 import matplotlib.pyplot as plt
 
-sys.path.append("..")
+p = os.path.abspath(os.path.realpath(__file__))
+elements = p.split('/')[:-2]
+qmla_root = os.path.abspath('/'.join(elements))
+sys.path.append(qmla_root)
+
+# sys.path.append("..")
 import qmla
 pickle.HIGHEST_PROTOCOL = 4
 
@@ -274,7 +279,6 @@ pickle.dump(
 # get measurements of the true system
 ## work them out only once and share with all instances
 true_system_measurements = growth_class.get_measurements_by_time()
-print("Measuerements from GR:", true_system_measurements)
 pickle.dump(
     true_system_measurements,
     open(
