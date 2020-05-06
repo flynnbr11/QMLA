@@ -51,7 +51,7 @@ def plot_tree_multiple_instances(
     for mod in mods:
         winning_count[mod] = mods.count(mod)
 
-    cumulative_qmla_tree_plot(
+    cumulative_TreeQMLA_plot(
         cumulative_csv=all_bayes_csv,
         wins_per_mod=winning_count,
         latex_mapping_file=latex_mapping_file,
@@ -105,7 +105,7 @@ def get_averages_from_combined_results(
     return means_dict, medians_dict, count_bayes
 
 
-def cumulative_qmla_tree_plot(
+def cumulative_TreeQMLA_plot(
     cumulative_csv,
     wins_per_mod,
     latex_mapping_file,
@@ -125,15 +125,15 @@ def cumulative_qmla_tree_plot(
         growth_generator=growth_generator
     )
     if avg == 'means':
-        # print("[cumulative_qmla_tree_plot] USING MEANS")
+        # print("[cumulative_TreeQMLA_plot] USING MEANS")
         # print(means)
         bayes_factors = means  # medians
     elif avg == 'medians':
-        # print("[cumulative_qmla_tree_plot] USING MEDIANS")
+        # print("[cumulative_TreeQMLA_plot] USING MEDIANS")
         # print(medians)
         bayes_factors = medians
 
-    print("[cumulative_qmla_tree_plot] COUNTS", counts)
+    print("[cumulative_TreeQMLA_plot] COUNTS", counts)
 
     max_bayes_factor = max([max(bayes_factors[k].values())
                             for k in bayes_factors.keys()])
@@ -204,7 +204,7 @@ def cumulative_qmla_tree_plot(
             G.nodes[m]['status'] = min_colour
             G.nodes[m]['info'] = 0
 
-    print("[cumulative_qmla_tree_plot] nodes added.")
+    print("[cumulative_TreeQMLA_plot] nodes added.")
     max_num_mods_any_branch = max(list(branch_mod_count.values()))
     # get the cordinates to display this model's node at
 
@@ -224,7 +224,7 @@ def cumulative_qmla_tree_plot(
         positions[m] = (x_pos, y_pos)
         G.node[m]['pos'] = (x_pos, y_pos)
 
-    print("[cumulative_qmla_tree_plot] node positions added.")
+    print("[cumulative_TreeQMLA_plot] node positions added.")
     sorted_positions = sorted(positions.values(), key=lambda x: (x[1], x[0]))
     mod_id = 0
     model_ids_names = {}
@@ -250,8 +250,8 @@ def cumulative_qmla_tree_plot(
         high = max_frequency
 
     # frequency_markers = list(np.linspace(0, max_frequency, 4, dtype=int))
-    print("[cumulative_qmla_tree_plot] setting edges.")
-    print("[cumulative_qmla_tree_plot] modelist:", modlist)
+    print("[cumulative_TreeQMLA_plot] setting edges.")
+    print("[cumulative_TreeQMLA_plot] modelist:", modlist)
     # only_adjacent_branches = False
 
     even_arrow_width = True
@@ -333,7 +333,7 @@ def cumulative_qmla_tree_plot(
                             )
                         except BaseException:
                             print(
-                                "[plotQMD - cumulative_qmla_tree_plot] failed to add edge", pairing
+                                "[plotQMD - cumulative_TreeQMLA_plot] failed to add edge", pairing
                             )
                             raise
 
@@ -342,7 +342,7 @@ def cumulative_qmla_tree_plot(
             else:
                 print("not adding edge {}/{}".format(a, b))
 
-    print("[cumulative_qmla_tree_plot] edges added.")
+    print("[cumulative_TreeQMLA_plot] edges added.")
     print("edge freqs:", edge_frequencies)
     max_freq = max(edge_frequencies)
     # print("freq markers:", frequency_markers)
@@ -363,7 +363,7 @@ def cumulative_qmla_tree_plot(
     new_cmap = truncate_colormap(cmap, 0.35, 1.0)
     # new_cmap = cmap
 
-    plot_qmla_tree(
+    plot_TreeQMLA(
         G,
         n_cmap=plt.cm.pink_r,
         e_cmap=new_cmap,
@@ -385,7 +385,7 @@ def cumulative_qmla_tree_plot(
         plt.savefig(save_to_file, bbox_inches='tight')
     return G, edges, edge_f
 
-def plot_qmla_tree(
+def plot_TreeQMLA(
     G,
     n_cmap,
     e_cmap,

@@ -20,6 +20,12 @@ __all__ = [
 
 # @GrowthRuleDecorator
 class GrowthRule():
+    r"""
+    User defined mechanism to control which models are considered by QMLA. 
+
+    
+    """
+
     # superclass for growth generation rules
     def __init__(
         self,
@@ -27,12 +33,8 @@ class GrowthRule():
         # configuration=None, 
         **kwargs
     ):
-        # print("GrowthRule __init__. kwargs", kwargs)
+
         self.growth_generation_rule = growth_generation_rule
-        # if 'use_experimental_data' in kwargs:
-        #     self.use_experimental_data = kwargs['use_experimental_data']
-        # else:
-        #     self.use_experimental_data = False
 
         if 'log_file' in kwargs:
             self.log_file = kwargs['log_file']

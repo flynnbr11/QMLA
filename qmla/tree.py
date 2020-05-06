@@ -21,7 +21,7 @@ import qmla.database_framework
 pickle.HIGHEST_PROTOCOL = 4  # TODO if >python3, can use higher protocol
 plt.switch_backend('agg')
 
-class qmla_tree():
+class TreeQMLA():
     r"""
     Tree corresponding to a growth rule for management within QMLA.
 
@@ -135,7 +135,7 @@ class qmla_tree():
         for m in model_instances:
             self.model_instances[m] = model_instances[m]
         
-        branch = qmla_branch(
+        branch = BranchQMLA(
             branch_id = branch_id, 
             models = models, 
             model_instances = model_instances, 
@@ -193,7 +193,7 @@ class qmla_tree():
         return self.growth_class.prune_complete
 
 
-class qmla_branch():
+class BranchQMLA():
     def __init__(
         self,
         branch_id, 
@@ -206,7 +206,7 @@ class qmla_branch():
     ):
         # housekeeping
         self.branch_id = branch_id
-        self.tree = tree # qmla_tree instance
+        self.tree = tree # TreeQMLA instance
         self.log_file = self.tree.log_file
         self.growth_class = self.tree.growth_class
         self.growth_rule = self.growth_class.growth_generation_rule

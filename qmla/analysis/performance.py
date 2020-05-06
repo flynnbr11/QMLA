@@ -1213,7 +1213,7 @@ def count_term_occurences(
         incorrect,
         color='b',
         left = correct,
-        label='Inorrectly'
+        label='Incorrectly'
     )
     ax.legend(
         title='Identified:'

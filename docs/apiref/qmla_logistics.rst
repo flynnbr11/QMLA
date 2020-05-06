@@ -55,9 +55,9 @@ Trees and branches
 ------------------
 Classes
 ~~~~~~~~~~~~~~~~
-.. autoclass:: qmla_tree
+.. autoclass:: TreeQMLA
     :members:
-.. autoclass:: qmla_branch
+.. autoclass:: BranchQMLA
     :members:
 
 

@@ -5,20 +5,18 @@
     letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View,
     California, 94041, USA.
     
-.. _quantum_model_learning_agent:
-    
 .. currentmodule:: qmla
 
-Quantum Model Learning Agent
-============================
 
-:class:`QuantumModelLearningAgent` - manager class for the implementation of QMLA
--------------------------------------------------------------------------------
+Growth Rules
+===============
 
-Class Reference 
+
+
+Classes
 ~~~~~~~~~~~~~~~
-.. autoclass:: QuantumModelLearningAgent
-    :members: 
-    :private-members:
+:class:`GrowthRule` Growth rules do this thing. 
 
-    
+.. autoclass:: qmla.growth_rules.GrowthRule
+    :members:
+

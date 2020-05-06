@@ -408,8 +408,8 @@ else:
         # TODO generalise so tree diagram can be used in all cases
         # currently only useful for Ising growth 2 qubits.
         try:
-            print("plot_qmla_tree")
-            qmla_instance.plot_qmla_tree(
+            print("plot_TreeQMLA")
+            qmla_instance.plot_TreeQMLA(
                 only_adjacent_branches=False,
                 save_to_file=str
                 (qmla_controls.plots_directory +

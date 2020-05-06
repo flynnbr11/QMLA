@@ -79,11 +79,11 @@ git_commit=$(git rev-parse HEAD)
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='FermiHubbardLatticeSet'
 # growth_rule='NVLargeSpinBath'
-growth_rule='SimulatedNVCentre'
+# growth_rule='SimulatedNVCentre'
 # growth_rule='GeneticTest'
 # growth_rule='IsingGenetic'
 # growth_rule='Genetic'
-# growth_rule='NVExperimentalData'
+growth_rule='NVExperimentalData'
 
 # sim_growth_rule='IsingProbabilistic'
 # sim_growth_rule='IsingPredetermined'

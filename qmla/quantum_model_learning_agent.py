@@ -207,7 +207,7 @@ class QuantumModelLearningAgent():
 
         # Tree object for each growth rule
         self.trees = {
-            gen : qmla.tree.qmla_tree(
+            gen : qmla.tree.TreeQMLA(
                 growth_class = self.unique_growth_rule_instances[gen],
                 log_file = self.log_file
             )
@@ -334,12 +334,6 @@ class QuantumModelLearningAgent():
                 port=self.redis_port_number
             )
             test_workers = self.use_rq
-            # self.rq_queue = Queue(
-            #     self.qmla_id, # queue number redis will assign tasks via
-            #     connection=self.redis_conn,
-            #     async=test_workers,
-            #     default_timeout=self.rq_timeout
-            # )
             parallel_enabled = True
         except BaseException:
             self.log_print("Importing rq failed: enforcing serial.")
@@ -609,41 +603,35 @@ class QuantumModelLearningAgent():
                     result_ttl=-1,
                     timeout=self.rq_timeout
                 )
-                if blocking:  # i.e. wait for result when called.
-                    self.log_print(
-                        [
-                            "Blocking: waiting for",
-                            model_name,
-                            "to finish on redis queue."
-                        ]
-                    )
+                if blocking:  
+                    # wait for result when called.
+                    self.log_print([
+                        "Blocking: waiting for {} to finish on redis queue".format(
+                            model_name
+                        )
+                    ])
                     while not queued_model.is_finished:
                         t_init = time.time()
                         some_job_failed = queued_model.is_failed
                         self.timings['jobs_finished'] += time.time() - t_init
                         self.call_counter['jobs_finished'] += 1
                         if some_job_failed:
-                            self.log_print(
-                                [
-                                    "Model", model_name,
-                                    "has failed on remote worker."
-                                ]
-                            )
+                            self.log_print([
+                                "Model", model_name,
+                                "has failed on remote worker."
+                            ])
                             raise NameError("Remote QML failure")
                             break
                         time.sleep(self.sleep_duration)
                     self.log_print(
                         ['Blocking RQ - model learned:', model_name]
                     )
-
             else:
-                self.log_print(
-                    [
-                        "Locally calling learn model function.",
-                        "model:", model_name,
-                        " ID:", model_id
-                    ]
-                )
+                self.log_print([
+                    "Locally calling learn model function.",
+                    "model:", model_name,
+                    " ID:", model_id
+                ])
                 # if computing locally, tell the fnc directly the probes rather than
                 # unpickling from redis database
                 self.qmla_settings['probe_dict'] = self.probes_system
@@ -662,15 +650,12 @@ class QuantumModelLearningAgent():
                     log_file = self.rq_log_file
                 )
 
-                # del updated_model_info
-
     def compare_model_pair(
         self,
         model_a_id,
         model_b_id,
         return_job=False,
         branch_id=None,
-        # interbranch=False,
         remote=True,
         wait_on_result=False
     ):
@@ -696,8 +681,6 @@ class QuantumModelLearningAgent():
 
         """
 
-        # if branch_id is None:
-        #     interbranch = True
         unique_id = database_framework.unique_model_pair_identifier(
             model_a_id,
             model_b_id
@@ -785,6 +768,7 @@ class QuantumModelLearningAgent():
 
         If `pair_list` is specified, those pairs are compared; 
         otherwise all pairs within `model_id_list` are compared. 
+
         Pairs are sent to :meth:`QuantumModelLearningAgent.compare_model_pair`
         to be computed either locally or on a job queue. 
         
@@ -870,6 +854,7 @@ class QuantumModelLearningAgent():
         If `pair_list` is specified, those pairs are compared; 
         otherwise pairs are retrieved from the `pairs_to_compare` 
         attribute of the branch, which is usually all-to-all. 
+
         Pairs are sent to :meth:`QuantumModelLearningAgent.compare_model_pair`
         to be computed either locally or on a job queue. 
         
@@ -887,21 +872,20 @@ class QuantumModelLearningAgent():
             pair_list = self.branches[branch_id].pairs_to_compare
         active_branches_bayes = self.redis_databases['active_branches_bayes']
         active_branches_bayes.set(int(branch_id), 0)  # set up branch 0
-        self.log_print(
-            [
-                'compare_models_within_branch',
+        self.log_print([
+            'compare_models_within_branch. branch {} has pairs {}'.format(
                 branch_id,
-                'pair_list:',
                 pair_list
-            ]
-        )
+            )
+        ])
 
         for pair in pair_list:
             a = pair[0]
             b = pair[1]
             if a != b:
                 unique_id = database_framework.unique_model_pair_identifier(
-                    a, b)
+                    a, b
+                )
                 if (
                     unique_id not in self.bayes_factor_pair_computed
                     or recompute == True
@@ -968,7 +952,7 @@ class QuantumModelLearningAgent():
             ])
 
         # bayes_factor refers to calculation BF(pair), where pair
-        # is defined (lower, higher) for continuity
+        # is always defined (lower, higher) for consistency
         lower_id = min(a, b)
         higher_id = max(a, b)
 
@@ -1001,8 +985,6 @@ class QuantumModelLearningAgent():
     def process_model_set_comparisons(
         self,
         model_list,
-        # models_points_dict=None,
-        # num_times_to_use='all'
     ):
         r"""
         Process comparisons between a set of models. 
@@ -1010,10 +992,13 @@ class QuantumModelLearningAgent():
         Pairwise comparisons are retrieved and processed by 
         :meth:`QuantumModelLearningAgent.process_model_pair_comparison`, 
         which informs the superior model. 
+        
         For each pairwise comparison a given model wins, it receives a single point. 
+        
         All comparisons are weighted evenly. 
         Model points are gathered; the model with most points is 
         deemed the champion of the set. 
+
         If a subset of models have the same (highest) number of points, 
         that subset is compared directly, with the nominated champion
         deemed the champion of the wider set. 
@@ -1022,63 +1007,60 @@ class QuantumModelLearningAgent():
         :return: unique model ID of the champion model within the set
 
         """
-        models_points = {}
-        for mod in model_list:
-            models_points[mod] = 0
 
-        for i in range(len(model_list)):
-            mod1 = model_list[i]
-            for j in range(i, len(model_list)):
-                mod2 = model_list[j]
-                if mod1 != mod2:
+        # establish pairs to check comparisons between
+        pair_list = list(itertools.combinations(
+            model_list, 2
+        ))
 
-                    res = self.process_model_pair_comparison(a=mod1, b=mod2)
-                    if res == mod1:
-                        loser = mod2
-                    elif res == mod2:
-                        loser = mod1
-                    models_points[res] += 1
-                    self.log_print(
-                        [
-                            "[process_model_set_comparisons]",
-                            "Point to", res,
-                            "(comparison {}/{})".format(mod1, mod2)
-                        ]
-                    )
+        # process result for each pair
+        models_points = {
+            mod : 0
+            for mod in model_list
+        }
+        for pair in pair_list:
+            mod1, mod2 = pair
+            if mod1 != mod2:
+                res = self.process_model_pair_comparison(a=mod1, b=mod2)
+                models_points[res] += 1
+                self.log_print(
+                    [
+                        "[process_model_set_comparisons]",
+                        "Point to", res,
+                        "(comparison {}/{})".format(mod1, mod2)
+                    ]
+                )
 
+        # analyse pairwise competition
         max_points = max(models_points.values())
-        max_points_branches = [key for key, val in models_points.items()
+        models_with_max_points = [key for key, val in models_points.items()
                                if val == max_points]
-        if len(max_points_branches) > 1:
-            self.log_print(
-                [
-                    "Multiple models \
-                    have same number of points in process_model_set_comparisons:",
-                    max_points_branches
-                ]
-            )
-            self.log_print(["Recompute Bayes bw:"])
-            for i in max_points_branches:
+        if len(models_with_max_points) > 1:
+            self.log_print([
+                "Multiple models \
+                have same number of points in process_model_set_comparisons:",
+                models_with_max_points
+            ])
+            for i in models_with_max_points:
                 self.log_print(
                     [
                         database_framework.model_name_from_id(self.model_database, i)
                     ]
                 )
-            self.log_print(["Points:\n", models_points])
+            self.log_print(["After re-comparison, points:\n", models_points])
             self.compare_model_set(
-                model_id_list=max_points_branches,
+                model_id_list=models_with_max_points,
                 remote=True,
                 recompute=True, # recompute here b/c deadlock last time
                 wait_on_result=True
             )
             champ_id = self.process_model_set_comparisons(
-                max_points_branches,
+                models_with_max_points,
             )
         else:
-            self.log_print(["After comparing list:", models_points])
+            self.log_print(["After comparing list, points:\n", models_points])
             champ_id = max(models_points, key=models_points.get)
         
-        champ_name = self.model_name_id_map[champ_id]
         return champ_id
 
 
@@ -1095,8 +1077,7 @@ class QuantumModelLearningAgent():
         such as updating the branch's `champion_id`, `bayes_points` 
         attributes). 
         Pairwise comparisons are retrieved and processed by 
-        :meth:`QuantumModelLearningAgent.process_model_pair_comparison`, 
-        which informs the superior model. 
+        :meth:`process_model_pair_comparison`, which informs the superior model. 
         For each pairwise comparison a given model wins, it receives a single point. 
         All comparisons are weighted evenly. 
         Model points are gathered; the model with most points is 
@@ -1112,6 +1093,8 @@ class QuantumModelLearningAgent():
             -   champ_id: unique model ID of the champion model within the set
 
         """
+
+        # establish pairs to check comparisons between
         if pair_list is None:
             pair_list = self.branches[branch_id].pairs_to_compare
             self.log_print([
@@ -1122,6 +1105,7 @@ class QuantumModelLearningAgent():
             ])
             active_models_in_branch = self.branches[branch_id].resident_model_ids
 
+        # process result for each pair
         models_points = {
             k : 0
             for k in active_models_in_branch
@@ -1144,55 +1128,40 @@ class QuantumModelLearningAgent():
                     "Point to", res,
                 ])
 
+        # analyse pairwise competition
         max_points = max(models_points.values())
-        max_points_branches = [
+        models_with_max_points = [
             key for key, val in models_points.items()
             if val == max_points
         ]
 
-        if len(max_points_branches) > 1:
-            # TODO ensure multiple models with same # wins
-            # doesn't crash
-            # e.g. take top two, and select the pairwise winner
-            # as champ_id
-            self.log_print(
-                [
-                    "This may cause it to crash:",
-                    "Multiple models have same number of points within \
+        if len(models_with_max_points) > 1:
+            # if multiple models have same number of wins, 
+            # run competition beween subset
+            self.log_print([
+                "Multiple models have same number of points within \
                     branch.\n",
-                    models_points
-                ]
-            )
+                models_points,
+                "This may cause infinite loop if models can \
+                    not be separated.",
+                ])
             self.compare_model_set(
-                model_id_list=max_points_branches,
-                remote=True,
-                recompute=False,
-                wait_on_result=True
+                model_id_list = models_with_max_points,
+                remote = True,
+                recompute = False,
+                wait_on_result = True
             )
-
             champ_id = self.process_model_set_comparisons(
-                max_points_branches,
-                # models_points_dict=models_points
+                models_with_max_points,
             )
         else:
+            # champion is model with most points
             champ_id = max(models_points, key=models_points.get)
 
+        # update branch object with results of competition
         champ_id = int(champ_id)
         champ_name = self.model_name_id_map[champ_id]
         champ_num_qubits = database_framework.get_num_qubits(champ_name)
-
-        for model_id in active_models_in_branch:
-            self._update_model_record(
-                model_id=model_id,
-                field='Status',
-                new_value='Deactivated'
-            )
-
-        self._update_model_record(
-            name=champ_name,
-            field='Status',
-            new_value='Active'
-        )
         ranked_model_list = sorted(
             models_points,
             key=models_points.get,
@@ -1203,45 +1172,20 @@ class QuantumModelLearningAgent():
         self.branches[branch_id].champion_name = champ_name
         self.branches[branch_id].rankings = ranked_model_list
         self.branches[branch_id].bayes_points = models_points
-        self.log_print(
-            [
-                "Model points for branch {}: {}".format(
-                    branch_id,
-                    models_points,
-                ),
-                "\nChampion of branch {} is model {}: {}".format(
-                    branch_id, 
-                    champ_id, 
-                    champ_name
-                )
-            ]
-        )
-
-        if self.branches[branch_id].is_ghost_branch:
-            models_to_deactivate = list(
-                set(active_models_in_branch)
-                - set([champ_id])
+        self.log_print([
+            "Model points for branch {}: {}".format(
+                branch_id,
+                models_points,
+            ),
+            "\nChampion of branch {} is model {}: {}".format(
+                branch_id, 
+                champ_id, 
+                champ_name
             )
-            # Ghost branches are to compare
-            # already computed models from
-            # different branches.
-            # So deactivate losers since they shouldn't
-            # progress if they lose in a ghost branch.
-            for losing_model_id in models_to_deactivate:
-                try:
-                    self._update_model_record(
-                        model_id=losing_model_id,
-                        field='Status',
-                        new_value='Deactivated'
-                    )
-                except BaseException:
-                    self.log_print(
-                        [
-                            "not deactivating",
-                            losing_model_id,
-                        ]
-                    )
-        return models_points, champ_id
+        ])
+
+        # return the winning model's ID
+        return champ_id
 
     ##########
     # Section: routines to implement tree-based QMLA 
@@ -1250,45 +1194,77 @@ class QuantumModelLearningAgent():
     def learn_models_until_trees_complete(
         self, 
     ):
+        r"""
+        Iteratively learn/compare/generate models on growth rule trees. 
+
+        Each :class:`growth_rules.GrowthRule` has a unique :class:`TreeQMLA`. 
+        Trees hold sets of models in :class:`BranchQMLA`s. 
+
+        Models on a given branch are learned through 
+        :meth:`learn_models_on_given_branch`. 
+        Any model which has previously been considered defaults to the earlier
+        instance of that model, rather than repeating the calculation. 
+        When all models on a branch are learned, they are all compared
+        through :meth:`compare_models_within_branch`. 
+
+        When a branch has completed learning and comparisons of models, 
+        the corresponding tree is checked to see if it has finished proposing 
+        models, through :meth:`TreeQMLA.is_tree_complete`. 
+        If the tree is not complete, the :meth:`TreeQMLA.next_layer`
+        method is called to generate the next branch on that tree. 
+        The next branch can correspond to `spawn` or `prune` stages of the 
+        tree's :class:`growth_rules.GrowthRule`, but QMLA is ambivalent to the 
+        inner workings of the tree/growth rule: a branch is 
+        simply a set of models to learn and compare. 
+
+        When all trees have completed learning, this function terminates. 
+        """
+
+        # get redis databases
         active_branches_learning_models = (
             self.redis_databases['active_branches_learning_models']
         )
         active_branches_bayes = self.redis_databases['active_branches_bayes']
 
-        self.log_print(
-            [
-                "Starting learning for initial branches:", 
-                list(self.branches.keys())
-            ]
-        )
         for b in self.branches:
             self.learn_models_on_given_branch(
                 b,
                 blocking=False,
                 use_rq=True
             )
+        self.log_print([
+            "Starting learning for initial branches:", 
+            list(self.branches.keys())
+        ])
 
-        self.log_print(
-            [
-                "Entering while loop; spawning model layers and comparing."
-            ]
-        )
+        # Iteratively learn/compare/spawn until all trees declare completion
+        self.log_print([
+            "Entering while loop: learning/comparing/spawning models."
+        ])
         while self.tree_count_completed < self.tree_count:
+            # get most recent branches on redis database
             branch_ids_on_db = list(
                 active_branches_learning_models.keys()
             )
             branch_ids_on_db = [
                 int(b) for b in branch_ids_on_db
             ]
-            self._inspect_remote_job_crashes()
+
+            # check if any job has crashed
+            if self.run_in_parallel:
+                self._inspect_remote_job_crashes()
+
+            # loop through active branches        
             for branch_id in branch_ids_on_db:
+                
+                # inspect if branch has finished learning
+                num_models_learned_on_branch = int(
+                    active_branches_learning_models.get(branch_id)
+                ) 
                 if (
-                    int(
-                        active_branches_learning_models.get(
-                            branch_id)
-                    ) == self.branches[branch_id].num_models
-                    and
-                    self.branches[branch_id].model_learning_complete == False
+                    not self.branches[branch_id].model_learning_complete
+                    and 
+                    num_models_learned_on_branch == self.branches[branch_id].num_models
                 ):
                     self.log_print([
                         "All models on branch {} learned".format(branch_id)
@@ -1297,28 +1273,29 @@ class QuantumModelLearningAgent():
                     for mod_id in self.branches[branch_id].resident_model_ids:
                         mod = self.get_model_storage_instance_by_id(mod_id)
                         mod.model_update_learned_values()
-                    self.compare_models_within_branch(branch_id) # launch bayes factors calculation
+                    # launch comparisons
+                    self.compare_models_within_branch(branch_id) 
 
             for branchID_bytes in active_branches_bayes.keys():
                 branch_id = int(branchID_bytes)
-                bayes_calculated = active_branches_bayes.get(
+                num_comparisons_complete_on_branch = active_branches_bayes.get(
                     branchID_bytes
-                ) # how many completed and stored on redis db
-
+                )
                 if (
-                    int(bayes_calculated) == self.branches[branch_id].num_model_pairs
+                    not self.branches[branch_id].comparisons_complete 
                     and
-                    self.branches[branch_id].comparisons_complete == False
+                    int(num_comparisons_complete_on_branch) == self.branches[branch_id].num_model_pairs
                 ):
                     self.branches[branch_id].comparisons_complete = True
-                    self.process_comparisons_within_branch(branch_id) # analyse resulting bayes factors
-                    self.log_print(
-                        [
-                            "Branch {} comparisons complete".format(
-                                branch_id
-                            )
-                        ]
-                    )
+                    # analyse resulting bayes factors
+                    self.process_comparisons_within_branch(branch_id) 
+                    self.log_print([
+                        "Branch {} comparisons complete".format(
+                            branch_id
+                        )
+                    ])
+                    
+                    # check if tree is complete
                     if self.branches[branch_id].tree.is_tree_complete():
                         self.tree_count_completed += 1
                         self.log_print(
@@ -1330,6 +1307,7 @@ class QuantumModelLearningAgent():
                             ]
                         )
                     else: 
+                        # tree not complete -> launch next set of models 
                         self.spawn_from_branch(
                             branch_id=branch_id,
                             growth_rule=self.branches[branch_id].tree.growth_rule,
@@ -1377,25 +1355,17 @@ class QuantumModelLearningAgent():
                         self.process_comparisons_within_branch(branch_id) 
 
             if (
-                np.all(
-                    np.array(
-                        [
-                            self.branches[b].model_learning_complete
-                            for b in self.branches
-                        ]
-                    ) == True
-                )
+                np.all(np.array([
+                    self.branches[b].model_learning_complete for b in self.branches
+                ]))
                 and
-                np.all(
-                    np.array(
-                        [self.branches[b].comparisons_complete for b in self.branches]
-                    ) == True
-                )
+                np.all(np.array([
+                    self.branches[b].comparisons_complete for b in self.branches 
+                ]))
             ):
-                still_learning = False  # i.e. break out of this while loop
-        self.log_print([
-            "Learning stage complete on all trees."
-        ])
+                # break out of this while loop
+                still_learning = False  
+        self.log_print(["Learning stage complete on all trees."])
 
     def spawn_from_branch(
         self,
@@ -2036,7 +2006,7 @@ class QuantumModelLearningAgent():
             pair_list = global_champ_branch.pairs_to_compare,
             wait_on_result = True, 
         )
-        model_points, champ_id = self.process_comparisons_within_branch(
+        champ_id = self.process_comparisons_within_branch(
             branch_id = global_champ_branch_id
         )
         self.global_champion_id = champ_id
@@ -2045,7 +2015,7 @@ class QuantumModelLearningAgent():
         )
         self.global_champion_name = self.global_champion_model.model_name
         self.log_print([
-            "Global champion branch points:", model_points, 
+            "Global champion branch points:", global_champ_branch.bayes_points,
             "\nGlobal champion ID:", champ_id,
             "\nGlobal champion:", self.global_champion_name
         ])
@@ -2658,7 +2628,7 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plot_qmla_tree(
+    def plot_TreeQMLA(
         self,
         modlist=None,
         only_adjacent_branches=True,

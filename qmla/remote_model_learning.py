@@ -37,14 +37,17 @@ def remote_learn_model_parameters(
     Standalone function to perform Quantum Hamiltonian Learning on individual models.
 
     Used in conjunction with redis databases so this calculation can be 
-        performed without any knowledge of the QMLA instance. 
+    performed without any knowledge of the QMLA instance. 
+    
     Given model ids and names are used to instantiate 
-        the ModelInstanceForLearning class, which is then used
-        for learning the models parameters.
+    the ModelInstanceForLearning class, which is then used
+    for learning the models parameters.
+    
     QMLA info is unpickled from a redis databse, containing
-        true operator, params etc.
+    true operator, params etc.
+    
     Once parameters are learned, we pickle the results to dictionaries
-        held on a redis database which can be accessed by other actors.
+    held on a redis database which can be accessed by other actors.
 
     :param str name: model name string
     :param int model_id: unique model id
