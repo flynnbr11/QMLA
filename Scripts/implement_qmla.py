@@ -11,9 +11,6 @@ import random
 import pickle
 pickle.HIGHEST_PROTOCOL = 4
 
-# qmla_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
-# sys.path.append(qmla_root)
-# print("Added {} to sys path".format(qmla_root))
 
 p = os.path.abspath(os.path.realpath(__file__))
 elements = p.split('/')[:-2]
