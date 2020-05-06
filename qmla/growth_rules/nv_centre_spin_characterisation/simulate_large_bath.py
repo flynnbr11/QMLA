@@ -35,6 +35,11 @@ class SimulatedNVCentre(
         gamma_n = 0.307e6 / 1e-6 # from Seb's thesis
         gamma = 10.705e6 # T^-1 s^-1 # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5226623/
         self.true_model_terms_params = {
+            # 'x' : 0.55,
+            # test
+            # 'pauliSet_1_x_d1' : 4, # TEST - kHz
+            # 'pauliSet_1_y_d1' : 4, # TEST - kHz
+            # 'pauliSet_1_z_d1' : 4, # TEST - kHz
             # spin
             'pauliSet_1_x_d3' : B*g*bohr_magneton/hbar, # ~1.943 GHz
             'pauliSet_1_y_d3' : B*g*bohr_magneton/hbar,
@@ -58,6 +63,11 @@ class SimulatedNVCentre(
         }
 
         self.gaussian_prior_means_and_widths = {
+            # 'x' : (0.5, 0.2),
+            # test
+            'pauliSet_1_x_d1' : (5, 2), # TEST
+            'pauliSet_1_y_d1' : (5, 2), # TEST
+            'pauliSet_1_z_d1' : (5, 2), # TEST
             # spin
             'pauliSet_1_x_d3' : (5e9, 2e9), # ~1.943 GHz
             'pauliSet_1_y_d3' : (5e9, 2e9),
@@ -95,6 +105,8 @@ class SimulatedNVCentre(
         time_basis = 1e-9 # nanoseconds
         self.max_time_to_consider = 50 * time_basis # 50 microseconds 
         self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
+        # self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
 
     def generate_models(self, model_list, **kwargs):
         if self.spawn_stage[-1]==None:
@@ -107,6 +119,12 @@ class SimulatedNVCentre(
         else:
             return False
 
+    def _latex_name(
+        self,
+        name,
+        **kwargs
+    ):
+        return "${}$".format(name)
 
     def latex_name(
         self,

@@ -273,11 +273,6 @@ pickle.dump(
 )
 # get measurements of the true system
 ## work them out only once and share with all instances
-print("[Set QMLA params] Storing true measurements to {}".format(
-    arguments.true_expec_path
-    )
-)
-
 true_system_measurements = growth_class.get_measurements_by_time()
 print("Measuerements from GR:", true_system_measurements)
 pickle.dump(

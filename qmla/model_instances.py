@@ -540,14 +540,19 @@ class ModelInstanceForLearning():
                 self.epochs_after_resampling.append(istep)
 
             _time_init = time.time()
+            volume = qi.utils.ellipsoid_volume(
+                invA = self.qinfer_updater.est_covariance_mtx()
+            )
             self.volume_by_epoch = np.append(
                 self.volume_by_epoch,
-                np.linalg.det(
-                    sp.linalg.sqrtm(
-                        self.qinfer_updater.est_covariance_mtx()
-                    )  # TODO seems unnecessary to do this every epoch - every 10th would be enough for plot
-                )
+                volume
+                # np.linalg.det(
+                #     sp.linalg.sqrtm(
+                #         self.qinfer_updater.est_covariance_mtx()
+                #     ) 
+                # )
             )
+            # TODO seems unnecessary to do this every epoch - every 10th would be enough for plot
             self.time_volume += time.time() - _time_init
 
             self.track_mean_params.append(self.qinfer_updater.est_mean())
