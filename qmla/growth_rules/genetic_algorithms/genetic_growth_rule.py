@@ -500,7 +500,8 @@ class Genetic(
 
             self.log_print(
                 [
-                    "Terminating search early b/c elite model unchanged in {} iterations.".format(
+                    "Terminating search early (after {} generations) b/c elite model unchanged in {} generations.".format(
+                        self.genetic_algorithm.genetic_generation, 
                         self.genetic_algorithm.unchanged_elite_num_generations_cutoff
                     ),
                     "Declaring champion:", self.champion_model
