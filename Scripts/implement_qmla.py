@@ -494,7 +494,15 @@ if qmla_controls.host_name.startswith('node'):
             qmla_controls.port_number
         )
     ])
-    redis_server.shutdown()
+    try:    
+        redis_server.shutdown()
+    except:
+        log_print([
+            "Failed to shut down server {}:{}".format(
+                qmla_controls.host_name, 
+                qmla_controls.port_number
+            )
+        ])
 else:
     log_print([
         "Not shutting down redis server {}:{}".format(
