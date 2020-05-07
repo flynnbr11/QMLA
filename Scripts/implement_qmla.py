@@ -481,7 +481,9 @@ log_print(
         ". Time:", end - start
     ],
 )
-
+log_print([
+    "Trying to shut down redis server"
+])
 if qmla_controls.host_name.startswith('node'):
     import redis
     redis_server = redis.Redis(
@@ -511,4 +513,8 @@ else:
         )
     ])
 
+
+log_print([
+    "Beyond the point of shutting down redis server"
+])
 print("-----------QMLA finished; results in {} ---------".format(qmla_controls.results_directory))
