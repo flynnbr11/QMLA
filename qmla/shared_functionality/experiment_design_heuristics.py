@@ -422,3 +422,107 @@ def new_time_based_on_eigvals(
     min_eigval = min(max_eigvals)
     new_time = time_scale * 1 / min_eigval
     return new_time
+
+
+class BaseHeuristicQMLA(qi.Heuristic):
+    def __init__(
+        self,
+        updater,
+        oplist=None,
+        norm='Frobenius',
+        inv_field='x_',
+        t_field='t',
+        maxiters=10,
+        other_fields=None,
+        inv_func=identity,
+        t_func=identity,        
+        **kwargs
+    ):
+        super().__init__(updater)
+        self._norm = norm
+        self._x_ = inv_field
+        self._t = t_field
+        self._inv_func = inv_func
+        self._t_func = t_func
+        self._other_fields = other_fields if other_fields is not None else {}
+        self._updater = updater
+        self._maxiters = maxiters
+        self._oplist = oplist
+        
+    def _get_exp_params_array(self):
+        r"""Return an empty array with a position for every experiment design parameter."""
+        experiment_params = np.empty(
+            (1,),
+            dtype=self._updater.model.expparams_dtype
+        )
+        return experiment_params
+
+    def __call__(self):
+        print("__call__ not written")
+
+
+class SampleOrderMagnitude(BaseHeuristicQMLA):
+    
+    def __init__(
+        self,
+        updater,
+        **kwargs
+    ):
+        super().__init__(updater, **kwargs)
+   
+    
+    def __call__(
+        self,
+        epoch_id=0,
+        **kwargs
+    ):
+        experiment = self._get_exp_params_array() # empty experiment array
+        
+        # sample from updater
+        idx_iter = 0
+        while idx_iter < self._maxiters:
+
+            x, xp = self._updater.sample(n=2)[:, np.newaxis, :]
+            if self._updater.model.distance(x, xp) > 0:
+                break
+            else:
+                idx_iter += 1
+
+        cov_mtx = self._updater.est_covariance_mtx()
+        orders_of_magnitude = np.log10(
+            np.sqrt(np.abs(np.diag(cov_mtx)))
+        ) # of the uncertainty on the individual parameters
+
+        probs_of_orders = [
+            i/sum(orders_of_magnitude) for i in orders_of_magnitude
+        ] # weight of each order of magnitude
+        # sample from the present orders of magnitude
+        selected_order = np.random.choice(
+            a = orders_of_magnitude, 
+            p = probs_of_orders
+        )
+
+        idx_params_of_similar_uncertainty = np.where(
+            np.isclose(orders_of_magnitude, selected_order, atol=1)
+        ) # within 1 order of magnitude of the max
+
+        # change the scaling matrix used to calculate the distance
+        # to place importance only on the sampled order of magnitude
+        self._updater.model._Q = np.zeros( len(orders_of_magnitude) )
+        for idx in idx_params_of_similar_uncertainty:
+            self._updater.model._Q[idx] = 1
+
+        d = self._updater.model.distance(x, xp)
+        new_time = 1 / d
+        experiment[self._t] = new_time
+
+        print("Available orders of magnitude:", orders_of_magnitude)
+        print("Selected order = ", selected_order)    
+        print("x= {}".format(x))
+        print("x'={}".format(xp))
+        print("Distance = ", d)
+        print("Distance order mag=", np.log10(d))
+        print("=> time=", new_time)
+        
+        return experiment
+
