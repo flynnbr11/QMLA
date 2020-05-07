@@ -482,21 +482,22 @@ log_print(
     ],
 )
 log_print([
-    "Trying to shut down redis server"
+    "Trying to shut down redis server",
+    "host={}; port={}".format(qmla_controls.host_name, qmla_controls.port_number)
 ])
 if qmla_controls.host_name.startswith('node'):
-    import redis
-    redis_server = redis.Redis(
-        host=qmla_controls.redis_host_name, 
-        port=qmla_controls.redis_port_number
-    )
-    log_print([
-        "Shutting down redis server -- {}:{}".format(
-            qmla_controls.host_name, 
-            qmla_controls.port_number
-        )
-    ])
     try:    
+        import redis
+        redis_server = redis.Redis(
+            host=qmla_controls.redis_host_name, 
+            port=qmla_controls.redis_port_number
+        )
+        log_print([
+            "Shutting down redis server -- {}:{}".format(
+                qmla_controls.host_name, 
+                qmla_controls.port_number
+            )
+        ])
         redis_server.shutdown()
     except:
         log_print([
@@ -505,6 +506,7 @@ if qmla_controls.host_name.startswith('node'):
                 qmla_controls.port_number
             )
         ])
+        raise
 else:
     log_print([
         "Not shutting down redis server {}:{}".format(
