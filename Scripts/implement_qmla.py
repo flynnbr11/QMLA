@@ -481,24 +481,14 @@ log_print(
         ". Time:", end - start
     ],
 )
-log_print([
-    "Trying to shut down redis server",
-    "host={}; port={}".format(qmla_controls.host_name, qmla_controls.port_number)
-])
+
 if qmla_controls.host_name.startswith('node'):
     try:    
         import redis
-    except:
-        log_print(["failed to import redis"])
-    try:
         redis_server = redis.Redis(
             host=qmla_controls.host_name, 
             port=qmla_controls.port_number
         )
-    except:
-        log_print(["failed to generate connection"])
-
-    try:
         log_print([
             "Shutting down redis server -- {}:{}".format(
                 qmla_controls.host_name, 
@@ -514,16 +504,4 @@ if qmla_controls.host_name.startswith('node'):
             )
         ])
 
-else:
-    log_print([
-        "Not shutting down redis server {}:{}".format(
-            qmla_controls.host_name, 
-            qmla_controls.port_number
-        )
-    ])
-
-
-log_print([
-    "Beyond the point of shutting down redis server"
-])
 print("-----------QMLA finished; results in {} ---------".format(qmla_controls.results_directory))
