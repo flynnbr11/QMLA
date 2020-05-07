@@ -482,4 +482,18 @@ log_print(
     ],
 )
 
+if qmla_controls.host_name.startswith('Node'):
+    import redis
+    redis_server = redis.Redis(
+        host=qmla_controls.redis_host_name, 
+        port=qmla_controls.redis_port_number
+    )
+    log_print([
+        "Shutting down redis server -- {}:{}".format(
+            qmla_controls.host_name, 
+            qmla_controls.port_number
+        )
+    ])
+    redis_server.shutdown()
+
 print("-----------QMLA finished; results in {} ---------".format(qmla_controls.results_directory))

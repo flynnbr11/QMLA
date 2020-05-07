@@ -1310,8 +1310,8 @@ class QuantumModelLearningAgent():
                         # tree not complete -> launch next set of models 
                         self.spawn_from_branch(
                             branch_id=branch_id,
-                            growth_rule=self.branches[branch_id].tree.growth_rule,
-                            num_models=1
+                            # growth_rule=self.branches[branch_id].tree.growth_rule,
+                            # num_models=1
                         )
 
         self.log_print([
@@ -1370,9 +1370,28 @@ class QuantumModelLearningAgent():
     def spawn_from_branch(
         self,
         branch_id,
-        growth_rule,
+        # growth_rule,
         num_models=1
     ):
+        r""" 
+        Retrieve the next set of models and place on a new branch. 
+
+        By checking the :class:`TreeQMLA` associated with the `branch_id` used 
+        to call this method, call :meth:`TreeQMLa.next_layer`, which returns 
+        a set of models to place on a new branch, as well as which models therein
+        to compare. These are passed to :meth:`new_branch`, constructing a new branch 
+        in the QMLA environment. 
+        :meth:`TreeQMLA.next_layer` is in control of how to select the next set of models, 
+        usually either by calling the :class:`GrowthRule`'s :meth:`generate_models` or 
+        :meth:`tree_pruning` methods. This allows the user to define how models are generated, 
+        given access to the comparisons of the previous branch, or how the tree is pruned, e.g. 
+        by performing preliminary parent/child branch champion comparisons. 
+
+        :param int branch_id: unique ID of the branch which has completed
+        :param str growth_rule: 
+
+
+        """
 
         all_models_this_branch = self.branches[branch_id].rankings
         best_models = all_models_this_branch[:num_models]
@@ -1426,7 +1445,7 @@ class QuantumModelLearningAgent():
         new_branch_id = self.new_branch(
             model_list = new_models,
             pairs_to_compare = pairs_to_compare, 
-            growth_rule = growth_rule,
+            growth_rule = self.branches[branch_id].growth_rule,
             spawning_branch = branch_id, 
         )
         self.log_print([

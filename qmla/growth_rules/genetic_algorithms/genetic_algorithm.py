@@ -23,7 +23,6 @@ class GeneticAlgorithmQMLA():
         self.num_sites = num_sites
         self.base_terms = base_terms
         self.get_base_chromosome()
-#         self.addition_str = 'P'*self.num_sites
         self.true_model = true_model
         self.true_chromosome = self.map_model_to_chromosome(self.true_model)
         self.true_chromosome_string = self.chromosome_string(
@@ -38,6 +37,7 @@ class GeneticAlgorithmQMLA():
         self.delta_f_by_generation = {}
         self.genetic_generation = 0
         self.f_score_change_by_generation = {}
+        self.fitness_at_generation = {}
         self.most_elite_models_by_generation = {}
         self.best_model_unchanged = False
         self.unchanged_elite_num_generations_cutoff = 5 #TODO put as 5 - 2 for tests
@@ -376,6 +376,8 @@ class GeneticAlgorithmQMLA():
         num_elites = 2,
         **kwargs
     ):
+
+        self.fitness_at_generation[self.genetic_generation] = model_fitnesses
         ranked_models = sorted(
             model_fitnesses,
             key=model_fitnesses.get,

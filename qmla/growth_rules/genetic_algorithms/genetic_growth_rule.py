@@ -48,6 +48,7 @@ class Genetic(
             initial_rating=1500,
             k_const=30
         ) # for use when ranking/rating models
+        self.fitness_method = 'f_scores' # 'elo_ratings'
         self.prune_completed_initially = True
         self.prune_complete = True
         self.fitness_by_f_score = pd.DataFrame()
@@ -87,7 +88,6 @@ class Genetic(
             mutation_probability=self.mutation_probability,
             log_file=self.log_file
         )
-
         self.true_chromosome = self.genetic_algorithm.true_chromosome
         self.true_chromosome_string = self.genetic_algorithm.true_chromosome_string
 
@@ -114,7 +114,7 @@ class Genetic(
                 for mod in self.initial_models
             ]
         }
-        self.fitness_at_step = {}      
+        self.model_points_at_step = {}      
 
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
@@ -143,7 +143,7 @@ class Genetic(
         evaluation_log_likelihoods = kwargs['evaluation_log_likelihoods']
         # print("Model points:", model_points)
         # print("kwargs: ", kwargs)
-        self.fitness_at_step[self.spawn_step] = model_points
+        self.model_points_at_step[self.spawn_step] = model_points
         model_number_wins = {}
         model_f_scores = {}
         # fitness_by_f_score = {}
@@ -280,13 +280,20 @@ class Genetic(
         self.log_print(
             ["Re-rated fitnessses:", ratings_by_name]
         )
+        if self.fitness_method == 'elo_ratings':
+            genetic_algorithm_fitnesses = ratings_by_name
+        elif self.fitness_method == 'f_scores':
+            genetic_algorithm_fitnesses = model_f_scores
+        elif self.fitness_method == 'number_of_wins':
+            genetic_algorithm_fitnesses = model_number_wins
+        elif self.fitness_method == 'ranking':
+            genetic_algorithm_fitnesses = fitness_by_ranking
+        else:
+            self.log_print(["No fitness method selected for genetic algorithm"])
+
         # TEST: instead of relative number of wins, use model f score as fitness
         new_models = self.genetic_algorithm.genetic_algorithm_step(
-            # model_fitnesses=model_f_scores,
-            # model_fitnesses=model_number_wins,
-            model_fitnesses=ratings_by_name, 
-            # model_fitnesses=fitness_by_ranking,
-            # num_pairs_to_sample=self.initial_num_models
+            model_fitnesses=genetic_algorithm_fitnesses, 
             num_pairs_to_sample=self.initial_num_models / 2 # for every pair, 2 chromosomes proposed
         )
 
