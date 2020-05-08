@@ -691,6 +691,13 @@ class ModelInstanceForLearning():
                         self.final_learned_params[iterator][1]
                     )
 
+        try:
+                self.log_print([
+                "Number of times each order of magnitude of uncertainty used during learning:", 
+                self.model_heuristic.count_order_of_magnitudes
+            ])
+        except:
+            pass
         for k in self.qinfer_model.timings:
             for kk in self.qinfer_model.timings[k]:
                 self.log_print([

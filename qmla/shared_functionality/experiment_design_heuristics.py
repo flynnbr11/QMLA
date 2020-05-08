@@ -469,6 +469,7 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
         **kwargs
     ):
         super().__init__(updater, **kwargs)
+        self.count_order_of_magnitudes =  {}
    
     
     def __call__(
@@ -501,6 +502,10 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
             a = orders_of_magnitude, 
             p = probs_of_orders
         )
+        try:
+            self.count_order_of_magnitudes[ np.round(selected_order)] += 1
+        except:
+            self.count_order_of_magnitudes[ np.round(selected_order)] = 1
 
         idx_params_of_similar_uncertainty = np.where(
             np.isclose(orders_of_magnitude, selected_order, atol=1)
