@@ -41,9 +41,9 @@ class SimulatedNVCentre(
             # 'pauliSet_1_y_d1' : 4, # TEST - kHz
             # 'pauliSet_1_z_d1' : 4, # TEST - kHz
             # spin
-            # 'pauliSet_1_x_d3' : B*g*bohr_magneton/hbar, # ~1.943 GHz
-            # 'pauliSet_1_y_d3' : B*g*bohr_magneton/hbar,
-            # 'pauliSet_1_z_d3' : B*g*bohr_magneton/hbar,
+            'pauliSet_1_x_d3' : B*g*bohr_magneton/hbar, # ~1.943 GHz
+            'pauliSet_1_y_d3' : B*g*bohr_magneton/hbar,
+            'pauliSet_1_z_d3' : B*g*bohr_magneton/hbar,
             # nitrogen nuclei
             # 'pauliSet_2_x_d3' : B*gamma_n , # ~3.37GHz
             # 'pauliSet_2_y_d3' : B*gamma_n ,
@@ -69,10 +69,15 @@ class SimulatedNVCentre(
             'pauliSet_1_x_d1' : (5, 2), # TEST
             'pauliSet_1_y_d1' : (5, 2), # TEST
             'pauliSet_1_z_d1' : (5, 2), # TEST
+            # spin w v thin prior
+            'pauliSet_1_x_d3' : (B*g*bohr_magneton/hbar, 2e4), # ~1.943 GHz
+            'pauliSet_1_y_d3' : (B*g*bohr_magneton/hbar, 2e4),
+            'pauliSet_1_z_d3' : (B*g*bohr_magneton/hbar, 2e4),
+
             # spin
-            'pauliSet_1_x_d3' : (5e9, 2e9), # ~1.943 GHz
-            'pauliSet_1_y_d3' : (5e9, 2e9),
-            'pauliSet_1_z_d3' : (5e9, 2e9),
+            # 'pauliSet_1_x_d3' : (5e9, 2e9), # ~1.943 GHz
+            # 'pauliSet_1_y_d3' : (5e9, 2e9),
+            # 'pauliSet_1_z_d3' : (5e9, 2e9),
             # nitrogen nuclei
             'pauliSet_2_x_d3' : (5e9, 2e9) , # ~3.37GHz
             'pauliSet_2_y_d3' : (5e9, 2e9) ,
