@@ -70,14 +70,14 @@ class SimulatedNVCentre(
             'pauliSet_1_y_d1' : (5, 2), # TEST
             'pauliSet_1_z_d1' : (5, 2), # TEST
             # spin w v thin prior
-            'pauliSet_1_x_d3' : (B*g*bohr_magneton/hbar, 2e4), # ~1.943 GHz
-            'pauliSet_1_y_d3' : (B*g*bohr_magneton/hbar, 2e4),
-            'pauliSet_1_z_d3' : (B*g*bohr_magneton/hbar, 2e4),
+            # 'pauliSet_1_x_d3' : (B*g*bohr_magneton/hbar + 1.23e4, 5e7), # ~1.943 GHz
+            # 'pauliSet_1_y_d3' : (B*g*bohr_magneton/hbar+ 1.23e5, 2.3e7),
+            # 'pauliSet_1_z_d3' : (B*g*bohr_magneton/hbar + 3.23e4, 2e7),
 
             # spin
-            # 'pauliSet_1_x_d3' : (5e9, 2e9), # ~1.943 GHz
-            # 'pauliSet_1_y_d3' : (5e9, 2e9),
-            # 'pauliSet_1_z_d3' : (5e9, 2e9),
+            'pauliSet_1_x_d3' : (5e9, 2e9), # ~1.943 GHz
+            'pauliSet_1_y_d3' : (5e9, 2e9),
+            'pauliSet_1_z_d3' : (5e9, 2e9),
             # nitrogen nuclei
             'pauliSet_2_x_d3' : (5e9, 2e9) , # ~3.37GHz
             'pauliSet_2_y_d3' : (5e9, 2e9) ,
@@ -114,7 +114,8 @@ class SimulatedNVCentre(
         self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampledUncertaintyWithConvergenceThreshold
 
     def generate_models(self, model_list, **kwargs):
         if self.spawn_stage[-1]==None:

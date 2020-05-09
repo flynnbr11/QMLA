@@ -692,10 +692,14 @@ class ModelInstanceForLearning():
                     )
 
         try:
-                self.log_print([
+            self.log_print([
                 "Number of times each order of magnitude of uncertainty used during learning:", 
                 self.model_heuristic.count_order_of_magnitudes
             ])
+            self.log_print([
+                "Number of counter productive experiments:", self.model_heuristic.counter_productive_experiments
+            ])
+
         except:
             pass
         for k in self.qinfer_model.timings:
@@ -762,6 +766,7 @@ class ModelInstanceForLearning():
         learned_info['num_experiments'] = self.num_experiments
         learned_info['growth_generator'] = self.growth_rule_of_this_model
         learned_info['heuristic'] = self.model_heuristic_class
+        learned_info['heuristic_instance'] = self.model_heuristic # TODO remove - storing during development
         try:
             learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
             learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record

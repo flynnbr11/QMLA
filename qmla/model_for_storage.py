@@ -126,7 +126,6 @@ class ModelInstanceForStorage():
 
     def model_update_learned_values(
         self,
-        # fitness_parameters,
         learned_info=None,
         **kwargs
     ):
@@ -218,6 +217,7 @@ class ModelInstanceForStorage():
             except BaseException:
                 raise
             self.model_heuristic_class = learned_info['heuristic']
+            self.model_heuristic_instance = learned_info['heuristic_instance']
             self.model_name_latex = self.growth_class.latex_name(
                 name=self.model_name
             )

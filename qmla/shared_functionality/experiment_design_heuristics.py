@@ -531,3 +531,117 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
         
         return experiment
 
+class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
+    
+    def __init__(
+        self,
+        updater,
+        **kwargs
+    ):
+        super().__init__(updater, **kwargs)
+        
+        self._qinfer_model = self._updater.model
+        cov_mtx = self._updater.est_covariance_mtx()
+        self.initial_uncertainties = np.sqrt(np.abs(np.diag(cov_mtx)))
+        self.track_param_uncertainties = np.zeros(self._qinfer_model.n_modelparams)
+        self.selection_criteria = 'relative_volume_decrease'
+        self.count_order_of_magnitudes =  {}
+        self.counter_productive_experiments = 0 
+        
+    def __call__(
+        self,
+        epoch_id=0,
+        **kwargs
+    ):
+        experiment = self._get_exp_params_array() # empty experiment array
+        
+        # sample from updater
+        idx_iter = 0
+        while idx_iter < self._maxiters:
+
+            x, xp = self._updater.sample(n=2)[:, np.newaxis, :]
+            if self._updater.model.distance(x, xp) > 0:
+                break
+            else:
+                idx_iter += 1
+
+        cov_mtx = self._updater.est_covariance_mtx()
+        param_uncertainties = np.sqrt(np.abs(np.diag(cov_mtx))) # uncertainty of params individually
+        orders_of_magnitude = np.log10(
+            param_uncertainties
+        ) # of the uncertainty on the individual parameters
+        self.track_param_uncertainties = np.vstack( 
+            (self.track_param_uncertainties, param_uncertainties) 
+        )
+        
+        if self.selection_criteria == 'relative_volume_decrease':
+            # probability of choosing  order of magnitude 
+            # of each parameter based on the ratio
+            # (change in volume)/(current estimate)
+            # for that parameter
+            print("Sampling by delta uncertainty/ estimate")
+            change_in_uncertainty = np.diff( 
+                self.track_param_uncertainties[-2:], # most recent two track-params
+                axis = 0
+            )[0]
+            print("change in uncertainty=", change_in_uncertainty)
+            if np.all( change_in_uncertainty <0):
+                # TODO better way to deal with all increasing uncertainties
+                print("All parameter uncertainties increased")
+                self.counter_productive_experiments += 1
+                change_in_uncertainty = np.abs(change_in_uncertainty)
+            else:
+                # disregard changes which INCREASE volume:
+                change_in_uncertainty[ change_in_uncertainty < 0 ] = 0
+            current_param_est = self._updater.est_mean()
+            # weight = ratio of how much that change has decreased the volume 
+            # over the current best estimate of the parameter
+            weights = change_in_uncertainty / current_param_est
+            probability_of_param = weights / sum(weights)
+
+        elif self.selection_criteria == 'order_of_magniutde':
+            # probability directly from order of magnitude
+            print("Sampling by order magnitude")
+            probability_of_param = np.array(orders_of_magnitude) / sum(orders_of_magnitude)
+
+        else:
+            # sample evenly
+            print("Sampling evenly")
+            probability_of_param = np.ones(self._qinfer_model.n_modelparams)
+       
+
+        # sample from the present orders of magnitude
+        print("Prob of param=", probability_of_param)
+        selected_order = np.random.choice(
+            a = orders_of_magnitude, 
+            p = probability_of_param
+        )
+        try:
+            self.count_order_of_magnitudes[ np.round(selected_order)] += 1
+        except:
+            self.count_order_of_magnitudes[ np.round(selected_order)] = 1
+
+        idx_params_of_similar_uncertainty = np.where(
+            np.isclose(orders_of_magnitude, selected_order, atol=1)
+        ) # within 1 order of magnitude of the max
+
+
+
+        self._updater.model._Q = np.zeros( len(orders_of_magnitude) )
+        for idx in idx_params_of_similar_uncertainty:
+            self._qinfer_model._Q[idx] = 1
+
+        d = self._qinfer_model.distance(x, xp)
+        new_time = 1 / d
+        experiment[self._t] = new_time
+
+        print("orders_of_magnitude:", orders_of_magnitude)
+        print("probability_of_param: ", probability_of_param)
+        print("Selected order = ", selected_order)    
+        print("x={}".format(x))
+        print("xp={}".format(xp))
+        print("Distance = ", d)
+        print("Distance order mag=", np.log10(d))
+        print("=> time=", new_time)
+        
+        return experiment
