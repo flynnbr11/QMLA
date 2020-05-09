@@ -462,6 +462,16 @@ class ModelInstanceForLearning():
                         "Epoch", istep
                     ]
                 )
+                try:
+                    self.log_print([
+                        "epoch {} times used: {}".format(
+                            istep,
+                            self.model_heuristic.count_order_of_magnitudes
+                        ) 
+                    ])
+                    self.model_heuristic.count_order_of_magnitudes = {} #reset
+                except:
+                    pass
             if istep == 0:
                 param_estimates = self.qinfer_updater.est_mean()
             else:
