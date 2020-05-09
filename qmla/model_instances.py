@@ -464,7 +464,7 @@ class ModelInstanceForLearning():
                 )
                 try:
                     self.log_print([
-                        "epoch {} times used: {}".format(
+                        "epoch {} - time magnitudes used: {}".format(
                             istep,
                             self.model_heuristic.count_order_of_magnitudes
                         ) 
