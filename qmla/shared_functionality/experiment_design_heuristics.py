@@ -544,15 +544,21 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         cov_mtx = self._updater.est_covariance_mtx()
         self.initial_uncertainties = np.sqrt(np.abs(np.diag(cov_mtx)))
         self.track_param_uncertainties = np.zeros(self._qinfer_model.n_modelparams)
-        self.selection_criteria = 'relative_volume_decrease'
+        self.selection_criteria = 'hard_code_6_9_magnitudes'  #'relative_volume_decrease'
         self.count_order_of_magnitudes =  {}
         self.counter_productive_experiments = 0 
+        self.call_counter = 0 
+        self._num_experiments = kwargs['num_experiments']
+        self._num_exp_to_switch_magnitude = self._num_experiments / 2
+        print("Heuristic - num experiments = ", self._num_experiments)
+        print("epoch to switch target at:", self._num_exp_to_switch_magnitude)
         
     def __call__(
         self,
         epoch_id=0,
         **kwargs
     ):
+        self.call_counter += 1
         experiment = self._get_exp_params_array() # empty experiment array
         
         # sample from updater
@@ -575,7 +581,21 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
             (self.track_param_uncertainties, param_uncertainties) 
         )
         
-        if self.selection_criteria == 'relative_volume_decrease':
+        
+        if self.selection_criteria == 'hard_code_6_9_magnitudes':
+            if self.call_counter > self._num_exp_to_switch_magnitude:
+                order_to_target = 6
+            else:
+                order_to_target = 9
+                
+            locations = np.where(
+                np.isclose(orders_of_magnitude, order_to_target, atol=1)
+            )
+            weights = np.zeros( len(orders_of_magnitude) )
+            weights[locations] = 1
+            probability_of_param = weights / sum(weights)
+
+        elif self.selection_criteria == 'relative_volume_decrease':
             # probability of choosing  order of magnitude 
             # of each parameter based on the ratio
             # (change in volume)/(current estimate)
