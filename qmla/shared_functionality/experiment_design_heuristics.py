@@ -565,6 +565,7 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
             else:
                 idx_iter += 1
 
+        current_param_est = self._updater.est_mean()
         cov_mtx = self._updater.est_covariance_mtx()
         param_uncertainties = np.sqrt(np.abs(np.diag(cov_mtx))) # uncertainty of params individually
         orders_of_magnitude = np.log10(
@@ -593,10 +594,11 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
             else:
                 # disregard changes which INCREASE volume:
                 change_in_uncertainty[ change_in_uncertainty < 0 ] = 0
-            current_param_est = self._updater.est_mean()
+            
             # weight = ratio of how much that change has decreased the volume 
             # over the current best estimate of the parameter
             weights = change_in_uncertainty / current_param_est
+            weights *= orders_of_magnitude # weight the likelihood of selecting a parameter by its order of magnitude
             probability_of_param = weights / sum(weights)
 
         elif self.selection_criteria == 'order_of_magniutde':
@@ -635,8 +637,14 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         new_time = 1 / d
         experiment[self._t] = new_time
 
+        print("Current param estimates:", current_param_est)
         print("orders_of_magnitude:", orders_of_magnitude)
         print("probability_of_param: ", probability_of_param)
+        try:
+            print("Weights:", weights)
+        except:
+            pass
+
         print("Selected order = ", selected_order)    
         print("x={}".format(x))
         print("xp={}".format(xp))
