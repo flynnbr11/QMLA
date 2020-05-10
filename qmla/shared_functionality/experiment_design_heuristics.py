@@ -630,7 +630,6 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
             # probability directly from order of magnitude
             print("Sampling by order magnitude")
             probability_of_param = np.array(orders_of_magnitude) / sum(orders_of_magnitude)
-
         else:
             # sample evenly
             print("Sampling evenly")
@@ -652,8 +651,6 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         idx_params_of_similar_uncertainty = np.where(
             np.isclose(orders_of_magnitude, selected_order, atol=1)
         ) # within 1 order of magnitude of the max
-
-
 
         self._updater.model._Q = np.zeros( len(orders_of_magnitude) )
         for idx in idx_params_of_similar_uncertainty:
