@@ -703,8 +703,8 @@ class ModelInstanceForLearning():
 
         try:
             self.log_print([
-                "Number of times each order of magnitude of uncertainty used during learning:", 
-                self.model_heuristic.count_order_of_magnitudes
+                "Total number of times each order of magnitude of uncertainty used during learning:", 
+                self.model_heuristic.all_count_order_of_magnitudes
             ])
             self.log_print([
                 "Number of counter productive experiments:", self.model_heuristic.counter_productive_experiments

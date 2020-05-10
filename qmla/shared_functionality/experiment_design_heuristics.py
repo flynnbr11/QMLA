@@ -544,8 +544,9 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         cov_mtx = self._updater.est_covariance_mtx()
         self.initial_uncertainties = np.sqrt(np.abs(np.diag(cov_mtx)))
         self.track_param_uncertainties = np.zeros(self._qinfer_model.n_modelparams)
-        self.selection_criteria = 'hard_code_6_9_magnitudes'  #'relative_volume_decrease'
+        self.selection_criteria = 'relative_volume_decrease' # 'hard_code_6_9_magnitudes'
         self.count_order_of_magnitudes =  {}
+        self.all_count_order_of_magnitudes =  {}
         self.counter_productive_experiments = 0 
         self.call_counter = 0 
         self._num_experiments = kwargs['num_experiments']
@@ -577,9 +578,13 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         orders_of_magnitude = np.log10(
             param_uncertainties
         ) # of the uncertainty on the individual parameters
+        param_order_mag = np.log10(current_param_est)
+        relative_order_magnitude = param_order_mag / max(param_order_mag)
+        weighting_by_relative_order_magnitude = 10**relative_order_magnitude
         self.track_param_uncertainties = np.vstack( 
             (self.track_param_uncertainties, param_uncertainties) 
         )
+        
         
         
         if self.selection_criteria == 'hard_code_6_9_magnitudes':
@@ -606,19 +611,19 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
                 axis = 0
             )[0]
             print("change in uncertainty=", change_in_uncertainty)
-            if np.all( change_in_uncertainty <0):
+            if np.all( change_in_uncertainty <0 ):
                 # TODO better way to deal with all increasing uncertainties
                 print("All parameter uncertainties increased")
                 self.counter_productive_experiments += 1
-                change_in_uncertainty = np.abs(change_in_uncertainty)
+                weights = 1 / np.abs(change_in_uncertainty)
+
             else:
                 # disregard changes which INCREASE volume:
-                change_in_uncertainty[ change_in_uncertainty < 0 ] = 0
-            
-            # weight = ratio of how much that change has decreased the volume 
-            # over the current best estimate of the parameter
-            weights = change_in_uncertainty / current_param_est
-            weights *= orders_of_magnitude # weight the likelihood of selecting a parameter by its order of magnitude
+                change_in_uncertainty[ change_in_uncertainty < 0 ] = 0            
+                # weight = ratio of how much that change has decreased the volume 
+                # over the current best estimate of the parameter
+                weights = change_in_uncertainty / current_param_est
+            weights *= weighting_by_relative_order_magnitude # weight the likelihood of selecting a parameter by its order of magnitude
             probability_of_param = weights / sum(weights)
 
         elif self.selection_criteria == 'order_of_magniutde':
@@ -633,15 +638,16 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
        
 
         # sample from the present orders of magnitude
-        print("Prob of param=", probability_of_param)
         selected_order = np.random.choice(
             a = orders_of_magnitude, 
             p = probability_of_param
         )
         try:
             self.count_order_of_magnitudes[ np.round(selected_order)] += 1
+            self.all_count_order_of_magnitudes[np.round(selected_order)] += 1
         except:
             self.count_order_of_magnitudes[ np.round(selected_order)] = 1
+            self.all_count_order_of_magnitudes[np.round(selected_order)] = 1
 
         idx_params_of_similar_uncertainty = np.where(
             np.isclose(orders_of_magnitude, selected_order, atol=1)
@@ -658,13 +664,13 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         experiment[self._t] = new_time
 
         print("Current param estimates:", current_param_est)
-        print("orders_of_magnitude:", orders_of_magnitude)
-        print("probability_of_param: ", probability_of_param)
         try:
             print("Weights:", weights)
         except:
             pass
 
+        print("probability_of_param: ", probability_of_param)
+        print("orders_of_magnitude:", orders_of_magnitude)
         print("Selected order = ", selected_order)    
         print("x={}".format(x))
         print("xp={}".format(xp))
