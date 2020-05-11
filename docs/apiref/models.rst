@@ -17,7 +17,7 @@ Model for learning
 
 Classes
 ~~~~~~~~~~~~~~~
-:class:`ModelInstanceForLearning` model to perform QHL training upon
+Model to perform parameter learning upon, usually Quantum Hamiltonian Learning. 
 
 .. autoclass:: ModelInstanceForLearning
     :members:
@@ -27,7 +27,7 @@ Model for comparisons
 ---------------------
 Classes
 ~~~~~~~~~~~~~~~~
-:class:`ModelInstanceForComparison` model to use during Bayes factor comparisons
+Model to use during Bayes factor comparisons
 
 .. autoclass:: ModelInstanceForComparison
     :members:
@@ -37,7 +37,7 @@ Model for storage
 
 Classes
 ~~~~~~~~~~~~~~~~
-:class:`ModelInstanceForStorage` reduced model to store in `QuantumModelLearningAgent`_
+Reduced model to store in :class:`qmla.QuantumModelLearningAgent`
 
 .. autoclass:: ModelInstanceForStorage
     :members:

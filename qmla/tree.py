@@ -76,6 +76,9 @@ class TreeQMLA():
         self, 
         **kwargs
     ):
+        r"""
+        Determine the next set of models, for the next branch of this growth rule tree. 
+        """
         if not self.growth_class.check_tree_completed(spawn_step = self.spawn_step):
             self.log_print([
                 "Next layer - spawn"

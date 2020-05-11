@@ -31,6 +31,7 @@ class GeneticAlgorithmQMLA():
         self.all_zero_chromosome_string = '0'*self.num_terms
         self.addition_str = '+'
         self.mutation_probability = mutation_probability
+        self.mutation_count = 0
         self.previously_considered_chromosomes = []
         self.log_file = log_file
         self.chromosomes_at_generation = {}
@@ -210,7 +211,6 @@ class GeneticAlgorithmQMLA():
 
     def selection(
         self,
-        # chromosome_selection_probabilities,
         **kwargs
     ):
         r"""
@@ -236,6 +236,7 @@ class GeneticAlgorithmQMLA():
         pair_ids = list(self.chrom_pair_df.index)
         pair_probs = [ self.chrom_pair_df.loc[i].probability for i in pair_ids]
         
+        # randomly select a pair from list of pairs
         selected_id = np.random.choice(
             a = pair_ids, 
             p = pair_probs
@@ -250,11 +251,6 @@ class GeneticAlgorithmQMLA():
                 'force_mutation' : bool(selected_entry['force_mutation'])
             }
         }
-        # self.log_print(
-        #     [
-        #         "Selection id {}: {}".format(selected_id, selection)
-        #     ]
-        # )
         return selection
 
 
@@ -328,12 +324,9 @@ class GeneticAlgorithmQMLA():
         mutated_chromosomes = []
         for c in copy_chromosomes:
             if np.all(c == 0):
-                self.log_print(
-                    [
-                        "Input chomosome {} has no interactions -- forcing mutation".format(
-                       c)
-                    ]
-                )
+                self.log_print([
+                    "Input chomosome {} has no interactions -- forcing mutation".format(c)
+                ])
                 mutation_probability = 1.0
             else:
                 mutation_probability = self.mutation_probability
@@ -343,6 +336,7 @@ class GeneticAlgorithmQMLA():
                 or 
                 force_mutation
             ):
+                self.mutation_count += 1
                 idx = np.random.choice(range(len(c)))
                 # print("Flipping idx {}".format(idx))
                 if c[idx] == 0:

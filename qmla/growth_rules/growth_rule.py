@@ -213,6 +213,9 @@ class GrowthRule():
         model_list,
         **kwargs
     ):
+        r"""
+        Determine the next set of models for this growth rule. 
+        """
         # default is to just return given model list and set spawn stage to
         # complete
         return model_list
@@ -438,6 +441,9 @@ class GrowthRule():
         self,
         previous_prune_branch,
     ):
+        r"""
+        Get next model set through pruning. 
+        """
         self.prune_step += 1
         prune_step = self.prune_step
         pruning_models = []

@@ -39,21 +39,24 @@ class QuantumModelLearningAgent():
     QMLA manager class.
 
     Controls the infrastructure which determines which models are learned and compared.
-    By interpreting user defined :class:`qmla.growth_rules.GrowthRule`,
-    grows :class:`qmla.tree.QMLATree`s which hold numerous models
-    on :class:`qmla.tree.BranchTree`s.
+    By interpreting user defined :class:`~qmla.growth_rules.GrowthRule`,
+    grows :class:`~qmla.TreeQMLA` objects which hold numerous models
+    on :class:`~qmla.BranchQMLA` objects.
     All models on branches are learned and then compared.
     The comparisons on a branch inform the next set of models generated on that tree.
 
     First calls a series of setup functions to implement
     infrastructure used throughout.
 
-    The available algorithms are:
+    The available algorithms, and their corresponding methods, are:
         - Quantum Hamilontian Learning:
+
             :meth:`run_quantum_hamiltonian_learning`
         - Quantum Hamilontian Learning multiple models:
+
             :meth:`run_quantum_hamiltonian_learning_multiple_models`
         - Quantum Model Learning Agent:
+
             :meth:`run_complete_qmla`
 
     :param ControlsQMLA qmla_controls: Storage for configuration of a QMLA instance.
@@ -394,15 +397,12 @@ class QuantumModelLearningAgent():
         r"""
         Gather info needed to run QMLA tasks and store remotely.
 
-        QMLA issues jobs to run remotely,
-        namely for model (parameter) learning
-        and model comparisons (Bayes factors).
-        These jobs don't need access to all QMLA data,
-        but do need some common info,
-        e.g. number of particles and epochs.
-        This function gathers all relevant information
-        in a single dict, and stores it on the redis server
-        which all worker nodes have access to.
+        QMLA issues jobs to run remotely, namely for model (parameter) 
+        learning and model comparisons (Bayes factors).
+        These jobs don't need access to all QMLA data, but do need
+        some common info, e.g. number of particles and epochs.
+        This function gathers all relevant information in a single dict, 
+        and stores it on the redis server which all worker nodes have access to.
         It also stores the probe sets required for the same tasks.
 
         """
@@ -496,10 +496,10 @@ class QuantumModelLearningAgent():
 
         Models which are on the branch but have already been learned are not re-learned.
         For each remaining model on the branch,
-        :meth:`QuantumModelLearningAgent.learn_model` is called.
+        :meth:`~qmla.QuantumModelLearningAgent.learn_model` is called.
         The branch is added to the redis database `active_branches_learning_models`,
         indicating that branch_id has currently got models in the learning phase.
-        This redis database is monitored by the :meth:`QuantumModelLearningAgent.learn_models_until_trees_complete`.
+        This redis database is monitored by the :meth:`~qmla.QuantumModelLearningAgent.learn_models_until_trees_complete`.
         When all models registered on the branch have completed, it is recorded, allowing QMLA
         to perform the next stage: either spawning a new branch from this branch, or
         continuing to the final stage of QMLA.
@@ -552,15 +552,13 @@ class QuantumModelLearningAgent():
         self,
         model_name,
         branch_id,
-        # use_rq=True,
         blocking=False
     ):
         r"""
         Learn a given model by calling the standalone model learning functionality.
 
         The model is learned by launching a job either locally or to the job queue.
-        Model learning is implemented by
-        :func:`remote_learn_model_parameters`,
+        Model learning is implemented by :func:`remote_learn_model_parameters`,
         which takes a unique model name (string) and distills the terms to learn.
         If running locally, QMLA core info is passed.
         Else if RQ workers are being used, it retrieves QMLA info from the shared redis
@@ -784,15 +782,15 @@ class QuantumModelLearningAgent():
         If `pair_list` is specified, those pairs are compared;
         otherwise all pairs within `model_id_list` are compared.
 
-        Pairs are sent to :meth:`QuantumModelLearningAgent.compare_model_pair`
+        Pairs are sent to :meth:`~qmla.QuantumModelLearningAgent.compare_model_pair`
         to be computed either locally or on a job queue.
 
         :param list model_id_list: list of model names to compute comparisons between
         :param list pair_list: list of tuples specifying model IDs to compare
         :param bool remote:
-            passed directly to :meth:`QuantumModelLearningAgent.compare_model_pair`
+            passed directly to :meth:`~qmla.QuantumModelLearningAgent.compare_model_pair`
         :param bool wait_on_results:
-            passed directly to :meth:`QuantumModelLearningAgent.compare_model_pair`
+            passed directly to :meth:`~qmla.QuantumModelLearningAgent.compare_model_pair`
         :param bool recompute: whether to force comparison even if a pair has
             been compared previously
 
@@ -870,15 +868,15 @@ class QuantumModelLearningAgent():
         otherwise pairs are retrieved from the `pairs_to_compare`
         attribute of the branch, which is usually all-to-all.
 
-        Pairs are sent to :meth:`QuantumModelLearningAgent.compare_model_pair`
+        Pairs are sent to :meth:`~qmla.QuantumModelLearningAgent.compare_model_pair`
         to be computed either locally or on a job queue.
 
         :param branch_id: unique ID of the branch within the QMLA environment
         :param list pair_list: list of tuples specifying model IDs to compare
         :param bool remote:
-            passed directly to :meth:`QuantumModelLearningAgent.compare_model_pair`
+            passed directly to :meth:`~qmla.QuantumModelLearningAgent.compare_model_pair`
         :param bool wait_on_results:
-            passed directly to :meth:`QuantumModelLearningAgent.compare_model_pair`
+            passed directly to :meth:`~qmla.QuantumModelLearningAgent.compare_model_pair`
         :param bool recompute: whether to force comparison even if a pair has
             been compared previously
         """
@@ -1005,7 +1003,7 @@ class QuantumModelLearningAgent():
         Process comparisons between a set of models.
 
         Pairwise comparisons are retrieved and processed by
-        :meth:`QuantumModelLearningAgent.process_model_pair_comparison`,
+        :meth:`~qmla.QuantumModelLearningAgent.process_model_pair_comparison`,
         which informs the superior model.
 
         For each pairwise comparison a given model wins, it receives a single point.
@@ -1087,12 +1085,13 @@ class QuantumModelLearningAgent():
         r"""
         Process comparisons between models on the same branch.
 
-        (Similar functionality to :meth:`QuantumModelLearningAgent`,
-        but additionally updates some branch infrastructure,
-        such as updating the branch's `champion_id`, `bayes_points`
-        attributes).
+        (Similar functionality to 
+        :meth:`~qmla.QuantumModelLearningAgent.process_model_set_comparisons`,
+        but additionally updates some branch infrastructure, such as updating 
+        the branch's `champion_id`, `bayes_points` attributes).
         Pairwise comparisons are retrieved and processed by
-        :meth:`process_model_pair_comparison`, which informs the superior model.
+        :meth:`~qmla.QuantumModelLearningAgent.process_model_pair_comparison`, 
+        which informs the superior model.
         For each pairwise comparison a given model wins, it receives a single point.
         All comparisons are weighted evenly.
         Model points are gathered; the model with most points is
@@ -1212,11 +1211,10 @@ class QuantumModelLearningAgent():
         r"""
         Iteratively learn/compare/generate models on growth rule trees.
 
-        Each :class:`qmla.growth_rules.GrowthRule` has a unique :class:`qmla.tree.QMLATree``.
-        Trees hold sets of models in :class:`qmla.tree.BranchTree`s.
+        Each :class:`~qmla.growth_rules.GrowthRule` has a unique :class:`~qmla.tree.QMLATree``.
+        Trees hold sets of models on :class:`~qmla.tree.BranchTree` objects.
 
-        Models on a given branch are learned through
-        :meth:`learn_models_on_given_branch`.
+        Models on a each branch are learned through :meth:`learn_models_on_given_branch`.
         Any model which has previously been considered defaults to the earlier
         instance of that model, rather than repeating the calculation.
         When all models on a branch are learned, they are all compared
@@ -1224,15 +1222,15 @@ class QuantumModelLearningAgent():
 
         When a branch has completed learning and comparisons of models,
         the corresponding tree is checked to see if it has finished proposing
-        models, through :meth:`TreeQMLA.is_tree_complete`.
-        If the tree is not complete, the :meth:`TreeQMLA.next_layer`
+        models, through :meth:`~qmla.TreeQMLA.is_tree_complete`.
+        If the tree is not complete, the :meth:`~qmla.TreeQMLA.next_layer`
         method is called to generate the next branch on that tree.
         The next branch can correspond to `spawn` or `prune` stages of the
-        tree's :class:`growth_rules.GrowthRule`, but QMLA is ambivalent to the
+        tree's :class:`~qmla.growth_rules.GrowthRule`, but QMLA is ambivalent to the
         inner workings of the tree/growth rule: a branch is
         simply a set of models to learn and compare.
 
-        When all trees have completed learning, this function terminates.
+        When all trees have completed learning, this method terminates.
         """
 
         # get redis databases
@@ -1388,17 +1386,20 @@ class QuantumModelLearningAgent():
         r"""
         Retrieve the next set of models and place on a new branch.
 
-        By checking the :class:`qmla.tree.QMLATree`` associated with the `branch_id` used
+        By checking the :class:`~qmla.tree.QMLATree`` associated with the `branch_id` used
         to call this method, call :meth:`TreeQMLa.next_layer`, which returns
         a set of models to place on a new branch, as well as which models therein
         to compare. These are passed to :meth:`new_branch`, constructing a new branch
         in the QMLA environment. The generated new branch then has all its models
-        learned by calling :meth:`learn_models_on_given_branch`.
-        :meth:`TreeQMLA.next_layer` is in control of how to select the next set of models,
-        usually either by calling the :class:`qmla.growth_rules.GrowthRule`'s :meth:`generate_models` or
-        :meth:`tree_pruning` methods. This allows the user to define how models are generated,
-        given access to the comparisons of the previous branch, or how the tree is pruned, e.g.
-        by performing preliminary parent/child branch champion comparisons.
+        learned by calling :meth:`~qmla.QuantumModelLearningAgent.learn_models_on_given_branch`.
+        :meth:`~qmla.TreeQMLA.next_layer` is in control of how to select the next set of models,
+        usually either by calling the :class:`~qmla.growth_rules.GrowthRule`'s 
+        :meth:`~qmla.growth_rules.GrowthRule.generate_models` or
+        :meth:`~qmla.growth_rules.GrowthRule.tree_pruning` methods. 
+        This allows the user to define how models are generated,
+        given access to the comparisons of the previous branch, 
+        or how the tree is pruned, e.g. by performing preliminary 
+        parent/child branch champion comparisons.
 
         :param int branch_id: unique ID of the branch which has completed
         """
@@ -2068,7 +2069,7 @@ class QuantumModelLearningAgent():
         r"""
         Run Quantum Hamiltonian Learning algorithm .
 
-        The `true_model` of the :class:`qmla.growth_rules.GrowthRule` is used to generate
+        The `true_model` of the :class:`~qmla.growth_rules.GrowthRule` is used to generate
         true data (in simulation) and have its parameters learned.
 
         """
@@ -2129,11 +2130,11 @@ class QuantumModelLearningAgent():
         Run Quantum Hamiltonian Learning algorithm with multiple simulated models.
 
         Numerous Hamiltonian models attempt to learn the dynamics of the true model.
-        The underlying model is set in the :class:`qmla.growth_rules.GrowthRule`'s `true_model` attribute.
+        The underlying model is set in the :class:`~qmla.growth_rules.GrowthRule`'s `true_model` attribute.
 
         :param list model_names:
             list of strings of model names to learn the parameterisations of.
-            None: taken from :class:`qmla.growth_rules.GrowthRule` `qhl_models`.
+            None: taken from :class:`~qmla.growth_rules.GrowthRule` `qhl_models`.
         """
 
         if model_names is None:
@@ -2224,11 +2225,10 @@ class QuantumModelLearningAgent():
         r"""
         Run complete Quantum Model Learning Agent algorithm.
 
-        Each :class:`qmla.growth_rules.GrowthRule` is assigned a :class:`qmla.tree.QMLATree``,
-        which manages the growth rule. When new models are spawned
-        by a growth rule, they are placed on :class:`qmla.tree.BranchQMLA`s of the
-        corresponding tree.
-        Models are learned/compared/spawned iteratively in
+        Each :class:`~qmla.growth_rules.GrowthRule` is assigned a :class:`~qmla.tree.QMLATree`,
+        which manages the growth rule. When new models are spawned by a growth rule, 
+        they are placed on a :class:`~qmla.tree.BranchQMLA` of the corresponding tree.
+        Models are learned/compared/spawned iteratively in 
         :meth:`learn_models_until_trees_complete`, until all
         trees declare that their growth rule has completed.
         Growth rules are complete when they have nominated one or more champions,
@@ -2322,11 +2322,11 @@ class QuantumModelLearningAgent():
 
     def get_model_storage_instance_by_id(self, model_id):
         r"""
-        Get the unique :class:`qmla.ModelInstanceForLearning` for the given model_id.
+        Get the unique :class:`~qmla.ModelInstanceForLearning` for the given model_id.
 
         :param int model_id: unique ID of desired model
         :return: storage class of the model
-        :rtype: :class:`qmla.ModelInstanceForLearning`
+        :rtype: :class:`~qmla.ModelInstanceForLearning`
 
         """
         idx = self.model_database.loc[self.model_database['model_id']
@@ -2336,7 +2336,7 @@ class QuantumModelLearningAgent():
 
     def _update_database_model_info(self):
         r"""
-        Calls :meth:`ModelForStorage.model_update_learned_values` for all models learned in this instance.
+        Calls :meth:`~qmla.ModelForStorage.model_update_learned_values` for all models learned in this instance.
         """
 
         self.log_print([
@@ -2563,7 +2563,7 @@ class QuantumModelLearningAgent():
         self,
         save_to_file=None,
     ):
-        r"""Wrapper for :meth:`plot_quadratic_loss`."""
+        r"""Wrapper for :func:`~qmla.analysis.plot_quadratic_loss`."""
         qmla.analysis.plot_quadratic_loss(
             qmd=self,
             champs_or_all='champs',
@@ -2634,10 +2634,11 @@ class QuantumModelLearningAgent():
 
     def store_bayes_factors_to_csv(self, save_to_file, names_ids='latex'):
         r"""
-        Store the pairwise comparisons computed during this instance.
+        *deprecated* Store the pairwise comparisons computed during this instance.
+        :func:`~qmla.analysis.model_bayes_factorsCSV` removed and is needed 
+        TODO if wanted, find in old github commits and reimplement.
 
-        Wrapper for :meth:`model_bayes_factorsCSV`.
-
+        Wrapper for :func:`~qmla.analysis.model_bayes_factorsCSV`.
         """
         qmla.analysis.model_bayes_factorsCSV(
             self, save_to_file, names_ids=names_ids)
@@ -2657,7 +2658,7 @@ class QuantumModelLearningAgent():
         r"""
         Plot parameter estimates vs experiment number for a single model.
 
-        Wrapper for :meth:`plot_parameter_estimates`
+        Wrapper for :func:`~qmla.analysis.plot_parameter_estimates`
         :param bool true_model: whether to force only plotting the true
             model's parameter estimeates
         """
@@ -2726,7 +2727,7 @@ class QuantumModelLearningAgent():
                               ):
         r"""
         Plot volume vs experiment number of a single model.
-        Wrapper for :meth:`plot_volume_after_qhl`
+        Wrapper for :func:`~qmla.analysis.plot_volume_after_qhl`
         """
         qmla.analysis.plot_volume_after_qhl(
             qmd=self,
@@ -2742,7 +2743,7 @@ class QuantumModelLearningAgent():
         only_adjacent_branches=True,
         save_to_file=None
     ):
-        r"""Wrappter for :meth:`plot_qmla_single_instance_tree`"""
+        r"""Wrappter for :func:`~qmla.analysis.plot_qmla_single_instance_tree`"""
         qmla.analysis.plot_qmla_single_instance_tree(
             self,
             modlist=modlist,
@@ -2751,7 +2752,7 @@ class QuantumModelLearningAgent():
         )
 
     def plot_qmla_radar_scores(self, modlist=None, save_to_file=None):
-        r"""*deprecated* Wrapper for :meth:plotRadar."""
+        r"""*deprecated* Wrapper for :func:`~qmla.analysis.plotRadar`."""
         plot_title = str("Radar Plot QMD " + str(self.qmla_id))
         if modlist is None:
             modlist = list(self.branch_champions.values())

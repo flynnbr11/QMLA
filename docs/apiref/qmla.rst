@@ -19,6 +19,5 @@ Class Reference
 ~~~~~~~~~~~~~~~
 .. autoclass:: QuantumModelLearningAgent
     :members: 
-    :private-members:
 
     
