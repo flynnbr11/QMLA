@@ -366,9 +366,11 @@ class GeneticAlgorithmQMLA():
         
         """
 
-        return self.elite_ranking_top_two(
-            **kwargs
-        )
+        return []
+        # return self.elite_ranking_top_two(
+        #     **kwargs
+        # )
+
 
     def elite_ranking_top_two(
         self, 

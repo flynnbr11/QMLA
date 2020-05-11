@@ -5,7 +5,7 @@
     letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View,
     California, 94041, USA.
     
-.. currentmodule:: qmla
+.. currentmodule:: qmla.growth_rules
 
 
 Growth Rules
@@ -17,6 +17,6 @@ Classes
 ~~~~~~~~~~~~~~~
 :class:`GrowthRule` Growth rules do this thing. 
 
-.. autoclass:: qmla.growth_rules.GrowthRule
+.. autoclass:: GrowthRule
     :members:
 

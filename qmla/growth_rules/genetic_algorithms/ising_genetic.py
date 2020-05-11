@@ -72,7 +72,7 @@ class IsingGenetic(
 
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
-        self.max_spawn_depth = 20
+        self.max_spawn_depth = 40
         self.initial_num_models = 14
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
