@@ -51,13 +51,13 @@ class QuantumModelLearningAgent():
     The available algorithms, and their corresponding methods, are:
         - Quantum Hamilontian Learning:
 
-            :meth:`run_quantum_hamiltonian_learning`
+            :meth:`~qmla.QuantumModelLearningAgent.run_quantum_hamiltonian_learning`
         - Quantum Hamilontian Learning multiple models:
 
-            :meth:`run_quantum_hamiltonian_learning_multiple_models`
+            :meth:`~qmla.QuantumModelLearningAgent.run_quantum_hamiltonian_learning_multiple_models`
         - Quantum Model Learning Agent:
 
-            :meth:`run_complete_qmla`
+            :meth:`~qmla.QuantumModelLearningAgent.run_complete_qmla`
 
     :param ControlsQMLA qmla_controls: Storage for configuration of a QMLA instance.
     :param dict model_priors: values of means/widths to enfore on given models,
@@ -2312,7 +2312,7 @@ class QuantumModelLearningAgent():
     ##########
 
     def log_print(self, to_print_list):
-        r"""Wrapper for :meth:`print_to_log`"""
+        r"""Wrapper for :func:`~qmla.print_to_log`"""
         qmla.logging.print_to_log(
             to_print_list=to_print_list,
             log_file=self.log_file,
