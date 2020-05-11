@@ -873,7 +873,7 @@ def plot_evaluation_log_likelihoods(
         f_scores = eval(res.AllModelFScores)
 
         instance = res.QID
-        instance_true_id = res.TrueModelID
+        instance_true_id = res.Truemodel_id
         instance_champion_id = res.ChampID
 
         model_ids = list(log_lls.keys())

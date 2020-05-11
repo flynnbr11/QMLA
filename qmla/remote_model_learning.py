@@ -228,10 +228,10 @@ def remote_learn_model_parameters(
     timings['updating_db'] = time.time() - t_init
 
     time_end = time.time()
-    for k in timings:
-        log_print([
-            "QHL Timing - {}: {}".format(k, np.round(timings[k], 2))
-        ])
+    # for k in timings:
+    #     log_print([
+    #         "QHL Timing - {}: {}".format(k, np.round(timings[k], 2))
+    #     ])
     if remote:
         t_init = time.time()
         del updated_model_info

@@ -921,14 +921,17 @@ class ModelInstanceForLearning():
                 np.median(evaluation_updater.normalization_record),
                 2
             )
-        for k in evaluation_qinfer_model.timings:
-            for kk in evaluation_qinfer_model.timings[k]:
-                self.log_print([
-                    "Evaluation Timing - {}/{}: {}".format(
-                        k, kk, 
-                        np.round(evaluation_qinfer_model.timings[k][kk], 2)
-                    )
-                ])
+        
+        print_timings = False
+        if print_timings: 
+            for k in evaluation_qinfer_model.timings:
+                for kk in evaluation_qinfer_model.timings[k]:
+                    self.log_print([
+                        "Evaluation Timing - {}/{}: {}".format(
+                            k, kk, 
+                            np.round(evaluation_qinfer_model.timings[k][kk], 2)
+                        )
+                    ])
 
 
 

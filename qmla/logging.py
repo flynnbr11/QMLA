@@ -5,7 +5,7 @@ __all__ = [
 ]
 
 def time_seconds():
-    # return time in h:m:s format for logging.
+    r"""return current time in h:m:s format for logging."""
     now = datetime.date.today()
     hour = datetime.datetime.now().hour
     minute = datetime.datetime.now().minute
@@ -20,15 +20,14 @@ def print_to_log(
     log_identifier=''
 ):
     """
-    log_print writes in the log file the string passed as first argument.
-    log_print(to_print_list, log_file, log_identifier)
+    Writes to the log file, registering the time and identifier. 
 
-    longhish description: adds the content of the first argument to the log file passed as second argument
-    and using the identifier for the log entry specified in the third parameter
-    if the first argument is not passed as string will be converted to string.
+    Adds the content of `to_print_list` to the `log_file`,
+    using the `log_identifier` to indicate where a given 
+    log entry originated. 
 
     :param to_print_list: string you want to print
-    :type to_print_list: str()
+    :type to_print_list: str() or list()
     :param log_file: path of the log file you want to update
     :type log_file: str()
     :param log_identifier: identifier for the log

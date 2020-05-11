@@ -530,7 +530,7 @@ def plot_TreeQMLA(
     model_labels = []
     handler_map = {}
 
-    # mod_handle = textHandleModelID(
+    # mod_handle = textHandlemodel_id(
     #     "ID",
     #     "black"
     # )
@@ -550,7 +550,7 @@ def plot_TreeQMLA(
         model_labels.append(mod_lab)
         mod_colour = "black"  # if true/champ can change colour
         # mod_colour =n_cmap(G.nodes[mod_str]['status'])
-        mod_handle = textHandleModelID(
+        mod_handle = textHandlemodel_id(
             mid,
             relation_to_true_model,
             num_wins,
@@ -634,7 +634,7 @@ def plot_TreeQMLA(
         plt.savefig(save_to_file, bbox_inches='tight')
 
 
-class textHandleModelID(object):
+class textHandlemodel_id(object):
     def __init__(
         self,
         model_id,

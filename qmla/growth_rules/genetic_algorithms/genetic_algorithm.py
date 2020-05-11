@@ -378,11 +378,16 @@ class GeneticAlgorithmQMLA():
     ):
 
         self.fitness_at_generation[self.genetic_generation] = model_fitnesses
-        ranked_models = sorted(
-            model_fitnesses,
-            key=model_fitnesses.get,
-            reverse=True
-        )
+        try:
+            ranked_models = sorted(
+                model_fitnesses,
+                key=model_fitnesses.get,
+                reverse=True
+            )
+        except:
+            self.log_print([
+                "Could not get ranked models. model fitnesses:", model_fitnesses
+            ])
         elite_models = ranked_models[:num_elites]
         self.most_elite_models_by_generation[self.genetic_generation] = elite_models[0]
         # num_elites_for_termination = 2

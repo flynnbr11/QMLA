@@ -527,9 +527,9 @@ def get_location(db, name):
     """
     Return which row in db corresponds to the string name.
     """
-#    for i in range(len(db['<Name>'])):
+#    for i in range(len(db['model_name'])):
     for i in list(db.index.values):
-        if db['<Name>'][i] == name:
+        if db['model_name'][i] == name:
             return i
 
 
@@ -591,23 +591,18 @@ def unique_model_pair_identifier(model_a_id, model_b_id):
     return id_str
 
 
-def get_operator_instance(db, name):
-    location = get_location(db, name)
-    return db.loc[location]["Operator_Instance"]
-
-
 def model_id_from_name(db, name):
     name = alph(name)
-    return db.loc[db['<Name>'] == name]['ModelID'].item()
+    return db.loc[db['model_name'] == name]['model_id'].item()
 
 
 def model_name_from_id(db, model_id):
     print("[DB] model_id:", model_id)
-    return db.loc[db['ModelID'] == model_id]['<Name>'].item()
+    return db.loc[db['model_id'] == model_id]['model_name'].item()
 
 
 def index_from_model_id(db, model_id):
-    return db.loc[db['ModelID'] == model_id].index[0]
+    return db.loc[db['model_id'] == model_id].index[0]
 
 
 def reduced_model_instance_from_id(db, model_id):
@@ -616,15 +611,15 @@ def reduced_model_instance_from_id(db, model_id):
 
 
 def list_model_id_in_branch(db, branch_id):
-    return list(db[db['branch_id'] == branch_id]['ModelID'])
+    return list(db[db['branch_id'] == branch_id]['model_id'])
 
 
 def update_field(db, field, name=None, model_id=None,
                  new_value=None, increment=None):
     if name is not None:
-        db.loc[db['<Name>'] == name, field] = new_value
+        db.loc[db['model_name'] == name, field] = new_value
     elif model_id is not None:
-        db.loc[db['ModelID'] == model_id, field] = new_value
+        db.loc[db['model_id'] == model_id, field] = new_value
 
 
 def pull_field(db, name, field):
@@ -636,9 +631,9 @@ def pull_field(db, name, field):
 
 
 def all_active_model_ids(db):
-    return list(db[(db['Status'] == 'Active')]['ModelID'])
+    return list(db[(db['Status'] == 'Active')]['model_id'])
 
 
 def active_model_ids_by_branch_id(db, branch_id):
     return list(db[(db['branch_id'] == branch_id) & (
-        db['Status'] == 'Active')]['ModelID'])
+        db['Status'] == 'Active')]['model_id'])
