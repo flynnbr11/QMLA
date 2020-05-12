@@ -98,7 +98,10 @@ def average_parameters_across_instances(
         params = qmla.database_framework.get_constituent_names_from_name(mod)
         for p in params:
             avg_sigmas_dict[mod][p] = np.median(sigmas_dict[mod][p])
-            averaging_weight = [1 / sig for sig in sigmas_dict[mod][p]]
+            try:
+                averaging_weight = [1 / sig for sig in sigmas_dict[mod][p]]
+            except:
+                averaging_weight = 0
             average_params_dict[mod][p] = np.average(
                 params_dict[mod][p],
                 weights=sigmas_dict[mod][p]
