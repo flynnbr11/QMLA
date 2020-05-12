@@ -41,8 +41,8 @@ class SimulatedNVCentre(
             # 'pauliSet_1_y_d1' : 4, # TEST - kHz
             # 'pauliSet_1_z_d1' : 4, # TEST - kHz
             # spin
-            # 'pauliSet_1_x_d3' : B*g*bohr_magneton/hbar, # ~1.943 GHz
-            # 'pauliSet_1_y_d3' : B*g*bohr_magneton/hbar,
+            'pauliSet_1_x_d3' : B*g*bohr_magneton/hbar, # ~1.943 GHz
+            'pauliSet_1_y_d3' : B*g*bohr_magneton/hbar,
             'pauliSet_1_z_d3' : B*g*bohr_magneton/hbar,
             # nitrogen nuclei
             # 'pauliSet_2_x_d3' : B*gamma_n , # ~3.37GHz
