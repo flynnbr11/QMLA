@@ -98,6 +98,10 @@ class TreeQMLA():
             model_list, pairs_to_compare = self.growth_class.tree_pruning(
                 previous_prune_branch = kwargs['called_by_branch']
             )
+        else:
+            self.log_print([
+                "Trying to generate next layer but neither pruning or spawning."
+            ])
 
         model_list = list(set(model_list))
         model_list = [qmla.database_framework.alph(mod) for mod in model_list]
@@ -118,6 +122,8 @@ class TreeQMLA():
             final_branch = self.branches[
                 max(branches)
             ]
+
+        # call GR method to select champion
 
         self.log_print([
             "Final branch is {}".format(final_branch.branch_id)
