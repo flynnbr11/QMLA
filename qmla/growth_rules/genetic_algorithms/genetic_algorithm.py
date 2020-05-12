@@ -469,7 +469,7 @@ class GeneticAlgorithmQMLA():
                 "ranked models:", ranked_models
             ]
         )
-        truncation_cutoff = max( int(num_models*0.75), 4)#  either consider top half, or top 4 if too small
+        truncation_cutoff = max( int(num_models*0.75), 4) # either consider top half, or top 4 if too small
         truncation_cutoff = min( truncation_cutoff, num_models )
         truncated_model_list = ranked_models[:truncation_cutoff]
 
