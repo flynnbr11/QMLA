@@ -73,7 +73,7 @@ class SimulatedNVCentre(
 
             'pauliSet_1_x_d3' : (B*g*bohr_magneton/hbar + 1.23e8, 5e8), # ~1.943 GHz
             'pauliSet_1_y_d3' : (B*g*bohr_magneton/hbar - 4.23e5, 2.3e8),
-            'pauliSet_1_z_d3' : (B*g*bohr_magneton/hbar + 1e8, 2e8),
+            'pauliSet_1_z_d3' : (B*g*bohr_magneton/hbar + 1e7, 2e7),
             # spin
             # 'pauliSet_1_x_d3' : (5e9, 2e9), # ~1.943 GHz
             # 'pauliSet_1_y_d3' : (5e9, 2e9),
