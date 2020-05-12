@@ -2089,7 +2089,7 @@ class QuantumModelLearningAgent():
         self.learn_model(
             model_name=mod_to_learn,
             branch_id=qhl_branch,
-            use_rq=self.use_rq,
+            # use_rq=self.use_rq,
             blocking=True
         )
 
