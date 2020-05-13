@@ -299,10 +299,10 @@ def remote_bayes_factor_calculation(
         time_end = time.time()
         timings['total'] = time.time() - time_start
 
-        for k in timings:
-            log_print([
-                "Timing - {}: {}".format(k, np.round(timings[k], 2))
-            ])
+        # for k in timings:
+        #     log_print([
+        #         "Timing - {}: {}".format(k, np.round(timings[k], 2))
+        #     ])
         log_print(
             [
                 "Finished. rq time: ",

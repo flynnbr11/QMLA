@@ -17,8 +17,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-exp=10
-prt=50
+exp=3
+prt=5
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -79,9 +79,9 @@ git_commit=$(git rev-parse HEAD)
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='FermiHubbardLatticeSet'
 # growth_rule='NVLargeSpinBath'
-growth_rule='SimulatedNVCentre'
+# growth_rule='SimulatedNVCentre'
 # growth_rule='GeneticTest'
-# growth_rule='IsingGenetic'
+growth_rule='IsingGenetic'
 # growth_rule='Genetic'
 # growth_rule='NVExperimentalData'
 

@@ -712,14 +712,14 @@ class ModelInstanceForLearning():
 
         except:
             pass
-        for k in self.qinfer_model.timings:
-            for kk in self.qinfer_model.timings[k]:
-                self.log_print([
-                    "QinferModel Timing - {}/{}: {}".format(
-                        k, kk, 
-                        np.round(self.qinfer_model.timings[k][kk], 2)
-                    )
-                ])
+        # for k in self.qinfer_model.timings:
+        #     for kk in self.qinfer_model.timings[k]:
+        #         self.log_print([
+        #             "QinferModel Timing - {}/{}: {}".format(
+        #                 k, kk, 
+        #                 np.round(self.qinfer_model.timings[k][kk], 2)
+        #             )
+        #         ])
             # self.qinfer_model.timings[k] =  {
             #     v : np.round(self.qinfer_model.timings[k][v], 2)
             #     for v in self.qinfer_model.timings[k]

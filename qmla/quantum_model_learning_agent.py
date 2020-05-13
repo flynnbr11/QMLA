@@ -1405,6 +1405,10 @@ class QuantumModelLearningAgent():
         """
 
         model_list = self.branches[branch_id].rankings
+        model_names = [
+            self.model_name_id_map[mod_id]
+            for mod_id in model_list
+        ]
         evaluation_log_likelihoods = {
             mod:
             self.get_model_storage_instance_by_id(
@@ -1412,7 +1416,7 @@ class QuantumModelLearningAgent():
             for mod in model_list
         }
         new_models, pairs_to_compare = self.branches[branch_id].tree.next_layer(
-            model_list=model_list,
+            model_list=model_names,
             log_file=self.log_file,
             branch_model_points=self.branches[branch_id].bayes_points,
             model_names_ids=self.model_name_id_map,
@@ -1476,11 +1480,6 @@ class QuantumModelLearningAgent():
         model_list = list(set(model_list))  # remove possible duplicates
         branch_id = int(self.branch_highest_id) + 1
         self.branch_highest_id = branch_id
-        self.log_print(
-            [
-                "NEW BRANCH {}. growth rule= {}".format(branch_id, growth_rule)
-            ]
-        )
 
         this_branch_models = {}
         model_id_list = []

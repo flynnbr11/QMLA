@@ -528,6 +528,15 @@ class GrowthRule():
         self.log_print(["Returning from pruning fnc"])
         return list(set(pruning_models)), pruning_sets
 
+    def nominate_champions(self):
+        final_branch = self.tree.branches[ max(self.tree.branches.keys()) ]
+        self.log_print([
+            "Nominating champion as champion of final branch {}: {}".format(
+                final_branch.branch_id, 
+                final_branch.champion_name
+            )
+        ])
+        return [final_branch.champion_name]
 
 
     def growth_rule_finalise(self):

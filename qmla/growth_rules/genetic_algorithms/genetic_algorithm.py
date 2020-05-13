@@ -372,8 +372,6 @@ class GeneticAlgorithmQMLA():
         num_elites = 2,
         **kwargs
     ):
-
-        self.fitness_at_generation[self.genetic_generation] = model_fitnesses
         try:
             ranked_models = sorted(
                 model_fitnesses,
@@ -550,14 +548,12 @@ class GeneticAlgorithmQMLA():
         model_fitnesses,
         **kwargs
     ):
-
+        self.fitness_at_generation[self.genetic_generation] = model_fitnesses
         input_models = list(model_fitnesses.keys())
         num_models_for_next_generation = len(input_models)
-        self.log_print(
-            [
-                "Num models reqd for generation:", num_models_for_next_generation
-            ]
-        )
+        self.log_print([
+            "Num models reqd for generation:", num_models_for_next_generation
+        ])
 
         elite_models = self.get_elite_models(
             model_fitnesses = model_fitnesses,

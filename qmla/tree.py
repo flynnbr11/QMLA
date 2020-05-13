@@ -110,26 +110,28 @@ class TreeQMLA():
     def nominate_champions(
         self,
     ):
-        if len(self.prune_branches) > 0:
-            final_branch = self.branches[
-                self.prune_branches[-1]
-            ]
-        else:
-            self.log_print([
-                "Prune branches not listed; assuming final branch to hold tree champion"
-            ])
-            branches = sorted(list(self.branches.keys()))
-            final_branch = self.branches[
-                max(branches)
-            ]
+        # if len(self.prune_branches) > 0:
+        #     final_branch = self.branches[
+        #         self.prune_branches[-1]
+        #     ]
+        # else:
+        #     self.log_print([
+        #         "Prune branches not listed; assuming final branch to hold tree champion"
+        #     ])
+        #     branches = sorted(list(self.branches.keys()))
+        #     final_branch = self.branches[
+        #         max(branches)
+        #     ]
 
-        # call GR method to select champion
+        # # call GR method to select champion
 
-        self.log_print([
-            "Final branch is {}".format(final_branch.branch_id)
-        ])
+        # self.log_print([
+        #     "Final branch is {}".format(final_branch.branch_id)
+        # ])
 
-        return [final_branch.champion_name]
+        # return [final_branch.champion_name]
+
+        return self.growth_class.nominate_champions()
 
     def new_branch_on_tree(
         self, 

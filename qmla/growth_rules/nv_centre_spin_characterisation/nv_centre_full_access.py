@@ -79,25 +79,16 @@ class ExperimentFullAccessNV(
         **kwargs
     ):
         import random
-        self.log_print(
-            [
-                "Generating. input model list:", model_list
-            ]
-        )
+        self.log_print([
+            "Generating. input model list:", model_list
+        ])
         single_qubit_terms = ['xTi', 'yTi', 'zTi']
         nontransverse_terms = ['xTx', 'yTy', 'zTz']
         transverse_terms = ['xTy', 'xTz', 'yTz']
         all_two_qubit_terms = (single_qubit_terms + nontransverse_terms
                                + transverse_terms
                                )
-        if len(model_list) > 1:
-            log_print(["Only one model required for transverse Ising growth."],
-                      log_file
-                      )
-            return False
-        else:
-            model = model_list[0]
-
+        model = model_list[0]
         present_terms = model.split('PP')
 
         new_models = []
