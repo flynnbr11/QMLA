@@ -3,5 +3,8 @@
 time="walltime=00:15:00"
 processes_request="nodes=1:ppn=4"
 
-qsub -l $processes_request,$time run_my_script.sh
+results_dir="$(pwd)/outputs/"
+mkdir -p $results_dir
+
+qsub -l $processes_request,$time -o "$results_dir/output.txt" -e "$results_dir/error.txt" run_my_script.sh
 
