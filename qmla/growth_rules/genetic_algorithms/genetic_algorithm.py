@@ -15,15 +15,25 @@ class GeneticAlgorithmQMLA():
     def __init__(
         self,
         num_sites,
-        true_model,
+        true_model=None,
         base_terms=['x', 'y', 'z'],
         mutation_probability=0.1,
+        selection_method = 'roulette', 
+        mutation_method = 'element_wise', 
+        crossover_method = 'one_point',
+        num_protected_elite_models = 2, 
         log_file=None, 
     ):
         self.num_sites = num_sites
         self.base_terms = base_terms
         self.get_base_chromosome()
-        self.true_model = true_model
+        if true_model is None: 
+            r = random.randint(1, 2**self.num_terms-1)
+            r = format(r, '0{}b'.format(self.num_terms))
+            self.true_model = self.map_chromosome_to_model(r)
+        else:
+            self.true_model = true_model
+
         self.true_chromosome = self.map_model_to_chromosome(self.true_model)
         self.true_chromosome_string = self.chromosome_string(
             self.true_chromosome
@@ -39,10 +49,30 @@ class GeneticAlgorithmQMLA():
         self.genetic_generation = 0
         self.f_score_change_by_generation = {}
         self.fitness_at_generation = {}
+        self.models_ranked_by_fitness = {}
         self.most_elite_models_by_generation = {}
+        self.num_protected_elite_models = num_protected_elite_models
         self.best_model_unchanged = False
         self.unchanged_elite_num_generations_cutoff = 6 #TODO put as 5 - 2 for tests
+
+        # specifying which functionality to use
+        self.selection_method = self.select_from_pair_df_remove_selected
+        self.mutation_method = self.element_wise_mutation
+        self.crossover_method = self.one_point_crossover
         
+        available_selection_methods = {
+            'roulette' : self.select_from_pair_df_remove_selected,
+        }
+        available_mutation_methods = {
+            'element_wise' : self.element_wise_mutation
+        }
+        available_crossover_methods = {
+            'one_point' : self.one_point_crossover
+        }
+
+        self.selection_method = available_selection_methods[selection_method]
+        self.mutation_method = available_mutation_methods[mutation_method]
+        self.crossover_method = available_crossover_methods[crossover_method]
 
 
     def get_base_chromosome(self):
@@ -101,7 +131,7 @@ class GeneticAlgorithmQMLA():
             )
             term_list.append(term)
 
-        model_string = self.addition_str.join(term_list)
+        model_string = '+'.join(term_list)
         return model_string
 
     def map_model_to_chromosome(
@@ -143,6 +173,13 @@ class GeneticAlgorithmQMLA():
         new_chromosome[chromosome_locations] = 1
         return new_chromosome
 
+    def model_f_score(
+        self, 
+        model_name
+    ):
+        model_as_chromosome = self.map_model_to_chromosome(model_name)
+        return self.chromosome_f_score(model_as_chromosome)
+
     def chromosome_string(
         self,
         c
@@ -181,6 +218,16 @@ class GeneticAlgorithmQMLA():
         self,
         num_models=5
     ):
+        if num_models > 2**self.num_terms:
+            self.log_print([
+                "Number of models requested > number of possible models ({})".format(
+                    2**self.num_terms
+                ),
+                "Reducing by half until < half available"
+            ])
+
+            while num_models > (2**self.num_terms)/2:
+                num_models = int(num_models/2)
         new_models = []
         self.initial_number_models = num_models
         self.chromosomes_at_generation[0] = []
@@ -189,8 +236,10 @@ class GeneticAlgorithmQMLA():
             r = random.randint(1, 2**self.num_terms-1)
             r = format(r, '0{}b'.format(self.num_terms))
 
-            if self.chromosome_string(
-                    r) not in self.previously_considered_chromosomes:
+            if (
+                self.chromosome_string(r)
+                not in self.previously_considered_chromosomes
+            ):
                 r = list(r)
                 r = np.array([int(i) for i in r])
                 mod = self.map_chromosome_to_model(r)
@@ -220,11 +269,8 @@ class GeneticAlgorithmQMLA():
             * prescribed_chromosomes
             * chromosomes_for_crossover - pairs
         """
-        # return self.basic_pair_selection(
-        #     chromosome_selection_probabilities,
-        #     **kwargs
-        # )
-        return self.select_from_pair_df_remove_selected()
+
+        return self.selection_method(**kwargs)
 
     def select_from_pair_df_remove_selected(
         self,
@@ -276,7 +322,7 @@ class GeneticAlgorithmQMLA():
 
     def crossover(
         self,
-        selection, 
+        # selection, 
         **kwargs
     ):
         """
@@ -284,15 +330,14 @@ class GeneticAlgorithmQMLA():
         and does so in the most basic method of splitting
         down the middle and swapping
         """
-        suggested_chromosomes =  self.one_point_crossover(selection)
-        return suggested_chromosomes
+        return self.crossover_method(**kwargs)
 
 
     def one_point_crossover(
         self, 
-        selection,
         **kwargs
     ):
+        selection = kwargs['selection']
         c1 = np.array(list(selection['chromosome_1']))
         c2 = np.array(list(selection['chromosome_2']))
         x = selection['other_data']['cut']
@@ -316,10 +361,18 @@ class GeneticAlgorithmQMLA():
     ######################
 
     def mutation(
-        self,
-        chromosomes,
-        force_mutation = False, 
+        self, 
+        **kwargs
     ):
+        return self.mutation_method(**kwargs)
+
+    def element_wise_mutation(
+        self,
+        **kwargs
+    ):
+        chromosomes = kwargs['chromosomes']
+        force_mutation = kwargs['force_mutation']
+
         copy_chromosomes = copy.copy(chromosomes)
         mutated_chromosomes = []
         for c in copy_chromosomes:
@@ -360,16 +413,16 @@ class GeneticAlgorithmQMLA():
         
         """
 
-        return []
-        # return self.elite_ranking_top_two(
-        #     **kwargs
-        # )
+        # return []
+        return self.elite_ranking_top_n_models(
+            **kwargs
+        )
 
 
-    def elite_ranking_top_two(
+    def elite_ranking_top_n_models(
         self, 
         model_fitnesses,
-        num_elites = 2,
+        # num_protected_elite_models = 2,
         **kwargs
     ):
         try:
@@ -382,9 +435,9 @@ class GeneticAlgorithmQMLA():
             self.log_print([
                 "Could not get ranked models. model fitnesses:", model_fitnesses
             ])
-        elite_models = ranked_models[:num_elites]
+        elite_models = ranked_models[:self.num_protected_elite_models]
         self.most_elite_models_by_generation[self.genetic_generation] = elite_models[0]
-        # num_elites_for_termination = 2
+        # num_protected_elite_models_for_termination = 2
 
         if self.genetic_generation > self.unchanged_elite_num_generations_cutoff + 2:
             gen = self.genetic_generation
@@ -549,6 +602,11 @@ class GeneticAlgorithmQMLA():
         **kwargs
     ):
         self.fitness_at_generation[self.genetic_generation] = model_fitnesses
+        self.models_ranked_by_fitness[self.genetic_generation] = sorted(
+            model_fitnesses,
+            key=model_fitnesses.get,
+            reverse=True
+        )
         input_models = list(model_fitnesses.keys())
         num_models_for_next_generation = len(input_models)
         self.log_print([
@@ -557,7 +615,7 @@ class GeneticAlgorithmQMLA():
 
         elite_models = self.get_elite_models(
             model_fitnesses = model_fitnesses,
-            num_elites = 2
+            num_protected_elite_models = 2
         )
         proposed_chromosomes = [
             self.chromosome_string(
@@ -585,7 +643,7 @@ class GeneticAlgorithmQMLA():
                 selection = selection
             )
             suggested_chromosomes = self.mutation(
-                suggested_chromosomes,
+                chromosomes = suggested_chromosomes,
                 force_mutation=selection['other_data']['force_mutation']
             )
             c0_str = self.chromosome_string( suggested_chromosomes[0] )
