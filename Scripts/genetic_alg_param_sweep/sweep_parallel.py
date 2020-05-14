@@ -162,7 +162,7 @@ if __name__ == '__main__':
     rank = comm.Get_rank()
 
     print("__main__ starting, on rank {}".format(rank))
-    if rank == MASTER_RANK:
+    if rank == 0:
         master()
     else:
         worker()
