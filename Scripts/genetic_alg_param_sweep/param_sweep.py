@@ -17,7 +17,6 @@ import qmla
 
 
 def run_genetic_algorithm(configuration):
-    print("Running GA, received configuration=", configuration)
     try:
         ga = qmla.growth_rules.genetic_algorithm.GeneticAlgorithmQMLA(
             num_sites = configuration['number_sites'],
@@ -49,25 +48,41 @@ def run_genetic_algorithm(configuration):
         configuration['champion_f_score'] = champ_f_score
         configuration['number_terms'] = ga.num_terms
         configuration['number_possible_models'] = 2**ga.num_terms
+        print("Result:", configuration, flush=True)
         return configuration
     except:
-        return "failed"
+        print("Job failed.", flush=True)
+        return None
 
 
 def get_all_configurations(
     log_file=None,
 ):
-
     # set up hyper parameters to sweep over
-    number_of_iterations = 10
-    numbers_of_sites = [4, 5, 6]
-    numbers_of_generations = [4, 8, 16, 32]
-    starting_populations = [4, 8, 16, 32]
-    elite_models_protected = [0, 1, 2, 4]
-    mutation_probabilities = [0, 0.1, 0.25]
-    selection_methods = ['roulette']
-    mutation_methods = ['element_wise']
-    crossover_methods = ['one_point']
+    test_setup = True
+    if test_setup: 
+        print("Getting reduced set of configurations to test.")
+        number_of_iterations = 1
+        numbers_of_sites = [5,6]
+        numbers_of_generations = [4, 8]
+        starting_populations = [4, ]
+        elite_models_protected = [1]
+        mutation_probabilities = [0,]
+        selection_methods = ['roulette']
+        mutation_methods = ['element_wise']
+        crossover_methods = ['one_point']
+    else:
+        # full sets to use
+        print("Getting complete set of configurations to test.")
+        number_of_iterations = 10
+        numbers_of_sites = [4, 5, 6]
+        numbers_of_generations = [4, 8, 16, 32]
+        starting_populations = [4, 8, 16, 32]
+        elite_models_protected = [0, 1, 2, 4]
+        mutation_probabilities = [0, 0.1, 0.25]
+        selection_methods = ['roulette']
+        mutation_methods = ['element_wise']
+        crossover_methods = ['one_point']
 
 
     # generate the configurations to cycle through
@@ -96,5 +111,6 @@ def get_all_configurations(
                                         all_configurations.append(config)
     
     all_configurations = all_configurations * number_of_iterations
+    
     return all_configurations
     

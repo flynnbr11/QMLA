@@ -11,23 +11,28 @@ from mpi4py import MPI
 from param_sweep import get_all_configurations, run_genetic_algorithm
 
 # globals  
-WORKTAG = 0
-DIETAG = 1
-MASTER_RANK = 0
+TAGS = {
+    'awake' : 0,
+    'work' : 1,
+    'result' : 2,
+    'failed_job' : 3, 
+    'shutdown' : 4, 
+}
 
 def master():   
     # MPI setup
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    status = MPI.Status()
-    num_processes = comm.Get_size()
+    comm = MPI.COMM_WORLD # communicator for this MPI session
+    rank = comm.Get_rank() # ID of this process
     
+    status = MPI.Status()
+    num_processes = comm.Get_size()    
     other_processes = list(range(num_processes))
     other_processes.remove(rank)
-    print("Worker process ranks:", other_processes)
+    num_workers = len(other_processes)
+    num_workers_shutdown = 0
 
     # set up results infrastructure
-    ga_results_df = pd.DataFrame() # for storage
+    ga_results_df = pd.DataFrame() 
 
     # get configurations to cycle over
     all_configurations = get_all_configurations(
@@ -36,80 +41,50 @@ def master():
         ),
     )
     iterable_configurations = iter(all_configurations)
-        
-    # send first batches of work to the workers
-    for r in other_processes:
-        try:
-            configuration = next(iterable_configurations)
-        except:
-            print("No remaining configurations - all workers not sent work")
-            break
-        comm.send(
-            obj = configuration, 
-            dest = r, 
-            tag = WORKTAG
-        )
+    print("[MASTER] Configurations to cycle through:", all_configurations, flush=True)
 
     # iteratively send configurations to workers, until none remain
-    while True: 
-        try:
-            configuration = next(iterable_configurations)
-        except:
-            print("No remaining configurations - exiting while loop")
-            break
+    while num_workers_shutdown < num_workers: 
 
-        # process result
+        # receive any message from any worker
         incoming_data = comm.recv(
             source = MPI.ANY_SOURCE,
             tag = MPI.ANY_TAG,
             status = status
         )
-        if incoming_data == "failed":
-            print("Failure reported on", status.Get_source())
-        else:
+        sender = status.Get_source()
+        tag = status.Get_tag()
+
+        # process the message
+        if tag == TAGS['shutdown']:
+            num_workers_shutdown += 1
+        elif tag == TAGS['failed_job'] : 
+            print("[MASTER] Job failure recorded from worker ", sender, flush=True)
+        elif tag == TAGS['result']:
+            # store result sent within message
             result = pd.Series(incoming_data)
             ga_results_df = ga_results_df.append(
                 result, 
                 ignore_index=True
             )
 
-            # send more work to the process which has just finished
-            sender = status.Get_source()
-            print("Sending next config to {} : {}".format(
-                sender, 
-                configuration
-            ))
-            comm.send(
-                obj = configuration, 
-                dest = sender, 
-                tag = WORKTAG
-            )
-    
-    # wait for outstanding work packets
-    print("Waiting on outstanding work packets")
-    for r in other_processes:
-        incoming_data = comm.recv(
-            source = MPI.ANY_SOURCE,
-            tag = MPI.ANY_TAG,
-            status = status
-        )
-        if incoming_data == "failed":
-            print("Failure reported on", status.Get_source())
-        else:
-            result = pd.Series(incoming_data)
-            ga_results_df = ga_results_df.append(
-                result, 
-                ignore_index=True
-            )
-
-    # kill the workers 
-    print("Killing workers")
-    for r in other_processes:
-        comm.send(
-            obj=None, 
-            dest = r,
-            tag = DIETAG, 
-        )
+        # if the worker is still available, send it the next message
+        if tag != TAGS['shutdown']:
+            try:
+                # if some configs still to process, send the next one to the worker
+                configuration = next(iterable_configurations)
+                comm.send(
+                    obj = configuration, 
+                    dest = sender, 
+                    tag = TAGS['work']
+                )
+            except:
+                # no configurations left to do; tell it to shut down
+                comm.send(
+                    obj=None, 
+                    dest = sender,
+                    tag = TAGS['shutdown'], 
+                )
 
     # store the result
     result_directory = os.path.join(os.getcwd(), 'results')
@@ -122,53 +97,74 @@ def master():
         now.strftime("%H"),
         now.strftime("%M"),
     )
-
     path_to_store_result = os.path.join(
         result_directory, 
         'results_{}.csv'.format(time)
     )
     ga_results_df.to_csv( path_to_store_result )
-    print("Results stored at:", path_to_store_result)
+    print("[MASTER] Results stored at:", path_to_store_result, flush=True)
+    # FINISHED 
 
 
 def worker():
     comm = MPI.COMM_WORLD
     status = MPI.Status()
-    print("I am worker with rank {}".format(rank))
+    print("I am worker with rank {}".format(rank), flush=True)
+    
+    # tell the master I am awake
+    comm.send(
+        obj = None,
+        dest = 0,
+        tag = TAGS['awake']
+    )
 
+    # accept messages and act based on what they say
     while True: 
-
+        print("Worker {} waiting on message from master".format(rank), flush=True)
         incoming_data = comm.recv(
             source = 0, 
             tag = MPI.ANY_TAG, 
             status = status, 
         )
-        if status.Get_tag() == DIETAG: 
-            # received die tag
-            print("Received DIE tag; terminating")
-            break   
-        else:
-            result = run_genetic_algorithm(configuration = incoming_data)
-            print(
-                "Completed genetic alg run; sending result to master. config=", incoming_data, 
-                "\nresult=", result
+        tag = status.Get_tag()
+
+        # act based on message
+        if tag == TAGS['shutdown']: 
+            # Tell master I am shutting down
+            comm.send(
+                obj = None,
+                dest = 0,
+                tag = TAGS['shutdown'], 
             )
+            break   
+        elif tag == TAGS['work']:
+            # perform the calculation and send the result to the master
+            result = run_genetic_algorithm(configuration = incoming_data)
+            if result is None: 
+                print("Job failed")
+                tag = TAGS['failed_job']
+            else: 
+                tag = TAGS['result']
             comm.send(
                 obj = result,
-                dest = 0
+                dest = 0,
+                tag = tag
             )
-    print("Worker {} received DIETAG so has stopped accepting work.")
+        else:
+            print("Received message with unexpected tag:", tag, "on worker", rank)
+
+    print("Worker {} no longer accepting work.".format(rank), flush=True)
 
 
 # Run the script; this is run on every process. 
 if __name__ == '__main__':
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
+
+    print("__main__ starting, on rank {}".format(rank))
     if rank == MASTER_RANK:
         master()
-        print("Master finished")
     else:
         worker()
-
-
+    print("__main__ finished, on rank {}".format(rank))    
 
