@@ -73,7 +73,7 @@ class SimulatedNVCentre(
 
             # values found in a QHL for GHz terms
             'pauliSet_1_x_d3' : (1.85197880e+09,   7.28778717e+07), # ~1.943 GHz
-            'pauliSet_1_y_d3' : (1.97413207e+09,   7.77490072e+07]),
+            'pauliSet_1_y_d3' : (1.97413207e+09,   7.77490072e+07),
             'pauliSet_1_z_d3' : (1.99779857e+09,  3.95883908e+07),
 
             # 'pauliSet_1_x_d3' : (B*g*bohr_magneton/hbar - 0.4e7, 2e7), # ~1.943 GHz
