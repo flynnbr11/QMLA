@@ -440,14 +440,12 @@ class QuantumModelLearningAgent():
             # could be path to unpickle within model?
             'experimental_measurements': self.experimental_measurements,
             'base_resources': self.base_resources,  # put inside growth rule
-            'reallocate_resources': self.reallocate_resources,  # put inside growth rule
+            'reallocate_resources': self.reallocate_resources,  #TODO remove - now in GR
             # TODO put this inside growth rule, does it need to be top level
             # control?
             'resampler_thresh': self.qinfer_resample_threshold,
-            # TODO put this inside growth rule, does it need to be top level
-            # control?
             'resampler_a': self.qinfer_resampler_a,
-            # TODO put this inside growth rule
+            # TODO threshd and a are in GR now -- remove from calls to qmla controls
             'pgh_prefactor': self.qinfer_PGH_heuristic_factor,
             # TODO put this inside growth rule
             'pgh_exponent': self.qinfer_PGH_heuristic_exponent,
@@ -2103,14 +2101,12 @@ class QuantumModelLearningAgent():
         self.champion_model_id = mod_id
         self.true_model_found = True
         self.true_model_considered = True
-        self.log_print(
-            [
-                "Learned model {}: {}".format(
-                    mod_id,
-                    mod_to_learn
-                )
-            ]
-        )
+        self.log_print([
+            "Learned model {}: {}".format(
+                mod_id,
+                mod_to_learn
+            )
+        ])
         self._update_database_model_info()
         self.compute_model_f_score(
             model_id=mod_id

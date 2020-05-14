@@ -820,7 +820,7 @@ def plot_parameter_estimates(
         term_positions[terms[t]] = t
         term = terms[t]
         param_position = term_positions[term]
-        param_estimates = mod.track_mean_params[:, param_position]
+        param_estimates = mod.track_param_means[:, param_position]
         #std_dev = mod.cov_matrix[param_position,param_position]
         std_dev = mod.track_covariance_matrices[:, param_position, param_position]
         param_estimate_by_term[term] = param_estimates

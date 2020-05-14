@@ -13,13 +13,10 @@ import qinfer as qi
 import redis
 import pickle
 
-import qmla.redis_settings as rds
-# import qmla.qinfer_model_interface as qml_qi
-import qmla.memory_tests
+import qmla.redis_settings
 import qmla.logging
-import qmla.get_growth_rule as get_growth_rule
+import qmla.get_growth_rule
 import qmla.database_framework
-import qmla.analysis
 
 pickle.HIGHEST_PROTOCOL = 4
 
@@ -66,8 +63,9 @@ class ModelInstanceForComparison():
         self.qmla_id = qid
         self.model_id = model_id
 
+        # Get essential data
         if qmla_core_info_database is None:
-            redis_databases = rds.get_redis_databases_by_qmla_id(
+            redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
                 host_name,
                 port_number,
                 qid
@@ -81,7 +79,7 @@ class ModelInstanceForComparison():
             self.probes_system = qmla_core_info_database['ProbeDict']
             self.probes_simulator = qmla_core_info_database['SimProbeDict']
 
-
+        # Assign attributes based on core data
         self.num_particles = qmla_core_info_dict['num_particles']
         self.probe_number = qmla_core_info_dict['num_probes']
         self.qinfer_resampler_threshold = qmla_core_info_dict['resampler_thresh']
@@ -91,17 +89,15 @@ class ModelInstanceForComparison():
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
         self.true_param_dict = qmla_core_info_dict['true_param_dict']
-        # self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         self.results_directory = qmla_core_info_dict['results_directory']
 
-        # Get model specific data
+        
         if learned_model_info is None:
-            # get the learned info dictionary from the redis
-            # database corresponding to this model id
+            # Get data specific to this model, learned elsewhere and stored on redis database
             try:
-                redis_databases = rds.get_redis_databases_by_qmla_id(
+                redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
                     host_name,
                     port_number,
                     qid
@@ -121,9 +117,8 @@ class ModelInstanceForComparison():
                 learned_model_info = pickle.loads(
                     learned_models_info_db.get(model_id_str)
                 )
-            except: 
-                print("Learned model's info not provided to ModelInstanceForComparison")
 
+        # Assign parameters based on model-specific infomation
         self.model_name = learned_model_info['name']
         self.log_print(
             [
@@ -136,21 +131,19 @@ class ModelInstanceForComparison():
         self.final_learned_params = learned_model_info['final_params']
         self.model_terms_parameters_final = np.array(self.final_learned_params)
         self.growth_rule_of_this_model = learned_model_info['growth_generator']
-        self.growth_class = get_growth_rule.get_growth_generator_class(
+        self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.growth_rule_of_this_model,
-            # use_experimental_data=self.use_experimental_data,
             log_file=self.log_file
         )
         self.model_prior = learned_model_info['final_prior']
         self.posterior_marginal = learned_model_info['posterior_marginal']
-        self.initial_prior = learned_model_info['initial_prior']
         self.model_normalization_record = learned_model_info['normalization_record']
         self.log_total_likelihood = learned_model_info['log_total_likelihood']
         self.learned_parameters_qhl = learned_model_info['learned_parameters']
         self.final_sigmas_qhl = learned_model_info['final_sigmas']
         self.covariance_mtx_final = learned_model_info['final_cov_mat']
-        log_identifier = str("Bayes " + str(self.model_id))
 
+        # New instances of model and updater used by QInfer
         self.qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters_final,
@@ -163,12 +156,9 @@ class ModelInstanceForComparison():
             probe_dict=self.probes_system,
             sim_probe_dict=self.probes_simulator,
             growth_generation_rule=self.growth_rule_of_this_model,
-            # use_experimental_data=self.use_experimental_data,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            # measurement_type=self.measurement_class,
-            # log_identifier=log_identifier
         )
 
         self.reconstruct_updater = True # optionally just load it
@@ -182,60 +172,43 @@ class ModelInstanceForComparison():
             num_particles_for_bf = max(
                 5, 
                 int(self.growth_class.fraction_particles_for_bf * self.num_particles)
-            )
-            self.log_print(
-                [
-                    "For Bayes factor calculation, using {} particles".format(num_particles_for_bf)
-                ]
-            )
+            ) # this allows the growth rule to use less particles for the comparison stage
+            self.log_print([
+                "Using {} particles for comparison.".format(num_particles_for_bf)
+            ])
 
             self.qinfer_updater = qi.SMCUpdater(
                 model=self.qinfer_model,
-                # n_particles=self.num_particles,
                 n_particles=num_particles_for_bf,
                 prior=posterior_distribution,
                 zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
-                resample_thresh=self.qinfer_resampler_threshold,
+                resample_thresh=self.growth_class.qinfer_resampler_threshold,
                 resampler=qi.LiuWestResampler(
-                    a=self.qinfer_resampler_a
+                    a=self.growth_class.qinfer_resampler_a
                 ),
-                # debug_resampling=False
             )
             self.qinfer_updater._normalization_record = self.model_normalization_record
             self.qinfer_updater._log_total_likelihood = self.log_total_likelihood
             time_taken = time.time() - time_s
-            self.log_print(
-                [
-                    "Time to reconstruct updater: {}".format(
-                        time_taken
-                    )
-                ]
-            )
-
         else:
-            time_s = time.time()
+            # Not currently pickling the updater -- can be done in ModelInstanceForLearning.learned_info_dict()
             self.qinfer_updater = pickle.loads(
                 learned_model_info['updater']
             )
-            time_taken = time.time() - time_s
-            self.log_print(
-                [
-                    "Time to unpickle updater: {}".format(
-                        time_taken
-                    )
-                ]
-            )
         self.log_print(
             [
-                "Prior mean:", self.qinfer_updater.est_mean()
+                "Posterior mean:", self.qinfer_updater.est_mean()
             ]
         )
+
+        # Delete extra data now that everything useful is extracted
         del qmla_core_info_dict, learned_model_info
 
     def log_print(
         self,
         to_print_list
     ):
+        r"""Wrapper for :func:`~qmla.print_to_log`"""
         qmla.logging.print_to_log(
             to_print_list=to_print_list,
             log_file=self.log_file,
