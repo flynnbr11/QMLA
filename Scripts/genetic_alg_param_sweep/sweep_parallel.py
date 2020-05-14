@@ -15,6 +15,15 @@ WORKTAG = 0
 DIETAG = 1
 MASTER_RANK = 0
 
+TAGS = {
+    'available' : 0, 
+    'work' : 1,
+    'shutdown' : 2, 
+    'failed_job' : 3, 
+    'awake' : 4,
+    'result' : 5
+}
+
 def master():   
     # MPI setup
     comm = MPI.COMM_WORLD
@@ -24,7 +33,9 @@ def master():
     
     other_processes = list(range(num_processes))
     other_processes.remove(rank)
-    print("Worker process ranks:", other_processes)
+    num_workers = len(other_processes)
+    num_workers_shutdown = 0
+    num_workers_registered = 0
 
     # set up results infrastructure
     ga_results_df = pd.DataFrame() # for storage
@@ -36,80 +47,50 @@ def master():
         ),
     )
     iterable_configurations = iter(all_configurations)
-        
-    # send first batches of work to the workers
-    for r in other_processes:
-        try:
-            configuration = next(iterable_configurations)
-        except:
-            print("No remaining configurations - all workers not sent work")
-            break
-        comm.send(
-            obj = configuration, 
-            dest = r, 
-            tag = WORKTAG
-        )
+    print("[MASTER] Configurations to cycle through:", all_configurations, flush=True)
 
     # iteratively send configurations to workers, until none remain
-    while True: 
-        try:
-            configuration = next(iterable_configurations)
-        except:
-            print("No remaining configurations - exiting while loop")
-            break
+    while num_workers_shutdown < num_workers: 
 
-        # process result
+        # receive a message from any worker
         incoming_data = comm.recv(
             source = MPI.ANY_SOURCE,
             tag = MPI.ANY_TAG,
             status = status
         )
-        if incoming_data == "failed":
-            print("Failure reported on", status.Get_source())
-        else:
+        sender = status.Get_source()
+        tag = status.Get_tag()
+
+        # process the message
+        if tag == TAGS['shutdown']:
+            num_workers_shutdown += 1
+        elif tag == TAGS['failed_job'] : 
+            print("[MASTER] Job failure recorded from worker ", sender, flush=True)
+        elif tag == TAGS['result']:
             result = pd.Series(incoming_data)
+            print("[MASTER] received result:", result)
             ga_results_df = ga_results_df.append(
                 result, 
                 ignore_index=True
             )
 
-            # send more work to the process which has just finished
-            sender = status.Get_source()
-            print("Sending next config to {} : {}".format(
-                sender, 
-                configuration
-            ))
-            comm.send(
-                obj = configuration, 
-                dest = sender, 
-                tag = WORKTAG
-            )
-    
-    # wait for outstanding work packets
-    print("Waiting on outstanding work packets")
-    for r in other_processes:
-        incoming_data = comm.recv(
-            source = MPI.ANY_SOURCE,
-            tag = MPI.ANY_TAG,
-            status = status
-        )
-        if incoming_data == "failed":
-            print("Failure reported on", status.Get_source())
-        else:
-            result = pd.Series(incoming_data)
-            ga_results_df = ga_results_df.append(
-                result, 
-                ignore_index=True
-            )
-
-    # kill the workers 
-    print("Killing workers")
-    for r in other_processes:
-        comm.send(
-            obj=None, 
-            dest = r,
-            tag = DIETAG, 
-        )
+        # if the worker is still available, send it the next message
+        if tag == TAGS['result'] or tag == TAGS['failed_job'] or tag==TAGS['awake']:
+            try:
+                configuration = next(iterable_configurations)
+                print("[MASTER] Got a new config", flush=True)
+                comm.send(
+                    obj = configuration, 
+                    dest = sender, 
+                    tag = TAGS['work']
+                )
+            except:
+                print("[MASTER] No remaining configurations - sending shut down message", flush=True)
+                comm.send(
+                    obj=None, 
+                    dest = sender,
+                    tag = TAGS['shutdown'], 
+                )
 
     # store the result
     result_directory = os.path.join(os.getcwd(), 'results')
@@ -122,53 +103,74 @@ def master():
         now.strftime("%H"),
         now.strftime("%M"),
     )
-
     path_to_store_result = os.path.join(
         result_directory, 
         'results_{}.csv'.format(time)
     )
     ga_results_df.to_csv( path_to_store_result )
-    print("Results stored at:", path_to_store_result)
+    print("[MASTER] Results stored at:", path_to_store_result, flush=True)
 
 
 def worker():
     comm = MPI.COMM_WORLD
     status = MPI.Status()
-    print("I am worker with rank {}".format(rank))
+    print("I am worker with rank {}".format(rank), flush=True)
+    
+    # tell the master I am awake
+    comm.send(
+        obj = None,
+        dest = 0,
+        tag = TAGS['awake']
+    )
 
+    # accept messages and act based on what they say
     while True: 
-
+        print("Worker {} waiting on message from master".format(rank), flush=True)
         incoming_data = comm.recv(
             source = 0, 
             tag = MPI.ANY_TAG, 
             status = status, 
         )
-        if status.Get_tag() == DIETAG: 
-            # received die tag
-            print("Received DIE tag; terminating")
-            break   
-        else:
-            result = run_genetic_algorithm(configuration = incoming_data)
-            print(
-                "Completed genetic alg run; sending result to master. config=", incoming_data, 
-                "\nresult=", result
+        tag = status.Get_tag()
+
+        # act based on message
+        if tag == TAGS['shutdown']: 
+            # Tell master I am shutting down
+            print("Received shut down tag; terminating worker ", rank, flush=True)
+            comm.send(
+                obj = None,
+                dest = 0,
+                tag = TAGS['shutdown'], 
             )
+            break   
+        elif tag == TAGS['work']:
+            # perform the calculation and send the result to the master
+            result = run_genetic_algorithm(configuration = incoming_data)
+            if result is None: 
+                print("Job failed")
+                tag = TAGS['failed_job']
+            else: 
+                tag = TAGS['result']
             comm.send(
                 obj = result,
-                dest = 0
+                dest = 0,
+                tag = tag
             )
-    print("Worker {} received DIETAG so has stopped accepting work.")
+        else:
+            print("Received message with unexpected tag:", tag, "on worker", rank)
+
+    print("Worker {} no longer accepting work.".format(rank), flush=True)
 
 
 # Run the script; this is run on every process. 
 if __name__ == '__main__':
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
+
+    print("__main__ starting, on rank {}".format(rank))
     if rank == MASTER_RANK:
         master()
-        print("Master finished")
     else:
         worker()
-
-
+    print("__main__ finished, on rank {}".format(rank))    
 
