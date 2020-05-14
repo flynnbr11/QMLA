@@ -376,12 +376,16 @@ class GeneticAlgorithmQMLA():
         copy_chromosomes = copy.copy(chromosomes)
         mutated_chromosomes = []
         for c in copy_chromosomes:
-            if np.all(c == 0):
-                self.log_print([
-                    "Input chomosome {} has no interactions -- forcing mutation".format(c)
-                ])
-                mutation_probability = 1.0
-            else:
+            try:
+                if np.all(c == 0):
+                    self.log_print([
+                        "Input chomosome {} has no interactions -- forcing mutation".format(c)
+                    ])
+                    mutation_probability = 1.0
+                else:
+                    mutation_probability = self.mutation_probability
+            except:
+                self.log_print(["Can't compare all w/ 0 :", c])
                 mutation_probability = self.mutation_probability
 
             if (

@@ -11,34 +11,28 @@ from mpi4py import MPI
 from param_sweep import get_all_configurations, run_genetic_algorithm
 
 # globals  
-WORKTAG = 0
-DIETAG = 1
-MASTER_RANK = 0
-
 TAGS = {
-    'available' : 0, 
+    'awake' : 0,
     'work' : 1,
-    'shutdown' : 2, 
+    'result' : 2,
     'failed_job' : 3, 
-    'awake' : 4,
-    'result' : 5
+    'shutdown' : 4, 
 }
 
 def master():   
     # MPI setup
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    status = MPI.Status()
-    num_processes = comm.Get_size()
+    comm = MPI.COMM_WORLD # communicator for this MPI session
+    rank = comm.Get_rank() # ID of this process
     
+    status = MPI.Status()
+    num_processes = comm.Get_size()    
     other_processes = list(range(num_processes))
     other_processes.remove(rank)
     num_workers = len(other_processes)
     num_workers_shutdown = 0
-    num_workers_registered = 0
 
     # set up results infrastructure
-    ga_results_df = pd.DataFrame() # for storage
+    ga_results_df = pd.DataFrame() 
 
     # get configurations to cycle over
     all_configurations = get_all_configurations(
@@ -52,7 +46,7 @@ def master():
     # iteratively send configurations to workers, until none remain
     while num_workers_shutdown < num_workers: 
 
-        # receive a message from any worker
+        # receive any message from any worker
         incoming_data = comm.recv(
             source = MPI.ANY_SOURCE,
             tag = MPI.ANY_TAG,
@@ -67,25 +61,25 @@ def master():
         elif tag == TAGS['failed_job'] : 
             print("[MASTER] Job failure recorded from worker ", sender, flush=True)
         elif tag == TAGS['result']:
+            # store result sent within message
             result = pd.Series(incoming_data)
-            print("[MASTER] received result:", result)
             ga_results_df = ga_results_df.append(
                 result, 
                 ignore_index=True
             )
 
         # if the worker is still available, send it the next message
-        if tag == TAGS['result'] or tag == TAGS['failed_job'] or tag==TAGS['awake']:
+        if tag != TAGS['shutdown']:
             try:
+                # if some configs still to process, send the next one to the worker
                 configuration = next(iterable_configurations)
-                print("[MASTER] Got a new config", flush=True)
                 comm.send(
                     obj = configuration, 
                     dest = sender, 
                     tag = TAGS['work']
                 )
             except:
-                print("[MASTER] No remaining configurations - sending shut down message", flush=True)
+                # no configurations left to do; tell it to shut down
                 comm.send(
                     obj=None, 
                     dest = sender,
@@ -109,6 +103,7 @@ def master():
     )
     ga_results_df.to_csv( path_to_store_result )
     print("[MASTER] Results stored at:", path_to_store_result, flush=True)
+    # FINISHED 
 
 
 def worker():
@@ -136,7 +131,6 @@ def worker():
         # act based on message
         if tag == TAGS['shutdown']: 
             # Tell master I am shutting down
-            print("Received shut down tag; terminating worker ", rank, flush=True)
             comm.send(
                 obj = None,
                 dest = 0,
