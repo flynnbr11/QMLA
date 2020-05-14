@@ -10,7 +10,6 @@ import redis
 import pickle
 
 import qmla.redis_settings as rds
-import qmla.memory_tests
 import qmla.logging
 import qmla.get_growth_rule as get_growth_rule
 import qmla.shared_functionality.prior_distributions
@@ -255,28 +254,26 @@ class ModelInstanceForLearning():
 
         self.quadratic_losses = []
         self.track_total_log_likelihood = np.array([])
-        self.track_experimental_times = np.array([])  # only for debugging
         self.particles = np.array([])
         self.weights = np.array([])
         self.epochs_after_resampling = []
         self.final_learned_params = np.empty(
             [len(self.model_terms_matrices), 2])
-        self.covariances = np.empty(self.num_experiments)
         self.track_param_means = [self.qinfer_updater.est_mean()]
         self.track_covariance_matrices = []
         self.track_param_uncertainties = []
         self.track_posterior_dist = []
         # self.track_prior_means = []
         # self.track_prior_std_dev = []
-        self.track_experimental_times = np.empty(
-            self.num_experiments)  # only for debugging
+        self.track_experimental_times = []
         self.true_model_params_dict = {}
-        self.learned_parameters_qhl = {}
-        self.final_sigmas_qhl = {}
+        self.qhl_final_param_estimates = {}
+        self.qhl_final_param_uncertainties = {}
         self.time_update = 0
         self.time_volume = 0
         self.time_simulate_experiment = 0
         self.time_heuristic = 0 
+        self.terminate_learning_at_volume_convergence = False
         self.track_quadratic_loss = False
         if self.track_quadratic_loss:
             self.all_params_for_q_loss = list(
@@ -287,6 +284,345 @@ class ModelInstanceForLearning():
                 op_name : self.model_terms_names.index(op_name)
                 for op_name in self.model_terms_names
             }
+
+
+
+
+    def update_model(
+        self,
+    ):
+        r"""
+        Run updates on model, corresponding to quantum Hamiltonian learning procedure. 
+
+        Get datum corresponding to true system, where true system is either experimental or simulated,
+        by calling 
+
+        """
+
+        full_update_time_init = time.time()
+
+        self.true_model_params_dict = self.growth_class.true_params_dict
+        print_frequency = max(
+            int(self.num_experiments / 5),
+            5
+        )
+        for update_step in range(self.num_experiments):
+            if (update_step % print_frequency == 0):
+                # Print so user can see how far along algorithm is.
+                self.log_print(["Epoch", update_step])
+                try:
+                    self.log_print([
+                        "epoch {} - time magnitudes used: {}".format(
+                            update_step,
+                            self.model_heuristic.count_order_of_magnitudes
+                        ) 
+                    ])
+                    self.model_heuristic.count_order_of_magnitudes = {} #reset
+                except:
+                    pass
+
+            new_experiment = self.model_heuristic(
+                num_params=len(self.model_terms_names),
+                epoch_id=update_step,
+                current_params=self.track_param_means[-1]
+            )
+
+            if update_step == 0:
+                self.log_print(['Initial time selected = ',
+                                str(new_experiment[0][0])]
+                               )
+            self.track_experimental_times.append(new_experiment[0][0])
+
+            # Run (or simulate) the experiment
+            datum_from_experiment = self.qinfer_model.simulate_experiment(
+                self.model_terms_parameters, # this doesn't actually matter - likelihood overwrites this for true system
+                new_experiment,
+                repeat=1
+            ) 
+
+            # Call updater to update distribution based on datum
+            try:
+                self.qinfer_updater.update(
+                    datum_from_experiment,
+                    new_experiment
+                )
+            except RuntimeError as e:
+                import sys
+                self.log_print([
+                    "RuntimeError from updater on model {} - {}. Error: {}".format(
+                        self.model_id, self.model_name, str(e)
+                    )
+                ])
+                print("\n\n[Model class] EXITING; Inspect log\n\n")
+                raise NameError("Qinfer update failure")
+                sys.exit()
+            except: 
+                self.log_print(
+                    [
+                        "Failed to update model ({}) {} at update step {}".format(
+                            self.model_id, 
+                            self.model_id, 
+                            update_step
+                        )
+                    ]
+                )
+                sys.exit()
+
+            # Track learning 
+            self._record_experiment_updates(update_step=update_step)
+
+            # Terminate
+            if self.terminate_learning_at_volume_convergence:  # can be reinstated to stop learning when volume converges
+                self._finalise_learning()
+                break
+
+            if update_step == self.num_experiments - 1:
+                self._finalise_learning()
+
+        try:
+            self.log_print([
+                "Total number of times each order of magnitude of uncertainty used during learning:", 
+                self.model_heuristic.all_count_order_of_magnitudes,
+                "Number of counter productive experiments:", self.model_heuristic.counter_productive_experiments
+            ])
+        except:
+            pass
+
+
+
+    def _record_experiment_updates(self, update_step):
+        self.volume_by_epoch = np.append(
+            self.volume_by_epoch,
+            qi.utils.ellipsoid_volume(
+                invA = self.qinfer_updater.est_covariance_mtx()
+            )
+        )
+        self.track_param_means.append(self.qinfer_updater.est_mean())
+        self.track_param_uncertainties.append(
+            np.sqrt(
+                np.diag(self.qinfer_updater.est_covariance_mtx())
+            )
+        )
+        if self.qinfer_updater.just_resampled:
+            self.epochs_after_resampling.append(update_step)
+
+        # TODO remove? this doesn't seem necessary to store
+        if self.growth_class.track_cov_mtx:
+            self.track_covariance_matrices.append(
+                self.qinfer_updater.est_covariance_mtx())
+
+        if self.track_quadratic_loss:
+            # TODO not currently recording quadratic loss
+            quadratic_loss = 0
+            for param in self.all_params_for_q_loss:
+                if param in self.model_terms_names:
+                    learned_param = self.qinfer_updater.est_mean()[self.param_indices[param]]
+                else:
+                    learned_param = 0
+
+                if param in list(self.true_model_params_dict.keys()):
+                    true_param = self.true_model_params_dict[param]
+                else:
+                    true_param = 0
+                quadratic_loss += (learned_param - true_param)**2
+            self.quadratic_losses.append(quadratic_loss)
+
+
+    def _finalise_learning(self):
+        self.log_print(["QHL finished for ", self.model_name])
+        self.log_print([
+            'Final time selected:',
+            self.track_experimental_times[-1]
+        ])
+        self.log_print([
+            "{} Resample epochs: {}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
+        ])
+
+        self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
+
+        cov_mat = self.qinfer_updater.est_covariance_mtx()
+        est_params = self.qinfer_updater.est_mean()
+        for iterator in range(len(self.final_learned_params)):
+            # TODO get rid of uses of final_learned_params, use qhl_final_param_estimates instead
+            term = self.model_terms_names[iterator]
+            self.final_learned_params[iterator] = [
+                self.qinfer_updater.est_mean()[iterator],
+                np.sqrt(cov_mat[iterator][iterator])
+            ]
+            
+            self.qhl_final_param_estimates[term] = est_params[iterator]
+            self.qhl_final_param_uncertainties[term] = np.sqrt(cov_mat[iterator][iterator])
+            self.log_print([
+                "Final parameters estimates and uncertainties (term {}): {} +- {}".format(
+                    self.model_terms_names[iterator], '):',
+                    self.qhl_final_param_estimates[term], 
+                    self.qhl_final_param_uncertainties[term]
+                )
+            ])
+
+    def learned_info_dict(self):
+        """
+        Place essential information after learning has occured into a dict.
+        This can be used to recreate the model on another node.
+        """
+
+        all_post_margs = []
+        for i in range(len(self.final_learned_params)):
+            all_post_margs.append(
+                self.qinfer_updater.posterior_marginal(idx_param=i)
+            )
+
+        learned_info = {}
+        # wanted by storage class
+        learned_info['num_particles'] = self.num_particles
+        learned_info['num_experiments'] = self.num_experiments
+        learned_info['times_learned_over'] = self.track_experimental_times
+        learned_info['final_learned_params'] = self.final_learned_params
+        learned_info['model_normalization_record'] = self.qinfer_updater.normalization_record
+        learned_info['log_total_likelihood'] = self.qinfer_updater.log_total_likelihood
+        learned_info['raw_volume_list'] = self.volume_by_epoch
+        learned_info['track_param_means'] = self.track_param_means
+        learned_info['track_covariance_matrices'] = self.track_covariance_matrices
+        learned_info['track_param_uncertainties'] = self.track_param_uncertainties
+        learned_info['epochs_after_resampling'] = self.epochs_after_resampling
+        learned_info['quadratic_losses_record'] = self.quadratic_losses
+        learned_info['qhl_final_param_estimates'] = self.qhl_final_param_estimates
+        learned_info['qhl_final_param_uncertainties'] = self.qhl_final_param_uncertainties
+        learned_info['covariance_mtx_final'] = self.qinfer_updater.est_covariance_mtx()
+        learned_info['estimated_mean_params'] = self.qinfer_updater.est_mean()
+        learned_info['growth_rule_of_this_model'] = self.growth_rule_of_this_model
+        learned_info['model_heuristic_class'] = self.model_heuristic_class
+        try:
+            learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
+            learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
+            learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
+        except:
+            learned_info['evaluation_log_likelihood'] = None
+            learned_info['evaluation_normalization_record'] = None
+            learned_info['evaluation_median_likelihood'] = None
+
+        # additionally wanted by comparison class
+        learned_info['data_record'] = self.qinfer_updater.data_record
+        learned_info['name'] = self.model_name
+        learned_info['model_id'] = self.model_id
+        learned_info['final_prior'] = self.qinfer_updater.prior
+        learned_info['model_terms_names'] = self.model_terms_names
+        learned_info['covariance_mtx_final'] = self.qinfer_updater.est_covariance_mtx()
+        learned_info['posterior_marginal'] = all_post_margs
+        learned_info['initial_params'] = self.model_terms_parameters
+
+        return learned_info
+
+
+    def compute_likelihood_after_parameter_learning(
+        self,
+    ):
+        estimated_params = self.qinfer_updater.est_mean()
+        cov_mt_uncertainty = [1e-10] * np.shape(self.qinfer_updater.est_mean())[0]
+        cov_mt = np.diag(cov_mt_uncertainty)
+        posterior_distribution = qi.MultivariateNormalDistribution(
+            estimated_params,
+            cov_mt
+        )
+
+        learned_params = list(self.final_learned_params[:, 0])
+        self.learned_hamiltonian = np.tensordot(
+            learned_params,
+            self.model_terms_matrices,
+            axes=1
+        )
+
+        true_params_dict = pickle.load(
+            open(
+                self.true_params_path, 
+                'rb'
+            )
+        )
+        
+        evaluation_times = true_params_dict['evaluation_times']
+        evaluation_probe_dict = true_params_dict['evaluation_probes']
+        self.log_print([
+            "Evaluating learned model. number of times:", len(evaluation_times)
+        ])
+
+        evaluation_qinfer_model = self.growth_class.qinfer_model(
+            model_name=self.model_name,
+            modelparams=self.model_terms_parameters,
+            oplist=self.model_terms_matrices,
+            true_oplist=self.true_model_constituent_operators,
+            truename=self.true_model_name,
+            trueparams=self.true_model_params,
+            true_param_dict = self.true_param_dict, 
+            num_probes=self.probe_number,
+            probe_dict=evaluation_probe_dict,
+            sim_probe_dict=evaluation_probe_dict,
+            growth_generation_rule=self.growth_rule_of_this_model,
+            experimental_measurements=self.experimental_measurements,
+            experimental_measurement_times=self.experimental_measurement_times,
+            log_file=self.log_file,
+        )
+
+        evaluation_updater = qi.SMCUpdater(
+            # model=self.qinfer_model,
+            model = evaluation_qinfer_model, 
+            n_particles=min(5, self.num_particles),
+            # n_particles=self.num_particles,
+            prior=posterior_distribution,
+            # resample more aggressively once learned, since closer to true values
+            # resample_thresh=max(self.qinfer_resampler_threshold, 0.6), 
+            # turn off resampling - want to evaluate the learned model, not improved version
+            resample_thresh=0.0,  
+            resampler=qi.LiuWestResampler(
+                a=self.growth_class.qinfer_resampler_a
+            ),
+        )
+
+        evaluation_updater._log_total_likelihood = 0.0
+        evaluation_updater._normalization_record = []
+        for t in evaluation_times:
+            exp = qmla.utilities.format_experiment(
+                evaluation_qinfer_model, 
+                final_learned_params = self.final_learned_params, 
+                time = [t],
+            )
+            params_array = np.array([[self.true_model_params[:]]])
+            datum = evaluation_updater.model.simulate_experiment(
+                params_array,
+                exp,
+                repeat=1
+            )
+            evaluation_updater.update(datum, exp)
+        self.log_print([
+            "Evaluation updates complete. num resamples:", evaluation_updater.resample_count
+        ])
+        log_likelihood = evaluation_updater.log_total_likelihood
+        self.evaluation_normalization_record = evaluation_updater.normalization_record
+        if np.isnan(evaluation_updater.log_total_likelihood):
+            self.evaluation_log_likelihood = None 
+            self.evaluation_median_likelihood = None
+            self.log_print([
+                "Evaluation ll is nan"
+            ])
+        else:
+            self.evaluation_log_likelihood = qmla.utilities.round_nearest(
+                evaluation_updater.log_total_likelihood, 
+                0.05
+            )
+            self.evaluation_median_likelihood = np.round(
+                np.median(evaluation_updater.normalization_record),
+                2
+            )
+        
+        print_timings = False
+        if print_timings: 
+            for k in evaluation_qinfer_model.timings:
+                for kk in evaluation_qinfer_model.timings[k]:
+                    self.log_print([
+                        "Evaluation Timing - {}/{}: {}".format(
+                            k, kk, 
+                            np.round(evaluation_qinfer_model.timings[k][kk], 2)
+                        )
+                    ])
 
 
     def _consider_reallocate_resources(self):
@@ -366,328 +702,7 @@ class ModelInstanceForLearning():
             self.log_print([
                 "Failed to plot prior"
             ])
-
-
-    def update_model(
-        self,
-    ):
-        r"""
-        Run updates on model, corresponding to quantum Hamiltonian learning procedure. 
-
-        Get datum corresponding to true system, where true system is either experimental or simulated,
-        by calling 
-
-        """
-
-        full_update_time_init = time.time()
-
-        self.true_model_params_dict = self.growth_class.true_params_dict
-        print_frequency = max(
-            int(self.num_experiments / 5),
-            5
-        )
-        for update_step in range(self.num_experiments):
-            if (update_step % print_frequency == 0):
-                # print so we can see how far along algorithm is.
-                self.log_print(["Epoch", update_step])
-                try:
-                    self.log_print([
-                        "epoch {} - time magnitudes used: {}".format(
-                            update_step,
-                            self.model_heuristic.count_order_of_magnitudes
-                        ) 
-                    ])
-                    self.model_heuristic.count_order_of_magnitudes = {} #reset
-                except:
-                    pass
-
-            new_experiment = self.model_heuristic(
-                num_params=len(self.model_terms_names),
-                epoch_id=update_step,
-                current_params=self.track_param_means[-1]
-            )
-
-            if update_step == 0:
-                self.log_print(['Initial time selected = ',
-                                str(new_experiment[0][0])]
-                               )
-            self.track_experimental_times[update_step] = new_experiment[0][0]
-
-            # Run (or simulate) the experiment
-            datum_from_experiment = self.qinfer_model.simulate_experiment(
-                self.model_terms_parameters, # this doesn't actually matter - likelihood overwrites this for true system
-                new_experiment,
-                repeat=1
-            ) 
-
-            # Call updater to update distribution based on datum
-            try:
-                self.qinfer_updater.update(
-                    datum_from_experiment,
-                    new_experiment
-                )
-            except RuntimeError as e:
-                import sys
-                self.log_print([
-                    "RuntimeError from updater on model {} - {}. Error: {}".format(
-                        self.model_id, self.model_name, str(e)
-                    )
-                ])
-                print("\n\n[Model class] EXITING; Inspect log\n\n")
-                raise NameError("Qinfer update failure")
-                sys.exit()
-            except: 
-                self.log_print(
-                    [
-                        "Failed to update model ({}) {} at update step {}".format(
-                            self.model_id, 
-                            self.model_id, 
-                            update_step
-                        )
-                    ]
-                )
-                sys.exit()
-
-            if self.qinfer_updater.just_resampled:
-                self.epochs_after_resampling.append(update_step)
-
-            volume = qi.utils.ellipsoid_volume(
-                invA = self.qinfer_updater.est_covariance_mtx()
-            )
-            self.volume_by_epoch = np.append(
-                self.volume_by_epoch,
-                volume
-            )
-
-            self.track_param_means.append(self.qinfer_updater.est_mean())
-            self.track_param_uncertainties.append(
-                np.sqrt(
-                    np.diag(self.qinfer_updater.est_covariance_mtx())
-                )
-            )
-            # TODO this doesn't seem necessary to store
-            if self.growth_class.track_cov_mtx:
-                self.track_covariance_matrices.append(
-                    self.qinfer_updater.est_covariance_mtx())
-            # prior_sample = self.qinfer_updater.sample(int(5))
-
-            # these_means = []
-            # these_std = []
-            # for i in range(len(self.model_terms_matrices)):
-            #     these_means.append(np.mean(prior_sample[:, i]))
-            #     these_std.append(np.std(prior_sample[:, i]))
-
-            # self.track_posterior_dist.append(prior_sample)
-            # self.track_prior_means.append(these_means)
-            # self.track_prior_std_dev.append(these_std)
-            self.covariances[update_step] = np.linalg.norm(
-                self.qinfer_updater.est_covariance_mtx()
-            ) # TODO do we ever need norm of covariance mtx?
-
-            if self.track_quadratic_loss:
-                # TODO not currently recording quadratic loss
-                quadratic_loss = 0
-                for param in self.all_params_for_q_loss:
-                    if param in self.model_terms_names:
-                        learned_param = self.qinfer_updater.est_mean()[self.param_indices[param]]
-                    else:
-                        learned_param = 0
-
-                    if param in list(self.true_model_params_dict.keys()):
-                        true_param = self.true_model_params_dict[param]
-                    else:
-                        true_param = 0
-                    quadratic_loss += (learned_param - true_param)**2
-                self.quadratic_losses.append(quadratic_loss)
-
-                if False:  # can be reinstated to stop learning when volume converges
-                    self.log_print(['Final time selected > ',
-                                    str(new_experiment[0][0])]
-                                   )
-                    print('Exiting learning for Reaching Num. Prec. \
-                         -  Iteration Number ' + str(update_step)
-                          )
-
-                    for iterator in range(len(self.final_learned_params)):
-                        self.final_learned_params[iterator] = [
-                            self.qinfer_updater.est_mean(),
-                            np.sqrt(np.diag(updater.est_covariance_mtx()))
-                        ]
-                        print('Final Parameters mean and stdev:' +
-                              str(self.final_learned_params[iterator])
-                              )
-                    self.model_log_total_likelihood = (
-                        self.qinfer_updater.log_total_likelihood
-                    )
-                    self.covariances = (
-                        np.resize(
-                            self.covariances, (1, update_step)))[0]
-                    # self.particles = self.particles[:, :, 0:update_step]
-                    # self.weights = self.weights[:, 0:update_step]
-                    self.track_experimental_times = self.track_experimental_times[0:update_step]
-                    break
-
-            if self.covariances[update_step] < self.sigma_threshold and False:
-                # can be reinstated to stop learning when volume converges
-                self.log_print(['Final time selected > ',
-                                str(new_experiment[0][0])]
-                               )
-                self.log_print(['Exiting learning for Reaching Cov. \
-                    Norm. Thrshold of ', str(self.covariances[update_step])]
-                               )
-                self.log_print([' at Iteration Number ', str(update_step)])
-                for iterator in range(len(self.final_learned_params)):
-                    self.final_learned_params[iterator] = [
-                        #                        np.mean(self.particles[:,iterator,update_step]),
-                        self.qinfer_updater.est_mean(),
-                        np.std(self.particles[:, iterator, update_step])
-                    ]
-                    self.log_print(['Final Parameters mean and stdev:',
-                                    str(self.final_learned_params[iterator])]
-                                   )
-                self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
-                self.covariances = (np.resize(self.covariances, (1, update_step)))[0]
-                # self.particles = self.particles[:, :, 0:update_step]
-                # self.weights = self.weights[:, 0:update_step]
-                self.track_experimental_times = self.track_experimental_times[0:update_step]
-
-                break
-
-            if update_step == self.num_experiments - 1:
-                self.log_print(["Results for QHL on ", self.model_name])
-                self.log_print(
-                    [
-                        'Final time selected >',
-                        str(new_experiment[0][0])
-                    ]
-                )
-                self.log_print([
-                    "{} Resample epochs: {}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
-                ])
-                self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
-                self.log_print([
-                    "{} subroutine times:".format(self.redis_host),  
-                    "Total:", np.round(time.time() - full_update_time_init, 2),
-                    "\tUpdates:", np.round(self.time_update,2), 
-                    "\t Simulate experiment:", np.round(self.time_simulate_experiment, 2), 
-                    "\t Volume:", np.round(self.time_volume, 2),
-                    "\t Heuristic:", np.round(self.time_heuristic, 2),
-                ])
-
-                cov_mat = self.qinfer_updater.est_covariance_mtx()
-                for iterator in range(len(self.final_learned_params)):
-                    self.final_learned_params[iterator] = [
-                        self.qinfer_updater.est_mean()[iterator],
-                        np.sqrt(cov_mat[iterator][iterator])
-                    ]
-                    self.log_print([
-                        'Final Parameters mean and stdev (term ',
-                        self.model_terms_names[iterator], '):',
-                        str(self.final_learned_params[iterator])]
-                    )
-                    
-                    self.learned_parameters_qhl[self.model_terms_names[iterator]] = (
-                        self.final_learned_params[iterator][0]
-                    )
-                    self.final_sigmas_qhl[self.model_terms_names[iterator]] = (
-                        self.final_learned_params[iterator][1]
-                    )
-
-        try:
-            self.log_print([
-                "Total number of times each order of magnitude of uncertainty used during learning:", 
-                self.model_heuristic.all_count_order_of_magnitudes
-            ])
-            self.log_print([
-                "Number of counter productive experiments:", self.model_heuristic.counter_productive_experiments
-            ])
-
-        except:
-            pass
-        # for k in self.qinfer_model.timings:
-        #     for kk in self.qinfer_model.timings[k]:
-        #         self.log_print([
-        #             "QinferModel Timing - {}/{}: {}".format(
-        #                 k, kk, 
-        #                 np.round(self.qinfer_model.timings[k][kk], 2)
-        #             )
-        #         ])
-            # self.qinfer_model.timings[k] =  {
-            #     v : np.round(self.qinfer_model.timings[k][v], 2)
-            #     for v in self.qinfer_model.timings[k]
-            # }
-        # self.log_print([
-        #     "{} calls to likelihood fnc. After updates, qinfer model timings:\n{}".format(
-        #         self.qinfer_model.calls_to_likelihood,
-        #         self.qinfer_model.timings
-        #     )
-        # ])
-
-    def learned_info_dict(self):
-        """
-        Place essential information after learning has occured into a dict.
-        This can be used to recreate the model on another node.
-        """
-
-        all_post_margs = []
-        for i in range(len(self.final_learned_params)):
-            all_post_margs.append(
-                self.qinfer_updater.posterior_marginal(idx_param=i)
-            )
-
-        learned_info = {}
-        # wanted by storage class OR comparison class
-        learned_info['num_particles'] = self.num_particles
-        learned_info['num_experiments'] = self.num_experiments
-        learned_info['times_learned_over'] = self.track_experimental_times
-        learned_info['final_learned_params'] = self.final_learned_params
-        learned_info['model_normalization_record'] = self.qinfer_updater.normalization_record
-        learned_info['log_total_likelihood'] = self.qinfer_updater.log_total_likelihood
-        learned_info['raw_volume_list'] = self.volume_by_epoch
-        learned_info['track_param_means'] = self.track_param_means
-        learned_info['track_covariance_matrices'] = self.track_covariance_matrices
-        learned_info['track_param_uncertainties'] = self.track_param_uncertainties
-        learned_info['epochs_after_resampling'] = self.epochs_after_resampling
-        learned_info['quadratic_losses_record'] = self.quadratic_losses
-        learned_info['learned_parameters_qhl'] = self.learned_parameters_qhl
-        learned_info['final_sigmas_qhl'] = self.final_sigmas_qhl
-        learned_info['covariance_mtx_final'] = self.qinfer_updater.est_covariance_mtx()
-        learned_info['estimated_mean_params'] = self.qinfer_updater.est_mean()
-        learned_info['growth_rule_of_this_model'] = self.growth_rule_of_this_model
-        learned_info['model_heuristic_class'] = self.model_heuristic_class
-
-        # additionally wanted by comparison class
-        learned_info['data_record'] = self.qinfer_updater.data_record
-        learned_info['name'] = self.model_name
-        learned_info['model_id'] = self.model_id
-        learned_info['final_prior'] = self.qinfer_updater.prior
-        learned_info['model_terms_names'] = self.model_terms_names
-        learned_info['covariance_mtx_final'] = self.qinfer_updater.est_covariance_mtx()
-        learned_info['posterior_marginal'] = all_post_margs
-        learned_info['initial_params'] = self.model_terms_parameters
-        # learned_info['track_posterior'] = self.track_posterior_dist
-        # repeat of track param sigmas?
-        # learned_info['track_prior_means'] = self.track_prior_means
-        # learned_info['track_prior_std_devs'] = self.track_prior_std_dev
-        try:
-            learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
-            learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
-            learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
-        except:
-            learned_info['evaluation_log_likelihood'] = None
-            learned_info['evaluation_normalization_record'] = None
-            learned_info['evaluation_median_likelihood'] = None
-
-        if self.store_particle_locations_and_weights:
-            self.log_print([
-                "Storing particles and weights for model",
-                self.model_id
-            ])
-            # not currently tracking - should never want to
-            learned_info['particles'] = self.particles 
-            learned_info['weights'] = self.weights
-        return learned_info
-
+            
     def plot_distribution_progression(self,
                                       renormalise=False,
                                       save_to_file=None
@@ -699,151 +714,3 @@ class ModelInstanceForLearning():
             renormalise=renormalise,
             save_to_file=save_to_file
         )
-
-    def compute_likelihood_after_parameter_learning(
-        self,
-        # times = [1, 2]
-    ):
-        estimated_params = self.qinfer_updater.est_mean()
-        cov_mt_uncertainty = [1e-10] * np.shape(self.qinfer_updater.est_mean())[0]
-        cov_mt = np.diag(cov_mt_uncertainty)
-        # self.log_print([
-        #     "Generating evaluation posterior with estimated params =\n{} \nand cov mt:\n{}".format(
-        #         estimated_params, cov_mt
-        #     )
-        # ])
-        posterior_distribution = qi.MultivariateNormalDistribution(
-            estimated_params,
-            cov_mt
-            # np.diag(self.qinfer_updater.est_mean()**2), # extremely thin 
-            # self.qinfer_updater.est_covariance_mtx()
-        )
-
-        learned_params = list(self.final_learned_params[:, 0])
-        self.learned_hamiltonian = np.tensordot(
-            learned_params,
-            self.model_terms_matrices,
-            axes=1
-        )
-        self.log_print(
-            [
-                "Learned parameters:", learned_params, 
-            ]
-        )
-
-        true_params_dict = pickle.load(
-            open(
-                self.true_params_path, 
-                'rb'
-            )
-        )
-        
-        evaluation_times = true_params_dict['evaluation_times']
-        evaluation_probe_dict = true_params_dict['evaluation_probes']
-        self.log_print([
-            "Evaluating learned model. number of times:", len(evaluation_times)
-        ])
-
-        evaluation_qinfer_model = self.growth_class.qinfer_model(
-            model_name=self.model_name,
-            modelparams=self.model_terms_parameters,
-            oplist=self.model_terms_matrices,
-            true_oplist=self.true_model_constituent_operators,
-            truename=self.true_model_name,
-            trueparams=self.true_model_params,
-            true_param_dict = self.true_param_dict, 
-            num_probes=self.probe_number,
-            probe_dict=evaluation_probe_dict,
-            sim_probe_dict=evaluation_probe_dict,
-            growth_generation_rule=self.growth_rule_of_this_model,
-            experimental_measurements=self.experimental_measurements,
-            experimental_measurement_times=self.experimental_measurement_times,
-            log_file=self.log_file,
-        )
-
-        evaluation_updater = qi.SMCUpdater(
-            # model=self.qinfer_model,
-            model = evaluation_qinfer_model, 
-            n_particles=min(5, self.num_particles),
-            # n_particles=self.num_particles,
-            prior=posterior_distribution,
-            # resample more aggressively once learned, since closer to true values
-            # resample_thresh=max(self.qinfer_resampler_threshold, 0.6), 
-            # turn off resampling - want to evaluate the learned model, not improved version
-            resample_thresh=0.0,  
-            resampler=qi.LiuWestResampler(
-                a=self.growth_class.qinfer_resampler_a
-            ),
-            # debug_resampling=False
-        )
-
-        evaluation_updater._log_total_likelihood = 0.0
-        evaluation_updater._normalization_record = []
-        for t in evaluation_times:
-            exp = format_experiment(
-                evaluation_qinfer_model, 
-                final_learned_params = self.final_learned_params, 
-                time = [t],
-            )
-            params_array = np.array([[self.true_model_params[:]]])
-            datum = evaluation_updater.model.simulate_experiment(
-                params_array,
-                exp,
-                repeat=1
-            )
-            evaluation_updater.update(datum, exp)
-        self.log_print([
-            "Evaluation updates complete. num resamples:", evaluation_updater.resample_count
-        ])
-        log_likelihood = evaluation_updater.log_total_likelihood
-        self.evaluation_normalization_record = evaluation_updater.normalization_record
-        if np.isnan(evaluation_updater.log_total_likelihood):
-            self.evaluation_log_likelihood = None 
-            self.evaluation_median_likelihood = None
-            self.log_print([
-                "Evaluation ll is nan"
-            ])
-        else:
-            self.evaluation_log_likelihood = round_nearest(
-                evaluation_updater.log_total_likelihood, 
-                0.05
-            )
-            self.evaluation_median_likelihood = np.round(
-                np.median(evaluation_updater.normalization_record),
-                2
-            )
-        
-        print_timings = False
-        if print_timings: 
-            for k in evaluation_qinfer_model.timings:
-                for kk in evaluation_qinfer_model.timings[k]:
-                    self.log_print([
-                        "Evaluation Timing - {}/{}: {}".format(
-                            k, kk, 
-                            np.round(evaluation_qinfer_model.timings[k][kk], 2)
-                        )
-                    ])
-
-
-
-def round_nearest(x,a):
-    return round(round(x/a)*a ,2)
-
-
-
-def format_experiment(model, final_learned_params, time):
-    # gen = model.qinfer_model
-    exp = np.empty(
-        len(time),
-        dtype=model.expparams_dtype
-    )
-    exp['t'] = time
-
-    try:
-        for i in range(1, len(model.expparams_dtype)):
-            col_name = 'w_' + str(i)
-            exp[col_name] = final_learned_params[i - 1, 0]
-    except BaseException:
-        print("failed to get exp. \nFinal params:", final_learned_params)
-
-    return exp

@@ -139,8 +139,8 @@ class ModelInstanceForComparison():
         self.posterior_marginal = learned_model_info['posterior_marginal']
         self.model_normalization_record = learned_model_info['normalization_record']
         self.log_total_likelihood = learned_model_info['log_total_likelihood']
-        self.learned_parameters_qhl = learned_model_info['learned_parameters']
-        self.final_sigmas_qhl = learned_model_info['final_sigmas']
+        self.qhl_final_param_estimates = learned_model_info['learned_parameters']
+        self.qhl_final_param_uncertainties = learned_model_info['final_sigmas']
         self.covariance_mtx_final = learned_model_info['final_cov_mat']
 
         # New instances of model and updater used by QInfer

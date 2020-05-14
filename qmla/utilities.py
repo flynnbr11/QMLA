@@ -61,3 +61,27 @@ def resource_allocation(
 
     print("New resources:", new_resources)
     return new_resources
+
+
+
+def round_nearest(x,a):
+    return round(round(x/a)*a ,2)
+
+
+
+def format_experiment(model, final_learned_params, time):
+    # gen = model.qinfer_model
+    exp = np.empty(
+        len(time),
+        dtype=model.expparams_dtype
+    )
+    exp['t'] = time
+
+    try:
+        for i in range(1, len(model.expparams_dtype)):
+            col_name = 'w_' + str(i)
+            exp[col_name] = final_learned_params[i - 1, 0]
+    except BaseException:
+        print("failed to get exp. \nFinal params:", final_learned_params)
+
+    return exp

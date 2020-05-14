@@ -224,8 +224,8 @@ class ModelInstanceForStorage():
             max_exp = np.shape(self.track_param_means)[0] - 1
             for i in range(num_params):
                 some_final_param = self.track_param_means[max_exp][i]
-                for term in self.learned_parameters_qhl:
-                    if self.learned_parameters_qhl[term] == some_final_param:
+                for term in self.qhl_final_param_estimates:
+                    if self.qhl_final_param_estimates[term] == some_final_param:
                         param_estimate_v_experiments = self.track_param_means[:][i]
                         self.track_parameter_estimates[term] = param_estimate_v_experiments
             

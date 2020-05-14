@@ -1766,8 +1766,8 @@ class QuantumModelLearningAgent():
             'LearnedHamiltonian': mod.learned_hamiltonian,
             'GrowthGenerator': mod.growth_rule_of_this_model,
             'NameAlphabetical': database_framework.alph(mod.model_name),
-            'LearnedParameters': mod.learned_parameters_qhl,
-            'FinalSigmas': mod.final_sigmas_qhl,
+            'LearnedParameters': mod.qhl_final_param_estimates,
+            'FinalSigmas': mod.qhl_final_param_uncertainties,
             'ExpectationValues': mod.expectation_values,
             'Trackplot_parameter_estimates': mod.track_parameter_estimates,
             'TrackVolume': mod.volume_by_epoch,
@@ -1833,30 +1833,30 @@ class QuantumModelLearningAgent():
             [
                 "Checking reducibility of champ model:",
                 self.global_champion_name,
-                "\nParams:\n", champ_mod.learned_parameters_qhl,
-                "\nSigmas:\n", champ_mod.final_sigmas_qhl
+                "\nParams:\n", champ_mod.qhl_final_param_estimates,
+                "\nSigmas:\n", champ_mod.qhl_final_param_uncertainties
             ]
         )
 
-        params = list(champ_mod.learned_parameters_qhl.keys())
+        params = list(champ_mod.qhl_final_param_estimates.keys())
         to_remove = []
         removed_params = {}
         idx = 0
         for p in params:
-            # if champ_mod.final_sigmas_qhl[p] > champ_mod.learned_parameters_qhl[p]:
+            # if champ_mod.qhl_final_param_uncertainties[p] > champ_mod.qhl_final_param_estimates[p]:
             #     to_remove.append(p)
             #     removed_params[p] = np.round(
-            #         champ_mod.learned_parameters_qhl[p],
+            #         champ_mod.qhl_final_param_estimates[p],
             #         2
             #     )
 
             if (
-                np.abs(champ_mod.learned_parameters_qhl[p])
+                np.abs(champ_mod.qhl_final_param_estimates[p])
                 < self.growth_class.learned_param_limit_for_negligibility
             ):
                 to_remove.append(p)
                 removed_params[p] = np.round(
-                    champ_mod.learned_parameters_qhl[p], 2
+                    champ_mod.qhl_final_param_estimates[p], 2
                 )
 
         if len(to_remove) >= len(params):
@@ -1909,8 +1909,8 @@ class QuantumModelLearningAgent():
             reduced_params = {}
             reduced_sigmas = {}
             for term in reduced_mod_terms:
-                reduced_params[term] = champ_mod.learned_parameters_qhl[term]
-                reduced_sigmas[term] = champ_mod.final_sigmas_qhl[term]
+                reduced_params[term] = champ_mod.qhl_final_param_estimates[term]
+                reduced_sigmas[term] = champ_mod.qhl_final_param_uncertainties[term]
 
             learned_params = [reduced_params[t] for t in reduced_mod_terms]
             sigmas = np.array([reduced_sigmas[t] for t in reduced_mod_terms])
