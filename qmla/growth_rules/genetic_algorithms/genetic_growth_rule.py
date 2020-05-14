@@ -115,8 +115,7 @@ class Genetic(
             ]
         }
         self.model_points_at_step = {}     
-        self.generation_model_rankings = {}
-        self.models_ranked_by_fitness = {} 
+        self.generation_model_rankings = {} 
 
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
@@ -133,9 +132,9 @@ class Genetic(
         # choose model with highest fitness on final generation
         self.log_print([
             "Model rankings on final generation:",
-            self.models_ranked_by_fitness[self.spawn_step]
+            self.generation_model_rankings[self.spawn_step]
         ])
-        champ = self.models_ranked_by_fitness[self.spawn_step][0]
+        champ = self.generation_model_rankings[self.spawn_step][0]
         return [champ]
 
 
@@ -333,12 +332,12 @@ class Genetic(
                 self.fitness_method, genetic_algorithm_fitnesses
             )
         ])
+        # models_ranked_by_fitness = 
         self.models_ranked_by_fitness[self.spawn_step] = sorted(
             genetic_algorithm_fitnesses,
             key=genetic_algorithm_fitnesses.get,
             reverse=True
         )
-
         # get models from genetic algorithm
         new_models = self.genetic_algorithm.genetic_algorithm_step(
             model_fitnesses=genetic_algorithm_fitnesses, 

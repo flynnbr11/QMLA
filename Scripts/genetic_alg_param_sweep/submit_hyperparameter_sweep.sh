@@ -1,6 +1,6 @@
 #!/bin/bash
 
-time="walltime=00:15:00"
+time="walltime=02:30:00"
 processes_request="nodes=1:ppn=4"
 
 results_dir="$(pwd)/outputs/"

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import time
 import pickle
+import datetime
 
 from mpi4py import MPI
 
@@ -41,7 +42,7 @@ def master():
         try:
             configuration = next(iterable_configurations)
         except:
-            print("No remaining configurations")
+            print("No remaining configurations - all workers not sent work")
             break
         comm.send(
             obj = configuration, 
@@ -54,7 +55,7 @@ def master():
         try:
             configuration = next(iterable_configurations)
         except:
-            print("No remaining configurations")
+            print("No remaining configurations - exiting while loop")
             break
 
         # process result
@@ -63,23 +64,26 @@ def master():
             tag = MPI.ANY_TAG,
             status = status
         )
-        result = pd.Series(incoming_data)
-        ga_results_df = ga_results_df.append(
-            result, 
-            ignore_index=True
-        )
+        if incoming_data == "failed":
+            print("Failure reported on", status.Get_source())
+        else:
+            result = pd.Series(incoming_data)
+            ga_results_df = ga_results_df.append(
+                result, 
+                ignore_index=True
+            )
 
-        # send more work to the process which has just finished
-        sender = status.Get_source()
-        print("Sending next config to {} : {}".format(
-            sender, 
-            configuration
-        ))
-        comm.send(
-            obj = configuration, 
-            dest = sender, 
-            tag = WORKTAG
-        )
+            # send more work to the process which has just finished
+            sender = status.Get_source()
+            print("Sending next config to {} : {}".format(
+                sender, 
+                configuration
+            ))
+            comm.send(
+                obj = configuration, 
+                dest = sender, 
+                tag = WORKTAG
+            )
     
     # wait for outstanding work packets
     print("Waiting on outstanding work packets")
@@ -89,11 +93,14 @@ def master():
             tag = MPI.ANY_TAG,
             status = status
         )
-        result = pd.Series(incoming_data)
-        ga_results_df = ga_results_df.append(
-            result, 
-            ignore_index=True
-        )
+        if incoming_data == "failed":
+            print("Failure reported on", status.Get_source())
+        else:
+            result = pd.Series(incoming_data)
+            ga_results_df = ga_results_df.append(
+                result, 
+                ignore_index=True
+            )
 
     # kill the workers 
     print("Killing workers")
@@ -105,9 +112,20 @@ def master():
         )
 
     # store the result
+    result_directory = os.path.join(os.getcwd(), 'results')
+    if not result_directory: os.makedirs(result_directory)
+
+    now = datetime.datetime.now()
+    time = "{}_{}_{}_{}".format(
+        now.strftime("%b"),
+        now.strftime("%d"),
+        now.strftime("%H"),
+        now.strftime("%M"),
+    )
+
     path_to_store_result = os.path.join(
-        os.getcwd(), 
-        'result_param_sweep.csv'
+        result_directory, 
+        'results_{}.csv'.format(time)
     )
     ga_results_df.to_csv( path_to_store_result )
     print("Results stored at:", path_to_store_result)
