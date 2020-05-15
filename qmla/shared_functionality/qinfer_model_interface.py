@@ -242,8 +242,19 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # parameter
         # 
         expnames = [('t', 'float')]
-        for exppar in range(self.n_modelparams):
-            expnames.append(('w_' + str(exppar + 1), 'float'))
+        try:
+            individual_model_terms = self.model_name.split('+')
+        except:
+            individual_model_terms = [
+                'w_{}'.format(i)
+                for i in range(self.n_modelparams)
+            ]
+        for term in individual_model_terms:
+            expnames.append( (term, 'float') )
+
+        # for exppar in range(self.n_modelparams):
+        #     expnames.append(('w_' + str(exppar + 1), 'float'))
+        # self.log_print(["Expparams:", expnames])
         return expnames
 
     ################################################################################

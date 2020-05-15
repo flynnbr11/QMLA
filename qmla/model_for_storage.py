@@ -16,6 +16,7 @@ import qmla.get_growth_rule as get_growth_rule
 import qmla.shared_functionality.experimental_data_processing
 import qmla.database_framework
 import qmla.analysis
+import qmla.process_string_to_matrix
 
 pickle.HIGHEST_PROTOCOL = 4
 
@@ -174,20 +175,20 @@ class ModelInstanceForStorage():
 
             for k in learned_info:
                 self.__setattr__(k, learned_info[k])      
-                self.log_print([
-                    "Set attr {} ".format(k)
-                ])      
+                # self.log_print([
+                #     "Set attr {} ".format(k)
+                # ])      
 
 
             # process the learned info
-            self.model_terms_parameters_final = np.array(
-                self.final_learned_params
-            )
-            self.track_param_means = np.array(self.track_param_means)
+            # self.model_terms_parameters_final = np.array(
+            #     self.final_learned_params
+            # )
+            # self.track_param_means = np.array(self.track_param_means)
+            # self.track_param_uncertainties = np.array(
+            #     self.track_param_uncertainties)
             self.track_covariance_matrices = np.array(
                 self.track_covariance_matrices)
-            self.track_param_uncertainties = np.array(
-                self.track_param_uncertainties)
             
             self.volume_by_epoch = {}
             for i in range(len(self.raw_volume_list)):
@@ -219,32 +220,18 @@ class ModelInstanceForStorage():
             ]
 
             # match the learned parameters by their name in a dict
-            self.track_parameter_estimates = {}
-            num_params = np.shape(self.track_param_means)[1]
-            max_exp = np.shape(self.track_param_means)[0] - 1
-            for i in range(num_params):
-                some_final_param = self.track_param_means[max_exp][i]
-                for term in self.qhl_final_param_estimates:
-                    if self.qhl_final_param_estimates[term] == some_final_param:
-                        param_estimate_v_experiments = self.track_param_means[:][i]
-                        self.track_parameter_estimates[term] = param_estimate_v_experiments
-            
-            sim_params = list(self.final_learned_params[:, 0])
-            try:
-                self.learned_hamiltonian = np.tensordot(
-                    sim_params,
-                    self.model_terms_matrices,
-                    axes=1
-                )
-            except:
-                print(
-                    "(failed) trying to build learned hamiltonian for ",
-                    self.model_id, " : ",
-                    self.model_name,
-                    "\nsim_params:", sim_params,
-                    "\nsim op list", self.model_terms_matrices
-                )
-                raise
+            # self.track_parameter_estimates = {}
+            # num_params = np.shape(self.track_param_means)[1]
+            # max_exp = np.shape(self.track_param_means)[0] - 1
+            # for i in range(num_params):
+            #     some_final_param = self.track_param_means[max_exp][i]
+            #     for term in self.qhl_final_param_estimates:
+            #         if self.qhl_final_param_estimates[term] == some_final_param:
+            #             param_estimate_v_experiments = self.track_param_means[:][i]
+            #             self.track_parameter_estimates[term] = param_estimate_v_experiments
+            # self.log_print(["C"])
+            self.track_parameter_estimates = self.track_param_estimate_v_epoch
+
 
             self.log_print([
                 "Updated learned info for model {}".format(self.model_id),

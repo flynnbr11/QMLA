@@ -744,6 +744,7 @@ class QuantumModelLearningAgent():
             elif return_job == True:
                 return job
         else:
+            self.log_print(["Locally requesting BF b/w {}/{} ".format(model_a_id, model_b_id)])
             remote_bayes_factor_calculation(
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,

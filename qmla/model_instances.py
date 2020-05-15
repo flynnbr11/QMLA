@@ -242,6 +242,7 @@ class ModelInstanceForLearning():
             pgh_exponent=self.qinfer_PGH_heuristic_exponent,
             max_time_to_enforce=self.growth_class.max_time_to_consider,
         )
+        self.log_print(["Heuristic built"])
         self.model_heuristic_class = self.model_heuristic.__class__.__name__
         
         # Implement tracking infrastructure for analysis
@@ -298,6 +299,7 @@ class ModelInstanceForLearning():
         by calling 
 
         """
+        self.log_print(["Updating model."])
 
         full_update_time_init = time.time()
 
@@ -321,11 +323,13 @@ class ModelInstanceForLearning():
                 except:
                     pass
 
+            self.log_print(["Getting exp"])
             new_experiment = self.model_heuristic(
                 num_params=len(self.model_terms_names),
                 epoch_id=update_step,
-                current_params=self.track_param_means[-1]
+                current_params=self.qinfer_updater.est_mean()
             )
+            self.log_print(["Got exp"])
 
             if update_step == 0:
                 self.log_print(['Initial time selected = ',
@@ -440,24 +444,49 @@ class ModelInstanceForLearning():
 
         self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
 
+        self.track_param_estimate_v_epoch = {}
+        self.track_param_uncertainty_v_epoch = {}
+
+        self.track_param_means = np.array(self.track_param_means)
+        self.track_param_uncertainties = np.array(self.track_param_uncertainties)
+
         cov_mat = self.qinfer_updater.est_covariance_mtx()
         est_params = self.qinfer_updater.est_mean()
-        for iterator in range(len(self.final_learned_params)):
+        for i in range(len(self.final_learned_params)):
             # TODO get rid of uses of final_learned_params, use qhl_final_param_estimates instead
-            term = self.model_terms_names[iterator]
-            self.final_learned_params[iterator] = [
-                self.qinfer_updater.est_mean()[iterator],
-                np.sqrt(cov_mat[iterator][iterator])
+            term = self.model_terms_names[i]
+            self.final_learned_params[i] = [
+                self.qinfer_updater.est_mean()[i],
+                np.sqrt(cov_mat[i][i])
             ]
             
-            self.qhl_final_param_estimates[term] = est_params[iterator]
-            self.qhl_final_param_uncertainties[term] = np.sqrt(cov_mat[iterator][iterator])
+            self.qhl_final_param_estimates[term] = est_params[i]
+            self.qhl_final_param_uncertainties[term] = np.sqrt(cov_mat[i][i])
             self.log_print([
                 "Final parameters estimates and uncertainties (term {}): {} +- {}".format(
-                    self.model_terms_names[iterator], '):',
+                    self.model_terms_names[i],
                     self.qhl_final_param_estimates[term], 
                     self.qhl_final_param_uncertainties[term]
                 )
+            ])
+
+            try:
+                self.track_param_estimate_v_epoch[term] = self.track_param_means[:, i]
+            except:
+                self.log_print([
+                    "Param estimate track:", self.track_param_means
+                ])
+            try:
+                self.track_param_uncertainty_v_epoch = self.track_param_uncertainties[:][i]
+            except:
+                self.log_print([
+                    "uncertainties:", self.track_param_uncertainties
+                ])
+
+            self.learned_hamiltonian = sum([
+                self.qhl_final_param_estimates[term]
+                * qmla.database_framework.compute(term)
+                for term in self.qhl_final_param_estimates
             ])
 
     def learned_info_dict(self):
@@ -484,14 +513,19 @@ class ModelInstanceForLearning():
         learned_info['track_param_means'] = self.track_param_means
         learned_info['track_covariance_matrices'] = self.track_covariance_matrices
         learned_info['track_param_uncertainties'] = self.track_param_uncertainties
+        learned_info['track_param_estimate_v_epoch'] = self.track_param_estimate_v_epoch
+        learned_info['track_param_uncertainty_v_epoch'] = self.track_param_uncertainty_v_epoch
         learned_info['epochs_after_resampling'] = self.epochs_after_resampling
         learned_info['quadratic_losses_record'] = self.quadratic_losses
         learned_info['qhl_final_param_estimates'] = self.qhl_final_param_estimates
         learned_info['qhl_final_param_uncertainties'] = self.qhl_final_param_uncertainties
         learned_info['covariance_mtx_final'] = self.qinfer_updater.est_covariance_mtx()
         learned_info['estimated_mean_params'] = self.qinfer_updater.est_mean()
+        learned_info['learned_hamiltonian'] = self.learned_hamiltonian
         learned_info['growth_rule_of_this_model'] = self.growth_rule_of_this_model
         learned_info['model_heuristic_class'] = self.model_heuristic_class
+        learned_info['qinfer_model'] = self.qinfer_model
+        # learned_info['qinfer_updater_expparams'] = self.qinfer_updater.expparams_dtype
         try:
             learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
             learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
@@ -502,14 +536,11 @@ class ModelInstanceForLearning():
             learned_info['evaluation_median_likelihood'] = None
 
         # additionally wanted by comparison class
-        learned_info['data_record'] = self.qinfer_updater.data_record
         learned_info['name'] = self.model_name
         learned_info['model_id'] = self.model_id
         learned_info['final_prior'] = self.qinfer_updater.prior
-        learned_info['model_terms_names'] = self.model_terms_names
-        learned_info['covariance_mtx_final'] = self.qinfer_updater.est_covariance_mtx()
         learned_info['posterior_marginal'] = all_post_margs
-        learned_info['initial_params'] = self.model_terms_parameters
+        # TODO restore initial_prior as required for plots in remote_bayes_factor
 
         return learned_info
 
@@ -525,24 +556,15 @@ class ModelInstanceForLearning():
             cov_mt
         )
 
-        learned_params = list(self.final_learned_params[:, 0])
-        self.learned_hamiltonian = np.tensordot(
-            learned_params,
-            self.model_terms_matrices,
-            axes=1
-        )
-
-        true_params_dict = pickle.load(
-            open(
-                self.true_params_path, 
-                'rb'
-            )
-        )
+        true_params_dict = pickle.load(open(
+            self.true_params_path, 
+            'rb'
+        ))
         
         evaluation_times = true_params_dict['evaluation_times']
         evaluation_probe_dict = true_params_dict['evaluation_probes']
         self.log_print([
-            "Evaluating learned model. number of times:", len(evaluation_times)
+            "Evaluating learned model."
         ])
 
         evaluation_qinfer_model = self.growth_class.qinfer_model(
@@ -563,10 +585,8 @@ class ModelInstanceForLearning():
         )
 
         evaluation_updater = qi.SMCUpdater(
-            # model=self.qinfer_model,
             model = evaluation_qinfer_model, 
             n_particles=min(5, self.num_particles),
-            # n_particles=self.num_particles,
             prior=posterior_distribution,
             # resample more aggressively once learned, since closer to true values
             # resample_thresh=max(self.qinfer_resampler_threshold, 0.6), 

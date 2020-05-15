@@ -63,6 +63,7 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         epoch_id=0,
         **kwargs
     ):
+        print("Call to MPGH")
 
         idx_iter = 0
         while idx_iter < self._maxiters:
@@ -84,18 +85,20 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
             dtype=self._updater.model.expparams_dtype
         )
 
-        idx_iter = 0  # modified in order to cycle through particle parameters with different names
-        for field_i in self._x_:
-            eps[field_i] = self._inv_func(x)[0][idx_iter]
-            idx_iter += 1
+        # idx_iter = 0  # modified in order to cycle through particle parameters with different names
+        # for field_i in self._x_:
+        #     eps[field_i] = self._inv_func(x)[0][idx_iter]
+        #     idx_iter += 1
 
         sigma = self._updater.model.distance(x, xp)
         new_time = self._t_func(
-            1 / sigma**self._pgh_exponent
+            1 / sigma
         )
-        eps[self._t] = new_time
-        for field, value in self._other_fields.items():
-            eps[field] = value**self._pgh_exponent
+        eps['t'] = new_time
+        print("Heuristic; eps = ", eps)
+        # eps[self._t] = new_time
+        # for field, value in self._other_fields.items():
+        #     eps[field] = value**self._pgh_exponent
 
         return eps
 
@@ -273,7 +276,7 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         epoch_id=0,
         **kwargs
     ):
-
+        print("Heuristiccalled " )
         idx_iter = 0
         while idx_iter < self._maxiters:
 
@@ -293,15 +296,15 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
             (1,),
             dtype=self._updater.model.expparams_dtype
         )
-        idx_iter = 0  # modified in order to cycle through particle parameters with different names
-        for field_i in self._x_:
-            eps[field_i] = self._inv_func(x)[0][idx_iter]
-            idx_iter += 1
+        # idx_iter = 0  # modified in order to cycle through particle parameters with different names
+        # for field_i in self._x_:
+        #     eps[field_i] = self._inv_func(x)[0][idx_iter]
+        #     idx_iter += 1
 
         if epoch_id < self.num_epochs_for_first_phase:
             sigma = self._updater.model.distance(x, xp)
             new_time = self._t_func(
-                1 / sigma**self._pgh_exponent
+                1 / sigma
             )
         else:
             # time_id = epoch_id % self._len_time_list
@@ -319,7 +322,8 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
                 log_file = self.log_file
             )
         
-        eps[self._t] = new_time
+        eps['t'] = new_time
+        print("Heuristic; eps = ", eps)
         return eps
 
 

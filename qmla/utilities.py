@@ -78,10 +78,14 @@ def format_experiment(model, final_learned_params, time):
     exp['t'] = time
 
     try:
-        for i in range(1, len(model.expparams_dtype)):
-            col_name = 'w_' + str(i)
-            exp[col_name] = final_learned_params[i - 1, 0]
+        # for i in range(1, len(gen.expparams_dtype)):
+        #     col_name = 'w_' + str(i)
+        #     exp[col_name] = model.final_learned_params[i - 1, 0]
+        for term in gen.expparams_dtype:
+            if term != 't':
+                exp[term] = model.qhl_final_param_estimates[term]
     except BaseException:
         print("failed to get exp. \nFinal params:", final_learned_params)
+
 
     return exp

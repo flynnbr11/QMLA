@@ -118,32 +118,31 @@ class ModelInstanceForComparison():
                     learned_models_info_db.get(model_id_str)
                 )
 
-        # Assign parameters based on model-specific infomation
+        # Assign parameters from model learned info, retrieved from database
         self.model_name = learned_model_info['name']
-        self.log_print(
-            [
-                "Name:", self.model_name
-            ]
-        )
+        self.times_learned_over = learned_model_info['times_learned_over']
+        self.final_learned_params = learned_model_info['final_learned_params']        
+        self.growth_rule_of_this_model = learned_model_info['growth_rule_of_this_model']
+        # self.model_prior = learned_model_info['final_prior']
+        self.posterior_marginal = learned_model_info['posterior_marginal']
+        self.model_normalization_record = learned_model_info['model_normalization_record']
+        self.log_total_likelihood = learned_model_info['log_total_likelihood']
+        self.estimated_mean_params = learned_model_info['estimated_mean_params']
+        self.qhl_final_param_estimates = learned_model_info['qhl_final_param_estimates']
+        self.qhl_final_param_uncertainties = learned_model_info['qhl_final_param_uncertainties']
+        self.covariance_mtx_final = learned_model_info['covariance_mtx_final']
+
+        # process data from learned info
         op = qmla.database_framework.Operator(self.model_name)
         self.model_terms_matrices = op.constituents_operators
-        self.times_learned_over = learned_model_info['times']
-        self.final_learned_params = learned_model_info['final_params']
         self.model_terms_parameters_final = np.array(self.final_learned_params)
-        self.growth_rule_of_this_model = learned_model_info['growth_generator']
         self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.growth_rule_of_this_model,
             log_file=self.log_file
         )
-        self.model_prior = learned_model_info['final_prior']
-        self.posterior_marginal = learned_model_info['posterior_marginal']
-        self.model_normalization_record = learned_model_info['normalization_record']
-        self.log_total_likelihood = learned_model_info['log_total_likelihood']
-        self.qhl_final_param_estimates = learned_model_info['learned_parameters']
-        self.qhl_final_param_uncertainties = learned_model_info['final_sigmas']
-        self.covariance_mtx_final = learned_model_info['final_cov_mat']
 
         # New instances of model and updater used by QInfer
+        self.log_print(["Getting QInfer model"])
         self.qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters_final,
@@ -160,12 +159,13 @@ class ModelInstanceForComparison():
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
         )
-
+        self.log_print(["Getting QInfer updater"])
         self.reconstruct_updater = True # optionally just load it
         time_s = time.time()
         if self.reconstruct_updater:
             posterior_distribution = qi.MultivariateNormalDistribution(
-                learned_model_info['est_mean'],
+                # self.qhl_final_param_estimates,
+                self.estimated_mean_params,
                 self.covariance_mtx_final
             )
 
@@ -174,7 +174,14 @@ class ModelInstanceForComparison():
                 int(self.growth_class.fraction_particles_for_bf * self.num_particles)
             ) # this allows the growth rule to use less particles for the comparison stage
             self.log_print([
-                "Using {} particles for comparison.".format(num_particles_for_bf)
+                "Using {} particles for comparison.".format(num_particles_for_bf),
+                "resample thresh:", self.growth_class.qinfer_resampler_threshold , 
+                "resampler a:", self.growth_class.qinfer_resampler_a,
+                "\nmodel=", self.qinfer_model,
+                "has expparamss_dtype:", self.qinfer_model.expparams_dtype,
+                "\n and posteror", posterior_distribution,
+                "qhl_final_param_estimates",self.qhl_final_param_estimates
+
             ])
 
             self.qinfer_updater = qi.SMCUpdater(
@@ -182,11 +189,16 @@ class ModelInstanceForComparison():
                 n_particles=num_particles_for_bf,
                 prior=posterior_distribution,
                 zero_weight_policy='ignore', #TODO testing ignore - does it cause failures?
-                resample_thresh=self.growth_class.qinfer_resampler_threshold,
-                resampler=qi.LiuWestResampler(
-                    a=self.growth_class.qinfer_resampler_a
+                # resample_thresh = self.growth_class.qinfer_resampler_threshold,
+                # resampler = qi.LiuWestResampler(
+                #     a=self.growth_class.qinfer_resampler_a
+                # ),
+                resample_thresh = self.qinfer_resampler_threshold,
+                resampler = qi.LiuWestResampler(
+                    a=self.qinfer_resampler_a
                 ),
             )
+            self.log_print(["Got QInfer updater"])
             self.qinfer_updater._normalization_record = self.model_normalization_record
             self.qinfer_updater._log_total_likelihood = self.log_total_likelihood
             time_taken = time.time() - time_s

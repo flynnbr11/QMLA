@@ -89,6 +89,7 @@ def remote_bayes_factor_calculation(
             log_file = log_file, 
             log_identifier = 'BF ({}/{})'.format(model_a_id, model_b_id)
         )
+    log_print(["Start. Branch", branch_id])
     timings = {}
     time_start = time.time()
     t_init = time.time()
@@ -123,6 +124,7 @@ def remote_bayes_factor_calculation(
             else:
                 return (1.0 / bayes_factor)
     else:
+        log_print(["Instantiating models"])
         t_init = time.time()
         model_a = QML.ModelInstanceForComparison(
             model_id=model_a_id,
@@ -144,7 +146,7 @@ def remote_bayes_factor_calculation(
         # up to t_idx given.
         # And inherit renormalization record from QML updater
         # In special cases, eg experimental data, change these defaults below.
-        log_print(["Start. Branch", branch_id])
+        
         if num_times_to_use == 'all':
             first_t_idx = 0
         else:
@@ -211,7 +213,8 @@ def remote_bayes_factor_calculation(
                     bf_data_folder=bf_data_folder
                 )
             except BaseException:
-                raise
+                log_print(["Plotting posterior marginals failed."])
+                # raise
 
         # TODO this is the original position of getting log likelihood + bayes factor;
         # moving above so we can plot posterior before and after BF updates.
@@ -384,13 +387,19 @@ def get_exp(model, time):
     )
     exp['t'] = time
 
-    try:
-        for i in range(1, len(gen.expparams_dtype)):
-            col_name = 'w_' + str(i)
-            exp[col_name] = model.final_learned_params[i - 1, 0]
-    except BaseException:
-        print("failed to get exp. \nFinal params:", model.final_learned_params)
+    # try:
+    #     # for i in range(1, len(gen.expparams_dtype)):
+    #     #     col_name = 'w_' + str(i)
+    #     #     exp[col_name] = model.final_learned_params[i - 1, 0]
+    #     for term in gen.expparams_dtype:
+    #         if term != 't':
+    #             exp[term] = model.qhl_final_param_estimates[term]
+        
 
+    # except BaseException:
+    #     print("failed to get exp. \nFinal params:", model.final_learned_params)
+
+    print("BF -- Exp:", exp)
     return exp
 
 
