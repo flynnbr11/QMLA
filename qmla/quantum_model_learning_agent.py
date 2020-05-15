@@ -1777,7 +1777,7 @@ class QuantumModelLearningAgent():
             'QuadraticLosses': mod.quadratic_losses_record,
             'FinalRSquared': mod.r_squared(
                 times=expec_val_plot_times,
-                plot_probes=self.probes_for_plots
+                # plot_probes=self.probes_for_plots
             ),
             'Fscore': self.model_f_scores[model_id],
             'Precision': self.model_precisions[model_id],

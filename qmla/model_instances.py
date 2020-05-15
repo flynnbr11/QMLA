@@ -84,7 +84,6 @@ class ModelInstanceForLearning():
 
         # Set up the model for learning
         self._initialise_model_for_learning(
-            # growth_generator=growth_generator,
             model_name = self.model_name, 
             qmla_core_info_database=qmla_core_info_database,
         )
@@ -97,7 +96,6 @@ class ModelInstanceForLearning():
     def _initialise_model_for_learning(
         self,
         model_name,
-        # growth_generator,
         qmla_core_info_database,
         **kwargs
     ):
@@ -435,7 +433,8 @@ class ModelInstanceForLearning():
         cov_mat = self.qinfer_updater.est_covariance_mtx()
         est_params = self.qinfer_updater.est_mean()
         for i in range(len(self.final_learned_params)):
-            # TODO get rid of uses of final_learned_params, use qhl_final_param_estimates instead
+            # Store learned parameters
+                # TODO get rid of uses of final_learned_params, use qhl_final_param_estimates instead
             term = self.model_terms_names[i]
             self.final_learned_params[i] = [
                 self.qinfer_updater.est_mean()[i],
@@ -445,26 +444,18 @@ class ModelInstanceForLearning():
             self.qhl_final_param_estimates[term] = est_params[i]
             self.qhl_final_param_uncertainties[term] = np.sqrt(cov_mat[i][i])
             self.log_print([
-                "Final parameters estimates and uncertainties (term {}): {} +- {}".format(
+                "Final parameters estimates and uncertainties (term {}): {} +/- {}".format(
                     self.model_terms_names[i],
                     self.qhl_final_param_estimates[term], 
                     self.qhl_final_param_uncertainties[term]
                 )
             ])
 
-            try:
-                self.track_param_estimate_v_epoch[term] = self.track_param_means[:, i]
-            except:
-                self.log_print([
-                    "Param estimate track:", self.track_param_means
-                ])
-            try:
-                self.track_param_uncertainty_v_epoch = self.track_param_uncertainties[:][i]
-            except:
-                self.log_print([
-                    "uncertainties:", self.track_param_uncertainties
-                ])
-
+            # Arrays of parameter estimates/uncertainties
+            self.track_param_estimate_v_epoch[term] = self.track_param_means[:, i]
+            self.track_param_uncertainty_v_epoch = self.track_param_uncertainties[:][i]
+            
+            # Compute the Hamiltonian corresponding to the parameter posterior distribution
             self.learned_hamiltonian = sum([
                 self.qhl_final_param_estimates[term]
                 * qmla.database_framework.compute(term)
@@ -511,14 +502,9 @@ class ModelInstanceForLearning():
         learned_info['learned_hamiltonian'] = self.learned_hamiltonian
         learned_info['growth_rule_of_this_model'] = self.growth_rule_of_this_model
         learned_info['model_heuristic_class'] = self.model_heuristic_class
-        try:
-            learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
-            learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
-            learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
-        except:
-            learned_info['evaluation_log_likelihood'] = None
-            learned_info['evaluation_normalization_record'] = None
-            learned_info['evaluation_median_likelihood'] = None
+        learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
+        learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
+        learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
 
         # additionally wanted by comparison class
         learned_info['name'] = self.model_name
@@ -541,7 +527,6 @@ class ModelInstanceForLearning():
         """
         self.log_print(["Evaluating learned model."])
         
-
         # Retrieve times and probe states used for evaluation. 
         true_params_dict = pickle.load(open(
             self.true_params_path, 
@@ -550,7 +535,7 @@ class ModelInstanceForLearning():
         evaluation_times = true_params_dict['evaluation_times']
         evaluation_probe_dict = true_params_dict['evaluation_probes']
 
-        # Construct a fresh updater and model to evaluate.
+        # Construct a fresh updater and model to evaluate on.
         estimated_params = self.qinfer_updater.est_mean()
         cov_mt_uncertainty = [1e-10] * np.shape(estimated_params)[0]
         cov_mt = np.diag(cov_mt_uncertainty)
