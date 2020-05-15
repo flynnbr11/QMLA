@@ -21,6 +21,7 @@ Model to perform parameter learning upon, usually Quantum Hamiltonian Learning.
 
 .. autoclass:: ModelInstanceForLearning
     :members:
+    :private-members: _initialise_model_for_learning
 
 
 Model for comparisons

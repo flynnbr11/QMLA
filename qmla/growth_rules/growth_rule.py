@@ -105,6 +105,10 @@ class GrowthRule():
         self.check_champion_reducibility = True
         self.learned_param_limit_for_negligibility = 0.05
         self.reduce_champ_bayes_factor_threshold = 1e1
+        self.qinfer_resampler_threshold = 0.5
+        self.qinfer_resampler_a = 0.98
+        self.reallocate_resources = False
+        self.track_cov_mtx = False # only sometimes want on for some plots
 
         self.experimental_dataset = 'NVB_rescale_dataset.p'
         # self.measurements_by_time = self.get_measurements_by_time()

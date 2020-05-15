@@ -134,7 +134,7 @@ class ModelInstanceForStorage():
         reconstructing the state of the model, updater and GenSimModel
 
         """
-        if self.values_updated == False:
+        if not self.values_updated:
             self.values_updated = True
             redis_databases = rds.get_redis_databases_by_qmla_id(
                 self.redis_host_name,
@@ -145,6 +145,7 @@ class ModelInstanceForStorage():
             self.log_print(
                 [
                     "Updating learned info for model {}".format(self.model_id),
+                    "learned info:", learned_info
                 ]
             )
 
@@ -169,55 +170,43 @@ class ModelInstanceForStorage():
                                 model_id_str)
                         ]
                     )
-            self.num_particles = learned_info['num_particles']
-            self.num_experiments = learned_info['num_experiments']
-            self.times_learned_over = list(learned_info['times'])
-            self.final_learned_params = learned_info['final_params']
+
+
+            for k in learned_info:
+                self.__setattr__(k, learned_info[k])      
+                self.log_print([
+                    "Set attr {} ".format(k)
+                ])      
+
+
+            # process the learned info
             self.model_terms_parameters_final = np.array(
                 self.final_learned_params
             )
-            # self.model_terms_parameters_final = np.array(
-            #     [[self.final_learned_params[0, 0]]])
-            self.model_prior = learned_info['final_prior']
-            self.model_normalization_record = learned_info['normalization_record']
-            self.log_total_likelihood = learned_info['log_total_likelihood']
-            self.raw_volume_list = learned_info['volume_list']
+            self.track_param_means = np.array(self.track_param_means)
+            self.track_covariance_matrices = np.array(
+                self.track_covariance_matrices)
+            self.track_param_uncertainties = np.array(
+                self.track_param_uncertainties)
+            
             self.volume_by_epoch = {}
             for i in range(len(self.raw_volume_list)):
                 self.volume_by_epoch[i] = self.raw_volume_list[i]
-
-            self.track_mean_params = np.array(learned_info['track_mean_params'])
-            self.track_covariance_matrices = np.array(
-                learned_info['track_cov_matrices'])
-            self.track_param_dist_widths = np.array(
-                learned_info['track_param_sigmas'])
-            self.track_prior_means = np.array(
-                learned_info['track_prior_means'])
-            self.track_posterior_dist = np.array(
-                learned_info['track_posterior'])
-            self.track_prior_std_dev = np.array(
-                learned_info['track_prior_std_devs'])
-            self.epochs_after_resampling = learned_info['epochs_after_resampling']
-            self.quadratic_losses_record = learned_info['quadratic_losses']
-            self.learned_parameters_qhl = learned_info['learned_parameters']
-            self.final_sigmas_qhl = learned_info['final_sigmas']
-            self.covariance_mtx_final = learned_info['final_cov_mat']
-            self.estimated_mean_params = learned_info['est_mean']
-            self.evaluation_log_likelihood = learned_info['evaluation_log_likelihood']
-            self.evaluation_normalization_record = learned_info['evaluation_normalization_record']
-            self.evaluation_median_likelihood = learned_info['evaluation_median_likelihood']
-            # self.cov_matrix = learned_info['cov_matrix']
-            self.growth_rule_of_this_model = learned_info['growth_generator']
+            
             try:
                 self.growth_class = get_growth_rule.get_growth_generator_class(
                     growth_generation_rule=self.growth_rule_of_this_model,
                     # use_experimental_data=self.use_experimental_data,
                     log_file=self.log_file
                 )
+                self.log_print(["Loaded growth class."])
             except BaseException:
+                self.log_print([
+                    "Failed to load growth class {} for model".format(
+                        self.growth_rule_of_this_model
+                    )
+                ])
                 raise
-            self.model_heuristic_class = learned_info['heuristic']
-            self.model_heuristic_instance = learned_info['heuristic_instance']
             self.model_name_latex = self.growth_class.latex_name(
                 name=self.model_name
             )
@@ -229,21 +218,17 @@ class ModelInstanceForStorage():
                 for term in model_constituent_terms
             ]
 
+            # match the learned parameters by their name in a dict
             self.track_parameter_estimates = {}
-            num_params = np.shape(self.track_mean_params)[1]
-            max_exp = np.shape(self.track_mean_params)[0] - 1
+            num_params = np.shape(self.track_param_means)[1]
+            max_exp = np.shape(self.track_param_means)[0] - 1
             for i in range(num_params):
-                for term in self.learned_parameters_qhl.keys():
-                    if self.learned_parameters_qhl[term] == self.track_mean_params[max_exp][i]:
-                        self.track_parameter_estimates[term] = self.track_mean_params[:, i]
-
-            try:
-                self.particles = np.array(learned_info['particles'])
-                self.weights = np.array(learned_info['weights'])
-            except BaseException:
-                self.particles = 'Particles not stored.'
-                self.weights = 'Weights not stored.'
-
+                some_final_param = self.track_param_means[max_exp][i]
+                for term in self.qhl_final_param_estimates:
+                    if self.qhl_final_param_estimates[term] == some_final_param:
+                        param_estimate_v_experiments = self.track_param_means[:][i]
+                        self.track_parameter_estimates[term] = param_estimate_v_experiments
+            
             sim_params = list(self.final_learned_params[:, 0])
             try:
                 self.learned_hamiltonian = np.tensordot(
@@ -251,9 +236,9 @@ class ModelInstanceForStorage():
                     self.model_terms_matrices,
                     axes=1
                 )
-            except BaseException:
+            except:
                 print(
-                    "[QML] (failed) trying to build learned hamiltonian for ",
+                    "(failed) trying to build learned hamiltonian for ",
                     self.model_id, " : ",
                     self.model_name,
                     "\nsim_params:", sim_params,
@@ -261,12 +246,9 @@ class ModelInstanceForStorage():
                 )
                 raise
 
-            self.log_print(
-                [
-                    "Updated learned info for model {}".format(self.model_id),
-
-                ]
-            )
+            self.log_print([
+                "Updated learned info for model {}".format(self.model_id),
+            ])
 
     def compute_expectation_values(
         self,
@@ -433,7 +415,7 @@ class ModelInstanceForStorage():
         for e in spaced_epochs:
 
             ham = np.tensordot(
-                self.track_mean_params[int(e)],
+                self.track_param_means[int(e)],
                 self.model_terms_matrices,
                 axes=1
             )  # the Hamiltonian this model held at epoch e
