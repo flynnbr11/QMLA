@@ -8,6 +8,9 @@ import datetime
 
 from mpi4py import MPI
 
+import ctypes
+ctypes.CDLL("libmpi.so", mode=ctypes.RTLD_GLOBAL)
+
 from param_sweep import get_all_configurations, run_genetic_algorithm
 
 # globals  
