@@ -9,7 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import qmla.database_framework as database_framework
-import qmla.model_instances as QML
+# import qmla.model_instances as QML
+import qmla.model_for_comparison
 import qmla.logging
 
 try:
@@ -126,14 +127,14 @@ def remote_bayes_factor_calculation(
     else:
         log_print(["Instantiating models"])
         t_init = time.time()
-        model_a = QML.ModelInstanceForComparison(
+        model_a = qmla.model_for_comparison.ModelInstanceForComparison(
             model_id=model_a_id,
             qid=qid,
             log_file=log_file,
             host_name=host_name,
             port_number=port_number,
         )
-        model_b = QML.ModelInstanceForComparison(
+        model_b = qmla.model_for_comparison.ModelInstanceForComparison(
             model_id=model_b_id,
             qid=qid,
             log_file=log_file,

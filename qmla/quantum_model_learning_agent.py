@@ -22,6 +22,7 @@ import qmla.analysis
 import qmla.database_framework as database_framework
 import qmla.get_growth_rule as get_growth_rule
 import qmla.redis_settings as rds
+import qmla.model_for_storage
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation
 from qmla.remote_model_learning import remote_learn_model_parameters
 import qmla.tree
@@ -1573,7 +1574,7 @@ class QuantumModelLearningAgent():
             op = qmla.database_framework.Operator(
                 name=model_name, undimensionalised_name=model_name
             )
-            model_storage_instance = qmla.model_instances.ModelInstanceForStorage(
+            model_storage_instance = qmla.model_for_storage.ModelInstanceForStorage(
                 model_name=model_name,
                 model_id=int(model_id),
                 model_terms_matrices=op.constituents_operators,
@@ -2706,14 +2707,17 @@ class QuantumModelLearningAgent():
             model_ids
         ])
 
-        qmla.analysis.plot_learned_models_dynamics(
-            qmd=self,
-            include_bayes_factors=include_bayes_factors,
-            include_times_learned=True,
-            include_param_estimates=include_params,
-            model_ids=model_ids,
-            save_to_file=save_to_file,
-        )
+        try:
+            qmla.analysis.plot_learned_models_dynamics(
+                qmd=self,
+                include_bayes_factors=include_bayes_factors,
+                include_times_learned=True,
+                include_param_estimates=include_params,
+                model_ids=model_ids,
+                save_to_file=save_to_file,
+            )
+        except:
+            self.log_print(["Failed to plot dynamics"])
 
     def plot_volume_after_qhl(self,
                               model_id=None,

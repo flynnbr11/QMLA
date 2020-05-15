@@ -9,25 +9,15 @@ import random
 import redis
 import pickle
 
-import qmla.redis_settings as rds
+import qmla.redis_settings
 import qmla.logging
-import qmla.get_growth_rule as get_growth_rule
+import qmla.get_growth_rule
 import qmla.shared_functionality.prior_distributions
 import qmla.database_framework
 import qmla.analysis
 import qmla.utilities
 
 pickle.HIGHEST_PROTOCOL = 4
-
-from qmla.model_for_comparison import ModelInstanceForComparison
-from qmla.model_for_storage import ModelInstanceForStorage
-
-global print_mem_status
-global debug_log_print
-debug_log_print = True
-print_mem_status = True
-global_print_loc = False
-
 
 __all__ = [
     'ModelInstanceForLearning',
@@ -85,33 +75,29 @@ class ModelInstanceForLearning():
         self.volume_by_epoch = np.array([])
         self.redis_host = host_name
         self.redis_port_number = port_number
+        self.growth_rule_of_this_model = growth_generator
         self.log_print([
-            "QHL for model {} (id:{})".format(
-                model_name,
-                model_id, 
+            "QHL for model (id:{}) {} ".format(
+                model_id, model_name, 
             )
         ])
+
+        # Set up the model for learning
         self._initialise_model_for_learning(
-            growth_generator=growth_generator,
+            # growth_generator=growth_generator,
             model_name = self.model_name, 
             qmla_core_info_database=qmla_core_info_database,
         )
+        self._initialise_tracking_infrastructure()
 
-    def log_print(
-        self,
-        to_print_list
-    ):
-        r"""Wrapper for :func:`~qmla.print_to_log`"""
-        qmla.logging.print_to_log(
-            to_print_list=to_print_list,
-            log_file=self.log_file,
-            log_identifier='ModelForLearning {}'.format(self.model_id)
-        )
+    ##########
+    # Section: Setup
+    ##########
 
     def _initialise_model_for_learning(
         self,
         model_name,
-        growth_generator,
+        # growth_generator,
         qmla_core_info_database,
         **kwargs
     ):
@@ -130,8 +116,8 @@ class ModelInstanceForLearning():
             If None, this is retrieved instead from the redis database. 
         """
 
-        # Extract data needed to perform parameter learning
-        redis_databases = rds.get_redis_databases_by_qmla_id(
+        # Retrieve data held on redis databases. 
+        redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
             self.redis_host,
             self.redis_port_number,
             self.qmla_id
@@ -146,12 +132,9 @@ class ModelInstanceForLearning():
             self.probes_system = qmla_core_info_database['ProbeDict']
             self.probes_simulator = qmla_core_info_database['SimProbeDict']
         
-
-        # get info from qmla core info dictionary held on redis database
+        # Extract data from core database
         self.num_particles = qmla_core_info_dict['num_particles']
         self.num_experiments = qmla_core_info_dict['num_experiments']
-        self.growth_rule_of_this_model = growth_generator
-
         self.probe_number = qmla_core_info_dict['num_probes']
         self.qinfer_resampler_threshold = qmla_core_info_dict['resampler_thresh']
         self.qinfer_resampler_a = qmla_core_info_dict['resampler_a']
@@ -169,11 +152,12 @@ class ModelInstanceForLearning():
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         self.true_params_path = qmla_core_info_dict['true_params_pickle_file']
+        # poterntially use different resources depending on model complexity
         
-
-        # instantiate growth rule
+        
+        # Instantiate growth rule
         try:
-            self.growth_class = get_growth_rule.get_growth_generator_class(
+            self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_rule_of_this_model,
                 log_file=self.log_file
             )
@@ -183,7 +167,7 @@ class ModelInstanceForLearning():
                 )
             )
             raise
-        self._consider_reallocate_resources()
+
         # Get initial configuration for this model 
         op = qmla.database_framework.Operator(name=model_name)
         self.model_terms_names = op.constituents_names
@@ -193,6 +177,8 @@ class ModelInstanceForLearning():
         self.model_terms_matrices = np.asarray(op.constituents_operators)
         self.model_dimension = qmla.database_framework.get_num_qubits(self.model_name)
 
+        # Prior parameter distribution via growth rule
+        self._consider_reallocate_resources()
         self.model_prior = self.growth_class.get_prior(
             model_name = self.model_name,
             log_file = self.log_file,
@@ -201,7 +187,7 @@ class ModelInstanceForLearning():
         self.model_terms_parameters = self.model_prior.sample()
         self._store_prior()
 
-        # Initialise QInfer interfacr and updater
+        # Initialise model, updater and heuristic used with QInfer 
         self.qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
@@ -224,12 +210,7 @@ class ModelInstanceForLearning():
             self.model_prior,
             resample_thresh = self.growth_class.qinfer_resampler_threshold,
             resampler = qi.LiuWestResampler( a=self.growth_class.qinfer_resampler_a ),
-            # resample_thresh=self.qinfer_resampler_threshold,
-            # resampler=qi.LiuWestResampler(a=self.qinfer_resampler_a),
         )
-        self.log_print(["QInfer model and updater generated."])
-
-        # Instantiate heuristic to design experiments for this model
         self.model_heuristic = self.growth_class.heuristic(
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
@@ -245,13 +226,11 @@ class ModelInstanceForLearning():
         self.log_print(["Heuristic built"])
         self.model_heuristic_class = self.model_heuristic.__class__.__name__
         
-        # Implement tracking infrastructure for analysis
-        self._initialise_tracking_infrastructure()
 
     def _initialise_tracking_infrastructure(
         self
     ):
-        r"""Arrays, dictionaries etc for tracking learning over experiments"""
+        r"""Arrays, dictionaries etc for tracking learning across experiments"""
 
         self.quadratic_losses = []
         self.track_total_log_likelihood = np.array([])
@@ -259,35 +238,29 @@ class ModelInstanceForLearning():
         self.weights = np.array([])
         self.epochs_after_resampling = []
         self.final_learned_params = np.empty(
+            # TODO remove final_leared_params and references to it, 
+            # use dictionaries defined here instead.
             [len(self.model_terms_matrices), 2])
         self.track_param_means = [self.qinfer_updater.est_mean()]
-        self.track_covariance_matrices = []
         self.track_param_uncertainties = []
         self.track_posterior_dist = []
-        # self.track_prior_means = []
-        # self.track_prior_std_dev = []
         self.track_experimental_times = []
-        self.true_model_params_dict = {}
         self.qhl_final_param_estimates = {}
         self.qhl_final_param_uncertainties = {}
-        self.time_update = 0
-        self.time_volume = 0
-        self.time_simulate_experiment = 0
-        self.time_heuristic = 0 
-        self.terminate_learning_at_volume_convergence = False
-        self.track_quadratic_loss = False
-        if self.track_quadratic_loss:
+        self.track_covariance_matrices = []
+        if self.growth_class.track_quadratic_loss:
+            self.true_model_params_dict = self.growth_class.true_params_dict
             self.all_params_for_q_loss = list(
                 set(list(self.true_model_params_dict.keys())).union(self.model_terms_names)
             )
-
             self.param_indices = {
                 op_name : self.model_terms_names.index(op_name)
                 for op_name in self.model_terms_names
             }
 
-
-
+    ##########
+    # Section: Model learning
+    ##########
 
     def update_model(
         self,
@@ -295,15 +268,21 @@ class ModelInstanceForLearning():
         r"""
         Run updates on model, corresponding to quantum Hamiltonian learning procedure. 
 
+        This function is called on an instance of this model to run the entire QHL algorithm.
+        
         Get datum corresponding to true system, where true system is either experimental or simulated,
-        by calling 
+        by calling `simulate_experiment <http://docs.qinfer.org/en/latest/guide/smc.html#using-smcupdater>`_
+        on the QInfer.SMCUpdater. This datum is taken as the true expected value for the system, which is used 
+        in the likelihood calucation in the Bayesian inference step. 
+        This is done by calling the `update` method on the `qinfer_updater 
+        <http://docs.qinfer.org/en/latest/apiref/smc.html?highlight=smcupdater#smcupdater-smc-based-particle-updater>`_.
+        Effects of the update are then recorded by :meth:`~qmla.ModelInstanceForLearning._record_experiment_updates`,
+        and terminate either upon convergence or after a fixed `num_experiments`. 
+        Final details are recorded by :meth:`~qmla.ModelInstanceForLearning._finalise_learning`.
 
         """
+
         self.log_print(["Updating model."])
-
-        full_update_time_init = time.time()
-
-        self.true_model_params_dict = self.growth_class.true_params_dict
         print_frequency = max(
             int(self.num_experiments / 5),
             5
@@ -323,19 +302,18 @@ class ModelInstanceForLearning():
                 except:
                     pass
 
-            self.log_print(["Getting exp"])
+            # Design exeriment
             new_experiment = self.model_heuristic(
                 num_params=len(self.model_terms_names),
                 epoch_id=update_step,
                 current_params=self.qinfer_updater.est_mean()
             )
-            self.log_print(["Got exp"])
 
             if update_step == 0:
-                self.log_print(['Initial time selected = ',
-                                str(new_experiment[0][0])]
-                               )
-            self.track_experimental_times.append(new_experiment[0][0])
+                self.log_print(
+                    ['Initial time selected = ',str(new_experiment['t'])]
+                )
+            self.track_experimental_times.append(new_experiment['t'])
 
             # Run (or simulate) the experiment
             datum_from_experiment = self.qinfer_model.simulate_experiment(
@@ -376,25 +354,21 @@ class ModelInstanceForLearning():
             self._record_experiment_updates(update_step=update_step)
 
             # Terminate
-            if self.terminate_learning_at_volume_convergence:  # can be reinstated to stop learning when volume converges
+            if (
+                self.growth_class.terminate_learning_at_volume_convergence
+                and volume_by_epoch[-1] < self.growth_class.volume_convergence_threshold
+
+            ):  # can be reinstated to stop learning when volume converges
                 self._finalise_learning()
                 break
 
             if update_step == self.num_experiments - 1:
                 self._finalise_learning()
 
-        try:
-            self.log_print([
-                "Total number of times each order of magnitude of uncertainty used during learning:", 
-                self.model_heuristic.all_count_order_of_magnitudes,
-                "Number of counter productive experiments:", self.model_heuristic.counter_productive_experiments
-            ])
-        except:
-            pass
-
-
-
     def _record_experiment_updates(self, update_step):
+        r"""Update tracking infrastructure."""
+        
+        # Data used in plots
         self.volume_by_epoch = np.append(
             self.volume_by_epoch,
             qi.utils.ellipsoid_volume(
@@ -410,13 +384,13 @@ class ModelInstanceForLearning():
         if self.qinfer_updater.just_resampled:
             self.epochs_after_resampling.append(update_step)
 
-        # TODO remove? this doesn't seem necessary to store
+        # Some optional tracking
         if self.growth_class.track_cov_mtx:
             self.track_covariance_matrices.append(
-                self.qinfer_updater.est_covariance_mtx())
+                self.qinfer_updater.est_covariance_mtx()
+            )
 
-        if self.track_quadratic_loss:
-            # TODO not currently recording quadratic loss
+        if self.growth_class.track_quadratic_loss:
             quadratic_loss = 0
             for param in self.all_params_for_q_loss:
                 if param in self.model_terms_names:
@@ -433,22 +407,30 @@ class ModelInstanceForLearning():
 
 
     def _finalise_learning(self):
-        self.log_print(["QHL finished for ", self.model_name])
+        r"""Record and log final result."""
+
+        # Print some results.
+        try:
+            self.log_print([
+                "Total number of times each order of magnitude of uncertainty used during learning:", 
+                self.model_heuristic.all_count_order_of_magnitudes,
+                "Number of counter productive experiments:", self.model_heuristic.counter_productive_experiments
+            ])
+        except:
+            pass
+
         self.log_print([
-            'Final time selected:',
-            self.track_experimental_times[-1]
-        ])
-        self.log_print([
+            "QHL finished for ", self.model_name],
+            'Final time selected:', self.track_experimental_times[-1],
             "{} Resample epochs: {}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
-        ])
+        )
 
+        # Final results
         self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
-
-        self.track_param_estimate_v_epoch = {}
-        self.track_param_uncertainty_v_epoch = {}
-
         self.track_param_means = np.array(self.track_param_means)
         self.track_param_uncertainties = np.array(self.track_param_uncertainties)
+        self.track_param_estimate_v_epoch = {}
+        self.track_param_uncertainty_v_epoch = {}
 
         cov_mat = self.qinfer_updater.est_covariance_mtx()
         est_params = self.qinfer_updater.est_mean()
@@ -492,7 +474,11 @@ class ModelInstanceForLearning():
     def learned_info_dict(self):
         """
         Place essential information after learning has occured into a dict.
-        This can be used to recreate the model on another node.
+
+        This is used to recreate the model for 
+            * comparisons: :class:`~qmla.ModelInstanceForComparison` 
+            * storage within the main QMLA environment :class:`~qmla.ModelInstanceForStorage>`.
+        
         """
 
         all_post_margs = []
@@ -502,7 +488,8 @@ class ModelInstanceForLearning():
             )
 
         learned_info = {}
-        # wanted by storage class
+        
+        # needed by storage class
         learned_info['num_particles'] = self.num_particles
         learned_info['num_experiments'] = self.num_experiments
         learned_info['times_learned_over'] = self.track_experimental_times
@@ -524,8 +511,6 @@ class ModelInstanceForLearning():
         learned_info['learned_hamiltonian'] = self.learned_hamiltonian
         learned_info['growth_rule_of_this_model'] = self.growth_rule_of_this_model
         learned_info['model_heuristic_class'] = self.model_heuristic_class
-        learned_info['qinfer_model'] = self.qinfer_model
-        # learned_info['qinfer_updater_expparams'] = self.qinfer_updater.expparams_dtype
         try:
             learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
             learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
@@ -544,29 +529,35 @@ class ModelInstanceForLearning():
 
         return learned_info
 
+    ##########
+    # Section: Evaluation
+    ##########
 
     def compute_likelihood_after_parameter_learning(
         self,
     ):
+        r""""
+        Evaluate the model after parameter learning on independent evaluation data. 
+        """
+        self.log_print(["Evaluating learned model."])
+        
+
+        # Retrieve times and probe states used for evaluation. 
+        true_params_dict = pickle.load(open(
+            self.true_params_path, 
+            'rb'
+        ))
+        evaluation_times = true_params_dict['evaluation_times']
+        evaluation_probe_dict = true_params_dict['evaluation_probes']
+
+        # Construct a fresh updater and model to evaluate.
         estimated_params = self.qinfer_updater.est_mean()
-        cov_mt_uncertainty = [1e-10] * np.shape(self.qinfer_updater.est_mean())[0]
+        cov_mt_uncertainty = [1e-10] * np.shape(estimated_params)[0]
         cov_mt = np.diag(cov_mt_uncertainty)
         posterior_distribution = qi.MultivariateNormalDistribution(
             estimated_params,
             cov_mt
         )
-
-        true_params_dict = pickle.load(open(
-            self.true_params_path, 
-            'rb'
-        ))
-        
-        evaluation_times = true_params_dict['evaluation_times']
-        evaluation_probe_dict = true_params_dict['evaluation_probes']
-        self.log_print([
-            "Evaluating learned model."
-        ])
-
         evaluation_qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
@@ -586,14 +577,12 @@ class ModelInstanceForLearning():
 
         evaluation_updater = qi.SMCUpdater(
             model = evaluation_qinfer_model, 
-            n_particles=min(5, self.num_particles),
-            prior=posterior_distribution,
-            # resample more aggressively once learned, since closer to true values
-            # resample_thresh=max(self.qinfer_resampler_threshold, 0.6), 
+            n_particles = min(5, self.num_particles),
+            prior = posterior_distribution,
             # turn off resampling - want to evaluate the learned model, not improved version
-            resample_thresh=0.0,  
-            resampler=qi.LiuWestResampler(
-                a=self.growth_class.qinfer_resampler_a
+            resample_thresh = 0.0,  
+            resampler = qi.LiuWestResampler(
+                a = self.growth_class.qinfer_resampler_a
             ),
         )
 
@@ -612,17 +601,13 @@ class ModelInstanceForLearning():
                 repeat=1
             )
             evaluation_updater.update(datum, exp)
-        self.log_print([
-            "Evaluation updates complete. num resamples:", evaluation_updater.resample_count
-        ])
-        log_likelihood = evaluation_updater.log_total_likelihood
+
+        # Store evaluation
         self.evaluation_normalization_record = evaluation_updater.normalization_record
         if np.isnan(evaluation_updater.log_total_likelihood):
             self.evaluation_log_likelihood = None 
             self.evaluation_median_likelihood = None
-            self.log_print([
-                "Evaluation ll is nan"
-            ])
+            self.log_print(["Evaluation ll is nan"])
         else:
             self.evaluation_log_likelihood = qmla.utilities.round_nearest(
                 evaluation_updater.log_total_likelihood, 
@@ -633,16 +618,20 @@ class ModelInstanceForLearning():
                 2
             )
         
-        print_timings = False
-        if print_timings: 
-            for k in evaluation_qinfer_model.timings:
-                for kk in evaluation_qinfer_model.timings[k]:
-                    self.log_print([
-                        "Evaluation Timing - {}/{}: {}".format(
-                            k, kk, 
-                            np.round(evaluation_qinfer_model.timings[k][kk], 2)
-                        )
-                    ])
+    ##########
+    # Section: Utilities
+    ##########
+
+    def log_print(
+        self,
+        to_print_list
+    ):
+        r"""Wrapper for :func:`~qmla.print_to_log`"""
+        qmla.logging.print_to_log(
+            to_print_list=to_print_list,
+            log_file=self.log_file,
+            log_identifier='ModelForLearning {}'.format(self.model_id)
+        )
 
 
     def _consider_reallocate_resources(self):
