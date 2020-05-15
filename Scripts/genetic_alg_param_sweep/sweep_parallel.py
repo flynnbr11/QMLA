@@ -57,6 +57,7 @@ def master():
         )
         sender = status.Get_source()
         tag = status.Get_tag()
+        print("[MASTER] received message with tag:", tag, flush=True)
 
         # process the message
         if tag == TAGS['shutdown']:
@@ -73,9 +74,11 @@ def master():
 
         # if the worker is still available, send it the next message
         if tag != TAGS['shutdown']:
+            print("[MASTER] Sending message to ", sender, flush=True)
             try:
                 # if some configs still to process, send the next one to the worker
                 configuration = next(iterable_configurations)
+                print("[MASTER] Sending work to ", sender, flush=True)
                 comm.send(
                     obj = configuration, 
                     dest = sender, 
@@ -83,6 +86,7 @@ def master():
                 )
             except:
                 # no configurations left to do; tell it to shut down
+                print("[MASTER] Sending shutdown to ", sender, flush=True)
                 comm.send(
                     obj=None, 
                     dest = sender,
