@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import qmla.database_framework as database_framework
-import qmla.model_instances as QML
+import qmla.model_for_comparison
 import qmla.logging
 
 try:
@@ -27,17 +27,14 @@ __all__ = [
     'remote_bayes_factor_calculation'
 ]
 
-# Single function call to compute Bayes Factor between models given their IDs
 def remote_bayes_factor_calculation(
     model_a_id,
     model_b_id,
     branch_id=None,
-    # interbranch=False,
     num_times_to_use='all',
     bf_data_folder=None,
     times_record='BayesFactorsTimes.txt',
     check_db=False,
-    # trueModel=None,
     bayes_threshold=1,
     host_name='localhost',
     port_number=6379,
@@ -89,6 +86,7 @@ def remote_bayes_factor_calculation(
             log_file = log_file, 
             log_identifier = 'BF ({}/{})'.format(model_a_id, model_b_id)
         )
+    log_print(["Start. Branch", branch_id])
     timings = {}
     time_start = time.time()
     t_init = time.time()
@@ -123,15 +121,16 @@ def remote_bayes_factor_calculation(
             else:
                 return (1.0 / bayes_factor)
     else:
+        log_print(["Instantiating models"])
         t_init = time.time()
-        model_a = QML.ModelInstanceForComparison(
+        model_a = qmla.model_for_comparison.ModelInstanceForComparison(
             model_id=model_a_id,
             qid=qid,
             log_file=log_file,
             host_name=host_name,
             port_number=port_number,
         )
-        model_b = QML.ModelInstanceForComparison(
+        model_b = qmla.model_for_comparison.ModelInstanceForComparison(
             model_id=model_b_id,
             qid=qid,
             log_file=log_file,
@@ -144,7 +143,7 @@ def remote_bayes_factor_calculation(
         # up to t_idx given.
         # And inherit renormalization record from QML updater
         # In special cases, eg experimental data, change these defaults below.
-        log_print(["Start. Branch", branch_id])
+        
         if num_times_to_use == 'all':
             first_t_idx = 0
         else:
@@ -211,7 +210,8 @@ def remote_bayes_factor_calculation(
                     bf_data_folder=bf_data_folder
                 )
             except BaseException:
-                raise
+                log_print(["Plotting posterior marginals failed."])
+                # raise
 
         # TODO this is the original position of getting log likelihood + bayes factor;
         # moving above so we can plot posterior before and after BF updates.
@@ -384,13 +384,19 @@ def get_exp(model, time):
     )
     exp['t'] = time
 
-    try:
-        for i in range(1, len(gen.expparams_dtype)):
-            col_name = 'w_' + str(i)
-            exp[col_name] = model.final_learned_params[i - 1, 0]
-    except BaseException:
-        print("failed to get exp. \nFinal params:", model.final_learned_params)
+    # try:
+    #     # for i in range(1, len(gen.expparams_dtype)):
+    #     #     col_name = 'w_' + str(i)
+    #     #     exp[col_name] = model.final_learned_params[i - 1, 0]
+    #     for term in gen.expparams_dtype:
+    #         if term != 't':
+    #             exp[term] = model.qhl_final_param_estimates[term]
+        
 
+    # except BaseException:
+    #     print("failed to get exp. \nFinal params:", model.final_learned_params)
+
+    print("BF -- Exp:", exp)
     return exp
 
 

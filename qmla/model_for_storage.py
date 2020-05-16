@@ -8,14 +8,14 @@ import qinfer as qi
 import redis
 import pickle
 
-import qmla.redis_settings as rds
-# import qmla.qinfer_model_interface as qml_qi
+import qmla.redis_settings
 import qmla.memory_tests
 import qmla.logging
-import qmla.get_growth_rule as get_growth_rule
+import qmla.get_growth_rule
 import qmla.shared_functionality.experimental_data_processing
 import qmla.database_framework
 import qmla.analysis
+import qmla.process_string_to_matrix
 
 pickle.HIGHEST_PROTOCOL = 4
 
@@ -23,21 +23,24 @@ __all__ = [
     'ModelInstanceForStorage'
 ]
 
-### Reduced class with only essential information saved ###
 class ModelInstanceForStorage():
-    """
-    Class holds what is required for updates only.
-    i.e.
-        - times learned over
-        - final parameters
-        - oplist
-        - true_oplist (?) needed to regenerate GenSimModel identically (necessary?)
-        - true_model_terms_params (?)
-        - resample_thresh
-        - resample_a [are resampling params needed only for updates?]
-        - Prior (specified by mean and std_dev?)
+    r"""
+    Model stored in QMLA environment. 
 
-    Then initialises an updater and GenSimModel which are used for updates.
+    Retrieves data after model is trained remotely, so that 
+    :class:`qmla.QuantumModelLearningAgent` can access that data. 
+
+    :param str model_name: name of model under study
+    :param int model_id: ID of model which is unique to QMLA instance
+    :param np.array() model_terms_matrices: 
+        list of matrices corresponding to the operators which compose the model
+    :param dict plot_probes: probes used in all plots for consistency
+    :param dict qmla_core_info_database: essential details about the QMLA 
+        instance needed to learn/compare models. 
+        If None, this is retrieved instead from the redis database. 
+    :param str host_name: name of host server on which redis database exists.
+    :param int port_number: port number unique to this QMLA instance on redis database
+    :param str log_file: path of QMLA instance's log file.
     """
 
     def __init__(
@@ -61,14 +64,14 @@ class ModelInstanceForStorage():
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
 
+        # Get data from redis database
         if qmla_core_info_database is None: 
-            redis_databases = rds.get_redis_databases_by_qmla_id(
+            redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
                 self.redis_host_name,
                 self.redis_port_number,
                 self.qmla_id
             )
             qmla_core_info_database = redis_databases['qmla_core_info_database']
-            # Get data from redis database which is needed to learn from
             self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
             self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
             qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
@@ -84,8 +87,8 @@ class ModelInstanceForStorage():
             self.probes_simulator = qmla_core_info_database['SimProbeDict']
             qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
 
+        # Extract data from core database
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
-        # self.use_experimental_data = qmla_core_info_dict['use_experimental_data']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_name = qmla_core_info_dict['true_name']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
@@ -93,7 +96,6 @@ class ModelInstanceForStorage():
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         self.qinfer_resampler_threshold = qmla_core_info_dict['resampler_thresh']
         self.qinfer_resampler_a = qmla_core_info_dict['resampler_a']
-
         if plot_probes is None: 
             self.probes_for_plots = pickle.load(
                 open(qmla_core_info_dict['probes_plot_file'], 'rb')
@@ -101,28 +103,17 @@ class ModelInstanceForStorage():
         else: 
             self.probes_for_plots = plot_probes 
 
-        self.store_particle_locations_and_weights = qmla_core_info_dict[
-            'store_particles_weights'
-        ]
-
-        # define parameters used by qmla class
+        # Define parameters used by qmla class
         self.model_bayes_factors = {}
         self.model_num_qubits = qmla.database_framework.get_num_qubits(
             self.model_name)
         self.probe_num_qubits = self.model_num_qubits
-        
         self.expectation_values = {}
         self.values_updated = False
 
-    def log_print(
-        self,
-        to_print_list
-    ):
-        qmla.logging.print_to_log(
-            to_print_list=to_print_list,
-            log_file=self.log_file,
-            log_identifier='ModelForStorage {}'.format(self.model_id)
-        )
+    ##########
+    # Section: Update model based on learned values 
+    ##########
 
     def model_update_learned_values(
         self,
@@ -130,24 +121,27 @@ class ModelInstanceForStorage():
         **kwargs
     ):
         """
-        Pass a dict, learned_info, with essential info on
-        reconstructing the state of the model, updater and GenSimModel
+        Get result of model learning and store here. 
 
+        Every element stored by :meth:`~qmla.ModelInstanceForLearning.learned_info_dict`
+        is stored as an attribute here. 
+
+        :param dict learned_info: results of remote model learning
+            if None, retrieved from the redis database
+            if not None, computed locally and passed
         """
+
         if not self.values_updated:
             self.values_updated = True
-            redis_databases = rds.get_redis_databases_by_qmla_id(
+            redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
                 self.redis_host_name,
                 self.redis_port_number,
                 self.qmla_id
             )
             learned_models_info_db = redis_databases['learned_models_info_db']
-            self.log_print(
-                [
-                    "Updating learned info for model {}".format(self.model_id),
-                    "learned info:", learned_info
-                ]
-            )
+            self.log_print([
+                "Updating learned info for model {}".format(self.model_id)
+            ])
 
             if learned_info is None:
                 # TODO put unloading redis inside this if statement
@@ -171,35 +165,24 @@ class ModelInstanceForStorage():
                         ]
                     )
 
-
+            # Load results: assign attribute of this class for everything stored 
+            # in learned_info_dict() of ModelInstanceForStorage. 
             for k in learned_info:
                 self.__setattr__(k, learned_info[k])      
-                self.log_print([
-                    "Set attr {} ".format(k)
-                ])      
 
-
-            # process the learned info
-            self.model_terms_parameters_final = np.array(
-                self.final_learned_params
-            )
-            self.track_param_means = np.array(self.track_param_means)
+            # Process the learned info
             self.track_covariance_matrices = np.array(
                 self.track_covariance_matrices)
-            self.track_param_uncertainties = np.array(
-                self.track_param_uncertainties)
-            
             self.volume_by_epoch = {}
             for i in range(len(self.raw_volume_list)):
                 self.volume_by_epoch[i] = self.raw_volume_list[i]
             
+            # Instantiate growth rule
             try:
-                self.growth_class = get_growth_rule.get_growth_generator_class(
+                self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                     growth_generation_rule=self.growth_rule_of_this_model,
-                    # use_experimental_data=self.use_experimental_data,
                     log_file=self.log_file
                 )
-                self.log_print(["Loaded growth class."])
             except BaseException:
                 self.log_print([
                     "Failed to load growth class {} for model".format(
@@ -207,6 +190,8 @@ class ModelInstanceForStorage():
                     )
                 ])
                 raise
+
+            # Compile some attributes
             self.model_name_latex = self.growth_class.latex_name(
                 name=self.model_name
             )
@@ -217,46 +202,36 @@ class ModelInstanceForStorage():
                 self.growth_class.latex_name(term)
                 for term in model_constituent_terms
             ]
-
-            # match the learned parameters by their name in a dict
-            self.track_parameter_estimates = {}
-            num_params = np.shape(self.track_param_means)[1]
-            max_exp = np.shape(self.track_param_means)[0] - 1
-            for i in range(num_params):
-                some_final_param = self.track_param_means[max_exp][i]
-                for term in self.qhl_final_param_estimates:
-                    if self.qhl_final_param_estimates[term] == some_final_param:
-                        param_estimate_v_experiments = self.track_param_means[:][i]
-                        self.track_parameter_estimates[term] = param_estimate_v_experiments
+            self.track_parameter_estimates = self.track_param_estimate_v_epoch
             
-            sim_params = list(self.final_learned_params[:, 0])
-            try:
-                self.learned_hamiltonian = np.tensordot(
-                    sim_params,
-                    self.model_terms_matrices,
-                    axes=1
-                )
-            except:
-                print(
-                    "(failed) trying to build learned hamiltonian for ",
-                    self.model_id, " : ",
-                    self.model_name,
-                    "\nsim_params:", sim_params,
-                    "\nsim op list", self.model_terms_matrices
-                )
-                raise
-
+            # Learned model loaded
             self.log_print([
                 "Updated learned info for model {}".format(self.model_id),
             ])
 
+    ##########
+    # Section: Evaluation
+    ##########
+
     def compute_expectation_values(
         self,
-        # plot_probes, 
         times=[],
     ):
+        r"""
+        Get the expectation values using the learned Hamiltonian.
+
+        Construct Hamiltonian from estimated learned parameters, 
+        and compute the expectation values, using the same input 
+        state as used for plotting.
+        Stores a dictionary of { t : expectation value }. 
+
+        :param list times: times to use 
+        """
+
+        # Choose probe to compute expectation value with
         probe = self.probes_for_plots[self.probe_num_qubits]
-        # probe = plot_probes[self.probe_num_qubits]
+
+        # Find which times are not yet in self.expectation_values
         present_expec_val_times = sorted(
             list(self.expectation_values.keys())
         )
@@ -264,6 +239,7 @@ class ModelInstanceForStorage():
             list(set(times) - set(present_expec_val_times))
         )
 
+        # Compute and store results. 
         for t in required_times:
             self.expectation_values[t] = self.growth_class.expectation_value(
                 ham=self.learned_hamiltonian,
@@ -275,20 +251,26 @@ class ModelInstanceForStorage():
 
     def r_squared(
         self,
-        plot_probes,
         times=None,
         min_time=0,
         max_time=None
     ):
-        self.log_print(
-            [
-                "R squared function for", self.model_name
-            ]
-        )
+        r"""
+        Compute and store r squared for given times.
+
+        :param list times: times to use for calculation
+        :param float min_time: minimum time to use for calculation
+        :param float min_time: maximum time to use for calculation
+        :return float final_r_squared: r squared of the learned model against the times given
+        """
+
+        self.log_print([
+            "R squared function for", self.model_name
+        ])
+
+        # Choose times to get r squared for
         if times is None:
-            exp_times = sorted(
-                list(self.experimental_measurements.keys())
-            )
+            exp_times = sorted(list(self.experimental_measurements.keys()))
         else:
             exp_times = times
             
@@ -300,10 +282,15 @@ class ModelInstanceForStorage():
         min_data_idx = exp_times.index(min_time)
         max_data_idx = exp_times.index(max_time)
         exp_times = exp_times[min_data_idx:max_data_idx]
+        
+        # Get expectation values for system
         exp_data = [
             self.experimental_measurements[t] for t in exp_times
         ]
+
+        # Compute r squared 
         probe = self.probes_for_plots[self.probe_num_qubits]
+
         datamean = np.mean(exp_data[0:max_data_idx])
         total_sum_of_squares = 0
         for d in exp_data:
@@ -311,7 +298,6 @@ class ModelInstanceForStorage():
         self.true_exp_val_mean = datamean
         self.total_sum_of_squares = total_sum_of_squares
 
-        ham = self.learned_hamiltonian
         sum_of_residuals = 0
         available_expectation_values = sorted(
             list(self.expectation_values.keys()))
@@ -323,7 +309,7 @@ class ModelInstanceForStorage():
                 sim = self.expectation_values[t]
             else:
                 sim = self.growth_class.expectation_value(
-                    ham=ham,
+                    ham=self.learned_hamiltonian,
                     t=t,
                     state=probe
                 )
@@ -337,41 +323,47 @@ class ModelInstanceForStorage():
             chi_squared += diff_squared / true
 
         if total_sum_of_squares == 0:
+            # calculation failed
             print(
-                "[ModelForStorage - r_squared] Total sum of squares is 0",
-                total_sum_of_squares)
-            print("data mean:", datamean)
-            print("d:", d)
-            print("exp_data:", exp_data)
+                "[ModelForStorage - r_squared]", 
+                "Total sum of squares is 0",
+                total_sum_of_squares,
+                "\ndatamean=", datamean, 
+                "\nd=",d, 
+                "\nexp_data=", exp_data
+            )
+
         self.final_r_squared = 1 - (sum_of_residuals / total_sum_of_squares)
-        self.sum_of_residuals = sum_of_residuals
-        self.chi_squared = chi_squared
         self.p_value = (
             1 -
             sp.stats.chi2.cdf(
-                self.chi_squared,
+                chi_squared,
                 len(exp_times) - 1  # number of degrees of freedom
             )
         )
+
         return self.final_r_squared
 
     def r_squared_by_epoch(
         self,
-        plot_probes,
         times=None,
         min_time=0,
         max_time=None,
         num_points=10 
     ):
-        self.log_print(
-            [
-                "R squared by epoch function for",
-                self.model_name,
-                "Times passed:",
-                times
-            ]
-        )
+        r""" 
+        Compute and store r squared up to all times.
+        TODO incorporate as flag in r_squared() to store by epoch
+        """
 
+        self.log_print([
+            "R squared by epoch function for",
+            self.model_name,
+            "Times passed:",
+            times
+        ])
+
+        # Choose times to get r squared for
         if times is None:
             exp_times = sorted(list(self.experimental_measurements.keys()))
         else:
@@ -379,7 +371,6 @@ class ModelInstanceForStorage():
 
         if max_time is None:
             max_time = max(exp_times)
-
         min_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(
             exp_times,
             min_time
@@ -392,10 +383,13 @@ class ModelInstanceForStorage():
         max_data_idx = exp_times.index(max_time)
         exp_times = exp_times[min_data_idx:max_data_idx]
 
+        # Get expectation values for system
         exp_data = [
             self.experimental_measurements[t]
             for t in exp_times
         ]
+
+        # Compute r squared 
         probe = self.probes_for_plots[self.probe_num_qubits]
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum(
@@ -403,8 +397,8 @@ class ModelInstanceForStorage():
         )
         r_squared_by_epoch = {}
 
-        # only use subset of epochs in case there are a large
-        # num experiments due to heavy computational overhead
+        ## only use subset of epochs in case there are a large
+        ## num experiments due to heavy computational overhead
         spaced_epochs = np.round(
             np.linspace(
                 0,
@@ -413,19 +407,13 @@ class ModelInstanceForStorage():
         )
 
         for e in spaced_epochs:
-
-            ham = np.tensordot(
-                self.track_param_means[int(e)],
-                self.model_terms_matrices,
-                axes=1
-            )  # the Hamiltonian this model held at epoch e
             sum_of_residuals = 0
             available_expectation_values = sorted(
                 list(self.expectation_values.keys())
             )
             for t in exp_times:
                 sim = self.growth_class.expectation_value(
-                    ham=ham,
+                    ham=self.learned_hamiltonian,
                     t=t,
                     state=probe
                 )
@@ -433,11 +421,24 @@ class ModelInstanceForStorage():
                 diff_squared = (sim - true)**2
                 sum_of_residuals += diff_squared
 
-            Rsq = 1 - sum_of_residuals / datavar
-
-            r_squared_by_epoch[e] = Rsq
+            rsq = 1 - sum_of_residuals / datavar
+            r_squared_by_epoch[e] = rqs
         self.r_squared_by_epoch = r_squared_by_epoch
-        self.final_r_squared = Rsq
+        self.final_r_squared = rsq
+
         return r_squared_by_epoch
 
+    ##########
+    # Section: Utilities
+    ##########
 
+    def log_print(
+        self,
+        to_print_list
+    ):
+        r"""Wrapper for :func:`~qmla.print_to_log`"""
+        qmla.logging.print_to_log(
+            to_print_list=to_print_list,
+            log_file=self.log_file,
+            log_identifier='ModelForStorage {}'.format(self.model_id)
+        )

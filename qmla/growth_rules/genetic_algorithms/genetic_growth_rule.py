@@ -116,6 +116,7 @@ class Genetic(
         }
         self.model_points_at_step = {}     
         self.generation_model_rankings = {} 
+        self.models_ranked_by_fitness = {}
 
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {

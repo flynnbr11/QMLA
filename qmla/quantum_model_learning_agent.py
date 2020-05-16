@@ -22,6 +22,7 @@ import qmla.analysis
 import qmla.database_framework as database_framework
 import qmla.get_growth_rule as get_growth_rule
 import qmla.redis_settings as rds
+import qmla.model_for_storage
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation
 from qmla.remote_model_learning import remote_learn_model_parameters
 import qmla.tree
@@ -744,6 +745,7 @@ class QuantumModelLearningAgent():
             elif return_job == True:
                 return job
         else:
+            self.log_print(["Locally requesting BF b/w {}/{} ".format(model_a_id, model_b_id)])
             remote_bayes_factor_calculation(
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
@@ -1572,7 +1574,7 @@ class QuantumModelLearningAgent():
             op = qmla.database_framework.Operator(
                 name=model_name, undimensionalised_name=model_name
             )
-            model_storage_instance = qmla.model_instances.ModelInstanceForStorage(
+            model_storage_instance = qmla.model_for_storage.ModelInstanceForStorage(
                 model_name=model_name,
                 model_id=int(model_id),
                 model_terms_matrices=op.constituents_operators,
@@ -1775,7 +1777,6 @@ class QuantumModelLearningAgent():
             'QuadraticLosses': mod.quadratic_losses_record,
             'FinalRSquared': mod.r_squared(
                 times=expec_val_plot_times,
-                plot_probes=self.probes_for_plots
             ),
             'Fscore': self.model_f_scores[model_id],
             'Precision': self.model_precisions[model_id],
@@ -2705,14 +2706,17 @@ class QuantumModelLearningAgent():
             model_ids
         ])
 
-        qmla.analysis.plot_learned_models_dynamics(
-            qmd=self,
-            include_bayes_factors=include_bayes_factors,
-            include_times_learned=True,
-            include_param_estimates=include_params,
-            model_ids=model_ids,
-            save_to_file=save_to_file,
-        )
+        try:
+            qmla.analysis.plot_learned_models_dynamics(
+                qmd=self,
+                include_bayes_factors=include_bayes_factors,
+                include_times_learned=True,
+                include_param_estimates=include_params,
+                model_ids=model_ids,
+                save_to_file=save_to_file,
+            )
+        except:
+            self.log_print(["Failed to plot dynamics"])
 
     def plot_volume_after_qhl(self,
                               model_id=None,

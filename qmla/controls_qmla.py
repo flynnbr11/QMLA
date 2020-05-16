@@ -19,16 +19,6 @@ These are gathered into a single class instance which can be probed by
 the QMLA instance to implement user specifications. 
 """
 
-def log_print(
-    to_print_list, 
-    log_file
-):
-    qmla.logging.print_to_log(
-        to_print_list = to_print_list, 
-        log_file = log_file, 
-        log_identifier = 'Setting QMLA controls'
-    )
-
 class ControlsQMLA():
     r"""
     Storage for configuration of a QMLA instance. 
@@ -75,12 +65,9 @@ class ControlsQMLA():
 
         # get core arguments passed to implement_qmla script
         # and generate required parameters from those
-        log_print(
-            [
-                "Getting growth rule instances for alternative growth rules", 
-            ],
-            log_file = self.log_file
-        )
+        self.log_print([
+            "Getting growth rule instances for alternative growth rules", 
+        ])
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
         self.generator_list = [self.growth_generation_rule]
@@ -101,19 +88,14 @@ class ControlsQMLA():
                 list(self.unique_growth_rule_instances.values())
             ]
         )
-        log_print(
-            [
-                "probe_max_num_qubits_all_growth_rules:", 
-                self.probe_max_num_qubits_all_growth_rules
-            ],
-            log_file = self.log_file
-        )
+        self.log_print([
+            "probe_max_num_qubits_all_growth_rules:", 
+            self.probe_max_num_qubits_all_growth_rules
+        ])
 
         self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
         
-        log_print([
-            "qhl models retrieved"
-        ], log_file=self.log_file)
+        self.log_print(["qhl models retrieved"])
         if arguments.true_params_pickle_file is None: 
             try:
                 true_params_info = qmla.set_shared_parameters(
@@ -121,9 +103,7 @@ class ControlsQMLA():
                     # all_growth_rules = # TODO get list of growth rules here
                 )
             except:
-                log_print([
-                    "Failed to set shared parameters"
-                ], log_file=self.log_file)
+                self.log_print(["Failed to set shared parameters"])
                 raise
         else:
             # true_params_pickle_file = arguments.true_params_pickle_file
@@ -133,7 +113,7 @@ class ControlsQMLA():
                     'rb'
                 )
             )
-        log_print([ "shared params set"], log_file=self.log_file)
+        self.log_print([ "shared params set"])
         self.true_params_pickle_file = arguments.true_params_pickle_file
         self.true_model = true_params_info['true_model']
         self.true_model_name = database_framework.alph(self.true_model)
@@ -142,9 +122,7 @@ class ControlsQMLA():
         )
         self.true_model_terms_matrices = self.true_model_class.constituents_operators
         self.true_model_terms_params = true_params_info['params_list']
-        log_print([
-            "True model set."
-        ], log_file=self.log_file)
+        self.log_print(["True model set."])
         # derive required info from data from growth rule and arguments
         # self.true_hamiltonian = self.growth_class.true_hamiltonian
         # self.true_params_dict = self.growth_class.true_params_dict
@@ -214,6 +192,14 @@ class ControlsQMLA():
                 str(self.long_id) + '.p'  # for pickling results into
             self.class_pickle_file = self.results_directory + \
                 'qmd_class_' + str(self.long_id) + '.p'
+
+    def log_print(self, to_print_list):
+        r"""Wrapper for :func:`~qmla.print_to_log`"""
+        qmla.logging.print_to_log(
+            to_print_list=to_print_list,
+            log_file=self.log_file,
+            log_identifier='Setting QMLA controls'
+        )
 
 
 def parse_cmd_line_args(args):
@@ -498,13 +484,18 @@ def parse_cmd_line_args(args):
     args_dict = vars(qmla_controls)
 
     for a in list(args_dict.keys()):
-        log_print(
-            [
-                a,
-                ':',
-                args_dict[a]
-            ],
-            log_file=qmla_controls.log_file
-        )
+        qmla_controls.log_print([
+            a,
+            ':',
+            args_dict[a]        
+        ])
+        # log_print(
+        #     [
+        #         a,
+        #         ':',
+        #         args_dict[a]
+        #     ],
+        #     log_file=qmla_controls.log_file
+        # )
 
     return qmla_controls

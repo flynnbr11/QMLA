@@ -89,18 +89,21 @@ class ExperimentFullAccessNV(
                                + transverse_terms
                                )
         model = model_list[0]
-        present_terms = model.split('PP')
+        # present_terms = model.split('PP')
+        # p_str = 'PP'
+        present_terms = model.split('+')
+        p_str = '+'
 
         new_models = []
         if spawn_step in [1, 2]:
             for term in single_qubit_terms:
                 if term not in present_terms:
-                    new_model = model + 'PP' + term
+                    new_model = model + p_str + term
                     new_models.append(new_model)
         elif spawn_step in [3, 4, 5]:
             for term in nontransverse_terms:
                 if term not in present_terms:
-                    new_model = model + 'PP' + term
+                    new_model = model + p_str + term
                     new_models.append(new_model)
 
         elif spawn_step == 6:
@@ -109,7 +112,7 @@ class ExperimentFullAccessNV(
                 term = random.choice(transverse_terms)
 
                 if term not in present_terms:
-                    new_model = model + 'PP' + term
+                    new_model = model + p_str + term
                     if (
                         database_framework.check_model_in_dict(
                             new_model, model_dict) == False
@@ -124,7 +127,7 @@ class ExperimentFullAccessNV(
                 term = random.choice(transverse_terms)
 
                 if term not in present_terms:
-                    new_model = model + 'PP' + term
+                    new_model = model + p_str + term
                     if (
                         database_framework.check_model_in_dict(
                             new_model, model_dict) == False
@@ -140,7 +143,7 @@ class ExperimentFullAccessNV(
                 term = random.choice(transverse_terms)
 
                 if term not in present_terms:
-                    new_model = model + 'PP' + term
+                    new_model = model + p_str + term
                     if (
                         database_framework.check_model_in_dict(
                             new_model, model_dict) == False
@@ -159,7 +162,8 @@ class ExperimentFullAccessNV(
             return '$' + name + '$'
 
         num_qubits = database_framework.get_num_qubits(name)
-        terms = name.split('PP')
+        # terms = name.split('PP')
+        terms = name.split('+')
         rotations = ['xTi', 'yTi', 'zTi']
         hartree_fock = ['xTx', 'yTy', 'zTz']
         transverse = ['xTy', 'xTz', 'yTz', 'yTx', 'zTx', 'zTy']
