@@ -62,6 +62,7 @@ class IsingGenetic(
             true_model = self.true_model,
             base_terms=self.base_terms,
             mutation_probability=self.mutation_probability,
+            num_protected_elite_models = 1, 
             log_file=self.log_file
         )
 
@@ -70,10 +71,12 @@ class IsingGenetic(
 
         self.num_possible_models = 2**len(self.true_chromosome)
 
+        self.fraction_particles_for_bf = 0.1
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
-        self.max_spawn_depth = 2
-        self.initial_num_models = 8
+        self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
+        self.max_spawn_depth = 16
+        self.initial_num_models = 16
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )

@@ -346,7 +346,6 @@ class ModelInstanceForStorage():
 
     def r_squared_by_epoch(
         self,
-        plot_probes,
         times=None,
         min_time=0,
         max_time=None,
@@ -354,6 +353,7 @@ class ModelInstanceForStorage():
     ):
         r""" 
         Compute and store r squared up to all times.
+        TODO incorporate as flag in r_squared() to store by epoch
         """
 
         self.log_print([
@@ -425,7 +425,7 @@ class ModelInstanceForStorage():
             r_squared_by_epoch[e] = rqs
         self.r_squared_by_epoch = r_squared_by_epoch
         self.final_r_squared = rsq
-        
+
         return r_squared_by_epoch
 
     ##########

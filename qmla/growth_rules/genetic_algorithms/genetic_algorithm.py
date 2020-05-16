@@ -52,6 +52,7 @@ class GeneticAlgorithmQMLA():
         self.models_ranked_by_fitness = {}
         self.most_elite_models_by_generation = {}
         self.num_protected_elite_models = num_protected_elite_models
+        self.terminate_early_if_top_model_unchanged = True
         self.best_model_unchanged = False
         self.unchanged_elite_num_generations_cutoff = 6 #TODO put as 5 - 2 for tests
 
@@ -440,7 +441,7 @@ class GeneticAlgorithmQMLA():
                 "Could not get ranked models. model fitnesses:", model_fitnesses
             ])
         elite_models = ranked_models[:self.num_protected_elite_models]
-        self.most_elite_models_by_generation[self.genetic_generation] = elite_models[0]
+        self.most_elite_models_by_generation[self.genetic_generation] = ranked_models[0]
         # num_protected_elite_models_for_termination = 2
 
         if self.genetic_generation > self.unchanged_elite_num_generations_cutoff + 2:
@@ -461,7 +462,7 @@ class GeneticAlgorithmQMLA():
                 np.array(recent_elite_models) 
                 == self.most_elite_models_by_generation[gen]
             )
-            if unchanged:
+            if unchanged and self.terminate_early_if_top_model_unchanged:
                 self.best_model_unchanged = True
                 self.log_print(
                     [
@@ -482,12 +483,6 @@ class GeneticAlgorithmQMLA():
                     )
                 ]
             )
-        self.log_print(
-            [
-                "1st Elite model:", elite_models[0],
-                "\n2nd Elite model", elite_models[1],
-            ]
-        )
         return elite_models
 
     ######################

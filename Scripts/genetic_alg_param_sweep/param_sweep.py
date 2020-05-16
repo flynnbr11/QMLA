@@ -62,20 +62,20 @@ def get_all_configurations(
     test_setup = True
     if test_setup: 
         print("Getting reduced set of configurations to test.")
-        number_of_iterations = 1
-        numbers_of_sites = [5,6]
-        numbers_of_generations = [4, 8]
-        starting_populations = [4, ]
-        elite_models_protected = [1]
-        mutation_probabilities = [0,]
+        number_of_iterations = 10
+        numbers_of_sites = [5]
+        numbers_of_generations = [16]
+        starting_populations = [16,]
+        elite_models_protected = [2]
+        mutation_probabilities = [0]
         selection_methods = ['roulette']
         mutation_methods = ['element_wise']
         crossover_methods = ['one_point']
     else:
         # full sets to use
         print("Getting complete set of configurations to test.")
-        number_of_iterations = 10
-        numbers_of_sites = [4, 5, 6]
+        number_of_iterations = 5
+        numbers_of_sites = [5,]
         numbers_of_generations = [4, 8, 16, 32]
         starting_populations = [4, 8, 16, 32]
         elite_models_protected = [0, 1, 2, 4]
@@ -106,9 +106,9 @@ def get_all_configurations(
                                         'num_protected_elite_models' : e,
                                         'log_file' : log_file
                                     }
-                                    if p < (2**s / 2):
+                                    # if p < (2**s / 2):
                                         # don't include where starting population over half size of total pool
-                                        all_configurations.append(config)
+                                    all_configurations.append(config)
     
     all_configurations = all_configurations * number_of_iterations
     

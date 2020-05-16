@@ -418,10 +418,10 @@ class ModelInstanceForLearning():
             pass
 
         self.log_print([
-            "QHL finished for ", self.model_name],
+            "QHL finished for ", self.model_name,
             'Final time selected:', self.track_experimental_times[-1],
             "{} Resample epochs: {}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
-        )
+        ])
 
         # Final results
         self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
@@ -453,7 +453,7 @@ class ModelInstanceForLearning():
 
             # Arrays of parameter estimates/uncertainties
             self.track_param_estimate_v_epoch[term] = self.track_param_means[:, i]
-            self.track_param_uncertainty_v_epoch = self.track_param_uncertainties[:][i]
+            self.track_param_uncertainty_v_epoch = self.track_param_uncertainties[:, i]
             
             # Compute the Hamiltonian corresponding to the parameter posterior distribution
             self.learned_hamiltonian = sum([

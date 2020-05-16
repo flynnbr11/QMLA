@@ -9,7 +9,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import qmla.database_framework as database_framework
-# import qmla.model_instances as QML
 import qmla.model_for_comparison
 import qmla.logging
 
@@ -28,17 +27,14 @@ __all__ = [
     'remote_bayes_factor_calculation'
 ]
 
-# Single function call to compute Bayes Factor between models given their IDs
 def remote_bayes_factor_calculation(
     model_a_id,
     model_b_id,
     branch_id=None,
-    # interbranch=False,
     num_times_to_use='all',
     bf_data_folder=None,
     times_record='BayesFactorsTimes.txt',
     check_db=False,
-    # trueModel=None,
     bayes_threshold=1,
     host_name='localhost',
     port_number=6379,
