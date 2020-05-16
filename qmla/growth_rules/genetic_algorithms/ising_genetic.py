@@ -76,7 +76,7 @@ class IsingGenetic(
         # default test - 32 generations x 16 starters
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
         self.max_spawn_depth = 16
-        self.initial_num_models = 16
+        self.initial_num_models = 15
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
