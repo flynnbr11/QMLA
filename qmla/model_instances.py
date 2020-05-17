@@ -696,8 +696,8 @@ class ModelInstanceForLearning():
 
             ## There is a bug when using log scale which causes overlap on the axis labels:
             ## https://stackoverflow.com/questions/46498157/overlapping-axis-tick-labels-in-logarithmic-plots
-            ax.semilogx()
-            ax.semilogy()
+            # ax.semilogx()
+            # ax.semilogy()
             # ax.minorticks_off()
             ax.set_title("{}".format(self.growth_class.latex_name(term)))
 
