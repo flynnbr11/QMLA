@@ -548,7 +548,7 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         cov_mtx = self._updater.est_covariance_mtx()
         self.initial_uncertainties = np.sqrt(np.abs(np.diag(cov_mtx)))
         self.track_param_uncertainties = np.zeros(self._qinfer_model.n_modelparams)
-        self.selection_criteria = 'hard_code_6' # 'relative_volume_decrease' # 'hard_code_6_9_magnitudes'
+        self.selection_criteria = 'relative_volume_decrease' # 'hard_code_6' # 'hard_code_6_9_magnitudes'
         self.count_order_of_magnitudes =  {}
         self.all_count_order_of_magnitudes =  {}
         self.counter_productive_experiments = 0 
