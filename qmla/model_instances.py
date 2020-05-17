@@ -443,6 +443,7 @@ class ModelInstanceForLearning():
 
         cov_mat = self.qinfer_updater.est_covariance_mtx()
         est_params = self.qinfer_updater.est_mean()
+        self.log_print(["model_terms_names:", self.model_terms_names])
         for i in range(self.qinfer_model.n_modelparams):
             # Store learned parameters
                 # TODO get rid of uses of final_learned_params, use qhl_final_param_estimates instead
@@ -473,8 +474,8 @@ class ModelInstanceForLearning():
                 for term in self.qhl_final_param_estimates
             ])
 
-            # Plots for this model
-            self.plot_posterior()
+        # Plots for this model
+        self.plot_posterior()
 
     def learned_info_dict(self):
         """
@@ -623,7 +624,10 @@ class ModelInstanceForLearning():
         )
         if not os.path.exists(posterior_directory): 
             self.log_print(["Making posterior dir:", posterior_directory])
-            os.makedirs(posterior_directory)
+            try:
+                os.makedirs(posterior_directory)
+            except:
+                pass # another instance made it at same time
 
         posterior_file_path = os.path.join(
             posterior_directory, 
@@ -680,17 +684,20 @@ class ModelInstanceForLearning():
                 )
             
             # Learned param
-            ax.axvline(
-                self.qhl_final_param_estimates[term], 
-                color='black', 
-                ls = '--',
-                label='Learned'
-            )
+            try:
+                ax.axvline(
+                    self.qhl_final_param_estimates[term], 
+                    color='black', 
+                    ls = '--',
+                    label='Learned'
+                )
+            except:
+                self.log_print(["{} not in {}".format(term, self.qhl_final_param_estimates)])
 
             ## There is a bug when using log scale which causes overlap on the axis labels:
             ## https://stackoverflow.com/questions/46498157/overlapping-axis-tick-labels-in-logarithmic-plots
-            # ax.semilogx()
-            # ax.semilogy()
+            ax.semilogx()
+            ax.semilogy()
             # ax.minorticks_off()
             ax.set_title("{}".format(self.growth_class.latex_name(term)))
 
