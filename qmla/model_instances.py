@@ -6,6 +6,8 @@ import copy
 import qinfer as qi
 import random 
 
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 import redis
 import pickle
 
@@ -223,7 +225,12 @@ class ModelInstanceForLearning():
         )
         self.log_print(["Heuristic built"])
         self.model_heuristic_class = self.model_heuristic.__class__.__name__
-        
+        self.prior_marginal = [
+            self.qinfer_updater.posterior_marginal(idx_param=i)
+            for i in range(self.qinfer_model.n_modelparams)
+        ]
+
+
 
     def _initialise_tracking_infrastructure(
         self
@@ -419,12 +426,16 @@ class ModelInstanceForLearning():
 
         self.log_print([
             "QHL finished for ", self.model_name,
-            'Final time selected:', self.track_experimental_times[-1],
+            "Final time selected:", self.track_experimental_times[-1],
             "{} Resample epochs: {}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
         ])
 
         # Final results
         self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
+        self.posterior_marginal = [
+            self.qinfer_updater.posterior_marginal(idx_param=i)
+            for i in range(self.qinfer_model.n_modelparams)
+        ]
         self.track_param_means = np.array(self.track_param_means)
         self.track_param_uncertainties = np.array(self.track_param_uncertainties)
         self.track_param_estimate_v_epoch = {}
@@ -432,7 +443,8 @@ class ModelInstanceForLearning():
 
         cov_mat = self.qinfer_updater.est_covariance_mtx()
         est_params = self.qinfer_updater.est_mean()
-        for i in range(len(self.final_learned_params)):
+        self.log_print(["model_terms_names:", self.model_terms_names])
+        for i in range(self.qinfer_model.n_modelparams):
             # Store learned parameters
                 # TODO get rid of uses of final_learned_params, use qhl_final_param_estimates instead
             term = self.model_terms_names[i]
@@ -462,6 +474,9 @@ class ModelInstanceForLearning():
                 for term in self.qhl_final_param_estimates
             ])
 
+        # Plots for this model
+        self.plot_posterior()
+
     def learned_info_dict(self):
         """
         Place essential information after learning has occured into a dict.
@@ -472,11 +487,6 @@ class ModelInstanceForLearning():
         
         """
 
-        all_post_margs = []
-        for i in range(len(self.final_learned_params)):
-            all_post_margs.append(
-                self.qinfer_updater.posterior_marginal(idx_param=i)
-            )
 
         learned_info = {}
         
@@ -510,7 +520,7 @@ class ModelInstanceForLearning():
         learned_info['name'] = self.model_name
         learned_info['model_id'] = self.model_id
         learned_info['final_prior'] = self.qinfer_updater.prior
-        learned_info['posterior_marginal'] = all_post_margs
+        learned_info['posterior_marginal'] = self.posterior_marginal
         # TODO restore initial_prior as required for plots in remote_bayes_factor
 
         return learned_info
@@ -603,6 +613,108 @@ class ModelInstanceForLearning():
                 2
             )
         
+    def plot_posterior(self):
+        if not self.growth_class.plot_posterior_after_learning: 
+            # GR doesn't want this plotted
+            return
+        
+        posterior_directory = os.path.join(
+            self.results_directory, 
+            'posteriors'
+        )
+        if not os.path.exists(posterior_directory): 
+            self.log_print(["Making posterior dir:", posterior_directory])
+            try:
+                os.makedirs(posterior_directory)
+            except:
+                pass # another instance made it at same time
+
+        posterior_file_path = os.path.join(
+            posterior_directory, 
+            "qmla_{}_model_{}.png".format(
+                self.qmla_id, 
+                self.model_id
+            )
+        )
+
+        num_terms = self.qinfer_model.n_modelparams
+        ncols = int(np.ceil(np.sqrt(num_terms)))
+        nrows = int(np.ceil(num_terms / ncols))
+        fig, axes = plt.subplots(
+            figsize=(10, 7),
+            nrows=nrows, 
+            ncols=ncols
+        )
+
+        gs = GridSpec(
+            nrows = nrows,
+            ncols = ncols,
+        )
+        row = 0
+        col = 0
+        for param_idx in range(num_terms):
+            term = self.model_terms_names[param_idx]
+            ax = fig.add_subplot(gs[row, col])
+            
+            # plot prior 
+            ax.plot(
+                self.prior_marginal[param_idx][0], # locations
+                self.prior_marginal[param_idx][1], # weights
+                color='blue', 
+                ls='-',
+                label='Prior'
+            )
+
+            # plot posterior
+            ax.plot(
+                self.posterior_marginal[param_idx][0], # locations
+                self.posterior_marginal[param_idx][1], # weights
+                color='black', 
+                ls='-',
+                label='Posterior'
+            )
+
+            # True param
+            if term in self.true_param_dict:
+                ax.axvline(
+                    self.true_param_dict[term], 
+                    color='red',
+                    ls='-.',
+                    label='True'
+                )
+            
+            # Learned param
+            try:
+                ax.axvline(
+                    self.qhl_final_param_estimates[term], 
+                    color='black', 
+                    ls = '--',
+                    label='Learned'
+                )
+            except:
+                self.log_print(["{} not in {}".format(term, self.qhl_final_param_estimates)])
+
+            ## There is a bug when using log scale which causes overlap on the axis labels:
+            ## https://stackoverflow.com/questions/46498157/overlapping-axis-tick-labels-in-logarithmic-plots
+            ax.semilogx()
+            ax.semilogy()
+            # ax.minorticks_off()
+            ax.set_title("{}".format(self.growth_class.latex_name(term)))
+
+            if row == 0  and col == ncols-1:
+                ax.legend()
+
+            col += 1
+            if col == ncols:
+                col = 0
+                row += 1
+
+        fig.text(0.5, 0.04, 'Particle locations', ha='center')
+        fig.text(0.04, 0.5, 'Weights', va='center', rotation='vertical')
+        fig.savefig(posterior_file_path)
+
+
+
     ##########
     # Section: Utilities
     ##########

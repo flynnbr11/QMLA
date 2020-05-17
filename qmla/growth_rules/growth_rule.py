@@ -112,6 +112,7 @@ class GrowthRule():
         self.track_quadratic_loss = False
         self.terminate_learning_at_volume_convergence = False
         self.volume_convergence_threshold = 1e-8
+        self.plot_posterior_after_learning = True
 
         self.experimental_dataset = 'NVB_rescale_dataset.p'
         # self.measurements_by_time = self.get_measurements_by_time()

@@ -75,7 +75,7 @@ class IsingGenetic(
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
-        self.max_spawn_depth = 16
+        self.max_spawn_depth = 32
         self.initial_num_models = 15
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
@@ -102,5 +102,5 @@ class IsingGenetic(
         self.num_processes_to_parallelise_over = self.initial_num_models + 1
 
         self.max_time_to_consider = 15
-        self.min_param = 0.35
-        self.max_param = 0.65
+        self.min_param = 0.45
+        self.max_param = 0.55
