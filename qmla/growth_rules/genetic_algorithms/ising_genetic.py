@@ -56,7 +56,7 @@ class IsingGenetic(
         self.spawn_step = 0
 
         self.mutation_probability = 0.33
-        self.fitness_method =   'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
+        self.fitness_method =   'elo_ratings' # 'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
         self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
             num_sites=self.num_sites,
             true_model = self.true_model,
@@ -102,5 +102,5 @@ class IsingGenetic(
         self.num_processes_to_parallelise_over = self.initial_num_models + 1
 
         self.max_time_to_consider = 15
-        self.min_param = 0.45
-        self.max_param = 0.55
+        self.min_param = 0.485
+        self.max_param = 0.515
