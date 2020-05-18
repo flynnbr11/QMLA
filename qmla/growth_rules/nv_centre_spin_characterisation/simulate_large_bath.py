@@ -77,8 +77,8 @@ class SimulatedNVCentre(
             # 'pauliSet_1_z_d3' : (1.99779857e+09,  3.95883908e+07),
 
             'pauliSet_1_x_d3' : (B*g*bohr_magneton/hbar - 0.4e7, 5e7), # ~1.943 GHz
-            'pauliSet_1_y_d3' : (B*g*bohr_magneton/hbar + 0.9e7, 5e7),
-            'pauliSet_1_z_d3' : (B*g*bohr_magneton/hbar + 0.5e7, 5e7),
+            'pauliSet_1_y_d3' : (B*g*bohr_magneton/hbar + 20, 1e2),
+            'pauliSet_1_z_d3' : (B*g*bohr_magneton/hbar - 20, 1e2),
             # spin
             # 'pauliSet_1_x_d3' : (5e9, 2e9), # ~1.943 GHz
             # 'pauliSet_1_y_d3' : (5e9, 2e9),
@@ -121,7 +121,7 @@ class SimulatedNVCentre(
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampledUncertaintyWithConvergenceThreshold
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampledUncertaintyWithConvergenceThreshold
 
     def generate_models(self, model_list, **kwargs):
         if self.spawn_stage[-1]==None:

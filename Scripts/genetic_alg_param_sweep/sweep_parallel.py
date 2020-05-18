@@ -146,7 +146,9 @@ def worker():
             break   
         elif tag == TAGS['work']:
             # perform the calculation and send the result to the master
+            print("Worker {} received package to compute: {}".format(rank, incoming_data), flush=True)
             result = run_genetic_algorithm(configuration = incoming_data)
+            print("Worker {} finished work package".format(rank), flush=True)
             if result is None: 
                 print("Job failed")
                 tag = TAGS['failed_job']

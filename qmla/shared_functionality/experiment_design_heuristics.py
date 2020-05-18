@@ -617,7 +617,7 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
                 axis = 0
             )[0]
             print("change in uncertainty=", change_in_uncertainty)
-            if np.all( change_in_uncertainty <0 ):
+            if np.all( change_in_uncertainty < 0 ):
                 # TODO better way to deal with all increasing uncertainties
                 print("All parameter uncertainties increased")
                 self.counter_productive_experiments += 1
