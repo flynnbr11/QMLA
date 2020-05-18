@@ -282,7 +282,8 @@ class GeneticAlgorithmQMLA():
         self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
         pair_ids = list(self.chrom_pair_df.index)
         pair_probs = [ self.chrom_pair_df.loc[i].probability for i in pair_ids]
-        
+        # self.log_print( ["Number available pairs:", len(pair_ids)] )
+
         # randomly select a pair from list of pairs
         selected_id = np.random.choice(
             a = pair_ids, 
@@ -342,18 +343,14 @@ class GeneticAlgorithmQMLA():
         c1 = np.array(list(selection['chromosome_1']))
         c2 = np.array(list(selection['chromosome_2']))
         x = selection['other_data']['cut']
-        # self.log_print(
-        #     [
-        #         "[Crossover Input] x={}\n {} / {}".format(x, repr(c1), repr(c2))
-        #     ]
-        # )
+        # self.log_print([
+        #     "[Crossover In ] x={} \t {} / {}".format(x, repr(c1), repr(c2))
+        # ])
         tmp = c2[:x].copy()
         c2[:x], c1[:x] = c1[:x], tmp
-        # self.log_print(
-        #     [
-        #         "[Crossover Result] (x={})\n {} / {}".format(x,repr(c1), repr(c2))
-        #     ]
-        # )
+        # self.log_print([
+        #     "[Crossover Out] x={} \t {} / {}".format(x, repr(c1), repr(c2))
+        # ])
 
         return c1, c2
 
@@ -392,15 +389,17 @@ class GeneticAlgorithmQMLA():
             if (
                 np.random.rand() < mutation_probability
                 or 
-                force_mutation
+                force_mutation 
             ):
+                num_mutations_to_perform = max(1, force_mutation)
                 self.mutation_count += 1
                 idx = np.random.choice(range(len(c)))
                 # print("Flipping idx {}".format(idx))
-                if c[idx] == 0:
-                    c[idx] = 1
-                elif c[idx] == 1:
-                    c[idx] = 0
+                if int(c[idx]) == 0:
+                    c[idx] = '1'
+                elif int(c[idx]) == 1:
+                    c[idx] = '0'
+                self.log_print(["After:", repr(c)])
             mutated_chromosomes.append(c)
         return mutated_chromosomes
 
@@ -518,7 +517,8 @@ class GeneticAlgorithmQMLA():
                 "ranked models:", ranked_models
             ]
         )
-        truncation_cutoff = max( int(num_models*0.5), 4) # either consider top half, or top 4 if too small
+        truncation_rate = 0.5
+        truncation_cutoff = max( int(num_models*truncation_rate), 4) # either consider top half, or top 4 if too small
         truncation_cutoff = min( truncation_cutoff, num_models )
         truncated_model_list = ranked_models[:truncation_cutoff]
 
@@ -628,6 +628,8 @@ class GeneticAlgorithmQMLA():
         self.unique_pair_combinations_considered = []
         num_loops_to_find_new_chromosome = 0
         force_mutation = False
+        num_genes_to_force_mutate = 0
+        
         while len(proposed_chromosomes) < num_models_for_next_generation:
             selection = self.selection()
             suggested_chromosomes = self.crossover(
@@ -640,44 +642,26 @@ class GeneticAlgorithmQMLA():
             c0_str = self.chromosome_string( suggested_chromosomes[0] )
             c1_str = self.chromosome_string( suggested_chromosomes[1] )
 
-            if (
-                c0_str not in proposed_chromosomes
-                and
-                c0_str != self.all_zero_chromosome_string 
-            ):
-                proposed_chromosomes.append(c0_str)
-                self.log_print(
-                    [   
-                        "Adding {}; num proposed chromosome now: {} of {}".format(
-                            c0_str,
-                            len(proposed_chromosomes),
-                            num_models_for_next_generation
-                        )
-                    ]
-                )
-
-            if (
-                c1_str not in proposed_chromosomes
-                and
-                c1_str != self.all_zero_chromosome_string
-            ):
-                proposed_chromosomes.append(c1_str)
-                self.log_print(
-                    [
+            for c in [c0_str, c1_str]:
+                if (c not in proposed_chromosomes and c != self.all_zero_chromosome_string):
+                    proposed_chromosomes.append(c)
+                    self.log_print([
                         "num proposed chromosome now: {} of {}".format(
                             len(proposed_chromosomes),
                             num_models_for_next_generation
                         )
-                    ]
-                )
+                    ])
+
             if len(self.chrom_pair_df) == 0 :
                 # already tried every available pair 
+                num_genes_to_force_mutate += 1 # TODO increase number of genes to flip to diversify population when repetitive
                 self.log_print([
-                    "Redrawing chromosome pair selection dataframe, enforcing mutation"
+                    "Redrawing chromosome pair selection dataframe, enforcing mutation on {} genes".format(num_genes_to_force_mutate)
                 ])
                 self.prepare_chromosome_pair_dataframe(
                     chromosome_probabilities=chromosome_selection_probabilities,
                     force_mutation=True
+                    # force_mutation=num_genes_to_force_mutate
                 )
             # else: 
             #     num_loops_to_find_new_chromosome += 1

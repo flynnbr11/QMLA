@@ -64,10 +64,10 @@ def get_all_configurations(
         print("Getting reduced set of configurations to test.")
         number_of_iterations = 10
         numbers_of_sites = [5]
-        numbers_of_generations = [16]
-        starting_populations = [16,]
+        numbers_of_generations = [12]
+        starting_populations = [12,]
         elite_models_protected = [1]
-        mutation_probabilities = [0.33]
+        mutation_probabilities = [0.2]
         selection_methods = ['roulette']
         mutation_methods = ['element_wise']
         crossover_methods = ['one_point']

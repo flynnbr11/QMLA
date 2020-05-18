@@ -157,17 +157,15 @@ true_model_latex = true_growth_class.latex_name(
     true_model
 )
 
+# name = true_params_info['true_model']
+# terms = qmla.database_framework.get_constituent_names_from_name(name)
+# params = []
+# ops = []
+# for t in terms:
+#     params.append(true_params_dict[t])
+#     ops.append(database_framework.compute(t))
 
-if exp_data is False:
-    name = true_params_info['true_model']
-    terms = database_framework.get_constituent_names_from_name(name)
-    params = []
-    ops = []
-    for t in terms:
-        params.append(true_params_dict[t])
-        ops.append(database_framework.compute(t))
-
-    true_ham = np.tensordot(params, ops, axes=1)
+# true_ham = np.tensordot(params, ops, axes=1)
 
 
 if not directory_to_analyse.endswith('/'):
@@ -362,7 +360,7 @@ try:
     )
 except BaseException:
     print("ANALYSIS FAILURE: finding average parameters across instances.")
-    raise
+    # raise
 
 try:
     qmla.analysis.average_parameter_estimates(
