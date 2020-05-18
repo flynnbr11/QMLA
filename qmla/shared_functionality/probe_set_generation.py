@@ -22,6 +22,9 @@ import itertools
 from scipy import linalg
 import random
 
+import qmla.utilities
+import qmla.database_framework
+
 ###################################
 # General useful functions
 ###################################
@@ -134,6 +137,24 @@ def separable_probe_dict(
 # Specific probe sets
 ## e.g. matching experiment.
 ###################################
+
+def eigenbasis_of_first_qubit(
+    max_num_qubits=2,
+    num_probes=40,
+    **kwargs
+):
+    probes = {}
+    bases_to_learn = ['x']
+    for N in range(1, max_num_qubits+1):
+        bases = ['pauliSet_1_{}_d{}'.format(b, N) for b in bases_to_learn ]
+        base_matrices = [qmla.database_framework.compute(b) for b in bases]
+        eig_vectors_list = qmla.utilities.flatten([np.linalg.eig(b)[1] for b in base_matrices])
+        eig_vectors = itertools.cycle(eig_vectors_list)
+
+        for j in range(num_probes):
+            probes[(j, N)] = next(eig_vectors)
+    return probes
+    
 
 def NV_centre_ising_probes_plus(
     max_num_qubits=2,

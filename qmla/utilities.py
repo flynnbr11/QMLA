@@ -89,3 +89,5 @@ def format_experiment(model, final_learned_params, time):
 
 
     return exp
+
+def flatten(l): return [item for sublist in l for item in sublist]
