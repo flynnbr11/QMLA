@@ -604,7 +604,7 @@ try:
     )
 except:
     print("ANALYSIS FAILURE: times learned upon.")
-    raise
+    # raise
 
 # Bayes factors Vs true model
 try:
