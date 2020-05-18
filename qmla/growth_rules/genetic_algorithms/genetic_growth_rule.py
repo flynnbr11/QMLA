@@ -131,17 +131,13 @@ class Genetic(
 
     def nominate_champions(self):
         # choose model with highest fitness on final generation
-        
-        if not self.champion_model:
-            self.log_print([
-                "Champion not set yet, setting as most fit of final generation"
-            ])
-            self.champion_model = self.models_ranked_by_fitness[self.spawn_step]
+        self.champion_model = self.models_ranked_by_fitness[self.spawn_step][0]
 
         self.log_print([
-            "Model rankings on final generation:",
+            "number mutations:", self.genetic_algorithm.mutation_count, 
+            "\nModel rankings on final generation:",
             self.models_ranked_by_fitness[self.spawn_step],
-            "Champion:", self.champion_model
+            "\nChampion:", self.champion_model
         ])
         
         return [self.champion_model]

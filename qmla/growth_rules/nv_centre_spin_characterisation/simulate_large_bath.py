@@ -115,7 +115,7 @@ class SimulatedNVCentre(
             qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic            
         self.timing_insurance_factor = 1
         time_basis = 1e-9 # nanoseconds
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
         self.max_time_to_consider = 50 * time_basis # 50 microseconds 
         self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
