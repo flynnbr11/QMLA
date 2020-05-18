@@ -55,7 +55,7 @@ class IsingGenetic(
         ]
         self.spawn_step = 0
 
-        self.mutation_probability = 0.1
+        self.mutation_probability = 0.33
         self.fitness_method =   'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
         self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
             num_sites=self.num_sites,
@@ -75,8 +75,8 @@ class IsingGenetic(
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
-        self.max_spawn_depth = 32
-        self.initial_num_models = 15
+        self.max_spawn_depth = 4
+        self.initial_num_models = 8
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )

@@ -519,7 +519,7 @@ class GeneticAlgorithmQMLA():
                 "ranked models:", ranked_models
             ]
         )
-        truncation_cutoff = max( int(num_models*0.75), 4) # either consider top half, or top 4 if too small
+        truncation_cutoff = max( int(num_models*0.5), 4) # either consider top half, or top 4 if too small
         truncation_cutoff = min( truncation_cutoff, num_models )
         truncated_model_list = ranked_models[:truncation_cutoff]
 
@@ -618,11 +618,8 @@ class GeneticAlgorithmQMLA():
         )
         proposed_chromosomes = [
             self.chromosome_string(
-                self.map_model_to_chromosome(
-                    mod
-                )
-            ) 
-            for mod in elite_models
+                self.map_model_to_chromosome(mod)
+            ) for mod in elite_models
         ] # list of chromosome strings to return
 
         chromosome_selection_probabilities = self.get_selection_probabilities(

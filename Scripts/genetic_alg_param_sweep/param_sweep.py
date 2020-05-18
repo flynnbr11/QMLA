@@ -67,7 +67,7 @@ def get_all_configurations(
         numbers_of_generations = [16]
         starting_populations = [16,]
         elite_models_protected = [2]
-        mutation_probabilities = [0]
+        mutation_probabilities = [0.33]
         selection_methods = ['roulette']
         mutation_methods = ['element_wise']
         crossover_methods = ['one_point']

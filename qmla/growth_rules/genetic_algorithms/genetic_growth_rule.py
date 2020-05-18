@@ -131,12 +131,20 @@ class Genetic(
 
     def nominate_champions(self):
         # choose model with highest fitness on final generation
+        
+        if not self.champion_model:
+            self.log_print([
+                "Champion not set yet, setting as most fit of final generation"
+            ])
+            self.champion_model = self.models_ranked_by_fitness[self.spawn_step]
+
         self.log_print([
             "Model rankings on final generation:",
-            self.generation_model_rankings[self.spawn_step]
+            self.models_ranked_by_fitness[self.spawn_step],
+            "Champion:", self.champion_model
         ])
-        champ = self.generation_model_rankings[self.spawn_step][0]
-        return [champ]
+        
+        return [self.champion_model]
 
 
     def generate_models(
@@ -171,7 +179,8 @@ class Genetic(
             reverse=True
         )
         ranked_models_by_name = [kwargs['model_names_ids'][m] for m in ranked_model_list]
-        self.log_print(["Ranked models:", ranked_model_list])
+        self.log_print(["Ranked models:", ranked_model_list, "\n Names:", ranked_models_by_name, "\n with fitnesses:", ])
+
         self.generation_model_rankings[self.spawn_step] = ranked_models_by_name
         rankings = list(range(1, len(ranked_model_list) + 1))
         rankings.reverse()
@@ -333,7 +342,6 @@ class Genetic(
                 self.fitness_method, genetic_algorithm_fitnesses
             )
         ])
-        # models_ranked_by_fitness = 
         self.models_ranked_by_fitness[self.spawn_step] = sorted(
             genetic_algorithm_fitnesses,
             key=genetic_algorithm_fitnesses.get,
@@ -578,7 +586,7 @@ class Genetic(
                         self.genetic_algorithm.genetic_generation, 
                         self.genetic_algorithm.unchanged_elite_num_generations_cutoff
                     ),
-                    "Declaring champion:", self.champion_model
+                    "\nDeclaring champion:", self.champion_model
                 ]
             )
             # check if elite model hasn't changed in last N generations
