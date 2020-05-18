@@ -427,7 +427,6 @@ class GeneticAlgorithmQMLA():
     def elite_ranking_top_n_models(
         self, 
         model_fitnesses,
-        # num_protected_elite_models = 2,
         **kwargs
     ):
         try:
@@ -540,11 +539,9 @@ class GeneticAlgorithmQMLA():
             self.chromosome_string(self.map_model_to_chromosome(mod)) : (truncated_model_fitnesses[mod] / sum_fitnesses)
             for mod in truncated_model_list
         }
-        self.log_print(
-            [
+        self.log_print([
                 "Chromosome Selection probabilities:\n", model_probabilities
-            ]
-        )
+        ])
         return model_probabilities
 
 
@@ -553,12 +550,10 @@ class GeneticAlgorithmQMLA():
         chromosome_probabilities,
         force_mutation=False,
     ):
-        self.log_print(
-            [
-                "Setting up chromosome pair dataframe with initial probabilities", 
-                chromosome_probabilities
-            ]
-        )
+        self.log_print([
+            "Setting up chromosome pair dataframe with initial probabilities", 
+            chromosome_probabilities
+        ])
         self.chrom_pair_df = pd.DataFrame(
             columns = ['c1', 'c2', 'probability', 'cut1', 'c1_prob', 'c2_prob', 'force_mutation'] 
         )
@@ -677,11 +672,9 @@ class GeneticAlgorithmQMLA():
                 )
             if len(self.chrom_pair_df) == 0 :
                 # already tried every available pair 
-                self.log_print(
-                    [
-                        "Redrawing chromosome pair selection dataframe, enforcing mutation"
-                    ]
-                )
+                self.log_print([
+                    "Redrawing chromosome pair selection dataframe, enforcing mutation"
+                ])
                 self.prepare_chromosome_pair_dataframe(
                     chromosome_probabilities=chromosome_selection_probabilities,
                     force_mutation=True
@@ -690,16 +683,9 @@ class GeneticAlgorithmQMLA():
             #     num_loops_to_find_new_chromosome += 1
             #     if num_loops_to_find_new_chromosome > 15:
             #         force_mutation = True
-            #         self.log_print(
-            #             [
-            #                 "Forcing mutation bc num loops to find new chromosome above limit"
-            #             ]
-            #         )
-            #     self.log_print(
-            #         [
-            #             "{} or {} already present in {}".format(c0_str, c1_str, proposed_chromosomes)
-            #         ]
-            #     )
+            #         self.log_print([
+            #             "Forcing mutation bc num loops to find new chromosome above limit of 15"
+            #         ])
 
         # chop extra chromosomes if generated
         proposed_chromosomes = proposed_chromosomes[:num_models_for_next_generation]
