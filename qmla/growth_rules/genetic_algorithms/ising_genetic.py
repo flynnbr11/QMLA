@@ -105,4 +105,4 @@ class IsingGenetic(
         self.max_time_to_consider = 15
         self.min_param = 0.485
         self.max_param = 0.515
-        self.timing_insurance_factor = 30
+        self.timing_insurance_factor = 15
