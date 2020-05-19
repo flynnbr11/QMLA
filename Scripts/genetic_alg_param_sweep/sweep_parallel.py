@@ -11,7 +11,7 @@ from mpi4py import MPI
 import ctypes
 ctypes.CDLL("libmpi.so", mode=ctypes.RTLD_GLOBAL)
 
-from param_sweep import get_all_configurations, run_genetic_algorithm
+from param_sweep import get_all_configurations, run_genetic_algorithm, analyse_results
 
 # globals  
 TAGS = {
@@ -38,7 +38,7 @@ def master():
     ga_results_df = pd.DataFrame() 
 
     # get configurations to cycle over
-    all_configurations = get_all_configurations(
+    all_configurations, configuration_df = get_all_configurations(
         log_file = os.path.join(
             os.getcwd(), 'output.log'
         ),
@@ -94,22 +94,32 @@ def master():
                 )
 
     # store the result
-    result_directory = os.path.join(os.getcwd(), 'results')
-    if not result_directory: os.makedirs(result_directory)
 
     now = datetime.datetime.now()
-    time = "{}_{}_{}_{}".format(
+    date = "{}_{}".format(
         now.strftime("%b"),
         now.strftime("%d"),
+    )
+    time = "{}_{}".format(
         now.strftime("%H"),
         now.strftime("%M"),
     )
-    path_to_store_result = os.path.join(
-        result_directory, 
-        'results_{}.csv'.format(time)
+
+    result_directory = os.path.join(os.getcwd(), 'results', date, time)
+    print("Making ", result_directory, flush=True)
+    if not os.path.exists(result_directory): 
+        try:
+            os.makedirs(result_directory)
+            print("Directory made", flush=True)
+        except:
+            print("Failed to make dir", flush=True)
+            raise
+
+    analyse_results(
+        ga_results_df, 
+        configuration_df, 
+        result_directory
     )
-    ga_results_df.to_csv( path_to_store_result )
-    print("[MASTER] Results stored at:", path_to_store_result, flush=True)
     # FINISHED 
 
 
