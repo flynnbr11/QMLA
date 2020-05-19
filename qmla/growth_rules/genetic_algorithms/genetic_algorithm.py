@@ -22,6 +22,7 @@ class GeneticAlgorithmQMLA():
         mutation_method = 'element_wise', 
         crossover_method = 'one_point',
         num_protected_elite_models = 2, 
+        unchanged_elite_num_generations_cutoff = 4,
         log_file=None, 
     ):
         self.num_sites = num_sites
@@ -54,7 +55,7 @@ class GeneticAlgorithmQMLA():
         self.num_protected_elite_models = num_protected_elite_models
         self.terminate_early_if_top_model_unchanged = True
         self.best_model_unchanged = False
-        self.unchanged_elite_num_generations_cutoff = 6 #TODO put as 5 - 2 for tests
+        self.unchanged_elite_num_generations_cutoff = unchanged_elite_num_generations_cutoff
 
         # specifying which functionality to use
         self.selection_method = self.select_from_pair_df_remove_selected
