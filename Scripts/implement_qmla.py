@@ -466,6 +466,17 @@ else:
         open(results_file, "wb"),
         protocol=4
     )
+    pickle.dump(
+        qmla_instance.storage, 
+        open(
+            os.path.join(
+                qmla_controls.results_directory, 
+                'storage_{}.p'.format(qmla_controls.long_id), 
+            ), 
+            'wb'
+        ),
+        protocol = 4, 
+    )
 
 #########################
 # Wrap up

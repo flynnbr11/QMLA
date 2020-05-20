@@ -91,3 +91,16 @@ def format_experiment(model, final_learned_params, time):
     return exp
 
 def flatten(l): return [item for sublist in l for item in sublist]
+
+
+class StorageUnit():
+    r""" 
+    Generic object which can be pickled for later use. 
+    """
+    def __init__(self, data_to_store):
+
+        for k in data_to_store:
+            self.__setattr__(
+                k, 
+                data_to_store[k]
+            )

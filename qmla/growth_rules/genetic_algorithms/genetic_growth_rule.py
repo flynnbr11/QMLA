@@ -151,16 +151,14 @@ class Genetic(
         model_list,
         **kwargs
     ):
-        # print("[Genetic] Calling generate_models")
         self.spawn_step += 1
-        self.log_print(
-            [
-                "Spawn step:", self.spawn_step
-            ]
-        )
+        self.log_print([
+            "Spawn step:", self.spawn_step
+        ])
         model_points = kwargs['branch_model_points']
         self.model_points_at_step[self.spawn_step] = model_points
         evaluation_log_likelihoods = kwargs['evaluation_log_likelihoods']
+        model_names_ids = kwargs['model_names_ids']
         sum_wins = sum(list(model_points.values()))
         model_ids = list(model_points.keys())
 
@@ -206,6 +204,23 @@ class Genetic(
             m : ratings_by_name[m]/sum_ratings
             for m in ratings_by_name
         }
+        # log likelihoods evaluated against test data
+        self.log_print(["Eval log likels:", evaluation_log_likelihoods])
+        ll_to_score = {
+            a : -1/evaluation_log_likelihoods[a]
+            for a in evaluation_log_likelihoods
+        }
+        s = sum(ll_to_score.values())
+        for a in ll_to_score:
+            ll_to_score[a] /= s
+
+        # sum_log_likelihoods = sum(evaluation_log_likelihoods.values())
+        log_likelihoods = {
+            model_names_ids[mod] : ll_to_score[mod]
+            for mod in evaluation_log_likelihoods
+        }
+        self.log_print(["Eval log likels:", log_likelihoods])
+
 
         # store info on each model for analysis
         for m in model_ids:
@@ -308,16 +323,31 @@ class Genetic(
                     ignore_index=True
                 )
             )
+            self.fitness_df = (
+                self.fitness_df.append(
+                    pd.Series(
+                        {
+                            'generation' : self.spawn_step,
+                            'f_score' : model_f_scores[mod], 
+                            'fitness' : log_likelihoods[mod], 
+                            'fitness_type' : 'log_likelihoods',
+                            'active_fitness_method' : self.fitness_method=='log_likelihoods',
+                        }
+                    ),
+                    ignore_index=True
+                )
+            )
         
         self.log_print(
             [
-                'Generation {} \nModel Win numbers: \n{} \nF-scores: \n{} \nWin ratio:\n{} \nModel Ratings:\n{} \nRanking: \n{}'.format(
+                'Generation {} \nModel Win numbers: \n{} \nF-scores: \n{} \nWin ratio:\n{} \nModel Ratings:\n{} \nRanking: \n{} \nlog_likelihoods: \n{}'.format(
                     self.spawn_step,
                     model_number_wins,
                     model_f_scores,
                     model_win_ratio,
                     ratings_by_name, 
-                    model_points_distributed_by_ranking
+                    model_points_distributed_by_ranking,
+                    log_likelihoods
                 )                
             ]
         )
@@ -333,6 +363,8 @@ class Genetic(
             genetic_algorithm_fitnesses = model_number_wins
         elif self.fitness_method == 'ranking':
             genetic_algorithm_fitnesses = model_points_distributed_by_ranking
+        elif self.fitness_method == 'log_likelihoods':
+            genetic_algorithm_fitnesses = log_likelihoods
         else:
             self.log_print(["No fitness method selected for genetic algorithm"])
 
@@ -517,6 +549,7 @@ class Genetic(
     def growth_rule_finalise(
         self
     ):        
+        self.growth_rule_specific_data_to_store['fitness_correlations'] = dict(self.fitness_correlations)
         chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
         dud_chromosome = str('1' +'0'*self.genetic_algorithm.num_terms)
         if dud_chromosome in chromosomes:
@@ -601,13 +634,21 @@ class Genetic(
         save_directory,
         qmla_id=0, 
     ):
+
+        
+        self.plot_correlation_fitness_with_f_score(
+            save_to_file = os.path.join(
+                save_directory, 
+                'correlations_bw_fitness_and_f_score{}.png'.format(qmla_id)
+            )
+        )
+
         self.plot_fitness_v_fscore_by_generation(
             save_to_file = os.path.join(
                 save_directory, 
                 'fitness_types_{}.png'.format(qmla_id)
             )
         )
-
         self.plot_fitness_v_fscore(
             save_to_file = os.path.join(
                 save_directory, 
@@ -620,6 +661,57 @@ class Genetic(
                 'fitness_v_generation_{}.png'.format(qmla_id)
             )
         )
+
+    def plot_correlation_fitness_with_f_score(
+        self,
+        save_to_file
+    ):
+        plt.clf()
+        correlations = pd.DataFrame(
+            columns = ['Generation', 'Method', 'Correlation']
+        )
+        fitness_types_to_ignore = ['f_score', 'model_hamming_distances']
+        for t in self.fitness_df.fitness_type.unique():
+            if t not in fitness_types_to_ignore:
+                this_fitness_type = self.fitness_df[
+                    self.fitness_df['fitness_type'] == t
+                ]
+                
+                for g in this_fitness_type.generation.unique():
+                    this_type_this_gen = this_fitness_type[
+                        this_fitness_type.generation == g
+                    ]
+                    
+                    corr = this_type_this_gen['f_score'].corr(
+                        this_type_this_gen['fitness']
+                    )
+                    
+                    corr = {
+                        'Generation' : g,
+                        'Method' : t, 
+                        'Correlation' : corr
+                    }
+                    correlations = correlations.append(
+                        pd.Series(corr),
+                        ignore_index=True
+                    )
+                
+        self.fitness_correlations = correlations
+        self.log_print(["fitness correlations:\n", self.fitness_correlations])
+        fig, ax = plt.subplots(figsize=(15, 10))
+        sns.lineplot(
+            y = 'Correlation', 
+            x = 'Generation', 
+            # style= 'Method', 
+            hue = 'Method',
+            data = correlations,
+            ax = ax,
+            markers = ['*', 'X', '<', '^'],
+        )
+        ax.axhline(0, ls='--', c='k')
+        plt.savefig(save_to_file)
+
+
 
     def plot_fitness_v_generation(self, save_to_file=None):
         import matplotlib.pyplot as plt

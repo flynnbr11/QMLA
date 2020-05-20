@@ -26,6 +26,7 @@ import qmla.model_for_storage
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation
 from qmla.remote_model_learning import remote_learn_model_parameters
 import qmla.tree
+import qmla.utilities
 
 pickle.HIGHEST_PROTOCOL = 4  # if <python3, must use lower protocol
 plt.switch_backend('agg')
@@ -1799,6 +1800,8 @@ class QuantumModelLearningAgent():
             # data stored during GrowthRule.growth_rule_finalise():
             'GrowthRuleStorageData': self.growth_class.growth_rule_specific_data_to_store,
         }
+
+        self.storage = qmla.utilities.StorageUnit(results_dict)
 
         return results_dict
 
