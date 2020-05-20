@@ -12,8 +12,9 @@
 # test_description='fixed-lattice__test__heis-6-sites-qhl__2-proc'
 # test_description='fixed-lattice__fermi-hubbard-qmla'
 # test_description='qhl-TIME-TEST'
-test_description='nv_simulation_3-sites-6-terms__QHL'
-# test_description="genetic-algorithm__ising-model"
+# test_description='nv_simulation__QHL__learn-MHz-with-uncertainty-on-GHz-terms'
+# test_description="genetic-algorithm__32x4__thin-prior-test"
+test_description='focussed-learning__3-param__learning-GHz'
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -21,7 +22,7 @@ test_description='nv_simulation_3-sites-6-terms__QHL'
 ### ---------------------------------------------------###
 
 ## Type/number of QMD(s) to run.
-num_tests=20
+num_tests=5
 num_processes_to_request=6
 qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
 min_id=0 # update so instances don't clash and hit eachother's redis databases
@@ -32,8 +33,8 @@ experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters.
-e=500 # experiments
-p=3000 # particles
+e=250 # experiments
+p=1000 # particles
 ra=0.98 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -47,12 +48,13 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 ### ---------------------------------------------------###
 
 growth_rule='SimulatedNVCentre'
+# growth_rule='IsingGenetic'
 # growth_rule='FermiHubbardLatticeSet'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='IsingSharedField'
 # growth_rule='Genetic'
-# growth_rule='IsingGenetic'
+
 
 # Simulation growth rule
 # sim_growth_rule='IsingProbabilistic'
@@ -233,7 +235,7 @@ printf "$day_time: \t $test_description \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; r
 force_plot_plus=0
 special_probe='random' #'ideal'
 special_probe_plot='random'
-time_request_insurance_factor=1
+time_request_insurance_factor=3
 if (( "$bin_times_bayes_factors" == 1))
 then
 	let time_request_insurance_factor="2*$time_request_insurance_factor"
@@ -362,7 +364,7 @@ do
 									this_output_file="$OUT_LOG/$output_file""_$qmd_id.txt"
 									printf "$day_time: \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; rp=$rp; qid=$qmd_id; seconds=$seconds_reqd; noise=$probe_noise_level; bintimesBF=$bin_times_bayes_factors \n" >> QMD_all_tasks.log
 
-									qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,ROOT_DIR=$qmd_dir,QMD_ID=$qmd_id,QHL=$qhl,MULTIPLE_QHL=$multiple_qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PGH_EXPONENT=$pgh_exp,PGH_INCREASE=$pgh_increase,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,STORE_PARTICLES_WEIGHTS=$store_particles_weights,DATA_MAX_TIME=$data_max_time,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,NUM_PROBES=$num_probes,SPECIAL_PROBE=$special_probe,PROBE_NOISE=$probe_noise_level,RESOURCE_REALLOCATION=$resource_reallocation,UPDATER_FROM_PRIOR=$updater_from_prior,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma,BIN_TIMES_BAYES=$bin_times_bayes_factors,BF_ALL_TIMES=$use_all_times_bf -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_qmd_instance.sh
+									qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,ROOT_DIR=$qmd_dir,QMD_ID=$qmd_id,QHL=$qhl,MULTIPLE_QHL=$multiple_qhl,FURTHER_QHL=0,EXP_DATA=$experimental_data,GLOBAL_SERVER=$global_server,RESULTS_DIR=$full_path_to_results,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PGH_EXPONENT=$pgh_exp,PGH_INCREASE=$pgh_increase,PLOTS=$do_plots,PICKLE_QMD=$pickle_class,BAYES_CSV=$all_qmd_bayes_csv,CUSTOM_PRIOR=$custom_prior,STORE_PARTICLES_WEIGHTS=$store_particles_weights,DATA_MAX_TIME=$data_max_time,GROWTH=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$true_params_pickle_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$true_expec_path,PLOT_PROBES=$plot_probe_file,NUM_PROBES=$num_probes,SPECIAL_PROBE=$special_probe,PROBE_NOISE=$probe_noise_level,RESOURCE_REALLOCATION=$resource_reallocation,UPDATER_FROM_PRIOR=$updater_from_prior,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma,BIN_TIMES_BAYES=$bin_times_bayes_factors,BF_ALL_TIMES=$use_all_times_bf -N $this_qmd_name -l $node_req,$time -o $this_output_file -e $this_error_file run_single_qmla_instance.sh
 
 								done
 							done

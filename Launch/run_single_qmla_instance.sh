@@ -1,0 +1,138 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=5,walltime=00:06:00
+
+print_passed_variables = 1
+if (( "$print_passed_variables" == 1 ))
+then
+	echo "
+	Inside run_qmd script. \m
+	QMD_ID=$QMD_ID \n
+	QHL=$QHL \n
+	SCRIPT_DIR = $SCRIPT_DIR
+	"
+fi
+rm dump.rdb 
+
+let NUM_WORKERS="$PBS_NUM_NODES * $PBS_NUM_PPN"
+let REDIS_PORT="6300 + $QMD_ID"
+host=$(hostname)
+running_dir=$RUNNING_DIR
+lib_dir=$LIBRARY_DIR
+script_dir=$SCRIPT_DIR
+root_dir=$ROOT_DIR
+echo "QMD ID = $QMD_ID; REDIS_PORT=$REDIS_PORT"
+echo "Global server: $GLOBAL_SERVER"
+echo "Running directory: $running_dir"
+echo "Library directory: $lib_dir"
+echo "Script directory: $script_dir"
+
+if (( "$MULTIPLE_GROWTH_RULES" == 0))
+then
+	ALT_GROWTH=""
+fi
+
+# assumed to be running on backend, where redis is loaded as below
+module load tools/redis-4.0.8
+# module load languages/intel-compiler-16-u2
+
+SERVER_HOST=$(head -1 "$PBS_NODEFILE")
+cd $lib_dir
+#cd $script_dir
+redis-server RedisDatabaseConfig.conf --protected-mode no --port $REDIS_PORT & 
+redis-cli -p $REDIS_PORT flushall
+
+#cd $lib_dir
+echo "Going in to launch redis script"
+echo "If this fails -- ensure permission enabled on RedisLaunch script in library"
+
+sleep 4 # this might need to be increased?
+
+set -x
+job_id=$PBS_JOBID
+
+job_number="$(cut -d'.' -f1 <<<"$job_id")"
+echo "Job id is $job_number"
+echo "$job_number" >> $RESULTS_DIR/job_ids_started.txt
+cd $running_dir
+mkdir -p $running_dir/logs
+mkdir -p $PBS_O_WORKDIR/logs
+
+
+
+# The redis server is started on the first node.
+REDIS_URL=redis://$SERVER_HOST:$REDIS_PORT
+echo "REDIS_URL : $REDIS_URL"
+QMD_LOG_DIR="$RESULTS_DIR/logs"
+OUTPUT_ERROR_DIR="$RESULTS_DIR/output_and_error_logs"
+mkdir -p $QMD_LOG_DIR
+QMD_JOB=$PBS_JOBNAME
+echo "PBS job name is $QMD_JOB"
+QMD_LOG="$QMD_LOG_DIR/$QMD_JOB.qmd.$job_number.log"
+
+
+# Create the node file ---------------
+# 
+cat $PBS_NODEFILE
+export nodes=`cat $PBS_NODEFILE`
+export nnodes=`cat $PBS_NODEFILE | wc -l`
+export confile="$OUTPUT_ERROR_DIR/node_info.$QMD_JOB.conf"
+for i in $nodes; do
+	echo ${i} >>$confile
+done
+# -------------------------------------
+
+
+# Launch RQ workers from QMLA root directory so that import statements calling qmla are understood
+cd $ROOT_DIR
+
+let NUM_RQ_WORKERS="$NUM_WORKERS-1"
+echo "Launching RQ workers on $NUM_RQ_WORKERS nodes. \n Directory: \\ $ROOT_DIR. log:$QMD_LOG \\ results dir: $RESULTS_DIR"
+echo "Test" > $QMD_LOG
+set -x 
+# mpirun -print-rank-map -prepend-rank \
+mpirun --display-map --tag-output \
+	-np 1 \
+	python3 Scripts/implement_qmla.py \
+	-rq=1 \
+	-qhl=$QHL \
+	-fq=$FURTHER_QHL \
+	-mqhl=$MULTIPLE_QHL \
+	-rq=1 \
+	-p=$NUM_PARTICLES \
+	-e=$NUM_EXP \
+	-bt=$NUM_BAYES \
+	-rt=$RESAMPLE_T \
+	-ra=$RESAMPLE_A \
+	-qid=$QMD_ID \
+	-host=$SERVER_HOST \
+	-port=$REDIS_PORT \
+	-log=$QMD_LOG \
+	-dir=$RESULTS_DIR \
+	-pgh=$RESAMPLE_PGH \
+	-pgh_exp=$PGH_EXPONENT \
+	-pgh_incr=$PGH_INCREASE \
+	-pt=$PLOTS \
+	-pkl=$PICKLE_QMD \
+	-cb=$BAYES_CSV \
+	-exp=$EXP_DATA \
+	-prior_path=$PRIOR_FILE \
+	-true_params_path=$TRUE_PARAMS_FILE \
+	-true_expec_path=$TRUE_EXPEC_PATH \
+	-plot_probes=$PLOT_PROBES \
+	-latex=$LATEX_MAP_FILE \
+	-resource=$RESOURCE_REALLOCATION \
+	-ggr=$GROWTH \
+	$ALT_GROWTH \
+	> $RESULTS_DIR/output_and_error_logs/profile_$QMD_ID.txt \
+	: \
+	-np $NUM_RQ_WORKERS \
+	-machinefile $confile rq worker $QMD_ID -u $REDIS_URL >> $QMD_LOG_DIR/$QMD_JOB.worker.$job_number.log 2>&1 
+
+echo "Finished at $(date +%H:%M:%S); results dir: $RESULTS_DIR"
+#	> $RESULTS_DIR/output_and_error_logs/terminal_output_$QMD_ID.txt \
+
+
+#redis-cli -p $REDIS_PORT flushall
+#redis-cli -p $REDIS_PORT shutdown
+echo "$job_number" >> $RESULTS_DIR/job_ids_completed.txt
+echo "QMD $QMD_ID Finished; end of script at Time: $(date +%H:%M:%S)"
