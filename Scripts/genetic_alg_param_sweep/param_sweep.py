@@ -26,6 +26,7 @@ def run_genetic_algorithm(configuration):
             selection_method = configuration['selection_method'],
             crossover_method = configuration['crossover_method'],
             mutation_probability = configuration['mutation_probability'], 
+            unchanged_elite_num_generations_cutoff = 3, # TODO make part of config
             log_file = configuration['log_file']
         )
         new_models = ga.random_initial_models(
@@ -42,6 +43,8 @@ def run_genetic_algorithm(configuration):
             new_models = ga.genetic_algorithm_step(
                 model_fitnesses = model_f_scores
             )
+            if ga.best_model_unchaged:
+                print("Best model unchaged; terminating early.")
 
         champion = ga.models_ranked_by_fitness[ max(ga.models_ranked_by_fitness)][0]
         champ_f_score = ga.model_f_score(champion)
@@ -60,13 +63,13 @@ def get_all_configurations(
     log_file=None,
 ):
     # set up hyper parameters to sweep over
-    test_setup = False
+    test_setup = True
     if test_setup: 
         print("Getting reduced set of configurations to test.")
         number_of_iterations = 2
         numbers_of_sites = [5]
-        numbers_of_generations = [4, ]
-        starting_populations = [4, ]
+        numbers_of_generations = [16, ]
+        starting_populations = [8, ]
         elite_models_protected = [1, ]
         mutation_probabilities = [0.1, ]
         selection_methods = ['roulette']
