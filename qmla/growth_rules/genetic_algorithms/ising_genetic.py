@@ -82,8 +82,8 @@ class IsingGenetic(
             num_models=self.initial_num_models
         )
         # test force true model to appear in first generation
-        if self.true_model not in self.initial_models:
-            self.initial_models[-1] = self.true_model
+        # if self.true_model not in self.initial_models:
+        #     self.initial_models[-1] = self.true_model
         self.hamming_distance_by_generation_step = {
             0: [
                 hamming_distance(

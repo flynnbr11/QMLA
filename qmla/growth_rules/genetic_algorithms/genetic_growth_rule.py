@@ -639,7 +639,7 @@ class Genetic(
         self.plot_correlation_fitness_with_f_score(
             save_to_file = os.path.join(
                 save_directory, 
-                'correlations_bw_fitness_and_f_score{}.png'.format(qmla_id)
+                'correlations_bw_fitness_and_f_score_{}.png'.format(qmla_id)
             )
         )
 
