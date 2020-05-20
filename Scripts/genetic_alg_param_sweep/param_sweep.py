@@ -26,7 +26,7 @@ def run_genetic_algorithm(configuration):
             selection_method = configuration['selection_method'],
             crossover_method = configuration['crossover_method'],
             mutation_probability = configuration['mutation_probability'], 
-            unchanged_elite_num_generations_cutoff = 3, # TODO make part of config
+            unchanged_elite_num_generations_cutoff = configuration['unchanged_elite_num_generations_cutoff'], 
             log_file = configuration['log_file']
         )
         new_models = ga.random_initial_models(
@@ -43,8 +43,12 @@ def run_genetic_algorithm(configuration):
             new_models = ga.genetic_algorithm_step(
                 model_fitnesses = model_f_scores
             )
-            if ga.best_model_unchaged:
-                print("Best model unchaged; terminating early.")
+            if ga.best_model_unchanged:
+                print("Best model unchaged; terminating early.", flush=True)
+                break
+            else:
+                print("Best model has chaged.", flush=True)
+        print("Finished generations.", flush=True)
 
         champion = ga.models_ranked_by_fitness[ max(ga.models_ranked_by_fitness)][0]
         champ_f_score = ga.model_f_score(champion)
@@ -72,6 +76,7 @@ def get_all_configurations(
         starting_populations = [8, ]
         elite_models_protected = [1, ]
         mutation_probabilities = [0.1, ]
+        unchanged_gen_count_for_termination = [3]        
         selection_methods = ['roulette']
         mutation_methods = ['element_wise']
         crossover_methods = ['one_point']
@@ -84,6 +89,7 @@ def get_all_configurations(
         starting_populations = [4, 8, 16, 32]
         elite_models_protected = [0, 1, 2, 3]
         mutation_probabilities = [0, 0.1, 0.25, 0.33]
+        unchanged_gen_count_for_termination = [3, 6, 10],
         selection_methods = ['roulette']
         mutation_methods = ['element_wise']
         crossover_methods = ['one_point']
@@ -98,30 +104,32 @@ def get_all_configurations(
             for p in starting_populations: 
                 for m in mutation_probabilities: 
                     for e in elite_models_protected: 
-                        for sel_meth in selection_methods: 
-                            for mut_meth in mutation_methods: 
-                                for cross_meth in crossover_methods:         
-                                    config_id += 1
-                                    # resources needed, i.e. scale of how many Hamiltonian exponentiations required
-                                    resources = g*(p + scipy.special.comb(p, 2)) 
-                                    config = {
-                                        'number_generations' : g,
-                                        'number_sites' : s,
-                                        'starting_population_size' : p, 
-                                        'mutation_probability' : m,
-                                        'selection_method' : sel_meth, 
-                                        'mutation_method' : mut_meth, 
-                                        'crossover_method' : cross_meth,
-                                        'num_protected_elite_models' : e,
-                                        'config_id' : config_id, 
-                                        'resources' : resources,
-                                        'log_file' : log_file
-                                    }
-                                    all_configurations.append(config)
-                                    configuration_df = configuration_df.append(
-                                        pd.Series(config), 
-                                        ignore_index=True
-                                    )
+                        for u in unchanged_gen_count_for_termination:
+                            for sel_meth in selection_methods: 
+                                for mut_meth in mutation_methods: 
+                                    for cross_meth in crossover_methods:         
+                                        config_id += 1
+                                        # resources needed, i.e. scale of how many Hamiltonian exponentiations required
+                                        resources = g*(p + scipy.special.comb(p, 2)) 
+                                        config = {
+                                            'number_generations' : g,
+                                            'number_sites' : s,
+                                            'starting_population_size' : p, 
+                                            'mutation_probability' : m,
+                                            'selection_method' : sel_meth, 
+                                            'mutation_method' : mut_meth, 
+                                            'crossover_method' : cross_meth,
+                                            'num_protected_elite_models' : e,
+                                            'unchanged_elite_num_generations_cutoff' : u, 
+                                            'config_id' : config_id, 
+                                            'resources' : resources,
+                                            'log_file' : log_file
+                                        }
+                                        all_configurations.append(config)
+                                        configuration_df = configuration_df.append(
+                                            pd.Series(config), 
+                                            ignore_index=True
+                                        )
     
     all_configurations = all_configurations * number_of_iterations
     
