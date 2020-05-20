@@ -663,14 +663,14 @@ class Genetic(
 
         g = sns.FacetGrid(
             candidate_fitnesses,
-            col ='generation',
+            row ='generation',
             hue='fitness_type',
             hue_kws=dict(marker=["x", "+", "*"]),
-            col_wrap=5, 
-            xlim=(0,1), 
-            ylim=(0,1),
-            size=2, 
-            aspect=1
+            # col_wrap=5, 
+            xlim=(-0.1, 1.1), 
+            # ylim=(0,1),
+            size=4, 
+            aspect=2
         )
         g = (
             g.map(plt.scatter,  'f_score', 'fitness').add_legend()
