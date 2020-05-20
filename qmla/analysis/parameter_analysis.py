@@ -120,8 +120,8 @@ def average_parameters_across_instances(
 
     return learned_priors
 
-
 def average_parameter_estimates(
+
     directory_name,
     results_path,
     results_file_name_start='results',
@@ -299,13 +299,13 @@ def average_parameter_estimates(
             except BaseException:
                 pass
 
-            ax.axhline(
-                0,
-                linestyle='--',
-                alpha=0.5,
-                color='black',
-                label='0'
-            )
+            # ax.axhline(
+            #     0,
+            #     linestyle='--',
+            #     alpha=0.5,
+            #     color='black',
+            #     label='0'
+            # )
             fill_between_sigmas(
                 ax,
                 parameters[term],

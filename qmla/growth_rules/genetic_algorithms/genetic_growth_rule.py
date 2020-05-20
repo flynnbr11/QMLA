@@ -645,7 +645,6 @@ class Genetic(
         sns.set(rc={'figure.figsize':(11.7,8.27)})
 
         cmap = sns.cubehelix_palette(dark=.3, light=.8, as_cmap=True)
-        # bplot = 
         sns.scatterplot(
             x='f_score', 
             y='model_elo_ratings', 
@@ -670,7 +669,7 @@ class Genetic(
         ax.set_xlabel('F score')
         ax.set_ylabel('Fitness (as probability)')
         # bplot.set_ylim((0,1))
-        ax.set_xlim((0,1))
+        ax.set_xlim((-0.05,1.05))
         ax.figure.savefig(save_to_file)
 
 

@@ -76,11 +76,14 @@ class IsingGenetic(
         # default test - 32 generations x 16 starters
         self.fitness_method = 'ranking' # 'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = False
-        self.max_spawn_depth = 32
+        self.max_spawn_depth = 2
         self.initial_num_models = 4
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
+        # test force true model to appear in first generation
+        if self.true_model not in self.initial_models:
+            self.initial_models[-1] = self.true_model
         self.hamming_distance_by_generation_step = {
             0: [
                 hamming_distance(

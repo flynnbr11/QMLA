@@ -400,7 +400,6 @@ class GeneticAlgorithmQMLA():
                     c[idx] = '1'
                 elif int(c[idx]) == 1:
                     c[idx] = '0'
-                self.log_print(["After:", repr(c)])
             mutated_chromosomes.append(c)
         return mutated_chromosomes
 
