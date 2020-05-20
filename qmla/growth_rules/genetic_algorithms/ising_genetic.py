@@ -77,7 +77,7 @@ class IsingGenetic(
         self.fitness_method = 'ranking' # 'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = False
         self.max_spawn_depth = 2
-        self.initial_num_models = 4
+        self.initial_num_models = 15
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )

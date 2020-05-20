@@ -6,8 +6,11 @@ import random
 import copy
 import scipy
 import time
+
 import pandas as pd
 import sklearn
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from qmla.growth_rules import growth_rule
 import qmla.shared_functionality.probe_set_generation
@@ -211,7 +214,7 @@ class Genetic(
             hamming_dist = self.hamming_distance_model_comparison(
                 test_model = mod
             ) # for fitness use 1/H
-            model_hamming_distances[mod] = self.genetic_algorithm.num_terms - hamming_dist
+            model_hamming_distances[mod] = (self.genetic_algorithm.num_terms - hamming_dist)/self.genetic_algorithm.num_terms
             model_f_scores[mod] = self.f_score_model_comparison(
                 test_model = mod, 
             )
@@ -598,6 +601,13 @@ class Genetic(
         save_directory,
         qmla_id=0, 
     ):
+        self.plot_fitness_v_fscore_by_generation(
+            save_to_file = os.path.join(
+                save_directory, 
+                'fitness_types_{}.png'.format(qmla_id)
+            )
+        )
+
         self.plot_fitness_v_fscore(
             save_to_file = os.path.join(
                 save_directory, 
@@ -637,9 +647,39 @@ class Genetic(
             plt.savefig(save_to_file)
 
 
+    def plot_fitness_v_fscore_by_generation(
+        self, save_to_file
+    ):
+        plt.clf()
+        sanity_check_df = self.fitness_df[ 
+            (self.fitness_df['fitness_type'] == 'f_score') 
+            | (self.fitness_df['fitness_type'] == 'model_hamming_distances') 
+        ]
+        candidate_fitnesses = self.fitness_df[ 
+            (self.fitness_df['fitness_type'] == 'elo_rating') 
+            | (self.fitness_df['fitness_type'] == 'ranking') 
+            | (self.fitness_df['fitness_type'] == 'model_win_ratio') 
+        ]
+
+        g = sns.FacetGrid(
+            candidate_fitnesses,
+            col ='generation',
+            hue='fitness_type',
+            hue_kws=dict(marker=["x", "+", "*"]),
+            col_wrap=5, 
+            xlim=(0,1), 
+            ylim=(0,1),
+            size=2, 
+            aspect=1
+        )
+        g = (
+            g.map(plt.scatter,  'f_score', 'fitness').add_legend()
+        )
+        plt.savefig(save_to_file)
+
+
+
     def plot_fitness_v_fscore(self, save_to_file):
-        import matplotlib.pyplot as plt
-        import seaborn as sns
         plt.clf()
         fig, ax = plt.subplots()
         sns.set(rc={'figure.figsize':(11.7,8.27)})
