@@ -102,12 +102,12 @@ class IsingGenetic(
 
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
-            self.num_sites : (self.initial_num_models * self.max_spawn_depth)/10,
+            self.num_sites : (len(self.initial_models) * self.max_spawn_depth),
             'other': 0
         }
-        self.num_processes_to_parallelise_over = self.initial_num_models + 1
+        self.num_processes_to_parallelise_over = len(self.initial_models) + 1
 
         self.max_time_to_consider = 15
         self.min_param = 0.485
         self.max_param = 0.515
-        self.timing_insurance_factor = 15
+        self.timing_insurance_factor = 1

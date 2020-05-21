@@ -4,8 +4,12 @@ import pickle
 import pandas as pd
 pickle.HIGHEST_PROTOCOL = 4
 
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 __all__ = [
     'collect_results_store_csv',
+    'generate_combined_datasets',
     'count_model_occurences'
 ]
 
@@ -69,6 +73,63 @@ def collect_results_store_csv(
 
     collected_results = pd.read_csv(results_csv)
     return collected_results
+
+
+
+def generate_combined_datasets(
+    directory_name,
+    results_file_name_start="results",
+    results_csv_name="results.csv", 
+):
+
+    pickled_files = []
+    for file in os.listdir(directory_name):
+        # TODO unload storage objects instead??
+        # then could pickle more e.g. pd DataFrames directly
+        if (
+            file.endswith(".p")
+            and
+            file.startswith(results_file_name_start)
+        ):
+            pickled_files.append(file)
+    filenames = [directory_name + str(f) for f in pickled_files]
+
+    # datasets to store
+    fitness_correlations = pd.DataFrame()
+
+    for f in filenames:
+        result = pickle.load(open(f, 'rb'))
+        result_id = result['QID']
+
+        try:
+            correlations = pd.DataFrame(result['GrowthRuleStorageData']['fitness_correlations'])
+            correlations['qmla_id'] = result_id
+            fitness_correlations = fitness_correlations.append(
+                correlations, 
+                ignore_index = True
+            )
+        except:
+            pass
+
+
+    try:
+        # fitness_correlations.to_csv(
+        #     os.path.join(directory_name, 'fitness_method_correlations.csv')
+        # )
+        fig = sns.catplot(
+            y  = 'Correlation', 
+            x='Method',
+            data = correlations,
+            kind='box'
+        )
+        fig.savefig(
+            os.path.join(
+                directory_name, "fitness_f_score_correlations.png"
+            )
+        )
+    except:
+        print("ANALYSIS FAILURE: fitness method  &  score correlations")
+        pass
 
 
 def count_model_occurences(
@@ -162,4 +223,3 @@ def count_model_occurences(
 
         )
         raise
-

@@ -289,6 +289,15 @@ if gather_summary_results:
         results_csv_name = results_csv_name, 
     )
 
+    try:
+        qmla.analysis.generate_combined_datasets(
+            directory_name = directory_to_analyse,
+            results_file_name_start = results_file_name_start,
+        )
+    except:
+        print("ANALYSIS FAILURE: number of occurences for each model.")
+        raise
+
     # Find number of occurences of each model
     # quite costly so it is optional
     plot_num_model_occurences = False 
