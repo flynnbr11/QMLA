@@ -113,6 +113,10 @@ class TreeQMLA():
 
 
     def finalise_tree(self, **kwargs):
+        last_branch = self.branches[max(self.branches.keys())]
+        kwargs['evaluation_log_likelihoods'] = last_branch.evaluation_log_likelihoods
+        kwargs['branch_model_points'] = last_branch.bayes_points
+
         self.growth_class.finalise_model_learning(
             **kwargs
         )

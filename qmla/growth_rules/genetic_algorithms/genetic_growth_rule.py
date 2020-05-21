@@ -689,15 +689,27 @@ class Genetic(
         self.fitness_correlations = correlations
         self.log_print(["fitness correlations:\n", self.fitness_correlations])
         fig, ax = plt.subplots(figsize=(15, 10))
-        sns.lineplot(
-            y = 'Correlation', 
-            x = 'Generation', 
-            # style= 'Method', 
-            hue = 'Method',
-            data = correlations,
-            ax = ax,
-            markers = ['*', 'X', '<', '^'],
-        )
+
+        if correlations.Generation.unique() == 1:
+            sns.scatterplot(
+                y = 'Correlation', 
+                x = 'Generation', 
+                # style= 'Method', 
+                hue = 'Method',
+                data = correlations,
+                ax = ax,
+                # markers = ['*', 'X', '<', '^'],
+            )
+        else:
+            sns.lineplot(
+                y = 'Correlation', 
+                x = 'Generation', 
+                # style= 'Method', 
+                hue = 'Method',
+                data = correlations,
+                ax = ax,
+                markers = ['*', 'X', '<', '^'],
+            )
         ax.axhline(0, ls='--', c='k')
         plt.savefig(save_to_file)
 

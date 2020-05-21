@@ -439,16 +439,6 @@ else:
                 ],
             )
 
-    if (
-        qmla_controls.pickle_qmd_class
-    ):
-        log_print(["QMD complete. Pickling result to",
-                   qmla_controls.class_pickle_file], 
-                  )
-        # pickle in cases where true model found
-        qmla_instance._delete_unpicklable_attributes() # TODO call from within QMLA
-        with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
-            pickle.dump(qmla_instance, pkl_file, protocol=4)
 
     qmla_instance.growth_class.growth_rule_specific_plots(
         save_directory = qmla_controls.plots_directory,
@@ -477,6 +467,17 @@ else:
         ),
         protocol = 4, 
     )
+
+    if (
+        qmla_controls.pickle_qmd_class
+    ):
+        log_print(["QMD complete. Pickling result to",
+                   qmla_controls.class_pickle_file], 
+                  )
+        # pickle in cases where true model found
+        qmla_instance._delete_unpicklable_attributes() # TODO call from within QMLA
+        with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
+            pickle.dump(qmla_instance, pkl_file, protocol=4)
 
 #########################
 # Wrap up

@@ -28,9 +28,6 @@ class IsingGenetic(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        # self.true_model = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
-        # self.true_model = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
-        # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
         self.ratings_class = qmla.growth_rules.rating_system.ELORating(
             initial_rating=1500,
             k_const=30
@@ -75,11 +72,30 @@ class IsingGenetic(
         # default test - 32 generations x 16 starters
         self.fitness_method = 'ranking' # 'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = False
-        self.max_spawn_depth = 4
+        self.max_spawn_depth = 1
         self.initial_num_models = 4
-        self.initial_models = self.genetic_algorithm.random_initial_models(
-            num_models=self.initial_num_models
-        )
+        test_fitness_models = [
+            'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J4_zJz_d5',
+            # 'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5',
+            # 'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5',
+            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5',
+            # 'pauliSet_1J2_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
+            # 'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',
+            # 'pauliSet_1J3_zJz_d5+pauliSet_2J5_zJz_d5',
+            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_4J5_zJz_d5',
+            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
+            # 'pauliSet_1J2_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
+            # 'pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
+            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
+        ]
+        self.initial_models = test_fitness_models
+
+        # self.initial_models = self.genetic_algorithm.random_initial_models(
+        #     num_models=self.initial_num_models
+        # )
         # test force true model to appear in first generation
         # if self.true_model not in self.initial_models:
         #     self.initial_models[-1] = self.true_model

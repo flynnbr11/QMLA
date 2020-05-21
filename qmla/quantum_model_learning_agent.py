@@ -1142,7 +1142,7 @@ class QuantumModelLearningAgent():
                     ),
                     "Point to", res,
                 ])
-
+        self.log_print(["Comparisons complete on branch {}".format(branch_id)])
         # analyse pairwise competition
         max_points = max(models_points.values())
         models_with_max_points = [
@@ -1187,9 +1187,10 @@ class QuantumModelLearningAgent():
         self.branches[branch_id].champion_name = champ_name
         self.branches[branch_id].rankings = ranked_model_list
         self.branches[branch_id].bayes_points = models_points
+        self.log_print(["Setting eval log like on branch"])
         self.branches[branch_id].evaluation_log_likelihoods = {
             k: self.get_model_storage_instance_by_id(k).evaluation_log_likelihood
-            for k in active_models_in_branch
+            for k in self.branches[branch_id].resident_model_ids
         }
 
 
@@ -1309,6 +1310,9 @@ class QuantumModelLearningAgent():
                 ):
                     self.branches[branch_id].comparisons_complete = True
                     # analyse resulting bayes factors
+                    self.log_print([
+                        "Branch {} comparisons starting".format(branch_id)
+                    ])
                     self.process_comparisons_within_branch(branch_id)
                     self.log_print([
                         "Branch {} comparisons complete".format(branch_id)
@@ -1317,12 +1321,12 @@ class QuantumModelLearningAgent():
                     # check if tree is complete
                     if self.branches[branch_id].tree.is_tree_complete():
                         self.tree_count_completed += 1
-                        self.branches[branch_id].tree.finalise_tree(
-                            model_names_ids=self.model_name_id_map,
-                            branch_model_points=self.branches[branch_id].bayes_points,
-                            evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods,
-                            called_by_branch=branch_id,
-                        )
+                        # self.branches[branch_id].tree.finalise_tree(
+                        #     model_names_ids=self.model_name_id_map,
+                        #     branch_model_points=self.branches[branch_id].bayes_points,
+                        #     evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods,
+                        #     called_by_branch=branch_id,
+                        # )
                         self.log_print(
                             [
                                 "Tree complete:",
@@ -1359,6 +1363,9 @@ class QuantumModelLearningAgent():
                 ):
                     self.branches[branch_id].model_learning_complete = True
                     self.compare_models_within_branch(branch_id)
+                    for mod_id in self.branches[branch_id].resident_model_ids:
+                        mod = self.get_model_storage_instance_by_id(mod_id)
+                        mod.model_update_learned_values()
 
                 if branchID_bytes in active_branches_bayes:
                     num_comparisons_complete_on_branch = (
@@ -1388,6 +1395,15 @@ class QuantumModelLearningAgent():
             ):
                 # break out of this while loop
                 still_learning = False
+
+        for tree in self.trees.values():
+            tree.finalise_tree(
+                model_names_ids=self.model_name_id_map,
+                # branch_model_points=self.branches[branch_id].bayes_points,
+                # evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods,
+                # called_by_branch=branch_id,
+            )
+
         self.log_print(["Learning stage complete on all trees."])
 
     def spawn_from_branch(
