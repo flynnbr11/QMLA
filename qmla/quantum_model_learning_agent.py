@@ -1187,6 +1187,12 @@ class QuantumModelLearningAgent():
         self.branches[branch_id].champion_name = champ_name
         self.branches[branch_id].rankings = ranked_model_list
         self.branches[branch_id].bayes_points = models_points
+        self.branches[branch_id].evaluation_log_likelihoods = {
+            k: self.get_model_storage_instance_by_id(k).evaluation_log_likelihood
+            for k in active_models_in_branch
+        }
+
+
         self.log_print([
             "Model points for branch {}: {}".format(
                 branch_id,
@@ -1305,14 +1311,18 @@ class QuantumModelLearningAgent():
                     # analyse resulting bayes factors
                     self.process_comparisons_within_branch(branch_id)
                     self.log_print([
-                        "Branch {} comparisons complete".format(
-                            branch_id
-                        )
+                        "Branch {} comparisons complete".format(branch_id)
                     ])
 
                     # check if tree is complete
                     if self.branches[branch_id].tree.is_tree_complete():
                         self.tree_count_completed += 1
+                        self.branches[branch_id].tree.finalise_tree(
+                            model_names_ids=self.model_name_id_map,
+                            branch_model_points=self.branches[branch_id].bayes_points,
+                            evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods,
+                            called_by_branch=branch_id,
+                        )
                         self.log_print(
                             [
                                 "Tree complete:",
@@ -1410,20 +1420,15 @@ class QuantumModelLearningAgent():
             self.model_name_id_map[mod_id]
             for mod_id in model_list
         ]
-        evaluation_log_likelihoods = {
-            mod:
-            self.get_model_storage_instance_by_id(
-                mod).evaluation_log_likelihood
-            for mod in model_list
-        }
+
         new_models, pairs_to_compare = self.branches[branch_id].tree.next_layer(
-            model_list=model_names,
-            log_file=self.log_file,
-            branch_model_points=self.branches[branch_id].bayes_points,
+            model_list=model_names, # can this be functionally replaced by info in branch_model_points?
             model_names_ids=self.model_name_id_map,
-            evaluation_log_likelihoods=evaluation_log_likelihoods,
-            model_dict=self.model_lists,
+            log_file=self.log_file, # tree/branch/GR already has this
             called_by_branch=branch_id,
+            branch_model_points=self.branches[branch_id].bayes_points, # can get from branch/tree
+            evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods, # can get from branch/tree
+            model_dict=self.model_lists, # is this used by any GR?
         )
 
         self.log_print(
@@ -1447,7 +1452,6 @@ class QuantumModelLearningAgent():
         self.learn_models_on_given_branch(
             new_branch_id,
             blocking=False,
-            # use_rq=True
         )
 
     def new_branch(

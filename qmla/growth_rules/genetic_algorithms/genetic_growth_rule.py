@@ -80,7 +80,7 @@ class Genetic(
             self.base_terms = [
                 'x', 'z',
             ]
-        self.spawn_step = 0
+        self.spawn_step = 1 # 1st generation's ID
 
         self.mutation_probability = 0.1
 
@@ -104,40 +104,28 @@ class Genetic(
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
-        self.hamming_distance_by_generation_step = {
-            0: [
-                hamming_distance(
-                    self.true_chromosome_string,
-                    self.genetic_algorithm.chromosome_string(
-                        self.genetic_algorithm.map_model_to_chromosome(
-                            mod
-                        )
-                    )
-                )
-                for mod in self.initial_models
-            ]
-        }
         self.model_points_at_step = {}     
         self.generation_model_rankings = {} 
         self.models_ranked_by_fitness = {}
+        self.model_fitness_by_generation = {}
 
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
             self.num_sites : (self.initial_num_models * self.max_spawn_depth)/10,
             'other': 0
         }
-        self.num_processes_to_parallelise_over = 16
+        self.num_processes_to_parallelise_over = self.initial_num_models
 
         self.max_time_to_consider = 15
         self.min_param = 0.35
         self.max_param = 0.65
 
     def nominate_champions(self):
-        # choose model with highest fitness on final generation
+        # Choose model with highest fitness on final generation
         self.champion_model = self.models_ranked_by_fitness[self.spawn_step][0]
 
         self.log_print([
-            "number mutations:", self.genetic_algorithm.mutation_count, 
+            "Final generation:", self.spawn_step, 
             "\nModel rankings on final generation:",
             self.models_ranked_by_fitness[self.spawn_step],
             "\nChampion:", self.champion_model
@@ -145,16 +133,11 @@ class Genetic(
         
         return [self.champion_model]
 
-
-    def generate_models(
-        self,
-        model_list,
-        **kwargs
+    def analyse_generation(
+        self, 
+        **kwargs        
     ):
-        self.spawn_step += 1
-        self.log_print([
-            "Spawn step:", self.spawn_step
-        ])
+        self.log_print(["Analysing generation at spawn step ", self.spawn_step])
         model_points = kwargs['branch_model_points']
         self.model_points_at_step[self.spawn_step] = model_points
         evaluation_log_likelihoods = kwargs['evaluation_log_likelihoods']
@@ -378,27 +361,33 @@ class Genetic(
             key=genetic_algorithm_fitnesses.get,
             reverse=True
         )
-        # get models from genetic algorithm
+        self.model_fitness_by_generation[self.spawn_step] = genetic_algorithm_fitnesses
+
+        return genetic_algorithm_fitnesses
+
+    def generate_models(
+        self,
+        model_list,
+        **kwargs
+    ):       
+        # Analyse the previous generation using results passed from QMLA
+        genetic_algorithm_fitnesses = self.analyse_generation(**kwargs)
+      
+        self.spawn_step += 1
+        self.log_print([
+            "Spawn step:", self.spawn_step,
+        ])
+
+        # Spawn models from genetic algorithm
         new_models = self.genetic_algorithm.genetic_algorithm_step(
-            model_fitnesses=genetic_algorithm_fitnesses, 
-            num_pairs_to_sample=self.initial_num_models / 2 # for every pair, 2 chromosomes proposed
+            model_fitnesses = genetic_algorithm_fitnesses, 
+            num_pairs_to_sample = self.initial_num_models / 2 # for every pair, 2 chromosomes proposed
         )
 
-        hamming_distances = [
-            hamming_distance(
-                self.true_chromosome_string,
-                self.genetic_algorithm.chromosome_string(
-                    self.genetic_algorithm.map_model_to_chromosome(
-                        mod
-                    )
-                )
-            )
-            for mod in new_models
-        ]
-        self.hamming_distance_by_generation_step[
-            self.spawn_step] = hamming_distances
-
         return new_models
+
+    def finalise_model_learning(self, **kwargs):
+        self.analyse_generation(**kwargs)
 
     def hamming_distance_model_comparison(
         self, 
@@ -604,7 +593,8 @@ class Genetic(
         spawn_step,
         **kwargs
     ):
-        if spawn_step == self.max_spawn_depth:
+        if self.spawn_step == self.max_spawn_depth:
+            self.log_print(["Terminating at spawn depth ", self.spawn_step])
             return True
         elif self.genetic_algorithm.best_model_unchanged:
             self.champion_determined = True
@@ -829,19 +819,6 @@ class GeneticTest(
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
-        self.hamming_distance_by_generation_step = {
-            0: [
-                hamming_distance(
-                    self.true_chromosome_string,
-                    self.genetic_algorithm.chromosome_string(
-                        self.genetic_algorithm.map_model_to_chromosome(
-                            mod
-                        )
-                    )
-                )
-                for mod in self.initial_models
-            ]
-        }
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
             self.num_sites : (self.initial_num_models * self.max_spawn_depth)/10,

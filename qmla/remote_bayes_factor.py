@@ -353,13 +353,6 @@ def log_likelihood(
     )
 
     for i in range(len(times)):
-        if i%print_freq == 0:
-            log_print([
-                "Step {}".format(i),
-                ],
-                log_file = log_file,
-                log_identifier = "BF {}. t={}".format(model.model_id, np.round(times[i], 2))
-            )
         exp = get_exp(model, [times[i]])
         params_array = np.array([[model.true_model_params[:]]])
         datum = updater.model.simulate_experiment(

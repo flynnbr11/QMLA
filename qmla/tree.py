@@ -79,6 +79,10 @@ class TreeQMLA():
         r"""
         Determine the next set of models, for the next branch of this growth rule tree. 
         """
+
+        # add stuff to the kwargs
+        self.log_print(["kwargs", kwargs])
+        
         if not self.growth_class.check_tree_completed(spawn_step = self.spawn_step):
             self.log_print([
                 "Next layer - spawn"
@@ -107,30 +111,16 @@ class TreeQMLA():
         model_list = [qmla.database_framework.alph(mod) for mod in model_list]
         return model_list, pairs_to_compare
 
+
+    def finalise_tree(self, **kwargs):
+        self.growth_class.finalise_model_learning(
+            **kwargs
+        )
+
+
     def nominate_champions(
         self,
     ):
-        # if len(self.prune_branches) > 0:
-        #     final_branch = self.branches[
-        #         self.prune_branches[-1]
-        #     ]
-        # else:
-        #     self.log_print([
-        #         "Prune branches not listed; assuming final branch to hold tree champion"
-        #     ])
-        #     branches = sorted(list(self.branches.keys()))
-        #     final_branch = self.branches[
-        #         max(branches)
-        #     ]
-
-        # # call GR method to select champion
-
-        # self.log_print([
-        #     "Final branch is {}".format(final_branch.branch_id)
-        # ])
-
-        # return [final_branch.champion_name]
-
         return self.growth_class.nominate_champions()
 
     def new_branch_on_tree(
@@ -151,7 +141,7 @@ class TreeQMLA():
             models = models, 
             model_instances = model_instances, 
             precomputed_models = precomputed_models,
-            tree = self, # TODO is this safe??
+            tree = self, 
             spawning_branch = spawning_branch,
             pairs_to_compare = pairs_to_compare, 
             **kwargs            

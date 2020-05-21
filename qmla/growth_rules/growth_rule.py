@@ -113,6 +113,7 @@ class GrowthRule():
         self.terminate_learning_at_volume_convergence = False
         self.volume_convergence_threshold = 1e-8
         self.plot_posterior_after_learning = True
+        self.growth_rule_specific_data_to_store = {}
 
         self.experimental_dataset = 'NVB_rescale_dataset.p'
         # self.measurements_by_time = self.get_measurements_by_time()
@@ -536,6 +537,10 @@ class GrowthRule():
         self.log_print(["Returning from pruning fnc"])
         return list(set(pruning_models)), pruning_sets
 
+    def finalise_model_learning(self, **kwargs):
+        self.log_print([" GR {} finished.".format(self.growth)])
+
+
     def nominate_champions(self):
         final_branch = self.tree.branches[ max(self.tree.branches.keys()) ]
         self.log_print([
@@ -550,7 +555,8 @@ class GrowthRule():
     def growth_rule_finalise(self):
         # do whatever is needed to wrap up growth rule
         # e.g. store data required for analysis
-        self.growth_rule_specific_data_to_store = {}
+        pass
+        
 
     def growth_rule_specific_plots(
         self,
