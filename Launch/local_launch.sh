@@ -7,7 +7,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=5
-qhl_test=0 # don't perform QMLA; perform QHL on known correct model
+qhl_test=1 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
@@ -38,6 +38,40 @@ bintimes=1
 bf_all_times=0
 # data_max_time=5 # nanoseconds
 # data_time_offset=205 # nanoseconds
+
+
+# Choose a growth rule This will determine how QMD proceeds. 
+# use_alt_growth_rules=1 # note this is redundant locally, currently
+
+
+growth_rule='SimulatedNVCentre'
+# growth_rule='IsingGenetic'
+# growth_rule='IsingLatticeSet'
+# growth_rule='HeisenbergLatticeSet'
+# growth_rule='FermiHubbardLatticeSet'
+# growth_rule='NVLargeSpinBath'
+# growth_rule='GeneticTest'
+# growth_rule='Genetic'
+# growth_rule='NVExperimentalData'
+
+alt_growth_rules=(
+    # 'GeneticTest'
+    # 'HeisenbergLatticeSet'
+    # 'IsingPredetermined'
+    # 'IsingProbabilistic'
+    # 'HeisenbergXYZProbabilistic'
+    # 'HeisenbergXYZPredetermined'
+    # 'FermiHubbardPredetermined' 
+    # 'FermiHubbardProbabilistic' 
+    # 'ExperimentReducedNV'
+    # 'ExperimentNVCentre'
+)
+
+growth_rules_command=""
+for item in ${alt_growth_rules[*]}
+do
+    growth_rules_command+=" -agr $item" 
+done
 
 ### ---------------------------------------------------###
 # Everything from here downwards uses the parameters
@@ -71,76 +105,6 @@ copied_launch_file="$full_path_to_results/launched_script.txt"
 cp $(pwd)/local_launch.sh $copied_launch_file
 git_commit=$(git rev-parse HEAD)
 
-# Choose a growth rule This will determine how QMD proceeds. 
-# use_alt_growth_rules=1 # note this is redundant locally, currently
-
-
-# growth_rule='SimulatedNVCentre'
-growth_rule='IsingGenetic'
-# growth_rule='IsingLatticeSet'
-# growth_rule='HeisenbergLatticeSet'
-# growth_rule='FermiHubbardLatticeSet'
-# growth_rule='NVLargeSpinBath'
-# growth_rule='GeneticTest'
-# growth_rule='Genetic'
-# growth_rule='NVExperimentalData'
-
-# sim_growth_rule='IsingProbabilistic'
-# sim_growth_rule='IsingPredetermined'
-# sim_growth_rule='TestReducedParticlesBayesFactors'
-# sim_growth_rule='TestAllParticlesBayesFactors'
-# sim_growth_rule='HeisenbergXYZPredetermined'
-# sim_growth_rule='HeisenbergXYZProbabilistic'
-# sim_growth_rule='HeisenbergSharedField'
-# sim_growth_rule='FermiHubbardPredetermined'
-# sim_growth_rule='FermiHubbardProbabilistic'
-# sim_growth_rule='Genetic'
-# sim_growth_rule='GeneticTest'
-# sim_growth_rule='Presentation'
-# sim_growth_rule='ExperimentReducedNV'
-# sim_growth_rule='example'
-# sim_growth_rule='NVExperimentalData'
-# sim_growth_rule='ExperimentNVCentre'
-
-### Experimental growth rules 
-### which will overwrite growth_rule if exp_data==1
-
-# exp_growth_rule='NVExperimentalData'
-# exp_growth_rule='ExperimentNVCentre'
-# exp_growth_rule='ExperimentNVCentreNoTransvereTerms'
-# exp_growth_rule='ExpAlternativeNV'
-# exp_growth_rule='ExperimentFullAccessNV'
-# exp_growth_rule='NVLargeSpinBath'
-# exp_growth_rule='ExperimentNVCentreVaryTrueModel'
-# exp_growth_rule='ExpNVRevivals'
-# exp_growth_rule='ExperimentReducedNV'
-
-
-# if (( $exp_data == 1 )) || (( $simulate_experiment == 1 ))
-# then
-#     growth_rule=$exp_growth_rule
-# else
-#     growth_rule=$sim_growth_rule
-# fi
-
-alt_growth_rules=(
-    # 'GeneticTest'
-    # 'HeisenbergLatticeSet'
-    # 'IsingPredetermined'
-    # 'IsingProbabilistic'
-    # 'HeisenbergXYZProbabilistic'
-    # 'HeisenbergXYZPredetermined'
-    # 'FermiHubbardPredetermined' 
-    # 'FermiHubbardProbabilistic' 
-    # 'ExperimentReducedNV'
-    # 'ExperimentNVCentre'
-)
-
-growth_rules_command=""
-for item in ${alt_growth_rules[*]}
-do
-    growth_rules_command+=" -agr $item" 
-done
 
 num_probes=10
 force_plot_plus=0

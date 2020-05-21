@@ -81,13 +81,13 @@ class SimulatedNVCentre(
             # 'pauliSet_1_z_d3' : (1.99779857e+09,  3.95883908e+07),
 
             # 'pauliSet_1_x_d3' : (B*g*bohr_magneton/hbar - 0.4e7, 5e7), # ~1.943 GHz
-            'pauliSet_1_y_d3' : (B*g*bohr_magneton/hbar + 0.5, 5e7),
+            # 'pauliSet_1_y_d3' : (B*g*bohr_magneton/hbar + 0.5, 5e7),
             # 'pauliSet_1_z_d3' : (B*g*bohr_magneton/hbar - 0.5, 5e7),
-            'pauliSet_1_z_d3' : (B*g*bohr_magneton/hbar - 50, 100),
+            # 'pauliSet_1_z_d3' : (B*g*bohr_magneton/hbar - 50, 100),
             # spin
-            # 'pauliSet_1_x_d3' : (5e9, 2e9), # ~1.943 GHz
-            # 'pauliSet_1_y_d3' : (5e9, 2e9),
-            # 'pauliSet_1_z_d3' : (5e9, 2e9),
+            'pauliSet_1_x_d3' : (5e9, 2e9), # ~1.943 GHz
+            'pauliSet_1_y_d3' : (5e9, 2e9),
+            'pauliSet_1_z_d3' : (5e9, 2e9),
             # nitrogen nuclei
             'pauliSet_2_x_d3' : (5e9, 2e9) , # ~3.37GHz
             'pauliSet_2_y_d3' : (5e9, 2e9) ,
