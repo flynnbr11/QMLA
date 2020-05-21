@@ -48,7 +48,7 @@ class ControlsQMLA():
         self.growth_generation_rule = arguments.growth_generation_rule
         self.log_file = arguments.log_file
         try:
-            self.growth_class = get_growth_rule.get_growth_generator_class(
+            self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
                 true_params_path = arguments.true_params_pickle_file,
                 plot_probes_path = arguments.probes_plot_file, 
