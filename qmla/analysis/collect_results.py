@@ -113,9 +113,9 @@ def generate_combined_datasets(
 
 
     try:
-        # fitness_correlations.to_csv(
-        #     os.path.join(directory_name, 'fitness_method_correlations.csv')
-        # )
+        fitness_correlations.to_csv(
+            os.path.join(directory_name, 'fitness_method_correlations.csv')
+        )
         fig = sns.catplot(
             y  = 'Correlation', 
             x='Method',
