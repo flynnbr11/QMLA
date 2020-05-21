@@ -77,18 +77,18 @@ class IsingGenetic(
         test_fitness_models = [
             'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
             'pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_4J5_zJz_d5',
-            # 'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J4_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5',
-            # 'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',
-            # 'pauliSet_1J3_zJz_d5+pauliSet_2J5_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_4J5_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
-            # 'pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
+            'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J4_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5',
+            'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J3_zJz_d5+pauliSet_2J5_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
+            'pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
         ]
         self.initial_models = test_fitness_models
@@ -110,4 +110,4 @@ class IsingGenetic(
         self.max_time_to_consider = 15
         self.min_param = 0.485
         self.max_param = 0.515
-        self.timing_insurance_factor = 1
+        self.timing_insurance_factor = 6
