@@ -108,6 +108,7 @@ class Genetic(
         self.generation_model_rankings = {} 
         self.models_ranked_by_fitness = {}
         self.model_fitness_by_generation = {}
+        self.fitness_correlations = {}
 
         self.tree_completed_initially = False
         self.max_num_models_by_shape = {
