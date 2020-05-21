@@ -3,7 +3,7 @@ import os
 import sys
 import pickle
 
-import qmla.get_growth_rule as get_growth_rule
+import qmla.get_growth_rule
 import qmla.database_framework as database_framework
 import qmla.logging
 
@@ -24,13 +24,19 @@ class ControlsQMLA():
     Storage for configuration of a QMLA instance. 
 
     Command line arguments specify details about the QMLA instance,
-        such as number of experiments/particles etc, required to implement
-        the QMLA instance.
-    The command line arguments are held together in this class. 
-    The class is then given to the QuantumModelLearningAgent class, 
-        which incorporates those details into the implementation.
+    such as number of experiments/particles etc, required to implement
+    the QMLA instance.
+    The command line arguments are stored together in this class. 
+    The class is then given to the :class:`qmla.QuantumModelLearningAgent` instance, 
+    which uses those details into the implementation.
+    In particular, the :class:`~qmla.growth_rules.GrowthRule` of the true model 
+    is instantiated by calling :meth:`~qmla.get_growth_generator_class`. 
+    This growth rule instance is the master growth rule for the QMLA instance: the true 
+    model is defined as the true model of that instance. 
+    Likewise instances are generated for all of the growth rules specified by the user:
+    these instances are associated with the growth rule :class:`~qmla.TreeQMLA` objects. 
 
-    :param arguments: parsed command line arguments.
+    :param dict arguments: command line arguments, parsed into a dict.
     """
 
     def __init__(
@@ -38,14 +44,12 @@ class ControlsQMLA():
         arguments,
         **kwargs
     ):
-        import inspect
-        # self.use_experimental_data = bool(arguments.experimental_data)
+        
         self.growth_generation_rule = arguments.growth_generation_rule
         self.log_file = arguments.log_file
         try:
             self.growth_class = get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
-                # use_experimental_data=self.use_experimental_data,
                 true_params_path = arguments.true_params_pickle_file,
                 plot_probes_path = arguments.probes_plot_file, 
                 log_file=self.log_file
@@ -74,7 +78,7 @@ class ControlsQMLA():
         self.generator_list.extend(self.alternative_growth_rules)
         self.generator_list = list(set(self.generator_list))
         self.unique_growth_rule_instances = {
-            gen : get_growth_rule.get_growth_generator_class(
+            gen : qmla.get_growth_rule.get_growth_generator_class(
                     growth_generation_rule = gen, 
                     # use_experimental_data = self.use_experimental_data, 
                     log_file = self.log_file
@@ -489,13 +493,5 @@ def parse_cmd_line_args(args):
             ':',
             args_dict[a]        
         ])
-        # log_print(
-        #     [
-        #         a,
-        #         ':',
-        #         args_dict[a]
-        #     ],
-        #     log_file=qmla_controls.log_file
-        # )
 
     return qmla_controls

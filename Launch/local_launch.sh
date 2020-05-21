@@ -44,8 +44,8 @@ bf_all_times=0
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 
-growth_rule='SimulatedNVCentre'
-# growth_rule='IsingGenetic'
+# growth_rule='SimulatedNVCentre'
+growth_rule='IsingGenetic'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='FermiHubbardLatticeSet'
