@@ -44,9 +44,10 @@ class ControlsQMLA():
         arguments,
         **kwargs
     ):
-        
-        self.growth_generation_rule = arguments.growth_generation_rule
         self.log_file = arguments.log_file
+
+        # Get growth rule instances for true and alternative growth rules
+        self.growth_generation_rule = arguments.growth_generation_rule
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
@@ -58,21 +59,6 @@ class ControlsQMLA():
             raise
             self.growth_class = None
 
-        # get useful stuff out of growth_rule class
-        self.dataset = self.growth_class.experimental_dataset
-        self.data_max_time = self.growth_class.max_time_to_consider  # arguments.data_max_time
-        self.num_probes = self.growth_class.num_probes
-        self.num_top_models_to_generate_from = (
-            self.growth_class.num_top_models_to_build_on    
-        )
-
-
-        # get core arguments passed to implement_qmla script
-        # and generate required parameters from those
-        self.log_print([
-            "Getting growth rule instances for alternative growth rules", 
-        ])
-
         self.alternative_growth_rules = arguments.alternative_growth_rules
         self.generator_list = [self.growth_generation_rule]
         self.generator_list.extend(self.alternative_growth_rules)
@@ -80,45 +66,37 @@ class ControlsQMLA():
         self.unique_growth_rule_instances = {
             gen : qmla.get_growth_rule.get_growth_generator_class(
                     growth_generation_rule = gen, 
-                    # use_experimental_data = self.use_experimental_data, 
                     log_file = self.log_file
                 )
             for gen in self.alternative_growth_rules
         }
         self.unique_growth_rule_instances[self.growth_generation_rule] = self.growth_class
-        self.probe_max_num_qubits_all_growth_rules = max( 
-            [
-                gr.max_num_probe_qubits for gr in 
-                list(self.unique_growth_rule_instances.values())
-            ]
-        )
-        self.log_print([
-            "probe_max_num_qubits_all_growth_rules:", 
-            self.probe_max_num_qubits_all_growth_rules
-        ])
+
+        # self.probe_max_num_qubits_all_growth_rules = max( 
+        #     [
+        #         gr.max_num_probe_qubits for gr in 
+        #         list(self.unique_growth_rule_instances.values())
+        #     ]
+        # )
 
         self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
-        
-        self.log_print(["qhl models retrieved"])
+
+        # Get (or set) true parameters from parameter files shared among instances within the same run. 
         if arguments.true_params_pickle_file is None: 
             try:
                 true_params_info = qmla.set_shared_parameters(
                     growth_class = self.growth_class,  
-                    # all_growth_rules = # TODO get list of growth rules here
                 )
             except:
                 self.log_print(["Failed to set shared parameters"])
                 raise
         else:
-            # true_params_pickle_file = arguments.true_params_pickle_file
             true_params_info = pickle.load(
                 open(
                     arguments.true_params_pickle_file, 
                     'rb'
                 )
             )
-        self.log_print([ "shared params set"])
-        self.true_params_pickle_file = arguments.true_params_pickle_file
         self.true_model = true_params_info['true_model']
         self.true_model_name = database_framework.alph(self.true_model)
         self.true_model_class = database_framework.Operator(
@@ -126,13 +104,15 @@ class ControlsQMLA():
         )
         self.true_model_terms_matrices = self.true_model_class.constituents_operators
         self.true_model_terms_params = true_params_info['params_list']
-        self.log_print(["True model set."])
-        # derive required info from data from growth rule and arguments
-        # self.true_hamiltonian = self.growth_class.true_hamiltonian
-        # self.true_params_dict = self.growth_class.true_params_dict
-        # self.true_params_list = self.growth_class.true_params_list            
-        
-        # get parameters from arguments passed to implement_qmla.py
+        self.true_params_pickle_file = arguments.true_params_pickle_file
+        self.log_print([ "Shared true params set for this instance."])
+
+        # # Get essentials out of growth_rule class
+        # self.dataset = self.growth_class.experimental_dataset
+        # self.data_max_time = self.growth_class.max_time_to_consider  # arguments.data_max_time
+        # self.num_probes = self.growth_class.num_probes
+
+        # Store parameters which were passed as arguments to implement_qmla.py
         self.prior_pickle_file = arguments.prior_pickle_file
         self.qhl_mode = bool(arguments.qhl_mode)
         self.further_qhl = bool(arguments.further_qhl)
@@ -154,6 +134,8 @@ class ControlsQMLA():
         self.host_name = arguments.host_name
         self.port_number = arguments.port_number
         self.results_directory = arguments.results_directory
+        if not self.results_directory.endswith('/'):
+            self.results_directory += '/'
         self.rq_timeout = arguments.rq_timeout
         self.cumulative_csv = arguments.cumulative_csv
         self.true_expec_path = arguments.true_expec_path
@@ -161,10 +143,8 @@ class ControlsQMLA():
         self.reallocate_resources = bool(arguments.reallocate_resources)
         self.probe_noise_level = arguments.probe_noise_level # TODO put in growth rule
 
-        # create some new parameters
-        if not self.results_directory.endswith('/'):
-            self.results_directory += '/'
-
+        # Create some new paths/parameters for storing results
+        self.long_id = '{0:03d}'.format(self.qmla_id)
         self.plots_directory = self.results_directory + 'plots/'
         if not os.path.exists(self.results_directory):
             try:
@@ -177,8 +157,7 @@ class ControlsQMLA():
                 os.makedirs(self.plots_directory)
             except FileExistsError:
                 pass
-
-        self.long_id = '{0:03d}'.format(self.qmla_id)
+        
         self.latex_mapping_file = arguments.latex_mapping_file
         if self.latex_mapping_file is None: 
             self.latex_name_map_file_path = os.path.join(
@@ -186,16 +165,17 @@ class ControlsQMLA():
                 'LatexMapping.txt'
             )
 
-        if self.further_qhl == True:
+        if self.further_qhl:
+            # further qhl model uses different results file names to distinguish
             self.results_file = self.results_directory + 'further_qhl_results_' + \
-                str(self.long_id) + '.p'  # for pickling results into
+                str(self.long_id) + '.p' 
             self.class_pickle_file = self.results_directory + \
-                'further_qhl_qmd_class_' + str(self.long_id) + '.p'
+                'further_qhl_qml_class_' + str(self.long_id) + '.p'
         else:
             self.results_file = self.results_directory + 'results_' + \
-                str(self.long_id) + '.p'  # for pickling results into
+                str(self.long_id) + '.p' 
             self.class_pickle_file = self.results_directory + \
-                'qmd_class_' + str(self.long_id) + '.p'
+                'qmla_class_' + str(self.long_id) + '.p'
 
     def log_print(self, to_print_list):
         r"""Wrapper for :func:`~qmla.print_to_log`"""
@@ -211,19 +191,18 @@ def parse_cmd_line_args(args):
     Parse command line arguments, store and return in a single class instance. 
     
     Defaults and help for all useable command line arguments are specified here.
-    These are parsed, then passed to a ControlsQMLA instance for ease of access. 
+    These are parsed, then passed to a :class:`~qmla.ControlsQMLA` instance,
+    which is given to the :class:`~qmla.QuantumModelLearningAgent` instance 
+    for ease of access. 
 
-    :param list args: command line arguments (e.g. sys.argv[1:]).
-    :return ControlsQMLA 
+    :param list args: command line arguments (i.e. sys.argv[1:]).
+    :return ControlsQMLA qmla_controls: object with all required data for this 
+        QMLA instance. 
     """
 
     parser = argparse.ArgumentParser(description='Pass variables for QMLA.')
 
-    # Interpret command line arguments
-    # These are passed through the launch script
-    # and into this function as args, 
-    # parsed here and then available to QMLA instances
-    # which have access to the controls class returned from  this function. 
+    # Parse command line arguments
 
     parser.add_argument(
         '-qhl', '--qhl_mode',
@@ -484,14 +463,11 @@ def parse_cmd_line_args(args):
         arguments,
     )
 
-    # args_dict = vars(arguments)
     args_dict = vars(qmla_controls)
 
     for a in list(args_dict.keys()):
         qmla_controls.log_print([
-            a,
-            ':',
-            args_dict[a]        
+            a, ':', args_dict[a]        
         ])
 
     return qmla_controls

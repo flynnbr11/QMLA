@@ -56,12 +56,12 @@ growth_classes = {
         GR.HeisenbergLatticeSet,
     'FermiHubbardLatticeSet': 
         GR.FermiHubbardLatticeSet, 
+
     # Others
     'basic_lindbladian':
         GR.Lindbladian,
     'GrowthRule':
         GR.GrowthRule,
-        # GR.GrowthRuleTemplate,
     'Presentation':
         GR.PresentationPlotGeneration,
     'Genetic':

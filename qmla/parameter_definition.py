@@ -18,47 +18,48 @@ __all__ = [
 
 def set_shared_parameters(
     growth_class,
-    true_prior=None,
     pickle_file=None,
     random_vals=False,
     all_growth_rules=[],
-    # exp_data=False,
     results_directory='',
     num_particles=100,
     probe_max_num_qubits_all_growth_rules = 12, 
     generate_evaluation_experiments=True, 
-    true_prior_plot_file=None,
 ):
     r"""
     Set up parameters for this run of QMLA. 
+    A run consists of any number of indeprendent QMLA instances;
+    for consistency they must share the same information.
     Parameters, such as true model parameters
     and probes to use for plotting purposes, 
     are shared by all instances of QMLA within a given run. 
 
+    :param GrowthRule growth_class: growth rule of true model, from
+        which to extract key info, e.g. true parameter ranges and prior
+    :param 
     """
-    true_model = growth_class.true_model
-    if true_prior is None: 
-        true_prior = growth_class.get_prior(
-            model_name=true_model,
-            log_file=growth_class.log_file,
-            log_identifier='[Param definition]'
-        )
 
+    # Generate true model data.
+    true_model = growth_class.true_model
+    true_prior = growth_class.get_prior(
+        model_name=true_model,
+        log_file=growth_class.log_file,
+        log_identifier='[Param definition]'
+    )
+
+    # Dissect true model into separate terms.
     terms = database_framework.get_constituent_names_from_name(
         true_model
     )
-
-    latex_terms = []
-    for term in terms:
-        lt = growth_class.latex_name(
-            name=term
-        )
-        latex_terms.append(lt)
+    latex_terms = [
+        growth_class.latex_name(name=term) for term in terms
+    ]
     true_model_latex = growth_class.latex_name(
         name=true_model,
     )
-
     num_terms = len(terms)
+    
+    # Generate and store true parameters.
     true_model_terms_params = []
     true_params_dict = {}
     true_params_dict_latex_names = {}
@@ -68,35 +69,37 @@ def set_shared_parameters(
         true_params_dict = growth_class.true_params_dict
         true_params_list = growth_class.true_params_list
     else:
-        print("[param def] NOT using fixed params")
-        # sample from wider distribution than initiated for QML
-        widen_prior_factor = 2  # should mean true values within 3 sigma of learning distribution
+        # # sample from a distribution to get candidate true parameters
+        # # use a wider distribution than initiated for QHL
+        # # => true parameters within 3 sigma of learning distribution
+        widen_prior_factor = 2  
         old_cov_mtx = true_prior.cov
         new_cov_mtx = widen_prior_factor * old_cov_mtx
         true_prior.__setattr__('cov', new_cov_mtx)
         sampled_list = true_prior.sample()
-        try:
-            fixed_true_params = growth_class.true_model_terms_params
-        except BaseException:
-            fixed_true_params = set_true_params
 
+        # Either use randomly sampled parameter or that set in growth rule
         for i in range(num_terms):
-            if random_vals == True:
-                print("[setQHL] using random vals")
+
+            term = terms[i]
+
+            # if random_vals == True:
+            #     true_param = sampled_list[0][i]
+            # else:
+            try:
+                # if this term is set in growth rule true_model_terms_params, use that value
+                true_param = growth_class.true_model_terms_params[term]
+            except:
+                # otherwise, use value sampled from true prior
                 true_param = sampled_list[0][i]
-            else:
-                try:
-                    term = terms[i]
-                    true_param = fixed_true_params[term]
-                except BaseException:
-                    true_param = sampled_list[0][i]
             true_model_terms_params.append(true_param)
             true_params_dict[terms[i]] = true_param
             true_params_dict_latex_names[latex_terms[i]] = true_param
 
+        # Plot the true prior. 
         true_prior.__setattr__('cov', old_cov_mtx)
         try:
-            print("[ParameterDefinition] latex terms:", latex_terms)
+            true_prior_plot_file = os.path.join(results_directory, 'true_prior.png')
             qmla.shared_functionality.prior_distributions.plot_prior(
                 model_name=true_model_latex,
                 model_name_individual_terms=latex_terms,
@@ -105,7 +108,7 @@ def set_shared_parameters(
                 true_model_terms_params=true_params_dict_latex_names
             )
         except BaseException:
-            print("[ParameterDefinition] plotting prior failed \n\n\n")
+            print("[ParameterDefinition] plotting prior failed.")
             pass
     
     print("[ParameterDefinition] parameters set")

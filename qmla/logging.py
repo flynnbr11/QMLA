@@ -4,7 +4,7 @@ __all__ = [
     'print_to_log'
 ]
 
-def time_seconds():
+def _time_seconds():
     r"""return current time in h:m:s format for logging."""
     now = datetime.date.today()
     hour = datetime.datetime.now().hour
@@ -36,7 +36,7 @@ def print_to_log(
     """
     if not isinstance(to_print_list, list):
         to_print_list = list(to_print_list)
-    identifier = str(str(time_seconds()) +
+    identifier = str(str(_time_seconds()) +
                      " [" + log_identifier + "]"
                      )
 

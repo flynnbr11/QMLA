@@ -198,41 +198,40 @@ true_model = growth_class.true_model
 force_plus_probe = bool(arguments.force_plus_probe)
 probe_noise_level = arguments.probe_noise_level
 
-true_prior_plot_file = str(
-    results_directory +
-    '/prior_true_params.png'
-)
+# true_prior_plot_file = str(
+#     results_directory +
+#     '/prior_true_params.png'
+# )
 
-true_prior = growth_class.get_prior(
-    model_name=true_model,
-    log_file=log_file,
-    log_identifier='[Set QMLA params script]'
-)
-prior_data = {
-    'true_prior': true_prior
-}
+# true_prior = growth_class.get_prior(
+#     model_name=true_model,
+#     log_file=log_file,
+#     log_identifier='[Set QMLA params script]'
+# )
+# prior_data = {
+#     'true_prior': true_prior
+# }
 
-pickle_file = arguments.prior_file
-if pickle_file is not None:
-    import pickle
-    pickle.dump(
-        prior_data,
-        open(pickle_file, 'wb')
-    )
+# pickle_file = arguments.prior_file
+# if pickle_file is not None:
+#     import pickle
+#     pickle.dump(
+#         prior_data,
+#         open(pickle_file, 'wb')
+#     )
 
 
 if arguments.true_params_file is not None:
     qmla.set_shared_parameters(
-        growth_class=growth_class,
-        true_prior=true_prior,
-        pickle_file=arguments.true_params_file,
-        all_growth_rules=all_growth_rules,
-        # exp_data=exp_data,
-        results_directory=results_directory,
+        growth_class = growth_class,
+        pickle_file = arguments.true_params_file,
+        all_growth_rules = all_growth_rules,
+        results_directory = results_directory,
         num_particles = num_particles,
-        generate_evaluation_experiments=True, 
+        generate_evaluation_experiments = True, 
         probe_max_num_qubits_all_growth_rules = probe_max_num_qubits_all_growth_rules, 
-        true_prior_plot_file=true_prior_plot_file
+        # true_prior=true_prior,
+        # true_prior_plot_file=true_prior_plot_file
     )
 
 
@@ -249,13 +248,9 @@ plot_probe_dict = growth_class.plot_probe_generator(
     true_model=true_model,
     growth_generator=growth_generation_rule,
     probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
-    # experimental_data=exp_data,
     noise_level=probe_noise_level,
 )
 
-# for k in list(plot_probe_dict.keys()):
-#     # replace tuple like key returned, with just dimension.
-#     plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
 if probes_plot_file is not None:
     import pickle
     pickle.dump(
