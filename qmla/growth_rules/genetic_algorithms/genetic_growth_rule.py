@@ -337,18 +337,20 @@ class Genetic(
         )
 
         # choose the fitness method to use for the genetic algorithm
-        if self.fitness_method == 'elo_ratings':
-            genetic_algorithm_fitnesses = model_elo_ratings
-        elif self.fitness_method == 'f_scores':
+        if self.fitness_method == 'f_scores':
             genetic_algorithm_fitnesses = model_f_scores
         elif self.fitness_method == 'hamming_distances': 
             genetic_algorithm_fitnesses = model_hamming_distances
+        elif self.fitness_method == 'elo_ratings':
+            genetic_algorithm_fitnesses = model_elo_ratings
         elif self.fitness_method == 'number_of_wins':
             genetic_algorithm_fitnesses = model_number_wins
         elif self.fitness_method == 'ranking':
             genetic_algorithm_fitnesses = model_points_distributed_by_ranking
         elif self.fitness_method == 'log_likelihoods':
             genetic_algorithm_fitnesses = log_likelihoods
+        elif self.fitness_method == 'model_win_ratio':
+            genetic_algorithm_fitnesses = model_win_ratio
         else:
             self.log_print(["No fitness method selected for genetic algorithm"])
 
