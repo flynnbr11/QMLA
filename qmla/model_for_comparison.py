@@ -77,9 +77,6 @@ class ModelInstanceForComparison():
         # Assign attributes based on core data
         self.num_particles = qmla_core_info_dict['num_particles']
         self.probe_number = qmla_core_info_dict['num_probes']
-        self.qinfer_resampler_threshold = qmla_core_info_dict['resampler_thresh']
-        self.qinfer_resampler_a = qmla_core_info_dict['resampler_a']
-        self.qinfer_PGH_heuristic_factor = qmla_core_info_dict['pgh_prefactor']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']

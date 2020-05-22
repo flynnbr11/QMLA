@@ -43,6 +43,14 @@ Functions
 .. autofunction:: consider_new_model
 
 
+Model Generation
+----------------
+
+Functions
+~~~~~~~~~
+.. autofunction:: process_basic_operator
+
+
 Initialising growth rule
 ------------------------
 

@@ -75,7 +75,7 @@ class ExperimentFullAccessNV(
         model_list,
         spawn_step,
         model_dict,
-        log_file,
+        # log_file,
         **kwargs
     ):
         import random

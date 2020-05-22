@@ -15,11 +15,9 @@ __all__ = [
     'set_shared_parameters'
 ]
 
-
 def set_shared_parameters(
     growth_class,
     pickle_file=None,
-    random_vals=False,
     all_growth_rules=[],
     results_directory='',
     num_particles=100,
@@ -27,15 +25,15 @@ def set_shared_parameters(
     generate_evaluation_experiments=True, 
 ):
     r"""
-    Set up parameters for this run of QMLA. 
-    A run consists of any number of indeprendent QMLA instances;
+    Set up parameters for this `run` of QMLA. 
+    A run consists of any number of independent QMLA instances;
     for consistency they must share the same information.
     Parameters, such as true model parameters
     and probes to use for plotting purposes, 
     are shared by all instances of QMLA within a given run. 
 
     :param GrowthRule growth_class: growth rule of true model, from
-        which to extract key info, e.g. true parameter ranges and prior
+        which to extract key info, e.g. true parameter ranges and prior.
     :param 
     """
 
@@ -80,18 +78,15 @@ def set_shared_parameters(
 
         # Either use randomly sampled parameter or that set in growth rule
         for i in range(num_terms):
-
             term = terms[i]
-
-            # if random_vals == True:
-            #     true_param = sampled_list[0][i]
-            # else:
+            
             try:
                 # if this term is set in growth rule true_model_terms_params, use that value
                 true_param = growth_class.true_model_terms_params[term]
             except:
                 # otherwise, use value sampled from true prior
                 true_param = sampled_list[0][i]
+            
             true_model_terms_params.append(true_param)
             true_params_dict[terms[i]] = true_param
             true_params_dict_latex_names[latex_terms[i]] = true_param
@@ -111,20 +106,19 @@ def set_shared_parameters(
             print("[ParameterDefinition] plotting prior failed.")
             pass
     
-    print("[ParameterDefinition] parameters set")
+    print("[ParameterDefinition] Shared parameters set.")
     if growth_class.growth_generation_rule not in all_growth_rules: 
         all_growth_rules.append(growth_class.growth_generation_rule)
 
+    evaluation_probes = None
     if generate_evaluation_experiments:
-        print("[ParameterDefinition] Setting evaluation stuff")
+        # Generate test data to evaluate independent of training data.
         evaluation_probes = growth_class.generate_probes(
             store_probes=False, 
             probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
-            # experimental_data = exp_data,
             noise_level = growth_class.probe_noise_level,
             minimum_tolerable_noise = 0.0,
         )
-        print("evaluation Probes generated")
 
         num_evaluation_times = int(max(num_particles, 50)) # use at least 50 times to evaluate
         evaluation_times = scipy.stats.reciprocal.rvs(
@@ -133,9 +127,10 @@ def set_shared_parameters(
             size=num_evaluation_times
         ) # evaluation times generated log-uniformly
         available_probe_ids = list(range(growth_class.num_probes))
-        print("evaluation times generated")
         list_len_fator = math.ceil(len(evaluation_times) / len(available_probe_ids))
         iterable_probe_ids = iter(available_probe_ids * list_len_fator)
+        
+        # Plot the times used for evaluation.
         plt.clf()
         plt.hist(
             evaluation_times,
@@ -148,22 +143,18 @@ def set_shared_parameters(
             results_directory, 
             'times_for_evaluation.png'
         )
-
         plt.savefig(fig_path)
         
-    else: 
-        evaluation_probes = None
+    # Gather and store/return the true parameters.     
     true_params_info = {
         'params_list': true_model_terms_params,
         'params_dict': true_params_dict,
         'all_growth_rules': all_growth_rules,
         'evaluation_probes' : evaluation_probes,
-        'evaluation_times' : evaluation_times
+        'evaluation_times' : evaluation_times,
+        'true_model' : true_model, 
+        'growth_generator' : growth_class.growth_generation_rule
     }
-    # print("True params info:", true_params_info)
-
-    true_params_info['true_model'] = true_model
-    true_params_info['growth_generator'] = growth_class.growth_generation_rule
     if pickle_file is not None:
         import pickle
         pickle.dump(

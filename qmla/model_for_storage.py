@@ -94,8 +94,6 @@ class ModelInstanceForStorage():
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.probe_number = qmla_core_info_dict['num_probes']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
-        self.qinfer_resampler_threshold = qmla_core_info_dict['resampler_thresh']
-        self.qinfer_resampler_a = qmla_core_info_dict['resampler_a']
         if plot_probes is None: 
             self.probes_for_plots = pickle.load(
                 open(qmla_core_info_dict['probes_plot_file'], 'rb')

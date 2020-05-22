@@ -136,24 +136,16 @@ class ModelInstanceForLearning():
         self.num_particles = qmla_core_info_dict['num_particles']
         self.num_experiments = qmla_core_info_dict['num_experiments']
         self.probe_number = qmla_core_info_dict['num_probes']
-        self.qinfer_resampler_threshold = qmla_core_info_dict['resampler_thresh']
-        self.qinfer_resampler_a = qmla_core_info_dict['resampler_a']
-        self.qinfer_PGH_heuristic_factor = qmla_core_info_dict['pgh_prefactor']
-        self.qinfer_PGH_heuristic_exponent = qmla_core_info_dict['pgh_exponent']
-        self.qinfer_PGH_heuristic_increase_time = qmla_core_info_dict['increase_pgh_time']
         self.store_particle_locations_and_weights = qmla_core_info_dict['store_particles_weights']
         self.results_directory = qmla_core_info_dict['results_directory']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
         self.true_param_dict = qmla_core_info_dict['true_param_dict']
-        self.sigma_threshold = qmla_core_info_dict['sigma_threshold']
         self.times_to_plot = qmla_core_info_dict['plot_times']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
-        self.true_params_path = qmla_core_info_dict['true_params_pickle_file']
-        # poterntially use different resources depending on model complexity
-        
+        self.true_params_path = qmla_core_info_dict['true_params_pickle_file']      
         
         # Instantiate growth rule
         try:
@@ -177,8 +169,10 @@ class ModelInstanceForLearning():
         self.model_terms_matrices = np.asarray(op.constituents_operators)
         self.model_dimension = qmla.database_framework.get_num_qubits(self.model_name)
 
-        # Prior parameter distribution via growth rule
+        # Poterntially use different resources depending on relative model complexity.
         self._consider_reallocate_resources()
+
+        # Prior parameter distribution via growth rule
         self.model_prior = self.growth_class.get_prior(
             model_name = self.model_name,
             log_file = self.log_file,
@@ -219,8 +213,6 @@ class ModelInstanceForLearning():
             log_file = self.log_file,
             # TODO these should be in GR or found automatically by heuristic
             inv_field = [item[0] for item in self.qinfer_model.expparams_dtype[1:]],
-            increase_time=self.qinfer_PGH_heuristic_increase_time,
-            pgh_exponent=self.qinfer_PGH_heuristic_exponent,
             max_time_to_enforce=self.growth_class.max_time_to_consider,
         )
         self.log_print(["Heuristic built"])

@@ -10,9 +10,8 @@ p = os.path.abspath(os.path.realpath(__file__))
 elements = p.split('/')[:-2]
 qmla_root = os.path.abspath('/'.join(elements))
 sys.path.append(qmla_root)
-
-# sys.path.append("..")
 import qmla
+
 pickle.HIGHEST_PROTOCOL = 4
 
 # Parse arguments from bash
