@@ -51,14 +51,14 @@ class IsingGenetic(
             'z',
         ]
 
-        self.mutation_probability = 0.1
+        self.mutation_probability = 0.25
         self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
             num_sites=self.num_sites,
             true_model = self.true_model,
             base_terms=self.base_terms,
             mutation_probability=self.mutation_probability,
             num_protected_elite_models = 2, 
-            unchanged_elite_num_generations_cutoff = 4, 
+            unchanged_elite_num_generations_cutoff = 5, 
             log_file=self.log_file
         )
 
@@ -70,13 +70,13 @@ class IsingGenetic(
         self.fraction_particles_for_bf = 1
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
-        self.fitness_method = 'ranking' # 'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
+        self.fitness_method = 'f_scores' #  'model_win_ratio' # 'ranking' # 'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = False
-        self.max_spawn_depth = 1
-        self.initial_num_models = 4
+        self.max_spawn_depth = 16
+        self.initial_num_models = 8
         test_fitness_models = [
-            'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
-            'pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_4J5_zJz_d5',
+            # 'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
+            # 'pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_4J5_zJz_d5',
             # 'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5',
             # 'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J4_zJz_d5',
             # 'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5',
@@ -86,16 +86,16 @@ class IsingGenetic(
             # 'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',
             # 'pauliSet_1J3_zJz_d5+pauliSet_2J5_zJz_d5',
             # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_4J5_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
             # 'pauliSet_1J2_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
             # 'pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
         ]
-        self.initial_models = test_fitness_models
+        # self.initial_models = test_fitness_models
 
-        # self.initial_models = self.genetic_algorithm.random_initial_models(
-        #     num_models=self.initial_num_models
-        # )
+        self.initial_models = self.genetic_algorithm.random_initial_models(
+            num_models=self.initial_num_models
+        )
         # test force true model to appear in first generation
         # if self.true_model not in self.initial_models:
         #     self.initial_models[-1] = self.true_model

@@ -81,6 +81,7 @@ Redis
 Functions
 ~~~~~~~~~~~~~~~~~~~
 .. autofunction:: get_redis_databases_by_qmla_id
+.. autofunction:: get_seed
 
 
 Logging

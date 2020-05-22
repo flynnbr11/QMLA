@@ -229,16 +229,6 @@ class GrowthRule():
         # complete
         return model_list
 
-    def check_tree_completed(
-        self,
-        spawn_step,
-        **kwargs
-    ):
-        if spawn_step == self.max_spawn_depth:
-            return True
-        else:
-            return False
-        return True
 
     def name_branch_map(
         self,
@@ -536,6 +526,25 @@ class GrowthRule():
             self.prune_complete = True
         self.log_print(["Returning from pruning fnc"])
         return list(set(pruning_models)), pruning_sets
+    
+    def check_tree_pruned(self, prune_step, **kwargs):
+        if prune_step >= 2 : 
+            return True
+        else:
+            return False
+
+    def check_tree_completed(
+        self,
+        spawn_step,
+        **kwargs
+    ):
+        if self.tree_completed_initially:
+            return True
+        elif spawn_step >= self.max_spawn_depth:
+            return True
+        else:
+            return False
+
 
     def finalise_model_learning(self, **kwargs):
         self.log_print([" GR {} finished.".format(self.growth)])

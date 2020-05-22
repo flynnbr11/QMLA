@@ -538,7 +538,9 @@ class ConnectedLattice(
         self.prune_complete = True
         return champion_models, 'all'
 
-
+    def check_tree_pruned(self, prune_step, **kwargs):
+        return self.prune_complete
+        
 
 def pauli_like_like_terms_connected_sites(
     connected_sites,

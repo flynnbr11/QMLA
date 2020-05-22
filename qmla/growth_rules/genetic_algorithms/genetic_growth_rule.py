@@ -620,6 +620,10 @@ class Genetic(
             ])
             return False
 
+    def check_tree_pruned(self, **kwargs):
+        # no pruning for GA, winner is champion of final branch
+        return True
+
     def growth_rule_specific_plots(
         self,
         save_directory,
@@ -691,7 +695,7 @@ class Genetic(
         self.log_print(["fitness correlations:\n", self.fitness_correlations])
         fig, ax = plt.subplots(figsize=(15, 10))
 
-        if correlations.Generation.unique() == 1:
+        if len(correlations.Generation.unique()) == 1:
             sns.scatterplot(
                 y = 'Correlation', 
                 x = 'Generation', 

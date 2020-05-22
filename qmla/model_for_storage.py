@@ -91,6 +91,11 @@ class ModelInstanceForStorage():
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_name = qmla_core_info_dict['true_name']
+        if self.model_name == self.true_model_name: 
+            self.is_true_model = True
+            self.log_print(["This is the true model for storage."])
+        else:
+            self.is_true_model = False
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.probe_number = qmla_core_info_dict['num_probes']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']

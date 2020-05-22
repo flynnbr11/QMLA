@@ -25,7 +25,7 @@ import qmla.redis_settings as rds
 import qmla.model_for_storage
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation
 from qmla.remote_model_learning import remote_learn_model_parameters
-import qmla.tree
+import qmla.growth_rule_tree
 import qmla.utilities
 
 pickle.HIGHEST_PROTOCOL = 4  # if <python3, must use lower protocol
@@ -42,7 +42,7 @@ class QuantumModelLearningAgent():
 
     Controls the infrastructure which determines which models are learned and compared.
     By interpreting user defined :class:`~qmla.growth_rules.GrowthRule`,
-    grows :class:`~qmla.TreeQMLA` objects which hold numerous models
+    grows :class:`~qmla.GrowthRuleTree` objects which hold numerous models
     on :class:`~qmla.BranchQMLA` objects.
     All models on branches are learned and then compared.
     The comparisons on a branch inform the next set of models generated on that tree.
@@ -137,6 +137,7 @@ class QuantumModelLearningAgent():
             self.qmla_id,
         )
         self.redis_databases['any_job_failed'].set('Status', 0)
+        print("[QMLA] Redis databases set.")
 
         # Logistics
         self.models_learned = []
@@ -175,11 +176,9 @@ class QuantumModelLearningAgent():
         self.true_model_id = -1
         self.true_model_on_branhces = []
         self.true_model_hamiltonian = self.growth_class.true_hamiltonian
-        self.log_print(
-            [
-                "True model:", self.true_model_name
-            ]
-        )
+        self.log_print([
+            "True model:", self.true_model_name
+        ])
 
     def _setup_tree_and_growth_rules(
         self,
@@ -219,9 +218,8 @@ class QuantumModelLearningAgent():
 
         # Tree object for each growth rule
         self.trees = {
-            gen: qmla.tree.TreeQMLA(
-                growth_class=self.unique_growth_rule_instances[gen],
-                log_file=self.log_file
+            gen: qmla.growth_rule_tree.GrowthRuleTree(
+                growth_class=self.unique_growth_rule_instances[gen]
             )
             for gen in self.unique_growth_rule_instances
         }
@@ -364,7 +362,7 @@ class QuantumModelLearningAgent():
         if self.growth_class.reallocate_resources:
             base_num_qubits = 3
             base_num_terms = 3
-            for op in self.growth_rules.initial_models:
+            for op in self.growth_class.initial_models:
                 if database_framework.get_num_qubits(op) < base_num_qubits:
                     base_num_qubits = database_framework.get_num_qubits(op)
                 num_terms = len(
@@ -1186,8 +1184,8 @@ class QuantumModelLearningAgent():
         r"""
         Iteratively learn/compare/generate models on growth rule trees.
 
-        Each :class:`~qmla.growth_rules.GrowthRule` has a unique :class:`~qmla.tree.QMLATree``.
-        Trees hold sets of models on :class:`~qmla.tree.BranchTree` objects.
+        Each :class:`~qmla.growth_rules.GrowthRule` has a unique :class:`~qmla.QMLATree``.
+        Trees hold sets of models on :class:`~qmla.BranchTree` objects.
 
         Models on a each branch are learned through :meth:`learn_models_on_given_branch`.
         Any model which has previously been considered defaults to the earlier
@@ -1197,8 +1195,8 @@ class QuantumModelLearningAgent():
 
         When a branch has completed learning and comparisons of models,
         the corresponding tree is checked to see if it has finished proposing
-        models, through :meth:`~qmla.TreeQMLA.is_tree_complete`.
-        If the tree is not complete, the :meth:`~qmla.TreeQMLA.next_layer`
+        models, through :meth:`~qmla.GrowthRuleTree.is_tree_complete`.
+        If the tree is not complete, the :meth:`~qmla.GrowthRuleTree.next_layer`
         method is called to generate the next branch on that tree.
         The next branch can correspond to `spawn` or `prune` stages of the
         tree's :class:`~qmla.growth_rules.GrowthRule`, but QMLA is ambivalent to the
@@ -1371,12 +1369,12 @@ class QuantumModelLearningAgent():
         Retrieve the next set of models and place on a new branch.
 
         By checking the :class:`~qmla.tree.QMLATree`` associated with the `branch_id` used
-        to call this method, call :meth:`TreeQMLa.next_layer`, which returns
+        to call this method, call :meth:`GrowthRuleTree.next_layer`, which returns
         a set of models to place on a new branch, as well as which models therein
         to compare. These are passed to :meth:`new_branch`, constructing a new branch
         in the QMLA environment. The generated new branch then has all its models
         learned by calling :meth:`~qmla.QuantumModelLearningAgent.learn_models_on_given_branch`.
-        :meth:`~qmla.TreeQMLA.next_layer` is in control of how to select the next set of models,
+        :meth:`~qmla.GrowthRuleTree.next_layer` is in control of how to select the next set of models,
         usually either by calling the :class:`~qmla.growth_rules.GrowthRule`'s 
         :meth:`~qmla.growth_rules.GrowthRule.generate_models` or
         :meth:`~qmla.growth_rules.GrowthRule.tree_pruning` methods. 
@@ -1583,6 +1581,7 @@ class QuantumModelLearningAgent():
                 self.true_model_considered = True
                 self.true_model_branch = branch_id
                 self.true_model_on_branhces = [branch_id]
+                self.log_print(["True model has ID", model_id])
             self.highest_model_id = model_id
             self.model_name_id_map[model_id] = model_name
             self.model_count += 1
@@ -2390,10 +2389,11 @@ class QuantumModelLearningAgent():
         :param str save_to_file: path to save the resultant figure in.
         """
         generations = sorted(set(self.branches.keys()))
-        generations = [
-            b for b in self.branches
-            if not self.branches[b].prune_branch
-        ]
+        # generations = sorted()
+        # [
+        #     b for b in self.branches
+        #     if not self.branches[b].prune_branch
+        # ]
         self.log_print(
             [
                 "[get_statistical_metrics",
@@ -2676,7 +2676,7 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plot_TreeQMLA(
+    def plot_GrowthRuleTree(
         self,
         modlist=None,
         only_adjacent_branches=True,

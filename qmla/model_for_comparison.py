@@ -123,6 +123,11 @@ class ModelInstanceForComparison():
         self.covariance_mtx_final = learned_model_info['covariance_mtx_final']
 
         # Process data from learned info
+        if self.model_name == self.true_model_name: 
+            self.is_true_model = True
+            self.log_print(["This is the true model for comparison."])
+        else:
+            self.is_true_model = False
         op = qmla.database_framework.Operator(self.model_name)
         self.model_terms_matrices = op.constituents_operators
         self.model_terms_parameters_final = np.array(self.final_learned_params)

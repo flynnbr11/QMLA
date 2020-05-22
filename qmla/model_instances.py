@@ -141,6 +141,11 @@ class ModelInstanceForLearning():
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
+        if self.model_name == self.true_model_name: 
+            self.is_true_model = True
+            self.log_print(["This is the true model for learning."])
+        else:
+            self.is_true_model = False
         self.true_param_dict = qmla_core_info_dict['true_param_dict']
         self.times_to_plot = qmla_core_info_dict['plot_times']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
@@ -604,6 +609,9 @@ class ModelInstanceForLearning():
                 np.median(evaluation_updater.normalization_record),
                 2
             )
+        self.log_print([
+            "Model evaluation ll:", self.evaluation_log_likelihood
+        ])
         
     def plot_posterior(self):
         if not self.growth_class.plot_posterior_after_learning: 
@@ -629,6 +637,20 @@ class ModelInstanceForLearning():
             )
         )
 
+        bf_posterior = qi.MultivariateNormalDistribution(
+            self.qinfer_updater.est_mean(), 
+            self.qinfer_updater.est_covariance_mtx()
+        )
+        bf_posterior_updater = qi.SMCUpdater(
+            model = self.qinfer_model, 
+            n_particles = self.num_particles, 
+            prior = bf_posterior
+        )
+        bf_posterior_marginal = [
+            bf_posterior_updater.posterior_marginal(idx_param=i)
+            for i in range(self.qinfer_model.n_modelparams)
+        ]
+        
         num_terms = self.qinfer_model.n_modelparams
         ncols = int(np.ceil(np.sqrt(num_terms)))
         nrows = int(np.ceil(num_terms / ncols))
@@ -664,6 +686,15 @@ class ModelInstanceForLearning():
                 color='black', 
                 ls='-',
                 label='Posterior'
+            )
+
+            # plot posterior_used for BF comparison
+            ax.plot(
+                bf_posterior_marginal[param_idx][0], # locations
+                bf_posterior_marginal[param_idx][1], # weights
+                color='green', 
+                ls=':',
+                label='Prior for BF'
             )
 
             # True param
@@ -704,7 +735,6 @@ class ModelInstanceForLearning():
         fig.text(0.5, 0.04, 'Particle locations', ha='center')
         fig.text(0.04, 0.5, 'Weights', va='center', rotation='vertical')
         fig.savefig(posterior_file_path)
-
 
 
     ##########

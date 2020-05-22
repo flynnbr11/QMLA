@@ -34,7 +34,7 @@ class ControlsQMLA():
     This growth rule instance is the master growth rule for the QMLA instance: the true 
     model is defined as the true model of that instance. 
     Likewise instances are generated for all of the growth rules specified by the user:
-    these instances are associated with the growth rule :class:`~qmla.TreeQMLA` objects. 
+    these instances are associated with the growth rule :class:`~qmla.GrowthRuleTree` objects. 
 
     :param dict arguments: command line arguments, parsed into a dict.
     """

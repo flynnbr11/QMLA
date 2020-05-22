@@ -9,7 +9,7 @@ from qmla.database_framework import * # TODO fix __all__
 from qmla.controls_qmla import *
 from qmla.logging import *
 from qmla.redis_settings import *
-from qmla.tree import *
+from qmla.growth_rule_tree import *
 from qmla.parameter_definition import *
 from qmla.process_string_to_matrix import *
 
