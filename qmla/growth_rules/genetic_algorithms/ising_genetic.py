@@ -100,7 +100,7 @@ class IsingGenetic(
         # if self.true_model not in self.initial_models:
         #     self.initial_models[-1] = self.true_model
 
-        self.tree_completed_initially = True
+        self.tree_completed_initially = False
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth),
             'other': 0
