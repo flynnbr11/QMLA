@@ -1634,6 +1634,10 @@ class QuantumModelLearningAgent():
                 self.get_model_storage_instance_by_id(i).model_bayes_factors
             )
             self.compute_model_f_score(i)
+        self.growth_class.growth_rule_specific_plots(
+            save_directory = self.qmla_controls.plots_directory,
+            qmla_id = self.qmla_controls.long_id
+        )
         self.growth_class.growth_rule_finalise()
         self.get_statistical_metrics()
 

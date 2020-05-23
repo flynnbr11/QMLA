@@ -109,6 +109,7 @@ def generate_combined_datasets(
                 ignore_index = True
             )
         except:
+            raise
             pass
 
 
@@ -129,7 +130,8 @@ def generate_combined_datasets(
         )
     except:
         print("ANALYSIS FAILURE: fitness method  &  score correlations")
-        pass
+        raise
+        # pass
 
 
 def count_model_occurences(

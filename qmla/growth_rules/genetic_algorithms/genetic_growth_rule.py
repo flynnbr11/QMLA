@@ -279,6 +279,21 @@ class Genetic(
                     ignore_index=True
                 )
             )
+            # self.fitness_df = (
+            #     self.fitness_df.append(
+            #         pd.Series(
+            #             {
+            #                 'generation' : self.spawn_step,
+            #                 'f_score' : model_f_scores[mod], 
+            #                 'fitness' : model_number_wins[mod], 
+            #                 'fitness_type' : 'model_number_wins',
+            #                 'active_fitness_method' : self.fitness_method=='model_number_wins',
+            #             }
+            #         ),
+            #         ignore_index=True
+            #     )
+            # )
+
             self.fitness_df = (
                 self.fitness_df.append(
                     pd.Series(
@@ -343,8 +358,8 @@ class Genetic(
             genetic_algorithm_fitnesses = model_hamming_distances
         elif self.fitness_method == 'elo_ratings':
             genetic_algorithm_fitnesses = model_elo_ratings
-        elif self.fitness_method == 'number_of_wins':
-            genetic_algorithm_fitnesses = model_number_wins
+        # elif self.fitness_method == 'model_number_wins':
+        #     genetic_algorithm_fitnesses = model_number_wins
         elif self.fitness_method == 'ranking':
             genetic_algorithm_fitnesses = model_points_distributed_by_ranking
         elif self.fitness_method == 'log_likelihoods':
@@ -541,6 +556,7 @@ class Genetic(
     def growth_rule_finalise(
         self
     ):        
+        self.log_print(["Call to growth_rule_finalise"])
         self.growth_rule_specific_data_to_store['fitness_correlations'] = dict(dict(self.fitness_correlations))
         chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
         dud_chromosome = str('1' +'0'*self.genetic_algorithm.num_terms)
