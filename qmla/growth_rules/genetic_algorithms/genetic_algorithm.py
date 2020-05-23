@@ -428,18 +428,21 @@ class GeneticAlgorithmQMLA():
         model_fitnesses,
         **kwargs
     ):
-        try:
-            ranked_models = sorted(
-                model_fitnesses,
-                key=model_fitnesses.get,
-                reverse=True
-            )
-        except:
-            self.log_print([
-                "Could not get ranked models. model fitnesses:", model_fitnesses
-            ])
-        elite_models = ranked_models[:self.num_protected_elite_models]
-        self.most_elite_models_by_generation[self.genetic_generation] = ranked_models[0]
+        # try:
+        #     ranked_models = sorted(
+        #         model_fitnesses,
+        #         key=model_fitnesses.get,
+        #         reverse=True
+        #     )
+        # except:
+        #     self.log_print([
+        #         "Could not get ranked models. model fitnesses:", model_fitnesses
+        #     ])
+        # elite_models = ranked_models[:self.num_protected_elite_models]
+        # self.most_elite_models_by_generation[self.genetic_generation] = ranked_models[0]
+        
+        elite_models = self.models_ranked_by_fitness[self.genetic_generation][:self.num_protected_elite_models]
+        self.most_elite_models_by_generation[self.genetic_generation] = self.models_ranked_by_fitness[0]
         # num_protected_elite_models_for_termination = 2
 
         if self.genetic_generation > self.unchanged_elite_num_generations_cutoff + 2:
@@ -601,6 +604,9 @@ class GeneticAlgorithmQMLA():
             key=model_fitnesses.get,
             reverse=True
         )
+        self.log_print([
+            "GA step. model ranked by fitness:", self.models_ranked_by_fitness[self.genetic_generation]
+        ])
         input_models = list(model_fitnesses.keys())
         num_models_for_next_generation = len(input_models)
         self.log_print([
