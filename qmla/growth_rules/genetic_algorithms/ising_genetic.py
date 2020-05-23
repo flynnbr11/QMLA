@@ -72,7 +72,7 @@ class IsingGenetic(
         # default test - 32 generations x 16 starters
         self.fitness_method =  'model_win_ratio' # 'f_scores' # 'model_number_wins'  # 'ranking' # 'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
-        self.max_spawn_depth = 1
+        self.max_spawn_depth = 16
         self.initial_num_models = 10
         test_fitness_models = [
             'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
@@ -91,11 +91,11 @@ class IsingGenetic(
             'pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
         ]
-        self.initial_models = test_fitness_models
+        # self.initial_models = test_fitness_models
 
-        # self.initial_models = self.genetic_algorithm.random_initial_models(
-        #     num_models=self.initial_num_models
-        # )
+        self.initial_models = self.genetic_algorithm.random_initial_models(
+            num_models=self.initial_num_models
+        )
         # test force true model to appear in first generation
         # if self.true_model not in self.initial_models:
         #     self.initial_models[-1] = self.true_model
