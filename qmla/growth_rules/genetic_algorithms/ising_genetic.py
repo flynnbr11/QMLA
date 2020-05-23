@@ -72,7 +72,7 @@ class IsingGenetic(
         # default test - 32 generations x 16 starters
         self.fitness_method =  'f_scores' # 'model_win_ratio' # 'ranking' # 'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
-        self.max_spawn_depth = 2
+        self.max_spawn_depth = 16
         self.initial_num_models = 7
         test_fitness_models = [
             # 'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
