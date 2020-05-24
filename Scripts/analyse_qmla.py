@@ -638,7 +638,6 @@ except:
 
 try: 
     qmla.analysis.model_generation_probability(
-        # results_path = results_csv,
         combined_results = combined_results,
         save_directory=directory_to_analyse, 
     )

@@ -75,32 +75,23 @@ class IsingGenetic(
         self.max_spawn_depth = 16
         self.initial_num_models = 10
         test_fitness_models = [
-            'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
-            # 'pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_4J5_zJz_d5',
-            'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J4_zJz_d5',
-            'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5',
-            # 'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5',
-            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5',
-            'pauliSet_1J2_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',
-            'pauliSet_1J3_zJz_d5+pauliSet_2J5_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_4J5_zJz_d5',
-            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
-            # 'pauliSet_1J2_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
-            'pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
-            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
+            'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5', # F=0
+            'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5', # F=0.2
+            'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.4
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.6
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5', # F=0.8
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
         ]
-        # self.initial_models = test_fitness_models
+        self.initial_models = test_fitness_models
 
-        self.initial_models = self.genetic_algorithm.random_initial_models(
-            num_models=self.initial_num_models
-        )
+        # self.initial_models = self.genetic_algorithm.random_initial_models(
+        #     num_models=self.initial_num_models
+        # )
         # test force true model to appear in first generation
         # if self.true_model not in self.initial_models:
         #     self.initial_models[-1] = self.true_model
 
-        self.tree_completed_initially = False
+        self.tree_completed_initially = True
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth),
             'other': 0
