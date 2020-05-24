@@ -2248,7 +2248,7 @@ class QuantumModelLearningAgent():
 
         self.log_print([
             "\nFinal winner:", self.global_champion_name,
-            "has F-score ", self.model_f_scores[self.champion_model_id]
+            "has F-score ", np.round(self.model_f_scores[self.champion_model_id], 2)
         ])
 
     ##########
