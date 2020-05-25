@@ -9,6 +9,7 @@ import qmla.shared_functionality.prior_distributions
 import qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation as probe_set_generation
 import qmla.shared_functionality.expectation_values
+import qmla.utilities
 import qmla.database_framework as database_framework
 import qmla.growth_rules.rating_system
 import qmla.shared_functionality.qinfer_model_interface
@@ -81,6 +82,7 @@ class GrowthRule():
         self.model_branches = {} 
         self.champion_determined = False
         self.growth_rule_specific_data_to_store = {}
+        self.storage = qmla.utilities.StorageUnit()
 
         # Parameters specific to the growth rule
         self.true_model = 'xTi'

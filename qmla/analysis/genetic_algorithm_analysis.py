@@ -270,13 +270,10 @@ def colour_by_hamming_dist(h, cmap):
     return (cmap_val[0], cmap_val[1], cmap_val[2], alpha)
 
 def model_generation_probability(
-    # results_path, 
     combined_results, 
     save_directory=None
 ):
     from numpy import inf
-    # print("Trying to read csv ", results_path)
-    # combined_results = pd.read_csv(results_path)
     data_indices = list(combined_results['GrowthRuleStorageData'].index)
     true_chromosome = eval(combined_results['GrowthRuleStorageData'][0])['true_model_chromosome']
     num_experiments = combined_results['NumExperiments'][0]

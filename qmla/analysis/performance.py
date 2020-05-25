@@ -15,6 +15,8 @@ import scipy
 import qmla.database_framework
 
 __all__ = [
+    'bayes_factor_f_score_heatmap',
+    'plot_from_combined_datasets',
     'update_shared_bayes_factor_csv', 
     'get_model_scores', 
     'plot_statistics', 
@@ -26,6 +28,100 @@ __all__ = [
     'count_term_occurences',
     'inspect_times_on_nodes'
 ]
+
+def bayes_factor_f_score_heatmap(bayes_factors_df):
+    plt.clf()
+    fig = plt.figure(
+        figsize=(15, 5),
+        tight_layout=True
+    )
+    gs = GridSpec(
+        nrows=2,
+        ncols=2,
+        height_ratios=[6, 1]
+    )
+
+    bayes_factor_by_f_score = pd.pivot_table(
+        bayes_factors_df, 
+        values='log10_bayes_factor', 
+        index=['f_score_a'], 
+        columns=['f_score_b'],
+        aggfunc=np.median
+    )
+
+    mask = np.tri(bayes_factor_by_f_score.shape[0], k=0).T
+    ax1 = fig.add_subplot(gs[0,0])
+    ax2 = fig.add_subplot(gs[0,1])
+    cbar_ax = fig.add_subplot(gs[1,:])
+
+    sns.heatmap(
+        bayes_factor_by_f_score,
+        cmap='RdYlGn',
+        mask=mask,
+        annot=True, 
+        ax = ax1,
+        cbar_ax = cbar_ax,
+        cbar_kws={"orientation": "horizontal"}
+    )
+    ax1.set_ylabel('$F(a)$')
+    ax1.set_xlabel('$F(b)$')
+    ax1.set_title('$F(A) > F(B)$')
+
+
+    mask = np.tri(bayes_factor_by_f_score.shape[0], k=-1)
+    sns.heatmap(
+        bayes_factor_by_f_score,
+        cmap='RdYlGn',
+        mask=mask,
+        annot=True, 
+        ax = ax2,
+        cbar_ax = cbar_ax,
+        cbar_kws={"orientation": "horizontal"}
+    )
+    ax2.set_ylabel('$F(a)$')
+    ax2.set_xlabel('$F(b)$')
+    ax2.set_title('$F(A) \leq F(B)$')
+
+    cbar_ax.set_title('$log_{10} BF$', fontsize=20)
+
+    fig.suptitle("$log_{10}$ Bayes factor by F score", fontsize=25, y=1.15)
+    return fig
+
+
+def plot_from_combined_datasets(
+    # directory_name, 
+    combined_datasets
+):
+    directory = combined_datasets['results_directory']
+    available_data = combined_datasets['datasets_generated']
+
+    # Bayes factors
+    if 'bayes_factors' in available_data:
+        bayes_factors = pd.read_csv(
+            os.path.join(directory, 'bayes_factors.csv')
+        )
+        f = bayes_factor_f_score_heatmap(bayes_factors)
+        f.savefig(
+            os.path.join(directory, 'bayes_factors_by_f_scores.png')
+        )
+
+    # F score correlations
+    if 'fitness_correlations' in available_data:
+        fitness_correlations = pd.read_csv(
+            os.path.join(directory, 'fitness_correlations.csv')
+        )
+        fig = sns.catplot(
+            y  = 'Correlation', 
+            x='Method',
+            data = fitness_correlations,
+            kind='box'
+        )
+        fig.savefig(
+            os.path.join(
+                directory, "fitness_f_score_correlations.png"
+            )
+        )
+
 
 def update_shared_bayes_factor_csv(qmd, all_bayes_csv):
     data = get_bayes_latex_dict(qmd)

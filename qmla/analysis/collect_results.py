@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 __all__ = [
     'collect_results_store_csv',
     'generate_combined_datasets',
-    'count_model_occurences'
+    'count_model_occurences',
+    # '_generate_combined_datasets'
 ]
 
 def collect_results_store_csv(
@@ -76,7 +77,7 @@ def collect_results_store_csv(
 
 
 
-def generate_combined_datasets(
+def _generate_combined_datasets(
     directory_name,
     results_file_name_start="results",
     results_csv_name="results.csv", 
@@ -132,6 +133,64 @@ def generate_combined_datasets(
         print("ANALYSIS FAILURE: fitness method  &  score correlations")
         raise
         # pass
+
+def generate_combined_datasets(
+    directory_name,
+):
+    combined_datasets_directory = os.path.join(
+        directory_name, 'combined_datasets'
+    )
+    if not os.path.exists(combined_datasets_directory):
+        try:
+            os.makedirs(combined_datasets_directory)
+        except:
+            pass
+
+    storage_files = []
+    for file in os.listdir(directory_name):
+        # TODO unload storage objects instead??
+        # then could pickle more e.g. pd DataFrames directly
+        if (
+            file.endswith(".p")
+            and
+            file.startswith("storage")
+        ):
+            storage_files.append(file)
+    filenames = [
+        os.path.join(directory_name, str(f)) for f in storage_files
+    ]
+
+    # combined datasets to generate
+    bayes_factors = pd.DataFrame()
+    fitness_correlations = pd.DataFrame()
+
+    # cycle through files
+    for f in filenames:
+        storage = pickle.load(open(f, 'rb'))
+
+        bf = storage.bayes_factors_df
+        bf['qmla_id'] = storage.qmla_id
+        bayes_factors = bayes_factors.append(bf, ignore_index=True)
+
+        fit_cor = storage.growth_rule_storage.fitness_correlations
+        fit_cor['qmla_id'] = storage.qmla_id
+        fitness_correlations = fitness_correlations.append(fit_cor, ignore_index=True)
+
+    # Store datasets and add their name to the list
+    datasets_generated = []
+
+    bayes_factors.to_csv(os.path.join(combined_datasets_directory, 'bayes_factors.csv'))
+    datasets_generated.append('bayes_factors')
+
+    fitness_correlations.to_csv(os.path.join(combined_datasets_directory, 'fitness_correlations.csv'))
+    datasets_generated.append('fitness_correlations')
+
+    # Gather together and return
+    combined_data = {
+        'results_directory' : combined_datasets_directory,  
+        'datasets_generated' : datasets_generated      
+    }
+    return combined_data
 
 
 def count_model_occurences(

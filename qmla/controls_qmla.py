@@ -145,7 +145,9 @@ class ControlsQMLA():
 
         # Create some new paths/parameters for storing results
         self.long_id = '{0:03d}'.format(self.qmla_id)
-        self.plots_directory = self.results_directory + 'plots/'
+        self.plots_directory = os.path.join(
+            self.results_directory, 'single_instance_plots', "qmla_{}".format(self.qmla_id)
+        )
         if not os.path.exists(self.results_directory):
             try:
                 os.makedirs(self.results_directory)

@@ -95,12 +95,11 @@ def flatten(l): return [item for sublist in l for item in sublist]
 
 class StorageUnit():
     r""" 
-    Generic object which can be pickled for later use. 
+    Generic object to which results can be pickled for later use/analysis. 
     """
-    def __init__(self, data_to_store):
-
-        for k in data_to_store:
-            self.__setattr__(
-                k, 
-                data_to_store[k]
-            )
+    def __init__(self, data_to_store=None):
+        if data_to_store is not None:
+            for k in data_to_store:
+                self.__setattr__(
+                    k, data_to_store[k]
+                )

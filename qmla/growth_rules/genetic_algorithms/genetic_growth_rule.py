@@ -556,12 +556,10 @@ class Genetic(
     def growth_rule_finalise(
         self
     ):        
-        self.log_print(["Call to growth_rule_finalise"])
-        self.growth_rule_specific_data_to_store['fitness_correlations'] = dict(dict(self.fitness_correlations))
+        self.storage.fitness_correlations = self.fitness_correlations
         chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
         dud_chromosome = str('1' +'0'*self.genetic_algorithm.num_terms)
         if dud_chromosome in chromosomes:
-            # TODO generatlise - should be  
             self.log_print(
                 [
                     "{} in previous chromosomes:\n{}".format(

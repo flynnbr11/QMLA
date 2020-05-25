@@ -16,6 +16,7 @@ from matplotlib.gridspec import GridSpec
 import pickle
 import redis
 import rq
+import seaborn as sns
 
 # QMLA functionality
 import qmla.analysis
@@ -238,7 +239,6 @@ class QuantumModelLearningAgent():
 
         # Miscellaneous
         self.model_priors = model_priors
-        # self.reallocate_resources = self.qmla_controls.reallocate_resources
 
         # Learning parameters, used by QInfer updates
         self.num_particles = self.qmla_controls.num_particles
@@ -1634,6 +1634,8 @@ class QuantumModelLearningAgent():
                 self.get_model_storage_instance_by_id(i).model_bayes_factors
             )
             self.compute_model_f_score(i)
+
+        self.bayes_factors_data()
         self.growth_class.growth_rule_specific_plots(
             save_directory = self.qmla_controls.plots_directory,
             qmla_id = self.qmla_controls.long_id
@@ -1646,6 +1648,48 @@ class QuantumModelLearningAgent():
         for k in self.model_name_id_map:
             v = self.model_name_id_map[k]
             self.model_id_to_name_map[v] = k
+
+
+    def bayes_factors_data(self):
+        self.bayes_factors_df = pd.DataFrame(
+            columns=[
+                'model_a', 'id_a', 'f_score_a',
+                'model_b', 'id_b', 'f_score_b',
+                'bayes_factor', 'log10_bayes_factor'
+                ]
+        )
+
+        for m in self.models_learned:
+            mod = self.get_model_storage_instance_by_id(m)
+            mod_name_a = mod.model_name
+            mod_id_a = int(mod.model_id)
+            f_score_a = qmla.utilities.round_nearest(
+                self.model_f_scores[mod_id_a], 0.05)
+
+            bayes_factors = mod.model_bayes_factors
+            for b in bayes_factors:
+                mod_name_b = self.model_name_id_map[b]
+                mod_id_b = int(b)
+                f_score_b = qmla.utilities.round_nearest(
+                    self.model_f_scores[mod_id_b], 0.05)
+                
+                for bf in bayes_factors[b]:
+                    d = pd.Series(
+                        {      
+                            'model_a' : mod_name_a,
+                            'id_a' : mod_id_a,
+                            'f_score_a' : f_score_a,
+                            'model_b' : mod_name_b, 
+                            'id_b' : mod_id_b, 
+                            'f_score_b' : f_score_b, 
+                            'bayes_factor' : bf,
+                            'log10_bayes_factor' : np.round(np.log10(bf), 1)
+                        }
+                    )
+                    new_idx = len(self.bayes_factors_df)
+                    self.bayes_factors_df.loc[new_idx] = d
+        self.plot_bayes_factors()
+
 
     def get_results_dict(
         self,
@@ -1771,7 +1815,10 @@ class QuantumModelLearningAgent():
             'GrowthRuleStorageData': self.growth_class.growth_rule_specific_data_to_store,
         }
 
-        self.storage = qmla.utilities.StorageUnit(results_dict)
+        self.storage = qmla.utilities.StorageUnit()
+        self.storage.qmla_id = self.qmla_id
+        self.storage.bayes_factors_df = self.bayes_factors_df
+        self.storage.growth_rule_storage = self.growth_class.storage        
 
         return results_dict
 
@@ -2500,6 +2547,42 @@ class QuantumModelLearningAgent():
         self.log_print(["getting statistical metrics complete"])
         if save_to_file is not None:
             plt.savefig(save_to_file)
+
+
+    def plot_bayes_factors(
+        self, 
+    ):
+        # Plot Bayes factors of this instance
+        bayes_factor_by_id = pd.pivot_table(
+            self.bayes_factors_df, 
+            values='log10_bayes_factor', 
+            index=['id_a'], 
+            columns=['id_b'],
+            aggfunc=np.median
+        )
+        mask = np.tri(bayes_factor_by_id.shape[0], k=-1).T
+        plt.clf()
+        s = sns.heatmap(
+            bayes_factor_by_id,
+            cmap='RdYlGn',
+            mask=mask,
+            annot=True
+        )   
+        s.get_figure().savefig(
+            os.path.join(
+                self.qmla_controls.plots_directory,
+                'bayes_factors_{}.png'.format(self.qmla_controls.long_id)
+            )
+        )                         
+
+        # # Heat map BF against F(A)/F(B)
+        fig = qmla.analysis.bayes_factor_f_score_heatmap(bayes_factors_df = self.bayes_factors_df)
+        fig.savefig(
+            os.path.join(
+                self.qmla_controls.plots_directory, "bayes_factors_by_f_score_{}".format(self.qmla_controls.long_id)
+            )
+        )
+        
 
     def plot_branch_champs_quadratic_losses(
         self,

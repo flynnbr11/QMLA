@@ -290,14 +290,20 @@ if gather_summary_results:
     )
 
     try:
-        qmla.analysis.generate_combined_datasets(
+        combined_datasets = qmla.analysis.generate_combined_datasets(
             directory_name = directory_to_analyse,
-            results_file_name_start = results_file_name_start,
+            # results_file_name_start = results_file_name_start,
         )
     except:
-        print("ANALYSIS FAILURE: number of occurences for each model.")
+        print("ANALYSIS FAILURE: Generate combined dataset.")
         raise
 
+    try:
+        qmla.analysis.plot_from_combined_datasets(combined_datasets = combined_datasets)
+    except:
+        print("ANALYSIS FAILURE: Plotting from combined datasets.")
+        raise
+        
     # Find number of occurences of each model
     # quite costly so it is optional
     plot_num_model_occurences = False 
@@ -334,7 +340,6 @@ try:
         directory_name=directory_to_analyse,
         dataset=dataset,
         results_path=results_csv,
-        # use_experimental_data=exp_data,
         results_file_name_start=results_file_name_start,
         true_expectation_value_path=true_expec_path,
         growth_generator=growth_generator,
@@ -398,7 +403,6 @@ try:
         plot_probe_path=probes_plot_file,
         true_params_path=true_params_path,
         growth_generator=growth_generator,
-        # measurement_type=measurement_type,
         save_param_values_to_file=str(
             plot_desc + 'clusters_by_param.png'),
         save_param_clusters_to_file=str(
