@@ -89,8 +89,8 @@ def bayes_factor_f_score_heatmap(bayes_factors_df):
 
 
 def plot_from_combined_datasets(
-    # directory_name, 
-    combined_datasets
+    combined_datasets,
+    save_directory
 ):
     directory = combined_datasets['results_directory']
     available_data = combined_datasets['datasets_generated']
@@ -102,7 +102,7 @@ def plot_from_combined_datasets(
         )
         f = bayes_factor_f_score_heatmap(bayes_factors)
         f.savefig(
-            os.path.join(directory, 'bayes_factors_by_f_scores.png')
+            os.path.join(save_directory, 'bayes_factors_by_f_scores.png')
         )
 
     # F score correlations
@@ -118,7 +118,7 @@ def plot_from_combined_datasets(
         )
         fig.savefig(
             os.path.join(
-                directory, "fitness_f_score_correlations.png"
+                save_directory, "fitness_f_score_correlations.png"
             )
         )
 

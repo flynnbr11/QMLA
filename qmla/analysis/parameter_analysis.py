@@ -129,7 +129,9 @@ def average_parameter_estimates(
     unique_growth_classes=None,
     top_number_models=2,
     true_params_dict=None,
-    save_to_file=None
+    save_to_file=None,
+    save_directory=None,
+    plot_prefix='', 
 ):
     r"""
     Plots progression of parameter estimates against experiment number
@@ -340,48 +342,34 @@ def average_parameter_estimates(
 
         latex_name = growth_classes[name].latex_name(name)
 
-        if save_to_file is not None:
-            fig.suptitle(
-                'Parameter Estimates for {} from {} wins'.format(latex_name, num_wins_for_name)
+        if save_directory is not None:
+            save_file = os.path.join(
+                save_directory, 
+                '{}params_{}.png'.format(plot_prefix, name)
             )
             try:
-                save_file = ''
-                if save_to_file[-4:] == '.png':
-                    partial_name = save_to_file[:-4]
-                    save_file = str(partial_name + '_' + name + '.png')
-                else:
-                    save_file = str(save_to_file + '_' + name + '.png')
-                # plt.tight_layout()
-                fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-                plt.savefig(save_file, bbox_inches='tight')
-            except BaseException:
-                print("Filename too long. Defaulting to idx")
-                save_file = ''
-                if save_to_file[-4:] == '.png':
-                    partial_name = save_to_file[:-4]
-                    save_file = str(
-                        partial_name +
-                        '_' +
-                        str(winning_models.index(name)) +
-                        '.png'
-                    )
-                else:
-                    save_file = str(save_to_file + '_' + name + '.png')
-                # plt.tight_layout()
-                fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-                plt.savefig(save_file, bbox_inches='tight')
+                plt.savefig(save_file)
+            except:
+                # model name too long, using index
+                save_file = os.path.join(
+                    save_directory, 
+                    '{}params_{}.png'.format(plot_prefix, winning_models.index(name))
+                )
+                plt.savefig(save_file)
+
 
 def cluster_results_and_plot(
-    path_to_results,  # results_summary_csv to be clustered
+    path_to_results,  
     true_expec_path,
     plot_probe_path,
     true_params_path,
     growth_generator,
-    # measurement_type,
     upper_x_limit=None,
     save_param_clusters_to_file=None,
     save_param_values_to_file=None,
     save_redrawn_expectation_values=None,
+    save_directory=None, 
+    plot_prefix='', 
 ):
     from matplotlib import cm
     growth_class = qmla.get_growth_rule.get_growth_generator_class(growth_generator)
@@ -585,11 +573,19 @@ def cluster_results_and_plot(
             col = 0
             row += 1
 
-    if save_param_values_to_file is not None:
+    if save_directory is not None:
         plt.savefig(
-            save_param_values_to_file,
-            bbox_to_inches='tight'
+            os.path.join(
+                save_directory, 
+                str(plot_prefix + 'clusters_by_param.png')
+            )
         )
+
+    # if save_param_values_to_file is not None:
+    #     plt.savefig(
+    #         save_param_values_to_file,
+    #         bbox_to_inches='tight'
+    #     )
 
     # Plot centroids by cluster
     ncols = int(np.ceil(np.sqrt(total_num_clusters)))
@@ -631,11 +627,20 @@ def cluster_results_and_plot(
                 col = 0
                 row += 1
 
-    if save_param_clusters_to_file is not None:
+    # if save_param_clusters_to_file is not None:
+    #     plt.title('Parameter clusters')
+    #     plt.savefig(
+    #         save_param_clusters_to_file,
+    #         bbox_to_inches='tight'
+    #     )
+
+    if save_directory is not None:
         plt.title('Parameter clusters')
         plt.savefig(
-            save_param_clusters_to_file,
-            bbox_to_inches='tight'
+            os.path.join(
+                save_directory, 
+                str(plot_prefix + 'clusters_by_model.png')
+            )
         )
 
     replot_expectation_values(
@@ -644,9 +649,9 @@ def cluster_results_and_plot(
         true_expec_vals_path=true_expec_path,
         plot_probe_path=plot_probe_path,
         growth_generator=growth_generator,
-        # measurement_method=measurement_type,
         upper_x_limit=upper_x_limit,  # can play with this
-        save_to_file=save_redrawn_expectation_values
+        save_to_file=save_redrawn_expectation_values,
+        save_directory = save_directory,
     )
 
 def replot_expectation_values(
@@ -654,10 +659,11 @@ def replot_expectation_values(
     true_expec_vals_path,
     plot_probe_path,
     growth_generator,
-    # measurement_method='full_access',
     upper_x_limit=None,
     model_descriptions=None,
-    save_to_file=None
+    save_to_file=None,
+    save_directory=None,
+    plot_prefix='',
 ):
     r"""
     Standalone function to redraw expectation values
@@ -786,10 +792,18 @@ def replot_expectation_values(
 
     # plt.legend(loc=1)
     fig.suptitle("Expectation Value of clustered parameters.")
-    if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
-    else:
-        plt.show()
+    if save_directory is not None:
+        plt.savefig(
+            os.path.join(
+                save_directory, 
+                str(plot_prefix + 'clusters_expec_vals.png')
+            )
+        )
+    
+    # if save_to_file is not None:
+    #     plt.savefig(save_to_file, bbox_inches='tight')
+    # else:
+    #     plt.show()
 
 
 def plot_parameter_estimates(

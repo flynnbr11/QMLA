@@ -133,10 +133,8 @@ true_growth_class = qmla.get_growth_generator_class(
     log_file=log_file
 )
 dataset = true_growth_class.experimental_dataset
-# measurement_type = true_growth_class.measurement_type
 latex_mapping_file = arguments.latex_mapping_file
 probes_plot_file = arguments.probes_plot_file
-# force_plus_probe = bool(arguments.force_plus_probe)
 results_collection_file = "{}/collect_analyses.p".format(
     directory_to_analyse
 )
@@ -157,15 +155,23 @@ true_model_latex = true_growth_class.latex_name(
     true_model
 )
 
-# name = true_params_info['true_model']
-# terms = qmla.database_framework.get_constituent_names_from_name(name)
-# params = []
-# ops = []
-# for t in terms:
-#     params.append(true_params_dict[t])
-#     ops.append(database_framework.compute(t))
+# Directories to store analyses in
+results_directories = {
+    'growth_rule' : os.path.join(directory_to_analyse, 'growth_rule_plots'),
+    'meta' : os.path.join(directory_to_analyse, 'meta'),
+    'champions' : os.path.join(directory_to_analyse, 'champion_models'),
+    'performance' : os.path.join(directory_to_analyse, 'performance')
+}
 
-# true_ham = np.tensordot(params, ops, axes=1)
+for d in results_directories.values():
+    if not os.path.exists(d):
+        try:
+            os.makedirs(d)
+        except:
+            pass
+
+
+
 
 
 if not directory_to_analyse.endswith('/'):
@@ -179,7 +185,7 @@ if further_qhl_mode == True:
     results_file_name_start = 'further_qhl_results'
     plot_desc = 'further_'
 else:
-    results_csv_name = 'summary_results.csv'
+    results_csv_name = 'combined_results.csv'
     results_csv = directory_to_analyse + results_csv_name
     results_file_name_start = 'results'
     plot_desc = ''
@@ -292,14 +298,16 @@ if gather_summary_results:
     try:
         combined_datasets = qmla.analysis.generate_combined_datasets(
             directory_name = directory_to_analyse,
-            # results_file_name_start = results_file_name_start,
         )
     except:
         print("ANALYSIS FAILURE: Generate combined dataset.")
         raise
 
     try:
-        qmla.analysis.plot_from_combined_datasets(combined_datasets = combined_datasets)
+        qmla.analysis.plot_from_combined_datasets(
+            combined_datasets = combined_datasets,
+            save_directory = results_directories['performance']
+        )
     except:
         print("ANALYSIS FAILURE: Plotting from combined datasets.")
         raise
@@ -347,10 +355,9 @@ try:
         top_number_models=arguments.top_number_models,
         probes_plot_file=probes_plot_file,
         collective_analysis_pickle_file=results_collection_file,
-        save_to_file=str(
-            directory_to_analyse +
-            plot_desc +
-            'expec_vals.png'
+        save_to_file=os.path.join(
+            results_directories['performance'], 
+            str(plot_desc + 'dynamics.png')
         )
     )
 except:
@@ -389,7 +396,8 @@ try:
             directory_to_analyse +
             plot_desc +
             'param_avg.png'
-        )
+        ),
+        save_directory = results_directories['champions']
     )
 except:
     print("ANALYSIS FAILURE: average parameter plots.")
@@ -408,7 +416,9 @@ try:
         save_param_clusters_to_file=str(
             plot_desc + 'clusters_by_model.png'),
         save_redrawn_expectation_values=str(
-            plot_desc + 'clusters_expec_vals.png')
+            plot_desc + 'clusters_expec_vals.png'),
+        plot_prefix = plot_desc, 
+        save_directory = results_directories['champions'], 
     )
 except BaseException:
     print("ANALYSIS FAILURE: clustering plots.")
@@ -432,8 +442,7 @@ try:
         f_scores=f_scores,
         true_model=true_model,
         growth_generator=growth_generator,
-        # collective_analysis_pickle_file = results_collection_file,
-        save_file=os.path.join(directory_to_analyse, 'model_wins.png')
+        save_file=os.path.join(results_directories['performance'], 'model_wins.png')
     )
 except:
     print("ANALYSIS FAILURE: plotting model win rates.")
@@ -445,10 +454,10 @@ try:
         to_plot = [wins, f_score, precision, sensitivity],
         models = models,
         true_model=true_model_latex,
-        save_to_file=str(
-            directory_to_analyse +
-            'model_stats.png'
-        )
+        save_to_file = os.path.join(
+            results_directories['performance'], 
+            'model_statistics.png'
+        )        
     )
 except:
     print("ANALYSIS FAILURE: plotting model statistics.")
@@ -457,7 +466,7 @@ except:
 try:
     qmla.analysis.count_term_occurences(
         combined_results = combined_results, 
-        save_directory = directory_to_analyse
+        save_directory = results_directores['performance']
     )
 except:
     print("ANALYSIS FAILURE: Counting term occurences.")
@@ -467,7 +476,7 @@ except:
 try:
     qmla.analysis.plot_evaluation_log_likelihoods(
         combined_results = combined_results, 
-        save_directory = directory_to_analyse,
+        save_directory = results_directores['performance'],
         include_median_likelihood=False, 
     )
 except: 
@@ -478,7 +487,7 @@ except:
 try:
     qmla.analysis.inspect_times_on_nodes(
         combined_results = combined_results, 
-        save_directory=directory_to_analyse,
+        save_directory = results_directories['meta'],
     )
 except: 
     print("ANALYSIS FAILURE: Time inspection of nodes.")
@@ -492,7 +501,7 @@ try:
     qmla.analysis.stat_metrics_histograms(
         champ_info = model_score_results, 
         save_to_file=os.path.join(
-            directory_to_analyse, 
+            results_directories['performance'], 
             'metrics.png'
         )
     )
@@ -519,8 +528,8 @@ try:
         directory_name=directory_to_analyse,
         results_csv=results_csv,
         save_to_file=os.path.join(
-            directory_to_analyse, 
-            'sweep_param_total.png'
+            results_directories['meta'], 
+            str(plot_desc + 'sweep_param_total.png')
         )
     )
     qmla.analysis.parameter_sweep_analysis(
@@ -529,8 +538,8 @@ try:
         use_log_times=True,
         use_percentage_models=True,
         save_to_file=os.path.join(
-            directory_to_analyse, 
-            'sweep_param_percentage.png'
+            results_directories['meta'], 
+            str(plot_desc + 'sweep_param_percentage.png')
         )
     )
 except BaseException:
@@ -548,12 +557,11 @@ except BaseException:
 try:
     qmla.analysis.generational_analysis(
         combined_results = combined_results, 
-        save_directory=directory_to_analyse,
+        save_directory = results_directories['growth_rule'],
     )
 except:
     print("ANALYSIS FAILURE: generational analysis.")
     pass
-    # raise
 
 try:
     qmla.analysis.r_sqaured_average(
@@ -561,10 +569,9 @@ try:
         growth_class=true_growth_class,
         top_number_models=arguments.top_number_models,
         growth_classes_by_name=growth_classes,
-        save_to_file=str(
-            directory_to_analyse +
-            plot_desc +
-            'r_squared_averages.png'
+        save_to_file = os.path.join(
+            results_directories['champions'], 
+            str(plot_desc + 'r_squared_avg.png')
         )
     )
 except BaseException:
@@ -580,10 +587,9 @@ try:
         growth_classes=unique_growth_classes,
         growth_generator=growth_generator,
         top_number_models=arguments.top_number_models,
-        save_to_file=str(
-            directory_to_analyse +
-            plot_desc +
-            'quadratic_losses_avg.png'
+        save_to_file = os.path.join(
+            results_directories['champions'], 
+            str( plot_desc + 'quadratic_losses.png')
         )
     )
 except:
@@ -595,10 +601,9 @@ try:
         results_path=results_csv,
         growth_class=true_growth_class,
         top_number_models=arguments.top_number_models,
-        save_to_file=str(
-            directory_to_analyse +
-            plot_desc +
-            'volume_averages.png'
+        save_to_file = os.path.join(
+            results_directories['champions'], 
+            str(plot_desc + 'volumes.png')
         )
     )
 except: 
@@ -609,15 +614,13 @@ try:
     qmla.analysis.all_times_learned_histogram(
         results_path=results_csv,
         top_number_models=arguments.top_number_models,
-        save_to_file=str(
-            directory_to_analyse +
-            plot_desc +
-            'times_learned_upon.png'
+        save_to_file=os.path.join(
+            results_directories['performance'], 
+            str(plot_desc + 'times_learned_upon.png')
         )
     )
 except:
     print("ANALYSIS FAILURE: times learned upon.")
-    # raise
 
 # Bayes factors Vs true model
 try:
@@ -626,7 +629,7 @@ try:
         correct_mod=true_model,
         growth_generator=growth_generator,
         save_to_file=os.path.join(
-            directory_to_analyse,
+            results_directories['performance'],
             'bayes_comparisons_true_model.png'
         )
     )
@@ -643,7 +646,7 @@ except:
 try: 
     qmla.analysis.model_generation_probability(
         combined_results = combined_results,
-        save_directory=directory_to_analyse, 
+        save_directory=results_directories['performance'], 
     )
 except:
     print("ANALYSIS FAILURE: [gentic algorithm] Model generation rate.")
@@ -654,7 +657,7 @@ except:
 try:
     qmla.analysis.genetic_alg_fitness_plots(
         results_path = results_csv, 
-        save_directory = directory_to_analyse, 
+        save_directory = results_directories['growth_rule'],
     )
 except:
     print("ANALYSIS FAILURE: [genetic algorithm] Fitness measures.")
@@ -679,7 +682,10 @@ try:
         growth_generator=growth_generator,
         entropy=0,
         inf_gain=0,
-        save_to_file='DAG_multi_qmla.png'
+        save_to_file=os.path.join(
+            results_directories['performance'], 
+            'DAG_multi_qmla.png'
+        )
     )
 
     sys.stdout = sys.__stdout__

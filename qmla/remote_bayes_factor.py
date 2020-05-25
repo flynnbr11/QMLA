@@ -388,8 +388,7 @@ def plot_models_dynamics(
 
     plot_path = os.path.join(
         save_directory,
-        'BF_{}__{}_{}.png'.format(
-            str(qmla_id),
+        'BF_{}_{}.png'.format(
             str(model_a.model_id),
             str(model_b.model_id)
         )

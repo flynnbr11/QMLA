@@ -21,6 +21,11 @@ __all__ = [
 
 
 def generational_analysis(combined_results, save_directory=None):
+    if not os.path.exists(save_directory):
+        try:
+            os.makedirs(save_directory)
+        except:
+            pass
 
     generational_scores = None
 
@@ -353,7 +358,7 @@ def average_quadratic_losses(
 
 
 def all_times_learned_histogram(
-    results_path="summary_results.csv",
+    results_path="combined_results.csv",
     top_number_models=2,
     save_to_file=None
 ):

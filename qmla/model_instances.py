@@ -151,7 +151,7 @@ class ModelInstanceForLearning():
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         self.true_params_path = qmla_core_info_dict['true_params_pickle_file']      
-        
+        self.plots_directory = qmla_core_info_dict['plots_directory']
         # Instantiate growth rule
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
@@ -619,11 +619,10 @@ class ModelInstanceForLearning():
             return
         
         posterior_directory = os.path.join(
-            self.results_directory, 
+            self.plots_directory, 
             'posteriors'
         )
         if not os.path.exists(posterior_directory): 
-            self.log_print(["Making posterior dir:", posterior_directory])
             try:
                 os.makedirs(posterior_directory)
             except:
@@ -631,7 +630,7 @@ class ModelInstanceForLearning():
 
         posterior_file_path = os.path.join(
             posterior_directory, 
-            "qmla_{}_model_{}.png".format(
+            "model_{}.png".format(
                 self.qmla_id, 
                 self.model_id
             )

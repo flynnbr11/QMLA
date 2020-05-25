@@ -308,18 +308,21 @@ class QuantumModelLearningAgent():
         self.time_dependent_params = None
 
         # Plotting data about pairwise comparisons
-        self.bayes_factors_store_directory = str(
-            self.results_directory
-            + 'BayesFactorsTimeRecords/'
+        self.instance_learning_and_comparisons_path = os.path.join(
+            # self.results_directory,
+            # 'instance_learning_and_comparisons', 
+            # str(self.qmla_id)
+            self.qmla_controls.plots_directory, 
+            'comparisons'
         )
-        if not os.path.exists(self.bayes_factors_store_directory):
+        if not os.path.exists(self.instance_learning_and_comparisons_path):
             try:
-                os.makedirs(self.bayes_factors_store_directory)
+                os.makedirs(self.instance_learning_and_comparisons_path)
             except BaseException:
                 # reached at exact same time as another process; don't crash
                 pass
         self.bayes_factors_store_times_file = str(
-            self.bayes_factors_store_directory
+            self.instance_learning_and_comparisons_path
             + 'BayesFactorsPairsTimes_'
             + str(self.qmla_controls.long_id)
             + '.txt'
@@ -697,7 +700,7 @@ class QuantumModelLearningAgent():
                 model_b_id=model_b_id,
                 branch_id=branch_id,
                 times_record=self.bayes_factors_store_times_file,
-                bf_data_folder=self.bayes_factors_store_directory,
+                bf_data_folder=self.instance_learning_and_comparisons_path,
                 num_times_to_use=self.num_experiments_for_bayes_updates,
                 bayes_threshold=self.bayes_threshold_lower,
                 host_name=self.redis_host_name,
@@ -724,7 +727,7 @@ class QuantumModelLearningAgent():
             remote_bayes_factor_calculation(
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
-                bf_data_folder=self.bayes_factors_store_directory,
+                bf_data_folder=self.instance_learning_and_comparisons_path,
                 times_record=self.bayes_factors_store_times_file,
                 num_times_to_use=self.num_experiments_for_bayes_updates,
                 branch_id=branch_id,
