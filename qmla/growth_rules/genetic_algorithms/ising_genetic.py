@@ -72,21 +72,21 @@ class IsingGenetic(
         # default test - 32 generations x 16 starters
         self.fitness_method =   'model_win_ratio'  # 'model_number_wins'  # 'ranking' # 'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
-        self.max_spawn_depth = 16
-        self.initial_num_models =10
-        # test_fitness_models = [
-        #     'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5', # F=0
-        #     'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5', # F=0.2
-        #     'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.4
-        #     'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.6
-        #     'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5', # F=0.8
-        #     'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
-        # ]
-        # self.initial_models = test_fitness_models
+        self.max_spawn_depth = 1
+        self.initial_num_models = 10
+        test_fitness_models = [
+            'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5', # F=0
+            'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5', # F=0.2
+            'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.4
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.6
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5', # F=0.8
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
+        ]
+        self.initial_models = test_fitness_models
 
-        self.initial_models = self.genetic_algorithm.random_initial_models(
-            num_models=self.initial_num_models
-        )
+        # self.initial_models = self.genetic_algorithm.random_initial_models(
+        #     num_models=self.initial_num_models
+        # )
         # test force true model to appear in first generation
         # if self.true_model not in self.initial_models:
         #     self.initial_models[-1] = self.true_model
@@ -99,6 +99,6 @@ class IsingGenetic(
         self.num_processes_to_parallelise_over = min(2*len(self.initial_models) + 1, 16)
 
         self.max_time_to_consider = 15
-        self.min_param = 0.52
-        self.max_param = 0.48
+        self.min_param = 0.6
+        self.max_param = 0.4
         self.timing_insurance_factor = 3
