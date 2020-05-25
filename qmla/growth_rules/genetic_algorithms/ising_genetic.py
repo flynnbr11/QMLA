@@ -97,7 +97,9 @@ class IsingGenetic(
             'other': 0
         }
         self.num_processes_to_parallelise_over = min(2*len(self.initial_models) + 1, 16)
-
+        if not self.tree_completed_initially:
+            self.num_processes_to_parallelise_over = 16
+        
         self.max_time_to_consider = 15
         self.min_param = 0.6
         self.max_param = 0.4
