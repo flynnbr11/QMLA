@@ -549,7 +549,7 @@ class GrowthRule():
 
 
     def finalise_model_learning(self, **kwargs):
-        self.log_print([" GR {} finished.".format(self.growth)])
+        self.log_print([" GR {} finished.".format(self.growth_generation_rule)])
 
 
     def nominate_champions(self):

@@ -8,6 +8,7 @@ import random
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
+import seaborn as sns
 import redis
 import pickle
 
@@ -620,21 +621,13 @@ class ModelInstanceForLearning():
         
         posterior_directory = os.path.join(
             self.plots_directory, 
-            'posteriors'
+            'model_learning'
         )
         if not os.path.exists(posterior_directory): 
             try:
                 os.makedirs(posterior_directory)
             except:
                 pass # another instance made it at same time
-
-        posterior_file_path = os.path.join(
-            posterior_directory, 
-            "model_{}.png".format(
-                self.qmla_id, 
-                self.model_id
-            )
-        )
 
         bf_posterior = qi.MultivariateNormalDistribution(
             self.qinfer_updater.est_mean(), 
@@ -654,7 +647,7 @@ class ModelInstanceForLearning():
         ncols = int(np.ceil(np.sqrt(num_terms)))
         nrows = int(np.ceil(num_terms / ncols))
         fig, axes = plt.subplots(
-            figsize=(10, 7),
+            figsize=(18, 10),
             nrows=nrows, 
             ncols=ncols
         )
@@ -733,8 +726,28 @@ class ModelInstanceForLearning():
 
         fig.text(0.5, 0.04, 'Particle locations', ha='center')
         fig.text(0.04, 0.5, 'Weights', va='center', rotation='vertical')
-        fig.savefig(posterior_file_path)
 
+        # save the plot
+        if self.is_true_model:
+            figure_prefix = 'true_'
+        else:
+            figure_prefix = ''
+
+        fig.savefig(
+            os.path.join(posterior_directory, "{}model_{}.png".format(
+                figure_prefix, 
+                self.model_id
+            )
+        ))
+
+        # Plot covariance matrix heatmap
+        plt.clf()
+        fig, ax = plt.subplots(
+            figsize=(10, 10),
+        )
+
+        sns.heatmap(self.qinfer_updater.est_covariance_mtx(), ax = ax)
+        fig.savefig(os.path.join(posterior_directory, '{}cov_mtx_final_{}.png'.format(figure_prefix, self.model_id)))
 
     ##########
     # Section: Utilities

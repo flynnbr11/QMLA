@@ -369,16 +369,15 @@ def plot_models_dynamics(
         ax2.hist(
             bf_times,
             bins=num_times,
-            # histtype='bar',
             histtype='stepfilled',
             fill=False,
-            color='black',
             label=str("{} times total".format(len(bf_times))),
             alpha=0.3
         )
-        ax2.set_ylabel('Frequency of time updated')
+        ax2.set_ylabel('Frequency time was during comparison')
     except:
-        pass
+        raise
+        # pass
 
     bf = np.log10(bayes_factor)
     plt.title(

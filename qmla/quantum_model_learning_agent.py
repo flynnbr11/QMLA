@@ -255,6 +255,7 @@ class QuantumModelLearningAgent():
         self.model_f_scores = {}
         self.model_precisions = {}
         self.model_sensitivities = {}
+        self.bayes_factors_df = pd.DataFrame()
 
         # Get probes used for learning
         self.growth_class.generate_probes(
@@ -2569,7 +2570,7 @@ class QuantumModelLearningAgent():
             bayes_factor_by_id,
             cmap='RdYlGn',
             mask=mask,
-            annot=True
+            annot=False
         )   
         s.get_figure().savefig(
             os.path.join(

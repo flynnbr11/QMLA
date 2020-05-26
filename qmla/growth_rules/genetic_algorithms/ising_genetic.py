@@ -124,3 +124,5 @@ class IsingGeneticTest(
         self.fitness_method =  'f_score' #  'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' # 'elo_ratings' 
         self.max_spawn_depth=1
         self.initial_num_models = 10
+        self.num_processes_to_parallelise_over = 16
+        self.max_time_to_consider = 20 
