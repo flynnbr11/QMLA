@@ -593,7 +593,7 @@ class Genetic(
         correlations = pd.DataFrame(
             columns = ['Generation', 'Method', 'Correlation']
         )
-        fitness_types_to_ignore = ['f_score', 'model_hamming_distances']
+        fitness_types_to_ignore = ['f_score', 'hamming_distance']
         for t in self.fitness_df.fitness_type.unique():
             if t not in fitness_types_to_ignore:
                 this_fitness_type = self.fitness_df[

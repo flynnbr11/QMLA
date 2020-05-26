@@ -464,7 +464,7 @@ def correlation_fitness_f_score(
         pass # allow to fail # todo just return exception
     fig = sns.catplot(
         y  = 'Correlation', 
-        x='Method',
+        x = 'Method',
         data = fitness_correlations,
         kind='box'
     )

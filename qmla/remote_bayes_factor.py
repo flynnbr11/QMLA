@@ -372,7 +372,7 @@ def plot_models_dynamics(
             histtype='stepfilled',
             fill=False,
             label=str("{} times total".format(len(bf_times))),
-            alpha=0.3
+            alpha=0.1
         )
         ax2.set_ylabel('Frequency time was during comparison')
     except:

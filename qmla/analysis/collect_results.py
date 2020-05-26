@@ -120,7 +120,7 @@ def _generate_combined_datasets(
         )
         fig = sns.catplot(
             y  = 'Correlation', 
-            x='Method',
+            x = 'Method',
             data = fitness_correlations,
             kind='box'
         )
