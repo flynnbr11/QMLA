@@ -70,7 +70,7 @@ class IsingGenetic(
         self.fraction_particles_for_bf = 1
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
-        self.fitness_method =   'model_win_ratio'  # 'model_number_wins'  # 'ranking' # 'f_scores' # 'hamming_distances'  #'elo_ratings' # 'ranking'
+        self.fitness_method =  'f_score' #  'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' # 'elo_ratings' 
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
         self.max_spawn_depth = 2
         self.initial_num_models = 5

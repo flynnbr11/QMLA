@@ -146,12 +146,6 @@ class Genetic(
         sum_wins = sum(list(model_points.values()))
         model_ids = list(model_points.keys())
 
-        # dictionaries which can be used as fitnesses:
-        model_number_wins = {}
-        model_f_scores = {}
-        model_hamming_distances = {}
-        model_win_ratio = {}
-        model_elo_ratings = {}
 
         # model rankings  by number of wins
         ranked_model_list = sorted(
@@ -206,6 +200,24 @@ class Genetic(
         self.log_print(["Eval log likels:", log_likelihoods])
 
 
+        # New dictionaries which can be used as fitnesses:
+        model_f_scores = {'fitness_type' : 'f_score'}
+        model_hamming_distances = {'fitness_type' : 'hamming_distance'}
+        model_number_wins = {'fitness_type' : 'number_wins'}
+        model_win_ratio = {'fitness_type' : 'win_ratio'}
+
+        # Alter finished dicts also useable as fitness
+        log_likelihoods['fitness_type'] = 'log_likelihoods'
+        model_elo_ratings['fitness_type'] = 'elo_ratings'
+        model_points_distributed_by_ranking['fitness_type'] = 'ranking'
+
+        available_fitness_data = [
+            model_f_scores, model_hamming_distances, 
+            model_number_wins, model_win_ratio, 
+            model_elo_ratings, model_points_distributed_by_ranking, 
+            log_likelihoods
+        ] 
+
         # store info on each model for analysis
         for m in model_ids:
             mod = kwargs['model_names_ids'][m]
@@ -235,106 +247,19 @@ class Genetic(
                 )
             )
 
-            self.fitness_df = (
-                self.fitness_df.append(
-                    pd.Series(
-                        {
-                            'generation' : self.spawn_step,
-                            'f_score' : model_f_scores[mod], 
-                            'fitness' : model_f_scores[mod], 
-                            'fitness_type' : 'f_score',
-                            'active_fitness_method' : self.fitness_method=='f_scores',
-                        }
-                    ),
-                    ignore_index=True
+            for data in available_fitness_data:
+                new_entry = pd.Series(
+                    {
+                        'generation' : self.spawn_step,
+                        'f_score' : model_f_scores[mod], 
+                        'fitness' : data[mod], 
+                        'fitness_type' : data['fitness_type'],
+                        'active_fitness_method' : self.fitness_method==data['fitness_type'],
+                    }
                 )
-            )
-            self.fitness_df = (
-                self.fitness_df.append(
-                    pd.Series(
-                        {
-                            'generation' : self.spawn_step,
-                            'f_score' : model_f_scores[mod], 
-                            'fitness' : model_elo_ratings[mod], 
-                            'fitness_type' : 'elo_rating',
-                            'active_fitness_method' : self.fitness_method=='elo_ratings',
-                        }
-                    ),
-                    ignore_index=True
-                )
-            )
-            self.fitness_df = (
-                self.fitness_df.append(
-                    pd.Series(
-                        {
-                            'generation' : self.spawn_step,
-                            'f_score' : model_f_scores[mod], 
-                            'fitness' : model_win_ratio[mod], 
-                            'fitness_type' : 'model_win_ratio',
-                            'active_fitness_method' : self.fitness_method=='model_win_ratio',
-                        }
-                    ),
-                    ignore_index=True
-                )
-            )
-            # self.fitness_df = (
-            #     self.fitness_df.append(
-            #         pd.Series(
-            #             {
-            #                 'generation' : self.spawn_step,
-            #                 'f_score' : model_f_scores[mod], 
-            #                 'fitness' : model_number_wins[mod], 
-            #                 'fitness_type' : 'model_number_wins',
-            #                 'active_fitness_method' : self.fitness_method=='model_number_wins',
-            #             }
-            #         ),
-            #         ignore_index=True
-            #     )
-            # )
+                self.fitness_df = self.fitness_df.append(
+                    new_entry, ignore_index=True)
 
-            self.fitness_df = (
-                self.fitness_df.append(
-                    pd.Series(
-                        {
-                            'generation' : self.spawn_step,
-                            'f_score' : model_f_scores[mod], 
-                            'fitness' : model_points_distributed_by_ranking[mod], 
-                            'fitness_type' : 'ranking',
-                            'active_fitness_method' : self.fitness_method=='ranking',
-                        }
-                    ),
-                    ignore_index=True
-                )
-            )
-            self.fitness_df = (
-                self.fitness_df.append(
-                    pd.Series(
-                        {
-                            'generation' : self.spawn_step,
-                            'f_score' : model_f_scores[mod], 
-                            'fitness' : model_hamming_distances[mod], 
-                            'fitness_type' : 'model_hamming_distances',
-                            'active_fitness_method' : self.fitness_method=='hamming_distances',
-                        }
-                    ),
-                    ignore_index=True
-                )
-            )
-            self.fitness_df = (
-                self.fitness_df.append(
-                    pd.Series(
-                        {
-                            'generation' : self.spawn_step,
-                            'f_score' : model_f_scores[mod], 
-                            'fitness' : log_likelihoods[mod], 
-                            'fitness_type' : 'log_likelihoods',
-                            'active_fitness_method' : self.fitness_method=='log_likelihoods',
-                        }
-                    ),
-                    ignore_index=True
-                )
-            )
-        
         self.log_print(
             [
                 'Generation {} \nModel Win numbers: \n{} \nF-scores: \n{} \nWin ratio:\n{} \nModel Ratings:\n{} \nRanking: \n{} \nlog_likelihoods: \n{}'.format(
@@ -350,9 +275,9 @@ class Genetic(
         )
 
         # choose the fitness method to use for the genetic algorithm
-        if self.fitness_method == 'f_scores':
+        if self.fitness_method == 'f_score':
             genetic_algorithm_fitnesses = model_f_scores
-        elif self.fitness_method == 'hamming_distances': 
+        elif self.fitness_method == 'hamming_distance': 
             genetic_algorithm_fitnesses = model_hamming_distances
         elif self.fitness_method == 'elo_ratings':
             genetic_algorithm_fitnesses = model_elo_ratings
@@ -362,10 +287,12 @@ class Genetic(
             genetic_algorithm_fitnesses = model_points_distributed_by_ranking
         elif self.fitness_method == 'log_likelihoods':
             genetic_algorithm_fitnesses = log_likelihoods
-        elif self.fitness_method == 'model_win_ratio':
+        elif self.fitness_method == 'win_ratio':
             genetic_algorithm_fitnesses = model_win_ratio
         else:
             self.log_print(["No fitness method selected for genetic algorithm"])
+
+        genetic_algorithm_fitnesses.pop('fitness_type', None)
 
         self.log_print([
             "fitness method:{} => Fitnesses={}".format(
@@ -557,6 +484,7 @@ class Genetic(
         self.storage.fitness_correlations = self.fitness_correlations
         self.storage.fitness_by_f_score = self.fitness_by_f_score
         self.storage.fitness_df = self.fitness_df
+        self.storage.true_model_chromosome = self.true_chromosome_string
 
         chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
         dud_chromosome = str('1' +'0'*self.genetic_algorithm.num_terms)
@@ -577,33 +505,16 @@ class Genetic(
                 try:
                     f_scores.append(np.round(self.f_score_from_chromosome_string(c), 3) )
                 except:
-                    self.log_print(
-                        [
-                            "Could not compute f score for chromosome: {}".format(c)
-                        ]
-                    )
+                    self.log_print([
+                        "Could not compute f score for chromosome: {}".format(c)
+                    ])
             self.growth_rule_specific_data_to_store['f_score_tested_models' ] = f_scores
         except:
-            self.log_print(
-                [
-                    "Could not compute f score for chromosome list: {}".format(chromosomes)
-                ]
-            )
+            self.log_print([
+                "Could not compute f score for chromosome list: {}".format(chromosomes)
+            ])
             pass
-        self.growth_rule_specific_data_to_store['true_model_chromosome'] = self.true_chromosome_string
-        try:
-            self.growth_rule_specific_data_to_store['f_score_fitnesses'] = list(zip(
-                self.fitness_by_f_score['f_score'],
-                self.fitness_by_f_score['model_win_ratio'],
-                self.fitness_by_f_score['model_elo_ratings'],
-                self.fitness_by_f_score['original_elo_rating'],
-                self.fitness_by_f_score['model_points_distributed_by_ranking'],
-                self.fitness_by_f_score['log_likelihood']
-                # self.fitness_by_f_score['fitness_ratio_rating_win_rate']
-            ))
-        except:
-            # did not enter generate_models
-            pass
+        
 
 
     def check_tree_completed(

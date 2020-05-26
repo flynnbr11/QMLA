@@ -22,92 +22,7 @@ def round_nearest(x,a):
 def flatten(l): 
     return [item for sublist in l for item in sublist]
 
-def get_f_score_dataframe(combined_results):
 
-    results_by_fscore = pd.DataFrame()
-    for i in combined_results.index:
-        ratings_list = eval(dict(combined_results['GrowthRuleStorageData'])[i])['f_score_fitnesses']
-        for result in ratings_list: 
-            f_score = float(round_nearest(result[0], 0.05))
-            run = i
-            generation = ratings_list.index(result)
-            # win ratio
-            results_by_fscore = (
-                results_by_fscore.append(
-                    pd.Series(
-                    {
-                        'f_score' : f_score,
-                        'fitness' : np.round(result[1], 2),
-                        'fitness_type' : 'win_ratio',
-                        'run' : run, 
-                        'generation' : generation
-                    }), 
-                    ignore_index=True
-                )
-            )    
-
-            # rating
-            results_by_fscore = (
-                results_by_fscore.append(
-                    pd.Series(
-                    {
-                        'f_score' : float(round_nearest(result[0], 0.05)),
-                        'fitness' : np.round(result[2], 2),
-                        'fitness_type' : 'elo_rating',
-                        'run' : run, 
-                        'generation' : generation
-                    }), 
-                    ignore_index=True
-                )
-            )    
-
-            # rating
-            results_by_fscore = (
-                results_by_fscore.append(
-                    pd.Series(
-                    {
-                        'f_score' : float(round_nearest(result[0], 0.05)),
-                        'fitness' : np.round(result[3], 2),
-                        'fitness_type' : 'elo_rating_raw',
-                        'run' : run, 
-                        'generation' : generation
-                    }), 
-                    ignore_index=True
-                )
-            )    
-
-
-            # ranking
-            results_by_fscore = (
-                results_by_fscore.append(
-                    pd.Series(
-                    {
-                        'f_score' : float(round_nearest(result[0], 0.05)),
-                        'fitness' : np.round(result[4], 2),
-                        'fitness_type' : 'ranking',
-                        'run' : run, 
-                        'generation' : generation
-                    }), 
-                    ignore_index=True
-                )
-            )    
-            
-            # log likelihood
-            results_by_fscore = (
-                results_by_fscore.append(
-                    pd.Series(
-                    {
-                        'f_score' : float(round_nearest(result[0], 0.05)),
-                        'fitness' : np.round(result[5], 2),
-                        'fitness_type' : 'log_likelihood',
-                        'run' : run, 
-                        'generation' : generation
-                    }), 
-                    ignore_index=True
-                )
-            )    
-        return results_by_fscore
-    
 
 def fitness_comparison(results_by_fscore, ax=None, save_directory=None):
     if ax is None: 
@@ -135,7 +50,7 @@ def elo_rating_by_fscore(results_by_fscore, ax=None, save_directory=None):
     sns.boxplot(
         x ='f_score',
         y='fitness',
-        data=results_by_fscore[ results_by_fscore['fitness_type']=='elo_rating'],
+        data=results_by_fscore[ results_by_fscore['fitness_type']=='elo_ratings'],
 #         hue='fitness_type',
         ax = ax
     )
@@ -159,8 +74,6 @@ def log_likelihood_by_fscore(results_by_fscore, ax=None, save_directory=None):
         plt.savefig(
             os.path.join(save_directory, 'genetic_log_likelihood.png')
         )
-
-
     
 def genetic_alg_num_models(results_by_fscore, ax=None, save_directory=None):
     if ax is None: 
