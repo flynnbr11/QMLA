@@ -233,7 +233,7 @@ pickle.dump(
     model_score_results, 
     open(
         os.path.join(
-            directory_to_analyse, 
+            results_directories['champions'], 
             'champions_info.p'
         ),
         'wb'
@@ -610,7 +610,7 @@ try:
         growth_class=true_growth_class,
         top_number_models=arguments.top_number_models,
         save_to_file = os.path.join(
-            results_directories['champions'], 
+            results_directories['performance'], 
             str(plot_desc + 'volumes.png')
         )
     )
