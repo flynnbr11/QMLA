@@ -302,13 +302,13 @@ if gather_summary_results:
         raise
 
     try:
-        qmla.analysis.cross_insantce_bayes_factor_heatmap(
+        qmla.analysis.cross_instance_bayes_factor_heatmap(
             combined_datasets_directory = results_directories['combined_datasets'],
             save_directory = results_directories['performance']
         )
     except:
         print("ANALYSIS FAILURE: Bayes factor heatmap.")
-        raise
+        pass
 
     try:
         qmla.analysis.correlation_fitness_f_score(
@@ -664,14 +664,12 @@ except:
 
 try:
     qmla.analysis.genetic_alg_fitness_plots(
-        # results_path = results_csv, 
         combined_datasets_directory= results_directories['combined_datasets'],
         save_directory = results_directories['growth_rule'],
     )
 except:
     print("ANALYSIS FAILURE: [genetic algorithm] Fitness measures.")
-    raise
-    # pass
+    pass
 
 
 ##################################

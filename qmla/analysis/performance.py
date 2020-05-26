@@ -16,7 +16,7 @@ import qmla.database_framework
 
 __all__ = [
     'bayes_factor_f_score_heatmap',
-    'cross_insantce_bayes_factor_heatmap',
+    'cross_instance_bayes_factor_heatmap',
     'update_shared_bayes_factor_csv', 
     'get_model_scores', 
     'plot_statistics', 
@@ -88,7 +88,7 @@ def bayes_factor_f_score_heatmap(bayes_factors_df):
     return fig
 
 
-def cross_insantce_bayes_factor_heatmap(
+def cross_instance_bayes_factor_heatmap(
     combined_datasets_directory, 
     save_directory
 ):
