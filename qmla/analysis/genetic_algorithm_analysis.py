@@ -135,7 +135,7 @@ def elo_rating_by_fscore(results_by_fscore, ax=None, save_directory=None):
     sns.boxplot(
         x ='f_score',
         y='fitness',
-        data=results_by_fscore[ results_by_fscore['fitness_type']=='elo_rating_raw'],
+        data=results_by_fscore[ results_by_fscore['fitness_type']=='elo_rating'],
 #         hue='fitness_type',
         ax = ax
     )
@@ -151,8 +151,7 @@ def log_likelihood_by_fscore(results_by_fscore, ax=None, save_directory=None):
     sns.boxplot(
         x ='f_score',
         y='fitness',
-        data=results_by_fscore[ results_by_fscore['fitness_type']=='log_likelihood'],
-#         hue='fitness_type',
+        data=results_by_fscore[ results_by_fscore['fitness_type']=='log_likelihoods'],
         ax = ax
     )
     ax.set_title("Log likelihood")
@@ -181,12 +180,16 @@ def genetic_alg_num_models(results_by_fscore, ax=None, save_directory=None):
 
 
 def genetic_alg_fitness_plots(
-    results_path, 
+    # results_path, 
+    combined_datasets_directory,
     save_directory=None
 ):
-    combined_results = pd.read_csv(results_path)
-    results_by_fscore = get_f_score_dataframe(
-        combined_results 
+    # combined_results = pd.read_csv(results_path)
+    # results_by_fscore = get_f_score_dataframe(
+    #     combined_results 
+    # )
+    results_by_fscore = pd.read_csv(
+        os.path.join(combined_datasets_directory, 'fitness_df.csv')
     )    
 
     fig = plt.figure(
@@ -207,22 +210,18 @@ def genetic_alg_fitness_plots(
     fitness_comparison(
         results_by_fscore, 
         ax = ax1, 
-        # save_directory
     )
     elo_rating_by_fscore(
         results_by_fscore, 
         ax = ax2, 
-        # save_directory
     )
     log_likelihood_by_fscore(
         results_by_fscore, 
         ax = ax3, 
-        # save_directory
     )
     genetic_alg_num_models(
         results_by_fscore, 
         ax = ax4, 
-        # save_directory
     )
 
 
@@ -535,4 +534,30 @@ def model_generation_probability(
     if save_directory is not None: 
         plt.savefig(os.path.join(save_directory, 'prob_f_score_generation.png'))
 
+
+def correlation_fitness_f_score(
+    combined_datasets_directory, 
+    save_directory
+):
+    try:
+        fitness_correlations = pd.read_csv(
+            os.path.join(
+                combined_datasets_directory, 
+                'fitness_correlations.csv'
+            )
+        )
+    except:
+        print("ANALYSIS FAILURE: could not load fitness correlation CSV.")
+        pass # allow to fail # todo just return exception
+    fig = sns.catplot(
+        y  = 'Correlation', 
+        x='Method',
+        data = fitness_correlations,
+        kind='box'
+    )
+    fig.savefig(
+        os.path.join(
+            save_directory, "fitness_f_score_correlations.png"
+        )
+    )
 

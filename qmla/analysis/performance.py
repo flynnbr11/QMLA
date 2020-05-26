@@ -16,7 +16,7 @@ import qmla.database_framework
 
 __all__ = [
     'bayes_factor_f_score_heatmap',
-    'plot_from_combined_datasets',
+    'cross_insantce_bayes_factor_heatmap',
     'update_shared_bayes_factor_csv', 
     'get_model_scores', 
     'plot_statistics', 
@@ -88,39 +88,28 @@ def bayes_factor_f_score_heatmap(bayes_factors_df):
     return fig
 
 
-def plot_from_combined_datasets(
-    combined_datasets,
+def cross_insantce_bayes_factor_heatmap(
+    combined_datasets_directory, 
     save_directory
 ):
-    directory = combined_datasets['results_directory']
-    available_data = combined_datasets['datasets_generated']
-
-    # Bayes factors
-    if 'bayes_factors' in available_data:
-        bayes_factors = pd.read_csv(
-            os.path.join(directory, 'bayes_factors.csv')
-        )
-        f = bayes_factor_f_score_heatmap(bayes_factors)
-        f.savefig(
-            os.path.join(save_directory, 'bayes_factors_by_f_scores.png')
-        )
-
-    # F score correlations
-    if 'fitness_correlations' in available_data:
+    try:
         fitness_correlations = pd.read_csv(
-            os.path.join(directory, 'fitness_correlations.csv')
-        )
-        fig = sns.catplot(
-            y  = 'Correlation', 
-            x='Method',
-            data = fitness_correlations,
-            kind='box'
-        )
-        fig.savefig(
             os.path.join(
-                save_directory, "fitness_f_score_correlations.png"
+                combined_datasets_directory, 
+                'fitness_correlations.csv'
             )
         )
+    except:
+        print("ANALYSIS FAILURE: could not load fitness correlation CSV.")
+        pass # allow to fail # todo just return exception
+
+    bayes_factors = pd.read_csv(
+        os.path.join(combined_datasets_directory, 'bayes_factors.csv')
+    )
+    f = bayes_factor_f_score_heatmap(bayes_factors)
+    f.savefig(
+        os.path.join(save_directory, 'bayes_factors_by_f_scores.png')
+    )
 
 
 def update_shared_bayes_factor_csv(qmd, all_bayes_csv):
@@ -949,6 +938,7 @@ def plot_evaluation_log_likelihoods(
     include_log_likelihood = True,
     include_median_likelihood = True,
     include_champion_percentiles = True,
+    save_data_as_csv=False, 
     save_directory=None,
 ):
     evaluation_cols = [
@@ -1212,18 +1202,19 @@ def plot_evaluation_log_likelihoods(
         )
 
         # save the df for manual analysis afterwards
-        evaluation_plot_df.to_csv(
-            os.path.join(
-                save_directory, 
-                'data_evaluation_plot.csv'
+        if save_data_as_csv:
+            evaluation_plot_df.to_csv(
+                os.path.join(
+                    save_directory, 
+                    'data_evaluation_plot.csv'
+                )
             )
-        )
-        sub_df.to_csv(
-            os.path.join(
-                save_directory, 
-                'data_classified_instances.csv'
+            sub_df.to_csv(
+                os.path.join(
+                    save_directory, 
+                    'data_classified_instances.csv'
+                )
             )
-        )
         
     # return evaluation_plot_df
 

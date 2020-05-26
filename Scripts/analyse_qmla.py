@@ -160,7 +160,8 @@ results_directories = {
     'growth_rule' : os.path.join(directory_to_analyse, 'growth_rule_plots'),
     'meta' : os.path.join(directory_to_analyse, 'meta'),
     'champions' : os.path.join(directory_to_analyse, 'champion_models'),
-    'performance' : os.path.join(directory_to_analyse, 'performance')
+    'performance' : os.path.join(directory_to_analyse, 'performance'),
+    'combined_datasets' : os.path.join(directory_to_analyse, 'combined_datasets')
 }
 
 for d in results_directories.values():
@@ -169,10 +170,6 @@ for d in results_directories.values():
             os.makedirs(d)
         except:
             pass
-
-
-
-
 
 if not directory_to_analyse.endswith('/'):
     directory_to_analyse += '/'
@@ -296,7 +293,8 @@ if gather_summary_results:
     )
 
     try:
-        combined_datasets = qmla.analysis.generate_combined_datasets(
+        datasets_generated = qmla.analysis.generate_combined_datasets(
+            combined_datasets_directory =  results_directories['combined_datasets'],
             directory_name = directory_to_analyse,
         )
     except:
@@ -304,13 +302,23 @@ if gather_summary_results:
         raise
 
     try:
-        qmla.analysis.plot_from_combined_datasets(
-            combined_datasets = combined_datasets,
+        qmla.analysis.cross_insantce_bayes_factor_heatmap(
+            combined_datasets_directory = results_directories['combined_datasets'],
             save_directory = results_directories['performance']
         )
     except:
-        print("ANALYSIS FAILURE: Plotting from combined datasets.")
+        print("ANALYSIS FAILURE: Bayes factor heatmap.")
         raise
+
+    try:
+        qmla.analysis.correlation_fitness_f_score(
+            combined_datasets_directory = results_directories['combined_datasets'],
+            save_directory = results_directories['growth_rule']
+        )
+    except:
+        print("ANALYSIS FAILURE: Correlation plot b/w fitness and F-score.")
+        pass
+        
         
     # Find number of occurences of each model
     # quite costly so it is optional
@@ -476,7 +484,7 @@ except:
 try:
     qmla.analysis.plot_evaluation_log_likelihoods(
         combined_results = combined_results, 
-        save_directory = results_directores['performance'],
+        save_directory = results_directories['performance'],
         include_median_likelihood=False, 
     )
 except: 
@@ -656,13 +664,14 @@ except:
 
 try:
     qmla.analysis.genetic_alg_fitness_plots(
-        results_path = results_csv, 
+        # results_path = results_csv, 
+        combined_datasets_directory= results_directories['combined_datasets'],
         save_directory = results_directories['growth_rule'],
     )
 except:
     print("ANALYSIS FAILURE: [genetic algorithm] Fitness measures.")
-    # raise
-    pass
+    raise
+    # pass
 
 
 ##################################

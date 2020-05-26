@@ -6,7 +6,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
-num_tests=1
+num_tests=2
 qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
@@ -36,9 +36,6 @@ number_best_models_further_qhl=5
 custom_prior=1
 bintimes=1
 bf_all_times=0
-# data_max_time=5 # nanoseconds
-# data_time_offset=205 # nanoseconds
-
 
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently

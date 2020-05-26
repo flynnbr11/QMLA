@@ -135,11 +135,12 @@ def _generate_combined_datasets(
         # pass
 
 def generate_combined_datasets(
-    directory_name,
+    directory_name, # where storage results are
+    combined_datasets_directory, # where to save datasets
 ):
-    combined_datasets_directory = os.path.join(
-        directory_name, 'combined_datasets'
-    )
+    # combined_datasets_directory = os.path.join(
+    #     directory_name, 'combined_datasets'
+    # )
     if not os.path.exists(combined_datasets_directory):
         try:
             os.makedirs(combined_datasets_directory)
@@ -163,6 +164,8 @@ def generate_combined_datasets(
     # combined datasets to generate
     bayes_factors = pd.DataFrame()
     fitness_correlations = pd.DataFrame()
+    fitness_by_f_score = pd.DataFrame()
+    fitness_df = pd.DataFrame()
 
     # cycle through files
     for f in filenames:
@@ -172,9 +175,26 @@ def generate_combined_datasets(
         bf['qmla_id'] = storage.qmla_id
         bayes_factors = bayes_factors.append(bf, ignore_index=True)
 
-        fit_cor = storage.growth_rule_storage.fitness_correlations
-        fit_cor['qmla_id'] = storage.qmla_id
-        fitness_correlations = fitness_correlations.append(fit_cor, ignore_index=True)
+        try:
+            fit_cor = storage.growth_rule_storage.fitness_correlations
+            fit_cor['qmla_id'] = storage.qmla_id
+            fitness_correlations = fitness_correlations.append(fit_cor, ignore_index=True)
+        except:
+            pass
+        
+        try:
+            fit_f = storage.growth_rule_storage.fitness_by_f_score
+            fit_f['qmla_id'] = storage.qmla_id
+            fitness_by_f_score = fitness_by_f_score.append(fit_f, ignore_index=True)
+        except:
+            pass
+
+        try:
+            fit_f = storage.growth_rule_storage.fitness_df
+            fit_f['qmla_id'] = storage.qmla_id
+            fitness_df = fitness_df.append(fit_f, ignore_index=True)
+        except:
+            pass            
 
     # Store datasets and add their name to the list
     datasets_generated = []
@@ -182,15 +202,36 @@ def generate_combined_datasets(
     bayes_factors.to_csv(os.path.join(combined_datasets_directory, 'bayes_factors.csv'))
     datasets_generated.append('bayes_factors')
 
-    fitness_correlations.to_csv(os.path.join(combined_datasets_directory, 'fitness_correlations.csv'))
-    datasets_generated.append('fitness_correlations')
+    try:
+        fitness_correlations.to_csv(os.path.join(
+            combined_datasets_directory, 'fitness_correlations.csv')
+        )
+        datasets_generated.append('fitness_correlations')
+    except:
+        pass
+
+    try:
+        fitness_by_f_score.to_csv(os.path.join(
+            combined_datasets_directory, 'fitness_by_f_score.csv')
+        )
+        datasets_generated.append('fitness_by_f_score')
+    except:
+        pass
+
+    try:
+        fitness_df.to_csv(
+            os.path.join( combined_datasets_directory, 'fitness_df.csv')
+        )
+        datasets_generated.append('fitness_df')
+    except:
+        pass
 
     # Gather together and return
-    combined_data = {
-        'results_directory' : combined_datasets_directory,  
-        'datasets_generated' : datasets_generated      
-    }
-    return combined_data
+    # combined_data = {
+    #     'results_directory' : combined_datasets_directory,  
+    #     'datasets_generated' : datasets_generated      
+    # }
+    return datasets_generated
 
 
 def count_model_occurences(

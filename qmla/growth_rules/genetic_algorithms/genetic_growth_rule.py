@@ -214,9 +214,7 @@ class Genetic(
                 test_model = mod
             ) # for fitness use 1/H
             model_hamming_distances[mod] = (self.genetic_algorithm.num_terms - hamming_dist)/self.genetic_algorithm.num_terms
-            model_f_scores[mod] = self.f_score_model_comparison(
-                test_model = mod, 
-            )
+            model_f_scores[mod] = np.round(self.f_score_model_comparison(test_model = mod), 2)
             model_win_ratio[mod] = model_number_wins[mod]/sum_wins
 
             # store scores for offline analysis
@@ -557,6 +555,9 @@ class Genetic(
         self
     ):        
         self.storage.fitness_correlations = self.fitness_correlations
+        self.storage.fitness_by_f_score = self.fitness_by_f_score
+        self.storage.fitness_df = self.fitness_df
+
         chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
         dud_chromosome = str('1' +'0'*self.genetic_algorithm.num_terms)
         if dud_chromosome in chromosomes:
