@@ -70,19 +70,10 @@ class IsingGenetic(
         self.fraction_particles_for_bf = 1
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
-        self.fitness_method =  'f_score' #  'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' # 'elo_ratings' 
+        self.fitness_method =  'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' # 'elo_ratings' 
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
         self.max_spawn_depth = 16
         self.initial_num_models = 10
-        # test_fitness_models = [
-        #     'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5', # F=0
-        #     'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5', # F=0.2
-        #     'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.4
-        #     'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.6
-        #     'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5', # F=0.8
-        #     'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
-        # ]
-        # self.initial_models = test_fitness_models
 
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
@@ -104,3 +95,32 @@ class IsingGenetic(
         self.min_param = 0.6
         self.max_param = 0.4
         self.timing_insurance_factor = 1
+
+
+class IsingGeneticTest(
+    IsingGenetic
+):
+
+    def __init__(
+        self,
+        growth_generation_rule,
+        **kwargs
+    ):
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            **kwargs
+        )
+
+        test_fitness_models = [
+            'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5', # F=0
+            'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5', # F=0.2
+            'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.4
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.6
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5', # F=0.8
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
+        ]
+        self.initial_models = test_fitness_models
+        self.tree_completed_initially = True
+        self.fitness_method =  'f_score' #  'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' # 'elo_ratings' 
+        self.max_spawn_depth=1
+        self.initial_num_models = 10

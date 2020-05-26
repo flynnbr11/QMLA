@@ -42,7 +42,8 @@ bf_all_times=0
 
 
 # growth_rule='SimulatedNVCentre'
-growth_rule='IsingGenetic'
+# growth_rule='IsingGenetic'
+growth_rule='IsingGeneticTest'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='FermiHubbardLatticeSet'
