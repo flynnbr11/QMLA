@@ -70,9 +70,9 @@ def set_shared_parameters(
         # # sample from a distribution to get candidate true parameters
         # # use a wider distribution than initiated for QHL
         # # => true parameters within 3 sigma of learning distribution
-        widen_prior_factor = 2  
+        widen_prior_factor = growth_class.true_param_cov_mtx_widen_factor  
         old_cov_mtx = true_prior.cov
-        new_cov_mtx = widen_prior_factor * old_cov_mtx
+        new_cov_mtx = old_cov_mtx**(1/widen_prior_factor)
         true_prior.__setattr__('cov', new_cov_mtx)
         sampled_list = true_prior.sample()
 

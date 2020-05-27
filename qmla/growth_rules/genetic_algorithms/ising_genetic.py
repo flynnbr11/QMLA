@@ -50,6 +50,7 @@ class IsingGenetic(
         self.base_terms = [
             'z',
         ]
+        self.true_param_cov_mtx_widen_factor = 1
 
         self.mutation_probability = 0.25
         self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
