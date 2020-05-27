@@ -1153,6 +1153,7 @@ class QuantumModelLearningAgent():
         )
 
         # Update the branch with comparison data
+        # TODO give these data to GR but let it decide chamion etc, in case decided otherwise than BF contest
         self.branches[branch_id].champion_id = champ_id
         self.branches[branch_id].champion_name = champ_name
         self.branches[branch_id].rankings = ranked_model_list
