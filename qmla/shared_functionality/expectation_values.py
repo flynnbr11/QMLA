@@ -232,7 +232,7 @@ def make_inversion_gate(num_qubits):
 
 def n_qubit_hahn_evolution(
     ham, t, state,
-    second_time_evolution_factor = 2,
+    second_time_evolution_factor = 1,
     precision=1e-10,
     log_file=None,
     log_identifier=None

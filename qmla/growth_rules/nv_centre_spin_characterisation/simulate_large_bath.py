@@ -122,7 +122,7 @@ class SimulatedNVCentre(
         self.max_time_to_consider = 50 * time_basis # 50 microseconds 
         self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
 
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
+        # self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampledUncertaintyWithConvergenceThreshold
