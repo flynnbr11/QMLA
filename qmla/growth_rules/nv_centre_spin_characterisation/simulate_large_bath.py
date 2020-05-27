@@ -116,8 +116,6 @@ class SimulatedNVCentre(
         self.initial_models=None
         self.expectation_value_function = \
             qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
-        self.model_heuristic_function = \
-            qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic            
         self.timing_insurance_factor = 1
         time_basis = 1e-9 # nanoseconds
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
@@ -125,7 +123,7 @@ class SimulatedNVCentre(
         self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
 
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampledUncertaintyWithConvergenceThreshold
 
