@@ -141,7 +141,7 @@ class GrowthRule():
         self.plot_time_increment=None
         self.min_param = 0
         self.max_param = 1
-        self.true_param_cov_mtx_widen_factor = 2
+        self.true_param_cov_mtx_widen_factor = 1
         self.prior_random_mean = False
         self.fixed_true_terms = False        
         self.get_true_parameters()
