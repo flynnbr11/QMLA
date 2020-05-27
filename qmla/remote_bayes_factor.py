@@ -369,6 +369,7 @@ def plot_models_dynamics(
         ax2.hist(
             bf_times,
             bins=num_times,
+            range = (min(times), max(times)), # TODO put on separate plot to see when higher times compared on
             histtype='stepfilled',
             fill=False,
             label=str("{} times total".format(len(bf_times))),
