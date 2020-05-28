@@ -275,7 +275,7 @@ class TestSimulatedNVCentre(
         gamma = 10.705e6 # T^-1 s^-1 # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5226623/
 
 
-        order_mag = 9
+        order_mag = 1
         self.true_model_terms_params = {
             # spin
             # 'pauliSet_1_x_d3' : B*g*bohr_magneton/hbar, # ~1.943 GHz = 1943123809.5238094
@@ -283,7 +283,7 @@ class TestSimulatedNVCentre(
             # 'pauliSet_1_z_d3' : B*g*bohr_magneton/hbar,
 
             'pauliSet_1_y_d3' : 1.9431238095238094 * (10**order_mag),
-            'pauliSet_1_z_d3' : 2*1.9431238095238094 * (10**order_mag)
+            'pauliSet_1_z_d3' : 1.9431238095238094 * (10**order_mag)
         }
 
         self.gaussian_prior_means_and_widths = {
@@ -300,6 +300,7 @@ class TestSimulatedNVCentre(
         self.true_model = qmla.database_framework.alph(self.true_model)
 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
+        # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         time_basis = 1/10**order_mag # nanoseconds
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
