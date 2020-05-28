@@ -275,7 +275,7 @@ class TestSimulatedNVCentre(
         gamma = 10.705e6 # T^-1 s^-1 # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5226623/
 
 
-        order_mag = 1
+        order_mag = 9
         self.true_model_terms_params = {
             # spin
             # 'pauliSet_1_x_d3' : B*g*bohr_magneton/hbar, # ~1.943 GHz = 1943123809.5238094
