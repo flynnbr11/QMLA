@@ -12,13 +12,8 @@ from matplotlib.gridspec import GridSpec
 import qmla.database_framework as database_framework
 import qmla.model_for_comparison
 import qmla.logging
-
-try:
-    import qmla.redis_settings as rds
-    import redis
-    enforce_serial = False
-except BaseException:
-    enforce_serial = True  # shouldn't be needed
+import qmla.redis_settings as rds
+import redis
 
 pickle.HIGHEST_PROTOCOL = 4
 plt.switch_backend('agg')
@@ -239,7 +234,8 @@ def remote_bayes_factor_calculation(
     log_print([
         "Finished. rq time: ", str(time.time() - time_start),
     ])
-
+    
+    del model_a, model_b
     return bayes_factor
 
 def log_print(

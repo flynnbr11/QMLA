@@ -3,11 +3,13 @@
 test_description="development"
 printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 
+
+# redis-server
 ### ---------------------------------------------------###
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1 # don't perform QMLA; perform QHL on known correct model
+qhl_test=0  # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
@@ -41,9 +43,9 @@ bf_all_times=0
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 
-growth_rule='SimulatedNVCentre'
+# growth_rule='SimulatedNVCentre'
 # growth_rule='IsingGenetic'
-# growth_rule='IsingGeneticTest'
+growth_rule='IsingGeneticTest'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='FermiHubbardLatticeSet'
@@ -335,3 +337,5 @@ then
     echo "------ Launching analyse further QHL ------"
     # sh $further_analyse_script
 fi
+
+# redis-cli shutdown

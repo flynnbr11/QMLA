@@ -581,7 +581,7 @@ class QuantumModelLearningAgent():
                     async=self.use_rq,
                     default_timeout=self.rq_timeout
                 )
-                self.log_print(["Redis queue object:", queue])
+                self.log_print(["Redis queue object:", queue, "has job waiting IDs:", queue.job_ids])
                 # send model learning as task to job queue
                 queued_model = queue.enqueue(
                     remote_learn_model_parameters,
@@ -597,6 +597,7 @@ class QuantumModelLearningAgent():
                     result_ttl=-1,
                     timeout=self.rq_timeout
                 )
+                self.log_print(["Model {} on rq job {}".format(model_id, queued_model)])
                 if blocking:
                     # wait for result when called.
                     self.log_print([

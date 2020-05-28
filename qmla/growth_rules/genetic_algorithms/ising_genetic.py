@@ -149,6 +149,7 @@ class IsingGeneticTest(
 
         # test F map for random set of 10 models
         self.initial_models = self.genetic_algorithm.random_initial_models(10)
+        self.log_print([len(self.initial_models), " initial models:", self.initial_models])
 
         self.tree_completed_initially = True
         self.fitness_method =  'win_ratio'  #'f_score' #  'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' # 'elo_ratings' 

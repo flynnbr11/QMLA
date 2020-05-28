@@ -165,7 +165,6 @@ def remote_learn_model_parameters(
         updated_model_info,
         protocol=4
     )
-    del qml_instance
 
     # Store the (compressed) result set on the redis database.
     try:
@@ -190,7 +189,11 @@ def remote_learn_model_parameters(
     if remote:
         del updated_model_info
         del compressed_info
-        log_print(["Learned model; remote time:", str(time.time() - time_start)])
+        del qml_instance
+        log_print([
+            "Learned model; remote time:", str(
+            np.round( (time.time() - time_start), 2))
+        ])
         return None
     else:
         return updated_model_info

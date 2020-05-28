@@ -136,6 +136,6 @@ def get_seed(host_name, port_number, qmla_id):
     print("Seed requested for host/port/id", host_name, '/', port_number,
             '/', qmla_id, ";has seed", seed
             )
-    print("Seed keys", seed_db_keys)
+    # print("Seed keys", seed_db_keys)
 
     return int(seed)
