@@ -36,6 +36,7 @@ redis_host_name = arguments.host_name
 redis_port_number = arguments.port_number
 qmla_id = arguments.qmla_id
 
+print("Custom RQ script. Host:{}; port:{}.".format(redis_host_name, redis_port_number))
 
 # make a redis connection
 redis_conn = redis.Redis(
