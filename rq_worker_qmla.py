@@ -38,12 +38,12 @@ qmla_id = arguments.qmla_id
 print("Custom RQ script. Host:{}; port:{}.".format(redis_host_name, redis_port_number))
 
 # # make a redis connection
-# redis_conn = redis.Redis(
-#         host = redis_host_name,
-#         port = redis_port_number
-# )
+redis_conn = redis.Redis(
+        host = redis_host_name,
+        port = redis_port_number
+)
 
-# with Connection( redis_conn ):
+with Connection( redis_conn ):
 
-#         w = Worker( [str(qmla_id)] , connection=redis_conn)
-#         w.work()
+        w = Worker( [str(qmla_id)] , connection=redis_conn)
+        w.work()
