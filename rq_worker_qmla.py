@@ -4,7 +4,6 @@ from rq import Queue, Connection, Worker
 import argparse
 
 #Preload libraries
-sys.path.append("..")
 import qmla
 
 
