@@ -283,7 +283,7 @@ class TestSimulatedNVCentre(
             # 'pauliSet_1_z_d3' : B*g*bohr_magneton/hbar,
 
             'pauliSet_1_y_d3' : 1.9431238095238094 * (10**order_mag),
-            'pauliSet_1_z_d3' : 1.9431238095238094 * (10**order_mag)
+            'pauliSet_1_z_d3' : 7.9431238095238094 * (10**order_mag)
         }
 
         self.gaussian_prior_means_and_widths = {

@@ -424,8 +424,8 @@ class ModelInstanceForLearning():
 
         self.log_print([
             "QHL finished for ", self.model_name,
-            "Final time selected:", self.track_experimental_times[-1],
-            "{} Resample epochs: {}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
+            "\n Final time selected:", self.track_experimental_times[-1],
+            "\n{} Resample epochs: \n{}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
         ])
 
         # Final results
