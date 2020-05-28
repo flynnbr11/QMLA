@@ -30,6 +30,8 @@ growth_classes = {
         GR.ExperimentReducedNV,
     'SimulatedNVCentre' : 
         GR.SimulatedNVCentre,
+    'TestSimulatedNVCentre' : 
+        GR.TestSimulatedNVCentre,
 
     # Theoretical paper growth rules
     'IsingPredetermined':

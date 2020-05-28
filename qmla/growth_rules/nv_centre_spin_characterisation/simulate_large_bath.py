@@ -244,3 +244,60 @@ def spin_system_model(
     return model
     
     
+
+
+class TestSimulatedNVCentre(
+    SimulatedNVCentre  # inherit from this
+):
+    # Uses some of the same functionality as
+    # default NV centre spin experiments/simulations
+    # but uses an expectation value which traces out
+    # and different model generation
+
+    def __init__(
+        self,
+        growth_generation_rule,
+        **kwargs
+    ):
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            **kwargs
+        )
+        
+
+        # Set up true model
+        B = 11e-3 # Tesla
+        g = 2 # 
+        bohr_magneton = 9.274e-24 # J T^-1
+        hbar = 1.05e-34 # m^2 kg s^-1
+        nuclear_magneton = 5.05e-27 # J T^-1 
+        gamma_n = 0.307e6 / 1e-6 # from Seb's thesis
+        gamma = 10.705e6 # T^-1 s^-1 # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5226623/
+
+
+        order_mag = -3
+        self.true_model_terms_params = {
+            # spin
+            # 'pauliSet_1_x_d3' : B*g*bohr_magneton/hbar, # ~1.943 GHz = 1943123809.5238094
+            # 'pauliSet_1_y_d3' : B*g*bohr_magneton/hbar,
+            # 'pauliSet_1_z_d3' : B*g*bohr_magneton/hbar,
+
+            'pauliSet_1_y_d3' : 1.9431238095238094 * (10**order_mag),
+            'pauliSet_1_z_d3' : 1.9431238095238094 * (10**order_mag)
+        }
+
+        self.gaussian_prior_means_and_widths = {
+            # spin
+            'pauliSet_1_x_d3' : (5* (10**order_mag), 2* (10**order_mag)),
+            'pauliSet_1_y_d3' : (5* (10**order_mag), 2* (10**order_mag)),
+            'pauliSet_1_z_d3' : (5* (10**order_mag), 2* (10**order_mag)),
+
+        }
+
+        self.true_model = '+'.join(
+            (self.true_model_terms_params.keys())
+        )
+        self.true_model = qmla.database_framework.alph(self.true_model)
+
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
