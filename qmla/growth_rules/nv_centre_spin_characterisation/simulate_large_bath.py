@@ -301,3 +301,7 @@ class TestSimulatedNVCentre(
 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        time_basis = 1/order_mag # nanoseconds
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
+        self.max_time_to_consider = 50 * time_basis # 50 microseconds 
+        self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
