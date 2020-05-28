@@ -69,25 +69,24 @@ def round_nearest(x,a):
 
 
 
-def format_experiment(model, final_learned_params, time):
-    # gen = model.qinfer_model
+def format_experiment(
+    qinfer_model, 
+    qhl_final_param_estimates, 
+    time,
+    final_learned_params=None, 
+):
     exp = np.empty(
         len(time),
-        dtype=model.expparams_dtype
+        dtype=qinfer_model.expparams_dtype
     )
     exp['t'] = time
-
     try:
-        # for i in range(1, len(gen.expparams_dtype)):
-        #     col_name = 'w_' + str(i)
-        #     exp[col_name] = model.final_learned_params[i - 1, 0]
-        for term in gen.expparams_dtype:
-            if term != 't':
-                exp[term] = model.qhl_final_param_estimates[term]
+        for dtype in qinfer_model.expparams_dtype:
+            term = dtype[0]
+            if term in qhl_final_param_estimates:
+                exp[term] = qhl_final_param_estimates[term]
     except BaseException:
-        print("failed to get exp. \nFinal params:", final_learned_params)
-
-
+        print("failed to set exp from param estimates.\nReturning:", exp)
     return exp
 
 def flatten(l): return [item for sublist in l for item in sublist]

@@ -28,7 +28,7 @@ rt=0.5
 ### ---------------------------------------------------###
 # QMD settings
 ### ---------------------------------------------------###
-use_rq=0
+use_rq=1
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
 plots=0

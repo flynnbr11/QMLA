@@ -585,6 +585,7 @@ class ModelInstanceForLearning():
             exp = qmla.utilities.format_experiment(
                 evaluation_qinfer_model, 
                 final_learned_params = self.final_learned_params, 
+                qhl_final_param_estimates = self.qhl_final_param_estimates,
                 time = [t],
             )
             params_array = np.array([[self.true_model_params[:]]])
