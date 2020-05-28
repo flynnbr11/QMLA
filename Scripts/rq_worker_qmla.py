@@ -44,7 +44,7 @@ print("Custom RQ script. Host:{}; port:{}.".format(redis_host_name, redis_port_n
 #         port = redis_port_number
 # )
 
-# with Connection( redis_conn ):
+with Connection( redis_conn ):
 
-#         w = Worker( [str(qmla_id)] , connection=redis_conn)
-#         w.work()
+        w = Worker( [str(qmla_id)] , connection=redis_conn)
+        w.work()
