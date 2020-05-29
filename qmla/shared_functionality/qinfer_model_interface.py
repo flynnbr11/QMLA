@@ -20,7 +20,7 @@ global_print_loc = False
 global debug_print
 debug_print = False
 global debug_log_print
-debug_log_print = False
+debug_log_print = True
 global debug_print_file_line
 debug_print_file_line = False
 
@@ -87,6 +87,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         experimental_measurements,
         experimental_measurement_times,
         log_file,
+        debug_log_print=False,
         **kwargs
     ):
         self.log_file = log_file
@@ -101,6 +102,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._truename = truename
         self._true_dim = qmla.database_framework.get_num_qubits(self._truename)
         self.true_param_dict = true_param_dict 
+        self.store_likelihoods = {}
+        self.debug_log_print = debug_log_print
         # get true_hamiltonian from true_param dict
         true_ham = None
         for k in list(self.true_param_dict.keys()):
@@ -192,7 +195,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     ):
         r"""Log print if global debug_log_print set to True."""
 
-        if debug_log_print:
+        if self.debug_log_print:
             self.log_print(
                 to_print_list = to_print_list,
                 log_identifier = 'QInfer interface debug'
@@ -429,25 +432,22 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.timings[timing_marker]['likelihood_array'] += time.time() - t_init
         self.log_print_debug(
             [
-                'Simulating experiment.',
-                'times:', times,
-                'true_evo:', true_evo,
-                'len(outcomes):', len(outcomes),
-                '_a = {}, _b={}'.format(self._a, self._b),
-                'probe counter:', self.probe_counter,
+                '\ntrue_evo:', true_evo,
+                '\ntimes:', times,
+                '\nlen(outcomes):', len(outcomes),
+                '\n_a = {}, _b={}'.format(self._a, self._b),
+                '\nprobe counter:', self.probe_counter,
                 '\nexp:', expparams,
-                '\nOutcomes:', outcomes,
-                '\nmodelparams:', params,
+                '\nOutcomes:', outcomes[:10],
+                '\nparticles:', params[:10],
+                "\nPr0: ", pr0[:10], 
+                "\nLikelihood: ", likelihood_array[0][:10]
             ]
         )
-        self.log_print_debug(
-            [
-                "Outcomes: ", outcomes, 
-                "\nPr0: ", pr0, 
-                "\nLikelihood: ", likelihood_array
-            ]
-        )
+        
         self.timings[timing_marker]['likelihood'] += time.time() - t_likelihood_start
+        if not true_evo:
+            self.store_likelihoods[self._b] = likelihood_array
         return likelihood_array
 
     def get_system_pr0_array(

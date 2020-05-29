@@ -144,7 +144,7 @@ def eigenbasis_of_first_qubit(
     **kwargs
 ):
     probes = {}
-    bases_to_learn = ['x']
+    bases_to_learn = ['x', 'y', 'z']
     for N in range(1, max_num_qubits+1):
         bases = ['pauliSet_1_{}_d{}'.format(b, N) for b in bases_to_learn ]
         base_matrices = [qmla.database_framework.compute(b) for b in bases]

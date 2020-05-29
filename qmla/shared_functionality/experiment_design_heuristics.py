@@ -85,21 +85,18 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
             dtype=self._updater.model.expparams_dtype
         )
 
-        # idx_iter = 0  # modified in order to cycle through particle parameters with different names
-        # for field_i in self._x_:
-        #     eps[field_i] = self._inv_func(x)[0][idx_iter]
-        #     idx_iter += 1
-
         sigma = self._updater.model.distance(x, xp)
-        new_time = self._t_func(
-            1 / sigma
-        )
+        # new_time = self._t_func(
+        #     1 / sigma
+        # )
+        new_time = 1 / sigma
+        time_prefactor = 1
+        if epoch_id > 200:
+            print("Introducing prefactor to heuristic")
+            time_prefactor = 1
+        new_time *= time_prefactor
         eps['t'] = new_time
         print("Heuristic; eps = ", eps)
-        # eps[self._t] = new_time
-        # for field, value in self._other_fields.items():
-        #     eps[field] = value**self._pgh_exponent
-
         return eps
 
 
@@ -276,7 +273,7 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         epoch_id=0,
         **kwargs
     ):
-        print("Heuristiccalled " )
+        print("Heuristic called" )
         idx_iter = 0
         while idx_iter < self._maxiters:
 

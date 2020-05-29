@@ -2718,7 +2718,7 @@ class QuantumModelLearningAgent():
 
         include_params = False
         include_bayes_factors = False
-        if all_models == True:
+        if all_models:
             model_ids = list(sorted(self.model_name_id_map.keys()))
         elif self.qhl_mode:
             model_ids = [self.true_model_id]
@@ -2739,18 +2739,21 @@ class QuantumModelLearningAgent():
             "Plotting dynamics of models:",
             model_ids
         ])
-
+        path_to_save = os.path.join(self.qmla_controls.plots_directory, 'dynamics.png')
         try:
+            include_times_learned = False
+            include_params = False
             qmla.analysis.plot_learned_models_dynamics(
                 qmd=self,
                 include_bayes_factors=include_bayes_factors,
-                include_times_learned=True,
+                include_times_learned=include_times_learned,
                 include_param_estimates=include_params,
                 model_ids=model_ids,
-                save_to_file=save_to_file,
+                save_to_file=path_to_save,
             )
         except:
             self.log_print(["Failed to plot dynamics"])
+            raise
 
     def plot_volume_after_qhl(self,
                               model_id=None,

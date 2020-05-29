@@ -339,25 +339,11 @@ def plot_learned_models_dynamics(
     include_param_estimates=False,
     save_to_file=None
 ):
-    # if qmd.qhl_mode == True:
-    #     model_ids = [qmd.true_model_id]
-    #     include_bayes_factors = False
-    # elif qmd.qhl_mode_multiple_models == True:
-    #     model_ids = list(qmd.qhl_mode_multiple_models_model_ids)
-    #     include_bayes_factors = False
-    # elif model_ids is None:
-    #     model_ids = [
-    #         self.branches[b].champion_id
-    #         for b in self.branches
-    #     ]
-
-        # model_ids = list(qmd.branch_champions.values())
 
     model_ids = list(sorted(set(model_ids)))  # only uniques values
     true_expec_vals = pickle.load(
         open(qmd.qmla_controls.true_expec_path, 'rb'))
     times_to_plot = list(sorted(true_expec_vals.keys()))
-    # times_to_plot = list(sorted(qmd.plot_times))
 
     # TODO this is overwritten within for loop below so that large
     # Hamiltonians don't have to work out each time step
@@ -449,13 +435,14 @@ def plot_learned_models_dynamics(
             ham = reduced.learned_hamiltonian
             dim = np.log2(np.shape(ham)[0])
             probe = plot_probes[reduced.probe_num_qubits]
-            # print(
-            #     "[plot_learned_models_dynamics]",
-            #     "\n\tModel ", reduced.model_name_latex,
-            #     "\n\tnum qubits:", dim,
-            #     "\n\tprobe:", probe
-
-            # )
+            qmd.log_print(
+                [
+                "[plot_learned_models_dynamics]",
+                "\n\tModel ", reduced.model_name_latex,
+                "\n\tnum qubits:", dim,
+                "\n\tprobe:", probe
+                ]
+            )
             # expec_vals = {}
             if dim > 4:
                 times_to_plot = times_to_plot[0::5]
@@ -544,14 +531,10 @@ def plot_learned_models_dynamics(
             ax = fig.add_subplot(gs[row, col])
             if row == 0:
                 ax.set_title('Times learned')
-    #         ax.set_ylabel(
-    #             desc,
-    #             color=name_colour,
-    #             rotation=0,
-    #         )
             ax.yaxis.set_label_position("right")
 
-            times_learned_over = reduced.times_learned_over
+            times_learned_over = sorted(qmla.utilities.flatten(reduced.times_learned_over))
+            qmd.log_print(["[single instance plot] Times for bin:", times_learned_over])
             n, bins, patches = ax.hist(
                 times_learned_over,
                 # histtype='step',
@@ -583,6 +566,7 @@ def plot_learned_models_dynamics(
             if col == ncols:
                 col = 0
                 row += 1
+
         ############ --------------- ############
         ############ Plot parameters estimates ############
         ############ --------------- ############

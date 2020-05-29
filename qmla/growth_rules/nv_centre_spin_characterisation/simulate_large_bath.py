@@ -307,11 +307,15 @@ class TestSimulatedNVCentre(
             (self.true_model_terms_params.keys())
         )
         self.true_model = qmla.database_framework.alph(self.true_model)
+        self.qinfer_resampler_threshold = 0.5
+        self.qinfer_resampler_a = 0.98
 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
         time_basis = 1/10**order_mag # nanoseconds
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
-        self.max_time_to_consider = 50 * time_basis # 50 microseconds 
+        self.max_time_to_consider = 500 * time_basis # 50 microseconds 
         self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds

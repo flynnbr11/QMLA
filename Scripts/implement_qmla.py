@@ -232,14 +232,14 @@ elif (
         ) for mod in qhl_models
     ]
 
-    qmla_instance.plot_branch_champions_dynamics(
-        save_to_file=str(
-            qmla_controls.plots_directory +
-            'dynamics_' +
-            str(qmla_controls.long_id) +
-            '.png'
-        )
-    )
+    # qmla_instance.plot_branch_champions_dynamics(
+    #     save_to_file=str(
+    #         qmla_controls.plots_directory +
+    #         'dynamics_' +
+    #         str(qmla_controls.long_id) +
+    #         '.png'
+    #     )
+    # )
 
     if qmla_controls.pickle_qmd_class:
         log_print(
@@ -291,16 +291,16 @@ else:
     expec_value_mods_to_plot.append(qmla_instance.champion_model_id)
 
     print("Plotting expectation values.")
-    plot_dynamics_all_models = False
-    qmla_instance.plot_branch_champions_dynamics(
-        all_models=plot_dynamics_all_models,
-        save_to_file=str(
-            qmla_controls.plots_directory +
-            'dynamics_' +
-            str(qmla_controls.long_id) +
-            '.png'
-        )
-    )
+    # plot_dynamics_all_models = False
+    # qmla_instance.plot_branch_champions_dynamics(
+    #     all_models=plot_dynamics_all_models,
+    #     save_to_file=str(
+    #         qmla_controls.plots_directory +
+    #         'dynamics_' +
+    #         str(qmla_controls.long_id) +
+    #         '.png'
+    #     )
+    # )
 
     print("Plotting statistical metrics")
     qmla_instance.get_statistical_metrics(

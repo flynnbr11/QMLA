@@ -1,11 +1,11 @@
 import numpy as np
-import scipy as sp
 import os
 import time
 import copy
-import qinfer as qi
+import scipy
 import random 
 
+import qinfer as qi
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import seaborn as sns
@@ -203,6 +203,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
+            debug_log_print=False,
         )
         self.qinfer_updater = qi.SMCUpdater(
             self.qinfer_model,
@@ -245,16 +246,18 @@ class ModelInstanceForLearning():
             # use dictionaries defined here instead.
             [len(self.model_terms_matrices), 2])
         self.track_param_means = [self.qinfer_updater.est_mean()]
-        self.track_param_uncertainties = []
+        self.track_param_uncertainties = [np.sqrt(
+            np.diag(self.qinfer_updater.est_covariance_mtx()))
+        ]
         self.track_posterior_dist = []
         self.track_experimental_times = []
         self.qhl_final_param_estimates = {}
         self.qhl_final_param_uncertainties = {}
         self.track_covariance_matrices = []
         if self.growth_class.track_quadratic_loss:
-            self.true_model_params_dict = self.growth_class.true_params_dict
+            self.true_params_dict = self.growth_class.true_params_dict # TODO check these are loaded properly by GR
             self.all_params_for_q_loss = list(
-                set(list(self.true_model_params_dict.keys())).union(self.model_terms_names)
+                set(list(self.true_params_dict.keys())).union(self.model_terms_names)
             )
             self.param_indices = {
                 op_name : self.model_terms_names.index(op_name)
@@ -327,6 +330,11 @@ class ModelInstanceForLearning():
 
             # Call updater to update distribution based on datum
             try:
+                self.log_print([
+                    # debug
+                    "Current param distribution mean\n", self.qinfer_updater.est_mean(),
+                    "\n uncertainty:\n", np.sqrt(np.diag(self.qinfer_updater.est_covariance_mtx()))
+                ])
                 self.qinfer_updater.update(
                     datum_from_experiment,
                     new_experiment
@@ -401,8 +409,8 @@ class ModelInstanceForLearning():
                 else:
                     learned_param = 0
 
-                if param in list(self.true_model_params_dict.keys()):
-                    true_param = self.true_model_params_dict[param]
+                if param in list(self.true_params_dict.keys()):
+                    true_param = self.true_params_dict[param]
                 else:
                     true_param = 0
                 quadratic_loss += (learned_param - true_param)**2
@@ -425,7 +433,7 @@ class ModelInstanceForLearning():
         self.log_print([
             "QHL finished for ", self.model_name,
             "\n Final time selected:", self.track_experimental_times[-1],
-            "\n{} Resample epochs: \n{}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
+            "\n {} Resample epochs: \n{}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
         ])
 
         # Final results
@@ -463,7 +471,7 @@ class ModelInstanceForLearning():
 
             # Arrays of parameter estimates/uncertainties
             self.track_param_estimate_v_epoch[term] = self.track_param_means[:, i]
-            self.track_param_uncertainty_v_epoch = self.track_param_uncertainties[:, i]
+            self.track_param_uncertainty_v_epoch[term] = self.track_param_uncertainties[:, i]
             
             # Compute the Hamiltonian corresponding to the parameter posterior distribution
             self.learned_hamiltonian = sum([
@@ -474,6 +482,7 @@ class ModelInstanceForLearning():
 
         # Plots for this model
         self.plot_posterior()
+        self.plot_parameters()
 
     def learned_info_dict(self):
         """
@@ -513,6 +522,7 @@ class ModelInstanceForLearning():
         learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
         learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
         learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
+        learned_info['qinfer_model_likelihoods'] = self.qinfer_model.store_likelihoods
 
         # additionally wanted by comparison class
         learned_info['name'] = self.model_name
@@ -566,6 +576,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
+            debug_log_print=False,
         )
 
         evaluation_updater = qi.SMCUpdater(
@@ -620,13 +631,17 @@ class ModelInstanceForLearning():
             # GR doesn't want this plotted
             return
         
-        posterior_directory = os.path.join(
+        self.model_learning_plots_directory = os.path.join(
             self.plots_directory, 
             'model_learning'
         )
-        if not os.path.exists(posterior_directory): 
+        self.plot_prefix =''
+        if self.is_true_model:
+            self.plot_prefix = 'true_'
+
+        if not os.path.exists(self.model_learning_plots_directory): 
             try:
-                os.makedirs(posterior_directory)
+                os.makedirs(self.model_learning_plots_directory)
             except:
                 pass # another instance made it at same time
 
@@ -735,8 +750,8 @@ class ModelInstanceForLearning():
             figure_prefix = ''
 
         fig.savefig(
-            os.path.join(posterior_directory, "{}model_{}.png".format(
-                figure_prefix, 
+            os.path.join(self.model_learning_plots_directory, "{}distributions_{}.png".format(
+                self.plot_prefix, 
                 self.model_id
             )
         ))
@@ -748,7 +763,129 @@ class ModelInstanceForLearning():
         )
 
         sns.heatmap(self.qinfer_updater.est_covariance_mtx(), ax = ax)
-        fig.savefig(os.path.join(posterior_directory, '{}cov_mtx_final_{}.png'.format(figure_prefix, self.model_id)))
+        fig.savefig(
+            os.path.join(self.model_learning_plots_directory, 
+            '{}cov_mtx_final_{}.png'.format(self.plot_prefix, self.model_id))
+        )
+
+    def plot_parameters(self):
+        terms = self.track_param_estimate_v_epoch.keys()
+        num_terms = len(terms)
+        
+        extra_plots = ['volume', 'time']
+        ncols = int(np.ceil(np.sqrt(num_terms))) 
+        nrows = int(np.ceil(num_terms / ncols))+ len(extra_plots)
+
+        fig = plt.figure( 
+            figsize=(3*ncols, 3*nrows)
+        )
+
+        gs = GridSpec(
+            nrows = nrows,
+            ncols = ncols,
+        )
+
+        row = 0
+        col = 0
+
+        # Parameter estimates
+        for term in terms:
+            ax = fig.add_subplot(gs[row, col])
+            estimates = self.track_param_estimate_v_epoch[term]
+            uncertainty = self.track_param_uncertainty_v_epoch[term]
+            lower_bound = estimates - uncertainty
+            upper_bound = estimates + uncertainty
+
+            epochs = range(len(estimates))
+
+            ax.plot(epochs, estimates, label='Estimate')
+            ax.fill_between(
+                epochs, 
+                lower_bound, 
+                upper_bound,
+                alpha = 0.2,
+                label='Uncertainty'
+            )
+
+            for e in self.epochs_after_resampling:
+                ax.axvline(
+                    e, 
+                    ls='--', 
+                    c='green', alpha = 0.5, 
+                    # label='Resample'
+                )
+
+            if term in self.true_param_dict:
+                true_param = self.true_param_dict[term]
+                ax.axhline(true_param, color='red', ls='--', label='True')
+                
+            ax.set_title(self.growth_class.latex_name(term))
+            ax.set_ylabel('Parameter')
+            ax.set_xlabel('Epoch')
+                
+            if row == 0  and col == ncols-1:
+                ax.legend()
+                
+            col += 1
+            if col == ncols-2:
+                col = 0
+                row += 1
+
+        # fig.text(0.5, 0.04, 'Epoch', ha='center')
+        # fig.text(0.04, 0.5, 'Parameter', va='center', rotation='vertical')
+
+        # Volume
+        row = nrows-2
+        col = 0
+        ax = fig.add_subplot(gs[row, :])
+
+        ax.plot(
+            range(len(self.volume_by_epoch)), 
+            self.volume_by_epoch,
+            label = 'Volume',
+        )
+        for e in self.epochs_after_resampling:
+            ax.axvline(
+                e, 
+                ls='--', 
+                c='green', alpha = 0.5, 
+                # label='Resample'
+            )
+
+        ax.set_title('Volume')
+        ax.set_ylabel('Volume')
+        ax.set_xlabel('Epoch')
+        ax.semilogy()
+        ax.legend()
+
+        # Times learned upon
+        row = nrows-1
+        col = 0
+        ax = fig.add_subplot(gs[row, :])
+
+        times = qmla.utilities.flatten(self.track_experimental_times)
+        hist_time_bins = scipy.stats.reciprocal.rvs(
+            min(times), 
+            max(times), 
+            size=100
+        ) # evaluation times generated log-uniformly
+        hist_time_bins = sorted(hist_time_bins)
+
+        ax.hist(
+            times,
+            bins = hist_time_bins,
+        )
+        ax.semilogx()
+        ax.set_title('Times learned on', pad = -15)
+        ax.set_ylabel('Frequency learned upon')
+        ax.set_xlabel('Time')
+
+        # Save figure
+        fig.savefig(
+            os.path.join(self.model_learning_plots_directory, 
+            '{}learning_summary_{}.png'.format(self.plot_prefix, self.model_id))
+        )
+                
 
     ##########
     # Section: Utilities
