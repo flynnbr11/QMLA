@@ -862,25 +862,38 @@ class ModelInstanceForLearning():
         row = nrows-1
         col = 0
         ax = fig.add_subplot(gs[row, :])
-
+        histogram = False # False -> scatter plot of time v epoch
         times = qmla.utilities.flatten(self.track_experimental_times)
-        hist_time_bins = scipy.stats.reciprocal.rvs(
-            min(times), 
-            max(times), 
-            size=100
-        ) # evaluation times generated log-uniformly
-        hist_time_bins = sorted(hist_time_bins)
+        if histogram:
+            hist_time_bins = scipy.stats.reciprocal.rvs(
+                min(times), 
+                max(times), 
+                size=100
+            ) # evaluation times generated log-uniformly
+            hist_time_bins = sorted(hist_time_bins)
 
-        ax.hist(
-            times,
-            bins = hist_time_bins,
-        )
-        ax.semilogx()
-        ax.set_title('Times learned on', pad = -15)
-        ax.set_ylabel('Frequency learned upon')
-        ax.set_xlabel('Time')
+            ax.hist(
+                times,
+                bins = hist_time_bins,
+            )
+            ax.semilogx()
+            ax.set_title('Times learned on', pad = -15)
+            ax.set_ylabel('Frequency learned upon')
+            ax.set_xlabel('Time')
+        else:
+            ax.scatter(
+                range(len(self.track_experimental_times)), 
+                self.track_experimental_times,
+                label='Time of experiment',
+                s=3,
+            )
+            ax.legend()
+            ax.set_xlabel('Epoch')
+            ax.set_ylabel('Time')
+            ax.semilogy()
 
         # Save figure
+        fig.tight_layout()
         fig.savefig(
             os.path.join(self.model_learning_plots_directory, 
             '{}learning_summary_{}.png'.format(self.plot_prefix, self.model_id))

@@ -202,6 +202,7 @@ if qmla_controls.qhl_mode:
             '.png'
         )
     )
+    qmla_instance.plot_one_qubit_probes_bloch_sphere(save=True)
     # log_print(
     #     [
     #         "Finished plotting dynamics",

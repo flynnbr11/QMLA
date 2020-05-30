@@ -138,6 +138,42 @@ def separable_probe_dict(
 ## e.g. matching experiment.
 ###################################
 
+def manual_set_probes(max_num_qubits = 2, num_probes = 10, **kwargs):
+    r"""
+    To manually check something. Currently should be ideal for learning Y. 
+    """
+    probes = {}
+    ideal_probes_for_y = [
+
+        np.array([1, 0j]),
+        np.array([0, 1]),
+        
+        # np.array([0, 1j]),
+        # np.array([1j, 0]),
+
+        1/np.sqrt(2)*np.array([1,1]),
+        1/np.sqrt(2)*np.array([1,-1]),
+
+        1/np.sqrt(2)*np.array([1,1j]),
+        1/np.sqrt(2)*np.array([1,-1j]),
+
+    ]
+    available_probes = itertools.cycle(ideal_probes_for_y)
+    for j in range(num_probes):
+        probes[(j, 1)] = next(available_probes)
+    
+    for N in range(2, max_num_qubits+1):
+        new = next(available_probes)
+
+        for j in range(num_probes):
+            probes[(j, N)] = np.kron(
+                probes[(j, N-1)], 
+                next(available_probes)
+            )
+    return probes
+    
+    
+
 def eigenbasis_of_first_qubit(
     max_num_qubits=2,
     num_probes=40,

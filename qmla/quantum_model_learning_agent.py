@@ -2824,7 +2824,7 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plot_one_qubit_probes_bloch_sphere(self):
+    def plot_one_qubit_probes_bloch_sphere(self, save=False):
         r"""Show all one qubit probes on Bloch sphere."""
         import qutip as qt
         bloch = qt.Bloch()
@@ -2837,4 +2837,14 @@ class QuantumModelLearningAgent():
             vec = (A + B)
             print(vec)
             bloch.add_states(vec)
-        bloch.show()
+        
+        if save:
+            bloch.save(
+                os.path.join(
+                    self.qmla_controls.plots_directory, 
+                    'probes_bloch_sphere.png'
+                )
+            )
+        else:
+            bloch.show()
+
