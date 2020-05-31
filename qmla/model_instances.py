@@ -775,7 +775,9 @@ class ModelInstanceForLearning():
         extra_plots = ['volume', 'time']
         ncols = int(np.ceil(np.sqrt(num_terms))) 
         nrows = int(np.ceil(num_terms / ncols))+ len(extra_plots)
+        self.log_print(["Plotting parameters. ncol={} nrow={}".format(ncols, nrows)])
 
+        plt.clf()
         fig = plt.figure( 
             figsize=(3*ncols, 3*nrows)
         )
@@ -787,9 +789,13 @@ class ModelInstanceForLearning():
 
         row = 0
         col = 0
-
+        self.log_print([
+            "Estimates:", self.track_param_estimate_v_epoch, 
+            "Uncertainty:", self.track_param_uncertainty_v_epoch
+        ])
         # Parameter estimates
         for term in terms:
+            self.log_print(["Getting ax {},{}".format(row, col)])
             ax = fig.add_subplot(gs[row, col])
             estimates = self.track_param_estimate_v_epoch[term]
             uncertainty = self.track_param_uncertainty_v_epoch[term]
@@ -827,7 +833,7 @@ class ModelInstanceForLearning():
                 ax.legend()
                 
             col += 1
-            if col == ncols-2:
+            if col == ncols:
                 col = 0
                 row += 1
 
