@@ -102,7 +102,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._truename = truename
         self._true_dim = qmla.database_framework.get_num_qubits(self._truename)
         self.true_param_dict = true_param_dict 
-        self.store_likelihoods = {}
+        self.store_likelihoods = {'system' : {}, 'simulator' : {}}
+        self.store_p0_diffs = []
         self.debug_log_print = debug_log_print
         # get true_hamiltonian from true_param dict
         true_ham = None
@@ -446,8 +447,12 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         )
         
         self.timings[timing_marker]['likelihood'] += time.time() - t_likelihood_start
-        if not true_evo:
-            self.store_likelihoods[self._b] = likelihood_array
+        if true_evo: 
+            self.store_likelihoods['system'][self._b] = pr0
+        else:
+            self.store_likelihoods['simulator'][self._b] = pr0
+            diff_p0 = np.abs( pr0 - self.store_likelihoods['system'][self._b])
+            self.store_p0_diffs.append( [np.median(diff_p0), np.std(diff_p0)])
         return likelihood_array
 
     def get_system_pr0_array(

@@ -203,7 +203,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_log_print=False,
+            debug_log_print=True,
         )
         self.qinfer_updater = qi.SMCUpdater(
             self.qinfer_model,
@@ -236,7 +236,7 @@ class ModelInstanceForLearning():
     ):
         r"""Arrays, dictionaries etc for tracking learning across experiments"""
 
-        self.quadratic_losses = []
+        self.quadratic_losses_record = []
         self.track_total_log_likelihood = np.array([])
         self.particles = np.array([])
         self.weights = np.array([])
@@ -309,11 +309,17 @@ class ModelInstanceForLearning():
                     pass
 
             # Design exeriment
+
+            print( #debug
+                "Current param distribution mean\n", self.qinfer_updater.est_mean(),
+                "\n uncertainty:\n", np.sqrt(np.diag(self.qinfer_updater.est_covariance_mtx()))
+            )
             new_experiment = self.model_heuristic(
                 num_params=len(self.model_terms_names),
                 epoch_id=update_step,
                 current_params=self.qinfer_updater.est_mean()
             )
+            self.log_print(["Heuristic called; new experiment:", new_experiment])
 
             if update_step == 0:
                 self.log_print(
@@ -330,6 +336,7 @@ class ModelInstanceForLearning():
 
             # Call updater to update distribution based on datum
             try:
+
                 # self.log_print([
                 #     # debug
                 #     "Current param distribution mean\n", self.qinfer_updater.est_mean(),
@@ -414,7 +421,7 @@ class ModelInstanceForLearning():
                 else:
                     true_param = 0
                 quadratic_loss += (learned_param - true_param)**2
-            self.quadratic_losses.append(quadratic_loss)
+            self.quadratic_losses_record.append(quadratic_loss)
 
 
     def _finalise_learning(self):
@@ -482,7 +489,16 @@ class ModelInstanceForLearning():
 
         # Plots for this model
         self.plot_posterior()
-        self.plot_parameters()
+        try:
+            self.plot_parameters()
+        except:
+            self.log_print(["Failed to plot_parameters"])
+            pass
+        try:
+            self.plot_heuristic_attributes()
+        except:
+            self.log_print(["Failed to plot_heuristic_attributes"])
+            pass
 
     def learned_info_dict(self):
         """
@@ -511,7 +527,7 @@ class ModelInstanceForLearning():
         learned_info['track_param_estimate_v_epoch'] = self.track_param_estimate_v_epoch
         learned_info['track_param_uncertainty_v_epoch'] = self.track_param_uncertainty_v_epoch
         learned_info['epochs_after_resampling'] = self.epochs_after_resampling
-        learned_info['quadratic_losses_record'] = self.quadratic_losses
+        learned_info['quadratic_losses_record'] = self.quadratic_losses_record
         learned_info['qhl_final_param_estimates'] = self.qhl_final_param_estimates
         learned_info['qhl_final_param_uncertainties'] = self.qhl_final_param_uncertainties
         learned_info['covariance_mtx_final'] = self.qinfer_updater.est_covariance_mtx()
@@ -523,6 +539,7 @@ class ModelInstanceForLearning():
         learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
         learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
         learned_info['qinfer_model_likelihoods'] = self.qinfer_model.store_likelihoods
+        learned_info['qinfer_pr0_diff_from_true'] = np.array(self.qinfer_model.store_p0_diffs)
 
         # additionally wanted by comparison class
         learned_info['name'] = self.model_name
@@ -530,6 +547,14 @@ class ModelInstanceForLearning():
         learned_info['final_prior'] = self.qinfer_updater.prior
         learned_info['posterior_marginal'] = self.posterior_marginal
         # TODO restore initial_prior as required for plots in remote_bayes_factor
+        try:
+            learned_info['heuristic_distances'] = self.model_heuristic.distances
+        except:
+            pass
+        try:
+            learned_info['heuristic_assorted_times'] = self.model_heuristic.designed_times
+        except:
+            pass
 
         return learned_info
 
@@ -772,14 +797,15 @@ class ModelInstanceForLearning():
         terms = self.track_param_estimate_v_epoch.keys()
         num_terms = len(terms)
         
-        extra_plots = ['volume', 'time']
+        extra_plots = ['volume', 'time', 'pr0_diff']
         ncols = int(np.ceil(np.sqrt(num_terms))) 
         nrows = int(np.ceil(num_terms / ncols))+ len(extra_plots)
         self.log_print(["Plotting parameters. ncol={} nrow={}".format(ncols, nrows)])
 
         plt.clf()
         fig = plt.figure( 
-            figsize=(3*ncols, 3*nrows)
+            figsize=(
+                max(3*ncols, 12), 3*nrows)
         )
 
         gs = GridSpec(
@@ -841,7 +867,7 @@ class ModelInstanceForLearning():
         # fig.text(0.04, 0.5, 'Parameter', va='center', rotation='vertical')
 
         # Volume
-        row = nrows-2
+        row = nrows-3
         col = 0
         ax = fig.add_subplot(gs[row, :])
 
@@ -865,7 +891,7 @@ class ModelInstanceForLearning():
         ax.legend()
 
         # Times learned upon
-        row = nrows-1
+        row = nrows-2
         col = 0
         ax = fig.add_subplot(gs[row, :])
         histogram = False # False -> scatter plot of time v epoch
@@ -898,6 +924,31 @@ class ModelInstanceForLearning():
             ax.set_ylabel('Time')
             ax.semilogy()
 
+        # | system-pr0 - particles-pr0 |
+        row = nrows-1
+        col = 0
+        ax = fig.add_subplot(gs[row, :])
+        self.qinfer_pr0_diff_from_true = np.array(self.qinfer_model.store_p0_diffs)
+        medians = self.qinfer_pr0_diff_from_true[:, 0]
+        std = self.qinfer_pr0_diff_from_true[:, 1]
+        ax.scatter(
+            range(len(medians)), 
+            medians,
+            s=3,
+            color='Blue'
+        )
+        ax.fill_between(
+            range(len(medians)), 
+            medians + std, 
+            medians - std, 
+            alpha = 0.3,
+            color='Blue'
+        )
+        ax.set_ylim(0,1)        
+        ax.set_ylabel("$ \|Pr(0)_{sys} - Pr(0)_{sim} \|  $")
+        ax.set_xlabel("Epoch")
+        # ax.set_yscale('log', basey=10)
+
         # Save figure
         fig.tight_layout()
         fig.savefig(
@@ -905,6 +956,76 @@ class ModelInstanceForLearning():
             '{}learning_summary_{}.png'.format(self.plot_prefix, self.model_id))
         )
                 
+    def plot_heuristic_attributes(self):
+        plt.clf()
+        plots = ['volume', 'heuristic_times']
+        nrows = len(plots)
+        fig = plt.figure( 
+            figsize=(15, 3*nrows)
+        )
+
+        gs = GridSpec(
+            nrows = nrows,
+            ncols = 1,
+        )
+
+        row = 0
+        col = 0
+
+        # Volume
+        ax = fig.add_subplot(gs[row, 0])
+
+        ax.plot(
+            range(len(self.volume_by_epoch)), 
+            self.volume_by_epoch,
+            label = 'Volume',
+        )
+        for e in self.epochs_after_resampling:
+            ax.axvline(
+                e, 
+                ls='--', 
+                c='green', alpha = 0.5, 
+                # label='Resample'
+            )
+
+        ax.set_title('Volume')
+        ax.set_ylabel('Volume')
+        ax.set_xlabel('Epoch')
+        ax.semilogy()
+        ax.legend()
+
+        # Times by distance metrics
+        row += 1
+        ax = fig.add_subplot(gs[row, 0])
+
+        self.heuristic_assorted_times = self.model_heuristic.designed_times
+        for method in self.heuristic_assorted_times:
+            times_of_method = self.heuristic_assorted_times[method]
+            epochs = sorted(times_of_method.keys())
+            time_by_epoch = [times_of_method[e] for e in epochs]
+
+            if self.model_heuristic.distance_metric_to_use == method:
+                ls = '--'
+            else:
+                ls  = '-'
+            ax.plot(
+                epochs,
+                time_by_epoch,
+                label=method,
+                ls=ls
+            )
+        ax.legend(title='Distance metric') 
+        ax.set_title('Times chosen by distance metrics')      
+        ax.semilogy()
+        ax.grid()
+
+        # Save figure
+        fig.tight_layout()
+        fig.savefig(
+            os.path.join(self.model_learning_plots_directory, 
+            '{}heuristic_attributes{}.png'.format(self.plot_prefix, self.model_id))
+        )
+
 
     ##########
     # Section: Utilities

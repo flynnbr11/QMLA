@@ -57,6 +57,13 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
+        self.distances = []
+        distance_metrics = [
+            'cityblock', 'euclidean', 'chebyshev', 
+            'canberra', 'braycurtis','minkowski', 
+        ]
+        self.designed_times = { m : {} for m in distance_metrics }
+        self.distance_metric_to_use = 'canberra'
 
     def __call__(
         self,
@@ -67,8 +74,8 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
 
         idx_iter = 0
         while idx_iter < self._maxiters:
-
-            x, xp = self._updater.sample(n=2)[:, np.newaxis, :]
+            sample = self._updater.sample(n=2) 
+            x, xp = sample[:, np.newaxis, :]
             if self._updater.model.distance(x, xp) > 0:
                 break
             else:
@@ -80,23 +87,23 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
                 {} iterations.".format(self._maxiters)
             )
 
-        eps = np.empty(
+        for method in self.designed_times:
+            d = sp.spatial.distance.pdist(
+                sample, 
+                metric=method
+            )
+            self.designed_times[method][epoch_id] = 1/d
+
+        eps = np.zeros(
             (1,),
             dtype=self._updater.model.expparams_dtype
         )
 
-        sigma = self._updater.model.distance(x, xp)
-        # new_time = self._t_func(
-        #     1 / sigma
-        # )
-        new_time = 1 / sigma
-        time_prefactor = 1
-        if epoch_id > 200:
-            print("Introducing prefactor to heuristic")
-            time_prefactor = 1
-        new_time *= time_prefactor
+        new_time = self.designed_times[self.distance_metric_to_use][epoch_id]
+        d = 1 / new_time
+        self.distances.append(d)
         eps['t'] = new_time
-        print("Heuristic; eps = ", eps)
+        print("x=\t{} \nx'=\t{} \nx-x'=\t{} \nd=\t{}\nt=\t{} \n".format(x, xp, x-xp, d, new_time))
         return eps
 
 
@@ -264,7 +271,7 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         ))
         t_list.remove(0)  # dont want to waste an epoch on t=0
         t_list = [np.round(t, 2) for t in t_list]
-        random.shuffle(t_list)
+        # random.shuffle(t_list)
         self._time_list = iter( t_list )
         
 

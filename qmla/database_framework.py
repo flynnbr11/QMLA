@@ -238,6 +238,16 @@ def get_num_qubits(name):
 
 
 def get_constituent_names_from_name(name):
+    return name.split('+')
+
+
+
+def DEPRECATED_get_constituent_names_from_name(name):
+    r""" 
+    Used when terms are separated by P strings, such as xTiPPyTi, 
+    i.e. the old method. Now all terms should be separable by +
+    (e.g. xTi+yTi)
+    """
     verbose_naming_mechanism_terms = ['T', 'P', 'M']
 
     if np.any(

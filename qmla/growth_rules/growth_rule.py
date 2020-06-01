@@ -432,11 +432,11 @@ class GrowthRule():
             )
             for t in plot_times
         }
-        self.log_print(
-            [
-                "Storing measurements:\n", self.measurements
-            ]
-        )
+        # self.log_print(
+        #     [
+        #         "Storing measurements:\n", self.measurements
+        #     ]
+        # )
         return self.measurements
 
     def tree_pruning(
