@@ -330,11 +330,11 @@ class ModelInstanceForLearning():
 
             # Call updater to update distribution based on datum
             try:
-                self.log_print([
-                    # debug
-                    "Current param distribution mean\n", self.qinfer_updater.est_mean(),
-                    "\n uncertainty:\n", np.sqrt(np.diag(self.qinfer_updater.est_covariance_mtx()))
-                ])
+                # self.log_print([
+                #     # debug
+                #     "Current param distribution mean\n", self.qinfer_updater.est_mean(),
+                #     "\n uncertainty:\n", np.sqrt(np.diag(self.qinfer_updater.est_covariance_mtx()))
+                # ])
                 self.qinfer_updater.update(
                     datum_from_experiment,
                     new_experiment
