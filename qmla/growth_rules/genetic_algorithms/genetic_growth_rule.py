@@ -10,6 +10,7 @@ import time
 import pandas as pd
 import sklearn
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 import seaborn as sns
 
 from qmla.growth_rules import growth_rule
@@ -593,12 +594,12 @@ class Genetic(
                 'fitness_v_generation.png'.format(qmla_id)
             )
         )
-        # self.plot_model_ratings(
-        #     save_to_file = os.path.join(
-        #         save_directory, 
-        #         'ratings.png'.format(qmla_id)
-        #     )
-        # )
+        self.plot_model_ratings(
+            save_to_file = os.path.join(
+                save_directory, 
+                'ratings.png'.format(qmla_id)
+            )
+        )
 
     def plot_correlation_fitness_with_f_score(
         self,
@@ -720,18 +721,47 @@ class Genetic(
         plt.savefig(save_to_file)
 
     def plot_model_ratings(self, save_to_file):
+        # plt.clf()
+        # fig, ax = plt.subplots()
+        # for model in self.ratings_class.models.values():
+        #     model_id = model.model_id
+        #     # TODO get model name
+        #     ax.plot(
+        #         model.rating_history,
+        #         label= "{}".format(model_id)
+        #     )        
+        # ax.set_ylabel('Rating')
+        # ax.legend()
+        # fig.savefig(save_to_file)
         plt.clf()
-        fig, ax = plt.subplots()
-        for model in self.ratings_class.models.values():
-            model_id = model.model_id
-            # TODO get model name
-            ax.plot(
-                model.rating_history,
-                label= "{}".format(model_id)
-            )        
-        ax.set_ylabel('Rating')
-        ax.legend()
+        ratings = self.ratings_class.all_ratings
+        generations = [int(g) for g in ratings.generation.unique()]
+        num_generations = len(generations)
+
+        fig, axes = plt.subplots(figsize=(15, 5*num_generations), constrained_layout=True)
+        gs = GridSpec(nrows=num_generations, ncols = 1, )
+
+        # TODO : linestyle and colour unique for each model ID and tracks across subplots
+
+        row = -1
+        for gen in generations:
+            row += 1
+            ax = fig.add_subplot(gs[row, 0])
+                
+            r = ratings[ratings.generation==gen]
+            sns.lineplot(
+                x = 'idx', 
+                y = 'rating', 
+                hue = 'model_id', 
+                hue_order = sorted(r.model_id.unique()),
+                data=r, 
+                ax = ax,
+                legend='full',
+                palette = 'Dark2'
+            )
+            ax.set_title('Generation {}'.format(gen), pad = -15)   
         fig.savefig(save_to_file)
+
 
     def plot_fitness_v_fscore(self, save_to_file):
         plt.clf()
