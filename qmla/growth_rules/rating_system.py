@@ -108,7 +108,6 @@ class ELORating(RatingSystem):
         if model_b_id not in self.models: 
             self.add_ranking_model(model_id = model_b_id)
         
-        
         model_a = self.models[model_a_id]
         model_b = self.models[model_b_id]
         

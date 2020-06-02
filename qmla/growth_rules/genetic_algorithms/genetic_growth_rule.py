@@ -173,10 +173,15 @@ class Genetic(
             for m in model_ids
         }
         min_rating = min(original_ratings_by_name.values())
+        # ratings_by_name = {
+        #     m : original_ratings_by_name[m] - min_rating
+        #     for m in original_ratings_by_name
+        # }
         ratings_by_name = {
-            m : original_ratings_by_name[m] - min_rating
+            m : original_ratings_by_name[m] / self.ratings_class.initial_rating
             for m in original_ratings_by_name
         }
+        self.log_print(["Rating (as fraction of starting rating):\n", ratings_by_name])
         sum_ratings = np.sum(list(ratings_by_name.values()))
         model_elo_ratings = {
             m : ratings_by_name[m]/sum_ratings

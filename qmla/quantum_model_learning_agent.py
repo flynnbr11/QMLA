@@ -958,6 +958,7 @@ class QuantumModelLearningAgent():
             champ = mod_high.model_id
 
         # Tell growth rule's rating system about this comparison
+        # TODO more general fnc to tell GR about this comparison
         self.growth_class.ratings_class.compute_new_ratings(
             model_a_id=mod_low.model_id,
             model_b_id=mod_high.model_id,
