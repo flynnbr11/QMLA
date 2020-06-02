@@ -964,6 +964,7 @@ class QuantumModelLearningAgent():
             model_b_id=mod_high.model_id,
             winner_id=champ,
             bayes_factor = bayes_factor,
+            spawn_step = self.growth_class.spawn_step, 
         )
 
         return champ

@@ -593,12 +593,12 @@ class Genetic(
                 'fitness_v_generation.png'.format(qmla_id)
             )
         )
-        self.plot_model_ratings(
-            save_to_file = os.path.join(
-                save_directory, 
-                'ratings.png'.format(qmla_id)
-            )
-        )
+        # self.plot_model_ratings(
+        #     save_to_file = os.path.join(
+        #         save_directory, 
+        #         'ratings.png'.format(qmla_id)
+        #     )
+        # )
 
     def plot_correlation_fitness_with_f_score(
         self,

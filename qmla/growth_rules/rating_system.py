@@ -15,17 +15,29 @@ class RatingSystem():
         self.initial_rating = initial_rating
         self.k_const = k_const
         self.ratings_df = pd.DataFrame()
+        self.all_ratings = pd.DataFrame()
         
         
     def add_ranking_model(
         self,
-        model_id
+        model_id,
+        generation_born=0,
     ):
         new_model = RateableModel(
             model_id = model_id, 
-            initial_rating = self.initial_rating
+            initial_rating = self.initial_rating,
+            generation_born = generation_born
         )
         self.models[model_id] = new_model
+        latest = pd.Series({
+            'model_id' : new_model.model_id, 
+            'generation' : generation_born,
+            'rating' : new_model.rating,
+            'idx' : 0
+        })
+        self.all_ratings = self.all_ratings.append(
+            latest, ignore_index=True
+        )
 
         
     def get_ratings(
@@ -50,25 +62,31 @@ class RateableModel():
     def __init__(
         self, 
         model_id, 
-        initial_rating=1000
+        initial_rating=1000,
+        generation_born = 0,
     ):
         self.model_id = model_id
         self.rating = initial_rating
         self.opponents_considered = []
         self.opponents_record = {}
-        self.rating_history = [self.rating]
+        self.rating_history = {generation_born : [self.rating]}
+        self.generation_born = generation_born
 
     def update_rating(
         self,
         opponent_id,
         winner_id, 
         new_rating, 
+        generation, 
     ):
         # assumes the calculation has occured outside
         # this model class, and here we update the record
         self.opponents_considered.append(opponent_id)
         self.rating = new_rating
-        self.rating_history.append(np.round(new_rating, 1))
+        if generation not in self.rating_history:
+            self.rating_history[generation] = [self.rating]
+        self.rating_history[generation].append(np.round(new_rating, 1))       
+
         if winner_id == self.model_id: 
             win = 1
         else: 
@@ -156,12 +174,13 @@ class ModifiedEloRating(ELORating):
         model_b_id, 
         winner_id, 
         bayes_factor, 
+        spawn_step, 
         **kwargs
     ):
         if model_a_id not in self.models: 
-            self.add_ranking_model(model_id = model_a_id)
+            self.add_ranking_model(model_id = model_a_id, generation_born=spawn_step)
         if model_b_id not in self.models: 
-            self.add_ranking_model(model_id = model_b_id)
+            self.add_ranking_model(model_id = model_b_id, generation_born=spawn_step)
 
         model_a = self.models[model_a_id]
         model_b = self.models[model_b_id]
@@ -189,24 +208,20 @@ class ModifiedEloRating(ELORating):
         delta_a = bayes_factor_weight * (result_a - prob_a)
         delta_b = bayes_factor_weight * (result_b - prob_b)
 
-        # if winner_id == model_a_id: 
-        #     rating_a_new = rating_a + (bayes_factor_weight * (1 - prob_a))
-        #     rating_b_new = rating_b + (bayes_factor_weight * (0 - prob_b))
-        # elif winner_id == model_b_id: 
-        #     rating_a_new = rating_a + (bayes_factor_weight * (0 - prob_a))
-        #     rating_b_new = rating_b + (bayes_factor_weight * (1 - prob_b))
         rating_a_new = np.round(rating_a + delta_a, 2)
         rating_b_new = np.round(rating_b + delta_b, 2)
 
         model_a.update_rating(
             opponent_id = model_b_id, 
             winner_id = winner_id,
-            new_rating = rating_a_new            
+            new_rating = rating_a_new       ,
+            generation = spawn_step,      
         )
         model_b.update_rating(
             opponent_id = model_a_id, 
             winner_id = winner_id,
-            new_rating = rating_b_new            
+            new_rating = rating_b_new,
+            generation = spawn_step,      
         )
 
         this_round = pd.Series({
@@ -220,8 +235,28 @@ class ModifiedEloRating(ELORating):
             r"$\Delta R^{b}$" : delta_b,
             'bayes_factor' : bayes_factor,
             'weight' : bayes_factor_weight,
-            'winner' : winner_id
+            'winner' : winner_id,
+            'generation' : spawn_step, 
         })
+        
+        for mod in [model_a, model_b]:
+            new_idx = len(
+                self.all_ratings[ (self.all_ratings.model_id == mod.model_id) 
+                & (self.all_ratings.generation == spawn_step)]
+            )
+            latest = pd.Series(
+                {
+                    'model_id' : mod.model_id, 
+                    'generation' : spawn_step,
+                    'rating' : mod.rating,
+                    'idx' : new_idx
+                    
+                }
+            )
+            self.all_ratings = self.all_ratings.append(
+                latest, ignore_index=True
+            )
+        
         self.ratings_df = self.ratings_df.append(
             this_round, 
             ignore_index=True
