@@ -179,14 +179,24 @@ class ModifiedEloRating(ELORating):
         else:
             bayes_factor_weight = np.log10(1/bayes_factor)
 
+        # update A
         if winner_id == model_a_id: 
-            rating_a_new = rating_a + (bayes_factor_weight * (1 - prob_a))
-            rating_b_new = rating_b + (bayes_factor_weight * (0 - prob_b))
-        elif winner_id == model_b_id: 
-            rating_a_new = rating_a + (bayes_factor_weight * (0 - prob_a))
-            rating_b_new = rating_b + (bayes_factor_weight * (1 - prob_b))
-        rating_a_new = int(rating_a_new)
-        rating_b_new = int(rating_b_new)
+            result_a = 1 # A won
+            result_b = 0
+        else:
+            result_a = 0 # A lost
+            result_b = 1
+        point_change_a = bayes_factor_weight * (result_a - prob_a)
+        point_change_b = bayes_factor_weight * (result_b - prob_b)
+
+        # if winner_id == model_a_id: 
+        #     rating_a_new = rating_a + (bayes_factor_weight * (1 - prob_a))
+        #     rating_b_new = rating_b + (bayes_factor_weight * (0 - prob_b))
+        # elif winner_id == model_b_id: 
+        #     rating_a_new = rating_a + (bayes_factor_weight * (0 - prob_a))
+        #     rating_b_new = rating_b + (bayes_factor_weight * (1 - prob_b))
+        rating_a_new = int(rating_a + point_change_a)
+        rating_b_new = int(rating_b + point_change_b)
 
         model_a.update_rating(
             opponent_id = model_b_id, 
@@ -202,12 +212,15 @@ class ModifiedEloRating(ELORating):
         this_round = pd.Series({
             'model_a' : model_a_id, 
             'model_b' : model_b_id, 
-            'a_rating_before'  : rating_a, 
-            'b_rating_before' : rating_b,
-            'a_rating_after' : rating_a_new, 
-            'b_rating_new' : rating_b_new,
+            r'$R^{a}_{0}$'  : rating_a, 
+            r'$R^{b}_{0}$' : rating_b,
+            r'$R^{a}_{N}$' : rating_a_new, 
+            r'$R^{b}_{N}$' : rating_b_new,
+            r"$\Delta R^{a}$" : point_change_a,
+            r"$\Delta R^{b}$" : point_change_b,
             'bayes_factor' : bayes_factor,
-            'weight' : bayes_factor_weight
+            'weight' : bayes_factor_weight,
+            'winner' : winner_id
         })
         self.ratings_df = self.ratings_df.append(
             this_round, 
