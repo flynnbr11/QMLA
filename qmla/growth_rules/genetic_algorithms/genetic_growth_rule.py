@@ -495,6 +495,7 @@ class Genetic(
         self.storage.fitness_by_f_score = self.fitness_by_f_score
         self.storage.fitness_df = self.fitness_df
         self.storage.true_model_chromosome = self.true_chromosome_string
+        self.storage.ratings = self.ratings_class.ratings_df
 
         chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
         dud_chromosome = str('1' +'0'*self.genetic_algorithm.num_terms)
@@ -567,31 +568,35 @@ class Genetic(
         save_directory,
         qmla_id=0, 
     ):
-
-        
         self.plot_correlation_fitness_with_f_score(
             save_to_file = os.path.join(
                 save_directory, 
-                'correlations_bw_fitness_and_f_score_{}.png'.format(qmla_id)
+                'correlations_bw_fitness_and_f_score.png'.format(qmla_id)
             )
         )
 
         self.plot_fitness_v_fscore_by_generation(
             save_to_file = os.path.join(
                 save_directory, 
-                'fitness_types_{}.png'.format(qmla_id)
+                'fitness_types.png'.format(qmla_id)
             )
         )
         self.plot_fitness_v_fscore(
             save_to_file = os.path.join(
                 save_directory, 
-                'fitness_v_fscore_{}.png'.format(qmla_id)
+                'fitness_v_fscore.png'.format(qmla_id)
             )
         )
         self.plot_fitness_v_generation(
             save_to_file = os.path.join(
                 save_directory, 
-                'fitness_v_generation_{}.png'.format(qmla_id)
+                'fitness_v_generation.png'.format(qmla_id)
+            )
+        )
+        self.plot_model_ratings(
+            save_to_file = os.path.join(
+                save_directory, 
+                'ratings.png'.format(qmla_id)
             )
         )
 
@@ -714,7 +719,19 @@ class Genetic(
         )
         plt.savefig(save_to_file)
 
-
+    def plot_model_ratings(self, save_to_file):
+        plt.clf()
+        fig, ax = plt.subplots()
+        for model in self.ratings_class.models.values():
+            model_id = model.model_id
+            # TODO get model name
+            ax.plot(
+                model.rating_history,
+                label= "{}".format(model_id)
+            )        
+        ax.set_ylabel('Rating')
+        ax.legend()
+        fig.savefig(save_to_file)
 
     def plot_fitness_v_fscore(self, save_to_file):
         plt.clf()

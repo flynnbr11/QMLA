@@ -186,8 +186,8 @@ class ModifiedEloRating(ELORating):
         else:
             result_a = 0 # A lost
             result_b = 1
-        point_change_a = bayes_factor_weight * (result_a - prob_a)
-        point_change_b = bayes_factor_weight * (result_b - prob_b)
+        delta_a = bayes_factor_weight * (result_a - prob_a)
+        delta_b = bayes_factor_weight * (result_b - prob_b)
 
         # if winner_id == model_a_id: 
         #     rating_a_new = rating_a + (bayes_factor_weight * (1 - prob_a))
@@ -195,8 +195,8 @@ class ModifiedEloRating(ELORating):
         # elif winner_id == model_b_id: 
         #     rating_a_new = rating_a + (bayes_factor_weight * (0 - prob_a))
         #     rating_b_new = rating_b + (bayes_factor_weight * (1 - prob_b))
-        rating_a_new = int(rating_a + point_change_a)
-        rating_b_new = int(rating_b + point_change_b)
+        rating_a_new = np.round(rating_a + delta_a, 2)
+        rating_b_new = np.round(rating_b + delta_b, 2)
 
         model_a.update_rating(
             opponent_id = model_b_id, 
@@ -214,10 +214,10 @@ class ModifiedEloRating(ELORating):
             'model_b' : model_b_id, 
             r'$R^{a}_{0}$'  : rating_a, 
             r'$R^{b}_{0}$' : rating_b,
-            r'$R^{a}_{N}$' : rating_a_new, 
-            r'$R^{b}_{N}$' : rating_b_new,
-            r"$\Delta R^{a}$" : point_change_a,
-            r"$\Delta R^{b}$" : point_change_b,
+            r'$R^{a}_{new}$' : rating_a_new, 
+            r'$R^{b}_{new}$' : rating_b_new,
+            r"$\Delta R^{a}$" : delta_a,
+            r"$\Delta R^{b}$" : delta_b,
             'bayes_factor' : bayes_factor,
             'weight' : bayes_factor_weight,
             'winner' : winner_id

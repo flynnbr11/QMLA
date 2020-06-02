@@ -116,7 +116,12 @@ class GrowthRuleTree():
                 spawn_step = self.spawn_step,             
                 **kwargs
             )
-            pairs_to_compare = 'all'
+            if self.growth_class.branch_comparison_strategy == 'random':
+                pairs_to_compare = 'all'
+            if self.growth_class.branch_comparison_strategy == 'all':
+                pairs_to_compare = 'all'
+            else: 
+                pairs_to_compare = 'all'
 
         elif not self.growth_class.check_tree_pruned(prune_step = self.prune_step):
             self.prune_step += 1

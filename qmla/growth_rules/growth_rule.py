@@ -101,6 +101,7 @@ class GrowthRule():
         self.num_top_models_to_build_on = 1
         # If you want to do just Bayes facotr calculation on a deterministic
         # initial set you set tree_completed_initially to True
+        self.branch_comparison_strategy = 'all'
         self.tree_completed_initially = False
         self.prune_complete = False
         self.prune_completed_initially = False
