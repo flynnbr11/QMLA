@@ -90,6 +90,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         debug_log_print=False,
         **kwargs
     ):
+        self.model_name = model_name
         self.log_file = log_file
         self.growth_generation_rule = growth_generation_rule
         self._oplist = oplist
@@ -154,7 +155,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # This is the solver used for time evolution scipy is faster
         # QuTip can handle implicit time dependent likelihoods
 
-        self.model_name = model_name
         self.model_dimension = qmla.database_framework.get_num_qubits(self.model_name)
         self.inBayesUpdates = False
         if true_oplist is not None and trueparams is None:
@@ -218,11 +218,13 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         Returns the names of the various model parameters admitted by this
         model, formatted as LaTeX strings. (Inherited from Qinfer)
         """
-
-        modnames = ['w0']
-        for modpar in range(self.n_modelparams - 1):
-            modnames.append('w' + str(modpar + 1))
-        return modnames
+        try:
+            individual_term_names = self.model_name.split('+')
+        except:
+            individual_term_names = ['w0']
+            for modpar in range(self.n_modelparams - 1):
+                individual_term_names.append('w' + str(modpar + 1))
+        return individual_term_names
 
 
     @property

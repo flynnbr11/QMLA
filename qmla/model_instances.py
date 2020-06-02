@@ -495,10 +495,11 @@ class ModelInstanceForLearning():
             self.log_print(["Failed to plot_parameters"])
             pass
         try:
-            self.plot_heuristic_attributes()
+            self._plot_heuristic_attributes()
         except:
             self.log_print(["Failed to plot_heuristic_attributes"])
             pass
+        self._plot_posterior_mesh_pairwise()
 
     def learned_info_dict(self):
         """
@@ -956,7 +957,7 @@ class ModelInstanceForLearning():
             '{}learning_summary_{}.png'.format(self.plot_prefix, self.model_id))
         )
                 
-    def plot_heuristic_attributes(self):
+    def _plot_heuristic_attributes(self):
         plt.clf()
         plots = ['volume', 'heuristic_times']
         nrows = len(plots)
@@ -1023,8 +1024,92 @@ class ModelInstanceForLearning():
         fig.tight_layout()
         fig.savefig(
             os.path.join(self.model_learning_plots_directory, 
-            '{}heuristic_attributes{}.png'.format(self.plot_prefix, self.model_id))
+            '{}heuristic_attributes_{}.png'.format(self.plot_prefix, self.model_id))
         )
+
+    def _plot_posterior_mesh_pairwise(self):
+        r"""
+        Plots the posterior mesh as contours for each pair of parameters. 
+
+        Mesh from  qinfer.SMCUpdater.posterior_mesh
+        """
+        import itertools
+        fig, axes = plt.subplots(
+            figsize=(18, 10),
+            constrained_layout=True
+        )
+        selected_cmap = plt.cm.coolwarm
+
+        n_param = self.qinfer_model.n_modelparams
+        nrows = ncols = n_param
+        gs = GridSpec(
+            nrows+1, ncols,
+        )
+        
+        include_param_self_correlation = False
+        if include_param_self_correlation: 
+            pairs_of_params = list(itertools.combinations_with_replacement(range(n_param), 2))
+        else:
+            pairs_of_params = list(itertools.combinations(range(n_param), 2)) # exlcude param with itself
+        vmin = 1e3
+        vmax = 0
+        posterior_meshes = {}
+        for i, j in pairs_of_params:
+            post_mesh = self.qinfer_updater.posterior_mesh(
+                idx_param1 = i, 
+                idx_param2 = j
+            )
+            # store the post mesh - don't want to compute twice
+            posterior_meshes[i,j] = post_mesh
+
+            # find global min/max contour value for consistency across plots
+            if np.min(post_mesh[2]) < vmin: 
+                vmin = np.min(post_mesh[2])
+            if np.max(post_mesh[2]) > vmax:
+                vmax = np.max(post_mesh[2])
+                self.log_print(["Setting vmax={} for i,j={},{}".format(vmax, i, j)])
+        
+        for i in range(n_param):
+            for j in range(n_param):
+                ax = fig.add_subplot(gs[i,j])
+                if ax.is_first_col():
+                    ax.set_ylabel(
+                        self.growth_class.latex_name(self.qinfer_model.modelparam_names[i]),
+                        rotation = 0
+                    )
+                if ax.is_first_row():
+                    ax.set_title(
+                        self.growth_class.latex_name(self.qinfer_model.modelparam_names[j])
+                    )
+                if (i, j) in pairs_of_params:
+                    ax.contourf(*posterior_meshes[i,j], vmin=vmin, vmax=vmax,  cmap=selected_cmap)
+                else:
+                    ax.spines['top'].set_visible(False)
+                    ax.spines['right'].set_visible(False)
+                    ax.spines['bottom'].set_visible(False)
+                    ax.spines['left'].set_visible(False)
+                    ax.get_xaxis().set_ticks([])
+                    ax.get_yaxis().set_ticks([])
+                
+        # colour bar
+        ax = fig.add_subplot(gs[nrows, :])
+        m = plt.cm.ScalarMappable(cmap=selected_cmap)
+        # m.set_array(post_mesh[2])
+        m.set_array([])
+        m.set_clim(vmin, vmax)
+        fig.colorbar(m, 
+            cax = ax, orientation='horizontal', shrink=0.7
+        )    
+
+        # save
+        self.log_print(["min/max contour values:{}/{}".format(vmin, vmax)])
+        fig.text(0.5, 0.04, 'Posterior mesh', ha='center')
+        fig.savefig(
+            os.path.join(self.model_learning_plots_directory, 
+            '{}posterior_mesh_pairwise_{}.png'.format(self.plot_prefix, self.model_id))
+        )
+
+
 
 
     ##########
