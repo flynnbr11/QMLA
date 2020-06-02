@@ -224,6 +224,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             individual_term_names = ['w0']
             for modpar in range(self.n_modelparams - 1):
                 individual_term_names.append('w' + str(modpar + 1))
+        
         return individual_term_names
 
 

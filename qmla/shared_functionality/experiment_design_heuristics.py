@@ -63,7 +63,7 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
             'canberra', 'braycurtis','minkowski', 
         ]
         self.designed_times = { m : {} for m in distance_metrics }
-        self.distance_metric_to_use = 'chebyshev'
+        self.distance_metric_to_use = 'euclidean'
 
     def __call__(
         self,

@@ -1046,7 +1046,7 @@ class ModelInstanceForLearning():
             nrows+1, ncols,
         )
         
-        include_param_self_correlation = False
+        include_param_self_correlation = True
         if include_param_self_correlation: 
             pairs_of_params = list(itertools.combinations_with_replacement(range(n_param), 2))
         else:
@@ -1057,7 +1057,8 @@ class ModelInstanceForLearning():
         for i, j in pairs_of_params:
             post_mesh = self.qinfer_updater.posterior_mesh(
                 idx_param1 = i, 
-                idx_param2 = j
+                idx_param2 = j,
+                res1=50, res2=50
             )
             # store the post mesh - don't want to compute twice
             posterior_meshes[i,j] = post_mesh
@@ -1072,17 +1073,31 @@ class ModelInstanceForLearning():
         for i in range(n_param):
             for j in range(n_param):
                 ax = fig.add_subplot(gs[i,j])
+
+                y_term = self.qinfer_model.modelparam_names[i]
+                x_term = self.qinfer_model.modelparam_names[j]
                 if ax.is_first_col():
                     ax.set_ylabel(
-                        self.growth_class.latex_name(self.qinfer_model.modelparam_names[i]),
+                        self.growth_class.latex_name(y_term),
                         rotation = 0
                     )
                 if ax.is_first_row():
                     ax.set_title(
-                        self.growth_class.latex_name(self.qinfer_model.modelparam_names[j])
+                        self.growth_class.latex_name(x_term)
                     )
                 if (i, j) in pairs_of_params:
                     ax.contourf(*posterior_meshes[i,j], vmin=vmin, vmax=vmax,  cmap=selected_cmap)
+
+                    if x_term in self.true_param_dict:
+                        true_param = self.true_param_dict[x_term]
+                        if ax.get_xlim()[0] < true_param < ax.get_xlim()[1]:
+                            ax.axvline(true_param, c='black', ls='--')
+                    if y_term in self.true_param_dict:
+                        true_param = self.true_param_dict[y_term]
+                        if ax.get_ylim()[0] < true_param < ax.get_ylim()[1]:
+                            ax.axhline(true_param, c='black', ls='--')
+
+
                 else:
                     ax.spines['top'].set_visible(False)
                     ax.spines['right'].set_visible(False)
