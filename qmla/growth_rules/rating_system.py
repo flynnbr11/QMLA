@@ -2,6 +2,7 @@ import sys
 import os
 import numpy as np
 import random
+import pandas as pd
 
 
 class RatingSystem():
@@ -13,6 +14,7 @@ class RatingSystem():
         self.models = {}
         self.initial_rating = initial_rating
         self.k_const = k_const
+        self.ratings_df = pd.DataFrame()
         
         
     def add_ranking_model(
@@ -102,6 +104,8 @@ class ELORating(RatingSystem):
         model_a_id, 
         model_b_id, 
         winner_id, 
+        bayes_factor, 
+        **kwargs
     ):
         if model_a_id not in self.models: 
             self.add_ranking_model(model_id = model_a_id)
@@ -141,3 +145,71 @@ class ELORating(RatingSystem):
         )
     
 
+
+class ModifiedEloRating(ELORating):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def compute_new_ratings(
+        self, 
+        model_a_id, 
+        model_b_id, 
+        winner_id, 
+        bayes_factor, 
+        **kwargs
+    ):
+        if model_a_id not in self.models: 
+            self.add_ranking_model(model_id = model_a_id)
+        if model_b_id not in self.models: 
+            self.add_ranking_model(model_id = model_b_id)
+
+        model_a = self.models[model_a_id]
+        model_b = self.models[model_b_id]
+        
+        rating_a = model_a.rating
+        rating_b = model_b.rating
+                
+        q_a = model_a.q_value
+        q_b = model_b.q_value
+        prob_a = q_a / (q_a + q_b) # expectation A will win
+        prob_b = q_b / (q_a + q_b) # expectation B will win
+        
+        if bayes_factor > 1:
+            bayes_factor_weight = np.log10(bayes_factor)
+        else:
+            bayes_factor_weight = np.log10(1/bayes_factor)
+
+        if winner_id == model_a_id: 
+            rating_a_new = rating_a + (bayes_factor_weight * (1 - prob_a))
+            rating_b_new = rating_b + (bayes_factor_weight * (0 - prob_b))
+        elif winner_id == model_b_id: 
+            rating_a_new = rating_a + (bayes_factor_weight * (0 - prob_a))
+            rating_b_new = rating_b + (bayes_factor_weight * (1 - prob_b))
+        rating_a_new = int(rating_a_new)
+        rating_b_new = int(rating_b_new)
+
+        model_a.update_rating(
+            opponent_id = model_b_id, 
+            winner_id = winner_id,
+            new_rating = rating_a_new            
+        )
+        model_b.update_rating(
+            opponent_id = model_a_id, 
+            winner_id = winner_id,
+            new_rating = rating_b_new            
+        )
+
+        this_round = pd.Series({
+            'model_a' : model_a_id, 
+            'model_b' : model_b_id, 
+            'a_rating_before'  : rating_a, 
+            'b_rating_before' : rating_b,
+            'a_rating_after' : rating_a_new, 
+            'b_rating_new' : rating_b_new,
+            'bayes_factor' : bayes_factor,
+            'weight' : bayes_factor_weight
+        })
+        self.ratings_df = self.ratings_df.append(
+            this_round, 
+            ignore_index=True
+        )

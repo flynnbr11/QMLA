@@ -962,7 +962,8 @@ class QuantumModelLearningAgent():
         self.growth_class.ratings_class.compute_new_ratings(
             model_a_id=mod_low.model_id,
             model_b_id=mod_high.model_id,
-            winner_id=champ
+            winner_id=champ,
+            bayes_factor = bayes_factor,
         )
 
         return champ

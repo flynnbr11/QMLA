@@ -28,10 +28,10 @@ class IsingGenetic(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.ratings_class = qmla.growth_rules.rating_system.ELORating(
-            initial_rating=1500,
-            k_const=30
-        ) # for use when ranking/rating models
+        # self.ratings_class = qmla.growth_rules.rating_system.ELORating(
+        #     initial_rating=1500,
+        #     k_const=30
+        # ) # for use when ranking/rating models
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.zero_state_probes
         self.prune_completed_initially = True
         self.prune_complete = True
@@ -148,7 +148,7 @@ class IsingGeneticTest(
         #     self.initial_models[rand_idx] = self.true_model
 
         # test F map for random set of 10 models
-        self.initial_models = self.genetic_algorithm.random_initial_models(10)
+        self.initial_models = self.genetic_algorithm.random_initial_models(4)
         self.log_print([len(self.initial_models), " initial models:", self.initial_models])
 
         self.tree_completed_initially = True
