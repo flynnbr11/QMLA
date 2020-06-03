@@ -148,18 +148,19 @@ class IsingGeneticTest(
         #     self.initial_models[rand_idx] = self.true_model
 
         # test F map for random set of 10 models
-        self.initial_models = self.genetic_algorithm.random_initial_models(6)
+        self.initial_models = self.genetic_algorithm.random_initial_models(10)
         self.log_print([len(self.initial_models), " initial models:", self.initial_models])
 
         self.tree_completed_initially = False
         self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth=8
-        self.initial_num_models = 10
+        self.max_spawn_depth=6
+        self.initial_num_models = 4
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth),
             'other': 0
         }
         self.num_processes_to_parallelise_over = 16
+        self.timing_insurance_factor = 10
         self.max_time_to_consider = 20 
         self.min_param = 0.6
         self.max_param = 0.4

@@ -3,7 +3,9 @@ import os
 import numpy as np
 import random
 import pandas as pd
-
+import seaborn as sns
+import math
+import matplotlib.pyplot as plt
 
 class RatingSystem():
     def __init__(
@@ -16,16 +18,23 @@ class RatingSystem():
         self.k_const = k_const
         self.ratings_df = pd.DataFrame()
         self.all_ratings = pd.DataFrame()
+        self.recorded_points= pd.DataFrame()
         
         
     def add_ranking_model(
         self,
         model_id,
+        initial_rating=None,
         generation_born=0,
     ):
+        if model_id in self.models.keys():
+            print("Model already present; not adding.")
+            return
+        if initial_rating is None:
+            initial_rating = self.initial_rating
         new_model = RateableModel(
             model_id = model_id, 
-            initial_rating = self.initial_rating,
+            initial_rating = initial_rating,
             generation_born = generation_born
         )
         self.models[model_id] = new_model
@@ -57,6 +66,101 @@ class RatingSystem():
             }
             return model_list_ratings
         
+    def get_rankings(self, model_list=None):
+        ratings = self.get_ratings(model_list=model_list)
+        rankings = sorted(
+            ratings,
+            key=ratings.get,
+            reverse=True
+        )
+        return rankings
+
+    def record_current_ratings(self, 
+        model_list = None, 
+        generation=0, 
+        marker='start', 
+        other_data={}
+    ):
+
+        current_ratings = self.get_ratings(model_list)
+        for m in current_ratings:
+            data = other_data
+            data['model_id'] = m
+            data['marker'] = marker
+            data['generation'] = generation
+            data['rating'] = current_ratings[m]
+            
+            p = pd.Series(data)
+            self.recorded_points = self.recorded_points.append(p, ignore_index = True)
+
+    def plot_models_ratings_against_generation(self, save_directory):
+
+        all_model_ratings_by_generation = pd.DataFrame()
+        models = self.all_ratings.model_id.unique()
+
+        for model in models:
+            model_ratings = self.all_ratings[ self.all_ratings.model_id == model ]
+            generations = model_ratings.generation.unique()
+            
+            for g in generations:
+                mod_ratings_this_generation = model_ratings[model_ratings.generation == g]
+                
+                start_idx = mod_ratings_this_generation.idx.min()
+                final_idx = mod_ratings_this_generation.idx.max()
+                
+                start_rating = self.all_ratings[
+                    (self.all_ratings.model_id == model)
+                    & (self.all_ratings.generation == g)
+                    & (self.all_ratings.idx == start_idx)
+                ].rating.item()
+                final_rating = self.all_ratings[
+                    (self.all_ratings.model_id == model)
+                    & (self.all_ratings.generation == g)
+                    & (self.all_ratings.idx == final_idx)
+                ].rating.item()        
+                
+                new_data = [
+                    pd.Series({
+                        'model_id' : model, 
+                        'generation' : g, 
+                        'rating' : start_rating
+                    }),
+                    pd.Series({
+                        'model_id' : model, 
+                        'generation' : g+0.8, 
+                        'rating' : final_rating
+                    }),
+                ]
+                
+                for d in new_data:
+                    all_model_ratings_by_generation = all_model_ratings_by_generation.append(
+                        d, ignore_index=True
+                    )
+
+        # plot rating of each model vs generation
+        fig, ax = plt.subplots(figsize=(15,10))
+        sns.lineplot(
+            x = 'generation', 
+            y = 'rating', 
+            hue = 'model_id', 
+            data = all_model_ratings_by_generation,
+            legend=False # too many to view meaningfully
+        )
+
+        for g in self.all_ratings.generation.unique():
+            ax.axvline(g, ls='--', c='green')
+        ax.axhline(self.initial_rating, ls=':', color='red')
+        label_fontsize = 25
+        ax.set_xlabel('Generation', fontsize = label_fontsize)
+        ax.set_ylabel('Modified Elo rating', fontsize=label_fontsize)
+        ax.grid(False)
+        ax.set_xticks(list(self.all_ratings.generation.unique()))
+
+
+        fig.savefig(
+            os.path.join(save_directory, 'elo_ratings_of_all_models.png')
+        )
+
 
 class RateableModel():
     def __init__(
@@ -175,6 +279,7 @@ class ModifiedEloRating(ELORating):
         winner_id, 
         bayes_factor, 
         spawn_step, 
+        weight_log_base=10, 
         **kwargs
     ):
         if model_a_id not in self.models: 
@@ -194,9 +299,12 @@ class ModifiedEloRating(ELORating):
         prob_b = q_b / (q_a + q_b) # expectation B will win
         
         if bayes_factor > 1:
-            bayes_factor_weight = np.log10(bayes_factor)
+            # bayes_factor_weight = np.log10(bayes_factor)
+            bayes_factor_weight = math.log(bayes_factor, weight_log_base)
+
         else:
-            bayes_factor_weight = np.log10(1/bayes_factor)
+            # bayes_factor_weight = np.log10(1/bayes_factor)
+            bayes_factor_weight = math.log(1/bayes_factor, weight_log_base)
 
         # update A
         if winner_id == model_a_id: 

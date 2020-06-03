@@ -109,6 +109,11 @@ class GrowthRuleTree():
             to perform comparisons between. 
         """
 
+        # record end of previous generation
+        # self.growth_class.ratings_class.record_current_ratings(
+        #     model_list = , generation = self.spawn_step+0.85, marker='end'
+        # )
+
         if not self.growth_class.check_tree_completed(spawn_step = self.spawn_step):
             self.spawn_step += 1
             self.log_print(["Next layer - spawn"])
@@ -213,6 +218,12 @@ class GrowthRuleTree():
         self.branches[branch_id] = branch
         for m in model_instances:
             self.model_instances[m] = model_instances[m]
+        
+        # Record current state of ratings
+        model_ids = list(model_instances.keys())
+        # self.growth_class.ratings_class.record_current_ratings(
+        #     model_list = model_ids, generation = self.spawn_step, marker='start'
+        # )
 
         return branch
 

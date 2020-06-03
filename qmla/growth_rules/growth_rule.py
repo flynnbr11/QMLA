@@ -580,6 +580,18 @@ class GrowthRule():
             ['No growth rule plots specified.']
         )
 
+    # def record_comparison(
+    #     self, 
+    #     model_a_id, 
+    #     model_b_id, 
+    #     bayes_factor,
+    #     spawn_step,
+    #     **kwargs
+    # ):
+    #     # ensure a,b reads lower to higher, as everywhere in reference to pairwise comparisons
+    #     mod_a = min([model_a_id, model_b_id])
+    #     mod_b = max([model_a_id, model_b_id])
+
     def log_print(
         self,
         to_print_list

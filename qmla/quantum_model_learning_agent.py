@@ -965,7 +965,14 @@ class QuantumModelLearningAgent():
             winner_id=champ,
             bayes_factor = bayes_factor,
             spawn_step = self.growth_class.spawn_step, 
-        )
+        )   
+        # self.growth_class.record_comparison(
+        #     model_a_id=mod_low.model_id,
+        #     model_b_id=mod_high.model_id,
+        #     winner_id=champ,
+        #     bayes_factor = bayes_factor,
+        #     spawn_step = self.growth_class.spawn_step, 
+        # )
 
         return champ
 
@@ -1168,6 +1175,7 @@ class QuantumModelLearningAgent():
             k: self.get_model_storage_instance_by_id(k).evaluation_log_likelihood
             for k in self.branches[branch_id].resident_model_ids
         }
+        # self.growth_class.record_comparisons(comparisons = models_points)
 
         self.log_print([
             "Model points for branch {}: {}".format(

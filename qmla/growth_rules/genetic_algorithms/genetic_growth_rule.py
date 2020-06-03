@@ -53,7 +53,7 @@ class Genetic(
         #     k_const=30
         # ) # for use when ranking/rating models
         self.ratings_class = qmla.growth_rules.rating_system.ModifiedEloRating(
-            initial_rating=1500,
+            initial_rating=1000,
             k_const=30
         ) # for use when ranking/rating models
 
@@ -172,27 +172,28 @@ class Genetic(
         ))
         model_points_distributed_by_ranking = dict(model_points_distributed_by_ranking)
 
-        # model ratings  (Elo ratings)
+        # Model ratings  (Elo ratings)        
         precomputed_ratings = self.ratings_class.get_ratings(list(model_points.keys()))
         original_ratings_by_name = {
             kwargs['model_names_ids'][m] : precomputed_ratings[m]
             for m in model_ids
         }
         min_rating = min(original_ratings_by_name.values())
-        # ratings_by_name = {
-        #     m : original_ratings_by_name[m] - min_rating
-        #     for m in original_ratings_by_name
-        # }
         ratings_by_name = {
-            m : original_ratings_by_name[m] / self.ratings_class.initial_rating
+            m : original_ratings_by_name[m] - min_rating
             for m in original_ratings_by_name
         }
+        # ratings_by_name = {
+        #     m : original_ratings_by_name[m] / self.ratings_class.initial_rating
+        #     for m in original_ratings_by_name
+        # }
         self.log_print(["Rating (as fraction of starting rating):\n", ratings_by_name])
         sum_ratings = np.sum(list(ratings_by_name.values()))
         model_elo_ratings = {
             m : ratings_by_name[m]/sum_ratings
             for m in ratings_by_name
         }
+
         # log likelihoods evaluated against test data
         self.log_print(["Eval log likels:", evaluation_log_likelihoods])
         ll_to_score = {
@@ -209,7 +210,6 @@ class Genetic(
             for mod in evaluation_log_likelihoods
         }
         self.log_print(["Eval log likels:", log_likelihoods])
-
 
         # New dictionaries which can be used as fitnesses:
         model_f_scores = {'fitness_type' : 'f_score'}
@@ -599,6 +599,10 @@ class Genetic(
                 save_directory, 
                 'ratings.png'.format(qmla_id)
             )
+        )
+
+        self.ratings_class.plot_models_ratings_against_generation(
+            save_directory = save_directory
         )
 
     def plot_correlation_fitness_with_f_score(
