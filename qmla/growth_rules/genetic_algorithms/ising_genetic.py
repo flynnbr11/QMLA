@@ -142,18 +142,19 @@ class IsingGeneticTest(
         #     # F = 1
         #     'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
         # ]
+        # self.initial_models = test_fitness_models
         # self.initial_models = list(np.random.choice(test_fitness_models, 10, replace=False))
         # if self.true_model not in self.initial_models:
         #     rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
         #     self.initial_models[rand_idx] = self.true_model
 
         # test F map for random set of 10 models
-        self.initial_models = self.genetic_algorithm.random_initial_models(8)
+        self.initial_models = self.genetic_algorithm.random_initial_models(10)
         self.log_print([len(self.initial_models), " initial models:", self.initial_models])
 
         self.tree_completed_initially = False
         self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth=6
+        self.max_spawn_depth = 3
         self.initial_num_models = 4
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth),
