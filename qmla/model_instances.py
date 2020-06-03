@@ -1018,7 +1018,7 @@ class ModelInstanceForLearning():
         ax.legend(title='Distance metric') 
         ax.set_title('Times chosen by distance metrics')      
         ax.semilogy()
-        ax.grid()
+        # ax.grid()
 
         # Save figure
         fig.tight_layout()

@@ -110,6 +110,7 @@ class Genetic(
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
+        self.model_f_scores = {}
         self.model_points_at_step = {}     
         self.generation_model_rankings = {} 
         self.models_ranked_by_fitness = {}
@@ -238,6 +239,7 @@ class Genetic(
             ) # for fitness use 1/H
             model_hamming_distances[mod] = (self.genetic_algorithm.num_terms - hamming_dist)/self.genetic_algorithm.num_terms
             model_f_scores[mod] = np.round(self.f_score_model_comparison(test_model = mod), 2)
+            self.model_f_scores[m] = model_f_scores[mod]
             model_win_ratio[mod] = model_number_wins[mod]/sum_wins
 
             # store scores for offline analysis
@@ -419,13 +421,11 @@ class Genetic(
             )
             return f
         except:
-            self.log_print(
-                [
-                    "F score from chromosome {} with mod {} not working against true chrom {}".format(
-                        mod, chromosome, self.true_chromosome
-                    )
-                ]
-            )
+            self.log_print([
+                "F score from chromosome {} with mod {} not working against true chrom {}".format(
+                    mod, chromosome, self.true_chromosome
+                )
+            ])
             raise
 
     def latex_name(
@@ -602,6 +602,7 @@ class Genetic(
         )
 
         self.ratings_class.plot_models_ratings_against_generation(
+            f_scores = self.model_f_scores, 
             save_directory = save_directory
         )
 

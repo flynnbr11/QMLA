@@ -2,10 +2,14 @@ import sys
 import os
 import numpy as np
 import random
+import math
+
 import pandas as pd
 import seaborn as sns
-import math
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
+
+import qmla.utilities
 
 class RatingSystem():
     def __init__(
@@ -93,7 +97,11 @@ class RatingSystem():
             p = pd.Series(data)
             self.recorded_points = self.recorded_points.append(p, ignore_index = True)
 
-    def plot_models_ratings_against_generation(self, save_directory):
+    def plot_models_ratings_against_generation(
+        self, 
+        f_scores,
+        save_directory,
+    ):
 
         all_model_ratings_by_generation = pd.DataFrame()
         models = self.all_ratings.model_id.unique()
@@ -137,25 +145,84 @@ class RatingSystem():
                         d, ignore_index=True
                     )
 
-        # plot rating of each model vs generation
-        fig, ax = plt.subplots(figsize=(15,10))
+        # # plot rating of each model vs generation
+        # fig, ax = plt.subplots(figsize=(15,10))
+
+        # sns.lineplot(
+        #     x = 'generation', 
+        #     y = 'rating', 
+        #     hue = 'model_id', 
+        #     data = all_model_ratings_by_generation,
+        #     legend=False # too many to view meaningfully
+        # )
+
+        # for g in self.all_ratings.generation.unique():
+        #     ax.axvline(g, ls='--', c='green')
+        # ax.axhline(self.initial_rating, ls=':', color='red')
+        # label_fontsize = 25
+        # ax.set_xlabel('Generation', fontsize = label_fontsize)
+        # ax.set_ylabel('Modified Elo rating', fontsize=label_fontsize)
+        # ax.grid(False)
+        # ax.set_xticks(list(self.all_ratings.generation.unique()))
+
+        # First prepare a dictionary to map model id to a colour corresponding to F-score
+        f_granularity = 0.05
+        # f_scores = {
+        #     # randomly assign while testing plot
+        #     # TODO get from GR.
+        #     m : qmla.utilities.round_nearest(np.random.uniform(0, 1), f_granularity)
+        #     for m in all_model_ratings_by_generation.model_id.unique()
+        # }
+
+        f_score_colour_map = plt.cm.Spectral
+
+        available_f_scores = np.linspace(0, 1, 1 + (1/f_granularity) )
+        my_cmap = f_score_colour_map(available_f_scores)
+
+        colour_by_f = {
+            np.round(f, 2) : my_cmap[ np.where( available_f_scores == f ) ][0]
+            for f in available_f_scores
+        }
+
+        model_coloured_by_f = {
+            m : colour_by_f[ qmla.utilities.round_nearest(f_scores[m], f_granularity) ]
+            for m in all_model_ratings_by_generation.model_id.unique()
+        }
+
+        # Plot
+        fig, ax = plt.subplots(figsize=(15,10), constrained_layout=True)
+        gs = GridSpec(
+            nrows=1, ncols=2,
+            width_ratios=[10,1]
+        )
+
+        ax = fig.add_subplot(gs[0,0])
         sns.lineplot(
             x = 'generation', 
             y = 'rating', 
             hue = 'model_id', 
-            data = all_model_ratings_by_generation,
-            legend=False # too many to view meaningfully
+            data = all_model_ratings_by_generation, 
+            palette=model_coloured_by_f,
+            legend=False
         )
-
         for g in self.all_ratings.generation.unique():
-            ax.axvline(g, ls='--', c='green')
-        ax.axhline(self.initial_rating, ls=':', color='red')
+            ax.axvline(g, ls='--', c='black')
+        ax.axhline(self.initial_rating, ls=':', color='black')
+
         label_fontsize = 25
         ax.set_xlabel('Generation', fontsize = label_fontsize)
         ax.set_ylabel('Modified Elo rating', fontsize=label_fontsize)
-        ax.grid(False)
         ax.set_xticks(list(self.all_ratings.generation.unique()))
 
+        # color bar
+        ax = fig.add_subplot(gs[0,1])
+        sm = plt.cm.ScalarMappable(
+            cmap = f_score_colour_map, 
+            norm=plt.Normalize(vmin=0, vmax=1)
+        )
+        sm.set_array(available_f_scores)
+        plt.colorbar(sm, cax=ax, orientation='vertical')
+        ax.set_ylabel('F-score',  fontsize=label_fontsize)
 
         fig.savefig(
             os.path.join(save_directory, 'elo_ratings_of_all_models.png')
