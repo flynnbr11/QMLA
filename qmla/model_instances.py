@@ -444,10 +444,13 @@ class ModelInstanceForLearning():
             pass
 
         self.log_print([
-            "QHL finished for ", self.model_name,
+            "Epoch {}".format(self.num_experiments), 
+            "\n QHL finished for ", self.model_name,
             "\n Final time selected:", self.track_experimental_times[-1],
             "\n {} Resample epochs: \n{}".format(len(self.epochs_after_resampling), self.epochs_after_resampling),
-            "\n Final MPGH time prefactor:{}".format(self.model_heuristic.time_multiplicative_factor)
+            "\n Final MPGH time prefactor:{}".format(self.model_heuristic.time_multiplicative_factor),
+            "\n Hueristic check deriv freq:", self.model_heuristic.derivative_frequency,
+            "Time factor changes: ", self.model_heuristic.time_factor_changes
         ])
 
         # Final results
@@ -563,6 +566,7 @@ class ModelInstanceForLearning():
             pass
         try:
             learned_info['heuristic_assorted_times'] = self.model_heuristic.designed_times
+            learned_info['volume_derivatives'] = self.model_heuristic.derivatives
         except:
             pass
 
@@ -672,7 +676,9 @@ class ModelInstanceForLearning():
         )
         self.plot_prefix =''
         if self.is_true_model:
-            self.plot_prefix = 'true_'
+            self.plot_prefix = ''
+            # TODO turn back on when not in dev
+            # self.plot_prefix = 'true_'
 
         if not os.path.exists(self.model_learning_plots_directory): 
             try:
@@ -909,7 +915,7 @@ class ModelInstanceForLearning():
         ax.set_xlabel('Epoch')
         # ax.semilogy()
         ax.set_yscale('log')
-        ax.legend()
+        ax.legend(loc='upper right')
 
         dv_ax = ax.twinx()
         delta_v = [ 
@@ -919,7 +925,7 @@ class ModelInstanceForLearning():
         dv_ax.axhline(0, ls=':', color='blue', alpha=0.5, label=r"$\Delta V=0$")
         dv_ax.set_yscale('symlog')
         dv_ax.set_ylabel(r'$\Delta V$')
-        dv_ax.legend()
+        dv_ax.legend(loc='lower right')
 
         # Times learned upon
         row = nrows-2
@@ -950,10 +956,32 @@ class ModelInstanceForLearning():
                 label='Time of experiment',
                 s=3,
             )
-            ax.legend()
             ax.set_xlabel('Epoch')
             ax.set_ylabel('Time')
             ax.semilogy()
+
+        if len(self.model_heuristic.time_factor_changes['decreasing']) > 0:
+            ax.axvline(
+                self.model_heuristic.time_factor_changes['decreasing'][0], 
+                ls='--', color='red', label='decrease k', alpha=0.5
+            )
+
+            for e in self.model_heuristic.time_factor_changes['decreasing'][1:]:
+                ax.axvline(
+                    e, ls='--', color='red', alpha=0.5
+                )
+        if len(self.model_heuristic.time_factor_changes['increasing']) > 0:
+            ax.axvline(
+                self.model_heuristic.time_factor_changes['increasing'][0], 
+                ls='--', color='green', label='increase k', alpha=0.5
+            )
+
+            for e in self.model_heuristic.time_factor_changes['increasing'][1:]:
+                ax.axvline(
+                    e, ls='--', color='green', alpha=0.5
+                )
+        ax.legend()
+
 
         # | system-pr0 - particles-pr0 |
         row = nrows-1
@@ -1029,7 +1057,6 @@ class ModelInstanceForLearning():
         # Volume Derivatives
         row += 1
         ax = fig.add_subplot(gs[row, 0])
-
         ## first derivatives
         derivs = self.model_heuristic.derivatives[1]
         epochs = sorted(derivs.keys())
@@ -1048,16 +1075,38 @@ class ModelInstanceForLearning():
         ax.set_ylabel('Derivatives', fontsize=label_fontsize)
         ax.set_xlabel('Epoch', fontsize=label_fontsize)
 
-        if len(self.model_heuristic.epochs_time_factor_increased) > 0:
+        # if len(self.model_heuristic.epochs_time_factor_increased) > 0:
+        #     ax.axvline(
+        #         self.model_heuristic.epochs_time_factor_increased[0], 
+        #         ls='--', color='green', label='increase k', alpha=0.5
+        #     )
+
+        #     for e in self.model_heuristic.epochs_time_factor_increased[1:]:
+        #         ax.axvline(
+        #             e, ls='--', color='green', alpha=0.5
+        #         )
+
+        if len(self.model_heuristic.time_factor_changes['decreasing']) > 0:
             ax.axvline(
-                self.model_heuristic.epochs_time_factor_increased[0], 
+                self.model_heuristic.time_factor_changes['decreasing'][0], 
+                ls='--', color='red', label='decrease k', alpha=0.5
+            )
+
+            for e in self.model_heuristic.time_factor_changes['decreasing'][1:]:
+                ax.axvline(
+                    e, ls='--', color='red', alpha=0.5
+                )
+        if len(self.model_heuristic.time_factor_changes['increasing']) > 0:
+            ax.axvline(
+                self.model_heuristic.time_factor_changes['increasing'][0], 
                 ls='--', color='green', label='increase k', alpha=0.5
             )
 
-            for e in self.model_heuristic.epochs_time_factor_increased[1:]:
+            for e in self.model_heuristic.time_factor_changes['increasing'][1:]:
                 ax.axvline(
                     e, ls='--', color='green', alpha=0.5
                 )
+
 
         ax.legend(loc='lower right')
 
@@ -1107,7 +1156,7 @@ class ModelInstanceForLearning():
             figsize=(18, 10),
             constrained_layout=True
         )
-        selected_cmap = plt.cm.coolwarm
+        selected_cmap = plt.cm.Paired
 
         n_param = self.qinfer_model.n_modelparams
         nrows = ncols = n_param
@@ -1160,11 +1209,11 @@ class ModelInstanceForLearning():
                     if x_term in self.true_param_dict:
                         true_param = self.true_param_dict[x_term]
                         if ax.get_xlim()[0] < true_param < ax.get_xlim()[1]:
-                            ax.axvline(true_param, c='black', ls='--')
+                            ax.axvline(true_param, c='black', ls='--', alpha=0.3)
                     if y_term in self.true_param_dict:
                         true_param = self.true_param_dict[y_term]
                         if ax.get_ylim()[0] < true_param < ax.get_ylim()[1]:
-                            ax.axhline(true_param, c='black', ls='--')
+                            ax.axhline(true_param, c='black', ls='--', alpha=0.3)
 
 
                 else:

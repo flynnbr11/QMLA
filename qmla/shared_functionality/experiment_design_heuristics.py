@@ -60,8 +60,10 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         self.volumes = []
         self.epochs_time_factor_increased = []
         self.time_multiplicative_factor = 1
-        self.derivative_frequency = 50
+        self.derivative_frequency = 10
+        self.time_factor_boost = 5
         self.derivatives = { 1:{}, 2:{} }
+        self.time_factor_changes =  {'decreasing' : [], 'increasing' : [] }
         self.distances = []
         distance_metrics = [
             'cityblock', 'euclidean', 'chebyshev', 
@@ -81,7 +83,12 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
             self.volumes.append(current_volume)
         self.volumes.append(current_volume)
 
-        if epoch_id % self.derivative_frequency == 0 :
+        # if epoch_id % self.derivative_frequency == 0 and epoch_id > self.derivative_frequency:
+        #     # allow one round as bleed-in time 
+        #     self.time_multiplicative_factor *= 2
+        #     self.epochs_time_factor_increased.append(epoch_id)
+
+        if epoch_id > 0 and epoch_id % self.derivative_frequency == 0 :
             try:
                 first_derivative = ( 
                     (self.volumes[-1] - self.volumes[-1 - self.derivative_frequency] ) 
@@ -100,16 +107,33 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
                 )
                 self.derivatives[2][epoch_id] = second_derivative
 
-                if second_derivative > 0: 
-                    self.time_multiplicative_factor *= 2
-                    self.epochs_time_factor_increased.append(epoch_id)
-                    print("Learning has slowed by epoch {}. Increasing multiplicative factor to {}".format(epoch_id, self.time_multiplicative_factor))
+                # if second_derivative > 0: 
+                #     self.time_multiplicative_factor *= 2
+                #     self.epochs_time_factor_increased.append(epoch_id)
+                #     print("Learning has slowed by epoch {}. Increasing multiplicative factor to {}".format(epoch_id, self.time_multiplicative_factor))
             except:
                 print("Not enough data yet to work out second derivative.")        
 
-        dv = current_volume - self.volumes[-1]
-        print("MPGH vol:", current_volume)
-        print("dv = ", dv)
+            try:
+                previous_volume = self.volumes[-1 - self.derivative_frequency] 
+            except:
+                previous_volume = self.volumes[0] 
+            relative_change =  (1 - current_volume / previous_volume)
+
+            print("At epoch {} relative change={}".format(epoch_id, relative_change))
+            
+            expected_change = 0.2 # N% decrease in volume after N experiments (?)
+            if 0 < relative_change <= expected_change:
+                self.time_multiplicative_factor *= self.time_factor_boost
+                print("Epoch {} r={}. Increasing time factor: {}".format(epoch_id, relative_change, self.time_multiplicative_factor))
+                self.time_factor_changes['increasing'].append(epoch_id)
+            elif relative_change < -0.05 :
+                self.time_multiplicative_factor /= self.time_factor_boost # volume increasing -> use lower times
+                print("Epoch {} r={}. Decreasing time factor: {}".format(epoch_id, relative_change,self.time_multiplicative_factor))
+                self.time_factor_changes['decreasing'].append(epoch_id)
+            elif relative_change > 0.1:
+                self.time_multiplicative_factor *= 1 # learning well enough
+                print("Epoch {} r={}. Maintaining time factor: {}".format(epoch_id, relative_change, self.time_multiplicative_factor))
 
         idx_iter = 0
         while idx_iter < self._maxiters:
