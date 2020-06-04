@@ -4,6 +4,7 @@ import time
 import copy
 import scipy
 import random 
+import logging
 
 import qinfer as qi
 import matplotlib.pyplot as plt
@@ -75,7 +76,6 @@ class ModelInstanceForLearning():
         self.model_id = int(model_id)
         self.model_name = model_name
         self.log_file = log_file
-        self.volume_by_epoch = np.array([])
         self.redis_host = host_name
         self.redis_port_number = port_number
         self.growth_rule_of_this_model = growth_generator
@@ -84,6 +84,7 @@ class ModelInstanceForLearning():
                 model_id, model_name, 
             )
         ])
+        logging.info("Model {}".format(self.model_id))
 
         # Set up the model for learning
         self._initialise_model_for_learning(
@@ -254,6 +255,9 @@ class ModelInstanceForLearning():
         self.qhl_final_param_estimates = {}
         self.qhl_final_param_uncertainties = {}
         self.track_covariance_matrices = []
+        self.volume_by_epoch = np.array([
+            qi.utils.ellipsoid_volume( invA = self.qinfer_updater.est_covariance_mtx() )
+        ])
         if self.growth_class.track_quadratic_loss:
             self.true_params_dict = self.growth_class.true_params_dict # TODO check these are loaded properly by GR
             self.all_params_for_q_loss = list(
@@ -310,14 +314,16 @@ class ModelInstanceForLearning():
 
             # Design exeriment
 
-            print( #debug
-                "Current param distribution mean\n", self.qinfer_updater.est_mean(),
-                "\n uncertainty:\n", np.sqrt(np.diag(self.qinfer_updater.est_covariance_mtx()))
-            )
+            # print( #debug
+            #     "Current param distribution mean\n", self.qinfer_updater.est_mean(),
+            #     "\n uncertainty:\n", np.sqrt(np.diag(self.qinfer_updater.est_covariance_mtx()))
+            # )
             new_experiment = self.model_heuristic(
                 num_params=len(self.model_terms_names),
                 epoch_id=update_step,
-                current_params=self.qinfer_updater.est_mean()
+                # current_params = self.qinfer_updater.est_mean(),
+                current_params = self.track_param_means[-1],
+                current_volume = self.volume_by_epoch[-1]
             )
             self.log_print(["Heuristic called; new experiment:", new_experiment])
 
@@ -440,7 +446,8 @@ class ModelInstanceForLearning():
         self.log_print([
             "QHL finished for ", self.model_name,
             "\n Final time selected:", self.track_experimental_times[-1],
-            "\n {} Resample epochs: \n{}".format(len(self.epochs_after_resampling), self.epochs_after_resampling)
+            "\n {} Resample epochs: \n{}".format(len(self.epochs_after_resampling), self.epochs_after_resampling),
+            "\n Final MPGH time prefactor:{}".format(self.model_heuristic.time_multiplicative_factor)
         ])
 
         # Final results
@@ -499,7 +506,8 @@ class ModelInstanceForLearning():
             self._plot_heuristic_attributes()
         except:
             self.log_print(["Failed to plot_heuristic_attributes"])
-            pass
+            raise
+            # pass
         self._plot_posterior_mesh_pairwise()
 
     def learned_info_dict(self):
@@ -900,7 +908,7 @@ class ModelInstanceForLearning():
         ax.set_ylabel('Volume')
         ax.set_xlabel('Epoch')
         # ax.semilogy()
-        ax.set_yscale('symlog')
+        ax.set_yscale('log')
         ax.legend()
 
         dv_ax = ax.twinx()
@@ -981,7 +989,8 @@ class ModelInstanceForLearning():
                 
     def _plot_heuristic_attributes(self):
         plt.clf()
-        plots = ['volume', 'heuristic_times']
+        plots = ['volume', 'heuristic_times', 'derivatives']
+        label_fontsize = 20
         nrows = len(plots)
         fig = plt.figure( 
             figsize=(15, 3*nrows)
@@ -997,9 +1006,9 @@ class ModelInstanceForLearning():
 
         # Volume
         ax = fig.add_subplot(gs[row, 0])
-
+        full_epoch_list = range(len(self.volume_by_epoch))
         ax.plot(
-            range(len(self.volume_by_epoch)), 
+            full_epoch_list, 
             self.volume_by_epoch,
             label = 'Volume',
         )
@@ -1011,11 +1020,47 @@ class ModelInstanceForLearning():
                 # label='Resample'
             )
 
-        ax.set_title('Volume')
-        ax.set_ylabel('Volume')
-        ax.set_xlabel('Epoch')
+        ax.set_title('Volume', fontsize=label_fontsize)
+        ax.set_ylabel('Volume', fontsize=label_fontsize)
+        ax.set_xlabel('Epoch', fontsize=label_fontsize)
         ax.semilogy()
         ax.legend()
+
+        # Volume Derivatives
+        row += 1
+        ax = fig.add_subplot(gs[row, 0])
+
+        ## first derivatives
+        derivs = self.model_heuristic.derivatives[1]
+        epochs = sorted(derivs.keys())
+        first_derivatives = [derivs[e] if e in derivs else None for e in epochs]
+        ax.plot(epochs, first_derivatives, label=r"$\frac{dV}{dE}$", color='darkblue', marker='x')
+
+        ## second derivatives
+        derivs = self.model_heuristic.derivatives[2]
+        epochs = sorted(derivs.keys())
+        second_derivatives = [derivs[e] if e in derivs else None for e in epochs]
+        ax.plot(epochs, second_derivatives, label=r"$\frac{d^2V}{dE^2}$", color='maroon', marker='+')
+
+        ax.axhline(0, ls='--', alpha=0.3)
+        ax.legend(loc='upper right')
+        ax.set_yscale('symlog')
+        ax.set_ylabel('Derivatives', fontsize=label_fontsize)
+        ax.set_xlabel('Epoch', fontsize=label_fontsize)
+
+        if len(self.model_heuristic.epochs_time_factor_increased) > 0:
+            ax.axvline(
+                self.model_heuristic.epochs_time_factor_increased[0], 
+                ls='--', color='green', label='increase k', alpha=0.5
+            )
+
+            for e in self.model_heuristic.epochs_time_factor_increased[1:]:
+                ax.axvline(
+                    e, ls='--', color='green', alpha=0.5
+                )
+
+        ax.legend(loc='lower right')
+
 
         # Times by distance metrics
         row += 1
@@ -1038,7 +1083,9 @@ class ModelInstanceForLearning():
                 ls=ls
             )
         ax.legend(title='Distance metric') 
-        ax.set_title('Times chosen by distance metrics')      
+        ax.set_title('Times chosen by distance metrics', fontsize=label_fontsize)      
+        ax.set_ylabel('Time', fontsize=label_fontsize)
+        ax.set_xlabel('Epoch', fontsize=label_fontsize)
         ax.semilogy()
         # ax.grid()
 

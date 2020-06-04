@@ -44,7 +44,8 @@ class ControlsQMLA():
         arguments,
         **kwargs
     ):
-        self.log_file = arguments.log_file
+        self.log_file = os.path.abspath(arguments.log_file)
+        # self.alt_log_file = self.log_file
 
         # Get growth rule instances for true and alternative growth rules
         self.growth_generation_rule = arguments.growth_generation_rule
@@ -144,6 +145,9 @@ class ControlsQMLA():
         self.probe_noise_level = arguments.probe_noise_level # TODO put in growth rule
 
         # Create some new paths/parameters for storing results
+        self.alt_log_file = os.path.join(
+            self.results_directory, 'qmla_log_{}.log'.format(self.qmla_id)
+        )
         self.long_id = '{0:03d}'.format(self.qmla_id)
         self.plots_directory = os.path.join(
             self.results_directory, 'single_instance_plots', "qmla_{}".format(self.qmla_id)

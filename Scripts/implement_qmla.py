@@ -7,6 +7,7 @@ import sys as sys
 import pandas as pd
 import warnings
 import time as time
+import logging
 import random
 import pickle
 pickle.HIGHEST_PROTOCOL = 4
@@ -40,6 +41,14 @@ def log_print(to_print_list, log_file=None):
         log_file=qmla_controls.log_file,
         log_identifier='Implement QMLA script'
     )    
+
+logging.basicConfig(
+    filename=qmla_controls.alt_log_file, 
+    level=logging.INFO,
+    format='%(levelname)s:%(asctime)s:%(message)s'
+)
+logging.info('Implement QMLA script')
+
 
 print("Implement QMLA script")
 start = time.time()

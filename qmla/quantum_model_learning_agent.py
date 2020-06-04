@@ -10,6 +10,7 @@ import pandas as pd
 import time
 from time import sleep
 import random
+import logging
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -76,6 +77,7 @@ class QuantumModelLearningAgent():
                  experimental_measurements=None,
                  **kwargs
                  ):
+        logging.info('QMLA class instance')
         self._start_time = time.time()  # to measure run-time
 
         # Configure this QMLA instance

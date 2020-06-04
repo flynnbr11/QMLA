@@ -57,6 +57,11 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
+        self.volumes = []
+        self.epochs_time_factor_increased = []
+        self.time_multiplicative_factor = 1
+        self.derivative_frequency = 50
+        self.derivatives = { 1:{}, 2:{} }
         self.distances = []
         distance_metrics = [
             'cityblock', 'euclidean', 'chebyshev', 
@@ -70,7 +75,41 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         epoch_id=0,
         **kwargs
     ):
-        print("Call to MPGH")
+        current_params = kwargs['current_params'] 
+        current_volume = kwargs['current_volume']
+        if len(self.volumes) == 0: 
+            self.volumes.append(current_volume)
+        self.volumes.append(current_volume)
+
+        if epoch_id % self.derivative_frequency == 0 :
+            try:
+                first_derivative = ( 
+                    (self.volumes[-1] - self.volumes[-1 - self.derivative_frequency] ) 
+                    / 2*self.derivative_frequency
+                )
+                self.derivatives[1][epoch_id] = first_derivative
+            except:
+                print("Not enough data yet to work out first derivative.")        
+            try:
+                second_derivative = ( 
+                    (
+                        self.volumes[-1] 
+                        - 2*self.volumes[-1 - self.derivative_frequency] 
+                        + self.volumes[-1 - 2*self.derivative_frequency] 
+                    ) / 4*self.derivative_frequency
+                )
+                self.derivatives[2][epoch_id] = second_derivative
+
+                if second_derivative > 0: 
+                    self.time_multiplicative_factor *= 2
+                    self.epochs_time_factor_increased.append(epoch_id)
+                    print("Learning has slowed by epoch {}. Increasing multiplicative factor to {}".format(epoch_id, self.time_multiplicative_factor))
+            except:
+                print("Not enough data yet to work out second derivative.")        
+
+        dv = current_volume - self.volumes[-1]
+        print("MPGH vol:", current_volume)
+        print("dv = ", dv)
 
         idx_iter = 0
         while idx_iter < self._maxiters:
@@ -101,9 +140,10 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
 
         new_time = self.designed_times[self.distance_metric_to_use][epoch_id]
         d = 1 / new_time
+        new_time *= self.time_multiplicative_factor
         self.distances.append(d)
         eps['t'] = new_time
-        print("x=\t{} \nx'=\t{} \nx-x'=\t{} \nd=\t{}\nt=\t{} \n".format(x, xp, x-xp, d, new_time))
+        # print("x=\t{} \nx'=\t{} \nx-x'=\t{} \nd=\t{}\nt=\t{} \n".format(x, xp, x-xp, d, new_time))
         return eps
 
 
@@ -280,7 +320,6 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         epoch_id=0,
         **kwargs
     ):
-        print("Heuristic called" )
         idx_iter = 0
         while idx_iter < self._maxiters:
 
