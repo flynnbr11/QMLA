@@ -60,9 +60,9 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         self.volumes = []
         self.epochs_time_factor_increased = []
         self.time_multiplicative_factor = 1
-        self.derivative_frequency = 10
-        self.burn_in_learning_time = 10 * self.derivative_frequency
-        self.time_factor_boost = np.e
+        self.derivative_frequency = 25
+        self.burn_in_learning_time = 3 * self.derivative_frequency
+        self.time_factor_boost = 10
         self.derivatives = { 1:{}, 2:{} }
         self.time_factor_changes =  {'decreasing' : [], 'increasing' : [] }
         self.distances = []
@@ -128,7 +128,7 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
                 self.time_multiplicative_factor *= self.time_factor_boost
                 print("Epoch {} r={}. Increasing time factor: {}".format(epoch_id, relative_change, self.time_multiplicative_factor))
                 self.time_factor_changes['increasing'].append(epoch_id)
-            elif relative_change < -0.05 :
+            elif relative_change < -0.1 :
                 self.time_multiplicative_factor /= self.time_factor_boost # volume increasing -> use lower times
                 print("Epoch {} r={}. Decreasing time factor: {}".format(epoch_id, relative_change,self.time_multiplicative_factor))
                 self.time_factor_changes['decreasing'].append(epoch_id)

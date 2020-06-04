@@ -960,7 +960,7 @@ class ModelInstanceForLearning():
             ax.scatter(
                 range(len(self.track_experimental_times)), 
                 self.track_experimental_times,
-                label='Time of experiment',
+                label=r"$t \sim k \frac{1}{V}$",
                 s=3,
             )
             ax.set_xlabel('Epoch')
