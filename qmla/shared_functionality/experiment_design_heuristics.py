@@ -63,6 +63,7 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         self.time_multiplicative_factor = 1
         self.derivative_frequency = self.num_experiments / 10
         self.burn_in_learning_time = 4 * self.derivative_frequency
+        print("Derivative freq:{} \t burn in:{}".format(self.derivative_frequency, self.burn_in_learning_time) ) 
         self.time_factor_boost = 10
         self.derivatives = { 1:{}, 2:{} }
         self.time_factor_changes =  {'decreasing' : [], 'increasing' : [] }
@@ -83,6 +84,7 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         current_volume = kwargs['current_volume']
         if len(self.volumes) == 0: 
             self.volumes.append(current_volume)
+            print("V0 = ", current_volume)
         self.volumes.append(current_volume)
 
         # if epoch_id % self.derivative_frequency == 0 and epoch_id > self.derivative_frequency:
@@ -117,12 +119,18 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
                 print("Not enough data yet to work out second derivative.")        
 
             try:
-                previous_volume = self.volumes[-1 - self.derivative_frequency] 
+                previous_epoch_to_compare = int(-1 - self.derivative_frequency)
+                previous_volume = self.volumes[ previous_epoch_to_compare ] 
             except:
                 previous_volume = self.volumes[0] 
+                print("Couldn't find {}th element of volumes: {}".format(-1 - self.derivative_frequency, self.volumes))
             relative_change =  (1 - current_volume / previous_volume)
 
-            print("At epoch {} relative change={}".format(epoch_id, relative_change))
+            print("At epoch {} V_old/V_new={}/{}. relative change={}".format(
+                epoch_id, 
+                np.round(previous_volume, 2), np.round(current_volume, 2), 
+                relative_change)
+            )
             
             expected_change = 0.2 # N% decrease in volume after N experiments (?)
             if 0 < relative_change <= expected_change:

@@ -315,7 +315,7 @@ class TestSimulatedNVCentre(
             (self.true_model_terms_params.keys())
         )
         self.true_model = qmla.database_framework.alph(self.true_model)
-        self.qinfer_resampler_threshold = 0.35
+        self.qinfer_resampler_threshold = 0.5
         self.qinfer_resampler_a = 0.98
 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
