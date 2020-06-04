@@ -706,7 +706,8 @@ class ModelInstanceForLearning():
         fig, axes = plt.subplots(
             figsize=(18, 10),
             nrows=nrows, 
-            ncols=ncols
+            ncols=ncols,
+            constrained_layout=True, 
         )
 
         gs = GridSpec(
