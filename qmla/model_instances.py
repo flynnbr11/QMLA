@@ -907,8 +907,8 @@ class ModelInstanceForLearning():
         delta_v = [ 
             self.volume_by_epoch[j] - self.volume_by_epoch[j-1] for j in range(1, len(self.volume_by_epoch))
         ]
-        dv_ax.plot(delta_v, color='blue', ls='--', label=r'$\Delta V$', alpha=0.5)
-        dv_ax.axhline(0, ls=':', color='blue', alpha=0.5)
+        dv_ax.plot(range(1, len(delta_v)+1), delta_v, color='blue', ls='--', label=r'$\Delta V$', alpha=0.5)
+        dv_ax.axhline(0, ls=':', color='blue', alpha=0.5, label=r"$\Delta V=0$")
         dv_ax.set_yscale('symlog')
         dv_ax.set_ylabel(r'$\Delta V$')
         dv_ax.legend()
