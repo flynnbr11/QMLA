@@ -814,6 +814,7 @@ class ModelInstanceForLearning():
         num_terms = len(terms)
         
         extra_plots = ['volume', 'time', 'pr0_diff']
+        resample_colour = 'grey' 
         ncols = int(np.ceil(np.sqrt(num_terms))) 
         nrows = int(np.ceil(num_terms / ncols))+ len(extra_plots)
         self.log_print(["Plotting parameters. ncol={} nrow={}".format(ncols, nrows)])
@@ -855,12 +856,17 @@ class ModelInstanceForLearning():
                 label='Uncertainty'
             )
 
-            for e in self.epochs_after_resampling:
+            ax.axvline(
+                self.epochs_after_resampling[0], 
+                ls='--', 
+                c=resample_colour, alpha = 0.5, label='Resample'
+            )
+
+            for e in self.epochs_after_resampling[1:]:
                 ax.axvline(
                     e, 
                     ls='--', 
-                    c='green', alpha = 0.5, 
-                    # label='Resample'
+                    c=resample_colour, alpha = 0.5, 
                 )
 
             if term in self.true_param_dict:
@@ -897,7 +903,7 @@ class ModelInstanceForLearning():
         ax.axvline( # label first resample only
             self.epochs_after_resampling[0], 
             ls='--', 
-            c='green', 
+            c=resample_colour, 
             alpha = 0.5, 
             label='Resample'
         )
@@ -906,7 +912,7 @@ class ModelInstanceForLearning():
             ax.axvline(
                 e, 
                 ls='--', 
-                c='green', 
+                c=resample_colour, 
                 alpha = 0.5, 
             )
 
@@ -917,15 +923,15 @@ class ModelInstanceForLearning():
         ax.set_yscale('log')
         ax.legend(loc='upper right')
 
-        dv_ax = ax.twinx()
-        delta_v = [ 
-            self.volume_by_epoch[j] - self.volume_by_epoch[j-1] for j in range(1, len(self.volume_by_epoch))
-        ]
-        dv_ax.plot(range(1, len(delta_v)+1), delta_v, color='blue', ls='--', label=r'$\Delta V$', alpha=0.5)
-        dv_ax.axhline(0, ls=':', color='blue', alpha=0.5, label=r"$\Delta V=0$")
-        dv_ax.set_yscale('symlog')
-        dv_ax.set_ylabel(r'$\Delta V$')
-        dv_ax.legend(loc='lower right')
+        # dv_ax = ax.twinx()
+        # delta_v = [ 
+        #     self.volume_by_epoch[j] - self.volume_by_epoch[j-1] for j in range(1, len(self.volume_by_epoch))
+        # ]
+        # dv_ax.plot(range(1, len(delta_v)+1), delta_v, color='blue', ls='--', label=r'$\Delta V$', alpha=0.5)
+        # dv_ax.axhline(0, ls=':', color='blue', alpha=0.5, label=r"$\Delta V=0$")
+        # dv_ax.set_yscale('symlog')
+        # dv_ax.set_ylabel(r'$\Delta V$')
+        # dv_ax.legend(loc='lower right')
 
         # Times learned upon
         row = nrows-2

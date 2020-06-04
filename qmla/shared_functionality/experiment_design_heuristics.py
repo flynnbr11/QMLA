@@ -61,7 +61,7 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         self.epochs_time_factor_increased = []
         self.time_multiplicative_factor = 1
         self.derivative_frequency = 10
-        self.time_factor_boost = 5
+        self.time_factor_boost = np.e
         self.derivatives = { 1:{}, 2:{} }
         self.time_factor_changes =  {'decreasing' : [], 'increasing' : [] }
         self.distances = []
