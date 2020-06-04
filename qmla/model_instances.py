@@ -493,7 +493,8 @@ class ModelInstanceForLearning():
             self.plot_parameters()
         except:
             self.log_print(["Failed to plot_parameters"])
-            pass
+            raise
+            # pass
         try:
             self._plot_heuristic_attributes()
         except:
@@ -876,20 +877,41 @@ class ModelInstanceForLearning():
             range(len(self.volume_by_epoch)), 
             self.volume_by_epoch,
             label = 'Volume',
+            color='k'
         )
-        for e in self.epochs_after_resampling:
+
+        ax.axvline( # label first resample only
+            self.epochs_after_resampling[0], 
+            ls='--', 
+            c='green', 
+            alpha = 0.5, 
+            label='Resample'
+        )
+
+        for e in self.epochs_after_resampling[1:]:
             ax.axvline(
                 e, 
                 ls='--', 
-                c='green', alpha = 0.5, 
-                # label='Resample'
+                c='green', 
+                alpha = 0.5, 
             )
 
         ax.set_title('Volume')
         ax.set_ylabel('Volume')
         ax.set_xlabel('Epoch')
-        ax.semilogy()
+        # ax.semilogy()
+        ax.set_yscale('symlog')
         ax.legend()
+
+        dv_ax = ax.twinx()
+        delta_v = [ 
+            self.volume_by_epoch[j] - self.volume_by_epoch[j-1] for j in range(1, len(self.volume_by_epoch))
+        ]
+        dv_ax.plot(delta_v, color='blue', ls='--', label=r'$\Delta V$', alpha=0.5)
+        dv_ax.axhline(0, ls=':', color='blue', alpha=0.5)
+        dv_ax.set_yscale('symlog')
+        dv_ax.set_ylabel(r'$\Delta V$')
+        dv_ax.legend()
 
         # Times learned upon
         row = nrows-2
