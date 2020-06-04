@@ -61,8 +61,8 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         self.volumes = []
         self.epochs_time_factor_increased = []
         self.time_multiplicative_factor = 1
-        self.derivative_frequency = self.num_experiments / 10
-        self.burn_in_learning_time = 4 * self.derivative_frequency
+        self.derivative_frequency = self.num_experiments / 20
+        self.burn_in_learning_time = 6 * self.derivative_frequency
         print("Derivative freq:{} \t burn in:{}".format(self.derivative_frequency, self.burn_in_learning_time) ) 
         self.time_factor_boost = 10
         self.derivatives = { 1:{}, 2:{} }
