@@ -57,11 +57,12 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
+        self.num_experiments = kwargs['num_experiments']
         self.volumes = []
         self.epochs_time_factor_increased = []
         self.time_multiplicative_factor = 1
-        self.derivative_frequency = 25
-        self.burn_in_learning_time = 3 * self.derivative_frequency
+        self.derivative_frequency = self.num_experiments / 10
+        self.burn_in_learning_time = 4 * self.derivative_frequency
         self.time_factor_boost = 10
         self.derivatives = { 1:{}, 2:{} }
         self.time_factor_changes =  {'decreasing' : [], 'increasing' : [] }
