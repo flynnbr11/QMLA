@@ -61,6 +61,7 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         self.epochs_time_factor_increased = []
         self.time_multiplicative_factor = 1
         self.derivative_frequency = 10
+        self.burn_in_learning_time = 10 * self.derivative_frequency
         self.time_factor_boost = np.e
         self.derivatives = { 1:{}, 2:{} }
         self.time_factor_changes =  {'decreasing' : [], 'increasing' : [] }
@@ -88,7 +89,7 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         #     self.time_multiplicative_factor *= 2
         #     self.epochs_time_factor_increased.append(epoch_id)
 
-        if epoch_id > 0 and epoch_id % self.derivative_frequency == 0 :
+        if epoch_id > 0 and epoch_id % self.derivative_frequency == 0 and epoch_id > self.burn_in_learning_time:
             try:
                 first_derivative = ( 
                     (self.volumes[-1] - self.volumes[-1 - self.derivative_frequency] ) 
