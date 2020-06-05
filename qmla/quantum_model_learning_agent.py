@@ -77,7 +77,7 @@ class QuantumModelLearningAgent():
                  experimental_measurements=None,
                  **kwargs
                  ):
-        logging.info('QMLA class instance')
+        # logging.info('QMLA class instance')
         self._start_time = time.time()  # to measure run-time
 
         # Configure this QMLA instance

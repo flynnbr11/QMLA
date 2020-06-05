@@ -42,12 +42,13 @@ def log_print(to_print_list, log_file=None):
         log_identifier='Implement QMLA script'
     )    
 
-logging.basicConfig(
-    filename=qmla_controls.alt_log_file, 
-    level=logging.INFO,
-    format='%(levelname)s:%(asctime)s:%(message)s'
-)
-logging.info('Implement QMLA script')
+# TODO replace custom logger with default python one as below:
+# logging.basicConfig(
+#     filename=qmla_controls.alt_log_file, 
+#     level=logging.INFO,
+#     format='%(levelname)s:%(asctime)s:%(message)s'
+# )
+# logging.info('Implement QMLA script')
 
 
 print("Implement QMLA script")

@@ -4,7 +4,10 @@ import scipy as sp
 import random 
 import math
 
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 from inspect import currentframe, getframeinfo
+
 import qmla.logging
 
 
@@ -12,10 +15,8 @@ frameinfo = getframeinfo(currentframe())
 
 __all__ = [
     'MultiParticleGuessHeuristic',
-    'TimeHeurstic',
-    'TimeFromListHeuristic',
     'MixedMultiParticleLinspaceHeuristic',
-    'InverseEigenvalueHeuristic'
+    'VolumeAdaptiveParticleGuessHeuristic'
 ]
 
 def identity(arg): return arg
@@ -30,7 +31,7 @@ def log_print(
         log_identifier = 'Heuristic'
     )
 
-class MultiParticleGuessHeuristic(qi.Heuristic):
+class BaseHeuristicQMLA(qi.Heuristic):
     def __init__(
         self,
         updater,
@@ -38,309 +39,127 @@ class MultiParticleGuessHeuristic(qi.Heuristic):
         norm='Frobenius',
         inv_field='x_',
         t_field='t',
-        inv_func=identity,
-        t_func=identity,
-        pgh_exponent=1,
-        increase_time=False,
         maxiters=10,
         other_fields=None,
+        inv_func=identity,
+        t_func=identity,    
+        log_file='qmla_log.log',    
         **kwargs
     ):
-        super(MultiParticleGuessHeuristic, self).__init__(updater)
-        self._oplist = oplist
+        super().__init__(updater)
         self._norm = norm
         self._x_ = inv_field
         self._t = t_field
         self._inv_func = inv_func
         self._t_func = t_func
-        self._maxiters = maxiters
         self._other_fields = other_fields if other_fields is not None else {}
-        self._pgh_exponent = pgh_exponent
-        self._increase_time = increase_time
+        self._updater = updater
+        self._model = updater.model
+        self._maxiters = maxiters
+        self._oplist = oplist
         self.num_experiments = kwargs['num_experiments']
-        self.volumes = []
-        self.epochs_time_factor_increased = []
-        self.time_multiplicative_factor = 1
-        self.derivative_frequency = self.num_experiments / 20
-        self.burn_in_learning_time = 6 * self.derivative_frequency
-        print("Derivative freq:{} \t burn in:{}".format(self.derivative_frequency, self.burn_in_learning_time) ) 
-        self.time_factor_boost = 10
-        self.derivatives = { 1:{}, 2:{} }
-        self.time_factor_changes =  {'decreasing' : [], 'increasing' : [] }
-        self.distances = []
-        distance_metrics = [
-            'cityblock', 'euclidean', 'chebyshev', 
-            'canberra', 'braycurtis','minkowski', 
-        ]
-        self.designed_times = { m : {} for m in distance_metrics }
-        self.distance_metric_to_use = 'euclidean'
+        self.log_file = log_file
+        
+        self.times_suggested = []
+        self.heuristic_data = {} # to be stored by model instance
+        
+    def _get_exp_params_array(self):
+        r"""Return an empty array with a position for every experiment design parameter."""
+        experiment_params = np.empty(
+            (1,),
+            dtype=self._model.expparams_dtype
+        )
+        return experiment_params
+
+    def log_print(
+        self,
+        to_print_list
+    ):
+        r"""Wrapper for :func:`~qmla.print_to_log`"""
+        qmla.logging.print_to_log(
+            to_print_list=to_print_list,
+            log_file=self.log_file,
+            log_identifier="Heuristic" # TODO add heuristic name 
+        )
+
+    def __call__(self, **kwargs):
+        raise RuntimeError(
+            "__call__ method not written for this heuristic."
+        )
+    
+    def summarise_heuristic(self, **kwargs):
+        self.log_print([
+            "Times suggested:", self.times_suggested
+        ])
+
+    def plot_heuristic_attributes(self, save_to_file, **kwargs):
+        # Plot results related to heuristic here
+        # and/or log_print some details. 
+        pass
+
+
+class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
 
     def __call__(
         self,
         epoch_id=0,
         **kwargs
     ):
-        current_params = kwargs['current_params'] 
-        current_volume = kwargs['current_volume']
-        if len(self.volumes) == 0: 
-            self.volumes.append(current_volume)
-            print("V0 = ", current_volume)
-        self.volumes.append(current_volume)
-
-        # if epoch_id % self.derivative_frequency == 0 and epoch_id > self.derivative_frequency:
-        #     # allow one round as bleed-in time 
-        #     self.time_multiplicative_factor *= 2
-        #     self.epochs_time_factor_increased.append(epoch_id)
-
-        if epoch_id > 0 and epoch_id % self.derivative_frequency == 0 and epoch_id > self.burn_in_learning_time:
-            try:
-                first_derivative = ( 
-                    (self.volumes[-1] - self.volumes[-1 - self.derivative_frequency] ) 
-                    / 2*self.derivative_frequency
-                )
-                self.derivatives[1][epoch_id] = first_derivative
-            except:
-                print("Not enough data yet to work out first derivative.")        
-            try:
-                second_derivative = ( 
-                    (
-                        self.volumes[-1] 
-                        - 2*self.volumes[-1 - self.derivative_frequency] 
-                        + self.volumes[-1 - 2*self.derivative_frequency] 
-                    ) / 4*self.derivative_frequency
-                )
-                self.derivatives[2][epoch_id] = second_derivative
-
-                # if second_derivative > 0: 
-                #     self.time_multiplicative_factor *= 2
-                #     self.epochs_time_factor_increased.append(epoch_id)
-                #     print("Learning has slowed by epoch {}. Increasing multiplicative factor to {}".format(epoch_id, self.time_multiplicative_factor))
-            except:
-                print("Not enough data yet to work out second derivative.")        
-
-            try:
-                previous_epoch_to_compare = int(-1 - self.derivative_frequency)
-                previous_volume = self.volumes[ previous_epoch_to_compare ] 
-            except:
-                previous_volume = self.volumes[0] 
-                print("Couldn't find {}th element of volumes: {}".format(-1 - self.derivative_frequency, self.volumes))
-            relative_change =  (1 - current_volume / previous_volume)
-
-            print("At epoch {} V_old/V_new={}/{}. relative change={}".format(
-                epoch_id, 
-                np.round(previous_volume, 2), np.round(current_volume, 2), 
-                relative_change)
-            )
-            
-            expected_change = 0.2 # N% decrease in volume after N experiments (?)
-            if 0 < relative_change <= expected_change:
-                self.time_multiplicative_factor *= self.time_factor_boost
-                print("Epoch {} r={}. Increasing time factor: {}".format(epoch_id, relative_change, self.time_multiplicative_factor))
-                self.time_factor_changes['increasing'].append(epoch_id)
-            elif relative_change < -0.1 :
-                self.time_multiplicative_factor /= self.time_factor_boost # volume increasing -> use lower times
-                print("Epoch {} r={}. Decreasing time factor: {}".format(epoch_id, relative_change,self.time_multiplicative_factor))
-                self.time_factor_changes['decreasing'].append(epoch_id)
-            elif relative_change > 0.1:
-                self.time_multiplicative_factor *= 1 # learning well enough
-                print("Epoch {} r={}. Maintaining time factor: {}".format(epoch_id, relative_change, self.time_multiplicative_factor))
-
         idx_iter = 0
         while idx_iter < self._maxiters:
             sample = self._updater.sample(n=2) 
             x, xp = sample[:, np.newaxis, :]
-            if self._updater.model.distance(x, xp) > 0:
+            if self._model.distance(x, xp) > 0:
                 break
             else:
                 idx_iter += 1
 
-        if self._updater.model.distance(x, xp) == 0:
+        if self._model.distance(x, xp) == 0:
             raise RuntimeError(
                 "PGH did not find distinct particles in \
                 {} iterations.".format(self._maxiters)
             )
 
-        for method in self.designed_times:
-            d = sp.spatial.distance.pdist(
-                sample, 
-                metric=method
-            )
-            self.designed_times[method][epoch_id] = 1/d
-
-        eps = np.zeros(
-            (1,),
-            dtype=self._updater.model.expparams_dtype
-        )
-
-        new_time = self.designed_times[self.distance_metric_to_use][epoch_id]
-        d = 1 / new_time
-        new_time *= self.time_multiplicative_factor
-        self.distances.append(d)
+        d = self._model.distance(x, xp)
+        eps = self._get_exp_params_array()
+        new_time = 1 / d
         eps['t'] = new_time
-        # print("x=\t{} \nx'=\t{} \nx-x'=\t{} \nd=\t{}\nt=\t{} \n".format(x, xp, x-xp, d, new_time))
-        return eps
-
-
-class TimeHeurstic(qi.Heuristic):
-
-    def identity(arg): return arg
-
-    def __init__(self, updater, t_field='t',
-                 t_func=identity,
-                 maxiters=10
-                 ):
-        super(TimeHeurstic, self).__init__(updater)
-        self._t = t_field
-        self._t_func = t_func
-        self._maxiters = maxiters
-
-    def __call__(self, **kwargs):
-        idx_iter = 0
-        while idx_iter < self._maxiters:
-
-            x, xp = self._updater.sample(n=2)[:, np.newaxis, :]
-            if self._updater.model.distance(x, xp) > 0:
-                break
-            else:
-                idx_iter += 1
-
-        if self._updater.model.distance(x, xp) == 0:
-            raise RuntimeError("PGH did not find distinct particles in {} \
-                iterations.".format(self._maxiters)
-                               )
-
-        eps = np.empty((1,), dtype=self._updater.model.expparams_dtype)
-        eps[self._t] = self._t_func(1 / self._updater.model.distance(x, xp))
 
         return eps
 
 
-class TimeFromListHeuristic(qi.Heuristic):
+class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
+    r"""
+    First half of experiments are standard MPGH, then force times evenly spaced 
+    between 0 and max_time.
+    """
 
     def __init__(
         self,
-        updater,
-        oplist=None,
-        pgh_exponent=1,
-        increase_time=False,
-        norm='Frobenius',
-        inv_field='x_',
-        t_field='t',
-        inv_func=identity,
-        t_func=identity,
-        maxiters=10,
-        other_fields=None,
-        time_list=None,
         **kwargs
     ):
-        super(TimeFromListHeuristic, self).__init__(updater)
-        self._oplist = oplist
-        self._norm = norm
-        self._x_ = inv_field
-        self._t = t_field
-        self._inv_func = inv_func
-        self._t_func = t_func
-        self._maxiters = maxiters
-        self._other_fields = other_fields if other_fields is not None else {}
-        self._pgh_exponent = pgh_exponent
-        self._increase_time = increase_time
-        # self._time_list = kwargs['time_list']
-        self._time_list = time_list
-        self._len_time_list = len(self._time_list)
+        super().__init__(**kwargs)
 
-        try:
-            self._num_experiments = kwargs.get('num_experiments')
-            print("self.num_experiments:", self._num_experiments)
-        except BaseException:
-            print("Can't find num_experiments in kwargs")
-
-    def __call__(
-        self,
-        epoch_id=0,
-        **kwargs
-    ):
-
-        idx_iter = 0
-        while idx_iter < self._maxiters:
-
-            x, xp = self._updater.sample(n=2)[:, np.newaxis, :]
-            if self._updater.model.distance(x, xp) > 0:
-                break
-            else:
-                idx_iter += 1
-
-        if self._updater.model.distance(x, xp) == 0:
-            raise RuntimeError(
-                "PGH did not find distinct particles in \
-                {} iterations.".format(self._maxiters)
-            )
-        eps = np.empty(
-            (1,),
-            dtype=self._updater.model.expparams_dtype
-        )
-        idx_iter = 0  # modified in order to cycle through particle parameters with different names
-        for field_i in self._x_:
-            eps[field_i] = self._inv_func(x)[0][idx_iter]
-            idx_iter += 1
-
-        time_id = epoch_id % self._len_time_list
-        new_time = self._time_list[time_id]
-        eps[self._t] = new_time
-
-        return eps
-
-
-class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
-
-    def __init__(
-        self,
-        updater,
-        oplist=None,
-        pgh_exponent=1,
-        increase_time=False,
-        norm='Frobenius',
-        inv_field='x_',
-        t_field='t',
-        inv_func=identity,
-        t_func=identity,
-        maxiters=10,
-        other_fields=None,
-        time_list=None,
-        max_time_to_enforce=10,
-        num_experiments=100,
-        log_file='qmla_log.log',
-        **kwargs
-    ):
-        super().__init__(updater)
-        self._oplist = oplist
-        self._norm = norm
-        self._x_ = inv_field
-        self._t = t_field
-        self._inv_func = inv_func
-        self._t_func = t_func
-        self._maxiters = maxiters
-        self._other_fields = other_fields if other_fields is not None else {}
-        self._pgh_exponent = pgh_exponent
-        self._increase_time = increase_time
-        # self._num_experiments = kwargs.get('num_experiments', 200)
-        self.log_file = log_file
-        self._num_experiments = num_experiments
-        self._time_list = time_list
-        self._len_time_list = len(self._time_list)
-        self._max_time_to_enforce = max_time_to_enforce
+        self.max_time_to_enforce = kwargs['max_time_to_enforce']
         self.count_number_high_times_suggested = 0 
-        self.num_epochs_for_first_phase = self._num_experiments / 2
+
+        self.num_epochs_for_first_phase = self.num_experiments / 2
         # generate a list of times of length Ne/2
         # evenly spaced between 0, max_time (from growth_rule)
         # then every t in that list is learned upon once. 
         # Higher Ne means finer granularity 
         # times are leared in a random order (from random.shuffle below)
         num_epochs_to_space_time_list = math.ceil(
-            self._num_experiments - self.num_epochs_for_first_phase
+            self.num_experiments - self.num_epochs_for_first_phase
         )
         t_list = list(np.linspace(
             0, 
-            max_time_to_enforce,
+            self.max_time_to_enforce,
             num_epochs_to_space_time_list + 1
         ))
         t_list.remove(0)  # dont want to waste an epoch on t=0
@@ -358,188 +177,37 @@ class MixedMultiParticleLinspaceHeuristic(qi.Heuristic):
         while idx_iter < self._maxiters:
 
             x, xp = self._updater.sample(n=2)[:, np.newaxis, :]
-            if self._updater.model.distance(x, xp) > 0:
+            if self._model.distance(x, xp) > 0:
                 break
             else:
                 idx_iter += 1
 
-        if self._updater.model.distance(x, xp) == 0:
+        if self._model.distance(x, xp) == 0:
             raise RuntimeError(
                 "PGH did not find distinct particles in \
                 {} iterations.".format(self._maxiters)
             )
 
-        eps = np.empty(
-            (1,),
-            dtype=self._updater.model.expparams_dtype
-        )
-        # idx_iter = 0  # modified in order to cycle through particle parameters with different names
-        # for field_i in self._x_:
-        #     eps[field_i] = self._inv_func(x)[0][idx_iter]
-        #     idx_iter += 1
+        eps = self._get_exp_params_array()
 
         if epoch_id < self.num_epochs_for_first_phase:
-            sigma = self._updater.model.distance(x, xp)
+            d = self._model.distance(x, xp)
             new_time = self._t_func(
-                1 / sigma
+                1 / d
             )
         else:
-            # time_id = epoch_id % self._len_time_list
-            # new_time = self._time_list[time_id]
             new_time = next(self._time_list)
         
-        if new_time > self._max_time_to_enforce:
+        if new_time > self.max_time_to_enforce:
             self.count_number_high_times_suggested += 1
         
-        if epoch_id == self._num_experiments - 1 : 
-            log_print(
-                [
-                    "Number of suggested t > t_max:", self.count_number_high_times_suggested 
-                ],
-                log_file = self.log_file
+        if epoch_id == self.num_experiments - 1 : 
+            log_print([
+                "Number of suggested t > t_max:", self.count_number_high_times_suggested 
+                ],log_file = self.log_file 
             )
-        
         eps['t'] = new_time
-        print("Heuristic; eps = ", eps)
         return eps
-
-
-class InverseEigenvalueHeuristic(qi.Heuristic):
-
-    def __init__(
-        self,
-        updater,
-        oplist=None,
-        pgh_exponent=1,
-        increase_time=False,
-        norm='Frobenius',
-        inv_field='x_',
-        t_field='t',
-        inv_func=identity,
-        t_func=identity,
-        maxiters=10,
-        other_fields=None,
-        time_list=None,
-        **kwargs
-    ):
-        super(InverseEigenvalueHeuristic, self).__init__(updater)
-        self._oplist = oplist
-        self._norm = norm
-        self._x_ = inv_field
-        self._t = t_field
-        self._inv_func = inv_func
-        self._t_func = t_func
-        self._maxiters = maxiters
-        self._other_fields = other_fields if other_fields is not None else {}
-        self._pgh_exponent = pgh_exponent
-        self._increase_time = increase_time
-        self._num_experiments = kwargs.get('num_experiments', 200)
-        self._time_list = time_list
-        self._len_time_list = len(self._time_list)
-        self.num_epochs_for_first_phase = self._num_experiments / 2
-
-    def __call__(
-        self,
-        epoch_id=0,
-        **kwargs
-    ):
-        print(
-            "[Heuristic - InverseEigenvalueHeuristic]",
-            "kwargs:", kwargs
-        )
-        current_params = kwargs['current_params']
-        idx_iter = 0
-        while idx_iter < self._maxiters:
-
-            x, xp = self._updater.sample(n=2)[:, np.newaxis, :]
-            if self._updater.model.distance(x, xp) > 0:
-                break
-            else:
-                idx_iter += 1
-
-        if self._updater.model.distance(x, xp) == 0:
-            raise RuntimeError(
-                "PGH did not find distinct particles in \
-                {} iterations.".format(self._maxiters)
-            )
-        eps = np.empty(
-            (1,),
-            dtype=self._updater.model.expparams_dtype
-        )
-        idx_iter = 0  # modified in order to cycle through particle parameters with different names
-        for field_i in self._x_:
-            eps[field_i] = self._inv_func(x)[0][idx_iter]
-            idx_iter += 1
-
-        if epoch_id < self.num_epochs_for_first_phase:
-            sigma = self._updater.model.distance(x, xp)
-            new_time = self._t_func(
-                1 / sigma**self._pgh_exponent
-            )
-        else:
-            new_time = new_time_based_on_eigvals(
-                params=current_params,
-                raw_ops=self._oplist
-            )
-
-        eps[self._t] = new_time
-        return eps
-
-
-def new_time_based_on_eigvals(
-    params,
-    raw_ops,
-    time_scale=1
-):
-    param_ops = [
-        (params[i] * raw_ops[i]) for i in range(len(params))
-    ]
-    max_eigvals = []
-    for i in range(len(params)):
-        param_eigvals = sp.linalg.eigh(param_ops[i])[0]
-
-        max_eigval_this_op = max(np.abs(param_eigvals))
-        max_eigvals.append(max_eigval_this_op)
-    min_eigval = min(max_eigvals)
-    new_time = time_scale * 1 / min_eigval
-    return new_time
-
-
-class BaseHeuristicQMLA(qi.Heuristic):
-    def __init__(
-        self,
-        updater,
-        oplist=None,
-        norm='Frobenius',
-        inv_field='x_',
-        t_field='t',
-        maxiters=10,
-        other_fields=None,
-        inv_func=identity,
-        t_func=identity,        
-        **kwargs
-    ):
-        super().__init__(updater)
-        self._norm = norm
-        self._x_ = inv_field
-        self._t = t_field
-        self._inv_func = inv_func
-        self._t_func = t_func
-        self._other_fields = other_fields if other_fields is not None else {}
-        self._updater = updater
-        self._maxiters = maxiters
-        self._oplist = oplist
-        
-    def _get_exp_params_array(self):
-        r"""Return an empty array with a position for every experiment design parameter."""
-        experiment_params = np.empty(
-            (1,),
-            dtype=self._updater.model.expparams_dtype
-        )
-        return experiment_params
-
-    def __call__(self):
-        print("__call__ not written")
 
 
 class SampleOrderMagnitude(BaseHeuristicQMLA):
@@ -551,7 +219,6 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
     ):
         super().__init__(updater, **kwargs)
         self.count_order_of_magnitudes =  {}
-   
     
     def __call__(
         self,
@@ -565,7 +232,7 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
         while idx_iter < self._maxiters:
 
             x, xp = self._updater.sample(n=2)[:, np.newaxis, :]
-            if self._updater.model.distance(x, xp) > 0:
+            if self._model.distance(x, xp) > 0:
                 break
             else:
                 idx_iter += 1
@@ -594,11 +261,11 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
 
         # change the scaling matrix used to calculate the distance
         # to place importance only on the sampled order of magnitude
-        self._updater.model._Q = np.zeros( len(orders_of_magnitude) )
+        self._model._Q = np.zeros( len(orders_of_magnitude) )
         for idx in idx_params_of_similar_uncertainty:
-            self._updater.model._Q[idx] = 1
+            self._model._Q[idx] = 1
 
-        d = self._updater.model.distance(x, xp)
+        d = self._model.distance(x, xp)
         new_time = 1 / d
         experiment[self._t] = new_time
 
@@ -612,6 +279,7 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
         
         return experiment
 
+
 class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
     
     def __init__(
@@ -621,7 +289,7 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
     ):
         super().__init__(updater, **kwargs)
         
-        self._qinfer_model = self._updater.model
+        self._qinfer_model = self._model
         cov_mtx = self._updater.est_covariance_mtx()
         self.initial_uncertainties = np.sqrt(np.abs(np.diag(cov_mtx)))
         self.track_param_uncertainties = np.zeros(self._qinfer_model.n_modelparams)
@@ -648,7 +316,7 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         while idx_iter < self._maxiters:
 
             x, xp = self._updater.sample(n=2)[:, np.newaxis, :]
-            if self._updater.model.distance(x, xp) > 0:
+            if self._model.distance(x, xp) > 0:
                 break
             else:
                 idx_iter += 1
@@ -735,7 +403,7 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
             np.isclose(orders_of_magnitude, selected_order, atol=1)
         ) # within 1 order of magnitude of the max
 
-        self._updater.model._Q = np.zeros( len(orders_of_magnitude) )
+        self._model._Q = np.zeros( len(orders_of_magnitude) )
         for idx in idx_params_of_similar_uncertainty:
             self._qinfer_model._Q[idx] = 1
 
@@ -759,3 +427,231 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         print("=> time=", new_time)
         
         return experiment
+
+class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
+    def __init__(
+        self,
+        updater,
+        **kwargs
+    ):
+        super().__init__(updater, **kwargs)
+        
+        self.volumes = []
+        self.time_multiplicative_factor = 1
+        self.derivative_frequency = self.num_experiments / 20
+        self.burn_in_learning_time = 6 * self.derivative_frequency
+        self.log_print([
+            "Derivative freq:{} \t burn in:{}".format(
+                self.derivative_frequency, self.burn_in_learning_time) 
+        ])
+        self.time_factor_boost = 10 # factor to increase/decrease by 
+        self.derivatives = { 1:{}, 2:{} }
+        self.time_factor_changes =  {'decreasing' : [], 'increasing' : [] }
+        self.distances = []
+        distance_metrics = [
+            'cityblock', 'euclidean', 'chebyshev', 
+            'canberra', 'braycurtis','minkowski', 
+        ]
+        self.designed_times = { m : {} for m in distance_metrics }
+        self.distance_metric_to_use = 'euclidean'
+
+    def __call__(
+        self,
+        epoch_id=0,
+        **kwargs
+    ):
+        current_params = kwargs['current_params'] 
+        current_volume = kwargs['current_volume']
+        if len(self.volumes) == 0: 
+            self.volumes.append(current_volume)
+            print("V0 = ", current_volume)
+        self.volumes.append(current_volume)
+
+        # Maybe increase multiplicative factor for time chosen later
+        if (
+            epoch_id % self.derivative_frequency == 0 
+            and epoch_id > self.burn_in_learning_time
+        ):
+            try:
+                previous_epoch_to_compare = int(-1 - self.derivative_frequency)
+                previous_volume = self.volumes[ previous_epoch_to_compare ] 
+            except:
+                previous_volume = self.volumes[0] 
+                self.log_print([
+                    "Couldn't find {}th element of volumes: {}".format(
+                        -1 - self.derivative_frequency, self.volumes)
+                ])
+            relative_change =  (1 - current_volume / previous_volume)
+
+            self.log_print([
+                "At epoch {} V_old/V_new={}/{}. relative change={}".format(
+                    epoch_id, 
+                    np.round(previous_volume, 2), np.round(current_volume, 2), 
+                    relative_change)
+            ])
+            
+            expected_change = 0.2 # N% decrease in volume after N experiments (?)
+            if 0 < relative_change <= expected_change:
+                self.time_multiplicative_factor *= self.time_factor_boost
+                print("Epoch {} r={}. Increasing time factor: {}".format(epoch_id, relative_change, self.time_multiplicative_factor))
+                self.time_factor_changes['increasing'].append(epoch_id)
+            elif relative_change < -0.1 :
+                self.time_multiplicative_factor /= self.time_factor_boost # volume increasing -> use lower times
+                print("Epoch {} r={}. Decreasing time factor: {}".format(epoch_id, relative_change,self.time_multiplicative_factor))
+                self.time_factor_changes['decreasing'].append(epoch_id)
+            elif relative_change > 0.1:
+                self.time_multiplicative_factor *= 1 # learning well enough
+                print("Epoch {} r={}. Maintaining time factor: {}".format(epoch_id, relative_change, self.time_multiplicative_factor))
+
+        # Select particles
+        idx_iter = 0
+        while idx_iter < self._maxiters:
+            sample = self._updater.sample(n=2) 
+            x, xp = sample[:, np.newaxis, :]
+            if self._model.distance(x, xp) > 0:
+                break
+            else:
+                idx_iter += 1
+
+        if self._model.distance(x, xp) == 0:
+            raise RuntimeError(
+                "PGH did not find distinct particles in \
+                {} iterations.".format(self._maxiters)
+            )
+
+        for method in self.designed_times:
+            d = sp.spatial.distance.pdist(
+                sample, 
+                metric=method
+            )
+            self.designed_times[method][epoch_id] = 1/d
+
+        eps = np.zeros(
+            (1,),
+            dtype=self._model.expparams_dtype
+        )
+
+        new_time = self.designed_times[self.distance_metric_to_use][epoch_id]
+        d = 1 / new_time
+        new_time *= self.time_multiplicative_factor
+        self.distances.append(d)
+        eps['t'] = new_time
+        return eps
+
+    def plot_heuristic_attributes(self, save_to_file, **kwargs):
+
+        plt.clf()
+        label_fontsize = 20
+        nrows = 3
+        fig = plt.figure( 
+            figsize=(15, 3*nrows)
+        )
+
+        gs = GridSpec(
+            nrows = nrows,
+            ncols = 1,
+        )
+
+        row = 0
+        col = 0
+
+        # Volume
+        ax = fig.add_subplot(gs[row, 0])
+        full_epoch_list = range(len(self.volumes))
+        ax.plot(
+            full_epoch_list, 
+            self.volumes,
+            label = 'Volume',
+        )
+        ax.set_title('Volume', fontsize=label_fontsize)
+        ax.set_ylabel('Volume', fontsize=label_fontsize)
+        ax.set_xlabel('Epoch', fontsize=label_fontsize)
+        ax.semilogy()
+        ax.legend()
+
+        # Volume Derivatives
+        row += 1
+        ax = fig.add_subplot(gs[row, 0])
+        ## first derivatives
+        derivs = self.derivatives[1]
+        epochs = sorted(derivs.keys())
+        first_derivatives = [derivs[e] if e in derivs else None for e in epochs]
+        ax.plot(
+            epochs, first_derivatives, 
+            label=r"$\frac{dV}{dE}$", 
+            color='darkblue', marker='x'
+        )
+
+        ## second derivatives
+        derivs = self.derivatives[2]
+        epochs = sorted(derivs.keys())
+        second_derivatives = [derivs[e] if e in derivs else None for e in epochs]
+        ax.plot(
+            epochs, second_derivatives, 
+            label=r"$\frac{d^2V}{dE^2}$", 
+            color='maroon', marker='+'
+        )
+
+        ax.axhline(0, ls='--', alpha=0.3)
+        ax.legend(loc='upper right')
+        ax.set_yscale('symlog')
+        ax.set_ylabel('Derivatives', fontsize=label_fontsize)
+        ax.set_xlabel('Epoch', fontsize=label_fontsize)
+
+        if len(self.time_factor_changes['decreasing']) > 0:
+            ax.axvline(
+                self.time_factor_changes['decreasing'][0], 
+                ls='--', color='red', label='decrease k', alpha=0.5
+            )
+
+            for e in self.time_factor_changes['decreasing'][1:]:
+                ax.axvline(
+                    e, ls='--', color='red', alpha=0.5
+                )
+        if len(self.time_factor_changes['increasing']) > 0:
+            ax.axvline(
+                self.time_factor_changes['increasing'][0], 
+                ls='--', color='green', label='increase k', alpha=0.5
+            )
+
+            for e in self.time_factor_changes['increasing'][1:]:
+                ax.axvline(
+                    e, ls='--', color='green', alpha=0.5
+                )
+
+        ax.legend(loc='lower right')
+
+
+        # Times by distance metrics
+        row += 1
+        ax = fig.add_subplot(gs[row, 0])
+
+    
+        for method in self.designed_times:
+            times_of_method = self.designed_times[method]
+            epochs = sorted(times_of_method.keys())
+            time_by_epoch = [times_of_method[e] for e in epochs]
+
+            if self.distance_metric_to_use == method:
+                ls = '--'
+            else:
+                ls  = '-'
+            ax.plot(
+                epochs,
+                time_by_epoch,
+                label=method,
+                ls=ls
+            )
+        ax.legend(title='Distance metric') 
+        ax.set_title('Times chosen by distance metrics', fontsize=label_fontsize)      
+        ax.set_ylabel('Time', fontsize=label_fontsize)
+        ax.set_xlabel('Epoch', fontsize=label_fontsize)
+        ax.semilogy()
+        # ax.grid()
+
+        # Save figure
+        fig.tight_layout()
+        fig.savefig(
+            save_to_file
+        )
+

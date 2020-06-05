@@ -84,7 +84,7 @@ class ModelInstanceForLearning():
                 model_id, model_name, 
             )
         ])
-        logging.info("Model {}".format(self.model_id))
+        # logging.info("Model {}".format(self.model_id))
 
         # Set up the model for learning
         self._initialise_model_for_learning(
@@ -216,7 +216,6 @@ class ModelInstanceForLearning():
         self.model_heuristic = self.growth_class.heuristic(
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
-            time_list=self.times_to_plot,
             num_experiments=self.num_experiments,
             log_file = self.log_file,
             # TODO these should be in GR or found automatically by heuristic
@@ -301,16 +300,6 @@ class ModelInstanceForLearning():
             if (update_step % print_frequency == 0):
                 # Print so user can see how far along algorithm is.
                 self.log_print(["Epoch", update_step])
-                try:
-                    self.log_print([
-                        "epoch {} - time magnitudes used: {}".format(
-                            update_step,
-                            self.model_heuristic.count_order_of_magnitudes
-                        ) 
-                    ])
-                    self.model_heuristic.count_order_of_magnitudes = {} #reset
-                except:
-                    pass
 
             # Design exeriment
 
@@ -448,9 +437,6 @@ class ModelInstanceForLearning():
             "\n QHL finished for ", self.model_name,
             "\n Final time selected:", self.track_experimental_times[-1],
             "\n {} Resample epochs: \n{}".format(len(self.epochs_after_resampling), self.epochs_after_resampling),
-            "\n Final MPGH time prefactor:{}".format(self.model_heuristic.time_multiplicative_factor),
-            "\n Hueristic check deriv freq:", self.model_heuristic.derivative_frequency,
-            "Time factor changes: ", self.model_heuristic.time_factor_changes
         ])
 
         # Final results
@@ -506,7 +492,12 @@ class ModelInstanceForLearning():
             raise
             # pass
         try:
-            self._plot_heuristic_attributes()
+            self.model_heuristic.plot_heuristic_attributes(
+                save_to_file = os.path.join(
+                    self.model_learning_plots_directory, 
+                    '{}heuristic_attributes_{}.png'.format(self.plot_prefix, self.model_id)
+                )
+            )
         except:
             self.log_print(["Failed to plot_heuristic_attributes"])
             raise
@@ -560,6 +551,11 @@ class ModelInstanceForLearning():
         learned_info['final_prior'] = self.qinfer_updater.prior
         learned_info['posterior_marginal'] = self.posterior_marginal
         # TODO restore initial_prior as required for plots in remote_bayes_factor
+        try:
+            learned_info['heuristic_data'] = self.model_heuristic.heuristic_data
+        except:
+            pass
+
         try:
             learned_info['heuristic_distances'] = self.model_heuristic.distances
         except:
@@ -924,16 +920,6 @@ class ModelInstanceForLearning():
         ax.set_yscale('log')
         ax.legend(loc='upper right')
 
-        # dv_ax = ax.twinx()
-        # delta_v = [ 
-        #     self.volume_by_epoch[j] - self.volume_by_epoch[j-1] for j in range(1, len(self.volume_by_epoch))
-        # ]
-        # dv_ax.plot(range(1, len(delta_v)+1), delta_v, color='blue', ls='--', label=r'$\Delta V$', alpha=0.5)
-        # dv_ax.axhline(0, ls=':', color='blue', alpha=0.5, label=r"$\Delta V=0$")
-        # dv_ax.set_yscale('symlog')
-        # dv_ax.set_ylabel(r'$\Delta V$')
-        # dv_ax.legend(loc='lower right')
-
         # Times learned upon
         row = nrows-2
         col = 0
@@ -967,26 +953,6 @@ class ModelInstanceForLearning():
             ax.set_ylabel('Time')
             ax.semilogy()
 
-        if len(self.model_heuristic.time_factor_changes['decreasing']) > 0:
-            ax.axvline(
-                self.model_heuristic.time_factor_changes['decreasing'][0], 
-                ls='--', color='red', label='decrease k', alpha=0.5
-            )
-
-            for e in self.model_heuristic.time_factor_changes['decreasing'][1:]:
-                ax.axvline(
-                    e, ls='--', color='red', alpha=0.5
-                )
-        if len(self.model_heuristic.time_factor_changes['increasing']) > 0:
-            ax.axvline(
-                self.model_heuristic.time_factor_changes['increasing'][0], 
-                ls='--', color='green', label='increase k', alpha=0.5
-            )
-
-            for e in self.model_heuristic.time_factor_changes['increasing'][1:]:
-                ax.axvline(
-                    e, ls='--', color='green', alpha=0.5
-                )
         ax.legend()
 
 
@@ -1020,136 +986,6 @@ class ModelInstanceForLearning():
         fig.savefig(
             os.path.join(self.model_learning_plots_directory, 
             '{}learning_summary_{}.png'.format(self.plot_prefix, self.model_id))
-        )
-                
-    def _plot_heuristic_attributes(self):
-        plt.clf()
-        plots = ['volume', 'heuristic_times', 'derivatives']
-        label_fontsize = 20
-        nrows = len(plots)
-        fig = plt.figure( 
-            figsize=(15, 3*nrows)
-        )
-
-        gs = GridSpec(
-            nrows = nrows,
-            ncols = 1,
-        )
-
-        row = 0
-        col = 0
-
-        # Volume
-        ax = fig.add_subplot(gs[row, 0])
-        full_epoch_list = range(len(self.volume_by_epoch))
-        ax.plot(
-            full_epoch_list, 
-            self.volume_by_epoch,
-            label = 'Volume',
-        )
-        for e in self.epochs_after_resampling:
-            ax.axvline(
-                e, 
-                ls='--', 
-                c='green', alpha = 0.5, 
-                # label='Resample'
-            )
-
-        ax.set_title('Volume', fontsize=label_fontsize)
-        ax.set_ylabel('Volume', fontsize=label_fontsize)
-        ax.set_xlabel('Epoch', fontsize=label_fontsize)
-        ax.semilogy()
-        ax.legend()
-
-        # Volume Derivatives
-        row += 1
-        ax = fig.add_subplot(gs[row, 0])
-        ## first derivatives
-        derivs = self.model_heuristic.derivatives[1]
-        epochs = sorted(derivs.keys())
-        first_derivatives = [derivs[e] if e in derivs else None for e in epochs]
-        ax.plot(epochs, first_derivatives, label=r"$\frac{dV}{dE}$", color='darkblue', marker='x')
-
-        ## second derivatives
-        derivs = self.model_heuristic.derivatives[2]
-        epochs = sorted(derivs.keys())
-        second_derivatives = [derivs[e] if e in derivs else None for e in epochs]
-        ax.plot(epochs, second_derivatives, label=r"$\frac{d^2V}{dE^2}$", color='maroon', marker='+')
-
-        ax.axhline(0, ls='--', alpha=0.3)
-        ax.legend(loc='upper right')
-        ax.set_yscale('symlog')
-        ax.set_ylabel('Derivatives', fontsize=label_fontsize)
-        ax.set_xlabel('Epoch', fontsize=label_fontsize)
-
-        # if len(self.model_heuristic.epochs_time_factor_increased) > 0:
-        #     ax.axvline(
-        #         self.model_heuristic.epochs_time_factor_increased[0], 
-        #         ls='--', color='green', label='increase k', alpha=0.5
-        #     )
-
-        #     for e in self.model_heuristic.epochs_time_factor_increased[1:]:
-        #         ax.axvline(
-        #             e, ls='--', color='green', alpha=0.5
-        #         )
-
-        if len(self.model_heuristic.time_factor_changes['decreasing']) > 0:
-            ax.axvline(
-                self.model_heuristic.time_factor_changes['decreasing'][0], 
-                ls='--', color='red', label='decrease k', alpha=0.5
-            )
-
-            for e in self.model_heuristic.time_factor_changes['decreasing'][1:]:
-                ax.axvline(
-                    e, ls='--', color='red', alpha=0.5
-                )
-        if len(self.model_heuristic.time_factor_changes['increasing']) > 0:
-            ax.axvline(
-                self.model_heuristic.time_factor_changes['increasing'][0], 
-                ls='--', color='green', label='increase k', alpha=0.5
-            )
-
-            for e in self.model_heuristic.time_factor_changes['increasing'][1:]:
-                ax.axvline(
-                    e, ls='--', color='green', alpha=0.5
-                )
-
-
-        ax.legend(loc='lower right')
-
-
-        # Times by distance metrics
-        row += 1
-        ax = fig.add_subplot(gs[row, 0])
-
-        self.heuristic_assorted_times = self.model_heuristic.designed_times
-        for method in self.heuristic_assorted_times:
-            times_of_method = self.heuristic_assorted_times[method]
-            epochs = sorted(times_of_method.keys())
-            time_by_epoch = [times_of_method[e] for e in epochs]
-
-            if self.model_heuristic.distance_metric_to_use == method:
-                ls = '--'
-            else:
-                ls  = '-'
-            ax.plot(
-                epochs,
-                time_by_epoch,
-                label=method,
-                ls=ls
-            )
-        ax.legend(title='Distance metric') 
-        ax.set_title('Times chosen by distance metrics', fontsize=label_fontsize)      
-        ax.set_ylabel('Time', fontsize=label_fontsize)
-        ax.set_xlabel('Epoch', fontsize=label_fontsize)
-        ax.semilogy()
-        # ax.grid()
-
-        # Save figure
-        fig.tight_layout()
-        fig.savefig(
-            os.path.join(self.model_learning_plots_directory, 
-            '{}heuristic_attributes_{}.png'.format(self.plot_prefix, self.model_id))
         )
 
     def _plot_posterior_mesh_pairwise(self):
