@@ -287,8 +287,8 @@ class TestSimulatedNVCentre(
             # 'pauliSet_1_y_d3' : 1.9431238095238094 * (10**order_mag),
             # 'pauliSet_1_z_d3' : 7.9431238095238094 * (10**order_mag)
 
-            'pauliSet_1_y_d1' : 3.9431238095238094 * (10**order_mag),
-            # 'pauliSet_1_z_d1' : 5.9431238095238094 * (10**order_mag),
+            # 'pauliSet_1_y_d1' : 3.9431238095238094 * (10**order_mag),
+            'pauliSet_1_z_d1' : 5.9431238095238094 * (10**order_mag),
             'pauliSet_1_x_d1' : 1.9431238095238094 * (10**order_mag),
 
 
