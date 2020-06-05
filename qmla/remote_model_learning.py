@@ -8,9 +8,8 @@ import matplotlib.pyplot as plt
 import pickle
 import redis
 
-import qmla.database_framework as database_framework
-import qmla.model_instances as QML
-import qmla.redis_settings as rds
+import qmla.model_instances
+import qmla.redis_settings
 import qmla.logging
 
 pickle.HIGHEST_PROTOCOL = 4
@@ -80,7 +79,7 @@ def remote_learn_model_parameters(
     time_start = time.time()
 
     # Access databases
-    redis_databases = rds.get_redis_databases_by_qmla_id(host_name, port_number, qid)
+    redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(host_name, port_number, qid)
     qmla_core_info_database = redis_databases['qmla_core_info_database']
     learned_models_info_db = redis_databases['learned_models_info_db']
     learned_models_ids = redis_databases['learned_models_ids']

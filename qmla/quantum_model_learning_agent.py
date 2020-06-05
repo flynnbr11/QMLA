@@ -1258,6 +1258,7 @@ class QuantumModelLearningAgent():
 
             # check if any job has crashed
             if self.run_in_parallel:
+                sleep(self.sleep_duration)
                 self._inspect_remote_job_crashes()
 
             # loop through active branches
@@ -2366,12 +2367,10 @@ class QuantumModelLearningAgent():
         t_init = time.time()
         if self.redis_databases['any_job_failed']['Status'] == b'1':
             # TODO better way to detect errors?
-            self.log_print(
-                [
-                    "Failure on remote node. Terminating QMD."
-                ]
-            )
-            raise NameError('Remote QML Failure')
+            self.log_print([
+                "Failure on remote job. Terminating QMLA."
+            ])
+            raise NameError('Remote model learning failure')
         self.timings['inspect_job_crashes'] += time.time() - t_init
 
     def _delete_unpicklable_attributes(self):

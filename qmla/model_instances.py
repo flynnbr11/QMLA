@@ -214,11 +214,11 @@ class ModelInstanceForLearning():
             resampler = qi.LiuWestResampler( a=self.growth_class.qinfer_resampler_a ),
         )
         self.model_heuristic = self.growth_class.heuristic(
+            model_id = self.model_id, 
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
             num_experiments=self.num_experiments,
             log_file = self.log_file,
-            # TODO these should be in GR or found automatically by heuristic
             inv_field = [item[0] for item in self.qinfer_model.expparams_dtype[1:]],
             max_time_to_enforce=self.growth_class.max_time_to_consider,
         )
@@ -314,7 +314,6 @@ class ModelInstanceForLearning():
                 current_params = self.track_param_means[-1],
                 current_volume = self.volume_by_epoch[-1]
             )
-            self.log_print(["Heuristic called; new experiment:", new_experiment])
 
             if update_step == 0:
                 self.log_print(
@@ -431,6 +430,8 @@ class ModelInstanceForLearning():
             ])
         except:
             pass
+        
+        self.model_heuristic.finalise_heuristic()
 
         self.log_print([
             "Epoch {}".format(self.num_experiments), 
@@ -853,18 +854,19 @@ class ModelInstanceForLearning():
                 label='Uncertainty'
             )
 
-            ax.axvline(
-                self.epochs_after_resampling[0], 
-                ls='--', 
-                c=resample_colour, alpha = 0.5, label='Resample'
-            )
-
-            for e in self.epochs_after_resampling[1:]:
+            if len(self.epochs_after_resampling) > 0:
                 ax.axvline(
-                    e, 
+                    self.epochs_after_resampling[0], 
                     ls='--', 
-                    c=resample_colour, alpha = 0.5, 
+                    c=resample_colour, alpha = 0.5, label='Resample'
                 )
+
+                for e in self.epochs_after_resampling[1:]:
+                    ax.axvline(
+                        e, 
+                        ls='--', 
+                        c=resample_colour, alpha = 0.5, 
+                    )
 
             if term in self.true_param_dict:
                 true_param = self.true_param_dict[term]
@@ -897,21 +899,22 @@ class ModelInstanceForLearning():
             color='k'
         )
 
-        ax.axvline( # label first resample only
-            self.epochs_after_resampling[0], 
-            ls='--', 
-            c=resample_colour, 
-            alpha = 0.5, 
-            label='Resample'
-        )
-
-        for e in self.epochs_after_resampling[1:]:
-            ax.axvline(
-                e, 
+        if len(self.epochs_after_resampling) > 0:
+            ax.axvline( # label first resample only
+                self.epochs_after_resampling[0], 
                 ls='--', 
                 c=resample_colour, 
                 alpha = 0.5, 
+                label='Resample'
             )
+
+            for e in self.epochs_after_resampling[1:]:
+                ax.axvline(
+                    e, 
+                    ls='--', 
+                    c=resample_colour, 
+                    alpha = 0.5, 
+                )
 
         ax.set_title('Volume')
         ax.set_ylabel('Volume')
