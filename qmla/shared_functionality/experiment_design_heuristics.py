@@ -21,16 +21,6 @@ __all__ = [
 
 def identity(arg): return arg
 
-def log_print(
-    to_print_list, 
-    log_file, 
-):
-    qmla.logging.print_to_log(
-        to_print_list = to_print_list, 
-        log_file = log_file, 
-        log_identifier = 'Heuristic'
-    )
-
 class BaseHeuristicQMLA(qi.Heuristic):
     def __init__(
         self,
@@ -47,22 +37,28 @@ class BaseHeuristicQMLA(qi.Heuristic):
         **kwargs
     ):
         super().__init__(updater)
+        # Most importantly - access to updater and underlying model
+        self._updater = updater
+        self._model = updater.model
+
+        # Other useful attributes passed
         self._norm = norm
         self._x_ = inv_field
         self._t = t_field
         self._inv_func = inv_func
         self._t_func = t_func
         self._other_fields = other_fields if other_fields is not None else {}
-        self._updater = updater
-        self._model = updater.model
         self._maxiters = maxiters
         self._oplist = oplist
         self.num_experiments = kwargs['num_experiments']
         self.log_file = log_file
         
+        # storage infrastructure
+        self.volumes = []
         self.times_suggested = []
         self.heuristic_data = {} # to be stored by model instance
-        
+        self.label_fontsize = 10 # consistency when plotting
+
     def _get_exp_params_array(self):
         r"""Return an empty array with a position for every experiment design parameter."""
         experiment_params = np.empty(
@@ -83,8 +79,20 @@ class BaseHeuristicQMLA(qi.Heuristic):
         )
 
     def __call__(self, **kwargs):
+        # process some data from the model first
+        current_volume = kwargs['current_volume']
+        if len(self.volumes) == 0: 
+            self.volumes.append(current_volume)
+        self.volumes.append(current_volume)
+
+        new_experiment =  self.design_experiment(**kwargs)
+        new_time = new_experiment['t']
+        self.times_suggested.append(new_time)
+        return new_experiment
+
+    def design_experiment(self, **kwargs):
         raise RuntimeError(
-            "__call__ method not written for this heuristic."
+            "experiment design method not written for this heuristic."
         )
     
     def summarise_heuristic(self, **kwargs):
@@ -93,9 +101,72 @@ class BaseHeuristicQMLA(qi.Heuristic):
         ])
 
     def plot_heuristic_attributes(self, save_to_file, **kwargs):
-        # Plot results related to heuristic here
-        # and/or log_print some details. 
-        pass
+        plots_to_include = [
+            'volume', 'times_used', 
+        ]
+        
+        plt.clf()
+        nrows = len(plots_to_include)
+        fig = plt.figure( 
+            figsize=(15, 3*nrows)
+        )
+        gs = GridSpec(
+            nrows = nrows,
+            ncols = 1,
+        )
+
+        row = -1 # add 1 for every ax included
+        col = 0
+
+        if 'volume' in plots_to_include:
+            try:
+                row += 1
+                ax = fig.add_subplot(gs[row, 0])
+                self._plot_volumes(ax = ax)
+                ax.legend()
+            except:
+                self.log_print(["Failed to plot volumes."])
+
+        if 'times_used' in plots_to_include:
+            try:
+                row += 1
+                ax = fig.add_subplot(gs[row, 0])
+                self._plot_suggested_times(ax = ax)
+                ax.legend()
+            except:
+                self.log_print(["Failed to plot times."])
+
+        # Save figure
+        fig.tight_layout()
+        fig.savefig(
+            save_to_file
+        )
+
+
+    def _plot_suggested_times(self, ax, **kwargs):
+        full_epoch_list = range(len(self.times_suggested))
+        ax.scatter(
+            full_epoch_list, 
+            self.times_suggested,
+            label = r"$t \sim k \ \frac{1}{V}$",
+            s = 5,
+        )
+        ax.set_title('Experiment times', fontsize=self.label_fontsize)
+        ax.set_ylabel('Time', fontsize=self.label_fontsize)
+        ax.set_xlabel('Epoch', fontsize=self.label_fontsize)
+        ax.semilogy()
+
+    def _plot_volumes(self, ax, **kwargs):
+        full_epoch_list = range(len(self.volumes))
+        ax.plot(
+            full_epoch_list, 
+            self.volumes,
+            label = 'Volume',
+        )
+        ax.set_title('Volume', fontsize=self.label_fontsize)
+        ax.set_ylabel('Volume', fontsize=self.label_fontsize)
+        ax.set_xlabel('Epoch', fontsize=self.label_fontsize)
+        ax.semilogy()
 
 
 class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
@@ -105,7 +176,7 @@ class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
     ):
         super().__init__(**kwargs)
 
-    def __call__(
+    def design_experiment(
         self,
         epoch_id=0,
         **kwargs
@@ -168,7 +239,7 @@ class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
         self._time_list = iter( t_list )
         
 
-    def __call__(
+    def design_experiment(
         self,
         epoch_id=0,
         **kwargs
@@ -202,10 +273,9 @@ class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
             self.count_number_high_times_suggested += 1
         
         if epoch_id == self.num_experiments - 1 : 
-            log_print([
+            self.log_print([
                 "Number of suggested t > t_max:", self.count_number_high_times_suggested 
-                ],log_file = self.log_file 
-            )
+            ])
         eps['t'] = new_time
         return eps
 
@@ -220,7 +290,7 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
         super().__init__(updater, **kwargs)
         self.count_order_of_magnitudes =  {}
     
-    def __call__(
+    def design_experiment(
         self,
         epoch_id=0,
         **kwargs
@@ -303,7 +373,7 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         print("Heuristic - num experiments = ", self._num_experiments)
         print("epoch to switch target at:", self._num_exp_to_switch_magnitude)
         
-    def __call__(
+    def design_experiment(
         self,
         epoch_id=0,
         **kwargs
@@ -436,7 +506,6 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
     ):
         super().__init__(updater, **kwargs)
         
-        self.volumes = []
         self.time_multiplicative_factor = 1
         self.derivative_frequency = self.num_experiments / 20
         self.burn_in_learning_time = 6 * self.derivative_frequency
@@ -455,31 +524,26 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
         self.designed_times = { m : {} for m in distance_metrics }
         self.distance_metric_to_use = 'euclidean'
 
-    def __call__(
+    def design_experiment(
         self,
         epoch_id=0,
         **kwargs
     ):
-        current_params = kwargs['current_params'] 
-        current_volume = kwargs['current_volume']
-        if len(self.volumes) == 0: 
-            self.volumes.append(current_volume)
-            print("V0 = ", current_volume)
-        self.volumes.append(current_volume)
 
         # Maybe increase multiplicative factor for time chosen later
         if (
             epoch_id % self.derivative_frequency == 0 
             and epoch_id > self.burn_in_learning_time
         ):
+            current_volume = self.volumes[-1]
+            previous_epoch_to_compare = int(-1 - self.derivative_frequency)
             try:
-                previous_epoch_to_compare = int(-1 - self.derivative_frequency)
                 previous_volume = self.volumes[ previous_epoch_to_compare ] 
             except:
                 previous_volume = self.volumes[0] 
                 self.log_print([
                     "Couldn't find {}th element of volumes: {}".format(
-                        -1 - self.derivative_frequency, self.volumes)
+                        previous_epoch_to_compare, self.volumes)
                 ])
             relative_change =  (1 - current_volume / previous_volume)
 
@@ -526,11 +590,7 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
             )
             self.designed_times[method][epoch_id] = 1/d
 
-        eps = np.zeros(
-            (1,),
-            dtype=self._model.expparams_dtype
-        )
-
+        eps = self._get_exp_params_array()
         new_time = self.designed_times[self.distance_metric_to_use][epoch_id]
         d = 1 / new_time
         new_time *= self.time_multiplicative_factor
@@ -539,69 +599,139 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
         return eps
 
     def plot_heuristic_attributes(self, save_to_file, **kwargs):
-
+        plots_to_include = [
+            'volume', 'metric_distances', 'times_used', #'derivatives',
+        ]
+        
         plt.clf()
-        label_fontsize = 20
-        nrows = 3
+        nrows = len(plots_to_include)
         fig = plt.figure( 
             figsize=(15, 3*nrows)
         )
-
         gs = GridSpec(
             nrows = nrows,
             ncols = 1,
         )
 
-        row = 0
+        row = -1 # add 1 for every ax included
         col = 0
 
         # Volume
-        ax = fig.add_subplot(gs[row, 0])
-        full_epoch_list = range(len(self.volumes))
-        ax.plot(
-            full_epoch_list, 
-            self.volumes,
-            label = 'Volume',
-        )
-        ax.set_title('Volume', fontsize=label_fontsize)
-        ax.set_ylabel('Volume', fontsize=label_fontsize)
-        ax.set_xlabel('Epoch', fontsize=label_fontsize)
-        ax.semilogy()
-        ax.legend()
+        if 'volume' in plots_to_include:
+            row += 1
+            ax = fig.add_subplot(gs[row, 0])
+            self._plot_volumes(ax = ax)
+            self.add_time_factor_change_points_to_ax(ax = ax)
+            ax.legend()
 
-        # Volume Derivatives
-        row += 1
-        ax = fig.add_subplot(gs[row, 0])
-        ## first derivatives
-        derivs = self.derivatives[1]
-        epochs = sorted(derivs.keys())
-        first_derivatives = [derivs[e] if e in derivs else None for e in epochs]
-        ax.plot(
-            epochs, first_derivatives, 
-            label=r"$\frac{dV}{dE}$", 
-            color='darkblue', marker='x'
+        if 'times_used' in plots_to_include:
+            row += 1
+            ax = fig.add_subplot(gs[row, 0])
+
+            self._plot_suggested_times(ax = ax)
+            self.add_time_factor_change_points_to_ax(ax = ax)
+            ax.legend()
+
+        if 'derivatives' in plots_to_include:
+            # Volume Derivatives
+            row += 1
+            ax = fig.add_subplot(gs[row, 0])
+            ## first derivatives
+            derivs = self.derivatives[1]
+            epochs = sorted(derivs.keys())
+            first_derivatives = [derivs[e] if e in derivs else None for e in epochs]
+            ax.plot(
+                epochs, first_derivatives, 
+                label=r"$\frac{dV}{dE}$", 
+                color='darkblue', marker='x'
+            )
+
+            ## second derivatives
+            derivs = self.derivatives[2]
+            epochs = sorted(derivs.keys())
+            second_derivatives = [derivs[e] if e in derivs else None for e in epochs]
+            ax.plot(
+                epochs, second_derivatives, 
+                label=r"$\frac{d^2V}{dE^2}$", 
+                color='maroon', marker='+'
+            )
+
+            ax.axhline(0, ls='--', alpha=0.3)
+            ax.legend(loc='upper right')
+            ax.set_yscale('symlog')
+            ax.set_ylabel('Derivatives', fontsize=self.label_fontsize)
+            ax.set_xlabel('Epoch', fontsize=self.label_fontsize)
+
+            if len(self.time_factor_changes['decreasing']) > 0:
+                ax.axvline(
+                    self.time_factor_changes['decreasing'][0], 
+                    ls='--', color='red', label='decrease k', alpha=0.5
+                )
+
+                for e in self.time_factor_changes['decreasing'][1:]:
+                    ax.axvline(
+                        e, ls='--', color='red', alpha=0.5
+                    )
+            if len(self.time_factor_changes['increasing']) > 0:
+                ax.axvline(
+                    self.time_factor_changes['increasing'][0], 
+                    ls='--', color='green', label='increase k', alpha=0.5
+                )
+
+                for e in self.time_factor_changes['increasing'][1:]:
+                    ax.axvline(
+                        e, ls='--', color='green', alpha=0.5
+                    )
+            ax.legend(loc='lower right')
+
+        if 'metric_distances' in plots_to_include:
+            # Times by distance metrics
+            row += 1
+            ax = fig.add_subplot(gs[row, 0])
+
+            for method in self.designed_times:
+                times_of_method = self.designed_times[method]
+                epochs = sorted(times_of_method.keys())
+                time_by_epoch = [times_of_method[e] for e in epochs]
+
+                lb = method
+                if self.distance_metric_to_use == method:
+                    ls = '--'
+                    lb += ' (used)'
+                    alpha = 1
+                else:
+                    ls  = '-'
+                    alpha = 0.5
+
+                ax.plot(
+                    epochs,
+                    time_by_epoch,
+                    label=lb,
+                    ls=ls,
+                    alpha=alpha
+                )
+            ax.legend(title='Distance metric') 
+            ax.set_title('Times chosen by distance metrics', fontsize=self.label_fontsize)      
+            ax.set_ylabel('Time', fontsize=self.label_fontsize)
+            ax.set_xlabel('Epoch', fontsize=self.label_fontsize)
+            ax.semilogy()
+
+        # Save figure
+        fig.tight_layout()
+        fig.savefig(
+            save_to_file
         )
 
-        ## second derivatives
-        derivs = self.derivatives[2]
-        epochs = sorted(derivs.keys())
-        second_derivatives = [derivs[e] if e in derivs else None for e in epochs]
-        ax.plot(
-            epochs, second_derivatives, 
-            label=r"$\frac{d^2V}{dE^2}$", 
-            color='maroon', marker='+'
-        )
 
-        ax.axhline(0, ls='--', alpha=0.3)
-        ax.legend(loc='upper right')
-        ax.set_yscale('symlog')
-        ax.set_ylabel('Derivatives', fontsize=label_fontsize)
-        ax.set_xlabel('Epoch', fontsize=label_fontsize)
+    def add_time_factor_change_points_to_ax(self, ax):
 
         if len(self.time_factor_changes['decreasing']) > 0:
             ax.axvline(
                 self.time_factor_changes['decreasing'][0], 
-                ls='--', color='red', label='decrease k', alpha=0.5
+                ls='--', 
+                color='red', 
+                label=r"$k \rightarrow k / {}$".format(np.round(self.time_factor_boost, 2)), 
+                alpha=0.5
             )
 
             for e in self.time_factor_changes['decreasing'][1:]:
@@ -611,47 +741,14 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
         if len(self.time_factor_changes['increasing']) > 0:
             ax.axvline(
                 self.time_factor_changes['increasing'][0], 
-                ls='--', color='green', label='increase k', alpha=0.5
+                ls='--', 
+                color='green', 
+                # label='increase k', 
+                label=r"$ k \rightarrow k \times {}$".format(np.round(self.time_factor_boost,2)), 
+                alpha=0.5
             )
 
             for e in self.time_factor_changes['increasing'][1:]:
                 ax.axvline(
                     e, ls='--', color='green', alpha=0.5
                 )
-
-        ax.legend(loc='lower right')
-
-
-        # Times by distance metrics
-        row += 1
-        ax = fig.add_subplot(gs[row, 0])
-
-    
-        for method in self.designed_times:
-            times_of_method = self.designed_times[method]
-            epochs = sorted(times_of_method.keys())
-            time_by_epoch = [times_of_method[e] for e in epochs]
-
-            if self.distance_metric_to_use == method:
-                ls = '--'
-            else:
-                ls  = '-'
-            ax.plot(
-                epochs,
-                time_by_epoch,
-                label=method,
-                ls=ls
-            )
-        ax.legend(title='Distance metric') 
-        ax.set_title('Times chosen by distance metrics', fontsize=label_fontsize)      
-        ax.set_ylabel('Time', fontsize=label_fontsize)
-        ax.set_xlabel('Epoch', fontsize=label_fontsize)
-        ax.semilogy()
-        # ax.grid()
-
-        # Save figure
-        fig.tight_layout()
-        fig.savefig(
-            save_to_file
-        )
-
