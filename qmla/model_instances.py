@@ -235,7 +235,7 @@ class ModelInstanceForLearning():
         self
     ):
         r"""Arrays, dictionaries etc for tracking learning across experiments"""
-
+        self.timings = { 'update_qinfer': 0 } 
         self.quadratic_losses_record = []
         self.track_total_log_likelihood = np.array([])
         self.particles = np.array([])
@@ -301,8 +301,8 @@ class ModelInstanceForLearning():
                 # Print so user can see how far along algorithm is.
                 self.log_print(["Epoch", update_step])
 
-            # Design exeriment
 
+            # Design exeriment
             # print( #debug
             #     "Current param distribution mean\n", self.qinfer_updater.est_mean(),
             #     "\n uncertainty:\n", np.sqrt(np.diag(self.qinfer_updater.est_covariance_mtx()))
@@ -310,7 +310,6 @@ class ModelInstanceForLearning():
             new_experiment = self.model_heuristic(
                 num_params=len(self.model_terms_names),
                 epoch_id=update_step,
-                # current_params = self.qinfer_updater.est_mean(),
                 current_params = self.track_param_means[-1],
                 current_volume = self.volume_by_epoch[-1]
             )
@@ -336,10 +335,12 @@ class ModelInstanceForLearning():
                 #     "Current param distribution mean\n", self.qinfer_updater.est_mean(),
                 #     "\n uncertainty:\n", np.sqrt(np.diag(self.qinfer_updater.est_covariance_mtx()))
                 # ])
+                time_init = time.time()
                 self.qinfer_updater.update(
                     datum_from_experiment,
                     new_experiment
                 )
+                self.timings['update_qinfer'] += time.time() - time_init
             except RuntimeError as e:
                 import sys
                 self.log_print([
@@ -351,15 +352,13 @@ class ModelInstanceForLearning():
                 raise NameError("Qinfer update failure")
                 sys.exit()
             except: 
-                self.log_print(
-                    [
-                        "Failed to update model ({}) {} at update step {}".format(
-                            self.model_id, 
-                            self.model_id, 
-                            update_step
-                        )
-                    ]
-                )
+                self.log_print([  
+                    "Failed to update model ({}) {} at update step {}".format(
+                        self.model_id, 
+                        self.model_name, 
+                        update_step
+                    )
+                ])
                 sys.exit()
 
             # Track learning 
@@ -436,8 +435,9 @@ class ModelInstanceForLearning():
         self.log_print([
             "Epoch {}".format(self.num_experiments), 
             "\n QHL finished for ", self.model_name,
-            "\n Final time selected:", self.track_experimental_times[-1],
+            "\n Final experiment time:", self.track_experimental_times[-1],
             "\n {} Resample epochs: \n{}".format(len(self.epochs_after_resampling), self.epochs_after_resampling),
+            "\nTimings:\n", self.timings
         ])
 
         # Final results

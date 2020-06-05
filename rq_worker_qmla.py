@@ -8,25 +8,26 @@ import argparse
 
 import copy
 import numpy as np
-import time as time
+import time
 import pickle
 import random
-import os as os
+import os
 import pandas as pd
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import pickle
 import redis
+import qinfer
 
 import qmla
-import qmla.remote_bayes_factor
-import qmla.remote_model_learning
-import qmla.database_framework as database_framework
-import qmla.model_instances as QML
-import qmla.model_for_comparison
-import qmla.redis_settings as rds
-import qmla.logging
+# import qmla.remote_bayes_factor
+# import qmla.remote_model_learning
+# import qmla.database_framework as database_framework
+# import qmla.model_instances as QML
+# import qmla.model_for_comparison
+# import qmla.redis_settings as rds
+# import qmla.logging
 
 # Parse command line arguments
 
