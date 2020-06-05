@@ -1,5 +1,6 @@
 from qmla.shared_functionality.branch_mapping import *
 from qmla.shared_functionality.expectation_values import *
+from qmla.shared_functionality.model_pairing_strategies import * 
 # from qmla.shared_functionality.experiment_design_heuristics import *
 # from qmla.shared_functionality.experimental_data_processing import *
 # from qmla.shared_functionality.model_naming import *

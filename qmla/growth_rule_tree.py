@@ -70,7 +70,19 @@ class GrowthRuleTree():
             )
         else:
             self.initial_models = self.growth_class.initial_models
-        return self.initial_models
+
+        if self.growth_class.branch_comparison_strategy == 'all':
+            pairs_to_compare = 'all'
+        elif self.growth_class.branch_comparison_strategy == 'optimal_graph':
+            pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
+                model_names = self.initial_models
+            )
+            self.log_print(["Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(len(pairs_to_compare))])
+        else: 
+            pairs_to_compare = 'all'
+
+
+        return self.initial_models, pairs_to_compare
 
     def next_layer(
         self, 
@@ -121,10 +133,13 @@ class GrowthRuleTree():
                 spawn_step = self.spawn_step,             
                 **kwargs
             )
-            if self.growth_class.branch_comparison_strategy == 'random':
-                pairs_to_compare = 'all'
             if self.growth_class.branch_comparison_strategy == 'all':
                 pairs_to_compare = 'all'
+            elif self.growth_class.branch_comparison_strategy == 'optimal_graph':
+                pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
+                    model_names = model_list
+                )
+                self.log_print(["Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(len(pairs_to_compare))])
             else: 
                 pairs_to_compare = 'all'
 
@@ -314,7 +329,7 @@ class BranchQMLA():
         self.growth_rule = self.growth_class.growth_generation_rule
 
         self.log_print([
-            "Branch {} on tree {}".format(self.branch_id, self.tree)
+            "Branch {} on tree {}".format(self.branch_id, self.tree),
         ])
 
         # Get parent branch of this branch
@@ -350,6 +365,9 @@ class BranchQMLA():
                 )
             )
         else:
+            self.log_print([
+                "Comparison pairs passed:", pairs_to_compare
+            ])
             self.pairs_to_compare = pairs_to_compare
         self.num_model_pairs = len(self.pairs_to_compare)
         

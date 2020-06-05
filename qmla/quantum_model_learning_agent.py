@@ -859,8 +859,9 @@ class QuantumModelLearningAgent():
         active_branches_bayes = self.redis_databases['active_branches_bayes']
         active_branches_bayes.set(int(branch_id), 0)  # set up branch 0
         self.log_print([
-            'compare_models_within_branch. branch {} has pairs {}'.format(
+            'compare_models_within_branch. branch {} has {} pairs: {}'.format(
                 branch_id,
+                len(pair_list), 
                 pair_list
             )
         ])
@@ -1413,7 +1414,7 @@ class QuantumModelLearningAgent():
             for mod_id in model_list
         ]
 
-        new_models, pairs_to_compare = self.branches[branch_id].tree.next_layer(
+        new_models, models_to_compare = self.branches[branch_id].tree.next_layer(
             model_list=model_names, # can this be functionally replaced by info in branch_model_points?
             model_names_ids=self.model_name_id_map,
             called_by_branch=branch_id,
@@ -1427,14 +1428,15 @@ class QuantumModelLearningAgent():
                 "After model generation for GR",
                 self.branches[branch_id].growth_rule,
                 "\nnew models:", new_models,
-                "pairs to compare:", pairs_to_compare,
+                # "pairs to compare:", pairs_to_compare,
             ]
         )
 
         # Generate new QMLA level branch
         new_branch_id = self.new_branch(
             model_list=new_models,
-            pairs_to_compare=pairs_to_compare,
+            # pairs_to_compare=pairs_to_compare,
+            pairs_to_compare_by_names = models_to_compare,
             growth_rule=self.branches[branch_id].growth_rule,
             spawning_branch=branch_id,
         )
@@ -1449,6 +1451,7 @@ class QuantumModelLearningAgent():
         self,
         model_list,
         pairs_to_compare='all',
+        pairs_to_compare_by_names=None, 
         growth_rule=None,
         spawning_branch=0,
     ):
@@ -1511,6 +1514,16 @@ class QuantumModelLearningAgent():
         if growth_rule is None:
             growth_rule = self.growth_rule_of_true_model
         growth_tree = self.trees[growth_rule]
+
+        if pairs_to_compare_by_names is not None:
+            self.log_print(["Getting model IDs to set comparison subset"])
+            pairs_to_compare = [
+                (
+                    self.model_database[self.model_database.model_name == m1 ].model_id.item(),
+                    self.model_database[self.model_database.model_name == m2 ].model_id.item()
+                ) for m1, m2 in pairs_to_compare_by_names
+            ]
+            self.log_print(["IDs:", pairs_to_compare])
 
         self.branches[branch_id] = growth_tree.new_branch_on_tree(
             branch_id=branch_id,
@@ -2260,15 +2273,16 @@ class QuantumModelLearningAgent():
 
         # Set up one tree per growth rule
         for tree in list(self.trees.values()):
-            starting_models = tree.get_initial_models()
+            starting_models, models_to_compare = tree.get_initial_models()
             self.log_print([
                 "First branch for {} has starting models: {}".format(
                     tree.growth_rule, starting_models
                 ),
             ])
             self.new_branch(
-                model_list=starting_models,
-                growth_rule=tree.growth_rule
+                model_list = starting_models,
+                growth_rule = tree.growth_rule,
+                pairs_to_compare_by_names = models_to_compare
             )
 
         # Iteratively learn models, compute bayes factors, spawn new models
