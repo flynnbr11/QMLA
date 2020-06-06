@@ -589,6 +589,12 @@ class ModelInstanceForLearning():
         evaluation_times = true_params_dict['evaluation_times']
         evaluation_probe_dict = true_params_dict['evaluation_probes']
 
+        if self.num_experiments < 20:
+            # TODO make optional robustly in GR or pass dev arg to QMLA instance. 
+            self.log_print(["<20 experiments; presumed dev mode. Not evaluating all models"])
+            evaluation_times = evaluation_times[::10]
+
+
         # Construct a fresh updater and model to evaluate on.
         estimated_params = self.qinfer_updater.est_mean()
         cov_mt_uncertainty = [1e-10] * np.shape(estimated_params)[0]

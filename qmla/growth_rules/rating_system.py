@@ -198,7 +198,7 @@ class RatingSystem():
         sm = plt.cm.ScalarMappable(
             # cmap = f_score_colour_map, 
             cmap = f_score_cmap, 
-            # norm=plt.Normalize(vmin=0, vmax=1)
+            norm=plt.Normalize(vmin=0, vmax=1)
         )
         sm.set_array(available_f_scores)
 

@@ -149,6 +149,7 @@ class Genetic(
         model_points = kwargs['branch_model_points']
         self.model_points_at_step[self.spawn_step] = model_points
         evaluation_log_likelihoods = kwargs['evaluation_log_likelihoods']
+        
         model_names_ids = kwargs['model_names_ids']
         sum_wins = sum(list(model_points.values()))
         model_ids = list(model_points.keys())

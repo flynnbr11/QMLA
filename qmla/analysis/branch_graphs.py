@@ -52,7 +52,7 @@ def plot_qmla_branches(q):
     
     
     #     widths.extend([0.1, 0.1])
-    size_scaler = 10 / num_branches
+    size_scaler = min(3, 10 / num_branches)
     label_fontsize = 20*size_scaler
 
     gs = GridSpec(
