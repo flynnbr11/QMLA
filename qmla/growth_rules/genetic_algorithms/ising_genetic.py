@@ -156,7 +156,7 @@ class IsingGeneticTest(
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = True
         self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth = 8
+        self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth),
