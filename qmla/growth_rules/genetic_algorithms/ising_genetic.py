@@ -163,7 +163,7 @@ class IsingGeneticTest(
             'other': 0
         }
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor =10
+        self.timing_insurance_factor = 2
         self.max_time_to_consider = 20 
         self.min_param = 0.4
         self.max_param = 0.5

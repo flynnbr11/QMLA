@@ -30,7 +30,7 @@ def plot_qmla_branches(q):
 
     num_branches = len(branches)
     ncols = int(np.ceil(np.sqrt(num_branches))) 
-    if ncols == 1:
+    if num_branches == 1:
         ncols = 1
         nrows = 1
         cmap_widths = 0.1
