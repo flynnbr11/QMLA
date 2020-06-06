@@ -152,13 +152,19 @@ class RatingSystem():
         available_f_scores = np.linspace(0, 1, 1 + (1/f_granularity) )
         my_cmap = f_score_colour_map(available_f_scores)
 
-        colour_by_f = {
-            np.round(f, 2) : my_cmap[ np.where( available_f_scores == f ) ][0]
-            for f in available_f_scores
-        }
+        f_score_cmap = plt.cm.get_cmap('Blues')
+        f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.25, 1.0)
+
+
+        # colour_by_f = {
+        #     # np.round(f, 2) : my_cmap[ np.where( available_f_scores == f ) ][0]
+        #     np.round(f, 2) : f_score_cmap[ np.where( available_f_scores == f ) ][0]
+        #     for f in available_f_scores
+        # }
 
         model_coloured_by_f = {
-            m : colour_by_f[ qmla.utilities.round_nearest(f_scores[m], f_granularity) ]
+            # m : colour_by_f[ qmla.utilities.round_nearest(f_scores[m], f_granularity) ]
+            m : f_score_cmap(f_scores[m])
             for m in all_model_ratings_by_generation.model_id.unique()
         }
 
@@ -190,10 +196,13 @@ class RatingSystem():
         # color bar
         ax = fig.add_subplot(gs[0,1])
         sm = plt.cm.ScalarMappable(
-            cmap = f_score_colour_map, 
-            norm=plt.Normalize(vmin=0, vmax=1)
+            # cmap = f_score_colour_map, 
+            cmap = f_score_cmap, 
+            # norm=plt.Normalize(vmin=0, vmax=1)
         )
         sm.set_array(available_f_scores)
+
+        
         plt.colorbar(sm, cax=ax, orientation='vertical')
         ax.set_ylabel('F-score',  fontsize=label_fontsize)
 
