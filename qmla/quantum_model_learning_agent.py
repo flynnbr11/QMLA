@@ -1683,6 +1683,8 @@ class QuantumModelLearningAgent():
             v = self.model_name_id_map[k]
             self.model_id_to_name_map[v] = k
 
+        qmla.analysis.branch_graphs.plot_qmla_branches(q = self)
+
 
     def bayes_factors_data(self):
         self.bayes_factors_df = pd.DataFrame(

@@ -145,35 +145,8 @@ class RatingSystem():
                         d, ignore_index=True
                     )
 
-        # # plot rating of each model vs generation
-        # fig, ax = plt.subplots(figsize=(15,10))
-
-        # sns.lineplot(
-        #     x = 'generation', 
-        #     y = 'rating', 
-        #     hue = 'model_id', 
-        #     data = all_model_ratings_by_generation,
-        #     legend=False # too many to view meaningfully
-        # )
-
-        # for g in self.all_ratings.generation.unique():
-        #     ax.axvline(g, ls='--', c='green')
-        # ax.axhline(self.initial_rating, ls=':', color='red')
-        # label_fontsize = 25
-        # ax.set_xlabel('Generation', fontsize = label_fontsize)
-        # ax.set_ylabel('Modified Elo rating', fontsize=label_fontsize)
-        # ax.grid(False)
-        # ax.set_xticks(list(self.all_ratings.generation.unique()))
-
         # First prepare a dictionary to map model id to a colour corresponding to F-score
         f_granularity = 0.05
-        # f_scores = {
-        #     # randomly assign while testing plot
-        #     # TODO get from GR.
-        #     m : qmla.utilities.round_nearest(np.random.uniform(0, 1), f_granularity)
-        #     for m in all_model_ratings_by_generation.model_id.unique()
-        # }
-
         f_score_colour_map = plt.cm.Spectral
 
         available_f_scores = np.linspace(0, 1, 1 + (1/f_granularity) )

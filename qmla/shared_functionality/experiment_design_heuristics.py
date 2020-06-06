@@ -105,7 +105,7 @@ class BaseHeuristicQMLA(qi.Heuristic):
     def finalise_heuristic(self, **kwargs):
         self.log_print([
             "Resample epochs: ", self._resample_epochs,
-            "\nTimes suggested:", self._times_suggested
+            # "\nTimes suggested:", self._times_suggested
         ])
 
 

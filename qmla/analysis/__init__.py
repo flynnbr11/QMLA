@@ -8,3 +8,4 @@ from qmla.analysis.outputs import *
 from qmla.analysis.internals import *
 from qmla.analysis.performance import *
 from qmla.analysis.tree_plot import *
+from qmla.analysis.branch_graphs import *

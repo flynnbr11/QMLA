@@ -830,10 +830,6 @@ class ModelInstanceForLearning():
 
         row = 0
         col = 0
-        self.log_print([
-            "Estimates:", self.track_param_estimate_v_epoch, 
-            "Uncertainty:", self.track_param_uncertainty_v_epoch
-        ])
         # Parameter estimates
         for term in terms:
             self.log_print(["Getting ax {},{}".format(row, col)])
