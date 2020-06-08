@@ -1,3 +1,9 @@
+import os
+# Set environment variables so numpy doesn't steal processes
+os.environ["MKL_NUM_THREADS"] = "1" 
+os.environ["NUMEXPR_NUM_THREADS"] = "1" 
+os.environ["OMP_NUM_THREADS"] = "1"
+
 import sys
 import redis
 from rq import Queue, Connection, Worker
@@ -11,7 +17,6 @@ import numpy as np
 import time
 import pickle
 import random
-import os
 import pandas as pd
 
 import matplotlib.pyplot as plt
