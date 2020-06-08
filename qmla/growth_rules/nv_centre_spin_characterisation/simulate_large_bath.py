@@ -284,18 +284,17 @@ class TestSimulatedNVCentre(
             # 'pauliSet_1_y_d3' : B*g*bohr_magneton/hbar,
             # 'pauliSet_1_z_d3' : B*g*bohr_magneton/hbar,
 
-            # 'pauliSet_1_y_d3' : 1.9431238095238094 * (10**order_mag),
-            # 'pauliSet_1_z_d3' : 7.9431238095238094 * (10**order_mag)
 
-            'pauliSet_1_x_d1' : 1.9431238095238094 * (10**order_mag),
-            'pauliSet_1_y_d1' : 3.9431238095238094 * (10**order_mag),
+            # 'pauliSet_1_x_d1' : 1.9431238095238094 * (10**order_mag),
+            # 'pauliSet_1_y_d1' : 3.9431238095238094 * (10**order_mag),
             # 'pauliSet_1_z_d1' : 5.9431238095238094 * (10**order_mag),
 
-            # 'pauliSet_1_y_d1' : 4 * (10**order_mag),
-            # 'pauliSet_1_z_d1' : 5.9431238095238094 * (10**order_mag),
-            # 'pauliSet_1_x_d1' : 4 * (10**order_mag),
-
-
+            'pauliSet_1_x_d2' : 1.9431238095238094 * (10**order_mag),
+            'pauliSet_1_y_d2' : 8.9431238095238094 * (10**order_mag),
+            'pauliSet_1_z_d2' : 3.9431238095238094 * (10**order_mag),
+            'pauliSet_2_x_d2' : 4.9431238095238094 * (10**order_mag),
+            'pauliSet_2_y_d2' : 7.9431238095238094 * (10**order_mag),
+            'pauliSet_2_z_d2' : 6.9431238095238094 * (10**order_mag),
         }
 
         self.gaussian_prior_means_and_widths = {
