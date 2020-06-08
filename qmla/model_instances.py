@@ -204,7 +204,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_log_print=True,
+            debug_log_print=False,
         )
         self.qinfer_updater = qi.SMCUpdater(
             self.qinfer_model,
