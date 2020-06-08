@@ -105,7 +105,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.true_param_dict = true_param_dict 
         self.store_likelihoods = {'system' : {}, 'simulator' : {}}
         self.store_p0_diffs = []
-        self.iqle_mode = False
+        self.iqle_mode = True
         self.debug_log_print = debug_log_print
         # get true_hamiltonian from true_param dict
         true_ham = None
@@ -624,10 +624,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
                 if self.iqle_mode and self.true_evolution:
                     # H to compute for IQLE on the system
-                    ham = self.true_hamiltonian - self.ham_from_expparams
+                    ham =  self.true_hamiltonian - self.ham_from_expparams
                 elif self.iqle_mode and not self.true_evolution:
                     # H to compute for IQLE on the simulator
-                    ham = self.ham_from_expparams - ham
+                    ham = ham - self.ham_from_expparams
 
                 self.timings[timing_marker]['construct_ham'] += time.time()-t_init
             except BaseException:
