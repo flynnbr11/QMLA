@@ -66,7 +66,7 @@ class GrowthRule():
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
         self.probe_noise_level = 1e-5
         self.fraction_particles_for_bf = 1.0 # testing whether reduced num particles for BF can work 
         self.ratings_class = qmla.growth_rules.rating_system.ELORating(

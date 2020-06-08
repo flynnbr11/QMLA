@@ -117,15 +117,15 @@ class SimulatedNVCentre(
         self.expectation_value_function = \
             qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         self.timing_insurance_factor = 1
-        self.num_probes = 1
+        self.num_probes = 20
         time_basis = 1e-9 # nanoseconds
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
         self.max_time_to_consider = 50 * time_basis # 50 microseconds 
         self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
         self.track_quadratic_loss = True
-        # self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        # self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampledUncertaintyWithConvergenceThreshold
 
@@ -287,9 +287,13 @@ class TestSimulatedNVCentre(
             # 'pauliSet_1_y_d3' : 1.9431238095238094 * (10**order_mag),
             # 'pauliSet_1_z_d3' : 7.9431238095238094 * (10**order_mag)
 
+            'pauliSet_1_x_d1' : 1.9431238095238094 * (10**order_mag),
             'pauliSet_1_y_d1' : 3.9431238095238094 * (10**order_mag),
             # 'pauliSet_1_z_d1' : 5.9431238095238094 * (10**order_mag),
-            'pauliSet_1_x_d1' : 1.9431238095238094 * (10**order_mag),
+
+            # 'pauliSet_1_y_d1' : 4 * (10**order_mag),
+            # 'pauliSet_1_z_d1' : 5.9431238095238094 * (10**order_mag),
+            # 'pauliSet_1_x_d1' : 4 * (10**order_mag),
 
 
         }
@@ -299,6 +303,12 @@ class TestSimulatedNVCentre(
             'pauliSet_1_x_d1' : (5* (10**order_mag), 2* (10**order_mag)),
             'pauliSet_1_y_d1' : (5* (10**order_mag), 2* (10**order_mag)),
             'pauliSet_1_z_d1' : (5* (10**order_mag), 2* (10**order_mag)),
+
+            # TEST
+            # 'pauliSet_1_x_d1' : (0.8, 0.0001),
+            # 'pauliSet_1_y_d1' : (0.3, 0.0001),
+            # 'pauliSet_1_z_d1' : (0.5, 0.0001),
+
 
             # 'pauliSet_1_x_d1' : (self.true_model_terms_params['pauliSet_1_x_d1']+0.5, 0.1),
             # 'pauliSet_1_y_d1' : (self.true_model_terms_params['pauliSet_1_y_d1']-0.5, 0.1),
@@ -319,8 +329,8 @@ class TestSimulatedNVCentre(
         self.qinfer_resampler_threshold = 0.5
         self.qinfer_resampler_a = 0.98
 
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.default_expectation_value
-        # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
+        # self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         
         # Choose heuristic
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic

@@ -105,6 +105,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.true_param_dict = true_param_dict 
         self.store_likelihoods = {'system' : {}, 'simulator' : {}}
         self.store_p0_diffs = []
+        self.iqle_mode = False
         self.debug_log_print = debug_log_print
         # get true_hamiltonian from true_param dict
         true_ham = None
@@ -378,33 +379,47 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         super(QInferModelQMLA, self).likelihood(
             outcomes, modelparams, expparams
         )  # just adds to self._call_count (Qinfer abstact model class)
+
+        # process expparams
         times = expparams['t'] # times to compute likelihood for. typicall only per experiment. 
+        expparams_sampled_particle = np.array(
+            [expparams.item(0)[1:]]) # TODO THIS IS DANGEROUS - DONT DO IT OUTSIDE OF TESTS
+            
+        self.ham_from_expparams = np.tensordot(
+            expparams_sampled_particle, 
+            self._oplist, 
+            axes=1    
+        )[0]
+        
         num_particles = modelparams.shape[0]
         num_parameters = modelparams.shape[1]
+
         # assumption is that calls to likelihood are paired: 
         # one for system, one for simulator
         # therefore the same probe should be assumed for consecutive calls
         # probe id is tracked with _a and _b.
         # i.e. increments each 2nd call, loops back when probe dict exhausted
         self._a += 1
-        if self._a % 2 == 1:
+        # if self._a % 2 == 1:
+        if self._a % 60 == 1:
             self._b += 1
         self.probe_counter = (self._b % int(self.probe_number)) 
 
 
+
         if num_particles == 1:
-            # TODO better mechanism to determine if true_evo, 
+            # TODO better mechanism to determine if self.true_evolution, 
             # rather than assuming 1 particle => system
             # call the system, use the true paramaters as a single particle, 
             # to get the true evolution
-            true_evo = True
+            self.true_evolution = True
             params = [copy.deepcopy(self._trueparams)]
         else:
-            true_evo = False
+            self.true_evolution = False
             params = modelparams
 
         try:
-            if true_evo:
+            if self.true_evolution:
                 t_init = time.time()
                 pr0 = self.get_system_pr0_array(
                     times=times,
@@ -436,7 +451,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.timings[timing_marker]['likelihood_array'] += time.time() - t_init
         self.log_print_debug(
             [
-                '\ntrue_evo:', true_evo,
+                '\ntrue_evo:', self.true_evolution,
                 '\ntimes:', times,
                 '\nlen(outcomes):', len(outcomes),
                 '\n_a = {}, _b={}'.format(self._a, self._b),
@@ -445,12 +460,13 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 '\nOutcomes:', outcomes[:10],
                 '\nparticles:', params[:10],
                 "\nPr0: ", pr0[:10], 
-                "\nLikelihood: ", likelihood_array[0][:10]
+                "\nLikelihood: ", likelihood_array[0][:10],
+                "\nexpparams_sampled_particle:", expparams_sampled_particle
             ]
         )
         
         self.timings[timing_marker]['likelihood'] += time.time() - t_likelihood_start
-        if true_evo: 
+        if self.true_evolution: 
             self.store_likelihoods['system'][self._b] = pr0
         else:
             self.store_likelihoods['simulator'][self._b] = pr0
@@ -497,7 +513,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             t_list = times,
             particles = particles, 
             oplist = operator_list, 
-            hamiltonian=self.true_hamiltonian, 
+            # hamiltonian=self.true_hamiltonian, 
             probe = probe, 
             timing_marker=timing_marker
             # **kwargs
@@ -578,15 +594,19 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         """
 
         from rq import timeouts
-        self.log_print_debug(
-            [
-                "Probe[0] (dimension {}): \n {}".format(
-                    np.shape(probe),
-                    probe[0],
-                ),
-                "Times: ", t_list
-            ]
-        )
+        if np.shape(probe)[0] < 4 : 
+            probe_to_print = probe
+        else:
+            probe_to_print = probe[0]
+
+        self.log_print_debug([
+            "Getting pr0; true system ->", self.true_evolution, 
+            "\n(part of) Probe (dimension {}): \n {}".format(
+                np.shape(probe),
+                probe_to_print,
+            ),
+            "\nTimes: ", t_list
+        ])
 
         num_particles = len(particles)
         num_times = len(t_list)
@@ -601,6 +621,14 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     )
                 else:                    
                     ham = hamiltonian
+
+                if self.iqle_mode and self.true_evolution:
+                    # H to compute for IQLE on the system
+                    ham = self.true_hamiltonian - self.ham_from_expparams
+                elif self.iqle_mode and not self.true_evolution:
+                    # H to compute for IQLE on the simulator
+                    ham = self.ham_from_expparams - ham
+
                 self.timings[timing_marker]['construct_ham'] += time.time()-t_init
             except BaseException:
                 self.log_print(
@@ -611,10 +639,12 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     ],
                 )
                 raise
-            # if evoId == 0:
-            #     self.log_print([
-            #         "{} 1st particle hamiltonian 1st row:\n{}".format(timing_marker, ham[0])
-            #     ])
+            if evoId == 0:
+                self.log_print_debug([
+                    "\nHamiltonian:\n", ham,
+                    "\ntimes:", t_list,
+                    "\nH from expparams:", self.ham_from_expparams
+                ])
 
             for tId in range(len(t_list)):
 
@@ -625,7 +655,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     t = random.randint(1e6, 3e6)
                 try:
                     t_init = time.time()
-                    likel = self.growth_class.expectation_value(
+                    prob_meas_input_state = self.growth_class.expectation_value(
                         ham=ham,
                         t=t,
                         state=probe,
@@ -634,7 +664,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     )
                     self.timings[timing_marker]['expectation_values'] += time.time() - t_init
                     t_init = time.time()
-                    output[evoId][tId] = likel
+                    output[evoId][tId] = prob_meas_input_state
                     self.timings[timing_marker]['storing_output'] += time.time() - t_init
 
                 except NameError:
@@ -676,6 +706,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                         ]
                     )
         return output
+
+
 
 
 

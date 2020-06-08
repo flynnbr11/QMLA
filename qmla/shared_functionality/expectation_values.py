@@ -34,7 +34,7 @@ def log_print(
 
 # Default expectation value calculations
 
-def default_expectation_value(
+def probability_from_default_expectation_value(
     ham,
     t,
     state,
@@ -42,7 +42,7 @@ def default_expectation_value(
     log_identifier='Expecation Value'
 ):
     """
-    Default expectation value calculation: | <state.transpose | e^{-iHt} | state> |**2
+    Default probability calculation: | <state.transpose | e^{-iHt} | state> |**2
 
     Returns the expectation value computed by evolving the input state with
     the provided Hamiltonian operator. NB: In this case, the assumption is that the 
@@ -55,32 +55,31 @@ def default_expectation_value(
     :param str log_file: (optional) path of the log file
     :param str log_identifier: (optional) identifier for the log
 
-    :return: expectation value of the evolved state
+    :return: probability of measuring the input state after Hamiltonian evolution
     """
 
     unitary = linalg.expm(-1j * ham * t)
     probe_bra = state.conj().T
     u_psi = np.dot(unitary, state)
-    psi_u_psi = np.dot(probe_bra, u_psi)
-    expec_val = psi_u_psi
-    # expec_val = np.abs(psi_u_psi)**2
+    expectation_value = np.dot(probe_bra, u_psi) # in general a complex number
+    prob_of_measuring_input_state = np.abs(expectation_value)
 
-    # check that expectation value is reasonable (0 <= EV <= 1)
+    # check that probability is reasonable (0 <= P <= 1)
     ex_val_tol = 1e-9
-    # if (
-    #     expec_val > (1 + ex_val_tol)
-    #     or
-    #     expec_val < (0 - ex_val_tol)
-    # ):
-    #     log_print(
-    #         [
-    #             "Expectation value greater than 1 or less than 0: \t",
-    #             expec_val
-    #         ],
-    #         log_file=log_file,
-    #         log_identifier=log_identifier
-    #     )
-    return expec_val
+    if (
+        prob_of_measuring_input_state > (1 + ex_val_tol)
+        or
+        prob_of_measuring_input_state < (0 - ex_val_tol)
+    ):
+        log_print(
+            [
+                "prob_of_measuring_input_state value greater than 1 or less than 0: \t",
+                prob_of_measuring_input_state
+            ],
+            log_file=log_file,
+            log_identifier=log_identifier
+        )
+    return prob_of_measuring_input_state
 
 
 

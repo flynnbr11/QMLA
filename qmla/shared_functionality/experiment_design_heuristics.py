@@ -56,6 +56,10 @@ class BaseHeuristicQMLA(qi.Heuristic):
         self._oplist = oplist
         self._num_experiments = kwargs['num_experiments']
         self._log_file = log_file
+
+        self.log_print([
+            "Op list:", self._oplist
+        ])
         
         # storage infrastructure
         self._resample_epochs = []
@@ -223,13 +227,39 @@ class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
                 {} iterations.".format(self._maxiters)
             )
 
+
+        # h1 = (np.tensordot(x, self._oplist, axes=1))[0]
+        # h2 = (np.tensordot(xp, self._oplist, axes=1))[0]
+        # self.log_print([
+        #     "x={} \tH1=\n{}".format(x, h1),
+        #     "\nx'={} \tH1=\n{}".format(xp, h2)
+        # ])
+        # h_diff = h1 - h2
+        # frob_norm  = np.linalg.norm(h_diff)
+        # new_time = 1 / frob_norm
+        # self.log_print(["h_diff =\n{} \n frob norm={} \t t={}".format(h_diff, frob_norm,new_time)])
         d = self._model.distance(x, xp)
-        eps = self._get_exp_params_array()
         new_time = 1 / d
+
+        eps = self._get_exp_params_array()
+
         eps['t'] = new_time
 
-        return eps
+        # get sample from x
 
+        particle = self._updater.sample()
+        n_params = particle.shape[1]
+
+        for i in range(n_params):
+            p = particle[0][i]            
+            corresponding_expparam = self._model.modelparam_names[i]
+            eps[corresponding_expparam] = p
+
+        self.log_print([
+            "Particle x={}".format(particle),
+            "Experiment:", eps
+        ])
+        return eps
 
 class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
     r"""
