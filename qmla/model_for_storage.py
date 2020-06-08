@@ -336,14 +336,18 @@ class ModelInstanceForStorage():
                 "\nexp_data=", exp_data
             )
 
-        self.final_r_squared = 1 - (sum_of_residuals / total_sum_of_squares)
-        self.p_value = (
-            1 -
-            sp.stats.chi2.cdf(
-                chi_squared,
-                len(exp_times) - 1  # number of degrees of freedom
-            )
-        )
+        try:
+            self.final_r_squared = 1 - (sum_of_residuals / total_sum_of_squares)
+        except:
+            self.final_r_squared = None
+        self.p_value = 0
+        # self.p_value = (
+        #     1 -
+        #     sp.stats.chi2.cdf(
+        #         chi_squared,
+        #         len(exp_times) - 1  # number of degrees of freedom
+        #     )
+        # )
 
         return self.final_r_squared
 

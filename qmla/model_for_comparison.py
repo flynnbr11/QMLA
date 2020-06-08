@@ -3,8 +3,8 @@ import scipy as sp
 import os
 import time
 import copy
-import qinfer as qi
 
+import qinfer as qi
 import redis
 import pickle
 

@@ -204,7 +204,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_log_print=False,
+            debug_log_print=True,
         )
         self.qinfer_updater = qi.SMCUpdater(
             self.qinfer_model,
@@ -321,11 +321,13 @@ class ModelInstanceForLearning():
             self.track_experimental_times.append(new_experiment['t'])
 
             # Run (or simulate) the experiment
+            self.log_print(["Simulating experiment"])
             datum_from_experiment = self.qinfer_model.simulate_experiment(
                 self.model_terms_parameters, # this doesn't actually matter - likelihood overwrites this for true system
                 new_experiment,
                 repeat=1
             ) 
+            self.log_print(["Datum:", datum_from_experiment])
 
             # Call updater to update distribution based on datum
             try:

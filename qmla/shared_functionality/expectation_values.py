@@ -62,23 +62,24 @@ def default_expectation_value(
     probe_bra = state.conj().T
     u_psi = np.dot(unitary, state)
     psi_u_psi = np.dot(probe_bra, u_psi)
-    expec_val = np.abs(psi_u_psi)**2
+    expec_val = psi_u_psi
+    # expec_val = np.abs(psi_u_psi)**2
 
     # check that expectation value is reasonable (0 <= EV <= 1)
     ex_val_tol = 1e-9
-    if (
-        expec_val > (1 + ex_val_tol)
-        or
-        expec_val < (0 - ex_val_tol)
-    ):
-        log_print(
-            [
-                "Expectation value greater than 1 or less than 0: \t",
-                expec_val
-            ],
-            log_file=log_file,
-            log_identifier=log_identifier
-        )
+    # if (
+    #     expec_val > (1 + ex_val_tol)
+    #     or
+    #     expec_val < (0 - ex_val_tol)
+    # ):
+    #     log_print(
+    #         [
+    #             "Expectation value greater than 1 or less than 0: \t",
+    #             expec_val
+    #         ],
+    #         log_file=log_file,
+    #         log_identifier=log_identifier
+    #     )
     return expec_val
 
 

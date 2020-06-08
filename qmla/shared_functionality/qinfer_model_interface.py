@@ -466,6 +466,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     ):
         r"""
         Compute pr0 array for the system. 
+        # TODO compute e^(-iH) once for true Hamiltonian and use that rather than computing every step. 
 
         For user specific data, or method to compute system data, replace this function 
             in growth_rule.qinfer_model_class. 
