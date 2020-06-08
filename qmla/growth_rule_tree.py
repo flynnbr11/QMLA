@@ -74,6 +74,7 @@ class GrowthRuleTree():
         if self.growth_class.branch_comparison_strategy == 'all':
             pairs_to_compare = 'all'
         elif self.growth_class.branch_comparison_strategy == 'optimal_graph':
+            self.log_print(["Getting optimal comparison graph for {} models".format(len(self.initial_models))])
             pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
                 model_names = self.initial_models
             )

@@ -1516,14 +1516,21 @@ class QuantumModelLearningAgent():
         growth_tree = self.trees[growth_rule]
 
         if pairs_to_compare_by_names is not None:
-            self.log_print(["Getting model IDs to set comparison subset"])
-            pairs_to_compare = [
-                (
-                    self.model_database[self.model_database.model_name == m1 ].model_id.item(),
-                    self.model_database[self.model_database.model_name == m2 ].model_id.item()
-                ) for m1, m2 in pairs_to_compare_by_names
-            ]
-            self.log_print(["IDs:", pairs_to_compare])
+            if pairs_to_compare_by_names == 'all':
+                pairs_to_compare = 'all'
+            else:
+                self.log_print(["Getting model IDs to set comparison subset"])
+                try:
+                    pairs_to_compare = [
+                        (
+                            self.model_database[self.model_database.model_name == m1 ].model_id.item(),
+                            self.model_database[self.model_database.model_name == m2 ].model_id.item()
+                        ) for m1, m2 in pairs_to_compare_by_names
+                    ]
+                    self.log_print(["IDs:", pairs_to_compare])
+                except:
+                    self.log_print(["Failed to unpack pairs_to_compare_by_names:\n", pairs_to_compare_by_names])
+                    raise
 
         self.branches[branch_id] = growth_tree.new_branch_on_tree(
             branch_id=branch_id,
@@ -2280,6 +2287,7 @@ class QuantumModelLearningAgent():
                 "First branch for {} has starting models: {}".format(
                     tree.growth_rule, starting_models
                 ),
+                "models_to_compare:", models_to_compare
             ])
             self.new_branch(
                 model_list = starting_models,
