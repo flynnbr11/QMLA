@@ -144,7 +144,7 @@ class IsingGeneticTest(
         ]
         # self.initial_models = list(np.random.choice(test_fitness_models, 11, replace=False))
 
-        self.initial_models = self.genetic_algorithm.random_initial_models(12)
+        self.initial_models = self.genetic_algorithm.random_initial_models(15)
         # self.log_print([len(self.initial_models), " initial models:", self.initial_models])
 
         # if self.true_model not in self.initial_models:
