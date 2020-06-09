@@ -63,10 +63,10 @@ def plot_qmla_branches(q):
     )
 
     # colour maps
-    f_score_cmap = plt.cm.get_cmap('Blues')
-    f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.25, 1.0)
+    # f_score_cmap = plt.cm.get_cmap('Blues')
+    # f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.25, 1.0)
+    f_score_cmap = plt.cm.get_cmap('coolwarm_r')
 
-#     f_score_cmap = plt.cm.get_cmap('coolwarm_r')
     bf_cmap = plt.cm.get_cmap('PRGn')
 #     bf_cmap = plt.cm.get_cmap('jet')
     min_bf = q.bayes_factors_df.log10_bayes_factor.min()

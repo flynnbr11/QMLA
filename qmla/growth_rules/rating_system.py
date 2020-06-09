@@ -152,8 +152,10 @@ class RatingSystem():
         available_f_scores = np.linspace(0, 1, 1 + (1/f_granularity) )
         my_cmap = f_score_colour_map(available_f_scores)
 
-        f_score_cmap = plt.cm.get_cmap('Blues')
-        f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.25, 1.0)
+        # f_score_cmap = plt.cm.get_cmap('Blues')
+        # f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.25, 1.0)
+        f_score_cmap = plt.cm.get_cmap('coolwarm_r')
+
 
 
         # colour_by_f = {
