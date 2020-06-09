@@ -303,21 +303,13 @@ class TestSimulatedNVCentre(
             'pauliSet_1_y_d1' : (5* (10**order_mag), 2* (10**order_mag)),
             'pauliSet_1_z_d1' : (5* (10**order_mag), 2* (10**order_mag)),
 
-            # TEST
-            # 'pauliSet_1_x_d1' : (0.8, 0.0001),
-            # 'pauliSet_1_y_d1' : (0.3, 0.0001),
-            # 'pauliSet_1_z_d1' : (0.5, 0.0001),
+            'pauliSet_1_x_d2' : (5* (10**order_mag), 2* (10**order_mag)),
+            'pauliSet_1_y_d2' : (5* (10**order_mag), 2* (10**order_mag)),
+            'pauliSet_1_z_d2' : (5* (10**order_mag), 2* (10**order_mag)),
 
-
-            # 'pauliSet_1_x_d1' : (self.true_model_terms_params['pauliSet_1_x_d1']+0.5, 0.1),
-            # 'pauliSet_1_y_d1' : (self.true_model_terms_params['pauliSet_1_y_d1']-0.5, 0.1),
-            # 'pauliSet_1_z_d1' : (self.true_model_terms_params['pauliSet_1_z_d1']+0.02, 0.1),
-
-
-            # spin
-            'pauliSet_1_x_d3' : (5* (10**order_mag), 2* (10**order_mag)),
-            'pauliSet_1_y_d3' : (5* (10**order_mag), 2* (10**order_mag)),
-            'pauliSet_1_z_d3' : (5* (10**order_mag), 2* (10**order_mag)),
+            'pauliSet_2_x_d2' : (5* (10**order_mag), 2* (10**order_mag)),
+            'pauliSet_2_y_d2' : (5* (10**order_mag), 2* (10**order_mag)),
+            'pauliSet_2_z_d2' : (5* (10**order_mag), 2* (10**order_mag)),
 
         }
 

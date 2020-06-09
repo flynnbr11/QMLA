@@ -1,17 +1,12 @@
-import os
 # Set environment variables so numpy doesn't steal processes
+# must be set before numpy is loaded
+import os
+import sys
 os.environ["MKL_NUM_THREADS"] = "1" 
 os.environ["NUMEXPR_NUM_THREADS"] = "1" 
 os.environ["OMP_NUM_THREADS"] = "1"
 
-import sys
-import redis
-from rq import Queue, Connection, Worker
-import argparse
-
-#Preload libraries
-# import qmla
-
+# Preload libraries
 import copy
 import numpy as np
 import time
@@ -19,20 +14,17 @@ import pickle
 import random
 import pandas as pd
 
+# Third party libraries
+import redis
+from rq import Queue, Connection, Worker
+import argparse
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import pickle
-import redis
 import qinfer
 
+# Custom libraries
 import qmla
-# import qmla.remote_bayes_factor
-# import qmla.remote_model_learning
-# import qmla.database_framework as database_framework
-# import qmla.model_instances as QML
-# import qmla.model_for_comparison
-# import qmla.redis_settings as rds
-# import qmla.logging
 
 # Parse command line arguments
 
@@ -62,9 +54,7 @@ redis_host_name = arguments.host_name
 redis_port_number = arguments.port_number
 qmla_id = arguments.qmla_id
 
-print("Custom RQ script. Host:{}; port:{}.".format(redis_host_name, redis_port_number))
-
-# # make a redis connection
+# Generate a redis connection
 redis_conn = redis.Redis(
         host = redis_host_name,
         port = redis_port_number

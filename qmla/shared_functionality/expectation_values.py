@@ -258,12 +258,9 @@ def n_qubit_hahn_evolution(
 
     """
 
-    # print("n qubit hahn")
-    # import qutip
     import numpy as np
     import qmla.database_framework
     from scipy import linalg
-    # print("n qubit hahn")
     num_qubits = int(np.log2(np.shape(ham)[0]))
 
     try:
@@ -272,8 +269,6 @@ def n_qubit_hahn_evolution(
     except BaseException:
         inversion_gate = make_inversion_gate(num_qubits)
 
-    # print("[expectation values] N qubit Hahn evolution. dimension {}".format(np.shape(ham)))
-    # print("state:", state)
     # want to evolve for t, then han inversion gate, 
     # then again evolution for (S * t)
     # where S = 2 in standard Hahn evolution, 
