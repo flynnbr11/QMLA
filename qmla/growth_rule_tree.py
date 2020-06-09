@@ -53,6 +53,7 @@ class GrowthRuleTree():
         self.child_parents = {}        
         self.spawn_step = 0
         self.prune_step = 0 
+        self.graphs = {}
 
     ##########
     # Section: Interface with growth rule
@@ -79,6 +80,7 @@ class GrowthRuleTree():
                 model_names = self.initial_models
             )
             self.log_print(["Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(len(pairs_to_compare))])
+            self.graphs[self.spawn_step] = graph
         else: 
             pairs_to_compare = 'all'
 
@@ -141,6 +143,7 @@ class GrowthRuleTree():
                     model_names = model_list
                 )
                 self.log_print(["Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(len(pairs_to_compare))])
+                self.graphs[self.spawn_step] = graph
             else: 
                 pairs_to_compare = 'all'
 

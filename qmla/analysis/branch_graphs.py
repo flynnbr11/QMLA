@@ -18,9 +18,10 @@ from matplotlib.pyplot import GridSpec
 
 import qmla
 
-def plot_qmla_branches(q):
+def plot_qmla_branches(q, return_graphs=False):
     trees = list(q.trees.values())
     tree = trees[0] # TODO plot for all GR's this instance
+    graphs = {}
 
     branches = [
         tree.branches[b] for b in 
@@ -185,6 +186,7 @@ def plot_qmla_branches(q):
         if col == ncols:
             col = 0
             row += 1
+        graphs[branch.growth_rule] =  graph
 
     # BF cmap
     ax = fig.add_subplot(gs[:, total_ncols-2])
@@ -209,3 +211,5 @@ def plot_qmla_branches(q):
         os.path.join(q.qmla_controls.plots_directory, 
         'branch_graphs.png')
     )
+    if return_graphs:
+        return graphs

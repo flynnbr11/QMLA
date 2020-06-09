@@ -154,7 +154,7 @@ class IsingGeneticTest(
         # test F map for random set of 10 models
 
         self.branch_comparison_strategy = 'optimal_graph'
-        self.tree_completed_initially = True
+        self.tree_completed_initially = False
         self.fitness_method =  'elo_ratings' 
         self.max_spawn_depth = 3
         if self.tree_completed_initially:

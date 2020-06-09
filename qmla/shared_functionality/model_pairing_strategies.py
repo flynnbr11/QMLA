@@ -38,7 +38,7 @@ def generate_graph(
         g.add_node(n)
         g.nodes[n]['longest_path_to_any_target'] = 0
     for s in sampled_pairs:
-        g.add_edge(s[0],s[1])
+        g.add_edge(min(s),max(s)) # edge min -> max
 
     node_edges = { n : len(g.edges(n)) for n in model_list}
 

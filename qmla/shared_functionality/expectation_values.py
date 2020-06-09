@@ -269,7 +269,7 @@ def n_qubit_hahn_evolution(
     except BaseException:
         inversion_gate = make_inversion_gate(num_qubits)
 
-    # want to evolve for t, then han inversion gate, 
+    # want to evolve for t, then apply Hahn inversion gate, 
     # then again evolution for (S * t)
     # where S = 2 in standard Hahn evolution, 
     # S = 1 for long time dynamics study
