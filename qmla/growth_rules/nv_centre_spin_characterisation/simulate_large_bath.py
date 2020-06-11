@@ -116,7 +116,7 @@ class SimulatedNVCentre(
         self.initial_models=None
         self.expectation_value_function = \
             qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
-        self.timing_insurance_factor = 1
+        self.timing_insurance_factor = 2/3
         self.num_probes = 20
         time_basis = 1e-9 # nanoseconds
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
