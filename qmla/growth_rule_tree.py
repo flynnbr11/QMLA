@@ -468,7 +468,6 @@ class BranchQMLA():
                 # TODO rankings for models should be set as they are distinguished
                 # ie 10 models at first which are reduced to a competition bw 3, 
                 # rankings for models 4-10 should be set at first call.
-                self.champion_id = max(models_points, key=models_points.get)
                 self.is_branch_champion_set = True
                 self.joint_branch_champions = None
         
@@ -477,7 +476,6 @@ class BranchQMLA():
             self.ranked_models = self.growth_class.ratings_class.get_rankings(
                 model_list = self.resident_model_ids
             )
-            self.champion_id = int(self.ranked_models[0])
             self.log_print(["Champion set by ratings"])
             self.is_branch_champion_set =  True
 
@@ -488,16 +486,18 @@ class BranchQMLA():
                 )
             ])
             self.is_branch_champion_set = True
-            self.champion_id = int(models_with_max_points[0])
+            self.ranked_models = sorted(
+                models_points,
+                key=models_points.get,
+                reverse=True
+            ) 
 
         # Update branch with results of competition
         if self.is_branch_champion_set:
-            champ_name = self.models[self.champion_id]
+            self.champion_id = int(self.ranked_models[0])
+            self.champion_name = self.models[self.champion_id]
             self.log_print(["Branch {} champion ID: ".format(
                 self.branch_id, self.champion_id)])
-            self.champion_name = champ_name
-
-
     ##########
     # Section: Utilities
     ##########
