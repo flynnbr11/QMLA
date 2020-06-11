@@ -79,23 +79,20 @@ class RatingSystem():
         )
         return rankings
 
-    def record_current_ratings(self, 
-        model_list = None, 
-        generation=0, 
-        marker='start', 
-        other_data={}
+    def batch_update(
+        self, 
+        model_pairs_bayes_factors,
+        spawn_step=0,
     ):
+        pairs = list(model_pairs_bayes_factors.keys())
+        for a, b in pairs:
+            self.compute_new_ratings(
+                model_a_id = a,
+                model_b_id = b, 
+                bayes_factor = model_pairs_bayes_factors[a, b],
+                spawn_step = spawn_step
+            )
 
-        current_ratings = self.get_ratings(model_list)
-        for m in current_ratings:
-            data = other_data
-            data['model_id'] = m
-            data['marker'] = marker
-            data['generation'] = generation
-            data['rating'] = current_ratings[m]
-            
-            p = pd.Series(data)
-            self.recorded_points = self.recorded_points.append(p, ignore_index = True)
 
     def plot_models_ratings_against_generation(
         self, 
@@ -232,7 +229,7 @@ class RateableModel():
         opponent_id,
         winner_id, 
         new_rating, 
-        generation, 
+        generation=0, 
     ):
         # assumes the calculation has occured outside
         # this model class, and here we update the record
@@ -276,15 +273,15 @@ class ELORating(RatingSystem):
         self, 
         model_a_id, 
         model_b_id, 
-        winner_id, 
         bayes_factor, 
+        winner_id = None, 
         **kwargs
     ):
         if model_a_id not in self.models: 
             self.add_ranking_model(model_id = model_a_id)
         if model_b_id not in self.models: 
             self.add_ranking_model(model_id = model_b_id)
-        
+                        
         model_a = self.models[model_a_id]
         model_b = self.models[model_b_id]
         
@@ -327,9 +324,9 @@ class ModifiedEloRating(ELORating):
         self, 
         model_a_id, 
         model_b_id, 
-        winner_id, 
         bayes_factor, 
         spawn_step, 
+        winner_id = None, 
         weight_log_base=10, 
         **kwargs
     ):
@@ -340,7 +337,14 @@ class ModifiedEloRating(ELORating):
 
         model_a = self.models[model_a_id]
         model_b = self.models[model_b_id]
-        
+
+        if winner_id is None:
+            if bayes_factor > 1 : 
+                winner_id = model_a_id
+            else:
+                winner_id = model_b_id
+        print("Rating update. A/B={}/{} \t BF={}".format(model_a_id, model_b_id, bayes_factor))
+
         rating_a = model_a.rating
         rating_b = model_b.rating
                 

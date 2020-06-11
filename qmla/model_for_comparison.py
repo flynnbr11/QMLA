@@ -185,11 +185,6 @@ class ModelInstanceForComparison():
             self.qinfer_updater = pickle.loads(
                 learned_model_info['updater']
             )
-        self.log_print(
-            [
-                "Posterior mean:", self.qinfer_updater.est_mean()
-            ]
-        )
 
         # Delete extra data now that everything useful is extracted
         del qmla_core_info_dict, learned_model_info

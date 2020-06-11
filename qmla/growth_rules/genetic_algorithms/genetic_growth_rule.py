@@ -57,6 +57,7 @@ class Genetic(
             k_const=30
         ) # for use when ranking/rating models
 
+        self.branch_champion_selection_stratgey = 'ratings'
         self.fitness_method = 'f_scores' # 'elo_ratings'
         self.prune_completed_initially = True
         self.prune_complete = True

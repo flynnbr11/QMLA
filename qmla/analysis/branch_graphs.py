@@ -20,7 +20,7 @@ import qmla
 
 def plot_qmla_branches(q, return_graphs=False):
     trees = list(q.trees.values())
-    tree = trees[0] # TODO plot for all GR's this instance
+    tree = trees[0] # TODO loop over trees
     graphs = {}
 
     branches = [
@@ -53,7 +53,7 @@ def plot_qmla_branches(q, return_graphs=False):
     
     
     #     widths.extend([0.1, 0.1])
-    size_scaler = min(3, 10 / num_branches)
+    size_scaler = min(3, 8 / num_branches)
     label_fontsize = 20*size_scaler
 
     gs = GridSpec(
@@ -187,7 +187,7 @@ def plot_qmla_branches(q, return_graphs=False):
         if col == ncols:
             col = 0
             row += 1
-        graphs[branch.growth_rule] =  graph
+        graphs[branch.branch_id] =  graph
 
     # BF cmap
     ax = fig.add_subplot(gs[:, total_ncols-2])

@@ -962,20 +962,15 @@ class QuantumModelLearningAgent():
 
         # Tell growth rule's rating system about this comparison
         # TODO more general fnc to tell GR about this comparison
-        self.growth_class.ratings_class.compute_new_ratings(
-            model_a_id=mod_low.model_id,
-            model_b_id=mod_high.model_id,
-            winner_id=champ,
-            bayes_factor = bayes_factor,
-            spawn_step = self.growth_class.spawn_step, 
-        )   
-        # self.growth_class.record_comparison(
+        # This rating system belongs only to the true GR
+        # -- there should be a unique rating system for each GR tree.
+        # self.growth_class.ratings_class.compute_new_ratings(
         #     model_a_id=mod_low.model_id,
         #     model_b_id=mod_high.model_id,
         #     winner_id=champ,
         #     bayes_factor = bayes_factor,
         #     spawn_step = self.growth_class.spawn_step, 
-        # )
+        # )   
 
         return champ
 
@@ -1020,13 +1015,11 @@ class QuantumModelLearningAgent():
             if mod1 != mod2:
                 res = self.process_model_pair_comparison(a=mod1, b=mod2)
                 models_points[res] += 1
-                self.log_print(
-                    [
-                        "[process_model_set_comparisons]",
-                        "Point to", res,
-                        "(comparison {}/{})".format(mod1, mod2)
-                    ]
-                )
+                self.log_print([
+                    "[process_model_set_comparisons]",
+                    "Point to", res,
+                    "(comparison {}/{})".format(mod1, mod2)
+                ])
 
         # Analyse pairwise competition
         max_points = max(models_points.values())
@@ -1092,25 +1085,28 @@ class QuantumModelLearningAgent():
 
         """
 
+        branch = self.branches[branch_id]
+        active_models_in_branch = branch.resident_model_ids
         # Establish pairs to check comparisons between
         if pair_list is None:
-            pair_list = self.branches[branch_id].pairs_to_compare
+            pair_list = branch.pairs_to_compare
             self.log_print([
                 "Pair list not given for branch {}, generated:{}".format(
                     branch_id,
                     pair_list
                 ),
             ])
-            active_models_in_branch = self.branches[branch_id].resident_model_ids
+        else:
+            self.log_print([
+                "pair list given to branch processing:", pair_list
+            ])
 
         # Process result for each pair
         models_points = {
-            k: 0
+            k : 0
             for k in active_models_in_branch
         }
-        for pair in pair_list:
-            mod1 = pair[0]
-            mod2 = pair[1]
+        for mod1, mod2 in pair_list:
             if mod1 != mod2:
                 res = self.process_model_pair_comparison(
                     a=mod1, b=mod2
@@ -1127,73 +1123,35 @@ class QuantumModelLearningAgent():
                 ])
         self.log_print(["Comparisons complete on branch {}".format(branch_id)])
         
-        # Analyse pairwise competition
-        max_points = max(models_points.values())
-        models_with_max_points = [
-            key for key, val in models_points.items()
-            if val == max_points
-        ]
+        # Update branch with these results to determine branch champion
+        branch.update_branch(
+            pair_list=pair_list, models_points = models_points)
 
-        if len(models_with_max_points) > 1:
-            # if multiple models have same number of wins,
-            # run competition beween subset
+        # if the given results are not enough for the GR to determine a branch champion, 
+        # reconsider a subset of models
+        while not branch.is_branch_champion_set:
+            reduced_model_set = branch.joint_branch_champions
             self.log_print([
-                "Multiple models have same number of points within \
-                    branch.\n",
-                models_points,
-                "This may cause infinite loop if models can \
-                    not be separated.",
+                "Branch champion not determined.",
+                "Reconsidering:", reduced_model_set
             ])
             self.compare_model_set(
-                model_id_list=models_with_max_points,
+                model_id_list=reduced_model_set,
                 remote=True,
                 recompute=False,
                 wait_on_result=True
             )
-            champ_id = self.process_model_set_comparisons(
-                models_with_max_points,
+            # Pass result of compare_model_set to branch to decide if sufficient to choose champion
+            # do this in while loop?
+            models_to_recompare = list(itertools.combinations(
+                reduced_model_set, 2
+            ))
+            self.process_comparisons_within_branch(
+                branch_id = branch_id, 
+                pair_list = models_to_recompare
             )
-        else:
-            # champion is model with most points
-            champ_id = max(models_points, key=models_points.get)
 
-        # Update branch object with results of competition
-        champ_id = int(champ_id)
-        champ_name = self.model_name_id_map[champ_id]
-        champ_num_qubits = database_framework.get_num_qubits(champ_name)
-        ranked_model_list = sorted(
-            models_points,
-            key=models_points.get,
-            reverse=True
-        )
-
-        # Update the branch with comparison data
-        # TODO give these data to GR but let it decide chamion etc, in case decided otherwise than BF contest
-        self.branches[branch_id].champion_id = champ_id
-        self.branches[branch_id].champion_name = champ_name
-        self.branches[branch_id].rankings = ranked_model_list
-        self.branches[branch_id].bayes_points = models_points
-        self.log_print(["Setting eval log like on branch"])
-        self.branches[branch_id].evaluation_log_likelihoods = {
-            k: self.get_model_storage_instance_by_id(k).evaluation_log_likelihood
-            for k in self.branches[branch_id].resident_model_ids
-        }
-        # self.growth_class.record_comparisons(comparisons = models_points)
-
-        self.log_print([
-            "Model points for branch {}: {}".format(
-                branch_id,
-                models_points,
-            ),
-            "\nChampion of branch {} is model {}: {}".format(
-                branch_id,
-                champ_id,
-                champ_name
-            )
-        ])
-
-        # Return the winning model's ID
-        return champ_id
+        return branch.champion_id
 
     ##########
     # Section: routines to implement tree-based QMLA
@@ -1408,7 +1366,7 @@ class QuantumModelLearningAgent():
         :param int branch_id: unique ID of the branch which has completed
         """
 
-        model_list = self.branches[branch_id].rankings
+        model_list = self.branches[branch_id].ranked_models
         model_names = [
             self.model_name_id_map[mod_id]
             for mod_id in model_list
@@ -1418,8 +1376,8 @@ class QuantumModelLearningAgent():
             model_list=model_names, # can this be functionally replaced by info in branch_model_points?
             model_names_ids=self.model_name_id_map,
             called_by_branch=branch_id,
-            branch_model_points=self.branches[branch_id].bayes_points, # can get from branch/tree
-            evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods, # can get from branch/tree
+            branch_model_points=self.branches[branch_id].bayes_points, # remove usage of
+            evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods, 
             model_dict=self.model_lists, # is this used by any GR? TODO remove
         )
 
@@ -1428,14 +1386,12 @@ class QuantumModelLearningAgent():
                 "After model generation for GR",
                 self.branches[branch_id].growth_rule,
                 "\nnew models:", new_models,
-                # "pairs to compare:", pairs_to_compare,
             ]
         )
 
         # Generate new QMLA level branch
         new_branch_id = self.new_branch(
             model_list=new_models,
-            # pairs_to_compare=pairs_to_compare,
             pairs_to_compare_by_names = models_to_compare,
             growth_rule=self.branches[branch_id].growth_rule,
             spawning_branch=branch_id,
@@ -1690,7 +1646,9 @@ class QuantumModelLearningAgent():
             v = self.model_name_id_map[k]
             self.model_id_to_name_map[v] = k
 
-        qmla.analysis.branch_graphs.plot_qmla_branches(q = self)
+        self.branch_graphs = qmla.analysis.branch_graphs.plot_qmla_branches(
+            q = self, return_graphs=True
+        )
 
 
     def bayes_factors_data(self):
@@ -1855,7 +1813,7 @@ class QuantumModelLearningAgent():
             'ModelEvaluationMedianLikelihoods': model_evaluation_median_likelihoods,
             'AllModelFScores': self.model_f_scores,
             # data stored during GrowthRule.growth_rule_finalise():
-            'GrowthRuleStorageData': self.growth_class.growth_rule_specific_data_to_store,
+            # 'GrowthRuleStorageData': self.growth_class.growth_rule_specific_data_to_store,
         }
 
         self.storage = qmla.utilities.StorageUnit()

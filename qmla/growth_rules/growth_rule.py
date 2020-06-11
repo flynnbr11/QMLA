@@ -31,7 +31,6 @@ class GrowthRule():
     def __init__(
         self,
         growth_generation_rule,
-        # configuration=None, 
         **kwargs
     ):
 
@@ -78,8 +77,10 @@ class GrowthRule():
         self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.gaussian_prior
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
+        self.spawn_step = 0
         self.prune_step = 0 
-        self.model_branches = {} 
+        self.model_branches = {}
+        self.branch_champion_selection_stratgey = 'number_comarison_wins' 
         self.champion_determined = False
         self.growth_rule_specific_data_to_store = {}
         self.storage = qmla.utilities.StorageUnit()

@@ -238,12 +238,6 @@ class GrowthRuleTree():
         for m in model_instances:
             self.model_instances[m] = model_instances[m]
         
-        # Record current state of ratings
-        model_ids = list(model_instances.keys())
-        # self.growth_class.ratings_class.record_current_ratings(
-        #     model_list = model_ids, generation = self.spawn_step, marker='start'
-        # )
-
         return branch
 
     ##########
@@ -354,6 +348,7 @@ class BranchQMLA():
         self.model_instances = model_instances
         self.models = models
         self.models_by_id = models
+        self.log_print(["Models on new branch:", models])
         self.resident_model_ids = sorted(self.models_by_id.keys())
         self.resident_models = list(self.models_by_id.values())
         self.num_models = len(self.resident_models)
@@ -388,6 +383,7 @@ class BranchQMLA():
         self.comparisons_complete = False
         self.bayes_points = {}
         self.rankings = [] # ordered from best to worst
+        self.result_counter = 0
 
         self.log_print([
             "New branch {}; models: {}".format(
@@ -395,6 +391,112 @@ class BranchQMLA():
                 self.models
             )
         ])
+
+    ##########
+    # Section: Interact with QMLA instance
+    ##########
+
+    def update_branch(
+        self, 
+        pair_list, 
+        models_points=None
+    ):
+        self.result_counter += 1 
+        self.log_print([
+            "Branch processing results for the N={} time".format(
+                self.result_counter
+            ),
+            "pair list:", pair_list
+        ])
+
+        if self.result_counter == 1:
+            # TODO should not be using bayes_points anywhere
+            self.bayes_points = models_points 
+            self.evaluation_log_likelihoods = {
+                k: self.model_instances[k].evaluation_log_likelihood
+                for k in self.resident_model_ids
+            }
+        else:
+            self.log_print([
+                "Reconsidering branch {} champion".format(self.branch_id)
+            ])
+    
+        # inspect the pairwise comparisons; 
+        ## update the GR ratings system
+        ## rank models according to the active ranking system
+        pair_list = [ (min(pair), max(pair) ) for pair in pair_list ]
+        bayes_factors = {
+            pair :
+            self.model_instances[min(pair)].model_bayes_factors[max(pair)][-1]
+            for pair in pair_list
+        }
+
+        self.growth_class.ratings_class.batch_update(
+            model_pairs_bayes_factors = bayes_factors,
+            spawn_step = self.tree.spawn_step
+        )
+
+        # Use growth rule's reasoning to decide if a champion can be set
+        if self.growth_class.branch_champion_selection_stratgey == 'number_comparison_wins':
+            max_points = max(models_points.values())
+            models_with_max_points = [
+                key for key, val in models_points.items()
+                if val == max_points
+            ]
+
+            if len(models_with_max_points) > 1:
+                # if multiple models have same number of wins,
+                # can't declare a branch champion yet
+
+                self.log_print([
+                    "Multiple models have same number of points within \
+                        branch.\n",
+                    models_points,
+                    "This may cause infinite loop if models can \
+                        not be separated.",
+                ])
+                self.joint_branch_champions = models_with_max_points
+                self.is_branch_champion_set = False
+                return      
+            else:
+                # champion is model with most points
+                self.ranked_models = sorted(
+                    models_points,
+                    key=models_points.get,
+                    reverse=True
+                ) 
+                # TODO rankings for models should be set as they are distinguished
+                # ie 10 models at first which are reduced to a competition bw 3, 
+                # rankings for models 4-10 should be set at first call.
+                self.champion_id = max(models_points, key=models_points.get)
+                self.is_branch_champion_set = True
+                self.joint_branch_champions = None
+        
+        elif self.growth_class.branch_champion_selection_stratgey == 'ratings':
+            # TODO check if multiple models have exactly same rating
+            self.ranked_models = self.growth_class.ratings_class.get_rankings(
+                model_list = self.resident_model_ids
+            )
+            self.champion_id = int(self.ranked_models[0])
+            self.log_print(["Champion set by ratings"])
+            self.is_branch_champion_set =  True
+
+        if not self.is_branch_champion_set and self.result_counter > 1:
+            self.log_print([
+                "On branch {}, comparisons consiered {} times; forcing choice.".format(
+                    self.branch_id, self.result_counter
+                )
+            ])
+            self.is_branch_champion_set = True
+            self.champion_id = int(models_with_max_points[0])
+
+        # Update branch with results of competition
+        if self.is_branch_champion_set:
+            champ_name = self.models[self.champion_id]
+            self.log_print(["Branch {} champion ID: ".format(
+                self.branch_id, self.champion_id)])
+            self.champion_name = champ_name
+
 
     ##########
     # Section: Utilities
@@ -406,5 +508,3 @@ class BranchQMLA():
             log_file = self.log_file,
             log_identifier = 'Branch {}'.format(self.branch_id)
         )
-
-

@@ -132,10 +132,4 @@ def get_seed(host_name, port_number, qmla_id):
         qid_seeds.set('max', new_qid_seed)
 
         seed = new_qid_seed
-
-    print("Seed requested for host/port/id", host_name, '/', port_number,
-            '/', qmla_id, ";has seed", seed
-            )
-    # print("Seed keys", seed_db_keys)
-
     return int(seed)
