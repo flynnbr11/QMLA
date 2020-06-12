@@ -32,7 +32,7 @@ class ExperimentNVCentreNQubits(
         self.true_model = qmla.database_framework.alph(self.true_model) 
         self.initial_models = ['pauliSet_1_x_d1', 'pauliSet_1_y_d1', 'pauliSet_1_z_d1']
         self.qhl_models = [
-            qmla.utilities.n_qubit_nv_gali_model(n) for n in range(1, self.max_num_qubits)
+            qmla.utilities.n_qubit_nv_gali_model(n) for n in range(1, 1+self.max_num_qubits)
         ]
 
         # probes

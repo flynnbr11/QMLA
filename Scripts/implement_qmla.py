@@ -271,7 +271,7 @@ elif (
             output_prefix +
             'results_' +
             str("m{}_q{}.p".format(
-                mid, 
+                int(mid), 
                 qmla_controls.long_id
                 )
             )
