@@ -62,6 +62,7 @@ class ExperimentNVCentreNQubits(
             2: 18,
             'other': 1
         }
+        self.timing_insurance_factor = 2
 
     def get_true_parameters(
         self,
