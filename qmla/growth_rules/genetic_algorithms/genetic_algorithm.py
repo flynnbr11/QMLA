@@ -9,11 +9,15 @@ import time
 import pandas as pd
 import sklearn
 
+sys.path.append("/home/bf16951/QMD")
+import qmla
+
 import qmla.database_framework
 
 class GeneticAlgorithmQMLA():
     def __init__(
         self,
+        genes,
         num_sites,
         true_model=None,
         base_terms=['x', 'y', 'z'],
@@ -27,8 +31,11 @@ class GeneticAlgorithmQMLA():
     ):
         self.num_sites = num_sites
         self.base_terms = base_terms
+        self.genes = list(sorted(genes))
         self.get_base_chromosome()
+        
         if true_model is None: 
+        
             r = random.randint(1, 2**self.num_terms-1)
             r = format(r, '0{}b'.format(self.num_terms))
             self.true_model = self.map_chromosome_to_model(r)
@@ -77,35 +84,13 @@ class GeneticAlgorithmQMLA():
         self.crossover_method = available_crossover_methods[crossover_method]
 
 
+        
     def get_base_chromosome(self):
-        """
-        get empty chromosome with binary
-        position for each possible term
-        within this model type
-
-        Basic: all pairs can be connected operator o on sites i,j:
-        e.g. i=4,j=7,N=9: IIIoIIoII
-        """
-
-        basic_chromosome = []
-        chromosome_description = []
-        for i in range(1, 1 + self.num_sites):
-            for j in range(i + 1, 1 + self.num_sites):
-                for t in self.base_terms:
-                    pair = (int(i), int(j), t)
-                    pair = tuple(pair)
-                    basic_chromosome.append(0)
-                    chromosome_description.append(pair)
-
-        self.chromosome_description = chromosome_description
-        self.chromosome_description_array = np.array(
-            self.chromosome_description)
-        self.basic_chromosome = np.array(basic_chromosome)
-        self.num_terms = len(self.basic_chromosome)
-        # print("Chromosome definition:", self.chromosome_description_array)
-#         binary_combinations = list(itertools.product([0,1], repeat=self.num_terms))
-#         binary_combinations = [list(b) for b in binary_combinations]
-#         self.possible_chromosomes = np.array(binary_combinations)
+        
+        self.num_terms = len(self.genes)
+        self.basic_chromosome = np.array([0]  * self.num_terms)        
+        self.chromosome_description = self.genes
+        self.chromosome_description_array = np.array(self.genes)
 
     def map_chromosome_to_model(
         self,
@@ -114,67 +99,32 @@ class GeneticAlgorithmQMLA():
         if isinstance(chromosome, str):
             chromosome = list(chromosome)
             chromosome = np.array([int(i) for i in chromosome])
-
+        assert \
+            len(chromosome) == self.num_terms, \
+            "Chromosome must be of length {}".format(self.num_terms)
+            
         nonzero_postions = chromosome.nonzero()
         present_terms = list(
             self.chromosome_description_array[nonzero_postions]
         )
-        term_list = []
-        for t in present_terms:
-            i = t[0]
-            j = t[1]
-            o = t[2]
 
-            term = 'pauliSet_{i}J{j}_{o}J{o}_d{N}'.format(
-                i=i,
-                j=j,
-                o=o,
-                N=self.num_sites
-            )
-            term_list.append(term)
-
-        model_string = '+'.join(term_list)
+        model_string = '+'.join(present_terms)
         return model_string
-
+        
     def map_model_to_chromosome(
         self,
         model
     ):
         terms = qmla.database_framework.get_constituent_names_from_name(model)
-        chromosome_locations = []
-        for term in terms:
-            components = term.split('_')
-            try:
-                components.remove('pauliSet')
-            except BaseException:
-                print(
-                    "[GA - map model to chromosome] \
-                    \nCannot remove pauliSet from components:",
-                    components,
-                    "\nModel:", model
-                )
-                raise
-            core_operators = list(sorted(qmla.database_framework.core_operator_dict.keys()))
-            for l in components:
-                if l[0] == 'd':
-                    dim = int(l.replace('d', ''))
-                elif l[0] in core_operators:
-                    operators = l.split('J')
-                else:
-                    sites = l.split('J')
-            # get strings when splitting the list elements
-            sites = [int(s) for s in sites]
-            sites = sorted(sites)
-
-            term_desc = [sites[0], sites[1], operators[0]]
-            term_desc = tuple(term_desc)
-            term_chromosome_location = self.chromosome_description.index(
-                term_desc)
-            chromosome_locations.append(term_chromosome_location)
+        assert \
+            np.all([ t in self.chromosome_description for t in terms]), \
+            "Cannot map some term(s) to any available gene. Terms: {}".format(terms)
+            
+        locs = [ self.chromosome_description.index(t) for t in terms]
         new_chromosome = copy.copy(self.basic_chromosome)
-        new_chromosome[chromosome_locations] = 1
+        new_chromosome[np.array(locs)] = 1
         return new_chromosome
-
+           
     def model_f_score(
         self, 
         model_name
@@ -189,11 +139,11 @@ class GeneticAlgorithmQMLA():
         b = [str(i) for i in c]
         s = ''.join(b)
         if s == '1000000000':
-            self.log_print(
-                [
-                    "Unallowed chromosome string {} for {}".format(b, c)
-                ]
-            )
+            # TODO generaalise
+            # 1 followed by num_terms 0's can be generated and is not permitted
+            self.log_print([
+                "Unallowed chromosome string {} for {}".format(b, c)
+            ])
         return s
 
     def chromosome_f_score(
@@ -233,10 +183,13 @@ class GeneticAlgorithmQMLA():
         new_models = []
         self.initial_number_models = num_models
         self.chromosomes_at_generation[0] = []
+        self.previously_considered_chromosomes = []
 
         while len(new_models) < num_models:
+            # generate random number and 
+            # format as binary string, i.e. chromosome
             r = random.randint(1, 2**self.num_terms-1)
-            r = format(r, '0{}b'.format(self.num_terms))
+            r = format(r, '0{}b'.format(self.num_terms)) 
 
             if (
                 self.chromosome_string(r)
@@ -344,14 +297,8 @@ class GeneticAlgorithmQMLA():
         c1 = np.array(list(selection['chromosome_1']))
         c2 = np.array(list(selection['chromosome_2']))
         x = selection['other_data']['cut']
-        # self.log_print([
-        #     "[Crossover In ] x={} \t {} / {}".format(x, repr(c1), repr(c2))
-        # ])
         tmp = c2[:x].copy()
         c2[:x], c1[:x] = c1[:x], tmp
-        # self.log_print([
-        #     "[Crossover Out] x={} \t {} / {}".format(x, repr(c1), repr(c2))
-        # ])
 
         return c1, c2
 
@@ -465,25 +412,21 @@ class GeneticAlgorithmQMLA():
             )
             if unchanged and self.terminate_early_if_top_model_unchanged:
                 self.best_model_unchanged = True
-                self.log_print(
-                    [
-                        "Setting best_model_unchanged to {}".format(self.best_model_unchanged)
-                    ]
-                )
-            self.log_print(
-                [
-                    "Elite model unchanged in last {} generations: {}. \nCurrently: {} with f-score {}".format(
-                        self.unchanged_elite_num_generations_cutoff, 
-                        self.best_model_unchanged,
-                        self.most_elite_models_by_generation[gen],
-                        self.chromosome_f_score(
-                            self.map_model_to_chromosome(
-                                self.most_elite_models_by_generation[gen]
-                            )
+                self.log_print([
+                    "Setting best_model_unchanged to {}".format(self.best_model_unchanged)
+                ])
+            self.log_print([
+                "Elite model unchanged in last {} generations: {}. \nCurrently: {} with f-score {}".format(
+                    self.unchanged_elite_num_generations_cutoff, 
+                    self.best_model_unchanged,
+                    self.most_elite_models_by_generation[gen],
+                    self.chromosome_f_score(
+                        self.map_model_to_chromosome(
+                            self.most_elite_models_by_generation[gen]
                         )
                     )
-                ]
-            )
+                )
+            ])
         return elite_models
 
     ######################
@@ -514,12 +457,10 @@ class GeneticAlgorithmQMLA():
             reverse=True
         )
         num_models = len(ranked_models)
-        self.log_print(
-            [
-                "Considering truncation for {} models".format(num_models),
-                "ranked models:", ranked_models
-            ]
-        )
+        self.log_print([
+            "Considering truncation for {} models".format(num_models),
+            "ranked models:", ranked_models
+        ])
         truncation_rate = 0.5
         truncation_cutoff = max( int(num_models*truncation_rate), 4) # either consider top half, or top 4 if too small
         truncation_cutoff = min( truncation_cutoff, num_models )
@@ -708,4 +649,22 @@ class GeneticAlgorithmQMLA():
         return new_models
 
 
+class GeneticAlgorithmFullyConnectedLikewisePauliTerms(GeneticAlgorithmQMLA):
+    def __init__(self, num_sites, base_terms=['x', 'y', 'z'], **kwargs):
+                
+        terms = []
+        for i in range(1, 1 + num_sites):
+            for j in range(i + 1, 1 + num_sites):
+                for t in base_terms:
+                    new_term = 'pauliSet_{i}J{j}_{o}J{o}_d{N}'.format(
+                        i= i, j=j, o=t, N=num_sites, 
+                    )
+                    terms.append(new_term)
 
+
+        super().__init__(
+            genes = terms, 
+            num_sites = num_sites, 
+            **kwargs
+        )
+        

@@ -9,8 +9,8 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1  # don't perform QMLA; perform QHL on known correct model
-multiple_qhl=0 # perform QHL for defined list of models.
+qhl_test=0  # don't perform QMLA; perform QHL on known correct model
+multiple_qhl=1 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
 simulate_experiment=0
@@ -44,11 +44,12 @@ bf_all_times=0
 
 
 # growth_rule='SimulatedNVCentre'
-growth_rule='TestSimulatedNVCentre'
+# growth_rule='TestSimulatedNVCentre'
 # growth_rule='IsingGeneticTest'
 # growth_rule='IsingGenetic'
 
-
+growth_rule='ExperimentNVCentreNQubits'
+# growth_rule='NVCentreGenticAlgorithm'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='FermiHubbardLatticeSet'

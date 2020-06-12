@@ -157,7 +157,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # QuTip can handle implicit time dependent likelihoods
 
         self.model_dimension = qmla.database_framework.get_num_qubits(self.model_name)
-        self.inBayesUpdates = False
         if true_oplist is not None and trueparams is None:
             raise(
                 ValueError(
@@ -166,6 +165,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 )
             )
         super(QInferModelQMLA, self).__init__(self._oplist)
+        self.log_print_debug([
+            "true ops:\n", self._true_oplist,
+            "\nsim ops:\n", self._oplist
+        ])
 
         try:
             self.probe_dict = probe_dict
@@ -436,11 +439,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 timing_marker = 'simulator'
                 self.timings[timing_marker]['get_pr0'] += time.time() - t_init
         except:
-            self.log_print(
-                [
-                    "Failed to compute pr0.",
-                ]
-            )
+            self.log_print([
+                "Failed to compute pr0.",
+            ])
+            raise # TODO raise specific error
             sys.exit()
         t_init = time.time()
         likelihood_array = (
@@ -721,18 +723,13 @@ class QInferNVCentreExperiment(QInferModelQMLA):
         particles, 
         **kwargs
     ):
+        self.log_print_debug(["Getting pr0 from experimental dataset."])
         # time = expparams['t']
         if len(times) > 1:
             self.log_print("Multiple times given to experimental true evoluation:", times)
             sys.exit()
 
         time = times[0]
-        # self.log_print(
-        #     [
-        #         'Getting system outcome',
-        #         'time:\n', time
-        #     ]
-        # )
         
         try:
             # If time already exists in experimental data

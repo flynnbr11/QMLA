@@ -959,6 +959,13 @@ class QuantumModelLearningAgent():
             champ = mod_low.model_id
         elif bayes_factor < (1.0 / self.bayes_threshold_lower):
             champ = mod_high.model_id
+        else:
+            champ = None
+            self.log_print([
+                "Neither model sufficiently better to earn point between {}/{}".format(
+                    mod_low.model_id, mod_high.model_id
+                )
+            ])
 
         # Tell growth rule's rating system about this comparison
         # TODO more general fnc to tell GR about this comparison

@@ -19,7 +19,7 @@ import qmla
 
 def run_genetic_algorithm(configuration):
     try:
-        ga = qmla.growth_rules.genetic_algorithm.GeneticAlgorithmQMLA(
+        ga = qmla.growth_rules.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
             num_sites = configuration['number_sites'],
             base_terms = ['z'],
             mutation_method = configuration['mutation_method'], 

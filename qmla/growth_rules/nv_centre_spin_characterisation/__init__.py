@@ -8,3 +8,5 @@ from qmla.growth_rules.nv_centre_spin_characterisation.nv_centre_vary_true_model
 from qmla.growth_rules.nv_centre_spin_characterisation.nv_centre_revivals import * 
 from qmla.growth_rules.nv_centre_spin_characterisation.nv_centre_reduced import * 
 from qmla.growth_rules.nv_centre_spin_characterisation.simulate_large_bath import *
+from qmla.growth_rules.nv_centre_spin_characterisation.genetic_algorithm_nv_centre import *
+from qmla.growth_rules.nv_centre_spin_characterisation.experiment_vary_num_qubits import *

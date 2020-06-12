@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import sys
 import time
 import copy
 import scipy
@@ -204,7 +205,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_log_print=False,
+            debug_log_print=True,
         )
         self.qinfer_updater = qi.SMCUpdater(
             self.qinfer_model,
@@ -354,6 +355,7 @@ class ModelInstanceForLearning():
                 raise NameError("Qinfer update failure")
                 sys.exit()
             except: 
+                import sys
                 self.log_print([  
                     "Failed to update model ({}) {} at update step {}".format(
                         self.model_id, 
@@ -361,6 +363,7 @@ class ModelInstanceForLearning():
                         update_step
                     )
                 ])
+                raise ValueError("Failed to learn model")
                 sys.exit()
 
             # Track learning 
@@ -376,7 +379,9 @@ class ModelInstanceForLearning():
                 break
 
             if update_step == self.num_experiments - 1:
+                self.log_print(["Starting _finalise_learning"])
                 self._finalise_learning()
+                self.log_print(["After finalise learning"])
 
     def _record_experiment_updates(self, update_step):
         r"""Update tracking infrastructure."""
@@ -479,15 +484,20 @@ class ModelInstanceForLearning():
             self.track_param_estimate_v_epoch[term] = self.track_param_means[:, i]
             self.track_param_uncertainty_v_epoch[term] = self.track_param_uncertainties[:, i]
             
-            # Compute the Hamiltonian corresponding to the parameter posterior distribution
-            self.learned_hamiltonian = sum([
-                self.qhl_final_param_estimates[term]
-                * qmla.database_framework.compute(term)
-                for term in self.qhl_final_param_estimates
-            ])
+        # Compute the Hamiltonian corresponding to the parameter posterior distribution
+        self.learned_hamiltonian = sum([
+            self.qhl_final_param_estimates[term]
+            * qmla.database_framework.compute(term)
+            for term in self.qhl_final_param_estimates
+        ])
 
         # Plots for this model
-        self.plot_posterior()
+        # TODO replace excepts prints with warnings
+        self._plot_preliminary_preparation()
+        try:
+            self.plot_posterior()
+        except:
+            self.log_print(["Failed to plot posterior"])
         try:
             self.plot_parameters()
         except:
@@ -503,9 +513,12 @@ class ModelInstanceForLearning():
             )
         except:
             self.log_print(["Failed to plot_heuristic_attributes"])
-            raise
+            # raise
             # pass
-        self._plot_posterior_mesh_pairwise()
+        try:
+            self._plot_posterior_mesh_pairwise()
+        except:
+            self.log_print(["failed to _plot_poster_mesh_pairwise"])
 
     def learned_info_dict(self):
         """
@@ -670,11 +683,7 @@ class ModelInstanceForLearning():
             "Model evaluation ll:", self.evaluation_log_likelihood
         ])
         
-    def plot_posterior(self):
-        if not self.growth_class.plot_posterior_after_learning: 
-            # GR doesn't want this plotted
-            return
-        
+    def _plot_preliminary_preparation(self):
         self.model_learning_plots_directory = os.path.join(
             self.plots_directory, 
             'model_learning'
@@ -690,6 +699,13 @@ class ModelInstanceForLearning():
                 os.makedirs(self.model_learning_plots_directory)
             except:
                 pass # another instance made it at same time
+
+
+    def plot_posterior(self):
+        if not self.growth_class.plot_posterior_after_learning: 
+            # GR doesn't want this plotted
+            # TODO replace by levelled plotting
+            return
 
         bf_posterior = qi.MultivariateNormalDistribution(
             self.qinfer_updater.est_mean(), 
@@ -791,11 +807,6 @@ class ModelInstanceForLearning():
         fig.text(0.04, 0.5, 'Weights', va='center', rotation='vertical')
 
         # save the plot
-        if self.is_true_model:
-            figure_prefix = 'true_'
-        else:
-            figure_prefix = ''
-
         fig.savefig(
             os.path.join(self.model_learning_plots_directory, "{}distributions_{}.png".format(
                 self.plot_prefix, 
@@ -840,7 +851,7 @@ class ModelInstanceForLearning():
         col = 0
         # Parameter estimates
         for term in terms:
-            self.log_print(["Getting ax {},{}".format(row, col)])
+            self.log_print(["Getting ax {},{} for term {}".format(row, col, term)])
             ax = fig.add_subplot(gs[row, col])
             estimates = self.track_param_estimate_v_epoch[term]
             uncertainty = self.track_param_uncertainty_v_epoch[term]
@@ -876,7 +887,13 @@ class ModelInstanceForLearning():
                 true_param = self.true_param_dict[term]
                 ax.axhline(true_param, color='red', ls='--', label='True')
                 
-            ax.set_title(self.growth_class.latex_name(term))
+            try:
+                term_latex = self.growth_class.latex_name(term)
+                ax.set_title(term_latex)
+                self.log_print(["Latex for this term:", term_latex])
+            except:
+                self.log_print(["Failed to get latex name"])
+                raise
             ax.set_ylabel('Parameter')
             ax.set_xlabel('Epoch')
                 
@@ -959,9 +976,7 @@ class ModelInstanceForLearning():
             ax.set_xlabel('Epoch')
             ax.set_ylabel('Time')
             ax.semilogy()
-
         ax.legend()
-
 
         # | system-pr0 - particles-pr0 |
         row = nrows-1

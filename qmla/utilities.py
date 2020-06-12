@@ -110,3 +110,24 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
         cmap(np.linspace(minval, maxval, n)))
     return new_cmap
+
+
+def n_qubit_nv_gali_model(
+    n_qubits, 
+    rotation_terms = ['x', 'y', 'z'], 
+    coupling_terms = ['x', 'y', 'z'], 
+):
+    
+    terms = [
+        'pauliSet_1_{o}_d{N}'.format(o=operator, N=n_qubits)
+        for operator in rotation_terms
+    ]
+    for k in range(2, n_qubits+1):
+        new_terms = [
+            'pauliSet_1J{k}_{o}J{o}_d{N}'.format(k=k, o=operator, N=n_qubits)
+            for operator in coupling_terms
+        ]
+        terms.extend(new_terms)
+    terms = sorted(terms)
+    return '+'.join(terms)
+    

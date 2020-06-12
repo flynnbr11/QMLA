@@ -152,6 +152,7 @@ class RatingSystem():
         # f_score_cmap = plt.cm.get_cmap('Blues')
         # f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.25, 1.0)
         f_score_cmap = plt.cm.get_cmap('tab20c_r')
+        f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.6, 1.0)
 
 
 

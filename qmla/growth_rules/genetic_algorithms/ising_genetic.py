@@ -53,7 +53,7 @@ class IsingGenetic(
         self.true_param_cov_mtx_widen_factor = 1
 
         self.mutation_probability = 0.25
-        self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
+        self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
             num_sites=self.num_sites,
             true_model = self.true_model,
             base_terms=self.base_terms,
@@ -143,9 +143,7 @@ class IsingGeneticTest(
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
         ]
         self.initial_models = list(np.random.choice(test_fitness_models, 10, replace=False))
-
-        # self.initial_models = self.genetic_algorithm.random_initial_models(11)
-        # self.log_print([len(self.initial_models), " initial models:", self.initial_models])
+        # self.initial_models = self.genetic_algorithm.random_initial_models(10)
 
         if self.true_model not in self.initial_models:
             rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
@@ -156,7 +154,7 @@ class IsingGeneticTest(
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = True
         self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth = 3
+        self.max_spawn_depth = 5
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)

@@ -32,6 +32,10 @@ growth_classes = {
         GR.SimulatedNVCentre,
     'TestSimulatedNVCentre' : 
         GR.TestSimulatedNVCentre,
+    'NVCentreGenticAlgorithm' :
+        GR.NVCentreGenticAlgorithm, 
+    'ExperimentNVCentreNQubits' : 
+        GR.ExperimentNVCentreNQubits,
 
     # Theoretical paper growth rules
     'IsingPredetermined':

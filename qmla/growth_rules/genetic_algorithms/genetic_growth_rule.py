@@ -91,7 +91,7 @@ class Genetic(
 
         self.mutation_probability = 0.1
 
-        self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
+        self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
             num_sites=self.num_sites,
             true_model = self.true_model,
             base_terms=self.base_terms,
@@ -528,8 +528,6 @@ class Genetic(
                 "Could not compute f score for chromosome list: {}".format(chromosomes)
             ])
             pass
-        
-
 
     def check_tree_completed(
         self,
