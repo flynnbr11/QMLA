@@ -45,7 +45,7 @@ parser.add_argument(
     default=0
 )
 parser.add_argument(
-    '-bt', '--num_times_bayes',
+    '-bt', '--num_experiments_for_bayes_updates',
     help='Number of times to consider in Bayes function.',
     type=int,
     default=0

@@ -120,7 +120,7 @@ class ControlsQMLA():
         self.use_rq = bool(arguments.use_rq)
         self.num_experiments = arguments.num_experiments
         self.num_particles = arguments.num_particles
-        self.num_times_bayes = arguments.num_times_bayes
+        self.fraction_experiments_for_bf = self.growth_class.fraction_experiments_for_bf
         self.bayes_lower = arguments.bayes_lower # TODO put inside growth rule
         self.bayes_upper = arguments.bayes_upper
         self.save_plots = bool(arguments.save_plots)
@@ -239,7 +239,7 @@ def parse_cmd_line_args(args):
         default=20
     )
     parser.add_argument(
-        '-bt', '--num_times_bayes',
+        '-bt', '--num_experiments_for_bayes_updates',
         help='Number of times to consider in Bayes function.',
         type=int,
         default=5

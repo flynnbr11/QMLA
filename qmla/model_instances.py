@@ -322,22 +322,15 @@ class ModelInstanceForLearning():
             self.track_experimental_times.append(new_experiment['t'])
 
             # Run (or simulate) the experiment
-            self.log_print(["Simulating experiment"])
             datum_from_experiment = self.qinfer_model.simulate_experiment(
                 self.model_terms_parameters, # this doesn't actually matter - likelihood overwrites this for true system
                 new_experiment,
                 repeat=1
             ) 
-            self.log_print(["Datum:", datum_from_experiment])
+            # self.log_print(["Datum:", datum_from_experiment])
 
             # Call updater to update distribution based on datum
             try:
-
-                # self.log_print([
-                #     # debug
-                #     "Current param distribution mean\n", self.qinfer_updater.est_mean(),
-                #     "\n uncertainty:\n", np.sqrt(np.diag(self.qinfer_updater.est_covariance_mtx()))
-                # ])
                 time_init = time.time()
                 self.qinfer_updater.update(
                     datum_from_experiment,

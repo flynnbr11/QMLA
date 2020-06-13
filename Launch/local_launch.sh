@@ -19,8 +19,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-exp=10
-prt=50
+exp=50
+prt=200
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -45,10 +45,10 @@ bf_all_times=0
 
 # growth_rule='SimulatedNVCentre'
 # growth_rule='TestSimulatedNVCentre'
-# growth_rule='IsingGeneticTest'
+growth_rule='IsingGeneticTest'
 # growth_rule='IsingGenetic'
+# growth_rule='ExperimentNVCentreNQubits'
 
-growth_rule='ExperimentNVCentreNQubits'
 # growth_rule='NVCentreGenticAlgorithm'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'

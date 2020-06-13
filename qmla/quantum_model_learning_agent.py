@@ -245,7 +245,14 @@ class QuantumModelLearningAgent():
         # Learning parameters, used by QInfer updates
         self.num_particles = self.qmla_controls.num_particles
         self.num_experiments = self.qmla_controls.num_experiments
-        self.num_experiments_for_bayes_updates = self.qmla_controls.num_times_bayes
+        self.fraction_experiments_for_bf = self.qmla_controls.fraction_experiments_for_bf
+        self.num_experiments_for_bayes_updates = int(max(
+            self.num_experiments * self.fraction_experiments_for_bf, 
+            5
+        ))
+        if self.num_experiments_for_bayes_updates > self.num_experiments:
+            self.num_experiments_for_bayes_updates = 'all'
+
         self.bayes_threshold_lower = self.qmla_controls.bayes_lower
         self.bayes_threshold_upper = self.qmla_controls.bayes_upper
         self.qinfer_resample_threshold = self.qmla_controls.resample_threshold

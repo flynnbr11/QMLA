@@ -68,7 +68,8 @@ class IsingGenetic(
 
         self.num_possible_models = 2**len(self.true_chromosome)
 
-        self.fraction_particles_for_bf = 1
+        self.fraction_particles_for_bf = 0.25
+        self.fraction_experiments_for_bf = 0.5
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
         self.fitness_method =  'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' # 'elo_ratings' 
@@ -83,7 +84,7 @@ class IsingGenetic(
         # if self.true_model not in self.initial_models:
         #     self.initial_models[-1] = self.true_model
 
-        self.tree_completed_initially = False
+        self.tree_completed_initially = True
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth),
             'other': 0

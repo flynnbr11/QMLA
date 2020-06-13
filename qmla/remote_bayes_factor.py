@@ -83,7 +83,8 @@ def remote_bayes_factor_calculation(
             log_file = log_file, 
             log_identifier = 'BF ({}/{})'.format(model_a_id, model_b_id)
         )
-    log_print(["Start. Branch", branch_id])
+    log_print(["BF Start on branch", branch_id])
+    log_print(["num experiments to use for BF=", num_times_to_use])
     time_start = time.time()
 
     # Access databases

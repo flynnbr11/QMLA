@@ -255,10 +255,6 @@ class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
             corresponding_expparam = self._model.modelparam_names[i]
             eps[corresponding_expparam] = p
 
-        self.log_print([
-            "Particle x={}".format(particle),
-            "Experiment:", eps
-        ])
         return eps
 
 class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
