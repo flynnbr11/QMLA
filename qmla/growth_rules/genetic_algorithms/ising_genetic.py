@@ -68,8 +68,6 @@ class IsingGenetic(
 
         self.num_possible_models = 2**len(self.true_chromosome)
 
-        self.fraction_particles_for_bf = 0.25
-        self.fraction_experiments_for_bf = 0.5
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
         self.fitness_method =  'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' # 'elo_ratings' 
@@ -153,9 +151,11 @@ class IsingGeneticTest(
         # test F map for random set of 10 models
 
         self.branch_comparison_strategy = 'optimal_graph'
-        self.tree_completed_initially = True
+        self.tree_completed_initially = False
+        self.fraction_particles_for_bf = 0.25
+        self.fraction_experiments_for_bf = 0.5
         self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth = 5
+        self.max_spawn_depth = 3
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
@@ -164,7 +164,7 @@ class IsingGeneticTest(
             'other': 0
         }
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 1
+        self.timing_insurance_factor = 0.5
         self.max_time_to_consider = 20 
         self.min_param = 0.4
         self.max_param = 0.6
