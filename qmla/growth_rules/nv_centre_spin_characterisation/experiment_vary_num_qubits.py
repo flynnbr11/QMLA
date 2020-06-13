@@ -61,7 +61,6 @@ class ExperimentNVCentreNQubits(
 
         self.max_num_models_by_shape = {
             1: 0,
-            2: 18,
             'other': 1
         }
 
