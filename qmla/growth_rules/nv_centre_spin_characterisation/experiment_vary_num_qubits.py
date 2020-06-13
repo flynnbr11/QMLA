@@ -64,7 +64,10 @@ class ExperimentNVCentreNQubits(
             2: 18,
             'other': 1
         }
+
+        # logistics
         self.timing_insurance_factor = 2
+        self.num_processes_to_parallelise_over = 6
 
     def get_true_parameters(
         self,
