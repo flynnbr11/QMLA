@@ -205,7 +205,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_log_print=True,
+            debug_log_print=False,
         )
         self.qinfer_updater = qi.SMCUpdater(
             self.qinfer_model,
@@ -690,9 +690,9 @@ class ModelInstanceForLearning():
         )
         self.plot_prefix =''
         if self.is_true_model:
-            self.plot_prefix = ''
+            # self.plot_prefix = ''
             # TODO turn back on when not in dev
-            # self.plot_prefix = 'true_'
+            self.plot_prefix = 'true_'
 
         if not os.path.exists(self.model_learning_plots_directory): 
             try:

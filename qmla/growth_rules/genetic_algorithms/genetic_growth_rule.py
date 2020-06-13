@@ -48,10 +48,6 @@ class Genetic(
         # self.true_model = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
         # self.true_model = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
         # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
-        # self.ratings_class = qmla.growth_rules.rating_system.ELORating(
-        #     initial_rating=1500,
-        #     k_const=30
-        # ) # for use when ranking/rating models
         self.ratings_class = qmla.growth_rules.rating_system.ModifiedEloRating(
             initial_rating=1000,
             k_const=30

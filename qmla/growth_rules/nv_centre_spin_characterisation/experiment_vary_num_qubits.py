@@ -30,11 +30,11 @@ class ExperimentNVCentreNQubits(
         self.max_num_qubits = 5
 
         self.true_model = qmla.database_framework.alph(self.true_model) 
-        self.initial_models = ['pauliSet_1_x_d1', 'pauliSet_1_y_d1', 'pauliSet_1_z_d1']
-        self.qhl_models = [
+        self.initial_models = [
             qmla.utilities.n_qubit_nv_gali_model(n) 
             for n in range(2, 1+self.max_num_qubits)
         ]
+        self.qhl_models = self.initial_models
 
         # probes
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
@@ -53,6 +53,7 @@ class ExperimentNVCentreNQubits(
         # Tree
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
+        self.tree_completed_initially = True
 
         # parameter learning
         self.gaussian_prior_means_and_widths = {

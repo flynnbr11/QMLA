@@ -406,7 +406,8 @@ class BranchQMLA():
             "Branch processing results for the N={} time".format(
                 self.result_counter
             ),
-            "pair list:", pair_list
+            "pair list:", pair_list,
+            "\n Selectiong strategy:", self.growth_class.branch_champion_selection_stratgey
         ])
 
         if self.result_counter == 1:
@@ -438,6 +439,7 @@ class BranchQMLA():
 
         # Use growth rule's reasoning to decide if a champion can be set
         if self.growth_class.branch_champion_selection_stratgey == 'number_comparison_wins':
+            self.log_print(["Choosing champion from number of wins on branch."])
             max_points = max(models_points.values())
             models_with_max_points = [
                 key for key, val in models_points.items()

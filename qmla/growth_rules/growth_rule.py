@@ -68,8 +68,8 @@ class GrowthRule():
         self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
         self.probe_noise_level = 1e-5
         self.fraction_particles_for_bf = 1.0 # testing whether reduced num particles for BF can work 
-        self.ratings_class = qmla.growth_rules.rating_system.ELORating(
-            initial_rating=1500,
+        self.ratings_class = qmla.growth_rules.rating_system.ModifiedEloRating(
+            initial_rating=1000,
             k_const=30
         ) # for use when ranking/rating models
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
@@ -80,7 +80,7 @@ class GrowthRule():
         self.spawn_step = 0
         self.prune_step = 0 
         self.model_branches = {}
-        self.branch_champion_selection_stratgey = 'number_comarison_wins' 
+        self.branch_champion_selection_stratgey = 'number_comparison_wins' 
         self.champion_determined = False
         self.growth_rule_specific_data_to_store = {}
         self.storage = qmla.utilities.StorageUnit()
