@@ -419,7 +419,7 @@ class BranchQMLA():
             }
         else:
             self.log_print([
-                "Reconsidering branch {} champion".format(self.branch_id)
+                "Reconsidering branch {} champion with pairs {}".format(self.branch_id, pair_list)
             ])
     
         # inspect the pairwise comparisons; 
