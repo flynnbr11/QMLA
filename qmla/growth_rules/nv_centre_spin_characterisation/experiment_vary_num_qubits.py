@@ -31,7 +31,7 @@ class ExperimentNVCentreNQubits(
 
         self.true_model = qmla.database_framework.alph(self.true_model) 
         self.initial_models = [
-            qmla.utilities.n_qubit_nv_gali_model(n) 
+            qmla.utilities.n_qubit_nv_gali_model(n, coupling_terms=['z']) 
             for n in range(2, 1+self.max_num_qubits)
         ]
         self.qhl_models = self.initial_models

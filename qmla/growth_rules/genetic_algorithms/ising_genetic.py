@@ -144,9 +144,9 @@ class IsingGeneticTest(
         # self.initial_models = list(np.random.choice(test_fitness_models, 10, replace=False))
         self.initial_models = self.genetic_algorithm.random_initial_models(10)
 
-        if self.true_model not in self.initial_models:
-            rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
-            self.initial_models[rand_idx] = self.true_model
+        # if self.true_model not in self.initial_models:
+        #     rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
+        #     self.initial_models[rand_idx] = self.true_model
 
         # test F map for random set of 10 models
 
