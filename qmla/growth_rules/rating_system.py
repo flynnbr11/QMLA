@@ -34,6 +34,7 @@ class RatingSystem():
         if model_id in self.models.keys():
             print("Model already present; not adding.")
             return
+        print("Adding {} with starting rating {}".format(model_id, initial_rating))
         if initial_rating is None:
             initial_rating = self.initial_rating
         new_model = RateableModel(
@@ -42,15 +43,15 @@ class RatingSystem():
             generation_born = generation_born
         )
         self.models[model_id] = new_model
-        latest = pd.Series({
-            'model_id' : new_model.model_id, 
-            'generation' : generation_born,
-            'rating' : new_model.rating,
-            'idx' : 0
-        })
-        self.all_ratings = self.all_ratings.append(
-            latest, ignore_index=True
-        )
+        # latest = pd.Series({
+        #     'model_id' : new_model.model_id, 
+        #     'generation' : generation_born,
+        #     'rating' : new_model.rating,
+        #     'idx' : 0
+        # })
+        # self.all_ratings = self.all_ratings.append(
+        #     latest, ignore_index=True
+        # )
 
         
     def get_ratings(
@@ -84,6 +85,49 @@ class RatingSystem():
         model_pairs_bayes_factors,
         spawn_step=0,
     ):
+        print("Ratings batch update for spawn step ", spawn_step)
+        models = list(set(qmla.utilities.flatten(list(model_pairs_bayes_factors.keys()))))
+        models_already_present = list(
+            set(models).intersection(self.models)
+        )
+        print("rating df models:", self.models)
+        print("Models:", models, "\n already present:",models_already_present)
+        try:
+            ratings = self.get_ratings(model_list=models_already_present)
+            ratings = list(sorted( ratings.values() ))
+            print("Ratings of present models", ratings)
+            min_rating = ratings[1] # take the 2nd highest rating # TODO generalise
+        except:
+            min_rating = self.initial_rating
+
+        for model in models:
+            # add model to ratings database, 
+            # starting with rating of worst model already present
+            self.add_ranking_model(
+                model_id = model, 
+                initial_rating = min_rating
+            )
+
+        for model_id in models:
+            # update ratings df for plotting so 
+            # start of next generation is end of previous one
+            # new_idx = len(
+            #     self.all_ratings[ (self.all_ratings.model_id == model_id) 
+            #     & (self.all_ratings.generation == spawn_step)]
+            # )
+            latest = pd.Series(
+                {
+                    'model_id' : model_id, 
+                    'generation' : spawn_step,
+                    'rating' : self.models[model_id].rating,
+                    'idx' : 0                    
+                }
+            )
+            self.all_ratings = self.all_ratings.append(
+                latest, ignore_index=True
+            )
+
+
         pairs = list(model_pairs_bayes_factors.keys())
         for a, b in pairs:
             self.compute_new_ratings(
