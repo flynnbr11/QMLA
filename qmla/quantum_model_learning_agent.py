@@ -1726,7 +1726,7 @@ class QuantumModelLearningAgent():
 
         # Get expectation values of this model
         n_qubits = database_framework.get_num_qubits(model_name)
-        if n_qubits > 3:
+        if n_qubits > 5:
             expec_val_plot_times = self.times_to_plot_reduced_set
         else:
             expec_val_plot_times = self.times_to_plot
