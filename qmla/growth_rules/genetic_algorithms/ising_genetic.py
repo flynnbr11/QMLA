@@ -155,7 +155,7 @@ class IsingGeneticTest(
         self.fraction_particles_for_bf = 1
         self.fraction_experiments_for_bf = 1
         self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth = 4
+        self.max_spawn_depth = 3
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
@@ -164,7 +164,7 @@ class IsingGeneticTest(
             'other': 0
         }
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 1.5
+        self.timing_insurance_factor = 0.75
         self.max_time_to_consider = 20 
         self.min_param = 0.4
         self.max_param = 0.6
