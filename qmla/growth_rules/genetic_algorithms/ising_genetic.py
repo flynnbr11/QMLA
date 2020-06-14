@@ -152,10 +152,10 @@ class IsingGeneticTest(
 
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = False
-        self.fraction_particles_for_bf = 0.5
+        self.fraction_particles_for_bf = 0.25
         self.fraction_experiments_for_bf = 0.5
         self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth = 3
+        self.max_spawn_depth = 8
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
@@ -164,7 +164,7 @@ class IsingGeneticTest(
             'other': 0
         }
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 0.35
+        self.timing_insurance_factor = 0.5
         self.max_time_to_consider = 20 
         self.min_param = 0.4
         self.max_param = 0.6
