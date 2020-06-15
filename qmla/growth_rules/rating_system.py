@@ -95,7 +95,7 @@ class RatingSystem():
         print("Models:", models, "\n already present:",models_already_present)
         try:
             ratings = self.get_ratings(model_list=models_already_present)
-            ratings = list(sorted( ratings.values() ))
+            ratings = list(sorted( ratings.values(), reverse=True ))
             print("Ratings of present models", ratings)
             min_rating = ratings[1] # take the 2nd highest rating # TODO generalise
         except:
