@@ -105,7 +105,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.true_param_dict = true_param_dict 
         self.store_likelihoods = {'system' : {}, 'simulator' : {}}
         self.store_p0_diffs = []
-        self.iqle_mode = True
+        self.iqle_mode = False
         self.debug_log_print = debug_log_print
         # get true_hamiltonian from true_param dict
         true_ham = None
