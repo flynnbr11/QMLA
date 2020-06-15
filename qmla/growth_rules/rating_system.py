@@ -8,6 +8,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
+import matplotlib
 
 import qmla.utilities
 
@@ -196,7 +197,9 @@ class RatingSystem():
         # f_score_cmap = plt.cm.get_cmap('Blues')
         # f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.25, 1.0)
         # f_score_cmap = plt.cm.get_cmap('tab20c_r')
-        f_score_cmap = plt.cm.get_cmap('Accent')
+        # f_score_cmap = plt.cm.get_cmap('Accent')
+        f_score_cmap = matplotlib.colors.ListedColormap(["red", "darkorange", "sienna", "gold", "blue"])
+
         # f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.6, 1.0)
 
 
