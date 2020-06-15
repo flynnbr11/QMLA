@@ -9,6 +9,7 @@ import time
 
 import pandas as pd
 import sklearn
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import seaborn as sns
@@ -596,6 +597,13 @@ class Genetic(
                 'ratings.png'.format(qmla_id)
             )
         )
+        self.plot_gene_pool(
+            save_to_file = os.path.join(
+                save_directory, 
+                'gene_pool.png'
+            )
+        )
+
 
         self.ratings_class.plot_models_ratings_against_generation(
             f_scores = self.model_f_scores, 
@@ -796,6 +804,72 @@ class Genetic(
         # bplot.set_ylim((0,1))
         ax.set_xlim((-0.05,1.05))
         ax.figure.savefig(save_to_file)
+
+    def plot_gene_pool(self, save_to_file):
+        ga = self.genetic_algorithm
+
+        plt.clf()
+        fig, axes = plt.subplots(
+            figsize=(10, 8),
+            constrained_layout=True, 
+        )
+
+        gs = GridSpec(
+            nrows = 2,
+            ncols = 1,
+            height_ratios=[7, 1]
+        )
+        label_fontsize = 10
+        # TODO get f score cmap from growth rule
+        f_score_cmap = matplotlib.colors.ListedColormap(["sienna", "red", "darkorange", "gold", "blue"])
+
+        # Bar plots for probability of gene being selected, coloured by f score
+        ax = fig.add_subplot(gs[0,0])
+
+        generations = list(sorted(ga.gene_pool.generation.unique()))
+        probability_grouped_by_f_by_generation = {
+            g : 
+                {
+                    f : ga.gene_pool[ 
+                        (ga.gene_pool.f_score == f)
+                        & (ga.gene_pool.generation == g)
+                    ].probability.sum()
+                for f in ga.gene_pool.f_score.unique() 
+                }
+            for g in generations
+        }
+        probability_grouped_by_f_by_generation = pd.DataFrame(probability_grouped_by_f_by_generation).T
+
+        sorted_f_scores = list(sorted(ga.gene_pool.f_score.unique()))
+        below = [0]*len(generations)
+        for f in sorted_f_scores[:]:
+            probs_this_f = list(probability_grouped_by_f_by_generation[f])
+            ax.bar(
+                generations,
+                probs_this_f,
+                color = f_score_cmap(f),
+                bottom = below,
+                edgecolor=['black']*len(generations)
+            )
+
+            below = [b+p for b,p in zip(below,probs_this_f)]
+        ax.set_xticks(generations)
+        ax.set_ylabel('Probability', fontsize=label_fontsize)
+        ax.set_xlabel('Generation', fontsize=label_fontsize)
+        ax.set_title('Gene pool', fontsize=label_fontsize)
+
+        # Colour bar
+        ax = fig.add_subplot(gs[1,0])
+        sm = plt.cm.ScalarMappable(
+            cmap = f_score_cmap, 
+            norm=plt.Normalize(vmin=0, vmax=1)
+        )
+        sm.set_array(np.linspace(0, 1, 100))
+        plt.colorbar(sm, cax=ax, orientation='horizontal')
+        ax.set_xlabel('F-score',  fontsize=label_fontsize)
+
+        # Save figure
+        fig.savefig(save_to_file)
 
 
 class GeneticTest(

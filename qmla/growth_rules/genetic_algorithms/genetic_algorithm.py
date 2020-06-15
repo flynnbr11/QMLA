@@ -63,6 +63,17 @@ class GeneticAlgorithmQMLA():
         self.terminate_early_if_top_model_unchanged = True
         self.best_model_unchanged = False
         self.unchanged_elite_num_generations_cutoff = unchanged_elite_num_generations_cutoff
+        self.birth_register = pd.DataFrame(
+            columns=[
+                'child', 'chromosome_child', 
+                'parent_a', 'parent_b', 
+                'chromosome_parent_a', 'chromosome_parent_b', 
+                'generation'
+            ]
+        )
+        self.gene_pool = pd.DataFrame(columns=[
+            'model', 'chromosome', 'f_score', 'probability', 'generation'
+        ])
 
         # specifying which functionality to use
         self.selection_method = self.select_from_pair_df_remove_selected
@@ -244,10 +255,11 @@ class GeneticAlgorithmQMLA():
             p = pair_probs
         )
         selected_entry = self.chrom_pair_df.loc[selected_id]
+        # Drop so it can't be chosen again
         self.chrom_pair_df = self.chrom_pair_df.drop(selected_id)
         selection = {
             'chromosome_1' : selected_entry['c1'], 
-            'chromosome_2' : selected_entry['c2'], 
+            'chromosome_2' : selected_entry['c2'],
             'other_data' : { 
                 'cut' : int(selected_entry['cut1']),
                 'force_mutation' : bool(selected_entry['force_mutation'])
@@ -498,6 +510,21 @@ class GeneticAlgorithmQMLA():
             "Setting up chromosome pair dataframe with initial probabilities", 
             chromosome_probabilities
         ])
+
+        # Register gene pool
+        for c in chromosome_probabilities:
+            model = self.map_chromosome_to_model(c)
+            gene_probability = pd.Series({
+                'model' : model, 
+                'chromosome' : c, 
+                'f_score' : self.model_f_score(model), 
+                'probability' : chromosome_probabilities[c],
+                'generation' : self.genetic_generation
+            })
+            self.gene_pool.loc[len(self.gene_pool)] = gene_probability
+
+        # Construct df of pairs of chromosomes from the gene pool, where the probability of that 
+        # pair being selected is the product of their individual fitnesses
         self.chrom_pair_df = pd.DataFrame(
             columns = ['c1', 'c2', 'probability', 'cut1', 'c1_prob', 'c2_prob', 'force_mutation'] 
         )
@@ -507,6 +534,8 @@ class GeneticAlgorithmQMLA():
         for c1,c2 in chromosome_combinations:
             pair_prob = chromosome_probabilities[c1] * chromosome_probabilities[c2] # TODO better way to get pair prob?
             for cut1 in range(1, len(c1)-2):
+                # every possible cut down these two chromosomes is equally probable of being selected
+                # therefore the same pair can be selected twice with different cuts
                 this_pair_df = pd.DataFrame(
                     np.array([
                         [
@@ -539,6 +568,7 @@ class GeneticAlgorithmQMLA():
         model_fitnesses,
         **kwargs
     ):
+        self.genetic_generation += 1
         self.fitness_at_generation[self.genetic_generation] = model_fitnesses
         self.models_ranked_by_fitness[self.genetic_generation] = sorted(
             model_fitnesses,
@@ -596,8 +626,19 @@ class GeneticAlgorithmQMLA():
                         "num proposed chromosome now: {} of {}".format(
                             len(proposed_chromosomes),
                             num_models_for_next_generation
-                        )
+                        ),
+                        "Selection:", selection
                     ])
+                    birth = pd.Series({
+                        'child' : self.map_chromosome_to_model(c), 
+                        'chromosome_child' : c, 
+                        'chromosome_parent_a' : selection['chromosome_1'], 
+                        'chromosome_parent_b' : selection['chromosome_2'], 
+                        'parent_a' : self.map_chromosome_to_model( selection['chromosome_1']),
+                        'parent_b' : self.map_chromosome_to_model( selection['chromosome_2']),
+                        'generation' : self.genetic_generation,
+                    })
+                    self.birth_register.loc[len(self.birth_register)] = birth
 
             if len(self.chrom_pair_df) == 0 :
                 # already tried every available pair 
@@ -610,13 +651,6 @@ class GeneticAlgorithmQMLA():
                     force_mutation=True
                     # force_mutation=num_genes_to_force_mutate
                 )
-            # else: 
-            #     num_loops_to_find_new_chromosome += 1
-            #     if num_loops_to_find_new_chromosome > 15:
-            #         force_mutation = True
-            #         self.log_print([
-            #             "Forcing mutation bc num loops to find new chromosome above limit of 15"
-            #         ])
 
         # chop extra chromosomes if generated
         proposed_chromosomes = proposed_chromosomes[:num_models_for_next_generation]
@@ -631,7 +665,7 @@ class GeneticAlgorithmQMLA():
             self.chromosome_string(r) for r in proposed_chromosomes
             ]
         )
-        self.genetic_generation += 1
+        
         # self.delta_f_by_generation[self.genetic_generation] = delta_f_score
         self.chromosomes_at_generation[self.genetic_generation] = [
             self.chromosome_string(r) for r in proposed_chromosomes

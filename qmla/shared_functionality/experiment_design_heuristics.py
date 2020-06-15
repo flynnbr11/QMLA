@@ -457,8 +457,6 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
             (self.track_param_uncertainties, param_uncertainties) 
         )
         
-        
-        
         if self.selection_criteria.startswith('hard_code'):
             if self.selection_criteria== 'hard_code_6_9_magnitudes':
                 if self.call_counter > self._num_exp_to_switch_magnitude:
@@ -806,3 +804,38 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
                 ax.axvline(
                     e, ls='--', color='green', alpha=0.5
                 )
+
+
+class FixedNineEighthsToPowerK(BaseHeuristicQMLA):
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        self._k = -25
+
+    def design_experiment(
+        self,
+        epoch_id=0,
+        **kwargs
+    ):
+        if epoch_id %5 == 0:
+            self._k += 1
+        new_time = (9/8)**self._k
+
+        eps = self._get_exp_params_array()
+        eps['t'] = new_time
+
+        # get sample from x
+
+        particle = self._updater.sample()
+        n_params = particle.shape[1]
+
+        for i in range(n_params):
+            p = particle[0][i]            
+            corresponding_expparam = self._model.modelparam_names[i]
+            eps[corresponding_expparam] = p
+
+        return eps
+
+

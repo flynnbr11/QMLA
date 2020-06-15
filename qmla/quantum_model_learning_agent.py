@@ -190,12 +190,16 @@ class QuantumModelLearningAgent():
 
         # TODO most of this can probably go inside run_complete_qmla
         # Infrastructure
-        self.model_database = pd.DataFrame({
-            'model_id': [],
-            'model_name': [],
-            'branch_id': [],
-            'model_storage_instance': [],
-        })
+        self.model_database = pd.DataFrame(
+            {
+                'model_id' : [],
+                'model_name' : [],
+                'latex_name' : [], 
+                'branch_id' : [],
+                'f_score' : [], 
+                'model_storage_instance' : [],
+            }
+        )
         self.model_lists = {
             # assumes maxmium 13 qubit-models considered
             # to be checked when checking model_lists
@@ -1449,6 +1453,10 @@ class QuantumModelLearningAgent():
         branch_id = int(self.branch_highest_id) + 1
         self.branch_highest_id = branch_id
 
+        if growth_rule is None:
+            growth_rule = self.growth_rule_of_true_model
+        growth_tree = self.trees[growth_rule]
+
         this_branch_models = {}
         model_id_list = []
         pre_computed_models = []
@@ -1457,7 +1465,8 @@ class QuantumModelLearningAgent():
             # if false, that's because it's already been computed
             add_model_info = self.add_model_to_database(
                 model,
-                branch_id=branch_id
+                branch_id=branch_id,
+                growth_tree=growth_tree,
             )
             already_computed = not(
                 add_model_info['is_new_model']
@@ -1481,9 +1490,6 @@ class QuantumModelLearningAgent():
         }
 
         # Start new branch on corresponding growth rule tree
-        if growth_rule is None:
-            growth_rule = self.growth_rule_of_true_model
-        growth_tree = self.trees[growth_rule]
 
         if pairs_to_compare_by_names is not None:
             if pairs_to_compare_by_names == 'all':
@@ -1516,6 +1522,7 @@ class QuantumModelLearningAgent():
     def add_model_to_database(
         self,
         model,
+        growth_tree,
         branch_id=-1,
         force_create_model=False
     ):
@@ -1576,10 +1583,18 @@ class QuantumModelLearningAgent():
             )
 
             # add to the model database
+
+            f_score = np.round(self.compute_model_f_score(
+                model_id=model_id,
+                model_name = model_name,
+                growth_class=growth_tree.growth_class
+            ),2)
             running_db_new_row = pd.Series({
                 'model_id': int(model_id),
                 'model_name': model_name,
+                'latex_name' : growth_tree.growth_class.latex_name(model_name),
                 'branch_id': int(branch_id),
+                'f_score' : f_score, 
                 'model_storage_instance': model_storage_instance,
             })
             num_rows = len(self.model_database)
@@ -1644,7 +1659,7 @@ class QuantumModelLearningAgent():
             self.all_bayes_factors[i] = (
                 self.get_model_storage_instance_by_id(i).model_bayes_factors
             )
-            self.compute_model_f_score(i)
+            # self.compute_model_f_score(i)
 
         self.bayes_factors_data()
         self.growth_class.growth_rule_specific_plots(
@@ -1662,6 +1677,15 @@ class QuantumModelLearningAgent():
 
         self.branch_graphs = qmla.analysis.branch_graphs.plot_qmla_branches(
             q = self, return_graphs=True
+        )
+
+        # Store model IDs and names
+        model_data = self.model_database[ 
+            # subset of columns to store
+            [ 'model_id', 'model_name', 'latex_name', 'branch_id', 'f_score'] 
+        ]
+        model_data.to_csv(
+            os.path.join(self.qmla_controls.plots_directory, 'model_directory.csv')
         )
 
 
@@ -2131,9 +2155,9 @@ class QuantumModelLearningAgent():
             )
         ])
         self._update_database_model_info()
-        self.compute_model_f_score(
-            model_id=mod_id
-        )
+        # self.compute_model_f_score(
+        #     model_id=mod_id
+        # )
         self.growth_class.growth_rule_finalise()
         self.get_statistical_metrics()
 
@@ -2219,7 +2243,7 @@ class QuantumModelLearningAgent():
             )
             mod = self.get_model_storage_instance_by_id(mod_id)
             mod.model_update_learned_values()
-            self.compute_model_f_score(model_id=mod_id)
+            # self.compute_model_f_score(model_id=mod_id)
         self.growth_class.growth_rule_finalise()
         self.get_statistical_metrics()
         self.model_id_to_name_map = {}
@@ -2395,6 +2419,8 @@ class QuantumModelLearningAgent():
     def compute_model_f_score(
         self,
         model_id,
+        model_name = None, 
+        growth_class=None,
         beta=1  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
     ):
         r"""
@@ -2405,19 +2431,24 @@ class QuantumModelLearningAgent():
         :return float f_score: F-score of given model.
 
         """
+        # TODO remove calls everywhere except in add_model_to_database
 
         # TODO set precision, f-score etc as model instance attributes and
         # return those in champion_results
         true_set = self.growth_class.true_model_terms
-        growth_class = self.get_model_storage_instance_by_id(
-            model_id).growth_class
+        if growth_class is None:
+            growth_class = self.get_model_storage_instance_by_id(
+                model_id).growth_class
+            model_name = self.model_name_id_map[model_id]
+        self.log_print(["Getting F score for {}".format(model_name)])
         terms = [
             growth_class.latex_name(
                 term
             )
             for term in
             database_framework.get_constituent_names_from_name(
-                self.model_name_id_map[model_id]
+                # self.model_name_id_map[model_id]
+                model_name
             )
         ]
         learned_set = set(sorted(terms))
