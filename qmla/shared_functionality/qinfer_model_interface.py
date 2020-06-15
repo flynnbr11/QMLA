@@ -105,7 +105,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.true_param_dict = true_param_dict 
         self.store_likelihoods = {'system' : {}, 'simulator' : {}}
         self.store_p0_diffs = []
-        self.iqle_mode = False
+        self.iqle_mode = True
         self.debug_log_print = debug_log_print
         # get true_hamiltonian from true_param dict
         true_ham = None
@@ -421,6 +421,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.true_evolution = False
             params = modelparams
 
+        self.log_print_debug([
+            "\n\nLikelihood fnc called. True system -> {}".format(self.true_evolution)
+        ])
+
         try:
             if self.true_evolution:
                 t_init = time.time()
@@ -641,12 +645,12 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     ],
                 )
                 raise
-            if evoId == 0:
-                self.log_print_debug([
-                    "\nHamiltonian:\n", ham,
-                    "\ntimes:", t_list,
-                    "\nH from expparams:", self.ham_from_expparams
-                ])
+            # if evoId == 0:
+            #     self.log_print_debug([
+            #         "\nHamiltonian:\n", ham,
+            #         "\ntimes:", t_list,
+            #         "\nH from expparams:", self.ham_from_expparams
+            #     ])
 
             for tId in range(len(t_list)):
 

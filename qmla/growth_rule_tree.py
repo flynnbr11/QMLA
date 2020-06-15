@@ -498,7 +498,7 @@ class BranchQMLA():
         if self.is_branch_champion_set:
             self.champion_id = int(self.ranked_models[0])
             self.champion_name = self.models[self.champion_id]
-            self.log_print(["Branch {} champion ID: ".format(
+            self.log_print(["Branch {} champion ID: {}".format(
                 self.branch_id, self.champion_id)])
     ##########
     # Section: Utilities

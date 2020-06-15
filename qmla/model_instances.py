@@ -325,9 +325,9 @@ class ModelInstanceForLearning():
             datum_from_experiment = self.qinfer_model.simulate_experiment(
                 self.model_terms_parameters, # this doesn't actually matter - likelihood overwrites this for true system
                 new_experiment,
-                repeat=1
+                repeat=100
             ) 
-            # self.log_print(["Datum:", datum_from_experiment])
+            self.log_print(["Datum:", datum_from_experiment])
 
             # Call updater to update distribution based on datum
             try:
@@ -929,6 +929,11 @@ class ModelInstanceForLearning():
                     c=resample_colour, 
                     alpha = 0.5, 
                 )
+        try:
+            ax.axhline(0.5, label='0.5', ls='--', alpha=0.3, c='grey')
+            ax.axhline(0.1, label='0.1', ls=':', alpha=0.3, c='grey')
+        except:
+            pass
 
         ax.set_title('Volume')
         ax.set_ylabel('Volume')
@@ -991,9 +996,10 @@ class ModelInstanceForLearning():
             alpha = 0.3,
             color='Blue'
         )
-        ax.set_ylim(0,1)        
+        # ax.set_ylim(0,1)        
         ax.set_ylabel("$ \|Pr(0)_{sys} - Pr(0)_{sim} \|  $")
         ax.set_xlabel("Epoch")
+        ax.semilogy()
         # ax.set_yscale('log', basey=10)
 
         # Save figure
