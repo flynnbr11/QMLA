@@ -155,7 +155,7 @@ class IsingGeneticTest(
         self.fraction_particles_for_bf = 1
         self.fraction_experiments_for_bf = 1
         self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth = 2
+        self.max_spawn_depth = 16
         self.iqle_mode = True
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
