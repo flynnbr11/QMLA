@@ -87,6 +87,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         experimental_measurements,
         experimental_measurement_times,
         log_file,
+        comparison_model = False, 
         debug_log_print=False,
         **kwargs
     ):
@@ -150,7 +151,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             raise
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
-        self.iqle_mode = self.growth_class.iqle_mode
+        self.iqle_mode = self.growth_class.iqle_mode 
+        self.comparison_model = comparison_model
         # Required by QInfer: 
         self._min_freq = 0 # what does this do?
         self._solver = 'scipy'
@@ -387,14 +389,13 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # process expparams
         times = expparams['t'] # times to compute likelihood for. typicall only per experiment. 
         expparams_sampled_particle = np.array(
-            [expparams.item(0)[1:]]) # TODO THIS IS DANGEROUS - DONT DO IT OUTSIDE OF TESTS
-            
+            [expparams.item(0)[1:]]) # TODO THIS IS DANGEROUS - DONT DO IT OUTSIDE OF TESTS               
         self.ham_from_expparams = np.tensordot(
             expparams_sampled_particle, 
             self._oplist, 
             axes=1    
         )[0]
-        
+
         num_particles = modelparams.shape[0]
         num_parameters = modelparams.shape[1]
 
@@ -445,8 +446,9 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 self.timings[timing_marker]['get_pr0'] += time.time() - t_init
         except:
             self.log_print([
-                "Failed to compute pr0.",
+                "Failed to compute pr0. Params:\n", params[:5]
             ])
+            self.log_print(["H_ for IQLE:", self.ham_from_expparams[0]])
             raise # TODO raise specific error
             sys.exit()
         t_init = time.time()
@@ -635,6 +637,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 elif self.iqle_mode and not self.true_evolution:
                     # H to compute for IQLE on the simulator
                     ham = ham - self.ham_from_expparams
+                    if np.any(np.isnan(ham)):
+                        self.log_print(["NaN detected in Hamiltonian. Ham from expparams:", self.ham_from_expparams])
 
                 self.timings[timing_marker]['construct_ham'] += time.time()-t_init
             except BaseException:

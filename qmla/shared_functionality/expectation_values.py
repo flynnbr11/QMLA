@@ -57,8 +57,14 @@ def probability_from_default_expectation_value(
 
     :return: probability of measuring the input state after Hamiltonian evolution
     """
-
-    unitary = linalg.expm(-1j * ham * t)
+    try:
+        unitary = linalg.expm(-1j * ham * t)
+    except:
+        log_print(
+            [ "Failed to build unitary for ham:\n {}".format(ham) ],
+            log_file=log_file, log_identifier=log_identifier
+        )
+        raise
     probe_bra = state.conj().T
     u_psi = np.dot(unitary, state)
     expectation_value = np.dot(probe_bra, u_psi) # in general a complex number

@@ -460,17 +460,6 @@ class ModelInstanceForLearning():
             else:
                 true_param = 0
 
-            # TODO bug in how QL is calculated
-            if update_step == 0:
-                self.log_print([
-                    "QL -- Param {} has true value {}".format(
-                        param, true_param
-                    ),
-                    "\n and learened value ", learned_param, 
-                    "\ntrue param dict:", self.true_param_dict,
-                    # "\ntrue params dict:", self.true_params_dict
-                ])
-
             quadratic_loss += (learned_param - true_param)**2
         self.quadratic_losses_record.append(quadratic_loss)
 

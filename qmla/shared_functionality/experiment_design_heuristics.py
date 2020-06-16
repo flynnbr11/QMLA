@@ -202,6 +202,7 @@ class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
         **kwargs
     ):
         super().__init__(**kwargs)
+        self.log_print(["Particle Guess Heuristic"])
 
     def design_experiment(
         self,
@@ -223,27 +224,15 @@ class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
                 {} iterations.".format(self._maxiters)
             )
 
-
-        # h1 = (np.tensordot(x, self._oplist, axes=1))[0]
-        # h2 = (np.tensordot(xp, self._oplist, axes=1))[0]
-        # self.log_print([
-        #     "x={} \tH1=\n{}".format(x, h1),
-        #     "\nx'={} \tH1=\n{}".format(xp, h2)
-        # ])
-        # h_diff = h1 - h2
-        # frob_norm  = np.linalg.norm(h_diff)
-        # new_time = 1 / frob_norm
-        # self.log_print(["h_diff =\n{} \n frob norm={} \t t={}".format(h_diff, frob_norm,new_time)])
         d = self._model.distance(x, xp)
         new_time = 1 / d
 
         eps = self._get_exp_params_array()
-
         eps['t'] = new_time
 
         # get sample from x
-
         particle = self._updater.sample()
+        self.log_print(["Particle for IQLE=", particle])
         n_params = particle.shape[1]
 
         for i in range(n_params):
@@ -264,6 +253,7 @@ class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
         **kwargs
     ):
         super().__init__(**kwargs)
+        self.log_print(["Mixed Particle Guess Heuristic"])
 
         self.max_time_to_enforce = kwargs['max_time_to_enforce']
         self.count_number_high_times_suggested = 0 

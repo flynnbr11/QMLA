@@ -295,6 +295,15 @@ def format_experiment(model, time):
         dtype=gen.expparams_dtype
     )
     exp['t'] = time
+
+    particle = model.qinfer_updater.sample() # generate particle for IQLE 
+    # TODO record all experimental parameters instead of just time
+    n_params = particle.shape[1]
+    for i in range(n_params):
+        p = particle[0][i]            
+        corresponding_expparam = model.qinfer_model.modelparam_names[i]
+        exp[corresponding_expparam] = p
+
     return exp
 
 
