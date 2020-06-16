@@ -251,36 +251,65 @@ class ModelInstanceForLearning():
     ):
         r"""Arrays, dictionaries etc for tracking learning across experiments"""
         self.timings = { 'update_qinfer': 0 } 
-        self.quadratic_losses_record = []
+        # Unused
         self.track_total_log_likelihood = np.array([])
         self.particles = np.array([])
         self.weights = np.array([])
         self.epochs_after_resampling = []
+        self.track_posterior_dist = []
+        
+        # Final results
         self.final_learned_params = np.empty(
             # TODO remove final_leared_params and references to it, 
             # use dictionaries defined here instead.
             [len(self.model_terms_matrices), 2])
-        self.track_param_means = [self.qinfer_updater.est_mean()]
-        self.track_param_uncertainties = [np.sqrt(
-            np.diag(self.qinfer_updater.est_covariance_mtx()))
-        ]
-        self.track_posterior_dist = []
-        self.track_experimental_times = []
         self.qhl_final_param_estimates = {}
         self.qhl_final_param_uncertainties = {}
+
+        # self.true_params_dict = self.growth_class.true_params_dict
+        self.all_params_for_q_loss = list(
+            set(list(self.true_param_dict.keys())).union(self.model_terms_names)
+        )
+        self.param_indices = {
+            op_name : self.model_terms_names.index(op_name)
+            for op_name in self.model_terms_names
+        }
+        # To track at every epoch  
+        self.track_experimental_times = [] 
+
+        self.volume_by_epoch = np.array([])
+        self.track_param_means = []
+        self.track_param_uncertainties = []
+        self.track_norm_cov_matrices = []
         self.track_covariance_matrices = []
-        self.volume_by_epoch = np.array([
-            qi.utils.ellipsoid_volume( invA = self.qinfer_updater.est_covariance_mtx() )
-        ])
-        if self.growth_class.track_quadratic_loss:
-            self.true_params_dict = self.growth_class.true_params_dict # TODO check these are loaded properly by GR
-            self.all_params_for_q_loss = list(
-                set(list(self.true_params_dict.keys())).union(self.model_terms_names)
-            )
-            self.param_indices = {
-                op_name : self.model_terms_names.index(op_name)
-                for op_name in self.model_terms_names
-            }
+        self.quadratic_losses_record = []
+        # Initialise all 
+        self._record_experiment_updates(update_step = 0 )
+
+
+        # self.track_experimental_times = [] 
+
+        # self.volume_by_epoch = np.array([
+        #     qi.utils.ellipsoid_volume( invA = self.qinfer_updater.est_covariance_mtx() )
+        # ])
+        # self.track_param_means = [self.qinfer_updater.est_mean()]
+        # self.track_param_uncertainties = [np.sqrt(
+        #     np.diag(self.qinfer_updater.est_covariance_mtx()))
+        # ]
+        # self.track_norm_cov_matrices = [
+        #     np.linalg.norm(self.qinfer_updater.est_covariance_mtx())
+        # ]
+        # self.track_covariance_matrices = []
+        # self.quadratic_losses_record = [None]
+        # if self.growth_class.track_quadratic_loss:
+        #     self.true_params_dict = self.growth_class.true_params_dict # TODO check these are loaded properly by GR
+        #     self.all_params_for_q_loss = list(
+        #         set(list(self.true_params_dict.keys())).union(self.model_terms_names)
+        #     )
+        #     self.param_indices = {
+        #         op_name : self.model_terms_names.index(op_name)
+        #         for op_name in self.model_terms_names
+        #     }
 
     ##########
     # Section: Model learning
@@ -393,19 +422,22 @@ class ModelInstanceForLearning():
     def _record_experiment_updates(self, update_step):
         r"""Update tracking infrastructure."""
         
+        cov_mt = self.qinfer_updater.est_covariance_mtx()
+        param_estimates = self.qinfer_updater.est_mean()
         # Data used in plots
         self.volume_by_epoch = np.append(
             self.volume_by_epoch,
             qi.utils.ellipsoid_volume(
-                invA = self.qinfer_updater.est_covariance_mtx()
+                invA = cov_mt
             )
         )
-        self.track_param_means.append(self.qinfer_updater.est_mean())
+        self.track_param_means.append(param_estimates)
         self.track_param_uncertainties.append(
             np.sqrt(
-                np.diag(self.qinfer_updater.est_covariance_mtx())
+                np.diag(cov_mt)
             )
         )
+        self.track_norm_cov_matrices.append( np.linalg.norm(cov_mt ))
         if self.qinfer_updater.just_resampled:
             self.epochs_after_resampling.append(update_step)
 
@@ -415,20 +447,32 @@ class ModelInstanceForLearning():
                 self.qinfer_updater.est_covariance_mtx()
             )
 
-        if self.growth_class.track_quadratic_loss:
-            quadratic_loss = 0
-            for param in self.all_params_for_q_loss:
-                if param in self.model_terms_names:
-                    learned_param = self.qinfer_updater.est_mean()[self.param_indices[param]]
-                else:
-                    learned_param = 0
+        # compute quadratic loss
+        quadratic_loss = 0
+        for param in self.all_params_for_q_loss:
+            if param in self.model_terms_names:
+                learned_param = param_estimates[self.param_indices[param]]
+            else:
+                learned_param = 0
 
-                if param in list(self.true_params_dict.keys()):
-                    true_param = self.true_params_dict[param]
-                else:
-                    true_param = 0
-                quadratic_loss += (learned_param - true_param)**2
-            self.quadratic_losses_record.append(quadratic_loss)
+            if param in list(self.true_param_dict.keys()):
+                true_param = self.true_param_dict[param]
+            else:
+                true_param = 0
+
+            # TODO bug in how QL is calculated
+            if update_step == 0:
+                self.log_print([
+                    "QL -- Param {} has true value {}".format(
+                        param, true_param
+                    ),
+                    "\n and learened value ", learned_param, 
+                    "\ntrue param dict:", self.true_param_dict,
+                    # "\ntrue params dict:", self.true_params_dict
+                ])
+
+            quadratic_loss += (learned_param - true_param)**2
+        self.quadratic_losses_record.append(quadratic_loss)
 
 
     def _finalise_learning(self):
@@ -550,6 +594,7 @@ class ModelInstanceForLearning():
         learned_info['raw_volume_list'] = self.volume_by_epoch
         learned_info['track_param_means'] = self.track_param_means
         learned_info['track_covariance_matrices'] = self.track_covariance_matrices
+        learned_info['track_norm_cov_matrices'] = self.track_norm_cov_matrices
         learned_info['track_param_uncertainties'] = self.track_param_uncertainties
         learned_info['track_param_estimate_v_epoch'] = self.track_param_estimate_v_epoch
         learned_info['track_param_uncertainty_v_epoch'] = self.track_param_uncertainty_v_epoch
@@ -949,12 +994,9 @@ class ModelInstanceForLearning():
         ax.set_xlabel('Epoch')
         # ax.semilogy()
         ax.set_yscale('log')
-        ax.legend(loc='upper right')
 
         # Times learned upon
-        row = nrows-2
-        col = 0
-        ax = fig.add_subplot(gs[row, :])
+        time_ax = ax.twinx()
         histogram = False # False -> scatter plot of time v epoch
         times = qmla.utilities.flatten(self.track_experimental_times)
         if histogram:
@@ -974,16 +1016,44 @@ class ModelInstanceForLearning():
             ax.set_ylabel('Frequency learned upon')
             ax.set_xlabel('Time')
         else:
-            ax.scatter(
+            if self.num_experiments > 100:
+                s = 4 # size of time dots
+            else:
+                s = 7
+            time_ax.scatter(
                 range(len(self.track_experimental_times)), 
                 self.track_experimental_times,
                 label=r"$t \sim k \frac{1}{V}$",
-                s=3,
+                s=s,
             )
-            ax.set_xlabel('Epoch')
-            ax.set_ylabel('Time')
-            ax.semilogy()
-        ax.legend()
+            # time_ax.set_xlabel('Epoch')
+            time_ax.set_ylabel('Time')
+            time_ax.semilogy()
+        time_ax.legend(loc='upper right')
+        ax.legend(loc='upper center')
+
+        # Covariance mtx norm and quadratic loss
+        row = nrows-2
+        col = 0
+
+        ax = fig.add_subplot(gs[row, :])
+        ax.plot(
+            range(len(self.track_norm_cov_matrices)), 
+            self.track_norm_cov_matrices,
+            label = "Covariance norm",
+            color='green', ls=':'
+        )
+        ax.semilogy()
+        ax.set_ylabel('Q.L / Norm')
+
+        ax.plot(
+            range(len(self.quadratic_losses_record)),
+            self.quadratic_losses_record,
+            label='Quadratic loss',
+            c = 'orange', ls='--'
+        )
+        # ax.set_ylabel('Quadratic loss')
+        ax.legend(loc='upper right')
 
         # | system-pr0 - particles-pr0 |
         row = nrows-1

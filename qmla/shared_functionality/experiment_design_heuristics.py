@@ -57,10 +57,6 @@ class BaseHeuristicQMLA(qi.Heuristic):
         self._num_experiments = kwargs['num_experiments']
         self._log_file = log_file
 
-        self.log_print([
-            "Op list:", self._oplist
-        ])
-        
         # storage infrastructure
         self._resample_epochs = []
         self._volumes = []
@@ -845,7 +841,7 @@ class RandomTimeUpperBounded(BaseHeuristicQMLA):
         **kwargs
     ):
         super().__init__(**kwargs)
-        self._max_time = 1e-3
+        self._max_time = 1e-2
 
     def design_experiment(
         self,

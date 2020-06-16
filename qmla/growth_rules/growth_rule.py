@@ -110,6 +110,7 @@ class GrowthRule():
         self.check_champion_reducibility = True
         self.learned_param_limit_for_negligibility = 0.05
         self.reduce_champ_bayes_factor_threshold = 1e1
+        self.iqle_mode = False
         self.qinfer_resampler_threshold = 0.5
         self.qinfer_resampler_a = 0.98
         self.hard_fix_resample_effective_sample_size = None

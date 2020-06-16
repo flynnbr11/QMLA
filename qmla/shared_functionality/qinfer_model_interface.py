@@ -105,7 +105,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.true_param_dict = true_param_dict 
         self.store_likelihoods = {'system' : {}, 'simulator' : {}}
         self.store_p0_diffs = []
-        self.iqle_mode = False
         self.debug_log_print = debug_log_print
         # get true_hamiltonian from true_param dict
         true_ham = None
@@ -148,8 +147,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     )
                 ]
             )
+            raise
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
+        self.iqle_mode = self.growth_class.iqle_mode
         # Required by QInfer: 
         self._min_freq = 0 # what does this do?
         self._solver = 'scipy'

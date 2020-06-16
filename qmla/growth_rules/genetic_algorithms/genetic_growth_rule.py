@@ -247,6 +247,7 @@ class Genetic(
                     pd.Series(
                     {
                         'generation' : self.spawn_step,
+                        'model' : mod, 
                         'model_win_ratio' : model_win_ratio[mod], 
                         'model_elo_ratings' : model_elo_ratings[mod], 
                         'original_elo_rating' : original_ratings_by_name[mod],
@@ -604,6 +605,13 @@ class Genetic(
             )
         )
 
+        self.plot_generational_metrics(
+            save_to_file = os.path.join(
+                save_directory, 
+                'generation_progress.png'
+            )
+        )
+
 
         self.ratings_class.plot_models_ratings_against_generation(
             f_scores = self.model_f_scores, 
@@ -870,6 +878,41 @@ class Genetic(
 
         # Save figure
         fig.savefig(save_to_file)
+
+    def plot_generational_metrics(self, save_to_file):
+
+        fig, axes = plt.subplots(figsize=(15, 10), constrained_layout=True)
+        gs = GridSpec(nrows=2, ncols = 1, )
+
+        ax = fig.add_subplot(gs[0,0])
+        sns.boxplot(
+            y = 'f_score', 
+            x = 'generation', 
+            data = self.fitness_by_f_score,
+            ax = ax
+        )
+        ax.set_ylabel('F-score')
+        ax.set_xlabel('Generation')
+        ax.set_title('F score')
+        ax.set_ylim(0,1)
+        ax.legend()
+
+        ax = fig.add_subplot(gs[1,0])
+        sns.boxplot(
+            y = 'log_likelihood', 
+            x = 'generation', 
+            data = self.fitness_by_f_score,
+            ax = ax
+        )
+        ax.set_ylabel('log-likelihood')
+        ax.set_xlabel('Generation')
+        ax.set_title('Evaluation log likeihood')
+        ax.legend()
+
+        # Save figure
+        fig.savefig(save_to_file)
+
+
 
 
 class GeneticTest(
