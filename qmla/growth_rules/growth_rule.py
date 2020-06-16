@@ -112,6 +112,7 @@ class GrowthRule():
         self.reduce_champ_bayes_factor_threshold = 1e1
         self.qinfer_resampler_threshold = 0.5
         self.qinfer_resampler_a = 0.98
+        self.hard_fix_resample_effective_sample_size = None
         self.reallocate_resources = False
         self.track_cov_mtx = False # only sometimes want on for some plots
         self.track_quadratic_loss = False

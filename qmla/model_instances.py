@@ -207,11 +207,25 @@ class ModelInstanceForLearning():
             log_file=self.log_file,
             debug_log_print=False,
         )
+        
+        # get resampler treshold
+        if (
+            self.growth_class.hard_fix_resample_effective_sample_size is not None
+            and self.growth_class.hard_fix_resample_effective_sample_size < self.num_particles
+        ): 
+            resampler_threshold = self.growth_class.hard_fix_resample_effective_sample_size / self.num_particles
+        else:
+            resampler_threshold = self.growth_class.qinfer_resampler_threshold
+        self.log_print(["Using fixed resampler effective number partices = {}, so resampler threshold = {}".format(
+            self.growth_class.hard_fix_resample_effective_sample_size, resampler_threshold
+        )])
+
+
         self.qinfer_updater = qi.SMCUpdater(
             self.qinfer_model,
             self.num_particles,
             self.model_prior,
-            resample_thresh = self.growth_class.qinfer_resampler_threshold,
+            resample_thresh = resampler_threshold,
             resampler = qi.LiuWestResampler( a=self.growth_class.qinfer_resampler_a ),
         )
         self.model_heuristic = self.growth_class.heuristic(
