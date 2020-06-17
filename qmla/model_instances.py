@@ -978,7 +978,7 @@ class ModelInstanceForLearning():
                     alpha = 0.5, 
                 )
 
-        ax.set_title('Volume')
+        ax.set_title('Volume and Experimental Times')
         ax.set_ylabel('Volume')
         ax.set_xlabel('Epoch')
         # ax.semilogy()

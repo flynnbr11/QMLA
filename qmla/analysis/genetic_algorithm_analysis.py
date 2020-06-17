@@ -15,6 +15,7 @@ from matplotlib.lines import Line2D
 from matplotlib.gridspec import GridSpec
 import seaborn as sns
 
+import qmla.utilities
 
 def round_nearest(x,a):
     return round(round(x/a)*a ,2)
@@ -181,19 +182,22 @@ def colour_by_hamming_dist(h, cmap):
 
     return (cmap_val[0], cmap_val[1], cmap_val[2], alpha)
 
+def map_to_full_chromosome(c, num_terms):
+    return format( int( str(c), 2),  '0{}b'.format(num_terms))
+
 def model_generation_probability(
     combined_results, 
+    unique_chromosomes, 
     save_directory=None
-):
-    from numpy import inf
-    data_indices = list(combined_results['GrowthRuleStorageData'].index)
-    true_chromosome = eval(combined_results['GrowthRuleStorageData'][0])['true_model_chromosome']
+):  
+    num_terms = unique_chromosomes.num_terms.unique()[0]
+    unique_chromosomes['full_chromosome'] = [map_to_full_chromosome(c, num_terms) for c in unique_chromosomes.chromosome ]   
     num_experiments = combined_results['NumExperiments'][0]
     num_particles = combined_results['NumParticles'][0]
-    num_terms = len(true_chromosome)
+    true_chromosome = map_to_full_chromosome(unique_chromosomes.true_chromosome[0], num_terms = num_terms)
     full_chromosome = 2**num_terms
     cmap = plt.cm.viridis
-    num_runs = len(data_indices)
+    num_runs = len(unique_chromosomes.qmla_id.unique())
     num_models = 2**num_terms
     all_models = range(num_models)
 
@@ -226,38 +230,17 @@ def model_generation_probability(
     random_width_array_upper = [random_sampling_prob + random_sampling_width] * num_models
     random_width_array_lower = [random_sampling_prob - random_sampling_width] * num_models
 
+    chromosomes = list(unique_chromosomes.full_chromosome)
+    unique_chromosome_list = list(set(chromosomes))
+    numeric_chromosomes = list(unique_chromosomes.numeric_chromosome)
+    unique_numeric_chromosome_list = list(unique_chromosomes.numeric_chromosome.unique())
+    f_scores = list(unique_chromosomes.f_score)
 
-    chromosomes = []
-    chromosomes.extend(
-        c for c in 
-        [
-            eval(combined_results['GrowthRuleStorageData'][c])['chromosomes_tested'] 
-            for c in data_indices
-        ]
-    )
-    chromosomes = flatten(chromosomes)
-
-    f_scores = []
-    f_scores.extend(
-        c for c in 
-        [
-            eval(combined_results['GrowthRuleStorageData'][c])['f_score_tested_models'] 
-            for c in data_indices
-        ]
-    )
-    f_scores = flatten(f_scores)
-
-    unique_chromosome_numbers = sorted(list(set(chromosomes)))
-    unique_chromosomes = [bin(int(c))[2:].zfill(num_terms) for c in unique_chromosome_numbers]
-    counts = [chromosomes.count(a) for a in unique_chromosome_numbers]
-#     ham_d = [hamming_distance(c, true_chromosome) for c in unique_chromosomes]
-#     chromosome_colours = [colour_by_hamming_dist(h, cmap=cmap) for h in ham_d]
+    counts = [numeric_chromosomes.count(a) for a in unique_numeric_chromosome_list]
     counts = [c/num_runs for c in counts] # so this reflects 'probability' of being generated
 
     array_counts = np.zeros(num_models)
-    for i in unique_chromosome_numbers:
-        idx = unique_chromosome_numbers.index(i)
-        array_counts[i] = counts[idx]
+    array_counts[ np.array(unique_numeric_chromosome_list)] = counts
 
     f_score_values = [np.round(i,2) for i in list(np.arange(0,1.001,0.01))]
     f_occurences = {f : [] for f in f_score_values}
@@ -267,6 +250,8 @@ def model_generation_probability(
 
     f_counts = {}
     f_plot_colours =  {f : [] for f in f_score_values}
+
+
 
     f_v_hamming = []
     hamming_v_f = []
@@ -278,8 +263,8 @@ def model_generation_probability(
         c = colour_by_hamming_dist(h, cmap=cmap)
         colours[mod] = c
         f_score = f_score_from_chromosome_string(chromosome = chromosome, target_chromosome=true_chromosome)
-        f_score = round_nearest(f_score, 0.01)
-        
+        f_score = qmla.utilities.round_nearest(f_score, 0.01)
+
         occurences = chromosomes.count(mod)
         f_occurences[f_score].append(occurences)
         if occurences > 0:
@@ -289,7 +274,27 @@ def model_generation_probability(
         f_plot_colours[f_score].append(c)
         f_v_hamming.append(f_score)
         hamming_v_f.append(h)
-        
+    
+    
+    colours = [cmap(1)]*num_models
+    for mod in all_models:
+        chromosome = bin(mod)[2:].zfill(num_terms)
+        h = hamming_distance(chromosome, true_chromosome)
+        c = colour_by_hamming_dist(h, cmap=cmap)
+        colours[mod] = c
+        f_score = f_score_from_chromosome_string(chromosome = chromosome, target_chromosome=true_chromosome)
+        f_score = qmla.utilities.round_nearest(f_score, 0.01)
+
+        occurences = chromosomes.count(mod)
+        f_occurences[f_score].append(occurences)
+        if occurences > 0:
+            f_mod_present[f_score] += 1
+        f_num_mods[f_score] += 1
+        f_count_ratio[f_score].append( occurences/num_runs )
+        f_plot_colours[f_score].append(c)
+        f_v_hamming.append(f_score)
+        hamming_v_f.append(h)
+
     colours = np.array(colours)
 
     fig, ax = plt.subplots(figsize=(17, 7))
@@ -347,7 +352,7 @@ def model_generation_probability(
         prop={'size' : 0.65*label_fontsize},
         loc='upper center',
         ncol=5
-   )
+    )
     ax.set_title(
         "True chromosome: {} ({})".format(true_chromosome, int(true_chromosome,2)),
         fontsize = label_fontsize
@@ -396,7 +401,7 @@ def model_generation_probability(
             f_vals.append(f)
             count_vals.append(count)
             f_colours.append(colour)
-            
+
     ax.scatter(f_vals, count_vals, c=f_colours)
     ax.axhline(
         random_sampling_prob, 
@@ -415,7 +420,7 @@ def model_generation_probability(
         loc='upper center',
         ncol=5
     )
-    
+
     ax.set_xlabel('Model F-score', fontsize=label_fontsize)
     ax.set_ylabel('Prob. of generation', fontsize=label_fontsize)
     ax2 = ax.twinx()

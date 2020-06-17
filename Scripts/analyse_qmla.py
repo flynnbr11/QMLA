@@ -344,7 +344,7 @@ if gather_summary_results:
             print("ANALYSIS FAILURE: number of occurences for each model.")
             raise
 else:
-    combined_results = pd.read_csv(
+    combined_results = pandas.read_csv(
         os.path.join(directory_to_analyse, results_csv_name)
     )
 
@@ -653,14 +653,18 @@ except:
 #######################################
 
 try: 
+    unique_chromosomes = pandas.read_csv(
+        os.path.join(results_directories['combined_datasets'], 'unique_chromosomes.csv')
+    )
     qmla.analysis.model_generation_probability(
         combined_results = combined_results,
-        save_directory=results_directories['performance'], 
+        unique_chromosomes = unique_chromosomes, 
+        save_directory = results_directories['performance'], 
     )
 except:
     print("ANALYSIS FAILURE: [gentic algorithm] Model generation rate.")
-    pass
-    # raise
+    # pass
+    raise
 
 
 try:

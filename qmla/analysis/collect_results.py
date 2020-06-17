@@ -166,6 +166,8 @@ def generate_combined_datasets(
     fitness_correlations = pd.DataFrame()
     fitness_by_f_score = pd.DataFrame()
     fitness_df = pd.DataFrame()
+    misc_gr_data = pd.DataFrame()
+    unique_chromosomes = pd.DataFrame()
 
     # cycle through files
     for f in filenames:
@@ -194,8 +196,23 @@ def generate_combined_datasets(
             fit_f['qmla_id'] = storage.qmla_id
             fitness_df = fitness_df.append(fit_f, ignore_index=True)
         except:
-            pass            
-
+            pass                   
+        
+        try:
+            # NOTE chromosomes cast to integers when written to CSV
+            # so they may be shorter than chomosome 
+            # and should be recast to chromosome length
+            uc = storage.growth_rule_storage.unique_chromosomes
+            uc['qmla_id'] = storage.qmla_id
+            uc['true_chromosome'] = storage.growth_rule_storage.true_model_chromosome
+            num_terms = uc.num_terms.unique()[0]
+            # method to retrieve full chromosome (also will store as float -- do this during application)
+            uc['full_chromosome'] = [format( int( str(c), 2),  '0{}b'.format(num_terms)) for c in uc.chromosome ] 
+            unique_chromosomes = unique_chromosomes.append(
+                uc, ignore_index=True
+            )
+        except:
+            pass
     # Store datasets and add their name to the list
     datasets_generated = []
 
@@ -226,6 +243,23 @@ def generate_combined_datasets(
     except:
         pass
 
+    try:
+        growth_rule_data.to_csv(
+            os.path.join( combined_datasets_directory, 'growth_rule_data.csv')
+        )
+        datasets_generated.append('growth_rule_data')
+    except:
+        pass
+    
+    try:
+        unique_chromosomes.to_csv(
+            os.path.join( combined_datasets_directory, 'unique_chromosomes.csv'),
+        )
+        datasets_generated.append('unique_chromosomes')
+    except:
+        raise
+        # pass
+    
     # Gather together and return
     # combined_data = {
     #     'results_directory' : combined_datasets_directory,  

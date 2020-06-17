@@ -498,7 +498,27 @@ class Genetic(
         self.storage.true_model_chromosome = self.true_chromosome_string
         self.storage.ratings = self.ratings_class.ratings_df
 
-        chromosomes = sorted(list(set(self.genetic_algorithm.previously_considered_chromosomes)))
+        chromosomes = sorted(list(set(
+            self.genetic_algorithm.previously_considered_chromosomes)))
+        self.unique_chromosomes = pd.DataFrame(
+            columns=['chromosome', 'numeric_chromosome', 'f_score', 'num_terms', 'hamming_distance'])
+        for c in chromosomes:
+            hamming_dist = self.hamming_distance_model_comparison(
+                test_model = self.genetic_algorithm.map_chromosome_to_model(c)
+            ) # for fitness use 1/H
+
+            chrom_data = pd.Series({
+                'chromosome' : str(c), 
+                'numeric_chromosome' : int(c, 2),
+                'num_terms' : self.genetic_algorithm.num_terms, 
+                'hamming_distance' : hamming_dist,
+                'f_score' : np.round(self.f_score_from_chromosome_string(c), 3) 
+            })
+            self.unique_chromosomes.loc[len(self.unique_chromosomes)] = chrom_data
+        self.log_print(["self.unique_chromosomes:", self.unique_chromosomes])
+        self.storage.unique_chromosomes = self.unique_chromosomes
+
+
         dud_chromosome = str('1' +'0'*self.genetic_algorithm.num_terms)
         if dud_chromosome in chromosomes:
             self.log_print(
@@ -526,6 +546,9 @@ class Genetic(
                 "Could not compute f score for chromosome list: {}".format(chromosomes)
             ])
             pass
+
+        self.storage.chromosomes_tested = chromosome_numbers
+        self.storage.f_score_tested_models = f_scores
 
     def check_tree_completed(
         self,
