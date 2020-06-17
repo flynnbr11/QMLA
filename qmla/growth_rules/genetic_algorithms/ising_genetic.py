@@ -147,7 +147,7 @@ class IsingGeneticTest(
             # F = 1
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
         ]
-        self.initial_models = list(np.random.choice(test_fitness_models, 4, replace=False))
+        self.initial_models = list(np.random.choice(test_fitness_models, 9, replace=False))
         # self.initial_models = self.genetic_algorithm.random_initial_models(4)
 
         # if self.true_model not in self.initial_models:
