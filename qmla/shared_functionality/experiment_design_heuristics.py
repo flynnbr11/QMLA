@@ -60,6 +60,7 @@ class BaseHeuristicQMLA(qi.Heuristic):
         # storage infrastructure
         self._resample_epochs = []
         self._volumes = []
+        self.effective_sample_size = []
         self._times_suggested = []
         self.heuristic_data = {} # to be stored by model instance
         self._label_fontsize = 10 # consistency when plotting
@@ -90,6 +91,8 @@ class BaseHeuristicQMLA(qi.Heuristic):
 
         if self._updater.just_resampled:
             self._resample_epochs.append(kwargs['epoch_id'] -1 )
+        
+        self.effective_sample_size.append(self._updater.n_ess)
 
         # Design a new experiment
         new_experiment =  self.design_experiment(**kwargs)
@@ -115,7 +118,7 @@ class BaseHeuristicQMLA(qi.Heuristic):
         **kwargs
     ):
         plots_to_include = [
-            'volume', 'times_used', 
+            'volume', 'times_used', 'effective_sample_size'
         ]
         
         plt.clf()
@@ -141,6 +144,12 @@ class BaseHeuristicQMLA(qi.Heuristic):
             row += 1
             ax = fig.add_subplot(gs[row, 0])
             self._plot_suggested_times(ax = ax)
+            ax.legend()
+
+        if 'effective_sample_size' in plots_to_include:
+            row += 1
+            ax = fig.add_subplot(gs[row, 0])
+            self._plot_effective_sample_size(ax = ax)
             ax.legend()
 
         # Save figure
@@ -176,6 +185,40 @@ class BaseHeuristicQMLA(qi.Heuristic):
         ax.set_xlabel('Epoch', fontsize=self._label_fontsize)
         self._add_resample_epochs_to_ax(ax = ax)
         ax.semilogy()
+
+    def _plot_effective_sample_size(self, ax, **kwargs):
+        full_epoch_list = range(len(self.effective_sample_size))
+        ax.plot(
+            full_epoch_list, 
+            self.effective_sample_size,
+            label = r"$N_{ESS}$",
+        )
+
+        resample_thresh = self._updater.resample_thresh
+        ax.axhline(
+            resample_thresh * self.effective_sample_size[0], 
+            label="Resample threshold ({}%)".format(resample_thresh*100),
+            color = 'grey',
+            ls = '-',
+            alpha = 0.5
+        )
+        if resample_thresh != 0.5:
+            ax.axhline(
+                self.effective_sample_size[0] / 2, 
+                label="50%",
+                color = 'grey',
+                ls = '--', 
+                alpha = 0.5
+            )
+
+        ax.set_title('Effective Sample Size', fontsize=self._label_fontsize)
+        ax.set_ylabel('$N_{ESS}$', fontsize=self._label_fontsize)
+        ax.set_xlabel('Epoch', fontsize=self._label_fontsize)
+        self._add_resample_epochs_to_ax(ax = ax)
+        ax.legend()
+        ax.set_ylim(0, self.effective_sample_size[0]*1.1)
+        # ax.semilogy()
+
 
     def _add_resample_epochs_to_ax(self, ax, **kwargs):
         c = 'grey'

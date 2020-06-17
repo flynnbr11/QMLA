@@ -553,7 +553,7 @@ class ModelInstanceForLearning():
             )
         except:
             self.log_print(["Failed to plot_heuristic_attributes"])
-            # raise
+            raise
             # pass
         try:
             self._plot_posterior_mesh_pairwise()
