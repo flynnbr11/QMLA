@@ -285,8 +285,8 @@ class TestSimulatedNVCentre(
             # 'pauliSet_1_z_d3' : B*g*bohr_magneton/hbar,
 
 
-            'pauliSet_1_x_d1' : 1.9431238095238094 * (10**order_mag),
-            'pauliSet_1_y_d1' : 3.9431238095238094 * (10**order_mag),
+            'pauliSet_1_x_d1' : 3.2431238095238094 * (10**order_mag),
+            'pauliSet_1_y_d1' : 6.9431238095238094 * (10**order_mag),
             # 'pauliSet_1_z_d1' : 5.9431238095238094 * (10**order_mag),
 
             # 'pauliSet_1_x_d2' : 3.2431238095238094 * (10**order_mag),
@@ -328,8 +328,8 @@ class TestSimulatedNVCentre(
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         
         # Choose heuristic
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.RandomTimeUpperBounded
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.RandomTimeUpperBounded
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.VolumeAdaptiveParticleGuessHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.FixedNineEighthsToPowerK
