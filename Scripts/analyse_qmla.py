@@ -663,8 +663,8 @@ try:
     )
 except:
     print("ANALYSIS FAILURE: [gentic algorithm] Model generation rate.")
-    # pass
-    raise
+    pass
+    # raise
 
 
 try:
