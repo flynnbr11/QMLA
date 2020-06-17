@@ -156,7 +156,7 @@ class IsingGeneticTest(
         self.fraction_experiments_for_bf = 1
         self.fitness_method =  'elo_ratings' 
         self.max_spawn_depth = 16
-        self.iqle_mode = True
+        self.iqle_mode = False
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
