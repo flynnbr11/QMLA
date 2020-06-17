@@ -290,7 +290,7 @@ class TestSimulatedNVCentre(
             # 'pauliSet_1_z_d1' : 5.9431238095238094 * (10**order_mag),
 
             'pauliSet_1_x_d2' : 3.2431238095238094 * (10**order_mag),
-            'pauliSet_1_y_d2' : 6.9431238095238094 * (10**order_mag),
+            # 'pauliSet_1_y_d2' : 6.9431238095238094 * (10**order_mag),
             # 'pauliSet_1_x_d2' : 1.9431238095238094 * (10**order_mag),
             # 'pauliSet_1_y_d2' : 8.9431238095238094 * (10**order_mag),
             # 'pauliSet_1_z_d2' : 3.9431238095238094 * (10**order_mag),
@@ -321,22 +321,22 @@ class TestSimulatedNVCentre(
         self.true_model = qmla.database_framework.alph(self.true_model)
         self.qinfer_resampler_threshold = 0.5
         self.qinfer_resampler_a = 0.98
-        self.iqle_mode = True
+        self.iqle_mode = False
         self.hard_fix_resample_effective_sample_size = 1000
 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         
         # Choose heuristic
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.RandomTimeUpperBounded
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.RandomTimeUpperBounded
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.VolumeAdaptiveParticleGuessHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.FixedNineEighthsToPowerK
 
 
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.manual_set_probes
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.manual_set_probes
         time_basis = 1/10**order_mag # nanoseconds
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
         self.max_time_to_consider = 500 * time_basis # 50 microseconds 

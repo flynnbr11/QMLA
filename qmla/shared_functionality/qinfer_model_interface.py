@@ -405,8 +405,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # probe id is tracked with _a and _b.
         # i.e. increments each 2nd call, loops back when probe dict exhausted
         self._a += 1
-        if self._a % 2 == 1:
-        # if self._a % 60 == 1:
+        # if self._a % 2 == 1:
+        if self._a % 60 == 1:
             self._b += 1
         self.probe_counter = (self._b % int(self.probe_number)) 
 

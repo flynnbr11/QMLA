@@ -146,16 +146,16 @@ def manual_set_probes(max_num_qubits = 2, num_probes = 10, **kwargs):
     ideal_probes_for_y = [
 
         np.array([1, 0j]),
-        # np.array([0, 1]),
+        np.array([0, 1]),
         
-        # np.array([0, 1j]),
-        # np.array([1j, 0]),
+        np.array([0, 1j]),
+        np.array([1j, 0]),
 
-        # 1/np.sqrt(2)*np.array([1,1]),
-        # 1/np.sqrt(2)*np.array([1,-1]),
+        1/np.sqrt(2)*np.array([1,1]),
+        1/np.sqrt(2)*np.array([1,-1]),
 
-        # 1/np.sqrt(2)*np.array([1,1j]),
-        # 1/np.sqrt(2)*np.array([1,-1j]),
+        1/np.sqrt(2)*np.array([1,1j]),
+        1/np.sqrt(2)*np.array([1,-1j]),
 
     ]
     available_probes = itertools.cycle(ideal_probes_for_y)
