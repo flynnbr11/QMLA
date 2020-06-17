@@ -1070,10 +1070,11 @@ class ModelInstanceForLearning():
         ax.semilogy()
         try:
             ax.axhline(0.5, label='0.5', ls='--', alpha=0.3, c='grey')
-            ax.axhline(0.1, label='0.1', ls=':', alpha=0.3, c='grey')
+            ax.axhline(0.1, label='0.1', ls=':', alpha=0.3, c='grey',)
         except:
             pass
         # ax.set_yscale('log', basey=10)
+        ax.legend()
 
         # Save figure
         fig.tight_layout()

@@ -138,7 +138,7 @@ def separable_probe_dict(
                 separable_probes[i, j] = (
                     np.tensordot(
                         separable_probes[i, j - 1],
-                        random_probe(1),
+                        harr_random_probe(1),
                         axes=0
                     ).flatten(order='c')
                 )
@@ -161,11 +161,11 @@ def manual_set_probes(max_num_qubits = 2, num_probes = 10, **kwargs):
     probes = {}
     ideal_probes_for_y = [
 
-        np.array([1, 0j]),
-        np.array([0, 1]),
+        # np.array([1, 0j]),
+        # np.array([0, 1]),
         
-        np.array([0, 1j]),
-        np.array([1j, 0]),
+        # np.array([1j, 0]),
+        # np.array([0, 1j]),
 
         1/np.sqrt(2)*np.array([1,1]),
         1/np.sqrt(2)*np.array([1,-1]),

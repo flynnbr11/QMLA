@@ -98,7 +98,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._a = 0
         self._b = 0
         self.probe_counter = 0
-        self.probe_rotation_frequency = 1
+        self.probe_rotation_frequency = 25
         self._modelparams = modelparams
         self.signs_of_inital_params = np.sign(modelparams)
         self._true_oplist = true_oplist
