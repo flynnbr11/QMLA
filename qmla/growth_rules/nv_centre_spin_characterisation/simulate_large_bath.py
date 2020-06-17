@@ -336,7 +336,7 @@ class TestSimulatedNVCentre(
 
 
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.manual_set_probes
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.manual_set_probes
         time_basis = 1/10**order_mag # nanoseconds
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
         self.max_time_to_consider = 500 * time_basis # 50 microseconds 

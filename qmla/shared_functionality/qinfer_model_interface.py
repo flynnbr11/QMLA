@@ -97,6 +97,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._oplist = oplist
         self._a = 0
         self._b = 0
+        self.probe_counter = 0
+        self.probe_rotation_frequency = 1
         self._modelparams = modelparams
         self.signs_of_inital_params = np.sign(modelparams)
         self._true_oplist = true_oplist
@@ -404,13 +406,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # therefore the same probe should be assumed for consecutive calls
         # probe id is tracked with _a and _b.
         # i.e. increments each 2nd call, loops back when probe dict exhausted
-        self._a += 1
-        # if self._a % 2 == 1:
-        if self._a % 60 == 1:
-            self._b += 1
-        self.probe_counter = (self._b % int(self.probe_number)) 
-
-
 
         if num_particles == 1:
             # TODO better mechanism to determine if self.true_evolution, 
@@ -422,6 +417,15 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         else:
             self.true_evolution = False
             params = modelparams
+
+        if self.true_evolution:
+            # set probe counter at true evolution; keep for simulator
+            self._a += 1
+            if self._a % self.probe_rotation_frequency == 0:
+                self.probe_counter += 1
+                if self.probe_counter >= self.probe_number:
+                    self.probe_counter = 0
+        self.log_print(["True evolution {} \t a = {} \t Probe counter {}".format(self.true_evolution, self._a,  self.probe_counter) ] )
 
         self.log_print_debug([
             "\n\nLikelihood fnc called. True system -> {}".format(self.true_evolution)

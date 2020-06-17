@@ -19,7 +19,7 @@ These functions are set to growth rule attributes, which are then called in wrap
 
 import numpy as np
 import itertools
-from scipy import linalg
+from scipy import linalg, stats
 import random
 
 import qmla.utilities
@@ -67,7 +67,23 @@ def n_qubit_plus_state(num_qubits):
         plus_n = np.kron(plus_n, one_qubit_plus)
     return plus_n
 
+def n_qubit_repeat_probe(num_qubits, input_state = np.array([1,0]) ):
+   
+    state = input_state
+    for i in range(num_qubits - 1):
+        state = np.tensordot(state, input_state, axes=0).flatten('c')
+    return state
 
+def harr_random_probe(num_qubits=1):
+
+    random_unitary = stats.unitary_group.rvs(2**num_qubits)
+    zero_probe = n_qubit_repeat_probe(num_qubits = num_qubits)
+    random_state = np.dot(random_unitary, zero_probe)
+    if not np.isclose(np.linalg.norm(random_state), 1, atol=1e-14):
+        # call again until a normalised probe is generated
+        print("Probe generated is not normalised")
+        random_state = harr_random_probe(num_qubits = num_qubits)
+    return random_state
 
 ###################################
 # Default probe set
@@ -96,7 +112,7 @@ def separable_probe_dict(
     """
     separable_probes = {}
     for i in range(num_probes):
-        separable_probes[i, 0] = random_probe(1)
+        separable_probes[i, 0] = harr_random_probe(1)
         for j in range(1, 1 + max_num_qubits):
             if j == 1:
                 separable_probes[i, j] = separable_probes[i, 0]
@@ -104,7 +120,7 @@ def separable_probe_dict(
                 separable_probes[i, j] = (
                     np.tensordot(
                         separable_probes[i, j - 1],
-                        random_probe(1),
+                        harr_random_probe(1),
                         axes=0
                     ).flatten(order='c')
                 )
