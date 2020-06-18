@@ -117,6 +117,46 @@ class IsingGeneticTest(
             'pauliSet_2J5_zJz_d5' : 0.35,
             'pauliSet_3J5_zJz_d5' : 0.4
         }
+
+        # test F map for random set of 10 models
+        self.initial_models = self.genetic_algorithm.random_initial_models(9)
+
+        self.branch_comparison_strategy = 'optimal_graph'
+        self.tree_completed_initially = False
+        self.fraction_particles_for_bf = 0.5
+        self.fraction_experiments_for_bf = 0.5
+        self.fitness_method =  'elo_ratings' 
+        self.max_spawn_depth = 4
+        self.iqle_mode = False
+
+        if self.tree_completed_initially:
+            self.max_spawn_depth = 1
+        self.initial_num_models = len(self.initial_models)
+        self.max_num_models_by_shape = {
+            self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
+            'other': 0
+        }
+
+        self.num_processes_to_parallelise_over = 16
+        self.timing_insurance_factor = 0.55
+        self.max_time_to_consider = 20 
+        self.min_param = 0.35
+        self.max_param = 0.65
+
+class IsingGeneticSingleLayer(
+    IsingGenetic
+):
+
+    def __init__(
+        self,
+        growth_generation_rule,
+        **kwargs
+    ):
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            **kwargs
+        )
+
         test_fitness_models = [
             # F=0
             'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5', 
@@ -148,21 +188,13 @@ class IsingGeneticTest(
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
         ]
         self.initial_models = list(np.random.choice(test_fitness_models, 9, replace=False))
-        # self.initial_models = self.genetic_algorithm.random_initial_models(4)
 
         # if self.true_model not in self.initial_models:
         #     rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
         #     self.initial_models[rand_idx] = self.true_model
 
-        # test F map for random set of 10 models
-
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = True
-        self.fraction_particles_for_bf = 0.5
-        self.fraction_experiments_for_bf = 0.5
-        self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth = 16
-        self.iqle_mode = False
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
@@ -175,3 +207,5 @@ class IsingGeneticTest(
         self.max_time_to_consider = 20 
         self.min_param = 0.35
         self.max_param = 0.65
+
+
