@@ -332,8 +332,8 @@ class TestSimulatedNVCentre(
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         
         # Choose heuristic
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.RandomTimeUpperBounded
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.RandomTimeUpperBounded
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.VolumeAdaptiveParticleGuessHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.FixedNineEighthsToPowerK
@@ -343,5 +343,5 @@ class TestSimulatedNVCentre(
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.manual_set_probes
         time_basis = 1/10**order_mag # nanoseconds
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
-        self.max_time_to_consider = 500 * time_basis # 50 microseconds 
+        self.max_time_to_consider = 50 * time_basis # 50 microseconds 
         self.plot_time_increment = 5 * time_basis # 0.5 microseconds
