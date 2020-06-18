@@ -882,7 +882,7 @@ class RandomTimeUpperBounded(BaseHeuristicQMLA):
         **kwargs
     ):
         new_time = random.uniform(0 , self._max_time)
-        new_time  = self._max_time
+        # new_time  = self._max_time
 
         eps = self._get_exp_params_array()
         eps['t'] = new_time
