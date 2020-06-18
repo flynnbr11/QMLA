@@ -106,7 +106,11 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._truename = truename
         self._true_dim = qmla.database_framework.get_num_qubits(self._truename)
         self.true_param_dict = true_param_dict 
-        self.store_likelihoods = {'system' : {}, 'simulator' : {}}
+        self.store_likelihoods = {x : {} for x in ['system', 'simulator']}
+        self.summarise_likelihoods = {
+            x : []
+            for x in ['system', 'particles_median', 'particles_std', 'particles_lower_quartile', 'particles_upper_quartile']
+        }
         self.store_p0_diffs = []
         self.debug_log_print = debug_log_print
         # get true_hamiltonian from true_param dict
@@ -428,7 +432,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.log_print(["True evolution {} \t a = {} \t Probe counter {}".format(self.true_evolution, self._a,  self.probe_counter) ] )
 
         self.log_print_debug([
-            "\n\nLikelihood fnc called. True system -> {}".format(self.true_evolution)
+            "\n\nLikelihood fnc called. Probe counter={}. True system -> {}.".format(self.probe_counter, self.true_evolution)
         ])
 
         try:
@@ -480,11 +484,17 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         
         self.timings[timing_marker]['likelihood'] += time.time() - t_likelihood_start
         if self.true_evolution: 
-            self.store_likelihoods['system'][self._b] = pr0
+            self.store_likelihoods['system'][self._a] = pr0
+            self.summarise_likelihoods['system'].append(np.median(pr0))
         else:
-            self.store_likelihoods['simulator'][self._b] = pr0
-            diff_p0 = np.abs( pr0 - self.store_likelihoods['system'][self._b])
+            self.store_likelihoods['simulator'][self._a] = pr0
+            diff_p0 = np.abs( pr0 - self.store_likelihoods['system'][self._a])
             self.store_p0_diffs.append( [np.median(diff_p0), np.std(diff_p0)])
+            self.summarise_likelihoods['particles_median'].append( np.median(pr0) )
+            self.summarise_likelihoods['particles_std'].append( np.std(pr0) )
+            self.summarise_likelihoods['particles_lower_quartile'].append( np.quantile(pr0, 0.25) )
+            self.summarise_likelihoods['particles_upper_quartile'].append( np.quantile(pr0, 0.75) )
+
         return likelihood_array
 
     def get_system_pr0_array(

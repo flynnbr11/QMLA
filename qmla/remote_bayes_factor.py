@@ -176,7 +176,6 @@ def remote_bayes_factor_calculation(
     # Plot dynamics on which models were compared, if one of the pair is the true model
     if (
         plot_true_mod_post_bayes_factor_dynamics
-        # and ( model_a.is_true_model or model_b.is_true_model )
     ):
         try:
             plot_models_dynamics(

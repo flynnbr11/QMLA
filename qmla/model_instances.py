@@ -205,7 +205,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_log_print=False,
+            debug_log_print=1,
         )
         
         # get resampler treshold
@@ -558,6 +558,7 @@ class ModelInstanceForLearning():
         try:
             self._plot_posterior_mesh_pairwise()
         except:
+            raise
             self.log_print(["failed to _plot_poster_mesh_pairwise"])
 
     def learned_info_dict(self):
@@ -871,10 +872,11 @@ class ModelInstanceForLearning():
         terms = self.track_param_estimate_v_epoch.keys()
         num_terms = len(terms)
         
-        extra_plots = ['volume', 'time', 'pr0_diff']
+        extra_plots = ['volume', 'time', 'pr0_diff', 'likelihoods']
         resample_colour = 'grey' 
         ncols = int(np.ceil(np.sqrt(num_terms))) 
-        nrows = int(np.ceil(num_terms / ncols))+ len(extra_plots)
+        nrows_for_params = int(np.ceil(num_terms / ncols)) 
+        nrows = nrows_for_params + len(extra_plots)
         self.log_print(["Plotting parameters. ncol={} nrow={}".format(ncols, nrows)])
 
         plt.clf()
@@ -950,7 +952,7 @@ class ModelInstanceForLearning():
         # fig.text(0.04, 0.5, 'Parameter', va='center', rotation='vertical')
 
         # Volume
-        row = nrows-3
+        row = nrows_for_params
         col = 0
         ax = fig.add_subplot(gs[row, :])
 
@@ -1022,7 +1024,7 @@ class ModelInstanceForLearning():
         ax.legend(loc='upper center')
 
         # Covariance mtx norm and quadratic loss
-        row = nrows-2
+        row += 1
         col = 0
 
         ax = fig.add_subplot(gs[row, :])
@@ -1044,8 +1046,51 @@ class ModelInstanceForLearning():
         # ax.set_ylabel('Quadratic loss')
         ax.legend(loc='upper right')
 
-        # | system-pr0 - particles-pr0 |
-        row = nrows-1
+        # Likelihoods of system and particles
+        row += 1
+        col = 0
+        ax = fig.add_subplot(gs[row, :])
+        particle_likelihoods = self.qinfer_model.summarise_likelihoods['particles_median']
+        particle_likelihoods_std = self.qinfer_model.summarise_likelihoods['particles_std']
+        system_likelihoods = self.qinfer_model.summarise_likelihoods['system']
+
+        ax.plot(
+            range(len(system_likelihoods)), 
+            system_likelihoods,
+            # s=3,
+            color='red',
+            ls = '--', 
+            label='System'
+        )
+
+        ax.scatter(
+            range(len(particle_likelihoods)), 
+            particle_likelihoods,
+            s=3,
+            color='Blue',
+            label='Particles'
+        )
+        ax.fill_between(
+            range(len(particle_likelihoods)), 
+            self.qinfer_model.summarise_likelihoods['particles_upper_quartile'],
+            self.qinfer_model.summarise_likelihoods['particles_lower_quartile'],
+            alpha = 0.3,
+            color='Blue',
+            label='Particles IQR'
+        )
+        # ax.set_ylim(0,1)        
+        ax.set_ylabel("$ Pr(0) $")
+        ax.set_xlabel("Epoch")
+        ax.semilogy()
+        # try:
+        #     ax.axhline(0.5, label='0.5', ls='--', alpha=0.3, c='grey')
+        # except:
+        #     pass
+        # ax.set_yscale('log', basey=10)
+        ax.legend()
+
+        # Difference | system-pr0 - particles-pr0 |
+        row += 1
         col = 0
         ax = fig.add_subplot(gs[row, :])
         self.qinfer_pr0_diff_from_true = np.array(self.qinfer_model.store_p0_diffs)
@@ -1064,7 +1109,6 @@ class ModelInstanceForLearning():
             alpha = 0.3,
             color='Blue'
         )
-        # ax.set_ylim(0,1)        
         ax.set_ylabel("$ \|Pr(0)_{sys} - Pr(0)_{sim} \|  $")
         ax.set_xlabel("Epoch")
         ax.semilogy()
@@ -1112,8 +1156,8 @@ class ModelInstanceForLearning():
         posterior_meshes = {}
         for i, j in pairs_of_params:
             post_mesh = self.qinfer_updater.posterior_mesh(
-                idx_param1 = i, 
-                idx_param2 = j,
+                idx_param1 = j, 
+                idx_param2 = i,
                 res1=50, res2=50
             )
             # store the post mesh - don't want to compute twice
@@ -1143,6 +1187,13 @@ class ModelInstanceForLearning():
                     )
                 if (i, j) in pairs_of_params:
                     ax.contourf(*posterior_meshes[i,j], vmin=vmin, vmax=vmax,  cmap=selected_cmap)
+
+                    # set limit for IQLE test # TODO remove
+                    # xlim = ax.get_xlim()
+                    # ax.set_xlim( 0.99*xlim[0], 1.01*xlim[1] )
+                    # ylim = ax.get_ylim()
+                    # ax.set_ylim( 0.99*ylim[0], 1.01*ylim[1] )
+
 
                     if x_term in self.true_param_dict:
                         true_param = self.true_param_dict[x_term]

@@ -159,10 +159,10 @@ def manual_set_probes(max_num_qubits = 2, num_probes = 10, **kwargs):
     To manually check something. Currently should be ideal for learning Y. 
     """
     probes = {}
-    ideal_probes_for_y = [
+    probe_list = [
 
-        # np.array([1, 0j]),
-        # np.array([0, 1]),
+        np.array([1, 0j]),
+        np.array([0, 1]),
         
         # np.array([1j, 0]),
         # np.array([0, 1j]),
@@ -174,7 +174,7 @@ def manual_set_probes(max_num_qubits = 2, num_probes = 10, **kwargs):
         1/np.sqrt(2)*np.array([1,-1j]),
 
     ]
-    available_probes = itertools.cycle(ideal_probes_for_y)
+    available_probes = itertools.cycle(probe_list)
     for j in range(num_probes):
         probes[(j, 1)] = next(available_probes)
     

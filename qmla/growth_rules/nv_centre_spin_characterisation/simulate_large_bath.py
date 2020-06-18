@@ -284,7 +284,6 @@ class TestSimulatedNVCentre(
             # 'pauliSet_1_y_d3' : B*g*bohr_magneton/hbar,
             # 'pauliSet_1_z_d3' : B*g*bohr_magneton/hbar,
 
-
             'pauliSet_1_x_d1' : 3.2431238095238094 * (10**order_mag),
             'pauliSet_1_y_d1' : 6.9431238095238094 * (10**order_mag),
             # 'pauliSet_1_z_d1' : 5.9431238095238094 * (10**order_mag),
@@ -300,6 +299,11 @@ class TestSimulatedNVCentre(
         }
 
         self.gaussian_prior_means_and_widths = {
+            # start accurate with very small prior
+            # 'pauliSet_1_x_d1' : ( 3.243 * (10**order_mag) , 0.001 * (10**order_mag) ),
+            # 'pauliSet_1_y_d1' : ( 6.943 * (10**order_mag) , 0.001 * (10**order_mag) ) ,
+            # 'pauliSet_1_z_d1' : (5* (10**order_mag), 2* (10**order_mag)),
+
             # spin
             'pauliSet_1_x_d1' : (5* (10**order_mag), 2* (10**order_mag)),
             'pauliSet_1_y_d1' : (5* (10**order_mag), 2* (10**order_mag)),
@@ -336,7 +340,7 @@ class TestSimulatedNVCentre(
 
 
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.manual_set_probes
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.manual_set_probes
         time_basis = 1/10**order_mag # nanoseconds
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
         self.max_time_to_consider = 500 * time_basis # 50 microseconds 

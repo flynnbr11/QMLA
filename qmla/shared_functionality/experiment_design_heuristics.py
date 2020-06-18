@@ -874,7 +874,7 @@ class RandomTimeUpperBounded(BaseHeuristicQMLA):
         **kwargs
     ):
         super().__init__(**kwargs)
-        self._max_time = 1e-1
+        self._max_time = 1
 
     def design_experiment(
         self,
@@ -882,6 +882,7 @@ class RandomTimeUpperBounded(BaseHeuristicQMLA):
         **kwargs
     ):
         new_time = random.uniform(0 , self._max_time)
+        new_time  = self._max_time
 
         eps = self._get_exp_params_array()
         eps['t'] = new_time
