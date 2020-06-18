@@ -43,8 +43,8 @@ bf_all_times=0
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 
-# growth_rule='TestSimulatedNVCentre'
-growth_rule='IsingGeneticTest'
+growth_rule='TestSimulatedNVCentre'
+# growth_rule='IsingGeneticTest'
 
 # growth_rule='IsingGenetic'
 # growth_rule='SimulatedNVCentre'
