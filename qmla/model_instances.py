@@ -205,7 +205,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_log_print=0,
+            debug_log_print=True,
         )
         
         # get resampler treshold

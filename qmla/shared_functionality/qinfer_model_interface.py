@@ -429,7 +429,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 self.probe_counter += 1
                 if self.probe_counter >= self.probe_number:
                     self.probe_counter = 0
-        self.log_print(["True evolution {} \t a = {} \t Probe counter {}".format(self.true_evolution, self._a,  self.probe_counter) ] )
+        # self.log_print(["True evolution {} \t a = {} \t Probe counter {}".format(self.true_evolution, self._a,  self.probe_counter) ] )
 
         self.log_print_debug([
             "\n\nLikelihood fnc called. Probe counter={}. True system -> {}.".format(self.probe_counter, self.true_evolution)
@@ -483,6 +483,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         )
         
         self.timings[timing_marker]['likelihood'] += time.time() - t_likelihood_start
+
+        self.log_print_debug(["Storing likelihoods"])
         if self.true_evolution: 
             self.store_likelihoods['system'][self._a] = pr0
             self.summarise_likelihoods['system'].append(np.median(pr0))
@@ -494,6 +496,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.summarise_likelihoods['particles_std'].append( np.std(pr0) )
             self.summarise_likelihoods['particles_lower_quartile'].append( np.quantile(pr0, 0.25) )
             self.summarise_likelihoods['particles_upper_quartile'].append( np.quantile(pr0, 0.75) )
+        self.log_print_debug(["Stored likelihoods"])
 
         return likelihood_array
 

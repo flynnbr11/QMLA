@@ -275,7 +275,7 @@ class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
 
         # get sample from x
         particle = self._updater.sample()
-        self.log_print(["Particle for IQLE=", particle])
+        # self.log_print(["Particle for IQLE=", particle])
         n_params = particle.shape[1]
 
         for i in range(n_params):
