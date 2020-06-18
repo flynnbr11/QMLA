@@ -490,18 +490,13 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.store_likelihoods['system'][self._a] = pr0
             self.summarise_likelihoods['system'].append(np.median(pr0))
         else:
-            self.log_print_debug(["Storing simulator likelihoods"])
             self.store_likelihoods['simulator'][self._a] = pr0
             diff_p0 = np.abs( pr0 - self.store_likelihoods['system'][self._a])
-            self.log_print_debug(["Storing simulator pr0 diffs"])
             self.store_p0_diffs.append( [np.median(diff_p0), np.std(diff_p0)])
-            self.log_print_debug(["Storing simulator pr0 medians"])
             self.summarise_likelihoods['particles_median'].append( np.median(pr0) )
             self.summarise_likelihoods['particles_std'].append( np.std(pr0) )
-            self.log_print_debug(["Storing simulator pr0 lower quartile"])
-            self.summarise_likelihoods['particles_lower_quartile'].append( np.quantile(pr0, 0.25) )
-            self.log_print_debug(["Storing simulator pr0 lower quartile"])
-            self.summarise_likelihoods['particles_upper_quartile'].append( np.quantile(pr0, 0.75) )
+            self.summarise_likelihoods['particles_lower_quartile'].append( np.percentile(pr0, 25) )
+            self.summarise_likelihoods['particles_upper_quartile'].append( np.percentile(pr0, 75) )
         self.log_print_debug(["Stored likelihoods"])
 
         return likelihood_array
