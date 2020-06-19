@@ -24,12 +24,16 @@ class ModelInstanceForComparison():
     Model instances used for Bayes factor comparisons. 
 
     When Bayes factors are calculated remotely (ie on RQ workers),
-    they require SMCUpdaters etc to do calculations.
+    they require infrastructure to do calculations, e.g. QInfer SMCUpdater instances.
     This class captures the minimum required to enable these calculations.
     After learning, important data from :class:`~qmla.ModelInstanceForLearning`
     is stored on the redis database. 
     This class unpickles the useful information and generates new 
     instances of the updater etc. to use in the comparison calculations.
+
+    If run locally, `qmla_core_info_database` and `learned_model_info`
+    can be passed directly to this class, to save unpickling 
+    data from the redis database. 
 
     :param int model_id: ID of the model to study
     :param qid: ID of the QMLA instance
@@ -155,10 +159,9 @@ class ModelInstanceForComparison():
             log_file=self.log_file,
         )
 
+        # Reconstruct the updater from results of learning
         self.reconstruct_updater = True # optionally just load it
-        time_s = time.time()
         if self.reconstruct_updater:
-            # reconstruct the updater from results of learning
             posterior_distribution = qi.MultivariateNormalDistribution(
                 self.estimated_mean_params,
                 self.covariance_mtx_final
@@ -181,7 +184,8 @@ class ModelInstanceForComparison():
             self.qinfer_updater._normalization_record = self.model_normalization_record
             self.qinfer_updater._log_total_likelihood = self.log_total_likelihood
         else:
-            # Not currently pickling the updater -- can be done in ModelInstanceForLearning.learned_info_dict()
+            # Optionally pickle the entire updater 
+            # (first include updater in ModelInstanceForLearning.learned_info_dict())
             self.qinfer_updater = pickle.loads(
                 learned_model_info['updater']
             )
