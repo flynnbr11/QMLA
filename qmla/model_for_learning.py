@@ -130,13 +130,13 @@ class ModelInstanceForLearning():
             qmla_core_info_dict = pickle.loads(
                 qmla_core_info_database.get('qmla_settings'))
             self.probes_system = pickle.loads(
-                qmla_core_info_database['ProbeDict'])
+                qmla_core_info_database['probes_system'])
             self.probes_simulator = pickle.loads(
-                qmla_core_info_database['SimProbeDict'])
+                qmla_core_info_database['probes_simulator'])
         else:
             qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
-            self.probes_system = qmla_core_info_database['ProbeDict']
-            self.probes_simulator = qmla_core_info_database['SimProbeDict']
+            self.probes_system = qmla_core_info_database['probes_system']
+            self.probes_simulator = qmla_core_info_database['probes_simulator']
 
         # Extract data from core database
         self.num_particles = qmla_core_info_dict['num_particles']

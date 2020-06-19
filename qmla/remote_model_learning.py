@@ -95,7 +95,7 @@ def remote_learn_model_parameters(
     else:
         qmla_core_info_dict = pickle.loads(
             qmla_core_info_database['qmla_settings'])
-        probe_dict = pickle.loads(qmla_core_info_database['ProbeDict'])
+        probe_dict = pickle.loads(qmla_core_info_database['probes_system'])
 
     true_model_terms_matrices = qmla_core_info_dict['true_oplist']
     qhl_plots = qmla_core_info_dict['qhl_plots']

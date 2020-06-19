@@ -1,11 +1,8 @@
-# Quantum Model Learning Agent instructions
-
-
+# Quantum Model Learning Agent 
 
 ## Packages required:
 
 ### Python 
-TODO: add package installations used
 * numpy 1.16.2
 * pandas 0.20.3
 * scipy 1.0.0
@@ -18,6 +15,7 @@ TODO: add package installations used
 * time (standard)
 * copy (standard)
 * argparse 1.1
+* fermilib==0.1a3
 * redis 2.10.6
 * rq 0.10.6
 * redis-py-cluster 1.3.4
@@ -31,12 +29,6 @@ TODO: add package installations used
 ### Other
 * redis
 
-### Programming convention
-Note that Python files in this package follow Pep8. 
-Before commiting new files, ensure to run autopep8 on the file first. 
-```
-autopep8 --in-place --aggressive <filename>
-```
 
 ## Overview 
 QMLA is a Python package for learning the model describing data obtained by probing a quantum system. 
@@ -81,7 +73,28 @@ The main control the user must change for their purposes is which `growth_rule` 
 Growth rules are the mechanism by which the user can control how QMLA progresses: 
 they specify the logic used to combine previously considered models, 
 to produce unseen models to test against the system. 
+They also contain key attributes for every stage of QMLA, which the user should be familiar with before 
+constructing their own.
+
 
 User growth rules can be written as sub-classes of the GrowthRule class. 
-See the documentation for details of how to do this. 
+In order to write your own growth rule, users should familiarise themselves with 
+the GrowthRule class to fully understand the available degrees of freedom.
+User growth rules must inherit from it, and users should ensure that all the inherited methods
+are suitable for their system and their intended learning procedure.
 
+Briefly, some of the crucial aspects are
+* how to generate probes used for parameter learning
+* how to compute expectation values/likelihoods
+* generating models from prior results
+* selecting which experiment design heuristic to use
+* selecting which prior distribution to use
+* setting the true parameters of the target system
+* setting parameters for 
+
+### Programming convention
+Note that Python files in this package follow Pep8. 
+Before commiting new files, ensure to run autopep8 on the file first. 
+```
+autopep8 --in-place --aggressive <filename>
+```

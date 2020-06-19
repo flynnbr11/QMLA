@@ -77,9 +77,9 @@ class ModelInstanceForStorage():
             )
             qmla_core_info_database = redis_databases['qmla_core_info_database']
             self.probes_system = pickle.loads(
-                qmla_core_info_database['ProbeDict'])
+                qmla_core_info_database['probes_system'])
             self.probes_simulator = pickle.loads(
-                qmla_core_info_database['SimProbeDict'])
+                qmla_core_info_database['probes_simulator'])
             qmla_core_info_dict = pickle.loads(
                 qmla_core_info_database.get('qmla_settings'))
 
@@ -90,8 +90,8 @@ class ModelInstanceForStorage():
                     list(qmla_core_info_database.keys())
                 ]
             )
-            self.probes_system = qmla_core_info_database['ProbeDict']
-            self.probes_simulator = qmla_core_info_database['SimProbeDict']
+            self.probes_system = qmla_core_info_database['probes_system']
+            self.probes_simulator = qmla_core_info_database['probes_simulator']
             qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
 
         # Extract data from core QMLA database
