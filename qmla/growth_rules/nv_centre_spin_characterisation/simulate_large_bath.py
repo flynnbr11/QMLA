@@ -345,3 +345,4 @@ class TestSimulatedNVCentre(
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
         self.max_time_to_consider = 50 * time_basis # 50 microseconds 
         self.plot_time_increment = 5 * time_basis # 0.5 microseconds
+        self.timing_insurance_factor = 0.25
