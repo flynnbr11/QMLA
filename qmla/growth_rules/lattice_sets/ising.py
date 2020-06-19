@@ -7,7 +7,7 @@ from qmla.growth_rules import connected_lattice, growth_rule
 from qmla.growth_rules.lattice_sets import fixed_lattice_set
 import qmla.shared_functionality.probe_set_generation
 from qmla.shared_functionality import topology_predefined
-from qmla import database_framework
+from qmla import construct_models
 
 class IsingLatticeSet(
     fixed_lattice_set.LatticeSet

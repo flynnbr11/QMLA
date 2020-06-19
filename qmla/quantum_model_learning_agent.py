@@ -21,7 +21,7 @@ import seaborn as sns
 
 # QMLA functionality
 import qmla.analysis
-import qmla.database_framework as database_framework
+import qmla.construct_models as construct_models
 import qmla.get_growth_rule as get_growth_rule
 import qmla.redis_settings as rds
 import qmla.model_for_storage
@@ -159,15 +159,15 @@ class QuantumModelLearningAgent():
     def _true_model_definition(self):
         r""" Information related to true (target) model."""
 
-        self.true_model_name = database_framework.alph(
+        self.true_model_name = construct_models.alph(
             self.qmla_controls.true_model_name)
-        self.true_model_dimension = database_framework.get_num_qubits(
+        self.true_model_dimension = construct_models.get_num_qubits(
             self.true_model_name)
         self.true_model_constituent_operators = self.qmla_controls.true_model_terms_matrices
         self.true_model_constituent_terms_latex = [
             self.growth_class.latex_name(term)
             for term in
-            qmla.database_framework.get_constituent_names_from_name(
+            qmla.construct_models.get_constituent_names_from_name(
                 self.true_model_name)
         ]
         self.true_model_num_params = self.qmla_controls.true_model_class.num_constituents
@@ -380,10 +380,10 @@ class QuantumModelLearningAgent():
             base_num_qubits = 3
             base_num_terms = 3
             for op in self.growth_class.initial_models:
-                if database_framework.get_num_qubits(op) < base_num_qubits:
-                    base_num_qubits = database_framework.get_num_qubits(op)
+                if construct_models.get_num_qubits(op) < base_num_qubits:
+                    base_num_qubits = construct_models.get_num_qubits(op)
                 num_terms = len(
-                    database_framework.get_constituent_names_from_name(op))
+                    construct_models.get_constituent_names_from_name(op))
                 if (
                     num_terms < base_num_terms
                 ):
@@ -566,11 +566,14 @@ class QuantumModelLearningAgent():
         :param bool blocking: whether to wait on model to finish learning before proceeding.
         """
 
-        model_already_exists = database_framework.check_model_exists(
+        model_already_exists = self._check_model_exists(
             model_name=model_name,
-            model_lists=self.model_lists,
-            db=self.model_database
         )
+        # model_already_exists = construct_models.check_model_exists(
+        #     model_name=model_name,
+        #     model_lists=self.model_lists,
+        #     # db=self.model_database
+        # )
 
         if not model_already_exists:
             self.log_print([
@@ -579,9 +582,12 @@ class QuantumModelLearningAgent():
                 )
             ])
         else:
-            model_id = database_framework.model_id_from_name(
-                self.model_database,
-                name=model_name
+            # model_id = construct_models.model_id_from_name(
+            #     self.model_database,
+            #     name=model_name
+            # )
+            model_id = self._get_model_id_from_name(
+                model_name = model_name
             )
             if model_id not in self.models_learned:
                 self.models_learned.append(model_id)
@@ -690,7 +696,7 @@ class QuantumModelLearningAgent():
             `wait_on_result==True`.
         """
 
-        unique_id = database_framework.unique_model_pair_identifier(
+        unique_id = construct_models.unique_model_pair_identifier(
             model_a_id,
             model_b_id
         )
@@ -754,7 +760,7 @@ class QuantumModelLearningAgent():
                 log_file=self.rq_log_file
             )
         if wait_on_result == True:
-            pair_id = database_framework.unique_model_pair_identifier(
+            pair_id = construct_models.unique_model_pair_identifier(
                 model_a_id,
                 model_b_id
             )
@@ -803,7 +809,7 @@ class QuantumModelLearningAgent():
 
         remote_jobs = []
         for pair in pair_list:
-            unique_id = database_framework.unique_model_pair_identifier(
+            unique_id = construct_models.unique_model_pair_identifier(
                 pair[0], pair[1]
             )
             if (
@@ -881,7 +887,7 @@ class QuantumModelLearningAgent():
             a = pair[0]
             b = pair[1]
             if a != b:
-                unique_id = database_framework.unique_model_pair_identifier(
+                unique_id = construct_models.unique_model_pair_identifier(
                     a, b
                 )
                 if (
@@ -931,7 +937,7 @@ class QuantumModelLearningAgent():
         elif a is not None and b is not None:
             a = float(a)
             b = float(b)
-            pair = database_framework.unique_model_pair_identifier(a, b)
+            pair = construct_models.unique_model_pair_identifier(a, b)
         else:
             self.log_print([
                 "Must pass either two model ids, or a \
@@ -1049,13 +1055,6 @@ class QuantumModelLearningAgent():
                 have same number of points in process_model_set_comparisons:",
                 models_with_max_points
             ])
-            for i in models_with_max_points:
-                self.log_print(
-                    [
-                        database_framework.model_name_from_id(
-                            self.model_database, i)
-                    ]
-                )
             self.log_print(["After re-comparison, points:\n", models_points])
             self.compare_model_set(
                 model_id_list=models_with_max_points,
@@ -1544,17 +1543,18 @@ class QuantumModelLearningAgent():
             model_id: unique model ID for the model, whether new or existing
         """
 
-        model_name = database_framework.alph(model) 
+        model_name = construct_models.alph(model) 
         self.log_print(["Trying to add model to DB:", model_name])
 
         # Add model if not yet considered or told to force create
         if (
-            qmla.database_framework.consider_new_model(
-                self.model_lists, model_name, self.model_database) == 'New'
+            # qmla.construct_models.consider_new_model(
+            #     self.model_lists, model_name) == 'New'
+            self._consider_new_model(model_name) == 'New'
             or force_create_model == True
         ):
             # create new model instance
-            model_num_qubits = qmla.database_framework.get_num_qubits(
+            model_num_qubits = qmla.construct_models.get_num_qubits(
                 model_name)
             model_id = self.highest_model_id + 1
             self.model_lists[model_num_qubits].append(model_name)
@@ -1564,7 +1564,7 @@ class QuantumModelLearningAgent():
                     model_name, model_id
                 )
             ])
-            op = qmla.database_framework.Operator(
+            op = qmla.construct_models.Operator(
                 name=model_name
             )
             # generate model storage instance
@@ -1601,8 +1601,8 @@ class QuantumModelLearningAgent():
             self.model_database.loc[num_rows] = running_db_new_row
             
             model_added = True
-            if database_framework.alph(
-                    model) == database_framework.alph(self.true_model_name):
+            if construct_models.alph(
+                    model) == construct_models.alph(self.true_model_name):
                 self.true_model_id = model_id
                 self.true_model_considered = True
                 self.true_model_branch = branch_id
@@ -1619,9 +1619,12 @@ class QuantumModelLearningAgent():
                 "Model not added: {}".format(model_name)
             ])
             try:
-                model_id = database_framework.model_id_from_name(
-                    db=self.model_database,
-                    name=model_name
+                # model_id = construct_models.model_id_from_name(
+                #     db=self.model_database,
+                #     name=model_name
+                # )
+                model_id = self._get_model_id_from_name(
+                    model_name=model_name
                 )
                 self.log_print([
                     "Previously considered as model ", model_id
@@ -1749,7 +1752,7 @@ class QuantumModelLearningAgent():
         model_name = mod.model_name
 
         # Get expectation values of this model
-        n_qubits = database_framework.get_num_qubits(model_name)
+        n_qubits = construct_models.get_num_qubits(model_name)
         if n_qubits > 5:
             expec_val_plot_times = self.times_to_plot_reduced_set
         else:
@@ -1775,7 +1778,7 @@ class QuantumModelLearningAgent():
         # Compare this model to the true model (only meaningful for simulated
         # cases)
         correct_model = misfit = underfit = overfit = 0
-        num_params_champ_model = database_framework.Operator(
+        num_params_champ_model = construct_models.Operator(
             model_name).num_constituents
 
         if model_name == self.true_model_name:
@@ -1820,7 +1823,7 @@ class QuantumModelLearningAgent():
             'ConstituentTerms': mod.constituents_terms_latex,
             'LearnedHamiltonian': mod.learned_hamiltonian,
             'GrowthGenerator': mod.growth_rule_of_this_model,
-            'NameAlphabetical': database_framework.alph(mod.model_name),
+            'NameAlphabetical': construct_models.alph(mod.model_name),
             'LearnedParameters': mod.qhl_final_param_estimates,
             'FinalSigmas': mod.qhl_final_param_uncertainties,
             'ExpectationValues': mod.expectation_values,
@@ -1931,7 +1934,7 @@ class QuantumModelLearningAgent():
                 set(params) - set(to_remove)
             )
             new_mod = '+'.join(new_model_terms)
-            new_mod = database_framework.alph(new_mod)
+            new_mod = construct_models.alph(new_mod)
 
             self.log_print([
                 "Some neglibible parameters found:", removed_params,
@@ -1948,7 +1951,7 @@ class QuantumModelLearningAgent():
             )
 
             reduced_mod_terms = sorted(
-                database_framework.get_constituent_names_from_name(
+                construct_models.get_constituent_names_from_name(
                     new_mod
                 )
             )
@@ -2134,9 +2137,12 @@ class QuantumModelLearningAgent():
             blocking=True
         )
 
-        mod_id = database_framework.model_id_from_name(
-            db=self.model_database,
-            name=mod_to_learn
+        # mod_id = construct_models.model_id_from_name(
+        #     db=self.model_database,
+        #     name=mod_to_learn
+        # )
+        mod_id = self._get_model_id_from_name(
+            model_name=mod_to_learn
         )
 
         # these don't really matter for QHL,
@@ -2185,11 +2191,16 @@ class QuantumModelLearningAgent():
         self.qhl_mode_multiple_models = True
         self.champion_model_id = -1,  # TODO just so not to crash during dynamics plot
         self.qhl_mode_multiple_models_model_ids = [
-            database_framework.model_id_from_name(
-                db=self.model_database,
-                name=mod_name
+            self._get_model_id_from_name(
+                model_name=mod_name
             ) for mod_name in model_names
         ]
+        # self.qhl_mode_multiple_models_model_ids = [
+        #     construct_models.model_id_from_name(
+        #         db=self.model_database,
+        #         name=mod_name
+        #     ) for mod_name in model_names
+        # ]
         self.log_print(
             [
                 'QHL for multiple models:', model_names,
@@ -2199,10 +2210,13 @@ class QuantumModelLearningAgent():
 
         # learn models
         for mod_name in model_names:
-            mod_id = database_framework.model_id_from_name(
-                db=self.model_database,
-                name=mod_name
+            mod_id = self._get_model_id_from_name(
+                model_name=mod_name
             )
+            # mod_id = construct_models.model_id_from_name(
+            #     db=self.model_database,
+            #     name=mod_name
+            # )
             learned_models_ids.set(
                 str(mod_id), 0
             )
@@ -2235,9 +2249,12 @@ class QuantumModelLearningAgent():
 
         # Tidy up: store learned info, analyse, etc.
         for mod_name in model_names:
-            mod_id = database_framework.model_id_from_name(
-                db=self.model_database, name=mod_name
+            mod_id = self._get_model_id_from_name(
+                model_name=mod_name
             )
+            # mod_id = construct_models.model_id_from_name(
+            #     db=self.model_database, name=mod_name
+            # )
             mod = self.get_model_storage_instance_by_id(mod_id)
             mod.model_update_learned_values()
             # self.compute_model_f_score(model_id=mod_id)
@@ -2314,7 +2331,7 @@ class QuantumModelLearningAgent():
         if self.true_model_found:
             self.log_print([
                 "True model found: {}".format(
-                    database_framework.alph(self.true_model_name)
+                    construct_models.alph(self.true_model_name)
                 )
             ])
         self.log_print([
@@ -2335,6 +2352,61 @@ class QuantumModelLearningAgent():
             "\nFinal winner:", self.global_champion_name,
             "has F-score ", np.round(self.model_f_scores[self.champion_model_id], 2)
         ])
+
+    ##########
+    # Section: Database interface
+    ##########
+
+    def _get_model_data_by_field(self, name, field):
+        r"""
+        Get any data from the model database corresponding to a given model name.
+
+        :param str name: model name to get data of
+        :param str field: field name to get data corresponding to model
+        """
+
+        # val = list(self.model_database[self.model_database['model_name'] == name][field])[0]
+        # TODO use below instead:
+        val = self.model_database[self.model_database['model_name'] == name][field].item()
+        return val
+
+    def _get_model_id_from_name(self, model_name):
+        return self._get_model_data_by_field(
+            name = model_name, 
+            field = 'model_id'
+        )
+
+    def _consider_new_model(self, model_name):
+        r"""
+        Check whether a proposed model already exists. 
+
+        Check whether the new model `name`, exists in 
+        all previously considered models, held in `model_lists`, organised 
+        by dimension of models.
+        If name has not been previously considered, 'New' is returned.
+        If name has been previously considered, the corresponding location
+            in db is returned.
+        
+        :param dict model_lists: lists of models already considered, organised 
+            by the number of qubits of those models
+        :param str name: model for consideration
+        """
+        # Return true indicates it has not been considered and so can be added
+        al_name = qmla.construct_models.alph(model_name)
+        n_qub = qmla.construct_models.get_num_qubits(model_name)
+        if al_name in self.model_lists[n_qub]:
+            return 'Previously Considered'  # todo -- make clear if in legacy or running db
+        else:
+            return 'New'
+
+    def _check_model_exists(self, model_name):
+        r""" 
+        True if model already exists; False if not.
+        """
+        if self._consider_new_model(model_name) == 'New':
+            return False
+        else:
+            return True
 
     ##########
     # Section: Utilities
@@ -2397,16 +2469,7 @@ class QuantumModelLearningAgent():
         del self.redis_databases
         del self.write_log_file
 
-    def _get_model_data_by_field(self, name, field):
-        r"""
-        Get information from the model database by model name.
 
-        :param str name: model name to get data of
-        :param str field: field name to get data corresponding to model
-        """
-
-        val = list(self.model_database[self.model_database['model_name'] == name][field])[0]
-        return val
 
     ##########
     # Section: Analysis/plotting methods
@@ -2441,7 +2504,7 @@ class QuantumModelLearningAgent():
                 term
             )
             for term in
-            database_framework.get_constituent_names_from_name(
+            construct_models.get_constituent_names_from_name(
                 # self.model_name_id_map[model_id]
                 model_name
             )
@@ -2661,8 +2724,12 @@ class QuantumModelLearningAgent():
             plot_descriptor += '[Branch champions]'
 
         elif branch_id is not None:
-            model_id_list = database_framework.list_model_id_in_branch(
-                self.model_database, branch_id)
+            model_id_list = list(
+                self.model_database[
+                    self.model_database['branch_id'] == branch_id]['model_id']
+            )
+            # model_id_list = construct_models.list_model_id_in_branch(
+            #     self.model_database, branch_id)
             plot_descriptor += '[Branch' + str(branch_id) + ']'
 
         elif model_id_list is None:
@@ -2727,8 +2794,9 @@ class QuantumModelLearningAgent():
             model's parameter estimeates
         """
         if true_model:
-            model_id = database_framework.model_id_from_name(
-                db=self.model_database, name=self.true_model_name)
+            # model_id = construct_models.model_id_from_name(
+            #     db=self.model_database, name=self.true_model_name)
+            model_id = self._get_model_id_from_name(name=self.true_model_name)
 
         qmla.analysis.plot_parameter_estimates(qmd=self,
                                                model_id=model_id,

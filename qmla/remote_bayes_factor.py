@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
-import qmla.database_framework as database_framework
+import qmla.construct_models as construct_models
 import qmla.model_for_comparison
 import qmla.logging
 import qmla.redis_settings as rds
@@ -207,7 +207,7 @@ def remote_bayes_factor_calculation(
     elif bayes_factor > 1e160:
         bayes_factor = 1e160
 
-    pair_id = database_framework.unique_model_pair_identifier(
+    pair_id = construct_models.unique_model_pair_identifier(
         model_a_id, model_b_id
     )
 

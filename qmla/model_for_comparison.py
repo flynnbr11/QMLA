@@ -11,7 +11,7 @@ import pickle
 import qmla.redis_settings
 import qmla.logging
 import qmla.get_growth_rule
-import qmla.database_framework
+import qmla.construct_models
 
 pickle.HIGHEST_PROTOCOL = 4
 
@@ -128,7 +128,7 @@ class ModelInstanceForComparison():
             self.log_print(["This is the true model for comparison."])
         else:
             self.is_true_model = False
-        op = qmla.database_framework.Operator(self.model_name)
+        op = qmla.construct_models.Operator(self.model_name)
         self.model_terms_matrices = op.constituents_operators
         self.model_terms_parameters_final = np.array(self.final_learned_params)
         self.growth_class = qmla.get_growth_rule.get_growth_generator_class(

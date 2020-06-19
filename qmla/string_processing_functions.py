@@ -4,7 +4,7 @@ import numpy as np
 from fermilib.ops import FermionOperator
 import fermilib.transforms
 
-from qmla import database_framework
+from qmla import construct_models
 
 import qmla.logging
 
@@ -36,7 +36,7 @@ def full_model_string(operations):
 
     # Note TODO: this doesn't give an error when tuples are
     # given which aren't used. it should
-    from qmla.database_framework import alph
+    from qmla.construct_models import alph
     terms = operations['terms']
     num_qubits = operations['dim']
     num_terms = len(terms)
@@ -72,8 +72,8 @@ def full_model_string(operations):
 
 
 def operations_dict_from_name(mod_name):
-    constituents = database_framework.get_constituent_names_from_name(mod_name)
-    num_qubits = database_framework.get_num_qubits(mod_name)
+    constituents = construct_models.get_constituent_names_from_name(mod_name)
+    num_qubits = construct_models.get_num_qubits(mod_name)
     initial_t_str = ''
     all_terms = []
     for j in range(num_qubits - 1):
@@ -119,7 +119,7 @@ def process_transverse_term(term):
 
     components = term.split('_')
     components.remove('transverse')
-    core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+    core_operators = list(sorted(construct_models.core_operator_dict.keys()))
 
     for l in components:
         if l[0] == 'd':
@@ -142,7 +142,7 @@ def process_multipauli_term(term):
 
     components = term.split('_')
     components.remove('pauliSet')
-    core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+    core_operators = list(sorted(construct_models.core_operator_dict.keys()))
     for l in components:
         if l[0] == 'd':
             dim = int(l.replace('d', ''))
@@ -161,7 +161,7 @@ def process_multipauli_term(term):
     }
 
     full_mod_str = full_model_string(term_dict)
-    return database_framework.compute(full_mod_str)
+    return construct_models.compute(full_mod_str)
 
 def process_likewise_pauli_sum(term):
     r"""
@@ -194,7 +194,7 @@ def process_likewise_pauli_sum(term):
         all_terms.append(new_term)
 
     total_model_string = '+'.join(all_terms)  
-    return qmla.database_framework.compute(total_model_string)    
+    return qmla.construct_models.compute(total_model_string)    
 
 def process_n_qubit_NV_centre_spin(term):
     components = term.split('_')
@@ -233,7 +233,7 @@ def process_n_qubit_NV_centre_spin(term):
                 op_name += p_str
 
     # print("Type {} ; name {}".format(term_type, op_name))
-    return database_framework.compute(op_name)
+    return construct_models.compute(op_name)
 
 def process_ising_chain(term):
     print("USING ISING CHAIN MTX PROCESS for ", term)
@@ -248,9 +248,9 @@ def process_ising_chain(term):
     for d in range(1, dim):
         s = 'pauliSet_{}J{}_zJz_d{}'.format(d, d+1, dim)
         if mtx is None:
-            mtx = qmla.database_framework.compute(s)
+            mtx = qmla.construct_models.compute(s)
         else:
-            mtx += qmla.database_framework.compute(s)
+            mtx += qmla.construct_models.compute(s)
     return mtx
 
 
@@ -301,9 +301,9 @@ def transverse_axis_matrix(
                 t_str += 'T'
 
         individual_transverse_terms.append(single_term)
-    running_mtx = database_framework.compute(individual_transverse_terms[0])
+    running_mtx = construct_models.compute(individual_transverse_terms[0])
     for term in individual_transverse_terms[1:]:
-        running_mtx += database_framework.compute(term)
+        running_mtx += construct_models.compute(term)
     return running_mtx
 
 
@@ -333,10 +333,10 @@ def ising_interaction_component(num_qubits, interaction_axis):
 
         individual_interaction_terms.append(single_term)
 
-    running_mtx = database_framework.compute(individual_interaction_terms[0])
+    running_mtx = construct_models.compute(individual_interaction_terms[0])
 
     for term in individual_interaction_terms[1:]:
-        running_mtx += database_framework.compute(term)
+        running_mtx += construct_models.compute(term)
 
     return running_mtx
 
@@ -389,10 +389,10 @@ def single_axis_nearest_neighbour_interaction_chain(
 
         individual_interaction_terms.append(single_term)
 
-    running_mtx = database_framework.compute(individual_interaction_terms[0])
+    running_mtx = construct_models.compute(individual_interaction_terms[0])
 
     for term in individual_interaction_terms[1:]:
-        running_mtx += database_framework.compute(term)
+        running_mtx += construct_models.compute(term)
 
     return running_mtx
 
@@ -418,10 +418,10 @@ def single_axis_transverse_component(
 
         individual_transverse_terms.append(single_term)
 
-    running_mtx = database_framework.compute(individual_transverse_terms[0])
+    running_mtx = construct_models.compute(individual_transverse_terms[0])
 
     for term in individual_transverse_terms[1:]:
-        running_mtx += database_framework.compute(term)
+        running_mtx += construct_models.compute(term)
 
     return running_mtx
 
@@ -583,5 +583,5 @@ def process_hubbard_operator(
     term
 ):
     # TODO deprecated?
-    # for use in computing base level terms in a model, used in database_framework.
+    # for use in computing base level terms in a model, used in construct_models.
     return base_hubbard_grouped_term(term)

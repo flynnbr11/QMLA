@@ -12,7 +12,7 @@ from matplotlib.lines import Line2D
 from matplotlib.gridspec import GridSpec
 import scipy
 
-import qmla.database_framework
+import qmla.construct_models
 
 __all__ = [
     'bayes_factor_f_score_heatmap',
@@ -556,13 +556,13 @@ def plot_scores(
     batch_correct_models = []
     if batch_nearest_num_params_as_winners == True:
         num_true_params = len(
-            qmla.database_framework.get_constituent_names_from_name(
+            qmla.construct_models.get_constituent_names_from_name(
                 true_model
             )
         )
         for mod in models:
             num_params = len(
-                qmla.database_framework.get_constituent_names_from_name(mod)
+                qmla.construct_models.get_constituent_names_from_name(mod)
             )
 
             if (

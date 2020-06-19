@@ -13,7 +13,7 @@ import qmla.growth_rules.genetic_algorithms.genetic_growth_rule
 from qmla.growth_rules.genetic_algorithms.genetic_growth_rule import Genetic
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.expectation_values
-import qmla.database_framework
+import qmla.construct_models
 
 
 class NVCentreGenticAlgorithm(
@@ -50,7 +50,7 @@ class NVCentreGenticAlgorithm(
             'yTz'
         ]
         self.true_model = 'xTi+yTi+zTi+zTz'
-        self.num_sites = qmla.database_framework.get_num_qubits(self.true_model)
+        self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
 
         self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
             num_sites=self.num_sites,
@@ -88,7 +88,7 @@ class NVCentreGenticAlgorithm(
         if name == 'x' or name == 'y' or name == 'z':
             return '$' + name + '$'
 
-        num_qubits = qmla.database_framework.get_num_qubits(name)
+        num_qubits = qmla.construct_models.get_num_qubits(name)
         # terms = name.split('PP')
         terms = name.split('+')
         rotations = ['xTi', 'yTi', 'zTi']

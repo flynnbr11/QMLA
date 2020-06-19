@@ -5,7 +5,7 @@ import os
 
 from qmla.growth_rules import connected_lattice, growth_rule
 import qmla.shared_functionality.probe_set_generation
-from qmla import database_framework
+from qmla import construct_models
 
 class LatticeSet(
     # connected_lattice.ConnectedLattice
@@ -67,7 +67,7 @@ class LatticeSet(
                 lattice_dimension
             )
             complete_model += '+{}'.format(transverse_term)
-        return database_framework.alph(complete_model)
+        return construct_models.alph(complete_model)
 
 
     def generate_models(

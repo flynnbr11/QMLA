@@ -1,6 +1,6 @@
 import numpy as np
 
-import qmla.database_framework as database_framework
+import qmla.construct_models as construct_models
 
 """
 Useful functions

@@ -23,7 +23,7 @@ from scipy import linalg, stats
 import random
 
 import qmla.utilities
-import qmla.database_framework
+import qmla.construct_models
 
 ###################################
 # General useful functions
@@ -199,7 +199,7 @@ def eigenbasis_of_first_qubit(
     bases_to_learn = ['x', 'y', 'z']
     for N in range(1, max_num_qubits+1):
         bases = ['pauliSet_1_{}_d{}'.format(b, N) for b in bases_to_learn ]
-        base_matrices = [qmla.database_framework.compute(b) for b in bases]
+        base_matrices = [qmla.construct_models.compute(b) for b in bases]
         eig_vectors_list = qmla.utilities.flatten([np.linalg.eig(b)[1] for b in base_matrices])
         eig_vectors = itertools.cycle(eig_vectors_list)
 

@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
-import qmla.database_framework as database_framework
+import qmla.construct_models as construct_models
 import qmla.logging
 
 __all__ = [
@@ -67,7 +67,7 @@ def gaussian_prior(
         log_file,
         log_identifier
     )
-    individual_terms = database_framework.get_constituent_names_from_name(
+    individual_terms = construct_models.get_constituent_names_from_name(
         model_name
     )
     num_terms = len(individual_terms)

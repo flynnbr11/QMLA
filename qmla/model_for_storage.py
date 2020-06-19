@@ -13,7 +13,7 @@ import qmla.memory_tests
 import qmla.logging
 import qmla.get_growth_rule
 import qmla.shared_functionality.experimental_data_processing
-import qmla.database_framework
+import qmla.construct_models
 import qmla.analysis
 import qmla.process_string_to_matrix
 
@@ -60,7 +60,7 @@ class ModelInstanceForStorage():
         self.redis_port_number = port_number
         self.qmla_id = qid
         self.log_file = log_file
-        self.model_name = qmla.database_framework.alph(model_name)
+        self.model_name = qmla.construct_models.alph(model_name)
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
 
@@ -108,7 +108,7 @@ class ModelInstanceForStorage():
 
         # Define parameters used by qmla class
         self.model_bayes_factors = {}
-        self.model_num_qubits = qmla.database_framework.get_num_qubits(
+        self.model_num_qubits = qmla.construct_models.get_num_qubits(
             self.model_name)
         self.probe_num_qubits = self.model_num_qubits
         self.expectation_values = {}
@@ -198,7 +198,7 @@ class ModelInstanceForStorage():
             self.model_name_latex = self.growth_class.latex_name(
                 name=self.model_name
             )
-            model_constituent_terms = qmla.database_framework.get_constituent_names_from_name(
+            model_constituent_terms = qmla.construct_models.get_constituent_names_from_name(
                 self.model_name
             )
             self.constituents_terms_latex = [

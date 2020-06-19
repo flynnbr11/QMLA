@@ -18,7 +18,7 @@ import qmla.redis_settings
 import qmla.logging
 import qmla.get_growth_rule
 import qmla.shared_functionality.prior_distributions
-import qmla.database_framework
+import qmla.construct_models
 import qmla.analysis
 import qmla.utilities
 
@@ -169,13 +169,13 @@ class ModelInstanceForLearning():
             raise
 
         # Get initial configuration for this model 
-        op = qmla.database_framework.Operator(name=model_name)
+        op = qmla.construct_models.Operator(name=model_name)
         self.model_terms_names = op.constituents_names
         self.model_name_latex = self.growth_class.latex_name(
             name=self.model_name
         )
         self.model_terms_matrices = np.asarray(op.constituents_operators)
-        self.model_dimension = qmla.database_framework.get_num_qubits(self.model_name)
+        self.model_dimension = qmla.construct_models.get_num_qubits(self.model_name)
 
         # Poterntially use different resources depending on relative model complexity.
         self._consider_reallocate_resources()
@@ -527,7 +527,7 @@ class ModelInstanceForLearning():
         # Compute the Hamiltonian corresponding to the parameter posterior distribution
         self.learned_hamiltonian = sum([
             self.qhl_final_param_estimates[term]
-            * qmla.database_framework.compute(term)
+            * qmla.construct_models.compute(term)
             for term in self.qhl_final_param_estimates
         ])
 
@@ -1255,10 +1255,10 @@ class ModelInstanceForLearning():
         
         if self.growth_class.reallocate_resources:
             base_resources = qmla_core_info_dict['base_resources']
-            this_model_num_qubits = qmla.database_framework.get_num_qubits(
+            this_model_num_qubits = qmla.construct_models.get_num_qubits(
                 self.model_name)
             this_model_num_terms = len(
-                qmla.database_framework.get_constituent_names_from_name(
+                qmla.construct_models.get_constituent_names_from_name(
                     self.model_name)
             )
             max_num_params = self.growth_class.max_num_parameter_estimate
@@ -1306,7 +1306,7 @@ class ModelInstanceForLearning():
             '.png'
         )
 
-        individual_terms_in_name = qmla.database_framework.get_constituent_names_from_name(
+        individual_terms_in_name = qmla.construct_models.get_constituent_names_from_name(
             self.model_name
         )
         latex_terms = []

@@ -34,7 +34,7 @@ import seaborn as sns
 import qmla.get_growth_rule as get_growth_rule
 import qmla.shared_functionality.experimental_data_processing
 import qmla.shared_functionality.expectation_values
-import qmla.database_framework as database_framework
+import qmla.construct_models as construct_models
 
 frameinfo = getframeinfo(currentframe())
 
@@ -226,7 +226,7 @@ def plot_parameter_estimates(
             list(qmd.model_name_id_map.values())
         )
         return False
-    terms = database_framework.get_constituent_names_from_name(name)
+    terms = construct_models.get_constituent_names_from_name(name)
     num_terms = len(terms)
 
     term_positions = {}
@@ -573,7 +573,7 @@ def plot_learned_models_dynamics(
         if include_param_estimates == True:
             ax = fig.add_subplot(gs[row, col])
             name = reduced.model_name
-            terms = database_framework.get_constituent_names_from_name(name)
+            terms = construct_models.get_constituent_names_from_name(name)
             num_terms = len(terms)
 
             term_positions = {}
@@ -915,7 +915,7 @@ def r_squared_from_epoch_list(
         mod = qmd.get_model_storage_instance_by_id(model_id)
         r_squared_by_epoch = {}
 
-        mod_num_qubits = database_framework.get_num_qubits(mod.model_name)
+        mod_num_qubits = construct_models.get_num_qubits(mod.model_name)
         probe = qmla.shared_functionality.expectation_values.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.num_experiments - 1])
         if len(mod.epochs_after_resampling) > 0:

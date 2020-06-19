@@ -4,7 +4,7 @@ import os
 
 from qmla.growth_rules.growth_rule import GrowthRule
 import qmla.shared_functionality.experiment_design_heuristics
-from qmla import database_framework
+from qmla import construct_models
 
 __all__ = [
     'ExperimentFullAccessNV'
@@ -114,7 +114,7 @@ class ExperimentFullAccessNV(
                 if term not in present_terms:
                     new_model = model + p_str + term
                     if (
-                        database_framework.check_model_in_dict(
+                        check_model_in_dict(
                             new_model, model_dict) == False
                         and new_model not in new_models
                     ):
@@ -129,7 +129,7 @@ class ExperimentFullAccessNV(
                 if term not in present_terms:
                     new_model = model + p_str + term
                     if (
-                        database_framework.check_model_in_dict(
+                        check_model_in_dict(
                             new_model, model_dict) == False
                         and new_model not in new_models
                     ):
@@ -145,7 +145,7 @@ class ExperimentFullAccessNV(
                 if term not in present_terms:
                     new_model = model + p_str + term
                     if (
-                        database_framework.check_model_in_dict(
+                        check_model_in_dict(
                             new_model, model_dict) == False
                         and new_model not in new_models
                     ):
@@ -161,7 +161,7 @@ class ExperimentFullAccessNV(
         if name == 'x' or name == 'y' or name == 'z':
             return '$' + name + '$'
 
-        num_qubits = database_framework.get_num_qubits(name)
+        num_qubits = construct_models.get_num_qubits(name)
         # terms = name.split('PP')
         terms = name.split('+')
         rotations = ['xTi', 'yTi', 'zTi']
@@ -213,3 +213,21 @@ class ExperimentFullAccessNV(
             latex_term = '+'.join(individual_terms)
             final_term = '$' + latex_term + '$'
             return final_term
+
+
+def check_model_in_dict(name, model_dict):
+    """
+    Check whether the new model, name, exists in all previously considered models,
+        held in model_lists.
+    [previously in construct_models]
+    If name has not been previously considered, False is returned.
+    """
+    # Return true indicates it has not been considered and so can be added
+
+    al_name = alph(name)
+    n_qub = get_num_qubits(name)
+
+    if al_name in model_dict[n_qub]:
+        return True  # todo -- make clear if in legacy or running db
+    else:
+        return False

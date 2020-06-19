@@ -4,7 +4,7 @@ import sys
 import pickle
 
 import qmla.get_growth_rule
-import qmla.database_framework as database_framework
+import qmla.construct_models as construct_models
 import qmla.logging
 
 __all__ = [
@@ -93,8 +93,8 @@ class ControlsQMLA():
         
         # Attributes about true model
         self.true_model = true_params_info['true_model']
-        self.true_model_name = database_framework.alph(self.true_model)
-        self.true_model_class = database_framework.Operator(
+        self.true_model_name = construct_models.alph(self.true_model)
+        self.true_model_class = construct_models.Operator(
             self.true_model_name
         )
         self.true_model_terms_matrices = self.true_model_class.constituents_operators

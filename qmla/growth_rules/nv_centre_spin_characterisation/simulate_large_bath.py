@@ -5,7 +5,7 @@ import itertools
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.expectation_values
-from qmla import database_framework
+from qmla import construct_models
 
 
 class SimulatedNVCentre(
@@ -110,7 +110,7 @@ class SimulatedNVCentre(
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
-        self.true_model = qmla.database_framework.alph(self.true_model)
+        self.true_model = qmla.construct_models.alph(self.true_model)
         
         self.tree_completed_initially = True
         self.initial_models=None
@@ -153,8 +153,8 @@ class SimulatedNVCentre(
         **kwargs
     ):
         # print("[latex name fnc] name:", name)
-        core_operators = list(sorted(database_framework.core_operator_dict.keys()))
-        num_sites = database_framework.get_num_qubits(name)
+        core_operators = list(sorted(construct_models.core_operator_dict.keys()))
+        num_sites = construct_models.get_num_qubits(name)
         p_str = '+'
         separate_terms = name.split(p_str)
 
@@ -241,7 +241,7 @@ def spin_system_model(
     if include_transverse_terms: all_terms.extend(transverse_terms)
     
     model = '+'.join(all_terms)
-    model = qmla.database_framework.alph(model)
+    model = qmla.construct_models.alph(model)
     print("Spin system used:", model)
     return model
     
@@ -322,7 +322,7 @@ class TestSimulatedNVCentre(
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
-        self.true_model = qmla.database_framework.alph(self.true_model)
+        self.true_model = qmla.construct_models.alph(self.true_model)
         self.qinfer_resampler_threshold = 0.15
         self.qinfer_resampler_a = 0.98
         self.iqle_mode = False

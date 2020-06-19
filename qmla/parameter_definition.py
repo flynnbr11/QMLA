@@ -6,7 +6,7 @@ import math
 import scipy
 import matplotlib.pyplot as plt
 
-import qmla.database_framework as database_framework
+import qmla.construct_models as construct_models
 import qmla.shared_functionality.prior_distributions
 
 pickle.HIGHEST_PROTOCOL = 4
@@ -46,7 +46,7 @@ def set_shared_parameters(
     )
 
     # Dissect true model into separate terms.
-    terms = database_framework.get_constituent_names_from_name(
+    terms = construct_models.get_constituent_names_from_name(
         true_model
     )
     latex_terms = [

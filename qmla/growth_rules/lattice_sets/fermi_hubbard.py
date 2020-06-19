@@ -7,7 +7,7 @@ from qmla.growth_rules import connected_lattice, growth_rule
 from qmla.growth_rules.lattice_sets import fixed_lattice_set
 import qmla.shared_functionality.probe_set_generation
 from qmla.shared_functionality import topology_predefined
-from qmla import database_framework
+from qmla import construct_models
 
 class FermiHubbardLatticeSet(
     fixed_lattice_set.LatticeSet
@@ -35,7 +35,7 @@ class FermiHubbardLatticeSet(
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
 
-        self.num_sites_true = database_framework.get_num_qubits(self.true_model)
+        self.num_sites_true = construct_models.get_num_qubits(self.true_model)
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
         self.max_num_qubits = 5
         self.max_num_probe_qubits = self.max_num_qubits
@@ -82,7 +82,7 @@ class FermiHubbardLatticeSet(
             individual_operators.append(onsite_sum)
 
         complete_model = '+'.join(individual_operators)
-        # complete_model = qmla.database_framework.alph(complete_model)
+        # complete_model = qmla.construct_models.alph(complete_model)
         return complete_model
 
     def latex_name(self, name):

@@ -5,7 +5,7 @@ from qmla.quantum_model_learning_agent import *
 
 # Logistics
 from qmla.get_growth_rule import * 
-from qmla.database_framework import * # TODO fix __all__
+from qmla.construct_models import * # TODO fix __all__
 from qmla.controls_qmla import *
 from qmla.logging import *
 from qmla.redis_settings import *

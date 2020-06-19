@@ -9,7 +9,7 @@ import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.expectation_values
-from qmla import database_framework
+from qmla import construct_models
 
 
 __all__ = [
@@ -134,7 +134,7 @@ class NVCentreExperimentalData(
         
         # self.true_model = 'iTi'
         # self.max_spawn_depth = 3
-        self.true_model = qmla.database_framework.alph(self.true_model) 
+        self.true_model = qmla.construct_models.alph(self.true_model) 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.hahn_evolution
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference

@@ -1,6 +1,6 @@
 import numpy as np
 
-from qmla import database_framework
+from qmla import construct_models
 import qmla.string_processing_functions
 import qmla.logging
 
@@ -54,7 +54,7 @@ def process_basic_operator(basic_operator):
     if indicator in string_processing_functions:
         mtx = string_processing_functions[indicator](basic_operator)
     else:
-        mtx = database_framework.core_operator_dict[basic_operator]
+        mtx = construct_models.core_operator_dict[basic_operator]
 
     return mtx
 

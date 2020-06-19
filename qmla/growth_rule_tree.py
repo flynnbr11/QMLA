@@ -16,7 +16,7 @@ from matplotlib.gridspec import GridSpec
 import pickle
 
 import qmla.logging 
-import qmla.database_framework
+import qmla.construct_models
 
 pickle.HIGHEST_PROTOCOL = 4
 plt.switch_backend('agg')
@@ -159,7 +159,7 @@ class GrowthRuleTree():
             ])
 
         model_list = list(set(model_list))
-        model_list = [qmla.database_framework.alph(mod) for mod in model_list]
+        model_list = [qmla.construct_models.alph(mod) for mod in model_list]
         return model_list, pairs_to_compare
 
 
