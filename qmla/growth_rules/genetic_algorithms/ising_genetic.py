@@ -119,14 +119,14 @@ class IsingGeneticTest(
         }
 
         # test F map for random set of 10 models
-        self.initial_models = self.genetic_algorithm.random_initial_models(9)
+        self.initial_models = self.genetic_algorithm.random_initial_models(4)
 
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = False
         self.fraction_particles_for_bf = 0.5
         self.fraction_experiments_for_bf = 0.5
         self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth = 4
+        self.max_spawn_depth = 1
         self.iqle_mode = False
 
         if self.tree_completed_initially:

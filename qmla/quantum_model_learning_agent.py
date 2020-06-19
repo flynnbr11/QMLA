@@ -259,10 +259,10 @@ class QuantumModelLearningAgent():
 
         self.bayes_threshold_lower = self.qmla_controls.bayes_lower
         self.bayes_threshold_upper = self.qmla_controls.bayes_upper
-        self.qinfer_resample_threshold = self.qmla_controls.resample_threshold
-        self.qinfer_resampler_a = self.qmla_controls.resample_a
-        self.qinfer_PGH_heuristic_factor = self.qmla_controls.pgh_factor
-        self.qinfer_PGH_heuristic_exponent = self.qmla_controls.pgh_exponent
+        # self.qinfer_resample_threshold = self.qmla_controls.resample_threshold
+        # self.qinfer_resampler_a = self.qmla_controls.resample_a
+        # self.qinfer_PGH_heuristic_factor = self.qmla_controls.pgh_factor
+        # self.qinfer_PGH_heuristic_exponent = self.qmla_controls.pgh_exponent
 
         # Tracking for analysis
         self.model_f_scores = {}
@@ -1565,7 +1565,7 @@ class QuantumModelLearningAgent():
                 )
             ])
             op = qmla.database_framework.Operator(
-                name=model_name, undimensionalised_name=model_name
+                name=model_name
             )
             # generate model storage instance
             model_storage_instance = qmla.model_for_storage.ModelInstanceForStorage(
@@ -1795,27 +1795,26 @@ class QuantumModelLearningAgent():
         # Summarise the results of this model and instance in a dictionary
         time_taken = time.time() - self._start_time
         results_dict = {
-            # details about QMLA instance:
+            # Details about QMLA instance:
             'QID': self.qmla_id,
             'NumParticles': self.num_particles,
             'NumExperiments': mod.num_experiments,
             'NumBayesTimes': self.num_experiments_for_bayes_updates,
-            'ResampleThreshold': self.qinfer_resample_threshold,
-            'ResamplerA': self.qinfer_resampler_a,
-            'PHGPrefactor': self.qinfer_PGH_heuristic_factor,
             'ConfigLatex': self.latex_config,
             'Heuristic': mod.model_heuristic_class,
             'Time': time_taken,
             'Host': self.redis_host_name,
             'Port': self.redis_port_number,
-            # details about true model:
+            'ResampleThreshold': self.growth_class.qinfer_resampler_threshold,
+            'ResamplerA': self.growth_class.qinfer_resampler_a,
+            # Details about true model:
             'TrueModel': self.true_model_name,
             'TrueModelConsidered': self.true_model_considered,
             'TrueModelFound': self.true_model_found,
             'TrueModelBranch': self.true_model_branch,
             'Truemodel_id': self.true_model_id,
             'TrueModelConstituentTerms': self.true_model_constituent_terms_latex,
-            # details about this model
+            # Details about this model
             'ChampID': model_id,
             'ChampLatex': mod.model_name_latex,
             'ConstituentTerms': mod.constituents_terms_latex,
@@ -1836,7 +1835,7 @@ class QuantumModelLearningAgent():
             'Precision': self.model_precisions[model_id],
             'Sensitivity': self.model_sensitivities[model_id],
             'PValue': mod.p_value,
-            # comparison to true model (for simulated cases)
+            # Comparison to true model (for simulated cases)
             'NumParamDifference': num_params_difference,
             'Underfit': underfit,
             'Overfit': overfit,
@@ -1850,8 +1849,6 @@ class QuantumModelLearningAgent():
             'ModelEvaluationLogLikelihoods': model_evaluation_log_likelihoods,
             'ModelEvaluationMedianLikelihoods': model_evaluation_median_likelihoods,
             'AllModelFScores': self.model_f_scores,
-            # data stored during GrowthRule.growth_rule_finalise():
-            # 'GrowthRuleStorageData': self.growth_class.growth_rule_specific_data_to_store,
         }
 
         self.storage = qmla.utilities.StorageUnit()
@@ -2303,7 +2300,7 @@ class QuantumModelLearningAgent():
             name=self.global_champion_name,
             field='model_id'
         )
-        self.log_print(["Champion selected."])
+        self.log_print(["Champion selected. ID={}".format(self.champion_model_id)])
 
         # Internal analysis
         try:
@@ -2407,11 +2404,9 @@ class QuantumModelLearningAgent():
         :param str name: model name to get data of
         :param str field: field name to get data corresponding to model
         """
-        return database_framework.pull_field(
-            self.model_database,
-            name,
-            field
-        )
+
+        val = list(self.model_database[self.model_database['model_name'] == name][field])[0]
+        return val
 
     ##########
     # Section: Analysis/plotting methods

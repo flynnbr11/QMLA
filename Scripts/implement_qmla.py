@@ -135,7 +135,7 @@ if qmla_controls.qhl_mode:
             "QHL complete",
         ],
     )
-    if qmla_controls.pickle_qmd_class:
+    if qmla_controls.pickle_qmla_instance:
         log_print(
             [
                 "QMD complete. Pickling result to",
@@ -252,7 +252,7 @@ elif (
     #     )
     # )
 
-    if qmla_controls.pickle_qmd_class:
+    if qmla_controls.pickle_qmla_instance:
         log_print(
             [
                 "QMD complete. Pickling result to",
@@ -480,7 +480,7 @@ else:
     )
 
     if (
-        qmla_controls.pickle_qmd_class
+        qmla_controls.pickle_qmla_instance
     ):
         log_print(["QMD complete. Pickling result to",
                    qmla_controls.class_pickle_file], 
