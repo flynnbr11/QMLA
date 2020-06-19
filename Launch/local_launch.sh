@@ -9,7 +9,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1 # don't perform QMLA; perform QHL on known correct model
+qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
@@ -19,8 +19,8 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-exp=500
-prt=2000
+exp=10
+prt=20
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -43,8 +43,8 @@ bf_all_times=0
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 
 
-growth_rule='TestSimulatedNVCentre'
-# growth_rule='IsingGeneticTest'
+# growth_rule='TestSimulatedNVCentre'
+growth_rule='IsingGeneticTest'
 # growth_rule='IsingGeneticSingleLayer'
 
 # growth_rule='IsingGenetic'
@@ -155,7 +155,7 @@ let bt="$exp"
 
 # First set up parameters/data to be used by all instances of QMD for this run. 
 # python3 ../qmla/SetQHLParams.py \
-python3 ../Scripts/set_qmla_params.py \
+python3 ../scripts/set_qmla_params.py \
     -true=$true_params_pickle_file \
     -prt=$prt \
     -prior=$prior_pickle_file \
@@ -187,7 +187,7 @@ echo "Generated configuration."
 # write to a script so we can recall analysis later.
 echo "
 cd $full_path_to_results
-python3 ../../../../Scripts/analyse_qmla.py \
+python3 ../../../../scripts/analyse_qmla.py \
     -dir=$full_path_to_results --bayes_csv=$bayes_csv \
     -log=$this_log \
     -top=$number_best_models_further_qhl \
@@ -199,7 +199,7 @@ python3 ../../../../Scripts/analyse_qmla.py \
     -latex=$latex_mapping_file \
     -gs=1
 
-python3 ../../../../Scripts/generate_results_pdf.py \
+python3 ../../../../scripts/generate_results_pdf.py \
     -dir=$full_path_to_results \
     -p=$prt -e=$exp -bt=$bt -t=$num_tests \
     -log=$this_log \
@@ -230,7 +230,7 @@ do
         let q_id="$q_id+1"
         # python3 -m cProfile -s time \
         python3 \
-            ../Scripts/implement_qmla.py \
+            ../scripts/implement_qmla.py \
             -qhl=$qhl_test \
             -mqhl=$multiple_qhl \
             -rq=$use_rq \
@@ -292,7 +292,7 @@ then
         # q_id=\$((q_id+1))
         let q_id="$q_id + 1"
         echo "QID: $q_id"
-        python3 /Scripts/implement_qmla.py \
+        python3 /scripts/implement_qmla.py \
             -fq=1 \
             -p=$particles \
             -e=$experiments \
@@ -324,7 +324,7 @@ then
     done
     echo "
     cd $full_path_to_results
-    python3 ../../../../Scripts/AnalyseMultipleQMD.py \
+    python3 ../../../../scripts/AnalyseMultipleQMD.py \
         -dir=$full_path_to_results \
         --bayes_csv=$bayes_csv \
         -log=$this_log \

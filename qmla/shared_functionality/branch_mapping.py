@@ -9,7 +9,7 @@ Branch IDs returned are displayed vertically downwards:
 
 import numpy as np
 
-import qmla.database_framework
+import qmla.construct_models
 
 def branch_is_num_params(latex_mapping_file, **kwargs):
     r"""
@@ -39,7 +39,7 @@ def branch_is_num_params(latex_mapping_file, **kwargs):
     model_branches = {}
 
     for mod in model_names:
-        num_params = len(qmla.database_framework.get_constituent_names_from_name(mod))
+        num_params = len(qmla.construct_models.get_constituent_names_from_name(mod))
         num_params_by_mod[mod] = num_params
         latex_name = latex_name_map[mod]
         model_branches[latex_name] = num_params
@@ -66,8 +66,8 @@ def branch_is_num_dims(latex_mapping_file, **kwargs):
     model_branches = {}
 
     for mod in model_names:
-        # num_params = len(qmla.database_framework.get_constituent_names_from_name(mod))
-        num_qubits = qmla.database_framework.get_num_qubits(mod)
+        # num_params = len(qmla.construct_models.get_constituent_names_from_name(mod))
+        num_qubits = qmla.construct_models.get_num_qubits(mod)
         latex_name = latex_name_map[mod]
         model_branches[latex_name] = num_qubits
 
@@ -96,11 +96,11 @@ def branch_is_num_params_and_qubits(
     model_branches = {}
 
     for mod in model_names:
-        # num_params = len(qmla.database_framework.get_constituent_names_from_name(mod))
-        num_qubits = qmla.database_framework.get_num_qubits(mod)
+        # num_params = len(qmla.construct_models.get_constituent_names_from_name(mod))
+        num_qubits = qmla.construct_models.get_num_qubits(mod)
         max_num_params_this_num_sites = 1
         num_params = len(
-            qmla.database_framework.get_constituent_names_from_name(mod)
+            qmla.construct_models.get_constituent_names_from_name(mod)
         )
         latex_name = latex_name_map[mod]
         branch_num = (max_num_params_this_num_sites * num_qubits) + num_params
@@ -131,7 +131,7 @@ def branch_computed_from_qubit_and_param_count(
 
     models_by_num_qubits = {}
     for mod in model_names:
-        num_qubits = qmla.database_framework.get_num_qubits(mod)
+        num_qubits = qmla.construct_models.get_num_qubits(mod)
         if num_qubits not in models_by_num_qubits.keys():
             models_by_num_qubits[num_qubits] = []
         models_by_num_qubits[num_qubits].append(mod)
@@ -144,7 +144,7 @@ def branch_computed_from_qubit_and_param_count(
         base_branch = highest_branch
         models = models_by_num_qubits[num_qubits]
         for model in models:
-            num_params = len(qmla.database_framework.get_constituent_names_from_name(model))
+            num_params = len(qmla.construct_models.get_constituent_names_from_name(model))
             branch_idx = base_branch + num_params
             if branch_idx > highest_branch:
                 highest_branch = branch_idx

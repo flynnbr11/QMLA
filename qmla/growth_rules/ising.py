@@ -4,7 +4,7 @@ import sys
 import os
 from qmla.growth_rules import connected_lattice
 import qmla.shared_functionality.probe_set_generation
-from qmla import database_framework
+from qmla import construct_models
 
 
 
@@ -31,7 +31,7 @@ class IsingProbabilistic(
 
         # self.true_model = 'pauliSet_zJz_1J2_d3PPPpauliSet_xJx_1J3_d3PPPpauliSet_zJz_2J3_d3PPPpauliSet_yJy_1J2_d3'
         self.true_model = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
-        self.true_model = database_framework.alph(self.true_model)
+        self.true_model = construct_models.alph(self.true_model)
         self.qhl_models = [self.true_model, 'pauliSet_zJz_1J2_d4']
         self.base_terms = [
             # 'x',
@@ -118,7 +118,7 @@ class IsingPredetermined(
         # self.true_model = 'pauliSet_zJz_1J2_d3PPPpauliSet_zJz_2J3_d3'
         # self.true_model = '1Dising_ix_d2'
         
-        self.true_model = database_framework.alph(self.true_model)
+        self.true_model = construct_models.alph(self.true_model)
         self.qhl_models = [
             self.true_model,
             'pauliSet_zJz_1J2_d2'
@@ -209,7 +209,7 @@ class TestReducedParticlesBayesFactors(
             'pauliSet_zJz_1J2_d5PPPPPpauliSet_zJz_2J3_d5PPPPPpauliSet_zJz_3J4_d5PPPPPpauliSet_zJz_4J5_d5',
             'pauliSet_zJz_1J2_d5PPPPPpauliSet_zJz_4J5_d5',
         ]
-        self.true_model = database_framework.alph(
+        self.true_model = construct_models.alph(
             self.initial_models[0]
         )
         self.max_num_models_by_shape = {

@@ -13,7 +13,7 @@ import qmla.shared_functionality.experimental_data_processing
 import qmla.get_growth_rule
 import qmla.memory_tests
 import qmla.shared_functionality.probe_set_generation
-import qmla.database_framework
+import qmla.construct_models
 import qmla.logging 
 
 global_print_loc = False
@@ -104,7 +104,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._true_oplist = true_oplist
         self._trueparams = trueparams
         self._truename = truename
-        self._true_dim = qmla.database_framework.get_num_qubits(self._truename)
+        self._true_dim = qmla.construct_models.get_num_qubits(self._truename)
         self.true_param_dict = true_param_dict 
         self.store_likelihoods = {x : {} for x in ['system', 'simulator']}
         self.summarise_likelihoods = {
@@ -117,7 +117,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         true_ham = None
         for k in list(self.true_param_dict.keys()):
             param = self.true_param_dict[k]
-            mtx = qmla.database_framework.compute(k)
+            mtx = qmla.construct_models.compute(k)
             if true_ham is not None:
                 true_ham += param * mtx
             else:
@@ -165,7 +165,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # This is the solver used for time evolution scipy is faster
         # QuTip can handle implicit time dependent likelihoods
 
-        self.model_dimension = qmla.database_framework.get_num_qubits(self.model_name)
+        self.model_dimension = qmla.construct_models.get_num_qubits(self.model_name)
         if true_oplist is not None and trueparams is None:
             raise(
                 ValueError(

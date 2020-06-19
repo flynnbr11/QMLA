@@ -5,7 +5,7 @@ import os
 
 from qmla.growth_rules import connected_lattice
 import qmla.shared_functionality.probe_set_generation
-from qmla import database_framework
+from qmla import construct_models
 
 # flatten list of lists
 def flatten(l): return [item for sublist in l for item in sublist]
@@ -39,7 +39,7 @@ class FermiHubbardBase(
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.FermiHubbard_single_spin_n_sites
 
         # self.max_time_to_consider = 20
-        self.num_sites_true = database_framework.get_num_qubits(self.true_model)
+        self.num_sites_true = construct_models.get_num_qubits(self.true_model)
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
         self.max_num_qubits = (self.num_sites_true * 2) + 2
         self.num_processes_to_parallelise_over = 9
@@ -156,7 +156,7 @@ class FermiHubbardProbabilistic(
     ):
         # possibility that some models not valid; not needed by default but
         # checked for general case
-        terms = database_framework.get_constituent_names_from_name(model)
+        terms = construct_models.get_constituent_names_from_name(model)
 
         if np.all(['FHhop' in a for a in terms]):
             return True
@@ -170,7 +170,7 @@ class FermiHubbardProbabilistic(
             hopping_sites = []
             number_term_sites = []
             chemical_sites = []
-            num_sites = database_framework.get_num_qubits(model)
+            num_sites = construct_models.get_num_qubits(model)
             for term in terms:
                 constituents = term.split('_')
                 constituents.remove('d{}'.format(num_sites))

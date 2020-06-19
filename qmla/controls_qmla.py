@@ -4,7 +4,7 @@ import sys
 import pickle
 
 import qmla.get_growth_rule
-import qmla.database_framework as database_framework
+import qmla.construct_models as construct_models
 import qmla.logging
 
 __all__ = [
@@ -13,29 +13,30 @@ __all__ = [
 ]
 
 r"""
-This file provides functionality to parse command line arguments 
-passed via the QMLA launch scripts. 
-These are gathered into a single class instance which can be probed by 
-the QMLA instance to implement user specifications. 
+This file provides functionality to parse command line arguments
+passed via the QMLA launch scripts.
+These are gathered into a single class instance which can be probed by
+the QMLA instance to implement user specifications.
 """
+
 
 class ControlsQMLA():
     r"""
-    Storage for configuration of a QMLA instance. 
+    Storage for configuration of a QMLA instance.
 
     Command line arguments specify details about the QMLA instance,
     such as number of experiments/particles etc, required to implement
     the QMLA instance.
-    The command line arguments are stored together in this class. 
-    The class is then given to the :class:`qmla.QuantumModelLearningAgent` instance, 
+    The command line arguments are stored together in this class.
+    The class is then given to the :class:`qmla.QuantumModelLearningAgent` instance,
     which uses those details into the implementation.
     Some QMLA parameters are also set by the attributes of the Growth Rule.
-    In particular, the :class:`~qmla.growth_rules.GrowthRule` of the true model 
-    is instantiated by calling :meth:`~qmla.get_growth_generator_class`. 
-    model is defined as the true model of that instance. 
-    This growth rule instance is the master growth rule for the QMLA instance: the true 
+    In particular, the :class:`~qmla.growth_rules.GrowthRule` of the true model
+    is instantiated by calling :meth:`~qmla.get_growth_generator_class`.
+    model is defined as the true model of that instance.
+    This growth rule instance is the master growth rule for the QMLA instance: the true
     Likewise, instances are generated for all of the growth rules specified by the user:
-    these instances are associated with the growth rule :class:`~qmla.GrowthRuleTree` objects. 
+    these instances are associated with the growth rule :class:`~qmla.GrowthRuleTree` objects.
 
     :param dict arguments: command line arguments, parsed into a dict.
     """
@@ -47,8 +48,10 @@ class ControlsQMLA():
     ):
         self.log_file = os.path.abspath(arguments.log_file)
 
-        # Mode of learning: QHL, mult-model-QHL, or QMLA (if all are False)
-        self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
+        # Mode of learning: QHL, mult-model-QHL; default QMLA (if all are
+        # False)
+        self.qhl_mode_multiple_models = bool(
+            arguments.qhl_mode_multiple_models)
         self.qhl_mode = bool(arguments.qhl_mode)
         self.further_qhl = bool(arguments.further_qhl)
 
@@ -57,82 +60,78 @@ class ControlsQMLA():
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
-                true_params_path = arguments.true_params_pickle_file,
-                plot_probes_path = arguments.probes_plot_file, 
+                true_params_path=arguments.true_params_pickle_file,
+                plot_probes_path=arguments.probes_plot_file,
                 log_file=self.log_file
             )
         except BaseException:
             raise
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
-        # self.generator_list = [self.growth_generation_rule]
-        # self.generator_list.extend(self.alternative_growth_rules)
-        # self.generator_list = list(set(self.generator_list))
         self.unique_growth_rule_instances = {
-            gen : qmla.get_growth_rule.get_growth_generator_class(
-                    growth_generation_rule = gen, 
-                    log_file = self.log_file
-                )
+            gen: qmla.get_growth_rule.get_growth_generator_class(
+                growth_generation_rule=gen,
+                log_file=self.log_file
+            )
             for gen in self.alternative_growth_rules
         }
         self.unique_growth_rule_instances[self.growth_generation_rule] = self.growth_class
 
-        # Get (or set) true parameters from parameter files shared among instances within the same run. 
-        if arguments.true_params_pickle_file is None: 
+        # Get (or set) true parameters from parameter files shared among
+        # instances within the same run.
+        if arguments.true_params_pickle_file is None:
             try:
                 true_params_info = qmla.set_shared_parameters(
-                    growth_class = self.growth_class,  
+                    growth_class=self.growth_class,
                 )
-            except:
+            except BaseException:
                 self.log_print(["Failed to set shared parameters"])
                 raise
         else:
             true_params_info = pickle.load(
                 open(
-                    arguments.true_params_pickle_file, 
+                    arguments.true_params_pickle_file,
                     'rb'
                 )
             )
-        
+
         # Attributes about true model
         self.true_model = true_params_info['true_model']
-        self.true_model_name = database_framework.alph(self.true_model)
-        self.true_model_class = database_framework.Operator(
+        self.true_model_name = construct_models.alph(self.true_model)
+        self.true_model_class = construct_models.Operator(
             self.true_model_name
         )
         self.true_model_terms_matrices = self.true_model_class.constituents_operators
         self.true_model_terms_params = true_params_info['params_list']
         self.true_params_pickle_file = arguments.true_params_pickle_file
-        self.log_print([ "Shared true params set for this instance."])
+        self.log_print(["Shared true params set for this instance."])
 
         # Store parameters which were passed as arguments to implement_qmla.py
+        self.qmla_id = arguments.qmla_id
         self.prior_pickle_file = arguments.prior_pickle_file
         self.use_rq = bool(arguments.use_rq)
         self.num_experiments = arguments.num_experiments
         self.num_particles = arguments.num_particles
-        # self.fraction_experiments_for_bf = self.growth_class.fraction_experiments_for_bf
-        self.bayes_lower = arguments.bayes_lower # TODO put inside growth rule
+        self.bayes_lower = arguments.bayes_lower  # TODO put inside growth rule
         self.bayes_upper = arguments.bayes_upper
         self.save_plots = bool(arguments.save_plots)
         self.store_particles_weights = bool(arguments.store_particles_weights)
-        self.resample_threshold = arguments.resample_threshold  # TODO put inside growth rule
-        self.resample_a = arguments.resample_a
-        self.pgh_factor = arguments.pgh_factor
-        self.pgh_exponent = arguments.pgh_exponent
-        self.increase_pgh_time = bool(arguments.increase_pgh_time)
-        self.pickle_qmd_class = bool(arguments.pickle_qmd_class)
-        self.qmla_id = arguments.qmla_id
+        self.pickle_qmla_instance = bool(arguments.pickle_qmla_instance)
+        self.rq_timeout = arguments.rq_timeout
+
+        # Redis
         self.host_name = arguments.host_name
         self.port_number = arguments.port_number
+
+        # Outputs
         self.results_directory = arguments.results_directory
         if not self.results_directory.endswith('/'):
             self.results_directory += '/'
-        self.rq_timeout = arguments.rq_timeout
         self.cumulative_csv = arguments.cumulative_csv
+
         self.true_expec_path = arguments.true_expec_path
         self.probes_plot_file = arguments.probes_plot_file
-        self.reallocate_resources = bool(arguments.reallocate_resources)
-        self.probe_noise_level = arguments.probe_noise_level # TODO put in growth rule
+        self.probe_noise_level = arguments.probe_noise_level  # TODO put in growth rule
 
         # Create some new paths/parameters for storing results
         self.alt_log_file = os.path.join(
@@ -140,7 +139,8 @@ class ControlsQMLA():
         )
         self.long_id = '{0:03d}'.format(self.qmla_id)
         self.plots_directory = os.path.join(
-            self.results_directory, 'single_instance_plots', "qmla_{}".format(self.qmla_id)
+            self.results_directory, 'single_instance_plots', "qmla_{}".format(
+                self.qmla_id)
         )
         if not os.path.exists(self.results_directory):
             try:
@@ -153,23 +153,24 @@ class ControlsQMLA():
                 os.makedirs(self.plots_directory)
             except FileExistsError:
                 pass
-        
+
         self.latex_mapping_file = arguments.latex_mapping_file
-        if self.latex_mapping_file is None: 
+        if self.latex_mapping_file is None:
             self.latex_name_map_file_path = os.path.join(
-                self.results_directory, 
+                self.results_directory,
                 'LatexMapping.txt'
             )
 
         if self.further_qhl:
-            # further qhl model uses different results file names to distinguish
+            # further qhl model uses different results file names to
+            # distinguish
             self.results_file = self.results_directory + 'further_qhl_results_' + \
-                str(self.long_id) + '.p' 
+                str(self.long_id) + '.p'
             self.class_pickle_file = self.results_directory + \
                 'further_qhl_qml_class_' + str(self.long_id) + '.p'
         else:
             self.results_file = self.results_directory + 'results_' + \
-                str(self.long_id) + '.p' 
+                str(self.long_id) + '.p'
             self.class_pickle_file = self.results_directory + \
                 'qmla_class_' + str(self.long_id) + '.p'
 
@@ -184,21 +185,29 @@ class ControlsQMLA():
 
 def parse_cmd_line_args(args):
     r"""
-    Parse command line arguments, store and return in a single class instance. 
-    
+    Parse command line arguments, store and return in a single class instance.
+
     Defaults and help for all useable command line arguments are specified here.
     These are parsed, then passed to a :class:`~qmla.ControlsQMLA` instance,
-    which is given to the :class:`~qmla.QuantumModelLearningAgent` instance 
-    for ease of access. 
+    which is given to the :class:`~qmla.QuantumModelLearningAgent` instance
+    for ease of access.
 
     :param list args: command line arguments (i.e. sys.argv[1:]).
-    :return ControlsQMLA qmla_controls: object with all required data for this 
-        QMLA instance. 
+    :return ControlsQMLA qmla_controls: object with all required data for this
+        QMLA instance.
     """
 
     parser = argparse.ArgumentParser(description='Pass variables for QMLA.')
 
     # Parse command line arguments
+
+    # Instance data
+    parser.add_argument(
+        '-qid', '--qmla_id',
+        help='ID tag for QMD.',
+        type=int,
+        default=1
+    )
 
     # Mode of learning
     parser.add_argument(
@@ -257,7 +266,6 @@ def parse_cmd_line_args(args):
         default=1
     )
 
-
     # Include optional plots
     parser.add_argument(
         '-pt', '--save_plots',
@@ -265,7 +273,6 @@ def parse_cmd_line_args(args):
         type=int,
         default=False
     )
-
     parser.add_argument(
         '-prtwt', '--store_particles_weights',
         help='True: Store all particles and weights from learning.',
@@ -273,8 +280,89 @@ def parse_cmd_line_args(args):
         default=0
     )
 
-    # QInfer parameters, i.e. resampling a and resamping threshold, pgh
-    # prefactor.
+    # Redis configuration
+    parser.add_argument(
+        '-host', '--host_name',
+        help='Name of Redis host.',
+        type=str,
+        default='localhost'
+    )
+    parser.add_argument(
+        '-port', '--port_number',
+        help='Redis port number.',
+        type=int,
+        default=6379
+    )
+    parser.add_argument(
+        '-rqt', '--rq_timeout',
+        help='Time allowed before RQ job crashes.',
+        type=int,
+        default=-1
+    )
+
+    ## Outputs and filepaths
+    parser.add_argument(
+        '-dir', '--results_directory',
+        help='Relative directory to store results in.',
+        type=str,
+        default='QMLA_default_results/'
+    )
+    parser.add_argument(
+        '-pkl', '--pickle_qmla_instance',
+        help='Whether to pickle QMLA class used. Large memory requirement, recommend not to except during development.',
+        type=int,
+        default=0
+    )
+    parser.add_argument(
+        '-log', '--log_file',
+        help='Log file for this QMLA instance.',
+        type=str,
+        default='default_log_file.log'
+    )
+    parser.add_argument(
+        '-cb', '--cumulative_csv',
+        help='CSV to store Bayes factors of all QMDs.',
+        type=str,
+        default='cumulative.csv'
+    )
+    parser.add_argument(
+        '-prior_path', '--prior_pickle_file',
+        help='Path to save prior to.',
+        type=str,
+        default=None
+    )
+    parser.add_argument(
+        '-true_params_path', '--true_params_pickle_file',
+        help='Path to save true params to.',
+        type=str,
+        default=None
+    )
+    parser.add_argument(
+        '-true_expec_path', '--true_expec_path',
+        help='Path to save true params to.',
+        type=str,
+        default="{}/true_model_terms_params.p".format(os.getcwd())
+    )
+    parser.add_argument(
+        '-plot_probes', '--probes_plot_file',
+        help='Path where plot probe dict is pickled to.',
+        type=str,
+        default=None
+    )
+    parser.add_argument(
+        '-latex', '--latex_mapping_file',
+        help='Path to save list of terms latex/name maps to.',
+        type=str,
+        default=None
+    )
+
+    # Old inputs - TODO get from GR and remove from here
+    parser.add_argument(
+        '-pnoise', '--probe_noise_level',
+        help='Noise level to add to probe for learning',
+        type=float,
+        default=0.03
+    )
     parser.add_argument(
         '-rt', '--resample_threshold',
         help='Resampling threshold for QInfer.',
@@ -299,146 +387,32 @@ def parse_cmd_line_args(args):
         type=float,
         default=1.0
     )
-
     parser.add_argument(
         '-pgh_incr', '--increase_pgh_time',
         help='Boost times found by PGH heursitic. Bool.',
         type=int,
         default=0
     )
-
-    # Environmental variables including redis configuration
-    parser.add_argument(
-        '-host', '--host_name',
-        help='Name of Redis host.',
-        type=str,
-        default='localhost'
-    )
-    parser.add_argument(
-        '-port', '--port_number',
-        help='Redis port number.',
-        type=int,
-        default=6379
-    )
-
-    parser.add_argument(
-        '-qid', '--qmla_id',
-        help='ID tag for QMD.',
-        type=int,
-        default=1
-    )
-    parser.add_argument(
-        '-dir', '--results_directory',
-        help='Relative directory to store results in.',
-        type=str,
-        default='QMLA_default_results/'
-    )
-    parser.add_argument(
-        '-pkl', '--pickle_qmd_class',
-        help='Whether to pickle QMLA class used. Large memory requirement, recommend not to except during development.',
-        type=int,
-        default=0
-    )
-
-    parser.add_argument(
-        '-rqt', '--rq_timeout',
-        help='Time allowed before RQ job crashes.',
-        type=int,
-        default=-1
-    )
-
-    parser.add_argument(
-        '-log', '--log_file',
-        help='Log file for this QMLA instance.',
-        type=str,
-        default='default_log_file.log'
-    )
-
-    parser.add_argument(
-        '-cb', '--cumulative_csv',
-        help='CSV to store Bayes factors of all QMDs.',
-        type=str,
-        default='cumulative.csv'
-    )
-
-    # Old inputs - to rmeove
-
     parser.add_argument(
         '-bu', '--bayes_upper',
         help='Higher Bayes threshold.',
         type=int,
         default=100
     )
-
     parser.add_argument(
         '-bl', '--bayes_lower',
         help='Lower Bayes threshold.',
         type=int,
         default=1
     )
+
+    # Completely unused - TODO remove from passing to implement_qmla
     parser.add_argument(
         '-bt', '--num_experiments_for_bayes_updates',
         help='Number of times to consider in Bayes function.',
         type=int,
         default=5
     )
-
-    parser.add_argument(
-        '-exp', '--experimental_data',
-        help='Use experimental data if provided',
-        type=int,
-        default=False
-    )
-
-    parser.add_argument(
-        '-dst', '--data_max_time',
-        help='Maximum useful time in given data.',
-        type=int,
-        default=2000
-    )
-
-
-    parser.add_argument(
-        '-qhl_mods', '--models_for_qhl',
-        help='Models on which to run QHL.',
-        # type=str,
-        action='append',
-        default=[],
-    )
-
-    parser.add_argument(
-        '-prior_path', '--prior_pickle_file',
-        help='Path to save prior to.',
-        type=str,
-        default=None
-    )
-    parser.add_argument(
-        '-true_params_path', '--true_params_pickle_file',
-        help='Path to save true params to.',
-        type=str,
-        default=None
-    )
-
-    parser.add_argument(
-        '-true_expec_path', '--true_expec_path',
-        help='Path to save true params to.',
-        type=str,
-        default="{}/true_model_terms_params.p".format(os.getcwd())
-    )
-    parser.add_argument(
-        '-plot_probes', '--probes_plot_file',
-        help='Path where plot probe dict is pickled to.',
-        type=str,
-        default=None
-    )
-
-    parser.add_argument(
-        '-latex', '--latex_mapping_file',
-        help='Path to save list of terms latex/name maps to.',
-        type=str,
-        default=None
-    )
-
     parser.add_argument(
         '-resource', '--reallocate_resources',
         help='Bool: whether to reallocate resources scaling  \
@@ -446,12 +420,23 @@ def parse_cmd_line_args(args):
         type=int,
         default=0
     )
-
     parser.add_argument(
-        '-pnoise', '--probe_noise_level',
-        help='Noise level to add to probe for learning',
-        type=float,
-        default=0.03
+        '-exp', '--experimental_data',
+        help='Use experimental data if provided',
+        type=int,
+        default=False
+    )
+    parser.add_argument(
+        '-dst', '--data_max_time',
+        help='Maximum useful time in given data.',
+        type=int,
+        default=2000
+    )
+    parser.add_argument(
+        '-qhl_mods', '--models_for_qhl',
+        help='Models on which to run QHL.',
+        action='append',
+        default=[],
     )
 
     # Process arguments from command line
@@ -466,7 +451,7 @@ def parse_cmd_line_args(args):
     args_dict = vars(qmla_controls)
     for a in list(args_dict.keys()):
         qmla_controls.log_print([
-            a, ':', args_dict[a]        
+            a, ':', args_dict[a]
         ])
 
     return qmla_controls

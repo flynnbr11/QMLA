@@ -10,7 +10,7 @@ import qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation as probe_set_generation
 import qmla.shared_functionality.expectation_values
 import qmla.utilities
-import qmla.database_framework as database_framework
+import qmla.construct_models as construct_models
 import qmla.growth_rules.rating_system
 import qmla.shared_functionality.qinfer_model_interface
 from qmla.growth_rules.growth_rule_decorator import GrowthRuleDecorator
@@ -180,7 +180,7 @@ class GrowthRule():
         true_ham = None
         for k in list(self.true_params_dict.keys()):
             param = self.true_params_dict[k]
-            mtx = database_framework.compute(k)
+            mtx = construct_models.compute(k)
             if true_ham is not None:
                 true_ham += param * mtx
             else:
@@ -357,7 +357,7 @@ class GrowthRule():
 
     @property
     def true_model_terms(self):
-        true_terms = database_framework.get_constituent_names_from_name(
+        true_terms = construct_models.get_constituent_names_from_name(
             self.true_model
         )
 
@@ -387,14 +387,14 @@ class GrowthRule():
         true_ham = None
         for k in list(self.true_params_dict.keys()):
             param = self.true_params_dict[k]
-            mtx = database_framework.compute(k)
+            mtx = construct_models.compute(k)
             if true_ham is not None:
                 true_ham += param * mtx
             else:
                 true_ham = param * mtx
         self.true_hamiltonian = true_ham
 
-        true_ham_dim = database_framework.get_num_qubits(self.true_model)
+        true_ham_dim = construct_models.get_num_qubits(self.true_model)
         plot_probes = pickle.load(
             open(
                 self.plot_probes_path, 
@@ -492,7 +492,7 @@ class GrowthRule():
             for pair in pruned_branch.pairs_to_compare:
                 id_1 = pair[0]
                 id_2 = pair[1]
-                mod_1 = pruned_branch.model_instances[id_1]
+                mod_1 = pruned_branch.model_for_learning[id_1]
                 try:
                     bf_1_v_2 = mod_1.model_bayes_factors[ float(id_2) ][-1]
                 except:

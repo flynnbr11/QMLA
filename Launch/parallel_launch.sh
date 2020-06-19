@@ -148,7 +148,7 @@ running_dir="$(pwd)"
 qmd_dir="${running_dir%/Launch}" # chop off ParallelDevelopment to get qmd folder path
 #lib_dir="$qmd_dir/Libraries/QML_lib"
 lib_dir="$qmd_dir/qmla"
-script_dir="$qmd_dir/Scripts"
+script_dir="$qmd_dir/scripts"
 results_dir=$day_time
 full_path_to_results=$(pwd)/Results/$results_dir
 all_qmd_bayes_csv="$full_path_to_results/cumulative.csv"
@@ -261,7 +261,7 @@ fi
 
 ### First set up parameters/data to be used by all instances of QMD for this run. 
 # python3 ../qmla/SetQHLParams.py \
-python3 ../Scripts/set_qmla_params.py \
+python3 ../scripts/set_qmla_params.py \
 	-true=$true_params_pickle_file \
 	-prior=$prior_pickle_file \
 	-probe=$plot_probe_file \
@@ -285,7 +285,7 @@ python3 ../Scripts/set_qmla_params.py \
 
 ### Call script to determine how much time is needed based on above params. Store in QMD_TIME, QHL_TIME, etc. 
 let temp_bayes_times="2*$e" # TODO fix time calculator
-python3 ../Scripts/time_required_calculation.py \
+python3 ../scripts/time_required_calculation.py \
 	-ggr=$growth_rule \
 	-use_agr=$multiple_growth_rules \
 	$growth_rules_command \

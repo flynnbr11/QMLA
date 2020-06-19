@@ -3,7 +3,7 @@ import os
 
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_large_spin_bath
 import qmla.shared_functionality.probe_set_generation
-from qmla import database_framework
+from qmla import construct_models
 
 class ExpNVRevivals(
     nv_centre_large_spin_bath.NVLargeSpinBath  # inherit from this

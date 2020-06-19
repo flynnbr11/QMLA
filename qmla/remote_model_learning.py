@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import pickle
 import redis
 
-import qmla.model_instances
+import qmla.model_for_learning
 import qmla.redis_settings
 import qmla.logging
 
@@ -18,6 +18,7 @@ plt.switch_backend('agg')
 __all__ = [
     'remote_learn_model_parameters'
 ]
+
 
 def remote_learn_model_parameters(
     name,
@@ -34,16 +35,16 @@ def remote_learn_model_parameters(
     """
     Standalone function to perform Quantum Hamiltonian Learning on individual models.
 
-    Used in conjunction with redis databases so this calculation can be 
-    performed without any knowledge of the QMLA instance. 
-    
-    Given model ids and names are used to instantiate 
+    Used in conjunction with redis databases so this calculation can be
+    performed without any knowledge of the QMLA instance.
+
+    Given model ids and names are used to instantiate
     the ModelInstanceForLearning class, which is then used
     for learning the models parameters.
-    
+
     QMLA info is unpickled from a redis databse, containing
     true operator, params etc.
-    
+
     Once parameters are learned, we pickle the results to dictionaries
     held on a redis database which can be accessed by other actors.
 
@@ -51,26 +52,26 @@ def remote_learn_model_parameters(
     :param int model_id: unique model id
     :param int branch_id: QMLA branch where the model was generated
     :param str growth_generator: string corresponding to a unique growth rule,
-        used by get_growth_generator_class to generate a 
+        used by get_growth_generator_class to generate a
         GrowthRule (or subclass) instance.
-    :param dict qmla_core_info_dict: crucial data for QMLA, such as number 
-        of experiments/particles etc. Default None: core info is stored on the 
-        redis database so can be retrieved there on a server; if running locally, 
-        can be passed to save pickling. 
+    :param dict qmla_core_info_dict: crucial data for QMLA, such as number
+        of experiments/particles etc. Default None: core info is stored on the
+        redis database so can be retrieved there on a server; if running locally,
+        can be passed to save pickling.
     :param bool remote: whether QMLA is running remotely via RQ workers.
     :param str host_name: name of host server on which redis database exists.
     :param int port_number: this QMLA instance's unique port number,
-        on which redis database exists. 
-    :param int qid: QMLA id, unique to a single instance within a run. 
+        on which redis database exists.
+    :param int qid: QMLA id, unique to a single instance within a run.
         Used to identify the redis database corresponding to this instance.
     :param str log_file: Path of the log file.
     """
 
     def log_print(to_print_list):
         qmla.logging.print_to_log(
-            to_print_list = to_print_list, 
-            log_file = log_file, 
-            log_identifier = 'RemoteLearnModel {}'.format(model_id)
+            to_print_list=to_print_list,
+            log_file=log_file,
+            log_identifier='RemoteLearnModel {}'.format(model_id)
         )
 
     log_print([
@@ -79,19 +80,22 @@ def remote_learn_model_parameters(
     time_start = time.time()
 
     # Access databases
-    redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(host_name, port_number, qid)
+    redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
+        host_name, port_number, qid)
     qmla_core_info_database = redis_databases['qmla_core_info_database']
     learned_models_info_db = redis_databases['learned_models_info_db']
     learned_models_ids = redis_databases['learned_models_ids']
     active_branches_learning_models = redis_databases['active_branches_learning_models']
     any_job_failed_db = redis_databases['any_job_failed']
 
-    if qmla_core_info_dict is not None:  
-        # in serial, qmla_core_info_dict passed, with probe_dict included in it.
+    if qmla_core_info_dict is not None:
+        # for local runs, qmla_core_info_dict passed, with probe_dict included
+        # in it.
         probe_dict = qmla_core_info_dict['probe_dict']
     else:
-        qmla_core_info_dict = pickle.loads(qmla_core_info_database['qmla_settings'])
-        probe_dict = pickle.loads(qmla_core_info_database['ProbeDict'])
+        qmla_core_info_dict = pickle.loads(
+            qmla_core_info_database['qmla_settings'])
+        probe_dict = pickle.loads(qmla_core_info_database['probes_system'])
 
     true_model_terms_matrices = qmla_core_info_dict['true_oplist']
     qhl_plots = qmla_core_info_dict['qhl_plots']
@@ -99,7 +103,7 @@ def remote_learn_model_parameters(
     long_id = qmla_core_info_dict['long_id']
 
     # Generate model instance
-    qml_instance = qmla.model_instances.ModelInstanceForLearning(
+    qml_instance = qmla.model_for_learning.ModelInstanceForLearning(
         model_id=model_id,
         model_name=name,
         qid=qid,
@@ -121,17 +125,17 @@ def remote_learn_model_parameters(
 
         # Evaluate learned parameterisation
         qml_instance.compute_likelihood_after_parameter_learning()
-        
+
     except NameError:
         log_print([
-            "QHL failed for model id {}. Setting job failure database_framework.".format(
+            "QHL failed for model id {}. Setting job failure construct_models.".format(
                 model_id)
         ])
         any_job_failed_db.set('Status', 1)
         raise
     except BaseException:
         log_print([
-            "QHL failed for model id {}. Setting job failure database_framework.".format(
+            "QHL failed for model id {}. Setting job failure construct_models.".format(
                 model_id)
         ])
         any_job_failed_db.set('Status', 1)
@@ -180,9 +184,9 @@ def remote_learn_model_parameters(
             "Failed to add learned_models_info_db for model:",
             model_id
         ])
-    
-    # Update databases to record that this model has finished. 
-    active_branches_learning_models.incr(int(branch_id), 1)    
+
+    # Update databases to record that this model has finished.
+    active_branches_learning_models.incr(int(branch_id), 1)
     learned_models_ids.set(str(model_id), 1)
 
     if remote:
@@ -191,9 +195,8 @@ def remote_learn_model_parameters(
         del qml_instance
         log_print([
             "Learned model; remote time:", str(
-            np.round( (time.time() - time_start), 2))
+                np.round((time.time() - time_start), 2))
         ])
         return None
     else:
         return updated_model_info
-    

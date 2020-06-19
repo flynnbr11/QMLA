@@ -16,7 +16,7 @@ import seaborn as sns
 
 from qmla.growth_rules import growth_rule
 import qmla.shared_functionality.probe_set_generation
-import qmla.database_framework
+import qmla.construct_models
 
 import qmla.growth_rules.genetic_algorithms.genetic_algorithm
 
@@ -65,8 +65,8 @@ class Genetic(
         self.four_site_true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4'
         self.three_site_true_model = 'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
         self.true_model = self.four_site_true_model
-        self.true_model = qmla.database_framework.alph(self.true_model)
-        self.num_sites = qmla.database_framework.get_num_qubits(self.true_model)
+        self.true_model = qmla.construct_models.alph(self.true_model)
+        self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
         self.num_probes = 50
         self.max_num_qubits = 7
 
@@ -376,14 +376,14 @@ class Genetic(
 
         true_set = set(
             self.latex_name(mod) for mod in
-            qmla.database_framework.get_constituent_names_from_name(target_model)
+            qmla.construct_models.get_constituent_names_from_name(target_model)
         )
         terms = [
             self.latex_name(
                 term
             )
             for term in
-            qmla.database_framework.get_constituent_names_from_name(
+            qmla.construct_models.get_constituent_names_from_name(
                 test_model
             )
         ]
@@ -434,8 +434,8 @@ class Genetic(
         **kwargs
     ):
         # print("[latex name fnc] name:", name)
-        core_operators = list(sorted(qmla.database_framework.core_operator_dict.keys()))
-        num_sites = qmla.database_framework.get_num_qubits(name)
+        core_operators = list(sorted(qmla.construct_models.core_operator_dict.keys()))
+        num_sites = qmla.construct_models.get_num_qubits(name)
         p_str = 'P' * num_sites
         p_str = '+'
         separate_terms = name.split(p_str)

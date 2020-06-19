@@ -4,24 +4,26 @@ import numpy as np
 from fermilib.ops import FermionOperator
 import fermilib.transforms
 
-from qmla import database_framework
+from qmla import construct_models
 
 import qmla.logging
 
 
 def log_print(
-    to_print_list, 
+    to_print_list,
     log_file
 ):
+    r"""Wrapper for :func:`~qmla.print_to_log`"""
     qmla.logging.print_to_log(
-        to_print_list = to_print_list, 
-        log_file = log_file,
-        log_identifier = 'Model Generation'
+        to_print_list=to_print_list,
+        log_file=log_file,
+        log_identifier='Model Generation'
     )
 
 ######################
-# Useful functions 
+# Section: construction facilities
 ######################
+
 
 def full_model_string(operations):
     """
@@ -36,7 +38,7 @@ def full_model_string(operations):
 
     # Note TODO: this doesn't give an error when tuples are
     # given which aren't used. it should
-    from qmla.database_framework import alph
+    from qmla.construct_models import alph
     terms = operations['terms']
     num_qubits = operations['dim']
     num_terms = len(terms)
@@ -72,8 +74,8 @@ def full_model_string(operations):
 
 
 def operations_dict_from_name(mod_name):
-    constituents = database_framework.get_constituent_names_from_name(mod_name)
-    num_qubits = database_framework.get_num_qubits(mod_name)
+    constituents = construct_models.get_constituent_names_from_name(mod_name)
+    num_qubits = construct_models.get_num_qubits(mod_name)
     initial_t_str = ''
     all_terms = []
     for j in range(num_qubits - 1):
@@ -107,9 +109,8 @@ def operations_dict_from_name(mod_name):
 
 
 ######################
-# Process single terms
+# Section: process individual terms
 ######################
-
 
 def process_transverse_term(term):
     # terms of form transverse_x_d3
@@ -119,7 +120,7 @@ def process_transverse_term(term):
 
     components = term.split('_')
     components.remove('transverse')
-    core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+    core_operators = list(sorted(construct_models.core_operator_dict.keys()))
 
     for l in components:
         if l[0] == 'd':
@@ -142,7 +143,7 @@ def process_multipauli_term(term):
 
     components = term.split('_')
     components.remove('pauliSet')
-    core_operators = list(sorted(database_framework.core_operator_dict.keys()))
+    core_operators = list(sorted(construct_models.core_operator_dict.keys()))
     for l in components:
         if l[0] == 'd':
             dim = int(l.replace('d', ''))
@@ -161,11 +162,12 @@ def process_multipauli_term(term):
     }
 
     full_mod_str = full_model_string(term_dict)
-    return database_framework.compute(full_mod_str)
+    return construct_models.compute(full_mod_str)
+
 
 def process_likewise_pauli_sum(term):
     r"""
-    Terms where the same Pauli is applied to different qubits, summed together. 
+    Terms where the same Pauli is applied to different qubits, summed together.
 
     Example usage: pauliLikewise_lx_1J2_1J3_2J3_d3
     = XXI + XIX + IXX
@@ -187,14 +189,15 @@ def process_likewise_pauli_sum(term):
     for s in connected_sites:
         conn = 'J'.join(list(s))
         new_term = 'pauliSet_{o}J{o}_{conn}_d{N}'.format(
-            o = operator,
+            o=operator,
             conn=conn,
-            N = dim
+            N=dim
         )
         all_terms.append(new_term)
 
-    total_model_string = '+'.join(all_terms)  
-    return qmla.database_framework.compute(total_model_string)    
+    total_model_string = '+'.join(all_terms)
+    return qmla.construct_models.compute(total_model_string)
+
 
 def process_n_qubit_NV_centre_spin(term):
     components = term.split('_')
@@ -233,7 +236,8 @@ def process_n_qubit_NV_centre_spin(term):
                 op_name += p_str
 
     # print("Type {} ; name {}".format(term_type, op_name))
-    return database_framework.compute(op_name)
+    return construct_models.compute(op_name)
+
 
 def process_ising_chain(term):
     print("USING ISING CHAIN MTX PROCESS for ", term)
@@ -244,13 +248,13 @@ def process_ising_chain(term):
         if element[0] == 'd':
             dim = int(element.replace('d', ''))
 
-    mtx = None        
+    mtx = None
     for d in range(1, dim):
-        s = 'pauliSet_{}J{}_zJz_d{}'.format(d, d+1, dim)
+        s = 'pauliSet_{}J{}_zJz_d{}'.format(d, d + 1, dim)
         if mtx is None:
-            mtx = qmla.database_framework.compute(s)
+            mtx = qmla.construct_models.compute(s)
         else:
-            mtx += qmla.database_framework.compute(s)
+            mtx += qmla.construct_models.compute(s)
     return mtx
 
 
@@ -301,9 +305,9 @@ def transverse_axis_matrix(
                 t_str += 'T'
 
         individual_transverse_terms.append(single_term)
-    running_mtx = database_framework.compute(individual_transverse_terms[0])
+    running_mtx = construct_models.compute(individual_transverse_terms[0])
     for term in individual_transverse_terms[1:]:
-        running_mtx += database_framework.compute(term)
+        running_mtx += construct_models.compute(term)
     return running_mtx
 
 
@@ -312,6 +316,7 @@ def ising_transverse_component(
     transverse_axis
 ):
     return transverse_axis_matrix(num_qubits, transverse_axis)
+
 
 def ising_interaction_component(num_qubits, interaction_axis):
 
@@ -333,12 +338,13 @@ def ising_interaction_component(num_qubits, interaction_axis):
 
         individual_interaction_terms.append(single_term)
 
-    running_mtx = database_framework.compute(individual_interaction_terms[0])
+    running_mtx = construct_models.compute(individual_interaction_terms[0])
 
     for term in individual_interaction_terms[1:]:
-        running_mtx += database_framework.compute(term)
+        running_mtx += construct_models.compute(term)
 
     return running_mtx
+
 
 def process_heisenberg_xyz(term):
     components = term.split('_')
@@ -367,6 +373,7 @@ def process_heisenberg_xyz(term):
             transverse_axis=transverse_axis
         )
 
+
 def single_axis_nearest_neighbour_interaction_chain(
     num_qubits,
     interaction_axis='x'
@@ -389,12 +396,13 @@ def single_axis_nearest_neighbour_interaction_chain(
 
         individual_interaction_terms.append(single_term)
 
-    running_mtx = database_framework.compute(individual_interaction_terms[0])
+    running_mtx = construct_models.compute(individual_interaction_terms[0])
 
     for term in individual_interaction_terms[1:]:
-        running_mtx += database_framework.compute(term)
+        running_mtx += construct_models.compute(term)
 
     return running_mtx
+
 
 def single_axis_transverse_component(
     num_qubits,
@@ -418,10 +426,10 @@ def single_axis_transverse_component(
 
         individual_transverse_terms.append(single_term)
 
-    running_mtx = database_framework.compute(individual_transverse_terms[0])
+    running_mtx = construct_models.compute(individual_transverse_terms[0])
 
     for term in individual_transverse_terms[1:]:
-        running_mtx += database_framework.compute(term)
+        running_mtx += construct_models.compute(term)
 
     return running_mtx
 
@@ -471,6 +479,7 @@ def process_fermi_hubbard_onsite(constituents):
         jordan_wigner_mtx(dimensional_fermion_op)
     return np.array(mtx)
 
+
 def process_fermi_hubbard_onsite_sum(constituents):
     from qmla.process_string_to_matrix import process_basic_operator
     sites = []
@@ -478,19 +487,20 @@ def process_fermi_hubbard_onsite_sum(constituents):
         if c[0] == 'd':
             num_sites = int(c[1:])
         else:
-            sites.append( int(c) )
+            sites.append(int(c))
 
     mtx = None
-    for s in sites: 
+    for s in sites:
         onsite_term = "FHonsite_{s}_d{N}".format(
-            s = s, 
-            N = num_sites
+            s=s,
+            N=num_sites
         )
         if mtx is None:
             mtx = process_basic_operator(onsite_term)
         else:
             mtx += process_basic_operator(onsite_term)
     return mtx
+
 
 def process_fermi_hubbard_hopping_sum(constituents):
     from qmla.process_string_to_matrix import process_basic_operator
@@ -507,16 +517,17 @@ def process_fermi_hubbard_hopping_sum(constituents):
     mtx = None
     for cs in connected_sites:
         hopping_term = "FHhop_{s}_{i}h{k}_d{N}".format(
-            s = spin_type, 
-            i = cs[0],
-            k = cs[1],
-            N = num_sites
+            s=spin_type,
+            i=cs[0],
+            k=cs[1],
+            N=num_sites
         )
         if mtx is None:
             mtx = process_basic_operator(hopping_term)
         else:
             mtx += process_basic_operator(hopping_term)
     return mtx
+
 
 def process_fermi_hubbard_hopping(constituents):
     for c in constituents:
@@ -546,7 +557,8 @@ def process_fermi_hubbard_hopping(constituents):
     mtx = jordan_wigner_mtx(hopping_term) - \
         jordan_wigner_mtx(dimensional_fermion_op)
     return np.array(mtx)
-    
+
+
 def jordan_wigner_mtx(fermion_operator):
     """
     Calls fermilib functinoality to compute complete matrix given a
@@ -579,9 +591,11 @@ def process_fermi_hubbard_term(term):
             mtx = process_fermi_hubbard_chemical(constituents)
     return mtx
 
+
 def process_hubbard_operator(
     term
 ):
     # TODO deprecated?
-    # for use in computing base level terms in a model, used in database_framework.
+    # for use in computing base level terms in a model, used in
+    # construct_models.
     return base_hubbard_grouped_term(term)

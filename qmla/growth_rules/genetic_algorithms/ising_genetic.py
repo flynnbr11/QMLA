@@ -11,7 +11,7 @@ import sklearn
 
 from qmla.growth_rules.genetic_algorithms.genetic_growth_rule import Genetic, hamming_distance
 import qmla.shared_functionality.probe_set_generation
-import qmla.database_framework
+import qmla.construct_models
 
 
 class IsingGenetic(
@@ -39,8 +39,8 @@ class IsingGenetic(
         self.fitness_df = pd.DataFrame()
         self.true_model = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
         # self.true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_zJz_d4' # four sites
-        self.true_model = qmla.database_framework.alph(self.true_model)
-        self.num_sites = qmla.database_framework.get_num_qubits(self.true_model)
+        self.true_model = qmla.construct_models.alph(self.true_model)
+        self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
         self.num_probes = 50
         self.max_num_qubits = 7
 
@@ -119,14 +119,14 @@ class IsingGeneticTest(
         }
 
         # test F map for random set of 10 models
-        self.initial_models = self.genetic_algorithm.random_initial_models(9)
+        self.initial_models = self.genetic_algorithm.random_initial_models(14)
 
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = False
         self.fraction_particles_for_bf = 0.5
         self.fraction_experiments_for_bf = 0.5
         self.fitness_method =  'elo_ratings' 
-        self.max_spawn_depth = 4
+        self.max_spawn_depth = 12
         self.iqle_mode = False
 
         if self.tree_completed_initially:
@@ -187,7 +187,7 @@ class IsingGeneticSingleLayer(
             # F = 1
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
         ]
-        self.initial_models = list(np.random.choice(test_fitness_models, 9, replace=False))
+        self.initial_models = list(np.random.choice(test_fitness_models, 15, replace=False))
 
         # if self.true_model not in self.initial_models:
         #     rand_idx = self.initial_models.index(np.random.choice(self.initial_models))

@@ -14,7 +14,7 @@ import os
 # import DataBase
 
 from qmla.growth_rules import connected_lattice
-import qmla.database_framework
+import qmla.construct_models
 
 class ConnectedLatticeProbabilistic(
     connected_lattice.ConnectedLattice
@@ -85,7 +85,7 @@ class ConnectedLatticeProbabilistic(
                 )
 
         new_models = [
-            qmla.database_framework.alph(mod)
+            qmla.construct_models.alph(mod)
             for mod in new_models
             # Final check whether this model is allowed
             if self.check_model_validity(mod)
@@ -97,7 +97,7 @@ class ConnectedLatticeProbabilistic(
                 latex_model_name = self.latex_name(model)
                 branch_id = (
                     self.generation_DAG
-                    + len(qmla.database_framework.get_constituent_names_from_name(model))
+                    + len(qmla.construct_models.get_constituent_names_from_name(model))
                 )
                 self.model_branches[latex_model_name] = branch_id
 

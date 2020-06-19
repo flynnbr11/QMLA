@@ -20,7 +20,7 @@ sys.path.append(qmla_root)
 
 # sys.path.append("..")
 import qmla
-from qmla import database_framework
+from qmla import construct_models
 from qmla.quantum_model_learning_agent import QuantumModelLearningAgent  # QMD class in Library
 from qmla import redis_settings as rds
 import qmla.logging
@@ -135,7 +135,7 @@ if qmla_controls.qhl_mode:
             "QHL complete",
         ],
     )
-    if qmla_controls.pickle_qmd_class:
+    if qmla_controls.pickle_qmla_instance:
         log_print(
             [
                 "QMD complete. Pickling result to",
@@ -236,7 +236,7 @@ elif (
     or qmla_controls.qhl_mode_multiple_models == True
 ):
     model_ids = [
-        database_framework.model_id_from_name(
+        construct_models.model_id_from_name(
             db=qmla_instance.model_database,
             name=mod
             # ) for mod in further_qhl_models
@@ -252,7 +252,7 @@ elif (
     #     )
     # )
 
-    if qmla_controls.pickle_qmd_class:
+    if qmla_controls.pickle_qmla_instance:
         log_print(
             [
                 "QMD complete. Pickling result to",
@@ -480,7 +480,7 @@ else:
     )
 
     if (
-        qmla_controls.pickle_qmd_class
+        qmla_controls.pickle_qmla_instance
     ):
         log_print(["QMD complete. Pickling result to",
                    qmla_controls.class_pickle_file], 

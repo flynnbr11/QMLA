@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
-import qmla.database_framework as database_framework
+import qmla.construct_models as construct_models
 import qmla.model_for_comparison
 import qmla.logging
 import qmla.redis_settings as rds
@@ -22,6 +22,7 @@ plt.switch_backend('agg')
 __all__ = [
     'remote_bayes_factor_calculation'
 ]
+
 
 def remote_bayes_factor_calculation(
     model_a_id,
@@ -39,56 +40,60 @@ def remote_bayes_factor_calculation(
 ):
     r"""
     Standalone function to compute Bayes factors.
-    
-    Used in conjunction with redis databases so this calculation can be 
-    performed without any knowledge other than model IDs. 
+
+    Used in conjunction with redis databases so this calculation can be
+    performed without any knowledge other than model IDs.
     Data is unpickled from a redis databse, containing
-    learned_model information, i.e. final parameters etc.
-    Given model ids correspond to model names in the database, which are combined
+    `learned_model` information, i.e. final parameters etc.
+    Given `model_id`s correspond to model names in the database, which are combined
     with the final learned parameters to reconstruct model classes of
     complete learned models.
+    Each model had been trained on a given set of experimental parmaeters (times).
+    The reconstructed model classes are updated according to the experimental parameters
+    of the opponent model, such that both models have underwent the same experiments.
     From these we extract log likelihoods to compute the Bayes factor, BF(A,B).
     Models have a unique pair_id, simply (min(A,B), max(A,B)).
-    For BF(A,B) >> 1, A is deemed the winner; BF(A,B)<<1 deems B the winner. 
+    For BF(A,B) >> 1, A is deemed the winner; BF(A,B)<<1 deems B the winner.
     The result is then stored redis databases:
         - bayes_factors_db: BF(A,B)
         - bayes_factors_winners_db: id of winning model
-        - active_branches_bayes: when complete, increase the count of 
+        - active_branches_bayes: when complete, increase the count of
           complete pairs' BF on the given branch.
 
     :param int model_a_id: unique id for model A
     :param int model_b_id: unique id for model B
     :param int branch_id: unique id of branch the pair (A,B) are on
-    :param str or int num_times_to_use: how many times, used during the training of 
-        models A,B, to use during the BF calculation. Default 'all'; if 
-        otherwise, Nt, keeps the most recent Nt experiment times of A,B. 
+    :param str or int num_times_to_use: how many times, used during the training of
+        models A,B, to use during the BF calculation. Default 'all'; if
+        otherwise, Nt, keeps the most recent Nt experiment times of A,B.
     :param str bf_data_folder: folder path to store information such as times
         used during calculation, and plots of posterior marginals.
     :param str times_record: filename to store times used during calculation.
     :param bool check_db: look in redis databases to check if this pair's BF
-        has already been computed; return pre-computed BF if so. 
+        has already been computed; return pre-computed BF if so.
     :param float bayes_threshold: value to determine whether either model is superior
-        enough to "win" the comparison. If 1 < BF < threshold, neither win. 
+        enough to "win" the comparison. If 1 < BF < threshold, neither win.
     :param str host_name: name of host server on which redis database exists.
     :param int port_number: this QMLA instance's unique port number,
-        on which redis database exists. 
-    :param int qid: QMLA id, unique to a single instance within a run. 
+        on which redis database exists.
+    :param int qid: QMLA id, unique to a single instance within a run.
         Used to identify the redis database corresponding to this instance.
     :param str log_file: Path of the log file.
     """
-    
+
     def log_print(to_print_list):
         qmla.logging.print_to_log(
-            to_print_list = to_print_list, 
-            log_file = log_file, 
-            log_identifier = 'BF ({}/{})'.format(model_a_id, model_b_id)
+            to_print_list=to_print_list,
+            log_file=log_file,
+            log_identifier='BF ({}/{})'.format(model_a_id, model_b_id)
         )
     log_print(["BF Start on branch", branch_id])
     log_print(["num experiments to use for BF=", num_times_to_use])
     time_start = time.time()
 
     # Access databases
-    redis_databases = rds.get_redis_databases_by_qmla_id(host_name, port_number, qid)
+    redis_databases = rds.get_redis_databases_by_qmla_id(
+        host_name, port_number, qid)
     qmla_core_info_database = redis_databases['qmla_core_info_database']
     learned_models_info_db = redis_databases['learned_models_info_db']
     learned_models_ids = redis_databases['learned_models_ids']
@@ -99,10 +104,11 @@ def remote_bayes_factor_calculation(
     active_interbranch_bayes = redis_databases['active_interbranch_bayes']
 
     # Retrieve data from databases
-    qmla_core_info_dict = pickle.loads(redis_databases['qmla_core_info_database']['qmla_settings'])
+    qmla_core_info_dict = pickle.loads(
+        redis_databases['qmla_core_info_database']['qmla_settings'])
     true_mod_name = qmla_core_info_dict['true_name']
     log_print(["True name:", true_mod_name])
-    
+
     # Whether to build plots
     save_plots_of_posteriors = True
     plot_true_mod_post_bayes_factor_dynamics = True
@@ -132,7 +138,7 @@ def remote_bayes_factor_calculation(
     update_times_model_a = model_b.times_learned_over[first_t_idx:]
     update_times_model_b = model_a.times_learned_over[first_t_idx:]
 
-    # Take a copy of one updater before updates
+    # Take a copy of each updater before updates (for plotting later)
     updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
     updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
 
@@ -140,12 +146,12 @@ def remote_bayes_factor_calculation(
     log_l_a = updated_log_likelihood(
         model_a,
         update_times_model_a,
-        log_file = log_file, 
+        log_file=log_file,
     )
     log_l_b = updated_log_likelihood(
         model_b,
         update_times_model_b,
-        log_file = log_file, 
+        log_file=log_file,
     )
     bayes_factor = np.exp(log_l_a - log_l_b)
 
@@ -153,8 +159,8 @@ def remote_bayes_factor_calculation(
     if (
         save_plots_of_posteriors
         and (model_a.is_true_model or model_b.is_true_model)
-    ):  
-        if model_a.is_true_model: 
+    ):
+        if model_a.is_true_model:
             true_model = model_a
             updater_copy = updater_a_copy
         elif model_b.is_true_model:
@@ -173,7 +179,8 @@ def remote_bayes_factor_calculation(
             log_print(["Plotting posterior marginal of true model failed."])
             pass
 
-    # Plot dynamics on which models were compared, if one of the pair is the true model
+    # Plot dynamics on which models were compared, if one of the pair is the
+    # true model
     if (
         plot_true_mod_post_bayes_factor_dynamics
     ):
@@ -181,19 +188,19 @@ def remote_bayes_factor_calculation(
             plot_models_dynamics(
                 model_a,
                 model_b,
-                exp_msmts = qmla_core_info_dict['experimental_measurements'],
-                plot_probes_path = qmla_core_info_dict['probes_plot_file'],
+                exp_msmts=qmla_core_info_dict['experimental_measurements'],
+                plot_probes_path=qmla_core_info_dict['probes_plot_file'],
                 bayes_factor=bayes_factor,
                 bf_times=update_times_model_a,
-                qmla_id = qid, 
+                qmla_id=qid,
                 log_file=log_file,
-                save_directory = bf_data_folder, 
+                save_directory=bf_data_folder,
             )
         except BaseException:
             log_print(["Failed to plot dynamics after comparison."])
             raise
             # pass
-    
+
     # Present result
     log_print([
         "BF computed: A:{}; B:{}; log10 BF={}".format(
@@ -207,7 +214,7 @@ def remote_bayes_factor_calculation(
     elif bayes_factor > 1e160:
         bayes_factor = 1e160
 
-    pair_id = database_framework.unique_model_pair_identifier(
+    pair_id = construct_models.unique_model_pair_identifier(
         model_a_id, model_b_id
     )
 
@@ -234,19 +241,21 @@ def remote_bayes_factor_calculation(
     log_print([
         "Finished. rq time: ", str(time.time() - time_start),
     ])
-    
+
     del model_a, model_b
     return bayes_factor
 
+
 def log_print(
     to_print_list,
-    log_file, 
+    log_file,
     log_identifier
 ):
+    r"""Wrapper for :func:`~qmla.print_to_log`"""
     qmla.logging.print_to_log(
-        to_print_list = to_print_list, 
-        log_file = log_file, 
-        log_identifier = log_identifier
+        to_print_list=to_print_list,
+        log_file=log_file,
+        log_identifier=log_identifier
     )
 
 
@@ -258,18 +267,17 @@ def updated_log_likelihood(
     r"""
     Get log likelihood of a single model.
 
-    TODO get all aspects of experiments from other model, 
-    including time, probe, datum, 
+    TODO get all aspects of experiments from other model,
+    including time, probe, datum,
     so that bayes factor is on completely same set D.
 
     :param QInfer.Model model: Qinfer model instance
-    :param list times: times to update the model with 
+    :param list times: times to update the model with
     :param str log_file: Path of the log file.
     """
 
     updater = model.qinfer_updater
 
-    # for i in range(len(times)):
     for t in times:
         exp = format_experiment(model, [t])
         params_array = np.array([[model.true_model_params[:]]])
@@ -286,7 +294,7 @@ def updated_log_likelihood(
 
 def format_experiment(model, time):
     r"""
-    Format a single experiment so QInfer can handle it. 
+    Format a single experiment so QInfer can handle it.
     """
     gen = model.qinfer_model
     exp = np.empty(
@@ -295,11 +303,11 @@ def format_experiment(model, time):
     )
     exp['t'] = time
 
-    particle = model.qinfer_updater.sample() # generate particle for IQLE 
+    particle = model.qinfer_updater.sample()  # generate particle for IQLE
     # TODO record all experimental parameters instead of just time
     n_params = particle.shape[1]
     for i in range(n_params):
-        p = particle[0][i]            
+        p = particle[0][i]
         corresponding_expparam = model.qinfer_model.modelparam_names[i]
         exp[corresponding_expparam] = p
 
@@ -314,10 +322,10 @@ def plot_models_dynamics(
     model_a,
     model_b,
     exp_msmts,
-    plot_probes_path, 
+    plot_probes_path,
     bayes_factor,
     bf_times,
-    qmla_id, 
+    qmla_id,
     log_file,
     save_directory=None,
 ):
@@ -353,11 +361,11 @@ def plot_models_dynamics(
 
         mod_exp_vals = [
             mod.growth_class.expectation_value(
-                ham = final_ham, 
-                t = t, 
-                state = plot_probe, 
-                log_file = log_file, 
-                log_identifier = '[remote_bayes_factor: plotting]'
+                ham=final_ham,
+                t=t,
+                state=plot_probe,
+                log_file=log_file,
+                log_identifier='[remote_bayes_factor: plotting]'
             )
             for t in times
         ]
@@ -374,14 +382,15 @@ def plot_models_dynamics(
         ax2.hist(
             bf_times,
             bins=num_times,
-            range = (min(times), max(times)), # TODO put on separate plot to see when higher times compared on
+            # TODO put on separate plot to see when higher times compared on
+            range=(min(times), max(times)),
             histtype='stepfilled',
             fill=False,
             label=str("{} times total".format(len(bf_times))),
             alpha=0.1
         )
         ax2.set_ylabel('Frequency time was during comparison')
-    except:
+    except BaseException:
         raise
         # pass
 
@@ -402,17 +411,17 @@ def plot_models_dynamics(
 
 
 def plot_posterior_marginals(
-    model, 
-    initial_updater_copy, 
-    qmla_id, 
-    save_directory, 
+    model,
+    initial_updater_copy,
+    qmla_id,
+    save_directory,
 ):
     r"""
     Shows parameter distribution before/after updates for BF.
 
     # TODO indicate which comparison this corresponds to
     # TODO plot posterior for both models in this comparison
-    # TODO also plot learned posterior -- 
+    # TODO also plot learned posterior --
     # ie particle locations and weights that are learned, rather than
     # the normal approximation the BF assumes
     """
@@ -420,12 +429,12 @@ def plot_posterior_marginals(
     num_terms = model.qinfer_model.n_modelparams
 
     before_updates = [
-        initial_updater_copy.posterior_marginal(idx_param = i)
+        initial_updater_copy.posterior_marginal(idx_param=i)
         for i in range(num_terms)
     ]
 
     after_updates = [
-        model.qinfer_updater.posterior_marginal(idx_param = i)
+        model.qinfer_updater.posterior_marginal(idx_param=i)
         for i in range(num_terms)
     ]
 
@@ -433,13 +442,13 @@ def plot_posterior_marginals(
     nrows = int(np.ceil(num_terms / ncols))
     fig, axes = plt.subplots(
         figsize=(10, 7),
-        nrows=nrows, 
+        nrows=nrows,
         ncols=ncols
     )
 
     gs = GridSpec(
-        nrows = nrows,
-        ncols = ncols,
+        nrows=nrows,
+        ncols=ncols,
     )
     row = 0
     col = 0
@@ -448,20 +457,20 @@ def plot_posterior_marginals(
         ax = fig.add_subplot(gs[row, col])
 
         ax.plot(
-            before_updates[param][0] ,
-            before_updates[param][1], 
+            before_updates[param][0],
+            before_updates[param][1],
             color='blue',
             ls='-',
-            label='Before'                
+            label='Before'
         )
         ax.plot(
-            after_updates[param][0] ,
-            after_updates[param][1], 
+            after_updates[param][0],
+            after_updates[param][1],
             color='red',
             ls=':',
-            label='After'                
+            label='After'
         )
-        if row == 0  and col == ncols-1:
+        if row == 0 and col == ncols - 1:
             ax.legend()
 
         col += 1
@@ -470,10 +479,9 @@ def plot_posterior_marginals(
             row += 1
 
     save_path = os.path.join(
-        save_directory, 
+        save_directory,
         'bf_posteriors_qmla_{}_model_{}'.format(
             qmla_id, model.model_id
         )
     )
     plt.savefig(save_path)
-

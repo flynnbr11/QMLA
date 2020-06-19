@@ -4,7 +4,7 @@ import os
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.expectation_values
-from qmla import database_framework
+from qmla import construct_models
 
 
 class NVLargeSpinBath(
@@ -41,7 +41,7 @@ class NVLargeSpinBath(
             # self.true_model,
             'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
         ]
-        self.num_qubits_current_model = qmla.database_framework.get_num_qubits(
+        self.num_qubits_current_model = qmla.construct_models.get_num_qubits(
             self.initial_models[0]
         )
         self.qhl_models = [
@@ -153,10 +153,10 @@ class NVLargeSpinBath(
     ):
 
         max_num_qubits = max(
-            [database_framework.get_num_qubits(mod) for mod in model_list]
+            [construct_models.get_num_qubits(mod) for mod in model_list]
         )       
         new_gali_model = gali_model_nv_centre_spin(max_num_qubits + 1)
-        self.num_qubits_current_model = qmla.database_framework.get_num_qubits(
+        self.num_qubits_current_model = qmla.construct_models.get_num_qubits(
             new_gali_model
         )
         return [new_gali_model]
@@ -167,7 +167,7 @@ class NVLargeSpinBath(
         **kwargs
     ):
         term = name
-        num_qubits = database_framework.get_num_qubits(term)
+        num_qubits = construct_models.get_num_qubits(term)
         t_str = 'T' * (num_qubits - 1)
         p_str = 'P' * num_qubits
         separate_terms = term.split(p_str)
