@@ -44,8 +44,8 @@ bf_all_times=0
 
 
 # growth_rule='TestSimulatedNVCentre'
-growth_rule='IsingGeneticTest'
-# growth_rule='IsingGeneticSingleLayer'
+# growth_rule='IsingGeneticTest'
+growth_rule='IsingGeneticSingleLayer'
 
 # growth_rule='IsingGenetic'
 # growth_rule='SimulatedNVCentre'

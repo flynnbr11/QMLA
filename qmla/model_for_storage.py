@@ -23,21 +23,22 @@ __all__ = [
     'ModelInstanceForStorage'
 ]
 
+
 class ModelInstanceForStorage():
     r"""
-    Model stored in QMLA environment. 
+    Model stored in QMLA environment.
 
-    Retrieves data after model is trained remotely, so that 
-    :class:`qmla.QuantumModelLearningAgent` can access that data. 
+    Retrieves data after model is trained remotely, so that
+    :class:`qmla.QuantumModelLearningAgent` can access that data.
 
     :param str model_name: name of model under study
     :param int model_id: ID of model which is unique to QMLA instance
-    :param np.array() model_terms_matrices: 
+    :param np.array() model_terms_matrices:
         list of matrices corresponding to the operators which compose the model
     :param dict plot_probes: probes used in all plots for consistency
-    :param dict qmla_core_info_database: essential details about the QMLA 
-        instance needed to learn/compare models. 
-        If None, this is retrieved instead from the redis database. 
+    :param dict qmla_core_info_database: essential details about the QMLA
+        instance needed to learn/compare models.
+        If None, this is retrieved instead from the redis database.
     :param str host_name: name of host server on which redis database exists.
     :param int port_number: port number unique to this QMLA instance on redis database
     :param str log_file: path of QMLA instance's log file.
@@ -49,34 +50,40 @@ class ModelInstanceForStorage():
         model_id,
         model_terms_matrices,
         qid,
-        plot_probes=None, 
-        qmla_core_info_database=None, 
+        plot_probes=None,
+        qmla_core_info_database=None,
         host_name='localhost',
         port_number=6379,
         log_file='QMD_log.log',
         **kwargs
     ):
-        self.redis_host_name = host_name
-        self.redis_port_number = port_number
+        # Basic info about this QMLA instance and model
         self.qmla_id = qid
-        self.log_file = log_file
         self.model_name = qmla.construct_models.alph(model_name)
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
+        self.log_file = log_file
+
+        # Redis database settings
+        self.redis_host_name = host_name
+        self.redis_port_number = port_number
 
         # Get data from redis database
-        if qmla_core_info_database is None: 
+        if qmla_core_info_database is None:
             redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
                 self.redis_host_name,
                 self.redis_port_number,
                 self.qmla_id
             )
             qmla_core_info_database = redis_databases['qmla_core_info_database']
-            self.probes_system = pickle.loads(qmla_core_info_database['ProbeDict'])
-            self.probes_simulator = pickle.loads(qmla_core_info_database['SimProbeDict'])
-            qmla_core_info_dict = pickle.loads(qmla_core_info_database.get('qmla_settings'))
+            self.probes_system = pickle.loads(
+                qmla_core_info_database['ProbeDict'])
+            self.probes_simulator = pickle.loads(
+                qmla_core_info_database['SimProbeDict'])
+            qmla_core_info_dict = pickle.loads(
+                qmla_core_info_database.get('qmla_settings'))
 
-        else: 
+        else:
             self.log_print(
                 [
                     'QMLA core info provided to model storage class w/ keys:',
@@ -87,11 +94,11 @@ class ModelInstanceForStorage():
             self.probes_simulator = qmla_core_info_database['SimProbeDict']
             qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
 
-        # Extract data from core database
+        # Extract data from core QMLA database
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_name = qmla_core_info_dict['true_name']
-        if self.model_name == self.true_model_name: 
+        if self.model_name == self.true_model_name:
             self.is_true_model = True
             self.log_print(["This is the true model for storage."])
         else:
@@ -99,14 +106,14 @@ class ModelInstanceForStorage():
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.probe_number = qmla_core_info_dict['num_probes']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
-        if plot_probes is None: 
+        if plot_probes is None:
             self.probes_for_plots = pickle.load(
                 open(qmla_core_info_dict['probes_plot_file'], 'rb')
             )
-        else: 
-            self.probes_for_plots = plot_probes 
+        else:
+            self.probes_for_plots = plot_probes
 
-        # Define parameters used by qmla class
+        # Parameters used by QMLA manager class
         self.model_bayes_factors = {}
         self.model_num_qubits = qmla.construct_models.get_num_qubits(
             self.model_name)
@@ -115,7 +122,7 @@ class ModelInstanceForStorage():
         self.values_updated = False
 
     ##########
-    # Section: Update model based on learned values 
+    # Section: Update model based on learned values
     ##########
 
     def model_update_learned_values(
@@ -124,93 +131,89 @@ class ModelInstanceForStorage():
         **kwargs
     ):
         """
-        Get result of model learning and store here. 
+        Get result of model learning and store within this object.
 
         Every element stored by :meth:`~qmla.ModelInstanceForLearning.learned_info_dict`
-        is stored as an attribute here. 
+        is stored as an attribute here.
 
         :param dict learned_info: results of remote model learning
             if None, retrieved from the redis database
             if not None, computed locally and passed
         """
 
-        if not self.values_updated:
-            self.values_updated = True
-            redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
-                self.redis_host_name,
-                self.redis_port_number,
-                self.qmla_id
-            )
-            learned_models_info_db = redis_databases['learned_models_info_db']
+        if self.values_updated:
             self.log_print([
-                "Updating learned info for model {}".format(self.model_id)
+                "Attempting to update values for storage, but already stored."
             ])
+            return
 
-            if learned_info is None:
-                # TODO put unloading redis inside this if statement
-                # everything can be done locally if learned_info is provided
-                model_id_float = float(self.model_id)
-                model_id_str = str(model_id_float)
-                try:
-                    learned_info = pickle.loads(
-                        learned_models_info_db.get(model_id_str),
-                        encoding='latin1'
-                    )
-                except BaseException:
-                    self.log_print(
-                        [
-                            "Unable to load learned info",
-                            "model_id_str: ", model_id_str,
-                            "model id: ", self.model_id,
-                            "learned info keys:, ", learned_models_info_db.keys(),
-                            "learned info:, ", learned_models_info_db.get(
-                                model_id_str)
-                        ]
-                    )
+        self.values_updated = True
+        redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
+            self.redis_host_name,
+            self.redis_port_number,
+            self.qmla_id
+        )
+        learned_models_info_db = redis_databases['learned_models_info_db']
+        self.log_print([
+            "Updating learned info for model {}".format(self.model_id)
+        ])
 
-            # Load results: assign attribute of this class for everything stored 
-            # in learned_info_dict() of ModelInstanceForStorage. 
-            for k in learned_info:
-                self.__setattr__(k, learned_info[k])      
-
-            # Process the learned info
-            self.track_covariance_matrices = np.array(
-                self.track_covariance_matrices)
-            self.volume_by_epoch = {}
-            for i in range(len(self.raw_volume_list)):
-                self.volume_by_epoch[i] = self.raw_volume_list[i]
-            
-            # Instantiate growth rule
+        if learned_info is None:
+            # TODO put unloading redis inside this if statement
+            # everything can be done locally if learned_info is provided
+            model_id_float = float(self.model_id)
+            model_id_str = str(model_id_float)
             try:
-                self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
-                    growth_generation_rule=self.growth_rule_of_this_model,
-                    log_file=self.log_file
+                learned_info = pickle.loads(
+                    learned_models_info_db.get(model_id_str),
+                    encoding='latin1'
                 )
             except BaseException:
                 self.log_print([
-                    "Failed to load growth class {} for model".format(
-                        self.growth_rule_of_this_model
-                    )
+                    "Unable to load learned info",
+                    "model_id_str: ", model_id_str,
+                    "model id: ", self.model_id,
+                    "learned info keys:, ", learned_models_info_db.keys(),
+                    "learned info:, ", learned_models_info_db.get(
+                        model_id_str)
                 ])
-                raise
 
-            # Compile some attributes
-            self.model_name_latex = self.growth_class.latex_name(
-                name=self.model_name
-            )
-            model_constituent_terms = qmla.construct_models.get_constituent_names_from_name(
-                self.model_name
-            )
-            self.constituents_terms_latex = [
-                self.growth_class.latex_name(term)
-                for term in model_constituent_terms
-            ]
-            self.track_parameter_estimates = self.track_param_estimate_v_epoch
-            
-            # Learned model loaded
-            self.log_print([
-                "Updated learned info for model {}".format(self.model_id),
-            ])
+        # Load results: assign attribute of this class for everything stored
+        # in learned_info_dict() of ModelInstanceForStorage.
+        for k in learned_info:
+            self.__setattr__(k, learned_info[k])
+
+        # Process the learned info
+        self.track_covariance_matrices = np.array(
+            self.track_covariance_matrices)
+        self.volume_by_epoch = {}
+        for i in range(len(self.raw_volume_list)):
+            self.volume_by_epoch[i] = self.raw_volume_list[i]
+
+        # Instantiate growth rule instance (passive - not used to generate
+        # models)
+        self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
+            growth_generation_rule=self.growth_rule_of_this_model,
+            log_file=self.log_file
+        )
+
+        # Compile some attributes
+        self.model_name_latex = self.growth_class.latex_name(
+            name=self.model_name
+        )
+        model_constituent_terms = qmla.construct_models.get_constituent_names_from_name(
+            self.model_name
+        )
+        self.constituents_terms_latex = [
+            self.growth_class.latex_name(term)
+            for term in model_constituent_terms
+        ]
+        self.track_parameter_estimates = self.track_param_estimate_v_epoch
+
+        # Learned model loaded
+        self.log_print([
+            "Updated learned info for model {}".format(self.model_id),
+        ])
 
     ##########
     # Section: Evaluation
@@ -223,12 +226,12 @@ class ModelInstanceForStorage():
         r"""
         Get the expectation values using the learned Hamiltonian.
 
-        Construct Hamiltonian from estimated learned parameters, 
-        and compute the expectation values, using the same input 
+        Construct Hamiltonian from estimated learned parameters,
+        and compute the expectation values, using the same input
         state as used for plotting.
-        Stores a dictionary of { t : expectation value }. 
+        Stores a dictionary of { t : expectation value }.
 
-        :param list times: times to use 
+        :param list times: times to use
         """
 
         # Choose probe to compute expectation value with
@@ -242,7 +245,7 @@ class ModelInstanceForStorage():
             list(set(times) - set(present_expec_val_times))
         )
 
-        # Compute and store results. 
+        # Compute and store results.
         for t in required_times:
             self.expectation_values[t] = self.growth_class.expectation_value(
                 ham=self.learned_hamiltonian,
@@ -276,22 +279,24 @@ class ModelInstanceForStorage():
             exp_times = sorted(list(self.experimental_measurements.keys()))
         else:
             exp_times = times
-            
+
         if max_time is None:
             max_time = max(exp_times)
 
-        min_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(exp_times, min_time)
-        max_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(exp_times, max_time)
+        min_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(
+            exp_times, min_time)
+        max_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(
+            exp_times, max_time)
         min_data_idx = exp_times.index(min_time)
         max_data_idx = exp_times.index(max_time)
         exp_times = exp_times[min_data_idx:max_data_idx]
-        
+
         # Get expectation values for system
         exp_data = [
             self.experimental_measurements[t] for t in exp_times
         ]
 
-        # Compute r squared 
+        # Compute r squared
         probe = self.probes_for_plots[self.probe_num_qubits]
 
         datamean = np.mean(exp_data[0:max_data_idx])
@@ -328,17 +333,18 @@ class ModelInstanceForStorage():
         if total_sum_of_squares == 0:
             # calculation failed
             print(
-                "[ModelForStorage - r_squared]", 
+                "[ModelForStorage - r_squared]",
                 "Total sum of squares is 0",
                 total_sum_of_squares,
-                "\ndatamean=", datamean, 
-                "\nd=",d, 
+                "\ndatamean=", datamean,
+                "\nd=", d,
                 "\nexp_data=", exp_data
             )
 
         try:
-            self.final_r_squared = 1 - (sum_of_residuals / total_sum_of_squares)
-        except:
+            self.final_r_squared = 1 - \
+                (sum_of_residuals / total_sum_of_squares)
+        except BaseException:
             self.final_r_squared = None
         self.p_value = 0
         # self.p_value = (
@@ -356,9 +362,9 @@ class ModelInstanceForStorage():
         times=None,
         min_time=0,
         max_time=None,
-        num_points=10 
+        num_points=10
     ):
-        r""" 
+        r"""
         Compute and store r squared up to all times.
         TODO incorporate as flag in r_squared() to store by epoch
             instead of separate fnc.
@@ -371,7 +377,7 @@ class ModelInstanceForStorage():
             times
         ])
 
-        # Choose times to get r squared for
+        # Choose times to get R-squared for
         if times is None:
             exp_times = sorted(list(self.experimental_measurements.keys()))
         else:
@@ -397,7 +403,7 @@ class ModelInstanceForStorage():
             for t in exp_times
         ]
 
-        # Compute r squared 
+        # Compute r squared
         probe = self.probes_for_plots[self.probe_num_qubits]
         datamean = np.mean(exp_data[0:max_data_idx])
         datavar = np.sum(
@@ -405,8 +411,8 @@ class ModelInstanceForStorage():
         )
         r_squared_by_epoch = {}
 
-        ## only use subset of epochs in case there are a large
-        ## num experiments due to heavy computational overhead
+        # only use subset of epochs in case there are a large
+        # num experiments due to heavy computational overhead
         spaced_epochs = np.round(
             np.linspace(
                 0,

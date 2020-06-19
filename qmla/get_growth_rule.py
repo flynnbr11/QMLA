@@ -3,13 +3,13 @@ from __future__ import absolute_import
 import qmla.growth_rules as GR
 
 __all__ = [
-    'growth_classes', 
+    'growth_classes',
     'get_growth_generator_class'
 ]
 
 growth_classes = {
     # Experimental paper growth rules
-    'NVExperimentalData' : 
+    'NVExperimentalData':
         GR.NVCentreExperimentalData,
     'ExperimentNVCentre':
         GR.ExperimentNVCentre,
@@ -29,13 +29,13 @@ growth_classes = {
         GR.NVLargeSpinBath,
     'ExperimentReducedNV':
         GR.ExperimentReducedNV,
-    'SimulatedNVCentre' : 
+    'SimulatedNVCentre':
         GR.SimulatedNVCentre,
-    'TestSimulatedNVCentre' : 
+    'TestSimulatedNVCentre':
         GR.TestSimulatedNVCentre,
-    'NVCentreGenticAlgorithm' :
-        GR.NVCentreGenticAlgorithm, 
-    'ExperimentNVCentreNQubits' : 
+    'NVCentreGenticAlgorithm':
+        GR.NVCentreGenticAlgorithm,
+    'ExperimentNVCentreNQubits':
         GR.ExperimentNVCentreNQubits,
 
     # Theoretical paper growth rules
@@ -49,20 +49,20 @@ growth_classes = {
         GR.HeisenbergXYZPredetermined,
     'HeisenbergXYZProbabilistic':
         GR.HeisenbergXYZProbabilistic,
-    'HeisenbergSharedField' : 
-        GR.HeisenbergSharedField, 
+    'HeisenbergSharedField':
+        GR.HeisenbergSharedField,
     'FermiHubbardPredetermined':
         GR.FermiHubbardPredetermined,
     'FermiHubbardProbabilistic':
         GR.FermiHubbardProbabilistic,
-    'LatticeSet' : 
+    'LatticeSet':
         GR.LatticeSet,
-    'IsingLatticeSet' : 
-        GR.IsingLatticeSet, 
-    'HeisenbergLatticeSet' : 
+    'IsingLatticeSet':
+        GR.IsingLatticeSet,
+    'HeisenbergLatticeSet':
         GR.HeisenbergLatticeSet,
-    'FermiHubbardLatticeSet': 
-        GR.FermiHubbardLatticeSet, 
+    'FermiHubbardLatticeSet':
+        GR.FermiHubbardLatticeSet,
 
     # Others
     'basic_lindbladian':
@@ -74,16 +74,16 @@ growth_classes = {
     'Genetic':
         GR.Genetic,
     'GeneticTest':
-        GR.GeneticTest,    
-    'IsingGenetic' : 
+        GR.GeneticTest,
+    'IsingGenetic':
         GR.IsingGenetic,
-    'IsingGeneticTest' : 
+    'IsingGeneticTest':
         GR.IsingGeneticTest,
-    'IsingGeneticSingleLayer' : 
-        GR.IsingGeneticSingleLayer, 
-    'TestReducedParticlesBayesFactors': 
-        GR.TestReducedParticlesBayesFactors, 
-    'TestAllParticlesBayesFactors' : 
+    'IsingGeneticSingleLayer':
+        GR.IsingGeneticSingleLayer,
+    'TestReducedParticlesBayesFactors':
+        GR.TestReducedParticlesBayesFactors,
+    'TestAllParticlesBayesFactors':
         GR.TestAllParticlesBayesFactors,
 }
 
@@ -95,16 +95,16 @@ def get_growth_generator_class(
     r"""
     Get an instance of the class specified by the user which implements a Growth Rule.
 
-    Instance of a :class:`~qmla.GrowthRule` (or subclass). 
-    This is used to specify how QMLA proceeds, in particular by designing the next batch 
+    Instance of a :class:`~qmla.GrowthRule` (or subclass).
+    This is used to specify how QMLA proceeds, in particular by designing the next batch
     of models to test.
-    Growth rule is specified by the name passed to implement_qmla in the launch script, 
-    through the command line flag `growth_rule`. This string is searched for in the 
-    growth_classes dictionary. New growth rules must be added here so that QMLA can find them. 
+    Growth rule is specified by the name passed to implement_qmla in the launch script,
+    through the command line flag `growth_rule`. This string is searched for in the
+    growth_classes dictionary. New growth rules must be added here so that QMLA can find them.
 
 
     :param str growth_generation_rule: string corresponding to a growth rule
-    :params **kwargs: arguments required by the growth rule, passed directly 
+    :params **kwargs: arguments required by the growth rule, passed directly
         to the desired growth rule's constructor.
     :return GrowthRule gr: growth rule class instance
     """
@@ -115,7 +115,9 @@ def get_growth_generator_class(
             **kwargs
         )
     except BaseException:
-        print("Cannot find growth rule in available rules:", growth_generation_rule)
+        print(
+            "Cannot find growth rule in available rules:",
+            growth_generation_rule)
         raise
 
     return gr

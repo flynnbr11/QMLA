@@ -20,28 +20,28 @@ __all__ = [
 ##########
 
 core_operator_dict = {
-    'i': np.array([ # Identity
-        [1 + 0.j, 0 + 0.j], 
+    'i': np.array([  # Identity
+        [1 + 0.j, 0 + 0.j],
         [0 + 0.j, 1 + 0.j]
     ]),
-    'x': np.array([ # Pauli-X
-        [0 + 0.j, 1 + 0.j], 
+    'x': np.array([  # Pauli-X
+        [0 + 0.j, 1 + 0.j],
         [1 + 0.j, 0 + 0.j]
     ]),
-    'y': np.array([ # Pauli-Y
-        [0 + 0.j, 0 - 1.j], 
+    'y': np.array([  # Pauli-Y
+        [0 + 0.j, 0 - 1.j],
         [0 + 1.j, 0 + 0.j]
     ]),
-    'z': np.array([ # Pauli-Z
-        [1 + 0.j, 0 + 0.j], 
+    'z': np.array([  # Pauli-Z
+        [1 + 0.j, 0 + 0.j],
         [0 + 0.j, -1 + 0.j]
     ]),
-    'a': np.array([ # Add
-        [0 + 0.j, 1 + 0.j], 
+    'a': np.array([  # Add
+        [0 + 0.j, 1 + 0.j],
         [0 + 0.j, 0 + 0.j]
     ]),
-    's': np.array([ # Subtract
-        [0 + 0.j, 0 + 0.j], 
+    's': np.array([  # Subtract
+        [0 + 0.j, 0 + 0.j],
         [1 + 0.j, 0 + 0.j]
     ])
 }
@@ -49,6 +49,7 @@ core_operator_dict = {
 ##########
 # Section: Operator object
 ##########
+
 
 class Operator():
     r"""
@@ -132,9 +133,10 @@ class Operator():
 
 ##########
 # Section: functions for constructing models.
-# compte methods are called recursively on names to 
+# compte methods are called recursively on names to
 # construct matrices corresponding to input model names
 ##########
+
 
 def compute_t(inp):
     """
@@ -259,17 +261,16 @@ def compute(inp):
         return compute_p(inp)
 
 
-
 ##########
 # Section: functions for dissecting models
 ##########
 
 def alph(name):
     r"""
-    Alphabetise the model name. 
-    
-    If name newer follows convention where terms are separated by +, simply separate them. 
-    If name follows older convention, analyse to separate terms and then alphabetise them. 
+    Alphabetise the model name.
+
+    If name newer follows convention where terms are separated by +, simply separate them.
+    If name follows older convention, analyse to separate terms and then alphabetise them.
     Parse string and recursively call alph function to alphabetise substrings.
 
     :param str name: name of model to alphabetise
@@ -331,16 +332,17 @@ def alph(name):
         out = string.join(spread)
         return out
 
+
 def get_num_qubits(name):
     r"""
     Parse string and determine number of qubits this operator acts on.
 
-    Default convention is to use a naming mechanism specified by 
-    :func:`~qmla.string_processing_functions`. 
-    In all such constructions, the final element of each term is `dN`, 
-    so we can extract the number of qubits N. 
+    Default convention is to use a naming mechanism specified by
+    :func:`~qmla.string_processing_functions`.
+    In all such constructions, the final element of each term is `dN`,
+    so we can extract the number of qubits N.
 
-    If using old convention where terms are tensor-producted 
+    If using old convention where terms are tensor-producted
     by T, TT, TTT... ,
     we find the largest T string instance, from which we deduce the number of qubits.
     - xTx = pauli_x TENSOR_PRODUCT pauli_x --> 2 qubits
@@ -376,14 +378,16 @@ def get_num_qubits(name):
 
     return num_qubits
 
+
 def get_constituent_names_from_name(name):
     r"""
-    Separate into separate terms in model name. 
-    e.g. 'pauliSet_1_x_d2+pauliSet_1_y_d2' 
+    Separate into separate terms in model name.
+    e.g. 'pauliSet_1_x_d2+pauliSet_1_y_d2'
     -> ['pauliSet_1_x_d2', 'pauliSet_1_y_d2']
     :param str name: name of model
     """
     return name.split('+')
+
 
 def empty_array_of_same_dim(name):
     """
@@ -394,6 +398,7 @@ def empty_array_of_same_dim(name):
     dim = 2**num_qubits
     empty_mtx = np.zeros([dim, dim], dtype=np.complex128)
     return empty_mtx
+
 
 def find_max_letter(string, letter):
     r"""
@@ -406,6 +411,7 @@ def find_max_letter(string, letter):
 
     return len(letter_str), letter_str
 
+
 def ideal_probe(name):
     """
     Returns a probe state which is the normalised sum of the given operator's
@@ -417,19 +423,21 @@ def ideal_probe(name):
     normalised_probe = summed_eigvals / np.linalg.norm(summed_eigvals)
     return normalised_probe
 
+
 def get_eigenvectors(name):
     r"""
-    Get eigenvectors of a model from its name. 
+    Get eigenvectors of a model from its name.
     """
 
     mtx = Operator(name).matrix
     eigvectors = np.linalg.eig(mtx)[0]
     return eigvectors
 
+
 def unique_model_pair_identifier(model_a_id, model_b_id):
     r"""
-    Pair uniquely coupling to model ids, for consistency. 
-    Formatted as 'low_id,high_id', 
+    Pair uniquely coupling to model ids, for consistency.
+    Formatted as 'low_id,high_id',
     """
 
     a = int(float(model_a_id))
@@ -447,9 +455,10 @@ def unique_model_pair_identifier(model_a_id, model_b_id):
 # Section: deprecated functions, to be removed when safe to do so
 ##########
 
+
 def DEPRECATED_get_constituent_names_from_name(name):
-    r""" 
-    Used when terms are separated by P strings, such as xTiPPyTi, 
+    r"""
+    Used when terms are separated by P strings, such as xTiPPyTi,
     i.e. the old method. Now all terms should be separable by +
     (e.g. xTi+yTi)
     """
@@ -464,8 +473,8 @@ def DEPRECATED_get_constituent_names_from_name(name):
 
 
 def verbose_naming_mechanism_separate_terms(name):
-    r""" 
-    Separate terms of a model name according to old "verbose" naming scheme. 
+    r"""
+    Separate terms of a model name according to old "verbose" naming scheme.
     """
 
     t_str, p_str, max_t, max_p = get_t_p_strings(name)

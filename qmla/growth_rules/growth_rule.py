@@ -492,7 +492,7 @@ class GrowthRule():
             for pair in pruned_branch.pairs_to_compare:
                 id_1 = pair[0]
                 id_2 = pair[1]
-                mod_1 = pruned_branch.model_instances[id_1]
+                mod_1 = pruned_branch.model_for_learning[id_1]
                 try:
                     bf_1_v_2 = mod_1.model_bayes_factors[ float(id_2) ][-1]
                 except:

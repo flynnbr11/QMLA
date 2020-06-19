@@ -4,6 +4,7 @@ __all__ = [
     'print_to_log'
 ]
 
+
 def _time_seconds():
     r"""return current time in h:m:s format for logging."""
     now = datetime.date.today()
@@ -20,11 +21,11 @@ def print_to_log(
     log_identifier=''
 ):
     """
-    Writes to the log file, registering the time and identifier. 
+    Writes to the log file, registering the time and identifier.
 
     Adds the content of `to_print_list` to the `log_file`,
-    using the `log_identifier` to indicate where a given 
-    log entry originated. 
+    using the `log_identifier` to indicate where a given
+    log entry originated.
 
     :param to_print_list: string you want to print
     :type to_print_list: str() or list()

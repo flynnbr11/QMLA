@@ -48,16 +48,16 @@ To run locally, initialise the redis-server in a terminal:
 redis-server
 ```
 
-In a separate terminal window, go to QMD/Launch, which contains scripts local_launch.sh and parallel_launch.sh. 
-These implement QMLa locally or on a cluster respectively; they contain the top-level controls of interest:
+In a separate terminal window, go to QMD/Launch, which contains scripts `local_launch.sh` and `parallel_launch.sh`. 
+These implement QMLA locally or on a cluster respectively; they contain the top-level controls of interest:
 
 * Binary settings - top level
-** num_tests: how many independent QMLA instances to run
-** qhl_test: don't perform full QMLA tree, just run QHL on known/set true model. 
-** multiple_qhl: perform QHL on preset list of models
-** do_further_qhl: perform QHL refinement stage on preferred models after QMLA has finished.
-** exp_data: (1) use set of experimental data; (0) generate data according to simulated  
-** simulate_experiment: use the growth rule set by experimental data but generate true data according to set model
+    * num_tests: how many independent QMLA instances to run
+    * qhl_test: don't perform full QMLA tree, just run QHL on known/set true model. 
+    * multiple_qhl: perform QHL on preset list of models
+    * do_further_qhl: perform QHL refinement stage on preferred models after QMLA has finished.
+    * exp_data: (1) use set of experimental data; (0) generate data according to simulated  
+    * simulate_experiment: use the growth rule set by experimental data but generate true data according to set model
 
 * QHL parmaeters:
 ** prt: number of particles

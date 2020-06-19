@@ -192,12 +192,12 @@ class QuantumModelLearningAgent():
         # Infrastructure
         self.model_database = pd.DataFrame(
             {
-                'model_id' : [],
-                'model_name' : [],
-                'latex_name' : [], 
-                'branch_id' : [],
-                'f_score' : [], 
-                'model_storage_instance' : [],
+                'model_id': [],
+                'model_name': [],
+                'latex_name': [],
+                'branch_id': [],
+                'f_score': [],
+                'model_storage_instance': [],
             }
         )
         self.model_lists = {
@@ -251,7 +251,7 @@ class QuantumModelLearningAgent():
         self.num_experiments = self.qmla_controls.num_experiments
         self.fraction_experiments_for_bf = self.growth_class.fraction_experiments_for_bf
         self.num_experiments_for_bayes_updates = int(max(
-            self.num_experiments * self.fraction_experiments_for_bf, 
+            self.num_experiments * self.fraction_experiments_for_bf,
             5
         ))
         if self.num_experiments_for_bayes_updates > self.num_experiments:
@@ -324,9 +324,9 @@ class QuantumModelLearningAgent():
         # Plotting data about pairwise comparisons
         self.instance_learning_and_comparisons_path = os.path.join(
             # self.results_directory,
-            # 'instance_learning_and_comparisons', 
+            # 'instance_learning_and_comparisons',
             # str(self.qmla_id)
-            self.qmla_controls.plots_directory, 
+            self.qmla_controls.plots_directory,
             'comparisons'
         )
         if not os.path.exists(self.instance_learning_and_comparisons_path):
@@ -374,7 +374,7 @@ class QuantumModelLearningAgent():
         2 parameters.
         """
 
-        # Decide if reallocating resources based on true GR; 
+        # Decide if reallocating resources based on true GR;
         # TODO In models, check base resources to decide whether to reallocate
         if self.growth_class.reallocate_resources:
             base_num_qubits = 3
@@ -392,13 +392,13 @@ class QuantumModelLearningAgent():
             self.base_resources = {
                 'num_qubits': base_num_qubits,
                 'num_terms': base_num_terms,
-                'reallocate' : True
+                'reallocate': True
             }
         else:
             self.base_resources = {
                 'num_qubits': 1,
                 'num_terms': 1,
-                'reallocate' : False
+                'reallocate': False
             }
 
     def _compile_and_store_qmla_info_summary(
@@ -407,11 +407,11 @@ class QuantumModelLearningAgent():
         r"""
         Gather info needed to run QMLA tasks and store remotely.
 
-        QMLA issues jobs to run remotely, namely for model (parameter) 
+        QMLA issues jobs to run remotely, namely for model (parameter)
         learning and model comparisons (Bayes factors).
         These jobs don't need access to all QMLA data, but do need
         some common info, e.g. number of particles and epochs.
-        This function gathers all relevant information in a single dict, 
+        This function gathers all relevant information in a single dict,
         and stores it on the redis server which all worker nodes have access to.
         It also stores the probe sets required for the same tasks.
 
@@ -443,9 +443,10 @@ class QuantumModelLearningAgent():
             'results_directory': self.results_directory,
             'plots_directory': self.qmla_controls.plots_directory,
             'long_id': self.qmla_controls.long_id,
-            'model_priors': self.model_priors, # could be path to unpickle within model?
-            'experimental_measurements': self.experimental_measurements, # could be path to unpickle within model?
-            'base_resources': self.base_resources, 
+            'model_priors': self.model_priors,  # could be path to unpickle within model?
+            # could be path to unpickle within model?
+            'experimental_measurements': self.experimental_measurements,
+            'base_resources': self.base_resources,
             'store_particles_weights': False,  # TODO from growth rule or unneeded
             'qhl_plots': False,  # TODO get from growth rule
             'experimental_measurement_times': self.experimental_measurement_times,
@@ -453,7 +454,7 @@ class QuantumModelLearningAgent():
             'true_params_pickle_file': self.qmla_controls.true_params_pickle_file,
         }
 
-        # Store qmla_settings and probe dictionaries on the redis database, 
+        # Store qmla_settings and probe dictionaries on the redis database,
         # accessible by all workers.
         # These are retrieved by workers to set
         # parameters to use when learning/comparing models.
@@ -587,7 +588,7 @@ class QuantumModelLearningAgent():
             #     name=model_name
             # )
             model_id = self._get_model_id_from_name(
-                model_name = model_name
+                model_name=model_name
             )
             if model_id not in self.models_learned:
                 self.models_learned.append(model_id)
@@ -600,7 +601,8 @@ class QuantumModelLearningAgent():
                     async=self.use_rq,
                     default_timeout=self.rq_timeout
                 )
-                self.log_print(["Redis queue object:", queue, "has job waiting IDs:", queue.job_ids])
+                self.log_print(["Redis queue object:", queue,
+                                "has job waiting IDs:", queue.job_ids])
                 # send model learning as task to job queue
                 queued_model = queue.enqueue(
                     remote_learn_model_parameters,
@@ -616,7 +618,8 @@ class QuantumModelLearningAgent():
                     result_ttl=-1,
                     timeout=self.rq_timeout
                 )
-                self.log_print(["Model {} on rq job {}".format(model_id, queued_model)])
+                self.log_print(
+                    ["Model {} on rq job {}".format(model_id, queued_model)])
                 if blocking:
                     # wait for result when called.
                     self.log_print([
@@ -647,7 +650,8 @@ class QuantumModelLearningAgent():
                     "model:", model_name,
                     " ID:", model_id
                 ])
-                # pass probes directly instead of unpickling from redis database
+                # pass probes directly instead of unpickling from redis
+                # database
                 self.qmla_settings['probe_dict'] = self.probes_system
 
                 remote_learn_model_parameters(
@@ -745,7 +749,7 @@ class QuantumModelLearningAgent():
             elif return_job == True:
                 return job
         else:
-            # run comparison locally 
+            # run comparison locally
             remote_bayes_factor_calculation(
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
@@ -878,7 +882,7 @@ class QuantumModelLearningAgent():
         self.log_print([
             'compare_models_within_branch. branch {} has {} pairs: {}'.format(
                 branch_id,
-                len(pair_list), 
+                len(pair_list),
                 pair_list
             )
         ])
@@ -993,8 +997,8 @@ class QuantumModelLearningAgent():
         #     model_b_id=mod_high.model_id,
         #     winner_id=champ,
         #     bayes_factor = bayes_factor,
-        #     spawn_step = self.growth_class.spawn_step, 
-        # )   
+        #     spawn_step = self.growth_class.spawn_step,
+        # )
 
         return champ
 
@@ -1079,12 +1083,12 @@ class QuantumModelLearningAgent():
         r"""
         Process comparisons between models on the same branch.
 
-        (Similar functionality to 
+        (Similar functionality to
         :meth:`~qmla.QuantumModelLearningAgent.process_model_set_comparisons`,
-        but additionally updates some branch infrastructure, such as updating 
+        but additionally updates some branch infrastructure, such as updating
         the branch's `champion_id`, `bayes_points` attributes).
         Pairwise comparisons are retrieved and processed by
-        :meth:`~qmla.QuantumModelLearningAgent.process_model_pair_comparison`, 
+        :meth:`~qmla.QuantumModelLearningAgent.process_model_pair_comparison`,
         which informs the superior model.
         For each pairwise comparison a given model wins, it receives a single point.
         All comparisons are weighted evenly.
@@ -1120,7 +1124,7 @@ class QuantumModelLearningAgent():
 
         # Process result for each pair
         models_points = {
-            k : 0
+            k: 0
             for k in active_models_in_branch
         }
         for mod1, mod2 in pair_list:
@@ -1139,12 +1143,12 @@ class QuantumModelLearningAgent():
                     "Point to", res,
                 ])
         self.log_print(["Comparisons complete on branch {}".format(branch_id)])
-        
+
         # Update branch with these results to determine branch champion
         branch.update_branch(
-            pair_list=pair_list, models_points = models_points)
+            pair_list=pair_list, models_points=models_points)
 
-        # if the given results are not enough for the GR to determine a branch champion, 
+        # if the given results are not enough for the GR to determine a branch champion,
         # reconsider a subset of models
         while not branch.is_branch_champion_set:
             reduced_model_set = branch.joint_branch_champions
@@ -1164,8 +1168,8 @@ class QuantumModelLearningAgent():
                 reduced_model_set, 2
             ))
             self.process_comparisons_within_branch(
-                branch_id = branch_id, 
-                pair_list = models_to_recompare
+                branch_id=branch_id,
+                pair_list=models_to_recompare
             )
 
         return branch.champion_id
@@ -1372,12 +1376,12 @@ class QuantumModelLearningAgent():
         in the QMLA environment. The generated new branch then has all its models
         learned by calling :meth:`~qmla.QuantumModelLearningAgent.learn_models_on_given_branch`.
         :meth:`~qmla.GrowthRuleTree.next_layer` is in control of how to select the next set of models,
-        usually either by calling the :class:`~qmla.growth_rules.GrowthRule`'s 
+        usually either by calling the :class:`~qmla.growth_rules.GrowthRule`'s
         :meth:`~qmla.growth_rules.GrowthRule.generate_models` or
-        :meth:`~qmla.growth_rules.GrowthRule.tree_pruning` methods. 
+        :meth:`~qmla.growth_rules.GrowthRule.tree_pruning` methods.
         This allows the user to define how models are generated,
-        given access to the comparisons of the previous branch, 
-        or how the tree is pruned, e.g. by performing preliminary 
+        given access to the comparisons of the previous branch,
+        or how the tree is pruned, e.g. by performing preliminary
         parent/child branch champion comparisons.
 
         :param int branch_id: unique ID of the branch which has completed
@@ -1390,12 +1394,14 @@ class QuantumModelLearningAgent():
         ]
 
         new_models, models_to_compare = self.branches[branch_id].tree.next_layer(
-            model_list=model_names, # can this be functionally replaced by info in branch_model_points?
+            model_list=model_names,
+            # can this be functionally replaced by info in branch_model_points?
             model_names_ids=self.model_name_id_map,
             called_by_branch=branch_id,
-            branch_model_points=self.branches[branch_id].bayes_points, # remove usage of
-            evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods, 
-            model_dict=self.model_lists, # is this used by any GR? TODO remove
+            # remove usage of
+            branch_model_points=self.branches[branch_id].bayes_points,
+            evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods,
+            model_dict=self.model_lists,  # is this used by any GR? TODO remove
         )
 
         self.log_print(
@@ -1409,7 +1415,7 @@ class QuantumModelLearningAgent():
         # Generate new QMLA level branch
         new_branch_id = self.new_branch(
             model_list=new_models,
-            pairs_to_compare_by_names = models_to_compare,
+            pairs_to_compare_by_names=models_to_compare,
             growth_rule=self.branches[branch_id].growth_rule,
             spawning_branch=branch_id,
         )
@@ -1424,7 +1430,7 @@ class QuantumModelLearningAgent():
         self,
         model_list,
         pairs_to_compare='all',
-        pairs_to_compare_by_names=None, 
+        pairs_to_compare_by_names=None,
         growth_rule=None,
         spawning_branch=0,
     ):
@@ -1483,7 +1489,7 @@ class QuantumModelLearningAgent():
                 ),
             ])
 
-        model_instances = {
+        model_for_learning = {
             m: self.get_model_storage_instance_by_id(m)
             for m in list(this_branch_models.keys())
         }
@@ -1498,20 +1504,23 @@ class QuantumModelLearningAgent():
                 try:
                     pairs_to_compare = [
                         (
-                            self.model_database[self.model_database.model_name == m1 ].model_id.item(),
-                            self.model_database[self.model_database.model_name == m2 ].model_id.item()
+                            self.model_database[self.model_database.model_name == m1].model_id.item(
+                            ),
+                            self.model_database[self.model_database.model_name == m2].model_id.item(
+                            )
                         ) for m1, m2 in pairs_to_compare_by_names
                     ]
                     self.log_print(["IDs:", pairs_to_compare])
-                except:
-                    self.log_print(["Failed to unpack pairs_to_compare_by_names:\n", pairs_to_compare_by_names])
+                except BaseException:
+                    self.log_print(
+                        ["Failed to unpack pairs_to_compare_by_names:\n", pairs_to_compare_by_names])
                     raise
 
         self.branches[branch_id] = growth_tree.new_branch_on_tree(
             branch_id=branch_id,
             models=this_branch_models,
             pairs_to_compare=pairs_to_compare,
-            model_instances=model_instances,
+            model_for_learning=model_for_learning,
             precomputed_models=pre_computed_models,
             spawning_branch=spawning_branch,
         )
@@ -1543,7 +1552,7 @@ class QuantumModelLearningAgent():
             model_id: unique model ID for the model, whether new or existing
         """
 
-        model_name = construct_models.alph(model) 
+        model_name = construct_models.alph(model)
         self.log_print(["Trying to add model to DB:", model_name])
 
         # Add model if not yet considered or told to force create
@@ -1586,20 +1595,20 @@ class QuantumModelLearningAgent():
 
             f_score = np.round(self.compute_model_f_score(
                 model_id=model_id,
-                model_name = model_name,
+                model_name=model_name,
                 growth_class=growth_tree.growth_class
-            ),2)
+            ), 2)
             running_db_new_row = pd.Series({
                 'model_id': int(model_id),
                 'model_name': model_name,
-                'latex_name' : growth_tree.growth_class.latex_name(model_name),
+                'latex_name': growth_tree.growth_class.latex_name(model_name),
                 'branch_id': int(branch_id),
-                'f_score' : f_score, 
+                'f_score': f_score,
                 'model_storage_instance': model_storage_instance,
             })
             num_rows = len(self.model_database)
             self.model_database.loc[num_rows] = running_db_new_row
-            
+
             model_added = True
             if construct_models.alph(
                     model) == construct_models.alph(self.true_model_name):
@@ -1666,8 +1675,8 @@ class QuantumModelLearningAgent():
 
         self.bayes_factors_data()
         self.growth_class.growth_rule_specific_plots(
-            save_directory = self.qmla_controls.plots_directory,
-            qmla_id = self.qmla_controls.long_id
+            save_directory=self.qmla_controls.plots_directory,
+            qmla_id=self.qmla_controls.long_id
         )
         self.growth_class.growth_rule_finalise()
         self.get_statistical_metrics()
@@ -1679,18 +1688,19 @@ class QuantumModelLearningAgent():
             self.model_id_to_name_map[v] = k
 
         self.branch_graphs = qmla.analysis.branch_graphs.plot_qmla_branches(
-            q = self, return_graphs=True
+            q=self, return_graphs=True
         )
 
         # Store model IDs and names
-        model_data = self.model_database[ 
+        model_data = self.model_database[
             # subset of columns to store
-            [ 'model_id', 'model_name', 'latex_name', 'branch_id', 'f_score'] 
+            ['model_id', 'model_name', 'latex_name', 'branch_id', 'f_score']
         ]
         model_data.to_csv(
-            os.path.join(self.qmla_controls.plots_directory, 'model_directory.csv')
+            os.path.join(
+                self.qmla_controls.plots_directory,
+                'model_directory.csv')
         )
-
 
     def bayes_factors_data(self):
         self.bayes_factors_df = pd.DataFrame(
@@ -1698,7 +1708,7 @@ class QuantumModelLearningAgent():
                 'model_a', 'id_a', 'f_score_a',
                 'model_b', 'id_b', 'f_score_b',
                 'bayes_factor', 'log10_bayes_factor'
-                ]
+            ]
         )
 
         for m in self.models_learned:
@@ -1714,24 +1724,23 @@ class QuantumModelLearningAgent():
                 mod_id_b = int(b)
                 f_score_b = qmla.utilities.round_nearest(
                     self.model_f_scores[mod_id_b], 0.05)
-                
+
                 for bf in bayes_factors[b]:
                     d = pd.Series(
-                        {      
-                            'model_a' : mod_name_a,
-                            'id_a' : mod_id_a,
-                            'f_score_a' : f_score_a,
-                            'model_b' : mod_name_b, 
-                            'id_b' : mod_id_b, 
-                            'f_score_b' : f_score_b, 
-                            'bayes_factor' : bf,
-                            'log10_bayes_factor' : np.round(np.log10(bf), 1)
+                        {
+                            'model_a': mod_name_a,
+                            'id_a': mod_id_a,
+                            'f_score_a': f_score_a,
+                            'model_b': mod_name_b,
+                            'id_b': mod_id_b,
+                            'f_score_b': f_score_b,
+                            'bayes_factor': bf,
+                            'log10_bayes_factor': np.round(np.log10(bf), 1)
                         }
                     )
                     new_idx = len(self.bayes_factors_df)
                     self.bayes_factors_df.loc[new_idx] = d
         self.plot_bayes_factors()
-
 
     def get_results_dict(
         self,
@@ -1763,7 +1772,8 @@ class QuantumModelLearningAgent():
         )
 
         # Perform final steps in GrowthRule
-        # self.growth_class.growth_rule_finalise()  # TODO put in main QMLA/QHL method
+        # self.growth_class.growth_rule_finalise()  # TODO put in main QMLA/QHL
+        # method
 
         # Evaluations of all models in this instance
         model_evaluation_log_likelihoods = {
@@ -1857,7 +1867,7 @@ class QuantumModelLearningAgent():
         self.storage = qmla.utilities.StorageUnit()
         self.storage.qmla_id = self.qmla_id
         self.storage.bayes_factors_df = self.bayes_factors_df
-        self.storage.growth_rule_storage = self.growth_class.storage        
+        self.storage.growth_rule_storage = self.growth_class.storage
 
         return results_dict
 
@@ -2021,7 +2031,7 @@ class QuantumModelLearningAgent():
                 wait_on_result=True
             )
             self.log_print([
-                "BF b/w champ and reduced champ models:", bayes_factor                
+                "BF b/w champ and reduced champ models:", bayes_factor
             ])
 
             if (
@@ -2276,9 +2286,9 @@ class QuantumModelLearningAgent():
         Run complete Quantum Model Learning Agent algorithm.
 
         Each :class:`~qmla.growth_rules.GrowthRule` is assigned a :class:`~qmla.tree.QMLATree`,
-        which manages the growth rule. When new models are spawned by a growth rule, 
+        which manages the growth rule. When new models are spawned by a growth rule,
         they are placed on a :class:`~qmla.tree.BranchQMLA` of the corresponding tree.
-        Models are learned/compared/spawned iteratively in 
+        Models are learned/compared/spawned iteratively in
         :meth:`learn_models_until_trees_complete`, until all
         trees declare that their growth rule has completed.
         Growth rules are complete when they have nominated one or more champions,
@@ -2300,9 +2310,9 @@ class QuantumModelLearningAgent():
                 "models_to_compare:", models_to_compare
             ])
             self.new_branch(
-                model_list = starting_models,
-                growth_rule = tree.growth_rule,
-                pairs_to_compare_by_names = models_to_compare
+                model_list=starting_models,
+                growth_rule=tree.growth_rule,
+                pairs_to_compare_by_names=models_to_compare
             )
 
         # Iteratively learn models, compute bayes factors, spawn new models
@@ -2317,7 +2327,8 @@ class QuantumModelLearningAgent():
             name=self.global_champion_name,
             field='model_id'
         )
-        self.log_print(["Champion selected. ID={}".format(self.champion_model_id)])
+        self.log_print(
+            ["Champion selected. ID={}".format(self.champion_model_id)])
 
         # Internal analysis
         try:
@@ -2350,7 +2361,8 @@ class QuantumModelLearningAgent():
 
         self.log_print([
             "\nFinal winner:", self.global_champion_name,
-            "has F-score ", np.round(self.model_f_scores[self.champion_model_id], 2)
+            "has F-score ", np.round(
+                self.model_f_scores[self.champion_model_id], 2)
         ])
 
     ##########
@@ -2367,27 +2379,28 @@ class QuantumModelLearningAgent():
 
         # val = list(self.model_database[self.model_database['model_name'] == name][field])[0]
         # TODO use below instead:
-        val = self.model_database[self.model_database['model_name'] == name][field].item()
+        val = self.model_database[self.model_database['model_name'] == name][field].item(
+        )
         return val
 
     def _get_model_id_from_name(self, model_name):
         return self._get_model_data_by_field(
-            name = model_name, 
-            field = 'model_id'
+            name=model_name,
+            field='model_id'
         )
 
     def _consider_new_model(self, model_name):
         r"""
-        Check whether a proposed model already exists. 
+        Check whether a proposed model already exists.
 
-        Check whether the new model `name`, exists in 
-        all previously considered models, held in `model_lists`, organised 
+        Check whether the new model `name`, exists in
+        all previously considered models, held in `model_lists`, organised
         by dimension of models.
         If name has not been previously considered, 'New' is returned.
         If name has been previously considered, the corresponding location
             in db is returned.
-        
-        :param dict model_lists: lists of models already considered, organised 
+
+        :param dict model_lists: lists of models already considered, organised
             by the number of qubits of those models
         :param str name: model for consideration
         """
@@ -2400,7 +2413,7 @@ class QuantumModelLearningAgent():
             return 'New'
 
     def _check_model_exists(self, model_name):
-        r""" 
+        r"""
         True if model already exists; False if not.
         """
         if self._consider_new_model(model_name) == 'New':
@@ -2469,15 +2482,14 @@ class QuantumModelLearningAgent():
         del self.redis_databases
         del self.write_log_file
 
-
-
     ##########
     # Section: Analysis/plotting methods
     ##########
+
     def compute_model_f_score(
         self,
         model_id,
-        model_name = None, 
+        model_name=None,
         growth_class=None,
         beta=1  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
     ):
@@ -2652,15 +2664,14 @@ class QuantumModelLearningAgent():
         if save_to_file is not None:
             plt.savefig(save_to_file)
 
-
     def plot_bayes_factors(
-        self, 
+        self,
     ):
         # Plot Bayes factors of this instance
         bayes_factor_by_id = pd.pivot_table(
-            self.bayes_factors_df, 
-            values='log10_bayes_factor', 
-            index=['id_a'], 
+            self.bayes_factors_df,
+            values='log10_bayes_factor',
+            index=['id_a'],
             columns=['id_b'],
             aggfunc=np.median
         )
@@ -2671,22 +2682,23 @@ class QuantumModelLearningAgent():
             cmap='RdYlGn',
             mask=mask,
             annot=False
-        )   
+        )
         s.get_figure().savefig(
             os.path.join(
                 self.qmla_controls.plots_directory,
                 'bayes_factors_{}.png'.format(self.qmla_controls.long_id)
             )
-        )                         
+        )
 
         # # Heat map BF against F(A)/F(B)
-        fig = qmla.analysis.bayes_factor_f_score_heatmap(bayes_factors_df = self.bayes_factors_df)
+        fig = qmla.analysis.bayes_factor_f_score_heatmap(
+            bayes_factors_df=self.bayes_factors_df)
         fig.savefig(
             os.path.join(
-                self.qmla_controls.plots_directory, "bayes_factors_by_f_score_{}".format(self.qmla_controls.long_id)
+                self.qmla_controls.plots_directory, "bayes_factors_by_f_score_{}".format(
+                    self.qmla_controls.long_id)
             )
         )
-        
 
     def plot_branch_champs_quadratic_losses(
         self,
@@ -2766,7 +2778,7 @@ class QuantumModelLearningAgent():
     def store_bayes_factors_to_csv(self, save_to_file, names_ids='latex'):
         r"""
         *deprecated* Store the pairwise comparisons computed during this instance.
-        :func:`~qmla.analysis.model_bayes_factorsCSV` removed and is needed 
+        :func:`~qmla.analysis.model_bayes_factorsCSV` removed and is needed
         TODO if wanted, find in old github commits and reimplement.
 
         Wrapper for :func:`~qmla.analysis.model_bayes_factorsCSV`.
@@ -2841,7 +2853,9 @@ class QuantumModelLearningAgent():
             "Plotting dynamics of models:",
             model_ids
         ])
-        path_to_save = os.path.join(self.qmla_controls.plots_directory, 'dynamics.png')
+        path_to_save = os.path.join(
+            self.qmla_controls.plots_directory,
+            'dynamics.png')
         try:
             include_times_learned = False
             include_params = False
@@ -2853,7 +2867,7 @@ class QuantumModelLearningAgent():
                 model_ids=model_ids,
                 save_to_file=path_to_save,
             )
-        except:
+        except BaseException:
             self.log_print(["Failed to plot dynamics"])
             raise
 
@@ -2939,14 +2953,13 @@ class QuantumModelLearningAgent():
             vec = (A + B)
             print(vec)
             bloch.add_states(vec)
-        
+
         if save:
             bloch.save(
                 os.path.join(
-                    self.qmla_controls.plots_directory, 
+                    self.qmla_controls.plots_directory,
                     'probes_bloch_sphere.png'
                 )
             )
         else:
             bloch.show()
-
