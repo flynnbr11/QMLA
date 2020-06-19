@@ -1,20 +1,14 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-# test_description="genetic-algorithm__longer-run"
-# test_description='inspect-node-times__qhl__reset-zero-wt-policy'
-# test_description="theory-test__ising-predetermined__2-models__4-site-true__champ-reduction__mixed-heuristic__medium-run"
-# test_description='heis-predetermined__w-champ-reduction'
-# test_description='fh-qhl'
-# test_description='not_using_rq'
-# test_description="testing-bf-reqmt-reduced-particles"
-# test_description='ising_chain_shared_field'
-# test_description='pauli-likewise-pairs-test__heis-xyz'
-# test_description='fixed-lattice__test__heis-6-sites-qhl__2-proc'
-# test_description='fixed-lattice__fermi-hubbard-qmla'
-# test_description='qhl-TIME-TEST'
-# test_description='nv_simulation__QHL__learn-MHz-with-uncertainty-on-GHz-terms'
-# test_description="genetic-algorithm__32x4__thin-prior-test"
-test_description='focussed-learning__3-param__learning-GHz'
+# test_description="genetic-algorithm__16x10__250x250__slightly-wider-prior"
+# test_description='NV__up-to-4-qubit-models__only-z-coupling__mixed-heuristic__bayes-factors'
+test_description='NV__low-resampling-thresh__pgh_tomographic-basis__many-particles'
+# test_description='ga__qle__1000-5000-qhl__f-spread__4-generation__reduced-comparison'
+# test_description='ga__iqle__16-generations__partial-connectivity'
+# test_description="ga__new-models-get-2nd-highest-rating__4-gen-long"
+# test_description="genetic-algorithm__750x1500__11-model-per-gen__8-generations"
+# test_description="rq-customr-script__time-test__NV"
+# test_description='not-using-rq'
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -33,8 +27,8 @@ experimental_data=0 # use experimental data -> 1; use fake data ->0
 simulate_experiment=0
 
 # QHL parameters.
-e=250 # experiments
-p=1000 # particles
+e=2500 # experiments
+p=20000 # particles
 ra=0.98 #resample a 
 rt=0.5 # resample threshold
 rp=1.0 # PGH factor
@@ -47,8 +41,13 @@ pgh_increase=0 # whether or not to increase the times found by PGH
 # and value of experimental_data.
 ### ---------------------------------------------------###
 
-growth_rule='SimulatedNVCentre'
+growth_rule='TestSimulatedNVCentre'
+# growth_rule='IsingGeneticTest'
+
 # growth_rule='IsingGenetic'
+# growth_rule='ExperimentNVCentreNQubits'
+# growth_rule='SimulatedNVCentre'
+
 # growth_rule='FermiHubbardLatticeSet'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
@@ -235,7 +234,7 @@ printf "$day_time: \t $test_description \t e=$e; p=$p; bt=$bt; ra=$ra; rt=$rt; r
 force_plot_plus=0
 special_probe='random' #'ideal'
 special_probe_plot='random'
-time_request_insurance_factor=3
+time_request_insurance_factor=1
 if (( "$bin_times_bayes_factors" == 1))
 then
 	let time_request_insurance_factor="2*$time_request_insurance_factor"
