@@ -257,19 +257,6 @@ def parse_cmd_line_args(args):
         default=1
     )
 
-    parser.add_argument(
-        '-bu', '--bayes_upper',
-        help='Higher Bayes threshold.',
-        type=int,
-        default=100
-    )
-
-    parser.add_argument(
-        '-bl', '--bayes_lower',
-        help='Lower Bayes threshold.',
-        type=int,
-        default=1
-    )
 
     # Include optional plots
     parser.add_argument(
@@ -348,7 +335,7 @@ def parse_cmd_line_args(args):
     )
     parser.add_argument(
         '-pkl', '--pickle_qmd_class',
-        help='Store QMD class in pickled file at end. Large memory requirement, recommend not to.',
+        help='Whether to pickle QMLA class used. Large memory requirement, recommend not to except during development.',
         type=int,
         default=0
     )
@@ -362,7 +349,7 @@ def parse_cmd_line_args(args):
 
     parser.add_argument(
         '-log', '--log_file',
-        help='File to log RQ workers.',
+        help='Log file for this QMLA instance.',
         type=str,
         default='default_log_file.log'
     )
@@ -376,6 +363,19 @@ def parse_cmd_line_args(args):
 
     # Old inputs - to rmeove
 
+    parser.add_argument(
+        '-bu', '--bayes_upper',
+        help='Higher Bayes threshold.',
+        type=int,
+        default=100
+    )
+
+    parser.add_argument(
+        '-bl', '--bayes_lower',
+        help='Lower Bayes threshold.',
+        type=int,
+        default=1
+    )
     parser.add_argument(
         '-bt', '--num_experiments_for_bayes_updates',
         help='Number of times to consider in Bayes function.',
