@@ -211,7 +211,7 @@ class QuantumModelLearningAgent():
         self.bayes_factor_pair_computed = []
 
         # Growth rule setup
-        self.growth_rules_list = self.qmla_controls.generator_list
+        # self.growth_rules_list = self.qmla_controls.generator_list
         self.growth_rule_of_true_model = self.qmla_controls.growth_generation_rule
         self.unique_growth_rule_instances = self.qmla_controls.unique_growth_rule_instances
 
@@ -249,7 +249,7 @@ class QuantumModelLearningAgent():
         # Learning parameters, used by QInfer updates
         self.num_particles = self.qmla_controls.num_particles
         self.num_experiments = self.qmla_controls.num_experiments
-        self.fraction_experiments_for_bf = self.qmla_controls.fraction_experiments_for_bf
+        self.fraction_experiments_for_bf = self.growth_class.fraction_experiments_for_bf
         self.num_experiments_for_bayes_updates = int(max(
             self.num_experiments * self.fraction_experiments_for_bf, 
             5

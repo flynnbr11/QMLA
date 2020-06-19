@@ -12,7 +12,7 @@ __all__ = [
     'parse_cmd_line_args'
 ]
 
-"""
+r"""
 This file provides functionality to parse command line arguments 
 passed via the QMLA launch scripts. 
 These are gathered into a single class instance which can be probed by 
@@ -29,11 +29,12 @@ class ControlsQMLA():
     The command line arguments are stored together in this class. 
     The class is then given to the :class:`qmla.QuantumModelLearningAgent` instance, 
     which uses those details into the implementation.
+    Some QMLA parameters are also set by the attributes of the Growth Rule.
     In particular, the :class:`~qmla.growth_rules.GrowthRule` of the true model 
     is instantiated by calling :meth:`~qmla.get_growth_generator_class`. 
-    This growth rule instance is the master growth rule for the QMLA instance: the true 
     model is defined as the true model of that instance. 
-    Likewise instances are generated for all of the growth rules specified by the user:
+    This growth rule instance is the master growth rule for the QMLA instance: the true 
+    Likewise, instances are generated for all of the growth rules specified by the user:
     these instances are associated with the growth rule :class:`~qmla.GrowthRuleTree` objects. 
 
     :param dict arguments: command line arguments, parsed into a dict.
@@ -45,7 +46,11 @@ class ControlsQMLA():
         **kwargs
     ):
         self.log_file = os.path.abspath(arguments.log_file)
-        # self.alt_log_file = self.log_file
+
+        # Mode of learning: QHL, mult-model-QHL, or QMLA (if all are False)
+        self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
+        self.qhl_mode = bool(arguments.qhl_mode)
+        self.further_qhl = bool(arguments.further_qhl)
 
         # Get growth rule instances for true and alternative growth rules
         self.growth_generation_rule = arguments.growth_generation_rule
@@ -58,12 +63,11 @@ class ControlsQMLA():
             )
         except BaseException:
             raise
-            self.growth_class = None
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
-        self.generator_list = [self.growth_generation_rule]
-        self.generator_list.extend(self.alternative_growth_rules)
-        self.generator_list = list(set(self.generator_list))
+        # self.generator_list = [self.growth_generation_rule]
+        # self.generator_list.extend(self.alternative_growth_rules)
+        # self.generator_list = list(set(self.generator_list))
         self.unique_growth_rule_instances = {
             gen : qmla.get_growth_rule.get_growth_generator_class(
                     growth_generation_rule = gen, 
@@ -72,15 +76,6 @@ class ControlsQMLA():
             for gen in self.alternative_growth_rules
         }
         self.unique_growth_rule_instances[self.growth_generation_rule] = self.growth_class
-
-        # self.probe_max_num_qubits_all_growth_rules = max( 
-        #     [
-        #         gr.max_num_probe_qubits for gr in 
-        #         list(self.unique_growth_rule_instances.values())
-        #     ]
-        # )
-
-        self.qhl_mode_multiple_models = bool(arguments.qhl_mode_multiple_models)
 
         # Get (or set) true parameters from parameter files shared among instances within the same run. 
         if arguments.true_params_pickle_file is None: 
@@ -98,6 +93,8 @@ class ControlsQMLA():
                     'rb'
                 )
             )
+        
+        # Attributes about true model
         self.true_model = true_params_info['true_model']
         self.true_model_name = database_framework.alph(self.true_model)
         self.true_model_class = database_framework.Operator(
@@ -108,19 +105,12 @@ class ControlsQMLA():
         self.true_params_pickle_file = arguments.true_params_pickle_file
         self.log_print([ "Shared true params set for this instance."])
 
-        # # Get essentials out of growth_rule class
-        # self.dataset = self.growth_class.experimental_dataset
-        # self.data_max_time = self.growth_class.max_time_to_consider  # arguments.data_max_time
-        # self.num_probes = self.growth_class.num_probes
-
         # Store parameters which were passed as arguments to implement_qmla.py
         self.prior_pickle_file = arguments.prior_pickle_file
-        self.qhl_mode = bool(arguments.qhl_mode)
-        self.further_qhl = bool(arguments.further_qhl)
         self.use_rq = bool(arguments.use_rq)
         self.num_experiments = arguments.num_experiments
         self.num_particles = arguments.num_particles
-        self.fraction_experiments_for_bf = self.growth_class.fraction_experiments_for_bf
+        # self.fraction_experiments_for_bf = self.growth_class.fraction_experiments_for_bf
         self.bayes_lower = arguments.bayes_lower # TODO put inside growth rule
         self.bayes_upper = arguments.bayes_upper
         self.save_plots = bool(arguments.save_plots)
@@ -210,22 +200,44 @@ def parse_cmd_line_args(args):
 
     # Parse command line arguments
 
+    # Mode of learning
     parser.add_argument(
         '-qhl', '--qhl_mode',
         help="Bool to test QHL on given true operator only.",
         type=int,
         default=0
     )
-
     parser.add_argument(
         '-fq', '--further_qhl',
         help="Bool to perform further QHL on best models from previous run.",
         type=int,
         default=0
     )
+    parser.add_argument(
+        '-mqhl', '--qhl_mode_multiple_models',
+        help='Run QHL test on multiple (provided) models.',
+        type=int,
+        default=0
+    )
 
-    # QMD parameters -- fundamentals such as number of particles etc
+    # Growth rules to learn from
+    parser.add_argument(
+        '-ggr', '--growth_generation_rule',
+        help='Rule applied for generation of new models during QMD. \
+        Corresponding functions must be built into model_generation',
+        type=str,
+        default='GrowthRule'
+    )
 
+    parser.add_argument(
+        '-agr', '--alternative_growth_rules',
+        help='Growth rules to form other trees.',
+        # type=str,
+        action='append',
+        default=[],
+    )
+
+    # QMLA fundamental parameters, such as number of particles etc
     parser.add_argument(
         '-e', '--num_experiments',
         help='Number of experiments to use for the learning process',
@@ -237,12 +249,6 @@ def parse_cmd_line_args(args):
         help='Number of particles to use for the learning process',
         type=int,
         default=20
-    )
-    parser.add_argument(
-        '-bt', '--num_experiments_for_bayes_updates',
-        help='Number of times to consider in Bayes function.',
-        type=int,
-        default=5
     )
     parser.add_argument(
         '-rq', '--use_rq',
@@ -314,7 +320,7 @@ def parse_cmd_line_args(args):
         default=0
     )
 
-    # Redis environment
+    # Environmental variables including redis configuration
     parser.add_argument(
         '-host', '--host_name',
         help='Name of Redis host.',
@@ -368,6 +374,15 @@ def parse_cmd_line_args(args):
         default='cumulative.csv'
     )
 
+    # Old inputs - to rmeove
+
+    parser.add_argument(
+        '-bt', '--num_experiments_for_bayes_updates',
+        help='Number of times to consider in Bayes function.',
+        type=int,
+        default=5
+    )
+
     parser.add_argument(
         '-exp', '--experimental_data',
         help='Use experimental data if provided',
@@ -382,21 +397,6 @@ def parse_cmd_line_args(args):
         default=2000
     )
 
-    parser.add_argument(
-        '-ggr', '--growth_generation_rule',
-        help='Rule applied for generation of new models during QMD. \
-        Corresponding functions must be built into model_generation',
-        type=str,
-        default='GrowthRule'
-    )
-
-    parser.add_argument(
-        '-agr', '--alternative_growth_rules',
-        help='Growth rules to form other trees.',
-        # type=str,
-        action='append',
-        default=[],
-    )
 
     parser.add_argument(
         '-qhl_mods', '--models_for_qhl',
@@ -404,13 +404,6 @@ def parse_cmd_line_args(args):
         # type=str,
         action='append',
         default=[],
-    )
-
-    parser.add_argument(
-        '-mqhl', '--qhl_mode_multiple_models',
-        help='Run QHL test on multiple (provided) models.',
-        type=int,
-        default=0
     )
 
     parser.add_argument(
@@ -469,8 +462,8 @@ def parse_cmd_line_args(args):
         arguments,
     )
 
+    # Print to log file for inspection
     args_dict = vars(qmla_controls)
-
     for a in list(args_dict.keys()):
         qmla_controls.log_print([
             a, ':', args_dict[a]        
