@@ -6,33 +6,45 @@ import pandas as pd
 
 import qmla.logging
 
-# __all__ = [
-#     'Operator',
-#     'core_operator_dict',
-#     'get_num_qubits',
-#     'get_constituent_names_from_name',
-#     'alph',
-#     'consider_new_model',
-#     'reduced_model_instance_from_id',
-#     'update_field',
-#     'pull_field',
-#     'check_model_exists',
-#     'unique_model_pair_identifier',
-#     'all_active_model_ids',
-#     'model_id_from_name',
-#     'list_model_id_in_branch'
-# ]
+__all__ = [
+    'Operator',
+    'core_operator_dict',
+    'get_num_qubits',
+    'get_constituent_names_from_name',
+    'alph',
+    'unique_model_pair_identifier',
+]
+
+##########
+# Section: Core operators as arrays
+##########
 
 core_operator_dict = {
-    'i': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, 1 + 0.j]]),
-    'x': np.array([[0 + 0.j, 1 + 0.j], [1 + 0.j, 0 + 0.j]]),
-    'y': np.array([[0 + 0.j, 0 - 1.j], [0 + 1.j, 0 + 0.j]]),
-    'z': np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]]),
-    'a': np.array([[0 + 0.j, 1 + 0.j], [0 + 0.j, 0 + 0.j]]),
-    's': np.array([[0 + 0.j, 0 + 0.j], [1 + 0.j, 0 + 0.j]])
+    'i': np.array([ # Identity
+        [1 + 0.j, 0 + 0.j], 
+        [0 + 0.j, 1 + 0.j]
+    ]),
+    'x': np.array([ # Pauli-X
+        [0 + 0.j, 1 + 0.j], 
+        [1 + 0.j, 0 + 0.j]
+    ]),
+    'y': np.array([ # Pauli-Y
+        [0 + 0.j, 0 - 1.j], 
+        [0 + 1.j, 0 + 0.j]
+    ]),
+    'z': np.array([ # Pauli-Z
+        [1 + 0.j, 0 + 0.j], 
+        [0 + 0.j, -1 + 0.j]
+    ]),
+    'a': np.array([ # Add
+        [0 + 0.j, 1 + 0.j], 
+        [0 + 0.j, 0 + 0.j]
+    ]),
+    's': np.array([ # Subtract
+        [0 + 0.j, 0 + 0.j], 
+        [1 + 0.j, 0 + 0.j]
+    ])
 }
-
-
 
 ##########
 # Section: Operator object
@@ -88,7 +100,7 @@ class Operator():
     @property
     def num_constituents(self):
         """
-        Integer, how many constituents, and therefore parameters, are in this model.
+        Integer, number of constituents (and therefore parameters) in this model.
         """
         return len(self.constituents_names)
 
@@ -406,11 +418,20 @@ def ideal_probe(name):
     return normalised_probe
 
 def get_eigenvectors(name):
+    r"""
+    Get eigenvectors of a model from its name. 
+    """
+
     mtx = Operator(name).matrix
     eigvectors = np.linalg.eig(mtx)[0]
     return eigvectors
 
 def unique_model_pair_identifier(model_a_id, model_b_id):
+    r"""
+    Pair uniquely coupling to model ids, for consistency. 
+    Formatted as 'low_id,high_id', 
+    """
+
     a = int(float(model_a_id))
     b = int(float(model_b_id))
     std = sorted([a, b])
@@ -474,4 +495,3 @@ def get_t_p_strings(name):
     max_p = len(p_str)
 
     return t_str, p_str, max_t, max_p
-

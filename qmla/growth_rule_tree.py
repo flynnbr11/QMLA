@@ -6,14 +6,14 @@ import numpy as np
 import os as os
 import sys as sys
 import pandas as pd
-import time as time
+import time 
 from time import sleep
 import random
 import itertools
 
+import pickle
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-import pickle
 
 import qmla.logging 
 import qmla.construct_models
@@ -38,14 +38,16 @@ class GrowthRuleTree():
         self, 
         growth_class,
     ):
+        # Give tree access to the GR instance
         self.growth_class = growth_class
-        self.growth_class.tree = self
-
+        
+        # Give the GR access to this tree.
+        self.growth_class.tree = self 
         self.growth_rule = self.growth_class.growth_generation_rule
+        
+        # Infrastructure
         self.log_file = self.growth_class.log_file
         self.log_print([ "Tree started for {}".format(self.growth_rule) ])
-
-        # Infrastructure
         self.branches = {}
         self.models = {}
         self.model_instances = {}
@@ -62,7 +64,17 @@ class GrowthRuleTree():
     def get_initial_models(
         self, 
     ):
+        r"""
+        Models for the first layer of this growth rule. 
+
+        :return list initial_models: list of model names to place on the first 
+            layer corresponding to this GR
+        :return list pairs_to_compare: list of model name pairs to compare 
+        """
+
+        # Get models to learn
         if self.growth_class.initial_models is None:
+            # call generate_models if not explicitly set by GR
             self.log_print([
                 "Initial models not set; retrieving from generate_models"
             ])
@@ -72,6 +84,7 @@ class GrowthRuleTree():
         else:
             self.initial_models = self.growth_class.initial_models
 
+        # Get comparisons: pairs of models to compare on the first layer
         if self.growth_class.branch_comparison_strategy == 'all':
             pairs_to_compare = 'all'
         elif self.growth_class.branch_comparison_strategy == 'optimal_graph':
@@ -83,7 +96,6 @@ class GrowthRuleTree():
             self.graphs[self.spawn_step] = graph
         else: 
             pairs_to_compare = 'all'
-
 
         return self.initial_models, pairs_to_compare
 
@@ -123,11 +135,6 @@ class GrowthRuleTree():
         :return str or list pairs_to_compare: which model IDs within the model_list
             to perform comparisons between. 
         """
-
-        # record end of previous generation
-        # self.growth_class.ratings_class.record_current_ratings(
-        #     model_list = , generation = self.spawn_step+0.85, marker='end'
-        # )
 
         if not self.growth_class.check_tree_completed(spawn_step = self.spawn_step):
             self.spawn_step += 1
@@ -204,7 +211,7 @@ class GrowthRuleTree():
         r"""
         Add a branch to this tree. 
 
-        Generate a new :class:`~qmla.BranchQMLA`, places the given models on it, 
+        Generate a new :class:`~qmla.BranchQMLA`, and places the given models on it, 
         and assign it to this tree. Return the object, so it can also act as a branch/layer in
         the :class:`~qmla.QuantumModelLearningAgent` environment. 
         Note models can reside on multiple branches. 
@@ -320,7 +327,7 @@ class BranchQMLA():
 
         self.branch_id = branch_id
 
-        # Get attributes from tree of this branch
+        # Get attributes from this branch's tree
         self.tree = tree 
         self.log_file = self.tree.log_file
         self.growth_class = self.tree.growth_class
@@ -344,11 +351,10 @@ class BranchQMLA():
             self.log_print(["Failed to set parent branch for ", branch_id])
 
         # Models to place on the branch
-        # TODO tidy up how models passed etc, a bit redundant
+        # TODO tidy up how models passed etc. (currently a bit redundant)
         self.model_instances = model_instances
         self.models = models
         self.models_by_id = models
-        self.log_print(["Models on new branch:", models])
         self.resident_model_ids = sorted(self.models_by_id.keys())
         self.resident_models = list(self.models_by_id.values())
         self.num_models = len(self.resident_models)
@@ -373,7 +379,6 @@ class BranchQMLA():
         # Models already considered on a previous branch
         self.precomputed_models = precomputed_models
         self.num_precomputed_models = len(self.precomputed_models)
-        
         self.unlearned_models = list(
             set(self.resident_models) - set(self.precomputed_models)
         )
@@ -401,14 +406,15 @@ class BranchQMLA():
         pair_list, 
         models_points=None
     ):
+        r"""
+        Process results for this branch. 
+
+        :param list pair_list: pairs of models which were compared on this branch
+        :param dict models_points: results of comparisons
+        """
+
+        # Track calls to this method for this branch
         self.result_counter += 1 
-        self.log_print([
-            "Branch processing results for the N={} time".format(
-                self.result_counter
-            ),
-            "pair list:", pair_list,
-            "\n Selectiong strategy:", self.growth_class.branch_champion_selection_stratgey
-        ])
 
         if self.result_counter == 1:
             # TODO should not be using bayes_points anywhere
@@ -422,9 +428,7 @@ class BranchQMLA():
                 "Reconsidering branch {} champion with pairs {}".format(self.branch_id, pair_list)
             ])
     
-        # inspect the pairwise comparisons; 
-        ## update the GR ratings system
-        ## rank models according to the active ranking system
+        # Inspect the pairwise comparisons; 
         pair_list = [ (min(pair), max(pair) ) for pair in pair_list ]
         bayes_factors = {
             pair :
@@ -432,6 +436,7 @@ class BranchQMLA():
             for pair in pair_list
         }
 
+        # Update the GR ratings system
         self.growth_class.ratings_class.batch_update(
             model_pairs_bayes_factors = bayes_factors,
             spawn_step = self.tree.spawn_step
@@ -440,6 +445,7 @@ class BranchQMLA():
         # Use growth rule's reasoning to decide if a champion can be set
         if self.growth_class.branch_champion_selection_stratgey == 'number_comparison_wins':
             self.log_print(["Choosing champion from number of wins on branch."])
+            
             max_points = max(models_points.values())
             models_with_max_points = [
                 key for key, val in models_points.items()
@@ -449,15 +455,13 @@ class BranchQMLA():
             if len(models_with_max_points) > 1:
                 # if multiple models have same number of wins,
                 # can't declare a branch champion yet
-
                 self.log_print([
-                    "Multiple models have same number of points within \
-                        branch.\n",
-                    models_points,
-                    "This may cause infinite loop if models can \
-                        not be separated.",
+                    "Multiple models have same number of points within branch {}:\n{}".format(
+                        self.branch_id, models_with_max_points
+                    )
                 ])
-                self.joint_branch_champions = models_with_max_points
+                # Set joint champions so QMLA can re-compare the subset
+                self.joint_branch_champions = models_with_max_points 
                 self.is_branch_champion_set = False
                 return      
             else:
@@ -474,7 +478,7 @@ class BranchQMLA():
                 self.joint_branch_champions = None
         
         elif self.growth_class.branch_champion_selection_stratgey == 'ratings':
-            # TODO check if multiple models have exactly same rating
+            # TODO check if multiple models have exactly same rating (unlikely)
             self.ranked_models = self.growth_class.ratings_class.get_rankings(
                 model_list = self.resident_model_ids
             )
@@ -483,7 +487,8 @@ class BranchQMLA():
 
         if not self.is_branch_champion_set and self.result_counter > 1:
             self.log_print([
-                "On branch {}, comparisons consiered {} times; forcing choice.".format(
+                "On branch {}, no outright champion after {} considerations. \
+                    Forcing selection.".format(
                     self.branch_id, self.result_counter
                 )
             ])
@@ -500,6 +505,7 @@ class BranchQMLA():
             self.champion_name = self.models[self.champion_id]
             self.log_print(["Branch {} champion ID: {}".format(
                 self.branch_id, self.champion_id)])
+    
     ##########
     # Section: Utilities
     ##########
