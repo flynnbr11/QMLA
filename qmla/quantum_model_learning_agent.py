@@ -2291,7 +2291,7 @@ class QuantumModelLearningAgent():
         """
 
         d = self.model_database[self.model_database['model_name'] == name][field].item()
-        return val
+        return d
 
     def _get_model_id_from_name(self, model_name):
         model_id = self._get_model_data_by_field(
@@ -2412,7 +2412,6 @@ class QuantumModelLearningAgent():
         :return float f_score: F-score of given model.
 
         """
-        # TODO remove calls everywhere except in add_model_to_database
 
         # TODO set precision, f-score etc as model instance attributes and
         # return those in champion_results
@@ -2421,14 +2420,12 @@ class QuantumModelLearningAgent():
             growth_class = self.get_model_storage_instance_by_id(
                 model_id).growth_class
             model_name = self.model_name_id_map[model_id]
-        self.log_print(["Getting F score for {}".format(model_name)])
         terms = [
             growth_class.latex_name(
                 term
             )
             for term in
             construct_models.get_constituent_names_from_name(
-                # self.model_name_id_map[model_id]
                 model_name
             )
         ]
@@ -2467,17 +2464,10 @@ class QuantumModelLearningAgent():
         :param str save_to_file: path to save the resultant figure in.
         """
         generations = sorted(set(self.branches.keys()))
-        # generations = sorted()
-        # [
-        #     b for b in self.branches
-        #     if not self.branches[b].prune_branch
-        # ]
-        self.log_print(
-            [
-                "[get_statistical_metrics",
-                "generations: ", generations
-            ]
-        )
+        self.log_print([
+            "[get_statistical_metrics",
+            "generations: ", generations
+        ])
 
         generational_sensitivity = {
             b: []
@@ -2498,14 +2488,12 @@ class QuantumModelLearningAgent():
 
         for b in generations:
             models_this_branch = sorted(self.branches[b].resident_model_ids)
-            self.log_print(
-                [
-                    "Adding models to generational measures for Generation {}:{}".format(
-                        b,
-                        models_this_branch
-                    )
-                ]
-            )
+            self.log_print([
+                "Adding models to generational measures for Generation {}:{}".format(
+                    b,
+                    models_this_branch
+                )
+            ])
             for m in models_this_branch:
                 generational_sensitivity[b].append(self.model_sensitivities[m])
                 generational_precision[b].append(self.model_precisions[m])
@@ -2578,6 +2566,9 @@ class QuantumModelLearningAgent():
     def plot_bayes_factors(
         self,
     ):
+        r"""
+        Plot Bayes factors between pairs of models, both by model IDs and by their F-scores.
+        """
         # Plot Bayes factors of this instance
         bayes_factor_by_id = pd.pivot_table(
             self.bayes_factors_df,
@@ -2601,7 +2592,7 @@ class QuantumModelLearningAgent():
             )
         )
 
-        # # Heat map BF against F(A)/F(B)
+        # Heat map BF against F(A)/F(B)
         fig = qmla.analysis.bayes_factor_f_score_heatmap(
             bayes_factors_df=self.bayes_factors_df)
         fig.savefig(
@@ -2651,8 +2642,6 @@ class QuantumModelLearningAgent():
                 self.model_database[
                     self.model_database['branch_id'] == branch_id]['model_id']
             )
-            # model_id_list = construct_models.list_model_id_in_branch(
-            #     self.model_database, branch_id)
             plot_descriptor += '[Branch' + str(branch_id) + ']'
 
         elif model_id_list is None:
@@ -2717,13 +2706,10 @@ class QuantumModelLearningAgent():
             model's parameter estimeates
         """
         if true_model:
-            # model_id = construct_models.model_id_from_name(
-            #     db=self.model_database, name=self.true_model_name)
             model_id = self._get_model_id_from_name(name=self.true_model_name)
 
         qmla.analysis.plot_parameter_estimates(qmd=self,
                                                model_id=model_id,
-                                               #    use_experimental_data=self.use_experimental_data,
                                                save_to_file=save_to_file
                                                )
 
