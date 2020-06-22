@@ -28,7 +28,11 @@ class GrowthRule():
     e.g. to generate probes according to a desired mechanism. 
     This allows the user to easily  change functionality in a modular fashion.
     To develop a new growth rule, users should read the definitions of all 
-    growth rule attributes listed in the various ``setup`` methods:
+    growth rule attributes listed in the various ``setup`` methods, and ensure
+    that the default are suitable for their system, or that they have replaced them
+    in their custom growth rule. 
+    The ``setup`` methods are:
+    
     * :meth:`~qmla.growth_rules.GrowthRule._setup_modular_functions`
     * :meth:`~qmla.growth_rules.GrowthRule._setup_true_model`
     * :meth:`~qmla.growth_rules.GrowthRule._setup_model_learning`    
@@ -121,12 +125,19 @@ class GrowthRule():
         r"""
         Target system data, such as  model and parameters.
 
-        Set up
-        * ``true_model``: target model for QMLA; presumed model for QHL
-        * ``qhl_models``: for multi-model QHL mode, which models to learn parameters of
-        * ``true_model_terms_params``: target parameters for terms in true model 
-          (assigned randomly if not explicitly set here)
-          e.g. ``{ 'pauliSet_1_x_d1' : 0.75, 'pauliSet_1_x_d1' : 0.25}``
+        * Set up * 
+        
+        true_model 
+            target model for QMLA; presumed model for QHL
+        qhl_models
+            for multi-model QHL mode, which models to learn parameters of
+        true_model_terms_params
+            target parameters for terms in true model 
+            (assigned randomly if not explicitly set here)
+            e.g. ``{ 
+            'pauliSet_1_x_d1' : 0.75,
+            'pauliSet_1_x_d1' : 0.25
+            }``
 
         """
         self.true_model = 'pauliSet_1_x_d1'
@@ -152,12 +163,14 @@ class GrowthRule():
         min_param, max_param
             used to generate  a 
             normal distribution  :math:`N(\mu, \sigma)` 
-            where :math:`\mu=` ``mean(min_param, max_param), 
-            :math:`\sigma=` ``(max_param - min_param) / 4 ``, 
+            where :math:`\mu=` ``mean(min_param, max_param)``, 
+            :math:`\sigma=` 
+            ``(max_param - min_param) / 4 ``, 
             which is then used to generate true parameters 
             for each parameter which is not explicitly set in 
-            ``true_model_terms_params``, and also as the span of the prior 
-            distribution for each parameter not  explicitly set in 
+            ``true_model_terms_params``, 
+            and also as the span of the prior distribution 
+            for each parameter not  explicitly set in 
             ``gaussian_prior_means_and_widths``. 
             See :meth:`~qmla.growth_rules.GrowthRule.get_prior` for details.
         true_param_cov_mtx_widen_factor
@@ -176,10 +189,10 @@ class GrowthRule():
             number of probes generated for the probe dictionary, 
             which are cycled over during parameter learning and model comparison.
         max_time_to_consider
-            Upper limit on time
-                1. for all plots
-                2. is given to the experiment design heuristic which may use it upper-bound
-                   experimental times chosen. 
+            Upper limit on time. 
+                1. used for all plots of dynamics
+                2. given to the experiment design heuristic which may use it upper-bound
+                experimental times chosen. 
         terminate_learning_at_volume_convergence
             Whether to stop learning when a model reaches a given threshold in volume
         volume_convergence_threshold
@@ -207,8 +220,6 @@ class GrowthRule():
             complicated model given by ``max_num_parameter_estimate``. 
             e.g. you make 10 000 particles available, but only want to invoke such a high cost for 
             models with 6 parameters, and simpler models could learn with proportionally less particles. 
-        plot_time_increment
-             :math:`\Delta t` between each point plotted in dynamics plots. 
         fraction_particles_for_bf 
             fraction of particles to use during pairwise comparison between models. 
             e.g. if 10 000 particles are used for parameter learning for each model, 
@@ -221,6 +232,12 @@ class GrowthRule():
             towards the Bayes factor. 
             # TODO BF(A,B) uses full renormalisation_record of A, and only updates the portion of B's expeiriments; 
             it should base comparison on latter fraction only. 
+
+        *Plotting*
+
+        plot_time_increment
+             :math:`\Delta t` between each point plotted in dynamics plots. 
+
 
         """
 
@@ -280,10 +297,12 @@ class GrowthRule():
             Mostly unused by more-recent GRs. 
 
 
-        **Ratings class**
+        *Ratings class*
+        
         ratings_class
             scheme for rating models based on pairwise comparisons.
             Not used by default; used in genetic algorithm to determine top models. 
+
 
         Comparisons within branches:
 
@@ -337,7 +356,7 @@ class GrowthRule():
             By default, when spawning and pruning are both completed, GR nominates a champion, 
             and is then terminated. 
 
-        Miscellaneous
+        * Miscellaneous * 
         
         track_cov_mtx
             Whether to store the covariance matrix at the end of every experiment. 
@@ -381,9 +400,38 @@ class GrowthRule():
 
 
     def _setup_logistics(self):
-        ##########
-        # Logistics
-        ##########
+        r"""
+        Logistics for timing request etc.
+
+        *Timing*
+
+        On a compute cluster, we run QMLA by submitting jobs. 
+        Those jobs need to specify the number of cores to request, 
+        and the time required. These are computed in the 
+        ``time_reuqired_calculation`` script, using the details specified here. 
+
+        max_num_models_by_shape
+            How many models to allow per number of qubits
+        num_processes_to_parallelise_over
+            Number of cores to request.
+            On a single node, there are 16 cores available
+            In general we use 1 core as the master which runs the
+            :class:`~qmla.QuantumModelLearningAgent` instance, 
+            and N worker processes, so :math:`N \leq 15` to fit on a 
+            single node. 
+            It is advisable to request as few processes (i.e. cores)
+            as your growth rule needs, as the job scheduler favours less 
+            resource-expensive jobs, so your jobs will spend less time in 
+            the queue on the compute cluster.
+        timing_insurance_factor
+            A blunt tool to correct the estimate of time required 
+            as determined by the ``time_request_calculation``. 
+            Can be any float. 
+            Should be set :math:`\neq 1` when you find the jobs are requesting 
+            far too little time and are not finishing, or requesting too much
+            which places them on slower queues. 
+
+        """
 
         self.max_num_models_by_shape = {
             1: 0,
@@ -398,11 +446,14 @@ class GrowthRule():
     ##########
     # Section: System (true model) infomation
     ##########
+
     def true_model_latex(self):
+        r""" Latex representation of true model."""
         return self.latex_name(self.true_model)
 
     @property
     def true_model_terms(self):
+        r""" Terms (as latex strings) which make up the true model"""
         true_terms = construct_models.get_constituent_names_from_name(
             self.true_model
         )
@@ -417,7 +468,21 @@ class GrowthRule():
 
     def get_true_parameters(
         self,
-    ):        
+    ):  
+        r"""
+        Retrieve parameters of the true model and use them to construct the true Hamiltonian. 
+
+        True parameters are set once per run and shared by all instances within that run. 
+        Therefore the true parameters are generated only once 
+        by :meth:`~qmla.set_shared_parameters`, and stored to a file which
+        is accessible by all instances within the run. 
+
+        This method retrieves those shared true parameters and stores them for use by the 
+        :class:`~qmla.QuantumModelLearningAgent` instance and its subsidiary models and methods. 
+        It then uses the true parameters to construct ``true_hamiltonian`` for the GR.   
+
+        """      
+
         # get true data from pickled file
         try:
             true_config = pickle.load(
@@ -445,6 +510,19 @@ class GrowthRule():
     def get_measurements_by_time(
         self
     ):
+        r"""
+        Measure the true model for a series of times. 
+
+        In some experiment design heuristics, 
+        those prescribed times are the only ones available to 
+        the learning procedure. 
+        Other heuristics allow the choice of any experimental time 
+        in principle. 
+        In either case, the measurements generated here are computed using the 
+        ``plot_probes``, which are shared by all QMLA instances within the run. 
+        They are used for all dynamics plots. 
+        """
+
         try:
             true_info = pickle.load(
                 open(
@@ -522,9 +600,36 @@ class GrowthRule():
         **kwargs
     ):
         r"""
-        Measure the system. 
+        Call the GR's measurement method to compute quantum likelihood.
+
+        Compute the probability of measuring in some basis, to be used as likelihood. 
+        The default probability is that of the expectation value. 
+        Given an input state :math:`\| \psi \rangle`, 
+        :math:`P(\hat{H}, t, \| \psi \rangle) 
+        = \| \langle \| e^{-i \hat{H} t} \| \psi \rangle \|^2`.
+        However it is possible to use alternative measurements, 
+        for instance corresponding to a physical measurement scheme such 
+        as Hahn echo or Ramsey sequences. 
+
+
+        Modular functions here must take as parameters
+
+            ham 
+                Hamiltonian to compute probability of
+            t
+                time to evolve ``ham`` for
+            state
+                proobe state to compute probability with 
+            **kwargs
+                any further inputs required can be passed as kwargs
+
+        Modular functions must return 
+            :math:`P` : the probability of measurement according to 
+            custom requirements, to be used as likelihood in 
+            `(interactive) quantum likelihood estimation`. 
 
         """ 
+
         return self.expectation_value_function(
             **kwargs
         )
@@ -536,21 +641,64 @@ class GrowthRule():
         store_probes=True,
         **kwargs
     ):
+        r""" 
+        Call the GR's probe generation methods to set the system and simulator probes. 
+
+        In general it is possible for the system and simulator to 
+        have different probe states (e.g. due to noise).
+        These can be generated from the same or different methods. 
+        if ``shared_probes is True``, then ``probe_generation_function`` 
+        is called once and the same probes are used for the system as simulator. 
+        else ``simulator_probe_generation_function`` is called for the simulator
+        probes. 
+
+        Probe generation methods must take parameters
+        
+            max_num_qubits
+                number of qubits to go up to when generating probes
+            num_probes
+                number of probces to produce
+
+        Probe generation methods must return
+            probe_dict
+                A set of probes with ``num_probes`` states for each of 
+                1, ..., N qubits up to ``max_num_qubits``. 
+                Probe dictionaries should have keys which are tuples of the
+                number of qubits and a probe ID, i.e. 
+                ``(probe_id, num_qubits)``.
+
+        :param int probe_maximum_number_qubits: 
+            how many qubits to compose probes up to. 
+            Can be left None, in which case assigned based on GR's 
+            ``max_num_qubits``, or forced to a different value by passing 
+            to function call. 
+        :param bool store_probes: whether to assign the generated probes 
+            to the GR instance. 
+            If False, probe dict is just returned .
+        :returns dict new_probes: (if not storing)
+            dictionary of probes returned from probe generation
+            function, fulfilling the requirements outlined above. 
+        """
+
         if probe_maximum_number_qubits is None: 
             probe_maximum_number_qubits = self.max_num_probe_qubits
         self.log_print([
             "System Generate Probes called",
             "probe max num qubits:", probe_maximum_number_qubits
         ])
-        
+
+        # Generate a set of probes
         new_probes = self.probe_generation_function(
             max_num_qubits=probe_maximum_number_qubits,
             num_probes=self.num_probes,
             **kwargs
         )
+
+        # Store or return the generated probes
         if store_probes:
             self.probes_system = new_probes
             if self.shared_probes == True:
+                # Assign probes for simulator 
                 self.probes_simulator = self.probes_system
             else:
                 self.probes_simulator = self.simulator_probe_generation_function(
@@ -566,18 +714,43 @@ class GrowthRule():
         probe_maximum_number_qubits=None, 
         **kwargs
     ):
+        r"""
+        Generate a set of probes against which to compute measurements for plotting purposes. 
+
+        The same probe dict is used by all QMLA instances within a run for consistency. 
+        Generated by calling the modular function assigned to 
+        ``plot_probe_generation_function``. 
+
+        Plot probe generation methods must adhere to the same rules 
+        as in :meth:`~qmla.growth_rules.GrowthRule.generate_probes`. 
+        
+        :param int probe_maximum_number_qubits: 
+            how many qubits to compose probes up to. 
+            Can be left None, in which case assigned based on GR's 
+            ``max_num_qubits``, or forced to a different value by passing 
+            to function call. 
+        :return dict plot_probe_dict: 
+            set of states against which all models are plotted
+            over time in dynamics plots.
+        """
+
         if probe_maximum_number_qubits is None: 
             probe_maximum_number_qubits = self.max_num_probe_qubits
 
+        # Generate probes
         plot_probe_dict =  self.plot_probe_generation_function(
             max_num_qubits=probe_maximum_number_qubits,
             num_probes=1,
             **kwargs
         )
+
+        # Replace tuple like key returned, with just dimension.
         for k in list(plot_probe_dict.keys()):
-            # replace tuple like key returned, with just dimension.
             plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
+        
+        # Store the probes 
         self.plot_probe_dict = plot_probe_dict
+        
         return plot_probe_dict
 
 
