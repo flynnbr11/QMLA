@@ -160,7 +160,6 @@ print("Set QMLA Params script")
 arguments = parser.parse_args()
 random_true_params = bool(arguments.random_true_params)
 random_prior = bool(arguments.random_prior_terms)
-# exp_data = bool(arguments.use_experimental_data)
 num_particles = arguments.particle_number
 growth_generation_rule = arguments.growth_generation_rule
 log_file = arguments.log_file

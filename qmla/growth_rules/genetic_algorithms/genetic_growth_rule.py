@@ -469,7 +469,7 @@ class Genetic(
                 ]
             )
         chromosome_numbers = sorted([int(c,2) for c in chromosomes])
-        self.growth_rule_specific_data_to_store['chromosomes_tested'] = chromosome_numbers
+        # self.growth_rule_specific_data_to_store['chromosomes_tested'] = chromosome_numbers
         try:
             f_scores = []
             for c in chromosomes:
@@ -479,7 +479,7 @@ class Genetic(
                     self.log_print([
                         "Could not compute f score for chromosome: {}".format(c)
                     ])
-            self.growth_rule_specific_data_to_store['f_score_tested_models' ] = f_scores
+            # self.growth_rule_specific_data_to_store['f_score_tested_models' ] = f_scores
         except:
             self.log_print([
                 "Could not compute f score for chromosome list: {}".format(chromosomes)

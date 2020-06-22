@@ -20,7 +20,7 @@ Classes
 
 .. autoclass:: GrowthRule
     :members:
-
+    :private-members: _initialise_model_for_learning
 
 
 .. currentmodule:: qmla

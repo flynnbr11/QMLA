@@ -19,7 +19,7 @@ q_id=0 # can start from other ID if desired
 ### ---------------------------------------------------###
 # QHL parameters
 ### --------------------------------------------------###
-exp=10
+exp=5
 prt=20
 pgh=1.0
 pgh_exponent=1.0
@@ -46,11 +46,11 @@ bf_all_times=0
 # growth_rule='TestSimulatedNVCentre'
 # growth_rule='IsingGeneticTest'
 # growth_rule='IsingGeneticSingleLayer'
-# growth_rule='NVCentreRevivals'
+growth_rule='NVCentreRevivals'
 
 # growth_rule='IsingGenetic'
 # growth_rule='SimulatedNVCentre'
-growth_rule='ExperimentNVCentreNQubits'
+# growth_rule='ExperimentNVCentreNQubits'
 
 # growth_rule='NVCentreGenticAlgorithm'
 # growth_rule='IsingLatticeSet'

@@ -124,7 +124,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 true_ham = param * mtx
         self.true_hamiltonian = true_ham
 
-        # self.use_experimental_data = use_experimental_data
         self.timings = {
             'system': {}, 
             'simulator' : {}
@@ -143,7 +142,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
-                # use_experimental_data=self.use_experimental_data,
                 log_file=self.log_file
             )
         except BaseException:
@@ -753,7 +751,7 @@ class QInferNVCentreExperiment(QInferModelQMLA):
         self.log_print_debug(["Getting pr0 from experimental dataset."])
         # time = expparams['t']
         if len(times) > 1:
-            self.log_print("Multiple times given to experimental true evoluation:", times)
+            self.log_print("Multiple times given to experimental true evolution:", times)
             sys.exit()
 
         time = times[0]

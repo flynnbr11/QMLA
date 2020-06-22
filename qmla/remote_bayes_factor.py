@@ -279,7 +279,7 @@ def updated_log_likelihood(
     updater = model.qinfer_updater
 
     for t in times:
-        exp = format_experiment(model, [t])
+        exp = format_experiment(model, [t]) # TODO get exp from heuristic or sample from posterior in likelihood for IQLE
         params_array = np.array([[model.true_model_params[:]]])
         datum = updater.model.simulate_experiment(
             params_array,

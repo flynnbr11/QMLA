@@ -236,9 +236,22 @@ def make_inversion_gate(num_qubits):
     return inversion_gate
 
 
+def n_qubit_hahn_evolution_double_time_reverse(
+    ham, t, state,
+    **kwargs
+):
+    return n_qubit_hahn_evolution(
+        ham = ham,
+        t = t, 
+        state = state, 
+        second_time_evolution_factor=2, 
+        **kwargs
+    )
+
+
 def n_qubit_hahn_evolution(
     ham, t, state,
-    second_time_evolution_factor = 2,
+    second_time_evolution_factor = 1,
     precision=1e-10,
     log_file=None,
     log_identifier=None

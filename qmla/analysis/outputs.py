@@ -24,10 +24,10 @@ def format_exponent(n):
 
 def plot_dynamics_multiple_models(
     directory_name,
-    dataset,
     results_path,
     results_file_name_start='results',
     use_experimental_data=False,
+    dataset=None,
     true_expectation_value_path=None,
     probes_plot_file=None,
     growth_generator=None,
@@ -95,22 +95,9 @@ def plot_dynamics_multiple_models(
 
     # Relies on Results folder structure -- not safe?!
     # ie ExperimentalSimulations/Results/Sep_10/14_32/results_001.p, etc
-    if use_experimental_data == True:
-        os.chdir(directory_name)
-        os.chdir("../../../../Launch/Data/")
-        experimental_measurements = pickle.load(
-            open(str(dataset), 'rb')
-        )
-    elif true_expectation_value_path is not None:
-        experimental_measurements = pickle.load(
-            open(str(true_expectation_value_path), 'rb')
-        )
-    else:
-        print("Either set \
-            use_experimental_data=True or \
-            provide true_expectation_value_path"
-              )
-        return False
+    experimental_measurements = pickle.load(
+        open(str(true_expectation_value_path), 'rb')
+    )
 
     expectation_values_by_name = {}
     os.chdir(directory_name)

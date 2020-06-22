@@ -115,7 +115,7 @@ class SimulatedNVCentre(
         self.tree_completed_initially = True
         self.initial_models=None
         self.expectation_value_function = \
-            qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
+            qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
         self.timing_insurance_factor = 2/3
         self.num_probes = 20
         time_basis = 1e-9 # nanoseconds
@@ -268,7 +268,6 @@ class TestSimulatedNVCentre(
         self.hard_fix_resample_effective_sample_size = 1000
 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
-        # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         
         # Choose heuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic

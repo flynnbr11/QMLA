@@ -19,12 +19,22 @@ __all__ = [
     'GrowthRule'
 ]
 
-# @GrowthRuleDecorator
 class GrowthRule():
     r"""
     User defined mechanism to control which models are considered by QMLA. 
 
-    
+    By changing the attributes, various aspects of QMLA are altered. 
+    A number of growth rule attributes point to standalone methods available within QMLA, 
+    e.g. to generate probes according to a desired mechanism. 
+    This allows the user to easily  change functionality in a modular fashion.
+    To develop a new growth rule, users should read the definitions of all 
+    growth rule attributes listed in the various ``setup`` methods:
+    * :meth:`~qmla.growth_rules.GrowthRule._setup_modular_functions`
+    * :meth:`~qmla.growth_rules.GrowthRule._setup_true_model`
+    * :meth:`~qmla.growth_rules.GrowthRule._setup_model_learning`    
+    * :meth:`~qmla.growth_rules.GrowthRule._setup_tree_infrastructure`
+    * :meth:`~qmla.growth_rules.GrowthRule._setup_logistics`
+
     """
 
     # superclass for growth generation rules
@@ -51,310 +61,345 @@ class GrowthRule():
         else: 
             self.plot_probes_path = None
 
-        self.assign_parameters()
+        # self.assign_parameters()
+        self._setup_modular_functions()
+        self._setup_true_model()
+        self._setup_model_learning()
+        self._setup_tree_infrastructure()
+        self._setup_logistics()
 
-    def assign_parameters(self):
-        # TODO functional instantiation vs just for extracting functionality
-        self.use_experimental_data = False # TODO included for legacy; to be removed everywhere its called
-        # by changing the function object these point to,
-        # determine how probes are generated and expectation values are computed
-        # these can be directly overwritten within class definition
-        # by writing self.probe_generator and self.expectation_value methods
+    ##########
+    # Section: Set up, assign parameters etc
+    ##########
+
+    def _setup_modular_functions(self):
+        r"""
+        Assign modular functions for the realisation of this growth rule.
+
+        These are called by wrappers in the parent :class:`~qmla.GrowthRule` class; 
+        the wrapper methods are called throughout a QMLA instance, e.g. to generate a set of probes
+        according to the requirements of the user's growth rule. 
+        Note also that these wrappers can be directly over written in a user growth rule, or more simply 
+        the functionality can be replaced by adding a standalone function to ``qmla.shared_functionality``, 
+        and replacing the methods in the user growth rule's ``__init__`` method.
+        The wrappers and corresponding class attributes are:
+
+        * :meth:`~qmla.growth_rules.GrowthRule.expectation_value` : ``expectation_value_function``
+        * :meth:`~qmla.growth_rules.GrowthRule.generate_probes` : ``probe_generation_function``
+        * :meth:`~qmla.growth_rules.GrowthRule.plot_probe_generator` : ``plot_probe_generation_function``
+        * :meth:`~qmla.growth_rules.GrowthRule.heuristic` : ``model_heuristic_function``
+        * :meth:`~qmla.growth_rules.GrowthRule.qinfer_model` : ``qinfer_model_class``
+        * :meth:`~qmla.growth_rules.GrowthRule.get_prior` : ``prior_distribution_generator``
+        * :meth:`~qmla.growth_rules.GrowthRule.latex_name` : ``latex_model_naming_function``
+
+        """
+
+        # Measurement
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
+
+        # Probes
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
-        # unless specifically different set of probes required
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
         self.probe_noise_level = 1e-5
+
+        # Experiment design
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+                
+        # QInfer interface
+        self.qinfer_model_class = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
+
+        # Prior distribution
+        self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.gaussian_prior
+
+        # Map model name strings to latex representation
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+
+
+    def _setup_true_model(self):
+        r"""
+        Target system data, such as  model and parameters.
+
+        Set up
+        * ``true_model``: target model for QMLA; presumed model for QHL
+        * ``qhl_models``: for multi-model QHL mode, which models to learn parameters of
+        * ``true_model_terms_params``: target parameters for terms in true model 
+          (assigned randomly if not explicitly set here)
+          e.g. ``{ 'pauliSet_1_x_d1' : 0.75, 'pauliSet_1_x_d1' : 0.25}``
+
+        """
+        self.true_model = 'pauliSet_1_x_d1'
+        self.qhl_models = ['pauliSet_1_x_d1', 'pauliSet_1_y_d1', 'pauliSet_1_z_d1']
+        self.true_model_terms_params = {}
+
+        # Set or retrieve system data shared over instances
+        self.get_true_parameters()
+
+    def _setup_model_learning(self):
+        r"""
+        Parameters used on the model learning level.
+
+        *Setting prior distribution*
+
+        gaussian_prior_means_and_widths: 
+            Starting mean and width
+            for normal prior distribution used for each parameter, 
+            e.g. ``{ pauliSet_1_x_d1 : (0.5, 0.2), 'pauliSet_1_y_d1' : (0.5, 0.2)}``
+        
+        *True parameter selection*
+
+        min_param, max_param
+            used to generate  a 
+            normal distribution  :math:`N(\mu, \sigma)` 
+            where :math:`\mu=` ``mean(min_param, max_param), 
+            :math:`\sigma=` ``(max_param - min_param) / 4 ``, 
+            which is then used to generate true parameters 
+            for each parameter which is not explicitly set in 
+            ``true_model_terms_params``, and also as the span of the prior 
+            distribution for each parameter not  explicitly set in 
+            ``gaussian_prior_means_and_widths``. 
+            See :meth:`~qmla.growth_rules.GrowthRule.get_prior` for details.
+        true_param_cov_mtx_widen_factor
+            when selecting true parameters, 
+            they are chosen from :math:`N` defined for ``min_param``, ``max_param``; 
+            this factor :math:`k` changes the distribution to :math:`N(\mu, k \sigma)` for the selection
+            of the true parameters. e.g. so that true parameters are further than :math:`1 \sigma`
+            from the starting prior, to ensure the algorithm is robust to such cases. 
+        prior_random_mean
+            if True, overwrites any true parameter set in ``true_model_terms_params``
+            with a randomly drawn parameter as outlined above.
+
+        *Learning*
+
+        num_probes
+            number of probes generated for the probe dictionary, 
+            which are cycled over during parameter learning and model comparison.
+        max_time_to_consider
+            Upper limit on time
+                1. for all plots
+                2. is given to the experiment design heuristic which may use it upper-bound
+                   experimental times chosen. 
+        terminate_learning_at_volume_convergence
+            Whether to stop learning when a model reaches a given threshold in volume
+        volume_convergence_threshold
+            The volume at which to terminate learning if ``terminate_learning_at_volume_convergence==True`` 
+        iqle_mode
+            True for interactive quantum likelihood estimation; 
+            False for quantum likelihood estimation. 
+            i.e. the method of parmeater learning.
+            Note IQLE is far stronger for learning, but is not available for physical systems in general, 
+            since it assumes access to a coherent quantum channel which maps the target system 
+            to a simulator. 
+        qinfer_resampler_threshold
+            :math:`k_r`, fraction of particles below which to trigger a resampling event. 
+            i.e. when the effective sample size is less than this fraction of the initial number of particles, 
+            :math:`N_{ESS} < t=k_r N_p`, the QInfer updater resamples the distribution. 
+        qinfer_resampler_a
+            `a` parameter used by Liu-West resampler within 
+            `QInfer SMCUpdater <http://docs.qinfer.org/en/latest/guide/smc.html?highlight=smcupdater>`_.
+        hard_fix_resample_effective_sample_size
+            absolute number of effective particles, below which
+            to trigger resample. 
+        reallocate_resources`` : 
+            whether to decrease/increase the number of experiments/particles
+            used to train models based on their relative complexity, compared with an assumed maximally 
+            complicated model given by ``max_num_parameter_estimate``. 
+            e.g. you make 10 000 particles available, but only want to invoke such a high cost for 
+            models with 6 parameters, and simpler models could learn with proportionally less particles. 
+        plot_time_increment
+             :math:`\Delta t` between each point plotted in dynamics plots. 
+        fraction_particles_for_bf 
+            fraction of particles to use during pairwise comparison between models. 
+            e.g. if 10 000 particles are used for parameter learning for each model, 
+            the Bayes factor from 1 000 particles is expected to be in favour of the same 
+            model as the Bayes factor using 10 000 particles, using far less time, but with weaker evidence. 
+        fraction_experiments_for_bf
+            fraction of experiments to use during pairwise comparison between models. 
+            In particular, the latter portion of experiments are used. 
+            This is equivalent to allowing a number of `burn-in` experiments, which are not counted 
+            towards the Bayes factor. 
+            # TODO BF(A,B) uses full renormalisation_record of A, and only updates the portion of B's expeiriments; 
+            it should base comparison on latter fraction only. 
+
+        """
+
+        # Setting prior distribution
+        self.gaussian_prior_means_and_widths = {}
+
+        # True parameter selection
+        self.min_param = 0
+        self.max_param = 1
+        self.true_param_cov_mtx_widen_factor = 1
+        self.prior_random_mean = False
+        self.fixed_true_terms = False        
+
+        # Learning
+        self.num_probes = 40
+        self.max_time_to_consider = 15  # arbitrary time units
+        self.terminate_learning_at_volume_convergence = False
+        self.volume_convergence_threshold = 1e-8
+        self.iqle_mode = False
+        self.reallocate_resources = False
+        self.max_num_parameter_estimate = 2
+        self.qinfer_resampler_a = 0.98
+        self.qinfer_resampler_threshold = 0.5
+        self.hard_fix_resample_effective_sample_size = None
         self.fraction_experiments_for_bf = 1.0
         self.fraction_particles_for_bf = 1.0 # testing whether reduced num particles for BF can work 
-        self.ratings_class = qmla.growth_rules.rating_system.ModifiedEloRating(
-            initial_rating=1000,
-            k_const=30
-        ) # for use when ranking/rating models
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
-        self.qinfer_model_class = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
-        self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.gaussian_prior
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
-        self.highest_num_qubits = 1
-        self.spawn_stage = [None]
-        self.spawn_step = 0
-        self.prune_step = 0 
-        self.model_branches = {}
-        self.branch_champion_selection_stratgey = 'number_comparison_wins' 
-        self.champion_determined = False
-        self.growth_rule_specific_data_to_store = {}
-        self.storage = qmla.utilities.StorageUnit()
 
-        # Parameters specific to the growth rule
-        self.true_model = 'xTi'
-        # qhl_models is the list of models used in a fixed QHL case, where we
-        # are not running any QML
-        self.qhl_models = ['xTi', 'yTi', 'zTi']
-        # initial_models is the first branch of models in QML
+        # Plotting
+        self.plot_time_increment = None
+
+
+    def _setup_tree_infrastructure(self):
+        r"""
+        Determining how the GR tree grows, when it should stop etc. 
+
+        *Tree development*
+
+        initial_models
+            models to place on the first branch of the 
+            :class:`~qmla.GrowthRuleTree` corresponding to this growth rule. 
+        tree_completed_initially
+            if True, no spawning stage is performed
+        prune_completed_initially
+            if True, no pruning stage is performed
+            # TODO review how pruning attributes are called/checked
+            # TODO improve docs about pruning
+        max_spawn_depth
+            Number of branches to spawn for this GR
+        max_num_qubits
+            Maximum number of qubits expected in any model entertained by 
+            this GR. Used to generate probes up to this dimension. 
+        max_num_probe_qubits
+            TODO remove: serves same purpose as max_num_qubtis
+        num_top_models_to_build_on
+            number of models used during construction of next set of models
+            by :meth:`~qmla.growth_rules.GrowthRule.generate_models`. 
+            Mostly unused by more-recent GRs. 
+
+
+        **Ratings class**
+        ratings_class
+            scheme for rating models based on pairwise comparisons.
+            Not used by default; used in genetic algorithm to determine top models. 
+
+        Comparisons within branches:
+
+        branch_champion_selection_strategy
+            (string) mechanism by which to decide 
+            within a layer/branch, which model is favoured. 
+                - ``number_comparison_wins`` (default) : number of pairwise wins of each model
+                - ``ratings`` - models ranked by their rating as determined by the ``ratings_class``.
+        branch_comparison_strategy 
+            mechanism by which to perform pairwise model comparisons.
+                - ``all`` (default): completely connected graph
+                - ``optimal_graph``: generate a partially connected graph
+        
+
+        *Champion simplification*
+
+        check_champion_reducibility
+            Whether, after QMLA has determined a champion model, to test that 
+            champion model - i.e. whether any of its parameters are negligible 
+            and can be omitted.
+        learned_param_limit_for_negligibility
+            Threshold to consider a learned parmaeter negligible in the 
+            champion reduction test.
+        reduce_champ_bayes_factor_threshold
+            The Bayes factor by which a proposed reduced champion 
+            (omitting negligible parameters)
+            must defeat the nominated champion, in order to be declared 
+            champion in its place. 
+
+        *Infrastructure* (shouldn't need to be replaced by custom GR).
+
+        storage
+            Generic storage unit which is exported to the QMLA instance and stored. 
+            This allows for access to GR-specific data after QMLA has finished, 
+            for analysis and plotting on a cross-instance basis.         
+        spawn_stage
+            list which is used by GR to determine what is the current stage of development.
+            This can be checked against in :meth:`~qmla.growth_rules.GrowthRule.check_tree_completed`.
+            e.g. calls to :meth:`~qmla.growth_rules.GrowthRule.generate_models` can append the list with 
+            an indicator 'stage_1_complete'. 
+            Subsequent calls can check ``if self.spawn_stage[-1] == 'stage_1_complete ... ``
+            to design models according to the current stage. 
+            By default, GR terminates model generation stage `` if self.spawn_stage[-1] == 'Complete'
+        spawn_step
+            Number of times spawn method (:meth:`~qmla.growth_rules.GrowthRule.generate_models`)
+            has been called. 
+            By default, GR terminates model generation stage `` if self.spawn_step == self.max_spawn_depth``. 
+        prune_step
+            Number of times prune method (:meth:`~qmla.growth_rules.GrowthRule.tree_pruning`)
+            has been called.
+            By default, when spawning and pruning are both completed, GR nominates a champion, 
+            and is then terminated. 
+
+        Miscellaneous
+        
+        track_cov_mtx
+            Whether to store the covariance matrix at the end of every experiment. 
+            In general it is unnecessary to store. 
+        
+
+        """
+
+        # Tree development
         self.initial_models = ['xTi', 'yTi', 'zTi']
-        self.max_num_parameter_estimate = 2
-        # max_spawn_depth is the maximum number of spawns/branches in a run
+        self.tree_completed_initially = False
+        self.prune_completed_initially = False
         self.max_spawn_depth = 10
         self.max_num_qubits = 5
         self.max_num_probe_qubits = 6
-        # self.max_num_probe_qubits = 5  # TODO remove dependency on this -- it is not needed
-        self.max_time_to_consider = 15  # arbitrary time units
         self.num_top_models_to_build_on = 1
-        # If you want to do just Bayes facotr calculation on a deterministic
-        # initial set you set tree_completed_initially to True
+
+        # Rating models
+        self.ratings_class = qmla.growth_rules.rating_system.ModifiedEloRating(
+            initial_rating=1000,
+            k_const=30
+        ) 
+
+        # Comparisons within branches
+        self.branch_champion_selection_stratgey = 'number_comparison_wins' 
         self.branch_comparison_strategy = 'all'
-        self.tree_completed_initially = False
-        self.prune_complete = False
-        self.prune_completed_initially = False
+        
+        # Champion simplification
         self.check_champion_reducibility = True
         self.learned_param_limit_for_negligibility = 0.05
         self.reduce_champ_bayes_factor_threshold = 1e1
-        self.iqle_mode = False
-        self.qinfer_resampler_threshold = 0.5
-        self.qinfer_resampler_a = 0.98
-        self.hard_fix_resample_effective_sample_size = None
-        self.reallocate_resources = False
-        self.track_cov_mtx = False # only sometimes want on for some plots
-        self.track_quadratic_loss = False
-        self.terminate_learning_at_volume_convergence = False
-        self.volume_convergence_threshold = 1e-8
-        self.plot_posterior_after_learning = True
-        self.growth_rule_specific_data_to_store = {}
 
-        self.experimental_dataset = 'NVB_rescale_dataset.p'
-        # self.measurements_by_time = self.get_measurements_by_time()
-        # self.measurement_type = 'full_access'  # deprecated
-        # if you have a transverse axis and you want to generate on that axis
-        # than set it to True
-        # self.fixed_axis_generator = False
-        # self.fixed_axis = 'z'  # e.g. transverse axis
-        self.num_processes_to_parallelise_over = 6
-        self.timing_insurance_factor = 1
+        # Infrastructure for tracking
+        self.storage = qmla.utilities.StorageUnit()
+        # self.model_branches = {}
+        self.spawn_stage = [None]
+        self.spawn_step = 0
+        self.prune_complete = False
+        self.prune_step = 0 
+        self.track_cov_mtx = False # only sometimes want on for some plots
+
+
+    def _setup_logistics(self):
+        ##########
+        # Logistics
+        ##########
 
         self.max_num_models_by_shape = {
             1: 0,
             2: 1,
             'other': 0
         }
-
-        self.gaussian_prior_means_and_widths = {
-            # term : (mean, sigma)
-        }
-        self.num_probes = 40
-        # self._num_probes = 40
-        self.plot_time_increment=None
-        self.min_param = 0
-        self.max_param = 1
-        self.true_param_cov_mtx_widen_factor = 1
-        self.prior_random_mean = False
-        self.fixed_true_terms = False        
-        self.get_true_parameters()
-        self.true_model_terms_params = {
-            # term : true_param
-        }
-
-    def get_true_parameters(
-        self,
-    ):        
-        # get true data from pickled file
-        try:
-            true_config = pickle.load(
-                open(
-                    self.true_params_path, 
-                    'rb'
-                )
-            )
-            self.true_params_list = true_config['params_list']
-            self.true_params_dict = true_config['params_dict']
-        except:
-            # self.log_print(
-            #     [
-            #         "Could not unpickle {}".format(self.true_params_path)
-            #     ]
-            # )
-            self.true_params_list = []
-            self.true_params_dict = {}
-            # self.true_params_dict = self.true_model_terms_params
-
-        true_ham = None
-        for k in list(self.true_params_dict.keys()):
-            param = self.true_params_dict[k]
-            mtx = construct_models.compute(k)
-            if true_ham is not None:
-                true_ham += param * mtx
-            else:
-                true_ham = param * mtx
-        self.true_hamiltonian = true_ham
+        self.num_processes_to_parallelise_over = 6
+        self.timing_insurance_factor = 1
 
 
 
-
-    def store_growth_rule_configuration(
-        self, 
-        path_to_pickle_config = None,
-        **kwargs
-    ):
-        dict_for_storage = self.__dict__
-        if path_to_pickle_config is not None: 
-            pickle.dump(
-                dict_for_storage,
-                open(
-                    path_to_pickle_config, 'wb'
-                )                
-            )
-        return dict_for_storage
-
-    def overwrite_growth_class_methods(
-        self,
-        **kwargs
-    ):
-        # print("[GrowthRule] overwrite_growth_class_methods. kwargs", kwargs)
-        kw = list(kwargs.keys())
-
-        attributes = [
-            'probe_generator'
-        ]
-
-        for att in attributes:
-
-            if att in kw and kwargs[att] is not None:
-                print("Resetting {} to {}".format(att, kwargs[att]))
-                self.__setattr__(att, kwargs[att])
-
+    ##########
+    # Section: System (true model) infomation
+    ##########
     def true_model_latex(self):
         return self.latex_name(self.true_model)
-
-    def generate_models(
-        self,
-        model_list,
-        **kwargs
-    ):
-        r"""
-        Determine the next set of models for this growth rule. 
-        """
-        # default is to just return given model list and set spawn stage to
-        # complete
-        return model_list
-
-
-    def name_branch_map(
-        self,
-        latex_mapping_file,
-        **kwargs
-    ):
-        
-        r"""
-        branch_is_num_params
-        
-        """
-        import qmla.shared_functionality.branch_mapping        
-        return qmla.shared_functionality.branch_mapping.branch_computed_from_qubit_and_param_count(
-            latex_mapping_file=latex_mapping_file,
-            **kwargs
-        )
-
-
-    # General wrappers
-
-    def latex_name(
-        self,
-        name,
-        **kwargs
-    ):
-        return self.latex_model_naming_function(name, **kwargs)
-
-    def expectation_value(
-        self,
-        **kwargs
-    ):
-        return self.expectation_value_function(
-            **kwargs
-        )
-
-    def heuristic(
-        self,
-        **kwargs
-    ):
-        return self.model_heuristic_function(
-            **kwargs
-        )
-    
-    def qinfer_model(
-        self, 
-        **kwargs
-    ):
-        return self.qinfer_model_class(
-            **kwargs
-        )
-
-    def get_prior(
-        self,
-        model_name,
-        **kwargs
-    ):
-        self.prior = self.prior_distribution_generator(
-            model_name=model_name,
-            prior_specific_terms=self.gaussian_prior_means_and_widths,
-            param_minimum=self.min_param,
-            param_maximum=self.max_param,
-            random_mean=self.prior_random_mean,
-            **kwargs
-        )
-        return self.prior
-
-    def generate_probes(
-        self,
-        probe_maximum_number_qubits=None, 
-        store_probes=True,
-        **kwargs
-    ):
-        if probe_maximum_number_qubits is None: 
-            probe_maximum_number_qubits = self.max_num_probe_qubits
-        self.log_print(
-            [
-                "System Generate Probes called",
-                "probe max num qubits:", probe_maximum_number_qubits
-            ]
-        )
-        
-        new_probes = self.probe_generation_function(
-            max_num_qubits=probe_maximum_number_qubits,
-            num_probes=self.num_probes,
-            **kwargs
-        )
-        if store_probes:
-            self.probes_system = new_probes
-            if self.shared_probes == True:
-                self.probes_simulator = self.probes_system
-            else:
-                self.probes_simulator = self.simulator_probe_generation_function(
-                    max_num_qubits=probe_maximum_number_qubits,
-                    num_probes=self.num_probes,
-                    **kwargs
-                )
-        else:
-            return new_probes
-
-    def plot_probe_generator(
-        self,
-        probe_maximum_number_qubits=None, 
-        **kwargs
-    ):
-        if probe_maximum_number_qubits is None: 
-            probe_maximum_number_qubits = self.max_num_probe_qubits
-
-        plot_probe_dict =  self.plot_probe_generation_function(
-            max_num_qubits=probe_maximum_number_qubits,
-            num_probes=1,
-            **kwargs
-        )
-        for k in list(plot_probe_dict.keys()):
-            # replace tuple like key returned, with just dimension.
-            plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
-        self.plot_probe_dict = plot_probe_dict
-        return plot_probe_dict
 
     @property
     def true_model_terms(self):
@@ -370,14 +415,40 @@ class GrowthRule():
 
         return self.true_op_terms
 
+    def get_true_parameters(
+        self,
+    ):        
+        # get true data from pickled file
+        try:
+            true_config = pickle.load(
+                open(
+                    self.true_params_path, 
+                    'rb'
+                )
+            )
+            self.true_params_list = true_config['params_list']
+            self.true_params_dict = true_config['params_dict']
+        except:
+            self.true_params_list = []
+            self.true_params_dict = {}
+
+        true_ham = None
+        for k in list(self.true_params_dict.keys()):
+            param = self.true_params_dict[k]
+            mtx = construct_models.compute(k)
+            if true_ham is not None:
+                true_ham += param * mtx
+            else:
+                true_ham = param * mtx
+        self.true_hamiltonian = true_ham
+
     def get_measurements_by_time(
         self
     ):
         try:
             true_info = pickle.load(
                 open(
-                    self.true_params_path,
-                    'rb'
+                    self.true_params_path, 'rb'
                 )
             )
         except:
@@ -438,12 +509,157 @@ class GrowthRule():
             )
             for t in plot_times
         }
-        # self.log_print(
-        #     [
-        #         "Storing measurements:\n", self.measurements
-        #     ]
-        # )
         return self.measurements
+
+
+    ##########
+    # Section: Functionality wrappers
+    ##########
+
+    # Measurement
+    def expectation_value(
+        self,
+        **kwargs
+    ):
+        r"""
+        Measure the system. 
+
+        """ 
+        return self.expectation_value_function(
+            **kwargs
+        )
+
+    # Probe states
+    def generate_probes(
+        self,
+        probe_maximum_number_qubits=None, 
+        store_probes=True,
+        **kwargs
+    ):
+        if probe_maximum_number_qubits is None: 
+            probe_maximum_number_qubits = self.max_num_probe_qubits
+        self.log_print([
+            "System Generate Probes called",
+            "probe max num qubits:", probe_maximum_number_qubits
+        ])
+        
+        new_probes = self.probe_generation_function(
+            max_num_qubits=probe_maximum_number_qubits,
+            num_probes=self.num_probes,
+            **kwargs
+        )
+        if store_probes:
+            self.probes_system = new_probes
+            if self.shared_probes == True:
+                self.probes_simulator = self.probes_system
+            else:
+                self.probes_simulator = self.simulator_probe_generation_function(
+                    max_num_qubits=probe_maximum_number_qubits,
+                    num_probes=self.num_probes,
+                    **kwargs
+                )
+        else:
+            return new_probes
+
+    def plot_probe_generator(
+        self,
+        probe_maximum_number_qubits=None, 
+        **kwargs
+    ):
+        if probe_maximum_number_qubits is None: 
+            probe_maximum_number_qubits = self.max_num_probe_qubits
+
+        plot_probe_dict =  self.plot_probe_generation_function(
+            max_num_qubits=probe_maximum_number_qubits,
+            num_probes=1,
+            **kwargs
+        )
+        for k in list(plot_probe_dict.keys()):
+            # replace tuple like key returned, with just dimension.
+            plot_probe_dict[k[1]] = plot_probe_dict.pop(k)
+        self.plot_probe_dict = plot_probe_dict
+        return plot_probe_dict
+
+
+    # Experiment design
+    def heuristic(
+        self,
+        **kwargs
+    ):
+        return self.model_heuristic_function(
+            **kwargs
+        )
+
+    # QInfer interface
+    def qinfer_model(
+        self, 
+        **kwargs
+    ):
+        return self.qinfer_model_class(
+            **kwargs
+        )
+
+    # Prior parameterisation distribution
+    def get_prior(
+        self,
+        model_name,
+        **kwargs
+    ):
+        self.prior = self.prior_distribution_generator(
+            model_name=model_name,
+            prior_specific_terms=self.gaussian_prior_means_and_widths,
+            param_minimum=self.min_param,
+            param_maximum=self.max_param,
+            random_mean=self.prior_random_mean,
+            **kwargs
+        )
+        return self.prior
+
+    # Map model name strings to latex representation
+    def latex_name(
+        self,
+        name,
+        **kwargs
+    ):
+        r"""
+        Map a model name to a latex representation.
+        """
+
+        return self.latex_model_naming_function(name, **kwargs)
+
+    # Assign branch to model for visual representation of GR as tree
+    def name_branch_map(
+        self,
+        latex_mapping_file,
+        **kwargs
+    ):
+        
+        r"""
+        branch_is_num_params
+        
+        """
+        import qmla.shared_functionality.branch_mapping        
+        return qmla.shared_functionality.branch_mapping.branch_computed_from_qubit_and_param_count(
+            latex_mapping_file=latex_mapping_file,
+            **kwargs
+        )
+
+    ##########
+    # Section: Tree growth
+    ##########
+
+    def generate_models(
+        self,
+        model_list,
+        **kwargs
+    ):
+        r"""
+        Determine the next set of models for this growth rule. 
+        """
+        # default is to just return given model list and set spawn stage to
+        # complete
+        return model_list
+
 
     def tree_pruning(
         self,
@@ -555,10 +771,6 @@ class GrowthRule():
             return False
 
 
-    def finalise_model_learning(self, **kwargs):
-        self.log_print([" GR {} finished.".format(self.growth_generation_rule)])
-
-
     def nominate_champions(self):
         final_branch = self.tree.branches[ max(self.tree.branches.keys()) ]
         self.log_print([
@@ -569,13 +781,20 @@ class GrowthRule():
         ])
         return [final_branch.champion_name]
 
+    ##########
+    # Section: Wrap up
+    ##########
+
+    def finalise_model_learning(self, **kwargs):
+        self.log_print([" GR {} finished.".format(self.growth_generation_rule)])
+
 
     def growth_rule_finalise(self):
+        # TODO consolidate this method with finalise_model_learning()
         # do whatever is needed to wrap up growth rule
         # e.g. store data required for analysis
         pass
         
-
     def growth_rule_specific_plots(
         self,
         save_directory, 
@@ -585,17 +804,9 @@ class GrowthRule():
             ['No growth rule plots specified.']
         )
 
-    # def record_comparison(
-    #     self, 
-    #     model_a_id, 
-    #     model_b_id, 
-    #     bayes_factor,
-    #     spawn_step,
-    #     **kwargs
-    # ):
-    #     # ensure a,b reads lower to higher, as everywhere in reference to pairwise comparisons
-    #     mod_a = min([model_a_id, model_b_id])
-    #     mod_b = max([model_a_id, model_b_id])
+    ##########
+    # Section: Utilities
+    ##########
 
     def log_print(
         self,
@@ -614,3 +825,35 @@ class GrowthRule():
                 file=write_log_file,
                 flush=True
             )
+
+    def store_growth_rule_configuration(
+        self, 
+        path_to_pickle_config = None,
+        **kwargs
+    ):
+        dict_for_storage = self.__dict__
+        if path_to_pickle_config is not None: 
+            pickle.dump(
+                dict_for_storage,
+                open(
+                    path_to_pickle_config, 'wb'
+                )                
+            )
+        return dict_for_storage
+
+    def overwrite_growth_class_methods(
+        self,
+        **kwargs
+    ):
+        # print("[GrowthRule] overwrite_growth_class_methods. kwargs", kwargs)
+        kw = list(kwargs.keys())
+
+        attributes = [
+            'probe_generator'
+        ]
+
+        for att in attributes:
+
+            if att in kw and kwargs[att] is not None:
+                print("Resetting {} to {}".format(att, kwargs[att]))
+                self.__setattr__(att, kwargs[att])

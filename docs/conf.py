@@ -41,6 +41,7 @@ release = '0'
 extensions = [
 ]
 extensions.append('sphinx.ext.autodoc')
+extensions.append('sphinx.ext.pngmath')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

@@ -27,7 +27,7 @@ class ExperimentNVCentreNQubits(
             **kwargs
         )
 
-        self.true_model = 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2'
+        self.true_model = qmla.utilities.n_qubit_nv_gali_model(n_qubits=2, coupling_terms=['z']) 
         self.max_num_qubits = 4
 
         self.true_model = qmla.construct_models.alph(self.true_model) 
@@ -44,11 +44,11 @@ class ExperimentNVCentreNQubits(
         self.max_num_probe_qubits = self.max_num_qubits
 
         # experiment design and running
-        self.experimental_dataset = 'NVB_rescale_dataset.p'
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
+        # self.experimental_dataset = 'NVB_rescale_dataset.p'
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.VolumeAdaptiveParticleGuessHeuristic
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
         self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.max_time_to_consider = 4.24

@@ -212,7 +212,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_log_print=False,
+            debug_log_print=True,
         )
 
         # Updater to perform Bayesian inference with
@@ -728,12 +728,9 @@ class ModelInstanceForLearning():
         * learned parameter estimates
         * covariance matrix between parameters (separate plot)
 
+        # TODO add plotting levels: run, instance, model
         """
 
-        if not self.growth_class.plot_posterior_after_learning:
-            # GR doesn't want this plotted
-            # TODO replace by levelled plotting
-            return
 
         bf_posterior = qi.MultivariateNormalDistribution(
             self.qinfer_updater.est_mean(),

@@ -124,16 +124,14 @@ all_bayes_csv = arguments.bayes_csv
 qhl_mode = bool(arguments.qhl_mode)
 further_qhl_mode = bool(arguments.further_qhl_mode)
 true_params_path = arguments.true_model_terms_params
-exp_data = arguments.use_experimental_data
 true_expec_path = arguments.true_expectation_value_path
 growth_generator = arguments.growth_generation_rule
 gather_summary_results = bool(arguments.gather_summary_results)
 true_growth_class = qmla.get_growth_generator_class(
     growth_generation_rule=growth_generator,
-    # use_experimental_data=exp_data,
     log_file=log_file
 )
-dataset = true_growth_class.experimental_dataset
+# dataset = true_growth_class.experimental_dataset
 latex_mapping_file = arguments.latex_mapping_file
 probes_plot_file = arguments.probes_plot_file
 results_collection_file = "{}/collect_analyses.p".format(
@@ -355,7 +353,7 @@ else:
 try:
     qmla.analysis.plot_dynamics_multiple_models(  # average expected values
         directory_name=directory_to_analyse,
-        dataset=dataset,
+        # dataset=dataset,
         results_path=results_csv,
         results_file_name_start=results_file_name_start,
         true_expectation_value_path=true_expec_path,
