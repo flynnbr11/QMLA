@@ -763,15 +763,6 @@ class QInferNVCentreExperiment(QInferModelQMLA):
             experimental_expec_value = self.experimental_measurements[time]
         except BaseException:
             # map to nearest experimental time
-            self.log_print_debug(
-                [
-                    "In except.",
-                    # "exp times: \n{} \n exp meas: {}".format(
-                    #     self.experimental_measurement_times, 
-                    #     self.experimental_measurements
-                    # )
-                ]
-            )
             try:
                 experimental_expec_value = qmla.shared_functionality.experimental_data_processing.nearest_experimental_expect_val_available(
                     times=self.experimental_measurement_times,
@@ -779,32 +770,24 @@ class QInferNVCentreExperiment(QInferModelQMLA):
                     t=time
                 )
             except:
-                self.log_print_debug(
-                    [
-                        "Failed to get experimental data point"
-                    ]
-                )
+                self.log_print_debug([
+                    "Failed to get experimental data point"
+                ])
                 raise
-            self.log_print_debug(
-                [
-                    "experimental value for t={}: {}".format(
-                        time, 
-                        experimental_expec_value
-                    )
-                ]
-            )
-        self.log_print_debug(
-            [
-                "Using experimental time", time,
-                "\texp val:", experimental_expec_value
-            ],
-        )
+            self.log_print_debug([
+                "experimental value for t={}: {}".format(
+                    time, 
+                    experimental_expec_value
+                )
+            ])
+        self.log_print_debug([
+            "Using experimental time", time,
+            "\texp val:", experimental_expec_value
+        ])
         pr0 = np.array([[experimental_expec_value]])
-        self.log_print_debug(
-            [
-                "pr0 for system:", pr0
-            ]
-        )
+        self.log_print_debug([
+            "pr0 for system:", pr0
+        ])
         return pr0
 
     def get_simulator_pr0_array(

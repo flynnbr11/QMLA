@@ -125,6 +125,7 @@ class SimulatedNVCentre(
         self.track_quadratic_loss = True
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampledUncertaintyWithConvergenceThreshold
@@ -139,68 +140,6 @@ class SimulatedNVCentre(
             return True
         else:
             return False
-
-    def _latex_name(
-        self,
-        name,
-        **kwargs
-    ):
-        return "${}$".format(name)
-
-    def latex_name(
-        self,
-        name,
-        **kwargs
-    ):
-        # print("[latex name fnc] name:", name)
-        core_operators = list(sorted(construct_models.core_operator_dict.keys()))
-        num_sites = construct_models.get_num_qubits(name)
-        p_str = '+'
-        separate_terms = name.split(p_str)
-
-        site_connections = {}
-        # for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):
-        #     site_connections[c] = []
-
-        # term_type_markers = ['pauliSet', 'transverse']
-        transverse_axis = None
-        ising_axis = None
-        for term in separate_terms:
-            components = term.split('_')
-            if 'pauliSet' in components:
-                components.remove('pauliSet')
-
-                for l in components:
-                    if l[0] == 'd':
-                        dim = int(l.replace('d', ''))
-                    elif l[0] in core_operators:
-                        operators = l.split('J')
-                    else:
-                        sites = l.split('J')
-                # sites = tuple([int(a) for a in sites])
-                sites = ','.join([str(a) for a in sites])
-                # assumes like-like pauli terms like xx, yy, zz
-                op = operators[0]
-                try:
-                    site_connections[sites].append(op)
-                except:
-                    site_connections[sites] = [op]
-        ordered_connections = list(sorted(site_connections.keys()))
-        latex_term = ""
-
-        for c in ordered_connections:
-            if len(site_connections[c]) > 0:
-                this_term = r"\sigma_{"
-                this_term += str(c)
-                this_term += "}"
-                this_term += "^{"
-                for t in site_connections[c]:
-                    this_term += "{}".format(t)
-                this_term += "}"
-                latex_term += this_term
-
-        latex_term = "${}$".format(latex_term)
-        return latex_term
 
 
 def spin_system_model(

@@ -10,6 +10,7 @@ import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.expectation_values
+import qmla.shared_functionality.latex_model_names
 from qmla import construct_models
 
 
@@ -49,6 +50,7 @@ class ExperimentNVCentreNQubits(
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.VolumeAdaptiveParticleGuessHeuristic
         self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.max_time_to_consider = 4.24
 
         # Tree
@@ -100,7 +102,7 @@ class ExperimentNVCentreNQubits(
         )
         return self.measurements
 
-    def latex_name(
+    def DEPRECATED_latex_name(
         self,
         name,
         **kwargs

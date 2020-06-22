@@ -11,7 +11,6 @@ __all__ = [
 ]
 
 class ExperimentFullAccessNV(
-    # growth_rule.GrowthRule
     GrowthRule
 ):
     def __init__(
@@ -40,6 +39,7 @@ class ExperimentFullAccessNV(
             # 'zTi'
         ]
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         # self.max_num_qubits = 3
@@ -154,65 +154,6 @@ class ExperimentFullAccessNV(
                         i += 1
         return new_models
 
-    def latex_name(
-        self,
-        name
-    ):
-        if name == 'x' or name == 'y' or name == 'z':
-            return '$' + name + '$'
-
-        num_qubits = construct_models.get_num_qubits(name)
-        # terms = name.split('PP')
-        terms = name.split('+')
-        rotations = ['xTi', 'yTi', 'zTi']
-        hartree_fock = ['xTx', 'yTy', 'zTz']
-        transverse = ['xTy', 'xTz', 'yTz', 'yTx', 'zTx', 'zTy']
-
-        present_r = []
-        present_hf = []
-        present_t = []
-
-        for t in terms:
-            if t in rotations:
-                present_r.append(t[0])
-            elif t in hartree_fock:
-                present_hf.append(t[0])
-            elif t in transverse:
-                string = t[0] + t[-1]
-                present_t.append(string)
-            # else:
-            #     print("Term",t,"doesn't belong to rotations, Hartree-Fock or transverse.")
-            #     print("Given name:", name)
-        present_r.sort()
-        present_hf.sort()
-        present_t.sort()
-
-        r_terms = ','.join(present_r)
-        hf_terms = ','.join(present_hf)
-        t_terms = ','.join(present_t)
-
-        latex_term = ''
-        if len(present_r) > 0:
-            latex_term += r'\hat{S}_{' + r_terms + '}'
-        if len(present_hf) > 0:
-            latex_term += r'\hat{A}_{' + hf_terms + '}'
-        if len(present_t) > 0:
-            latex_term += r'\hat{T}_{' + t_terms + '}'
-
-        final_term = '$' + latex_term + '$'
-        if final_term != '$$':
-            return final_term
-
-        else:
-            plus_string = ''
-            for i in range(num_qubits):
-                plus_string += 'P'
-            individual_terms = name.split(plus_string)
-            individual_terms = sorted(individual_terms)
-
-            latex_term = '+'.join(individual_terms)
-            final_term = '$' + latex_term + '$'
-            return final_term
 
 
 def check_model_in_dict(name, model_dict):

@@ -6,6 +6,7 @@ import os
 from qmla.growth_rules import connected_lattice, growth_rule
 from qmla.growth_rules.lattice_sets import fixed_lattice_set
 import qmla.shared_functionality.probe_set_generation
+import qmla.shared_functionality.latex_model_names
 from qmla.shared_functionality import topology_predefined
 from qmla import construct_models
 
@@ -42,6 +43,7 @@ class FermiHubbardLatticeSet(
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_up_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_all_sites
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.lattice_set_fermi_hubbard
         self.timing_insurance_factor = 15
         self.min_param = 0.25
         self.max_param = 0.75
@@ -85,68 +87,7 @@ class FermiHubbardLatticeSet(
         # complete_model = qmla.construct_models.alph(complete_model)
         return complete_model
 
-    def latex_name(self, name):
-        separate_terms = name.split('+')
 
-        all_terms = []
-        for term in separate_terms:
-            components = term.split('_')
-            if 'FH-hopping-sum' in components:
-                components.remove('FH-hopping-sum')
-                connected_sites = ""
-                for c in components:
-                    if c in ['down', 'up']:
-                        spin_type = c
-                    elif c[0] == 'd':
-                        num_sites = int(c[1:])
-                    else:
-                        sites = [int(s) for s in c.split('h')]
-                        connected_sites += str(
-                            "({},{})".format(sites[0], sites[1])
-                        )
-                
-                if spin_type == 'up':
-                    spin_label = str("\\uparrow")
-                elif spin_type == 'down':
-                    spin_label = str("\\downarrow")
-                new_term = str(
-                    "\hat{H}^{" + spin_label + "}"
-                    + "_{"
-                    + connected_sites
-                    + "}"
-                )
-                all_terms.append(new_term)
-            elif 'FH-onsite-sum' in components:
-                components.remove('FH-onsite-sum')
-                sites = []
-                for c in components:
-                    if c[0] == 'd':
-                        num_sites = int(c[1:])
-                    else:
-                        sites.append(int(c))
-                sites = sorted(sites)
-                sites = ','.join([str(i) for i in sites])
-                sites_not_present =  list(
-                    set(range(1, num_sites+1))
-                    - set(sites)
-                )
-                if len(sites_not_present) > 0:
-                    new_term = str(
-                        "\hat{N" + "}^{" 
-                        + str(num_sites)
-                        + "}_{" + sites + "}"
-                    )
-                else:
-                    new_term = str(
-                        "\hat{N" + "}^{" 
-                        + str(num_sites)
-                        + "}"
-                    )
-                all_terms.append(new_term)
-
-        model_string = '+'.join(all_terms)
-        return "${}$".format(model_string)
-                
 
 
 

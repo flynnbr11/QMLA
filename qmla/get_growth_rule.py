@@ -21,8 +21,6 @@ growth_classes = {
         GR.ExpAlternativeNV_second,
     'ExperimentNVCentreVaryTrueModel':
         GR.ExperimentNVCentreVaryTrueModel,
-    'ExpNVRevivals':
-        GR.ExpNVRevivals,
     'ExperimentFullAccessNV':
         GR.ExperimentFullAccessNV,
     'NVLargeSpinBath':
@@ -37,6 +35,8 @@ growth_classes = {
         GR.NVCentreGenticAlgorithm,
     'ExperimentNVCentreNQubits':
         GR.ExperimentNVCentreNQubits,
+    'NVCentreRevivals' : 
+        GR.NVCentreRevivals,
 
     # Theoretical paper growth rules
     'IsingPredetermined':

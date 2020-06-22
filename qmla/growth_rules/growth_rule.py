@@ -76,6 +76,7 @@ class GrowthRule():
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         self.qinfer_model_class = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
         self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.gaussian_prior
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.highest_num_qubits = 1
         self.spawn_stage = [None]
         self.spawn_step = 0
@@ -254,15 +255,15 @@ class GrowthRule():
             **kwargs
         )
 
+
+    # General wrappers
+
     def latex_name(
         self,
         name,
         **kwargs
     ):
-        # name: string to be formatted for latex
-        return str('${}$'.format(name))
-
-    # General wrappers
+        return self.latex_model_naming_function(name, **kwargs)
 
     def expectation_value(
         self,

@@ -6,6 +6,7 @@ import os
 from qmla.growth_rules import growth_rule
 import qmla.shared_functionality.topology
 import qmla.shared_functionality.probe_set_generation
+import qmla.shared_functionality.latex_model_names
 from qmla import construct_models
 
 __all__ = [
@@ -51,7 +52,7 @@ class ConnectedLattice(
         ]
 
         # fitness calculation parameters. fitness calculation inherited.
-        # 'all' # at each generation Badassness parameter
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.num_top_models_to_build_on = 2
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 3
@@ -339,7 +340,7 @@ class ConnectedLattice(
     ):
         return increase_dimension_pauli_set(mod_name, num_sites)
 
-    def latex_name(
+    def DEPRECATED_latex_name(
         self,
         name,
         **kwargs

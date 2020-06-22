@@ -5,6 +5,7 @@ import os
 
 from qmla.growth_rules import connected_lattice
 import qmla.shared_functionality.probe_set_generation
+import qmla.shared_functionality.latex_model_names
 from qmla import construct_models
 
 # flatten list of lists
@@ -13,7 +14,6 @@ def flatten(l): return [item for sublist in l for item in sublist]
 
 class FermiHubbardBase(
     connected_lattice.ConnectedLattice
-    # hopping_probabilistic
 ):
     def __init__(
         self,
@@ -31,6 +31,7 @@ class FermiHubbardBase(
         self.initial_models = [
             self.true_model
         ]
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.fermi_hubbard_latex
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
         # unless specifically different set of probes required
         self.simulator_probe_generation_function = self.probe_generation_function
@@ -50,67 +51,6 @@ class FermiHubbardBase(
             6 : 1, 
             'other': 0
         }
-
-    def latex_name(
-        self,
-        name,
-        **kwargs
-    ):
-        # TODO gather terms in list, sort alphabetically and combine for latex
-        # str
-        basis_vectors = {
-            'vac': np.array([1, 0, 0, 0]),
-            'down': np.array([0, 1, 0, 0]),
-            'up': np.array([0, 0, 1, 0]),
-            'double': np.array([0, 0, 0, 1])
-        }
-
-        basis_latex = {
-            'vac': 'V',
-            'up': r'\uparrow',
-            'down': r'\downarrow',
-            'double': r'\updownarrow'
-        }
-
-        number_counting_terms = []
-        hopping_terms = []
-        chemical_terms = []
-        terms = name.split('+')
-        term_type = None
-        for term in terms:
-            constituents = term.split('_')
-            for c in constituents:
-                if c[0:2] == 'FH':
-                    term_type = c[2:]
-                    continue  # do nothing - just registers what type of matrix to construct
-                elif c in list(basis_vectors.keys()):
-                    spin_type = c
-                elif c[0] == 'd':
-                    num_sites = int(c[1:])
-                else:
-                    sites = [str(s) for s in c.split('h')]
-
-            if term_type == 'onsite':
-                term_latex = r"\hat{{N}}_{{{}}}".format(sites[0])
-                number_counting_terms.append(term_latex)
-            elif term_type == 'hop':
-                term_latex = '\hat{{H}}_{{{}}}^{{{}}}'.format(
-                    ",".join(sites),  # subscript site indices
-                    basis_latex[spin_type]  # superscript which spin type
-                )
-                hopping_terms.append(term_latex)
-            elif term_type == 'chemical':
-                term_latex = r"\hat{{C}}_{{{}}}".format(sites[0])
-                chemical_terms.append(term_latex)
-
-        latex_str = ""
-        for term_latex in (
-            sorted(hopping_terms) + sorted(number_counting_terms) +
-            sorted(chemical_terms)
-        ):
-            latex_str += term_latex
-        latex_str = "${}$".format(latex_str)
-        return latex_str
 
 
 class FermiHubbardProbabilistic(

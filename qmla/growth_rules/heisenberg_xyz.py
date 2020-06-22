@@ -5,6 +5,7 @@ import os
 
 from qmla.growth_rules import connected_lattice, connected_lattice_probabilistic
 import qmla.shared_functionality.probe_set_generation
+import qmla.shared_functionality.latex_model_names
 from qmla import construct_models
 
 
@@ -236,54 +237,10 @@ class HeisenbergSharedField(
             self.initial_models.append(self.true_model)
         self.qhl_models = self.initial_models
         self.tree_completed_initially = True
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.grouped_pauli_terms
         self.num_processes_to_parallelise_over = len(self.initial_models)
         # self.setup_growth_class()
 
     def generate_models(self, model_list, **kwargs):
         return self.initial_models
-
-    def latex_name(
-        self,
-        name,
-        **kwargs
-    ):
-        separate_terms = name.split('+')
-        all_connections = []
-        latex_term = ""
-        connections_terms = {}
-        for term in separate_terms:
-            components = term.split('_')
-            try:
-                components.remove('pauliLikewise')
-            except:
-                print("Couldn't remove pauliLikewise from", name)
-            this_term_connections = []
-            for l in components:
-                if l[0] == 'd':
-                    dim = int(l.replace('d', ''))
-                elif l[0] == 'l':
-                    operator = str(l.replace('l', ''))
-                else:
-                    sites = l.split('J')
-                    this_term_connections.append(sites)
-            for s in this_term_connections:
-                con = "({},{})".format(s[0], s[1])
-                try:
-                    connections_terms[con].append(operator)
-                except:
-                    connections_terms[con] = [operator]
-
-            latex_term = ""
-            for c in list(sorted(connections_terms.keys())):
-                connection_string = str(
-                    "\sigma_{"
-                    + str(c)
-                    + "}^{"
-                    + str(",".join(connections_terms[c]))
-                    + "}"
-                )
-                latex_term += connection_string
-
-        return "${}$".format(latex_term)
-
 

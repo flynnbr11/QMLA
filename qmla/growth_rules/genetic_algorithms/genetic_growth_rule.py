@@ -428,67 +428,6 @@ class Genetic(
             ])
             raise
 
-    def latex_name(
-        self,
-        name,
-        **kwargs
-    ):
-        # print("[latex name fnc] name:", name)
-        core_operators = list(sorted(qmla.construct_models.core_operator_dict.keys()))
-        num_sites = qmla.construct_models.get_num_qubits(name)
-        p_str = 'P' * num_sites
-        p_str = '+'
-        separate_terms = name.split(p_str)
-
-        site_connections = {}
-        for c in list(itertools.combinations(list(range(num_sites + 1)), 2)):
-            site_connections[c] = []
-
-        term_type_markers = ['pauliSet', 'transverse']
-        transverse_axis = None
-        for term in separate_terms:
-            components = term.split('_')
-            if 'pauliSet' in components:
-                components.remove('pauliSet')
-
-                for l in components:
-                    if l[0] == 'd':
-                        dim = int(l.replace('d', ''))
-                    elif l[0] in core_operators:
-                        operators = l.split('J')
-                    else:
-                        sites = l.split('J')
-                sites = tuple([int(a) for a in sites])
-                # assumes like-like pauli terms like xx, yy, zz
-                op = operators[0]
-                site_connections[sites].append(op)
-            elif 'transverse' in components:
-                components.remove('transverse')
-                for l in components:
-                    if l[0] == 'd':
-                        transverse_dim = int(l.replace('d', ''))
-                    elif l in core_operators:
-                        transverse_axis = l
-
-        ordered_connections = list(sorted(site_connections.keys()))
-        latex_term = ""
-
-        for c in ordered_connections:
-            if len(site_connections[c]) > 0:
-                this_term = r"\sigma_{"
-                this_term += str(c)
-                this_term += "}"
-                this_term += "^{"
-                for t in site_connections[c]:
-                    this_term += "{}".format(t)
-                this_term += "}"
-                latex_term += this_term
-        if transverse_axis is not None:
-            latex_term += 'T^{}_{}'.format(transverse_axis, transverse_dim)
-        latex_term = "${}$".format(latex_term)
-        return latex_term
-
-
     def growth_rule_finalise(
         self
     ):        

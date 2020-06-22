@@ -160,11 +160,9 @@ class NVCentreExperimentalData(
                 'data/NVB_rescale_dataset.p'
             )
         )
-        self.log_print(
-            [
-                "Getting experimental data from {}".format(data_path)
-            ]
-        )
+        self.log_print([
+            "Getting experimental data from {}".format(data_path)
+        ])
         self.measurements = pickle.load(
             open(
                 data_path,

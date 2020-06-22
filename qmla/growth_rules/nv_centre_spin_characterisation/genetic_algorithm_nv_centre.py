@@ -12,6 +12,7 @@ import sklearn
 import qmla.growth_rules.genetic_algorithms.genetic_growth_rule
 from qmla.growth_rules.genetic_algorithms.genetic_growth_rule import Genetic
 import qmla.shared_functionality.probe_set_generation
+import qmla.shared_functionality.latex_model_names
 import qmla.shared_functionality.expectation_values
 import qmla.construct_models
 
@@ -32,6 +33,7 @@ class NVCentreGenticAlgorithm(
 
         self.log_print(["Running GA for NV centre."])
 
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probe_generation_function = self.probe_generation_function
@@ -81,62 +83,3 @@ class NVCentreGenticAlgorithm(
         self.min_param = 0.4
         self.max_param = 0.6
 
-    def latex_name(
-        self,
-        name
-    ):
-        if name == 'x' or name == 'y' or name == 'z':
-            return '$' + name + '$'
-
-        num_qubits = qmla.construct_models.get_num_qubits(name)
-        # terms = name.split('PP')
-        terms = name.split('+')
-        rotations = ['xTi', 'yTi', 'zTi']
-        hartree_fock = ['xTx', 'yTy', 'zTz']
-        transverse = ['xTy', 'xTz', 'yTz', 'yTx', 'zTx', 'zTy']
-
-        present_r = []
-        present_hf = []
-        present_t = []
-
-        for t in terms:
-            if t in rotations:
-                present_r.append(t[0])
-            elif t in hartree_fock:
-                present_hf.append(t[0])
-            elif t in transverse:
-                string = t[0] + t[-1]
-                present_t.append(string)
-            # else:
-            #     print("Term",t,"doesn't belong to rotations, Hartree-Fock or transverse.")
-            #     print("Given name:", name)
-        present_r.sort()
-        present_hf.sort()
-        present_t.sort()
-
-        r_terms = ','.join(present_r)
-        hf_terms = ','.join(present_hf)
-        t_terms = ','.join(present_t)
-
-        latex_term = ''
-        if len(present_r) > 0:
-            latex_term += r'\hat{S}_{' + r_terms + '}'
-        if len(present_hf) > 0:
-            latex_term += r'\hat{A}_{' + hf_terms + '}'
-        if len(present_t) > 0:
-            latex_term += r'\hat{T}_{' + t_terms + '}'
-
-        final_term = '$' + latex_term + '$'
-        if final_term != '$$':
-            return final_term
-
-        else:
-            plus_string = ''
-            for i in range(num_qubits):
-                plus_string += 'P'
-            individual_terms = name.split(plus_string)
-            individual_terms = sorted(individual_terms)
-
-            latex_term = '+'.join(individual_terms)
-            final_term = '$' + latex_term + '$'
-            return final_term

@@ -4,6 +4,7 @@ import os
 from qmla.growth_rules.nv_centre_spin_characterisation import nv_centre_full_access
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.expectation_values
+import qmla.shared_functionality.latex_model_names
 from qmla import construct_models
 
 
@@ -26,6 +27,7 @@ class NVLargeSpinBath(
         )
 
         self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
+        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_spin_interaction
 
         # self.true_model = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
         # self.true_model = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
@@ -161,50 +163,6 @@ class NVLargeSpinBath(
         )
         return [new_gali_model]
 
-    def latex_name(
-        self,
-        name,
-        **kwargs
-    ):
-        term = name
-        num_qubits = construct_models.get_num_qubits(term)
-        t_str = 'T' * (num_qubits - 1)
-        p_str = 'P' * num_qubits
-        separate_terms = term.split(p_str)
-
-        spin_terms = []
-        interaction_terms = []
-
-        for t in separate_terms:
-            components = t.split('_')
-            components.remove('nv')
-            components.remove(str('d' + str(num_qubits)))
-            if 'spin' in components:
-                components.remove('spin')
-                spin_terms.append(components[0])
-            elif 'interaction' in components:
-                components.remove('interaction')
-                interaction_terms.append(components[0])
-
-        latex_name = '('
-        if len(spin_terms) > 0:
-            latex_name += 'S_{'
-            for s in spin_terms:
-                latex_name += str(s)
-            latex_name += '}'
-        if len(interaction_terms) > 0:
-            latex_name += 'I_{'
-            for s in interaction_terms:
-                latex_name += str(s)
-            latex_name += '}'
-
-        latex_name += str(
-            r')^{\otimes'
-            + str(num_qubits)
-            + '}'
-        )
-
-        return '$' + latex_name + '$'
 
 
     def name_branch_map(
