@@ -303,12 +303,19 @@ def n_qubit_hahn_evolution(
     num_qubits = int(np.log2(np.shape(ham)[0]))
 
     # try:
-    #     from qmla.shared_functionality.hahn_inversion_gates import precomputed_hahn_inversion_gates
-    #     inversion_gate = precomputed_hahn_inversion_gates[num_qubits]
+    #     from qmla.shared_functionality.hahn_inversion_gates import precomputed_hahn_z_inversion_gates
+    #     inversion_gate = precomputed_hahn_z_inversion_gates[num_qubits]
     # except BaseException:
     #     inversion_gate = make_inversion_gate(num_qubits)
 
-    inversion_gate = make_inversion_gate_rotate_y(num_qubits)
+    try:
+        from qmla.shared_functionality.hahn_y_gates import precomputed_hahn_y_inversion_gates
+        inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
+    except BaseException:
+        inversion_gate = make_inversion_gate(num_qubits)
+
+
+    # inversion_gate = make_inversion_gate_rotate_y(num_qubits)
 
     # want to evolve for t, then apply Hahn inversion gate, 
     # then again evolution for (S * t)

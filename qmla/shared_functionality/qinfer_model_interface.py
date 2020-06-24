@@ -739,7 +739,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
 
 
-
 class QInferNVCentreExperiment(QInferModelQMLA):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

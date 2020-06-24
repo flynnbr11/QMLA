@@ -64,39 +64,39 @@ class NVCentreRevivalsSimulated(
         self.true_model_terms_params = {
             # spin
             # 'pauliSet_1_x_d{}'.format(n_qubits) : 1.94e9,
-            'pauliSet_1_y_d{}'.format(n_qubits) : 1.94e9,
+            # 'pauliSet_1_y_d{}'.format(n_qubits) : 1.94e9,
             'pauliSet_1_z_d{}'.format(n_qubits) : 1.94e9,
             
-            # coupling
-            'pauliSet_1J2_zJz_d{}'.format(n_qubits) : 2.14e6, 
-            'pauliSet_1J3_zJz_d{}'.format(n_qubits) : 2.14e6, 
-            'pauliSet_1J4_zJz_d{}'.format(n_qubits) : 2.14e6, 
-            'pauliSet_1J5_zJz_d{}'.format(n_qubits) : 2.14e6, 
+            # # coupling
+            # 'pauliSet_1J2_zJz_d{}'.format(n_qubits) : 2.14e6, 
+            # 'pauliSet_1J3_zJz_d{}'.format(n_qubits) : 2.14e6, 
+            # 'pauliSet_1J4_zJz_d{}'.format(n_qubits) : 2.14e6, 
+            # 'pauliSet_1J5_zJz_d{}'.format(n_qubits) : 2.14e6, 
 
-            'pauliSet_1J2_yJy_d{}'.format(n_qubits) : 2.14e6, 
-            'pauliSet_1J3_yJy_d{}'.format(n_qubits) : 2.14e6, 
-            'pauliSet_1J4_yJy_d{}'.format(n_qubits) : 2.14e6, 
-            'pauliSet_1J5_yJy_d{}'.format(n_qubits) : 2.14e6, 
+            # 'pauliSet_1J2_yJy_d{}'.format(n_qubits) : 2.14e6, 
+            # 'pauliSet_1J3_yJy_d{}'.format(n_qubits) : 2.14e6, 
+            # 'pauliSet_1J4_yJy_d{}'.format(n_qubits) : 2.14e6, 
+            # 'pauliSet_1J5_yJy_d{}'.format(n_qubits) : 2.14e6, 
 
-            # nuclear 
-            'pauliSet_2_x_d{}'.format(n_qubits) : 3.5e9,
-            'pauliSet_2_y_d{}'.format(n_qubits) : 3.5e9,
-            'pauliSet_2_z_d{}'.format(n_qubits) : 3.5e9,
+            # # nuclear 
+            # 'pauliSet_2_x_d{}'.format(n_qubits) : 3.5e9,
+            # 'pauliSet_2_y_d{}'.format(n_qubits) : 3.5e9,
+            # 'pauliSet_2_z_d{}'.format(n_qubits) : 3.5e9,
 
-            # nuclear 3rd qubit
-            'pauliSet_3_x_d{}'.format(n_qubits) : 3.5e9,
-            'pauliSet_3_y_d{}'.format(n_qubits) : 3.5e9,
-            'pauliSet_3_z_d{}'.format(n_qubits) : 3.5e9,
+            # # nuclear 3rd qubit
+            # 'pauliSet_3_x_d{}'.format(n_qubits) : 3.5e9,
+            # 'pauliSet_3_y_d{}'.format(n_qubits) : 3.5e9,
+            # 'pauliSet_3_z_d{}'.format(n_qubits) : 3.5e9,
 
-            # nuclear 3rd qubit
-            'pauliSet_4_x_d{}'.format(n_qubits) : 3.5e9,
-            'pauliSet_4_y_d{}'.format(n_qubits) : 3.5e9,
-            'pauliSet_4_z_d{}'.format(n_qubits) : 3.5e9,
+            # # nuclear 3rd qubit
+            # 'pauliSet_4_x_d{}'.format(n_qubits) : 3.5e9,
+            # 'pauliSet_4_y_d{}'.format(n_qubits) : 3.5e9,
+            # 'pauliSet_4_z_d{}'.format(n_qubits) : 3.5e9,
 
-            # nuclear 3rd qubit
-            'pauliSet_5_x_d{}'.format(n_qubits) : 3.5e9,
-            'pauliSet_5_y_d{}'.format(n_qubits) : 3.5e9,
-            'pauliSet_5_z_d{}'.format(n_qubits) : 3.5e9,
+            # # nuclear 3rd qubit
+            # 'pauliSet_5_x_d{}'.format(n_qubits) : 3.5e9,
+            # 'pauliSet_5_y_d{}'.format(n_qubits) : 3.5e9,
+            # 'pauliSet_5_z_d{}'.format(n_qubits) : 3.5e9,
 
         }
 

@@ -252,7 +252,7 @@ class QuantumModelLearningAgent():
             5
         ))
         if self.num_experiments_for_bayes_updates > self.num_experiments:
-            self.num_experiments_for_bayes_updates = 'all'
+            self.num_experiments_for_bayes_updates = self.qmla_controls.num_experiments
 
         self.bayes_threshold_lower = self.qmla_controls.bayes_lower
         self.bayes_threshold_upper = self.qmla_controls.bayes_upper

@@ -7,7 +7,7 @@ they are stored here instead.
 from numpy import array
 
 
-precomputed_hahn_inversion_gates = {1: array([[0. - 1.j, 0. + 0.j],
+precomputed_hahn_z_inversion_gates = {1: array([[0. - 1.j, 0. + 0.j],
                                   [0. + 0.j, 0. + 1.j]]), 2: array([[0. - 1.j, 0. + 0.j, 0. + 0.j, 0. + 0.j],
                                                                     [0. + 0.j, 0. - 1.j,
                                                                         0. + 0.j, 0. + 0.j],
