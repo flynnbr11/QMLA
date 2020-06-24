@@ -22,7 +22,8 @@ import qmla.growth_rules.genetic_algorithms.genetic_algorithm
 
 __all__ = [
     'Genetic', 
-    'GeneticTest'
+    'GeneticTest',
+    'GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms'
     # 'GeneticAlgorithmQMLA'
 ]
 # flatten list of lists
@@ -35,20 +36,29 @@ def hamming_distance(str1, str2):
 class Genetic(
     growth_rule.GrowthRule
 ):
+    r"""
+    Growth rule where model generation is determined through a genetic algorithm.
+
+    """
 
     def __init__(
         self,
         growth_generation_rule,
+        genes,
+        true_model, 
         **kwargs
     ):
-        # print("[Growth Rules] init nv_spin_experiment_full_tree")
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        # self.true_model = 'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_1J4_yJy_d4'
-        # self.true_model = 'pauliSet_1J2_xJx_d3+pauliSet_1J2_yJy_d3+pauliSet_2J3_yJy_d3+pauliSet_2J3_zJz_d3'
-        # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4'
+
+        self.genes = genes
+        self.true_model = true_model
+        self.log_print([
+            "Genes:", genes
+        ])
+
         self.ratings_class = qmla.growth_rules.rating_system.ModifiedEloRating(
             initial_rating=1000,
             k_const=30
@@ -60,12 +70,12 @@ class Genetic(
         self.prune_complete = True
         self.fitness_by_f_score = pd.DataFrame()
         self.fitness_df = pd.DataFrame()
-        self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
-        self.heisenberg_xxz_small = 'pauliSet_1J2_xJx_d3+pauliSet_1J3_yJy_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
-        self.four_site_true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4'
-        self.three_site_true_model = 'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
-        self.true_model = self.four_site_true_model
-        self.true_model = qmla.construct_models.alph(self.true_model)
+        # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
+        # self.heisenberg_xxz_small = 'pauliSet_1J2_xJx_d3+pauliSet_1J3_yJy_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
+        # self.four_site_true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4'
+        # self.three_site_true_model = 'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
+        # self.true_model = self.four_site_true_model
+        # self.true_model = qmla.construct_models.alph(self.true_model)
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
         self.num_probes = 50
         self.max_num_qubits = 7
@@ -75,26 +85,36 @@ class Genetic(
             'pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
             'pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
         ]
-        if self.num_sites < 4 : 
-            # to keep state spaces reasonable for development.
-            self.base_terms = [
-                'x', 'y',  'z'
-            ]
-        else: 
-            self.base_terms = [
-                'x', 'z',
-            ]
+        # if self.num_sites < 4 : 
+        #     # to keep state spaces reasonable for development.
+        #     self.base_terms = [
+        #         'x', 'y',  'z'
+        #     ]
+        # else: 
+        #     self.base_terms = [
+        #         'x', 'z',
+        #     ]
         self.spawn_step = 1 # 1st generation's ID
 
         self.mutation_probability = 0.1
 
-        self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
+        self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
+            genes = genes, 
             num_sites=self.num_sites,
             true_model = self.true_model,
-            base_terms=self.base_terms,
+            # base_terms=self.base_terms,
             mutation_probability=self.mutation_probability,
             log_file=self.log_file
         )
+        # self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
+        #     num_sites=self.num_sites,
+        #     true_model = self.true_model,
+        #     base_terms=self.base_terms,
+        #     mutation_probability=self.mutation_probability,
+        #     log_file=self.log_file
+        # )
+
+
         self.true_chromosome = self.genetic_algorithm.true_chromosome
         self.true_chromosome_string = self.genetic_algorithm.true_chromosome_string
 
@@ -908,3 +928,35 @@ class GeneticTest(
         }
         self.num_processes_to_parallelise_over = self.initial_num_models
  
+
+class GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms(
+    Genetic
+):
+    def __init__(
+        self,
+        growth_generation_rule,
+        true_model, 
+        num_sites=None, 
+        base_terms=['x', 'y', 'z'],
+        **kwargs
+    ):
+        if num_sites is None: 
+            num_sites = qmla.construct_models.get_num_qubits(true_model)
+        terms = []
+        for i in range(1, 1 + num_sites):
+            for j in range(i + 1, 1 + num_sites):
+                for t in base_terms:
+                    new_term = 'pauliSet_{i}J{j}_{o}J{o}_d{N}'.format(
+                        i= i, j=j, o=t, N=num_sites, 
+                    )
+                    terms.append(new_term)
+        
+        super().__init__(
+            growth_generation_rule = growth_generation_rule,
+            genes = terms, 
+            true_model = true_model, 
+            **kwargs
+        )
+
+
+

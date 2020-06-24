@@ -31,12 +31,16 @@ growth_classes = {
         GR.SimulatedNVCentre,
     'TestSimulatedNVCentre':
         GR.TestSimulatedNVCentre,
-    'NVCentreGenticAlgorithm':
-        GR.NVCentreGenticAlgorithm,
+    'NVCentreSimulatedShortDynamicsGenticAlgorithm' : 
+        GR.NVCentreSimulatedShortDynamicsGenticAlgorithm, 
+    'NVCentreExperimentalShortDynamicsGenticAlgorithm':
+        GR.NVCentreExperimentalShortDynamicsGenticAlgorithm,
     'ExperimentNVCentreNQubits':
         GR.ExperimentNVCentreNQubits,
     'NVCentreRevivals' : 
         GR.NVCentreRevivals,
+    'NVCentreRevivalsSimulated' : 
+        GR.NVCentreRevivalsSimulated,
 
     # Theoretical paper growth rules
     'IsingPredetermined':

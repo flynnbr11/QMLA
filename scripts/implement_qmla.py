@@ -236,9 +236,9 @@ elif (
     or qmla_controls.qhl_mode_multiple_models == True
 ):
     model_ids = [
-        construct_models.model_id_from_name(
-            db=qmla_instance.model_database,
-            name=mod
+        qmla_instance._get_model_id_from_name(
+            # db=qmla_instance.model_database,
+            model_name=mod
             # ) for mod in further_qhl_models
         ) for mod in qhl_models
     ]

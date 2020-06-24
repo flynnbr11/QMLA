@@ -9,37 +9,37 @@ import time
 import pandas as pd
 import sklearn
 
-from qmla.growth_rules.genetic_algorithms.genetic_growth_rule import Genetic, hamming_distance
+from qmla.growth_rules.genetic_algorithms.genetic_growth_rule import \
+    Genetic, hamming_distance, GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms
 import qmla.shared_functionality.probe_set_generation
 import qmla.construct_models
 
 
 class IsingGenetic(
-    Genetic
+    GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms
 ):
 
     def __init__(
         self,
         growth_generation_rule,
+        true_model=None,
         **kwargs
     ):
-        # print("[Growth Rules] init nv_spin_experiment_full_tree")
+        self.base_terms = [
+            'z',
+        ]
+
         super().__init__(
             growth_generation_rule=growth_generation_rule,
+            true_model = true_model,
+            base_terms = self.base_terms, 
             **kwargs
         )
-        # self.ratings_class = qmla.growth_rules.rating_system.ELORating(
-        #     initial_rating=1500,
-        #     k_const=30
-        # ) # for use when ranking/rating models
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.zero_state_probes
+
         self.prune_completed_initially = True
         self.prune_complete = True
         self.fitness_by_f_score = pd.DataFrame()
         self.fitness_df = pd.DataFrame()
-        self.true_model = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
-        # self.true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_zJz_d4' # four sites
-        self.true_model = qmla.construct_models.alph(self.true_model)
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
         self.num_probes = 50
         self.max_num_qubits = 7
@@ -47,21 +47,9 @@ class IsingGenetic(
         self.qhl_models = [
             self.true_model
         ]
-        self.base_terms = [
-            'z',
-        ]
         self.true_param_cov_mtx_widen_factor = 1
 
         self.mutation_probability = 0.25
-        self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
-            num_sites=self.num_sites,
-            true_model = self.true_model,
-            base_terms=self.base_terms,
-            mutation_probability=self.mutation_probability,
-            num_protected_elite_models = 2, 
-            unchanged_elite_num_generations_cutoff = 5, 
-            log_file=self.log_file
-        )
 
         self.true_chromosome = self.genetic_algorithm.true_chromosome
         self.true_chromosome_string = self.genetic_algorithm.true_chromosome_string
@@ -104,10 +92,13 @@ class IsingGeneticTest(
     def __init__(
         self,
         growth_generation_rule,
+        true_model = None, 
         **kwargs
     ):
+        
         super().__init__(
             growth_generation_rule=growth_generation_rule,
+            true_model = true_model,
             **kwargs
         )
         self.true_model_terms_params = {
@@ -119,7 +110,7 @@ class IsingGeneticTest(
         }
 
         # test F map for random set of 10 models
-        self.initial_models = self.genetic_algorithm.random_initial_models(14)
+        self.initial_models = self.genetic_algorithm.random_initial_models(12)
 
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = False
@@ -150,10 +141,12 @@ class IsingGeneticSingleLayer(
     def __init__(
         self,
         growth_generation_rule,
+        true_model = None, # using that set by parent 
         **kwargs
     ):
         super().__init__(
             growth_generation_rule=growth_generation_rule,
+            true_model = true_model, 
             **kwargs
         )
 
@@ -189,9 +182,9 @@ class IsingGeneticSingleLayer(
         ]
         # self.initial_models = list(np.random.choice(test_fitness_models, 14, replace=False))
 
-        # if self.true_model not in self.initial_models:
-        #     rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
-        #     self.initial_models[rand_idx] = self.true_model
+        if self.true_model not in self.initial_models:
+            rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
+            self.initial_models[rand_idx] = self.true_model
 
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = True

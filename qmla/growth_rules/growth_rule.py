@@ -106,7 +106,7 @@ class GrowthRule():
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-        self.probe_noise_level = 1e-5
+        self.probe_noise_level = 0 # 1e-5
 
         # Experiment design
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
@@ -849,7 +849,7 @@ class GrowthRule():
         which is often not suitable, so this is not essential. 
         
         """
-        import qmla.shared_functionality.branch_mapping        x
+        import qmla.shared_functionality.branch_mapping
         return qmla.shared_functionality.branch_mapping.branch_computed_from_qubit_and_param_count(
             latex_mapping_file=latex_mapping_file,
             **kwargs

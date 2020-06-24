@@ -9,7 +9,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1 # don't perform QMLA; perform QHL on known correct model
+qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
@@ -46,13 +46,15 @@ bf_all_times=0
 # growth_rule='TestSimulatedNVCentre'
 # growth_rule='IsingGeneticTest'
 # growth_rule='IsingGeneticSingleLayer'
-growth_rule='NVCentreRevivals'
+# growth_rule='NVCentreRevivals'
+# growth_rule='NVCentreRevivalsSimulated'
 
 # growth_rule='IsingGenetic'
 # growth_rule='SimulatedNVCentre'
 # growth_rule='ExperimentNVCentreNQubits'
 
-# growth_rule='NVCentreGenticAlgorithm'
+# growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
+growth_rule='NVCentreExperimentalShortDynamicsGenticAlgorithm'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='FermiHubbardLatticeSet'
@@ -116,7 +118,7 @@ git_commit=$(git rev-parse HEAD)
 num_probes=10
 force_plot_plus=0
 gaussian=1
-probe_noise=0.0000001
+probe_noise=0.01
 param_min=0
 param_max=10
 param_mean=0.5

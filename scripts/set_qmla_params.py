@@ -246,7 +246,7 @@ plot_probe_dict = growth_class.plot_probe_generator(
     true_model=true_model,
     growth_generator=growth_generation_rule,
     probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
-    noise_level=probe_noise_level,
+    noise_level=0,
 )
 
 if probes_plot_file is not None:
@@ -283,8 +283,8 @@ pickle.dump(
 # store an example of the probes used
 growth_class.generate_probes(
     probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
-    # experimental_data=exp_data,
-    noise_level=growth_class.probe_noise_level,
+    # noise_level=growth_class.probe_noise_level,
+    noise_level=0, # TODO get directly in GR
     minimum_tolerable_noise=0.0,
 )
 

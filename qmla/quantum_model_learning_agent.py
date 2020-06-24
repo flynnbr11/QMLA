@@ -265,7 +265,7 @@ class QuantumModelLearningAgent():
 
         # Get probes used for learning
         self.growth_class.generate_probes(
-            noise_level=self.qmla_controls.probe_noise_level,
+            noise_level=self.growth_class.probe_noise_level,
             minimum_tolerable_noise=0.0,
         )
         self.probes_system = self.growth_class.probes_system

@@ -285,7 +285,8 @@ def NV_centre_ising_probes_plus(
 def plus_plus_with_phase_difference(
     max_num_qubits=2,
     num_probes=40,
-    noise_level=0.03,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    noise_level=0.,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    # noise_level=0.03,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
     # *args,
     **kwargs
 ):
@@ -308,18 +309,20 @@ def plus_plus_with_phase_difference(
 
     """
 
-    minimum_tolerable_noise=1e-6
+    # minimum_tolerable_noise=1e-6
     # minimum_tolerable_noise needed
     # or else run the risk of having
     # exact eigenstate and no learning occurs, and crashes.
 
-    if minimum_tolerable_noise > noise_level:
-        noise_level = minimum_tolerable_noise
+    # if minimum_tolerable_noise > noise_level:
+    #     noise_level = minimum_tolerable_noise
+    noise_level = 0.01
     plus_state = np.array([1 + 0j, 1]) / np.sqrt(2)
     random_noise = noise_level * random_probe(1)
     noisy_plus = plus_state + random_noise
     norm_factor = np.linalg.norm(noisy_plus)
     noisy_plus = noisy_plus / norm_factor
+    print("[|++'> probes] Noise factor:", noise_level)
 
     separable_probes = {}
     for i in range(num_probes):
@@ -395,8 +398,8 @@ def plus_probes_dict(
     """
 
     num_probes = kwargs['num_probes']
-    if minimum_tolerable_noise > noise_level:
-        noise_level = minimum_tolerable_noise
+    # if minimum_tolerable_noise > noise_level:
+    #     noise_level = minimum_tolerable_noise
     probe_dict = {}
     for j in range(num_probes):
         for i in range(1, 1 + max_num_qubits):

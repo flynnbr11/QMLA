@@ -217,11 +217,11 @@ class ModelInstanceForLearning():
 
         # Updater to perform Bayesian inference with
 
-        # get resampler treshold
         if (
             self.growth_class.hard_fix_resample_effective_sample_size is not None
             and self.growth_class.hard_fix_resample_effective_sample_size < self.num_particles
         ):
+            # get resampler treshold
             resampler_threshold = self.growth_class.hard_fix_resample_effective_sample_size / \
                 self.num_particles
         else:
@@ -887,8 +887,6 @@ class ModelInstanceForLearning():
 
         # Parameter estimates
         for term in terms:
-            self.log_print(
-                ["Getting ax {},{} for term {}".format(row, col, term)])
             ax = fig.add_subplot(gs[row, col])
             estimates = self.track_param_estimate_v_epoch[term]
             uncertainty = self.track_param_uncertainty_v_epoch[term]

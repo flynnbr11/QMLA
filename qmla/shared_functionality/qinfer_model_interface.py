@@ -145,13 +145,11 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 log_file=self.log_file
             )
         except BaseException:
-            self.log_print(
-                [
-                    "Could not instantiate growth rule {}. Terminating".foramt(
-                        self.growth_generation_rule
-                    )
-                ]
-            )
+            self.log_print([
+                "Could not instantiate growth rule {}. Terminating".foramt(
+                    self.growth_generation_rule
+                )
+            ])
             raise
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
@@ -185,6 +183,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             raise ValueError(
                 "Probe dictionaries not passed to Qinfer model"
             )
+        self.log_print_debug([
+            "_trueparams:", self._trueparams
+        ])
+
 
     def log_print(
         self, 

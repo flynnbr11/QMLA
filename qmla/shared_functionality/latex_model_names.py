@@ -1,4 +1,5 @@
 import qmla
+import qmla.construct_models
 
 ##########
 # Section: Generic
@@ -77,7 +78,7 @@ def nv_centre_SAT(
     if name == 'x' or name == 'y' or name == 'z':
         return '$' + name + '$'
 
-    num_qubits = construct_models.get_num_qubits(name)
+    num_qubits = qmla.construct_models.get_num_qubits(name)
     # terms = name.split('PP')
     terms = name.split('+')
     rotations = ['xTi', 'yTi', 'zTi']

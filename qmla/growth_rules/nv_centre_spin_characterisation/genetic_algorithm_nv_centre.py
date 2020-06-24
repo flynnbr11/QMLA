@@ -8,6 +8,7 @@ import scipy
 import time
 import pandas as pd
 import sklearn
+import pickle
 
 import qmla.growth_rules.genetic_algorithms.genetic_growth_rule
 from qmla.growth_rules.genetic_algorithms.genetic_growth_rule import Genetic
@@ -17,59 +18,62 @@ import qmla.shared_functionality.expectation_values
 import qmla.construct_models
 
 
-class NVCentreGenticAlgorithm(
+class NVCentreSimulatedShortDynamicsGenticAlgorithm(
     Genetic
 ):
     def __init__(
         self,
         growth_generation_rule,
+        true_model=None,
         **kwargs
     ):
-        # print("[Growth Rules] init nv_spin_experiment_full_tree")
+        # Fundamental set up
+        if true_model is None:
+            true_model = 'xTi+yTi+zTi+zTz'
+        true_model = qmla.construct_models.alph(true_model)
+        available_terms = [
+            'xTi', 'yTi', 'zTi', 
+            'xTx', 'yTy', 'zTz',
+            'xTy', 'xTz', 'yTz'
+        ]
+
         super().__init__(
             growth_generation_rule=growth_generation_rule,
+            true_model = true_model,
+            genes = available_terms,
             **kwargs
         )
 
-        self.log_print(["Running GA for NV centre."])
+        # Model design/learning
+        self.true_model_terms_params = {
+            'xTi': 0.92450565,
+            'yTi': 6.00664336,
+            'zTi': 1.65998543,
+            'zTz': 0.76546868,
+        }
+        self.min_param = 0.4
+        self.max_param = 0.6
 
+        # Modular functions
         self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
-        self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
+        self.expectation_value_function = qmla.shared_functionality.n_qubit_hahn_evolution_double_time_reverse
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = False
-        self.max_time_to_consider = 4.24
-        self.true_model = 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_1J2_zJz_d2'
-        available_terms = [
-            'xTi', 
-            'yTi', 
-            'zTi', 
-            'xTx', 
-            'yTy', 
-            'zTz', 
-            'xTy', 
-            'xTz', 
-            'yTz'
-        ]
-        self.true_model = 'xTi+yTi+zTi+zTz'
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
-
-        self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
-            num_sites=self.num_sites,
-            true_model = self.true_model,
-            genes = available_terms, 
-            mutation_probability=0.25,
-            num_protected_elite_models = 2, 
-            unchanged_elite_num_generations_cutoff = 5, 
-            log_file=self.log_file
-        )
-        self.initial_models = self.genetic_algorithm.random_initial_models(16)
-
         self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
-        self.branch_comparison_strategy = 'optimal_graph'
+
+        # Genetic algorithm options
         self.tree_completed_initially = False
-        self.fitness_method =  'f_scores' # 'elo_ratings' 
-        self.max_spawn_depth = 16
+        self.branch_comparison_strategy = 'optimal_graph'
+        self.fitness_method =  'elo_ratings'  # 'f_score'
+
+        num_models_per_generation = 10
+        self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
+        self.max_spawn_depth = 8
+
+        # Logistics
+        self.max_time_to_consider = 4.24
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
@@ -79,7 +83,53 @@ class NVCentreGenticAlgorithm(
         }
         self.num_processes_to_parallelise_over = 16
         self.timing_insurance_factor = 1
-        self.max_time_to_consider = 20 
-        self.min_param = 0.4
-        self.max_param = 0.6
 
+
+
+
+class NVCentreExperimentalShortDynamicsGenticAlgorithm(
+    NVCentreSimulatedShortDynamicsGenticAlgorithm
+):
+    def __init__(
+        self,
+        growth_generation_rule,
+        true_model=None,
+        **kwargs
+    ):
+
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            true_model = true_model,
+            **kwargs
+        )
+        self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
+
+
+    def get_true_parameters(
+        self,
+    ):        
+        self.fixed_true_terms = True
+        self.true_hamiltonian = None
+        self.true_params_dict = {}
+        self.true_params_list = []
+
+
+    def get_measurements_by_time(
+        self
+    ):
+        data_path = os.path.abspath(
+            os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                'data/NVB_rescale_dataset.p'
+            )
+        )
+        self.log_print([
+            "Getting experimental data from {}".format(data_path)
+        ])
+        self.measurements = pickle.load(
+            open(
+                data_path,
+                'rb'
+            )
+        )
+        return self.measurements

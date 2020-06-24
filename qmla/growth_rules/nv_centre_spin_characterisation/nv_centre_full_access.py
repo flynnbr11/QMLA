@@ -42,7 +42,7 @@ class ExperimentFullAccessNV(
         # self.max_num_qubits = 3
         self.max_num_probe_qubits = 8
         self.tree_completed_initially = False
-        self.experimental_dataset = 'NVB_rescale_dataset.p'
+        # self.experimental_dataset = 'NVB_rescale_dataset.p'
         # self.measurement_type = 'full_access'
         self.fixed_axis_generator = False
         self.fixed_axis = 'z'  # e.g. transverse axis

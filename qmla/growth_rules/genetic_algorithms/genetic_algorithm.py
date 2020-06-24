@@ -33,7 +33,7 @@ class GeneticAlgorithmQMLA():
         self.base_terms = base_terms
         self.genes = list(sorted(genes))
         self.get_base_chromosome()
-        
+       
         if true_model is None: 
         
             r = random.randint(1, 2**self.num_terms-1)
@@ -41,6 +41,8 @@ class GeneticAlgorithmQMLA():
             self.true_model = self.map_chromosome_to_model(r)
         else:
             self.true_model = true_model
+
+
 
         self.true_chromosome = self.map_model_to_chromosome(self.true_model)
         self.true_chromosome_string = self.chromosome_string(
@@ -51,10 +53,13 @@ class GeneticAlgorithmQMLA():
         self.mutation_probability = mutation_probability
         self.mutation_count = 0
         self.previously_considered_chromosomes = []
-        self.log_file = log_file
         self.chromosomes_at_generation = {}
         self.delta_f_by_generation = {}
         self.genetic_generation = 0
+        self.log_file = log_file
+        self.log_print([
+            "Genes: {} \n Base chromosome: {}".format(self.genes, self.basic_chromosome)
+        ])
         self.f_score_change_by_generation = {}
         self.fitness_at_generation = {}
         self.models_ranked_by_fitness = {}

@@ -214,6 +214,26 @@ def hahn_evolution(
 #    return expect_value
 
 
+def make_inversion_gate_rotate_y(num_qubits):
+    r"""
+    returns the inversion gate for the Hahn eco evolution as numpy array
+
+    :parameter num_qubits: size of the inversion gate required
+
+    :output : inversion gate
+    """
+    from scipy import linalg
+    sigma_y = np.array([[0 + 0.j, 0 - 1.j], [0 + 1.j, 0 + 0.j]])
+    hahn_angle = np.pi / 2
+    hahn_gate = np.kron(
+        hahn_angle * sigma_y,
+        np.eye(2**(num_qubits - 1))
+    )
+    # inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()
+    inversion_gate = linalg.expm(-1j * hahn_gate)
+
+    return inversion_gate
+
 
 def make_inversion_gate(num_qubits):
     r"""
@@ -282,11 +302,13 @@ def n_qubit_hahn_evolution(
     from scipy import linalg
     num_qubits = int(np.log2(np.shape(ham)[0]))
 
-    try:
-        from qmla.shared_functionality.hahn_inversion_gates import precomputed_hahn_inversion_gates
-        inversion_gate = precomputed_hahn_inversion_gates[num_qubits]
-    except BaseException:
-        inversion_gate = make_inversion_gate(num_qubits)
+    # try:
+    #     from qmla.shared_functionality.hahn_inversion_gates import precomputed_hahn_inversion_gates
+    #     inversion_gate = precomputed_hahn_inversion_gates[num_qubits]
+    # except BaseException:
+    #     inversion_gate = make_inversion_gate(num_qubits)
+
+    inversion_gate = make_inversion_gate_rotate_y(num_qubits)
 
     # want to evolve for t, then apply Hahn inversion gate, 
     # then again evolution for (S * t)
@@ -370,6 +392,9 @@ def n_qubit_hahn_evolution(
 
     return 1 - expect_value
     # return expect_value
+
+
+
 
 
 
