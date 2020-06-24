@@ -68,10 +68,10 @@ class NVCentreRevivalsSimulated(
             'pauliSet_1_z_d{}'.format(n_qubits) : 1.94e9,
             
             # # coupling
-            # 'pauliSet_1J2_zJz_d{}'.format(n_qubits) : 2.14e6, 
-            # 'pauliSet_1J3_zJz_d{}'.format(n_qubits) : 2.14e6, 
-            # 'pauliSet_1J4_zJz_d{}'.format(n_qubits) : 2.14e6, 
-            # 'pauliSet_1J5_zJz_d{}'.format(n_qubits) : 2.14e6, 
+            'pauliSet_1J2_zJz_d{}'.format(n_qubits) : 2.14e6, 
+            'pauliSet_1J3_zJz_d{}'.format(n_qubits) : 2.14e6, 
+            'pauliSet_1J4_zJz_d{}'.format(n_qubits) : 2.14e6, 
+            'pauliSet_1J5_zJz_d{}'.format(n_qubits) : 2.14e6, 
 
             # 'pauliSet_1J2_yJy_d{}'.format(n_qubits) : 2.14e6, 
             # 'pauliSet_1J3_yJy_d{}'.format(n_qubits) : 2.14e6, 

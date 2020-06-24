@@ -308,11 +308,15 @@ def n_qubit_hahn_evolution(
     # except BaseException:
     #     inversion_gate = make_inversion_gate(num_qubits)
 
-    try:
-        from qmla.shared_functionality.hahn_y_gates import precomputed_hahn_y_inversion_gates
-        inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
-    except BaseException:
-        inversion_gate = make_inversion_gate(num_qubits)
+    # try:
+    #     from qmla.shared_functionality.hahn_y_gates import precomputed_hahn_y_inversion_gates
+    #     inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
+    # except BaseException:
+    #     inversion_gate = make_inversion_gate(num_qubits)
+
+    from qmla.shared_functionality.hahn_y_gates import precomputed_hahn_y_inversion_gates
+    inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
+
 
 
     # inversion_gate = make_inversion_gate_rotate_y(num_qubits)
