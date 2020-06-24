@@ -69,9 +69,9 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         self.branch_comparison_strategy = 'optimal_graph'
         self.fitness_method =  'elo_ratings'  # 'f_score'
 
-        num_models_per_generation = 10
+        num_models_per_generation = 14
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
-        self.max_spawn_depth = 8
+        self.max_spawn_depth = 12
 
         # Logistics
         self.fraction_particles_for_bf = 0.5
