@@ -51,8 +51,8 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
             'zTi': 1.65998543,
             'zTz': 0.76546868,
         }
-        self.min_param = 0.4
-        self.max_param = 0.6
+        self.min_param = 0
+        self.max_param = 10
 
         # Modular functions
         self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
