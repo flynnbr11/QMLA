@@ -24,9 +24,9 @@ __all__ = [
     'Genetic', 
     'GeneticTest',
     'GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms'
-    # 'GeneticAlgorithmQMLA'
 ]
-# flatten list of lists
+
+# flatten list of lists # TODO replace calls with calls to qmla.utilities.flatten
 def flatten(l): return [item for sublist in l for item in sublist]
 
 def hamming_distance(str1, str2):
@@ -70,12 +70,6 @@ class Genetic(
         self.prune_complete = True
         self.fitness_by_f_score = pd.DataFrame()
         self.fitness_df = pd.DataFrame()
-        # self.ising_full_connectivity = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5'
-        # self.heisenberg_xxz_small = 'pauliSet_1J2_xJx_d3+pauliSet_1J3_yJy_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
-        # self.four_site_true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4'
-        # self.three_site_true_model = 'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3'
-        # self.true_model = self.four_site_true_model
-        # self.true_model = qmla.construct_models.alph(self.true_model)
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
         self.num_probes = 50
         self.max_num_qubits = 7
@@ -85,15 +79,6 @@ class Genetic(
             'pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
             'pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
         ]
-        # if self.num_sites < 4 : 
-        #     # to keep state spaces reasonable for development.
-        #     self.base_terms = [
-        #         'x', 'y',  'z'
-        #     ]
-        # else: 
-        #     self.base_terms = [
-        #         'x', 'z',
-        #     ]
         self.spawn_step = 1 # 1st generation's ID
 
         self.mutation_probability = 0.1
@@ -106,13 +91,6 @@ class Genetic(
             mutation_probability=self.mutation_probability,
             log_file=self.log_file
         )
-        # self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
-        #     num_sites=self.num_sites,
-        #     true_model = self.true_model,
-        #     base_terms=self.base_terms,
-        #     mutation_probability=self.mutation_probability,
-        #     log_file=self.log_file
-        # )
 
 
         self.true_chromosome = self.genetic_algorithm.true_chromosome
@@ -120,8 +98,8 @@ class Genetic(
 
         self.num_possible_models = 2**len(self.true_chromosome)
 
-        # self.true_model = 'pauliSet_xJx_1J2_d3+pauliSet_yJy_1J2_d3'
         self.max_num_probe_qubits = self.num_sites
+
         # default test - 32 generations x 16 starters
         self.max_spawn_depth = 24
         self.initial_num_models = 16
