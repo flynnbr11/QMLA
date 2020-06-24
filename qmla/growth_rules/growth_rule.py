@@ -575,9 +575,6 @@ class GrowthRule():
 
         plot_times = [np.round(a, 2) if a>0.1 else a for a in raw_times]
         plot_times = sorted(plot_times)
-        self.log_print([
-            "plot times:", plot_times,
-        ])
 
         self.measurements = {
             t : self.expectation_value(
@@ -857,6 +854,7 @@ class GrowthRule():
 
     ##########
     # Section: Tree growth
+    # Methods related to the generation and grouping of models
     ##########
 
     def generate_models(

@@ -74,6 +74,8 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         self.max_spawn_depth = 8
 
         # Logistics
+        self.fraction_particles_for_bf = 0.5
+        self.fraction_experiments_for_bf = 0.5
         self.max_time_to_consider = 4.24
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
