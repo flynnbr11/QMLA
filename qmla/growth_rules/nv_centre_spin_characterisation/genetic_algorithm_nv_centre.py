@@ -66,13 +66,15 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
 
         # Genetic algorithm options
         self.tree_completed_initially = False
-        self.branch_comparison_strategy = 'optimal_graph'
+        # self.branch_comparison_strategy = 'optimal_graph'
         self.fitness_method =  'elo_ratings'  # 'f_score'
 
         num_models_per_generation = 2
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [
+            'xTi+yTi+zTi',
             'xTi+yTi+zTi+zTz', 
+            'xTi+yTi+zTi+xTx+yTy+zTz+xTy+xTz+yTz', 
             'xTi+yTi+zTi+xTx+yTy+zTz+xTy+xTz+yTz', 
         ]
         self.initial_models = [ 

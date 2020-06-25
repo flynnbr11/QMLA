@@ -189,7 +189,6 @@ class ModelInstanceForComparison():
                 ),
             )
             self.qinfer_updater._normalization_record = self.model_normalization_record
-            # self.qinfer_updater._log_total_likelihood = self.log_total_likelihood
         else:
             # Optionally pickle the entire updater
             # (first include updater in ModelInstanceForLearning.learned_info_dict())
