@@ -69,13 +69,21 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         self.branch_comparison_strategy = 'optimal_graph'
         self.fitness_method =  'elo_ratings'  # 'f_score'
 
-        num_models_per_generation = 14
+        num_models_per_generation = 2
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
-        self.max_spawn_depth = 12
+        self.initial_models = [
+            'xTi+yTi+zTi+zTz', 
+            'xTi+yTi+zTi+xTx+yTy+zTz+xTy+xTz+yTz', 
+        ]
+        self.initial_models = [ 
+            qmla.construct_models.alph(m) for m in self.initial_models
+        ]
+        self.max_spawn_depth = 1
 
         # Logistics
         self.fraction_particles_for_bf = 0.5
-        self.fraction_experiments_for_bf = 0.5
+        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_opponents_experiments_for_bf = 0
         self.max_time_to_consider = 4.24
         if self.tree_completed_initially:
             self.max_spawn_depth = 1

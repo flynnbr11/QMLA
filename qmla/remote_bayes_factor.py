@@ -129,31 +129,24 @@ def remote_bayes_factor_calculation(
         port_number=port_number,
     )
 
-    # By default, use times the other model trained on, up to t_idx given.
-    if num_times_to_use == 'all':
-        first_t_idx = 0
-    else:
-        first_t_idx = len(model_a.times_learned_over) - num_times_to_use
-
-    update_times_model_a = model_b.times_learned_over[first_t_idx:]
-    update_times_model_b = model_a.times_learned_over[first_t_idx:]
-
     # Take a copy of each updater before updates (for plotting later)
     updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
     updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
 
     # Update the models with the times trained by the other model.
-    log_l_a = updated_log_likelihood(
-        model_a,
-        update_times_model_a,
-        log_file=log_file,
+    log_l_a = model_a.update_log_likelihood(
+        new_times = model_b.times_learned_over
     )
-    log_l_b = updated_log_likelihood(
-        model_b,
-        update_times_model_b,
-        log_file=log_file,
+    log_l_b = model_b.update_log_likelihood(
+        new_times = model_a.times_learned_over
     )
-    bayes_factor = np.exp(log_l_a - log_l_b)
+    bayes_factor = np.exp( log_l_a - log_l_b )
+
+    diff_in_bf_times = (
+        list ( set(model_a.bf_times) - set(model_b.bf_times) ) 
+        + list (set(model_b.bf_times) - set(model_a.bf_times) )
+    ) # should be empty if same experiments were used for A and B
+    log_print(["Difference in times:", diff_in_bf_times])
 
     # Plot the posterior of the true model only
     if (
@@ -179,19 +172,19 @@ def remote_bayes_factor_calculation(
             log_print(["Plotting posterior marginal of true model failed."])
             pass
 
-    # Plot dynamics on which models were compared, if one of the pair is the
-    # true model
+    # Plot dynamics on which models were compared
     if (
         plot_true_mod_post_bayes_factor_dynamics
     ):
         try:
+            times_used = model_a.bf_times + model_b.bf_times
             plot_models_dynamics(
                 model_a,
                 model_b,
                 exp_msmts=qmla_core_info_dict['experimental_measurements'],
                 plot_probes_path=qmla_core_info_dict['probes_plot_file'],
                 bayes_factor=bayes_factor,
-                bf_times=update_times_model_a,
+                bf_times=times_used,
                 qmla_id=qid,
                 log_file=log_file,
                 save_directory=bf_data_folder,
@@ -372,7 +365,7 @@ def plot_models_dynamics(
         ax1.plot(
             times,
             mod_exp_vals,
-            label=str(mod.model_id)
+            label=str("({}) {}".format(mod.model_id, mod.model_name_latex ))
         )
     try:
         # in background, show how often that time was considered

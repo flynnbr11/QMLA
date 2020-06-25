@@ -86,7 +86,10 @@ class BaseHeuristicQMLA(qi.Heuristic):
 
     def __call__(self, **kwargs):
         # Process some data from the model first
-        current_volume = kwargs['current_volume']
+        try:
+            current_volume = kwargs['current_volume']
+        except:
+            current_volume = None
         self._volumes.append(current_volume)
 
         if self._updater.just_resampled:
@@ -318,7 +321,7 @@ class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
         t_list.remove(0)  # dont want to waste an epoch on t=0
         t_list = [np.round(t, 2) for t in t_list]
         # random.shuffle(t_list)
-        self._time_list = iter( t_list )
+        self._time_list = itertools.cycle( t_list )
         
 
     def design_experiment(

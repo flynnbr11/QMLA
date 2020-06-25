@@ -83,6 +83,7 @@ class ModelInstanceForComparison():
             self.probes_simulator = qmla_core_info_database['probes_simulator']
 
         # Assign attributes based on core data
+        self.num_experiments = qmla_core_info_dict['num_experiments']
         self.num_particles = qmla_core_info_dict['num_particles']
         self.probe_number = qmla_core_info_dict['num_probes']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
@@ -144,6 +145,7 @@ class ModelInstanceForComparison():
             growth_generation_rule=self.growth_rule_of_this_model,
             log_file=self.log_file
         )
+        self.model_name_latex = self.growth_class.latex_name(self.model_name)
 
         # New instances of model and updater used by QInfer
         self.log_print(["Getting QInfer model"])
@@ -187,7 +189,7 @@ class ModelInstanceForComparison():
                 ),
             )
             self.qinfer_updater._normalization_record = self.model_normalization_record
-            self.qinfer_updater._log_total_likelihood = self.log_total_likelihood
+            # self.qinfer_updater._log_total_likelihood = self.log_total_likelihood
         else:
             # Optionally pickle the entire updater
             # (first include updater in ModelInstanceForLearning.learned_info_dict())
@@ -195,8 +197,78 @@ class ModelInstanceForComparison():
                 learned_model_info['updater']
             )
 
+        # Fresh experiment design heuristic
+        self.experiment_design_heuristic = self.growth_class.heuristic(
+            model_id=self.model_id,
+            updater=self.qinfer_updater,
+            oplist=self.model_terms_matrices,
+            num_experiments=self.num_experiments,
+            log_file=self.log_file,
+            inv_field=[item[0]
+                       for item in self.qinfer_model.expparams_dtype[1:]],
+            max_time_to_enforce=self.growth_class.max_time_to_consider,
+        )
+
         # Delete extra data now that everything useful is extracted
         del qmla_core_info_dict, learned_model_info
+
+    ##########
+    # Section: update for Bayes factor
+    ##########
+
+    def update_log_likelihood(
+        self, 
+        new_times, 
+    ):
+        r"""
+
+        """
+
+        # Rewrite normalization record using only experiments to consider
+        experiment_id_to_keep = int(
+            len(self.qinfer_updater.normalization_record)
+            - (self.growth_class.fraction_own_experiments_for_bf * len(self.qinfer_updater.normalization_record) ) 
+        )
+        self.qinfer_updater._normalization_record = self.qinfer_updater._normalization_record[experiment_id_to_keep:]
+        self.bf_times = self.times_learned_over[experiment_id_to_keep:]
+        
+        # List of opponent's times, possibly shortened
+        experiment_id_to_keep = int(
+            len(new_times)
+            - (self.growth_class.fraction_opponents_experiments_for_bf * len(new_times) ) 
+        )
+        self.times_to_update = new_times[experiment_id_to_keep:]
+        self.bf_times += self.times_to_update
+        self.bf_times = qmla.utilities.flatten(self.bf_times)
+        self.log_print(["Times to update length:", len(self.times_to_update)])
+
+        epoch_id = len(self.times_learned_over)
+
+        # Update with times of opponent
+        for t in self.times_to_update: 
+            experiment = self.experiment_design_heuristic(
+                epoch_id = epoch_id
+            )
+            experiment['t'] = t
+
+            params_array = np.array([[
+                self.true_model_params[:]
+            ]])
+            datum = self.qinfer_model.simulate_experiment(
+                params_array,
+                experiment,
+                repeat=1
+            )
+            self.qinfer_updater.update(datum, experiment)
+            epoch_id += 1
+
+        self.log_print([
+            "Final norm record has length {}. LL:{}".format(
+            len(self.qinfer_updater.normalization_record),
+            self.qinfer_updater.log_total_likelihood
+            )
+        ])
+        return self.qinfer_updater.log_total_likelihood
 
     ##########
     # Section: Utilities

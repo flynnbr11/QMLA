@@ -262,7 +262,9 @@ class GrowthRule():
         self.qinfer_resampler_a = 0.98
         self.qinfer_resampler_threshold = 0.5
         self.hard_fix_resample_effective_sample_size = None
-        self.fraction_experiments_for_bf = 1.0
+        self.fraction_experiments_for_bf = 1 # TODO remove
+        self.fraction_own_experiments_for_bf = 1.0
+        self.fraction_opponents_experiments_for_bf = 1.0
         self.fraction_particles_for_bf = 1.0 # testing whether reduced num particles for BF can work 
 
         # Plotting
