@@ -160,10 +160,9 @@ class GrowthRuleTree():
                 pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
                     model_names=model_list
                 )
-                self.log_print(
-                    [
-                        "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
-                            len(pairs_to_compare))])
+                self.log_print([
+                    "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
+                        len(pairs_to_compare))])
                 self.graphs[self.spawn_step] = graph
             else:
                 pairs_to_compare = 'all'

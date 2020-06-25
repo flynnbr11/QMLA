@@ -854,7 +854,9 @@ class GrowthRule():
 
     ##########
     # Section: Tree growth
-    # Methods related to the generation and grouping of models
+    # Methods related to the spawning/pruning models, 
+    # and checking whether the growth rule has concluded 
+    # each stage, or concluded overall.
     ##########
 
     def generate_models(
@@ -864,9 +866,56 @@ class GrowthRule():
     ):
         r"""
         Determine the next set of models for this growth rule. 
+        
+        This method is the main driver of QMLA. 
+        This method is called iteratively during the ``spawn`` stage 
+        of QMLA, until :meth:`~qmla.growth_rules.GrowthRule.check_tree_completed`
+        returns ``True``, for instance after a fixed depth of spawning. 
+        In particular it is called by :meth:`~qmla.GrowthRuleTree.next_layer`, 
+        which either spawns on the GR tree, or prunes it. 
+
+        Custom GRs must use this method to determine a set of models for 
+        QMLA to consider on the next layer (or :class:`~qmla.BranchQMLA`)
+        of QMLA.
+        Such a set of models can be constructed based on the results of the
+        previous layers, or according to any logic required by the GR. 
+
+        Custom methods to replace this have access to the following 
+        parameters, and must return the same format of outputs. 
+        # TODO remove old/unused data passed to this method
+
+        :param list model_list: 
+            list of models on the previous QMLA layer, 
+            ordered by their ranking on that layer. 
+        :param dict model_names_ids: 
+            map ``ID : model_name`` for all models in the 
+            :class:`~qmla.QuantumModelLearningAgent` instance.
+        :param int called_by_branch: 
+            the branch ID from which QMLA is spawning. 
+            This does not always need to be set; 
+            it is mostly used by the :class:`~qmla.GrowthRuleTree`
+            to track which models/branches are parents/children 
+            of each other. 
+        :param dict branch_model_points:
+            `` ID : number_wins `` number of wins of each model 
+            in the previous branch. 
+        :param dict evaluation_log_likelihoods:
+            `` ID : eval_log_likel `` foe each model in the previous
+            branch, where ``eval_log_likel`` is the log likelihood
+            computed against a set of validation data (i.e. not the
+            data on which the model was trained.)
+        :param dict model_dict: 
+            lists of models in the QMLA instance, 
+            organised by corresponding number 
+            of qubits.
+
+        :return list model_names: names of models as unique strings
+            where terms in each model are separated by ``+``, 
+            and each term in each model is interpretable by 
+            :func:`~qmla.process_basic_operator`.
+
         """
-        # default is to just return given model list and set spawn stage to
-        # complete
+
         return model_list
 
 
