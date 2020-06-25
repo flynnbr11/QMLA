@@ -69,18 +69,18 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         # self.branch_comparison_strategy = 'optimal_graph'
         self.fitness_method =  'elo_ratings'  # 'f_score'
 
-        num_models_per_generation = 2
+        num_models_per_generation = 14
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
-        self.initial_models = [
-            'xTi+yTi+zTi',
-            'xTi+yTi+zTi+zTz', 
-            'xTi+yTi+zTi+yTy+zTz+yTz', 
-            'xTi+yTi+zTi+xTx+yTy+zTz+xTy+xTz+yTz', 
-        ]
+        # self.initial_models = [
+        #     'xTi+yTi+zTi',
+        #     'xTi+yTi+zTi+zTz', 
+        #     'xTi+yTi+zTi+yTy+zTz+yTz', 
+        #     'xTi+yTi+zTi+xTx+yTy+zTz+xTy+xTz+yTz', 
+        # ]
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models
         ]
-        self.max_spawn_depth = 1
+        self.max_spawn_depth = 8
 
         # Logistics
         self.fraction_particles_for_bf = 0.5
@@ -95,8 +95,8 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
             'other': 0
         }
         # self.num_processes_to_parallelise_over = 16
-        self.num_processes_to_parallelise_over = 4
-        self.timing_insurance_factor = 2
+        self.num_processes_to_parallelise_over = 16
+        self.timing_insurance_factor = 0.25
 
 
 
