@@ -80,7 +80,7 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models
         ]
-        self.max_spawn_depth = 4
+        self.max_spawn_depth = 16
 
         # Logistics
         self.fraction_particles_for_bf = 0.5
