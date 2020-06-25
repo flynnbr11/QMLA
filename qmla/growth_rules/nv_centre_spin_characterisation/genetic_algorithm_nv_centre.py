@@ -74,7 +74,7 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         self.initial_models = [
             'xTi+yTi+zTi',
             'xTi+yTi+zTi+zTz', 
-            'xTi+yTi+zTi+xTx+yTy+zTz+xTy+xTz+yTz', 
+            'xTi+yTi+zTi+yTy+zTz+yTz', 
             'xTi+yTi+zTi+xTx+yTy+zTz+xTy+xTz+yTz', 
         ]
         self.initial_models = [ 
@@ -94,7 +94,8 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
             'other': 0
         }
-        self.num_processes_to_parallelise_over = 16
+        # self.num_processes_to_parallelise_over = 16
+        self.num_processes_to_parallelise_over = 4
         self.timing_insurance_factor = 1
 
 
