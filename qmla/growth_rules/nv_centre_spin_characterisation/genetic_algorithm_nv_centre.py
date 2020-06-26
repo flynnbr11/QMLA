@@ -86,7 +86,7 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         self.fraction_particles_for_bf = 0.5
         self.fraction_own_experiments_for_bf = 0.5
         self.fraction_opponents_experiments_for_bf = 0
-        self.max_time_to_consider = 4.24
+        self.max_time_to_consider = 10
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
@@ -117,7 +117,7 @@ class NVCentreExperimentalShortDynamicsGenticAlgorithm(
             **kwargs
         )
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
-
+        self.max_time_to_consider = 4.24
 
     def get_true_parameters(
         self,
